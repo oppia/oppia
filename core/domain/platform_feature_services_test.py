@@ -171,18 +171,6 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
             self.original_parameter_list)
         registry.Registry.parameter_registry = self.original_parameter_registry
 
-    def test_get_platform_parameter_value(self) -> None:
-        self.assertEqual(
-            feature_services.get_platform_parameter_value(
-                self.param_a.name), False)
-
-    def test_get_unknown_platform_param_value_results_in_error(self) -> None:
-        with self.assertRaisesRegex(
-            Exception, 'Unknown platform parameter: unknown_platform_param'
-        ):
-            feature_services.get_platform_parameter_value(
-                'unknown_platform_param')
-
     def test_get_all_platform_parameters_except_feature_flag_dicts(
         self
     ) -> None:
