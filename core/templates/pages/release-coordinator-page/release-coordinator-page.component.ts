@@ -79,8 +79,8 @@ export class ReleaseCoordinatorPageComponent implements OnInit {
     });
   }
 
-  updatePromoBarConfig(): void {
-    this.statusMessage = 'Updating promo-bar config...';
+  updatePromoBarParameter(): void {
+    this.statusMessage = 'Updating promo-bar platform parameter...';
     this.promoBarBackendApiService.updatePromoBarDataAsync(
       this.promoBarConfigForm.controls.enabled.value,
       this.promoBarConfigForm.controls.message.value).then(() => {
