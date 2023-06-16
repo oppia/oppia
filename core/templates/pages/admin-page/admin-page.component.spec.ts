@@ -111,6 +111,15 @@ describe('Admin Page component ', () => {
     expect(result).toBe(true);
   });
 
+  it('should check whether the admin platform params tab is open', () => {
+    // Setting admin platform params tab to be open.
+    spyOn(adminRouterService, 'isPlatformParamsTabOpen').and.returnValue(true);
+
+    let result = component.isPlatformParamsTabOpen();
+
+    expect(result).toBe(true);
+  });
+
   it('should check whether the admin roles tab is open', () => {
     // Setting admin roles tab to be open.
     spyOn(adminRouterService, 'isRolesTabOpen').and.returnValue(true);
