@@ -12,12 +12,16 @@ services:
     environment:
       - production=false
       - NODE_ENV=development
-    depends_on:
-      - firebase
-      - redis
-    # command: ./node_modules/.bin/ng build --watch
+    # command: >
+    #   sh -c '/app/oppia/wait-for-it.sh --folder=/app/oppia/webpack_bundles && trap "rm ./node_modules/@angular/compiler-cli/ngcc/__ngcc_lock_file__" EXIT && ./node_modules/.bin/ng build --watch'
+    healthcheck:
+      # TODO: Add a variable for the folder name inside the dist as per the prod_env flag is passed or not.
+      test: bash -c "[ -f /app/oppia/dist/oppia-angular/index.html ]]"
+      interval: 1m
+      timeout: 5s
+      retries: 5
     command: >
-      sh -c '/app/oppia/wait-for-it.sh --folder=/app/oppia/webpack_bundles && trap "rm ./node_modules/@angular/compiler-cli/ngcc/__ngcc_lock_file__" EXIT && ./node_modules/.bin/ng build --watch'
+      sh -c 'trap "rm ./node_modules/@angular/compiler-cli/ngcc/__ngcc_lock_file__" EXIT; ./node_modules/.bin/ng build --watch'
 
   webpack-compiler:
     platform: linux/arm64
@@ -27,6 +31,15 @@ services:
       dockerfile: Dockerfile
     volumes:
       - shared_root_dir:/app/oppia
+    depends_on:
+      webserver:
+        condition: service_healthy
+    healthcheck:
+      test: bash -c "[ -f /app/oppia/webpack_bundles/0.bundle.js ]]"
+      interval: 1m
+      timeout: 5s
+      retries: 5
+      start_period: 2m
     command: node ./node_modules/webpack/bin/webpack.js --config ./webpack.dev.config.ts --watch
 
   google_app_engine:
@@ -35,18 +48,33 @@ services:
       dockerfile: Dockerfile.google_cloud_sdk
     container_name: oppia-app-engine
     ports:
-      # - "8089:8089"
       - "8181:8181"
       - "8000:8000"
     volumes:
       - shared_root_dir:/app/oppia
-    links:
-      - redis
+    # links:
+    #   - redis
     depends_on:
-      - webserver
-      - webpack-compiler
+      webserver:
+        condition: service_healthy
+      webpack-compiler:
+        condition: service_healthy
+      datastore:
+        condition: service_healthy
+      firebase:
+        condition: service_healthy
+      redis:  
+        condition: service_healthy
+      elasticsearch:  
+        condition: service_healthy
+    healthcheck:
+      test: curl -f http://localhost:8181/ || exit 1
+      interval: 1m
+      timeout: 10s
+      retries: 5
+      start_period: 30s
     # command: /google-cloud-sdk/bin/dev_appserver.py --runtime python38 --host=0.0.0.0 --port=8181 --log_level=info --admin_host=0.0.0.0 --admin_port=8000 --dev_appserver_log_level=info --skip_sdk_update_check=True --enable_host_checking=False --automatic_restart=True /app/oppia/app_dev.yaml
-    command: /app/oppia/wait-for-it.sh --folder=/app/oppia/dist/oppia-angular -- /google-cloud-sdk/bin/dev_appserver.py /app/oppia/app_dev.yaml --runtime python38 --host=0.0.0.0 --port=8181
+    command: /google-cloud-sdk/bin/dev_appserver.py /app/oppia/app_dev.yaml --runtime python38 --host=0.0.0.0 --port=8181
   
   datastore:
     build:
@@ -58,8 +86,16 @@ services:
     volumes:
       - shared_root_dir:/app/oppia
     depends_on:
-      - google_app_engine
-    command: ../google-cloud-sdk/platform/cloud-datastore-emulator/cloud_datastore_emulator start --host=0.0.0.0 --port=8089 --store_on_disk=False  --consistency=1.0 /app/cloud_datastore_emulator_cache
+      webserver:
+        condition: service_healthy
+      webpack-compiler:
+        condition: service_healthy
+    healthcheck:
+      test: curl -f http://localhost:8089/ || exit 1
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    command: /google-cloud-sdk/platform/cloud-datastore-emulator/cloud_datastore_emulator start --host=0.0.0.0 --port=8089 --store_on_disk=False --consistency=1.0 /app/cloud_datastore_emulator_cache
 
   firebase:
     image: node:16.13.0-alpine
@@ -69,6 +105,12 @@ services:
       - "4000:4000"
     volumes:
       - shared_root_dir:/app/oppia
+    healthcheck:
+      test: curl -f http://localhost:4000/auth/ || exit 1
+      # test: curl -f http://localhost:9099/ || exit 1
+      interval: 30s
+      timeout: 10s
+      retries: 5
     command: /app/oppia/node_modules/firebase-tools/lib/bin/firebase.js emulators:start --only auth --project dev-project-id --config /app/oppia/.firebase.json --import /app/firebase_emulator_cache --export-on-exit /app/firebase_emulator_cache
 
   redis:
@@ -76,6 +118,11 @@ services:
     container_name: oppia-redis
     ports:
       - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli ping | grep PONG"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
     # command: redis-server --bind 0.0.0.0 --port 6379 --save "60 1" --tcp-keepalive 300 --dbfilename dump.rdb --dir /app/oppia/ --rdbcompression yes --appendonly yes
     # command: redis-server /app/oppia/redis.conf
 
@@ -89,12 +136,15 @@ services:
     environment:
       - ES_JAVA_OPTS=-Xms100m -Xmx500m
       - ES_PATH_CONF=/usr/share/elasticsearch/config
-      # - bootstrap.memory_lock=true
       - discovery.type=single-node
-    # ulimits:
-    #   memlock:
-    #     soft: -1
-    #     hard: -1
+    depends_on:
+      datastore:
+        condition: service_healthy
+    healthcheck:
+      test: curl -f http://localhost:9200/ || exit 1
+      interval: 30s
+      timeout: 10s
+      retries: 5
     command: elasticsearch -q
 
 volumes:
