@@ -77,6 +77,7 @@ export class GoalsTabComponent implements OnInit {
     NEITHER: 2
   };
 
+  indexOfSelectedTopic: number = -1;
   activityType: string = AppConstants.ACTIVITY_TYPE_LEARN_TOPIC;
   editGoalsTopicPageUrl: string[] = [];
   completedGoalsTopicPageUrl: string[] = [];
@@ -191,6 +192,12 @@ export class GoalsTabComponent implements OnInit {
 
   toggleThreeDotsDropdown(index: number): void {
     this.showThreeDotsDropdown[index] = !this.showThreeDotsDropdown[index];
+    if (this.indexOfSelectedTopic !== index) {
+      this.indexOfSelectedTopic = index;
+    } else {
+      this.indexOfSelectedTopic = -1;
+    }
+    return;
   }
 
   /**
