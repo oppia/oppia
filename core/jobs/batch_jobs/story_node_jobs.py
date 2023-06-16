@@ -20,6 +20,7 @@ from __future__ import annotations
 
 import logging
 
+from core import utils
 from core.jobs import base_jobs
 from core.jobs.io import ndb_io
 from core.jobs.transforms import job_result_transforms
@@ -50,8 +51,9 @@ class PopulateStoryNodeJob(base_jobs.JobBase):
         story_models.StoryModel,
         Tuple[str, Exception]
     ]:
-        """Populate the new fields in each story node of the StoryModel
-        instance.
+        """Populate the 5 new fields in each story node of the StoryModel
+        instance, namely: status, planned_publication_date_msecs,
+        last_modified_msecs, first_publication_date_msecs, unpublishing_reason.
 
         Args:
             story_model: StoryModel. The story whose nodes have to be
@@ -69,27 +71,29 @@ class PopulateStoryNodeJob(base_jobs.JobBase):
                 topic_model = topic_models.TopicModel.get(
                     story_model.corresponding_topic_id)
                 story_reference = next(
-                    x for x in topic_model.canonical_story_references
-                        if x['story_id'] == story_model.id)
+                    story_ref for story_ref in (
+                        topic_model.canonical_story_references)
+                        if story_ref['story_id'] == story_model.id)
                 for node in nodes:
                     node['unpublishing_reason'] = None
-
+                    node['status'] = 'Draft'
                     if story_reference['story_is_published']:
                         node['status'] = 'Published'
-                    else:
-                        node['status'] = 'Draft'
 
                     current_topic_version = topic_model.version
                     story_published_on = None
                     for version in range(current_topic_version, 0, -1):
+                        snapshot_id = topic_model.get_snapshot_id(
+                            topic_model.id, version)
                         topic_metadata = (
-                            topic_models.TopicModel.get_snapshots_metadata(
-                                topic_model.id, [version]))
-                        for cmd in topic_metadata[0]['commit_cmds']:
+                            topic_models.TopicSnapshotMetadataModel.get(
+                                snapshot_id))
+                        for cmd in topic_metadata.commit_cmds:
                             if (cmd['cmd'] == 'publish_story' and
                                 cmd['story_id'] == story_model.id):
                                 story_published_on = (
-                                    topic_metadata[0]['created_on_ms'])
+                                    utils.get_time_in_millisecs(
+                                    topic_metadata.created_on))
                                 break
                         if story_published_on is not None:
                             break
@@ -97,20 +101,24 @@ class PopulateStoryNodeJob(base_jobs.JobBase):
                     current_story_version = story_model.version
                     node_created_on = None
                     for version in range(current_story_version, 0, -1):
+                        snapshot_id = story_model.get_snapshot_id(
+                                story_model.id, version)
                         story_metadata = (
-                            story_models.StoryModel.get_snapshots_metadata(
-                                story_model.id, [version]))
-                        for cmd in story_metadata[0]['commit_cmds']:
+                            story_models.StorySnapshotMetadataModel.get(
+                                snapshot_id))
+                        for cmd in story_metadata.commit_cmds:
                             if (cmd['cmd'] == 'update_story_node_property' and
                                 cmd['node_id'] == node['id'] and
                                 node.get('last_modified_msecs') is None):
                                 node['last_modified_msecs'] = (
-                                    story_metadata[0]['created_on_ms'])
+                                    utils.get_time_in_millisecs(
+                                    story_metadata.created_on))
 
                             if (cmd['cmd'] == 'add_story_node' and
                                 cmd['node_id'] == node['id']):
                                 node_created_on = (
-                                    story_metadata[0]['created_on_ms'])
+                                    utils.get_time_in_millisecs(
+                                    story_metadata.created_on))
                                 break
                         if node_created_on is not None:
                             break
@@ -131,7 +139,6 @@ class PopulateStoryNodeJob(base_jobs.JobBase):
         except Exception as e:
             logging.exception(e)
             return result.Err((story_model.id, e))
-
         return result.Ok(story_model)
 
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:

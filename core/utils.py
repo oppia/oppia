@@ -623,16 +623,16 @@ def get_time_in_millisecs(datetime_obj: datetime.datetime) -> float:
     return msecs + (datetime_obj.microsecond / 1000.0)
 
 
-def convert_milisecs_time_to_datetime_object(
+def convert_millisecs_time_to_datetime_object(
         date_time_msecs: float) -> datetime.datetime:
-    """Returns date time object from the date time in miliseconds.
+    """Returns date time object from the date time in milliseconds.
 
     Args:
-        date_time_msecs: float. Date time represented in miliseconds.
+        date_time_msecs: float. Date time represented in milliseconds.
 
     Returns:
         datetime. An object of type datetime.datetime corresponding to
-        the given miliseconds.
+        the given milliseconds.
     """
     return datetime.datetime.fromtimestamp(date_time_msecs / 1000.0)
 

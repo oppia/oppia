@@ -779,9 +779,9 @@ class UtilsTests(test_utils.GenericTestBase):
         self.assertEqual(
             dt, datetime.datetime.fromtimestamp(msecs / 1000.0))
 
-    def test_convert_milisecs_time_to_datetime_object(self) -> None:
+    def test_convert_millisecs_time_to_datetime_object(self) -> None:
         msecs = 1000000.101
-        dt = utils.convert_milisecs_time_to_datetime_object(msecs)
+        dt = utils.convert_millisecs_time_to_datetime_object(msecs)
         self.assertEqual(
             msecs, (time.mktime(dt.timetuple())) * 1000.0 + (
             dt.microsecond / 1000.0)
