@@ -61,6 +61,7 @@ from core.domain import stats_domain
 from core.domain import stats_services
 from core.domain import suggestion_services
 from core.domain import taskqueue_services
+from core.domain import translation_domain
 from core.domain import translation_services
 from core.domain import user_domain
 from core.domain import user_services
@@ -2099,6 +2100,8 @@ def compute_models_to_put_when_saving_new_exp_version(
         old_content_id_set - new_content_id_set
     )
     content_ids_corresponding_translations_to_mark_needs_update = set()
+    language_code_to_new_translation = collections.defaultdict(
+        collections.defaultdict)
     for change in change_list:
         if change.cmd == exp_domain.CMD_MARK_TRANSLATIONS_NEEDS_UPDATE:
             content_ids_corresponding_translations_to_mark_needs_update.add(
@@ -2108,11 +2111,19 @@ def compute_models_to_put_when_saving_new_exp_version(
         if change.cmd == exp_domain.CMD_REMOVE_TRANSLATIONS:
             content_ids_corresponding_translations_to_remove.add(
                 change.content_id)
+        if change.cmd == exp_domain.CMD_EDIT_TRANSLATION:
+            language_code_to_new_translation[change.language_code][
+                change.content_id
+            ] = translation_domain.TranslatedContent.from_dict(
+                change.translation
+            )
+
     new_translation_models, translation_counts = (
         translation_services.compute_translation_related_change(
             updated_exploration,
             list(content_ids_corresponding_translations_to_remove),
             list(content_ids_corresponding_translations_to_mark_needs_update),
+            language_code_to_new_translation
         )
     )
     models_to_put.extend(new_translation_models)

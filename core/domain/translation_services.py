@@ -129,6 +129,8 @@ def compute_translation_related_change(
     updated_exploration: exp_domain.Exploration,
     content_ids_corresponding_translations_to_remove: List[str],
     content_ids_corresponding_translations_to_mark_needs_update: List[str],
+    language_code_to_new_translation: Dict[str, Dict[
+        str, translation_domain.TranslatedContent]]
 ) -> Tuple[List[translation_models.EntityTranslationsModel], Dict[str, int]]:
     """Cretase new EntityTranslation models corresponding to translation related
     changes.
@@ -139,6 +141,8 @@ def compute_translation_related_change(
             content Ids for translation removal.
         content_ids_corresponding_translations_to_mark_needs_update: List[str].
             The list of content Ids to mark translation needs update.
+        language_code_to_new_translation: Dict. The dict containing the new
+            translation content for each language.
 
     Returns:
         Tuple(list(EntityTranslationsModel), dict(str, int)). A tuple containing
@@ -152,14 +156,41 @@ def compute_translation_related_change(
             updated_exploration.version - 1
         ))
 
+    translation_language_codes = [
+        entity_translation.language_code
+        for entity_translation in old_translations
+    ]
+
+    for language_code in language_code_to_new_translation:
+        if language_code in translation_language_codes:
+            continue
+        old_translations.append(
+            translation_domain.EntityTranslation.create_empty(
+                feconf.TranslatableEntityType.EXPLORATION,
+                updated_exploration.id,
+                language_code,
+                updated_exploration.version - 1
+            )
+        )
+
     # Create new_translation_models with updated id and entity version.
     new_translation_models = []
     translation_counts = {}
     for entity_translation in old_translations:
+        # Required: The order of commands can affect whther the new translation
+        # should be removed or marked as needs update.
+        if entity_translation.language_code in language_code_to_new_translation:
+            entity_translation.translations.update(
+                language_code_to_new_translation[
+                    entity_translation.language_code
+                ]
+            )
         entity_translation.remove_translations(
             content_ids_corresponding_translations_to_remove)
         entity_translation.mark_translations_needs_update(
             content_ids_corresponding_translations_to_mark_needs_update)
+
+        entity_translation.validate()
 
         translation_counts[entity_translation.language_code] = (
             updated_exploration.get_translation_count(entity_translation))
@@ -173,7 +204,6 @@ def compute_translation_related_change(
                 entity_translation.to_dict()['translations']
             )
         )
-
     return new_translation_models, translation_counts
 
 

@@ -24,11 +24,13 @@ import { WrittenTranslationsBackendDict } from 'domain/exploration/WrittenTransl
 import { SubtitledHtmlBackendDict} from './subtitled-html.model';
 import { RecordedVoiceOverBackendDict} from './recorded-voiceovers.model';
 import { InteractionCustomizationArgsBackendDict } from 'interactions/customization-args-defs';
+import { TranslatedContentBackendDict } from './TranslatedContentObjectFactory';
 
 export type ExplorationChange = (
   ExplorationChangeAddState |
   ExplorationChangeAddWrittenTranslation |
   ExplorationChangeMarkTranslationsNeedsUpdate |
+  ExplorationChangeEditTranslation |
   ExplorationChangeRemoveTranslations |
   ExplorationChangeRenameState |
   ExplorationChangeDeleteState |
@@ -117,6 +119,13 @@ export interface ExplorationChangeAddWrittenTranslation {
 export interface ExplorationChangeMarkTranslationsNeedsUpdate {
   'cmd': 'mark_translations_needs_update';
   'content_id': string;
+}
+
+export interface ExplorationChangeEditTranslation {
+  'cmd': 'edit_translation';
+  'content_id': string;
+  'language_code': string;
+  'translation': TranslatedContentBackendDict;
 }
 
 export interface ExplorationChangeRemoveTranslations {
