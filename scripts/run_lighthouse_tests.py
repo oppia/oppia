@@ -114,6 +114,7 @@ def run_lighthouse_puppeteer_script(
         print('Puppeteer script failed. More details can be found above.')
         if vid_popen:
             vid_popen.kill()
+            vid_popen.wait()
             print('Saved video of failed script.')
 
         sys.exit(1)
@@ -251,7 +252,6 @@ def main(args: Optional[List[str]] = None) -> None:
             .input(format='x11grab', framerate=30, filename='desktop')
             .output(
             crf='0', preset='ultrafast', filename=video_path, c='libx264')
-
             .overwrite_output()
             )
         vid_popen = vid_popen.run_async(pipe_stdin=True)
