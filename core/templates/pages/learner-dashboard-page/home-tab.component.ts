@@ -26,7 +26,14 @@ import { WindowDimensionsService } from 'services/contextual/window-dimensions.s
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 
 import './home-tab.component.css';
+import { StorySummary } from 'domain/story/story-summary.model';
 
+interface storySummaryTile {
+  topicName: string;
+  storySummary: StorySummary;
+  storyProgress: number;
+  markTileAsGoal: boolean;
+}
  @Component({
    selector: 'oppia-home-tab',
    templateUrl: './home-tab.component.html',
@@ -51,6 +58,8 @@ export class HomeTabComponent {
   widthConst: number = 233;
   continueWhereYouLeftOffList: LearnerTopicSummary[] = [];
   windowIsNarrow: boolean = false;
+  storyInProgress: storySummaryTile[] = [];
+  storyInRecommended: storySummaryTile[] = [];
   directiveSubscriptions = new Subscription();
 
   constructor(
@@ -73,6 +82,36 @@ export class HomeTabComponent {
       for (var uniqueGoalId of uniqueGoalIds) {
         var index = allGoalIds.indexOf(uniqueGoalId);
         this.continueWhereYouLeftOffList.push(allGoals[index]);
+      }
+    }
+    if (this.currentGoals.length !== 0) {
+      var currentGoalsIds = [];
+      for (var goal of this.currentGoals) {
+        currentGoalsIds.push(goal.id);
+      }
+    }
+
+    for (var topicSummaryTile of this.continueWhereYouLeftOffList) {
+      for (var storySummary of topicSummaryTile.canonicalStorySummaryDicts) {
+        let stotyNodeCount = storySummary.getNodeTitles().length;
+        let storyCompletedNodeCount =
+        storySummary.getCompletedNodeTitles().length;
+
+        let storyProgress = Math.floor(
+          (storyCompletedNodeCount / stotyNodeCount) * 100);
+
+        var storyData: storySummaryTile = {
+          topicName: topicSummaryTile.name,
+          storySummary: storySummary,
+          storyProgress: storyProgress,
+          markTileAsGoal: currentGoalsIds.includes(topicSummaryTile.id)
+        };
+
+        if (storyProgress !== 0) {
+          this.storyInProgress.push(storyData);
+        } else {
+          this.storyInRecommended.push(storyData);
+        }
       }
     }
     this.windowIsNarrow = this.windowDimensionService.isWindowNarrow();

@@ -6,18 +6,18 @@
     <p class="continue-where-you-left-off-heading"
        [innerHTML]="'I18N_LEARNER_DASHBOARD_CONTINUE_WHERE_YOU_LEFT_OFF_SECTION' | translate" *ngIf="continueWhereYouLeftOffList.length !== 0">
     </p>
-    <p class="continue-where-you-left-off-heading"
+    <!-- <p class="continue-where-you-left-off-heading"
        [innerHTML]="'I18N_LEARNER_DASHBOARD_EMPTY_CONTINUE_WHERE_YOU_LEFT_OFF_SECTION_HEADING' | translate"
        *ngIf="continueWhereYouLeftOffList.length === 0">
-    </p>
-    <div class="empty-continue-where-you-left-off-section" *ngIf="continueWhereYouLeftOffList.length === 0">
+    </p> -->
+    <!-- <div class="empty-continue-where-you-left-off-section" *ngIf="continueWhereYouLeftOffList.length === 0">
       <p [innerHTML]="'I18N_LEARNER_DASHBOARD_EMPTY_CONTINUE_WHERE_YOU_LEFT_OFF_SECTION' | translate" class="empty-continue-where-you-left-off-section-text">
       </p>
       <a id="setting-a-goal-link" (click)="changeActiveSection()">
         <p [innerHTML]="'I18N_LEARNER_DASHBOARD_EMPTY_CONTINUE_WHERE_YOU_LEFT_OFF_SECTION_SET_A_GOAL' | translate" class="empty-continue-where-you-left-off-section-text">
         </p>
       </a>
-    </div>
+    </div> -->
     <div class="continue-where-you-left-off-scroll">
       <div class="continue-where-you-left-off-section" *ngIf="continueWhereYouLeftOffList.length !== 0"
         [ngStyle]="windowIsNarrow && {'width': width + 'px'}">
