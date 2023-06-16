@@ -333,7 +333,7 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
         self.assertIn('ABC error.', self.print_arr)
         self.assertIn(
             'Lighthouse checks failed. More details can be found above.',
-            self.print_arr)   
+            self.print_arr)
         self.assertIn('Saved video of failed check.', self.print_arr)
         self.assertTrue(vid_popen.poll() is not None)
         self.assertTrue(os.path.isfile(video_path))
