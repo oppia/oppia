@@ -19,6 +19,10 @@
                           (setStatusMessage)="setStatusMessage($event)">
   </oppia-admin-config-tab>
 
+  <oppia-admin-platform-parameters-tab *ngIf="isPlatformParamsTabOpen()"
+                                       (setStatusMessage)="setStatusMessage($event)">
+  </oppia-admin-platform-parameters-tab>
+
   <oppia-admin-roles-tab *ngIf="isRolesTabOpen()"
                          (setStatusMessage)="setStatusMessage($event)">
   </oppia-admin-roles-tab>
