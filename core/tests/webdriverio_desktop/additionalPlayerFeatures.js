@@ -260,6 +260,7 @@ describe('Full exploration editor', function() {
 
       await explorationPlayerPage.expectContentToMatch(
         await forms.toRichText('this is card 1'));
+      await browser.execute('window.click();');
       await explorationPlayerPage.submitAnswer('NumericInput', 21);
       await explorationPlayerPage.expectContentToMatch(
         await forms.toRichText('this is card 2 with previous answer 21'));

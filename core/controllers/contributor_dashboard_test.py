@@ -49,7 +49,7 @@ if MYPY:  # pragma: no cover
 class ContributorDashboardPageTest(test_utils.GenericTestBase):
     """Test for showing contributor dashboard pages."""
 
-    def test_page_with_enabled_contributor_dashboard_loads_correctly(
+    def test_contributor_dashboard_page_loads_correctly(
         self
     ) -> None:
         response = self.get_html_response(feconf.CONTRIBUTOR_DASHBOARD_URL)
