@@ -38,6 +38,20 @@ import { PlatformParameterFilterType, ServerMode } from
 import { FeatureStage, PlatformParameter } from 'domain/platform_feature/platform-parameter.model';
 import { HttpErrorResponse } from '@angular/common/http';
 
+class MockWindowRef {
+  nativeWindow = {
+    confirm() {
+      return true;
+    },
+    alert() {
+      return null;
+    },
+    prompt() {
+      return 'mock msg';
+    }
+  };
+}
+
 
 describe('Admin page platform parameters tab', () => {
   let component: AdminPlatformParametersTabComponent;
@@ -45,18 +59,22 @@ describe('Admin page platform parameters tab', () => {
   let adminDataService: AdminDataService;
   let featureApiService: PlatformFeatureAdminBackendApiService;
   let adminTaskManagerService: AdminTaskManagerService;
-  let windowRef: WindowRef;
+  let mockWindowRef: MockWindowRef;
 
   let updateApiSpy: jasmine.Spy;
 
-  let mockConfirmResult: (val: boolean) => void;
-  let mockPromptResult: (msg: string | null) => void;
-
   beforeEach(async(() => {
+    mockWindowRef = new MockWindowRef();
     TestBed.configureTestingModule({
       imports: [FormsModule, HttpClientTestingModule],
       declarations: [AdminPlatformParametersTabComponent],
-      providers: [AdminTaskManagerService],
+      providers: [
+        AdminTaskManagerService,
+        {
+          provide: WindowRef,
+          useValue: mockWindowRef
+        }
+      ],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
 
@@ -64,18 +82,7 @@ describe('Admin page platform parameters tab', () => {
     component = fixture.componentInstance;
     adminDataService = TestBed.get(AdminDataService);
     featureApiService = TestBed.get(PlatformFeatureAdminBackendApiService);
-    windowRef = TestBed.get(WindowRef);
     adminTaskManagerService = TestBed.get(AdminTaskManagerService);
-
-    let confirmResult = true;
-    let promptResult: string | null = 'mock msg';
-    spyOnProperty(windowRef, 'nativeWindow').and.returnValue({
-      confirm: () => confirmResult,
-      prompt: () => promptResult,
-      alert: () => null
-    } as unknown as Window);
-    mockConfirmResult = val => confirmResult = val;
-    mockPromptResult = msg => promptResult = msg;
 
     spyOn(adminDataService, 'getDataAsync').and.resolveTo({
       platformParameters: [
@@ -289,6 +296,7 @@ describe('Admin page platform parameters tab', () => {
 
   describe('.clearChanges', () => {
     it('should clear changes', () => {
+      spyOn(mockWindowRef.nativeWindow, 'confirm').and.returnValue(true);
       const platformParameter = component.platformParameters[0];
       const originalRules = cloneDeep(platformParameter.rules);
 
@@ -300,7 +308,7 @@ describe('Admin page platform parameters tab', () => {
     });
 
     it('should not proceed if the user doesn\'t confirm', () => {
-      mockConfirmResult(false);
+      spyOn(mockWindowRef.nativeWindow, 'confirm').and.returnValue(false);
       const platformParameter = component.platformParameters[0];
 
       expect(platformParameter.rules.length).toBe(1);
@@ -314,16 +322,18 @@ describe('Admin page platform parameters tab', () => {
 
   describe('.updateParameterRulesAsync', () => {
     let setStatusSpy: jasmine.Spy;
+    let promptSpy: jasmine.Spy;
 
     beforeEach(() => {
       setStatusSpy = jasmine.createSpy();
       setStatusSpy = spyOn(component.setStatusMessage, 'emit');
+      promptSpy = spyOn(mockWindowRef.nativeWindow, 'prompt');
 
       adminTaskManagerService.finishTask();
     });
 
     it('should update platform parameter rules', fakeAsync(() => {
-      mockPromptResult('mock msg');
+      promptSpy.and.returnValue('mock msg');
 
       const platformParameter = component.platformParameters[0];
 
@@ -339,7 +349,7 @@ describe('Admin page platform parameters tab', () => {
 
     it('should update platform param backup after update succeeds',
       fakeAsync(() => {
-        mockPromptResult('mock msg');
+        promptSpy.and.returnValue('mock msg');
 
         const platformParameter = component.platformParameters[0];
 
@@ -354,7 +364,7 @@ describe('Admin page platform parameters tab', () => {
 
     it('should not update platform param backup if update fails',
       fakeAsync(() => {
-        mockPromptResult('mock msg');
+        promptSpy.and.returnValue('mock msg');
         const errorResponse = new HttpErrorResponse({
           error: 'Error loading exploration 1.',
           status: 500,
@@ -375,7 +385,7 @@ describe('Admin page platform parameters tab', () => {
       }));
 
     it('should not proceed if there is another task running', fakeAsync(() => {
-      mockPromptResult('mock msg');
+      promptSpy.and.returnValue('mock msg');
 
       adminTaskManagerService.startTask();
 
@@ -398,7 +408,7 @@ describe('Admin page platform parameters tab', () => {
 
     it('should not proceed if the user cancels the prompt', fakeAsync(
       () => {
-        mockPromptResult(null);
+        promptSpy.and.returnValue(null);
 
         const platformParameter = component.platformParameters[0];
 
@@ -413,7 +423,7 @@ describe('Admin page platform parameters tab', () => {
     );
 
     it('should not proceed if there is any validation issue', fakeAsync(() => {
-      mockPromptResult(null);
+      promptSpy.and.returnValue(null);
 
       const platformParameter = component.platformParameters[0];
 
@@ -429,7 +439,7 @@ describe('Admin page platform parameters tab', () => {
     }));
 
     it('should show error if the update fails', fakeAsync(() => {
-      mockPromptResult('mock msg');
+      promptSpy.and.returnValue('mock msg');
 
       const errorResponse = new HttpErrorResponse({
         error: 'Error loading exploration 1.',
@@ -449,7 +459,7 @@ describe('Admin page platform parameters tab', () => {
     }));
 
     it('should show error if the update fails', fakeAsync(() => {
-      mockPromptResult('mock msg');
+      promptSpy.and.returnValue('mock msg');
 
       const errorResponse = new HttpErrorResponse({
         error: {
@@ -472,7 +482,7 @@ describe('Admin page platform parameters tab', () => {
     }));
 
     it('should throw error if error resonse is unexpected', fakeAsync(() => {
-      mockPromptResult('mock msg');
+      promptSpy.and.returnValue('mock msg');
 
       updateApiSpy.and.rejectWith('Error');
       const platformParameter = component.platformParameters[0];
