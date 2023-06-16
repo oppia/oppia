@@ -439,6 +439,7 @@ import { ConceptCardManagerService } from 'pages/exploration-player-page/service
 import { DiagnosticTestPlayerEngineService } from 'pages/exploration-player-page/services/diagnostic-test-player-engine.service';
 import { DiagnosticTestPlayerStatusService } from 'pages/diagnostic-test-player-page/diagnostic-test-player-status.service';
 import { RteHelperService } from 'services/rte-helper.service';
+import { HtmlLengthService } from 'services/html-length.service';
 
 export const angularServices: [string, Type<{}>][] = [
   ['AccessValidationBackendApiService', AccessValidationBackendApiService],
@@ -913,5 +914,6 @@ export const angularServices: [string, Type<{}>][] = [
   ['VoiceoverRecordingService', VoiceoverRecordingService],
   ['VersionHistoryService', VersionHistoryService],
   ['VoiceoverRecordingService', VoiceoverRecordingService],
-  ['RteHelperService', RteHelperService]
+  ['RteHelperService', RteHelperService],
+  ['HtmlLengthService', HtmlLengthService]
 ];
