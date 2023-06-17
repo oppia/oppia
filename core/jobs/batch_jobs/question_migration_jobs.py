@@ -37,6 +37,7 @@ from typing import Iterable, Sequence, Tuple
 
 MYPY = False
 if MYPY: # pragma: no cover
+    from mypy_imports import base_models
     from mypy_imports import datastore_services
     from mypy_imports import question_models
 
