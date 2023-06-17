@@ -15,7 +15,7 @@
              tabindex="0"
              (click)="toggleThreeDotsDropdown(i)">
           <i class="fa fa-ellipsis-v"></i>
-          <div *ngIf="showThreeDotsDropdown[i]" class="oppia-three-dots-dropdown">
+          <div *ngIf="indexOfSelectedTopic == i" class="oppia-three-dots-dropdown">
             <div class="oppia-trash-button"
                  (click)="removeFromLearnerGoals(topic, topic.id, topic.name, i)"
                  tabindex="0"
