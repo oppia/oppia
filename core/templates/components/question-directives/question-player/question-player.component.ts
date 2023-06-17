@@ -16,7 +16,7 @@
  * @fileoverview Component for the questions player.
  */
 
-import { Component, Input, OnDestroy, OnInit, SecurityContext } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit, SecurityContext, ElementRef, AfterViewInit } from '@angular/core';
 import { Location } from '@angular/common';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { DomSanitizer } from '@angular/platform-browser';
@@ -119,7 +119,8 @@ export class QuestionPlayerComponent implements OnInit, OnDestroy {
     private windowRef: WindowRef,
     private _sanitizer: DomSanitizer,
     private siteAnalyticsService: SiteAnalyticsService,
-    private urlService: UrlService
+    private urlService: UrlService,
+    private elementRef: ElementRef
   ) {}
 
   calculateScores(questionStateData: {[key: string]: QuestionData}): void {
@@ -520,6 +521,8 @@ export class QuestionPlayerComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     {
+      const focusedElement = document.activeElement as HTMLElement;
+      console.log('Currently focused element:', focusedElement);
       this.componentSubscription.add(
         this.playerPositionService.onCurrentQuestionChange.subscribe(
           result => this.updateCurrentQuestion(result + 1)
