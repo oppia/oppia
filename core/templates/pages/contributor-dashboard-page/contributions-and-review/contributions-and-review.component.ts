@@ -546,7 +546,7 @@ export class ContributionsAndReview
 
   computeTranslationWordCount(translationHtml: string): number {
     return this.htmlLengthService.
-    computeHtmlLengthInWords(translationHtml);
+      computeHtmlLengthInWords(translationHtml);
   }
 
   ngOnInit(): void {
