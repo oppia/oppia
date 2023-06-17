@@ -96,13 +96,14 @@ implements ControlValueAccessor, Validator, AfterViewInit {
     // FormGroup) in its constructor. Since FormGroup extends AbstractControl
     // (and indirectly AbstractControlDirective), it also has the
     // 'statusChanges' property. The 'control' getter in NgForm is overridden to
-    //  return 'this.form'.Thus, whenever we reference 'statusChanges' in our
-    // component, it is referring to 'statusChanges' of 'this.form'.Because
-    // 'this.form' is guaranteed to be initialized in the NgForm constructor
-    // before any lifecycle methods of our component are run,we can safely use
-    // a non-null assertion operator on 'statusChanges'.This is because we are
-    // confident that 'statusChanges' will not be null when we use it in our
-    // component.
+    // return 'this.form'. Thus, whenever we reference 'statusChanges' in our
+    // component, it is referring to 'statusChanges' of 'this.form'.
+
+    // Because 'this.form' is guaranteed to be initialized in the NgForm
+    // constructor before any lifecycle methods of our component are run, we can
+    // safely use a non-null assertion operator on 'statusChanges'. This is
+    // because we are confident that 'statusChanges' will not be null when we
+    // use it in our component.
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     this.hybridForm.statusChanges!.subscribe(() => {
       this.onValidatorChange();

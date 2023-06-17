@@ -18,12 +18,16 @@
 
 import { Component, EventEmitter, NO_ERRORS_SCHEMA, forwardRef } from '@angular/core';
 import { ControlValueAccessor, FormControl, FormsModule, NG_VALUE_ACCESSOR } from '@angular/forms';
-import { ComponentFixture, fakeAsync, flush, TestBed, tick, waitForAsync } from '@angular/core/testing';
+import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
 import { SchemaBasedCustomEditorComponent } from './schema-based-custom-editor.component';
 import { SchemaDefaultValue } from 'services/schema-default-value.service';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { TranslateFakeLoader, TranslateLoader, TranslateModule, TranslateService } from '@ngx-translate/core';
 
+// Trying to use the actual Object editor component in the tests would require
+// a lot of mocking to be done (given the size of the component and how many
+// other component it shows inside of itself). So, we use a mock component
+// instead.
 @Component({
   selector: 'object-editor',
   template: '',
@@ -126,17 +130,28 @@ describe('Schema Based Custom Editor Component', () => {
     fakeAsync(() => {
       component.schema = { obj_type: 'UnicodeString', type: 'custom' };
       fixture.detectChanges();
-      flush();
-      const spy = jasmine.createSpy('validator onchange spy');
-      let mockEmitter = new EventEmitter();
-      component.registerOnValidatorChange(spy);
+      const onValidatorChangeSpy = jasmine.createSpy('validator onchange spy');
+
+      // The statusChanges property in the form used in the component is an
+      // observable which is triggered by changes to the form state in the
+      // template. Since we are not doing template-based testing, we need to
+      // mock the statusChanges property of the form.
+      let mockFormStatusChangeEmitter = new EventEmitter();
       spyOnProperty(
-        component.hybridForm, 'statusChanges').and.returnValue(mockEmitter);
+        component.hybridForm, 'statusChanges'
+      ).and.returnValue(
+        mockFormStatusChangeEmitter);
+      component.registerOnValidatorChange(onValidatorChangeSpy);
       component.ngAfterViewInit();
+
+      expect(onValidatorChangeSpy).not.toHaveBeenCalled();
+
       component.validate(new FormControl());
-      mockEmitter.emit();
+      mockFormStatusChangeEmitter.emit();
+      // The subscription to statusChanges is asynchronous, so we need to
+      // tick() to trigger the callback.
       tick();
-      expect(spy).toHaveBeenCalled();
-    }
-    ));
+
+      expect(onValidatorChangeSpy).toHaveBeenCalled();
+    }));
 });
