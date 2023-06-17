@@ -813,6 +813,7 @@
 	"I18N_LEARNER_DASHBOARD_SUGGESTION_DESCRIPTION": "Text that appears in the learner dashboard in the suggestion modal. It gives a brief description of changes suggested by the learner.",
 	"I18N_LEARNER_DASHBOARD_SUGGESTION_NO_CURRENT_STATE": "Text that appears in the learner dashboard when a suggestion is opened. It denotes that the state for which the suggestion is suggested no longer exists.",
 	"I18N_LEARNER_DASHBOARD_SUGGESTION_SUGGESTED_STATE_CONTENT_HEADER": "Text that appears in the learner dashboard when a suggestion is opened. It is the header for the box which shows the suggested content of the state in a suggestion.",
+	"I18N_LEARNER_DASHBOARD_SUGGESTION_TEXT": "Text displayed in the learner dashboard. It appears in the thread summary, when last message sent in the thread is a suggestion.",
 	"I18N_LEARNER_DASHBOARD_TOOLTIP": "Text for the tooltip that appears on hovering over the info icon next to collections text",
 	"I18N_LEARNER_DASHBOARD_VIEW": "Text displayed beside the exploration filter dropdown in the learner dashboard.\n\n{{Identical|View}}",
 	"I18N_LEARNER_GROUPS_SECTION_TITLE": "Title of the section that shows lists of learner groups on the facilitator dashboard page.",
