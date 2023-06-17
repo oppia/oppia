@@ -548,7 +548,7 @@ export class ContributionsAndReview
       .reloadOpportunitiesEventEmitter.emit();
   }
 
-  computeTranslationLengthLabel(translationHtml: string): number {
+  computeTranslationWordCount(translationHtml: string): number {
     const translationLength = this.htmlLengthService.
       computeHtmlLengthInWords(translationHtml);
 
