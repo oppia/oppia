@@ -6872,7 +6872,7 @@ export default {
       "META": []
     },
     "CLASSROOM": {
-      "ROUTE": "learn/math",
+      "ROUTE": "learn/:classroom_url_fragment",
       "TITLE": "Oppia",
       "LIGHTWEIGHT": true,
       // Some routes contain url fragments, as syntax for url fragments are
@@ -7076,5 +7076,5 @@ export default {
   "CONTRIBUTOR_CERTIFICATE_WIDTH": 1493,
   "CONTRIBUTOR_CERTIFICATE_HEIGHT": 1313,
   "BRANCH_NAME": "shifted-feedback-updates-with-feature-flag",
-  "SHORT_COMMIT_HASH": "c801a81a7f"
+  "SHORT_COMMIT_HASH": "d03549f14d"
 } as const;
