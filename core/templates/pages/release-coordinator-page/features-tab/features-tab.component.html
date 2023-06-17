@@ -198,7 +198,7 @@
 </div>
 
 <div *ngFor="let featureFlag of featureFlags;">
-  <div *ngIf="!getFeatureValidOnCurrentServer(featureFlag)" class="container oppia-page-card oppia-long-text oppia-admin-features e2e-test-feature-flag">
+  <div *ngIf="!getFeatureValidOnCurrentServer(featureFlag)" class="container oppia-page-card oppia-long-text oppia-admin-features">
     <div class="oppia-feature-configuration-warning">
       <i class="material-icons oppia-feature-configuration-warning-icon">&#xe002;</i>
       This feature flag is in {{featureFlag.featureStage}} stage, and cannot be configured on this server (which is in {{serverStage}} server mode).
