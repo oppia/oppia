@@ -1413,7 +1413,7 @@ describe('Contributions and review component', () => {
         } as Record<string, SuggestionDetails>;
 
         component.activeTabType = component.TAB_TYPE_REVIEWS;
-        component.activeTabSubtype = component.SUGGESTION_TYPE_TRANSLATE
+        component.activeTabSubtype = component.SUGGESTION_TYPE_TRANSLATE;
         component.activeExplorationId = 'id';
         tick();
 
