@@ -1,4 +1,4 @@
-// Copyright 2021 The Oppia Authors. All Rights Reserved.
+// Copyright 2023 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -29,7 +29,6 @@ describe('Feedback Updates Backend API Service', () => {
   FeedbackUpdatesBackendApiService;
   let httpTestingController: HttpTestingController;
 
-
   const sampleFeedbackUpdatesDataResults = {
     number_of_unread_threads: 0,
     thread_summaries: [
@@ -51,7 +50,6 @@ describe('Feedback Updates Backend API Service', () => {
     ]
   };
 
-
   const FEEDBACK_UPDATES_DATA_URL = (
     '/feedbackupdateshandler/data');
   const ERROR_STATUS_CODE = 400;
@@ -69,7 +67,6 @@ describe('Feedback Updates Backend API Service', () => {
   afterEach(() => {
     httpTestingController.verify();
   });
-
 
   it('should successfully fetch learner dashboard feedback updates data ' +
     'from the backend', fakeAsync(() => {

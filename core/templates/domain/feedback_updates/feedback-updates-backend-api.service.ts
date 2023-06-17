@@ -1,4 +1,4 @@
-// Copyright 2017 The Oppia Authors. All Rights Reserved.
+// Copyright 2023 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -20,8 +20,6 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-
-
 import {
   FeedbackThreadSummary,
   FeedbackThreadSummaryBackendDict
@@ -40,7 +38,6 @@ interface FeedbackUpdatesData {
   threadSummaries: FeedbackThreadSummary[];
   paginatedThreadsList: FeedbackThreadSummaryBackendDict[][];
 }
-
 
 export interface AddMessagePayload {
   'updated_status': boolean;
