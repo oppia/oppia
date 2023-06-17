@@ -443,6 +443,11 @@
                   M
             </span>
           </div>
+          <div *ngIf="numberOfUnreadThreads !== 0" class="oppia-unread-feedback-indicator">
+            <span class="oppia-unread-feedback-number">
+              {{ numberOfUnreadThreads }}
+            </span>
+          </div>
         </div>
       </a>
       <ul ngbDropdownMenu

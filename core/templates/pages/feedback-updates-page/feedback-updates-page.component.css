@@ -57,7 +57,7 @@ oppia-learner-dashboard-page .empty-feedback-threads {
   background: rgb(255,255,255);
   box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
   font-family: "Capriola", "Roboto", Arial, sans-serif;
-  margin: 0 17px 0 4px;
+  margin: 0 0 0 18px;
   padding: 30px 55px 30px 30px;
 }
 
@@ -202,7 +202,7 @@ oppia-feedback-updates-page .oppia-feedback-message-spacing {
   }
 
   .oppia-feedback-updates-main-content-container .oppia-feedback-updates-page-no-activity-card {
-    margin: 0 2px 0 4px;
+    margin: 0 -18px 0 4px;
   }
 
   .oppia-feedback-updates-page-feedback-section .feedback-thread-reply-box {
