@@ -866,7 +866,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         )
         with self.swap(
             platform_feature_services,
-            'ALL_PLATFORM_PARAMETERS_EXCEPT_FEATURES',
+            'ALL_PLATFORM_PARAMS_EXCEPT_FEATURE_FLAGS',
             [ParamNames.TEST_PARAMETER_1]
         ):
             response_dict = self.get_json('/adminhandler')
@@ -901,7 +901,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
 
         with self.swap(
             platform_feature_services,
-            'ALL_PLATFORM_PARAMETERS_EXCEPT_FEATURES',
+            'ALL_PLATFORM_PARAMS_EXCEPT_FEATURE_FLAGS',
             [ParamNames.TEST_PARAMETER_1]
         ):
             self.post_json(
@@ -948,7 +948,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
 
         with self.swap(
             platform_feature_services,
-            'ALL_PLATFORM_PARAMETERS_EXCEPT_FEATURES',
+            'ALL_PLATFORM_PARAMS_EXCEPT_FEATURE_FLAGS',
             [ParamNames.TEST_PARAMETER_1]
         ):
             response_dict = self.get_json('/adminhandler')
@@ -991,7 +991,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
 
         with self.swap(
             platform_feature_services,
-            'ALL_PLATFORM_PARAMETERS_EXCEPT_FEATURES',
+            'ALL_PLATFORM_PARAMS_EXCEPT_FEATURE_FLAGS',
             [ParamNames.TEST_PARAMETER_1]
         ):
             response = self.post_json(

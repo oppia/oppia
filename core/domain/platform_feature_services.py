@@ -33,29 +33,31 @@ docstrings in this file.
 from __future__ import annotations
 
 from core import feconf
-from core import platform_feature_list as feature_list
+from core import platform_feature_list
 from core.constants import constants
 from core.domain import platform_parameter_domain
-from core.domain import platform_parameter_list as parameter_list
+from core.domain import platform_parameter_list
 from core.domain import platform_parameter_registry as registry
 
 from typing import Dict, List, Set
 
-ALL_FEATURES_LIST: List[feature_list.ParamNames] = (
-    feature_list.DEV_FEATURES_LIST +
-    feature_list.TEST_FEATURES_LIST +
-    feature_list.PROD_FEATURES_LIST
+ALL_FEATURE_FLAGS: List[platform_feature_list.ParamNames] = (
+    platform_feature_list.DEV_FEATURES_LIST +
+    platform_feature_list.TEST_FEATURES_LIST +
+    platform_feature_list.PROD_FEATURES_LIST
 )
 
 ALL_FEATURES_NAMES_SET: Set[str] = set(
-    feature.value for feature in ALL_FEATURES_LIST
+    feature.value for feature in ALL_FEATURE_FLAGS
 )
 
-ALL_PLATFORM_PARAMETERS_EXCEPT_FEATURES: List[parameter_list.ParamNames] = [
-    parameter_list.ParamNames.DUMMY_PARAMETER,
-    parameter_list.ParamNames.PROMO_BAR_ENABLED,
-    parameter_list.ParamNames.PROMO_BAR_MESSAGE
-]
+ALL_PLATFORM_PARAMS_EXCEPT_FEATURE_FLAGS: List[
+    platform_parameter_list.ParamNames
+] = [
+        platform_parameter_list.ParamNames.DUMMY_PARAMETER,
+        platform_parameter_list.ParamNames.PROMO_BAR_ENABLED,
+        platform_parameter_list.ParamNames.PROMO_BAR_MESSAGE
+    ]
 
 
 class FeatureFlagNotFoundException(Exception):
@@ -102,7 +104,7 @@ def get_all_feature_flag_dicts() -> List[
     """
     return [
         registry.Registry.get_platform_parameter(_feature.value).to_dict()
-        for _feature in ALL_FEATURES_LIST
+        for _feature in ALL_FEATURE_FLAGS
     ]
 
 
@@ -119,7 +121,7 @@ def get_all_platform_parameters_except_feature_flag_dicts() -> List[
     """
     return [
         registry.Registry.get_platform_parameter(_plat_param.value).to_dict()
-        for _plat_param in ALL_PLATFORM_PARAMETERS_EXCEPT_FEATURES
+        for _plat_param in ALL_PLATFORM_PARAMS_EXCEPT_FEATURE_FLAGS
     ]
 
 
