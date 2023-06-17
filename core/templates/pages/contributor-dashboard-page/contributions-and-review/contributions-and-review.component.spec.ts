@@ -1400,7 +1400,8 @@ describe('Contributions and review component', () => {
           suggestion: {
             suggestion: {
               suggestion_id: 'id',
-              status: 'review'
+              status: 'review',
+              exploration_content_html: '<p>This is test para</p>'
             } as Suggestion,
             details: {
               skill_description: 'skill_description',
@@ -1412,6 +1413,8 @@ describe('Contributions and review component', () => {
         } as Record<string, SuggestionDetails>;
 
         component.activeTabType = component.TAB_TYPE_REVIEWS;
+        component.activeTabSubtype = component.SUGGESTION_TYPE_TRANSLATE
+        component.activeExplorationId = 'id';
         tick();
 
         expect(component.getTranslationContributionsSummary(
@@ -1422,10 +1425,12 @@ describe('Contributions and review component', () => {
           labelText: 'Awaiting review',
           labelColor: '#eeeeee',
           actionButtonTitle: 'Review',
-          translationWordCount: undefined
+          translationWordCount: 4
         }]);
 
-        expect(component.computeTranslationWordCount(null)).toHaveBeenCalled;
+        expect(component.computeTranslationWordCount(
+          suggestionIdToSuggestions[0].suggestion.exploration_content_html))
+          .toHaveBeenCalled;
       }));
 
       it('should get in-review question suggestions', fakeAsync(() => {
