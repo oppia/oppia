@@ -56,11 +56,11 @@
         <div class="skill-score-body">
           <div class="score" *ngFor="let item of scorePerSkillMapping | keyvalue">
             <div *ngIf="item.value && item.value.total > 0">
-              <div class="list-item" 
+              <div class="list-item"
                    (click)="openSkillMasteryModal(item.key)"
                    tabindex="0"
-                   [attr.aria-label]="'Your score for ' + item.value.description + ' is ' + 
-                   item.value.score.toFixed(2) + ' answers correct of ' + 
+                   [attr.aria-label]="'Your score for ' + item.value.description + ' is ' +
+                   item.value.score.toFixed(2) + ' answers correct of ' +
                    item.value.total">
                    {{item.value.description}}
               </div>
@@ -75,8 +75,8 @@
               </div>
             </div>
           </div>
-          <div class="final-result" tabindex="0" 
-               [attr.aria-label]="'Your final result is: ' + finalCorrect.toFixed(2) + 
+          <div class="final-result" tabindex="0"
+               [attr.aria-label]="'Your final result is: ' + finalCorrect.toFixed(2) +
                ' correct answers out of total ' + allQuestions">
             <span class="score-final-description">Answers Correct:</span>
             <span class="score-final score-recieved">{{finalCorrect.toFixed(2)}}</span>
@@ -110,11 +110,11 @@
       <div class="question-player-results-footer" *ngIf="showActionButtonsFooter()">
         <span *ngFor="let actionButton of questionPlayerConfig.resultActionButtons"
               (click)="performAction(actionButton)">
-          <div *ngIf="actionButton.type === 'RETRY_SESSION'" 
-                class="action-button-inner {{getActionButtonInnerClass(actionButton.type)}}"
-                tabindex="0"
-                aria-label="Retry"
-                role="button">
+          <div *ngIf="actionButton.type === 'RETRY_SESSION'"
+               class="action-button-inner {{getActionButtonInnerClass(actionButton.type)}}"
+               tabindex="0"
+               aria-label="Retry"
+               role="button">
             <span [innerHTML]="getActionButtonIconHtml(actionButton.type)"></span>
             <span class="action-button-text" translate="{{actionButton.i18nId}}"></span>
           </div>
