@@ -1427,10 +1427,6 @@ describe('Contributions and review component', () => {
           actionButtonTitle: 'Review',
           translationWordCount: 4
         }]);
-
-        expect(component.computeTranslationWordCount(
-          suggestionIdToSuggestions[0].suggestion.exploration_content_html))
-          .toHaveBeenCalled;
       }));
 
       it('should get in-review question suggestions', fakeAsync(() => {
