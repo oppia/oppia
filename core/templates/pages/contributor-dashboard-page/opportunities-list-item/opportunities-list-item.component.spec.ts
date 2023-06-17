@@ -203,33 +203,4 @@ describe('Opportunities List Item Component', () => {
         expect(component.correspondingOpportunityDeleted).toBeFalse();
       });
   });
-
-  describe('when translation card opportunity is provided', () => {
-    beforeEach(() => {
-      component.opportunity = {
-        id: '1',
-        labelText: 'Label text',
-        labelColor: '#fff',
-        progressPercentage: 50,
-        inReviewCount: 20,
-        totalCount: 50,
-        translationsCount: 25,
-        translationLengthInWords: 30
-      };
-      component.opportunityType = 'translation';
-      component.clickActionButton.emit =
-        () => jasmine.createSpy('click', () => {});
-      component.labelRequired = true;
-      component.opportunityHeadingTruncationLength = 35;
-      fixture.detectChanges();
-      component.ngOnInit();
-    });
-
-    it('should show translation size label for translation suggestions', () => {
-      expect(component.translationLengthInWords).toBe(
-        component.opportunity.translationLengthInWords);
-      expect(component.translationLengthLabelRequired).toBeTrue();
-      expect(component.translationLengthLabel).toBe('long');
-    });
-  });
 });

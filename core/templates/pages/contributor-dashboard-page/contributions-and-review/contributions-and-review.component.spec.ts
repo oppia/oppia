@@ -1150,7 +1150,7 @@ describe('Contributions and review component', () => {
             labelText: 'Obsolete',
             labelColor: '#e76c8c',
             actionButtonTitle: 'View',
-            translationLengthInWords: undefined
+            translationWordCount: undefined
           }]);
           expect(more).toEqual(false);
         });
@@ -1422,10 +1422,10 @@ describe('Contributions and review component', () => {
           labelText: 'Awaiting review',
           labelColor: '#eeeeee',
           actionButtonTitle: 'Review',
-          translationLengthInWords: undefined
+          translationWordCount: undefined
         }]);
 
-        expect(component.computeTranslationLengthLabel(null)).toHaveBeenCalled;
+        expect(component.computeTranslationWordCount(null)).toHaveBeenCalled;
       }));
 
       it('should get in-review question suggestions', fakeAsync(() => {

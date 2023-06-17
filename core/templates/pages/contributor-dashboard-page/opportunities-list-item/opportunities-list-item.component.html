@@ -96,12 +96,10 @@
 
 <ng-template #TranslationLengthLabel>
   <div class="oppia-translation-label-container oppia-animate-fadein"
-       *ngIf="translationLengthLabelRequired">
+       *ngIf="opportunity?.translationWordCount">
     <div class="oppia-translation-length-label"
-        ngbTooltip="Word Count : {{translationLengthInWords}}">
-      <span [hidden]="opportunityDataIsLoading">
-        {{ translationLengthLabel }}
-      </span>
+         ngbTooltip="Word Count : {{opportunity.translationWordCount}}">
+         {{ opportunity.translationLengthInWords < 20 ? 'short' : 'long' }}
     </div>
   </div>
 </ng-template>

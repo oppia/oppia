@@ -35,7 +35,7 @@ export interface ExplorationOpportunity {
   translationsCount: number;
   heading?: string;
   actionButtonTitle?: string;
-  translationLengthInWords?: number;
+  translationWordCount?: number;
 }
 
 @Component({
@@ -69,9 +69,6 @@ export class OpportunitiesListItemComponent {
   cardsAvailable: number = 0;
   onMobile!: boolean;
   resizeSubscription!: Subscription;
-  translationLengthLabel: string = '';
-  translationLengthLabelRequired: boolean = false;
-  translationLengthInWords: number = 0;
   mobileBreakpoint: number = (
     AppConstants.OPPORTUNITIES_LIST_ITEM_MOBILE_BREAKPOINT);
 
@@ -97,12 +94,6 @@ export class OpportunitiesListItemComponent {
       this.labelStyle = {
         'background-color': this.opportunity.labelColor
       };
-    }
-    if (this.opportunity && this.opportunity.translationLengthInWords) {
-      this.translationLengthLabel = (
-        this.opportunity.translationLengthInWords < 20 ? 'short' : 'long');
-      this.translationLengthLabelRequired = true;
-      this.translationLengthInWords = this.opportunity.translationLengthInWords;
     }
 
     if (!this.opportunityHeadingTruncationLength) {

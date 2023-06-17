@@ -229,12 +229,6 @@ export class ContributionsAndReview
           details.topic_name + ' / ' + details.story_title +
           ' / ' + details.chapter_title);
       }
-      const translationLengthLabelRequired = (
-        this.isReviewTranslationsTab() && this.activeExplorationId);
-
-      const translationLengthInWords = (
-        translationLengthLabelRequired ? this.computeTranslationLengthLabel(
-          suggestion.exploration_content_html) : undefined);
 
       const requiredData = {
         id: suggestion.suggestion_id,
@@ -249,8 +243,10 @@ export class ContributionsAndReview
         labelColor: this.SUGGESTION_LABELS[suggestion.status].color,
         actionButtonTitle: (
           this.activeTabType === this.TAB_TYPE_REVIEWS ? 'Review' : 'View'),
-        translationLengthInWords: (
-          translationLengthLabelRequired ? translationLengthInWords : undefined)
+        translationWordCount: (
+          this.isReviewTranslationsTab() && this.activeExplorationId) ? (
+            this.computeTranslationWordCount(
+              suggestion.exploration_content_html)) : undefined
       };
 
       translationContributionsSummaryList.push(requiredData);
@@ -549,10 +545,8 @@ export class ContributionsAndReview
   }
 
   computeTranslationWordCount(translationHtml: string): number {
-    const translationLength = this.htmlLengthService.
-      computeHtmlLengthInWords(translationHtml);
-
-    return translationLength;
+    return this.htmlLengthService.
+    computeHtmlLengthInWords(translationHtml);
   }
 
   ngOnInit(): void {
