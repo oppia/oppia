@@ -73,7 +73,7 @@ export interface Opportunity {
   labelText: string;
   labelColor: string;
   actionButtonTitle: string;
-  translationLengthInWords?: number;
+  translationWordCount?: number;
 }
 
 export interface GetOpportunitiesResponse {
