@@ -3228,8 +3228,10 @@ def can_submit_images_to_explorations(
     handler: Callable[..., _GenericHandlerFunctionReturnType]
 ) -> Callable[..., _GenericHandlerFunctionReturnType]:
     """Decorator to check whether the user can submit images to explorations.
+
     Args:
         handler: function. The function to be decorated.
+
     Returns:
         function. The newly decorated function that now also checks if
         the user has permission to submit images to an exploration.
@@ -3242,11 +3244,14 @@ def can_submit_images_to_explorations(
         self: _SelfBaseHandlerType, target_id: str, **kwargs: Any
     ) -> _GenericHandlerFunctionReturnType:
         """Test to see if user can submit images to explorations.
+
         Args:
             target_id: str. The target exploration ID.
             **kwargs: *. Keyword arguments.
+
         Returns:
             *. The return value of the decorated function.
+
         Raises:
             NotLoggedInException. The user is not logged in.
             PageNotFoundException. The given page cannot be found.
