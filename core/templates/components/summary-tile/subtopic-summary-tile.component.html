@@ -1,6 +1,8 @@
 <div class="subtopic-card e2e-test-subtopic-tile"
      (click)="openSubtopicPage()"
-     [ngClass]="{'disabled-link': !classroomUrlFragment}">
+     (keydown.enter)="openSubtopicPage()"
+     [ngClass]="{'disabled-link': !classroomUrlFragment}"
+     tabindex="0">
   <div class="subtopic-thumbnail e2e-test-subtopic-thumbnail"
        [ngStyle]="{background: thumbnailBgColor}">
     <img [src]="thumbnailUrl"
@@ -26,7 +28,7 @@
   }
 
   .subtopic-card:focus {
-    outline: 0;
+    outline: 2px solid #000;
   }
 
   .subtopic-thumbnail {
