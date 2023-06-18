@@ -285,22 +285,21 @@ class GenerateContributorAdminStatsJob(base_jobs.JobBase):
         GeneralSuggestionModel to
         TranslationSubmitterTotalContributionStatsModel.
 
-            Args:
-                keys: Tuple(str, str).
-                    Tuple of (language_code, contributor_user_id).
-                translation_contribution_stats:
-                    Iterable[
-                        suggestion_models.TranslationContributionStatsModel].
-                    TranslationReviewStatsModel grouped by
-                    (language_code, contributor_user_id).
-                translation_general_suggestions_stats:
-                    Iterable[suggestion_models.GeneralSuggestionModel].
-                    TranslationReviewStatsModel grouped by
-                    (language_code, author_id).
+        Args:
+            keys: Tuple(str, str).
+                Tuple of (language_code, contributor_user_id).
+            translation_contribution_stats: Iterable[
+                suggestion_models.TranslationContributionStatsModel].
+                TranslationReviewStatsModel grouped by
+                (language_code, contributor_user_id).
+            translation_general_suggestions_stats:
+                Iterable[suggestion_models.GeneralSuggestionModel].
+                TranslationReviewStatsModel grouped by
+                (language_code, author_id).
 
-            Returns:
-                TranslationSubmitterTotalContributionStatsModel.
-                New TranslationReviewerTotalContributionStatsModel model.
+        Returns:
+            TranslationSubmitterTotalContributionStatsModel.
+            New TranslationReviewerTotalContributionStatsModel model.
         """
 
         translation_general_suggestions_sorted_stats = sorted(
@@ -419,18 +418,18 @@ class GenerateContributorAdminStatsJob(base_jobs.JobBase):
         """Transforms TranslationReviewStatsModel to
         TranslationReviewerTotalContributionStatsModel.
 
-            Args:
-                keys: Tuple(str, str). Tuple of
-                    (language_code, reviewer_user_id).
-                translation_reviewer_stats:
-                    Iterable[suggestion_models.TranslationReviewStatsModel].
-                    TranslationReviewStatsModel grouped by
-                    (language_code, reviewer_user_id).
+        Args:
+            keys: Tuple(str, str). Tuple of
+                (language_code, reviewer_user_id).
+            translation_reviewer_stats:
+                Iterable[suggestion_models.TranslationReviewStatsModel].
+                TranslationReviewStatsModel grouped by
+                (language_code, reviewer_user_id).
 
-            Returns:
-                suggestion_models
-                    .TranslationReviewerTotalContributionStatsModel.
-                New TranslationReviewerTotalContributionStatsModel model.
+        Returns:
+            suggestion_models
+            .TranslationReviewerTotalContributionStatsModel.
+            New TranslationReviewerTotalContributionStatsModel model.
         """
 
         translation_reviewer_stats = list(translation_reviewer_stats)
@@ -494,19 +493,19 @@ class GenerateContributorAdminStatsJob(base_jobs.JobBase):
         """Transforms QuestionContributionStatsModel and GeneralSuggestionModel
         to QuestionSubmitterTotalContributionStatsModel.
 
-            Args:
-                contributor_user_id: str. User ID acting as a key to new model.
-                question_contribution_stats:
-                    Iterable[suggestion_models.QuestionContributionStatsModel].
-                    QuestionContributionStatsModel grouped by
-                    contributor_user_id.
-                question_general_suggestions_stats:
-                    Iterable[suggestion_models.GeneralSuggestionModel].
-                    GeneralSuggestionModel grouped by author_id.
+        Args:
+            contributor_user_id: str. User ID acting as a key to new model.
+            question_contribution_stats:
+                Iterable[suggestion_models.QuestionContributionStatsModel].
+                QuestionContributionStatsModel grouped by
+                contributor_user_id.
+            question_general_suggestions_stats:
+                Iterable[suggestion_models.GeneralSuggestionModel].
+                GeneralSuggestionModel grouped by author_id.
 
-            Returns:
-                suggestion_models.QuestionSubmitterTotalContributionStatsModel.
-                New QuestionSubmitterTotalContributionStatsModel model.
+        Returns:
+            suggestion_models.QuestionSubmitterTotalContributionStatsModel.
+            New QuestionSubmitterTotalContributionStatsModel model.
         """
 
         question_general_suggestions_sorted_stats = sorted(
@@ -605,16 +604,16 @@ class GenerateContributorAdminStatsJob(base_jobs.JobBase):
         """Transforms QuestionReviewStatsModel to
         QuestionReviewerTotalContributionStatsModel.
 
-            Args:
-                reviewer_user_id: str. User ID acting as a key to new model.
-                question_reviewer_stats:
-                    Iterable[suggestion_models.QuestionReviewStatsModel].
-                    QuestionReviewStatsModel grouped by
-                    reviewer_user_id.
+        Args:
+            reviewer_user_id: str. User ID acting as a key to new model.
+            question_reviewer_stats:
+                Iterable[suggestion_models.QuestionReviewStatsModel].
+                QuestionReviewStatsModel grouped by
+                reviewer_user_id.
 
-            Returns:
-                suggestion_models.QuestionReviewerTotalContributionStatsModel.
-                New QuestionReviewerTotalContributionStatsModel model.
+        Returns:
+            suggestion_models.QuestionReviewerTotalContributionStatsModel.
+            New QuestionReviewerTotalContributionStatsModel model.
         """
 
         question_reviewer_stats = list(question_reviewer_stats)
