@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Unit tests for jobs.blog_validation_jobs."""
+"""Unit tests for jobs.contributor_admin_stats_jobs."""
 
 from __future__ import annotations
 
@@ -435,28 +435,28 @@ class GenerateContributorAdminStatsJobTests(job_test_utils.JobTestBase):
 
     def test_job_creates_admin_stats(self) -> None:
 
-        self.translation_contribution_model_1.update_timestamps(),
-        self.translation_contribution_model_2.update_timestamps(),
-        self.translation_contribution_model_3.update_timestamps(),
-        self.translation_contribution_model_4.update_timestamps(),
-        self.translation_review_model_1.update_timestamps(),
-        self.translation_review_model_2.update_timestamps(),
-        self.translation_review_model_3.update_timestamps(),
-        self.translation_review_model_4.update_timestamps(),
-        self.question_contribution_model_1.update_timestamps(),
-        self.question_contribution_model_2.update_timestamps(),
-        self.question_contribution_model_3.update_timestamps(),
-        self.question_contribution_model_4.update_timestamps(),
-        self.question_review_model_1.update_timestamps(),
-        self.question_review_model_2.update_timestamps(),
-        self.question_review_model_3.update_timestamps(),
-        self.question_review_model_4.update_timestamps(),
-        self.question_suggestion_rejected_model.update_timestamps(),
-        self.question_suggestion_accepted_with_edits_model.update_timestamps(),
-        self.question_suggestion_accepted_model.update_timestamps(),
-        self.translation_suggestion_rejected_model_user1.update_timestamps(),
-        self.translation_suggestion_rejected_model_user2.update_timestamps(),
-        self.translation_suggestion_accepted_with_edits_model.update_timestamps(), # pylint: disable=line-too-long
+        self.translation_contribution_model_1.update_timestamps()
+        self.translation_contribution_model_2.update_timestamps()
+        self.translation_contribution_model_3.update_timestamps()
+        self.translation_contribution_model_4.update_timestamps()
+        self.translation_review_model_1.update_timestamps()
+        self.translation_review_model_2.update_timestamps()
+        self.translation_review_model_3.update_timestamps()
+        self.translation_review_model_4.update_timestamps()
+        self.question_contribution_model_1.update_timestamps()
+        self.question_contribution_model_2.update_timestamps()
+        self.question_contribution_model_3.update_timestamps()
+        self.question_contribution_model_4.update_timestamps()
+        self.question_review_model_1.update_timestamps()
+        self.question_review_model_2.update_timestamps()
+        self.question_review_model_3.update_timestamps()
+        self.question_review_model_4.update_timestamps()
+        self.question_suggestion_rejected_model.update_timestamps()
+        self.question_suggestion_accepted_with_edits_model.update_timestamps()
+        self.question_suggestion_accepted_model.update_timestamps()
+        self.translation_suggestion_rejected_model_user1.update_timestamps()
+        self.translation_suggestion_rejected_model_user2.update_timestamps()
+        self.translation_suggestion_accepted_with_edits_model.update_timestamps() # pylint: disable=line-too-long
         self.translation_suggestion_accepted_model.update_timestamps()
 
         self.put_multi([
@@ -501,7 +501,7 @@ class GenerateContributorAdminStatsJobTests(job_test_utils.JobTestBase):
 
         translation_submitter_total_stats = (
             suggestion_models.TranslationSubmitterTotalContributionStatsModel
-            .get('hi','user1')
+            .get('hi', 'user1')
         )
         self.assertItemsEqual(
             ['topic1', 'topic2', 'topic3'],
@@ -567,7 +567,7 @@ class GenerateContributorAdminStatsJobTests(job_test_utils.JobTestBase):
 
         translation_reviewer_total_stats = (
             suggestion_models.TranslationReviewerTotalContributionStatsModel
-            .get('es','user1')
+            .get('es', 'user1')
         )
         self.assertItemsEqual(
             ['topic1', 'topic2'],
@@ -718,7 +718,7 @@ class GenerateContributorAdminStatsJobTests(job_test_utils.JobTestBase):
 
         for i in range(1, 120):
             suggestion_models.GeneralSuggestionModel(
-            id=i+120,
+            id=i + 120,
             suggestion_type=feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
             target_type=feconf.ENTITY_TYPE_EXPLORATION,
             target_id=self.target_id,

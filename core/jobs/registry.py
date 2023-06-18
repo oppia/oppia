@@ -69,7 +69,7 @@ from core.jobs.batch_jobs import (                                   # pylint: d
     rejecting_suggestion_for_invalid_content_ids_jobs)
 from core.jobs.batch_jobs import (                                   # pylint: disable=unused-import  # isort: skip
     remove_profile_picture_data_url_field_jobs)
-from core.jobs.batch_jobs import (
+from core.jobs.batch_jobs import (                                   # pylint: disable=unused-import  # isort: skip
     contributor_admin_stats_jobs
 )
 

@@ -18,10 +18,7 @@
 
 from __future__ import annotations
 
-import datetime
-
 from core import feconf
-from core.domain import change_domain
 from core.jobs import base_jobs
 from core.jobs.io import ndb_io
 from core.jobs.transforms import job_result_transforms
@@ -31,14 +28,14 @@ from core.platform import models
 import apache_beam as beam
 
 from typing import (
-    Final, Iterable, Mapping, Tuple)
+    Iterable, Tuple)
 
 MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import datastore_services
     from mypy_imports import suggestion_models
 
-(suggestion_models, )= models.Registry.import_models([
+(suggestion_models, ) = models.Registry.import_models([
     models.Names.SUGGESTION
 ])
 
@@ -68,7 +65,7 @@ class GenerateContributorAdminStatsJob(base_jobs.JobBase):
         translation_general_suggestions_stats= (
             general_suggestions_models
              | 'Filter reviewed translate suggestions' >> beam.Filter(
-                lambda m: (
+                lambda m : (
                     m.suggestion_type ==
                     feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT and
                     m.status in [
@@ -84,7 +81,7 @@ class GenerateContributorAdminStatsJob(base_jobs.JobBase):
         question_general_suggestions_stats= (
             general_suggestions_models
              | 'Filter reviewed questions suggestions' >> beam.Filter(
-                lambda m: (
+                lambda m : (
                     m.suggestion_type ==
                     feconf.SUGGESTION_TYPE_ADD_QUESTION and
                     m.status in [
@@ -178,7 +175,7 @@ class GenerateContributorAdminStatsJob(base_jobs.JobBase):
                 beam.GroupByKey()
             | 'Transform translation reviewer stats' >>
                 beam.MapTuple(
-                    lambda key,value:
+                    lambda key, value:
                         self.transform_translation_review_stats(
                             key,
                             value
@@ -211,7 +208,7 @@ class GenerateContributorAdminStatsJob(base_jobs.JobBase):
                 beam.GroupByKey()
             | 'Transform question reviewer stats' >>
                 beam.MapTuple(
-                    lambda key,value:
+                    lambda key, value:
                         self.transform_question_review_stats(
                             key,
                             value
@@ -281,9 +278,9 @@ class GenerateContributorAdminStatsJob(base_jobs.JobBase):
     def transform_translation_contribution_stats(
         keys: Tuple(str, str),
         translation_contribution_stats:
-            Iterable(suggestion_models.TranslationContributionStatsModel),
+            Iterable[suggestion_models.TranslationContributionStatsModel],
         translation_general_suggestions_stats:
-            Iterable(suggestion_models.GeneralSuggestionModel)) -> (
+            Iterable[suggestion_models.GeneralSuggestionModel]) -> (
         suggestion_models.TranslationSubmitterTotalContributionStatsModel):
         """Transforms TranslationContributionStatsModel and
         GeneralSuggestionModel to
@@ -293,27 +290,27 @@ class GenerateContributorAdminStatsJob(base_jobs.JobBase):
                 keys: Tuple(str, str). Tuple of
                     (language_code, contributor_user_id).
                 translation_contribution_stats:
-                    Iterable(suggestion_models.TranslationContributionStatsModel).
+                    Iterable[suggestion_models.TranslationContributionStatsModel]. # pylint: disable=line-too-long
                     TranslationReviewStatsModel grouped by
                     (language_code, contributor_user_id).
                 translation_general_suggestions_stats:
-                    Iterable(suggestion_models.GeneralSuggestionModel).
+                    Iterable[suggestion_models.GeneralSuggestionModel].
                     TranslationReviewStatsModel grouped by
                     (language_code, author_id).
 
             Returns:
-                suggestion_models.TranslationSubmitterTotalContributionStatsModel.
+                suggestion_models.TranslationSubmitterTotalContributionStatsModel. # pylint: disable=line-too-long
                 New TranslationReviewerTotalContributionStatsModel model.
         """
 
-        translation_general_suggestions__sorted_stats = sorted(
+        translation_general_suggestions_sorted_stats = sorted(
             translation_general_suggestions_stats,
-            key=lambda m: m.created_on
+            key=lambda m : m.created_on
         )
 
         translation_contribution_stats = list(translation_contribution_stats)
         general_suggestion_stats = list(
-            translation_general_suggestions__sorted_stats)
+            translation_general_suggestions_sorted_stats)
         recent_review_outcomes = []
 
         counts = {
@@ -323,9 +320,9 @@ class GenerateContributorAdminStatsJob(base_jobs.JobBase):
         }
 
         for v in general_suggestion_stats:
-            if (v.status=='accepted' and v.edited_by_reviewer==False):
+            if (v.status == 'accepted' and v.edited_by_reviewer is False):
                 recent_review_outcomes.append('accepted')
-            elif (v.status=='accepted' and v.edited_by_reviewer==True):
+            elif (v.status == 'accepted' and v.edited_by_reviewer is True):
                 recent_review_outcomes.append('accepted_with_edits')
             else:
                 recent_review_outcomes.append('rejected')
@@ -345,14 +342,12 @@ class GenerateContributorAdminStatsJob(base_jobs.JobBase):
             )
 
         language_code, contributor_user_id = keys
-        entity_id=(
+        entity_id = (
             '%s.%s' % (language_code, contributor_user_id)
         )
 
         topic_ids = list(
-            set([v.topic_id for v in translation_contribution_stats]))
-        recent_review_outcomes = recent_review_outcomes
-        recent_performance = recent_performance
+            [v.topic_id for v in translation_contribution_stats])
         submitted_translations_count = sum(
             [v.submitted_translations_count
                 for v in translation_contribution_stats])
@@ -419,7 +414,7 @@ class GenerateContributorAdminStatsJob(base_jobs.JobBase):
     def transform_translation_review_stats(
         keys: Tuple(str, str),
         translation_reviewer_stats:
-            Iterable(suggestion_models.TranslationReviewStatsModel)) -> (
+            Iterable[suggestion_models.TranslationReviewStatsModel]) -> (
         suggestion_models.TranslationReviewerTotalContributionStatsModel):
         """Transforms TranslationReviewStatsModel to
         TranslationReviewerTotalContributionStatsModel.
@@ -428,24 +423,24 @@ class GenerateContributorAdminStatsJob(base_jobs.JobBase):
                 keys: Tuple(str, str). Tuple of
                     (language_code, reviewer_user_id).
                 translation_reviewer_stats:
-                    Iterable(suggestion_models.TranslationReviewStatsModel).
+                    Iterable[suggestion_models.TranslationReviewStatsModel].
                     TranslationReviewStatsModel grouped by
                     (language_code, reviewer_user_id).
 
             Returns:
-                suggestion_models.TranslationReviewerTotalContributionStatsModel.
+                suggestion_models.TranslationReviewerTotalContributionStatsModel. # pylint: disable=line-too-long
                 New TranslationReviewerTotalContributionStatsModel model.
         """
 
         translation_reviewer_stats = list(translation_reviewer_stats)
 
         language_code, reviewer_user_id = keys
-        entity_id=(
+        entity_id = (
             '%s.%s' % (language_code, reviewer_user_id)
         )
 
         topic_ids = list(
-            set([v.topic_id for v in translation_reviewer_stats]))
+            [v.topic_id for v in translation_reviewer_stats])
         reviewed_translations_count = sum(
             [v.reviewed_translations_count
                 for v in translation_reviewer_stats])
@@ -491,9 +486,9 @@ class GenerateContributorAdminStatsJob(base_jobs.JobBase):
     def transform_question_contribution_stats(
         contributor_user_id: str,
         question_contribution_stats:
-            Iterable(suggestion_models.QuestionContributionStatsModel),
+            Iterable[suggestion_models.QuestionContributionStatsModel],
         question_general_suggestions_stats:
-            Iterable(suggestion_models.GeneralSuggestionModel)) -> (
+            Iterable[suggestion_models.GeneralSuggestionModel]) -> (
         suggestion_models.QuestionSubmitterTotalContributionStatsModel):
         """Transforms QuestionContributionStatsModel and GeneralSuggestionModel
         to QuestionSubmitterTotalContributionStatsModel.
@@ -501,11 +496,11 @@ class GenerateContributorAdminStatsJob(base_jobs.JobBase):
             Args:
                 contributor_user_id: str. User ID acting as a key to new model.
                 question_contribution_stats:
-                    Iterable(suggestion_models.QuestionContributionStatsModel).
+                    Iterable[suggestion_models.QuestionContributionStatsModel].
                     QuestionContributionStatsModel grouped by
                     contributor_user_id.
                 question_general_suggestions_stats:
-                    Iterable(suggestion_models.GeneralSuggestionModel).
+                    Iterable[suggestion_models.GeneralSuggestionModel].
                     GeneralSuggestionModel grouped by author_id.
 
             Returns:
@@ -515,7 +510,7 @@ class GenerateContributorAdminStatsJob(base_jobs.JobBase):
 
         question_general_suggestions_sorted_stats = sorted(
             question_general_suggestions_stats,
-            key=lambda m: m.created_on
+            key=lambda m : m.created_on
         )
 
         question_contribution_stats = list(question_contribution_stats)
@@ -530,9 +525,9 @@ class GenerateContributorAdminStatsJob(base_jobs.JobBase):
         }
 
         for v in general_suggestion_stats:
-            if (v.status=='accepted' and v.edited_by_reviewer==False):
+            if (v.status == 'accepted' and v.edited_by_reviewer is False):
                 recent_review_outcomes.append('accepted')
-            elif (v.status=='accepted' and v.edited_by_reviewer==True):
+            elif (v.status == 'accepted' and v.edited_by_reviewer is True):
                 recent_review_outcomes.append('accepted_with_edits')
             else:
                 recent_review_outcomes.append('rejected')
@@ -551,12 +546,10 @@ class GenerateContributorAdminStatsJob(base_jobs.JobBase):
             - (2 * (counts['rejected']))
             )
 
-        entity_id=contributor_user_id
+        entity_id = contributor_user_id
 
         topic_ids = list(
-            set([v.topic_id for v in question_contribution_stats]))
-        recent_review_outcomes = recent_review_outcomes
-        recent_performance = recent_performance
+            [v.topic_id for v in question_contribution_stats])
         submitted_questions_count = sum(
             [v.submitted_questions_count
                 for v in question_contribution_stats])
@@ -606,7 +599,7 @@ class GenerateContributorAdminStatsJob(base_jobs.JobBase):
     def transform_question_review_stats(
         reviewer_user_id: str,
         question_reviewer_stats:
-            Iterable(suggestion_models.QuestionReviewStatsModel)) -> (
+            Iterable[suggestion_models.QuestionReviewStatsModel]) -> (
         suggestion_models.QuestionReviewerTotalContributionStatsModel):
         """Transforms QuestionReviewStatsModel to
         QuestionReviewerTotalContributionStatsModel.
@@ -614,7 +607,7 @@ class GenerateContributorAdminStatsJob(base_jobs.JobBase):
             Args:
                 reviewer_user_id: str. User ID acting as a key to new model.
                 question_reviewer_stats:
-                    Iterable(suggestion_models.QuestionReviewStatsModel).
+                    Iterable[suggestion_models.QuestionReviewStatsModel].
                     QuestionReviewStatsModel grouped by
                     reviewer_user_id.
 
@@ -627,7 +620,7 @@ class GenerateContributorAdminStatsJob(base_jobs.JobBase):
         entity_id = reviewer_user_id
 
         topic_ids = list(
-            set([v.topic_id for v in question_reviewer_stats]))
+            [v.topic_id for v in question_reviewer_stats])
         reviewed_questions_count = sum(
             [v.reviewed_questions_count
                 for v in question_reviewer_stats])
