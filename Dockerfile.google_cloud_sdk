@@ -9,8 +9,6 @@ RUN tar -xzf gcloud-sdk.tar.gz
 RUN ./google-cloud-sdk/install.sh --quiet
 RUN rm gcloud-sdk.tar.gz
 
-RUN /google-cloud-sdk/bin/gcloud components install beta cloud-datastore-emulator app-engine-python app-engine-python-extras --quiet
-
 COPY . /app/oppia
 
 EXPOSE 8089
