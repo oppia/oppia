@@ -19,16 +19,12 @@ RUN pip install --upgrade pip==21.2.3
 RUN pip install pip-tools==6.6.2 setuptools==58.5.3
 
 # installing python dependencies from the requirements.txt file
-# COPY requirements.in .
-# COPY requirements.txt .
 COPY requirements_dev.in .
 COPY requirements_dev.txt .
 
-# RUN pip-compile --generate-hashes requirements.in
 RUN pip-compile --generate-hashes requirements_dev.in
 RUN pip install cmake
 # TODO: not installing pyarrow for now as facing problem while installing in my mac M1: refer - https://github.com/streamlit/streamlit/issues/2774
-# RUN pip install --require-hashes --no-deps -r requirements.txt
 RUN pip install --require-hashes --no-deps -r requirements_dev.txt
 
 ## installing packages from the package.json file
@@ -77,13 +73,10 @@ RUN chmod -R 744 $BUF_DIR \
 
 # compiling the protobuf files
 ENV PROTOC_FILES_PATH='/app/oppia/third_party/oppia-ml-proto-0.0.0'
-    # PATH=':/app/buf-0.29.0/protoc/bin:/app/oppia/node_modules/protoc-gen-ts'
 
 COPY buf.gen.yaml .
 COPY /extensions/classifiers/proto/ ./extensions/classifiers/proto/
 RUN mkdir /app/oppia/proto_files
-# RUN /app/buf-0.29.0/buf-Linux-x86_64 generate $PROTOC_FILES_PATH
-# RUN /app/buf-0.29.0/protoc/bin/protoc --plugin=protoc-gen-ts=/app/oppia/node_modules/.bin/protoc-gen-ts --ts_out=/output $PROTOC_FILES_PATH/*.proto --proto_path=$PROTOC_FILES_PATH
 RUN /app/buf-0.29.0/protoc/bin/protoc \
     --plugin=protoc-gen-ts=/app/oppia/node_modules/.bin/protoc-gen-ts \
     --ts_out=/app/oppia/extensions/classifiers/proto/ \

@@ -2,7 +2,7 @@
 FROM python@sha256:90834dba6381dfc3957573dc7a3e6c5c8ed255cf60079329a6da2b5e6d4257b8
 
 # python2 not installating as package might be removed - giving unable to locate python2
-RUN apt-get update && apt-get install -y python2 openjdk-11-jre wget
+RUN apt-get update && apt-get install -y python2 openjdk-11-jre wget curl
 
 RUN wget -O gcloud-sdk.tar.gz https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-sdk-364.0.0-linux-x86_64.tar.gz
 RUN tar -xzf gcloud-sdk.tar.gz

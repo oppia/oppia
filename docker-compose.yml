@@ -16,10 +16,11 @@ services:
     #   sh -c '/app/oppia/wait-for-it.sh --folder=/app/oppia/webpack_bundles && trap "rm ./node_modules/@angular/compiler-cli/ngcc/__ngcc_lock_file__" EXIT && ./node_modules/.bin/ng build --watch'
     healthcheck:
       # TODO: Add a variable for the folder name inside the dist as per the prod_env flag is passed or not.
-      test: bash -c "[ -f /app/oppia/dist/oppia-angular/index.html ]]"
-      interval: 1m
-      timeout: 5s
+      test: bash -f /app/oppia/dist/oppia-angular/index.html || sleep 25
+      timeout: 30s
+      interval: 30s
       retries: 5
+      start_period: 30s
     command: >
       sh -c 'trap "rm ./node_modules/@angular/compiler-cli/ngcc/__ngcc_lock_file__" EXIT; ./node_modules/.bin/ng build --watch'
 
@@ -35,11 +36,11 @@ services:
       webserver:
         condition: service_healthy
     healthcheck:
-      test: bash -c "[ -f /app/oppia/webpack_bundles/0.bundle.js ]]"
-      interval: 1m
-      timeout: 5s
+      test: bash -f /app/oppia/webpack_bundles/0.bundle.js || sleep 25
+      timeout: 30s
+      interval: 30s
       retries: 5
-      start_period: 2m
+      start_period: 30s
     command: node ./node_modules/webpack/bin/webpack.js --config ./webpack.dev.config.ts --watch
 
   google_app_engine:
@@ -52,8 +53,6 @@ services:
       - "8000:8000"
     volumes:
       - shared_root_dir:/app/oppia
-    # links:
-    #   - redis
     depends_on:
       webserver:
         condition: service_healthy
@@ -69,10 +68,10 @@ services:
         condition: service_healthy
     healthcheck:
       test: curl -f http://localhost:8181/ || exit 1
-      interval: 1m
       timeout: 10s
+      interval: 30s
       retries: 5
-      start_period: 30s
+      start_period: 5m
     # command: /google-cloud-sdk/bin/dev_appserver.py --runtime python38 --host=0.0.0.0 --port=8181 --log_level=info --admin_host=0.0.0.0 --admin_port=8000 --dev_appserver_log_level=info --skip_sdk_update_check=True --enable_host_checking=False --automatic_restart=True /app/oppia/app_dev.yaml
     command: /google-cloud-sdk/bin/dev_appserver.py /app/oppia/app_dev.yaml --runtime python38 --host=0.0.0.0 --port=8181
   
@@ -92,8 +91,8 @@ services:
         condition: service_healthy
     healthcheck:
       test: curl -f http://localhost:8089/ || exit 1
-      interval: 30s
       timeout: 10s
+      interval: 1m
       retries: 5
     command: /google-cloud-sdk/platform/cloud-datastore-emulator/cloud_datastore_emulator start --host=0.0.0.0 --port=8089 --store_on_disk=False --consistency=1.0 /app/cloud_datastore_emulator_cache
 
@@ -106,10 +105,9 @@ services:
     volumes:
       - shared_root_dir:/app/oppia
     healthcheck:
-      test: curl -f http://localhost:4000/auth/ || exit 1
-      # test: curl -f http://localhost:9099/ || exit 1
-      interval: 30s
+      test: wget --spider http://localhost:4000/auth/ || exit 1
       timeout: 10s
+      interval: 30s
       retries: 5
     command: /app/oppia/node_modules/firebase-tools/lib/bin/firebase.js emulators:start --only auth --project dev-project-id --config /app/oppia/.firebase.json --import /app/firebase_emulator_cache --export-on-exit /app/firebase_emulator_cache
 
@@ -118,13 +116,16 @@ services:
     container_name: oppia-redis
     ports:
       - "6379:6379"
+    environment:
+      - PATH=/usr/local/bin/
     healthcheck:
-      test: ["CMD", "redis-cli ping | grep PONG"]
-      interval: 30s
+      test: redis-cli ping
       timeout: 5s
+      interval: 30s
       retries: 5
-    # command: redis-server --bind 0.0.0.0 --port 6379 --save "60 1" --tcp-keepalive 300 --dbfilename dump.rdb --dir /app/oppia/ --rdbcompression yes --appendonly yes
-    # command: redis-server /app/oppia/redis.conf
+    volumes:
+      - shared_root_dir:/app/oppia
+    command: redis-server --bind 0.0.0.0 --port 6379 --save "60 1" --tcp-keepalive 300 --dbfilename dump.rdb --dir /app/oppia/ --rdbcompression yes
 
   elasticsearch:
     image: elasticsearch:7.17.0
@@ -142,8 +143,8 @@ services:
         condition: service_healthy
     healthcheck:
       test: curl -f http://localhost:9200/ || exit 1
-      interval: 30s
       timeout: 10s
+      interval: 1m
       retries: 5
     command: elasticsearch -q
 
