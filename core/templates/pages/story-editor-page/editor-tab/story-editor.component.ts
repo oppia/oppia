@@ -73,7 +73,7 @@ export class StoryEditorComponent implements OnInit, OnDestroy {
   chaptersListIsShown: boolean;
   selectedChapterIndex: number;
   chapterIsPublishable: boolean[];
-  selectedChapterIndexToPublishUpToInDropdown: number;
+  selectedChapterIndexInPublishUptoDropdown: number;
   publishedChaptersDropErrorIsShown: boolean = false;
   NOTES_SCHEMA = {
     type: 'html',
@@ -185,7 +185,7 @@ export class StoryEditorComponent implements OnInit, OnDestroy {
         this.linearNodesList.forEach((node, index) => {
           if (node.getStatus() === 'Published') {
             this.chapterIsPublishable.push(true);
-            this.selectedChapterIndexToPublishUpToInDropdown = index;
+            this.selectedChapterIndexInPublishUptoDropdown = index;
           } else if (node.getStatus() === 'Ready To Publish' &&
             index !== 0 && this.chapterIsPublishable[index - 1]) {
             this.chapterIsPublishable.push(true);
@@ -412,7 +412,7 @@ export class StoryEditorComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.storyPreviewCardIsShown = false;
     this.mainStoryCardIsShown = true;
-    this.selectedChapterIndexToPublishUpToInDropdown = 0;
+    this.selectedChapterIndexInPublishUptoDropdown = 0;
     this.chaptersListIsShown = (
       !this.windowDimensionsService.isWindowNarrow());
     this.directiveSubscriptions.add(

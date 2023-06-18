@@ -261,8 +261,8 @@
             <div class="chapter-control-bar" *ngIf="linearNodesList.length">
               <div class="publish-upto-chapter-menu">
                 <span class="publish-upto-chapter-label">Publish upto Chapter ...</span>
-                <select [(ngModel)]="selectedChapterIndexToPublishUpToInDropdown"
-                        (ngModelChange)="updatePublishUptoChapterSelection(selectedChapterIndexToPublishUpToInDropdown)"
+                <select [(ngModel)]="selectedChapterIndexInPublishUptoDropdown"
+                        (ngModelChange)="updatePublishUptoChapterSelection(selectedChapterIndexInPublishUptoDropdown)"
                         class="publish-upto-chapter-dropdown">
                   <option *ngFor="let node of linearNodesList;index as idx"
                           [disabled]="!chapterIsPublishable[idx]"
