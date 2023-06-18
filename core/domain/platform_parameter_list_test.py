@@ -37,16 +37,20 @@ class ExistingPlatformParameterValidityTests(test_utils.GenericTestBase):
                             'diagnostic_test',
                             'serial_chapter_launch_curriculum_admin_view',
                             'show_translation_size',
-                            'is_improvements_tab_enabled',
-                            'learner_groups_are_enabled',
                             'promo_bar_enabled',
                             'promo_bar_message',
                             'always_ask_learners_for_answer_details',
-                            'high_bounce_rate_task_state_bounce_'
-                            'rate_creation_threshold',
-                            'high_bounce_rate_task_state_bounce_rate_'
-                            'obsoletion_threshold',
-                            'high_bounce_rate_task_minimum_exploration_starts']
+                            (
+                                'high_bounce_rate_task_state_bounce_'
+                                'rate_creation_threshold'
+                            ),
+                            (
+                                'high_bounce_rate_task_state_bounce_rate_'
+                                'obsoletion_threshold'
+                            ),
+                            'high_bounce_rate_task_minimum_exploration_starts',
+                            'is_improvements_tab_enabled',
+                            'learner_groups_are_enabled']
 
     def test_all_defined_parameters_are_valid(self) -> None:
         all_names = params.Registry.get_all_platform_parameter_names()
