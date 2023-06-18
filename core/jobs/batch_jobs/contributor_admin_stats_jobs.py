@@ -173,13 +173,7 @@ class GenerateContributorAdminStatsJob(base_jobs.JobBase):
             | 'Group TranslationReviewerTotalContributionStatsModel by key' >>
                 beam.GroupByKey()
             | 'Transform translation reviewer stats' >>
-                beam.MapTuple(
-                    lambda key, value:
-                        self.transform_translation_review_stats(
-                            key,
-                            value
-                        )
-                )
+                beam.MapTuple(self.transform_translation_review_stats)
         )
 
         question_submitter_total_stats_models = (
@@ -206,13 +200,7 @@ class GenerateContributorAdminStatsJob(base_jobs.JobBase):
             | 'Group QuestionReviewerTotalContributionStatsModel by key' >>
                 beam.GroupByKey()
             | 'Transform question reviewer stats' >>
-                beam.MapTuple(
-                    lambda key, value:
-                        self.transform_question_review_stats(
-                            key,
-                            value
-                        )
-                )
+                beam.MapTuple(self.transform_question_review_stats)
         )
 
         unused_translation_submitter_put_results = (
@@ -298,7 +286,7 @@ class GenerateContributorAdminStatsJob(base_jobs.JobBase):
                 (language_code, author_id).
 
         Returns:
-            TranslationSubmitterTotalContributionStatsModel.
+            suggestion_models.TranslationSubmitterTotalContributionStatsModel.
             New TranslationReviewerTotalContributionStatsModel model.
         """
 
