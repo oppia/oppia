@@ -98,20 +98,15 @@ if MYPY:  # pragma: no cover
     from mypy_imports import platform_auth_services
     from mypy_imports import platform_taskqueue_services
     from mypy_imports import question_models
-    from mypy_imports import skill_models
     from mypy_imports import storage_services
-    from mypy_imports import story_models
     from mypy_imports import suggestion_models
-    from mypy_imports import topic_models
 
 (
-    auth_models, base_models, exp_models,
-    feedback_models, question_models, skill_models,
-    story_models, suggestion_models, topic_models
+    auth_models, base_models, exp_models, feedback_models, question_models,
+    suggestion_models,
 ) = models.Registry.import_models([
     models.Names.AUTH, models.Names.BASE_MODEL, models.Names.EXPLORATION,
-    models.Names.FEEDBACK, models.Names.QUESTION, models.Names.SKILL,
-    models.Names.STORY, models.Names.SUGGESTION, models.Names.TOPIC
+    models.Names.FEEDBACK, models.Names.QUESTION, models.Names.SUGGESTION,
 ])
 
 datastore_services = models.Registry.import_datastore_services()
