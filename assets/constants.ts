@@ -7057,6 +7057,6 @@ export default {
   ],
   "CONTRIBUTOR_CERTIFICATE_WIDTH": 1493,
   "CONTRIBUTOR_CERTIFICATE_HEIGHT": 1313,
-  "BRANCH_NAME": "",
-  "SHORT_COMMIT_HASH": ""
+  "BRANCH_NAME": "lighthouse",
+  "SHORT_COMMIT_HASH": "2f70b88f4"
 } as const;
