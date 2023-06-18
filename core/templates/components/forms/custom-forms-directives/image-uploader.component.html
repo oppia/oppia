@@ -26,7 +26,14 @@
     <i class="fas fa-image image-uploader-no-thumbnail-icon"
        [ngClass]="{'d-none': blogDashboardPageService.imageUploaderIsNarrow}">
     </i>
-    <span class="font-weight-light">{{ 'I18N_BLOG_POST_THUMBNAIL_PICTURE_DRAG' | translate }}</span>
+    <span *ngIf="!blogDashboardPageService.imageUploaderIsNarrow"
+          class="font-weight-light">
+      {{ 'I18N_BLOG_POST_THUMBNAIL_PICTURE_DRAG' | translate }}
+    </span>
+    <span *ngIf="blogDashboardPageService.imageUploaderIsNarrow"
+          class="font-weight-light">
+      {{ 'I18N_BLOG_POST_EDITOR_EDIT_THUMBNAIL_TEXT' | translate }}
+    </span>
   </label>
 </div>
 <style>
