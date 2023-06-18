@@ -263,7 +263,7 @@ class GenerateContributorAdminStatsJob(base_jobs.JobBase):
 
     @staticmethod
     def transform_translation_contribution_stats(
-        keys: Tuple(str, str),
+        keys: Tuple[str, str],
         translation_contribution_stats:
             Iterable[suggestion_models.TranslationContributionStatsModel],
         translation_general_suggestions_stats:
@@ -274,7 +274,7 @@ class GenerateContributorAdminStatsJob(base_jobs.JobBase):
         TranslationSubmitterTotalContributionStatsModel.
 
         Args:
-            keys: Tuple(str, str).
+            keys: Tuple[str, str].
                 Tuple of (language_code, contributor_user_id).
             translation_contribution_stats:
                 Iterable[suggestion_models.TranslationContributionStatsModel].
@@ -289,10 +289,13 @@ class GenerateContributorAdminStatsJob(base_jobs.JobBase):
             suggestion_models.TranslationSubmitterTotalContributionStatsModel.
             New TranslationReviewerTotalContributionStatsModel model.
         """
-
+        # The key for sorting is defined separately because of a mypy bug.
+        # A [no-any-return] is thrown if key is defined in the sort() method
+        # instead. Reference: https://github.com/python/mypy/issues/9590.\
+        by_created_on = lambda m: m.created_on
         translation_general_suggestions_sorted_stats = sorted(
             translation_general_suggestions_stats,
-            key=lambda m: m.created_on
+            key=by_created_on
         )
 
         translation_contribution_stats = list(translation_contribution_stats)
@@ -399,7 +402,7 @@ class GenerateContributorAdminStatsJob(base_jobs.JobBase):
 
     @staticmethod
     def transform_translation_review_stats(
-        keys: Tuple(str, str),
+        keys: Tuple[str, str],
         translation_reviewer_stats:
             Iterable[suggestion_models.TranslationReviewStatsModel]) -> (
         suggestion_models.TranslationReviewerTotalContributionStatsModel):
@@ -407,7 +410,7 @@ class GenerateContributorAdminStatsJob(base_jobs.JobBase):
         TranslationReviewerTotalContributionStatsModel.
 
         Args:
-            keys: Tuple(str, str). Tuple of
+            keys: Tuple[str, str]. Tuple of
                 (language_code, reviewer_user_id).
             translation_reviewer_stats:
                 Iterable[suggestion_models.TranslationReviewStatsModel].

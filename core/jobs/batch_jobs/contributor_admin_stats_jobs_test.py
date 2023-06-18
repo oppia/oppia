@@ -503,6 +503,8 @@ class GenerateContributorAdminStatsJobTests(job_test_utils.JobTestBase):
             suggestion_models.TranslationSubmitterTotalContributionStatsModel
             .get('hi', 'user1')
         )
+        # Ruling out the possibility of None for mypy type checking.
+        assert translation_submitter_total_stats is not None
         self.assertItemsEqual(
             ['topic1', 'topic2', 'topic3'],
             translation_submitter_total_stats
@@ -569,6 +571,8 @@ class GenerateContributorAdminStatsJobTests(job_test_utils.JobTestBase):
             suggestion_models.TranslationReviewerTotalContributionStatsModel
             .get('es', 'user1')
         )
+        # Ruling out the possibility of None for mypy type checking.
+        assert translation_reviewer_total_stats is not None
         self.assertItemsEqual(
             ['topic1', 'topic2'],
             translation_reviewer_total_stats
@@ -615,6 +619,8 @@ class GenerateContributorAdminStatsJobTests(job_test_utils.JobTestBase):
             suggestion_models.QuestionSubmitterTotalContributionStatsModel
             .get('user1')
         )
+        # Ruling out the possibility of None for mypy type checking.
+        assert question_submitter_total_stats is not None
         self.assertItemsEqual(
             ['topic1', 'topic2'],
             question_submitter_total_stats
@@ -669,6 +675,8 @@ class GenerateContributorAdminStatsJobTests(job_test_utils.JobTestBase):
             suggestion_models.QuestionReviewerTotalContributionStatsModel
             .get('user1')
         )
+        # Ruling out the possibility of None for mypy type checking.
+        assert question_reviewer_total_stats is not None
         self.assertItemsEqual(
             ['topic1', 'topic2'],
             question_reviewer_total_stats
