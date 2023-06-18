@@ -70,7 +70,12 @@ module.exports = {
       'offscreen-images': ['error', {'minScore': 0.45}],
       'time-to-first-byte': ['off', {}],
       // Best practices category.
-      'errors-in-console': ['error', {'minScore': 1}],
+      'errors-in-console': ['error', {
+        'minScore': 1,
+        // Error on the /donate page due to an embedded third-party component
+        // within it.
+        'ignoredPatterns': ['Refused to connect to \'https://stripe.com/cookie']
+      }],
       'no-document-write': ['error', {'minScore': 1}],
       'geolocation-on-start': ['error', {'minScore': 1}],
       'doctype': ['error', {'minScore': 1}],
