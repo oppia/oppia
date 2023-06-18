@@ -276,8 +276,8 @@ class GenerateContributorAdminStatsJob(base_jobs.JobBase):
         Args:
             keys: Tuple(str, str).
                 Tuple of (language_code, contributor_user_id).
-            translation_contribution_stats: Iterable[
-                suggestion_models.TranslationContributionStatsModel].
+            translation_contribution_stats:
+                Iterable[suggestion_models.TranslationContributionStatsModel].
                 TranslationReviewStatsModel grouped by
                 (language_code, contributor_user_id).
             translation_general_suggestions_stats:
