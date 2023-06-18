@@ -664,13 +664,6 @@ class MachineTranslationStateTextsHandler(
         If no translation is found for a given content id, that id is mapped to
         None.
 
-        Params:
-            exp_id: str. The ID of the exploration being translated.
-            state_name: str. The name of the exploration state being translated.
-            content_ids: str[]. The content IDs of the texts to be translated.
-            target_language_code: str. The language code of the target
-                translation language.
-
         Data Response:
 
             dict('translated_texts': dict(str, str|None))
@@ -808,6 +801,7 @@ class TranslatableTopicNamesHandler(
 
     @acl_decorators.open_access
     def get(self) -> None:
+        """Handles GET requests."""
         # Only published topics are translatable.
         topic_summaries = topic_fetchers.get_published_topic_summaries()
         topic_names = [summary.name for summary in topic_summaries]
@@ -906,7 +900,17 @@ class ContributorStatsSummariesHandler(
         contribution_subtype: str,
         username: str
     ) -> None:
-        """Handles GET requests."""
+        """Handles GET requests.
+
+        Args:
+            contribution_type: str. The contribution type.
+            contribution_subtype: str. The contribution subtype.
+            username: str. The username.
+
+        Raises:
+            InvalidInputException. The contribution type or the contribution
+                subtype is invalid.
+        """
         if contribution_type not in [
             feconf.CONTRIBUTION_TYPE_TRANSLATION,
             feconf.CONTRIBUTION_TYPE_QUESTION
@@ -1024,7 +1028,12 @@ class ContributorCertificateHandler(
     def get(
         self, username: str, suggestion_type: str
     ) -> None:
-        """Handles GET requests."""
+        """Handles GET requests.
+
+        Args:
+            username: str. The user name.
+            suggestion_type:  str. The suggestion type.
+        """
         assert self.normalized_request is not None
         from_date = self.normalized_request['from_date']
         to_date = self.normalized_request['to_date']
@@ -1065,7 +1074,11 @@ class ContributorAllStatsSummariesHandler(
 
     @acl_decorators.can_fetch_all_contributor_dashboard_stats
     def get(self, username: str) -> None:
-        """Handles GET requests."""
+        """Handles GET requests.
+
+        Args:
+            username: str. The username.
+        """
         user_id = user_services.get_user_id_from_username(username)
         # Here we are sure that user_id will never be None, because
         # we are already handling the None case of user_id in
