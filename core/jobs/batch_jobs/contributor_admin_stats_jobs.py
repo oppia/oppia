@@ -27,8 +27,7 @@ from core.platform import models
 
 import apache_beam as beam
 
-from typing import (
-    Iterable, Tuple)
+from typing import Iterable, Tuple
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -62,10 +61,10 @@ class GenerateContributorAdminStatsJob(base_jobs.JobBase):
                     include_deleted=False))
         )
 
-        translation_general_suggestions_stats= (
+        translation_general_suggestions_stats = (
             general_suggestions_models
              | 'Filter reviewed translate suggestions' >> beam.Filter(
-                lambda m : (
+                lambda m: (
                     m.suggestion_type ==
                     feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT and
                     m.status in [
@@ -78,10 +77,10 @@ class GenerateContributorAdminStatsJob(base_jobs.JobBase):
             )
         )
 
-        question_general_suggestions_stats= (
+        question_general_suggestions_stats = (
             general_suggestions_models
              | 'Filter reviewed questions suggestions' >> beam.Filter(
-                lambda m : (
+                lambda m: (
                     m.suggestion_type ==
                     feconf.SUGGESTION_TYPE_ADD_QUESTION and
                     m.status in [
@@ -287,10 +286,11 @@ class GenerateContributorAdminStatsJob(base_jobs.JobBase):
         TranslationSubmitterTotalContributionStatsModel.
 
             Args:
-                keys: Tuple(str, str). Tuple of
-                    (language_code, contributor_user_id).
+                keys: Tuple(str, str).
+                    Tuple of (language_code, contributor_user_id).
                 translation_contribution_stats:
-                    Iterable[suggestion_models.TranslationContributionStatsModel]. # pylint: disable=line-too-long
+                    Iterable[
+                        suggestion_models.TranslationContributionStatsModel].
                     TranslationReviewStatsModel grouped by
                     (language_code, contributor_user_id).
                 translation_general_suggestions_stats:
@@ -299,13 +299,13 @@ class GenerateContributorAdminStatsJob(base_jobs.JobBase):
                     (language_code, author_id).
 
             Returns:
-                suggestion_models.TranslationSubmitterTotalContributionStatsModel. # pylint: disable=line-too-long
+                TranslationSubmitterTotalContributionStatsModel.
                 New TranslationReviewerTotalContributionStatsModel model.
         """
 
         translation_general_suggestions_sorted_stats = sorted(
             translation_general_suggestions_stats,
-            key=lambda m : m.created_on
+            key=lambda m: m.created_on
         )
 
         translation_contribution_stats = list(translation_contribution_stats)
@@ -346,7 +346,7 @@ class GenerateContributorAdminStatsJob(base_jobs.JobBase):
             '%s.%s' % (language_code, contributor_user_id)
         )
 
-        topic_ids = list(
+        topic_ids = (
             [v.topic_id for v in translation_contribution_stats])
         submitted_translations_count = sum(
             [v.submitted_translations_count
@@ -428,7 +428,8 @@ class GenerateContributorAdminStatsJob(base_jobs.JobBase):
                     (language_code, reviewer_user_id).
 
             Returns:
-                suggestion_models.TranslationReviewerTotalContributionStatsModel. # pylint: disable=line-too-long
+                suggestion_models
+                    .TranslationReviewerTotalContributionStatsModel.
                 New TranslationReviewerTotalContributionStatsModel model.
         """
 
@@ -439,7 +440,7 @@ class GenerateContributorAdminStatsJob(base_jobs.JobBase):
             '%s.%s' % (language_code, reviewer_user_id)
         )
 
-        topic_ids = list(
+        topic_ids = (
             [v.topic_id for v in translation_reviewer_stats])
         reviewed_translations_count = sum(
             [v.reviewed_translations_count
@@ -510,7 +511,7 @@ class GenerateContributorAdminStatsJob(base_jobs.JobBase):
 
         question_general_suggestions_sorted_stats = sorted(
             question_general_suggestions_stats,
-            key=lambda m : m.created_on
+            key=lambda m: m.created_on
         )
 
         question_contribution_stats = list(question_contribution_stats)
@@ -548,7 +549,7 @@ class GenerateContributorAdminStatsJob(base_jobs.JobBase):
 
         entity_id = contributor_user_id
 
-        topic_ids = list(
+        topic_ids = (
             [v.topic_id for v in question_contribution_stats])
         submitted_questions_count = sum(
             [v.submitted_questions_count
@@ -619,7 +620,7 @@ class GenerateContributorAdminStatsJob(base_jobs.JobBase):
         question_reviewer_stats = list(question_reviewer_stats)
         entity_id = reviewer_user_id
 
-        topic_ids = list(
+        topic_ids = (
             [v.topic_id for v in question_reviewer_stats])
         reviewed_questions_count = sum(
             [v.reviewed_questions_count
