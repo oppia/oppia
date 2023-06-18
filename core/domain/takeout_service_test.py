@@ -427,11 +427,19 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
     REVIEWED_TRANSLATIONS_COUNT: Final = 0
     REVIEWED_TRANSLATION_WORD_COUNT: Final = 0
     ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT: Final = 0
-    SUBMITTED_QUESTION_COUNT: Final = 20
+    SUBMITTED_QUESTIONS_COUNT: Final = 20
+    REJECTED_QUESTIONS_COUNT: Final = 20
     ACCEPTED_QUESTIONS_COUNT: Final = 2
     ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT: Final = 0
     REVIEWED_QUESTIONS_COUNT: Final = 2
     ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT: Final = 0
+    TOPIC_IDS_WITH_TRANSLATION_SUBMISSIONS: Final = ['15', '16', '17']
+    TOPIC_IDS_WITH_TRANSLATION_REVIEWS: Final = ['18', '19', '20']
+    TOPIC_IDS_WITH_QUESTION_SUBMISSIONS: Final = ['18', '19', '20']
+    TOPIC_IDS_WITH_QUESTION_REVIEWS: Final = ['18', '19', '20']
+    RECENT_REVIEW_OUTCOMES: Final = ['accepted', 'rejected']
+    RECENT_PERFORMANCE: Final = 20
+    OVERALL_ACCURACY: Final = 2.0
     # Timestamp dates in sec since epoch for Mar 19 2021 UTC.
     CONTRIBUTION_DATES: Final = [
         datetime.date.fromtimestamp(1616173836),
@@ -745,7 +753,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         suggestion_models.QuestionContributionStatsModel.create(
             contributor_user_id=self.USER_ID_1,
             topic_id=self.TOPIC_ID_1,
-            submitted_questions_count=self.SUBMITTED_QUESTION_COUNT,
+            submitted_questions_count=self.SUBMITTED_QUESTIONS_COUNT,
             accepted_questions_count=self.ACCEPTED_QUESTIONS_COUNT,
             accepted_questions_without_reviewer_edits_count=(
                 self.ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT),
@@ -760,6 +768,75 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             accepted_questions_count=self.ACCEPTED_QUESTIONS_COUNT,
             accepted_questions_with_reviewer_edits_count=(
                 self.ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT),
+            first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
+            last_contribution_date=self.LAST_CONTRIBUTION_DATE
+        )
+
+        suggestion_models.TranslationSubmitterTotalContributionStatsModel.create( # pylint: disable=line-too-long
+            language_code=self.SUGGESTION_LANGUAGE_CODE,
+            contributor_id=self.USER_ID_1,
+            topic_ids_with_translation_submissions=(
+                self.TOPIC_IDS_WITH_TRANSLATION_SUBMISSIONS),
+            recent_review_outcomes=self.RECENT_REVIEW_OUTCOMES,
+            recent_performance=self.RECENT_PERFORMANCE,
+            overall_accuracy=self.OVERALL_ACCURACY,
+            submitted_translations_count=self.SUBMITTED_TRANSLATIONS_COUNT,
+            submitted_translation_word_count=(
+                self.SUBMITTED_TRANSLATION_WORD_COUNT),
+            accepted_translations_count=self.ACCEPTED_TRANSLATIONS_COUNT,
+            accepted_translations_without_reviewer_edits_count=(
+                self.ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT),
+            accepted_translation_word_count=(
+                self.ACCEPTED_TRANSLATION_WORD_COUNT),
+            rejected_translations_count=self.REJECTED_TRANSLATIONS_COUNT,
+            rejected_translation_word_count=(
+                self.REJECTED_TRANSLATION_WORD_COUNT),
+            first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
+            last_contribution_date=self.LAST_CONTRIBUTION_DATE
+        )
+
+        suggestion_models.TranslationReviewerTotalContributionStatsModel.create( # pylint: disable=line-too-long
+            language_code=self.SUGGESTION_LANGUAGE_CODE,
+            contributor_id=self.USER_ID_1,
+            topic_ids_with_translation_reviews=(
+                self.TOPIC_IDS_WITH_TRANSLATION_REVIEWS),
+            reviewed_translations_count=self.REVIEWED_TRANSLATIONS_COUNT,
+            accepted_translations_count=self.ACCEPTED_TRANSLATIONS_COUNT,
+            accepted_translations_with_reviewer_edits_count=(
+                self.ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT),
+            accepted_translation_word_count=(
+                self.ACCEPTED_TRANSLATION_WORD_COUNT),
+            rejected_translations_count=(
+                self.REJECTED_TRANSLATIONS_COUNT),
+            first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
+            last_contribution_date=self.LAST_CONTRIBUTION_DATE
+        )
+
+        suggestion_models.QuestionSubmitterTotalContributionStatsModel.create(
+            contributor_id=self.USER_ID_1,
+            topic_ids_with_question_submissions=(
+                self.TOPIC_IDS_WITH_QUESTION_SUBMISSIONS),
+            recent_review_outcomes=self.RECENT_REVIEW_OUTCOMES,
+            recent_performance=self.RECENT_PERFORMANCE,
+            overall_accuracy=self.OVERALL_ACCURACY,
+            submitted_questions_count=self.SUBMITTED_QUESTIONS_COUNT,
+            accepted_questions_count=self.ACCEPTED_QUESTIONS_COUNT,
+            accepted_questions_without_reviewer_edits_count=(
+                self.ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT),
+            rejected_questions_count=self.REJECTED_QUESTIONS_COUNT,
+            first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
+            last_contribution_date=self.LAST_CONTRIBUTION_DATE
+        )
+
+        suggestion_models.QuestionReviewerTotalContributionStatsModel.create(
+            contributor_id=self.USER_ID_1,
+            topic_ids_with_question_reviews=(
+                self.TOPIC_IDS_WITH_QUESTION_REVIEWS),
+            reviewed_questions_count=self.REVIEWED_QUESTIONS_COUNT,
+            accepted_questions_count=self.ACCEPTED_QUESTIONS_COUNT,
+            accepted_questions_with_reviewer_edits_count=(
+                self.ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT),
+            rejected_questions_count=self.REJECTED_QUESTIONS_COUNT,
             first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
             last_contribution_date=self.LAST_CONTRIBUTION_DATE
         )
@@ -1099,6 +1176,18 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         expected_question_review_stats: Dict[
             str, Dict[str, Dict[str, str]]
         ] = {}
+        expected_translation_submitter_total_contribution_stats: Dict[
+            str, Dict[str, Dict[str, str]]
+        ] = {}
+        expected_translation_reviewer_total_contribution_stats: Dict[
+            str, Dict[str, Dict[str, str]]
+        ] = {}
+        expected_question_submitter_total_contribution_stats: Dict[
+            str, Dict[str, Dict[str, str]]
+        ] = {}
+        expected_question_reviewer_total_contribution_stats: Dict[
+            str, Dict[str, Dict[str, str]]
+        ] = {}
         expected_story_sm: Dict[str, Dict[str, Dict[str, str]]] = {}
         expected_question_sm: Dict[str, Dict[str, Dict[str, str]]] = {}
         expected_config_property_sm: Dict[str, Dict[str, Dict[str, str]]] = {}
@@ -1173,6 +1262,14 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
                 expected_question_contribution_stats,
             'question_review_stats':
                 expected_question_review_stats,
+            'translation_submitter_total_contribution_stats':
+                expected_translation_submitter_total_contribution_stats,
+            'translation_reviewer_total_contribution_stats':
+                expected_translation_reviewer_total_contribution_stats,
+            'question_submitter_total_contribution_stats':
+                expected_question_submitter_total_contribution_stats,
+            'question_reviewer_total_contribution_stats':
+                expected_question_reviewer_total_contribution_stats,
             'story_snapshot_metadata': expected_story_sm,
             'question_snapshot_metadata': expected_question_sm,
             'config_property_snapshot_metadata':
@@ -1844,7 +1941,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
                 self.USER_ID_1, self.TOPIC_ID_1): {
                     'topic_id': self.TOPIC_ID_1,
                     'submitted_questions_count': (
-                        self.SUBMITTED_QUESTION_COUNT),
+                        self.SUBMITTED_QUESTIONS_COUNT),
                     'accepted_questions_count': (
                         self.ACCEPTED_QUESTIONS_COUNT),
                     'accepted_questions_without_reviewer_edits_count': (
@@ -1867,6 +1964,100 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
                     'accepted_questions_with_reviewer_edits_count': (
                         self
                         .ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT),
+                    'first_contribution_date': (
+                        self.FIRST_CONTRIBUTION_DATE.isoformat()),
+                    'last_contribution_date': (
+                        self.LAST_CONTRIBUTION_DATE.isoformat())
+                }
+        }
+        expected_translation_submitter_total_contribution_stats_data = {
+            '%s.%s' % (
+                self.SUGGESTION_LANGUAGE_CODE, self.USER_ID_1): {
+                    'language_code': self.SUGGESTION_LANGUAGE_CODE,
+                    'topic_ids_with_translation_submissions': (
+                        self.TOPIC_IDS_WITH_TRANSLATION_SUBMISSIONS),
+                    'recent_review_outcomes': self.RECENT_REVIEW_OUTCOMES,
+                    'recent_performance': self.RECENT_PERFORMANCE,
+                    'overall_accuracy': self.OVERALL_ACCURACY,
+                    'submitted_translations_count': (
+                        self.SUBMITTED_TRANSLATIONS_COUNT),
+                    'submitted_translation_word_count': (
+                        self.SUBMITTED_TRANSLATION_WORD_COUNT),
+                    'accepted_translations_count': (
+                        self.ACCEPTED_TRANSLATIONS_COUNT),
+                    'accepted_translations_without_reviewer_edits_count': (
+                        self
+                        .ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT),
+                    'accepted_translation_word_count': (
+                        self.ACCEPTED_TRANSLATION_WORD_COUNT),
+                    'rejected_translations_count': (
+                        self.REJECTED_TRANSLATIONS_COUNT),
+                    'rejected_translation_word_count': (
+                        self.REJECTED_TRANSLATION_WORD_COUNT),
+                    'first_contribution_date': (
+                        self.FIRST_CONTRIBUTION_DATE.isoformat()),
+                    'last_contribution_date': (
+                        self.LAST_CONTRIBUTION_DATE.isoformat())
+                }
+        }
+        expected_translation_reviewer_total_contribution_stats_data = {
+            '%s.%s' % (
+                self.SUGGESTION_LANGUAGE_CODE, self.USER_ID_1): {
+                    'language_code': self.SUGGESTION_LANGUAGE_CODE,
+                    'topic_ids_with_translation_reviews': (
+                        self.TOPIC_IDS_WITH_TRANSLATION_REVIEWS),
+                    'reviewed_translations_count': (
+                        self.REVIEWED_TRANSLATIONS_COUNT),
+                    'accepted_translations_count': (
+                        self.ACCEPTED_TRANSLATIONS_COUNT),
+                    'accepted_translations_with_reviewer_edits_count': (
+                        self
+                        .ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT),
+                    'accepted_translation_word_count': (
+                        self.ACCEPTED_TRANSLATION_WORD_COUNT),
+                    'rejected_translations_count': (
+                        self.REJECTED_TRANSLATIONS_COUNT),
+                    'first_contribution_date': (
+                        self.FIRST_CONTRIBUTION_DATE.isoformat()),
+                    'last_contribution_date': (
+                        self.LAST_CONTRIBUTION_DATE.isoformat())
+                }
+        }
+        expected_question_submitter_total_contribution_stats_data = {
+            '%s' % (
+                self.USER_ID_1): {
+                    'topic_ids_with_question_submissions': (
+                        self.TOPIC_IDS_WITH_QUESTION_SUBMISSIONS),
+                    'recent_review_outcomes': self.RECENT_REVIEW_OUTCOMES,
+                    'recent_performance': self.RECENT_PERFORMANCE,
+                    'overall_accuracy': self.OVERALL_ACCURACY,
+                    'submitted_questions_count': (
+                        self.SUBMITTED_QUESTIONS_COUNT),
+                    'accepted_questions_count': (
+                        self.ACCEPTED_QUESTIONS_COUNT),
+                    'accepted_questions_without_reviewer_edits_count': (
+                        self
+                        .ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT),
+                    'rejected_questions_count': self.REJECTED_QUESTIONS_COUNT,
+                    'first_contribution_date': (
+                        self.FIRST_CONTRIBUTION_DATE.isoformat()),
+                    'last_contribution_date': (
+                        self.LAST_CONTRIBUTION_DATE.isoformat())
+                }
+        }
+        expected_question_reviewer_total_contribution_stats_data = {
+            '%s' % (
+                self.USER_ID_1): {
+                    'topic_ids_with_question_reviews': (
+                        self.TOPIC_IDS_WITH_QUESTION_REVIEWS),
+                    'reviewed_questions_count': (
+                        self.REVIEWED_QUESTIONS_COUNT),
+                    'accepted_questions_count': (
+                        self.ACCEPTED_QUESTIONS_COUNT),
+                    'accepted_questions_with_reviewer_edits_count': (
+                        self
+                        .ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT),
+                    'rejected_questions_count': self.REJECTED_QUESTIONS_COUNT,
                     'first_contribution_date': (
                         self.FIRST_CONTRIBUTION_DATE.isoformat()),
                     'last_contribution_date': (
@@ -1922,6 +2113,14 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
                 expected_question_contribution_stats_data,
             'question_review_stats':
                 expected_question_review_stats_data,
+            'translation_submitter_total_contribution_stats':
+                expected_translation_submitter_total_contribution_stats_data,
+            'translation_reviewer_total_contribution_stats':
+                expected_translation_reviewer_total_contribution_stats_data,
+            'question_submitter_total_contribution_stats':
+                expected_question_submitter_total_contribution_stats_data,
+            'question_reviewer_total_contribution_stats':
+                expected_question_reviewer_total_contribution_stats_data,
             'story_snapshot_metadata': expected_story_sm,
             'question_snapshot_metadata': expected_question_sm,
             'config_property_snapshot_metadata':
