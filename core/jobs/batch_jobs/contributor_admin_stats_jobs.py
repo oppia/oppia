@@ -262,7 +262,7 @@ class GenerateContributorAdminStatsJob(base_jobs.JobBase):
         )
 
         question_reviewer_models_job_run_results = (
-            question_submitter_total_stats_models
+            question_reviewer_total_stats_models
             | 'Create question reviewer job run result' >> (
                 job_result_transforms.CountObjectsToJobRunResult())
         )
@@ -285,9 +285,35 @@ class GenerateContributorAdminStatsJob(base_jobs.JobBase):
         translation_general_suggestions_stats:
             Iterable(suggestion_models.GeneralSuggestionModel)) -> (
         suggestion_models.TranslationSubmitterTotalContributionStatsModel):
+        """Transforms TranslationContributionStatsModel and
+        GeneralSuggestionModel to
+        TranslationSubmitterTotalContributionStatsModel.
+
+            Args:
+                keys: Tuple(str, str). Tuple of
+                    (language_code, contributor_user_id).
+                translation_contribution_stats:
+                    Iterable(suggestion_models.TranslationContributionStatsModel).
+                    TranslationReviewStatsModel grouped by
+                    (language_code, contributor_user_id).
+                translation_general_suggestions_stats:
+                    Iterable(suggestion_models.GeneralSuggestionModel).
+                    TranslationReviewStatsModel grouped by
+                    (language_code, author_id).
+
+            Returns:
+                suggestion_models.TranslationSubmitterTotalContributionStatsModel.
+                New TranslationReviewerTotalContributionStatsModel model.
+        """
+
+        translation_general_suggestions__sorted_stats = sorted(
+            translation_general_suggestions_stats,
+            key=lambda m: m.created_on
+        )
 
         translation_contribution_stats = list(translation_contribution_stats)
-        general_suggestion_stats = list(translation_general_suggestions_stats)
+        general_suggestion_stats = list(
+            translation_general_suggestions__sorted_stats)
         recent_review_outcomes = []
 
         counts = {
@@ -309,8 +335,7 @@ class GenerateContributorAdminStatsJob(base_jobs.JobBase):
 
         # Iterate over the list and count occurrences.
         for outcome in recent_review_outcomes:
-            if outcome in counts:
-                counts[outcome] += 1
+            counts[outcome] += 1
 
         # Weights of recent_performance as documented in
         # https://docs.google.com/document/d/19lCEYQUgV7_DwIK_0rz3zslRHX2qKOHn-t9Twpi0qu0/edit.
@@ -356,8 +381,11 @@ class GenerateContributorAdminStatsJob(base_jobs.JobBase):
 
         # Weights of overall_accuracy as documented in
         # https://docs.google.com/document/d/19lCEYQUgV7_DwIK_0rz3zslRHX2qKOHn-t9Twpi0qu0/edit.
-        overall_accuracy = float(
-            accepted_translations_count / submitted_translations_count)
+        overall_accuracy = (
+            round(
+                accepted_translations_count / submitted_translations_count, 2
+            ) * 100
+        )
 
         with datastore_services.get_ndb_context():
             translation_submit_stats_models = (
@@ -393,6 +421,21 @@ class GenerateContributorAdminStatsJob(base_jobs.JobBase):
         translation_reviewer_stats:
             Iterable(suggestion_models.TranslationReviewStatsModel)) -> (
         suggestion_models.TranslationReviewerTotalContributionStatsModel):
+        """Transforms TranslationReviewStatsModel to
+        TranslationReviewerTotalContributionStatsModel.
+
+            Args:
+                keys: Tuple(str, str). Tuple of
+                    (language_code, reviewer_user_id).
+                translation_reviewer_stats:
+                    Iterable(suggestion_models.TranslationReviewStatsModel).
+                    TranslationReviewStatsModel grouped by
+                    (language_code, reviewer_user_id).
+
+            Returns:
+                suggestion_models.TranslationReviewerTotalContributionStatsModel.
+                New TranslationReviewerTotalContributionStatsModel model.
+        """
 
         translation_reviewer_stats = list(translation_reviewer_stats)
 
@@ -452,9 +495,32 @@ class GenerateContributorAdminStatsJob(base_jobs.JobBase):
         question_general_suggestions_stats:
             Iterable(suggestion_models.GeneralSuggestionModel)) -> (
         suggestion_models.QuestionSubmitterTotalContributionStatsModel):
+        """Transforms QuestionContributionStatsModel and GeneralSuggestionModel
+        to QuestionSubmitterTotalContributionStatsModel.
+
+            Args:
+                contributor_user_id: str. User ID acting as a key to new model.
+                question_contribution_stats:
+                    Iterable(suggestion_models.QuestionContributionStatsModel).
+                    QuestionContributionStatsModel grouped by
+                    contributor_user_id.
+                question_general_suggestions_stats:
+                    Iterable(suggestion_models.GeneralSuggestionModel).
+                    GeneralSuggestionModel grouped by author_id.
+
+            Returns:
+                suggestion_models.QuestionSubmitterTotalContributionStatsModel.
+                New QuestionSubmitterTotalContributionStatsModel model.
+        """
+
+        question_general_suggestions_sorted_stats = sorted(
+            question_general_suggestions_stats,
+            key=lambda m: m.created_on
+        )
 
         question_contribution_stats = list(question_contribution_stats)
-        general_suggestion_stats = list(question_general_suggestions_stats)
+        general_suggestion_stats = list(
+            question_general_suggestions_sorted_stats)
         recent_review_outcomes = []
 
         counts = {
@@ -476,8 +542,7 @@ class GenerateContributorAdminStatsJob(base_jobs.JobBase):
 
         # Iterate over the list and count occurrences.
         for outcome in recent_review_outcomes:
-            if outcome in counts:
-                counts[outcome] += 1
+            counts[outcome] += 1
 
         # Weights of recent_performance as documented in
         # https://docs.google.com/document/d/19lCEYQUgV7_DwIK_0rz3zslRHX2qKOHn-t9Twpi0qu0/edit.
@@ -511,8 +576,10 @@ class GenerateContributorAdminStatsJob(base_jobs.JobBase):
 
         # Weights of overall_accuracy as documented in
         # https://docs.google.com/document/d/19lCEYQUgV7_DwIK_0rz3zslRHX2qKOHn-t9Twpi0qu0/edit.
-        overall_accuracy = float(
-            accepted_questions_count / submitted_questions_count)
+        overall_accuracy = (
+            round(accepted_questions_count / submitted_questions_count, 2)
+            * 100
+        )
 
         with datastore_services.get_ndb_context():
             question_submit_stats_models = (
@@ -541,6 +608,20 @@ class GenerateContributorAdminStatsJob(base_jobs.JobBase):
         question_reviewer_stats:
             Iterable(suggestion_models.QuestionReviewStatsModel)) -> (
         suggestion_models.QuestionReviewerTotalContributionStatsModel):
+        """Transforms QuestionReviewStatsModel to
+        QuestionReviewerTotalContributionStatsModel.
+
+            Args:
+                reviewer_user_id: str. User ID acting as a key to new model.
+                question_reviewer_stats:
+                    Iterable(suggestion_models.QuestionReviewStatsModel).
+                    QuestionReviewStatsModel grouped by
+                    reviewer_user_id.
+
+            Returns:
+                suggestion_models.QuestionReviewerTotalContributionStatsModel.
+                New QuestionReviewerTotalContributionStatsModel model.
+        """
 
         question_reviewer_stats = list(question_reviewer_stats)
         entity_id = reviewer_user_id
