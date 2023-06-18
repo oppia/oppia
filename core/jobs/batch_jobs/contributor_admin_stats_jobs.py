@@ -498,10 +498,13 @@ class GenerateContributorAdminStatsJob(base_jobs.JobBase):
             suggestion_models.QuestionSubmitterTotalContributionStatsModel.
             New QuestionSubmitterTotalContributionStatsModel model.
         """
-
+        # The key for sorting is defined separately because of a mypy bug.
+        # A [no-any-return] is thrown if key is defined in the sort() method
+        # instead. Reference: https://github.com/python/mypy/issues/9590.
+        by_created_on = lambda m: m.created_on
         question_general_suggestions_sorted_stats = sorted(
             question_general_suggestions_stats,
-            key=lambda m: m.created_on
+            key=by_created_on
         )
 
         question_contribution_stats = list(question_contribution_stats)

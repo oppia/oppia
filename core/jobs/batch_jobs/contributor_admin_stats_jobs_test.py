@@ -753,6 +753,8 @@ class GenerateContributorAdminStatsJobTests(job_test_utils.JobTestBase):
             suggestion_models.TranslationSubmitterTotalContributionStatsModel
             .get('hi', 'user1')
         )
+        # Ruling out the possibility of None for mypy type checking.
+        assert translation_model is not None
 
         self.assertEqual(100, len(translation_model.recent_review_outcomes))
 
@@ -760,5 +762,7 @@ class GenerateContributorAdminStatsJobTests(job_test_utils.JobTestBase):
             suggestion_models.QuestionSubmitterTotalContributionStatsModel
             .get('user1')
         )
+        # Ruling out the possibility of None for mypy type checking.
+        assert question_model is not None
 
         self.assertEqual(100, len(question_model.recent_review_outcomes))
