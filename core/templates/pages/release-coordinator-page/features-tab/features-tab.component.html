@@ -111,8 +111,8 @@
                               </ng-container>
                               <ng-container *ngIf="!filterTypeToContext[filter.type].options">
                                 <input [(ngModel)]="filter.conditions[conditionIndex][1]"
-                                      [placeholder]="filterTypeToContext[filter.type].placeholder"
-                                      class="oppia-condition-input">
+                                       [placeholder]="filterTypeToContext[filter.type].placeholder"
+                                       class="oppia-condition-input">
                                 <ng-container *ngIf="filterTypeToContext[filter.type].inputRegex">
                                   <span class="oppia-input-error"
                                         *ngIf="!filterTypeToContext[filter.type].inputRegex.test(filter.conditions[conditionIndex][1])">

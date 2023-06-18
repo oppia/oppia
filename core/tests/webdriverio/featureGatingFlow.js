@@ -54,71 +54,80 @@ describe('Feature Gating Flow', function() {
     await users.login(RELEASE_COORDINATOR_USER1_EMAIL, true);
 
     await releaseCoordinatorPage.getFeaturesTab();
-    var accomplishmentsFeatureElement = (
-      await releaseCoordinatorPage.
-        getContributorDashboardAccomplishmentsFeatureElement()
-    );
+    var dummy = await releaseCoordinatorPage.getDummyFeatureElement();
 
-    await releaseCoordinatorPage.removeAllRulesOfFeature(
-      accomplishmentsFeatureElement);
-    await releaseCoordinatorPage.saveChangeOfFeature(
-      accomplishmentsFeatureElement);
+    await releaseCoordinatorPage.removeAllRulesOfFeature(dummy);
+    await releaseCoordinatorPage.saveChangeOfFeature(dummy);
     await users.logout();
   });
 
-  it('should not show indicators gated by contributor_dashboard_' +
-  'accomplishments when disabled', async() => {
-    await users.login(RELEASE_COORDINATOR_USER1_EMAIL, true);
-    await releaseCoordinatorPage.getFeaturesTab();
+  it('should not show indicators gated by dummy feature when disabled',
+    async() => {
+      await users.login(RELEASE_COORDINATOR_USER1_EMAIL, true);
+      await releaseCoordinatorPage.getFeaturesTab();
 
-    // Indicator in Angular component that is visible if the
-    // contributor_dashboard_accomplishments is enabled, and the
-    // feature status is successfully loaded in the Angular component.
-    var accomplishmentsFeatureIndicator = $(
-      '.e2e-test-accomplishments-tab-enabled-indicator');
+      // Indicator in Angular component that is visible if the dummy_feature
+      // is enabled, and the feature status is successfully loaded in the
+      // Angular component.
+      var agDummyFeatureIndicator = $(
+        '.e2e-test-angular-dummy-feature-indicator');
 
-    expect(await accomplishmentsFeatureIndicator.isExisting()).toBe(false);
-    await users.logout();
-  });
+      // Indicator in AngularJS directive that is visible if the dummy_feature
+      // is enabled, and the feature status is successfully loaded in the
+      // AngularJS directive.
+      var ajsDummyFeatureIndicator = $(
+        '.e2e-test-angularjs-dummy-feature-indicator');
+
+      expect(await agDummyFeatureIndicator.isExisting()).toBe(false);
+      expect(await ajsDummyFeatureIndicator.isExisting()).toBe(false);
+      await users.logout();
+    }
+  );
 
   it('should show dummy feature in the features tab', async() => {
     await users.login(RELEASE_COORDINATOR_USER1_EMAIL, true);
 
     await releaseCoordinatorPage.getFeaturesTab();
 
-    var accomplishmentsFeatureElement = (
-      await releaseCoordinatorPage.
-        getContributorDashboardAccomplishmentsFeatureElement()
-    );
+    var dummy = await releaseCoordinatorPage.getDummyFeatureElement();
 
-    expect(await accomplishmentsFeatureElement.isExisting()).toBe(true);
+    expect(await dummy.isExisting()).toBe(true);
     await users.logout();
   });
 
-  it('should not show indicators for contributor_dashboard_accomplishments ' +
-  'to different users', async() => {
-    await users.login(RELEASE_COORDINATOR_USER1_EMAIL, true);
+  it('should not show indicators for dummy_feature to different users',
+    async() => {
+      await users.login(RELEASE_COORDINATOR_USER1_EMAIL, true);
 
-    await releaseCoordinatorPage.getFeaturesTab();
-    var accomplishmentsFeatureElement = (
-      await releaseCoordinatorPage.
-        getContributorDashboardAccomplishmentsFeatureElement()
-    );
-    await releaseCoordinatorPage.enableFeatureForDev(
-      accomplishmentsFeatureElement);
+      await releaseCoordinatorPage.getFeaturesTab();
+      var dummy = await releaseCoordinatorPage.getDummyFeatureElement();
+      await releaseCoordinatorPage.enableFeatureForDev(dummy);
 
-    await users.logout();
-    await users.login(RELEASE_COORDINATOR_USER2_EMAIL, true);
+      await users.logout();
+      await users.login(RELEASE_COORDINATOR_USER2_EMAIL, true);
 
-    await releaseCoordinatorPage.getFeaturesTab();
+      await releaseCoordinatorPage.getFeaturesTab();
 
-    // Indicator in Angular component that is visible if the
-    // contributor_dashboard_accomplishments is enabled, and the
-    // feature status is successfully loaded in the Angular component.
-    var accomplishmentsFeatureIndicator = $(
-      '.e2e-test-accomplishments-tab-enabled-indicator');
+      // Indicator in Angular component that is visible if the dummy_feature
+      // is enabled, and the feature status is successfully loaded in the
+      // Angular component.
+      var agDummyFeatureIndicator = $(
+        '.e2e-test-angular-dummy-feature-indicator');
 
-    expect(await accomplishmentsFeatureIndicator.isExisting()).toBe(false);
-    await users.logout();
-  });
+      // Indicator in Angular component that is visible if the dummy_feature
+      // is enabled, and the backend dummy handler is also enabled.
+      var agDummyHandlerIndicator = $(
+        '.e2e-test-angular-dummy-handler-indicator');
+
+      // Indicator in AngularJS directive that is visible if the dummy_feature
+      // is enabled, and the feature status is successfully loaded in the
+      // AngularJS directive.
+      var ajsDummyFeatureIndicator = $(
+        '.e2e-test-angularjs-dummy-feature-indicator');
+
+      expect(await agDummyFeatureIndicator.isExisting()).toBe(false);
+      expect(await agDummyHandlerIndicator.isExisting()).toBe(false);
+      expect(await ajsDummyFeatureIndicator.isExisting()).toBe(false);
+      await users.logout();
+    });
 });
