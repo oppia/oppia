@@ -30,7 +30,7 @@ from core.platform import models
 from core.tests import test_utils
 
 import elasticsearch
-from typing import Callable, Final, OrderedDict
+from typing import Callable, Final, List, OrderedDict, Tuple
 import webapp2
 
 email_services = models.Registry.import_email_services()
@@ -660,7 +660,7 @@ class TestUtilsTests(test_utils.GenericTestBase):
             test_utils.mock_load_template('invalid_path')
 
     def test_raises_error_if_multiple_file_paths_found(self) -> None:
-        def mock_walk(_):
+        def mock_walk(_: str) -> List[Tuple[str, List[str], List[str]]]:
             return [
                 ('page-dir-1', [], ['duplicate_file.ts']),
                 ('page-dir-2', [], ['duplicate_file.ts']),
