@@ -46,7 +46,7 @@ class ExistingPlatformParameterValidityTests(test_utils.GenericTestBase):
                                 'obsoletion_threshold'
                             ),
                             'is_improvements_tab_enabled',
-                            'learner_groups_are_enabled'
+                            'learner_groups_are_enabled',
                             'promo_bar_enabled',
                             'promo_bar_message',
                             'serial_chapter_launch_curriculum_admin_view',
