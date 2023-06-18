@@ -681,6 +681,17 @@ class TestUtilsTests(test_utils.GenericTestBase):
                 'invalidemail@gmail.com'
             )
 
+    def test_assert_matches_regexps_error_diff_num_expressions(self) -> None:
+        with self.assertRaisesRegex(
+            AssertionError, 'missing item expected to match: \'1\''
+        ):
+            self.assert_matches_regexps([], ['1'])
+
+        with self.assertRaisesRegex(
+            AssertionError, 'extra item \'1\''
+        ):
+            self.assert_matches_regexps(['1'], [])
+
 
 class CheckImagePngOrWebpTests(test_utils.GenericTestBase):
 
