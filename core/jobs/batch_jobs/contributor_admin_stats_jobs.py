@@ -56,7 +56,7 @@ class GenerateContributorAdminStatsJob(base_jobs.JobBase):
 
         general_suggestions_models = (
             self.pipeline
-            | 'Get last 100 GeneralSuggestionModel' >> ndb_io.GetModels(
+            | 'Get non-deleted GeneralSuggestionModel' >> ndb_io.GetModels(
                 suggestion_models.GeneralSuggestionModel.get_all(
                     include_deleted=False))
         )
@@ -203,50 +203,6 @@ class GenerateContributorAdminStatsJob(base_jobs.JobBase):
                 beam.MapTuple(self.transform_question_review_stats)
         )
 
-        translation_submitter_error_job_run_results = (
-            translation_submitter_total_stats_models
-            | 'Filter translation submitter err results' >> beam.Filter(
-                lambda x: x[1].is_err())
-            # Pylint disable is needed because pylint is not able to correctly
-            # detect that the value is passed through the pipe.
-            | 'Remove translation submitter keys' >> beam.Values()  # pylint: disable=no-value-for-parameter
-            | 'Transform translation submitter result to job run result' >> (
-                job_result_transforms.ResultsToJobRunResults())
-        )
-
-        translation_reviewer_error_job_run_results = (
-            translation_submitter_total_stats_models
-            | 'Filter translation reviewer err results' >> beam.Filter(
-                lambda x: x[1].is_err())
-            # Pylint disable is needed because pylint is not able to correctly
-            # detect that the value is passed through the pipe.
-            | 'Remove translation reviewer keys' >> beam.Values()  # pylint: disable=no-value-for-parameter
-            | 'Transform translation reviewer result to job run result' >> (
-                job_result_transforms.ResultsToJobRunResults())
-        )
-
-        question_submitter_error_job_run_results = (
-            translation_submitter_total_stats_models
-            | 'Filter question submitter err results' >> beam.Filter(
-                lambda x: x[1].is_err())
-            # Pylint disable is needed because pylint is not able to correctly
-            # detect that the value is passed through the pipe.
-            | 'Remove question submitter keys' >> beam.Values()  # pylint: disable=no-value-for-parameter
-            | 'Transform question submitter result to job run result' >> (
-                job_result_transforms.ResultsToJobRunResults())
-        )
-
-        question_reviewer_error_job_run_results = (
-            translation_submitter_total_stats_models
-            | 'Filter question reviewer err results' >> beam.Filter(
-                lambda x: x[1].is_err())
-            # Pylint disable is needed because pylint is not able to correctly
-            # detect that the value is passed through the pipe.
-            | 'Remove question reviewer keys' >> beam.Values()  # pylint: disable=no-value-for-parameter
-            | 'Transform question reviewer result to job run result' >> (
-                job_result_transforms.ResultsToJobRunResults())
-        )
-
         unused_translation_submitter_put_results = (
             translation_submitter_total_stats_models
             | 'Put TranslationSubmitterTotalContributionStatsModel models' >>
@@ -297,10 +253,6 @@ class GenerateContributorAdminStatsJob(base_jobs.JobBase):
 
         return (
             (
-                translation_submitter_error_job_run_results,
-                translation_reviewer_error_job_run_results,
-                question_submitter_error_job_run_results,
-                question_reviewer_error_job_run_results,
                 translation_submitter_models_job_run_results,
                 translation_reviewer_models_job_run_results,
                 question_submitter_models_job_run_results,
@@ -713,7 +665,7 @@ class AuditGenerateContributorAdminStatsJob(base_jobs.JobBase):
 
         general_suggestions_models = (
             self.pipeline
-            | 'Get last 100 GeneralSuggestionModel' >> ndb_io.GetModels(
+            | 'Get non-deleted GeneralSuggestionModel' >> ndb_io.GetModels(
                 suggestion_models.GeneralSuggestionModel.get_all(
                     include_deleted=False))
         )
@@ -860,50 +812,6 @@ class AuditGenerateContributorAdminStatsJob(base_jobs.JobBase):
                 beam.MapTuple(self.transform_question_review_stats)
         )
 
-        translation_submitter_error_job_run_results = (
-            translation_submitter_total_stats_models
-            | 'Filter translation submitter err results' >> beam.Filter(
-                lambda x: x[1].is_err())
-            # Pylint disable is needed because pylint is not able to correctly
-            # detect that the value is passed through the pipe.
-            | 'Remove translation submitter keys' >> beam.Values()  # pylint: disable=no-value-for-parameter
-            | 'Transform translation submitter result to job run result' >> (
-                job_result_transforms.ResultsToJobRunResults())
-        )
-
-        translation_reviewer_error_job_run_results = (
-            translation_submitter_total_stats_models
-            | 'Filter translation reviewer err results' >> beam.Filter(
-                lambda x: x[1].is_err())
-            # Pylint disable is needed because pylint is not able to correctly
-            # detect that the value is passed through the pipe.
-            | 'Remove translation reviewer keys' >> beam.Values()  # pylint: disable=no-value-for-parameter
-            | 'Transform translation reviewer result to job run result' >> (
-                job_result_transforms.ResultsToJobRunResults())
-        )
-
-        question_submitter_error_job_run_results = (
-            translation_submitter_total_stats_models
-            | 'Filter question submitter err results' >> beam.Filter(
-                lambda x: x[1].is_err())
-            # Pylint disable is needed because pylint is not able to correctly
-            # detect that the value is passed through the pipe.
-            | 'Remove question submitter keys' >> beam.Values()  # pylint: disable=no-value-for-parameter
-            | 'Transform question submitter result to job run result' >> (
-                job_result_transforms.ResultsToJobRunResults())
-        )
-
-        question_reviewer_error_job_run_results = (
-            translation_submitter_total_stats_models
-            | 'Filter question reviewer err results' >> beam.Filter(
-                lambda x: x[1].is_err())
-            # Pylint disable is needed because pylint is not able to correctly
-            # detect that the value is passed through the pipe.
-            | 'Remove question reviewer keys' >> beam.Values()  # pylint: disable=no-value-for-parameter
-            | 'Transform question reviewer result to job run result' >> (
-                job_result_transforms.ResultsToJobRunResults())
-        )
-
         translation_submitter_models_job_run_results = (
             translation_submitter_total_stats_models
             | 'Create translation submitter job run result' >> (
@@ -930,10 +838,6 @@ class AuditGenerateContributorAdminStatsJob(base_jobs.JobBase):
 
         return (
             (
-                translation_submitter_error_job_run_results,
-                translation_reviewer_error_job_run_results,
-                question_submitter_error_job_run_results,
-                question_reviewer_error_job_run_results,
                 translation_submitter_models_job_run_results,
                 translation_reviewer_models_job_run_results,
                 question_submitter_models_job_run_results,
