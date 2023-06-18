@@ -69,9 +69,7 @@ class GenerateContributorAdminStatsJobTests(job_test_utils.JobTestBase):
         datetime.date(2023, 4, 2)
     ]
 
-    score_category: str = (
-        'translation' +
-        '.' + 'English')
+    score_category: str = 'translation' + '.' + 'English'
 
     topic_name = 'topic'
     target_id = 'exp1'
@@ -766,3 +764,456 @@ class GenerateContributorAdminStatsJobTests(job_test_utils.JobTestBase):
         assert question_model is not None
 
         self.assertEqual(100, len(question_model.recent_review_outcomes))
+
+
+class AuditGenerateContributorAdminStatsJobTests(job_test_utils.JobTestBase):
+
+    JOB_CLASS: Type[
+        contributor_admin_stats_jobs.GenerateContributorAdminStatsJob
+    ] = contributor_admin_stats_jobs.GenerateContributorAdminStatsJob
+
+    LANGUAGE_CODE: Final = 'es'
+    CONTRIBUTOR_USER_ID: Final = 'uid_01234567890123456789012345678912'
+    TOPIC_ID: Final = 'topic_id'
+    SUBMITTED_TRANSLATIONS_COUNT: Final = 20
+    SUBMITTED_TRANSLATION_WORD_COUNT: Final = 100
+    ACCEPTED_TRANSLATIONS_COUNT: Final = 15
+    ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT: Final = 5
+    ACCEPTED_TRANSLATION_WORD_COUNT: Final = 50
+    REJECTED_TRANSLATIONS_COUNT: Final = 5
+    REJECTED_TRANSLATION_WORD_COUNT: Final = 5
+    REVIEWED_TRANSLATIONS_COUNT = 20
+    REVIEWED_TRANSLATION_WORD_COUNT = 10
+    ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT = 10
+    FIRST_CONTRIBUTION_DATE = datetime.date(2023, 4, 2)
+    LAST_CONTRIBUTION_DATE = datetime.date(2023, 5, 2)
+    SUBMITTED_QUESTION_COUNT = 10
+    ACCEPTED_QUESTIONS_COUNT = 5
+    ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT = 3
+    REVIEWED_QUESTIONS_COUNT = 10
+    ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT = 3
+    CONTRIBUTION_DATES: Final = [
+        datetime.date(2022, 5, 2),
+        datetime.date(2023, 4, 2)
+    ]
+
+    score_category: str = 'translation' + '.' + 'English'
+
+    topic_name = 'topic'
+    target_id = 'exp1'
+    target_version_at_submission = 1
+    change_cmd: Mapping[
+        str, change_domain.AcceptableChangeDictTypes
+    ] = {}
+    # Language code that would normally be derived from the change_cmd.
+    translation_language_code = 'en'
+    # Language code that would normally be derived from the question_dict in
+    # the change_cmd.
+    question_language_code = 'en'
+    mocked_datetime_utcnow = datetime.datetime(2020, 6, 15, 5)
+
+    def setUp(self) -> None:
+        super().setUp()
+
+        self.translation_contribution_model_1 = self.create_model(
+            suggestion_models.TranslationContributionStatsModel,
+            language_code='hi',
+            contributor_user_id='user1',
+            topic_id='topic2',
+            submitted_translations_count=self.SUBMITTED_TRANSLATIONS_COUNT,
+            submitted_translation_word_count=(
+                self.SUBMITTED_TRANSLATION_WORD_COUNT),
+            accepted_translations_count=self.ACCEPTED_TRANSLATIONS_COUNT,
+            accepted_translations_without_reviewer_edits_count=(
+                self.ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT),
+            accepted_translation_word_count=(
+                self.ACCEPTED_TRANSLATION_WORD_COUNT),
+            rejected_translations_count=self.REJECTED_TRANSLATIONS_COUNT,
+            rejected_translation_word_count=(
+                self.REJECTED_TRANSLATION_WORD_COUNT),
+            contribution_dates=self.CONTRIBUTION_DATES
+        )
+
+        self.translation_contribution_model_2 = self.create_model(
+            suggestion_models.TranslationContributionStatsModel,
+            language_code='hi',
+            contributor_user_id='user1',
+            topic_id='topic1',
+            submitted_translations_count=self.SUBMITTED_TRANSLATIONS_COUNT,
+            submitted_translation_word_count=(
+                self.SUBMITTED_TRANSLATION_WORD_COUNT),
+            accepted_translations_count=self.ACCEPTED_TRANSLATIONS_COUNT,
+            accepted_translations_without_reviewer_edits_count=(
+                self.ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT),
+            accepted_translation_word_count=(
+                self.ACCEPTED_TRANSLATION_WORD_COUNT),
+            rejected_translations_count=self.REJECTED_TRANSLATIONS_COUNT,
+            rejected_translation_word_count=(
+                self.REJECTED_TRANSLATION_WORD_COUNT),
+            contribution_dates=self.CONTRIBUTION_DATES
+        )
+
+        self.translation_contribution_model_3 = self.create_model(
+            suggestion_models.TranslationContributionStatsModel,
+            language_code=self.LANGUAGE_CODE,
+            contributor_user_id='user2',
+            topic_id='topic1',
+            submitted_translations_count=self.SUBMITTED_TRANSLATIONS_COUNT,
+            submitted_translation_word_count=(
+                self.SUBMITTED_TRANSLATION_WORD_COUNT),
+            accepted_translations_count=self.ACCEPTED_TRANSLATIONS_COUNT,
+            accepted_translations_without_reviewer_edits_count=(
+                self.ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT),
+            accepted_translation_word_count=(
+                self.ACCEPTED_TRANSLATION_WORD_COUNT),
+            rejected_translations_count=self.REJECTED_TRANSLATIONS_COUNT,
+            rejected_translation_word_count=(
+                self.REJECTED_TRANSLATION_WORD_COUNT),
+            contribution_dates=self.CONTRIBUTION_DATES
+        )
+
+        self.translation_contribution_model_4 = self.create_model(
+            suggestion_models.TranslationContributionStatsModel,
+            language_code='hi',
+            contributor_user_id='user1',
+            topic_id='topic3',
+            submitted_translations_count=self.SUBMITTED_TRANSLATIONS_COUNT,
+            submitted_translation_word_count=(
+                self.SUBMITTED_TRANSLATION_WORD_COUNT),
+            accepted_translations_count=self.ACCEPTED_TRANSLATIONS_COUNT,
+            accepted_translations_without_reviewer_edits_count=(
+                self.ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT),
+            accepted_translation_word_count=(
+                self.ACCEPTED_TRANSLATION_WORD_COUNT),
+            rejected_translations_count=self.REJECTED_TRANSLATIONS_COUNT,
+            rejected_translation_word_count=(
+                self.REJECTED_TRANSLATION_WORD_COUNT),
+            contribution_dates=self.CONTRIBUTION_DATES
+        )
+
+        self.translation_review_model_1 = self.create_model(
+            suggestion_models.TranslationReviewStatsModel,
+            language_code=self.LANGUAGE_CODE,
+            reviewer_user_id='user1',
+            topic_id='topic1',
+            reviewed_translations_count=self.REVIEWED_TRANSLATIONS_COUNT,
+            reviewed_translation_word_count=(
+                self.REVIEWED_TRANSLATION_WORD_COUNT),
+            accepted_translations_count=self.ACCEPTED_TRANSLATIONS_COUNT,
+            accepted_translations_with_reviewer_edits_count=(
+                self.ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT),
+            accepted_translation_word_count=(
+                self.ACCEPTED_TRANSLATION_WORD_COUNT),
+            first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
+            last_contribution_date=self.LAST_CONTRIBUTION_DATE
+        )
+
+        self.translation_review_model_2 = self.create_model(
+            suggestion_models.TranslationReviewStatsModel,
+            language_code=self.LANGUAGE_CODE,
+            reviewer_user_id='user1',
+            topic_id='topic2',
+            reviewed_translations_count=self.REVIEWED_TRANSLATIONS_COUNT,
+            reviewed_translation_word_count=(
+                self.REVIEWED_TRANSLATION_WORD_COUNT),
+            accepted_translations_count=self.ACCEPTED_TRANSLATIONS_COUNT,
+            accepted_translations_with_reviewer_edits_count=(
+                self.ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT),
+            accepted_translation_word_count=(
+                self.ACCEPTED_TRANSLATION_WORD_COUNT),
+            first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
+            last_contribution_date=self.LAST_CONTRIBUTION_DATE
+        )
+
+        self.translation_review_model_3 = self.create_model(
+            suggestion_models.TranslationReviewStatsModel,
+            language_code='hi',
+            reviewer_user_id='user2',
+            topic_id='topic1',
+            reviewed_translations_count=self.REVIEWED_TRANSLATIONS_COUNT,
+            reviewed_translation_word_count=(
+                self.REVIEWED_TRANSLATION_WORD_COUNT),
+            accepted_translations_count=self.ACCEPTED_TRANSLATIONS_COUNT,
+            accepted_translations_with_reviewer_edits_count=(
+                self.ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT),
+            accepted_translation_word_count=(
+                self.ACCEPTED_TRANSLATION_WORD_COUNT),
+            first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
+            last_contribution_date=self.LAST_CONTRIBUTION_DATE
+        )
+
+        self.translation_review_model_4 = self.create_model(
+            suggestion_models.TranslationReviewStatsModel,
+            language_code=self.LANGUAGE_CODE,
+            reviewer_user_id='user3',
+            topic_id='topic4',
+            reviewed_translations_count=self.REVIEWED_TRANSLATIONS_COUNT,
+            reviewed_translation_word_count=(
+                self.REVIEWED_TRANSLATION_WORD_COUNT),
+            accepted_translations_count=self.ACCEPTED_TRANSLATIONS_COUNT,
+            accepted_translations_with_reviewer_edits_count=(
+                self.ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT),
+            accepted_translation_word_count=(
+                self.ACCEPTED_TRANSLATION_WORD_COUNT),
+            first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
+            last_contribution_date=self.LAST_CONTRIBUTION_DATE
+        )
+
+        self.question_contribution_model_1 = self.create_model(
+            suggestion_models.QuestionContributionStatsModel,
+            contributor_user_id='user1',
+            topic_id='topic1',
+            submitted_questions_count=self.SUBMITTED_QUESTION_COUNT,
+            accepted_questions_count=self.ACCEPTED_QUESTIONS_COUNT,
+            accepted_questions_without_reviewer_edits_count=(
+                self.ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT),
+            first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
+            last_contribution_date=self.LAST_CONTRIBUTION_DATE
+        )
+
+        self.question_contribution_model_2 = self.create_model(
+            suggestion_models.QuestionContributionStatsModel,
+            contributor_user_id='user1',
+            topic_id='topic2',
+            submitted_questions_count=self.SUBMITTED_QUESTION_COUNT,
+            accepted_questions_count=self.ACCEPTED_QUESTIONS_COUNT,
+            accepted_questions_without_reviewer_edits_count=(
+                self.ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT),
+            first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
+            last_contribution_date=self.LAST_CONTRIBUTION_DATE
+        )
+
+        self.question_contribution_model_3 = self.create_model(
+            suggestion_models.QuestionContributionStatsModel,
+            contributor_user_id='user2',
+            topic_id='topic1',
+            submitted_questions_count=self.SUBMITTED_QUESTION_COUNT,
+            accepted_questions_count=self.ACCEPTED_QUESTIONS_COUNT,
+            accepted_questions_without_reviewer_edits_count=(
+                self.ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT),
+            first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
+            last_contribution_date=self.LAST_CONTRIBUTION_DATE
+        )
+
+        self.question_contribution_model_4 = self.create_model(
+            suggestion_models.QuestionContributionStatsModel,
+            contributor_user_id='user3',
+            topic_id='topic1',
+            submitted_questions_count=self.SUBMITTED_QUESTION_COUNT,
+            accepted_questions_count=self.ACCEPTED_QUESTIONS_COUNT,
+            accepted_questions_without_reviewer_edits_count=(
+                self.ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT),
+            first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
+            last_contribution_date=self.LAST_CONTRIBUTION_DATE
+        )
+
+        self.question_review_model_1 = self.create_model(
+            suggestion_models.QuestionReviewStatsModel,
+            reviewer_user_id='user1',
+            topic_id='topic1',
+            reviewed_questions_count=self.REVIEWED_QUESTIONS_COUNT,
+            accepted_questions_count=self.ACCEPTED_QUESTIONS_COUNT,
+            accepted_questions_with_reviewer_edits_count=(
+                self.ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT),
+            first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
+            last_contribution_date=self.LAST_CONTRIBUTION_DATE
+        )
+
+        self.question_review_model_2 = self.create_model(
+            suggestion_models.QuestionReviewStatsModel,
+            reviewer_user_id='user1',
+            topic_id='topic2',
+            reviewed_questions_count=self.REVIEWED_QUESTIONS_COUNT,
+            accepted_questions_count=self.ACCEPTED_QUESTIONS_COUNT,
+            accepted_questions_with_reviewer_edits_count=(
+                self.ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT),
+            first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
+            last_contribution_date=self.LAST_CONTRIBUTION_DATE
+        )
+
+        self.question_review_model_3 = self.create_model(
+            suggestion_models.QuestionReviewStatsModel,
+            reviewer_user_id='user2',
+            topic_id='topic1',
+            reviewed_questions_count=self.REVIEWED_QUESTIONS_COUNT,
+            accepted_questions_count=self.ACCEPTED_QUESTIONS_COUNT,
+            accepted_questions_with_reviewer_edits_count=(
+                self.ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT),
+            first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
+            last_contribution_date=self.LAST_CONTRIBUTION_DATE
+        )
+
+        self.question_review_model_4 = self.create_model(
+            suggestion_models.QuestionReviewStatsModel,
+            reviewer_user_id='user3',
+            topic_id='topic1',
+            reviewed_questions_count=self.REVIEWED_QUESTIONS_COUNT,
+            accepted_questions_count=self.ACCEPTED_QUESTIONS_COUNT,
+            accepted_questions_with_reviewer_edits_count=(
+                self.ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT),
+            first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
+            last_contribution_date=self.LAST_CONTRIBUTION_DATE
+        )
+
+        self.question_suggestion_rejected_model = self.create_model(
+            suggestion_models.GeneralSuggestionModel,
+            suggestion_type=feconf.SUGGESTION_TYPE_ADD_QUESTION,
+            target_type=feconf.ENTITY_TYPE_EXPLORATION,
+            target_id=self.target_id,
+            target_version_at_submission=self.target_version_at_submission,
+            status=suggestion_models.STATUS_REJECTED,
+            author_id='user1',
+            final_reviewer_id='reviewer_1',
+            change_cmd=self.change_cmd,
+            score_category=self.score_category,
+            language_code=None,
+            created_on=datetime.datetime(2023, 5, 2))
+
+        self.question_suggestion_accepted_with_edits_model = self.create_model(
+            suggestion_models.GeneralSuggestionModel,
+            suggestion_type=feconf.SUGGESTION_TYPE_ADD_QUESTION,
+            target_type=feconf.ENTITY_TYPE_EXPLORATION,
+            target_id=self.target_id,
+            target_version_at_submission=self.target_version_at_submission,
+            status=suggestion_models.STATUS_ACCEPTED,
+            author_id='user1',
+            final_reviewer_id='reviewer_2',
+            change_cmd=self.change_cmd,
+            score_category=self.score_category,
+            language_code=None,
+            edited_by_reviewer=True,
+            created_on=datetime.datetime(2023, 4, 2))
+
+        self.question_suggestion_accepted_model = self.create_model(
+            suggestion_models.GeneralSuggestionModel,
+            suggestion_type=feconf.SUGGESTION_TYPE_ADD_QUESTION,
+            target_type=feconf.ENTITY_TYPE_EXPLORATION,
+            target_id=self.target_id,
+            target_version_at_submission=self.target_version_at_submission,
+            status=suggestion_models.STATUS_ACCEPTED,
+            author_id='user1',
+            final_reviewer_id='reviewer_2',
+            change_cmd=self.change_cmd,
+            score_category=self.score_category,
+            language_code=None,
+            edited_by_reviewer=False,
+            created_on=datetime.datetime(2023, 3, 2))
+
+        self.translation_suggestion_rejected_model_user1 = self.create_model(
+            suggestion_models.GeneralSuggestionModel,
+            suggestion_type=feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            target_type=feconf.ENTITY_TYPE_EXPLORATION,
+            target_id=self.target_id,
+            target_version_at_submission=self.target_version_at_submission,
+            status=suggestion_models.STATUS_REJECTED,
+            author_id='user1',
+            final_reviewer_id='reviewer_3',
+            change_cmd=self.change_cmd,
+            score_category=self.score_category,
+            language_code='hi',
+            edited_by_reviewer=False,
+            created_on=datetime.datetime(2023, 5, 2))
+
+        self.translation_suggestion_rejected_model_user2 = self.create_model(
+            suggestion_models.GeneralSuggestionModel,
+            suggestion_type=feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            target_type=feconf.ENTITY_TYPE_EXPLORATION,
+            target_id=self.target_id,
+            target_version_at_submission=self.target_version_at_submission,
+            status=suggestion_models.STATUS_REJECTED,
+            author_id='user2',
+            final_reviewer_id='reviewer_3',
+            change_cmd=self.change_cmd,
+            score_category=self.score_category,
+            language_code='es',
+            edited_by_reviewer=False,
+            created_on=datetime.datetime(2023, 4, 2))
+
+        self.translation_suggestion_accepted_with_edits_model = self.create_model( # pylint: disable=line-too-long
+            suggestion_models.GeneralSuggestionModel,
+            suggestion_type=feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            target_type=feconf.ENTITY_TYPE_EXPLORATION,
+            target_id=self.target_id,
+            target_version_at_submission=self.target_version_at_submission,
+            status=suggestion_models.STATUS_ACCEPTED,
+            author_id='user1',
+            final_reviewer_id='reviewer_2',
+            change_cmd=self.change_cmd,
+            score_category=self.score_category,
+            language_code='hi',
+            edited_by_reviewer=True,
+            created_on=datetime.datetime(2023, 3, 2))
+
+        self.translation_suggestion_accepted_model = self.create_model(
+            suggestion_models.GeneralSuggestionModel,
+            suggestion_type=feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            target_type=feconf.ENTITY_TYPE_EXPLORATION,
+            target_id=self.target_id,
+            target_version_at_submission=self.target_version_at_submission,
+            status=suggestion_models.STATUS_ACCEPTED,
+            author_id='user1',
+            final_reviewer_id='reviewer_2',
+            change_cmd=self.change_cmd,
+            score_category=self.score_category,
+            language_code='hi',
+            edited_by_reviewer=False,
+            created_on=datetime.datetime(2023, 2, 2))
+
+    def test_job_audits_admin_stats(self) -> None:
+
+        self.translation_contribution_model_1.update_timestamps()
+        self.translation_contribution_model_2.update_timestamps()
+        self.translation_contribution_model_3.update_timestamps()
+        self.translation_contribution_model_4.update_timestamps()
+        self.translation_review_model_1.update_timestamps()
+        self.translation_review_model_2.update_timestamps()
+        self.translation_review_model_3.update_timestamps()
+        self.translation_review_model_4.update_timestamps()
+        self.question_contribution_model_1.update_timestamps()
+        self.question_contribution_model_2.update_timestamps()
+        self.question_contribution_model_3.update_timestamps()
+        self.question_contribution_model_4.update_timestamps()
+        self.question_review_model_1.update_timestamps()
+        self.question_review_model_2.update_timestamps()
+        self.question_review_model_3.update_timestamps()
+        self.question_review_model_4.update_timestamps()
+        self.question_suggestion_rejected_model.update_timestamps()
+        self.question_suggestion_accepted_with_edits_model.update_timestamps()
+        self.question_suggestion_accepted_model.update_timestamps()
+        self.translation_suggestion_rejected_model_user1.update_timestamps()
+        self.translation_suggestion_rejected_model_user2.update_timestamps()
+        self.translation_suggestion_accepted_with_edits_model.update_timestamps() # pylint: disable=line-too-long
+        self.translation_suggestion_accepted_model.update_timestamps()
+
+        self.put_multi([
+            self.translation_contribution_model_1,
+            self.translation_contribution_model_2,
+            self.translation_contribution_model_3,
+            self.translation_contribution_model_4,
+            self.translation_review_model_1,
+            self.translation_review_model_2,
+            self.translation_review_model_3,
+            self.translation_review_model_4,
+            self.question_contribution_model_1,
+            self.question_contribution_model_2,
+            self.question_contribution_model_3,
+            self.question_contribution_model_4,
+            self.question_review_model_1,
+            self.question_review_model_2,
+            self.question_review_model_3,
+            self.question_review_model_4,
+            self.question_suggestion_rejected_model,
+            self.question_suggestion_accepted_with_edits_model,
+            self.question_suggestion_accepted_model,
+            self.translation_suggestion_rejected_model_user1,
+            self.translation_suggestion_rejected_model_user2,
+            self.translation_suggestion_accepted_with_edits_model,
+            self.translation_suggestion_accepted_model
+        ])
+
+        self.assert_job_output_is([
+            job_run_result.JobRunResult(stdout='SUCCESS: 3'),
+            job_run_result.JobRunResult(stdout='SUCCESS: 2'),
+            job_run_result.JobRunResult(stdout='SUCCESS: 3'),
+            job_run_result.JobRunResult(stdout='SUCCESS: 3'),
+        ])
