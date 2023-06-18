@@ -1485,7 +1485,6 @@ class TestBase(unittest.TestCase):
         attr: str,
         raises: Optional[Exception] = None,
         returns: Any = None,
-        call_through: bool = False
     ) -> Iterator[CallCounter]:
         """Swap obj.attr with a CallCounter instance.
 
@@ -1495,26 +1494,20 @@ class TestBase(unittest.TestCase):
             raises: Exception|None. The exception raised by the swapped
                 function. If None, then no exception is raised.
             returns: *. The return value of the swapped function.
-            call_through: bool. Whether to call through to the real function,
-                rather than use a stub implementation. If True, the `raises` and
-                `returns` arguments will be ignored.
 
         Yields:
             CallCounter. A CallCounter instance that's installed as obj.attr's
             implementation while within the context manager returned.
         """
-        if call_through:
-            impl = obj.attr
-        else:
-            # Here we use type Any because this method returns the return value
-            # of the swapped function, and that value can be of any type.
-            def impl(*_: str, **__: str) -> Any:
-                """Behaves according to the given values."""
-                if raises is not None:
-                    # Pylint thinks we're trying to raise `None` even though
-                    # we've explicitly checked for it above.
-                    raise raises # pylint: disable=raising-bad-type
-                return returns
+        # Here we use type Any because this method returns the return value
+        # of the swapped function, and that value can be of any type.
+        def impl(*_: str, **__: str) -> Any:
+            """Behaves according to the given values."""
+            if raises is not None:
+                # Pylint thinks we're trying to raise `None` even though
+                # we've explicitly checked for it above.
+                raise raises # pylint: disable=raising-bad-type
+            return returns
         call_counter = CallCounter(impl)
         with self.swap(obj, attr, call_counter):
             yield call_counter
