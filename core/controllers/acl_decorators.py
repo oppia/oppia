@@ -3212,7 +3212,10 @@ def can_submit_images_to_questions(
         if not self.user_id:
             raise base.UserFacingExceptions.NotLoggedInException
 
-        if role_services.ACTION_SUGGEST_CHANGES in self.user.actions:
+        if any(action in self.user.actions for action in [
+            role_services.ACTION_SUGGEST_CHANGES,
+            role_services.ACTION_EDIT_ANY_QUESTION
+        ]):
             return handler(self, skill_id, **kwargs)
         else:
             raise self.UnauthorizedUserException(
