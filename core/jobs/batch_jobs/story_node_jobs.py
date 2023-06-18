@@ -167,3 +167,129 @@ class PopulateStoryNodeJob(base_jobs.JobBase):
         )
 
         return updated_story_models_job_results
+
+
+class AuditPopulateStoryNodeJob(base_jobs.JobBase):
+    """Job that audits PopulateStoryNodeJob."""
+
+    def _update_story_node(
+            self, story_model: story_models.StoryModel
+    ) -> result.Result[
+        story_models.StoryModel,
+        Tuple[str, Exception]
+    ]:
+        """Populate the 5 new fields in each story node of the StoryModel
+        instance, namely: status, planned_publication_date_msecs,
+        last_modified_msecs, first_publication_date_msecs, unpublishing_reason.
+
+        Args:
+            story_model: StoryModel. The story whose nodes have to be
+                populated.
+
+        Returns:
+            Result(StoryModel, (str, Exception)). Result containing the
+            updated StoryModel instance to be put.
+        """
+
+        nodes = story_model.story_contents['nodes']
+
+        try:
+            with datastore_services.get_ndb_context():
+                topic_model = topic_models.TopicModel.get(
+                    story_model.corresponding_topic_id)
+                story_reference = next(
+                    story_ref for story_ref in (
+                        topic_model.canonical_story_references)
+                        if story_ref['story_id'] == story_model.id)
+                for node in nodes:
+                    node['unpublishing_reason'] = None
+                    node['status'] = 'Draft'
+                    if story_reference['story_is_published']:
+                        node['status'] = 'Published'
+
+                    current_topic_version = topic_model.version
+                    story_published_on = None
+                    for version in range(current_topic_version, 0, -1):
+                        snapshot_id = topic_model.get_snapshot_id(
+                            topic_model.id, version)
+                        topic_metadata = (
+                            topic_models.TopicSnapshotMetadataModel.get(
+                                snapshot_id))
+                        for cmd in topic_metadata.commit_cmds:
+                            if (cmd['cmd'] == 'publish_story' and
+                                cmd['story_id'] == story_model.id):
+                                story_published_on = (
+                                    utils.get_time_in_millisecs(
+                                    topic_metadata.created_on))
+                                break
+                        if story_published_on is not None:
+                            break
+
+                    current_story_version = story_model.version
+                    node_created_on = None
+                    for version in range(current_story_version, 0, -1):
+                        snapshot_id = story_model.get_snapshot_id(
+                                story_model.id, version)
+                        story_metadata = (
+                            story_models.StorySnapshotMetadataModel.get(
+                                snapshot_id))
+                        for cmd in story_metadata.commit_cmds:
+                            if (cmd['cmd'] == 'update_story_node_property' and
+                                cmd['node_id'] == node['id'] and
+                                node.get('last_modified_msecs') is None):
+                                node['last_modified_msecs'] = (
+                                    utils.get_time_in_millisecs(
+                                    story_metadata.created_on))
+
+                            if (cmd['cmd'] == 'add_story_node' and
+                                cmd['node_id'] == node['id']):
+                                node_created_on = (
+                                    utils.get_time_in_millisecs(
+                                    story_metadata.created_on))
+                                break
+                        if node_created_on is not None:
+                            break
+
+                    node_published_on = story_published_on if (
+                        story_published_on is not None and
+                        node_created_on is not None and
+                        story_published_on > node_created_on) else (
+                            node_created_on)
+                    node['first_publication_date_msecs'] = (
+                        node_published_on if node['status'] == 'Published'
+                        else None)
+                    node['planned_publication_date_msecs'] = (
+                        node['first_publication_date_msecs'])
+                    if node.get('last_modified_msecs') is None:
+                        node['last_modified_msecs'] = node_published_on
+
+        except Exception as e:
+            logging.exception(e)
+            return result.Err((story_model.id, e))
+        return result.Ok(story_model)
+
+    def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
+
+        updated_story_models_results = (
+            self.pipeline
+            | 'Get all story models' >> ndb_io.GetModels(
+                story_models.StoryModel.get_all())
+            | 'Update story node fields' >> beam.Map(self._update_story_node)
+        )
+
+        unused_updated_story_models = (
+            updated_story_models_results
+            | 'Filter results with oks' >> beam.Filter(
+                lambda result_item: result_item.is_ok())
+            | 'Unwrap models' >> beam.Map(
+                lambda result_item: result_item.unwrap())
+        )
+
+        updated_story_models_job_results = (
+            updated_story_models_results
+            | 'Generate results for updated story models' >> (
+                job_result_transforms.ResultsToJobRunResults(
+                    'STORY MODELS UPDATED'))
+        )
+
+        return updated_story_models_job_results
