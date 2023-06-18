@@ -75,6 +75,19 @@ module.exports = {
         {
           'matchingUrlPattern': 'http://[^/]+/donate$',
           'assertions': {
+            'errors-in-console': ['error', {
+              'minScore': 1,
+              // Error on the /donate page due to an embedded third-party
+              // component within it.
+              'ignoredPatterns': [
+                'Refused to connect to \'https://stripe.com/cookie'
+              ],
+              'options': {
+                'ignoredPatterns': [
+                  'https://stripe.com/cookie-settings/enforcement-mode'
+                ]
+              }
+            }],
             // The YouTube embed on donate page loads images in jpg format, thus
             // we need to allow one image.
             'modern-image-formats': [
