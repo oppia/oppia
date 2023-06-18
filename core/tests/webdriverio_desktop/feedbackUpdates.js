@@ -41,10 +41,10 @@ describe('Learner dashboard functionality', function() {
 
   it('should display learner feedback threads', async function() {
     await users.createUser(
-      'learner2@learnerDashboard.com', 'learner2learnerDashboard');
+      'learner2@feedbackUpdates.com', 'learner2feedbackUpdates');
     await users.createUser(
-      'feedbackAdm@learnerDashboard.com', 'feedbackAdmlearnerDashboard');
-    await users.login('feedbackAdm@learnerDashboard.com');
+      'feedbackAdm@feedbackUpdates.com', 'feedbackAdmfeedbackUpdates');
+    await users.login('feedbackAdm@feedbackUpdates.com');
     await workflow.createAndPublishExploration(
       'BUS101',
       'Business',
@@ -54,7 +54,7 @@ describe('Learner dashboard functionality', function() {
     );
     await users.logout();
 
-    await users.login('learner2@learnerDashboard.com');
+    await users.login('learner2@feedbackUpdates.com');
     var feedback = 'A good exploration. Would love to see a few ' +
       'more questions';
     await libraryPage.get();
