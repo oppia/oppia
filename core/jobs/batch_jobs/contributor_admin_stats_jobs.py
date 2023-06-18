@@ -291,7 +291,7 @@ class GenerateContributorAdminStatsJob(base_jobs.JobBase):
         """
         # The key for sorting is defined separately because of a mypy bug.
         # A [no-any-return] is thrown if key is defined in the sort() method
-        # instead. Reference: https://github.com/python/mypy/issues/9590.\
+        # instead. Reference: https://github.com/python/mypy/issues/9590.
         by_created_on = lambda m: m.created_on
         translation_general_suggestions_sorted_stats = sorted(
             translation_general_suggestions_stats,
