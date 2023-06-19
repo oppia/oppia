@@ -20,9 +20,9 @@ from __future__ import annotations
 import argparse
 import contextlib
 import os
+import signal
 import subprocess
 import sys
-import signal
 
 from typing import Final, List, Optional
 
