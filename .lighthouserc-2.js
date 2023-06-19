@@ -33,6 +33,7 @@ module.exports = {
         {
           'matchingUrlPattern': 'http://[^/]+/learner-dashboard$',
           'assertions': {
+            'errors-in-console': ['error', {'minScore': 1}],
             'modern-image-formats': [
               'error', {'maxLength': 0, 'strategy': 'pessimistic'}
             ],
@@ -86,6 +87,7 @@ module.exports = {
         {
           'matchingUrlPattern': 'http://[^/]+/create/.*$',
           'assertions': {
+            'errors-in-console': ['error', {'minScore': 1}],
             // TODO(#13465): Change this maxLength to 0 once images are migrated.
             'modern-image-formats': [
               'error', {'maxLength': 3, 'strategy': 'pessimistic'}
