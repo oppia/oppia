@@ -19,10 +19,6 @@
 module.exports = {
   numberOfRuns: 3,
   puppeteerScript: 'puppeteer-login-script.js',
-  audits: [
-    // Test the `ignoredPatterns` audit option.
-    {path: '.', options: {ignoredPatterns: ['^.*https://stripe.com/cookie-settings/enforcement-mode.*$']}},
-  ],
   urlShards: {
     1: [
       'http://127.0.0.1:8181/',
