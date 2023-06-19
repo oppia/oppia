@@ -93,5 +93,9 @@ module.exports = {
   },
   baseAccessibilityAssertions: {
     'categories:accessibility': ['error', {'minScore': 1}]
-  }
+  },
+  audits: [
+    // Test the `ignoredPatterns` audit option.
+    {path: 'errors-in-console', options: {ignoredPatterns: ['^.*Content Security Policy.*$']}},
+  ],
 };
