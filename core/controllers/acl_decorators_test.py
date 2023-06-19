@@ -3429,6 +3429,9 @@ class EditExplorationTests(test_utils.GenericTestBase):
         rights_manager.publish_exploration(self.owner, self.published_exp_id)
 
     def test_cannot_edit_exploration_with_invalid_exp_id(self) -> None:
+        """Test that a user cannot edit an exploration if exploration ID is
+        invalid.
+        """
         self.login(self.OWNER_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
@@ -3437,6 +3440,7 @@ class EditExplorationTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_banned_user_cannot_edit_exploration(self) -> None:
+        """Tests that a banned user cannot edit an exploration."""
         self.login(self.user_email)
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
@@ -3445,6 +3449,7 @@ class EditExplorationTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_owner_can_edit_exploration(self) -> None:
+        """Tests that the owner can edit an exploration."""
         self.login(self.OWNER_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(
@@ -3453,6 +3458,7 @@ class EditExplorationTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_moderator_can_edit_public_exploration(self) -> None:
+        """Tests that the moderator can edit an exploration."""
         self.login(self.MODERATOR_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(
@@ -3461,6 +3467,7 @@ class EditExplorationTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_moderator_can_edit_private_exploration(self) -> None:
+        """Tests that the moderator can edit a private exploration."""
         self.login(self.MODERATOR_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(
@@ -3470,6 +3477,7 @@ class EditExplorationTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_admin_can_edit_private_exploration(self) -> None:
+        """Tests that the admin can edit a private exploration."""
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(
@@ -3478,6 +3486,7 @@ class EditExplorationTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_guest_cannot_cannot_edit_exploration(self) -> None:
+        """Tests that the guest user cannot edit an exploration."""
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/mock_edit_exploration/%s' % self.private_exp_id,
@@ -3514,12 +3523,14 @@ class ManageOwnAccountTests(test_utils.GenericTestBase):
         ))
 
     def test_banned_user_cannot_update_preferences(self) -> None:
+        """Tests that a banned user cannot manage their own account."""
         self.login(self.banned_user_email)
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json('/mock/', expected_status_int=401)
         self.logout()
 
     def test_normal_user_can_manage_preferences(self) -> None:
+        """Tests that a user can manage their own account."""
         self.login(self.user_email)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json('/mock/')
@@ -3527,6 +3538,7 @@ class ManageOwnAccountTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_guest_cannot_update_preferences(self) -> None:
+        """Tests that a guest user cannot manage their own account."""
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json('/mock/', expected_status_int=401)
         error_msg = 'You must be logged in to access this resource.'
@@ -3561,12 +3573,14 @@ class AccessAdminPageTests(test_utils.GenericTestBase):
         ))
 
     def test_banned_user_cannot_access_admin_page(self) -> None:
+        """Tests that a banned user cannot access the admin page."""
         self.login(self.banned_user_email)
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json('/mock/', expected_status_int=401)
         self.logout()
 
     def test_normal_user_cannot_access_admin_page(self) -> None:
+        """Tests that a user cannot access the admin page."""
         self.login(self.user_email)
         user_id = user_services.get_user_id_from_username(self.username)
         with self.swap(self, 'testapp', self.mock_testapp):
@@ -3576,6 +3590,7 @@ class AccessAdminPageTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_super_admin_can_access_admin_page(self) -> None:
+        """Tests that a super admin can access the admin page."""
         self.login(self.user_email, is_super_admin=True)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json('/mock/')
@@ -3583,6 +3598,7 @@ class AccessAdminPageTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_guest_cannot_access_admin_page(self) -> None:
+        """Tests that a guest user cannot access the admin page."""
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json('/mock/', expected_status_int=401)
         error_msg = 'You must be logged in to access this resource.'
@@ -3621,6 +3637,9 @@ class AccessContributorDashboardAdminPageTests(test_utils.GenericTestBase):
     def test_banned_user_cannot_access_contributor_dashboard_admin_page(
         self
     ) -> None:
+        """Tests that a banned user cannot access the contributor dashboard
+        admin page.
+        """
         self.login(self.banned_user_email)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json('/mock/', expected_status_int=401)
@@ -3634,6 +3653,9 @@ class AccessContributorDashboardAdminPageTests(test_utils.GenericTestBase):
     def test_question_admin_can_access_contributor_dashboard_admin_page(
         self
     ) -> None:
+        """Tests that the question admin can access the contributor dashboard
+        admin page.
+        """
         self.add_user_role(
             self.username, feconf.ROLE_ID_QUESTION_ADMIN)
         self.login(self.user_email)
@@ -3645,6 +3667,9 @@ class AccessContributorDashboardAdminPageTests(test_utils.GenericTestBase):
     def test_guest_cannot_access_contributor_dashboard_admin_page(
         self
     ) -> None:
+        """Tests that a guest user acnnot access the contributor dsahboard
+        admin page.
+        """
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json('/mock/', expected_status_int=401)
         error_msg = 'You must be logged in to access this resource.'
@@ -3653,6 +3678,9 @@ class AccessContributorDashboardAdminPageTests(test_utils.GenericTestBase):
     def test_normal_user_cannot_access_contributor_dashboard_admin_page(
         self
     ) -> None:
+        """Tests that a user cannot access the contributor dashboard admin
+        page.
+        """
         self.login(self.user_email)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json('/mock/', expected_status_int=401)
@@ -3686,12 +3714,14 @@ class UploadExplorationTests(test_utils.GenericTestBase):
         ))
 
     def test_super_admin_can_upload_explorations(self) -> None:
+        """Tests that a super admin can upload an exploration."""
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json('/mock_upload_exploration/')
         self.logout()
 
     def test_normal_user_cannot_upload_explorations(self) -> None:
+        """Tests that a user cannot upload an exploration."""
         self.login(self.EDITOR_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(
@@ -3702,6 +3732,7 @@ class UploadExplorationTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_guest_cannot_upload_explorations(self) -> None:
+        """Tests that a guest user cannot upload an exploration."""
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/mock_upload_exploration/', expected_status_int=401)
@@ -3751,6 +3782,7 @@ class DeleteExplorationTests(test_utils.GenericTestBase):
         rights_manager.publish_exploration(self.owner, self.published_exp_id)
 
     def test_guest_cannot_delete_exploration(self) -> None:
+        """Tests that a guest user cannot delete an exploration."""
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/mock_delete_exploration/%s' % self.private_exp_id,
@@ -3760,6 +3792,7 @@ class DeleteExplorationTests(test_utils.GenericTestBase):
             'You must be logged in to access this resource.')
 
     def test_owner_can_delete_owned_private_exploration(self) -> None:
+        """Tests that the owner can delete an owned exploration."""
         self.login(self.OWNER_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(
@@ -3768,6 +3801,7 @@ class DeleteExplorationTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_moderator_can_delete_published_exploration(self) -> None:
+        """Tests that the moderator can delete a published exploration."""
         self.login(self.MODERATOR_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(
@@ -3776,6 +3810,7 @@ class DeleteExplorationTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_owner_cannot_delete_published_exploration(self) -> None:
+        """Tests that the owner cannot delete a published exploration."""
         self.login(self.OWNER_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(
@@ -3788,6 +3823,7 @@ class DeleteExplorationTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_moderator_can_delete_private_exploration(self) -> None:
+        """Tests that the moderator can delete a private exploration."""
         self.login(self.MODERATOR_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(
@@ -3832,6 +3868,9 @@ class SuggestChangesToExplorationTests(test_utils.GenericTestBase):
         ))
 
     def test_banned_user_cannot_suggest_changes(self) -> None:
+        """Tests that a banned user cannot make suggestions to an
+        exploration.
+        """
         self.login(self.banned_user_email)
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
@@ -3839,6 +3878,7 @@ class SuggestChangesToExplorationTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_normal_user_can_suggest_changes(self) -> None:
+        """Tests that a user can make suggestions to an exploration."""
         self.login(self.user_email)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json('/mock/%s' % self.exploration_id)
@@ -3875,12 +3915,14 @@ class SuggestChangesDecoratorsTests(test_utils.GenericTestBase):
         ))
 
     def test_banned_user_cannot_suggest_changes(self) -> None:
+        """Tests that a banned user cannot make suggestions."""
         self.login(self.banned_user_email)
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json('/mock', expected_status_int=401)
         self.logout()
 
     def test_normal_user_can_suggest_changes(self) -> None:
+        """Tests that a user can make suggestions."""
         self.login(self.user_email)
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json('/mock')
@@ -3945,6 +3987,7 @@ class ResubmitSuggestionDecoratorsTests(test_utils.GenericTestBase):
         self.suggestion_id = suggestion.suggestion_id
 
     def test_author_can_resubmit_suggestion(self) -> None:
+        """Tests that the author can resubmit a suggestion."""
         self.login(self.author_email)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json('/mock/%s' % self.suggestion_id)
@@ -3952,6 +3995,9 @@ class ResubmitSuggestionDecoratorsTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_non_author_cannot_resubmit_suggestion(self) -> None:
+        """Tests that a user who is not the author cannot resubmit a
+        suggestion.
+        """
         self.login(self.user_email)
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
@@ -3959,6 +4005,9 @@ class ResubmitSuggestionDecoratorsTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_error_with_invalid_suggestion_id(self) -> None:
+        """Tests that user cannot resubmit a suggestion if suggestion ID
+        is invalid.
+        """
         invalid_id = 'invalid'
         self.login(self.user_email)
         with self.swap(self, 'testapp', self.mock_testapp):
@@ -4085,6 +4134,7 @@ class DecoratorForAcceptingSuggestionTests(test_utils.GenericTestBase):
         self.suggestion_id_3 = self.suggestion_3.suggestion_id
 
     def test_guest_cannot_accept_suggestion(self) -> None:
+        """Tests that a guest user cannot accept a suggestion."""
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/mock_accept_suggestion/%s/%s'
@@ -4095,6 +4145,7 @@ class DecoratorForAcceptingSuggestionTests(test_utils.GenericTestBase):
             'You must be logged in to access this resource.')
 
     def test_owner_can_accept_suggestion(self) -> None:
+        """Tests that the owner can accept a suggestion."""
         self.login(self.OWNER_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(
@@ -4105,6 +4156,7 @@ class DecoratorForAcceptingSuggestionTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_user_with_review_rights_can_accept_suggestion(self) -> None:
+        """Tests that a user with review rights can accept a suggestion."""
         self.login(self.EDITOR_EMAIL)
         testapp_swap = self.swap(self, 'testapp', self.mock_testapp)
         review_swap = self.swap_to_always_return(
@@ -4120,6 +4172,9 @@ class DecoratorForAcceptingSuggestionTests(test_utils.GenericTestBase):
     def test_user_with_review_rights_can_accept_translation_suggestion(
         self
     ) -> None:
+        """Tests that a user with review rights can accept a translation
+        suggestions.
+        """
         self.login(self.EDITOR_EMAIL)
         testapp_swap = self.swap(self, 'testapp', self.mock_testapp)
         translation_review_swap = self.swap_to_always_return(
@@ -4135,6 +4190,9 @@ class DecoratorForAcceptingSuggestionTests(test_utils.GenericTestBase):
     def test_user_with_review_rights_can_accept_question_suggestion(
         self
     ) -> None:
+        """Tests that a user with review rights can accept a question
+        suggestion.
+        """
         self.login(self.EDITOR_EMAIL)
         testapp_swap = self.swap(self, 'testapp', self.mock_testapp)
         question_review_swap = self.swap_to_always_return(
@@ -4148,6 +4206,7 @@ class DecoratorForAcceptingSuggestionTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_curriculum_admin_can_accept_suggestions(self) -> None:
+        """Tests that a curriculum admin can accept a suggestion."""
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(
@@ -4158,6 +4217,9 @@ class DecoratorForAcceptingSuggestionTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_error_when_format_of_suggestion_id_is_invalid(self) -> None:
+        """Tests that a user cannot accept a suggestion if suggestion ID
+        format is invalid.
+        """
         self.login(self.OWNER_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(
@@ -4173,6 +4235,9 @@ class DecoratorForAcceptingSuggestionTests(test_utils.GenericTestBase):
     def test_page_not_found_exception_when_suggestion_id_is_invalid(
         self
     ) -> None:
+        """Tests that a user cannot accept a suggestion if suggestion ID is
+        invalid.
+        """
         self.login(self.OWNER_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
@@ -4223,6 +4288,7 @@ class ViewReviewableSuggestionsTests(test_utils.GenericTestBase):
         ))
 
     def test_guest_cannot_review_suggestion(self) -> None:
+        """Tests that a guest user cannot review a suggestion."""
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/mock_review_suggestion/%s/%s' % (
@@ -4232,6 +4298,9 @@ class ViewReviewableSuggestionsTests(test_utils.GenericTestBase):
         self.assertEqual(response['error'], error_msg)
 
     def test_error_when_suggestion_type_is_invalid(self) -> None:
+        """Tests that a user cannot review a suggestion if suggestion type is
+        invalid.
+        """
         self.login(self.VIEWER_EMAIL)
         testapp_swap = self.swap(self, 'testapp', self.mock_testapp)
         with testapp_swap:
@@ -4249,6 +4318,9 @@ class ViewReviewableSuggestionsTests(test_utils.GenericTestBase):
     def test_user_with_review_rights_can_review_translation_suggestions(
         self
     ) -> None:
+        """Tests that a user with review rights can review a translation
+        suggestion.
+        """
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         testapp_swap = self.swap(self, 'testapp', self.mock_testapp)
         translation_review_swap = self.swap_to_always_return(
@@ -4267,6 +4339,9 @@ class ViewReviewableSuggestionsTests(test_utils.GenericTestBase):
     def test_user_with_review_rights_can_review_question_suggestions(
         self
     ) -> None:
+        """Tests that a user with review rights can review a question
+        suggestion.
+        """
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         testapp_swap = self.swap(self, 'testapp', self.mock_testapp)
         question_review_swap = self.swap_to_always_return(
@@ -4285,6 +4360,9 @@ class ViewReviewableSuggestionsTests(test_utils.GenericTestBase):
     def test_user_without_review_rights_cannot_review_question_suggestions(
         self
     ) -> None:
+        """Tests that a user without review rights cannot review a question
+        suggestion.
+        """
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         testapp_swap = self.swap(self, 'testapp', self.mock_testapp)
         user_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
@@ -4307,6 +4385,9 @@ class ViewReviewableSuggestionsTests(test_utils.GenericTestBase):
     def test_user_without_review_rights_cannot_review_translation_suggestions(
         self
     ) -> None:
+        """Tests that a user with no review rights cannot review a translation
+        suggestion.
+        """
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         testapp_swap = self.swap(self, 'testapp', self.mock_testapp)
         user_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
@@ -4370,6 +4451,9 @@ class PublishExplorationTests(test_utils.GenericTestBase):
         rights_manager.publish_exploration(self.owner, self.public_exp_id)
 
     def test_cannot_publish_exploration_with_invalid_exp_id(self) -> None:
+        """Tests that a user cannot publish an exploration if exploration ID
+        is invalid.
+        """
         self.login(self.OWNER_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
@@ -4378,6 +4462,7 @@ class PublishExplorationTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_owner_can_publish_owned_exploration(self) -> None:
+        """Tests that the owner can publish an owned exploration."""
         self.login(self.OWNER_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(
@@ -4386,6 +4471,9 @@ class PublishExplorationTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_already_published_exploration_cannot_be_published(self) -> None:
+        """Tests that an exploration that is already published cannnot be
+        published.
+        """
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
@@ -4394,6 +4482,7 @@ class PublishExplorationTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_moderator_cannot_publish_private_exploration(self) -> None:
+        """Tests that the moderator cannot publish a private exploration."""
         self.login(self.MODERATOR_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
@@ -4402,6 +4491,7 @@ class PublishExplorationTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_admin_can_publish_any_exploration(self) -> None:
+        """Tests that the admin can publish any exploration."""
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(
@@ -4449,6 +4539,7 @@ class ModifyExplorationRolesTests(test_utils.GenericTestBase):
             self.private_exp_id, self.owner_id)
 
     def test_banned_user_cannot_modify_exploration_roles(self) -> None:
+        """Tests that a banned user cannot modify exploration roles."""
         self.login(self.banned_user_email)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(
@@ -4461,6 +4552,7 @@ class ModifyExplorationRolesTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_owner_can_modify_exploration_roles(self) -> None:
+        """Tests that the owner can modify exploration roles."""
         self.login(self.OWNER_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json('/mock/%s' % self.private_exp_id)
@@ -4468,12 +4560,16 @@ class ModifyExplorationRolesTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_moderator_can_modify_roles_of_unowned_exploration(self) -> None:
+        """Tests that a moderator can modify roles of an unowned
+        exploration.
+        """
         self.login(self.MODERATOR_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json('/mock/%s' % self.private_exp_id)
         self.logout()
 
     def test_admin_can_modify_roles_of_any_exploration(self) -> None:
+        """Tests that the admin can modify the roles of any exploration."""
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json('/mock/%s' % self.private_exp_id)
@@ -4559,6 +4655,9 @@ class CollectionPublishStatusTests(test_utils.GenericTestBase):
         rights_manager.publish_collection(self.owner, self.published_col_id)
 
     def test_cannot_publish_collection_with_invalid_exp_id(self) -> None:
+        """Tests that a user cannot publish a collection if exploration
+        ID is invalid.
+        """
         self.login(self.OWNER_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
@@ -4567,6 +4666,9 @@ class CollectionPublishStatusTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_cannot_unpublish_collection_with_invalid_exp_id(self) -> None:
+        """Tests that a user cannot unpublish a collection if exploration ID
+        is invalid.
+        """
         self.login(self.OWNER_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
@@ -4575,6 +4677,7 @@ class CollectionPublishStatusTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_owner_can_publish_collection(self) -> None:
+        """Tests that the owner can publish a collection."""
         self.login(self.OWNER_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(
@@ -4583,6 +4686,7 @@ class CollectionPublishStatusTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_owner_cannot_unpublish_public_collection(self) -> None:
+        """Tests that the owner cannot unpublish a public collection."""
         self.login(self.OWNER_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
@@ -4591,6 +4695,7 @@ class CollectionPublishStatusTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_moderator_can_unpublish_public_collection(self) -> None:
+        """Tests that the moderator can unpublish a public collection."""
         self.login(self.MODERATOR_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(
@@ -4599,6 +4704,7 @@ class CollectionPublishStatusTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_admin_can_publish_any_collection(self) -> None:
+        """Tests that the admin can publish any collection."""
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(
@@ -4607,6 +4713,9 @@ class CollectionPublishStatusTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_admin_cannot_publish_already_published_collection(self) -> None:
+        """Tests that the admin cannot publish an already published
+        collection.
+        """
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
@@ -4643,6 +4752,7 @@ class AccessLearnerDashboardDecoratorTests(test_utils.GenericTestBase):
         ))
 
     def test_banned_user_cannot_access_learner_dashboard(self) -> None:
+        """Tests that a banned user cannot access the learner dashboard."""
         self.login(self.banned_user_email)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json('/mock/', expected_status_int=401)
@@ -4651,6 +4761,9 @@ class AccessLearnerDashboardDecoratorTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_exploration_editor_can_access_learner_dashboard(self) -> None:
+        """Tests that an exploration editor can access the learner
+        dashboard.
+        """
         self.login(self.user_email)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json('/mock/')
@@ -4658,6 +4771,7 @@ class AccessLearnerDashboardDecoratorTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_guest_user_cannot_access_learner_dashboard(self) -> None:
+        """Tests that a guest user cannot access the learner dashboard."""
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json('/mock/', expected_status_int=401)
         error_msg = 'You must be logged in to access this resource.'
@@ -4692,6 +4806,7 @@ class AccessLearnerGroupsDecoratorTests(test_utils.GenericTestBase):
         ))
 
     def test_banned_user_cannot_access_teacher_dashboard(self) -> None:
+        """Tests that a banned user cannot access learner groups."""
         self.login(self.banned_user_email)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json('/mock/', expected_status_int=401)
@@ -4700,6 +4815,7 @@ class AccessLearnerGroupsDecoratorTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_exploration_editor_can_access_learner_groups(self) -> None:
+        """Tests that an exploration editor can access learner groups."""
         self.login(self.user_email)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json('/mock/')
@@ -4707,6 +4823,7 @@ class AccessLearnerGroupsDecoratorTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_guest_user_cannot_access_teacher_dashboard(self) -> None:
+        """Tests that a guest user cannot access learner groups."""
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json('/mock/', expected_status_int=401)
         error_msg = 'You must be logged in to access this resource.'
@@ -4757,6 +4874,7 @@ class EditTopicDecoratorTests(test_utils.GenericTestBase):
         self.set_topic_managers([self.manager_username], self.topic_id)
 
     def test_cannot_edit_topic_with_invalid_topic_id(self) -> None:
+        """Tests that a user cannot edit a topic if topic ID is invalid."""
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
@@ -4764,6 +4882,7 @@ class EditTopicDecoratorTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_admin_can_edit_topic(self) -> None:
+        """Tests that the admin can edit a topic."""
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json('/mock_edit_topic/%s' % self.topic_id)
@@ -4771,6 +4890,7 @@ class EditTopicDecoratorTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_topic_manager_can_edit_topic(self) -> None:
+        """"Tests that a topic manager can edit a topic."""
         self.login(self.manager_email)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json('/mock_edit_topic/%s' % self.topic_id)
@@ -4778,6 +4898,7 @@ class EditTopicDecoratorTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_normal_user_cannot_edit_topic(self) -> None:
+        """Tests that a normal user cannot edit a topic."""
         self.login(self.viewer_email)
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
@@ -4785,6 +4906,7 @@ class EditTopicDecoratorTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_guest_user_cannot_edit_topic(self) -> None:
+        """Tests that a guest user cannot edit a topic."""
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/mock_edit_topic/%s' % self.topic_id, expected_status_int=401)
@@ -4832,6 +4954,7 @@ class DeleteTopicDecoratorTests(test_utils.GenericTestBase):
         topic_services.create_new_topic_rights(self.topic_id, self.admin_id)
 
     def test_cannot_delete_topic_with_invalid_topic_id(self) -> None:
+        """"Tests that a user cannot delete a topic if topic ID is invalid."""
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
@@ -4839,6 +4962,7 @@ class DeleteTopicDecoratorTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_admin_can_delete_topic(self) -> None:
+        """Tests that admin can delete a topic."""
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json('/mock_delete_topic/%s' % self.topic_id)
@@ -4846,6 +4970,7 @@ class DeleteTopicDecoratorTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_normal_user_cannot_delete_topic(self) -> None:
+        """Tests that a user cannot delete a topic."""
         self.login(self.viewer_email)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(
@@ -4859,6 +4984,7 @@ class DeleteTopicDecoratorTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_guest_user_cannot_delete_topic(self) -> None:
+        """"Tests that a guest user cannot delete a topic."""
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/mock_delete_topic/%s' % self.topic_id,
@@ -4916,6 +5042,7 @@ class ViewAnyTopicEditorDecoratorTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_admin_can_view_topic_editor(self) -> None:
+        """Tests that the admin can view any topic editor."""
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json('/mock_view_topic_editor/%s' % (
@@ -4924,6 +5051,7 @@ class ViewAnyTopicEditorDecoratorTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_normal_user_cannot_view_topic_editor(self) -> None:
+        """Tests that a user cannot view anytopic editors."""
         self.login(self.viewer_email)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(
@@ -4937,6 +5065,7 @@ class ViewAnyTopicEditorDecoratorTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_guest_user_cannot_view_topic_editor(self) -> None:
+        """Tests that a guest user cannot view any topic editors."""
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/mock_view_topic_editor/%s' % self.topic_id,
@@ -4987,6 +5116,7 @@ class EditStoryDecoratorTests(test_utils.GenericTestBase):
         topic_services.create_new_topic_rights(self.topic_id, self.admin_id)
 
     def test_cannot_edit_story_with_invalid_story_id(self) -> None:
+        """Tests that a user cannot edit a story if story ID is invalid."""
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
@@ -4994,6 +5124,9 @@ class EditStoryDecoratorTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_cannot_edit_story_with_invalid_topic_id(self) -> None:
+        """Tests that a user cannot edit a story if the topic ID is
+        invalid.
+        """
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         story_id = story_services.get_new_story_id()
         topic_id = topic_fetchers.get_new_topic_id()
@@ -5004,6 +5137,9 @@ class EditStoryDecoratorTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_cannot_edit_story_with_invalid_canonical_story_ids(self) -> None:
+        """Tests that a usre cannot edit a story if the canonical story IDs
+        are invalid.
+        """
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         testapp_swap = self.swap(self, 'testapp', self.mock_testapp)
         canonical_story_ids_swap = self.swap_to_always_return(
@@ -5019,6 +5155,7 @@ class EditStoryDecoratorTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_admin_can_edit_story(self) -> None:
+        """Tests that the admin can edit a story."""
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json('/mock_edit_story/%s' % self.story_id)
@@ -5026,6 +5163,7 @@ class EditStoryDecoratorTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_topic_manager_can_edit_story(self) -> None:
+        """Tests that the topic manager can edit a story"""
         self.signup(self.manager_email, self.manager_username)
         self.set_topic_managers([self.manager_username], self.topic_id)
 
@@ -5036,6 +5174,7 @@ class EditStoryDecoratorTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_normal_user_cannot_edit_story(self) -> None:
+        """Tests that a normal user cannot edit a story."""
         self.signup(self.viewer_email, self.viewer_username)
 
         self.login(self.viewer_email)
@@ -5045,6 +5184,7 @@ class EditStoryDecoratorTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_guest_user_cannot_edit_story(self) -> None:
+        """Tests that a guest user cannot edit a story."""
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/mock_edit_story/%s' % self.story_id, expected_status_int=401)
@@ -5094,6 +5234,9 @@ class DeleteStoryDecoratorTests(test_utils.GenericTestBase):
         topic_services.create_new_topic_rights(self.topic_id, self.admin_id)
 
     def test_cannot_delete_story_with_invalid_story_id(self) -> None:
+        """Tests that a user canot delete a story if the story ID is
+        invalid.
+        """
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
@@ -5101,6 +5244,9 @@ class DeleteStoryDecoratorTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_cannot_delete_story_with_invalid_topic_id(self) -> None:
+        """Tests that a user cannot delete a story if the topic ID is
+        invalid.
+        """
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         story_id = story_services.get_new_story_id()
         topic_id = topic_fetchers.get_new_topic_id()
@@ -5111,6 +5257,7 @@ class DeleteStoryDecoratorTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_admin_can_delete_story(self) -> None:
+        """Tests that the admin can delete a story."""
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json('/mock_delete_story/%s' % self.story_id)
@@ -5118,6 +5265,7 @@ class DeleteStoryDecoratorTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_topic_manager_can_delete_story(self) -> None:
+        """Tests that the topic manager can delete a story."""
         self.signup(self.manager_email, self.manager_username)
         self.set_topic_managers([self.manager_username], self.topic_id)
 
@@ -5128,6 +5276,7 @@ class DeleteStoryDecoratorTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_normal_user_cannot_delete_story(self) -> None:
+        """Tests that the normal user cannot delete a story."""
         self.signup(self.viewer_email, self.viewer_username)
 
         self.login(self.viewer_email)
@@ -5140,6 +5289,7 @@ class DeleteStoryDecoratorTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_guest_user_cannot_delete_story(self) -> None:
+        """Tests that the guest user cannot delete a story."""
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/mock_delete_story/%s' % self.story_id,
@@ -5187,6 +5337,7 @@ class AccessTopicsAndSkillsDashboardDecoratorTests(test_utils.GenericTestBase):
         self.set_topic_managers([self.manager_username], self.topic_id)
 
     def test_admin_can_access_dashboard(self) -> None:
+        """Tests that the admin can access the topics and skills dashboard."""
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json('/mock_access_dashboard/')
@@ -5194,6 +5345,9 @@ class AccessTopicsAndSkillsDashboardDecoratorTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_topic_manager_can_access_dashboard(self) -> None:
+        """Tests that the topic manager can access the topics and skills
+        dashboard.
+        """
         self.login(self.manager_email)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json('/mock_access_dashboard/')
@@ -5201,6 +5355,9 @@ class AccessTopicsAndSkillsDashboardDecoratorTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_normal_user_cannot_access_dashboard(self) -> None:
+        """Tests that a normal user cannot access the topic and skills
+        dashboard.
+        """
         self.login(self.viewer_email)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(
@@ -5213,6 +5370,9 @@ class AccessTopicsAndSkillsDashboardDecoratorTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_guest_user_cannot_access_dashboard(self) -> None:
+        """Tests that a guest user cannot access the topics and skills
+        dashboard.
+        """
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/mock_access_dashboard/', expected_status_int=401)
@@ -5265,6 +5425,9 @@ class AddStoryToTopicTests(test_utils.GenericTestBase):
         self.set_topic_managers([self.manager_username], self.topic_id)
 
     def test_cannot_add_story_to_topic_with_invalid_topic_id(self) -> None:
+        """Tests that a user cannot add a new strory to a topic if topic ID
+        is invalid.
+        """
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
@@ -5273,6 +5436,7 @@ class AddStoryToTopicTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_admin_can_add_story_to_topic(self) -> None:
+        """Tests that the admin can add a story to a topic."""
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(
@@ -5283,6 +5447,9 @@ class AddStoryToTopicTests(test_utils.GenericTestBase):
     def test_topic_manager_cannot_add_story_to_topic_with_invalid_topic_id(
         self
     ) -> None:
+        """Tests that a topic manager cannot add a story to a topic id the
+        topic ID is invalid.
+        """
         self.login(self.manager_email)
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
@@ -5291,6 +5458,7 @@ class AddStoryToTopicTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_topic_manager_can_add_story_to_topic(self) -> None:
+        """Tests that a topic manager can add a story to a topic."""
         self.login(self.manager_email)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(
@@ -5299,6 +5467,7 @@ class AddStoryToTopicTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_normal_user_cannot_add_story_to_topic(self) -> None:
+        """Tests that a normal user cannot add a story to a topic."""
         self.login(self.viewer_email)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(
@@ -5310,6 +5479,7 @@ class AddStoryToTopicTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_guest_cannot_add_story_to_topic(self) -> None:
+        """Tests that a guest user cannot add a strory to a topic."""
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/mock_add_story_to_topic/%s' % self.topic_id,
@@ -5418,12 +5588,16 @@ class StoryViewerAsLoggedInUserTests(test_utils.GenericTestBase):
         self.login(self.user_email)
 
     def test_user_cannot_access_non_existent_story(self) -> None:
+        """Tests that a user cannot access a non existent story."""
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
                 '/mock_story_data/staging/topic/non-existent-frag',
                 expected_status_int=404)
 
     def test_user_cannot_access_story_when_topic_is_not_published(self) -> None:
+        """Tests that a user cannot access a story if the topic is not
+        published.
+        """
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
                 '/mock_story_data/staging/topic/%s'
@@ -5431,6 +5605,9 @@ class StoryViewerAsLoggedInUserTests(test_utils.GenericTestBase):
                 expected_status_int=404)
 
     def test_user_cannot_access_story_when_story_is_not_published(self) -> None:
+        """Tests that a user cannot access a story if the story is not
+        published.
+        """
         topic_services.publish_topic(self.topic_id, self.admin_id)
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
@@ -5441,6 +5618,9 @@ class StoryViewerAsLoggedInUserTests(test_utils.GenericTestBase):
     def test_user_can_access_story_when_story_and_topic_are_published(
         self
     ) -> None:
+        """Tests that a user can access a story if both the story and the topic
+        are published.
+        """
         topic_services.publish_topic(self.topic_id, self.admin_id)
         topic_services.publish_story(
             self.topic_id, self.story_id, self.admin_id)
@@ -5453,6 +5633,9 @@ class StoryViewerAsLoggedInUserTests(test_utils.GenericTestBase):
     def test_user_can_access_story_when_all_url_fragments_are_valid(
         self
     ) -> None:
+        """Tests that a user can access a story if all the URL fragments are
+        valid.
+        """
         topic_services.publish_topic(self.topic_id, self.admin_id)
         topic_services.publish_story(
             self.topic_id, self.story_id, self.admin_id)
@@ -5465,6 +5648,9 @@ class StoryViewerAsLoggedInUserTests(test_utils.GenericTestBase):
     def test_user_redirect_to_story_page_if_story_url_fragment_is_invalid(
         self
     ) -> None:
+        """Tests that a user is redirected to the story page if the story URL
+        fragmment is invalid.
+        """
         topic_services.publish_topic(self.topic_id, self.admin_id)
         topic_services.publish_story(
             self.topic_id, self.story_id, self.admin_id)
