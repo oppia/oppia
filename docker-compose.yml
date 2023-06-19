@@ -75,16 +75,8 @@ services:
       interval: 30s
       retries: 5
       start_period: 5m
-    command: >
-      sh -c '
-        if [ "$disable_host_checking" = "true" ]
-        then
-          /google-cloud-sdk/bin/dev_appserver.py /app/oppia/app_dev.yaml --runtime python38 --host=0.0.0.0 --port=8181 --admin_host=0.0.0.0 --admin_port=8000 --skip_sdk_update_check=True --log_level=info --dev_appserver_log_level=info --enable_host_checking=False
-        else
-          /google-cloud-sdk/bin/dev_appserver.py /app/oppia/app_dev.yaml --runtime python38 --host=0.0.0.0 --port=8181 --admin_host=0.0.0.0 --admin_port=8000 --skip_sdk_update_check=True --log_level=info --dev_appserver_log_level=info --enable_host_checking=True
-        fi
-      '
-  
+    command: /google-cloud-sdk/bin/dev_appserver.py /app/oppia/app_dev.yaml --runtime python38 --host=0.0.0.0 --port=8181 --admin_host=0.0.0.0 --admin_port=8000 --skip_sdk_update_check=True --log_level=info --dev_appserver_log_level=info
+
   datastore:
     build:
       context: .
@@ -112,6 +104,7 @@ services:
       timeout: 10s
       interval: 1m
       retries: 5
+      start_period: 1m
     # Line 110 is checking if previous datastore cache exists and deleting it if it does as user has not passed the save_datastore flag.
     # TODO: thouroughly test this.
     command: >
