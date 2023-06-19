@@ -96,6 +96,7 @@ import { AppConstants } from 'app.constants';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { UrlService } from 'services/contextual/url.service';
 import { I18nService } from 'i18n/i18n.service';
+import { RteHelperService } from 'services/rte-helper.service';
 
 const componentMap = {
   Collapsible: {
@@ -180,6 +181,7 @@ export class OppiaAngularRootComponent implements AfterViewInit {
     private profilePageBackendApiService: ProfilePageBackendApiService,
     private ratingComputationService: RatingComputationService,
     private reviewTestBackendApiService: ReviewTestBackendApiService,
+    private rteHelperService: RteHelperService,
     private storyViewerBackendApiService: StoryViewerBackendApiService,
     private urlInterpolationService: UrlInterpolationService,
     private urlService: UrlService,
@@ -188,6 +190,7 @@ export class OppiaAngularRootComponent implements AfterViewInit {
     if (OppiaAngularRootComponent.rteElementsAreInitialized) {
       return;
     }
+    OppiaAngularRootComponent.rteHelperService = this.rteHelperService;
     registerCustomElements(this.injector);
     OppiaAngularRootComponent.rteElementsAreInitialized = true;
   }
