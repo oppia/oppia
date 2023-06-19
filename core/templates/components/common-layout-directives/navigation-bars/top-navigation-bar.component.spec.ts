@@ -204,7 +204,7 @@ describe('TopNavigationBarComponent', () => {
     component.showNumberOfUnreadfeedback();
 
     tick();
-    expect(component.numberOfUnreadThreads).toBe(10);
+    expect(component.unreadThreadsCount).toBe(10);
     expect(fetchDataSpy).toHaveBeenCalled();
   }));
 

@@ -580,17 +580,17 @@ describe('Feedback updates page', () => {
         .and.returnValue(Promise.resolve(threadMessages));
 
       expect(component.numberOfUnreadThreads).toBe(10);
-      expect(component.loadingFeedbacks).toBe(false);
+      expect(component.loadingFeedback).toBe(false);
 
       component.onClickThread(
         threadStatus, explorationId, threadId, explorationTitle);
 
-      expect(component.loadingFeedbacks).toBe(true);
+      expect(component.loadingFeedback).toBe(true);
 
       tick();
       fixture.detectChanges();
 
-      expect(component.loadingFeedbacks).toBe(false);
+      expect(component.loadingFeedback).toBe(false);
       expect(component.feedbackThreadActive).toBe(true);
       expect(component.numberOfUnreadThreads).toBe(6);
       expect(component.messageSummaries.length).toBe(1);
@@ -618,17 +618,17 @@ describe('Feedback updates page', () => {
         .and.returnValue(Promise.resolve(threadMessages));
 
       expect(component.numberOfUnreadThreads).toBe(10);
-      expect(component.loadingFeedbacks).toBe(false);
+      expect(component.loadingFeedback).toBe(false);
 
       component.onClickThread(
         threadStatus, explorationId, threadId, explorationTitle);
 
-      expect(component.loadingFeedbacks).toBe(true);
+      expect(component.loadingFeedback).toBe(true);
 
       tick();
       fixture.detectChanges();
 
-      expect(component.loadingFeedbacks).toBe(false);
+      expect(component.loadingFeedback).toBe(false);
       expect(component.feedbackThreadActive).toBe(true);
       expect(component.numberOfUnreadThreads).toBe(6);
       expect(component.messageSummaries.length).toBe(1);
@@ -657,17 +657,17 @@ describe('Feedback updates page', () => {
             .and.returnValue(Promise.resolve(threadMessages));
 
         expect(component.numberOfUnreadThreads).toBe(10);
-        expect(component.loadingFeedbacks).toBe(false);
+        expect(component.loadingFeedback).toBe(false);
 
         component.onClickThread(
           threadStatus, explorationId, threadId, explorationTitle);
 
-        expect(component.loadingFeedbacks).toBe(true);
+        expect(component.loadingFeedback).toBe(true);
 
         tick();
         fixture.detectChanges();
 
-        expect(component.loadingFeedbacks).toBe(false);
+        expect(component.loadingFeedback).toBe(false);
         expect(component.feedbackThreadActive).toBe(true);
         expect(component.numberOfUnreadThreads).toBe(6);
         expect(component.messageSummaries.length).toBe(1);
@@ -706,17 +706,17 @@ describe('Feedback updates page', () => {
           .and.returnValue(Promise.resolve());
 
         expect(component.numberOfUnreadThreads).toBe(10);
-        expect(component.loadingFeedbacks).toBe(false);
+        expect(component.loadingFeedback).toBe(false);
 
         component.onClickThread(
           threadStatus, explorationId, threadId, explorationTitle);
 
-        expect(component.loadingFeedbacks).toBe(true);
+        expect(component.loadingFeedback).toBe(true);
 
         tick();
         fixture.detectChanges();
 
-        expect(component.loadingFeedbacks).toBe(false);
+        expect(component.loadingFeedback).toBe(false);
         expect(component.feedbackThreadActive).toBe(true);
         expect(component.numberOfUnreadThreads).toBe(6);
         expect(component.messageSummaries.length).toBe(1);

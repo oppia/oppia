@@ -86,7 +86,6 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
   inClassroomPage: boolean = false;
   showLanguageSelector: boolean = false;
   standardNavIsShown: boolean = false;
-  featureEnable: boolean;
   getInvolvedMenuOffset: number = 0;
   donateMenuOffset: number = 0;
   ACTION_OPEN!: string;
@@ -111,7 +110,7 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
   windowIsNarrow: boolean = false;
   profilePicturePngDataUrl!: string;
   profilePictureWebpDataUrl!: string;
-  numberOfUnreadThreads: number = 0;
+  unreadThreadsCount: number = 0;
   paginatedThreadsList: FeedbackThreadSummaryBackendDict[][] = [];
 
 
@@ -146,7 +145,7 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
 
   CLASSROOM_PROMOS_ARE_ENABLED = false;
   LEARNER_GROUPS_FEATURE_IS_ENABLED = false;
-  SHOW_FEEDBACK_UPDATES_IN_PROFILE_PIC_DROP_DOWN = false;
+  FEEDBACK_UPDATES_IN_PROFILE_PIC_DROP_DOWN_IS_ENABLED = false;
   googleSignInIconUrl = this.urlInterpolationService.getStaticImageUrl(
     '/google_signin_buttons/google_signin.svg');
 
@@ -216,7 +215,7 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
         this.LEARNER_GROUPS_FEATURE_IS_ENABLED = featureIsEnabled;
       });
 
-    this.SHOW_FEEDBACK_UPDATES_IN_PROFILE_PIC_DROP_DOWN =
+    this.FEEDBACK_UPDATES_IN_PROFILE_PIC_DROP_DOWN_IS_ENABLED =
     this.isShowFeedbackUpdatesInProfilepicDropdownFeatureFlagEnable();
 
     let service = this.classroomBackendApiService;
@@ -411,7 +410,7 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
             this.paginatedThreadsList));
       feedbackUpdatesDataPromise.then(
         responseData => {
-          this.numberOfUnreadThreads =
+          this.unreadThreadsCount =
             responseData.numberOfUnreadThreads;
         }, errorResponseStatus => {
           if (

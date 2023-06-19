@@ -108,7 +108,7 @@ export class FeedbackUpdatesPageComponent implements OnInit, OnDestroy {
     'text': string | null;
   };
 
-  loadingFeedbacks!: boolean;
+  loadingFeedback!: boolean;
   explorationTitle!: string;
   threadStatus!: string;
   explorationId!: string;
@@ -176,7 +176,7 @@ export class FeedbackUpdatesPageComponent implements OnInit, OnDestroy {
       // This is placed here in order to satisfy Unit tests.
     });
 
-    this.loadingFeedbacks = false;
+    this.loadingFeedback = false;
 
     this.newMessage = {
       text: ''
@@ -281,7 +281,7 @@ export class FeedbackUpdatesPageComponent implements OnInit, OnDestroy {
   onClickThread(
       threadStatus: string, explorationId: string,
       threadId: string, explorationTitle: string): void {
-    this.loadingFeedbacks = true;
+    this.loadingFeedback = true;
     let threadDataUrl = this.urlInterpolationService.interpolateUrl(
       '/feedbackupdatesthreadhandler/<threadId>', {
         threadId: threadId
@@ -312,7 +312,7 @@ export class FeedbackUpdatesPageComponent implements OnInit, OnDestroy {
             FeedbackMessageSummary.createFromBackendDict(
               messageSummaryDicts[index]));
         }
-        this.loadingFeedbacks = false;
+        this.loadingFeedback = false;
       });
   }
 
