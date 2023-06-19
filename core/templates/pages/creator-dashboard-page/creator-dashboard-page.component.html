@@ -10,7 +10,9 @@
        *ngIf="explorationsList?.length > 0 || collectionsList?.length > 0"
        [ngClass]="{'oppia-creator-dashboard-mobile-mode': checkMobileView()}">
     <mat-card layout="row" class="oppia-mat-card">
-      <div class="average-ratings stats-card" [attr.aria-label]="'Average ratings ' + (dashboardStats.averageRatings || 'N/A')" tabindex="0" >
+      <div class="average-ratings stats-card"
+           [attr.aria-label]="'Average ratings ' + (dashboardStats.averageRatings || 'N/A')"
+           tabindex="0" >
         <p class="stat-description" [innerHTML]="'I18N_DASHBOARD_STATS_AVERAGE_RATING' | translate"></p>
         <h2 class="stat-value-with-rating e2e-test-oppia-average-rating"
             [hidden]="!dashboardStats.numRatings || relativeChangeInTotalPlays">

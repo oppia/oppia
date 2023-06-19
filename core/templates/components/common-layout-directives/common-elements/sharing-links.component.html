@@ -18,7 +18,11 @@
     </a>
   </div>
   <div *ngIf="shareType !== 'blog'" class="fx-main-center fx-cross-center padding-0-2 classroom-icon">
-    <a class="fx-main-center fx-cross-center" title="Share on Google Classroom" [href]="getUrl('classroom')"  (click)="registerShareEvent('classroom')" target="_window">
+    <a class="fx-main-center fx-cross-center"
+       title="Share on Google Classroom"
+       [href]="getUrl('classroom')"
+       (click)="registerShareEvent('classroom')"
+       target="_window">
       <img class="share-option-img share-icons" [ngClass]="smallFont ? 'font-small' : 'font-big'"  [src]="classroomUrl" alt="Classroom">
     </a>
   </div>
