@@ -16,35 +16,21 @@
  * @fileoverview Unit tests for RteHelperService.
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// RteHelperService.ts is upgraded to Angular 8.
-import { UpgradedServices } from 'services/UpgradedServices';
-// ^^^ This block is to be removed.
+import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { RteHelperService } from './rte-helper.service';
+import { TestBed, fakeAsync, tick } from '@angular/core/testing';
 
-describe('Rte Helper Service', function() {
-  var RteHelperService = null;
-  var $q = null;
-  var $uibModal = null;
-  var $log = null;
-  var $rootScope = null;
+describe('Rte Helper Service', () => {
+  let rteHelperService: RteHelperService;
+  let ngbModal: NgbModal;
 
-  beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
-  }));
-  beforeEach(angular.mock.inject(function($injector) {
-    RteHelperService = $injector.get('RteHelperService');
-    $q = $injector.get('$q');
-    $uibModal = $injector.get('$uibModal');
-    $log = $injector.get('$log');
-    $rootScope = $injector.get('$rootScope');
-  }));
+  beforeEach(() => {
+    rteHelperService = TestBed.inject(RteHelperService);
+    ngbModal = TestBed.inject(NgbModal);
+  });
 
-  it('should get rich text components', function() {
-    expect(RteHelperService.getRichTextComponents()).toEqual([{
+  it('should get rich text components', () => {
+    expect(rteHelperService.getRichTextComponents()).toEqual([{
       backendId: 'Collapsible',
       customizationArgSpecs: [{
         name: 'heading',
@@ -271,75 +257,56 @@ describe('Rte Helper Service', function() {
     }]);
   });
 
-  it('should evalute when rich text component is inline', function() {
-    expect(RteHelperService.isInlineComponent('link')).toBe(true);
-    expect(RteHelperService.isInlineComponent('math')).toBe(true);
-    expect(RteHelperService.isInlineComponent('skillreview')).toBe(true);
+  it('should evalute when rich text component is inline', () => {
+    expect(rteHelperService.isInlineComponent('link')).toBe(true);
+    expect(rteHelperService.isInlineComponent('math')).toBe(true);
+    expect(rteHelperService.isInlineComponent('skillreview')).toBe(true);
   });
 
-  it('should evalute when rich text component is not inline', function() {
-    expect(RteHelperService.isInlineComponent('video')).toBe(false);
-    expect(RteHelperService.isInlineComponent('tabs')).toBe(false);
-    expect(RteHelperService.isInlineComponent('image')).toBe(false);
+  it('should evalute when rich text component is not inline', () => {
+    expect(rteHelperService.isInlineComponent('video')).toBe(false);
+    expect(rteHelperService.isInlineComponent('tabs')).toBe(false);
+    expect(rteHelperService.isInlineComponent('image')).toBe(false);
   });
 
-  it('should create customization arg dict from attributes', function() {
-    var logSpy = spyOn($log, 'error').and.callThrough();
-    var attrs = [{
-      name: 'class'
-    }, {
-      name: 'src'
-    }, {
-      name: '_moz_resizing'
-    }, {
-      name: 'attribute-with-value',
-      value: '"attribute value"'
-    }, {
-      name: 'invalid'
-    }];
-
-    expect(RteHelperService.createCustomizationArgDictFromAttrs(attrs))
-      .toEqual({
-        attribute: 'attribute value'
-      });
-
-    expect(logSpy).toHaveBeenCalledWith(
-      'RTE Error: invalid customization attribute invalid');
-  });
-
-  it('should open customization modal', function() {
-    var uibModalSpy = spyOn($uibModal, 'open').and.callThrough();
+  it('should open customization modal', () => {
+    var ngbModalSpy = spyOn(ngbModal, 'open').and.callFake(() => ({
+      componentInstance: {},
+      result: Promise.resolve()
+    } as unknown as NgbModalRef));
     var submitCallBackSpy = jasmine.createSpy('submit');
     var dismissCallBackSpy = jasmine.createSpy('dismiss');
-    RteHelperService.openCustomizationModal(
-      {}, {}, submitCallBackSpy, dismissCallBackSpy, function() {});
+    rteHelperService.openCustomizationModal(
+      [], {}, submitCallBackSpy, dismissCallBackSpy);
 
-    expect(uibModalSpy).toHaveBeenCalled();
+    expect(ngbModalSpy).toHaveBeenCalled();
   });
 
-  it('should open customization modal', function() {
-    spyOn($uibModal, 'open').and.returnValue({
-      result: $q.resolve()
-    });
+  it('should open customization modal', fakeAsync(() => {
+    spyOn(ngbModal, 'open').and.callFake(() => ({
+      componentInstance: {},
+      result: Promise.resolve()
+    } as unknown as NgbModalRef));
     var submitCallBackSpy = jasmine.createSpy('submit');
     var dismissCallBackSpy = jasmine.createSpy('dismiss');
-    RteHelperService.openCustomizationModal(
-      {}, {}, submitCallBackSpy, dismissCallBackSpy, function() {});
-    $rootScope.$apply();
+    rteHelperService.openCustomizationModal(
+      [], {}, submitCallBackSpy, dismissCallBackSpy);
+    tick();
 
     expect(submitCallBackSpy).toHaveBeenCalled();
-  });
+  }));
 
-  it('should open customization modal', function() {
-    spyOn($uibModal, 'open').and.returnValue({
-      result: $q.reject()
-    });
+  it('should open customization modal', fakeAsync(() => {
+    spyOn(ngbModal, 'open').and.callFake(() => ({
+      componentInstance: {},
+      result: Promise.reject()
+    } as unknown as NgbModalRef));
     var submitCallBackSpy = jasmine.createSpy('submit');
     var dismissCallBackSpy = jasmine.createSpy('dismiss');
-    RteHelperService.openCustomizationModal(
-      {}, {}, submitCallBackSpy, dismissCallBackSpy, function() {});
-    $rootScope.$apply();
+    rteHelperService.openCustomizationModal(
+      [], {}, submitCallBackSpy, dismissCallBackSpy);
+    tick();
 
     expect(dismissCallBackSpy).toHaveBeenCalled();
-  });
+  }));
 });

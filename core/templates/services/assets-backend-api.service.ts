@@ -123,7 +123,7 @@ export class AssetsBackendApiService {
     }
   }
 
-  async saveMathExpresionImage(
+  async saveMathExpressionImage(
       resampledFile: Blob, filename: string, entityType: string,
       entityId: string): Promise<SaveImageResponse> {
     const form = new FormData();

@@ -16,102 +16,72 @@
  * @fileoverview A helper service for the Rich text editor(RTE).
  */
 
-require('services/html-escaper.service.ts');
-require('services/stateful/focus-manager.service.ts');
-require('services/rte-helper-modal.controller.ts');
+import { Injectable } from '@angular/core';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { AppConstants } from 'app.constants';
+import { ServicesConstants } from 'services/services.constants';
+import { CustomizationArgsForRteType, CustomizationArgsSpecsType, RteHelperModalComponent } from './rte-helper-modal.controller';
+import cloneDeep from 'lodash/cloneDeep';
 
-require('services/alerts.service.ts');
-require('services/assets-backend-api.service.ts');
-require('services/context.service.ts');
-require('services/image-local-storage.service.ts');
-require('services/image-upload-helper.service.ts');
-require('app.constants.ajs.ts');
-require('services/services.constants.ajs.ts');
+const RTE_COMPONENT_SPECS = ServicesConstants.RTE_COMPONENT_SPECS;
+const _RICH_TEXT_COMPONENTS = Object.values(RTE_COMPONENT_SPECS).map(spec => ({
+  backendId: spec.backend_id,
+  customizationArgSpecs: cloneDeep(
+    spec.customization_arg_specs),
+  id: spec.frontend_id,
+  iconDataUrl: spec.icon_data_url,
+  isComplex: spec.is_complex,
+  isBlockElement: spec.is_block_element,
+  requiresFs: spec.requires_fs,
+  tooltip: spec.tooltip,
+  requiresInternet: spec.requires_internet
+}));
 
-angular.module('oppia').factory('RteHelperService', [
-  '$document', '$log', '$uibModal', 'HtmlEscaperService',
-  'INLINE_RTE_COMPONENTS',
-  'RTE_COMPONENT_SPECS', function(
-      $document, $log, $uibModal, HtmlEscaperService,
-      INLINE_RTE_COMPONENTS,
-      RTE_COMPONENT_SPECS) {
-    var _RICH_TEXT_COMPONENTS = [];
+@Injectable({
+  providedIn: 'root'
+})
+export class RteHelperService {
+  constructor(
+    private modalService: NgbModal,
+  ) {}
 
-    Object.keys(RTE_COMPONENT_SPECS).sort().forEach(function(componentId) {
-      _RICH_TEXT_COMPONENTS.push({
-        backendId: RTE_COMPONENT_SPECS[componentId].backend_id,
-        customizationArgSpecs: angular.copy(
-          RTE_COMPONENT_SPECS[componentId].customization_arg_specs),
-        id: RTE_COMPONENT_SPECS[componentId].frontend_id,
-        iconDataUrl: RTE_COMPONENT_SPECS[componentId].icon_data_url,
-        isComplex: RTE_COMPONENT_SPECS[componentId].is_complex,
-        isBlockElement: RTE_COMPONENT_SPECS[componentId].is_block_element,
-        requiresFs: RTE_COMPONENT_SPECS[componentId].requires_fs,
-        tooltip: RTE_COMPONENT_SPECS[componentId].tooltip,
-        requiresInternet: RTE_COMPONENT_SPECS[componentId].requires_internet
-      });
-    });
-
-    var _createCustomizationArgDictFromAttrs = function(attrs) {
-      var customizationArgsDict = {};
-      for (var i = 0; i < attrs.length; i++) {
-        var attr = attrs[i];
-        if (attr.name === 'class' || attr.name === 'src' ||
-          attr.name === '_moz_resizing') {
-          continue;
-        }
-        var separatorLocation = attr.name.indexOf('-with-value');
-        if (separatorLocation === -1) {
-          $log.error('RTE Error: invalid customization attribute ' + attr.name);
-          continue;
-        }
-        var argName = attr.name.substring(0, separatorLocation);
-        customizationArgsDict[argName] = HtmlEscaperService.escapedJsonToObj(
-          attr.value);
-      }
-      return customizationArgsDict;
-    };
-
-    return {
-      createCustomizationArgDictFromAttrs: function(attrs) {
-        return _createCustomizationArgDictFromAttrs(attrs);
-      },
-      getRichTextComponents: function() {
-        return angular.copy(_RICH_TEXT_COMPONENTS);
-      },
-      isInlineComponent: function(richTextComponent) {
-        return INLINE_RTE_COMPONENTS.indexOf(richTextComponent) !== -1;
-      },
-      // The refocusFn arg is a function that restores focus to the text editor
-      // after exiting the modal, and moves the cursor back to where it was
-      // before the modal was opened.
-      openCustomizationModal: function(
-          customizationArgSpecs, attrsCustomizationArgsDict, onSubmitCallback,
-          onDismissCallback, refocusFn) {
-        $document[0].execCommand('enableObjectResizing', false, false);
-        $uibModal.open({
-          template: require(
-            'components/ck-editor-helpers/' +
-            'customize-rte-component-modal.template.html'),
-          backdrop: 'static',
-          // The 'windowClass' & 'backdropClass' options may be removed once
-          // this service is migrated to Angular and NgbModal is used instead of
-          // uibModal. Currently, these custom classes are used for correctly
-          // stacking AngularJS modals on top of Angular modals.
-          windowClass: 'oppia-customization-arg-editor-modal',
-          backdropClass: 'oppia-customization-arg-editor-modal',
-          resolve: {
-            customizationArgSpecs: function() {
-              return customizationArgSpecs;
-            },
-            attrsCustomizationArgsDict: function() {
-              return attrsCustomizationArgsDict;
-            }
-          },
-          controller: 'RteHelperModalController'
-        }).result.then(onSubmitCallback).catch(onDismissCallback);
-      }
-
-    };
+  getRichTextComponents(): typeof _RICH_TEXT_COMPONENTS {
+    return cloneDeep(_RICH_TEXT_COMPONENTS);
   }
-]);
+
+  isInlineComponent(
+      richTextComponent: typeof AppConstants.INLINE_RTE_COMPONENTS[number]
+  ): boolean {
+    return AppConstants.INLINE_RTE_COMPONENTS.indexOf(richTextComponent) !== -1;
+  }
+
+  // The refocusFn arg is a function that restores focus to the text editor
+  // after exiting the modal, and moves the cursor back to where it was
+  // before the modal was opened.
+  openCustomizationModal(
+      customizationArgSpecs: CustomizationArgsSpecsType,
+      attrsCustomizationArgsDict: CustomizationArgsForRteType,
+      onSubmitCallback?: (arg0: unknown) => void,
+      onDismissCallback?: (
+        reason: boolean | 'cancel') => void): void {
+    document.execCommand('enableObjectResizing', false);
+    const modalRef = this.modalService.open(RteHelperModalComponent, {
+      backdrop: 'static'
+    });
+    modalRef.componentInstance.customizationArgSpecs = customizationArgSpecs;
+    modalRef.componentInstance.attrsCustomizationArgsDict = (
+      attrsCustomizationArgsDict);
+    modalRef.result.then(
+      (result) => {
+        if (onSubmitCallback) {
+          onSubmitCallback(result);
+        }
+      },
+      (reason) => {
+        if (onDismissCallback) {
+          onDismissCallback(reason);
+        }
+      }
+    );
+  }
+}
