@@ -12,8 +12,6 @@ services:
     environment:
       - production=false
       - NODE_ENV=development
-    # command: >
-    #   sh -c '/app/oppia/wait-for-it.sh --folder=/app/oppia/webpack_bundles && trap "rm ./node_modules/@angular/compiler-cli/ngcc/__ngcc_lock_file__" EXIT && ./node_modules/.bin/ng build --watch'
     healthcheck:
       # TODO: Add a variable for the folder name inside the dist as per the prod_env flag is passed or not.
       test: bash -f /app/oppia/dist/oppia-angular/index.html || sleep 25
@@ -23,8 +21,23 @@ services:
       start_period: 30s
     command: >
       sh -c '
-        trap "rm ./node_modules/@angular/compiler-cli/ngcc/__ngcc_lock_file__" EXIT;
-        ./node_modules/.bin/ng build --watch
+        trap "rm /app/oppia/node_modules/@angular/compiler-cli/ngcc/__ngcc_lock_file__" EXIT;
+
+        if [ "$prod_env" = "true" ]; then
+          if [ "$source_maps" = "true" -a "$maintenance_mode" = "true" ]; then
+            python3 -m scripts.build --prod_env --maintenance_mode --source_maps
+          elif [ "$maintenance_mode" = "true" ]; then
+            python3 -m scripts.build --prod_env --maintenance_mode
+          elif [ "$source_maps" = "true" ]; then
+            python3 -m scripts.build --prod_env --source_maps
+          else
+            python3 -m scripts.build --prod_env
+          fi
+
+          /app/oppia/node_modules/.bin/ng build --prod
+        else
+          /app/oppia/node_modules/.bin/ng build --watch
+        fi
       '
 
   webpack-compiler:
@@ -44,7 +57,22 @@ services:
       interval: 30s
       retries: 5
       start_period: 30s
-    command: node ./node_modules/webpack/bin/webpack.js --config ./webpack.dev.config.ts --watch --color --progress
+    command: >
+      sh -c '
+        if [ "$prod_env" = "true" ]; then
+          if [ "$source_maps" = "true" ]; then
+            node --max-old-space-size=8192 ./node_modules/webpack/bin/webpack.js --config /app/oppia/webpack.prod.sourcemap.config.ts
+          else
+            node --max-old-space-size=8192 ./node_modules/webpack/bin/webpack.js --config /app/oppia/webpack.prod.config.ts
+          fi
+        else
+          if [ "$source_maps" = "true" ]; then
+            node ./node_modules/webpack/bin/webpack.js --config /app/oppia/webpack.dev.sourcemap.config.ts --watch --color --progress
+          else
+            node ./node_modules/webpack/bin/webpack.js --config /app/oppia/webpack.dev.config.ts --watch --color --progress
+          fi
+        fi
+      '
 
   google_app_engine:
     build: 
@@ -75,7 +103,14 @@ services:
       interval: 30s
       retries: 5
       start_period: 5m
-    command: /google-cloud-sdk/bin/dev_appserver.py /app/oppia/app_dev.yaml --runtime python38 --host=0.0.0.0 --port=8181 --admin_host=0.0.0.0 --admin_port=8000 --skip_sdk_update_check=True --log_level=info --dev_appserver_log_level=info
+    command: >
+      sh -c '
+        if [ "$prod_env" = "true" ]; then
+          /google-cloud-sdk/bin/dev_appserver.py /app/oppia/app.yaml --runtime python38 --host=0.0.0.0 --port=8181 --admin_host=0.0.0.0 --admin_port=8000 --skip_sdk_update_check=True
+        else
+          /google-cloud-sdk/bin/dev_appserver.py /app/oppia/app_dev.yaml --runtime python38 --host=0.0.0.0 --port=8181 --admin_host=0.0.0.0 --admin_port=8000 --skip_sdk_update_check=True
+        fi
+      '
 
   datastore:
     build:
@@ -117,7 +152,7 @@ services:
           then
             rm -rf /app/cloud_datastore_emulator_cache
           fi
-          /google-cloud-sdk/bin/gcloud beta emulators datastore start --project dev-project-id --data-dir /app/cloud_datastore_emulator_cache --host-port 0.0.0.0:8089 --consistency=1.0 --quiet --no-store-on-disk
+          /google-cloud-sdk/bin/gcloud beta emulators datastore start --project dev-project-id --data-dir /app/cloud_datastore_emulator_cache --host-port 0.0.0.0:8089 --consistency=1.0 --no-store-on-disk --quiet
         fi
       '
 
@@ -138,7 +173,7 @@ services:
       sh -c '
         if [ "$save_datastore" = "true" ]
         then
-          /app/oppia/node_modules/firebase-tools/lib/bin/firebase.js emulators:start --only auth --project dev-project-id --config /app/oppia/.firebase.json --import /app/firebase_emulator_cache --export-on-exit
+          /app/oppia/node_modules/firebase-tools/lib/bin/firebase.js emulators:start --only auth --project dev-project-id --config /app/oppia/.firebase.json --import /app/firebase_emulator_cache --export-on-exit /app/firebase_emulator_cache
         else
           /app/oppia/node_modules/firebase-tools/lib/bin/firebase.js emulators:start --only auth --project dev-project-id --config /app/oppia/.firebase.json --export-on-exit /app/firebase_emulator_cache
         fi
