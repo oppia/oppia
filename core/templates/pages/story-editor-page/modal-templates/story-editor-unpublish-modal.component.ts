@@ -47,6 +47,12 @@ export class StoryEditorUnpublishModalComponent {
     this.activeModal.close();
   }
 
+  isSerialChapterFeatureFlagEnabled(): boolean {
+    return (
+      this.platformFeatureService.
+        status.SerialChapterLaunchCurriculumAdminView.isEnabled);
+  }
+
   setReason(reason: string): void {
     this.unpublishingReason = reason;
     if (reason === 'BAD_CONTENT') {

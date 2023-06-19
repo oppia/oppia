@@ -80,22 +80,15 @@ describe('Story Editor Unpublish Modal Component', () => {
     expect(confirmSpy).toHaveBeenCalled();
   });
 
-  it('should set unpublishing reason to BAD_CONTENT', () => {
+  it('should get status of Serial Chapter Launch Feature flag', () => {
+    expect(component.isSerialChapterFeatureFlagEnabled()).toEqual(false);
+
     mockPlatformFeatureService.
       status.SerialChapterLaunchCurriculumAdminView.isEnabled = true;
-
-    expect(component.unpublishingReason).toBe('BAD_CONTENT');
-    expect(component.selectedReasonText).toBe(component.badContentReasonText);
-
-    component.setReason('BAD_CONTENT');
-    expect(component.unpublishingReason).toBe('BAD_CONTENT');
-    expect(component.selectedReasonText).toBe(component.badContentReasonText);
+    expect(component.isSerialChapterFeatureFlagEnabled()).toEqual(true);
   });
 
-  it('should set unpublishing reason to CHAPTER_NEEDS_SPLITTING', () => {
-    mockPlatformFeatureService.
-      status.SerialChapterLaunchCurriculumAdminView.isEnabled = true;
-
+  it('should set unpublishing reason', () => {
     expect(component.unpublishingReason).toBe('BAD_CONTENT');
     expect(component.selectedReasonText).toBe(component.badContentReasonText);
 
@@ -103,5 +96,9 @@ describe('Story Editor Unpublish Modal Component', () => {
     expect(component.unpublishingReason).toBe('CHAPTER_NEEDS_SPLITTING');
     expect(component.selectedReasonText).toBe(
       component.splitChapterReasonText);
+
+    component.setReason('BAD_CONTENT');
+    expect(component.unpublishingReason).toBe('BAD_CONTENT');
+    expect(component.selectedReasonText).toBe(component.badContentReasonText);
   });
 });

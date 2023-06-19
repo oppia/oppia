@@ -1,4 +1,4 @@
-<div *ngIf="platformFeatureService.status.SerialChapterLaunchCurriculumAdminView.isEnabled">
+<div *ngIf="isSerialChapterFeatureFlagEnabled()">
   <div class="modal-header">
     <p>
       You're attempting to unpublish chapters, please specify a reason and note the warning
@@ -69,7 +69,7 @@
   </div>
 </div>
 
-<div *ngIf="!platformFeatureService.status.SerialChapterLaunchCurriculumAdminView.isEnabled">
+<div *ngIf="!isSerialChapterFeatureFlagEnabled()">
   <div class="modal-header">
     <p>
       Are you sure you want to unpublish this story? Unpublishing a story will
