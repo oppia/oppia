@@ -2,9 +2,9 @@
   <!-- Question Player -->
   <div class="oppia-question-player" *ngIf="!resultsLoaded">
 
-    <div class="oppia-practice-session">
+    <h1 class="oppia-practice-session">
       Practice Session
-    </div>
+    </h1>
 
     <div class="oppia-question-player-card">
       <span class="beta-label"
@@ -13,7 +13,7 @@
         Beta
       </span>
       <div tabindex="0" [hidden]="!(totalQuestions > 0)">
-        <h3 class="oppia-question-player-header">Question {{currentQuestion}}/{{totalQuestions}}</h3>
+        <h2 class="oppia-question-player-header">Question {{currentQuestion}}/{{totalQuestions}}</h2>
         <div class="oppia-question-player-progress">
           <div class="current-progress" [ngStyle]="{'width': currentProgress + '%'}"></div>
         </div>
