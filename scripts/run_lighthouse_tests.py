@@ -22,6 +22,7 @@ import contextlib
 import os
 import subprocess
 import sys
+import signal
 
 from typing import Final, List, Optional
 
@@ -113,7 +114,7 @@ def run_lighthouse_puppeteer_script(
         print(stderr.decode('utf-8'))
         print('Puppeteer script failed. More details can be found above.')
         if vid_popen:
-            vid_popen.kill()
+            vid_popen.send_signal(signal.SIGINT)
             vid_popen.wait()
             print('Saved video of failed script.')
 
@@ -189,7 +190,7 @@ def run_lighthouse_checks(
     if process.returncode == 0:
         print('Lighthouse checks completed successfully.')
         if vid_popen:
-            vid_popen.kill()
+            vid_popen.send_signal(signal.SIGINT)
             vid_popen.wait()
         print(vid_path)
         # If vid_path:.
@@ -207,7 +208,8 @@ def run_lighthouse_checks(
         print(stderr.decode('utf-8'))
         print('Lighthouse checks failed. More details can be found above.')
         if vid_popen:
-            vid_popen.kill()
+            vid_popen.send_signal(signal.SIGINT)
+            vid_popen.wait()
             print('Saved video of failed check.')
         sys.exit(1)
 
