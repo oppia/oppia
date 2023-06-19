@@ -654,7 +654,6 @@ class GenerateContributorAdminStatsJob(base_jobs.JobBase):
             return question_review_stats_models
 
 
-
 class AuditGenerateContributorAdminStatsJob(
     GenerateContributorAdminStatsJob
 ):
