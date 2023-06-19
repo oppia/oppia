@@ -1,6 +1,6 @@
 # coding: utf-8
 #
-# Copyright 2021 The Oppia Authors. All Rights Reserved.
+# Copyright 2023 The Oppia Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -430,6 +430,9 @@ class GenerateContributorAdminStatsJobTests(job_test_utils.JobTestBase):
             language_code='hi',
             edited_by_reviewer=False,
             created_on=datetime.datetime(2023, 2, 2))
+
+    def test_empty_storage(self) -> None:
+        self.assert_job_output_is_empty()
 
     def test_job_creates_admin_stats(self) -> None:
 
@@ -1158,6 +1161,9 @@ class AuditGenerateContributorAdminStatsJobTests(job_test_utils.JobTestBase):
             language_code='hi',
             edited_by_reviewer=False,
             created_on=datetime.datetime(2023, 2, 2))
+
+    def test_empty_storage(self) -> None:
+        self.assert_job_output_is_empty()
 
     def test_job_audits_admin_stats(self) -> None:
 
