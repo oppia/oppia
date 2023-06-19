@@ -374,6 +374,7 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
           .fetchLearnerDashboardExplorationsDataAsync());
       dashboardExplorationsDataPromise.then(
         responseData => {
+          console.error(responseData,"reponse");
           this.completedExplorationsList = (
             responseData.completedExplorationsList);
           this.incompleteExplorationsList = (

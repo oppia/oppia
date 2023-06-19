@@ -91,6 +91,8 @@ export class ExplorationSummaryTileComponent implements OnInit, OnDestroy {
   mobileCardToBeShown: boolean = false;
   expTitleTranslationKey!: string;
   expObjectiveTranslationKey!: string;
+  buttonIsHovered: boolean = false;
+
 
   constructor(
     private ratingComputationService: RatingComputationService,
@@ -248,6 +250,13 @@ export class ExplorationSummaryTileComponent implements OnInit, OnDestroy {
       }
       return result;
     }
+  }
+
+  isButtonHovered(): string {
+    if (this.buttonIsHovered) {
+      return 'box-shadow: 0 5px 5px -5px #333;';
+    }
+    // Return 'height: 144px; width: 192px;';
   }
 
   getCompleteThumbnailIconUrl(): string {
