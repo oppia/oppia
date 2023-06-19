@@ -676,7 +676,7 @@ class ReviewableSuggestionsHandlerNormalizedRequestDict(TypedDict):
     normalized_request dictionary.
     """
 
-    limit: int
+    limit: Optional[int]
     offset: int
     sort_key: str
     exploration_id: Optional[str]
@@ -714,7 +714,8 @@ class ReviewableSuggestionsHandler(
                         'id': 'is_at_least',
                         'min_value': 1
                     }]
-                }
+                },
+                'default_value': None
             },
             'offset': {
                 'schema': {
@@ -752,7 +753,7 @@ class ReviewableSuggestionsHandler(
         assert self.normalized_request is not None
         self._require_valid_suggestion_and_target_types(
             target_type, suggestion_type)
-        limit = self.normalized_request['limit']
+        limit = self.normalized_request.get('limit')
         offset = self.normalized_request['offset']
         sort_key = self.normalized_request['sort_key']
         exploration_id = self.normalized_request.get('exploration_id')

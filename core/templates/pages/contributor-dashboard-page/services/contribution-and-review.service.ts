@@ -170,6 +170,42 @@ export class ContributionAndReviewService {
     );
   }
 
+  async fetchReviewableSuggestionsAsync(
+      fetcher: SuggestionFetcher,
+      shouldResetOffset: boolean,
+      explorationId: string
+  ): Promise<FetchSuggestionsResponse> {
+    if (shouldResetOffset) {
+      // Handle the case where we need to fetch starting from the beginning.
+      fetcher.offset = 0;
+      fetcher.suggestionIdToDetails = {};
+    }
+    return (
+      this.contributionAndReviewBackendApiService.fetchSuggestionsAsync(
+        fetcher.type,
+        null,
+        fetcher.offset,
+        fetcher.sortKey,
+        explorationId
+      )).then((responseBody) => {
+      const responseSuggestionIdToDetails = fetcher.suggestionIdToDetails;
+      fetcher.suggestionIdToDetails = {};
+      const targetIdToDetails = responseBody.target_id_to_opportunity_dict;
+      responseBody.suggestions.forEach((suggestion) => {
+        const suggestionDetails = {
+          suggestion: suggestion,
+          details: targetIdToDetails[suggestion.target_id]
+        };
+        responseSuggestionIdToDetails[suggestion.suggestion_id] = (
+          suggestionDetails);
+      });
+      return {
+        suggestionIdToDetails: responseSuggestionIdToDetails,
+        more: Object.keys(fetcher.suggestionIdToDetails).length > 0
+      };
+    });
+  }
+
   async getUserCreatedQuestionSuggestionsAsync(
       shouldResetOffset: boolean = true,
       sortKey: string
@@ -206,6 +242,13 @@ export class ContributionAndReviewService {
       explorationId?: string
   ): Promise<FetchSuggestionsResponse> {
     this.reviewableTranslationFetcher.sortKey = sortKey;
+    if (explorationId) {
+      return this.fetchReviewableSuggestionsAsync (
+        this.reviewableTranslationFetcher,
+        shouldResetOffset,
+        explorationId
+      );
+    }
     return this.fetchSuggestionsAsync(
       this.reviewableTranslationFetcher,
       shouldResetOffset,

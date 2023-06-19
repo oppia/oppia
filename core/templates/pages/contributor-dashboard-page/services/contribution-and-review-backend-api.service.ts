@@ -98,7 +98,7 @@ export class ContributionAndReviewBackendApiService {
 
   async fetchSuggestionsAsync(
       fetchType: string,
-      limit: number,
+      limit: number | null,
       offset: number,
       sortKey: string,
       explorationId?: string
@@ -151,7 +151,7 @@ export class ContributionAndReviewBackendApiService {
   async fetchReviewableSuggestionsAsync(
       targetType: string,
       suggestionType: string,
-      limit: number,
+      limit: number | null,
       offset: number,
       sortKey: string,
       explorationId?: string
@@ -163,16 +163,18 @@ export class ContributionAndReviewBackendApiService {
       }
     );
     const params: {
-      limit: string;
+      limit?: string;
       offset: string;
       sort_key: string;
       exploration_id?: string;
     } = {
-      limit: limit.toString(),
       offset: offset.toString(),
       sort_key: sortKey
     };
-    if (explorationId !== undefined) {
+    if (limit) {
+      params.limit = limit.toString();
+    }
+    if (explorationId) {
       params.exploration_id = explorationId;
     }
     return this.http.get<FetchSuggestionsResponse>(
