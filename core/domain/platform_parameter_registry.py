@@ -193,7 +193,8 @@ class Registry:
         name: str,
         committer_id: str,
         commit_message: str,
-        new_rules: List[platform_parameter_domain.PlatformParameterRule]
+        new_rules: List[platform_parameter_domain.PlatformParameterRule],
+        default_value: platform_parameter_domain.PlatformDataTypes
     ) -> None:
         """Updates the platform parameter with new rules.
 
@@ -212,11 +213,14 @@ class Registry:
         new_rule_dicts = [rules.to_dict() for rules in new_rules]
         param_dict = param.to_dict()
         param_dict['rules'] = new_rule_dicts
+        param_dict['default_value'] = default_value
         updated_param = param.from_dict(param_dict)
         updated_param.validate()
 
         model_instance = cls._to_platform_parameter_model(param)
         param.set_rules(new_rules)
+        param.set_default_value(default_value)
+        cls.parameter_registry[param.name] = param
 
         model_instance.rules = [rule.to_dict() for rule in param.rules]
         model_instance.commit(

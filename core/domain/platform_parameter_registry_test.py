@@ -183,6 +183,7 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
                     'value_when_matched': 'updated'
                 })
             ],
+            'default'
         )
         parameter_updated = registry.Registry.get_platform_parameter(
             parameter_name)
@@ -211,6 +212,7 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
                     'value_when_matched': 'updated'
                 })
             ],
+            'default'
         )
         self.assertIsNone(
             registry.Registry.load_platform_parameter_from_memcache(
@@ -240,6 +242,7 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
                         'value_when_matched': True
                     })
                 ],
+                'default'
             )
 
     def test_update_dev_feature_with_rule_enabled_for_test_raises_exception(
@@ -268,6 +271,7 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
                         'value_when_matched': True
                     })
                 ],
+                'default'
             )
 
     def test_update_dev_feature_with_rule_enabled_for_prod_raises_exception(
@@ -296,6 +300,7 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
                         'value_when_matched': True
                     })
                 ],
+                'default'
             )
 
     def test_update_test_feature_with_rule_enabled_for_prod_raises_exception(
@@ -324,6 +329,7 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
                         'value_when_matched': True
                     })
                 ],
+                'default'
             )
 
     def test_updated_parameter_is_saved_in_storage(self) -> None:
@@ -348,6 +354,7 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
                     'value_when_matched': 'updated'
                 })
             ],
+            'default'
         )
 
         parameter_updated = (

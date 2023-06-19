@@ -605,12 +605,12 @@ describe('Release coordinator page feature tab', function() {
     });
   });
 
-  describe('.isFeatureFlagRulesChanged', () => {
+  describe('.isFeatureFlagChanged', () => {
     it('should return false if the feature is the same as the backup instance',
       () => {
         const featureFlag = component.featureFlags[0];
 
-        expect(component.isFeatureFlagRulesChanged(featureFlag))
+        expect(component.isFeatureFlagChanged(featureFlag))
           .toBeFalse();
       }
     );
@@ -622,7 +622,7 @@ describe('Release coordinator page feature tab', function() {
 
         component.addNewRuleToTop(featureFlag);
 
-        expect(component.isFeatureFlagRulesChanged(featureFlag))
+        expect(component.isFeatureFlagChanged(featureFlag))
           .toBeTrue();
       }
     );

@@ -24,7 +24,7 @@ import { AdminPageConstants } from
   'pages/admin-page/admin-page.constants';
 import { PlatformFeatureDomainConstants } from
   'domain/platform_feature/platform-feature-domain.constants';
-import { PlatformParameterRule } from
+import { PlatformParameterRule, PlatformParameterValue } from
   'domain/platform_feature/platform-parameter-rule.model';
 import {
   PlatformParameter,
@@ -67,15 +67,18 @@ export class PlatformFeatureAdminBackendApiService {
   }
 
   async updateFeatureFlag(
-      name: string, message: string, newRules: PlatformParameterRule[]):
+      name: string, message: string, newRules: PlatformParameterRule[],
+      defaultValue: PlatformParameterValue
+  ):
       Promise<void> {
     await this.http.post(
       PlatformFeatureDomainConstants.FEATURE_FLAGS_URL,
       {
-        action: PlatformFeatureDomainConstants.UPDATE_FEATURE_FLAG_RULES_ACTION,
+        action: PlatformFeatureDomainConstants.UPDATE_FEATURE_FLAG_ACTION,
         feature_name: name,
         commit_message: message,
-        new_rules: newRules.map(rule => rule.toBackendDict())
+        new_rules: newRules.map(rule => rule.toBackendDict()),
+        default_value: defaultValue
       }
     ).toPromise();
   }
