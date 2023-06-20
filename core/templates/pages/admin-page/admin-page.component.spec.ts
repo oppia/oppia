@@ -49,7 +49,7 @@ class MockWindowRef {
 class MockPlatformFeatureService {
   get status() {
     return {
-      DummyFeature: {
+      DummyFeatureFlagForE2ETests: {
         isEnabled: true
       }
     };
@@ -149,7 +149,7 @@ describe('Admin Page component ', () => {
   });
 
   it('should check whether the dummy features enabled', () => {
-    let result = component.isDummyFeatureEnabled();
+    let result = component.isDummyFeatureFlagForE2ETestsEnabled();
 
     // Mocked 'PlatformFeatureService.status' method to return true.
     expect(result).toBe(true);

@@ -73,8 +73,8 @@ export class AdminPageComponent {
     this.changeDetectorRef.detectChanges();
   }
 
-  isDummyFeatureEnabled(): boolean {
-    return this.platformFeatureService.status.DummyFeature.isEnabled;
+  isDummyFeatureFlagForE2ETestsEnabled(): boolean {
+    return this.platformFeatureService.status.DummyFeatureFlagForE2ETests.isEnabled;
   }
 }
 
