@@ -1,0 +1,25 @@
+name: Docker Setup Test
+on:
+  merge_group:
+    types: [checks_requested]
+  push:
+    branches:
+      - develop
+      - release-*
+  pull_request:
+    branches:
+      - develop
+      - release-*
+
+jobs:
+  build:
+    runs-on:  ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-22.04]
+    steps:
+      - name: Checkout to the Oppia repository code
+        uses: actions/checkout@v3
+
+      - name: Build Docker Images
+        run: make run-devserver

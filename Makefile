@@ -22,5 +22,9 @@ build-n-run-devserver:
 setup-devserver:
 	docker compose build
 
+terminal:
+# check if server is up, if not start it
+	docker exec -it oppia-webserver bash
+
 stop-devserver:
 	docker compose down

@@ -3,6 +3,9 @@ FROM --platform=linux/amd64 python:3.8
 
 WORKDIR /app/oppia
 
+ENV oppia_is_dockerized="true"
+
+
 # installing the pre-requisites libs and dependencies
 RUN apt-get update -y && apt-get upgrade -y \
     curl \
@@ -14,18 +17,18 @@ RUN apt-get update -y && apt-get upgrade -y \
     python3-yaml \
     python3-matplotlib \
     chromium
-RUN pip install --upgrade pip==21.2.3
 
-RUN pip install pip-tools==6.6.2 setuptools==58.5.3
+RUN pip install --upgrade pip==21.2.3
+RUN pip install pip-tools==6.6.2 setuptools==58.5.3 cmake
+
 
 # installing python dependencies from the requirements.txt file
 COPY requirements_dev.in .
 COPY requirements_dev.txt .
 
 RUN pip-compile --generate-hashes requirements_dev.in
-RUN pip install cmake
-# TODO: not installing pyarrow for now as facing problem while installing in my mac M1: refer - https://github.com/streamlit/streamlit/issues/2774
 RUN pip install --require-hashes --no-deps -r requirements_dev.txt
+
 
 ## installing packages from the package.json file
 COPY package.json .
@@ -38,15 +41,17 @@ RUN apt-get install -y nodejs
 RUN npm install -g yarn
 RUN yarn install
 
+
 # installing third party dependencies
 COPY scripts ./scripts
 COPY /core ./core
 COPY /assets ./assets
 COPY dependencies.json .
 COPY buf.gen.yaml .
-RUN python -m scripts.install_third_party
 
+RUN python -m scripts.install_third_party
 RUN python -m scripts.build
+
 
 # installing buf and proto for Linux -- this docker container is based on Linux
 ENV BUF_LINUX_FILES="buf-Linux-x86_64 protoc-gen-buf-check-lint-Linux-x86_64 protoc-gen-buf-check-breaking-Linux-x86_64" \
@@ -88,10 +93,5 @@ RUN /app/buf-0.29.0/protoc/bin/protoc \
 RUN sed -i 's/import text_classifier_pb2 as text__classifier__pb2/from . import text_classifier_pb2 as text__classifier__pb2/' /app/oppia/proto_files/training_job_response_payload_pb2.py
 
 ENV NODE_OPTIONS=--openssl-legacy-provider
-
-# COPY setup.py .
-# COPY requirements.in .
-# COPY requirements.txt .
-# RUN python setup.py -q sdist -d build
 
 COPY . .

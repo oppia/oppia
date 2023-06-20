@@ -29,7 +29,7 @@ import sys
 import tempfile
 import threading
 
-from core import utils
+from core import feconf, utils
 from core.tests import test_utils
 
 from typing import ContextManager, Deque, Dict, Iterator, List, Tuple, Union
@@ -714,8 +714,10 @@ class BuildTests(test_utils.GenericTestBase):
         setattr(
             app_dev_yaml_temp_file, 'name', mock_dev_yaml_filepath)
         with utils.open_file(mock_dev_yaml_filepath, 'w') as tmp:
+            # TODO: (#18260) Chnage this when we permanently move to the Dockerized Setup.
+            firebase_host = 'firebase' if feconf.OPPIA_IS_DOCKERIZED else 'localhost'
             tmp.write('Some content in mock_app_dev.yaml\n')
-            tmp.write('  FIREBASE_AUTH_EMULATOR_HOST: "firebase:9099"\n')
+            tmp.write('  FIREBASE_AUTH_EMULATOR_HOST: "%s:9099"\n' % firebase_host)
             tmp.write('version: default')
 
         app_yaml_temp_file = tempfile.NamedTemporaryFile()
@@ -761,8 +763,10 @@ class BuildTests(test_utils.GenericTestBase):
         setattr(
             app_dev_yaml_temp_file, 'name', mock_dev_yaml_filepath)
         with utils.open_file(mock_dev_yaml_filepath, 'w') as tmp:
+            # TODO: (#18260) Chnage this when we permanently move to the Dockerized Setup.
+            firebase_host = 'firebase' if feconf.OPPIA_IS_DOCKERIZED else 'localhost'
             tmp.write('Some content in mock_app_dev.yaml\n')
-            tmp.write('  FIREBASE_AUTH_EMULATOR_HOST: "firebase:9099"\n')
+            tmp.write('  FIREBASE_AUTH_EMULATOR_HOST: "%s:9099"\n' % firebase_host)
             tmp.write('version: default')
 
         app_yaml_temp_file = tempfile.NamedTemporaryFile()

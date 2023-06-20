@@ -324,9 +324,10 @@ def _minify_and_create_sourcemap(
     """
     print('Minifying and creating sourcemap for %s' % source_path)
     source_map_properties = 'includeSources,url=\'third_party.min.js.map\''
-    cmd = '%s %s %s -c -m --source-map %s -o %s ' % (
-        common.NODE_BIN_PATH, UGLIFY_FILE, source_path,
-        source_map_properties, target_file_path)
+    # cmd = '%s %s %s -c -m --source-map %s -o %s ' % (
+    #     common.NODE_BIN_PATH, UGLIFY_FILE, source_path,
+    #     source_map_properties, target_file_path)
+    cmd = ['bash', '-c', 'node /app/oppia/node_modules/uglify-js/bin/uglifyjs /app/oppia/third_party/generated/js/third_party.js -c -m --source-map %s -o /app/op0pia/third_party/generated/js/third_party.min.js' % (source_map_properties)]
     subprocess.check_call(cmd, shell=True)
 
 
@@ -1267,10 +1268,17 @@ def _verify_hashes(
 
     # The path in hashes.json (generated via file_hashes) file is in posix
     # style, see the comment above HASHES_JSON_FILENAME for details.
+    # third_party_js_final_filename = _insert_hash(
+    #     '/app/oppia/third_party/generated/js/third_party.min.js',
+    #     file_hashes[
+    #         '/app/oppia/third_party/generated/js/third_party.min.js'])
     third_party_js_final_filename = _insert_hash(
         MINIFIED_THIRD_PARTY_JS_RELATIVE_FILEPATH,
-        file_hashes[common.convert_to_posixpath(
-            MINIFIED_THIRD_PARTY_JS_RELATIVE_FILEPATH)])
+        file_hashes[MINIFIED_THIRD_PARTY_JS_RELATIVE_FILEPATH])
+    # third_party_js_final_filename = _insert_hash(
+    #     MINIFIED_THIRD_PARTY_JS_RELATIVE_FILEPATH,
+    #     file_hashes[common.convert_to_posixpath(
+    #         MINIFIED_THIRD_PARTY_JS_RELATIVE_FILEPATH)])
 
     # The path in hashes.json (generated via file_hashes) file is in posix
     # style, see the comment above HASHES_JSON_FILENAME for details.
@@ -1302,6 +1310,8 @@ def generate_hashes() -> Dict[str, str]:
         THIRD_PARTY_GENERATED_DEV_DIR]
     for hash_dir in hash_dirs:
         hashes.update(get_file_hashes(hash_dir))
+    # tried fixing the error that I am getting by adding the prod_env flag in docker setup.
+    # hashes.update(get_file_hashes(MINIFIED_THIRD_PARTY_JS_RELATIVE_FILEPATH))
 
     # Save hashes as JSON and write the JSON into JS file
     # to make the hashes available to the frontend.

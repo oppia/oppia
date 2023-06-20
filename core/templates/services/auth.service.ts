@@ -129,8 +129,11 @@ export class AuthService {
   }
 
   static get firebaseEmulatorConfig(): readonly [string, number] | undefined {
+    // TODO: (#18260) Change this when we permanently move to the Dockerized Setup.
+    let firebaseHost =
+      process.env.oppia_is_dockerized ? 'firebase' : 'localhost';
     return AuthService.firebaseEmulatorIsEnabled ?
-      ['firebase', 9099] : undefined;
+      [firebaseHost, 9099] : undefined;
   }
 
   async handleRedirectResultAsync(): Promise<boolean> {
