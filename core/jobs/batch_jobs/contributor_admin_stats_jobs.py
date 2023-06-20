@@ -233,25 +233,33 @@ class GenerateContributorAdminStatsJob(base_jobs.JobBase):
         translation_submitter_models_job_run_results = (
             translation_submitter_total_stats_models
             | 'Create translation submitter job run result' >> (
-                job_result_transforms.CountObjectsToJobRunResult())
+                job_result_transforms.CountObjectsToJobRunResult(
+                    "Translation Submitter Models"
+                ))
         )
 
         translation_reviewer_models_job_run_results = (
             translation_reviewer_total_stats_models
             | 'Create translation reviewer job run result' >> (
-                job_result_transforms.CountObjectsToJobRunResult())
+                job_result_transforms.CountObjectsToJobRunResult(
+                    "Translation Reviewer Models"
+                ))
         )
 
         question_submitter_models_job_run_results = (
             question_submitter_total_stats_models
             | 'Create question submitter job run result' >> (
-                job_result_transforms.CountObjectsToJobRunResult())
+                job_result_transforms.CountObjectsToJobRunResult(
+                    "Question Submitter Models"
+                ))
         )
 
         question_reviewer_models_job_run_results = (
             question_reviewer_total_stats_models
             | 'Create question reviewer job run result' >> (
-                job_result_transforms.CountObjectsToJobRunResult())
+                job_result_transforms.CountObjectsToJobRunResult(
+                    "Question Reviewer Models"
+                ))
         )
 
         return (
