@@ -487,10 +487,14 @@ class GenerateContributorAdminStatsJobTests(job_test_utils.JobTestBase):
         ])
 
         self.assert_job_output_is([
-            job_run_result.JobRunResult(stdout='SUCCESS: 3'),
-            job_run_result.JobRunResult(stdout='SUCCESS: 2'),
-            job_run_result.JobRunResult(stdout='SUCCESS: 3'),
-            job_run_result.JobRunResult(stdout='SUCCESS: 3'),
+            job_run_result.JobRunResult(
+                stdout='Translation Reviewer Models SUCCESS: 3'),
+            job_run_result.JobRunResult(
+                stdout='Translation Submitter Models SUCCESS: 2'),
+            job_run_result.JobRunResult(
+                stdout='Question Submitter Models SUCCESS: 3'),
+            job_run_result.JobRunResult(
+                stdout='Question Reviewer Models SUCCESS: 3'),
         ])
 
         # Check for TranslationSubmitterTotalContributionStatsModel.
@@ -746,8 +750,10 @@ class GenerateContributorAdminStatsJobTests(job_test_utils.JobTestBase):
         self.question_contribution_model_1.put()
 
         self.assert_job_output_is([
-            job_run_result.JobRunResult(stdout='SUCCESS: 1'),
-            job_run_result.JobRunResult(stdout='SUCCESS: 1')
+            job_run_result.JobRunResult(
+                stdout='Question Submitter Models SUCCESS: 1'),
+            job_run_result.JobRunResult(
+                stdout='Translation Submitter Models SUCCESS: 1')
         ])
 
         translation_model = (
@@ -1218,10 +1224,14 @@ class AuditGenerateContributorAdminStatsJobTests(job_test_utils.JobTestBase):
         ])
 
         self.assert_job_output_is([
-            job_run_result.JobRunResult(stdout='SUCCESS: 3'),
-            job_run_result.JobRunResult(stdout='SUCCESS: 2'),
-            job_run_result.JobRunResult(stdout='SUCCESS: 3'),
-            job_run_result.JobRunResult(stdout='SUCCESS: 3'),
+            job_run_result.JobRunResult(
+                stdout='Translation Reviewer Models SUCCESS: 3'),
+            job_run_result.JobRunResult(
+                stdout='Translation Submitter Models SUCCESS: 2'),
+            job_run_result.JobRunResult(
+                stdout='Question Submitter Models SUCCESS: 3'),
+            job_run_result.JobRunResult(
+                stdout='Question Reviewer Models SUCCESS: 3'),
         ])
 
     def test_job_for_recent_review_outcomes_limit(self) -> None:
@@ -1261,6 +1271,8 @@ class AuditGenerateContributorAdminStatsJobTests(job_test_utils.JobTestBase):
         self.question_contribution_model_1.put()
 
         self.assert_job_output_is([
-            job_run_result.JobRunResult(stdout='SUCCESS: 1'),
-            job_run_result.JobRunResult(stdout='SUCCESS: 1')
+            job_run_result.JobRunResult(
+                stdout='Translation Submitter Models SUCCESS: 1'),
+            job_run_result.JobRunResult(
+                stdout='Question Submitter Models SUCCESS: 1')
         ])
