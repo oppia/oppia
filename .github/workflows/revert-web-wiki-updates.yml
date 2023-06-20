@@ -1,7 +1,7 @@
 name: Manual revert
 on:
+  gollum:
   workflow_dispatch:
-  gollum
 jobs:
   revert:
     runs-on: ubuntu-22.04
