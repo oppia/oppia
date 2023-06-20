@@ -109,7 +109,7 @@ export class ContributionAndReviewBackendApiService {
     }
     if (fetchType === this.SUBMITTED_TRANSLATION_SUGGESTIONS) {
       return this.fetchSubmittedSuggestionsAsync(
-        'exploration', 'translate_content', limit, offset, sortKey);
+        'exploration', 'translate_content', limit || 0, offset, sortKey);
     }
     if (fetchType === this.REVIEWABLE_QUESTION_SUGGESTIONS) {
       return this.fetchReviewableSuggestionsAsync(
