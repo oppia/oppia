@@ -1,9 +1,9 @@
 <div class="position-relative">
   <form class="form-justify e2e-test-rule-details" role="form">
     <div *ngIf="rule.type != 'FuzzyMatches'" class="rule-parent">
-      <oppia-rule-type-selector class="e2e-test-answer-description" 
-                                aria-live="polite" 
-                                [(localValue)]="rule.type" 
+      <oppia-rule-type-selector class="e2e-test-answer-description"
+                                aria-live="polite"
+                                [(localValue)]="rule.type"
                                 (onSelectionChange)="onSelectNewRuleType($event)">
       </oppia-rule-type-selector>
 
