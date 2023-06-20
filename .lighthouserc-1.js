@@ -77,10 +77,6 @@ module.exports = {
           'assertions': {
             // The YouTube embed on donate page loads images in jpg format, thus
             // we need to allow one image.
-            audits: [
-              // Test the `ignoredPatterns` audit option.
-              {path: 'errors-in-console', options: {ignoredPatterns: ['^.*Content Security Policy.*$']}},
-            ],
             'modern-image-formats': [
               'error', {'maxLength': 1, 'strategy': 'pessimistic'}
             ],
@@ -90,7 +86,11 @@ module.exports = {
             'deprecations': ['error', {'minScore': 1}],
             'redirects': ['error', {'minScore': 1}],
             'uses-responsive-images': ['error', {'minScore': 0.8}]
-          }
+          },
+          audits: [
+            // Test the `ignoredPatterns` audit option.
+            {path: 'errors-in-console', options: {ignoredPatterns: ['^.*Content Security Policy.*$']}},
+          ],
         },
         {
           'matchingUrlPattern': 'http://[^/]+/emaildashboard$',
