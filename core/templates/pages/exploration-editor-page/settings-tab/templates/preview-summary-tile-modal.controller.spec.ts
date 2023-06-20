@@ -92,7 +92,7 @@ describe('Preview Summary Tile Modal Controller', function() {
 
   it('should get thumbnail bg color if category is listed', function() {
     explorationCategoryService.init('Algebra');
-    expect(component.getThumbnailBgColor()).toBe('#cd672b');
+    expect(component.getThumbnailBgColor()).toBe('#cc4b00');
   });
 
   it('should get thumbnail bg color if category is not listed', function() {
