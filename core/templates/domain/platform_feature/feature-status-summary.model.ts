@@ -33,7 +33,7 @@ export enum FeatureNames {
   SerialChapterLaunchCurriculumAdminView =
   'serial_chapter_launch_curriculum_admin_view',
   ShowTranslationSize = 'show_translation_size',
-  ShowFeedbackUpdatesInProfilepicDropdownMenu =
+  ShowFeedbackUpdatesInProfilePicDropdownMenu =
   'show_feedback_updates_in_profile_pic_dropdown'
 }
 

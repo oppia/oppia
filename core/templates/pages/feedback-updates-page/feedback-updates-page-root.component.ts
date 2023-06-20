@@ -44,10 +44,10 @@ export class FeedbackUpdatesPageRootComponent implements OnDestroy {
 
   setPageTitleAndMetaTags(): void {
     let translatedTitle = this.translateService.instant(
-      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.FEEDBACKUPDATES.TITLE);
+      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.FEEDBACK_UPDATES.TITLE);
     this.pageHeadService.updateTitleAndMetaTags(
       translatedTitle,
-      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.FEEDBACKUPDATES.META);
+      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.FEEDBACK_UPDATES.META);
   }
 
   ngOnInit(): void {

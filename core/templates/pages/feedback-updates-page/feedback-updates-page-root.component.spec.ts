@@ -143,10 +143,10 @@ describe('FeedbackUpdates Page Root', () => {
     component.setPageTitleAndMetaTags();
 
     expect(translateService.instant).toHaveBeenCalledWith(
-      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.FEEDBACKUPDATES.TITLE);
+      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.FEEDBACK_UPDATES.TITLE);
     expect(pageHeadService.updateTitleAndMetaTags).toHaveBeenCalledWith(
-      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.FEEDBACKUPDATES.TITLE,
-      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.FEEDBACKUPDATES.META);
+      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.FEEDBACK_UPDATES.TITLE,
+      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.FEEDBACK_UPDATES.META);
   });
 
   it('should unsubscribe on component destruction', () => {

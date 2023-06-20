@@ -6811,21 +6811,19 @@ export default {
         }
       ]
     },
-    "FEEDBACKUPDATES": {
+    "FEEDBACK_UPDATES": {
       "ROUTE": "feedback-updates",
       "TITLE": "Feedback Updates",
       "META": [
         {
           "PROPERTY_TYPE": "itemprop",
           "PROPERTY_VALUE": "description",
-          // eslint-disable-next-line max-len
-          "CONTENT": "With Oppia, you can learn and give feedback to improve the lessons"
+          "CONTENT": "With Oppia,learn and give feedback to improve the lessons"
         },
         {
           "PROPERTY_TYPE": "itemprop",
           "PROPERTY_VALUE": "og:description",
-          // eslint-disable-next-line max-len
-          "CONTENT": "With Oppia, you can learn and give feedback to improve the lessons"
+          "CONTENT": "With Oppia,learn and give feedback to improve the lessons"
         }
       ]
     },

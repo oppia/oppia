@@ -53,7 +53,7 @@ class MockPlatformFeatureService {
     BlogPages: {
       isEnabled: false
     },
-    ShowFeedbackUpdatesInProfilepicDropdownMenu: {
+    ShowFeedbackUpdatesInProfilePicDropdownMenu: {
       isEnabled: false
     }
   };
@@ -731,7 +731,7 @@ describe('TopNavigationBarComponent', () => {
       .toBeFalse();
 
     mockPlatformFeatureService.status.
-      ShowFeedbackUpdatesInProfilepicDropdownMenu.isEnabled = true;
+      ShowFeedbackUpdatesInProfilePicDropdownMenu.isEnabled = true;
 
     expect(
       component.
