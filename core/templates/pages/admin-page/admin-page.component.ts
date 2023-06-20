@@ -74,7 +74,8 @@ export class AdminPageComponent {
   }
 
   isDummyFeatureFlagForE2ETestsEnabled(): boolean {
-    return this.platformFeatureService.status.DummyFeatureFlagForE2ETests.isEnabled;
+    return (
+      this.platformFeatureService.status.DummyFeatureFlagForE2ETests.isEnabled);
   }
 }
 

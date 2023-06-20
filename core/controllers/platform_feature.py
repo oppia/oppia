@@ -121,7 +121,9 @@ class PlatformFeatureDummyHandler(
         # i.e. it's only visible when the dummy_feature_flag_for_e2e_tests
         # is enabled.
         if not platform_feature_services.is_feature_enabled(
-                platform_feature_list.ParamNames.DUMMY_FEATURE_FLAG_FOR_E2E_TESTS.value):
+            platform_feature_list.ParamNames.
+            DUMMY_FEATURE_FLAG_FOR_E2E_TESTS.value
+        ):
             raise self.PageNotFoundException()
         self.render_json({
             'msg': 'ok'

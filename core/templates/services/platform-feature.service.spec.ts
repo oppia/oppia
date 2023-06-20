@@ -224,7 +224,8 @@ describe('PlatformFeatureService', () => {
       () => {
         platformFeatureService = TestBed.inject(PlatformFeatureService);
         expect(
-          () => platformFeatureService.status.DummyFeatureFlagForE2ETests.isEnabled
+          () => (
+            platformFeatureService.status.DummyFeatureFlagForE2ETests.isEnabled)
         ).toThrowError(
           'The platform feature service has not been initialized.');
       })

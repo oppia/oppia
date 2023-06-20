@@ -41,7 +41,9 @@ import { HttpErrorResponse } from '@angular/common/http';
 
 
 let dummyFeatureStatus = false;
-const mockDummyFeatureFlagForE2ETestsStatus = (status: boolean) => dummyFeatureStatus = status;
+const mockDummyFeatureFlagForE2ETestsStatus = (status: boolean) => {
+  dummyFeatureStatus = status
+};
 
 class MockPlatformFeatureService {
   get status() {

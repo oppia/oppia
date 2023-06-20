@@ -209,7 +209,8 @@ class PlatformFeatureDummyHandlerTest(test_utils.GenericTestBase):
 
     def tearDown(self) -> None:
         feature_services.update_feature_flag_rules(
-            param_list.ParamNames.DUMMY_FEATURE_FLAG_FOR_E2E_TESTS.value, self.user_id,
+            param_list.ParamNames.DUMMY_FEATURE_FLAG_FOR_E2E_TESTS.value,
+            self.user_id,
             'clear rule', []
         )
 
@@ -220,7 +221,8 @@ class PlatformFeatureDummyHandlerTest(test_utils.GenericTestBase):
     ) -> None:
         """Enables the dummy_feature for the dev environment."""
         feature_services.update_feature_flag_rules(
-            param_list.ParamNames.DUMMY_FEATURE_FLAG_FOR_E2E_TESTS.value, self.user_id,
+            param_list.ParamNames.DUMMY_FEATURE_FLAG_FOR_E2E_TESTS.value,
+            self.user_id,
             'update rule for testing purpose',
             [param_domain.PlatformParameterRule.from_dict({
                 'value_when_matched': is_enabled,

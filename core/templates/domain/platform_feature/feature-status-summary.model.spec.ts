@@ -53,7 +53,8 @@ describe('Feature Status Summary Model', () => {
       expect(
         () => checker.DummyFeatureFlagForE2ETests.isEnabled
       ).toThrowError(
-        `Feature \'${FeatureNames.DummyFeatureFlagForE2ETests}\' does not exist.`);
+        `Feature \'${
+          FeatureNames.DummyFeatureFlagForE2ETests}\' does not exist.`);
     });
   });
 });
