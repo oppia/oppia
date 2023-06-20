@@ -1401,7 +1401,9 @@ describe('Contributions and review component', () => {
             suggestion: {
               suggestion_id: 'id',
               status: 'review',
-              exploration_content_html: '<p>This is test para</p>'
+              change : {
+                content_html: '<p>This is test para</p>'
+              }
             } as Suggestion,
             details: {
               skill_description: 'skill_description',

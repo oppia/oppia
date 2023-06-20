@@ -246,7 +246,7 @@ export class ContributionsAndReview
         translationWordCount: (
           this.isReviewTranslationsTab() && this.activeExplorationId) ? (
             this.computeTranslationWordCount(
-              suggestion.exploration_content_html)) : undefined
+              suggestion.change.content_html)) : undefined
       };
 
       translationContributionsSummaryList.push(requiredData);
