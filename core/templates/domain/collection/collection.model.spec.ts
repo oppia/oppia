@@ -56,7 +56,7 @@ describe('Collection model', () => {
         thumbnail_icon_url: '/subjects/Algebra.svg',
         human_readable_contributors_summary: {},
         language_code: 'en',
-        thumbnail_bg_color: '#cd672b',
+        thumbnail_bg_color: '#cc4b00',
         created_on_msec: 1591296635736.666,
         ratings: {
           1: 0,
@@ -109,7 +109,7 @@ describe('Collection model', () => {
           thumbnail_icon_url: '/subjects/Algebra.svg',
           human_readable_contributors_summary: {},
           language_code: 'en',
-          thumbnail_bg_color: '#cd672b',
+          thumbnail_bg_color: '#cc4b00',
           created_on_msec: 1591296635736.666,
           ratings: {
             1: 0,
@@ -163,7 +163,7 @@ describe('Collection model', () => {
           thumbnail_icon_url: '/subjects/Algebra.svg',
           human_readable_contributors_summary: {},
           language_code: 'en',
-          thumbnail_bg_color: '#cd672b',
+          thumbnail_bg_color: '#cc4b00',
           created_on_msec: 1591296635736.666,
           ratings: {
             1: 0,
@@ -207,7 +207,7 @@ describe('Collection model', () => {
         thumbnail_icon_url: '/subjects/Algebra.svg',
         human_readable_contributors_summary: {},
         language_code: 'en',
-        thumbnail_bg_color: '#cd672b',
+        thumbnail_bg_color: '#cc4b00',
         created_on_msec: 1591296635736.666,
         ratings: {
           1: 0,
@@ -248,7 +248,7 @@ describe('Collection model', () => {
         thumbnail_icon_url: '/subjects/Algebra.svg',
         human_readable_contributors_summary: {},
         language_code: 'en',
-        thumbnail_bg_color: '#cd672b',
+        thumbnail_bg_color: '#cc4b00',
         created_on_msec: 1591296635736.666,
         ratings: {
           1: 0,
@@ -275,7 +275,7 @@ describe('Collection model', () => {
         thumbnail_icon_url: '/subjects/Algebra.svg',
         human_readable_contributors_summary: {},
         language_code: 'en',
-        thumbnail_bg_color: '#cd672b',
+        thumbnail_bg_color: '#cc4b00',
         created_on_msec: 1591296635736.666,
         ratings: {
           1: 0,
@@ -324,7 +324,7 @@ describe('Collection model', () => {
           thumbnail_icon_url: '/subjects/Algebra.svg',
           human_readable_contributors_summary: {},
           language_code: 'en',
-          thumbnail_bg_color: '#cd672b',
+          thumbnail_bg_color: '#cc4b00',
           created_on_msec: 1591296635736.666,
           ratings: {
             1: 0,
@@ -453,7 +453,7 @@ describe('Collection model', () => {
         thumbnail_icon_url: '/subjects/Algebra.svg',
         human_readable_contributors_summary: {},
         language_code: 'en',
-        thumbnail_bg_color: '#cd672b',
+        thumbnail_bg_color: '#cc4b00',
         created_on_msec: 1591296635736.666,
         ratings: {
           1: 0,
