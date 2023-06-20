@@ -336,12 +336,12 @@ export class FeaturesTabComponent implements OnInit {
     return issues;
   }
 
-  get isDummyFeatureFlagForE2ETestsEnabled(): boolean {
+  get dummyFeatureFlagForE2eTestsIsEnabled(): boolean {
     return this.featureService.status.DummyFeatureFlagForE2ETests.isEnabled;
   }
 
   async reloadDummyHandlerStatusAsync(): Promise<void> {
-    if (this.isDummyFeatureFlagForE2ETestsEnabled) {
+    if (this.dummyFeatureFlagForE2eTestsIsEnabled) {
       this.isDummyApiEnabled = await this.dummyApiService.isHandlerEnabled();
     }
   }

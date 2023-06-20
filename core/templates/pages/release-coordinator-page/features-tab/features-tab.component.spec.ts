@@ -790,15 +790,15 @@ describe('Release coordinator page feature tab', function() {
     });
   });
 
-  describe('.isDummyFeatureFlagForE2ETestsEnabled', () => {
+  describe('.dummyFeatureFlagForE2eTestsIsEnabled', () => {
     it('should return true when dummy feature is enabled', () => {
       mockDummyFeatureFlagForE2ETestsStatus(true);
-      expect(component.isDummyFeatureFlagForE2ETestsEnabled).toBeTrue();
+      expect(component.dummyFeatureFlagForE2eTestsIsEnabled).toBeTrue();
     });
 
     it('should return false when dummy feature is disabled', () => {
       mockDummyFeatureFlagForE2ETestsStatus(false);
-      expect(component.isDummyFeatureFlagForE2ETestsEnabled).toBeFalse();
+      expect(component.dummyFeatureFlagForE2eTestsIsEnabled).toBeFalse();
     });
   });
 
