@@ -430,57 +430,57 @@ class GenerateContributionStatsJob(base_jobs.JobBase):
         if opportunity is not None:
             topic_id = opportunity.topic_id
 
-        for suggestion in suggestions:
-            user_id = (
-                suggestion.author_id if model ==
-                suggestion_models.TranslationContributionStatsModel
-                else suggestion.final_reviewer_id
-            )
-
-            if user_id is None:
-                user_id = feconf.SUGGESTION_BOT_USER_ID
-
-            key = model.construct_id(
-                suggestion.language_code,
-                user_id,
-                topic_id
-            )
-            try:
-                change = suggestion.change
-                # In the new translation command the content in set format is
-                # a list, content in unicode and html format is a string.
-                # This code normalizes the content to the list type so that
-                # we can easily count words.
-                if (
-                        change.cmd == exp_domain.CMD_ADD_WRITTEN_TRANSLATION and
-                        translation_domain.TranslatableContentFormat
-                        .is_data_format_list(change.data_format)
-                ):
-                    content_items: Union[
-                        str, List[str]
-                    ] = change.translation_html
-                else:
-                    content_items = [change.translation_html]
-
-                word_count = 0
-                for item in content_items:
-                    # Count the number of words in the original content,
-                    # ignoring any HTML tags and attributes.
-                    content_plain_text = html_cleaner.strip_html_tags(item)
-                    word_count += len(content_plain_text.split())
-
-                translation_contribution_stats_dict = {
-                    'suggestion_status': suggestion.status,
-                    'edited_by_reviewer': suggestion.edited_by_reviewer,
-                    'word_count': word_count,
-                    'last_updated_date': (
-                        suggestion.last_updated.date())
-                }
-                yield (key, result.Ok(translation_contribution_stats_dict))
-            except Exception as e:
-                yield (
-                    key, result.Err('%s: %s' % (suggestion.suggestion_id, e))
+            for suggestion in suggestions:
+                user_id = (
+                    suggestion.author_id if model ==
+                    suggestion_models.TranslationContributionStatsModel
+                    else suggestion.final_reviewer_id
                 )
+
+                if user_id is None:
+                    user_id = feconf.SUGGESTION_BOT_USER_ID
+
+                key = model.construct_id(
+                    suggestion.language_code,
+                    user_id,
+                    topic_id
+                )
+                try:
+                    change = suggestion.change
+                    # In the new translation command the content in set format is
+                    # a list, content in unicode and html format is a string.
+                    # This code normalizes the content to the list type so that
+                    # we can easily count words.
+                    if (
+                            change.cmd == exp_domain.CMD_ADD_WRITTEN_TRANSLATION and
+                            translation_domain.TranslatableContentFormat
+                            .is_data_format_list(change.data_format)
+                    ):
+                        content_items: Union[
+                            str, List[str]
+                        ] = change.translation_html
+                    else:
+                        content_items = [change.translation_html]
+
+                    word_count = 0
+                    for item in content_items:
+                        # Count the number of words in the original content,
+                        # ignoring any HTML tags and attributes.
+                        content_plain_text = html_cleaner.strip_html_tags(item)
+                        word_count += len(content_plain_text.split())
+
+                    translation_contribution_stats_dict = {
+                        'suggestion_status': suggestion.status,
+                        'edited_by_reviewer': suggestion.edited_by_reviewer,
+                        'word_count': word_count,
+                        'last_updated_date': (
+                            suggestion.last_updated.date())
+                    }
+                    yield (key, result.Ok(translation_contribution_stats_dict))
+                except Exception as e:
+                    yield (
+                        key, result.Err('%s: %s' % (suggestion.suggestion_id, e))
+                    )
 
     @staticmethod
     def _generate_question_stats(

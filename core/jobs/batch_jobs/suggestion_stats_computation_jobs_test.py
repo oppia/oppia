@@ -99,6 +99,18 @@ class GenerateContributionStatsJobTests(job_test_utils.JobTestBase):
         )
         suggestion_model.update_timestamps()
         suggestion_model.put()
+        opportunity_model = self.create_model(
+            opportunity_models.ExplorationOpportunitySummaryModel,
+            id=self.EXP_1_ID,
+            topic_id=self.TOPIC_1_ID,
+            chapter_title='irelevant',
+            content_count=1,
+            story_id='irelevant',
+            story_title='irelevant',
+            topic_name='irelevant'
+        )
+        opportunity_model.update_timestamps()
+        opportunity_model.put()
 
         self.assert_job_output_is([
             job_run_result.JobRunResult(stdout='SUCCESS: 1')
@@ -106,14 +118,14 @@ class GenerateContributionStatsJobTests(job_test_utils.JobTestBase):
 
         translation_stats_model = (
             suggestion_models.TranslationContributionStatsModel.get(
-                self.LANG_1, self.VALID_USER_ID_1, ''))
+                self.LANG_1, self.VALID_USER_ID_1, self.TOPIC_1_ID))
 
         # Ruling out the possibility of None for mypy type checking.
         assert translation_stats_model is not None
         self.assertEqual(translation_stats_model.language_code, self.LANG_1)
         self.assertEqual(
             translation_stats_model.contributor_user_id, self.VALID_USER_ID_1)
-        self.assertEqual(translation_stats_model.topic_id, '')
+        self.assertEqual(translation_stats_model.topic_id, self.TOPIC_1_ID)
         self.assertEqual(
             translation_stats_model.submitted_translations_count, 1)
         self.assertEqual(
@@ -158,6 +170,18 @@ class GenerateContributionStatsJobTests(job_test_utils.JobTestBase):
         )
         suggestion_model.update_timestamps()
         suggestion_model.put()
+        opportunity_model = self.create_model(
+            opportunity_models.ExplorationOpportunitySummaryModel,
+            id=self.EXP_1_ID,
+            topic_id=self.TOPIC_1_ID,
+            chapter_title='irelevant',
+            content_count=1,
+            story_id='irelevant',
+            story_title='irelevant',
+            topic_name='irelevant'
+        )
+        opportunity_model.update_timestamps()
+        opportunity_model.put()
 
         self.assert_job_output_is([
             job_run_result.JobRunResult(
@@ -192,6 +216,18 @@ class GenerateContributionStatsJobTests(job_test_utils.JobTestBase):
         )
         suggestion_model.update_timestamps()
         suggestion_model.put()
+        opportunity_model = self.create_model(
+            opportunity_models.ExplorationOpportunitySummaryModel,
+            id=self.EXP_1_ID,
+            topic_id=self.TOPIC_1_ID,
+            chapter_title='irelevant',
+            content_count=1,
+            story_id='irelevant',
+            story_title='irelevant',
+            topic_name='irelevant'
+        )
+        opportunity_model.update_timestamps()
+        opportunity_model.put()
 
         self.assert_job_output_is([
             job_run_result.JobRunResult(stdout='SUCCESS: 1')
@@ -199,14 +235,14 @@ class GenerateContributionStatsJobTests(job_test_utils.JobTestBase):
 
         translation_stats_model = (
             suggestion_models.TranslationContributionStatsModel.get(
-                self.LANG_1, self.VALID_USER_ID_1, ''))
+                self.LANG_1, self.VALID_USER_ID_1, self.TOPIC_1_ID))
 
         # Ruling out the possibility of None for mypy type checking.
         assert translation_stats_model is not None
         self.assertEqual(translation_stats_model.language_code, self.LANG_1)
         self.assertEqual(
             translation_stats_model.contributor_user_id, self.VALID_USER_ID_1)
-        self.assertEqual(translation_stats_model.topic_id, '')
+        self.assertEqual(translation_stats_model.topic_id, self.TOPIC_1_ID)
         self.assertEqual(
             translation_stats_model.submitted_translations_count, 1)
         self.assertEqual(
@@ -252,6 +288,18 @@ class GenerateContributionStatsJobTests(job_test_utils.JobTestBase):
         )
         suggestion_model.update_timestamps()
         suggestion_model.put()
+        opportunity_model = self.create_model(
+            opportunity_models.ExplorationOpportunitySummaryModel,
+            id=self.EXP_1_ID,
+            topic_id=self.TOPIC_1_ID,
+            chapter_title='irelevant',
+            content_count=1,
+            story_id='irelevant',
+            story_title='irelevant',
+            topic_name='irelevant'
+        )
+        opportunity_model.update_timestamps()
+        opportunity_model.put()
 
         self.assert_job_output_is([
             job_run_result.JobRunResult(stdout='SUCCESS: 1')
@@ -259,14 +307,14 @@ class GenerateContributionStatsJobTests(job_test_utils.JobTestBase):
 
         translation_stats_model = (
             suggestion_models.TranslationContributionStatsModel.get(
-                self.LANG_1, self.VALID_USER_ID_1, ''))
+                self.LANG_1, self.VALID_USER_ID_1, self.TOPIC_1_ID))
 
         # Ruling out the possibility of None for mypy type checking.
         assert translation_stats_model is not None
         self.assertEqual(translation_stats_model.language_code, self.LANG_1)
         self.assertEqual(
             translation_stats_model.contributor_user_id, self.VALID_USER_ID_1)
-        self.assertEqual(translation_stats_model.topic_id, '')
+        self.assertEqual(translation_stats_model.topic_id, self.TOPIC_1_ID)
         self.assertEqual(
             translation_stats_model.submitted_translations_count, 1)
         self.assertEqual(
@@ -385,6 +433,18 @@ class GenerateContributionStatsJobTests(job_test_utils.JobTestBase):
         )
         suggestion_model.update_timestamps()
         suggestion_model.put()
+        opportunity_model = self.create_model(
+            opportunity_models.ExplorationOpportunitySummaryModel,
+            id=self.EXP_1_ID,
+            topic_id=self.TOPIC_1_ID,
+            chapter_title='irelevant',
+            content_count=1,
+            story_id='irelevant',
+            story_title='irelevant',
+            topic_name='irelevant'
+        )
+        opportunity_model.update_timestamps()
+        opportunity_model.put()
 
         self.assert_job_output_is([
             job_run_result.JobRunResult(stdout='SUCCESS: 1'),
@@ -393,10 +453,10 @@ class GenerateContributionStatsJobTests(job_test_utils.JobTestBase):
 
         translation_stats_model = (
             suggestion_models.TranslationContributionStatsModel.get(
-                self.LANG_1, self.VALID_USER_ID_1, ''))
+                self.LANG_1, self.VALID_USER_ID_1, self.TOPIC_1_ID))
         translation_review_stats_model = (
             suggestion_models.TranslationReviewStatsModel.get(
-                self.LANG_1, 'reviewer1', ''))
+                self.LANG_1, 'reviewer1', self.TOPIC_1_ID))
 
         # Ruling out the possibility of None for mypy type checking.
         assert translation_stats_model is not None
@@ -405,7 +465,7 @@ class GenerateContributionStatsJobTests(job_test_utils.JobTestBase):
         self.assertEqual(translation_stats_model.language_code, self.LANG_1)
         self.assertEqual(
             translation_stats_model.contributor_user_id, self.VALID_USER_ID_1)
-        self.assertEqual(translation_stats_model.topic_id, '')
+        self.assertEqual(translation_stats_model.topic_id, self.TOPIC_1_ID)
         self.assertEqual(
             translation_stats_model.submitted_translations_count, 1)
         self.assertEqual(
@@ -430,7 +490,7 @@ class GenerateContributionStatsJobTests(job_test_utils.JobTestBase):
             translation_review_stats_model.language_code, self.LANG_1)
         self.assertEqual(
             translation_review_stats_model.reviewer_user_id, 'reviewer1')
-        self.assertEqual(translation_review_stats_model.topic_id, '')
+        self.assertEqual(translation_review_stats_model.topic_id, self.TOPIC_1_ID)
         self.assertEqual(
             translation_review_stats_model.reviewed_translations_count, 1)
         self.assertEqual(
@@ -479,6 +539,18 @@ class GenerateContributionStatsJobTests(job_test_utils.JobTestBase):
         )
         first_suggestion_model.update_timestamps()
         first_suggestion_model.put()
+        opportunity_model = self.create_model(
+            opportunity_models.ExplorationOpportunitySummaryModel,
+            id=self.EXP_1_ID,
+            topic_id=self.TOPIC_1_ID,
+            chapter_title='irelevant',
+            content_count=1,
+            story_id='irelevant',
+            story_title='irelevant',
+            topic_name='irelevant'
+        )
+        opportunity_model.update_timestamps()
+        opportunity_model.put()
 
         second_suggestion_model = self.create_model(
             suggestion_models.GeneralSuggestionModel,
@@ -511,10 +583,10 @@ class GenerateContributionStatsJobTests(job_test_utils.JobTestBase):
 
         translation_stats_model = (
             suggestion_models.TranslationContributionStatsModel.get(
-                self.LANG_1, self.VALID_USER_ID_1, ''))
+                self.LANG_1, self.VALID_USER_ID_1, self.TOPIC_1_ID))
         translation_review_stats_model = (
             suggestion_models.TranslationReviewStatsModel.get(
-                self.LANG_1, feconf.SUGGESTION_BOT_USER_ID, ''))
+                self.LANG_1, feconf.SUGGESTION_BOT_USER_ID, self.TOPIC_1_ID))
 
         # Ruling out the possibility of None for mypy type checking.
         assert translation_stats_model is not None
@@ -523,7 +595,7 @@ class GenerateContributionStatsJobTests(job_test_utils.JobTestBase):
         self.assertEqual(translation_stats_model.language_code, self.LANG_1)
         self.assertEqual(
             translation_stats_model.contributor_user_id, self.VALID_USER_ID_1)
-        self.assertEqual(translation_stats_model.topic_id, '')
+        self.assertEqual(translation_stats_model.topic_id, self.TOPIC_1_ID)
         self.assertEqual(
             translation_stats_model.submitted_translations_count, 2)
         self.assertEqual(
@@ -549,7 +621,7 @@ class GenerateContributionStatsJobTests(job_test_utils.JobTestBase):
         self.assertEqual(
             translation_review_stats_model.reviewer_user_id,
             feconf.SUGGESTION_BOT_USER_ID)
-        self.assertEqual(translation_review_stats_model.topic_id, '')
+        self.assertEqual(translation_review_stats_model.topic_id, self.TOPIC_1_ID)
         self.assertEqual(
             translation_review_stats_model.reviewed_translations_count, 2)
         self.assertEqual(
@@ -575,6 +647,18 @@ class GenerateContributionStatsJobTests(job_test_utils.JobTestBase):
     def test_creates_multiple_stats_models_from_multiple_users(
         self
     ) -> None:
+        opportunity_model = self.create_model(
+            opportunity_models.ExplorationOpportunitySummaryModel,
+            id=self.EXP_1_ID,
+            topic_id=self.TOPIC_1_ID,
+            chapter_title='irelevant',
+            content_count=1,
+            story_id='irelevant',
+            story_title='irelevant',
+            topic_name='irelevant'
+        )
+        opportunity_model.update_timestamps()
+        opportunity_model.put()
         first_suggestion_model = self.create_model(
             suggestion_models.GeneralSuggestionModel,
             suggestion_type=feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
@@ -630,13 +714,13 @@ class GenerateContributionStatsJobTests(job_test_utils.JobTestBase):
 
         first_translation_stats_model = (
             suggestion_models.TranslationContributionStatsModel.get(
-                self.LANG_1, self.VALID_USER_ID_1, ''))
+                self.LANG_1, self.VALID_USER_ID_1, self.TOPIC_1_ID))
         second_translation_stats_model = (
             suggestion_models.TranslationContributionStatsModel.get(
-                self.LANG_1, self.VALID_USER_ID_2, ''))
+                self.LANG_1, self.VALID_USER_ID_2, self.TOPIC_1_ID))
         translation_review_stats_model = (
             suggestion_models.TranslationReviewStatsModel.get(
-                self.LANG_1, 'reviewer1', ''))
+                self.LANG_1, 'reviewer1', self.TOPIC_1_ID))
 
         # Ruling out the possibility of None for mypy type checking.
         assert first_translation_stats_model is not None
@@ -649,7 +733,7 @@ class GenerateContributionStatsJobTests(job_test_utils.JobTestBase):
             first_translation_stats_model.contributor_user_id,
             self.VALID_USER_ID_1
         )
-        self.assertEqual(first_translation_stats_model.topic_id, '')
+        self.assertEqual(first_translation_stats_model.topic_id, self.TOPIC_1_ID)
         self.assertEqual(
             first_translation_stats_model.submitted_translations_count, 1)
         self.assertEqual(
@@ -678,7 +762,7 @@ class GenerateContributionStatsJobTests(job_test_utils.JobTestBase):
             second_translation_stats_model.contributor_user_id,
             self.VALID_USER_ID_2
         )
-        self.assertEqual(second_translation_stats_model.topic_id, '')
+        self.assertEqual(second_translation_stats_model.topic_id, self.TOPIC_1_ID)
         self.assertEqual(
             second_translation_stats_model.submitted_translations_count, 1)
         self.assertEqual(
@@ -705,7 +789,7 @@ class GenerateContributionStatsJobTests(job_test_utils.JobTestBase):
             translation_review_stats_model.language_code, self.LANG_1)
         self.assertEqual(
             translation_review_stats_model.reviewer_user_id, 'reviewer1')
-        self.assertEqual(translation_review_stats_model.topic_id, '')
+        self.assertEqual(translation_review_stats_model.topic_id, self.TOPIC_1_ID)
         self.assertEqual(
             translation_review_stats_model.reviewed_translations_count, 2)
         self.assertEqual(
@@ -971,6 +1055,18 @@ class GenerateContributionStatsJobTests(job_test_utils.JobTestBase):
         )
 
     def test_creates_stats_model_from_multiple_suggestions(self) -> None:
+        opportunity_model = self.create_model(
+            opportunity_models.ExplorationOpportunitySummaryModel,
+            id=self.EXP_1_ID,
+            topic_id=self.TOPIC_1_ID,
+            chapter_title='irelevant',
+            content_count=1,
+            story_id='irelevant',
+            story_title='irelevant',
+            topic_name='irelevant'
+        )
+        opportunity_model.update_timestamps()
+        opportunity_model.put()
         suggestion_1_model = self.create_model(
             suggestion_models.GeneralSuggestionModel,
             suggestion_type=feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
@@ -1023,14 +1119,14 @@ class GenerateContributionStatsJobTests(job_test_utils.JobTestBase):
 
         translation_stats_model = (
             suggestion_models.TranslationContributionStatsModel.get(
-                self.LANG_1, self.VALID_USER_ID_1, ''))
+                self.LANG_1, self.VALID_USER_ID_1, self.TOPIC_1_ID))
 
         # Ruling out the possibility of None for mypy type checking.
         assert translation_stats_model is not None
         self.assertEqual(translation_stats_model.language_code, self.LANG_1)
         self.assertEqual(
             translation_stats_model.contributor_user_id, self.VALID_USER_ID_1)
-        self.assertEqual(translation_stats_model.topic_id, '')
+        self.assertEqual(translation_stats_model.topic_id, self.TOPIC_1_ID)
         self.assertEqual(
             translation_stats_model.submitted_translations_count, 2)
         self.assertEqual(
