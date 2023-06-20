@@ -21,6 +21,7 @@ import { FormBuilder, FormGroup } from '@angular/forms';
 import { downgradeComponent } from '@angular/upgrade/static';
 
 import { PromoBarBackendApiService } from 'services/promo-bar-backend-api.service';
+import { PlatformFeatureService } from 'services/platform-feature.service';
 
 import { ReleaseCoordinatorBackendApiService } from './services/release-coordinator-backend-api.service';
 import { ReleaseCoordinatorPageConstants } from './release-coordinator-page.constants';
@@ -53,6 +54,7 @@ export class ReleaseCoordinatorPageComponent implements OnInit {
 
   constructor(
     private formBuilder: FormBuilder,
+    private platformFeatureService: PlatformFeatureService,
     private backendApiService: ReleaseCoordinatorBackendApiService,
     private promoBarBackendApiService: PromoBarBackendApiService) {}
 
@@ -89,6 +91,11 @@ export class ReleaseCoordinatorPageComponent implements OnInit {
     }, errorResponse => {
       this.statusMessage = 'Server error: ' + errorResponse;
     });
+  }
+
+  isDummyFeatureFlagForE2ETestsEnabled(): boolean {
+    return (
+      this.platformFeatureService.status.DummyFeatureFlagForE2ETests.isEnabled);
   }
 
   ngOnInit(): void {

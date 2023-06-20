@@ -72,14 +72,7 @@ describe('Feature Gating Flow', function() {
       var agDummyFeatureIndicator = $(
         '.e2e-test-angular-dummy-feature-indicator');
 
-      // Indicator in AngularJS directive that is visible if the
-      // dummy_feature_flag_for_e2e_tests is enabled, and the feature status
-      // is successfully loaded in the AngularJS directive.
-      var ajsDummyFeatureIndicator = $(
-        '.e2e-test-angularjs-dummy-feature-indicator');
-
       expect(await agDummyFeatureIndicator.isExisting()).toBe(false);
-      expect(await ajsDummyFeatureIndicator.isExisting()).toBe(false);
       await users.logout();
     }
   );
@@ -120,15 +113,8 @@ describe('Feature Gating Flow', function() {
     var agDummyHandlerIndicator = $(
       '.e2e-test-angular-dummy-handler-indicator');
 
-    // Indicator in AngularJS directive that is visible if the
-    // dummy_feature_flag_for_e2e_tests is enabled, and the feature status
-    // is successfully loaded in the AngularJS directive.
-    var ajsDummyFeatureIndicator = $(
-      '.e2e-test-angularjs-dummy-feature-indicator');
-
     expect(await agDummyFeatureIndicator.isExisting()).toBe(false);
     expect(await agDummyHandlerIndicator.isExisting()).toBe(false);
-    expect(await ajsDummyFeatureIndicator.isExisting()).toBe(false);
     await users.logout();
   });
 });
