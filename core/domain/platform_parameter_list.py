@@ -41,6 +41,10 @@ class ParamNames(enum.Enum):
     DIAGNOSTIC_TEST = 'diagnostic_test'
     SERIAL_CHAPTER_LAUNCH_CURRICULUM_ADMIN_VIEW = (
         'serial_chapter_launch_curriculum_admin_view')
+    SHOW_TRANSLATION_SIZE = 'show_translation_size'
+
+    PROMO_BAR_ENABLED = 'promo_bar_enabled'
+    PROMO_BAR_MESSAGE = 'promo_bar_message'
 
 
 # Platform parameters should all be defined below.
@@ -98,3 +102,21 @@ Registry.create_feature_flag(
     'This flag is for serial chapter launch feature and making changes only' +
     'in the curriculum admin view.',
     platform_parameter_domain.FeatureStages.DEV)
+
+Registry.create_feature_flag(
+    ParamNames.SHOW_TRANSLATION_SIZE,
+    'This flag is to show translation size on translation cards in' +
+    'contributor dashboard.',
+    platform_parameter_domain.FeatureStages.DEV)
+
+Registry.create_platform_parameter(
+    ParamNames.PROMO_BAR_ENABLED,
+    'Whether the promo bar should be enabled for all users',
+    platform_parameter_domain.DataTypes.BOOL
+)
+
+Registry.create_platform_parameter(
+    ParamNames.PROMO_BAR_MESSAGE,
+    'The message to show to all users if the promo bar is enabled',
+    platform_parameter_domain.DataTypes.STRING
+)

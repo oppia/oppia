@@ -58,6 +58,9 @@
   </section>
   <div [hidden]="!(!reviewable && suggestionIsRejected)"
        class="oppia-suggestion-review-message">
+    <strong>Reviewer: </strong>
+    {{reviewer}}
+    <br>
     <strong>Review message: </strong>
     <div class="oppia-review-message">
       {{reviewMessage}}

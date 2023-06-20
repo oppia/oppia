@@ -188,7 +188,7 @@ class BlogHomepageDataHandler(
 
     @acl_decorators.open_access
     def get(self) -> None:
-        """Handles GET requests."""
+        """Retrieves blog post summaries for the blog homepage."""
         assert self.normalized_request is not None
         offset = int(self.normalized_request['offset'])
         published_post_summaries = (
@@ -247,7 +247,15 @@ class BlogPostDataHandler(
 
     @acl_decorators.open_access
     def get(self, blog_post_url: str) -> None:
-        """Handles GET requests."""
+        """Retrieves a specific blog post and its related recommendations.
+
+        Args:
+            blog_post_url: str. The URL of the blog post.
+
+        Raises:
+            PageNotFoundException. The blog post page with the given url
+                doesn't exist.
+        """
         blog_post = blog_services.get_blog_post_by_url_fragment(blog_post_url)
         if not blog_post:
             raise self.PageNotFoundException(
@@ -351,7 +359,14 @@ class AuthorsPageHandler(
 
     @acl_decorators.open_access
     def get(self, author_username: str) -> None:
-        """Handles GET requests."""
+        """Retrieves blog post summaries and specific author details.
+
+        Args:
+            author_username: str. The username of the author.
+
+        Raises:
+            Exception. No user settings found for the given author_username.
+        """
         assert self.normalized_request is not None
         offset = int(self.normalized_request['offset'])
 
@@ -446,7 +461,7 @@ class BlogPostSearchHandler(
 
     @acl_decorators.open_access
     def get(self) -> None:
-        """Handles GET requests."""
+        """Searches for blog posts based on a query and tags."""
         assert self.normalized_request is not None
         query_string = utils.get_formatted_query_string(
             self.normalized_request['q']

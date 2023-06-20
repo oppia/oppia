@@ -24,7 +24,14 @@ export const PlatformFeatureDomainConstants = {
   PLATFORM_FEATURES_EVALUATION_HANDLER_URL: (
     '/platform_features_evaluation_handler'),
 
+  // Url for the backend handler to perform actions for feature flags.
+  FEATURE_FLAGS_URL: '/feature_flags',
+
   // Action name for request to the admin handler that updates the rules
   // of feature flags.
-  UPDATE_FEATURE_FLAG_RULES_ACTION: 'update_feature_flag_rules'
+  UPDATE_FEATURE_FLAG_RULES_ACTION: 'update_feature_flag_rules',
+
+  // Action name for request to the release-coordinator handler that updates
+  // the rules of feature flags.
+  UPDATE_PLATFORM_PARAMETER_RULES_ACTION: 'update_platform_parameter_rules'
 } as const;

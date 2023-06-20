@@ -836,7 +836,7 @@ def compute_summary_of_question(
         )
     question_summary = question_domain.QuestionSummary(
         question.id, question_content, misconception_ids, interaction_id,
-        question.created_on, question.last_updated)
+        question.created_on, question.last_updated, question.version)
     return question_summary
 
 
@@ -856,7 +856,8 @@ def save_question_summary(
         question_model_created_on=question_summary.created_on,
         question_content=question_summary.question_content,
         misconception_ids=question_summary.misconception_ids,
-        interaction_id=question_summary.interaction_id
+        interaction_id=question_summary.interaction_id,
+        version=question_summary.version
     )
 
     question_summary_model.update_timestamps()
@@ -883,7 +884,8 @@ def get_question_summary_from_model(
         question_summary_model.misconception_ids,
         question_summary_model.interaction_id,
         question_summary_model.question_model_created_on,
-        question_summary_model.question_model_last_updated
+        question_summary_model.question_model_last_updated,
+        question_summary_model.version
     )
 
 
