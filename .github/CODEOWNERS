@@ -250,7 +250,8 @@
 # Forms pages.
 /core/templates/components/forms/ @oppia/lace-frontend-reviewers
 /core/templates/components/common-layout-directives/common-elements/confirmation-modal.template.html @oppia/lace-frontend-reviewers
-/core/templates/components/ck-editor-helpers/customize-rte-component-modal.template.html @oppia/lace-frontend-reviewers
+/core/templates/services/rte-helper-modal.component.html @oppia/lace-frontend-reviewers
+/core/templates/utility/forms.ts @oppia/lace-frontend-reviewers
 /core/templates/services/schema-default-value.service*.ts @oppia/lace-frontend-reviewers
 /core/templates/services/schema-form-submitted.service*.ts @oppia/lace-frontend-reviewers
 /core/templates/services/schema-undefined-last-element.service*.ts @oppia/lace-frontend-reviewers
