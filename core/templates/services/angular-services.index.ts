@@ -438,6 +438,7 @@ import { VersionHistoryService } from 'pages/exploration-editor-page/services/ve
 import { ConceptCardManagerService } from 'pages/exploration-player-page/services/concept-card-manager.service';
 import { DiagnosticTestPlayerEngineService } from 'pages/exploration-player-page/services/diagnostic-test-player-engine.service';
 import { DiagnosticTestPlayerStatusService } from 'pages/diagnostic-test-player-page/diagnostic-test-player-status.service';
+import { RteHelperService } from 'services/rte-helper.service';
 import { HtmlLengthService } from 'services/html-length.service';
 
 export const angularServices: [string, Type<{}>][] = [
@@ -913,5 +914,6 @@ export const angularServices: [string, Type<{}>][] = [
   ['VoiceoverRecordingService', VoiceoverRecordingService],
   ['VersionHistoryService', VersionHistoryService],
   ['VoiceoverRecordingService', VoiceoverRecordingService],
+  ['RteHelperService', RteHelperService],
   ['HtmlLengthService', HtmlLengthService]
 ];
