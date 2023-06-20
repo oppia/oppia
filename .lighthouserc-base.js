@@ -80,11 +80,11 @@ module.exports = {
       'image-aspect-ratio': ['error', {'minScore': 1}],
       'is-on-https': ['off', {}],
       'uses-http2': ['off', {}],
-    },
-    audits: [
-      // Test the `ignoredPatterns` audit option.
-      {path: 'errors-in-console', options: {ignoredPatterns: ['^.*Content Security Policy.*$']}},
-    ]
+      audits: [
+        // Test the `ignoredPatterns` audit option.
+        {path: 'errors-in-console', options: {ignoredPatterns: ['^.*Content Security Policy.*$']}},
+      ]
+    }
   },
   basePerformanceAssertions: {
     'modern-image-formats': [
