@@ -77,6 +77,10 @@ module.exports = {
           'assertions': {
             // The YouTube embed on donate page loads images in jpg format, thus
             // we need to allow one image.
+            audits: [
+              // Test the `ignoredPatterns` audit option.
+              {path: 'errors-in-console', options: {ignoredPatterns: ['^.*Content Security Policy.*$']}},
+            ],
             'modern-image-formats': [
               'error', {'maxLength': 1, 'strategy': 'pessimistic'}
             ],
