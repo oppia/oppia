@@ -27,6 +27,8 @@ import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 
 import './home-tab.component.css';
 import { StorySummary } from 'domain/story/story-summary.model';
+import { LearnerExplorationSummary } from 'domain/summary/learner-exploration-summary.model';
+import { CollectionSummary } from 'domain/collection/collection-summary.model';
 
 interface storySummaryTile {
   topicName: string;
@@ -49,10 +51,16 @@ export class HomeTabComponent {
   @Input() partiallyLearntTopicsList!: LearnerTopicSummary[];
   @Input() untrackedTopics!: Record<string, LearnerTopicSummary[]>;
   @Input() username!: string;
+  @Input() explorationPlaylist!: LearnerExplorationSummary[];
+  @Input() collectionPlaylist!: CollectionSummary[];
+
   currentGoalsLength!: number;
   classroomUrlFragment!: string;
   goalTopicsLength!: number;
   width!: number;
+  startIndexInPlaylist: number = 0;
+  endIndexInPlaylist: number = 3;
+  noPlaylistActivity: boolean = false;
   CLASSROOM_LINK_URL_TEMPLATE: string = '/learn/<classroom_url_fragment>';
   nextIncompleteNodeTitles: string[] = [];
   widthConst: number = 233;
@@ -60,6 +68,12 @@ export class HomeTabComponent {
   windowIsNarrow: boolean = false;
   storyInProgress: storySummaryTile[] = [];
   storyInRecommended: storySummaryTile[] = [];
+  displayLessonsInPlaylist: (
+    LearnerExplorationSummary | CollectionSummary)[] = [];
+
+  totalLessonsInPlaylist: (
+      LearnerExplorationSummary | CollectionSummary)[] = [];
+
   directiveSubscriptions = new Subscription();
 
   constructor(
@@ -69,10 +83,22 @@ export class HomeTabComponent {
   ) {}
 
   ngOnInit(): void {
+    this.noPlaylistActivity = (
+      (this.explorationPlaylist.length === 0) &&
+      (this.collectionPlaylist.length === 0));
+
+    this.totalLessonsInPlaylist.push(
+      ...this.explorationPlaylist, ...this.collectionPlaylist);
+
+    this.displayLessonsInPlaylist = this.totalLessonsInPlaylist;
+    this.startIndexInPlaylist = 0;
+    this.endIndexInPlaylist = this.totalLessonsInPlaylist.length;
+
     this.width = this.widthConst * (this.currentGoals.length);
     var allGoals = [...this.currentGoals, ...this.partiallyLearntTopicsList];
     this.currentGoalsLength = this.currentGoals.length;
     this.goalTopicsLength = this.goalTopics.length;
+
     if (allGoals.length !== 0) {
       var allGoalIds = [];
       for (var goal of allGoals) {
@@ -114,6 +140,9 @@ export class HomeTabComponent {
         }
       }
     }
+
+    console.error(this.displayLessonsInPlaylist, 'playlist data');
+
     this.windowIsNarrow = this.windowDimensionService.isWindowNarrow();
     this.directiveSubscriptions.add(
       this.windowDimensionService.getResizeEvent().subscribe(() => {

@@ -1,0 +1,209 @@
+oppia-collection-summary-tile .oppia-activity-summary-tile {
+    position: relative;
+    z-index: 5;
+  }
+
+oppia-collection-summary-tile  .oppia-activity-summary-tile .thumbnail {
+    text-decoration: none;
+  }
+
+oppia-collection-summary-tile  .oppia-activity-summary-tile .thumbnail-image {
+    top: 15.5%;
+  }
+
+oppia-collection-summary-tile  .oppia-activity-summary-tile .collection-corner-image {
+    position: absolute;
+    width: 36px;
+  }
+
+oppia-collection-summary-tile  .mobile-activity-summary-card {
+    box-shadow: slategrey 2px 4px 4px 0;
+    padding: 0 0 0 0;
+  }
+
+oppia-collection-summary-tile  .mobile-collection-card-cascading-images-container {
+    align-self: center;
+    height: 63px;
+    position: relative;
+    width: 63px;
+  }
+
+oppia-collection-summary-tile  .mobile-collection-card-image-container {
+    box-shadow: slategrey -1px 3px 4px 0;
+    position: absolute;
+    width: 55px;
+  }
+
+oppia-collection-summary-tile  .rear-image {
+    opacity: 40%;
+    right: 0;
+    top: 0;
+  }
+
+oppia-collection-summary-tile  .middle-image {
+    left: 4px;
+    opacity: 70%;
+    top: 4px;
+  }
+
+oppia-collection-summary-tile  .front-image {
+    bottom: 0;
+    left: 0;
+  }
+
+
+oppia-collection-summary-tile .collection-progress-svg {
+  transform: rotate(-90deg);
+}
+
+oppia-collection-summary-tile .collection-progress-circle {
+  fill: none;
+}
+
+oppia-collection-summary-tile .total-circle {
+  stroke: #adadad;
+  stroke-width: 3;
+}
+
+oppia-collection-summary-tile .completed-circle {
+  stroke: #00645c;
+  stroke-width: 3;
+}
+
+oppia-collection-summary-tile .collection-progress {
+  position: relative;
+  top: 76px;
+}
+oppia-collection-summary-tile .oppia-collection-objective-title {
+  color: #333;
+  display: inline-block;
+  font-size: 11px;
+  height: 40px;
+  letter-spacing: 0;
+  margin: 0px 8px 0 8px;
+  opacity: 1;
+  text-align: left;
+}
+oppia-collection-summary-tile .oppia-collection-title {
+  color: #00645C;
+  font-family: Capriola,Roboto,Arial,sans-serif;
+  font-size: 15px;
+  font-weight: 400;
+  /* margin: 24px 0 12px 6px; */
+  padding-left: 8px;
+  text-align: left;
+}
+oppia-collection-summary-tile .continue-button {
+  background: white 0% 0% no-repeat padding-box;
+  border: 1px solid #00645C;
+  border-radius: 4px;
+  bottom: 7px;
+  /* box-shadow: 0 2px 2px #0000003d; */
+  /* display: none; */
+  height: 36px;
+  left: 86px;
+  position: absolute;
+  width: 122px;
+}
+oppia-collection-summary-tile .continue-button-text {
+  color: #00645C;
+  font-size: 14px;
+  font-weight: 500;
+  left: 1px;
+  letter-spacing: 0;
+  position: relative;
+  text-align: center;
+  /* text-transform: uppercase; */
+  top: 10px;
+}
+oppia-collection-summary-tile .oppia-story-completion {
+  background: #000c 0% 0% no-repeat padding-box;
+  border-radius: 2px;
+  bottom: 23px;
+  float: right;
+  height: 19px;
+  margin: 0 8px 0 8px;
+  position: relative;
+  right: 4px;
+  text-align: left;
+  width: 90px;
+}
+oppia-collection-summary-tile .story-completion {
+  bottom: 52px;
+}
+oppia-collection-summary-tile .oppia-svg-star-image {
+  bottom: 3px;
+  filter: invert(95%) sepia(49%) saturate(2374%) hue-rotate(320deg) brightness(91%) contrast(89%);
+  left: 3px;
+  position: relative;
+  width: 11px;
+}
+oppia-collection-summary-tile .oppia-collection-link {
+  text-decoration: none;
+}
+oppia-collection-summary-tile .collection-card {
+  height: 100%;
+}
+oppia-collection-summary-tile .oppia-summary-section {
+  position: absolute;
+  width: 100%;
+  margin-top: 8px;
+}
+oppia-collection-summary-tile .oppia-library-title {
+  color: #333;
+  display: block;
+  font-family: 'Roboto';
+  font-size: 12px;
+  font-weight: 600;
+  height: 16px;
+  letter-spacing: 0.05px;
+  margin: 4px 8px 0px 8px;
+  padding-bottom: 12px;
+  text-align: left;
+  width: 188px;
+}
+oppia-collection-summary-tile .oppia-story-completed-percent {
+  color: #fff;
+  font-size: 10px;
+  letter-spacing: 0;
+  margin: 2px;
+  padding: 2px;
+  position: absolute;
+  width: 100%;
+}
+oppia-collection-summary-tile .oppia-percent-story-completed {
+  color: #fff;
+  font-size: 10px;
+  letter-spacing: 0;
+  margin: 2px;
+  padding: 2px;
+  position: absolute;
+  width: 100%;
+}
+oppia-collection-summary-tile .oppia-collection-dashboard-card {
+  border-radius: 4px;
+  box-shadow: 0 3px 6px #00000029;
+  display: inline-block;
+  height: 270px;
+  margin: 0 2px 30px 6px;
+  padding: 0;
+  position: relative;
+  width: 216px;
+  z-index: 5;
+}
+oppia-collection-summary-tile .oppia-title-section {
+  border-top-left-radius: 4px;
+  border-top-right-radius: 4px;
+  height: 144px;
+  width: 216px;
+}
+oppia-collection-summary-tile .oppia-thumbnail-image {
+  height: 144px;
+  width: 216px !important;
+}
+oppia-collection-summary-tile .oppia-collection-dashboard-card .continue-button:hover {
+  /* display: block;
+  float: left; */
+  background-color: #35ada3;
+}
+

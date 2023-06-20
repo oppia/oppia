@@ -28,9 +28,12 @@ import { WindowDimensionsService } from 'services/contextual/window-dimensions.s
 import { UrlService } from 'services/contextual/url.service';
 import { Subscription } from 'rxjs';
 
+import './collection-summary-tile.component.css';
+
 @Component({
   selector: 'oppia-collection-summary-tile',
   templateUrl: './collection-summary-tile.component.html',
+  styleUrls: ['./collection-summary-tile.component.css']
 })
 export class CollectionSummaryTileComponent implements OnInit, OnDestroy {
   // These properties are initialized using Angular lifecycle hooks
@@ -55,6 +58,7 @@ export class CollectionSummaryTileComponent implements OnInit, OnDestroy {
   collectionIsCurrentlyHoveredOver: boolean = false;
   defaultEmptyTitle!: string;
   activityTypeCollection!: string;
+  buttonIsHovered!: boolean;
   mobileCardToBeShown: boolean = false;
   resizeSubscription!: Subscription;
   // A null value for 'relativeLastUpdatedDateTime' indicates that
@@ -125,6 +129,13 @@ export class CollectionSummaryTileComponent implements OnInit, OnDestroy {
         collection_id: this.getCollectionId
       }
     );
+  }
+
+  isButtonHovered(): string {
+    if (this.buttonIsHovered) {
+      return 'box-shadow: 0 5px 5px -5px #333;';
+    }
+    // Return 'height: 144px; width: 192px;';
   }
 
   getCompleteThumbnailIconUrl(): string {

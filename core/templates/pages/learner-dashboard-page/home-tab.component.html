@@ -80,4 +80,51 @@
       </p>
     </div>
   </div>
-</div>
+ <!-- <div *ngIf="totalLessonsInPlaylist.length !== 0">
+    <div class="summary-container">
+      <div *ngFor="let summaryTile of displayLessonsInPlaylist.slice(startIndexInPlaylist, endIndexInPlaylist)"
+           class="oppia-summary-tile-container"
+           (mouseenter)="summaryTile.toggle = !summaryTile.toggle"
+           (mouseleave)="summaryTile.toggle = !summaryTile.toggle">
+        <div *ngIf="getTileType(summaryTile) === 'exploration'">
+          <i class="remove-icon fa fa-times"
+             *ngIf="summaryTile.toggle || windowIsNarrow"
+             aria-hidden="true"
+             (click)="openRemoveActivityModal('I18N_LEARNER_DASHBOARD_PLAYLIST_SECTION', 'I18N_DASHBOARD_EXPLORATIONS', summaryTile)"
+             ngbTooltip="Remove"
+             container="body"
+             placement="top">
+          </i>
+          <oppia-exploration-summary-tile [explorationId]="summaryTile.id"
+                                          [explorationTitle]="summaryTile.title"
+                                          [lastUpdatedMsec]="summaryTile.lastUpdatedMsec"
+                                          [objective]="summaryTile.objective"
+                                          [category]="summaryTile.category"
+                                          [ratings]="summaryTile.ratings"
+                                          [numViews]="summaryTile.numViews"
+                                          [thumbnailIconUrl]="summaryTile.thumbnailIconUrl"
+                                          [thumbnailBgColor]="summaryTile.thumbnailBgColor">
+          </oppia-exploration-summary-tile>
+        </div>
+        <div *ngIf="getTileType(summaryTile) === 'collection'">
+          <i class="remove-icon fa fa-times"
+             *ngIf="summaryTile.toggle || windowIsNarrow"
+             aria-hidden="true"
+             (click)="openRemoveActivityModal('I18N_LEARNER_DASHBOARD_PLAYLIST_SECTION', 'I18N_DASHBOARD_COLLECTIONS', summaryTile)"
+             ngbTooltip="Remove"
+             container="body"
+             placement="top">
+          </i>
+          <oppia-collection-summary-tile [getCollectionId]="summaryTile.id"
+                                         [getCollectionTitle]="summaryTile.title"
+                                         [getLastUpdatedMsec]="summaryTile.lastUpdatedMsec"
+                                         [getObjective]="summaryTile.objective"
+                                         [getNodeCount]="summaryTile.nodeCount"
+                                         [getCategory]="summaryTile.category"
+                                         [getThumbnailIconUrl]="summaryTile.thumbnailIconUrl"
+                                         [getThumbnailBgColor]="summaryTile.thumbnailBgColor">
+          </oppia-collection-summary-tile>
+        </div>
+      </div>
+  </div>
+</div> -->

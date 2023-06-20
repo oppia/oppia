@@ -1,4 +1,4 @@
-<div *ngIf="true">
+<div *ngIf="false">
 <div *ngIf="!mobileCardToBeShown">
   <oppia-learner-dashboard-icons *ngIf="showLearnerDashboardIconsIfPossible && userIsLoggedIn"
                                 [activityType]="activityType"
@@ -136,12 +136,12 @@
 
 <!-- alag -->
 <!-- <div class="learner-story-summary-tile"> -->
-  <div *ngIf="false">
+  <div *ngIf="true">
   <mat-card class="oppia-exploration-dashboard-card" [attr.style]="isButtonHovered()">
       <div>
       <div class="exploration-card">
         <div class="oppia-title-section" [ngStyle]="{'background-color': thumbnailBgColor}">
-          <img class="oppia-thumbnail-image" [src]="thumbnailUrl">
+          <img class="oppia-thumbnail-image" [src]="thumbnailIcon">
         </div>
         <div class="oppia-summary-section">
           <span class="oppia-exploration-title">
