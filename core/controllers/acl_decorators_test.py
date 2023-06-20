@@ -6885,6 +6885,39 @@ class EditEntityDecoratorTests(test_utils.GenericTestBase):
                 ' images to questions.')
         self.logout()
 
+    def test_can_submit_images_to_explorations(self) -> None:
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json('/mock_edit_entity/%s/%s' % (
+                feconf.IMAGE_CONTEXT_EXPLORATION_SUGGESTIONS,
+                self.published_exp_id))
+            self.assertEqual(response['entity_id'], self.published_exp_id)
+            self.assertEqual(response['entity_type'], 'exploration_suggestions')
+        self.logout()
+
+    def test_unauthenticated_users_cannot_submit_images_to_explorations(
+        self
+    ) -> None:
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json('/mock_edit_entity/%s/%s' % (
+                feconf.IMAGE_CONTEXT_EXPLORATION_SUGGESTIONS,
+                self.published_exp_id),
+                expected_status_int=401)
+
+    def test_cannot_submit_images_to_explorations_without_having_permissions(
+        self
+    ) -> None:
+        self.login(self.user_email)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json('/mock_edit_entity/%s/%s' % (
+                feconf.IMAGE_CONTEXT_EXPLORATION_SUGGESTIONS,
+                self.published_exp_id),
+                expected_status_int=401)
+            self.assertEqual(
+                response['error'], 'You do not have credentials to submit'
+                ' images to explorations.')
+        self.logout()
+
     def test_can_edit_blog_post(self) -> None:
         self.login(self.BLOG_ADMIN_EMAIL)
         blog_admin_id = (
