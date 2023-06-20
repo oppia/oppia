@@ -1,6 +1,6 @@
 name: Revert Wiki Changes Made Through the Web Interface
 on:
-  gollum
+  gollum:
   workflow_dispatch:
 jobs:
   revert:
