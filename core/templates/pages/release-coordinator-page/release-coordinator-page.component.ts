@@ -93,11 +93,6 @@ export class ReleaseCoordinatorPageComponent implements OnInit {
     });
   }
 
-  isDummyFeatureFlagForE2ETestsEnabled(): boolean {
-    return (
-      this.platformFeatureService.status.DummyFeatureFlagForE2ETests.isEnabled);
-  }
-
   ngOnInit(): void {
     this.statusMessage = '';
     this.submitButtonDisabled = true;
