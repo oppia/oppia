@@ -183,7 +183,7 @@ describe('Community lessons tab Component', () => {
       thumbnail_icon_url: '/subjects/Algebra.svg',
       human_readable_contributors_summary: {},
       language_code: 'en',
-      thumbnail_bg_color: '#cd672b',
+      thumbnail_bg_color: '#cc4b00',
       created_on_msec: 1591296635736.666,
       ratings: {
         1: 0,
@@ -261,7 +261,7 @@ describe('Community lessons tab Component', () => {
       thumbnail_icon_url: '/subjects/Algebra.svg',
       human_readable_contributors_summary: {},
       language_code: 'en',
-      thumbnail_bg_color: '#cd672b',
+      thumbnail_bg_color: '#cc4b00',
       created_on_msec: 1591296635736.666,
       ratings: {
         1: 0,
@@ -287,7 +287,7 @@ describe('Community lessons tab Component', () => {
       thumbnail_icon_url: '/subjects/Algebra.svg',
       human_readable_contributors_summary: {},
       language_code: 'en',
-      thumbnail_bg_color: '#cd672b',
+      thumbnail_bg_color: '#cc4b00',
       created_on_msec: 1591296635736.666,
       ratings: {
         1: 0,
@@ -313,7 +313,7 @@ describe('Community lessons tab Component', () => {
       thumbnail_icon_url: '/subjects/Algebra.svg',
       human_readable_contributors_summary: {},
       language_code: 'en',
-      thumbnail_bg_color: '#cd672b',
+      thumbnail_bg_color: '#cc4b00',
       created_on_msec: 1591296635736.666,
       ratings: {
         1: 0,
@@ -339,7 +339,7 @@ describe('Community lessons tab Component', () => {
       thumbnail_icon_url: '/subjects/Algebra.svg',
       human_readable_contributors_summary: {},
       language_code: 'en',
-      thumbnail_bg_color: '#cd672b',
+      thumbnail_bg_color: '#cc4b00',
       created_on_msec: 1591296635736.666,
       ratings: {
         1: 0,
@@ -407,7 +407,7 @@ describe('Community lessons tab Component', () => {
       id: '44LKoKLlIbGe',
       thumbnail_icon_url: '/subjects/Algebra.svg',
       language_code: 'en',
-      thumbnail_bg_color: '#cd672b',
+      thumbnail_bg_color: '#cc4b00',
       created_on: 1591296635736.666,
       status: 'public',
       category: 'Algebra',
@@ -426,7 +426,7 @@ describe('Community lessons tab Component', () => {
       thumbnail_icon_url: '/subjects/Algebra.svg',
       human_readable_contributors_summary: {},
       language_code: 'en',
-      thumbnail_bg_color: '#cd672b',
+      thumbnail_bg_color: '#cc4b00',
       created_on_msec: 1591296635736.666,
       ratings: {
         1: 0,
@@ -461,7 +461,7 @@ describe('Community lessons tab Component', () => {
       thumbnail_icon_url: '/subjects/Algebra.svg',
       human_readable_contributors_summary: {},
       language_code: 'en',
-      thumbnail_bg_color: '#cd672b',
+      thumbnail_bg_color: '#cc4b00',
       created_on_msec: 1591296635736.666,
       ratings: {
         1: 0,
@@ -487,7 +487,7 @@ describe('Community lessons tab Component', () => {
       thumbnail_icon_url: '/subjects/Algebra.svg',
       human_readable_contributors_summary: {},
       language_code: 'en',
-      thumbnail_bg_color: '#cd672b',
+      thumbnail_bg_color: '#cc4b00',
       created_on_msec: 1591296635736.666,
       ratings: {
         1: 0,
@@ -513,7 +513,7 @@ describe('Community lessons tab Component', () => {
       thumbnail_icon_url: '/subjects/Algebra.svg',
       human_readable_contributors_summary: {},
       language_code: 'en',
-      thumbnail_bg_color: '#cd672b',
+      thumbnail_bg_color: '#cc4b00',
       created_on_msec: 1591296635736.666,
       ratings: {
         1: 0,
@@ -539,7 +539,7 @@ describe('Community lessons tab Component', () => {
       thumbnail_icon_url: '/subjects/Algebra.svg',
       human_readable_contributors_summary: {},
       language_code: 'en',
-      thumbnail_bg_color: '#cd672b',
+      thumbnail_bg_color: '#cc4b00',
       created_on_msec: 1591296635736.666,
       ratings: {
         1: 0,
@@ -598,7 +598,7 @@ describe('Community lessons tab Component', () => {
         thumbnail_icon_url: '/subjects/Algebra.svg',
         human_readable_contributors_summary: {},
         language_code: 'en',
-        thumbnail_bg_color: '#cd672b',
+        thumbnail_bg_color: '#cc4b00',
         created_on_msec: 1591296635736.666,
         ratings: {
           1: 0,
@@ -647,7 +647,7 @@ describe('Community lessons tab Component', () => {
         id: '44LKoKLlIbGe',
         thumbnail_icon_url: '/subjects/Algebra.svg',
         language_code: 'en',
-        thumbnail_bg_color: '#cd672b',
+        thumbnail_bg_color: '#cc4b00',
         created_on: 1591296635736.666,
         status: 'public',
         category: 'Algebra',
@@ -690,7 +690,7 @@ describe('Community lessons tab Component', () => {
         thumbnail_icon_url: '/subjects/Algebra.svg',
         human_readable_contributors_summary: {},
         language_code: 'en',
-        thumbnail_bg_color: '#cd672b',
+        thumbnail_bg_color: '#cc4b00',
         created_on_msec: 1591296635736.666,
         ratings: {
           1: 0,
@@ -739,7 +739,7 @@ describe('Community lessons tab Component', () => {
         id: '44LKoKLlIbGe',
         thumbnail_icon_url: '/subjects/Algebra.svg',
         language_code: 'en',
-        thumbnail_bg_color: '#cd672b',
+        thumbnail_bg_color: '#cc4b00',
         created_on: 1591296635736.666,
         status: 'public',
         category: 'Algebra',

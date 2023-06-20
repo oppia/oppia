@@ -84,7 +84,7 @@ describe('Collection node editor component ', () => {
       objective: 'Test Objective',
       status: 'public',
       tags: [],
-      thumbnail_bg_color: '#cd672b',
+      thumbnail_bg_color: '#cc4b00',
       thumbnail_icon_url: '/subjects/Algebra.svg',
       title: 'a title'
     };
