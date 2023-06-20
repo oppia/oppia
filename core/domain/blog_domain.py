@@ -31,7 +31,6 @@ from core.domain import html_cleaner  # pylint: disable=invalid-import-from # is
 
 # TODO(#14537): Refactor this file and remove imports marked
 # with 'invalid-import-from'.
-
 MAX_CHARS_IN_BLOG_POST_URL_FRAGMENT: Final = (
     constants.MAX_CHARS_IN_BLOG_POST_TITLE
     + len('-')

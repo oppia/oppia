@@ -1,4 +1,4 @@
-// Copyright 2023 The Oppia Authors. All Rights Reserved.
+// Copyright 2021 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -227,7 +227,6 @@ export class BlogStatisticsTabComponent implements OnInit {
         return;
       }
     }
-    console.log(this._dataForActiveChart);
     this.blogDashboardBackendApiService.fetchBlogPostViewsStatsAsync(
       this.activeStatsBlogPostId
     ).then((stats: BlogPostViewsStats) => {
@@ -326,14 +325,8 @@ export class BlogStatisticsTabComponent implements OnInit {
   showHourlyStats(): void {
     let data = (this._dataForActiveChart as Stats).hourlyStats;
     let statsKeys = Object.keys(data);
-    let hourOffset = statsKeys.length - 1;
     this.xAxisLabels = [];
-    statsKeys.map(() => {
-      this.xAxisLabels.push(
-        this.blogDashboardPageService.getPastHourString(hourOffset)
-      );
-      hourOffset -= 1;
-    });
+    statsKeys.map(hourKey => this.xAxisLabels.push(hourKey.replace('_', 'h')));
     this.selectedTimePeriod = 'hourly';
     this.plotStatsGraph(data);
   }
@@ -341,15 +334,8 @@ export class BlogStatisticsTabComponent implements OnInit {
   showMonthlyStats(): void {
     let data = (this._dataForActiveChart as Stats).monthlyStats;
     let statsKeys = Object.keys(data);
-    console.log(statsKeys)
-    let dayOffset = 0;
     this.xAxisLabels = [];
-    statsKeys.map(() => {
-      this.xAxisLabels.push(
-        this.blogDashboardPageService.getCurrentMonthDayString(dayOffset)
-      );
-      dayOffset += 1;
-    });
+    statsKeys.map(dayKey => this.xAxisLabels.push(dayKey.replace('_', ' ')));
     this.selectedTimePeriod = 'monthly';
     this.plotStatsGraph(data);
   }
@@ -357,14 +343,8 @@ export class BlogStatisticsTabComponent implements OnInit {
   showWeeklyStats(): void {
     let data = (this._dataForActiveChart as Stats).weeklyStats;
     let statsKeys = Object.keys(data);
-    let dayOffset = statsKeys.length - 1;
     this.xAxisLabels = [];
-    statsKeys.map(() => {
-      this.xAxisLabels.push(
-        this.blogDashboardPageService.getPastDayString(dayOffset)
-      );
-      dayOffset -= 1;
-    });
+    statsKeys.map(key => this.xAxisLabels.push(key.replace('_', ' ')));
     this.selectedTimePeriod = 'weekly';
     this.plotStatsGraph(data);
   }
@@ -372,27 +352,12 @@ export class BlogStatisticsTabComponent implements OnInit {
   showYearlyStats(): void {
     let data = (this._dataForActiveChart as Stats).yearlyStats;
     let statsKeys = Object.keys(data);
-    let monthOffset = 0;
     this.xAxisLabels = [];
-    statsKeys.map(() => {
-      this.xAxisLabels.push(
-        this.blogDashboardPageService.getMonthString(monthOffset)
-      );
-      monthOffset += 1;
-    });
+    let year = (new Date()).getFullYear();
+    statsKeys.map(key => this.xAxisLabels.push(
+      dayjs(new Date (year, Number(key.replace('_', ' ')))).format('MMM YY')));
     this.selectedTimePeriod = 'yearly';
     this.plotStatsGraph(data);
-  }
-
-  showAllStats(): void {
-    let data = (this._dataForActiveChart as Stats).allStats;
-    this.xAxisLabels = Object.keys(data);
-    let cumulatedYearlyStats: StatsDict = {};
-    for (let year in data) {
-      cumulatedYearlyStats.year = (d3.sum(Object.values(data[year])));
-    }
-    this.selectedTimePeriod = 'all';
-    this.plotStatsGraph(cumulatedYearlyStats as StatsDict);
   }
 
   plotReadingTimeStatsChart(): void {
@@ -516,12 +481,9 @@ export class BlogStatisticsTabComponent implements OnInit {
     }
 
     // Create the Y-axis band scale.
-    let yAxisMaxValue = d3.max(plotData, d => Number(d.value)) as number;
-    if (yAxisMaxValue < 10) {
-      yAxisMaxValue += 100;
-    } else {
-      yAxisMaxValue += 50;
-    }
+    let yAxisMaxValue = (
+      d3.max(plotData, d => Number(d.value)) as number + 50
+    );
     this._y.domain([0, yAxisMaxValue]);
     // Draw the Y-axis on the DOM.
     this._yAxis.transition().duration(1000).call(

@@ -26,8 +26,6 @@ import { BlogDashboardPageConstants } from 'pages/blog-dashboard-page/blog-dashb
 import { BlogPostEditorBackendApiService } from 'domain/blog/blog-post-editor-backend-api.service';
 import { PreventPageUnloadEventService } from 'services/prevent-page-unload-event.service';
 import { BlogPostData } from 'domain/blog/blog-post.model';
-import dayjs from 'dayjs';
-
 @Injectable({
   providedIn: 'root'
 })
@@ -159,55 +157,6 @@ export class BlogDashboardPageService {
     } else {
       return this.updateNavTitleEventEmitter.emit('New Post - Untitled');
     }
-  }
-
-  getMonthString(monthOffset: number): string {
-    let now = new Date();
-    let day = (
-      new Date(
-        now.getFullYear(),
-        monthOffset,
-        now.getDate()
-      )
-    );
-    return dayjs(day).format('MMM YY');
-  }
-
-  getCurrentMonthDayString(dayOffset: number): string {
-    let now = new Date();
-    let day = (
-      new Date(
-        now.getFullYear(),
-        now.getMonth(),
-        1 + dayOffset
-      )
-    );
-    return dayjs(day).format('D');
-  }
-
-  getPastDayString(dayOffset: number): string {
-    let now = new Date();
-    let day = (
-      new Date(
-        now.getFullYear(),
-        now.getMonth(),
-        now.getDate() - dayOffset
-      )
-    );
-    return dayjs(day).format('D MMM');
-  }
-
-  getPastHourString(hourOffset: number): string {
-    let now = new Date();
-    let hour = (
-      new Date(
-        now.getFullYear(),
-        now.getMonth(),
-        now.getDate(),
-        now.getHours() - hourOffset
-      ).getHours()
-    );
-    return hour.toString() + 'h';
   }
 }
 
