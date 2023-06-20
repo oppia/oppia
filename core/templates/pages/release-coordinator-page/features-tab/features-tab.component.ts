@@ -264,7 +264,7 @@ export class FeaturesTabComponent implements OnInit {
 
     if (backup) {
       featureFlag.rules = cloneDeep(backup.rules);
-      featureFlag.defaultValue = backup.defaultValue
+      featureFlag.defaultValue = backup.defaultValue;
     }
   }
 

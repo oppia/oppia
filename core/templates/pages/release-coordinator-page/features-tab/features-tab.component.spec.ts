@@ -424,7 +424,8 @@ describe('Release coordinator page feature tab', function() {
       flushMicrotasks();
 
       expect(updateApiSpy).toHaveBeenCalledWith(
-        featureFlag.name, 'mock msg', featureFlag.rules);
+        featureFlag.name, 'mock msg', featureFlag.rules,
+        featureFlag.defaultValue);
       expect(setStatusSpy).toHaveBeenCalledWith('Saved successfully.');
     }));
 

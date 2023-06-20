@@ -84,7 +84,9 @@ export class PlatformFeatureAdminBackendApiService {
   }
 
   async updatePlatformParameter(
-      name: string, message: string, newRules: PlatformParameterRule[]):
+      name: string, message: string, newRules: PlatformParameterRule[],
+      defaultValue: PlatformParameterValue
+  ):
       Promise<void> {
     await this.http.post(
       AdminPageConstants.ADMIN_HANDLER_URL,
@@ -94,7 +96,8 @@ export class PlatformFeatureAdminBackendApiService {
             UPDATE_PLATFORM_PARAMETER_RULES_ACTION),
         platform_param_name: name,
         commit_message: message,
-        new_rules: newRules.map(rule => rule.toBackendDict())
+        new_rules: newRules.map(rule => rule.toBackendDict()),
+        default_value: defaultValue
       }
     ).toPromise();
   }

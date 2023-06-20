@@ -216,7 +216,7 @@ export class AdminPlatformParametersTabComponent implements OnInit {
       this.adminTaskManager.startTask();
 
       await this.apiService.updatePlatformParameter(
-        param.name, commitMessage, param.rules);
+        param.name, commitMessage, param.rules, param.defaultValue);
 
       this.platformParameterNameToBackupMap.set(param.name, cloneDeep(param));
 
@@ -251,6 +251,7 @@ export class AdminPlatformParametersTabComponent implements OnInit {
 
     if (backup) {
       param.rules = cloneDeep(backup.rules);
+      param.defaultValue = backup.defaultValue;
     }
   }
 
@@ -258,14 +259,17 @@ export class AdminPlatformParametersTabComponent implements OnInit {
     filter.conditions.splice(0);
   }
 
-  isPlatformParamRulesChanged(param: PlatformParameter): boolean {
+  isPlatformParamChanged(param: PlatformParameter): boolean {
     const original = this.platformParameterNameToBackupMap.get(
       param.name
     );
     if (original === undefined) {
       throw new Error('Backup not found for platform params: ' + param.name);
     }
-    return !isEqual(original.rules, param.rules);
+    return (
+      !isEqual(original.rules, param.rules) ||
+      !isEqual(original.defaultValue, param.defaultValue)
+    );
   }
 
   /**

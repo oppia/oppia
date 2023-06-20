@@ -67,6 +67,7 @@ class FeatureFlagsHandlerNormalizedPayloadDict(TypedDict):
     feature_name: str
     commit_message: str
     new_rules: List[parameter_domain.PlatformParameterRule]
+    default_value: parameter_domain.PlatformDataTypes
 
 
 class FeatureFlagsHandler(

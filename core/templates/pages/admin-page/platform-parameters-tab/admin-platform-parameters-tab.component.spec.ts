@@ -343,7 +343,7 @@ describe('Admin page platform parameters tab', () => {
       flushMicrotasks();
 
       expect(updateApiSpy).toHaveBeenCalledWith(
-        platformParameter.name, 'mock msg', platformParameter.rules);
+        platformParameter.name, 'mock msg', platformParameter.rules, false);
       expect(setStatusSpy).toHaveBeenCalledWith('Saved successfully.');
     }));
 
@@ -494,12 +494,12 @@ describe('Admin page platform parameters tab', () => {
     }));
   });
 
-  describe('.isPlatformParamRulesChanged', () => {
+  describe('.isPlatformParamChanged', () => {
     it('should return false if the parameter is same as the backup instance',
       () => {
         const platformParameter = component.platformParameters[0];
 
-        expect(component.isPlatformParamRulesChanged(platformParameter))
+        expect(component.isPlatformParamChanged(platformParameter))
           .toBeFalse();
       }
     );
@@ -511,7 +511,7 @@ describe('Admin page platform parameters tab', () => {
 
         component.addNewRuleToTop(platformParameter);
 
-        expect(component.isPlatformParamRulesChanged(platformParameter))
+        expect(component.isPlatformParamChanged(platformParameter))
           .toBeTrue();
       }
     );
@@ -547,7 +547,7 @@ describe('Admin page platform parameters tab', () => {
       });
 
       expect(() => {
-        component.isPlatformParamRulesChanged(platformParameter);
+        component.isPlatformParamChanged(platformParameter);
       }).toThrowError();
     });
   });

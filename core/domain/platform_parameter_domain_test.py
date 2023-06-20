@@ -1861,7 +1861,7 @@ class PlatformParameterTests(test_utils.GenericTestBase):
         self.assertEqual(len(param.rules), 1)
         self.assertEqual(param.rules[0].to_dict(), new_rule_dict)
 
-    def test_set_rules_correctly_changes_rules(self) -> None:
+    def test_set_default_value_correctly_changes_default_value(self) -> None:
         param = parameter_domain.PlatformParameter.from_dict({
             'name': 'parameter_a',
             'description': 'for test',
