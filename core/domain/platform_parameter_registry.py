@@ -223,6 +223,7 @@ class Registry:
         cls.parameter_registry[param.name] = param
 
         model_instance.rules = [rule.to_dict() for rule in param.rules]
+        model_instance.default_value = default_value
         model_instance.commit(
             committer_id,
             commit_message,
@@ -230,7 +231,8 @@ class Registry:
                 'cmd': (
                     platform_parameter_domain
                     .PlatformParameterChange.CMD_EDIT_RULES),
-                'new_rules': new_rule_dicts
+                'new_rules': new_rule_dicts,
+                'default_value': default_value
             }]
         )
 
@@ -312,7 +314,7 @@ class Registry:
                 'data_type': param_with_init_settings.data_type,
                 'rules': parameter_model.rules,
                 'rule_schema_version': parameter_model.rule_schema_version,
-                'default_value': param_with_init_settings.default_value,
+                'default_value': parameter_model.default_value,
                 'is_feature': param_with_init_settings.is_feature,
                 'feature_stage': param_with_init_settings.feature_stage,
             })
@@ -357,6 +359,7 @@ class Registry:
             model_instance = config_models.PlatformParameterModel.create(
                 param.name,
                 [rule.to_dict() for rule in param.rules],
-                feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION
+                feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION,
+                default_value=param.default_value
             )
         return model_instance
