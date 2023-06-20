@@ -14,7 +14,10 @@
         {{ heading | wrapTextWithEllipsis : 25 }}
       </div>
     </div>
-    <button type="button" class="close oppia-close-button-position" (click)="activeModal.close()" attr.aria-label="Close">
+    <button type="button"
+            class="close oppia-close-button-position"
+            (click)="activeModal.close()"
+            aria-label="Close">
       <span aria-hidden="true">&times;</span>
     </button>
   </div>
@@ -165,7 +168,7 @@
       display: none;
     }
   .oppia-translate-text-header-container .oppia-opportunities-subheading {
-    color: #009688;
+    color: #00645d;
     display: block;
     font-size: 14px;
     height: 40%;
