@@ -254,4 +254,4 @@ export default {
       "default_value": false
     }]
   }
-};
+} as const;
