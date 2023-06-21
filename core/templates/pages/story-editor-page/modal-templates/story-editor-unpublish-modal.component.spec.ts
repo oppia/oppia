@@ -88,17 +88,26 @@ describe('Story Editor Unpublish Modal Component', () => {
     expect(component.isSerialChapterFeatureFlagEnabled()).toEqual(true);
   });
 
+  it('should check if the default reason for unpublishing is BAD_CONTENT',
+    () => {
+      expect(component.unpublishingReason).toBe('BAD_CONTENT');
+      expect(component.selectedReasonText).toBe(component.badContentReasonText);
+    });
+
   it('should set unpublishing reason', () => {
     expect(component.unpublishingReason).toBe('BAD_CONTENT');
     expect(component.selectedReasonText).toBe(component.badContentReasonText);
 
     component.setReason('CHAPTER_NEEDS_SPLITTING');
+
     expect(component.unpublishingReason).toBe('CHAPTER_NEEDS_SPLITTING');
     expect(component.selectedReasonText).toBe(
       component.splitChapterReasonText);
 
     component.setReason('BAD_CONTENT');
+
     expect(component.unpublishingReason).toBe('BAD_CONTENT');
-    expect(component.selectedReasonText).toBe(component.badContentReasonText);
+    expect(component.selectedReasonText).toBe(
+      component.badContentReasonText);
   });
 });
