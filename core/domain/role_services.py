@@ -118,6 +118,7 @@ UPDATABLE_ROLES = [
     feconf.ROLE_ID_RELEASE_COORDINATOR,
     feconf.ROLE_ID_TOPIC_MANAGER,
     feconf.ROLE_ID_TRANSLATION_ADMIN,
+    feconf.ROLE_ID_QUESTION_COORDINATOR,
 ]
 
 # Users can be viewed by following list of role IDs via admin interface.
@@ -135,6 +136,7 @@ VIEWABLE_ROLES = [
     feconf.ROLE_ID_TOPIC_MANAGER,
     feconf.ROLE_ID_TRANSLATION_ADMIN,
     feconf.ROLE_ID_VOICEOVER_ADMIN,
+    feconf.ROLE_ID_QUESTION_COORDINATOR,
 ]
 
 # The string corresponding to role IDs that should be visible to admin.
@@ -152,6 +154,7 @@ HUMAN_READABLE_ROLES = {
     feconf.ROLE_ID_TOPIC_MANAGER: 'topic manager',
     feconf.ROLE_ID_TRANSLATION_ADMIN: 'translation admin',
     feconf.ROLE_ID_VOICEOVER_ADMIN: 'voiceover admin',
+    feconf.ROLE_ID_QUESTION_COORDINATOR: 'question coordinator'
 }
 
 
@@ -256,6 +259,10 @@ _ROLE_ACTIONS = {
     ],
     feconf.ROLE_ID_BLOG_POST_EDITOR: [
         ACTION_ACCESS_BLOG_DASHBOARD
+    ],
+    feconf.ROLE_ID_QUESTION_COORDINATOR: [
+        ACTION_ACCESS_CONTRIBUTOR_DASHBOARD_ADMIN_PAGE,
+        ACTION_MANAGE_QUESTION_CONTRIBUTOR_ROLES
     ]
 }
 
