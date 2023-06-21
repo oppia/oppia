@@ -102,9 +102,6 @@
       <ng-container *ngIf="opportunity.translationWordCount < 20">
           short
       </ng-container>
-      <ng-container *ngIf="opportunity.translationWordCount >= 20">
-          long
-      </ng-container>
     </div>
   </div>
 </ng-template>
@@ -304,12 +301,11 @@
   .oppia-translation-length-label {
     align-items: center;
     border: 2px solid;
-    border-color: #4e89b1;
-    border-radius: 8px;
-    color: #4e89b1;
+    background-color: #4e89b1;
+    color: #ffffff;
     display: flex;
-    font-size: 18px;
-    height: 35px;
+    font-size: 12px;
+    height: 26px;
     justify-content: center;
     margin: 18px;
     padding: 3px;
