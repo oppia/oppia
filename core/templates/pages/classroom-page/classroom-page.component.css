@@ -58,6 +58,10 @@
   font-size: 1.2em;
 }
 
+.classroom-name {
+  color: #01645c;
+}
+
 .oppia-classroom-viewer-container .oppia-classroom-header {
   color: #01645c;
   font-family: 'Capriola', 'Roboto', Arial, sans-serif;
