@@ -191,43 +191,43 @@ describe('TopNavigationBarComponent', () => {
       ['default-image-url-png', 'default-image-url-webp']);
   });
 
-  it('should set the number of unread threads when fetch' +
-  'feedback updates data resolve', fakeAsync(() => {
-    const fetchDataSpy = spyOn(
-      feedbackUpdatesBackendApiService,
-      'fetchFeedbackUpdatesDataAsync').and.returnValue(Promise.resolve({
-      numberOfUnreadThreads: FeedbackUpdatesData.
-        number_of_unread_threads
-    }));
+  // It('should set the number of unread threads when fetch' +
+  // 'feedback updates data resolve', fakeAsync(() => {
+  //   const fetchDataSpy = spyOn(
+  //     feedbackUpdatesBackendApiService,
+  //     'fetchFeedbackUpdatesDataAsync').and.returnValue(Promise.resolve({
+  //     numberOfUnreadThreads: FeedbackUpdatesData.
+  //       number_of_unread_threads
+  //   }));
 
-    component.userIsLoggedIn = true;
-    component.showNumberOfUnreadfeedback();
+  //   component.userIsLoggedIn = true;
+  //   component.showNumberOfUnreadfeedback();
 
-    tick();
-    expect(component.unreadThreadsCount).toBe(10);
-    expect(fetchDataSpy).toHaveBeenCalled();
-  }));
+  //   tick();
+  //   expect(component.unreadThreadsCount).toBe(10);
+  //   expect(fetchDataSpy).toHaveBeenCalled();
+  // }));
 
-  it('should show an alert warning when fails to get feedback updates data',
-    fakeAsync(() => {
-      const fetchDataSpy = spyOn(
-        feedbackUpdatesBackendApiService,
-        'fetchFeedbackUpdatesDataAsync')
-        .and.rejectWith(404);
-      const alertsSpy = spyOn(alertsService, 'addWarning').and.callThrough();
+  // it('should show an alert warning when fails to get feedback updates data',
+  //   fakeAsync(() => {
+  //     const fetchDataSpy = spyOn(
+  //       feedbackUpdatesBackendApiService,
+  //       'fetchFeedbackUpdatesDataAsync')
+  //       .and.rejectWith(404);
+  //     const alertsSpy = spyOn(alertsService, 'addWarning').and.callThrough();
 
-      component.userIsLoggedIn = true;
+  //     component.userIsLoggedIn = true;
 
-      component.showNumberOfUnreadfeedback();
+  //     component.showNumberOfUnreadfeedback();
 
-      tick(1010);
-      fixture.detectChanges();
+  //     tick(1010);
+  //     fixture.detectChanges();
 
-      expect(alertsSpy).toHaveBeenCalledWith(
-        'Failed to get number of unread thread of feedback updates');
-      expect(fetchDataSpy).toHaveBeenCalled();
-      tick(1010);
-    }));
+  //     expect(alertsSpy).toHaveBeenCalledWith(
+  //       'Failed to get number of unread thread of feedback updates');
+  //     expect(fetchDataSpy).toHaveBeenCalled();
+  //     tick(1010);
+  //   }));
 
   it('should truncate navbar after search bar is loaded', fakeAsync(() => {
     spyOn(component, 'truncateNavbar').and.stub();
@@ -608,6 +608,90 @@ describe('TopNavigationBarComponent', () => {
         urlInterpolationService.getStaticImageUrl(
           AppConstants.DEFAULT_PROFILE_IMAGE_WEBP_PATH));
     }));
+
+  it('should fetch the number of unread feedback' +
+  'when user is logged In', fakeAsync(() => {
+    let userInfo = new UserInfo(
+      ['USER_ROLE'], true, false, false, false, true,
+      'en', 'username1', 'tester@example.com', true
+    );
+
+    spyOn(component, 'truncateNavbar').and.stub();
+    spyOn(userService, 'getUserInfoAsync').and.resolveTo(userInfo);
+    const fetchDataSpy = spyOn(
+      feedbackUpdatesBackendApiService,
+      'fetchFeedbackUpdatesDataAsync').and.returnValue(Promise.resolve({
+      numberOfUnreadThreads: FeedbackUpdatesData.
+        number_of_unread_threads
+    }));
+
+    component.userIsLoggedIn = true;
+    tick();
+
+    expect(component.unreadThreadsCount).toBe(10);
+    expect(fetchDataSpy).toHaveBeenCalled();
+  }));
+
+  it('should show an alert when fails to' +
+  'get the feedback updates data', fakeAsync(() => {
+    let userInfo = new UserInfo(
+      ['USER_ROLE'], true, false, false, false, true,
+      'en', 'username1', 'tester@example.com', true
+    );
+
+    spyOn(component, 'truncateNavbar').and.stub();
+    spyOn(userService, 'getUserInfoAsync').and.resolveTo(userInfo);
+    const fetchDataSpy = spyOn(
+      feedbackUpdatesBackendApiService,
+      'fetchFeedbackUpdatesDataAsync')
+      .and.rejectWith(404);
+    const alertsSpy = spyOn(alertsService, 'addWarning').and.callThrough();
+
+    component.userIsLoggedIn = true;
+    tick();
+
+    expect(alertsSpy).toHaveBeenCalledWith(
+      'Failed to get number of unread thread of feedback updates');
+    expect(fetchDataSpy).toHaveBeenCalled();
+  }));
+
+  // It('should set the number of unread threads when fetch' +
+  // 'feedback updates data resolve', fakeAsync(() => {
+  //   const fetchDataSpy = spyOn(
+  //     feedbackUpdatesBackendApiService,
+  //     'fetchFeedbackUpdatesDataAsync').and.returnValue(Promise.resolve({
+  //     numberOfUnreadThreads: FeedbackUpdatesData.
+  //       number_of_unread_threads
+  //   }));
+
+  //   component.userIsLoggedIn = true;
+  //   component.showNumberOfUnreadfeedback();
+
+  //   tick();
+  //   expect(component.unreadThreadsCount).toBe(10);
+  //   expect(fetchDataSpy).toHaveBeenCalled();
+  // }));
+
+  // it('should show an alert warning when fails to get feedback updates data',
+  //   fakeAsync(() => {
+  //     const fetchDataSpy = spyOn(
+  //       feedbackUpdatesBackendApiService,
+  //       'fetchFeedbackUpdatesDataAsync')
+  //       .and.rejectWith(404);
+  //     const alertsSpy = spyOn(alertsService, 'addWarning').and.callThrough();
+
+  //     component.userIsLoggedIn = true;
+
+  //     component.showNumberOfUnreadfeedback();
+
+  //     tick(1010);
+  //     fixture.detectChanges();
+
+  //     expect(alertsSpy).toHaveBeenCalledWith(
+  //       'Failed to get number of unread thread of feedback updates');
+  //     expect(fetchDataSpy).toHaveBeenCalled();
+  //     tick(1010);
+  //   }));
 
   it('should return proper offset for dropdown', ()=>{
     var dummyElement = document.createElement('div');

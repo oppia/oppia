@@ -273,6 +273,26 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
       this.isBlogPostEditor = userInfo.isBlogPostEditor();
       this.userIsLoggedIn = userInfo.isLoggedIn();
       let usernameFromUserInfo = userInfo.getUsername();
+      if (this.userIsLoggedIn) {
+        console.error("har har mahadev");
+        let feedbackUpdatesDataPromise = (
+          this.feedbackUpdatesBackendApiService
+            .fetchFeedbackUpdatesDataAsync(
+              this.paginatedThreadsList));
+        feedbackUpdatesDataPromise.then(
+          responseData => {
+            this.unreadThreadsCount =
+              responseData.numberOfUnreadThreads;
+          }, errorResponseStatus => {
+            if (
+              AppConstants.FATAL_ERROR_CODES.
+                indexOf(errorResponseStatus) !== -1) {
+              this.alertsService.addWarning(
+                'Failed to get number of unread thread of feedback updates');
+            }
+          }
+        );
+      }
       if (usernameFromUserInfo) {
         this.username = usernameFromUserInfo;
         this.profilePageUrl = this.urlInterpolationService.interpolateUrl(
@@ -357,12 +377,14 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
     }, 0);
   }
 
-  ngAfterViewInit(): void {
-    // Wait for userIsLoggedIn = true.
-    setTimeout(() => {
-      this.showNumberOfUnreadfeedback();
-    }, 1010);
-  }
+  // NgAfterViewInit(): void {
+  //   // Wait for userIsLoggedIn = true.
+  //   console.error(this.userIsLoggedIn, 'user log.....');
+
+  //   setTimeout(() => {
+  //     this.showNumberOfUnreadfeedback();
+  //   }, 1010);
+  // }
 
   ngAfterViewChecked(): void {
     this.getInvolvedMenuOffset = this
@@ -402,27 +424,27 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
     }
   }
 
-  showNumberOfUnreadfeedback(): void {
-    if (this.userIsLoggedIn) {
-      let feedbackUpdatesDataPromise = (
-        this.feedbackUpdatesBackendApiService
-          .fetchFeedbackUpdatesDataAsync(
-            this.paginatedThreadsList));
-      feedbackUpdatesDataPromise.then(
-        responseData => {
-          this.unreadThreadsCount =
-            responseData.numberOfUnreadThreads;
-        }, errorResponseStatus => {
-          if (
-            AppConstants.FATAL_ERROR_CODES.
-              indexOf(errorResponseStatus) !== -1) {
-            this.alertsService.addWarning(
-              'Failed to get number of unread thread of feedback updates');
-          }
-        }
-      );
-    }
-  }
+  // ShowNumberOfUnreadfeedback(): void {
+  //   if (this.userIsLoggedIn) {
+  //     let feedbackUpdatesDataPromise = (
+  //       this.feedbackUpdatesBackendApiService
+  //         .fetchFeedbackUpdatesDataAsync(
+  //           this.paginatedThreadsList));
+  //     feedbackUpdatesDataPromise.then(
+  //       responseData => {
+  //         this.unreadThreadsCount =
+  //           responseData.numberOfUnreadThreads;
+  //       }, errorResponseStatus => {
+  //         if (
+  //           AppConstants.FATAL_ERROR_CODES.
+  //             indexOf(errorResponseStatus) !== -1) {
+  //           this.alertsService.addWarning(
+  //             'Failed to get number of unread thread of feedback updates');
+  //         }
+  //       }
+  //     );
+  //   }
+  // }
 
   changeLanguage(languageCode: string): void {
     this.i18nService.updateUserPreferredLanguage(languageCode);
