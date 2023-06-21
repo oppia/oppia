@@ -28,11 +28,11 @@ import subprocess
 import sys
 import threading
 
-from core import utils
+from core import feconf, utils
 from scripts import common
-# from scripts import install_python_dev_dependencies
-# from scripts import install_third_party_libs
-# from scripts import servers
+from scripts import install_python_dev_dependencies
+from scripts import install_third_party_libs
+from scripts import servers
 
 import rcssmin
 from typing import (
@@ -186,31 +186,31 @@ class DependencyBundleDict(TypedDict):
     fontsPath: str
 
 
-# def run_webpack_compilation(source_maps: bool = False) -> None:
-#     """Runs webpack compilation.
+def run_webpack_compilation(source_maps: bool = False) -> None:
+    """Runs webpack compilation.
 
-#     Args:
-#         source_maps: bool. Whether to compile with source maps.
-#     """
-#     max_tries = 5
-#     webpack_bundles_dir_name = 'webpack_bundles'
+    Args:
+        source_maps: bool. Whether to compile with source maps.
+    """
+    max_tries = 5
+    webpack_bundles_dir_name = 'webpack_bundles'
 
-#     for _ in range(max_tries):
-#         try:
-#             managed_webpack_compiler = (
-#                 servers.managed_webpack_compiler(use_source_maps=source_maps))
-#             with managed_webpack_compiler as proc:
-#                 proc.wait()
-#         except subprocess.CalledProcessError as error:
-#             print(error.output)
-#             sys.exit(error.returncode)
-#             return
-#         if os.path.isdir(webpack_bundles_dir_name):
-#             break
-#     else:
-#         # We didn't break out of the loop, meaning all attempts have failed.
-#         print('Failed to complete webpack compilation, exiting...')
-#         sys.exit(1)
+    for _ in range(max_tries):
+        try:
+            managed_webpack_compiler = (
+                servers.managed_webpack_compiler(use_source_maps=source_maps))
+            with managed_webpack_compiler as proc:
+                proc.wait()
+        except subprocess.CalledProcessError as error:
+            print(error.output)
+            sys.exit(error.returncode)
+            return
+        if os.path.isdir(webpack_bundles_dir_name):
+            break
+    else:
+        # We didn't break out of the loop, meaning all attempts have failed.
+        print('Failed to complete webpack compilation, exiting...')
+        sys.exit(1)
 
 
 def build_js_files(dev_mode: bool, source_maps: bool = False) -> None:
@@ -233,7 +233,8 @@ def build_js_files(dev_mode: bool, source_maps: bool = False) -> None:
     else:
         main(args=[])
         common.run_ng_compilation()
-        # run_webpack_compilation(source_maps=source_maps)
+        if not feconf.OPPIA_IS_DOCKERIZED:
+            run_webpack_compilation(source_maps=source_maps)
 
 
 def generate_app_yaml(deploy_mode: bool = False) -> None:
@@ -324,10 +325,10 @@ def _minify_and_create_sourcemap(
     """
     print('Minifying and creating sourcemap for %s' % source_path)
     source_map_properties = 'includeSources,url=\'third_party.min.js.map\''
-    # cmd = '%s %s %s -c -m --source-map %s -o %s ' % (
-    #     common.NODE_BIN_PATH, UGLIFY_FILE, source_path,
-    #     source_map_properties, target_file_path)
-    cmd = ['bash', '-c', 'node /app/oppia/node_modules/uglify-js/bin/uglifyjs /app/oppia/third_party/generated/js/third_party.js -c -m --source-map %s -o /app/op0pia/third_party/generated/js/third_party.min.js' % (source_map_properties)]
+    # TODO: (#18260) Chnage this when we permanently move to the Dockerized Setup.
+    cmd = '%s %s %s -c -m --source-map %s -o %s ' % (
+        common.NODE_BIN_PATH, UGLIFY_FILE, source_path,
+        source_map_properties, target_file_path) if not feconf.OPPIA_IS_DOCKERIZED else ['bash', '-c', 'node /app/oppia/node_modules/uglify-js/bin/uglifyjs /app/oppia/third_party/generated/js/third_party.js -c -m --source-map %s -o /app/op0pia/third_party/generated/js/third_party.min.js' % (source_map_properties)]
     subprocess.check_call(cmd, shell=True)
 
 
@@ -672,38 +673,38 @@ def build_third_party_libs(third_party_directory_path: str) -> None:
             dependency_filepaths['fonts'], webfonts_dir))
 
 
-# def build_using_ng() -> None:
-#     """Execute angular build process. This runs the angular compiler and
-#     generates an ahead of time compiled bundle. This bundle can be found in the
-#     dist/oppia-angular-prod folder.
-#     """
-#     print('Building using angular cli')
-#     managed_ng_build_process = servers.managed_ng_build(
-#         use_prod_env=True, watch_mode=False)
-#     with managed_ng_build_process as p:
-#         p.wait()
-#     assert get_file_count('dist/oppia-angular-prod') > 0, (
-#         'angular generated bundle should be non-empty')
+def build_using_ng() -> None:
+    """Execute angular build process. This runs the angular compiler and
+    generates an ahead of time compiled bundle. This bundle can be found in the
+    dist/oppia-angular-prod folder.
+    """
+    print('Building using angular cli')
+    managed_ng_build_process = servers.managed_ng_build(
+        use_prod_env=True, watch_mode=False)
+    with managed_ng_build_process as p:
+        p.wait()
+    assert get_file_count('dist/oppia-angular-prod') > 0, (
+        'angular generated bundle should be non-empty')
 
 
-# def build_using_webpack(config_path: str) -> None:
-#     """Execute webpack build process. This takes all TypeScript files we have in
-#     /templates and generates JS bundles according the require() imports
-#     and also compiles HTML pages into the /backend_prod_files/webpack_bundles
-#     folder. The files are later copied into /build/webpack_bundles.
+def build_using_webpack(config_path: str) -> None:
+    """Execute webpack build process. This takes all TypeScript files we have in
+    /templates and generates JS bundles according the require() imports
+    and also compiles HTML pages into the /backend_prod_files/webpack_bundles
+    folder. The files are later copied into /build/webpack_bundles.
 
-#     Args:
-#         config_path: str. Webpack config to be used for building.
-#     """
+    Args:
+        config_path: str. Webpack config to be used for building.
+    """
 
-#     print('Building webpack')
-#     managed_webpack_compiler = servers.managed_webpack_compiler(
-#         config_path=config_path,
-#         max_old_space_size=MAX_OLD_SPACE_SIZE_FOR_WEBPACK_BUILD)
-#     with managed_webpack_compiler as p:
-#         p.wait()
-#     assert get_file_count('backend_prod_files/webpack_bundles/') > 0, (
-#         'webpack_bundles should be non-empty.')
+    print('Building webpack')
+    managed_webpack_compiler = servers.managed_webpack_compiler(
+        config_path=config_path,
+        max_old_space_size=MAX_OLD_SPACE_SIZE_FOR_WEBPACK_BUILD)
+    with managed_webpack_compiler as p:
+        p.wait()
+    assert get_file_count('backend_prod_files/webpack_bundles/') > 0, (
+        'webpack_bundles should be non-empty.')
 
 
 def hash_should_be_inserted(filepath: str) -> bool:
@@ -1268,17 +1269,10 @@ def _verify_hashes(
 
     # The path in hashes.json (generated via file_hashes) file is in posix
     # style, see the comment above HASHES_JSON_FILENAME for details.
-    # third_party_js_final_filename = _insert_hash(
-    #     '/app/oppia/third_party/generated/js/third_party.min.js',
-    #     file_hashes[
-    #         '/app/oppia/third_party/generated/js/third_party.min.js'])
     third_party_js_final_filename = _insert_hash(
         MINIFIED_THIRD_PARTY_JS_RELATIVE_FILEPATH,
-        file_hashes[MINIFIED_THIRD_PARTY_JS_RELATIVE_FILEPATH])
-    # third_party_js_final_filename = _insert_hash(
-    #     MINIFIED_THIRD_PARTY_JS_RELATIVE_FILEPATH,
-    #     file_hashes[common.convert_to_posixpath(
-    #         MINIFIED_THIRD_PARTY_JS_RELATIVE_FILEPATH)])
+        file_hashes[common.convert_to_posixpath(
+            MINIFIED_THIRD_PARTY_JS_RELATIVE_FILEPATH)])
 
     # The path in hashes.json (generated via file_hashes) file is in posix
     # style, see the comment above HASHES_JSON_FILENAME for details.
@@ -1310,8 +1304,6 @@ def generate_hashes() -> Dict[str, str]:
         THIRD_PARTY_GENERATED_DEV_DIR]
     for hash_dir in hash_dirs:
         hashes.update(get_file_hashes(hash_dir))
-    # tried fixing the error that I am getting by adding the prod_env flag in docker setup.
-    # hashes.update(get_file_hashes(MINIFIED_THIRD_PARTY_JS_RELATIVE_FILEPATH))
 
     # Save hashes as JSON and write the JSON into JS file
     # to make the hashes available to the frontend.
@@ -1390,22 +1382,22 @@ def generate_build_directory(hashes: Dict[str, str]) -> None:
     print('Build completed.')
 
 
-# def generate_python_package() -> None:
-#     """Generates Python package using setup.py."""
+def generate_python_package() -> None:
+    """Generates Python package using setup.py."""
 
-#     # We first remove this dev dependencies because they should not be needed
-#     # for the package build and we need to verify that they are actually not
-#     # needed.
-#     try:
-#         print('Remove dev dependencies')
-#         install_python_dev_dependencies.main(['--uninstall'])
+    # We first remove this dev dependencies because they should not be needed
+    # for the package build and we need to verify that they are actually not
+    # needed.
+    try:
+        print('Remove dev dependencies')
+        install_python_dev_dependencies.main(['--uninstall'])
 
-#         print('Building Oppia package...')
-#         subprocess.check_call('python setup.py -q sdist -d build', shell=True)
-#         print('Oppia package build completed.')
-#     finally:
-#         install_third_party_libs.main()
-#         print('Dev dependencies reinstalled')
+        print('Building Oppia package...')
+        subprocess.check_call('python setup.py -q sdist -d build', shell=True)
+        print('Oppia package build completed.')
+    finally:
+        install_third_party_libs.main()
+        print('Dev dependencies reinstalled')
 
 
 def clean() -> None:
@@ -1448,12 +1440,13 @@ def main(args: Optional[Sequence[str]] = None) -> None:
     if options.prod_env:
         minify_third_party_libs(THIRD_PARTY_GENERATED_DEV_DIR)
         hashes = generate_hashes()
-        # generate_python_package()
-        # if options.source_maps:
-            # build_using_webpack(WEBPACK_PROD_SOURCE_MAPS_CONFIG)
-        # else:
-            # build_using_webpack(WEBPACK_PROD_CONFIG)
-        # build_using_ng()
+        if not feconf.OPPIA_IS_DOCKERIZED:
+            generate_python_package()
+            if options.source_maps:
+                build_using_webpack(WEBPACK_PROD_SOURCE_MAPS_CONFIG)
+            else:
+                build_using_webpack(WEBPACK_PROD_CONFIG)
+            build_using_ng()
         generate_app_yaml(
             deploy_mode=options.deploy_mode)
         generate_build_directory(hashes)

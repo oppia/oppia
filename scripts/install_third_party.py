@@ -457,12 +457,14 @@ def install_redis_cli() -> None:
     users to communicate with any Redis cache using Python. The redis-cli-6.0.6
     package installed in this function contains C++ scripts for the redis-cli
     and redis-server programs detailed below.
+
     The redis-cli program is the command line interface that serves up an
     interpreter that allows users to connect to a redis database cache and
     query the cache using the Redis CLI API. It also contains functionality to
     shutdown the redis server. We need to install redis-cli separately from the
     default installation of backend libraries since it is a system program and
     we need to build the program files after the library is untarred.
+
     The redis-server starts a Redis database on the local machine that can be
     queried using either the Python redis library or the redis-cli interpreter.
     """
