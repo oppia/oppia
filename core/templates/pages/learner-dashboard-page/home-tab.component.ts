@@ -29,6 +29,7 @@ import './home-tab.component.css';
 import { StorySummary } from 'domain/story/story-summary.model';
 import { LearnerExplorationSummary } from 'domain/summary/learner-exploration-summary.model';
 import { CollectionSummary } from 'domain/collection/collection-summary.model';
+import { LearnerDashboardActivityBackendApiService } from 'domain/learner_dashboard/learner-dashboard-activity-backend-api.service';
 
 interface storySummaryTile {
   topicName: string;
@@ -61,6 +62,7 @@ export class HomeTabComponent {
   startIndexInPlaylist: number = 0;
   endIndexInPlaylist: number = 3;
   noPlaylistActivity: boolean = false;
+  showMoreInPlaylistSection: boolean = false;
   CLASSROOM_LINK_URL_TEMPLATE: string = '/learn/<classroom_url_fragment>';
   nextIncompleteNodeTitles: string[] = [];
   widthConst: number = 233;
@@ -78,6 +80,8 @@ export class HomeTabComponent {
 
   constructor(
     private i18nLanguageCodeService: I18nLanguageCodeService,
+    private learnerDashboardActivityBackendApiService:
+    LearnerDashboardActivityBackendApiService,
     private windowDimensionService: WindowDimensionsService,
     private urlInterpolationService: UrlInterpolationService,
   ) {}
@@ -150,6 +154,13 @@ export class HomeTabComponent {
       }));
   }
 
+  getTileType(tile: LearnerExplorationSummary | CollectionSummary): string {
+    if (tile instanceof LearnerExplorationSummary) {
+      return 'exploration';
+    }
+    return 'collection';
+  }
+
   getTimeOfDay(): string {
     let time = new Date().getHours();
 
@@ -198,6 +209,44 @@ export class HomeTabComponent {
      * enable scrolling.
     */
     return (length + 1) * 164;
+  }
+
+  openRemoveActivityModal(
+      sectionNameI18nId: string, subsectionName: string,
+      activity: LearnerExplorationSummary | CollectionSummary): void {
+    this.learnerDashboardActivityBackendApiService.removeActivityModalAsync(
+      sectionNameI18nId, subsectionName,
+      activity.id, activity.title)
+      .then(() => {
+        if (sectionNameI18nId ===
+        LearnerDashboardPageConstants
+          .LEARNER_DASHBOARD_SECTION_I18N_IDS.PLAYLIST) {
+          if (subsectionName ===
+          LearnerDashboardPageConstants
+            .LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.EXPLORATIONS) {
+            let index = this.totalLessonsInPlaylist.findIndex(
+              exp => exp.id === activity.id);
+            if (index !== -1) {
+              this.totalLessonsInPlaylist.splice(index, 1);
+            }
+          } else if (subsectionName ===
+          LearnerDashboardPageConstants
+            .LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.COLLECTIONS) {
+            let index = this.totalLessonsInPlaylist.findIndex(
+              collection => collection.id === activity.id);
+            if (index !== -1) {
+              this.totalLessonsInPlaylist.splice(index, 1);
+            }
+          } if (this.showMoreInPlaylistSection === true) {
+            this.displayLessonsInPlaylist = this.totalLessonsInPlaylist;
+          } else if (this.showMoreInPlaylistSection === false) {
+            this.displayLessonsInPlaylist = (
+              this.totalLessonsInPlaylist.slice(0, 3));
+          }
+        }
+        this.noPlaylistActivity = (
+          (this.totalLessonsInPlaylist.length === 0));
+      });
   }
 
   changeActiveSection(): void {

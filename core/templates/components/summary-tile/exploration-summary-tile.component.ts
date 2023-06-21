@@ -55,6 +55,7 @@ export class ExplorationSummaryTileComponent implements OnInit, OnDestroy {
   @Input() contributorsSummary!: HumanReadableContributorsSummary;
   @Input() thumbnailIconUrl!: string;
   @Input() thumbnailBgColor!: string;
+  @Input() displayAreaIsLearnerDashboard: boolean = false;
   // If this is not null, the new exploration opens in a new window when
   // the summary tile is clicked.
   @Input() openInNewWindow!: string;

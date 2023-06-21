@@ -104,6 +104,36 @@
   padding-right: 30px;
   width: 228px;
 }
+.home-tab .playlist-section {
+  background-color: #fff;
+  border-radius: 4px;
+  box-shadow: 0 0 4px #0000001a;
+  margin-bottom: 25px;
+  min-height: 215px;
+  opacity: 1;
+  padding: 0 0 30px 0;
+  width: auto;
+}
+.home-tab .playlist-section .summary-container {
+  margin: auto;
+  width: auto;
+}
+.home-tab .playlist-section .oppia-summary-tile-container {
+  display: inline-block;
+  padding: 0 10px 30px 0;
+}
+.home-tab .playlist-section .remove-icon {
+  color: white;
+  float: right;
+  font-size: 20px;
+  left: -7px;
+  margin-left: -26px;
+  margin-top: 10px;
+  position: relative;
+  width: 18px;
+  z-index: 20;
+}
+
 @media screen and (max-width: 1200px) {
   .home-tab .greeting {
     margin-left: 0;

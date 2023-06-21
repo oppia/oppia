@@ -205,6 +205,49 @@ export class NewLearnerDashboardComponent {
       }
     );
 
+    let dashboardCollectionsDataPromise = (
+      this.learnerDashboardBackendApiService
+        .fetchLearnerDashboardCollectionsDataAsync());
+    dashboardCollectionsDataPromise.then(
+      responseData => {
+        this.completedCollectionsList = (
+          responseData.completedCollectionsList);
+        this.incompleteCollectionsList = (
+          responseData.incompleteCollectionsList);
+        this.completedToIncompleteCollections = (
+          responseData.completedToIncompleteCollections);
+        this.collectionPlaylist = responseData.collectionPlaylist;
+      }, errorResponseStatus => {
+        if (
+          AppConstants.FATAL_ERROR_CODES.indexOf(errorResponseStatus
+          ) !== -1) {
+          this.alertsService.addWarning(
+            'Failed to get learner dashboard collections data');
+        }
+      }
+    );
+
+    let dashboardExplorationsDataPromise = (
+      this.learnerDashboardBackendApiService
+        .fetchLearnerDashboardExplorationsDataAsync());
+    dashboardExplorationsDataPromise.then(
+      responseData => {
+        this.completedExplorationsList = (
+          responseData.completedExplorationsList);
+        this.incompleteExplorationsList = (
+          responseData.incompleteExplorationsList);
+        this.subscriptionsList = responseData.subscriptionList;
+        this.explorationPlaylist = responseData.explorationPlaylist;
+      }, errorResponseStatus => {
+        if (
+          AppConstants.FATAL_ERROR_CODES.indexOf(errorResponseStatus
+          ) !== -1) {
+          this.alertsService.addWarning(
+            'Failed to get learner dashboard explorations data');
+        }
+      }
+    );
+
     let learnerGroupFeatureIsEnabledPromise = (
       this.learnerGroupBackendApiService.isLearnerGroupFeatureEnabledAsync()
     );
@@ -217,7 +260,9 @@ export class NewLearnerDashboardComponent {
     Promise.all([
       userInfoPromise,
       dashboardTopicAndStoriesDataPromise,
-      learnerGroupFeatureIsEnabledPromise
+      learnerGroupFeatureIsEnabledPromise,
+      dashboardExplorationsDataPromise,
+      dashboardCollectionsDataPromise
     ]).then(() => {
       setTimeout(() => {
         this.loaderService.hideLoadingScreen();

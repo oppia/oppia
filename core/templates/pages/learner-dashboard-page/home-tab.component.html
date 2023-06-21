@@ -80,9 +80,9 @@
       </p>
     </div>
   </div>
- <!-- <div *ngIf="totalLessonsInPlaylist.length !== 0">
+ <div class="playlist-section" *ngIf="totalLessonsInPlaylist.length !== 0">
     <div class="summary-container">
-      <div *ngFor="let summaryTile of displayLessonsInPlaylist.slice(startIndexInPlaylist, endIndexInPlaylist)"
+      <div *ngFor="let summaryTile of displayLessonsInPlaylist"
            class="oppia-summary-tile-container"
            (mouseenter)="summaryTile.toggle = !summaryTile.toggle"
            (mouseleave)="summaryTile.toggle = !summaryTile.toggle">
@@ -127,4 +127,5 @@
         </div>
       </div>
   </div>
-</div> -->
+</div>
+</div>

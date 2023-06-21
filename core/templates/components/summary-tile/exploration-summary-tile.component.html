@@ -1,4 +1,4 @@
-<div *ngIf="false">
+<div *ngIf="!displayAreaIsLearnerDashboard">
 <div *ngIf="!mobileCardToBeShown">
   <oppia-learner-dashboard-icons *ngIf="showLearnerDashboardIconsIfPossible && userIsLoggedIn"
                                 [activityType]="activityType"
@@ -134,9 +134,7 @@
 </div>
 </div>
 
-<!-- alag -->
-<!-- <div class="learner-story-summary-tile"> -->
-  <div *ngIf="true">
+  <div *ngIf="displayAreaIsLearnerDashboard">
   <mat-card class="oppia-exploration-dashboard-card" [attr.style]="isButtonHovered()">
       <div>
       <div class="exploration-card">
@@ -148,7 +146,6 @@
             {{explorationTitle}}
           </span>
           <span class="oppia-library-title e2e-test-topic-name-in-learner-story-summary-tile">
-            <!-- {{topicName}} -->
             Community Lesson
           </span>
           <span class="oppia-exploration-objective-title e2e-test-story-name-in-learner-story-summary-tile">
@@ -190,6 +187,5 @@
 
       </div>
     </div>
-    <!-- </a> -->
   </mat-card>
 </div>
