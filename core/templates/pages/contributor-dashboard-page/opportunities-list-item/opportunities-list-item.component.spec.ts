@@ -224,16 +224,18 @@ describe('Opportunities List Item Component', () => {
       fixture.detectChanges();
       component.ngOnInit();
     });
-    it('should show translation length label for reviewable translation cards', () => {
-      const bannerElement: HTMLElement= fixture.nativeElement;
-      const translationLengthLabelContainer = bannerElement.querySelector('.oppia-translation-label-container');
+    it('should show translation length label for reviewable translation' +
+      'cards', () => {
+      const bannerElement: HTMLElement = fixture.nativeElement;
+      const translationLengthLabelContainer = bannerElement.querySelector(
+        '.oppia-translation-label-container');
       expect(translationLengthLabelContainer).toBeTruthy();
 
-      const translationLengthLabel = bannerElement.querySelector('.oppia-translation-length-label');
+      const translationLengthLabel = bannerElement.querySelector(
+        '.oppia-translation-length-label');
       expect(translationLengthLabel).toBeTruthy();
 
-      const ngbTooltip = translationLengthLabel.getAttribute('ngbTooltip');
-      expect(ngbTooltip).toContain(`Word Count : ${component.opportunity.translationWordCount}`);
+      expect(translationLengthLabel.textContent).toBe('short')
     });
   });
 });
