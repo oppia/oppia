@@ -45,9 +45,6 @@ class PopulateStoryNodeJobTests(job_test_utils.JobTestBase):
         story_node_jobs.PopulateStoryNodeJob
     ] = story_node_jobs.PopulateStoryNodeJob
 
-    def test_empty_storage(self) -> None:
-        self.assert_job_output_is_empty()
-
     STORY_1_ID: Final = 'story_1_id'
     STORY_2_ID: Final = 'story_2_id'
     TOPIC_1_ID: Final = 'topic_1_id'
@@ -108,6 +105,9 @@ class PopulateStoryNodeJobTests(job_test_utils.JobTestBase):
     STORY_1_SHAPSHOT_1_DATE: Final = datetime.datetime(2023, 6, 13, 1, 0, 0, 0)
     STORY_1_SHAPSHOT_2_DATE: Final = datetime.datetime(2023, 6, 13, 2, 0, 0, 0)
     STORY_2_SHAPSHOT_1_DATE: Final = datetime.datetime(2023, 6, 13, 2, 0, 0, 0)
+
+    def test_empty_storage(self) -> None:
+        self.assert_job_output_is_empty()
 
     def test_story_nodes_are_populated(self) -> None:
         story_model_1 = self.create_model(
@@ -272,15 +272,82 @@ class PopulateStoryNodeJobTests(job_test_utils.JobTestBase):
         self.assertEqual(story_2_nodes[0]['last_modified_msecs'], (
             utils.get_time_in_millisecs(self.STORY_2_SHAPSHOT_1_DATE)))
 
+    def test_broken_story_is_not_populated(self) -> None:
+        story_model_1 = self.create_model(
+            story_models.StoryModel,
+            id=self.STORY_1_ID,
+            story_contents_schema_version=4,
+            title='title_1',
+            language_code='en',
+            notes='notes_1',
+            description='description_1',
+            story_contents=self.story_contents_dict_1,
+            corresponding_topic_id=self.TOPIC_1_ID,
+            url_fragment='urlfragment-1',
+            version=2
+        )
+        topic_model = self.create_model(
+            topic_models.TopicModel,
+            id=self.TOPIC_1_ID,
+            name='topic summary',
+            canonical_name='topic summary',
+            language_code='en',
+            description='description',
+            url_fragment='/fragm',
+            canonical_story_references=[{
+                'story_id': self.STORY_1_ID,
+                'story_is_published': True
+            }],
+            next_subtopic_id=1,
+            page_title_fragment_for_web='fragm',
+            story_reference_schema_version=1,
+            subtopic_schema_version=feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION,
+            version=1
+        )
+        story_snapshot_metadata_model = self.create_model(
+            story_models.StorySnapshotMetadataModel,
+            id=self.STORY_1_ID + '-1',
+            commit_cmds=[{
+                'cmd': 'add_story_node',
+                'node_id': 'node_1'
+            }],
+            commit_type=feconf.COMMIT_TYPE_CREATE,
+            committer_id='user_1',
+            created_on=self.STORY_1_SHAPSHOT_1_DATE
+        )
+        topic_snapshot_metadata_model = self.create_model(
+            topic_models.TopicSnapshotMetadataModel,
+            id=self.TOPIC_1_ID + '-1',
+            commit_cmds=[{
+                'cmd': 'add_canonical_story',
+                'story_id': self.STORY_1_ID
+            }],
+            commit_type=feconf.COMMIT_TYPE_CREATE,
+            committer_id='user_1',
+            created_on=self.TOPIC_SNAPSHOT_1_DATE
+        )
+        self.put_multi(
+            [story_model_1, topic_model,
+            story_snapshot_metadata_model,
+            topic_snapshot_metadata_model])
+
+        self.assert_job_output_is([
+            job_run_result.JobRunResult(
+                stderr=(
+                    'STORY MODELS UPDATED ERROR: \"(\'story_1_id\', '
+                    'EntityNotFoundError(\'Entity for class '
+                    'StorySnapshotMetadataModel with id story_1_id-2 not '
+                    'found\'))\": 1'
+                )
+            )
+        ])
+
 
 class AuditPopulateStoryNodeJobTests(job_test_utils.JobTestBase):
 
     JOB_CLASS: Type[
         story_node_jobs.AuditPopulateStoryNodeJob
     ] = story_node_jobs.AuditPopulateStoryNodeJob
-
-    def test_empty_storage(self) -> None:
-        self.assert_job_output_is_empty()
 
     STORY_1_ID: Final = 'story_1_id'
     STORY_2_ID: Final = 'story_2_id'
@@ -342,6 +409,9 @@ class AuditPopulateStoryNodeJobTests(job_test_utils.JobTestBase):
     STORY_1_SHAPSHOT_1_DATE: Final = datetime.datetime(2023, 6, 13, 1, 0, 0, 0)
     STORY_1_SHAPSHOT_2_DATE: Final = datetime.datetime(2023, 6, 13, 2, 0, 0, 0)
     STORY_2_SHAPSHOT_1_DATE: Final = datetime.datetime(2023, 6, 13, 2, 0, 0, 0)
+
+    def test_empty_storage(self) -> None:
+        self.assert_job_output_is_empty()
 
     def test_story_nodes_are_populated(self) -> None:
         story_model_1 = self.create_model(
@@ -467,5 +537,75 @@ class AuditPopulateStoryNodeJobTests(job_test_utils.JobTestBase):
         self.assert_job_output_is([
             job_run_result.JobRunResult(
                 stdout='STORY MODELS UPDATED SUCCESS: 2'
+            )
+        ])
+
+    def test_broken_story_is_not_populated(self) -> None:
+        story_model_1 = self.create_model(
+            story_models.StoryModel,
+            id=self.STORY_1_ID,
+            story_contents_schema_version=4,
+            title='title_1',
+            language_code='en',
+            notes='notes_1',
+            description='description_1',
+            story_contents=self.story_contents_dict_1,
+            corresponding_topic_id=self.TOPIC_1_ID,
+            url_fragment='urlfragment-1',
+            version=2
+        )
+        topic_model = self.create_model(
+            topic_models.TopicModel,
+            id=self.TOPIC_1_ID,
+            name='topic summary',
+            canonical_name='topic summary',
+            language_code='en',
+            description='description',
+            url_fragment='/fragm',
+            canonical_story_references=[{
+                'story_id': self.STORY_1_ID,
+                'story_is_published': True
+            }],
+            next_subtopic_id=1,
+            page_title_fragment_for_web='fragm',
+            story_reference_schema_version=1,
+            subtopic_schema_version=feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION,
+            version=1
+        )
+        story_snapshot_metadata_model = self.create_model(
+            story_models.StorySnapshotMetadataModel,
+            id=self.STORY_1_ID + '-1',
+            commit_cmds=[{
+                'cmd': 'add_story_node',
+                'node_id': 'node_1'
+            }],
+            commit_type=feconf.COMMIT_TYPE_CREATE,
+            committer_id='user_1',
+            created_on=self.STORY_1_SHAPSHOT_1_DATE
+        )
+        topic_snapshot_metadata_model = self.create_model(
+            topic_models.TopicSnapshotMetadataModel,
+            id=self.TOPIC_1_ID + '-1',
+            commit_cmds=[{
+                'cmd': 'add_canonical_story',
+                'story_id': self.STORY_1_ID
+            }],
+            commit_type=feconf.COMMIT_TYPE_CREATE,
+            committer_id='user_1',
+            created_on=self.TOPIC_SNAPSHOT_1_DATE
+        )
+        self.put_multi(
+            [story_model_1, topic_model,
+            story_snapshot_metadata_model,
+            topic_snapshot_metadata_model])
+
+        self.assert_job_output_is([
+            job_run_result.JobRunResult(
+                stderr=(
+                    'STORY MODELS UPDATED ERROR: \"(\'story_1_id\', '
+                    'EntityNotFoundError(\'Entity for class '
+                    'StorySnapshotMetadataModel with id story_1_id-2 not '
+                    'found\'))\": 1'
+                )
             )
         ])
