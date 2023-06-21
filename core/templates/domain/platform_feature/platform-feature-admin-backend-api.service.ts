@@ -97,7 +97,11 @@ export class PlatformFeatureAdminBackendApiService {
         platform_param_name: name,
         commit_message: message,
         new_rules: newRules.map(rule => rule.toBackendDict()),
-        default_value: defaultValue
+        // The default_value is being sent as a map in order to handle the schema in the backend.
+        // The default value can be of type number, string and boolean and to handle this part
+        // we are passing a map so we can declare the schema for the incoming value as a map and
+        // then further validate the actual value.
+        default_value: {'value': defaultValue}
       }
     ).toPromise();
   }

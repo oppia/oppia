@@ -237,7 +237,10 @@ class AdminHandler(
             },
             'default_value': {
                 'schema': {
-                    'type': 'basestring'
+                    'type': 'object_dict',
+                    'validation_method': (
+                        validation_method.
+                        validate_new_default_value_of_platform_parameter)
                 },
                 'default_value': None
             }
@@ -463,7 +466,7 @@ class AdminHandler(
                     registry.Registry.update_platform_parameter(
                         platform_param_name, self.user_id, commit_message,
                         new_rules,
-                        default_value
+                        default_value['value']
                     )
                 except (
                     utils.ValidationError,
