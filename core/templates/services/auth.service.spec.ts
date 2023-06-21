@@ -69,8 +69,9 @@ describe('Auth service', function() {
     spyOnProperty(AuthService, 'firebaseEmulatorIsEnabled', 'get')
       .and.returnValue(true);
 
-    // TODO: (#18260) Change this when we permanently move to the Dockerized Setup.
-    let firebaseHost = process.env.oppia_is_dockerized ? 'firebase' : 'localhost';
+    // TODO: (#18260) Change this when we permanently move to the Docker Setup.
+    let firebaseHost =
+      process.env.oppia_is_dockerized ? 'firebase' : 'localhost';
     expect(AuthService.firebaseEmulatorConfig).toEqual([firebaseHost, 9099]);
   });
 
