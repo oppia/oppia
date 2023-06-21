@@ -285,7 +285,7 @@ describe('Learner Dashboard Backend API Service', () => {
   const sampleCollectionsDataResults = {
     completed_collections_list: [{
       status: 'public',
-      thumbnail_bg_color: '#d68453',
+      thumbnail_bg_color: '#ae511b',
       community_owned: false,
       created_on: 1558593739415.726,
       thumbnail_icon_url: '/subjects/Arithmetic.svg',
@@ -299,7 +299,7 @@ describe('Learner Dashboard Backend API Service', () => {
     }],
     collection_playlist: [{
       status: 'public',
-      thumbnail_bg_color: '#d68453',
+      thumbnail_bg_color: '#ae511b',
       community_owned: false,
       created_on: 1558593739415.726,
       thumbnail_icon_url: '/subjects/Arithmetic.svg',
@@ -313,7 +313,7 @@ describe('Learner Dashboard Backend API Service', () => {
     }],
     incomplete_collections_list: [{
       status: 'public',
-      thumbnail_bg_color: '#d68453',
+      thumbnail_bg_color: '#ae511b',
       community_owned: false,
       created_on: 1491118537846.88,
       thumbnail_icon_url: '/subjects/Arithmetic.svg',
@@ -362,7 +362,7 @@ describe('Learner Dashboard Backend API Service', () => {
       category: 'Arithmetic',
       created_on_msec: 1515553584276.8,
       community_owned: false,
-      thumbnail_bg_color: '#d68453',
+      thumbnail_bg_color: '#ae511b',
       title: 'Equality of Fractions (Recap)',
       num_views: 760,
       tags: [
