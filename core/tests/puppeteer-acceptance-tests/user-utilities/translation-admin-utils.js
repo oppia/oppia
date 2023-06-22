@@ -82,8 +82,8 @@ module.exports = class TranslationAdmin extends baseUser {
     await this.type(addContributorUsernameInput, username);
     await this.select(
       addContributonRightsCategorySelect, translationRightValue);
-    await this.select(addContributonRightsLanguageDropdown, 
-      'string:' + languageCode);
+    await this.select(
+      addContributonRightsLanguageDropdown, 'string:' + languageCode);
     await this.clickOn(addontributionRightsSubmitButton);
 
     await this.page.waitForNetworkIdle();
@@ -98,8 +98,8 @@ module.exports = class TranslationAdmin extends baseUser {
     await this.type(revokeContributorUsernameInput, username);
     await this.select(
       revokeContributonRightsCategorySelect, translationRightValue);
-    await this.select(revokeContributonRightsLanguageSelect, 
-      'string:' + languageCode);
+    await this.select(
+      revokeContributonRightsLanguageSelect, 'string:' + languageCode);
     await this.clickOn(revokeContributionRightsSubmitButton);
 
     await this.page.waitForNetworkIdle();
