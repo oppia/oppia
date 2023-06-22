@@ -33,6 +33,8 @@ import { DebouncerService } from 'services/debouncer.service';
 import { SidebarStatusService } from 'services/sidebar-status.service';
 import { UserInfo } from 'domain/user/user-info.model';
 import { FeedbackUpdatesBackendApiService } from 'domain/feedback_updates/feedback-updates-backend-api.service';
+import { FeedbackThreadSummary } from
+  'domain/feedback_thread/feedback-thread-summary.model';
 import { ClassroomBackendApiService } from 'domain/classroom/classroom-backend-api.service';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { I18nService } from 'i18n/i18n.service';
@@ -114,7 +116,37 @@ describe('TopNavigationBarComponent', () => {
   let mockPlatformFeatureService = new MockPlatformFeatureService();
   let urlInterpolationService: UrlInterpolationService;
 
+  let threadSummaryList = [{
+    status: 'open',
+    original_author_id: '1',
+    last_updated_msecs: 1000,
+    last_message_text: 'Last Message',
+    total_message_count: 5,
+    last_message_is_read: false,
+    second_last_message_is_read: true,
+    author_last_message: '2',
+    author_second_last_message: 'Last Message',
+    exploration_title: 'Biology',
+    exploration_id: 'exp1',
+    thread_id: 'thread_1'
+  },
+  {
+    status: 'open',
+    original_author_id: '2',
+    last_updated_msecs: 1001,
+    last_message_text: 'Last Message',
+    total_message_count: 5,
+    last_message_is_read: false,
+    second_last_message_is_read: true,
+    author_last_message: '2',
+    author_second_last_message: 'Last Message',
+    exploration_title: 'Algebra',
+    exploration_id: 'exp1',
+    thread_id: 'thread_1'
+  }];
+
   let FeedbackUpdatesData = {
+    thread_summaries: threadSummaryList,
     number_of_unread_threads: 10
   };
 
@@ -584,7 +616,12 @@ describe('TopNavigationBarComponent', () => {
       feedbackUpdatesBackendApiService,
       'fetchFeedbackUpdatesDataAsync').and.returnValue(Promise.resolve({
       numberOfUnreadThreads: FeedbackUpdatesData.
-        number_of_unread_threads
+        number_of_unread_threads,
+      threadSummaries: (
+        FeedbackUpdatesData.thread_summaries.map(
+          threadSummary => FeedbackThreadSummary
+            .createFromBackendDict(threadSummary))),
+      paginatedThreadsList: []
     }));
 
     component.userIsLoggedIn = true;
