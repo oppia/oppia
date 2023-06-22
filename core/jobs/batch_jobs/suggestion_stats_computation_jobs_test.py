@@ -490,7 +490,8 @@ class GenerateContributionStatsJobTests(job_test_utils.JobTestBase):
             translation_review_stats_model.language_code, self.LANG_1)
         self.assertEqual(
             translation_review_stats_model.reviewer_user_id, 'reviewer1')
-        self.assertEqual(translation_review_stats_model.topic_id, self.TOPIC_1_ID)
+        self.assertEqual(
+            translation_review_stats_model.topic_id, self.TOPIC_1_ID)
         self.assertEqual(
             translation_review_stats_model.reviewed_translations_count, 1)
         self.assertEqual(
@@ -660,7 +661,8 @@ class GenerateContributionStatsJobTests(job_test_utils.JobTestBase):
         self.assertEqual(
             translation_review_stats_model.reviewer_user_id,
             feconf.SUGGESTION_BOT_USER_ID)
-        self.assertEqual(translation_review_stats_model.topic_id, self.TOPIC_1_ID)
+        self.assertEqual(
+            translation_review_stats_model.topic_id, self.TOPIC_1_ID)
         self.assertEqual(
             translation_review_stats_model.reviewed_translations_count, 2)
         self.assertEqual(
@@ -772,7 +774,8 @@ class GenerateContributionStatsJobTests(job_test_utils.JobTestBase):
             first_translation_stats_model.contributor_user_id,
             self.VALID_USER_ID_1
         )
-        self.assertEqual(first_translation_stats_model.topic_id, self.TOPIC_1_ID)
+        self.assertEqual(
+            first_translation_stats_model.topic_id, self.TOPIC_1_ID)
         self.assertEqual(
             first_translation_stats_model.submitted_translations_count, 1)
         self.assertEqual(
@@ -801,7 +804,8 @@ class GenerateContributionStatsJobTests(job_test_utils.JobTestBase):
             second_translation_stats_model.contributor_user_id,
             self.VALID_USER_ID_2
         )
-        self.assertEqual(second_translation_stats_model.topic_id, self.TOPIC_1_ID)
+        self.assertEqual(
+            second_translation_stats_model.topic_id, self.TOPIC_1_ID)
         self.assertEqual(
             second_translation_stats_model.submitted_translations_count, 1)
         self.assertEqual(
@@ -828,7 +832,8 @@ class GenerateContributionStatsJobTests(job_test_utils.JobTestBase):
             translation_review_stats_model.language_code, self.LANG_1)
         self.assertEqual(
             translation_review_stats_model.reviewer_user_id, 'reviewer1')
-        self.assertEqual(translation_review_stats_model.topic_id, self.TOPIC_1_ID)
+        self.assertEqual(
+            translation_review_stats_model.topic_id, self.TOPIC_1_ID)
         self.assertEqual(
             translation_review_stats_model.reviewed_translations_count, 2)
         self.assertEqual(
