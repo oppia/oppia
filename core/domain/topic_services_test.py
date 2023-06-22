@@ -2223,6 +2223,69 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             topic_summary.url_fragment
         )
 
+    def test_populate_topic_summary_model_fields_with_no_input_model(
+        self
+    ) -> None:
+        topic_summary = topic_services.compute_summary_of_topic(self.topic)
+        populated_model = topic_services.populate_topic_summary_model_fields(
+            None, topic_summary)
+        self.assertEqual(populated_model.name, topic_summary.name)
+        self.assertEqual(
+            populated_model.description,
+            topic_summary.description
+        )
+        self.assertEqual(
+            populated_model.canonical_name,
+            topic_summary.canonical_name
+        )
+        self.assertEqual(
+            populated_model.language_code,
+            topic_summary.language_code
+        )
+        self.assertEqual(populated_model.version, topic_summary.version)
+        self.assertEqual(
+            populated_model.additional_story_count,
+            topic_summary.additional_story_count
+        )
+        self.assertEqual(
+            populated_model.canonical_story_count,
+            topic_summary.canonical_story_count
+        )
+        self.assertEqual(
+            populated_model.uncategorized_skill_count,
+            topic_summary.uncategorized_skill_count
+        )
+        self.assertEqual(
+            populated_model.subtopic_count,
+            topic_summary.subtopic_count)
+        self.assertEqual(
+            populated_model.total_skill_count,
+            topic_summary.total_skill_count
+        )
+        self.assertEqual(
+            populated_model.total_published_node_count,
+            topic_summary.total_published_node_count
+        )
+        self.assertEqual(
+            populated_model.thumbnail_filename,
+            topic_summary.thumbnail_filename
+        )
+        self.assertEqual(
+            populated_model.thumbnail_bg_color,
+            topic_summary.thumbnail_bg_color
+        )
+        self.assertEqual(
+            populated_model.topic_model_last_updated,
+            topic_summary.topic_model_last_updated
+        )
+        self.assertEqual(
+            populated_model.topic_model_created_on,
+            topic_summary.topic_model_created_on)
+        self.assertEqual(
+            populated_model.url_fragment,
+            topic_summary.url_fragment
+        )
+
 
 # TODO(#7009): Remove this mock class and the SubtopicMigrationTests class
 # once the actual functions for subtopic migrations are implemented.
