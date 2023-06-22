@@ -117,10 +117,13 @@ class PlatformFeatureDummyHandler(
 
     @acl_decorators.open_access
     def get(self) -> None:
-        # This handler is gated by the dummy_feature flag, i.e. it's only
-        # visible when the dummy_feature is enabled.
+        # This handler is gated by the dummy_feature_flag_for_e2e_tests flag,
+        # i.e. it's only visible when the dummy_feature_flag_for_e2e_tests
+        # is enabled.
         if not platform_feature_services.is_feature_enabled(
-                platform_feature_list.ParamNames.DUMMY_FEATURE.value):
+            platform_feature_list.ParamNames.
+            DUMMY_FEATURE_FLAG_FOR_E2E_TESTS.value
+        ):
             raise self.PageNotFoundException()
         self.render_json({
             'msg': 'ok'
