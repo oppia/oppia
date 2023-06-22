@@ -37,7 +37,7 @@ class ExistingPlatformParameterValidityTests(test_utils.GenericTestBase):
                             'diagnostic_test',
                             'serial_chapter_launch_curriculum_admin_view',
                             'show_translation_size',
-                            'show_feedback_updates_in_profile_pic_dropdown'
+                            'show_feedback_updates_in_profile_pic_dropdown',
                             'promo_bar_enabled',
                             'promo_bar_message']
 
