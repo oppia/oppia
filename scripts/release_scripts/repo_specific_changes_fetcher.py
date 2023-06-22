@@ -29,7 +29,7 @@ from typing import Dict, Final, List, Optional
 # TODO(#15567): The order can be fixed after Literal in utils.py is loaded
 # from typing instead of typing_extensions, this will be possible after
 # we migrate to Python 3.8.
-from scripts import common  # isort:skip  # pylint: disable=wrong-import-position
+from scripts import common  # isort:skip  ng-import-position
 from core import utils  # isort:skip  # pylint: disable=wrong-import-position
 
 GIT_CMD_DIFF_NAMES_ONLY_FORMAT_STRING: Final = 'git diff --name-only %s %s'

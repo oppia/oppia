@@ -1252,6 +1252,40 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
             question_summary.misconception_ids
         )
 
+    def test_populate_question_summary_model_fields_with_no_input_model(
+        self
+    ) -> None:
+        question = question_services.get_question_by_id(self.question_id)
+        question_summary = question_services.compute_summary_of_question(
+            question
+        )
+        question_services.save_question_summary(question_summary)
+        populated_model = (
+            question_services.populate_question_summary_model_fields(
+            None, question_summary)  # type: ignore[arg-type]
+        )
+        self.assertEqual(
+            populated_model.question_model_last_updated,
+            question_summary.last_updated
+        )
+        self.assertEqual(
+            populated_model.question_model_created_on,
+            question_summary.created_on
+        )
+        self.assertEqual(
+            populated_model.question_content,
+            question_summary.question_content
+        )
+        self.assertEqual(populated_model.version, question_summary.version)
+        self.assertEqual(
+            populated_model.interaction_id,
+            question_summary.interaction_id
+        )
+        self.assertEqual(
+            populated_model.misconception_ids,
+            question_summary.misconception_ids
+        )
+
 
 class QuestionMigrationTests(test_utils.GenericTestBase):
 
