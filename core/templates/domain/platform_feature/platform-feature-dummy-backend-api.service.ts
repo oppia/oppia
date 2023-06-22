@@ -25,8 +25,8 @@ import { PlatformFeatureDomainConstants } from
 
 /**
  * Api service for the backend dummy handler that is gated by the
- * dummy_feature. This api is used for testing the end-to-end feature gating
- * flow.
+ * dummy_feature_flag_for_e2e_tests. This api is used for testing the
+ * end-to-end feature gating flow.
  */
 @Injectable({
   providedIn: 'root'
@@ -37,7 +37,8 @@ export class PlatformFeatureDummyBackendApiService {
   ) {}
 
   /**
-   * Checks if the dummy handler gated by dummy_feature is enabled.
+   * Checks if the dummy handler gated by dummy_feature_flag_for_e2e_tests
+   * is enabled.
    *
    * @returns {Promise<boolean>} - A promise that resolves to true if request
    * to the dummy handler succeeded without 404 error.
