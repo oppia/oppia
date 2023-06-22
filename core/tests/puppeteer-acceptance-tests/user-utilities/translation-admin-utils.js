@@ -85,8 +85,7 @@ module.exports = class TranslationAdmin extends baseUser {
     await this.select(addContributonRightsLanguageDropdown, languageValue);
     await this.clickOn(addontributionRightsSubmitButton);
 
-    // Wait a moment for changes to take effect.
-    await this.page.waitForTimeout(1000);
+    await this.page.waitForNetworkIdle();
   }
 
   /**
@@ -100,6 +99,8 @@ module.exports = class TranslationAdmin extends baseUser {
       revokeContributonRightsCategorySelect, translationRightValue);
     await this.select(revokeContributonRightsLanguageSelect, languageValue);
     await this.clickOn(revokeContributionRightsSubmitButton);
+
+    await this.page.waitForNetworkIdle();
   }
 
   /**
@@ -110,6 +111,8 @@ module.exports = class TranslationAdmin extends baseUser {
     await this.select(viewContributorMethodSelect, usernameMethodValue);
     await this.type(viewContributerUsernameInput, username);
     await this.clickOn(viewContributorSubmitButton);
+
+    await this.page.waitForNetworkIdle();
   }
 
   /**
@@ -122,8 +125,7 @@ module.exports = class TranslationAdmin extends baseUser {
     await this.select(viewContributorLanguageSelect, languageValue);
     await this.clickOn(viewContributorSubmitButton);
 
-    // Wait a moment for usernames to appear.
-    await this.page.waitForTimeout(1000);
+    await this.page.waitForNetworkIdle();
   }
 
   /**
