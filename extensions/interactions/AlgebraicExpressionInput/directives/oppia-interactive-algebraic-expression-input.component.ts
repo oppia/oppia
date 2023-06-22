@@ -66,7 +66,7 @@ export class AlgebraicExpressionInputInteractionComponent
     private translateService: TranslateService,
   ) {}
 
-  isCurrentAnswerValid(checkForTouched = true): boolean {
+  isCurrentAnswerValid = (checkForTouched = true): boolean => {
     const activeGuppyObject = (
       this.guppyInitializationService.findActiveGuppyObject());
     if (
@@ -84,15 +84,29 @@ export class AlgebraicExpressionInputInteractionComponent
     }
     this.warningText = '';
     return true;
-  }
+  };
 
-  submitAnswer(): void {
+  submitAnswer = (): void => {
+    this.hasBeenTouched = true;
     if (!this.isCurrentAnswerValid(false)) {
       return;
     }
     this.currentInteractionService.onSubmit(
       this.value, this.algebraicExpressionInputRulesService);
-  }
+  };
+
+  onAnswerChange = (focusObj: FocusObj): void => {
+    const activeGuppyObject = (
+      this.guppyInitializationService.findActiveGuppyObject());
+    if (activeGuppyObject !== undefined) {
+      this.hasBeenTouched = true;
+      this.value = activeGuppyObject.guppyInstance.asciimath();
+      this.currentInteractionService.updateCurrentAnswer(this.value);
+    }
+    if (!focusObj.focused) {
+      this.isCurrentAnswerValid();
+    }
+  };
 
   ngOnInit(): void {
     this.hasBeenTouched = false;
@@ -112,21 +126,9 @@ export class AlgebraicExpressionInputInteractionComponent
       this.savedSolution !== undefined ? this.savedSolution as string : ''
     );
 
-    Guppy.event('change', (focusObj: FocusObj) => {
-      let activeGuppyObject = (
-        this.guppyInitializationService.findActiveGuppyObject());
-      if (activeGuppyObject !== undefined) {
-        this.hasBeenTouched = true;
-        this.value = activeGuppyObject.guppyInstance.asciimath();
-      }
-      if (!focusObj.focused) {
-        this.isCurrentAnswerValid();
-      }
-    });
+    Guppy.event('change', this.onAnswerChange);
 
-    Guppy.event('done', () => {
-      this.submitAnswer();
-    });
+    Guppy.event('done', this.submitAnswer);
 
     Guppy.event('focus', (focusObj: FocusObj) => {
       if (!focusObj.focused) {
@@ -134,15 +136,8 @@ export class AlgebraicExpressionInputInteractionComponent
       }
     });
 
-    const isCurrentAnswerValid = (): boolean => {
-      return this.isCurrentAnswerValid();
-    };
-
-    const submitAnswer = () => {
-      return this.submitAnswer();
-    };
     this.currentInteractionService.registerCurrentInteraction(
-      submitAnswer, isCurrentAnswerValid);
+      this.submitAnswer, this.isCurrentAnswerValid);
   }
 
   ngOnDestroy(): void {

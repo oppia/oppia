@@ -62,7 +62,7 @@ export class InteractiveMathEquationInput implements OnInit {
     private translateService: TranslateService,
   ) {}
 
-  isCurrentAnswerValid(checkForTouched = true): boolean {
+  isCurrentAnswerValid = (checkForTouched = true): boolean => {
     let activeGuppyObject = (
       this.guppyInitializationService.findActiveGuppyObject());
     if (
@@ -79,15 +79,30 @@ export class InteractiveMathEquationInput implements OnInit {
     }
     this.warningText = '';
     return true;
-  }
+  };
 
-  submitAnswer(): void {
+  submitAnswer = (): void => {
+    this.hasBeenTouched = true;
     if (!this.isCurrentAnswerValid(false)) {
       return;
     }
     this.currentInteractionService.onSubmit(
       this.value, this.mathEquationInputRulesService);
-  }
+  };
+
+  onAnswerChange = (focusObj: FocusObj): void => {
+    const activeGuppyObject = (
+      this.guppyInitializationService.findActiveGuppyObject());
+    if (activeGuppyObject !== undefined) {
+      this.hasBeenTouched = true;
+      this.value = activeGuppyObject.guppyInstance.asciimath();
+      this.currentInteractionService.updateCurrentAnswer(this.value);
+    }
+
+    if (!focusObj.focused) {
+      this.isCurrentAnswerValid();
+    }
+  };
 
   showOSK(): void {
     this.guppyInitializationService.setShowOSK(true);
@@ -111,20 +126,9 @@ export class InteractiveMathEquationInput implements OnInit {
       this.htmlEscaperService.escapedJsonToObj(
         this.allowedVariablesWithValue) as string[]);
 
-    Guppy.event('change', (focusObj: FocusObj) => {
-      let activeGuppyObject = (
-        this.guppyInitializationService.findActiveGuppyObject());
-      if (activeGuppyObject !== undefined) {
-        this.hasBeenTouched = true;
-        this.value = activeGuppyObject.guppyInstance.asciimath();
-      }
-      if (!focusObj.focused) {
-        this.isCurrentAnswerValid();
-      }
-    });
-    Guppy.event('done', () => {
-      this.submitAnswer();
-    });
+    Guppy.event('change', this.onAnswerChange);
+
+    Guppy.event('done', this.submitAnswer);
 
     Guppy.event('focus', (focusObj: FocusObj) => {
       if (!focusObj.focused) {
@@ -133,7 +137,7 @@ export class InteractiveMathEquationInput implements OnInit {
     });
 
     this.currentInteractionService.registerCurrentInteraction(
-      () => this.submitAnswer(), () => this.isCurrentAnswerValid());
+      this.submitAnswer, this.isCurrentAnswerValid);
   }
 }
 
