@@ -5595,8 +5595,8 @@ class StoryViewerAsLoggedInUserTests(test_utils.GenericTestBase):
                 expected_status_int=404)
 
     def test_user_cannot_access_story_when_topic_is_not_published(self) -> None:
-        """Tests that a user cannot access a story if the topic is not
-        published.
+        """Tests that a user cannot access a story viewer page if the topic is
+        not published.
         """
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
@@ -5605,8 +5605,8 @@ class StoryViewerAsLoggedInUserTests(test_utils.GenericTestBase):
                 expected_status_int=404)
 
     def test_user_cannot_access_story_when_story_is_not_published(self) -> None:
-        """Tests that a user cannot access a story if the story is not
-        published.
+        """Tests that a user cannot access a story viewer page if the story
+        is not published.
         """
         topic_services.publish_topic(self.topic_id, self.admin_id)
         with self.swap(self, 'testapp', self.mock_testapp):
@@ -5618,8 +5618,8 @@ class StoryViewerAsLoggedInUserTests(test_utils.GenericTestBase):
     def test_user_can_access_story_when_story_and_topic_are_published(
         self
     ) -> None:
-        """Tests that a user can access a story if both the story and the topic
-        are published.
+        """Tests that a user can access a story viewer page if both the story
+        and the topic are published.
         """
         topic_services.publish_topic(self.topic_id, self.admin_id)
         topic_services.publish_story(
@@ -5633,8 +5633,8 @@ class StoryViewerAsLoggedInUserTests(test_utils.GenericTestBase):
     def test_user_can_access_story_when_all_url_fragments_are_valid(
         self
     ) -> None:
-        """Tests that a user can access a story if all the URL fragments are
-        valid.
+        """Tests that a user can access a story viewer page if all the URL
+        fragments are valid.
         """
         topic_services.publish_topic(self.topic_id, self.admin_id)
         topic_services.publish_story(
@@ -5648,8 +5648,8 @@ class StoryViewerAsLoggedInUserTests(test_utils.GenericTestBase):
     def test_user_redirect_to_story_page_if_story_url_fragment_is_invalid(
         self
     ) -> None:
-        """Tests that a user is redirected to the story page if the story URL
-        fragmment is invalid.
+        """Tests that a user is redirected to the story viewer page if the
+        story fragmment is invalid.
         """
         topic_services.publish_topic(self.topic_id, self.admin_id)
         topic_services.publish_story(
@@ -5665,6 +5665,9 @@ class StoryViewerAsLoggedInUserTests(test_utils.GenericTestBase):
     def test_user_redirect_to_correct_url_if_abbreviated_topic_is_invalid(
         self
     ) -> None:
+        """Tests that a user is redirected to the correct story viewer page if
+        the abbreviated topic is invalid.
+        """
         topic_services.publish_topic(self.topic_id, self.admin_id)
         topic_services.publish_story(
             self.topic_id, self.story_id, self.admin_id)
@@ -5679,6 +5682,9 @@ class StoryViewerAsLoggedInUserTests(test_utils.GenericTestBase):
                 response.headers['location'])
 
     def test_user_redirect_with_correct_classroom_name_in_url(self) -> None:
+        """Tests that a user is redirected the the story viewer page if there
+        is a classroom name in the URL.
+        """
         topic_services.publish_topic(self.topic_id, self.admin_id)
         topic_services.publish_story(
             self.topic_id, self.story_id, self.admin_id)
@@ -5693,6 +5699,9 @@ class StoryViewerAsLoggedInUserTests(test_utils.GenericTestBase):
                 response.headers['location'])
 
     def test_user_redirect_to_lowercase_story_url_fragment(self) -> None:
+        """Tests that a user is redirected to a lowercase story viewer URL if
+        there are uppercase letters in the story URL fragment.
+        """
         topic_services.publish_topic(self.topic_id, self.admin_id)
         topic_services.publish_story(
             self.topic_id, self.story_id, self.admin_id)
@@ -5800,12 +5809,16 @@ class StoryViewerTests(test_utils.GenericTestBase):
             subtopics=[subtopic_1], next_subtopic_id=2)
 
     def test_cannot_access_non_existent_story(self) -> None:
+        """Tests that a user cannot access a non existent story."""
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
                 '/mock_story_data/staging/topic/non-existent-frag',
                 expected_status_int=404)
 
     def test_cannot_access_story_when_topic_is_not_published(self) -> None:
+        """Tests that a user cannot access a story viewer page when the topic
+        is not published.
+        """
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
                 '/mock_story_data/staging/topic/%s'
@@ -5813,6 +5826,9 @@ class StoryViewerTests(test_utils.GenericTestBase):
                 expected_status_int=404)
 
     def test_cannot_access_story_when_story_is_not_published(self) -> None:
+        """Tests that a user cannot access a story viewer page when the story
+        is not published.
+        """
         topic_services.publish_topic(self.topic_id, self.admin_id)
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
@@ -5821,6 +5837,9 @@ class StoryViewerTests(test_utils.GenericTestBase):
                 expected_status_int=404)
 
     def test_can_access_story_when_story_and_topic_are_published(self) -> None:
+        """Tests that a user can access a story viewr page when both the
+        story and the topic are published.
+        """
         topic_services.publish_topic(self.topic_id, self.admin_id)
         topic_services.publish_story(
             self.topic_id, self.story_id, self.admin_id)
@@ -5831,6 +5850,9 @@ class StoryViewerTests(test_utils.GenericTestBase):
                 expected_status_int=200)
 
     def test_can_access_story_when_all_url_fragments_are_valid(self) -> None:
+        """Tests that a user can access a story viewer page when all the URL
+        fragments are valid.
+        """
         topic_services.publish_topic(self.topic_id, self.admin_id)
         topic_services.publish_story(
             self.topic_id, self.story_id, self.admin_id)
@@ -5843,6 +5865,9 @@ class StoryViewerTests(test_utils.GenericTestBase):
     def test_redirect_to_story_page_if_story_url_fragment_is_invalid(
         self
     ) -> None:
+        """Tests that a user is redirected to the correct story viewer URL if
+        the abbreviated story URL fragment is invalid.
+        """
         topic_services.publish_topic(self.topic_id, self.admin_id)
         topic_services.publish_story(
             self.topic_id, self.story_id, self.admin_id)
@@ -5857,6 +5882,9 @@ class StoryViewerTests(test_utils.GenericTestBase):
     def test_redirect_to_correct_url_if_abbreviated_topic_is_invalid(
         self
     ) -> None:
+        """Tests that a user is redirected to the correct story viewer URL if
+        the abbreviated topic is invalid.
+        """
         topic_services.publish_topic(self.topic_id, self.admin_id)
         topic_services.publish_story(
             self.topic_id, self.story_id, self.admin_id)
@@ -5871,6 +5899,9 @@ class StoryViewerTests(test_utils.GenericTestBase):
                 response.headers['location'])
 
     def test_redirect_with_correct_classroom_name_in_url(self) -> None:
+        """Tests that a user is redirected to a story viewer URL if there is
+        a classroom name in the URL.
+        """
         topic_services.publish_topic(self.topic_id, self.admin_id)
         topic_services.publish_story(
             self.topic_id, self.story_id, self.admin_id)
@@ -5885,6 +5916,9 @@ class StoryViewerTests(test_utils.GenericTestBase):
                 response.headers['location'])
 
     def test_redirect_lowercase_story_url_fragment(self) -> None:
+        """Tests that a user is redirected to a lowercase story viewer URL if
+        there are uppercase letters in the story URL fragment.
+        """
         topic_services.publish_topic(self.topic_id, self.admin_id)
         topic_services.publish_story(
             self.topic_id, self.story_id, self.admin_id)
@@ -6012,18 +6046,27 @@ class SubtopicViewerTests(test_utils.GenericTestBase):
             url_fragment='topic-frag')
 
     def test_cannot_access_non_existent_subtopic(self) -> None:
+        """Tests that a user cannot access a non existent subtopic page
+        viewer.
+        """
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
                 '/mock_subtopic_data/staging/topic-frag/non-existent-frag',
                 expected_status_int=404)
 
     def test_cannot_access_subtopic_when_topic_is_not_published(self) -> None:
+        """Tests that a user cannot access a subtopic page viewer if the
+        topic is not published.
+        """
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
                 '/mock_subtopic_data/staging/topic-frag/sub-one-frag',
                 expected_status_int=404)
 
     def test_can_access_subtopic_when_topic_is_published(self) -> None:
+        """Tests that a user can access a subtopic if the topic is
+        published.
+        """
         topic_services.publish_topic(self.topic_id, self.admin_id)
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
@@ -6031,6 +6074,9 @@ class SubtopicViewerTests(test_utils.GenericTestBase):
                 expected_status_int=200)
 
     def test_redirect_to_classroom_if_user_is_banned(self) -> None:
+        """Tests that a user is redirected to the classroom if the user is
+        banned.
+        """
         self.login(self.banned_user_email)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_html_response(
@@ -6041,6 +6087,9 @@ class SubtopicViewerTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_can_access_subtopic_when_all_url_fragments_are_valid(self) -> None:
+        """Tests that a user can access a subtopic if all the URL fragments
+        are valid.
+        """
         topic_services.publish_topic(self.topic_id, self.admin_id)
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_html_response(
@@ -6050,6 +6099,9 @@ class SubtopicViewerTests(test_utils.GenericTestBase):
     def test_fall_back_to_revision_page_if_subtopic_url_frag_is_invalid(
         self
     ) -> None:
+        """Tests that a user is redirected to the revision page if the
+        subtopic URL fragment is invalid.
+        """
         topic_services.publish_topic(self.topic_id, self.admin_id)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_html_response(
@@ -6062,6 +6114,9 @@ class SubtopicViewerTests(test_utils.GenericTestBase):
     def test_fall_back_to_revision_page_when_subtopic_page_does_not_exist(
         self
     ) -> None:
+        """Tests that a user is redirected to the revision page if the
+        subtopic page doesn't exist.
+        """
         topic_services.publish_topic(self.topic_id, self.admin_id)
         testapp_swap = self.swap(self, 'testapp', self.mock_testapp)
         subtopic_swap = self.swap_to_always_return(
@@ -6077,6 +6132,9 @@ class SubtopicViewerTests(test_utils.GenericTestBase):
     def test_redirect_to_classroom_if_abbreviated_topic_is_invalid(
         self
     ) -> None:
+        """Tests that a user is redirected to the classroom page if the
+        abbreviated topic is invalid.
+        """
         topic_services.publish_topic(self.topic_id, self.admin_id)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_html_response(
@@ -6087,6 +6145,9 @@ class SubtopicViewerTests(test_utils.GenericTestBase):
                 response.headers['location'])
 
     def test_redirect_with_correct_classroom_name_in_url(self) -> None:
+        """Tests that a user is redirected to the revision page if there is
+        a classroom name in the URL.
+        """
         topic_services.publish_topic(self.topic_id, self.admin_id)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_html_response(
@@ -6098,6 +6159,9 @@ class SubtopicViewerTests(test_utils.GenericTestBase):
                 response.headers['location'])
 
     def test_redirect_with_lowercase_subtopic_url_fragment(self) -> None:
+        """Tests that a user is redirected to the revision page if there is
+        an upper case in the subtopic URL fragment.
+        """
         topic_services.publish_topic(self.topic_id, self.admin_id)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_html_response(
@@ -6187,18 +6251,21 @@ class TopicViewerTests(test_utils.GenericTestBase):
             subtopics=[subtopic_1], next_subtopic_id=2)
 
     def test_cannot_access_non_existent_topic(self) -> None:
+        """Tests that a user cannot access a non existent topic."""
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
                 '/mock_topic_data/staging/invalid-topic',
                 expected_status_int=404)
 
     def test_cannot_access_unpublished_topic(self) -> None:
+        """Tests that a user cannot access  an unpublished topic."""
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
                 '/mock_topic_data/staging/topic',
                 expected_status_int=404)
 
     def test_can_access_published_topic(self) -> None:
+        """Tests that a user can access a published topic."""
         topic_services.publish_topic(self.topic_id, self.admin_id)
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
@@ -6206,6 +6273,9 @@ class TopicViewerTests(test_utils.GenericTestBase):
                 expected_status_int=200)
 
     def test_can_access_topic_when_all_url_fragments_are_valid(self) -> None:
+        """Tests that a user can access the topic viewer page if all the URL
+        fragments are valid.
+        """
         topic_services.publish_topic(self.topic_id, self.admin_id)
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_html_response(
@@ -6215,6 +6285,9 @@ class TopicViewerTests(test_utils.GenericTestBase):
     def test_redirect_to_classroom_if_abbreviated_topic_is_invalid(
         self
     ) -> None:
+        """Tests that a user is redirected to the classroom page if the
+        abbreviated topic is invalid.
+        """
         topic_services.publish_topic(self.topic_id, self.admin_id)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_html_response(
@@ -6225,6 +6298,9 @@ class TopicViewerTests(test_utils.GenericTestBase):
                 response.headers['location'])
 
     def test_redirect_with_correct_classroom_name_in_url(self) -> None:
+        """Tests that a user is redirected to the topic viewer page if there
+        is a classroom name in the URL.
+        """
         topic_services.publish_topic(self.topic_id, self.admin_id)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_html_response(
@@ -6235,6 +6311,9 @@ class TopicViewerTests(test_utils.GenericTestBase):
                 response.headers['location'])
 
     def test_redirect_with_lowercase_topic_url_fragment(self) -> None:
+        """Tests that a user is redirected to the topic viewer page if there
+        is an upper case in the topic URL fragment.
+        """
         topic_services.publish_topic(self.topic_id, self.admin_id)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_html_response(
@@ -6276,12 +6355,14 @@ class CreateSkillTests(test_utils.GenericTestBase):
         ))
 
     def test_admin_can_create_skill(self) -> None:
+        """Tests that the admin can create a skill."""
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json('/mock_create_skill')
         self.logout()
 
     def test_banned_user_cannot_create_skill(self) -> None:
+        """Tests that a banned user cannot create a skill."""
         self.login(self.banned_user_email)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(
@@ -6292,6 +6373,7 @@ class CreateSkillTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_guest_cannot_add_create_skill(self) -> None:
+        """Tests that a guest user cannot create a skill."""
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/mock_create_skill', expected_status_int=401)
@@ -6347,6 +6429,7 @@ class ManageQuestionSkillStatusTests(test_utils.GenericTestBase):
             self.admin_id, self.question_id, self.skill_id, 0.5)
 
     def test_admin_can_manage_question_skill_status(self) -> None:
+        """Tests that the admin can publish a question on a skill."""
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(
@@ -6355,6 +6438,7 @@ class ManageQuestionSkillStatusTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_viewer_cannot_manage_question_skill_status(self) -> None:
+        """Tests that a viewer cannot publish a question on a skill."""
         self.login(self.viewer_email)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(
@@ -6366,6 +6450,7 @@ class ManageQuestionSkillStatusTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_guest_cannot_manage_question_skill_status(self) -> None:
+        """Tests that a guest user cannot publish a question on a skill."""
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/mock_manage_question_skill_status/%s' % self.skill_id,
@@ -6403,12 +6488,14 @@ class CreateTopicTests(test_utils.GenericTestBase):
         ))
 
     def test_admin_can_create_topic(self) -> None:
+        """Tests that the admin can create a topic."""
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json('/mock_create_topic')
         self.logout()
 
     def test_banned_user_cannot_create_topic(self) -> None:
+        """Tests that a banned user cannot create a topic."""
         self.login(self.banned_user_email)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(
@@ -6419,6 +6506,7 @@ class CreateTopicTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_guest_cannot_create_topic(self) -> None:
+        """Tests that a guest user cannot create a topic."""
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/mock_create_topic', expected_status_int=401)
@@ -6464,12 +6552,14 @@ class ManageRightsForTopicTests(test_utils.GenericTestBase):
         topic_services.create_new_topic_rights(self.topic_id, self.admin_id)
 
     def test_admin_can_manage_rights(self) -> None:
+        """Tests that the admin can manage a topic's rights."""
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json('/mock_manage_rights_for_topic/%s' % self.topic_id)
         self.logout()
 
     def test_banned_user_cannot_manage_rights(self) -> None:
+        """Tests that a banned user cannot manage a topic's rights."""
         self.login(self.banned_user_email)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(
@@ -6481,6 +6571,7 @@ class ManageRightsForTopicTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_guest_cannot_manage_rights(self) -> None:
+        """Tests that a guest user cannot manage a topic's rights."""
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/mock_manage_rights_for_topic/%s' % self.topic_id,
@@ -6531,6 +6622,7 @@ class ChangeTopicPublicationStatusTests(test_utils.GenericTestBase):
         ))
 
     def test_admin_can_change_topic_publication_status(self) -> None:
+        """Tests that the admin can publish or unpublish a topic."""
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json('/mock_change_publication_status/%s' % self.topic_id)
@@ -6539,6 +6631,9 @@ class ChangeTopicPublicationStatusTests(test_utils.GenericTestBase):
     def test_cannot_change_topic_publication_status_with_invalid_topic_id(
         self
     ) -> None:
+        """Tests that a user cannot change the publication status of a topic
+        if the topic ID is invalid.
+        """
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
@@ -6547,6 +6642,9 @@ class ChangeTopicPublicationStatusTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_banned_user_cannot_change_topic_publication_status(self) -> None:
+        """Tests that a banned user cannot change the publication status of a
+        topic.
+        """
         self.login(self.banned_user_email)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(
@@ -6558,6 +6656,9 @@ class ChangeTopicPublicationStatusTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_guest_cannot_change_topic_publication_status(self) -> None:
+        """Tests that a guest user cannot change the publication status of a
+        topic.
+        """
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/mock_change_publication_status/%s' % self.topic_id,
@@ -6594,12 +6695,14 @@ class PerformTasksInTaskqueueTests(test_utils.GenericTestBase):
         ))
 
     def test_super_admin_can_perform_tasks_in_taskqueue(self) -> None:
+        """Tests that the superadmin can perform taks in the taskqueue."""
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json('/mock_perform_tasks_in_taskqueue')
         self.logout()
 
     def test_normal_user_cannot_perform_tasks_in_taskqueue(self) -> None:
+        """Tests that a normal user cannot perform tasks in the taskqueue."""
         self.login(self.viewer_email)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(
@@ -6612,6 +6715,9 @@ class PerformTasksInTaskqueueTests(test_utils.GenericTestBase):
     def test_request_with_appropriate_header_can_perform_tasks_in_taskqueue(
         self
     ) -> None:
+        """Tests that a request with the appropriate headers can perform taks
+        in a taskqueue.
+        """
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
                 '/mock_perform_tasks_in_taskqueue',
@@ -6645,12 +6751,14 @@ class PerformCronTaskTests(test_utils.GenericTestBase):
         ))
 
     def test_super_admin_can_perform_cron_tasks(self) -> None:
+        """Tests that the admin can perform cron tasks."""
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json('/mock_perform_cron_task')
         self.logout()
 
     def test_normal_user_cannot_perform_cron_tasks(self) -> None:
+        """Tests that a normal user cannot perform cron tasks."""
         self.login(self.viewer_email)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(
@@ -6663,6 +6771,9 @@ class PerformCronTaskTests(test_utils.GenericTestBase):
     def test_request_with_appropriate_header_can_perform_cron_tasks(
         self
     ) -> None:
+        """Tests that a request with the appropriate headers can perform cron
+        tasks.
+        """
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
                 '/mock_perform_cron_task', headers={'X-AppEngine-Cron': 'true'})
