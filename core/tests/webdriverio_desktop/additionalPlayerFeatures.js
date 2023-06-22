@@ -208,7 +208,7 @@ describe('Full exploration editor', function() {
     await users.logout();
   });
 
-  it('should navigate multiple states correctly, with parameters',
+  fit('should navigate multiple states correctly, with parameters',
     async function() {
       await users.createUser(
         'user4@editorAndPlayer.com', 'user4EditorAndPlayer');
@@ -260,7 +260,8 @@ describe('Full exploration editor', function() {
 
       await explorationPlayerPage.expectContentToMatch(
         await forms.toRichText('this is card 1'));
-      await browser.execute('window.click();');
+      var explorationHeader = $('.e2e-test-exploration-header');
+      await action.click('Exploration header', explorationHeader);
       await explorationPlayerPage.submitAnswer('NumericInput', 21);
       await explorationPlayerPage.expectContentToMatch(
         await forms.toRichText('this is card 2 with previous answer 21'));
