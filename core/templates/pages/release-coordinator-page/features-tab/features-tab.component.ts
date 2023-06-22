@@ -122,6 +122,11 @@ export class FeaturesTabComponent implements OnInit {
     })
   );
 
+  DEV_SERVER_STAGE = 'dev';
+  TEST_SERVER_STAGE = 'test';
+  PROD_SERVER_STAGE = 'prod';
+  serverStage: string = '';
+
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
@@ -142,6 +147,7 @@ export class FeaturesTabComponent implements OnInit {
 
   async reloadFeatureFlagsAsync(): Promise<void> {
     const data = await this.apiService.getFeatureFlags();
+    this.serverStage = data.serverStage;
     this.featureFlagsAreFetched = true;
     this.featureFlags = data.featureFlags;
     this.featureFlagNameToBackupMap = new Map(
@@ -192,6 +198,20 @@ export class FeaturesTabComponent implements OnInit {
     const rule = feature.rules[ruleIndex];
     this.removeRule(feature, ruleIndex);
     feature.rules.splice(ruleIndex + 1, 0, rule);
+  }
+
+  getFeatureValidOnCurrentServer(feature: PlatformParameter): boolean {
+    if (this.serverStage === this.DEV_SERVER_STAGE) {
+      return true;
+    } else if (this.serverStage === this.TEST_SERVER_STAGE) {
+      return (
+        feature.featureStage === this.TEST_SERVER_STAGE ||
+        feature.featureStage === this.PROD_SERVER_STAGE
+      ) ? true : false;
+    } else if (this.serverStage === this.PROD_SERVER_STAGE) {
+      return feature.featureStage === this.PROD_SERVER_STAGE ? true : false;
+    }
+    return false;
   }
 
   async updateFeatureRulesAsync(feature: PlatformParameter): Promise<void> {
@@ -316,12 +336,12 @@ export class FeaturesTabComponent implements OnInit {
     return issues;
   }
 
-  get isDummyFeatureEnabled(): boolean {
-    return this.featureService.status.DummyFeature.isEnabled;
+  get dummyFeatureFlagForE2eTestsIsEnabled(): boolean {
+    return this.featureService.status.DummyFeatureFlagForE2ETests.isEnabled;
   }
 
   async reloadDummyHandlerStatusAsync(): Promise<void> {
-    if (this.isDummyFeatureEnabled) {
+    if (this.dummyFeatureFlagForE2eTestsIsEnabled) {
       this.isDummyApiEnabled = await this.dummyApiService.isHandlerEnabled();
     }
   }

@@ -33,10 +33,12 @@ import {
 
 export interface FeatureFlagsDicts {
   'feature_flags': PlatformParameterBackendDict[];
+  'server_stage': string;
 }
 
 export interface FeatureFlagsResponse {
   featureFlags: PlatformParameter[];
+  serverStage: string;
 }
 
 @Injectable({
@@ -55,8 +57,8 @@ export class PlatformFeatureAdminBackendApiService {
         resolve({
           featureFlags: response.feature_flags.map(
             dict => PlatformParameter.createFromBackendDict(
-              dict)
-          )
+              dict)),
+          serverStage: response.server_stage
         });
       }, errorResponse => {
         reject(errorResponse.error.error);

@@ -29,7 +29,7 @@ Registry = registry.Registry
 class ParamNames(enum.Enum):
     """Enum for parameter names."""
 
-    DUMMY_FEATURE = 'dummy_feature'
+    DUMMY_FEATURE_FLAG_FOR_E2E_TESTS = 'dummy_feature_flag_for_e2e_tests'
     DUMMY_PARAMETER = 'dummy_parameter'
 
     END_CHAPTER_CELEBRATION = 'end_chapter_celebration'
@@ -50,9 +50,9 @@ class ParamNames(enum.Enum):
 # Platform parameters should all be defined below.
 
 Registry.create_feature_flag(
-    ParamNames.DUMMY_FEATURE,
-    'This is a dummy feature flag.',
-    platform_parameter_domain.FeatureStages.DEV,
+    ParamNames.DUMMY_FEATURE_FLAG_FOR_E2E_TESTS,
+    'This is a dummy feature flag for the e2e tests.',
+    platform_parameter_domain.FeatureStages.PROD,
 )
 
 Registry.create_platform_parameter(

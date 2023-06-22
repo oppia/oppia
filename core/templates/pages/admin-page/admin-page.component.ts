@@ -20,7 +20,6 @@ import { ChangeDetectorRef, Component, EventEmitter } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { AppConstants } from 'app.constants';
 import { WindowRef } from 'services/contextual/window-ref.service';
-import { PlatformFeatureService } from 'services/platform-feature.service';
 import { AdminRouterService } from './services/admin-router.service';
 
 @Component({
@@ -35,7 +34,6 @@ export class AdminPageComponent {
   constructor(
     private adminRouterService: AdminRouterService,
     private changeDetectorRef: ChangeDetectorRef,
-    private platformFeatureService: PlatformFeatureService,
     private windowRef: WindowRef
   ) {}
 
@@ -71,10 +69,6 @@ export class AdminPageComponent {
   setStatusMessage(statusMessage: string): void {
     this.statusMessage = statusMessage;
     this.changeDetectorRef.detectChanges();
-  }
-
-  isDummyFeatureEnabled(): boolean {
-    return this.platformFeatureService.status.DummyFeature.isEnabled;
   }
 }
 

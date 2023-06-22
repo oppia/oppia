@@ -22,7 +22,7 @@ import { FeatureStatusSummary, FeatureNames } from
 describe('Feature Status Summary Model', () => {
   it('should create an instance from a backend dict.', () => {
     const summary = FeatureStatusSummary.createFromBackendDict({
-      [FeatureNames.DummyFeature]: true,
+      [FeatureNames.DummyFeatureFlagForE2ETests]: true,
     });
 
     expect(summary.featureNameToFlag.size).toBe(1);
@@ -30,7 +30,7 @@ describe('Feature Status Summary Model', () => {
 
   it('should convert an instance back to a dict.', () => {
     const backendDict = {
-      [FeatureNames.DummyFeature]: true,
+      [FeatureNames.DummyFeatureFlagForE2ETests]: true,
     };
     const summary = FeatureStatusSummary.createFromBackendDict(backendDict);
     expect(summary.toBackendDict()).toEqual(backendDict);
@@ -39,11 +39,11 @@ describe('Feature Status Summary Model', () => {
   describe('.isFeatureEnabled', () => {
     it('should return the value of the parameter', () => {
       const summary = FeatureStatusSummary.createFromBackendDict({
-        [FeatureNames.DummyFeature]: true
+        [FeatureNames.DummyFeatureFlagForE2ETests]: true
       });
       const checker = summary.toStatusChecker();
 
-      expect(checker.DummyFeature.isEnabled).toBeTrue();
+      expect(checker.DummyFeatureFlagForE2ETests.isEnabled).toBeTrue();
     });
 
     it('should throw if the feature status is missing in backend dict.', () => {
@@ -51,9 +51,10 @@ describe('Feature Status Summary Model', () => {
       const checker = summary.toStatusChecker();
 
       expect(
-        () => checker.DummyFeature.isEnabled
+        () => checker.DummyFeatureFlagForE2ETests.isEnabled
       ).toThrowError(
-        `Feature \'${FeatureNames.DummyFeature}\' does not exist.`);
+        `Feature \'${
+          FeatureNames.DummyFeatureFlagForE2ETests}\' does not exist.`);
     });
   });
 });

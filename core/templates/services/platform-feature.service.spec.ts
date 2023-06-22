@@ -103,7 +103,7 @@ describe('PlatformFeatureService', () => {
 
     apiSpy = spyOn(apiService, 'fetchFeatureFlags').and.resolveTo(
       FeatureStatusSummary.createFromBackendDict({
-        [FeatureNames.DummyFeature]: true,
+        [FeatureNames.DummyFeatureFlagForE2ETests]: true,
       })
     );
   });
@@ -133,7 +133,7 @@ describe('PlatformFeatureService', () => {
             sessionId: sessionId,
             timestamp: Date.now(),
             featureStatusSummary: {
-              [FeatureNames.DummyFeature]: true,
+              [FeatureNames.DummyFeatureFlagForE2ETests]: true,
             }
           })
         });
@@ -191,7 +191,7 @@ describe('PlatformFeatureService', () => {
       flushMicrotasks();
 
       expect(
-        platformFeatureService.status.DummyFeature.isEnabled
+        platformFeatureService.status.DummyFeatureFlagForE2ETests.isEnabled
       ).toBeFalse();
       expect(platformFeatureService.isInitializedWithError).toBeTrue();
     }));
@@ -215,7 +215,7 @@ describe('PlatformFeatureService', () => {
       flushMicrotasks();
 
       expect(
-        platformFeatureService.status.DummyFeature.isEnabled
+        platformFeatureService.status.DummyFeatureFlagForE2ETests.isEnabled
       ).toBeTrue();
       expect(platformFeatureService.isInitializedWithError).toBeFalse();
     }));
@@ -224,7 +224,8 @@ describe('PlatformFeatureService', () => {
       () => {
         platformFeatureService = TestBed.inject(PlatformFeatureService);
         expect(
-          () => platformFeatureService.status.DummyFeature.isEnabled
+          () => (
+            platformFeatureService.status.DummyFeatureFlagForE2ETests.isEnabled)
         ).toThrowError(
           'The platform feature service has not been initialized.');
       })

@@ -36,7 +36,7 @@ describe('PlatformFeatureAdminBackendApiService', () => {
   let httpTestingController: HttpTestingController;
   let featureFlagsResponse = {
     feature_flags: [{
-      name: 'dummy_feature',
+      name: 'dummy_feature_flag_for_e2e_tests',
       description: 'this is a dummy feature',
       data_type: 'bool',
       rules: [{
@@ -50,7 +50,8 @@ describe('PlatformFeatureAdminBackendApiService', () => {
       default_value: false,
       is_feature: true,
       feature_stage: FeatureStage.DEV
-    }]
+    }],
+    server_stage: 'dev'
   };
 
   beforeEach(() => {
@@ -72,7 +73,8 @@ describe('PlatformFeatureAdminBackendApiService', () => {
 
     let featureFlagsObject = {
       featureFlags: featureFlagsResponse.feature_flags.map(
-        dict => PlatformParameter.createFromBackendDict(dict))
+        dict => PlatformParameter.createFromBackendDict(dict)),
+      serverStage: featureFlagsResponse.server_stage
     };
     featureAdminService.getFeatureFlags().then(successHandler, failHandler);
 

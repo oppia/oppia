@@ -17,7 +17,8 @@
  */
 
 export const PlatformFeatureDomainConstants = {
-  // Url for the dummy backend handler gated by the dummy_feature.
+  // Url for the dummy backend handler gated by the
+  // dummy_feature_flag_for_e2e_tests.
   DUMMY_HANDLER_URL: '/platform_feature_dummy_handler',
 
   // Url for the backend handler for evaluation of platform features.
