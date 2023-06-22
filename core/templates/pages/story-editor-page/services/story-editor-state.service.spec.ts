@@ -544,6 +544,21 @@ describe('Story editor state service', () => {
     expect(storyEditorStateService.areAnyExpIdsChanged()).toBeFalse();
   });
 
+  it('should set _currentNodeIsPublishable when setCurrentNodeAsPublishable ' +
+  'is called', () => {
+    storyEditorStateService._currentNodeIsPublishable = false;
+    storyEditorStateService.setCurrentNodeAsPublishable(true);
+    expect(storyEditorStateService._currentNodeIsPublishable).toBe(true);
+  });
+
+  it('should return _currentNodeIsPublishable when isCurrentNodePublishable ' +
+  'is called', () => {
+    storyEditorStateService._currentNodeIsPublishable = false;
+    expect(storyEditorStateService.isCurrentNodePublishable()).toBe(false);
+    storyEditorStateService._currentNodeIsPublishable = true;
+    expect(storyEditorStateService.isCurrentNodePublishable()).toBe(true);
+  });
+
   it('should return skill summaries when called', fakeAsync(() => {
     storyEditorStateService.loadStory('storyId_0');
     tick(1000);
