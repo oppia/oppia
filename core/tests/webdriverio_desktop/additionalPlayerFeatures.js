@@ -208,7 +208,7 @@ describe('Full exploration editor', function() {
     await users.logout();
   });
 
-  fit('should navigate multiple states correctly, with parameters',
+  it('should navigate multiple states correctly, with parameters',
     async function() {
       await users.createUser(
         'user4@editorAndPlayer.com', 'user4EditorAndPlayer');
