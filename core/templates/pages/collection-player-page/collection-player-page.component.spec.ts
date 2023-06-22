@@ -117,7 +117,7 @@ describe('Collection player page component', () => {
         thumbnail_icon_url: '/subjects/Algebra.svg',
         human_readable_contributors_summary: {},
         language_code: 'en',
-        thumbnail_bg_color: '#cd672b',
+        thumbnail_bg_color: '#cc4b00',
         created_on_msec: 1591296635736.666,
         ratings: {
           1: 0,
@@ -162,37 +162,37 @@ describe('Collection player page component', () => {
         thumbnailIconUrl: '/inverted_subjects/Algebra.svg',
         left: '225px',
         top: '35px',
-        thumbnailBgColor: '#cd672b'
+        thumbnailBgColor: '#cc4b00'
       },
       {
         thumbnailIconUrl: '/inverted_subjects/Algebra.svg',
         left: '390px',
         top: '145px',
-        thumbnailBgColor: '#cd672b'
+        thumbnailBgColor: '#cc4b00'
       },
       {
         thumbnailIconUrl: '/inverted_subjects/Algebra.svg',
         left: '225px',
         top: '255px',
-        thumbnailBgColor: '#cd672b'
+        thumbnailBgColor: '#cc4b00'
       },
       {
         thumbnailIconUrl: '/inverted_subjects/Algebra.svg',
         left: '60px',
         top: '365px',
-        thumbnailBgColor: '#cd672b'
+        thumbnailBgColor: '#cc4b00'
       },
       {
         thumbnailIconUrl: '/inverted_subjects/Algebra.svg',
         left: '225px',
         top: '475px',
-        thumbnailBgColor: '#cd672b'
+        thumbnailBgColor: '#cc4b00'
       },
       {
         thumbnailIconUrl: '/inverted_subjects/Algebra.svg',
         left: '390px',
         top: '585px',
-        thumbnailBgColor: '#cd672b'
+        thumbnailBgColor: '#cc4b00'
       }
     ];
 

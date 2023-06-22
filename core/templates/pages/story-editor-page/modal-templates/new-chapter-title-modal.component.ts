@@ -27,6 +27,7 @@ import { StoryUpdateService } from 'domain/story/story-update.service';
 import { Story } from 'domain/story/story.model';
 import { ValidatorsService } from 'services/validators.service';
 import { StoryEditorStateService } from '../services/story-editor-state.service';
+import { PlatformFeatureService } from 'services/platform-feature.service';
 
 @Component({
   selector: 'oppia-new-chapter-title-modal',
@@ -59,7 +60,8 @@ export class NewChapterTitleModalComponent implements OnInit {
     private ngbActiveModal: NgbActiveModal,
     private storyEditorStateService: StoryEditorStateService,
     private storyUpdateService: StoryUpdateService,
-    private validatorsService: ValidatorsService
+    private validatorsService: ValidatorsService,
+    private platformFeatureService: PlatformFeatureService
   ) {}
 
   ngOnInit(): void {
@@ -74,6 +76,11 @@ export class NewChapterTitleModalComponent implements OnInit {
       this.story, this.nodeId, this.editableThumbnailFilename);
     this.storyUpdateService.setStoryNodeThumbnailBgColor(
       this.story, this.nodeId, this.editableThumbnailBgColor);
+    if (this.platformFeatureService.status.
+      SerialChapterLaunchCurriculumAdminView.isEnabled) {
+      this.storyUpdateService.setStoryNodeStatus(
+        this.story, this.nodeId, 'Draft');
+    }
   }
 
   init(): void {

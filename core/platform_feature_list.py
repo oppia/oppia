@@ -43,7 +43,6 @@ ParamNames = params.ParamNames
 # Names of features in dev stage, the corresponding feature flag instances must
 # be in dev stage otherwise it will cause a test error in the backend test.
 DEV_FEATURES_LIST = [
-    params.ParamNames.DUMMY_FEATURE,
     params.ParamNames.SERIAL_CHAPTER_LAUNCH_CURRICULUM_ADMIN_VIEW,
     params.ParamNames.SHOW_TRANSLATION_SIZE
 ]
@@ -56,6 +55,7 @@ TEST_FEATURES_LIST: List[ParamNames] = [
 # Names of features in prod stage, the corresponding feature flag instances must
 # be in prod stage otherwise it will cause a test error in the backend test.
 PROD_FEATURES_LIST: List[ParamNames] = [
+    params.ParamNames.DUMMY_FEATURE_FLAG_FOR_E2E_TESTS,
     params.ParamNames.END_CHAPTER_CELEBRATION,
     params.ParamNames.CHECKPOINT_CELEBRATION,
     params.ParamNames.ANDROID_BETA_LANDING_PAGE,
