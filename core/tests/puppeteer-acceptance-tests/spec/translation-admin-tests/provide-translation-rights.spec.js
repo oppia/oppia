@@ -37,15 +37,13 @@ describe('Translation Admin', function() {
       await userFactory.createNewGuestUser(
         'translatorSpanish', 'translatorSpanish@example.com');
       await translationAdmin.navigateToContributorDashboardAdminPage();
-      await translationAdmin.assignTranslationRights(
-        'translatorSpanish', 'string:es');
-      await translationAdmin.viewContributorRightsByUser('translatorSpanish');
-      await translationAdmin.expectLanguageToBeDisplayedforSelectedUser(
-        'Spanish');
-      await translationAdmin.viewContributorTranslationRightsByLanguage(
-        'string:es');
-      await translationAdmin.expectUserToBeDisplayedForSelectedLanguage(
-        'translatorSpanish');
+      await translationAdmin.assignTranslationRightsToUserWithLanguageCode(
+        'translatorSpanish', 'es');
+      await translationAdmin.viewContributorRightsForUser('translatorSpanish');
+      await translationAdmin.expectDisplayedLanguagesToContain('Spanish');
+      await translationAdmin.viewContributorTranslationRightsByLanguageCode(
+        'es');
+      await translationAdmin.expectUserToBeDisplayed('translatorSpanish');
     }, DEFAULT_SPEC_TIMEOUT);
 
   afterAll(async function() {

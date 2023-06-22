@@ -76,13 +76,14 @@ module.exports = class TranslationAdmin extends baseUser {
   /**
    * Function for assigning a translation right to a user.
    * @param {string} username - the username of the user.
-   * @param {string} languageValue - the language to assign as an option value.
+   * @param {string} languageCode - the language code of the language to assign.
    */
-  async assignTranslationRights(username, languageValue) {
+  async assignTranslationRightsToUserWithLanguageCode(username, languageCode) {
     await this.type(addContributorUsernameInput, username);
     await this.select(
       addContributonRightsCategorySelect, translationRightValue);
-    await this.select(addContributonRightsLanguageDropdown, languageValue);
+    await this.select(addContributonRightsLanguageDropdown, 
+      'string:' + languageCode);
     await this.clickOn(addontributionRightsSubmitButton);
 
     await this.page.waitForNetworkIdle();
@@ -91,13 +92,14 @@ module.exports = class TranslationAdmin extends baseUser {
   /**
    * Function for revoking a translation right from a user.
    * @param {string} username - the username of the user.
-   * @param {string} languageValue - the language to revoke as an option value.
+   * @param {string} languageCode - the language code of the language to revoke.
    */
-  async revokeTranslationRights(username, languageValue) {
+  async revokeTranslationRightsFromUserForLanguageCode(username, languageCode) {
     await this.type(revokeContributorUsernameInput, username);
     await this.select(
       revokeContributonRightsCategorySelect, translationRightValue);
-    await this.select(revokeContributonRightsLanguageSelect, languageValue);
+    await this.select(revokeContributonRightsLanguageSelect, 
+      'string:' + languageCode);
     await this.clickOn(revokeContributionRightsSubmitButton);
 
     await this.page.waitForNetworkIdle();
@@ -107,7 +109,7 @@ module.exports = class TranslationAdmin extends baseUser {
    * Function to display contributon rights by user.
    * @param {string} username - the username of the user to view.
    */
-  async viewContributorRightsByUser(username) {
+  async viewContributorRightsForUser(username) {
     await this.select(viewContributorMethodSelect, usernameMethodValue);
     await this.type(viewContributerUsernameInput, username);
     await this.clickOn(viewContributorSubmitButton);
@@ -117,12 +119,12 @@ module.exports = class TranslationAdmin extends baseUser {
 
   /**
    * Function to display translation rights by language.
-   * @param {string} languageValue - the language option as an option value.
+   * @param {string} languageCode - the language option as an option value.
    */
-  async viewContributorTranslationRightsByLanguage(languageValue) {
+  async viewContributorTranslationRightsByLanguageCode(languageCode) {
     await this.select(viewContributorMethodSelect, roleMethodValue);
     await this.select(viewContributorCategorySelect, translationRightValue);
-    await this.select(viewContributorLanguageSelect, languageValue);
+    await this.select(viewContributorLanguageSelect, 'string:' + languageCode);
     await this.clickOn(viewContributorSubmitButton);
 
     await this.page.waitForNetworkIdle();
@@ -132,7 +134,7 @@ module.exports = class TranslationAdmin extends baseUser {
    * Function to check if the language is displayed as a translation right.
    * @param {string} language - the language to match.
    */
-  async expectLanguageToBeDisplayedforSelectedUser(language) {
+  async expectDisplayedLanguagesToContain(language) {
     await this.page.waitForSelector(viewContributorLanguageResult);
     let displayedLanguage = await this.page.$eval(
       viewContributorLanguageResult,
@@ -148,15 +150,15 @@ module.exports = class TranslationAdmin extends baseUser {
 
   /**
    * Function to check if the user is displayed as a translator.
-   * @param {string} user - the user expected to be displayed.
+   * @param {string} usenamer - the user expected to be displayed.
    */
-  async expectUserToBeDisplayedForSelectedLanguage(user) {
+  async expectUserToBeDisplayed(username) {
     await this.page.waitForSelector(viewLanguageRoleUserResult);
     let displayedUsers = await this.page.$eval(
       viewLanguageRoleUserResult,
       element => element.innerText
     );
-    if (!displayedUsers.includes(user)) {
+    if (!displayedUsers.includes(username)) {
       throw new Error(
         `${user} does not have translation rights for selected language!`);
     }
@@ -164,14 +166,15 @@ module.exports = class TranslationAdmin extends baseUser {
 
   /**
    * Function to check that there are no translators for the selected language.
+   * @param {string} usename - the user expected to not be displayed.
    */
-  async expectUserToNotBeDisplayedForSelectedLanguage(user) {
+  async expectUserToNotBeDisplayed(username) {
     await this.page.waitForSelector(viewLanguageRoleUserResult);
     let displayedUsers = await this.page.$eval(
       viewLanguageRoleUserResult,
       element => element.innerText
     );
-    if (displayedUsers.includes(user)) {
+    if (displayedUsers.includes(username)) {
       throw new Error(
         `${user} has translation rights for selected language!`);
     }
