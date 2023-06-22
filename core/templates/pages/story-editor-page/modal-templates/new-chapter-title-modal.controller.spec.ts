@@ -26,6 +26,7 @@ import { EditableStoryBackendApiService } from '../../../domain/story/editable-s
 import { StoryEditorStateService } from '../services/story-editor-state.service';
 import { StoryUpdateService } from '../../../domain/story/story-update.service';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { PlatformFeatureService } from '../../../services/platform-feature.service';
 
 class MockActiveModal {
   close(): void {
@@ -37,6 +38,14 @@ class MockActiveModal {
   }
 }
 
+class MockPlatformFeatureService {
+  status = {
+    SerialChapterLaunchCurriculumAdminView: {
+      isEnabled: false
+    }
+  };
+}
+
 describe('Create New Chapter Modal Component', () => {
   let fixture: ComponentFixture<NewChapterTitleModalComponent>;
   let component: NewChapterTitleModalComponent;
@@ -44,6 +53,7 @@ describe('Create New Chapter Modal Component', () => {
   let storyUpdateService: StoryUpdateService;
   let curatedExplorationValidationService;
   let nodeTitles = ['title 1', 'title 2', 'title 3'];
+  let mockPlatformFeatureService = new MockPlatformFeatureService();
   let editableStoryBackendApiService:
     EditableStoryBackendApiService;
 
@@ -58,6 +68,10 @@ describe('Create New Chapter Modal Component', () => {
         StoryUpdateService,
         CuratedExplorationValidationService,
         EditableStoryBackendApiService,
+        {
+          provide: PlatformFeatureService,
+          useValue: mockPlatformFeatureService
+        },
         {
           provide: NgbActiveModal,
           useClass: MockActiveModal
@@ -127,11 +141,16 @@ describe('Create New Chapter Modal Component', () => {
       storyUpdateService, 'setStoryNodeThumbnailBgColor');
     let storyUpdateSpyThumbnailFilename = spyOn(
       storyUpdateService, 'setStoryNodeThumbnailFilename');
+    let storyUpdateSpyStatus = spyOn(
+      storyUpdateService, 'setStoryNodeStatus');
+    mockPlatformFeatureService.
+      status.SerialChapterLaunchCurriculumAdminView.isEnabled = true;
 
     component.addStoryNodeWithData();
 
     expect(storyUpdateSpyThumbnailBgColor).toHaveBeenCalled();
     expect(storyUpdateSpyThumbnailFilename).toHaveBeenCalled();
+    expect(storyUpdateSpyStatus).toHaveBeenCalled();
   });
 
   it('should initialize component properties after controller is initialized',

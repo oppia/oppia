@@ -32,6 +32,11 @@ export interface StoryNodeBackendDict {
   'exploration_id': string | null;
   'thumbnail_bg_color': string | null;
   'thumbnail_filename': string | null;
+  'status': string;
+  'planned_publication_date_msecs': number | null;
+  'last_modified_msecs': number | null;
+  'first_publication_date_msecs': number | null;
+  'unpublishing_reason': string | null;
 }
 
 export class StoryNode {
@@ -46,12 +51,22 @@ export class StoryNode {
   _explorationId: string | null;
   _thumbnailBgColor: string | null;
   _thumbnailFilename: string | null;
+  _status: string;
+  _plannedPublicationDateMsecs: number | null;
+  _lastModifiedMsecs: number | null;
+  _firstPublicationDateMsecs: number | null;
+  _unpublishingReason: string | null;
+
   constructor(
       id: string, title: string, description: string,
       destinationNodeIds: string[], prerequisiteSkillIds: string[],
       acquiredSkillIds: string[], outline: string,
       outlineIsFinalized: boolean, explorationId: string | null,
-      thumbnailBgColor: string | null, thumbnailFilename: string | null) {
+      thumbnailBgColor: string | null, thumbnailFilename: string | null,
+      status: string, plannedPublicationDateMsecs: number | null,
+      lastModifiedMsecs: number | null,
+      firstPublicationDateMsecs: number | null,
+      unpublishingReason: string | null) {
     this._id = id;
     this._title = title;
     this._description = description;
@@ -63,6 +78,11 @@ export class StoryNode {
     this._explorationId = explorationId;
     this._thumbnailBgColor = thumbnailBgColor;
     this._thumbnailFilename = thumbnailFilename;
+    this._status = status;
+    this._plannedPublicationDateMsecs = plannedPublicationDateMsecs;
+    this._lastModifiedMsecs = lastModifiedMsecs;
+    this._firstPublicationDateMsecs = firstPublicationDateMsecs;
+    this._unpublishingReason = unpublishingReason;
   }
 
   _checkValidNodeId(nodeId: string): boolean {
@@ -99,6 +119,50 @@ export class StoryNode {
 
   getOutline(): string {
     return this._outline;
+  }
+
+  getStatus(): string {
+    return this._status;
+  }
+
+  getPlannedPublicationDateMsecs(): number | null {
+    return this._plannedPublicationDateMsecs;
+  }
+
+  getLastModifiedMsecs(): number | null {
+    return this._lastModifiedMsecs;
+  }
+
+  getFirstPublicationDateMsecs(): number | null {
+    return this._firstPublicationDateMsecs;
+  }
+
+  getUnpublishingReason(): string | null {
+    return this._unpublishingReason;
+  }
+
+  setStatus(status: string): void {
+    this._status = status;
+  }
+
+  setPlannedPublicationDateMsecs(
+      plannedPublicationDateMsecs: number | null
+  ): void {
+    this._plannedPublicationDateMsecs = plannedPublicationDateMsecs;
+  }
+
+  setLastModifiedMsecs(lastModifiedMsecs: number | null): void {
+    this._lastModifiedMsecs = lastModifiedMsecs;
+  }
+
+  setFirstPublicationDateMsecs(
+      firstPublicationDateMsecs: number | null
+  ): void {
+    this._firstPublicationDateMsecs = firstPublicationDateMsecs;
+  }
+
+  setUnpublishingReason(unpublishingReason: string | null): void {
+    this._unpublishingReason = unpublishingReason;
   }
 
   setOutline(outline: string): void {
@@ -283,13 +347,18 @@ export class StoryNode {
       storyNodeBackendObject.outline_is_finalized,
       storyNodeBackendObject.exploration_id,
       storyNodeBackendObject.thumbnail_bg_color,
-      storyNodeBackendObject.thumbnail_filename
+      storyNodeBackendObject.thumbnail_filename,
+      storyNodeBackendObject.status,
+      storyNodeBackendObject.planned_publication_date_msecs,
+      storyNodeBackendObject.last_modified_msecs,
+      storyNodeBackendObject.first_publication_date_msecs,
+      storyNodeBackendObject.unpublishing_reason
     );
   }
 
   static createFromIdAndTitle(nodeId: string, title: string): StoryNode {
     return new StoryNode(
       nodeId, title, '', [], [], [], '', false, null,
-      null, null);
+      null, null, 'Draft', null, null, null, null);
   }
 }

@@ -99,7 +99,12 @@ describe('Learner Story Summary Tile Component', () => {
       outline: 'Outline',
       exploration_id: null,
       outline_is_finalized: false,
-      thumbnail_bg_color: '#a33f40'
+      thumbnail_bg_color: '#a33f40',
+      status: 'Published',
+      planned_publication_date_msecs: 100,
+      last_modified_msecs: 100,
+      first_publication_date_msecs: 200,
+      unpublishing_reason: null
     };
     const sampleStorySummaryBackendDict = {
       id: '0',
@@ -142,7 +147,12 @@ describe('Learner Story Summary Tile Component', () => {
       outline: 'Outline',
       exploration_id: 'test',
       outline_is_finalized: false,
-      thumbnail_bg_color: '#a33f40'
+      thumbnail_bg_color: '#a33f40',
+      status: 'Published',
+      planned_publication_date_msecs: 100,
+      last_modified_msecs: 100,
+      first_publication_date_msecs: 200,
+      unpublishing_reason: null
     };
     const sampleStorySummaryBackendDict = {
       id: '0',

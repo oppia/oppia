@@ -357,6 +357,46 @@ interface StoryNodeDestinationIdsChange {
   'node_id': string;
 }
 
+interface StoryNodeStatusChange {
+  'cmd': 'update_story_node_property';
+  'property_name': 'status';
+  'new_value': string;
+  'old_value': string;
+  'node_id': string;
+}
+
+interface StoryNodePlannedPublicationDateMsecsChange {
+  'cmd': 'update_story_node_property';
+  'property_name': 'planned_publication_date_msecs';
+  'new_value': number;
+  'old_value': number;
+  'node_id': string;
+}
+
+interface StoryNodeLastModifiedMsecsChange {
+  'cmd': 'update_story_node_property';
+  'property_name': 'last_modified_msecs';
+  'new_value': number;
+  'old_value': number;
+  'node_id': string;
+}
+
+interface StoryNodeFirstPublicationDateMsecsChange {
+  'cmd': 'update_story_node_property';
+  'property_name': 'first_publication_date_msecs';
+  'new_value': number;
+  'old_value': number;
+  'node_id': string;
+}
+
+interface StoryNodeUnpublishingReasonChange {
+  'cmd': 'update_story_node_property';
+  'property_name': 'unpublishing_reason';
+  'new_value': string;
+  'old_value': string;
+  'node_id': string;
+}
+
 interface StoryNodePrerequisiteSkillsChange {
   'cmd': 'update_story_node_property';
   'property_name': 'prerequisite_skill_ids';
@@ -382,7 +422,13 @@ type StoryNodePropertyChange = (
   StoryNodeExplorationIdChange |
   StoryNodeDestinationIdsChange |
   StoryNodePrerequisiteSkillsChange |
-  StoryNodeAcequiredSkillsChange);
+  StoryNodeAcequiredSkillsChange |
+  StoryNodeStatusChange |
+  StoryNodePlannedPublicationDateMsecsChange |
+  StoryNodeLastModifiedMsecsChange |
+  StoryNodeFirstPublicationDateMsecsChange |
+  StoryNodeUnpublishingReasonChange
+  );
 
 interface StoryAddNodeChange {
   'cmd': 'add_story_node';

@@ -25,16 +25,32 @@ import { StoryUpdateService } from 'domain/story/story-update.service';
 import { UndoRedoService } from 'domain/editor/undo_redo/undo-redo.service';
 import { EntityEditorBrowserTabsInfo } from 'domain/entity_editor_browser_tabs_info/entity-editor-browser-tabs-info.model';
 import { LocalStorageService } from 'services/local-storage.service';
+import { PlatformFeatureService } from '../../services/platform-feature.service';
+
+class MockPlatformFeatureService {
+  status = {
+    SerialChapterLaunchCurriculumAdminView: {
+      isEnabled: false
+    }
+  };
+}
 
 describe('Story update service', () => {
   let storyUpdateService: StoryUpdateService;
   let undoRedoService: UndoRedoService;
   let localStorageService: LocalStorageService;
   let _sampleStory: Story;
+  let mockPlatformFeatureService = new MockPlatformFeatureService();
 
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
+      providers: [
+        {
+          provide: PlatformFeatureService,
+          useValue: mockPlatformFeatureService
+        },
+      ]
     });
 
     storyUpdateService = TestBed.inject(StoryUpdateService);
@@ -63,6 +79,11 @@ describe('Story update service', () => {
             outline_is_finalized: false,
             thumbnail_filename: 'fileName',
             thumbnail_bg_color: 'blue',
+            status: 'Published',
+            planned_publication_date_msecs: 30,
+            last_modified_msecs: 40,
+            first_publication_date_msecs: 20,
+            unpublishing_reason: null
           }, {
             id: 'node_2',
             title: 'Title 2',
@@ -75,6 +96,11 @@ describe('Story update service', () => {
             outline_is_finalized: true,
             thumbnail_filename: 'fileName',
             thumbnail_bg_color: 'blue',
+            status: 'Draft',
+            planned_publication_date_msecs: 10,
+            last_modified_msecs: 50,
+            first_publication_date_msecs: 10,
+            unpublishing_reason: 'Bad Content'
           }],
         next_node_id: 'node_3'
       },
@@ -94,6 +120,8 @@ describe('Story update service', () => {
 
   it('should add/remove a prerequisite skill id to/from a node in the story',
     () => {
+      let storyNodeLastModifiedSpy = spyOn(
+        storyUpdateService, 'setStoryNodeLastModifiedMsecs');
       expect(
         _sampleStory.getStoryContents().getNodes()[0].getPrerequisiteSkillIds()
       ).toEqual(['skill_1']);
@@ -103,6 +131,8 @@ describe('Story update service', () => {
         _sampleStory.getStoryContents().getNodes()[0].getPrerequisiteSkillIds()
       ).toEqual(['skill_1', 'skill_3']);
       expect(storyUpdateService.onStoryChapterUpdateEventEmitter.emit)
+        .toHaveBeenCalled();
+      expect(storyNodeLastModifiedSpy)
         .toHaveBeenCalled();
 
       undoRedoService.undoChange(_sampleStory);
@@ -115,6 +145,8 @@ describe('Story update service', () => {
   it('should create a proper backend change dict for adding a prerequisite ' +
     'skill id to a node',
   () => {
+    let storyNodeLastModifiedSpy = spyOn(
+      storyUpdateService, 'setStoryNodeLastModifiedMsecs');
     storyUpdateService.addPrerequisiteSkillIdToNode(
       _sampleStory, 'node_1', 'skill_3');
     expect(undoRedoService.getCommittableChangeList()).toEqual([{
@@ -124,10 +156,14 @@ describe('Story update service', () => {
       old_value: ['skill_1'],
       node_id: 'node_1'
     }]);
+    expect(storyNodeLastModifiedSpy)
+      .toHaveBeenCalled();
   });
 
   it('should add/remove an acquired skill id to/from a node in the story',
     () => {
+      let storyNodeLastModifiedSpy = spyOn(
+        storyUpdateService, 'setStoryNodeLastModifiedMsecs');
       expect(
         _sampleStory.getStoryContents().getNodes()[0].getAcquiredSkillIds()
       ).toEqual(['skill_2']);
@@ -137,6 +173,8 @@ describe('Story update service', () => {
         _sampleStory.getStoryContents().getNodes()[0].getAcquiredSkillIds()
       ).toEqual(['skill_2', 'skill_4']);
       expect(storyUpdateService.onStoryChapterUpdateEventEmitter.emit)
+        .toHaveBeenCalled();
+      expect(storyNodeLastModifiedSpy)
         .toHaveBeenCalled();
 
       undoRedoService.undoChange(_sampleStory);
@@ -149,6 +187,8 @@ describe('Story update service', () => {
   it('should create a proper backend change dict for adding an acquired ' +
     'skill id to a node',
   () => {
+    let storyNodeLastModifiedSpy = spyOn(
+      storyUpdateService, 'setStoryNodeLastModifiedMsecs');
     storyUpdateService.addAcquiredSkillIdToNode(
       _sampleStory, 'node_1', 'skill_4');
     expect(undoRedoService.getCommittableChangeList()).toEqual([{
@@ -158,15 +198,21 @@ describe('Story update service', () => {
       old_value: ['skill_2'],
       node_id: 'node_1'
     }]);
+    expect(storyNodeLastModifiedSpy)
+      .toHaveBeenCalled();
   });
 
   it('should add/remove a destination node id to/from a node in the story',
     () => {
+      let storyNodeLastModifiedSpy = spyOn(
+        storyUpdateService, 'setStoryNodeLastModifiedMsecs');
       expect(
         _sampleStory.getStoryContents().getNodes()[0].getDestinationNodeIds()
       ).toEqual([]);
       storyUpdateService.addDestinationNodeIdToNode(
         _sampleStory, 'node_1', 'node_2');
+      expect(storyNodeLastModifiedSpy)
+        .toHaveBeenCalled();
 
       // Adding an invalid destination node id should throw an error.
       expect(() => {
@@ -188,6 +234,8 @@ describe('Story update service', () => {
   it('should create a proper backend change dict for adding a destination ' +
     'node id to a node',
   () => {
+    let storyNodeLastModifiedSpy = spyOn(
+      storyUpdateService, 'setStoryNodeLastModifiedMsecs');
     storyUpdateService.addDestinationNodeIdToNode(
       _sampleStory, 'node_1', 'node_2');
     expect(undoRedoService.getCommittableChangeList()).toEqual([{
@@ -197,10 +245,14 @@ describe('Story update service', () => {
       old_value: [],
       node_id: 'node_1'
     }]);
+    expect(storyNodeLastModifiedSpy)
+      .toHaveBeenCalled();
   });
 
   it('should remove/add a prerequisite skill id from/to a node in the story',
     () => {
+      let storyNodeLastModifiedSpy = spyOn(
+        storyUpdateService, 'setStoryNodeLastModifiedMsecs');
       expect(
         _sampleStory.getStoryContents().getNodes()[0].getPrerequisiteSkillIds()
       ).toEqual(['skill_1']);
@@ -210,6 +262,8 @@ describe('Story update service', () => {
         _sampleStory.getStoryContents().getNodes()[0].getPrerequisiteSkillIds()
       ).toEqual([]);
       expect(storyUpdateService.onStoryChapterUpdateEventEmitter.emit)
+        .toHaveBeenCalled();
+      expect(storyNodeLastModifiedSpy)
         .toHaveBeenCalled();
 
       undoRedoService.undoChange(_sampleStory);
@@ -238,6 +292,8 @@ describe('Story update service', () => {
   it('should create a proper backend change dict for removing a prerequisite ' +
     'skill id from a node',
   () => {
+    let storyNodeLastModifiedSpy = spyOn(
+      storyUpdateService, 'setStoryNodeLastModifiedMsecs');
     storyUpdateService.removePrerequisiteSkillIdFromNode(
       _sampleStory, 'node_1', 'skill_1');
     expect(undoRedoService.getCommittableChangeList()).toEqual([{
@@ -247,10 +303,14 @@ describe('Story update service', () => {
       old_value: ['skill_1'],
       node_id: 'node_1'
     }]);
+    expect(storyNodeLastModifiedSpy)
+      .toHaveBeenCalled();
   });
 
   it('should remove/add an acquired skill id from/to a node in the story',
     () => {
+      let storyNodeLastModifiedSpy = spyOn(
+        storyUpdateService, 'setStoryNodeLastModifiedMsecs');
       expect(
         _sampleStory.getStoryContents().getNodes()[0].getAcquiredSkillIds()
       ).toEqual(['skill_2']);
@@ -259,6 +319,8 @@ describe('Story update service', () => {
       expect(
         _sampleStory.getStoryContents().getNodes()[0].getAcquiredSkillIds()
       ).toEqual([]);
+      expect(storyNodeLastModifiedSpy)
+        .toHaveBeenCalled();
 
       undoRedoService.undoChange(_sampleStory);
       expect(
@@ -286,6 +348,8 @@ describe('Story update service', () => {
   it('should create a proper backend change dict for removing an acquired ' +
     'skill id from a node',
   () => {
+    let storyNodeLastModifiedSpy = spyOn(
+      storyUpdateService, 'setStoryNodeLastModifiedMsecs');
     storyUpdateService.removeAcquiredSkillIdFromNode(
       _sampleStory, 'node_1', 'skill_2');
     expect(undoRedoService.getCommittableChangeList()).toEqual([{
@@ -295,15 +359,21 @@ describe('Story update service', () => {
       old_value: ['skill_2'],
       node_id: 'node_1'
     }]);
+    expect(storyNodeLastModifiedSpy)
+      .toHaveBeenCalled();
   });
 
   it('should remove/add a destination node id from/to a node in the story',
     () => {
+      let storyNodeLastModifiedSpy = spyOn(
+        storyUpdateService, 'setStoryNodeLastModifiedMsecs');
       expect(
         _sampleStory.getStoryContents().getNodes()[1].getDestinationNodeIds()
       ).toEqual(['node_1']);
       storyUpdateService.removeDestinationNodeIdFromNode(
         _sampleStory, 'node_2', 'node_1');
+      expect(storyNodeLastModifiedSpy)
+        .toHaveBeenCalled();
 
       expect(
         _sampleStory.getStoryContents().getNodes()[1].getDestinationNodeIds()
@@ -340,6 +410,8 @@ describe('Story update service', () => {
   it('should create a proper backend change dict for removing a destination ' +
     'node id from a node',
   () => {
+    let storyNodeLastModifiedSpy = spyOn(
+      storyUpdateService, 'setStoryNodeLastModifiedMsecs');
     storyUpdateService.removeDestinationNodeIdFromNode(
       _sampleStory, 'node_2', 'node_1');
     expect(undoRedoService.getCommittableChangeList()).toEqual([{
@@ -349,6 +421,8 @@ describe('Story update service', () => {
       old_value: ['node_1'],
       node_id: 'node_2'
     }]);
+    expect(storyNodeLastModifiedSpy)
+      .toHaveBeenCalled();
   });
 
   it('should add/remove a story node', () => {
@@ -407,6 +481,8 @@ describe('Story update service', () => {
   );
 
   it('should finalize a story node outline', () => {
+    let storyNodeLastModifiedSpy = spyOn(
+      storyUpdateService, 'setStoryNodeLastModifiedMsecs');
     expect(
       _sampleStory.getStoryContents().getNodes()[0].getOutlineStatus()
     ).toBe(false);
@@ -416,6 +492,8 @@ describe('Story update service', () => {
     ).toBe(true);
 
     expect(storyUpdateService.onStoryChapterUpdateEventEmitter.emit)
+      .toHaveBeenCalled();
+    expect(storyNodeLastModifiedSpy)
       .toHaveBeenCalled();
     undoRedoService.undoChange(_sampleStory);
     expect(
@@ -433,6 +511,8 @@ describe('Story update service', () => {
 
   it('should create a proper backend change dict for finalizing a node outline',
     () => {
+      let storyNodeLastModifiedSpy = spyOn(
+        storyUpdateService, 'setStoryNodeLastModifiedMsecs');
       storyUpdateService.finalizeStoryNodeOutline(_sampleStory, 'node_1');
       expect(undoRedoService.getCommittableChangeList()).toEqual([{
         cmd: 'update_story_node_outline_status',
@@ -440,10 +520,14 @@ describe('Story update service', () => {
         old_value: false,
         node_id: 'node_1'
       }]);
+      expect(storyNodeLastModifiedSpy)
+        .toHaveBeenCalled();
     }
   );
 
   it('should unfinalize a story node outline', () => {
+    let storyNodeLastModifiedSpy = spyOn(
+      storyUpdateService, 'setStoryNodeLastModifiedMsecs');
     expect(
       _sampleStory.getStoryContents().getNodes()[1].getOutlineStatus()
     ).toBe(true);
@@ -452,6 +536,8 @@ describe('Story update service', () => {
       _sampleStory.getStoryContents().getNodes()[1].getOutlineStatus()
     ).toBe(false);
     expect(storyUpdateService.onStoryChapterUpdateEventEmitter.emit)
+      .toHaveBeenCalled();
+    expect(storyNodeLastModifiedSpy)
       .toHaveBeenCalled();
 
     undoRedoService.undoChange(_sampleStory);
@@ -469,6 +555,8 @@ describe('Story update service', () => {
 
   it('should create a proper backend change dict for unfinalizing a node ' +
     'outline', () => {
+    let storyNodeLastModifiedSpy = spyOn(
+      storyUpdateService, 'setStoryNodeLastModifiedMsecs');
     storyUpdateService.unfinalizeStoryNodeOutline(_sampleStory, 'node_2');
     expect(undoRedoService.getCommittableChangeList()).toEqual([{
       cmd: 'update_story_node_outline_status',
@@ -476,9 +564,13 @@ describe('Story update service', () => {
       old_value: true,
       node_id: 'node_2'
     }]);
+    expect(storyNodeLastModifiedSpy)
+      .toHaveBeenCalled();
   });
 
   it('should set a story node outline', () => {
+    let storyNodeLastModifiedSpy = spyOn(
+      storyUpdateService, 'setStoryNodeLastModifiedMsecs');
     expect(
       _sampleStory.getStoryContents().getNodes()[0].getOutline()
     ).toBe('Outline');
@@ -487,6 +579,8 @@ describe('Story update service', () => {
     expect(
       _sampleStory.getStoryContents().getNodes()[0].getOutline()
     ).toBe('new outline');
+    expect(storyNodeLastModifiedSpy)
+      .toHaveBeenCalled();
 
     undoRedoService.undoChange(_sampleStory);
     expect(
@@ -496,6 +590,8 @@ describe('Story update service', () => {
 
   it('should create a proper backend change dict for setting a node outline',
     () => {
+      let storyNodeLastModifiedSpy = spyOn(
+        storyUpdateService, 'setStoryNodeLastModifiedMsecs');
       storyUpdateService.setStoryNodeOutline(
         _sampleStory, 'node_1', 'new outline');
       expect(undoRedoService.getCommittableChangeList()).toEqual([{
@@ -505,10 +601,14 @@ describe('Story update service', () => {
         old_value: 'Outline',
         node_id: 'node_1'
       }]);
+      expect(storyNodeLastModifiedSpy)
+        .toHaveBeenCalled();
     }
   );
 
   it('should set a story node title', () => {
+    let storyNodeLastModifiedSpy = spyOn(
+      storyUpdateService, 'setStoryNodeLastModifiedMsecs');
     expect(
       _sampleStory.getStoryContents().getNodes()[0].getTitle()
     ).toBe('Title 1');
@@ -517,6 +617,8 @@ describe('Story update service', () => {
     expect(
       _sampleStory.getStoryContents().getNodes()[0].getTitle()
     ).toBe('new title');
+    expect(storyNodeLastModifiedSpy)
+      .toHaveBeenCalled();
 
     undoRedoService.undoChange(_sampleStory);
     expect(
@@ -526,6 +628,8 @@ describe('Story update service', () => {
 
   it('should create a proper backend change dict for setting a node title',
     () => {
+      let storyNodeLastModifiedSpy = spyOn(
+        storyUpdateService, 'setStoryNodeLastModifiedMsecs');
       storyUpdateService.setStoryNodeTitle(
         _sampleStory, 'node_1', 'new title');
       expect(undoRedoService.getCommittableChangeList()).toEqual([{
@@ -535,10 +639,123 @@ describe('Story update service', () => {
         old_value: 'Title 1',
         node_id: 'node_1'
       }]);
+      expect(storyNodeLastModifiedSpy)
+        .toHaveBeenCalled();
     }
   );
 
+  it('should set a story node status', () => {
+    let storyNodeLastModifiedSpy = spyOn(
+      storyUpdateService, 'setStoryNodeLastModifiedMsecs');
+    expect(
+      _sampleStory.getStoryContents().getNodes()[0].getStatus()
+    ).toBe('Published');
+    storyUpdateService.setStoryNodeStatus(
+      _sampleStory, 'node_1', 'Draft');
+    expect(
+      _sampleStory.getStoryContents().getNodes()[0].getStatus()
+    ).toBe('Draft');
+    expect(storyNodeLastModifiedSpy)
+      .toHaveBeenCalled();
+
+    undoRedoService.undoChange(_sampleStory);
+
+    expect(
+      _sampleStory.getStoryContents().getNodes()[0].getStatus()
+    ).toBe('Published');
+  });
+
+  it('should set a story node planned publication date', () => {
+    let storyNodeLastModifiedSpy = spyOn(
+      storyUpdateService, 'setStoryNodeLastModifiedMsecs');
+    expect(
+      _sampleStory.getStoryContents().getNodes()[
+        0].getPlannedPublicationDateMsecs()
+    ).toBe(30);
+    storyUpdateService.setStoryNodePlannedPublicationDateMsecs(
+      _sampleStory, 'node_1', 40);
+    expect(
+      _sampleStory.getStoryContents().getNodes()[
+        0].getPlannedPublicationDateMsecs()
+    ).toBe(40);
+    expect(storyNodeLastModifiedSpy)
+      .toHaveBeenCalled();
+
+    undoRedoService.undoChange(_sampleStory);
+
+    expect(
+      _sampleStory.getStoryContents().getNodes()[
+        0].getPlannedPublicationDateMsecs()
+    ).toBe(30);
+  });
+
+  it('should set a story node last modified', () => {
+    mockPlatformFeatureService.
+      status.SerialChapterLaunchCurriculumAdminView.isEnabled = true;
+    expect(
+      _sampleStory.getStoryContents().getNodes()[0].getLastModifiedMsecs()
+    ).toBe(40);
+    storyUpdateService.setStoryNodeLastModifiedMsecs(
+      _sampleStory, 'node_1', 50);
+    expect(
+      _sampleStory.getStoryContents().getNodes()[0].getLastModifiedMsecs()
+    ).toBe(50);
+
+    undoRedoService.undoChange(_sampleStory);
+
+    expect(
+      _sampleStory.getStoryContents().getNodes()[0].getLastModifiedMsecs()
+    ).toBe(40);
+  });
+
+  it('should set a story node first publication date', () => {
+    let storyNodeLastModifiedSpy = spyOn(
+      storyUpdateService, 'setStoryNodeLastModifiedMsecs');
+    expect(
+      _sampleStory.getStoryContents().getNodes()[
+        0].getFirstPublicationDateMsecs()
+    ).toBe(20);
+    storyUpdateService.setStoryNodeFirstPublicationDateMsecs(
+      _sampleStory, 'node_1', 30);
+    expect(
+      _sampleStory.getStoryContents().getNodes()[
+        0].getFirstPublicationDateMsecs()
+    ).toBe(30);
+    expect(storyNodeLastModifiedSpy)
+      .toHaveBeenCalled();
+
+    undoRedoService.undoChange(_sampleStory);
+
+    expect(
+      _sampleStory.getStoryContents().getNodes()[
+        0].getFirstPublicationDateMsecs()
+    ).toBe(20);
+  });
+
+  it('should set a story node unpublishing reason', () => {
+    let storyNodeLastModifiedSpy = spyOn(
+      storyUpdateService, 'setStoryNodeLastModifiedMsecs');
+    expect(
+      _sampleStory.getStoryContents().getNodes()[0].getUnpublishingReason()
+    ).toBe(null);
+    storyUpdateService.setStoryNodeUnpublishingReason(
+      _sampleStory, 'node_1', 'Bad Content');
+    expect(
+      _sampleStory.getStoryContents().getNodes()[0].getUnpublishingReason()
+    ).toBe('Bad Content');
+    expect(storyNodeLastModifiedSpy)
+      .toHaveBeenCalled();
+
+    undoRedoService.undoChange(_sampleStory);
+
+    expect(
+      _sampleStory.getStoryContents().getNodes()[0].getUnpublishingReason()
+    ).toBe(null);
+  });
+
   it('should set a story node description', () => {
+    let storyNodeLastModifiedSpy = spyOn(
+      storyUpdateService, 'setStoryNodeLastModifiedMsecs');
     expect(
       _sampleStory.getStoryContents().getNodes()[0].getDescription()
     ).toBe('Description 1');
@@ -547,6 +764,8 @@ describe('Story update service', () => {
     expect(
       _sampleStory.getStoryContents().getNodes()[0].getDescription()
     ).toBe('new description');
+    expect(storyNodeLastModifiedSpy)
+      .toHaveBeenCalled();
 
     undoRedoService.undoChange(_sampleStory);
     expect(
@@ -556,6 +775,8 @@ describe('Story update service', () => {
 
   it('should create a backend change dict for setting a node description',
     () => {
+      let storyNodeLastModifiedSpy = spyOn(
+        storyUpdateService, 'setStoryNodeLastModifiedMsecs');
       storyUpdateService.setStoryNodeDescription(
         _sampleStory, 'node_1', 'new description');
       expect(undoRedoService.getCommittableChangeList()).toEqual([{
@@ -565,10 +786,14 @@ describe('Story update service', () => {
         old_value: 'Description 1',
         node_id: 'node_1'
       }]);
+      expect(storyNodeLastModifiedSpy)
+        .toHaveBeenCalled();
     }
   );
 
   it('should set the exploration id of a story node', () => {
+    let storyNodeLastModifiedSpy = spyOn(
+      storyUpdateService, 'setStoryNodeLastModifiedMsecs');
     expect(
       _sampleStory.getStoryContents().getNodes()[0].getExplorationId()
     ).toBe('exp_id');
@@ -577,6 +802,8 @@ describe('Story update service', () => {
     expect(
       _sampleStory.getStoryContents().getNodes()[0].getExplorationId()
     ).toBe('exp_2');
+    expect(storyNodeLastModifiedSpy)
+      .toHaveBeenCalled();
 
     // Adding an already existing exploration in the story should throw an
     // error.
@@ -593,6 +820,8 @@ describe('Story update service', () => {
 
   it('should create a proper backend change dict for setting the exploration ' +
     'id of a node', () => {
+    let storyNodeLastModifiedSpy = spyOn(
+      storyUpdateService, 'setStoryNodeLastModifiedMsecs');
     storyUpdateService.setStoryNodeExplorationId(
       _sampleStory, 'node_1', 'exp_2');
     expect(undoRedoService.getCommittableChangeList()).toEqual([{
@@ -602,6 +831,8 @@ describe('Story update service', () => {
       old_value: 'exp_id',
       node_id: 'node_1'
     }]);
+    expect(storyNodeLastModifiedSpy)
+      .toHaveBeenCalled();
   });
 
   it('should set/unset the initial node of the story', () => {
@@ -726,10 +957,14 @@ describe('Story update service', () => {
 
   it('should set story node thumbnail background color when calling ' +
     '\'setStoryNodeThumbnailBgColor\'', () => {
+    let storyNodeLastModifiedSpy = spyOn(
+      storyUpdateService, 'setStoryNodeLastModifiedMsecs');
     storyUpdateService.setStoryNodeThumbnailBgColor(
       _sampleStory, 'node_1', 'red');
     expect(_sampleStory.getStoryContents().getNodes()[0].getThumbnailBgColor())
       .toBe('red');
+    expect(storyNodeLastModifiedSpy)
+      .toHaveBeenCalled();
 
     undoRedoService.undoChange(_sampleStory);
     expect(_sampleStory.getStoryContents().getNodes()[0].getThumbnailBgColor())
@@ -738,11 +973,15 @@ describe('Story update service', () => {
 
   it('should set story node thumbnail file name when calling ' +
     '\'setStoryNodeThumbnailFilename\'', () => {
+    let storyNodeLastModifiedSpy = spyOn(
+      storyUpdateService, 'setStoryNodeLastModifiedMsecs');
     storyUpdateService.setStoryNodeThumbnailFilename(
       _sampleStory, 'node_1', 'newName');
     expect(
       _sampleStory.getStoryContents().getNodes()[0].getThumbnailFilename())
       .toBe('newName');
+    expect(storyNodeLastModifiedSpy)
+      .toHaveBeenCalled();
 
     undoRedoService.undoChange(_sampleStory);
     expect(

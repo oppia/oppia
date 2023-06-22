@@ -37,6 +37,8 @@ import { DeleteChapterModalComponent } from '../modal-templates/delete-chapter-m
 import { Story } from 'domain/story/story.model';
 import { StoryContents } from 'domain/story/story-contents-object.model';
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
+import { PlatformFeatureService } from 'services/platform-feature.service';
+import { DateTimeFormatService } from 'services/date-time-format.service';
 
 @Component({
   selector: 'oppia-story-editor',
@@ -70,6 +72,9 @@ export class StoryEditorComponent implements OnInit, OnDestroy {
   storyPreviewCardIsShown: boolean;
   chaptersListIsShown: boolean;
   selectedChapterIndex: number;
+  chapterIsPublishable: boolean[];
+  selectedChapterIndexInPublishUptoDropdown: number;
+  publishedChaptersDropErrorIsShown: boolean = false;
   NOTES_SCHEMA = {
     type: 'html',
     ui_config: {
@@ -87,7 +92,9 @@ export class StoryEditorComponent implements OnInit, OnDestroy {
     private windowDimensionsService: WindowDimensionsService,
     private storyEditorNavigationService: StoryEditorNavigationService,
     private undoRedoService: UndoRedoService,
-    private urlInterpolationService: UrlInterpolationService
+    private urlInterpolationService: UrlInterpolationService,
+    private platformFeatureService: PlatformFeatureService,
+    private dateTimeFormatService: DateTimeFormatService,
   ) {}
 
   directiveSubscriptions = new Subscription();
@@ -115,23 +122,50 @@ export class StoryEditorComponent implements OnInit, OnDestroy {
     this._initEditor();
   }
 
-  drop(event: CdkDragDrop<string[]>): void {
+  rearrangeNodeInList(fromIndex: number, toIndex: number): void {
     moveItemInArray(
       this.linearNodesList,
-      event.previousIndex, event.currentIndex);
-    if (event.previousIndex === 0) {
+      fromIndex, toIndex);
+    if (fromIndex === 0) {
       this.storyUpdateService.setInitialNodeId(
         this.story, this.story.getStoryContents().getNodes()[
-          event.currentIndex].getId());
+          toIndex].getId());
     }
-    if (event.currentIndex === 0) {
+    if (fromIndex === 0) {
       this.storyUpdateService.setInitialNodeId(
         this.story, this.story.getStoryContents().getNodes()[
-          event.previousIndex].getId());
+          toIndex].getId());
     }
     this.storyUpdateService.rearrangeNodeInStory(
-      this.story, event.previousIndex, event.currentIndex);
+      this.story, fromIndex, toIndex);
     this._initEditor();
+  }
+
+  drop(event: CdkDragDrop<string[]>): void {
+    if (this.linearNodesList[event.currentIndex].getStatus() === 'Published') {
+      this.publishedChaptersDropErrorIsShown = true;
+      setTimeout(() => {
+        this.publishedChaptersDropErrorIsShown = false;
+      }, 5000);
+      return;
+    }
+    this.rearrangeNodeInList(event.previousIndex, event.currentIndex);
+  }
+
+  moveNodeUpInStory(index: number): void {
+    this.toggleChapterEditOptions(-1);
+    this.rearrangeNodeInList(index, index - 1);
+  }
+
+  moveNodeDownInStory(index: number): void {
+    this.toggleChapterEditOptions(-1);
+    this.rearrangeNodeInList(index, index + 1);
+  }
+
+  isSerialChapterFeatureFlagEnabled(): boolean {
+    return (
+      this.platformFeatureService.
+        status.SerialChapterLaunchCurriculumAdminView.isEnabled);
   }
 
   _initEditor(): void {
@@ -147,6 +181,18 @@ export class StoryEditorComponent implements OnInit, OnDestroy {
         this.initialNodeId = this.storyContents.getInitialNodeId();
         this.linearNodesList =
           this.storyContents.getLinearNodesList();
+        this.chapterIsPublishable = [];
+        this.linearNodesList.forEach((node, index) => {
+          if (node.getStatus() === 'Published') {
+            this.chapterIsPublishable.push(true);
+            this.selectedChapterIndexInPublishUptoDropdown = index;
+          } else if (node.getStatus() === 'Ready To Publish' &&
+            index !== 0 && this.chapterIsPublishable[index - 1]) {
+            this.chapterIsPublishable.push(true);
+          } else {
+            this.chapterIsPublishable.push(false);
+          }
+        });
       }
       this.notesEditorIsShown = false;
       this.storyTitleEditorIsShown = false;
@@ -366,6 +412,7 @@ export class StoryEditorComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.storyPreviewCardIsShown = false;
     this.mainStoryCardIsShown = true;
+    this.selectedChapterIndexInPublishUptoDropdown = 0;
     this.chaptersListIsShown = (
       !this.windowDimensionsService.isWindowNarrow());
     this.directiveSubscriptions.add(
