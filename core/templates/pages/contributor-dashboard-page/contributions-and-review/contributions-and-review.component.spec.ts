@@ -1399,10 +1399,14 @@ describe('Contributions and review component', () => {
         let suggestionIdToSuggestions = {
           suggestion: {
             suggestion: {
+              author_name: 'a',
+              target_id: '1',
               suggestion_id: 'id',
+              suggestion_type: 'translate_content',
               status: 'review',
               change: {
-                content_html: '<p>This is test para</p>'
+                content_html: '<p>This is test para</p>',
+                translation_html: 'Traducáú'
               }
             } as Suggestion,
             details: {
