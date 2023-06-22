@@ -73,7 +73,12 @@ describe('Learner Topic Summary Tile Component', () => {
       outline: 'Outline',
       exploration_id: null,
       outline_is_finalized: false,
-      thumbnail_bg_color: '#a33f40'
+      thumbnail_bg_color: '#a33f40',
+      status: 'Published',
+      planned_publication_date_msecs: 100,
+      last_modified_msecs: 100,
+      first_publication_date_msecs: 200,
+      unpublishing_reason: null
     };
     const learnerTopicSummaryBackendDict = {
       id: 'sample_topic_id',
@@ -147,7 +152,12 @@ describe('Learner Topic Summary Tile Component', () => {
       outline: 'Outline',
       exploration_id: null,
       outline_is_finalized: false,
-      thumbnail_bg_color: '#a33f40'
+      thumbnail_bg_color: '#a33f40',
+      status: 'Published',
+      planned_publication_date_msecs: 100,
+      last_modified_msecs: 100,
+      first_publication_date_msecs: 200,
+      unpublishing_reason: null
     };
     const learnerTopicSummaryBackendDict = {
       id: 'sample_topic_id',
