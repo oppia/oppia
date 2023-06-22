@@ -27,7 +27,7 @@ from typing import Dict, List, Mapping, Optional, Union
 
 
 REDIS_CLIENT = redis.StrictRedis(
-    host=feconf.REDISHOST,
+    host='redis',
     port=feconf.REDISPORT,
     db=feconf.STORAGE_EMULATOR_REDIS_DB_INDEX,
     decode_responses=False

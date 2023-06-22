@@ -30,9 +30,10 @@ import threading
 
 from core import feconf, utils
 from scripts import common
-from scripts import install_python_dev_dependencies
-from scripts import install_third_party_libs
-from scripts import servers
+if not feconf.OPPIA_IS_DOCKERIZED:
+    from scripts import install_python_dev_dependencies
+    from scripts import install_third_party_libs
+    from scripts import servers
 
 import rcssmin
 from typing import (

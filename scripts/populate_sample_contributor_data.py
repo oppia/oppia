@@ -46,7 +46,7 @@ from typing import Dict, Final, List
 
 PORT_NUMBER_FOR_GAE_SERVER: Final = 8181
 # TODO: (#18260) Chnage this when we permanently move to the Dockerized Setup.
-FIREBASE_HOST = 'firebase' if feconf.OPPIA_IS_DOCKERIZED else 'localhost'
+FIREBASE_HOST = 'firebase'
 
 FIREBASE_AUTH_EMULATOR_HOST: Final = (
     '%s:%s' % FIREBASE_HOST, feconf.FIREBASE_EMULATOR_PORT)

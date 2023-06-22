@@ -142,7 +142,7 @@ services:
       timeout: 10s
       interval: 1m
       retries: 5
-      start_period: 1m
+      start_period: 3m
     # Line 110 is checking if previous datastore cache exists and deleting it if it does as user has not passed the save_datastore flag.
     # TODO: thouroughly test this.
     command: >
@@ -167,7 +167,6 @@ services:
       - "4000:4000"
     volumes:
       - shared_root_dir:/app/oppia
-      - .:/app/oppia/node_modules
     healthcheck:
       test: wget --spider http://localhost:4000/auth/ || exit 1
       timeout: 10s
