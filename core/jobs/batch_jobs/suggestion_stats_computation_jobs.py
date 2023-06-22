@@ -447,13 +447,13 @@ class GenerateContributionStatsJob(base_jobs.JobBase):
                 )
                 try:
                     change = suggestion.change
-                    # In the new translation command the content in set format is
-                    # a list, content in unicode and html format is a string.
+                    # In the new translation command the content in set format
+                    # is a list, content in unicode and html format is a string.
                     # This code normalizes the content to the list type so that
                     # we can easily count words.
                     if (
-                            change.cmd == exp_domain.CMD_ADD_WRITTEN_TRANSLATION and
-                            translation_domain.TranslatableContentFormat
+                            change.cmd == exp_domain.CMD_ADD_WRITTEN_TRANSLATION
+                            and translation_domain.TranslatableContentFormat
                             .is_data_format_list(change.data_format)
                     ):
                         content_items: Union[
@@ -479,7 +479,8 @@ class GenerateContributionStatsJob(base_jobs.JobBase):
                     yield (key, result.Ok(translation_contribution_stats_dict))
                 except Exception as e:
                     yield (
-                        key, result.Err('%s: %s' % (suggestion.suggestion_id, e))
+                        key, result.Err(
+                            '%s: %s' % (suggestion.suggestion_id, e))
                     )
 
     @staticmethod

@@ -513,6 +513,45 @@ class GenerateContributionStatsJobTests(job_test_utils.JobTestBase):
             datetime.datetime.utcnow().date()
         )
 
+    def test_escapes_stats_without_opportunity(
+        self
+    ) -> None:
+        suggestion_model = self.create_model(
+            suggestion_models.GeneralSuggestionModel,
+            suggestion_type=feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            author_id=self.VALID_USER_ID_1,
+            change_cmd={
+                'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
+                'state_name': 'state',
+                'content_id': 'content_id',
+                'language_code': 'lang',
+                'content_html': '111 222 333',
+                'translation_html': '111 222 333',
+                'data_format': 'unicode'
+            },
+            score_category='irelevant',
+            status=suggestion_models.STATUS_ACCEPTED,
+            target_type='exploration',
+            target_id=self.EXP_1_ID,
+            target_version_at_submission=0,
+            language_code=self.LANG_1,
+            final_reviewer_id='reviewer1'
+        )
+        suggestion_model.update_timestamps()
+        suggestion_model.put()
+
+        self.assert_job_output_is([])
+
+        translation_stats_model = (
+            suggestion_models.TranslationContributionStatsModel.get(
+                self.LANG_1, self.VALID_USER_ID_1, ''))
+        translation_review_stats_model = (
+            suggestion_models.TranslationReviewStatsModel.get(
+                self.LANG_1, 'reviewer1', ''))
+
+        assert translation_stats_model is None
+        assert translation_review_stats_model is None
+
     def test_creates_translation_stats_models_from_two_accepted_suggestions(
         self
     ) -> None:
