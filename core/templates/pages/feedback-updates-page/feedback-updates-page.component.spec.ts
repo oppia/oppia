@@ -270,7 +270,7 @@ describe('Feedback updates page', () => {
     ' initialization and get data from backend', fakeAsync(() => {
       spyOn(userService, 'getUserInfoAsync').and
         .callFake(async() => {
-          return Promise.resolve(userInfo);
+          return Promise.resolve(userInfo as UserInfo);
         });
       component.ngOnInit();
       flush();
@@ -315,7 +315,7 @@ describe('Feedback updates page', () => {
       const focusSpy = spyOn(focusManagerService, 'setFocusWithoutScroll');
       spyOn(userService, 'getUserInfoAsync').and
         .callFake(async() => {
-          return Promise.resolve(userInfo);
+          return Promise.resolve(userInfo as UserInfo);
         });
 
       component.ngOnInit();
@@ -817,7 +817,7 @@ describe('Feedback updates page', () => {
         ['default-image-url-png', 'default-image-url-webp']);
 
       spyOn(userService, 'getUserInfoAsync').and.returnValue(
-        Promise.resolve(userInfo));
+        Promise.resolve(userInfo as UserInfo));
     }));
 
     it('should show an alert warning when fails to get feedback updates data',
