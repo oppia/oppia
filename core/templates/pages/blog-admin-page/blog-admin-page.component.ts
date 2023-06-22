@@ -119,7 +119,7 @@ export class BlogAdminPageComponent implements OnInit {
         formResponse.newRole);
       this.refreshFormData();
     }, errorResponse => {
-      this.statusMessage = 'Server error: ' + errorResponse;
+      this.statusMessage = errorResponse;
     });
     this.adminTaskManagerService.finishTask();
   }

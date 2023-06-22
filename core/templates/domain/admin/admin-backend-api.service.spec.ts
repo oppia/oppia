@@ -23,7 +23,7 @@ import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 import { AdminPageData, AdminBackendApiService } from 'domain/admin/admin-backend-api.service';
 import { CreatorTopicSummary } from 'domain/topic/creator-topic-summary.model';
 import { PlatformParameterFilterType } from 'domain/platform_feature/platform-parameter-filter.model';
-import { FeatureStage, PlatformParameter } from 'domain/platform_feature/platform-parameter.model';
+import { PlatformParameter } from 'domain/platform_feature/platform-parameter.model';
 import { CsrfTokenService } from 'services/csrf-token.service';
 import { Schema } from 'services/schema-default-value.service';
 
@@ -81,21 +81,21 @@ describe('Admin backend api service', () => {
       ]
     ],
     viewable_roles: ['TOPIC_MANAGER'],
-    feature_flags: [{
-      name: 'dummy_feature',
-      description: 'this is a dummy feature',
-      data_type: 'bool',
+    platform_params_dicts: [{
+      name: 'dummy_parameter',
+      description: 'This is a dummy platform parameter.',
+      data_type: 'string',
       rules: [{
         filters: [{
           type: PlatformParameterFilterType.ServerMode,
           conditions: [['=', 'dev'] as [string, string]]
         }],
-        value_when_matched: true
+        value_when_matched: ''
       }],
       rule_schema_version: 1,
-      default_value: false,
-      is_feature: true,
-      feature_stage: FeatureStage.DEV
+      default_value: '',
+      is_feature: false,
+      feature_stage: null
     }]
   };
   let adminDataObject: AdminPageData;
@@ -114,7 +114,6 @@ describe('Admin backend api service', () => {
     email_footer: 'fsdf',
     email_sender_name: 'Site Admin',
     enable_admin_notifications_for_reviewer_shortage: false,
-    featured_translation_languages: [],
     high_bounce_rate_task_minimum_exploration_starts: 1001,
     high_bounce_rate_task_state_bounce_rate_creation_threshold: 0.2,
     high_bounce_rate_task_state_bounce_rate_obsoletion_threshold: 0.2,
@@ -125,20 +124,12 @@ describe('Admin backend api service', () => {
     notification_user_ids_for_failed_tasks: [],
     notify_admins_suggestions_waiting_too_long_is_enabled: false,
     oppia_csrf_secret: 'H62T5aIngXb1PB6arDkFrAnxakpQ=',
-    promo_bar_enabled: false,
-    promo_bar_message: 'fasdfa',
     record_playthrough_probability: 0.2,
     signup_email_content: {
       subject: 'THIS IS A PLACEHOLDER.',
       html_body: 'THIS IS A <b>PLACEHOLDER</b> AND SHOULD BE REPLACED.'
     },
-    unpublish_exploration_email_html_body: 'test',
-    vmid_shared_secret_key_mapping: {
-      shared_secret_key: 'aafd1a2b3c4e',
-      vm_id: 'fds'
-    },
-    whitelisted_exploration_ids_for_playthroughs: [
-      'umPkawp0L1M0-', 'oswa1m5Q3jK41']
+    unpublish_exploration_email_html_body: 'test'
   };
 
   beforeEach(() => {
@@ -162,9 +153,8 @@ describe('Admin backend api service', () => {
       humanReadableRoles: adminBackendResponse.human_readable_roles,
       topicSummaries: adminBackendResponse.topic_summaries.map(
         dict => CreatorTopicSummary.createFromBackendDict(dict)),
-      featureFlags: adminBackendResponse.feature_flags.map(
-        dict => PlatformParameter.createFromBackendDict(dict)
-      )
+      platformParameters: adminBackendResponse.platform_params_dicts.map(
+        dict => PlatformParameter.createFromBackendDict(dict))
     };
 
     spyOn(csrfService, 'getTokenAsync').and.callFake(async() => {
@@ -985,7 +975,7 @@ describe('Admin backend api service', () => {
     'value given the config property ID when calling' +
     'revertConfigPropertyAsync', fakeAsync(() => {
     let action = 'revert_config_property';
-    let configPropertyId = 'promo_bar_enabled';
+    let configPropertyId = 'record_playthrough_probability';
     let payload = {
       action: action,
       config_property_id: configPropertyId

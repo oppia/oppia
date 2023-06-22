@@ -3,7 +3,6 @@ core.controllers.base_test
 core.controllers.blog_homepage_test
 core.controllers.contributor_dashboard_test
 core.controllers.creator_dashboard_test
-core.controllers.domain_objects_validator_test
 core.controllers.editor_test
 core.controllers.feedback_test
 core.controllers.learner_playlist_test

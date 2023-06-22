@@ -55,10 +55,10 @@
             class="nav-item  oppia-navbar-clickable-dropdown e2e-test-home-oppia-list-item">
           <a (keydown)="onMenuKeypress($event, 'homeMenu', {shiftTab: ACTION_CLOSE, enter: ACTION_OPEN})"
              class="nav-link oppia-navbar-tab"
-             role="menuitem"
              aria-haspopup="true"
              aria-expanded="false"
              aria-hidden="false"
+             aria-label="Home"
              tabindex="0"
              href="/"
              [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.SPLASH.ROUTE"
@@ -76,10 +76,11 @@
           <a ngbDropdownToggle
              (keydown)="onMenuKeypress($event, 'learnMenu', {shiftTab: ACTION_CLOSE, enter: ACTION_OPEN})"
              class="nav-link oppia-navbar-tab dropdown-toggle learn-tab"
-             role="menuitem"
              aria-haspopup="true"
              aria-expanded="false"
              aria-hidden="false"
+             aria-label="learn"
+             role="button"
              tabindex="0"
              (mouseover)="openSubmenu($event, 'learnMenu')"
              (mouseleave)="closeSubmenuIfNotMobile($event)"
@@ -203,6 +204,7 @@
              class="nav-link oppia-navbar-tab dropdown-toggle"
              aria-haspopup="true"
              aria-expanded="false"
+             role="button"
              tabindex="0"
              (mouseover)="openSubmenu($event, 'aboutMenu')"
              (mouseleave)="closeSubmenuIfNotMobile($event)"
@@ -260,6 +262,7 @@
              aria-haspopup="true"
              aria-expanded="false"
              tabindex="0"
+             role="button"
              (mouseover)="openSubmenu($event, 'getInvolvedMenu')"
              (mouseleave)="closeSubmenuIfNotMobile($event)"
              autofocus>
@@ -405,6 +408,7 @@
          aria-expanded="false"
          aria-label="User Menu"
          tabindex="0"
+         role="button"
          (mouseover)="openSubmenu($event, 'profileMenu')"
          (mouseleave)="closeSubmenuIfNotMobile($event)"
          autofocus>

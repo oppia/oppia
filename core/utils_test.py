@@ -905,7 +905,7 @@ class UtilsTests(test_utils.GenericTestBase):
 
     def test_get_hex_color_for_category(self) -> None:
         self.assertEqual(
-            utils.get_hex_color_for_category('Law'), '#538270')
+            utils.get_hex_color_for_category('Law'), '#507c6b')
         self.assertEqual(
             utils.get_hex_color_for_category('Quantum Physics'), '#a33f40')
 
