@@ -271,7 +271,7 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
                         'value_when_matched': True
                     })
                 ],
-                'default'
+                False
             )
 
     def test_update_dev_feature_with_rule_enabled_for_prod_raises_exception(
@@ -300,7 +300,7 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
                         'value_when_matched': True
                     })
                 ],
-                'default'
+                False
             )
 
     def test_update_test_feature_with_rule_enabled_for_prod_raises_exception(
@@ -329,7 +329,7 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
                         'value_when_matched': True
                     })
                 ],
-                'default'
+                False
             )
 
     def test_updated_parameter_is_saved_in_storage(self) -> None:
