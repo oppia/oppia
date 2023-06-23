@@ -623,8 +623,8 @@ describe('TopNavigationBarComponent', () => {
             .createFromBackendDict(threadSummary))),
       paginatedThreadsList: []
     }));
-
     component.userIsLoggedIn = true;
+
     component.ngOnInit();
     tick();
 
