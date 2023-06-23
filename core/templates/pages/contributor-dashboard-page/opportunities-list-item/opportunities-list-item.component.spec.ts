@@ -224,18 +224,27 @@ describe('Opportunities List Item Component', () => {
       fixture.detectChanges();
       component.ngOnInit();
     });
-    it('should show translation length label for reviewable translation' +
-      'cards', () => {
-      const bannerElement: HTMLElement = fixture.nativeElement;
-      const translationLengthLabelContainer = bannerElement.querySelector(
-        '.oppia-translation-label-container');
-      expect(translationLengthLabelContainer).toBeTruthy();
 
+    it('should show short label for translation suggestions with' +
+      ' word count less than 20', () => {
+      const bannerElement: HTMLElement = fixture.nativeElement;
       const translationLengthLabel = bannerElement.querySelector(
         '.oppia-translation-length-label');
-      expect(translationLengthLabel).toBeTruthy();
 
+      expect(translationLengthLabel).toBeTruthy();
       expect(translationLengthLabel?.textContent).toContain('short');
     });
+
+    it('should not show length label for translation suggestions with word' +
+      ' count more than 20', () => {
+        component.opportunity.translationWordCount = 25;
+        fixture.detectChanges();
+
+        const bannerElement: HTMLElement = fixture.nativeElement;
+        const translationLengthLabel = bannerElement.querySelector(
+          '.oppia-translation-length-label');
+
+        expect(translationLengthLabel).toBeFalse();
+      });
   });
 });

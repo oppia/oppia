@@ -245,7 +245,7 @@ export class ContributionsAndReview
           this.activeTabType === this.TAB_TYPE_REVIEWS ? 'Review' : 'View'),
         translationWordCount: (
           this.isReviewTranslationsTab() && this.activeExplorationId) ? (
-            this.computeTranslationWordCount(
+            this.htmlLengthService.computeHtmlLengthInWords(
               suggestion.change.content_html)) : undefined
       };
 
@@ -542,11 +542,6 @@ export class ContributionsAndReview
     this.reviewableQuestionsSortKey = sortKey;
     this.contributionOpportunitiesService
       .reloadOpportunitiesEventEmitter.emit();
-  }
-
-  computeTranslationWordCount(translationHtml: string): number {
-    return this.htmlLengthService.
-      computeHtmlLengthInWords(translationHtml);
   }
 
   ngOnInit(): void {
