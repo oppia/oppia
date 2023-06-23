@@ -167,6 +167,14 @@ why they need to be overriden.  */
   transform: translate3d(0,-1px,0);
 }
 
+.oppia-focus-indicator-blue:focus {
+  outline: 2px solid rgb(23, 23, 255);
+}
+
+.oppia-focus-indicator-white:focus {
+  outline: 2px solid rgb(255, 255, 255);
+}
+
 .oppia-learner-confirm-button.oppia-learner-submit-answer-button.md-button[disabled],
 .oppia-learner-confirm-button.oppia-learner-submit-answer-button.mat-button[disabled] {
   background-color: transparent;
