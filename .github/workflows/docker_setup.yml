@@ -22,4 +22,12 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Build Docker Images
-        run: make run-devserver
+        run: docker compose up -d
+        
+      - name: Checking server reachability
+        run: |
+          curl localhost:8181
+          echo ---Dev-server is up---
+          
+      - name: Stop Container
+        run: docker compose down
