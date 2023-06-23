@@ -30,7 +30,7 @@ from core.domain import platform_parameter_registry
 from core.domain import role_services
 from core.domain import user_services
 
-from typing import Dict, Final, List, Optional, TypedDict, Union
+from typing import Dict, Final, Optional, TypedDict
 
 BLOG_POST_EDITOR: Final = feconf.ROLE_ID_BLOG_POST_EDITOR
 BLOG_ADMIN: Final = feconf.ROLE_ID_BLOG_ADMIN
