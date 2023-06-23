@@ -124,7 +124,7 @@ describe('PlatformFeatureAdminBackendApiService', () => {
       ];
 
       featureAdminService.updateFeatureFlag(
-        'feature_name', 'update message', newRules
+        'feature_name', 'update message', newRules, false
       ).then(successHandler, failHandler);
 
       const req = httpTestingController.expectOne(
@@ -151,7 +151,7 @@ describe('PlatformFeatureAdminBackendApiService', () => {
     ];
 
     featureAdminService.updateFeatureFlag(
-      'feature_name', 'update message', newRules
+      'feature_name', 'update message', newRules, false
     ).then(successHandler, failHandler);
 
     const req = httpTestingController.expectOne(

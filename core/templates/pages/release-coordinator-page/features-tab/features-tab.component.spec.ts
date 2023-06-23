@@ -631,6 +631,15 @@ describe('Release coordinator page feature tab', function() {
       }
     );
 
+    it('should return true if the feature default value is different from ' +
+    'the backup instance', () => {
+      let featureFlag = component.featureFlags[0];
+      featureFlag.defaultValue = true;
+
+      expect(component.isFeatureFlagChanged(featureFlag))
+        .toBeTrue();
+    });
+
     it('should throw error if the feature username is not found', () => {
       const featureFlag = PlatformParameter.createFromBackendDict({
         data_type: 'bool',
@@ -662,7 +671,7 @@ describe('Release coordinator page feature tab', function() {
       });
 
       expect(() => {
-        component.isFeatureFlagRulesChanged(featureFlag);
+        component.isFeatureFlagChanged(featureFlag);
       }).toThrowError();
     });
   });
