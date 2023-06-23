@@ -23,9 +23,8 @@ from core.controllers import acl_decorators
 from core.controllers import base
 from core.controllers import domain_objects_validator as validation_method
 from core.domain import blog_services
-from core.domain import config_services
-from core.domain import platform_parameter_domain
 from core.domain import platform_feature_services
+from core.domain import platform_parameter_domain
 from core.domain import platform_parameter_list
 from core.domain import platform_parameter_registry
 from core.domain import role_services
@@ -112,7 +111,7 @@ class BlogAdminHandler(
             param_name: str. The name of the platform parameter.
 
         Returns:
-            PlatformParamBlogAdminSchemaDict: The platform params value to
+            PlatformParamBlogAdminSchemaDict. The platform params value to
             display on the blog admin page.
         """
         parameter = platform_parameter_registry.Registry.get_platform_parameter(

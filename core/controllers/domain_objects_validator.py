@@ -21,7 +21,6 @@ handler arguments.
 from __future__ import annotations
 
 from core import utils
-from core import schema_utils
 from core.constants import constants
 from core.controllers import base
 from core.domain import blog_domain
@@ -166,12 +165,7 @@ def validate_platform_params_values_for_blog_admin(
                 'Platform parameter name should be a string, received'
                 ': %s' % name)
 
-        if not (
-            isinstance(value, bool) or
-            isinstance(value, str) or
-            isinstance(value, float) or
-            isinstance(value, int)
-        ):
+        if not isinstance(value, (bool, float, int, str)):
             raise Exception(
                 'The value of %s platform parameter is not of valid type, '
                 'it should be one of %s.' % (

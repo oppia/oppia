@@ -19,12 +19,8 @@ from __future__ import annotations
 import logging
 
 from core import feconf
-from core.domain import config_domain
-from core.domain import config_services
 from core.domain import platform_parameter_list
 from core.tests import test_utils
-
-from typing import List
 
 
 class BlogAdminPageTests(test_utils.GenericTestBase):
@@ -212,7 +208,7 @@ class BlogAdminHandlerTest(test_utils.GenericTestBase):
             'assigned_to_blog_post platform parameter is not of valid type, '
             'it should be one of typing.Union[str, int, bool, float].')
 
-    def test_platform_params_cannot_be_saved_without_new_platform_parameter_values(
+    def test_params_cannot_be_saved_without_new_platform_parameter_values(
         self
     ) -> None:
         self.login(self.BLOG_ADMIN_EMAIL)
@@ -264,7 +260,7 @@ class BlogAdminHandlerTest(test_utils.GenericTestBase):
             response_dict['error'], 'Schema validation for \'new_platform_'
             'parameter_values\' failed: The value of max_number_of_tags_'
             'assigned_to_blog_post should be greater than 0, it is -2.')
-        
+
     def test_invalid_value_for_platform_param_raises_error(self) -> None:
         self.login(self.BLOG_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()

@@ -189,7 +189,7 @@ class ValidateNewPlatformParamsValueForBlogAdminTests(
         with self.assertRaisesRegex(
             Exception, 'The value of max_number_of_tags_assigned_to_blog_post '
             'platform parameter is not of valid type, it should be one of '
-            'typing.Union\[str, int, bool, float\].'
+            'typing.Union\\[str, int, bool, float].'
         ):
             (
                 domain_objects_validator.
