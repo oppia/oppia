@@ -500,6 +500,9 @@ URLS = [
         feconf.LEARNER_DASHBOARD_FEEDBACK_THREAD_DATA_URL,
         learner_dashboard.LearnerDashboardFeedbackThreadHandler),
     get_redirect_route(
+        r'/user_progress_in_explorations_handler/<username>',
+        learner_dashboard.LearnerExplorationProgressHandler),
+    get_redirect_route(
         r'%s' % feconf.TOPICS_AND_SKILLS_DASHBOARD_URL,
         topics_and_skills_dashboard.TopicsAndSkillsDashboardPage),
     get_redirect_route(

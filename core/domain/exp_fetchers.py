@@ -25,12 +25,15 @@ storage model to be changed without affecting this module and others above it.
 from __future__ import annotations
 
 import copy
+import itertools
 import logging
 
 from core import feconf
 from core.domain import caching_services
 from core.domain import exp_domain
+from core.domain import exp_fetchers
 from core.domain import subscription_services
+from core.domain import user_services
 from core.domain import user_domain
 from core.platform import models
 
@@ -673,3 +676,55 @@ def get_exploration_version_history(
         version_history_model.metadata_last_edited_committer_id,
         version_history_model.committer_ids
     )
+
+
+def get_user_progress_in_exploration(
+    user_id: str, exp_ids: List[str]
+) -> List[exp_domain.ExplorationProgressSummaryDict]:
+    """Returns the progress of multiple users in multiple exploration.
+
+    Args:
+        user_id: str. The user id of the user.
+        exp_ids: list(str). The ids of the exploration.
+
+    Returns:
+        list(ExplorationProgressSummaryDict). The list of the progress
+        summaries of the user corresponding to all exploration.
+    """
+    # all_valid_story_nodes: List[story_domain.StoryNode] = []
+    # for story in get_stories_by_ids(story_ids):
+    #     if story is not None:
+    #         all_valid_story_nodes.extend(story.story_contents.nodes)
+    # exp_ids = [
+    #     node.exploration_id for node in all_valid_story_nodes
+    #     if node.exploration_id
+    # ]
+    exp_id_to_exp_map = exp_fetchers.get_multiple_explorations_by_id(exp_ids)
+    user_id_exp_id_combinations = list(itertools.product([user_id], exp_ids))
+    exp_user_data_models = (
+        user_models.ExplorationUserDataModel.get_multi(
+            user_id_exp_id_combinations))
+
+    all_chapters_progress: List[
+        exp_domain.ExplorationProgressSummaryDict] = []
+    for i, user_id_exp_id_pair in enumerate(user_id_exp_id_combinations):
+        exp_id = user_id_exp_id_pair[1]
+        exploration = exp_id_to_exp_map[exp_id]
+        all_checkpoints = user_services.get_checkpoints_in_order(
+            exploration.init_state_name,
+            exploration.states)
+        model = exp_user_data_models[i]
+        visited_checkpoints = 0
+        if model is not None:
+            most_recently_visited_checkpoint = (
+                model.most_recently_reached_checkpoint_state_name)
+            if most_recently_visited_checkpoint is not None:
+                visited_checkpoints = all_checkpoints.index(
+                    most_recently_visited_checkpoint) + 1
+        all_chapters_progress.append({
+            'exploration_id': exp_id,
+            'visited_checkpoints_count': visited_checkpoints,
+            'total_checkpoints_count': len(all_checkpoints)
+        })
+
+    return all_chapters_progress

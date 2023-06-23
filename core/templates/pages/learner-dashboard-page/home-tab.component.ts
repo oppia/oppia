@@ -26,6 +26,9 @@ import { WindowDimensionsService } from 'services/contextual/window-dimensions.s
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 
 import './home-tab.component.css';
+import { StoryViewerBackendApiService } from 'domain/story_viewer/story-viewer-backend-api.service';
+import { ChapterProgressSummary } from 'domain/exploration/chapter-progress-summary.model';
+import { ReadOnlyExplorationBackendApiService } from 'domain/exploration/read-only-exploration-backend-api.service';
 
  @Component({
    selector: 'oppia-home-tab',
@@ -42,6 +45,8 @@ export class HomeTabComponent {
   @Input() partiallyLearntTopicsList!: LearnerTopicSummary[];
   @Input() untrackedTopics!: Record<string, LearnerTopicSummary[]>;
   @Input() username!: string;
+  explorationProgress!: ChapterProgressSummary[];
+  expIds: string[] = ['AkaorLQx5bBQ', 'verb1ixpFPFb', '5359aGbB3WIx'];
   currentGoalsLength!: number;
   classroomUrlFragment!: string;
   goalTopicsLength!: number;
@@ -57,6 +62,10 @@ export class HomeTabComponent {
     private i18nLanguageCodeService: I18nLanguageCodeService,
     private windowDimensionService: WindowDimensionsService,
     private urlInterpolationService: UrlInterpolationService,
+    private readOnlyExplorationBackendApiService:
+    ReadOnlyExplorationBackendApiService,
+    private storyViewerBackendApiService: StoryViewerBackendApiService,
+
   ) {}
 
   ngOnInit(): void {
@@ -75,6 +84,16 @@ export class HomeTabComponent {
         this.continueWhereYouLeftOffList.push(allGoals[index]);
       }
     }
+
+    this.readOnlyExplorationBackendApiService.
+      fetchProgressInExplorationsOrChapters(
+        'shivv', this.expIds
+      ).then(explorationProgress => {
+        this.explorationProgress = explorationProgress;
+        console.error(explorationProgress, 'progressof exploration .....');
+      });
+
+
     this.windowIsNarrow = this.windowDimensionService.isWindowNarrow();
     this.directiveSubscriptions.add(
       this.windowDimensionService.getResizeEvent().subscribe(() => {

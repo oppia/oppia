@@ -17,6 +17,7 @@
 from __future__ import annotations
 
 import datetime
+import json
 
 from core import feconf
 from core import utils
@@ -36,6 +37,7 @@ from core.domain import suggestion_services
 from core.domain import topic_domain
 from core.domain import topic_services
 from core.platform import models
+from core.domain import user_services
 from core.tests import test_utils
 
 from typing import Dict, Final, Union
@@ -1112,3 +1114,99 @@ class LearnerDashboardFeedbackThreadHandlerTests(test_utils.GenericTestBase):
         self.assertEqual(
             messages_summary['description'], suggestion_thread.subject)
         self.logout()
+
+
+class LearnerExplorationProgressHandlerTests(test_utils.GenericTestBase):
+    """Tests for Learner Exploration Progress Handler."""
+
+    NODE_ID_1: Final = story_domain.NODE_ID_PREFIX + '1'
+    NODE_ID_2: Final = story_domain.NODE_ID_PREFIX + '2'
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
+        self.USER_ID = self.get_user_id_from_email(self.NEW_USER_EMAIL)
+
+        self.story_id = story_services.get_new_story_id()
+        self.TOPIC_ID = topic_fetchers.get_new_topic_id()
+        self.save_new_topic(
+            self.TOPIC_ID, self.USER_ID, name='Topic',
+            description='A new topic', canonical_story_ids=[],
+            additional_story_ids=[], uncategorized_skill_ids=[],
+            subtopics=[], next_subtopic_id=0)
+        self.save_new_story(
+            self.story_id, self.USER_ID, self.TOPIC_ID, url_fragment='story-one'
+        )
+        topic_services.add_canonical_story(
+            self.USER_ID, self.TOPIC_ID, self.story_id)
+        changelist = [
+            story_domain.StoryChange({
+                'cmd': story_domain.CMD_ADD_STORY_NODE,
+                'node_id': self.NODE_ID_1,
+                'title': 'Title 1'
+            })
+        ]
+        story_services.update_story(
+            self.USER_ID, self.story_id, changelist,
+            'Added node.')
+        self.story = story_fetchers.get_story_by_id(self.story_id)
+
+        self.exp_id_1 = 'expid1'
+        self.save_new_valid_exploration(self.exp_id_1, self.USER_ID)
+
+        change_list = [
+            story_domain.StoryChange({
+                'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+                'property_name': (
+                    story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
+                'node_id': story_domain.NODE_ID_PREFIX + '1',
+                'old_value': None,
+                'new_value': self.exp_id_1
+            })
+        ]
+        story_services.update_story(
+            self.USER_ID, self.story_id, change_list,
+            'Added a node.')
+
+    def test_get_learner_stories_chapters_progress(self) -> None:
+        self.login(self.NEW_USER_EMAIL)
+
+        user_services.update_learner_checkpoint_progress(
+            self.USER_ID, self.exp_id_1, 'Introduction', 1)
+
+        params = {
+            'exp_ids': json.dumps([self.exp_id])
+        }
+        response = self.get_json(
+            '/user_progress_in_explorations_handler/%s' % (
+                self.NEW_USER_USERNAME), params=params)
+
+        self.assertEqual(len(response), 1)
+        self.assertEqual(response[0]['exploration_id'], self.exp_id_1)
+        self.assertEqual(response[0]['visited_checkpoints_count'], 1)
+        self.assertEqual(response[0]['total_checkpoints_count'], 1)
+
+        self.logout()
+
+    def test_cannot_fetch_learner_stories_progress_with_invalid_username(
+        self
+    ) -> None:
+        self.login(self.NEW_USER_EMAIL)
+
+        user_services.update_learner_checkpoint_progress(
+            self.USER_ID, self.exp_id_1, 'Introduction', 1)
+
+        params = {
+            'exp_ids': json.dumps([self.exp_id])
+        }
+        response = self.get_json(
+            '/user_progress_in_explorations_handler/%s' % (
+                'Invalid_username'),
+                params=params,
+                expected_status_int=500
+        )
+        self.assertEqual(
+            response['error'],
+            'No learner user_id found for the given learner username: '
+            'Invalid_username'
+        )
