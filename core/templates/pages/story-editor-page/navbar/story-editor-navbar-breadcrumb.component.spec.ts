@@ -77,7 +77,12 @@ describe('StoryEditorNavbarBreadcrumbComponent', () => {
           exploration_id: 'exp_1',
           outline_is_finalized: false,
           thumbnail_filename: 'img.png',
-          thumbnail_bg_color: '#a33f40'
+          thumbnail_bg_color: '#a33f40',
+          status: 'Published',
+          planned_publication_date_msecs: 100,
+          last_modified_msecs: 100,
+          first_publication_date_msecs: 200,
+          unpublishing_reason: null
         }, {
           title: 'title_2',
           description: 'description_2',
@@ -89,7 +94,12 @@ describe('StoryEditorNavbarBreadcrumbComponent', () => {
           exploration_id: 'exp_2',
           outline_is_finalized: false,
           thumbnail_filename: 'img2.png',
-          thumbnail_bg_color: '#a33f40'
+          thumbnail_bg_color: '#a33f40',
+          status: 'Published',
+          planned_publication_date_msecs: 100,
+          last_modified_msecs: 100,
+          first_publication_date_msecs: 200,
+          unpublishing_reason: null
         }],
       },
       language_code: 'en',
