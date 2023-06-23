@@ -34,7 +34,8 @@ class ExistingPlatformParameterValidityTests(test_utils.GenericTestBase):
                             'checkpoint_celebration',
                             'contributor_dashboard_accomplishments',
                             'diagnostic_test',
-                            'dummy_feature', 'dummy_parameter',
+                            'dummy_feature_flag_for_e2e_tests',
+                            'dummy_parameter',
                             'end_chapter_celebration',
                             'high_bounce_rate_task_minimum_exploration_starts',
                             (
