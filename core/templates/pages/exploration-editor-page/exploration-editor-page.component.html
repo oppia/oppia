@@ -40,8 +40,6 @@
               </ng-container>
             </li>
           </ul>
-        </li>
-      </ul>
 
       <ul [ngClass]="{'navbar-tab-active': getActiveTabName() === 'translation', 'oppia-disabled-tab': !connectedToInternet || editabilityService.isLockedByAdmin()}"
           id="tutorialTranslationTab"
