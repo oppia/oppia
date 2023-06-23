@@ -237,14 +237,14 @@ describe('Opportunities List Item Component', () => {
 
     it('should not show length label for translation suggestions with word' +
       ' count more than 20', () => {
-        component.opportunity.translationWordCount = 25;
-        fixture.detectChanges();
+      component.opportunity.translationWordCount = 25;
+      fixture.detectChanges();
 
-        const bannerElement: HTMLElement = fixture.nativeElement;
-        const translationLengthLabel = bannerElement.querySelector(
-          '.oppia-translation-length-label');
+      const bannerElement: HTMLElement = fixture.nativeElement;
+      const translationLengthLabel = bannerElement.querySelector(
+        '.oppia-translation-length-label');
 
-        expect(translationLengthLabel).toBeFalse();
-      });
+      expect(translationLengthLabel).toBeFalse();
+    });
   });
 });
