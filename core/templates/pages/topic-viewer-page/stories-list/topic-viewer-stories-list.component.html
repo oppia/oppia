@@ -1,7 +1,7 @@
 <div class="stories-list">
   <div class="oppia-stories-list-container">
     <mat-card class="oppia-page-card oppia-long-text">
-      <h1 class="tab-title">
+      <h1 class="tab-title" tabindex="0">
         <span *ngIf="!isHackyTopicNameTranslationDisplayed()">
           {{ topicName }}
         </span>
@@ -9,7 +9,7 @@
           {{ topicNameTranslationKey | translate }}
         </span>
       </h1>
-      <div class="topic-description e2e-test-topic-description">
+      <div class="topic-description e2e-test-topic-description" tabindex="0">
         <span *ngIf="!isHackyTopicNameTranslationDisplayed()">
           {{ topicDescription }}
         </span>

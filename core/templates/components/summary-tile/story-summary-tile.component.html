@@ -1,6 +1,10 @@
 <div class="e2e-test-story-summary-title"
   [ngClass]="checkTabletView() ? 'story-summary-tile-mobile': 'story-summary-tile-desktop'">
-  <div class="story-progress-bar" *ngIf="!checkTabletView()">
+  <div class="story-progress-bar"
+       tabindex="0"
+       role="progressbar"
+       [attr.aria-label]="'Progress ' + storyProgress + '%'"
+       *ngIf="!checkTabletView()">
     <svg class="story-progress-svg" width="50" height="50" *ngIf="nodeCount">
       <circle class="story-progress-circle total-circle"
               cx="25"
@@ -38,7 +42,7 @@
         </span>
       </a>
     </strong>
-    <span dir="auto" class="oppia-chapters-count">
+    <span dir="auto" class="oppia-chapters-count" tabindex="0" [attr.aria-label]="'Number of chapters: ' + (nodeCount || 0)">
       <span [innerHTML]="'I18N_TOPIC_VIEWER_CHAPTERS' | translate:{count:nodeCount, messageFormat: true}"></span>
     </span>
   </div>

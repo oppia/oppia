@@ -3,6 +3,7 @@
        [ngClass]="{'practice-tab-for-learner-dashboard': displayArea === 'progressTab'}">
     <mat-card class="oppia-page-card oppia-long-text">
       <h1 class="tab-title"
+          tabindex="0"
           *ngIf="displayArea === 'topicViewer'">
         <span [innerHTML]="'I18N_TOPIC_VIEWER_PRACTICE_SESSION_BETA_TAG' | translate"
               class="beta-label"
@@ -13,6 +14,7 @@
         <span>&nbsp;</span>
       </h1>
       <div class="practice-content"
+           tabindex="0"
            *ngIf="displayArea === 'topicViewer'">
         <span [innerHTML]="'I18N_TOPIC_VIEWER_SELECT_SKILLS' | translate: {topicName: topicName}"></span>
       </div>

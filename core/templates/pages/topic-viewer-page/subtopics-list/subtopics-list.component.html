@@ -3,15 +3,15 @@
     <mat-card class="oppia-page-card oppia-long-text">
       <!-- Add topic translation key to replace <topicName> in language constants so topic name is
         also translated in selected language -->
-      <h2 class="tab-title">
+      <h1 class="tab-title" tabindex="0">
         <span *ngIf="!isHackyTopicNameTranslationDisplayed()"
               [innerHTML]="'I18N_TOPIC_VIEWER_STUDY_SKILLS' | translate: {topicName: topicName}">
         </span>
         <span *ngIf="isHackyTopicNameTranslationDisplayed()"
               [innerHTML]="'I18N_TOPIC_VIEWER_STUDY_SKILLS' | translate: {topicName: topicNameTranslationKey | translate}">
         </span>
-      </h2>
-      <div class="subtopic-subheading">
+      </h1>
+      <div class="subtopic-subheading" tabindex="0">
         <span *ngIf="!isHackyTopicNameTranslationDisplayed()"
               [innerHTML]="'I18N_TOPIC_VIEWER_STUDY_SKILLS_SUBTITLE' | translate: {topicName: topicName}">
         </span>
