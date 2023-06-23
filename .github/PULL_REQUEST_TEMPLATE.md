@@ -7,14 +7,30 @@ If there is no corresponding issue number, fill in N/A where it says [fill_in_nu
 
 1. This PR fixes or fixes part of #[fill_in_number_here].
 2. This PR does the following: [Explain here what your PR does and why]
+3. (For bug-fixing PRs only) The original bug occurred because: [Explain what
+   the cause of the bug was, and which PR introduced it]
 
 ## Essential Checklist
 
-- [ ] The PR title starts with "Fix #bugnum: ", followed by a short, clear summary of the changes. (If this PR fixes part of an issue, prefix the title with "Fix part of #bugnum: ...".)
-- [ ] The linter/Karma presubmit checks have passed locally on your machine.
+- [ ] The **PR title** starts with "Fix #bugnum: " or "Fix part of #bugnum: ...",
+followed by a short, clear summary of the changes.
+- [ ] I have followed the [instructions for making a code change](https://github.com/oppia/oppia/wiki/Make-a-pull-request).
+- [ ] The linter/Karma presubmit checks have passed on my local machine.
 - [ ] "Allow edits from maintainers" is checked. (See [here](https://help.github.com/en/github/collaborating-with-issues-and-pull-requests/allowing-changes-to-a-pull-request-branch-created-from-a-fork) for instructions on how to enable it.)
-  - This lets reviewers restart your CircleCI tests for you.
-- [ ] The PR is made from a branch that's **not** called "develop".
+- [ ] I have assigned the correct reviewers to this PR (or will leave a
+comment with the phrase "@{{reviewer_username}} PTAL" if I don't have
+permissions to assign reviewers directly).
+
+
+## Testing doc (for PRs with Beam jobs that modify production server data)
+
+<!--
+If this PR affects production server data, please follow
+[these instructions](https://github.com/oppia/oppia/wiki/Testing-jobs-and-other-features-on-production#submitting-a-pr-with-a-new-job-or-feature-that-requires-third-party-api)
+and link to the job request doc here.
+
+Otherwise, please delete this section.
+-->
 
 ## Proof that changes are correct
 
@@ -68,9 +84,7 @@ language set to Arabic as well (we use Arabic as it is a language written from r
 
 ## PR Pointers
 
-- Make sure to follow the [instructions for making a code change](https://github.com/oppia/oppia/wiki/Make-a-pull-request).
-- If you need a review or an answer to a question, and don't have permissions to assign people, **leave a comment** like the following: "{{Question/comment}} @{{reviewer_username}} PTAL". Oppiabot will help assign that person for you.
-- For what code owners will expect, see the [Code Owner's wiki page](https://github.com/oppia/oppia/wiki/Oppia's-code-owners-and-checks-to-be-carried-out-by-developers).
-- Make sure your PR follows conventions in the [style guide](https://github.com/oppia/oppia/wiki/Coding-style-guide), otherwise this will lead to review delays.
-- Never force push. If you do, your PR will be closed.
-- Some of the e2e tests are flaky, and can fail for reasons unrelated to your PR. We are working on fixing this, but in the meantime, if you need to restart the tests, please check the ["If your build fails" wiki page](https://github.com/oppia/oppia/wiki/If-CI-checks-fail-on-your-PR).
+- Never force push! If you do, your PR will be closed.
+- Make sure your PR follows the [style guide](https://github.com/oppia/oppia/wiki/Coding-style-guide), otherwise this will lead to review delays.
+- Some e2e tests are flaky, and can fail for reasons unrelated to your PR. We are working on fixing this, but in the meantime, if you need to restart the tests, please check the ["If your build fails" wiki page](https://github.com/oppia/oppia/wiki/If-CI-checks-fail-on-your-PR).
+- See the [Code Owner's wiki page](https://github.com/oppia/oppia/wiki/Oppia's-code-owners-and-checks-to-be-carried-out-by-developers) for what code owners will expect.
