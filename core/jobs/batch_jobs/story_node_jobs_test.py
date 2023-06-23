@@ -272,7 +272,7 @@ class PopulateStoryNodeJobTests(job_test_utils.JobTestBase):
         self.assertEqual(story_2_nodes[0]['last_modified_msecs'], (
             utils.get_time_in_millisecs(self.STORY_2_SHAPSHOT_1_DATE)))
 
-    def test_broken_story_is_not_populated(self) -> None:
+    def test_topic_with_no_story_reference_raises_error(self) -> None:
         story_model_1 = self.create_model(
             story_models.StoryModel,
             id=self.STORY_1_ID,
@@ -284,7 +284,60 @@ class PopulateStoryNodeJobTests(job_test_utils.JobTestBase):
             story_contents=self.story_contents_dict_1,
             corresponding_topic_id=self.TOPIC_1_ID,
             url_fragment='urlfragment-1',
-            version=2
+            version=1
+        )
+        topic_model = self.create_model(
+            topic_models.TopicModel,
+            id=self.TOPIC_1_ID,
+            name='topic summary',
+            canonical_name='topic summary',
+            language_code='en',
+            description='description',
+            url_fragment='/fragm',
+            canonical_story_references=[],
+            next_subtopic_id=1,
+            page_title_fragment_for_web='fragm',
+            story_reference_schema_version=1,
+            subtopic_schema_version=feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION,
+            version=1
+        )
+        story_snapshot_metadata_model = self.create_model(
+            story_models.StorySnapshotMetadataModel,
+            id=self.STORY_1_ID + '-1',
+            commit_cmds=[{
+                'cmd': 'add_story_node',
+                'node_id': 'node_1'
+            }],
+            commit_type=feconf.COMMIT_TYPE_CREATE,
+            committer_id='user_1',
+            created_on=self.STORY_1_SHAPSHOT_1_DATE
+        )
+        self.put_multi(
+            [story_model_1, topic_model,
+             story_snapshot_metadata_model])
+
+        self.assert_job_output_is([
+            job_run_result.JobRunResult(
+                stderr=(
+                    'STORY MODELS UPDATED ERROR: \"(\'story_1_id\', '
+                    'StopIteration())\": 1'
+                )
+            )
+        ])
+
+    def test_story_with_wrong_commit_history_raises_error(self) -> None:
+        story_model_1 = self.create_model(
+            story_models.StoryModel,
+            id=self.STORY_1_ID,
+            story_contents_schema_version=4,
+            title='title_1',
+            language_code='en',
+            notes='notes_1',
+            description='description_1',
+            story_contents=self.story_contents_dict_1,
+            corresponding_topic_id=self.TOPIC_1_ID,
+            url_fragment='urlfragment-1',
+            version=1
         )
         topic_model = self.create_model(
             topic_models.TopicModel,
@@ -309,7 +362,7 @@ class PopulateStoryNodeJobTests(job_test_utils.JobTestBase):
             id=self.STORY_1_ID + '-1',
             commit_cmds=[{
                 'cmd': 'add_story_node',
-                'node_id': 'node_1'
+                'node_id': 'node_2'
             }],
             commit_type=feconf.COMMIT_TYPE_CREATE,
             committer_id='user_1',
@@ -328,16 +381,14 @@ class PopulateStoryNodeJobTests(job_test_utils.JobTestBase):
         )
         self.put_multi(
             [story_model_1, topic_model,
-            story_snapshot_metadata_model,
-            topic_snapshot_metadata_model])
+             story_snapshot_metadata_model,
+             topic_snapshot_metadata_model])
 
         self.assert_job_output_is([
             job_run_result.JobRunResult(
                 stderr=(
                     'STORY MODELS UPDATED ERROR: \"(\'story_1_id\', '
-                    'EntityNotFoundError(\'Entity for class '
-                    'StorySnapshotMetadataModel with id story_1_id-2 not '
-                    'found\'))\": 1'
+                    'Exception(\'Node was not created.\'))\": 1'
                 )
             )
         ])
@@ -540,7 +591,7 @@ class AuditPopulateStoryNodeJobTests(job_test_utils.JobTestBase):
             )
         ])
 
-    def test_broken_story_is_not_populated(self) -> None:
+    def test_topic_with_no_story_reference_raises_error(self) -> None:
         story_model_1 = self.create_model(
             story_models.StoryModel,
             id=self.STORY_1_ID,
@@ -552,7 +603,60 @@ class AuditPopulateStoryNodeJobTests(job_test_utils.JobTestBase):
             story_contents=self.story_contents_dict_1,
             corresponding_topic_id=self.TOPIC_1_ID,
             url_fragment='urlfragment-1',
-            version=2
+            version=1
+        )
+        topic_model = self.create_model(
+            topic_models.TopicModel,
+            id=self.TOPIC_1_ID,
+            name='topic summary',
+            canonical_name='topic summary',
+            language_code='en',
+            description='description',
+            url_fragment='/fragm',
+            canonical_story_references=[],
+            next_subtopic_id=1,
+            page_title_fragment_for_web='fragm',
+            story_reference_schema_version=1,
+            subtopic_schema_version=feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION,
+            version=1
+        )
+        story_snapshot_metadata_model = self.create_model(
+            story_models.StorySnapshotMetadataModel,
+            id=self.STORY_1_ID + '-1',
+            commit_cmds=[{
+                'cmd': 'add_story_node',
+                'node_id': 'node_1'
+            }],
+            commit_type=feconf.COMMIT_TYPE_CREATE,
+            committer_id='user_1',
+            created_on=self.STORY_1_SHAPSHOT_1_DATE
+        )
+        self.put_multi(
+            [story_model_1, topic_model,
+             story_snapshot_metadata_model])
+
+        self.assert_job_output_is([
+            job_run_result.JobRunResult(
+                stderr=(
+                    'STORY MODELS UPDATED ERROR: \"(\'story_1_id\', '
+                    'StopIteration())\": 1'
+                )
+            )
+        ])
+
+    def test_story_with_wrong_commit_history_raises_error(self) -> None:
+        story_model_1 = self.create_model(
+            story_models.StoryModel,
+            id=self.STORY_1_ID,
+            story_contents_schema_version=4,
+            title='title_1',
+            language_code='en',
+            notes='notes_1',
+            description='description_1',
+            story_contents=self.story_contents_dict_1,
+            corresponding_topic_id=self.TOPIC_1_ID,
+            url_fragment='urlfragment-1',
+            version=1
         )
         topic_model = self.create_model(
             topic_models.TopicModel,
@@ -577,7 +681,7 @@ class AuditPopulateStoryNodeJobTests(job_test_utils.JobTestBase):
             id=self.STORY_1_ID + '-1',
             commit_cmds=[{
                 'cmd': 'add_story_node',
-                'node_id': 'node_1'
+                'node_id': 'node_2'
             }],
             commit_type=feconf.COMMIT_TYPE_CREATE,
             committer_id='user_1',
@@ -596,16 +700,14 @@ class AuditPopulateStoryNodeJobTests(job_test_utils.JobTestBase):
         )
         self.put_multi(
             [story_model_1, topic_model,
-            story_snapshot_metadata_model,
-            topic_snapshot_metadata_model])
+             story_snapshot_metadata_model,
+             topic_snapshot_metadata_model])
 
         self.assert_job_output_is([
             job_run_result.JobRunResult(
                 stderr=(
                     'STORY MODELS UPDATED ERROR: \"(\'story_1_id\', '
-                    'EntityNotFoundError(\'Entity for class '
-                    'StorySnapshotMetadataModel with id story_1_id-2 not '
-                    'found\'))\": 1'
+                    'Exception(\'Node was not created.\'))\": 1'
                 )
             )
         ])

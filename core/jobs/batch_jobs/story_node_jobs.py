@@ -125,6 +125,11 @@ class PopulateStoryNodeJob(base_jobs.JobBase):
                         if node_created_on is not None:
                             break
 
+                    if node_created_on is None:
+                        raise Exception(
+                            'Node was not created.'
+                        )
+
                     node_published_on = story_published_on if (
                         story_published_on is not None and
                         node_created_on is not None and
