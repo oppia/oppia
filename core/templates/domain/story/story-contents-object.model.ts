@@ -244,6 +244,55 @@ export class StoryContents {
     }
   }
 
+  setNodeStatus(nodeId: string, status: string): void {
+    let index = this.getNodeIndex(nodeId);
+    if (index === -1) {
+      throw new Error('The node with given id doesn\'t exist');
+    }
+    this._nodes[index].setStatus(status);
+  }
+
+  setNodePlannedPublicationDateMsecs(
+      nodeId: string, plannedPublicationDateMsecs: number | null): void {
+    let index = this.getNodeIndex(nodeId);
+    if (index === -1) {
+      throw new Error('The node with given id doesn\'t exist');
+    }
+    this._nodes[index].setPlannedPublicationDateMsecs(
+      plannedPublicationDateMsecs);
+  }
+
+  setNodeLastModifiedMsecs(
+      nodeId: string, lastModifiedMsecs: number | null
+  ): void {
+    let index = this.getNodeIndex(nodeId);
+    if (index === -1) {
+      throw new Error('The node with given id doesn\'t exist');
+    }
+    this._nodes[index].setLastModifiedMsecs(lastModifiedMsecs);
+  }
+
+  setNodeFirstPublicationDateMsecs(
+      nodeId: string, firstPublicationDateMsecs: number | null
+  ): void {
+    let index = this.getNodeIndex(nodeId);
+    if (index === -1) {
+      throw new Error('The node with given id doesn\'t exist');
+    }
+    this._nodes[index].setFirstPublicationDateMsecs(
+      firstPublicationDateMsecs);
+  }
+
+  setNodeUnpublishingReason(
+      nodeId: string, unpublishingReason: string | null
+  ): void {
+    let index = this.getNodeIndex(nodeId);
+    if (index === -1) {
+      throw new Error('The node with given id doesn\'t exist');
+    }
+    this._nodes[index].setUnpublishingReason(unpublishingReason);
+  }
+
   markNodeOutlineAsFinalized(nodeId: string): void {
     var index = this.getNodeIndex(nodeId);
     if (index === -1) {

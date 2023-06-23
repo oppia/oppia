@@ -41,12 +41,14 @@ import { HttpErrorResponse } from '@angular/common/http';
 
 
 let dummyFeatureStatus = false;
-const mockDummyFeatureStatus = (status: boolean) => dummyFeatureStatus = status;
+const mockDummyFeatureFlagForE2ETestsStatus = (status: boolean) => {
+  dummyFeatureStatus = status;
+};
 
 class MockPlatformFeatureService {
   get status() {
     return {
-      DummyFeature: {
+      DummyFeatureFlagForE2ETests: {
         get isEnabled() {
           return dummyFeatureStatus;
         }
@@ -104,7 +106,7 @@ describe('Release coordinator page feature tab', function() {
           description: 'This is a dummy feature flag.',
           feature_stage: FeatureStage.DEV,
           is_feature: true,
-          name: 'dummy_feature',
+          name: 'dummy_feature_flag_for_e2e_tests',
           rule_schema_version: 1,
           rules: [{
             filters: [
@@ -131,7 +133,8 @@ describe('Release coordinator page feature tab', function() {
 
   it('should load feature flags on init', () => {
     expect(component.featureFlags.length).toBe(1);
-    expect(component.featureFlags[0].name).toEqual('dummy_feature');
+    expect(component.featureFlags[0].name).toEqual(
+      'dummy_feature_flag_for_e2e_tests');
   });
 
   describe('.addNewRuleToTop', () => {
@@ -321,7 +324,7 @@ describe('Release coordinator page feature tab', function() {
       description: 'This is a dummy feature flag.',
       feature_stage: FeatureStage.DEV,
       is_feature: true,
-      name: 'dummy_feature',
+      name: 'dummy_feature_flag_for_e2e_tests',
       rule_schema_version: 1,
       rules: [{
         filters: [
@@ -340,7 +343,7 @@ describe('Release coordinator page feature tab', function() {
       description: 'This is a dummy feature flag.',
       feature_stage: FeatureStage.PROD,
       is_feature: true,
-      name: 'dummy_feature',
+      name: 'dummy_feature_flag_for_e2e_tests',
       rule_schema_version: 1,
       rules: [{
         filters: [
@@ -673,7 +676,7 @@ describe('Release coordinator page feature tab', function() {
           description: 'This is a dummy feature flag.',
           feature_stage: FeatureStage.DEV,
           is_feature: true,
-          name: 'dummy_feature',
+          name: 'dummy_feature_flag_for_e2e_tests',
           rule_schema_version: 1,
           rules: [
             {
@@ -708,7 +711,7 @@ describe('Release coordinator page feature tab', function() {
           description: 'This is a dummy feature flag.',
           feature_stage: FeatureStage.DEV,
           is_feature: true,
-          name: 'dummy_feature',
+          name: 'dummy_feature_flag_for_e2e_tests',
           rule_schema_version: 1,
           rules: [
             {
@@ -734,7 +737,7 @@ describe('Release coordinator page feature tab', function() {
           description: 'This is a dummy feature flag.',
           feature_stage: FeatureStage.DEV,
           is_feature: true,
-          name: 'dummy_feature',
+          name: 'dummy_feature_flag_for_e2e_tests',
           rule_schema_version: 1,
           rules: [
             {
@@ -766,7 +769,7 @@ describe('Release coordinator page feature tab', function() {
           description: 'This is a dummy feature flag.',
           feature_stage: FeatureStage.DEV,
           is_feature: true,
-          name: 'dummy_feature',
+          name: 'dummy_feature_flag_for_e2e_tests',
           rule_schema_version: 1,
           rules: [
             {
@@ -788,15 +791,15 @@ describe('Release coordinator page feature tab', function() {
     });
   });
 
-  describe('.isDummyFeatureEnabled', () => {
+  describe('.dummyFeatureFlagForE2eTestsIsEnabled', () => {
     it('should return true when dummy feature is enabled', () => {
-      mockDummyFeatureStatus(true);
-      expect(component.isDummyFeatureEnabled).toBeTrue();
+      mockDummyFeatureFlagForE2ETestsStatus(true);
+      expect(component.dummyFeatureFlagForE2eTestsIsEnabled).toBeTrue();
     });
 
     it('should return false when dummy feature is disabled', () => {
-      mockDummyFeatureStatus(false);
-      expect(component.isDummyFeatureEnabled).toBeFalse();
+      mockDummyFeatureFlagForE2ETestsStatus(false);
+      expect(component.dummyFeatureFlagForE2eTestsIsEnabled).toBeFalse();
     });
   });
 
@@ -814,7 +817,7 @@ describe('Release coordinator page feature tab', function() {
 
     it('should not request dummy handler if the dummy feature is disabled',
       fakeAsync(() => {
-        mockDummyFeatureStatus(false);
+        mockDummyFeatureFlagForE2ETestsStatus(false);
 
         component.reloadDummyHandlerStatusAsync();
 
@@ -826,7 +829,7 @@ describe('Release coordinator page feature tab', function() {
 
     it('should request dummy handler if the dummy feature is enabled',
       fakeAsync(() => {
-        mockDummyFeatureStatus(true);
+        mockDummyFeatureFlagForE2ETestsStatus(true);
 
         component.reloadDummyHandlerStatusAsync();
 
