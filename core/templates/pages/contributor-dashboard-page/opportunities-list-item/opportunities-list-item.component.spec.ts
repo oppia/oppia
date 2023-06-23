@@ -244,7 +244,7 @@ describe('Opportunities List Item Component', () => {
       const translationLengthLabel = bannerElement.querySelector(
         '.oppia-translation-length-label');
 
-      expect(translationLengthLabel).toBeFalse();
+      expect(translationLengthLabel).toBeFalsy();
     });
   });
 });
