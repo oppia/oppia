@@ -120,6 +120,7 @@ class FeatureFlagsHandler(
         feature_flag_dicts = feature_services.get_all_feature_flag_dicts()
         self.render_json({
             'feature_flags': feature_flag_dicts,
+            'server_stage': feature_services.get_server_mode().value
         })
 
     @acl_decorators.can_access_release_coordinator_page
