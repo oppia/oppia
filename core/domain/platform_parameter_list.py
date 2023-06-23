@@ -45,6 +45,8 @@ class ParamNames(enum.Enum):
 
     PROMO_BAR_ENABLED = 'promo_bar_enabled'
     PROMO_BAR_MESSAGE = 'promo_bar_message'
+    MAX_NUMBER_OF_TAGS_ASSIGNED_TO_BLOG_POST = (
+        'max_number_of_tags_assigned_to_blog_post')
 
 
 # Platform parameters should all be defined below.
@@ -119,4 +121,12 @@ Registry.create_platform_parameter(
     ParamNames.PROMO_BAR_MESSAGE,
     'The message to show to all users if the promo bar is enabled',
     platform_parameter_domain.DataTypes.STRING
+)
+
+Registry.create_platform_parameter(
+    ParamNames.MAX_NUMBER_OF_TAGS_ASSIGNED_TO_BLOG_POST,
+    'The maximum number of tags that can be selected to categorize the blog '
+    'post',
+    platform_parameter_domain.DataTypes.NUMBER,
+    default=10
 )

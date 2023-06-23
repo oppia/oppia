@@ -21,6 +21,7 @@ handler arguments.
 from __future__ import annotations
 
 from core import utils
+from core import schema_utils
 from core.constants import constants
 from core.controllers import base
 from core.domain import blog_domain
@@ -30,6 +31,9 @@ from core.domain import config_domain
 from core.domain import exp_domain
 from core.domain import image_validation_services
 from core.domain import improvements_domain
+from core.domain import platform_parameter_domain
+from core.domain import platform_parameter_list
+from core.domain import platform_parameter_registry
 from core.domain import question_domain
 from core.domain import skill_domain
 from core.domain import state_domain
@@ -106,6 +110,92 @@ def validate_new_config_property_values(
     # individually. Hence conversion of dicts to domain objects is not required
     # for new_config_properties.
     return new_config_property
+
+
+def validate_platform_params_values_for_blog_admin(
+    new_platform_parameter_values: Dict[
+        str, platform_parameter_domain.PlatformDataTypes]
+) -> Dict[str, platform_parameter_domain.PlatformDataTypes]:
+    """Validates new platform parameter values.
+
+    Args:
+        new_platform_parameter_values: dict. Data that needs to be validated.
+
+    Returns:
+        dict(str, PlatformDataTypes). Returns the dict after validation.
+
+    Raises:
+        Exception. The name of the platform parameter is not of type string.
+        Exception. The value of the platform parameter is not of valid type.
+        Exception. The max_number_of_tags_assigned_to_blog_post platform
+            parameter has incoming value less than or equal to 0.
+    """
+
+    def _validate_parameter_value_as_per_its_data_type(
+        param_name: str, value: platform_parameter_domain.PlatformDataTypes
+    ) -> None:
+        """Validates the type of incoming value of platform parameter
+        with the data_type.
+
+        Args:
+            param_name: str. The name of the platform parameter.
+            value: PlatformDataTypes. The incoming value of the platform
+                parameter.
+
+        Raises:
+            Exception. The type of incoming value is not same as the data_type.
+        """
+        parameter = platform_parameter_registry.Registry.get_platform_parameter(
+            param_name)
+
+        if not (
+            (isinstance(value, bool) and parameter.data_type == 'bool') or
+            (isinstance(value, str) and parameter.data_type == 'string') or
+            (isinstance(value, float) and parameter.data_type == 'number') or
+            (isinstance(value, int) and parameter.data_type == 'number')
+        ):
+            raise Exception(
+                'The value of platform parameter %s is of type %s, '
+                'expected it to be %s' % (
+                    param_name, value, parameter.data_type)
+            )
+
+    for (name, value) in new_platform_parameter_values.items():
+        if not isinstance(name, str):
+            raise Exception(
+                'Platform parameter name should be a string, received'
+                ': %s' % name)
+
+        if not (
+            isinstance(value, bool) or
+            isinstance(value, str) or
+            isinstance(value, float) or
+            isinstance(value, int)
+        ):
+            raise Exception(
+                'The value of %s platform parameter is not of valid type, '
+                'it should be one of %s.' % (
+                    name, str(platform_parameter_domain.PlatformDataTypes))
+            )
+
+        _validate_parameter_value_as_per_its_data_type(name, value)
+
+        if (
+            name ==
+            platform_parameter_list.ParamNames.
+            MAX_NUMBER_OF_TAGS_ASSIGNED_TO_BLOG_POST.value
+        ):
+            assert isinstance(value, int)
+            if value <= 0:
+                raise Exception(
+                    'The value of %s should be greater than 0, it is %s.' % (
+                        name, value)
+                )
+    # The new_platform_parameter_values do not represent a domain class directly
+    # and in the handler these dict values are used to set platform parameters
+    # individually. Hence conversion of dicts to domain objects is not required
+    # for new_platform_parameter_values.
+    return new_platform_parameter_values
 
 
 def validate_change_dict_for_blog_post(

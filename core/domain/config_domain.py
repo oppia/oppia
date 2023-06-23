@@ -216,6 +216,7 @@ class ConfigProperty:
     - featured_translation_languages.
     - full_site_url.
     - list_of_default_tags_for_blog_post.
+    - max_number_of_tags_assigned_to_blog_post.
     - moderator_ids.
     - moderator_request_forum_url.
     - moderator_usernames.
@@ -522,14 +523,6 @@ MAX_NUMBER_OF_EXPLORATIONS_IN_MATH_SVGS_BATCH = ConfigProperty(
     'The maximum number of explorations that can be send in a batch of math '
     'rich text svgs.',
     2)
-
-MAX_NUMBER_OF_TAGS_ASSIGNED_TO_BLOG_POST = ConfigProperty(
-    'max_number_of_tags_assigned_to_blog_post',
-    POSITIVE_INT_SCHEMA,
-    'The maximum number of tags that can be selected to categorize the blog'
-    ' post',
-    10
-)
 
 CONTRIBUTOR_DASHBOARD_IS_ENABLED = ConfigProperty(
     'contributor_dashboard_is_enabled', BOOL_SCHEMA,
