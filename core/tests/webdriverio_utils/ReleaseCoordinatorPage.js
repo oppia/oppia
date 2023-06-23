@@ -50,13 +50,15 @@ var ReleaseCoordinatorPage = function() {
       featureFlagElement, 'Feature flags not showing up');
   };
 
-  this.getDummyFeatureElement = async function() {
+  // Remove this method after the dummy_feature_flag_for_e2e_tests feature flag
+  // is deprecated.
+  this.getDummyFeatureFlagForE2ETests = async function() {
     var featureFlagElements = await featureFlagElementsSelector();
     var count = featureFlagElements.length;
     for (let i = 0; i < count; i++) {
       var elem = featureFlagElements[i];
       if ((await elem.$(featureNameLocator).getText()) ===
-          'dummy_feature') {
+          'dummy_feature_flag_for_e2e_tests') {
         return elem;
       }
     }
