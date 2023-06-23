@@ -28,7 +28,8 @@ class ExistingPlatformParameterValidityTests(test_utils.GenericTestBase):
     core/domain/platform_parameter_list.py.
     """
 
-    EXPECTED_PARAM_NAMES = ['dummy_feature', 'dummy_parameter',
+    EXPECTED_PARAM_NAMES = ['dummy_feature_flag_for_e2e_tests',
+                            'dummy_parameter',
                             'end_chapter_celebration',
                             'checkpoint_celebration',
                             'android_beta_landing_page',
