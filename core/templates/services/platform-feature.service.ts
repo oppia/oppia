@@ -87,7 +87,8 @@ export class PlatformFeatureService {
    * to get the value of feature flags.
    *
    * Example:
-   *   platformFeatureService.status.DummyFeature.isEnabled === true.
+   *   platformFeatureService.status.DummyFeatureFlagForE2ETests.isEnabled === (
+   *   true).
    *
    * @returns {FeatureStatusChecker} - Status checker object for feature flags.
    * @throws {Error} - If this method is called before inialization.
