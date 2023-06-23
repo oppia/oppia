@@ -112,9 +112,9 @@ def validate_new_config_property_values(
 
 
 def validate_platform_params_values_for_blog_admin(
-    new_platform_parameter_values: Dict[
+    new_platform_parameter_values: Mapping[
         str, platform_parameter_domain.PlatformDataTypes]
-) -> Dict[str, platform_parameter_domain.PlatformDataTypes]:
+) -> Mapping[str, platform_parameter_domain.PlatformDataTypes]:
     """Validates new platform parameter values.
 
     Args:

@@ -65,8 +65,7 @@ class BlogAdminHandlerNormalizedPayloadDict(TypedDict):
     """
 
     action: str
-    new_config_property_values: Optional[Dict[str, Union[List[str], int]]]
-    config_property_id: Optional[str]
+    new_platform_parameter_values: Optional[Dict[str, int]]
 
 
 class BlogAdminHandler(
@@ -116,7 +115,7 @@ class BlogAdminHandler(
         """
         parameter = platform_parameter_registry.Registry.get_platform_parameter(
             param_name)
-        schema = ''
+        schema = {}
         if parameter.data_type == 'bool':
             schema = {'type': 'bool'}
         elif parameter.data_type == 'string':

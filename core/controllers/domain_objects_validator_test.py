@@ -168,18 +168,19 @@ class ValidateNewPlatformParamsValueForBlogAdminTests(
             )
 
     def test_param_name_type_other_than_str_raises_error(self) -> None:
-        # TODO(#13059): Here we use MyPy ignore because after we fully type the
-        # codebase we plan to get rid of the tests that intentionally test wrong
-        # inputs that we can normally catch by typing.
-        new_platform_parameter_values = {1234: 20, } # type: ignore[dict-item]
+        new_platform_parameter_values = {1234: 20, }
         with self.assertRaisesRegex(
             Exception, 'Platform parameter name should be a string, received'
             ': %s' % 1234
         ):
             (
+                # TODO(#13059): Here we use MyPy ignore because after we fully
+                # type the codebase we plan to get rid of the tests that
+                # intentionally test wrong inputs that we can normally catch
+                # by typing.
                 domain_objects_validator.
                 validate_platform_params_values_for_blog_admin(
-                    new_platform_parameter_values)
+                    new_platform_parameter_values) # type: ignore[arg-type]
             )
 
     def test_with_invalid_type_raises_error(self) -> None:
@@ -192,9 +193,13 @@ class ValidateNewPlatformParamsValueForBlogAdminTests(
             'typing.Union\\[str, int, bool, float].'
         ):
             (
+                # TODO(#13059): Here we use MyPy ignore because after we fully
+                # type the codebase we plan to get rid of the tests that
+                # intentionally test wrong inputs that we can normally catch
+                # by typing.
                 domain_objects_validator.
                 validate_platform_params_values_for_blog_admin(
-                    new_platform_parameter_values)
+                    new_platform_parameter_values) # type: ignore[arg-type]
             )
 
     def test_value_less_or_equal_0_for_max_no_of_tags_raises_errors(
