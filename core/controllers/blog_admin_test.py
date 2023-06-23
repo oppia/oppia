@@ -16,8 +16,6 @@
 
 from __future__ import annotations
 
-import logging
-
 from core import feconf
 from core.domain import platform_parameter_list
 from core.tests import test_utils
