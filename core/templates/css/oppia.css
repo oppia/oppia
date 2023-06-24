@@ -921,11 +921,21 @@ textarea {
 
 }
 .oppia-navbar-breadcrumb {
+  -webkit-box-orient: vertical;
   color: #fff;
   cursor: default;
+  display: -webkit-box;
   font-family: "Capriola", "Roboto", Arial, sans-serif;
   font-size: 20px;
+  -webkit-line-clamp: 1;
+  margin: 0;
+  margin-bottom: -3px;
+  margin-left: -6px;
+  overflow: hidden;
   padding-top: 13px;
+  text-overflow: ellipsis;
+  white-space: break-spaces;
+  width: -webkit-fill-available;
 }
 
 .oppia-navbar-breadcrumb-separator {
