@@ -95,7 +95,7 @@ class ExplorationPage(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     @acl_decorators.can_play_exploration
     def get(self) -> None:
         """Handles GET requests."""
-      
+
         self.render_template('exploration-editor-page.mainpage.html')
 
 
@@ -286,7 +286,7 @@ class ExplorationHandler(
     @acl_decorators.can_delete_exploration
     def delete(self, exploration_id: str) -> None:
         """Deletes the given exploration.
-        
+
         Args:
             exploration_id: str. The exploration ID.
         """
@@ -882,7 +882,7 @@ class StateYamlHandler(
     @acl_decorators.can_play_exploration
     def post(self) -> None:
         """Handles POST requests."""
-      
+
         assert self.normalized_payload is not None
         state_dict = self.normalized_payload['state_dict']
         width = self.normalized_payload['width']
@@ -1343,7 +1343,7 @@ class ImageUploadHandler(
     @acl_decorators.can_edit_entity
     def post(self, entity_type: str, entity_id: str) -> None:
         """Saves an image uploaded by a content creator.
-        
+
         Args:
             entity_type: str. The entity type.
             entity_id: str. The ID of the entity.
@@ -1647,7 +1647,7 @@ class LearnerAnswerInfoHandler(
         Args:
             entity_type: str. The entity type.
             entity_id: str. The ID of the entity.
-            
+
         Raises:
             PageNotFoundException. The page cannot be found.
         """
@@ -1707,7 +1707,7 @@ class LearnerAnswerInfoHandler(
     @acl_decorators.can_edit_entity
     def delete(self, entity_type: str, entity_id: str) -> None:
         """Deletes the learner answer info by the given id.
-        
+
         Args:
             entity_type: str. The entity type.
             entity_id: str. The ID of the entity.
