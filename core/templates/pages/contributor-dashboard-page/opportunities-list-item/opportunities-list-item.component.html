@@ -94,6 +94,18 @@
   </div>
 </ng-template>
 
+<ng-template #TranslationLengthLabel>
+  <div class="oppia-translation-label-container oppia-animate-fadein"
+       *ngIf="opportunity?.translationWordCount < 20">
+    <div class="oppia-translation-length-label"
+         ngbTooltip="Translation word count: {{opportunity.translationWordCount}}">
+      <ng-container>
+          short
+      </ng-container>
+    </div>
+  </div>
+</ng-template>
+
 <ng-template #OpportunitiesButton>
   <div class="oppia-opportunities-button-container oppia-animate-fadein">
     <div class="oppia-opportunities-button-wrapper"
@@ -122,6 +134,7 @@
   <ng-template [ngTemplateOutlet]="OpportunitiesDetails"></ng-template>
   <ng-template [ngTemplateOutlet]="ProgressBar"></ng-template>
   <ng-template [ngTemplateOutlet]="OpportunitiesLabel"></ng-template>
+  <ng-template [ngTemplateOutlet]="TranslationLengthLabel"></ng-template>
   <ng-template [ngTemplateOutlet]="OpportunitiesButton"></ng-template>
 </div>
 
@@ -131,6 +144,7 @@
   <ng-template [ngTemplateOutlet]="ProgressBar"></ng-template>
   <ng-template [ngTemplateOutlet]="OpportunitiesDetails"></ng-template>
   <ng-template [ngTemplateOutlet]="OpportunitiesLabel"></ng-template>
+  <ng-template [ngTemplateOutlet]="TranslationLengthLabel"></ng-template>
   <ng-template [ngTemplateOutlet]="OpportunitiesButton"></ng-template>
 </div>
 
@@ -141,6 +155,7 @@
         (click)="clickActionButton.emit(opportunity.id)">
   <ng-template [ngTemplateOutlet]="ProgressBar"></ng-template>
   <ng-template [ngTemplateOutlet]="OpportunitiesDetails"></ng-template>
+  <ng-template [ngTemplateOutlet]="TranslationLengthLabel"></ng-template>
   <ng-template [ngTemplateOutlet]="OpportunitiesLabel"></ng-template>
 </button>
 
@@ -274,6 +289,27 @@
     margin-top: 24px;
     min-height: 90px;
     padding: 0% 3%;
+  }
+  .oppia-translation-label-container {
+    align-items: center;
+    background-color: #fff;
+    display: flex;
+    justify-content: center;
+    margin: 1% 0;
+    width: 20%;
+  }
+  .oppia-translation-length-label {
+    align-items: center;
+    background-color: #4e89b1;
+    color: #fff;
+    display: flex;
+    font-size: 12px;
+    height: 26px;
+    justify-content: center;
+    margin: 18px;
+    padding: 3px;
+    text-align: center;
+    width: 60px;
   }
   .oppia-animate-fadein {
     -webkit-animation: fadein 0.5s linear 1 normal forwards; /* Safari, Chrome and Opera > 12.1 */

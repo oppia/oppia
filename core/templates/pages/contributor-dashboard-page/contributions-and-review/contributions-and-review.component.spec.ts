@@ -1149,7 +1149,8 @@ describe('Contributions and review component', () => {
             subheading: 'topic_name / story_title / chapter_title',
             labelText: 'Obsolete',
             labelColor: '#e76c8c',
-            actionButtonTitle: 'View'
+            actionButtonTitle: 'View',
+            translationWordCount: undefined
           }]);
           expect(more).toEqual(false);
         });
@@ -1398,8 +1399,15 @@ describe('Contributions and review component', () => {
         let suggestionIdToSuggestions = {
           suggestion: {
             suggestion: {
+              author_name: 'a',
+              target_id: '1',
               suggestion_id: 'id',
-              status: 'review'
+              suggestion_type: 'translate_content',
+              status: 'review',
+              change: {
+                content_html: '<p>This is test para</p>',
+                translation_html: 'Traducáú'
+              }
             } as Suggestion,
             details: {
               skill_description: 'skill_description',
@@ -1411,6 +1419,8 @@ describe('Contributions and review component', () => {
         } as Record<string, SuggestionDetails>;
 
         component.activeTabType = component.TAB_TYPE_REVIEWS;
+        component.activeTabSubtype = component.SUGGESTION_TYPE_TRANSLATE;
+        component.activeExplorationId = 'id';
         tick();
 
         expect(component.getTranslationContributionsSummary(
@@ -1420,7 +1430,8 @@ describe('Contributions and review component', () => {
           subheading: 'topic_name / story_title / chapter_title',
           labelText: 'Awaiting review',
           labelColor: '#eeeeee',
-          actionButtonTitle: 'Review'
+          actionButtonTitle: 'Review',
+          translationWordCount: 4
         }]);
       }));
 

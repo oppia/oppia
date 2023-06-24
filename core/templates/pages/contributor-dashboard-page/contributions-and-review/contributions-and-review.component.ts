@@ -38,6 +38,7 @@ import { ContributionAndReviewService } from '../services/contribution-and-revie
 import { ContributionOpportunitiesService } from '../services/contribution-opportunities.service';
 import { OpportunitiesListComponent } from '../opportunities-list/opportunities-list.component';
 import { PlatformFeatureService } from 'services/platform-feature.service';
+import { HtmlLengthService } from 'services/html-length.service';
 
 export interface Suggestion {
   change: {
@@ -62,6 +63,7 @@ export interface ContributionsSummary {
   labelText: string;
   labelColor: string;
   actionButtonTitle: string;
+  translationWordCount?: number;
 }
 
 export interface Opportunity {
@@ -71,6 +73,7 @@ export interface Opportunity {
   labelText: string;
   labelColor: string;
   actionButtonTitle: string;
+  translationWordCount?: number;
 }
 
 export interface GetOpportunitiesResponse {
@@ -173,7 +176,8 @@ export class ContributionsAndReview
     private skillBackendApiService: SkillBackendApiService,
     private translationTopicService: TranslationTopicService,
     private userService: UserService,
-    private featureService: PlatformFeatureService
+    private featureService: PlatformFeatureService,
+    private htmlLengthService: HtmlLengthService
   ) {}
 
   getQuestionContributionsSummary(
@@ -238,7 +242,11 @@ export class ContributionsAndReview
           this.SUGGESTION_LABELS[suggestion.status].text),
         labelColor: this.SUGGESTION_LABELS[suggestion.status].color,
         actionButtonTitle: (
-          this.activeTabType === this.TAB_TYPE_REVIEWS ? 'Review' : 'View')
+          this.activeTabType === this.TAB_TYPE_REVIEWS ? 'Review' : 'View'),
+        translationWordCount: (
+          this.isReviewTranslationsTab() && this.activeExplorationId) ? (
+            this.htmlLengthService.computeHtmlLengthInWords(
+              suggestion.change.content_html)) : undefined
       };
 
       translationContributionsSummaryList.push(requiredData);

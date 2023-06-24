@@ -35,6 +35,7 @@ export interface ExplorationOpportunity {
   translationsCount: number;
   heading?: string;
   actionButtonTitle?: string;
+  translationWordCount?: number;
 }
 
 @Component({

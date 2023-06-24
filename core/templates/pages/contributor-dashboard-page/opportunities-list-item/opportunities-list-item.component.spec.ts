@@ -203,4 +203,48 @@ describe('Opportunities List Item Component', () => {
         expect(component.correspondingOpportunityDeleted).toBeFalse();
       });
   });
+
+  describe('when reviewable translation suggestions are provided', () => {
+    beforeEach(() => {
+      component.opportunity = {
+        id: '1',
+        labelText: 'Label text',
+        labelColor: '#fff',
+        progressPercentage: 50,
+        inReviewCount: 20,
+        totalCount: 50,
+        translationsCount: 25,
+        translationWordCount: 13
+      };
+      component.opportunityType = 'translation';
+      component.clickActionButton.emit =
+        () => jasmine.createSpy('click', () => {});
+      component.labelRequired = true;
+      component.opportunityHeadingTruncationLength = 35;
+      fixture.detectChanges();
+      component.ngOnInit();
+    });
+
+    it('should show short label for translation suggestions with' +
+      ' word count less than 20', () => {
+      const bannerElement: HTMLElement = fixture.nativeElement;
+      const translationLengthLabel = bannerElement.querySelector(
+        '.oppia-translation-length-label');
+
+      expect(translationLengthLabel).toBeTruthy();
+      expect(translationLengthLabel?.textContent).toContain('short');
+    });
+
+    it('should not show length label for translation suggestions with word' +
+      ' count more than 20', () => {
+      component.opportunity.translationWordCount = 25;
+      fixture.detectChanges();
+
+      const bannerElement: HTMLElement = fixture.nativeElement;
+      const translationLengthLabel = bannerElement.querySelector(
+        '.oppia-translation-length-label');
+
+      expect(translationLengthLabel).toBeNull();
+    });
+  });
 });
