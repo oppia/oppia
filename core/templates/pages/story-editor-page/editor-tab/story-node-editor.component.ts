@@ -81,7 +81,9 @@ export class StoryNodeEditorComponent implements OnInit, OnDestroy {
   expIdIsValid: boolean;
   invalidExpErrorIsShown: boolean;
   nodeTitleEditorIsShown: boolean;
-  plannedPublicationDate: Date;
+  plannedPublicationDate: Date | null;
+  editablePlannedPublicationDate: Date | null;
+  plannedPublicationDateIsInPast: boolean = false;
 
   OUTLINE_SCHEMA = {
     type: 'html',
@@ -160,6 +162,7 @@ export class StoryNodeEditorComponent implements OnInit, OnDestroy {
     this.nodeTitleEditorIsShown = false;
     this.plannedPublicationDate = this.plannedPublicationDateMsecs ? new Date(
       this.plannedPublicationDateMsecs) : null;
+    this.editablePlannedPublicationDate = this.plannedPublicationDate;
 
     this.updateCurrentNodeIsPublishable();
   }
@@ -222,20 +225,40 @@ export class StoryNodeEditorComponent implements OnInit, OnDestroy {
     }
   }
 
-  updatePlannedPublicationDate(dateString: string): void {
-    let newPlannedPublicationDate = dateString.length ? new Date(
+  updatePlannedPublicationDate(dateString: string | null): void {
+    let newPlannedPublicationDate = dateString && dateString.length ? new Date(
       dateString) : null;
+
     if (newPlannedPublicationDate !== this.plannedPublicationDate) {
-      this.plannedPublicationDate = newPlannedPublicationDate;
       if (newPlannedPublicationDate) {
-        this.storyUpdateService.setStoryNodePlannedPublicationDateMsecs(
-          this.story, this.nodeId, newPlannedPublicationDate.getTime());
+        let currentDateTime = new Date();
+        if (newPlannedPublicationDate.getTime() < currentDateTime.getTime()) {
+          this.plannedPublicationDateIsInPast = true;
+          if (this.plannedPublicationDate) {
+            this.storyUpdateService.setStoryNodePlannedPublicationDateMsecs(
+              this.story, this.nodeId, null);
+          }
+          this.plannedPublicationDate = null;
+          this.editablePlannedPublicationDate = null;
+          setTimeout(() => {
+            this.plannedPublicationDateIsInPast = false;
+          }, 5000);
+          return;
+        } else if (this.plannedPublicationDate === null ||
+          this.plannedPublicationDate.getTime() !==
+          newPlannedPublicationDate.getTime()) {
+          this.storyUpdateService.setStoryNodePlannedPublicationDateMsecs(
+            this.story, this.nodeId, newPlannedPublicationDate.getTime());
+          this.plannedPublicationDate = newPlannedPublicationDate;
+        }
       } else {
         this.storyUpdateService.setStoryNodePlannedPublicationDateMsecs(
           this.story, this.nodeId, null);
+        this.plannedPublicationDate = null;
       }
-      this.updateCurrentNodeIsPublishable();
     }
+
+    this.updateCurrentNodeIsPublishable();
   }
 
   updateThumbnailFilename(newThumbnailFilename: string): void {

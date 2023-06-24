@@ -1,3 +1,7 @@
+<div *ngIf="plannedPublicationDateIsInPast"
+     class="oppia-error-message-container">
+     Planned Publication Date cannot be in the past.
+</div>
 <div class="story-node">
   <div class="story-node-content-container">
     <div class="story-node-content">
@@ -67,8 +71,8 @@
           <div class="story-node-planned-publication-date" *ngIf="isSerialChapterFeatureFlagEnabled()">
             <label for="storyNodePlannedPublicationDate" class="form-heading">Planned Publication Date*</label>
             <input id="storyNodePlannedPublicationDate" type="date" class="form-control"
-                   [ngModel]="plannedPublicationDate | date:'yyyy-MM-dd'"
-                   (ngModelChange)="updatePlannedPublicationDate($event)">
+                   [(ngModel)]="editablePlannedPublicationDate"
+                   (blur)="updatePlannedPublicationDate(editablePlannedPublicationDate)">
           </div>
           <div class="e2e-test-story-node-thumbnail">
             <label class="form-heading">Thumbnail Image*</label>
@@ -301,7 +305,7 @@
       <mat-card class="oppia-page-card checklist-container oppia-long-text story-node-card story-node-input-card oppia-mobile-collapsible-card"
                 *ngIf="isSerialChapterFeatureFlagEnabled()">
         <div class="story-node-header oppia-mobile-collapsible-card-header" (click)="toggleChapterTodoCard()">
-          <span>Checklist For Publication</span>
+          <span>Chapter Publication Checklist</span>
           <i class="fa fa-caret-down"
              *ngIf="!chapterTodoCardIsShown"
              aria-hidden="true">
@@ -331,7 +335,7 @@
               <i class="fa fa-exclamation-triangle" *ngIf="!explorationId"></i>
               <i class="fa fa-check todo-completed" *ngIf="explorationId"></i>
             </div>
-            <span>Exploration ID added</span>
+            <span>Exploration ID</span>
           </div>
           <div class="todo-item-container">
             <div>
@@ -347,7 +351,7 @@
               <i class="fa fa-exclamation-triangle" *ngIf="!outlineIsFinalized"></i>
               <i class="fa fa-check todo-completed" *ngIf="outlineIsFinalized"></i>
             </div>
-            <span>Chapter Outline Finalized</span>
+            <span>Chapter Outline</span>
           </div>
           <div class="todo-item-container">
             <i class="fa fa-exclamation-triangle" *ngIf="!plannedPublicationDate"></i>
@@ -482,6 +486,17 @@
   }
   .story-skill-mobile {
     display: none;
+  }
+  .oppia-error-message-container {
+    background-color: #fff;
+    border: 1px solid #00376d;
+    bottom: 30px;
+    max-width: 30%;
+    padding: 5px;
+    position: fixed;
+    right: 30px;
+    text-align: center;
+    z-index: 3000;
   }
   @media screen and (max-width: 768px) {
     .story-node-content-container {

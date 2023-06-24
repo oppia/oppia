@@ -397,25 +397,45 @@ describe('Story node editor component', () => {
   });
 
   it('should call StoryUpdate service to update planned publication date',
-    () => {
+    fakeAsync(() => {
       let storySpy = spyOn(
         storyUpdateService, 'setStoryNodePlannedPublicationDateMsecs');
       let currentNodeIsPublishableSpy = spyOn(
         component, 'updateCurrentNodeIsPublishable');
 
-      component.updatePlannedPublicationDate('2017-04-20');
+      component.plannedPublicationDate = null;
+      component.updatePlannedPublicationDate(null);
+      expect(currentNodeIsPublishableSpy).toHaveBeenCalled();
+      expect(storyUpdateService.setStoryNodePlannedPublicationDateMsecs).
+        toHaveBeenCalledTimes(0);
 
-      let date = new Date('2017-04-20');
+      let oldDateString = '2000-09-09';
+      component.updatePlannedPublicationDate(oldDateString);
+      expect(currentNodeIsPublishableSpy).toHaveBeenCalled();
+      expect(storyUpdateService.setStoryNodePlannedPublicationDateMsecs).
+        toHaveBeenCalledTimes(0);
+      expect(component.plannedPublicationDate).toBe(null);
+      expect(component.plannedPublicationDateIsInPast).toBeTrue();
+      tick(5000);
+      expect(component.plannedPublicationDateIsInPast).toBeFalse();
+
+      let futureDateString = '2037-04-20';
+      component.updatePlannedPublicationDate(futureDateString);
+      let futureDate = new Date(futureDateString);
       expect(storySpy).toHaveBeenCalledWith(
-        component.story, component.nodeId, date.getTime());
+        component.story, component.nodeId, futureDate.getTime());
       expect(currentNodeIsPublishableSpy).toHaveBeenCalled();
 
       component.updatePlannedPublicationDate('');
-
-      expect(storySpy).toHaveBeenCalledWith(
-        component.story, component.nodeId, null);
+      expect(storySpy).toHaveBeenCalled();
       expect(currentNodeIsPublishableSpy).toHaveBeenCalled();
-    });
+      expect(component.plannedPublicationDate).toBe(null);
+
+      component.plannedPublicationDate = new Date();
+      component.updatePlannedPublicationDate(oldDateString);
+      expect(storySpy).toHaveBeenCalled();
+      flush();
+    }));
 
   it('should update check if current node can be changed to' +
   'Ready To Publish', () => {
