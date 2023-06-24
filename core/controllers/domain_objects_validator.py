@@ -125,15 +125,10 @@ def validate_new_default_value_of_platform_parameter(
         Exception. The default_value is not of valid type.
     """
 
-    if not (
-        isinstance(default_value['value'], bool) or
-        isinstance(default_value['value'], str) or
-        isinstance(default_value['value'], int) or
-        isinstance(default_value['value'], float)
-    ):
+    if not isinstance(default_value['value'], (bool, float, int, str)):
         raise Exception('Expected type to be %s but received %s' % (
-            platform_parameter_domain.PlatformDataTypes, type(
-                default_value['value']))
+            platform_parameter_domain.PlatformDataTypes,
+            default_value['value'])
         )
 
     # The default_value values do not represent a domain class directly

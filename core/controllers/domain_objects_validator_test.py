@@ -138,6 +138,29 @@ class ValidateNewConfigPropertyValuesTests(test_utils.GenericTestBase):
         }
         domain_objects_validator.validate_new_config_property_values(
             config_properties)
+        
+
+class ValidateNewDefaultValueForPlatformParametersTests(test_utils.GenericTestBase):
+    """Tests to validate default value dict coming from API."""
+
+    def test_valid_object_raises_no_exception(self) -> None:
+        default_value = {'value': False}
+        (
+            domain_objects_validator.
+            validate_new_default_value_of_platform_parameter(default_value)
+        )
+
+    def test_invalid_type_raises_exception(self) -> None:
+        default_value = {'value': [10]}
+        with self.assertRaisesRegex(
+            Exception, (
+            'Expected type to be typing.Union\\[str, int, bool, float] '
+            'but received \\[10]')
+        ):
+            (
+                domain_objects_validator.
+                validate_new_default_value_of_platform_parameter(default_value)
+            )
 
 
 class ValidateChangeDictForBlogPost(test_utils.GenericTestBase):

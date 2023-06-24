@@ -27,6 +27,7 @@ from core.controllers import base
 from core.domain import fs_services
 from core.domain import platform_feature_services
 from core.domain import platform_parameter_domain
+from core.domain import platform_parameter_list
 from core.domain import platform_parameter_registry as registry
 from core.domain import value_generators_domain
 
@@ -247,13 +248,23 @@ class PromoBarHandler(
             })
         ]
 
+        promo_bar_enabled_parameter = (
+            registry.Registry.get_platform_parameter(
+                platform_parameter_list.ParamNames.PROMO_BAR_ENABLED.value)
+        )
+
+        promo_bar_message_parameter = (
+            registry.Registry.get_platform_parameter(
+                platform_parameter_list.ParamNames.PROMO_BAR_MESSAGE.value)
+        )
+
         registry.Registry.update_platform_parameter(
             'promo_bar_enabled',
             self.user_id,
             'Update promo_bar_enabled property from release '
             'coordinator page.',
             rules_for_promo_bar_enabled_value,
-            False)
+            promo_bar_enabled_parameter.default_value)
 
         registry.Registry.update_platform_parameter(
             'promo_bar_message',
@@ -261,6 +272,6 @@ class PromoBarHandler(
             'Update promo_bar_message property from release '
             'coordinator page.',
             rules_for_promo_bar_message_value,
-            False)
+            promo_bar_message_parameter.default_value)
 
         self.render_json({})

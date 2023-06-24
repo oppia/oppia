@@ -204,7 +204,8 @@ class Registry:
             commit_message: str. The commit message.
             new_rules: list(PlatformParameterRule). A list of
                 PlatformParameterRule objects.
-            default_value: The new default value of platform parameter.
+            default_value: PlatformDataTypes. The new default value of
+                platform parameter.
         """
         param = cls.get_platform_parameter(name)
 
