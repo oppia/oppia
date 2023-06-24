@@ -13,9 +13,10 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for the feature tab in admin page.
+ * @fileoverview Unit tests for the feature tab in release coordinator page.
  */
 
+import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ComponentFixture, fakeAsync, async, TestBed, flushMicrotasks, tick } from
   '@angular/core/testing';
@@ -23,12 +24,10 @@ import { FormsModule } from '@angular/forms';
 
 import cloneDeep from 'lodash/cloneDeep';
 
-import { AdminPageData } from 'domain/admin/admin-backend-api.service';
-import { AdminFeaturesTabComponent } from
-  'pages/admin-page/features-tab/admin-features-tab.component';
-import { AdminDataService } from 'pages/admin-page/services/admin-data.service';
-import { AdminTaskManagerService } from
-  'pages/admin-page/services/admin-task-manager.service';
+import { FeatureFlagsResponse } from
+  'domain/platform_feature/platform-feature-admin-backend-api.service';
+import { FeaturesTabComponent } from
+  'pages/release-coordinator-page/features-tab/features-tab.component';
 import { PlatformFeatureAdminBackendApiService } from
   'domain/platform_feature/platform-feature-admin-backend-api.service';
 import { PlatformFeatureDummyBackendApiService } from
@@ -42,12 +41,14 @@ import { HttpErrorResponse } from '@angular/common/http';
 
 
 let dummyFeatureStatus = false;
-const mockDummyFeatureStatus = (status: boolean) => dummyFeatureStatus = status;
+const mockDummyFeatureFlagForE2ETestsStatus = (status: boolean) => {
+  dummyFeatureStatus = status;
+};
 
 class MockPlatformFeatureService {
   get status() {
     return {
-      DummyFeature: {
+      DummyFeatureFlagForE2ETests: {
         get isEnabled() {
           return dummyFeatureStatus;
         }
@@ -56,12 +57,10 @@ class MockPlatformFeatureService {
   }
 }
 
-describe('Admin page feature tab', function() {
-  let component: AdminFeaturesTabComponent;
-  let fixture: ComponentFixture<AdminFeaturesTabComponent>;
-  let adminDataService: AdminDataService;
+describe('Release coordinator page feature tab', function() {
+  let component: FeaturesTabComponent;
+  let fixture: ComponentFixture<FeaturesTabComponent>;
   let featureApiService: PlatformFeatureAdminBackendApiService;
-  let adminTaskManagerService: AdminTaskManagerService;
   let windowRef: WindowRef;
 
   let updateApiSpy: jasmine.Spy;
@@ -73,22 +72,21 @@ describe('Admin page feature tab', function() {
     TestBed
       .configureTestingModule({
         imports: [FormsModule, HttpClientTestingModule],
-        declarations: [AdminFeaturesTabComponent],
+        declarations: [FeaturesTabComponent],
         providers: [
           {
             provide: PlatformFeatureService,
             useClass: MockPlatformFeatureService
           }
-        ]
+        ],
+        schemas: [NO_ERRORS_SCHEMA]
       })
       .compileComponents();
 
-    fixture = TestBed.createComponent(AdminFeaturesTabComponent);
+    fixture = TestBed.createComponent(FeaturesTabComponent);
     component = fixture.componentInstance;
-    adminDataService = TestBed.get(AdminDataService);
     featureApiService = TestBed.get(PlatformFeatureAdminBackendApiService);
     windowRef = TestBed.get(WindowRef);
-    adminTaskManagerService = TestBed.get(AdminTaskManagerService);
 
     let confirmResult = true;
     let promptResult: string | null = 'mock msg';
@@ -100,7 +98,7 @@ describe('Admin page feature tab', function() {
     mockConfirmResult = val => confirmResult = val;
     mockPromptResult = msg => promptResult = msg;
 
-    spyOn(adminDataService, 'getDataAsync').and.resolveTo({
+    spyOn(featureApiService, 'getFeatureFlags').and.resolveTo({
       featureFlags: [
         PlatformParameter.createFromBackendDict({
           data_type: 'bool',
@@ -108,7 +106,7 @@ describe('Admin page feature tab', function() {
           description: 'This is a dummy feature flag.',
           feature_stage: FeatureStage.DEV,
           is_feature: true,
-          name: 'dummy_feature',
+          name: 'dummy_feature_flag_for_e2e_tests',
           rule_schema_version: 1,
           rules: [{
             filters: [
@@ -123,8 +121,9 @@ describe('Admin page feature tab', function() {
             value_when_matched: 'original',
           }],
         })
-      ]
-    } as AdminPageData);
+      ],
+      serverStage: 'dev'
+    } as FeatureFlagsResponse);
 
     updateApiSpy = spyOn(featureApiService, 'updateFeatureFlag')
       .and.resolveTo();
@@ -134,7 +133,8 @@ describe('Admin page feature tab', function() {
 
   it('should load feature flags on init', () => {
     expect(component.featureFlags.length).toBe(1);
-    expect(component.featureFlags[0].name).toEqual('dummy_feature');
+    expect(component.featureFlags[0].name).toEqual(
+      'dummy_feature_flag_for_e2e_tests');
   });
 
   describe('.addNewRuleToTop', () => {
@@ -317,14 +317,103 @@ describe('Admin page feature tab', function() {
     });
   });
 
+  describe('.getFeatureValidOnCurrentServer', () => {
+    let featureFlagDevStage = PlatformParameter.createFromBackendDict({
+      data_type: 'bool',
+      default_value: false,
+      description: 'This is a dummy feature flag.',
+      feature_stage: FeatureStage.DEV,
+      is_feature: true,
+      name: 'dummy_feature_flag_for_e2e_tests',
+      rule_schema_version: 1,
+      rules: [{
+        filters: [
+          {
+            type: PlatformParameterFilterType.ServerMode,
+            conditions: [['=', ServerMode.Dev]]
+          }
+        ],
+        value_when_matched: true,
+      }],
+    });
+
+    let featureFlagProdStage = PlatformParameter.createFromBackendDict({
+      data_type: 'bool',
+      default_value: false,
+      description: 'This is a dummy feature flag.',
+      feature_stage: FeatureStage.PROD,
+      is_feature: true,
+      name: 'dummy_feature_flag_for_e2e_tests',
+      rule_schema_version: 1,
+      rules: [{
+        filters: [
+          {
+            type: PlatformParameterFilterType.ServerMode,
+            conditions: [['=', ServerMode.Dev]]
+          }
+        ],
+        value_when_matched: true,
+      }],
+    });
+
+    afterEach(() => {
+      component.serverStage = '';
+    });
+
+    it('should return true when the server in dev stage and feature ' +
+    'stage is dev too', (() => {
+      component.serverStage = 'dev';
+
+      expect(component.getFeatureValidOnCurrentServer(
+        featureFlagDevStage)).toBe(true);
+    }));
+
+    it('should return false when the server in test stage and feature ' +
+    'stage is dev', (() => {
+      component.serverStage = 'test';
+
+      expect(component.getFeatureValidOnCurrentServer(
+        featureFlagDevStage)).toBe(false);
+    }));
+
+    it('should return true when the server in test stage and feature ' +
+    'stage is prod', (() => {
+      component.serverStage = 'test';
+
+      expect(component.getFeatureValidOnCurrentServer(
+        featureFlagProdStage)).toBe(true);
+    }));
+
+    it('should return true when the server in prod stage and feature ' +
+    'stage is prod', (() => {
+      component.serverStage = 'prod';
+
+      expect(component.getFeatureValidOnCurrentServer(
+        featureFlagProdStage)).toBe(true);
+    }));
+
+    it('should return false when the server in prod stage and feature ' +
+    'stage is dev', (() => {
+      component.serverStage = 'prod';
+
+      expect(component.getFeatureValidOnCurrentServer(
+        featureFlagDevStage)).toBe(false);
+    }));
+
+    it('should return false when the server stage is unknown', (() => {
+      component.serverStage = 'unknown';
+
+      expect(component.getFeatureValidOnCurrentServer(
+        featureFlagDevStage)).toBe(false);
+    }));
+  });
+
   describe('.updateFeatureRulesAsync', () => {
     let setStatusSpy: jasmine.Spy;
 
     beforeEach(() => {
       setStatusSpy = jasmine.createSpy();
       setStatusSpy = spyOn(component.setStatusMessage, 'emit');
-
-      adminTaskManagerService.finishTask();
     });
 
     it('should update feature rules', fakeAsync(() => {
@@ -375,28 +464,6 @@ describe('Admin page feature tab', function() {
 
       expect(component.featureFlagNameToBackupMap.get(featureFlag.name))
         .toEqual(originalFeatureFlag);
-    }));
-
-    it('should not proceed if there is another task running', fakeAsync(() => {
-      mockPromptResult('mock msg');
-
-      adminTaskManagerService.startTask();
-
-      const featureFlag = component.featureFlags[0];
-
-      component.addNewRuleToTop(featureFlag);
-      component.updateFeatureRulesAsync(featureFlag);
-
-      flushMicrotasks();
-
-      expect(updateApiSpy).not.toHaveBeenCalled();
-      expect(setStatusSpy).not.toHaveBeenCalled();
-
-      // We need to do this at the end, otherwise the AdminTaskManager will
-      // still think that the task is running (and this can mess up other
-      // frontend tests that rely on the starting state to be "nothing is
-      // happening").
-      adminTaskManagerService.finishTask();
     }));
 
     it('should not proceed if the user cancels the prompt', fakeAsync(
@@ -608,7 +675,7 @@ describe('Admin page feature tab', function() {
           description: 'This is a dummy feature flag.',
           feature_stage: FeatureStage.DEV,
           is_feature: true,
-          name: 'dummy_feature',
+          name: 'dummy_feature_flag_for_e2e_tests',
           rule_schema_version: 1,
           rules: [
             {
@@ -643,7 +710,7 @@ describe('Admin page feature tab', function() {
           description: 'This is a dummy feature flag.',
           feature_stage: FeatureStage.DEV,
           is_feature: true,
-          name: 'dummy_feature',
+          name: 'dummy_feature_flag_for_e2e_tests',
           rule_schema_version: 1,
           rules: [
             {
@@ -669,7 +736,7 @@ describe('Admin page feature tab', function() {
           description: 'This is a dummy feature flag.',
           feature_stage: FeatureStage.DEV,
           is_feature: true,
-          name: 'dummy_feature',
+          name: 'dummy_feature_flag_for_e2e_tests',
           rule_schema_version: 1,
           rules: [
             {
@@ -701,7 +768,7 @@ describe('Admin page feature tab', function() {
           description: 'This is a dummy feature flag.',
           feature_stage: FeatureStage.DEV,
           is_feature: true,
-          name: 'dummy_feature',
+          name: 'dummy_feature_flag_for_e2e_tests',
           rule_schema_version: 1,
           rules: [
             {
@@ -723,15 +790,15 @@ describe('Admin page feature tab', function() {
     });
   });
 
-  describe('.isDummyFeatureEnabled', () => {
+  describe('.dummyFeatureFlagForE2eTestsIsEnabled', () => {
     it('should return true when dummy feature is enabled', () => {
-      mockDummyFeatureStatus(true);
-      expect(component.isDummyFeatureEnabled).toBeTrue();
+      mockDummyFeatureFlagForE2ETestsStatus(true);
+      expect(component.dummyFeatureFlagForE2eTestsIsEnabled).toBeTrue();
     });
 
     it('should return false when dummy feature is disabled', () => {
-      mockDummyFeatureStatus(false);
-      expect(component.isDummyFeatureEnabled).toBeFalse();
+      mockDummyFeatureFlagForE2ETestsStatus(false);
+      expect(component.dummyFeatureFlagForE2eTestsIsEnabled).toBeFalse();
     });
   });
 
@@ -749,7 +816,7 @@ describe('Admin page feature tab', function() {
 
     it('should not request dummy handler if the dummy feature is disabled',
       fakeAsync(() => {
-        mockDummyFeatureStatus(false);
+        mockDummyFeatureFlagForE2ETestsStatus(false);
 
         component.reloadDummyHandlerStatusAsync();
 
@@ -761,7 +828,7 @@ describe('Admin page feature tab', function() {
 
     it('should request dummy handler if the dummy feature is enabled',
       fakeAsync(() => {
-        mockDummyFeatureStatus(true);
+        mockDummyFeatureFlagForE2ETestsStatus(true);
 
         component.reloadDummyHandlerStatusAsync();
 

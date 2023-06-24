@@ -326,6 +326,7 @@ describe('Learner dashboard page', () => {
     isBlogAdmin: () => false,
     isBlogPostEditor: () => false,
     isQuestionAdmin: () => false,
+    isQuestionCoordinator: () => false,
     canCreateCollections: () => true,
     getPreferredSiteLanguageCode: () =>'en',
     getUsername: () => 'username1',
@@ -404,6 +405,10 @@ describe('Learner dashboard page', () => {
       urlService = TestBed.inject(UrlService);
       learnerGroupBackendApiService = TestBed.inject(
         LearnerGroupBackendApiService);
+
+      const mockElement = document.createElement('div');
+      mockElement.className = 'oppia-exploration-title';
+      document.body.appendChild(mockElement);
 
       spyOn(csrfTokenService, 'getTokenAsync').and.callFake(async() => {
         return Promise.resolve('sample-csrf-token');
@@ -855,6 +860,10 @@ describe('Learner dashboard page', () => {
         learnerDashboardBackendApiService, 'onClickThreadAsync')
         .and.returnValue(Promise.resolve(threadMessages));
 
+      const focusSpy = spyOn(
+        (document.querySelector(
+          '.oppia-exploration-title') as HTMLElement), 'focus');
+
       expect(component.numberOfUnreadThreads).toBe(10);
       expect(component.loadingFeedbacks).toBe(false);
 
@@ -871,6 +880,7 @@ describe('Learner dashboard page', () => {
       expect(component.numberOfUnreadThreads).toBe(6);
       expect(component.messageSummaries.length).toBe(1);
       expect(threadSpy).toHaveBeenCalled();
+      expect(focusSpy).toHaveBeenCalled();
     }));
 
     it('should set a new section as active when fetching message summary' +
