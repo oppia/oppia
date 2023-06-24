@@ -24,24 +24,32 @@ var workflow = require('../webdriverio_utils/workflow.js');
 var AdminPage = require('../webdriverio_utils/AdminPage.js');
 var ExplorationEditorPage = (
   require('../webdriverio_utils/ExplorationEditorPage.js'));
+var ReleaseCoordinatorPage = require(
+  '../webdriverio_utils/ReleaseCoordinatorPage.js');
 
 describe('Improvements tab', function() {
-  let adminPage = null;
   let explorationEditorPage = null;
   let explorationEditorImprovementsTab = null;
+  let releaseCoordinatorPage = null;
+  let improvementsTabFeature = null;
+  let adminPage = null;
 
   beforeAll(async() => {
     adminPage = new AdminPage.AdminPage();
     explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
-
-    explorationEditorImprovementsTab = (
-      explorationEditorPage.getImprovementsTab());
+    releaseCoordinatorPage = (
+      new ReleaseCoordinatorPage.ReleaseCoordinatorPage());
     await users.createAndLoginCurriculumAdminUser(
       'superUser@improvementsTab.com', 'superUser');
-    await adminPage.editConfigProperty(
-      'Exposes the Improvements Tab for creators in the exploration editor.',
-      'Boolean',
-      async(elem) => await elem.setValue(true));
+    await adminPage.get();
+    await adminPage.addRole('superUser', 'release coordinator');
+    await releaseCoordinatorPage.getFeaturesTab();
+    improvementsTabFeature = (
+      await releaseCoordinatorPage.getImprovementsTabFeatureElement());
+    await releaseCoordinatorPage.enableFeatureForTest(
+      improvementsTabFeature);
+    explorationEditorImprovementsTab = (
+      explorationEditorPage.getImprovementsTab());
     await users.logout();
   });
 

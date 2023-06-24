@@ -29,6 +29,8 @@ var ExplorationEditorPage =
 var ExplorationPlayerPage =
   require('../webdriverio_utils/ExplorationPlayerPage.js');
 var LibraryPage = require('../webdriverio_utils/LibraryPage.js');
+var ReleaseCoordinatorPage = require(
+  '../webdriverio_utils/ReleaseCoordinatorPage.js');
 
 describe('Library index page', function() {
   var adminPage = null;
@@ -37,6 +39,7 @@ describe('Library index page', function() {
   var explorationEditorMainTab = null;
   var explorationEditorSettingsTab = null;
   var explorationPlayerPage = null;
+  let releaseCoordinatorPage = null;
 
   beforeAll(async function() {
     adminPage = new AdminPage.AdminPage();
@@ -45,16 +48,18 @@ describe('Library index page', function() {
     explorationEditorMainTab = explorationEditorPage.getMainTab();
     explorationEditorSettingsTab = explorationEditorPage.getSettingsTab();
     explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
+    releaseCoordinatorPage = (
+      new ReleaseCoordinatorPage.ReleaseCoordinatorPage());
 
     await users.createAndLoginSuperAdminUser(
       'superUser@publicationAndLibrary.com', 'superUser');
-    // TODO(#7569): Change this test to work with the improvements tab.
-    await adminPage.editConfigProperty(
-      'Exposes the Improvements Tab for creators in the exploration editor',
-      'Boolean',
-      async function(elem) {
-        await elem.setValue(false);
-      });
+    await adminPage.get();
+    await adminPage.addRole('superUser', 'release coordinator');
+    await releaseCoordinatorPage.getFeaturesTab();
+    improvementsTabFeature = (
+      await releaseCoordinatorPage.getImprovementsTabFeatureElement());
+    await releaseCoordinatorPage.enableFeatureForTest(
+      improvementsTabFeature);
     await users.logout();
   });
 

@@ -66,6 +66,20 @@ var ReleaseCoordinatorPage = function() {
     return null;
   };
 
+  this.getImprovementsTabFeatureElement = async function() {
+    var featureFlagElements = await featureFlagElementsSelector();
+    var count = featureFlagElements.length;
+    for (let i = 0; i < count; i++) {
+      var elem = featureFlagElements[i];
+      if ((await elem.$(featureNameLocator).getText()) ===
+          'is_improvements_tab_enabled') {
+        return elem;
+      }
+    }
+
+    return null;
+  };
+
   this.removeAllRulesOfFeature = async function(featureElement) {
     while (!await featureElement.$(noRuleIndicatorLocator).isExisting()) {
       await action.click(

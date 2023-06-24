@@ -22,7 +22,6 @@ from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import blog_services
 from core.domain import classroom_services
-from core.domain import config_domain
 from core.domain import learner_group_services
 from core.domain import user_services
 
@@ -185,7 +184,7 @@ class ViewLearnerGroupPageAccessValidationHandler(
                 group.
         """
         assert self.user_id is not None
-        if not config_domain.LEARNER_GROUPS_ARE_ENABLED.value:
+        if not learner_group_services.is_learner_group_feature_enabled():
             raise self.PageNotFoundException
 
         is_valid_request = learner_group_services.is_user_learner(
