@@ -58,7 +58,6 @@ class FeedbackUpdatesPage(
 
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
-
     @acl_decorators.can_access_feedback_updates
     def get(self) -> None:
         """Handles GET requests."""
@@ -99,7 +98,6 @@ class FeedbackUpdatesHandler(
             }
         }
     }
-
     @acl_decorators.can_access_feedback_updates
     def post(self) -> None:
         """Handles POST requests."""

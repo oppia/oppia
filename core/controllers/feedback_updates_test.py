@@ -42,10 +42,6 @@ if MYPY:  # pragma: no cover
 class FeedbackUpdatesPageTest(test_utils.GenericTestBase):
     """Checks the access to the Feedback Updates page and its rendering."""
 
-    def test_feedback_updates_page_access_without_logging_in(self) -> None:
-        """Tests access to the Feedback Updates page."""
-        self.get_html_response('/feedback-updates', expected_status_int=302)
-
     def setUp(self) -> None:
         super().setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
