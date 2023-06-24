@@ -76,7 +76,8 @@ BOTH_MODERATOR_AND_ADMIN_USERNAME = 'moderatorandadm1n'
 class ParamNames(enum.Enum):
     """Enum for parameter names."""
 
-    TEST_FEATURE_1 = 'test_param_1'
+    TEST_PARAM_1 = 'test_param_1'
+    TEST_PARAM_2 = 'test_param_2'
 
 
 class AdminIntegrationTest(test_utils.GenericTestBase):
@@ -859,7 +860,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         param = (
             platform_parameter_registry.Registry.create_platform_parameter(
-                ParamNames.TEST_FEATURE_1,
+                ParamNames.TEST_PARAM_1,
                 'Param for test.',
                 platform_parameter_domain.DataTypes.BOOL)
         )
@@ -883,7 +884,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
 
         param = (
             platform_parameter_registry.Registry.create_platform_parameter(
-                ParamNames.TEST_FEATURE_1,
+                ParamNames.TEST_PARAM_2,
                 'Param for test.',
                 platform_parameter_domain.DataTypes.BOOL)
         )
@@ -905,6 +906,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
                 'platform_param_name': param.name,
                 'new_rules': new_rule_dicts,
                 'commit_message': 'test update param',
+                'default_value': {'value': False}
             }, csrf_token=csrf_token)
 
         rule_dicts = [
@@ -926,7 +928,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
 
         platform_parameter_registry.Registry.parameter_registry.clear()
         param = platform_parameter_registry.Registry.create_platform_parameter(
-            ParamNames.TEST_FEATURE_1,
+            ParamNames.TEST_PARAM_1,
             'Param for test.',
             platform_parameter_domain.DataTypes.BOOL)
         new_rule_dicts = [
@@ -951,6 +953,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
                 'platform_param_name': param.name,
                 'new_rules': new_rule_dicts,
                 'commit_message': 'test update param',
+                'default_value': {'value': False}
             }, csrf_token=csrf_token)
 
         response_dict = self.get_json('/adminhandler')
@@ -985,6 +988,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
                 'platform_param_name': 'unknown_param',
                 'new_rules': new_rule_dicts,
                 'commit_message': 'test update param',
+                'default_value': {'value': False}
             },
             csrf_token=csrf_token,
             expected_status_int=500
@@ -1003,7 +1007,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
 
         platform_parameter_registry.Registry.parameter_registry.clear()
         param = platform_parameter_registry.Registry.create_platform_parameter(
-            ParamNames.TEST_FEATURE_1,
+            ParamNames.TEST_PARAM_1,
             'Param for test.',
             platform_parameter_domain.DataTypes.BOOL)
         new_rule_dicts = [
@@ -1024,6 +1028,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
                 'platform_param_name': param.name,
                 'new_rules': new_rule_dicts,
                 'commit_message': 'test update param',
+                'default_value': {'value': False}
             },
             csrf_token=csrf_token,
             expected_status_int=400
@@ -1133,7 +1138,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         csrf_token = self.get_new_csrf_token()
 
         param = platform_parameter_registry.Registry.create_platform_parameter(
-            ParamNames.TEST_FEATURE_1,
+            ParamNames.TEST_PARAM_2,
             'Param for test.',
             platform_parameter_domain.DataTypes.BOOL)
         new_rule_dicts = [
@@ -1160,6 +1165,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
                 'platform_param_name': param.name,
                 'new_rules': new_rule_dicts,
                 'commit_message': 'test update param',
+                'default_value': {'value': False}
             },
             csrf_token=csrf_token,
             expected_status_int=500
