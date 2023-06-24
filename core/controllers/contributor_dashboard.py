@@ -329,7 +329,7 @@ class ReviewableOpportunitiesHandler(
 
     @acl_decorators.open_access
     def get(self) -> None:
-        """Handles GET requests."""
+        """Fetches reviewable translation suggestions."""
         assert self.normalized_request is not None
         topic_name = self.normalized_request.get('topic_name')
         language = self.normalized_request.get('language_code')
@@ -775,7 +775,7 @@ class UserContributionRightsDataHandler(
 class FeaturedTranslationLanguagesHandler(
     base.BaseHandler[Dict[str, str], Dict[str, str]]
 ):
-    """Provides featured translation languages set in admin config."""
+    """Provides featured translation languages."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
@@ -786,7 +786,7 @@ class FeaturedTranslationLanguagesHandler(
         """Handles GET requests."""
         self.render_json({
             'featured_translation_languages':
-                config_domain.FEATURED_TRANSLATION_LANGUAGES.value
+                constants.FEATURED_TRANSLATION_LANGUAGES
         })
 
 
@@ -1028,11 +1028,11 @@ class ContributorCertificateHandler(
     def get(
         self, username: str, suggestion_type: str
     ) -> None:
-        """Handles GET requests.
+        """Generates data for contributor certificates.
 
         Args:
-            username: str. The user name.
-            suggestion_type:  str. The suggestion type.
+            username: str. A user's username.
+            suggestion_type: str. The suggestion type.
         """
         assert self.normalized_request is not None
         from_date = self.normalized_request['from_date']
@@ -1074,10 +1074,10 @@ class ContributorAllStatsSummariesHandler(
 
     @acl_decorators.can_fetch_all_contributor_dashboard_stats
     def get(self, username: str) -> None:
-        """Handles GET requests.
+        """Fetches stats for given contributor.
 
         Args:
-            username: str. The username.
+            username: str. A user's username.
         """
         user_id = user_services.get_user_id_from_username(username)
         # Here we are sure that user_id will never be None, because

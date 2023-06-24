@@ -20,6 +20,7 @@ from __future__ import annotations
 
 from core import feconf
 from core.constants import constants
+from core.domain import opportunity_services
 from core.domain import state_domain
 from core.jobs import job_test_utils
 from core.jobs.batch_jobs import opportunity_management_jobs
@@ -868,3 +869,92 @@ class GenerateExplorationOpportunitySummariesJobTests(
         self.assertEqual(opportunity_model.translation_counts, {})
         self.assertEqual(
             opportunity_model.language_codes_needing_voice_artists, ['en'])
+
+    def test_job_correctly_reports_opportunity_generation_errors(self) -> None:
+        topic_model = self.create_model(
+            topic_models.TopicModel,
+            id=self.TOPIC_2_ID,
+            name='topic 2 title',
+            canonical_name='topic 2 title',
+            story_reference_schema_version=1,
+            subtopic_schema_version=1,
+            next_subtopic_id=1,
+            language_code='cs',
+            url_fragment='topic',
+            canonical_story_references=[{
+                'story_id': self.STORY_2_ID,
+                'story_is_published': False
+            }],
+            page_title_fragment_for_web='fragm',
+        )
+        topic_model.update_timestamps()
+        topic_rights_model = self.create_model(
+            topic_models.TopicRightsModel, id=self.TOPIC_2_ID)
+        topic_rights_model.update_timestamps()
+
+        story_model = self.create_model(
+            story_models.StoryModel,
+            id=self.STORY_2_ID,
+            title='story 2 title',
+            language_code='cs',
+            story_contents_schema_version=1,
+            corresponding_topic_id=self.TOPIC_1_ID,
+            url_fragment='story',
+            story_contents={
+                'nodes': [{
+                    'id': 'node',
+                    'outline': 'outline',
+                    'title': 'node 2 title',
+                    'description': 'description',
+                    'destination_node_ids': ['123'],
+                    'acquired_skill_ids': [],
+                    'exploration_id': self.EXP_2_ID,
+                    'prerequisite_skill_ids': [],
+                    'outline_is_finalized': True
+                }],
+                'initial_node_id': 'abc',
+                'next_node_id': 'efg'
+            },
+            notes='note')
+        story_model.update_timestamps()
+
+        exp_model = self.create_model(
+            exp_models.ExplorationModel,
+            id=self.EXP_2_ID,
+            title='exploration 2 title',
+            category='category',
+            objective='objective',
+            language_code='en',
+            init_state_name='state1',
+            states_schema_version=feconf.CURRENT_STATE_SCHEMA_VERSION,
+            states={
+                'state1': state_domain.State.create_default_state(
+                    'state1', 'content_0', 'default_outcome_1',
+                    is_initial_state=True
+                ).to_dict(),
+                'state2': state_domain.State.create_default_state(
+                    'state2', 'content_2', 'default_outcome_3',
+                ).to_dict()
+            },
+            next_content_id_index=4
+        )
+        exp_model.states['state1']['content']['html'] = 'A text for translation'
+        exp_model.states['state2']['content']['html'] = 'A text for translation'
+        exp_model.update_timestamps()
+        datastore_services.put_multi([
+            exp_model, story_model, topic_model, topic_rights_model
+        ])
+
+        with self.swap_to_always_raise(
+            opportunity_services,
+            'create_exp_opportunity_summary',
+            Exception('Error generating opportunity')
+        ):
+            error_template = (
+                'ERROR: '
+                '"(\'%s\', Exception(\'Error generating opportunity\'))": 1'
+            )
+            self.assert_job_output_is([
+                job_run_result.JobRunResult(stderr=error_template % 'exp_1_id'),
+                job_run_result.JobRunResult(stderr=error_template % 'exp_2_id')
+            ])

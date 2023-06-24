@@ -29,7 +29,7 @@ Registry = registry.Registry
 class ParamNames(enum.Enum):
     """Enum for parameter names."""
 
-    DUMMY_FEATURE = 'dummy_feature'
+    DUMMY_FEATURE_FLAG_FOR_E2E_TESTS = 'dummy_feature_flag_for_e2e_tests'
     DUMMY_PARAMETER = 'dummy_parameter'
 
     END_CHAPTER_CELEBRATION = 'end_chapter_celebration'
@@ -39,14 +39,20 @@ class ParamNames(enum.Enum):
     ANDROID_BETA_LANDING_PAGE = 'android_beta_landing_page'
     BLOG_PAGES = 'blog_pages'
     DIAGNOSTIC_TEST = 'diagnostic_test'
+    SERIAL_CHAPTER_LAUNCH_CURRICULUM_ADMIN_VIEW = (
+        'serial_chapter_launch_curriculum_admin_view')
+    SHOW_TRANSLATION_SIZE = 'show_translation_size'
+
+    PROMO_BAR_ENABLED = 'promo_bar_enabled'
+    PROMO_BAR_MESSAGE = 'promo_bar_message'
 
 
 # Platform parameters should all be defined below.
 
 Registry.create_feature_flag(
-    ParamNames.DUMMY_FEATURE,
-    'This is a dummy feature flag.',
-    platform_parameter_domain.FeatureStages.DEV,
+    ParamNames.DUMMY_FEATURE_FLAG_FOR_E2E_TESTS,
+    'This is a dummy feature flag for the e2e tests.',
+    platform_parameter_domain.FeatureStages.PROD,
 )
 
 Registry.create_platform_parameter(
@@ -90,3 +96,27 @@ Registry.create_feature_flag(
     ParamNames.DIAGNOSTIC_TEST,
     'This flag is for the diagnostic test functionality.',
     platform_parameter_domain.FeatureStages.PROD)
+
+Registry.create_feature_flag(
+    ParamNames.SERIAL_CHAPTER_LAUNCH_CURRICULUM_ADMIN_VIEW,
+    'This flag is for serial chapter launch feature and making changes only' +
+    'in the curriculum admin view.',
+    platform_parameter_domain.FeatureStages.DEV)
+
+Registry.create_feature_flag(
+    ParamNames.SHOW_TRANSLATION_SIZE,
+    'This flag is to show translation size on translation cards in' +
+    'contributor dashboard.',
+    platform_parameter_domain.FeatureStages.DEV)
+
+Registry.create_platform_parameter(
+    ParamNames.PROMO_BAR_ENABLED,
+    'Whether the promo bar should be enabled for all users',
+    platform_parameter_domain.DataTypes.BOOL
+)
+
+Registry.create_platform_parameter(
+    ParamNames.PROMO_BAR_MESSAGE,
+    'The message to show to all users if the promo bar is enabled',
+    platform_parameter_domain.DataTypes.STRING
+)

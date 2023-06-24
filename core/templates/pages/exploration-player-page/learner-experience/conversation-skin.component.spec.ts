@@ -1298,6 +1298,25 @@ describe('Conversation skin component', () => {
     expect(componentInstance.mostRecentlyReachedCheckpoint).toBe('Mid');
   }));
 
+  it('should display the exploration after the the progress reminder modal' +
+   'has loaded', () => {
+    componentInstance.CHECKPOINTS_FEATURE_IS_ENABLED = true;
+    spyOn(contextService, 'isInExplorationEditorPage').and.returnValue(false);
+    spyOn(contextService, 'isInExplorationPlayerPage').and.returnValue(true);
+    spyOn(urlService, 'getCollectionIdFromExplorationUrl').and.returnValue(
+      null);
+    spyOn(urlService, 'getPidFromUrl').and.returnValue(null);
+    spyOn(explorationEngineService, 'getExplorationId').and.returnValue(
+      'expl_1');
+    spyOn(explorationEngineService, 'isInPreviewMode').and.returnValue(false);
+    spyOn(urlService, 'isIframed').and.returnValue(false);
+
+    componentInstance.ngOnInit();
+    expect(componentInstance.hasFullyLoaded).toBe(false);
+    explorationPlayerStateService.onShowProgressModal.emit();
+    expect(componentInstance.hasFullyLoaded).toBe(true);
+  });
+
   it('should determine if chapter was completed for the first time',
     fakeAsync(() => {
       componentInstance.isLoggedIn = true;

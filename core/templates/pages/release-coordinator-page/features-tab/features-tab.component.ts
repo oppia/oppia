@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Component for the feature tab in the admin panel.
+ * @fileoverview Component for the feature tab on the release coordinator page.
  */
 
 import { Component, OnInit, EventEmitter, Output } from '@angular/core';
@@ -21,14 +21,12 @@ import { downgradeComponent } from '@angular/upgrade/static';
 
 import cloneDeep from 'lodash/cloneDeep';
 import isEqual from 'lodash/isEqual';
+import { Subscription } from 'rxjs';
 
 import { AdminFeaturesTabConstants } from
-  'pages/admin-page/features-tab/admin-features-tab.constants';
+  'pages/release-coordinator-page/features-tab/features-tab.constants';
+import { LoaderService } from 'services/loader.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
-import { AdminDataService } from
-  'pages/admin-page/services/admin-data.service';
-import { AdminTaskManagerService } from
-  'pages/admin-page/services/admin-task-manager.service';
 import { PlatformFeatureAdminBackendApiService } from
   'domain/platform_feature/platform-feature-admin-backend-api.service';
 import { PlatformFeatureDummyBackendApiService } from
@@ -47,10 +45,10 @@ import { HttpErrorResponse } from '@angular/common/http';
 type FilterType = keyof typeof PlatformParameterFilterType;
 
 @Component({
-  selector: 'admin-features-tab',
-  templateUrl: './admin-features-tab.component.html'
+  selector: 'features-tab',
+  templateUrl: './features-tab.component.html'
 })
-export class AdminFeaturesTabComponent implements OnInit {
+export class FeaturesTabComponent implements OnInit {
   @Output() setStatusMessage = new EventEmitter<string>();
 
   readonly availableFilterTypes: PlatformParameterFilterType[] = Object
@@ -124,30 +122,37 @@ export class AdminFeaturesTabComponent implements OnInit {
     })
   );
 
+  DEV_SERVER_STAGE = 'dev';
+  TEST_SERVER_STAGE = 'test';
+  PROD_SERVER_STAGE = 'prod';
+  serverStage: string = '';
+
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   featureFlagNameToBackupMap!: Map<string, PlatformParameter>;
   featureFlags: PlatformParameter[] = [];
-
+  featureFlagsAreFetched: boolean = false;
   isDummyApiEnabled: boolean = false;
+  loadingMessage: string = '';
+  directiveSubscriptions = new Subscription();
 
   constructor(
     private windowRef: WindowRef,
-    private adminDataService: AdminDataService,
-    private adminTaskManager: AdminTaskManagerService,
     private apiService: PlatformFeatureAdminBackendApiService,
     private featureService: PlatformFeatureService,
     private dummyApiService: PlatformFeatureDummyBackendApiService,
+    private loaderService: LoaderService,
   ) {}
 
   async reloadFeatureFlagsAsync(): Promise<void> {
-    const data = await this.adminDataService.getDataAsync();
-
+    const data = await this.apiService.getFeatureFlags();
+    this.serverStage = data.serverStage;
+    this.featureFlagsAreFetched = true;
     this.featureFlags = data.featureFlags;
-
     this.featureFlagNameToBackupMap = new Map(
       this.featureFlags.map(feature => [feature.name, cloneDeep(feature)]));
+    this.loaderService.hideLoadingScreen();
   }
 
   addNewRuleToTop(feature: PlatformParameter): void {
@@ -195,13 +200,24 @@ export class AdminFeaturesTabComponent implements OnInit {
     feature.rules.splice(ruleIndex + 1, 0, rule);
   }
 
+  getFeatureValidOnCurrentServer(feature: PlatformParameter): boolean {
+    if (this.serverStage === this.DEV_SERVER_STAGE) {
+      return true;
+    } else if (this.serverStage === this.TEST_SERVER_STAGE) {
+      return (
+        feature.featureStage === this.TEST_SERVER_STAGE ||
+        feature.featureStage === this.PROD_SERVER_STAGE
+      ) ? true : false;
+    } else if (this.serverStage === this.PROD_SERVER_STAGE) {
+      return feature.featureStage === this.PROD_SERVER_STAGE ? true : false;
+    }
+    return false;
+  }
+
   async updateFeatureRulesAsync(feature: PlatformParameter): Promise<void> {
     const issues = this.validateFeatureFlag(feature);
     if (issues.length > 0) {
       this.windowRef.nativeWindow.alert(issues.join('\n'));
-      return;
-    }
-    if (this.adminTaskManager.isTaskRunning()) {
       return;
     }
     const commitMessage = this.windowRef.nativeWindow.prompt(
@@ -214,8 +230,6 @@ export class AdminFeaturesTabComponent implements OnInit {
     }
 
     try {
-      this.adminTaskManager.startTask();
-
       await this.apiService.updateFeatureFlag(
         feature.name, commitMessage, feature.rules);
 
@@ -236,8 +250,6 @@ export class AdminFeaturesTabComponent implements OnInit {
       } else {
         throw new Error('Unexpected error response.');
       }
-    } finally {
-      this.adminTaskManager.finishTask();
     }
   }
 
@@ -324,22 +336,33 @@ export class AdminFeaturesTabComponent implements OnInit {
     return issues;
   }
 
-  get isDummyFeatureEnabled(): boolean {
-    return this.featureService.status.DummyFeature.isEnabled;
+  get dummyFeatureFlagForE2eTestsIsEnabled(): boolean {
+    return this.featureService.status.DummyFeatureFlagForE2ETests.isEnabled;
   }
 
   async reloadDummyHandlerStatusAsync(): Promise<void> {
-    if (this.isDummyFeatureEnabled) {
+    if (this.dummyFeatureFlagForE2eTestsIsEnabled) {
       this.isDummyApiEnabled = await this.dummyApiService.isHandlerEnabled();
     }
   }
 
   ngOnInit(): void {
+    this.directiveSubscriptions.add(
+      this.loaderService.onLoadingMessageChange.subscribe(
+        (message: string) => {
+          this.loadingMessage = message;
+        }
+      ));
+    this.loaderService.showLoadingScreen('Loading');
     this.reloadFeatureFlagsAsync();
     this.reloadDummyHandlerStatusAsync();
+  }
+
+  ngOnDestroy(): void {
+    this.directiveSubscriptions.unsubscribe();
   }
 }
 
 angular.module('oppia').directive(
   'adminFeaturesTab', downgradeComponent(
-    {component: AdminFeaturesTabComponent}));
+    {component: FeaturesTabComponent}));

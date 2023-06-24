@@ -77,8 +77,7 @@ class TopicsAndSkillsDashboardPageDataHandler(
 
     @acl_decorators.can_access_topics_and_skills_dashboard
     def get(self) -> None:
-        """Handles GET requests."""
-
+        """Retrieves data for the topics and skills dashboard."""
         topic_summaries = topic_fetchers.get_all_topic_summaries()
         # Here we use MyPy ignore because we are explicitly changing
         # the type from the list of 'TopicSummaryDict' to the list of
@@ -226,9 +225,10 @@ class TopicAssignmentsHandler(
 
     @acl_decorators.can_access_topics_and_skills_dashboard
     def get(self, skill_id: str) -> None:
-        """Handles GET requests.
-        ARGS:
-            skill_id. str. The ID of the skill.
+        """Retrieves topic assignments.
+
+        Args:
+            skill_id: str. The skill ID.
         """
         topic_assignments = skill_services.get_all_topic_assignments_for_skill(
             skill_id)
@@ -311,7 +311,7 @@ class SkillsDashboardPageDataHandler(
 
     @acl_decorators.can_access_topics_and_skills_dashboard
     def post(self) -> None:
-        """Handles POST requests."""
+        """Filters and fetches skill summaries."""
         assert self.normalized_payload is not None
         classroom_name = self.normalized_payload['classroom_name']
         urlsafe_start_cursor = self.normalized_payload.get('next_cursor')
@@ -437,6 +437,7 @@ class NewTopicHandler(
             InvalidInputException. If there are validation errors
                 during image validation.
         """
+        
         assert self.user_id is not None
         assert self.normalized_payload is not None
         assert self.normalized_request is not None
@@ -566,6 +567,7 @@ class NewSkillHandler(
         Raises:
             InvalidInputException. Topic is None or duplicate skill description.
         """
+
         assert self.user_id is not None
         assert self.normalized_payload is not None
         description = self.normalized_payload['description']
@@ -660,7 +662,8 @@ class MergeSkillHandler(
 
     @acl_decorators.can_access_topics_and_skills_dashboard
     def post(self) -> None:
-        """Handles POST request."""
+        """Merges skills."""
+
         assert self.user_id is not None
         assert self.normalized_payload is not None
         old_skill_id = self.normalized_payload['old_skill_id']
@@ -738,7 +741,8 @@ class TopicIdToDiagnosticTestSkillIdsHandler(
 
     @acl_decorators.open_access
     def get(self) -> None:
-        """Handles Get requests."""
+        """Retrieves diagnostic test skill IDs."""
+
         assert self.normalized_request is not None
         topic_ids = self.normalized_request[
             'comma_separated_topic_ids']
