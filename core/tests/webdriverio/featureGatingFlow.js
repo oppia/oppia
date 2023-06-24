@@ -54,7 +54,7 @@ describe('Feature Gating Flow', function() {
     await users.login(RELEASE_COORDINATOR_USER1_EMAIL, true);
 
     await releaseCoordinatorPage.getFeaturesTab();
-    var dummy = await releaseCoordinatorPage.getDummyFeatureElement();
+    var dummy = await releaseCoordinatorPage.getDummyFeatureFlagForE2ETests();
 
     await releaseCoordinatorPage.removeAllRulesOfFeature(dummy);
     await releaseCoordinatorPage.saveChangeOfFeature(dummy);
@@ -66,20 +66,13 @@ describe('Feature Gating Flow', function() {
       await users.login(RELEASE_COORDINATOR_USER1_EMAIL, true);
       await releaseCoordinatorPage.getFeaturesTab();
 
-      // Indicator in Angular component that is visible if the dummy_feature
-      // is enabled, and the feature status is successfully loaded in the
-      // Angular component.
+      // Indicator in Angular component that is visible if the
+      // dummy_feature_flag_for_e2e_tests is enabled, and the feature status
+      // is successfully loaded in the Angular component.
       var agDummyFeatureIndicator = $(
         '.e2e-test-angular-dummy-feature-indicator');
 
-      // Indicator in AngularJS directive that is visible if the dummy_feature
-      // is enabled, and the feature status is successfully loaded in the
-      // AngularJS directive.
-      var ajsDummyFeatureIndicator = $(
-        '.e2e-test-angularjs-dummy-feature-indicator');
-
       expect(await agDummyFeatureIndicator.isExisting()).toBe(false);
-      expect(await ajsDummyFeatureIndicator.isExisting()).toBe(false);
       await users.logout();
     }
   );
@@ -89,45 +82,39 @@ describe('Feature Gating Flow', function() {
 
     await releaseCoordinatorPage.getFeaturesTab();
 
-    var dummy = await releaseCoordinatorPage.getDummyFeatureElement();
+    var dummy = await releaseCoordinatorPage.getDummyFeatureFlagForE2ETests();
 
     expect(await dummy.isExisting()).toBe(true);
     await users.logout();
   });
 
-  it('should not show indicators for dummy_feature to different users',
-    async() => {
-      await users.login(RELEASE_COORDINATOR_USER1_EMAIL, true);
+  it('should not show indicators for dummy_feature_flag_for_e2e_tests ' +
+  'to different users', async() => {
+    await users.login(RELEASE_COORDINATOR_USER1_EMAIL, true);
 
-      await releaseCoordinatorPage.getFeaturesTab();
-      var dummy = await releaseCoordinatorPage.getDummyFeatureElement();
-      await releaseCoordinatorPage.enableFeatureForDev(dummy);
+    await releaseCoordinatorPage.getFeaturesTab();
+    var dummy = await releaseCoordinatorPage.getDummyFeatureFlagForE2ETests();
+    await releaseCoordinatorPage.enableFeatureForDev(dummy);
 
-      await users.logout();
-      await users.login(RELEASE_COORDINATOR_USER2_EMAIL, true);
+    await users.logout();
+    await users.login(RELEASE_COORDINATOR_USER2_EMAIL, true);
 
-      await releaseCoordinatorPage.getFeaturesTab();
+    await releaseCoordinatorPage.getFeaturesTab();
 
-      // Indicator in Angular component that is visible if the dummy_feature
-      // is enabled, and the feature status is successfully loaded in the
-      // Angular component.
-      var agDummyFeatureIndicator = $(
-        '.e2e-test-angular-dummy-feature-indicator');
+    // Indicator in Angular component that is visible if the
+    // dummy_feature_flag_for_e2e_tests is enabled, and the feature status
+    // is successfully loaded in the Angular component.
+    var agDummyFeatureIndicator = $(
+      '.e2e-test-angular-dummy-feature-indicator');
 
-      // Indicator in Angular component that is visible if the dummy_feature
-      // is enabled, and the backend dummy handler is also enabled.
-      var agDummyHandlerIndicator = $(
-        '.e2e-test-angular-dummy-handler-indicator');
+    // Indicator in Angular component that is visible if the
+    // dummy_feature_flag_for_e2e_tests is enabled, and the backend
+    // dummy handler is also enabled.
+    var agDummyHandlerIndicator = $(
+      '.e2e-test-angular-dummy-handler-indicator');
 
-      // Indicator in AngularJS directive that is visible if the dummy_feature
-      // is enabled, and the feature status is successfully loaded in the
-      // AngularJS directive.
-      var ajsDummyFeatureIndicator = $(
-        '.e2e-test-angularjs-dummy-feature-indicator');
-
-      expect(await agDummyFeatureIndicator.isExisting()).toBe(false);
-      expect(await agDummyHandlerIndicator.isExisting()).toBe(false);
-      expect(await ajsDummyFeatureIndicator.isExisting()).toBe(false);
-      await users.logout();
-    });
+    expect(await agDummyFeatureIndicator.isExisting()).toBe(false);
+    expect(await agDummyHandlerIndicator.isExisting()).toBe(false);
+    await users.logout();
+  });
 });
