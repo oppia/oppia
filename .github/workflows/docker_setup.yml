@@ -21,13 +21,22 @@ jobs:
       - name: Checkout to the Oppia repository code
         uses: actions/checkout@v3
 
-      - name: Build Docker Images
+      - name: Start Containers
         run: docker compose up -d
-        
+
       - name: Checking server reachability
         run: |
-          curl localhost:8181
-          echo ---Dev-server is up---
+          for i in {1..5}; do
+            if curl -s http://localhost:8181/; then
+              echo ---Dev-server is up---
+              exit 0
+            else
+              echo ---Retrying in 5mins---
+              sleep 300
+            fi
+          done
+          echo ---Dev-server is not started after all retries---
+          exit 1
           
-      - name: Stop Container
+      - name: Stop Containers
         run: docker compose down
