@@ -32,7 +32,7 @@ if MYPY:  # pragma: no cover
     ])
 )
 
-def get_translation_submitter_admin_stats_from_model(
+def get_translation_submitter_total_stats_from_model(
     translation_submitter_model:
         suggestion_models.TranslationSubmitterTotalContributionStatsModel
 ) -> suggestion_registry.TranslationSubmitterTotalContributionStats:
@@ -89,7 +89,7 @@ def get_translation_submitter_admin_stats_from_model(
         ),
     )
 
-def get_translation_reviewer_admin_stats_from_model(
+def get_translation_reviewer_total_stats_from_model(
     translation_reviewer_model:
         suggestion_models.TranslationReviewerTotalContributionStatsModel
 ) -> suggestion_registry.TranslationReviewerTotalContributionStats:
@@ -135,7 +135,7 @@ def get_translation_reviewer_admin_stats_from_model(
         ),
     )
 
-def get_question_submitter_admin_stats_from_model(
+def get_question_submitter_total_stats_from_model(
     question_submitter_model:
         suggestion_models.QuestionSubmitterTotalContributionStatsModel
 ) -> suggestion_registry.QuestionSubmitterTotalContributionStats:
@@ -182,7 +182,7 @@ def get_question_submitter_admin_stats_from_model(
         ),
     )
 
-def get_question_reviewer_admin_stats_from_model(
+def get_question_reviewer_total_stats_from_model(
     question_reviewer_model:
         suggestion_models.QuestionReviewerTotalContributionStatsModel
 ) -> suggestion_registry.QuestionReviewerTotalContributionStats:
@@ -224,7 +224,7 @@ def get_question_reviewer_admin_stats_from_model(
         ),
     )
 
-def get_translation_submitter_admin_stats(
+def get_translation_submitter_total_stats(
     page_size: int,
     offset: int,
     language_code: str,
@@ -274,7 +274,7 @@ def get_translation_submitter_admin_stats(
     )
 
     translation_submitter_stats = [
-        get_translation_submitter_admin_stats_from_model(model)
+        get_translation_submitter_total_stats_from_model(model)
         for model in translation_submitter_models]
 
     return (
@@ -283,7 +283,7 @@ def get_translation_submitter_admin_stats(
         more
     )
 
-def get_translation_reviewer_admin_stats(
+def get_translation_reviewer_total_stats(
         page_size: int,
         offset: int,
         language_code: str,
@@ -330,7 +330,7 @@ def get_translation_reviewer_admin_stats(
     )
 
     translation_reviewer_stats = [
-        get_translation_reviewer_admin_stats_from_model(model)
+        get_translation_reviewer_total_stats_from_model(model)
         for model in translation_reviewer_models]
 
     return (
@@ -339,7 +339,7 @@ def get_translation_reviewer_admin_stats(
         more
     )
 
-def get_question_submitter_admin_stats(
+def get_question_submitter_total_stats(
     page_size: int,
     offset: int,
     sort_by: Optional[suggestion_models.SortChoices],
@@ -386,7 +386,7 @@ def get_question_submitter_admin_stats(
     )
 
     question_submitter_stats = [
-        get_question_submitter_admin_stats_from_model(model)
+        get_question_submitter_total_stats_from_model(model)
         for model in question_submitter_models]
 
     return (
@@ -395,7 +395,7 @@ def get_question_submitter_admin_stats(
         more
     )
 
-def get_question_reviewer_admin_stats(
+def get_question_reviewer_total_stats(
         page_size: int,
         offset: int,
         sort_by: Optional[suggestion_models.SortChoices],
@@ -439,7 +439,7 @@ def get_question_reviewer_admin_stats(
     )
 
     question_reviewer_stats = [
-        get_question_reviewer_admin_stats_from_model(model)
+        get_question_reviewer_total_stats_from_model(model)
         for model in question_reviewer_models]
 
     return (

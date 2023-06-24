@@ -2582,6 +2582,12 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
                 'hi', self.author_id, '0'
             )
         )
+        translation_submitter_total_stats_model = (
+            suggestion_models.TranslationSubmitterTotalContributionStatsModel
+            .get(
+                'hi', self.author_id
+            )
+        )
         # Assert translation contribution stats.
         # At this point we can confirm that there should be an associated
         # translation contribution stat object for the given IDs since we have
@@ -2603,6 +2609,36 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             translation_contribution_stats_model.accepted_translations_count,
             0
         )
+
+        self.assertEqual(
+            (
+                translation_submitter_total_stats_model
+                .submitted_translations_count
+            ),
+            2
+        )
+        self.assertEqual(
+            (
+                translation_submitter_total_stats_model
+                .submitted_translation_word_count
+            ),
+            7
+        )
+        self.assertEqual(
+            (
+                translation_submitter_total_stats_model
+                .accepted_translations_count
+            ),
+            0
+        )
+        self.assertEqual(
+            (
+                translation_submitter_total_stats_model
+                .topic_ids_with_translation_submissions
+            ),
+            ['0']
+        )
+        
 
     def test_update_translation_review_stats_when_suggestion_is_accepted(
         self) -> None:

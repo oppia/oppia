@@ -25,7 +25,7 @@ import re
 
 from core import feconf
 from core.constants import constants
-from core.domain import email_manager
+from core.domain import contributor_admin_dashboard_services, email_manager
 from core.domain import exp_fetchers
 from core.domain import feedback_services
 from core.domain import html_cleaner
@@ -2400,6 +2400,47 @@ def _update_translation_review_stats_models(
         stats_models_to_update)
 
 
+def _update_translation_reviewer_total_stats_models(
+    translation_reviewer_total_stat:
+        suggestion_registry.TranslationReviewerTotalContributionStats
+) -> None:
+    """Updates TranslationReviewerTotalContributionStats
+    models for given translation review stats.
+
+    Args:
+        translation_reviewer_total_stat: list(TranslationReviewStats). A list of
+            TranslationReviewStats domain objects.
+    """
+    stat = translation_reviewer_total_stat
+
+    stats_model = suggestion_models.TranslationReviewerTotalContributionStatsModel.get(
+        translation_reviewer_total_stat.language_code,
+        translation_reviewer_total_stat.contributor_id)
+
+    stats_model.topic_ids_with_translation_reviews = (
+        stat.topic_ids_with_translation_reviews)
+    stats_model.reviewed_translations_count = (
+        stat.reviewed_translations_count)
+    stats_model.accepted_translations_count = (
+        stat.accepted_translations_count)
+    stats_model.accepted_translations_with_reviewer_edits_count = (
+        stat.accepted_translations_with_reviewer_edits_count)
+    stats_model.accepted_translation_word_count = (
+        stat.accepted_translation_word_count)
+    stats_model.rejected_translations_count = (
+        stat.rejected_translations_count)
+    stats_model.first_contribution_date = (
+        stat.first_contribution_date)
+    stats_model.last_contribution_date = (
+        stat.last_contribution_date)
+
+    suggestion_models.TranslationReviewerTotalContributionStatsModel.update_timestamps(
+        stats_model,
+        update_last_updated_time=True)
+    suggestion_models.TranslationReviewerTotalContributionStatsModel.put(
+        stats_model)
+
+
 def _update_question_contribution_stats_models(
     question_contribution_stats: List[
         suggestion_registry.QuestionContributionStats
@@ -2484,10 +2525,68 @@ def _update_question_review_stats_models(
         stats_models_to_update)
 
 
+def _update_translation_submitter_total_stats_model(
+    translation_submitter_total_stats:
+        suggestion_registry.TranslationSubmitterTotalContributionStats
+) -> None:
+    """Updates TranslationSubmitterTotalContributionStats
+    model for given translation submitter stats.
+
+    Args:
+        translation_contribution_stats:
+            list(TranslationSubmitterTotalContributionStats).
+            TranslationSubmitterTotalContributionStats domain object.
+
+    Raises:
+        Exception. Language is None.
+        Exception. Contributor user ID is None.
+    """
+    stat = translation_submitter_total_stats
+    if stat.language_code is None:
+        raise Exception('Language code should not be None.')
+    if stat.contributor_id is None:
+        raise Exception('Contributor user ID should not be None.')
+
+    stats_model = suggestion_models.TranslationSubmitterTotalContributionStatsModel.get(
+            stat.language_code,
+            stat.contributor_id)
+
+    stats_model.topic_ids_with_translation_submissions = (
+        stat.topic_ids_with_translation_submissions)
+    stats_model.recent_review_outcomes = stat.recent_review_outcomes
+    stats_model.recent_performance = stat.recent_performance
+    stats_model.overall_accuracy = (
+        stat.accepted_translations_count / stat.submitted_translations_count
+    )
+    stats_model.submitted_translations_count = (
+        stat.submitted_translations_count)
+    stats_model.submitted_translation_word_count = (
+        stat.submitted_translation_word_count)
+    stats_model.accepted_translations_count = (
+        stat.accepted_translations_count)
+    stats_model.accepted_translations_without_reviewer_edits_count = (
+        stat.accepted_translations_without_reviewer_edits_count)
+    stats_model.accepted_translation_word_count = (
+        stat.accepted_translation_word_count)
+    stats_model.rejected_translations_count = (
+        stat.rejected_translations_count)
+    stats_model.rejected_translation_word_count = (
+        stat.rejected_translation_word_count)
+    stats_model.first_contribution_date = stat.first_contribution_date
+    stats_model.last_contribution_date = stat.last_contribution_date
+
+    suggestion_models.TranslationSubmitterTotalContributionStatsModel.update_timestamps(
+        stats_model,
+        update_last_updated_time=True)
+    suggestion_models.TranslationSubmitterTotalContributionStatsModel.put(
+        stats_model)
+
+
 def update_translation_contribution_stats_at_submission(
     suggestion: suggestion_registry.BaseSuggestion
 ) -> None:
-    """Creates/updates TranslationContributionStatsModel model for
+    """Creates/updates TranslationContributionStatsModel and
+    TranslationSubmitterTotalContributionStatsModel model for
     given translation submitter when a translation is submitted.
 
     Args:
@@ -2517,6 +2616,51 @@ def update_translation_contribution_stats_at_submission(
         suggestion_models.TranslationContributionStatsModel.get(
             suggestion.change.language_code, suggestion.author_id, topic_id
         ))
+
+    translation_submitter_total_stat_model = (
+        suggestion_models.TranslationSubmitterTotalContributionStatsModel.get(
+            suggestion.change.language_code, suggestion.author_id
+        )
+    )
+
+    if translation_submitter_total_stat_model is None:
+        suggestion_models.TranslationSubmitterTotalContributionStatsModel.create(
+            language_code=suggestion.change.language_code,
+            contributor_id=suggestion.author_id,
+            topic_ids_with_translation_submissions=[topic_id],
+            recent_review_outcomes=[],
+            recent_performance=0,
+            overall_accuracy=0.0,
+            submitted_translations_count=1,
+            submitted_translation_word_count=content_word_count,
+            accepted_translations_count=0,
+            accepted_translations_without_reviewer_edits_count=0,
+            accepted_translation_word_count=0,
+            rejected_translations_count=0,
+            rejected_translation_word_count=0,
+            first_contribution_date=suggestion.last_updated.date(),
+            last_contribution_date=suggestion.last_updated.date()
+        )
+    else:
+        translation_submitter_total_stat = (
+            contributor_admin_dashboard_services
+            .get_translation_submitter_total_stats_from_model(
+                translation_submitter_total_stat_model))
+
+        if topic_id not in (
+            translation_submitter_total_stat
+            .topic_ids_with_translation_submissions):
+            (
+                translation_submitter_total_stat
+                .topic_ids_with_translation_submissions).append(topic_id)
+        translation_submitter_total_stat.submitted_translations_count += 1
+        translation_submitter_total_stat.submitted_translation_word_count += (
+            content_word_count)
+        translation_submitter_total_stat.last_contribution_date = (
+            suggestion.last_updated.date())
+
+        _update_translation_submitter_total_stats_model(
+            translation_submitter_total_stat)
 
     if translation_contribution_stat_model is None:
         suggestion_models.TranslationContributionStatsModel.create(
@@ -2585,22 +2729,56 @@ def update_translation_contribution_stats_at_review(
             suggestion.change.language_code, suggestion.author_id, topic_id
         ))
 
+    translation_submitter_total_stat_model = (
+        suggestion_models.TranslationSubmitterTotalContributionStatsModel.get(
+            suggestion.change.language_code, suggestion.author_id
+        ))
+
+    accepted_translations_count = 0
+    accepted_translation_word_count = 0
+    rejected_translations_count = 0
+    rejected_translation_word_count = 0
+    accepted_translations_without_reviewer_edits_count = 0
+
+    if suggestion_is_accepted:
+        accepted_translations_count += 1
+        accepted_translation_word_count += content_word_count
+    else:
+        rejected_translations_count += 1
+        rejected_translation_word_count += content_word_count
+    if suggestion_is_accepted and not suggestion.edited_by_reviewer:
+        accepted_translations_without_reviewer_edits_count += 1
+
+    if translation_submitter_total_stat_model is None:
+        suggestion_models.TranslationSubmitterTotalContributionStatsModel.create(
+            language_code=suggestion.change.language_code,
+            contributor_user_id=suggestion.author_id,
+            topic_ids_with_translation_submissions=[topic_id],
+            submitted_translations_count=1,
+            submitted_translation_word_count=content_word_count,
+            accepted_translations_count=accepted_translations_count,
+            accepted_translations_without_reviewer_edits_count=(
+                accepted_translations_without_reviewer_edits_count),
+            accepted_translation_word_count=accepted_translation_word_count,
+            rejected_translations_count=rejected_translations_count,
+            rejected_translation_word_count=rejected_translation_word_count,
+            first_contribution_date=suggestion.last_updated.date(),
+            last_contribution_date=suggestion.last_updated.date()
+        )
+    else:
+        translation_submitter_stat = (
+            contributor_admin_dashboard_services
+            .get_translation_submitter_total_stats_from_model(
+                translation_submitter_stat)
+        )
+
+        increment_translation_submitter_total_stats_at_review(
+            translation_contribution_stat, content_word_count,
+            suggestion_is_accepted, suggestion.edited_by_reviewer)
+        _update_translation_submitter_total_stats_model(
+            translation_contribution_stat)
+
     if translation_contribution_stat_model is None:
-        accepted_translations_count = 0
-        accepted_translation_word_count = 0
-        rejected_translations_count = 0
-        rejected_translation_word_count = 0
-        accepted_translations_without_reviewer_edits_count = 0
-
-        if suggestion_is_accepted:
-            accepted_translations_count += 1
-            accepted_translation_word_count += content_word_count
-        else:
-            rejected_translations_count += 1
-            rejected_translation_word_count += content_word_count
-        if suggestion_is_accepted and not suggestion.edited_by_reviewer:
-            accepted_translations_without_reviewer_edits_count += 1
-
         suggestion_models.TranslationContributionStatsModel.create(
             language_code=suggestion.change.language_code,
             contributor_user_id=suggestion.author_id,
@@ -2674,6 +2852,53 @@ def update_translation_review_stats(
             suggestion.change.language_code, suggestion.final_reviewer_id,
             topic_id
         ))
+
+    translation_reviewer_total_stat_model = (
+        suggestion_models.TranslationReviewerTotalContributionStatsModel.get(
+            suggestion.change.language_code, suggestion.final_reviewer_id
+        ))
+
+    if translation_reviewer_total_stat_model is None:
+        # This function is called when reviewing a translation and hence
+        # final_reviewer_id should not be None when the suggestion is
+        # up-to-date.
+        accepted_translations_count = 0
+        accepted_translations_with_reviewer_edits_count = 0
+        rejected_translation_count = 0
+        accepted_translation_word_count = 0
+        if suggestion_is_accepted:
+            accepted_translations_count += 1
+            accepted_translation_word_count = content_word_count
+        else:
+            rejected_translation_count += 1
+        if suggestion_is_accepted and suggestion.edited_by_reviewer:
+            accepted_translations_with_reviewer_edits_count += 1
+        suggestion_models.TranslationReviewerTotalContributionStatsModel.create(
+            language_code=suggestion.change.language_code,
+            contributor_id=suggestion.final_reviewer_id,
+            topic_ids_with_translation_reviews=[topic_id],
+            reviewed_translations_count=1,
+            accepted_translations_count=accepted_translations_count,
+            accepted_translations_with_reviewer_edits_count=(
+                accepted_translations_with_reviewer_edits_count),
+            accepted_translation_word_count=accepted_translation_word_count,
+            rejected_translation_count=rejected_translation_count,
+            first_contribution_date=suggestion.last_updated.date(),
+            last_contribution_date=suggestion.last_updated.date()
+        )
+    else:
+        translation_reviewer_total_stat = (
+            contributor_admin_dashboard_services
+            .get_translation_reviewer_total_stats_from_model(
+                translation_reviewer_total_stat_model))
+
+        increment_translation_reviewer_total_stats(
+            translation_reviewer_total_stat, content_word_count,
+            suggestion.last_updated, suggestion_is_accepted,
+            suggestion.edited_by_reviewer
+        )
+        _update_translation_reviewer_total_stats_models(
+            translation_reviewer_total_stat)
 
     if translation_review_stat_model is None:
         # This function is called when reviewing a translation and hence
@@ -2905,6 +3130,90 @@ def increment_translation_contribution_stats_at_review(
         translation_contribution_stat.accepted_translations_without_reviewer_edits_count += 1 # pylint: disable=line-too-long
 
 
+def increment_translation_submitter_total_stats_at_review(
+    translation_submitter_total_stat: (
+        suggestion_registry.TranslationSubmitterTotalContributionStats),
+    content_word_count: int,
+    suggestion_is_accepted: bool,
+    edited_by_reviewer: bool
+) -> None:
+    """Updates TranslationSubmitterTotalContributionStats object.
+
+    Args:
+        translation_submitter_total_stat:
+            TranslationSubmitterTotalContributionStats. The stats object to
+            update.
+        content_word_count: int. The number of words in the translation.
+        suggestion_is_accepted: bool. A flag that indicates whether the
+            suggestion is accepted.
+        edited_by_reviewer: bool. A flag that indicates whether the suggestion
+            is edited by the reviewer.
+    """
+    # Weights for calculating performance.
+    # recent_performance = accepted cards - 2 (rejected cards) in last
+    # 100 contributions.
+    if suggestion_is_accepted:
+        translation_submitter_total_stat.accepted_translations_count += 1
+        translation_submitter_total_stat.accepted_translation_word_count += (
+            content_word_count)
+        translation_submitter_total_stat.overall_accuracy = (
+            translation_submitter_total_stat.accepted_translations_count
+            / translation_submitter_total_stat.submitted_translations_count
+        )
+
+        if (
+                len(translation_submitter_total_stat
+                    .topic_ids_with_translation_submissions)
+                > 100
+            ):
+            oldest_outcome = (
+                translation_submitter_total_stat
+                .topic_ids_with_translation_submissions).pop(0)
+            if oldest_outcome == suggestion_models.REVIEW_OUTCOME_REJECTED:
+                translation_submitter_total_stat.recent_performance += 3
+        else:
+            translation_submitter_total_stat.recent_performance += 1
+
+        (
+            translation_submitter_total_stat
+            .topic_ids_with_translation_submissions
+        ).append(suggestion_models.REVIEW_OUTCOME_ACCEPTED_WITH_EDITS)
+
+    else:
+        translation_submitter_total_stat.rejected_translations_count += 1
+        translation_submitter_total_stat.rejected_translation_word_count += (
+            content_word_count)
+
+        if (
+                len(translation_submitter_total_stat
+                    .topic_ids_with_translation_submissions)
+                > 100
+            ):
+            oldest_outcome = (
+                translation_submitter_total_stat
+                .topic_ids_with_translation_submissions).pop(0)
+            if oldest_outcome != suggestion_models.REVIEW_OUTCOME_REJECTED:
+                translation_submitter_total_stat.recent_performance -= 3
+        else:
+            translation_submitter_total_stat.recent_performance -= 2
+
+        (
+            translation_submitter_total_stat
+            .topic_ids_with_translation_submissions
+        ).append(suggestion_models.REVIEW_OUTCOME_REJECTED)
+
+    if suggestion_is_accepted and not edited_by_reviewer:
+        translation_submitter_total_stat.accepted_translations_without_reviewer_edits_count += 1 # pylint: disable=line-too-long
+        (
+            translation_submitter_total_stat
+            .topic_ids_with_translation_submissions
+        ).pop()
+        (
+            translation_submitter_total_stat
+            .topic_ids_with_translation_submissions
+        ).append(suggestion_models.REVIEW_OUTCOME_ACCEPTED)
+
+
 def increment_translation_review_stats(
     translation_review_stat: suggestion_registry.TranslationReviewStats,
     content_word_count: int,
@@ -2937,6 +3246,45 @@ def increment_translation_review_stats(
             .accepted_translations_with_reviewer_edits_count
         ) += 1
     translation_review_stat.last_contribution_date = (
+        last_contribution_date.date())
+
+
+def increment_translation_reviewer_total_stats(
+    translation_reviewer_total_stat:
+        suggestion_registry.TranslationReviewerTotalContributionStats,
+    content_word_count: int,
+    last_contribution_date: datetime.datetime,
+    suggestion_is_accepted: bool,
+    edited_by_reviewer: bool
+) -> None:
+    """Updates TranslationReviewerTotalContributionStats object.
+
+    Args:
+        translation_reviewer_total_stat:
+            TranslationReviewerTotalContributionStats. The stats object to
+            update.
+        content_word_count: int. The number of words in the translation.
+        last_contribution_date: datetime.datetime. The last updated date.
+        suggestion_is_accepted: bool. A flag that indicates whether the
+            suggestion is accepted.
+        edited_by_reviewer: bool. A flag that indicates whether the suggestion
+            is edited by the reviewer.
+    """
+    translation_reviewer_total_stat.reviewed_translations_count += 1
+    translation_reviewer_total_stat.reviewed_translation_word_count += (
+        content_word_count)
+    if suggestion_is_accepted:
+        translation_reviewer_total_stat.accepted_translations_count += 1
+        translation_reviewer_total_stat.accepted_translation_word_count += (
+            content_word_count)
+    else:
+        translation_reviewer_total_stat.rejected_translations_count += 1
+    if suggestion_is_accepted and edited_by_reviewer:
+        (
+            translation_reviewer_total_stat
+            .accepted_translations_with_reviewer_edits_count
+        ) += 1
+    translation_reviewer_total_stat.last_contribution_date = (
         last_contribution_date.date())
 
 

@@ -358,7 +358,7 @@ class ContributorAdminDashboardServicesUnitTest(test_utils.GenericTestBase):
 
     def test_get_translation_submitter_admin_stats(self) -> None:
         stats, next_offset, more = (
-            contributor_admin_dashboard_services.get_translation_submitter_admin_stats( # pylint: disable=line-too-long
+            contributor_admin_dashboard_services.get_translation_submitter_total_stats( # pylint: disable=line-too-long
             page_size=2,
             offset=1,
             language_code='es',
@@ -376,7 +376,7 @@ class ContributorAdminDashboardServicesUnitTest(test_utils.GenericTestBase):
 
     def test_get_translation_reviewer_admin_stats(self) -> None:
         stats, next_offset, more = (
-            contributor_admin_dashboard_services.get_translation_reviewer_admin_stats( # pylint: disable=line-too-long
+            contributor_admin_dashboard_services.get_translation_reviewer_total_stats( # pylint: disable=line-too-long
             page_size=2,
             offset=1,
             language_code='es',
@@ -393,7 +393,7 @@ class ContributorAdminDashboardServicesUnitTest(test_utils.GenericTestBase):
 
     def test_get_question_submitter_admin_stats(self) -> None:
         stats, next_offset, more = (
-            contributor_admin_dashboard_services.get_question_submitter_admin_stats( # pylint: disable=line-too-long
+            contributor_admin_dashboard_services.get_question_submitter_total_stats( # pylint: disable=line-too-long
             page_size=2,
             offset=1,
             sort_by=None,
@@ -410,7 +410,7 @@ class ContributorAdminDashboardServicesUnitTest(test_utils.GenericTestBase):
 
     def test_get_question_reviewer_admin_stats(self) -> None:
         stats, next_offset, more = (
-            contributor_admin_dashboard_services.get_question_reviewer_admin_stats( # pylint: disable=line-too-long
+            contributor_admin_dashboard_services.get_question_reviewer_total_stats( # pylint: disable=line-too-long
             page_size=2,
             offset=1,
             sort_by=None,
