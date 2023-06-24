@@ -51,6 +51,7 @@ class ExistingPlatformParameterValidityTests(test_utils.GenericTestBase):
                             'promo_bar_enabled',
                             'promo_bar_message',
                             'serial_chapter_launch_curriculum_admin_view',
+                            'show_feedback_updates_in_profile_pic_dropdown',
                             'show_translation_size']
 
     def test_all_defined_parameters_are_valid(self) -> None:

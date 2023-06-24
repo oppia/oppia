@@ -43,7 +43,8 @@ class ParamNames(enum.Enum):
         'serial_chapter_launch_curriculum_admin_view')
     SHOW_TRANSLATION_SIZE = 'show_translation_size'
     SHOW_FEEDBACK_UPDATES_IN_PROFILE_PIC_DROPDOWN = (
-        'show_feedback_updates_in_profile_pic_dropdown')
+        'show_feedback_updates_in_profile_pic_dropdown'
+    )
     IS_IMPROVEMENTS_TAB_ENABLED = 'is_improvements_tab_enabled'
     LEARNER_GROUPS_ARE_ENABLED = 'learner_groups_are_enabled'
     PROMO_BAR_ENABLED = 'promo_bar_enabled'
@@ -118,6 +119,12 @@ Registry.create_feature_flag(
     'This flag is to show translation size on translation cards in' +
     'contributor dashboard.',
     platform_parameter_domain.FeatureStages.DEV)
+
+Registry.create_feature_flag(
+    ParamNames.SHOW_FEEDBACK_UPDATES_IN_PROFILE_PIC_DROPDOWN,
+    'This flag is to show feedback updates in the' +
+    'profile pic drop-down menu.',
+     platform_parameter_domain.FeatureStages.PROD)
 
 Registry.create_feature_flag(
     ParamNames.IS_IMPROVEMENTS_TAB_ENABLED,
