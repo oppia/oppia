@@ -8,17 +8,18 @@ services:
       context: .
       dockerfile: Dockerfile
     volumes:
-      - shared_root_dir:/app/oppia
+      - shared_root_dir:/
     environment:
       - production=false
       - NODE_ENV=development
+      - oppia_is_dockerized=true
     healthcheck:
       # TODO: Add a variable for the folder name inside the dist as per the prod_env flag is passed or not.
       test: bash -f /app/oppia/dist/oppia-angular/index.html || sleep 25
       timeout: 30s
       interval: 30s
       retries: 5
-      start_period: 30s
+      start_period: 20m
     command: >
       sh -c '
         trap "rm /app/oppia/node_modules/@angular/compiler-cli/ngcc/__ngcc_lock_file__" EXIT;
@@ -47,16 +48,18 @@ services:
       context: .
       dockerfile: Dockerfile
     volumes:
-      - shared_root_dir:/app/oppia
+      - shared_root_dir:/
     depends_on:
       webserver:
         condition: service_healthy
+    environment:
+      - oppia_is_dockerized=true
     healthcheck:
       test: bash -f /app/oppia/webpack_bundles/0.bundle.js || sleep 25
       timeout: 30s
       interval: 30s
       retries: 5
-      start_period: 30s
+      start_period: 20m
     command: >
       sh -c '
         if [ "$prod_env" = "true" ]; then
@@ -83,9 +86,10 @@ services:
       - "8181:8181"
       - "8000:8000"
     volumes:
-      - shared_root_dir:/app/oppia
+      - shared_root_dir:/
     environment:
       - CLOUDSDK_CORE_DISABLE_PROMPTS=1
+      - oppia_is_dockerized=true
     depends_on:
       webserver:
         condition: service_healthy
@@ -104,7 +108,7 @@ services:
       timeout: 10s
       interval: 30s
       retries: 5
-      start_period: 5m
+      start_period: 20m
     command: >
       sh -c '
         if [ "$prod_env" = "true" ]; then
@@ -122,7 +126,7 @@ services:
     ports:
       - "8089:8089"
     volumes:
-      - shared_root_dir:/app/oppia
+      - shared_root_dir:/
     environment:
       - DATASTORE_DATASET=dev-project-id
       - DATASTORE_EMULATOR_HOST=0.0.0.0:8089
@@ -132,6 +136,7 @@ services:
       - DATASTORE_USE_PROJECT_ID_AS_APP_ID=true
       - GOOGLE_CLOUD_PROJECT=dev-project-id
       - CLOUDSDK_CORE_DISABLE_PROMPTS=1
+      - oppia_is_dockerized=true
     depends_on:
       webserver:
         condition: service_healthy
@@ -140,9 +145,9 @@ services:
     healthcheck:
       test: curl -f http://localhost:8089/ || exit 1
       timeout: 10s
-      interval: 1m
+      interval: 2m
       retries: 5
-      start_period: 3m
+      start_period: 20m
     # Line 110 is checking if previous datastore cache exists and deleting it if it does as user has not passed the save_datastore flag.
     # TODO: thouroughly test this.
     command: >
@@ -166,12 +171,14 @@ services:
       - "9099:9099"
       - "4000:4000"
     volumes:
-      - shared_root_dir:/app/oppia
+      - shared_root_dir:/
     healthcheck:
       test: wget --spider http://localhost:4000/auth/ || exit 1
       timeout: 10s
       interval: 30s
       retries: 5
+    environment:
+      - oppia_is_dockerized=true
     command: >
       sh -c '
         if [ "$save_datastore" = "true" ]
@@ -189,13 +196,14 @@ services:
       - "6379:6379"
     environment:
       - PATH=/usr/local/bin/
+      - oppia_is_dockerized=true
     healthcheck:
       test: redis-cli ping
       timeout: 5s
       interval: 30s
       retries: 5
     volumes:
-      - shared_root_dir:/app/oppia
+      - shared_root_dir:/
     command: redis-server --bind 0.0.0.0 --port 6379 --save "60 1" --tcp-keepalive 300 --dbfilename dump.rdb --dir /app/oppia/ --rdbcompression yes
 
   elasticsearch:
@@ -204,11 +212,12 @@ services:
     ports:
       - "9200:9200"
     volumes:
-      - shared_root_dir:/app/oppia
+      - shared_root_dir:/
     environment:
       - ES_JAVA_OPTS=-Xms100m -Xmx500m
       - ES_PATH_CONF=/usr/share/elasticsearch/config
       - discovery.type=single-node
+      - oppia_is_dockerized=true
     depends_on:
       datastore:
         condition: service_healthy
@@ -217,6 +226,7 @@ services:
       timeout: 10s
       interval: 1m
       retries: 5
+      start_period: 20m
     command: elasticsearch -q
 
 volumes:

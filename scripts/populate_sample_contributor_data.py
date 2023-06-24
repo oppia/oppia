@@ -49,7 +49,7 @@ PORT_NUMBER_FOR_GAE_SERVER: Final = 8181
 FIREBASE_HOST = 'firebase'
 
 FIREBASE_AUTH_EMULATOR_HOST: Final = (
-    '%s:%s' % FIREBASE_HOST, feconf.FIREBASE_EMULATOR_PORT)
+    '%s:%s' % (FIREBASE_HOST, feconf.FIREBASE_EMULATOR_PORT))
 FIREBASE_SIGN_IN_URL: Final = (
     'http://%s/identitytoolkit.googleapis.com/v1/accounts:signInWithPassword'
     % FIREBASE_AUTH_EMULATOR_HOST)
