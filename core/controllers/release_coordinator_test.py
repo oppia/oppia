@@ -183,7 +183,7 @@ class FeatureFlagsHandlerTest(test_utils.GenericTestBase):
             ParamNames.TEST_FEATURE_1, 'feature for test.', FeatureStages.DEV)
 
         feature_list_ctx = self.swap(
-            platform_feature_services, 'ALL_FEATURES_LIST',
+            platform_feature_services, 'ALL_FEATURE_FLAGS',
             [ParamNames.TEST_FEATURE_1])
         feature_set_ctx = self.swap(
             platform_feature_services, 'ALL_FEATURES_NAMES_SET',
@@ -216,7 +216,7 @@ class FeatureFlagsHandlerTest(test_utils.GenericTestBase):
         ]
 
         feature_list_ctx = self.swap(
-            platform_feature_services, 'ALL_FEATURES_LIST',
+            platform_feature_services, 'ALL_FEATURE_FLAGS',
             [ParamNames.TEST_FEATURE_1])
         feature_set_ctx = self.swap(
             platform_feature_services, 'ALL_FEATURES_NAMES_SET',
@@ -261,7 +261,7 @@ class FeatureFlagsHandlerTest(test_utils.GenericTestBase):
         ]
 
         feature_list_ctx = self.swap(
-            platform_feature_services, 'ALL_FEATURES_LIST', [])
+            platform_feature_services, 'ALL_FEATURE_FLAGS', [])
         feature_set_ctx = self.swap(
             platform_feature_services, 'ALL_FEATURES_NAMES_SET', set([]))
         with feature_list_ctx, feature_set_ctx:
@@ -301,7 +301,7 @@ class FeatureFlagsHandlerTest(test_utils.GenericTestBase):
         ]
 
         feature_list_ctx = self.swap(
-            platform_feature_services, 'ALL_FEATURES_LIST',
+            platform_feature_services, 'ALL_FEATURE_FLAGS',
             [ParamNames.TEST_FEATURE_2])
         feature_set_ctx = self.swap(
             platform_feature_services, 'ALL_FEATURES_NAMES_SET',
@@ -348,7 +348,7 @@ class FeatureFlagsHandlerTest(test_utils.GenericTestBase):
         ]
 
         feature_list_ctx = self.swap(
-            platform_feature_services, 'ALL_FEATURES_LIST',
+            platform_feature_services, 'ALL_FEATURE_FLAGS',
             [ParamNames.TEST_FEATURE_2])
         feature_set_ctx = self.swap(
             platform_feature_services, 'ALL_FEATURES_NAMES_SET',

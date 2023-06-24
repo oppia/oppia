@@ -32,6 +32,7 @@ from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import fs_services
 from core.domain import opportunity_services
+from core.domain import platform_feature_services
 from core.domain import platform_parameter_domain
 from core.domain import platform_parameter_registry
 from core.domain import question_fetchers
@@ -76,8 +77,7 @@ BOTH_MODERATOR_AND_ADMIN_USERNAME = 'moderatorandadm1n'
 class ParamNames(enum.Enum):
     """Enum for parameter names."""
 
-    TEST_PARAM_1 = 'test_param_1'
-    TEST_PARAM_2 = 'test_param_2'
+    TEST_PARAMETER_1 = 'test_param_1'
 
 
 class AdminIntegrationTest(test_utils.GenericTestBase):
@@ -860,16 +860,15 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         param = (
             platform_parameter_registry.Registry.create_platform_parameter(
-                ParamNames.TEST_PARAM_1,
+                ParamNames.TEST_PARAMETER_1,
                 'Param for test.',
                 platform_parameter_domain.DataTypes.BOOL)
         )
-
         with self.swap(
-            platform_parameter_registry.Registry,
-            'parameter_registry', {
-            'test_param_1': param
-        }):
+            platform_feature_services,
+            'ALL_PLATFORM_PARAMS_EXCEPT_FEATURE_FLAGS',
+            [ParamNames.TEST_PARAMETER_1]
+        ):
             response_dict = self.get_json('/adminhandler')
         self.assertEqual(
             response_dict['platform_params_dicts'], [param.to_dict()])
@@ -884,7 +883,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
 
         param = (
             platform_parameter_registry.Registry.create_platform_parameter(
-                ParamNames.TEST_PARAM_2,
+                ParamNames.TEST_PARAMETER_1,
                 'Param for test.',
                 platform_parameter_domain.DataTypes.BOOL)
         )
@@ -900,14 +899,19 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
             }
         ]
 
-        self.post_json(
-            '/adminhandler', {
-                'action': 'update_platform_parameter_rules',
-                'platform_param_name': param.name,
-                'new_rules': new_rule_dicts,
-                'commit_message': 'test update param',
-                'default_value': {'value': False}
-            }, csrf_token=csrf_token)
+        with self.swap(
+            platform_feature_services,
+            'ALL_PLATFORM_PARAMS_EXCEPT_FEATURE_FLAGS',
+            [ParamNames.TEST_PARAMETER_1]
+        ):
+            self.post_json(
+                '/adminhandler', {
+                    'action': 'update_platform_parameter_rules',
+                    'platform_param_name': param.name,
+                    'new_rules': new_rule_dicts,
+                    'commit_message': 'test update param',
+                    'default_value': {'value': False}
+                }, csrf_token=csrf_token)
 
         rule_dicts = [
             rule.to_dict() for rule
@@ -928,7 +932,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
 
         platform_parameter_registry.Registry.parameter_registry.clear()
         param = platform_parameter_registry.Registry.create_platform_parameter(
-            ParamNames.TEST_PARAM_1,
+            ParamNames.TEST_PARAMETER_1,
             'Param for test.',
             platform_parameter_domain.DataTypes.BOOL)
         new_rule_dicts = [
@@ -943,22 +947,27 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
             }
         ]
 
-        response_dict = self.get_json('/adminhandler')
-        self.assertEqual(
-            response_dict['platform_params_dicts'], [param.to_dict()])
+        with self.swap(
+            platform_feature_services,
+            'ALL_PLATFORM_PARAMS_EXCEPT_FEATURE_FLAGS',
+            [ParamNames.TEST_PARAMETER_1]
+        ):
+            response_dict = self.get_json('/adminhandler')
+            self.assertEqual(
+                response_dict['platform_params_dicts'], [param.to_dict()])
 
-        self.post_json(
-            '/adminhandler', {
-                'action': 'update_platform_parameter_rules',
-                'platform_param_name': param.name,
-                'new_rules': new_rule_dicts,
-                'commit_message': 'test update param',
-                'default_value': {'value': False}
-            }, csrf_token=csrf_token)
+            self.post_json(
+                '/adminhandler', {
+                    'action': 'update_platform_parameter_rules',
+                    'platform_param_name': param.name,
+                    'new_rules': new_rule_dicts,
+                    'commit_message': 'test update param',
+                    'default_value': {'value': False}
+                }, csrf_token=csrf_token)
 
-        response_dict = self.get_json('/adminhandler')
-        rules = response_dict['platform_params_dicts'][0]['rules']
-        self.assertEqual(rules, new_rule_dicts)
+            response_dict = self.get_json('/adminhandler')
+            rules = response_dict['platform_params_dicts'][0]['rules']
+            self.assertEqual(rules, new_rule_dicts)
 
         platform_parameter_registry.Registry.parameter_registry.pop(
             param.name)
@@ -982,17 +991,22 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
             }
         ]
 
-        response = self.post_json(
-            '/adminhandler', {
-                'action': 'update_platform_parameter_rules',
-                'platform_param_name': 'unknown_param',
-                'new_rules': new_rule_dicts,
-                'commit_message': 'test update param',
-                'default_value': {'value': False}
-            },
-            csrf_token=csrf_token,
-            expected_status_int=500
-        )
+        with self.swap(
+            platform_feature_services,
+            'ALL_PLATFORM_PARAMS_EXCEPT_FEATURE_FLAGS',
+            [ParamNames.TEST_PARAMETER_1]
+        ):
+            response = self.post_json(
+                '/adminhandler', {
+                    'action': 'update_platform_parameter_rules',
+                    'platform_param_name': 'unknown_param',
+                    'new_rules': new_rule_dicts,
+                    'commit_message': 'test update param',
+                    'default_value': {'value': False}
+                },
+                csrf_token=csrf_token,
+                expected_status_int=500
+            )
         self.assertEqual(
             response['error'],
             'Platform parameter not found: unknown_param.')
@@ -1007,7 +1021,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
 
         platform_parameter_registry.Registry.parameter_registry.clear()
         param = platform_parameter_registry.Registry.create_platform_parameter(
-            ParamNames.TEST_PARAM_1,
+            ParamNames.TEST_PARAMETER_1,
             'Param for test.',
             platform_parameter_domain.DataTypes.BOOL)
         new_rule_dicts = [
@@ -1138,7 +1152,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         csrf_token = self.get_new_csrf_token()
 
         param = platform_parameter_registry.Registry.create_platform_parameter(
-            ParamNames.TEST_PARAM_2,
+            ParamNames.TEST_PARAMETER_1,
             'Param for test.',
             platform_parameter_domain.DataTypes.BOOL)
         new_rule_dicts = [
