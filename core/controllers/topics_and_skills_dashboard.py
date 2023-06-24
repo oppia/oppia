@@ -437,7 +437,7 @@ class NewTopicHandler(
             InvalidInputException. If there are validation errors
                 during image validation.
         """
-        
+
         assert self.user_id is not None
         assert self.normalized_payload is not None
         assert self.normalized_request is not None
