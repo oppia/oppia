@@ -159,9 +159,13 @@ class ValidateNewDefaultValueForPlatformParametersTests(
             'Expected type to be typing.Union\\[str, int, bool, float] '
             'but received \\[10]')
         ):
+            # TODO(#13059): Here we use MyPy ignore because after we fully
+            # type the codebase we plan to get rid of the tests that
+            # intentionally test wrong inputs that we can normally catch
+            # by typing.
             (
                 domain_objects_validator.
-                validate_new_default_value_of_platform_parameter(default_value)
+                validate_new_default_value_of_platform_parameter(default_value) # type: ignore[arg-type]
             )
 
 
