@@ -150,6 +150,12 @@ class ValidateNewPlatformParamsValueForBlogAdminTests(
         }
         domain_objects_validator.validate_platform_params_values_for_blog_admin(
             new_platform_parameter_values)
+        
+        new_platform_parameter_values = {
+            'promo_bar_enabled': False,
+        }
+        domain_objects_validator.validate_platform_params_values_for_blog_admin(
+            new_platform_parameter_values)
 
     def test_difference_of_incoming_value_and_parameter_data_type_raise_error(
         self
