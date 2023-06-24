@@ -34,11 +34,6 @@ class ExistingPlatformParameterValidityTests(test_utils.GenericTestBase):
                             'checkpoint_celebration',
                             'contributor_dashboard_accomplishments',
                             'diagnostic_test',
-<<<<<<< HEAD
-                            'serial_chapter_launch_curriculum_admin_view',
-                            'show_translation_size',
-                            'show_feedback_updates_in_profile_pic_dropdown',
-=======
                             'dummy_feature_flag_for_e2e_tests',
                             'dummy_parameter',
                             'end_chapter_celebration',
@@ -53,7 +48,6 @@ class ExistingPlatformParameterValidityTests(test_utils.GenericTestBase):
                             ),
                             'is_improvements_tab_enabled',
                             'learner_groups_are_enabled',
->>>>>>> upstream/develop
                             'promo_bar_enabled',
                             'promo_bar_message',
                             'serial_chapter_launch_curriculum_admin_view',

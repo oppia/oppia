@@ -42,15 +42,10 @@ class ParamNames(enum.Enum):
     SERIAL_CHAPTER_LAUNCH_CURRICULUM_ADMIN_VIEW = (
         'serial_chapter_launch_curriculum_admin_view')
     SHOW_TRANSLATION_SIZE = 'show_translation_size'
-<<<<<<< HEAD
     SHOW_FEEDBACK_UPDATES_IN_PROFILE_PIC_DROPDOWN = (
-        'show_feedback_updates_in_profile_pic_dropdown'
-    )
-=======
+        'show_feedback_updates_in_profile_pic_dropdown')
     IS_IMPROVEMENTS_TAB_ENABLED = 'is_improvements_tab_enabled'
     LEARNER_GROUPS_ARE_ENABLED = 'learner_groups_are_enabled'
->>>>>>> upstream/develop
-
     PROMO_BAR_ENABLED = 'promo_bar_enabled'
     PROMO_BAR_MESSAGE = 'promo_bar_message'
     ALWAYS_ASK_LEARNERS_FOR_ANSWER_DETAILS = (
@@ -125,11 +120,6 @@ Registry.create_feature_flag(
     platform_parameter_domain.FeatureStages.DEV)
 
 Registry.create_feature_flag(
-<<<<<<< HEAD
-    ParamNames.SHOW_FEEDBACK_UPDATES_IN_PROFILE_PIC_DROPDOWN,
-    'This flag is to show feedback updates in the' +
-    'profile pic drop-down menu.',
-=======
     ParamNames.IS_IMPROVEMENTS_TAB_ENABLED,
     'Exposes the Improvements Tab for creators in the exploration editor.',
     platform_parameter_domain.FeatureStages.PROD)
@@ -137,7 +127,6 @@ Registry.create_feature_flag(
 Registry.create_feature_flag(
     ParamNames.LEARNER_GROUPS_ARE_ENABLED,
     'Enable learner groups feature',
->>>>>>> upstream/develop
     platform_parameter_domain.FeatureStages.PROD)
 
 Registry.create_platform_parameter(
