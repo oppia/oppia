@@ -150,7 +150,7 @@ class ValidateNewPlatformParamsValueForBlogAdminTests(
         }
         domain_objects_validator.validate_platform_params_values_for_blog_admin(
             new_platform_parameter_values)
-        
+
         new_platform_parameter_values = {
             'promo_bar_enabled': False,
         }
