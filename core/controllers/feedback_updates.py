@@ -84,21 +84,21 @@ class FeedbackUpdatesHandler(
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
     HANDLER_ARGS_SCHEMAS = {
-            'POST': {
-                'paginated_threads_list': {
-                    'schema': {
+        'POST': {
+            'paginated_threads_list': {
+                'schema': {
+                    'type': 'list',
+                    'items': {
                         'type': 'list',
                         'items': {
-                            'type': 'list',
-                            'items': {
-                                'type': 'basestring'
-                            },
+                            'type': 'basestring'
                         },
                     },
-                    'default_value': []
-                }
+                },
+                'default_value': []
             }
         }
+    }
 
     @acl_decorators.can_access_feedback_updates
     def post(self) -> None:

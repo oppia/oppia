@@ -2671,7 +2671,7 @@ def can_access_feedback_updates(
         if not self.user_id:
             raise base.UserFacingExceptions.NotLoggedInException
 
-        if role_services.ACTION_ACCESS_LEARNER_DASHBOARD in self.user.actions:
+        if role_services.ACTION_ACCESS_FEEDBACK_UPDATES in self.user.actions:
             return handler(self, **kwargs)
         else:
             raise self.UnauthorizedUserException(
