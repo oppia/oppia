@@ -1262,7 +1262,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         question_services.save_question_summary(question_summary)
         # Here we use MyPy ignore because we need to test
         # populate_question_summary_model_fields when the there is no
-        # input QuestionSummaryModel. 
+        # input QuestionSummaryModel.
         populated_model = (
             question_services.populate_question_summary_model_fields(
             None, question_summary)  # type: ignore[arg-type]
