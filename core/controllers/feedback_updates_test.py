@@ -46,15 +46,13 @@ class FeedbackUpdatesPageTest(test_utils.GenericTestBase):
         """Tests access to the Feedback Updates page."""
         self.get_html_response('/feedback-updates', expected_status_int=302)
 
-    def test_feedback_updates_page_access(self) -> None:
-        self.signup(self.OWNER_EMAIL,self.OWNER_USERNAME)
-        self.login(self.OWNER_EMAIL)
-        self.get_html_response('/feedback-updates', expected_status_int=200)
-        self.logout()
+    def setUp(self) -> None:
+        super().setUp()
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
 
-    def test_feedback_updates_page_access_editor(self) -> None:
-        self.signup(self.EDITOR_EMAIL,self.EDITOR_USERNAME)
-        self.login(self.EDITOR_EMAIL)
+    def test_feedback_updates_page_access(self) -> None:
+        self.login(self.OWNER_EMAIL)
         self.get_html_response('/feedback-updates', expected_status_int=200)
         self.logout()
 
