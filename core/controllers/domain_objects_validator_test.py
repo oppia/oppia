@@ -138,9 +138,11 @@ class ValidateNewConfigPropertyValuesTests(test_utils.GenericTestBase):
         }
         domain_objects_validator.validate_new_config_property_values(
             config_properties)
-        
 
-class ValidateNewDefaultValueForPlatformParametersTests(test_utils.GenericTestBase):
+
+class ValidateNewDefaultValueForPlatformParametersTests(
+    test_utils.GenericTestBase
+):
     """Tests to validate default value dict coming from API."""
 
     def test_valid_object_raises_no_exception(self) -> None:
