@@ -323,3 +323,21 @@ def get_platform_parameter_value(
     context = _create_evaluation_context_for_server()
     param = registry.Registry.get_platform_parameter(parameter_name)
     return param.evaluate(context)
+
+def get_platform_parameter_schema(param_name: str) -> Dict[str, str]:
+    """Returns the schema for the platform parameter.
+
+    Args:
+        param_name: str. The name of the platform parameter.
+
+    Returns:
+        Dict[str, str]. The schema of the platform parameter according
+        to the data_type.
+    """
+    parameter = registry.Registry.get_platform_parameter(param_name)
+    if parameter.data_type == 'string':
+        return {'type': 'unicode'}
+    elif parameter.data_type == 'number':
+        return {'type': 'float'}
+    else:
+        return {'type': parameter.data_type}

@@ -38,6 +38,7 @@ class ParamNames(enum.Enum):
     FEATURE_C = 'feature_c'
     PARAM_A = 'param_a'
     PARAM_B = 'param_b'
+    PARAM_C = 'param_c'
 
 
 ServerMode = platform_parameter_domain.ServerMode
@@ -57,8 +58,9 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
             registry.Registry.parameter_registry.copy())
         registry.Registry.parameter_registry.clear()
         # Parameter names that might be used in following tests.
-        param_names = ['param_a', 'param_b']
-        param_name_enums = [ParamNames.PARAM_A, ParamNames.PARAM_B]
+        param_names = ['param_a', 'param_b', 'param_c']
+        param_name_enums = [
+            ParamNames.PARAM_A, ParamNames.PARAM_B, ParamNames.PARAM_C]
         param_names_features = ['feature_a', 'feature_b', 'feature_c']
         param_name_enums_features = [
             ParamNames.FEATURE_A, ParamNames.FEATURE_B, ParamNames.FEATURE_C]
@@ -81,11 +83,15 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
         self.param_a = registry.Registry.create_platform_parameter(
             ParamNames.PARAM_A,
             'Parameter named a',
-            platform_parameter_domain.DataTypes.BOOL)
+            platform_parameter_domain.DataTypes.STRING)
         self.param_b = registry.Registry.create_platform_parameter(
             ParamNames.PARAM_B,
             'Parameter named b',
             platform_parameter_domain.DataTypes.BOOL)
+        self.param_c = registry.Registry.create_platform_parameter(
+            ParamNames.PARAM_C,
+            'Parameter named c',
+            platform_parameter_domain.DataTypes.NUMBER)
         registry.Registry.update_platform_parameter(
             self.dev_feature.name, self.user_id, 'edit rules',
             [
@@ -177,6 +183,7 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
         expected_dicts = [
             self.param_a.to_dict(),
             self.param_b.to_dict(),
+            self.param_c.to_dict()
         ]
         self.assertEqual(
             feature_services.
@@ -186,7 +193,7 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
     def test_get_platform_parameter_value(self) -> None:
         self.assertEqual(
             feature_services.get_platform_parameter_value(
-                self.param_a.name), False)
+                self.param_b.name), False)
 
     def test_get_unknown_platform_param_value_results_in_error(self) -> None:
         with self.assertRaisesRegex(
@@ -469,3 +476,19 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
                     'in the ALL_PLATFORM_PARAMS_EXCEPT_FEATURE_FLAGS list and '
                     'should not be present in the ALL_FEATURE_FLAGS list.' % (
                         param_name))
+
+    def test_platform_parameter_schema_acc_to_data_type(self) -> None:
+        self.assertEqual(
+            {'type': 'unicode'},
+            feature_services.get_platform_parameter_schema(self.param_a.name)
+        )
+
+        self.assertEqual(
+            {'type': 'bool'},
+            feature_services.get_platform_parameter_schema(self.param_b.name)
+        )
+
+        self.assertEqual(
+            {'type': 'float'},
+            feature_services.get_platform_parameter_schema(self.param_c.name)
+        )

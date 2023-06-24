@@ -100,45 +100,24 @@ class BlogAdminHandler(
         }
     }
 
-    def _get_platform_parameter_schema(
-        self, param_name: str
-    ) -> PlatformParamBlogAdminSchemaDict:
-        """Returns a platform parameter dict to display on the blog
-        admin page.
-
-        Args:
-            param_name: str. The name of the platform parameter.
-
-        Returns:
-            PlatformParamBlogAdminSchemaDict. The platform params value to
-            display on the blog admin page.
-        """
-        parameter = platform_parameter_registry.Registry.get_platform_parameter(
-            param_name)
-        schema = {}
-        if parameter.data_type == 'bool':
-            schema = {'type': 'bool'}
-        elif parameter.data_type == 'string':
-            schema = {'type': 'unicode'}
-        elif parameter.data_type == 'number':
-            schema = {'type': 'float'}
-        return {
-            'schema': schema,
-            'description': parameter.description,
-            'value': platform_feature_services.get_platform_parameter_value(
-                param_name)
-        }
-
     @acl_decorators.can_access_blog_admin_page
     def get(self) -> None:
         """Handles GET requests."""
+        max_no_of_tags_parameter = (
+            platform_parameter_registry.Registry.get_platform_parameter(
+                platform_parameter_list.ParamNames.
+                MAX_NUMBER_OF_TAGS_ASSIGNED_TO_BLOG_POST.value)
+        )
         platform_params_for_blog_admin = {
-            'max_number_of_tags_assigned_to_blog_post': (
-                self._get_platform_parameter_schema(
-                    platform_parameter_list.ParamNames.
-                    MAX_NUMBER_OF_TAGS_ASSIGNED_TO_BLOG_POST.value
-                )
-            )
+            'max_number_of_tags_assigned_to_blog_post': {
+                'schema': (
+                    platform_feature_services.get_platform_parameter_schema(
+                        max_no_of_tags_parameter.name)
+                ),
+                'description': max_no_of_tags_parameter.description,
+                'value': platform_feature_services.get_platform_parameter_value(
+                    max_no_of_tags_parameter.name)
+            }
         }
         role_to_action = role_services.get_role_actions()
         self.render_json({
