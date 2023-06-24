@@ -76,7 +76,12 @@ describe('StorySummaryTileComponent', () => {
           outline_is_finalized: true,
           exploration_id: null,
           thumbnail_bg_color: null,
-          thumbnail_filename: null
+          thumbnail_filename: null,
+          status: 'Draft',
+          planned_publication_date_msecs: null,
+          last_modified_msecs: null,
+          first_publication_date_msecs: null,
+          unpublishing_reason: null
         }
       ]
     });
@@ -400,7 +405,12 @@ describe('StorySummaryTileComponent', () => {
           outline_is_finalized: true,
           exploration_id: null,
           thumbnail_bg_color: null,
-          thumbnail_filename: null
+          thumbnail_filename: null,
+          status: 'Draft',
+          planned_publication_date_msecs: null,
+          last_modified_msecs: null,
+          first_publication_date_msecs: null,
+          unpublishing_reason: null
         }
       ]
     });
