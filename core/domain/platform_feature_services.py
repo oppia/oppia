@@ -54,13 +54,29 @@ ALL_FEATURES_NAMES_SET: Set[str] = set(
 ALL_PLATFORM_PARAMS_EXCEPT_FEATURE_FLAGS: List[
     platform_parameter_list.ParamNames
 ] = [
+        (
+            platform_parameter_list.ParamNames.
+            ALWAYS_ASK_LEARNERS_FOR_ANSWER_DETAILS
+        ),
         platform_parameter_list.ParamNames.DUMMY_PARAMETER,
+        (
+            platform_parameter_list.ParamNames.
+            HIGH_BOUNCE_RATE_TASK_STATE_BOUNCE_RATE_CREATION_THRESHOLD
+        ),
+        (
+            platform_parameter_list.ParamNames.
+            HIGH_BOUNCE_RATE_TASK_STATE_BOUNCE_RATE_OBSOLETION_THRESHOLD
+        ),
+        (
+            platform_parameter_list.ParamNames.
+            HIGH_BOUNCE_RATE_TASK_MINIMUM_EXPLORATION_STARTS
+        ),
         (
             platform_feature_list.ParamNames.
             MAX_NUMBER_OF_TAGS_ASSIGNED_TO_BLOG_POST
         ),
         platform_parameter_list.ParamNames.PROMO_BAR_ENABLED,
-        platform_parameter_list.ParamNames.PROMO_BAR_MESSAGE
+        platform_parameter_list.ParamNames.PROMO_BAR_MESSAGE,
     ]
 
 
