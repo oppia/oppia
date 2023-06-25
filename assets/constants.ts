@@ -6818,12 +6818,12 @@ export default {
         {
           "PROPERTY_TYPE": "itemprop",
           "PROPERTY_VALUE": "description",
-          "CONTENT": "With Oppia,learn and give feedback to improve the lessons"
+          "CONTENT": "With Oppia, learn and give feedback to improve the lessons"
         },
         {
           "PROPERTY_TYPE": "itemprop",
           "PROPERTY_VALUE": "og:description",
-          "CONTENT": "With Oppia,learn and give feedback to improve the lessons"
+          "CONTENT": "With Oppia, learn and give feedback to improve the lessons"
         }
       ]
     },
@@ -7073,6 +7073,6 @@ export default {
   ],
   "CONTRIBUTOR_CERTIFICATE_WIDTH": 1493,
   "CONTRIBUTOR_CERTIFICATE_HEIGHT": 1313,
-  "BRANCH_NAME": "shifted-feedback-updates-with-feature-flag",
-  "SHORT_COMMIT_HASH": "a58fb4bad0"
+  "BRANCH_NAME": "",
+  "SHORT_COMMIT_HASH": ""
 } as const;
