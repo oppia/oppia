@@ -312,6 +312,14 @@ export class ConversationSkinComponent {
     }
 
     this.directiveSubscriptions.add(
+      this.explorationPlayerStateService.onShowProgressModal.subscribe(
+        () => {
+          this.hasFullyLoaded = true;
+        }
+      )
+    );
+
+    this.directiveSubscriptions.add(
       this.playerPositionService.onNewCardOpened.subscribe(
         (newCard: StateCard) => {
           this.solutionForState = newCard.getSolution();
@@ -1147,7 +1155,9 @@ export class ConversationSkinComponent {
 
     this.focusManagerService.setFocusIfOnDesktop(focusLabel);
     this.loaderService.hideLoadingScreen();
-    this.hasFullyLoaded = true;
+    if (!this.CHECKPOINTS_FEATURE_IS_ENABLED) {
+      this.hasFullyLoaded = true;
+    }
 
     // If the exploration is embedded, use the url language code
     // as site language. If the url language code is not supported
