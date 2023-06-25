@@ -2661,7 +2661,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
     ) -> None:
         with self.can_send_emails_ctx, self.log_new_info_ctx:
             with self.swap_platform_parameter_value:
-                email_manager.send_mail_to_notify_contributor_dashboard_reviewers(
+                email_manager.send_mail_to_notify_contributor_dashboard_reviewers( # pylint: disable=line-too-long
                     [self.reviewer_1_id], [[]]
                 )
 
