@@ -203,6 +203,7 @@ export class GoalsTabComponent implements OnInit {
     return;
   }
 
+
   /**
    * Close dropdown when outside elements are clicked
    * @param event mouse click event
