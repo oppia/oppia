@@ -707,6 +707,47 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         self.story.update_node_title('node_1', 'new title')
         self.assertEqual(self.story.story_contents.nodes[0].title, 'new title')
 
+    def test_story_node_update_status(self) -> None:
+        self.story.story_contents.nodes[0].status = 'Draft'
+        self.story.update_node_status('node_1', 'Published')
+        self.assertEqual(
+            self.story.story_contents.nodes[0].status, 'Published')
+
+    def test_story_node_update_planned_publication_date(self) -> None:
+        self.story.story_contents.nodes[0].planned_publication_date = None
+        current_time = datetime.datetime.now()
+        current_time_msecs = utils.get_time_in_millisecs(current_time)
+        self.story.update_node_planned_publication_date(
+            'node_1', current_time_msecs)
+        self.assertEqual(
+            self.story.story_contents.nodes[0]. planned_publication_date,
+            current_time)
+
+    def test_story_node_update_last_modified(self) -> None:
+        self.story.story_contents.nodes[0].last_modified = None
+        current_time = datetime.datetime.now()
+        current_time_msecs = utils.get_time_in_millisecs(current_time)
+        self.story.update_node_last_modified('node_1', current_time_msecs)
+        self.assertEqual(
+            self.story.story_contents.nodes[0].last_modified, current_time)
+
+    def test_story_node_update_first_publication_date(self) -> None:
+        self.story.story_contents.nodes[0].first_publication_date = None
+        current_time = datetime.datetime.now()
+        current_time_msecs = utils.get_time_in_millisecs(current_time)
+        self.story.update_node_first_publication_date(
+            'node_1', current_time_msecs)
+        self.assertEqual(
+            self.story.story_contents.nodes[0].first_publication_date,
+            current_time)
+
+    def test_story_node_update_unpublishing_reason(self) -> None:
+        self.story.story_contents.nodes[0].unpublishing_reason = None
+        self.story.update_node_unpublishing_reason('node_1', 'BAD CONTENT')
+        self.assertEqual(
+            self.story.story_contents.nodes[0].unpublishing_reason,
+            'BAD CONTENT')
+
     def test_node_thumbnail_bg_validation(self) -> None:
         self.story.story_contents.nodes[0].thumbnail_bg_color = '#FFFFFF'
         self._assert_validation_error(
