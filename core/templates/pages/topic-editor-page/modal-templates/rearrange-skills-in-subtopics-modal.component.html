@@ -49,8 +49,7 @@
       <div *ngFor="let subtopic of subtopics"
            class="item-flex-container">
         <mat-card class="subtopic item-container">
-          <div class="subtopic-header"
-               (click)="editNameOfSubtopicWithId(subtopic.getId())">
+          <div class="subtopic-header">
             <strong [ngbTooltip]="subtopic.getTitle()"
                     placement="bottom"
                     *ngIf="subtopic?.getTitle()?.length < 25">
@@ -61,6 +60,9 @@
                     *ngIf="subtopic?.getTitle().length >= 25">
               {{ subtopic?.getTitle().substring(0,15) }}...
             </strong>
+            <span _ngcontent-wdq-c17="" class="fas fa-pen" 
+                  (click)="editNameOfSubtopicWithId(subtopic.getId())">
+            </span>
             <div class="number-skills-container">
               <span *ngIf="subtopic.getSkillSummaries().length === 1"
                     class="number-skills-text">
