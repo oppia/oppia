@@ -17,9 +17,7 @@
 """Python file with valid syntax, used by scripts/linters/
 python_linter_test.py. This file contain valid python syntax.
 Every job in core/jobs/batch_jobs should be imported in this file.
-If we don't import
-https://github.com/oppia/oppia/blob/develop/scripts/linters/python_linter_test.py#L67
-the above test fails
+If we don't import test_valid_job_imports fails
 """
 
 from __future__ import annotations
