@@ -131,7 +131,7 @@ export class AuthService {
   static get firebaseEmulatorConfig(): readonly [string, number] | undefined {
     // TODO: (#18260) Change this when we permanently move to the Docker Setup.
     return AuthService.firebaseEmulatorIsEnabled ?
-      ['firebase', 9099] : undefined;
+      ['0.0.0.0', 9099] : undefined;
   }
 
   async handleRedirectResultAsync(): Promise<boolean> {

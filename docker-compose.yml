@@ -8,7 +8,7 @@ services:
       context: .
       dockerfile: Dockerfile
     volumes:
-      - shared_root_dir:/
+      - shared_root_dir:/app/oppia
     environment:
       - production=false
       - NODE_ENV=development
@@ -48,7 +48,7 @@ services:
       context: .
       dockerfile: Dockerfile
     volumes:
-      - shared_root_dir:/
+      - shared_root_dir:/app/oppia
     depends_on:
       webserver:
         condition: service_healthy
@@ -86,7 +86,7 @@ services:
       - "8181:8181"
       - "8000:8000"
     volumes:
-      - shared_root_dir:/
+      - shared_root_dir:/app/oppia
     environment:
       - CLOUDSDK_CORE_DISABLE_PROMPTS=1
       - oppia_is_dockerized=true
@@ -126,7 +126,7 @@ services:
     ports:
       - "8089:8089"
     volumes:
-      - shared_root_dir:/
+      - shared_root_dir:/app/oppia
     environment:
       - DATASTORE_DATASET=dev-project-id
       - DATASTORE_EMULATOR_HOST=0.0.0.0:8089
@@ -171,7 +171,7 @@ services:
       - "9099:9099"
       - "4000:4000"
     volumes:
-      - shared_root_dir:/
+      - shared_root_dir:/app/oppia
     healthcheck:
       test: wget --spider http://localhost:4000/auth/ || exit 1
       timeout: 10s
@@ -181,12 +181,12 @@ services:
       - oppia_is_dockerized=true
     command: >
       sh -c '
-        if [ "$save_datastore" = "true" ]
-        then
-          /app/oppia/node_modules/firebase-tools/lib/bin/firebase.js emulators:start --only auth --project dev-project-id --config /app/oppia/.firebase.json --import /app/firebase_emulator_cache --export-on-exit
-        else
-          /app/oppia/node_modules/firebase-tools/lib/bin/firebase.js emulators:start --only auth --project dev-project-id --config /app/oppia/.firebase.json --export-on-exit /app/firebase_emulator_cache
-        fi
+        /app/oppia/node_modules/firebase-tools/lib/bin/firebase.js emulators:start \
+        --only auth \
+        --project=dev-project-id \
+        --config=/app/oppia/.firebase.json \
+        --export-on-exit${save_datastore:+ --import} \
+        /app/firebase_emulator_cache
       '
 
   redis:
@@ -203,7 +203,7 @@ services:
       interval: 30s
       retries: 5
     volumes:
-      - shared_root_dir:/
+      - shared_root_dir:/app/oppia
     command: redis-server --bind 0.0.0.0 --port 6379 --save "60 1" --tcp-keepalive 300 --dbfilename dump.rdb --dir /app/oppia/ --rdbcompression yes
 
   elasticsearch:
@@ -212,7 +212,7 @@ services:
     ports:
       - "9200:9200"
     volumes:
-      - shared_root_dir:/
+      - shared_root_dir:/app/oppia
     environment:
       - ES_JAVA_OPTS=-Xms100m -Xmx500m
       - ES_PATH_CONF=/usr/share/elasticsearch/config

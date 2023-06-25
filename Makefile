@@ -9,7 +9,7 @@ run-devserver:
 	@echo "source_maps=$(source_maps)"
 	docker compose up
 
-# for Shivkant while developing the dockerized devserver, otherwise seems to reason for devs use this
+# for Shivkant while developing the dockerized devserver, otherwise seems no reason for devs use this
 build-n-run-devserver:
 	@echo "Updating the docker env variables..."
 	@echo "save_datastore=$(save_datastore)"
