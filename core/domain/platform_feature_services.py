@@ -324,6 +324,7 @@ def get_platform_parameter_value(
     param = registry.Registry.get_platform_parameter(parameter_name)
     return param.evaluate(context)
 
+
 def get_platform_parameter_schema(param_name: str) -> Dict[str, str]:
     """Returns the schema for the platform parameter.
 
