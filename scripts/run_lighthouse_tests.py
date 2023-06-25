@@ -248,6 +248,7 @@ def main(args: Optional[List[str]] = None) -> None:
         import ffmpeg
         name = 'lhci.mp4'
         dir_path = os.path.join(os.getcwd(), '..', '..', 'webdriverio-video/')
+        print(dir_path)
         os.mkdir(dir_path)
         video_path = os.path.join(dir_path, name)
         vid_popen = (
@@ -258,6 +259,7 @@ def main(args: Optional[List[str]] = None) -> None:
             .overwrite_output()
             )
         vid_popen = vid_popen.run_async(pipe_stdin=True)
+        print('video_path=', video_path)
 
     with contextlib.ExitStack() as stack:
         stack.enter_context(servers.managed_redis_server())
@@ -275,6 +277,8 @@ def main(args: Optional[List[str]] = None) -> None:
 
         if os.getenv('GITHUB_ACTIONS') and parsed_args.record_screen:
             run_lighthouse_puppeteer_script(vid_popen)
+            print('video_path=', video_path)
+            print('sending video path to run_lighthouse_checks...')
             run_lighthouse_checks(
                 lighthouse_mode, parsed_args.shard, vid_popen, video_path)
         else:
