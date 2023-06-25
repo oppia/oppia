@@ -22,7 +22,6 @@ from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import blog_services
 from core.domain import classroom_services
-from core.domain import config_domain
 from core.domain import learner_group_services
 from core.domain import user_services
 
@@ -63,6 +62,11 @@ class ClassroomAccessValidationHandler(
 
     @acl_decorators.open_access
     def get(self) -> None:
+        """Retrieves information about a classroom.
+
+        Raises:
+            PageNotFoundException. The classroom cannot be found.
+        """
         assert self.normalized_request is not None
         classroom_url_fragment = self.normalized_request[
             'classroom_url_fragment'
@@ -89,6 +93,7 @@ class ManageOwnAccountValidationHandler(
 
     @acl_decorators.can_manage_own_account
     def get(self) -> None:
+        """Handles GET requests."""
         pass
 
 
@@ -110,8 +115,15 @@ class ProfileExistsValidationHandler(
 
     @acl_decorators.open_access
     def get(self, username: str) -> None:
-        """Validates access to profile page."""
+        """Validates access to profile page.
 
+        Args:
+            username: str. The username of the user.
+
+        Raises:
+            PageNotFoundException. No user settings found for the given
+                username.
+        """
         user_settings = user_services.get_user_settings_from_username(
             username)
 
@@ -161,9 +173,18 @@ class ViewLearnerGroupPageAccessValidationHandler(
 
     @acl_decorators.can_access_learner_groups
     def get(self, learner_group_id: str) -> None:
-        """Handles GET requests."""
+        """Retrieves information about a learner group.
+
+        Args:
+            learner_group_id: str. The learner group ID.
+
+        Raises:
+            PageNotFoundException. The learner groups are not enabled.
+            PageNotFoundException. The user is not a member of the learner
+                group.
+        """
         assert self.user_id is not None
-        if not config_domain.LEARNER_GROUPS_ARE_ENABLED.value:
+        if not learner_group_services.is_learner_group_feature_enabled():
             raise self.PageNotFoundException
 
         is_valid_request = learner_group_services.is_user_learner(
@@ -221,6 +242,11 @@ class BlogPostPageAccessValidationHandler(
 
     @acl_decorators.open_access
     def get(self) -> None:
+        """Retrieves information about a blog post.
+
+        Raises:
+            PageNotFoundException. The blog post cannot be found.
+        """
         assert self.normalized_request is not None
         blog_post_url_fragment = self.normalized_request[
             'blog_post_url_fragment']
@@ -255,6 +281,16 @@ class BlogAuthorProfilePageAccessValidationHandler(
 
     @acl_decorators.open_access
     def get(self, author_username: str) -> None:
+        """Retrieves information about a blog post author.
+
+        Args:
+            author_username: str. The author username.
+
+        Raises:
+            PageNotFoundException. User with given username does not exist.
+            PageNotFoundException. User with given username is not a blog
+                post author.
+        """
         author_settings = (
             user_services.get_user_settings_from_username(author_username))
 
