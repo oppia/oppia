@@ -60,9 +60,9 @@
                     *ngIf="subtopic?.getTitle().length >= 25">
               {{ subtopic?.getTitle().substring(0,15) }}...
             </strong>
-            <span _ngcontent-wdq-c17="" class="fas fa-pen" 
-                  (click)="editNameOfSubtopicWithId(subtopic.getId())">
-            </span>
+            <a (click)="editNameOfSubtopicWithId(subtopic.getId())">
+              <span class="fas fa-pen"></span>
+            </a>
             <div class="number-skills-container">
               <span *ngIf="subtopic.getSkillSummaries().length === 1"
                     class="number-skills-text">
