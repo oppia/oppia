@@ -24,6 +24,8 @@ from core.domain import beam_job_services
 from core.domain import config_domain
 from core.domain import cron_services
 from core.domain import email_manager
+from core.domain import platform_feature_services
+from core.domain import platform_parameter_list
 from core.domain import suggestion_services
 from core.domain import taskqueue_services
 from core.domain import user_services
@@ -120,8 +122,10 @@ class CronMailReviewersContributorDashboardSuggestionsHandler(
         # are reviewers to notify.
         if not feconf.CAN_SEND_EMAILS:
             return self.render_json({})
-        if not (config_domain
-                .CONTRIBUTOR_DASHBOARD_REVIEWER_EMAILS_IS_ENABLED.value):
+        if not platform_feature_services.get_platform_parameter_value(
+            platform_parameter_list.ParamNames.
+            CONTRIBUTOR_DASHBOARD_REVIEWER_EMAILS_IS_ENABLED.value
+        ):
             return self.render_json({})
         reviewer_ids = user_services.get_reviewer_user_ids_to_notify()
         if not reviewer_ids:

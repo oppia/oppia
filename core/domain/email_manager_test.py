@@ -27,6 +27,7 @@ from core.domain import config_services
 from core.domain import email_manager
 from core.domain import exp_domain
 from core.domain import html_cleaner
+from core.domain import platform_feature_services
 from core.domain import question_domain
 from core.domain import rights_domain
 from core.domain import subscription_services
@@ -2582,12 +2583,16 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             .create_reviewable_suggestion_email_info_from_suggestion(
                 question_suggestion))
 
-    def test_email_not_sent_if_can_send_emails_is_false(self) -> None:
-        config_services.set_property(
-            'committer_id',
-            'contributor_dashboard_reviewer_emails_is_enabled', True)
+        self.swap_platform_parameter_value = self.swap_to_always_return(
+            platform_feature_services,
+            'get_platform_parameter_value',
+            True
+        )
 
-        with self.capture_logging(min_level=logging.ERROR) as logs:
+    def test_email_not_sent_if_can_send_emails_is_false(self) -> None:
+        with self.swap_platform_parameter_value, self.capture_logging(
+            min_level=logging.ERROR
+        ) as logs:
             with self.cannot_send_emails_ctx, self.log_new_error_ctx:
                 email_manager.send_mail_to_notify_contributor_dashboard_reviewers(  # pylint: disable=line-too-long
                     [self.reviewer_1_id],
@@ -2601,10 +2606,6 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
                 logs[0], 'This app cannot send emails to users.')
 
     def test_email_not_sent_if_reviewer_notifications_is_disabled(self) -> None:
-        config_services.set_property(
-            'committer_id',
-            'contributor_dashboard_reviewer_emails_is_enabled', False)
-
         with self.capture_logging(min_level=logging.ERROR) as logs:
             with self.can_send_emails_ctx, self.log_new_error_ctx:
                 email_manager.send_mail_to_notify_contributor_dashboard_reviewers(  # pylint: disable=line-too-long
@@ -2622,11 +2623,9 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
                 'to send reviewers the emails.')
 
     def test_email_not_sent_if_reviewer_email_does_not_exist(self) -> None:
-        config_services.set_property(
-            'committer_id',
-            'contributor_dashboard_reviewer_emails_is_enabled', True)
-
-        with self.capture_logging(min_level=logging.ERROR) as logs:
+        with self.swap_platform_parameter_value, self.capture_logging(
+            min_level=logging.ERROR
+        ) as logs:
             with self.can_send_emails_ctx, self.log_new_error_ctx:
                 email_manager.send_mail_to_notify_contributor_dashboard_reviewers(  # pylint: disable=line-too-long
                     ['reviewer_id_with_no_email'],
@@ -2642,11 +2641,9 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
                 'reviewer_id_with_no_email.')
 
     def test_email_not_sent_if_no_reviewers_to_notify(self) -> None:
-        config_services.set_property(
-            'committer_id',
-            'contributor_dashboard_reviewer_emails_is_enabled', True)
-
-        with self.capture_logging(min_level=logging.ERROR) as logs:
+        with self.swap_platform_parameter_value, self.capture_logging(
+            min_level=logging.ERROR
+        ) as logs:
             with self.can_send_emails_ctx, self.log_new_error_ctx:
                 email_manager.send_mail_to_notify_contributor_dashboard_reviewers(  # pylint: disable=line-too-long
                     [], [[self.reviewable_suggestion_email_info]]
@@ -2662,14 +2659,11 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
     def test_email_not_sent_if_no_suggestions_to_notify_the_reviewer_about(
         self
     ) -> None:
-        config_services.set_property(
-            'committer_id',
-            'contributor_dashboard_reviewer_emails_is_enabled', True)
-
         with self.can_send_emails_ctx, self.log_new_info_ctx:
-            email_manager.send_mail_to_notify_contributor_dashboard_reviewers(
-                [self.reviewer_1_id], [[]]
-            )
+            with self.swap_platform_parameter_value:
+                email_manager.send_mail_to_notify_contributor_dashboard_reviewers(
+                    [self.reviewer_1_id], [[]]
+                )
 
         messages = self._get_all_sent_email_messages()
         self.assertEqual(len(messages), 0)
@@ -2681,9 +2675,6 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
     def test_email_sent_to_reviewer_with_question_waiting_a_day_for_review(
         self
     ) -> None:
-        config_services.set_property(
-            'committer_id',
-            'contributor_dashboard_reviewer_emails_is_enabled', True)
         question_suggestion = (
             self._create_question_suggestion_with_question_html_and_datetime(
                 '<p>What is the meaning of life?</p>',
@@ -2719,7 +2710,9 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
                 email_manager.EMAIL_FOOTER.value))
 
         with self.can_send_emails_ctx, self.log_new_error_ctx:
-            with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
+            with self.swap_platform_parameter_value, self.mock_datetime_utcnow(
+                mocked_datetime_for_utcnow
+            ):
                 (
                     email_manager
                     .send_mail_to_notify_contributor_dashboard_reviewers(
@@ -2740,9 +2733,6 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
     def test_email_sent_to_reviewer_with_question_waiting_days_for_review(
         self
     ) -> None:
-        config_services.set_property(
-            'committer_id',
-            'contributor_dashboard_reviewer_emails_is_enabled', True)
         question_suggestion = (
             self._create_question_suggestion_with_question_html_and_datetime(
                 '<p>What is the meaning of life?</p>',
@@ -2778,7 +2768,9 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
                 email_manager.EMAIL_FOOTER.value))
 
         with self.can_send_emails_ctx, self.log_new_error_ctx:
-            with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
+            with self.swap_platform_parameter_value, self.mock_datetime_utcnow(
+                mocked_datetime_for_utcnow
+            ):
                 (
                     email_manager
                     .send_mail_to_notify_contributor_dashboard_reviewers(
@@ -2799,9 +2791,6 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
     def test_email_sent_to_reviewer_with_question_waiting_an_hour_for_review(
         self
     ) -> None:
-        config_services.set_property(
-            'committer_id',
-            'contributor_dashboard_reviewer_emails_is_enabled', True)
         question_suggestion = (
             self._create_question_suggestion_with_question_html_and_datetime(
                 '<p>What is the meaning of life?</p>',
@@ -2837,7 +2826,9 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
                 email_manager.EMAIL_FOOTER.value))
 
         with self.can_send_emails_ctx, self.log_new_error_ctx:
-            with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
+            with self.swap_platform_parameter_value, self.mock_datetime_utcnow(
+                mocked_datetime_for_utcnow
+            ):
                 (
                     email_manager
                     .send_mail_to_notify_contributor_dashboard_reviewers(
@@ -2859,9 +2850,6 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
     def test_email_sent_to_reviewer_with_question_waiting_hours_for_review(
         self
     ) -> None:
-        config_services.set_property(
-            'committer_id',
-            'contributor_dashboard_reviewer_emails_is_enabled', True)
         question_suggestion = (
             self._create_question_suggestion_with_question_html_and_datetime(
                 '<p>What is the meaning of life?</p>',
@@ -2897,7 +2885,9 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
                 email_manager.EMAIL_FOOTER.value))
 
         with self.can_send_emails_ctx, self.log_new_error_ctx:
-            with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
+            with self.swap_platform_parameter_value, self.mock_datetime_utcnow(
+                mocked_datetime_for_utcnow
+            ):
                 (
                     email_manager
                     .send_mail_to_notify_contributor_dashboard_reviewers(
@@ -2919,9 +2909,6 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
     def test_email_sent_to_reviewer_with_question_waiting_a_minute_for_review(
         self
     ) -> None:
-        config_services.set_property(
-            'committer_id',
-            'contributor_dashboard_reviewer_emails_is_enabled', True)
         question_suggestion = (
             self._create_question_suggestion_with_question_html_and_datetime(
                 '<p>What is the meaning of life?</p>',
@@ -2957,7 +2944,9 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
                 email_manager.EMAIL_FOOTER.value))
 
         with self.can_send_emails_ctx, self.log_new_error_ctx:
-            with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
+            with self.swap_platform_parameter_value, self.mock_datetime_utcnow(
+                mocked_datetime_for_utcnow
+            ):
                 (
                     email_manager
                     .send_mail_to_notify_contributor_dashboard_reviewers(
@@ -2978,9 +2967,6 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
     def test_email_sent_to_reviewer_with_question_waiting_minutes_for_review(
         self
     ) -> None:
-        config_services.set_property(
-            'committer_id',
-            'contributor_dashboard_reviewer_emails_is_enabled', True)
         question_suggestion = (
             self._create_question_suggestion_with_question_html_and_datetime(
                 '<p>What is the meaning of life?</p>',
@@ -3016,7 +3002,9 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
                 email_manager.EMAIL_FOOTER.value))
 
         with self.can_send_emails_ctx, self.log_new_error_ctx:
-            with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
+            with self.swap_platform_parameter_value, self.mock_datetime_utcnow(
+                mocked_datetime_for_utcnow
+            ):
                 (
                     email_manager
                     .send_mail_to_notify_contributor_dashboard_reviewers(
@@ -3037,9 +3025,6 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
     def test_email_sent_to_reviewer_with_question_waiting_seconds_for_review(
         self
     ) -> None:
-        config_services.set_property(
-            'committer_id',
-            'contributor_dashboard_reviewer_emails_is_enabled', True)
         question_suggestion = (
             self._create_question_suggestion_with_question_html_and_datetime(
                 '<p>What is the meaning of life?</p>',
@@ -3075,7 +3060,9 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
                 email_manager.EMAIL_FOOTER.value))
 
         with self.can_send_emails_ctx, self.log_new_error_ctx:
-            with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
+            with self.swap_platform_parameter_value, self.mock_datetime_utcnow(
+                mocked_datetime_for_utcnow
+            ):
                 (
                     email_manager
                     .send_mail_to_notify_contributor_dashboard_reviewers(
@@ -3096,9 +3083,6 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
     def test_email_sent_to_reviewer_with_multi_questions_waiting_for_a_review(
         self
     ) -> None:
-        config_services.set_property(
-            'committer_id',
-            'contributor_dashboard_reviewer_emails_is_enabled', True)
         mocked_datetime_for_utcnow = (
             self.mocked_review_submission_datetime + datetime.timedelta(
                 days=1, hours=1))
@@ -3143,7 +3127,9 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
                 email_manager.EMAIL_FOOTER.value))
 
         with self.can_send_emails_ctx, self.log_new_error_ctx:
-            with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
+            with self.swap_platform_parameter_value, self.mock_datetime_utcnow(
+                mocked_datetime_for_utcnow
+            ):
                 (
                     email_manager
                     .send_mail_to_notify_contributor_dashboard_reviewers(
@@ -3164,9 +3150,6 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
     def test_email_sent_to_multi_reviewers_with_multi_question_suggestions(
         self
     ) -> None:
-        config_services.set_property(
-            'committer_id',
-            'contributor_dashboard_reviewer_emails_is_enabled', True)
         mocked_datetime_for_utcnow = (
             self.mocked_review_submission_datetime + datetime.timedelta(
                 days=1, hours=1, minutes=1))
@@ -3251,7 +3234,9 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
                 email_manager.EMAIL_FOOTER.value))
 
         with self.can_send_emails_ctx, self.log_new_error_ctx:
-            with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
+            with self.swap_platform_parameter_value, self.mock_datetime_utcnow(
+                mocked_datetime_for_utcnow
+            ):
                 (
                     email_manager
                     .send_mail_to_notify_contributor_dashboard_reviewers(
@@ -3281,9 +3266,6 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
     def test_email_sent_to_reviewer_with_translation_waiting_a_day_for_review(
         self
     ) -> None:
-        config_services.set_property(
-            'committer_id',
-            'contributor_dashboard_reviewer_emails_is_enabled', True)
         translation_suggestion = (
             self._create_translation_suggestion_in_lang_with_html_and_datetime(
                 'hi', '<p>Sample translation</p>',
@@ -3321,7 +3303,9 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
                 email_manager.EMAIL_FOOTER.value))
 
         with self.can_send_emails_ctx, self.log_new_error_ctx:
-            with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
+            with self.swap_platform_parameter_value, self.mock_datetime_utcnow(
+                mocked_datetime_for_utcnow
+            ):
                 (
                     email_manager
                     .send_mail_to_notify_contributor_dashboard_reviewers(
@@ -3341,9 +3325,6 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
     def test_email_sent_to_reviewer_with_translation_waiting_days_for_review(
         self
     ) -> None:
-        config_services.set_property(
-            'committer_id',
-            'contributor_dashboard_reviewer_emails_is_enabled', True)
         translation_suggestion = (
             self._create_translation_suggestion_in_lang_with_html_and_datetime(
                 'hi', '<p>Sample translation</p>',
@@ -3379,7 +3360,9 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
                 email_manager.EMAIL_FOOTER.value))
 
         with self.can_send_emails_ctx, self.log_new_error_ctx:
-            with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
+            with self.swap_platform_parameter_value, self.mock_datetime_utcnow(
+                mocked_datetime_for_utcnow
+            ):
                 (
                     email_manager
                     .send_mail_to_notify_contributor_dashboard_reviewers(
@@ -3400,9 +3383,6 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
     def test_email_sent_to_reviewer_with_translation_waiting_an_hour_for_review(
         self
     ) -> None:
-        config_services.set_property(
-            'committer_id',
-            'contributor_dashboard_reviewer_emails_is_enabled', True)
         translation_suggestion = (
             self._create_translation_suggestion_in_lang_with_html_and_datetime(
                 'hi', '<p>Sample translation</p>',
@@ -3440,7 +3420,9 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
                 email_manager.EMAIL_FOOTER.value))
 
         with self.can_send_emails_ctx, self.log_new_error_ctx:
-            with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
+            with self.swap_platform_parameter_value, self.mock_datetime_utcnow(
+                mocked_datetime_for_utcnow
+            ):
                 (
                     email_manager
                     .send_mail_to_notify_contributor_dashboard_reviewers(
@@ -3461,9 +3443,6 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
     def test_email_sent_to_reviewer_with_translation_waiting_hours_for_review(
         self
     ) -> None:
-        config_services.set_property(
-            'committer_id',
-            'contributor_dashboard_reviewer_emails_is_enabled', True)
         translation_suggestion = (
             self._create_translation_suggestion_in_lang_with_html_and_datetime(
                 'hi', '<p>Sample translation</p>',
@@ -3501,7 +3480,9 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
                 email_manager.EMAIL_FOOTER.value))
 
         with self.can_send_emails_ctx, self.log_new_error_ctx:
-            with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
+            with self.swap_platform_parameter_value, self.mock_datetime_utcnow(
+                mocked_datetime_for_utcnow
+            ):
                 (
                     email_manager
                     .send_mail_to_notify_contributor_dashboard_reviewers(
@@ -3522,9 +3503,6 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
     def test_email_sent_to_reviewer_with_translation_waiting_a_min_for_review(
         self
     ) -> None:
-        config_services.set_property(
-            'committer_id',
-            'contributor_dashboard_reviewer_emails_is_enabled', True)
         translation_suggestion = (
             self._create_translation_suggestion_in_lang_with_html_and_datetime(
                 'hi', '<p>Sample translation</p>',
@@ -3562,7 +3540,9 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
                 email_manager.EMAIL_FOOTER.value))
 
         with self.can_send_emails_ctx, self.log_new_error_ctx:
-            with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
+            with self.swap_platform_parameter_value, self.mock_datetime_utcnow(
+                mocked_datetime_for_utcnow
+            ):
                 (
                     email_manager
                     .send_mail_to_notify_contributor_dashboard_reviewers(
@@ -3583,9 +3563,6 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
     def test_email_sent_to_reviewer_with_translation_waiting_mins_for_review(
         self
     ) -> None:
-        config_services.set_property(
-            'committer_id',
-            'contributor_dashboard_reviewer_emails_is_enabled', True)
         translation_suggestion = (
             self._create_translation_suggestion_in_lang_with_html_and_datetime(
                 'hi', '<p>Sample translation</p>',
@@ -3623,7 +3600,9 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
                 email_manager.EMAIL_FOOTER.value))
 
         with self.can_send_emails_ctx, self.log_new_error_ctx:
-            with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
+            with self.swap_platform_parameter_value, self.mock_datetime_utcnow(
+                mocked_datetime_for_utcnow
+            ):
                 (
                     email_manager
                     .send_mail_to_notify_contributor_dashboard_reviewers(
@@ -3644,9 +3623,6 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
     def test_email_sent_to_reviewer_with_translation_waiting_secs_for_review(
         self
     ) -> None:
-        config_services.set_property(
-            'committer_id',
-            'contributor_dashboard_reviewer_emails_is_enabled', True)
         translation_suggestion = (
             self._create_translation_suggestion_in_lang_with_html_and_datetime(
                 'hi', '<p>Sample translation</p>',
@@ -3684,7 +3660,9 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
                 email_manager.EMAIL_FOOTER.value))
 
         with self.can_send_emails_ctx, self.log_new_error_ctx:
-            with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
+            with self.swap_platform_parameter_value, self.mock_datetime_utcnow(
+                mocked_datetime_for_utcnow
+            ):
                 (
                     email_manager
                     .send_mail_to_notify_contributor_dashboard_reviewers(
@@ -3705,9 +3683,6 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
     def test_email_sent_to_reviewer_with_multi_translation_waiting_for_review(
         self
     ) -> None:
-        config_services.set_property(
-            'committer_id',
-            'contributor_dashboard_reviewer_emails_is_enabled', True)
         mocked_datetime_for_utcnow = (
             self.mocked_review_submission_datetime + datetime.timedelta(
                 days=1, hours=1))
@@ -3752,7 +3727,9 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
                 email_manager.EMAIL_FOOTER.value))
 
         with self.can_send_emails_ctx, self.log_new_error_ctx:
-            with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
+            with self.swap_platform_parameter_value, self.mock_datetime_utcnow(
+                mocked_datetime_for_utcnow
+            ):
                 (
                     email_manager
                     .send_mail_to_notify_contributor_dashboard_reviewers(
@@ -3773,9 +3750,6 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
     def test_email_sent_to_multi_reviewers_with_multi_translations_suggestions(
         self
     ) -> None:
-        config_services.set_property(
-            'committer_id',
-            'contributor_dashboard_reviewer_emails_is_enabled', True)
         mocked_datetime_for_utcnow = (
             self.mocked_review_submission_datetime + datetime.timedelta(
                 days=1, hours=1, minutes=1))
@@ -3860,7 +3834,9 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
                 email_manager.EMAIL_FOOTER.value))
 
         with self.can_send_emails_ctx, self.log_new_error_ctx:
-            with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
+            with self.swap_platform_parameter_value, self.mock_datetime_utcnow(
+                mocked_datetime_for_utcnow
+            ):
                 (
                     email_manager
                     .send_mail_to_notify_contributor_dashboard_reviewers(
@@ -3890,9 +3866,6 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
     def test_email_sent_to_multi_reviewers_with_multi_suggestions_waiting(
         self
     ) -> None:
-        config_services.set_property(
-            'committer_id',
-            'contributor_dashboard_reviewer_emails_is_enabled', True)
         mocked_datetime_for_utcnow = (
             self.mocked_review_submission_datetime + datetime.timedelta(
                 days=1, hours=1, minutes=1))
@@ -3977,7 +3950,9 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
                 email_manager.EMAIL_FOOTER.value))
 
         with self.can_send_emails_ctx, self.log_new_error_ctx:
-            with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
+            with self.swap_platform_parameter_value, self.mock_datetime_utcnow(
+                mocked_datetime_for_utcnow
+            ):
                 (
                     email_manager
                     .send_mail_to_notify_contributor_dashboard_reviewers(

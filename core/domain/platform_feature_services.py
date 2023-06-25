@@ -58,6 +58,10 @@ ALL_PLATFORM_PARAMS_EXCEPT_FEATURE_FLAGS: List[
             platform_parameter_list.ParamNames.
             ALWAYS_ASK_LEARNERS_FOR_ANSWER_DETAILS
         ),
+        (
+            platform_parameter_list.ParamNames.
+            CONTRIBUTOR_DASHBOARD_REVIEWER_EMAILS_IS_ENABLED
+        ),
         platform_parameter_list.ParamNames.DUMMY_PARAMETER,
         (
             platform_parameter_list.ParamNames.

@@ -98,7 +98,6 @@ export interface ConfigPropertyValues {
   'classroom_pages_data': ClassroomPageData;
   'classroom_promos_are_enabled': boolean;
   'contributor_dashboard_is_enabled': boolean;
-  'contributor_dashboard_reviewer_emails_is_enabled': boolean;
   'email_footer': string;
   'email_sender_name': string;
   'enable_admin_notifications_for_reviewer_shortage': boolean;

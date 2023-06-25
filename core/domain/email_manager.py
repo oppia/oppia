@@ -29,6 +29,8 @@ from core.domain import change_domain
 from core.domain import config_domain
 from core.domain import email_services
 from core.domain import html_cleaner
+from core.domain import platform_feature_services
+from core.domain import platform_parameter_list
 from core.domain import rights_domain
 from core.domain import subscription_services
 from core.domain import suggestion_registry
@@ -1911,9 +1913,10 @@ def send_mail_to_notify_contributor_dashboard_reviewers(
         logging.error('This app cannot send emails to users.')
         return
 
-    if not (
-            config_domain
-            .CONTRIBUTOR_DASHBOARD_REVIEWER_EMAILS_IS_ENABLED.value):
+    if not platform_feature_services.get_platform_parameter_value(
+        platform_parameter_list.ParamNames.
+        CONTRIBUTOR_DASHBOARD_REVIEWER_EMAILS_IS_ENABLED.value
+    ):
         logging.error(
             'The "contributor_dashboard_reviewer_emails_is_enabled" property '
             'must be enabled on the admin config page in order to send '

@@ -109,7 +109,6 @@ describe('Admin backend api service', () => {
     },
     classroom_promos_are_enabled: false,
     contributor_dashboard_is_enabled: true,
-    contributor_dashboard_reviewer_emails_is_enabled: true,
     email_footer: 'fsdf',
     email_sender_name: 'Site Admin',
     enable_admin_notifications_for_reviewer_shortage: false,

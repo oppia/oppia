@@ -33,6 +33,7 @@ class ExistingPlatformParameterValidityTests(test_utils.GenericTestBase):
                             'blog_pages',
                             'checkpoint_celebration',
                             'contributor_dashboard_accomplishments',
+                            'contributor_dashboard_reviewer_emails_is_enabled',
                             'diagnostic_test',
                             'dummy_feature_flag_for_e2e_tests',
                             'dummy_parameter',

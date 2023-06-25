@@ -57,6 +57,8 @@ class ParamNames(enum.Enum):
         'high_bounce_rate_task_state_bounce_rate_obsoletion_threshold')
     HIGH_BOUNCE_RATE_TASK_MINIMUM_EXPLORATION_STARTS = (
         'high_bounce_rate_task_minimum_exploration_starts')
+    CONTRIBUTOR_DASHBOARD_REVIEWER_EMAILS_IS_ENABLED = (
+        'contributor_dashboard_reviewer_emails_is_enabled')
 
 
 # Platform parameters should all be defined below.
@@ -176,4 +178,11 @@ Registry.create_platform_parameter(
     'generate high bounce-rate improvements tasks.',
     platform_parameter_domain.DataTypes.NUMBER,
     default=100
+)
+
+Registry.create_platform_parameter(
+    ParamNames.CONTRIBUTOR_DASHBOARD_REVIEWER_EMAILS_IS_ENABLED,
+    'Enable sending Contributor Dashboard reviewers email notifications '
+    'about suggestions that need review. The default value is false.',
+    platform_parameter_domain.DataTypes.BOOL
 )
