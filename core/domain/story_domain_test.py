@@ -1158,10 +1158,10 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
             'outline': '',
             'outline_is_finalized': False,
             'exploration_id': 'exp_1',
-            'status': 'Published',
-            'planned_publication_date_msecs': 100,
-            'last_modified_msecs': 100,
-            'first_publication_date_msecs': 100,
+            'status': None,
+            'planned_publication_date_msecs': None,
+            'last_modified_msecs': None,
+            'first_publication_date_msecs': None,
             'unpublishing_reason': None
         }
         self.story.story_contents.initial_node_id = 'node_1'
