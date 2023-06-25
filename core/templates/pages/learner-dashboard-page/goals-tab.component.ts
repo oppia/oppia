@@ -187,6 +187,9 @@ export class GoalsTabComponent implements OnInit {
           }
         }
       }
+    } else {
+      const goalIndex = this.topicIdsInCurrentGoals.indexOf(activityId);
+      this.removeFromLearnerGoals(topic, topicId, topic.name, goalIndex);
     }
   }
 
