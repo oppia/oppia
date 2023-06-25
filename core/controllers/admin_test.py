@@ -119,12 +119,14 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         self.assertDictContainsSubset({
             'value': False,
         }, response_config_properties[
-            config_domain.IS_IMPROVEMENTS_TAB_ENABLED.name])
+            config_domain.
+            ENABLE_ADMIN_NOTIFICATIONS_FOR_REVIEWER_SHORTAGE.name])
 
         payload = {
             'action': 'save_config_properties',
             'new_config_property_values': {
-                config_domain.IS_IMPROVEMENTS_TAB_ENABLED.name: (
+                config_domain.
+                ENABLE_ADMIN_NOTIFICATIONS_FOR_REVIEWER_SHORTAGE.name: (
                     new_config_value),
             }
         }
@@ -135,7 +137,8 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         self.assertDictContainsSubset({
             'value': new_config_value,
         }, response_config_properties[
-            config_domain.IS_IMPROVEMENTS_TAB_ENABLED.name])
+            config_domain.
+            ENABLE_ADMIN_NOTIFICATIONS_FOR_REVIEWER_SHORTAGE.name])
 
         self.logout()
 

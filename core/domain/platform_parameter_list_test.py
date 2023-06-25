@@ -28,18 +28,30 @@ class ExistingPlatformParameterValidityTests(test_utils.GenericTestBase):
     core/domain/platform_parameter_list.py.
     """
 
-    EXPECTED_PARAM_NAMES = ['dummy_feature_flag_for_e2e_tests',
-                            'dummy_parameter',
-                            'end_chapter_celebration',
-                            'checkpoint_celebration',
+    EXPECTED_PARAM_NAMES = ['always_ask_learners_for_answer_details',
                             'android_beta_landing_page',
                             'blog_pages',
+                            'checkpoint_celebration',
                             'contributor_dashboard_accomplishments',
                             'diagnostic_test',
-                            'serial_chapter_launch_curriculum_admin_view',
-                            'show_translation_size',
+                            'dummy_feature_flag_for_e2e_tests',
+                            'dummy_parameter',
+                            'end_chapter_celebration',
+                            'high_bounce_rate_task_minimum_exploration_starts',
+                            (
+                                'high_bounce_rate_task_state_bounce_'
+                                'rate_creation_threshold'
+                            ),
+                            (
+                                'high_bounce_rate_task_state_bounce_rate_'
+                                'obsoletion_threshold'
+                            ),
+                            'is_improvements_tab_enabled',
+                            'learner_groups_are_enabled',
                             'promo_bar_enabled',
-                            'promo_bar_message']
+                            'promo_bar_message',
+                            'serial_chapter_launch_curriculum_admin_view',
+                            'show_translation_size']
 
     def test_all_defined_parameters_are_valid(self) -> None:
         all_names = params.Registry.get_all_platform_parameter_names()
