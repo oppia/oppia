@@ -24,12 +24,14 @@ import re
 
 from core import android_validation_constants
 from core import feconf
+from core import platform_feature_list
 from core import utils
 from core.constants import constants
 from core.domain import change_domain
 
 from typing import Final, List, Literal, Optional, TypedDict, overload
 
+from core.domain import platform_feature_services # pylint: disable=invalid-import-from # isort:skip
 from core.domain import fs_services  # pylint: disable=invalid-import-from # isort:skip
 from core.domain import html_cleaner  # pylint: disable=invalid-import-from # isort:skip
 from core.domain import html_validation_service  # pylint: disable=invalid-import-from # isort:skip
@@ -482,7 +484,7 @@ class StoryNodeDict(TypedDict):
     planned_publication_date_msecs: Optional[float]
     last_modified_msecs: Optional[float]
     first_publication_date_msecs: Optional[float]
-    unpublishing_reason: Optional[float]
+    unpublishing_reason: Optional[str]
 
 
 class StoryNode:
@@ -559,11 +561,14 @@ class StoryNode:
         self.outline = html_cleaner.clean(outline)
         self.outline_is_finalized = outline_is_finalized
         self.exploration_id = exploration_id
-        self.status = status
-        self.planned_publication_date = planned_publication_date
-        self.last_modified = last_modified
-        self.first_publication_date = first_publication_date
-        self.unpublishing_reason = unpublishing_reason
+        if platform_feature_services.is_feature_enabled(
+            platform_feature_list.ParamNames.
+            SERIAL_CHAPTER_LAUNCH_CURRICULUM_ADMIN_VIEW.value):
+            self.status = status
+            self.planned_publication_date = planned_publication_date
+            self.last_modified = last_modified
+            self.first_publication_date = first_publication_date
+            self.unpublishing_reason = unpublishing_reason
 
     @classmethod
     def get_number_from_node_id(cls, node_id: str) -> int:
@@ -638,25 +643,53 @@ class StoryNode:
         Returns:
             dict. A dict, mapping all fields of StoryNode instance.
         """
-        return {
-            'id': self.id,
-            'title': self.title,
-            'description': self.description,
-            'thumbnail_filename': self.thumbnail_filename,
-            'thumbnail_bg_color': self.thumbnail_bg_color,
-            'thumbnail_size_in_bytes': self.thumbnail_size_in_bytes,
-            'destination_node_ids': self.destination_node_ids,
-            'acquired_skill_ids': self.acquired_skill_ids,
-            'prerequisite_skill_ids': self.prerequisite_skill_ids,
-            'outline': self.outline,
-            'outline_is_finalized': self.outline_is_finalized,
-            'exploration_id': self.exploration_id,
-            'status': None,
-            'planned_publication_date_msecs': None,
-            'last_modified_msecs': None,
-            'first_publication_date_msecs': None,
-            'unpublishing_reason': None
-        }
+        if platform_feature_services.is_feature_enabled(
+            platform_feature_list.ParamNames.
+            SERIAL_CHAPTER_LAUNCH_CURRICULUM_ADMIN_VIEW.value):
+            return {
+                'id': self.id,
+                'title': self.title,
+                'description': self.description,
+                'thumbnail_filename': self.thumbnail_filename,
+                'thumbnail_bg_color': self.thumbnail_bg_color,
+                'thumbnail_size_in_bytes': self.thumbnail_size_in_bytes,
+                'destination_node_ids': self.destination_node_ids,
+                'acquired_skill_ids': self.acquired_skill_ids,
+                'prerequisite_skill_ids': self.prerequisite_skill_ids,
+                'outline': self.outline,
+                'outline_is_finalized': self.outline_is_finalized,
+                'exploration_id': self.exploration_id,
+                'status': self.status,
+                'planned_publication_date_msecs': utils.get_time_in_millisecs(
+                    self.planned_publication_date) if
+                    self.planned_publication_date else None,
+                'last_modified_msecs': utils.get_time_in_millisecs(
+                    self.last_modified) if self.last_modified else None,
+                'first_publication_date_msecs': utils.get_time_in_millisecs(
+                    self.first_publication_date) if self.first_publication_date
+                    else None,
+                'unpublishing_reason': None
+            }
+        else:
+            return {
+                'id': self.id,
+                'title': self.title,
+                'description': self.description,
+                'thumbnail_filename': self.thumbnail_filename,
+                'thumbnail_bg_color': self.thumbnail_bg_color,
+                'thumbnail_size_in_bytes': self.thumbnail_size_in_bytes,
+                'destination_node_ids': self.destination_node_ids,
+                'acquired_skill_ids': self.acquired_skill_ids,
+                'prerequisite_skill_ids': self.prerequisite_skill_ids,
+                'outline': self.outline,
+                'outline_is_finalized': self.outline_is_finalized,
+                'exploration_id': self.exploration_id,
+                'status': None,
+                'planned_publication_date_msecs': None,
+                'last_modified_msecs': None,
+                'first_publication_date_msecs': None,
+                'unpublishing_reason': None
+            }
 
     @classmethod
     def from_dict(cls, node_dict: StoryNodeDict) -> StoryNode:
@@ -668,23 +701,59 @@ class StoryNode:
         Returns:
             StoryNode. The corresponding StoryNode domain object.
         """
-        node = cls(
-            node_dict['id'],
-            node_dict['title'],
-            node_dict['description'],
-            node_dict['thumbnail_filename'],
-            node_dict['thumbnail_bg_color'],
-            node_dict['thumbnail_size_in_bytes'],
-            node_dict['destination_node_ids'],
-            node_dict['acquired_skill_ids'],
-            node_dict['prerequisite_skill_ids'],
-            node_dict['outline'],
-            node_dict['outline_is_finalized'],
-            node_dict['exploration_id'],
-            None, None, None,
-            None, None
-        )
-
+        if platform_feature_services.is_feature_enabled(
+            platform_feature_list.ParamNames.
+            SERIAL_CHAPTER_LAUNCH_CURRICULUM_ADMIN_VIEW.value):
+            planned_publication_date = None
+            if node_dict['planned_publication_date_msecs'] is not None:
+                planned_publication_date = (
+                    utils.convert_millisecs_time_to_datetime_object(
+                        node_dict['planned_publication_date_msecs']))
+            last_modified = None
+            if node_dict['last_modified_msecs'] is not None:
+                last_modified = (
+                    utils.convert_millisecs_time_to_datetime_object(
+                        node_dict['last_modified_msecs']))
+            first_publication_date = None
+            if node_dict['first_publication_date_msecs'] is not None:
+                first_publication_date = (
+                    utils.convert_millisecs_time_to_datetime_object(
+                        node_dict['first_publication_date_msecs']))
+            node = cls(
+                node_dict['id'],
+                node_dict['title'],
+                node_dict['description'],
+                node_dict['thumbnail_filename'],
+                node_dict['thumbnail_bg_color'],
+                node_dict['thumbnail_size_in_bytes'],
+                node_dict['destination_node_ids'],
+                node_dict['acquired_skill_ids'],
+                node_dict['prerequisite_skill_ids'],
+                node_dict['outline'],
+                node_dict['outline_is_finalized'],
+                node_dict['exploration_id'],
+                node_dict['status'],
+                planned_publication_date,
+                last_modified,
+                first_publication_date,
+                node_dict['unpublishing_reason']
+            )
+        else:
+            node = cls(
+                node_dict['id'],
+                node_dict['title'],
+                node_dict['description'],
+                node_dict['thumbnail_filename'],
+                node_dict['thumbnail_bg_color'],
+                node_dict['thumbnail_size_in_bytes'],
+                node_dict['destination_node_ids'],
+                node_dict['acquired_skill_ids'],
+                node_dict['prerequisite_skill_ids'],
+                node_dict['outline'],
+                node_dict['outline_is_finalized'],
+                node_dict['exploration_id'],
+                None, None, None, None, None
+            )
         return node
 
     @classmethod
@@ -699,10 +768,18 @@ class StoryNode:
             StoryNode. The StoryNode domain object with default
             value.
         """
-        return cls(
-            node_id, title, '', None, None, None,
-            [], [], [], '', False, None, 'Draft', None,
-            None, None, None)
+        if platform_feature_services.is_feature_enabled(
+            platform_feature_list.ParamNames.
+            SERIAL_CHAPTER_LAUNCH_CURRICULUM_ADMIN_VIEW.value):
+            return cls(
+                node_id, title, '', None, None, None,
+                [], [], [], '', False, None, 'Draft', None,
+                None, None, None)
+        else:
+            return cls(
+                node_id, title, '', None, None, None,
+                [], [], [], '', False, None, None, None,
+                None, None, None)
 
     def validate(self) -> None:
         """Validates various properties of the story node.
