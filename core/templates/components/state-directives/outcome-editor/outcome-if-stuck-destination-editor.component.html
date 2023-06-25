@@ -31,6 +31,7 @@
     </span>
   </form>
   <p [hidden]="newStateNameForm.form.valid ||  outcomeNewStateName === undefined" class="form-text oppia-form-error oppia-form-error-text">Please pick a card name consisting of alphanumeric characters, spaces and/or hyphens.</p>
+  <p [hidden]="outcomeNewStateName === undefined || !outcomeNewStateName.endsWith(' ')" class="form-text oppia-form-error oppia-form-error-text">New card name cannot end with a space.</p>
 </div>
 
 <style>
