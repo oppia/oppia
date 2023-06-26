@@ -18,7 +18,6 @@
 
 from __future__ import annotations
 
-from core import feconf
 from core import schema_utils
 from core.constants import constants
 from core.domain import change_domain
@@ -147,30 +146,8 @@ SET_OF_CLASSROOM_DICTS_SCHEMA = {
     }
 }
 
-VMID_SHARED_SECRET_KEY_SCHEMA = {
-    'type': schema_utils.SCHEMA_TYPE_LIST,
-    'items': {
-        'type': schema_utils.SCHEMA_TYPE_DICT,
-        'properties': [{
-            'name': 'vm_id',
-            'schema': {
-                'type': schema_utils.SCHEMA_TYPE_UNICODE
-            }
-        }, {
-            'name': 'shared_secret_key',
-            'schema': {
-                'type': schema_utils.SCHEMA_TYPE_UNICODE
-            }
-        }]
-    }
-}
-
 BOOL_SCHEMA = {
     'type': schema_utils.SCHEMA_TYPE_BOOL
-}
-
-UNICODE_SCHEMA = {
-    'type': schema_utils.SCHEMA_TYPE_UNICODE
 }
 
 FLOAT_SCHEMA = {
@@ -222,6 +199,7 @@ class ConfigProperty:
     - admin_ids.
     - admin_usernames.
     - allow_yaml_file_upload.
+    - always_ask_learners_for_answer_details.
     - banned_usernames.
     - banner_alt_text.
     - before_end_body_tag_hook.
@@ -236,10 +214,19 @@ class ConfigProperty:
     - editor_page_announcement.
     - editor_prerequisites_agreement.
     - embedded_google_group_url.
+    - featured_translation_languages.
     - full_site_url.
+    - high_bounce_rate_task_minimum_exploration_starts.
+    - high_bounce_rate_task_state_bounce_rate_creation_threshold.
+    - high_bounce_rate_task_state_bounce_rate_obsoletion_threshold.
+    - is_improvements_tab_enabled.
+    - learner_groups_are_enabled.
+    - list_of_default_tags_for_blog_post.
     - moderator_ids.
     - moderator_request_forum_url.
     - moderator_usernames.
+    - promo_bar_enabled.
+    - promo_bar_message.
     - publicize_exploration_email_html_body.
     - sharing_options.
     - sharing_options_twitter_text.
@@ -250,7 +237,9 @@ class ConfigProperty:
     - splash_page_exploration_version.
     - splash_page_youtube_video_id.
     - ssl_challenge_responses.
+    - vmid_shared_secret_key_mapping.
     - whitelisted_email_senders.
+    - whitelisted_exploration_ids_for_playthroughs.
     """
 
     # Here we use type Any because the general structure of schemas are like
@@ -461,29 +450,6 @@ class Registry:
         return list(cls._config_registry)
 
 
-PROMO_BAR_ENABLED = ConfigProperty(
-    'promo_bar_enabled', BOOL_SCHEMA,
-    'Whether the promo bar should be enabled for all users', False)
-PROMO_BAR_MESSAGE = ConfigProperty(
-    'promo_bar_message', UNICODE_SCHEMA,
-    'The message to show to all users if the promo bar is enabled', '')
-
-VMID_SHARED_SECRET_KEY_MAPPING = ConfigProperty(
-    'vmid_shared_secret_key_mapping', VMID_SHARED_SECRET_KEY_SCHEMA,
-    'VMID and shared secret key corresponding to that VM',
-    [{
-        'vm_id': feconf.DEFAULT_VM_ID,
-        'shared_secret_key': feconf.DEFAULT_VM_SHARED_SECRET
-    }])
-
-WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS = ConfigProperty(
-    'whitelisted_exploration_ids_for_playthroughs',
-    SET_OF_STRINGS_SCHEMA,
-    'The set of exploration IDs for recording playthrough issues', [
-        'umPkwp0L1M0-', 'MjZzEVOG47_1', '9trAQhj6uUC2', 'rfX8jNkPnA-1',
-        '0FBWxCE5egOw', '670bU6d9JGBh', 'aHikhPlxYgOH', '-tMgcP1i_4au',
-        'zW39GLG_BdN2', 'Xa3B_io-2WI5', '6Q6IyIDkjpYC', 'osw1m5Q3jK41'])
-
 # Add classroom name to SEARCH_DROPDOWN_CLASSROOMS in constants.ts file
 # to add that classroom to learner group syllabus filter whenever a new
 # classroom is added.
@@ -502,16 +468,6 @@ RECORD_PLAYTHROUGH_PROBABILITY = ConfigProperty(
     'record_playthrough_probability', FLOAT_SCHEMA,
     'The probability of recording playthroughs', 0.2)
 
-IS_IMPROVEMENTS_TAB_ENABLED = ConfigProperty(
-    'is_improvements_tab_enabled', BOOL_SCHEMA,
-    'Exposes the Improvements Tab for creators in the exploration editor.',
-    False)
-
-ALWAYS_ASK_LEARNERS_FOR_ANSWER_DETAILS = ConfigProperty(
-    'always_ask_learners_for_answer_details', BOOL_SCHEMA,
-    'Always ask learners for answer details. For testing -- do not use',
-    False)
-
 # TODO(#15682): Implement user checkpoints feature flag using feature-gating
 # service.
 CHECKPOINTS_FEATURE_IS_ENABLED = ConfigProperty(
@@ -522,41 +478,9 @@ CLASSROOM_PROMOS_ARE_ENABLED = ConfigProperty(
     'classroom_promos_are_enabled', BOOL_SCHEMA,
     'Show classroom promos.', False)
 
-LEARNER_GROUPS_ARE_ENABLED = ConfigProperty(
-    'learner_groups_are_enabled', BOOL_SCHEMA,
-    'Enable learner groups feature', False)
-
 BATCH_INDEX_FOR_MAILCHIMP = ConfigProperty(
     'batch_index_for_mailchimp', INT_SCHEMA,
     'Index of batch to populate mailchimp database.', 0)
-
-_FEATURED_TRANSLATION_LANGUAGES_DEFAULT_VALUE: List[str] = []
-
-FEATURED_TRANSLATION_LANGUAGES = ConfigProperty(
-    'featured_translation_languages',
-    LIST_OF_FEATURED_TRANSLATION_LANGUAGES_DICTS_SCHEMA,
-    'Featured Translation Languages',
-    _FEATURED_TRANSLATION_LANGUAGES_DEFAULT_VALUE
-)
-
-HIGH_BOUNCE_RATE_TASK_STATE_BOUNCE_RATE_CREATION_THRESHOLD = ConfigProperty(
-    'high_bounce_rate_task_state_bounce_rate_creation_threshold',
-    FLOAT_SCHEMA,
-    'The bounce-rate a state must exceed to create a new improvements task.',
-    0.20)
-
-HIGH_BOUNCE_RATE_TASK_STATE_BOUNCE_RATE_OBSOLETION_THRESHOLD = ConfigProperty(
-    'high_bounce_rate_task_state_bounce_rate_obsoletion_threshold',
-    FLOAT_SCHEMA,
-    'The bounce-rate a state must fall under to discard its improvement task.',
-    0.20)
-
-HIGH_BOUNCE_RATE_TASK_MINIMUM_EXPLORATION_STARTS = ConfigProperty(
-    'high_bounce_rate_task_minimum_exploration_starts',
-    INT_SCHEMA,
-    'The minimum number of times an exploration is started before it can '
-    'generate high bounce-rate improvements tasks.',
-    100)
 
 MAX_NUMBER_OF_SVGS_IN_MATH_SVGS_BATCH = ConfigProperty(
     'max_number_of_svgs_in_math_svgs_batch',
@@ -578,16 +502,6 @@ MAX_NUMBER_OF_TAGS_ASSIGNED_TO_BLOG_POST = ConfigProperty(
     'The maximum number of tags that can be selected to categorize the blog'
     ' post',
     10
-)
-
-LIST_OF_DEFAULT_TAGS_FOR_BLOG_POST = ConfigProperty(
-    'list_of_default_tags_for_blog_post',
-    SET_OF_STRINGS_SCHEMA,
-    'The list of tags available to a blog post editor for categorizing the blog'
-    ' post.',
-    ['News', 'International', 'Educators', 'Learners', 'Community',
-     'Partnerships', 'Volunteer', 'Stories', 'Languages', 'New features',
-     'New lessons', 'Software development', 'Content']
 )
 
 CONTRIBUTOR_DASHBOARD_IS_ENABLED = ConfigProperty(

@@ -56,7 +56,7 @@ export class ExplorationFeaturesService {
       return;
     }
     ExplorationFeaturesService.settings.isPlaythroughRecordingEnabled =
-      featuresData.isExplorationWhitelisted;
+      featuresData.explorationIsCurated;
     if (explorationData.param_changes &&
         explorationData.param_changes.length > 0) {
       this.enableParameters();
