@@ -22,6 +22,7 @@ from core import feconf
 from core.domain import config_services
 from core.domain import learner_group_fetchers
 from core.domain import learner_group_services
+from core.domain import platform_feature_services
 from core.platform import models
 from core.storage.blog import gae_models as blog_models
 from core.tests import test_utils
@@ -199,33 +200,45 @@ class ViewLearnerGroupPageAccessValidationHandlerTests(
     def test_validation_returns_false_with_learner_groups_feature_disabled(
         self
     ) -> None:
-        config_services.set_property(
-            'admin', 'learner_groups_are_enabled', False)
-        self.get_json(
-            '%s/does_learner_group_exist/%s' % (
-                ACCESS_VALIDATION_HANDLER_PREFIX, self.LEARNER_GROUP_ID),
-                expected_status_int=404)
+        swap_is_feature_enabled = self.swap_to_always_return(
+            platform_feature_services,
+            'is_feature_enabled',
+            False
+        )
+        with swap_is_feature_enabled:
+            self.get_json(
+                '%s/does_learner_group_exist/%s' % (
+                    ACCESS_VALIDATION_HANDLER_PREFIX, self.LEARNER_GROUP_ID),
+                    expected_status_int=404)
         self.logout()
 
     def test_validation_returns_false_with_user_not_being_a_learner(
         self
     ) -> None:
-        config_services.set_property(
-            'admin', 'learner_groups_are_enabled', True)
-        self.get_json(
-            '%s/does_learner_group_exist/%s' % (
-                ACCESS_VALIDATION_HANDLER_PREFIX, self.LEARNER_GROUP_ID),
-                expected_status_int=404)
+        swap_is_feature_enabled = self.swap_to_always_return(
+            platform_feature_services,
+            'is_feature_enabled',
+            True
+        )
+        with swap_is_feature_enabled:
+            self.get_json(
+                '%s/does_learner_group_exist/%s' % (
+                    ACCESS_VALIDATION_HANDLER_PREFIX, self.LEARNER_GROUP_ID),
+                    expected_status_int=404)
         self.logout()
 
     def test_validation_returns_true_for_valid_learner(self) -> None:
         learner_group_services.add_learner_to_learner_group(
             self.LEARNER_GROUP_ID, self.learner_id, False)
-        config_services.set_property(
-            'admin', 'learner_groups_are_enabled', True)
-        self.get_html_response(
-            '%s/does_learner_group_exist/%s' % (
-                ACCESS_VALIDATION_HANDLER_PREFIX, self.LEARNER_GROUP_ID))
+        swap_is_feature_enabled = self.swap_to_always_return(
+            platform_feature_services,
+            'is_feature_enabled',
+            True
+        )
+        with swap_is_feature_enabled:
+            self.get_html_response(
+                '%s/does_learner_group_exist/%s' % (
+                    ACCESS_VALIDATION_HANDLER_PREFIX, self.LEARNER_GROUP_ID))
 
 
 class BlogHomePageAccessValidationHandlerTests(test_utils.GenericTestBase):

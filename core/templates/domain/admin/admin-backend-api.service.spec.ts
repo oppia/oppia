@@ -22,6 +22,8 @@ import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
 import { AdminPageData, AdminBackendApiService } from 'domain/admin/admin-backend-api.service';
 import { CreatorTopicSummary } from 'domain/topic/creator-topic-summary.model';
+import { PlatformParameterFilterType } from 'domain/platform_feature/platform-parameter-filter.model';
+import { PlatformParameter } from 'domain/platform_feature/platform-parameter.model';
 import { CsrfTokenService } from 'services/csrf-token.service';
 import { Schema } from 'services/schema-default-value.service';
 
@@ -78,11 +80,26 @@ describe('Admin backend api service', () => {
         'welcome.yaml'
       ]
     ],
-    viewable_roles: ['TOPIC_MANAGER']
+    viewable_roles: ['TOPIC_MANAGER'],
+    platform_params_dicts: [{
+      name: 'dummy_parameter',
+      description: 'This is a dummy platform parameter.',
+      data_type: 'string',
+      rules: [{
+        filters: [{
+          type: PlatformParameterFilterType.ServerMode,
+          conditions: [['=', 'dev'] as [string, string]]
+        }],
+        value_when_matched: ''
+      }],
+      rule_schema_version: 1,
+      default_value: '',
+      is_feature: false,
+      feature_stage: null
+    }]
   };
   let adminDataObject: AdminPageData;
   let configPropertyValues = {
-    always_ask_learners_for_answer_details: false,
     classroom_pages_data: {
       course_details: 'fds',
       name: 'mathfas',
@@ -96,18 +113,12 @@ describe('Admin backend api service', () => {
     email_footer: 'fsdf',
     email_sender_name: 'Site Admin',
     enable_admin_notifications_for_reviewer_shortage: false,
-    high_bounce_rate_task_minimum_exploration_starts: 1001,
-    high_bounce_rate_task_state_bounce_rate_creation_threshold: 0.2,
-    high_bounce_rate_task_state_bounce_rate_obsoletion_threshold: 0.2,
-    is_improvements_tab_enabled: false,
     max_number_of_explorations_in_math_svgs_batch: 2,
     max_number_of_suggestions_per_reviewer: 5,
     max_number_of_svgs_in_math_svgs_batch: 25,
     notification_user_ids_for_failed_tasks: [],
     notify_admins_suggestions_waiting_too_long_is_enabled: false,
     oppia_csrf_secret: 'H62T5aIngXb1PB6arDkFrAnxakpQ=',
-    promo_bar_enabled: false,
-    promo_bar_message: 'fasdfa',
     record_playthrough_probability: 0.2,
     signup_email_content: {
       subject: 'THIS IS A PLACEHOLDER.',
@@ -136,7 +147,9 @@ describe('Admin backend api service', () => {
       viewableRoles: adminBackendResponse.viewable_roles,
       humanReadableRoles: adminBackendResponse.human_readable_roles,
       topicSummaries: adminBackendResponse.topic_summaries.map(
-        dict => CreatorTopicSummary.createFromBackendDict(dict))
+        dict => CreatorTopicSummary.createFromBackendDict(dict)),
+      platformParameters: adminBackendResponse.platform_params_dicts.map(
+        dict => PlatformParameter.createFromBackendDict(dict))
     };
 
     spyOn(csrfService, 'getTokenAsync').and.callFake(async() => {
@@ -957,7 +970,7 @@ describe('Admin backend api service', () => {
     'value given the config property ID when calling' +
     'revertConfigPropertyAsync', fakeAsync(() => {
     let action = 'revert_config_property';
-    let configPropertyId = 'promo_bar_enabled';
+    let configPropertyId = 'record_playthrough_probability';
     let payload = {
       action: action,
       config_property_id: configPropertyId
