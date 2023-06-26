@@ -237,11 +237,6 @@ export class HomeTabComponent {
             if (index !== -1) {
               this.totalLessonsInPlaylist.splice(index, 1);
             }
-          } if (this.showMoreInPlaylistSection === true) {
-            this.displayLessonsInPlaylist = this.totalLessonsInPlaylist;
-          } else if (this.showMoreInPlaylistSection === false) {
-            this.displayLessonsInPlaylist = (
-              this.totalLessonsInPlaylist.slice(0, 3));
           }
         }
         this.noPlaylistActivity = (

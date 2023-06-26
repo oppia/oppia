@@ -137,14 +137,15 @@
 </div>
 
   <div *ngIf="displayAreaIsLearnerDashboard">
-  <mat-card class="oppia-exploration-dashboard-card" [attr.style]="isButtonHovered()">
-      <div>
+  <mat-card class="oppia-exploration-learner-dashboard-card" [attr.style]="isButtonHovered()">
       <div class="exploration-card">
         <div class="oppia-title-section" [ngStyle]="{'background-color': thumbnailBgColor}">
           <img class="oppia-thumbnail-image" [src]="thumbnailIcon">
         </div>
+      </div>
+      <div class="oppia-exploration-summary-container">
         <div class="oppia-summary-section">
-          <span class="oppia-exploration-title">
+          <span class="oppia-learner-dashboard-exploration-title">
             {{explorationTitle}}
           </span>
           <span class="oppia-library-title e2e-test-topic-name-in-learner-story-summary-tile">
@@ -154,8 +155,7 @@
             {{ objective }}
           </span>
         </div>
-      </div>
-      <div>
+        <div class="exploration-progress-button-container">
         <span class="exploration-progress">
           <svg class="exploration-progress-svg" width="50" height="50">
             <circle class="exploration-progress-circle total-circle"
@@ -186,8 +186,8 @@
           </p>
           </a>
         </span>
-
+          </div>
       </div>
-    </div>
+    
   </mat-card>
 </div>

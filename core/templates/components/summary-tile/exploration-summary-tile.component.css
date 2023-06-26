@@ -91,24 +91,36 @@ oppia-exploration-summary-tile .completed-circle {
 
 oppia-exploration-summary-tile .exploration-progress {
   position: relative;
-  top: 76px;
+  top: 98px;
 }
 oppia-exploration-summary-tile .oppia-exploration-objective-title {
+  -webkit-box-orient: vertical;
+  display: -webkit-box;
+  font-family: "Roboto", Arial, sans-serif;
+  font-size: 0.85em;
+  height: 70px;
+  -webkit-line-clamp: 3;
+  line-height: 1.26;
+  max-height: 4.71em;
+  overflow: hidden;
+  padding: 12px;
+  text-overflow: ellipsis;
+  word-break: break-word;
   color: #333;
-  display: inline-block;
+  /* display: flex;
   font-size: 11px;
-  height: 40px;
+  height: 40px; */
   letter-spacing: 0;
   margin: 0px 8px 0 8px;
   opacity: 1;
   text-align: left;
 }
-oppia-exploration-summary-tile .oppia-exploration-title {
+oppia-exploration-summary-tile .oppia-learner-dashboard-exploration-title {
   color: #00645C;
+  display: flex;
   font-family: Capriola,Roboto,Arial,sans-serif;
   font-size: 15px;
   font-weight: 400;
-  /* margin: 24px 0 12px 6px; */
   padding-left: 8px;
   text-align: left;
 }
@@ -116,12 +128,12 @@ oppia-exploration-summary-tile .continue-button {
   background: white 0% 0% no-repeat padding-box;
   border: 1px solid #00645C;
   border-radius: 4px;
-  bottom: 7px;
   /* box-shadow: 0 2px 2px #0000003d; */
   /* display: none; */
   height: 36px;
   left: 86px;
   position: absolute;
+  top: 108px;
   width: 122px;
 }
 oppia-exploration-summary-tile .continue-button-text {
@@ -199,11 +211,11 @@ oppia-exploration-summary-tile .oppia-percent-story-completed {
   position: absolute;
   width: 100%;
 }
-oppia-exploration-summary-tile .oppia-exploration-dashboard-card {
+oppia-exploration-summary-tile .oppia-exploration-learner-dashboard-card {
   border-radius: 4px;
   box-shadow: 0 3px 6px #00000029;
   display: inline-block;
-  height: 270px;
+  height: 286px;
   margin: 0 2px 30px 6px;
   padding: 0;
   position: relative;
@@ -213,15 +225,21 @@ oppia-exploration-summary-tile .oppia-exploration-dashboard-card {
 oppia-exploration-summary-tile .oppia-title-section {
   border-top-left-radius: 4px;
   border-top-right-radius: 4px;
-  height: 144px;
+  height: 136px;
   width: 216px;
 }
 oppia-exploration-summary-tile .oppia-thumbnail-image {
-  height: 144px;
-  width: 216px !important;
+  height: 108px;
+  margin: 19px 43px 9px 44px;
+  width: 129px;
+
 }
-oppia-exploration-summary-tile .oppia-exploration-dashboard-card .continue-button:hover {
+oppia-exploration-summary-tile .oppia-exploration-learner-dashboard-card .continue-button:hover {
   /* display: block;
   float: left; */
   background-color: #35ada3;
+}
+oppia-exploration-summary-tile .oppia-exploration-summary-container {
+  position: relative;
+  bottom: 150px;
 }
