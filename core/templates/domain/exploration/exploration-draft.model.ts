@@ -40,6 +40,12 @@ export type ExplorationChange = (
   CreateChangeList |
   MigrateStatesVersionChangeList);
 
+export type ExplorationTranslationChange = (
+  ExplorationChangeMarkTranslationsNeedsUpdate |
+  ExplorationChangeEditTranslation |
+  ExplorationChangeRemoveTranslations
+);
+
 export interface ExplorationChangeAddState {
   'cmd': 'add_state';
   'state_name': string;

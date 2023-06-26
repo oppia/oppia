@@ -121,16 +121,15 @@ export class StateTranslationEditorComponent
     this.HTML_SCHEMA = {
       type: 'html',
       ui_config: {
-        language: this.translationLanguageService.getActiveLanguageCode(),
+        language: this.languageCode,
         languageDirection: (
           this.translationLanguageService.getActiveLanguageDirection())
       }
     };
 
-    this.activeWrittenTranslation = null;
-    let langCode = this.translationLanguageService.getActiveLanguageCode();
     const entityTranslations = (
-      this.entityTranslationsService.languageCodeToEntityTranslations[langCode]
+      this.entityTranslationsService.languageCodeToEntityTranslations[
+        this.languageCode]
     );
     if (entityTranslations) {
       this.activeWrittenTranslation = entityTranslations.getWrittenTranslation(
@@ -171,20 +170,10 @@ export class StateTranslationEditorComponent
 
   onSaveTranslationButtonClicked(): void {
     this.activeWrittenTranslation.needsUpdate = false;
-    let displayedWrittenTranslations = (
-      this.entityTranslationsService.languageCodeToEntityTranslations[
-        this.languageCode
-      ]
-    );
-
-    displayedWrittenTranslations.updateTranslation(
-      this.contentId, this.activeWrittenTranslation);
-
     this.saveTranslation();
   }
 
   cancelEdit(): void {
-    // This.stateWrittenTranslationsService.restoreFromMemento();
     this.initEditor();
   }
 

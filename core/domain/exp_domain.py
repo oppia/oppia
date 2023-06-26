@@ -898,6 +898,16 @@ class TransientCheckpointUrlDict(TypedDict):
     most_recently_reached_checkpoint_exp_version: int
 
 
+class EditTranslationsChangesCmd(ExplorationChange):
+    """Class representing the ExplorationChange's
+    CMD_EDIT_TRANSLATION command.
+    """
+
+    language_code: str
+    content_id: str
+    translation: feconf.TranslatedContentDict
+
+
 class TransientCheckpointUrl:
     """Domain object representing the checkpoint progress of a
     logged-out user.

@@ -26,7 +26,7 @@ from core.domain import translation_domain
 from core.domain import translation_fetchers
 from core.platform import models
 
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Optional, Tuple, cast
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -138,7 +138,15 @@ def _apply_changes(
     """
     for change in translation_changes:
         if change.cmd == exp_domain.CMD_EDIT_TRANSLATION:
-            if entity_translation.language != change.language_code:
+            # Here we use cast because we are narrowing down the type of
+            # 'change' from exp_domain.ExplorationChange to specific type of
+            # change EditTranslationsChangesCmd.
+            change = cast(
+                exp_domain.EditTranslationsChangesCmd,
+                change
+            )
+
+            if entity_translation.language_code != change.language_code:
                 continue
             entity_translation.translations[change.content_id] = (
                 translation_domain.TranslatedContent.from_dict(
