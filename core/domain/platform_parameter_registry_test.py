@@ -67,8 +67,8 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
                 {
                     'filters': [
                         {
-                            'type': 'server_mode',
-                            'conditions': [['=', FeatureStages.DEV.value]]
+                            'type': 'platform_type',
+                            'conditions': [['=', 'Backend']]
                         }
                     ],
                     'value_when_matched': '222'
@@ -176,8 +176,8 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
                 parameter_domain.PlatformParameterRule.from_dict({
                     'filters': [
                         {
-                            'type': 'server_mode',
-                            'conditions': [['=', FeatureStages.DEV.value]]
+                            'type': 'platform_type',
+                            'conditions': [['=', 'Backend']]
                         }
                     ],
                     'value_when_matched': 'updated'
@@ -205,8 +205,8 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
                 parameter_domain.PlatformParameterRule.from_dict({
                     'filters': [
                         {
-                            'type': 'server_mode',
-                            'conditions': [['=', FeatureStages.DEV.value]]
+                            'type': 'platform_type',
+                            'conditions': [['=', 'Backend']]
                         }
                     ],
                     'value_when_matched': 'updated'
@@ -235,101 +235,14 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
                     parameter_domain.PlatformParameterRule.from_dict({
                         'filters': [
                             {
-                                'type': 'server_mode',
-                                'conditions': [['=', FeatureStages.DEV.value]]
+                                'type': 'platform_type',
+                                'conditions': [['=', 'Backend']]
                             }
                         ],
                         'value_when_matched': True
                     })
                 ],
                 'default'
-            )
-
-    def test_update_dev_feature_with_rule_enabled_for_test_raises_exception(
-        self
-    ) -> None:
-        parameter_name = 'parameter_a'
-        registry.Registry.create_feature_flag(
-            ParamNames.PARAMETER_A, 'dev feature', FeatureStages.DEV)
-
-        with self.assertRaisesRegex(
-            utils.ValidationError,
-            'Feature in dev stage cannot be enabled in test or production '
-            'environments.'):
-            registry.Registry.update_platform_parameter(
-                parameter_name,
-                feconf.SYSTEM_COMMITTER_ID,
-                'commit message',
-                [
-                    parameter_domain.PlatformParameterRule.from_dict({
-                        'filters': [
-                            {
-                                'type': 'server_mode',
-                                'conditions': [['=', FeatureStages.TEST.value]]
-                            }
-                        ],
-                        'value_when_matched': True
-                    })
-                ],
-                False
-            )
-
-    def test_update_dev_feature_with_rule_enabled_for_prod_raises_exception(
-        self
-    ) -> None:
-        parameter_name = 'parameter_a'
-        registry.Registry.create_feature_flag(
-            ParamNames.PARAMETER_A, 'dev feature', FeatureStages.DEV)
-
-        with self.assertRaisesRegex(
-            utils.ValidationError,
-            'Feature in dev stage cannot be enabled in test or production '
-            'environments.'):
-            registry.Registry.update_platform_parameter(
-                parameter_name,
-                feconf.SYSTEM_COMMITTER_ID,
-                'commit message',
-                [
-                    parameter_domain.PlatformParameterRule.from_dict({
-                        'filters': [
-                            {
-                                'type': 'server_mode',
-                                'conditions': [['=', FeatureStages.PROD.value]]
-                            }
-                        ],
-                        'value_when_matched': True
-                    })
-                ],
-                False
-            )
-
-    def test_update_test_feature_with_rule_enabled_for_prod_raises_exception(
-        self
-    ) -> None:
-        parameter_name = 'parameter_a'
-        registry.Registry.create_feature_flag(
-            ParamNames.PARAMETER_A, 'dev feature', FeatureStages.TEST)
-
-        with self.assertRaisesRegex(
-            utils.ValidationError,
-            'Feature in test stage cannot be enabled in production '
-            'environment.'):
-            registry.Registry.update_platform_parameter(
-                parameter_name,
-                feconf.SYSTEM_COMMITTER_ID,
-                'commit message',
-                [
-                    parameter_domain.PlatformParameterRule.from_dict({
-                        'filters': [
-                            {
-                                'type': 'server_mode',
-                                'conditions': [['=', FeatureStages.PROD.value]]
-                            }
-                        ],
-                        'value_when_matched': True
-                    })
-                ],
-                False
             )
 
     def test_updated_parameter_is_saved_in_storage(self) -> None:
@@ -347,8 +260,8 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
                 parameter_domain.PlatformParameterRule.from_dict({
                     'filters': [
                         {
-                            'type': 'server_mode',
-                            'conditions': [['=', FeatureStages.DEV.value]]
+                            'type': 'platform_type',
+                            'conditions': [['=', 'Backend']]
                         }
                     ],
                     'value_when_matched': 'updated'
@@ -366,7 +279,7 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
     def test_evaluate_all_parameters(self) -> None:
         context = parameter_domain.EvaluationContext.from_dict(
             {
-                'platform_type': 'Android',
+                'platform_type': 'Backend',
                 'browser_type': None,
                 'app_version': '1.2.3',
             },
@@ -382,8 +295,8 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
                 {
                     'filters': [
                         {
-                            'type': 'server_mode',
-                            'conditions': [['=', FeatureStages.DEV.value]]
+                            'type': 'platform_type',
+                            'conditions': [['=', 'Backend']]
                         }
                     ],
                     'value_when_matched': '222'

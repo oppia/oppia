@@ -36,6 +36,7 @@ class ParamNames(enum.Enum):
     FEATURE_A = 'feature_a'
     FEATURE_B = 'feature_b'
     FEATURE_C = 'feature_c'
+    FEATURE_D = 'feature_d'
     PARAM_A = 'param_a'
     PARAM_B = 'param_b'
 
@@ -59,9 +60,14 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
         # Parameter names that might be used in following tests.
         param_names = ['param_a', 'param_b']
         param_name_enums = [ParamNames.PARAM_A, ParamNames.PARAM_B]
-        param_names_features = ['feature_a', 'feature_b', 'feature_c']
+        param_names_features = [
+            'feature_a', 'feature_b', 'feature_c', 'feature_d']
         param_name_enums_features = [
-            ParamNames.FEATURE_A, ParamNames.FEATURE_B, ParamNames.FEATURE_C]
+            ParamNames.FEATURE_A,
+            ParamNames.FEATURE_B,
+            ParamNames.FEATURE_C,
+            ParamNames.FEATURE_D
+        ]
         caching_services.delete_multi(
             caching_services.CACHE_NAMESPACE_PLATFORM_PARAMETER, None,
             param_names_features)
@@ -69,15 +75,21 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
             caching_services.CACHE_NAMESPACE_PLATFORM_PARAMETER, None,
             param_names)
 
-        self.dev_feature = registry.Registry.create_feature_flag(
+        self.feature_for_chrome = registry.Registry.create_feature_flag(
             ParamNames.FEATURE_A, 'a feature in dev stage',
             FeatureStages.DEV)
-        self.test_feature = registry.Registry.create_feature_flag(
+        self.feature_for_saffari = registry.Registry.create_feature_flag(
             ParamNames.FEATURE_B, 'a feature in test stage',
             FeatureStages.TEST)
-        self.prod_feature = registry.Registry.create_feature_flag(
+        self.feature_for_firefox = registry.Registry.create_feature_flag(
             ParamNames.FEATURE_C, 'a feature in prod stage',
             FeatureStages.PROD)
+        self.feature_for_backend_platform = (
+            registry.Registry.create_feature_flag(
+                ParamNames.FEATURE_D, 'a feature for backend platform',
+                FeatureStages.PROD
+            )
+        )
         self.param_a = registry.Registry.create_platform_parameter(
             ParamNames.PARAM_A,
             'Parameter named a',
@@ -87,15 +99,13 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
             'Parameter named b',
             platform_parameter_domain.DataTypes.BOOL)
         registry.Registry.update_platform_parameter(
-            self.dev_feature.name, self.user_id, 'edit rules',
+            self.feature_for_chrome.name, self.user_id, 'edit rules',
             [
                 platform_parameter_domain.PlatformParameterRule.from_dict({
                     'filters': [
                         {
-                            'type': 'server_mode',
-                            'conditions': [
-                                ['=', ServerMode.DEV.value]
-                            ]
+                            'type': 'browser_type',
+                            'conditions': [['=', 'Chrome']]
                         }
                     ],
                     'value_when_matched': True
@@ -105,16 +115,13 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
         )
 
         registry.Registry.update_platform_parameter(
-            self.test_feature.name, self.user_id, 'edit rules',
+            self.feature_for_saffari.name, self.user_id, 'edit rules',
             [
                 platform_parameter_domain.PlatformParameterRule.from_dict({
                     'filters': [
                         {
-                            'type': 'server_mode',
-                            'conditions': [
-                                ['=', ServerMode.DEV.value],
-                                ['=', ServerMode.TEST.value],
-                            ]
+                            'type': 'browser_type',
+                            'conditions': [['=', 'Safari']]
                         }
                     ],
                     'value_when_matched': True
@@ -124,17 +131,29 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
         )
 
         registry.Registry.update_platform_parameter(
-            self.prod_feature.name, self.user_id, 'edit rules',
+            self.feature_for_firefox.name, self.user_id, 'edit rules',
             [
                 platform_parameter_domain.PlatformParameterRule.from_dict({
                     'filters': [
                         {
-                            'type': 'server_mode',
-                            'conditions': [
-                                ['=', ServerMode.DEV.value],
-                                ['=', ServerMode.TEST.value],
-                                ['=', ServerMode.PROD.value]
-                            ]
+                            'type': 'browser_type',
+                            'conditions': [['=', 'Firefox']]
+                        }
+                    ],
+                    'value_when_matched': True
+                })
+            ],
+            False
+        )
+
+        registry.Registry.update_platform_parameter(
+            self.feature_for_backend_platform.name, self.user_id, 'edit rules',
+            [
+                platform_parameter_domain.PlatformParameterRule.from_dict({
+                    'filters': [
+                        {
+                            'type': 'platform_type',
+                            'conditions': [['=', 'Backend']]
                         }
                     ],
                     'value_when_matched': True
@@ -218,154 +237,76 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
 
     def test_get_all_feature_flag_dicts_returns_correct_dicts(self) -> None:
         expected_dicts = [
-            self.dev_feature.to_dict(),
-            self.test_feature.to_dict(),
-            self.prod_feature.to_dict(),
+            self.feature_for_chrome.to_dict(),
+            self.feature_for_saffari.to_dict(),
+            self.feature_for_firefox.to_dict(),
+            self.feature_for_backend_platform.to_dict()
         ]
         self.assertEqual(
             feature_services.get_all_feature_flag_dicts(),
             expected_dicts)
 
-    def test_get_all_feature_flag_values_in_dev_returns_correct_values(
+    def test_get_all_feature_flag_for_chrome_browser_returns_correct_values(
         self
     ) -> None:
-        with self.swap(constants, 'DEV_MODE', True):
-            context = feature_services.create_evaluation_context_for_client({
-                'platform_type': 'Android',
-                'browser_type': None,
-                'app_version': '1.0.0',
+        context = feature_services.create_evaluation_context_for_client({
+            'platform_type': 'Android',
+            'browser_type': 'Chrome',
+            'app_version': '1.0.0',
+        })
+        self.assertEqual(
+            feature_services.evaluate_all_feature_flag_values_for_client(
+                context),
+            {
+                self.feature_for_chrome.name: True,
+                self.feature_for_saffari.name: False,
+                self.feature_for_firefox.name: False,
+                self.feature_for_backend_platform.name: False,
             })
-            self.assertEqual(
-                feature_services.evaluate_all_feature_flag_values_for_client(
-                    context),
-                {
-                    self.dev_feature.name: True,
-                    self.test_feature.name: True,
-                    self.prod_feature.name: True,
-                })
 
-    def test_get_all_feature_flag_values_in_test_returns_correct_values(
+    def test_get_all_feature_flag_for_safari_browser_returns_correct_values(
         self
     ) -> None:
-        constants_swap = self.swap(constants, 'DEV_MODE', False)
-        env_swap = self.swap(
-            feconf, 'ENV_IS_OPPIA_ORG_PRODUCTION_SERVER', False)
-        with constants_swap, env_swap:
-            context = feature_services.create_evaluation_context_for_client({
-                'platform_type': 'Android',
-                'browser_type': None,
-                'app_version': '1.0.0',
+        context = feature_services.create_evaluation_context_for_client({
+            'platform_type': 'Android',
+            'browser_type': 'Safari',
+            'app_version': '1.0.0',
+        })
+        self.assertEqual(
+            feature_services.evaluate_all_feature_flag_values_for_client(
+                context),
+            {
+                self.feature_for_chrome.name: False,
+                self.feature_for_saffari.name: True,
+                self.feature_for_firefox.name: False,
+                self.feature_for_backend_platform.name: False,
             })
-            self.assertEqual(
-                feature_services.evaluate_all_feature_flag_values_for_client(
-                    context),
-                {
-                    self.dev_feature.name: False,
-                    self.test_feature.name: True,
-                    self.prod_feature.name: True,
-                })
 
-    def test_get_all_feature_flag_values_in_prod_returns_correct_values(
+    def test_get_all_feature_flag_for_firefox_browser_returns_correct_values(
         self
     ) -> None:
-        constants_swap = self.swap(constants, 'DEV_MODE', False)
-        env_swap = self.swap(feconf, 'ENV_IS_OPPIA_ORG_PRODUCTION_SERVER', True)
-        with constants_swap, env_swap:
-            context = feature_services.create_evaluation_context_for_client({
-                'platform_type': 'Android',
-                'browser_type': None,
-                'app_version': '1.0.0',
+        context = feature_services.create_evaluation_context_for_client({
+            'platform_type': 'Android',
+            'browser_type': 'Firefox',
+            'app_version': '1.0.0',
+        })
+        self.assertEqual(
+            feature_services.evaluate_all_feature_flag_values_for_client(
+                context),
+            {
+                self.feature_for_chrome.name: False,
+                self.feature_for_saffari.name: False,
+                self.feature_for_firefox.name: True,
+                self.feature_for_backend_platform.name: False,
             })
-            self.assertEqual(
-                feature_services.evaluate_all_feature_flag_values_for_client(
-                    context),
-                {
-                    self.dev_feature.name: False,
-                    self.test_feature.name: False,
-                    self.prod_feature.name: True,
-                })
 
     def test_evaluate_dev_feature_for_dev_server_returns_true(self) -> None:
         with self.swap(constants, 'DEV_MODE', True):
             self.assertTrue(
-                feature_services.is_feature_enabled(self.dev_feature.name))
-
-    def test_evaluate_test_feature_for_dev_server_returns_true(self) -> None:
-        with self.swap(constants, 'DEV_MODE', True):
-            self.assertTrue(
-                feature_services.is_feature_enabled(self.test_feature.name))
-
-    def test_evaluate_prod_feature_for_dev_server_returns_true(self) -> None:
-        with self.swap(constants, 'DEV_MODE', True):
-            self.assertTrue(
-                feature_services.is_feature_enabled(self.prod_feature.name))
-
-    def test_evaluate_dev_feature_for_test_server_returns_false(self) -> None:
-        with self.swap(constants, 'DEV_MODE', False):
-            with self.swap(feconf, 'ENV_IS_OPPIA_ORG_PRODUCTION_SERVER', False):
-                self.assertFalse(
-                    feature_services.is_feature_enabled(self.dev_feature.name))
-
-    def test_evaluate_test_feature_for_test_server_returns_true(self) -> None:
-        with self.swap(constants, 'DEV_MODE', False):
-            with self.swap(feconf, 'ENV_IS_OPPIA_ORG_PRODUCTION_SERVER', False):
-                self.assertTrue(
-                    feature_services.is_feature_enabled(self.test_feature.name))
-
-    def test_evaluate_prod_feature_for_test_server_returns_true(self) -> None:
-        with self.swap(constants, 'DEV_MODE', False):
-            with self.swap(feconf, 'ENV_IS_OPPIA_ORG_PRODUCTION_SERVER', False):
-                self.assertTrue(
-                    feature_services.is_feature_enabled(self.prod_feature.name))
-
-    def test_evaluate_dev_feature_for_prod_server_returns_false(self) -> None:
-        with self.swap(constants, 'DEV_MODE', False):
-            with self.swap(feconf, 'ENV_IS_OPPIA_ORG_PRODUCTION_SERVER', True):
-                self.assertFalse(
-                    feature_services.is_feature_enabled(self.dev_feature.name))
-
-    def test_evaluate_test_feature_for_prod_server_returns_false(self) -> None:
-        with self.swap(constants, 'DEV_MODE', False):
-            with self.swap(feconf, 'ENV_IS_OPPIA_ORG_PRODUCTION_SERVER', True):
-                self.assertFalse(
-                    feature_services.is_feature_enabled(self.test_feature.name))
-
-    def test_evaluate_prod_feature_for_prod_server_returns_true(self) -> None:
-        with self.swap(constants, 'DEV_MODE', False):
-            with self.swap(feconf, 'ENV_IS_OPPIA_ORG_PRODUCTION_SERVER', True):
-                self.assertTrue(
-                    feature_services.is_feature_enabled(self.prod_feature.name))
-
-    def test_evaluate_feature_for_prod_server_matches_to_backend_filter(
-        self
-    ) -> None:
-        registry.Registry.update_platform_parameter(
-            self.prod_feature.name, self.user_id, 'edit rules',
-            [
-                platform_parameter_domain.PlatformParameterRule.from_dict({
-                    'filters': [
-                        {
-                            'type': 'server_mode',
-                            'conditions': [
-                                ['=', ServerMode.PROD.value]
-                            ],
-                        },
-                        {
-                            'type': 'platform_type',
-                            'conditions': [
-                                ['=', 'Backend']
-                            ],
-                        }
-                    ],
-                    'value_when_matched': True
-                })
-            ],
-            False
-        )
-        with self.swap(constants, 'DEV_MODE', False):
-            with self.swap(feconf, 'ENV_IS_OPPIA_ORG_PRODUCTION_SERVER', True):
-                self.assertTrue(
-                    feature_services.is_feature_enabled(self.prod_feature.name))
+                feature_services.is_feature_enabled(
+                    self.feature_for_backend_platform.name
+                )
+            )
 
     def test_get_feature_flag_values_with_unknown_name_raises_error(
         self
@@ -376,15 +317,13 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
 
     def test_update_feature_flag_successfully_updates_rules(self) -> None:
         feature_services.update_feature_flag(
-            self.dev_feature.name, self.user_id, 'test update',
+            self.feature_for_chrome.name, self.user_id, 'test update',
             [
                 platform_parameter_domain.PlatformParameterRule.from_dict({
                     'filters': [
                         {
-                            'type': 'server_mode',
-                            'conditions': [
-                                ['=', FeatureStages.DEV.value]
-                            ]
+                            'type': 'platform_type',
+                            'conditions': [['=', 'Backend']]
                         }
                     ],
                     'value_when_matched': False
@@ -395,7 +334,9 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
 
         with self.swap(constants, 'DEV_MODE', True):
             self.assertFalse(
-                feature_services.is_feature_enabled(self.dev_feature.name))
+                feature_services.is_feature_enabled(
+                    self.feature_for_chrome.name)
+            )
 
     def test_update_feature_flag_with_unknown_name_raises_error(
         self
@@ -417,9 +358,9 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
         self
     ) -> None:
         with self.assertRaisesRegex(
-            utils.ValidationError, 'must have a server_mode filter'):
+            utils.ValidationError, 'Filters inside the rules cannot be empty.'):
             feature_services.update_feature_flag(
-                self.dev_feature.name, self.user_id, 'test update',
+                self.feature_for_chrome.name, self.user_id, 'test update',
                 [
                     platform_parameter_domain.PlatformParameterRule.from_dict({
                         'filters': [

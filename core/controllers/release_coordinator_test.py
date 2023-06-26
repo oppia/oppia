@@ -149,8 +149,8 @@ class FeatureFlagsHandlerTest(test_utils.GenericTestBase):
             {
                 'filters': [
                     {
-                        'type': 'server_mode',
-                        'conditions': [['=', 'dev']]
+                        'type': 'platform_type',
+                        'conditions': [['=', 'Backend']]
                     }
                 ],
                 'value_when_matched': True
@@ -207,8 +207,8 @@ class FeatureFlagsHandlerTest(test_utils.GenericTestBase):
             {
                 'filters': [
                     {
-                        'type': 'server_mode',
-                        'conditions': [['=', 'dev']]
+                        'type': 'platform_type',
+                        'conditions': [['=', 'Backend']]
                     }
                 ],
                 'value_when_matched': True
@@ -252,8 +252,8 @@ class FeatureFlagsHandlerTest(test_utils.GenericTestBase):
             {
                 'filters': [
                     {
-                        'type': 'server_mode',
-                        'conditions': [['=', 'dev']]
+                        'type': 'platform_type',
+                        'conditions': [['=', 'Backend']]
                     }
                 ],
                 'value_when_matched': True
@@ -290,12 +290,7 @@ class FeatureFlagsHandlerTest(test_utils.GenericTestBase):
             ParamNames.TEST_FEATURE_2, 'feature for test.', FeatureStages.DEV)
         new_rule_dicts = [
             {
-                'filters': [
-                    {
-                        'type': 'server_mode',
-                        'conditions': [['=', 'prod']]
-                    }
-                ],
+                'filters': [],
                 'value_when_matched': True
             }
         ]
@@ -320,8 +315,8 @@ class FeatureFlagsHandlerTest(test_utils.GenericTestBase):
             )
             self.assertEqual(
                 response['error'],
-                'Feature in dev stage cannot be enabled in test or production '
-                'environments.')
+                'Schema validation for \'new_rules\' failed: Filters inside '
+                'the rules cannot be empty.')
 
         platform_parameter_registry.Registry.parameter_registry.pop(
             feature.name)
@@ -333,14 +328,12 @@ class FeatureFlagsHandlerTest(test_utils.GenericTestBase):
         self.login(self.RELEASE_COORDINATOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
-        feature = platform_parameter_registry.Registry.create_feature_flag(
-            ParamNames.TEST_FEATURE_2, 'feature for test.', FeatureStages.DEV)
         new_rule_dicts = [
             {
                 'filters': [
                     {
-                        'type': 'server_mode',
-                        'conditions': [['=', 'dev']]
+                        'type': 'platform_type',
+                        'conditions': [['=', 'Backend']]
                     }
                 ],
                 'value_when_matched': True
@@ -352,18 +345,18 @@ class FeatureFlagsHandlerTest(test_utils.GenericTestBase):
             [ParamNames.TEST_FEATURE_2])
         feature_set_ctx = self.swap(
             platform_feature_services, 'ALL_FEATURES_NAMES_SET',
-            set([feature.name]))
+            set([ParamNames.TEST_FEATURE_2.value]))
         # Here we use MyPy ignore because we are assigning a None value
         # where instance of 'PlatformParameter' is expected, and this is
         # done to Replace the stored instance with None in order to
         # trigger the unexpected exception during update.
         platform_parameter_registry.Registry.parameter_registry[
-            feature.name] = None  # type: ignore[assignment]
+            ParamNames.TEST_FEATURE_2.value] = None  # type: ignore[assignment]
         with feature_list_ctx, feature_set_ctx:
             response = self.post_json(
                 feconf.FEATURE_FLAGS_URL, {
                     'action': 'update_feature_flag',
-                    'feature_name': feature.name,
+                    'feature_name': ParamNames.TEST_FEATURE_2.value,
                     'new_rules': new_rule_dicts,
                     'commit_message': 'test update feature',
                     'default_value': False
@@ -376,5 +369,5 @@ class FeatureFlagsHandlerTest(test_utils.GenericTestBase):
                 '\'NoneType\' object has no attribute \'serialize\'')
 
         platform_parameter_registry.Registry.parameter_registry.pop(
-            feature.name)
+            ParamNames.TEST_FEATURE_2.value)
         self.logout()

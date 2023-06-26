@@ -43,7 +43,8 @@ class DiagnosticTestPlayerPage(
     def get(self) -> None:
         """Handles GET requests."""
         if platform_feature_services.is_feature_enabled(
-            platform_feature_list.ParamNames.DIAGNOSTIC_TEST.value):
+            platform_feature_list.ParamNames.DIAGNOSTIC_TEST.value
+        ) and constants.DEV_MODE:
             self.render_template('diagnostic-test-player-page.mainpage.html')
         else:
             raise self.PageNotFoundException

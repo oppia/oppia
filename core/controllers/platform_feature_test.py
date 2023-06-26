@@ -71,10 +71,8 @@ class PlatformFeaturesEvaluationHandlerTest(test_utils.GenericTestBase):
                 param_domain.PlatformParameterRule.from_dict({
                     'filters': [
                         {
-                            'type': 'server_mode',
-                            'conditions': [
-                                ['=', param_domain.ServerMode.DEV.value]
-                            ]
+                            'type': 'platform_type',
+                            'conditions': [['=', 'Android']]
                         }
                     ],
                     'value_when_matched': True
@@ -228,8 +226,8 @@ class PlatformFeatureDummyHandlerTest(test_utils.GenericTestBase):
             [param_domain.PlatformParameterRule.from_dict({
                 'value_when_matched': is_enabled,
                 'filters': [{
-                    'type': 'server_mode',
-                    'conditions': [['=', mode.value]]
+                    'type': 'platform_type',
+                    'conditions': [['=', 'Backend']]
                 }]
             })],
             False

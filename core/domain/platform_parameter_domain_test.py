@@ -373,34 +373,6 @@ class PlatformParameterFilterTests(test_utils.GenericTestBase):
 
         self.assertEqual(filter_domain.to_dict(), filter_dict)
 
-    def test_evaluate_dev_server_mode_filter_with_dev_env_returns_true(
-        self
-    ) -> None:
-        filter_dict: parameter_domain.PlatformParameterFilterDict = {
-            'type': 'server_mode',
-            'conditions': [['=', 'dev']]
-        }
-        filter_domain = (
-            parameter_domain
-            .PlatformParameterFilter.from_dict(filter_dict))
-
-        dev_context = self._create_example_context(mode='DEV')
-        self.assertTrue(filter_domain.evaluate(dev_context))
-
-    def test_evaluate_dev_server_mode_filter_with_prod_env_returns_false(
-        self
-    ) -> None:
-        filter_dict: parameter_domain.PlatformParameterFilterDict = {
-            'type': 'server_mode',
-            'conditions': [['=', 'dev']]
-        }
-        filter_domain = (
-            parameter_domain
-            .PlatformParameterFilter.from_dict(filter_dict))
-
-        prod_context = self._create_example_context(mode='PROD')
-        self.assertFalse(filter_domain.evaluate(prod_context))
-
     def test_eval_backend_client_filter_with_backend_client_returns_true(
         self
     ) -> None:
@@ -1289,22 +1261,23 @@ class PlatformParameterFilterTests(test_utils.GenericTestBase):
         self
     ) -> None:
         filter_dict: parameter_domain.PlatformParameterFilterDict = {
-            'type': 'server_mode',
-            'conditions': [['=', 'dev'], ['=', 'prod']]
+            'type': 'browser_type',
+            'conditions': [['=', 'Chrome']]
         }
         filter_domain = (
             parameter_domain
             .PlatformParameterFilter.from_dict(filter_dict))
 
-        dev_context = self._create_example_context(mode='DEV')
-        self.assertTrue(filter_domain.evaluate(dev_context))
+        browser_type_context = self._create_example_context(
+            browser_type='Chrome')
+        self.assertTrue(filter_domain.evaluate(browser_type_context))
 
     def test_evaluate_multi_value_filter_with_none_matched_returns_true(
         self
     ) -> None:
         filter_dict: parameter_domain.PlatformParameterFilterDict = {
-            'type': 'server_mode',
-            'conditions': [['=', 'dev'], ['=', 'prod']]
+            'type': 'browser_type',
+            'conditions': [['=', 'Chrome']]
         }
         filter_domain = (
             parameter_domain
@@ -1332,7 +1305,7 @@ class PlatformParameterFilterTests(test_utils.GenericTestBase):
         filter_domain = (
             parameter_domain
             .PlatformParameterFilter.from_dict(
-                {'type': 'server_mode', 'conditions': [['!=', 'dev']]}
+                {'type': 'browser_type', 'conditions': [['!=', 'Chrome']]}
             ))
         with self.assertRaisesRegex(
             Exception, 'Unsupported comparison operator \'!=\''):
@@ -1363,8 +1336,8 @@ class PlatformParameterFilterTests(test_utils.GenericTestBase):
 
     def test_validate_filter_passes_without_exception(self) -> None:
         filter_dict: parameter_domain.PlatformParameterFilterDict = {
-            'type': 'server_mode',
-            'conditions': [['=', 'dev'], ['=', 'prod']]
+            'type': 'browser_type',
+            'conditions': [['=', 'Chrome']]
         }
         filter_domain = (
             parameter_domain
@@ -1387,22 +1360,10 @@ class PlatformParameterFilterTests(test_utils.GenericTestBase):
         filter_domain = (
             parameter_domain
             .PlatformParameterFilter.from_dict(
-                {'type': 'server_mode', 'conditions': [['!=', 'dev']]}
+                {'type': 'browser_type', 'conditions': [['!=', 'Chrome']]}
             ))
         with self.assertRaisesRegex(
             utils.ValidationError, 'Unsupported comparison operator \'!=\''):
-            filter_domain.validate()
-
-    def test_validate_filter_with_invalid_server_mode_raises_exception(
-        self
-    ) -> None:
-        filter_domain = (
-            parameter_domain
-            .PlatformParameterFilter.from_dict(
-                {'type': 'server_mode', 'conditions': [['=', 'invalid']]}
-            ))
-        with self.assertRaisesRegex(
-            utils.ValidationError, 'Invalid server mode \'invalid\''):
             filter_domain.validate()
 
     def test_validate_filter_with_invalid_platform_type_raises_exception(
@@ -1452,10 +1413,6 @@ class PlatformParameterRuleTests(test_utils.GenericTestBase):
             {
                 'type': 'app_version',
                 'conditions': [['=', '1.2.3']]
-            },
-            {
-                'type': 'server_mode',
-                'conditions': [['=', 'dev'], ['=', 'test']]
             }
         ]
         rule = parameter_domain.PlatformParameterRule.from_dict(
@@ -1469,7 +1426,7 @@ class PlatformParameterRuleTests(test_utils.GenericTestBase):
         filter_domain = rule.filters[0]
         self.assertIsInstance(
             filter_domain, parameter_domain.PlatformParameterFilter)
-        self.assertEqual(len(rule.filters), 2)
+        self.assertEqual(len(rule.filters), 1)
         self.assertEqual(filter_domain.type, 'app_version')
         self.assertEqual(filter_domain.conditions, [['=', '1.2.3']])
         self.assertEqual(rule.value_when_matched, False)
@@ -1486,30 +1443,6 @@ class PlatformParameterRuleTests(test_utils.GenericTestBase):
         }
         rule = parameter_domain.PlatformParameterRule.from_dict(rule_dict)
         self.assertEqual(rule.to_dict(), rule_dict)
-
-    def test_has_server_mode_filter_with_mode_filter_returns_true(self) -> None:
-        rule = parameter_domain.PlatformParameterRule.from_dict(
-            {
-                'filters': [
-                    {'type': 'server_mode', 'conditions': [['=', 'dev']]}
-                ],
-                'value_when_matched': False,
-            },
-        )
-        self.assertTrue(rule.has_server_mode_filter())
-
-    def test_has_server_mode_filter_without_mode_filter_returns_false(
-        self
-    ) -> None:
-        rule = parameter_domain.PlatformParameterRule.from_dict(
-            {
-                'filters': [
-                    {'type': 'app_version', 'conditions': [['=', '1.2.3']]}
-                ],
-                'value_when_matched': False,
-            },
-        )
-        self.assertFalse(rule.has_server_mode_filter())
 
     def test_evaluation_with_matching_context_returns_true(self) -> None:
         rule = parameter_domain.PlatformParameterRule.from_dict(
@@ -1583,8 +1516,8 @@ class PlatformParameterTests(test_utils.GenericTestBase):
                 {
                     'filters': [
                         {
-                            'type': 'server_mode',
-                            'conditions': [['=', 'dev']]
+                            'type': 'browser_type',
+                            'conditions': [['=', 'Chrome']]
                         }
                     ],
                     'value_when_matched': '222'
@@ -1618,8 +1551,8 @@ class PlatformParameterTests(test_utils.GenericTestBase):
                 {
                     'filters': [
                         {
-                            'type': 'server_mode',
-                            'conditions': [['=', 'dev']]
+                            'type': 'browser_type',
+                            'conditions': [['=', 'Chrome']]
                         }
                     ],
                     'value_when_matched': '222'
@@ -1644,8 +1577,8 @@ class PlatformParameterTests(test_utils.GenericTestBase):
                 {
                     'filters': [
                         {
-                            'type': 'server_mode',
-                            'conditions': [['=', 'dev']]
+                            'type': 'browser_type',
+                            'conditions': [['=', 'Chrome']]
                         }
                     ],
                     'value_when_matched': '222'
@@ -1672,8 +1605,8 @@ class PlatformParameterTests(test_utils.GenericTestBase):
                 {
                     'filters': [
                         {
-                            'type': 'server_mode',
-                            'conditions': [['=', 'dev']]
+                            'type': 'browser_type',
+                            'conditions': [['=', 'Chrome']]
                         }
                     ],
                     'value_when_matched': '222'
@@ -1699,8 +1632,8 @@ class PlatformParameterTests(test_utils.GenericTestBase):
                 {
                     'filters': [
                         {
-                            'type': 'server_mode',
-                            'conditions': [['=', 'dev']]
+                            'type': 'browser_type',
+                            'conditions': [['=', 'Chrome']]
                         }
                     ],
                     'value_when_matched': '222'
@@ -1727,8 +1660,8 @@ class PlatformParameterTests(test_utils.GenericTestBase):
                 {
                     'filters': [
                         {
-                            'type': 'server_mode',
-                            'conditions': [['=', 'dev']]
+                            'type': 'browser_type',
+                            'conditions': [['=', 'Chrome']]
                         }
                     ],
                     'value_when_matched': '222'
@@ -1779,8 +1712,8 @@ class PlatformParameterTests(test_utils.GenericTestBase):
                         {
                             'filters': [
                                 {
-                                    'type': 'server_mode',
-                                    'conditions': [['=', 'dev']]
+                                    'type': 'browser_type',
+                                    'conditions': [['=', 'Chrome']]
                                 }
                             ],
                             'value_when_matched': '222'
@@ -1801,8 +1734,8 @@ class PlatformParameterTests(test_utils.GenericTestBase):
                 {
                     'filters': [
                         {
-                            'type': 'server_mode',
-                            'conditions': [['=', 'dev']]
+                            'type': 'browser_type',
+                            'conditions': [['=', 'Chrome']]
                         }
                     ],
                     'value_when_matched': '222'
@@ -1826,8 +1759,8 @@ class PlatformParameterTests(test_utils.GenericTestBase):
                 {
                     'filters': [
                         {
-                            'type': 'server_mode',
-                            'conditions': [['=', 'dev']]
+                            'type': 'browser_type',
+                            'conditions': [['=', 'Chrome']]
                         }
                     ],
                     'value_when_matched': '222'
@@ -1835,8 +1768,8 @@ class PlatformParameterTests(test_utils.GenericTestBase):
                 {
                     'filters': [
                         {
-                            'type': 'server_mode',
-                            'conditions': [['=', 'test']]
+                            'type': 'browser_type',
+                            'conditions': [['=', 'Chrome']]
                         }
                     ],
                     'value_when_matched': '555'
@@ -1850,7 +1783,7 @@ class PlatformParameterTests(test_utils.GenericTestBase):
         })
         new_rule_dict: parameter_domain.PlatformParameterRuleDict = {
             'filters': [
-                {'type': 'server_mode', 'conditions': [['=', 'test']]}
+                {'type': 'browser_type', 'conditions': [['=', 'Chrome']]}
             ],
             'value_when_matched': 'new rule value',
         }
@@ -1870,8 +1803,8 @@ class PlatformParameterTests(test_utils.GenericTestBase):
                 {
                     'filters': [
                         {
-                            'type': 'server_mode',
-                            'conditions': [['=', 'dev']]
+                            'type': 'browser_type',
+                            'conditions': [['=', 'Chrome']]
                         }
                     ],
                     'value_when_matched': '222'
@@ -1896,8 +1829,8 @@ class PlatformParameterTests(test_utils.GenericTestBase):
                 {
                     'filters': [
                         {
-                            'type': 'server_mode',
-                            'conditions': [['=', 'dev']]
+                            'type': 'browser_type',
+                            'conditions': [['=', 'Chrome']]
                         }
                     ],
                     'value_when_matched': '222'
@@ -1913,7 +1846,7 @@ class PlatformParameterTests(test_utils.GenericTestBase):
         dev_context = parameter_domain.EvaluationContext.from_dict(
             {
                 'platform_type': 'Android',
-                'browser_type': None,
+                'browser_type': 'Chrome',
                 'app_version': '1.2.3',
             },
             {
@@ -1931,8 +1864,8 @@ class PlatformParameterTests(test_utils.GenericTestBase):
                 {
                     'filters': [
                         {
-                            'type': 'server_mode',
-                            'conditions': [['=', 'dev']]
+                            'type': 'browser_type',
+                            'conditions': [['=', 'Chrome']]
                         }
                     ],
                     'value_when_matched': '222'
@@ -1968,8 +1901,8 @@ class PlatformParameterTests(test_utils.GenericTestBase):
                 {
                     'filters': [
                         {
-                            'type': 'server_mode',
-                            'conditions': [['=', 'dev']]
+                            'type': 'browser_type',
+                            'conditions': [['=', 'Chrome']]
                         }
                     ],
                     'value_when_matched': '222'
@@ -1985,7 +1918,7 @@ class PlatformParameterTests(test_utils.GenericTestBase):
         dev_context = parameter_domain.EvaluationContext.from_dict(
             {
                 'platform_type': 'invalid',
-                'browser_type': None,
+                'browser_type': 'Chrome',
                 'app_version': '1.2.3',
             },
             {
@@ -2005,8 +1938,8 @@ class PlatformParameterTests(test_utils.GenericTestBase):
                 {
                     'filters': [
                         {
-                            'type': 'server_mode',
-                            'conditions': [['=', 'dev']]
+                            'type': 'browser_type',
+                            'conditions': [['=', 'Chrome']]
                         }
                     ],
                     'value_when_matched': '222'
@@ -2022,7 +1955,7 @@ class PlatformParameterTests(test_utils.GenericTestBase):
         dev_context = parameter_domain.EvaluationContext.from_dict(
             {
                 'platform_type': '',
-                'browser_type': None,
+                'browser_type': 'Chrome',
                 'app_version': '1.2.3',
             },
             {
@@ -2039,7 +1972,10 @@ class PlatformParameterTests(test_utils.GenericTestBase):
             'rules': [
                 {
                     'filters': [
-                        {'type': 'server_mode', 'conditions': [['=', 'dev']]}
+                        {
+                            'type': 'browser_type',
+                            'conditions': [['=', 'Chrome']]
+                        }
                     ],
                     'value_when_matched': False
                 }
@@ -2105,75 +2041,7 @@ class PlatformParameterTests(test_utils.GenericTestBase):
             'feature_stage': 'dev',
         })
         with self.assertRaisesRegex(
-            utils.ValidationError, 'must have a server_mode filter'):
-            parameter.validate()
-
-    def test_validate_dev_feature_for_test_env_raises_exception(self) -> None:
-        parameter = parameter_domain.PlatformParameter.from_dict({
-            'name': 'parameter_a',
-            'description': '',
-            'data_type': 'bool',
-            'rules': [
-                {
-                    'filters': [
-                        {'type': 'server_mode', 'conditions': [['=', 'test']]}],
-                    'value_when_matched': True
-                }
-            ],
-            'rule_schema_version': (
-                feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION),
-            'default_value': False,
-            'is_feature': True,
-            'feature_stage': 'dev',
-        })
-        with self.assertRaisesRegex(
-            utils.ValidationError, 'cannot be enabled in test or production'):
-            parameter.validate()
-
-    def test_validate_dev_feature_for_prod_env_raises_exception(self) -> None:
-        parameter = parameter_domain.PlatformParameter.from_dict({
-            'name': 'parameter_a',
-            'description': '',
-            'data_type': 'bool',
-            'rules': [
-                {
-                    'filters': [
-                        {'type': 'server_mode', 'conditions': [['=', 'prod']]}],
-                    'value_when_matched': True
-                }
-            ],
-            'rule_schema_version': (
-                feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION),
-            'default_value': False,
-            'is_feature': True,
-            'feature_stage': 'dev',
-        })
-        with self.assertRaisesRegex(
-            utils.ValidationError, 'cannot be enabled in test or production'):
-            parameter.validate()
-
-    def test_validate_test_feature_for_prod_env_raises_exception(
-        self
-    ) -> None:
-        parameter = parameter_domain.PlatformParameter.from_dict({
-            'name': 'parameter_a',
-            'description': '',
-            'data_type': 'bool',
-            'rules': [
-                {
-                    'filters': [
-                        {'type': 'server_mode', 'conditions': [['=', 'prod']]}],
-                    'value_when_matched': True
-                }
-            ],
-            'rule_schema_version': (
-                feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION),
-            'default_value': False,
-            'is_feature': True,
-            'feature_stage': 'test',
-        })
-        with self.assertRaisesRegex(
-            utils.ValidationError, 'cannot be enabled in production'):
+            utils.ValidationError, 'Filters inside the rules cannot be empty.'):
             parameter.validate()
 
     def test_serialize_and_deserialize_returns_unchanged_platform_parameter(
@@ -2190,7 +2058,8 @@ class PlatformParameterTests(test_utils.GenericTestBase):
                 {
                     'filters': [
                         {
-                            'type': 'server_mode', 'conditions': [['=', 'prod']]
+                            'type': 'browser_type',
+                            'conditions': [['=', 'Chrome']]
                         }
                     ],
                     'value_when_matched': True

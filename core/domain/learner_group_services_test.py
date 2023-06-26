@@ -140,15 +140,14 @@ class LearnerGroupServicesUnitTests(test_utils.GenericTestBase):
                 param_domain.PlatformParameterRule.from_dict({
                     'filters': [
                         {
-                            'type': 'server_mode',
-                            'conditions': [
-                                ['=', param_domain.ServerMode.DEV.value]
-                            ]
+                            'type': 'platform_type',
+                            'conditions': [['=', 'Backend']]
                         }
                     ],
                     'value_when_matched': True
                 })
-            ]
+            ],
+            True
         )
         self.assertTrue(
             learner_group_services.is_learner_group_feature_enabled())
@@ -159,15 +158,14 @@ class LearnerGroupServicesUnitTests(test_utils.GenericTestBase):
                 param_domain.PlatformParameterRule.from_dict({
                     'filters': [
                         {
-                            'type': 'server_mode',
-                            'conditions': [
-                                ['=', param_domain.ServerMode.DEV.value]
-                            ]
+                            'type': 'platform_type',
+                            'conditions': [['=', 'Backend']]
                         }
                     ],
                     'value_when_matched': False
                 })
-            ]
+            ],
+            False
         )
         self.assertFalse(
             learner_group_services.is_learner_group_feature_enabled())

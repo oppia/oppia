@@ -21,6 +21,7 @@ from core.constants import constants
 from core.domain import platform_feature_services as feature_services
 from core.domain import platform_parameter_domain
 from core.domain import platform_parameter_list
+from core.domain import platform_parameter_registry
 from core.domain import question_services
 from core.domain import topic_domain
 from core.domain import topic_fetchers
@@ -36,6 +37,8 @@ class DiagnosticTestLandingPageTest(test_utils.GenericTestBase):
         super().setUp()
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
+        self.original_parameter_registry = (
+            platform_parameter_registry.Registry.parameter_registry.copy())
 
         feature_services.update_feature_flag(
             platform_parameter_list.ParamNames.DIAGNOSTIC_TEST.value,
@@ -44,17 +47,19 @@ class DiagnosticTestLandingPageTest(test_utils.GenericTestBase):
             [
                 platform_parameter_domain.PlatformParameterRule.from_dict({
                     'filters': [{
-                        'type': 'server_mode',
-                        'conditions': [[
-                            '=',
-                            platform_parameter_domain.FeatureStages.DEV.value]
-                            ]
+                        'type': 'platform_type',
+                        'conditions': [['=', 'Backend']]
                     }],
                     'value_when_matched': True
                 })
             ],
-            False
+            True
         )
+
+    def tearDown(self) -> None:
+        super().tearDown()
+        platform_parameter_registry.Registry.parameter_registry = (
+            self.original_parameter_registry)
 
     def test_should_access_diagnostic_test_page_in_dev_mode(self) -> None:
         with self.swap(constants, 'DEV_MODE', True):

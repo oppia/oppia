@@ -218,60 +218,21 @@ class PromoBarHandler(
         logging.info(
             '[RELEASE COORDINATOR] %s saved promo-bar config property values: '
             '%s' % (self.user_id, promo_bar_message_value))
-        server_mode = (
-            'dev'
-            if constants.DEV_MODE
-            else 'prod'
-            if feconf.ENV_IS_OPPIA_ORG_PRODUCTION_SERVER
-            else 'test'
-        )
-        rules_for_promo_bar_enabled_value = [
-            platform_parameter_domain.PlatformParameterRule.from_dict({
-                'filters': [
-                    {
-                        'type': 'server_mode',
-                        'conditions': [['=', server_mode]]
-                    }
-                ],
-                'value_when_matched': promo_bar_enabled_value
-            })
-        ]
-        rules_for_promo_bar_message_value = [
-            platform_parameter_domain.PlatformParameterRule.from_dict({
-                'filters': [
-                    {
-                        'type': 'server_mode',
-                        'conditions': [['=', server_mode]]
-                    }
-                ],
-                'value_when_matched': promo_bar_message_value
-            })
-        ]
-
-        promo_bar_enabled_parameter = (
-            registry.Registry.get_platform_parameter(
-                platform_parameter_list.ParamNames.PROMO_BAR_ENABLED.value)
-        )
-
-        promo_bar_message_parameter = (
-            registry.Registry.get_platform_parameter(
-                platform_parameter_list.ParamNames.PROMO_BAR_MESSAGE.value)
-        )
 
         registry.Registry.update_platform_parameter(
             'promo_bar_enabled',
             self.user_id,
             'Update promo_bar_enabled property from release '
             'coordinator page.',
-            rules_for_promo_bar_enabled_value,
-            promo_bar_enabled_parameter.default_value)
+            [],
+            promo_bar_enabled_value)
 
         registry.Registry.update_platform_parameter(
             'promo_bar_message',
             self.user_id,
             'Update promo_bar_message property from release '
             'coordinator page.',
-            rules_for_promo_bar_message_value,
-            promo_bar_message_parameter.default_value)
+            [],
+            promo_bar_message_value)
 
         self.render_json({})
