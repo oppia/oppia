@@ -19,6 +19,12 @@ body:
       required: true
   - type: textarea
     attributes:
+      label: URL
+      description: URL of the page where the issue is reproducible.
+    validations:
+      required: false 
+  - type: textarea
+    attributes:
       label: Steps To Reproduce
       description: Steps to reproduce the behavior. **Example:** "1. Go to the library page. 2. Click on the 'Sign in' button. 3. See error."
     validations:
