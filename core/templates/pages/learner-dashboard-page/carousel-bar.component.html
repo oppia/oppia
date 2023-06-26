@@ -1,0 +1,21 @@
+<div class="oppia-coursel-container">
+
+    <div class="left-right-button">
+         <button mat-button class="md-no-ink oppia-carousel-scroller"
+          (click)="scroll(true)">
+         <i class="fas fal fa-angle-left"></i>
+         </button> 
+
+        <button mat-button class="md-no-ink oppia-carousel-scroller"
+        (click)="scroll(false)">
+        <i class="fas fal fa-angle-right"></i>
+        </button>
+    </div>
+
+    <div class="oppia-carousel-content">
+        <div class="tiles">
+          <ng-content></ng-content>
+        </div>
+    </div>
+
+</div>

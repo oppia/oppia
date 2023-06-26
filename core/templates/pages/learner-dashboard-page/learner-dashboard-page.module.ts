@@ -31,6 +31,7 @@ import { LearnerTopicGoalsSummaryTileComponent } from 'components/summary-tile/l
 import { ProgressTabComponent } from './progress-tab.component';
 import { GoalsTabComponent } from './goals-tab.component';
 import { CommunityLessonsTabComponent } from './community-lessons-tab.component';
+import { CarouselBarComponent } from './carousel-bar.component';
 import { LearnerTopicSummaryTileComponent } from 'components/summary-tile/learner-topic-summary-tile.component';
 import { HomeTabComponent } from './home-tab.component';
 import { NewLearnerDashboardComponent } from './new-learner-dashboard.component';
@@ -69,6 +70,7 @@ import { MyHammerConfig, toastrConfig } from 'pages/oppia-root/app.module';
     LearnerGroupsTabComponent,
     LearnerTopicSummaryTileComponent,
     CommunityLessonsTabComponent,
+    CarouselBarComponent,
     RemoveActivityModalComponent,
     LearnerDashboardSuggestionModalComponent,
     DeclineInvitationModalComponent,
@@ -86,6 +88,7 @@ import { MyHammerConfig, toastrConfig } from 'pages/oppia-root/app.module';
     LearnerGroupsTabComponent,
     LearnerTopicSummaryTileComponent,
     CommunityLessonsTabComponent,
+    CarouselBarComponent,
     RemoveActivityModalComponent,
     LearnerDashboardSuggestionModalComponent,
     DeclineInvitationModalComponent,
