@@ -1,4 +1,4 @@
-// Copyright 2021 The Oppia Authors. All Rights Reserved.
+// Copyright 2023 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -88,7 +88,6 @@ export class BlogStatisticsTabComponent implements OnInit {
   directiveSubscriptions = new Subscription();
   constructor(
     private blogDashboardBackendApiService: BlogDashboardBackendApiService,
-    private blogDashboardPageService: BlogDashboardPageService,
     private alertsService: AlertsService,
     private windowDimensionsService: WindowDimensionsService,
   ) {}
@@ -264,6 +263,7 @@ export class BlogStatisticsTabComponent implements OnInit {
     this.blogDashboardBackendApiService.fetchBlogPostReadsStatsAsync(
       this.activeStatsBlogPostId
     ).then((stats: BlogPostReadsStats) => {
+      console.error(stats)
       let readsStats: Stats;
       readsStats = {
         hourlyStats: stats.hourlyReads,
@@ -335,7 +335,7 @@ export class BlogStatisticsTabComponent implements OnInit {
     let data = (this._dataForActiveChart as Stats).monthlyStats;
     let statsKeys = Object.keys(data);
     this.xAxisLabels = [];
-    statsKeys.map(dayKey => this.xAxisLabels.push(dayKey.replace('_', ' ')));
+    statsKeys.map(dayKey => this.xAxisLabels.push(dayKey.replace('_', '')));
     this.selectedTimePeriod = 'monthly';
     this.plotStatsGraph(data);
   }
@@ -355,7 +355,8 @@ export class BlogStatisticsTabComponent implements OnInit {
     this.xAxisLabels = [];
     let year = (new Date()).getFullYear();
     statsKeys.map(key => this.xAxisLabels.push(
-      dayjs(new Date (year, Number(key.replace('_', ' ')))).format('MMM YY')));
+      dayjs(new Date (year, Number(key.replace('_', ' ')) - 1)).format('MMM YY')
+    ));
     this.selectedTimePeriod = 'yearly';
     this.plotStatsGraph(data);
   }

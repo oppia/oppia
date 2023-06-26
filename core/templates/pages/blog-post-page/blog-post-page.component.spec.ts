@@ -91,7 +91,7 @@ describe('Blog home page component', () => {
     id: 'sampleBlogId',
     displayed_author_name: 'test_user',
     title: 'sample_title',
-    content: '<p>hello</p>',
+    content: '<p>hello bloggers</p>',
     thumbnail_filename: 'image.png',
     tags: ['learners', 'news'],
     url_fragment: 'sample-post-url',
@@ -153,6 +153,8 @@ describe('Blog home page component', () => {
     spyOn(loaderService, 'hideLoadingScreen');
     spyOn(urlService, 'getBlogPostUrlFromUrl').
       and.returnValue('sample-post-url');
+    spyOn(userService, 'getProfileImageDataUrl').and.returnValue(
+      ['default-image-url-png', 'default-image-url-webp']);
 
     blogPostData = BlogPostData.createFromBackendDict(
       sampleBlogPostBackendDict);
@@ -163,6 +165,7 @@ describe('Blog home page component', () => {
     };
     component.blogPostUrlFragment = 'sample-post-url';
     component.activeTimeUserStayedOnPostInMinutes = 0;
+    component.ngOnInit();
   });
 
   it('should get the blog post page url', () => {
@@ -223,9 +226,8 @@ describe('Blog home page component', () => {
       .and.returnValue('sample-url');
     spyOn(blogHomePageBackendApiService, 'recordBlogPostViewedEventAsync');
     spyOn(component, 'handleVisibilityChange');
+    spyOn(document, 'addEventListener');
     spyOnProperty(document, 'hidden').and.returnValue(false);
-    spyOn(userService, 'getProfileImageDataUrl').and.returnValue(
-      ['default-image-url-png', 'default-image-url-webp']);
 
     component.ngOnInit();
 
@@ -241,6 +243,10 @@ describe('Blog home page component', () => {
     expect(
       blogHomePageBackendApiService.recordBlogPostViewedEventAsync
     ).toHaveBeenCalledWith('sample-post-url');
+
+    document.dispatchEvent(visibilityChangeEvent);
+
+    expect(document.addEventListener).toHaveBeenCalled()
   });
 
   it('should fire blog post exited event after 45 minutes', fakeAsync(() => {

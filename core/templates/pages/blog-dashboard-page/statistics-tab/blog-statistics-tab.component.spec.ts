@@ -53,72 +53,72 @@ describe('Blog Dashboard Statistics Component', () => {
     moreThanTenMin: 0,
   };
   let hourlyStats: {[key: string]: number} = {
-    '00': 100,
-    '02': 200,
-    '03': 400,
-    '04': 100
+    '00_': 100,
+    '02_': 200,
+    '03_': 400,
+    '04_': 100
   };
   let weeklyStats: {[key: string]: number} = {
-    '02': 200,
-    '03': 400,
-    '04': 100,
-    '05': 200,
-    '06': 300,
-    '07': 100,
-    '08': 200
+    '02_': 200,
+    '03_': 400,
+    '04_': 100,
+    '05_': 200,
+    '06_': 300,
+    '07_': 100,
+    '08_': 200
   };
   let monthlyStats: {[key: string]: number} = {
-    '01': 100,
-    '02': 200,
-    '03': 400,
-    '04': 100,
-    '05': 200,
-    '06': 300,
-    '07': 100,
-    '08': 200
+    '01_': 100,
+    '02_': 200,
+    '03_': 400,
+    '04_': 100,
+    '05_': 200,
+    '06_': 300,
+    '07_': 100,
+    '08_': 200
   };
   let yearlyStats: {[key: string]: number} = {
-    '01': 100,
-    '02': 200,
-    '03': 400,
-    '04': 100,
-    '05': 200,
-    '06': 300,
-    '07': 100,
-    '08': 200,
-    '09': 300,
-    10: 400,
-    11: 10,
-    12: 10
+    '01_': 100,
+    '02_': 200,
+    '03_': 400,
+    '04_': 100,
+    '05_': 200,
+    '06_': 300,
+    '07_': 100,
+    '08_': 200,
+    '09_': 300,
+    '10_': 400,
+    '11_': 10,
+    '12_': 10
   };
   let allStats: {[key: string]: {[key: string]: number}} = {
     2022: {
-      '01': 100,
-      '02': 200,
-      '03': 400,
-      '04': 100,
-      '05': 200,
-      '06': 300,
-      '07': 100,
-      '08': 200,
-      '09': 300,
-      10: 0,
-      11: 0,
-      12: 0
+      '01_': 100,
+      '02_': 200,
+      '03_': 400,
+      '04_': 100,
+      '05_': 200,
+      '06_': 300,
+      '07_': 100,
+      '08_': 200,
+      '09_': 300,
+      '10_': 0,
+      '11_': 0,
+      '12_': 0
     },
     2021: {
-      '01': 100,
-      '02': 200,
-      '03': 400,
-      '04': 100,
-      '05': 200,
-      '06': 300,
-      '07': 100,
-      '08': 200,
-      '09': 300,
-      10: 0,
-      11: 400,
-      12: 0
+      '01_': 100,
+      '02_': 200,
+      '03_': 400,
+      '04_': 100,
+      '05_': 200,
+      '06_': 300,
+      '07_': 100,
+      '08_': 200,
+      '09_': 300,
+      '10__': 0,
+      '11_': 400,
+      '12_': 0
     }
   };
   let blogPostViewsStatsObject: BlogPostViewsStats = {
@@ -191,8 +191,7 @@ describe('Blog Dashboard Statistics Component', () => {
       document.createElement('div').appendChild(svgContainer));
     let baseTime = new Date();
     baseTime.setHours(5);
-    baseTime.setDate(20);
-    baseTime.setMonth(10);
+    baseTime.setFullYear(2022, 10, 20);
     jasmine.clock().mockDate(baseTime);
   });
 
@@ -746,7 +745,7 @@ describe('Blog Dashboard Statistics Component', () => {
 
     expect(component.loadingChartSpinnerShown).toBeTrue();
     expect(component.xAxisLabels).toEqual(
-      ['1', '2', '3', '4', '5', '6', '7', '8']);
+      ['01', '02', '03', '04', '05', '06', '07', '08']);
     expect(component.plotStatsGraph).toHaveBeenCalled();
   });
 
