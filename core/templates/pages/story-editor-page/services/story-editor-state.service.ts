@@ -283,8 +283,8 @@ export class StoryEditorStateService {
     return this._storyIsBeingSaved;
   }
 
-  setCurrentNodeAsPublishable(val: boolean): void {
-    this._currentNodeIsPublishable = val;
+  setCurrentNodeAsPublishable(currentNodeIsPublishable: boolean): void {
+    this._currentNodeIsPublishable = currentNodeIsPublishable;
   }
 
   isCurrentNodePublishable(): boolean {

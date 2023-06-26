@@ -226,8 +226,7 @@ export class StoryNodeEditorComponent implements OnInit, OnDestroy {
   }
 
   updatePlannedPublicationDate(dateString: string | null): void {
-    let newPlannedPublicationDate = dateString && dateString.length ? new Date(
-      dateString) : null;
+    let newPlannedPublicationDate = dateString ? new Date(dateString) : null;
 
     if (newPlannedPublicationDate !== this.plannedPublicationDate) {
       if (newPlannedPublicationDate) {

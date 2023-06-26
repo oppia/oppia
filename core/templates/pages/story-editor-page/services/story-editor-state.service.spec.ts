@@ -544,15 +544,13 @@ describe('Story editor state service', () => {
     expect(storyEditorStateService.areAnyExpIdsChanged()).toBeFalse();
   });
 
-  it('should set _currentNodeIsPublishable when setCurrentNodeAsPublishable ' +
-  'is called', () => {
+  it('should set current node as publishable', () => {
     storyEditorStateService._currentNodeIsPublishable = false;
     storyEditorStateService.setCurrentNodeAsPublishable(true);
     expect(storyEditorStateService._currentNodeIsPublishable).toBe(true);
   });
 
-  it('should return _currentNodeIsPublishable when isCurrentNodePublishable ' +
-  'is called', () => {
+  it('should return if current node is publishable', () => {
     storyEditorStateService._currentNodeIsPublishable = false;
     expect(storyEditorStateService.isCurrentNodePublishable()).toBe(false);
     storyEditorStateService._currentNodeIsPublishable = true;

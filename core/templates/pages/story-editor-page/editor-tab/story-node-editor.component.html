@@ -321,21 +321,21 @@
               <i class="fa fa-exclamation-triangle" *ngIf="!currentTitle"></i>
               <i class="fa fa-check todo-completed" *ngIf="currentTitle"></i>
             </div>
-            <span>Title</span>
+            <span class="checklist-item-name">Title</span>
           </div>
           <div class="todo-item-container">
             <div>
               <i class="fa fa-exclamation-triangle" *ngIf="!currentDescription"></i>
               <i class="fa fa-check todo-completed" *ngIf="currentDescription"></i>
             </div>
-            <span>Chapter Description</span>
+            <span class="checklist-item-name">Chapter Description</span>
           </div>
           <div class="todo-item-container">
             <div>
               <i class="fa fa-exclamation-triangle" *ngIf="!explorationId"></i>
               <i class="fa fa-check todo-completed" *ngIf="explorationId"></i>
             </div>
-            <span>Exploration ID</span>
+            <span class="checklist-item-name">Exploration ID</span>
           </div>
           <div class="todo-item-container">
             <div>
@@ -344,19 +344,19 @@
               <i class="fa fa-check todo-completed" *ngIf="editableThumbnailBgColor || editableThumbnailFilename">
               </i>
             </div>
-            <span>Thumbnail Image</span>
+            <span class="checklist-item-name">Thumbnail Image</span>
           </div>
           <div class="todo-item-container">
             <div>
               <i class="fa fa-exclamation-triangle" *ngIf="!outlineIsFinalized"></i>
               <i class="fa fa-check todo-completed" *ngIf="outlineIsFinalized"></i>
             </div>
-            <span>Chapter Outline</span>
+            <span class="checklist-item-name">Chapter Outline</span>
           </div>
           <div class="todo-item-container">
             <i class="fa fa-exclamation-triangle" *ngIf="!plannedPublicationDate"></i>
             <i class="fa fa-check todo-completed" *ngIf="plannedPublicationDate"></i>
-            <span>Planned Publication Date</span>
+            <span class="checklist-item-name">Planned Publication Date</span>
           </div>
         </div>
       </mat-card>
@@ -399,7 +399,7 @@
     display: flex;
     margin-bottom: 10%;
   }
-  .checklist-items .todo-item-container span {
+  .checklist-items .todo-item-container .checklist-item-name {
     margin-left: 10%;
   }
   .story-node-header {
