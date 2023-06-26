@@ -2,9 +2,7 @@ FROM node:16.13.0-alpine
 
 WORKDIR /app/oppia
 
-RUN npm install -g https://github.com/oppia/firebase-tools/releases/download/v9.6.0-PATCH/firebase-tools-9.6.0-PATCH.tgz
-
-COPY .firebase.json ./
+COPY .firebase.json .
 
 #TODO explain the post script!
 RUN echo "export firebase auth users data in the /app/firebase_emulator_cache directory" > sh -c "/app/oppia/node_modules/firebase-tools/lib/bin/firebase.js emulators:export /app/firebase_emulator_cache --project=dev-project-id"

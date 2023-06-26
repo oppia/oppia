@@ -356,7 +356,6 @@ def managed_redis_server() -> Iterator[psutil.Process]:
 
     # OK to use shell=True here because we are passing string literals and
     # constants, so there is no risk of a shell-injection attack.
-    print('checking redis in servers.py')
     proc_context = managed_process(
         [common.REDIS_SERVER_PATH, common.REDIS_CONF_PATH],
         human_readable_name='Redis Server', shell=True)
