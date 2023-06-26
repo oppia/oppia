@@ -26,7 +26,7 @@ from typing import Dict, List, Optional
 
 # Redis client for our own implementation of caching.
 OPPIA_REDIS_CLIENT = redis.StrictRedis(
-    host='redis',
+    host=feconf.REDISHOST,
     port=feconf.REDISPORT,
     db=feconf.OPPIA_REDIS_DB_INDEX,
     decode_responses=True
@@ -34,7 +34,7 @@ OPPIA_REDIS_CLIENT = redis.StrictRedis(
 
 # Redis client for the Cloud NDB cache.
 CLOUD_NDB_REDIS_CLIENT = redis.StrictRedis(
-    host='redis',
+    host=feconf.REDISHOST,
     port=feconf.REDISPORT,
     db=feconf.CLOUD_NDB_REDIS_DB_INDEX
 )

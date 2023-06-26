@@ -534,7 +534,7 @@ VALID_MAILCHIMP_FIELD_KEYS = ['NAME']
 VALID_MAILCHIMP_TAGS = ['Account', 'Android', 'Web']
 
 # TODO: (#18260) Change this when we permanently move to the Dockerized Setup.
-ES_HOST = 'elasticsearch'
+ES_HOST = 'elasticsearch' if OPPIA_IS_DOCKERIZED else 'localhost'
 ES_LOCALHOST_PORT = 9200
 # NOTE TO RELEASE COORDINATORS: Replace this with the correct ElasticSearch
 # auth information during deployment.
@@ -1364,7 +1364,7 @@ FIREBASE_ROLE_SUPER_ADMIN = 'super_admin'
 FIREBASE_AUTH_ID_REGEX = '^[A-Za-z0-9]{1,128}$'
 
 # TODO: (#18260) Change this when we permanently move to the Dockerized Setup.
-CLOUD_DATASTORE_EMULATOR_HOST = 'datastore'
+CLOUD_DATASTORE_EMULATOR_HOST = 'datastore' if OPPIA_IS_DOCKERIZED else 'localhost'
 CLOUD_DATASTORE_EMULATOR_PORT = 8089
 
 FIREBASE_EMULATOR_CONFIG_PATH = '.firebase.json'

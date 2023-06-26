@@ -172,6 +172,7 @@ services:
       - "4000:4000"
     volumes:
       - shared_root_dir:/app/oppia
+      - /app/firebase_emulator_cache
     healthcheck:
       test: wget --spider http://localhost:4000/auth/ || exit 1
       timeout: 10s
@@ -179,14 +180,22 @@ services:
       retries: 5
     environment:
       - oppia_is_dockerized=true
+# --export-on-exit${save_datastore:+ --import} \
+    # command: >
+    #   sh -c '
+    #     /app/oppia/node_modules/firebase-tools/lib/bin/firebase.js emulators:start \
+    #     --only auth \
+    #     --project=dev-project-id \
+    #     --config=/app/oppia/.firebase.json \
+    #     --import=/app/firebase_emulator_cache \
+    #     --export-on-exit=/app/firebase_emulator_cache
+    #   '
+        # trap "/app/oppia/node_modules/firebase-tools/lib/bin/firebase.js auth:export /firebase_emulator_cache --format=json --project=dev-project-id" SIGTERM;
     command: >
       sh -c '
-        /app/oppia/node_modules/firebase-tools/lib/bin/firebase.js emulators:start \
-        --only auth \
-        --project=dev-project-id \
-        --config=/app/oppia/.firebase.json \
-        --export-on-exit${save_datastore:+ --import} \
-        /app/firebase_emulator_cache
+        trap "/app/oppia/node_modules/firebase-tools/lib/bin/firebase.js emulators:exec --only auth '\''firebase auth:export /app/firebase_emulator_cache --format=json --project=dev-project-id'\''" EXIT;
+        
+        /app/oppia/node_modules/firebase-tools/lib/bin/firebase.js emulators:start --only auth --project=dev-project-id --config=/app/oppia/.firebase.json --import=/app/firebase_emulator_cache --export-on-exit=/app/firebase_emulator_cache
       '
 
   redis:
