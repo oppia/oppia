@@ -69,7 +69,7 @@ export class CarouselBarComponent implements OnInit {
     let carouselJQuerySelector = (
       '.tiles');
 
-    let direction = isLeftScroll ? -1 : 1;
+    // Let direction = isLeftScroll ? -1 : 1;
 
     let carouselScrollPositionPx = $(
       carouselJQuerySelector).scrollLeft() || 0;
@@ -77,8 +77,9 @@ export class CarouselBarComponent implements OnInit {
 
     carouselScrollPositionPx = Math.max(0, carouselScrollPositionPx);
 
-    let newScrollPositionPx = carouselScrollPositionPx +
-      (1 * AppConstants.LEARN_SOMETHING_NEW_TILE_WIDTH_PX * direction);
+    let newScrollPositionPx = carouselScrollPositionPx;
+    // +
+    // (1 * AppConstants.LEARN_SOMETHING_NEW_TILE_WIDTH_PX * direction);
 
     console.error(newScrollPositionPx);
 
