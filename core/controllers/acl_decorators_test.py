@@ -6822,6 +6822,9 @@ class EditSkillDecoratorTests(test_utils.GenericTestBase):
         ))
 
     def test_cannot_edit_skill_with_invalid_skill_id(self) -> None:
+        """Tests that a user cannot edit a skill if the skill ID is
+        invalid.
+        """
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_custom_response(
@@ -6829,6 +6832,7 @@ class EditSkillDecoratorTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_admin_can_edit_skill(self) -> None:
+        """Tests that the admin can edit a skill."""
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json('/mock_edit_skill/%s' % self.skill_id)
@@ -6836,6 +6840,7 @@ class EditSkillDecoratorTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_topic_manager_can_edit_public_skill(self) -> None:
+        """Tests that the topic manager can edit a public skill."""
         self.login(self.manager_email)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json('/mock_edit_skill/%s' % self.skill_id)
@@ -6843,6 +6848,7 @@ class EditSkillDecoratorTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_normal_user_cannot_edit_public_skill(self) -> None:
+        """Tests that a normal user cannot edit a public skill."""
         self.login(self.viewer_email)
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
@@ -6850,6 +6856,7 @@ class EditSkillDecoratorTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_guest_cannot_edit_public_skill(self) -> None:
+        """Tests that a guest user cannot edit a public skill."""
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/mock_edit_skill/%s' % self.skill_id, expected_status_int=401)
@@ -6885,6 +6892,7 @@ class DeleteSkillDecoratorTests(test_utils.GenericTestBase):
         ))
 
     def test_admin_can_delete_skill(self) -> None:
+        """Tests that the admin can delete a skill."""
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json('/mock_delete_skill')
@@ -6892,12 +6900,14 @@ class DeleteSkillDecoratorTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_normal_user_cannot_delete_public_skill(self) -> None:
+        """Tests that a normal user cannot delete a public skill."""
         self.login(self.viewer_email)
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json('/mock_delete_skill', expected_status_int=401)
         self.logout()
 
     def test_guest_cannot_delete_public_skill(self) -> None:
+        """Tests that a guest user cannnot delete a public skill."""
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/mock_delete_skill', expected_status_int=401)
@@ -6958,6 +6968,7 @@ class EditQuestionDecoratorTests(test_utils.GenericTestBase):
         ))
 
     def test_guest_cannot_edit_question(self) -> None:
+        """Tests that a guest user cannot edit a question."""
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/mock_edit_question/%s' % self.question_id,
@@ -6967,6 +6978,9 @@ class EditQuestionDecoratorTests(test_utils.GenericTestBase):
             'You must be logged in to access this resource.')
 
     def test_cannot_edit_question_with_invalid_question_id(self) -> None:
+        """Tests that a user cannot edit a question if the question ID is
+        invalid.
+        """
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
@@ -6975,6 +6989,7 @@ class EditQuestionDecoratorTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_admin_can_edit_question(self) -> None:
+        """Tests that the admin can edit a question."""
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(
@@ -6983,6 +6998,7 @@ class EditQuestionDecoratorTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_topic_manager_can_edit_question(self) -> None:
+        """Tests that a topic manager can edit questions."""
         self.login(self.user_a_email)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(
@@ -6991,6 +7007,7 @@ class EditQuestionDecoratorTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_any_user_cannot_edit_question(self) -> None:
+        """Test that not any user can edit a question."""
         self.login(self.user_b_email)
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
@@ -7052,6 +7069,7 @@ class ViewQuestionEditorDecoratorTests(test_utils.GenericTestBase):
         ))
 
     def test_guest_cannot_view_question_editor(self) -> None:
+        """Tests that a guest user cannot view a question editor."""
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/mock_view_question_editor/%s' % self.question_id,
@@ -7062,6 +7080,9 @@ class ViewQuestionEditorDecoratorTests(test_utils.GenericTestBase):
     def test_cannot_view_question_editor_with_invalid_question_id(
         self
     ) -> None:
+        """Tests that a user cannot view a question editor if the question ID
+        is invalid.
+        """
         invalid_id = 'invalid_question_id'
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
@@ -7076,6 +7097,7 @@ class ViewQuestionEditorDecoratorTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_curriculum_admin_can_view_question_editor(self) -> None:
+        """Tests that the curriculum admin can view a question editor."""
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(
@@ -7084,6 +7106,7 @@ class ViewQuestionEditorDecoratorTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_topic_manager_can_view_question_editor(self) -> None:
+        """Tests that a topic manager can view a question editor."""
         self.login(self.user_a_email)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(
@@ -7092,6 +7115,7 @@ class ViewQuestionEditorDecoratorTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_normal_user_cannot_view_question_editor(self) -> None:
+        """Tests that a normal user cannot view a question editor."""
         self.login(self.user_b_email)
         user_id_b = self.get_user_id_from_email(self.user_b_email)
         with self.swap(self, 'testapp', self.mock_testapp):
@@ -7152,6 +7176,7 @@ class DeleteQuestionDecoratorTests(test_utils.GenericTestBase):
         ))
 
     def test_guest_cannot_delete_question(self) -> None:
+        """Tests that a guest user cannot delete a question."""
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/mock_delete_question/%s' % self.question_id,
@@ -7160,6 +7185,7 @@ class DeleteQuestionDecoratorTests(test_utils.GenericTestBase):
         self.assertEqual(response['error'], error_msg)
 
     def test_curriculum_admin_can_delete_question(self) -> None:
+        """Tests that a curriculum admin can delete a question."""
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(
@@ -7168,6 +7194,7 @@ class DeleteQuestionDecoratorTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_topic_manager_can_delete_question(self) -> None:
+        """Tests that a topic manager can delete a question."""
         self.login(self.user_a_email)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(
@@ -7176,6 +7203,7 @@ class DeleteQuestionDecoratorTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_normal_user_cannot_delete_question(self) -> None:
+        """Tests that a normal user cannot delete a question."""
         self.login(self.user_b_email)
         user_id_b = self.get_user_id_from_email(self.user_b_email)
         with self.swap(self, 'testapp', self.mock_testapp):
@@ -7226,6 +7254,9 @@ class PlayQuestionDecoratorTests(test_utils.GenericTestBase):
             content_id_generator.next_content_id_index)
 
     def test_can_play_question_with_valid_question_id(self) -> None:
+        """Tests that a user can play a question if the question ID is
+        valid.
+        """
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json('/mock_play_question/%s' % (
                 self.question_id))
@@ -7289,6 +7320,9 @@ class PlayEntityDecoratorTests(test_utils.GenericTestBase):
         rights_manager.publish_exploration(self.owner, self.published_exp_id)
 
     def test_cannot_play_exploration_on_disabled_exploration_ids(self) -> None:
+        """Tests that a user cannot play an exploration if the the exploration
+        ID is disabled.
+        """
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json('/mock_play_entity/%s/%s' % (
                 feconf.ENTITY_TYPE_EXPLORATION,
@@ -7297,6 +7331,9 @@ class PlayEntityDecoratorTests(test_utils.GenericTestBase):
     def test_guest_can_play_exploration_on_published_exploration(
         self
     ) -> None:
+        """Tests that a guest user can play an exploration if the exploration
+        is published.
+        """
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json('/mock_play_entity/%s/%s' % (
                 feconf.ENTITY_TYPE_EXPLORATION, self.published_exp_id))
@@ -7306,12 +7343,18 @@ class PlayEntityDecoratorTests(test_utils.GenericTestBase):
                 response['entity_id'], self.published_exp_id)
 
     def test_guest_cannot_play_exploration_on_private_exploration(self) -> None:
+        """Tests that a guest user cannot play an exploration if the
+        exploration is private.
+        """
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json('/mock_play_entity/%s/%s' % (
                 feconf.ENTITY_TYPE_EXPLORATION,
                 self.private_exp_id), expected_status_int=404)
 
     def test_cannot_play_exploration_with_none_exploration_rights(self) -> None:
+        """Tests that a user cannot play an exploration if the exploration
+        rights are set to none.
+        """
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
                 '/mock_play_entity/%s/%s'
@@ -7319,6 +7362,9 @@ class PlayEntityDecoratorTests(test_utils.GenericTestBase):
                 expected_status_int=404)
 
     def test_can_play_question_for_valid_question_id(self) -> None:
+        """Tests that a user can play a question if the question ID is
+        valid.
+        """
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json('/mock_play_entity/%s/%s' % (
                 feconf.ENTITY_TYPE_QUESTION, self.question_id))
@@ -7328,12 +7374,18 @@ class PlayEntityDecoratorTests(test_utils.GenericTestBase):
         self.assertEqual(response['entity_type'], 'question')
 
     def test_cannot_play_question_invalid_question_id(self) -> None:
+        """Tests that a user cannot play a question if the question ID is
+        invalid.
+        """
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json('/mock_play_entity/%s/%s' % (
                 feconf.ENTITY_TYPE_QUESTION, 'question_id'),
                           expected_status_int=404)
 
     def test_cannot_play_entity_for_invalid_entity(self) -> None:
+        """Tests that a user cannot play an entity if the entity ID is
+        invalid.
+        """
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json('/mock_play_entity/%s/%s' % (
                 'fake_entity_type', 'fake_entity_id'), expected_status_int=404)
@@ -7403,6 +7455,9 @@ class EditEntityDecoratorTests(test_utils.GenericTestBase):
         rights_manager.publish_exploration(self.owner, self.published_exp_id)
 
     def test_can_edit_exploration_with_valid_exp_id(self) -> None:
+        """Tests that the owner can edit an exploration if the exploration ID
+        is valid.
+        """
         self.login(self.OWNER_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(
@@ -7415,6 +7470,9 @@ class EditEntityDecoratorTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_cannot_edit_exploration_with_invalid_exp_id(self) -> None:
+        """Tests that the owner cannot edit an exploration if the exploration
+        ID is invalid.
+        """
         self.login(self.OWNER_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
@@ -7423,6 +7481,7 @@ class EditEntityDecoratorTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_banned_user_cannot_edit_exploration(self) -> None:
+        """Tests that a banned user cannot edit an exploration."""
         self.login(self.user_email)
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
@@ -7432,6 +7491,9 @@ class EditEntityDecoratorTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_can_edit_question_with_valid_question_id(self) -> None:
+        """Tests that a curriculum admin can edit a question if the question
+        ID is valid.
+        """
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json('/mock_edit_entity/%s/%s' % (
@@ -7441,6 +7503,7 @@ class EditEntityDecoratorTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_can_edit_topic(self) -> None:
+        """Tests that a curriculum admin can edit a topic."""
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         topic_id = topic_fetchers.get_new_topic_id()
         self.save_new_topic(
@@ -7456,6 +7519,9 @@ class EditEntityDecoratorTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_cannot_edit_topic_with_invalid_topic_id(self) -> None:
+        """Tests that a curriculum admin cannot edit a topic if the topic ID
+        is invalid.
+        """
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         topic_id = 'incorrect_id'
         with self.swap(self, 'testapp', self.mock_testapp):
@@ -7466,6 +7532,7 @@ class EditEntityDecoratorTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_can_edit_skill(self) -> None:
+        """Tests that a curriculum admin can edit a skill."""
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         skill_id = skill_services.get_new_skill_id()
         self.save_new_skill(skill_id, self.admin_id, description='Description')
@@ -7477,6 +7544,7 @@ class EditEntityDecoratorTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_can_submit_images_to_questions(self) -> None:
+        """Tests that a curriculum admin can submit images to questions."""
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         skill_id = skill_services.get_new_skill_id()
         self.save_new_skill(skill_id, self.admin_id, description='Description')
@@ -7490,6 +7558,9 @@ class EditEntityDecoratorTests(test_utils.GenericTestBase):
     def test_unauthenticated_users_cannot_submit_images_to_questions(
         self
     ) -> None:
+        """Tests that an authenticated user cannnot submit images to a
+        question.
+        """
         skill_id = skill_services.get_new_skill_id()
         self.save_new_skill(skill_id, self.admin_id, description='Description')
         with self.swap(self, 'testapp', self.mock_testapp):
@@ -7500,6 +7571,9 @@ class EditEntityDecoratorTests(test_utils.GenericTestBase):
     def test_cannot_submit_images_to_questions_without_having_permissions(
         self
     ) -> None:
+        """Tests that a user cannot submit images to a question if the user
+        has no permissions.
+        """
         self.login(self.user_email)
         skill_id = skill_services.get_new_skill_id()
         self.save_new_skill(skill_id, self.admin_id, description='Description')
@@ -7513,6 +7587,7 @@ class EditEntityDecoratorTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_can_edit_blog_post(self) -> None:
+        """Tests that a blog admin can edit a blog post."""
         self.login(self.BLOG_ADMIN_EMAIL)
         blog_admin_id = (
             self.get_user_id_from_email(self.BLOG_ADMIN_EMAIL))
@@ -7526,6 +7601,7 @@ class EditEntityDecoratorTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_can_edit_story(self) -> None:
+        """Tests that a curriculum admin can edit a story."""
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         story_id = story_services.get_new_story_id()
         topic_id = topic_fetchers.get_new_topic_id()
@@ -7543,6 +7619,9 @@ class EditEntityDecoratorTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_cannot_edit_entity_invalid_entity(self) -> None:
+        """Tests that a user cannot edit an entity if the entity ID is
+        invalid.
+        """
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json('/mock_edit_entity/%s/%s' % (
                 'invalid_entity_type', 'q_id'), expected_status_int=404)
@@ -7619,6 +7698,7 @@ class SaveExplorationTests(test_utils.GenericTestBase):
             self.role)
 
     def test_unautheticated_user_cannot_save_exploration(self) -> None:
+        """Tests that an authenticated user cannot save an exploration."""
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
                 '/mock/%s' % self.private_exp_id_1, expected_status_int=401)
