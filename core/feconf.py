@@ -82,7 +82,7 @@ def check_dev_mode_is_true() -> None:
 check_dev_mode_is_true()
 
 # TODO: (#18260) Remove this when we permanently move to the Dockerized Setup.
-OPPIA_IS_DOCKERIZED = os.environ.get('oppia_is_dockerized')
+OPPIA_IS_DOCKERIZED = bool(os.environ.get('oppia_is_dockerized'))
 CLASSIFIERS_DIR = os.path.join('extensions', 'classifiers')
 TESTS_DATA_DIR = os.path.join('core', 'tests', 'data')
 SAMPLE_EXPLORATIONS_DIR = os.path.join('data', 'explorations')
