@@ -20,7 +20,7 @@ body:
   - type: textarea
     attributes:
       label: URL
-      description: URL of the page where the issue is reproducible if applicable.
+      description: URL of the page where the issue is observed, if applicable.
     validations:
       required: false 
   - type: textarea
