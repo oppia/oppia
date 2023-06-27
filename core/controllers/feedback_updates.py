@@ -99,14 +99,8 @@ class FeedbackUpdatesHandler(
                 )
             )
             paginated_threads_list = [
-<<<<<<< HEAD
                 full_thread_ids[index: index + paginated_threads_list_max_size]
                 for index in range(0, len(full_thread_ids), paginated_threads_list_max_size)]
-=======
-                full_thread_ids[index: index + 100]
-                for index in range(0, len(full_thread_ids), 100)
-            ]
->>>>>>> 4365063d028eee90d1ea2823c4fe05a706180795
         else:
             paginated_threads_list = self.normalized_payload[
                 'paginated_threads_list'
