@@ -199,40 +199,39 @@ export class AdminPlatformParametersTabComponent implements OnInit {
       return;
     }
     for (let param of this.platformParameters) {
-      let commitMessage = `Update default value for '${param.name}'.`
+      let commitMessage = `Update default value for '${param.name}'.`;
       await this.updatePlatformParameter(param, commitMessage);
     }
   }
 
   async updatePlatformParameter(
-    param: PlatformParameter, commitMessage: string
-  ): Promise<void> {
-    try {
-      this.adminTaskManager.startTask();
+    param: PlatformParameter, commitMessage: string): Promise<void> {
+      try {
+        this.adminTaskManager.startTask();
 
-      await this.apiService.updatePlatformParameter(
-        param.name, commitMessage, param.rules, param.defaultValue);
+        await this.apiService.updatePlatformParameter(
+          param.name, commitMessage, param.rules, param.defaultValue);
 
-      this.platformParameterNameToBackupMap.set(param.name, cloneDeep(param));
+        this.platformParameterNameToBackupMap.set(param.name, cloneDeep(param));
 
-      this.setStatusMessage.emit('Saved successfully.');
-    // We use unknown type because we are unsure of the type of error
-    // that was thrown. Since the catch block cannot identify the
-    // specific type of error, we are unable to further optimise the
-    // code by introducing more types of errors.
-    } catch (e: unknown) {
-      if (e instanceof HttpErrorResponse) {
-        if (e.error && e.error.error) {
-          this.setStatusMessage.emit(`Update failed: ${e.error.error}`);
+        this.setStatusMessage.emit('Saved successfully.');
+      // We use unknown type because we are unsure of the type of error
+      // that was thrown. Since the catch block cannot identify the
+      // specific type of error, we are unable to further optimise the
+      // code by introducing more types of errors.
+      } catch (e: unknown) {
+        if (e instanceof HttpErrorResponse) {
+          if (e.error && e.error.error) {
+            this.setStatusMessage.emit(`Update failed: ${e.error.error}`);
+          } else {
+            this.setStatusMessage.emit('Update failed.');
+          }
         } else {
-          this.setStatusMessage.emit('Update failed.');
+          throw new Error('Unexpected error response.');
         }
-      } else {
-        throw new Error('Unexpected error response.');
+      } finally {
+        this.adminTaskManager.finishTask();
       }
-    } finally {
-      this.adminTaskManager.finishTask();
-    }
   }
 
   async updateParameterRulesAsync(param: PlatformParameter): Promise<void> {

@@ -220,36 +220,35 @@ export class FeaturesTabComponent implements OnInit {
       return;
     }
     for (let feature of this.featureFlags) {
-      let commitMessage = `Update default value for '${feature.name}'.`
+      let commitMessage = `Update default value for '${feature.name}'.`;
       await this.updateFeatureFlag(feature, commitMessage);
     }
   }
 
   async updateFeatureFlag(
-    feature: PlatformParameter, commitMessage: string
-  ): Promise<void> {
-    try {
-      await this.apiService.updateFeatureFlag(
-        feature.name, commitMessage, feature.rules, feature.defaultValue);
+    feature: PlatformParameter, commitMessage: string): Promise<void> {
+      try {
+        await this.apiService.updateFeatureFlag(
+          feature.name, commitMessage, feature.rules, feature.defaultValue);
 
-      this.featureFlagNameToBackupMap.set(feature.name, cloneDeep(feature));
+        this.featureFlagNameToBackupMap.set(feature.name, cloneDeep(feature));
 
-      this.setStatusMessage.emit('Saved successfully.');
-    // We use unknown type because we are unsure of the type of error
-    // that was thrown. Since the catch block cannot identify the
-    // specific type of error, we are unable to further optimise the
-    // code by introducing more types of errors.
-    } catch (e: unknown) {
-      if (e instanceof HttpErrorResponse) {
-        if (e.error && e.error.error) {
-          this.setStatusMessage.emit(`Update failed: ${e.error.error}`);
+        this.setStatusMessage.emit('Saved successfully.');
+      // We use unknown type because we are unsure of the type of error
+      // that was thrown. Since the catch block cannot identify the
+      // specific type of error, we are unable to further optimise the
+      // code by introducing more types of errors.
+      } catch (e: unknown) {
+        if (e instanceof HttpErrorResponse) {
+          if (e.error && e.error.error) {
+            this.setStatusMessage.emit(`Update failed: ${e.error.error}`);
+          } else {
+            this.setStatusMessage.emit('Update failed.');
+          }
         } else {
-          this.setStatusMessage.emit('Update failed.');
+          throw new Error('Unexpected error response.');
         }
-      } else {
-        throw new Error('Unexpected error response.');
       }
-    }
   }
 
   async updateFeatureRulesAsync(feature: PlatformParameter): Promise<void> {
