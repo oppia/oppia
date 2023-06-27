@@ -26,6 +26,7 @@ import { AppConstants } from 'app.constants';
 import { SvgSanitizerService } from 'services/svg-sanitizer.service';
 import { AssetsBackendApiService } from 'services/assets-backend-api.service';
 import { SimpleChanges } from '@angular/core';
+import { By } from '@angular/platform-browser';
 
 describe('NoninteractiveImage', () => {
   let component: NoninteractiveImage;
@@ -323,4 +324,12 @@ describe('NoninteractiveImage', () => {
       // This is tested to make sure the function did no continue to execute.
       expect(imagePreloaderService.getDimensionsOfImage).not.toHaveBeenCalled();
     });
+  it('should show alt text images when showAltText property is true', () => {
+    component.showAltText = true;
+    component.imageAltText = 'This is alt text';
+    fixture.detectChanges();
+
+    const altTextcomponent = document.querySelector('figcaption.alt-text');
+    expect(altTextcomponent.textContent).toEqual('Description: '+component.imageAltText);
+  });
 });
