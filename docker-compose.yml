@@ -14,8 +14,7 @@ services:
       - NODE_ENV=development
       - oppia_is_dockerized=true
     healthcheck:
-      # TODO: Add a variable for the folder name inside the dist as per the prod_env flag is passed or not.
-      test: bash -n "$(ls -A /app/oppia/dist)" || exit 1
+      test: test "$(ls -A /app/oppia/dist)" || exit 1
       timeout: 30s
       interval: 30s
       retries: 5
@@ -55,7 +54,7 @@ services:
     environment:
       - oppia_is_dockerized=true
     healthcheck:
-      test: bash -n "$(ls -A /app/oppia/webpack_bundles)" || exit 1
+      test: test "$(ls -A /app/oppia/webpack_bundles)" || exit 1
       timeout: 30s
       interval: 30s
       retries: 5
