@@ -105,7 +105,7 @@ class FeedbackUpdatesHandler(
         """Handles POST requests."""
         assert self.user_id is not None
         assert self.normalized_payload is not None
-        if len(self.normalized_payload['paginated_threads_list']) == 0:
+        if not self.normalized_payload['paginated_threads_list']:
             full_thread_ids = (
                 subscription_services.get_all_threads_subscribed_to(
                     self.user_id
