@@ -17,7 +17,7 @@
  */
 
 import { AppConstants } from 'app.constants';
-import { Component, ElementRef, HostListener, Input, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { DeviceInfoService } from 'services/contextual/device-info.service';
 import { Subscription } from 'rxjs';
@@ -66,24 +66,21 @@ export class CarouselBarComponent implements OnInit {
   }
 
   scroll(isLeftScroll: boolean): void {
-    let carouselJQuerySelector = (
-      '.tiles');
+    let carouselSelector = document.querySelector('.tiles') as HTMLElement;
 
-    // Let direction = isLeftScroll ? -1 : 1;
+    let direction = isLeftScroll ? -1 : 1;
 
-    let carouselScrollPositionPx = $(
-      carouselJQuerySelector).scrollLeft() || 0;
-
+    let carouselScrollPositionPx = (
+      carouselSelector).scrollLeft || 0;
 
     carouselScrollPositionPx = Math.max(0, carouselScrollPositionPx);
 
-    let newScrollPositionPx = carouselScrollPositionPx;
-    // +
-    // (1 * AppConstants.LEARN_SOMETHING_NEW_TILE_WIDTH_PX * direction);
+    let newScrollPositionPx = carouselScrollPositionPx +
+    (1 * AppConstants.LEARN_SOMETHING_NEW_TILE_WIDTH_PX * direction);
 
     console.error(newScrollPositionPx);
 
-    $(carouselJQuerySelector).animate({
+    $(carouselSelector).animate({
       scrollLeft: newScrollPositionPx
     }, {
       duration: 800,

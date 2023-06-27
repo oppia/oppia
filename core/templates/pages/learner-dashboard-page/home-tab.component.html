@@ -43,10 +43,12 @@
         <div class="topic-summary-tile-scroll">
           <div class="topic-summary-tile-section d-flex"
             [ngStyle]="windowIsNarrow && {'width': getWidth(item.value.length) + 'px'}">
-            <div *ngFor="let topicSummaryTile of item.value.slice(0,3)" class="topic-summary-tile">
-              <oppia-learner-topic-summary-tile [topicSummary]="topicSummaryTile">
-              </oppia-learner-topic-summary-tile>
-            </div>
+            <oppia-carousel-bar>
+              <div *ngFor="let topicSummaryTile of item.value" class="topic-summary-tile">
+                <oppia-learner-topic-summary-tile [topicSummary]="topicSummaryTile">
+                </oppia-learner-topic-summary-tile>
+              </div>
+            </oppia-carousel-bar>
             <a [href]="getClassroomLink(item.key)" target="{{ openInNewWindow ? '_blank' : '_self' }}"
                class="oppia-classroom-link">
               <div class="classroom-card">
