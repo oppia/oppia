@@ -277,7 +277,7 @@ jobs:
         run: pip3 install ffmpeg-python
       - name: Run Lighthouse performance checks shard
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
-        run: xvfb-run -a --server-args="-screen 0, 1285x1000x24" python -m scripts.run_lighthouse_tests --mode performance --shard ${{ matrix.shard }} --skip_build
+        run: xvfb-run -a --server-args="-screen 0, 1285x1000x24" python -m scripts.run_lighthouse_tests --mode performance --shard ${{ matrix.shard }} --skip_build --record_screen
         env:
           VIDEO_RECORDING_IS_ENABLED: 0
       - name: Uploading webdriverio-video as Artifacts
