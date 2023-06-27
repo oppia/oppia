@@ -209,6 +209,7 @@ class ConfigProperty:
     - collection_editor_whitelist.
     - contact_email_address.
     - contribute_gallery_page_announcement.
+    - contributor_dashboard_reviewer_emails_is_enabled.
     - default_twitter_share_message_editor.
     - disabled_explorations.
     - editor_page_announcement.
@@ -500,13 +501,6 @@ MAX_NUMBER_OF_EXPLORATIONS_IN_MATH_SVGS_BATCH = ConfigProperty(
 CONTRIBUTOR_DASHBOARD_IS_ENABLED = ConfigProperty(
     'contributor_dashboard_is_enabled', BOOL_SCHEMA,
     'Enable contributor dashboard page. The default value is true.', True)
-
-CONTRIBUTOR_DASHBOARD_REVIEWER_EMAILS_IS_ENABLED = ConfigProperty(
-    'contributor_dashboard_reviewer_emails_is_enabled', BOOL_SCHEMA,
-    (
-        'Enable sending Contributor Dashboard reviewers email notifications '
-        'about suggestions that need review. The default value is false.'
-    ), False)
 
 ENABLE_ADMIN_NOTIFICATIONS_FOR_SUGGESTIONS_NEEDING_REVIEW = ConfigProperty(
     'notify_admins_suggestions_waiting_too_long_is_enabled', BOOL_SCHEMA,
