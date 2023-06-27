@@ -7,13 +7,13 @@
     <figcaption class="text-center">{{imageCaption}}</figcaption>
   </div>
   <div *ngIf="!isLoadingIndicatorShown && !isTryAgainShown && showAltText"
-       class="m-3">
+       class="oppia-readonly-image-container">
     <img [src]="imageUrl"
          alt="{{imageAltText}}"
-         class="center-element-horizontally e2e-test-image"
+         class="e2e-test-image mt-5"
          [ngStyle]="imageContainerStyle">
-    <figcaption class="text-center">Caption: {{imageCaption}}</figcaption>
-    <figcaption class="text-center alt-text">Description: {{imageAltText}}</figcaption>
+    <figcaption><strong>Caption:</strong> {{imageCaption}}</figcaption>
+    <figcaption class="alt-text mb-5"><strong>Description:</strong> {{imageAltText}}</figcaption>
   </div>
   <div *ngIf="isLoadingIndicatorShown"
        class="oppia-image-container"
@@ -31,3 +31,9 @@
     </button>
   </div>
 </figure>
+
+<style>
+  .oppia-readonly-image-container {
+    border-bottom: 1px solid #7c7c7c;
+  }
+</style>

@@ -134,20 +134,6 @@
     </div>
   </section>
   <div [hidden]="!reviewable"
-       class="oppia-suggestion-review-message">
-    <label for="reviewMessage">Review message (required if rejecting):</label>
-    <textarea id="reviewMessage"
-              class="e2e-test-suggestion-review-message w-100"
-              rows="3"
-              [(ngModel)]="reviewMessage"
-              [attr.maxlength]="MAX_REVIEW_MESSAGE_LENGTH">
-    </textarea>
-    <div class="alert alert-danger"
-         [hidden]="!(reviewMessage.length > MAX_REVIEW_MESSAGE_LENGTH)">
-      Review message should be at most {{ MAX_REVIEW_MESSAGE_LENGTH }} characters.
-    </div>
-  </div>
-  <div [hidden]="!reviewable"
        class="oppia-image-review-panel"
        *ngIf="explorationImagesString">
     <div class="oppia-image-container-wrapper">
@@ -165,6 +151,20 @@
                                   #contentPanel>
         </oppia-rte-output-display>
       </div>
+    </div>
+  </div>
+  <div [hidden]="!reviewable"
+       class="oppia-suggestion-review-message">
+    <label for="reviewMessage">Review message (required if rejecting):</label>
+    <textarea id="reviewMessage"
+              class="e2e-test-suggestion-review-message w-100"
+              rows="3"
+              [(ngModel)]="reviewMessage"
+              [attr.maxlength]="MAX_REVIEW_MESSAGE_LENGTH">
+    </textarea>
+    <div class="alert alert-danger"
+         [hidden]="!(reviewMessage.length > MAX_REVIEW_MESSAGE_LENGTH)">
+      Review message should be at most {{ MAX_REVIEW_MESSAGE_LENGTH }} characters.
     </div>
   </div>
   <div [hidden]="reviewable || !reviewMessage || !reviewer"
