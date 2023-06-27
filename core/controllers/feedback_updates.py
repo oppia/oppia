@@ -29,7 +29,6 @@ from core.domain import suggestion_services
 from core.domain import user_services
 
 from typing import Dict, List, Optional, TypedDict, Union
-paginated_threads_list_max_size = 100
 
 
 class MessageSummaryDict(TypedDict):
@@ -99,8 +98,8 @@ class FeedbackUpdatesHandler(
                 )
             )
             paginated_threads_list = [
-                full_thread_ids[index: index + paginated_threads_list_max_size]
-                for index in range(0, len(full_thread_ids), paginated_threads_list_max_size)]
+                full_thread_ids[index: index + 100]
+                for index in range(0, len(full_thread_ids), 100)]
         else:
             paginated_threads_list = self.normalized_payload[
                 'paginated_threads_list'
