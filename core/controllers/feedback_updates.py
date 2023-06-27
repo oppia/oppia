@@ -119,10 +119,7 @@ class FeedbackUpdatesHandler(
             paginated_threads_list = self.normalized_payload[
                 'paginated_threads_list'
             ]
-        if (
-            len(paginated_threads_list) > 0 and
-            len(paginated_threads_list[0]) > 0
-        ):
+        if paginated_threads_list and paginated_threads_list[0]:
             thread_summaries, number_of_unread_threads = (
                 feedback_services.get_exp_thread_summaries(
                     self.user_id, paginated_threads_list[0]))
