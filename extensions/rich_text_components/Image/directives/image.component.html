@@ -1,10 +1,19 @@
 <figure>
-  <div *ngIf="!isLoadingIndicatorShown && !isTryAgainShown">
+  <div *ngIf="!isLoadingIndicatorShown && !isTryAgainShown && !showAltText">
     <img [src]="imageUrl"
          alt="{{imageAltText}}"
          class="center-element-horizontally e2e-test-image"
          [ngStyle]="imageContainerStyle">
     <figcaption class="text-center">{{imageCaption}}</figcaption>
+  </div>
+  <div *ngIf="!isLoadingIndicatorShown && !isTryAgainShown && showAltText"
+       class="m-3">
+    <img [src]="imageUrl"
+         alt="{{imageAltText}}"
+         class="center-element-horizontally e2e-test-image"
+         [ngStyle]="imageContainerStyle">
+    <figcaption class="text-center">Caption: {{imageCaption}}</figcaption>
+    <figcaption class="text-center">Description: {{imageAltText}}</figcaption>
   </div>
   <div *ngIf="isLoadingIndicatorShown"
        class="oppia-image-container"

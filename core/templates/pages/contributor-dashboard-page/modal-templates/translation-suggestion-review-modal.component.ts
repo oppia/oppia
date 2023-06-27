@@ -17,7 +17,7 @@
  * @fileoverview Component for translation suggestion review modal.
  */
 
-import { Component, OnInit, ChangeDetectorRef, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, ViewChild, ElementRef, Input } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { AlertsService } from 'services/alerts.service';
 import { ContextService } from 'services/context.service';
@@ -138,6 +138,9 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
   isContentOverflowing: boolean = false;
   isTranslationExpanded: boolean = false;
   isTranslationOverflowing: boolean = false;
+  explorationImagesString: string;
+  suggestionImagesString: string;
+  @Input() showAltText: boolean = false;
 
   @ViewChild('contentPanel')
     contentPanel!: RteOutputDisplayComponent;
@@ -210,6 +213,10 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
     this.editedContent = {
       html: this.translationHtml
     };
+    this.explorationImagesString = this.getImageInfoForSuggestion(
+      this.contentHtml);
+    this.suggestionImagesString = this.getImageInfoForSuggestion(
+      this.translationHtml);
   }
 
   refreshActiveContributionState(): void {
@@ -544,5 +551,18 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
       this.editedContent.html = value;
       this.changeDetectorRef.detectChanges();
     }
+  }
+
+  getImageInfoForSuggestion(content: string | string[]): string {
+    let htmlString = '';
+
+    if (!Array.isArray(content)) {
+      this.showAltText = true;
+      const doc = new DOMParser().parseFromString(content, 'text/html');
+      const imgElements = doc.querySelectorAll('oppia-noninteractive-image');
+      htmlString = Array.from(imgElements).map((img) => img.outerHTML).join('');
+    }
+
+    return htmlString;
   }
 }
