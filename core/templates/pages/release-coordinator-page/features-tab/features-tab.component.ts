@@ -226,7 +226,8 @@ export class FeaturesTabComponent implements OnInit {
   }
 
   async updateFeatureFlag(
-    feature: PlatformParameter, commitMessage: string): Promise<void> {
+    feature: PlatformParameter, commitMessage: string
+  ): Promise<void> {
       try {
         await this.apiService.updateFeatureFlag(
           feature.name, commitMessage, feature.rules, feature.defaultValue);

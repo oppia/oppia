@@ -205,7 +205,8 @@ export class AdminPlatformParametersTabComponent implements OnInit {
   }
 
   async updatePlatformParameter(
-    param: PlatformParameter, commitMessage: string): Promise<void> {
+    param: PlatformParameter, commitMessage: string
+  ): Promise<void> {
       try {
         this.adminTaskManager.startTask();
 
