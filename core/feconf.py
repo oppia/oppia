@@ -534,7 +534,7 @@ VALID_MAILCHIMP_FIELD_KEYS = ['NAME']
 VALID_MAILCHIMP_TAGS = ['Account', 'Android', 'Web']
 
 # TODO: (#18260) Change this when we permanently move to the Dockerized Setup.
-ES_HOST = 'elasticsearch' if OPPIA_IS_DOCKERIZED else 'localhost'
+ES_HOST = '0.0.0.0' if OPPIA_IS_DOCKERIZED else 'localhost'
 ES_LOCALHOST_PORT = 9200
 # NOTE TO RELEASE COORDINATORS: Replace this with the correct ElasticSearch
 # auth information during deployment.

@@ -19,26 +19,26 @@ services:
       interval: 30s
       retries: 5
       start_period: 20m
-    command: >
-      sh -c '
-        trap "rm /app/oppia/node_modules/@angular/compiler-cli/ngcc/__ngcc_lock_file__" EXIT;
+    # command: >
+    #   sh -c '
+    #     trap "rm /app/oppia/node_modules/@angular/compiler-cli/ngcc/__ngcc_lock_file__" EXIT;
 
-        if [ "$prod_env" = "true" ]; then
-          if [ "$source_maps" = "true" -a "$maintenance_mode" = "true" ]; then
-            python3 -m scripts.build --prod_env --maintenance_mode --source_maps
-          elif [ "$maintenance_mode" = "true" ]; then
-            python3 -m scripts.build --prod_env --maintenance_mode
-          elif [ "$source_maps" = "true" ]; then
-            python3 -m scripts.build --prod_env --source_maps
-          else
-            python3 -m scripts.build --prod_env
-          fi
+    #     if [ "$prod_env" = "true" ]; then
+    #       if [ "$source_maps" = "true" -a "$maintenance_mode" = "true" ]; then
+    #         python3 -m scripts.build --prod_env --maintenance_mode --source_maps
+    #       elif [ "$maintenance_mode" = "true" ]; then
+    #         python3 -m scripts.build --prod_env --maintenance_mode
+    #       elif [ "$source_maps" = "true" ]; then
+    #         python3 -m scripts.build --prod_env --source_maps
+    #       else
+    #         python3 -m scripts.build --prod_env
+    #       fi
 
-          /app/oppia/node_modules/.bin/ng build --prod
-        else
-          /app/oppia/node_modules/.bin/ng build --watch
-        fi
-      '
+    #       /app/oppia/node_modules/.bin/ng build --prod
+    #     else
+    #       /app/oppia/node_modules/.bin/ng build --watch
+    #     fi
+    #   '
 
   webpack-compiler:
     platform: linux/arm64
@@ -48,9 +48,6 @@ services:
       dockerfile: Dockerfile
     volumes:
       - shared_root_dir:/app/oppia
-    depends_on:
-      webserver:
-        condition: service_healthy
     environment:
       - oppia_is_dockerized=true
     healthcheck:
@@ -59,22 +56,22 @@ services:
       interval: 30s
       retries: 5
       start_period: 20m
-    command: >
-      sh -c '
-        if [ "$prod_env" = "true" ]; then
-          if [ "$source_maps" = "true" ]; then
-            node --max-old-space-size=8192 /app/oppia/node_modules/webpack/bin/webpack.js --config /app/oppia/webpack.prod.sourcemap.config.ts
-          else
-            node --max-old-space-size=8192 /app/oppia/node_modules/webpack/bin/webpack.js --config /app/oppia/webpack.prod.config.ts
-          fi
-        else
-          if [ "$source_maps" = "true" ]; then
-            node /app/oppia/node_modules/webpack/bin/webpack.js --config /app/oppia/webpack.dev.sourcemap.config.ts --watch --color --progress
-          else
-            node /app/oppia/node_modules/webpack/bin/webpack.js --config /app/oppia/webpack.dev.config.ts --watch --color --progress
-          fi
-        fi
-      '
+    # command: >
+    #   sh -c '
+    #     if [ "$prod_env" = "true" ]; then
+    #       if [ "$source_maps" = "true" ]; then
+    #         node --max-old-space-size=8192 /app/oppia/node_modules/webpack/bin/webpack.js --config /app/oppia/webpack.prod.sourcemap.config.ts
+    #       else
+    #         node --max-old-space-size=8192 /app/oppia/node_modules/webpack/bin/webpack.js --config /app/oppia/webpack.prod.config.ts
+    #       fi
+    #     else
+    #       if [ "$source_maps" = "true" ]; then
+    #         node /app/oppia/node_modules/webpack/bin/webpack.js --config /app/oppia/webpack.dev.sourcemap.config.ts --watch --color --progress
+    #       else
+    #         node /app/oppia/node_modules/webpack/bin/webpack.js --config /app/oppia/webpack.dev.config.ts --watch --color --progress
+    #       fi
+    #     fi
+    #   '
 
   google_app_engine:
     build: 
