@@ -108,13 +108,17 @@ class FeedbackUpdatesHandler(
         if len(self.normalized_payload['paginated_threads_list']) == 0:
             full_thread_ids = (
                 subscription_services.get_all_threads_subscribed_to(
-                    self.user_id))
+                    self.user_id
+                )
+            )
             paginated_threads_list = [
                 full_thread_ids[index: index + 100]
-                for index in range(0, len(full_thread_ids), 100)]
+                for index in range(0, len(full_thread_ids), 100)
+            ]
         else:
             paginated_threads_list = self.normalized_payload[
-                'paginated_threads_list']
+                'paginated_threads_list'
+            ]
         if (
             len(paginated_threads_list) > 0 and
             len(paginated_threads_list[0]) > 0
