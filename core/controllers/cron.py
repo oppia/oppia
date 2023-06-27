@@ -180,10 +180,11 @@ class CronMailAdminContributorDashboardBottlenecksHandler(
                 translation_admin_ids,
                 question_admin_ids,
                 suggestion_types_needing_reviewers)
-        if (
-                config_domain
-                .ENABLE_ADMIN_NOTIFICATIONS_FOR_SUGGESTIONS_NEEDING_REVIEW
-                .value):
+
+        if platform_feature_services.get_platform_parameter_value(
+            platform_parameter_list.ParamNames.
+            ENABLE_ADMIN_NOTIFICATIONS_FOR_SUGGESTIONS_NEEDING_REVIEW.value
+        ):
             info_about_suggestions_waiting_too_long_for_review = (
                 suggestion_services
                 .get_info_about_suggestions_waiting_too_long_for_review()

@@ -1630,9 +1630,10 @@ def send_mail_to_notify_admins_suggestions_waiting_long(
         logging.error('This app cannot send emails to users.')
         return
 
-    if not (
-            config_domain
-            .ENABLE_ADMIN_NOTIFICATIONS_FOR_SUGGESTIONS_NEEDING_REVIEW.value):
+    if not platform_feature_services.get_platform_parameter_value(
+        platform_parameter_list.ParamNames.
+        ENABLE_ADMIN_NOTIFICATIONS_FOR_SUGGESTIONS_NEEDING_REVIEW.value
+    ):
         logging.error(
             'The "notify_admins_suggestions_waiting_too_long" property '
             'must be enabled on the admin config page in order to send '

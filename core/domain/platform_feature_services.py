@@ -64,6 +64,10 @@ ALL_PLATFORM_PARAMS_EXCEPT_FEATURE_FLAGS: List[
         ),
         platform_parameter_list.ParamNames.DUMMY_PARAMETER,
         (
+            platform_feature_list.ParamNames.
+            ENABLE_ADMIN_NOTIFICATIONS_FOR_SUGGESTIONS_NEEDING_REVIEW
+        ),
+        (
             platform_parameter_list.ParamNames.
             HIGH_BOUNCE_RATE_TASK_STATE_BOUNCE_RATE_CREATION_THRESHOLD
         ),

@@ -4167,11 +4167,15 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
                 question_suggestion))
 
     def test_email_not_sent_if_can_send_emails_is_false(self) -> None:
-        config_services.set_property(
-            'committer_id',
-            'notify_admins_suggestions_waiting_too_long_is_enabled', True)
+        swap_platform_parameter_value = self.swap_to_always_return(
+            platform_feature_services,
+            'get_platform_parameter_value',
+            True
+        )
 
-        with self.capture_logging(min_level=logging.ERROR) as logs:
+        with swap_platform_parameter_value, self.capture_logging(
+            min_level=logging.ERROR
+        ) as logs:
             with self.cannot_send_emails_ctx, self.log_new_error_ctx:
                 with self.swap(
                     suggestion_models,
@@ -4194,10 +4198,6 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
     def test_email_not_sent_if_notifying_admins_about_suggestions_is_disabled(
         self
     ) -> None:
-        config_services.set_property(
-            'committer_id',
-            'notify_admins_suggestions_waiting_too_long_is_enabled', False)
-
         with self.capture_logging(min_level=logging.ERROR) as logs:
             with self.can_send_emails_ctx, self.log_new_error_ctx:
                 with self.swap(
@@ -4220,13 +4220,15 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
                 'admins the emails.')
 
     def test_email_not_sent_if_admin_email_does_not_exist(self) -> None:
-        config_services.set_property(
-            'committer_id',
-            'notify_admins_suggestions_waiting_too_long_is_enabled', True)
+        swap_platform_parameter_value = self.swap_to_always_return(
+            platform_feature_services,
+            'get_platform_parameter_value',
+            True
+        )
 
         with self.capture_logging(min_level=logging.ERROR) as logs:
             with self.can_send_emails_ctx, self.log_new_error_ctx:
-                with self.swap(
+                with swap_platform_parameter_value, self.swap(
                     suggestion_models,
                     'SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS', 0):
                     (
@@ -4246,13 +4248,15 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
             )
 
     def test_email_not_sent_if_no_admins_to_notify(self) -> None:
-        config_services.set_property(
-            'committer_id',
-            'notify_admins_suggestions_waiting_too_long_is_enabled', True)
+        swap_platform_parameter_value = self.swap_to_always_return(
+            platform_feature_services,
+            'get_platform_parameter_value',
+            True
+        )
 
         with self.capture_logging(min_level=logging.ERROR) as logs:
             with self.can_send_emails_ctx, self.log_new_error_ctx:
-                with self.swap(
+                with swap_platform_parameter_value, self.swap(
                     suggestion_models,
                     'SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS', 0):
                     (
@@ -4270,12 +4274,14 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
     def test_email_not_sent_if_no_suggestions_to_notify_the_admin_about(
         self
     ) -> None:
-        config_services.set_property(
-            'committer_id',
-            'notify_admins_suggestions_waiting_too_long_is_enabled', True)
+        swap_platform_parameter_value = self.swap_to_always_return(
+            platform_feature_services,
+            'get_platform_parameter_value',
+            True
+        )
 
         with self.can_send_emails_ctx, self.log_new_info_ctx:
-            with self.swap(
+            with swap_platform_parameter_value, self.swap(
                 suggestion_models,
                 'SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS', 0):
                 (
@@ -4294,9 +4300,11 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
     def test_email_sent_to_admin_if_question_has_waited_too_long_for_a_review(
         self
     ) -> None:
-        config_services.set_property(
-            'committer_id',
-            'notify_admins_suggestions_waiting_too_long_is_enabled', True)
+        swap_platform_parameter_value = self.swap_to_always_return(
+            platform_feature_services,
+            'get_platform_parameter_value',
+            True
+        )
         question_suggestion = (
             self._create_question_suggestion_with_question_html_and_datetime(
                 '<p>What is the meaning of life?</p>',
@@ -4339,7 +4347,7 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
         )
 
         with self.can_send_emails_ctx, self.log_new_error_ctx:
-            with self.swap(
+            with swap_platform_parameter_value, self.swap(
                 suggestion_models,
                 'SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS', 0):
                 with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
@@ -4363,9 +4371,11 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
     def test_email_sent_to_admin_if_multiple_questions_have_waited_for_review(
         self
     ) -> None:
-        config_services.set_property(
-            'committer_id',
-            'notify_admins_suggestions_waiting_too_long_is_enabled', True)
+        swap_platform_parameter_value = self.swap_to_always_return(
+            platform_feature_services,
+            'get_platform_parameter_value',
+            True
+        )
         mocked_datetime_for_utcnow = (
             self.mocked_review_submission_datetime + datetime.timedelta(
                 days=2, hours=1))
@@ -4417,7 +4427,7 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
         )
 
         with self.can_send_emails_ctx, self.log_new_error_ctx:
-            with self.swap(
+            with swap_platform_parameter_value, self.swap(
                 suggestion_models,
                 'SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS', 0):
                 with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
@@ -4441,9 +4451,11 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
     def test_email_sent_to_admin_if_translation_has_waited_too_long_for_review(
         self
     ) -> None:
-        config_services.set_property(
-            'committer_id',
-            'notify_admins_suggestions_waiting_too_long_is_enabled', True)
+        swap_platform_parameter_value = self.swap_to_always_return(
+            platform_feature_services,
+            'get_platform_parameter_value',
+            True
+        )
         translation_suggestion = (
             self._create_translation_suggestion_in_lang_with_html_and_datetime(
                 'hi', '<p>Sample translation</p>',
@@ -4486,7 +4498,7 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
         )
 
         with self.can_send_emails_ctx, self.log_new_error_ctx:
-            with self.swap(
+            with swap_platform_parameter_value, self.swap(
                 suggestion_models,
                 'SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS', 0):
                 with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
@@ -4510,9 +4522,11 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
     def test_email_sent_to_admin_if_multi_translations_have_waited_for_review(
         self
     ) -> None:
-        config_services.set_property(
-            'committer_id',
-            'notify_admins_suggestions_waiting_too_long_is_enabled', True)
+        swap_platform_parameter_value = self.swap_to_always_return(
+            platform_feature_services,
+            'get_platform_parameter_value',
+            True
+        )
         mocked_datetime_for_utcnow = (
             self.mocked_review_submission_datetime + datetime.timedelta(
                 days=2, hours=1))
@@ -4564,7 +4578,7 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
         )
 
         with self.can_send_emails_ctx, self.log_new_error_ctx:
-            with self.swap(
+            with swap_platform_parameter_value, self.swap(
                 suggestion_models,
                 'SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS', 0):
                 with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
@@ -4588,9 +4602,11 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
     def test_email_sent_to_admin_if_multi_suggestion_types_waiting_for_review(
         self
     ) -> None:
-        config_services.set_property(
-            'committer_id',
-            'notify_admins_suggestions_waiting_too_long_is_enabled', True)
+        swap_platform_parameter_value = self.swap_to_always_return(
+            platform_feature_services,
+            'get_platform_parameter_value',
+            True
+        )
         mocked_datetime_for_utcnow = (
             self.mocked_review_submission_datetime + datetime.timedelta(
                 days=2, hours=1, minutes=5))
@@ -4650,7 +4666,7 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
         )
 
         with self.can_send_emails_ctx, self.log_new_error_ctx:
-            with self.swap(
+            with swap_platform_parameter_value, self.swap(
                 suggestion_models,
                 'SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS', 0):
                 with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
@@ -4705,9 +4721,11 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
             feconf.EMAIL_INTENT_ADDRESS_CONTRIBUTOR_DASHBOARD_SUGGESTIONS)
 
     def test_email_sent_to_multiple_admins(self) -> None:
-        config_services.set_property(
-            'committer_id',
-            'notify_admins_suggestions_waiting_too_long_is_enabled', True)
+        swap_platform_parameter_value = self.swap_to_always_return(
+            platform_feature_services,
+            'get_platform_parameter_value',
+            True
+        )
         question_suggestion = (
             self._create_question_suggestion_with_question_html_and_datetime(
                 '<p>What is the meaning of life?</p>',
@@ -4777,7 +4795,7 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
                 feconf.OPPIA_SITE_URL, feconf.ADMIN_URL))
 
         with self.can_send_emails_ctx, self.log_new_error_ctx:
-            with self.swap(
+            with swap_platform_parameter_value, self.swap(
                 suggestion_models,
                 'SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS', 0):
                 with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):

@@ -227,6 +227,7 @@ class ConfigProperty:
     - moderator_ids.
     - moderator_request_forum_url.
     - moderator_usernames.
+    - notify_admins_suggestions_waiting_too_long_is_enabled.
     - promo_bar_enabled.
     - promo_bar_message.
     - publicize_exploration_email_html_body.
@@ -501,15 +502,6 @@ MAX_NUMBER_OF_EXPLORATIONS_IN_MATH_SVGS_BATCH = ConfigProperty(
 CONTRIBUTOR_DASHBOARD_IS_ENABLED = ConfigProperty(
     'contributor_dashboard_is_enabled', BOOL_SCHEMA,
     'Enable contributor dashboard page. The default value is true.', True)
-
-ENABLE_ADMIN_NOTIFICATIONS_FOR_SUGGESTIONS_NEEDING_REVIEW = ConfigProperty(
-    'notify_admins_suggestions_waiting_too_long_is_enabled', BOOL_SCHEMA,
-    (
-        'Enable sending admins email notifications if there are Contributor '
-        'Dashboard suggestions that have been waiting for a review for more '
-        'than %s days. The default value is false.' % (
-            suggestion_models.SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS)
-    ), False)
 
 ENABLE_ADMIN_NOTIFICATIONS_FOR_REVIEWER_SHORTAGE = ConfigProperty(
     'enable_admin_notifications_for_reviewer_shortage', BOOL_SCHEMA,

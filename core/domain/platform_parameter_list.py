@@ -23,7 +23,17 @@ import enum
 from core.domain import platform_parameter_domain
 from core.domain import platform_parameter_registry as registry
 
+# TODO(#14537): Refactor this file and remove imports marked
+# with 'invalid-import-from'.
+from core.platform import models  # pylint: disable=invalid-import-from # isort:skip
+
 Registry = registry.Registry
+
+MYPY = False
+if MYPY: # pragma: no cover
+    from mypy_imports import suggestion_models
+
+(suggestion_models,) = models.Registry.import_models([models.Names.SUGGESTION])
 
 
 class ParamNames(enum.Enum):
@@ -59,6 +69,8 @@ class ParamNames(enum.Enum):
         'high_bounce_rate_task_minimum_exploration_starts')
     CONTRIBUTOR_DASHBOARD_REVIEWER_EMAILS_IS_ENABLED = (
         'contributor_dashboard_reviewer_emails_is_enabled')
+    ENABLE_ADMIN_NOTIFICATIONS_FOR_SUGGESTIONS_NEEDING_REVIEW = (
+        'notify_admins_suggestions_waiting_too_long_is_enabled')
 
 
 # Platform parameters should all be defined below.
@@ -184,5 +196,16 @@ Registry.create_platform_parameter(
     ParamNames.CONTRIBUTOR_DASHBOARD_REVIEWER_EMAILS_IS_ENABLED,
     'Enable sending Contributor Dashboard reviewers email notifications '
     'about suggestions that need review. The default value is false.',
+    platform_parameter_domain.DataTypes.BOOL
+)
+
+Registry.create_platform_parameter(
+    ParamNames.ENABLE_ADMIN_NOTIFICATIONS_FOR_SUGGESTIONS_NEEDING_REVIEW,
+    (
+        'Enable sending admins email notifications if there are Contributor '
+        'Dashboard suggestions that have been waiting for a review for more '
+        'than %s days. The default value is false.' % (
+            suggestion_models.SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS)
+    ),
     platform_parameter_domain.DataTypes.BOOL
 )

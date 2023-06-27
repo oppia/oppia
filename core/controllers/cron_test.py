@@ -615,12 +615,14 @@ class CronMailAdminContributorDashboardBottlenecksHandlerTests(
         config_services.set_property(
             'committer_id',
             'enable_admin_notifications_for_reviewer_shortage', True)
-        config_services.set_property(
-            'committer_id',
-            'notify_admins_suggestions_waiting_too_long_is_enabled', True)
+        swap_platform_parameter_value = self.swap_to_always_return(
+            platform_feature_services,
+            'get_platform_parameter_value',
+            True
+        )
 
         with self.cannot_send_emails, self.testapp_swap:
-            with self.swap(
+            with swap_platform_parameter_value, self.swap(
                 email_manager,
                 'send_mail_to_notify_admins_that_reviewers_are_needed',
                 self.mock_send_mail_to_notify_admins_that_reviewers_are_needed):
@@ -664,9 +666,6 @@ class CronMailAdminContributorDashboardBottlenecksHandlerTests(
         self
     ) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
-        config_services.set_property(
-            'committer_id',
-            'notify_admins_suggestions_waiting_too_long_is_enabled', False)
 
         with self.can_send_emails, self.testapp_swap:
             with self.swap(
@@ -707,12 +706,14 @@ class CronMailAdminContributorDashboardBottlenecksHandlerTests(
         self
     ) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
-        config_services.set_property(
-            'committer_id',
-            'notify_admins_suggestions_waiting_too_long_is_enabled', True)
+        swap_platform_parameter_value = self.swap_to_always_return(
+            platform_feature_services,
+            'get_platform_parameter_value',
+            True
+        )
 
         with self.can_send_emails, self.testapp_swap:
-            with self.swap(
+            with swap_platform_parameter_value, self.swap(
                 suggestion_models,
                 'SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS', 0):
                 with self.swap(

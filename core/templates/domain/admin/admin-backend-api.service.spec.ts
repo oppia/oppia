@@ -116,7 +116,6 @@ describe('Admin backend api service', () => {
     max_number_of_suggestions_per_reviewer: 5,
     max_number_of_svgs_in_math_svgs_batch: 25,
     notification_user_ids_for_failed_tasks: [],
-    notify_admins_suggestions_waiting_too_long_is_enabled: false,
     oppia_csrf_secret: 'H62T5aIngXb1PB6arDkFrAnxakpQ=',
     record_playthrough_probability: 0.2,
     signup_email_content: {
