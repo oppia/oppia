@@ -62,7 +62,7 @@ export class FeedbackUpdatesPageRootComponent implements OnDestroy {
         this.pageIsShown = true;
       }, (err) => {
         this.errorPageIsShown = true;
-      }).then(() => {
+      }).finally(() => {
         this.loaderService.hideLoadingScreen();
       });
   }

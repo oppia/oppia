@@ -169,7 +169,7 @@ export class FeedbackUpdatesPageComponent implements OnInit, OnDestroy {
     ]).then(() => {
       setTimeout(() => {
         this.loaderService.hideLoadingScreen();
-        // So that focus is applied after the loading screen has disappeared.
+        // This focus is applied after the loading screen has disappeared.
         this.focusManagerService.setFocusWithoutScroll('ourLessonsBtn');
       }, 0);
     }).catch(errorResponse => {
