@@ -18,10 +18,12 @@
 
 from __future__ import annotations
 
+from core import platform_feature_list
 from core.constants import constants
 from core.domain import config_domain
 from core.domain import learner_group_domain
 from core.domain import learner_group_fetchers
+from core.domain import platform_feature_services
 from core.domain import story_domain
 from core.domain import story_fetchers
 from core.domain import subtopic_page_domain
@@ -49,7 +51,9 @@ def is_learner_group_feature_enabled() -> bool:
     Returns:
         bool. Whether the learner group feature is enabled.
     """
-    return bool(config_domain.LEARNER_GROUPS_ARE_ENABLED.value)
+    return bool(platform_feature_services.is_feature_enabled(
+        platform_feature_list.ParamNames.
+        LEARNER_GROUPS_ARE_ENABLED.value))
 
 
 def create_learner_group(
