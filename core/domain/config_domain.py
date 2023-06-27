@@ -36,10 +36,8 @@ from core.platform import models  # pylint: disable=invalid-import-from # isort:
 MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import config_models
-    from mypy_imports import suggestion_models
 
-(config_models, suggestion_models,) = models.Registry.import_models(
-    [models.Names.CONFIG, models.Names.SUGGESTION])
+(config_models,) = models.Registry.import_models([models.Names.CONFIG])
 
 AllowedDefaultValueTypes = Union[
     str,
