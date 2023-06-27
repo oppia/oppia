@@ -1,7 +1,7 @@
 name: Revert Wiki Changes Made Through the Web Interface
 on:
-  gollum
-
+  gollum:
+  workflow_dispatch:
 jobs:
   revert:
     runs-on: ubuntu-22.04
@@ -24,9 +24,11 @@ jobs:
         run: git fetch source
       - name: Check for differences
         id: check-diff
-        run: 
-          diff=$(git log source/develop..origin/master)
-          echo "diff=$diff" >> $GITHUB_OUTPUT
+        run: |
+          delimiter="$(openssl rand -hex 8)"
+          echo "diff<<$delimiter" >> "$GITHUB_OUTPUT"
+          echo $(git log source/develop..origin/master) >> "$GITHUB_OUTPUT"
+          echo "$delimiter" >> "$GITHUB_OUTPUT"
       - name: Revert commits
         if: ${{ steps.check-diff.outputs.diff != '' }}
         run: |
