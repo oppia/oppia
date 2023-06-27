@@ -92,20 +92,26 @@ class FeedbackUpdatesHandler(
         """Handles POST requests."""
         assert self.user_id is not None
         assert self.normalized_payload is not None
-        if len(self.normalized_payload['paginated_threads_list']) == 0:
+        if not self.normalized_payload['paginated_threads_list']:
             full_thread_ids = (
                 subscription_services.get_all_threads_subscribed_to(
-                    self.user_id))
+                    self.user_id
+                )
+            )
             paginated_threads_list = [
+<<<<<<< HEAD
                 full_thread_ids[index: index + paginated_threads_list_max_size]
                 for index in range(0, len(full_thread_ids), paginated_threads_list_max_size)]
+=======
+                full_thread_ids[index: index + 100]
+                for index in range(0, len(full_thread_ids), 100)
+            ]
+>>>>>>> 4365063d028eee90d1ea2823c4fe05a706180795
         else:
             paginated_threads_list = self.normalized_payload[
-                'paginated_threads_list']
-        if (
-            len(paginated_threads_list) > 0 and
-            len(paginated_threads_list[0]) > 0
-        ):
+                'paginated_threads_list'
+            ]
+        if paginated_threads_list and paginated_threads_list[0]:
             thread_summaries, number_of_unread_threads = (
                 feedback_services.get_exp_thread_summaries(
                     self.user_id, paginated_threads_list[0]))
