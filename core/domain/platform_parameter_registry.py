@@ -84,7 +84,7 @@ class Registry:
             Exception. The data type is not supported.
         """
         if data_type in cls.DEFAULT_VALUE_BY_TYPE_DICT:
-            if not default:
+            if default is None:
                 default = cls.DEFAULT_VALUE_BY_TYPE_DICT[data_type]
         else:
             allowed_data_types = [
