@@ -99,9 +99,6 @@ module.exports = {
     exploration_editor:
       commonPrefix + '/pages/exploration-editor-page/' +
       'exploration-editor-page.import.ts',
-    feedback_updates:
-      commonPrefix + '/pages/feedback-updates-page/' +
-      'feedback-updates-page.import.ts',
     learner_dashboard:
       commonPrefix + '/pages/learner-dashboard-page/' +
       'learner-dashboard-page.import.ts',
@@ -382,17 +379,6 @@ module.exports = {
       template:
         commonPrefix + '/pages/exploration-editor-page/' +
         'exploration-editor-page.mainpage.html',
-      minify: htmlMinifyConfig,
-      inject: false
-    }),
-    new HtmlWebpackPlugin({
-      chunks: ['feedback_updates'],
-      filename: 'feedback-updates-page.mainpage.html',
-      hybrid: true,
-      meta: defaultMeta,
-      template:
-        commonPrefix + '/pages/feedback-updates-page/' +
-        'feedback-updates-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),

@@ -51,20 +51,6 @@ class SuggestionSummaryDict(TypedDict):
     created_on_msecs: float
 
 
-class FeedbackUpdatesPage(
-    base.BaseHandler[Dict[str, str], Dict[str, str]]
-):
-    """Page showing the user's feedback updates."""
-
-    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
-    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
-
-    @acl_decorators.can_access_feedback_updates
-    def get(self) -> None:
-        """Handles GET requests."""
-        self.render_template('feedback-updates-page.mainpage.html')
-
-
 class FeedbackUpdatesHandlerNormalizedPayloadDict(TypedDict):
     """Dict representation of FeedbackUpdatesHandler's
     normalized_payload dictionary.

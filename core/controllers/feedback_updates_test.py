@@ -39,20 +39,6 @@ if MYPY:  # pragma: no cover
 (suggestion_models,) = models.Registry.import_models([models.Names.SUGGESTION])
 
 
-class FeedbackUpdatesPageTest(test_utils.GenericTestBase):
-    """Checks the access to the Feedback Updates page and its rendering."""
-
-    def setUp(self) -> None:
-        super().setUp()
-        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
-        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-
-    def test_feedback_updates_page_access(self) -> None:
-        self.login(self.OWNER_EMAIL)
-        self.get_html_response('/feedback-updates', expected_status_int=200)
-        self.logout()
-
-
 class FeedbackUpdatesHandlerTests(test_utils.GenericTestBase):
 
     EXP_ID_1 = 'EXP_ID_1'
