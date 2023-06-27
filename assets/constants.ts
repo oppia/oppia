@@ -6818,12 +6818,12 @@ export default {
         {
           "PROPERTY_TYPE": "itemprop",
           "PROPERTY_VALUE": "description",
-          "CONTENT": "With Oppia, learn and give feedback to improve the lessons"
+          "CONTENT": "With Oppia,learn and give feedback to improve the lessons"
         },
         {
           "PROPERTY_TYPE": "itemprop",
           "PROPERTY_VALUE": "og:description",
-          "CONTENT": "With Oppia, learn and give feedback to improve the lessons"
+          "CONTENT": "With Oppia,learn and give feedback to improve the lessons"
         }
       ]
     },
