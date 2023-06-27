@@ -51,6 +51,7 @@ export class RteOutputDisplayComponent implements AfterViewInit {
   @ViewChild('tabs') tabsTagPortal: TemplateRef<unknown>;
   @ViewChild('video') videoTagPortal: TemplateRef<unknown>;
   @Input() rteString: string;
+  @Input() showAltText: boolean = false;
   node: OppiaRteNode | string = '';
   show = false;
   portalTree: PortalTree = [];

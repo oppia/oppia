@@ -147,6 +147,26 @@
       Review message should be at most {{ MAX_REVIEW_MESSAGE_LENGTH }} characters.
     </div>
   </div>
+  <div [hidden]="!reviewable"
+       class="oppia-image-review-panel"
+       *ngIf="explorationImagesString">
+    <div class="oppia-image-container-wrapper">
+      <div class="oppia-exploration-image-container">
+        <oppia-rte-output-display *ngIf="!contentTypeIsSetOfStrings"
+                                  [rteString]="explorationImagesString"
+                                  [showAltText]="showAltText"
+                                  #contentPanel>
+        </oppia-rte-output-display>
+      </div>
+      <div class="oppia-suggestion-image-container">
+        <oppia-rte-output-display *ngIf="!contentTypeIsSetOfStrings"
+                                  [rteString]="suggestionImagesString"
+                                  [showAltText]="showAltText"
+                                  #contentPanel>
+        </oppia-rte-output-display>
+      </div>
+    </div>
+  </div>
   <div [hidden]="reviewable || !reviewMessage || !reviewer"
        class="oppia-suggestion-review-message">
     <strong>Reviewer:</strong>
@@ -208,6 +228,30 @@
 </div>
 
 <style>
+  .oppia-image-container-wrapper {
+    border: 1px solid #ccc;
+    display: flex;
+    justify-content: space-around;
+    overflow-x: auto;
+    padding: 3px;
+  }
+  .oppia-exploration-image-container,
+  .oppia-suggestion-image-container {
+    border: 1px solid #ccc;
+    flex-basis: 150px;
+    flex-grow: 1;
+    max-height: 150px;
+    overflow-y: auto;
+    width: 300px;
+  }
+.oppia-image-review-panel {
+    margin: 15px;
+    padding: 6px;
+  }
+  oppia-rte-output-display oppia-noninteractive-image {
+    max-height: 50px;
+    max-width: 50px;
+  }
   .oppia-reviewable-message {
     border: 1px solid #ccc;
   }
