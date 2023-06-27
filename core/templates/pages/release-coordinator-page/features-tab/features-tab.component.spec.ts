@@ -317,6 +317,23 @@ describe('Release coordinator page feature tab', function() {
     });
   });
 
+  describe('.saveDefaultValueToStorage', () => {
+    it('should save the changes', fakeAsync(() => {
+      component.saveDefaultValueToStorage();
+
+      expect(updateApiSpy).toHaveBeenCalled();
+    }));
+
+    it('should not proceed if the user doesn\'t confirm', fakeAsync(() => {
+      mockConfirmResult(false);
+      component.saveDefaultValueToStorage();
+
+      flushMicrotasks();
+
+      expect(updateApiSpy).not.toHaveBeenCalled();
+    }));
+  });
+
   describe('.getFeatureValidOnCurrentServer', () => {
     let featureFlagDevStage = PlatformParameter.createFromBackendDict({
       data_type: 'bool',

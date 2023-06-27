@@ -214,21 +214,20 @@ export class FeaturesTabComponent implements OnInit {
     return false;
   }
 
-  async updateFeatureRulesAsync(feature: PlatformParameter): Promise<void> {
-    const issues = this.validateFeatureFlag(feature);
-    if (issues.length > 0) {
-      this.windowRef.nativeWindow.alert(issues.join('\n'));
+  async saveDefaultValueToStorage(): Promise<void> {
+    if (!this.windowRef.nativeWindow.confirm(
+      'This action is irreversible.')) {
       return;
     }
-    const commitMessage = this.windowRef.nativeWindow.prompt(
-      'This action is irreversible. If you insist to proceed, please enter ' +
-      'the commit message for the update',
-      `Update feature '${feature.name}'.`
-    );
-    if (commitMessage === null) {
-      return;
+    for (let feature of this.featureFlags) {
+      let commitMessage = `Update default value for '${feature.name}'.`
+      await this.updateFeatureFlag(feature, commitMessage);
     }
+  }
 
+  async updateFeatureFlag(
+    feature: PlatformParameter, commitMessage: string
+  ): Promise<void> {
     try {
       await this.apiService.updateFeatureFlag(
         feature.name, commitMessage, feature.rules, feature.defaultValue);
@@ -251,6 +250,24 @@ export class FeaturesTabComponent implements OnInit {
         throw new Error('Unexpected error response.');
       }
     }
+  }
+
+  async updateFeatureRulesAsync(feature: PlatformParameter): Promise<void> {
+    const issues = this.validateFeatureFlag(feature);
+    if (issues.length > 0) {
+      this.windowRef.nativeWindow.alert(issues.join('\n'));
+      return;
+    }
+    const commitMessage = this.windowRef.nativeWindow.prompt(
+      'This action is irreversible. If you insist to proceed, please enter ' +
+      'the commit message for the update',
+      `Update feature '${feature.name}'.`
+    );
+    if (commitMessage === null) {
+      return;
+    }
+
+    await this.updateFeatureFlag(feature, commitMessage);
   }
 
   clearChanges(featureFlag: PlatformParameter): void {
