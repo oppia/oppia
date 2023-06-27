@@ -138,8 +138,8 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
   isContentOverflowing: boolean = false;
   isTranslationExpanded: boolean = false;
   isTranslationOverflowing: boolean = false;
-  explorationImagesString: string;
-  suggestionImagesString: string;
+  explorationImagesString: string = '';
+  suggestionImagesString: string = '';
   @Input() showAltText: boolean = false;
 
   @ViewChild('contentPanel')
