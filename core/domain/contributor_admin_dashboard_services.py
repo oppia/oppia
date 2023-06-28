@@ -381,7 +381,7 @@ def get_question_submitter_total_stats(
             more: bool. If True, there are (probably) more results after
                 this batch. If False, there are no further results
                 after this batch.
-"""
+    """
     question_submitter_models, next_offset, more = (
         suggestion_models.QuestionSubmitterTotalContributionStatsModel
         .fetch_page(
