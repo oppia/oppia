@@ -310,13 +310,17 @@ class Registry:
 
         if parameter_model:
             param_with_init_settings = cls.parameter_registry[name]
+            if parameter_model.default_value is None:
+                default_value = param_with_init_settings.default_value
+            else:
+                default_value = parameter_model.default_value
             return platform_parameter_domain.PlatformParameter.from_dict({
                 'name': param_with_init_settings.name,
                 'description': param_with_init_settings.description,
                 'data_type': param_with_init_settings.data_type,
                 'rules': parameter_model.rules,
                 'rule_schema_version': parameter_model.rule_schema_version,
-                'default_value': parameter_model.default_value,
+                'default_value': default_value,
                 'is_feature': param_with_init_settings.is_feature,
                 'feature_stage': param_with_init_settings.feature_stage,
             })
