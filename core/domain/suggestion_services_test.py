@@ -4136,13 +4136,13 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
         )
 
     def generate_random_string(self, length: int) -> str:
-        """ Generate a random string of given length
+        """Generate a random string of given length.
 
         Args:
             length: int. Length of the string to be generated.
 
         Returns:
-            str.
+            str. Generated string.
         """
         letters = string.ascii_letters
         return (''.join(random.choice(letters) for _ in range(length))).lower()

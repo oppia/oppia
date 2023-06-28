@@ -355,32 +355,33 @@ def get_question_submitter_total_stats(
 ) -> Tuple[
         List[suggestion_registry.QuestionSubmitterTotalContributionStats],
         int,
-        bool]:
+        bool
+    ]:
     """Returns the list of domain objects according to values specified.
 
-        Args:
-            page_size: int. Number of models to fetch.
-            offset: int. Number of results to skip from the beginning of all
-                results matching the query.
-            sort_by: SortChoices|None. A string indicating how to sort the
-                result.
-            topic_ids: List[str]|None. List of topic ID(s) to fetch
-                contributor stats for.
-            num_days_since_last_activity: int. To get number of users
-                who are active in num_days_since_last_activity.
+    Args:
+        page_size: int. Number of models to fetch.
+        offset: int. Number of results to skip from the beginning of all
+            results matching the query.
+        sort_by: SortChoices|None. A string indicating how to sort the
+            result.
+        topic_ids: List[str]|None. List of topic ID(s) to fetch
+            contributor stats for.
+        num_days_since_last_activity: int. To get number of users
+            who are active in num_days_since_last_activity.
 
-        Returns:
+    Returns:
         3-tuple(sorted_results, next_offset, more). where:
-                sorted_results:
-                    list(QuestionSubmitterTotalContributionStats).
-                    The list of models which match the supplied topic_ids
-                    and num_days_since_last_activity filters,
-                    returned in the order specified by sort_by.
-                next_offset: int. Number of results to skip in next batch.
-                more: bool. If True, there are (probably) more results after
-                    this batch. If False, there are no further results
-                    after this batch.
-    """
+            sorted_results:
+                list(QuestionSubmitterTotalContributionStats).
+                The list of models which match the supplied topic_ids
+                and num_days_since_last_activity filters,
+                returned in the order specified by sort_by.
+            next_offset: int. Number of results to skip in next batch.
+            more: bool. If True, there are (probably) more results after
+                this batch. If False, there are no further results
+                after this batch.
+"""
     question_submitter_models, next_offset, more = (
         suggestion_models.QuestionSubmitterTotalContributionStatsModel
         .fetch_page(

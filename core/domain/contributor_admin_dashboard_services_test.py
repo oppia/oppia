@@ -30,6 +30,7 @@ if MYPY: # pragma: no cover
     models.Names.SUGGESTION
 ])
 
+
 class ContributorAdminDashboardServicesUnitTest(test_utils.GenericTestBase):
     """Test the Contributor Admin Dashboard services."""
 
