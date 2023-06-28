@@ -296,7 +296,7 @@ def get_translation_reviewer_total_stats(
         sort_by: Optional[suggestion_models.SortChoices],
         num_days_since_last_activity: Optional[int]
 ) -> Tuple[
-        List[suggestion_models.TranslationReviewerTotalContributionStatsModel],
+        List[suggestion_models.TranslationReviewerTotalContributionStats],
         int,
         bool
     ]:
@@ -360,21 +360,21 @@ def get_question_submitter_total_stats(
     """Returns the list of domain objects according to values specified.
 
     Args:
-        page_size: int. Number of models to fetch.
+        page_size: int. Number of results to fetch.
         offset: int. Number of results to skip from the beginning of all
             results matching the query.
         sort_by: SortChoices|None. A string indicating how to sort the
             result.
         topic_ids: List[str]|None. List of topic ID(s) to fetch
             contributor stats for.
-        num_days_since_last_activity: int. To get number of users
+        num_days_since_last_activity: int. To get results of users
             who are active in num_days_since_last_activity.
 
     Returns:
         3-tuple(sorted_results, next_offset, more). where:
             sorted_results:
                 list(QuestionSubmitterTotalContributionStats).
-                The list of models which match the supplied topic_ids
+                The list of domain objects which match the supplied topic_ids
                 and num_days_since_last_activity filters,
                 returned in the order specified by sort_by.
             next_offset: int. Number of results to skip in next batch.
@@ -410,26 +410,26 @@ def get_question_reviewer_total_stats(
         sort_by: Optional[suggestion_models.SortChoices],
         num_days_since_last_activity: Optional[int]
 ) -> Tuple[
-        List[suggestion_models.QuestionReviewerTotalContributionStatsModel],
+        List[suggestion_models.QuestionReviewerTotalContributionStats],
         int,
         bool
     ]:
     """Returns the list of domain objects according to values specified.
 
     Args:
-        page_size: int. Number of models to fetch.
+        page_size: int. Number of results to fetch.
         offset: int. Number of results to skip from the beginning of all
             results matching the query.
         sort_by: SortChoices|None. A string indicating how to sort the
             result.
-        num_days_since_last_activity: int|None. To get number of users
+        num_days_since_last_activity: int|None. To get result of users
             who are active in num_days_since_last_activity.
 
     Returns:
         3-tuple(sorted_results, next_offset, more). where:
             sorted_results:
-                list(QuestionReviewerTotalContributionStatsModel).
-                The list of models which match the supplied
+                list(QuestionReviewerTotalContributionStats).
+                The list of domain objects which match the supplied
                 num_days_since_last_activity filter,
                 returned in the order specified by sort_by.
             next_offset: int. Number of results to skip in next batch.

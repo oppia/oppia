@@ -2770,6 +2770,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
                 'hi', self.author_id
             )
         )
+        assert updated_translation_submitter_total_stats_model is not None
         self.assertItemsEqual(
             (
                 updated_translation_submitter_total_stats_model
@@ -2951,7 +2952,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
                 'hi', self.author_id
             )
         )
-
+        assert translation_submitter_total_stats_model_for_a_topic is not None
         self.assertItemsEqual(
             translation_reviewer_total_stats_model_for_a_topic.
             topic_ids_with_translation_reviews,
@@ -3365,7 +3366,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
                 'hi', self.author_id
             )
         )
-
+        assert updated_translation_submitter_total_stats_model is not None
         self.assertEqual(
             len(
                 updated_translation_submitter_total_stats_model
@@ -3397,6 +3398,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
                 'hi', self.author_id
             )
         )
+        assert rejected_translation_submitter_total_stats_model is not None
 
         self.assertEqual(
             len(
@@ -3446,7 +3448,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
                 'hi', self.author_id
             )
         )
-
+        assert updated_translation_submitter_total_stats_model is not None
         self.assertEqual(
             len(
                 updated_translation_submitter_total_stats_model
@@ -3479,7 +3481,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
                 'hi', self.author_id
             )
         )
-
+        assert accepted_translation_submitter_total_stats_model is not None
         self.assertEqual(
             len(
                 accepted_translation_submitter_total_stats_model
@@ -4531,36 +4533,6 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             )
         )
         self.assertEqual(len(filtered_translatable_suggestions), 0)
-
-    def test_update_translation_submitter_total_stats_without_language_codes(
-        self
-    ) -> None:
-        translation_submitter_total_stats = (
-            suggestion_registry.TranslationSubmitterTotalContributionStats(
-                None, 'user1', ['topic1'], ['accepted'], 1, 1.0, 1, 1, 1, 0, 1,
-                0, 0, datetime.date.today(), datetime.date.today()
-            )
-        )
-        with self.assertRaisesRegex(
-            Exception,
-            'Language code should not be None.'):
-            suggestion_services._update_translation_submitter_total_stats_model(  # pylint: disable=protected-access
-                translation_submitter_total_stats)
-
-    def test_update_translation_submitter_total_stats_without_contributor_id(
-        self
-    ) -> None:
-        translation_submitter_total_stats = (
-            suggestion_registry.TranslationSubmitterTotalContributionStats(
-                'hi', None, ['topic1'], ['accepted'], 1, 1.0, 1, 1, 1, 0, 1,
-                0, 0, datetime.date.today(), datetime.date.today()
-            )
-        )
-        with self.assertRaisesRegex(
-            Exception,
-            'Contributor user ID should not be None.'):
-            suggestion_services._update_translation_submitter_total_stats_model(  # pylint: disable=protected-access
-                translation_submitter_total_stats)
 
 
 class UserContributionProficiencyUnitTests(test_utils.GenericTestBase):

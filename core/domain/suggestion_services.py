@@ -2493,7 +2493,7 @@ def _update_translation_submitter_total_stats_model(
 
     Args:
         translation_submitter_total_stats:
-            list(TranslationSubmitterTotalContributionStats).
+            TranslationSubmitterTotalContributionStats.
             TranslationSubmitterTotalContributionStats domain object.
 
     Raises:
@@ -2501,15 +2501,12 @@ def _update_translation_submitter_total_stats_model(
         Exception. Contributor user ID is None.
     """
     stat = translation_submitter_total_stats
-    if stat.language_code is None:
-        raise Exception('Language code should not be None.')
-    if stat.contributor_id is None:
-        raise Exception('Contributor user ID should not be None.')
 
     stats_model = suggestion_models.TranslationSubmitterTotalContributionStatsModel.get( # pylint: disable=line-too-long
             stat.language_code,
             stat.contributor_id)
 
+    assert stats_model is not None
     stats_model.topic_ids_with_translation_submissions = (
         stat.topic_ids_with_translation_submissions)
     stats_model.recent_review_outcomes = stat.recent_review_outcomes
@@ -2557,6 +2554,7 @@ def _update_translation_reviewer_total_stats_models(
         translation_reviewer_total_stat.language_code,
         translation_reviewer_total_stat.contributor_id)
 
+    assert stats_model is not None
     stats_model.topic_ids_with_translation_reviews = (
         stat.topic_ids_with_translation_reviews)
     stats_model.reviewed_translations_count = (
