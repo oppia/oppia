@@ -27,5 +27,6 @@
 <% } else if (htmlWebpackPlugin.options.hybrid) { %>
   <script src="/third_party/static/angularjs-1.8.2/angular.js"></script>
 <% } %>
-<!-- TODO(#17664): Fetch widget.js from donorbox only in the donate page. -->
-<script async src="https://donorbox.org/widget.js" paypalExpress="false"></script>
+<% if (typeof window !== 'undefined' && window.location.href.includes('donate')) { %>
+  <script async src="https://donorbox.org/widget.js" paypalExpress="false"></script>
+<% } %>
