@@ -17,10 +17,10 @@ body:
       description: A concise description of what issue you're experiencing. **Example:** "When I click on the 'Sign in' button, I expect to be redirected to the login page, but instead I get a 404 error."
     validations:
       required: true
-  - type: textarea
+  - type: input
     attributes:
-      label: URL
-      description: URL of the page where the issue is observed, if applicable.
+      label: URL of the page on which the Issue is seen.
+      description: Provide the URL of the page where the issue is observed.
     validations:
       required: false 
   - type: textarea
