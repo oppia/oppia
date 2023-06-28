@@ -281,7 +281,7 @@ export class StateCard {
   swapContentsWithTranslation(entityTranslation: EntityTranslation): void {
     let writtenTranslation = entityTranslation.getWrittenTranslation(
       this._contentId) as TranslatedContent;
-    if (writtenTranslation && !writtenTranslation.needsUpdate) {
+    if (writtenTranslation) {
       this.contentHtml = writtenTranslation.translation as string;
     }
     this._interaction.swapContentsWithTranslation(entityTranslation);
