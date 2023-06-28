@@ -3176,7 +3176,7 @@ def update_question_contribution_stats_at_review(
             .get_by_id(
                 suggestion.author_id
             ))
-        
+
         accepted_questions_count = 0
         accepted_questions_without_reviewer_edits_count = 0
         rejected_questions_count = 0
@@ -3614,14 +3614,9 @@ def increment_question_submitter_total_stats_at_review(
 
     if suggestion_is_accepted and not edited_by_reviewer:
         question_submitter_total_stat.accepted_questions_without_reviewer_edits_count += 1 # pylint: disable=line-too-long
-        (
-            question_submitter_total_stat
-            .recent_review_outcomes
-        ).pop()
-        (
-            question_submitter_total_stat
-            .recent_review_outcomes
-        ).append(suggestion_models.REVIEW_OUTCOME_ACCEPTED)
+        (question_submitter_total_stat.recent_review_outcomes).pop()
+        (question_submitter_total_stat.recent_review_outcomes).append(
+            suggestion_models.REVIEW_OUTCOME_ACCEPTED)
 
 
 def increment_question_reviewer_total_stats(

@@ -17,6 +17,8 @@
 from __future__ import annotations
 
 import datetime
+import random
+import string
 
 from core import feconf
 from core import utils
@@ -2413,6 +2415,63 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             'data_format': 'html'
         }
 
+    def _set_up_topics_and_100_stories_for_translations(self) -> Mapping[
+        str, change_domain.AcceptableChangeDictTypes]:
+        """Sets up required topics and stories for translations. It does the
+        following.
+        1. Create 2 explorations and publish them.
+        2. Create a default topic.
+        3. Publish the topic with two story IDs.
+        4. Create 100 stories for translation opportunities.
+
+        Returns:
+            Mapping[str, change_domain.AcceptableChangeDictTypes]. A dictionary
+            of the change object for the translations.
+        """
+        explorations = [self.save_new_valid_exploration(
+            '%s' % i,
+            self.owner_id,
+            title='title %d' % i,
+            category='Algebra',
+            end_state_name='End State',
+            correctness_feedback_enabled=True
+        ) for i in range(103)]
+
+        for exp in explorations:
+            self.publish_exploration(self.owner_id, exp.id)
+            exp_services.update_exploration(
+                self.owner_id, exp.id, [exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+                    'state_name': 'Introduction',
+                    'new_value': {
+                        'content_id': 'content_0',
+                        'html': '<p>A content to translate.</p>'
+                    }
+                })], 'Changes content.')
+
+        topic_id = '0'
+        topic = topic_domain.Topic.create_default_topic(
+            topic_id, 'topic_name', 'abbrev', 'description', 'fragm')
+        skill_id_0 = 'skill_id_0'
+        skill_id_1 = 'skill_id_1'
+        self._publish_valid_topic(topic, [skill_id_0, skill_id_1])
+
+        for i in range(103):
+            self.create_story_for_translation_opportunity(
+                self.owner_id, self.admin_id, ('story_id_%s' % (i)), topic_id,
+                '%s' % i)
+
+        return {
+            'cmd': 'add_written_translation',
+            'content_id': 'content_0',
+            'language_code': 'hi',
+            'content_html': '<p>A content to translate.</p>',
+            'state_name': 'Introduction',
+            'translation_html': '<p>Translation for content.</p>',
+            'data_format': 'html'
+        }
+
     def _set_up_topicA_and_stories_for_translations(self) -> Mapping[
         str, change_domain.AcceptableChangeDictTypes]:
         """Sets up required topics and stories for translations. It does the
@@ -3270,6 +3329,170 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             0
         )
 
+    def test_increment_translation_stats_for_than_100_suggestions_accepted(
+        self)-> None:
+
+        change_dict = self._set_up_topics_and_100_stories_for_translations()
+        initial_suggestion = suggestion_services.create_suggestion(
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION,
+            '0', 0, self.author_id, change_dict, 'description')
+        suggestion_services.update_translation_contribution_stats_at_submission(
+            suggestion_services.get_suggestion_by_id(
+                initial_suggestion.suggestion_id)
+        )
+        for i in range(1, 102):
+            common_change_dict = self._get_change_with_normalized_string()
+            suggestion = suggestion_services.create_suggestion(
+                feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+                feconf.ENTITY_TYPE_EXPLORATION,
+                ('%s' % (i)), i, self.author_id, common_change_dict,
+                'description')
+            suggestion_services.update_translation_contribution_stats_at_submission(
+                suggestion_services.get_suggestion_by_id(
+                    suggestion.suggestion_id))
+            suggestion_services.accept_suggestion(
+                suggestion.suggestion_id, self.reviewer_id, 'Accepted',
+                'Accepted')
+            suggestion_services.update_translation_review_stats(
+                suggestion_services.get_suggestion_by_id(
+                    suggestion.suggestion_id)
+            )
+
+        updated_translation_submitter_total_stats_model = (
+            suggestion_models.TranslationSubmitterTotalContributionStatsModel
+            .get(
+                'hi', self.author_id
+            )
+        )
+
+        self.assertEqual(
+            len(
+                updated_translation_submitter_total_stats_model
+                .recent_review_outcomes),
+            100
+        )
+
+        new_change_dict = self._get_change_with_normalized_string()
+        latest_suggestion = suggestion_services.create_suggestion(
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION,
+            '102', 102, self.author_id, new_change_dict, 'description')
+        suggestion_services.update_translation_contribution_stats_at_submission(
+            suggestion_services.get_suggestion_by_id(
+                latest_suggestion.suggestion_id)
+        )
+        suggestion_services.reject_suggestion(
+            latest_suggestion.suggestion_id, self.reviewer_id, 'Rejected'
+        )
+
+        suggestion_services.update_translation_review_stats(
+            suggestion_services.get_suggestion_by_id(
+                latest_suggestion.suggestion_id)
+        )
+
+        rejected_translation_submitter_total_stats_model = (
+            suggestion_models.TranslationSubmitterTotalContributionStatsModel
+            .get(
+                'hi', self.author_id
+            )
+        )
+
+        self.assertEqual(
+            len(
+                rejected_translation_submitter_total_stats_model
+                .recent_review_outcomes),
+            100
+        )
+
+        self.assertEqual(
+            rejected_translation_submitter_total_stats_model
+            .recent_review_outcomes[99],
+            suggestion_models.REVIEW_OUTCOME_REJECTED
+        )
+
+    def test_increment_translation_stats_for_than_100_suggestions_rejected(
+        self)-> None:
+
+        change_dict = self._set_up_topics_and_100_stories_for_translations()
+        initial_suggestion = suggestion_services.create_suggestion(
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION,
+            '0', 0, self.author_id, change_dict, 'description')
+        suggestion_services.update_translation_contribution_stats_at_submission(
+            suggestion_services.get_suggestion_by_id(
+                initial_suggestion.suggestion_id)
+        )
+        for i in range(1, 102):
+            common_change_dict = self._get_change_with_normalized_string()
+            suggestion = suggestion_services.create_suggestion(
+                feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+                feconf.ENTITY_TYPE_EXPLORATION,
+                ('%s' % (i)), i, self.author_id, common_change_dict,
+                'description')
+            suggestion_services.update_translation_contribution_stats_at_submission(
+                suggestion_services.get_suggestion_by_id(
+                    suggestion.suggestion_id))
+            suggestion_services.reject_suggestion(
+                suggestion.suggestion_id, self.reviewer_id, 'Rejected')
+            suggestion_services.update_translation_review_stats(
+                suggestion_services.get_suggestion_by_id(
+                    suggestion.suggestion_id)
+            )
+
+        updated_translation_submitter_total_stats_model = (
+            suggestion_models.TranslationSubmitterTotalContributionStatsModel
+            .get(
+                'hi', self.author_id
+            )
+        )
+
+        self.assertEqual(
+            len(
+                updated_translation_submitter_total_stats_model
+                .recent_review_outcomes),
+            100
+        )
+
+        new_change_dict = self._get_change_with_normalized_string()
+        latest_suggestion = suggestion_services.create_suggestion(
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION,
+            '102', 102, self.author_id, new_change_dict, 'description')
+        suggestion_services.update_translation_contribution_stats_at_submission(
+            suggestion_services.get_suggestion_by_id(
+                latest_suggestion.suggestion_id)
+        )
+        suggestion_services.accept_suggestion(
+            latest_suggestion.suggestion_id, self.reviewer_id, 'Accepted',
+            'Accepted'
+        )
+
+        suggestion_services.update_translation_review_stats(
+            suggestion_services.get_suggestion_by_id(
+                latest_suggestion.suggestion_id)
+        )
+
+        accepted_translation_submitter_total_stats_model = (
+            suggestion_models.TranslationSubmitterTotalContributionStatsModel
+            .get(
+                'hi', self.author_id
+            )
+        )
+
+        self.assertEqual(
+            len(
+                accepted_translation_submitter_total_stats_model
+                .recent_review_outcomes),
+            100
+        )
+
+        self.assertEqual(
+            accepted_translation_submitter_total_stats_model
+            .recent_review_outcomes[99],
+            suggestion_models.REVIEW_OUTCOME_ACCEPTED
+        )
+
     def _create_question_suggestion(
         self,
         skill_id: str
@@ -3910,6 +4133,177 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
         self.assertEqual(
             question_submitter_total_stats_model.overall_accuracy,
             100.0
+        )
+
+    def generate_random_string(self, length: int) -> str:
+        letters = string.ascii_letters
+        return (''.join(random.choice(letters) for _ in range(length))).lower()
+
+    def test_increment_question_stats_for_than_100_suggestions_accepted(
+        self)-> None:
+
+        for i in range(102):
+            skill_id = self._create_skill()
+            topic_id = topic_fetchers.get_new_topic_id()
+            self.save_new_topic(
+                topic_id, 'topic_admin', name='Topic %s' % (i),
+                abbreviated_name='topic-three-1',
+                url_fragment=self.generate_random_string(20),
+                description='Description',
+                canonical_story_ids=[],
+                additional_story_ids=[],
+                uncategorized_skill_ids=[skill_id],
+                subtopics=[], next_subtopic_id=i)
+            suggestion = self._create_question_suggestion(skill_id)
+            suggestion_services.update_question_contribution_stats_at_submission(
+                suggestion_services.get_suggestion_by_id(
+                    suggestion.suggestion_id
+                )
+            )
+            suggestion_services.accept_suggestion(
+                suggestion.suggestion_id, self.reviewer_id, 'Accepted',
+                'Accepted')
+            suggestion_services.update_question_review_stats(
+                suggestion_services.get_suggestion_by_id(
+                    suggestion.suggestion_id)
+            )
+
+        updated_question_submitter_total_stats_model = (
+            suggestion_models.QuestionSubmitterTotalContributionStatsModel
+            .get_by_id(self.author_id)
+        )
+
+        self.assertEqual(
+            len(
+                updated_question_submitter_total_stats_model
+                .recent_review_outcomes),
+            100
+        )
+
+        new_skill_id = self._create_skill()
+        new_topic_id = topic_fetchers.get_new_topic_id()
+        self.save_new_topic(
+            new_topic_id, 'topic_admin', name='New Topic Rejected',
+            abbreviated_name='topic-three-1',
+            url_fragment=self.generate_random_string(20),
+            description='Description',
+            canonical_story_ids=[],
+            additional_story_ids=[],
+            uncategorized_skill_ids=[new_skill_id],
+            subtopics=[], next_subtopic_id=102)
+        latest_suggestion = self._create_question_suggestion(new_skill_id)
+        suggestion_services.update_question_contribution_stats_at_submission(
+            suggestion_services.get_suggestion_by_id(
+                latest_suggestion.suggestion_id
+            )
+        )
+        suggestion_services.reject_suggestion(
+            latest_suggestion.suggestion_id, self.reviewer_id, 'Rejected')
+
+        suggestion_services.update_question_review_stats(
+            suggestion_services.get_suggestion_by_id(
+                latest_suggestion.suggestion_id)
+        )
+
+        rejected_question_submitter_total_stats_model = (
+            suggestion_models.QuestionSubmitterTotalContributionStatsModel
+            .get_by_id(self.author_id)
+        )
+
+        self.assertEqual(
+            len(
+                rejected_question_submitter_total_stats_model
+                .recent_review_outcomes),
+            100
+        )
+
+        self.assertEqual(
+            rejected_question_submitter_total_stats_model
+            .recent_review_outcomes[99],
+            suggestion_models.REVIEW_OUTCOME_REJECTED
+        )
+
+    def test_increment_question_stats_for_than_100_suggestions_rejected(
+        self)-> None:
+
+        for i in range(102):
+            skill_id = self._create_skill()
+            topic_id = topic_fetchers.get_new_topic_id()
+            self.save_new_topic(
+                topic_id, 'topic_admin', name='Topic %s' % (i),
+                abbreviated_name='topic-three-1',
+                url_fragment=self.generate_random_string(20),
+                description='Description',
+                canonical_story_ids=[],
+                additional_story_ids=[],
+                uncategorized_skill_ids=[skill_id],
+                subtopics=[], next_subtopic_id=i)
+            suggestion = self._create_question_suggestion(skill_id)
+            suggestion_services.update_question_contribution_stats_at_submission(
+                suggestion_services.get_suggestion_by_id(
+                    suggestion.suggestion_id
+                )
+            )
+            suggestion_services.reject_suggestion(
+                suggestion.suggestion_id, self.reviewer_id, 'Rejected')
+            suggestion_services.update_question_review_stats(
+                suggestion_services.get_suggestion_by_id(
+                    suggestion.suggestion_id)
+            )
+
+        updated_question_submitter_total_stats_model = (
+            suggestion_models.QuestionSubmitterTotalContributionStatsModel
+            .get_by_id(self.author_id)
+        )
+
+        self.assertEqual(
+            len(
+                updated_question_submitter_total_stats_model
+                .recent_review_outcomes),
+            100
+        )
+
+        new_skill_id = self._create_skill()
+        new_topic_id = topic_fetchers.get_new_topic_id()
+        self.save_new_topic(
+            new_topic_id, 'topic_admin', name='New Topic Rejected',
+            abbreviated_name='topic-three-1',
+            url_fragment=self.generate_random_string(20),
+            description='Description',
+            canonical_story_ids=[],
+            additional_story_ids=[],
+            uncategorized_skill_ids=[new_skill_id],
+            subtopics=[], next_subtopic_id=102)
+        latest_suggestion = self._create_question_suggestion(new_skill_id)
+        suggestion_services.update_question_contribution_stats_at_submission(
+            suggestion_services.get_suggestion_by_id(
+                latest_suggestion.suggestion_id
+            )
+        )
+        suggestion_services.accept_suggestion(
+            latest_suggestion.suggestion_id, self.reviewer_id, 'Accepted',
+            'Accepted')
+        suggestion_services.update_question_review_stats(
+            suggestion_services.get_suggestion_by_id(
+                latest_suggestion.suggestion_id)
+        )
+
+        accepted_question_submitter_total_stats_model = (
+            suggestion_models.QuestionSubmitterTotalContributionStatsModel
+            .get_by_id(self.author_id)
+        )
+
+        self.assertEqual(
+            len(
+                accepted_question_submitter_total_stats_model
+                .recent_review_outcomes),
+            100
+        )
+
+        self.assertEqual(
+            accepted_question_submitter_total_stats_model
+            .recent_review_outcomes[99],
+            suggestion_models.REVIEW_OUTCOME_ACCEPTED
         )
 
     def test_create_and_reject_suggestion(self) -> None:
