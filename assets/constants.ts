@@ -5389,87 +5389,104 @@ export default {
     "id": "en",
     "text": "English",
     "direction": "ltr",
-    "decimal_separator": "."
+    "decimal_separator": ".",
+    "ariaLabelInEnglish": "English"
   }, {
     "id": "pt-br",
     "text": "Português (Brasil)",
     "direction": "ltr",
-    "decimal_separator": ","
+    "decimal_separator": ",",
+    "ariaLabelInEnglish": "Portuguese"
   }, {
     "id": "ar",
     "text": "العربية",
     "direction": "rtl",
-    "decimal_separator": ","
+    "decimal_separator": ",",
+    "ariaLabelInEnglish": "Arabic"
   }, {
     "id": "hi",
     "text": "हिन्दी",
     "direction": "ltr",
-    "decimal_separator": "."
+    "decimal_separator": ".",
+    "ariaLabelInEnglish": "Hindi"
   }, {
     "id": "es",
     "text": "Español",
     "direction": "ltr",
-    "decimal_separator": ","
+    "decimal_separator": ",",
+    "ariaLabelInEnglish": "Spanish"
   }, {
     "id": "bn",
     "text": "বাংলা",
     "direction": "ltr",
-    "decimal_separator": "."
+    "decimal_separator": ".",
+    "ariaLabelInEnglish": "Bangla"
   }, {
     "id": "fr",
     "text": "français",
     "direction": "ltr",
-    "decimal_separator": ","
+    "decimal_separator": ",",
+    "ariaLabelInEnglish": "French"
   }, {
     "id": "id",
     "text": "Bahasa Indonesia",
     "direction": "ltr",
-    "decimal_separator": ","
+    "decimal_separator": ",",
+    "ariaLabelInEnglish": "Indonesian"
   }, {
     "id": "pcm",
     "text": "Naijá (Nigerian Pidgin)",
     "direction": "ltr",
-    "decimal_separator": ","
+    "decimal_separator": ",",
+    "ariaLabelInEnglish": "Nigerian"
   }, {
     "id": "uk",
     "text": "украї́нська мо́ва",
     "direction": "ltr",
-    "decimal_separator": ","
+    "decimal_separator": ",",
+    "ariaLabelInEnglish": "Ukrainian"
   }, {
     "id": "sk",
     "text": "slovenčina",
     "direction": "ltr",
-    "decimal_separator": ","
+    "decimal_separator": ",",
+    "ariaLabelInEnglish": "Slovak"
   }, {
     "id": "nl",
     "text": "Nederlands",
     "direction": "ltr",
-    "decimal_separator": ","
+    "decimal_separator": ",",
+    "ariaLabelInEnglish": "Nederlands"
   }, {
     "id": "kab",
     "text": "Taqbaylit (Kabyle)",
     "direction": "ltr",
-    "decimal_separator": ","
+    "decimal_separator": ",",
+    "ariaLabelInEnglish": "Berber"
   }, {
     "id": "vi",
     "text": "Tiếng Việt",
     "direction": "ltr",
-    "decimal_separator": ","
+    "decimal_separator": ",",
+    "ariaLabelInEnglish": "Vietnamese"
   }, {
     "id": "tr",
     "text": "Türkçe",
     "direction": "ltr",
-    "decimal_separator": ","
+    "decimal_separator": ",",
+    "ariaLabelInEnglish": "Turkish"
   }, {
     "id": "zh-hans",
     "text": "中文(简体)",
     "direction": "ltr",
-    "decimal_separator": "."
+    "decimal_separator": ".",
+    "ariaLabelInEnglish": "Simplified Chinese"
   }, {
     "id": "zh-hant",
     "text": "中文(繁體)",
     "direction": "ltr",
-    "decimal_separator": "."
+    "decimal_separator": ".",
+    "ariaLabelInEnglish": "Traditional Chinese"
   }],
 
   // List of supported audio languages in which we have audio and translations
@@ -7057,6 +7074,6 @@ export default {
   ],
   "CONTRIBUTOR_CERTIFICATE_WIDTH": 1493,
   "CONTRIBUTOR_CERTIFICATE_HEIGHT": 1313,
-  "BRANCH_NAME": "",
-  "SHORT_COMMIT_HASH": ""
+  "BRANCH_NAME": "nav-arabic",
+  "SHORT_COMMIT_HASH": "a643a222f7"
 } as const;
