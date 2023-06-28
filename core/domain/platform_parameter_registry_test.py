@@ -441,6 +441,7 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
             )
 
         self.assertIsNotNone(parameter_storage)
+        assert parameter_storage is not None
         self.assertEqual(parameter_storage.default_value, 'default')
 
     def test_evaluate_all_parameters(self) -> None:
