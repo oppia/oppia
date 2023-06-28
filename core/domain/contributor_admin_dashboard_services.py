@@ -296,7 +296,7 @@ def get_translation_reviewer_total_stats(
         sort_by: Optional[suggestion_models.SortChoices],
         num_days_since_last_activity: Optional[int]
 ) -> Tuple[
-        List[suggestion_models.TranslationReviewerTotalContributionStats],
+        List[suggestion_registry.TranslationReviewerTotalContributionStats],
         int,
         bool
     ]:
@@ -410,7 +410,7 @@ def get_question_reviewer_total_stats(
         sort_by: Optional[suggestion_models.SortChoices],
         num_days_since_last_activity: Optional[int]
 ) -> Tuple[
-        List[suggestion_models.QuestionReviewerTotalContributionStats],
+        List[suggestion_registry.QuestionReviewerTotalContributionStats],
         int,
         bool
     ]:

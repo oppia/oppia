@@ -2952,6 +2952,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
                 'hi', self.author_id
             )
         )
+        assert translation_reviewer_total_stats_model_for_a_topic is not None
         assert translation_submitter_total_stats_model_for_a_topic is not None
         self.assertItemsEqual(
             translation_reviewer_total_stats_model_for_a_topic.
