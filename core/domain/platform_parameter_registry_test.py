@@ -384,7 +384,7 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
             updated_param = param.from_dict(param_dict)
             updated_param.validate()
 
-            model_instance = registry.Registry._to_platform_parameter_model(
+            model_instance = registry.Registry._to_platform_parameter_model( # pylint: disable=protected-access
                 param)
             param.set_rules(new_rules)
             param.set_default_value(default_value)
@@ -405,7 +405,10 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
             )
 
             caching_services.delete_multi(
-                caching_services.CACHE_NAMESPACE_PLATFORM_PARAMETER, None, [name])
+                caching_services.CACHE_NAMESPACE_PLATFORM_PARAMETER,
+                None,
+                [name]
+            )
 
         with self.swap(
             registry.Registry,
