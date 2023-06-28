@@ -211,10 +211,13 @@ services:
     healthcheck:
       test: wget --spider http://localhost:4000/auth/ && echo 'y' | /app/oppia/node_modules/firebase-tools/lib/bin/firebase.js emulators:export /app/firebase_emulator_cache --project=dev-project-id || exit 1
       timeout: 20s
-      interval: 10s
+      interval: 20s
       retries: 5
     environment:
       - oppia_is_dockerized=true
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
     command: >
       sh -c '
         /app/oppia/node_modules/firebase-tools/lib/bin/firebase.js \

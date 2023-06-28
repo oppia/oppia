@@ -24,7 +24,7 @@ jobs:
       - name: Start Containers
         run: |
           echo ---Starting containers---
-          docker compose up --build -d
+          docker compose up -d
 
       - name: Checking server reachability
         run: |
