@@ -20,7 +20,7 @@ from __future__ import annotations
 from core.domain import suggestion_registry
 from core.platform import models
 
-from typing import (List, Optional, Tuple)
+from typing import List, Optional, Tuple
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -31,6 +31,7 @@ if MYPY:  # pragma: no cover
         models.Names.SUGGESTION
     ])
 )
+
 
 def get_translation_submitter_total_stats_from_model(
     translation_submitter_model:
@@ -49,45 +50,46 @@ def get_translation_submitter_total_stats_from_model(
         corresponding to given model.
     """
     return suggestion_registry.TranslationSubmitterTotalContributionStats(
-        language_code = translation_submitter_model.language_code,
-        contributor_id = translation_submitter_model.contributor_id,
-        topic_ids_with_translation_submissions = (
+        language_code=translation_submitter_model.language_code,
+        contributor_id=translation_submitter_model.contributor_id,
+        topic_ids_with_translation_submissions=(
             translation_submitter_model.topic_ids_with_translation_submissions
         ),
-        recent_review_outcomes = (
+        recent_review_outcomes=(
             translation_submitter_model.recent_review_outcomes
         ),
-        recent_performance = translation_submitter_model.recent_performance,
-        overall_accuracy = translation_submitter_model.overall_accuracy,
-        submitted_translations_count = (
+        recent_performance=translation_submitter_model.recent_performance,
+        overall_accuracy=translation_submitter_model.overall_accuracy,
+        submitted_translations_count=(
             translation_submitter_model.submitted_translations_count
         ),
-        submitted_translation_word_count = (
+        submitted_translation_word_count=(
             translation_submitter_model.submitted_translation_word_count
         ),
-        accepted_translations_count = (
+        accepted_translations_count=(
             translation_submitter_model.accepted_translations_count
         ),
-        accepted_translations_without_reviewer_edits_count = (
+        accepted_translations_without_reviewer_edits_count=(
             translation_submitter_model
             .accepted_translations_without_reviewer_edits_count
         ),
-        accepted_translation_word_count = (
+        accepted_translation_word_count=(
             translation_submitter_model.accepted_translation_word_count
         ),
-        rejected_translations_count = (
+        rejected_translations_count=(
             translation_submitter_model.rejected_translations_count
         ),
-        rejected_translation_word_count = (
+        rejected_translation_word_count=(
             translation_submitter_model.rejected_translation_word_count
         ),
-        first_contribution_date = (
+        first_contribution_date=(
             translation_submitter_model.first_contribution_date
         ),
-        last_contribution_date = (
+        last_contribution_date=(
             translation_submitter_model.last_contribution_date
         ),
     )
+
 
 def get_translation_reviewer_total_stats_from_model(
     translation_reviewer_model:
@@ -106,34 +108,35 @@ def get_translation_reviewer_total_stats_from_model(
         corresponding to given model.
     """
     return suggestion_registry.TranslationReviewerTotalContributionStats(
-        language_code = translation_reviewer_model.language_code,
-        contributor_id = translation_reviewer_model.contributor_id,
-        topic_ids_with_translation_reviews = (
+        language_code=translation_reviewer_model.language_code,
+        contributor_id=translation_reviewer_model.contributor_id,
+        topic_ids_with_translation_reviews=(
             translation_reviewer_model.topic_ids_with_translation_reviews
         ),
-        reviewed_translations_count = (
+        reviewed_translations_count=(
             translation_reviewer_model.reviewed_translations_count
         ),
-        accepted_translations_count = (
+        accepted_translations_count=(
             translation_reviewer_model.accepted_translations_count
         ),
-        accepted_translations_with_reviewer_edits_count = (
+        accepted_translations_with_reviewer_edits_count=(
             translation_reviewer_model
             .accepted_translations_with_reviewer_edits_count
         ),
-        accepted_translation_word_count = (
+        accepted_translation_word_count=(
             translation_reviewer_model.accepted_translation_word_count
         ),
-        rejected_translations_count = (
+        rejected_translations_count=(
             translation_reviewer_model.rejected_translations_count
         ),
-        first_contribution_date = (
+        first_contribution_date=(
             translation_reviewer_model.first_contribution_date
         ),
-        last_contribution_date = (
+        last_contribution_date=(
             translation_reviewer_model.last_contribution_date
         ),
     )
+
 
 def get_question_submitter_total_stats_from_model(
     question_submitter_model:
@@ -152,35 +155,36 @@ def get_question_submitter_total_stats_from_model(
         corresponding to given model.
     """
     return suggestion_registry.QuestionSubmitterTotalContributionStats(
-        contributor_id = question_submitter_model.contributor_id,
-        topic_ids_with_question_submissions = (
+        contributor_id=question_submitter_model.contributor_id,
+        topic_ids_with_question_submissions=(
             question_submitter_model.topic_ids_with_question_submissions
         ),
-        recent_review_outcomes = (
+        recent_review_outcomes=(
             question_submitter_model.recent_review_outcomes
         ),
-        recent_performance = question_submitter_model.recent_performance,
-        overall_accuracy = question_submitter_model.overall_accuracy,
-        submitted_questions_count = (
+        recent_performance=question_submitter_model.recent_performance,
+        overall_accuracy=question_submitter_model.overall_accuracy,
+        submitted_questions_count=(
             question_submitter_model.submitted_questions_count
         ),
-        accepted_questions_count = (
+        accepted_questions_count=(
             question_submitter_model.accepted_questions_count
         ),
-        accepted_questions_without_reviewer_edits_count = (
+        accepted_questions_without_reviewer_edits_count=(
             question_submitter_model
             .accepted_questions_without_reviewer_edits_count
         ),
-        rejected_questions_count = (
+        rejected_questions_count=(
             question_submitter_model.rejected_questions_count
         ),
-        first_contribution_date = (
+        first_contribution_date=(
             question_submitter_model.first_contribution_date
         ),
-        last_contribution_date = (
+        last_contribution_date=(
             question_submitter_model.last_contribution_date
         ),
     )
+
 
 def get_question_reviewer_total_stats_from_model(
     question_reviewer_model:
@@ -199,30 +203,31 @@ def get_question_reviewer_total_stats_from_model(
         corresponding to given model.
     """
     return suggestion_registry.QuestionReviewerTotalContributionStats(
-        contributor_id = question_reviewer_model.contributor_id,
-        topic_ids_with_question_reviews = (
+        contributor_id=question_reviewer_model.contributor_id,
+        topic_ids_with_question_reviews=(
             question_reviewer_model.topic_ids_with_question_reviews
         ),
-        reviewed_questions_count = (
+        reviewed_questions_count=(
             question_reviewer_model.reviewed_questions_count
         ),
-        accepted_questions_count = (
+        accepted_questions_count=(
             question_reviewer_model.accepted_questions_count
         ),
-        accepted_questions_with_reviewer_edits_count = (
+        accepted_questions_with_reviewer_edits_count=(
             question_reviewer_model
             .accepted_questions_with_reviewer_edits_count
         ),
-        rejected_questions_count = (
+        rejected_questions_count=(
             question_reviewer_model.rejected_questions_count
         ),
-        first_contribution_date = (
+        first_contribution_date=(
             question_reviewer_model.first_contribution_date
         ),
-        last_contribution_date = (
+        last_contribution_date=(
             question_reviewer_model.last_contribution_date
         ),
     )
+
 
 def get_translation_submitter_total_stats(
     page_size: int,
@@ -283,6 +288,7 @@ def get_translation_submitter_total_stats(
         more
     )
 
+
 def get_translation_reviewer_total_stats(
         page_size: int,
         offset: int,
@@ -339,6 +345,7 @@ def get_translation_reviewer_total_stats(
         more
     )
 
+
 def get_question_submitter_total_stats(
     page_size: int,
     offset: int,
@@ -351,28 +358,28 @@ def get_question_submitter_total_stats(
         bool]:
     """Returns the list of domain objects according to values specified.
 
-    Args:
-        page_size: int. Number of models to fetch.
-        offset: int. Number of results to skip from the beginning of all
-            results matching the query.
-        sort_by: SortChoices|None. A string indicating how to sort the
-            result.
-        topic_ids: List[str]|None. List of topic ID(s) to fetch
-            contributor stats for.
-        num_days_since_last_activity: int. To get number of users
-            who are active in num_days_since_last_activity.
+        Args:
+            page_size: int. Number of models to fetch.
+            offset: int. Number of results to skip from the beginning of all
+                results matching the query.
+            sort_by: SortChoices|None. A string indicating how to sort the
+                result.
+            topic_ids: List[str]|None. List of topic ID(s) to fetch
+                contributor stats for.
+            num_days_since_last_activity: int. To get number of users
+                who are active in num_days_since_last_activity.
 
-    Returns:
-       3-tuple(sorted_results, next_offset, more). where:
-            sorted_results:
-                list(QuestionSubmitterTotalContributionStats).
-                The list of models which match the supplied topic_ids
-                and num_days_since_last_activity filters,
-                returned in the order specified by sort_by.
-            next_offset: int. Number of results to skip in next batch.
-            more: bool. If True, there are (probably) more results after
-                this batch. If False, there are no further results
-                after this batch.
+        Returns:
+        3-tuple(sorted_results, next_offset, more). where:
+                sorted_results:
+                    list(QuestionSubmitterTotalContributionStats).
+                    The list of models which match the supplied topic_ids
+                    and num_days_since_last_activity filters,
+                    returned in the order specified by sort_by.
+                next_offset: int. Number of results to skip in next batch.
+                more: bool. If True, there are (probably) more results after
+                    this batch. If False, there are no further results
+                    after this batch.
     """
     question_submitter_models, next_offset, more = (
         suggestion_models.QuestionSubmitterTotalContributionStatsModel
@@ -394,6 +401,7 @@ def get_question_submitter_total_stats(
         next_offset,
         more
     )
+
 
 def get_question_reviewer_total_stats(
         page_size: int,

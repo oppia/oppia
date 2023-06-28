@@ -2472,7 +2472,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             'data_format': 'html'
         }
 
-    def _set_up_topicA_and_stories_for_translations(self) -> Mapping[
+    def _set_up_a_topic_and_stories_for_translations(self) -> Mapping[
         str, change_domain.AcceptableChangeDictTypes]:
         """Sets up required topics and stories for translations. It does the
         following.
@@ -2684,12 +2684,12 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             feconf.ENTITY_TYPE_EXPLORATION,
             '1', 1, self.author_id, new_change_dict, 'description')
 
-        change_dict_for_topicA = (
-            self._set_up_topicA_and_stories_for_translations())
-        topicA_suggestion = suggestion_services.create_suggestion(
+        change_dict_for_a_topic = (
+            self._set_up_a_topic_and_stories_for_translations())
+        topic_suggestion = suggestion_services.create_suggestion(
             feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
             feconf.ENTITY_TYPE_EXPLORATION,
-            '2', 1, self.author_id, change_dict_for_topicA, 'description')
+            '2', 1, self.author_id, change_dict_for_a_topic, 'description')
 
         suggestion_services.update_translation_contribution_stats_at_submission(
             initial_suggestion
@@ -2762,7 +2762,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
         )
 
         suggestion_services.update_translation_contribution_stats_at_submission(
-            topicA_suggestion
+            topic_suggestion
         )
         updated_translation_submitter_total_stats_model = (
             suggestion_models.TranslationSubmitterTotalContributionStatsModel
@@ -2797,12 +2797,12 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
             feconf.ENTITY_TYPE_EXPLORATION,
             '1', 1, self.author_id, new_change_dict, 'description')
-        change_dict_for_topicA = (
-            self._set_up_topicA_and_stories_for_translations())
-        topicA_suggestion = suggestion_services.create_suggestion(
+        change_dict_for_a_topic = (
+            self._set_up_a_topic_and_stories_for_translations())
+        topic_suggestion = suggestion_services.create_suggestion(
             feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
             feconf.ENTITY_TYPE_EXPLORATION,
-            '2', 1, self.author_id, change_dict_for_topicA, 'description')
+            '2', 1, self.author_id, change_dict_for_a_topic, 'description')
 
         suggestion_services.update_translation_contribution_stats_at_submission(
             suggestion_services.get_suggestion_by_id(
@@ -2933,19 +2933,19 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
         )
 
         suggestion_services.accept_suggestion(
-            topicA_suggestion.suggestion_id, self.reviewer_id, 'Accepted',
+            topic_suggestion.suggestion_id, self.reviewer_id, 'Accepted',
             'Accepted')
         suggestion_services.update_translation_review_stats(
             suggestion_services.get_suggestion_by_id(
-                topicA_suggestion.suggestion_id)
+                topic_suggestion.suggestion_id)
         )
-        translation_reviewer_total_stats_model_for_topicA = (
+        translation_reviewer_total_stats_model_for_a_topic = (
             suggestion_models.TranslationReviewerTotalContributionStatsModel
             .get(
                 'hi', self.reviewer_id
             )
         )
-        translation_submitter_total_stats_model_for_topicA = (
+        translation_submitter_total_stats_model_for_a_topic = (
             suggestion_models.TranslationSubmitterTotalContributionStatsModel
             .get(
                 'hi', self.author_id
@@ -2953,13 +2953,13 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
         )
 
         self.assertItemsEqual(
-            translation_reviewer_total_stats_model_for_topicA.
+            translation_reviewer_total_stats_model_for_a_topic.
             topic_ids_with_translation_reviews,
             ['0', 'A']
         )
 
         self.assertItemsEqual(
-            translation_submitter_total_stats_model_for_topicA.
+            translation_submitter_total_stats_model_for_a_topic.
             topic_ids_with_translation_submissions,
             ['0', 'A']
         )
@@ -3330,7 +3330,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
         )
 
     def test_increment_translation_stats_for_than_100_suggestions_accepted(
-        self)-> None:
+        self) -> None:
 
         change_dict = self._set_up_topics_and_100_stories_for_translations()
         initial_suggestion = suggestion_services.create_suggestion(
@@ -3348,7 +3348,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
                 feconf.ENTITY_TYPE_EXPLORATION,
                 ('%s' % (i)), i, self.author_id, common_change_dict,
                 'description')
-            suggestion_services.update_translation_contribution_stats_at_submission(
+            suggestion_services.update_translation_contribution_stats_at_submission( # pylint: disable=line-too-long
                 suggestion_services.get_suggestion_by_id(
                     suggestion.suggestion_id))
             suggestion_services.accept_suggestion(
@@ -3412,7 +3412,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
         )
 
     def test_increment_translation_stats_for_than_100_suggestions_rejected(
-        self)-> None:
+        self) -> None:
 
         change_dict = self._set_up_topics_and_100_stories_for_translations()
         initial_suggestion = suggestion_services.create_suggestion(
@@ -3430,7 +3430,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
                 feconf.ENTITY_TYPE_EXPLORATION,
                 ('%s' % (i)), i, self.author_id, common_change_dict,
                 'description')
-            suggestion_services.update_translation_contribution_stats_at_submission(
+            suggestion_services.update_translation_contribution_stats_at_submission( # pylint: disable=line-too-long
                 suggestion_services.get_suggestion_by_id(
                     suggestion.suggestion_id))
             suggestion_services.reject_suggestion(
@@ -4136,11 +4136,19 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
         )
 
     def generate_random_string(self, length: int) -> str:
+        """ Generate a random string of given length
+
+        Args:
+            length: int. Length of the string to be generated.
+
+        Returns:
+            str.
+        """
         letters = string.ascii_letters
         return (''.join(random.choice(letters) for _ in range(length))).lower()
 
     def test_increment_question_stats_for_than_100_suggestions_accepted(
-        self)-> None:
+        self) -> None:
 
         for i in range(102):
             skill_id = self._create_skill()
@@ -4155,7 +4163,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
                 uncategorized_skill_ids=[skill_id],
                 subtopics=[], next_subtopic_id=i)
             suggestion = self._create_question_suggestion(skill_id)
-            suggestion_services.update_question_contribution_stats_at_submission(
+            suggestion_services.update_question_contribution_stats_at_submission( # pylint: disable=line-too-long
                 suggestion_services.get_suggestion_by_id(
                     suggestion.suggestion_id
                 )
@@ -4224,7 +4232,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
         )
 
     def test_increment_question_stats_for_than_100_suggestions_rejected(
-        self)-> None:
+        self) -> None:
 
         for i in range(102):
             skill_id = self._create_skill()
@@ -4239,7 +4247,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
                 uncategorized_skill_ids=[skill_id],
                 subtopics=[], next_subtopic_id=i)
             suggestion = self._create_question_suggestion(skill_id)
-            suggestion_services.update_question_contribution_stats_at_submission(
+            suggestion_services.update_question_contribution_stats_at_submission( # pylint: disable=line-too-long
                 suggestion_services.get_suggestion_by_id(
                     suggestion.suggestion_id
                 )

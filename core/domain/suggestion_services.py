@@ -25,7 +25,8 @@ import re
 
 from core import feconf
 from core.constants import constants
-from core.domain import contributor_admin_dashboard_services, email_manager
+from core.domain import contributor_admin_dashboard_services
+from core.domain import email_manager
 from core.domain import exp_fetchers
 from core.domain import feedback_services
 from core.domain import html_cleaner
@@ -40,10 +41,8 @@ from core.domain import user_domain
 from core.domain import user_services
 from core.platform import models
 
-from typing import (
-    Callable, Dict, Final, List, Literal, Mapping, Match, Optional,
-    Sequence, Set, Tuple, Union, cast, overload
-)
+from typing import (Callable, Dict, Final, List, Literal, Mapping, Match,
+                    Optional, Sequence, Set, Tuple, Union, cast, overload)
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -2492,7 +2491,7 @@ def _update_translation_submitter_total_stats_model(
     model for given translation submitter stats.
 
     Args:
-        translation_contribution_stats:
+        translation_submitter_total_stats:
             list(TranslationSubmitterTotalContributionStats).
             TranslationSubmitterTotalContributionStats domain object.
 
@@ -2506,7 +2505,7 @@ def _update_translation_submitter_total_stats_model(
     if stat.contributor_id is None:
         raise Exception('Contributor user ID should not be None.')
 
-    stats_model = suggestion_models.TranslationSubmitterTotalContributionStatsModel.get(
+    stats_model = suggestion_models.TranslationSubmitterTotalContributionStatsModel.get( # pylint: disable=line-too-long
             stat.language_code,
             stat.contributor_id)
 
@@ -2532,7 +2531,7 @@ def _update_translation_submitter_total_stats_model(
     stats_model.first_contribution_date = stat.first_contribution_date
     stats_model.last_contribution_date = stat.last_contribution_date
 
-    suggestion_models.TranslationSubmitterTotalContributionStatsModel.update_timestamps(
+    suggestion_models.TranslationSubmitterTotalContributionStatsModel.update_timestamps( # pylint: disable=line-too-long
         stats_model,
         update_last_updated_time=True)
     suggestion_models.TranslationSubmitterTotalContributionStatsModel.put(
@@ -2547,12 +2546,13 @@ def _update_translation_reviewer_total_stats_models(
     models for given translation review stats.
 
     Args:
-        translation_reviewer_total_stat: list(TranslationReviewStats). A list of
-            TranslationReviewStats domain objects.
+        translation_reviewer_total_stat:
+            TranslationReviewerTotalContributionStats.
+            TranslationReviewerTotalContributionStats domain object.
     """
     stat = translation_reviewer_total_stat
 
-    stats_model = suggestion_models.TranslationReviewerTotalContributionStatsModel.get(
+    stats_model = suggestion_models.TranslationReviewerTotalContributionStatsModel.get( # pylint: disable=line-too-long
         translation_reviewer_total_stat.language_code,
         translation_reviewer_total_stat.contributor_id)
 
@@ -2573,7 +2573,7 @@ def _update_translation_reviewer_total_stats_models(
     stats_model.last_contribution_date = (
         stat.last_contribution_date)
 
-    suggestion_models.TranslationReviewerTotalContributionStatsModel.update_timestamps(
+    suggestion_models.TranslationReviewerTotalContributionStatsModel.update_timestamps( # pylint: disable=line-too-long
         stats_model,
         update_last_updated_time=True)
     suggestion_models.TranslationReviewerTotalContributionStatsModel.put(
@@ -2581,7 +2581,7 @@ def _update_translation_reviewer_total_stats_models(
 
 
 def _update_question_submitter_total_stats_models(
-    question_submitter_total_stats: 
+    question_submitter_total_stats:
         suggestion_registry.QuestionSubmitterTotalContributionStats
 ) -> None:
     """Updates QuestionSubmitterTotalContributionStatsModel for given question
@@ -2589,10 +2589,10 @@ def _update_question_submitter_total_stats_models(
 
     Args:
         question_submitter_total_stats: QuestionSubmitterTotalContributionStats.
-        A QuestionSubmitterTotalContributionStats domain object.
+            A QuestionSubmitterTotalContributionStats domain object.
     """
     stat = question_submitter_total_stats
-    stats_model = suggestion_models.QuestionSubmitterTotalContributionStatsModel.get(
+    stats_model = suggestion_models.QuestionSubmitterTotalContributionStatsModel.get( # pylint: disable=line-too-long
             stat.contributor_id)
     stats_model.topic_ids_with_question_submissions = (
         stat.topic_ids_with_question_submissions)
@@ -2607,7 +2607,7 @@ def _update_question_submitter_total_stats_models(
     stats_model.first_contribution_date = stat.first_contribution_date
     stats_model.last_contribution_date = stat.last_contribution_date
 
-    suggestion_models.QuestionSubmitterTotalContributionStatsModel.update_timestamps(
+    suggestion_models.QuestionSubmitterTotalContributionStatsModel.update_timestamps( # pylint: disable=line-too-long
         stats_model,
         update_last_updated_time=True)
     suggestion_models.QuestionSubmitterTotalContributionStatsModel.put(
@@ -2615,7 +2615,7 @@ def _update_question_submitter_total_stats_models(
 
 
 def _update_question_reviewer_total_stats_models(
-    question_reviewer_total_stats: 
+    question_reviewer_total_stats:
         suggestion_registry.QuestionReviewerTotalContributionStats
 ) -> None:
     """Updates QuestionReviewerTotalContributionStatsModel for given question
@@ -2623,10 +2623,10 @@ def _update_question_reviewer_total_stats_models(
 
     Args:
         question_reviewer_total_stats: QuestionReviewerTotalContributionStats.
-        A QuestionreviewerTotalContributionStats domain object.
+            A QuestionreviewerTotalContributionStats domain object.
     """
     stat = question_reviewer_total_stats
-    stats_model = suggestion_models.QuestionReviewerTotalContributionStatsModel.get(
+    stats_model = suggestion_models.QuestionReviewerTotalContributionStatsModel.get( # pylint: disable=line-too-long
             stat.contributor_id)
     stats_model.topic_ids_with_question_reviews = (
         stat.topic_ids_with_question_reviews)
@@ -2638,7 +2638,7 @@ def _update_question_reviewer_total_stats_models(
     stats_model.first_contribution_date = stat.first_contribution_date
     stats_model.last_contribution_date = stat.last_contribution_date
 
-    suggestion_models.QuestionReviewerTotalContributionStatsModel.update_timestamps(
+    suggestion_models.QuestionReviewerTotalContributionStatsModel.update_timestamps( # pylint: disable=line-too-long
         stats_model,
         update_last_updated_time=True)
     suggestion_models.QuestionReviewerTotalContributionStatsModel.put(
@@ -2687,7 +2687,7 @@ def update_translation_contribution_stats_at_submission(
     )
 
     if translation_submitter_total_stat_model is None:
-        suggestion_models.TranslationSubmitterTotalContributionStatsModel.create(
+        suggestion_models.TranslationSubmitterTotalContributionStatsModel.create( # pylint: disable=line-too-long
             language_code=suggestion.change.language_code,
             contributor_id=suggestion.author_id,
             topic_ids_with_translation_submissions=[topic_id],
@@ -2757,7 +2757,8 @@ def update_translation_contribution_stats_at_submission(
 def update_translation_contribution_stats_at_review(
     suggestion: suggestion_registry.BaseSuggestion
 ) -> None:
-    """Creates/updates TranslationContributionStatsModel model for
+    """Creates/updates TranslationContributionStatsModel and
+    TranslationSubmitterTotalContributionStatsModel model for
     given translation submitter when a translation is reviewed.
 
     Args:
@@ -2823,7 +2824,7 @@ def update_translation_contribution_stats_at_review(
             suggestion_models.REVIEW_OUTCOME_ACCEPTED]
 
     if translation_submitter_total_stat_model is None:
-        suggestion_models.TranslationSubmitterTotalContributionStatsModel.create(
+        suggestion_models.TranslationSubmitterTotalContributionStatsModel.create( # pylint: disable=line-too-long
             language_code=suggestion.change.language_code,
             contributor_id=suggestion.author_id,
             topic_ids_with_translation_submissions=[topic_id],
@@ -2891,7 +2892,8 @@ def update_translation_contribution_stats_at_review(
 def update_translation_review_stats(
     suggestion: suggestion_registry.BaseSuggestion
 ) -> None:
-    """Creates/updates TranslationReviewStatsModel model for given translation
+    """Creates/updates TranslationReviewStatsModel
+    TranslationReviewerTotalContributionStatsModel model for given translation
     reviewer when a translation is reviewed.
 
     Args:
@@ -3080,7 +3082,7 @@ def update_question_contribution_stats_at_submission(
             ))
 
         if question_submitter_total_stat_model is None:
-            suggestion_models.QuestionSubmitterTotalContributionStatsModel.create(
+            suggestion_models.QuestionSubmitterTotalContributionStatsModel.create( # pylint: disable=line-too-long
                 contributor_id=suggestion.author_id,
                 topic_ids_with_question_submissions=[topic.topic_id],
                 recent_review_outcomes=[],
@@ -3198,7 +3200,7 @@ def update_question_contribution_stats_at_review(
                 suggestion_models.REVIEW_OUTCOME_ACCEPTED]
 
         if question_submitter_total_stat_model is None:
-            suggestion_models.QuestionSubmitterTotalContributionStatsModel.create(
+            suggestion_models.QuestionSubmitterTotalContributionStatsModel.create( # pylint: disable=line-too-long
                 contributor_id=suggestion.author_id,
                 topic_ids_with_question_submissions=[topic.topic_id],
                 recent_review_outcomes=recent_review_outcomes,
@@ -3309,7 +3311,7 @@ def update_question_review_stats(
                 rejected_questions_count += 1
             if suggestion_is_accepted and suggestion.edited_by_reviewer:
                 accepted_questions_with_reviewer_edits_count += 1
-            suggestion_models.QuestionReviewerTotalContributionStatsModel.create(
+            suggestion_models.QuestionReviewerTotalContributionStatsModel.create( # pylint: disable=line-too-long
                 contributor_id=suggestion.final_reviewer_id,
                 topic_ids_with_question_reviews=[topic.topic_id],
                 reviewed_questions_count=1,
