@@ -1,8 +1,0 @@
-FROM node:16.13.0-alpine
-
-WORKDIR /app/oppia
-COPY .firebase.json .
-
-RUN echo "export firebase auth users data in the /app/firebase_emulator_cache directory" > sh -c "/app/oppia/node_modules/firebase-tools/lib/bin/firebase.js emulators:export /app/firebase_emulator_cache --project=dev-project-id"
-
-CMD [ "/app/oppia/node_modules/firebase-tools/lib/bin/firebase.js", "emulators:start", "--only", "auth", "--project=dev-project-id", "--config=/app/oppia/.firebase.json", "--import=/app/firebase_emulator_cache", "--export-on-exit=/app/firebase_emulator_cache" ]

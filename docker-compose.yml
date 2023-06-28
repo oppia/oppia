@@ -172,8 +172,6 @@ services:
       interval: 2m
       retries: 5
       start_period: 20m
-    # Line 110 is checking if previous datastore cache exists and deleting it if it does as user has not passed the save_datastore flag.
-    # TODO: thouroughly test this.
     command: >
       sh -c '
         if [ "$save_datastore" = "true" ]
@@ -203,10 +201,7 @@ services:
 # +  #     '
 
   firebase:
-    # image: node:16.13.0-alpine
-    build:
-      context: .
-      dockerfile: ./docker/Dockerfile.firebase_emulator
+    image: node:16.13.0-alpine
     container_name: oppia-firebase-emulator
     ports:
       - "9099:9099"
@@ -214,16 +209,22 @@ services:
     volumes:
       - shared_root_dir:/app/oppia
     healthcheck:
-      test: wget --spider http://localhost:4000/auth/ || exit 1
-      timeout: 10s
-      interval: 30s
+      test: wget --spider http://localhost:4000/auth/ && echo 'y' | /app/oppia/node_modules/firebase-tools/lib/bin/firebase.js emulators:export /app/firebase_emulator_cache --project=dev-project-id || exit 1
+      timeout: 20s
+      interval: 10s
       retries: 5
     environment:
       - oppia_is_dockerized=true
-    depends_on:
-      elasticsearch:
-        condition: service_healthy
-# --export-on-exit${save_datastore:+ --import} \
+    command: >
+      sh -c '
+        /app/oppia/node_modules/firebase-tools/lib/bin/firebase.js \
+        emulators:start \
+        --only auth \
+        --project=dev-project-id \
+        --config=/app/oppia/.firebase.json \
+        ${save_datastore:+ --import=/app/firebase_emulator_cache} \
+        --export-on-exit=/app/firebase_emulator_cache
+      '  
 
   redis:
     image: redis:7.0-alpine
