@@ -39,6 +39,10 @@ services:
           /app/oppia/node_modules/.bin/ng build --watch
         fi
       '
+#       python3 -m scripts.build \
+# +              --prod_env \
+# +              $${maintenance_mode="true" : +--maintenance_mode} \
+# +              $${source_maps="true" : +--source_maps}
 
   webpack-compiler:
     platform: linux/arm64
@@ -72,6 +76,19 @@ services:
           fi
         fi
       '
+#       +  #     sh -c '
+#   #       if [ "$prod_env" = "true" ]; then
+#   #         node --max-old-space-size=8192 \
+#   #         /app/oppia/node_modules/webpack/bin/webpack.js \
+#   #         --config $( [ "$source_maps" = "true" ] && echo "/app/oppia/webpack.prod.sourcemap.config.ts" || echo "/app/oppia/webpack.prod.config.ts" )
+#   #       else
+#   #         node /app/oppia/node_modules/webpack/bin/webpack.js \
+#   #         --config $( [ "$source_maps" = "true" ] && echo "/app/oppia/webpack.dev.sourcemap.config.ts" || echo "/app/oppia/webpack.dev.config.ts" ) \
+#   #         --watch \
+#   #         --color \
+#   #         --progress
+#   #       fi
+#   #     '
 
   google_app_engine:
     build:
@@ -113,6 +130,17 @@ services:
           /google-cloud-sdk/bin/dev_appserver.py /app/oppia/app_dev_docker.yaml --runtime python38 --host=0.0.0.0 --port=8181 --admin_host=0.0.0.0 --admin_port=8000 --skip_sdk_update_check=True
         fi
       '
+#       command: >
+# +  #     sh -c '
+# +  #       /google-cloud-sdk/bin/dev_appserver.py \
+# +  #       $( [ "$prod_env" = "true" ] && echo "/app/oppia/app.yaml" || echo "/app/oppia/app_dev_docker.yaml" ) \
+# +  #       --runtime python38 \
+# +  #       --host=0.0.0.0 \
+# +  #       --port=8181 \
+# +  #       --admin_host=0.0.0.0 \
+# +  #       --admin_port=8000 \
+# +  #       --skip_sdk_update_check=True
+# +  #     '
 
   datastore:
     build:
@@ -159,6 +187,20 @@ services:
           /google-cloud-sdk/bin/gcloud beta emulators datastore start --project dev-project-id --data-dir /app/cloud_datastore_emulator_cache --host-port 0.0.0.0:8089 --consistency=1.0 --quiet --no-store-on-disk
         fi
       '
+#       command: >
+# +  #     sh -c '
+# +  #       if [ "$save_datastore" != "true" ]
+# +  #       then
+# +  #         rm -rf /app/cloud_datastore_emulator_cache || true
+# +  #       fi
+# +  #         /google-cloud-sdk/bin/gcloud beta emulators datastore start \
+# +  #         --project dev-project-id \
+# +  #         --data-dir /app/cloud_datastore_emulator_cache \
+# +  #         --host-port 0.0.0.0:8089 \
+# +  #         --consistency=1.0 \
+# +  #         --quiet \
+# +  #         ${save_datastore != "true":+--no-store-on-disk}
+# +  #     '
 
   firebase:
     # image: node:16.13.0-alpine
