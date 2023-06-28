@@ -275,15 +275,15 @@ def main(args: Optional[List[str]] = None) -> None:
             log_level='critical',
             skip_sdk_update_check=True))
 
-        if os.getenv('GITHUB_ACTIONS') and parsed_args.record_screen:
-            run_lighthouse_puppeteer_script(vid_popen)
-            print('video_path=', video_path)
-            print('sending video path to run_lighthouse_checks...')
-            run_lighthouse_checks(
-                lighthouse_mode, parsed_args.shard, vid_popen, video_path)
-        else:
-            run_lighthouse_puppeteer_script()
-            run_lighthouse_checks(lighthouse_mode, parsed_args.shard)
+    if parsed_args.record_screen:
+        run_lighthouse_puppeteer_script(vid_popen)
+        print('video_path=', video_path)
+        print('sending video path to run_lighthouse_checks...')
+        run_lighthouse_checks(
+            lighthouse_mode, parsed_args.shard, vid_popen, video_path)
+    else:
+        run_lighthouse_puppeteer_script()
+        run_lighthouse_checks(lighthouse_mode, parsed_args.shard)
 
 
 if __name__ == '__main__': # pragma: no cover
