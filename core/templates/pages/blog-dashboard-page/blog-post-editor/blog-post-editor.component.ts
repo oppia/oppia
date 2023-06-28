@@ -116,6 +116,7 @@ export class BlogPostEditorComponent implements OnInit {
     }
   }
 
+
   ngOnInit(): void {
     this.loaderService.showLoadingScreen('Loading');
     this.getUserInfoAsync();
