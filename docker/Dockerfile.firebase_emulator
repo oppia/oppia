@@ -4,7 +4,6 @@ WORKDIR /app/oppia
 
 COPY .firebase.json .
 
-#TODO explain the post script!
 RUN echo "export firebase auth users data in the /app/firebase_emulator_cache directory" > sh -c "/app/oppia/node_modules/firebase-tools/lib/bin/firebase.js emulators:export /app/firebase_emulator_cache --project=dev-project-id"
 
 COPY . .

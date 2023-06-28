@@ -6,9 +6,10 @@ services:
     container_name: oppia-webserver
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: ./docker/Dockerfile
     volumes:
       - shared_root_dir:/app/oppia
+      - /app/oppia/node_modules
     environment:
       - production=false
       - NODE_ENV=development
@@ -45,9 +46,10 @@ services:
     container_name: oppia-webpack-compiler
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: ./docker/Dockerfile
     volumes:
       - shared_root_dir:/app/oppia
+      - /app/oppia/node_modules
     environment:
       - oppia_is_dockerized=true
     healthcheck:
@@ -76,7 +78,7 @@ services:
   google_app_engine:
     build: 
       context: .
-      dockerfile: Dockerfile.google_cloud_sdk
+      dockerfile: ./docker/Dockerfile.google_cloud_sdk
     container_name: oppia-app-engine
     ports:
       - "8181:8181"
@@ -117,7 +119,7 @@ services:
   datastore:
     build:
       context: .
-      dockerfile: Dockerfile.google_cloud_sdk
+      dockerfile: ./docker/Dockerfile.google_cloud_sdk
     container_name: oppia-cloud-datastore
     ports:
       - "8089:8089"
@@ -164,13 +166,14 @@ services:
     # image: node:16.13.0-alpine
     build: 
       context: .
-      dockerfile: Dockerfile.firebase_emulator
+      dockerfile: ./docker/Dockerfile.firebase_emulator
     container_name: oppia-firebase-emulator
     ports:
       - "9099:9099"
       - "4000:4000"
     volumes:
       - shared_root_dir:/app/oppia
+      - /app/oppia/node_modules
     healthcheck:
       test: wget --spider http://localhost:4000/auth/ || exit 1
       timeout: 10s
