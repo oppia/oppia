@@ -5163,7 +5163,7 @@ class EditStoryDecoratorTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_topic_manager_can_edit_story(self) -> None:
-        """Tests that the topic manager can edit a story"""
+        """Tests that the topic manager can edit a story."""
         self.signup(self.manager_email, self.manager_username)
         self.set_topic_managers([self.manager_username], self.topic_id)
 
@@ -7737,6 +7737,9 @@ class SaveExplorationTests(test_utils.GenericTestBase):
                 '/mock/%s' % self.private_exp_id_1, expected_status_int=401)
 
     def test_cannot_save_exploration_with_invalid_exp_id(self) -> None:
+        """Tests that the owner cannot save an exploration if the exploration
+        ID is invalid.
+        """
         self.login(self.OWNER_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
@@ -7744,6 +7747,7 @@ class SaveExplorationTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_banned_user_cannot_save_exploration(self) -> None:
+        """Tests that a banned user cannot save a private exploration."""
         self.login(self.banned_user_email)
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
@@ -7751,6 +7755,7 @@ class SaveExplorationTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_owner_can_save_exploration(self) -> None:
+        """Tests that the owner can save a private exploration."""
         self.login(self.OWNER_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json('/mock/%s' % self.private_exp_id_1)
@@ -7758,6 +7763,7 @@ class SaveExplorationTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_moderator_can_save_public_exploration(self) -> None:
+        """Tests that a moderator can save a public exploration."""
         self.login(self.MODERATOR_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json('/mock/%s' % self.published_exp_id_1)
@@ -7765,6 +7771,7 @@ class SaveExplorationTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_moderator_can_save_private_exploration(self) -> None:
+        """Tests that a moderator can save a private exploration."""
         self.login(self.MODERATOR_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json('/mock/%s' % self.private_exp_id_1)
@@ -7773,6 +7780,7 @@ class SaveExplorationTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_admin_can_save_private_exploration(self) -> None:
+        """Tests that a curriculum admin can save a private exploration."""
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json('/mock/%s' % self.private_exp_id_1)
@@ -7780,6 +7788,9 @@ class SaveExplorationTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_voice_artist_can_only_save_assigned_exploration(self) -> None:
+        """Tests that a voice artist can only save an assigned public
+        exploration.
+        """
         self.login(self.VOICE_ARTIST_EMAIL)
         # Checking voice artist can only save assigned public exploration.
         with self.swap(self, 'testapp', self.mock_testapp):
@@ -7876,6 +7887,7 @@ class OppiaMLAccessDecoratorTest(test_utils.GenericTestBase):
         ))
 
     def test_unauthorized_vm_cannot_fetch_jobs(self) -> None:
+        """Tests that unauthorized VM cannot fetch jobs."""
         payload = {}
         payload['vm_id'] = 'fake_vm'
         secret = 'fake_secret'
@@ -7897,6 +7909,7 @@ class OppiaMLAccessDecoratorTest(test_utils.GenericTestBase):
                 expected_status_int=401)
 
     def test_default_vm_id_raises_exception_in_prod_mode(self) -> None:
+        """Tests that the default VM ID is not accepted in production mode."""
         payload = {}
         payload['vm_id'] = feconf.DEFAULT_VM_ID
         secret = feconf.DEFAULT_VM_SHARED_SECRET
@@ -7911,6 +7924,9 @@ class OppiaMLAccessDecoratorTest(test_utils.GenericTestBase):
                     '/ml/nextjobhandler', payload, expected_status_int=401)
 
     def test_that_invalid_signature_raises_exception(self) -> None:
+        """Tests that a request with an invalid signature cannot fetch
+        jobs.
+        """
         payload = {}
         payload['vm_id'] = feconf.DEFAULT_VM_ID
         secret = feconf.DEFAULT_VM_SHARED_SECRET
@@ -7929,6 +7945,7 @@ class OppiaMLAccessDecoratorTest(test_utils.GenericTestBase):
                 '/ml/nextjobhandler', payload, expected_status_int=401)
 
     def test_that_no_excpetion_is_raised_when_valid_vm_access(self) -> None:
+        """Tests that a valid request fetches jobs."""
         payload = {}
         payload['vm_id'] = feconf.DEFAULT_VM_ID
         secret = feconf.DEFAULT_VM_SHARED_SECRET
@@ -8119,6 +8136,7 @@ class DecoratorForUpdatingSuggestionTests(test_utils.GenericTestBase):
         self.edit_state_suggestion_id = edit_state_suggestion.suggestion_id
 
     def test_authors_cannot_update_suggestion_that_they_created(self) -> None:
+        """Tests that an author cannot update a self-created suggestion."""
         self.login(self.author_email)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(
@@ -8131,6 +8149,7 @@ class DecoratorForUpdatingSuggestionTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_admin_can_update_any_given_translation_suggestion(self) -> None:
+        """Tests that an author can update any translation suggestion."""
         self.login(self.curriculum_admin_email)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(
@@ -8140,6 +8159,7 @@ class DecoratorForUpdatingSuggestionTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_admin_can_update_any_given_question_suggestion(self) -> None:
+        """Tests that an admin can update any question suggestion."""
         self.login(self.curriculum_admin_email)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json('/mock/%s' % self.question_suggestion_id)
@@ -8147,6 +8167,7 @@ class DecoratorForUpdatingSuggestionTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_reviewer_can_update_translation_suggestion(self) -> None:
+        """Tests that a reviewer can update a translation suggestion."""
         self.login(self.hi_language_reviewer)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(
@@ -8156,6 +8177,7 @@ class DecoratorForUpdatingSuggestionTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_reviewer_can_update_question_suggestion(self) -> None:
+        """Tests that a reviewer can update question suggestions."""
         self.login(self.hi_language_reviewer)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json('/mock/%s' % self.question_suggestion_id)
@@ -8164,6 +8186,7 @@ class DecoratorForUpdatingSuggestionTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_guest_cannot_update_any_suggestion(self) -> None:
+        """Tests that a guest user cannot update translation suggestions."""
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/mock/%s' % self.translation_suggestion_id,
@@ -8175,6 +8198,9 @@ class DecoratorForUpdatingSuggestionTests(test_utils.GenericTestBase):
     def test_reviewers_without_permission_cannot_update_any_suggestion(
         self
     ) -> None:
+        """Tests that an English language reviewer does not have permissions
+        to update a translation suggestion.
+        """
         self.login(self.en_language_reviewer)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(
@@ -8187,6 +8213,9 @@ class DecoratorForUpdatingSuggestionTests(test_utils.GenericTestBase):
     def test_suggestions_with_invalid_suggestion_id_cannot_be_updated(
         self
     ) -> None:
+        """Tests that a Hindi language reviewer cannot update a suggestion if
+        the suggestion ID is invalid.
+        """
         self.login(self.hi_language_reviewer)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(
@@ -8198,6 +8227,7 @@ class DecoratorForUpdatingSuggestionTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_non_existent_suggestions_cannot_be_updated(self) -> None:
+        """Tests that a non-existant suggestion cannot be updated."""
         self.login(self.hi_language_reviewer)
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
@@ -8207,6 +8237,9 @@ class DecoratorForUpdatingSuggestionTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_not_allowed_suggestions_cannot_be_updated(self) -> None:
+        """Tests that an English language reviewer cannot update a state
+        suggestion.
+        """
         self.login(self.en_language_reviewer)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(
@@ -8328,6 +8361,9 @@ class OppiaAndroidDecoratorTest(test_utils.GenericTestBase):
     def test_that_no_exception_is_raised_when_valid_oppia_android_headers(
         self
     ) -> None:
+        """Tests that a valid request with correct headers does not raise
+        exceptions.
+        """
         headers = {
             'api_key': android_validation_constants.ANDROID_API_KEY,
             'app_package_name': (
@@ -8344,6 +8380,9 @@ class OppiaAndroidDecoratorTest(test_utils.GenericTestBase):
                 headers=headers)
 
     def test_invalid_api_key_raises_exception(self) -> None:
+        """Tests that unathorized access error is raised if api key is
+        invalid.
+        """
         invalid_headers = {
             'api_key': 'bad_key',
             'app_package_name': (
@@ -8360,6 +8399,9 @@ class OppiaAndroidDecoratorTest(test_utils.GenericTestBase):
                 headers=invalid_headers, expected_status_int=401)
 
     def test_invalid_package_name_raises_exception(self) -> None:
+        """Tests that unathorized access error is raised if the package name
+        is invalid.
+        """
         invalid_headers = {
             'api_key': android_validation_constants.ANDROID_API_KEY,
             'app_package_name': 'bad_package_name',
@@ -8375,6 +8417,9 @@ class OppiaAndroidDecoratorTest(test_utils.GenericTestBase):
                 headers=invalid_headers, expected_status_int=401)
 
     def test_invalid_version_name_raises_exception(self) -> None:
+        """Tests that unathorized access error is raised if the package version
+        is invalid.
+        """
         invalid_headers = {
             'api_key': android_validation_constants.ANDROID_API_KEY,
             'app_package_name': (
@@ -8391,6 +8436,9 @@ class OppiaAndroidDecoratorTest(test_utils.GenericTestBase):
                 headers=invalid_headers, expected_status_int=401)
 
     def test_invalid_version_code_raises_exception(self) -> None:
+        """Tests that unathorized access error is raised if the version code
+        is invalid.
+        """
         invalid_headers = {
             'api_key': android_validation_constants.ANDROID_API_KEY,
             'app_package_name': (
@@ -8436,6 +8484,7 @@ class CanAccessClassroomAdminPageDecoratorTests(test_utils.GenericTestBase):
         ))
 
     def test_normal_user_cannot_access_classroom_admin_page(self) -> None:
+        """Tests that a normal user cannot access the classroom admin page."""
         self.login(self.user_email)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(
@@ -8447,6 +8496,7 @@ class CanAccessClassroomAdminPageDecoratorTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_guest_user_cannot_access_classroom_admin_page(self) -> None:
+        """Tests that a guest user cannot access the classroom admin page."""
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/classroom-admin', expected_status_int=401)
@@ -8456,6 +8506,9 @@ class CanAccessClassroomAdminPageDecoratorTests(test_utils.GenericTestBase):
             'You must be logged in to access this resource.')
 
     def test_classroom_admin_can_manage_blog_editors(self) -> None:
+        """Tests that a classroom admin page can access the classroom admin
+        page.
+        """
         self.login(self.CLASSROOM_ADMIN_EMAIL)
 
         with self.swap(self, 'testapp', self.mock_testapp):
@@ -8492,6 +8545,7 @@ class IsFromOppiaAndroidBuildDecoratorTests(test_utils.GenericTestBase):
         ))
 
     def test_error_when_android_build_secret_is_none(self) -> None:
+        """Tests that an error occurs if the build secret is none."""
         testapp_swap = self.swap(self, 'testapp', self.mock_testapp)
         swap_api_key_secrets_return_none = self.swap_with_checks(
             secrets_services,
@@ -8516,6 +8570,7 @@ class IsFromOppiaAndroidBuildDecoratorTests(test_utils.GenericTestBase):
         )
 
     def test_error_when_given_api_key_is_invalid(self) -> None:
+        """Tests that an error occurs if the API key is invalid."""
         testapp_swap = self.swap(self, 'testapp', self.mock_testapp)
         mailchimp_swap = self.swap_to_always_return(
             secrets_services, 'get_secret', 'secret')
@@ -8533,6 +8588,9 @@ class IsFromOppiaAndroidBuildDecoratorTests(test_utils.GenericTestBase):
         )
 
     def test_no_error_when_given_api_key_is_valid(self) -> None:
+        """Tests that no error occurs if the API key is valid in the
+        header.
+        """
         testapp_swap = self.swap(self, 'testapp', self.mock_testapp)
         mailchimp_swap = self.swap_to_always_return(
             secrets_services, 'get_secret', 'secret')
