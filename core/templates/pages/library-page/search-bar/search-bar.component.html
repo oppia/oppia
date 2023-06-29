@@ -1,7 +1,7 @@
 <div class="oppia-same-row-container">
   <form class="search-bar-float-left oppia-search-bar-form" role="search">
     <div class="form-group">
-      <div class="input-group oppia-input-group" [ngClass]="{'classroom-page-input-group': isSearchButtonActive()}">
+      <div class="input-group oppia-input-group inptcls" [ngClass]="{'classroom-page-input-group': isSearchButtonActive()}">
         <div class="input-group-addon oppia-search-bar-icon">
           <i class="fas fa-search oppia-translate-icon-down md-18" *ngIf="!isSearchInProgress()"></i>
           <span *ngIf="isSearchInProgress()">
@@ -28,7 +28,7 @@
             (focus)="openSubmenu($event, 'category')"
             (keydown)="onMenuKeypress($event, 'category', {shiftTab: ACTION_CLOSE, enter: ACTION_OPEN})"
             type="button"
-            class="btn e2e-test-search-bar-dropdown-toggle oppia-search-bar-dropdown-toggle oppia-search-bar-input oppia-search-bar-category-input dropdown-toggle"
+            class="btn e2e-test-search-bar-dropdown-toggle oppia-search-bar-dropdown-toggle oppia-search-bar-input oppia-search-bar-category-input dropdown-toggle catbtn"
             title="{{ selectionDetails.categories.description | translate }}">
       <i *ngIf="isMobileViewActive()" class="fas fa-shapes category-selector-icon"></i>
       <span class="btn-text">
@@ -88,7 +88,7 @@
             (focus)="openSubmenu($event, 'language')"
             (keydown)="onMenuKeypress($event, 'language', {shiftTab: ACTION_CLOSE, enter: ACTION_OPEN})"
             type="button"
-            class="btn e2e-test-search-bar-dropdown-toggle oppia-search-bar-input oppia-search-bar-language-input dropdown-toggle language-dropdown-toggle oppia-search-bar-dropdown-toggle-button"
+            class="btn e2e-test-search-bar-dropdown-toggle oppia-search-bar-input oppia-search-bar-language-input dropdown-toggle language-dropdown-toggle oppia-search-bar-dropdown-toggle-button langbtn"
             title="{{selectionDetails.languageCodes.description | translate}}">
       <i *ngIf="isMobileViewActive()" class="fas fa-globe language-selector-icon"></i>
       <span class="btn-text">
@@ -148,3 +148,67 @@
     </div>
   </div>
 </div>
+<style>
+  @media (max-width: 445px){
+  .inptcls{
+    width: 14em !important;
+    font-size: 15.7px !important;
+  }
+  .catbtn{
+    width : 10em !important; 
+ font-size: 13px !important;
+ position: relative;
+ left: 6rem;
+  }
+  .langbtn{
+    width : 10em !important; 
+ font-size: 13px !important;
+ position: relative;
+ left: 5rem;
+  }
+  :lang(ar) .inptcls{
+    width: 14em !important;
+    font-size: 12px !important;
+  }
+  :lang(ar) .catbtn{
+width : 10em !important; 
+ font-size: 13px !important;
+ position: relative;
+ right : 9rem; 
+  }
+  :lang(ar) .langbtn{
+  width : 10em !important; 
+ font-size: 13px !important;
+ position: relative;
+ right : 10rem; 
+ padding-left: 3rem;
+  }
+}
+@media (max-width : 340px){
+  :lang(ar) .langbtn{
+  width : 10em !important; 
+ font-size: 13px !important;
+ position: relative;
+ right : 8rem; 
+ padding-left: 3rem;
+  }
+}
+ 
+@media (max-width : 285px){
+    .inptcls{
+    width: 13.4em !important;
+    font-size: 13.4px !important;
+  }
+  .catbtn{
+    width : 12em !important; 
+ font-size: 10px !important;
+
+ left: 10rem !important;
+  }
+  .langbtn{
+    width : 12em !important; 
+ font-size: 10px !important;
+ left: 4.8rem !important;
+  }
+}
+</style>

@@ -369,12 +369,12 @@
         (mouseover)="openSubmenu($event, 'languageMenu')"
         (mouseleave)="closeSubmenuIfNotMobile($event)"
         autofocus>
-      <div class="oppia-navbar-button-container dropdown">
+      <div class="oppia-navbar-button-container dropdown langbtnContainer">
         <button ngbDropdownToggle
-                class="btn dropdown-toggle oppia-navbar-button oppia-language-dropdown-button e2e-test-language-dropdown"
+                class="btn dropdown-toggle oppia-navbar-button oppia-language-dropdown-button e2e-test-language-dropdown langbtn"
                 (keydown)="onMenuKeypress($event, 'languageMenu', {shiftTab: ACTION_CLOSE, enter: ACTION_OPEN})">
-          <i class="fas fa-globe language-icon"></i>
-          <span class="mobile-view-language-code" *ngIf="windowIsNarrow"> {{ currentLanguageCode }} </span>
+          <i class="fas fa-globe language-icon langi"></i>
+          <span class="mobile-view-language-code lngcd" *ngIf="windowIsNarrow"> {{ currentLanguageCode }} </span>
           <span class="desktop-view-language-code" *ngIf="!windowIsNarrow"> {{ currentLanguageText }} </span>
         </button>
       </div>
@@ -401,7 +401,7 @@
     <li [ngClass]="{'open' : activeMenuName === 'profileMenu'}"
         ngbDropdown
         *ngIf="userIsLoggedIn"
-        class="nav-item e2e-test-profile-dropdown oppia-navbar-clickable-dropdown profile-dropdown">
+        class="nav-item e2e-test-profile-dropdown oppia-navbar-clickable-dropdown profile-dropdown pfl">
       <a (keydown)="onMenuKeypress($event, 'profileMenu', {shiftTab: ACTION_CLOSE, enter: ACTION_OPEN})"
          class="nav-link oppia-navbar-dropdown-toggle e2e-test-navbar-dropdown-toggle"
          aria-haspopup="true"
@@ -446,7 +446,7 @@
         </div>
       </a>
       <ul ngbDropdownMenu
-          class="dropdown-menu dropdown-menu oppia-navbar-dropdown"
+          class="dropdown-menu dropdown-menu oppia-navbar-dropdown dropdn"
           (mouseover)="openSubmenu($event, 'profileMenu')"
           (mouseleave)="closeSubmenuIfNotMobile($event)"
           autofocus>
@@ -548,15 +548,15 @@
     <li ngbDropdown
         *ngIf="!userIsLoggedIn && username !== ''"
         class="nav-item oppia-navbar-clickable-dropdown dropdown">
-      <div class="oppia-navbar-button-container dropdown oppia-navbar-button-container-extra-info">
+      <div class="oppia-navbar-button-container dropdown oppia-navbar-button-container-extra-info sinin">
         <button ngbDropdownToggle
-                class="btn dropdown-toggle oppia-navbar-button e2e-mobile-test-login"
+                class="btn dropdown-toggle oppia-navbar-button e2e-mobile-test-login sinin"
                 (click)="onLoginButtonClicked()">
           <span [innerHTML]="'I18N_TOPNAV_SIGN_IN' | translate"></span>
         </button>
       </div>
       <ul ngbDropdownMenu
-          class="dropdown-menu oppia-navbar-dropdown oppia-navbar-dropdown-menu">
+          class="dropdown-menu oppia-navbar-dropdown oppia-navbar-dropdown-menu dropdn">
         <li class="nav-item">
           <a (click)="onLoginButtonClicked()"
              class="nav-link oppia-nav-link">
@@ -581,3 +581,91 @@
     </li>
   </ul>
 </div>
+<style>
+  .dropdn{
+    position: absolute; 
+    z-index: 500;
+  }
+  @media only screen and (max-width: 335px) {
+  :lang(ar) .sinin{
+font-size: 0.5rem !important;
+padding : 0;
+position: relative;
+top : 2rem;  
+  }
+  }
+
+    @media only screen and (max-width: 355px) {
+    .langbtn{
+    padding :0; 
+    margin-left : 0; 
+    margin-right : 0; 
+    margin-top : 4px; 
+  }
+  .langi{
+    padding-left :2px; 
+    margin-left : 0; 
+    margin-right : 0; 
+    margin-top : 4px; 
+  }
+   .langcd{
+    padding :0; 
+    margin-top : 4px; 
+    margin-left : 0; 
+    margin-right : 0; 
+  }
+    .langbtnContainer{
+    margin-top : 4px; 
+    margin-left : 0; 
+    margin-right : 0; 
+  }
+   .sinin{
+    padding :3px; 
+    margin-top : 3px; 
+    margin-left : 0; 
+    margin-right : 0; 
+  }
+  :lang(ar) .langbtn{
+    padding :0; 
+    position: relative; 
+    top : 6.2rem; 
+    margin-top : 6px !important; 
+  }
+  :lang(ar) .langi{
+    font-size: 1.2rem !important;
+    padding-left :0px; 
+    margin-left : 1rem; 
+    margin-right : 0; 
+    margin-top : 4px; 
+  }
+  :lang(ar) .langbtnContainer{
+   
+    margin-top : 4px; 
+    margin-left : 1rem; 
+    margin-right : 0; 
+  }
+  :lang(ar) .sinin{
+font-size: 1.2rem !important;
+padding : 0;
+position: relative;
+top : 3.4rem;  
+  }
+  :lang(ar) .pfl{
+    position: relative; 
+    top : 6rem; 
+  }
+
+    }
+
+  
+  @media only screen and (max-width: 308px) {
+ 
+  :lang(ar) .langbtn{
+    padding :0; 
+    position: relative; 
+    top : 11.2rem; 
+    margin-top : 6px !important; 
+  }
+}
+
+</style>
