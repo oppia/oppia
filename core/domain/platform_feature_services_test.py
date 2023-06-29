@@ -53,9 +53,12 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.user_id = self.get_user_id_from_email(self.OWNER_EMAIL)
 
+        self.original_parameter_registry = (
+            registry.Registry.parameter_registry.copy())
         registry.Registry.parameter_registry.clear()
         # Parameter names that might be used in following tests.
         param_names = ['param_a', 'param_b']
+        param_name_enums = [ParamNames.PARAM_A, ParamNames.PARAM_B]
         param_names_features = ['feature_a', 'feature_b', 'feature_c']
         param_name_enums_features = [
             ParamNames.FEATURE_A, ParamNames.FEATURE_B, ParamNames.FEATURE_C]
@@ -138,23 +141,35 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
         )
 
         # Replace feature lists with mocked names.
-        self.original_feature_list = feature_services.ALL_FEATURES_LIST
+        self.original_feature_list = feature_services.ALL_FEATURE_FLAGS
         self.original_feature_name_set = (
             feature_services.ALL_FEATURES_NAMES_SET
         )
-        # Here we use MyPy ignore because the expected type of ALL_FEATURES_LIST
+        self.original_parameter_list = (
+            feature_services.ALL_PLATFORM_PARAMS_EXCEPT_FEATURE_FLAGS)
+        # Here we use MyPy ignore because the expected type of ALL_FEATURE_FLAGS
         # is a list of 'PARAM_NAMES' Enum, but here for testing purposes we are
         # providing a list of 'ParamNames' enums, which causes MyPy to throw an
         # 'Incompatible types in assignment' error. Thus to avoid the error, we
         # used ignore here.
-        feature_services.ALL_FEATURES_LIST = param_name_enums_features  # type: ignore[assignment]
+        feature_services.ALL_FEATURE_FLAGS = param_name_enums_features  # type: ignore[assignment]
         feature_services.ALL_FEATURES_NAMES_SET = set(param_names_features)
+        # Here we use MyPy ignore because the expected type of
+        # ALL_PLATFORM_PARAMS_EXCEPT_FEATURE_FLAGS is a list of 'PARAM_NAMES'
+        # Enum, but here for testing purposes we are providing a list of
+        # 'ParamNames' enums, which causes MyPy to throw an 'Incompatible types
+        # in assignment' error. Thus to avoid the error, we used ignore here.
+        feature_services.ALL_PLATFORM_PARAMS_EXCEPT_FEATURE_FLAGS = (
+            param_name_enums) # type: ignore[assignment]
 
     def tearDown(self) -> None:
         super().tearDown()
-        feature_services.ALL_FEATURES_LIST = self.original_feature_list
+        feature_services.ALL_FEATURE_FLAGS = self.original_feature_list
         feature_services.ALL_FEATURES_NAMES_SET = (
             self.original_feature_name_set)
+        feature_services.ALL_PLATFORM_PARAMS_EXCEPT_FEATURE_FLAGS = (
+            self.original_parameter_list)
+        registry.Registry.parameter_registry = self.original_parameter_registry
 
     def test_get_all_platform_parameters_except_feature_flag_dicts(
         self
@@ -414,3 +429,43 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
                     })
                 ]
             )
+
+    def test_all_platform_params_should_appear_once_in_features_or_in_params_list( # pylint: disable=line-too-long
+        self
+    ) -> None:
+        feature_services.ALL_FEATURE_FLAGS = self.original_feature_list
+        feature_services.ALL_FEATURES_NAMES_SET = (
+            self.original_feature_name_set)
+        feature_services.ALL_PLATFORM_PARAMS_EXCEPT_FEATURE_FLAGS = (
+            self.original_parameter_list)
+        registry.Registry.parameter_registry = self.original_parameter_registry
+        all_params_name = registry.Registry.get_all_platform_parameter_names()
+        all_features_names_list = [
+            feature.value for feature in feature_services.ALL_FEATURE_FLAGS]
+        all_params_except_features_names_list = [
+            params.value
+            for params in feature_services.ALL_PLATFORM_PARAMS_EXCEPT_FEATURE_FLAGS]
+        self.assertEqual(
+            len(all_params_name),
+            (
+                len(all_features_names_list) +
+                len(all_params_except_features_names_list)
+            )
+        )
+        for param_name in all_params_name:
+            if param_name in all_features_names_list:
+                self.assertNotIn(
+                    param_name,
+                    all_params_except_features_names_list,
+                    'The platform parameter named %s is already present '
+                    'in the ALL_FEATURE_FLAGS list and should not be present '
+                    'in the ALL_PLATFORM_PARAMS_EXCEPT_FEATURE_FLAGS list.' % (
+                        param_name))
+            elif param_name in all_params_except_features_names_list:
+                self.assertNotIn(
+                    param_name,
+                    all_features_names_list,
+                    'The platform parameter named %s is already present '
+                    'in the ALL_PLATFORM_PARAMS_EXCEPT_FEATURE_FLAGS list and '
+                    'should not be present in the ALL_FEATURE_FLAGS list.' % (
+                        param_name))
