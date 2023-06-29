@@ -581,8 +581,9 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
   }
 
   isShowFeedbackUpdatesInProfilepicDropdownFeatureFlagEnable(): boolean {
-    return this.platformFeatureService.status.
-      ShowFeedbackUpdatesInProfilePicDropdownMenu.isEnabled;
+    return (
+      this.platformFeatureService.status.
+        ShowFeedbackUpdatesInProfilePicDropdownMenu.isEnabled);
   }
 }
 

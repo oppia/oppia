@@ -175,7 +175,6 @@
 /core/templates/pages/learner-dashboard-page/ @oppia/lace-frontend-reviewers
 
 
-
 # Dev workflow team.
 /.eslintignore @oppia/dev-workflow-reviewers
 /.eslintrc @oppia/dev-workflow-reviewers
