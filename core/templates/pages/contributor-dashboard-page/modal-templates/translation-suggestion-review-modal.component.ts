@@ -553,9 +553,21 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
     }
   }
 
+  /**
+   * Retrieves image information from the given content and
+   * returns it as a string.
+   * If the content is in the form of a string (not an array),
+   * it parses the content using a DOMParser and extracts the HTML
+   * for all 'oppia-noninteractive-image' elements. The extracted HTML
+   * is returned as a string.
+   * @param content The content containing image information (
+   * either a string or an array of strings).
+   * @returns A string representation of the extracted image information.
+   */
   getImageInfoForSuggestion(content: string | string[]): string {
     let htmlString = '';
 
+    // Images are present in form of strings not as Array of strings
     if (!Array.isArray(content)) {
       this.showAltText = true;
       const doc = new DOMParser().parseFromString(content, 'text/html');
