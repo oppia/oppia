@@ -323,6 +323,7 @@ describe('NoninteractiveImage', () => {
       // This is tested to make sure the function did no continue to execute.
       expect(imagePreloaderService.getDimensionsOfImage).not.toHaveBeenCalled();
     });
+
   it('should show alt text images when showAltText property is true', () => {
     component.showAltText = true;
     component.imageAltText = 'This is alt text';
@@ -332,12 +333,14 @@ describe('NoninteractiveImage', () => {
     expect(altTextcomponent?.textContent).toEqual(
       'Description: ' + component.imageAltText);
   });
-  fit('should not show alt text images when showAltText property is false', () => {
-    component.showAltText = false;
-    component.imageAltText = 'This is alt text';
-    fixture.detectChanges();
 
-    const altTextComponent = document.querySelector('figcaption.alt-text');
-    expect(altTextComponent).toBeNull();
+  it('should not show alt text images when showAltText property is false',
+    () => {
+      component.showAltText = false;
+      component.imageAltText = 'This is alt text';
+      fixture.detectChanges();
+
+      const altTextComponent = document.querySelector('figcaption.alt-text');
+      expect(altTextComponent).toBeNull();
   });
 });
