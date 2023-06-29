@@ -567,7 +567,7 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
   getImageInfoForSuggestion(content: string | string[]): string {
     let htmlString = '';
 
-    // Images are present in form of strings not as Array of strings
+    // Images are present in form of strings not as Array of strings.
     if (!Array.isArray(content)) {
       this.showAltText = true;
       const doc = new DOMParser().parseFromString(content, 'text/html');
