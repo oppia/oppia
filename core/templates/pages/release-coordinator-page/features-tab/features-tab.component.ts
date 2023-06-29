@@ -36,7 +36,7 @@ import {
   PlatformParameterFilterType,
   PlatformParameterFilter,
 } from 'domain/platform_feature/platform-parameter-filter.model';
-import { PlatformParameter, FeatureStage } from
+import { PlatformParameter } from
   'domain/platform_feature/platform-parameter.model';
 import { PlatformParameterRule } from
   'domain/platform_feature/platform-parameter-rule.model';

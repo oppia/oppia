@@ -225,8 +225,8 @@ describe('Admin page platform parameters tab', () => {
 
       expect(rule.filters.length).toBe(2);
       // Original filter list: ['platform_type']
-      // Verifies it's ['platform_type', 'app_version'] after adding a new filter
-      // to the end.
+      // Verifies it's ['platform_type', 'app_version'] after adding a new
+      // filter to the end.
       expect(rule.filters[0].type)
         .toEqual(PlatformParameterFilterType.PlatformType);
       expect(rule.filters[1].type)
