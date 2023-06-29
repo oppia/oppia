@@ -130,6 +130,22 @@ services:
           /google-cloud-sdk/bin/dev_appserver.py /app/oppia/app_dev_docker.yaml --runtime python38 --host=0.0.0.0 --port=8181 --admin_host=0.0.0.0 --admin_port=8000 --skip_sdk_update_check=True
         fi
       '
+# sh -c '
+#   if [ "$prod_env" = "true" ]; then
+#     if [ "$no_auto_restart" = "true" ]; then
+#       /google-cloud-sdk/bin/dev_appserver.py /app/oppia/app.yaml --runtime python38 --host=0.0.0.0 --port=8181 --admin_host=0.0.0.0 --admin_port=8000 --skip_sdk_update_check=True --automatic_restart=False
+#     else
+#       /google-cloud-sdk/bin/dev_appserver.py /app/oppia/app.yaml --runtime python38 --host=0.0.0.0 --port=8181 --admin_host=0.0.0.0 --admin_port=8000 --skip_sdk_update_check=True --automatic_restart=True
+#     fi
+#   else
+#     if [ "$no_auto_restart" = "true" ]; then
+#       /google-cloud-sdk/bin/dev_appserver.py /app/oppia/app_dev_docker.yaml --runtime python38 --host=0.0.0.0 --port=8181 --admin_host=0.0.0.0 --admin_port=8000 --skip_sdk_update_check=True --automatic_restart=False
+#     else
+#       /google-cloud-sdk/bin/dev_appserver.py /app/oppia/app_dev_docker.yaml --runtime python38 --host=0.0.0.0 --port=8181 --admin_host=0.0.0.0 --admin_port=8000 --skip_sdk_update_check=True --automatic_restart=True
+#     fi
+#   fi
+# '
+
 #       command: >
 # +  #     sh -c '
 # +  #       /google-cloud-sdk/bin/dev_appserver.py \
