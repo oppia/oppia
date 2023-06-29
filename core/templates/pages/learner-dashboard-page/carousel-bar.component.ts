@@ -16,7 +16,6 @@
  * @fileoverview Component for Carouselbar in the Learner Dashboard page.
  */
 
-import { AppConstants } from 'app.constants';
 import { Component, OnInit } from '@angular/core';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { DeviceInfoService } from 'services/contextual/device-info.service';
@@ -32,15 +31,13 @@ import './carousel-bar.component.css';
   styleUrls: ['./carousel-bar.component.css']
 })
 export class CarouselBarComponent implements OnInit {
-  tileDisplayCount: number;
-  leftmostCardIndices: number;
-  isAnyCarouselCurrentlyScrolling: boolean;
-  scrolledLeft: number;
-  offSetWidth: number;
-  scrollWidth: number;
-  clientWidth: number;
-  disableBtn: boolean = true;
-  howMuchtoScroll: number;
+  CarouselScrollWidthPx: number;
+  CarouselClientWidthPx: number;
+  untrackedTopicTiles: boolean = true;
+  carouselScrollPositionPx: number = 0;
+  scrollUntrackedTopics: boolean = true;
+  disableLeftButton: boolean = true;
+
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
@@ -49,7 +46,6 @@ export class CarouselBarComponent implements OnInit {
 
   constructor(
     private windowDimensionService: WindowDimensionsService,
-    private windowDimensionsService: WindowDimensionsService,
     private urlInterpolationService: UrlInterpolationService,
     private i18nLanguageCodeService: I18nLanguageCodeService,
     private deviceInfoService: DeviceInfoService) {
@@ -65,66 +61,57 @@ export class CarouselBarComponent implements OnInit {
 
   ngOnInit(): void {
     this.windowIsNarrow = this.windowDimensionService.isWindowNarrow();
-    setTimeout(() => {
-      let carouselSelector = document.querySelector('.tiles') as HTMLElement;
-      this.scrollWidth = carouselSelector.scrollWidth;
-      this.clientWidth = carouselSelector.clientWidth;
-      let scrollRatio = this.clientWidth / this.scrollWidth;
-      var maxScrollPosition = this.scrollWidth - this.clientWidth;
-      var scrollPosition = scrollRatio * maxScrollPosition;
-      console.error(scrollPosition, 'scroll position...');
-    },);
+    // Let carouselSelector = document.querySelector('.tiles') as HTMLElement;
     this.directiveSubscriptions.add(
       this.windowDimensionService.getResizeEvent().subscribe(() => {
-        // This.offSetWidth = carouselSelector.offsetWidth;
-        // console.error(this.offSetWidth, 'off set width....');
-        // this.scrollWidth = carouselSelector.scrollWidth;
-        // console.error(this.scrollWidth, 'scroll widhth .....');
-        // this.clientWidth = carouselSelector.clientWidth;
-        // console.error(this.clientWidth, 'client width ....');
         this.windowIsNarrow = this.windowDimensionService.isWindowNarrow();
       }));
   }
-
-  // ngAfterViewInit(): void {
-    
-  // }
 
 
 
   scroll(isLeftScroll: boolean): void {
     let carouselSelector = document.querySelector('.tiles') as HTMLElement;
+    this.CarouselScrollWidthPx = carouselSelector.scrollWidth;
+    console.error(this.CarouselScrollWidthPx, 'scroll width ..');
+    this.CarouselClientWidthPx = carouselSelector.clientWidth;
+    console.error(this.CarouselClientWidthPx, 'client Width ...');
 
     let direction = isLeftScroll ? -1 : 1;
 
-    let carouselScrollPositionPx = (
-      carouselSelector).scrollLeft || 0;
+    console.error(direction * 210, 'directionn.......');
+    console.error(this.carouselScrollPositionPx, 'carousel scroll.* 210');
+    console.error(
+      this.carouselScrollPositionPx >
+      (this.CarouselScrollWidthPx - this.CarouselClientWidthPx), '> he');
 
-    carouselScrollPositionPx = Math.max(0, carouselScrollPositionPx);
-    let newScrollPositionPx = carouselScrollPositionPx +
-    (1 * AppConstants.LEARN_SOMETHING_NEW_TILE_WIDTH_PX * direction);
 
-    console.error(newScrollPositionPx);
-    console.error(carouselScrollPositionPx, 'scroll left.....');
-    console.error(this.clientWidth, 'clientwidth ....');
-    console.error(this.scrollWidth, 'scroll width....');
-    if ((carouselScrollPositionPx) >= this.scrollWidth - this.clientWidth) {
-      console.error('right - disable--->>>true');
+    if (this.scrollUntrackedTopics && ((this.carouselScrollPositionPx === 0) ||
+     (this.carouselScrollPositionPx >
+       (this.CarouselScrollWidthPx - this.CarouselClientWidthPx)))) {
+      this.carouselScrollPositionPx = this.carouselScrollPositionPx +
+        (direction * 190);
+      carouselSelector.scrollBy({
+        top: 0,
+        left: (direction * 190),
+        behavior: 'smooth',
+      });
     } else {
-      console.error('right--disable--->>>false');
+      this.carouselScrollPositionPx = this.carouselScrollPositionPx +
+        (direction * 230);
+      carouselSelector.scrollBy({
+        top: 0,
+        left: (direction * 230),
+        behavior: 'smooth',
+      });
     }
 
-    $(carouselSelector).animate({
-      scrollLeft: newScrollPositionPx
-    }, {
-      duration: 800,
-      queue: false,
-      start: () => {
-        this.isAnyCarouselCurrentlyScrolling = true;
-      },
-      complete: () => {
-        this.isAnyCarouselCurrentlyScrolling = false;
-      }
-    });
+    if (this.carouselScrollPositionPx <= 0) {
+      this.disableLeftButton = true;
+      this.carouselScrollPositionPx = 0;
+    } else {
+      this.disableLeftButton = false;
+    }
+    console.error(this.carouselScrollPositionPx, 'intial caro..posti..');
   }
 }
