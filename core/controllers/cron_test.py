@@ -21,7 +21,6 @@ import datetime
 from core import feconf
 from core.constants import constants
 from core.domain import beam_job_services
-from core.domain import config_services
 from core.domain import email_manager
 from core.domain import exp_domain
 from core.domain import exp_services
@@ -612,9 +611,6 @@ class CronMailAdminContributorDashboardBottlenecksHandlerTests(
 
     def test_email_not_sent_if_sending_emails_is_disabled(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
-        config_services.set_property(
-            'committer_id',
-            'enable_admin_notifications_for_reviewer_shortage', True)
         swap_platform_parameter_value = self.swap_to_always_return(
             platform_feature_services,
             'get_platform_parameter_value',
@@ -645,9 +641,6 @@ class CronMailAdminContributorDashboardBottlenecksHandlerTests(
         self
     ) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
-        config_services.set_property(
-            'committer_id',
-            'enable_admin_notifications_for_reviewer_shortage', False)
 
         with self.can_send_emails, self.testapp_swap:
             with self.swap(
@@ -684,12 +677,14 @@ class CronMailAdminContributorDashboardBottlenecksHandlerTests(
         self
     ) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
-        config_services.set_property(
-            'committer_id',
-            'enable_admin_notifications_for_reviewer_shortage', True)
+        swap_platform_parameter_value = self.swap_to_always_return(
+            platform_feature_services,
+            'get_platform_parameter_value',
+            True
+        )
 
         with self.can_send_emails, self.testapp_swap:
-            with self.swap(
+            with swap_platform_parameter_value, self.swap(
                 email_manager,
                 'send_mail_to_notify_admins_that_reviewers_are_needed',
                 self.mock_send_mail_to_notify_admins_that_reviewers_are_needed):

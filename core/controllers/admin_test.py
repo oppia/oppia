@@ -112,21 +112,21 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
 
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
-        new_config_value = False
+        new_config_value = 0.4
 
         response_dict = self.get_json('/adminhandler')
         response_config_properties = response_dict['config_properties']
         self.assertDictContainsSubset({
-            'value': False,
+            'value': 0.2,
         }, response_config_properties[
             config_domain.
-            ENABLE_ADMIN_NOTIFICATIONS_FOR_REVIEWER_SHORTAGE.name])
+            RECORD_PLAYTHROUGH_PROBABILITY.name])
 
         payload = {
             'action': 'save_config_properties',
             'new_config_property_values': {
                 config_domain.
-                ENABLE_ADMIN_NOTIFICATIONS_FOR_REVIEWER_SHORTAGE.name: (
+                RECORD_PLAYTHROUGH_PROBABILITY.name: (
                     new_config_value),
             }
         }
@@ -138,7 +138,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
             'value': new_config_value,
         }, response_config_properties[
             config_domain.
-            ENABLE_ADMIN_NOTIFICATIONS_FOR_REVIEWER_SHORTAGE.name])
+            RECORD_PLAYTHROUGH_PROBABILITY.name])
 
         self.logout()
 

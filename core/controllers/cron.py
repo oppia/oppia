@@ -21,7 +21,6 @@ from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import app_feedback_report_services
 from core.domain import beam_job_services
-from core.domain import config_domain
 from core.domain import cron_services
 from core.domain import email_manager
 from core.domain import platform_feature_services
@@ -168,9 +167,10 @@ class CronMailAdminContributorDashboardBottlenecksHandler(
         translation_admin_ids = user_services.get_user_ids_by_role(
             feconf.ROLE_ID_TRANSLATION_ADMIN)
 
-        if (
-                config_domain
-                .ENABLE_ADMIN_NOTIFICATIONS_FOR_REVIEWER_SHORTAGE.value):
+        if platform_feature_services.get_platform_parameter_value(
+            platform_parameter_list.ParamNames.
+            ENABLE_ADMIN_NOTIFICATIONS_FOR_REVIEWER_SHORTAGE.value
+        ):
             suggestion_types_needing_reviewers = (
                 suggestion_services
                 .get_suggestion_types_that_need_reviewers()

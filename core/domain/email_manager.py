@@ -1767,9 +1767,10 @@ def send_mail_to_notify_admins_that_reviewers_are_needed(
         logging.error('This app cannot send emails to users.')
         return
 
-    if not (
-            config_domain
-            .ENABLE_ADMIN_NOTIFICATIONS_FOR_REVIEWER_SHORTAGE.value):
+    if not platform_feature_services.get_platform_parameter_value(
+        platform_parameter_list.ParamNames.
+        ENABLE_ADMIN_NOTIFICATIONS_FOR_REVIEWER_SHORTAGE.value
+    ):
         logging.error(
             'The "enable_admin_notifications_for_reviewer_shortage" '
             'property must be enabled on the admin config page in order to '

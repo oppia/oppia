@@ -37,6 +37,7 @@ class ExistingPlatformParameterValidityTests(test_utils.GenericTestBase):
                             'diagnostic_test',
                             'dummy_feature_flag_for_e2e_tests',
                             'dummy_parameter',
+                            'enable_admin_notifications_for_reviewer_shortage',
                             'end_chapter_celebration',
                             'high_bounce_rate_task_minimum_exploration_starts',
                             (
@@ -50,6 +51,7 @@ class ExistingPlatformParameterValidityTests(test_utils.GenericTestBase):
                             'is_improvements_tab_enabled',
                             'learner_groups_are_enabled',
                             'max_number_of_tags_assigned_to_blog_post',
+                            'notify_admins_suggestions_waiting_too_long_is_enabled',
                             'promo_bar_enabled',
                             'promo_bar_message',
                             'serial_chapter_launch_curriculum_admin_view',

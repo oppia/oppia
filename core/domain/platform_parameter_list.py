@@ -71,6 +71,8 @@ class ParamNames(enum.Enum):
         'contributor_dashboard_reviewer_emails_is_enabled')
     ENABLE_ADMIN_NOTIFICATIONS_FOR_SUGGESTIONS_NEEDING_REVIEW = (
         'notify_admins_suggestions_waiting_too_long_is_enabled')
+    ENABLE_ADMIN_NOTIFICATIONS_FOR_REVIEWER_SHORTAGE = (
+        'enable_admin_notifications_for_reviewer_shortage')
 
 
 # Platform parameters should all be defined below.
@@ -206,6 +208,16 @@ Registry.create_platform_parameter(
         'Dashboard suggestions that have been waiting for a review for more '
         'than %s days. The default value is false.' % (
             suggestion_models.SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS)
+    ),
+    platform_parameter_domain.DataTypes.BOOL
+)
+
+Registry.create_platform_parameter(
+    ParamNames.ENABLE_ADMIN_NOTIFICATIONS_FOR_REVIEWER_SHORTAGE,
+    (
+        'Enable sending admins email notifications if Contributor Dashboard '
+        'reviewers are needed in specific suggestion types. The default value '
+        'is false.'
     ),
     platform_parameter_domain.DataTypes.BOOL
 )

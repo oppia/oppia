@@ -213,6 +213,7 @@ class ConfigProperty:
     - editor_page_announcement.
     - editor_prerequisites_agreement.
     - embedded_google_group_url.
+    - enable_admin_notifications_for_reviewer_shortage.
     - featured_translation_languages.
     - full_site_url.
     - high_bounce_rate_task_minimum_exploration_starts.
@@ -500,14 +501,6 @@ MAX_NUMBER_OF_EXPLORATIONS_IN_MATH_SVGS_BATCH = ConfigProperty(
 CONTRIBUTOR_DASHBOARD_IS_ENABLED = ConfigProperty(
     'contributor_dashboard_is_enabled', BOOL_SCHEMA,
     'Enable contributor dashboard page. The default value is true.', True)
-
-ENABLE_ADMIN_NOTIFICATIONS_FOR_REVIEWER_SHORTAGE = ConfigProperty(
-    'enable_admin_notifications_for_reviewer_shortage', BOOL_SCHEMA,
-    (
-        'Enable sending admins email notifications if Contributor Dashboard '
-        'reviewers are needed in specific suggestion types. The default value '
-        'is false.'
-    ), False)
 
 MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER = ConfigProperty(
     'max_number_of_suggestions_per_reviewer',

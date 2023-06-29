@@ -4963,11 +4963,15 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
         }
 
     def test_email_not_sent_if_can_send_emails_is_false(self) -> None:
-        config_services.set_property(
-            'committer_id',
-            'enable_admin_notifications_for_reviewer_shortage', True)
+        swap_platform_parameter_value = self.swap_to_always_return(
+            platform_feature_services,
+            'get_platform_parameter_value',
+            True
+        )
 
-        with self.capture_logging(min_level=logging.ERROR) as logs:
+        with swap_platform_parameter_value, self.capture_logging(
+            min_level=logging.ERROR
+        ) as logs:
             with self.cannot_send_emails_ctx, self.log_new_error_ctx:
                 email_manager.send_mail_to_notify_admins_that_reviewers_are_needed(  # pylint: disable=line-too-long
                     [self.admin_1_id], [], [],
@@ -4982,10 +4986,6 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
     def test_email_not_sent_if_notifying_admins_reviewers_needed_is_disabled(
         self
     ) -> None:
-        config_services.set_property(
-            'committer_id',
-            'enable_admin_notifications_for_reviewer_shortage', False)
-
         with self.capture_logging(min_level=logging.ERROR) as logs:
             with self.can_send_emails_ctx, self.log_new_error_ctx:
                 email_manager.send_mail_to_notify_admins_that_reviewers_are_needed(  # pylint: disable=line-too-long
@@ -5002,11 +5002,15 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
                 'send admins the emails.')
 
     def test_email_not_sent_if_no_admins_to_notify(self) -> None:
-        config_services.set_property(
-            'committer_id',
-            'enable_admin_notifications_for_reviewer_shortage', True)
+        swap_platform_parameter_value = self.swap_to_always_return(
+            platform_feature_services,
+            'get_platform_parameter_value',
+            True
+        )
 
-        with self.capture_logging(min_level=logging.ERROR) as logs:
+        with swap_platform_parameter_value, self.capture_logging(
+            min_level=logging.ERROR
+        ) as logs:
             with self.can_send_emails_ctx, self.log_new_error_ctx:
                 email_manager.send_mail_to_notify_admins_that_reviewers_are_needed(  # pylint: disable=line-too-long
                     [], [], [],
@@ -5021,13 +5025,19 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
     def test_email_not_sent_if_no_suggestion_types_that_need_reviewers(
         self
     ) -> None:
-        config_services.set_property(
-            'committer_id',
-            'enable_admin_notifications_for_reviewer_shortage', True)
+        swap_platform_parameter_value = self.swap_to_always_return(
+            platform_feature_services,
+            'get_platform_parameter_value',
+            True
+        )
 
         with self.can_send_emails_ctx, self.log_new_info_ctx:
-            email_manager.send_mail_to_notify_admins_that_reviewers_are_needed(
-                [self.admin_1_id], [], [], {})
+            with swap_platform_parameter_value:
+                (
+                    email_manager.
+                    send_mail_to_notify_admins_that_reviewers_are_needed(
+                        [self.admin_1_id], [], [], {})
+                )
 
         messages = self._get_all_sent_email_messages()
         self.assertEqual(len(messages), 0)
@@ -5037,11 +5047,15 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
             'Contributor Dashboard.')
 
     def test_email_not_sent_if_admin_email_does_not_exist(self) -> None:
-        config_services.set_property(
-            'committer_id',
-            'enable_admin_notifications_for_reviewer_shortage', True)
+        swap_platform_parameter_value = self.swap_to_always_return(
+            platform_feature_services,
+            'get_platform_parameter_value',
+            True
+        )
 
-        with self.capture_logging(min_level=logging.ERROR) as logs:
+        with swap_platform_parameter_value, self.capture_logging(
+            min_level=logging.ERROR
+        ) as logs:
             with self.can_send_emails_ctx, self.log_new_error_ctx:
                 email_manager.send_mail_to_notify_admins_that_reviewers_are_needed(  # pylint: disable=line-too-long
                     ['admin_id_without_email'], [], [],
@@ -5059,9 +5073,11 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
     def test_email_sent_to_admin_if_question_suggestions_need_reviewers(
         self
     ) -> None:
-        config_services.set_property(
-            'committer_id',
-            'enable_admin_notifications_for_reviewer_shortage', True)
+        swap_platform_parameter_value = self.swap_to_always_return(
+            platform_feature_services,
+            'get_platform_parameter_value',
+            True
+        )
         self._create_question_suggestion()
         suggestion_types_needing_reviewers = (
             suggestion_services.get_suggestion_types_that_need_reviewers())
@@ -5087,7 +5103,7 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
                 feconf.CONTRIBUTOR_DASHBOARD_URL)
         )
 
-        with self.can_send_emails_ctx:
+        with swap_platform_parameter_value, self.can_send_emails_ctx:
             email_manager.send_mail_to_notify_admins_that_reviewers_are_needed(
                 [self.admin_1_id], [], [],
                 self.suggestion_types_needing_reviewers)
@@ -5105,9 +5121,11 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
     def test_email_sent_to_admins_if_question_suggestions_need_reviewers(
         self
     ) -> None:
-        config_services.set_property(
-            'committer_id',
-            'enable_admin_notifications_for_reviewer_shortage', True)
+        swap_platform_parameter_value = self.swap_to_always_return(
+            platform_feature_services,
+            'get_platform_parameter_value',
+            True
+        )
         self._create_question_suggestion()
         suggestion_types_needing_reviewers = (
             suggestion_services.get_suggestion_types_that_need_reviewers())
@@ -5151,7 +5169,7 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
                 feconf.CONTRIBUTOR_DASHBOARD_URL)
         )
 
-        with self.can_send_emails_ctx:
+        with swap_platform_parameter_value, self.can_send_emails_ctx:
             email_manager.send_mail_to_notify_admins_that_reviewers_are_needed(
                 [self.admin_1_id, self.admin_2_id], [], [],
                 suggestion_types_needing_reviewers)
@@ -5175,9 +5193,11 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
     def test_admin_email_sent_if_translations_need_reviewers_for_one_lang(
         self
     ) -> None:
-        config_services.set_property(
-            'committer_id',
-            'enable_admin_notifications_for_reviewer_shortage', True)
+        swap_platform_parameter_value = self.swap_to_always_return(
+            platform_feature_services,
+            'get_platform_parameter_value',
+            True
+        )
         self._create_translation_suggestion_with_language_code('hi')
         suggestion_types_needing_reviewers = (
             suggestion_services.get_suggestion_types_that_need_reviewers())
@@ -5202,7 +5222,7 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
                 feconf.CONTRIBUTOR_DASHBOARD_URL)
         )
 
-        with self.can_send_emails_ctx:
+        with swap_platform_parameter_value, self.can_send_emails_ctx:
             email_manager.send_mail_to_notify_admins_that_reviewers_are_needed(
                 [self.admin_1_id], [], [],
                 suggestion_types_needing_reviewers)
@@ -5220,9 +5240,11 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
     def test_admin_emails_sent_if_translations_need_reviewers_for_one_lang(
         self
     ) -> None:
-        config_services.set_property(
-            'committer_id',
-            'enable_admin_notifications_for_reviewer_shortage', True)
+        swap_platform_parameter_value = self.swap_to_always_return(
+            platform_feature_services,
+            'get_platform_parameter_value',
+            True
+        )
         self._create_translation_suggestion_with_language_code('hi')
         suggestion_types_needing_reviewers = (
             suggestion_services.get_suggestion_types_that_need_reviewers())
@@ -5264,7 +5286,7 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
                 feconf.CONTRIBUTOR_DASHBOARD_URL)
         )
 
-        with self.can_send_emails_ctx:
+        with swap_platform_parameter_value, self.can_send_emails_ctx:
             email_manager.send_mail_to_notify_admins_that_reviewers_are_needed(
                 [self.admin_1_id, self.admin_2_id], [], [],
                 suggestion_types_needing_reviewers)
@@ -5288,9 +5310,11 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
     def test_admin_email_sent_if_translations_need_reviewers_for_multi_lang(
         self
     ) -> None:
-        config_services.set_property(
-            'committer_id',
-            'enable_admin_notifications_for_reviewer_shortage', True)
+        swap_platform_parameter_value = self.swap_to_always_return(
+            platform_feature_services,
+            'get_platform_parameter_value',
+            True
+        )
         self._create_translation_suggestion_with_language_code('fr')
         self._create_translation_suggestion_with_language_code('hi')
         suggestion_types_needing_reviewers = (
@@ -5322,7 +5346,7 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
                 feconf.CONTRIBUTOR_DASHBOARD_URL)
         )
 
-        with self.can_send_emails_ctx:
+        with swap_platform_parameter_value, self.can_send_emails_ctx:
             email_manager.send_mail_to_notify_admins_that_reviewers_are_needed(
                 [self.admin_1_id], [], [],
                 suggestion_types_needing_reviewers)
@@ -5340,9 +5364,11 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
     def test_admin_emails_sent_if_translations_need_reviewers_for_multi_lang(
         self
     ) -> None:
-        config_services.set_property(
-            'committer_id',
-            'enable_admin_notifications_for_reviewer_shortage', True)
+        swap_platform_parameter_value = self.swap_to_always_return(
+            platform_feature_services,
+            'get_platform_parameter_value',
+            True
+        )
         self._create_translation_suggestion_with_language_code('fr')
         self._create_translation_suggestion_with_language_code('hi')
         suggestion_types_needing_reviewers = (
@@ -5396,7 +5422,7 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
                 feconf.CONTRIBUTOR_DASHBOARD_URL)
         )
 
-        with self.can_send_emails_ctx:
+        with swap_platform_parameter_value, self.can_send_emails_ctx:
             email_manager.send_mail_to_notify_admins_that_reviewers_are_needed(
                 [self.admin_1_id, self.admin_2_id], [], [],
                 suggestion_types_needing_reviewers)
@@ -5420,9 +5446,11 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
     def test_email_sent_to_admins_if_mutli_suggestion_types_needing_reviewers(
         self
     ) -> None:
-        config_services.set_property(
-            'committer_id',
-            'enable_admin_notifications_for_reviewer_shortage', True)
+        swap_platform_parameter_value = self.swap_to_always_return(
+            platform_feature_services,
+            'get_platform_parameter_value',
+            True
+        )
         self._create_translation_suggestion_with_language_code('fr')
         self._create_translation_suggestion_with_language_code('hi')
         self._create_question_suggestion()
@@ -5480,7 +5508,7 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
                 feconf.CONTRIBUTOR_DASHBOARD_URL)
         )
 
-        with self.can_send_emails_ctx:
+        with swap_platform_parameter_value, self.can_send_emails_ctx:
             email_manager.send_mail_to_notify_admins_that_reviewers_are_needed(
                 [self.admin_1_id], [self.admin_2_id], [],
                 suggestion_types_needing_reviewers)

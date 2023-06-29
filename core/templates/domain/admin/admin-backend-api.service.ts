@@ -100,7 +100,6 @@ export interface ConfigPropertyValues {
   'contributor_dashboard_is_enabled': boolean;
   'email_footer': string;
   'email_sender_name': string;
-  'enable_admin_notifications_for_reviewer_shortage': boolean;
   'max_number_of_explorations_in_math_svgs_batch': number;
   'max_number_of_suggestions_per_reviewer': number;
   'max_number_of_svgs_in_math_svgs_batch': number;
