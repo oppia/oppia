@@ -12,9 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { ServerMode } from
-  'domain/platform_feature/platform-parameter-filter.model';
-
 import { AppConstants } from 'app.constants';
 
 /**
@@ -22,10 +19,6 @@ import { AppConstants } from 'app.constants';
  */
 
 export const AdminFeaturesTabConstants = {
-  ALLOWED_SERVER_MODES: [
-    ServerMode.Dev, ServerMode.Test, ServerMode.Prod
-  ].map(val => val.toString()),
-
   ALLOWED_PLATFORM_TYPES: (
     AppConstants.PLATFORM_PARAMETER_ALLOWED_PLATFORM_TYPES),
 

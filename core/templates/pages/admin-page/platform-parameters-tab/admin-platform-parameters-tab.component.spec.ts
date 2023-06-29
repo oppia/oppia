@@ -33,7 +33,7 @@ import { AdminPlatformParametersTabComponent } from
   // eslint-disable-next-line max-len
   'pages/admin-page/platform-parameters-tab/admin-platform-parameters-tab.component';
 import { WindowRef } from 'services/contextual/window-ref.service';
-import { PlatformParameterFilterType, ServerMode } from
+import { PlatformParameterFilterType } from
   'domain/platform_feature/platform-parameter-filter.model';
 import { FeatureStage, PlatformParameter } from 'domain/platform_feature/platform-parameter.model';
 import { HttpErrorResponse } from '@angular/common/http';
@@ -97,8 +97,8 @@ describe('Admin page platform parameters tab', () => {
           rules: [{
             filters: [
               {
-                type: PlatformParameterFilterType.ServerMode,
-                conditions: [['=', ServerMode.Dev]]
+                type: PlatformParameterFilterType.BrowserType,
+                conditions: [['=', 'Chrome']]
               }
             ],
             // This does not match the data type of platform param, but this is
@@ -224,11 +224,11 @@ describe('Admin page platform parameters tab', () => {
       rule.filters[1].type = PlatformParameterFilterType.AppVersion;
 
       expect(rule.filters.length).toBe(2);
-      // Original filter list: ['server_mode']
-      // Verifies it's ['server_mode', 'app_version'] after adding a new filter
+      // Original filter list: ['platform_type']
+      // Verifies it's ['platform_type', 'app_version'] after adding a new filter
       // to the end.
       expect(rule.filters[0].type)
-        .toEqual(PlatformParameterFilterType.ServerMode);
+        .toEqual(PlatformParameterFilterType.PlatformType);
       expect(rule.filters[1].type)
         .toEqual(PlatformParameterFilterType.AppVersion);
     });
@@ -242,7 +242,7 @@ describe('Admin page platform parameters tab', () => {
 
       component.removeFilter(rule, 0);
 
-      // Original filter list: ['server_mode', 'app_version']
+      // Original filter list: ['platform_type', 'app_version']
       // Verifies it's ['app_version'] after removing the first filter.
       expect(rule.filters.length).toBe(1);
       expect(rule.filters[0].type)
@@ -262,7 +262,7 @@ describe('Admin page platform parameters tab', () => {
       // Original condition list: ['=dev']
       // Verifies it's ['=dev', '=mock'] after adding.
       expect(filter.conditions[0])
-        .toEqual(['=', ServerMode.Dev.toString()]);
+        .toEqual(['=', 'Web']);
       expect(filter.conditions[1])
         .toEqual(['=', 'mock']);
     });
@@ -549,12 +549,8 @@ describe('Admin page platform parameters tab', () => {
           {
             filters: [
               {
-                type: PlatformParameterFilterType.ServerMode,
-                conditions: [['=', ServerMode.Dev], ['=', ServerMode.Test]]
-              },
-              {
-                type: PlatformParameterFilterType.ServerMode,
-                conditions: [['=', ServerMode.Prod]]
+                type: PlatformParameterFilterType.PlatformType,
+                conditions: [['=', 'Web']]
               }
             ],
             value_when_matched: true,
@@ -587,12 +583,8 @@ describe('Admin page platform parameters tab', () => {
             {
               filters: [
                 {
-                  type: PlatformParameterFilterType.ServerMode,
-                  conditions: [['=', ServerMode.Dev], ['=', ServerMode.Test]]
-                },
-                {
-                  type: PlatformParameterFilterType.ServerMode,
-                  conditions: [['=', ServerMode.Prod]]
+                  type: PlatformParameterFilterType.PlatformType,
+                  conditions: [['=', 'Web']]
                 }
               ],
               value_when_matched: true,
@@ -648,12 +640,12 @@ describe('Admin page platform parameters tab', () => {
             {
               filters: [
                 {
-                  type: PlatformParameterFilterType.ServerMode,
-                  conditions: [['=', ServerMode.Dev]]
+                  type: PlatformParameterFilterType.PlatformType,
+                  conditions: [['=', 'Web']]
                 },
                 {
-                  type: PlatformParameterFilterType.ServerMode,
-                  conditions: [['=', ServerMode.Dev]]
+                  type: PlatformParameterFilterType.PlatformType,
+                  conditions: [['=', 'Web']]
                 }
               ],
               value_when_matched: true
@@ -680,8 +672,8 @@ describe('Admin page platform parameters tab', () => {
             {
               filters: [
                 {
-                  type: PlatformParameterFilterType.ServerMode,
-                  conditions: [['=', ServerMode.Dev], ['=', ServerMode.Dev]]
+                  type: PlatformParameterFilterType.PlatformType,
+                  conditions: [['=', 'Web'], ['=', 'Web']]
                 },
               ],
               value_when_matched: true

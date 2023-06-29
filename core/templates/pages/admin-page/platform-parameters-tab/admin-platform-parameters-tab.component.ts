@@ -71,11 +71,6 @@ export class AdminPlatformParametersTabComponent implements OnInit {
       inputRegex?: RegExp;
     }
   } = {
-      [PlatformParameterFilterType.ServerMode]: {
-        displayName: 'Server Mode',
-        options: AdminFeaturesTabConstants.ALLOWED_SERVER_MODES,
-        operators: ['=']
-      },
       [PlatformParameterFilterType.PlatformType]: {
         displayName: 'Platform Type',
         options: AdminFeaturesTabConstants.ALLOWED_PLATFORM_TYPES,
@@ -101,7 +96,7 @@ export class AdminPlatformParametersTabComponent implements OnInit {
 
   private readonly defaultNewFilter: PlatformParameterFilter = (
     PlatformParameterFilter.createFromBackendDict({
-      type: PlatformParameterFilterType.ServerMode,
+      type: PlatformParameterFilterType.PlatformType,
       conditions: []
     })
   );

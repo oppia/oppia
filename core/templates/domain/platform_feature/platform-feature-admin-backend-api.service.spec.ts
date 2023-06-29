@@ -41,8 +41,8 @@ describe('PlatformFeatureAdminBackendApiService', () => {
       data_type: 'bool',
       rules: [{
         filters: [{
-          type: PlatformParameterFilterType.ServerMode,
-          conditions: [['=', 'dev'] as [string, string]]
+          type: PlatformParameterFilterType.PlatformType,
+          conditions: [['=', 'Web'] as [string, string]]
         }],
         value_when_matched: true
       }],

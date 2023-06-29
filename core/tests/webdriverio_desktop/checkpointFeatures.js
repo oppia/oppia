@@ -102,7 +102,7 @@ describe('Checkpoints functionality', function() {
     await releaseCoordinatorPage.getFeaturesTab();
     var checkpointCelebrationFlag = (
       await releaseCoordinatorPage.getCheckpointCelebrationFeatureElement());
-    await releaseCoordinatorPage.enableFeatureForTest(
+    await releaseCoordinatorPage.enableDefaultValueOfFeature(
       checkpointCelebrationFlag);
 
     await createDummyExploration();

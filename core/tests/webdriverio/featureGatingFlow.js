@@ -88,13 +88,13 @@ describe('Feature Gating Flow', function() {
     await users.logout();
   });
 
-  it('should not show indicators for dummy_feature_flag_for_e2e_tests ' +
-  'to different users', async() => {
+  it('should show indicators for dummy_feature_flag_for_e2e_tests ' +
+  'to different users when feature is enabled', async() => {
     await users.login(RELEASE_COORDINATOR_USER1_EMAIL, true);
 
     await releaseCoordinatorPage.getFeaturesTab();
     var dummy = await releaseCoordinatorPage.getDummyFeatureFlagForE2ETests();
-    await releaseCoordinatorPage.enableFeatureForDev(dummy);
+    await releaseCoordinatorPage.enableDefaultValueOfFeature(dummy);
 
     await users.logout();
     await users.login(RELEASE_COORDINATOR_USER2_EMAIL, true);
@@ -113,8 +113,8 @@ describe('Feature Gating Flow', function() {
     var agDummyHandlerIndicator = $(
       '.e2e-test-angular-dummy-handler-indicator');
 
-    expect(await agDummyFeatureIndicator.isExisting()).toBe(false);
-    expect(await agDummyHandlerIndicator.isExisting()).toBe(false);
+    expect(await agDummyFeatureIndicator.isExisting()).toBe(true);
+    expect(await agDummyHandlerIndicator.isExisting()).toBe(true);
     await users.logout();
   });
 });

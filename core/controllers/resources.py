@@ -26,8 +26,6 @@ from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import fs_services
 from core.domain import platform_feature_services
-from core.domain import platform_parameter_domain
-from core.domain import platform_parameter_list
 from core.domain import platform_parameter_registry as registry
 from core.domain import value_generators_domain
 

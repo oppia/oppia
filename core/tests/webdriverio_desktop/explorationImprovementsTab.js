@@ -46,7 +46,7 @@ describe('Improvements tab', function() {
     await releaseCoordinatorPage.getFeaturesTab();
     improvementsTabFeature = (
       await releaseCoordinatorPage.getImprovementsTabFeatureElement());
-    await releaseCoordinatorPage.enableFeatureForTest(
+    await releaseCoordinatorPage.enableDefaultValueOfFeature(
       improvementsTabFeature);
     explorationEditorImprovementsTab = (
       explorationEditorPage.getImprovementsTab());

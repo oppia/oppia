@@ -68,23 +68,6 @@ export class FeaturesTabComponent implements OnInit {
       inputRegex?: RegExp;
     }
   } = {
-      [PlatformParameterFilterType.ServerMode]: {
-        displayName: 'Server Mode',
-        options: AdminFeaturesTabConstants.ALLOWED_SERVER_MODES,
-        operators: ['='],
-        optionFilter: (feature: PlatformParameter, option: string): boolean => {
-          switch (feature.featureStage) {
-            case FeatureStage.DEV:
-              return option === 'dev';
-            case FeatureStage.TEST:
-              return option === 'dev' || option === 'test';
-            case FeatureStage.PROD:
-              return true;
-            default:
-              return false;
-          }
-        }
-      },
       [PlatformParameterFilterType.PlatformType]: {
         displayName: 'Platform Type',
         options: AdminFeaturesTabConstants.ALLOWED_PLATFORM_TYPES,
@@ -110,7 +93,7 @@ export class FeaturesTabComponent implements OnInit {
 
   private readonly defaultNewFilter: PlatformParameterFilter = (
     PlatformParameterFilter.createFromBackendDict({
-      type: PlatformParameterFilterType.ServerMode,
+      type: PlatformParameterFilterType.PlatformType,
       conditions: []
     })
   );
