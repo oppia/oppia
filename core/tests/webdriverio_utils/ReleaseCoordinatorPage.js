@@ -23,8 +23,6 @@ var waitFor = require('./waitFor.js');
 
 var ReleaseCoordinatorPage = function() {
   var RELEASE_COORDINATOR_URL_SUFFIX = '/release-coordinator';
-  var addConditionButtonLocator = '.e2e-test-add-condition-button';
-  var addFeatureRuleButtonLocator = '.e2e-test-feature-add-rule-button';
   var featureFlagElementsSelector = function() {
     return $$('.e2e-test-feature-flag');
   };
@@ -34,10 +32,8 @@ var ReleaseCoordinatorPage = function() {
   var noRuleIndicatorLocator = '.e2e-test-no-rule-indicator';
   var removeRuleButtonLocator = '.e2e-test-remove-rule-button';
   var saveButtonLocator = '.e2e-test-save-button';
-  var serverModeSelectorLocator = '.e2e-test-server-mode-selector';
   var featureDefaultValueSelectorLocator = (
     '.e2e-test-feature-default-value-selector');
-  var valueSelectorLocator = '.e2e-test-value-selector';
   var statusMessage = $('.e2e-test-status-message');
 
   this.get = async function() {
