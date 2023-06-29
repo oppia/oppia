@@ -338,8 +338,8 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
                     parameter_domain.PlatformParameterRule.from_dict({
                         'filters': [
                             {
-                                'type': 'server_mode',
-                                'conditions': [['=', FeatureStages.DEV.value]]
+                                'type': 'platform_type',
+                                'conditions': [['=', 'Backend']]
                             }
                         ],
                         'value_when_matched': 'updated'
