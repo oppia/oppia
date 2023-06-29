@@ -51,7 +51,10 @@ class ExistingPlatformParameterValidityTests(test_utils.GenericTestBase):
                             'is_improvements_tab_enabled',
                             'learner_groups_are_enabled',
                             'max_number_of_tags_assigned_to_blog_post',
-                            'notify_admins_suggestions_waiting_too_long_is_enabled',
+                            (
+                                'notify_admins_suggestions_waiting_too_long_'
+                                'is_enabled'
+                            ),
                             'promo_bar_enabled',
                             'promo_bar_message',
                             'serial_chapter_launch_curriculum_admin_view',
