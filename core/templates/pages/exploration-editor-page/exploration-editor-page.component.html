@@ -25,41 +25,37 @@
             (mouseover)="isWarningsAreShown(true)"
             (mouseleave)="isWarningsAreShown(false)"
             [ngClass]="{'oppia-editor-warnings-critical-color': hasCriticalWarnings(), 'oppia-editor-warnings-error-color': !hasCriticalWarnings()}">
-          <li class="oppia-editor-warnings-count">
+          <span class="oppia-editor-warnings-count">
             {{ countWarnings() }}
-          </li>
-          <ul class="uib-dropdown-menu oppia-editor-warnings-box dropdown-menu exploration-editor-warning-box" *ngIf="warningsAreShown">
-            <li class="oppia-editor-warnings-header">Warnings</li>
+          </span>
+          <ng-container class="uib-dropdown-menu oppia-editor-warnings-box dropdown-menu exploration-editor-warning-box" *ngIf="warningsAreShown">
+            <span class="oppia-editor-warnings-header">Warnings</span>
             <li class="oppia-editor-warnings-text" *ngFor="let warning of getWarnings(); index as index">
               <hr class="oppia-editor-warnings-separator">
-              <ng-container *ngIf="warning && (warning.type === 'critical')">
-                <li><strong>{{ warning.message }}</strong></li>
-              </ng-container>
-              <ng-container *ngIf="warning && (warning.type !== 'critical')">
-                <li>{{ warning.message }}</li>
-              </ng-container>
+              <span *ngIf="warning && (warning.type === 'critical')">
+                <strong>{{ warning.message }}</strong>
+              </span>
+              <span *ngIf="warning && (warning.type !== 'critical')">
+                {{ warning.message }}
+              </span>
             </li>
-          </ul>
+          </ng-container>
+        </li>
+      </ul>
 
-      <ul [ngClass]="{'navbar-tab-active': getActiveTabName() === 'translation', 'oppia-disabled-tab': !connectedToInternet || editabilityService.isLockedByAdmin()}"
-          id="tutorialTranslationTab"
-          class="nav-item icon nav-list-item e2e-test-translation-tab"
-          (click)="!connectedToInternet || editabilityService.isLockedByAdmin() || selectTranslationTab()"
-          [ngbTooltip]="'Translations does not work when offline.'"
-          [disableTooltip]="connectedToInternet"
-          placement="bottom">
-        <li class="nav-link navbar-tab" [ngbTooltip]="'Translations'" placement="bottom" tabindex="0"
+      <ul [ngClass]="{'navbar-tab-active': getActiveTabName() === 'translation', 'oppia-disabled-tab': !connectedToInternet || editabilityService.isLockedByAdmin()}" id="tutorialTranslationTab" class="nav-item icon nav-list-item e2e-test-translation-tab"
+          (click)="!connectedToInternet || editabilityService.isLockedByAdmin() || selectTranslationTab()" [ngbTooltip]="'Translations does not work when offline.'" [disableTooltip]="connectedToInternet" placement="bottom">
+        <li class="nav-link navbar-tab"
+            [ngbTooltip]="'Translations'"
+            placement="bottom"
+            tabindex="0"
             aria-label="Exploration Translation Button"
             (keydown.enter)="!connectedToInternet || editabilityService.isLockedByAdmin() || selectTranslationTab()">
           <i class="fas fa-microphone navbar-tab-icon" [ngClass]="{'navbar-tab-active-icon': getActiveTabName() === 'translation'}"></i>
         </li>
       </ul>
 
-      <ul [ngClass]="{'navbar-tab-active': getActiveTabName() === 'preview', 'oppia-disabled-tab': !connectedToInternet}"
-          id="tutorialPreviewTab"
-          class="nav-item icon nav-list-item e2e-test-preview-tab"
-          joyrideStep="editorTabTourPreviewTab"
-          [stepContent]="EditorTabTourPreviewTab"
+      <ul [ngClass]="{'navbar-tab-active': getActiveTabName() === 'preview', 'oppia-disabled-tab': !connectedToInternet}" id="tutorialPreviewTab" class="nav-item icon nav-list-item e2e-test-preview-tab" joyrideStep="editorTabTourPreviewTab" [stepContent]="EditorTabTourPreviewTab"
           (click)="!connectedToInternet || selectPreviewTab()" [ngbTooltip]="'Preview does not work when offline.'" [disableTooltip]="connectedToInternet" placement="bottom">
         <li class="nav-link  navbar-tab"
             [ngbTooltip]="'Preview'"
@@ -71,12 +67,8 @@
         </li>
       </ul>
 
-      <ul [ngClass]="{'navbar-tab-active': getActiveTabName() === 'settings', 'oppia-disabled-tab': !connectedToInternet}"
-          class="nav-item icon nav-list-item e2e-test-settings-tab"
-          (click)="!connectedToInternet || selectSettingsTab()"
-          [ngbTooltip]="'Settings does not work when offline.'"
-          [disableTooltip]="connectedToInternet"
-          placement="bottom">
+      <ul [ngClass]="{'navbar-tab-active': getActiveTabName() === 'settings', 'oppia-disabled-tab': !connectedToInternet}" class="nav-item icon nav-list-item e2e-test-settings-tab"
+          (click)="!connectedToInternet || selectSettingsTab()" [ngbTooltip]="'Settings does not work when offline.'" [disableTooltip]="connectedToInternet" placement="bottom">
         <li class="nav-link  navbar-tab"
             [ngbTooltip]="'Settings'"
             placement="bottom"
@@ -87,12 +79,8 @@
         </li>
       </ul>
 
-      <ul [ngClass]="{'navbar-tab-active': getActiveTabName() === 'stats', 'oppia-disabled-tab': !connectedToInternet}"
-          class="nav-item icon nav-list-item e2e-test-stats-tab"
-          (click)="!connectedToInternet || selectStatsTab()"
-          [ngbTooltip]="'Statistics does not work when offline.'"
-          [disableTooltip]="connectedToInternet"
-          placement="bottom">
+      <ul [ngClass]="{'navbar-tab-active': getActiveTabName() === 'stats', 'oppia-disabled-tab': !connectedToInternet}" class="nav-item icon nav-list-item e2e-test-stats-tab"
+          (click)="!connectedToInternet || selectStatsTab()" [ngbTooltip]="'Statistics does not work when offline.'" [disableTooltip]="connectedToInternet" placement="bottom">
         <li class="nav-link  navbar-tab"
             [ngbTooltip]="'Statistics'"
             placement="bottom"
@@ -105,7 +93,10 @@
 
       <li *ngIf="isImprovementsTabEnabled() && screenIsLarge" [ngClass]="{'navbar-tab-active': getActiveTabName() === 'improvements', 'oppia-disabled-tab': !connectedToInternet}" class="nav-item icon nav-list-item e2e-test-improvements-tab"
           (click)="!connectedToInternet || selectImprovementsTab()"  [ngbTooltip]="'Improvements does not work when offline.'" [disableTooltip]="connectedToInternet" placement="bottom">
-        <a class="nav-link  navbar-tab" [ngbTooltip]="'Improvements'" placement="bottom" tabindex="0"
+        <a class="nav-link  navbar-tab"
+           [ngbTooltip]="'Improvements'"
+           placement="bottom"
+           tabindex="0"
            aria-label="Exploration Improvement Button"
            (keydown.enter)="!connectedToInternet || selectImprovementsTab()">
           <i class="material-icons navbar-tab-icon" [ngClass]="{'navbar-tab-active-icon': getActiveTabName() === 'improvements'}">trending_up</i>
@@ -124,12 +115,8 @@
         </li>
       </ul>
 
-      <ul [ngClass]="{'navbar-tab-active': getActiveTabName() === 'feedback', 'oppia-disabled-tab': !connectedToInternet}"
-          class="nav-item icon nav-list-item e2e-test-feedback-tab"
-          (click)="!connectedToInternet || selectFeedbackTab()"
-          [ngbTooltip]="'Feedback does not work when offline.'"
-          [disableTooltip]="connectedToInternet"
-          placement="bottom">
+      <ul [ngClass]="{'navbar-tab-active': getActiveTabName() === 'feedback', 'oppia-disabled-tab': !connectedToInternet}" class="nav-item icon nav-list-item e2e-test-feedback-tab"
+          (click)="!connectedToInternet || selectFeedbackTab()" [ngbTooltip]="'Feedback does not work when offline.'" [disableTooltip]="connectedToInternet" placement="bottom">
         <li class="nav-link  navbar-tab"
             [ngbTooltip]="'Feedback'"
             placement="bottom"
@@ -138,11 +125,11 @@
             (keydown.enter)="!connectedToInternet || selectFeedbackTab()">
           <i class="fas fa-comment-alt navbar-tab-icon" [ngClass]="{'navbar-tab-active-icon': getActiveTabName() === 'feedback'}"></i>
         </li>
-        <li [hidden]="!(getOpenThreadsCount())" class="oppia-exploration-open-threads-indicator oppia-exploration-open-threads-color">
-          <div class="oppia-exploration-open-threads-count">
+        <div [hidden]="!(getOpenThreadsCount())" class="oppia-exploration-open-threads-indicator oppia-exploration-open-threads-color">
+          <span class="oppia-exploration-open-threads-count">
               {{ getOpenThreadsCount() }}
-          </div>
-        </li>
+          </span>
+        </div>
       </ul>
 
       <ul [ngClass]="{'oppia-disabled-tab': !connectedToInternet}" class="nav-item icon nav-list-item" (click)="!connectedToInternet || showUserHelpModal()"
