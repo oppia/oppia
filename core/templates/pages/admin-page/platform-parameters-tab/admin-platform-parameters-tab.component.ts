@@ -193,25 +193,19 @@ export class AdminPlatformParametersTabComponent implements OnInit {
     param.rules.splice(ruleIndex + 1, 0, rule);
   }
 
-  async updateParameterRulesAsync(param: PlatformParameter): Promise<void> {
-    const issues = (
-      AdminPlatformParametersTabComponent.validatePlatformParam(param));
-    if (issues.length > 0) {
-      this.windowRef.nativeWindow.alert(issues.join('\n'));
+  async saveDefaultValueToStorage(): Promise<void> {
+    if (!this.windowRef.nativeWindow.confirm(
+      'This action is irreversible.')) {
       return;
     }
-    if (this.adminTaskManager.isTaskRunning()) {
-      return;
+    for (let param of this.platformParameters) {
+      let commitMessage = `Update default value for '${param.name}'.`;
+      await this.updatePlatformParameter(param, commitMessage);
     }
-    const commitMessage = this.windowRef.nativeWindow.prompt(
-      'This action is irreversible. If you insist to proceed, please enter ' +
-      'the commit message for the update',
-      `Update parameter '${param.name}'.`
-    );
-    if (commitMessage === null) {
-      return;
-    }
+  }
 
+  async updatePlatformParameter(
+      param: PlatformParameter, commitMessage: string): Promise<void> {
     try {
       this.adminTaskManager.startTask();
 
@@ -238,6 +232,28 @@ export class AdminPlatformParametersTabComponent implements OnInit {
     } finally {
       this.adminTaskManager.finishTask();
     }
+  }
+
+  async updateParameterRulesAsync(param: PlatformParameter): Promise<void> {
+    const issues = (
+      AdminPlatformParametersTabComponent.validatePlatformParam(param));
+    if (issues.length > 0) {
+      this.windowRef.nativeWindow.alert(issues.join('\n'));
+      return;
+    }
+    if (this.adminTaskManager.isTaskRunning()) {
+      return;
+    }
+    const commitMessage = this.windowRef.nativeWindow.prompt(
+      'This action is irreversible. If you insist to proceed, please enter ' +
+      'the commit message for the update',
+      `Update parameter '${param.name}'.`
+    );
+    if (commitMessage === null) {
+      return;
+    }
+
+    await this.updatePlatformParameter(param, commitMessage);
   }
 
   clearChanges(param: PlatformParameter): void {

@@ -123,7 +123,7 @@ class AdminHandlerNormalizePayloadDict(TypedDict):
     commit_message: Optional[str]
     new_rules: Optional[List[parameter_domain.PlatformParameterRule]]
     exp_id: Optional[str]
-    default_value: parameter_domain.PlatformDataTypes
+    default_value: Dict[str, parameter_domain.PlatformDataTypes]
 
 
 class AdminHandler(
@@ -461,6 +461,7 @@ class AdminHandler(
                         'action is update_platform_parameter_rules.'
                     )
                 default_value = self.normalized_payload.get('default_value')
+                assert default_value is not None
 
                 try:
                     registry.Registry.update_platform_parameter(

@@ -1,4 +1,11 @@
 <oppia-loading-message [message]="loadingMessage"></oppia-loading-message>
+<div class="save-default-values-button">
+  <button
+          class="btn btn-primary"
+          (click)="saveDefaultValueToStorage()">
+    Save default values to storage
+  </button>
+</div>
 <div *ngFor="let platformParameter of platformParameters;" class="container oppia-page-card oppia-long-text oppia-admin-parameters e2e-test-platform-param">
   <h2 class="oppia-parameter-name e2e-test-parameter-name">{{platformParameter.name}}</h2>
   <div class="row oppia-parameter-top-margin">
@@ -197,6 +204,15 @@
 
 
 <style>
+  .save-default-values-button {
+    align-items: center;
+    display: flex;
+    float: right;
+    font-size: 12px;
+    justify-content: space-between;
+    margin-top: 20px;
+  }
+
   .oppia-admin-parameters .oppia-flex-center {
     align-items: center;
     display: flex;

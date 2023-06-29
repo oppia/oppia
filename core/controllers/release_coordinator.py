@@ -67,7 +67,7 @@ class FeatureFlagsHandlerNormalizedPayloadDict(TypedDict):
     feature_name: str
     commit_message: str
     new_rules: List[parameter_domain.PlatformParameterRule]
-    default_value: parameter_domain.PlatformDataTypes
+    default_value: bool
 
 
 class FeatureFlagsHandler(
@@ -161,6 +161,7 @@ class FeatureFlagsHandler(
                     'action is update_feature_flag.'
                 )
             default_value = self.normalized_payload.get('default_value')
+            assert default_value is not None
 
             assert self.user_id is not None
             try:
