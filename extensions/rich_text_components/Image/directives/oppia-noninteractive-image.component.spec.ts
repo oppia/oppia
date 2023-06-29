@@ -342,5 +342,5 @@ describe('NoninteractiveImage', () => {
 
       const altTextComponent = document.querySelector('figcaption.alt-text');
       expect(altTextComponent).toBeNull();
-  });
+    });
 });
