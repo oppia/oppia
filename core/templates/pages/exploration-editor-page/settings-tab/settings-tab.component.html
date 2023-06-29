@@ -411,7 +411,8 @@
         <i class="fa fa-caret-up" *ngIf="voiceArtistsCardIsShown" aria-hidden="true">
         </i>
       </div>
-      <div class="oppia-mobile-collapsible-card-content" *ngIf="voiceArtistsCardIsShown">
+      <div class="oppia-mobile-collapsible-card-content oppia-mobile-collapsible-card-content-display"
+        *ngIf="voiceArtistsCardIsShown">
         <div>
           <div [hidden]="isVoiceoverFormOpen" class="oppia-no-voice-artist-message"
             *ngIf="!(explorationRightsService.voiceArtistNames && explorationRightsService.voiceArtistNames.length)">
@@ -872,13 +873,11 @@
 
   .oppia-no-voice-artist-message {
     float: left;
-    /* display: flex */
   }
 
+  /* The following style addresses the bug #18544 */
   @media only screen and (max-width: 768px) {
-    .oppia-mobile-collapsible-card-content {
-      /* border-top: 1px solid #999;
-      padding: 20px 26px 15px; */
+    .oppia-mobile-collapsible-card-content-display {
       display: flex
     }
   }
