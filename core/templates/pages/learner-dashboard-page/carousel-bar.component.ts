@@ -35,6 +35,12 @@ export class CarouselBarComponent implements OnInit {
   tileDisplayCount: number;
   leftmostCardIndices: number;
   isAnyCarouselCurrentlyScrolling: boolean;
+  scrolledLeft: number;
+  offSetWidth: number;
+  scrollWidth: number;
+  clientWidth: number;
+  disableBtn: boolean = true;
+  howMuchtoScroll: number;
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
@@ -59,11 +65,32 @@ export class CarouselBarComponent implements OnInit {
 
   ngOnInit(): void {
     this.windowIsNarrow = this.windowDimensionService.isWindowNarrow();
+    setTimeout(() => {
+      let carouselSelector = document.querySelector('.tiles') as HTMLElement;
+      this.scrollWidth = carouselSelector.scrollWidth;
+      this.clientWidth = carouselSelector.clientWidth;
+      let scrollRatio = this.clientWidth / this.scrollWidth;
+      var maxScrollPosition = this.scrollWidth - this.clientWidth;
+      var scrollPosition = scrollRatio * maxScrollPosition;
+      console.error(scrollPosition, 'scroll position...');
+    },);
     this.directiveSubscriptions.add(
       this.windowDimensionService.getResizeEvent().subscribe(() => {
+        // This.offSetWidth = carouselSelector.offsetWidth;
+        // console.error(this.offSetWidth, 'off set width....');
+        // this.scrollWidth = carouselSelector.scrollWidth;
+        // console.error(this.scrollWidth, 'scroll widhth .....');
+        // this.clientWidth = carouselSelector.clientWidth;
+        // console.error(this.clientWidth, 'client width ....');
         this.windowIsNarrow = this.windowDimensionService.isWindowNarrow();
       }));
   }
+
+  // ngAfterViewInit(): void {
+    
+  // }
+
+
 
   scroll(isLeftScroll: boolean): void {
     let carouselSelector = document.querySelector('.tiles') as HTMLElement;
@@ -74,11 +101,18 @@ export class CarouselBarComponent implements OnInit {
       carouselSelector).scrollLeft || 0;
 
     carouselScrollPositionPx = Math.max(0, carouselScrollPositionPx);
-
     let newScrollPositionPx = carouselScrollPositionPx +
     (1 * AppConstants.LEARN_SOMETHING_NEW_TILE_WIDTH_PX * direction);
 
     console.error(newScrollPositionPx);
+    console.error(carouselScrollPositionPx, 'scroll left.....');
+    console.error(this.clientWidth, 'clientwidth ....');
+    console.error(this.scrollWidth, 'scroll width....');
+    if ((carouselScrollPositionPx) >= this.scrollWidth - this.clientWidth) {
+      console.error('right - disable--->>>true');
+    } else {
+      console.error('right--disable--->>>false');
+    }
 
     $(carouselSelector).animate({
       scrollLeft: newScrollPositionPx
