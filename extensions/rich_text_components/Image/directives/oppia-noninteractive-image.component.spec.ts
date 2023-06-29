@@ -332,4 +332,12 @@ describe('NoninteractiveImage', () => {
     expect(altTextcomponent?.textContent).toEqual(
       'Description: ' + component.imageAltText);
   });
+  fit('should not show alt text images when showAltText property is false', () => {
+    component.showAltText = false;
+    component.imageAltText = 'This is alt text';
+    fixture.detectChanges();
+
+    const altTextComponent = document.querySelector('figcaption.alt-text');
+    expect(altTextComponent).toBeNull();
+  });
 });
