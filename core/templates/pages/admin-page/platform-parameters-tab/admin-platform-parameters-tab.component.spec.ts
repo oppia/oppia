@@ -97,8 +97,8 @@ describe('Admin page platform parameters tab', () => {
           rules: [{
             filters: [
               {
-                type: PlatformParameterFilterType.BrowserType,
-                conditions: [['=', 'Chrome']]
+                type: PlatformParameterFilterType.PlatformType,
+                conditions: [['=', 'Web']]
               }
             ],
             // This does not match the data type of platform param, but this is

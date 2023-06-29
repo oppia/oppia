@@ -572,60 +572,6 @@ describe('Release coordinator page feature tab', function() {
     }));
   });
 
-  describe('server mode option filter', () => {
-    type OptionFilterType = (
-      (feature: PlatformParameter, option: string) => boolean);
-    let options: readonly string[];
-    let optionFilter: OptionFilterType;
-
-    beforeEach(() => {
-      options = component
-        .filterTypeToContext[PlatformParameterFilterType.PlatformType]
-        .options as readonly string[];
-      optionFilter = component
-        .filterTypeToContext[PlatformParameterFilterType.PlatformType]
-        .optionFilter as OptionFilterType;
-    });
-
-    it('should return [\'dev\'] for feature in dev stage', () => {
-      expect(
-        options.filter(option => optionFilter(
-          { featureStage: FeatureStage.DEV } as PlatformParameter,
-          option))
-      )
-        .toEqual(['dev']);
-    });
-
-    it('should return [\'dev\', \'test\'] for feature in test stage', () => {
-      expect(
-        options.filter(option => optionFilter(
-          { featureStage: FeatureStage.TEST } as PlatformParameter,
-          option))
-      )
-        .toEqual(['dev', 'test']);
-    });
-
-    it('should return [\'dev\', \'test\', \'prod\'] for feature in prod stage',
-      () => {
-        expect(
-          options.filter(option => optionFilter(
-            { featureStage: FeatureStage.PROD } as PlatformParameter,
-            option))
-        )
-          .toEqual(['dev', 'test', 'prod']);
-      }
-    );
-
-    it('should return empty array for feature in invalid stage', () => {
-      expect(
-        options.filter(option => optionFilter(
-          { featureStage: null } as PlatformParameter,
-          option))
-      )
-        .toEqual([]);
-    });
-  });
-
   describe('.isFeatureFlagChanged', () => {
     it('should return false if the feature is the same as the backup instance',
       () => {
