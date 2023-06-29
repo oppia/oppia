@@ -1,11 +1,14 @@
 <div class="oppia-settings-container">
-  <mat-card
-    class="oppia-editor-card oppia-settings-card-container oppia-basic-settings-card oppia-mobile-collapsible-card">
+  <mat-card class="oppia-editor-card oppia-settings-card-container oppia-basic-settings-card oppia-mobile-collapsible-card">
     <div class="oppia-basic-settings-header oppia-mobile-collapsible-card-header" (click)="toggleCards('settings')">
       <h3 class="e2e-test-settings-container">Basic Settings</h3>
-      <i class="fa fa-caret-down" *ngIf="!basicSettingIsShown" aria-hidden="true">
+      <i class="fa fa-caret-down"
+         *ngIf="!basicSettingIsShown"
+         aria-hidden="true">
       </i>
-      <i class="fa fa-caret-up" *ngIf="basicSettingIsShown" aria-hidden="true">
+      <i class="fa fa-caret-up"
+         *ngIf="basicSettingIsShown"
+         aria-hidden="true">
       </i>
     </div>
 
@@ -14,14 +17,16 @@
         <div *ngIf="editabilityService.isEditable()">
           <div role="form" class="form-horizontal">
             <div class="oppia-settings-input-group">
-              <oppia-exploration-title-editor [labelText]="'Title'" [focusLabel]="EXPLORATION_TITLE_INPUT_FOCUS_LABEL"
-                [titleEditorClass]="'e2e-test-exploration-title-input'" (onInputFieldBlur)="saveExplorationTitle()">
+              <oppia-exploration-title-editor [labelText]="'Title'"
+                                              [focusLabel]="EXPLORATION_TITLE_INPUT_FOCUS_LABEL"
+                                              [titleEditorClass]="'e2e-test-exploration-title-input'"
+                                              (onInputFieldBlur)="saveExplorationTitle()">
               </oppia-exploration-title-editor>
             </div>
             <div class="oppia-settings-input-group">
               <oppia-exploration-objective-editor [labelText]="'Goal'"
-                [objectiveEditorClass]="'e2e-test-exploration-objective-input'"
-                (onInputFieldBlur)="saveExplorationObjective()">
+                                                  [objectiveEditorClass]="'e2e-test-exploration-objective-input'"
+                                                  (onInputFieldBlur)="saveExplorationObjective()">
               </oppia-exploration-objective-editor>
             </div>
 
@@ -30,18 +35,19 @@
                 <div *ngIf="hasPageLoaded">
                   <p>
                     <mat-form-field class="e2e-test-exploration-category" appearance="fill">
-                      <mat-label for="explorationCategory" class="d-block">Add a category (Choose or type
-                        new)</mat-label>
-                      <mat-select [(value)]="explorationCategoryService.displayed"
-                        class="e2e-test-exploration-category-dropdown">
+                      <mat-label for="explorationCategory" class="d-block">Add a category (Choose or type new)</mat-label>
+                      <mat-select [(value)]="explorationCategoryService.displayed" class="e2e-test-exploration-category-dropdown">
                         <mat-option class="e2e-test-exploration-new-category-add">
-                          <ngx-mat-select-search ngModel (ngModelChange)="filterChoices($event)"
-                            (keydown.enter)="updateCategoryListWithUserData()"
-                            placeholderLabel="Type new category here...">
+                          <ngx-mat-select-search ngModel
+                                                 (ngModelChange)="filterChoices($event)"
+                                                 (keydown.enter)="updateCategoryListWithUserData()"
+                                                 placeholderLabel="Type new category here...">
                           </ngx-mat-select-search>
                         </mat-option>
-                        <mat-option (click)="updateCategoryListWithUserData()" *ngFor="let option of filteredChoices"
-                          class="e2e-test-exploration-category-selector-choice" [value]="option.id">
+                        <mat-option (click)="updateCategoryListWithUserData()"
+                                    *ngFor="let option of filteredChoices"
+                                    class="e2e-test-exploration-category-selector-choice"
+                                    [value]="option.id">
                           {{ option.text }}
                         </mat-option>
                       </mat-select>
@@ -54,11 +60,11 @@
               <div>
                 <mat-form-field appearance="fill">
                   <mat-label for="explorationLanguageCode" class="d-block">Language</mat-label>
-                  <mat-select class="e2e-test-exploration-language-select"
-                    [(value)]="explorationLanguageCodeService.displayed" name="language">
+                  <mat-select class="e2e-test-exploration-language-select" [(value)]="explorationLanguageCodeService.displayed" name="language">
                     <mat-option *ngFor="let value of explorationLanguageCodeService.getSupportedContentLanguages()"
-                      [value]="value.code" (click)="saveExplorationLanguageCode()"
-                      class="e2e-test-exploration-language-selector-choice">
+                                [value]="value.code"
+                                (click)="saveExplorationLanguageCode()"
+                                class="e2e-test-exploration-language-selector-choice">
                       {{value.description}}
                     </mat-option>
                   </mat-select>
@@ -66,9 +72,7 @@
                 <div>
                   <span class="form-text secondary-info-text">
                     <em>
-                      Don't see the language you want? <a
-                        href="https://github.com/oppia/oppia/issues/new?title=Please%20add%20a%20new%20language%20choice%20to%20the%20exploration%20settings%20tab&body=Please%20add%20the%20language%20choice%20%7B%7BYOUR_LANGUAGE_HERE%7D%7D%20to%20the%20exploration%20settings%20tab.%0A%0AHere%20is%20a%20link%20to%20an%20exploration%20that%20uses%20it:%20%7B%7BINSERT_LINK_HERE%7D%7D"
-                        target="_blank" rel="noopener">Tell us.</a>
+                      Don't see the language you want? <a href="https://github.com/oppia/oppia/issues/new?title=Please%20add%20a%20new%20language%20choice%20to%20the%20exploration%20settings%20tab&body=Please%20add%20the%20language%20choice%20%7B%7BYOUR_LANGUAGE_HERE%7D%7D%20to%20the%20exploration%20settings%20tab.%0A%0AHere%20is%20a%20link%20to%20an%20exploration%20that%20uses%20it:%20%7B%7BINSERT_LINK_HERE%7D%7D" target="_blank" rel="noopener">Tell us.</a>
                     </em>
                   </span>
                 </div>
@@ -77,12 +81,13 @@
             <div class="oppia-settings-input-group">
               <div>
                 <div *ngIf="stateNames && stateNames.length > 0">
-                  <mat-form-field id="explorationInitStateName" appearance="fill">
+                  <mat-form-field  id="explorationInitStateName" appearance="fill">
                     <mat-label for="explorationInitStateName" class="d-block">Name of first card</mat-label>
-                    <mat-select class="e2e-test-initial-state-select"
-                      [(value)]="explorationInitStateNameService.displayed" name="language">
-                      <mat-option *ngFor="let stateNames of stateNames" [value]="stateNames"
-                        (click)="saveExplorationInitStateName()" class="e2e-test-initial-state-select-element">
+                    <mat-select class="e2e-test-initial-state-select" [(value)]="explorationInitStateNameService.displayed" name="language">
+                      <mat-option *ngFor="let stateNames of stateNames"
+                                  [value]="stateNames"
+                                  (click)="saveExplorationInitStateName()"
+                                  class="e2e-test-initial-state-select-element">
                         {{stateNames}}
                       </mat-option>
                     </mat-select>
@@ -107,12 +112,15 @@
                           <mat-icon matChipRemove class="update-cross-icon">cancel</mat-icon>
                         </mat-chip>
                         <input placeholder="Add a new tag (using lowercase letters and spaces)..."
-                          class="e2e-test-chip-list-tags" pattern="[a-z]" [maxLength]="30" [matChipInputFor]="chipList"
-                          [matChipInputSeparatorKeyCodes]="separatorKeysCodes" [matChipInputAddOnBlur]="addOnBlur"
-                          (matChipInputTokenEnd)="add($event)">
+                               class="e2e-test-chip-list-tags"
+                               pattern="[a-z]"
+                               [maxLength]="30"
+                               [matChipInputFor]="chipList"
+                               [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
+                               [matChipInputAddOnBlur]="addOnBlur"
+                               (matChipInputTokenEnd)="add($event)">
                       </mat-chip-list>
-                      <mat-hint *ngIf="explorationTags.length >= 10" class="oppia-settings-tab-error-message">Can only
-                        contain 10 tags max</mat-hint>
+                      <mat-hint *ngIf="explorationTags.length >= 10" class="oppia-settings-tab-error-message">Can only contain 10 tags max</mat-hint>
                     </mat-form-field>
                   </div>
                 </div>
@@ -125,7 +133,8 @@
             </div>
             <div class="text-right">
               <button type="button" class="btn btn-secondary e2e-test-open-preview-summary-modal"
-                (click)="previewSummaryTile()" title="Preview this exploration's summary card">
+                      (click)="previewSummaryTile()"
+                      title="Preview this exploration's summary card">
                 Preview Summary
               </button>
             </div>
@@ -194,15 +203,16 @@
     </div>
   </mat-card>
 
-  <mat-card
-    class="oppia-settings-card-container oppia-advanced-features-card oppia-editor-card oppia-mobile-collapsible-card"
-    *ngIf="editabilityService.isEditable()">
-    <div class="oppia-basic-settings-header oppia-mobile-collapsible-card-header"
-      (click)="toggleCards('advanced_features')">
+  <mat-card class="oppia-settings-card-container oppia-advanced-features-card oppia-editor-card oppia-mobile-collapsible-card" *ngIf="editabilityService.isEditable()">
+    <div class="oppia-basic-settings-header oppia-mobile-collapsible-card-header" (click)="toggleCards('advanced_features')">
       <h3>Advanced Features</h3>
-      <i class="fa fa-caret-down" *ngIf="!advancedFeaturesIsShown" aria-hidden="true">
+      <i class="fa fa-caret-down"
+         *ngIf="!advancedFeaturesIsShown"
+         aria-hidden="true">
       </i>
-      <i class="fa fa-caret-up" *ngIf="advancedFeaturesIsShown" aria-hidden="true">
+      <i class="fa fa-caret-up"
+         *ngIf="advancedFeaturesIsShown"
+         aria-hidden="true">
       </i>
     </div>
 
@@ -214,10 +224,8 @@
           </label>
           <div>
             <div class="oppia-on-off-switch">
-              <input span *ngIf="areParametersEnabled()" type="checkbox" class="oppia-on-off-switch-checkbox"
-                id="parameter-switch" checked disabled>
-              <input span *ngIf="!areParametersEnabled()" [disabled]="explorationIsLinkedToStory" type="checkbox"
-                class="oppia-on-off-switch-checkbox" id="parameter-switch" (click)="enableParameters()">
+              <input span *ngIf="areParametersEnabled()" type="checkbox" class="oppia-on-off-switch-checkbox" id="parameter-switch" checked disabled>
+              <input span *ngIf="!areParametersEnabled()" [disabled]="explorationIsLinkedToStory" type="checkbox" class="oppia-on-off-switch-checkbox" id="parameter-switch" (click)="enableParameters()">
               <label class="oppia-on-off-switch-label e2e-test-enable-parameters" for="parameter-switch">
                 <span class="oppia-on-off-switch-inner"></span>
                 <span class="oppia-on-off-switch-main"></span>
@@ -226,8 +234,7 @@
           </div>
         </div>
         <span class="form-text secondary-info-text">
-          Parameters are values that change as the learner moves between cards (<a
-            href="http://oppia.github.io/#/Parameters" target="_blank" rel="noopener">more info</a>).
+          Parameters are values that change as the learner moves between cards (<a href="http://oppia.github.io/#/Parameters" target="_blank" rel="noopener">more info</a>).
         </span>
         <span class="form-text secondary-info-text" *ngIf="explorationIsLinkedToStory">
           Explorations in a story cannot have parameters enabled.
@@ -243,10 +250,8 @@
               </label>
               <div>
                 <div class="oppia-on-off-switch">
-                  <input type="checkbox" *ngIf="isAutomaticTextToSpeechEnabled()" class="oppia-on-off-switch-checkbox"
-                    id="text-speech-switch" (click)="toggleAutomaticTextToSpeech()" checked>
-                  <input type="checkbox" *ngIf="!isAutomaticTextToSpeechEnabled()" class="oppia-on-off-switch-checkbox"
-                    id="text-speech-switch" (click)="toggleAutomaticTextToSpeech()">
+                  <input type="checkbox" *ngIf="isAutomaticTextToSpeechEnabled()" class="oppia-on-off-switch-checkbox" id="text-speech-switch" (click)="toggleAutomaticTextToSpeech()" checked>
+                  <input type="checkbox" *ngIf="!isAutomaticTextToSpeechEnabled()" class="oppia-on-off-switch-checkbox" id="text-speech-switch" (click)="toggleAutomaticTextToSpeech()">
                   <label class="oppia-on-off-switch-label" for="text-speech-switch">
                     <span class="oppia-on-off-switch-inner"></span>
                     <span class="oppia-on-off-switch-main"></span>
@@ -255,8 +260,7 @@
               </div>
             </div>
             <span class="form-text secondary-info-text">
-              Automatic text-to-speech generates audio from your content for learners to listen to. It is recommended
-              that you disable this feature if creating an exploration whose content consists of multiple languages.
+              Automatic text-to-speech generates audio from your content for learners to listen to. It is recommended that you disable this feature if creating an exploration whose content consists of multiple languages.
             </span>
           </div>
         </div>
@@ -269,13 +273,9 @@
           </label>
           <div>
             <div class="oppia-on-off-switch">
-              <input type="checkbox" *ngIf="!isCorrectnessFeedbackEnabled()" class="oppia-on-off-switch-checkbox"
-                id="correctness-switch" (click)="toggleCorrectnessFeedback()">
-              <input type="checkbox" *ngIf="isCorrectnessFeedbackEnabled()" [disabled]="explorationIsLinkedToStory"
-                class="oppia-on-off-switch-checkbox" id="correctness-switch" (click)="toggleCorrectnessFeedback()"
-                checked>
-              <label class="oppia-on-off-switch-label e2e-test-enable-mark-correctness-feedback"
-                for="correctness-switch">
+              <input type="checkbox" *ngIf="!isCorrectnessFeedbackEnabled()" class="oppia-on-off-switch-checkbox" id="correctness-switch" (click)="toggleCorrectnessFeedback()">
+              <input type="checkbox" *ngIf="isCorrectnessFeedbackEnabled()" [disabled]="explorationIsLinkedToStory" class="oppia-on-off-switch-checkbox" id="correctness-switch" (click)="toggleCorrectnessFeedback()" checked>
+              <label class="oppia-on-off-switch-label e2e-test-enable-mark-correctness-feedback" for="correctness-switch">
                 <span class="oppia-on-off-switch-inner"></span>
                 <span class="oppia-on-off-switch-main"></span>
               </label>
@@ -285,8 +285,7 @@
         <span class="form-text secondary-info-text">
           Correctness feedback allows the user to categorise answer groups as correct or incorrect.
         </span>
-        <span class="form-text secondary-info-text"
-          *ngIf="explorationIsLinkedToStory && isCorrectnessFeedbackEnabled()">
+        <span class="form-text secondary-info-text" *ngIf="explorationIsLinkedToStory && isCorrectnessFeedbackEnabled()">
           Correctness feedback cannot be disabled for an exploration linked to a story.
         </span>
       </div>
@@ -294,21 +293,23 @@
     </div>
   </mat-card>
 
-  <mat-card
-    *ngIf="explorationRightsService.ownerNames && explorationRightsService.ownerNames.length > 0 && !explorationRightsService.isCloned()"
-    class="oppia-settings-card-container oppia-editor-card oppia-roles-editor-card oppia-mobile-collapsible-card">
+  <mat-card *ngIf="explorationRightsService.ownerNames && explorationRightsService.ownerNames.length > 0 && !explorationRightsService.isCloned()"
+            class="oppia-settings-card-container oppia-editor-card oppia-roles-editor-card oppia-mobile-collapsible-card">
     <div class="oppia-roles-container">
       <div class="oppia-basic-settings-header oppia-mobile-collapsible-card-header" (click)="toggleCards('roles')">
         <h3>Roles</h3>
-        <i class="fa fa-caret-down" *ngIf="!rolesCardIsShown" aria-hidden="true">
+        <i class="fa fa-caret-down"
+           *ngIf="!rolesCardIsShown"
+           aria-hidden="true">
         </i>
-        <i class="fa fa-caret-up" *ngIf="rolesCardIsShown" aria-hidden="true">
+        <i class="fa fa-caret-up"
+           *ngIf="rolesCardIsShown"
+           aria-hidden="true">
         </i>
       </div>
       <div class="oppia-mobile-collapsible-card-content" *ngIf="rolesCardIsShown">
         <div *ngIf="canModifyRoles" [hidden]="isRolesFormOpen" class="oppia-edit-roles-btn-container">
-          <span tabindex="0" (click)="openEditRolesForm()" (keydown.enter)="openEditRolesForm()"
-            class="oppia-edit-roles-btn e2e-test-edit-roles">
+          <span tabindex="0" (click)="openEditRolesForm()" (keydown.enter)="openEditRolesForm()" class="oppia-edit-roles-btn e2e-test-edit-roles">
             EDIT
           </span>
         </div>
@@ -319,8 +320,7 @@
             <li *ngFor="let ownerName of explorationRightsService.ownerNames; let index = index">
               <div class="oppia-user-list-item e2e-test-owner-role-names">
                 <span>{{ ownerName }}</span>
-                <span [hidden]="!isRolesFormOpen || ownerName === loggedInUser" [ngbTooltip]="'Remove user'"
-                  type="button" class="far fa-times-circle" (click)="removeRole(ownerName, 'Managers')">
+                <span [hidden]="!isRolesFormOpen || ownerName === loggedInUser" [ngbTooltip]="'Remove user'" type="button" class="far fa-times-circle" (click)="removeRole(ownerName, 'Managers')">
                 </span>
               </div>
             </li>
@@ -331,10 +331,9 @@
           <strong>Collaborators</strong>
           <ul>
             <li *ngFor="let editorName of explorationRightsService.editorNames; let index = index">
-              <div class="oppia-user-list-item e2e-test-editor-role-names">
+              <div  class="oppia-user-list-item e2e-test-editor-role-names">
                 <span>{{ editorName }}</span>
-                <span [hidden]="!isRolesFormOpen" type="button" [ngbTooltip]="'Remove user'" class="far fa-times-circle"
-                  (click)="removeRole(editorName, 'Collaborators')">
+                <span [hidden]="!isRolesFormOpen" type="button" [ngbTooltip]="'Remove user'" class="far fa-times-circle" (click)="removeRole(editorName, 'Collaborators')">
                 </span>
               </div>
             </li>
@@ -347,8 +346,7 @@
             <li *ngFor="let viewerName of explorationRightsService.viewerNames; let index = index">
               <div class="oppia-user-list-item e2e-test-viewer-role-names">
                 <span>{{ viewerName }}</span>
-                <span [hidden]="!isRolesFormOpen" type="button" [ngbTooltip]="'Remove user'" class="far fa-times-circle"
-                  (click)="removeRole(viewerName, 'Playtesters')">
+                <span [hidden]="!isRolesFormOpen" type="button" [ngbTooltip]="'Remove user'" class="far fa-times-circle" (click)="removeRole(viewerName, 'Playtesters')">
                 </span>
               </div>
             </li>
@@ -363,9 +361,7 @@
               <div>
                 <mat-form-field class="example-full-width" appearance="fill">
                   <mat-label>username</mat-label>
-                  <input matInput type="text" id="newMemberUsername" name="newMemberUsername"
-                    class="e2e-test-role-username" [(ngModel)]="newMemberUsername" placeholder="username"
-                    (blur)="onRolesFormUsernameBlur()">
+                  <input matInput type="text" id="newMemberUsername" name="newMemberUsername" class="e2e-test-role-username" [(ngModel)]="newMemberUsername" placeholder="username" (blur)="onRolesFormUsernameBlur()">
                 </mat-form-field>
               </div>
               <br>
@@ -373,22 +369,20 @@
               <div>
                 <mat-form-field appearance="fill">
                   <mat-select class="e2e-test-role-select" [(ngModel)]="newMemberRole" name="newMemberRole">
-                    <mat-option *ngFor="let item of ROLES" [value]="item" (blur)="onRolesFormUsernameBlur()">
+                    <mat-option *ngFor="let item of ROLES"
+                                [value]="item"
+                                (blur)="onRolesFormUsernameBlur()">
                       {{ item.name }}
                     </mat-option>
                   </mat-select>
                 </mat-form-field>
                 <span class="form-text">
-                  <p>Note that managers also have the permissions of collaborators, collaborators also have the
-                    permissions of playtesters, and playtesters also have the permissions of viewers.</p>
+                  <p>Note that managers also have the permissions of collaborators, collaborators also have the permissions of playtesters, and playtesters also have the permissions of viewers.</p>
                 </span>
               </div>
 
-              <button type="submit" (click)="editRole(newMemberUsername, newMemberRole.value)"
-                class="btn btn-secondary e2e-test-save-role"
-                [disabled]="!rolesSaveButtonEnabled || !newMemberUsername">Save</button>
-              <button type="button" class="btn btn-secondary" (click)="closeEditRolesForm()"
-                [hidden]="!(isRolesFormOpen)">
+              <button type="submit" (click)="editRole(newMemberUsername, newMemberRole.value)" class="btn btn-secondary e2e-test-save-role" [disabled]="!rolesSaveButtonEnabled || !newMemberUsername">Save</button>
+              <button type="button" class="btn btn-secondary" (click)="closeEditRolesForm()" [hidden]="!(isRolesFormOpen)">
                 Cancel
               </button>
               <p [hidden]="rolesSaveButtonEnabled" class="text-danger e2e-test-title-warning">{{ errorMessage }}</p>
@@ -399,42 +393,38 @@
     </div>
   </mat-card>
 
-  <mat-card
-    *ngIf="explorationRightsService.ownerNames && explorationRightsService.ownerNames.length > 0 && !explorationRightsService.isCloned()"
-    class="oppia-settings-card-container oppia-editor-card oppia-roles-editor-card oppia-mobile-collapsible-card">
+  <mat-card *ngIf="explorationRightsService.ownerNames && explorationRightsService.ownerNames.length > 0 && !explorationRightsService.isCloned()"
+            class="oppia-settings-card-container oppia-editor-card oppia-roles-editor-card oppia-mobile-collapsible-card">
     <div class="oppia-roles-container">
-      <div class="oppia-basic-settings-header oppia-mobile-collapsible-card-header"
-        (click)="toggleCards('voice_artists')">
+      <div class="oppia-basic-settings-header oppia-mobile-collapsible-card-header" (click)="toggleCards('voice_artists')">
         <h3>Voice Artists</h3>
-        <i class="fa fa-caret-down" *ngIf="!voiceArtistsCardIsShown" aria-hidden="true">
+        <i class="fa fa-caret-down"
+           *ngIf="!voiceArtistsCardIsShown"
+           aria-hidden="true">
         </i>
-        <i class="fa fa-caret-up" *ngIf="voiceArtistsCardIsShown" aria-hidden="true">
+        <i class="fa fa-caret-up"
+           *ngIf="voiceArtistsCardIsShown"
+           aria-hidden="true">
         </i>
       </div>
-      <div class="oppia-mobile-collapsible-card-content oppia-mobile-collapsible-card-content-display"
-        *ngIf="voiceArtistsCardIsShown">
+      <div class="oppia-mobile-collapsible-card-content oppia-mobile-collapsible-card-content-display" *ngIf="voiceArtistsCardIsShown">
         <div>
-          <div [hidden]="isVoiceoverFormOpen" class="oppia-no-voice-artist-message"
-            *ngIf="!(explorationRightsService.voiceArtistNames && explorationRightsService.voiceArtistNames.length)">
+          <div [hidden]="isVoiceoverFormOpen" class="oppia-no-voice-artist-message" *ngIf="!(explorationRightsService.voiceArtistNames && explorationRightsService.voiceArtistNames.length)">
             No voice artists are assigned to this exploration.
           </div>
           <div *ngIf="canManageVoiceArtist" [hidden]="isVoiceoverFormOpen" class="oppia-edit-roles-btn-container">
-            <span tabindex="0" (keydown.enter)="openVoiceoverRolesForm()" (click)="openVoiceoverRolesForm()"
-              class="oppia-edit-roles-btn e2e-test-edit-voice-artist-roles">
+            <span tabindex="0" (keydown.enter)="openVoiceoverRolesForm()" (click)="openVoiceoverRolesForm()" class="oppia-edit-roles-btn e2e-test-edit-voice-artist-roles">
               EDIT
             </span>
           </div>
         </div>
 
-        <div
-          [hidden]="!(explorationRightsService.voiceArtistNames && explorationRightsService.voiceArtistNames.length > 0)">
+        <div [hidden]="!(explorationRightsService.voiceArtistNames && explorationRightsService.voiceArtistNames.length > 0)">
           <ul>
             <li *ngFor="let voiceArtistName of explorationRightsService.voiceArtistNames; let index = index">
-              <div
-                class="oppia-user-list-item .e2e-test-voiceArtist-role-names e2e-test-voice-artist-{{voiceArtistName}}">
+              <div class="oppia-user-list-item .e2e-test-voiceArtist-role-names e2e-test-voice-artist-{{voiceArtistName}}">
                 <span>{{voiceArtistName}}</span>
-                <span [hidden]="!(isVoiceoverFormOpen)" type="button" [ngbTooltip]="'Remove user'"
-                  class="far fa-times-circle" (click)="removeVoiceArtist(voiceArtistName)">
+                <span [hidden]="!(isVoiceoverFormOpen)" type="button" [ngbTooltip]="'Remove user'" class="far fa-times-circle" (click)="removeVoiceArtist(voiceArtistName)">
                 </span>
               </div>
             </li>
@@ -446,13 +436,17 @@
             <form>
               <div>
                 <label>Add new voice artsit: </label>
-                <input id="newVoicAartistUsername" class="form-control e2e-test-new-voice-artist-username"
-                  [(ngModel)]="newVoicAartistUsername" [ngModelOptions]="{standalone: true}"
-                  placeholder="Voice artist username" type="text">
+                <input id="newVoicAartistUsername"
+                       class="form-control e2e-test-new-voice-artist-username"
+                       [(ngModel)]="newVoicAartistUsername"
+                       [ngModelOptions]="{standalone: true}"
+                       placeholder="Voice artist username"
+                       type="text">
               </div>
-              <button (click)="editVoiceArtist(newVoicAartistUsername)"
-                class="btn btn-secondary e2e-test-add-voice-artist-role-button" value="Save">Save</button>
-              <button type="button" class="btn btn-secondary" (click)="closeVoiceoverForm()">
+              <button (click)="editVoiceArtist(newVoicAartistUsername)" class="btn btn-secondary e2e-test-add-voice-artist-role-button" value="Save">Save</button>
+              <button type="button"
+                      class="btn btn-secondary"
+                      (click)="closeVoiceoverForm()">
                 Cancel
               </button>
             </form>
@@ -462,15 +456,17 @@
     </div>
   </mat-card>
 
-  <mat-card
-    class="oppia-settings-card-container oppia-editor-card oppia-permissions-card oppia-mobile-collapsible-card">
+  <mat-card class="oppia-settings-card-container oppia-editor-card oppia-permissions-card oppia-mobile-collapsible-card">
     <div>
-      <div class="oppia-basic-settings-header oppia-mobile-collapsible-card-header"
-        (click)="toggleCards('permissions')">
+      <div class="oppia-basic-settings-header oppia-mobile-collapsible-card-header" (click)="toggleCards('permissions')">
         <h3>Permissions</h3>
-        <i class="fa fa-caret-down" *ngIf="!permissionsCardIsShown" aria-hidden="true">
+        <i class="fa fa-caret-down"
+           *ngIf="!permissionsCardIsShown"
+           aria-hidden="true">
         </i>
-        <i class="fa fa-caret-up" *ngIf="permissionsCardIsShown" aria-hidden="true">
+        <i class="fa fa-caret-up"
+           *ngIf="permissionsCardIsShown"
+           aria-hidden="true">
         </i>
       </div>
       <div class="oppia-mobile-collapsible-card-content" *ngIf="permissionsCardIsShown">
@@ -487,8 +483,7 @@
 
         <p *ngIf="!explorationRightsService.isPrivate() || explorationRightsService.viewableIfPrivate()">
           <em>Link to share:</em>
-          <input class="form-control" type="text" value="{{getExplorePageUrl(explorationId)}}" readonly="readonly"
-            onClick="this.select();">
+          <input class="form-control" type="text" value="{{getExplorePageUrl(explorationId)}}" readonly="readonly" onClick="this.select();">
         </p>
 
         <br>
@@ -500,8 +495,7 @@
           It is <strong>available</strong> in the Oppia library.
         </p>
 
-        <div
-          *ngIf="(explorationRightsService.ownerNames && explorationRightsService.ownerNames.length === 0) && !explorationRightsService.isCloned()">
+        <div *ngIf="(explorationRightsService.ownerNames && explorationRightsService.ownerNames.length === 0) && !explorationRightsService.isCloned()">
           <h3>Permissions</h3>
           <div class="e2e-test-is-community-owned">
             This exploration is <strong>public</strong> and <strong>community-editable</strong>.
@@ -521,13 +515,16 @@
     </div>
   </mat-card>
 
-  <mat-card class="oppia-settings-card-container oppia-editor-card oppia-feedback-card oppia-mobile-collapsible-card"
-    *ngIf="editabilityService.isEditable()">
+  <mat-card class="oppia-settings-card-container oppia-editor-card oppia-feedback-card oppia-mobile-collapsible-card" *ngIf="editabilityService.isEditable()">
     <div class="oppia-basic-settings-header oppia-mobile-collapsible-card-header" (click)="toggleCards('feedback')">
       <h3>Feedback/Suggestion Email Preferences</h3>
-      <i class="fa fa-caret-down" *ngIf="!feedbackCardIsShown" aria-hidden="true">
+      <i class="fa fa-caret-down"
+         *ngIf="!feedbackCardIsShown"
+         aria-hidden="true">
       </i>
-      <i class="fa fa-caret-up" *ngIf="feedbackCardIsShown" aria-hidden="true">
+      <i class="fa fa-caret-up"
+         *ngIf="feedbackCardIsShown"
+         aria-hidden="true">
       </i>
     </div>
     <div class="oppia-mobile-collapsible-card-content" *ngIf="feedbackCardIsShown">
@@ -538,10 +535,8 @@
           </label>
           <div>
             <div class="oppia-on-off-switch">
-              <input span *ngIf="userEmailPreferencesService.areFeedbackNotificationsMuted()" type="checkbox"
-                class="oppia-on-off-switch-checkbox" id="feedback-switch" (click)="unmuteFeedbackNotifications()">
-              <input span *ngIf="!userEmailPreferencesService.areFeedbackNotificationsMuted()" type="checkbox"
-                class="oppia-on-off-switch-checkbox" id="feedback-switch" checked (click)="muteFeedbackNotifications()">
+              <input span *ngIf="userEmailPreferencesService.areFeedbackNotificationsMuted()" type="checkbox" class="oppia-on-off-switch-checkbox" id="feedback-switch" (click)="unmuteFeedbackNotifications()">
+              <input span *ngIf="!userEmailPreferencesService.areFeedbackNotificationsMuted()" type="checkbox" class="oppia-on-off-switch-checkbox" id="feedback-switch" checked (click)="muteFeedbackNotifications()">
               <label class="oppia-on-off-switch-label e2e-test-enable-fallbacks" for="feedback-switch">
                 <span class="oppia-on-off-switch-inner"></span>
                 <span class="oppia-on-off-switch-main"></span>
@@ -549,13 +544,11 @@
             </div>
           </div>
         </div>
-        <span class="form-text secondary-info-text"
-          *ngIf="!userEmailPreferencesService.areFeedbackNotificationsMuted()">
+        <span class="form-text secondary-info-text" *ngIf="!userEmailPreferencesService.areFeedbackNotificationsMuted()">
           You are currently receiving notifications of new feedback for this exploration.
         </span>
         <span class="form-text secondary-info-text" *ngIf="userEmailPreferencesService.areFeedbackNotificationsMuted()">
-          You have muted feedback notifications for this exploration. You will not receive an email when new feedback is
-          submitted.
+          You have muted feedback notifications for this exploration. You will not receive an email when new feedback is submitted.
         </span>
       </div>
       <hr class="oppia-feature-separator">
@@ -566,12 +559,8 @@
           </label>
           <div>
             <div class="oppia-on-off-switch">
-              <input span *ngIf="userEmailPreferencesService.areSuggestionNotificationsMuted()" type="checkbox"
-                class="oppia-on-off-switch-checkbox e2e-test-enable-fallbacks" id="suggestion-switch"
-                (click)="unmuteSuggestionNotifications()">
-              <input span *ngIf="!userEmailPreferencesService.areSuggestionNotificationsMuted()" type="checkbox"
-                class="oppia-on-off-switch-checkbox e2e-test-enable-fallbacks" id="suggestion-switch" checked
-                (click)="muteSuggestionNotifications()">
+              <input span *ngIf="userEmailPreferencesService.areSuggestionNotificationsMuted()" type="checkbox" class="oppia-on-off-switch-checkbox e2e-test-enable-fallbacks" id="suggestion-switch" (click)="unmuteSuggestionNotifications()">
+              <input span *ngIf="!userEmailPreferencesService.areSuggestionNotificationsMuted()" type="checkbox" class="oppia-on-off-switch-checkbox e2e-test-enable-fallbacks" id="suggestion-switch" checked (click)="muteSuggestionNotifications()">
               <label class="oppia-on-off-switch-label" for="suggestion-switch">
                 <span class="oppia-on-off-switch-inner"></span>
                 <span class="oppia-on-off-switch-main"></span>
@@ -579,34 +568,32 @@
             </div>
           </div>
         </div>
-        <span class="form-text secondary-info-text"
-          *ngIf="!userEmailPreferencesService.areSuggestionNotificationsMuted()">
+        <span class="form-text secondary-info-text" *ngIf="!userEmailPreferencesService.areSuggestionNotificationsMuted()">
           You are currently receiving notifications of new suggestions for this exploration.
         </span>
-        <span class="form-text secondary-info-text"
-          *ngIf="userEmailPreferencesService.areSuggestionNotificationsMuted()">
-          You have muted suggestion notifications for this exploration. You will not receive an email when new
-          suggestion is submitted.
+        <span class="form-text secondary-info-text" *ngIf="userEmailPreferencesService.areSuggestionNotificationsMuted()">
+          You have muted suggestion notifications for this exploration. You will not receive an email when new suggestion is submitted.
         </span>
       </div>
       <hr class="oppia-feature-separator">
     </div>
   </mat-card>
 
-  <mat-card class="oppia-settings-card-container oppia-editor-card oppia-mobile-collapsible-card"
-    *ngIf="canDelete || canReleaseOwnership">
+  <mat-card class="oppia-settings-card-container oppia-editor-card oppia-mobile-collapsible-card" *ngIf="canDelete || canReleaseOwnership">
     <div class="oppia-basic-settings-header oppia-mobile-collapsible-card-header" (click)="toggleCards('controls')">
       <h3>Controls</h3>
-      <i class="fa fa-caret-down" *ngIf="!controlsCardIsShown" aria-hidden="true">
+      <i class="fa fa-caret-down"
+         *ngIf="!controlsCardIsShown"
+         aria-hidden="true">
       </i>
-      <i class="fa fa-caret-up" *ngIf="controlsCardIsShown" aria-hidden="true">
+      <i class="fa fa-caret-up"
+         *ngIf="controlsCardIsShown"
+         aria-hidden="true">
       </i>
     </div>
     <div class="oppia-mobile-collapsible-card-content" *ngIf="controlsCardIsShown">
-      <p *ngIf="canReleaseOwnership" class="oppia-exploration-ctrl"
-        [hidden]="explorationRightsService.isCommunityOwned()">
-        <button type="button" class="btn btn-secondary" (click)="showTransferExplorationOwnershipModal()"
-          [disabled]="isExplorationLockedForEditing()">
+      <p *ngIf="canReleaseOwnership" class="oppia-exploration-ctrl" [hidden]="explorationRightsService.isCommunityOwned()">
+        <button type="button" class="btn btn-secondary" (click)="showTransferExplorationOwnershipModal()" [disabled]="isExplorationLockedForEditing()">
           Transfer ownership to the community
         </button>
         <span *ngIf="isExplorationLockedForEditing()">
@@ -615,8 +602,9 @@
         </span>
       </p>
       <p *ngIf="canDelete" class="oppia-exploration-ctrl">
-        <button type="button" *ngIf="explorationRightsService.isPrivate()" class="btn oppia-delete-button"
-          (click)="deleteExploration()" title="Delete this exploration">
+        <button type="button" *ngIf="explorationRightsService.isPrivate()"
+                class="btn oppia-delete-button" (click)="deleteExploration()"
+                title="Delete this exploration">
           DELETE EXPLORATION
         </button>
       </p>
@@ -625,20 +613,17 @@
     <div class="col-lg-6 col-md-6 col-sm-6" *ngIf="currentUserIsCurriculumAdmin || currentUserIsModerator">
       <h3>Admin Controls</h3>
 
-      <p *ngIf="canUnpublish" class="oppia-exploration-ctrl oppia-exploration-ctrl-admin"
-        [hidden]="!(explorationRightsService.isPublic())">
-        <button type="button" class="btn btn-secondary" (click)="unpublishExplorationAsModerator()"
-          [disabled]="isExplorationLockedForEditing()">
+      <p *ngIf="canUnpublish" class="oppia-exploration-ctrl oppia-exploration-ctrl-admin" [hidden]="!(explorationRightsService.isPublic())">
+        <button type="button" class="btn btn-secondary" (click)="unpublishExplorationAsModerator()" [disabled]="isExplorationLockedForEditing()">
           Unpublish
           <span *ngIf="currentUserIsCurriculumAdmin">(as admin)</span>
           <span *ngIf="!currentUserIsCurriculumAdmin && currentUserIsModerator">(as moderator)</span>
         </button>
       </p>
 
-      <p class="oppia-exploration-ctrl oppia-exploration-ctrl-admin"
-        *ngIf="explorationRightsService.isPublic() && (currentUserIsCurriculumAdmin || currentUserIsModerator)">
+      <p class="oppia-exploration-ctrl oppia-exploration-ctrl-admin" *ngIf="explorationRightsService.isPublic() && (currentUserIsCurriculumAdmin || currentUserIsModerator)">
         <button type="button" class="btn oppia-delete-button e2e-test-delete-exploration-button"
-          (click)="deleteExploration()">
+                (click)="deleteExploration()">
           DELETE EXPLORATION
           <span *ngIf="currentUserIsCurriculumAdmin">(as admin)</span>
           <span *ngIf="!currentUserIsCurriculumAdmin && currentUserIsModerator">(as moderator)</span>
@@ -653,10 +638,8 @@
         </label>
         <div>
           <div class="oppia-on-off-switch">
-            <input span *ngIf="isExplorationEditable()" type="checkbox" class="oppia-on-off-switch-checkbox"
-              id="edits-switch" checked (click)="disableEdits()">
-            <input span *ngIf="!isExplorationEditable()" type="checkbox" class="oppia-on-off-switch-checkbox"
-              id="edits-switch" (click)="enableEdits()">
+            <input span *ngIf="isExplorationEditable()" type="checkbox" class="oppia-on-off-switch-checkbox" id="edits-switch" checked (click)="disableEdits()">
+            <input span *ngIf="!isExplorationEditable()" type="checkbox" class="oppia-on-off-switch-checkbox" id="edits-switch" (click)="enableEdits()">
             <label class="oppia-on-off-switch-label" for="edits-switch">
               <span class="oppia-on-off-switch-inner"></span>
               <span class="oppia-on-off-switch-main"></span>
@@ -678,8 +661,7 @@
     <h3>Parameters used in this exploration</h3>
     <div class="row">
       <div class="col-lg-12 col-md-12 col-sm-12">
-        <div
-          [hidden]="!(explorationParamSpecsService.savedMemento && explorationParamSpecsService.savedMemento.getParamDict())">
+        <div [hidden]="!(explorationParamSpecsService.savedMemento && explorationParamSpecsService.savedMemento.getParamDict())">
           <em>No parameters used.</em>
         </div>
         <ol *ngIf="explorationParamSpecsService.savedMemento">
@@ -692,8 +674,8 @@
 
     <h3>
       Initial parameter changes
-      <i class="material-icons md-18 oppia-info-icon"
-        [ngbTooltip]="'These changes are applied before the learner begins the exploration.'" placement="right">
+      <i class="material-icons md-18 oppia-info-icon" [ngbTooltip]="'These changes are applied before the learner begins the exploration.'"
+         placement="right">
         &#xE88E;
       </i>
     </h3>
@@ -701,7 +683,8 @@
     <div class="row">
       <div class="col-lg-12 col-md-12 col-sm-12 e2e-test-exploration-edit-param-changes">
         <param-changes-editor [paramChangesServiceName]="'explorationParamChangesService'"
-          [postSaveHook]="postSaveParamChangesHook.bind(this)" [currentlyInSettingsTab]="true">
+                              [postSaveHook]="postSaveParamChangesHook.bind(this)"
+                              [currentlyInSettingsTab]="true">
         </param-changes-editor>
       </div>
     </div>
@@ -709,14 +692,11 @@
 
   <mat-card class="oppia-settings-card-container oppia-editor-card">
     <div *ngIf="canShowExploreVersionHistoryButton();">
-      Metadata last changed by <strong>{{ getLastEditedCommitterUsername() }}</strong> at <strong>version {{
-        getLastEditedVersionNumber() + 1 }} of the exploration</strong>.
-      <a class="text-primary explore-version-history-button" (click)="onClickExploreVersionHistoryButton()"> More
-        details</a>.
+      Metadata last changed by <strong>{{ getLastEditedCommitterUsername() }}</strong> at <strong>version {{ getLastEditedVersionNumber() + 1 }} of the exploration</strong>.
+      <a class="text-primary explore-version-history-button" (click)="onClickExploreVersionHistoryButton()"> More details</a>.
     </div>
     <div *ngIf="!canShowExploreVersionHistoryButton();">
-      <span *ngIf="!validationErrorIsShown">No changes have been made to the exploration metadata after the initial
-        creation of the exploration.</span>
+      <span *ngIf="!validationErrorIsShown">No changes have been made to the exploration metadata after the initial creation of the exploration.</span>
       <span *ngIf="validationErrorIsShown" class="error-message">
         Unable to display the metadata version history due to an error loading the exploration data.
       </span>
@@ -747,8 +727,8 @@
     margin: 20px 0 20px 0;
   }
 
-  .oppia-advanced-features-card .form-horizontal>label,
-  .oppia-feedback-card .form-horizontal>label {
+  .oppia-advanced-features-card .form-horizontal > label,
+  .oppia-feedback-card .form-horizontal > label {
     float: left;
     height: auto;
     padding-right: 0;
@@ -838,21 +818,17 @@
     .oppia-settings-container {
       width: 100%;
     }
-
     .oppia-basic-settings-header i {
       display: block;
     }
-
     .oppia-settings-card-container {
       border: 0;
       padding: 0;
     }
-
     .oppia-basic-settings-header {
       display: flex;
       justify-content: space-between;
     }
-
     .oppia-settings-card-container h3 {
       margin-bottom: 0;
     }
@@ -875,14 +851,13 @@
     float: left;
   }
 
-  /* The following style addresses the bug #18544 */
+  .error-message {
+    color: #f00;
+  }
+
   @media only screen and (max-width: 768px) {
     .oppia-mobile-collapsible-card-content-display {
       display: flex
     }
-  }
-
-  .error-message {
-    color: #f00;
   }
 </style>
