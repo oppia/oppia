@@ -73,6 +73,8 @@ class ParamNames(enum.Enum):
         'notify_admins_suggestions_waiting_too_long_is_enabled')
     ENABLE_ADMIN_NOTIFICATIONS_FOR_REVIEWER_SHORTAGE = (
         'enable_admin_notifications_for_reviewer_shortage')
+    MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER = (
+        'max_number_of_suggestions_per_reviewer')
 
 
 # Platform parameters should all be defined below.
@@ -220,4 +222,16 @@ Registry.create_platform_parameter(
         'is false.'
     ),
     platform_parameter_domain.DataTypes.BOOL
+)
+
+Registry.create_platform_parameter(
+    ParamNames.MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER,
+    (
+        'The maximum number of Contributor Dashboard suggestions per reviewer.'
+        'If the number of suggestions per reviewer surpasses this maximum, '
+        'for any given suggestion type on the dashboard, the admins are '
+        'notified by email.'
+    ),
+    platform_parameter_domain.DataTypes.NUMBER,
+    default=5
 )

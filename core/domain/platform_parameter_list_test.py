@@ -50,6 +50,7 @@ class ExistingPlatformParameterValidityTests(test_utils.GenericTestBase):
                             ),
                             'is_improvements_tab_enabled',
                             'learner_groups_are_enabled',
+                            'max_number_of_suggestions_per_reviewer',
                             'max_number_of_tags_assigned_to_blog_post',
                             (
                                 'notify_admins_suggestions_waiting_too_long_'

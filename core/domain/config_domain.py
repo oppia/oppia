@@ -222,6 +222,7 @@ class ConfigProperty:
     - is_improvements_tab_enabled.
     - learner_groups_are_enabled.
     - list_of_default_tags_for_blog_post.
+    - max_number_of_suggestions_per_reviewer.
     - max_number_of_tags_assigned_to_blog_post.
     - moderator_ids.
     - moderator_request_forum_url.
@@ -501,11 +502,3 @@ MAX_NUMBER_OF_EXPLORATIONS_IN_MATH_SVGS_BATCH = ConfigProperty(
 CONTRIBUTOR_DASHBOARD_IS_ENABLED = ConfigProperty(
     'contributor_dashboard_is_enabled', BOOL_SCHEMA,
     'Enable contributor dashboard page. The default value is true.', True)
-
-MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER = ConfigProperty(
-    'max_number_of_suggestions_per_reviewer',
-    INT_SCHEMA,
-    'The maximum number of Contributor Dashboard suggestions per reviewer. If '
-    'the number of suggestions per reviewer surpasses this maximum, for any '
-    'given suggestion type on the dashboard, the admins are notified by email.',
-    5)

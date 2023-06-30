@@ -101,7 +101,6 @@ export interface ConfigPropertyValues {
   'email_footer': string;
   'email_sender_name': string;
   'max_number_of_explorations_in_math_svgs_batch': number;
-  'max_number_of_suggestions_per_reviewer': number;
   'max_number_of_svgs_in_math_svgs_batch': number;
   'notification_user_ids_for_failed_tasks': string[];
   'oppia_csrf_secret': string;
