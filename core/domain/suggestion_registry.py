@@ -1352,12 +1352,16 @@ class CommunityContributionStats:
             self.translation_reviewer_counts_by_lang_code[lang_code])
         number_of_suggestions = (
             self.translation_suggestion_counts_by_lang_code[lang_code])
+        max_number_of_suggestions_per_reviewer = (
+            platform_feature_services.get_platform_parameter_value(
+                platform_parameter_list.ParamNames.
+                MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER.value
+            )
+        )
+        assert isinstance(max_number_of_suggestions_per_reviewer, int)
         return bool(
             number_of_suggestions > (
-                platform_feature_services.get_platform_parameter_value(
-                    platform_parameter_list.ParamNames.
-                    MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER.value
-                ) * number_of_reviewers
+                max_number_of_suggestions_per_reviewer * number_of_reviewers
             )
         )
 
@@ -1396,12 +1400,18 @@ class CommunityContributionStats:
         if self.question_reviewer_count == 0:
             return True
 
+        max_number_of_suggestions_per_reviewer = (
+            platform_feature_services.get_platform_parameter_value(
+                platform_parameter_list.ParamNames.
+                MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER.value
+            )
+        )
+        assert isinstance(max_number_of_suggestions_per_reviewer, int)
+
         return bool(
             self.question_suggestion_count > (
-                platform_feature_services.get_platform_parameter_value(
-                    platform_parameter_list.ParamNames.
-                    MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER.value
-                ) * self.question_reviewer_count
+                max_number_of_suggestions_per_reviewer *
+                self.question_reviewer_count
             )
         )
 
