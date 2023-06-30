@@ -918,4 +918,13 @@
      width: fit-content;
     }
   }
+ 
+  /* Fixes the bug 18452 */
+  .mat-card>:first-child, .mat-card-content>:first-child {
+    margin-top: 10px;
+  }
+  /* Fixes the bug 18452 */
+  .mat-card>:last-child:not(.mat-card-footer), .mat-card-content>:last-child:not(.mat-card-footer) {
+    margin-bottom: 10px;
+  }
 </style>
