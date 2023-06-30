@@ -149,6 +149,8 @@ class BlogAdminHandler(
                 ' action is save_platform_parameters.'
             )
         for (name, value) in new_platform_parameter_values.items():
+            param = platform_parameter_registry.Registry.get_platform_parameter(
+                name)
             rules_for_platform_parameter = [
                 platform_parameter_domain.PlatformParameterRule.from_dict({
                     'filters': [
@@ -168,7 +170,8 @@ class BlogAdminHandler(
                 name,
                 self.user_id,
                 'Update platform parameter property from blog admin page.',
-                rules_for_platform_parameter
+                rules_for_platform_parameter,
+                param.default_value
             )
 
         logging.info(
