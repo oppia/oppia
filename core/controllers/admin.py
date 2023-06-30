@@ -123,6 +123,7 @@ class AdminHandlerNormalizePayloadDict(TypedDict):
     commit_message: Optional[str]
     new_rules: Optional[List[parameter_domain.PlatformParameterRule]]
     exp_id: Optional[str]
+    default_value: Dict[str, parameter_domain.PlatformDataTypes]
 
 
 class AdminHandler(
@@ -231,6 +232,15 @@ class AdminHandler(
             'exp_id': {
                 'schema': {
                     'type': 'basestring'
+                },
+                'default_value': None
+            },
+            'default_value': {
+                'schema': {
+                    'type': 'object_dict',
+                    'validation_method': (
+                        validation_method.
+                        validate_new_default_value_of_platform_parameter)
                 },
                 'default_value': None
             }
@@ -450,11 +460,14 @@ class AdminHandler(
                         'The \'commit_message\' must be provided when the '
                         'action is update_platform_parameter_rules.'
                     )
+                default_value = self.normalized_payload.get('default_value')
+                assert default_value is not None
 
                 try:
                     registry.Registry.update_platform_parameter(
                         platform_param_name, self.user_id, commit_message,
-                        new_rules
+                        new_rules,
+                        default_value['value']
                     )
                 except (
                     utils.ValidationError,
