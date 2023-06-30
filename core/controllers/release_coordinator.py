@@ -67,6 +67,7 @@ class FeatureFlagsHandlerNormalizedPayloadDict(TypedDict):
     feature_name: str
     commit_message: str
     new_rules: List[parameter_domain.PlatformParameterRule]
+    default_value: bool
 
 
 class FeatureFlagsHandler(
@@ -84,7 +85,7 @@ class FeatureFlagsHandler(
                 'schema': {
                     'type': 'basestring',
                     'choices': [
-                        'update_feature_flag_rules'
+                        'update_feature_flag'
                     ]
                 },
                 'default_value': None
@@ -111,6 +112,12 @@ class FeatureFlagsHandler(
                 },
                 'default_value': None
             },
+            'default_value': {
+                'schema': {
+                    'type': 'bool'
+                },
+                'default_value': None
+            },
         }
     }
 
@@ -132,33 +139,35 @@ class FeatureFlagsHandler(
             # The handler schema defines the possible values of 'action'.
             # If 'action' has a value other than those defined in the
             # schema, a Bad Request error will be thrown. Hence, 'action'
-            # must be 'update_feature_flag_rules' if this branch is
+            # must be 'update_feature_flag' if this branch is
             # executed.
-            assert action == 'update_feature_flag_rules'
+            assert action == 'update_feature_flag'
             feature_name = self.normalized_payload.get('feature_name')
             if feature_name is None:
                 raise Exception(
                     'The \'feature_name\' must be provided when the action'
-                    ' is update_feature_flag_rules.'
+                    ' is update_feature_flag.'
                 )
             new_rules = self.normalized_payload.get('new_rules')
             if new_rules is None:
                 raise Exception(
                     'The \'new_rules\' must be provided when the action'
-                    ' is update_feature_flag_rules.'
+                    ' is update_feature_flag.'
                 )
             commit_message = self.normalized_payload.get('commit_message')
             if commit_message is None:
                 raise Exception(
                     'The \'commit_message\' must be provided when the '
-                    'action is update_feature_flag_rules.'
+                    'action is update_feature_flag.'
                 )
+            default_value = self.normalized_payload.get('default_value')
+            assert default_value is not None
 
             assert self.user_id is not None
             try:
-                feature_services.update_feature_flag_rules(
+                feature_services.update_feature_flag(
                     feature_name, self.user_id, commit_message,
-                    new_rules)
+                    new_rules, default_value)
             except (
                     utils.ValidationError,
                     feature_services.FeatureFlagNotFoundException) as e:

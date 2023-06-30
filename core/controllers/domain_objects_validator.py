@@ -192,6 +192,35 @@ def validate_platform_params_values_for_blog_admin(
     return new_platform_parameter_values
 
 
+def validate_new_default_value_of_platform_parameter(
+    default_value: Mapping[str, platform_parameter_domain.PlatformDataTypes]
+) -> Mapping[str, platform_parameter_domain.PlatformDataTypes]:
+    """Validates new default value of platform parameter.
+
+    Args:
+        default_value: dict. Data that needs to be validated.
+
+    Returns:
+        dict(str, PlatformDataTypes). Returns the default value dict after
+        validating.
+
+    Raises:
+        Exception. The default_value is not of valid type.
+    """
+
+    if not isinstance(default_value['value'], (bool, float, int, str)):
+        raise Exception('Expected type to be %s but received %s' % (
+            platform_parameter_domain.PlatformDataTypes,
+            default_value['value'])
+        )
+
+    # The default_value values do not represent a domain class directly
+    # and in the handler it is used to set the default value of the platform
+    # parameter. Hence conversion of dicts to domain objects is not required
+    # for default_value.
+    return default_value
+
+
 def validate_change_dict_for_blog_post(
     change_dict: blog_services.BlogPostChangeDict
 ) -> blog_services.BlogPostChangeDict:
