@@ -102,7 +102,7 @@ RUN sed -i 's/import text_classifier_pb2 as text__classifier__pb2/from . import 
 
 RUN python -m scripts.build
 
-ENV NODE_OPTIONS=--openssl-legacy-provider
+# ENV NODE_OPTIONS=--openssl-legacy-provider
 
 COPY . .
 
