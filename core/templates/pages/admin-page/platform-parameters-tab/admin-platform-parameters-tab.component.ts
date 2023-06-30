@@ -193,30 +193,24 @@ export class AdminPlatformParametersTabComponent implements OnInit {
     param.rules.splice(ruleIndex + 1, 0, rule);
   }
 
-  async updateParameterRulesAsync(param: PlatformParameter): Promise<void> {
-    const issues = (
-      AdminPlatformParametersTabComponent.validatePlatformParam(param));
-    if (issues.length > 0) {
-      this.windowRef.nativeWindow.alert(issues.join('\n'));
+  async saveDefaultValueToStorage(): Promise<void> {
+    if (!this.windowRef.nativeWindow.confirm(
+      'This action is irreversible.')) {
       return;
     }
-    if (this.adminTaskManager.isTaskRunning()) {
-      return;
+    for (let param of this.platformParameters) {
+      let commitMessage = `Update default value for '${param.name}'.`;
+      await this.updatePlatformParameter(param, commitMessage);
     }
-    const commitMessage = this.windowRef.nativeWindow.prompt(
-      'This action is irreversible. If you insist to proceed, please enter ' +
-      'the commit message for the update',
-      `Update parameter '${param.name}'.`
-    );
-    if (commitMessage === null) {
-      return;
-    }
+  }
 
+  async updatePlatformParameter(
+      param: PlatformParameter, commitMessage: string): Promise<void> {
     try {
       this.adminTaskManager.startTask();
 
       await this.apiService.updatePlatformParameter(
-        param.name, commitMessage, param.rules);
+        param.name, commitMessage, param.rules, param.defaultValue);
 
       this.platformParameterNameToBackupMap.set(param.name, cloneDeep(param));
 
@@ -240,6 +234,28 @@ export class AdminPlatformParametersTabComponent implements OnInit {
     }
   }
 
+  async updateParameterRulesAsync(param: PlatformParameter): Promise<void> {
+    const issues = (
+      AdminPlatformParametersTabComponent.validatePlatformParam(param));
+    if (issues.length > 0) {
+      this.windowRef.nativeWindow.alert(issues.join('\n'));
+      return;
+    }
+    if (this.adminTaskManager.isTaskRunning()) {
+      return;
+    }
+    const commitMessage = this.windowRef.nativeWindow.prompt(
+      'This action is irreversible. If you insist to proceed, please enter ' +
+      'the commit message for the update',
+      `Update parameter '${param.name}'.`
+    );
+    if (commitMessage === null) {
+      return;
+    }
+
+    await this.updatePlatformParameter(param, commitMessage);
+  }
+
   clearChanges(param: PlatformParameter): void {
     if (!this.windowRef.nativeWindow.confirm(
       'This will revert all changes you made. Are you sure?')) {
@@ -251,6 +267,7 @@ export class AdminPlatformParametersTabComponent implements OnInit {
 
     if (backup) {
       param.rules = cloneDeep(backup.rules);
+      param.defaultValue = backup.defaultValue;
     }
   }
 
@@ -258,14 +275,17 @@ export class AdminPlatformParametersTabComponent implements OnInit {
     filter.conditions.splice(0);
   }
 
-  isPlatformParamRulesChanged(param: PlatformParameter): boolean {
+  isPlatformParamChanged(param: PlatformParameter): boolean {
     const original = this.platformParameterNameToBackupMap.get(
       param.name
     );
     if (original === undefined) {
       throw new Error('Backup not found for platform params: ' + param.name);
     }
-    return !isEqual(original.rules, param.rules);
+    return (
+      !isEqual(original.rules, param.rules) ||
+      !isEqual(original.defaultValue, param.defaultValue)
+    );
   }
 
   /**

@@ -79,7 +79,8 @@ class PlatformFeaturesEvaluationHandlerTest(test_utils.GenericTestBase):
                     ],
                     'value_when_matched': True
                 })
-            ]
+            ],
+            False
         )
 
         # Here we use MyPy ignore because the expected type of ALL_FEATURE_FLAGS
@@ -208,10 +209,10 @@ class PlatformFeatureDummyHandlerTest(test_utils.GenericTestBase):
         self.user_id = self.get_user_id_from_email(self.OWNER_EMAIL)
 
     def tearDown(self) -> None:
-        feature_services.update_feature_flag_rules(
+        feature_services.update_feature_flag(
             param_list.ParamNames.DUMMY_FEATURE_FLAG_FOR_E2E_TESTS.value,
             self.user_id,
-            'clear rule', []
+            'clear rule', [], False
         )
 
         super().tearDown()
@@ -220,7 +221,7 @@ class PlatformFeatureDummyHandlerTest(test_utils.GenericTestBase):
         self, is_enabled: bool, mode: param_domain.ServerMode
     ) -> None:
         """Enables the dummy_feature for the dev environment."""
-        feature_services.update_feature_flag_rules(
+        feature_services.update_feature_flag(
             param_list.ParamNames.DUMMY_FEATURE_FLAG_FOR_E2E_TESTS.value,
             self.user_id,
             'update rule for testing purpose',
@@ -230,7 +231,8 @@ class PlatformFeatureDummyHandlerTest(test_utils.GenericTestBase):
                     'type': 'server_mode',
                     'conditions': [['=', mode.value]]
                 }]
-            })]
+            })],
+            False
         )
 
     def _mock_dummy_feature_stage(

@@ -37,7 +37,7 @@ class DiagnosticTestLandingPageTest(test_utils.GenericTestBase):
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
 
-        feature_services.update_feature_flag_rules(
+        feature_services.update_feature_flag(
             platform_parameter_list.ParamNames.DIAGNOSTIC_TEST.value,
             self.owner_id,
             'test update',
@@ -52,7 +52,8 @@ class DiagnosticTestLandingPageTest(test_utils.GenericTestBase):
                     }],
                     'value_when_matched': True
                 })
-            ]
+            ],
+            False
         )
 
     def test_should_access_diagnostic_test_page_in_dev_mode(self) -> None:

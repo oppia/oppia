@@ -140,6 +140,35 @@ class ValidateNewConfigPropertyValuesTests(test_utils.GenericTestBase):
             config_properties)
 
 
+class ValidateNewDefaultValueForPlatformParametersTests(
+    test_utils.GenericTestBase
+):
+    """Tests to validate default value dict coming from API."""
+
+    def test_valid_object_raises_no_exception(self) -> None:
+        default_value = {'value': False}
+        (
+            domain_objects_validator.
+            validate_new_default_value_of_platform_parameter(default_value)
+        )
+
+    def test_invalid_type_raises_exception(self) -> None:
+        default_value = {'value': [10]}
+        with self.assertRaisesRegex(
+            Exception, (
+            'Expected type to be typing.Union\\[str, int, bool, float] '
+            'but received \\[10]')
+        ):
+            # TODO(#13059): Here we use MyPy ignore because after we fully
+            # type the codebase we plan to get rid of the tests that
+            # intentionally test wrong inputs that we can normally catch
+            # by typing.
+            (
+                domain_objects_validator.
+                validate_new_default_value_of_platform_parameter(default_value) # type: ignore[arg-type]
+            )
+
+
 class ValidateChangeDictForBlogPost(test_utils.GenericTestBase):
     """Tests to validate change_dict containing updated values for blog
     post object coming from API."""

@@ -27,6 +27,8 @@ from core.domain import platform_parameter_domain as parameter_domain
 from core.domain import platform_parameter_registry as registry
 from core.tests import test_utils
 
+from typing import List
+
 DataTypes = parameter_domain.DataTypes
 FeatureStages = parameter_domain.FeatureStages
 
@@ -183,6 +185,7 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
                     'value_when_matched': 'updated'
                 })
             ],
+            'default'
         )
         parameter_updated = registry.Registry.get_platform_parameter(
             parameter_name)
@@ -211,6 +214,7 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
                     'value_when_matched': 'updated'
                 })
             ],
+            'default'
         )
         self.assertIsNone(
             registry.Registry.load_platform_parameter_from_memcache(
@@ -240,6 +244,7 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
                         'value_when_matched': True
                     })
                 ],
+                'default'
             )
 
     def test_update_dev_feature_with_rule_enabled_for_test_raises_exception(
@@ -268,6 +273,7 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
                         'value_when_matched': True
                     })
                 ],
+                False
             )
 
     def test_update_dev_feature_with_rule_enabled_for_prod_raises_exception(
@@ -296,6 +302,7 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
                         'value_when_matched': True
                     })
                 ],
+                False
             )
 
     def test_update_test_feature_with_rule_enabled_for_prod_raises_exception(
@@ -324,6 +331,7 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
                         'value_when_matched': True
                     })
                 ],
+                False
             )
 
     def test_updated_parameter_is_saved_in_storage(self) -> None:
@@ -348,6 +356,7 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
                     'value_when_matched': 'updated'
                 })
             ],
+            'default'
         )
 
         parameter_updated = (
@@ -355,6 +364,85 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
                 parameter_name)
         )
         self.assertIsNotNone(parameter_updated)
+
+    def test_default_value_return_from_parameter_registry_when_none_in_model(
+        self
+    ) -> None:
+        def _mock_update_platform_parameter(
+            name: str,
+            committer_id: str,
+            commit_message: str,
+            new_rules: List[parameter_domain.PlatformParameterRule],
+            default_value: parameter_domain.PlatformDataTypes
+        ) -> None:
+            param = registry.Registry.get_platform_parameter(name)
+
+            new_rule_dicts = [rules.to_dict() for rules in new_rules]
+            param_dict = param.to_dict()
+            param_dict['rules'] = new_rule_dicts
+            param_dict['default_value'] = default_value
+            updated_param = param.from_dict(param_dict)
+            updated_param.validate()
+
+            model_instance = registry.Registry._to_platform_parameter_model( # pylint: disable=protected-access
+                param)
+            param.set_rules(new_rules)
+            param.set_default_value(default_value)
+            registry.Registry.parameter_registry[param.name] = param
+
+            model_instance.rules = [rule.to_dict() for rule in param.rules]
+            model_instance.default_value = None
+            model_instance.commit(
+                committer_id,
+                commit_message,
+                [{
+                    'cmd': (
+                        parameter_domain
+                        .PlatformParameterChange.CMD_EDIT_RULES),
+                    'new_rules': new_rule_dicts,
+                    'default_value': None
+                }]
+            )
+
+            caching_services.delete_multi(
+                caching_services.CACHE_NAMESPACE_PLATFORM_PARAMETER,
+                None,
+                [name]
+            )
+
+        with self.swap(
+            registry.Registry,
+            'update_platform_parameter',
+            _mock_update_platform_parameter
+        ):
+            parameter_name = 'parameter_b'
+            self._create_example_parameter_with_name(parameter_name)
+            registry.Registry.update_platform_parameter(
+                parameter_name,
+                feconf.SYSTEM_COMMITTER_ID,
+                'commit message',
+                [
+                    parameter_domain.PlatformParameterRule.from_dict({
+                        'filters': [
+                            {
+                                'type': 'server_mode',
+                                'conditions': [['=', FeatureStages.DEV.value]]
+                            }
+                        ],
+                        'value_when_matched': 'updated'
+                    })
+                ],
+                'default'
+            )
+
+            parameter_storage = (
+                registry.Registry.load_platform_parameter_from_storage(
+                    parameter_name)
+            )
+
+        self.assertIsNotNone(parameter_storage)
+        assert parameter_storage is not None
+        self.assertEqual(parameter_storage.default_value, 'default')
 
     def test_evaluate_all_parameters(self) -> None:
         context = parameter_domain.EvaluationContext.from_dict(

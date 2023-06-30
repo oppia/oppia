@@ -100,7 +100,8 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
                     ],
                     'value_when_matched': True
                 })
-            ]
+            ],
+            False
         )
 
         registry.Registry.update_platform_parameter(
@@ -118,7 +119,8 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
                     ],
                     'value_when_matched': True
                 })
-            ]
+            ],
+            False
         )
 
         registry.Registry.update_platform_parameter(
@@ -137,7 +139,8 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
                     ],
                     'value_when_matched': True
                 })
-            ]
+            ],
+            False
         )
 
         # Replace feature lists with mocked names.
@@ -356,7 +359,8 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
                     ],
                     'value_when_matched': True
                 })
-            ]
+            ],
+            False
         )
         with self.swap(constants, 'DEV_MODE', False):
             with self.swap(feconf, 'ENV_IS_OPPIA_ORG_PRODUCTION_SERVER', True):
@@ -370,8 +374,8 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
             Exception, 'Unknown feature flag'):
             feature_services.is_feature_enabled('feature_that_does_not_exist')
 
-    def test_update_feature_flag_rules_successfully_updates_rules(self) -> None:
-        feature_services.update_feature_flag_rules(
+    def test_update_feature_flag_successfully_updates_rules(self) -> None:
+        feature_services.update_feature_flag(
             self.dev_feature.name, self.user_id, 'test update',
             [
                 platform_parameter_domain.PlatformParameterRule.from_dict({
@@ -385,34 +389,36 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
                     ],
                     'value_when_matched': False
                 })
-            ]
+            ],
+            False
         )
 
         with self.swap(constants, 'DEV_MODE', True):
             self.assertFalse(
                 feature_services.is_feature_enabled(self.dev_feature.name))
 
-    def test_update_feature_flag_rules_with_unknown_name_raises_error(
+    def test_update_feature_flag_with_unknown_name_raises_error(
         self
     ) -> None:
         unknown_name = 'feature_that_does_not_exist'
         with self.assertRaisesRegex(
             Exception, 'Unknown feature flag: %s' % unknown_name):
-            feature_services.update_feature_flag_rules(
+            feature_services.update_feature_flag(
                 unknown_name, self.user_id, 'test update',
                 [
                     platform_parameter_domain.PlatformParameterRule.from_dict(
                         {'filters': [], 'value_when_matched': False}
                     ),
-                ]
+                ],
+                False
             )
 
-    def test_update_feature_flag_rules_with_invalid_rules_raises_error(
+    def test_update_feature_flag_with_invalid_rules_raises_error(
         self
     ) -> None:
         with self.assertRaisesRegex(
             utils.ValidationError, 'must have a server_mode filter'):
-            feature_services.update_feature_flag_rules(
+            feature_services.update_feature_flag(
                 self.dev_feature.name, self.user_id, 'test update',
                 [
                     platform_parameter_domain.PlatformParameterRule.from_dict({
@@ -427,7 +433,8 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
                     platform_parameter_domain.PlatformParameterRule.from_dict({
                         'filters': [], 'value_when_matched': False
                     })
-                ]
+                ],
+                False
             )
 
     def test_all_platform_params_should_appear_once_in_features_or_in_params_list( # pylint: disable=line-too-long

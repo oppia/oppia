@@ -913,6 +913,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
                     'platform_param_name': param.name,
                     'new_rules': new_rule_dicts,
                     'commit_message': 'test update param',
+                    'default_value': {'value': False}
                 }, csrf_token=csrf_token)
 
         rule_dicts = [
@@ -964,6 +965,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
                     'platform_param_name': param.name,
                     'new_rules': new_rule_dicts,
                     'commit_message': 'test update param',
+                    'default_value': {'value': False}
                 }, csrf_token=csrf_token)
 
             response_dict = self.get_json('/adminhandler')
@@ -1003,6 +1005,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
                     'platform_param_name': 'unknown_param',
                     'new_rules': new_rule_dicts,
                     'commit_message': 'test update param',
+                    'default_value': {'value': False}
                 },
                 csrf_token=csrf_token,
                 expected_status_int=500
@@ -1042,6 +1045,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
                 'platform_param_name': param.name,
                 'new_rules': new_rule_dicts,
                 'commit_message': 'test update param',
+                'default_value': {'value': False}
             },
             csrf_token=csrf_token,
             expected_status_int=400
@@ -1178,6 +1182,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
                 'platform_param_name': param.name,
                 'new_rules': new_rule_dicts,
                 'commit_message': 'test update param',
+                'default_value': {'value': False}
             },
             csrf_token=csrf_token,
             expected_status_int=500

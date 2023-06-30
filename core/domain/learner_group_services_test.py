@@ -148,7 +148,8 @@ class LearnerGroupServicesUnitTests(test_utils.GenericTestBase):
                     ],
                     'value_when_matched': True
                 })
-            ]
+            ],
+            False
         )
         self.assertTrue(
             learner_group_services.is_learner_group_feature_enabled())
@@ -167,7 +168,8 @@ class LearnerGroupServicesUnitTests(test_utils.GenericTestBase):
                     ],
                     'value_when_matched': False
                 })
-            ]
+            ],
+            False
         )
         self.assertFalse(
             learner_group_services.is_learner_group_feature_enabled())

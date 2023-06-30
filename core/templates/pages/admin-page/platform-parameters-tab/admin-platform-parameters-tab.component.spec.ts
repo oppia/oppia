@@ -320,6 +320,26 @@ describe('Admin page platform parameters tab', () => {
     });
   });
 
+  describe('.saveDefaultValueToStorage', () => {
+    it('should save the changes', fakeAsync(() => {
+      spyOn(mockWindowRef.nativeWindow, 'confirm').and.returnValue(true);
+
+      component.saveDefaultValueToStorage();
+
+      expect(updateApiSpy).toHaveBeenCalled();
+    }));
+
+    it('should not proceed if the user doesn\'t confirm', fakeAsync(() => {
+      spyOn(mockWindowRef.nativeWindow, 'confirm').and.returnValue(false);
+
+      component.saveDefaultValueToStorage();
+
+      flushMicrotasks();
+
+      expect(updateApiSpy).not.toHaveBeenCalled();
+    }));
+  });
+
   describe('.updateParameterRulesAsync', () => {
     let setStatusSpy: jasmine.Spy;
     let promptSpy: jasmine.Spy;
@@ -343,7 +363,7 @@ describe('Admin page platform parameters tab', () => {
       flushMicrotasks();
 
       expect(updateApiSpy).toHaveBeenCalledWith(
-        platformParameter.name, 'mock msg', platformParameter.rules);
+        platformParameter.name, 'mock msg', platformParameter.rules, false);
       expect(setStatusSpy).toHaveBeenCalledWith('Saved successfully.');
     }));
 
@@ -494,12 +514,12 @@ describe('Admin page platform parameters tab', () => {
     }));
   });
 
-  describe('.isPlatformParamRulesChanged', () => {
+  describe('.isPlatformParamChanged', () => {
     it('should return false if the parameter is same as the backup instance',
       () => {
         const platformParameter = component.platformParameters[0];
 
-        expect(component.isPlatformParamRulesChanged(platformParameter))
+        expect(component.isPlatformParamChanged(platformParameter))
           .toBeFalse();
       }
     );
@@ -511,7 +531,7 @@ describe('Admin page platform parameters tab', () => {
 
         component.addNewRuleToTop(platformParameter);
 
-        expect(component.isPlatformParamRulesChanged(platformParameter))
+        expect(component.isPlatformParamChanged(platformParameter))
           .toBeTrue();
       }
     );
@@ -547,7 +567,7 @@ describe('Admin page platform parameters tab', () => {
       });
 
       expect(() => {
-        component.isPlatformParamRulesChanged(platformParameter);
+        component.isPlatformParamChanged(platformParameter);
       }).toThrowError();
     });
   });

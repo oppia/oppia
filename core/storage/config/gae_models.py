@@ -120,6 +120,7 @@ class PlatformParameterModel(base_models.VersionedModel):
     rules = datastore_services.JsonProperty(repeated=True)
     rule_schema_version = (
         datastore_services.IntegerProperty(required=True, indexed=True))
+    default_value = datastore_services.JsonProperty()
 
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:
@@ -137,7 +138,8 @@ class PlatformParameterModel(base_models.VersionedModel):
         """Model doesn't contain any data directly corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'rules': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'rule_schema_version': base_models.EXPORT_POLICY.NOT_APPLICABLE
+            'rule_schema_version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'default_value': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
 
     @classmethod
@@ -145,7 +147,8 @@ class PlatformParameterModel(base_models.VersionedModel):
         cls,
         param_name: str,
         rule_dicts: List[platform_parameter_domain.PlatformParameterRuleDict],
-        rule_schema_version: int
+        rule_schema_version: int,
+        default_value: platform_parameter_domain.PlatformDataTypes
     ) -> PlatformParameterModel:
         """Creates a PlatformParameterModel instance.
 
@@ -165,6 +168,8 @@ class PlatformParameterModel(base_models.VersionedModel):
                                 operator for comparison and value is the value
                                 used for comparison.
             rule_schema_version: int. The schema version for the rule dicts.
+            default_value: PlatformDataTypes. The default value of the platform
+                parameter.
 
         Returns:
             PlatformParameterModel. The created PlatformParameterModel
@@ -173,4 +178,5 @@ class PlatformParameterModel(base_models.VersionedModel):
         return cls(
             id=param_name,
             rules=rule_dicts,
-            rule_schema_version=rule_schema_version)
+            rule_schema_version=rule_schema_version,
+            default_value=default_value)

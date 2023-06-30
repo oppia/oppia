@@ -214,24 +214,22 @@ export class FeaturesTabComponent implements OnInit {
     return false;
   }
 
-  async updateFeatureRulesAsync(feature: PlatformParameter): Promise<void> {
-    const issues = this.validateFeatureFlag(feature);
-    if (issues.length > 0) {
-      this.windowRef.nativeWindow.alert(issues.join('\n'));
+  async saveDefaultValueToStorage(): Promise<void> {
+    if (!this.windowRef.nativeWindow.confirm(
+      'This action is irreversible.')) {
       return;
     }
-    const commitMessage = this.windowRef.nativeWindow.prompt(
-      'This action is irreversible. If you insist to proceed, please enter ' +
-      'the commit message for the update',
-      `Update feature '${feature.name}'.`
-    );
-    if (commitMessage === null) {
-      return;
+    for (let feature of this.featureFlags) {
+      let commitMessage = `Update default value for '${feature.name}'.`;
+      await this.updateFeatureFlag(feature, commitMessage);
     }
+  }
 
+  async updateFeatureFlag(
+      feature: PlatformParameter, commitMessage: string): Promise<void> {
     try {
       await this.apiService.updateFeatureFlag(
-        feature.name, commitMessage, feature.rules);
+        feature.name, commitMessage, feature.rules, feature.defaultValue);
 
       this.featureFlagNameToBackupMap.set(feature.name, cloneDeep(feature));
 
@@ -253,6 +251,24 @@ export class FeaturesTabComponent implements OnInit {
     }
   }
 
+  async updateFeatureRulesAsync(feature: PlatformParameter): Promise<void> {
+    const issues = this.validateFeatureFlag(feature);
+    if (issues.length > 0) {
+      this.windowRef.nativeWindow.alert(issues.join('\n'));
+      return;
+    }
+    const commitMessage = this.windowRef.nativeWindow.prompt(
+      'This action is irreversible. If you insist to proceed, please enter ' +
+      'the commit message for the update',
+      `Update feature '${feature.name}'.`
+    );
+    if (commitMessage === null) {
+      return;
+    }
+
+    await this.updateFeatureFlag(feature, commitMessage);
+  }
+
   clearChanges(featureFlag: PlatformParameter): void {
     if (!this.windowRef.nativeWindow.confirm(
       'This will revert all changes you made. Are you sure?')) {
@@ -264,6 +280,7 @@ export class FeaturesTabComponent implements OnInit {
 
     if (backup) {
       featureFlag.rules = cloneDeep(backup.rules);
+      featureFlag.defaultValue = backup.defaultValue;
     }
   }
 
@@ -271,14 +288,17 @@ export class FeaturesTabComponent implements OnInit {
     filter.conditions.splice(0);
   }
 
-  isFeatureFlagRulesChanged(feature: PlatformParameter): boolean {
+  isFeatureFlagChanged(feature: PlatformParameter): boolean {
     const original = this.featureFlagNameToBackupMap.get(
       feature.name
     );
     if (original === undefined) {
       throw new Error('Backup not found for feature flag: ' + feature.name);
     }
-    return !isEqual(original.rules, feature.rules);
+    return (
+      !isEqual(original.rules, feature.rules) ||
+      !isEqual(original.defaultValue, feature.defaultValue)
+    );
   }
 
   /**

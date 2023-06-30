@@ -30,7 +30,7 @@ export const PlatformFeatureDomainConstants = {
 
   // Action name for request to the admin handler that updates the rules
   // of feature flags.
-  UPDATE_FEATURE_FLAG_RULES_ACTION: 'update_feature_flag_rules',
+  UPDATE_FEATURE_FLAG_ACTION: 'update_feature_flag',
 
   // Action name for request to the release-coordinator handler that updates
   // the rules of feature flags.

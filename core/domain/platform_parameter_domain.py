@@ -804,6 +804,15 @@ class PlatformParameter:
         """
         return self._default_value
 
+    def set_default_value(self, default_value: PlatformDataTypes) -> None:
+        """Sets the default value of the PlatformParameter.
+
+        Args:
+            default_value: PlatformDataTypes. The new default value of the
+                parameter.
+        """
+        self._default_value = default_value
+
     @property
     def is_feature(self) -> bool:
         """Returns whether this parameter is also a feature flag.
