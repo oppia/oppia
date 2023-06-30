@@ -17,6 +17,7 @@
            class="progress">
         <div class="progress-bar bg-success"
              role="progressbar"
+             aria-hidden="true"
              [ngStyle]="translatedProgressStyle"
              ngbTooltip="{{opportunity.translationsCount}}/{{opportunity.totalCount}} cards accepted"
              container="body"
@@ -24,6 +25,7 @@
         </div>
         <div class="progress-bar bg-light-green"
              role="progressbar"
+             aria-hidden="true"
              [ngStyle]="inReviewProgressStyle"
              ngbTooltip="{{opportunity.inReviewCount}}/{{opportunity.totalCount}} cards awaiting review"
              container="body"
@@ -31,6 +33,7 @@
         </div>
         <div class="progress-bar bg-light"
              role="progressbar"
+             aria-label="Progress Bar"
              [ngStyle]="untranslatedProgressStyle"
              ngbTooltip="{{cardsAvailable}}/{{opportunity.totalCount}} cards available for translation"
              container="body"
@@ -130,7 +133,7 @@
 
 <!-- Desktop -->
 <div *ngIf="!onMobile && !opportunityDataIsLoading"
-     class="oppia-opportunities-list-item oppia-desktop-list-item e2e-test-opportunity-list-item">
+     class="oppia-opportunities-list-item oppia-desktop-list-item e2e-test-opportunity-list-item" tabindex="0">
   <ng-template [ngTemplateOutlet]="OpportunitiesDetails"></ng-template>
   <ng-template [ngTemplateOutlet]="ProgressBar"></ng-template>
   <ng-template [ngTemplateOutlet]="OpportunitiesLabel"></ng-template>
@@ -202,7 +205,7 @@
     min-width: 64%;
     text-align: center;
   }
-  .oppia-opportunities-button:hover {
+  .oppia-opportunities-button:hover, .oppia-opportunities-button:focus {
     background-color: #6f817f;
     color: #fff;
     -webkit-transition: background-color 200ms ease-out;

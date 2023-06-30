@@ -46,8 +46,8 @@
     </div>
   </div>
   <div class="oppia-contributions-show-review-side-navbar-container" >
-    <div class="oppia-contributions-side-navbar-part" *ngIf="reviewTabs.length > 0">
-      <div class="oppia-contributions-navbar-items-list" navbar-label="Available Tasks">
+    <div class="oppia-contributions-side-navbar-part" *ngIf="reviewTabs.length > 0" tabindex="0">
+      <div class="oppia-contributions-navbar-items-list" navbar-label="Available Tasks" aria-label="Available tasks">
         <div class="oppia-contributions-navbar-item" *ngFor="let tab of reviewTabs">
           <button class="oppia-contributions-navbar-button"
                   (click)="switchToTab(TAB_TYPE_REVIEWS, tab.tabSubType)"
@@ -56,8 +56,8 @@
         </div>
       </div>
     </div>
-    <div class="oppia-contributions-side-navbar-part" *ngIf="userIsLoggedIn">
-      <div class="oppia-contributions-navbar-items-list" navbar-label="Contributions">
+    <div class="oppia-contributions-side-navbar-part" *ngIf="userIsLoggedIn" tabindex="0">
+      <div class="oppia-contributions-navbar-items-list" navbar-label="Contributions" aria-label="Contributions">
         <div class="oppia-contributions-navbar-item" *ngFor="let tab of contributionTabs">
           <button *ngIf="tab && tab.enabled"
                   class="oppia-contributions-navbar-button"
@@ -66,8 +66,8 @@
           </button>
         </div>
       </div>
-      <div class="oppia-contributions-side-navbar-part" *ngIf="accomplishmentsTabIsEnabled && userIsLoggedIn">
-        <div class="oppia-contributions-navbar-items-list" navbar-label="Accomplishments">
+      <div class="oppia-contributions-side-navbar-part" *ngIf="accomplishmentsTabIsEnabled && userIsLoggedIn" tabindex="0">
+        <div class="oppia-contributions-navbar-items-list" navbar-label="Accomplishments" aria-label="Accomplishments">
           <div class="oppia-contributions-navbar-item" *ngFor="let tab of accomplishmentsTabs">
             <button *ngIf="tab && tab.enabled"
                     class="oppia-contributions-navbar-button"
@@ -96,6 +96,7 @@
           <p class="sort-by-text">Sort By</p>
           <select [(ngModel)]="reviewableQuestionsSortKey"
                   class="sort-options"
+                  aria-label="Sort by"
                   (change)="setReviewableQuestionsSortKey(reviewableQuestionsSortKey)">
             <option *ngFor="let key of REVIEWABLE_QUESTIONS_SORT_KEYS"
                     [value]="key"
@@ -151,7 +152,7 @@
   }
 
   .oppia-contributions-show-review-side-navbar-container {
-    background-color: #009688;
+    background-color: #00645d;
     width: 25%;
   }
 
@@ -314,7 +315,8 @@
 
   .oppia-contributions-active-navbar,
   .oppia-contributions-navbar-button:hover {
-    background-color: #0b6c63;
+    background-color: #fff;
+    color: #00645d;
   }
 
   .oppia-contributions-navbar-items-list::before {

@@ -67,6 +67,7 @@
                   </h1>
                 </div>
                 <div class="oppia-review-right-details-container e2e-test-review-rights"
+                     tabindex="0"
                      *ngIf="userIsReviewer">
                   <strong>Review rights:</strong>
                   <div *ngIf="userCanReviewTranslationSuggestionsInLanguages.length > 0">
@@ -130,14 +131,14 @@
                  *ngIf="showLanguageSelector() || showTopicSelector()">
               <div class="oppia-dashboard-language-container"
                    *ngIf="showLanguageSelector()">
-                <div class="oppia-dashboard-language-container-label">Translate to</div>
+                <div class="oppia-dashboard-language-container-label" tabindex="0">Translate to</div>
                 <translation-language-selector class="oppia-language-selector"
                                                [activeLanguageCode]="languageCode"
                                                (setActiveLanguageCode)="onChangeLanguage($event)">
                 </translation-language-selector>
               </div>
               <div class="oppia-dashboard-topic-container" *ngIf="showTopicSelector()">
-                <div class="oppia-dashboard-topic-container-label">Subject</div>
+                <div class="oppia-dashboard-topic-container-label" tabindex="0">Subject</div>
                 <translation-topic-selector class="oppia-topic-selector"
                                             [activeTopicName]="topicName"
                                             (setActiveTopicName)="onChangeTopic($event)">
