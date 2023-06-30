@@ -30,7 +30,6 @@ export function initializeGoogleAnalytics() {
 
   if (
     analyticsConstants.GA_ANALYTICS_ID &&
-    analyticsConstants.UA_ANALYTICS_ID &&
     analyticsConstants.SITE_NAME_FOR_ANALYTICS
   ) {
     // Reference doc:
@@ -44,10 +43,6 @@ export function initializeGoogleAnalytics() {
     });
     gtag('js', new Date());
     gtag('config', analyticsConstants.GA_ANALYTICS_ID, {
-      'anonymize_ip': true,
-      'forceSSL': true,
-    });
-    gtag('config', analyticsConstants.UA_ANALYTICS_ID, {
       'anonymize_ip': true,
       'forceSSL': true,
     });
