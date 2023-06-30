@@ -385,5 +385,6 @@
         "core.jobs.io.gcs_io_test",
         "core.domain.android_services_test",
         "core.jobs.batch_jobs.story_node_jobs_test"
+        "core.jobs.batch_jobs.contributor_admin_stats_jobs_test"
     ]
 }
