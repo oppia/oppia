@@ -1,14 +1,15 @@
+# using digestID of the 3rd party dockerhub image, as updates in the dockerhub images might break the build
 # added platform flag here because -- https://stackoverflow.com/questions/71040681/qemu-x86-64-could-not-open-lib64-ld-linux-x86-64-so-2-no-such-file-or-direc
-FROM --platform=linux/amd64 python:3.8
+FROM --platform=linux/amd64 python@sha256:90834dba6381dfc3957573dc7a3e6c5c8ed255cf60079329a6da2b5e6d4257b8
 
-WORKDIR /app/oppia
+WORKDIR /
 
 ENV oppia_is_dockerized="true"
-
 
 # installing the pre-requisites libs and dependencies
 RUN apt-get update -y && apt-get upgrade -y \
     curl \
+    wget \
     git \
     python3-dev \
     python3-setuptools \
@@ -16,44 +17,53 @@ RUN apt-get update -y && apt-get upgrade -y \
     unzip \
     python3-yaml \
     python3-matplotlib \
+    npm \
+    python2 \
+    openjdk-11-jre \
     chromium
+
+RUN curl -fsSL https://deb.nodesource.com/setup_16.x | bash -
+RUN apt-get install -y nodejs
 
 RUN pip install --upgrade pip==21.2.3
 RUN pip install pip-tools==6.6.2 setuptools==58.5.3 cmake
 
+# installing google cloud sdk
+RUN wget -O gcloud-sdk.tar.gz https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-sdk-364.0.0-linux-x86_64.tar.gz
+RUN tar -xzf gcloud-sdk.tar.gz
+RUN ./google-cloud-sdk/install.sh --quiet
+RUN rm gcloud-sdk.tar.gz
 
-# installing python dependencies from the requirements.txt file
+WORKDIR /app/oppia
+
+# installing python dependencies from the requirements_dev.txt file
 COPY requirements_dev.in .
 COPY requirements_dev.txt .
 
 RUN pip-compile --generate-hashes requirements_dev.in
 RUN pip install --require-hashes --no-deps -r requirements_dev.txt
 
-
 ## installing packages from the package.json file
 COPY package.json .
 COPY scripts/linters/custom_eslint_checks ./scripts/linters/custom_eslint_checks
-RUN apt-get -y install npm
-
-RUN curl -fsSL https://deb.nodesource.com/setup_16.x | bash -
-RUN apt-get install -y nodejs
 
 RUN npm install -g yarn
-RUN yarn install
+# mathjs ESOCKETTIMEDOUT error fix -- https://stackoverflow.com/questions/55845756/esockettimedout-error-while-yarn-install-command
+RUN yarn install --network-timeout 1000000
 
+# installing buf and proto for Linux -- this docker container is based on Linux
+COPY buf.gen.yaml .
+COPY /extensions/classifiers/proto/ ./extensions/classifiers/proto/
 
 # installing third party dependencies
 COPY scripts ./scripts
 COPY /core ./core
 COPY /assets ./assets
 COPY dependencies.json .
-COPY buf.gen.yaml .
 
+# installation for proto buf requires the third party dependencies to be installed (oppia-ml-proto)
 RUN python -m scripts.install_third_party
-RUN python -m scripts.build
 
-
-# installing buf and proto for Linux -- this docker container is based on Linux
 ENV BUF_LINUX_FILES="buf-Linux-x86_64 protoc-gen-buf-check-lint-Linux-x86_64 protoc-gen-buf-check-breaking-Linux-x86_64" \
     PROTOC_LINUX_FILE='protoc-3.13.0-linux-x86_64.zip' \
     BUF_DIR='/app/buf-0.29.0' \
@@ -79,8 +89,6 @@ RUN chmod -R 744 $BUF_DIR \
 # compiling the protobuf files
 ENV PROTOC_FILES_PATH='/app/oppia/third_party/oppia-ml-proto-0.0.0'
 
-COPY buf.gen.yaml .
-COPY /extensions/classifiers/proto/ ./extensions/classifiers/proto/
 RUN mkdir /app/oppia/proto_files
 RUN /app/buf-0.29.0/protoc/bin/protoc \
     --plugin=protoc-gen-ts=/app/oppia/node_modules/.bin/protoc-gen-ts \
@@ -92,6 +100,12 @@ RUN /app/buf-0.29.0/protoc/bin/protoc \
 
 RUN sed -i 's/import text_classifier_pb2 as text__classifier__pb2/from . import text_classifier_pb2 as text__classifier__pb2/' /app/oppia/proto_files/training_job_response_payload_pb2.py
 
+RUN python -m scripts.build
+
 ENV NODE_OPTIONS=--openssl-legacy-provider
 
 COPY . .
+
+EXPOSE 8089
+EXPOSE 8000
+EXPOSE 8181

@@ -2,11 +2,10 @@ version: '3.8'
 
 services:
   webserver:
-    platform: linux/arm64
-    container_name: oppia-webserver
     build:
       context: .
       dockerfile: ./docker/Dockerfile
+    container_name: oppia-webserver
     volumes:
       - shared_root_dir:/app/oppia
     environment:
@@ -19,37 +18,37 @@ services:
       interval: 30s
       retries: 5
       start_period: 20m
-    command: >
-      sh -c '
-        trap "rm /app/oppia/node_modules/@angular/compiler-cli/ngcc/__ngcc_lock_file__" EXIT;
+    command: ["sh", "-c", "sleep infinity"]
+    # command: >
+    #   sh -c '
+    #     trap "rm /app/oppia/node_modules/@angular/compiler-cli/ngcc/__ngcc_lock_file__" EXIT;
 
-        if [ "$prod_env" = "true" ]; then
-          if [ "$source_maps" = "true" -a "$maintenance_mode" = "true" ]; then
-            python3 -m scripts.build --prod_env --maintenance_mode --source_maps
-          elif [ "$maintenance_mode" = "true" ]; then
-            python3 -m scripts.build --prod_env --maintenance_mode
-          elif [ "$source_maps" = "true" ]; then
-            python3 -m scripts.build --prod_env --source_maps
-          else
-            python3 -m scripts.build --prod_env
-          fi
+    #     if [ "$prod_env" = "true" ]; then
+    #       if [ "$source_maps" = "true" -a "$maintenance_mode" = "true" ]; then
+    #         python3 -m scripts.build --prod_env --maintenance_mode --source_maps
+    #       elif [ "$maintenance_mode" = "true" ]; then
+    #         python3 -m scripts.build --prod_env --maintenance_mode
+    #       elif [ "$source_maps" = "true" ]; then
+    #         python3 -m scripts.build --prod_env --source_maps
+    #       else
+    #         python3 -m scripts.build --prod_env
+    #       fi
 
-          /app/oppia/node_modules/.bin/ng build --prod
-        else
-          /app/oppia/node_modules/.bin/ng build --watch
-        fi
-      '
+    #       /app/oppia/node_modules/.bin/ng build --prod
+    #     else
+    #       /app/oppia/node_modules/.bin/ng build --watch
+    #     fi
+    #   '
 #       python3 -m scripts.build \
 # +              --prod_env \
 # +              $${maintenance_mode="true" : +--maintenance_mode} \
 # +              $${source_maps="true" : +--source_maps}
 
   webpack-compiler:
-    platform: linux/arm64
-    container_name: oppia-webpack-compiler
     build:
       context: .
       dockerfile: ./docker/Dockerfile
+    container_name: oppia-webpack-compiler
     volumes:
       - shared_root_dir:/app/oppia
     environment:
@@ -60,40 +59,13 @@ services:
       interval: 30s
       retries: 5
       start_period: 20m
-    command: >
-      sh -c '
-        if [ "$prod_env" = "true" ]; then
-          if [ "$source_maps" = "true" ]; then
-            node --max-old-space-size=8192 /app/oppia/node_modules/webpack/bin/webpack.js --config /app/oppia/webpack.prod.sourcemap.config.ts
-          else
-            node --max-old-space-size=8192 /app/oppia/node_modules/webpack/bin/webpack.js --config /app/oppia/webpack.prod.config.ts
-          fi
-        else
-          if [ "$source_maps" = "true" ]; then
-            node /app/oppia/node_modules/webpack/bin/webpack.js --config /app/oppia/webpack.dev.sourcemap.config.ts --watch --color --progress
-          else
-            node /app/oppia/node_modules/webpack/bin/webpack.js --config /app/oppia/webpack.dev.config.ts --watch --color --progress
-          fi
-        fi
-      '
-#       +  #     sh -c '
-#   #       if [ "$prod_env" = "true" ]; then
-#   #         node --max-old-space-size=8192 \
-#   #         /app/oppia/node_modules/webpack/bin/webpack.js \
-#   #         --config $( [ "$source_maps" = "true" ] && echo "/app/oppia/webpack.prod.sourcemap.config.ts" || echo "/app/oppia/webpack.prod.config.ts" )
-#   #       else
-#   #         node /app/oppia/node_modules/webpack/bin/webpack.js \
-#   #         --config $( [ "$source_maps" = "true" ] && echo "/app/oppia/webpack.dev.sourcemap.config.ts" || echo "/app/oppia/webpack.dev.config.ts" ) \
-#   #         --watch \
-#   #         --color \
-#   #         --progress
-#   #       fi
-#   #     '
+    command: ["sh", "-c", "sleep infinity"]
+    # command: >
 
   google_app_engine:
     build:
       context: .
-      dockerfile: ./docker/Dockerfile.google_cloud_sdk
+      dockerfile: ./docker/Dockerfile
     container_name: oppia-app-engine
     ports:
       - "8181:8181"
@@ -161,7 +133,7 @@ services:
   datastore:
     build:
       context: .
-      dockerfile: ./docker/Dockerfile.google_cloud_sdk
+      dockerfile: ./docker/Dockerfile
     container_name: oppia-cloud-datastore
     ports:
       - "8089:8089"
@@ -267,8 +239,6 @@ services:
     container_name: oppia-elasticsearch
     ports:
       - "9200:9200"
-    volumes:
-      - shared_root_dir:/app/oppia
     environment:
       - ES_JAVA_OPTS=-Xms100m -Xmx500m
       - ES_PATH_CONF=/usr/share/elasticsearch/config
