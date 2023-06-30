@@ -199,6 +199,7 @@ class ConfigProperty:
     - admin_ids.
     - admin_usernames.
     - allow_yaml_file_upload.
+    - always_ask_learners_for_answer_details.
     - banned_usernames.
     - banner_alt_text.
     - before_end_body_tag_hook.
@@ -219,6 +220,11 @@ class ConfigProperty:
     - embedded_google_group_url.
     - featured_translation_languages.
     - full_site_url.
+    - high_bounce_rate_task_minimum_exploration_starts.
+    - high_bounce_rate_task_state_bounce_rate_creation_threshold.
+    - high_bounce_rate_task_state_bounce_rate_obsoletion_threshold.
+    - is_improvements_tab_enabled.
+    - learner_groups_are_enabled.
     - list_of_default_tags_for_blog_post.
     - max_number_of_explorations_in_math_svgs_batch.
     - max_number_of_svgs_in_math_svgs_batch.
@@ -467,39 +473,6 @@ CLASSROOM_PAGES_DATA = ConfigProperty(
 RECORD_PLAYTHROUGH_PROBABILITY = ConfigProperty(
     'record_playthrough_probability', FLOAT_SCHEMA,
     'The probability of recording playthroughs', 0.2)
-
-IS_IMPROVEMENTS_TAB_ENABLED = ConfigProperty(
-    'is_improvements_tab_enabled', BOOL_SCHEMA,
-    'Exposes the Improvements Tab for creators in the exploration editor.',
-    False)
-
-ALWAYS_ASK_LEARNERS_FOR_ANSWER_DETAILS = ConfigProperty(
-    'always_ask_learners_for_answer_details', BOOL_SCHEMA,
-    'Always ask learners for answer details. For testing -- do not use',
-    False)
-
-LEARNER_GROUPS_ARE_ENABLED = ConfigProperty(
-    'learner_groups_are_enabled', BOOL_SCHEMA,
-    'Enable learner groups feature', False)
-
-HIGH_BOUNCE_RATE_TASK_STATE_BOUNCE_RATE_CREATION_THRESHOLD = ConfigProperty(
-    'high_bounce_rate_task_state_bounce_rate_creation_threshold',
-    FLOAT_SCHEMA,
-    'The bounce-rate a state must exceed to create a new improvements task.',
-    0.20)
-
-HIGH_BOUNCE_RATE_TASK_STATE_BOUNCE_RATE_OBSOLETION_THRESHOLD = ConfigProperty(
-    'high_bounce_rate_task_state_bounce_rate_obsoletion_threshold',
-    FLOAT_SCHEMA,
-    'The bounce-rate a state must fall under to discard its improvement task.',
-    0.20)
-
-HIGH_BOUNCE_RATE_TASK_MINIMUM_EXPLORATION_STARTS = ConfigProperty(
-    'high_bounce_rate_task_minimum_exploration_starts',
-    INT_SCHEMA,
-    'The minimum number of times an exploration is started before it can '
-    'generate high bounce-rate improvements tasks.',
-    100)
 
 MAX_NUMBER_OF_TAGS_ASSIGNED_TO_BLOG_POST = ConfigProperty(
     'max_number_of_tags_assigned_to_blog_post',
