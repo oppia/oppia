@@ -193,7 +193,8 @@ class Registry:
         name: str,
         committer_id: str,
         commit_message: str,
-        new_rules: List[platform_parameter_domain.PlatformParameterRule]
+        new_rules: List[platform_parameter_domain.PlatformParameterRule],
+        default_value: platform_parameter_domain.PlatformDataTypes
     ) -> None:
         """Updates the platform parameter with new rules.
 
@@ -203,6 +204,8 @@ class Registry:
             commit_message: str. The commit message.
             new_rules: list(PlatformParameterRule). A list of
                 PlatformParameterRule objects.
+            default_value: PlatformDataTypes. The new default value of
+                platform parameter.
         """
         param = cls.get_platform_parameter(name)
 
@@ -212,13 +215,17 @@ class Registry:
         new_rule_dicts = [rules.to_dict() for rules in new_rules]
         param_dict = param.to_dict()
         param_dict['rules'] = new_rule_dicts
+        param_dict['default_value'] = default_value
         updated_param = param.from_dict(param_dict)
         updated_param.validate()
 
         model_instance = cls._to_platform_parameter_model(param)
         param.set_rules(new_rules)
+        param.set_default_value(default_value)
+        cls.parameter_registry[param.name] = param
 
         model_instance.rules = [rule.to_dict() for rule in param.rules]
+        model_instance.default_value = default_value
         model_instance.commit(
             committer_id,
             commit_message,
@@ -226,7 +233,8 @@ class Registry:
                 'cmd': (
                     platform_parameter_domain
                     .PlatformParameterChange.CMD_EDIT_RULES),
-                'new_rules': new_rule_dicts
+                'new_rules': new_rule_dicts,
+                'default_value': default_value
             }]
         )
 
@@ -302,13 +310,17 @@ class Registry:
 
         if parameter_model:
             param_with_init_settings = cls.parameter_registry[name]
+            if parameter_model.default_value is None:
+                default_value = param_with_init_settings.default_value
+            else:
+                default_value = parameter_model.default_value
             return platform_parameter_domain.PlatformParameter.from_dict({
                 'name': param_with_init_settings.name,
                 'description': param_with_init_settings.description,
                 'data_type': param_with_init_settings.data_type,
                 'rules': parameter_model.rules,
                 'rule_schema_version': parameter_model.rule_schema_version,
-                'default_value': param_with_init_settings.default_value,
+                'default_value': default_value,
                 'is_feature': param_with_init_settings.is_feature,
                 'feature_stage': param_with_init_settings.feature_stage,
             })
@@ -353,6 +365,7 @@ class Registry:
             model_instance = config_models.PlatformParameterModel.create(
                 param.name,
                 [rule.to_dict() for rule in param.rules],
-                feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION
+                feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION,
+                default_value=param.default_value
             )
         return model_instance
