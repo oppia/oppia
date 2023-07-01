@@ -88,7 +88,9 @@
           <source type="image/png" [srcset]="getStaticImageUrl('/images/general/no_explorations_found.png')">
           <img [src]="getStaticImageUrl('/general/no_explorations_found.png')">
         </picture>
-        {{ 'I18N_BLOG_HOME_PAGE_NO_RESULTS_FOUND' | translate }}
+        <p class="text-center">
+          {{ 'I18N_BLOG_HOME_PAGE_NO_RESULTS_FOUND' | translate }}
+        </p>
       </div>
       <div *ngIf="showBlogPostCardsLoadingScreen" class="col-8 my-auto">
         <mat-spinner class="mx-auto"></mat-spinner>
