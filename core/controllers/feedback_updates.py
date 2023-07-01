@@ -174,7 +174,9 @@ class FeedbackThreadHandler(
             exploration = exp_fetchers.get_exploration_by_id(exploration_id)
             current_content_html = (
                 exploration.states[
-                    suggestion.change.state_name].content.html)
+                    suggestion.change.state_name
+                ].content.html
+            )
             suggestion_summary: SuggestionSummaryDict = {
                 'suggestion_html': suggestion.change.new_value['html'],
                 'current_content_html': current_content_html,
