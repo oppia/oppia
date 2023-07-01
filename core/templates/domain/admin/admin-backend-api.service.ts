@@ -23,6 +23,10 @@ import { Injectable } from '@angular/core';
 import { AdminPageConstants } from
   'pages/admin-page/admin-page.constants';
 import {
+  PlatformParameter,
+  PlatformParameterBackendDict
+} from 'domain/platform_feature/platform-parameter.model';
+import {
   CreatorTopicSummary,
   CreatorTopicSummaryBackendDict
 } from 'domain/topic/creator-topic-summary.model';
@@ -91,7 +95,6 @@ export interface ConfigProperty {
 }
 
 export interface ConfigPropertyValues {
-  'always_ask_learners_for_answer_details': boolean;
   'classroom_pages_data': ClassroomPageData;
   'classroom_promos_are_enabled': boolean;
   'contributor_dashboard_is_enabled': boolean;
@@ -99,18 +102,12 @@ export interface ConfigPropertyValues {
   'email_footer': string;
   'email_sender_name': string;
   'enable_admin_notifications_for_reviewer_shortage': boolean;
-  'high_bounce_rate_task_minimum_exploration_starts': number;
-  'high_bounce_rate_task_state_bounce_rate_creation_threshold': number;
-  'high_bounce_rate_task_state_bounce_rate_obsoletion_threshold': number;
-  'is_improvements_tab_enabled': boolean;
   'max_number_of_explorations_in_math_svgs_batch': number;
   'max_number_of_suggestions_per_reviewer': number;
   'max_number_of_svgs_in_math_svgs_batch': number;
   'notification_user_ids_for_failed_tasks': string[];
   'notify_admins_suggestions_waiting_too_long_is_enabled': boolean;
   'oppia_csrf_secret': string;
-  'promo_bar_enabled': boolean;
-  'promo_bar_message': string;
   'record_playthrough_probability': number;
   'signup_email_content': SignupEmailContent;
   'unpublish_exploration_email_html_body': string;
@@ -127,6 +124,7 @@ export interface AdminPageDataBackendDict {
   'viewable_roles': string[];
   'human_readable_roles': HumanReadableRolesBackendResponse;
   'topic_summaries': CreatorTopicSummaryBackendDict[];
+  'platform_params_dicts': PlatformParameterBackendDict[];
 }
 
 export interface AdminPageData {
@@ -139,6 +137,7 @@ export interface AdminPageData {
   viewableRoles: string[];
   humanReadableRoles: HumanReadableRolesBackendResponse;
   topicSummaries: CreatorTopicSummary[];
+  platformParameters: PlatformParameter[];
 }
 
 @Injectable({
@@ -163,7 +162,9 @@ export class AdminBackendApiService {
           humanReadableRoles: response.human_readable_roles,
           viewableRoles: response.viewable_roles,
           topicSummaries: response.topic_summaries.map(
-            CreatorTopicSummary.createFromBackendDict)
+            CreatorTopicSummary.createFromBackendDict),
+          platformParameters: response.platform_params_dicts.map(
+            dict => PlatformParameter.createFromBackendDict(dict))
         });
       }, errorResponse => {
         reject(errorResponse.error.error);

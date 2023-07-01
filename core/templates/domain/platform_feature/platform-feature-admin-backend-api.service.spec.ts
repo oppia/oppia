@@ -36,7 +36,7 @@ describe('PlatformFeatureAdminBackendApiService', () => {
   let httpTestingController: HttpTestingController;
   let featureFlagsResponse = {
     feature_flags: [{
-      name: 'dummy_feature',
+      name: 'dummy_feature_flag_for_e2e_tests',
       description: 'this is a dummy feature',
       data_type: 'bool',
       rules: [{
@@ -50,7 +50,8 @@ describe('PlatformFeatureAdminBackendApiService', () => {
       default_value: false,
       is_feature: true,
       feature_stage: FeatureStage.DEV
-    }]
+    }],
+    server_stage: 'dev'
   };
 
   beforeEach(() => {
@@ -72,7 +73,8 @@ describe('PlatformFeatureAdminBackendApiService', () => {
 
     let featureFlagsObject = {
       featureFlags: featureFlagsResponse.feature_flags.map(
-        dict => PlatformParameter.createFromBackendDict(dict))
+        dict => PlatformParameter.createFromBackendDict(dict)),
+      serverStage: featureFlagsResponse.server_stage
     };
     featureAdminService.getFeatureFlags().then(successHandler, failHandler);
 
@@ -122,7 +124,7 @@ describe('PlatformFeatureAdminBackendApiService', () => {
       ];
 
       featureAdminService.updateFeatureFlag(
-        'feature_name', 'update message', newRules
+        'feature_name', 'update message', newRules, false
       ).then(successHandler, failHandler);
 
       const req = httpTestingController.expectOne(
@@ -149,7 +151,7 @@ describe('PlatformFeatureAdminBackendApiService', () => {
     ];
 
     featureAdminService.updateFeatureFlag(
-      'feature_name', 'update message', newRules
+      'feature_name', 'update message', newRules, false
     ).then(successHandler, failHandler);
 
     const req = httpTestingController.expectOne(
@@ -161,4 +163,55 @@ describe('PlatformFeatureAdminBackendApiService', () => {
     expect(successHandler).not.toHaveBeenCalled();
     expect(failHandler).toHaveBeenCalled();
   }));
+
+  it('should make a request to update the platform param rules',
+    fakeAsync(() => {
+      const successHandler = jasmine.createSpy('success');
+      const failHandler = jasmine.createSpy('fail');
+
+      const newRules = [
+        PlatformParameterRule.createFromBackendDict({
+          filters: [],
+          value_when_matched: false
+        })
+      ];
+
+      featureAdminService.updatePlatformParameter(
+        'param_name', 'update message', newRules, false
+      ).then(successHandler, failHandler);
+
+      const req = httpTestingController.expectOne('/adminhandler');
+      req.flush({});
+      expect(req.request.method).toEqual('POST');
+
+      flushMicrotasks();
+
+      expect(successHandler).toHaveBeenCalled();
+      expect(failHandler).not.toHaveBeenCalled();
+    }));
+
+  it('should reject to update platform params if the request fails',
+    fakeAsync(() => {
+      const successHandler = jasmine.createSpy('success');
+      const failHandler = jasmine.createSpy('fail');
+
+      const newRules = [
+        PlatformParameterRule.createFromBackendDict({
+          filters: [],
+          value_when_matched: false
+        })
+      ];
+
+      featureAdminService.updatePlatformParameter(
+        'param_name', 'update message', newRules, false
+      ).then(successHandler, failHandler);
+
+      const req = httpTestingController.expectOne('/adminhandler');
+      req.error(new ErrorEvent('Error'));
+
+      flushMicrotasks();
+
+      expect(successHandler).not.toHaveBeenCalled();
+      expect(failHandler).toHaveBeenCalled();
+    }));
 });

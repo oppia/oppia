@@ -109,12 +109,12 @@ class FeatureFlagsHandlerTest(test_utils.GenericTestBase):
         assert_raises_regexp_context_manager = self.assertRaisesRegex(
             Exception,
             'The \'feature_name\' must be provided when the action is '
-            'update_feature_flag_rules.'
+            'update_feature_flag.'
         )
         with assert_raises_regexp_context_manager, prod_mode_swap:
             self.post_json(
                 feconf.FEATURE_FLAGS_URL, {
-                    'action': 'update_feature_flag_rules',
+                    'action': 'update_feature_flag',
                     'feature_name': None
                 }, csrf_token=csrf_token)
 
@@ -130,12 +130,12 @@ class FeatureFlagsHandlerTest(test_utils.GenericTestBase):
         assert_raises_regexp_context_manager = self.assertRaisesRegex(
             Exception,
             'The \'new_rules\' must be provided when the action is '
-            'update_feature_flag_rules.'
+            'update_feature_flag.'
         )
         with assert_raises_regexp_context_manager, prod_mode_swap:
             self.post_json(
                 feconf.FEATURE_FLAGS_URL, {
-                    'action': 'update_feature_flag_rules',
+                    'action': 'update_feature_flag',
                     'feature_name': 'new_feature',
                     'new_rules': None
                 }, csrf_token=csrf_token)
@@ -164,12 +164,12 @@ class FeatureFlagsHandlerTest(test_utils.GenericTestBase):
         assert_raises_regexp_context_manager = self.assertRaisesRegex(
             Exception,
             'The \'commit_message\' must be provided when the action is '
-            'update_feature_flag_rules.'
+            'update_feature_flag.'
         )
         with assert_raises_regexp_context_manager, prod_mode_swap:
             self.post_json(
                 feconf.FEATURE_FLAGS_URL, {
-                    'action': 'update_feature_flag_rules',
+                    'action': 'update_feature_flag',
                     'feature_name': 'new_feature',
                     'new_rules': new_rule_dicts,
                     'commit_message': None
@@ -183,7 +183,7 @@ class FeatureFlagsHandlerTest(test_utils.GenericTestBase):
             ParamNames.TEST_FEATURE_1, 'feature for test.', FeatureStages.DEV)
 
         feature_list_ctx = self.swap(
-            platform_feature_services, 'ALL_FEATURES_LIST',
+            platform_feature_services, 'ALL_FEATURE_FLAGS',
             [ParamNames.TEST_FEATURE_1])
         feature_set_ctx = self.swap(
             platform_feature_services, 'ALL_FEATURES_NAMES_SET',
@@ -216,7 +216,7 @@ class FeatureFlagsHandlerTest(test_utils.GenericTestBase):
         ]
 
         feature_list_ctx = self.swap(
-            platform_feature_services, 'ALL_FEATURES_LIST',
+            platform_feature_services, 'ALL_FEATURE_FLAGS',
             [ParamNames.TEST_FEATURE_1])
         feature_set_ctx = self.swap(
             platform_feature_services, 'ALL_FEATURES_NAMES_SET',
@@ -224,10 +224,11 @@ class FeatureFlagsHandlerTest(test_utils.GenericTestBase):
         with feature_list_ctx, feature_set_ctx:
             self.post_json(
                 feconf.FEATURE_FLAGS_URL, {
-                    'action': 'update_feature_flag_rules',
+                    'action': 'update_feature_flag',
                     'feature_name': feature.name,
                     'new_rules': new_rule_dicts,
                     'commit_message': 'test update feature',
+                    'default_value': False
                 }, csrf_token=csrf_token)
 
             rule_dicts = [
@@ -260,16 +261,17 @@ class FeatureFlagsHandlerTest(test_utils.GenericTestBase):
         ]
 
         feature_list_ctx = self.swap(
-            platform_feature_services, 'ALL_FEATURES_LIST', [])
+            platform_feature_services, 'ALL_FEATURE_FLAGS', [])
         feature_set_ctx = self.swap(
             platform_feature_services, 'ALL_FEATURES_NAMES_SET', set([]))
         with feature_list_ctx, feature_set_ctx:
             response = self.post_json(
                 feconf.FEATURE_FLAGS_URL, {
-                    'action': 'update_feature_flag_rules',
+                    'action': 'update_feature_flag',
                     'feature_name': 'test_feature_1',
                     'new_rules': new_rule_dicts,
                     'commit_message': 'test update feature',
+                    'default_value': False
                 },
                 csrf_token=csrf_token,
                 expected_status_int=400
@@ -299,7 +301,7 @@ class FeatureFlagsHandlerTest(test_utils.GenericTestBase):
         ]
 
         feature_list_ctx = self.swap(
-            platform_feature_services, 'ALL_FEATURES_LIST',
+            platform_feature_services, 'ALL_FEATURE_FLAGS',
             [ParamNames.TEST_FEATURE_2])
         feature_set_ctx = self.swap(
             platform_feature_services, 'ALL_FEATURES_NAMES_SET',
@@ -307,10 +309,11 @@ class FeatureFlagsHandlerTest(test_utils.GenericTestBase):
         with feature_list_ctx, feature_set_ctx:
             response = self.post_json(
                 feconf.FEATURE_FLAGS_URL, {
-                    'action': 'update_feature_flag_rules',
+                    'action': 'update_feature_flag',
                     'feature_name': feature.name,
                     'new_rules': new_rule_dicts,
                     'commit_message': 'test update feature',
+                    'default_value': False
                 },
                 csrf_token=csrf_token,
                 expected_status_int=400
@@ -345,7 +348,7 @@ class FeatureFlagsHandlerTest(test_utils.GenericTestBase):
         ]
 
         feature_list_ctx = self.swap(
-            platform_feature_services, 'ALL_FEATURES_LIST',
+            platform_feature_services, 'ALL_FEATURE_FLAGS',
             [ParamNames.TEST_FEATURE_2])
         feature_set_ctx = self.swap(
             platform_feature_services, 'ALL_FEATURES_NAMES_SET',
@@ -359,10 +362,11 @@ class FeatureFlagsHandlerTest(test_utils.GenericTestBase):
         with feature_list_ctx, feature_set_ctx:
             response = self.post_json(
                 feconf.FEATURE_FLAGS_URL, {
-                    'action': 'update_feature_flag_rules',
+                    'action': 'update_feature_flag',
                     'feature_name': feature.name,
                     'new_rules': new_rule_dicts,
                     'commit_message': 'test update feature',
+                    'default_value': False
                 },
                 csrf_token=csrf_token,
                 expected_status_int=500
