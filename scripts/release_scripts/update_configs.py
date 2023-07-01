@@ -189,7 +189,6 @@ def update_analytics_constants_based_on_config(
 
     Raises:
         Exception. No GA_ANALYTICS_ID key found.
-        Exception. No UA_ANALYTICS_ID key found.
         Exception. No SITE_NAME_FOR_ANALYTICS key found.
         Exception. No CAN_SEND_ANALYTICS_EVENTS key found.
     """
@@ -202,13 +201,6 @@ def update_analytics_constants_based_on_config(
             'Error: No GA_ANALYTICS_ID key found.'
         )
     ga_analytics_id = ga_analytics_searched_key.group(1)
-    ua_analytics_searched_key = re.search(
-        r'"UA_ANALYTICS_ID": "(.*)"', config_file_contents)
-    if ua_analytics_searched_key is None:
-        raise Exception(
-            'Error: No UA_ANALYTICS_ID key found.'
-        )
-    ua_analytics_id = ua_analytics_searched_key.group(1)
     site_name_for_analytics_searched_key = re.search(
         r'"SITE_NAME_FOR_ANALYTICS": "(.*)"', config_file_contents)
     if site_name_for_analytics_searched_key is None:
@@ -228,10 +220,6 @@ def update_analytics_constants_based_on_config(
         release_analytics_constants_path,
         '"GA_ANALYTICS_ID": ""',
         '"GA_ANALYTICS_ID": "%s"' % ga_analytics_id)
-    common.inplace_replace_file(
-        release_analytics_constants_path,
-        '"UA_ANALYTICS_ID": ""',
-        '"UA_ANALYTICS_ID": "%s"' % ua_analytics_id)
     common.inplace_replace_file(
         release_analytics_constants_path,
         '"SITE_NAME_FOR_ANALYTICS": ""',
