@@ -807,7 +807,7 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
         self.login(self.CONTRIBUTOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
         response = self.post_json(
-            '/contributor-dashboard-admin-stats/invalid/submission',{
+            '/contributor-dashboard-admin-stats/invalid/submission', {
                 'page_size': 2,
                 'offset': 1,
                 'language_code': self.SUGGESTION_LANGUAGE_CODE,
@@ -829,7 +829,7 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
         self.login(self.CONTRIBUTOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
         response = self.post_json(
-            '/contributor-dashboard-admin-stats/translation/invalid',{
+            '/contributor-dashboard-admin-stats/translation/invalid', {
                 'page_size': 2,
                 'offset': 1,
                 'language_code': self.SUGGESTION_LANGUAGE_CODE,
@@ -951,7 +951,7 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
 
         # Test with language filter and pagination.
         response = self.post_json(
-            '/contributor-dashboard-admin-stats/translation/submission',{
+            '/contributor-dashboard-admin-stats/translation/submission', {
                 'page_size': 2,
                 'offset': 1,
                 'language_code': self.SUGGESTION_LANGUAGE_CODE,
@@ -979,7 +979,7 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
 
         # Test with sorting and pagination.
         response = self.post_json(
-            '/contributor-dashboard-admin-stats/translation/submission',{
+            '/contributor-dashboard-admin-stats/translation/submission', {
                 'page_size': 2,
                 'offset': 1,
                 'language_code': self.SUGGESTION_LANGUAGE_CODE,
@@ -1007,7 +1007,7 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
 
         # Test with topic filter and pagination.
         response = self.post_json(
-            '/contributor-dashboard-admin-stats/translation/submission',{
+            '/contributor-dashboard-admin-stats/translation/submission', {
                 'page_size': 2,
                 'offset': 1,
                 'language_code': self.SUGGESTION_LANGUAGE_CODE,
@@ -1039,7 +1039,7 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
 
         # Test with num_days_since_last_activity filter and pagination.
         response = self.post_json(
-            '/contributor-dashboard-admin-stats/translation/submission',{
+            '/contributor-dashboard-admin-stats/translation/submission', {
                 'page_size': 4,
                 'offset': 1,
                 'language_code': self.SUGGESTION_LANGUAGE_CODE,
@@ -1150,7 +1150,7 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
 
         # Test with language filter and pagination.
         response = self.post_json(
-            '/contributor-dashboard-admin-stats/translation/review',{
+            '/contributor-dashboard-admin-stats/translation/review', {
                 'page_size': 2,
                 'offset': 1,
                 'language_code': self.SUGGESTION_LANGUAGE_CODE,
@@ -1178,7 +1178,7 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
 
         # Test with sorting and pagination.
         response = self.post_json(
-            '/contributor-dashboard-admin-stats/translation/review',{
+            '/contributor-dashboard-admin-stats/translation/review', {
                 'page_size': 2,
                 'offset': 1,
                 'language_code': self.SUGGESTION_LANGUAGE_CODE,
@@ -1206,7 +1206,7 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
 
         # Test with num_days_since_last_activity filter and pagination.
         response = self.post_json(
-            '/contributor-dashboard-admin-stats/translation/review',{
+            '/contributor-dashboard-admin-stats/translation/review', {
                 'page_size': 4,
                 'offset': 1,
                 'language_code': self.SUGGESTION_LANGUAGE_CODE,
@@ -1317,7 +1317,7 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
 
         # Test pagination.
         response = self.post_json(
-            '/contributor-dashboard-admin-stats/question/submission',{
+            '/contributor-dashboard-admin-stats/question/submission', {
                 'page_size': 2,
                 'offset': 1,
                 'language_code': None,
@@ -1345,7 +1345,7 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
 
         # Test with sorting and pagination.
         response = self.post_json(
-            '/contributor-dashboard-admin-stats/question/submission',{
+            '/contributor-dashboard-admin-stats/question/submission', {
                 'page_size': 2,
                 'offset': 1,
                 'language_code': None,
@@ -1373,7 +1373,7 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
 
         # Test with topic filter and pagination.
         response = self.post_json(
-            '/contributor-dashboard-admin-stats/question/submission',{
+            '/contributor-dashboard-admin-stats/question/submission', {
                 'page_size': 2,
                 'offset': 1,
                 'language_code': None,
@@ -1405,7 +1405,7 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
 
         # Test with num_days_since_last_activity filter and pagination.
         response = self.post_json(
-            '/contributor-dashboard-admin-stats/question/submission',{
+            '/contributor-dashboard-admin-stats/question/submission', {
                 'page_size': 4,
                 'offset': 1,
                 'language_code': None,
@@ -1504,7 +1504,7 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
 
         # Test pagination.
         response = self.post_json(
-            '/contributor-dashboard-admin-stats/question/review',{
+            '/contributor-dashboard-admin-stats/question/review', {
                 'page_size': 2,
                 'offset': 1,
                 'language_code': None,
@@ -1532,7 +1532,7 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
 
         # Test with sorting and pagination.
         response = self.post_json(
-            '/contributor-dashboard-admin-stats/question/review',{
+            '/contributor-dashboard-admin-stats/question/review', {
                 'page_size': 2,
                 'offset': 1,
                 'language_code': None,
@@ -1560,7 +1560,7 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
 
         # Test with num_days_since_last_activity filter and pagination.
         response = self.post_json(
-            '/contributor-dashboard-admin-stats/question/review',{
+            '/contributor-dashboard-admin-stats/question/review', {
                 'page_size': 4,
                 'offset': 1,
                 'language_code': None,

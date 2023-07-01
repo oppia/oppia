@@ -47,6 +47,7 @@ def get_translation_submitter_total_stats_from_model(
         TranslationSubmitterTotalContributionStats. The domain object
         corresponding to given model.
     """
+
     return suggestion_registry.TranslationSubmitterTotalContributionStats(
         language_code=translation_submitter_model.language_code,
         contributor_id=translation_submitter_model.contributor_id,
@@ -103,6 +104,7 @@ def get_translation_reviewer_total_stats_from_model(
         TranslationreviewerTotalContributionStats. The domain object
         corresponding to given model.
     """
+
     return suggestion_registry.TranslationReviewerTotalContributionStats(
         language_code=translation_reviewer_model.language_code,
         contributor_id=translation_reviewer_model.contributor_id,
@@ -148,6 +150,7 @@ def get_question_submitter_total_stats_from_model(
         QuestionSubmitterTotalContributionStats. The domain object
         corresponding to given model.
     """
+
     return suggestion_registry.QuestionSubmitterTotalContributionStats(
         contributor_id=question_submitter_model.contributor_id,
         topic_ids_with_question_submissions=(
@@ -194,6 +197,7 @@ def get_question_reviewer_total_stats_from_model(
         QuestionreviewerTotalContributionStats. The domain object
         corresponding to given model.
     """
+
     return suggestion_registry.QuestionReviewerTotalContributionStats(
         contributor_id=question_reviewer_model.contributor_id,
         topic_ids_with_question_reviews=(
@@ -256,6 +260,7 @@ def get_translation_submitter_total_stats(
                     this batch. If False, there are no further results
                     after this batch.
     """
+
     translation_submitter_models, next_offset, more = (
         suggestion_models.TranslationSubmitterTotalContributionStatsModel
         .fetch_page(
@@ -312,6 +317,7 @@ def get_translation_reviewer_total_stats(
                 this batch. If False, there are no further results
                 after this batch.
     """
+
     translation_reviewer_models, next_offset, more = (
         suggestion_models.TranslationReviewerTotalContributionStatsModel
         .fetch_page(
@@ -368,6 +374,7 @@ def get_question_submitter_total_stats(
                 this batch. If False, there are no further results
                 after this batch.
     """
+
     question_submitter_models, next_offset, more = (
         suggestion_models.QuestionSubmitterTotalContributionStatsModel
         .fetch_page(
@@ -421,6 +428,7 @@ def get_question_reviewer_total_stats(
                 this batch. If False, there are no further results
                 after this batch.
     """
+
     question_reviewer_models, next_offset, more = (
         suggestion_models.QuestionReviewerTotalContributionStatsModel
         .fetch_page(

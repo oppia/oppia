@@ -15,19 +15,18 @@
 """Controllers for the contributor dashboard page."""
 
 from __future__ import annotations
-import enum
 
 from core import feconf
 from core import utils
 from core.constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
+from core.domain import contributor_admin_dashboard_services
 from core.domain import email_manager
 from core.domain import suggestion_registry
 from core.domain import suggestion_services
 from core.domain import topic_fetchers
 from core.domain import user_services
-from core.domain import contributor_admin_dashboard_services
 
 from typing import Dict, List, Optional, TypedDict, Union
 
@@ -554,6 +553,7 @@ class ContributorDashboardAdminStatsHandler(
 ):
     """Return Contributor Admin Dashboard Stats for supplied parameters.
     """
+
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS = {
         'contribution_type': {
@@ -617,6 +617,7 @@ class ContributorDashboardAdminStatsHandler(
         contribution_type: str,
         contribution_subtype: str
     ) -> None:
+        """Handles POST requests."""
 
         if contribution_type not in [
             feconf.CONTRIBUTION_TYPE_TRANSLATION,
@@ -633,7 +634,6 @@ class ContributorDashboardAdminStatsHandler(
                 'Invalid contribution subtype %s.' % (contribution_subtype)
             )
 
-        """Handles GET requests."""
         page_size = self.normalized_payload['page_size']
         offset = self.normalized_payload['offset']
         language_code = self.normalized_payload['language_code']
