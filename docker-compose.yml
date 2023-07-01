@@ -1,11 +1,11 @@
 version: '3.8'
 
 services:
-  webserver:
+  angular-build:
     build:
       context: .
       dockerfile: ./docker/Dockerfile
-    container_name: oppia-webserver
+    container_name: oppia-angular-build
     volumes:
       - shared_root_dir:/app/oppia
     environment:
@@ -91,17 +91,13 @@ services:
       - CLOUDSDK_CORE_DISABLE_PROMPTS=1
       - oppia_is_dockerized=true
     depends_on:
-      webserver:
+      angular-build:
         condition: service_healthy
       webpack-compiler:
-        condition: service_healthy
-      datastore:
         condition: service_healthy
       firebase:
         condition: service_healthy
       redis:  
-        condition: service_healthy
-      elasticsearch:  
         condition: service_healthy
     healthcheck:
       test: curl -f http://localhost:8181/ || exit 1
@@ -165,7 +161,7 @@ services:
       - CLOUDSDK_CORE_DISABLE_PROMPTS=1
       - oppia_is_dockerized=true
     depends_on:
-      webserver:
+      angular-build:
         condition: service_healthy
       webpack-compiler:
         condition: service_healthy
@@ -218,9 +214,6 @@ services:
       retries: 5
     environment:
       - oppia_is_dockerized=true
-    depends_on:
-      elasticsearch:
-        condition: service_healthy
     command: >
       sh -c '
         /app/oppia/node_modules/firebase-tools/lib/bin/firebase.js \
