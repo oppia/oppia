@@ -644,7 +644,7 @@ class ContributorDashboardAdminStatsHandler(
 
         if contribution_type == feconf.CONTRIBUTION_TYPE_TRANSLATION:
             if contribution_subtype == feconf.CONTRIBUTION_SUBTYPE_SUBMISSION:
-                stats, next_offset, more = (
+                translation_submitter_stats, next_offset, more = (
                     contributor_admin_dashboard_services
                     .get_translation_submitter_total_stats(
                         page_size,
@@ -654,7 +654,8 @@ class ContributorDashboardAdminStatsHandler(
                         topic_ids,
                         num_days_since_last_activity
                     ))
-                frontend_dicts = [stat.to_frontend_dict() for stat in stats]
+                frontend_dicts = [stat.to_frontend_dict() for stat in
+                    translation_submitter_stats]
                 response = {
                     'frontend_dicts': frontend_dicts,
                     'next_offset': next_offset,
@@ -662,7 +663,7 @@ class ContributorDashboardAdminStatsHandler(
                 }
 
             else:
-                stats, next_offset, more = (
+                translation_reviewer_stats, next_offset, more = (
                     contributor_admin_dashboard_services
                     .get_translation_reviewer_total_stats(
                         page_size,
@@ -671,7 +672,8 @@ class ContributorDashboardAdminStatsHandler(
                         sort_by,
                         num_days_since_last_activity
                     ))
-                frontend_dicts = [stat.to_frontend_dict() for stat in stats]
+                frontend_dicts = [stat.to_frontend_dict() for stat in
+                    translation_reviewer_stats]
                 response = {
                     'frontend_dicts': frontend_dicts,
                     'next_offset': next_offset,
@@ -680,7 +682,7 @@ class ContributorDashboardAdminStatsHandler(
 
         else:
             if contribution_subtype == feconf.CONTRIBUTION_SUBTYPE_SUBMISSION:
-                stats, next_offset, more = (
+                question_submitter_stats, next_offset, more = (
                     contributor_admin_dashboard_services
                     .get_question_submitter_total_stats(
                         page_size,
@@ -689,7 +691,8 @@ class ContributorDashboardAdminStatsHandler(
                         topic_ids,
                         num_days_since_last_activity
                     ))
-                frontend_dicts = [stat.to_frontend_dict() for stat in stats]
+                frontend_dicts = [stat.to_frontend_dict() for stat in
+                    question_submitter_stats]
                 response = {
                     'frontend_dicts': frontend_dicts,
                     'next_offset': next_offset,
@@ -697,7 +700,7 @@ class ContributorDashboardAdminStatsHandler(
                 }
 
             else:
-                stats, next_offset, more = (
+                question_reviewer_stats, next_offset, more = (
                     contributor_admin_dashboard_services
                     .get_question_reviewer_total_stats(
                         page_size,
@@ -705,7 +708,8 @@ class ContributorDashboardAdminStatsHandler(
                         sort_by,
                         num_days_since_last_activity
                     ))
-                frontend_dicts = [stat.to_frontend_dict() for stat in stats]
+                frontend_dicts = [stat.to_frontend_dict() for stat in
+                    question_reviewer_stats]
                 response = {
                     'frontend_dicts': frontend_dicts,
                     'next_offset': next_offset,
