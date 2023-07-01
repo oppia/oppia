@@ -133,26 +133,24 @@
       </oppia-rte-output-display>
     </div>
   </section>
-  <div [hidden]="!reviewable"
+  <section [hidden]="!reviewable"
        class="oppia-image-review-panel"
        *ngIf="explorationImagesString">
-    <div class="oppia-image-container-wrapper">
-      <div class="oppia-exploration-image-container">
+      <div class="oppia-exploration-image-container float-left">
         <oppia-rte-output-display *ngIf="!contentTypeIsSetOfStrings"
                                   [rteString]="explorationImagesString"
                                   [showAltText]="showAltText"
                                   #contentPanel>
         </oppia-rte-output-display>
       </div>
-      <div class="oppia-suggestion-image-container">
+      <div class="oppia-suggestion-image-container float-right">
         <oppia-rte-output-display *ngIf="!contentTypeIsSetOfStrings"
                                   [rteString]="suggestionImagesString"
                                   [showAltText]="showAltText"
                                   #contentPanel>
         </oppia-rte-output-display>
       </div>
-    </div>
-  </div>
+  </section>
   <div [hidden]="!reviewable"
        class="oppia-suggestion-review-message">
     <label for="reviewMessage">Review message (required if rejecting):</label>
@@ -228,25 +226,19 @@
 </div>
 
 <style>
-  .oppia-image-container-wrapper {
-    border: 1px solid #ccc;
+  .oppia-image-review-panel {
     display: flex;
-    justify-content: space-around;
+    flex-direction: row;
+    justify-content: space-between;
     overflow-x: auto;
-    padding: 3px;
+    padding: 10px;
   }
   .oppia-exploration-image-container,
   .oppia-suggestion-image-container {
     border: 1px solid #ccc;
-    flex-basis: 150px;
-    flex-grow: 1;
-    max-height: 150px;
+    max-height: 250px;
     overflow-y: auto;
-    width: 300px;
-  }
-.oppia-image-review-panel {
-    margin: 15px;
-    padding: 6px;
+    width: 49%
   }
   oppia-rte-output-display oppia-noninteractive-image {
     max-height: 50px;
