@@ -39,15 +39,16 @@ def get_translation_submitter_total_stats_from_model(
 ) -> suggestion_registry.TranslationSubmitterTotalContributionStats:
     """Returns a domain object for TranslationSubmitterTotalContributionStats
     model.
+
     Args:
         translation_submitter_model:
             TranslationSubmitterTotalContributionStatsModel. Model
             to get corresponding domain object.
+
     Returns:
         TranslationSubmitterTotalContributionStats. The domain object
         corresponding to given model.
     """
-
     return suggestion_registry.TranslationSubmitterTotalContributionStats(
         language_code=translation_submitter_model.language_code,
         contributor_id=translation_submitter_model.contributor_id,
@@ -96,15 +97,16 @@ def get_translation_reviewer_total_stats_from_model(
 ) -> suggestion_registry.TranslationReviewerTotalContributionStats:
     """Returns a domain object for TranslationReviewerTotalContributionStats
     model.
+
     Args:
         translation_reviewer_model:
             TranslationReviewerTotalContributionStatsModel. Model
             to get corresponding domain object.
+
     Returns:
         TranslationreviewerTotalContributionStats. The domain object
         corresponding to given model.
     """
-
     return suggestion_registry.TranslationReviewerTotalContributionStats(
         language_code=translation_reviewer_model.language_code,
         contributor_id=translation_reviewer_model.contributor_id,
@@ -142,15 +144,16 @@ def get_question_submitter_total_stats_from_model(
 ) -> suggestion_registry.QuestionSubmitterTotalContributionStats:
     """Returns a domain object for QuestionSubmitterTotalContributionStats
     model.
+
     Args:
         question_submitter_model:
             QuestionSubmitterTotalContributionStatsModel. Model
             to get corresponding domain object.
+
     Returns:
         QuestionSubmitterTotalContributionStats. The domain object
         corresponding to given model.
     """
-
     return suggestion_registry.QuestionSubmitterTotalContributionStats(
         contributor_id=question_submitter_model.contributor_id,
         topic_ids_with_question_submissions=(
@@ -189,15 +192,16 @@ def get_question_reviewer_total_stats_from_model(
 ) -> suggestion_registry.QuestionReviewerTotalContributionStats:
     """Returns a domain object for QuestionReviewerTotalContributionStats
     model.
+
     Args:
         question_reviewer_model:
             QuestionReviewerTotalContributionStatsModel. Model
             to get corresponding domain object.
+
     Returns:
         QuestionreviewerTotalContributionStats. The domain object
         corresponding to given model.
     """
-
     return suggestion_registry.QuestionReviewerTotalContributionStats(
         contributor_id=question_reviewer_model.contributor_id,
         topic_ids_with_question_reviews=(
@@ -237,6 +241,7 @@ def get_translation_submitter_total_stats(
         int,
         bool]:
     """Returns the list of domain objects according to values specified.
+
     Args:
         page_size: int. Number of models to fetch.
         offset: int. Number of results to skip from the beginning of all
@@ -248,6 +253,7 @@ def get_translation_submitter_total_stats(
             contributor stats for.
         num_days_since_last_activity: int. To get number of users
             who are active in num_days_since_last_activity.
+
     Returns:
         3-tuple(sorted_results, next_offset, more). where:
                 sorted_results:
@@ -260,7 +266,6 @@ def get_translation_submitter_total_stats(
                     this batch. If False, there are no further results
                     after this batch.
     """
-
     translation_submitter_models, next_offset, more = (
         suggestion_models.TranslationSubmitterTotalContributionStatsModel
         .fetch_page(
@@ -296,6 +301,7 @@ def get_translation_reviewer_total_stats(
         bool
     ]:
     """Returns the list of domain objects according to values specified.
+
     Args:
         page_size: int. Number of models to fetch.
         offset: int. Number of results to skip from the beginning of all
@@ -305,6 +311,7 @@ def get_translation_reviewer_total_stats(
             result.
         num_days_since_last_activity: int|None. To get number of users
             who are active in num_days_since_last_activity.
+
     Returns:
         3-tuple(sorted_results, next_offset, more). where:
             sorted_results:
@@ -317,7 +324,6 @@ def get_translation_reviewer_total_stats(
                 this batch. If False, there are no further results
                 after this batch.
     """
-
     translation_reviewer_models, next_offset, more = (
         suggestion_models.TranslationReviewerTotalContributionStatsModel
         .fetch_page(
@@ -352,6 +358,7 @@ def get_question_submitter_total_stats(
         bool
     ]:
     """Returns the list of domain objects according to values specified.
+
     Args:
         page_size: int. Number of results to fetch.
         offset: int. Number of results to skip from the beginning of all
@@ -362,6 +369,7 @@ def get_question_submitter_total_stats(
             contributor stats for.
         num_days_since_last_activity: int. To get results of users
             who are active in num_days_since_last_activity.
+
     Returns:
         3-tuple(sorted_results, next_offset, more). where:
             sorted_results:
@@ -374,7 +382,6 @@ def get_question_submitter_total_stats(
                 this batch. If False, there are no further results
                 after this batch.
     """
-
     question_submitter_models, next_offset, more = (
         suggestion_models.QuestionSubmitterTotalContributionStatsModel
         .fetch_page(
@@ -408,6 +415,7 @@ def get_question_reviewer_total_stats(
         bool
     ]:
     """Returns the list of domain objects according to values specified.
+
     Args:
         page_size: int. Number of results to fetch.
         offset: int. Number of results to skip from the beginning of all
@@ -416,6 +424,7 @@ def get_question_reviewer_total_stats(
             result.
         num_days_since_last_activity: int|None. To get result of users
             who are active in num_days_since_last_activity.
+
     Returns:
         3-tuple(sorted_results, next_offset, more). where:
             sorted_results:
@@ -428,7 +437,6 @@ def get_question_reviewer_total_stats(
                 this batch. If False, there are no further results
                 after this batch.
     """
-
     question_reviewer_models, next_offset, more = (
         suggestion_models.QuestionReviewerTotalContributionStatsModel
         .fetch_page(
