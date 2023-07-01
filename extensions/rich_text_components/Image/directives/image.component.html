@@ -6,8 +6,7 @@
          [ngStyle]="imageContainerStyle">
     <figcaption class="text-center">{{imageCaption}}</figcaption>
   </div>
-  <div *ngIf="!isLoadingIndicatorShown && !isTryAgainShown && showAltText"
-       class="oppia-readonly-image-container">
+  <div *ngIf="!isLoadingIndicatorShown && !isTryAgainShown && showAltText">
     <img [src]="imageUrl"
          alt="{{imageAltText}}"
          class="e2e-test-image mt-5"
@@ -31,9 +30,3 @@
     </button>
   </div>
 </figure>
-
-<style>
-  .oppia-readonly-image-container {
-    border-bottom: 1px solid #7c7c7c;
-  }
-</style>
