@@ -15,6 +15,7 @@
 """Controllers for the contributor dashboard page."""
 
 from __future__ import annotations
+import enum
 
 from core import feconf
 from core import utils
@@ -26,6 +27,7 @@ from core.domain import suggestion_registry
 from core.domain import suggestion_services
 from core.domain import topic_fetchers
 from core.domain import user_services
+from core.domain import contributor_admin_dashboard_services
 
 from typing import Dict, List, Optional, TypedDict, Union
 
@@ -529,3 +531,185 @@ class TranslationContributionStatsHandler(
             })
 
         return response_translation_contribution_stats_dicts
+
+
+class ContributorDashboardAdminStatsHandlerNormalizedPayloadDict(TypedDict):
+    """Dict representation of ContributorDashboardAdminStatsHandler's
+    normalized_request dictionary.
+    """
+
+    page_size: int
+    offset: int
+    language_code: str
+    sort_by: Optional[str]
+    topic_ids: Optional[List[str]]
+    num_days_since_last_activity: Optional[int]
+
+
+class ContributorDashboardAdminStatsHandler(
+    base.BaseHandler[
+        Dict[str, str],
+        ContributorDashboardAdminStatsHandlerNormalizedPayloadDict
+    ]
+):
+    """Return Contributor Admin Dashboard Stats for supplied parameters.
+    """
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {
+        'contribution_type': {
+            'schema': {
+                'type': 'basestring'
+            }
+        },
+        'contribution_subtype': {
+            'schema': {
+                'type': 'basestring'
+            }
+        }
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'POST': {
+            'page_size': {
+                'schema': {
+                    'type': 'int'
+                },
+                'default_value': 20
+            },
+            'offset': {
+                'schema': {
+                    'type': 'int'
+                }
+            },
+            'language_code': {
+                'schema': {
+                    'type': 'basestring'
+                },
+                'default_value': None
+            },
+            'sort_by': {
+                'schema': {
+                    'type': 'basestring'
+                },
+                'default_value': None,
+                'choices': constants.CD_ADMIN_STATS_SORT_OPTIONS
+            },
+            'topic_ids': {
+                'schema': {
+                    'type': 'list',
+                    'items': {
+                        'type': 'basestring'
+                    }
+                },
+                'default_value': None
+            },
+            'num_days_since_last_activity': {
+                'schema': {
+                    'type': 'int'
+                },
+                'default_value': None
+            }
+        }
+    }
+
+    @acl_decorators.can_access_contributor_dashboard_admin_page
+    def post(
+        self,
+        contribution_type: str,
+        contribution_subtype: str
+    ) -> None:
+
+        if contribution_type not in [
+            feconf.CONTRIBUTION_TYPE_TRANSLATION,
+            feconf.CONTRIBUTION_TYPE_QUESTION
+        ]:
+            raise self.InvalidInputException(
+                'Invalid contribution type %s.' % (contribution_type)
+            )
+        if contribution_subtype not in [
+            feconf.CONTRIBUTION_SUBTYPE_SUBMISSION,
+            feconf.CONTRIBUTION_SUBTYPE_REVIEW
+        ]:
+            raise self.InvalidInputException(
+                'Invalid contribution subtype %s.' % (contribution_subtype)
+            )
+
+        """Handles GET requests."""
+        page_size = self.normalized_payload['page_size']
+        offset = self.normalized_payload['offset']
+        language_code = self.normalized_payload['language_code']
+        sort_by = self.normalized_payload['sort_by']
+        topic_ids = self.normalized_payload['topic_ids']
+        num_days_since_last_activity = self.normalized_payload[
+            'num_days_since_last_activity']
+
+        if contribution_type == feconf.CONTRIBUTION_TYPE_TRANSLATION:
+            if contribution_subtype == feconf.CONTRIBUTION_SUBTYPE_SUBMISSION:
+                stats, next_offset, more = (
+                    contributor_admin_dashboard_services
+                    .get_translation_submitter_total_stats(
+                        page_size,
+                        offset,
+                        language_code,
+                        sort_by,
+                        topic_ids,
+                        num_days_since_last_activity
+                    ))
+                frontend_dicts = [stat.to_frontend_dict() for stat in stats]
+                response = {
+                    'frontend_dicts': frontend_dicts,
+                    'next_offset': next_offset,
+                    'more': more
+                }
+
+            else:
+                stats, next_offset, more = (
+                    contributor_admin_dashboard_services
+                    .get_translation_reviewer_total_stats(
+                        page_size,
+                        offset,
+                        language_code,
+                        sort_by,
+                        num_days_since_last_activity
+                    ))
+                frontend_dicts = [stat.to_frontend_dict() for stat in stats]
+                response = {
+                    'frontend_dicts': frontend_dicts,
+                    'next_offset': next_offset,
+                    'more': more
+                }
+
+        else:
+            if contribution_subtype == feconf.CONTRIBUTION_SUBTYPE_SUBMISSION:
+                stats, next_offset, more = (
+                    contributor_admin_dashboard_services
+                    .get_question_submitter_total_stats(
+                        page_size,
+                        offset,
+                        sort_by,
+                        topic_ids,
+                        num_days_since_last_activity
+                    ))
+                frontend_dicts = [stat.to_frontend_dict() for stat in stats]
+                response = {
+                    'frontend_dicts': frontend_dicts,
+                    'next_offset': next_offset,
+                    'more': more
+                }
+
+            else:
+                stats, next_offset, more = (
+                    contributor_admin_dashboard_services
+                    .get_question_reviewer_total_stats(
+                        page_size,
+                        offset,
+                        sort_by,
+                        num_days_since_last_activity
+                    ))
+                frontend_dicts = [stat.to_frontend_dict() for stat in stats]
+                response = {
+                    'frontend_dicts': frontend_dicts,
+                    'next_offset': next_offset,
+                    'more': more
+                }
+
+        self.render_json(response)
