@@ -97,6 +97,7 @@ class QuestionCreationHandlerTest(BaseQuestionEditorControllerTests):
     def test_post_with_non_admin_or_topic_manager_email_disallows_access(
         self
     ) -> None:
+        """Tests that a new user cannot create a new question."""
         self.login(self.NEW_USER_EMAIL)
         csrf_token = self.get_new_csrf_token()
         self.post_json(
@@ -108,6 +109,9 @@ class QuestionCreationHandlerTest(BaseQuestionEditorControllerTests):
     def test_post_with_editor_email_does_not_allow_question_creation(
         self
     ) -> None:
+        """Tests that an editor cannot create a new question if the question ID
+        is invalid.
+        """
         self.login(self.EDITOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
         question_dict = self.question.to_dict()
@@ -124,6 +128,9 @@ class QuestionCreationHandlerTest(BaseQuestionEditorControllerTests):
         self.logout()
 
     def test_post_with_incorrect_skill_id_returns_404(self) -> None:
+        """Tests that a curriculum admin cannot create a new question if the
+        skill ID is invalid.
+        """
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
         incorrect_skill_id = 'abc123456789'
@@ -134,6 +141,9 @@ class QuestionCreationHandlerTest(BaseQuestionEditorControllerTests):
         self.logout()
 
     def test_post_with_no_skill_ids_returns_400(self) -> None:
+        """Tests that a curriculum admin cannot create a new question if the
+        skill IDs are not specified.
+        """
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
         self.post_json(
@@ -142,6 +152,9 @@ class QuestionCreationHandlerTest(BaseQuestionEditorControllerTests):
         self.logout()
 
     def test_post_with_incorrect_list_of_skill_ids_returns_400(self) -> None:
+        """Tests that a curriculum admin cannot create a new question if the
+        skill IDs are invalid.
+        """
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
         incorrect_skill_ids = [1, 2]
@@ -154,6 +167,9 @@ class QuestionCreationHandlerTest(BaseQuestionEditorControllerTests):
     def test_post_with_incorrect_type_of_skill_ids_returns_400(
         self
     ) -> None:
+        """Tests that a curriculum admin cannot create a new question if the
+        skill ID is invalid.
+        """
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
         incorrect_skill_id = 1
@@ -164,6 +180,9 @@ class QuestionCreationHandlerTest(BaseQuestionEditorControllerTests):
         self.logout()
 
     def test_post_with_incorrect_question_id_returns_400(self) -> None:
+        """Tests that a curriculum admin cannot create a new question if the
+        question ID is invalid.
+        """
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
         question_dict = self.question.to_dict()
@@ -177,6 +196,9 @@ class QuestionCreationHandlerTest(BaseQuestionEditorControllerTests):
         self.logout()
 
     def test_post_with_incorrect_question_schema_returns_400(self) -> None:
+        """Tests that a curriculum admin cannot create a new questionif the
+        question schema is invalid.
+        """
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
         question_dict = self.question.to_dict()
@@ -192,6 +214,9 @@ class QuestionCreationHandlerTest(BaseQuestionEditorControllerTests):
         self.logout()
 
     def test_post_with_no_skill_difficulty_returns_400(self) -> None:
+        """Tests that a curriculum admin cannot create a new question if the
+        skill difficulty is not specified.
+        """
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
         question_dict = self.question.to_dict()
@@ -209,6 +234,9 @@ class QuestionCreationHandlerTest(BaseQuestionEditorControllerTests):
         self.logout()
 
     def test_post_with_incorrect_version_returns_400(self) -> None:
+        """Tests that a curriculum admin cannot create a new question if the
+        version is invalid.
+        """
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
         question_dict = self.question.to_dict()
@@ -221,6 +249,9 @@ class QuestionCreationHandlerTest(BaseQuestionEditorControllerTests):
         self.logout()
 
     def test_post_with_wrong_skill_difficulty_length_returns_400(self) -> None:
+        """Tests that a curriculum admin cannot create a new question if the
+        length of skill difficulty is invalid.
+        """
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
         question_dict = self.question.to_dict()
@@ -241,6 +272,9 @@ class QuestionCreationHandlerTest(BaseQuestionEditorControllerTests):
     def test_post_with_invalid_skill_difficulty_type_returns_400(
         self
     ) -> None:
+        """Tests that a curriculum admin cannot create a new question if the
+        skill difficulty is invalid.
+        """
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
         question_dict = self.question.to_dict()
@@ -261,6 +295,9 @@ class QuestionCreationHandlerTest(BaseQuestionEditorControllerTests):
     def test_post_with_invalid_skill_difficulty_value_returns_400(
         self
     ) -> None:
+        """Tests that a curriculum admin cannot create a new question if the
+        skill difficulty value is invalid.
+        """
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
         question_dict = self.question.to_dict()
@@ -279,6 +316,7 @@ class QuestionCreationHandlerTest(BaseQuestionEditorControllerTests):
         self.logout()
 
     def test_post_with_admin_email_allows_question_creation(self) -> None:
+        """Tests that a curriculum admin can create new questions."""
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
         question_dict = self.question.to_dict()
@@ -305,6 +343,7 @@ class QuestionCreationHandlerTest(BaseQuestionEditorControllerTests):
     def test_post_with_topic_manager_email_allows_question_creation(
         self
     ) -> None:
+        """Tests that a topic manager can create new questions."""
         self.login(self.TOPIC_MANAGER_EMAIL)
         csrf_token = self.get_new_csrf_token()
         question_dict = self.question.to_dict()
@@ -329,6 +368,9 @@ class QuestionCreationHandlerTest(BaseQuestionEditorControllerTests):
         self.logout()
 
     def test_post_with_invalid_question_returns_400_status(self) -> None:
+        """Tests that a curriculum admin cannot create a new question if the
+        question state data is invalid.
+        """
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
         question_dict = self.question.to_dict()
@@ -350,6 +392,9 @@ class QuestionCreationHandlerTest(BaseQuestionEditorControllerTests):
         self.logout()
 
     def test_post_with_too_many_skills_returns_400(self) -> None:
+        """Tests that a curriculum admin cannot create a question if it has
+        more than maximum number of skill IDs.
+        """
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
         skill_ids = [1, 2, 3, 4]
@@ -360,7 +405,7 @@ class QuestionCreationHandlerTest(BaseQuestionEditorControllerTests):
         self.logout()
 
     def test_post_with_valid_images(self) -> None:
-        """Test question creation with valid images."""
+        """Tests that a curriculum admin can create questions with valid images."""
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
         filename = 'img.png'
@@ -403,7 +448,9 @@ class QuestionCreationHandlerTest(BaseQuestionEditorControllerTests):
         self.logout()
 
     def test_post_with_invalid_images(self) -> None:
-        """Test question creation with invalid images."""
+        """Tests that a curriculum admin cannot create questions with invalid
+        images.
+        """
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
         question_dict = self.question.to_dict()
@@ -470,6 +517,7 @@ class QuestionSkillLinkHandlerTest(BaseQuestionEditorControllerTests):
             self.content_id_generator_2.next_content_id_index)
 
     def test_put_with_non_admin_or_topic_manager_disallows_access(self) -> None:
+        """Tests that a new user cannot link a question to a skill."""
         self.login(self.NEW_USER_EMAIL)
         csrf_token = self.get_new_csrf_token()
         self.put_json(
@@ -487,6 +535,9 @@ class QuestionSkillLinkHandlerTest(BaseQuestionEditorControllerTests):
         self.logout()
 
     def test_put_with_admin_email_allows_updation(self) -> None:
+        """Tests that a curriculum admin can link and unlink a question to or
+        from a skill.
+        """
         question_services.create_new_question_skill_link(
             self.editor_id, self.question_id, self.skill_id, 0.5)
         (
@@ -546,6 +597,9 @@ class QuestionSkillLinkHandlerTest(BaseQuestionEditorControllerTests):
         self.logout()
 
     def test_put_with_invalid_input_throws_error(self) -> None:
+        """Tests that a curriculum admin cannot link a question to a skill if
+        the input is invalid.
+        """
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
         self.put_json(
@@ -589,6 +643,9 @@ class QuestionSkillLinkHandlerTest(BaseQuestionEditorControllerTests):
         self.logout()
 
     def test_put_with_topic_manager_email_allows_updation(self) -> None:
+        """Tests that a topic manager can update the difficulty of a skill
+        associated with a question.
+        """
         question_services.create_new_question_skill_link(
             self.editor_id, self.question_id, self.skill_id, 0.3)
 
@@ -619,6 +676,9 @@ class EditableQuestionDataHandlerTest(BaseQuestionEditorControllerTests):
     """Tests get, put and delete methods of editable questions data handler."""
 
     def test_get_can_not_access_handler_with_invalid_question_id(self) -> None:
+        """Tests that a curriculum admin cannot access a question editor
+        question ID is invalid.
+        """
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         self.get_json(
             '%s/%s' % (
@@ -627,6 +687,7 @@ class EditableQuestionDataHandlerTest(BaseQuestionEditorControllerTests):
         self.logout()
 
     def test_delete_with_guest_does_not_allow_question_deletion(self) -> None:
+        """Tests that a guest user cannot delete a question."""
         response = self.delete_json(
             '%s/%s' % (
                 feconf.QUESTION_EDITOR_DATA_URL_PREFIX, self.question_id),
@@ -638,6 +699,7 @@ class EditableQuestionDataHandlerTest(BaseQuestionEditorControllerTests):
     def test_delete_with_new_user_does_not_allow_question_deletion(
         self
     ) -> None:
+        """"Tests that a new user cannot delete a question."""
         self.login(self.NEW_USER_EMAIL)
         response = self.delete_json(
             '%s/%s' % (
@@ -651,6 +713,9 @@ class EditableQuestionDataHandlerTest(BaseQuestionEditorControllerTests):
     def test_get_with_non_admin_or_topic_manager_email_disallows_access(
         self
     ) -> None:
+        """Tests that a user with no admin access or topic manager role cannot
+        access the question editor.
+        """
         self.login(self.NEW_USER_EMAIL)
         self.get_json(
             '%s/%s' % (
@@ -659,6 +724,7 @@ class EditableQuestionDataHandlerTest(BaseQuestionEditorControllerTests):
         self.logout()
 
     def test_get_with_admin_email_allows_question_fetching(self) -> None:
+        """Tests that a a curriculum admin is able to fetch a question."""
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         response_dict = self.get_json('%s/%s' % (
             feconf.QUESTION_EDITOR_DATA_URL_PREFIX, self.question_id))
@@ -679,6 +745,7 @@ class EditableQuestionDataHandlerTest(BaseQuestionEditorControllerTests):
     def test_get_with_topic_manager_email_allows_question_fetching(
         self
     ) -> None:
+        """Tests that a topic manager is able to fetch a question."""
         self.login(self.TOPIC_MANAGER_EMAIL)
         response_dict = self.get_json('%s/%s' % (
             feconf.QUESTION_EDITOR_DATA_URL_PREFIX, self.question_id))
@@ -697,6 +764,9 @@ class EditableQuestionDataHandlerTest(BaseQuestionEditorControllerTests):
         self.logout()
 
     def test_get_with_invalid_question_id_returns_404_status(self) -> None:
+        """Tests that an editor cannot fetch a question with an invalid
+        question ID.
+        """
         def _mock_get_question_by_id(
             unused_question_id: str, **unused_kwargs: str
         ) -> None:
@@ -716,6 +786,9 @@ class EditableQuestionDataHandlerTest(BaseQuestionEditorControllerTests):
             self.logout()
 
     def test_delete_with_incorrect_question_id_returns_404_status(self) -> None:
+        """Tests that a curriculum admin cannot delete a question if the
+        question ID is invalid.
+        """
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         self.delete_json(
             '%s/%s' % (
@@ -724,6 +797,7 @@ class EditableQuestionDataHandlerTest(BaseQuestionEditorControllerTests):
         self.logout()
 
     def test_delete_with_admin_email_allows_question_deletion(self) -> None:
+        """Tests that a curriculum admin can delete a question."""
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         self.delete_json(
             '%s/%s' % (
@@ -732,6 +806,9 @@ class EditableQuestionDataHandlerTest(BaseQuestionEditorControllerTests):
         self.logout()
 
     def test_put_with_long_commit_message_fails(self) -> None:
+        """Tests that a put request fails if the commit message exceeds the
+        maximum commit message length.
+        """
         new_question_data = self._create_valid_question_data(
             'DEF', self.content_id_generator)
         change_list = [{
@@ -767,6 +844,9 @@ class EditableQuestionDataHandlerTest(BaseQuestionEditorControllerTests):
         )
 
     def test_put_with_admin_email_allows_question_editing(self) -> None:
+        """Tests that a curriculum admin cannot edit a question if the payload
+        is invalid.
+        """
         new_question_data = self._create_valid_question_data(
             'DEF', self.content_id_generator)
         change_list = [{
@@ -820,6 +900,9 @@ class EditableQuestionDataHandlerTest(BaseQuestionEditorControllerTests):
         self.logout()
 
     def test_put_with_topic_manager_email_allows_question_editing(self) -> None:
+        """Tests that a topic manager can edit a question if the payload is
+        valid.
+        """
         new_question_data = self._create_valid_question_data(
             'DEF', self.content_id_generator)
         change_list = [{
@@ -868,6 +951,9 @@ class EditableQuestionDataHandlerTest(BaseQuestionEditorControllerTests):
     def test_put_with_creating_new_fully_specified_question_returns_400(
         self
     ) -> None:
+        """Tests that that a curriculum admin cannot create a fully specified
+        question using a put request.
+        """
         self._create_valid_question_data('XXX', self.content_id_generator)
         change_list = [{
             'cmd': 'create_new_fully_specified_question',
