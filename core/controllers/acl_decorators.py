@@ -3212,13 +3212,62 @@ def can_submit_images_to_questions(
         if not self.user_id:
             raise base.UserFacingExceptions.NotLoggedInException
 
-        if role_services.ACTION_SUGGEST_CHANGES in self.user.actions:
+        if any(action in self.user.actions for action in [
+            role_services.ACTION_SUGGEST_CHANGES,
+            role_services.ACTION_EDIT_ANY_QUESTION
+        ]):
             return handler(self, skill_id, **kwargs)
         else:
             raise self.UnauthorizedUserException(
                 'You do not have credentials to submit images to questions.')
 
     return test_can_submit_images_to_questions
+
+
+def can_submit_images_to_explorations(
+    handler: Callable[..., _GenericHandlerFunctionReturnType]
+) -> Callable[..., _GenericHandlerFunctionReturnType]:
+    """Decorator to check whether the user can submit images to explorations.
+
+    Args:
+        handler: function. The function to be decorated.
+
+    Returns:
+        function. The newly decorated function that now also checks if
+        the user has permission to submit images to an exploration.
+    """
+
+    # Here we use type Any because this method can accept arbitrary number of
+    # arguments with different types.
+    @functools.wraps(handler)
+    def test_can_submit_images_to_explorations(
+        self: _SelfBaseHandlerType, target_id: str, **kwargs: Any
+    ) -> _GenericHandlerFunctionReturnType:
+        """Test to see if user can submit images to explorations.
+
+        Args:
+            target_id: str. The target exploration ID.
+            **kwargs: *. Keyword arguments.
+
+        Returns:
+            *. The return value of the decorated function.
+
+        Raises:
+            NotLoggedInException. The user is not logged in.
+            PageNotFoundException. The given page cannot be found.
+            UnauthorizedUserException. The user does not have the
+                credentials to edit the target exploration.
+        """
+        if not self.user_id:
+            raise base.UserFacingExceptions.NotLoggedInException
+
+        if role_services.ACTION_SUGGEST_CHANGES in self.user.actions:
+            return handler(self, target_id, **kwargs)
+        else:
+            raise self.UnauthorizedUserException(
+                'You do not have credentials to submit images to explorations.')
+
+    return test_can_submit_images_to_explorations
 
 
 def can_delete_skill(
@@ -4366,6 +4415,9 @@ def can_edit_entity(
                     self, entity_id, **kwargs)),
             feconf.IMAGE_CONTEXT_QUESTION_SUGGESTIONS: lambda entity_id: (
                 can_submit_images_to_questions(reduced_handler)(
+                    self, entity_id, **kwargs)),
+            feconf.IMAGE_CONTEXT_EXPLORATION_SUGGESTIONS: lambda entity_id: (
+                can_submit_images_to_explorations(reduced_handler)(
                     self, entity_id, **kwargs)),
             feconf.ENTITY_TYPE_STORY: lambda entity_id: (
                 can_edit_story(reduced_handler)(

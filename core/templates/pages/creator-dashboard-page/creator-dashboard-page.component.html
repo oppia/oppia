@@ -2,7 +2,7 @@
 <div class="oppia-dashboard-container position-relative">
   <div class="oppia-dashboard-title"
     [ngClass]="{'oppia-dashboard-title-mobile': checkTabletView(), 'oppia-dashboard-title-desktop': !checkTabletView()}">
-    <h1 [innerHTML]="'I18N_DASHBOARD_CREATOR_DASHBOARD' | translate"></h1>
+    <h1 tabindex="0" [innerHTML]="'I18N_DASHBOARD_CREATOR_DASHBOARD' | translate"></h1>
     <oppia-create-activity-button></oppia-create-activity-button>
   </div>
 
@@ -10,7 +10,9 @@
        *ngIf="explorationsList?.length > 0 || collectionsList?.length > 0"
        [ngClass]="{'oppia-creator-dashboard-mobile-mode': checkMobileView()}">
     <mat-card layout="row" class="oppia-mat-card">
-      <div class="average-ratings stats-card">
+      <div class="average-ratings stats-card"
+           [attr.aria-label]="'Average ratings ' + (dashboardStats.averageRatings || 'N/A')"
+           tabindex="0" >
         <p class="stat-description" [innerHTML]="'I18N_DASHBOARD_STATS_AVERAGE_RATING' | translate"></p>
         <h2 class="stat-value-with-rating e2e-test-oppia-average-rating"
             [hidden]="!dashboardStats.numRatings || relativeChangeInTotalPlays">
@@ -29,7 +31,7 @@
           </p>
         </div>
       </div>
-      <div class="total-plays stats-card">
+      <div class="total-plays stats-card"  [attr.aria-label]="'Total plays ' + (dashboardStats.totalPlays)" tabindex="0">
         <p class="stat-description" [innerHTML]="'I18N_DASHBOARD_STATS_TOTAL_PLAYS' | translate"></p>
         <h2 class="stat-value-with-rating e2e-test-oppia-total-plays"
             [hidden]="!dashboardStats.numRatings || relativeChangeInTotalPlays">
@@ -43,7 +45,7 @@
           (+{{ relativeChangeInTotalPlays }} from last week)
         </p>
       </div>
-      <div class="total-open-feedback stats-card">
+      <div class="total-open-feedback stats-card" [attr.aria-label]="'Total feedbacks ' + (dashboardStats.totalOpenFeedback)" tabindex="0">
         <p class="stat-description" [innerHTML]="'I18N_DASHBOARD_STATS_OPEN_FEEDBACK' | translate"></p>
         <h2 class="stat-value-with-rating e2e-test-oppia-open-feedback"
             [hidden]="!dashboardStats.numRatings || relativeChangeInTotalPlays">
@@ -51,7 +53,7 @@
         </h2>
         <h2 class="stat-value-without-rating" [hidden]="dashboardStats.numRatings || relativeChangeInTotalPlays">{{ dashboardStats.totalOpenFeedback }}</h2>
       </div>
-      <div class="total-open-feedback stats-card">
+      <div class="total-open-feedback stats-card" [attr.aria-label]="'Total subscribers ' + (subscribersList?.length)" tabindex="0">
         <p class="stat-description" [innerHTML]="'I18N_DASHBOARD_STATS_TOTAL_SUBSCRIBERS' | translate"></p>
         <h2 class="stat-value-with-rating e2e-test-oppia-total-subscribers"
             [hidden]="!dashboardStats.numRatings || relativeChangeInTotalPlays">
@@ -236,28 +238,30 @@
              aria-label="Dashboard Statistics"
              [href]="getExplorationUrl(exploration.id)">
           </a>
-          <div class="exp-private-text" *ngIf="exploration.status === 'private'">
+          <div class="exp-private-text" *ngIf="exploration.status === 'private'" tabindex="0">
             {{ publishText }}
           </div>
-          <ul *ngIf="exploration.status !== 'private'"
-              fxLayout="row"
-              layout-wrap
-              class="metrics"
-              fxLayoutAlign="space-between center">
-            <div class="row-one">
+          <div *ngIf="exploration.status !== 'private'"
+               fxLayout="row"
+               layout-wrap
+               class="metrics"
+               fxLayoutAlign="space-between center">
+            <ul class="row-one">
               <li flex="50" class="e2e-test-exp-summary-tile-rating">
                 <span>
                   <span class="fa fa-star oppia-dashboard-card-statistic-icon"
                         ngbTooltip="{{ 'I18N_LIBRARY_RATINGS_TOOLTIP' | translate }}"
                         placement="top">
                   </span>
-                  <span class="oppia-dashboard-card-statistic-value">
+                  <span class="oppia-dashboard-card-statistic-value" tabindex="0" [attr.aria-label]="'Ratings ' + (getAverageRating(exploration.ratings) | number:'1.1-1') || 'N/A'">
                     {{ (getAverageRating(exploration.ratings) | number:'1.1-1') || 'N/A' }}
                   </span>
                 </span>
               </li>
 
-              <li flex="50" class="e2e-test-exp-summary-tile-open-feedback">
+              <li flex="50" class="e2e-test-exp-summary-tile-open-feedback"
+                  tabindex="0"
+                  [attr.aria-label]="'Feedbacks ' + exploration.numOpenThreads ">
                 <span class="fa fa-comments oppia-dashboard-card-statistic-icon"
                       ngbTooltip="{{ 'I18N_DASHBOARD_OPEN_FEEDBACK' | translate }}"
                       placement="top">
@@ -272,15 +276,17 @@
                   {{ exploration.numOpenThreads }}
                 </span>
               </li>
-            </div>
+            </ul>
 
-            <div class="row-two">
+            <ul class="row-two">
               <li flex="50" class="e2e-test-exp-summary-tile-num-views">
                 <span class="fa fa-eye oppia-dashboard-card-statistic-icon"
                       ngbTooltip="{{ 'I18N_LIBRARY_VIEWS_TOOLTIP' | translate }}"
                       placement="top">
                 </span>
-                <span class="oppia-dashboard-card-statistic-value">
+                <span class="oppia-dashboard-card-statistic-value"
+                      tabindex="0"
+                      [attr.aria-label]="'Views ' + exploration.numViews">
                   {{ exploration.numViews }}
                 </span>
               </li>
@@ -290,12 +296,14 @@
                       ngbTooltip="{{ 'I18N_LIBRARY_LAST_UPDATED' | translate }}"
                       placement="top">
                 </span>
-                <span class="oppia-dashboard-card-statistic-value">
+                <span class="oppia-dashboard-card-statistic-value"
+                      tabindex="0"
+                      [attr.aria-label]="'Last updated ' + getLocaleAbbreviatedDatetimeString(exploration.lastUpdatedMsec)">
                   {{ getLocaleAbbreviatedDatetimeString(exploration.lastUpdatedMsec) }}
                 </span>
               </li>
-            </div>
-            <li flex="100">
+            </ul>
+            <div class="row-three" flex="100">
               <sharing-links *ngIf="exploration.status !== 'private'"
                              (click)="$event.stopPropagation()"
                              flex="100"
@@ -307,8 +315,8 @@
                              smallFont="true"
                              [explorationId]="exploration.id">
               </sharing-links>
-            </li>
-          </ul>
+            </div>
+          </div>
         </div>
       </mat-card>
     </div>
@@ -406,7 +414,10 @@
   }
   .row-one, .row-two {
     display: flex;
+    font-size: 12px;
     justify-content: space-between;
+    list-style-type: none;
+    margin-bottom: 0;
     padding-left: 10px;
     padding-right: 10px;
     padding-top: 7px;
@@ -442,6 +453,7 @@
     padding-right: 10px;
   }
   .oppia-creator-dashboard-main-content .stats-card .stat-value-with-rating {
+    margin-top: 0;
     position: absolute;
     top: 0.75em;
   }
@@ -577,7 +589,7 @@
     padding: 13px 0 10px;
   }
 
-  .oppia-dashboard-card-view-item .metrics > li {
+  .oppia-dashboard-card-view-item .metrics > .row-three {
     padding: 0 0 5px 14px;
     text-align: left;
   }
@@ -723,7 +735,7 @@
   }
   .oppia-dashboard-statistics-card-link {
     background: white;
-    height: 34%;
+    height: 37%;
     opacity: 0;
     position: absolute;
     width: 184px;
@@ -875,7 +887,7 @@
       height: auto;
     }
 
-    .oppia-dashboard-card-view-item .metrics > li {
+    .oppia-dashboard-card-view-item .metrics > .row-three {
       flex-basis: 25%;
     }
 

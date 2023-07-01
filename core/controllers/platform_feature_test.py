@@ -47,7 +47,7 @@ class PlatformFeaturesEvaluationHandlerTest(test_utils.GenericTestBase):
         self.user_id = self.get_user_id_from_email(self.OWNER_EMAIL)
 
         self.original_registry = registry.Registry.parameter_registry
-        self.original_feature_list = feature_services.ALL_FEATURES_LIST
+        self.original_feature_list = feature_services.ALL_FEATURE_FLAGS
         self.original_feature_name_set = feature_services.ALL_FEATURES_NAMES_SET
 
         param_names = ['parameter_a', 'parameter_b']
@@ -79,22 +79,23 @@ class PlatformFeaturesEvaluationHandlerTest(test_utils.GenericTestBase):
                     ],
                     'value_when_matched': True
                 })
-            ]
+            ],
+            False
         )
 
-        # Here we use MyPy ignore because the expected type of ALL_FEATURES_LIST
+        # Here we use MyPy ignore because the expected type of ALL_FEATURE_FLAGS
         # is a list of 'platform_feature_list.ParamNames' Enum, but here for
         # testing purposes we are providing a list of custom 'ParamNames' enums
         # for mocking the actual behavior, which causes MyPy to throw an
         # 'Incompatible types in assignment' error. Thus to avoid the error, we
         # used ignore here.
-        feature_services.ALL_FEATURES_LIST = param_name_enums  # type: ignore[assignment]
+        feature_services.ALL_FEATURE_FLAGS = param_name_enums  # type: ignore[assignment]
         feature_services.ALL_FEATURES_NAMES_SET = set(param_names)
 
     def tearDown(self) -> None:
         super().tearDown()
 
-        feature_services.ALL_FEATURES_LIST = self.original_feature_list
+        feature_services.ALL_FEATURE_FLAGS = self.original_feature_list
         feature_services.ALL_FEATURES_NAMES_SET = self.original_feature_name_set
         registry.Registry.parameter_registry = self.original_registry
 
@@ -208,9 +209,10 @@ class PlatformFeatureDummyHandlerTest(test_utils.GenericTestBase):
         self.user_id = self.get_user_id_from_email(self.OWNER_EMAIL)
 
     def tearDown(self) -> None:
-        feature_services.update_feature_flag_rules(
-            param_list.ParamNames.DUMMY_FEATURE.value, self.user_id,
-            'clear rule', []
+        feature_services.update_feature_flag(
+            param_list.ParamNames.DUMMY_FEATURE_FLAG_FOR_E2E_TESTS.value,
+            self.user_id,
+            'clear rule', [], False
         )
 
         super().tearDown()
@@ -219,8 +221,9 @@ class PlatformFeatureDummyHandlerTest(test_utils.GenericTestBase):
         self, is_enabled: bool, mode: param_domain.ServerMode
     ) -> None:
         """Enables the dummy_feature for the dev environment."""
-        feature_services.update_feature_flag_rules(
-            param_list.ParamNames.DUMMY_FEATURE.value, self.user_id,
+        feature_services.update_feature_flag(
+            param_list.ParamNames.DUMMY_FEATURE_FLAG_FOR_E2E_TESTS.value,
+            self.user_id,
             'update rule for testing purpose',
             [param_domain.PlatformParameterRule.from_dict({
                 'value_when_matched': is_enabled,
@@ -228,7 +231,8 @@ class PlatformFeatureDummyHandlerTest(test_utils.GenericTestBase):
                     'type': 'server_mode',
                     'conditions': [['=', mode.value]]
                 }]
-            })]
+            })],
+            False
         )
 
     def _mock_dummy_feature_stage(
@@ -239,10 +243,10 @@ class PlatformFeatureDummyHandlerTest(test_utils.GenericTestBase):
         """
         caching_services.delete_multi(
             caching_services.CACHE_NAMESPACE_PLATFORM_PARAMETER, None,
-            [param_list.ParamNames.DUMMY_FEATURE.value])
+            [param_list.ParamNames.DUMMY_FEATURE_FLAG_FOR_E2E_TESTS.value])
 
         feature = registry.Registry.parameter_registry.get(
-            param_list.ParamNames.DUMMY_FEATURE.value)
+            param_list.ParamNames.DUMMY_FEATURE_FLAG_FOR_E2E_TESTS.value)
         return self.swap(feature, '_feature_stage', stage.value)
 
     def test_get_with_dummy_feature_enabled_in_dev_returns_ok(self) -> None:

@@ -115,6 +115,22 @@ export default {
     "IncreasingUpdatedOn": "Most Recently Updated",
     "DecreasingUpdatedOn": "Least Recently Updated"
   },
+
+  // Sorting categories for contributor admin dashboard.
+  "CD_ADMIN_STATS_SORT_OPTIONS": {
+    "IncreasingLastActivity": "Most Recently Active",
+    "DecreasingLastActivity": "Least Recently Active",
+    "IncreasingPerformance": "Lowest to Highest Performance",
+    "DecreasingPerformance": "Highest to Lowest Performance",
+    "IncreasingAccuracy": "Lowest to Highest Accuracy",
+    "DecreasingAccuracy": "Highest to Lowest Accuracy",
+    "IncreasingSubmissions": "Lowest to Highest Submitted Contributions",
+    "DecreasingSubmissions": "Highest to Lowest Submitted Contributions",
+    "IncreasingReviewedTranslations": "Lowest to Highest Reviewed Translations",
+    "DecreasingReviewedTranslations": "Highest to Lowest Reviewed Translations",
+    "IncreasingReviewedQuestions": "Lowest to Highest Reviewed Questions",
+    "DecreasingReviewedQuestions": "Highest to Lowest Reviewed Questions"
+  },
   // These categories are shown in the library navbar. The categories should
   // be in sorted order.
   "SEARCH_DROPDOWN_CATEGORIES": ["Algorithms", "Architecture", "Art",
@@ -5021,29 +5037,29 @@ export default {
   // color associated with it. Each category also has a thumbnail icon whose
   // filename is '{{CategoryName}}.svg'.
   "CATEGORIES_TO_COLORS": {
-    "Mathematics": "#cd672b",
-    "Algebra": "#cd672b",
-    "Arithmetic": "#d68453",
-    "Calculus": "#b86330",
-    "Logic": "#d68453",
-    "Combinatorics": "#cf5935",
-    "Graph Theory": "#cf5935",
-    "Probability": "#cf5935",
-    "Statistics": "#cd672b",
-    "Geometry": "#d46949",
-    "Trigonometry": "#d46949",
+    "Mathematics": "#cc4b00",
+    "Algebra": "#cc4b00",
+    "Arithmetic": "#ae511b",
+    "Calculus": "#ae5f2d",
+    "Logic": "#ae511b",
+    "Combinatorics": "#c54f2b",
+    "Graph Theory": "#c54f2b",
+    "Probability": "#c54f2b",
+    "Statistics": "#cc4b00",
+    "Geometry": "#be5637",
+    "Trigonometry": "#be5637",
 
-    "Algorithms": "#d0982a",
-    "Computing": "#bb8b2f",
-    "Programming": "#d9aa53",
+    "Algorithms": "#9d6901",
+    "Computing": "#927117",
+    "Programming": "#886628",
 
-    "Astronomy": "#879d6c",
-    "Biology": "#97a766",
-    "Chemistry": "#aab883",
-    "Engineering": "#8b9862",
-    "Environment": "#aba86d",
-    "Medicine": "#97a766",
-    "Physics": "#879d6c",
+    "Astronomy": "#58613a",
+    "Biology": "#657030",
+    "Chemistry": "#6c7c36",
+    "Engineering": "#6f7a48",
+    "Environment": "#747142",
+    "Medicine": "#657030",
+    "Physics": "#58613a",
 
     "Architecture": "#6e3466",
     "Art": "#895a83",
@@ -5059,11 +5075,11 @@ export default {
     "Gaulish": "#1b4174",
 
     "Business": "#387163",
-    "Economics": "#5d8b7f",
+    "Economics": "#2f836d",
     "Geography": "#3c6d62",
-    "Government": "#538270",
+    "Government": "#507c6b",
     "History": "#3d6b52",
-    "Law": "#538270",
+    "Law": "#507c6b",
 
     "Education": "#942e20",
     "Puzzles": "#a8554a",
