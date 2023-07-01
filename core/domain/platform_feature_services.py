@@ -272,6 +272,9 @@ def _evaluate_feature_flag_values_for_context(
     for feature_name in feature_names_set:
         param = registry.Registry.get_platform_parameter(
             feature_name)
+        if not feature_flag_valid_on_current_server(param.feature_stage):
+            result_dict[feature_name] = False
+            continue
         feature_name_value = param.evaluate(context)
         # Ruling out the possibility of any other type for mypy type checking.
         assert isinstance(feature_name_value, bool)
@@ -321,3 +324,34 @@ def get_platform_parameter_value(
     context = _create_evaluation_context_for_server()
     param = registry.Registry.get_platform_parameter(parameter_name)
     return param.evaluate(context)
+
+
+def feature_flag_valid_on_current_server(feature_stage: str) -> bool:
+    """Checks if the feature is valid on the current server.
+
+    Args:
+        feature: str. The stage of the feature flag.
+
+    Returns:
+        bool. Returns True if the feature is valid on current server else False.
+    """
+    server_mode = get_server_mode().value
+    if server_mode == platform_parameter_domain.ServerMode.DEV.value:
+        return True
+    elif server_mode == platform_parameter_domain.ServerMode.TEST.value:
+        if (
+            feature_stage == (
+                platform_parameter_domain.ServerMode.TEST.value) or
+            feature_stage == (
+                platform_parameter_domain.ServerMode.PROD.value)
+        ):
+            return True
+        else:
+            return False
+    else:
+        if feature_stage == (
+            platform_parameter_domain.ServerMode.PROD.value
+        ):
+            return True
+        else:
+            False

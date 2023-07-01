@@ -40,41 +40,38 @@ class DiagnosticTestLandingPageTest(test_utils.GenericTestBase):
         self.original_parameter_registry = (
             platform_parameter_registry.Registry.parameter_registry.copy())
 
-        feature_services.update_feature_flag(
-            platform_parameter_list.ParamNames.DIAGNOSTIC_TEST.value,
-            self.owner_id,
-            'test update',
-            [
-                platform_parameter_domain.PlatformParameterRule.from_dict({
-                    'filters': [{
-                        'type': 'platform_type',
-                        'conditions': [['=', 'Backend']]
-                    }],
-                    'value_when_matched': True
-                })
-            ],
-            True
-        )
-
     def tearDown(self) -> None:
         super().tearDown()
         platform_parameter_registry.Registry.parameter_registry = (
             self.original_parameter_registry)
 
-    def test_should_access_diagnostic_test_page_in_dev_mode(self) -> None:
-        with self.swap(constants, 'DEV_MODE', True):
-            self.get_html_response(
-                feconf.DIAGNOSTIC_TEST_PLAYER_PAGE_URL,
-                expected_status_int=200
-            )
-
-    def test_should_not_access_diagnostic_test_page_when_not_in_dev_mode(
+    def test_should_not_access_diagnostic_test_page_when_feature_is_disabled(
         self) -> None:
-        with self.swap(constants, 'DEV_MODE', False):
-            self.get_html_response(
-                feconf.DIAGNOSTIC_TEST_PLAYER_PAGE_URL,
-                expected_status_int=404
-            )
+        feature_services.update_feature_flag(
+            platform_parameter_list.ParamNames.DIAGNOSTIC_TEST.value,
+            self.owner_id,
+            'test update',
+            [],
+            False
+        )
+        self.get_html_response(
+            feconf.DIAGNOSTIC_TEST_PLAYER_PAGE_URL,
+            expected_status_int=404
+        )
+
+    def test_should_access_diagnostic_test_page_when_feature_is_enabled(
+        self) -> None:
+        feature_services.update_feature_flag(
+            platform_parameter_list.ParamNames.DIAGNOSTIC_TEST.value,
+            self.owner_id,
+            'test update',
+            [],
+            True
+        )
+        self.get_html_response(
+            feconf.DIAGNOSTIC_TEST_PLAYER_PAGE_URL,
+            expected_status_int=200
+        )
 
 
 class DiagnosticTestQuestionsHandlerTest(test_utils.GenericTestBase):
