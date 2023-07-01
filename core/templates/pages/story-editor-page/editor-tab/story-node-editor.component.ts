@@ -241,7 +241,7 @@ export class StoryNodeEditorComponent implements OnInit, OnDestroy {
           this.editablePlannedPublicationDate = null;
           setTimeout(() => {
             this.plannedPublicationDateIsInPast = false;
-          }, 5000);
+          }, AppConstants.ERROT_TOAST_DISPLAY_TIME);
           return;
         } else if (this.plannedPublicationDate === null ||
           this.plannedPublicationDate.getTime() !==
