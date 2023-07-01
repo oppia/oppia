@@ -1,4 +1,11 @@
 <oppia-loading-message [message]="loadingMessage"></oppia-loading-message>
+<div class="save-default-values-button">
+  <button
+          class="btn btn-primary"
+          (click)="saveDefaultValueToStorage()">
+    Save default values to storage
+  </button>
+</div>
 <div *ngFor="let featureFlag of featureFlags;">
   <div *ngIf="getFeatureValidOnCurrentServer(featureFlag)" class="container oppia-page-card oppia-long-text oppia-admin-features e2e-test-feature-flag">
     <h2 class="oppia-feature-name e2e-test-feature-name">{{featureFlag.name}}</h2>
@@ -12,7 +19,13 @@
     </div>
     <div class="row oppia-feature-top-margin">
       <div class="col-2"><b>Default:</b></div>
-      <div class="col-10">{{featureFlag.defaultValue ? 'Enabled' : 'Disabled'}}</div>
+      <div *ngIf="featureFlag.rules.length === 0" class="col-10">
+        <select [(ngModel)]="featureFlag.defaultValue">
+          <option [ngValue]="true">Enabled</option>
+          <option [ngValue]="false">Disabled</option>
+        </select>
+      </div>
+      <div *ngIf="featureFlag.rules.length !== 0" class="col-10">{{featureFlag.defaultValue ? 'Enabled' : 'Disabled'}}</div>
     </div>
     <div class="row oppia-feature-top-margin">
       <div class="col-2">
@@ -184,13 +197,13 @@
       <button
               class="btn btn-primary e2e-test-save-button"
               (click)="updateFeatureRulesAsync(featureFlag)"
-              [disabled]="!isFeatureFlagRulesChanged(featureFlag)">
+              [disabled]="!isFeatureFlagChanged(featureFlag)">
         Save
       </button>
       <button
               class="btn btn-secondary"
               (click)="clearChanges(featureFlag)"
-              [disabled]="!isFeatureFlagRulesChanged(featureFlag)">
+              [disabled]="!isFeatureFlagChanged(featureFlag)">
         Clear Changes
       </button>
     </div>
@@ -226,6 +239,15 @@
 
 
 <style>
+  .save-default-values-button {
+    align-items: center;
+    display: flex;
+    float: right;
+    font-size: 12px;
+    justify-content: space-between;
+    margin-top: 20px;
+  }
+
   .oppia-feature-configuration-warning-icon {
     color: #827127;
   }
