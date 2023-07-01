@@ -4,7 +4,7 @@ Oppia is an online learning tool that enables anyone to easily create and share 
 
 In addition to developing the Oppia platform, the team is also developing and piloting a set of free and effective [lessons](https://www.oppia.org/fractions) on basic mathematics. These lessons are targeted at learners who lack access to educational resources.
 
-Oppia is written using Python and AngularJS, and is built on top of Google App Engine.
+Oppia is written using Python and AngularJS, and is built on top of Google App Engine. See also:
 
   * [Oppia.org community site](https://www.oppia.org)
   * [User Documentation](https://oppia.github.io/)
@@ -12,6 +12,8 @@ Oppia is written using Python and AngularJS, and is built on top of Google App E
   * [GitHub Discussions](https://github.com/oppia/oppia/discussions)
   * [Developer announcements](http://groups.google.com/group/oppia-dev)
   * [File an issue](https://github.com/oppia/oppia/issues/new/choose)
+
+You can also sign up to our [email newsletter](https://shorturl.at/CHPY6) for news and updates about the overall Oppia project.
 
 <p align="center">
   <a href="http://www.youtube.com/watch?v=Ntcw0H0hwPU" target="_blank" rel="noopener">
@@ -30,6 +32,8 @@ The Oppia project is built by the community for the community. We welcome contri
 You can help with Oppia's development in many ways, including art, coding, design and documentation.
   * **Developers**: please see [this wiki page](https://github.com/oppia/oppia/wiki/Contributing-code-to-Oppia#setting-things-up) for instructions on how to set things up and commit changes.
   * **All other contributors**: please see our [general contributor guidelines](https://github.com/oppia/oppia/wiki).
+
+If you'd like to donate to support our work, you can do so [here](https://www.oppia.org/donate).
 
 
 ## Support
