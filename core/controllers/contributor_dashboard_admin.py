@@ -547,8 +547,8 @@ class ContributorDashboardAdminStatsHandlerNormalizedPayloadDict(TypedDict):
 
 class ContributorDashboardAdminStatsHandler(
     base.BaseHandler[
-        Dict[str, str],
-        ContributorDashboardAdminStatsHandlerNormalizedPayloadDict
+        ContributorDashboardAdminStatsHandlerNormalizedPayloadDict,
+        Dict[str, str]
     ]
 ):
     """Return Contributor Admin Dashboard Stats for supplied parameters.
@@ -654,10 +654,10 @@ class ContributorDashboardAdminStatsHandler(
                         topic_ids,
                         num_days_since_last_activity
                     ))
-                frontend_dicts = [stat.to_frontend_dict() for stat in
-                    translation_submitter_stats]
+                translation_submitter_frontend_dicts = [stat.to_frontend_dict()
+                    for stat in translation_submitter_stats]
                 response = {
-                    'frontend_dicts': frontend_dicts,
+                    'frontend_dicts': translation_submitter_frontend_dicts,
                     'next_offset': next_offset,
                     'more': more
                 }
@@ -672,10 +672,10 @@ class ContributorDashboardAdminStatsHandler(
                         sort_by,
                         num_days_since_last_activity
                     ))
-                frontend_dicts = [stat.to_frontend_dict() for stat in
-                    translation_reviewer_stats]
+                translation_reviewer_frontend_dicts = [stat.to_frontend_dict()
+                    for stat in translation_reviewer_stats]
                 response = {
-                    'frontend_dicts': frontend_dicts,
+                    'frontend_dicts': translation_reviewer_frontend_dicts,
                     'next_offset': next_offset,
                     'more': more
                 }
@@ -691,10 +691,10 @@ class ContributorDashboardAdminStatsHandler(
                         topic_ids,
                         num_days_since_last_activity
                     ))
-                frontend_dicts = [stat.to_frontend_dict() for stat in
-                    question_submitter_stats]
+                question_submitter_frontend_dicts = [stat.to_frontend_dict()
+                    for stat in question_submitter_stats]
                 response = {
-                    'frontend_dicts': frontend_dicts,
+                    'frontend_dicts': question_submitter_frontend_dicts,
                     'next_offset': next_offset,
                     'more': more
                 }
@@ -708,10 +708,10 @@ class ContributorDashboardAdminStatsHandler(
                         sort_by,
                         num_days_since_last_activity
                     ))
-                frontend_dicts = [stat.to_frontend_dict() for stat in
-                    question_reviewer_stats]
+                question_reviewer_frontend_dicts = [stat.to_frontend_dict()
+                    for stat in question_reviewer_stats]
                 response = {
-                    'frontend_dicts': frontend_dicts,
+                    'frontend_dicts': question_reviewer_frontend_dicts,
                     'next_offset': next_offset,
                     'more': more
                 }
