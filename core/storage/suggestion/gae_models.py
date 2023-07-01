@@ -2308,7 +2308,7 @@ class TranslationSubmitterTotalContributionStatsModel(base_models.BaseModel):
                     temp_offset += 1
                     if result_model.last_contribution_date >= last_date:
                         filtered_results.append(result_model)
-                        if len(filtered_results) == page_size:
+                        if len(filtered_results) == page_size + offset:
                             break
             sorted_results = filtered_results[offset:]
             next_offset = offset + len(sorted_results)
@@ -2728,7 +2728,7 @@ class TranslationReviewerTotalContributionStatsModel(base_models.BaseModel):
                     temp_offset += 1
                     if result_model.last_contribution_date >= last_date:
                         filtered_results.append(result_model)
-                        if len(filtered_results) == page_size:
+                        if len(filtered_results) == page_size + offset:
                             break
             sorted_results = filtered_results[offset:]
             next_offset = offset + len(sorted_results)
@@ -3081,7 +3081,7 @@ class QuestionSubmitterTotalContributionStatsModel(base_models.BaseModel):
                     temp_offset += 1
                     if result_model.last_contribution_date >= last_date:
                         filtered_results.append(result_model)
-                        if len(filtered_results) == page_size:
+                        if len(filtered_results) == page_size + offset:
                             break
             sorted_results = filtered_results[offset:]
             next_offset = offset + len(sorted_results)
@@ -3379,7 +3379,7 @@ class QuestionReviewerTotalContributionStatsModel(base_models.BaseModel):
                     temp_offset += 1
                     if result_model.last_contribution_date >= last_date:
                         filtered_results.append(result_model)
-                        if len(filtered_results) == page_size:
+                        if len(filtered_results) == page_size + offset:
                             break
             sorted_results = filtered_results[offset:]
             next_offset = offset + len(sorted_results)
