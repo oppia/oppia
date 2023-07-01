@@ -547,7 +547,6 @@ class ContributorDashboardAdminStatsHandlerNormalizedPayloadDict(TypedDict):
 
 class ContributorDashboardAdminStatsHandler(
     base.BaseHandler[
-        Dict[str, str],
         ContributorDashboardAdminStatsHandlerNormalizedPayloadDict
     ]
 ):

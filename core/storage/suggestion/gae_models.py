@@ -2292,6 +2292,9 @@ class TranslationSubmitterTotalContributionStatsModel(base_models.BaseModel):
         filtered_results: List[
             TranslationSubmitterTotalContributionStatsModel] = []
         today = datetime.date.today()
+        more: bool
+        next_result_model: Sequence[
+            TranslationSubmitterTotalContributionStatsModel] = []
 
         if num_days_since_last_activity is not None:
             last_date = today - datetime.timedelta(
@@ -2315,24 +2318,20 @@ class TranslationSubmitterTotalContributionStatsModel(base_models.BaseModel):
 
             # Check whether we have more results.
             if len(sorted_results) < page_size:
-                more: bool = False
+                more = False
             else:
-                next_result_model: Sequence[
-                    TranslationSubmitterTotalContributionStatsModel] = (
-                        sort_query.fetch(offset=temp_offset))
-                more: bool = len(next_result_model) != 0
+                next_result_model = sort_query.fetch(offset=temp_offset)
+                more = len(next_result_model) != 0
         else:
             sorted_results = list(sort_query.fetch(page_size, offset=offset))
             next_offset = offset + len(sorted_results)
 
             # Check whether we have more results.
             if len(sorted_results) < page_size:
-                more: bool = False
+                more = False
             else:
-                next_result_model: Sequence[
-                    TranslationSubmitterTotalContributionStatsModel] = (
-                        sort_query.fetch(offset=next_offset))
-                more: bool = len(next_result_model) != 0
+                next_result_model = sort_query.fetch(offset=next_offset)
+                more = len(next_result_model) != 0
 
         return (
             sorted_results,
@@ -2652,7 +2651,7 @@ class TranslationReviewerTotalContributionStatsModel(base_models.BaseModel):
         page_size: int,
         offset: int,
         language_code: str,
-        sort_by: Optional[SortChoices],
+        sort_by: Optional[SortChoices.value],
         num_days_since_last_activity: Optional[int]
     ) -> Tuple[Sequence[TranslationReviewerTotalContributionStatsModel],
                 int,
@@ -2712,6 +2711,9 @@ class TranslationReviewerTotalContributionStatsModel(base_models.BaseModel):
         filtered_results: List[
             TranslationReviewerTotalContributionStatsModel] = []
         today = datetime.date.today()
+        more: bool
+        next_result_model: Sequence[
+            TranslationReviewerTotalContributionStatsModel] = []
 
         if num_days_since_last_activity is not None:
             last_date = today - datetime.timedelta(
@@ -2735,24 +2737,20 @@ class TranslationReviewerTotalContributionStatsModel(base_models.BaseModel):
 
             # Check whether we have more results.
             if len(sorted_results) < page_size:
-                more: bool = False
+                more = False
             else:
-                next_result_model: Sequence[
-                    TranslationReviewerTotalContributionStatsModel] = (
-                        sort_query.fetch(1, offset=temp_offset))
-                more: bool = len(next_result_model) != 0
+                next_result_model = sort_query.fetch(1, offset=temp_offset)
+                more = len(next_result_model) != 0
         else:
             sorted_results = list(sort_query.fetch(page_size, offset=offset))
             next_offset = offset + len(sorted_results)
 
             # Check whether we have more results.
             if len(sorted_results) < page_size:
-                more: bool = False
+                more = False
             else:
-                next_result_model: Sequence[
-                    TranslationReviewerTotalContributionStatsModel] = (
-                        sort_query.fetch(1, offset=next_offset))
-                more: bool = len(next_result_model) != 0
+                next_result_model = sort_query.fetch(1, offset=next_offset)
+                more = len(next_result_model) != 0
 
         return (
             sorted_results,
@@ -2992,7 +2990,7 @@ class QuestionSubmitterTotalContributionStatsModel(base_models.BaseModel):
         cls,
         page_size: int,
         offset: int,
-        sort_by: Optional[SortChoices],
+        sort_by: Optional[SortChoices.value],
         topic_ids: Optional[List[str]],
         num_days_since_last_activity: Optional[int]
     ) -> Tuple[Sequence[QuestionSubmitterTotalContributionStatsModel],
@@ -3065,6 +3063,9 @@ class QuestionSubmitterTotalContributionStatsModel(base_models.BaseModel):
         filtered_results: List[
             QuestionSubmitterTotalContributionStatsModel] = []
         today = datetime.date.today()
+        more: bool
+        next_result_model: Sequence[
+            QuestionSubmitterTotalContributionStatsModel] = []
 
         if num_days_since_last_activity is not None:
             last_date = today - datetime.timedelta(
@@ -3088,24 +3089,20 @@ class QuestionSubmitterTotalContributionStatsModel(base_models.BaseModel):
 
             # Check whether we have more results.
             if len(sorted_results) < page_size:
-                more: bool = False
+                more = False
             else:
-                next_result_model: Sequence[
-                    QuestionSubmitterTotalContributionStatsModel] = (
-                        sort_query.fetch(offset=temp_offset))
-                more: bool = len(next_result_model) != 0
+                next_result_model = sort_query.fetch(offset=temp_offset)
+                more = len(next_result_model) != 0
         else:
             sorted_results = list(sort_query.fetch(page_size, offset=offset))
             next_offset = offset + len(sorted_results)
 
             # Check whether we have more results.
             if len(sorted_results) < page_size:
-                more: bool = False
+                more = False
             else:
-                next_result_model: Sequence[
-                    QuestionSubmitterTotalContributionStatsModel] = (
-                        sort_query.fetch(offset=next_offset))
-                more: bool = len(next_result_model) != 0
+                next_result_model = sort_query.fetch(offset=next_offset)
+                more = len(next_result_model) != 0
 
         return (
             sorted_results,
@@ -3307,7 +3304,7 @@ class QuestionReviewerTotalContributionStatsModel(base_models.BaseModel):
         cls,
         page_size: int,
         offset: int,
-        sort_by: Optional[SortChoices],
+        sort_by: Optional[SortChoices.value],
         num_days_since_last_activity: Optional[int]
     ) -> Tuple[Sequence[QuestionReviewerTotalContributionStatsModel],
                 int,
@@ -3363,6 +3360,9 @@ class QuestionReviewerTotalContributionStatsModel(base_models.BaseModel):
         filtered_results: List[
             QuestionReviewerTotalContributionStatsModel] = []
         today = datetime.date.today()
+        more: bool
+        next_result_model: Sequence[
+            QuestionSubmitterTotalContributionStatsModel] = []
 
         if num_days_since_last_activity is not None:
             last_date = today - datetime.timedelta(
@@ -3386,24 +3386,20 @@ class QuestionReviewerTotalContributionStatsModel(base_models.BaseModel):
 
             # Check whether we have more results.
             if len(sorted_results) < page_size:
-                more: bool = False
+                more = False
             else:
-                next_result_model: Sequence[
-                    QuestionReviewerTotalContributionStatsModel] = (
-                        sort_query.fetch(1, offset=temp_offset))
-                more: bool = len(next_result_model) != 0
+                next_result_model = sort_query.fetch(1, offset=temp_offset)
+                more = len(next_result_model) != 0
         else:
             sorted_results = list(sort_query.fetch(page_size, offset=offset))
             next_offset = offset + len(sorted_results)
 
             # Check whether we have more results.
             if len(sorted_results) < page_size:
-                more: bool = False
+                more = False
             else:
-                next_result_model: Sequence[
-                    QuestionReviewerTotalContributionStatsModel] = (
-                        sort_query.fetch(1, offset=next_offset))
-                more: bool = len(next_result_model) != 0
+                next_result_model = sort_query.fetch(1, offset=next_offset)
+                more = len(next_result_model) != 0
 
         return (
             sorted_results,
