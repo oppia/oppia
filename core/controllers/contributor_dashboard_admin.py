@@ -634,6 +634,7 @@ class ContributorDashboardAdminStatsHandler(
                 'Invalid contribution subtype %s.' % (contribution_subtype)
             )
 
+        assert self.normalized_payload is not None
         page_size = self.normalized_payload['page_size']
         offset = self.normalized_payload['offset']
         language_code = self.normalized_payload['language_code']
