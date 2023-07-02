@@ -892,16 +892,29 @@ class PlatformParameter:
                 'Invalid feature stage, got \'%s\', expected one of %s.' % (
                     self._feature_stage, ALLOWED_FEATURE_STAGES))
 
-        # Need to import it here as doing it above creates an circular
-        # import error.
-        from core.domain import platform_feature_services
-        if not platform_feature_services.feature_flag_valid_on_current_server(
-            self._feature_stage
+        server_mode = (
+            ServerMode.DEV
+            if constants.DEV_MODE
+            else ServerMode.PROD
+            if feconf.ENV_IS_OPPIA_ORG_PRODUCTION_SERVER
+            else ServerMode.TEST
+        )
+        if (
+            server_mode.value == ServerMode.TEST.value and
+            self._feature_stage == ServerMode.DEV.value
         ):
             raise utils.ValidationError(
                 'Feature in %s stage cannot be enabled in %s environment.' % (
-                    self._feature_stage,
-                    platform_feature_services.get_server_mode().value
+                    self._feature_stage, server_mode.value
+                )
+            )
+        if (
+            server_mode.value == ServerMode.PROD.value and
+            self._feature_stage in (ServerMode.DEV.value, ServerMode.TEST.value)
+        ):
+            raise utils.ValidationError(
+                'Feature in %s stage cannot be enabled in %s environment.' % (
+                    self._feature_stage, server_mode.value
                 )
             )
 
