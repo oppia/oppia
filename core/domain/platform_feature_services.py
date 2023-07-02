@@ -270,12 +270,13 @@ def _evaluate_feature_flag_values_for_context(
 
     result_dict = {}
     for feature_name in feature_names_set:
-        param = registry.Registry.get_platform_parameter(
+        feature = registry.Registry.get_platform_parameter(
             feature_name)
-        if not feature_flag_valid_on_current_server(param.feature_stage):
+        assert feature.feature_stage is not None
+        if not feature_flag_valid_on_current_server(feature.feature_stage):
             result_dict[feature_name] = False
             continue
-        feature_name_value = param.evaluate(context)
+        feature_name_value = feature.evaluate(context)
         # Ruling out the possibility of any other type for mypy type checking.
         assert isinstance(feature_name_value, bool)
         result_dict[feature_name] = feature_name_value
