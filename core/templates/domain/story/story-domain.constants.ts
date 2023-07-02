@@ -59,4 +59,12 @@ export const StoryDomainConstants = {
   STORY_NODE_PROPERTY_DESTINATION_NODE_IDS: 'destination_node_ids',
   STORY_NODE_PROPERTY_ACQUIRED_SKILL_IDS: 'acquired_skill_ids',
   STORY_NODE_PROPERTY_PREREQUISITE_SKILL_IDS: 'prerequisite_skill_ids',
+  STORY_NODE_PROPERTY_STATUS: 'status',
+  STORY_NODE_PROPERTY_PLANNED_PUBLICATION_DATE_MSECS:
+    'planned_publication_date_msecs',
+  STORY_NODE_PROPERTY_LAST_MODIFIED_MSECS:
+    'last_modified_msecs',
+  STORY_NODE_PROPERTY_FIRST_PUBLICATION_DATE_MSECS:
+    'first_publication_date_msecs',
+  STORY_NODE_PROPERTY_UNPUBLISHING_REASON: 'unpublishing_reason'
 } as const;
