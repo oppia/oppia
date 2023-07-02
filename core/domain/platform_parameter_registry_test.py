@@ -22,6 +22,7 @@ import enum
 
 from core import feconf
 from core import utils
+from core.constants import constants
 from core.domain import caching_services
 from core.domain import platform_parameter_domain as parameter_domain
 from core.domain import platform_parameter_registry as registry
@@ -246,6 +247,50 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
                 ],
                 'default'
             )
+
+    def test_update_dev_feature_in_prod_environment_raises_exception(
+        self
+    ) -> None:
+        parameter_name = 'parameter_a'
+        registry.Registry.create_feature_flag(
+            ParamNames.PARAMETER_A, 'dev feature', FeatureStages.DEV)
+
+        with self.swap(constants, 'DEV_MODE', False):
+            with self.swap(feconf, 'ENV_IS_OPPIA_ORG_PRODUCTION_SERVER', True):
+                with self.assertRaisesRegex(
+                    utils.ValidationError,
+                    'Feature in dev stage cannot be enabled in prod '
+                    'environment.'
+                ):
+                    registry.Registry.update_platform_parameter(
+                        parameter_name,
+                        feconf.SYSTEM_COMMITTER_ID,
+                        'commit message',
+                        [],
+                        True
+                    )
+
+    def test_update_dev_feature_in_test_environment_raises_exception(
+        self
+    ) -> None:
+        parameter_name = 'parameter_a'
+        registry.Registry.create_feature_flag(
+            ParamNames.PARAMETER_A, 'dev feature', FeatureStages.DEV)
+
+        with self.swap(constants, 'DEV_MODE', False):
+            with self.swap(feconf, 'ENV_IS_OPPIA_ORG_PRODUCTION_SERVER', False):
+                with self.assertRaisesRegex(
+                    utils.ValidationError,
+                    'Feature in dev stage cannot be enabled in test '
+                    'environment.'
+                ):
+                    registry.Registry.update_platform_parameter(
+                        parameter_name,
+                        feconf.SYSTEM_COMMITTER_ID,
+                        'commit message',
+                        [],
+                        True
+                    )
 
     def test_updated_parameter_is_saved_in_storage(self) -> None:
         parameter_name = 'parameter_a'

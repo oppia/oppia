@@ -59,13 +59,9 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
         # Parameter names that might be used in following tests.
         param_names = ['param_a', 'param_b']
         param_name_enums = [ParamNames.PARAM_A, ParamNames.PARAM_B]
-        param_names_features = [
-            'feature_a', 'feature_b', 'feature_c']
+        param_names_features = ['feature_a', 'feature_b', 'feature_c']
         param_name_enums_features = [
-            ParamNames.FEATURE_A,
-            ParamNames.FEATURE_B,
-            ParamNames.FEATURE_C
-        ]
+            ParamNames.FEATURE_A, ParamNames.FEATURE_B, ParamNames.FEATURE_C]
         caching_services.delete_multi(
             caching_services.CACHE_NAMESPACE_PLATFORM_PARAMETER, None,
             param_names_features)
@@ -216,7 +212,7 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
         expected_dicts = [
             self.dev_feature.to_dict(),
             self.test_feature.to_dict(),
-            self.prod_feature.to_dict()
+            self.prod_feature.to_dict(),
         ]
         self.assertEqual(
             feature_services.get_all_feature_flag_dicts(),
@@ -237,7 +233,7 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
                 {
                     self.dev_feature.name: True,
                     self.test_feature.name: True,
-                    self.prod_feature.name: True
+                    self.prod_feature.name: True,
                 })
 
     def test_get_all_feature_flag_values_in_test_returns_correct_values(
@@ -258,7 +254,7 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
                 {
                     self.dev_feature.name: False,
                     self.test_feature.name: True,
-                    self.prod_feature.name: True
+                    self.prod_feature.name: True,
                 })
 
     def test_get_all_feature_flag_values_in_prod_returns_correct_values(

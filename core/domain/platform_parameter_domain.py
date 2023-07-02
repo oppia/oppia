@@ -885,12 +885,25 @@ class PlatformParameter:
                 'Data type of feature flags must be bool, got \'%s\' '
                 'instead.' % self._data_type)
         if not any(
-                self._feature_stage == feature_stage
-                for feature_stage in ALLOWED_FEATURE_STAGES
+            self._feature_stage == feature_stage
+            for feature_stage in ALLOWED_FEATURE_STAGES
         ):
             raise utils.ValidationError(
                 'Invalid feature stage, got \'%s\', expected one of %s.' % (
                     self._feature_stage, ALLOWED_FEATURE_STAGES))
+
+        # Need to import it here as doing it above creates an circular
+        # import error.
+        from core.domain import platform_feature_services
+        if not platform_feature_services.feature_flag_valid_on_current_server(
+            self._feature_stage
+        ):
+            raise utils.ValidationError(
+                'Feature in %s stage cannot be enabled in %s environment.' % (
+                    self._feature_stage,
+                    platform_feature_services.get_server_mode().value
+                )
+            )
 
     @classmethod
     def from_dict(cls, param_dict: PlatformParameterDict) -> PlatformParameter:
