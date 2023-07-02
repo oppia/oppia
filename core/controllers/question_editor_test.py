@@ -405,7 +405,9 @@ class QuestionCreationHandlerTest(BaseQuestionEditorControllerTests):
         self.logout()
 
     def test_post_with_valid_images(self) -> None:
-        """Tests that a curriculum admin can create questions with valid images."""
+        """Tests that a curriculum admin can create questions with valid
+        images.
+        """
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
         filename = 'img.png'
