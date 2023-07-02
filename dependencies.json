@@ -149,6 +149,16 @@
           "js": ["angular-material.js"]
         }
       },
+      "codemirror": {
+        "version": "5.17.0",
+        "downloadFormat": "zip",
+        "url": "https://github.com/codemirror/CodeMirror/archive/5.17.0.zip",
+        "rootDirPrefix": "codemirror5-",
+        "targetDirPrefix": "code-mirror-",
+        "bundle": {
+          "css": ["lib/codemirror.css", "addon/merge/merge.css"]
+        }
+      },
       "diff-match-patch": {
         "version": "1.0.0",
         "downloadFormat": "files",
@@ -195,6 +205,13 @@
         "rootDirPrefix": "angular-simple-logger-",
         "targetDirPrefix": "angular-simple-logger-",
         "files": ["angular-simple-logger.min.js"]
+      },
+      "guppy": {
+        "version": "f509e155dc66f6310737c328cbfbc35b85194be2",
+        "downloadFormat": "zip",
+        "url": "https://github.com/oppia/guppy/archive/f509e155dc66f6310737c328cbfbc35b85194be2.zip",
+        "rootDirPrefix": "guppy-",
+        "targetDir": "guppy-f509e1"
       },
       "jquery": {
         "version": "3.5.1",
