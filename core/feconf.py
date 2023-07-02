@@ -81,7 +81,7 @@ def check_dev_mode_is_true() -> None:
 
 check_dev_mode_is_true()
 
-# TODO: (#18260) Remove this when we permanently move to the Dockerized Setup.
+# TODO(#18260): Remove this when we permanently move to the Dockerized Setup.
 OPPIA_IS_DOCKERIZED = bool(os.environ.get('oppia_is_dockerized'))
 CLASSIFIERS_DIR = os.path.join('extensions', 'classifiers')
 TESTS_DATA_DIR = os.path.join('core', 'tests', 'data')
@@ -533,8 +533,8 @@ VALID_MAILCHIMP_FIELD_KEYS = ['NAME']
 # Valid Mailchimp tags.
 VALID_MAILCHIMP_TAGS = ['Account', 'Android', 'Web']
 
-# TODO: (#18260) Change this when we permanently move to the Dockerized Setup.
-ES_HOST = '0.0.0.0' if OPPIA_IS_DOCKERIZED else 'localhost'
+# TODO(#18260): Change this when we permanently move to the Dockerized Setup.
+ES_HOST = 'elasticsearch' if OPPIA_IS_DOCKERIZED else 'localhost'
 ES_LOCALHOST_PORT = 9200
 # NOTE TO RELEASE COORDINATORS: Replace this with the correct ElasticSearch
 # auth information during deployment.
@@ -545,8 +545,8 @@ ES_USERNAME = None
 # Port when switching to prod server. Keep this in sync with redis.conf in the
 # root folder. Specifically, REDISPORT should always be the same as the port in
 # redis.conf.
-# TODO: (#18260) Change this when we permanently move to the Dockerized Setup.
-REDISHOST = 'redis'
+# TODO(#18260): Change this when we permanently move to the Dockerized Setup.
+REDISHOST = 'redis' if OPPIA_IS_DOCKERIZED else 'localhost'
 REDISPORT = 6379
 
 # The DB numbers for various Redis instances that Oppia uses. Do not reuse these
@@ -1363,7 +1363,7 @@ FIREBASE_ROLE_SUPER_ADMIN = 'super_admin'
 # use alpha-numeric characters, hence the tighter restriction.
 FIREBASE_AUTH_ID_REGEX = '^[A-Za-z0-9]{1,128}$'
 
-# TODO: (#18260) Change this when we permanently move to the Dockerized Setup.
+# TODO(#18260): Change this when we permanently move to the Dockerized Setup.
 CLOUD_DATASTORE_EMULATOR_HOST = 'datastore' if OPPIA_IS_DOCKERIZED else 'localhost'
 CLOUD_DATASTORE_EMULATOR_PORT = 8089
 

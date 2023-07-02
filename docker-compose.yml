@@ -18,31 +18,11 @@ services:
       interval: 30s
       retries: 5
       start_period: 20m
-    # command: ["sh", "-c", "sleep infinity"]
-    command: >
+    entrypoint: >
       sh -c '
-        trap "rm /app/oppia/node_modules/@angular/compiler-cli/ngcc/__ngcc_lock_file__" EXIT;
-
-        if [ "$prod_env" = "true" ]; then
-          if [ "$source_maps" = "true" -a "$maintenance_mode" = "true" ]; then
-            python3 -m scripts.build --prod_env --maintenance_mode --source_maps
-          elif [ "$maintenance_mode" = "true" ]; then
-            python3 -m scripts.build --prod_env --maintenance_mode
-          elif [ "$source_maps" = "true" ]; then
-            python3 -m scripts.build --prod_env --source_maps
-          else
-            python3 -m scripts.build --prod_env
-          fi
-
-          /app/oppia/node_modules/.bin/ng build --prod
-        else
-          /app/oppia/node_modules/.bin/ng build --watch
-        fi
+        trap "rm /app/oppia/node_modules/@angular/compiler-cli/ngcc/__ngcc_lock_file__" EXIT
+        /app/oppia/node_modules/.bin/ng build --watch
       '
-#       python3 -m scripts.build \
-# +              --prod_env \
-# +              $${maintenance_mode="true" : +--maintenance_mode} \
-# +              $${source_maps="true" : +--source_maps}
 
   webpack-compiler:
     build:
@@ -59,22 +39,13 @@ services:
       interval: 30s
       retries: 5
       start_period: 20m
-    # command: ["sh", "-c", "sleep infinity"]
-    command: >
+    entrypoint: >
       sh -c '
-        if [ "$prod_env" = "true" ]; then
-          if [ "$source_maps" = "true" ]; then
-            node --max-old-space-size=8192 /app/oppia/node_modules/webpack/bin/webpack.js --config /app/oppia/webpack.prod.sourcemap.config.ts
-          else
-            node --max-old-space-size=8192 /app/oppia/node_modules/webpack/bin/webpack.js --config /app/oppia/webpack.prod.config.ts
-          fi
-        else
-          if [ "$source_maps" = "true" ]; then
-            node /app/oppia/node_modules/webpack/bin/webpack.js --config /app/oppia/webpack.dev.sourcemap.config.ts --watch --color --progress
-          else
-            node /app/oppia/node_modules/webpack/bin/webpack.js --config /app/oppia/webpack.dev.config.ts --watch --color --progress
-          fi
-        fi
+        node /app/oppia/node_modules/webpack/bin/webpack.js \
+        --config /app/oppia/webpack.dev.config.ts \
+        --watch \
+        --color \
+        --progress
       '
 
   google_app_engine:
@@ -105,41 +76,16 @@ services:
       interval: 30s
       retries: 5
       start_period: 20m
-    command: >
+    entrypoint: >
       sh -c '
-        if [ "$prod_env" = "true" ]; then
-          /google-cloud-sdk/bin/dev_appserver.py /app/oppia/app.yaml --runtime python38 --host=0.0.0.0 --port=8181 --admin_host=0.0.0.0 --admin_port=8000 --skip_sdk_update_check=True
-        else
-          /google-cloud-sdk/bin/dev_appserver.py /app/oppia/app_dev_docker.yaml --runtime python38 --host=0.0.0.0 --port=8181 --admin_host=0.0.0.0 --admin_port=8000 --skip_sdk_update_check=True
-        fi
+        /google-cloud-sdk/bin/dev_appserver.py /app/oppia/app_dev_docker.yaml \
+        --runtime python38 \
+        --host=0.0.0.0 \
+        --port=8181 \
+        --admin_host=0.0.0.0 \
+        --admin_port=8000 \
+        --skip_sdk_update_check=True
       '
-# sh -c '
-#   if [ "$prod_env" = "true" ]; then
-#     if [ "$no_auto_restart" = "true" ]; then
-#       /google-cloud-sdk/bin/dev_appserver.py /app/oppia/app.yaml --runtime python38 --host=0.0.0.0 --port=8181 --admin_host=0.0.0.0 --admin_port=8000 --skip_sdk_update_check=True --automatic_restart=False
-#     else
-#       /google-cloud-sdk/bin/dev_appserver.py /app/oppia/app.yaml --runtime python38 --host=0.0.0.0 --port=8181 --admin_host=0.0.0.0 --admin_port=8000 --skip_sdk_update_check=True --automatic_restart=True
-#     fi
-#   else
-#     if [ "$no_auto_restart" = "true" ]; then
-#       /google-cloud-sdk/bin/dev_appserver.py /app/oppia/app_dev_docker.yaml --runtime python38 --host=0.0.0.0 --port=8181 --admin_host=0.0.0.0 --admin_port=8000 --skip_sdk_update_check=True --automatic_restart=False
-#     else
-#       /google-cloud-sdk/bin/dev_appserver.py /app/oppia/app_dev_docker.yaml --runtime python38 --host=0.0.0.0 --port=8181 --admin_host=0.0.0.0 --admin_port=8000 --skip_sdk_update_check=True --automatic_restart=True
-#     fi
-#   fi
-# '
-
-#       command: >
-# +  #     sh -c '
-# +  #       /google-cloud-sdk/bin/dev_appserver.py \
-# +  #       $( [ "$prod_env" = "true" ] && echo "/app/oppia/app.yaml" || echo "/app/oppia/app_dev_docker.yaml" ) \
-# +  #       --runtime python38 \
-# +  #       --host=0.0.0.0 \
-# +  #       --port=8181 \
-# +  #       --admin_host=0.0.0.0 \
-# +  #       --admin_port=8000 \
-# +  #       --skip_sdk_update_check=True
-# +  #     '
 
   datastore:
     build:
@@ -151,13 +97,6 @@ services:
     volumes:
       - shared_root_dir:/app/oppia
     environment:
-      - DATASTORE_DATASET=dev-project-id
-      - DATASTORE_EMULATOR_HOST=0.0.0.0:8089
-      - DATASTORE_EMULATOR_HOST_PATH=0.0.0.0:8089/datastore
-      - DATASTORE_HOST=http://0.0.0.0:8089
-      - DATASTORE_PROJECT_ID=dev-project-id
-      - DATASTORE_USE_PROJECT_ID_AS_APP_ID=true
-      - GOOGLE_CLOUD_PROJECT=dev-project-id
       - CLOUDSDK_CORE_DISABLE_PROMPTS=1
       - oppia_is_dockerized=true
     depends_on:
@@ -171,33 +110,16 @@ services:
       interval: 2m
       retries: 5
       start_period: 20m
-    command: >
+    entrypoint: >
       sh -c '
-        if [ "$save_datastore" = "true" ]
-        then
-          /google-cloud-sdk/bin/gcloud beta emulators datastore start --project dev-project-id --data-dir /app/cloud_datastore_emulator_cache --host-port 0.0.0.0:8089 --consistency=1.0 --quiet
-        else
-          if [ -d /app/cloud_datastore_emulator_cache ]
-          then
-            rm -rf /app/cloud_datastore_emulator_cache
-          fi
-          /google-cloud-sdk/bin/gcloud beta emulators datastore start --project dev-project-id --data-dir /app/cloud_datastore_emulator_cache --host-port 0.0.0.0:8089 --consistency=1.0 --quiet --no-store-on-disk
-        fi
+        /google-cloud-sdk/bin/gcloud beta emulators datastore start \
+        --project dev-project-id \
+        --data-dir /app/cloud_datastore_emulator_cache \
+        --host-port 0.0.0.0:8089 \
+        --consistency=1.0 \
+        --quiet \
+        --no-store-on-disk
       '
-#       command: >
-# +  #     sh -c '
-# +  #       if [ "$save_datastore" != "true" ]
-# +  #       then
-# +  #         rm -rf /app/cloud_datastore_emulator_cache || true
-# +  #       fi
-# +  #         /google-cloud-sdk/bin/gcloud beta emulators datastore start \
-# +  #         --project dev-project-id \
-# +  #         --data-dir /app/cloud_datastore_emulator_cache \
-# +  #         --host-port 0.0.0.0:8089 \
-# +  #         --consistency=1.0 \
-# +  #         --quiet \
-# +  #         ${save_datastore != "true":+--no-store-on-disk}
-# +  #     '
 
   firebase:
     image: node:16.13.0-alpine
@@ -214,14 +136,14 @@ services:
       retries: 5
     environment:
       - oppia_is_dockerized=true
-    command: >
+    entrypoint: >
       sh -c '
         /app/oppia/node_modules/firebase-tools/lib/bin/firebase.js \
         emulators:start \
         --only auth \
         --project=dev-project-id \
         --config=/app/oppia/.firebase.json \
-        ${save_datastore:+ --import=/app/firebase_emulator_cache} \
+        --import=/app/firebase_emulator_cache \
         --export-on-exit=/app/firebase_emulator_cache
       '  
 

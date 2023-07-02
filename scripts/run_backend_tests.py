@@ -63,18 +63,16 @@ import threading
 import time
 from typing import Dict, Final, List, Optional, Tuple, cast
 
-from core import feconf, utils  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
+from . import install_third_party_libs
 
-if not feconf.OPPIA_IS_DOCKERIZED:
-    from . import install_third_party_libs
-    # This installs third party libraries before importing other files or importing
-    # libraries that use the builtins python module (e.g. build, utils).
-    install_third_party_libs.main()
+# This installs third party libraries before importing other files or importing
+# libraries that use the builtins python module (e.g. build, utils).
+install_third_party_libs.main()
 
+from core import utils  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 from . import common  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 from . import concurrent_task_utils  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
-if not feconf.OPPIA_IS_DOCKERIZED:
-    from . import servers  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
+from . import servers  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 
 COVERAGE_EXCLUSION_LIST_PATH: Final = os.path.join(
     os.getcwd(), 'scripts', 'backend_tests_incomplete_coverage.txt'
@@ -498,10 +496,9 @@ def main(args: Optional[List[str]] = None) -> None:
         raise Exception('The delimiter in test_target should be a dot (.)')
 
     with contextlib.ExitStack() as stack:
-        if not feconf.OPPIA_IS_DOCKERIZED:
-            stack.enter_context(
-                servers.managed_cloud_datastore_emulator(clear_datastore=True))
-            stack.enter_context(servers.managed_redis_server())
+        stack.enter_context(
+            servers.managed_cloud_datastore_emulator(clear_datastore=True))
+        stack.enter_context(servers.managed_redis_server())
         if parsed_args.test_target:
             # Check if target either ends with '_test' which means a path to
             # a test file has been provided or has '_test.' in it which means

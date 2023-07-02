@@ -510,7 +510,6 @@ def install_redis_cli() -> None:
         print('Redis-cli installed successfully.')
 
 
-
 def main(args: Optional[List[str]] = None) -> None:
     """Installs all the third party libraries."""
     if common.is_windows_os():

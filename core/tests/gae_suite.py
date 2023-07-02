@@ -42,7 +42,7 @@ THIRD_PARTY_PYTHON_LIBS_DIR: Final = os.path.join(
     THIRD_PARTY_DIR, 'python_libs'
 )
 
-GOOGLE_APP_ENGINE_SDK_HOME: Final = 'google-cloud-sdk/platform/google_appengine' if feconf.OPPIA_IS_DOCKERIZED else os.path.join(
+GOOGLE_APP_ENGINE_SDK_HOME: Final = os.path.join(
     OPPIA_TOOLS_DIR, 'google-cloud-sdk-335.0.0', 'google-cloud-sdk', 'platform',
     'google_appengine')
 
