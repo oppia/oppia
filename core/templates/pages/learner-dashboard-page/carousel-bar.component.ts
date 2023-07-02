@@ -1,4 +1,4 @@
-// Copyright 2020 The Oppia Authors. All Rights Reserved.
+// Copyright 2023 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -37,6 +37,7 @@ export class CarouselBarComponent implements OnInit {
   carouselScrollPositionPx: number = 0;
   scrollUntrackedTopics: boolean = true;
   disableLeftButton: boolean = true;
+  disableRightButton: boolean = false;
 
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
@@ -61,9 +62,12 @@ export class CarouselBarComponent implements OnInit {
 
   ngOnInit(): void {
     this.windowIsNarrow = this.windowDimensionService.isWindowNarrow();
-    // Let carouselSelector = document.querySelector('.tiles') as HTMLElement;
     this.directiveSubscriptions.add(
       this.windowDimensionService.getResizeEvent().subscribe(() => {
+        let carouselSelector = document.querySelector('.tiles') as HTMLElement;
+        carouselSelector.scrollTo(0, 0);
+        this.carouselScrollPositionPx = 0;
+        this.disableLeftButton = true;
         this.windowIsNarrow = this.windowDimensionService.isWindowNarrow();
       }));
   }
@@ -81,9 +85,6 @@ export class CarouselBarComponent implements OnInit {
 
     console.error(direction * 210, 'directionn.......');
     console.error(this.carouselScrollPositionPx, 'carousel scroll.* 210');
-    console.error(
-      this.carouselScrollPositionPx >
-      (this.CarouselScrollWidthPx - this.CarouselClientWidthPx), '> he');
 
 
     if (this.scrollUntrackedTopics && ((this.carouselScrollPositionPx === 0) ||
@@ -111,6 +112,14 @@ export class CarouselBarComponent implements OnInit {
       this.carouselScrollPositionPx = 0;
     } else {
       this.disableLeftButton = false;
+    }
+
+    if (
+      this.carouselScrollPositionPx >
+      (this.CarouselScrollWidthPx - this.CarouselClientWidthPx)) {
+      this.disableRightButton = true;
+    } else {
+      this.disableRightButton = false;
     }
     console.error(this.carouselScrollPositionPx, 'intial caro..posti..');
   }

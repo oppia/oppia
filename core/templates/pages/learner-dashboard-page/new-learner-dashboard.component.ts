@@ -205,48 +205,48 @@ export class NewLearnerDashboardComponent {
       }
     );
 
-    let dashboardCollectionsDataPromise = (
-      this.learnerDashboardBackendApiService
-        .fetchLearnerDashboardCollectionsDataAsync());
-    dashboardCollectionsDataPromise.then(
-      responseData => {
-        this.completedCollectionsList = (
-          responseData.completedCollectionsList);
-        this.incompleteCollectionsList = (
-          responseData.incompleteCollectionsList);
-        this.completedToIncompleteCollections = (
-          responseData.completedToIncompleteCollections);
-        this.collectionPlaylist = responseData.collectionPlaylist;
-      }, errorResponseStatus => {
-        if (
-          AppConstants.FATAL_ERROR_CODES.indexOf(errorResponseStatus
-          ) !== -1) {
-          this.alertsService.addWarning(
-            'Failed to get learner dashboard collections data');
-        }
-      }
-    );
+    // Let dashboardCollectionsDataPromise = (
+    //   this.learnerDashboardBackendApiService
+    //     .fetchLearnerDashboardCollectionsDataAsync());
+    // dashboardCollectionsDataPromise.then(
+    //   responseData => {
+    //     this.completedCollectionsList = (
+    //       responseData.completedCollectionsList);
+    //     this.incompleteCollectionsList = (
+    //       responseData.incompleteCollectionsList);
+    //     this.completedToIncompleteCollections = (
+    //       responseData.completedToIncompleteCollections);
+    //     this.collectionPlaylist = responseData.collectionPlaylist;
+    //   }, errorResponseStatus => {
+    //     if (
+    //       AppConstants.FATAL_ERROR_CODES.indexOf(errorResponseStatus
+    //       ) !== -1) {
+    //       this.alertsService.addWarning(
+    //         'Failed to get learner dashboard collections data');
+    //     }
+    //   }
+    // );
 
-    let dashboardExplorationsDataPromise = (
-      this.learnerDashboardBackendApiService
-        .fetchLearnerDashboardExplorationsDataAsync());
-    dashboardExplorationsDataPromise.then(
-      responseData => {
-        this.completedExplorationsList = (
-          responseData.completedExplorationsList);
-        this.incompleteExplorationsList = (
-          responseData.incompleteExplorationsList);
-        this.subscriptionsList = responseData.subscriptionList;
-        this.explorationPlaylist = responseData.explorationPlaylist;
-      }, errorResponseStatus => {
-        if (
-          AppConstants.FATAL_ERROR_CODES.indexOf(errorResponseStatus
-          ) !== -1) {
-          this.alertsService.addWarning(
-            'Failed to get learner dashboard explorations data');
-        }
-      }
-    );
+    // let dashboardExplorationsDataPromise = (
+    //   this.learnerDashboardBackendApiService
+    //     .fetchLearnerDashboardExplorationsDataAsync());
+    // dashboardExplorationsDataPromise.then(
+    //   responseData => {
+    //     this.completedExplorationsList = (
+    //       responseData.completedExplorationsList);
+    //     this.incompleteExplorationsList = (
+    //       responseData.incompleteExplorationsList);
+    //     this.subscriptionsList = responseData.subscriptionList;
+    //     this.explorationPlaylist = responseData.explorationPlaylist;
+    //   }, errorResponseStatus => {
+    //     if (
+    //       AppConstants.FATAL_ERROR_CODES.indexOf(errorResponseStatus
+    //       ) !== -1) {
+    //       this.alertsService.addWarning(
+    //         'Failed to get learner dashboard explorations data');
+    //     }
+    //   }
+    // );
 
     let learnerGroupFeatureIsEnabledPromise = (
       this.learnerGroupBackendApiService.isLearnerGroupFeatureEnabledAsync()
@@ -255,14 +255,13 @@ export class NewLearnerDashboardComponent {
       this.LEARNER_GROUP_FEATURE_IS_ENABLED = featureIsEnabled;
     });
 
-    this.fetchFeedbackUpdates();
+    // This.fetchFeedbackUpdates();
+    this.fetchCommunityLessonsData();
 
     Promise.all([
       userInfoPromise,
       dashboardTopicAndStoriesDataPromise,
       learnerGroupFeatureIsEnabledPromise,
-      dashboardExplorationsDataPromise,
-      dashboardCollectionsDataPromise
     ]).then(() => {
       setTimeout(() => {
         this.loaderService.hideLoadingScreen();
@@ -342,6 +341,65 @@ export class NewLearnerDashboardComponent {
         }
       }
     );
+  }
+
+  fetchCommunityLessonsData(): void {
+    this.loaderService.showLoadingScreen('Loading');
+    let dashboardCollectionsDataPromise = (
+      this.learnerDashboardBackendApiService
+        .fetchLearnerDashboardCollectionsDataAsync());
+    dashboardCollectionsDataPromise.then(
+      responseData => {
+        this.completedCollectionsList = (
+          responseData.completedCollectionsList);
+        this.incompleteCollectionsList = (
+          responseData.incompleteCollectionsList);
+        this.completedToIncompleteCollections = (
+          responseData.completedToIncompleteCollections);
+        this.collectionPlaylist = responseData.collectionPlaylist;
+      }, errorResponseStatus => {
+        if (
+          AppConstants.FATAL_ERROR_CODES.indexOf(errorResponseStatus
+          ) !== -1) {
+          this.alertsService.addWarning(
+            'Failed to get learner dashboard collections data');
+        }
+      }
+    );
+
+    let dashboardExplorationsDataPromise = (
+      this.learnerDashboardBackendApiService
+        .fetchLearnerDashboardExplorationsDataAsync());
+    dashboardExplorationsDataPromise.then(
+      responseData => {
+        this.completedExplorationsList = (
+          responseData.completedExplorationsList);
+        this.incompleteExplorationsList = (
+          responseData.incompleteExplorationsList);
+        this.subscriptionsList = responseData.subscriptionList;
+        this.explorationPlaylist = responseData.explorationPlaylist;
+      }, errorResponseStatus => {
+        if (
+          AppConstants.FATAL_ERROR_CODES.indexOf(errorResponseStatus
+          ) !== -1) {
+          this.alertsService.addWarning(
+            'Failed to get learner dashboard explorations data');
+        }
+      }
+    );
+    Promise.all([
+      dashboardCollectionsDataPromise,
+      dashboardExplorationsDataPromise,
+    ]).then(() => {
+      setTimeout(() => {
+        this.loaderService.hideLoadingScreen();
+        this.communtiyLessonsDataLoaded = true;
+        // So that focus is applied after the loading screen has dissapeared.
+        this.focusManagerService.setFocusWithoutScroll('ourLessonsBtn');
+      }, 0);
+    }).catch(errorResponse => {
+      // This is placed here in order to satisfy Unit tests.
+    });
   }
 
   getStaticImageUrl(imagePath: string): string {

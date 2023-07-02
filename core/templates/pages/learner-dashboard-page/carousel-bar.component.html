@@ -1,23 +1,26 @@
 <div class="oppia-coursel-container">
+    <div class="oppia-carousel-head">
+        <div class="oppia-carousel-head-content">
+            <span class="oppia-carousel-heading" [innerHTML]="'I18N_LEARNER_DASHBOARD_LEARN_SOMETHING_NEW_SECTION' | translate"></span>
+            <span class="oppia-carousel-button">
+                <button class="oppia-carousel-scroller" (click)="scroll(true)"
+                [ngStyle]="{'background-color': disableLeftButton ? 'gray' : '#00645C'}"
+                    [disabled]="disableLeftButton">
+                    <i class="fas fal fa-angle-left"></i>
+                </button>
 
-    <div class="left-right-button">
-         <button mat-button class="md-no-ink oppia-carousel-scroller"
-          (click)="scroll(true)"
-          [disabled]="disableLeftButton">
-         <i class="fas fal fa-angle-left"></i>
-         </button> 
-
-        <button mat-button class="md-no-ink oppia-carousel-scroller"
-        (click)="scroll(false)"
-        [disabled]="carouselScrollPositionPx > (CarouselScrollWidthPx - CarouselClientWidthPx)">
-        <i class="fas fal fa-angle-right"></i>
-        </button>
-    </div>
-
-    <div class="oppia-carousel-content">
-        <div class="tiles" [ngStyle]="{'gap': untrackedTopicTiles ? '8px' : '16px'}">
-          <ng-content></ng-content>
+                <button class="oppia-carousel-scroller" (click)="scroll(false)"
+                    [disabled]="disableRightButton"
+                    [ngStyle]="{'background-color': disableRightButton ? 'gray' : '#00645C'}">
+                    <i class="fas fal fa-angle-right"></i>
+                </button>
+            </span>
         </div>
     </div>
-
+    <hr>
+    <div class="oppia-carousel-content">
+        <div class="tiles" [ngStyle]="{'gap': untrackedTopicTiles ? '8px' : '16px'}">
+            <ng-content></ng-content>
+        </div>
+    </div>
 </div>
