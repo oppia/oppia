@@ -1,10 +1,12 @@
 <div class="home-tab">
-  <div tabindex="0" class="greeting" [ngStyle]="!windowIsNarrow && {'margin-top': '64px'}">
+  <div tabindex="0" class="greeting" [ngStyle]="!windowIsNarrow && {'margin-top': '27px'}">
     {{ getTimeOfDay() | translate }}, {{ username }}!
   </div>
-  <div tabindex="0" class="continue-where-you-left-off" *ngIf="isNonemptyObject(untrackedTopics) || continueWhereYouLeftOffList.length !== 0">
+  <div tabindex="0" class="continue-where-you-left-off"
+    *ngIf="isNonemptyObject(untrackedTopics) || continueWhereYouLeftOffList.length !== 0">
     <p class="continue-where-you-left-off-heading"
-       [innerHTML]="'I18N_LEARNER_DASHBOARD_CONTINUE_WHERE_YOU_LEFT_OFF_SECTION' | translate" *ngIf="continueWhereYouLeftOffList.length !== 0">
+      [innerHTML]="'I18N_LEARNER_DASHBOARD_CONTINUE_WHERE_YOU_LEFT_OFF_SECTION' | translate"
+      *ngIf="continueWhereYouLeftOffList.length !== 0">
     </p>
     <!-- <p class="continue-where-you-left-off-heading"
        [innerHTML]="'I18N_LEARNER_DASHBOARD_EMPTY_CONTINUE_WHERE_YOU_LEFT_OFF_SECTION_HEADING' | translate"
@@ -23,7 +25,7 @@
         [ngStyle]="windowIsNarrow && {'width': width + 'px'}">
         <div *ngFor="let topicSummaryTile of continueWhereYouLeftOffList" class="topic-summary">
           <div *ngFor="let storySummaryTile of topicSummaryTile.canonicalStorySummaryDicts; let i = index"
-               class="story-summary-tile">
+            class="story-summary-tile">
             <oppia-learner-story-summary-tile [storySummary]="storySummaryTile" [displayArea]="'homeTab'"
               [topicName]="topicSummaryTile.name">
             </oppia-learner-story-summary-tile>
@@ -32,102 +34,87 @@
       </div>
     </div>
   </div>
-  <!-- <div tabindex="0" class="suggested-for-you e2e-test-suggested-for-you" *ngIf="isNonemptyObject(untrackedTopics) && !isGoalLimitReached()">
+
+  <div tabindex="0" class="topic-suggested-for-you">
     <p class="suggested-for-you-heading" [innerHTML]="'I18N_LEARNER_DASHBOARD_LEARN_SOMETHING_NEW_SECTION' | translate">
     </p>
-    <div class="suggested-for-you-section">
-      <div *ngFor="let item of untrackedTopics | keyvalue" class="untracked-topics">
-        <div *ngIf="item.value.length !== 0" class="classroom-name">
-          Basic {{item.key}}
-        </div>
-        <div class="topic-summary-tile-scroll">
-          <div class="topic-summary-tile-section d-flex"
-            [ngStyle]="windowIsNarrow && {'width': getWidth(item.value.length) + 'px'}">
-            <oppia-carousel-bar>
-              <div *ngFor="let topicSummaryTile of item.value" class="topic-summary-tile">
-                <oppia-learner-topic-summary-tile [topicSummary]="topicSummaryTile">
-                </oppia-learner-topic-summary-tile>
-              </div>
-            </oppia-carousel-bar>
-            <a [href]="getClassroomLink(item.key)" target="{{ openInNewWindow ? '_blank' : '_self' }}"
-               class="oppia-classroom-link">
-              <div class="classroom-card">
-                <p class="classroom-text">
-                  <span [innerHTML]="'I18N_VIEW_ALL_TOPICS' | translate: {classroomName: item.key}"></span>
-                </p>
-              </div>
-            </a>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div> -->
-
-  <div tabindex="0" class="empty-suggested-for-you">
-    <p class="suggested-for-you-heading" [innerHTML]="'I18N_LEARNER_DASHBOARD_LEARN_SOMETHING_NEW_SECTION' | translate"></p>
     <div *ngFor="let item of untrackedTopics | keyvalue" class="untracked-topics">
-    <oppia-carousel-bar>
-      <div *ngFor="let topicSummaryTile of item.value" class="topic-summary-tile">
-        <oppia-learner-topic-summary-tile [topicSummary]="topicSummaryTile">
-        </oppia-learner-topic-summary-tile>
+      <oppia-carousel-bar>
+        <div *ngFor="let topicSummaryTile of item.value" class="topic-summary-tile">
+          <oppia-learner-topic-summary-tile [topicSummary]="topicSummaryTile">
+          </oppia-learner-topic-summary-tile>
+        </div>
+      </oppia-carousel-bar>
+      <div>
+        <a [href]="getClassroomLink(item.key)" target="{{ openInNewWindow ? '_blank' : '_self' }}"
+          class="oppia-classroom-link">
+          <div class="classroom-card">
+            <p class="classroom-text">
+              <span [innerHTML]="'I18N_VIEW_ALL_TOPICS' | translate: {classroomName: item.key}"></span>
+            </p>
+          </div>
+        </a>
       </div>
-    </oppia-carousel-bar>
     </div>
   </div>
 
-  <div tabindex="0" class="empty-suggested-for-you learn-something-new-section"
-       *ngIf="!isNonemptyObject(untrackedTopics) && continueWhereYouLeftOffList.length === 0">
+  <!-- <div tabindex="0" class="empty-suggested-for-you learn-something-new-section"
+    *ngIf="!isNonemptyObject(untrackedTopics) && continueWhereYouLeftOffList.length === 0">
     <p class="suggested-for-you-heading" [innerHTML]="'I18N_LEARNER_DASHBOARD_LEARN_SOMETHING_NEW_SECTION' | translate">
     </p>
     <div class="empty-suggested-for-you-section">
       <p [innerHTML]="'I18N_LEARNER_DASHBOARD_EMPTY_SUGGESTED_FOR_YOU_SECTION' | translate">
       </p>
     </div>
-  </div>
- <div class="playlist-section" *ngIf="totalLessonsInPlaylist.length !== 0">
+  </div> -->
+  <div class="playlist-section" *ngIf="totalLessonsInPlaylist.length !== 0">
     <div class="summary-container">
-      <div *ngFor="let summaryTile of displayLessonsInPlaylist"
-           class="oppia-summary-tile-container"
-           (mouseenter)="summaryTile.toggle = !summaryTile.toggle"
-           (mouseleave)="summaryTile.toggle = !summaryTile.toggle">
-        <div *ngIf="getTileType(summaryTile) === 'exploration'">
-          <i class="remove-icon fa fa-times"
-             *ngIf="summaryTile.toggle || windowIsNarrow"
-             aria-hidden="true"
-             (click)="openRemoveActivityModal('I18N_LEARNER_DASHBOARD_PLAYLIST_SECTION', 'I18N_DASHBOARD_EXPLORATIONS', summaryTile)"
-             ngbTooltip="Remove"
-             container="body"
-             placement="top">
-          </i>
-          <oppia-exploration-summary-tile [explorationId]="summaryTile.id"
-                                          [explorationTitle]="summaryTile.title"
-                                          [objective]="summaryTile.objective"
-                                          [category]="summaryTile.category"
-                                          [displayAreaIsLearnerDashboard]="true"
-                                          [thumbnailIconUrl]="summaryTile.thumbnailIconUrl"
-                                          [thumbnailBgColor]="summaryTile.thumbnailBgColor">
-          </oppia-exploration-summary-tile>
+      <oppia-carousel-bar>
+        <div *ngFor="let summaryTile of displayLessonsInPlaylist" class="oppia-summary-tile-container"
+          (mouseenter)="summaryTile.toggle = !summaryTile.toggle"
+          (mouseleave)="summaryTile.toggle = !summaryTile.toggle">
+
+          <div *ngIf="getTileType(summaryTile) === 'exploration'">
+            <i class="remove-icon fa fa-times"
+            *ngIf="summaryTile.toggle || windowIsNarrow"
+            aria-hidden="true"
+            (click)="openRemoveActivityModal('I18N_LEARNER_DASHBOARD_PLAYLIST_SECTION', 'I18N_DASHBOARD_EXPLORATIONS', summaryTile)"
+              ngbTooltip="Remove"
+              container="body"
+              placement="top">
+            </i>
+            <oppia-exploration-summary-tile
+              [explorationId]="summaryTile.id"
+              [explorationTitle]="summaryTile.title"
+              [objective]="summaryTile.objective" 
+              [category]="summaryTile.category"
+              [displayAreaIsLearnerDashboard]="true" 
+              [thumbnailIconUrl]="summaryTile.thumbnailIconUrl"
+              [thumbnailBgColor]="summaryTile.thumbnailBgColor">
+            </oppia-exploration-summary-tile>
+          </div>
+          <div *ngIf="getTileType(summaryTile) === 'collection'">
+            <i class="remove-icon fa fa-times" 
+            *ngIf="summaryTile.toggle || windowIsNarrow" 
+            aria-hidden="true"
+            (click)="openRemoveActivityModal('I18N_LEARNER_DASHBOARD_PLAYLIST_SECTION', 'I18N_DASHBOARD_COLLECTIONS', summaryTile)"
+              ngbTooltip="Remove" 
+              container="body" 
+              placement="top">
+            </i>
+            <oppia-collection-summary-tile 
+              [getCollectionId]="summaryTile.id" 
+              [getCollectionTitle]="summaryTile.title"
+              [getLastUpdatedMsec]="summaryTile.lastUpdatedMsec" 
+              [getObjective]="summaryTile.objective"
+              [getNodeCount]="summaryTile.nodeCount" 
+              [getCategory]="summaryTile.category"
+              [getThumbnailIconUrl]="summaryTile.thumbnailIconUrl" 
+              [getThumbnailBgColor]="summaryTile.thumbnailBgColor">
+            </oppia-collection-summary-tile>
+          </div>
         </div>
-        <div *ngIf="getTileType(summaryTile) === 'collection'">
-          <i class="remove-icon fa fa-times"
-             *ngIf="summaryTile.toggle || windowIsNarrow"
-             aria-hidden="true"
-             (click)="openRemoveActivityModal('I18N_LEARNER_DASHBOARD_PLAYLIST_SECTION', 'I18N_DASHBOARD_COLLECTIONS', summaryTile)"
-             ngbTooltip="Remove"
-             container="body"
-             placement="top">
-          </i>
-          <oppia-collection-summary-tile [getCollectionId]="summaryTile.id"
-                                         [getCollectionTitle]="summaryTile.title"
-                                         [getLastUpdatedMsec]="summaryTile.lastUpdatedMsec"
-                                         [getObjective]="summaryTile.objective"
-                                         [getNodeCount]="summaryTile.nodeCount"
-                                         [getCategory]="summaryTile.category"
-                                         [getThumbnailIconUrl]="summaryTile.thumbnailIconUrl"
-                                         [getThumbnailBgColor]="summaryTile.thumbnailBgColor">
-          </oppia-collection-summary-tile>
-        </div>
-      </div>
+      </oppia-carousel-bar>
+    </div>
   </div>
-</div>
 </div>

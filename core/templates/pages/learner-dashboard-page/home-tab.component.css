@@ -24,7 +24,7 @@
   padding: 24px 0 8px 0;
   text-transform: capitalize;
 }
-.home-tab .suggested-for-you .oppia-classroom-link {
+.home-tab .topic-suggested-for-you .oppia-classroom-link {
   text-decoration: none;
 }
 .home-tab .suggested-for-you .topic-summary-tile {
@@ -36,7 +36,7 @@
 }
 .home-tab .continue-where-you-left-off .continue-where-you-left-off-heading,
 .home-tab .suggested-for-you .suggested-for-you-heading,
-.home-tab .empty-suggested-for-you .suggested-for-you-heading {
+.home-tab .topic-suggested-for-you .suggested-for-you-heading {
   color: #00645c;
   font-family: 'Capriola', 'Roboto', Arial, sans-serif;
   font-size: 24px;
@@ -47,26 +47,20 @@
   font-size: 18px;
   padding-top: 32px;
 }
-.home-tab .suggested-for-you .classroom-card {
-  background-color: #eee ;
+.home-tab .topic-suggested-for-you .classroom-card {
+  border: 1px solid #205D86;
   border-radius: 4px;
-  float: right;
-  height: 210px;
-  margin: 0 2px 30px 6px;
-  padding: 0;
-  position: relative;
-  width: 144px;
-  z-index: 5;
+  height: 44px;
+  padding: 10px 0px;
+  width: 344px;
 }
-.home-tab .suggested-for-you .classroom-text {
-  color: #333;
-  font-size: 15px;
+.home-tab .topic-suggested-for-you .classroom-text {
+  color: #205D86;
+  font-size: 16px;
   font-weight: bold;
   letter-spacing: 0.25px;
-  position: relative;
   text-align: center;
   text-transform: capitalize;
-  top: 85px;
 }
 .home-tab .continue-where-you-left-off .empty-continue-where-you-left-off-section-text {
   display: inline-block;
@@ -81,12 +75,12 @@
   padding: 30px 0;
 }
 
-.home-tab .empty-suggested-for-you.learn-something-new-section {
+.home-tab .topic-suggested-for-you.learn-something-new-section {
   padding: 32px 23px 0 32px;
 }
 
 .home-tab .suggested-for-you,
-.home-tab .empty-suggested-for-you {
+.home-tab .topic-suggested-for-you {
   background-color: #fff;
   border-radius: 4px;
   box-shadow: 0 0 4px #0000001a;
@@ -140,7 +134,7 @@
     padding-top: 30px;
   }
   .home-tab .continue-where-you-left-off, .home-tab .suggested-for-you,
-  .home-tab .empty-suggested-for-you {
+  .home-tab .topic-suggested-for-you {
     margin-left: 0;
   }
   .home-tab .continue-where-you-left-off .continue-where-you-left-off-scroll {
@@ -167,7 +161,7 @@
     margin: 24px 0 0 20px;
   }
   .home-tab .continue-where-you-left-off, .home-tab .suggested-for-you,
-  .home-tab .empty-suggested-for-you {
+  .home-tab .topic-suggested-for-you {
     margin-left: auto;
     width: 465px;
   }
@@ -202,7 +196,7 @@
   }
   .home-tab .continue-where-you-left-off,
   .home-tab .suggested-for-you,
-  .home-tab .empty-suggested-for-you {
+  .home-tab .topic-suggested-for-you {
     margin: 18px 0 25px 0;
     padding: 40px 0 20px 32px;
     width: 500px;
@@ -225,7 +219,7 @@
 
 @media(max-width: 500px) {
   .home-tab .continue-where-you-left-off, .home-tab .suggested-for-you,
-  .home-tab .empty-suggested-for-you {
+  .home-tab .topic-suggested-for-you {
     margin-left: auto;
     width: 335px;
   }

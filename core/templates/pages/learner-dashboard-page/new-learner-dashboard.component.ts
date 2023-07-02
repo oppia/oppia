@@ -256,7 +256,9 @@ export class NewLearnerDashboardComponent {
     });
 
     // This.fetchFeedbackUpdates();
-    this.fetchCommunityLessonsData();
+    setTimeout(() => {
+      this.fetchCommunityLessonsData();
+    }, 1000);
 
     Promise.all([
       userInfoPromise,
