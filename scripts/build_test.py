@@ -713,11 +713,15 @@ class BuildTests(test_utils.GenericTestBase):
         # silence the MyPy complaints `setattr` is used to set the attribute.
         setattr(
             app_dev_yaml_temp_file, 'name', mock_dev_yaml_filepath)
+        # TODO(#18260): Change this when we permanently move to
+        # the Dockerized Setup.
+        firebase_host = (
+            'firebase' if feconf.OPPIA_IS_DOCKERIZED else 'localhost'
+        )
         with utils.open_file(mock_dev_yaml_filepath, 'w') as tmp:
-            # TODO(#18260): Chnage this when we permanently move to the Dockerized Setup.
-            firebase_host = 'firebase' if feconf.OPPIA_IS_DOCKERIZED else 'localhost'
             tmp.write('Some content in mock_app_dev.yaml\n')
-            tmp.write('  FIREBASE_AUTH_EMULATOR_HOST: "%s:9099"\n' % firebase_host)
+            tmp.write(
+                '  FIREBASE_AUTH_EMULATOR_HOST: "%s:9099"\n' % firebase_host)
             tmp.write('version: default')
 
         app_yaml_temp_file = tempfile.NamedTemporaryFile()
@@ -762,11 +766,15 @@ class BuildTests(test_utils.GenericTestBase):
         # silence the MyPy complaints `setattr` is used to set the attribute.
         setattr(
             app_dev_yaml_temp_file, 'name', mock_dev_yaml_filepath)
+        # TODO(#18260): Change this when we permanently move to
+        # the Dockerized Setup.
+        firebase_host = (
+            'firebase' if feconf.OPPIA_IS_DOCKERIZED else 'localhost'
+        )
         with utils.open_file(mock_dev_yaml_filepath, 'w') as tmp:
-            # TODO(#18260): Chnage this when we permanently move to the Dockerized Setup.
-            firebase_host = 'firebase' if feconf.OPPIA_IS_DOCKERIZED else 'localhost'
             tmp.write('Some content in mock_app_dev.yaml\n')
-            tmp.write('  FIREBASE_AUTH_EMULATOR_HOST: "%s:9099"\n' % firebase_host)
+            tmp.write(
+                '  FIREBASE_AUTH_EMULATOR_HOST: "%s:9099"\n' % firebase_host)
             tmp.write('version: default')
 
         app_yaml_temp_file = tempfile.NamedTemporaryFile()

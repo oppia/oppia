@@ -142,7 +142,10 @@ FILEPATHS_PROVIDED_TO_FRONTEND = (
 
 HASH_BLOCK_SIZE = 2**20
 
-APP_DEV_YAML_FILEPATH = 'app_dev_docker.yaml' if feconf.OPPIA_IS_DOCKERIZED else 'app_dev.yaml'
+APP_DEV_YAML_FILEPATH = (
+    'app_dev_docker.yaml' if feconf.OPPIA_IS_DOCKERIZED else 'app_dev.yaml'
+)
+
 APP_YAML_FILEPATH = 'app.yaml'
 
 MAX_OLD_SPACE_SIZE_FOR_WEBPACK_BUILD = 8192
@@ -326,10 +329,22 @@ def _minify_and_create_sourcemap(
     """
     print('Minifying and creating sourcemap for %s' % source_path)
     source_map_properties = 'includeSources,url=\'third_party.min.js.map\''
-    # TODO(#18260): Chnage this when we permanently move to the Dockerized Setup.
+    # TODO(#18260): Change this when we permanently move to
+    # the Dockerized Setup.
     cmd = '%s %s %s -c -m --source-map %s -o %s ' % (
         common.NODE_BIN_PATH, UGLIFY_FILE, source_path,
-        source_map_properties, target_file_path) if not feconf.OPPIA_IS_DOCKERIZED else ['bash', '-c', 'node /app/oppia/node_modules/uglify-js/bin/uglifyjs /app/oppia/third_party/generated/js/third_party.js -c -m --source-map %s -o /app/op0pia/third_party/generated/js/third_party.min.js' % (source_map_properties)]
+        source_map_properties, target_file_path)
+    if feconf.OPPIA_IS_DOCKERIZED:
+        cmd = [
+            'bash', '-c',
+            'node /app/oppia/node_modules/uglify-js/bin/uglifyjs'
+            ' /app/oppia/third_party/generated/js/third_party.js'
+            ' -c -m --source-map %s -o /app/op0pia/third_party/'
+            'generated/js/third_party.min.js' % (
+                source_map_properties
+            )
+        ]
+
     subprocess.check_call(cmd, shell=True)
 
 
