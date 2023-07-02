@@ -330,7 +330,7 @@ def feature_flag_valid_on_current_server(feature_stage: str) -> bool:
     """Checks if the feature is valid on the current server.
 
     Args:
-        feature: str. The stage of the feature flag.
+        feature_stage: str. The stage of the feature flag.
 
     Returns:
         bool. Returns True if the feature is valid on current server else False.
@@ -339,19 +339,10 @@ def feature_flag_valid_on_current_server(feature_stage: str) -> bool:
     if server_mode == platform_parameter_domain.ServerMode.DEV.value:
         return True
     elif server_mode == platform_parameter_domain.ServerMode.TEST.value:
-        if (
-            feature_stage == (
-                platform_parameter_domain.ServerMode.TEST.value) or
-            feature_stage == (
-                platform_parameter_domain.ServerMode.PROD.value)
-        ):
-            return True
-        else:
-            return False
+        return bool(feature_stage in (
+            platform_parameter_domain.ServerMode.TEST.value,
+            platform_parameter_domain.ServerMode.PROD.value)
+        )
     else:
-        if feature_stage == (
-            platform_parameter_domain.ServerMode.PROD.value
-        ):
-            return True
-        else:
-            False
+        return bool(
+            feature_stage == platform_parameter_domain.ServerMode.PROD.value)
