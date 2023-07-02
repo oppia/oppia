@@ -21,6 +21,8 @@ jobs:
       - name: Checkout to the Oppia repository code
         uses: actions/checkout@v3
 
+      - uses: ./.github/actions/merge
+
       - name: Start Containers
         run: |
           echo ---Starting containers---
