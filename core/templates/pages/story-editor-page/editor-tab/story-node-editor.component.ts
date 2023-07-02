@@ -227,6 +227,7 @@ export class StoryNodeEditorComponent implements OnInit, OnDestroy {
 
   updatePlannedPublicationDate(dateString: string | null): void {
     let newPlannedPublicationDate = dateString ? new Date(dateString) : null;
+    const TOAST_MESSAGE_DISPLAY_TIME_MSEC = 5000;
 
     if (newPlannedPublicationDate !== this.plannedPublicationDate) {
       if (newPlannedPublicationDate) {
@@ -241,7 +242,7 @@ export class StoryNodeEditorComponent implements OnInit, OnDestroy {
           this.editablePlannedPublicationDate = null;
           setTimeout(() => {
             this.plannedPublicationDateIsInPast = false;
-          }, AppConstants.ERROT_TOAST_DISPLAY_TIME);
+          }, TOAST_MESSAGE_DISPLAY_TIME_MSEC);
           return;
         } else if (this.plannedPublicationDate === null ||
           this.plannedPublicationDate.getTime() !==
