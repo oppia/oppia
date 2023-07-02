@@ -27,7 +27,8 @@ import tarfile
 import urllib
 import zipfile
 
-from core import feconf, utils
+from core import utils
+from core import feconf
 from typing import Dict, Final, List, Literal, Optional, TypedDict, cast
 
 from . import common

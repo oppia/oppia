@@ -33,7 +33,8 @@ import time
 from urllib import error as urlerror
 from urllib import request as urlrequest
 
-from core import constants, feconf
+from core import constants
+from core import feconf
 from scripts import servers
 
 from typing import Dict, Final, Generator, List, Optional, Union
