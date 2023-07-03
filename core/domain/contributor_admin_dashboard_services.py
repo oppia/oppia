@@ -18,6 +18,7 @@
 from __future__ import annotations
 
 from core.domain import suggestion_registry
+from core.constants import constants
 from core.platform import models
 
 from typing import List, Optional, Tuple
@@ -233,7 +234,7 @@ def get_translation_submitter_total_stats(
     page_size: int,
     offset: int,
     language_code: str,
-    sort_by: Optional[suggestion_models.SortChoices.value],
+    sort_by: Optional[constants.CD_ADMIN_STATS_SORT_OPTIONS],
     topic_ids: Optional[List[str]],
     num_days_since_last_activity: Optional[int]
 ) -> Tuple[
@@ -293,7 +294,7 @@ def get_translation_reviewer_total_stats(
         page_size: int,
         offset: int,
         language_code: str,
-        sort_by: Optional[suggestion_models.SortChoices.value],
+        sort_by: Optional[constants.CD_ADMIN_STATS_SORT_OPTIONS],
         num_days_since_last_activity: Optional[int]
 ) -> Tuple[
         List[suggestion_registry.TranslationReviewerTotalContributionStats],
@@ -349,7 +350,7 @@ def get_translation_reviewer_total_stats(
 def get_question_submitter_total_stats(
     page_size: int,
     offset: int,
-    sort_by: Optional[suggestion_models.SortChoices.value],
+    sort_by: Optional[constants.CD_ADMIN_STATS_SORT_OPTIONS],
     topic_ids: Optional[List[str]],
     num_days_since_last_activity: Optional[int]
 ) -> Tuple[
@@ -407,7 +408,7 @@ def get_question_submitter_total_stats(
 def get_question_reviewer_total_stats(
         page_size: int,
         offset: int,
-        sort_by: Optional[suggestion_models.SortChoices.value],
+        sort_by: Optional[constants.CD_ADMIN_STATS_SORT_OPTIONS],
         num_days_since_last_activity: Optional[int]
 ) -> Tuple[
         List[suggestion_registry.QuestionReviewerTotalContributionStats],

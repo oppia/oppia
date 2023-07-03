@@ -3459,7 +3459,6 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
                 num_days_since_last_activity=7,
                 language_code='es'
             ))
-        # self.assertEqual(len(sorted_results), 1)
         self.assertEqual(sorted_results[0].id, 'model_1')
         self.assertFalse(more)
         self.assertEqual(next_offset, 1)
