@@ -33,6 +33,8 @@ if MYPY:  # pragma: no cover
     ])
 )
 
+CD_ADMIN_STATS_SORT_OPTIONS = constants.CD_ADMIN_STATS_SORT_OPTIONS
+
 
 def get_translation_submitter_total_stats_from_model(
     translation_submitter_model:
@@ -234,7 +236,7 @@ def get_translation_submitter_total_stats(
     page_size: int,
     offset: int,
     language_code: str,
-    sort_by: Optional[constants.CD_ADMIN_STATS_SORT_OPTIONS],
+    sort_by: Optional[CD_ADMIN_STATS_SORT_OPTIONS],
     topic_ids: Optional[List[str]],
     num_days_since_last_activity: Optional[int]
 ) -> Tuple[
@@ -294,7 +296,7 @@ def get_translation_reviewer_total_stats(
         page_size: int,
         offset: int,
         language_code: str,
-        sort_by: Optional[constants.CD_ADMIN_STATS_SORT_OPTIONS],
+        sort_by: Optional[CD_ADMIN_STATS_SORT_OPTIONS],
         num_days_since_last_activity: Optional[int]
 ) -> Tuple[
         List[suggestion_registry.TranslationReviewerTotalContributionStats],
@@ -350,7 +352,7 @@ def get_translation_reviewer_total_stats(
 def get_question_submitter_total_stats(
     page_size: int,
     offset: int,
-    sort_by: Optional[constants.CD_ADMIN_STATS_SORT_OPTIONS],
+    sort_by: Optional[CD_ADMIN_STATS_SORT_OPTIONS],
     topic_ids: Optional[List[str]],
     num_days_since_last_activity: Optional[int]
 ) -> Tuple[
@@ -408,7 +410,7 @@ def get_question_submitter_total_stats(
 def get_question_reviewer_total_stats(
         page_size: int,
         offset: int,
-        sort_by: Optional[constants.CD_ADMIN_STATS_SORT_OPTIONS],
+        sort_by: Optional[CD_ADMIN_STATS_SORT_OPTIONS],
         num_days_since_last_activity: Optional[int]
 ) -> Tuple[
         List[suggestion_registry.QuestionReviewerTotalContributionStats],
