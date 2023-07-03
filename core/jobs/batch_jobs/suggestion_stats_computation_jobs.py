@@ -68,6 +68,8 @@ class ContributionStatsDict(TypedDict):
 class GenerateContributionStatsJob(base_jobs.JobBase):
     """Job that generates contributor stats."""
 
+    DATASTORE_UPDATES_ALLOWED = True
+
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
         """Generates the translation review stats.
 
@@ -339,24 +341,25 @@ class GenerateContributionStatsJob(base_jobs.JobBase):
                 job_result_transforms.ResultsToJobRunResults())
         )
 
-        unused_contribution_put_result = (
-            user_contribution_stats_models
-            | 'Put contribution models into the datastore' >> ndb_io.PutModels()
-        )
-        unused_review_put_result = (
-            user_review_stats_models
-            | 'Put review models into the datastore' >> ndb_io.PutModels()
-        )
-        unused_question_contribution_put_result = (
-            user_question_contribution_stats_models
-            | 'Put question contribution models into the datastore' >> (
-                ndb_io.PutModels())
-        )
-        unused_question_review_put_result = (
-            user_question_review_stats_models
-            | 'Put question review models into the datastore' >> (
-                ndb_io.PutModels())
-        )
+        if self.DATASTORE_UPDATES_ALLOWED:
+            unused_contribution_put_result = (
+                user_contribution_stats_models
+                | 'Put contribution models into the datastore' >> ndb_io.PutModels()
+            )
+            unused_review_put_result = (
+                user_review_stats_models
+                | 'Put review models into the datastore' >> ndb_io.PutModels()
+            )
+            unused_question_contribution_put_result = (
+                user_question_contribution_stats_models
+                | 'Put question contribution models into the datastore' >> (
+                    ndb_io.PutModels())
+            )
+            unused_question_review_put_result = (
+                user_question_review_stats_models
+                | 'Put question review models into the datastore' >> (
+                    ndb_io.PutModels())
+            )
 
         user_stats_models_job_run_results = (
             user_contribution_stats_models
@@ -1015,3 +1018,11 @@ class GenerateContributionStatsJob(base_jobs.JobBase):
             )
             question_review_stats_model.update_timestamps()
             return question_review_stats_model
+
+
+class AuditGenerateContributionStatsJob(
+    GenerateContributionStatsJob
+):
+    """Audit GenerateContributionStatsJob."""
+
+    DATASTORE_UPDATES_ALLOWED = False
