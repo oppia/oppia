@@ -344,7 +344,8 @@ class GenerateContributionStatsJob(base_jobs.JobBase):
         if self.DATASTORE_UPDATES_ALLOWED:
             unused_contribution_put_result = (
                 user_contribution_stats_models
-                | 'Put contribution models into the datastore' >> ndb_io.PutModels()
+                | 'Put contribution models into the datastore' >> (
+                    ndb_io.PutModels())
             )
             unused_review_put_result = (
                 user_review_stats_models
