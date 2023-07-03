@@ -136,8 +136,6 @@ COMMUNITY_CONTRIBUTION_STATS_MODEL_ID: Final = 'community_contribution_stats'
 # Number of models to fetch for contributor admin dashboard stats.
 NUM_MODELS_PER_FETCH: Final = 500
 
-CD_ADMIN_STATS_SORT_OPTIONS = constants.CD_ADMIN_STATS_SORT_OPTIONS
-
 
 class SortChoices(enum.Enum):
     """Enum for Sort Options available in Contributor Admin Dashboard.
@@ -2216,7 +2214,7 @@ class TranslationSubmitterTotalContributionStatsModel(base_models.BaseModel):
         page_size: int,
         offset: int,
         language_code: str,
-        sort_by: Optional[CD_ADMIN_STATS_SORT_OPTIONS],
+        sort_by: Optional[str],
         topic_ids: Optional[List[str]],
         num_days_since_last_activity: Optional[int]
     ) -> Tuple[Sequence[TranslationSubmitterTotalContributionStatsModel],
@@ -2653,7 +2651,7 @@ class TranslationReviewerTotalContributionStatsModel(base_models.BaseModel):
         page_size: int,
         offset: int,
         language_code: str,
-        sort_by: Optional[CD_ADMIN_STATS_SORT_OPTIONS],
+        sort_by: Optional[str],
         num_days_since_last_activity: Optional[int]
     ) -> Tuple[Sequence[TranslationReviewerTotalContributionStatsModel],
                 int,
@@ -2992,7 +2990,7 @@ class QuestionSubmitterTotalContributionStatsModel(base_models.BaseModel):
         cls,
         page_size: int,
         offset: int,
-        sort_by: Optional[CD_ADMIN_STATS_SORT_OPTIONS],
+        sort_by: Optional[str],
         topic_ids: Optional[List[str]],
         num_days_since_last_activity: Optional[int]
     ) -> Tuple[Sequence[QuestionSubmitterTotalContributionStatsModel],
@@ -3306,7 +3304,7 @@ class QuestionReviewerTotalContributionStatsModel(base_models.BaseModel):
         cls,
         page_size: int,
         offset: int,
-        sort_by: Optional[CD_ADMIN_STATS_SORT_OPTIONS],
+        sort_by: Optional[str],
         num_days_since_last_activity: Optional[int]
     ) -> Tuple[Sequence[QuestionReviewerTotalContributionStatsModel],
                 int,
