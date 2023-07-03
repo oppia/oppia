@@ -17,8 +17,8 @@
 
 from __future__ import annotations
 
-from core.domain import suggestion_registry
 from core.constants import constants
+from core.domain import suggestion_registry
 from core.platform import models
 
 from typing import List, Optional, Tuple
