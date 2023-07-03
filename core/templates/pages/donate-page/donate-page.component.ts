@@ -68,7 +68,7 @@ export class DonatePageComponent implements OnInit, OnDestroy {
     scriptElement.src = 'https://donorbox.org/widget.js';
     scriptElement.setAttribute('paypalExpress', 'false');
     scriptElement.async = true;
-    this.renderer2.appendChild(document.body, scriptElement)
+    this.renderer2.appendChild(document.body, scriptElement);
     this.windowIsNarrow = this.windowDimensionService.isWindowNarrow();
     this.donateImgUrl = this.getStaticImageUrl('/general/opp_donate_text.svg');
     this.directiveSubscriptions.add(
