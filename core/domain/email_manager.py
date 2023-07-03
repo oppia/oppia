@@ -1921,8 +1921,8 @@ def send_mail_to_notify_contributor_dashboard_reviewers(
     ):
         logging.error(
             'The "contributor_dashboard_reviewer_emails_is_enabled" property '
-            'must be enabled on the admin config page in order to send '
-            'reviewers the emails.'
+            'must be enabled on the platform parameters tab on the admin page '
+            'in order to send reviewers the emails.'
         )
         return
 

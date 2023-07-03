@@ -2619,8 +2619,8 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             self.assertEqual(
                 logs[0],
                 'The "contributor_dashboard_reviewer_emails_is_enabled" '
-                'property must be enabled on the admin config page in order '
-                'to send reviewers the emails.')
+                'property must be enabled on the platform parameters tab on '
+                'the admin page in order to send reviewers the emails.')
 
     def test_email_not_sent_if_reviewer_email_does_not_exist(self) -> None:
         with self.swap_platform_parameter_value, self.capture_logging(
