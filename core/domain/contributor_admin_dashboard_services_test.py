@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Tests the Funtions to get stats Displayed in contributor Admin Dashboard."""
+"""Tests the functions to get stats displayed in contributor Admin Dashboard."""
 
 from __future__ import annotations
 import datetime
