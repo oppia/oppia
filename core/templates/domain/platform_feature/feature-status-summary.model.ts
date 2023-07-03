@@ -23,13 +23,18 @@
  * of features in the backend.
  */
 export enum FeatureNames {
-  DummyFeature = 'dummy_feature',
+  DummyFeatureFlagForE2ETests = 'dummy_feature_flag_for_e2e_tests',
   EndChapterCelebration = 'end_chapter_celebration',
   CheckpointCelebration = 'checkpoint_celebration',
   ContributorDashboardAccomplishments = 'contributor_dashboard_accomplishments',
   AndroidBetaLandingPage = 'android_beta_landing_page',
   BlogPages = 'blog_pages',
-  DiagnosticTest = 'diagnostic_test'
+  DiagnosticTest = 'diagnostic_test',
+  SerialChapterLaunchCurriculumAdminView =
+  'serial_chapter_launch_curriculum_admin_view',
+  ShowTranslationSize = 'show_translation_size',
+  IsImprovementsTabEnabled = 'is_improvements_tab_enabled',
+  LearnerGroupsAreEnabled = 'learner_groups_are_enabled'
 }
 
 export interface FeatureStatusSummaryBackendDict {
@@ -40,7 +45,7 @@ export interface FeatureStatusSummaryBackendDict {
  * Status checker of feature flags, which are keyed on their names defined in
  * FeatureNames. This provides interface for developer to access feature flag
  * values with feature name hint:
- *   featureStatusChecker.DummyFeature.isEnabled === true
+ *   featureStatusChecker.DummyFeatureFlagForE2ETests.isEnabled === true
  */
 export type FeatureStatusChecker = {
   [name in keyof typeof FeatureNames]: {

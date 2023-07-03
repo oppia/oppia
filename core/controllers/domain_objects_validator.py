@@ -30,6 +30,7 @@ from core.domain import config_domain
 from core.domain import exp_domain
 from core.domain import image_validation_services
 from core.domain import improvements_domain
+from core.domain import platform_parameter_domain
 from core.domain import question_domain
 from core.domain import skill_domain
 from core.domain import state_domain
@@ -108,6 +109,35 @@ def validate_new_config_property_values(
     return new_config_property
 
 
+def validate_new_default_value_of_platform_parameter(
+    default_value: Mapping[str, platform_parameter_domain.PlatformDataTypes]
+) -> Mapping[str, platform_parameter_domain.PlatformDataTypes]:
+    """Validates new default value of platform parameter.
+
+    Args:
+        default_value: dict. Data that needs to be validated.
+
+    Returns:
+        dict(str, PlatformDataTypes). Returns the default value dict after
+        validating.
+
+    Raises:
+        Exception. The default_value is not of valid type.
+    """
+
+    if not isinstance(default_value['value'], (bool, float, int, str)):
+        raise Exception('Expected type to be %s but received %s' % (
+            platform_parameter_domain.PlatformDataTypes,
+            default_value['value'])
+        )
+
+    # The default_value values do not represent a domain class directly
+    # and in the handler it is used to set the default value of the platform
+    # parameter. Hence conversion of dicts to domain objects is not required
+    # for default_value.
+    return default_value
+
+
 def validate_change_dict_for_blog_post(
     change_dict: blog_services.BlogPostChangeDict
 ) -> blog_services.BlogPostChangeDict:
@@ -133,10 +163,9 @@ def validate_change_dict_for_blog_post(
             change_dict['tags'], False)
         # Validates that the tags in the change dict are from the list of
         # default tags set by admin.
-        list_of_default_tags = config_domain.Registry.get_config_property(
-            'list_of_default_tags_for_blog_post')
+        list_of_default_tags = constants.LIST_OF_DEFAULT_TAGS_FOR_BLOG_POST
         assert list_of_default_tags is not None
-        list_of_default_tags_value = list_of_default_tags.value
+        list_of_default_tags_value = list_of_default_tags
         if not all(
             tag in list_of_default_tags_value for tag in change_dict['tags']
         ):

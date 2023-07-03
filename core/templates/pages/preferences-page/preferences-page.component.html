@@ -40,11 +40,13 @@
                  (click)="showEditProfilePictureModal()"
                  aria-label="Edit profile picture button">
             </div>
-            <i class="fas fa-pen oppia-editor-edit-icon oppia-editor-edit-icon-pos"
-               tabindex="0"
-               aria-label="Edit profile picture"
-               (keydown.enter)="showEditProfilePictureModal()">
-            </i>
+            <div class="oppia-editor-edit-btn oppia-editor-edit-btn-pos">
+              <i class="fas fa-pen oppia-editor-profile-edit-icon"
+                 tabindex="0"
+                 aria-label="Edit profile picture"
+                 (keydown.enter)="showEditProfilePictureModal()">
+              </i>
+            </div>
             <picture *ngIf="profilePicturePngDataUrl">
               <source type="image/webp" [srcset]="profilePictureWebpDataUrl">
               <source type="image/png" [srcset]="profilePicturePngDataUrl">

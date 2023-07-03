@@ -32,26 +32,58 @@ docstrings in this file.
 
 from __future__ import annotations
 
+from core import feconf
 from core import platform_feature_list
 from core.constants import constants
 from core.domain import platform_parameter_domain
+from core.domain import platform_parameter_list
 from core.domain import platform_parameter_registry as registry
 
 from typing import Dict, List, Set
 
-ALL_FEATURES_LIST: List[platform_feature_list.ParamNames] = (
+ALL_FEATURE_FLAGS: List[platform_feature_list.ParamNames] = (
     platform_feature_list.DEV_FEATURES_LIST +
     platform_feature_list.TEST_FEATURES_LIST +
     platform_feature_list.PROD_FEATURES_LIST
 )
 
 ALL_FEATURES_NAMES_SET: Set[str] = set(
-    feature.value for feature in ALL_FEATURES_LIST
+    feature.value for feature in ALL_FEATURE_FLAGS
 )
+
+ALL_PLATFORM_PARAMS_EXCEPT_FEATURE_FLAGS: List[
+    platform_parameter_list.ParamNames
+] = [
+        (
+            platform_parameter_list.ParamNames.
+            ALWAYS_ASK_LEARNERS_FOR_ANSWER_DETAILS
+        ),
+        platform_parameter_list.ParamNames.DUMMY_PARAMETER,
+        (
+            platform_parameter_list.ParamNames.
+            HIGH_BOUNCE_RATE_TASK_STATE_BOUNCE_RATE_CREATION_THRESHOLD
+        ),
+        (
+            platform_parameter_list.ParamNames.
+            HIGH_BOUNCE_RATE_TASK_STATE_BOUNCE_RATE_OBSOLETION_THRESHOLD
+        ),
+        (
+            platform_parameter_list.ParamNames.
+            HIGH_BOUNCE_RATE_TASK_MINIMUM_EXPLORATION_STARTS
+        ),
+        platform_parameter_list.ParamNames.PROMO_BAR_ENABLED,
+        platform_parameter_list.ParamNames.PROMO_BAR_MESSAGE,
+    ]
 
 
 class FeatureFlagNotFoundException(Exception):
     """Exception thrown when an unknown feature flag is requested."""
+
+    pass
+
+
+class PlatformParameterNotFoundException(Exception):
+    """Exception thrown when an unknown platform parameter is requested."""
 
     pass
 
@@ -71,7 +103,7 @@ def create_evaluation_context_for_client(
     return platform_parameter_domain.EvaluationContext.from_dict(
         client_context_dict,
         {
-            'server_mode': _get_server_mode()
+            'server_mode': get_server_mode()
         }
     )
 
@@ -88,7 +120,24 @@ def get_all_feature_flag_dicts() -> List[
     """
     return [
         registry.Registry.get_platform_parameter(_feature.value).to_dict()
-        for _feature in ALL_FEATURES_LIST
+        for _feature in ALL_FEATURE_FLAGS
+    ]
+
+
+def get_all_platform_parameters_except_feature_flag_dicts() -> List[
+    platform_parameter_domain.PlatformParameterDict
+]:
+    """Returns dict representations of all platform parameters that do not
+    contains feature flags. This method is used for providing detailed
+    platform parameters information to the release-coordinator page.
+
+    Returns:
+        list(dict). A list containing the dict mappings of all fields of the
+        platform parameters.
+    """
+    return [
+        registry.Registry.get_platform_parameter(_plat_param.value).to_dict()
+        for _plat_param in ALL_PLATFORM_PARAMS_EXCEPT_FEATURE_FLAGS
     ]
 
 
@@ -122,11 +171,12 @@ def is_feature_enabled(feature_name: str) -> bool:
     return _evaluate_feature_flag_value_for_server(feature_name)
 
 
-def update_feature_flag_rules(
+def update_feature_flag(
     feature_name: str,
     committer_id: str,
     commit_message: str,
-    new_rules: List[platform_parameter_domain.PlatformParameterRule]
+    new_rules: List[platform_parameter_domain.PlatformParameterRule],
+    default_value: bool
 ) -> None:
     """Updates the feature flag's rules.
 
@@ -136,6 +186,7 @@ def update_feature_flag_rules(
         commit_message: str. The commit message.
         new_rules: list(PlatformParameterRule). A list of PlatformParameterRule
             objects to update.
+        default_value: bool. The default value of the feature flag.
 
     Raises:
         FeatureFlagNotFoundException. The feature_name is not registered in
@@ -146,24 +197,24 @@ def update_feature_flag_rules(
             'Unknown feature flag: %s.' % feature_name)
 
     registry.Registry.update_platform_parameter(
-        feature_name, committer_id, commit_message, new_rules)
+        feature_name, committer_id, commit_message, new_rules, default_value)
 
 
-# TODO(#10211): Currently Oppia runs in either of the two modes:
-# dev or prod. There should be another mode 'test' added for QA testing,
-# once it is added, this function needs to be updated to take that into
-# consideration.
-def _get_server_mode() -> platform_parameter_domain.ServerMode:
+def get_server_mode() -> platform_parameter_domain.ServerMode:
     """Returns the running mode of Oppia.
 
     Returns:
-        Enum(SERVER_MODES). The server mode of Oppia, dev if Oppia is running
-        in development mode, prod if in production mode.
+        Enum(SERVER_MODES). The server mode of Oppia. This is "dev" if Oppia is
+        running in development mode, "test" if Oppia is running in production
+        mode but not on the main website, and "prod" if Oppia is running in
+        full production mode on the main website.
     """
     return (
         platform_parameter_domain.ServerMode.DEV
         if constants.DEV_MODE
         else platform_parameter_domain.ServerMode.PROD
+        if feconf.ENV_IS_OPPIA_ORG_PRODUCTION_SERVER
+        else platform_parameter_domain.ServerMode.TEST
     )
 
 
@@ -188,7 +239,7 @@ def _create_evaluation_context_for_server() -> (
             'app_version': None,
         },
         {
-            'server_mode': _get_server_mode()
+            'server_mode': get_server_mode()
         }
     )
 
@@ -243,3 +294,30 @@ def _evaluate_feature_flag_value_for_server(feature_name: str) -> bool:
     values_dict = _evaluate_feature_flag_values_for_context(
         set([feature_name]), context)
     return values_dict[feature_name]
+
+
+def get_platform_parameter_value(
+    parameter_name: str) -> platform_parameter_domain.PlatformDataTypes:
+    """Returns the value of the platform parameter.
+
+    Args:
+        parameter_name: str. The name of the platform parameter whose
+            value is required.
+
+    Returns:
+        PlatformDataTypes. The value of the platform parameter.
+
+    Raises:
+        PlatformParameterNotFoundException. Platform parameter is not valid.
+    """
+    all_platform_params_dicts = (
+        get_all_platform_parameters_except_feature_flag_dicts())
+    all_platform_params_names_set = set(
+        param['name'] for param in all_platform_params_dicts)
+    if parameter_name not in all_platform_params_names_set:
+        raise PlatformParameterNotFoundException(
+            'Unknown platform parameter: %s.' % parameter_name)
+
+    context = _create_evaluation_context_for_server()
+    param = registry.Registry.get_platform_parameter(parameter_name)
+    return param.evaluate(context)
