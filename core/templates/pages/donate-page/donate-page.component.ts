@@ -16,7 +16,7 @@
  * @fileoverview Component for the donate page.
  */
 
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, Renderer2} from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { TranslateService } from '@ngx-translate/core';
 import { Subscription } from 'rxjs';
@@ -59,10 +59,16 @@ export class DonatePageComponent implements OnInit, OnDestroy {
     private translateService: TranslateService,
     private alertsService: AlertsService,
     private mailingListBackendApiService: MailingListBackendApiService,
-    private ngbModal: NgbModal
+    private ngbModal: NgbModal,
+    private renderer2: Renderer2
   ) {}
 
   ngOnInit(): void {
+    const scriptElement = document.createElement('script');
+    scriptElement.src = 'https://donorbox.org/widget.js';
+    scriptElement.setAttribute('paypalExpress', 'false');
+    scriptElement.async = true;
+    this.renderer2.appendChild(document.body, scriptElement)
     this.windowIsNarrow = this.windowDimensionService.isWindowNarrow();
     this.donateImgUrl = this.getStaticImageUrl('/general/opp_donate_text.svg');
     this.directiveSubscriptions.add(
