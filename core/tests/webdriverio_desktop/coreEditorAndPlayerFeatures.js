@@ -190,8 +190,8 @@ describe('Enable correctness feedback and set correctness', function() {
       await testEnableCorrectnessInPlayerPage();
     });
 
-  it('should show Learn Again button correctly', async function() {
-    await workflow.createExploration(false);
+  fit('should show Learn Again button correctly', async function() {
+    await workflow.createExploration(true);
     await explorationEditorPage.navigateToSettingsTab();
     await explorationEditorSettingsTab.setTitle(explorationTitle);
     await explorationEditorSettingsTab.setCategory('Algorithm');
@@ -261,6 +261,7 @@ describe('Enable correctness feedback and set correctness', function() {
     await explorationPlayerPage.expectNextCardButtonTextToBe('LEARN AGAIN');
     await explorationPlayerPage.clickThroughToNextCard();
 
+    await explorationPlayerPage.dismissLessonInfoTooltip();
     await explorationPlayerPage.submitAnswer.apply(null, correctOptions[0]);
     await explorationPlayerPage.expectNextCardButtonTextToBe('CONTINUE');
     await explorationPlayerPage.clickThroughToNextCard();
