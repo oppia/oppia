@@ -34,6 +34,7 @@ import { EditableStoryBackendApiService } from '../../../domain/story/editable-s
 import { SkillBackendApiService } from '../../../domain/skill/skill-backend-api.service';
 import { TopicsAndSkillsDashboardBackendApiService } from '../../../domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { PlatformFeatureService } from '../../../services/platform-feature.service';
 
 class MockNgbModalRef {
   componentInstance: {
@@ -89,6 +90,13 @@ class MockSkillBackendApiService {
   };
 }
 
+class MockPlatformFeatureService {
+  status = {
+    SerialChapterLaunchCurriculumAdminView: {
+      isEnabled: false
+    }
+  };
+}
 
 describe('Story node editor component', () => {
   let fixture: ComponentFixture<StoryNodeEditorComponent>;
@@ -102,6 +110,7 @@ describe('Story node editor component', () => {
   let alertsService: AlertsService;
   let storyEditorStateService: StoryEditorStateService;
   let focusManagerService: FocusManagerService;
+  let mockPlatformFeatureService = new MockPlatformFeatureService();
   let mockEventEmitterLast = new EventEmitter();
 
   beforeEach(waitForAsync(() => {
@@ -118,6 +127,10 @@ describe('Story node editor component', () => {
         StoryEditorStateService,
         FocusManagerService,
         EditableStoryBackendApiService,
+        {
+          provide: PlatformFeatureService,
+          useValue: mockPlatformFeatureService
+        },
         {
           provide: SkillBackendApiService,
           useClass: MockSkillBackendApiService
@@ -174,7 +187,8 @@ describe('Story node editor component', () => {
             destination_node_ids: [],
             outline: 'Outline',
             exploration_id: null,
-            outline_is_finalized: false
+            outline_is_finalized: false,
+            planned_publication_date_msecs: 168960000000
           }, {
             id: 'node_2',
             title: 'Title 2',
@@ -230,6 +244,14 @@ describe('Story node editor component', () => {
     expect(component.chapterPreviewCardIsShown).toEqual(false);
     expect(component.mainChapterCardIsShown).toEqual(true);
     expect(component.explorationInputButtonsAreShown).toEqual(false);
+  });
+
+  it('should get status of Serial Chapter Launch Feature flag', () => {
+    expect(component.isSerialChapterFeatureFlagEnabled()).toEqual(false);
+
+    mockPlatformFeatureService.
+      status.SerialChapterLaunchCurriculumAdminView.isEnabled = true;
+    expect(component.isSerialChapterFeatureFlagEnabled()).toEqual(true);
   });
 
   it('should return skill editor URL', () => {
@@ -310,37 +332,49 @@ describe('Story node editor component', () => {
   it('should call StoryUpdate service to set story thumbnail filename',
     () => {
       let storySpy = spyOn(storyUpdateService, 'setStoryNodeThumbnailFilename');
+      let currentNodeIsPublishableSpy = spyOn(
+        component, 'updateCurrentNodeIsPublishable');
 
       component.updateThumbnailFilename('new_file.png');
 
       expect(storySpy).toHaveBeenCalled();
+      expect(currentNodeIsPublishableSpy).toHaveBeenCalled();
     });
 
   it('should call StoryUpdate service to set story thumbnail filename',
     () => {
       let storySpy = spyOn(storyUpdateService, 'setStoryNodeThumbnailBgColor');
+      let currentNodeIsPublishableSpy = spyOn(
+        component, 'updateCurrentNodeIsPublishable');
 
       component.updateThumbnailBgColor('#333');
 
       expect(storySpy).toHaveBeenCalled();
+      expect(currentNodeIsPublishableSpy).toHaveBeenCalled();
     });
 
   it('should call StoryUpdate service to finalize story node outline',
     () => {
       let storySpy = spyOn(storyUpdateService, 'unfinalizeStoryNodeOutline');
+      let currentNodeIsPublishableSpy = spyOn(
+        component, 'updateCurrentNodeIsPublishable');
 
       component.unfinalizeOutline();
 
       expect(storySpy).toHaveBeenCalled();
+      expect(currentNodeIsPublishableSpy).toHaveBeenCalled();
     });
 
   it('should call StoryUpdate service to finalize story node outline',
     () => {
       let storySpy = spyOn(storyUpdateService, 'finalizeStoryNodeOutline');
+      let currentNodeIsPublishableSpy = spyOn(
+        component, 'updateCurrentNodeIsPublishable');
 
       component.finalizeOutline();
 
       expect(storySpy).toHaveBeenCalled();
+      expect(currentNodeIsPublishableSpy).toHaveBeenCalled();
     });
 
   it('should call StoryUpdate service to update outline', () => {
@@ -353,10 +387,73 @@ describe('Story node editor component', () => {
 
   it('should call StoryUpdate service to update description', () => {
     let storySpy = spyOn(storyUpdateService, 'setStoryNodeDescription');
+    let currentNodeIsPublishableSpy = spyOn(
+      component, 'updateCurrentNodeIsPublishable');
 
     component.updateDescription('New description');
 
     expect(storySpy).toHaveBeenCalled();
+    expect(currentNodeIsPublishableSpy).toHaveBeenCalled();
+  });
+
+  it('should call StoryUpdate service to update planned publication date',
+    fakeAsync(() => {
+      let storySpy = spyOn(
+        storyUpdateService, 'setStoryNodePlannedPublicationDateMsecs');
+      let currentNodeIsPublishableSpy = spyOn(
+        component, 'updateCurrentNodeIsPublishable');
+
+      component.plannedPublicationDate = null;
+      component.updatePlannedPublicationDate(null);
+      expect(currentNodeIsPublishableSpy).toHaveBeenCalled();
+      expect(storyUpdateService.setStoryNodePlannedPublicationDateMsecs).
+        toHaveBeenCalledTimes(0);
+
+      let oldDateString = '2000-09-09';
+      component.updatePlannedPublicationDate(oldDateString);
+      expect(currentNodeIsPublishableSpy).toHaveBeenCalled();
+      expect(storyUpdateService.setStoryNodePlannedPublicationDateMsecs).
+        toHaveBeenCalledTimes(0);
+      expect(component.plannedPublicationDate).toBe(null);
+      expect(component.plannedPublicationDateIsInPast).toBeTrue();
+      tick(5000);
+      expect(component.plannedPublicationDateIsInPast).toBeFalse();
+
+      let futureDateString = '2037-04-20';
+      component.updatePlannedPublicationDate(futureDateString);
+      let futureDate = new Date(futureDateString);
+      expect(storySpy).toHaveBeenCalledWith(
+        component.story, component.nodeId, futureDate.getTime());
+      expect(currentNodeIsPublishableSpy).toHaveBeenCalled();
+
+      component.updatePlannedPublicationDate('');
+      expect(storySpy).toHaveBeenCalled();
+      expect(currentNodeIsPublishableSpy).toHaveBeenCalled();
+      expect(component.plannedPublicationDate).toBe(null);
+
+      component.plannedPublicationDate = new Date();
+      component.updatePlannedPublicationDate(oldDateString);
+      expect(storySpy).toHaveBeenCalled();
+      flush();
+    }));
+
+  it('should update check if current node can be changed to' +
+  'Ready To Publish', () => {
+    let currentNodeIsPublishableSpy = spyOn(
+      storyEditorStateService, 'setCurrentNodeAsPublishable');
+    component.updateCurrentNodeIsPublishable();
+
+    expect(currentNodeIsPublishableSpy).toHaveBeenCalledWith(false);
+
+    component.outlineIsFinalized = true;
+    component.editableThumbnailBgColor = '#fff';
+    component.explorationId = 'exp_1';
+    component.currentTitle = 'title';
+    component.currentDescription = 'desc';
+    component.plannedPublicationDate = new Date();
+    component.updateCurrentNodeIsPublishable();
+
+    expect(currentNodeIsPublishableSpy).toHaveBeenCalledWith(true);
   });
 
   it('should open and close node title editor', () => {
@@ -621,8 +718,11 @@ describe('Story node editor component', () => {
   it('should call StoryUpdate service to set story node title', () => {
     let storyUpdateSpy = spyOn(
       storyUpdateService, 'setStoryNodeTitle');
+    let currentNodeIsPublishableSpy = spyOn(
+      component, 'updateCurrentNodeIsPublishable');
     component.updateTitle('Title 10');
     expect(storyUpdateSpy).toHaveBeenCalled();
+    expect(currentNodeIsPublishableSpy).toHaveBeenCalled();
   });
 
   it('should not call StoryUpdate service to set story node title and ' +

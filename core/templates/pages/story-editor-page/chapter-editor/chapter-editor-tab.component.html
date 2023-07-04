@@ -1,6 +1,6 @@
 <p class="oppia-mobile-back-to-parent" (click)="navigateToStoryEditor()">
   <i class="fa fa-angle-left"></i>
-  <span>Back to Story</span>
+  <span class="story-node-breadcrumb">Back to Story</span>
 </p>
 <div class="story-chapter-name">
   <span class="story-name e2e-test-back-to-story-editor-button" (click)="navigateToStoryEditor()">
@@ -20,10 +20,14 @@
                            [outlineIsFinalized]="node.getOutlineStatus()"
                            [destinationNodeIds]="node.getDestinationNodeIds()"
                            [prerequisiteSkillIds]="node.getPrerequisiteSkillIds()"
-                           [acquiredSkillIds]="node.getAcquiredSkillIds()">
+                           [acquiredSkillIds]="node.getAcquiredSkillIds()"
+                           [plannedPublicationDateMsecs]="node.getPlannedPublicationDateMsecs()">
   </oppia-story-node-editor>
 </div>
 <style>
+  .story-node-breadcrumb {
+    margin-left: 2%;
+  }
   .story-chapter-name {
     font-size: 15px;
     margin-bottom: 35px;
