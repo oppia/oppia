@@ -20,7 +20,7 @@
     <div class="row oppia-feature-top-margin">
       <div class="col-2"><b>Default:</b></div>
       <div *ngIf="featureFlag.rules.length === 0" class="col-10">
-        <select [(ngModel)]="featureFlag.defaultValue" class="e2e-test-feature-default-value-selector">
+        <select [(ngModel)]="featureFlag.defaultValue">
           <option [ngValue]="true">Enabled</option>
           <option [ngValue]="false">Disabled</option>
         </select>
