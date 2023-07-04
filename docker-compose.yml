@@ -148,7 +148,7 @@ services:
       '  
 
   redis:
-    image: redis:7.0-alpine
+    image: redis@sha256:aebc052b5a7f50d79f00a4deee22109e2ecf22f439140a03f2c9770055ffec7b
     container_name: oppia-redis
     ports:
       - "6379:6379"
@@ -162,10 +162,10 @@ services:
       retries: 5
     volumes:
       - shared_root_dir:/app/oppia
-    command: redis-server --bind 0.0.0.0 --port 6379 --save "60 1" --tcp-keepalive 300 --dbfilename dump.rdb --dir /app/oppia/ --rdbcompression yes
+    command: redis-server /app/oppia/redis_docker.conf
 
   elasticsearch:
-    image: elasticsearch:7.17.0
+    image: elasticsearch@sha256:fa7141154a7e14df214e42f08c333702403eb88c02ba44e79322a1f42d733013
     container_name: oppia-elasticsearch
     ports:
       - "9200:9200"
