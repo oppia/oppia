@@ -85,7 +85,6 @@ export class ExplorationDataService {
     }
   }
 
-
   private async _autosaveChangeListAsync(
       changeList: ExplorationChange[]): Promise<DraftAutoSaveResponse> {
     this.localStorageService.saveExplorationDraft(
