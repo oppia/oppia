@@ -8,19 +8,19 @@ ENV oppia_is_dockerized="true"
 
 # installing the pre-requisites libs and dependencies
 RUN apt-get update -y && apt-get upgrade -y \
+    chromium \
     curl \
-    wget \
     git \
-    python3-dev \
-    python3-setuptools \
-    python3-pip \
-    unzip \
-    python3-yaml \
-    python3-matplotlib \
     npm \
-    python2 \
     openjdk-11-jre \
-    chromium
+    python2 \
+    python3-dev \
+    python3-matplotlib \
+    python3-pip \
+    python3-setuptools \
+    python3-yaml \
+    unzip \
+    wget
 
 RUN curl -fsSL https://deb.nodesource.com/setup_16.x | bash -
 RUN apt-get install -y nodejs
@@ -29,10 +29,10 @@ RUN pip install --upgrade pip==21.2.3
 RUN pip install pip-tools==6.6.2 setuptools==58.5.3 cmake
 
 # installing google cloud sdk
-RUN wget -O gcloud-sdk.tar.gz https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-sdk-364.0.0-linux-x86_64.tar.gz
-RUN tar -xzf gcloud-sdk.tar.gz
-RUN ./google-cloud-sdk/install.sh --quiet
-RUN rm gcloud-sdk.tar.gz
+RUN wget -O gcloud-sdk.tar.gz https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-sdk-364.0.0-linux-x86_64.tar.gz \
+    tar -xzf gcloud-sdk.tar.gz \
+    ./google-cloud-sdk/install.sh --quiet \
+    rm gcloud-sdk.tar.gz
 
 WORKDIR /app/oppia
 
