@@ -327,7 +327,6 @@ describe('Goals tab Component', () => {
     expect(learnerGoalsSpy).not.toHaveBeenCalled();
   });
 
-
   it('should remove topic from the learner goals', () => {
     expect(learnerDashboardActivityBackendApiService.removeActivityModalStatus)
       .toBeUndefined;
