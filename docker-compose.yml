@@ -78,7 +78,7 @@ services:
       start_period: 20m
     entrypoint: >
       sh -c '
-        /google-cloud-sdk/bin/dev_appserver.py /app/oppia/app_dev_docker.yaml \
+        /app/google-cloud-sdk/bin/dev_appserver.py /app/oppia/app_dev_docker.yaml \
         --runtime python38 \
         --host=0.0.0.0 \
         --port=8181 \
@@ -112,7 +112,7 @@ services:
       start_period: 20m
     entrypoint: >
       sh -c '
-        /google-cloud-sdk/bin/gcloud beta emulators datastore start \
+        /app/google-cloud-sdk/bin/gcloud beta emulators datastore start \
         --project dev-project-id \
         --data-dir /app/cloud_datastore_emulator_cache \
         --host-port 0.0.0.0:8089 \
