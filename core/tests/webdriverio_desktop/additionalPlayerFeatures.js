@@ -260,9 +260,7 @@ describe('Full exploration editor', function() {
 
       await explorationPlayerPage.expectContentToMatch(
         await forms.toRichText('this is card 1'));
-      var generateAttribution = $('.e2e-test-generate-attribution');
-      await action.click('Generate attribution', generateAttribution);
-      await action.click('Generate attribution', generateAttribution);
+      await explorationPlayerPage.dismissLessonInfoTooltip();
       await explorationPlayerPage.submitAnswer('NumericInput', 21);
       await explorationPlayerPage.expectContentToMatch(
         await forms.toRichText('this is card 2 with previous answer 21'));
