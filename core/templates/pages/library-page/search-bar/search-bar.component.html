@@ -31,7 +31,7 @@
             class="btn e2e-test-search-bar-dropdown-toggle oppia-search-bar-dropdown-toggle oppia-search-bar-input oppia-search-bar-category-input dropdown-toggle catbtn"
             title="{{ selectionDetails.categories.description | translate }}">
       <i *ngIf="isMobileViewActive()" class="fas fa-shapes category-selector-icon"></i>
-      <span class="btn-text">
+      <span class="btn-text spnel">
         {{ categoryButtonText | truncate:14 }}
       </span>
     </button>
@@ -91,7 +91,7 @@
             class="btn e2e-test-search-bar-dropdown-toggle oppia-search-bar-input oppia-search-bar-language-input dropdown-toggle language-dropdown-toggle oppia-search-bar-dropdown-toggle-button langbtn"
             title="{{selectionDetails.languageCodes.description | translate}}">
       <i *ngIf="isMobileViewActive()" class="fas fa-globe language-selector-icon"></i>
-      <span class="btn-text">
+      <span class="btn-text spnel">
         {{ languageButtonText | truncate:14 }}
       </span>
     </button>
@@ -149,7 +149,14 @@
   </div>
 </div>
 <style>
+      :lang(ar) .oppia-search-bar-dropdown-toggle-button:after {
+ margin-right: 10px;
+    }
+    :lang(ar) .oppia-search-bar-dropdown-toggle:after {
+      margin-right : 8px;
+    }
   @media (max-width: 445px){
+
   .inptcls{
     width: 14em !important;
     font-size: 15.7px !important;
@@ -171,17 +178,18 @@
     font-size: 12px !important;
   }
   :lang(ar) .catbtn{
-width : 10em !important; 
+width : 11em !important; 
  font-size: 13px !important;
  position: relative;
  right : 9rem; 
   }
   :lang(ar) .langbtn{
-  width : 10em !important; 
+  width : 9em !important; 
  font-size: 13px !important;
  position: relative;
  right : 10rem; 
  padding-left: 3rem;
+ display: flex;
   }
 }
 @media (max-width : 340px){

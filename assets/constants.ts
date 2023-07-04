@@ -7058,5 +7058,5 @@ export default {
   "CONTRIBUTOR_CERTIFICATE_WIDTH": 1493,
   "CONTRIBUTOR_CERTIFICATE_HEIGHT": 1313,
   "BRANCH_NAME": "responsive-langbtn",
-  "SHORT_COMMIT_HASH": "b550fab54"
+  "SHORT_COMMIT_HASH": "41e50c8c2"
 } as const;
