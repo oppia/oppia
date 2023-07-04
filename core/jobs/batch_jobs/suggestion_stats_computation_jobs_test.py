@@ -1880,6 +1880,8 @@ class AuditGenerateContributionStatsJobTests(job_test_utils.JobTestBase):
     def test_creates_question_stats_models_from_one_accepted_suggestion(
         self
     ) -> None:
+        self._create_question()
+
         self.assert_job_output_is([
             job_run_result.JobRunResult(stdout='SUCCESS: 1'),
             job_run_result.JobRunResult(stdout='SUCCESS: 1')
