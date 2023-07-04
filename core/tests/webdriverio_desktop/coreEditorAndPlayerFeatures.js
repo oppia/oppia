@@ -190,7 +190,7 @@ describe('Enable correctness feedback and set correctness', function() {
       await testEnableCorrectnessInPlayerPage();
     });
 
-  fit('should show Learn Again button correctly', async function() {
+  it('should show Learn Again button correctly', async function() {
     await workflow.createExploration(true);
     await explorationEditorPage.navigateToSettingsTab();
     await explorationEditorSettingsTab.setTitle(explorationTitle);
