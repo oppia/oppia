@@ -21,7 +21,7 @@ RUN yarn install --network-timeout 1000000
 # added platform flag here because -- https://stackoverflow.com/questions/71040681/qemu-x86-64-could-not-open-lib64-ld-linux-x86-64-so-2-no-such-file-or-direc
 FROM --platform=linux/amd64 python@sha256:90834dba6381dfc3957573dc7a3e6c5c8ed255cf60079329a6da2b5e6d4257b8 AS backend
 
-WORKDIR /app
+WORKDIR /
 
 ENV oppia_is_dockerized="true"
 
