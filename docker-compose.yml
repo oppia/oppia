@@ -161,7 +161,7 @@ services:
       interval: 30s
       retries: 5
     volumes:
-      - shared_root_dir:/app/oppia
+      - oppia_redis_dump:/app/oppia/dump.db
     command: redis-server /app/oppia/redis_docker.conf
 
   elasticsearch:
