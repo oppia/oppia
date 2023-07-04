@@ -14,7 +14,7 @@
       </div>
       <div class="filter-container">
         <span>Filter</span>
-        <input class="oppia-autofocus" type="text" (change)="filterByUsername()" [(ngModel)]="username" placeholder="Search for a user" oppiaFocusOn="usernameInputField">
+        <input class="oppia-autofocus history-filter-input" type="text" (change)="filterByUsername()" [(ngModel)]="username" placeholder="Search for a user" oppiaFocusOn="usernameInputField">
         <i class="fa fa-search"></i>
       </div>
       <div class="history-table-header">
@@ -410,7 +410,7 @@
       width: 100%;
     }
 
-    .filter-container input {
+    .filter-container .history-filter-input {
       width: 70%;
     }
 
