@@ -3130,6 +3130,27 @@ def update_question_contribution_stats_at_review(
     suggestion_is_accepted = (
         suggestion.status == suggestion_models.STATUS_ACCEPTED
     )
+
+    accepted_questions_count = 0
+    accepted_questions_without_reviewer_edits_count = 0
+    rejected_questions_count = 0
+    if suggestion_is_accepted:
+        accepted_questions_count += 1
+        recent_review_outcomes = [
+            suggestion_models.REVIEW_OUTCOME_ACCEPTED_WITH_EDITS]
+        recent_performance = 1
+        overall_accuracy = 100.0
+    else:
+        rejected_questions_count += 1
+        recent_review_outcomes = [
+            suggestion_models.REVIEW_OUTCOME_REJECTED]
+        recent_performance = -2
+        overall_accuracy = 0.0
+    if suggestion_is_accepted and not suggestion.edited_by_reviewer:
+        accepted_questions_without_reviewer_edits_count += 1
+        recent_review_outcomes = [
+            suggestion_models.REVIEW_OUTCOME_ACCEPTED]
+
     for topic in skill_services.get_all_topic_assignments_for_skill(
         suggestion.target_id):
         question_contribution_stat_model = (
@@ -3138,12 +3159,6 @@ def update_question_contribution_stats_at_review(
             ))
 
         if question_contribution_stat_model is None:
-            accepted_questions_count = 0
-            accepted_questions_without_reviewer_edits_count = 0
-            if suggestion_is_accepted:
-                accepted_questions_count += 1
-            if suggestion_is_accepted and not suggestion.edited_by_reviewer:
-                accepted_questions_without_reviewer_edits_count += 1
             suggestion_models.QuestionContributionStatsModel.create(
                 contributor_user_id=suggestion.author_id,
                 topic_id=topic.topic_id,
@@ -3177,26 +3192,6 @@ def update_question_contribution_stats_at_review(
             .get_by_id(
                 suggestion.author_id
             ))
-
-        accepted_questions_count = 0
-        accepted_questions_without_reviewer_edits_count = 0
-        rejected_questions_count = 0
-        if suggestion_is_accepted:
-            accepted_questions_count += 1
-            recent_review_outcomes = [
-                suggestion_models.REVIEW_OUTCOME_ACCEPTED_WITH_EDITS]
-            recent_performance = 1
-            overall_accuracy = 100.0
-        else:
-            rejected_questions_count += 1
-            recent_review_outcomes = [
-                suggestion_models.REVIEW_OUTCOME_REJECTED]
-            recent_performance = -2
-            overall_accuracy = 0.0
-        if suggestion_is_accepted and not suggestion.edited_by_reviewer:
-            accepted_questions_without_reviewer_edits_count += 1
-            recent_review_outcomes = [
-                suggestion_models.REVIEW_OUTCOME_ACCEPTED]
 
         if question_submitter_total_stat_model is None:
             suggestion_models.QuestionSubmitterTotalContributionStatsModel.create( # pylint: disable=line-too-long
