@@ -644,9 +644,6 @@ class PlatformParameterRule:
 
     def validate(self) -> None:
         """Validates the PlatformParameterRule domain object."""
-        if len(self._filters) <= 0:
-            raise utils.ValidationError(
-                'Filters inside the rules cannot be empty.')
         for filter_domain_object in self._filters:
             filter_domain_object.validate()
 
@@ -835,6 +832,20 @@ class PlatformParameter:
         if self._is_feature:
             self._validate_feature_flag()
 
+    def _get_server_mode(self) -> ServerMode:
+        """Returns the current server mode.
+
+        Returns:
+            ServerMode. The current server mode.
+        """
+        return (
+            ServerMode.DEV
+            if constants.DEV_MODE
+            else ServerMode.PROD
+            if feconf.ENV_IS_OPPIA_ORG_PRODUCTION_SERVER
+            else ServerMode.TEST
+        )
+
     def evaluate(
         self, context: EvaluationContext
     ) -> PlatformDataTypes:
@@ -853,6 +864,19 @@ class PlatformParameter:
             *. The evaluate result of the platform parameter.
         """
         if context.is_valid:
+            if self._is_feature:
+                server_mode = self._get_server_mode().value
+                if (
+                    server_mode == ServerMode.TEST.value and
+                    self._feature_stage == ServerMode.DEV.value
+                ):
+                    return False
+                if (
+                    server_mode == ServerMode.PROD.value and
+                    self._feature_stage in (
+                        ServerMode.DEV.value, ServerMode.TEST.value)
+                ):
+                    return False
             for rule in self._rules:
                 if rule.evaluate(context):
                     return rule.value_when_matched
@@ -892,29 +916,23 @@ class PlatformParameter:
                 'Invalid feature stage, got \'%s\', expected one of %s.' % (
                     self._feature_stage, ALLOWED_FEATURE_STAGES))
 
-        server_mode = (
-            ServerMode.DEV
-            if constants.DEV_MODE
-            else ServerMode.PROD
-            if feconf.ENV_IS_OPPIA_ORG_PRODUCTION_SERVER
-            else ServerMode.TEST
-        )
+        server_mode = self._get_server_mode().value
         if (
-            server_mode.value == ServerMode.TEST.value and
+            server_mode == ServerMode.TEST.value and
             self._feature_stage == ServerMode.DEV.value
         ):
             raise utils.ValidationError(
-                'Feature in %s stage cannot be enabled in %s environment.' % (
-                    self._feature_stage, server_mode.value
+                'Feature in %s stage cannot be updated in %s environment.' % (
+                    self._feature_stage, server_mode
                 )
             )
         if (
-            server_mode.value == ServerMode.PROD.value and
+            server_mode == ServerMode.PROD.value and
             self._feature_stage in (ServerMode.DEV.value, ServerMode.TEST.value)
         ):
             raise utils.ValidationError(
-                'Feature in %s stage cannot be enabled in %s environment.' % (
-                    self._feature_stage, server_mode.value
+                'Feature in %s stage cannot be updated in %s environment.' % (
+                    self._feature_stage, server_mode
                 )
             )
 

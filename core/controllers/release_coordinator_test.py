@@ -145,18 +145,6 @@ class FeatureFlagsHandlerTest(test_utils.GenericTestBase):
     def test_without_commit_message_action_update_feature_flag_is_not_performed(
         self
     ) -> None:
-        new_rule_dicts = [
-            {
-                'filters': [
-                    {
-                        'type': 'platform_type',
-                        'conditions': [['=', 'Backend']]
-                    }
-                ],
-                'value_when_matched': True
-            }
-        ]
-
         self.login(self.RELEASE_COORDINATOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
@@ -171,7 +159,7 @@ class FeatureFlagsHandlerTest(test_utils.GenericTestBase):
                 feconf.FEATURE_FLAGS_URL, {
                     'action': 'update_feature_flag',
                     'feature_name': 'new_feature',
-                    'new_rules': new_rule_dicts,
+                    'new_rules': [],
                     'commit_message': None
                 }, csrf_token=csrf_token)
 
@@ -248,18 +236,6 @@ class FeatureFlagsHandlerTest(test_utils.GenericTestBase):
         self.login(self.RELEASE_COORDINATOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
-        new_rule_dicts = [
-            {
-                'filters': [
-                    {
-                        'type': 'platform_type',
-                        'conditions': [['=', 'Backend']]
-                    }
-                ],
-                'value_when_matched': True
-            }
-        ]
-
         feature_list_ctx = self.swap(
             platform_feature_services, 'ALL_FEATURE_FLAGS', [])
         feature_set_ctx = self.swap(
@@ -269,7 +245,7 @@ class FeatureFlagsHandlerTest(test_utils.GenericTestBase):
                 feconf.FEATURE_FLAGS_URL, {
                     'action': 'update_feature_flag',
                     'feature_name': 'test_feature_1',
-                    'new_rules': new_rule_dicts,
+                    'new_rules': [],
                     'commit_message': 'test update feature',
                     'default_value': False
                 },
@@ -290,7 +266,12 @@ class FeatureFlagsHandlerTest(test_utils.GenericTestBase):
             ParamNames.TEST_FEATURE_2, 'feature for test.', FeatureStages.DEV)
         new_rule_dicts = [
             {
-                'filters': [],
+                'filters': [
+                    {
+                        'type': 'app_version',
+                        'conditions': [['!', '1.2.3']]
+                    }
+                ],
                 'value_when_matched': True
             }
         ]
@@ -315,8 +296,9 @@ class FeatureFlagsHandlerTest(test_utils.GenericTestBase):
             )
             self.assertEqual(
                 response['error'],
-                'Schema validation for \'new_rules\' failed: Filters inside '
-                'the rules cannot be empty.')
+                'Schema validation for \'new_rules\' failed: '
+                'Unsupported comparison operator \'!\' for app_version filter, '
+                'expected one of [\'=\', \'<\', \'<=\', \'>\', \'>=\'].')
 
         platform_parameter_registry.Registry.parameter_registry.pop(
             feature.name)
@@ -327,18 +309,6 @@ class FeatureFlagsHandlerTest(test_utils.GenericTestBase):
     ) -> None:
         self.login(self.RELEASE_COORDINATOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
-
-        new_rule_dicts = [
-            {
-                'filters': [
-                    {
-                        'type': 'platform_type',
-                        'conditions': [['=', 'Backend']]
-                    }
-                ],
-                'value_when_matched': True
-            }
-        ]
 
         feature_list_ctx = self.swap(
             platform_feature_services, 'ALL_FEATURE_FLAGS',
@@ -357,7 +327,7 @@ class FeatureFlagsHandlerTest(test_utils.GenericTestBase):
                 feconf.FEATURE_FLAGS_URL, {
                     'action': 'update_feature_flag',
                     'feature_name': ParamNames.TEST_FEATURE_2.value,
-                    'new_rules': new_rule_dicts,
+                    'new_rules': [],
                     'commit_message': 'test update feature',
                     'default_value': False
                 },

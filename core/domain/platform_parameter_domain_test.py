@@ -22,6 +22,7 @@ import collections
 
 from core import feconf
 from core import utils
+from core.constants import constants
 from core.domain import platform_parameter_domain as parameter_domain
 from core.tests import test_utils
 
@@ -1277,7 +1278,7 @@ class PlatformParameterFilterTests(test_utils.GenericTestBase):
     ) -> None:
         filter_dict: parameter_domain.PlatformParameterFilterDict = {
             'type': 'browser_type',
-            'conditions': [['=', 'Chrome']]
+            'conditions': [['=', 'Chrome'], ['=', 'Safari']]
         }
         filter_domain = (
             parameter_domain
@@ -1918,7 +1919,7 @@ class PlatformParameterTests(test_utils.GenericTestBase):
         dev_context = parameter_domain.EvaluationContext.from_dict(
             {
                 'platform_type': 'invalid',
-                'browser_type': 'Chrome',
+                'browser_type': None,
                 'app_version': '1.2.3',
             },
             {
@@ -1955,7 +1956,7 @@ class PlatformParameterTests(test_utils.GenericTestBase):
         dev_context = parameter_domain.EvaluationContext.from_dict(
             {
                 'platform_type': '',
-                'browser_type': 'Chrome',
+                'browser_type': None,
                 'app_version': '1.2.3',
             },
             {
@@ -2021,12 +2022,10 @@ class PlatformParameterTests(test_utils.GenericTestBase):
             utils.ValidationError, 'Invalid feature stage, got \'Invalid\''):
             parameter.validate()
 
-    def test_validate_feature_with_no_mode_filter_raises_exception(
-        self
-    ) -> None:
+    def test_validate_dev_feature_for_test_env_raises_exception(self) -> None:
         parameter = parameter_domain.PlatformParameter.from_dict({
             'name': 'parameter_a',
-            'description': 'for test',
+            'description': '',
             'data_type': 'bool',
             'rules': [
                 {
@@ -2040,9 +2039,68 @@ class PlatformParameterTests(test_utils.GenericTestBase):
             'is_feature': True,
             'feature_stage': 'dev',
         })
-        with self.assertRaisesRegex(
-            utils.ValidationError, 'Filters inside the rules cannot be empty.'):
-            parameter.validate()
+        with self.swap(constants, 'DEV_MODE', False):
+            with self.swap(feconf, 'ENV_IS_OPPIA_ORG_PRODUCTION_SERVER', False):
+                with self.assertRaisesRegex(
+                    utils.ValidationError,
+                    'Feature in dev stage cannot be updated in test '
+                    'environment.'
+                ):
+                    parameter.validate()
+
+    def test_validate_dev_feature_for_prod_env_raises_exception(self) -> None:
+        parameter = parameter_domain.PlatformParameter.from_dict({
+            'name': 'parameter_a',
+            'description': '',
+            'data_type': 'bool',
+            'rules': [
+                {
+                    'filters': [],
+                    'value_when_matched': True
+                }
+            ],
+            'rule_schema_version': (
+                feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION),
+            'default_value': False,
+            'is_feature': True,
+            'feature_stage': 'dev',
+        })
+        with self.swap(constants, 'DEV_MODE', False):
+            with self.swap(feconf, 'ENV_IS_OPPIA_ORG_PRODUCTION_SERVER', True):
+                with self.assertRaisesRegex(
+                    utils.ValidationError,
+                    'Feature in dev stage cannot be updated in prod '
+                    'environment.'
+                ):
+                    parameter.validate()
+
+    def test_validate_test_feature_for_prod_env_raises_exception(
+        self
+    ) -> None:
+        parameter = parameter_domain.PlatformParameter.from_dict({
+            'name': 'parameter_a',
+            'description': '',
+            'data_type': 'bool',
+            'rules': [
+                {
+                    'filters': [],
+                    'value_when_matched': True
+                }
+            ],
+            'rule_schema_version': (
+                feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION),
+            'default_value': False,
+            'is_feature': True,
+            'feature_stage': 'test',
+        })
+        with self.swap(constants, 'DEV_MODE', False):
+            with self.swap(feconf, 'ENV_IS_OPPIA_ORG_PRODUCTION_SERVER', True):
+                with self.assertRaisesRegex(
+                    utils.ValidationError,
+                    'Feature in test stage cannot be updated in prod '
+                    'environment.'
+                ):
+                    parameter.validate()
 
     def test_serialize_and_deserialize_returns_unchanged_platform_parameter(
         self

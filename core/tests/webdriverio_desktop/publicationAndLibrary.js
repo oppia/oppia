@@ -58,8 +58,7 @@ describe('Library index page', function() {
     await releaseCoordinatorPage.getFeaturesTab();
     improvementsTabFeature = (
       await releaseCoordinatorPage.getImprovementsTabFeatureElement());
-    await releaseCoordinatorPage.enableDefaultValueOfFeature(
-      improvementsTabFeature);
+    await releaseCoordinatorPage.enableFeature(improvementsTabFeature);
     await users.logout();
   });
 

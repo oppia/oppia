@@ -23,6 +23,8 @@ var waitFor = require('./waitFor.js');
 
 var ReleaseCoordinatorPage = function() {
   var RELEASE_COORDINATOR_URL_SUFFIX = '/release-coordinator';
+  var addConditionButtonLocator = '.e2e-test-add-condition-button';
+  var addFeatureRuleButtonLocator = '.e2e-test-feature-add-rule-button';
   var featureFlagElementsSelector = function() {
     return $$('.e2e-test-feature-flag');
   };
@@ -32,6 +34,9 @@ var ReleaseCoordinatorPage = function() {
   var noRuleIndicatorLocator = '.e2e-test-no-rule-indicator';
   var removeRuleButtonLocator = '.e2e-test-remove-rule-button';
   var saveButtonLocator = '.e2e-test-save-button';
+  var serverModeSelectorLocator = '.e2e-test-server-mode-selector';
+  var removeFilterConditionLocator = '.e2e-test-remove-condition';
+  var valueSelectorLocator = '.e2e-test-value-selector';
   var featureDefaultValueSelectorLocator = (
     '.e2e-test-feature-default-value-selector');
   var statusMessage = $('.e2e-test-status-message');
@@ -120,11 +125,35 @@ var ReleaseCoordinatorPage = function() {
     return null;
   };
 
-  this.enableDefaultValueOfFeature = async function(featureElement) {
+  this.enableFeature = async function(featureElement) {
     await this.removeAllRulesOfFeature(featureElement);
 
-    await (featureElement.$(
-      featureDefaultValueSelectorLocator)).selectByVisibleText('Enabled');
+    await action.click(
+      'Add feature rule button',
+      featureElement
+        .$(addFeatureRuleButtonLocator)
+    );
+    await waitFor.visibilityOf(
+      featureElement.$(valueSelectorLocator),
+      'Value Selector takes too long to appear'
+    );
+
+    await (featureElement.$(valueSelectorLocator)).selectByVisibleText(
+      'Enabled');
+    await action.click(
+      'Add condition button',
+      featureElement
+        .$(addConditionButtonLocator)
+    );
+    await waitFor.visibilityOf(
+      featureElement.$(serverModeSelectorLocator),
+      'Value Selector takes too long to appear'
+    );
+
+    await action.click(
+      'Remove filter condition',
+      featureElement.$(removeFilterConditionLocator)
+    );
 
     await this.saveChangeOfFeature(featureElement);
   };

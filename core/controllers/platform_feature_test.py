@@ -215,14 +215,17 @@ class PlatformFeatureDummyHandlerTest(test_utils.GenericTestBase):
         super().tearDown()
 
     def _set_dummy_feature_status(
-        self, is_enabled: bool) -> None:
+        self, feature_is_enabled: bool) -> None:
         """Enables the dummy_feature for the dev environment."""
         feature_services.update_feature_flag(
             param_list.ParamNames.DUMMY_FEATURE_FLAG_FOR_E2E_TESTS.value,
             self.user_id,
             'update rule for testing purpose',
-            [],
-            is_enabled
+            [param_domain.PlatformParameterRule.from_dict({
+                'value_when_matched': feature_is_enabled,
+                'filters': []
+            })],
+            False
         )
 
     def _mock_dummy_feature_stage(
@@ -240,6 +243,11 @@ class PlatformFeatureDummyHandlerTest(test_utils.GenericTestBase):
         return self.swap(feature, '_feature_stage', stage.value)
 
     def test_get_with_dummy_feature_enabled_returns_ok(self) -> None:
+        self.get_json(
+            '/platform_feature_dummy_handler',
+            expected_status_int=404
+        )
+
         self._set_dummy_feature_status(True)
         result = self.get_json(
             '/platform_feature_dummy_handler',
@@ -247,6 +255,16 @@ class PlatformFeatureDummyHandlerTest(test_utils.GenericTestBase):
         self.assertEqual(result, {'msg': 'ok'})
 
     def test_get_with_dummy_feature_disabled_raises_404(self) -> None:
+        self.get_json(
+            '/platform_feature_dummy_handler',
+            expected_status_int=404
+        )
+        self._set_dummy_feature_status(True)
+        self.get_json(
+            '/platform_feature_dummy_handler',
+            expected_status_int=200
+        )
+
         self._set_dummy_feature_status(False)
         self.get_json(
             '/platform_feature_dummy_handler',

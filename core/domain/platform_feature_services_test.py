@@ -91,48 +91,33 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
             self.dev_feature.name, self.user_id, 'edit rules',
             [
                 platform_parameter_domain.PlatformParameterRule.from_dict({
-                    'filters': [
-                        {
-                            'type': 'browser_type',
-                            'conditions': [['=', 'Chrome']]
-                        }
-                    ],
+                    'filters': [],
                     'value_when_matched': True
                 })
             ],
-            True
+            False
         )
 
         registry.Registry.update_platform_parameter(
             self.test_feature.name, self.user_id, 'edit rules',
             [
                 platform_parameter_domain.PlatformParameterRule.from_dict({
-                    'filters': [
-                        {
-                            'type': 'browser_type',
-                            'conditions': [['=', 'Safari']]
-                        }
-                    ],
+                    'filters': [],
                     'value_when_matched': True
                 })
             ],
-            True
+            False
         )
 
         registry.Registry.update_platform_parameter(
             self.prod_feature.name, self.user_id, 'edit rules',
             [
                 platform_parameter_domain.PlatformParameterRule.from_dict({
-                    'filters': [
-                        {
-                            'type': 'browser_type',
-                            'conditions': [['=', 'Firefox']]
-                        }
-                    ],
+                    'filters': [],
                     'value_when_matched': True
                 })
             ],
-            True
+            False
         )
 
         # Replace feature lists with mocked names.
@@ -365,12 +350,7 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
             self.dev_feature.name, self.user_id, 'test update',
             [
                 platform_parameter_domain.PlatformParameterRule.from_dict({
-                    'filters': [
-                        {
-                            'type': 'platform_type',
-                            'conditions': [['=', 'Backend']]
-                        }
-                    ],
+                    'filters': [],
                     'value_when_matched': False
                 })
             ],
@@ -379,9 +359,7 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
 
         with self.swap(constants, 'DEV_MODE', True):
             self.assertFalse(
-                feature_services.is_feature_enabled(
-                    self.dev_feature.name)
-            )
+                feature_services.is_feature_enabled(self.dev_feature.name))
 
     def test_update_feature_flag_with_unknown_name_raises_error(
         self
@@ -402,8 +380,10 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
     def test_update_feature_flag_with_invalid_rules_raises_error(
         self
     ) -> None:
-        with self.assertRaisesRegex(
-            utils.ValidationError, 'Filters inside the rules cannot be empty.'):
+        with self.assertRaisesRegex(utils.ValidationError, (
+            'Unsupported comparison operator \'!\' for app_version filter, '
+            'expected one of \\[\'=\', \'<\', \'<=\', \'>\', \'>=\'].')
+        ):
             feature_services.update_feature_flag(
                 self.dev_feature.name, self.user_id, 'test update',
                 [
@@ -411,7 +391,7 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
                         'filters': [
                             {
                                 'type': 'app_version',
-                                'conditions': [['=', '1.2.3']]
+                                'conditions': [['!', '1.2.3']]
                             }
                         ],
                         'value_when_matched': True

@@ -138,16 +138,11 @@ class LearnerGroupServicesUnitTests(test_utils.GenericTestBase):
             'learner_groups_are_enabled', self.admin_id, 'edit rules',
             [
                 param_domain.PlatformParameterRule.from_dict({
-                    'filters': [
-                        {
-                            'type': 'platform_type',
-                            'conditions': [['=', 'Backend']]
-                        }
-                    ],
+                    'filters': [],
                     'value_when_matched': True
                 })
             ],
-            True
+            False
         )
         self.assertTrue(
             learner_group_services.is_learner_group_feature_enabled())
