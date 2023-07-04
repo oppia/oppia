@@ -29,7 +29,6 @@ import { InteractionAnswer } from 'interactions/answer-defs';
 import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 import { DragAndDropAnswer } from 'interactions/answer-defs';
 
-import { DOWN_ARROW, LEFT_ARROW, RIGHT_ARROW, UP_ARROW } from '@angular/cdk/keycodes';
 import { Subscription } from 'rxjs';
 
 
@@ -127,7 +126,8 @@ export class InteractiveDragAndDropSortInputComponent implements OnInit {
     // drag is cancelled.
     moveItemInArray(
       this.multipleItemsInSamePositionArray,
-      event.previousIndex, event.currentIndex);
+      event.previousIndex,
+      event.currentIndex);
     this.resetArray();
   }
 
@@ -175,15 +175,35 @@ export class InteractiveDragAndDropSortInputComponent implements OnInit {
 
   handleKeyDown(event: KeyboardEvent, currentIndex: number): void {
     let newIndex = currentIndex;
-    if (event.keyCode === DOWN_ARROW || event.keyCode === RIGHT_ARROW) {
-      newIndex += 1;
-      moveItemInArray(this.singleItemInSamePositionArray, 
-        currentIndex, newIndex);
+    if (event.key === 'ArrowDown') {
+      event.preventDefault();
+      if(this.activeItem != this.listItems.length -1){
+        newIndex += 1;
+        moveItemInArray(this.singleItemInSamePositionArray, 
+          currentIndex, newIndex);
+      }
     }
-    if (event.keyCode === UP_ARROW || event.keyCode === LEFT_ARROW) {
-      newIndex -= 1;
-      moveItemInArray(this.singleItemInSamePositionArray, 
-        currentIndex, newIndex);
+    if (event.key === 'ArrowUp') {
+      event.preventDefault();
+      if(this.activeItem != 0){
+        newIndex -= 1;
+        moveItemInArray(this.singleItemInSamePositionArray, 
+          currentIndex, newIndex);
+      }
+    }
+
+    if (event.key === 'Tab') {
+      if (event.shiftKey) {
+        if (this.activeItem > 0) {
+          event.preventDefault();
+          newIndex -= 1;
+        }
+      } else {
+        if (this.activeItem < this.listItems.length - 1) {
+          event.preventDefault();
+          newIndex += 1;
+        }
+      }
     }
     this.activeItem = newIndex;
     this.setFocus();

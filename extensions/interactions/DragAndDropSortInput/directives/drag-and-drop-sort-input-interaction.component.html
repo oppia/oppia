@@ -1,5 +1,5 @@
 <form (submit)="submitAnswer()">
-  <div tabindex="0" class="drag-and-drop-sort-container conversation-skin-interaction-container">
+  <div class="drag-and-drop-sort-container conversation-skin-interaction-container">
     <!-- Drag and drop, when we allow multiple items in same position of list -->
     <div *ngIf="allowMultipleItemsInSamePosition" cdkDropList (cdkDropListDropped)="dropList($event)">
       <ng-container cdkDropListGroup>
@@ -44,7 +44,13 @@
          class="child-dnd-single-item"
          (cdkDropListDropped)="dropItemInSameList($event)"
          cdkDropList>
-      <div tabindex="0" class="child-dnd-item-box" *ngFor="let item of singleItemInSamePositionArray; let i = index" cdkDrag role="listitem" (keydown)="handleKeyDown($event, i)">
+      <div tabindex="0"
+           class="child-dnd-item-box"
+           *ngFor="let item of singleItemInSamePositionArray; let i = index"
+           cdkDrag
+           role="listitem"
+           #listItem
+           (keydown)="handleKeyDown($event, i)">
         <div class="child-dnd-single-item-placeholder" *cdkDragPlaceholder></div>
         <oppia-rte-output-display [rteString]="item"></oppia-rte-output-display>
       </div>
@@ -79,7 +85,7 @@
   }
 
   .drag-and-drop-sort-container:focus {
-    border: 5px solid blue;
+    outline: 1px solid #000;
   }
 
   .cdk-drag-placeholder {
@@ -127,7 +133,7 @@
   }
 
   .child-dnd-item-box:hover {
-    border: 5px solid blue;
+    outline: 1px solid #000;
   }
 
   .child-dnd-border {
