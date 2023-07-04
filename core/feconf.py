@@ -955,7 +955,7 @@ FEEDBACK_THREADLIST_URL_PREFIX_FOR_TOPICS = '/threadlisthandlerfortopic'
 FEEDBACK_THREAD_VIEW_EVENT_URL = '/feedbackhandler/thread_view_event'
 FEEDBACK_UPDATES_DATA_URL = (
     '/feedbackupdateshandler/data')
-FEEDBACK_UPDATES_URL = '/feedback-updates'
+FEEDBACK_UPDATES_URL = '/feedbackupdates'
 FEEDBACK_UPDATES_THREAD_DATA_URL = '/feedbackupdatesthreadhandler'
 FETCH_SKILLS_URL_PREFIX = '/fetch_skills'
 FLAG_EXPLORATION_URL_PREFIX = '/flagexplorationhandler'
