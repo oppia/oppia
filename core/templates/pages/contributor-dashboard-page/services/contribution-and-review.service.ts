@@ -272,7 +272,8 @@ export class ContributionAndReviewService {
 
     //  Create an empty map to store translation cards for each state.
     const translationSuggestionsByState = (
-      new Map<string, SuggestionBackendDict[]>());
+      // eslint-disable-next-line
+      new Map<string, any[]>());
 
     // Assign translation cards to the corresponding state in the map.
     for (const translationSuggestion of translationSuggestions) {
