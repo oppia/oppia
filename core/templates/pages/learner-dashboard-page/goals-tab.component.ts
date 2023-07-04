@@ -216,6 +216,7 @@ export class GoalsTabComponent implements OnInit {
     }
   }
 
+
   removeFromLearnerGoals(
       topic: LearnerTopicSummary, topicId: string,
       topicName: string, index: number): void {
