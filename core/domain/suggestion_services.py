@@ -2500,34 +2500,40 @@ def _update_translation_submitter_total_stats_model(
         Exception. Language is None.
         Exception. Contributor user ID is None.
     """
-    stat = translation_submitter_total_stats
 
     stats_model = suggestion_models.TranslationSubmitterTotalContributionStatsModel.get( # pylint: disable=line-too-long
-            stat.language_code,
-            stat.contributor_id)
+            translation_submitter_total_stats.language_code,
+            translation_submitter_total_stats.contributor_id)
 
     assert stats_model is not None
     stats_model.topic_ids_with_translation_submissions = (
-        stat.topic_ids_with_translation_submissions)
-    stats_model.recent_review_outcomes = stat.recent_review_outcomes
-    stats_model.recent_performance = stat.recent_performance
-    stats_model.overall_accuracy = stat.overall_accuracy
+        translation_submitter_total_stats
+        .topic_ids_with_translation_submissions)
+    stats_model.recent_review_outcomes = (
+        translation_submitter_total_stats.recent_review_outcomes)
+    stats_model.recent_performance = (
+        translation_submitter_total_stats.recent_performance)
+    stats_model.overall_accuracy = (
+        translation_submitter_total_stats.overall_accuracy)
     stats_model.submitted_translations_count = (
-        stat.submitted_translations_count)
+        translation_submitter_total_stats.submitted_translations_count)
     stats_model.submitted_translation_word_count = (
-        stat.submitted_translation_word_count)
+        translation_submitter_total_stats.submitted_translation_word_count)
     stats_model.accepted_translations_count = (
-        stat.accepted_translations_count)
+        translation_submitter_total_stats.accepted_translations_count)
     stats_model.accepted_translations_without_reviewer_edits_count = (
-        stat.accepted_translations_without_reviewer_edits_count)
+        translation_submitter_total_stats
+        .accepted_translations_without_reviewer_edits_count)
     stats_model.accepted_translation_word_count = (
-        stat.accepted_translation_word_count)
+        translation_submitter_total_stats.accepted_translation_word_count)
     stats_model.rejected_translations_count = (
-        stat.rejected_translations_count)
+        translation_submitter_total_stats.rejected_translations_count)
     stats_model.rejected_translation_word_count = (
-        stat.rejected_translation_word_count)
-    stats_model.first_contribution_date = stat.first_contribution_date
-    stats_model.last_contribution_date = stat.last_contribution_date
+        translation_submitter_total_stats.rejected_translation_word_count)
+    stats_model.first_contribution_date = (
+        translation_submitter_total_stats.first_contribution_date)
+    stats_model.last_contribution_date = (
+        translation_submitter_total_stats.last_contribution_date)
 
     suggestion_models.TranslationSubmitterTotalContributionStatsModel.update_timestamps( # pylint: disable=line-too-long
         stats_model,
@@ -2548,7 +2554,6 @@ def _update_translation_reviewer_total_stats_models(
             TranslationReviewerTotalContributionStats.
             TranslationReviewerTotalContributionStats domain object.
     """
-    stat = translation_reviewer_total_stat
 
     stats_model = suggestion_models.TranslationReviewerTotalContributionStatsModel.get( # pylint: disable=line-too-long
         translation_reviewer_total_stat.language_code,
@@ -2556,21 +2561,22 @@ def _update_translation_reviewer_total_stats_models(
 
     assert stats_model is not None
     stats_model.topic_ids_with_translation_reviews = (
-        stat.topic_ids_with_translation_reviews)
+        translation_reviewer_total_stat.topic_ids_with_translation_reviews)
     stats_model.reviewed_translations_count = (
-        stat.reviewed_translations_count)
+        translation_reviewer_total_stat.reviewed_translations_count)
     stats_model.accepted_translations_count = (
-        stat.accepted_translations_count)
+        translation_reviewer_total_stat.accepted_translations_count)
     stats_model.accepted_translations_with_reviewer_edits_count = (
-        stat.accepted_translations_with_reviewer_edits_count)
+        translation_reviewer_total_stat
+        .accepted_translations_with_reviewer_edits_count)
     stats_model.accepted_translation_word_count = (
-        stat.accepted_translation_word_count)
+        translation_reviewer_total_stat.accepted_translation_word_count)
     stats_model.rejected_translations_count = (
-        stat.rejected_translations_count)
+        translation_reviewer_total_stat.rejected_translations_count)
     stats_model.first_contribution_date = (
-        stat.first_contribution_date)
+        translation_reviewer_total_stat.first_contribution_date)
     stats_model.last_contribution_date = (
-        stat.last_contribution_date)
+        translation_reviewer_total_stat.last_contribution_date)
 
     suggestion_models.TranslationReviewerTotalContributionStatsModel.update_timestamps( # pylint: disable=line-too-long
         stats_model,
@@ -2590,21 +2596,29 @@ def _update_question_submitter_total_stats_models(
         question_submitter_total_stats: QuestionSubmitterTotalContributionStats.
             A QuestionSubmitterTotalContributionStats domain object.
     """
-    stat = question_submitter_total_stats
     stats_model = suggestion_models.QuestionSubmitterTotalContributionStatsModel.get( # pylint: disable=line-too-long
-            stat.contributor_id)
+            question_submitter_total_stats.contributor_id)
     stats_model.topic_ids_with_question_submissions = (
-        stat.topic_ids_with_question_submissions)
-    stats_model.recent_review_outcomes = stat.recent_review_outcomes
-    stats_model.recent_performance = stat.recent_performance
-    stats_model.overall_accuracy = stat.overall_accuracy
-    stats_model.submitted_questions_count = stat.submitted_questions_count
-    stats_model.accepted_questions_count = stat.accepted_questions_count
+        question_submitter_total_stats.topic_ids_with_question_submissions)
+    stats_model.recent_review_outcomes = (
+        question_submitter_total_stats.recent_review_outcomes)
+    stats_model.recent_performance = (
+        question_submitter_total_stats.recent_performance)
+    stats_model.overall_accuracy = (
+        question_submitter_total_stats.overall_accuracy)
+    stats_model.submitted_questions_count = (
+        question_submitter_total_stats.submitted_questions_count)
+    stats_model.accepted_questions_count = (
+        question_submitter_total_stats.accepted_questions_count)
     stats_model.accepted_questions_without_reviewer_edits_count = (
-        stat.accepted_questions_without_reviewer_edits_count)
-    stats_model.rejected_questions_count = stat.rejected_questions_count
-    stats_model.first_contribution_date = stat.first_contribution_date
-    stats_model.last_contribution_date = stat.last_contribution_date
+        question_submitter_total_stats
+        .accepted_questions_without_reviewer_edits_count)
+    stats_model.rejected_questions_count = (
+        question_submitter_total_stats.rejected_questions_count)
+    stats_model.first_contribution_date = (
+        question_submitter_total_stats.first_contribution_date)
+    stats_model.last_contribution_date = (
+        question_submitter_total_stats.last_contribution_date)
 
     suggestion_models.QuestionSubmitterTotalContributionStatsModel.update_timestamps( # pylint: disable=line-too-long
         stats_model,
@@ -2624,18 +2638,23 @@ def _update_question_reviewer_total_stats_models(
         question_reviewer_total_stats: QuestionReviewerTotalContributionStats.
             A QuestionreviewerTotalContributionStats domain object.
     """
-    stat = question_reviewer_total_stats
     stats_model = suggestion_models.QuestionReviewerTotalContributionStatsModel.get( # pylint: disable=line-too-long
-            stat.contributor_id)
+            question_reviewer_total_stats.contributor_id)
     stats_model.topic_ids_with_question_reviews = (
-        stat.topic_ids_with_question_reviews)
-    stats_model.reviewed_questions_count = stat.reviewed_questions_count
-    stats_model.accepted_questions_count = stat.accepted_questions_count
+        question_reviewer_total_stats.topic_ids_with_question_reviews)
+    stats_model.reviewed_questions_count = (
+        question_reviewer_total_stats.reviewed_questions_count)
+    stats_model.accepted_questions_count = (
+        question_reviewer_total_stats.accepted_questions_count)
     stats_model.accepted_questions_with_reviewer_edits_count = (
-        stat.accepted_questions_with_reviewer_edits_count)
-    stats_model.rejected_questions_count = stat.rejected_questions_count
-    stats_model.first_contribution_date = stat.first_contribution_date
-    stats_model.last_contribution_date = stat.last_contribution_date
+        question_reviewer_total_stats
+        .accepted_questions_with_reviewer_edits_count)
+    stats_model.rejected_questions_count = (
+        question_reviewer_total_stats.rejected_questions_count)
+    stats_model.first_contribution_date = (
+        question_reviewer_total_stats.first_contribution_date)
+    stats_model.last_contribution_date = (
+        question_reviewer_total_stats.last_contribution_date)
 
     suggestion_models.QuestionReviewerTotalContributionStatsModel.update_timestamps( # pylint: disable=line-too-long
         stats_model,
