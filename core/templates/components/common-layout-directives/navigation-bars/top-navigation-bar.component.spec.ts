@@ -18,7 +18,7 @@
 
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
-import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
+import { ComponentFixture, fakeAsync, flush, TestBed, tick, waitForAsync } from '@angular/core/testing';
 import { DeviceInfoService } from 'services/contextual/device-info.service';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
@@ -655,7 +655,7 @@ describe('TopNavigationBarComponent', () => {
     expect(alertsSpy).toHaveBeenCalledWith(
       'Failed to get number of unread thread of feedback updates');
     expect(fetchDataSpy).toHaveBeenCalled();
-    tick(1010);
+    flush();
   }));
 
   it('should return proper offset for dropdown', ()=>{

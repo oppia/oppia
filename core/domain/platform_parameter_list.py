@@ -123,7 +123,7 @@ Registry.create_feature_flag(
     ParamNames.SHOW_FEEDBACK_UPDATES_IN_PROFILE_PIC_DROPDOWN,
     'This flag is to show feedback updates in the' +
     'profile pic drop-down menu.',
-     platform_parameter_domain.FeatureStages.PROD)
+     platform_parameter_domain.FeatureStages.DEV)
 
 Registry.create_feature_flag(
     ParamNames.IS_IMPROVEMENTS_TAB_ENABLED,

@@ -263,7 +263,6 @@ describe('Feedback updates page', () => {
       component.ngOnInit();
       flush();
       fixture.detectChanges();
-      flush();
     }));
 
     it('should initialize correctly component properties after its' +
@@ -402,7 +401,6 @@ describe('Feedback updates page', () => {
       expect(component.getValueOfFeedbackThreadSortKey())
         .toBe('lastUpdatedMsecs');
 
-      tick();
       fixture.detectChanges();
 
       const feedbackListNameNodes =
