@@ -37,8 +37,6 @@ var ReleaseCoordinatorPage = function() {
   var serverModeSelectorLocator = '.e2e-test-server-mode-selector';
   var removeFilterConditionLocator = '.e2e-test-remove-condition';
   var valueSelectorLocator = '.e2e-test-value-selector';
-  var featureDefaultValueSelectorLocator = (
-    '.e2e-test-feature-default-value-selector');
   var statusMessage = $('.e2e-test-status-message');
 
   this.get = async function() {
