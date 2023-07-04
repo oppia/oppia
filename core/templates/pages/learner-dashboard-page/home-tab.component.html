@@ -35,11 +35,35 @@
     </div>
   </div>
 
-  <div tabindex="0" class="topic-suggested-for-you">
+  <div tabindex="0" class="topic-suggested-for-you shivam">
     <p class="suggested-for-you-heading" [innerHTML]="'I18N_LEARNER_DASHBOARD_LEARN_SOMETHING_NEW_SECTION' | translate">
     </p>
     <div *ngFor="let item of untrackedTopics | keyvalue" class="untracked-topics">
-      <oppia-carousel-bar>
+      <oppia-carousel-bar [carouselClassname]="'.shivam '">
+        <div *ngFor="let topicSummaryTile of item.value" class="topic-summary-tile">
+          <oppia-learner-topic-summary-tile [topicSummary]="topicSummaryTile">
+          </oppia-learner-topic-summary-tile>
+        </div>
+      </oppia-carousel-bar>
+      <div>
+        <a [href]="getClassroomLink(item.key)" target="{{ openInNewWindow ? '_blank' : '_self' }}"
+          class="oppia-classroom-link">
+          <div class="classroom-card">
+            <p class="classroom-text">
+              <span [innerHTML]="'I18N_VIEW_ALL_TOPICS' | translate: {classroomName: item.key}"></span>
+            </p>
+          </div>
+        </a>
+      </div>
+    </div>
+  </div>
+
+
+  <div tabindex="0" class="topic-suggested-for-you subhash">
+    <p class="suggested-for-you-heading" [innerHTML]="'I18N_LEARNER_DASHBOARD_LEARN_SOMETHING_NEW_SECTION' | translate">
+    </p>
+    <div *ngFor="let item of untrackedTopics | keyvalue" class="untracked-topics">
+      <oppia-carousel-bar [carouselClassname]="'.subhash '">
         <div *ngFor="let topicSummaryTile of item.value" class="topic-summary-tile">
           <oppia-learner-topic-summary-tile [topicSummary]="topicSummaryTile">
           </oppia-learner-topic-summary-tile>

@@ -55,6 +55,7 @@ export class HomeTabComponent {
   @Input() explorationPlaylist!: LearnerExplorationSummary[];
   @Input() collectionPlaylist!: CollectionSummary[];
 
+  carouselClassname: string = 'home-tab';
   currentGoalsLength!: number;
   classroomUrlFragment!: string;
   goalTopicsLength!: number;
@@ -87,16 +88,18 @@ export class HomeTabComponent {
   ) {}
 
   ngOnInit(): void {
-    this.noPlaylistActivity = (
-      (this.explorationPlaylist.length === 0) &&
+    setTimeout(() => {
+      this.noPlaylistActivity = (
+        (this.explorationPlaylist.length === 0) &&
       (this.collectionPlaylist.length === 0));
 
-    this.totalLessonsInPlaylist.push(
-      ...this.explorationPlaylist, ...this.collectionPlaylist);
+      this.totalLessonsInPlaylist.push(
+        ...this.explorationPlaylist, ...this.collectionPlaylist);
 
-    this.displayLessonsInPlaylist = this.totalLessonsInPlaylist;
-    this.startIndexInPlaylist = 0;
-    this.endIndexInPlaylist = this.totalLessonsInPlaylist.length;
+      this.displayLessonsInPlaylist = this.totalLessonsInPlaylist;
+      this.startIndexInPlaylist = 0;
+      this.endIndexInPlaylist = this.totalLessonsInPlaylist.length;
+    }, 2000);
 
     this.width = this.widthConst * (this.currentGoals.length);
     var allGoals = [...this.currentGoals, ...this.partiallyLearntTopicsList];

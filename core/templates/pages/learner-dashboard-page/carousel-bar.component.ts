@@ -16,7 +16,7 @@
  * @fileoverview Component for Carouselbar in the Learner Dashboard page.
  */
 
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { DeviceInfoService } from 'services/contextual/device-info.service';
 import { Subscription } from 'rxjs';
@@ -38,89 +38,90 @@ export class CarouselBarComponent implements OnInit {
   scrollUntrackedTopics: boolean = true;
   disableLeftButton: boolean = true;
   disableRightButton: boolean = false;
+ @Input() carouselClassname: string;
+ // These properties are initialized using Angular lifecycle hooks
+ // and we need to do non-null assertion. For more information, see
+ // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+ translateSubscription!: Subscription;
+ resizeSubscription!: Subscription;
 
-  // These properties are initialized using Angular lifecycle hooks
-  // and we need to do non-null assertion. For more information, see
-  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
-  translateSubscription!: Subscription;
-  resizeSubscription!: Subscription;
-
-  constructor(
+ constructor(
     private windowDimensionService: WindowDimensionsService,
     private urlInterpolationService: UrlInterpolationService,
     private i18nLanguageCodeService: I18nLanguageCodeService,
     private deviceInfoService: DeviceInfoService) {
-  }
+ }
 
-  // These properties are initialized using Angular lifecycle hooks
-  // and we need to do non-null assertion. For more information, see
-  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
-
-
-  windowIsNarrow: boolean = false;
-  directiveSubscriptions = new Subscription();
-
-  ngOnInit(): void {
-    this.windowIsNarrow = this.windowDimensionService.isWindowNarrow();
-    this.directiveSubscriptions.add(
-      this.windowDimensionService.getResizeEvent().subscribe(() => {
-        let carouselSelector = document.querySelector('.tiles') as HTMLElement;
-        carouselSelector.scrollTo(0, 0);
-        this.carouselScrollPositionPx = 0;
-        this.disableLeftButton = true;
-        this.windowIsNarrow = this.windowDimensionService.isWindowNarrow();
-      }));
-  }
+ // These properties are initialized using Angular lifecycle hooks
+ // and we need to do non-null assertion. For more information, see
+ // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
 
 
+ windowIsNarrow: boolean = false;
+ directiveSubscriptions = new Subscription();
 
-  scroll(isLeftScroll: boolean): void {
-    let carouselSelector = document.querySelector('.tiles') as HTMLElement;
-    this.CarouselScrollWidthPx = carouselSelector.scrollWidth;
-    console.error(this.CarouselScrollWidthPx, 'scroll width ..');
-    this.CarouselClientWidthPx = carouselSelector.clientWidth;
-    console.error(this.CarouselClientWidthPx, 'client Width ...');
+ ngOnInit(): void {
+   this.windowIsNarrow = this.windowDimensionService.isWindowNarrow();
+   this.directiveSubscriptions.add(
+     this.windowDimensionService.getResizeEvent().subscribe(() => {
+       let carouselSelector = document.querySelector('.tiles') as HTMLElement;
+       carouselSelector.scrollTo(0, 0);
+       this.carouselScrollPositionPx = 0;
+       this.disableLeftButton = true;
+       this.windowIsNarrow = this.windowDimensionService.isWindowNarrow();
+     }));
+ }
 
-    let direction = isLeftScroll ? -1 : 1;
-
-    console.error(direction * 210, 'directionn.......');
-    console.error(this.carouselScrollPositionPx, 'carousel scroll.* 210');
 
 
-    if (this.scrollUntrackedTopics && ((this.carouselScrollPositionPx === 0) ||
+ scroll(isLeftScroll: boolean): void {
+   let classname = this.carouselClassname + '.tiles';
+   let carouselSelector = document.querySelector(classname) as HTMLElement;
+   this.CarouselScrollWidthPx = carouselSelector.scrollWidth;
+   console.error(this.CarouselScrollWidthPx, 'scroll width ..');
+   this.CarouselClientWidthPx = carouselSelector.clientWidth;
+   console.error(this.CarouselClientWidthPx, 'client Width ...');
+
+   let direction = isLeftScroll ? -1 : 1;
+
+   console.error(direction * 210, 'directionn.......');
+   console.error(this.carouselScrollPositionPx, 'carousel scroll.* 210');
+
+
+   if (this.scrollUntrackedTopics && ((this.carouselScrollPositionPx === 0) ||
      (this.carouselScrollPositionPx >
        (this.CarouselScrollWidthPx - this.CarouselClientWidthPx)))) {
-      this.carouselScrollPositionPx = this.carouselScrollPositionPx +
+     this.carouselScrollPositionPx = this.carouselScrollPositionPx +
         (direction * 190);
-      carouselSelector.scrollBy({
-        top: 0,
-        left: (direction * 190),
-        behavior: 'smooth',
-      });
-    } else {
-      this.carouselScrollPositionPx = this.carouselScrollPositionPx +
+     carouselSelector.scrollBy({
+       top: 0,
+       left: (direction * 190),
+       behavior: 'smooth',
+     });
+   } else {
+     this.carouselScrollPositionPx = this.carouselScrollPositionPx +
         (direction * 230);
-      carouselSelector.scrollBy({
-        top: 0,
-        left: (direction * 230),
-        behavior: 'smooth',
-      });
-    }
+     carouselSelector.scrollBy({
+       top: 0,
+       left: (direction * 230),
+       behavior: 'smooth',
+     });
+   }
 
-    if (this.carouselScrollPositionPx <= 0) {
-      this.disableLeftButton = true;
-      this.carouselScrollPositionPx = 0;
-    } else {
-      this.disableLeftButton = false;
-    }
+   if (this.carouselScrollPositionPx <= 0) {
+     this.disableLeftButton = true;
+     this.carouselScrollPositionPx = 0;
+   } else {
+     this.disableLeftButton = false;
+   }
 
-    if (
-      this.carouselScrollPositionPx >
+   if (
+     this.carouselScrollPositionPx >
       (this.CarouselScrollWidthPx - this.CarouselClientWidthPx)) {
-      this.disableRightButton = true;
-    } else {
-      this.disableRightButton = false;
-    }
-    console.error(this.carouselScrollPositionPx, 'intial caro..posti..');
-  }
+     this.disableRightButton = true;
+   } else {
+     this.disableRightButton = false;
+   }
+   console.error(this.carouselScrollPositionPx, 'intial caro..posti..');
+ }
 }
