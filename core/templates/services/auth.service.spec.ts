@@ -70,9 +70,18 @@ describe('Auth service', function() {
       .and.returnValue(true);
 
     // TODO(#18260): Change this when we permanently move to the Docker Setup.
-    let firebaseHost =
-      process.env.oppia_is_dockerized ? '0.0.0.0' : 'localhost';
-    expect(AuthService.firebaseEmulatorConfig).toEqual([firebaseHost, 9099]);
+    process.env.oppia_is_dockerized = false
+    expect(AuthService.firebaseEmulatorConfig).toEqual(['localhost', 9099]);
+  });
+
+  it('should return emulator config when emulator is enabled under ' +
+     'docker environment', () => {
+    spyOnProperty(AuthService, 'firebaseEmulatorIsEnabled', 'get')
+      .and.returnValue(true);
+
+    // TODO(#18260): Change this when we permanently move to the Docker Setup.
+    process.env.oppia_is_dockerized = true
+    expect(AuthService.firebaseEmulatorConfig).toEqual(['0.0.0.0', 9099]);
   });
 
   it('should return undefined when emulator is disabled', () => {
