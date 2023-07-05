@@ -195,8 +195,9 @@ class CustomLintChecksManager(linter_utils.BaseLinter):
                 # such as 'git+https://github.com/username/repo#commit-hash',
                 # we extract the commit hash and use it as the version.
                 elif lib_version[:23] == 'git+https://github.com/':
-                    lib_version = re.search(
-                        GIT_COMMIT_HASH_REGEX, lib_version).group(1)
+                    match = re.search(GIT_COMMIT_HASH_REGEX, lib_version)
+                    if match:
+                        lib_version = match.group(1)
 
             prefix_name = third_party_lib['type_defs_filename_prefix']
 
