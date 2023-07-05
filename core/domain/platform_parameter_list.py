@@ -117,7 +117,7 @@ Registry.create_feature_flag(
 Registry.create_feature_flag(
     ParamNames.SHOW_REDESIGNED_LEARNER_DASHBOARD,
     'This flag is to show redesigned learner dashboard.',
-    platform_parameter_domain.FeatureStages.PROD)
+    platform_parameter_domain.FeatureStages.DEV)
 
 Registry.create_feature_flag(
     ParamNames.SHOW_TRANSLATION_SIZE,
