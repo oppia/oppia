@@ -38,6 +38,13 @@
   <div tabindex="0" class="topic-suggested-for-you shivam">
     <p class="suggested-for-you-heading" [innerHTML]="'I18N_LEARNER_DASHBOARD_LEARN_SOMETHING_NEW_SECTION' | translate">
     </p>
+    <div class="oppia-classroom-search-container">
+      <div class="oppia-classroom-search-section">
+        <div class="oppia-classroom-search-bar-container">
+          <oppia-search-bar [enableDropup]="true"></oppia-search-bar>
+        </div>
+      </div>
+    </div>
     <div *ngFor="let item of untrackedTopics | keyvalue" class="untracked-topics">
       <oppia-carousel-bar [carouselClassname]="'.shivam '">
         <div *ngFor="let topicSummaryTile of item.value" class="topic-summary-tile">
