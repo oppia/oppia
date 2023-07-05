@@ -70,7 +70,7 @@ describe('Auth service', function() {
       .and.returnValue(true);
 
     // TODO(#18260): Change this when we permanently move to the Docker Setup.
-    process.env.oppia_is_dockerized = false
+    process.env.oppia_is_dockerized = 'false';
     expect(AuthService.firebaseEmulatorConfig).toEqual(['localhost', 9099]);
   });
 
@@ -80,7 +80,7 @@ describe('Auth service', function() {
       .and.returnValue(true);
 
     // TODO(#18260): Change this when we permanently move to the Docker Setup.
-    process.env.oppia_is_dockerized = true
+    process.env.oppia_is_dockerized = 'true';
     expect(AuthService.firebaseEmulatorConfig).toEqual(['0.0.0.0', 9099]);
   });
 
