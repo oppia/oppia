@@ -260,7 +260,7 @@ export class ContributionAndReviewService {
   sortTranslationSuggestionsByState(
       translationSuggestions: SuggestionBackendDict[],
       states: States,
-      initStateName: string
+      initStateName: string | null
   ): SuggestionBackendDict[] {
   // Obtain the state names in the order of content flow in the lesson.
     const stateNamesInOrder = this.computeGraphService.
@@ -290,7 +290,7 @@ export class ContributionAndReviewService {
       const cardsForState = translationSuggestionsByState.get(stateName) || [];
 
       cardsForState.sort((cardA, cardB) => {
-        const getTypeOrder = (contentId: string) => {
+        const getTypeOrder = (contentId: string): number => {
           const type = (
             // Get the type prefix (e.g., feedback, hints).
             contentId.split('_')[0]);
