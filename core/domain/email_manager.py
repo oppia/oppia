@@ -29,6 +29,10 @@ from core.domain import change_domain
 from core.domain import config_domain
 from core.domain import email_services
 from core.domain import html_cleaner
+from core.domain import platform_feature_services
+from core.domain import platform_parameter_domain
+from core.domain import platform_parameter_list
+from core.domain import platform_parameter_registry
 from core.domain import rights_domain
 from core.domain import subscription_services
 from core.domain import suggestion_registry
@@ -54,6 +58,8 @@ if MYPY: # pragma: no cover
 app_identity_services = models.Registry.import_app_identity_services()
 transaction_services = models.Registry.import_transaction_services()
 secrets_services = models.Registry.import_secrets_services()
+
+Registry = platform_parameter_registry.Registry
 
 
 NEW_REVIEWER_EMAIL_DATA: Dict[str, Dict[str, str]] = {
@@ -157,9 +163,14 @@ EMAIL_CONTENT_SCHEMA: Dict[
     }],
 }
 
-EMAIL_SENDER_NAME: config_domain.ConfigProperty = config_domain.ConfigProperty(
-    'email_sender_name', {'type': 'unicode'},
-    'The default sender name for outgoing emails.', 'Site Admin')
+EMAIL_SENDER_NAME: platform_parameter_domain.PlatformParameter = (
+    Registry.create_platform_parameter(
+        platform_parameter_list.ParamNames.EMAIL_SENDER_NAME,
+        'The default sender name for outgoing emails.',
+        platform_parameter_domain.DataTypes.STRING,
+        default='Site Admin'
+    )
+)
 EMAIL_FOOTER: config_domain.ConfigProperty = config_domain.ConfigProperty(
     'email_footer', {'type': 'unicode', 'ui_config': {'rows': 5}},
     'The footer to append to all outgoing emails. (This should be written in '
@@ -599,7 +610,8 @@ def _send_email(
     """
 
     if sender_name is None:
-        sender_name = EMAIL_SENDER_NAME.value
+        sender_name = platform_feature_services.get_platform_parameter_value(
+            EMAIL_SENDER_NAME.name)
 
     require_sender_id_is_valid(intent, sender_id)
 

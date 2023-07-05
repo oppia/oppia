@@ -27,6 +27,9 @@ from core.domain import config_services
 from core.domain import email_manager
 from core.domain import exp_domain
 from core.domain import html_cleaner
+from core.domain import platform_feature_services
+from core.domain import platform_parameter_domain
+from core.domain import platform_parameter_registry
 from core.domain import question_domain
 from core.domain import rights_domain
 from core.domain import subscription_services
@@ -784,16 +787,20 @@ class SignupEmailTests(test_utils.EmailTestBase):
                 self.assertEqual(0, len(messages))
 
     def test_contents_of_signup_email_are_correct(self) -> None:
-        with self.swap(feconf, 'CAN_SEND_EMAILS', True):
+        swap_get_platform_parameter_value = self.swap_to_always_return(
+            platform_feature_services,
+            'get_platform_parameter_value',
+            'Email Sender'
+        )
+        with swap_get_platform_parameter_value, self.swap(
+            feconf, 'CAN_SEND_EMAILS', True
+        ):
             config_services.set_property(
                 self.admin_id, email_manager.EMAIL_FOOTER.name,
                 self.new_footer)
             config_services.set_property(
                 self.admin_id, email_manager.SIGNUP_EMAIL_CONTENT.name,
                 self.new_email_content)
-            config_services.set_property(
-                self.admin_id, email_manager.EMAIL_SENDER_NAME.name,
-                'Email Sender')
 
             self.login(self.EDITOR_EMAIL)
             self.get_html_response(feconf.SIGNUP_URL + '?return_url=/')
@@ -924,16 +931,21 @@ class SignupEmailTests(test_utils.EmailTestBase):
             self.assertEqual(1, len(messages))
 
     def test_record_of_sent_email_is_written_to_datastore(self) -> None:
-        with self.swap(feconf, 'CAN_SEND_EMAILS', True):
+        swap_get_platform_parameter_value = self.swap_to_always_return(
+            platform_feature_services,
+            'get_platform_parameter_value',
+            'Email Sender'
+        )
+
+        with swap_get_platform_parameter_value, self.swap(
+            feconf, 'CAN_SEND_EMAILS', True
+        ):
             config_services.set_property(
                 self.admin_id, email_manager.EMAIL_FOOTER.name,
                 self.new_footer)
             config_services.set_property(
                 self.admin_id, email_manager.SIGNUP_EMAIL_CONTENT.name,
                 self.new_email_content)
-            config_services.set_property(
-                self.admin_id, email_manager.EMAIL_SENDER_NAME.name,
-                'Email Sender')
 
             all_models: Sequence[
                 email_models.SentEmailModel
@@ -1083,12 +1095,16 @@ class DuplicateEmailTests(test_utils.EmailTestBase):
         log_new_error_ctx = self.swap(
             logging, 'error', log_new_error_counter)
 
-        with self.capture_logging(min_level=logging.ERROR) as logs:
-            with can_send_emails_ctx, duplicate_email_ctx, log_new_error_ctx:
-                config_services.set_property(
-                    self.admin_id, email_manager.EMAIL_SENDER_NAME.name,
-                    'Email Sender')
+        swap_get_platform_parameter_value = self.swap_to_always_return(
+            platform_feature_services,
+            'get_platform_parameter_value',
+            'Email Sender'
+        )
 
+        with swap_get_platform_parameter_value, self.capture_logging(
+            min_level=logging.ERROR
+        ) as logs:
+            with can_send_emails_ctx, duplicate_email_ctx, log_new_error_ctx:
                 all_models: Sequence[
                     email_models.SentEmailModel
                 ] = email_models.SentEmailModel.get_all().fetch()

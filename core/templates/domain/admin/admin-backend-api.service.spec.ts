@@ -111,7 +111,6 @@ describe('Admin backend api service', () => {
     contributor_dashboard_is_enabled: true,
     contributor_dashboard_reviewer_emails_is_enabled: true,
     email_footer: 'fsdf',
-    email_sender_name: 'Site Admin',
     enable_admin_notifications_for_reviewer_shortage: false,
     max_number_of_explorations_in_math_svgs_batch: 2,
     max_number_of_suggestions_per_reviewer: 5,

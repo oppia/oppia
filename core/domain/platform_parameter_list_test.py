@@ -36,6 +36,7 @@ class ExistingPlatformParameterValidityTests(test_utils.GenericTestBase):
                             'diagnostic_test',
                             'dummy_feature_flag_for_e2e_tests',
                             'dummy_parameter',
+                            'email_sender_name',
                             'end_chapter_celebration',
                             'high_bounce_rate_task_minimum_exploration_starts',
                             (
