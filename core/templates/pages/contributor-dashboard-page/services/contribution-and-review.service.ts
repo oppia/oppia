@@ -263,12 +263,14 @@ export class ContributionAndReviewService {
       initStateName: string | null
   ): SuggestionBackendDict[] {
   // Obtain the state names in the order of content flow in the lesson.
-    const stateNamesInOrder = this.computeGraphService.
-      computeBfsTraversalOfStates(
-        initStateName,
-        states,
-        initStateName
-      );
+    if (initStateName) {
+      const stateNamesInOrder = this.computeGraphService.
+        computeBfsTraversalOfStates(
+          initStateName,
+          states,
+          initStateName
+        );
+    }
 
     //  Create an empty map to store translation cards for each state.
     const translationSuggestionsByState = (
