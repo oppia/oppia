@@ -53,6 +53,7 @@ export class OutcomeEditorComponent implements OnInit {
   @Input() isEditable!: boolean;
   @Input() outcome!: Outcome;
   @Input() addState!: (value: string) => void;
+  outcomeNewStateName!: string;
   savedOutcome!: Outcome;
   directiveSubscriptions = new Subscription();
   ENABLE_PREREQUISITE_SKILLS = AppConstants.ENABLE_PREREQUISITE_SKILLS;
@@ -88,6 +89,14 @@ export class OutcomeEditorComponent implements OnInit {
 
   isCorrectnessFeedbackEnabled(): boolean {
     return this.stateEditorService.getCorrectnessFeedbackEnabled();
+  }
+
+  onOutcomeNewStateNameChange(outcomeNewStateName: string) {
+    this.outcomeNewStateName = outcomeNewStateName;
+  }
+
+  isOutcomeNewStateNameInvalid() {
+    return this.outcomeNewStateName.endsWith(' ');
   }
 
   isCurrentInteractionLinear(): boolean {

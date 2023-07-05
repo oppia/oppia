@@ -44,6 +44,7 @@ interface DestValidation {
 export class OutcomeDestinationEditorComponent implements OnInit {
   @Output() addState: EventEmitter<string> = new EventEmitter<string>();
   @Output() getChanges: EventEmitter<DestValidation> = new EventEmitter();
+  @Output() outcomeNewStateNameChange = new EventEmitter<string>();
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
@@ -92,6 +93,10 @@ export class OutcomeDestinationEditorComponent implements OnInit {
       value: $event
     };
     this.getChanges.emit(validation);
+  }
+
+  onOutcomeNewStateNameChange() {
+    this.outcomeNewStateNameChange.emit(this.outcomeNewStateName);
   }
 
   onDestSelectorChange(): void {

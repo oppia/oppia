@@ -171,7 +171,7 @@
       </button>
       <button type="button"
               class="btn btn-success e2e-test-save-outcome-dest"
-              [disabled]="invalidStateAfterDestinationSave()"
+              [disabled]="invalidStateAfterDestinationSave() || !isOutcomeStateNameInvalid()"
               (click)="saveThisDestination()">
         Save Destination
       </button>
