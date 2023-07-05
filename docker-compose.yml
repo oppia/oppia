@@ -155,14 +155,14 @@ services:
     environment:
       - PATH=/usr/local/bin/
       - oppia_is_dockerized=true
+    volumes:
+      - oppia_redis_dump:/app/oppia/dump.db
+      - ./redis_docker.conf:/app/oppia/redis_docker.conf
     healthcheck:
       test: redis-cli ping
       timeout: 5s
       interval: 30s
       retries: 5
-    volumes:
-      - oppia_redis_dump:/app/oppia/dump.db
-      - ./redis_docker.conf:/app/oppia/redis_docker.conf
     command: redis-server /app/oppia/redis_docker.conf
 
   elasticsearch:

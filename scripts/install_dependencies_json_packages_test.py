@@ -21,14 +21,13 @@ from __future__ import annotations
 import builtins
 import os
 import re
-import subprocess
 import tarfile
 import tempfile
 import zipfile
 
 from core import utils
 from core.tests import test_utils
-from typing import BinaryIO, Final, List, Tuple
+from typing import BinaryIO, Final, Tuple
 
 from . import common
 from . import install_dependencies_json_packages
@@ -77,7 +76,8 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
             self.check_function_calls['extractall_is_called'] = True
 
         self.unzip_swap = self.swap(
-            install_dependencies_json_packages, 'TMP_UNZIP_PATH', MOCK_TMP_UNZIP_PATH)
+            install_dependencies_json_packages, 'TMP_UNZIP_PATH',
+            MOCK_TMP_UNZIP_PATH)
         self. dir_exists_swap = self.swap(
             common, 'ensure_directory_exists', mock_ensure_directory_exists)
         self.exists_swap = self.swap(os.path, 'exists', mock_exists)
@@ -201,7 +201,8 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
         with utils.open_file(temp_file, 'w') as f:
             f.write(actual_text)
         self.assertEqual(
-            install_dependencies_json_packages.get_file_contents(temp_file), actual_text)
+            install_dependencies_json_packages.get_file_contents(temp_file),
+            actual_text)
 
     def test_return_json(self) -> None:
         temp_file = tempfile.NamedTemporaryFile().name
@@ -410,7 +411,8 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
             mock_validate_dependencies
         )
         download_files_swap = self.swap(
-            install_dependencies_json_packages, 'download_files', mock_download_files)
+            install_dependencies_json_packages, 'download_files',
+            mock_download_files)
         unzip_files_swap = self.swap(
             install_dependencies_json_packages, 'download_and_unzip_files',
             mock_download_and_unzip_files)

@@ -26,7 +26,7 @@ import urllib
 import zipfile
 
 from core import utils
-from typing import Dict, Final, List, Literal, Optional, TypedDict, cast
+from typing import Dict, Final, List, Literal, TypedDict, cast
 
 from . import common
 
@@ -395,7 +395,7 @@ def download_all_dependencies(filepath: str) -> None:
                     dependency_tar_root_name, dependency_target_root_name)
 
 
-def main(args: Optional[List[str]] = None) -> None:
+def main() -> None:
     """Installs all the packages from the dependencies.json file."""
 
     download_all_dependencies(DEPENDENCIES_FILE_PATH)
