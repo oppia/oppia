@@ -324,8 +324,8 @@ describe('NoninteractiveImage', () => {
       expect(imagePreloaderService.getDimensionsOfImage).not.toHaveBeenCalled();
     });
 
-  it('should show alt text images when showAltText property is true', () => {
-    component.showAltText = true;
+  it('should show alt text images when altTextIsDisplayed property is true', () => {
+    component.altTextIsDisplayed = true;
     component.imageAltText = 'This is alt text';
     fixture.detectChanges();
 
@@ -334,9 +334,9 @@ describe('NoninteractiveImage', () => {
       'Description: ' + component.imageAltText);
   });
 
-  it('should not show alt text images when showAltText property is false',
+  it('should not show alt text images when altTextIsDisplayed property is false',
     () => {
-      component.showAltText = false;
+      component.altTextIsDisplayed = false;
       component.imageAltText = 'This is alt text';
       fixture.detectChanges();
 

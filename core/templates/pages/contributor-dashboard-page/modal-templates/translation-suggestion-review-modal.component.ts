@@ -140,7 +140,7 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
   isTranslationOverflowing: boolean = false;
   explorationImagesString: string = '';
   suggestionImagesString: string = '';
-  @Input() showAltText: boolean = false;
+  @Input() altTextIsDisplayed: boolean = false;
 
   @ViewChild('contentPanel')
     contentPanel!: RteOutputDisplayComponent;
@@ -569,7 +569,7 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
 
     // Images are present in form of strings not as Array of strings.
     if (!Array.isArray(content)) {
-      this.showAltText = true;
+      this.altTextIsDisplayed = true;
       const doc = new DOMParser().parseFromString(content, 'text/html');
       const imgElements = doc.querySelectorAll('oppia-noninteractive-image');
       htmlString = Array.from(imgElements).map((img) => img.outerHTML).join('');

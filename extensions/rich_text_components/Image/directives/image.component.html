@@ -1,15 +1,15 @@
 <figure>
-  <div *ngIf="!isLoadingIndicatorShown && !isTryAgainShown && !showAltText">
+  <div *ngIf="!isLoadingIndicatorShown && !isTryAgainShown && !altTextIsDisplayed">
     <img [src]="imageUrl"
          alt="{{imageAltText}}"
          class="center-element-horizontally e2e-test-image"
          [ngStyle]="imageContainerStyle">
     <figcaption class="text-center">{{imageCaption}}</figcaption>
   </div>
-  <div *ngIf="!isLoadingIndicatorShown && !isTryAgainShown && showAltText">
+  <div *ngIf="!isLoadingIndicatorShown && !isTryAgainShown && altTextIsDisplayed">
     <img [src]="imageUrl"
          alt="{{imageAltText}}"
-         class="e2e-test-image mt-5"
+         class="e2e-test-image"
          [ngStyle]="imageContainerStyle">
     <figcaption><strong>Caption:</strong> {{imageCaption}}</figcaption>
     <figcaption class="alt-text mb-5"><strong>Description:</strong> {{imageAltText}}</figcaption>
