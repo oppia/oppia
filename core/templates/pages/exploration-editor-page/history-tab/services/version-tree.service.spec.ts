@@ -32,7 +32,9 @@ describe('Versions tree service', () => {
       commit_type: 'edit',
       commit_cmds: [{
         cmd: 'add_state',
-        state_name: 'B'
+        state_name: 'B',
+        content_id_for_state_content: 'content_0',
+        content_id_for_default_outcome: 'default_outcome_1'
       }, {
         cmd: 'rename_state',
         new_state_name: 'A',
@@ -91,7 +93,9 @@ describe('Versions tree service', () => {
       commit_type: 'edit',
       commit_cmds: [{
         cmd: 'add_state',
-        state_name: 'D'
+        state_name: 'D',
+        content_id_for_state_content: 'content_5',
+        content_id_for_default_outcome: 'default_outcome_6'
       }],
       version_number: 7,
       committer_id: 'admin',
@@ -177,7 +181,9 @@ describe('Versions tree service', () => {
       }).toThrowError('Tried to retrieve change list of version 1');
       expect(vts.getChangeList(2)).toEqual([{
         cmd: 'add_state',
-        state_name: 'B'
+        state_name: 'B',
+        content_id_for_state_content: 'content_0',
+        content_id_for_default_outcome: 'default_outcome_1'
       }, {
         cmd: 'rename_state',
         new_state_name: 'A',

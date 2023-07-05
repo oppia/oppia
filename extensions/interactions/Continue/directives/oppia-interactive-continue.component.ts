@@ -24,10 +24,10 @@ import { Component, Input, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { ContinueCustomizationArgs } from 'interactions/customization-args-defs';
 import { InteractionAttributesExtractorService } from 'interactions/interaction-attributes-extractor.service';
-import { InteractionRulesService } from 'pages/exploration-player-page/services/answer-classification.service';
 import { CurrentInteractionService } from 'pages/exploration-player-page/services/current-interaction.service';
 import { ContextService } from 'services/context.service';
 import { ContinueRulesService } from './continue-rules.service';
+import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 
 @Component({
   selector: 'oppia-interactive-continue',
@@ -35,16 +35,21 @@ import { ContinueRulesService } from './continue-rules.service';
   styleUrls: []
 })
 export class OppiaInteractiveContinue implements OnInit {
-  @Input() buttonTextWithValue: string;
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  @Input() buttonTextWithValue!: string;
   buttonText: string = '';
   isInEditorMode: boolean = false;
   readonly DEFAULT_BUTTON_TEXT: string = 'Continue';
   readonly DEFAULT_HUMAN_READABLE_ANSWER: string = (
     'Please continue.');
+
   constructor(
     private continueRulesService: ContinueRulesService,
     private contextService: ContextService,
     private currentInteractionService: CurrentInteractionService,
+    private i18nLanguageCodeService: I18nLanguageCodeService,
     private interactionAttributesExtractorService:
       InteractionAttributesExtractorService) {}
 
@@ -68,11 +73,14 @@ export class OppiaInteractiveContinue implements OnInit {
         humanReadableAnswer = this.buttonText;
       }
       this.currentInteractionService.onSubmit(
-        humanReadableAnswer as string,
-      this.continueRulesService as InteractionRulesService);
+        humanReadableAnswer, this.continueRulesService);
     };
     this.currentInteractionService.registerCurrentInteraction(
       submitAnswer, null);
+  }
+
+  isLanguageRTL(): boolean {
+    return this.i18nLanguageCodeService.isCurrentLanguageRTL();
   }
 }
 angular.module('oppia').directive(

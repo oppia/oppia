@@ -17,6 +17,7 @@
  */
 
 import { NgModule } from '@angular/core';
+import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { DonatePageComponent } from './donate-page.component';
 import { SharedComponentsModule } from 'components/shared-component.module';
 import { DonatePageRootComponent } from './donate-page-root.component';
@@ -27,7 +28,8 @@ import { DonatePageRoutingModule } from './donate-page-routing.module';
   imports: [
     CommonModule,
     SharedComponentsModule,
-    DonatePageRoutingModule
+    DonatePageRoutingModule,
+    NgbModule
   ],
   declarations: [
     DonatePageComponent,

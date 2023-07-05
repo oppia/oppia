@@ -34,8 +34,6 @@ import { EndExplorationCustomizationArgs, InteractionCustomizationArgs } from
   'interactions/customization-args-defs';
 import { Interaction } from
   'domain/exploration/InteractionObjectFactory';
-import { BindableVoiceovers } from
-  'domain/exploration/recorded-voiceovers.model';
 import { State } from 'domain/state/StateObjectFactory';
 import {
   StateObjectsBackendDict,
@@ -45,13 +43,15 @@ import {
 } from 'domain/exploration/StatesObjectFactory';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
-import { Voiceover } from 'domain/exploration/voiceover.model';
 
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
+import { InteractionSpecsKey } from 'pages/interaction-specs.constants';
 import { ExplorationChange } from './exploration-draft.model';
+import { BaseTranslatableObject } from 'domain/objects/BaseTranslatableObject.model';
+import { ExplorationMetadataBackendDict } from './ExplorationMetadataObjectFactory';
 
 export interface ExplorationBackendDict {
-  'auto_tts_enabled'?: boolean;
+  'auto_tts_enabled': boolean;
   'correctness_feedback_enabled': boolean;
   'draft_changes': ExplorationChange[];
   'is_version_of_draft_valid': boolean;
@@ -61,11 +61,14 @@ export interface ExplorationBackendDict {
   'states': StateObjectsBackendDict;
   'title': string;
   'language_code': string;
-  'draft_change_list_id'?: number;
+  'draft_change_list_id': number;
   'version'?: number;
+  'next_content_id_index': number;
+  'edits_allowed'?: boolean;
+  'exploration_metadata': ExplorationMetadataBackendDict;
 }
 
-export class Exploration {
+export class Exploration extends BaseTranslatableObject {
   initStateName: string;
   paramChanges: ParamChange[];
   paramSpecs: ParamSpecs;
@@ -74,12 +77,16 @@ export class Exploration {
   languageCode: string;
   logger: LoggerService;
   urlInterpolationService: UrlInterpolationService;
+  nextContentIdIndex: number;
 
   constructor(
       initStateName: string, paramChanges: ParamChange[],
       paramSpecs: ParamSpecs, states: States, title: string,
-      languageCode: string, loggerService: LoggerService,
+      nextContentIdIndex: number, languageCode: string,
+      loggerService: LoggerService,
       urlInterpolationService: UrlInterpolationService) {
+    super();
+
     this.initStateName = initStateName;
     this.paramChanges = paramChanges;
     this.paramSpecs = paramSpecs;
@@ -88,16 +95,25 @@ export class Exploration {
     this.languageCode = languageCode;
     this.logger = loggerService;
     this.urlInterpolationService = urlInterpolationService;
+    this.nextContentIdIndex = nextContentIdIndex;
+  }
+
+  getTranslatableObjects(): BaseTranslatableObject[] {
+    return Object.values(this.states.getStateObjects());
   }
 
   // ---- Instance methods ----
   isStateTerminal(stateName: string): boolean {
+    let interactionId = this.getInteractionId(stateName);
     return (
-      stateName && this.getInteractionId(stateName) &&
-        INTERACTION_SPECS[this.getInteractionId(stateName)].is_terminal);
+      Boolean(interactionId) &&
+      INTERACTION_SPECS[interactionId as InteractionSpecsKey].is_terminal
+    );
   }
 
-  getAuthorRecommendedExpIds(stateName: string): string[] {
+  // If no customization arguments are defined for a terminal state,
+  // a null value is returned.
+  getAuthorRecommendedExpIds(stateName: string): string[] | null {
     if (!this.isStateTerminal(stateName)) {
       throw new Error(
         'Tried to get recommendations for a non-terminal state: ' +
@@ -112,7 +128,8 @@ export class Exploration {
       customizationArgs.recommendedExplorationIds.value : null;
   }
 
-  getInteraction(stateName: string): Interaction {
+  // Interaction is null for invalid state name.
+  getInteraction(stateName: string): Interaction | null {
     let state = this.states.getState(stateName);
     if (!state) {
       this.logger.error('Invalid state name: ' + stateName);
@@ -121,7 +138,8 @@ export class Exploration {
     return state.interaction;
   }
 
-  getInteractionId(stateName: string): string {
+  // Interaction ID is null for invalid state name.
+  getInteractionId(stateName: string): string | null {
     let interaction = this.getInteraction(stateName);
     if (interaction === null) {
       return null;
@@ -129,35 +147,15 @@ export class Exploration {
     return interaction.id;
   }
 
+  // Interaction customization args are null for invalid state name.
   getInteractionCustomizationArgs(
-      stateName: string): InteractionCustomizationArgs {
+      stateName: string
+  ): InteractionCustomizationArgs | null {
     let interaction = this.getInteraction(stateName);
     if (interaction === null) {
       return null;
     }
     return interaction.customizationArgs;
-  }
-
-  getInteractionInstructions(stateName: string): string {
-    let interactionId = this.getInteractionId(stateName);
-    return interactionId ? INTERACTION_SPECS[interactionId].instructions : '';
-  }
-
-  getNarrowInstructions(stateName: string): string {
-    let interactionId = this.getInteractionId(stateName);
-    return (
-        interactionId ?
-            INTERACTION_SPECS[interactionId].narrow_instructions :
-            '');
-  }
-
-  getInteractionThumbnailSrc(stateName: string): string {
-    // TODO(sll): Unify this with the 'choose interaction' modal in
-    // state_editor_interaction.html.
-    let interactionId = this.getInteractionId(stateName);
-    return interactionId ? (
-        this.urlInterpolationService
-          .getInteractionThumbnailImageUrl(interactionId)) : '';
   }
 
   isInteractionInline(stateName: string): boolean {
@@ -168,9 +166,10 @@ export class Exploration {
     // possible in the learner view.
     return (
       !interactionId ||
-        INTERACTION_SPECS[interactionId].display_mode ===
+        INTERACTION_SPECS[interactionId as InteractionSpecsKey].display_mode ===
         AppConstants.INTERACTION_DISPLAY_MODE_INLINE);
   }
+
   getStates(): States {
     return cloneDeep(this.states);
   }
@@ -191,31 +190,6 @@ export class Exploration {
     return this.getState(stateName).content.html;
   }
 
-  getVoiceovers(stateName: string): BindableVoiceovers {
-    let state = this.getState(stateName);
-    if (!state) {
-      this.logger.error('Invalid state name: ' + stateName);
-      return null;
-    }
-    let recordedVoiceovers = state.recordedVoiceovers;
-    let contentId = state.content.contentId;
-    return recordedVoiceovers.getBindableVoiceovers(
-      contentId);
-  }
-
-  getVoiceover(
-      stateName: string, languageCode: string): Voiceover {
-    let state = this.getState(stateName);
-    if (!state) {
-      this.logger.error('Invalid state name: ' + stateName);
-      return null;
-    }
-    let recordedVoiceovers = state.recordedVoiceovers;
-    let contentId = state.content.contentId;
-    const voiceovers = recordedVoiceovers.getVoiceover(contentId, languageCode);
-    return voiceovers || null;
-  }
-
   getAllVoiceovers(languageCode: string): VoiceoverObjectsDict {
     return this.states.getAllVoiceovers(languageCode);
   }
@@ -226,17 +200,6 @@ export class Exploration {
 
   getAllVoiceoverLanguageCodes(): string[] {
     return this.states.getAllVoiceoverLanguageCodes();
-  }
-
-  getDisplayableWrittenTranslationLanguageCodes(): string[] {
-    const allLanguageCodes = (
-      this.states.getAllWrittenTranslationLanguageCodes());
-
-    const displayableLanguageCodes = allLanguageCodes.filter(
-      languageCode => this.states.areWrittenTranslationsDisplayable(
-        languageCode));
-
-    return displayableLanguageCodes;
   }
 }
 
@@ -262,6 +225,7 @@ export class ExplorationObjectFactory {
       this.statesObjectFactory.createFromBackendDict(
         explorationBackendDict.states),
       explorationBackendDict.title,
+      explorationBackendDict.next_content_id_index,
       explorationBackendDict.language_code,
       this.logger, this.urlInterpolationService);
   }

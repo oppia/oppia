@@ -22,7 +22,7 @@ import { Injectable } from '@angular/core';
 import cloneDeep from 'lodash/cloneDeep';
 import isEqual from 'lodash/isEqual';
 
-import { InteractionSpecsConstants } from 'pages/interaction-specs.constants';
+import { InteractionSpecsConstants, InteractionSpecsKey } from 'pages/interaction-specs.constants';
 
 import {
   ExplorationChangeAddState,
@@ -37,15 +37,15 @@ export interface ExplorationGraphChangeList {
   directionForwards: boolean;
 }
 
-interface StateData {
+export interface StateData {
   [stateName: string]: {
     newestStateName: string;
     originalStateName: string;
     stateProperty: string;
-  }
+  };
 }
 
-interface StateIds {
+export interface StateIds {
   [stateName: string]: number;
 }
 
@@ -54,7 +54,7 @@ interface StateIdsAndData {
   stateData: StateData;
 }
 
-interface ProcessedStateIdsAndData {
+export interface ProcessedStateIdsAndData {
   nodes: StateData;
   links: StateLink[];
   originalStateIds: StateIds;
@@ -65,10 +65,15 @@ interface ProcessedStateIdsAndData {
 interface AdjMatrix {
   [state1: number]: {
     [state2: number]: boolean;
-  }
+  };
 }
 
-interface StateLink {
+interface ResultInterface {
+  stateIds: StateIds;
+  stateData: StateData;
+}
+
+export interface StateLink {
   source: number;
   target: number;
   linkProperty: string;
@@ -88,6 +93,7 @@ export class ExplorationDiffService {
   _resetMaxId(): void {
     this._maxId = 0;
   }
+
   _generateNewId(): number {
     this._maxId++;
     return this._maxId;
@@ -95,7 +101,7 @@ export class ExplorationDiffService {
 
   _generateInitialStateIdsAndData(
       statesDict: StateObjectsDict): StateIdsAndData {
-    let result = {
+    let result: ResultInterface = {
       stateIds: {},
       stateData: {}
     };
@@ -149,16 +155,18 @@ export class ExplorationDiffService {
       let oldStateIsTerminal = false;
       let newStateIsTerminal = false;
       if (oldState) {
-        oldStateIsTerminal = (
-          oldState.interaction.id &&
-            InteractionSpecsConstants.INTERACTION_SPECS[
-              oldState.interaction.id].is_terminal);
+        let interactionId = oldState.interaction.id as InteractionSpecsKey;
+        const interactionSpec = (
+          InteractionSpecsConstants.INTERACTION_SPECS[interactionId]);
+        oldStateIsTerminal = Boolean(
+          oldState.interaction.id && interactionSpec.is_terminal);
       }
       if (newState) {
-        newStateIsTerminal = (
-          newState.interaction.id &&
-            InteractionSpecsConstants.INTERACTION_SPECS[
-              newState.interaction.id].is_terminal);
+        let interactionId = newState.interaction.id as InteractionSpecsKey;
+        const interactionSpec = (
+          InteractionSpecsConstants.INTERACTION_SPECS[interactionId]);
+        newStateIsTerminal = Boolean(
+          newState.interaction.id && interactionSpec.is_terminal);
       }
       if (oldStateIsTerminal || newStateIsTerminal) {
         finalStateIds.push(stateId);
@@ -277,8 +285,8 @@ export class ExplorationDiffService {
           change.cmd !== 'AUTO_revert_version_number' &&
           change.cmd !== 'edit_exploration_property' &&
           change.cmd !== 'add_written_translation' &&
-          change.cmd !== 'mark_written_translation_as_needing_update' &&
-          change.cmd !== 'mark_written_translations_as_needing_update'
+          change.cmd !== 'mark_translations_needs_update' &&
+          change.cmd !== 'remove_translations'
         ) {
           throw new Error('Invalid change command: ' + change.cmd);
         }
@@ -304,7 +312,7 @@ export class ExplorationDiffService {
   _getAdjMatrix(
       states: StateObjectsDict,
       stateIds: StateIds, maxId: number): AdjMatrix {
-    let adjMatrix = {};
+    let adjMatrix: AdjMatrix = {};
     for (let stateId = 1; stateId <= maxId; stateId++) {
       adjMatrix[stateId] = {};
     }

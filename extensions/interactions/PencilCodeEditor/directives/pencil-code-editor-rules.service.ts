@@ -43,6 +43,7 @@ export class PencilCodeEditorRulesService {
       this.cn.getNormalizedCode(inputs.x);
     return normalizedCode === normalizedExpectedCode;
   }
+
   CodeContains(
       answer: PencilCodeEditorAnswer,
       inputs: PencilCodeEditorRuleInputs): boolean {
@@ -52,6 +53,7 @@ export class PencilCodeEditorRulesService {
       this.cn.getNormalizedCode(inputs.x);
     return normalizedCode.indexOf(normalizedSnippet) !== -1;
   }
+
   CodeDoesNotContain(
       answer: PencilCodeEditorAnswer,
       inputs: PencilCodeEditorRuleInputs): boolean {
@@ -61,6 +63,7 @@ export class PencilCodeEditorRulesService {
       this.cn.getNormalizedCode(inputs.x);
     return normalizedCode.indexOf(normalizedSnippet) === -1;
   }
+
   OutputEquals(
       answer: PencilCodeEditorAnswer,
       inputs: PencilCodeEditorRuleInputs): boolean {
@@ -69,6 +72,7 @@ export class PencilCodeEditorRulesService {
       this.nwp.transform(inputs.x);
     return normalizedOutput === normalizedExpectedOutput;
   }
+
   OutputRoughlyEquals(
       answer: PencilCodeEditorAnswer,
       inputs: PencilCodeEditorRuleInputs): boolean {
@@ -76,9 +80,11 @@ export class PencilCodeEditorRulesService {
     var normalizedExpectedOutput = this.nwpac.transform(inputs.x);
     return normalizedOutput === normalizedExpectedOutput;
   }
+
   ResultsInError(answer: PencilCodeEditorAnswer): boolean {
     return !!(answer.error.trim());
   }
+
   ErrorContains(
       answer: PencilCodeEditorAnswer,
       inputs: PencilCodeEditorRuleInputs): boolean {

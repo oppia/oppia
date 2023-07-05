@@ -20,8 +20,8 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 
 interface DeleteSummaryEventData {
-  index: number,
-  event: Event
+  index: number;
+  event: Event;
 }
 
 @Component({
@@ -30,7 +30,7 @@ interface DeleteSummaryEventData {
 })
 export class SummaryListHeaderComponent {
   // These properties are initialized using Angular lifecycle hooks
-  // and we need to do non-null assertion, for more information see
+  // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() disableSorting: boolean = false;
   @Input() index!: number;
@@ -39,6 +39,7 @@ export class SummaryListHeaderComponent {
   @Input() isActive: boolean = false;
   @Output() summaryDelete:
     EventEmitter<DeleteSummaryEventData> = (new EventEmitter());
+
   @Input() isDeleteAvailable: boolean = false;
   @Input() numItems!: number;
 

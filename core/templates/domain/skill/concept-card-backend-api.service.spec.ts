@@ -22,13 +22,12 @@ import { HttpClientTestingModule, HttpTestingController } from
 
 import { ConceptCardBackendApiService } from
   'domain/skill/concept-card-backend-api.service';
-import { ConceptCard, ConceptCardBackendDict, ConceptCardObjectFactory } from
-  'domain/skill/ConceptCardObjectFactory';
+import { ConceptCard, ConceptCardBackendDict} from
+  'domain/skill/concept-card.model';
 
 describe('Concept card backend API service', () => {
   let conceptCardBackendApiService: ConceptCardBackendApiService;
   let httpTestingController: HttpTestingController;
-  let conceptCardObjectFactory: ConceptCardObjectFactory;
   let sampleResponse1: Record<string, ConceptCardBackendDict[]>;
   let sampleResponse2: Record<string, ConceptCardBackendDict[]>;
   let sampleResponse3: Record<string, ConceptCardBackendDict[]>;
@@ -44,7 +43,6 @@ describe('Concept card backend API service', () => {
 
     conceptCardBackendApiService = TestBed.inject(ConceptCardBackendApiService);
     httpTestingController = TestBed.inject(HttpTestingController);
-    conceptCardObjectFactory = TestBed.inject(ConceptCardObjectFactory);
 
     var example1 = {
       question: {
@@ -135,19 +133,19 @@ describe('Concept card backend API service', () => {
     conceptCardSampleResponse1 = [];
     sampleResponse1.concept_card_dicts.forEach((conceptCardDict) => {
       conceptCardSampleResponse1.push(
-        conceptCardObjectFactory.createFromBackendDict(conceptCardDict));
+        ConceptCard.createFromBackendDict(conceptCardDict));
     });
 
     conceptCardSampleResponse2 = [];
     sampleResponse2.concept_card_dicts.forEach((conceptCardDict) => {
       conceptCardSampleResponse2.push(
-        conceptCardObjectFactory.createFromBackendDict(conceptCardDict));
+        ConceptCard.createFromBackendDict(conceptCardDict));
     });
 
     conceptCardSampleResponse3 = [];
     sampleResponse3.concept_card_dicts.forEach((conceptCardDict) => {
       conceptCardSampleResponse3.push(
-        conceptCardObjectFactory.createFromBackendDict(conceptCardDict));
+        ConceptCard.createFromBackendDict(conceptCardDict));
     });
   });
 
@@ -162,7 +160,8 @@ describe('Concept card backend API service', () => {
 
       conceptCardBackendApiService.loadConceptCardsAsync(['1']).then(
         successHandler, failHandler);
-      var req = httpTestingController.expectOne('/concept_card_handler/1');
+      var req = httpTestingController.expectOne(
+        '/concept_card_handler/' + encodeURIComponent('["1"]'));
       expect(req.request.method).toEqual('GET');
       req.flush(sampleResponse1);
 
@@ -179,7 +178,7 @@ describe('Concept card backend API service', () => {
       let failHandler = jasmine.createSpy('fail');
 
       let conceptCardDataUrl = (
-        '/concept_card_handler/' + encodeURIComponent('1,2'));
+        '/concept_card_handler/' + encodeURIComponent('["1","2"]'));
 
       conceptCardBackendApiService.loadConceptCardsAsync(['1', '2']).then(
         successHandler, failHandler);
@@ -204,12 +203,14 @@ describe('Concept card backend API service', () => {
               expect(conceptCards2).toEqual(conceptCardSampleResponse3);
             });
 
-          var req1 = httpTestingController.expectOne('/concept_card_handler/2');
+          var req1 = httpTestingController.expectOne(
+            '/concept_card_handler/' + encodeURIComponent('["2"]'));
           expect(req1.request.method).toEqual('GET');
           req1.flush(sampleResponse2);
         });
 
-      var req2 = httpTestingController.expectOne('/concept_card_handler/1');
+      var req2 = httpTestingController.expectOne(
+        '/concept_card_handler/' + encodeURIComponent('["1"]'));
       expect(req2.request.method).toEqual('GET');
       req2.flush(sampleResponse1);
 
@@ -223,7 +224,8 @@ describe('Concept card backend API service', () => {
 
       conceptCardBackendApiService.loadConceptCardsAsync(['1']).then(
         successHandler, failHandler);
-      var req = httpTestingController.expectOne('/concept_card_handler/1');
+      var req = httpTestingController.expectOne(
+        '/concept_card_handler/' + encodeURIComponent('["1"]'));
       expect(req.request.method).toEqual('GET');
       req.flush({
         error: 'Error loading skill 1.'
@@ -247,7 +249,8 @@ describe('Concept card backend API service', () => {
           });
       });
 
-    var req = httpTestingController.expectOne('/concept_card_handler/1');
+    var req = httpTestingController.expectOne(
+      '/concept_card_handler/' + encodeURIComponent('["1"]'));
     expect(req.request.method).toEqual('GET');
     req.flush(sampleResponse1);
 

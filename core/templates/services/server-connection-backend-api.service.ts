@@ -29,13 +29,13 @@ export interface ConnectionCheckResponse {
   providedIn: 'root'
 })
 export class ServerConnectionBackendApiService {
-    private checkConnectionUrl: string = '/internetconnectivityhandler';
-    constructor(private http: HttpClient) {}
+  private checkConnectionUrl: string = '/internetconnectivityhandler';
+  constructor(private http: HttpClient) {}
 
-    async fetchConnectionCheckResultAsync(): Promise<ConnectionCheckResponse> {
-      return this.http.get<ConnectionCheckResponse>(
-        this.checkConnectionUrl).toPromise();
-    }
+  async fetchConnectionCheckResultAsync(): Promise<ConnectionCheckResponse> {
+    return this.http.get<ConnectionCheckResponse>(
+      this.checkConnectionUrl).toPromise();
+  }
 }
 
 angular.module('oppia').factory(

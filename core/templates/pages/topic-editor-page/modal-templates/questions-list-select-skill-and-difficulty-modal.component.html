@@ -1,0 +1,102 @@
+<!-- Select Skill View -->
+<div *ngIf="currentMode === 'MODE_SELECT_SKILL'">
+  <div class="modal-header">
+    <h3 *ngIf="skillSummaries.length === 0">
+      No skills linked to topic
+    </h3>
+    <h3 *ngIf="skillSummaries.length > 0">
+      {{ instructionMessage }}
+    </h3>
+  </div>
+  <div class="modal-body select-skill-modal e2e-test-skill-select-modal">
+    <div *ngIf="skillSummaries.length === 0">
+      You can only create questions for topics that have atleast one skill
+      attached to it. Please link a skill to this topic before adding questions.
+    </div>
+    <div class="list-group">
+      <div layout="row" class="list-view-item">
+        Search By Skill
+        <input type="text"
+               class="form-control"
+               placeholder="Enter a skill name"
+               [(ngModel)]="skillFilterText"
+               (ngModelChange)="filterSkills($event)"
+               autofocus>
+      </div>
+      <div class="skill-summary-container">
+        <a class="list-group-item e2e-test-skill-item"
+           *ngFor="let skillSummary of skillsToShow"
+           (click)="selectOrDeselectSkill(skillSummary)"
+           [ngClass]="{'list-group-item-success': isSkillSelected(skillSummary.id)}">
+          <label class="list-group-item-heading">{{ skillSummary.description }}</label>
+        </a>
+        <hr *ngIf="skillSummariesInitial.length > 0">
+        <a class="list-group-item e2e-test-skill-item"
+           *ngFor="let skillSummary of skillsToShow"
+           (click)="selectOrDeselectSkill(skillSummary)"
+           [ngClass]="{'list-group-item-success': isSkillSelected(skillSummary.id)}">
+          <label class="list-group-item-heading">{{ skillSummary.description }}</label>
+        </a>
+      </div>
+    </div>
+  </div>
+  <div>
+    <div *ngIf="skillSummaries.length > 0" class="modal-footer" >
+      <button class="btn btn-secondary" (click)="cancel()"> Cancel </button>
+      <button class="btn btn-success e2e-test-confirm-skill-button"
+              [disabled]="selectedSkillIds.length === 0"
+              (click)="goToNextStep()"> Next
+      </button>
+    </div>
+    <div *ngIf="skillSummaries.length === 0">
+      <button class="btn btn-secondary" (click)="cancel()"> Ok </button>
+    </div>
+  </div>
+</div>
+<!-- Select Difficulty View -->
+<div *ngIf="currentMode === 'MODE_SELECT_DIFFICULTY'">
+  <div class="modal-header">
+    <h3 *ngIf="linkedSkillsWithDifficulty.length === 0">
+      Select skills you would like to link to the question.
+    </h3>
+    <h3 *ngIf="linkedSkillsWithDifficulty.length > 0">
+      Select the difficulty per skill according to the specified rubrics
+    </h3>
+  </div>
+  <div class="modal-body select-skill-modal">
+    <div *ngIf="linkedSkillsWithDifficulty.length === 0">
+      You can only set difficulty after selecting skills linked to the question. Please go back and link skill(s) to this question.
+    </div>
+    <div class="list-group">
+      <div class="list-group-item"  *ngFor="let skillWithDifficulty of linkedSkillsWithDifficulty; let idx = index;">
+        <label class="list-group-item-heading skill-description">{{ skillWithDifficulty.getDescription() }}</label>
+        <oppia-question-difficulty-selector [skillIdToRubricsObject]="skillIdToRubricsObject"
+                                            [skillWithDifficulty]="skillWithDifficulty"
+                                            (skillWithDifficultyChange)="changeSkillWithDifficulty($event, idx)">
+        </oppia-question-difficulty-selector>
+      </div>
+    </div>
+  </div>
+  <div>
+    <div *ngIf="linkedSkillsWithDifficulty.length > 0" class="modal-footer">
+      <button class="btn btn-secondary" (click)="cancel()"> Cancel </button>
+      <button class="btn btn-success e2e-test-confirm-skill-difficulty-button"
+              [disabled]="linkedSkillsWithDifficulty.length === 0"
+              (click)="startQuestionCreation()"> Continue
+      </button>
+    </div>
+    <div *ngIf="linkedSkillsWithDifficulty.length === 0">
+      <button class="btn btn-secondary" (click)="goToSelectSkillView()"> Back </button>
+    </div>
+  </div>
+</div>
+<style>
+  .select-skill-modal .skill-summary-container {
+    max-height: 50vh;
+    overflow-y: auto;
+  }
+  .select-skill-modal .skill-description {
+    display: block;
+    font-size: 1em;
+  }
+</style>

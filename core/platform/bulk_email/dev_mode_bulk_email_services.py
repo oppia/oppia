@@ -20,6 +20,8 @@ from __future__ import annotations
 
 import logging
 
+from typing import Dict
+
 
 def permanently_delete_user_from_list(user_email: str) -> None:
     """Logs that the delete request was sent.
@@ -33,7 +35,11 @@ def permanently_delete_user_from_list(user_email: str) -> None:
 
 
 def add_or_update_user_status(
-        user_email: str, can_receive_email_updates: bool
+    user_email: str,
+    unused_merge_fields: Dict[str, str],
+    unused_tag: str,
+    *,
+    can_receive_email_updates: bool
 ) -> bool:
     """Subscribes/unsubscribes an existing user or creates a new user with
     correct status in the mailchimp DB.
@@ -42,6 +48,11 @@ def add_or_update_user_status(
         user_email: str. Email id of the user.
         can_receive_email_updates: bool. Whether they want to be subscribed to
             list or not.
+        unused_merge_fields: dict. Additional 'merge fields' used by mailchimp
+            for adding extra information for each user. The format is
+            { 'KEY': value } where the key is defined in the mailchimp
+            dashboard.
+        unused_tag: str. Tag to add to user in mailchimp.
 
     Returns:
         bool. True to mock successful user creation.

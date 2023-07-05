@@ -71,7 +71,7 @@ describe('Oppia CodeMirror Component', () => {
       refresh: () => {
         return;
       }
-    } as unknown as CodeMirror.Editor;
+    } as CodeMirror.Editor;
     const refreshSpy = spyOn(component.codemirror, 'refresh');
     const changes: SimpleChanges = {
       refresh: {

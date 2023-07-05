@@ -18,6 +18,7 @@
 
 from __future__ import annotations
 
+from core.domain import platform_feature_services as feature_services
 from core.domain import platform_parameter_list as params
 from core.tests import test_utils
 
@@ -27,15 +28,39 @@ class ExistingPlatformParameterValidityTests(test_utils.GenericTestBase):
     core/domain/platform_parameter_list.py.
     """
 
-    EXPECTED_PARAM_NAMES = ['dummy_feature', 'dummy_parameter']
+    EXPECTED_PARAM_NAMES = ['always_ask_learners_for_answer_details',
+                            'android_beta_landing_page',
+                            'blog_pages',
+                            'checkpoint_celebration',
+                            'contributor_dashboard_accomplishments',
+                            'diagnostic_test',
+                            'dummy_feature_flag_for_e2e_tests',
+                            'dummy_parameter',
+                            'end_chapter_celebration',
+                            'high_bounce_rate_task_minimum_exploration_starts',
+                            (
+                                'high_bounce_rate_task_state_bounce_'
+                                'rate_creation_threshold'
+                            ),
+                            (
+                                'high_bounce_rate_task_state_bounce_rate_'
+                                'obsoletion_threshold'
+                            ),
+                            'is_improvements_tab_enabled',
+                            'learner_groups_are_enabled',
+                            'promo_bar_enabled',
+                            'promo_bar_message',
+                            'serial_chapter_launch_curriculum_admin_view',
+                            'show_redesigned_learner_dashboard',
+                            'show_translation_size']
 
-    def test_all_defined_parameters_are_valid(self):
+    def test_all_defined_parameters_are_valid(self) -> None:
         all_names = params.Registry.get_all_platform_parameter_names()
         for name in all_names:
             param = params.Registry.get_platform_parameter(name)
             param.validate()
 
-    def test_number_of_parameters_meets_expectation(self):
+    def test_number_of_parameters_meets_expectation(self) -> None:
         """Test that the Registry and EXPECTED_PARAM_NAMES have the same number
         of platform parameters.
 
@@ -52,7 +77,7 @@ class ExistingPlatformParameterValidityTests(test_utils.GenericTestBase):
             len(params.Registry.get_all_platform_parameter_names()),
             len(self.EXPECTED_PARAM_NAMES))
 
-    def test_all_expected_parameters_are_present_in_registry(self):
+    def test_all_expected_parameters_are_present_in_registry(self) -> None:
         """Test that all parameters in EXPECTED_PARAM_NAMES are present in
         Registry.
 
@@ -73,7 +98,7 @@ class ExistingPlatformParameterValidityTests(test_utils.GenericTestBase):
                 list(missing_names))
         )
 
-    def test_no_unexpected_parameter_in_registry(self):
+    def test_no_unexpected_parameter_in_registry(self) -> None:
         """Test that all parameters registered in Registry are expected.
 
         If this test fails, it means some parameters in
@@ -90,3 +115,15 @@ class ExistingPlatformParameterValidityTests(test_utils.GenericTestBase):
             unexpected_names,
             msg='Unexpected platform parameters: %s.' % list(unexpected_names)
         )
+
+    def test_all_feature_flags_are_of_bool_type(self) -> None:
+        feature_flags = feature_services.get_all_feature_flag_dicts()
+        self.assertGreater(len(feature_flags), 0)
+        for feature in feature_flags:
+            self.assertEqual(
+                feature['data_type'],
+                'bool',
+                'We expect all the feature-flags to be of type boolean '
+                'but "%s" feature-flag is of type "%s".' % (
+                    feature['name'], feature['data_type'])
+            )

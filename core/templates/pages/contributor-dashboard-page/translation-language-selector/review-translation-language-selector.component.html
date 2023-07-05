@@ -1,0 +1,126 @@
+<div #dropdown class="oppia-review-translation-language-selector-container e2e-test-language-selector">
+
+  <div class="oppia-review-translation-language-selector-inner-container" (click)="toggleDropdown()" (keydown.enter)="toggleDropdown()" tabindex="0">
+    <span class="oppia-language-selector-label e2e-test-language-selector-selected">
+      {{languageSelection}}
+    </span>
+    <span class="fas fa-caret-down oppia-review-translation-language-selector-inner-container-arrow" [ngStyle]="{ 'transform': dropdownShown ? 'scaleY(-1)' : 'scaleY(1)' }">
+    </span>
+  </div>
+
+  <div *ngIf="dropdownShown" class="oppia-review-translation-language-selector-dropdown-container e2e-test-language-selector-dropdown">
+    <input #filterDiv type="text" class="oppia-review-translation-language-selector-filter-input"
+           placeholder="Language"
+           [(ngModel)]="optionsFilter"
+           (input)="filterOptions()"
+           autofocus>
+    <div class="material-icons oppia-review-translation-language-selector-inner-container-arrow" (click)="toggleDropdown()">
+      arrow_drop_down
+    </div>
+
+    <div class="oppia-review-translation-language-selector-dropdown-options-container">
+      <div class="oppia-review-translation-language-selector-dropdown-option e2e-test-language-selector-option"
+           *ngFor="let option of filteredOptions"
+           (click)="selectOption(option.id)"
+           (keydown.enter)="selectOption(option.id)"
+           tabindex="0"
+           [ngClass]="{'oppia-review-translation-language-selector-dropdown-option-selected' : option.id === activeLanguageCode}">
+        {{option.description}}
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .oppia-review-translation-language-selector-container {
+    background-color: #fff;
+    border-radius: 4px;
+    box-shadow: 0 0 4px rgba(0, 0, 0, 0.25);
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 20px;
+    position: relative;
+    width: 100%;
+  }
+
+  .oppia-review-translation-language-selector-inner-container {
+    display: flex;
+    flex: 1;
+    justify-content: space-between;
+  }
+
+  .oppia-review-translation-language-selector-inner-container-arrow {
+    color: #009688;
+    cursor: pointer;
+    padding-top: 3px;
+  }
+
+  .oppia-review-translation-language-selector-dropdown-options-container {
+    height: calc(100% - 26px);
+    overflow-y: scroll;
+  }
+
+  .oppia-review-translation-language-selector-dropdown-container {
+    background-color: #fff;
+    border-radius: 4px;
+    box-shadow: 0 0 4px rgba(0, 0, 0, 0.25);
+    height: 40vh;
+    left: 0;
+    padding: 8px 12px;
+    position: absolute;
+    right: 0;
+    top: 0;
+    z-index: 1;
+  }
+
+  .oppia-review-translation-language-selector-dropdown-container::-webkit-scrollbar {
+    width: 7px;
+  }
+  .oppia-review-translation-language-selector-dropdown-container::-webkit-scrollbar-track {
+    border-radius: 5px;
+    box-shadow: inset 0 0 3px #808080;
+  }
+  .oppia-review-translation-language-selector-dropdown-container::-webkit-scrollbar-thumb {
+    background: #808080;
+    border-radius: 5px;
+    transition: background 0.5s ease;
+  }
+  .oppia-review-translation-language-selector-dropdown-container::-webkit-scrollbar-thumb:hover {
+    background: #000;
+  }
+
+  .oppia-review-translation-language-selector-info-icon {
+    color: rgb(183, 183, 183);
+    margin-right: 4px;
+  }
+
+  .oppia-review-translation-language-selector-dropdown-option {
+    color: rgb(104, 104, 104);
+    cursor: pointer;
+    display: flex;
+    flex: 1;
+    padding: 8px;
+  }
+
+  .oppia-review-translation-language-selector-dropdown-option:hover {
+    background-color: rgb(238, 238, 238);
+  }
+
+  .oppia-review-translation-language-selector-dropdown-option-selected {
+    background-color: rgb(238, 238, 238);
+    border-radius: 4px;
+  }
+
+  @media screen and (max-width: 700px) {
+    .oppia-language-selector-label {
+      font-size: 18px;
+    }
+  }
+
+  .oppia-review-translation-language-selector-filter-input {
+    border: none;
+    outline: none;
+    width: calc(100% - 32px);
+  }
+</style>

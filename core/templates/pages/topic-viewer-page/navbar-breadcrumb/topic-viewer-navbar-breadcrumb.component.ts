@@ -24,6 +24,7 @@ import { ReadOnlyTopic } from
 import { TopicViewerBackendApiService } from
   'domain/topic_viewer/topic-viewer-backend-api.service';
 import { UrlService } from 'services/contextual/url.service';
+import { I18nLanguageCodeService, TranslationKeyType } from 'services/i18n-language-code.service';
 
 @Component({
   selector: 'topic-viewer-navbar-breadcrumb',
@@ -32,17 +33,38 @@ import { UrlService } from 'services/contextual/url.service';
 })
 export class TopicViewerNavbarBreadcrumbComponent implements OnInit {
   topicName: string = '';
+  topicNameTranslationKey: string = '';
   constructor(
     private topicViewerBackendApiService: TopicViewerBackendApiService,
+    private i18nLanguageCodeService: I18nLanguageCodeService,
     private urlService: UrlService
   ) {}
+
   ngOnInit(): void {
     this.topicViewerBackendApiService.fetchTopicDataAsync(
       this.urlService.getTopicUrlFragmentFromLearnerUrl(),
       this.urlService.getClassroomUrlFragmentFromLearnerUrl()).then(
       (readOnlyTopic: ReadOnlyTopic) => {
         this.topicName = readOnlyTopic.getTopicName();
+        this.topicNameTranslationKey = (
+          this.i18nLanguageCodeService.getTopicTranslationKey(
+            readOnlyTopic.getTopicId(),
+            TranslationKeyType.TITLE
+          )
+        );
       });
+  }
+
+  isHackyTopicNameTranslationDisplayed(): boolean {
+    return (
+      this.i18nLanguageCodeService.isHackyTranslationAvailable(
+        this.topicNameTranslationKey
+      ) && !this.i18nLanguageCodeService.isCurrentLanguageEnglish()
+    );
+  }
+
+  isLanguageRTL(): boolean {
+    return this.i18nLanguageCodeService.isCurrentLanguageRTL();
   }
 }
 angular.module('oppia').directive(

@@ -174,7 +174,8 @@ export class NumberWithUnitsObjectFactory {
                 keys[i]].front_units[j]) !== -1) {
               throw new Error(
                 ObjectsDomainConstants
-                  .NUMBER_WITH_UNITS_PARSING_ERRORS.INVALID_CURRENCY_FORMAT);
+                  .NUMBER_WITH_UNITS_PARSING_ERROR_I18N_KEYS
+                  .INVALID_CURRENCY_FORMAT);
             }
           }
         }
@@ -199,13 +200,15 @@ export class NumberWithUnitsObjectFactory {
         if (startsWithCorrectCurrencyUnit === false) {
           throw new Error(
             // eslint-disable-next-line max-len
-            ObjectsDomainConstants.NUMBER_WITH_UNITS_PARSING_ERRORS.INVALID_CURRENCY);
+            ObjectsDomainConstants
+              .NUMBER_WITH_UNITS_PARSING_ERROR_I18N_KEYS.INVALID_CURRENCY);
         }
         const ind = rawInput.indexOf(String(rawInput.match(/[0-9]/)));
         if (ind === -1) {
           throw new Error(
             // eslint-disable-next-line max-len
-            ObjectsDomainConstants.NUMBER_WITH_UNITS_PARSING_ERRORS.INVALID_CURRENCY);
+            ObjectsDomainConstants
+              .NUMBER_WITH_UNITS_PARSING_ERROR_I18N_KEYS.INVALID_CURRENCY);
         }
         units = rawInput.substr(0, ind).trim();
 
@@ -224,7 +227,8 @@ export class NumberWithUnitsObjectFactory {
         if (startsWithCorrectCurrencyUnit === false) {
           throw new Error(
             // eslint-disable-next-line max-len
-            ObjectsDomainConstants.NUMBER_WITH_UNITS_PARSING_ERRORS.INVALID_CURRENCY);
+            ObjectsDomainConstants
+              .NUMBER_WITH_UNITS_PARSING_ERROR_I18N_KEYS.INVALID_CURRENCY);
         }
         units = units + ' ';
 
@@ -242,7 +246,7 @@ export class NumberWithUnitsObjectFactory {
       if (value.match(/[a-z]/i) || value.match(/[*^$₹()#@]/)) {
         throw new Error(
           // eslint-disable-next-line max-len
-          ObjectsDomainConstants.NUMBER_WITH_UNITS_PARSING_ERRORS.INVALID_VALUE);
+          ObjectsDomainConstants.NUMBER_WITH_UNITS_PARSING_ERROR_I18N_KEYS.INVALID_VALUE);
       }
 
       if (value.includes('/')) {
@@ -257,7 +261,7 @@ export class NumberWithUnitsObjectFactory {
         if (units.match(/[^0-9a-z/* ^()₹$-]/i)) {
           throw new Error(
             // eslint-disable-next-line max-len
-            ObjectsDomainConstants.NUMBER_WITH_UNITS_PARSING_ERRORS.INVALID_UNIT_CHARS);
+            ObjectsDomainConstants.NUMBER_WITH_UNITS_PARSING_ERROR_I18N_KEYS.INVALID_UNIT_CHARS);
         }
       }
     }

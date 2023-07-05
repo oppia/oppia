@@ -33,6 +33,7 @@ export class TextInputRulesService {
     return inputs.x.normalizedStrSet.some(
       input => this.nws.transform(input).toLowerCase() === normalizedAnswer);
   }
+
   FuzzyEquals(answer: TextInputAnswer, inputs: TextInputRuleInputs): boolean {
     const normalizedAnswer = this.nws.transform(answer).toLowerCase();
     const normalizedInput = inputs.x.normalizedStrSet.map(
@@ -67,12 +68,14 @@ export class TextInputRulesService {
     return normalizedInput.some(
       input => hasEditDistanceEqualToOne(input, normalizedAnswer));
   }
+
   StartsWith(answer: TextInputAnswer, inputs: TextInputRuleInputs): boolean {
     const normalizedAnswer = this.nws.transform(answer).toLowerCase();
     const normalizedInput = inputs.x.normalizedStrSet.map(
       input => this.nws.transform(input).toLowerCase());
     return normalizedInput.some(input => normalizedAnswer.indexOf(input) === 0);
   }
+
   Contains(answer: TextInputAnswer, inputs: TextInputRuleInputs): boolean {
     const normalizedAnswer = this.nws.transform(answer).toLowerCase();
     const normalizedInput = inputs.x.normalizedStrSet.map(

@@ -19,7 +19,7 @@
 
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
-import { SuggestionThread } from 'domain/suggestion/SuggestionThreadObjectFactory';
+import { SuggestionThread } from 'domain/suggestion/suggestion-thread-object.model';
 import { DateTimeFormatService } from 'services/date-time-format.service';
 import { ThreadStatusDisplayService } from '../services/thread-status-display.service';
 
@@ -30,6 +30,7 @@ import { ThreadStatusDisplayService } from '../services/thread-status-display.se
 export class ThreadTableComponent {
   @Output() rowClick: EventEmitter<string> = (
     new EventEmitter());
+
   @Input() threads: SuggestionThread[] = [];
   constructor(
     private dateTimeFormatService: DateTimeFormatService,

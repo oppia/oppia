@@ -27,7 +27,7 @@ import { CreatorTopicSummary } from 'domain/topic/creator-topic-summary.model';
 })
 export class AssignSkillToTopicModalComponent extends ConfirmOrCancelModal {
   // This property is initialized using component interactions
-  // and we need to do non-null assertion, for more information see
+  // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   topicSummaries!: CreatorTopicSummary[];
   selectedTopicIds: string[] = [];

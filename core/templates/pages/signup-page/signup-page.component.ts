@@ -29,12 +29,20 @@ import { UtilsService } from 'services/utils.service';
 import { LicenseExplanationModalComponent } from './modals/license-explanation-modal.component';
 import { RegistrationSessionExpiredModalComponent } from './modals/registration-session-expired-modal.component';
 import { SignupPageBackendApiService } from './services/signup-page-backend-api.service';
+import analyticsConstants from 'analytics-constants';
 
 @Component({
   selector: 'oppia-signup-page',
   templateUrl: './signup-page.component.html'
 })
 export class SignupPageComponent {
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  username!: string;
+  emailPreferencesWarningText!: string;
+  // Null represents, if the user has not yet agreed to the latest terms.
+  canReceiveEmailUpdates!: string | null;
   MAX_USERNAME_LENGTH = AppConstants.MAX_USERNAME_LENGTH;
   warningI18nCode = '';
   siteName = AppConstants.SITE_NAME;
@@ -42,14 +50,11 @@ export class SignupPageComponent {
   usernameCheckIsInProgress = false;
   showEmailSignupLink = false;
   emailSignupLink = AppConstants.BULK_EMAIL_SERVICE_SIGNUP_URL;
-  username: string;
-  hasEverRegistered: boolean;
-  hasAgreedToLatestTerms: boolean;
-  showEmailPreferencesForm: boolean;
-  hasUsername: boolean;
+  hasEverRegistered: boolean = false;
+  hasAgreedToLatestTerms: boolean = false;
+  showEmailPreferencesForm: boolean = false;
+  hasUsername: boolean = false;
   blurredAtLeastOnce = false;
-  canReceiveEmailUpdates: boolean;
-  emailPreferencesWarningText: string;
 
   constructor(
     private ngbModal: NgbModal,
@@ -154,7 +159,7 @@ export class SignupPageComponent {
   submitPrerequisitesForm(
       agreedToTerms: boolean,
       username: string,
-      canReceiveEmailUpdates: string): void {
+      canReceiveEmailUpdates: string | null = null): void {
     if (!agreedToTerms) {
       this.alertsService.addWarning('I18N_SIGNUP_ERROR_MUST_AGREE_TO_TERMS');
       return;
@@ -170,20 +175,18 @@ export class SignupPageComponent {
 
     if (returnUrl.indexOf('creator-dashboard') !== -1) {
       defaultDashboard = AppConstants.DASHBOARD_TYPE_CREATOR;
+    } else if (returnUrl.indexOf('contributor-dashboard') !== -1) {
+      defaultDashboard = AppConstants.DASHBOARD_TYPE_CONTRIBUTOR;
     } else {
       defaultDashboard = AppConstants.DASHBOARD_TYPE_LEARNER;
     }
 
     let requestParams = {
       agreed_to_terms: agreedToTerms,
-      can_receive_email_updates: null,
+      can_receive_email_updates: false,
       default_dashboard: defaultDashboard,
-      username: null
+      username: username
     };
-
-    if (!this.hasUsername) {
-      requestParams.username = username;
-    }
 
     if (this.showEmailPreferencesForm && !this.hasUsername) {
       if (canReceiveEmailUpdates === null) {
@@ -210,11 +213,11 @@ export class SignupPageComponent {
           this.submissionInProcess = false;
           return;
         }
-        this.siteAnalyticsService.registerNewSignupEvent();
+        this.siteAnalyticsService.registerNewSignupEvent('#signup-submit');
         setTimeout(() => {
           this.windowRef.nativeWindow.location.href = (
             this.utilsService.getSafeReturnUrl(returnUrl));
-        }, AppConstants.CAN_SEND_ANALYTICS_EVENTS ? 150 : 0);
+        }, analyticsConstants.CAN_SEND_ANALYTICS_EVENTS ? 150 : 0);
       }, (rejection) => {
         if (rejection && rejection.status_code === 401) {
           this.showRegistrationSessionExpiredModal();

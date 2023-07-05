@@ -19,16 +19,21 @@
 import { Component } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 
-import constants from 'assets/constants';
+import { AppConstants } from 'app.constants';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 import { WindowRef } from
   'services/contextual/window-ref.service';
+import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
+import { PlatformFeatureService } from 'services/platform-feature.service';
+
+import './about-page.component.css';
 
 @Component({
   selector: 'about-page',
-  templateUrl: './about-page.component.html'
+  templateUrl: './about-page.component.html',
+  styleUrls: ['./about-page.component.css']
 })
 export class AboutPageComponent {
   features = [{
@@ -47,20 +52,31 @@ export class AboutPageComponent {
     i18nDescription: 'I18N_ABOUT_PAGE_LANGUAGE_FEATURE',
     imageFilename: '/about/language_icon.svg'
   }];
+
+  androidPageIsEnabled: boolean = (
+    this.platformFeatureService.status.AndroidBetaLandingPage.isEnabled
+  );
+
   constructor(
+    private i18nLanguageCodeService: I18nLanguageCodeService,
     private urlInterpolationService: UrlInterpolationService,
     private windowRef: WindowRef,
-    private siteAnalyticsService: SiteAnalyticsService) {
-  }
+    private siteAnalyticsService: SiteAnalyticsService,
+    private platformFeatureService: PlatformFeatureService
+  ) {}
 
   getStaticImageUrl(imagePath: string): string {
     return this.urlInterpolationService.getStaticImageUrl(imagePath);
   }
 
+  onClickAccessAndroidButton(): void {
+    this.windowRef.nativeWindow.location.href = '/android';
+  }
+
   onClickVisitClassroomButton(): void {
     let classroomUrl = this.urlInterpolationService.interpolateUrl(
       '/learn/<classroomUrlFragment>', {
-        classroomUrlFragment: constants.DEFAULT_CLASSROOM_URL_FRAGMENT
+        classroomUrlFragment: AppConstants.DEFAULT_CLASSROOM_URL_FRAGMENT
       });
     this.siteAnalyticsService.registerClickVisitClassroomButtonEvent();
     this.windowRef.nativeWindow.location.href = classroomUrl;

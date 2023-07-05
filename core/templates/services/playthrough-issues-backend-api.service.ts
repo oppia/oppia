@@ -21,7 +21,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
 export interface FetchIssuesResponseBackendDict {
-  'unresolved_issues': PlaythroughIssueBackendDict[],
+  'unresolved_issues': PlaythroughIssueBackendDict[];
 }
 
 import {

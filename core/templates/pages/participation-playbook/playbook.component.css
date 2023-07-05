@@ -1,0 +1,63 @@
+/*
+  NOTE to developers: We generate RTL CSS from this file in the webpack
+  compilation, here are sme additional rules that can be added to the CSS files:
+  https://rtlcss.com/learn/usage-guide/control-directives .
+*/
+.playbook .oppia-static-content ul {
+  justify-content: center;
+  padding: 0;
+}
+.playbook .participation h2:not(:first-child) {
+  margin-top: 2.5em;
+}
+.playbook .oppia-teach-tab-content {
+  padding-bottom: 7%;
+}
+.playbook .oppia-teach-button {
+  display: block;
+  margin: 0 auto 0 auto;
+}
+.playbook .oppia-publication-instructions-container {
+  margin-left: 25px;
+}
+.playbook .oppia-about-buttons-container {
+  text-align: center;
+}
+.playbook .oppia-about-extra-info {
+  background-color: #009788;
+  color: #fff;
+  height: 245px;
+  width: 100%;
+}
+
+.playbook .oppia-about-extra-container {
+  position: relative;
+  top: 50px;
+  width: 100%;
+}
+
+.playbook .oppia-static-extra-content {
+  margin: 0 auto;
+}
+
+.playbook .oppia-about-extra-container h3 {
+  color: #fff;
+  text-align: center;
+}
+
+@media only screen and (min-width: 1400px) {
+  .playbook .oppia-about-extra-info {
+    height: 245px;
+  }
+}
+
+@media(max-width: 700px) {
+  .playbook .oppia-about-extra-container {
+    margin-bottom: -10px;
+  }
+}
+@media(max-width: 440px) {
+  .playbook .oppia-about-extra-container {
+    margin-bottom: 30px;
+  }
+}

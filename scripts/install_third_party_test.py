@@ -18,30 +18,42 @@
 
 from __future__ import annotations
 
+import builtins
 import os
 import re
 import subprocess
 import tarfile
 import tempfile
-import urllib.request as urlrequest
 import zipfile
 
-from core import python_utils
+from core import utils
 from core.tests import test_utils
+from typing import BinaryIO, Final, List, Tuple
 
 from . import common
-from . import install_backend_python_libs
+from . import install_python_prod_dependencies
 from . import install_third_party
 
-RELEASE_TEST_DIR = os.path.join('core', 'tests', 'release_sources', '')
-MOCK_TMP_UNZIP_PATH = os.path.join(RELEASE_TEST_DIR, 'tmp_unzip.zip')
+RELEASE_TEST_DIR: Final = os.path.join('core', 'tests', 'release_sources', '')
+MOCK_TMP_UNZIP_PATH: Final = os.path.join(RELEASE_TEST_DIR, 'tmp_unzip.zip')
+
+
+class Ret:
+    """Return object with required attributes."""
+
+    def __init__(self) -> None:
+        self.returncode = 0
+
+    def communicate(self) -> Tuple[str, str]:
+        """Return required method."""
+        return '', ''
 
 
 class InstallThirdPartyTests(test_utils.GenericTestBase):
     """Test the methods for installing third party."""
 
-    def setUp(self):
-        super(InstallThirdPartyTests, self).setUp()
+    def setUp(self) -> None:
+        super().setUp()
         self.check_function_calls = {
             'remove_is_called': False,
             'rename_is_called': False,
@@ -52,17 +64,17 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
             'rename_is_called': True,
             'extractall_is_called': True
         }
-        def mock_ensure_directory_exists(unused_path):
+        def mock_ensure_directory_exists(_path: str) -> None:
             pass
-        def mock_exists(unused_path):
+        def mock_exists(_path: str) -> bool:
             return True
-        def mock_remove(unused_path):
+        def mock_remove(_path: str) -> None:
             self.check_function_calls['remove_is_called'] = True
-        def mock_rename(unused_path1, unused_path2):
+        def mock_rename(_path1: str, _path2: str) -> None:
             self.check_function_calls['rename_is_called'] = True
-        def mock_url_retrieve(unused_url, filename):  # pylint: disable=unused-argument
+        def mock_url_retrieve(_url: str, filename: str) -> None:  # pylint: disable=unused-argument
             pass
-        def mock_extractall(unused_self, path):  # pylint: disable=unused-argument
+        def mock_extractall(_self: zipfile.ZipFile, path: str) -> None:  # pylint: disable=unused-argument
             self.check_function_calls['extractall_is_called'] = True
 
         self.unzip_swap = self.swap(
@@ -73,18 +85,21 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
         self.remove_swap = self.swap(os, 'remove', mock_remove)
         self.rename_swap = self.swap(os, 'rename', mock_rename)
         self.url_retrieve_swap = self.swap(
-            urlrequest, 'urlretrieve', mock_url_retrieve)
+            common, 'url_retrieve', mock_url_retrieve)
         self.extract_swap = self.swap(
             zipfile.ZipFile, 'extractall', mock_extractall)
 
-    def test_download_files_with_invalid_source_filenames(self):
-        with self.assertRaisesRegexp(
+    def test_download_files_with_invalid_source_filenames(self) -> None:
+        # TODO(#13059): Here we use MyPy ignore because after we fully type the
+        # codebase we plan to get rid of the tests that intentionally test wrong
+        # inputs that we can normally catch by typing.
+        with self.assertRaisesRegex(
             AssertionError,
             'Expected list of filenames, got \'invalid source filename\''):
             install_third_party.download_files(
-                'source_url', 'target_dir', 'invalid source filename')
+                'source_url', 'target_dir', 'invalid source filename')  # type: ignore[arg-type]
 
-    def test_download_files_with_valid_source_filenames(self):
+    def test_download_files_with_valid_source_filenames(self) -> None:
         check_file_downloads = {
             'target_dir/file1': False,
             'target_dir/file2': False
@@ -94,26 +109,26 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
             'target_dir/file2': True
         }
 
-        def mock_exists(path):
+        def mock_exists(path: str) -> bool:
             if path == 'target_dir/file1':
                 return True
             return False
-        def mock_url_retrieve(unused_url, filename):
+        def mock_url_retrieve(_url: str, filename: str) -> None:
             check_file_downloads[filename] = True
 
         exists_swap = self.swap(os.path, 'exists', mock_exists)
         url_retrieve_swap = self.swap(
-            urlrequest, 'urlretrieve', mock_url_retrieve)
+            common, 'url_retrieve', mock_url_retrieve)
         with self.dir_exists_swap, exists_swap, url_retrieve_swap:
             install_third_party.download_files(
                 'source_url', 'target_dir', ['file1', 'file2'])
         self.assertEqual(check_file_downloads, expected_check_file_downloads)
 
-    def test_download_and_unzip_files_without_exception(self):
+    def test_download_and_unzip_files_without_exception(self) -> None:
         exists_arr = []
         self.check_function_calls['url_open_is_called'] = False
         self.expected_check_function_calls['url_open_is_called'] = False
-        def mock_exists(unused_path):
+        def mock_exists(_path: str) -> bool:
             exists_arr.append(False)
             return False
 
@@ -128,46 +143,42 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
             self.check_function_calls, self.expected_check_function_calls)
         self.assertEqual(exists_arr, [False])
 
-    def test_download_and_unzip_files_with_exception(self):
+    def test_download_and_unzip_files_with_exception(self) -> None:
         exists_arr = []
         self.check_function_calls['url_open_is_called'] = False
         self.expected_check_function_calls['url_open_is_called'] = True
-        def mock_exists(path):
+        def mock_exists(path: str) -> bool:
             if path == install_third_party.TMP_UNZIP_PATH:
                 exists_arr.append(True)
                 return True
             exists_arr.append(False)
             return False
 
-        def mock_url_open(unused_url):
+        def mock_url_open(_url: str) -> BinaryIO:
             self.check_function_calls['url_open_is_called'] = True
-            # The function is used as follows: python_utils.url_open(req).read()
+            # The function is used as follows: utils.url_open(req).read()
             # So, the mock returns a file object as a mock so that the read
             # function can work correctly.
-            temp_file = tempfile.NamedTemporaryFile()
-            file_obj = python_utils.open_file(temp_file.name, 'r')
+            file_obj = utils.open_file(MOCK_TMP_UNZIP_PATH, 'rb', None)
             return file_obj
-        def mock_string_io(buffer_value):  # pylint: disable=unused-argument
-            return MOCK_TMP_UNZIP_PATH
 
         exists_swap = self.swap(os.path, 'exists', mock_exists)
-        url_open_swap = self.swap(python_utils, 'url_open', mock_url_open)
-        string_io_swap = self.swap(python_utils, 'string_io', mock_string_io)
+        url_open_swap = self.swap(utils, 'url_open', mock_url_open)
         with exists_swap, self.dir_exists_swap, self.url_retrieve_swap:
             with self.remove_swap, self.rename_swap, self.extract_swap:
-                with url_open_swap, string_io_swap:
+                with url_open_swap:
                     install_third_party.download_and_unzip_files(
                         'http://src', 'target dir', 'zip root', 'target root')
         self.assertEqual(
             self.check_function_calls, self.expected_check_function_calls)
         self.assertEqual(exists_arr, [False, True])
 
-    def test_download_and_untar_files(self):
+    def test_download_and_untar_files(self) -> None:
         exists_arr = []
-        def mock_exists(unused_path):
+        def mock_exists(_path: str) -> bool:
             exists_arr.append(False)
             return False
-        def mock_extractall(unused_self, unused_path):
+        def mock_extractall(_self: zipfile.ZipFile, _path: str) -> None:
             self.check_function_calls['extractall_is_called'] = True
 
         exists_swap = self.swap(os.path, 'exists', mock_exists)
@@ -185,53 +196,57 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
             self.check_function_calls, self.expected_check_function_calls)
         self.assertEqual(exists_arr, [False])
 
-    def test_get_file_contents(self):
+    def test_get_file_contents(self) -> None:
         temp_file = tempfile.NamedTemporaryFile().name
         actual_text = 'Testing install third party file.'
-        with python_utils.open_file(temp_file, 'w') as f:
+        with utils.open_file(temp_file, 'w') as f:
             f.write(actual_text)
         self.assertEqual(
             install_third_party.get_file_contents(temp_file), actual_text)
 
-    def test_return_json(self):
+    def test_return_json(self) -> None:
         temp_file = tempfile.NamedTemporaryFile().name
         actual_text = '{"Testing": "install_third_party"}'
-        with python_utils.open_file(temp_file, 'w') as f:
+        with utils.open_file(temp_file, 'w') as f:
             f.write(actual_text)
         self.assertEqual(
             install_third_party.return_json(temp_file),
             {'Testing': 'install_third_party'})
 
-    def test_dependencies_syntax_testing_with_valid_syntax(self):
+    def test_dependencies_syntax_testing_with_valid_syntax(self) -> None:
         install_third_party.test_dependencies_syntax(
-            'files', {
-                'url': 'https://github.com/yui/yuicompressor/v2.4.8#md5=123456',
-                'files': ['yuicompressor-2.4.8.jar'],
-                'version': '2.4.8',
-                'targetDirPrefix': 'yuicompressor-',
-                'downloadFormat': 'files'})
+            'zip', {
+                'version': 'c26ebb9baaf0abc060c8a13254dad283c6ee7304',
+                'downloadFormat': 'zip',
+                'url': 'https://github.com/oppia/MIDI.js/archive/c26e.zip',
+                'rootDirPrefix': 'MIDI.js-',
+                'targetDir': 'midi-js-c26ebb'
+            }
+        )
 
-    def test_dependencies_syntax_with_missing_mandatory_key(self):
+    def test_dependencies_syntax_with_missing_mandatory_key(self) -> None:
         print_arr = []
-        def mock_print(msg):
+        def mock_print(msg: str) -> None:
             print_arr.append(msg)
-        print_swap = self.swap(python_utils, 'PRINT', mock_print)
-        with print_swap, self.assertRaisesRegexp(SystemExit, '1'):
+        print_swap = self.swap(builtins, 'print', mock_print)
+        with print_swap, self.assertRaisesRegex(SystemExit, '1'):
             install_third_party.test_dependencies_syntax(
                 'files', {
-                    'files': ['yuicompressor-2.4.8.jar'],
-                    'version': '2.4.8',
-                    'targetDirPrefix': 'yuicompressor-',
-                    'downloadFormat': 'files'})
+                    'files': ['MathJax-2.7.5.jar'],
+                    'version': '2.7.5',
+                    'targetDirPrefix': 'MathJax-',
+                    'downloadFormat': 'files'
+                }
+            )
         self.assertTrue(
             'This key is missing or misspelled: "url".' in print_arr)
 
-    def test_dependencies_syntax_with_extra_optional_key(self):
+    def test_dependencies_syntax_with_extra_optional_key(self) -> None:
         print_arr = []
-        def mock_print(msg):
+        def mock_print(msg: str) -> None:
             print_arr.append(msg)
-        print_swap = self.swap(python_utils, 'PRINT', mock_print)
-        with print_swap, self.assertRaisesRegexp(SystemExit, '1'):
+        print_swap = self.swap(builtins, 'print', mock_print)
+        with print_swap, self.assertRaisesRegex(SystemExit, '1'):
             install_third_party.test_dependencies_syntax(
                 'zip', {
                     'url': 'https://github.com/jsocol/bleach/v3.1.0.zip',
@@ -244,12 +259,12 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
             'Only one of these keys pair must be used: '
             '"rootDir, rootDirPrefix".' in print_arr)
 
-    def test_dependencies_syntax_with_invalid_url(self):
+    def test_dependencies_syntax_with_invalid_url(self) -> None:
         print_arr = []
-        def mock_print(msg):
+        def mock_print(msg: str) -> None:
             print_arr.append(msg)
-        print_swap = self.swap(python_utils, 'PRINT', mock_print)
-        with print_swap, self.assertRaisesRegexp(SystemExit, '1'):
+        print_swap = self.swap(builtins, 'print', mock_print)
+        with print_swap, self.assertRaisesRegex(SystemExit, '1'):
             install_third_party.test_dependencies_syntax(
                 'tar', {
                     'version': '4.7.1',
@@ -264,71 +279,77 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
             'This url https://python.org/packages/beautifulsoup4-4.7.1.zip is '
             'invalid for tar file format.' in print_arr)
 
-    def test_validate_dependencies_with_correct_syntax(self):
-        def mock_return_json(unused_filepath):
+    def test_validate_dependencies_with_correct_syntax(self) -> None:
+        def mock_return_json(
+            _path: str
+        ) -> install_third_party.DependenciesDict:
             return {
                 'dependencies': {
-                    'oppiaTools': {
-                        'yuiCompressor': {
-                            'url': 'https://github.com/yui/v2.4.8',
-                            'files': ['yuicompressor-2.4.8.jar'],
-                            'version': '2.4.8',
-                            'targetDirPrefix': 'yuicompressor-',
-                            'downloadFormat': 'files'}}}}
+                    'frontend': {
+                        'mathJax': {
+                            'url': 'https://github.com/mathjax/2.7.5',
+                            'files': ['MathJax-2.7.5.jar'],
+                            'version': '2.7.5',
+                            'targetDirPrefix': 'MathJax-',
+                            'downloadFormat': 'files'
+                        }
+                    }
+                }
+            }
+
         return_json_swap = self.swap(
             install_third_party, 'return_json', mock_return_json)
         with return_json_swap:
             install_third_party.validate_dependencies('filepath')
 
-    def test_validate_dependencies_with_missing_download_format(self):
-        def mock_return_json(unused_filepath):
+    def test_validate_dependencies_with_missing_download_format(self) -> None:
+        def mock_return_json(
+            _path: str
+        ) -> install_third_party.DependenciesDict:
             return {
                 'dependencies': {
-                    'oppiaTools': {
-                        'yuiCompressor': {
-                            'url': 'https://github.com/yui/v2.4.8',
-                            'files': ['yuicompressor-2.4.8.jar'],
-                            'version': '2.4.8',
-                            'targetDirPrefix': 'yuicompressor-'}}}}
+                    'frontend': {
+                        'mathJax': {
+                            'version': '2.7.5',
+                            'url': 'https://github.com/mathjax/2.7.5.zip',
+                            'targetDirPrefix': 'MathJax-'
+                        }
+                    }
+                }
+            }
         return_json_swap = self.swap(
             install_third_party, 'return_json', mock_return_json)
-        with return_json_swap, self.assertRaisesRegexp(
+        with return_json_swap, self.assertRaisesRegex(
             Exception,
             re.escape(
-                'downloadFormat not specified in {\'url\': '
-                '\'https://github.com/yui/v2.4.8\', \'files\': '
-                '[\'yuicompressor-2.4.8.jar\'], \'version\': \'2.4.8\', '
-                '\'targetDirPrefix\': \'yuicompressor-\'}'
+                'downloadFormat not specified in {\'version\': \'2.7.5\', '
+                '\'url\': \'https://github.com/mathjax/2.7.5.zip\', '
+                '\'targetDirPrefix\': \'MathJax-\'}'
             )
         ):
             install_third_party.validate_dependencies('filepath')
 
-    def test_function_calls(self):
+    def test_function_calls(self) -> None:
         check_function_calls = {
             'validate_dependencies_is_called': False,
             'download_files_is_called': False,
             'download_and_unzip_files_is_called': False,
             'download_and_untar_files_is_called': False,
-            'install_backend_python_libs_is_called': False
+            'install_python_prod_dependencies_is_called': False
         }
         expected_check_function_calls = {
             'validate_dependencies_is_called': True,
             'download_files_is_called': True,
             'download_and_unzip_files_is_called': True,
             'download_and_untar_files_is_called': True,
-            'install_backend_python_libs_is_called': True
+            'install_python_prod_dependencies_is_called': True
         }
-        def mock_return_json(unused_filepath):
+        def mock_return_json(
+            _path: str
+        ) -> install_third_party.DependenciesDict:
             return {
                 'dependencies': {
                     'oppiaTools': {
-                        'yuiCompressor': {
-                            'url': 'https://github.com/yui/v2.4.8',
-                            'files': ['yuicompressor-2.4.8.jar'],
-                            'version': '2.4.8',
-                            'targetDirPrefix': 'yuicompressor-',
-                            'downloadFormat': 'files'
-                        },
                         'bleach': {
                             'version': '3.1.0',
                             'downloadFormat': 'zip',
@@ -349,24 +370,44 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
                             'downloadFormat': 'zip',
                             'url': 'https://bootstrap/bootstrap-4.3.1-dist.zip',
                             'rootDir': 'bootstrap-4.3.1-dist',
-                            'targetDir': 'bootstrap'}}}}
+                            'targetDir': 'bootstrap'
+                        },
+                        'angularTest': {
+                            'version': '1.8.2',
+                            'downloadFormat': 'files',
+                            'url': 'https://code.angularjs.org/1.8.2',
+                            'targetDirPrefix': 'angularjs-',
+                            'files': ['angular-mocks.js']
+                        },
+                    }
+                }
+            }
 
-        def mock_validate_dependencies(unused_filepath):
+        def mock_validate_dependencies(_path: str) -> None:
             check_function_calls['validate_dependencies_is_called'] = True
         def mock_download_files(
-                unused_source_url_root, unused_target_dir,
-                unused_source_filenames):
+            unused_source_url_root: str,
+            unused_target_dir: str,
+            unused_source_filenames: str
+        ) -> None:
             check_function_calls['download_files_is_called'] = True
         def mock_download_and_unzip_files(
-                unused_source_url, unused_target_parent_dir,
-                unused_zip_root_name, unused_target_root_name):
+            unused_source_url: str,
+            unused_target_parent_dir: str,
+            unused_zip_root_name: str,
+            unused_target_root_name: str
+        ) -> None:
             check_function_calls['download_and_unzip_files_is_called'] = True
         def mock_download_and_untar_files(
-                unused_source_url, unused_target_parent_dir,
-                unused_tar_root_name, unused_target_root_name):
+            unused_source_url: str,
+            unused_target_parent_dir: str,
+            unused_tar_root_name: str,
+            unused_target_root_name: str
+        ) -> None:
             check_function_calls['download_and_untar_files_is_called'] = True
-        def mock_install_backend_python_libs():
-            check_function_calls['install_backend_python_libs_is_called'] = True
+        def mock_install_python_prod_dependencies() -> None:
+            check_function_calls[
+                'install_python_prod_dependencies_is_called'] = True
         return_json_swap = self.swap(
             install_third_party, 'return_json', mock_return_json)
         validate_swap = self.swap(
@@ -382,20 +423,20 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
         untar_files_swap = self.swap(
             install_third_party, 'download_and_untar_files',
             mock_download_and_untar_files)
-        mock_install_backend_python_libs_swap = self.swap(
-            install_backend_python_libs, 'main',
-            mock_install_backend_python_libs)
+        mock_install_python_prod_dependencies_swap = self.swap(
+            install_python_prod_dependencies, 'main',
+            mock_install_python_prod_dependencies)
 
         with validate_swap, return_json_swap, download_files_swap, (
-            mock_install_backend_python_libs_swap):
+            mock_install_python_prod_dependencies_swap):
             with unzip_files_swap, untar_files_swap:
                 install_third_party.main(args=[])
         self.assertEqual(check_function_calls, expected_check_function_calls)
 
-    def test_windows_os_throws_exception(self):
-        def mock_is_windows_os():
+    def test_windows_os_throws_exception(self) -> None:
+        def mock_is_windows_os() -> bool:
             return True
-        windows_not_supported_exception = self.assertRaisesRegexp(
+        windows_not_supported_exception = self.assertRaisesRegex(
             Exception,
             'The redis command line interface will not be installed because '
             'your machine is on the Windows operating system.')
@@ -404,7 +445,7 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
             windows_not_supported_exception):
             install_third_party.main(args=[])
 
-    def test_install_redis_cli_function_calls(self):
+    def test_install_redis_cli_function_calls(self) -> None:
         check_function_calls = {
             'subprocess_call_is_called': False,
             'download_and_untar_files_is_called': False
@@ -414,27 +455,22 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
             'download_and_untar_files_is_called': True
         }
         def mock_download_and_untar_files(
-                unused_source_url, unused_target_parent_dir,
-                unused_tar_root_name, unused_target_root_name):
+            unused_source_url: str,
+            unused_target_parent_dir: str,
+            unused_tar_root_name: str,
+            unused_target_root_name: str
+        ) -> None:
             check_function_calls['download_and_untar_files_is_called'] = True
 
-        def mock_call(unused_cmd_tokens, *args, **kwargs):  # pylint: disable=unused-argument
+        def mock_call(unused_cmd_tokens: List[str], **kwargs: str) -> Ret:  # pylint: disable=unused-argument
             check_function_calls['subprocess_call_is_called'] = True
-            class Ret:
-                """Return object with required attributes."""
-
-                def __init__(self):
-                    self.returncode = 0
-                def communicate(self):
-                    """Return required method."""
-                    return '', ''
 
             # The first subprocess.call() in install_redis_cli needs to throw an
             # exception so that the script can execute the installation pathway.
             if unused_cmd_tokens == [common.REDIS_SERVER_PATH, '--version']:
                 raise OSError('redis-server: command not found')
-            else:
-                return Ret()
+
+            return Ret()
 
         swap_call = self.swap(
             subprocess, 'call', mock_call)
@@ -446,7 +482,7 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
 
         self.assertEqual(check_function_calls, expected_check_function_calls)
 
-    def test_install_elasticsearch_dev_server_windows(self):
+    def test_install_elasticsearch_dev_server_windows(self) -> None:
         check_function_calls = {
             'subprocess_call_is_called': False,
             'download_and_untar_files_is_called': False,
@@ -457,34 +493,30 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
             'download_and_untar_files_is_called': False,
             'download_and_unzip_files_is_called': True
         }
-        def mock_is_mac_os():
+        def mock_is_mac_os() -> bool:
             return False
-        def mock_is_linux_os():
+        def mock_is_linux_os() -> bool:
             return False
-        def mock_is_windows_os():
+        def mock_is_windows_os() -> bool:
             return True
         def mock_download_and_unzip_files(
-                unused_source_url, unused_target_parent_dir,
-                unused_tar_root_name, unused_target_root_name):
+            unused_source_url: str,
+            unused_target_parent_dir: str,
+            unused_tar_root_name: str,
+            unused_target_root_name: str
+        ) -> None:
             check_function_calls['download_and_unzip_files_is_called'] = True
-        def mock_call(unused_cmd_tokens, *args, **kwargs):  # pylint: disable=unused-argument
-            check_function_calls['subprocess_call_is_called'] = True
-            class Ret:
-                """Return object with required attributes."""
 
-                def __init__(self):
-                    self.returncode = 0
-                def communicate(self):
-                    """Return required method."""
-                    return '', ''
+        def mock_call(unused_cmd_tokens: List[str], **_args: int) -> Ret:
+            check_function_calls['subprocess_call_is_called'] = True
 
             # The first subprocess.call() needs to throw an
             # exception so that the script can execute the installation pathway.
             if unused_cmd_tokens == [
                     '%s/bin/elasticsearch' % common.ES_PATH, '--version']:
                 raise OSError('elasticsearch: command not found')
-            else:
-                return Ret()
+
+            return Ret()
 
         swap_call = self.swap(
             subprocess, 'call', mock_call)
@@ -499,39 +531,37 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
             install_third_party.install_elasticsearch_dev_server()
         self.assertEqual(check_function_calls, expected_check_function_calls)
 
-    def test_install_elasticsearch_dev_server_unix(self):
+    def test_install_elasticsearch_dev_server_unix(self) -> None:
         check_function_calls = {
             'subprocess_call_is_called': False,
             'download_and_untar_files_is_called': False,
             'download_and_unzip_files_is_called': False
         }
-        def mock_is_linux_os():
+        def mock_is_linux_os() -> bool:
             return False
-        def mock_is_mac_os():
+        def mock_is_mac_os() -> bool:
             return True
         def mock_download_and_untar_files(
-                unused_source_url, unused_target_parent_dir,
-                unused_tar_root_name, unused_target_root_name):
+            unused_source_url: str,
+            unused_target_parent_dir: str,
+            unused_tar_root_name: str,
+            unused_target_root_name: str
+        ) -> None:
             check_function_calls['download_and_untar_files_is_called'] = True
 
-        def mock_call(unused_cmd_tokens, *args, **kwargs):  # pylint: disable=unused-argument
+        def mock_call(
+            unused_cmd_tokens: List[str],
+            *_args: str,
+            **_kwargs: str
+        ) -> Ret:
             check_function_calls['subprocess_call_is_called'] = True
-            class Ret:
-                """Return object with required attributes."""
-
-                def __init__(self):
-                    self.returncode = 0
-                def communicate(self):
-                    """Return required method."""
-                    return '', ''
-
             # The first subprocess.call() needs to throw an
             # exception so that the script can execute the installation pathway.
             if unused_cmd_tokens == [
                     '%s/bin/elasticsearch' % common.ES_PATH, '--version']:
                 raise OSError('elasticsearch: command not found')
-            else:
-                return Ret()
+
+            return Ret()
 
         swap_call = self.swap(
             subprocess, 'call', mock_call)
@@ -551,37 +581,32 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
             install_third_party.install_elasticsearch_dev_server()
         self.assertEqual(check_function_calls, expected_check_function_calls)
 
-    def test_install_elasticsearch_unrecognized_os(self):
+    def test_install_elasticsearch_unrecognized_os(self) -> None:
 
-        def mock_is_mac_os():
+        def mock_is_mac_os() -> bool:
             return False
-        def mock_is_linux_os():
+        def mock_is_linux_os() -> bool:
             return False
-        def mock_is_windows_os():
+        def mock_is_windows_os() -> bool:
             return False
 
-        def mock_call(unused_cmd_tokens, *args, **kwargs):  # pylint: disable=unused-argument
-            class Ret:
-                """Return object with required attributes."""
-
-                def __init__(self):
-                    self.returncode = 0
-                def communicate(self):
-                    """Return required method."""
-                    return '', ''
-
+        def mock_call(
+            unused_cmd_tokens: List[str],
+            *_args: str,
+            **_kwargs: str
+        ) -> Ret:
             # The first subprocess.call() needs to throw an
             # exception so that the script can execute the installation pathway.
             if unused_cmd_tokens == [
                     '%s/bin/elasticsearch' % common.ES_PATH, '--version']:
                 raise OSError('elasticsearch: command not found')
-            else:
-                return Ret()
+
+            return Ret()
 
         swap_call = self.swap(
             subprocess, 'call', mock_call)
 
-        os_not_supported_exception = self.assertRaisesRegexp(
+        os_not_supported_exception = self.assertRaisesRegex(
             Exception, 'Unrecognized or unsupported operating system.')
         mac_swap = self.swap(common, 'is_mac_os', mock_is_mac_os)
         linux_swap = self.swap(common, 'is_linux_os', mock_is_linux_os)
@@ -590,23 +615,19 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
             os_not_supported_exception):
             install_third_party.install_elasticsearch_dev_server()
 
-    def test_elasticsearch_already_installed(self):
+    def test_elasticsearch_already_installed(self) -> None:
         check_function_calls = {
             'subprocess_call_is_called': False,
             'download_and_untar_files_is_called': False,
             'download_and_unzip_files_is_called': False
         }
 
-        def mock_call(unused_cmd_tokens, *args, **kwargs):  # pylint: disable=unused-argument
+        def mock_call(
+            unused_cmd_tokens: List[str],
+            *_args: str,
+            **_kwargs: str
+        ) -> Ret:
             check_function_calls['subprocess_call_is_called'] = True
-            class Ret:
-                """Return object with required attributes."""
-
-                def __init__(self):
-                    self.returncode = 0
-                def communicate(self):
-                    """Return required method."""
-                    return '', ''
 
             return Ret()
 

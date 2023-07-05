@@ -30,7 +30,6 @@ import { AudioTranslationLanguageService } from
   'pages/exploration-player-page/services/audio-translation-language.service';
 import { Interaction } from 'domain/exploration/InteractionObjectFactory';
 import { RecordedVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
-import { WrittenTranslations } from 'domain/exploration/WrittenTranslationsObjectFactory';
 
 describe('Player position service', () => {
   let pts: PlayerTranscriptService;
@@ -79,14 +78,12 @@ describe('Player position service', () => {
     pts.addNewCard(StateCard.createNewCard(
       'First state', 'Content HTML',
       '<oppia-text-input-html></oppia-text-input-html>',
-      {} as Interaction, {} as RecordedVoiceovers,
-      {} as WrittenTranslations, '', atls));
+      {} as Interaction, {} as RecordedVoiceovers, '', atls));
 
     pts.addNewCard(StateCard.createNewCard(
       'Second state', 'Content HTML',
       '<oppia-text-input-html></oppia-text-input-html>',
-      {} as Interaction, {} as RecordedVoiceovers,
-      {} as WrittenTranslations, '', atls));
+      {} as Interaction, {} as RecordedVoiceovers, '', atls));
     let callBack = () => {};
     pps.init(callBack);
     pps.setDisplayedCardIndex(0);
@@ -132,5 +129,11 @@ describe('Player position service', () => {
   it('should fetch EventEmitter when help card is available', () => {
     let mockHelpCardAvailableEvent = new EventEmitter();
     expect(pps.onHelpCardAvailable).toEqual(mockHelpCardAvailableEvent);
+  });
+
+  it('should fetch EventEmitter for loading most recent checkpoint', () => {
+    let mockLoadMostRecentCheckpointEvent = new EventEmitter();
+    expect(pps.onLoadedMostRecentCheckpoint).toEqual(
+      mockLoadMostRecentCheckpointEvent);
   });
 });

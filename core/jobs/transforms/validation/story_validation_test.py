@@ -31,7 +31,7 @@ if MYPY: # pragma: no cover
     from mypy_imports import story_models
 
 (base_models, story_models) = models.Registry.import_models(
-    [models.NAMES.base_model, models.NAMES.story])
+    [models.Names.BASE_MODEL, models.Names.STORY])
 
 
 class ValidateStorySnapshotMetadataModelTests(job_test_utils.PipelinedTestBase):
@@ -236,7 +236,7 @@ class ValidateStorySnapshotMetadataModelTests(job_test_utils.PipelinedTestBase):
             ])
 
     def test_story_change_object_with_invalid_story_contents_property(
-            self
+        self
     ) -> None:
         commit_dict = {
             'cmd': 'update_story_contents_property',

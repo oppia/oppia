@@ -24,8 +24,8 @@ import { Component, EventEmitter, Input, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 
 interface IntValidatorSchema {
-  type: string,
-  validators: { id: string }[]
+  type: string;
+  validators: { id: string }[];
 }
 
 @Component({
@@ -35,7 +35,7 @@ interface IntValidatorSchema {
 })
 export class IntEditorComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks
-  // and we need to do non-null assertion, for more information see
+  // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() modalId!: symbol;
   @Input() value!: number;

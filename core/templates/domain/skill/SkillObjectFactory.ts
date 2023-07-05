@@ -33,14 +33,14 @@ export interface SkillBackendDict {
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-import { ConceptCardObjectFactory, ConceptCard, ConceptCardBackendDict } from
-  'domain/skill/ConceptCardObjectFactory';
+import { ConceptCard, ConceptCardBackendDict } from
+  'domain/skill/concept-card.model';
 import { MisconceptionObjectFactory, Misconception, MisconceptionBackendDict }
   from 'domain/skill/MisconceptionObjectFactory';
 import { Rubric, RubricBackendDict } from
   'domain/skill/rubric.model';
 import { ValidatorsService } from 'services/validators.service';
-import constants from 'assets/constants';
+import { AppConstants } from 'app.constants';
 
 export class Skill {
   _id: string;
@@ -54,7 +54,7 @@ export class Skill {
   _supersedingSkillId: string;
   _allQuestionsMerged: boolean;
   _prerequisiteSkillIds: string[];
-  SKILL_DIFFICULTIES: readonly string[] = constants.SKILL_DIFFICULTIES;
+  SKILL_DIFFICULTIES: readonly string[] = AppConstants.SKILL_DIFFICULTIES;
 
   constructor(
       id: string,
@@ -80,6 +80,7 @@ export class Skill {
     this._supersedingSkillId = supersedingSkillId;
     this._prerequisiteSkillIds = prerequisiteSkillIds;
   }
+
   copyFromSkill(skill: Skill): void {
     this._id = skill.getId();
     this._description = skill.getDescription();
@@ -152,8 +153,8 @@ export class Skill {
     return this._nextMisconceptionId;
   }
 
-  getIncrementedMisconceptionId(id: string): number {
-    return (parseInt(id) + 1);
+  getIncrementedMisconceptionId(id: number): number {
+    return (id + 1);
   }
 
   getSupersedingSkillId(): string {
@@ -164,7 +165,7 @@ export class Skill {
     return this._allQuestionsMerged;
   }
 
-  findMisconceptionById(id: string): Misconception {
+  findMisconceptionById(id: number): Misconception {
     for (var idx in this._misconceptions) {
       if (this._misconceptions[idx].getId() === id) {
         return this._misconceptions[idx];
@@ -173,7 +174,7 @@ export class Skill {
     throw new Error('Could not find misconception with ID: ' + id);
   }
 
-  deleteMisconception(id: string): void {
+  deleteMisconception(id: number): void {
     this._misconceptions.forEach((misc: Misconception) => {
       if (misc.getId() === id) {
         this._misconceptions.splice(this._misconceptions.indexOf(misc), 1);
@@ -197,7 +198,7 @@ export class Skill {
     );
   }
 
-  getMisconceptionId(index: number): string {
+  getMisconceptionId(index: number): number {
     return this._misconceptions[index].getId();
   }
 
@@ -234,6 +235,7 @@ export class Skill {
       prerequisite_skill_ids: this._prerequisiteSkillIds
     };
   }
+
   getValidationIssues(): string[] {
     var issues = [];
     if (this.getConceptCard().getExplanation().html === '') {
@@ -254,7 +256,6 @@ export class Skill {
 })
 export class SkillObjectFactory {
   constructor(
-    private conceptCardObjectFactory: ConceptCardObjectFactory,
     private misconceptionObjectFactory: MisconceptionObjectFactory,
     private validatorService: ValidatorsService) {
   }
@@ -272,7 +273,7 @@ export class SkillObjectFactory {
       this.generateMisconceptionsFromBackendDict(
         skillBackendDict.misconceptions),
       this.generateRubricsFromBackendDict(skillBackendDict.rubrics),
-      this.conceptCardObjectFactory.createFromBackendDict(
+      ConceptCard.createFromBackendDict(
         skillBackendDict.skill_contents),
       skillBackendDict.language_code,
       skillBackendDict.version,

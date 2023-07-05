@@ -2,12 +2,18 @@ var argv = require('yargs').positional('terminalEnabled', {
   type: 'boolean',
   'default': false
 }).argv;
-
+var path = require('path');
 var generatedJs = 'third_party/generated/js/third_party.js';
 if (argv.prodEnv) {
   generatedJs = (
     'third_party/generated/js/third_party.min.js');
 }
+
+// Generate a random number between 0 and 999 to use as the seed for the
+// frontend test execution order.
+let jasmineSeed = Math.floor(Math.random() * 1000);
+// eslint-disable-next-line no-console
+console.log(`Seed for Frontend Test Execution Order ${jasmineSeed}`);
 
 module.exports = function(config) {
   config.set({
@@ -81,6 +87,13 @@ module.exports = function(config) {
       'extensions/interactions/*.json': ['json_fixtures'],
       'core/tests/data/*.json': ['json_fixtures']
     },
+    client: {
+      jasmine: {
+        random: true,
+        seed: jasmineSeed,
+      },
+    },
+    crossOriginAttribute: true,
     reporters: ['progress', 'coverage-istanbul'],
     coverageIstanbulReporter: {
       reports: ['html', 'json', 'lcovonly'],
@@ -114,7 +127,7 @@ module.exports = function(config) {
           '--no-sandbox',
           '--disable-gpu',
           '--disable-dev-shm-usage',
-          '--js-flags=--max-old-space-size=2048'
+          '--js-flags=--max-old-space-size=4096'
         ]
       }
     },
@@ -178,7 +191,8 @@ module.exports = function(config) {
                 }
               },
               {
-                loader: 'angular2-template-loader'
+                loader: path.resolve(
+                  'angular-template-style-url-replacer.webpack-loader')
               }
             ]
           },

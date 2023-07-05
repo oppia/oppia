@@ -16,55 +16,70 @@
  * @fileoverview Unit tests for ParameterMetadataService.
  */
 
-import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
+import { TestBed } from '@angular/core/testing';
+import { ParameterMetadataService } from 'pages/exploration-editor-page/services/parameter-metadata.service';
+import { ExplorationParamChangesService } from 'pages/exploration-editor-page/services/exploration-param-changes.service';
+import { ExplorationStatesService } from 'pages/exploration-editor-page/services/exploration-states.service';
+import { GraphDataService } from 'pages/exploration-editor-page/services/graph-data.service';
+import { StatesObjectFactory } from 'domain/exploration/StatesObjectFactory';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 
-require('pages/exploration-editor-page/services/parameter-metadata.service');
-require('expressions/expression-interpolation.service.ts');
-require(
-  'pages/exploration-editor-page/services/' +
-  'exploration-param-changes.service.ts');
-require('pages/exploration-editor-page/services/exploration-states.service.ts');
-require('pages/exploration-editor-page/services/graph-data.service.ts');
-
-require(
-  'pages/exploration-editor-page/exploration-editor-page.constants.ajs.ts');
-
-describe('Parameter Metadata Service', function() {
-  var ParameterMetadataService = null;
-  var StatesObjectFactory = null;
-
-  beforeEach(angular.mock.module('oppia'));
-
-  importAllAngularServices();
-
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('ExplorationParamChangesService', {
-      savedMemento: [{
-        customizationArgs: {
-          parse_with_jinja: false,
-          value: '5'
-        },
-        generatorId: 'Copier',
-        name: 'ParamChange1'
+class MockExplorationParamChangesService {
+  savedMemento = [{
+    customizationArgs: {
+      parse_with_jinja: false,
+      value: '5'
+    },
+    generatorId: 'Copier',
+    name: 'ParamChange1'
+  }, {
+    customizationArgs: {
+      parse_with_jinja: true,
+      value: '{{ParamChange2}}'
+    },
+    generatorId: 'Copier',
+  }, {
+    customizationArgs: {
+      parse_with_jinja: true,
+      value: '5'
+    },
+    generatorId: 'RandomSelector',
+    name: 'ParamChange3'
+  }];
+}
+class MockGraphDataService {
+  getGraphData() {
+    return {
+      links: [{
+        source: 'Hola',
+        target: 'Hola'
       }, {
-        customizationArgs: {
-          parse_with_jinja: true,
-          value: '{{ParamChange2}}'
-        },
-        generatorId: 'Copier',
+        source: 'State2',
+        target: 'State3'
       }, {
-        customizationArgs: {
-          parse_with_jinja: true,
-          value: '5'
-        },
-        generatorId: 'RandomSelector',
-        name: 'ParamChange3'
+        source: 'State',
+        target: 'State'
+      }, {
+        source: 'State3',
+        target: 'State'
       }]
-    });
-    $provide.value('ExplorationStatesService', {
-      getStates: function() {
-        return StatesObjectFactory.createFromBackendDict({
+    };
+  }
+}
+
+describe('Parameter Metadata Service', () => {
+  let parameterMetadataService: ParameterMetadataService;
+  let statesObjectFactory: StatesObjectFactory;
+
+  beforeEach(() => {
+    class MockExplorationStatesService {
+      getStates() {
+        return statesObjectFactory.createFromBackendDict({
           Hola: {
+            classifier_model_id: null,
+            solicit_answer_details: false,
+            card_is_checkpoint: false,
+            linked_skill_id: null,
             content: {
               content_id: 'content',
               html: '{{HtmlValue}}'
@@ -77,11 +92,41 @@ describe('Parameter Metadata Service', function() {
             },
             param_changes: [],
             interaction: {
-              id: null,
+              confirmed_unclassified_answers: [],
+              customization_args: {
+                placeholder: {
+                  value: {
+                    content_id: 'ca_placeholder_2',
+                    unicode_str: ''
+                  }
+                },
+                rows: {
+                  value: 1
+                },
+                catchMisspellings: {
+                  value: false
+                }
+              },
+              solution: {
+                answer_is_exclusive: true,
+                correct_answer: '1',
+                explanation: {
+                  content_id: 'solution_5',
+                  html: '<p>1</p>'
+                }
+              },
+              id: 'TextInput',
               answer_groups: [{
                 rule_specs: [],
+                training_data: [],
+                tagged_skill_misconception_id: null,
                 outcome: {
+                  labelled_as_correct: true,
+                  param_changes: [],
+                  refresher_exploration_id: null,
+                  missing_prerequisite_skill_id: null,
                   dest: '',
+                  dest_if_really_stuck: null,
                   feedback: {
                     content_id: 'feedback_1',
                     html: '{{FeedbackValue}}'
@@ -89,7 +134,12 @@ describe('Parameter Metadata Service', function() {
                 },
               }],
               default_outcome: {
+                labelled_as_correct: true,
+                param_changes: [],
+                refresher_exploration_id: null,
+                missing_prerequisite_skill_id: null,
                 dest: 'Hola',
+                dest_if_really_stuck: null,
                 feedback: {
                   content_id: '',
                   html: '',
@@ -97,14 +147,12 @@ describe('Parameter Metadata Service', function() {
               },
               hints: [],
             },
-            written_translations: {
-              translations_mapping: {
-                content: {},
-                default_outcome: {},
-              },
-            },
           },
           State: {
+            classifier_model_id: null,
+            solicit_answer_details: false,
+            card_is_checkpoint: false,
+            linked_skill_id: null,
             content: {
               content_id: 'content',
               html: 'content'
@@ -117,11 +165,41 @@ describe('Parameter Metadata Service', function() {
             },
             param_changes: [],
             interaction: {
-              id: null,
+              confirmed_unclassified_answers: [],
+              customization_args: {
+                placeholder: {
+                  value: {
+                    content_id: 'ca_placeholder_2',
+                    unicode_str: ''
+                  }
+                },
+                rows: {
+                  value: 1
+                },
+                catchMisspellings: {
+                  value: false
+                }
+              },
+              solution: {
+                answer_is_exclusive: true,
+                correct_answer: '1',
+                explanation: {
+                  content_id: 'solution_5',
+                  html: '<p>1</p>'
+                }
+              },
+              id: 'TextInput',
               answer_groups: [{
                 rule_specs: [],
+                training_data: [],
+                tagged_skill_misconception_id: null,
                 outcome: {
+                  labelled_as_correct: true,
+                  param_changes: [],
+                  refresher_exploration_id: null,
+                  missing_prerequisite_skill_id: null,
                   dest: '',
+                  dest_if_really_stuck: null,
                   feedback: {
                     content_id: 'feedback_1',
                     html: '{{StateFeedbackValue}}'
@@ -129,7 +207,12 @@ describe('Parameter Metadata Service', function() {
                 },
               }],
               default_outcome: {
+                labelled_as_correct: true,
+                param_changes: [],
+                refresher_exploration_id: null,
+                missing_prerequisite_skill_id: null,
                 dest: 'State',
+                dest_if_really_stuck: null,
                 feedback: {
                   content_id: 'default_outcome',
                   html: ''
@@ -137,14 +220,12 @@ describe('Parameter Metadata Service', function() {
               },
               hints: []
             },
-            written_translations: {
-              translations_mapping: {
-                content: {},
-                default_outcome: {},
-              }
-            }
           },
           State2: {
+            classifier_model_id: null,
+            solicit_answer_details: false,
+            card_is_checkpoint: false,
+            linked_skill_id: null,
             content: {
               content_id: 'content',
               html: 'content'
@@ -157,11 +238,41 @@ describe('Parameter Metadata Service', function() {
             },
             param_changes: [],
             interaction: {
-              id: null,
+              confirmed_unclassified_answers: [],
+              customization_args: {
+                placeholder: {
+                  value: {
+                    content_id: 'ca_placeholder_2',
+                    unicode_str: ''
+                  }
+                },
+                rows: {
+                  value: 1
+                },
+                catchMisspellings: {
+                  value: false
+                }
+              },
+              solution: {
+                answer_is_exclusive: true,
+                correct_answer: '1',
+                explanation: {
+                  content_id: 'solution_5',
+                  html: '<p>1</p>'
+                }
+              },
+              id: 'TextInput',
               answer_groups: [{
                 rule_specs: [],
+                training_data: [],
+                tagged_skill_misconception_id: null,
                 outcome: {
+                  labelled_as_correct: true,
+                  param_changes: [],
+                  refresher_exploration_id: null,
+                  missing_prerequisite_skill_id: null,
                   dest: '',
+                  dest_if_really_stuck: null,
                   feedback: {
                     content_id: '',
                     html: ''
@@ -169,7 +280,12 @@ describe('Parameter Metadata Service', function() {
                 }
               }],
               default_outcome: {
+                labelled_as_correct: true,
+                param_changes: [],
+                refresher_exploration_id: null,
+                missing_prerequisite_skill_id: null,
                 dest: 'State2',
+                dest_if_really_stuck: null,
                 feedback: {
                   content_id: 'default_outcome',
                   html: ''
@@ -177,14 +293,12 @@ describe('Parameter Metadata Service', function() {
               },
               hints: []
             },
-            written_translations: {
-              translations_mapping: {
-                content: {},
-                default_outcome: {},
-              }
-            }
           },
           State3: {
+            classifier_model_id: null,
+            solicit_answer_details: false,
+            card_is_checkpoint: false,
+            linked_skill_id: null,
             content: {
               content_id: 'content',
               html: 'content'
@@ -197,11 +311,41 @@ describe('Parameter Metadata Service', function() {
             },
             param_changes: [],
             interaction: {
-              id: null,
+              confirmed_unclassified_answers: [],
+              customization_args: {
+                placeholder: {
+                  value: {
+                    content_id: 'ca_placeholder_2',
+                    unicode_str: ''
+                  }
+                },
+                rows: {
+                  value: 1
+                },
+                catchMisspellings: {
+                  value: false
+                }
+              },
+              solution: {
+                answer_is_exclusive: true,
+                correct_answer: '1',
+                explanation: {
+                  content_id: 'solution_5',
+                  html: '<p>1</p>'
+                }
+              },
+              id: 'TextInput',
               answer_groups: [{
                 rule_specs: [],
+                training_data: [],
+                tagged_skill_misconception_id: null,
                 outcome: {
+                  labelled_as_correct: true,
+                  param_changes: [],
+                  refresher_exploration_id: null,
+                  missing_prerequisite_skill_id: null,
                   dest: '',
+                  dest_if_really_stuck: null,
                   feedback: {
                     content_id: '',
                     html: ''
@@ -209,52 +353,50 @@ describe('Parameter Metadata Service', function() {
                 }
               }],
               default_outcome: {
+                labelled_as_correct: true,
+                param_changes: [],
+                refresher_exploration_id: null,
+                missing_prerequisite_skill_id: null,
                 dest: 'State2',
+                dest_if_really_stuck: null,
                 feedback: {
                   content_id: '',
                   html: ''
                 },
               },
               hints: []
-            },
-            written_translations: {
-              translations_mapping: {
-                content: {},
-                default_outcome: {},
-              }
             }
           }
         });
       }
-    });
-    $provide.value('GraphDataService', {
-      getGraphData: function() {
-        return {
-          links: [{
-            source: 'Hola',
-            target: 'Hola'
-          }, {
-            source: 'State2',
-            target: 'State3'
-          }, {
-            source: 'State',
-            target: 'State'
-          }, {
-            source: 'State3',
-            target: 'State'
-          }]
-        };
-      }
-    });
-  }));
-  beforeEach(angular.mock.inject(function($injector) {
-    ParameterMetadataService = $injector.get(
-      'ParameterMetadataService');
-    StatesObjectFactory = $injector.get('StatesObjectFactory');
-  }));
+    }
 
-  it('should get unset parameters info', function() {
-    expect(ParameterMetadataService.getUnsetParametersInfo(
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
+      providers: [
+        ParameterMetadataService,
+        {
+          provide: ExplorationParamChangesService,
+          useClass: MockExplorationParamChangesService
+        },
+        {
+          provide: ExplorationStatesService,
+          useClass: MockExplorationStatesService
+        },
+        {
+          provide: GraphDataService,
+          useClass: MockGraphDataService
+        }
+      ]
+    });
+
+    parameterMetadataService = TestBed.inject(ParameterMetadataService);
+    statesObjectFactory = TestBed.inject(StatesObjectFactory);
+  });
+
+
+  it('should get unset parameters info', () => {
+    expect(parameterMetadataService.getUnsetParametersInfo(
       ['Hola', 'State2']))
       .toEqual([{
         paramName: 'ParamChange2',
@@ -270,7 +412,7 @@ describe('Parameter Metadata Service', function() {
         stateName: 'State'
       }]);
 
-    expect(ParameterMetadataService.getUnsetParametersInfo(
+    expect(parameterMetadataService.getUnsetParametersInfo(
       ['State', 'State3']))
       .toEqual([{
         paramName: 'ParamChange2',

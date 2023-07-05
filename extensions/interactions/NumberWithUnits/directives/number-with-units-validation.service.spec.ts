@@ -23,7 +23,7 @@ import { AnswerGroup, AnswerGroupObjectFactory } from
 import { AppConstants } from 'app.constants';
 import { NumberWithUnitsValidationService } from 'interactions/NumberWithUnits/directives/number-with-units-validation.service';
 import { Outcome, OutcomeObjectFactory } from 'domain/exploration/OutcomeObjectFactory';
-import { Rule, RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
+import { Rule } from 'domain/exploration/rule.model';
 import { Unit } from 'interactions/answer-defs';
 import { Fraction, FractionDict } from 'domain/objects/fraction.model';
 import { NumberWithUnits, NumberWithUnitsObjectFactory } from 'domain/objects/NumberWithUnitsObjectFactory';
@@ -42,7 +42,6 @@ describe('NumberWithUnitsValidationService', () => {
   let equivalentToTwoRule: Rule;
   let oof: OutcomeObjectFactory;
   let agof: AnswerGroupObjectFactory;
-  let rof: RuleObjectFactory;
   let numberWithUnitsObjectFactory: NumberWithUnitsObjectFactory;
 
   beforeEach(() => {
@@ -50,7 +49,6 @@ describe('NumberWithUnitsValidationService', () => {
     validatorService = TestBed.inject(NumberWithUnitsValidationService);
     oof = TestBed.inject(OutcomeObjectFactory);
     agof = TestBed.inject(AnswerGroupObjectFactory);
-    rof = TestBed.inject(RuleObjectFactory);
     WARNING_TYPES = AppConstants.WARNING_TYPES;
 
     var createFractionDict = (
@@ -78,6 +76,7 @@ describe('NumberWithUnitsValidationService', () => {
     currentState = 'First State';
     goodDefaultOutcome = oof.createFromBackendDict({
       dest: 'Second State',
+      dest_if_really_stuck: null,
       feedback: {
         content_id: null,
         html: ''
@@ -88,7 +87,7 @@ describe('NumberWithUnitsValidationService', () => {
       missing_prerequisite_skill_id: null
     });
 
-    equalsTwoRule = rof.createFromBackendDict({
+    equalsTwoRule = Rule.createFromBackendDict({
       rule_type: 'IsEqualTo',
       inputs: {
         f: createNumberWithUnitsDict(
@@ -98,7 +97,7 @@ describe('NumberWithUnitsValidationService', () => {
       }
     }, 'NumberWithUnits');
 
-    equivalentToTwoThousandRule = rof.createFromBackendDict({
+    equivalentToTwoThousandRule = Rule.createFromBackendDict({
       rule_type: 'IsEquivalentTo',
       inputs: {
         f: createNumberWithUnitsDict(
@@ -108,7 +107,7 @@ describe('NumberWithUnitsValidationService', () => {
       }
     }, 'NumberWithUnits');
 
-    equivalentToTwoRule = rof.createFromBackendDict({
+    equivalentToTwoRule = Rule.createFromBackendDict({
       rule_type: 'IsEquivalentTo',
       inputs: {
         f: createNumberWithUnitsDict(
@@ -118,7 +117,7 @@ describe('NumberWithUnitsValidationService', () => {
       }
     }, 'NumberWithUnits');
 
-    equalsTwoByThreeRule = rof.createFromBackendDict({
+    equalsTwoByThreeRule = Rule.createFromBackendDict({
       rule_type: 'IsEqualTo',
       inputs: {
         f: createNumberWithUnitsDict('fraction', 0, createFractionDict(
@@ -127,7 +126,7 @@ describe('NumberWithUnitsValidationService', () => {
       }
     }, 'NumberWithUnits');
 
-    equivalentToTwoByThreeRule = rof.createFromBackendDict({
+    equivalentToTwoByThreeRule = Rule.createFromBackendDict({
       rule_type: 'IsEquivalentTo',
       inputs: {
         f: createNumberWithUnitsDict('fraction', 0, createFractionDict(
@@ -156,8 +155,8 @@ describe('NumberWithUnitsValidationService', () => {
       currentState, {}, answerGroups, goodDefaultOutcome);
     expect(warnings).toEqual([{
       type: WARNING_TYPES.ERROR,
-      message: 'Rule 2 from answer group 1 will never be matched ' +
-        'because it is made redundant by rule 1 from answer group 1.'
+      message: 'Learner answer 2 from Oppia response 1 will never be matched' +
+        ' because it is made redundant by answer 1 from response 1.'
     }]);
   });
 
@@ -189,8 +188,8 @@ describe('NumberWithUnitsValidationService', () => {
         currentState, {}, answerGroups, goodDefaultOutcome);
       expect(warnings).toEqual([{
         type: WARNING_TYPES.ERROR,
-        message: 'Rule 2 from answer group 1 will never be matched ' +
-          'because it is made redundant by rule 1 from answer group 1.'
+        message: 'Learner answer 2 from Oppia response 1 will never be ' +
+        'matched because it is made redundant by answer 1 from response 1.'
       }]);
     });
 
@@ -210,8 +209,8 @@ describe('NumberWithUnitsValidationService', () => {
         currentState, {}, answerGroups, goodDefaultOutcome);
       expect(warnings).toEqual([{
         type: WARNING_TYPES.ERROR,
-        message: 'Rule 2 from answer group 1 will never be matched ' +
-          'because it is made redundant by rule 1 from answer group 1.'
+        message: 'Learner answer 2 from Oppia response 1 will never be ' +
+        'matched because it is made redundant by answer 1 from response 1.'
       }]);
     });
 
@@ -238,8 +237,13 @@ describe('NumberWithUnitsValidationService', () => {
           return 0.0;
         }
       },
+      // This throws "Type null is not assignable to type
+      // 'string'." We need to suppress this error
+      // because of the need to test validations. This
+      // function is not used in the validations.
+      // @ts-ignore
       toMathjsCompatibleString: () => {
-        return null as unknown as string;
+        return null;
       },
       toDict: () => {
         let uof = new UnitsObjectFactory();

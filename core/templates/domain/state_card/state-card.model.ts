@@ -27,19 +27,19 @@ import { BindableVoiceovers, RecordedVoiceovers } from
   'domain/exploration/recorded-voiceovers.model';
 import { InteractionCustomizationArgs } from
   'interactions/customization-args-defs';
-import { Hint } from 'domain/exploration/HintObjectFactory';
+import { Hint } from 'domain/exploration/hint-object.model';
 import { Solution } from 'domain/exploration/SolutionObjectFactory';
 
-import { WrittenTranslations } from
-  'domain/exploration/WrittenTranslationsObjectFactory';
 import { InteractionSpecsConstants, InteractionSpecsKey } from 'pages/interaction-specs.constants';
+import { EntityTranslation } from 'domain/translation/EntityTranslationObjectFactory';
+import { TranslatedContent } from 'domain/exploration/TranslatedContentObjectFactory';
 
 export interface InputResponsePair {
-  learnerInput: string,
+  learnerInput: string | { answerDetails: string };
   // 'oppiaResponse' is null when the response for the input has
   // not been received yet.
-  oppiaResponse: string | null,
-  isHint: boolean
+  oppiaResponse: string | null;
+  isHint: boolean;
 }
 
 export class StateCard {
@@ -49,7 +49,6 @@ export class StateCard {
   _interaction: Interaction;
   _inputResponsePairs: InputResponsePair[];
   _recordedVoiceovers: RecordedVoiceovers;
-  _writtenTranslations: WrittenTranslations;
   _contentId: string;
   _completed: boolean;
   audioTranslationLanguageService: AudioTranslationLanguageService;
@@ -58,7 +57,6 @@ export class StateCard {
       interactionHtml: string, interaction: Interaction,
       inputResponsePairs: InputResponsePair[],
       recordedVoiceovers: RecordedVoiceovers,
-      writtenTranslations: WrittenTranslations,
       contentId: string,
       audioTranslationLanguageService: AudioTranslationLanguageService) {
     this._stateName = stateName;
@@ -67,7 +65,6 @@ export class StateCard {
     this._inputResponsePairs = inputResponsePairs;
     this._interaction = interaction;
     this._recordedVoiceovers = recordedVoiceovers;
-    this._writtenTranslations = writtenTranslations;
     this._contentId = contentId;
     this._completed = false;
     this.audioTranslationLanguageService = audioTranslationLanguageService;
@@ -218,7 +215,7 @@ export class StateCard {
   }
 
   // This will return null when there is no input response pair.
-  getLastAnswer(): string | null {
+  getLastAnswer(): string | null | { answerDetails: string } {
     const lastInputResponsePair = this.getLastInputResponsePair();
     if (lastInputResponsePair === null) {
       return null;
@@ -255,12 +252,18 @@ export class StateCard {
     }
   }
 
-  setInteractionHtml(interactionHtml: string): void {
-    this._interactionHtml = interactionHtml;
+  addToExistingFeedback(response: string): void {
+    if (this._inputResponsePairs.length >= 1) {
+      let newResponse = this._inputResponsePairs[
+        this._inputResponsePairs.length - 1].oppiaResponse + '\n' +
+        response;
+      this._inputResponsePairs[
+        this._inputResponsePairs.length - 1].oppiaResponse = newResponse;
+    }
   }
 
-  get writtenTranslations(): WrittenTranslations {
-    return cloneDeep(this._writtenTranslations);
+  setInteractionHtml(interactionHtml: string): void {
+    this._interactionHtml = interactionHtml;
   }
 
   get contentHtml(): string {
@@ -273,6 +276,15 @@ export class StateCard {
 
   get contentId(): string {
     return this._contentId;
+  }
+
+  swapContentsWithTranslation(entityTranslation: EntityTranslation): void {
+    let writtenTranslation = entityTranslation.getWrittenTranslation(
+      this._contentId) as TranslatedContent;
+    if (writtenTranslation) {
+      this.contentHtml = writtenTranslation.translation as string;
+    }
+    this._interaction.swapContentsWithTranslation(entityTranslation);
   }
 
   /**
@@ -290,13 +302,13 @@ export class StateCard {
   static createNewCard(
       stateName: string, contentHtml: string, interactionHtml: string,
       interaction: Interaction, recordedVoiceovers: RecordedVoiceovers,
-      writtenTranslations: WrittenTranslations, contentId: string,
+      contentId: string,
       audioTranslationLanguageService: AudioTranslationLanguageService
   ): StateCard {
     return new StateCard(
       stateName, contentHtml, interactionHtml,
       cloneDeep(interaction), [],
-      recordedVoiceovers, writtenTranslations, contentId,
+      recordedVoiceovers, contentId,
       audioTranslationLanguageService);
   }
 }

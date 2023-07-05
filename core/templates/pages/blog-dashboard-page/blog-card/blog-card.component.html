@@ -1,41 +1,91 @@
-<mat-card class="blog-card">
+<mat-card role="button"
+          class="blog-card"
+          [ngClass]="{'recommendation-blog-card': shownOnblogPostPage, 'blog-card-is-clickable': !blogCardPreviewModeIsActive}"
+          (click)="navigateToBlogPostPage()"
+          (keydown.enter)="navigateToBlogPostPage()">
   <div mat-card-image class="blog-card-thumbnail-container">
     <picture>
       <img mat-card-image
+           *ngIf="thumbnailUrl || !blogCardPreviewModeIsActive"
            class="blog-card-thumbnail"
            [src]="thumbnailUrl"
            alt="Thumbnail image of the blog card">
+      <p *ngIf="!thumbnailUrl && blogCardPreviewModeIsActive" class="px-4 py-2">
+        {{ 'I18N_BLOG_POST_EDITOR_NO_THUMBNAIL_UPLOADED_WARNING' | translate }}
+      </p>
     </picture>
   </div>
-  <div class="blog-card-content">
-    <mat-card-title class="blog-card-title">{{ blogPostSummary.title }}</mat-card-title>
+  <div class="blog-card-content" [ngClass]="{'mx-1 my-1': shownOnblogPostPage}">
+    <mat-card-title class="blog-card-title e2e-test-blog-post-tile-title">
+      {{ blogPostSummary.title }}
+    </mat-card-title>
     <mat-card-header class="mt-2">
-      <img mat-card-avatar
-           [src]="authorProfilePictureUrl"
-           alt="Profile image of the author of the blog post"
-           class="protractor-test-profile-current-user-photo">
-      <mat-card-subtitle class="protractor-test-username-visible">
-        {{ blogPostSummary.authorUsername }}
+      <picture>
+        <source type="image/webp" [srcset]="authorProfilePicWebpUrl">
+        <source type="image/png" [srcset]="authorProfilePicPngUrl">
+        <img mat-card-avatar
+             [src]="authorProfilePicPngUrl"
+             class="e2e-test-profile-user-photo"
+             alt="Profile image of the author of the blog post">
+      </picture>
+      <mat-card-subtitle class="e2e-test-username-visible">
+        {{ blogPostSummary.displayedAuthorName }}
       </mat-card-subtitle>
       <mat-card-subtitle class="font-weight-light mobile-published-date">
         {{ publishedDateString }}
       </mat-card-subtitle>
     </mat-card-header>
     <mat-card-content class="mt-4 blog-card-summary">
-      <p>
-        {{ blogPostSummary.summary }}
-      </p>
+      <oppia-rte-output-display [rteString]="this.blogPostSummary.summary"
+                                class="d-block">
+      </oppia-rte-output-display>
     </mat-card-content>
+    <mat-card-footer class="d-flex blog-card-tag-container flex-wrap pt-2">
+      <div *ngFor="let tag of blogPostSummary.tags"
+           class="blog-card-tag px-1 py-1 mx-1 my-1">
+        <span>{{ tag }}</span>
+      </div>
+    </mat-card-footer>
   </div>
 </mat-card>
 <style>
+  @media (min-width: 900px) {
+    .blog-card.recommendation-blog-card {
+      margin: 0;
+      max-width: 455px;
+      width: 33.5vw;
+    }
+  }
+
+  .blog-card-tag-container {
+    margin: unset;
+  }
+
+  .blog-card-tag {
+    background: #fff;
+    border: 1px solid #333;
+    border-radius: 2px;
+    color: #555;
+    font-family: 'Roboto', Arial, sans-serif;
+    font-size: 16px;
+    font-weight: bold;
+    letter-spacing: 0;
+    line-height: 19px;
+    opacity: 1;
+    text-align: center;
+  }
+
   .blog-card {
-    border: 1px solid #CCC;
+    border: 1px solid #ccc;
     border-radius: 4px;
     box-shadow: 0 3px 3px #00000029;
-    height: 384px;
     margin: 10px;
+    min-height: 420px;
     width: 576px;
+  }
+
+  .blog-card.blog-card-is-clickable {
+    cursor: pointer;
   }
 
   .mat-card-image.blog-card-thumbnail {
@@ -48,7 +98,7 @@
   }
 
   .blog-card-thumbnail-container {
-    background-color: #AAA9;
+    background-color: #aaa9;
     border-top-left-radius: inherit;
     border-top-right-radius: inherit;
     height: 144px;
@@ -92,46 +142,112 @@
     text-align: left;
   }
 
-@media(max-width: 680px) {
-  .blog-card {
-    height: 280px;
-    width: 222px;
+  .blog-card-content mat-card-content {
+    margin-bottom: 0;
   }
 
-  .mat-card-image.blog-card-thumbnail {
-    height: 78px;
+  @media (min-width: 1024px) and (max-width: 1200px), (max-width: 768px) {
+    .blog-card {
+      margin-left: auto;
+      margin-right: auto;
+      min-height: unset;
+      width: 476px;
+    }
+
+    .mat-card-image.blog-card-thumbnail {
+      height: 119px;
+    }
+
+    .blog-card-thumbnail-container {
+      height: 119px;
+    }
+
+    .blog-card-title {
+      font-size: 1.6rem;
+      font-weight: 500;
+      line-height: 14px;
+    }
+
+    .blog-card-content .mat-card-avatar {
+      height: 29px;
+      width: 29px;
+    }
+
+    .mobile-published-date {
+      font-size: 10px;
+    }
+
+    .blog-card-summary {
+      font-size: 1.3rem;
+    }
+
+    .blog-card-content {
+      margin: 0;
+    }
+
+    .blog-card-content mat-card-subtitle {
+      font-size: 1rem;
+      line-height: 16px;
+    }
+
+    .blog-card-tag {
+      color: #555;
+      font-size: 13px;
+      letter-spacing: 0;
+      line-height: 15px;
+      opacity: 1;
+    }
   }
 
-  .blog-card-thumbnail-container {
-    height: 78px;
-  }
+  @media(max-width: 550px) {
+    @media (max-width: 470px) {
+      .mat-card-image.blog-card-thumbnail {
+        height: 85px;
+      }
 
-  .blog-card-title {
-    font-size: 1.2rem;
-    font-weight: 500;
-    line-height: 14px;
-  }
+      .blog-card-thumbnail-container {
+        height: 85px;
+      }
+    }
 
-  .blog-card-content .mat-card-avatar {
-    height: 27px;
-    width: 27px;
-  }
+    @media (max-width: 440px) {
+      mat-card.blog-card {
+        width: 335px;
+      }
+    }
 
-  .mobile-published-date {
-    font-size: 9px;
-  }
+    .blog-card {
+      margin-left: auto;
+      margin-right: auto;
+      width: 376px;
+    }
 
-  .blog-card-summary {
-    font-size: 1rem;
-  }
+    .blog-card-title {
+      font-size: 1.2rem;
+      font-weight: 500;
+      line-height: 14px;
+    }
 
-  .blog-card-content {
-    margin: 0;
-  }
+    .blog-card-content .mat-card-avatar {
+      height: 27px;
+      width: 27px;
+    }
 
-  .blog-card-content mat-card-subtitle {
-    font-size: 0.9rem;
-    line-height: 16px;
+    .mobile-published-date {
+      font-size: 9px;
+    }
+
+    .blog-card-summary {
+      font-size: 1rem;
+    }
+
+    .blog-card-content {
+      margin: 0;
+    }
+
+    .blog-card-content mat-card-subtitle {
+      font-size: 0.9rem;
+      line-height: 16px;
+    }
   }
-}
 </style>

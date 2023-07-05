@@ -33,16 +33,15 @@ describe('Exploration Diff Service', () => {
 
   it('should throw error if try to access graph ' +
     'diff data with invalid command', () => {
-    let newState = stateObjectFactory.createDefaultState('newState');
-    let oldState = stateObjectFactory.createDefaultState('oldState');
+    let newState = stateObjectFactory.createDefaultState(
+      'newState', 'content_0', 'default_outcome_1');
+    let oldState = stateObjectFactory.createDefaultState(
+      'oldState', 'content_0', 'default_outcome_1');
     explorationGraphChangeList = [{
       changeList: [{
         cmd: 'invalidCommand',
         state_name: 'newState'
       } as unknown as ExplorationChange],
-      // Here 'as unknown as' is used to test invalid Command,
-      // But if we try to enter 'invalidCommand' directly in cmd
-      // it will throw type script error ts(2322).
       directionForwards: true
     }];
 

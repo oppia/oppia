@@ -39,8 +39,11 @@ interface SwapFunction {
   providedIn: 'root'
 })
 export class CollectionLinearizerService {
-  explorationIds: string[];
-  explorationId: number;
+  // These properties are initialized using private methods
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  explorationIds!: string[];
+  explorationId!: number;
   constructor(
       private collectionUpdateService: CollectionUpdateService
   ) {}
@@ -127,8 +130,9 @@ export class CollectionLinearizerService {
      * collection is immediately playable by the user. NOTE: This function
      * does not assume that the collection is linear.
      */
+  // Returns null if the collection is empty or next exploration is not found.
   getNextExplorationId(
-      collection: Collection, completedExpIds: string[]): string {
+      collection: Collection, completedExpIds: string[]): string | null {
     return this._getNextExplorationId(collection, completedExpIds);
   }
 

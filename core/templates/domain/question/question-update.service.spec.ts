@@ -20,14 +20,12 @@
 // question-update.service.ts is upgraded to Angular 8.
 import { AnswerGroupObjectFactory } from
   'domain/exploration/AnswerGroupObjectFactory';
-import { HintObjectFactory } from 'domain/exploration/HintObjectFactory';
 import { OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory';
 import { ParamChangeObjectFactory } from
   'domain/exploration/ParamChangeObjectFactory';
 import { ParamChangesObjectFactory } from
   'domain/exploration/ParamChangesObjectFactory';
-import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
 import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory';
 import { WrittenTranslationObjectFactory } from
   'domain/exploration/WrittenTranslationObjectFactory';
@@ -65,17 +63,13 @@ describe('Question update service', function() {
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value(
       'AnswerGroupObjectFactory', new AnswerGroupObjectFactory(
-        new OutcomeObjectFactory(),
-        new RuleObjectFactory()));
-    $provide.value(
-      'HintObjectFactory', new HintObjectFactory());
+        new OutcomeObjectFactory()));
     $provide.value(
       'OutcomeObjectFactory', new OutcomeObjectFactory());
     $provide.value('ParamChangeObjectFactory', new ParamChangeObjectFactory());
     $provide.value(
       'ParamChangesObjectFactory', new ParamChangesObjectFactory(
         new ParamChangeObjectFactory()));
-    $provide.value('RuleObjectFactory', new RuleObjectFactory());
     $provide.value('UnitsObjectFactory', new UnitsObjectFactory());
     $provide.value(
       'WrittenTranslationObjectFactory',
@@ -116,6 +110,7 @@ describe('Question update service', function() {
           }],
           outcome: {
             dest: 'Me Llamo',
+            dest_if_really_stuck: null,
             feedback: {
               content_id: 'feedback_1',
               html: 'buen trabajo!'
@@ -130,10 +125,14 @@ describe('Question update service', function() {
               unicode_str: ''
             }
           },
-          rows: { value: 1 }
+          rows: { value: 1 },
+          catchMisspellings: {
+            value: false
+          }
         },
         default_outcome: {
           dest: 'Hola',
+          dest_if_really_stuck: null,
           feedback: {
             content_id: 'default_outcome',
             html: 'try again!'
@@ -150,13 +149,7 @@ describe('Question update service', function() {
           default_outcome: {}
         }
       },
-      solicit_answer_details: false,
-      written_translations: {
-        translations_mapping: {
-          content: {},
-          default_outcome: {}
-        }
-      }
+      solicit_answer_details: false
     };
 
     expectedOutputStateDict = {
@@ -178,6 +171,7 @@ describe('Question update service', function() {
           }],
           outcome: {
             dest: 'Me Llamo',
+            dest_if_really_stuck: null,
             feedback: {
               content_id: 'feedback_1',
               html: 'buen trabajo!'
@@ -192,10 +186,14 @@ describe('Question update service', function() {
               unicode_str: ''
             }
           },
-          rows: { value: 1 }
+          rows: { value: 1 },
+          catchMisspellings: {
+            value: false
+          }
         },
         default_outcome: {
           dest: 'Hola',
+          dest_if_really_stuck: null,
           feedback: {
             content_id: 'default_outcome',
             html: 'try again!'
@@ -212,13 +210,7 @@ describe('Question update service', function() {
           default_outcome: {}
         }
       },
-      solicit_answer_details: false,
-      written_translations: {
-        translations_mapping: {
-          content: {},
-          default_outcome: {}
-        }
-      }
+      solicit_answer_details: false
     };
 
     expectedOutputState = StateObjectFactory.createFromBackendDict(

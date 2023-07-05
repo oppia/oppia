@@ -1,0 +1,101 @@
+<div class="oppia-learner-group-overview">
+  <div class="learner-group-summary-card">
+    <div class="learners-info">
+      <div class="learners-count">{{learnerGroup.learnerUsernames.length}}</div>
+      <div>{{'I18N_LEARNER_GROUP_LEARNERS_SECTION' | translate:{learnersCount: learnerGroup.learnerUsernames.length, messageFormat: true} }}</div>
+    </div>
+    <div class="assigned-skills-info">
+      <div class="assigned-skills-count">{{learnerGroup.subtopicPageIds.length}}</div>
+      <div>{{'I18N_LEARNER_GROUP_ASSIGNED_SKILLS' | translate:{skillsCount: learnerGroup.subtopicPageIds.length, messageFormat: true} }}</div>
+    </div>
+    <div class="assigned-stories-info">
+      <div class="assigned-stories-count">{{learnerGroup.storyIds.length}}</div>
+      <div>{{'I18N_LEARNER_GROUP_ASSIGNED_STORIES' | translate:{storiesCount: learnerGroup.storyIds.length, messageFormat: true} }}</div>
+    </div>
+  </div>
+
+  <div class="oppia-learner-group-learners-progress-overview">
+    <div class="overview-tab-sections">
+      <div class="overview-tab-sections-header">
+        <div class="overview-tab-sections-header-title"
+             [ngClass]="{'active': isTabActive(EDIT_OVERVIEW_SECTIONS_I18N_IDS.SKILLS_ANALYSIS)}"
+             (click)="setActiveTab(EDIT_OVERVIEW_SECTIONS_I18N_IDS.SKILLS_ANALYSIS)">
+          <span translate="I18N_LEARNER_GROUP_SKILLS_ANALYSIS_SECTION"></span>
+        </div>
+        <div class="overview-tab-sections-header-title"
+             [ngClass]="{'active': isTabActive(EDIT_OVERVIEW_SECTIONS_I18N_IDS.PROGRESS_IN_STORIES)}"
+             (click)="setActiveTab(EDIT_OVERVIEW_SECTIONS_I18N_IDS.PROGRESS_IN_STORIES)">
+          <span translate="I18N_LEARNER_GROUP_PROGRESS_IN_STORIES_SECTION"></span>
+        </div>
+      </div>
+      <div class="skill-analysis-tab overview-tab-sections-subtab" *ngIf="isTabActive(EDIT_OVERVIEW_SECTIONS_I18N_IDS.SKILLS_ANALYSIS)">
+        <div class="tab-description">
+          <span translate="I18N_LEARNER_GROUP_SKILLS_SECTION_PROGRESS_DESCRIPTION"></span>
+          <div *ngIf="learnersProgress">
+            <div *ngFor="let subtopicSummary of learnersProgress[0].subtopicsProgress">
+              <div class="progress-summary">
+                <div class="progress-summary-header">
+                  <div class="progress-summary-title">
+                    {{subtopicSummary.subtopicTitle}}
+                  </div>
+                  <div class="progress-summary-info"
+                       [ngClass]="{'warning': getStrugglingLearnersInfoInSubtopics(subtopicSummary.subtopicPageId).length > 0}">
+                    {{getStrugglingLearnersInfoInSubtopics(subtopicSummary.subtopicPageId).length}}
+                    <span *ngIf="getStrugglingLearnersInfoInSubtopics(subtopicSummary.subtopicPageId).length === 1">learner is</span>
+                    <span *ngIf="getStrugglingLearnersInfoInSubtopics(subtopicSummary.subtopicPageId).length !== 1">learners are</span>
+                    struggling with this skill
+                  </div>
+                </div>
+                <div *ngIf="getStrugglingLearnersInfoInSubtopics(subtopicSummary.subtopicPageId).length > 0" class="progress-summary-learners">
+                  <div class="learner-info-card" *ngFor="let learnerInfo of getStrugglingLearnersInfoInSubtopics(subtopicSummary.subtopicPageId)">
+                    <picture>
+                      <source type="image/webp"
+                              [srcset]="getProfileImageWebpDataUrl(learnerInfo.username)">
+                      <source type="image/png"
+                              [srcset]="getProfileImagePngDataUrl(learnerInfo.username)">
+                      <img [src]="getProfileImagePngDataUrl(learnerInfo.username)"
+                           alt="User profile picture">
+                    </picture>
+                    <div>{{learnerInfo.username}}</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="stories-progress-tab overview-tab-sections-subtab" *ngIf="isTabActive(EDIT_OVERVIEW_SECTIONS_I18N_IDS.PROGRESS_IN_STORIES)">
+        <span translate="I18N_LEARNER_GROUP_STORIES_SECTION_PROGRESS_DESCRIPTION"></span>
+        <div *ngIf="learnersProgress">
+          <div *ngFor="let storySummary of learnersProgress[0].storiesProgress">
+            <div class="progress-summary">
+              <div class="progress-summary-header">
+                <div class="progress-summary-title">
+                  {{storySummary.getTitle()}} · {{storySummary.getNodeTitles().length}} Lessons
+                </div>
+                <div class="progress-summary-info">
+                  {{getStoryCompletionsInfo(storySummary.getId()).length}}
+                  <span *ngIf="getStoryCompletionsInfo(storySummary.getId()).length === 1">learner has</span>
+                  <span *ngIf="getStoryCompletionsInfo(storySummary.getId()).length !== 1">learners have</span>
+                  completed this story
+                </div>
+              </div>
+              <div *ngIf="getStoryCompletionsInfo(storySummary.getId()).length > 0" class="progress-summary-learners">
+                <div class="learner-info-card" *ngFor="let learnerInfo of getStoryCompletionsInfo(storySummary.getId())">
+                  <picture>
+                    <source type="image/webp"
+                            [srcset]="getProfileImageWebpDataUrl(learnerInfo.username)">
+                    <source type="image/png"
+                            [srcset]="getProfileImagePngDataUrl(learnerInfo.username)">
+                    <img [src]="getProfileImagePngDataUrl(learnerInfo.username)">
+                  </picture>
+                  <div>{{learnerInfo.username}}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

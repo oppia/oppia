@@ -25,16 +25,18 @@ import { ExplorationPropertyService } from './exploration-property.service';
 import { AlertsService } from 'services/alerts.service';
 import { ChangeListService } from './change-list.service';
 import { LoggerService } from 'services/contextual/logger.service';
-import { ContextService } from 'services/context.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ExplorationInitStateNameService
-  extends ExplorationPropertyService {
+    extends ExplorationPropertyService {
+  // This property is initialized using init method and we need to do
+  // non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  savedMemento!: string;
   propertyName: string = 'init_state_name';
   constructor(
-    private contextService: ContextService,
     protected alertsService: AlertsService,
     protected changeListService: ChangeListService,
     protected loggerService: LoggerService

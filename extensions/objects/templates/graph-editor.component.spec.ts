@@ -17,7 +17,7 @@
  */
 
 import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { async, ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { GraphEditorComponent } from './graph-editor.component';
 
 describe('GraphEditorComponent', () => {
@@ -36,8 +36,12 @@ describe('GraphEditorComponent', () => {
     component = fixture.componentInstance;
   });
 
-  it('should update value component when user edits a graph', () => {
+  it('should update value component when user edits a graph', fakeAsync(() => {
     spyOn(component.valueChanged, 'emit');
+    expect(component.graphIsShown).toBeFalse();
+    component.ngAfterViewInit();
+    tick();
+    expect(component.graphIsShown).toBeTrue();
     let graph = {
       isWeighted: false,
       edges: [
@@ -84,5 +88,5 @@ describe('GraphEditorComponent', () => {
 
     expect(component.value).toEqual(graph);
     expect(component.valueChanged.emit).toHaveBeenCalledWith(graph);
-  });
+  }));
 });

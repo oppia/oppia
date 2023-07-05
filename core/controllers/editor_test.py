@@ -25,32 +25,42 @@ import os
 import zipfile
 
 from core import feconf
-from core import python_utils
+from core import utils
 from core.constants import constants
 from core.controllers import creator_dashboard
 from core.domain import config_services
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
+from core.domain import fs_services
 from core.domain import question_services
 from core.domain import rights_domain
 from core.domain import rights_manager
 from core.domain import state_domain
 from core.domain import stats_services
+from core.domain import translation_domain
 from core.domain import user_services
 from core.domain import wipeout_service
 from core.platform import models
 from core.tests import test_utils
 
+from typing import Dict, Final, List, Optional, Union
+
+MYPY = False
+if MYPY:  # pragma: no cover
+    from mypy_imports import exp_models
+    from mypy_imports import stats_models
+    from mypy_imports import user_models
+
 (exp_models, user_models, stats_models) = models.Registry.import_models(
-    [models.NAMES.exploration, models.NAMES.user, models.NAMES.statistics])
+    [models.Names.EXPLORATION, models.Names.USER, models.Names.STATISTICS])
 
 
 class BaseEditorControllerTests(test_utils.GenericTestBase):
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Completes the sign-up process for self.EDITOR_EMAIL."""
-        super(BaseEditorControllerTests, self).setUp()
+        super().setUp()
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
@@ -79,7 +89,7 @@ class BaseEditorControllerTests(test_utils.GenericTestBase):
         self.voiceover_admin = user_services.get_user_actions_info(
             self.voiceover_admin_id)
 
-    def assert_can_edit(self, exp_id):
+    def assert_can_edit(self, exp_id: str) -> None:
         """Returns True if the current user can edit the exploration
         editable.
         """
@@ -87,7 +97,7 @@ class BaseEditorControllerTests(test_utils.GenericTestBase):
             '%s/%s' % (feconf.USER_PERMISSIONS_URL_PREFIX, exp_id))
         self.assertEqual(response['can_edit'], True)
 
-    def assert_cannot_edit(self, exp_id):
+    def assert_cannot_edit(self, exp_id: str) -> None:
         """Returns True if the current user can not edit the exploration
         not editable.
         """
@@ -95,13 +105,13 @@ class BaseEditorControllerTests(test_utils.GenericTestBase):
             '%s/%s' % (feconf.USER_PERMISSIONS_URL_PREFIX, exp_id))
         self.assertEqual(response['can_edit'], False)
 
-    def assert_can_voiceover(self, exp_id):
+    def assert_can_voiceover(self, exp_id: str) -> None:
         """Returns True if the current user can voiceover the exploration."""
         response = self.get_json(
             '%s/%s' % (feconf.USER_PERMISSIONS_URL_PREFIX, exp_id))
         self.assertEqual(response['can_voiceover'], True)
 
-    def assert_cannot_voiceover(self, exp_id):
+    def assert_cannot_voiceover(self, exp_id: str) -> None:
         """Returns True if the current user can not voiceover the
         exploration.
         """
@@ -112,14 +122,14 @@ class BaseEditorControllerTests(test_utils.GenericTestBase):
 
 class EditorTests(BaseEditorControllerTests):
 
-    def setUp(self):
-        super(EditorTests, self).setUp()
+    def setUp(self) -> None:
+        super().setUp()
         exp_services.load_demo('0')
 
         rights_manager.release_ownership_of_exploration(
             self.system_user, '0')
 
-    def test_editor_page(self):
+    def test_editor_page(self) -> None:
         """Test access to editor pages for the sample exploration."""
 
         # Check that non-editors can access, but not edit, the editor page.
@@ -141,19 +151,7 @@ class EditorTests(BaseEditorControllerTests):
 
         self.logout()
 
-    def test_new_state_template(self):
-        """Test the validity of the NEW_STATE_TEMPLATE."""
-
-        exploration = exp_fetchers.get_exploration_by_id('0')
-        exploration.add_states([feconf.DEFAULT_INIT_STATE_NAME])
-        new_state_dict = exploration.states[
-            feconf.DEFAULT_INIT_STATE_NAME].to_dict()
-        self.assertEqual(new_state_dict, constants.NEW_STATE_TEMPLATE)
-        # Validates if the current NEW_STATE_TEMPLATE is the latest version
-        # by validating it.
-        exploration.states[feconf.DEFAULT_INIT_STATE_NAME].validate(None, True)
-
-    def test_that_default_exploration_cannot_be_published(self):
+    def test_that_default_exploration_cannot_be_published(self) -> None:
         """Test that publishing a default exploration raises an error
         due to failing strict validation.
         """
@@ -173,19 +171,44 @@ class EditorTests(BaseEditorControllerTests):
 
         self.logout()
 
-    def test_add_new_state_error_cases(self):
+    def test_add_new_state_error_cases(self) -> None:
         """Test the error cases for adding a new state to an exploration."""
         current_version = 1
 
         self.login(self.EDITOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
+        exploration = exp_fetchers.get_exploration_by_id('0')
+        content_id_generator = translation_domain.ContentIdGenerator(
+            exploration.next_content_id_index
+        )
 
-        def _get_payload(new_state_name, version=None):
+        def _get_payload(
+            new_state_name: str,
+            version: Optional[int] = None
+        ) -> Dict[str, Union[str, List[Dict[str, Union[str, int]]], int]]:
             """Gets the payload in the dict format."""
-            result = {
+            result: Dict[
+                str, Union[
+                    str,
+                    List[Dict[str, Union[str, int]]],
+                    int
+                ]
+            ] = {
                 'change_list': [{
                     'cmd': 'add_state',
-                    'state_name': new_state_name
+                    'state_name': new_state_name,
+                    'content_id_for_state_content': (
+                        content_id_generator.generate(
+                            translation_domain.ContentType.CONTENT)
+                    ),
+                    'content_id_for_default_outcome': (
+                        content_id_generator.generate(
+                            translation_domain.ContentType.DEFAULT_OUTCOME)
+                    )
+                }, {
+                   'cmd': 'edit_exploration_property',
+                    'property_name': 'next_content_id_index',
+                    'new_value': content_id_generator.next_content_id_index
                 }],
                 'commit_message': 'Add new state',
             }
@@ -193,7 +216,10 @@ class EditorTests(BaseEditorControllerTests):
                 result['version'] = version
             return result
 
-        def _put_and_expect_400_error(payload):
+        def _put_and_expect_400_error(
+            payload: Dict[
+                str, Union[str, List[Dict[str, Union[str, int]]], int]]
+        ) -> Dict[str, str]:
             """Puts a request with no version number and hence, expects 400
             error.
             """
@@ -248,7 +274,7 @@ class EditorTests(BaseEditorControllerTests):
 
         self.logout()
 
-    def test_publish_exploration(self):
+    def test_publish_exploration(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL)
 
         exp_id = exp_fetchers.get_new_exploration_id()
@@ -271,6 +297,82 @@ class EditorTests(BaseEditorControllerTests):
 
         self.logout()
 
+    def test_lock_exploration(self) -> None:
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+
+        exp_id = exp_fetchers.get_new_exploration_id()
+        self.save_new_valid_exploration(
+            exp_id, self.admin_id, end_state_name='end state')
+        csrf_token = self.get_new_csrf_token()
+        edits_allowed_url = '/editsallowedhandler/%s' % exp_id
+        exploration = exp_fetchers.get_exploration_by_id(exp_id)
+        self.assertEqual(exploration.edits_allowed, True)
+
+        self.put_json(
+            edits_allowed_url,
+            {'edits_are_allowed': False},
+            csrf_token=csrf_token)
+
+        exploration = exp_fetchers.get_exploration_by_id(exp_id)
+        self.assertEqual(exploration.edits_allowed, False)
+
+        self.logout()
+
+    def test_cannot_update_exploration_when_locked(self) -> None:
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+
+        exp_id = exp_fetchers.get_new_exploration_id()
+        self.save_new_valid_exploration(
+            exp_id, self.admin_id, end_state_name='end state')
+        csrf_token = self.get_new_csrf_token()
+        edits_allowed_url = '/editsallowedhandler/%s' % exp_id
+        self.put_json(
+            edits_allowed_url,
+            {'edits_are_allowed': False},
+            csrf_token=csrf_token)
+
+        exploration = exp_fetchers.get_exploration_by_id(exp_id)
+        content_id_generator = translation_domain.ContentIdGenerator(
+            exploration.next_content_id_index
+        )
+        self.assertEqual(exploration.edits_allowed, False)
+
+        response_dict = self.put_json(
+            '%s/%s' % (feconf.EXPLORATION_DATA_PREFIX, exp_id),
+            {
+                'version': exploration.version,
+                'commit_message': 'dummy update',
+                'change_list': [{
+                    'cmd': 'add_state',
+                    'state_name': 'State 4',
+                    'content_id_for_state_content': (
+                        content_id_generator.generate(
+                            translation_domain.ContentType.CONTENT)
+                    ),
+                    'content_id_for_default_outcome': (
+                        content_id_generator.generate(
+                            translation_domain.ContentType.DEFAULT_OUTCOME)
+                    ),
+                }, {
+                    'cmd': 'edit_state_property',
+                    'state_name': 'State 4',
+                    'property_name': 'widget_id',
+                    'new_value': 'TextInput',
+                }, {
+                    'cmd': 'edit_exploration_property',
+                    'property_name': 'next_content_id_index',
+                    'new_value': content_id_generator.next_content_id_index
+                }]
+            },
+            csrf_token=csrf_token,
+            expected_status_int=400
+        )
+
+        self.assertEqual(
+            response_dict['error'],
+            'This exploration cannot be edited. Please contact the admin.')
+        self.logout()
+
 
 class DownloadIntegrationTest(BaseEditorControllerTests):
     """Test handler for exploration and state download."""
@@ -280,22 +382,25 @@ class DownloadIntegrationTest(BaseEditorControllerTests):
             """card_is_checkpoint: false
 classifier_model_id: null
 content:
-  content_id: content
+  content_id: content_3
   html: ''
 interaction:
   answer_groups: []
   confirmed_unclassified_answers: []
   customization_args:
+    catchMisspellings:
+      value: false
     placeholder:
       value:
-        content_id: ca_placeholder_0
+        content_id: ca_placeholder_9
         unicode_str: ''
     rows:
       value: 1
   default_outcome:
     dest: State A
+    dest_if_really_stuck: null
     feedback:
-      content_id: default_outcome
+      content_id: default_outcome_4
       html: ''
     labelled_as_correct: false
     missing_prerequisite_skill_id: null
@@ -305,40 +410,37 @@ interaction:
   id: TextInput
   solution: null
 linked_skill_id: null
-next_content_id_index: 1
 param_changes: []
 recorded_voiceovers:
   voiceovers_mapping:
-    ca_placeholder_0: {}
-    content: {}
-    default_outcome: {}
+    ca_placeholder_9: {}
+    content_3: {}
+    default_outcome_4: {}
 solicit_answer_details: false
-written_translations:
-  translations_mapping:
-    ca_placeholder_0: {}
-    content: {}
-    default_outcome: {}
 """),
         'State B': (
             """card_is_checkpoint: false
 classifier_model_id: null
 content:
-  content_id: content
+  content_id: content_5
   html: ''
 interaction:
   answer_groups: []
   confirmed_unclassified_answers: []
   customization_args:
+    catchMisspellings:
+      value: false
     placeholder:
       value:
-        content_id: ca_placeholder_0
+        content_id: ca_placeholder_10
         unicode_str: ''
     rows:
       value: 1
   default_outcome:
     dest: State B
+    dest_if_really_stuck: null
     feedback:
-      content_id: default_outcome
+      content_id: default_outcome_6
       html: ''
     labelled_as_correct: false
     missing_prerequisite_skill_id: null
@@ -348,40 +450,37 @@ interaction:
   id: TextInput
   solution: null
 linked_skill_id: null
-next_content_id_index: 1
 param_changes: []
 recorded_voiceovers:
   voiceovers_mapping:
-    ca_placeholder_0: {}
-    content: {}
-    default_outcome: {}
+    ca_placeholder_10: {}
+    content_5: {}
+    default_outcome_6: {}
 solicit_answer_details: false
-written_translations:
-  translations_mapping:
-    ca_placeholder_0: {}
-    content: {}
-    default_outcome: {}
 """),
         feconf.DEFAULT_INIT_STATE_NAME: (
             """card_is_checkpoint: true
 classifier_model_id: null
 content:
-  content_id: content
+  content_id: content_0
   html: ''
 interaction:
   answer_groups: []
   confirmed_unclassified_answers: []
   customization_args:
+    catchMisspellings:
+      value: false
     placeholder:
       value:
-        content_id: ca_placeholder_0
+        content_id: ca_placeholder_2
         unicode_str: ''
     rows:
       value: 1
   default_outcome:
     dest: %s
+    dest_if_really_stuck: null
     feedback:
-      content_id: default_outcome
+      content_id: default_outcome_1
       html: ''
     labelled_as_correct: false
     missing_prerequisite_skill_id: null
@@ -391,19 +490,13 @@ interaction:
   id: TextInput
   solution: null
 linked_skill_id: null
-next_content_id_index: 1
 param_changes: []
 recorded_voiceovers:
   voiceovers_mapping:
-    ca_placeholder_0: {}
-    content: {}
-    default_outcome: {}
+    ca_placeholder_2: {}
+    content_0: {}
+    default_outcome_1: {}
 solicit_answer_details: false
-written_translations:
-  translations_mapping:
-    ca_placeholder_0: {}
-    content: {}
-    default_outcome: {}
 """) % feconf.DEFAULT_INIT_STATE_NAME
     }
 
@@ -411,22 +504,25 @@ written_translations:
         """card_is_checkpoint: false
 classifier_model_id: null
 content:
-  content_id: content
+  content_id: content_3
   html: ''
 interaction:
   answer_groups: []
   confirmed_unclassified_answers: []
   customization_args:
+    catchMisspellings:
+      value: false
     placeholder:
       value:
-        content_id: ca_placeholder_0
+        content_id: ca_placeholder_9
         unicode_str: ''
     rows:
       value: 1
   default_outcome:
     dest: State A
+    dest_if_really_stuck: null
     feedback:
-      content_id: default_outcome
+      content_id: default_outcome_4
       html: ''
     labelled_as_correct: false
     missing_prerequisite_skill_id: null
@@ -436,26 +532,20 @@ interaction:
   id: TextInput
   solution: null
 linked_skill_id: null
-next_content_id_index: 1
 param_changes: []
 recorded_voiceovers:
   voiceovers_mapping:
-    ca_placeholder_0: {}
-    content: {}
-    default_outcome: {}
+    ca_placeholder_9: {}
+    content_3: {}
+    default_outcome_4: {}
 solicit_answer_details: false
-written_translations:
-  translations_mapping:
-    ca_placeholder_0: {}
-    content: {}
-    default_outcome: {}
 """)
 
-    def test_can_not_download_exploration_with_disabled_exp_id(self):
+    def test_can_not_download_exploration_with_disabled_exp_id(self) -> None:
         download_url = '/createhandler/download/5'
         self.get_json(download_url, expected_status_int=404)
 
-    def test_exploration_download_handler_for_default_exploration(self):
+    def test_exploration_download_handler_for_default_exploration(self) -> None:
         self.login(self.EDITOR_EMAIL)
         owner_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
 
@@ -468,22 +558,55 @@ written_translations:
             objective='')
 
         exploration = exp_fetchers.get_exploration_by_id(exp_id)
+        content_id_generator = translation_domain.ContentIdGenerator(
+            exploration.next_content_id_index
+        )
         init_state = exploration.states[exploration.init_state_name]
         init_interaction = init_state.interaction
+        assert init_interaction.default_outcome is not None
         init_interaction.default_outcome.dest = exploration.init_state_name
         exp_services.update_exploration(
             owner_id, exp_id, [
                 exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                    'property_name': 'auto_tts_enabled',
+                    'new_value': True,
+                }),
+                exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_ADD_STATE,
                     'state_name': 'State A',
+                    'content_id_for_state_content': (
+                        content_id_generator.generate(
+                            translation_domain.ContentType.CONTENT)
+                    ),
+                    'content_id_for_default_outcome': (
+                        content_id_generator.generate(
+                            translation_domain.ContentType.DEFAULT_OUTCOME)
+                    )
                 }),
                 exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_ADD_STATE,
                     'state_name': 'State 2',
+                    'content_id_for_state_content': (
+                        content_id_generator.generate(
+                            translation_domain.ContentType.CONTENT)
+                    ),
+                    'content_id_for_default_outcome': (
+                        content_id_generator.generate(
+                            translation_domain.ContentType.DEFAULT_OUTCOME)
+                    )
                 }),
                 exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_ADD_STATE,
                     'state_name': 'State 3',
+                    'content_id_for_state_content': (
+                        content_id_generator.generate(
+                            translation_domain.ContentType.CONTENT)
+                    ),
+                    'content_id_for_default_outcome': (
+                        content_id_generator.generate(
+                            translation_domain.ContentType.DEFAULT_OUTCOME)
+                    )
                 }),
                 exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
@@ -499,19 +622,19 @@ written_translations:
                     'new_value': {
                         'placeholder': {
                             'value': {
-                                'content_id': 'ca_placeholder_0',
+                                'content_id': content_id_generator.generate(
+                                    translation_domain.ContentType
+                                    .CUSTOMIZATION_ARG,
+                                    extra_prefix='placeholder'
+                                ),
                                 'unicode_str': ''
                             }
                         },
-                        'rows': {'value': 1}
+                        'rows': {'value': 1},
+                        'catchMisspellings': {
+                            'value': False
+                        }
                     }
-                }),
-                exp_domain.ExplorationChange({
-                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                    'property_name':
-                        exp_domain.STATE_PROPERTY_NEXT_CONTENT_ID_INDEX,
-                    'state_name': 'State A',
-                    'new_value': 1
                 }),
                 exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
@@ -527,19 +650,19 @@ written_translations:
                     'new_value': {
                         'placeholder': {
                             'value': {
-                                'content_id': 'ca_placeholder_0',
+                                'content_id': content_id_generator.generate(
+                                    translation_domain.ContentType
+                                    .CUSTOMIZATION_ARG,
+                                    extra_prefix='placeholder'
+                                ),
                                 'unicode_str': ''
                             }
                         },
-                        'rows': {'value': 1}
+                        'rows': {'value': 1},
+                        'catchMisspellings': {
+                            'value': False
+                        }
                     }
-                }),
-                exp_domain.ExplorationChange({
-                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                    'property_name':
-                        exp_domain.STATE_PROPERTY_NEXT_CONTENT_ID_INDEX,
-                    'state_name': 'State 2',
-                    'new_value': 1
                 }),
                 exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
@@ -555,19 +678,19 @@ written_translations:
                     'new_value': {
                         'placeholder': {
                             'value': {
-                                'content_id': 'ca_placeholder_0',
+                                'content_id': content_id_generator.generate(
+                                    translation_domain.ContentType
+                                    .CUSTOMIZATION_ARG,
+                                    extra_prefix='placeholder'
+                                ),
                                 'unicode_str': ''
                             }
                         },
-                        'rows': {'value': 1}
+                        'rows': {'value': 1},
+                        'catchMisspellings': {
+                            'value': False
+                        }
                     }
-                }),
-                exp_domain.ExplorationChange({
-                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                    'property_name':
-                        exp_domain.STATE_PROPERTY_NEXT_CONTENT_ID_INDEX,
-                    'state_name': 'State 3',
-                    'new_value': 1
                 }),
                 exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_RENAME_STATE,
@@ -577,6 +700,11 @@ written_translations:
                 exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_DELETE_STATE,
                     'state_name': 'State 3',
+                }),
+                exp_domain.ExplorationChange({
+                    'cmd': 'edit_exploration_property',
+                    'property_name': 'next_content_id_index',
+                    'new_value': content_id_generator.next_content_id_index
                 })], 'changes')
         response = self.get_html_response('/create/%s' % exp_id)
 
@@ -599,7 +727,7 @@ written_translations:
         golden_zip_filepath = os.path.join(
             feconf.TESTS_DATA_DIR,
             'oppia-ThetitleforZIPdownloadhandlertest!-v2-gold.zip')
-        with python_utils.open_file(
+        with utils.open_file(
             golden_zip_filepath, 'rb', encoding=None) as f:
             golden_zipfile = f.read()
         zf_gold = zipfile.ZipFile(io.BytesIO(golden_zipfile))
@@ -620,7 +748,7 @@ written_translations:
                 })], 'Updates exploration objective')
 
         # Download to JSON string using download handler.
-        self.maxDiff = None
+        self.maxDiff = 0
         download_url = (
             '/createhandler/download/%s?output_format=%s' %
             (exp_id, feconf.OUTPUT_FORMAT_JSON))
@@ -638,7 +766,7 @@ written_translations:
 
         self.logout()
 
-    def test_exploration_download_handler_with_unicode_title(self):
+    def test_exploration_download_handler_with_unicode_title(self) -> None:
         self.login(self.EDITOR_EMAIL)
         owner_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
 
@@ -665,7 +793,7 @@ written_translations:
 
         self.logout()
 
-    def test_exploration_download_handler_with_no_title(self):
+    def test_exploration_download_handler_with_no_title(self) -> None:
         # This is the case for most unpublished explorations.
         self.login(self.EDITOR_EMAIL)
         owner_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
@@ -693,7 +821,7 @@ written_translations:
 
         self.logout()
 
-    def test_state_yaml_handler(self):
+    def test_state_yaml_handler(self) -> None:
         self.login(self.EDITOR_EMAIL)
         owner_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
 
@@ -706,8 +834,11 @@ written_translations:
 
         exploration = exp_fetchers.get_exploration_by_id(exp_id)
         exploration.add_states(['State A', 'State 2', 'State 3'])
+        content_id_generator = translation_domain.ContentIdGenerator(
+            exploration.next_content_id_index
+        )
         self.set_interaction_for_state(
-            exploration.states['State A'], 'TextInput')
+            exploration.states['State A'], 'TextInput', content_id_generator)
 
         csrf_token = self.get_new_csrf_token()
         response = self.post_json('/createhandler/state_yaml/%s' % exp_id, {
@@ -720,7 +851,7 @@ written_translations:
 
         self.logout()
 
-    def test_state_yaml_handler_with_no_state_dict_raises_error(self):
+    def test_state_yaml_handler_with_no_state_dict_raises_error(self) -> None:
         self.login(self.OWNER_EMAIL)
         exp_id = 'eid'
         owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
@@ -734,7 +865,9 @@ written_translations:
 
         self.logout()
 
-    def test_exploration_download_handler_with_invalid_exploration_id(self):
+    def test_exploration_download_handler_with_invalid_exploration_id(
+        self
+    ) -> None:
         self.login(self.OWNER_EMAIL)
 
         self.get_json(
@@ -743,11 +876,13 @@ written_translations:
 
         self.logout()
 
-    def test_guest_cannot_access_exploration_download_handler(self):
+    def test_guest_cannot_access_exploration_download_handler(self) -> None:
         self.save_new_valid_exploration('exp_id', 'owner_id')
         self.get_json('/createhandler/download/exp_id', expected_status_int=404)
 
-    def test_exploration_download_handler_with_invalid_output_format(self):
+    def test_exploration_download_handler_with_invalid_output_format(
+        self
+    ) -> None:
         self.login(self.OWNER_EMAIL)
         owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         exp_id = 'exp_id1'
@@ -770,11 +905,11 @@ written_translations:
 
 class ExplorationSnapshotsHandlerTests(test_utils.GenericTestBase):
 
-    def setUp(self):
-        super(ExplorationSnapshotsHandlerTests, self).setUp()
+    def setUp(self) -> None:
+        super().setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
 
-    def test_get_with_invalid_exploration_id_raises_error(self):
+    def test_get_with_invalid_exploration_id_raises_error(self) -> None:
         self.login(self.OWNER_EMAIL)
 
         self.get_json(
@@ -783,13 +918,15 @@ class ExplorationSnapshotsHandlerTests(test_utils.GenericTestBase):
 
         self.logout()
 
-    def test_get_exploration_snapshot_history(self):
+    def test_get_exploration_snapshot_history(self) -> None:
         self.login(self.OWNER_EMAIL)
         exp_id = 'eid'
         owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
 
-        self.save_new_valid_exploration(exp_id, owner_id)
-
+        exploration = self.save_new_valid_exploration(exp_id, owner_id)
+        content_id_generator = translation_domain.ContentIdGenerator(
+            exploration.next_content_id_index
+        )
         snapshots = exp_services.get_exploration_snapshots_metadata(exp_id)
 
         # Patch `snapshots` to use the editor's display name.
@@ -807,7 +944,20 @@ class ExplorationSnapshotsHandlerTests(test_utils.GenericTestBase):
                 exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_ADD_STATE,
                     'state_name': 'State A',
-                })], 'Addes state')
+                    'content_id_for_state_content': (
+                        content_id_generator.generate(
+                            translation_domain.ContentType.CONTENT)
+                    ),
+                    'content_id_for_default_outcome': (
+                        content_id_generator.generate(
+                            translation_domain.ContentType.DEFAULT_OUTCOME)
+                    )
+                }), exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                    'property_name': 'next_content_id_index',
+                    'new_value': content_id_generator.next_content_id_index,
+                    'old_value': 0
+            })], 'Addes state')
 
         snapshots = exp_services.get_exploration_snapshots_metadata(exp_id)
 
@@ -826,11 +976,11 @@ class ExplorationSnapshotsHandlerTests(test_utils.GenericTestBase):
 
 class ExplorationStatisticsHandlerTests(test_utils.GenericTestBase):
 
-    def setUp(self):
-        super(ExplorationStatisticsHandlerTests, self).setUp()
+    def setUp(self) -> None:
+        super().setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
 
-    def test_get_with_invalid_exploration_id_raises_error(self):
+    def test_get_with_invalid_exploration_id_raises_error(self) -> None:
         self.login(self.OWNER_EMAIL)
 
         self.get_json(
@@ -839,17 +989,20 @@ class ExplorationStatisticsHandlerTests(test_utils.GenericTestBase):
 
         self.logout()
 
-    def test_guest_cannot_access_exploration_statistics_handler(self):
+    def test_guest_cannot_access_exploration_statistics_handler(self) -> None:
         self.save_new_valid_exploration('exp_id', 'owner_id')
         self.get_json(
             '/createhandler/statistics/exp_id', expected_status_int=404)
 
-    def test_get_exploration_statistics(self):
+    def test_get_exploration_statistics(self) -> None:
         self.login(self.OWNER_EMAIL)
         exp_id = 'eid'
         owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
 
         exploration = self.save_new_valid_exploration(exp_id, owner_id)
+        content_id_generator = translation_domain.ContentIdGenerator(
+            exploration.next_content_id_index
+        )
         exp_stats = stats_services.get_exploration_stats(
             exp_id, exploration.version)
 
@@ -862,7 +1015,21 @@ class ExplorationStatisticsHandlerTests(test_utils.GenericTestBase):
                 exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_ADD_STATE,
                     'state_name': 'State A',
-                })], 'Addes state')
+                    'content_id_for_state_content': (
+                        content_id_generator.generate(
+                            translation_domain.ContentType.CONTENT)
+                    ),
+                    'content_id_for_default_outcome': (
+                        content_id_generator.generate(
+                            translation_domain.ContentType.DEFAULT_OUTCOME)
+                    )
+                }), exp_domain.ExplorationChange({
+                        'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                        'property_name': 'next_content_id_index',
+                        'new_value': content_id_generator.next_content_id_index,
+                        'old_value': 0
+                })
+            ], 'Addes state')
 
         exploration = exp_fetchers.get_exploration_by_id(exp_id)
         exp_stats = stats_services.get_exploration_stats(
@@ -877,11 +1044,11 @@ class ExplorationStatisticsHandlerTests(test_utils.GenericTestBase):
 
 class StartedTutorialEventHandlerTests(test_utils.GenericTestBase):
 
-    def setUp(self):
-        super(StartedTutorialEventHandlerTests, self).setUp()
+    def setUp(self) -> None:
+        super().setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
 
-    def test_record_user_saw_tutorial(self):
+    def test_record_user_saw_tutorial(self) -> None:
         self.login(self.OWNER_EMAIL)
         exp_id = 'eid'
         owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
@@ -907,8 +1074,8 @@ class StartedTutorialEventHandlerTests(test_utils.GenericTestBase):
 
 class TopUnresolvedAnswersHandlerTests(test_utils.GenericTestBase):
 
-    def setUp(self):
-        super(TopUnresolvedAnswersHandlerTests, self).setUp()
+    def setUp(self) -> None:
+        super().setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
 
@@ -916,7 +1083,7 @@ class TopUnresolvedAnswersHandlerTests(test_utils.GenericTestBase):
         self.exploration = self.save_new_valid_exploration(
             self.exp_id, self.owner_id)
 
-    def test_cannot_get_unresolved_answers_with_no_state_name(self):
+    def test_cannot_get_unresolved_answers_with_no_state_name(self) -> None:
         self.login(self.OWNER_EMAIL)
 
         response = self.get_json(
@@ -930,11 +1097,11 @@ class TopUnresolvedAnswersHandlerTests(test_utils.GenericTestBase):
 
 class StateInteractionStatsHandlerTests(test_utils.GenericTestBase):
 
-    def setUp(self):
-        super(StateInteractionStatsHandlerTests, self).setUp()
+    def setUp(self) -> None:
+        super().setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
 
-    def test_get_with_invalid_exploration_id_raises_error(self):
+    def test_get_with_invalid_exploration_id_raises_error(self) -> None:
         self.login(self.OWNER_EMAIL)
 
         self.get_json(
@@ -945,10 +1112,13 @@ class StateInteractionStatsHandlerTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_cannot_get_learner_answer_statistics_with_invalid_state_name(
-            self):
+        self
+    ) -> None:
         observed_log_messages = []
 
-        def _mock_logging_function(msg, *args, **unused_kwargs):
+        def _mock_logging_function(
+            msg: str, *args: str, **unused_kwargs: str
+        ) -> None:
             """Mocks logging.error()."""
             observed_log_messages.append(msg % args)
 
@@ -974,11 +1144,11 @@ class StateInteractionStatsHandlerTests(test_utils.GenericTestBase):
                 'Available states: [\'Introduction\']'
             ]
         )
-        self.assertRaisesRegexp(Exception, 'Bad response: 503')
+        self.assertRaisesRegex(Exception, 'Bad response: 503')
 
         self.logout()
 
-    def test_get_learner_answer_statistics_for_state(self):
+    def test_get_learner_answer_statistics_for_state(self) -> None:
         self.login(self.OWNER_EMAIL)
         exp_id = 'eid'
         owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
@@ -993,7 +1163,7 @@ class StateInteractionStatsHandlerTests(test_utils.GenericTestBase):
 
 class ExplorationDeletionRightsTests(BaseEditorControllerTests):
 
-    def test_deletion_rights_for_unpublished_exploration(self):
+    def test_deletion_rights_for_unpublished_exploration(self) -> None:
         """Test rights management for deletion of unpublished explorations."""
         # Unpublished exploration id.
         unpublished_exp_id = 'unpub_eid'
@@ -1023,7 +1193,7 @@ class ExplorationDeletionRightsTests(BaseEditorControllerTests):
             expected_status_int=200)
         self.logout()
 
-    def test_deletion_rights_for_published_exploration(self):
+    def test_deletion_rights_for_published_exploration(self) -> None:
         """Test rights management for deletion of published explorations."""
         # Published exploration id.
         published_exp_id = 'pub_eid'
@@ -1069,11 +1239,11 @@ class ExplorationDeletionRightsTests(BaseEditorControllerTests):
             expected_status_int=200)
         self.logout()
 
-    def test_logging_info_after_deletion(self):
+    def test_logging_info_after_deletion(self) -> None:
         """Test correctness of logged statements while deleting exploration."""
         observed_log_messages = []
 
-        def mock_logging_function(msg, *_):
+        def mock_logging_function(msg: str, *_: str) -> None:
             # Message logged by function clear_all_pending() in
             # oppia_tools/google_appengine_1.9.67/google_appengine/google/
             # appengine/ext/ndb/tasklets.py, not to be checked here.
@@ -1130,9 +1300,9 @@ class VersioningIntegrationTest(BaseEditorControllerTests):
 
     EXP_ID = '0'
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Create exploration with two versions."""
-        super(VersioningIntegrationTest, self).setUp()
+        super().setUp()
 
         exp_services.load_demo(self.EXP_ID)
         rights_manager.release_ownership_of_exploration(
@@ -1143,6 +1313,7 @@ class VersioningIntegrationTest(BaseEditorControllerTests):
 
         # In version 2, change the objective and the initial state content.
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_ID)
+        init_state = exploration.states[exploration.init_state_name]
         exp_services.update_exploration(
             self.editor_id, self.EXP_ID, [exp_domain.ExplorationChange({
                 'cmd': 'edit_exploration_property',
@@ -1153,18 +1324,25 @@ class VersioningIntegrationTest(BaseEditorControllerTests):
                 'property_name': 'content',
                 'state_name': exploration.init_state_name,
                 'new_value': {
-                    'content_id': 'content',
+                    'content_id': init_state.content.content_id,
                     'html': '<p>ABC</p>'
                 },
             })], 'Change objective and init state content')
 
-    def test_get_with_disabled_exploration_id_raises_error(self):
+    def test_get_with_disabled_exploration_id_raises_error(self) -> None:
         self.get_html_response(
             '%s/%s' % (
                 feconf.EDITOR_URL_PREFIX, feconf.DISABLED_EXPLORATION_IDS[0]),
             expected_status_int=404)
 
-    def test_reverting_to_old_exploration(self):
+    def test_check_revert_valid(self) -> None:
+        """Test if an old exploration version is valid."""
+        reader_dict = self.get_json(
+            '/createhandler/check_revert_valid/%s/%s' % (self.EXP_ID, 1))
+        self.assertTrue(reader_dict['valid'])
+        self.assertIsNone(reader_dict['details'])
+
+    def test_reverting_to_old_exploration(self) -> None:
         """Test reverting to old exploration versions."""
         # Open editor page.
         csrf_token = self.get_new_csrf_token()
@@ -1220,7 +1398,7 @@ class VersioningIntegrationTest(BaseEditorControllerTests):
         self.assertNotIn('ABC', init_content)
         self.assertIn('Hi, welcome to Oppia!', init_content)
 
-    def test_versioning_for_default_exploration(self):
+    def test_versioning_for_default_exploration(self) -> None:
         """Test retrieval of old exploration versions."""
         # The latest version contains 'ABC'.
         reader_dict = self.get_json(
@@ -1257,7 +1435,7 @@ class VersioningIntegrationTest(BaseEditorControllerTests):
             '%s/%s?v=3' % (feconf.EXPLORATION_INIT_URL_PREFIX, self.EXP_ID),
             expected_status_int=404)
 
-    def test_revert_with_invalid_current_version_raises_error(self):
+    def test_revert_with_invalid_current_version_raises_error(self) -> None:
         csrf_token = self.get_new_csrf_token()
 
         response = self.post_json(
@@ -1276,7 +1454,7 @@ class VersioningIntegrationTest(BaseEditorControllerTests):
 class ExplorationEditRightsTest(BaseEditorControllerTests):
     """Test the handling of edit rights for explorations."""
 
-    def test_user_banning(self):
+    def test_user_banning(self) -> None:
         """Test that banned users are banned."""
 
         exp_id = '0'
@@ -1315,153 +1493,18 @@ class ExplorationEditRightsTest(BaseEditorControllerTests):
 class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
     """Test the handler for managing exploration editing rights."""
 
-    COLLABORATOR_EMAIL = 'collaborator@example.com'
-    COLLABORATOR_USERNAME = 'collab'
-    COLLABORATOR2_EMAIL = 'collaborator2@example.com'
-    COLLABORATOR2_USERNAME = 'collab2'
-    COLLABORATOR3_EMAIL = 'collaborator3@example.com'
-    COLLABORATOR3_USERNAME = 'collab3'
-    RANDOM_USER_EMAIL = 'randomuser@example.com'
-    RANDOM_USER_USERNAME = 'randomuser'
+    COLLABORATOR_EMAIL: Final = 'collaborator@example.com'
+    COLLABORATOR_USERNAME: Final = 'collab'
+    COLLABORATOR2_EMAIL: Final = 'collaborator2@example.com'
+    COLLABORATOR2_USERNAME: Final = 'collab2'
+    COLLABORATOR3_EMAIL: Final = 'collaborator3@example.com'
+    COLLABORATOR3_USERNAME: Final = 'collab3'
+    COLLABORATOR4_EMAIL: Final = 'collaborator4@example.com'
+    COLLABORATOR4_USERNAME: Final = 'collab4'
+    RANDOM_USER_EMAIL: Final = 'randomuser@example.com'
+    RANDOM_USER_USERNAME: Final = 'randomuser'
 
-    def test_for_assign_role_for_exploration(self):
-        """Test exploration rights handler for assign role for exploration."""
-        # Create several users.
-        self.signup(
-            self.COLLABORATOR_EMAIL, self.COLLABORATOR_USERNAME)
-        self.signup(
-            self.COLLABORATOR2_EMAIL, self.COLLABORATOR2_USERNAME)
-        self.signup(
-            self.COLLABORATOR3_EMAIL, self.COLLABORATOR3_USERNAME)
-
-        # Owner creates exploration.
-        self.login(self.OWNER_EMAIL)
-        exp_id = 'eid'
-        self.save_new_valid_exploration(
-            exp_id, self.owner_id, title='Title for rights handler test!',
-            category='My category')
-
-        exploration = exp_fetchers.get_exploration_by_id(exp_id)
-        exploration.add_states(['State A', 'State 2', 'State 3'])
-        self.set_interaction_for_state(
-            exploration.states['State A'], 'TextInput')
-        self.set_interaction_for_state(
-            exploration.states['State 2'], 'TextInput')
-        self.set_interaction_for_state(
-            exploration.states['State 3'], 'TextInput')
-
-        csrf_token = self.get_new_csrf_token()
-
-        # Owner adds rights for other users.
-        rights_url = '%s/%s' % (feconf.EXPLORATION_RIGHTS_PREFIX, exp_id)
-        self.put_json(
-            rights_url, {
-                'version': exploration.version,
-                'new_member_username': self.VIEWER_USERNAME,
-                'new_member_role': rights_domain.ROLE_VIEWER
-            }, csrf_token=csrf_token)
-
-        self.put_json(
-            rights_url, {
-                'version': exploration.version,
-                'new_member_username': self.COLLABORATOR_USERNAME,
-                'new_member_role': rights_domain.ROLE_EDITOR
-            }, csrf_token=csrf_token)
-        self.put_json(
-            rights_url, {
-                'version': exploration.version,
-                'new_member_username': self.COLLABORATOR2_USERNAME,
-                'new_member_role': rights_domain.ROLE_EDITOR
-            }, csrf_token=csrf_token)
-        self.logout()
-
-        # Check that viewer can access editor page but cannot edit.
-        self.login(self.VIEWER_EMAIL)
-        self.assert_cannot_edit(exp_id)
-        self.assert_cannot_voiceover(exp_id)
-        self.logout()
-
-        # Check that collaborator can access editor page and can edit.
-        self.login(self.COLLABORATOR_EMAIL)
-        self.assert_can_edit(exp_id)
-        self.assert_can_voiceover(exp_id)
-        csrf_token = self.get_new_csrf_token()
-
-        # Check that collaborator can add a new state called 'State 4'.
-        response_dict = self.put_json(
-            '%s/%s' % (feconf.EXPLORATION_DATA_PREFIX, exp_id),
-            {
-                'version': exploration.version,
-                'commit_message': 'Added State 4',
-                'change_list': [{
-                    'cmd': 'add_state',
-                    'state_name': 'State 4'
-                }]
-            },
-            csrf_token=csrf_token,
-            expected_status_int=200
-        )
-        self.assertIn('State 4', response_dict['states'])
-
-        # Check that collaborator cannot add new members.
-        exploration = exp_fetchers.get_exploration_by_id(exp_id)
-        rights_url = '%s/%s' % (feconf.EXPLORATION_RIGHTS_PREFIX, exp_id)
-        self.put_json(
-            rights_url, {
-                'version': exploration.version,
-                'new_member_username': self.COLLABORATOR3_USERNAME,
-                'new_member_role': rights_domain.ROLE_EDITOR,
-            }, csrf_token=csrf_token,
-            expected_status_int=401)
-
-        self.logout()
-
-        # Check that collaborator2 can access editor page and can edit.
-        self.login(self.COLLABORATOR2_EMAIL)
-        self.get_html_response('/create/%s' % exp_id)
-        self.assert_can_edit(exp_id)
-        csrf_token = self.get_new_csrf_token()
-
-        # Check that collaborator2 can add a new state called 'State 5'.
-        response_dict = self.put_json(
-            '%s/%s' % (feconf.EXPLORATION_DATA_PREFIX, exp_id),
-            {
-                'version': exploration.version,
-                'commit_message': 'Added State 5',
-                'change_list': [{
-                    'cmd': 'add_state',
-                    'state_name': 'State 5'
-                }]
-            },
-            csrf_token=csrf_token,
-            expected_status_int=200
-        )
-        self.assertIn('State 5', response_dict['states'])
-
-        # Check that collaborator2 cannot add new members.
-        exploration = exp_fetchers.get_exploration_by_id(exp_id)
-        rights_url = '%s/%s' % (feconf.EXPLORATION_RIGHTS_PREFIX, exp_id)
-        self.put_json(
-            rights_url, {
-                'version': exploration.version,
-                'new_member_username': self.COLLABORATOR3_USERNAME,
-                'new_member_role': rights_domain.ROLE_EDITOR,
-                }, csrf_token=csrf_token, expected_status_int=401)
-
-        self.logout()
-
-        # Check that existing editor can be assigned to any other role.
-        self.login(self.OWNER_EMAIL)
-        csrf_token = self.get_new_csrf_token()
-        self.put_json(
-            rights_url, {
-                'version': exploration.version,
-                'new_member_username': self.COLLABORATOR_USERNAME,
-                'new_member_role': rights_domain.ROLE_OWNER
-            }, csrf_token=csrf_token)
-        self.logout()
-
-    def test_for_deassign_editor_role(self):
+    def test_for_deassign_editor_role(self) -> None:
         self.signup(
             self.COLLABORATOR_EMAIL, self.COLLABORATOR_USERNAME)
 
@@ -1474,12 +1517,14 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
 
         exploration = exp_fetchers.get_exploration_by_id(exp_id)
         exploration.add_states(['State A', 'State 2', 'State 3'])
+        content_id_generator = translation_domain.ContentIdGenerator(
+            exploration.next_content_id_index)
         self.set_interaction_for_state(
-            exploration.states['State A'], 'TextInput')
+            exploration.states['State A'], 'TextInput', content_id_generator)
         self.set_interaction_for_state(
-            exploration.states['State 2'], 'TextInput')
+            exploration.states['State 2'], 'TextInput', content_id_generator)
         self.set_interaction_for_state(
-            exploration.states['State 3'], 'TextInput')
+            exploration.states['State 3'], 'TextInput', content_id_generator)
         self.logout()
 
         self.login(self.COLLABORATOR_EMAIL)
@@ -1495,7 +1540,8 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
             rights_url, {
                 'version': exploration.version,
                 'new_member_username': self.COLLABORATOR_USERNAME,
-                'new_member_role': rights_domain.ROLE_EDITOR
+                'new_member_role': rights_domain.ROLE_EDITOR,
+                'viewable_if_private': None
             }, csrf_token=csrf_token)
         self.logout()
 
@@ -1517,7 +1563,7 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
             expected_status_int=404)
         self.logout()
 
-    def test_for_deassign_sole_owner_from_exploration(self):
+    def test_for_deassign_sole_owner_from_exploration(self) -> None:
         self.login(self.OWNER_EMAIL)
         exp_id = 'eid'
         self.save_new_valid_exploration(
@@ -1526,12 +1572,14 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
 
         exploration = exp_fetchers.get_exploration_by_id(exp_id)
         exploration.add_states(['State A', 'State 2', 'State 3'])
+        content_id_generator = translation_domain.ContentIdGenerator(
+            exploration.next_content_id_index)
         self.set_interaction_for_state(
-            exploration.states['State A'], 'TextInput')
+            exploration.states['State A'], 'TextInput', content_id_generator)
         self.set_interaction_for_state(
-            exploration.states['State 2'], 'TextInput')
+            exploration.states['State 2'], 'TextInput', content_id_generator)
         self.set_interaction_for_state(
-            exploration.states['State 3'], 'TextInput')
+            exploration.states['State 3'], 'TextInput', content_id_generator)
         rights_url = '%s/%s' % (feconf.EXPLORATION_RIGHTS_PREFIX, exp_id)
 
         response = self.delete_json(
@@ -1542,7 +1590,7 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
             response['error'], 'Sorry, users cannot remove their own roles.')
         self.logout()
 
-    def test_users_cannot_assign_other_role_to_itself(self):
+    def test_users_cannot_assign_other_role_to_itself(self) -> None:
         self.login(self.OWNER_EMAIL)
         exp_id = 'eid'
         self.save_new_valid_exploration(
@@ -1557,14 +1605,16 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
             rights_url, {
                 'version': exploration.version,
                 'new_member_username': self.OWNER_USERNAME,
-                'new_member_role': rights_domain.ROLE_EDITOR
+                'new_member_role': rights_domain.ROLE_EDITOR,
+                'make_community_owned': False,
+                'viewable_if_private': None
             }, csrf_token=csrf_token, expected_status_int=400)
         self.assertEqual(
             response['error'],
-            'Users are not allowed to assign other roles to themselves')
+            'Users are not allowed to assign other roles to themselves.')
         self.logout()
 
-    def test_for_deassign_viewer_role_from_exploration(self):
+    def test_for_deassign_viewer_role_from_exploration(self) -> None:
         self.login(self.OWNER_EMAIL)
         exp_id = 'eid'
         self.save_new_valid_exploration(
@@ -1573,12 +1623,14 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
 
         exploration = exp_fetchers.get_exploration_by_id(exp_id)
         exploration.add_states(['State A', 'State 2', 'State 3'])
+        content_id_generator = translation_domain.ContentIdGenerator(
+            exploration.next_content_id_index)
         self.set_interaction_for_state(
-            exploration.states['State A'], 'TextInput')
+            exploration.states['State A'], 'TextInput', content_id_generator)
         self.set_interaction_for_state(
-            exploration.states['State 2'], 'TextInput')
+            exploration.states['State 2'], 'TextInput', content_id_generator)
         self.set_interaction_for_state(
-            exploration.states['State 3'], 'TextInput')
+            exploration.states['State 3'], 'TextInput', content_id_generator)
         self.logout()
 
         self.login(self.VIEWER_EMAIL)
@@ -1594,7 +1646,8 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
             rights_url, {
                 'version': exploration.version,
                 'new_member_username': self.VIEWER_USERNAME,
-                'new_member_role': rights_domain.ROLE_VIEWER
+                'new_member_role': rights_domain.ROLE_VIEWER,
+                'viewable_if_private': None
             }, csrf_token=csrf_token)
         self.logout()
 
@@ -1616,7 +1669,425 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
             expected_status_int=404)
         self.logout()
 
-    def test_for_checking_username_is_valid(self):
+    def test_role_must_be_provided_for_a_new_member(self) -> None:
+        self.signup(
+            self.COLLABORATOR_EMAIL, self.COLLABORATOR_USERNAME)
+        self.signup(
+            self.COLLABORATOR2_EMAIL, self.COLLABORATOR2_USERNAME)
+
+        self.login(self.OWNER_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+        exp_id = 'eid'
+        self.save_new_valid_exploration(
+            exp_id, self.owner_id, title='Title for rights handler test!',
+            category='My category')
+
+        exploration = exp_fetchers.get_exploration_by_id(exp_id)
+        exploration.add_states(['State A'])
+
+        rights_url = '%s/%s' % (feconf.EXPLORATION_RIGHTS_PREFIX, exp_id)
+        response = self.put_json(
+            rights_url, {
+                'version': exploration.version,
+                'new_member_username': self.COLLABORATOR_USERNAME,
+                'viewable_if_private': None
+            },
+            csrf_token=csrf_token,
+            expected_status_int=400
+        )
+        self.assertEqual(
+            response['error'],
+            'Please provide a role for the new member of the exploration.'
+        )
+
+    def test_that_an_editor_can_edit_the_exploration(self) -> None:
+        self.signup(
+            self.COLLABORATOR_EMAIL, self.COLLABORATOR_USERNAME)
+        self.signup(
+            self.COLLABORATOR2_EMAIL, self.COLLABORATOR2_USERNAME)
+
+        self.login(self.OWNER_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+        exp_id = 'eid'
+        self.save_new_valid_exploration(
+            exp_id, self.owner_id, title='Title for rights handler test!',
+            category='My category')
+
+        exploration = exp_fetchers.get_exploration_by_id(exp_id)
+        exploration.add_states(['State A'])
+        content_id_generator = translation_domain.ContentIdGenerator(
+            exploration.next_content_id_index
+        )
+
+        rights_url = '%s/%s' % (feconf.EXPLORATION_RIGHTS_PREFIX, exp_id)
+        self.put_json(
+            rights_url, {
+                'version': exploration.version,
+                'new_member_username': self.COLLABORATOR_USERNAME,
+                'new_member_role': rights_domain.ROLE_EDITOR,
+                'viewable_if_private': None
+            }, csrf_token=csrf_token)
+
+        # Check that collaborator can add a new state called 'State B'.
+        self.login(self.COLLABORATOR_EMAIL)
+        self.assert_can_edit(exp_id)
+        self.assert_can_voiceover(exp_id)
+        csrf_token = self.get_new_csrf_token()
+
+        reader_dict = self.get_json(
+            '%s/%s' % (feconf.EXPLORATION_DATA_PREFIX, exp_id))
+        self.assertNotIn('State B', reader_dict['states'])
+
+        response = self.put_json(
+            '%s/%s' % (feconf.EXPLORATION_DATA_PREFIX, exp_id),
+            {
+                'version': exploration.version,
+                'commit_message': 'Added State B',
+                'change_list': [{
+                    'cmd': 'add_state',
+                    'state_name': 'State B',
+                    'content_id_for_state_content': (
+                        content_id_generator.generate(
+                            translation_domain.ContentType.CONTENT)
+                    ),
+                    'content_id_for_default_outcome': (
+                        content_id_generator.generate(
+                            translation_domain.ContentType.DEFAULT_OUTCOME)
+                    )
+                }, {
+                    'cmd': 'edit_exploration_property',
+                    'property_name': 'next_content_id_index',
+                    'new_value': content_id_generator.next_content_id_index
+                }]
+            },
+            csrf_token=csrf_token,
+            expected_status_int=200
+        )
+        self.assertIn('State B', response['states'])
+        self.logout()
+
+    def test_that_an_editor_cannot_assign_role_to_others(self) -> None:
+        self.signup(
+            self.COLLABORATOR_EMAIL, self.COLLABORATOR_USERNAME)
+        self.signup(
+            self.COLLABORATOR2_EMAIL, self.COLLABORATOR2_USERNAME)
+
+        self.login(self.OWNER_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+        exp_id = 'eid'
+        self.save_new_valid_exploration(
+            exp_id, self.owner_id, title='Title for rights handler test!',
+            category='My category')
+
+        exploration = exp_fetchers.get_exploration_by_id(exp_id)
+        exploration.add_states(['State A'])
+
+        rights_url = '%s/%s' % (feconf.EXPLORATION_RIGHTS_PREFIX, exp_id)
+        self.put_json(
+            rights_url, {
+                'version': exploration.version,
+                'new_member_username': self.COLLABORATOR_USERNAME,
+                'new_member_role': rights_domain.ROLE_EDITOR,
+                'viewable_if_private': None
+            }, csrf_token=csrf_token)
+
+        # Check that collaborator cannot add new members.
+        self.login(self.COLLABORATOR_EMAIL)
+        self.assert_can_edit(exp_id)
+        self.assert_can_voiceover(exp_id)
+        csrf_token = self.get_new_csrf_token()
+
+        exploration = exp_fetchers.get_exploration_by_id(exp_id)
+        rights_url = '%s/%s' % (feconf.EXPLORATION_RIGHTS_PREFIX, exp_id)
+
+        reader_dict = self.get_json(
+            '%s/%s' % (feconf.EXPLORATION_DATA_PREFIX, exp_id))
+        self.assertNotIn(
+            self.COLLABORATOR2_USERNAME,
+            reader_dict['rights']['editor_names']
+        )
+
+        response = self.put_json(
+            rights_url, {
+                'version': exploration.version,
+                'new_member_username': self.COLLABORATOR2_USERNAME,
+                'new_member_role': rights_domain.ROLE_EDITOR,
+            }, csrf_token=csrf_token,
+            expected_status_int=401
+        )
+        error_msg = (
+            'You do not have credentials to change rights '
+            'for this exploration.'
+        )
+        self.assertEqual(response['error'], error_msg)
+        reader_dict = self.get_json(
+            '%s/%s' % (feconf.EXPLORATION_DATA_PREFIX, exp_id))
+        self.assertNotIn(
+            self.COLLABORATOR2_USERNAME,
+            reader_dict['rights']['editor_names']
+        )
+        self.logout()
+
+    def test_that_a_viewer_cannot_edit_the_exploration(self) -> None:
+        self.signup(
+            self.COLLABORATOR_EMAIL, self.COLLABORATOR_USERNAME)
+        self.signup(
+            self.COLLABORATOR2_EMAIL, self.COLLABORATOR2_USERNAME)
+
+        self.login(self.OWNER_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+        exp_id = 'eid'
+        self.save_new_valid_exploration(
+            exp_id, self.owner_id, title='Title for rights handler test!',
+            category='My category')
+
+        exploration = exp_fetchers.get_exploration_by_id(exp_id)
+        exploration.add_states(['State A'])
+        content_id_generator = translation_domain.ContentIdGenerator(
+            exploration.next_content_id_index
+        )
+
+        rights_url = '%s/%s' % (feconf.EXPLORATION_RIGHTS_PREFIX, exp_id)
+        self.put_json(
+            rights_url, {
+                'version': exploration.version,
+                'new_member_username': self.COLLABORATOR_USERNAME,
+                'new_member_role': rights_domain.ROLE_VIEWER,
+                'viewable_if_private': None
+            }, csrf_token=csrf_token)
+
+        # Check that collaborator cannot add a new state called 'State B'.
+        self.login(self.COLLABORATOR_EMAIL)
+        self.assert_cannot_edit(exp_id)
+        self.assert_cannot_voiceover(exp_id)
+        csrf_token = self.get_new_csrf_token()
+
+        reader_dict = self.get_json(
+            '%s/%s' % (feconf.EXPLORATION_DATA_PREFIX, exp_id))
+        self.assertNotIn('State B', reader_dict['states'])
+
+        response = self.put_json(
+            '%s/%s' % (feconf.EXPLORATION_DATA_PREFIX, exp_id),
+            {
+                'version': exploration.version,
+                'commit_message': 'Added State B',
+                'change_list': [{
+                    'cmd': 'add_state',
+                    'state_name': 'State B',
+                    'content_id_for_state_content': (
+                        content_id_generator.generate(
+                            translation_domain.ContentType.CONTENT)
+                    ),
+                    'content_id_for_default_outcome': (
+                        content_id_generator.generate(
+                            translation_domain.ContentType.DEFAULT_OUTCOME)
+                    )
+                }, {
+                    'cmd': 'edit_exploration_property',
+                    'property_name': 'next_content_id_index',
+                    'new_value': content_id_generator.next_content_id_index
+                }]
+            },
+            csrf_token=csrf_token,
+            expected_status_int=401
+        )
+        error_msg = (
+            'You do not have permissions to save this exploration.'
+        )
+        self.assertEqual(response['error'], error_msg)
+        reader_dict = self.get_json(
+            '%s/%s' % (feconf.EXPLORATION_DATA_PREFIX, exp_id))
+        self.assertNotIn('State B', reader_dict['states'])
+        self.logout()
+
+    def test_that_a_viewer_cannot_assign_role_to_others(self) -> None:
+        self.signup(
+            self.COLLABORATOR_EMAIL, self.COLLABORATOR_USERNAME)
+        self.signup(
+            self.COLLABORATOR2_EMAIL, self.COLLABORATOR2_USERNAME)
+
+        self.login(self.OWNER_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+        exp_id = 'eid'
+        self.save_new_valid_exploration(
+            exp_id, self.owner_id, title='Title for rights handler test!',
+            category='My category')
+
+        exploration = exp_fetchers.get_exploration_by_id(exp_id)
+        exploration.add_states(['State A'])
+
+        rights_url = '%s/%s' % (feconf.EXPLORATION_RIGHTS_PREFIX, exp_id)
+        self.put_json(
+            rights_url, {
+                'version': exploration.version,
+                'new_member_username': self.COLLABORATOR_USERNAME,
+                'new_member_role': rights_domain.ROLE_VIEWER,
+                'viewable_if_private': None
+            }, csrf_token=csrf_token)
+
+        # Check that collaborator cannot add new members.
+        self.login(self.COLLABORATOR_EMAIL)
+        self.assert_cannot_edit(exp_id)
+        self.assert_cannot_voiceover(exp_id)
+        csrf_token = self.get_new_csrf_token()
+
+        exploration = exp_fetchers.get_exploration_by_id(exp_id)
+        rights_url = '%s/%s' % (feconf.EXPLORATION_RIGHTS_PREFIX, exp_id)
+
+        reader_dict = self.get_json(
+            '%s/%s' % (feconf.EXPLORATION_DATA_PREFIX, exp_id))
+        self.assertNotIn(
+            self.COLLABORATOR2_USERNAME,
+            reader_dict['rights']['editor_names']
+        )
+
+        response = self.put_json(
+            rights_url, {
+                'version': exploration.version,
+                'new_member_username': self.COLLABORATOR2_USERNAME,
+                'new_member_role': rights_domain.ROLE_EDITOR,
+                'viewable_if_private': None
+            }, csrf_token=csrf_token,
+            expected_status_int=401
+        )
+        error_msg = (
+            'You do not have credentials to change rights '
+            'for this exploration.'
+        )
+        self.assertEqual(response['error'], error_msg)
+        reader_dict = self.get_json(
+            '%s/%s' % (feconf.EXPLORATION_DATA_PREFIX, exp_id))
+        self.assertNotIn(
+            self.COLLABORATOR2_USERNAME,
+            reader_dict['rights']['editor_names']
+        )
+        self.logout()
+
+    def test_that_a_voice_artist_cannot_edit_the_exploration(self) -> None:
+        self.signup(
+            self.COLLABORATOR2_EMAIL, self.COLLABORATOR2_USERNAME)
+
+        self.login(self.OWNER_EMAIL)
+        exp_id = 'eid'
+        self.save_new_valid_exploration(
+            exp_id, self.owner_id, title='Title for rights handler test!',
+            category='My category')
+
+        exploration = exp_fetchers.get_exploration_by_id(exp_id)
+        exploration.add_states(['State A'])
+        content_id_generator = translation_domain.ContentIdGenerator(
+            exploration.next_content_id_index
+        )
+
+        rights_manager.publish_exploration(self.owner, exp_id)
+        rights_manager.assign_role_for_exploration(
+            self.voiceover_admin, exp_id, self.voice_artist_id,
+            rights_domain.ROLE_VOICE_ARTIST)
+
+        voiceover_artist_email = user_services.get_email_from_user_id(
+            self.voice_artist_id)
+
+        # Check that voiceover artist cannot add a new state
+        # called 'State B'.
+        self.login(voiceover_artist_email)
+        self.assert_cannot_edit(exp_id)
+        self.assert_can_voiceover(exp_id)
+        csrf_token = self.get_new_csrf_token()
+
+        reader_dict = self.get_json(
+            '%s/%s' % (feconf.EXPLORATION_DATA_PREFIX, exp_id))
+        self.assertNotIn('State B', reader_dict['states'])
+
+        self.put_json(
+            '%s/%s' % (feconf.EXPLORATION_DATA_PREFIX, exp_id),
+            {
+                'version': exploration.version,
+                'commit_message': 'Added State B',
+                'change_list': [{
+                    'cmd': 'add_state',
+                    'state_name': 'State B',
+                    'content_id_for_state_content': (
+                        content_id_generator.generate(
+                            translation_domain.ContentType.CONTENT)
+                    ),
+                    'content_id_for_default_outcome': (
+                        content_id_generator.generate(
+                            translation_domain.ContentType.DEFAULT_OUTCOME)
+                    )
+                }, {
+                    'cmd': 'edit_exploration_property',
+                    'property_name': 'next_content_id_index',
+                    'new_value': content_id_generator.next_content_id_index
+                }]
+            },
+            csrf_token=csrf_token,
+            expected_status_int=500
+        )
+        reader_dict = self.get_json(
+            '%s/%s' % (feconf.EXPLORATION_DATA_PREFIX, exp_id))
+        self.assertNotIn('State B', reader_dict['states'])
+        self.logout()
+
+    def test_that_a_voice_artist_cannot_assign_role_to_others(self) -> None:
+        self.signup(
+            self.COLLABORATOR2_EMAIL, self.COLLABORATOR2_USERNAME)
+
+        self.login(self.OWNER_EMAIL)
+        exp_id = 'eid'
+        self.save_new_valid_exploration(
+            exp_id, self.owner_id, title='Title for rights handler test!',
+            category='My category')
+
+        exploration = exp_fetchers.get_exploration_by_id(exp_id)
+        exploration.add_states(['State A'])
+
+        rights_manager.publish_exploration(self.owner, exp_id)
+        rights_manager.assign_role_for_exploration(
+            self.voiceover_admin, exp_id, self.voice_artist_id,
+            rights_domain.ROLE_VOICE_ARTIST)
+
+        voiceover_artist_email = user_services.get_email_from_user_id(
+            self.voice_artist_id)
+
+        # Check that voice artist cannot add new members.
+        self.login(voiceover_artist_email)
+        self.assert_cannot_edit(exp_id)
+        self.assert_can_voiceover(exp_id)
+        csrf_token = self.get_new_csrf_token()
+
+        exploration = exp_fetchers.get_exploration_by_id(exp_id)
+        rights_url = '%s/%s' % (feconf.EXPLORATION_RIGHTS_PREFIX, exp_id)
+
+        reader_dict = self.get_json(
+            '%s/%s' % (feconf.EXPLORATION_DATA_PREFIX, exp_id))
+        self.assertNotIn(
+            self.COLLABORATOR2_USERNAME,
+            reader_dict['rights']['editor_names']
+        )
+
+        response = self.put_json(
+            rights_url, {
+                'version': exploration.version,
+                'new_member_username': self.COLLABORATOR2_USERNAME,
+                'new_member_role': rights_domain.ROLE_EDITOR,
+            },
+            csrf_token=csrf_token,
+            expected_status_int=401
+        )
+        error_msg = (
+            'You do not have credentials to change rights '
+            'for this exploration.'
+        )
+        self.assertEqual(response['error'], error_msg)
+        reader_dict = self.get_json(
+            '%s/%s' % (feconf.EXPLORATION_DATA_PREFIX, exp_id))
+        self.assertNotIn(
+            self.COLLABORATOR2_USERNAME,
+            reader_dict['rights']['editor_names']
+        )
+        self.logout()
+
+    def test_for_checking_username_is_valid(self) -> None:
         self.login(self.OWNER_EMAIL)
         exp_id = 'exp_id'
         self.save_new_valid_exploration(exp_id, self.owner_id)
@@ -1627,7 +2098,7 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
             response['error'], 'Sorry, we could not find the specified user.')
         self.logout()
 
-    def test_transfering_ownership_to_the_community(self):
+    def test_transfering_ownership_to_the_community(self) -> None:
         """Test exploration rights handler for transfering ownership to the
         community.
         """
@@ -1646,7 +2117,10 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
         self.put_json(
             rights_url, {
                 'version': exploration.version,
-                'make_community_owned': True
+                'make_community_owned': True,
+                'new_member_username': None,
+                'new_member_role': None,
+                'viewable_if_private': None
             }, csrf_token=csrf_token)
 
         self.logout()
@@ -1666,11 +2140,14 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
 
         self.logout()
 
-    def test_cannot_transfer_ownership_of_invalid_exp_to_the_community(self):
+    def test_cannot_transfer_ownership_of_invalid_exp_to_the_community(
+        self
+    ) -> None:
         self.login(self.OWNER_EMAIL)
         exp_id = 'exp_id'
 
         rights_manager.create_new_exploration_rights(exp_id, self.owner_id)
+        content_id_generator = translation_domain.ContentIdGenerator()
         model = exp_models.ExplorationModel(
             id=exp_id,
             category='category',
@@ -1680,9 +2157,15 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
             states={
                 feconf.DEFAULT_INIT_STATE_NAME: (
                     state_domain.State.create_default_state(
-                        'End', is_initial_state=True
+                        'End',
+                        content_id_generator.generate(
+                            translation_domain.ContentType.CONTENT),
+                        content_id_generator.generate(
+                            translation_domain.ContentType.DEFAULT_OUTCOME),
+                    is_initial_state=True
                     ).to_dict()),
             },
+            next_content_id_index=content_id_generator.next_content_id_index,
             states_schema_version=feconf.CURRENT_STATE_SCHEMA_VERSION,
         )
         commit_cmd = exp_domain.ExplorationChange({
@@ -1702,13 +2185,16 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
         response = self.put_json(
             rights_url, {
                 'version': 1,
-                'make_community_owned': True
+                'make_community_owned': True,
+                'new_member_username': None,
+                'new_member_role': None,
+                'viewable_if_private': None
             }, csrf_token=csrf_token, expected_status_int=400)
 
         self.assertEqual(
             response['error'], 'Invalid language_code: invalid_language_code')
 
-    def test_get_with_invalid_version_raises_error(self):
+    def test_get_with_invalid_version_raises_error(self) -> None:
         self.login(self.OWNER_EMAIL)
         exp_id = 'exp_id'
         self.save_new_valid_exploration(exp_id, self.owner_id)
@@ -1717,7 +2203,7 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
             params={'v': '546'}, expected_status_int=404)
         self.logout()
 
-    def test_put_with_long_commit_message_raises_error(self):
+    def test_put_with_long_commit_message_raises_error(self) -> None:
         # Create several users.
         self.signup(self.COLLABORATOR_EMAIL, self.COLLABORATOR_USERNAME)
 
@@ -1730,6 +2216,9 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
 
         exploration = exp_fetchers.get_exploration_by_id(exp_id)
         exploration.add_states(['State A', 'State 2', 'State 3'])
+        content_id_generator = translation_domain.ContentIdGenerator(
+            exploration.next_content_id_index
+        )
         long_commit_message = 'a' * (constants.MAX_COMMIT_MESSAGE_LENGTH + 1)
 
         csrf_token = self.get_new_csrf_token()
@@ -1741,12 +2230,24 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
                 'commit_message': long_commit_message,
                 'change_list': [{
                     'cmd': 'add_state',
-                    'state_name': 'State 4'
+                    'state_name': 'State 4',
+                    'content_id_for_state_content': (
+                        content_id_generator.generate(
+                            translation_domain.ContentType.CONTENT)
+                    ),
+                    'content_id_for_default_outcome': (
+                        content_id_generator.generate(
+                            translation_domain.ContentType.DEFAULT_OUTCOME)
+                    )
                 }, {
                     'cmd': 'edit_state_property',
                     'state_name': 'State 4',
                     'property_name': 'widget_id',
                     'new_value': 'TextInput',
+                }, {
+                    'cmd': 'edit_exploration_property',
+                    'property_name': 'next_content_id_index',
+                    'new_value': content_id_generator.next_content_id_index
                 }]
             },
             csrf_token=csrf_token,
@@ -1760,7 +2261,7 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
         )
         self.assertEqual(response_dict['error'], error_msg)
 
-    def test_put_with_invalid_new_member_raises_error(self):
+    def test_put_with_invalid_new_member_raises_error(self) -> None:
         self.login(self.OWNER_EMAIL)
         exp_id = 'exp_id'
         self.save_new_valid_exploration(exp_id, self.owner_id)
@@ -1771,14 +2272,18 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
             '%s/%s' % (feconf.EXPLORATION_RIGHTS_PREFIX, exp_id),
             {
                 'version': exploration.version,
-                'new_member_username': 'invalid_new_member_username'},
+                'new_member_username': 'invalid_new_member_username',
+                'make_community_owned': False,
+                'new_member_role': None,
+                'viewable_if_private': None
+            },
             csrf_token=csrf_token, expected_status_int=400)
 
         self.assertEqual(
             response['error'],
             'Sorry, we could not find the specified user.')
 
-    def test_put_with_deleted_user_raises_error(self):
+    def test_put_with_deleted_user_raises_error(self) -> None:
         wipeout_service.pre_delete_user(self.viewer_id)
 
         self.login(self.OWNER_EMAIL)
@@ -1791,14 +2296,18 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
             '%s/%s' % (feconf.EXPLORATION_RIGHTS_PREFIX, exp_id),
             {
                 'version': exploration.version,
-                'new_member_username': self.VIEWER_USERNAME},
+                'new_member_username': self.VIEWER_USERNAME,
+                'make_community_owned': False,
+                'new_member_role': None,
+                'viewable_if_private': None
+            },
             csrf_token=csrf_token, expected_status_int=400)
 
         self.assertEqual(
             response['error'],
             'Sorry, we could not find the specified user.')
 
-    def test_make_private_exploration_viewable(self):
+    def test_make_private_exploration_viewable(self) -> None:
         self.login(self.OWNER_EMAIL)
         exp_id = 'exp_id'
         self.save_new_valid_exploration(exp_id, self.owner_id)
@@ -1810,12 +2319,16 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
             '%s/%s' % (feconf.EXPLORATION_RIGHTS_PREFIX, exp_id),
             {
                 'version': exploration.version,
-                'viewable_if_private': True}, csrf_token=csrf_token)
+                'viewable_if_private': True,
+                'new_member_username': None,
+                'new_member_role': None,
+                'make_community_owned': False,
+            }, csrf_token=csrf_token)
         exploration = exp_fetchers.get_exploration_by_id(exp_id)
         exploration_rights = rights_manager.get_exploration_rights(exp_id)
         self.assertTrue(exploration_rights.viewable_if_private)
 
-    def test_put_with_no_specified_changes_raise_error(self):
+    def test_put_with_no_specified_changes_raise_error(self) -> None:
         self.login(self.OWNER_EMAIL)
         exp_id = 'exp_id'
         self.save_new_valid_exploration(exp_id, self.owner_id)
@@ -1824,13 +2337,19 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
 
         response = self.put_json(
             '%s/%s' % (feconf.EXPLORATION_RIGHTS_PREFIX, exp_id),
-            {'version': exploration.version}, csrf_token=csrf_token,
+            {
+                'version': exploration.version,
+                'new_member_username': None,
+                'make_community_owned': False,
+                'new_member_role': None,
+                'viewable_if_private': None
+            }, csrf_token=csrf_token,
             expected_status_int=400)
 
         self.assertEqual(
             response['error'], 'No change was made to this exploration.')
 
-    def test_can_not_assign_roles_with_invalid_payload_version(self):
+    def test_can_not_assign_roles_with_invalid_payload_version(self) -> None:
          # Create collaborator user.
         self.signup(
             self.COLLABORATOR_EMAIL, self.COLLABORATOR_USERNAME)
@@ -1844,12 +2363,14 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
 
         exploration = exp_fetchers.get_exploration_by_id(exp_id)
         exploration.add_states(['State A', 'State 2', 'State 3'])
+        content_id_generator = translation_domain.ContentIdGenerator(
+            exploration.next_content_id_index)
         self.set_interaction_for_state(
-            exploration.states['State A'], 'TextInput')
+            exploration.states['State A'], 'TextInput', content_id_generator)
         self.set_interaction_for_state(
-            exploration.states['State 2'], 'TextInput')
+            exploration.states['State 2'], 'TextInput', content_id_generator)
         self.set_interaction_for_state(
-            exploration.states['State 3'], 'TextInput')
+            exploration.states['State 3'], 'TextInput', content_id_generator)
 
         csrf_token = self.get_new_csrf_token()
 
@@ -1887,7 +2408,7 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
 class UserExplorationEmailsIntegrationTest(BaseEditorControllerTests):
     """Test the handler for user email notification preferences."""
 
-    def test_user_exploration_emails_handler(self):
+    def test_user_exploration_emails_handler(self) -> None:
         """Test user exploration emails handler."""
 
         # Owner creates exploration.
@@ -1937,7 +2458,7 @@ class UserExplorationEmailsIntegrationTest(BaseEditorControllerTests):
 
         self.logout()
 
-    def test_put_with_invalid_message_type_raises_error(self):
+    def test_put_with_invalid_message_type_raises_error(self) -> None:
         self.login(self.OWNER_EMAIL)
         exp_id = 'eid'
         self.save_new_valid_exploration(exp_id, self.owner_id)
@@ -1961,10 +2482,10 @@ class UserExplorationEmailsIntegrationTest(BaseEditorControllerTests):
 class ModeratorEmailsTests(test_utils.EmailTestBase):
     """Integration test for post-moderator action emails."""
 
-    EXP_ID = 'eid'
+    EXP_ID: Final = 'eid'
 
-    def setUp(self):
-        super(ModeratorEmailsTests, self).setUp()
+    def setUp(self) -> None:
+        super().setUp()
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
         self.editor = user_services.get_user_actions_info(self.editor_id)
@@ -1985,7 +2506,7 @@ class ModeratorEmailsTests(test_utils.EmailTestBase):
             self.admin_id, 'unpublish_exploration_email_html_body',
             'Default unpublishing email body')
 
-    def test_error_cases_for_email_sending(self):
+    def test_error_cases_for_email_sending(self) -> None:
         with self.swap(
             feconf, 'REQUIRE_EMAIL_ON_MODERATOR_ACTION', True
             ), self.swap(
@@ -2038,7 +2559,7 @@ class ModeratorEmailsTests(test_utils.EmailTestBase):
             # Log out.
             self.logout()
 
-    def test_email_is_sent_correctly_when_unpublishing(self):
+    def test_email_is_sent_correctly_when_unpublishing(self) -> None:
         with self.swap(
             feconf, 'REQUIRE_EMAIL_ON_MODERATOR_ACTION', True
             ), self.swap(
@@ -2098,7 +2619,7 @@ class ModeratorEmailsTests(test_utils.EmailTestBase):
 
             self.logout()
 
-    def test_email_functionality_cannot_be_used_by_non_moderators(self):
+    def test_email_functionality_cannot_be_used_by_non_moderators(self) -> None:
         with self.swap(
             feconf, 'REQUIRE_EMAIL_ON_MODERATOR_ACTION', True
             ), self.swap(
@@ -2128,10 +2649,10 @@ class ModeratorEmailsTests(test_utils.EmailTestBase):
 class FetchIssuesPlaythroughHandlerTests(test_utils.GenericTestBase):
     """Test the handling of request to fetch issues and playthroughs."""
 
-    EXP_ID = 'exp_id1'
+    EXP_ID: Final = 'exp_id1'
 
-    def setUp(self):
-        super(FetchIssuesPlaythroughHandlerTests, self).setUp()
+    def setUp(self) -> None:
+        super().setUp()
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
         self.editor = user_services.get_user_actions_info(self.editor_id)
@@ -2214,22 +2735,22 @@ class FetchIssuesPlaythroughHandlerTests(test_utils.GenericTestBase):
             }]
         )
 
-    def test_cannot_fetch_issues_with_invalid_version(self):
+    def test_cannot_fetch_issues_with_invalid_version(self) -> None:
         self.get_json(
             '/issuesdatahandler/%s' % self.EXP_ID,
             params={'exp_version': 2}, expected_status_int=404)
 
-    def test_cannot_fetch_playthrough_with_invalid_playthrough_id(self):
+    def test_cannot_fetch_playthrough_with_invalid_playthrough_id(self) -> None:
         self.get_json(
             '/playthroughdatahandler/%s/%s' % (
                 self.EXP_ID, 'invalid_playthrough_id'), expected_status_int=404)
 
-    def test_fetch_issues_handler_with_disabled_exp_id(self):
+    def test_fetch_issues_handler_with_disabled_exp_id(self) -> None:
         self.get_json(
             '/issuesdatahandler/5', params={'exp_version': 2},
             expected_status_int=404)
 
-    def test_fetch_issues_handler(self):
+    def test_fetch_issues_handler(self) -> None:
         """Test that all issues get fetched correctly."""
         response = self.get_json(
             '/issuesdatahandler/%s' % self.EXP_ID,
@@ -2241,10 +2762,11 @@ class FetchIssuesPlaythroughHandlerTests(test_utils.GenericTestBase):
             response['unresolved_issues'][1]['issue_type'],
             'MultipleIncorrectSubmissions')
 
-    def test_invalid_issues_are_not_retrieved(self):
+    def test_invalid_issues_are_not_retrieved(self) -> None:
         """Test that invalid issues are not retrieved."""
         exp_issues_model = stats_models.ExplorationIssuesModel.get_model(
             self.EXP_ID, 1)
+        assert exp_issues_model is not None
         exp_issues_model.unresolved_issues[1]['is_valid'] = False
         exp_issues_model.update_timestamps()
         exp_issues_model.put()
@@ -2256,7 +2778,7 @@ class FetchIssuesPlaythroughHandlerTests(test_utils.GenericTestBase):
         self.assertEqual(
             response['unresolved_issues'][0]['issue_type'], 'EarlyQuit')
 
-    def test_fetch_playthrough_handler(self):
+    def test_fetch_playthrough_handler(self) -> None:
         """Test that the playthrough gets fetched correctly."""
         response = self.get_json(
             '/playthroughdatahandler/%s/%s' % (
@@ -2288,10 +2810,10 @@ class FetchIssuesPlaythroughHandlerTests(test_utils.GenericTestBase):
 class ResolveIssueHandlerTests(test_utils.GenericTestBase):
     """Test the handler for resolving issues."""
 
-    EXP_ID = 'exp_id1'
+    EXP_ID: Final = 'exp_id1'
 
-    def setUp(self):
-        super(ResolveIssueHandlerTests, self).setUp()
+    def setUp(self) -> None:
+        super().setUp()
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
         self.editor = user_services.get_user_actions_info(self.editor_id)
@@ -2377,7 +2899,7 @@ class ResolveIssueHandlerTests(test_utils.GenericTestBase):
             'is_valid': True
         }
 
-    def test_resolve_issue_handler(self):
+    def test_resolve_issue_handler(self) -> None:
         """Test that resolving an issue deletes associated playthroughs."""
         with self.login_context(self.MODERATOR_EMAIL):
             csrf_token = self.get_new_csrf_token()
@@ -2395,7 +2917,7 @@ class ResolveIssueHandlerTests(test_utils.GenericTestBase):
             [self.playthrough_id1, self.playthrough_id2])
         self.assertEqual(playthrough_instances, [None, None])
 
-    def test_error_on_passing_invalid_exp_issue_dict(self):
+    def test_error_on_passing_invalid_exp_issue_dict(self) -> None:
         """Test that error is raised on passing invalid exploration issue
         dict.
         """
@@ -2413,24 +2935,36 @@ class ResolveIssueHandlerTests(test_utils.GenericTestBase):
                 }, csrf_token=csrf_token,
                 expected_status_int=400)
 
-    def test_error_on_passing_non_matching_exp_issue_dict(self):
+    def test_error_on_passing_non_matching_exp_issue_dict(self) -> None:
         """Test that error is raised on passing an exploration issue dict that
         doesn't match an issue in the exploration issues model.
         """
-        self.exp_issue_dict['issue_customization_args']['state_name'][
-            'value'] = 'state_name2'
+        exp_issue_dict = {
+            'issue_type': 'EarlyQuit',
+            'issue_customization_args': {
+                'state_name': {
+                    'value': 'state_name2'
+                },
+                'time_spent_in_exp_in_msecs': {
+                    'value': 200
+                }
+            },
+            'playthrough_ids': [self.playthrough_id1, self.playthrough_id2],
+            'schema_version': 1,
+            'is_valid': True
+        }
 
         with self.login_context(self.MODERATOR_EMAIL):
             csrf_token = self.get_new_csrf_token()
             self.post_json(
                 '/resolveissuehandler/%s' % (self.EXP_ID),
                 {
-                    'exp_issue_dict': self.exp_issue_dict,
+                    'exp_issue_dict': exp_issue_dict,
                     'exp_version': 1
                 }, csrf_token=csrf_token,
                 expected_status_int=404)
 
-    def test_error_on_passing_invalid_exploration_version(self):
+    def test_error_on_passing_invalid_exploration_version(self) -> None:
 
         with self.login_context(self.MODERATOR_EMAIL):
             csrf_token = self.get_new_csrf_token()
@@ -2445,29 +2979,29 @@ class ResolveIssueHandlerTests(test_utils.GenericTestBase):
 class EditorAutosaveTest(BaseEditorControllerTests):
     """Test the handling of editor autosave actions."""
 
-    EXP_ID1 = '1'
-    EXP_ID2 = '2'
-    EXP_ID3 = '3'
+    EXP_ID1: Final = '1'
+    EXP_ID2: Final = '2'
+    EXP_ID3: Final = '3'
     # 30 days into the future.
-    NEWER_DATETIME = datetime.datetime.utcnow() + datetime.timedelta(30)
+    NEWER_DATETIME: Final = datetime.datetime.utcnow() + datetime.timedelta(30)
     # A date in the past.
-    OLDER_DATETIME = datetime.datetime.strptime('2015-03-16', '%Y-%m-%d')
-    DRAFT_CHANGELIST = [{
+    OLDER_DATETIME: Final = datetime.datetime.strptime('2015-03-16', '%Y-%m-%d')
+    DRAFT_CHANGELIST: Final = [{
         'cmd': 'edit_exploration_property',
         'property_name': 'title',
         'old_value': None,
         'new_value': 'Updated title'}]
-    NEW_CHANGELIST = [{
+    NEW_CHANGELIST: Final = [{
         'cmd': 'edit_exploration_property',
         'property_name': 'title',
         'old_value': None,
         'new_value': 'New title'}]
-    INVALID_CHANGELIST = [{
+    INVALID_CHANGELIST: Final = [{
         'cmd': 'edit_exploration_property',
         'property_name': 'title',
         'new_value': 1}]
 
-    def _create_explorations_for_tests(self):
+    def _create_explorations_for_tests(self) -> None:
         """Creates the mock explorations for testing."""
         self.save_new_valid_exploration(self.EXP_ID1, self.owner_id)
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_ID1)
@@ -2476,7 +3010,7 @@ class EditorAutosaveTest(BaseEditorControllerTests):
         self.save_new_valid_exploration(self.EXP_ID2, self.owner_id)
         self.save_new_valid_exploration(self.EXP_ID3, self.owner_id)
 
-    def _create_exp_user_data_model_objects_for_tests(self):
+    def _create_exp_user_data_model_objects_for_tests(self) -> None:
         """Creates the ExplorationUserDataModel objects for testing."""
         # Explorations with draft set.
         user_models.ExplorationUserDataModel(
@@ -2499,8 +3033,8 @@ class EditorAutosaveTest(BaseEditorControllerTests):
             id='%s.%s' % (self.owner_id, self.EXP_ID3), user_id=self.owner_id,
             exploration_id=self.EXP_ID3).put()
 
-    def setUp(self):
-        super(EditorAutosaveTest, self).setUp()
+    def setUp(self) -> None:
+        super().setUp()
         self.login(self.OWNER_EMAIL)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self._create_explorations_for_tests()
@@ -2509,7 +3043,7 @@ class EditorAutosaveTest(BaseEditorControllerTests):
         # Generate CSRF token.
         self.csrf_token = self.get_new_csrf_token()
 
-    def test_exploration_loaded_with_draft_applied(self):
+    def test_exploration_loaded_with_draft_applied(self) -> None:
         response = self.get_json(
             '/createhandler/data/%s' % self.EXP_ID2,
             params={'apply_draft': True})
@@ -2520,7 +3054,9 @@ class EditorAutosaveTest(BaseEditorControllerTests):
         # Draft changes passed to UI.
         self.assertEqual(response['draft_changes'], self.DRAFT_CHANGELIST)
 
-    def test_exploration_loaded_without_draft_when_draft_version_invalid(self):
+    def test_exploration_loaded_without_draft_when_draft_version_invalid(
+        self
+    ) -> None:
         exp_user_data = user_models.ExplorationUserDataModel.get_by_id(
             '%s.%s' % (self.owner_id, self.EXP_ID2))
         exp_user_data.draft_change_list_exp_version = 20
@@ -2536,7 +3072,9 @@ class EditorAutosaveTest(BaseEditorControllerTests):
         # Draft changes passed to UI even when version is invalid.
         self.assertEqual(response['draft_changes'], self.DRAFT_CHANGELIST)
 
-    def test_exploration_loaded_without_draft_as_draft_does_not_exist(self):
+    def test_exploration_loaded_without_draft_as_draft_does_not_exist(
+        self
+    ) -> None:
         response = self.get_json(
             '/createhandler/data/%s' % self.EXP_ID3,
             params={'apply_draft': True})
@@ -2547,7 +3085,7 @@ class EditorAutosaveTest(BaseEditorControllerTests):
         # Draft changes None.
         self.assertIsNone(response['draft_changes'])
 
-    def test_exploration_not_updated_because_cmd_is_invalid(self):
+    def test_exploration_not_updated_because_cmd_is_invalid(self) -> None:
         changelist = [dict(self.NEW_CHANGELIST[0])]
         changelist[0]['cmd'] = 'edit_exploration_propert'
         payload = {
@@ -2564,7 +3102,7 @@ class EditorAutosaveTest(BaseEditorControllerTests):
         )
         self.assertEqual(response['error'], error_msg)
 
-    def test_draft_not_updated_because_newer_draft_exists(self):
+    def test_draft_not_updated_because_newer_draft_exists(self) -> None:
         payload = {
             'change_list': self.NEW_CHANGELIST,
             'version': 1,
@@ -2580,7 +3118,7 @@ class EditorAutosaveTest(BaseEditorControllerTests):
         self.assertTrue(response['is_version_of_draft_valid'])
         self.assertEqual(response['draft_change_list_id'], 1)
 
-    def test_draft_not_updated_because_cmd_is_invalid(self):
+    def test_draft_not_updated_because_cmd_is_invalid(self) -> None:
         changelist = [dict(self.NEW_CHANGELIST[0])]
         changelist[0]['cmd'] = 'edit_exploration_propert'
         payload = {
@@ -2597,7 +3135,7 @@ class EditorAutosaveTest(BaseEditorControllerTests):
         )
         self.assertEqual(response['error'], error_msg)
 
-    def test_draft_not_updated_validation_error(self):
+    def test_draft_not_updated_validation_error(self) -> None:
         self.put_json(
             '/createhandler/autosave_draft/%s' % self.EXP_ID2, {
                 'change_list': self.DRAFT_CHANGELIST,
@@ -2619,7 +3157,7 @@ class EditorAutosaveTest(BaseEditorControllerTests):
             response, {'status_code': 400,
                        'error': 'Expected title to be a string, received 1'})
 
-    def test_draft_updated_version_valid(self):
+    def test_draft_updated_version_valid(self) -> None:
         payload = {
             'change_list': self.NEW_CHANGELIST,
             'version': 1,
@@ -2635,7 +3173,46 @@ class EditorAutosaveTest(BaseEditorControllerTests):
         self.assertEqual(response['draft_change_list_id'], 2)
         self.assertTrue(response['changes_are_mergeable'])
 
-    def test_draft_updated_version_invalid(self):
+    def test_draft_not_updated_without_editing_rights(self) -> None:
+        payload = {
+            'change_list': self.NEW_CHANGELIST,
+            'version': 10,
+        }
+
+        exp_user_data = user_models.ExplorationUserDataModel.get_by_id(
+            '%s.%s' % (self.owner_id, self.EXP_ID2))
+        self.assertNotEqual(
+            exp_user_data.draft_change_list, self.NEW_CHANGELIST)
+        self.assertNotEqual(exp_user_data.draft_change_list_exp_version, 10)
+        self.assertNotEqual(exp_user_data.draft_change_list_id, 2)
+
+        # User will behave as a voice artist because check_can_edit_activity
+        # is false but check_can_voiceover_activity is still true.
+        get_voiceover_swap = self.swap_to_always_return(
+            rights_manager, 'check_can_edit_activity', value=False)
+
+        with get_voiceover_swap:
+            response = self.put_json(
+                '/createhandler/autosave_draft/%s' % self.EXP_ID2,
+                payload,
+                csrf_token=self.csrf_token,
+                expected_status_int=400
+            )
+            exp_user_data = user_models.ExplorationUserDataModel.get_by_id(
+                '%s.%s' % (self.owner_id, self.EXP_ID2))
+            self.assertNotEqual(
+                exp_user_data.draft_change_list, self.NEW_CHANGELIST)
+            self.assertNotEqual(exp_user_data.draft_change_list_exp_version, 10)
+            self.assertNotEqual(exp_user_data.draft_change_list_id, 2)
+
+        error_msg = (
+            'Voice artist does not have permission to make some changes '
+            'in the change list.'
+        )
+
+        self.assertEqual(response['error'], error_msg)
+
+    def test_draft_updated_version_invalid(self) -> None:
         payload = {
             'change_list': self.NEW_CHANGELIST,
             'version': 10,
@@ -2651,7 +3228,7 @@ class EditorAutosaveTest(BaseEditorControllerTests):
         self.assertFalse(response['changes_are_mergeable'])
         self.assertEqual(response['draft_change_list_id'], 2)
 
-    def test_discard_draft(self):
+    def test_discard_draft(self) -> None:
         self.post_json(
             '/createhandler/autosave_draft/%s' % self.EXP_ID2, {},
             csrf_token=self.csrf_token)
@@ -2664,7 +3241,7 @@ class EditorAutosaveTest(BaseEditorControllerTests):
 
 class HasSeenTutorialTests(BaseEditorControllerTests):
 
-    def test_get_user_has_seen_editor_tutorial(self):
+    def test_get_user_has_seen_editor_tutorial(self) -> None:
         self.login(self.OWNER_EMAIL)
 
         exp_id = exp_fetchers.get_new_exploration_id()
@@ -2683,7 +3260,7 @@ class HasSeenTutorialTests(BaseEditorControllerTests):
 
         self.logout()
 
-    def test_get_user_has_seen_translation_tutorial(self):
+    def test_get_user_has_seen_translation_tutorial(self) -> None:
         self.login(self.OWNER_EMAIL)
 
         exp_id = exp_fetchers.get_new_exploration_id()
@@ -2705,7 +3282,7 @@ class HasSeenTutorialTests(BaseEditorControllerTests):
 
 class StateAnswerStatisticsHandlerTests(BaseEditorControllerTests):
 
-    def test_get_invalid_exploration_id(self):
+    def test_get_invalid_exploration_id(self) -> None:
         with self.login_context(self.OWNER_EMAIL):
             illegal_id = '@#$%^&*'
             self.get_json(
@@ -2713,7 +3290,7 @@ class StateAnswerStatisticsHandlerTests(BaseEditorControllerTests):
                     feconf.EXPLORATION_STATE_ANSWER_STATS_PREFIX, illegal_id),
                 expected_status_int=400)
 
-    def test_get_missing_exploration_id(self):
+    def test_get_missing_exploration_id(self) -> None:
         with self.login_context(self.OWNER_EMAIL):
             missing_id = '0'
             self.get_json(
@@ -2721,8 +3298,11 @@ class StateAnswerStatisticsHandlerTests(BaseEditorControllerTests):
                     feconf.EXPLORATION_STATE_ANSWER_STATS_PREFIX, missing_id),
                 expected_status_int=404)
 
-    def test_get_returns_empty_values_from_unvisited_exploration(self):
+    def test_get_returns_empty_values_from_unvisited_exploration(
+        self
+    ) -> None:
         with self.login_context(self.OWNER_EMAIL) as owner_id:
+            assert owner_id is not None
             exp_id = exp_fetchers.get_new_exploration_id()
             self.save_new_valid_exploration(exp_id, owner_id)
 
@@ -2732,8 +3312,11 @@ class StateAnswerStatisticsHandlerTests(BaseEditorControllerTests):
 
         self.assertEqual(state_stats['answers'], {})
 
-    def test_get_returns_assigned_interaction_ids_of_exploration_states(self):
+    def test_get_returns_assigned_interaction_ids_of_exploration_states(
+        self
+    ) -> None:
         with self.login_context(self.OWNER_EMAIL) as owner_id:
+            assert owner_id is not None
             exp_id = exp_fetchers.get_new_exploration_id()
             self.save_new_linear_exp_with_state_names_and_interactions(
                 exp_id, owner_id,
@@ -2748,8 +3331,8 @@ class StateAnswerStatisticsHandlerTests(BaseEditorControllerTests):
 
 class LearnerAnswerInfoHandlerTests(BaseEditorControllerTests):
 
-    def setUp(self):
-        super(LearnerAnswerInfoHandlerTests, self).setUp()
+    def setUp(self) -> None:
+        super().setUp()
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.exp_id = exp_fetchers.get_new_exploration_id()
         self.save_new_valid_exploration(self.exp_id, self.owner_id)
@@ -2758,8 +3341,10 @@ class LearnerAnswerInfoHandlerTests(BaseEditorControllerTests):
         self.exploration = exp_fetchers.get_exploration_by_id(self.exp_id)
 
         self.state_name = self.exploration.init_state_name
-        self.interaction_id = self.exploration.states[
+        interaction_id = self.exploration.states[
             self.state_name].interaction.id
+        assert interaction_id is not None
+        self.interaction_id = interaction_id
         self.customization_args = self.exploration.states[
             self.state_name].interaction.to_dict()['customization_args']
         self.answer = 'This is an answer'
@@ -2771,7 +3356,7 @@ class LearnerAnswerInfoHandlerTests(BaseEditorControllerTests):
             self.entity_type, self.state_reference, self.interaction_id,
             self.answer, self.answer_details)
 
-    def test_get_learner_answer_details_of_exploration_states(self):
+    def test_get_learner_answer_details_of_exploration_states(self) -> None:
         self.login(self.OWNER_EMAIL)
         with self.swap(
             constants, 'ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE', False):
@@ -2784,6 +3369,7 @@ class LearnerAnswerInfoHandlerTests(BaseEditorControllerTests):
             constants, 'ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE', True):
             learner_answer_details = stats_services.get_learner_answer_details(
                 self.entity_type, self.state_reference)
+            assert learner_answer_details is not None
             learner_answer_info_dicts = [
                 learner_answer_info.to_dict() for
                 learner_answer_info in
@@ -2801,13 +3387,16 @@ class LearnerAnswerInfoHandlerTests(BaseEditorControllerTests):
             self.assertEqual(response, learner_answer_info_data)
         self.logout()
 
-    def test_get_learner_answer_details_of_question_states(self):
+    def test_get_learner_answer_details_of_question_states(self) -> None:
         self.login(self.OWNER_EMAIL)
         question_id = question_services.get_new_question_id()
+        content_id_generator = translation_domain.ContentIdGenerator()
         question = self.save_new_question(
             question_id, self.owner_id,
-            self._create_valid_question_data('ABC'), ['skill_1'])
-        self.assertNotEqual(question, None)
+            self._create_valid_question_data('ABC', content_id_generator),
+            ['skill_1'],
+            content_id_generator.next_content_id_index)
+        self.assertIsNotNone(question)
         interaction_id = question.question_state_data.interaction.id
         customization_args = (
             question.question_state_data.interaction.to_dict()[
@@ -2822,6 +3411,7 @@ class LearnerAnswerInfoHandlerTests(BaseEditorControllerTests):
             constants, 'ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE', True):
             learner_answer_details = stats_services.get_learner_answer_details(
                 feconf.ENTITY_TYPE_QUESTION, state_reference)
+            assert learner_answer_details is not None
             learner_answer_info_dicts = [learner_answer_info.to_dict() for
                                          learner_answer_info in
                                          learner_answer_details
@@ -2838,7 +3428,7 @@ class LearnerAnswerInfoHandlerTests(BaseEditorControllerTests):
             self.assertEqual(response, learner_answer_info_data)
         self.logout()
 
-    def test_delete_learner_answer_info_of_exploration_states(self):
+    def test_delete_learner_answer_info_of_exploration_states(self) -> None:
         self.login(self.OWNER_EMAIL)
         with self.swap(
             constants, 'ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE', False):
@@ -2852,20 +3442,28 @@ class LearnerAnswerInfoHandlerTests(BaseEditorControllerTests):
             constants, 'ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE', True):
             learner_answer_details = stats_services.get_learner_answer_details(
                 self.entity_type, self.state_reference)
+            assert learner_answer_details is not None
             self.assertEqual(
                 len(learner_answer_details.learner_answer_info_list), 1)
             learner_answer_info_id = (
                 learner_answer_details.learner_answer_info_list[0].id)
-            self.assertNotEqual(learner_answer_info_id, None)
+            self.assertIsNotNone(learner_answer_info_id)
             self.delete_json(
                 '%s/%s/%s?state_name=%s&learner_answer_info_id=%s' % (
                     feconf.LEARNER_ANSWER_INFO_HANDLER_URL,
                     feconf.ENTITY_TYPE_EXPLORATION, self.exp_id,
                     self.state_name, learner_answer_info_id))
-            learner_answer_details = stats_services.get_learner_answer_details(
-                self.entity_type, self.state_reference)
+            updated_learner_answer_details = (
+                stats_services.get_learner_answer_details(
+                    self.entity_type, self.state_reference
+                )
+            )
+            assert updated_learner_answer_details is not None
             self.assertEqual(
-                len(learner_answer_details.learner_answer_info_list), 0)
+                len(
+                    updated_learner_answer_details.learner_answer_info_list
+                ), 0
+            )
             self.delete_json(
                 '%s/%s/%s?learner_answer_info_id=%s' % (
                     feconf.LEARNER_ANSWER_INFO_HANDLER_URL,
@@ -2878,13 +3476,16 @@ class LearnerAnswerInfoHandlerTests(BaseEditorControllerTests):
                     self.state_name), expected_status_int=400)
         self.logout()
 
-    def test_delete_learner_answer_info_of_question_states(self):
+    def test_delete_learner_answer_info_of_question_states(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         question_id = question_services.get_new_question_id()
+        content_id_generator = translation_domain.ContentIdGenerator()
         question = self.save_new_question(
             question_id, self.owner_id,
-            self._create_valid_question_data('ABC'), ['skill_1'])
-        self.assertNotEqual(question, None)
+            self._create_valid_question_data('ABC', content_id_generator),
+            ['skill_1'],
+            content_id_generator.next_content_id_index)
+        self.assertIsNotNone(question)
         state_reference = (
             stats_services.get_state_reference_for_question(question_id))
         self.assertEqual(state_reference, question_id)
@@ -2895,26 +3496,31 @@ class LearnerAnswerInfoHandlerTests(BaseEditorControllerTests):
             constants, 'ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE', True):
             learner_answer_details = stats_services.get_learner_answer_details(
                 feconf.ENTITY_TYPE_QUESTION, state_reference)
+            assert learner_answer_details is not None
             self.assertEqual(
                 len(learner_answer_details.learner_answer_info_list), 1)
             learner_answer_info_id = (
                 learner_answer_details.learner_answer_info_list[0].id)
-            self.assertNotEqual(learner_answer_info_id, None)
+            self.assertIsNotNone(learner_answer_info_id)
             self.delete_json(
                 '%s/%s/%s?learner_answer_info_id=%s' % (
                     feconf.LEARNER_ANSWER_INFO_HANDLER_URL,
                     feconf.ENTITY_TYPE_QUESTION, question_id,
                     learner_answer_info_id))
-            learner_answer_details = stats_services.get_learner_answer_details(
-                feconf.ENTITY_TYPE_QUESTION, state_reference)
+            updated_learner_answer_details = (
+                stats_services.get_learner_answer_details(
+                    feconf.ENTITY_TYPE_QUESTION, state_reference
+                )
+            )
+            assert updated_learner_answer_details is not None
             self.assertEqual(
-                len(learner_answer_details.learner_answer_info_list), 0)
+                len(updated_learner_answer_details.learner_answer_info_list), 0)
         self.logout()
 
 
 class UserExplorationPermissionsHandlerTests(BaseEditorControllerTests):
 
-    def test_rights_handler_returns_appropriate_rights(self):
+    def test_rights_handler_returns_appropriate_rights(self) -> None:
         """Test that rights handler returns the correct rights of a user
         for an exploration.
         """
@@ -2935,5 +3541,154 @@ class UserExplorationPermissionsHandlerTests(BaseEditorControllerTests):
         self.assertTrue(response['can_voiceover'])
         self.assertFalse(response['can_unpublish'])
         self.assertFalse(response['can_manage_voice_artist'])
+
+        self.logout()
+
+
+class ImageUploadHandlerTests(BaseEditorControllerTests):
+
+    def test_return_error_when_image_not_uploaded(self) -> None:
+        """Test that an error is returned when no image is uploaded."""
+
+        self.login(self.EDITOR_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+
+        exp_id = exp_fetchers.get_new_exploration_id()
+        self.save_new_valid_exploration(exp_id, self.editor_id)
+
+        filename = 'image_file.svg'
+        filename_prefix = 'image'
+
+        publish_url = '%s/%s/%s' % (
+            feconf.EXPLORATION_IMAGE_UPLOAD_PREFIX,
+            feconf.ENTITY_TYPE_EXPLORATION, exp_id)
+
+        # Check that the file is not already present.
+        fs = fs_services.GcsFileSystem(feconf.ENTITY_TYPE_EXPLORATION, exp_id)
+        filepath = '%s/%s' % (filename_prefix, filename)
+        self.assertFalse(fs.isfile(filepath))
+
+        response = self.post_json(
+            publish_url, {
+                'image': 'sample_image',
+                'filename': filename,
+                'filename_prefix': filename_prefix
+            },
+            csrf_token=csrf_token,
+            expected_status_int=400,
+            upload_files=[('image', 'unused_filename', b'')]
+        )
+
+        error_msg = ('No image supplied')
+        self.assertEqual(response['error'], error_msg)
+
+        # Check that the file is not uploaded.
+        fs = fs_services.GcsFileSystem(feconf.ENTITY_TYPE_EXPLORATION, exp_id)
+        filepath = '%s/%s' % (filename_prefix, filename)
+        self.assertFalse(fs.isfile(filepath))
+
+        self.logout()
+
+    def test_return_error_when_uploaded_image_already_exists(self) -> None:
+        """Test that an error is returned when uploaded
+        image already exists.
+        """
+
+        self.login(self.EDITOR_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+
+        exp_id = exp_fetchers.get_new_exploration_id()
+        self.save_new_valid_exploration(exp_id, self.editor_id)
+
+        filename = 'img.png'
+        filename_prefix = 'image'
+
+        publish_url = '%s/%s/%s' % (
+            feconf.EXPLORATION_IMAGE_UPLOAD_PREFIX,
+            feconf.ENTITY_TYPE_EXPLORATION, exp_id)
+
+        # Check that the file is not already present.
+        fs = fs_services.GcsFileSystem(feconf.ENTITY_TYPE_EXPLORATION, exp_id)
+        filepath = '%s/%s' % (filename_prefix, filename)
+        self.assertFalse(fs.isfile(filepath))
+
+        # Read raw image for testing.
+        with utils.open_file(
+            os.path.join(feconf.TESTS_DATA_DIR, 'img.png'),
+            'rb', encoding=None
+        ) as f:
+            raw_image = f.read()
+
+        get_image_exists_swap = self.swap_to_always_return(
+            fs_services.GcsFileSystem, 'isfile', value=True)
+
+        with get_image_exists_swap:
+            response = self.post_json(
+                publish_url, {
+                    'image': 'img',
+                    'filename': filename,
+                    'filename_prefix': filename_prefix
+                },
+                csrf_token=csrf_token,
+                expected_status_int=400,
+                upload_files=[('image', 'unused_filename', raw_image)]
+            )
+
+        error_msg = (
+            'A file with the name %s already exists. Please choose a '
+            'different name.' % filename
+        )
+        self.assertEqual(response['error'], error_msg)
+
+        # Check that the file is not uploaded.
+        fs = fs_services.GcsFileSystem(feconf.ENTITY_TYPE_EXPLORATION, exp_id)
+        filepath = '%s/%s' % (filename_prefix, filename)
+        self.assertFalse(fs.isfile(filepath))
+
+        self.logout()
+
+    def test_upload_successful_when_image_uploaded(self) -> None:
+        """Test that no error is returned when valid image is uploaded."""
+
+        self.login(self.EDITOR_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+
+        exp_id = exp_fetchers.get_new_exploration_id()
+        self.save_new_valid_exploration(exp_id, self.editor_id)
+
+        filename = 'img.png'
+        filename_prefix = 'image'
+
+        publish_url = '%s/%s/%s' % (
+            feconf.EXPLORATION_IMAGE_UPLOAD_PREFIX,
+            feconf.ENTITY_TYPE_EXPLORATION, exp_id)
+
+        # Check that the file is not already present.
+        fs = fs_services.GcsFileSystem(feconf.ENTITY_TYPE_EXPLORATION, exp_id)
+        filepath = '%s/%s' % (filename_prefix, filename)
+        self.assertFalse(fs.isfile(filepath))
+        # Read raw image for testing.
+        with utils.open_file(
+            os.path.join(feconf.TESTS_DATA_DIR, 'img.png'),
+            'rb', encoding=None
+        ) as f:
+            raw_image = f.read()
+
+        response = self.post_json(
+            publish_url, {
+                'image': 'img',
+                'filename': filename,
+                'filename_prefix': filename_prefix
+            },
+            csrf_token=csrf_token,
+            expected_status_int=200,
+            upload_files=[('image', 'unused_filename', raw_image)]
+        )
+        self.assertEqual(response['filename'], filename)
+
+        # Check that the file is uploaded successfully.
+        fs = fs_services.GcsFileSystem(feconf.ENTITY_TYPE_EXPLORATION, exp_id)
+        filepath = '%s/%s' % (filename_prefix, filename)
+        self.assertTrue(fs.isfile(filepath))
 
         self.logout()

@@ -23,6 +23,14 @@ import { ComponentFixture, waitForAsync, TestBed } from '@angular/core/testing';
 import { CurrentInteractionService } from 'pages/exploration-player-page/services/current-interaction.service';
 import { GuppyInitializationService, GuppyObject } from 'services/guppy-initialization.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
+import { TranslateService } from '@ngx-translate/core';
+import { AlgebraicExpressionAnswer } from 'interactions/answer-defs';
+
+class MockTranslateService {
+  instant(key: string): string {
+    return key;
+  }
+}
 
 describe('AlgebraicExpressionInputInteractive', () => {
   let component: AlgebraicExpressionInputInteractionComponent;
@@ -39,23 +47,30 @@ describe('AlgebraicExpressionInputInteractive', () => {
     }
   };
   class MockGuppy {
+    static focused = true;
     constructor(id: string, config: Object) {}
 
     asciimath() {
       return 'Dummy value';
     }
+
     configure(name: string, val: Object): void {}
     static event(name: string, handler: Function): void {
-      handler({focused: true});
+      handler({focused: MockGuppy.focused});
     }
+
     static configure(name: string, val: Object): void {}
     static 'remove_global_symbol'(symbol: string): void {}
     static 'add_global_symbol'(name: string, symbol: Object): void {}
   }
 
   let mockCurrentInteractionService = {
-    onSubmit: (answer, rulesService) => {},
-    registerCurrentInteraction: (submitAnswerFn, validateExpressionFn) => {
+    onSubmit: (
+        answer: AlgebraicExpressionAnswer,
+        rulesService: CurrentInteractionService
+    ) => {},
+    registerCurrentInteraction: (
+        submitAnswerFn: Function, validateExpressionFn: Function) => {
       submitAnswerFn();
       validateExpressionFn();
     }
@@ -66,8 +81,13 @@ describe('AlgebraicExpressionInputInteractive', () => {
       {
         declarations: [AlgebraicExpressionInputInteractionComponent],
         providers: [
-          { provide: CurrentInteractionService,
+          {
+            provide: CurrentInteractionService,
             useValue: mockCurrentInteractionService
+          },
+          {
+            provide: TranslateService,
+            useClass: MockTranslateService
           }
         ]
       }).compileComponents();
@@ -75,13 +95,13 @@ describe('AlgebraicExpressionInputInteractive', () => {
 
   beforeEach(() => {
     windowRef = TestBed.inject(WindowRef);
-    windowRef.nativeWindow.Guppy = MockGuppy;
+    windowRef.nativeWindow.Guppy = MockGuppy as unknown as Guppy;
     guppyInitializationService = TestBed.inject(GuppyInitializationService);
     deviceInfoService = TestBed.inject(DeviceInfoService);
     fixture = TestBed.createComponent(
       AlgebraicExpressionInputInteractionComponent);
     component = fixture.componentInstance;
-    component.customOskLettersWithValue = '[&quot;a&quot;, &quot;b&quot;]';
+    component.allowedVariablesWithValue = '[&quot;a&quot;, &quot;b&quot;]';
     fixture.detectChanges();
   });
 
@@ -90,6 +110,14 @@ describe('AlgebraicExpressionInputInteractive', () => {
       mockGuppyObject as GuppyObject);
     component.ngOnInit();
     expect(guppyInitializationService.findActiveGuppyObject).toHaveBeenCalled();
+  });
+
+  it('should determine when the component is destroyed', () => {
+    component.ngOnInit();
+    expect(component.viewIsDestroyed).toBe(false);
+
+    component.ngOnDestroy();
+    expect(component.viewIsDestroyed).toBe(true);
   });
 
   it('should not submit the answer if invalid', () => {
@@ -125,5 +153,13 @@ describe('AlgebraicExpressionInputInteractive', () => {
     expect(guppyInitializationService.getShowOSK()).toBeFalse();
     component.showOsk();
     expect(guppyInitializationService.getShowOSK()).toBeTrue();
+  });
+
+  it('should initialize component.value with an empty string', () => {
+    spyOn(guppyInitializationService, 'findActiveGuppyObject').and.returnValue(
+      mockGuppyObject as GuppyObject);
+    MockGuppy.focused = false;
+    component.ngOnInit();
+    expect(component.value).not.toBeNull();
   });
 });

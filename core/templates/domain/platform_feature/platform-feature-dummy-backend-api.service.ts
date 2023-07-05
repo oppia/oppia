@@ -25,8 +25,8 @@ import { PlatformFeatureDomainConstants } from
 
 /**
  * Api service for the backend dummy handler that is gated by the
- * dummy_feature. This api is used for testing the end-to-end feature gating
- * flow.
+ * dummy_feature_flag_for_e2e_tests. This api is used for testing the
+ * end-to-end feature gating flow.
  */
 @Injectable({
   providedIn: 'root'
@@ -37,7 +37,8 @@ export class PlatformFeatureDummyBackendApiService {
   ) {}
 
   /**
-   * Checks if the dummy handler gated by dummy_feature is enabled.
+   * Checks if the dummy handler gated by dummy_feature_flag_for_e2e_tests
+   * is enabled.
    *
    * @returns {Promise<boolean>} - A promise that resolves to true if request
    * to the dummy handler succeeded without 404 error.
@@ -47,6 +48,10 @@ export class PlatformFeatureDummyBackendApiService {
       await this.http.get(PlatformFeatureDomainConstants.DUMMY_HANDLER_URL)
         .toPromise();
       return true;
+    // We use unknown type because we are unsure of the type of error
+    // that was thrown. Since the catch block cannot identify the
+    // specific type of error, we are unable to further optimise the
+    // code by introducing more types of errors.
     } catch (err: unknown) {
       if (err instanceof HttpErrorResponse && err.status === 404) {
         return false;

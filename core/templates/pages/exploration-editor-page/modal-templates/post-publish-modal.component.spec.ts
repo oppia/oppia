@@ -49,7 +49,6 @@ describe('Post Publish Modal Controller', function() {
   let fixture: ComponentFixture<PostPublishModalComponent>;
   let ngbActiveModal: NgbActiveModal;
   let contextService: ContextService;
-  let windowRef: WindowRef;
   let urlInterpolationService: UrlInterpolationService;
 
   const explorationId = 'exp1';
@@ -62,11 +61,7 @@ describe('Post Publish Modal Controller', function() {
       }
     };
   }
-  const mockWindow = {
-    document: {
-      execCommand: (command) => {}
-    }
-  };
+
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [
@@ -94,8 +89,6 @@ describe('Post Publish Modal Controller', function() {
 
     ngbActiveModal = TestBed.inject(NgbActiveModal);
     contextService = TestBed.inject(ContextService);
-    windowRef = TestBed.inject(WindowRef);
-    windowRef = (windowRef as unknown) as jasmine.SpyObj<WindowRef>;
     urlInterpolationService = TestBed.inject(UrlInterpolationService);
     spyOn(contextService, 'getExplorationId').and.returnValue(explorationId);
     spyOn(urlInterpolationService, 'getStaticImageUrl')
@@ -114,40 +107,5 @@ describe('Post Publish Modal Controller', function() {
     const dismissSpy = spyOn(ngbActiveModal, 'dismiss').and.callThrough();
     component.cancel();
     expect(dismissSpy).toHaveBeenCalledWith();
-  });
-
-  it('should add range from a click event', function() {
-    let removeAllRanges = jasmine.createSpy('removeAllRanges');
-    let addRange = jasmine.createSpy('addRange');
-    // This throws "Argument of type '{ removeAllRanges:
-    // jasmine.Spy<jasmine.Func>; addRange: jasmine.Spy<jasmine.Func>; }'
-    // is not assignable to parameter of type 'Selection'." This is because
-    // the type of the actual 'getSelection' function doesn't match the type
-    // of function we've mocked it to. We need to suppress this error because
-    // we need to mock 'getSelection' function to our function for testing
-    // purposes.
-    // @ts-expect-error
-    spyOn(window, 'getSelection').and.returnValue({
-      removeAllRanges: removeAllRanges,
-      addRange: addRange
-    });
-    spyOn(mockWindow.document, 'execCommand');
-
-    var firstChild = document.createElement('div');
-    var lastChild = document.createElement('div');
-    var element = document.createElement('div');
-    element.appendChild(firstChild);
-    element.appendChild(lastChild);
-
-    element.onclick = function(event) {
-      component.selectText(event);
-    };
-
-    element.click();
-
-    expect(removeAllRanges).toHaveBeenCalled();
-    expect(addRange).toHaveBeenCalledWith(document.createRange());
-    expect(mockWindow.document.execCommand).not.toHaveBeenCalled();
-    expect(component.explorationLinkCopied).toBe(true);
   });
 });

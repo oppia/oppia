@@ -1,0 +1,142 @@
+<div *ngIf="!isLearnerSpecificViewActive()" class="oppia-learner-group-learners-progress">
+  <div class="search-bar-label">{{'I18N_LEARNER_GROUP_SEARCH_BY_USERNAME' | translate}}</div>
+  <div>
+    <input class="search-bar-input"
+           type="text"
+           [(ngModel)]="searchUsernameQuery"
+           (keyup)="getSearchUsernameResults()"
+           placeholder="Search Learner"
+    >
+  </div>
+  <div *ngFor="let learnerProgress of matchingUsersProgress; let idx = index">
+    <div *ngIf="learnerProgress.isProgressSharingTurnedOn" class="learner-progress-summary">
+      <div class="learner-progress-summary-header">
+        <div class="learner-info">
+          <picture>
+            <source type="image/webp"
+                    [srcset]="getProfileImageWebpDataUrl(learnerProgress.username)">
+            <source type="image/png"
+                    [srcset]="getProfileImagePngDataUrl(learnerProgress.username)">
+            <img [src]="getProfileImagePngDataUrl(learnerProgress.username)">
+          </picture>
+          <div>{{learnerProgress.username}}</div>
+        </div>
+        <div class="view-details-button btn btn-primary" (click)="activateLearnerSpecificView(learnerProgress)">
+          {{'I18N_LEARNER_GROUP_VIEW_DETAILS' | translate}}
+        </div>
+      </div>
+      <div class="learner-progress-summary-info">
+        <span class="warning">Struggling with {{getStrugglingSubtopicsCountOfLearner(idx)}}
+          <span *ngIf="getStrugglingSubtopicsCountOfLearner(idx) === 1">skill</span>
+          <span *ngIf="getStrugglingSubtopicsCountOfLearner(idx) !== 1">skills</span>
+          <span class="divider"> | </span>
+        </span>
+        <span>Completed {{getCompletedStoriesCountByLearner(idx)}}
+          <span *ngIf="getCompletedStoriesCountByLearner(idx) === 1">story</span>
+          <span *ngIf="getCompletedStoriesCountByLearner(idx) !== 1">stories</span>
+        </span>
+      </div>
+    </div>
+    <div *ngIf="!learnerProgress.isProgressSharingTurnedOn" class="learner-progress-summary">
+      <div class="learner-progress-summary-header">
+        <div class="learner-info">
+          <picture>
+            <source type="image/webp" [srcset]="getProfileImageWebpDataUrl(learnerProgress.username)">
+            <source type="image/png" [srcset]="getProfileImagePngDataUrl(learnerProgress.username)">
+            <img [src]="getProfileImagePngDataUrl(learnerProgress.username)">
+          </picture>
+          <div>{{learnerProgress.username}}</div>
+        </div>
+        <div class="permissions-message gray-message">
+          {{'I18N_LEARNER_GROUP_PERMISSION_NOT_GIVEN' | translate}} &nbsp;
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none">
+            <path d="M10 2.00391C5.58879 2.00391 2 5.38879 2 9.54937C2 13.7099 5.58879 17.0948 10 17.0948C14.4112 17.0948 18 13.7099
+                  18 9.54937C18 5.38879 14.4112 2.00391 10 2.00391ZM10 0.00390625C15.5229 0.00390625 20 4.27756 20 9.54937C20 14.8212
+                  15.5229 19.0948 10 19.0948C4.47715 19.0948 0 14.8212 0 9.54937C0 4.27756 4.47715 0.00390625 10 0.00390625Z"
+                  fill="#757575"
+            />
+            <path d="M10.7119 12.0879H9.44043C9.44499 11.6504 9.48372 11.2926 9.55664 11.0146C9.63411 10.7321 9.75944 10.4746
+                  9.93262 10.2422C10.1058 10.0098 10.3359 9.74544 10.623 9.44922C10.8327 9.23503 11.0241 9.03451 11.1973
+                  8.84766C11.375 8.65625 11.5186 8.45117 11.6279 8.23242C11.7373 8.00911 11.792 7.74251 11.792 7.43262C11.792
+                  7.11816 11.735 6.84701 11.6211 6.61914C11.5117 6.39128 11.3477 6.21582 11.1289 6.09277C10.9147 5.96973
+                  10.6481 5.9082 10.3291 5.9082C10.0648 5.9082 9.81413 5.95605 9.57715 6.05176C9.34017 6.14746 9.14876 6.29557
+                  9.00293 6.49609C8.8571 6.69206 8.7819 6.94954 8.77734 7.26855H7.5127C7.52181 6.75358 7.64941 6.31152 7.89551
+                  5.94238C8.14616 5.57324 8.4834 5.29069 8.90723 5.09473C9.33105 4.89876 9.80501 4.80078 10.3291 4.80078C10.9079
+                  4.80078 11.4001 4.9056 11.8057 5.11523C12.2158 5.32487 12.528 5.62565 12.7422 6.01758C12.9564 6.40495 13.0635
+                  6.86523 13.0635 7.39844C13.0635 7.80859 12.9792 8.18685 12.8105 8.5332C12.6465 8.875 12.4346 9.19629 12.1748
+                  9.49707C11.915 9.79785 11.6393 10.085 11.3477 10.3584C11.097 10.5908 10.9284 10.8529 10.8418 11.1445C10.7552
+                  11.4362 10.7119 11.7507 10.7119 12.0879ZM9.38574 14.2549C9.38574 14.0498 9.44954 13.8766 9.57715 13.7354C9.70475
+                  13.5941 9.88932 13.5234 10.1309 13.5234C10.377 13.5234 10.5638 13.5941 10.6914 13.7354C10.819 13.8766 10.8828
+                  14.0498 10.8828 14.2549C10.8828 14.4508 10.819 14.6195 10.6914 14.7607C10.5638 14.902 10.377 14.9727 10.1309
+                  14.9727C9.88932 14.9727 9.70475 14.902 9.57715 14.7607C9.44954 14.6195 9.38574 14.4508 9.38574 14.2549Z"
+                  fill="#757575"
+            />
+          </svg>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div *ngIf="learnersProgress && matchingUsersProgress.length === 0 && learnersProgress.length > 0" class="gray-message">
+    <span translate="I18N_NO_RESULTS_FOUND_FOR_MATCHING_USERNAME"></span>
+  </div>
+  <div *ngIf="!learnersProgress || learnersProgress.length === 0" class="gray-message">
+    <span translate="I18N_LEARNER_GROUP_PROGRESS_NO_LEARNERS"></span>
+  </div>
+</div>
+<div *ngIf="isLearnerSpecificViewActive()">
+  <div class="learner-specific-progress-view-selectors">
+    <div (click)="disableLearnerSpecificView()">
+      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 14 14" fill="none">
+        <path d="M14 6.125H3.35125L8.2425 1.23375L7 0L0 7L7 14L8.23375 12.7662L3.35125 7.875H14V6.125Z" fill="#333333"/>
+      </svg>
+      <span class="back-to-all-learners-progress-button"> {{'I18N_LEARNER_GROUP_BACK_TO_ALL_LEARNERS_PROGRESS' | translate}}</span>
+    </div>
+    <div class="learner-progress-selection-container">
+      {{'I18N_LEARNER_GROUP_SHOWING_PROGRESS_FOR_LEARNER' | translate}}
+      <div class="learner-progress-selection">
+        <div class="learner-progress-selection-dropdown">
+          <div ngbDropdown class="search-bar-float-left oppia-search-bar-type-selector dropdown" autoClose="outside">
+            <button ngbDropdownToggle
+                    (click)="openSubmenu($event, 'learner')"
+                    type="button"
+                    class="btn dropdown-toggle learners-dropdown-toggle"
+                    title="progress">
+              <div class="learner-info">
+                <picture>
+                  <source type="image/webp"
+                          [srcset]="getProfileImageWebpDataUrl(specificLearnerProgress.username)">
+                  <source type="image/png"
+                          [srcset]="getProfileImagePngDataUrl(specificLearnerProgress.username)">
+                  <img [src]="getProfileImagePngDataUrl(specificLearnerProgress.username)">
+                </picture>
+                <div>{{specificLearnerProgress.username}}</div>
+              </div>
+            </button>
+            <ul ngbDropdownMenu
+                class="learners-dropdown-menu dropdown-menu"
+                role="menu">
+              <ng-container *ngFor="let learnerProgress of learnersProgress">
+                <li ngbDropdownItem>
+                  <div class="learner-info" (click)="updateLearnerSpecificProgress(learnerProgress)">
+                    <picture>
+                      <source type="image/webp"
+                              [srcset]="getProfileImageWebpDataUrl(learnerProgress.username)">
+                      <source type="image/png"
+                              [srcset]="getProfileImagePngDataUrl(learnerProgress.username)">
+                      <img [src]="getProfileImagePngDataUrl(learnerProgress.username)"
+                           alt="User profile picture">
+                    </picture>
+                    <div>{{learnerProgress.username}}</div>
+                  </div>
+                </li>
+              </ng-container>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <oppia-learner-group-learner-specific-progress [learnerProgress]="specificLearnerProgress"
+                                                 [storiesChaptersProgress]="storiesChaptersProgress">
+  </oppia-learner-group-learner-specific-progress>
+</div>

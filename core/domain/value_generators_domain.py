@@ -26,7 +26,7 @@ import os
 from core import feconf
 from core import utils
 
-from typing import Any, Dict, Tuple, Type
+from typing import Any, Dict, Type
 
 
 class BaseValueGenerator:
@@ -53,7 +53,7 @@ class BaseValueGenerator:
         return self.__class__.__name__
 
     @classmethod
-    def get_html_template(cls) -> bytes:
+    def get_html_template(cls) -> str:
         """Returns the HTML template for the class.
 
         Returns:
@@ -61,16 +61,15 @@ class BaseValueGenerator:
         """
         return utils.get_file_contents(os.path.join(
             os.getcwd(), feconf.VALUE_GENERATORS_DIR, 'templates',
-            '%s.html' % cls.__name__))
+            '%s.component.html' % cls.__name__))
 
-    # Since child classes of BaseValueGenerator can use
-    # the 'generate_value' function with different types
-    # of arguments, 'args', 'kwargs' and return type
-    # are set to 'Any'.
+    # Here we use type Any because child classes of BaseValueGenerator can use
+    # the 'generate_value' function with different types of arguments, 'args',
+    # 'kwargs' and return type are set to 'Any'.
     def generate_value(
         self,
-        *args: Tuple[Any],
-        **kwargs: Dict[str, Any]
+        *args: Any,
+        **kwargs: Any
     ) -> Any:
         """Generates a new value, using the given customization args.
 

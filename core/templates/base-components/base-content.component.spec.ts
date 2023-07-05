@@ -19,6 +19,7 @@
 import { DOCUMENT } from '@angular/common';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+import { NavigationEnd, Router } from '@angular/router';
 import { AppConstants } from 'app.constants';
 import { LimitToPipe } from 'filters/limit-to.pipe';
 import { CookieModule, CookieService } from 'ngx-cookie';
@@ -61,6 +62,19 @@ describe('Base Content Component', () => {
     }
   }
 
+  class MockLoaderService {
+    onLoadingMessageChange: Observable<string> = of('Test Message');
+  }
+
+  // We are mocking Router service to return the NavigationEnd object,
+  // so that we can test the routing event in our base component.
+  class MockRouteService {
+    public events: Observable<NavigationEnd> = (
+      of(new NavigationEnd(
+        0, 'http://localhost:8181', 'http://localhost:8181')
+      ));
+  }
+
   class MockWindowRef {
     nativeWindow = {
       location: {
@@ -76,10 +90,6 @@ describe('Base Content Component', () => {
         }
       }
     };
-  }
-
-  class MockLoaderService {
-    onLoadingMessageChange: Observable<string> = of('Test Message');
   }
 
   class MockPageTitleService {
@@ -103,6 +113,10 @@ describe('Base Content Component', () => {
         LimitToPipe
       ],
       providers: [
+        {
+          provide: Router,
+          useClass: MockRouteService
+        },
         {
           provide: WindowRef,
           useClass: MockWindowRef
@@ -132,20 +146,20 @@ describe('Base Content Component', () => {
     fixture = TestBed.createComponent(BaseContentComponent);
     componentInstance = fixture.componentInstance;
     loaderService = TestBed.inject(LoaderService);
-    loaderService = (loaderService as unknown) as jasmine.SpyObj<LoaderService>;
+    loaderService = loaderService as jasmine.SpyObj<LoaderService>;
     keyboardShortcutService = TestBed.inject(KeyboardShortcutService);
-    keyboardShortcutService = (keyboardShortcutService as unknown) as
+    keyboardShortcutService = keyboardShortcutService as
      jasmine.SpyObj<KeyboardShortcutService>;
     windowRef = TestBed.inject(WindowRef);
-    windowRef = (windowRef as unknown) as jasmine.SpyObj<WindowRef>;
+    windowRef = windowRef as jasmine.SpyObj<WindowRef>;
     sidebarStatusService = TestBed.inject(SidebarStatusService);
-    sidebarStatusService = (sidebarStatusService as unknown) as
+    sidebarStatusService = sidebarStatusService as
      jasmine.SpyObj<SidebarStatusService>;
     bottomNavbarStatusService = TestBed.inject(BottomNavbarStatusService);
-    bottomNavbarStatusService = (bottomNavbarStatusService as unknown) as
+    bottomNavbarStatusService = bottomNavbarStatusService as
      jasmine.SpyObj<BottomNavbarStatusService>;
     backgroundMaskService = TestBed.inject(BackgroundMaskService);
-    backgroundMaskService = (backgroundMaskService as unknown) as
+    backgroundMaskService = backgroundMaskService as
      jasmine.SpyObj<BackgroundMaskService>;
     cookieService = TestBed.inject(CookieService);
   });

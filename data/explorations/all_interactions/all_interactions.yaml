@@ -3,6 +3,7 @@ auto_tts_enabled: true
 blurb: ''
 category: Test
 correctness_feedback_enabled: false
+edits_allowed: true
 init_state_name: "Text Input state name with unicode \u0105\u0142"
 language_code: en
 objective: Dummy exploration for testing all interactions

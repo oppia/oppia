@@ -16,13 +16,16 @@
  * @fileoverview Unit tests for the FractionInput interaction.
  */
 
-import { async, ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
+import { async, ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
 import { InteractiveFractionInputComponent } from './oppia-interactive-fraction-input.component';
 import { InteractionAttributesExtractorService } from 'interactions/interaction-attributes-extractor.service';
 import { CurrentInteractionService } from 'pages/exploration-player-page/services/current-interaction.service';
 import { TranslateModule } from '@ngx-translate/core';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ObjectsDomainConstants } from 'domain/objects/objects-domain.constants';
+import { InteractionSpecsKey } from 'pages/interaction-specs.constants';
+import { FractionAnswer } from 'interactions/answer-defs';
+import { Fraction } from 'domain/objects/fraction.model';
 
 describe('InteractiveFractionInputComponent', () => {
   let component: InteractiveFractionInputComponent;
@@ -30,7 +33,9 @@ describe('InteractiveFractionInputComponent', () => {
   let currentInteractionService: CurrentInteractionService;
 
   class mockInteractionAttributesExtractorService {
-    getValuesFromAttributes(interactionId, attributes) {
+    getValuesFromAttributes(
+        interactionId: InteractionSpecsKey, attributes: Record<string, string>
+    ) {
       return {
         requireSimplestForm: {
           value: JSON.parse(attributes.requireSimplestFormWithValue)
@@ -51,8 +56,10 @@ describe('InteractiveFractionInputComponent', () => {
 
   let mockCurrentInteractionService = {
     updateViewWithNewAnswer: () => {},
-    onSubmit: (answer, rulesService) => {},
-    registerCurrentInteraction: (submitAnswerFn, validateExpressionFn) => {
+    onSubmit: (
+        answer: FractionAnswer, rulesService: CurrentInteractionService) => {},
+    registerCurrentInteraction: (
+        submitAnswerFn: Function, validateExpressionFn: Function,) => {
       submitAnswerFn();
       validateExpressionFn();
     }
@@ -131,14 +138,15 @@ describe('InteractiveFractionInputComponent', () => {
     component.answerValueChanged();
     component.answer = '12345678';
 
-    expect(component.errorMessage).toBe('');
+    expect(component.errorMessageI18nKey).toBe('');
     expect(component.isValid).toBe(true);
     component.answerValueChanged();
     tick(150);
 
-    expect(component.errorMessage)
+    expect(component.errorMessageI18nKey)
       .toBe(
-        ObjectsDomainConstants.FRACTION_PARSING_ERRORS.INVALID_CHARS_LENGTH);
+        ObjectsDomainConstants.
+          FRACTION_PARSING_ERROR_I18N_KEYS.INVALID_CHARS_LENGTH);
     expect(component.isValid).toBe(false);
   }));
 
@@ -148,13 +156,15 @@ describe('InteractiveFractionInputComponent', () => {
     component.answerValueChanged();
     component.answer = '??2';
 
-    expect(component.errorMessage).toBe('');
+    expect(component.errorMessageI18nKey).toBe('');
     expect(component.isValid).toBe(true);
     component.answerValueChanged();
     tick(150);
 
-    expect(component.errorMessage)
-      .toBe(ObjectsDomainConstants.FRACTION_PARSING_ERRORS.INVALID_CHARS);
+    expect(component.errorMessageI18nKey)
+      .toBe(
+        ObjectsDomainConstants.
+          FRACTION_PARSING_ERROR_I18N_KEYS.INVALID_CHARS);
     expect(component.isValid).toBe(false);
   }));
 
@@ -164,13 +174,15 @@ describe('InteractiveFractionInputComponent', () => {
     component.answerValueChanged();
     component.answer = '2 / 4 / 5';
 
-    expect(component.errorMessage).toBe('');
+    expect(component.errorMessageI18nKey).toBe('');
     expect(component.isValid).toBe(true);
     component.answerValueChanged();
     tick(150);
 
-    expect(component.errorMessage)
-      .toBe(ObjectsDomainConstants.FRACTION_PARSING_ERRORS.INVALID_FORMAT);
+    expect(component.errorMessageI18nKey)
+      .toBe(
+        ObjectsDomainConstants.
+          FRACTION_PARSING_ERROR_I18N_KEYS.INVALID_FORMAT);
     expect(component.isValid).toBe(false);
   }));
 
@@ -180,12 +192,12 @@ describe('InteractiveFractionInputComponent', () => {
     component.answerValueChanged();
     component.answer = '2/3';
     component.isValid = false;
-    component.errorMessage = 'error';
+    component.errorMessageI18nKey = 'error';
 
     component.answerValueChanged();
     tick(150);
 
-    expect(component.errorMessage).toBe('');
+    expect(component.errorMessageI18nKey).toBe('');
     expect(component.isValid).toBe(true);
   }));
 
@@ -196,10 +208,8 @@ describe('InteractiveFractionInputComponent', () => {
 
     component.submitAnswer();
 
-    expect(component.errorMessage)
-      .toBe(
-        'Please enter an answer in simplest form ' +
-        '(e.g., 1/3 instead of 2/6).');
+    expect(component.errorMessageI18nKey)
+      .toBe('I18N_INTERACTIONS_FRACTIONS_SIMPLEST_FORM');
     expect(component.isValid).toBe(false);
   });
 
@@ -210,10 +220,8 @@ describe('InteractiveFractionInputComponent', () => {
 
     component.submitAnswer();
 
-    expect(component.errorMessage)
-      .toBe(
-        'Please enter an answer with a "proper" fractional part ' +
-        '(e.g., 1 2/3 instead of 5/3).');
+    expect(component.errorMessageI18nKey)
+      .toBe('I18N_INTERACTIONS_FRACTIONS_PROPER_FRACTION');
     expect(component.isValid).toBe(false);
   });
 
@@ -224,10 +232,8 @@ describe('InteractiveFractionInputComponent', () => {
 
     component.submitAnswer();
 
-    expect(component.errorMessage)
-      .toBe(
-        'Please enter your answer as a fraction (e.g., 5/3 instead ' +
-        'of 1 2/3).');
+    expect(component.errorMessageI18nKey)
+      .toBe('I18N_INTERACTIONS_FRACTIONS_NON_MIXED');
     expect(component.isValid).toBe(false);
   });
 
@@ -238,10 +244,26 @@ describe('InteractiveFractionInputComponent', () => {
 
     component.submitAnswer();
 
-    expect(component.errorMessage).toBe('');
+    expect(component.errorMessageI18nKey).toBe('');
     expect(currentInteractionService.onSubmit).toHaveBeenCalled();
     expect(component.isValid).toBe(true);
   });
+
+  it('should throw uncaught errors that are not Error type',
+    waitForAsync(() => {
+      spyOn(Fraction, 'fromRawInputString').and.callFake(
+        () => {
+          throw TypeError;
+        }
+      );
+
+      expect(()=>{
+        component.submitAnswer();
+        // The eslint error is suppressed since we need to test if
+        // just a string was thrown.
+        // eslint-disable-next-line oppia/no-to-throw
+      }).toThrow(TypeError);
+    }));
 
   it('should get no integer placeholder text when interaction loads', () => {
     component.allowNonzeroIntegerPart = false;

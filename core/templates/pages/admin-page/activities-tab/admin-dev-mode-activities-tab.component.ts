@@ -171,6 +171,19 @@ export class AdminDevModeActivitiesTabComponent implements OnInit {
     this.adminTaskManagerService.finishTask();
   }
 
+  generateNewClassroom(): void {
+    this.adminTaskManagerService.startTask();
+    this.setStatusMessage.emit('Processing...');
+
+    this.adminBackendApiService.generateDummyClassroomDataAsync().then(() => {
+      this.setStatusMessage.emit('Dummy new classroom generated successfully.');
+    }, (errorResponse) => {
+      this.setStatusMessage.emit(
+        'Server error: ' + errorResponse);
+    });
+    this.adminTaskManagerService.finishTask();
+  }
+
   reloadCollection(collectionId: string): void {
     if (this.adminTaskManagerService.isTaskRunning()) {
       return;

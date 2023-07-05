@@ -25,10 +25,17 @@ from core.constants import constants
 from core.domain import activity_domain
 from core.platform import models
 
-(activity_models,) = models.Registry.import_models([models.NAMES.activity])
+from typing import List, Tuple
+
+MYPY = False
+if MYPY: # pragma: no cover
+    from mypy_imports import activity_models
+
+(activity_models,) = models.Registry.import_models([models.Names.ACTIVITY])
 
 
-def get_featured_activity_references():
+def get_featured_activity_references(
+) -> List[activity_domain.ActivityReference]:
     """Gets a list of ActivityReference domain models.
 
     Returns:
@@ -44,7 +51,9 @@ def get_featured_activity_references():
         for reference in featured_model_instance.activity_references]
 
 
-def update_featured_activity_references(featured_activity_references):
+def update_featured_activity_references(
+    featured_activity_references: List[activity_domain.ActivityReference]
+) -> None:
     """Updates the current list of featured activity references.
 
     Args:
@@ -74,7 +83,7 @@ def update_featured_activity_references(featured_activity_references):
     featured_model_instance.put()
 
 
-def remove_featured_activity(activity_type, activity_id):
+def remove_featured_activity(activity_type: str, activity_id: str) -> None:
     """Removes the specified activity reference from the list of featured
     activity references.
 
@@ -85,7 +94,9 @@ def remove_featured_activity(activity_type, activity_id):
     remove_featured_activities(activity_type, [activity_id])
 
 
-def remove_featured_activities(activity_type, activity_ids):
+def remove_featured_activities(
+    activity_type: str, activity_ids: list[str]
+) -> None:
     """Removes the specified activity references from the list of featured
     activity references.
 
@@ -113,7 +124,9 @@ def remove_featured_activities(activity_type, activity_ids):
         update_featured_activity_references(new_activity_references)
 
 
-def split_by_type(activity_references):
+def split_by_type(
+    activity_references: List[activity_domain.ActivityReference]
+) -> Tuple[List[str], List[str]]:
     """Given a list of activity references, returns two lists: the first list
     contains the exploration ids, and the second contains the collection ids.
     The elements in each of the returned lists are in the same order as those

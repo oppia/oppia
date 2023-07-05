@@ -25,11 +25,15 @@ import { AttributionService } from 'services/attribution.service';
 import { ContextService } from 'services/context.service';
 import { UrlService } from 'services/contextual/url.service';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
+import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
+
+import './attribution-guide.component.css';
+
 
 @Component({
   selector: 'attribution-guide',
   templateUrl: './attribution-guide.component.html',
-  styleUrls: []
+  styleUrls: ['./attribution-guide.component.css']
 })
 export class AttributionGuideComponent implements OnInit {
   deviceUsedIsMobile: boolean = false;
@@ -42,7 +46,8 @@ export class AttributionGuideComponent implements OnInit {
     private browserCheckerService: BrowserCheckerService,
     private contextService: ContextService,
     private i18nLanguageCodeService: I18nLanguageCodeService,
-    private urlService: UrlService
+    private urlService: UrlService,
+    private windowDimensionsService: WindowDimensionsService
   ) {}
 
   ngOnInit(): void {
@@ -52,13 +57,17 @@ export class AttributionGuideComponent implements OnInit {
       '<a href=\"https://creativecommons.org/licenses/by-sa/4.0/\" ' +
       'rel=\"noopener\" target=\"_blank\"><span ' +
       'class=\"oppia-attribution-licence-link\">CC BY SA 4.0 license</span>' +
-      '<span class=\"material-icons oppia-open-new-tab-icon\">' +
-      'open_in_new</span></a>');
+      '<span class=\"fas fa-external-link-alt oppia-open-new-tab-icon\">' +
+      '</span></a>');
     this.generateAttibutionIsAllowed = (
       this.attributionService.isGenerateAttributionAllowed());
     if (this.generateAttibutionIsAllowed) {
       this.attributionService.init();
     }
+  }
+
+  checkMobileView(): boolean {
+    return (this.windowDimensionsService.getWidth() <= 1024);
   }
 
   getAttributionModalStatus(): boolean {
@@ -68,10 +77,6 @@ export class AttributionGuideComponent implements OnInit {
   showAttributionModal(): void {
     this.attributionService.showAttributionModal();
     this.maskIsShown = true;
-  }
-
-  isLanguageRTL(): boolean {
-    return this.i18nLanguageCodeService.isCurrentLanguageRTL();
   }
 
   hideAttributionModal(): void {

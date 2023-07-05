@@ -8,10 +8,6 @@
  *    functions.
  */
 var constants = {
-  // Whether to allow custom event reporting to Google Analytics.
-  // Mock gtag function is used when disabled.
-  "CAN_SEND_ANALYTICS_EVENTS": false,
-
   "ALL_CATEGORIES": ["Algebra", "Algorithms", "Architecture", "Arithmetic",
     "Art", "Astronomy", "Biology", "Business", "Calculus", "Chemistry",
     "Combinatorics", "Computing", "Economics", "Education", "Engineering",
@@ -27,6 +23,7 @@ var constants = {
   "LIBRARY_TILE_WIDTH_PX": 208,
   "DASHBOARD_TYPE_CREATOR": "creator",
   "DASHBOARD_TYPE_LEARNER": "learner",
+  "DASHBOARD_TYPE_CONTRIBUTOR": "contributor",
   "DEFAULT_COLOR": "#a33f40",
   "DEFAULT_THUMBNAIL_ICON": "Lightbulb",
   "DEFAULT_CATEGORY_ICON": "Lightbulb",
@@ -45,29 +42,29 @@ var constants = {
   // color associated with it. Each category also has a thumbnail icon whose
   // filename is '{{CategoryName}}.svg'.
   "CATEGORIES_TO_COLORS": {
-    "Mathematics": "#cd672b",
-    "Algebra": "#cd672b",
-    "Arithmetic": "#d68453",
-    "Calculus": "#b86330",
-    "Logic": "#d68453",
-    "Combinatorics": "#cf5935",
-    "Graph Theory": "#cf5935",
-    "Probability": "#cf5935",
-    "Statistics": "#cd672b",
-    "Geometry": "#d46949",
-    "Trigonometry": "#d46949",
+    "Mathematics": "#cc4b00",
+    "Algebra": "#cc4b00",
+    "Arithmetic": "#ae511b",
+    "Calculus": "#ae5f2d",
+    "Logic": "#ae511b",
+    "Combinatorics": "#c54f2b",
+    "Graph Theory": "#c54f2b",
+    "Probability": "#c54f2b",
+    "Statistics": "#cc4b00",
+    "Geometry": "#be5637",
+    "Trigonometry": "#be5637",
 
-    "Algorithms": "#d0982a",
-    "Computing": "#bb8b2f",
-    "Programming": "#d9aa53",
+    "Algorithms": "#9d6901",
+    "Computing": "#927117",
+    "Programming": "#886628",
 
-    "Astronomy": "#879d6c",
-    "Biology": "#97a766",
-    "Chemistry": "#aab883",
-    "Engineering": "#8b9862",
-    "Environment": "#aba86d",
-    "Medicine": "#97a766",
-    "Physics": "#879d6c",
+    "Astronomy": "#58613a",
+    "Biology": "#657030",
+    "Chemistry": "#6c7c36",
+    "Engineering": "#6f7a48",
+    "Environment": "#747142",
+    "Medicine": "#657030",
+    "Physics": "#58613a",
 
     "Architecture": "#6e3466",
     "Art": "#895a83",
@@ -83,11 +80,11 @@ var constants = {
     "Gaulish": "#1b4174",
 
     "Business": "#387163",
-    "Economics": "#5d8b7f",
+    "Economics": "#2f836d",
     "Geography": "#3c6d62",
-    "Government": "#538270",
+    "Government": "#507c6b",
     "History": "#3d6b52",
-    "Law": "#538270",
+    "Law": "#507c6b",
 
     "Education": "#942e20",
     "Puzzles": "#a8554a",

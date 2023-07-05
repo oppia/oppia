@@ -113,12 +113,12 @@ export class Fraction {
     var INVALID_CHARS_REGEX = /[^\d\s\/-]/g;
     if (INVALID_CHARS_REGEX.test(rawInput)) {
       throw new Error(
-        ObjectsDomainConstants.FRACTION_PARSING_ERRORS.INVALID_CHARS);
+        ObjectsDomainConstants.FRACTION_PARSING_ERROR_I18N_KEYS.INVALID_CHARS);
     }
     var FRACTION_REGEX = /^\s*-?\s*((\d*\s*\d+\s*\/\s*\d+)|\d+)\s*$/;
     if (!FRACTION_REGEX.test(rawInput)) {
       throw new Error(
-        ObjectsDomainConstants.FRACTION_PARSING_ERRORS.INVALID_FORMAT);
+        ObjectsDomainConstants.FRACTION_PARSING_ERROR_I18N_KEYS.INVALID_FORMAT);
     }
     var isNegative = false;
     var wholeNumber = 0;
@@ -149,7 +149,8 @@ export class Fraction {
     }
     if (denominator === 0) {
       throw new Error(
-        ObjectsDomainConstants.FRACTION_PARSING_ERRORS.DIVISION_BY_ZERO);
+        ObjectsDomainConstants.FRACTION_PARSING_ERROR_I18N_KEYS.DIVISION_BY_ZERO
+      );
     }
     return new Fraction(isNegative, wholeNumber, numerator, denominator);
   }

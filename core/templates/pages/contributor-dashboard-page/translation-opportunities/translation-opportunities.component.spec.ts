@@ -31,9 +31,8 @@ import { UserInfo } from 'domain/user/user-info.model';
 import { UserService } from 'services/user.service';
 import { WrapTextWithEllipsisPipe } from 'filters/string-utility-filters/wrap-text-with-ellipsis.pipe';
 import { LazyLoadingComponent } from 'components/common-layout-directives/common-elements/lazy-loading.component';
-import { SchemaBasedEditorDirective } from 'components/forms/schema-based-editors/schema-based-editor.directive';
-import { AngularHtmlBindWrapperDirective } from 'components/angular-html-bind/angular-html-bind-wrapper.directive';
 import { CkEditorCopyToolbarComponent } from 'components/ck-editor-helpers/ck-editor-copy-toolbar/ck-editor-copy-toolbar.component';
+import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { EventEmitter } from '@angular/core';
 
 describe('Translation opportunities component', () => {
@@ -44,7 +43,7 @@ describe('Translation opportunities component', () => {
   let component: TranslationOpportunitiesComponent;
   let fixture: ComponentFixture<TranslationOpportunitiesComponent>;
   let translationModal: NgbModalRef;
-  let httpTestingController;
+  let httpTestingController: HttpTestingController;
   let loggedInUserInfo = new UserInfo(
     ['EXPLORATION_EDITOR'], false, false, false, false, false,
     'en', 'username', 'test@example.com', true
@@ -64,12 +63,10 @@ describe('Translation opportunities component', () => {
         NgbTooltipModule
       ],
       declarations: [
-        AngularHtmlBindWrapperDirective,
         CkEditorCopyToolbarComponent,
         LazyLoadingComponent,
         OpportunitiesListComponent,
         OpportunitiesListItemComponent,
-        SchemaBasedEditorDirective,
         TranslationModalComponent,
         TranslationOpportunitiesComponent,
         WrapTextWithEllipsisPipe,
@@ -78,6 +75,7 @@ describe('Translation opportunities component', () => {
         NgbModal,
         NgbActiveModal
       ],
+      schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
     translationModal = TestBed.createComponent(
       TranslationModalComponent) as unknown as NgbModalRef;
@@ -103,26 +101,28 @@ describe('Translation opportunities component', () => {
         topic_name: 'topic_1',
         story_title: 'Story title 1',
         chapter_title: 'Chapter title 1',
-        content_count: 1,
+        content_count: 4,
         translation_counts: {
           en: 2
         },
         translation_in_review_counts: {
           en: 2
-        }
+        },
+        language_code: 'en'
       }),
       ExplorationOpportunitySummary.createFromBackendDict({
         id: '2',
         topic_name: 'topic_2',
         story_title: 'Story title 2',
         chapter_title: 'Chapter title 2',
-        content_count: 2,
+        content_count: 10,
         translation_counts: {
           en: 4
         },
         translation_in_review_counts: {
           en: 4
-        }
+        },
+        language_code: 'en'
       })
     ];
 
@@ -175,6 +175,106 @@ describe('Translation opportunities component', () => {
       });
   });
 
+  it('should move opportunities with no translatable cards to the bottom ' +
+    'of opportunity list', () => {
+    spyOn(translationLanguageService, 'getActiveLanguageCode').and.returnValue(
+      'en');
+
+    const {opportunitiesDicts, } = (
+      component.getPresentableOpportunitiesData({
+        opportunities: opportunitiesArray,
+        more: false
+      }));
+
+    expect(opportunitiesDicts.length).toBe(2);
+    expect(
+      opportunitiesDicts[opportunitiesDicts.length - 1].translationsCount +
+      opportunitiesDicts[opportunitiesDicts.length - 1].inReviewCount ===
+      opportunitiesDicts[opportunitiesDicts.length - 1].totalCount).toBeTrue();
+    expect(opportunitiesDicts).toEqual([{
+      id: '2',
+      heading: 'Chapter title 2',
+      subheading: 'topic_2 - Story title 2',
+      progressPercentage: '40.00',
+      actionButtonTitle: 'Translate',
+      inReviewCount: 4,
+      totalCount: 10,
+      translationsCount: 4,
+    },
+    {
+      id: '1',
+      heading: 'Chapter title 1',
+      subheading: 'topic_1 - Story title 1',
+      progressPercentage: '50.00',
+      actionButtonTitle: 'Translate',
+      inReviewCount: 2,
+      totalCount: 4,
+      translationsCount: 2,
+    }
+    ]);
+  });
+
+  it('should not chagne contents of each opportunity when get presentable ' +
+    'opportunities', () => {
+    spyOn(translationLanguageService, 'getActiveLanguageCode').and.returnValue(
+      'en');
+
+    expect(component.allOpportunities).toEqual({});
+
+    const {opportunitiesDicts, } = (
+      component.getPresentableOpportunitiesData({
+        opportunities: opportunitiesArray,
+        more: false
+      }));
+
+    expect(Object.keys(component.allOpportunities).length).toEqual(2);
+    expect(component.allOpportunities['1']).toEqual({
+      id: '1',
+      heading: 'Chapter title 1',
+      subheading: 'topic_1 - Story title 1',
+      progressPercentage: '50.00',
+      actionButtonTitle: 'Translate',
+      inReviewCount: 2,
+      totalCount: 4,
+      translationsCount: 2,
+    });
+    expect(component.allOpportunities['2']).toEqual({
+      id: '2',
+      heading: 'Chapter title 2',
+      subheading: 'topic_2 - Story title 2',
+      progressPercentage: '40.00',
+      actionButtonTitle: 'Translate',
+      inReviewCount: 4,
+      totalCount: 10,
+      translationsCount: 4,
+    });
+
+    expect(opportunitiesDicts.length).toBe(2);
+    expect(opportunitiesDicts.sort((a, b) => {
+      return parseInt(a.id) - parseInt(b.id);
+    })).toEqual([{
+      id: '1',
+      heading: 'Chapter title 1',
+      subheading: 'topic_1 - Story title 1',
+      progressPercentage: '50.00',
+      actionButtonTitle: 'Translate',
+      inReviewCount: 2,
+      totalCount: 4,
+      translationsCount: 2,
+    },
+    {
+      id: '2',
+      heading: 'Chapter title 2',
+      subheading: 'topic_2 - Story title 2',
+      progressPercentage: '40.00',
+      actionButtonTitle: 'Translate',
+      inReviewCount: 4,
+      totalCount: 10,
+      translationsCount: 4,
+    }
+    ]);
+  });
+
   it('should open translation modal when clicking button', fakeAsync(() => {
     spyOn(translationLanguageService, 'getActiveLanguageCode').and.returnValue(
       'en');
@@ -218,8 +318,7 @@ describe('Translation opportunities component', () => {
   it('should not show translation opportunities when language is not ' +
     'selected', fakeAsync(() => {
     spyOn(
-      translationLanguageService, 'getActiveLanguageCode').and.returnValue(
-      null);
+      translationLanguageService, 'getActiveLanguageCode').and.callThrough();
     spyOn(userService, 'getUserInfoAsync').and.resolveTo(loggedInUserInfo);
     expect(component.languageSelected).toBe(false);
 
@@ -231,8 +330,7 @@ describe('Translation opportunities component', () => {
   it('should show translation opportunities when language is changed'
     , fakeAsync(() => {
       spyOn(
-        translationLanguageService, 'getActiveLanguageCode').and.returnValue(
-        null);
+        translationLanguageService, 'getActiveLanguageCode').and.callThrough();
       spyOn(userService, 'getUserInfoAsync').and.resolveTo(loggedInUserInfo);
       component.ngOnInit();
       expect(component.languageSelected).toBe(false);

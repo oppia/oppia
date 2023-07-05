@@ -24,7 +24,7 @@ require('domain/utilities/url-interpolation.service.ts');
 require('interactions/GraphInput/directives/graph-detail.service.ts');
 require('services/html-escaper.service.ts');
 
-require('interactions/interactions-extension.constants.ajs.ts');
+import 'interactions/interactions-extension.constants';
 import { Component, Input } from '@angular/core';
 import { GraphAnswer } from 'interactions/answer-defs';
 import { HtmlEscaperService } from 'services/html-escaper.service';
@@ -38,7 +38,7 @@ import { downgradeComponent } from '@angular/upgrade/static';
 })
 export class ResponseGraphInput {
   // These properties are initialized using Angular lifecycle hooks
-  // and we need to do non-null assertion, for more information see
+  // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() answer!: string;
   graph!: GraphAnswer;
@@ -46,6 +46,7 @@ export class ResponseGraphInput {
   EDGE_WIDTH!: number;
   GRAPH_INPUT_LEFT_MARGIN = (
     InteractionsExtensionsConstants.GRAPH_INPUT_LEFT_MARGIN);
+
   constructor(
     private graphDetailService: GraphDetailService,
     private htmlEscaperService: HtmlEscaperService,

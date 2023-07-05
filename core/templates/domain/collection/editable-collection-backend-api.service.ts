@@ -54,6 +54,7 @@ export class EditableCollectionBackendApiService {
     private http: HttpClient,
     private readOnlyCollectionService: ReadOnlyCollectionBackendApiService,
     private urlInterpolationService: UrlInterpolationService) {}
+
   private _fetchCollection(
       collectionId: string,
       successCallback: (value: Collection) => void,

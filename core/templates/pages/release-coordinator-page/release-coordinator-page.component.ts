@@ -21,14 +21,15 @@ import { FormBuilder, FormGroup } from '@angular/forms';
 import { downgradeComponent } from '@angular/upgrade/static';
 
 import { PromoBarBackendApiService } from 'services/promo-bar-backend-api.service';
+import { PlatformFeatureService } from 'services/platform-feature.service';
 
 import { ReleaseCoordinatorBackendApiService } from './services/release-coordinator-backend-api.service';
 import { ReleaseCoordinatorPageConstants } from './release-coordinator-page.constants';
 
 interface MemoryCacheProfile {
-  totalAllocatedInBytes: string,
-  peakAllocatedInBytes: string,
-  totalKeysStored: string
+  totalAllocatedInBytes: string;
+  peakAllocatedInBytes: string;
+  totalKeysStored: string;
 }
 
 
@@ -38,7 +39,7 @@ interface MemoryCacheProfile {
 })
 export class ReleaseCoordinatorPageComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks
-  // and we need to do non-null assertion, for more information see
+  // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   statusMessage!: string;
   activeTab!: string;
@@ -48,10 +49,12 @@ export class ReleaseCoordinatorPageComponent implements OnInit {
   submitButtonDisabled: boolean = false;
 
   TAB_ID_BEAM_JOBS: string = ReleaseCoordinatorPageConstants.TAB_ID_BEAM_JOBS;
+  TAB_ID_FEATURES: string = ReleaseCoordinatorPageConstants.TAB_ID_FEATURES;
   TAB_ID_MISC: string = ReleaseCoordinatorPageConstants.TAB_ID_MISC;
 
   constructor(
     private formBuilder: FormBuilder,
+    private platformFeatureService: PlatformFeatureService,
     private backendApiService: ReleaseCoordinatorBackendApiService,
     private promoBarBackendApiService: PromoBarBackendApiService) {}
 
@@ -78,8 +81,8 @@ export class ReleaseCoordinatorPageComponent implements OnInit {
     });
   }
 
-  updatePromoBarConfig(): void {
-    this.statusMessage = 'Updating promo-bar config...';
+  updatePromoBarParameter(): void {
+    this.statusMessage = 'Updating promo-bar platform parameter...';
     this.promoBarBackendApiService.updatePromoBarDataAsync(
       this.promoBarConfigForm.controls.enabled.value,
       this.promoBarConfigForm.controls.message.value).then(() => {

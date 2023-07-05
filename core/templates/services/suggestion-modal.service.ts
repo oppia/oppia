@@ -18,12 +18,14 @@
 
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
+import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 
 export interface ParamDict {
   action: string;
-  audioUpdateRequired: boolean;
-  commitMessage: string;
+  audioUpdateRequired?: boolean;
+  commitMessage?: string;
   reviewMessage: string;
+  skillDifficulty?: number;
 }
 
 @Injectable({
@@ -32,14 +34,18 @@ export interface ParamDict {
 export class SuggestionModalService {
   SUGGESTION_ACCEPTED_MSG: string = (
     'This suggestion has already been accepted.');
+
   SUGGESTION_REJECTED_MSG: string = (
     'This suggestion has already been rejected.');
+
   SUGGESTION_INVALID_MSG: string = (
     'This suggestion was made for a state that no longer exists.' +
     ' It cannot be accepted.');
+
   UNSAVED_CHANGES_MSG: string = (
     'You have unsaved changes to this exploration. Please save/discard your ' +
     'unsaved changes if you wish to accept.');
+
   ACTION_RESUBMIT_SUGGESTION: string = 'resubmit';
   SUGGESTION_ACCEPTED: string = 'accepted';
   SUGGESTION_REJECTED: string = 'rejected';
@@ -65,9 +71,9 @@ export class SuggestionModalService {
    * - reviewMessage: review message for the suggestion.
    */
   acceptSuggestion(
-      $uibModalInstance: ng.ui.bootstrap.IModalServiceInstance,
+      ngbActiveModal: NgbActiveModal,
       paramDict: ParamDict): void {
-    $uibModalInstance.close(paramDict);
+    ngbActiveModal.close(paramDict);
   }
 
   /**
@@ -91,9 +97,9 @@ export class SuggestionModalService {
    * - reviewMessage: review message for the suggestion.
    */
   rejectSuggestion(
-      $uibModalInstance: ng.ui.bootstrap.IModalServiceInstance,
+      ngbActiveModal: NgbActiveModal,
       paramDict: ParamDict): void {
-    $uibModalInstance.close(paramDict);
+    ngbActiveModal.close(paramDict);
   }
 
   /**
@@ -110,8 +116,8 @@ export class SuggestionModalService {
    *    animation completes.
    */
   cancelSuggestion(
-      $uibModalInstance: ng.ui.bootstrap.IModalServiceInstance): void {
-    $uibModalInstance.dismiss('cancel');
+      ngbActiveModal: NgbActiveModal): void {
+    ngbActiveModal.dismiss('cancel');
   }
 }
 

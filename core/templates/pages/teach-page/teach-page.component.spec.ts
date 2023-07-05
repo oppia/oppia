@@ -31,6 +31,39 @@ import { UserInfo } from 'domain/user/user-info.model';
 import { UserService } from 'services/user.service';
 import { of } from 'rxjs';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
+import { PlatformFeatureService } from 'services/platform-feature.service';
+
+class MockPlatformFeatureService {
+  status = {
+    AndroidBetaLandingPage: {
+      isEnabled: false
+    }
+  };
+}
+
+class MockWindowRef {
+  _window = {
+    location: {
+      _href: '',
+      get href() {
+        return this._href;
+      },
+      set href(val) {
+        this._href = val;
+      },
+      replace: (val: string) => {}
+    },
+    sessionStorage: {
+      last_uploaded_audio_lang: 'en',
+      removeItem: (name: string) => {}
+    },
+    gtag: () => {}
+  };
+
+  get nativeWindow() {
+    return this._window;
+  }
+}
 
 class MockI18nLanguageCodeService {
   codeChangeEventEmiiter = new EventEmitter<string>();
@@ -45,11 +78,14 @@ class MockI18nLanguageCodeService {
 
 describe('Teach Page', () => {
   let siteAnalyticsService: SiteAnalyticsService;
-  let loaderService: LoaderService = null;
+  let loaderService: LoaderService;
   let userService: UserService;
   let windowDimensionsService: WindowDimensionsService;
-  var resizeEvent = new Event('resize');
+  let windowRef: MockWindowRef;
+  let resizeEvent = new Event('resize');
+  let mockPlatformFeatureService = new MockPlatformFeatureService();
   beforeEach(async() => {
+    windowRef = new MockWindowRef();
     TestBed.configureTestingModule({
       declarations: [TeachPageComponent, MockTranslatePipe],
       providers: [
@@ -58,25 +94,22 @@ describe('Teach Page', () => {
           useClass: MockI18nLanguageCodeService
         },
         {
+          provide: WindowRef,
+          useValue: windowRef
+        },
+        {
           provide: WindowDimensionsService,
           useValue: {
             isWindowNarrow: () => true,
             getResizeEvent: () => of(resizeEvent)
           }
         },
+        {
+          provide: PlatformFeatureService,
+          useValue: mockPlatformFeatureService
+        },
         SiteAnalyticsService,
         UrlInterpolationService,
-        {
-          provide: WindowRef,
-          useValue: {
-            nativeWindow: {
-              location: {
-                href: ''
-              },
-              gtag: () => {}
-            }
-          }
-        }
       ]
     }).compileComponents();
   });
@@ -92,10 +125,9 @@ describe('Teach Page', () => {
     siteAnalyticsService = TestBed.inject(SiteAnalyticsService);
   });
 
-  let component;
-  let teachPageComponent;
+  let component: TeachPageComponent;
   beforeEach(() => {
-    teachPageComponent = TestBed.createComponent(TeachPageComponent);
+    let teachPageComponent = TestBed.createComponent(TeachPageComponent);
     component = teachPageComponent.componentInstance;
   });
 
@@ -168,9 +200,7 @@ describe('Teach Page', () => {
   it('should redirect to library page when Browse Library is clicked',
     () => {
       component.onClickBrowseLibraryButton();
-      expect(
-        component.windowRef.nativeWindow.location.href
-      ).toBe('/community-library');
+      expect(windowRef.nativeWindow.location.href).toBe('/community-library');
     }
   );
 
@@ -186,9 +216,7 @@ describe('Teach Page', () => {
   it('should redirect to teach page when Guide For Parents is clicked',
     () => {
       component.onClickGuideParentsButton();
-      expect(
-        component.windowRef.nativeWindow.location.href
-      ).toBe('/teach');
+      expect(windowRef.nativeWindow.location.href).toBe('/teach');
     }
   );
 
@@ -204,9 +232,7 @@ describe('Teach Page', () => {
   it('should redirect to teach page when Tips For Parents is clicked',
     () => {
       component.onClickTipforParentsButton();
-      expect(
-        component.windowRef.nativeWindow.location.href
-      ).toBe('/teach');
+      expect(windowRef.nativeWindow.location.href).toBe('/teach');
     }
   );
 
@@ -248,5 +274,24 @@ describe('Teach Page', () => {
   it('should get testimonials correctly', () => {
     component.ngOnInit();
     expect(component.getTestimonials().length).toBe(component.testimonialCount);
+  });
+
+  it('should direct users to the android page on click', function() {
+    expect(windowRef.nativeWindow.location.href).not.toEqual('/android');
+
+    component.onClickAccessAndroidButton();
+
+    expect(windowRef.nativeWindow.location.href).toEqual('/android');
+  });
+
+  it('should show android button if the feature is enabled', () => {
+    // The androidPageIsEnabled property is set when the component is
+    // constructed and the value is not modified after that so there is no
+    // pre-check for this test.
+    mockPlatformFeatureService.status.AndroidBetaLandingPage.isEnabled = true;
+
+    const component = TestBed.createComponent(TeachPageComponent);
+
+    expect(component.componentInstance.androidPageIsEnabled).toBeTrue();
   });
 });

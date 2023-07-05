@@ -1,0 +1,102 @@
+
+/*
+  NOTE to developers: We generate RTL CSS from this file in the webpack
+  compilation, here are sme additional rules that can be added to the CSS files:
+  https://rtlcss.com/learn/usage-guide/control-directives .
+*/
+
+/*
+  This affects the progress nav bar.
+*/
+.progress-nav-bar .oppia-nav-button .mat-button.oppia-autofocus:focus {
+  background-color: #0d48a1;
+}
+
+.progress-nav-bar .oppia-learner-confirm-button {
+  border-radius: 2px;
+  font-size: 16px;
+  line-height: 22px;
+  outline: none;
+  text-transform: uppercase;
+}
+
+.progress-nav-bar .continue-button {
+  margin-bottom: 8px;
+  margin-left: 8px;
+  margin-right: 8px;
+  margin-top: 12px;
+}
+
+.progress-nav-bar {
+  background-color: white;
+  margin-left: 0;
+  margin-right: 0;
+  max-width: 100%;
+}
+
+.progress-nav-bar .oppia-nav-button {
+  height: 36px;
+  margin: 0 12px 20px 12px;
+  min-width: 36px;
+  padding: 6px;
+}
+
+/*
+  The comment in the section below is an rtlcss value directive mentioned here:
+  https://rtlcss.com/learn/usage-guide/value-directives/, which tells rtlcss
+  to replace the value of the input style to whatever is specified in the
+  comment.
+*/
+.progress-nav-bar .oppia-arrow {
+  font-size: 19px;
+  padding-top: 1.5px;
+  -moz-transform: scaleX(1) /*rtl:scaleX(-1)*/;
+  -o-transform: scaleX(1) /*rtl:scaleX(-1)*/;
+  -webkit-transform: scaleX(1) /*rtl:scaleX(-1)*/;
+  transform: scaleX(1) /*rtl:scaleX(-1)*/;
+}
+.progress-nav-bar .oppia-nav-button.oppia-nav-left-button {
+  margin: 0 12px 12px 12px;
+}
+
+.progress-nav-bar.row {
+  display: flex;
+  flex-direction: row;
+}
+.progress-nav-bar.space-between {
+  justify-content: space-between;
+}
+.progress-nav-bar.center {
+  align-content: center;
+  align-items: center;
+}
+.progress-nav-bar .row-item {
+  flex-grow: 1;
+}
+.progress-nav-bar .row-item-next-card {
+  text-align: right;
+}
+.progress-nav-bar .row-item-previous-card {
+  text-align: left;
+}
+
+/*
+  The comment in the section below is an rtlcss value directive mentioned here:
+  https://rtlcss.com/learn/usage-guide/value-directives/, which tells rtlcss
+  to replace the value of the input style to whatever is specified in the
+  comment.
+*/
+.progress-nav-bar .material-icons {
+  -moz-transform: scaleX(1) /*rtl:scaleX(-1)*/;
+  -o-transform: scaleX(1) /*rtl:scaleX(-1)*/;
+  -webkit-transform: scaleX(1) /*rtl:scaleX(-1)*/;
+  transform: scaleX(1) /*rtl:scaleX(-1)*/;
+}
+
+.progress-nav-bar .oppia-skip-button {
+  border: 1px solid #0d48a1;
+  color: #0d48a1;
+  font-weight: bold;
+  margin-right: 10px;
+  text-transform: uppercase;
+}

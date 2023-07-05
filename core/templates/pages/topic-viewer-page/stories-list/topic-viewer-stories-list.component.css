@@ -1,0 +1,65 @@
+/*
+  NOTE to developers: We generate RTL CSS from this file in the webpack
+  compilation, here are sme additional rules that can be added to the CSS files:
+  https://rtlcss.com/learn/usage-guide/control-directives .
+*/
+stories-list .tab-title {
+  color: #017a70;
+  font-weight: lighter;
+  margin: .83em 0 0.3em 0;
+}
+
+stories-list .story-info-container {
+  padding-top: 4vh;
+}
+
+stories-list .stories-can-play {
+  display: inline-block;
+  font-size: 1.4em;
+  font-weight: 500;
+  margin-top: 0.5em;
+  padding-bottom: 15px;
+}
+
+stories-list .topic-description {
+  border-bottom: 1px solid #7b7b7b;
+  font-size: 1.1em;
+  padding-bottom: 2vh;
+}
+
+stories-list .oppia-stories-list-container .oppia-page-card {
+  border-radius: 0.25em;
+  padding-bottom: 7.5vh;
+  width: 704px;
+}
+
+stories-list .mat-card-margin-desktop {
+  margin-top: 10em;
+}
+
+@media(max-width: 1024px) {
+  stories-list .oppia-stories-list-container .oppia-page-card {
+    width: 80vw;
+  }
+}
+
+@media(max-width: 768px) {
+  stories-list .oppia-stories-list-container .oppia-page-card {
+    width: 100%;
+  }
+
+  stories-list .story-info-container {
+    padding-top: 0;
+  }
+}
+
+@media(max-width: 500px) {
+  stories-list .oppia-stories-list-container .oppia-page-card {
+    padding: 12em 24px 64px 24px;
+    width: 100%;
+  }
+
+  stories-list .story-info-container {
+    padding-top: 0;
+  }
+}

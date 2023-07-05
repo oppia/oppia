@@ -21,84 +21,91 @@ from __future__ import annotations
 import io
 
 from core import feconf
+from core.constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
-from core.domain import fs_domain
 from core.domain import fs_services
 from core.domain import rights_domain
 from core.domain import rights_manager
 from core.domain import user_services
 
-import mutagen
 from mutagen import mp3
+from typing import Dict, TypedDict
 
 
-class AudioUploadHandler(base.BaseHandler):
+class AudioUploadHandlerNormalizedRequestDict(TypedDict):
+    """Dict representation of AudioUploadHandler's
+    normalized_request dictionary.
+    """
+
+    raw_audio_file: bytes
+
+
+class AudioUploadHandler(
+    base.BaseHandler[Dict[str, str], AudioUploadHandlerNormalizedRequestDict]
+):
     """Handles audio file uploads (to Google Cloud Storage in production, and
     to the local datastore in dev).
     """
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+    URL_PATH_ARGS_SCHEMAS = {
+        'exploration_id': {
+            'schema': {
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'is_regex_matched',
+                    'regex_pattern': constants.ENTITY_ID_REGEX
+                }]
+            }
+        }
+    }
+
+    HANDLER_ARGS_SCHEMAS = {
+        'POST': {
+            'raw_audio_file': {
+                'schema': {
+                    'type': 'basestring',
+                    'validators': [{
+                        'id': 'is_valid_audio_file'
+                    }]
+                }
+            },
+            'filename': {
+                'schema': {
+                    'type': 'basestring',
+                    'validators': [{
+                        'id': 'is_regex_matched',
+                        'regex_pattern': r'[^\s]+(\.(?i)(mp3))$'
+                    }]
+                }
+            }
+        }
+    }
 
     # The string to prefix to the filename (before tacking the whole thing on
     # to the end of 'assets/').
     _FILENAME_PREFIX = 'audio'
 
     @acl_decorators.can_voiceover_exploration
-    def post(self, exploration_id):
-        """Saves an audio file uploaded by a content creator."""
-        raw_audio_file = self.request.get('raw_audio_file')
-        filename = self.payload.get('filename')
-        allowed_formats = list(feconf.ACCEPTED_AUDIO_EXTENSIONS.keys())
+    def post(self, exploration_id: str) -> None:
+        """Saves an audio file uploaded by a content creator.
 
-        if not raw_audio_file:
-            raise self.InvalidInputException('No audio supplied')
-        dot_index = filename.rfind('.')
-        extension = filename[dot_index + 1:].lower()
+        Args:
+            exploration_id: str. The exploration ID.
+        """
+        assert self.normalized_payload is not None
+        assert self.normalized_request is not None
 
-        if dot_index in (-1, 0):
-            raise self.InvalidInputException(
-                'No filename extension: it should have '
-                'one of the following extensions: %s' % allowed_formats)
-        if extension not in feconf.ACCEPTED_AUDIO_EXTENSIONS:
-            raise self.InvalidInputException(
-                'Invalid filename extension: it should have '
-                'one of the following extensions: %s' % allowed_formats)
+        raw_audio_file = self.normalized_request['raw_audio_file']
+        filename = self.normalized_payload['filename']
 
         tempbuffer = io.BytesIO()
         tempbuffer.write(raw_audio_file)
         tempbuffer.seek(0)
-        try:
-            # For every accepted extension, use the mutagen-specific
-            # constructor for that type. This will catch mismatched audio
-            # types e.g. uploading a flac file with an MP3 extension.
-            if extension == 'mp3':
-                audio = mp3.MP3(tempbuffer)
-            else:
-                audio = mutagen.File(tempbuffer)
-        except mutagen.MutagenError:
-            # The calls to mp3.MP3() versus mutagen.File() seem to behave
-            # differently upon not being able to interpret the audio.
-            # mp3.MP3() raises a MutagenError whereas mutagen.File()
-            # seems to return None. It's not clear if this is always
-            # the case. Occasionally, mutagen.File() also seems to
-            # raise a MutagenError.
-            raise self.InvalidInputException(
-                'Audio not recognized as a %s file' % extension)
+        audio = mp3.MP3(tempbuffer)
         tempbuffer.close()
-
-        if audio is None:
-            raise self.InvalidInputException(
-                'Audio not recognized as a %s file' % extension)
-        if audio.info.length > feconf.MAX_AUDIO_FILE_LENGTH_SEC:
-            raise self.InvalidInputException(
-                'Audio files must be under %s seconds in length. The uploaded '
-                'file is %.2f seconds long.' % (
-                    feconf.MAX_AUDIO_FILE_LENGTH_SEC, audio.info.length))
-        if len(set(audio.mime).intersection(
-                set(feconf.ACCEPTED_AUDIO_EXTENSIONS[extension]))) == 0:
-            raise self.InvalidInputException(
-                'Although the filename extension indicates the file '
-                'is a %s file, it was not recognized as one. '
-                'Found mime types: %s' % (extension, audio.mime))
 
         mimetype = audio.mime[0]
         # Fetch the audio file duration from the Mutagen metadata.
@@ -112,9 +119,8 @@ class AudioUploadHandler(base.BaseHandler):
 
         # Audio files are stored to the datastore in the dev env, and to GCS
         # in production.
-        file_system_class = fs_services.get_entity_file_system_class()
-        fs = fs_domain.AbstractFileSystem(file_system_class(
-            feconf.ENTITY_TYPE_EXPLORATION, exploration_id))
+        fs = fs_services.GcsFileSystem(
+            feconf.ENTITY_TYPE_EXPLORATION, exploration_id)
         fs.commit(
             '%s/%s' % (self._FILENAME_PREFIX, filename),
             raw_audio_file, mimetype=mimetype)
@@ -122,24 +128,114 @@ class AudioUploadHandler(base.BaseHandler):
         self.render_json({'filename': filename, 'duration_secs': duration_secs})
 
 
-class StartedTranslationTutorialEventHandler(base.BaseHandler):
+class StartedTranslationTutorialEventHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
     """Records that this user has started the state translation tutorial."""
 
-    @acl_decorators.can_play_exploration
-    def post(self, unused_exploration_id):
-        """Handles POST requests."""
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {
+        'exploration_id': {
+            'schema': {
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'is_regex_matched',
+                    'regex_pattern': constants.ENTITY_ID_REGEX
+                }]
+            }
+        }
+    }
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'POST': {}}
+
+    @acl_decorators.can_play_exploration_as_logged_in_user
+    def post(self, unused_exploration_id: str) -> None:
+        """Records that the user has started the state translation tutorial.
+
+        unused_exploration_id: str. The unused exploration ID.
+        """
+        assert self.user_id is not None
         user_services.record_user_started_state_translation_tutorial(
             self.user_id)
         self.render_json({})
 
 
-class VoiceArtistManagementHandler(base.BaseHandler):
+class VoiceArtistManagementHandlerNormalizedPayloadDict(TypedDict):
+    """Dict representation of VoiceArtistManagementHandler's
+    normalized_payload dictionary.
+    """
+
+    username: str
+
+
+class VoiceArtistManagementHandlerNormalizedRequestDict(TypedDict):
+    """Dict representation of VoiceArtistManagementHandler's
+    normalized_request dictionary.
+    """
+
+    voice_artist: str
+
+
+class VoiceArtistManagementHandler(
+    base.BaseHandler[
+        VoiceArtistManagementHandlerNormalizedPayloadDict,
+        VoiceArtistManagementHandlerNormalizedRequestDict
+    ]
+):
     """Handles assignment of voice artists."""
 
-    @acl_decorators.can_manage_voice_artist
-    def post(self, unused_entity_type, entity_id):
-        """Handles Post requests."""
-        voice_artist = self.payload.get('username')
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {
+        'entity_type': {
+            'schema': {
+                'type': 'basestring',
+                'choices': [
+                    feconf.ENTITY_TYPE_EXPLORATION
+                ]
+            }
+        },
+        'entity_id': {
+            'schema': {
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'is_regex_matched',
+                    'regex_pattern': constants.ENTITY_ID_REGEX
+                }]
+            }
+        }
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'POST': {
+            'username': {
+                'schema': {
+                    'type': 'basestring',
+                    'validators': [{
+                        'id': 'is_valid_username_string'
+                    }]
+                }
+            }
+        },
+        'DELETE': {
+            'voice_artist': {
+                'schema': {
+                    'type': 'basestring',
+                    'validators': [{
+                        'id': 'is_valid_username_string'
+                    }]
+                }
+            }
+        }
+    }
+
+    @acl_decorators.can_add_voice_artist
+    def post(self, unused_entity_type: str, entity_id: str) -> None:
+        """Assigns a voice artist role.
+
+        Args:
+            unused_entity_type: str. The unused entity type.
+            entity_id: str. The entity ID.
+        """
+        assert self.normalized_payload is not None
+        voice_artist = self.normalized_payload['username']
         voice_artist_id = user_services.get_user_id_from_username(
             voice_artist)
         if voice_artist_id is None:
@@ -151,16 +247,19 @@ class VoiceArtistManagementHandler(base.BaseHandler):
 
         self.render_json({})
 
-    @acl_decorators.can_manage_voice_artist
-    def delete(self, unused_entity_type, entity_id):
-        """Handles Delete requests."""
-        voice_artist = self.request.get('voice_artist')
+    @acl_decorators.can_remove_voice_artist
+    def delete(self, unused_entity_type: str, entity_id: str) -> None:
+        """Removes the voice artist role from a user.
+
+        Args:
+            unused_entity_type: str. The unused entity type.
+            entity_id: str. The entity ID.
+        """
+        assert self.normalized_request is not None
+        voice_artist = self.normalized_request['voice_artist']
         voice_artist_id = user_services.get_user_id_from_username(
             voice_artist)
-
-        if voice_artist_id is None:
-            raise self.InvalidInputException(
-                'Sorry, we could not find the specified user.')
+        assert voice_artist_id is not None
         rights_manager.deassign_role_for_exploration(
             self.user, entity_id, voice_artist_id)
 

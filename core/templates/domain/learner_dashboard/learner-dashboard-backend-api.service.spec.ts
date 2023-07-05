@@ -22,6 +22,7 @@ import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
 import { AddMessagePayload, LearnerDashboardBackendApiService } from
   'domain/learner_dashboard/learner-dashboard-backend-api.service';
+import { ShortLearnerGroupSummary } from 'domain/learner_group/short-learner-group-summary.model';
 import { LearnerTopicSummary } from 'domain/topic/learner-topic-summary.model';
 
 describe('Learner Dashboard Backend API Service', () => {
@@ -51,7 +52,7 @@ describe('Learner Dashboard Backend API Service', () => {
     url_fragment: 'subtopic-name'
   };
 
-  let sampleTopicsAndStoriesDataResults = {
+  const sampleTopicsAndStoriesDataResults = {
     completed_stories_list: [{
       id: 'sample_story_id',
       title: 'Story title',
@@ -281,10 +282,10 @@ describe('Learner Dashboard Backend API Service', () => {
   };
 
 
-  let sampleCollectionsDataResults = {
+  const sampleCollectionsDataResults = {
     completed_collections_list: [{
       status: 'public',
-      thumbnail_bg_color: '#d68453',
+      thumbnail_bg_color: '#ae511b',
       community_owned: false,
       created_on: 1558593739415.726,
       thumbnail_icon_url: '/subjects/Arithmetic.svg',
@@ -298,7 +299,7 @@ describe('Learner Dashboard Backend API Service', () => {
     }],
     collection_playlist: [{
       status: 'public',
-      thumbnail_bg_color: '#d68453',
+      thumbnail_bg_color: '#ae511b',
       community_owned: false,
       created_on: 1558593739415.726,
       thumbnail_icon_url: '/subjects/Arithmetic.svg',
@@ -312,7 +313,7 @@ describe('Learner Dashboard Backend API Service', () => {
     }],
     incomplete_collections_list: [{
       status: 'public',
-      thumbnail_bg_color: '#d68453',
+      thumbnail_bg_color: '#ae511b',
       community_owned: false,
       created_on: 1491118537846.88,
       thumbnail_icon_url: '/subjects/Arithmetic.svg',
@@ -335,7 +336,7 @@ describe('Learner Dashboard Backend API Service', () => {
   };
 
 
-  let sampleFeedbackUpdatesDataResults = {
+  const sampleFeedbackUpdatesDataResults = {
     number_of_unread_threads: 0,
     thread_summaries: [
       {
@@ -356,12 +357,12 @@ describe('Learner Dashboard Backend API Service', () => {
     ]
   };
 
-  let sampleExplorationDataResults = {
+  const sampleExplorationDataResults = {
     incomplete_explorations_list: [{
       category: 'Arithmetic',
       created_on_msec: 1515553584276.8,
       community_owned: false,
-      thumbnail_bg_color: '#d68453',
+      thumbnail_bg_color: '#ae511b',
       title: 'Equality of Fractions (Recap)',
       num_views: 760,
       tags: [
@@ -444,26 +445,31 @@ describe('Learner Dashboard Backend API Service', () => {
     subscription_list: [{
       creator_username: 'user',
       creator_impact: 0,
-      creator_picture_data_url: 'path/to/img'
     }],
     user_email: 'user@example.com'
   };
 
-  let sampleSubtopicMastery = {
+  const sampleCompletedChaptersCountDataResults = {
+    completed_chapters_count: 5,
+  };
+
+  const sampleSubtopicMastery = {
     topic_id: {
       1: 0
     }
   };
 
-  let LEARNER_DASHBOARD_TOPIC_AND_STORY_DATA_URL = (
+  const LEARNER_DASHBOARD_TOPIC_AND_STORY_DATA_URL = (
     '/learnerdashboardtopicsandstoriesprogresshandler/data');
-  let LEARNER_DASHBOARD_COLLECTION_DATA_URL = (
+  const LEARNER_DASHBOARD_COLLECTION_DATA_URL = (
     '/learnerdashboardcollectionsprogresshandler/data');
-  let LEARNER_DASHBOARD_EXPLORATION_DATA_URL = (
+  const LEARNER_DASHBOARD_EXPLORATION_DATA_URL = (
     '/learnerdashboardexplorationsprogresshandler/data');
-  let LEARNER_DASHBOARD_FEEDBACK_UPDATES_DATA_URL = (
+  const LEARNER_DASHBOARD_FEEDBACK_UPDATES_DATA_URL = (
     '/learnerdashboardfeedbackupdateshandler/data');
-  let ERROR_STATUS_CODE = 400;
+  const LEARNER_COMPLETED_CHAPTERS_COUNT_DATA_URL = (
+    '/learnercompletedchapterscounthandler/data');
+  const ERROR_STATUS_CODE = 400;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -554,7 +560,7 @@ describe('Learner Dashboard Backend API Service', () => {
 
     let req = httpTestingController.expectOne(
       LEARNER_DASHBOARD_FEEDBACK_UPDATES_DATA_URL);
-    expect(req.request.method).toEqual('GET');
+    expect(req.request.method).toEqual('POST');
     req.flush(sampleFeedbackUpdatesDataResults);
 
     flushMicrotasks();
@@ -564,17 +570,39 @@ describe('Learner Dashboard Backend API Service', () => {
   }
   ));
 
+  it('should successfully fetch learner\'s completed chapters count data',
+    fakeAsync(() => {
+      let successHandler = jasmine.createSpy('success');
+      let failHandler = jasmine.createSpy('fail');
+
+      learnerDashboardBackendApiService
+        .fetchLearnerCompletedChaptersCountDataAsync()
+        .then(successHandler, failHandler);
+
+      let req = httpTestingController.expectOne(
+        LEARNER_COMPLETED_CHAPTERS_COUNT_DATA_URL);
+      expect(req.request.method).toEqual('GET');
+      req.flush(sampleCompletedChaptersCountDataResults);
+
+      flushMicrotasks();
+
+      expect(successHandler).toHaveBeenCalled();
+      expect(failHandler).not.toHaveBeenCalled();
+    }
+    ));
+
   it('should successfully fetch subtopic mastery data from the' +
     ' backend', fakeAsync(() => {
     let successHandler = jasmine.createSpy('success');
     let failHandler = jasmine.createSpy('fail');
-    var topicIds = 'topic_id';
+    var topicIds = ['topic_id1', 'topic_id2'];
 
     learnerDashboardBackendApiService.fetchSubtopicMastery(topicIds)
       .then(successHandler, failHandler);
 
     let req = httpTestingController.expectOne(
-      '/subtopic_mastery_handler/data?comma_separated_topic_ids=topic_id');
+      '/subtopic_mastery_handler/data?' +
+      'selected_topic_ids=' + encodeURI(JSON.stringify(topicIds)));
     expect(req.request.method).toEqual('GET');
     req.flush(sampleSubtopicMastery);
 
@@ -589,13 +617,14 @@ describe('Learner Dashboard Backend API Service', () => {
     ' backend request failed', fakeAsync(() => {
     let successHandler = jasmine.createSpy('success');
     let failHandler = jasmine.createSpy('fail');
-    var topicIds = 'topic_id';
+    var topicIds = ['topic_id1', 'topic_id2'];
 
     learnerDashboardBackendApiService.fetchSubtopicMastery(topicIds)
       .then(successHandler, failHandler);
 
     let req = httpTestingController.expectOne(
-      '/subtopic_mastery_handler/data?comma_separated_topic_ids=topic_id');
+      '/subtopic_mastery_handler/data?' +
+      'selected_topic_ids=' + encodeURI(JSON.stringify(topicIds)));
     expect(req.request.method).toEqual('GET');
     req.flush({
       error: 400
@@ -696,6 +725,31 @@ describe('Learner Dashboard Backend API Service', () => {
 
     let req = httpTestingController.expectOne(
       LEARNER_DASHBOARD_FEEDBACK_UPDATES_DATA_URL);
+    expect(req.request.method).toEqual('POST');
+    req.flush({
+      error: 'Error loading dashboard data.'
+    }, {
+      status: ERROR_STATUS_CODE, statusText: 'Invalid Request'
+    });
+
+    flushMicrotasks();
+
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalledWith(400);
+  }
+  ));
+
+  it('should use rejection handler if learner completed chapters count ' +
+    'data backend request failed', fakeAsync(() => {
+    let successHandler = jasmine.createSpy('success');
+    let failHandler = jasmine.createSpy('fail');
+
+    learnerDashboardBackendApiService
+      .fetchLearnerCompletedChaptersCountDataAsync()
+      .then(successHandler, failHandler);
+
+    let req = httpTestingController.expectOne(
+      LEARNER_COMPLETED_CHAPTERS_COUNT_DATA_URL);
     expect(req.request.method).toEqual('GET');
     req.flush({
       error: 'Error loading dashboard data.'
@@ -764,7 +818,12 @@ describe('Learner Dashboard Backend API Service', () => {
       outline: 'Outline',
       exploration_id: null,
       outline_is_finalized: false,
-      thumbnail_bg_color: '#a33f40'
+      thumbnail_bg_color: '#a33f40',
+      status: 'Published',
+      planned_publication_date_msecs: 100,
+      last_modified_msecs: 100,
+      first_publication_date_msecs: 200,
+      unpublishing_reason: null
     };
 
     let sampleLearnerTopicSummaryBackendDict = {
@@ -853,8 +912,6 @@ describe('Learner Dashboard Backend API Service', () => {
 
     let url = '/threadhandler/exploration.4.Wfafsafd';
     let result = [{
-      author_picture_data_url:
-        'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAJYA',
       author_username: 'User',
       created_on_msecs: 1617712024611.706,
       message_id: 1,
@@ -873,8 +930,6 @@ describe('Learner Dashboard Backend API Service', () => {
     req.flush(
       {
         message_summary_list: [{
-          author_picture_data_url:
-            'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAJYA',
           author_username: 'User',
           created_on_msecs: 1617712024611.706,
           message_id: 1,
@@ -914,4 +969,56 @@ describe('Learner Dashboard Backend API Service', () => {
       'Given URL is invalid.');
   }
   ));
+
+  it('should fetch learner groups to show on learner dashboard successfully',
+    fakeAsync(() => {
+      let successHandler = jasmine.createSpy('success');
+      let failHandler = jasmine.createSpy('fail');
+
+      const sampleShortLearnerGroupSummaryDict1 = {
+        id: 'sampleId1',
+        title: 'sampleTitle',
+        description: 'sampleDescription',
+        facilitator_usernames: ['username1'],
+        learners_count: 5
+      };
+      const sampleShortLearnerGroupSummaryDict2 = {
+        id: 'sampleId2',
+        title: 'sampleTitle 2',
+        description: 'sampleDescription 2',
+        facilitator_usernames: ['username1'],
+        learners_count: 7
+      };
+      const sampleShortLearnerGroupSummary1 = (
+        ShortLearnerGroupSummary.createFromBackendDict(
+          sampleShortLearnerGroupSummaryDict1)
+      );
+      const sampleShortLearnerGroupSummary2 = (
+        ShortLearnerGroupSummary.createFromBackendDict(
+          sampleShortLearnerGroupSummaryDict2)
+      );
+
+      learnerDashboardBackendApiService
+        .fetchLearnerDashboardLearnerGroupsAsync()
+        .then(successHandler, failHandler);
+
+      let req = httpTestingController.expectOne(
+        '/learner_dashboard_learner_groups_handler');
+      expect(req.request.method).toEqual('GET');
+
+      req.flush({
+        learner_groups_joined: [sampleShortLearnerGroupSummaryDict1],
+        invited_to_learner_groups: [sampleShortLearnerGroupSummaryDict2]
+      });
+      flushMicrotasks();
+
+      const learnerDashboardLearnerGroupsData = {
+        learnerGroupsJoined: [sampleShortLearnerGroupSummary1],
+        invitedToLearnerGroups: [sampleShortLearnerGroupSummary2]
+      };
+      expect(successHandler).toHaveBeenCalledWith(
+        learnerDashboardLearnerGroupsData);
+      expect(failHandler).not.toHaveBeenCalled();
+    })
+  );
 });

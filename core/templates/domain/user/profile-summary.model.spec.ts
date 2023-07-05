@@ -22,7 +22,6 @@ import { ProfileSummary } from
 describe('Subscriber Summary model', () => {
   it('should correctly convert subscriber backend dict to object', () => {
     let backendDict = {
-      subscriber_picture_data_url: 'path/to/img',
       subscriber_username: 'username',
       subscriber_impact: 0,
     };
@@ -30,14 +29,12 @@ describe('Subscriber Summary model', () => {
     let subscriberObject = (
       ProfileSummary.createFromSubscriberBackendDict(backendDict));
 
-    expect(subscriberObject.pictureDataUrl).toEqual('path/to/img');
     expect(subscriberObject.username).toEqual('username');
     expect(subscriberObject.impact).toEqual(0);
   });
 
   it('should correctly convert creator backend dict to object', () => {
     let backendDict = {
-      creator_picture_data_url: 'path/to/img',
       creator_username: 'username',
       creator_impact: 0,
     };
@@ -45,7 +42,6 @@ describe('Subscriber Summary model', () => {
     let creatorObject = (
       ProfileSummary.createFromCreatorBackendDict(backendDict));
 
-    expect(creatorObject.pictureDataUrl).toEqual('path/to/img');
     expect(creatorObject.username).toEqual('username');
     expect(creatorObject.impact).toEqual(0);
   });

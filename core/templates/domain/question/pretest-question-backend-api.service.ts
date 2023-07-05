@@ -29,7 +29,7 @@ import { Question, QuestionBackendDict, QuestionObjectFactory } from
 import { QuestionDomainConstants } from
   'domain/question/question-domain.constants';
 
-import constants from 'assets/constants';
+import { AppConstants } from 'app.constants';
 
 interface PretestQuestionsBackendResponse {
   'pretest_question_dicts': QuestionBackendDict[];
@@ -51,7 +51,7 @@ export class PretestQuestionBackendApiService {
       errorCallback: (reason: string) => void): void {
     if (
       !storyUrlFragment ||
-      !storyUrlFragment.match(constants.VALID_URL_FRAGMENT_REGEX)) {
+      !storyUrlFragment.match(AppConstants.VALID_URL_FRAGMENT_REGEX)) {
       successCallback([]);
       return;
     }
@@ -68,10 +68,10 @@ export class PretestQuestionBackendApiService {
       var pretestQuestionDicts = (
         cloneDeep(data.pretest_question_dicts));
       var pretestQuestionObjects = pretestQuestionDicts.map(
-        function(pretestQuestionDict) {
+        (pretestQuestionDict) => {
           return this.questionObjectFactory.createFromBackendDict(
             pretestQuestionDict);
-        }, this);
+        });
       if (successCallback) {
         successCallback(pretestQuestionObjects);
       }

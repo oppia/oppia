@@ -20,7 +20,7 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { UndoRedoService } from 'domain/editor/undo_redo/undo-redo.service';
 import { EditableStoryBackendApiService } from 'domain/story/editable-story-backend-api.service';
 import { StoryValidationService } from 'domain/story/story-validation.service';
-import { Story } from 'domain/story/StoryObjectFactory';
+import { Story } from 'domain/story/story.model';
 import { Subscription } from 'rxjs';
 import { AlertsService } from 'services/alerts.service';
 import { StoryEditorStateService } from '../services/story-editor-state.service';
@@ -35,16 +35,19 @@ import { StoryEditorNavigationService } from '../services/story-editor-navigatio
   templateUrl: './story-editor-navbar.component.html'
 })
 export class StoryEditorNavbarComponent implements OnInit {
-  @Input() commitMessage;
-  validationIssues: string[];
-  prepublishValidationIssues: string | string[];
-  story: Story;
-  forceValidateExplorations: boolean;
-  storyIsPublished: boolean;
-  warningsAreShown: boolean;
-  showNavigationOptions: boolean;
-  showStoryEditOptions: boolean;
-  activeTab: string;
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  @Input() commitMessage!: string;
+  validationIssues!: string[];
+  prepublishValidationIssues!: string | string[];
+  story!: Story;
+  activeTab!: string;
+  forceValidateExplorations: boolean = false;
+  storyIsPublished: boolean = false;
+  warningsAreShown: boolean = false;
+  showNavigationOptions: boolean = false;
+  showStoryEditOptions: boolean = false;
   constructor(
     private storyEditorStateService: StoryEditorStateService,
     private undoRedoService: UndoRedoService,
@@ -58,7 +61,7 @@ export class StoryEditorNavbarComponent implements OnInit {
   EDITOR = 'Editor';
   PREVIEW = 'Preview';
   directiveSubscriptions = new Subscription();
-  explorationValidationIssues = [];
+  explorationValidationIssues: string[] = [];
 
   isStoryPublished(): boolean {
     return this.storyEditorStateService.isStoryPublished();
@@ -94,6 +97,16 @@ export class StoryEditorNavbarComponent implements OnInit {
       this.getWarningsCount() === 0);
   }
 
+  isWarningTooltipDisabled(): boolean {
+    return this.isStorySaveable() || this.getTotalWarningsCount() === 0;
+  }
+
+  getAllStoryWarnings(): string {
+    return this.validationIssues.concat(
+      this.explorationValidationIssues
+    ).concat(this.prepublishValidationIssues).join('\n');
+  }
+
   discardChanges(): void {
     this.undoRedoService.clearChanges();
     this.storyEditorStateService.loadStory(this.story.getId());
@@ -102,6 +115,7 @@ export class StoryEditorNavbarComponent implements OnInit {
   }
 
   private _validateStory(): void {
+    this.story = this.storyEditorStateService.getStory();
     this.validationIssues = this.story.validate();
     let nodes = this.story.getStoryContents().getNodes();
     let skillIdsInTopic = (
@@ -125,7 +139,7 @@ export class StoryEditorNavbarComponent implements OnInit {
     let storyPrepublishValidationIssues = (
       this.story.prepublishValidate());
     let nodePrepublishValidationIssues = (
-      [].concat.apply([], nodes.map(
+      Array.prototype.concat.apply([], nodes.map(
         (node) => node.prepublishValidate())));
     this.prepublishValidationIssues = (
       storyPrepublishValidationIssues.concat(
@@ -134,15 +148,16 @@ export class StoryEditorNavbarComponent implements OnInit {
 
   private _validateExplorations(): void {
     let nodes = this.story.getStoryContents().getNodes();
-    let explorationIds = [];
+    let explorationIds: string[] = [];
 
     if (
       this.storyEditorStateService.areAnyExpIdsChanged() ||
       this.forceValidateExplorations) {
       this.explorationValidationIssues = [];
       for (let i = 0; i < nodes.length; i++) {
-        if (nodes[i].getExplorationId() !== null) {
-          explorationIds.push(nodes[i].getExplorationId());
+        let explorationId = nodes[i].getExplorationId();
+        if (explorationId !== null) {
+          explorationIds.push(explorationId);
         } else {
           this.explorationValidationIssues.push(
             'Some chapters don\'t have exploration IDs provided.');

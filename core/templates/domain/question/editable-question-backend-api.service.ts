@@ -25,6 +25,7 @@ import { QuestionObjectFactory, QuestionBackendDict, Question } from 'domain/que
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { QuestionDomainConstants } from 'domain/question/question-domain.constants';
 import { SkillBackendDict } from 'domain/skill/SkillObjectFactory';
+import { BackendChangeObject } from 'domain/editor/undo_redo/change.model';
 
 export interface CreateQuestionResponse {
   questionId: string;
@@ -32,6 +33,12 @@ export interface CreateQuestionResponse {
 
 export interface CreateQuestionResponseBackendDict {
   'question_id': string;
+}
+
+export interface SkillLinkageModificationsArray {
+  id: string;
+  task: string;
+  difficulty: number;
 }
 
 export interface FetchQuestionBackendResponse {
@@ -45,12 +52,12 @@ export interface UpdateEditableQuestionBackendResponse {
   questionDict: QuestionBackendDict;
 }
 export interface FetchQuestionResponse{
-  questionObject: Question,
+  questionObject: Question;
   'associated_skill_dicts': SkillBackendDict[];
 }
 export interface ImageData {
-  filename: string,
-  imageBlob: Blob
+  filename: string;
+  imageBlob: Blob;
 }
 @Injectable({
   providedIn: 'root'
@@ -64,24 +71,24 @@ export class EditableQuestionBackendApiService {
   private async _createQuestionAsync(
       skillIds: string[],
       skillDifficulties: number[],
-      questionObject: Question,
+      questionObject: QuestionBackendDict,
       imagesData: ImageData[],
       successCallback: (value: CreateQuestionResponse) => void,
       errorCallback: (reason?: string) => void
   ): Promise<void> {
     return new Promise((resolve, reject) => {
+      let body = new FormData();
+      let filenames = imagesData.map(obj => obj.filename);
+      let imageBlobs = imagesData.map(obj => obj.imageBlob);
       let postData = {
         question_dict: questionObject,
         skill_ids: skillIds,
-        skill_difficulties: skillDifficulties
+        skill_difficulties: skillDifficulties,
+        filenames: JSON.stringify(filenames)
       };
-
-      let body = new FormData();
       body.append('payload', JSON.stringify(postData));
-      let filenames = imagesData.map(obj => obj.filename);
-      let imageBlobs = imagesData.map(obj => obj.imageBlob);
       for (let idx in imageBlobs) {
-        body.append(filenames[idx], imageBlobs[idx]);
+        body.append(`image${idx}`, imageBlobs[idx]);
       }
       this.http.post<CreateQuestionResponseBackendDict>(
         QuestionDomainConstants.QUESTION_CREATION_URL, body).toPromise()
@@ -96,6 +103,7 @@ export class EditableQuestionBackendApiService {
         });
     });
   }
+
   private async _fetchQuestionAsync(
       questionId: string,
       successCallback: (value: FetchQuestionResponse) => void,
@@ -125,11 +133,12 @@ export class EditableQuestionBackendApiService {
           });
     });
   }
+
   private async _updateQuestionAsync(
       questionId: string,
       questionVersion: string,
       commitMessage: string,
-      changeList: string[],
+      changeList: BackendChangeObject[],
       successCallback: (value: QuestionBackendDict) => void,
       errorCallback: (reason?: string) => void): Promise<QuestionBackendDict> {
     return new Promise((resolve, reject) => {
@@ -159,7 +168,7 @@ export class EditableQuestionBackendApiService {
 
   private async _editQuestionSkillLinksAsync(
       questionId: string,
-      skillIdsTaskArray: (string | number)[],
+      skillIdsTaskArray: SkillLinkageModificationsArray[],
       successCallback: (value: void) => void,
       errorCallback: (reason?: string) => void): Promise<Question> {
     return new Promise((resolve, reject) => {
@@ -184,7 +193,7 @@ export class EditableQuestionBackendApiService {
   async createQuestionAsync(
       skillIds: string[],
       skillDifficulties: number[],
-      questionDict: Question,
+      questionDict: QuestionBackendDict,
       imagesData: ImageData[]): Promise<CreateQuestionResponse> {
     return new Promise((resolve, reject) => {
       this._createQuestionAsync(
@@ -200,7 +209,7 @@ export class EditableQuestionBackendApiService {
 
   async editQuestionSkillLinksAsync(
       questionId: string,
-      skillIdsTaskArray: (string | number)[]): Promise<void> {
+      skillIdsTaskArray: SkillLinkageModificationsArray[]): Promise<void> {
     return new Promise((resolve, reject) => {
       this._editQuestionSkillLinksAsync(
         questionId, skillIdsTaskArray, resolve, reject);
@@ -221,7 +230,7 @@ export class EditableQuestionBackendApiService {
       questionId: string,
       questionVersion: string,
       commitMessage: string,
-      changeList: string[]): Promise<QuestionBackendDict> {
+      changeList: BackendChangeObject[]): Promise<QuestionBackendDict> {
     return new Promise((resolve, reject) => {
       this._updateQuestionAsync(
         questionId, questionVersion,

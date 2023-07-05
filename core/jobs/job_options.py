@@ -26,6 +26,11 @@ from apache_beam.options import pipeline_options
 from typing import List, Optional
 
 
+# TODO(#15613): Here we use MyPy ignore because the incomplete typing of
+# apache_beam library and absences of stubs in Typeshed, forces MyPy to
+# assume that PipelineOptions class is of type Any. Thus to avoid MyPy's
+# error (Class cannot subclass 'PipelineOptions' (has type 'Any')), we
+# added an ignore here.
 class JobOptions(pipeline_options.PipelineOptions): # type: ignore[misc]
     """Option class for configuring the behavior of Oppia jobs."""
 
@@ -48,13 +53,16 @@ class JobOptions(pipeline_options.PipelineOptions): # type: ignore[misc]
                 (unmodified) because PipelineOptions, a parent class, needs it.
             **job_options: dict(str: *). One of the options defined in the class
                 JOB_OPTIONS dict.
+
+        Raises:
+            ValueError. Unsupported job option(s).
         """
         unsupported_options = set(job_options).difference(self.JOB_OPTIONS)
         if unsupported_options:
             joined_unsupported_options = ', '.join(sorted(unsupported_options))
             raise ValueError(
                 'Unsupported option(s): %s' % joined_unsupported_options)
-        super(JobOptions, self).__init__(
+        super().__init__(
             # Needed by PipelineOptions.
             flags=flags,
             # Needed by GoogleCloudOptions.

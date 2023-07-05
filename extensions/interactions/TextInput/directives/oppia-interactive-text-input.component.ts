@@ -22,17 +22,18 @@
 
 import { ChangeDetectorRef, Component, Input, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
+import { TextInputAnswer } from 'interactions/answer-defs';
 import { TextInputCustomizationArgs } from 'interactions/customization-args-defs';
 import { InteractionAttributesExtractorService } from 'interactions/interaction-attributes-extractor.service';
-import { InteractionRulesService } from 'pages/exploration-player-page/services/answer-classification.service';
 import { CurrentInteractionService } from 'pages/exploration-player-page/services/current-interaction.service';
 import { TextInputRulesService } from './text-input-rules.service';
 
 interface TextInputSchema {
   type: string;
   'ui_config': {
-    placeholder?: string;
-    rows?: number;
+    placeholder: string;
+    rows: number;
+    catchMisspellings: boolean;
   };
 }
 
@@ -41,14 +42,19 @@ interface TextInputSchema {
   templateUrl: './text-input-interaction.component.html'
 })
 export class InteractiveTextInputComponent implements OnInit {
-  @Input() placeholderWithValue;
-  @Input() rowsWithValue;
-  @Input() savedSolution;
-  @Input() labelForFocusTarget: string;
-  answer: string;
-  placeholder: string;
-  schema: TextInputSchema;
-  rows: number;
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  @Input() placeholderWithValue!: string;
+  @Input() rowsWithValue!: string;
+  @Input() catchMisspellingsWithValue!: string;
+  @Input() savedSolution!: TextInputAnswer;
+  @Input() labelForFocusTarget!: string;
+  answer!: TextInputAnswer;
+  placeholder!: string;
+  schema!: TextInputSchema;
+  rows!: number;
+  catchMisspellings: boolean = false;
 
   constructor(
     private changeDetectorRef: ChangeDetectorRef,
@@ -61,32 +67,38 @@ export class InteractiveTextInputComponent implements OnInit {
   private _getAttrs() {
     return {
       placeholderWithValue: this.placeholderWithValue,
-      rowsWithValue: this.rowsWithValue
+      rowsWithValue: this.rowsWithValue,
+      catchMisspellingsWithValue: this.catchMisspellingsWithValue
     };
   }
 
   private validityCheckFn() {
-    return this.answer.length > 0;
+    return true;
   }
 
   ngOnInit(): void {
     const {
       placeholder,
-      rows
+      rows,
+      catchMisspellings
     } = this.interactionAttributesExtractorService.getValuesFromAttributes(
       'TextInput', this._getAttrs()
     ) as TextInputCustomizationArgs;
     this.placeholder = placeholder.value.unicode;
     this.rows = rows.value;
+    this.catchMisspellings = catchMisspellings.value;
     this.answer = (
       this.savedSolution !== undefined ?
       this.savedSolution : ''
     );
-    this.labelForFocusTarget = this.labelForFocusTarget || null;
 
     this.schema = {
       type: 'unicode',
-      ui_config: {}
+      ui_config: {
+        placeholder: 'Placeholder text',
+        rows: 1,
+        catchMisspellings: false
+      }
     };
     if (this.placeholder) {
       this.schema.ui_config.placeholder = this.placeholder;
@@ -94,7 +106,9 @@ export class InteractiveTextInputComponent implements OnInit {
     if (this.rows && this.rows !== 1) {
       this.schema.ui_config.rows = this.rows;
     }
-
+    if (this.catchMisspellings) {
+      this.schema.ui_config.catchMisspellings = this.catchMisspellings;
+    }
     this.currentInteractionService.registerCurrentInteraction(
       () => this.submitAnswer(this.answer), () => this.validityCheckFn());
   }
@@ -112,8 +126,7 @@ export class InteractiveTextInputComponent implements OnInit {
       return;
     }
     this.currentInteractionService.onSubmit(
-      answer,
-      this.textInputRulesService as unknown as InteractionRulesService);
+      answer, this.textInputRulesService);
   }
 
   updateAnswer(answer: string): void {

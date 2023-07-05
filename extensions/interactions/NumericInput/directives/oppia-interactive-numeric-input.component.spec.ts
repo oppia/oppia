@@ -23,6 +23,27 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { CurrentInteractionService } from 'pages/exploration-player-page/services/current-interaction.service';
 import { InteractionAttributesExtractorService } from 'interactions/interaction-attributes-extractor.service';
 import { InteractiveNumericInput } from './oppia-interactive-numeric-input.component';
+import { TranslateService } from '@ngx-translate/core';
+import { InteractionSpecsKey } from 'pages/interaction-specs.constants';
+import { NumericInputAnswer } from 'interactions/answer-defs';
+
+class MockTranslateService {
+  instant(key: string): string | undefined {
+    if (key === 'I18N_INTERACTIONS_NUMERIC_INPUT_LESS_THAN_ZERO') {
+      return (
+        'The answer should be greater than or equal to zero. ' +
+        'It should not contain minus symbol (-).'
+      );
+    } else if (
+      key === 'I18N_INTERACTIONS_NUMERIC_INPUT_GREATER_THAN_15_DIGITS'
+    ) {
+      return (
+        'The answer can contain at most 15 digits (0-9) ' +
+        'excluding symbols (. or -).'
+      );
+    }
+  }
+}
 
 describe('InteractiveNumericInput', () => {
   let component: InteractiveNumericInput;
@@ -30,7 +51,9 @@ describe('InteractiveNumericInput', () => {
   let currentInteractionService: CurrentInteractionService;
 
   class mockInteractionAttributesExtractorService {
-    getValuesFromAttributes(interactionId, attributes) {
+    getValuesFromAttributes(
+        interactionId: InteractionSpecsKey, attributes: Record<string, string>
+    ) {
       return {
         requireNonnegativeInput: {
           value: false
@@ -40,8 +63,11 @@ describe('InteractiveNumericInput', () => {
   }
 
   let mockCurrentInteractionService = {
-    onSubmit: (answer, rulesService) => {},
-    registerCurrentInteraction: (submitAnswerFn, validateExpressionFn) => {
+    onSubmit: (
+        answer: NumericInputAnswer, rulesService: CurrentInteractionService
+    ) => {},
+    registerCurrentInteraction: (
+        submitAnswerFn: Function, validateExpressionFn: Function) => {
       submitAnswerFn();
       validateExpressionFn();
     }
@@ -59,6 +85,10 @@ describe('InteractiveNumericInput', () => {
         {
           provide: CurrentInteractionService,
           useValue: mockCurrentInteractionService
+        },
+        {
+          provide: TranslateService,
+          useClass: MockTranslateService
         }
       ],
       schemas: [NO_ERRORS_SCHEMA]
@@ -80,7 +110,7 @@ describe('InteractiveNumericInput', () => {
     component.requireNonnegativeInput = false;
 
     expect(component.answer).toBe('');
-    expect(component.labelForFocusTarget).toBeNull();
+    expect(component.labelForFocusTarget).toBeUndefined();
     expect(component.requireNonnegativeInput).toEqual(false);
     expect(component.NUMERIC_INPUT_FORM_SCHEMA).toEqual({
       type: 'float',

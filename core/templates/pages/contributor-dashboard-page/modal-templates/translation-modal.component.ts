@@ -18,7 +18,7 @@
 
 import isEqual from 'lodash/isEqual';
 
-import { ChangeDetectorRef, Component, Input } from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, Input, ViewChild } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 
@@ -31,13 +31,17 @@ import { Status, TranslatableItem, TranslateTextService } from 'pages/contributo
 import { TranslationLanguageService } from 'pages/exploration-editor-page/translation-tab/services/translation-language.service';
 import { UserService } from 'services/user.service';
 import { AppConstants } from 'app.constants';
-import constants from 'assets/constants';
 import { OppiaAngularRootComponent } from 'components/oppia-angular-root.component';
 import { ListSchema, UnicodeSchema } from 'services/schema-default-value.service';
 import {
   TRANSLATION_DATA_FORMAT_SET_OF_NORMALIZED_STRING,
   TRANSLATION_DATA_FORMAT_SET_OF_UNICODE_STRING
 } from 'domain/exploration/WrittenTranslationObjectFactory';
+// This throws "TS2307". We need to
+// suppress this error because rte-output-display is not strictly typed yet.
+// @ts-ignore
+import { RteOutputDisplayComponent } from 'rich_text_components/rte-output-display.component';
+import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 
 const INTERACTION_SPECS = require('interactions/interaction_specs.json');
 
@@ -47,6 +51,12 @@ class UiConfig {
   'language'?: string;
   'languageDirection'?: string;
 }
+
+enum ExpansionTabType {
+  CONTENT,
+  TRANSLATION
+}
+
 export interface TranslationOpportunity {
   id: string;
   heading: string;
@@ -75,9 +85,11 @@ export class TranslationError {
   get hasDuplicateDescriptions(): boolean {
     return this._hasDuplicateDescriptions;
   }
+
   get hasDuplicateAltTexts(): boolean {
     return this._hasDuplicateAltTexts;
   }
+
   get hasUntranslatedElements(): boolean {
     return this._hasUntranslatedElements;
   }
@@ -88,23 +100,29 @@ export class TranslationError {
   templateUrl: './translation-modal.component.html'
 })
 export class TranslationModalComponent {
-  @Input() opportunity: TranslationOpportunity;
-  activeDataFormat: string;
+  // These properties below are initialized using Angular lifecycle hooks
+  // where we need to do non-null assertion. For more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  @Input() opportunity!: TranslationOpportunity;
+  activeDataFormat!: string;
   activeWrittenTranslation: string | string[] = '';
-  activeContentType: string;
-  activeRuleDescription: string;
-  uploadingTranslation = false;
-  subheading: string;
-  heading: string;
-  loadingData = true;
-  moreAvailable = false;
+  activeContentType!: string;
+  activeRuleDescription!: string;
+  uploadingTranslation: boolean = false;
+  subheading!: string;
+  heading!: string;
+  loadingData: boolean = true;
+  moreAvailable: boolean = false;
   textToTranslate: string | string[] = '';
-  languageDescription: string;
-  activeStatus: Status;
-  HTML_SCHEMA: {
+  activeStatus!: Status;
+  activeLanguageCode!: string;
+  HTML_SCHEMA!: {
     'type': string;
     'ui_config': UiConfig;
   };
+
+  // Language description is null when active language code is invalid.
+  languageDescription: string | null = null;
   UNICODE_SCHEMA: UnicodeSchema = { type: 'unicode' };
   SET_OF_STRINGS_SCHEMA: ListSchema = {
     type: 'list',
@@ -112,13 +130,22 @@ export class TranslationModalComponent {
       type: 'unicode'
     }
   };
-  TRANSLATION_TIPS = constants.TRANSLATION_TIPS;
-  activeLanguageCode: string;
+
+  TRANSLATION_TIPS = AppConstants.TRANSLATION_TIPS;
   isActiveLanguageReviewer: boolean = false;
-  hadCopyParagraphError = false;
-  hasImgTextError = false;
-  hasIncompleteTranslationError = false;
-  editorIsShown = true;
+  hadCopyParagraphError: boolean = false;
+  hasImgTextError: boolean = false;
+  hasIncompleteTranslationError: boolean = false;
+  editorIsShown: boolean = true;
+  isContentExpanded: boolean = false;
+  isTranslationExpanded: boolean = true;
+  isContentOverflowing: boolean = false;
+  isTranslationOverflowing: boolean = false;
+  textWhenExpanded: string = 'View Less';
+  textWhenContracted: string = 'View More';
+  // The value of cutoff must be equal to 'max-height' - 1 set in the
+  // class '.oppia-container-contracted' in 'translation-modal.component.html'.
+  cutoff_height: number = 29;
   ALLOWED_CUSTOM_TAGS_IN_TRANSLATION_SUGGESTION = [
     'oppia-noninteractive-image',
     'oppia-noninteractive-link',
@@ -126,8 +153,17 @@ export class TranslationModalComponent {
     'oppia-noninteractive-skillreview'
   ];
 
+  @ViewChild('contentPanel')
+    contentPanel!: RteOutputDisplayComponent;
+
+  @ViewChild('contentContainer')
+    contentContainer!: ElementRef;
+
+  @ViewChild('translationContainer')
+    translationContainer!: ElementRef;
+
   constructor(
-    private readonly activeModal: NgbActiveModal,
+    public readonly activeModal: NgbActiveModal,
     private readonly alertsService: AlertsService,
     private readonly ckEditorCopyContentService: CkEditorCopyContentService,
     private readonly contextService: ContextService,
@@ -136,9 +172,14 @@ export class TranslationModalComponent {
     private readonly translateTextService: TranslateTextService,
     private readonly translationLanguageService: TranslationLanguageService,
     private readonly userService: UserService,
-    private readonly changeDetectorRef: ChangeDetectorRef
+    private readonly changeDetectorRef: ChangeDetectorRef,
+    private readonly wds: WindowDimensionsService
   ) {
     this.contextService = OppiaAngularRootComponent.contextService;
+  }
+
+  public get expansionTabType(): typeof ExpansionTabType {
+    return ExpansionTabType;
   }
 
   ngOnInit(): void {
@@ -165,6 +206,9 @@ export class TranslationModalComponent {
       });
     this.userService.getUserContributionRightsDataAsync().then(
       userContributionRights => {
+        if (!userContributionRights) {
+          throw new Error('User contribution rights not found.');
+        }
         const reviewableLanguageCodes = (
           userContributionRights.can_review_translation_for_language_codes);
         if (reviewableLanguageCodes.includes(this.activeLanguageCode)) {
@@ -185,6 +229,35 @@ export class TranslationModalComponent {
     };
   }
 
+  ngAfterViewInit(): void {
+    this.computePanelOverflowState();
+  }
+
+  ngAfterContentChecked(): void {
+    this.computeTranslationEditorOverflowState();
+  }
+
+  computeTranslationEditorOverflowState(): void {
+    const windowHeight = this.wds.getHeight();
+    const heightLimit = windowHeight * (this.cutoff_height) / 100;
+
+    this.isTranslationOverflowing = (
+      this.translationContainer?.nativeElement.offsetHeight >=
+        heightLimit
+    );
+  }
+
+  computePanelOverflowState(): void {
+    // The delay of 500ms is required to allow the content to load
+    // before the overflow status is calculated. Values less than
+    // 500ms also work but they sometimes lead to unexpected results.
+    setTimeout(() => {
+      this.isContentOverflowing = (
+        this.contentPanel?.elementRef.nativeElement.offsetHeight >
+        this.contentContainer?.nativeElement.offsetHeight);
+    }, 500);
+  }
+
   // TODO(#13221): Remove this method completely after the change detection
   // issues in schema-based-editor have been resolved. The current workaround
   // used is to destroy and re-render the component in the view.
@@ -196,6 +269,9 @@ export class TranslationModalComponent {
 
   close(): void {
     this.activeModal.close();
+
+    // Reset copyMode to the default value and avoid console errors.
+    this.ckEditorCopyContentService.copyModeActive = false;
   }
 
   getHtmlSchema(): HTMLSchema {
@@ -231,6 +307,14 @@ export class TranslationModalComponent {
     this.activeRuleDescription = this.getRuleDescription(
       ruleType, interactionId
     );
+  }
+
+  toggleExpansionState(tab: ExpansionTabType): void {
+    if (tab === ExpansionTabType.CONTENT) {
+      this.isContentExpanded = !this.isContentExpanded;
+    } else if (tab === ExpansionTabType.TRANSLATION) {
+      this.isTranslationExpanded = !this.isTranslationExpanded;
+    }
   }
 
   onContentClick(event: MouseEvent): boolean | void {
@@ -301,7 +385,7 @@ export class TranslationModalComponent {
   }
 
   getFormattedContentType(
-      contentType: string, interactionId: string): string {
+      contentType: string, interactionId: string | undefined): string {
     if (contentType === 'interaction') {
       return interactionId + ' interaction';
     } else if (contentType === 'rule') {
@@ -310,7 +394,7 @@ export class TranslationModalComponent {
     return contentType;
   }
 
-  getRuleDescription(ruleType: string, interactionId: string): string {
+  getRuleDescription(ruleType?: string, interactionId?: string): string {
     if (!ruleType || !interactionId) {
       return '';
     }
@@ -332,12 +416,16 @@ export class TranslationModalComponent {
       // img_2021029_210552_zbmdt94_height_54_width_490.png&amp;quot;">
       // </oppia-noninteractive-image>
       if (element.localName === 'oppia-noninteractive-image') {
-        const attribute = element.attributes[type].value;
-        return attribute.substring(
-          textWrapperLength, attribute.length - textWrapperLength);
+        const attribute = element.attributes[
+          type as keyof NamedNodeMap] as Attr;
+        const attributeValue = attribute.value;
+        return attributeValue.substring(
+          textWrapperLength, attributeValue.length - textWrapperLength);
       }
     });
-    return attributes.filter(attribute => attribute);
+    // Typecasted to string[] because Array.from() returns
+    // (string | undefined)[] and we need to remove the undefined elements.
+    return attributes.filter(attributeValues => attributeValues) as string[];
   }
 
   getImageAttributeTexts(
@@ -364,7 +452,7 @@ export class TranslationModalComponent {
     if (originalElements.length === 0) {
       return false;
     }
-    const hasMatchingTranslatedElement = element => (
+    const hasMatchingTranslatedElement = (element: string) => (
       translatedElements.includes(element) && originalElements.length > 0 &&
       !mathEquationRegex.test(element));
     return originalElements.some(hasMatchingTranslatedElement);
@@ -454,7 +542,6 @@ export class TranslationModalComponent {
             this.resetEditor();
           } else {
             this.activeWrittenTranslation = '';
-            this.resetEditor();
           }
         }, (errorReason: string) => {
           this.contextService.resetImageSaveDestination();

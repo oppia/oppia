@@ -17,32 +17,36 @@
  */
 
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { ComponentFixture, fakeAsync, TestBed } from '@angular/core/testing';
-import { MockRouterModule } from 'hybrid-router-module-provider';
+import { ComponentFixture, fakeAsync, flush, TestBed } from '@angular/core/testing';
+import { RouterModule } from '@angular/router';
+import { APP_BASE_HREF } from '@angular/common';
+import { SmartRouterModule } from 'hybrid-router-module-provider';
 
 import { UserService } from 'services/user.service';
 import { ReleaseCoordinatorPageConstants } from '../release-coordinator-page.constants';
 import { ReleaseCoordinatorNavbarComponent } from './release-coordinator-navbar.component';
+import { UserInfo } from 'domain/user/user-info.model';
 
 
 describe('Release coordinator navbar component', () => {
   let component: ReleaseCoordinatorNavbarComponent;
-  let userService = null;
-  let userProfileImage = 'profile-data-url';
-  let userInfo = {
-    isModerator: () => true,
-    getUsername: () => 'username1',
-    isSuperAdmin: () => true
-  };
+  let userService: UserService;
   let profileUrl = '/profile/username1';
   let fixture: ComponentFixture<ReleaseCoordinatorNavbarComponent>;
   beforeEach(fakeAsync(() => {
     TestBed.configureTestingModule({
       imports: [
         HttpClientTestingModule,
-        MockRouterModule
+        // TODO(#13443): Remove hybrid router module provider once all pages are
+        // migrated to angular router.
+        SmartRouterModule,
+        RouterModule.forRoot([])
       ],
-      declarations: [ReleaseCoordinatorNavbarComponent]
+      declarations: [ReleaseCoordinatorNavbarComponent],
+      providers: [{
+        provide: APP_BASE_HREF,
+        useValue: '/'
+      }]
     }).compileComponents();
 
     fixture = TestBed.createComponent(ReleaseCoordinatorNavbarComponent);
@@ -50,23 +54,52 @@ describe('Release coordinator navbar component', () => {
     userService = TestBed.inject(UserService);
     fixture.detectChanges();
 
-    spyOn(userService, 'getProfileImageDataUrlAsync')
-      .and.resolveTo(userProfileImage);
-    spyOn(userService, 'getUserInfoAsync')
-      .and.resolveTo(userInfo);
+    spyOn(userService, 'getProfileImageDataUrl').and.returnValue(
+      ['profile-image-url-png', 'profile-image-url-webp']);
     spyOn(component.activeTabChange, 'emit');
     component.ngOnInit();
   }));
 
-  it('should initialize component properties correctly', () => {
-    expect(component.profilePictureDataUrl).toBe(userProfileImage);
+  it('should initialize component properties correctly', fakeAsync(() => {
+    let userInfo = {
+      isModerator: () => true,
+      getUsername: () => 'username1',
+      isSuperAdmin: () => true
+    };
+    spyOn(userService, 'getUserInfoAsync')
+      .and.resolveTo(userInfo as UserInfo);
+    component.ngOnInit();
+    flush();
+
+    expect(component.profilePicturePngDataUrl).toEqual(
+      'profile-image-url-png');
+    expect(component.profilePictureWebpDataUrl).toEqual(
+      'profile-image-url-webp');
     expect(component.username).toBe('username1');
     expect(component.profileUrl).toEqual(profileUrl);
     expect(component.logoutUrl).toEqual('/logout');
     expect(component.profileDropdownIsActive).toBe(false);
     expect(component.activeTab).toBe(
       ReleaseCoordinatorPageConstants.TAB_ID_BEAM_JOBS);
-  });
+  }));
+
+  it('should get default profile pictures when username is null',
+    fakeAsync(() => {
+      let userInfo = {
+        getUsername: () => null,
+        isSuperAdmin: () => true,
+        getEmail: () => 'test_email@example.com'
+      };
+      spyOn(userService, 'getUserInfoAsync')
+        .and.resolveTo(userInfo as UserInfo);
+      component.ngOnInit();
+      flush();
+
+      expect(component.profilePicturePngDataUrl).toEqual(
+        '/assets/images/avatar/user_blue_150px.png');
+      expect(component.profilePictureWebpDataUrl).toEqual(
+        '/assets/images/avatar/user_blue_150px.webp');
+    }));
 
   it('should allow switching tabs correctly', () => {
     expect(component.activeTab).toBe(

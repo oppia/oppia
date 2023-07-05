@@ -24,8 +24,8 @@ import { Component, Input, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { HtmlEscaperService } from 'services/html-escaper.service';
 interface ClickRegion {
-  clickPosition: number[],
-  clickedRegions: string[]
+  clickPosition: number[];
+  clickedRegions: string[];
 }
 @Component({
   selector: 'oppia-response-image-click-input',
@@ -34,7 +34,7 @@ interface ClickRegion {
 })
 export class ResponseImageClickInput implements OnInit {
   // These properties are initialized using Angular lifecycle hooks
-  // and we need to do non-null assertion, for more information see
+  // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() answer!: string;
   clickRegionLabel!: string;

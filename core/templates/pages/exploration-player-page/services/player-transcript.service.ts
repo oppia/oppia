@@ -65,6 +65,7 @@ export class PlayerTranscriptService {
       return transcriptItem.getStateName() === stateName;
     });
   }
+
   addNewCard(newCard: StateCard): void {
     this.transcript.push(newCard);
     this.numAnswersSubmitted = 0;
@@ -108,6 +109,11 @@ export class PlayerTranscriptService {
     card.setLastOppiaResponse(response);
   }
 
+  addNewResponseToExistingFeedback(response: string): void {
+    let card = this.getLastCard();
+    card.addToExistingFeedback(response);
+  }
+
   getNumCards(): number {
     return this.transcript.length;
   }
@@ -122,7 +128,9 @@ export class PlayerTranscriptService {
     return this.transcript[index];
   }
 
-  getLastAnswerOnDisplayedCard(displayedCardIndex: number): string | null {
+  getLastAnswerOnDisplayedCard(
+      displayedCardIndex: number
+  ): { answerDetails: string } | string | null {
     if (
       this.isLastCard(displayedCardIndex) ||
         this.transcript[displayedCardIndex].getStateName() === null ||

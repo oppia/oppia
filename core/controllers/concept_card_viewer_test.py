@@ -15,11 +15,13 @@
 """Tests for the handler that returns concept card for a skill."""
 
 from __future__ import annotations
+import json
 
 from core import feconf
 from core.domain import skill_domain
 from core.domain import skill_services
 from core.domain import state_domain
+from core.domain import translation_domain
 from core.domain import user_services
 from core.tests import test_utils
 
@@ -27,9 +29,9 @@ from core.tests import test_utils
 class ConceptCardDataHandlerTest(test_utils.GenericTestBase):
     """Tests the concept card data handler for a skill."""
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Before each individual test, create a dummy skill."""
-        super(ConceptCardDataHandlerTest, self).setUp()
+        super().setUp()
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
 
         self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
@@ -52,7 +54,7 @@ class ConceptCardDataHandlerTest(test_utils.GenericTestBase):
                     '1': {}, '2': {}, '3': {}, '4': {}, '5': {}
                 }
             }),
-            state_domain.WrittenTranslations.from_dict({
+            translation_domain.WrittenTranslations.from_dict({
                 'translations_mapping': {
                     '1': {}, '2': {}, '3': {}, '4': {}, '5': {}
                 }
@@ -67,7 +69,7 @@ class ConceptCardDataHandlerTest(test_utils.GenericTestBase):
                     '1': {}, '2': {}, '3': {}, '4': {}, '5': {}
                 }
             }),
-            state_domain.WrittenTranslations.from_dict({
+            translation_domain.WrittenTranslations.from_dict({
                 'translations_mapping': {
                     '1': {}, '2': {}, '3': {}, '4': {}, '5': {}
                 }
@@ -84,12 +86,12 @@ class ConceptCardDataHandlerTest(test_utils.GenericTestBase):
             skill_contents=self.skill_contents_1)
         self.skill_id_2 = skill_services.get_new_skill_id()
 
-    def test_get_concept_cards(self):
+    def test_get_concept_cards(self) -> None:
         json_response = self.get_json(
-            '%s/%s,%s' % (
+            '%s/%s' % (
                 feconf.CONCEPT_CARD_DATA_URL_PREFIX,
-                self.skill_id, self.skill_id_1)
-            )
+                json.dumps([self.skill_id, self.skill_id_1])
+            ))
         self.assertEqual(2, len(json_response['concept_card_dicts']))
         self.assertEqual(
             '<p>Skill Explanation</p>',
@@ -125,8 +127,18 @@ class ConceptCardDataHandlerTest(test_utils.GenericTestBase):
             ).to_dict()],
             json_response['concept_card_dicts'][1]['worked_examples'])
 
-    def test_get_concept_cards_fails_when_skill_doesnt_exist(self):
+    def test_get_concept_cards_fails_when_skill_doesnt_exist(self) -> None:
         self.get_json(
             '%s/%s' % (
-                feconf.CONCEPT_CARD_DATA_URL_PREFIX, self.skill_id_2),
+                feconf.CONCEPT_CARD_DATA_URL_PREFIX,
+                json.dumps([self.skill_id_2])),
             expected_status_int=404)
+
+    def test_invalid_skill_id(self) -> None:
+        skill_ids = [1, 2]
+        json_response = self.get_json(
+            '%s/%s' % (
+                feconf.CONCEPT_CARD_DATA_URL_PREFIX,
+                json.dumps(skill_ids)), expected_status_int=400)
+
+        self.assertEqual(json_response['error'], 'Skill id should be a string.')

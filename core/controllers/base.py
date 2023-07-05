@@ -16,10 +16,12 @@
 
 from __future__ import annotations
 
+import abc
 import base64
 import datetime
 import functools
 import hmac
+import io
 import json
 import logging
 import os
@@ -28,29 +30,38 @@ import time
 import urllib
 
 from core import feconf
-from core import python_utils
+from core import handler_schema_constants
 from core import utils
 from core.controllers import payload_validator
 from core.domain import auth_domain
 from core.domain import auth_services
+from core.domain import classifier_domain
 from core.domain import config_domain
 from core.domain import config_services
 from core.domain import user_services
 
+from typing import (
+    Any, Dict, Final, Generic, Mapping, Optional, Sequence, TypedDict, TypeVar,
+    Union
+)
+
 import webapp2
 
-from typing import Any, Dict, Optional # isort: skip
+# Note: These private type variables are only defined to implement the Generic
+# typing structure of BaseHandler. So, do not make them public in the future.
+_NormalizedRequestDictType = TypeVar('_NormalizedRequestDictType')
+_NormalizedPayloadDictType = TypeVar('_NormalizedPayloadDictType')
 
-ONE_DAY_AGO_IN_SECS = -24 * 60 * 60
-DEFAULT_CSRF_SECRET = 'oppia csrf secret'
-CSRF_SECRET = config_domain.ConfigProperty(
+ONE_DAY_AGO_IN_SECS: Final = -24 * 60 * 60
+DEFAULT_CSRF_SECRET: Final = 'oppia csrf secret'
+CSRF_SECRET: Final = config_domain.ConfigProperty(
     'oppia_csrf_secret', {'type': 'unicode'},
     'Text used to encrypt CSRF tokens.', DEFAULT_CSRF_SECRET)
 
 # NOTE: These handlers manage user sessions and serve auth pages. Thus, we
 # should never reject or replace them when running in maintenance mode;
 # otherwise admins will be unable to access the site.
-AUTH_HANDLER_PATHS = (
+AUTH_HANDLER_PATHS: Final = (
     '/csrfhandler',
     '/login',
     '/session_begin',
@@ -58,18 +69,37 @@ AUTH_HANDLER_PATHS = (
 )
 
 
+class ResponseValueDict(TypedDict):
+    """Dict representation of key-value pairs that will be included in the
+    response.
+    """
+
+    error: str
+    status_code: int
+
+
 @functools.lru_cache(maxsize=128)
-def load_template(filename):
+def load_template(
+    filename: str, *, template_is_aot_compiled: bool
+) -> str:
     """Return the HTML file contents at filepath.
 
     Args:
         filename: str. Name of the requested HTML file.
+        template_is_aot_compiled: bool. Used to determine which bundle to use.
 
     Returns:
         str. The HTML file content.
     """
-    filepath = os.path.join(feconf.FRONTEND_TEMPLATES_DIR, filename)
-    with python_utils.open_file(filepath, 'r') as f:
+    filepath = os.path.join(
+        (
+            feconf.FRONTEND_AOT_DIR
+            if template_is_aot_compiled
+            else feconf.FRONTEND_TEMPLATES_DIR
+        ),
+        filename
+    )
+    with utils.open_file(filepath, 'r') as f:
         html_text = f.read()
     return html_text
 
@@ -77,7 +107,7 @@ def load_template(filename):
 class SessionBeginHandler(webapp2.RequestHandler):
     """Handler for creating new authentication sessions."""
 
-    def get(self):
+    def get(self) -> None:
         """Establishes a new auth session."""
         auth_services.establish_auth_session(self.request, self.response)
 
@@ -85,7 +115,7 @@ class SessionBeginHandler(webapp2.RequestHandler):
 class SessionEndHandler(webapp2.RequestHandler):
     """Handler for destroying existing authentication sessions."""
 
-    def get(self):
+    def get(self) -> None:
         """Destroys an existing auth session."""
         auth_services.destroy_auth_session(self.response)
 
@@ -118,20 +148,11 @@ class UserFacingExceptions:
 
         pass
 
-    class TemporaryMaintenanceException(Exception):
-        """Error class for when the server is currently down for temporary
-        maintenance (error code 503).
-        """
 
-        def __init__(self):
-            super(
-                UserFacingExceptions.TemporaryMaintenanceException, self
-            ).__init__(
-                'Oppia is currently being upgraded, and the site should be up '
-                'and running again in a few hours. Thanks for your patience!')
-
-
-class BaseHandler(webapp2.RequestHandler):
+class BaseHandler(
+    webapp2.RequestHandler,
+    Generic[_NormalizedPayloadDictType, _NormalizedRequestDictType]
+):
     """Base class for all Oppia handlers."""
 
     # Whether to check POST and PUT payloads for CSRF tokens prior to
@@ -149,28 +170,42 @@ class BaseHandler(webapp2.RequestHandler):
     PUT_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     DELETE_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
-    # Using Dict[str, Any] here because the following schema can have a
-    # recursive structure and currently mypy doesn't support recursive type
-    # currently. See: https://github.com/python/mypy/issues/731
+    # Here we use type Any because the sub-classes of BaseHandler can contain
+    # different schemas with different types of values, like str, complex Dicts
+    # and etc.
     URL_PATH_ARGS_SCHEMAS: Optional[Dict[str, Any]] = None
-    # Using Dict[str, Any] here because the following schema can have a
-    # recursive structure and currently mypy doesn't support recursive type
-    # currently. See: https://github.com/python/mypy/issues/731
+    # Here we use type Any because the sub-classes of BaseHandler can contain
+    # different schemas with different types of values, like str, complex Dicts
+    # and etc.
     HANDLER_ARGS_SCHEMAS: Optional[Dict[str, Any]] = None
 
-    def __init__(self, request, response):  # pylint: disable=super-init-not-called
+    def __init__(  # pylint: disable=super-init-not-called
+        self, request: webapp2.Request, response: webapp2.Response
+    ) -> None:
         # Set self.request, self.response and self.app.
         self.initialize(request, response)
 
         self.start_time = datetime.datetime.utcnow()
 
-        # Initializes the return dict for the handlers.
-        self.values = {}
+        # Here we use type Any because dict 'self.values' is a return dict
+        # for the handlers, and different handlers can return different
+        # key-value pairs. So, to allow every type of key-value pair, we
+        # used Any type here.
+        self.values: Dict[str, Any] = {}
 
+        # This try-catch block is intended to log cases where getting the
+        # request payload errors with ValueError: Invalid boundary in multipart
+        # form: b''. This is done to gather sufficient data to help debug the
+        # error if it arises in the future.
+        try:
+            payload_json_string = self.request.get('payload')
+        except ValueError as e:
+            logging.error('%s: request %s', e, self.request)
+            raise e
         # TODO(#13155): Remove the if-else part once all the handlers have had
         # schema validation implemented.
-        if self.request.get('payload'):
-            self.payload = json.loads(self.request.get('payload'))
+        if payload_json_string:
+            self.payload = json.loads(payload_json_string)
         else:
             self.payload = None
         self.iframed = False
@@ -181,19 +216,19 @@ class BaseHandler(webapp2.RequestHandler):
         self.partially_logged_in = False
         self.user_is_scheduled_for_deletion = False
         self.current_user_is_super_admin = False
-        # Once the attribute `normalized_request` is type annotated here, make
-        # sure to fix all the subclasses using normalized_request.get() method
-        # by removing their type: ignore[union-attr] and using a type cast
-        # instead to eliminate the possibility on union types.
-        # e.g. ClassroomAccessValidationHandler.
-        self.normalized_request = None
-        self.normalized_payload = None
+        self.normalized_request: Optional[_NormalizedRequestDictType] = None
+        self.normalized_payload: Optional[_NormalizedPayloadDictType] = None
 
         try:
             auth_claims = auth_services.get_auth_claims_from_request(request)
         except auth_domain.StaleAuthSessionError:
             auth_services.destroy_auth_session(self.response)
             self.redirect(user_services.create_login_url(self.request.uri))
+            return
+        except auth_domain.UserDisabledError:
+            auth_services.destroy_auth_session(self.response)
+            self.redirect(
+                '/logout?redirect_url=%s' % feconf.PENDING_ACCOUNT_DELETION_URL)
             return
         except auth_domain.InvalidAuthSessionError:
             logging.exception('User session is invalid!')
@@ -212,11 +247,17 @@ class BaseHandler(webapp2.RequestHandler):
                 # to signup page create a new user settings. Otherwise logout
                 # the not-fully registered user.
                 email = auth_claims.email
+                if email is None:
+                    logging.exception(
+                        'No email address was found for the user.'
+                    )
+                    auth_services.destroy_auth_session(self.response)
+                    return
                 if 'signup?' in self.request.uri:
                     user_settings = (
                         user_services.create_new_user(auth_id, email))
                 else:
-                    logging.exception(
+                    logging.error(
                         'Cannot find user %s with email %s on page %s' % (
                             auth_id, email, self.request.uri))
                     auth_services.destroy_auth_session(self.response)
@@ -243,9 +284,11 @@ class BaseHandler(webapp2.RequestHandler):
                             user_settings.last_logged_in)):
                     user_services.record_user_logged_in(self.user_id)
 
-        self.roles = (
-            [feconf.ROLE_ID_GUEST]
-            if self.user_id is None else user_settings.roles)
+            self.roles = user_settings.roles
+
+        if self.user_id is None:
+            self.roles = [feconf.ROLE_ID_GUEST]
+
         self.user = user_services.get_user_actions_info(self.user_id)
 
         if not self._is_requested_path_currently_accessible_to_user():
@@ -254,7 +297,7 @@ class BaseHandler(webapp2.RequestHandler):
 
         self.values['is_super_admin'] = self.current_user_is_super_admin
 
-    def dispatch(self):
+    def dispatch(self) -> None:
         """Overrides dispatch method in webapp2 superclass.
 
         Raises:
@@ -274,8 +317,7 @@ class BaseHandler(webapp2.RequestHandler):
             return
 
         if not self._is_requested_path_currently_accessible_to_user():
-            self.handle_exception(
-                self.TemporaryMaintenanceException(), self.app.debug)
+            self.render_template('maintenance-page.mainpage.html')
             return
 
         if self.user_is_scheduled_for_deletion:
@@ -320,21 +362,22 @@ class BaseHandler(webapp2.RequestHandler):
         schema_validation_succeeded = True
         try:
             self.validate_and_normalize_args()
-        except self.InvalidInputException as e:
-            self.handle_exception(e, self.app.debug)
-            schema_validation_succeeded = False
-        # TODO(#13155): Remove this clause once all the handlers have had
-        # schema validation implemented.
-        except NotImplementedError as e:
-            self.handle_exception(e, self.app.debug)
-            schema_validation_succeeded = False
 
+        # TODO(#13155): Remove NotImplementedError once all the handlers
+        # have had schema validation implemented.
+        except (
+            NotImplementedError,
+            self.InternalErrorException,
+            self.InvalidInputException
+        ) as e:
+            self.handle_exception(e, self.app.debug)
+            schema_validation_succeeded = False
         if not schema_validation_succeeded:
             return
 
-        super(BaseHandler, self).dispatch()
+        super().dispatch()
 
-    def validate_and_normalize_args(self):
+    def validate_and_normalize_args(self) -> None:
         """Validates schema for controller layer handler class arguments.
 
         Raises:
@@ -343,11 +386,24 @@ class BaseHandler(webapp2.RequestHandler):
         """
         handler_class_name = self.__class__.__name__
         request_method = self.request.environ['REQUEST_METHOD']
-        url_path_args = self.request.route_kwargs
-        handler_class_names_with_no_schema = (
-            payload_validator.HANDLER_CLASS_NAMES_WITH_NO_SCHEMA)
 
-        if handler_class_name in handler_class_names_with_no_schema:
+        # For HEAD requests, we use the schema of GET handler,
+        # because HEAD returns just the handlers of the GET request.
+        if request_method == 'HEAD':
+            request_method = 'GET'
+
+        url_path_args = self.request.route_kwargs
+
+        if (
+            handler_class_name in
+            handler_schema_constants.HANDLER_CLASS_NAMES_WITH_NO_SCHEMA
+        ):
+            # TODO(#13155): Remove this clause once all the handlers have had
+            # schema validation implemented.
+            if self.URL_PATH_ARGS_SCHEMAS or self.HANDLER_ARGS_SCHEMAS:
+                raise self.InternalErrorException(
+                    'Remove handler class name from '
+                    'HANDLER_CLASS_NAMES_WHICH_STILL_NEED_SCHEMAS')
             return
 
         handler_args = {}
@@ -357,7 +413,7 @@ class BaseHandler(webapp2.RequestHandler):
             if arg == 'csrf_token':
                 # 'csrf_token' has been already validated in the
                 # dispatch method.
-                continue
+                pass
             elif arg == 'source':
                 source_url = self.request.get('source')
                 regex_pattern = (
@@ -389,8 +445,8 @@ class BaseHandler(webapp2.RequestHandler):
                     handler_class_name))
 
         schema_for_url_path_args = self.URL_PATH_ARGS_SCHEMAS
-        normalized_arg_values, errors = (
-            payload_validator.validate(
+        self.request.route_kwargs, errors = (
+            payload_validator.validate_arguments_against_schema(
                 url_path_args, schema_for_url_path_args, extra_args_are_allowed)
         )
 
@@ -410,24 +466,29 @@ class BaseHandler(webapp2.RequestHandler):
             return
 
         try:
+            if self.HANDLER_ARGS_SCHEMAS is None:
+                raise Exception(
+                    'No \'HANDLER_ARGS_SCHEMAS\' Found for the '
+                    'handler class: %s' % handler_class_name
+                )
             schema_for_request_method = self.HANDLER_ARGS_SCHEMAS[
                 request_method]
-        except Exception:
+        except Exception as e:
             raise NotImplementedError(
                 'Missing schema for %s method in %s handler class.' % (
-                    request_method, handler_class_name))
+                    request_method, handler_class_name)) from e
 
         allow_string_to_bool_conversion = request_method in ['GET', 'DELETE']
         normalized_arg_values, errors = (
-            payload_validator.validate(
+            payload_validator.validate_arguments_against_schema(
                 handler_args, schema_for_request_method, extra_args_are_allowed,
                 allow_string_to_bool_conversion)
         )
 
-        self.normalized_payload = {
+        normalized_payload = {
             arg: normalized_arg_values.get(arg) for arg in payload_arg_keys
         }
-        self.normalized_request = {
+        normalized_request = {
             arg: normalized_arg_values.get(arg) for arg in request_arg_keys
         }
 
@@ -442,15 +503,36 @@ class BaseHandler(webapp2.RequestHandler):
         # execution onwards to the handler.
         for arg in keys_that_correspond_to_default_values:
             if request_method in ['GET', 'DELETE']:
-                self.normalized_request[arg] = normalized_arg_values.get(arg)
+                normalized_request[arg] = normalized_arg_values.get(arg)
             else:
-                self.normalized_payload[arg] = normalized_arg_values.get(arg)
+                normalized_payload[arg] = normalized_arg_values.get(arg)
+
+        # Here we use MyPy ignore because 'normalized_payload' is of
+        # Dict[str, Any] type, whereas 'self.normalized_payload' is a Generic
+        # type whose type can be decided while defining sub-classes. So, Due
+        # to this mismatch in types MyPy throws an error. Thus, to silence the
+        # error, we used type ignore here.
+        self.normalized_payload = normalized_payload  # type: ignore[assignment]
+        # Here we use MyPy ignore because 'normalized_request' is of
+        # Dict[str, Any] type, whereas 'self.normalized_request' is a Generic
+        # type whose type can be decided while defining sub-classes. So, Due
+        # to this mismatch in types MyPy throws an error. Thus, to silence the
+        # error, we used type ignore here.
+        self.normalized_request = normalized_request  # type: ignore[assignment]
+
+        # Here we use MyPy ignore because here we assigning RaiseErrorOnGet's
+        # instance to a 'get' method, and according to MyPy assignment to a
+        # method is not allowed.
+        self.request.get = RaiseErrorOnGet(  # type: ignore[assignment]
+            'Use self.normalized_request instead of self.request.').get
+        self.payload = RaiseErrorOnGet(
+            'Use self.normalized_payload instead of self.payload.')
 
         if errors:
             raise self.InvalidInputException('\n'.join(errors))
 
     @property
-    def current_user_is_site_maintainer(self):
+    def current_user_is_site_maintainer(self) -> bool:
         """Returns whether the current user is a site maintainer.
 
         A super admin or release coordinator is also a site maintainer.
@@ -462,7 +544,7 @@ class BaseHandler(webapp2.RequestHandler):
             self.current_user_is_super_admin or
             feconf.ROLE_ID_RELEASE_COORDINATOR in self.roles)
 
-    def _is_requested_path_currently_accessible_to_user(self):
+    def _is_requested_path_currently_accessible_to_user(self) -> bool:
         """Checks whether the requested path is currently accessible to user.
 
         Returns:
@@ -473,15 +555,21 @@ class BaseHandler(webapp2.RequestHandler):
             not feconf.ENABLE_MAINTENANCE_MODE or
             self.current_user_is_site_maintainer)
 
-    def get(self, *args, **kwargs):  # pylint: disable=unused-argument
+    # Here we use type Any because the sub-classes of 'Basehandler' can have
+    # 'get' method with different number of arguments and types.
+    def get(self, *args: Any, **kwargs: Any) -> None:  # pylint: disable=unused-argument
         """Base method to handle GET requests."""
         logging.warning('Invalid URL requested: %s', self.request.uri)
         self.error(404)
-        self._render_exception(
-            404, {
-                'error': 'Could not find the page %s.' % self.request.uri})
+        values: ResponseValueDict = {
+            'error': 'Could not find the page %s.' % self.request.uri,
+            'status_code': 404
+        }
+        self._render_exception(values)
 
-    def post(self, *args):  # pylint: disable=unused-argument
+    # Here we use type Any because the sub-classes of 'Basehandler' can have
+    # 'post' method with different number of arguments and types.
+    def post(self, *args: Any) -> None:  # pylint: disable=unused-argument
         """Base method to handle POST requests.
 
         Raises:
@@ -489,7 +577,9 @@ class BaseHandler(webapp2.RequestHandler):
         """
         raise self.PageNotFoundException
 
-    def put(self, *args):  # pylint: disable=unused-argument
+    # Here we use type Any because the sub-classes of 'Basehandler' can have
+    # 'put' method with different number of arguments and types.
+    def put(self, *args: Any) -> None:  # pylint: disable=unused-argument
         """Base method to handle PUT requests.
 
         Raises:
@@ -497,7 +587,9 @@ class BaseHandler(webapp2.RequestHandler):
         """
         raise self.PageNotFoundException
 
-    def delete(self, *args):  # pylint: disable=unused-argument
+    # Here we use type Any because the sub-classes of 'Basehandler' can have
+    # 'delete' method with different number of arguments and types.
+    def delete(self, *args: Any) -> None:  # pylint: disable=unused-argument
         """Base method to handle DELETE requests.
 
         Raises:
@@ -505,11 +597,27 @@ class BaseHandler(webapp2.RequestHandler):
         """
         raise self.PageNotFoundException
 
-    def render_json(self, values: Dict[Any, Any]) -> None:
+    # Here we use type Any because the sub-classes of 'Basehandler' can have
+    # 'head' method with different number of arguments and types.
+    def head(self, *args: Any, **kwargs: Any) -> None:
+        """Method to handle HEAD requests. The webapp library automatically
+        makes sure that HEAD only returns the headers of GET request.
+        """
+        return self.get(*args, **kwargs)
+
+    # TODO(#16539): Once all the places are fixed with the type of value
+    # that is rendered to JSON, then please remove Sequence[Mapping[str, Any]]
+    # from render_json's argument type.
+    # Here we use type Any because the argument 'values' can accept various
+    # kinds of dictionaries that needs to be sent as a JSON response.
+    def render_json(
+        self, values: Union[str, Sequence[Mapping[str, Any]], Mapping[str, Any]]
+    ) -> None:
         """Prepares JSON response to be sent to the client.
 
         Args:
-            values: dict. The key-value pairs to encode in the JSON response.
+            values: str|dict. The key-value pairs to encode in the
+                JSON response.
         """
         self.response.content_type = 'application/json; charset=utf-8'
         self.response.headers['Content-Disposition'] = (
@@ -524,7 +632,9 @@ class BaseHandler(webapp2.RequestHandler):
         self.response.write(
             b'%s%s' % (feconf.XSSI_PREFIX, json_output.encode('utf-8')))
 
-    def render_downloadable_file(self, file, filename, content_type):
+    def render_downloadable_file(
+        self, file: io.BytesIO, filename: str, content_type: str
+    ) -> None:
         """Prepares downloadable content to be sent to the client.
 
         Args:
@@ -536,12 +646,23 @@ class BaseHandler(webapp2.RequestHandler):
         self.response.headers['Content-Disposition'] = (
             'attachment; filename=%s' % filename)
         self.response.charset = 'utf-8'
-        # We use this super in order to bypass the write method
-        # in webapp2.Response, since webapp2.Response doesn't support writing
-        # bytes.
-        super(webapp2.Response, self.response).write(file.getvalue())  # pylint: disable=bad-super-call
+        # Here we use MyPy ignore because according to MyPy super can
+        # accept 'super class and self' as arguments but here we are passing
+        # 'webapp2.Response, and self.response' which confuses MyPy about the
+        # typing of super, and due to this MyPy is unable to recognize the
+        # 'write' method and throws an error. This change in arguments is
+        # done because we use 'super' method in order to bypass the write
+        # method in webapp2.Response, since webapp2.Response doesn't support
+        # writing bytes.
+        super(webapp2.Response, self.response).write(file.getvalue())  # type: ignore[misc] # pylint: disable=bad-super-call
 
-    def render_template(self, filepath, iframe_restriction='DENY'):
+    def render_template(
+        self,
+        filepath: str,
+        iframe_restriction: Optional[str] = 'DENY',
+        *,
+        template_is_aot_compiled: bool = False
+    ) -> None:
         """Prepares an HTML response to be sent to the client.
 
         Args:
@@ -552,6 +673,11 @@ class BaseHandler(webapp2.RequestHandler):
                 DENY: Strictly prevents the template to load in an iframe.
                 SAMEORIGIN: The template can only be displayed in a frame
                     on the same origin as the page itself.
+            template_is_aot_compiled: bool. False by default. Use
+                True when the template is compiled by angular AoT compiler.
+
+        Raises:
+            Exception. Invalid X-Frame-Options.
         """
 
         # The 'no-store' must be used to properly invalidate the cache when we
@@ -573,10 +699,13 @@ class BaseHandler(webapp2.RequestHandler):
 
         self.response.expires = 'Mon, 01 Jan 1990 00:00:00 GMT'
         self.response.pragma = 'no-cache'
+        self.response.write(load_template(
+            filepath, template_is_aot_compiled=template_is_aot_compiled
+        ))
 
-        self.response.write(load_template(filepath))
-
-    def _render_exception_json_or_html(self, return_type, values):
+    def _render_exception_json_or_html(
+        self, return_type: str, values: ResponseValueDict
+    ) -> None:
         """Renders an error page, or an error JSON response.
 
         Args:
@@ -591,8 +720,6 @@ class BaseHandler(webapp2.RequestHandler):
             if self.iframed:
                 self.render_template(
                     'error-iframed.mainpage.html', iframe_restriction=None)
-            elif values['status_code'] == 503:
-                self.render_template('maintenance-page.mainpage.html')
             elif values['status_code'] == 404:
                 # Only 404 routes can be handled with angular router as it only
                 # has access to the path, not to the status code.
@@ -608,18 +735,17 @@ class BaseHandler(webapp2.RequestHandler):
                     'Not a recognized return type: defaulting to render JSON.')
             self.render_json(values)
 
-    def _render_exception(self, error_code, values):
+    def _render_exception(
+        self, values: ResponseValueDict
+    ) -> None:
         """Renders an error page, or an error JSON response.
 
         Args:
-            error_code: int. The HTTP status code (expected to be one of
-                400, 401, 404 or 500).
             values: dict. The key-value pairs to include in the response.
         """
         # The error codes here should be in sync with the error pages
         # generated via webpack.common.config.ts.
-        assert error_code in [400, 401, 404, 500, 503]
-        values['status_code'] = error_code
+        assert values['status_code'] in [400, 401, 404, 500]
         method = self.request.environ['REQUEST_METHOD']
 
         if method == 'GET':
@@ -636,9 +762,13 @@ class BaseHandler(webapp2.RequestHandler):
                 self.DELETE_HANDLER_ERROR_RETURN_TYPE, values)
         else:
             logging.warning('Not a recognized request method.')
-            self._render_exception_json_or_html(None, values)
+            self._render_exception_json_or_html(
+                feconf.HANDLER_TYPE_JSON, values
+            )
 
-    def handle_exception(self, exception, unused_debug_mode):
+    def handle_exception(
+        self, exception: BaseException, unused_debug_mode: bool
+    ) -> None:
         """Overwrites the default exception handler.
 
         Args:
@@ -651,14 +781,26 @@ class BaseHandler(webapp2.RequestHandler):
             # For GET requests, there is no payload, so we check against
             # GET_HANDLER_ERROR_RETURN_TYPE.
             # Otherwise, we check whether self.payload exists.
-            if (self.payload is not None or
+
+            # This check is to avoid throwing of 401 when payload doesn't
+            # exists and self.payload is replaced by RaiseErrorOnGet object.
+            # TODO(#13155): Change this to self.normalized_payload
+            #  once schema is implemented for all handlers.
+            payload_exists = (
+                self.payload is not None and
+                not isinstance(self.payload, RaiseErrorOnGet)
+            )
+            if (
+                    payload_exists or
                     self.GET_HANDLER_ERROR_RETURN_TYPE ==
-                    feconf.HANDLER_TYPE_JSON):
+                    feconf.HANDLER_TYPE_JSON
+            ):
                 self.error(401)
-                self._render_exception(
-                    401, {
-                        'error': (
-                            'You must be logged in to access this resource.')})
+                values: ResponseValueDict = {
+                    'error': 'You must be logged in to access this resource.',
+                    'status_code': 401
+                }
+                self._render_exception(values)
             else:
                 self.redirect(user_services.create_login_url(self.request.uri))
             return
@@ -669,61 +811,85 @@ class BaseHandler(webapp2.RequestHandler):
         if isinstance(exception, self.PageNotFoundException):
             logging.warning('Invalid URL requested: %s', self.request.uri)
             self.error(404)
-            self._render_exception(
-                404, {
-                    'error': 'Could not find the page %s.' % self.request.uri})
+            values = {
+                'error': 'Could not find the page %s.' % self.request.uri,
+                'status_code': 404
+            }
+            self._render_exception(values)
             return
 
         logging.exception('Exception raised: %s', exception)
 
         if isinstance(exception, self.UnauthorizedUserException):
             self.error(401)
-            self._render_exception(401, {'error': str(exception)})
+            values = {
+                'error': str(exception),
+                'status_code': 401
+            }
+            self._render_exception(values)
             return
 
         if isinstance(exception, self.InvalidInputException):
             self.error(400)
-            self._render_exception(400, {'error': str(exception)})
+            values = {
+                'error': str(exception),
+                'status_code': 400
+            }
+            self._render_exception(values)
             return
 
         if isinstance(exception, self.InternalErrorException):
             self.error(500)
-            self._render_exception(500, {'error': str(exception)})
-            return
-
-        if isinstance(exception, self.TemporaryMaintenanceException):
-            self.error(503)
-            self._render_exception(503, {'error': str(exception)})
+            values = {
+                'error': str(exception),
+                'status_code': 500
+            }
+            self._render_exception(values)
             return
 
         self.error(500)
-        self._render_exception(500, {'error': str(exception)})
+        values = {
+            'error': str(exception),
+            'status_code': 500
+        }
+        self._render_exception(values)
 
     InternalErrorException = UserFacingExceptions.InternalErrorException
     InvalidInputException = UserFacingExceptions.InvalidInputException
     NotLoggedInException = UserFacingExceptions.NotLoggedInException
     PageNotFoundException = UserFacingExceptions.PageNotFoundException
     UnauthorizedUserException = UserFacingExceptions.UnauthorizedUserException
-    TemporaryMaintenanceException = (
-        UserFacingExceptions.TemporaryMaintenanceException)
 
 
-class Error404Handler(BaseHandler):
+class Error404Handler(BaseHandler[Dict[str, str], Dict[str, str]]):
     """Handles 404 errors."""
 
     pass
+
+
+class RaiseErrorOnGet:
+    """Class that will throw a ValueError when the get function is invoked."""
+
+    def __init__(self, message: str) -> None:
+        self.error_message = message
+
+    # Here we use type Any because the 'get' method can accept arbitrary number
+    # of arguments with different types.
+    def get(self, *args: Any, **kwargs: Any) -> None:
+        """Raises an error when invoked."""
+        raise ValueError(self.error_message)
 
 
 class CsrfTokenManager:
     """Manages page/user tokens in memcache to protect against CSRF."""
 
     # Max age of the token (48 hours).
-    _CSRF_TOKEN_AGE_SECS = 60 * 60 * 48
+    _CSRF_TOKEN_AGE_SECS: Final = 60 * 60 * 48
     # Default user id for non-logged-in users.
-    _USER_ID_DEFAULT = 'non_logged_in_user'
+    _USER_ID_DEFAULT: Final = 'non_logged_in_user'
 
     @classmethod
-    def init_csrf_secret(cls):
+    def init_csrf_secret(cls) -> None:
         """Verify that non-default CSRF secret exists; creates one if not."""
 
         # Any non-default value is fine.
@@ -736,7 +902,7 @@ class CsrfTokenManager:
             base64.urlsafe_b64encode(os.urandom(20)))
 
     @classmethod
-    def _create_token(cls, user_id, issued_on):
+    def _create_token(cls, user_id: Optional[str], issued_on: float) -> str:
         """Creates a new CSRF token.
 
         Args:
@@ -755,23 +921,26 @@ class CsrfTokenManager:
             user_id = cls._USER_ID_DEFAULT
 
         # Round time to seconds.
-        issued_on = str(int(issued_on))
+        issued_on_str = str(int(issued_on))
 
-        digester = hmac.new(CSRF_SECRET.value.encode('utf-8'))
+        digester = hmac.new(
+            key=CSRF_SECRET.value.encode('utf-8'),
+            digestmod='md5'
+        )
         digester.update(user_id.encode('utf-8'))
         digester.update(b':')
-        digester.update(issued_on.encode('utf-8'))
+        digester.update(issued_on_str.encode('utf-8'))
 
         digest = digester.digest()
         # The b64encode returns bytes, so we first need to decode the returned
         # bytes to string.
         token = '%s/%s' % (
-            issued_on, base64.urlsafe_b64encode(digest).decode('utf-8'))
+            issued_on_str, base64.urlsafe_b64encode(digest).decode('utf-8'))
 
         return token
 
     @classmethod
-    def _get_current_time(cls):
+    def _get_current_time(cls) -> float:
         """Returns the current server time.
 
         Returns:
@@ -780,7 +949,7 @@ class CsrfTokenManager:
         return time.time()
 
     @classmethod
-    def create_csrf_token(cls, user_id):
+    def create_csrf_token(cls, user_id: Optional[str]) -> str:
         """Creates a CSRF token for the given user_id.
 
         Args:
@@ -792,7 +961,7 @@ class CsrfTokenManager:
         return cls._create_token(user_id, cls._get_current_time())
 
     @classmethod
-    def is_csrf_token_valid(cls, user_id, token):
+    def is_csrf_token_valid(cls, user_id: Optional[str], token: str) -> bool:
         """Validates a given CSRF token.
 
         Args:
@@ -821,13 +990,17 @@ class CsrfTokenManager:
             return False
 
 
-class CsrfTokenHandler(BaseHandler):
+class CsrfTokenHandler(BaseHandler[Dict[str, str], Dict[str, str]]):
     """Handles sending CSRF tokens to the frontend."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     REDIRECT_UNFINISHED_SIGNUPS = False
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
-    def get(self):
+    # Here we use MyPy ignore because the signature of 'get' method is not
+    # compatible with super class's (BaseHandler) 'get' method.
+    def get(self) -> None:  # type: ignore[override]
         csrf_token = CsrfTokenManager.create_csrf_token(
             self.user_id)
         self.render_json({
@@ -835,11 +1008,26 @@ class CsrfTokenHandler(BaseHandler):
         })
 
 
-class OppiaMLVMHandler(BaseHandler):
+class OppiaMLVMHandler(
+    BaseHandler[_NormalizedPayloadDictType, _NormalizedRequestDictType]
+):
     """Base class for the handlers that communicate with Oppia-ML VM instances.
     """
 
-    def extract_request_message_vm_id_and_signature(self):
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    # Here we use type Any because the sub-classes of OppiaMLVMHandler can
+    # contain different schemas with different types of values, like str,
+    # complex Dicts and etc.
+    URL_PATH_ARGS_SCHEMAS: Dict[str, Any] = {}
+    # Here we use type Any because the sub-classes of OppiaMLVMHandler can
+    # contain different schemas with different types of values, like str,
+    # complex Dicts and etc.
+    HANDLER_ARGS_SCHEMAS: Dict[str, Any] = {}
+
+    @abc.abstractmethod
+    def extract_request_message_vm_id_and_signature(
+        self
+    ) -> classifier_domain.OppiaMLAuthInfo:
         """Returns the OppiaMLAuthInfo domain object containing
         information from the incoming request that is necessary for
         authentication.

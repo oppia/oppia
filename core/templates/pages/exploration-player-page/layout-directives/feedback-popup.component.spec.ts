@@ -69,9 +69,9 @@ describe('FeedbackPopupComponent', () => {
   });
 
   it('should set component properties on initialization', fakeAsync(() => {
-    expect(component.isLoggedIn).toBe(undefined);
-    expect(component.feedbackPopoverId).toBe(undefined);
-    expect(component.feedbackTitle).toBe(undefined);
+    expect(component.isLoggedIn).toBeFalse();
+    expect(component.feedbackPopoverId).toBeUndefined();
+    expect(component.feedbackTitle).toBeUndefined();
 
     component.ngOnInit();
     tick();

@@ -19,9 +19,11 @@
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
+import { RecordedVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
+import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 import { ConceptCardBackendApiService } from 'domain/skill/concept-card-backend-api.service';
-import { ConceptCard } from 'domain/skill/ConceptCardObjectFactory';
-import { WorkedExample } from 'domain/skill/WorkedExampleObjectFactory';
+import { ConceptCard } from 'domain/skill/concept-card.model';
+import { WorkedExample } from 'domain/skill/worked-example.model';
 import { ConceptCardComponent } from './concept-card.component';
 
 describe('Concept card component', () => {
@@ -29,7 +31,9 @@ describe('Concept card component', () => {
   let componentInstance: ConceptCardComponent;
   let conceptCardBackendApiService: ConceptCardBackendApiService;
   let conceptCard = new ConceptCard(
-    null, [new WorkedExample(null, null)], null);
+    new SubtitledHtml('', '1'),
+    [new WorkedExample({} as SubtitledHtml, {} as SubtitledHtml)],
+    RecordedVoiceovers.createEmpty());
   let conceptCardObjects = [conceptCard];
 
   beforeEach(waitForAsync(() => {

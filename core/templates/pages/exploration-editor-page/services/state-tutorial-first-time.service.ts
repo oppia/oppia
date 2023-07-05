@@ -82,6 +82,7 @@ export class StateTutorialFirstTimeService {
 
     if (this._currentlyInTranslationFirstVisit) {
       this.enterTranslationForTheFirstTimeEventEmitter.emit();
+      this._currentlyInTranslationFirstVisit = false;
       this.editorFirstTimeEventsService.initRegisterEvents(expId);
       this.tutorialEventsBackendApiService
         .recordStartedTranslationTutorialEventAsync(expId).then(null, () => {
@@ -100,23 +101,23 @@ export class StateTutorialFirstTimeService {
     this._currentlyInTranslationFirstVisit = false;
   }
 
-  get onEnterEditorForTheFirstTime(): EventEmitter<unknown> {
+  get onEnterEditorForTheFirstTime(): EventEmitter<string> {
     return this.enterEditorForTheFirstTimeEventEmitter;
   }
 
-  get onEnterTranslationForTheFirstTime(): EventEmitter<unknown> {
+  get onEnterTranslationForTheFirstTime(): EventEmitter<string> {
     return this.enterTranslationForTheFirstTimeEventEmitter;
   }
 
-  get onOpenEditorTutorial(): EventEmitter<unknown> {
+  get onOpenEditorTutorial(): EventEmitter<string> {
     return this._openEditorTutorialEventEmitter;
   }
 
-  get onOpenPostTutorialHelpPopover(): EventEmitter<unknown> {
+  get onOpenPostTutorialHelpPopover(): EventEmitter<string> {
     return this._openPostTutorialHelpPopoverEventEmitter;
   }
 
-  get onOpenTranslationTutorial(): EventEmitter<unknown> {
+  get onOpenTranslationTutorial(): EventEmitter<string> {
     return this._openTranslationTutorialEventEmitter;
   }
 }

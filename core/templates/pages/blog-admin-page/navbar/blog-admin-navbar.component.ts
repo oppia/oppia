@@ -30,14 +30,19 @@ import { UserService } from 'services/user.service';
   templateUrl: './blog-admin-navbar.component.html',
 })
 export class BlogAdminNavbarComponent implements OnInit {
-  profilePictureDataUrl: string;
-  username: string;
-  profileUrl: string;
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  profilePicturePngDataUrl!: string;
+  profilePictureWebpDataUrl!: string;
+  profileUrl!: string;
+  username!: string | null;
+  logoWebpImageSrc!: string;
+  logoPngImageSrc!: string;
   PAGES_REGISTERED_WITH_FRONTEND = (
     AppConstants.PAGES_REGISTERED_WITH_FRONTEND);
+
   profileDropdownIsActive: boolean = false;
-  logoWebpImageSrc: string;
-  logoPngImageSrc: string;
 
   constructor(
     private urlInterpolationService: UrlInterpolationService,
@@ -52,24 +57,23 @@ export class BlogAdminNavbarComponent implements OnInit {
     return this.profileDropdownIsActive = false;
   }
 
-  async getProfileImageDataAsync(): Promise<void> {
-    let dataUrl = await this.userService.getProfileImageDataUrlAsync();
-    this.profilePictureDataUrl = decodeURIComponent(dataUrl);
-  }
-
   async getUserInfoAsync(): Promise<void> {
     const userInfo = await this.userService.getUserInfoAsync();
-
     this.username = userInfo.getUsername();
+
+    if (this.username === null) {
+      throw new Error('Cannot fetch username.');
+    }
     this.profileUrl = (
       this.urlInterpolationService.interpolateUrl(
         '/profile/<username>', {
           username: this.username
         }));
+    [this.profilePicturePngDataUrl, this.profilePictureWebpDataUrl] = (
+      this.userService.getProfileImageDataUrl(this.username));
   }
 
   ngOnInit(): void {
-    this.getProfileImageDataAsync();
     this.getUserInfoAsync();
 
     this.logoPngImageSrc = this.urlInterpolationService.getStaticImageUrl(

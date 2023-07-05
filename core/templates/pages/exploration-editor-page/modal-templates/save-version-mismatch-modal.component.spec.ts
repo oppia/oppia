@@ -17,7 +17,7 @@
  */
 
 import { Component, NO_ERRORS_SCHEMA } from '@angular/core';
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
 
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { SaveVersionMismatchModalComponent } from './save-version-mismatch-modal.component';
@@ -57,9 +57,8 @@ class MockWindowRef {
         if (this._hashChange === null) {
           return;
         }
-        this._hashChange();
       },
-      reload: (val) => val
+      reload: (val: string) => val
     },
     get onhashchange() {
       return this.location._hashChange;
@@ -69,6 +68,7 @@ class MockWindowRef {
       this.location._hashChange = val;
     }
   };
+
   get nativeWindow() {
     return this._window;
   }
@@ -86,6 +86,8 @@ describe('Save Version Mismatch Modal Component', () => {
   const lostChanges = [{
     cmd: 'add_state',
     state_name: 'State name',
+    content_id_for_state_content: 'content_0',
+    content_id_for_default_outcome: 'default_outcome_1'
   } as unknown as LostChange];
 
   let component: SaveVersionMismatchModalComponent;
@@ -129,22 +131,27 @@ describe('Save Version Mismatch Modal Component', () => {
   });
 
   it('should remove exploration draft from local storage when modal is closed',
-    () => {
+    fakeAsync(() => {
       const reloadSpy = jasmine.createSpy('reload');
       spyOnProperty(windowRef, 'nativeWindow').and.returnValue({
         location: {
-          reload: reloadSpy
-        }
+          _hash: '',
+          _hashChange: null,
+          hash: '',
+          reload: reloadSpy,
+        },
+        onhashchange: null,
       });
 
       component.discardChanges();
+      tick(component.MSECS_TO_REFRESH);
       fixture.detectChanges();
 
       waitForAsync(() => {
         expect(explorationDataService.discardDraftAsync).toHaveBeenCalled();
         expect(reloadSpy).toHaveBeenCalled();
       });
-    });
+    }));
 
   it('should contain correct modal header', () => {
     const modalHeader =
@@ -190,8 +197,12 @@ describe('Save Version Mismatch Modal Component', () => {
     const reloadSpy = jasmine.createSpy('reload');
     spyOnProperty(windowRef, 'nativeWindow').and.returnValue({
       location: {
-        reload: reloadSpy
-      }
+        _hash: '',
+        _hashChange: null,
+        hash: '',
+        reload: reloadSpy,
+      },
+      onhashchange: null,
     });
     spyOn(document, 'createElement').and.returnValue(spyObj);
     component.hasLostChanges = true;

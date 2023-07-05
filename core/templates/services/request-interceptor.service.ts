@@ -17,48 +17,12 @@
  */
 
 import { from, Observable } from 'rxjs';
-import { HttpRequest, HttpInterceptor,
-  HttpEvent, HttpHandler } from '@angular/common/http';
+// eslint-disable-next-line oppia/disallow-httpclient
+import { HttpRequest, HttpInterceptor, HttpEvent, HttpHandler } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { switchMap } from 'rxjs/operators';
 import { CsrfTokenService } from './csrf-token.service';
 
-@Injectable({
-  providedIn: 'root'
-})
-export class MockCsrfTokenService {
-  // 'tokenPromise' will be null when token is not initialized .
-  tokenPromise: PromiseLike<string> | null = null;
-
-  initializeToken(): void {
-    if (this.tokenPromise !== null) {
-      throw new Error('Token request has already been made');
-    }
-    // TODO(#8035): Remove the use of $.ajax and hence the ts-ignore
-    // in csrf-token.service.spec.ts once all the services are migrated
-    // We use jQuery here instead of Angular's $http, since the latter creates
-    // a circular dependency.
-    this.tokenPromise = $.ajax({
-      url: '/csrfhandler',
-      type: 'GET',
-      dataType: 'text',
-      dataFilter: function(data: string) {
-        // Remove the protective XSSI (cross-site scripting inclusion) prefix.
-        let actualData = data.substring(5);
-        return JSON.parse(actualData);
-      },
-    }).then(function(response: {token: string}) {
-      return response.token;
-    });
-  }
-
-  getTokenAsync(): PromiseLike<string> {
-    if (this.tokenPromise === null) {
-      throw new Error('Token needs to be initialized');
-    }
-    return this.tokenPromise;
-  }
-}
 
 @Injectable({
   providedIn: 'root'
@@ -71,6 +35,10 @@ export class RequestInterceptor implements HttpInterceptor {
     var csrf = this.csrf;
     try {
       csrf.initializeToken();
+    // We use unknown type because we are unsure of the type of error
+    // that was thrown. Since the catch block cannot identify the
+    // specific type of error, we are unable to further optimise the
+    // code by introducing more types of errors.
     } catch (e: unknown) {
       if (
         e instanceof Error &&
@@ -79,6 +47,8 @@ export class RequestInterceptor implements HttpInterceptor {
         throw e;
       }
     }
+
+    RequestInterceptor.checkForNullParams(request);
 
     if (request.body) {
       return from(this.csrf.getTokenAsync())
@@ -117,5 +87,19 @@ export class RequestInterceptor implements HttpInterceptor {
     } else {
       return next.handle(request);
     }
+  }
+
+  private static checkForNullParams(request: HttpRequest<FormData>): void {
+    // We only disallow null params for GET and DELETE requests.
+    if (request.method !== 'GET' && request.method !== 'DELETE') {
+      return;
+    }
+    request.params.keys().forEach((key: string) => {
+      request.params.getAll(key)?.forEach((value: string) => {
+        if (value === 'null' || value === 'None') {
+          throw new Error('Cannot supply params with value "None" or "null".');
+        }
+      });
+    });
   }
 }

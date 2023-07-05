@@ -24,7 +24,7 @@ import { SubtopicViewerBackendApiService } from
   'domain/subtopic_viewer/subtopic-viewer-backend-api.service';
 
 describe('Subtopic viewer backend API service', () => {
-  let subtopicViewerBackendApiService: SubtopicViewerBackendApiService = null;
+  let subtopicViewerBackendApiService: SubtopicViewerBackendApiService;
   let httpTestingController: HttpTestingController;
   // Sample subtopic page contents object returnable from the backend.
   let sampleDataResults = {

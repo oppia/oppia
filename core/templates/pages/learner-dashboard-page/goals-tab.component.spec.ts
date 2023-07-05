@@ -33,11 +33,11 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 
 class MockRemoveActivityNgbModalRef {
-  componentInstance: {
+  componentInstance = {
     sectionNameI18nId: null,
     subsectionName: null,
     activityId: null,
-    activityTitle: null
+    activityTitle: null,
   };
 }
 
@@ -108,7 +108,12 @@ describe('Goals tab Component', () => {
       outline: 'Outline',
       exploration_id: null,
       outline_is_finalized: false,
-      thumbnail_bg_color: '#a33f40'
+      thumbnail_bg_color: '#a33f40',
+      status: 'Published',
+      planned_publication_date_msecs: 100,
+      last_modified_msecs: 100,
+      first_publication_date_msecs: 200,
+      unpublishing_reason: null
     };
     const learnerTopicSummaryBackendDict1 = {
       id: 'sample_topic_id',
@@ -289,7 +294,7 @@ describe('Goals tab Component', () => {
   it('should toggle story', () => {
     component.currentGoalsStoryIsShown = [true];
 
-    component.toggleStory('0');
+    component.toggleStory(0);
     fixture.detectChanges();
 
     expect(component.currentGoalsStoryIsShown[0]).toEqual(false);
@@ -314,7 +319,6 @@ describe('Goals tab Component', () => {
     component.topicIdsInCurrentGoals = ['1', '2', '3'];
 
     const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
-      setTimeout(opt.beforeDismiss);
       return (
         { componentInstance: MockRemoveActivityNgbModalRef,
           result: Promise.resolve('success')
@@ -338,5 +342,32 @@ describe('Goals tab Component', () => {
     fixture.detectChanges();
 
     expect(urlSpy).toHaveBeenCalled();
+  });
+
+  it('should correctly show and hide the dropdown', () => {
+    for (let i = 0; i < component.currentGoals.length; i++) {
+      component.toggleThreeDotsDropdown(i);
+      expect(component.showThreeDotsDropdown[i]).toBe(true);
+
+      component.toggleThreeDotsDropdown(i);
+      expect(component.showThreeDotsDropdown[i]).toBe(false);
+
+      component.toggleThreeDotsDropdown(i);
+      expect(component.showThreeDotsDropdown[i]).toBe(true);
+
+      let fakeClickAwayEvent = new MouseEvent('click');
+      Object.defineProperty(
+        fakeClickAwayEvent,
+        'target',
+        {value: document.createElement('div')});
+      component.onDocumentClick(fakeClickAwayEvent);
+      fixture.detectChanges();
+      expect(component.showThreeDotsDropdown[i]).toBe(false);
+
+      // Three dots are not shown when no goals are present.
+      component.onDocumentClick(fakeClickAwayEvent);
+      fixture.detectChanges();
+      expect(component.showThreeDotsDropdown[i]).toBe(false);
+    }
   });
 });

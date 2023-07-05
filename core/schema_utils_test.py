@@ -32,6 +32,8 @@ SCHEMA_KEY_ITEMS = schema_utils.SCHEMA_KEY_ITEMS
 SCHEMA_KEY_LEN = schema_utils.SCHEMA_KEY_LEN
 SCHEMA_KEY_PROPERTIES = schema_utils.SCHEMA_KEY_PROPERTIES
 SCHEMA_KEY_TYPE = schema_utils.SCHEMA_KEY_TYPE
+SCHEMA_KEY_KEYS = schema_utils.SCHEMA_KEY_KEYS
+SCHEMA_KEY_VALUES = schema_utils.SCHEMA_KEY_VALUES
 SCHEMA_KEY_POST_NORMALIZERS = schema_utils.SCHEMA_KEY_POST_NORMALIZERS
 SCHEMA_KEY_CHOICES = schema_utils.SCHEMA_KEY_CHOICES
 SCHEMA_KEY_NAME = schema_utils.SCHEMA_KEY_NAME
@@ -62,6 +64,8 @@ SCHEMA_TYPE_BOOL = schema_utils.SCHEMA_TYPE_BOOL
 # in the relevant extensions/objects/models/objects.py class.
 SCHEMA_TYPE_CUSTOM = schema_utils.SCHEMA_TYPE_CUSTOM
 SCHEMA_TYPE_DICT = schema_utils.SCHEMA_TYPE_DICT
+SCHEMA_TYPE_DICT_WITH_VARIABLE_NO_OF_KEYS = (
+    schema_utils.SCHEMA_TYPE_DICT_WITH_VARIABLE_NO_OF_KEYS)
 SCHEMA_TYPE_FLOAT = schema_utils.SCHEMA_TYPE_FLOAT
 SCHEMA_TYPE_HTML = schema_utils.SCHEMA_TYPE_HTML
 SCHEMA_TYPE_INT = schema_utils.SCHEMA_TYPE_INT
@@ -73,20 +77,22 @@ SCHEMA_TYPE_OBJECT_DICT = schema_utils.SCHEMA_TYPE_OBJECT_DICT
 ALLOWED_SCHEMA_TYPES = [
     SCHEMA_TYPE_BOOL, SCHEMA_TYPE_CUSTOM, SCHEMA_TYPE_DICT, SCHEMA_TYPE_FLOAT,
     SCHEMA_TYPE_HTML, SCHEMA_TYPE_INT, SCHEMA_TYPE_LIST, SCHEMA_TYPE_BASESTRING,
-    SCHEMA_TYPE_UNICODE, SCHEMA_TYPE_UNICODE_OR_NONE, SCHEMA_TYPE_OBJECT_DICT]
+    SCHEMA_TYPE_UNICODE, SCHEMA_TYPE_UNICODE_OR_NONE, SCHEMA_TYPE_OBJECT_DICT,
+    SCHEMA_TYPE_DICT_WITH_VARIABLE_NO_OF_KEYS]
 ALLOWED_CUSTOM_OBJ_TYPES = [
     'Filepath', 'MathExpressionContent', 'MusicPhrase',
     'ParameterName', 'SanitizedUrl', 'Graph', 'ImageWithRegions',
     'ListOfTabs', 'SkillSelector', 'SubtitledHtml', 'SubtitledUnicode',
-    'SvgFilename', 'CustomOskLetters', 'PositiveInt']
+    'SvgFilename', 'AllowedVariables', 'PositiveInt']
 
 # Schemas for the UI config for the various types. All of these configuration
 # options are optional additions to the schema, and, if omitted, should not
 # result in any errors.
 # Note to developers: please keep this in sync with
 #     https://github.com/oppia/oppia/wiki/Schema-Based-Forms
-# The following types have recurive type definition, and currently mypy does
-# not support it, hence we are using type Any here.
+# Here we use type Any because the following types have recursive type
+# definition, and currently mypy does not support it, hence we are using
+# type Any here.
 # See - https://github.com/python/mypy/issues/731
 UI_CONFIG_SPECS: Dict[str, Dict[str, Any]] = {
     SCHEMA_TYPE_BOOL: {},
@@ -121,16 +127,18 @@ UI_CONFIG_SPECS: Dict[str, Dict[str, Any]] = {
         'placeholder': {
             'type': SCHEMA_TYPE_UNICODE,
         },
-    },
+    }
 }
 
 # Schemas for validators for the various types.
-# The following types have recurive type definition, and currently mypy does
-# not support it, hence we are using type Any here.
+# Here we use type Any because the following types have recursive type
+# definition, and currently mypy does not support it, hence we are
+# using type Any here.
 # See - https://github.com/python/mypy/issues/731
 VALIDATOR_SPECS: Dict[str, Dict[str, Any]] = {
     SCHEMA_TYPE_BOOL: {},
     SCHEMA_TYPE_DICT: {},
+    SCHEMA_TYPE_DICT_WITH_VARIABLE_NO_OF_KEYS: {},
     SCHEMA_TYPE_FLOAT: {
         'is_at_least': {
             'min_value': {
@@ -175,7 +183,8 @@ VALIDATOR_SPECS: Dict[str, Dict[str, Any]] = {
                 }],
             }
         },
-        'is_uniquified': {}
+        'is_uniquified': {},
+        'has_unique_subtitled_contents': {}
     },
     SCHEMA_TYPE_UNICODE: {
         'matches_regex': {
@@ -211,11 +220,19 @@ VALIDATOR_SPECS: Dict[str, Dict[str, Any]] = {
             }
         }
     },
+    SCHEMA_TYPE_CUSTOM: {
+        'has_subtitled_html_non_empty': {},
+        'has_expected_subtitled_content_length': {
+            'max_value': {
+                'type': SCHEMA_TYPE_INT
+            }
+        }
+    }
 }
 
 
-# The type of `validator` is Dict[str, Any] here because its values represent
-# objects for normalization, and they can have any type.
+# Here we use type Any because the argument `validator` represents the object
+# to be normalized, and that object can be of any type.
 def _validate_ui_config(obj_type: str, ui_config: Dict[str, Any]) -> None:
     """Validates the value of a UI configuration.
 
@@ -236,8 +253,8 @@ def _validate_ui_config(obj_type: str, ui_config: Dict[str, Any]) -> None:
             value, reference_dict[key])
 
 
-# The type of `validator` is Dict[str, Any] here because its values represent
-# objects for normalization, and they can have any type.
+# Here we use type Any because the argument `validator` represents the object
+# to be normalized, and that object can be of any type.
 def _validate_validator(obj_type: str, validator: Dict[str, Any]) -> None:
     """Validates the value of a 'validator' field.
 
@@ -271,7 +288,7 @@ def _validate_validator(obj_type: str, validator: Dict[str, Any]) -> None:
         try:
             schema_utils.normalize_against_schema(value, schema)
         except Exception as e:
-            raise AssertionError(e)
+            raise AssertionError(e) from e
 
     # Check that the id corresponds to a valid normalizer function.
     validator_fn = schema_utils.get_validator(validator['id'])
@@ -286,9 +303,9 @@ def _validate_validator(obj_type: str, validator: Dict[str, Any]) -> None:
                     set(customization_keys + ['obj']))))
 
 
-# Here the type chosen for `dict_to_check` is Dict[str, Any] because here we are
-# only concerned about the keys of the dictionary, not its values. Using Any for
-# dictionary values helps us achieve that.
+# Here we use type Any because here we are only concerned about the keys
+# of the 'dict_to_check' dictionary, not its values. Using Any for dictionary
+# values helps us achieve that.
 def _validate_dict_keys(
         dict_to_check: Dict[str, Any],
         required_keys: List[str],
@@ -312,8 +329,8 @@ def _validate_dict_keys(
         'Extra keys: %s' % dict_to_check)
 
 
-# The type Dict[str, Any] is used as type for schema because it can have a
-# recursive structure and mypy doesn't support recursive type currently.
+# Here we use type Any because schema can have a recursive structure and
+# mypy doesn't support recursive type currently.
 # See: https://github.com/python/mypy/issues/731
 def validate_schema(schema: Dict[str, Any]) -> None:
     """Validates a schema.
@@ -352,7 +369,7 @@ def validate_schema(schema: Dict[str, Any]) -> None:
         _validate_dict_keys(
             schema,
             [SCHEMA_KEY_TYPE, SCHEMA_KEY_OBJ_TYPE],
-            [SCHEMA_KEY_REPLACEMENT_UI_CONFIG])
+            [SCHEMA_KEY_REPLACEMENT_UI_CONFIG, SCHEMA_KEY_VALIDATORS])
         assert schema[SCHEMA_KEY_OBJ_TYPE] in ALLOWED_CUSTOM_OBJ_TYPES, schema
     elif schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_LIST:
         _validate_dict_keys(
@@ -388,6 +405,24 @@ def validate_schema(schema: Dict[str, Any]) -> None:
                     prop[SCHEMA_KEY_DESCRIPTION], str), (
                         'Expected %s, got %s' % (
                             str, prop[SCHEMA_KEY_DESCRIPTION]))
+    elif schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_DICT_WITH_VARIABLE_NO_OF_KEYS:
+        _validate_dict_keys(
+            schema,
+            [SCHEMA_KEY_TYPE, SCHEMA_KEY_KEYS, SCHEMA_KEY_VALUES],
+            OPTIONAL_SCHEMA_KEYS
+        )
+        items = [SCHEMA_KEY_VALUES, SCHEMA_KEY_KEYS]
+        for item in items:
+            assert isinstance(schema[item], dict), (
+                'Expected dict, got %s' % (schema[item])
+            )
+            _validate_dict_keys(
+                schema[item],
+                [SCHEMA_KEY_SCHEMA],
+                OPTIONAL_SCHEMA_KEYS
+            )
+            schema_item = schema[item]
+            validate_schema(schema_item[SCHEMA_KEY_SCHEMA])
     elif schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_OBJECT_DICT:
         _validate_dict_keys(
             schema,
@@ -446,20 +481,18 @@ class SchemaValidationUnitTests(test_utils.GenericTestBase):
         }]
     }
 
-    # The following types have recurive type definition, and currently mypy does
-    # not support it, hence we are using type Any here.
-    # See - https://github.com/python/mypy/issues/731
-    GLOBAL_VALIDATORS: List[Dict[str, Any]] = [{
+    GLOBAL_VALIDATORS: List[Dict[str, str]] = [{
         'id': 'does_not_contain_email'
     }]
 
-    # We are only concerned with dictionary keys here and the method should work
-    # regardless of dictionary value type, hence using type Any for it.
-    def arbitary_method(self, obj: Dict[str, Any]) -> None:
+    def arbitary_method(self, obj: Dict[str, str]) -> None:
         """Only required for testing.
 
         Args:
             obj: dict. Argument which needs to be validated.
+
+        Raises:
+            Exception. Given argument is missing 'any_arg'.
         """
         if 'any_arg' not in obj:
             raise Exception('Missing \'any_arg\'.')
@@ -538,6 +571,32 @@ class SchemaValidationUnitTests(test_utils.GenericTestBase):
             ),
             (
                 {
+                    'type': 'variable_keys_dict',
+                    'keys': 1,
+                    'values': {
+                        'schema': {
+                            'type': 'basestring'
+                        }
+                    }
+                },
+                'Expected dict, got 1'
+            ),
+            (
+                {
+                    'type': 'variable_keys_dict',
+                    'fake_arg': 'value',
+                    'values': {
+                        'schema': {
+                            'type': 'basestring'
+                        }
+                    }
+                },
+                'Missing keys: {\'type\': \'variable_keys_dict\', '
+                '\'fake_arg\': \'value\', \'values\': {\'schema\': '
+                '{\'type\': \'basestring\'}}}'
+            ),
+            (
+                {
                     'type': 'unicode',
                     'validators': [{
                         'id': 'fake_validator',
@@ -599,8 +658,9 @@ class SchemaValidationUnitTests(test_utils.GenericTestBase):
             )
         ]
 
-        # The following types have recurive type definition, and currently mypy
-        # does not support it, hence we are using type Any here.
+        # Here we use type Any because the following types have recursive type
+        # definition, and currently mypy does not support it, hence we are using
+        # type Any here.
         # See - https://github.com/python/mypy/issues/731
         valid_schemas: List[Dict[str, Any]] = [{
             'type': 'float'
@@ -614,6 +674,18 @@ class SchemaValidationUnitTests(test_utils.GenericTestBase):
                     'type': 'unicode'
                 }
             }]
+        }, {
+            'type': 'variable_keys_dict',
+            'keys': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            },
+            'values': {
+                'schema': {
+                    'type': 'float'
+                }
+            }
         }, {
             'type': 'list',
             'items': {
@@ -659,14 +731,17 @@ class SchemaValidationUnitTests(test_utils.GenericTestBase):
         for schema in valid_schemas:
             validate_schema(schema)
         for schemas, error_msg in invalid_schemas_with_error_messages:
-            with self.assertRaisesRegexp((AssertionError, KeyError), error_msg): # type: ignore[no-untyped-call]
+            # TODO(#13059): Here we use MyPy ignore because after we fully type
+            # the codebase we plan to get rid of the tests that intentionally
+            # test wrong inputs that we can normally catch by typing.
+            with self.assertRaisesRegex((AssertionError, KeyError), error_msg):
                 validate_schema(schemas) # type: ignore[arg-type]
 
     def test_normalize_against_schema_raises_exception(self) -> None:
         """Tests if normalize against schema raises exception
         for invalid key.
         """
-        with self.assertRaisesRegexp(Exception, 'Invalid schema type: invalid'): # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(Exception, 'Invalid schema type: invalid'):
             schema = {SCHEMA_KEY_TYPE: 'invalid'}
             schema_utils.normalize_against_schema('obj', schema)
 
@@ -704,7 +779,7 @@ class SchemaValidationUnitTests(test_utils.GenericTestBase):
         """Tests if class method 'get' in _Validator raises exception
         for invalid validator id.
         """
-        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception,
             'Invalid validator id: some invalid validator method name'):
             schema_utils.get_validator('some invalid validator method name')
@@ -717,7 +792,8 @@ class SchemaValidationUnitTests(test_utils.GenericTestBase):
             'is_valid_algebraic_expression')
 
         self.assertTrue(is_valid_algebraic_expression('a+b*2'))
-        self.assertFalse(is_valid_algebraic_expression('3+4/2'))
+        self.assertTrue(is_valid_algebraic_expression('3+4/2'))
+        self.assertFalse(is_valid_algebraic_expression('3+4/a*'))
 
     def test_is_valid_numeric_expression_validator(self) -> None:
         """Tests for the is_valid_numeric_expression static method with
@@ -792,7 +868,7 @@ class SchemaValidationUnitTests(test_utils.GenericTestBase):
         self.assertFalse(validate_url_fragment('!@#$%^&*()_+='))
 
     def test_global_validators_raise_exception_when_error_in_dict(self) -> None:
-        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             AssertionError,
             r'^Validation failed: does_not_contain_email .* email@email.com$'
         ):
@@ -806,7 +882,7 @@ class SchemaValidationUnitTests(test_utils.GenericTestBase):
             )
 
     def test_global_validators_raise_exception_when_error_in_list(self) -> None:
-        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             AssertionError,
             r'^Validation failed: does_not_contain_email .* email2@email.com$'
         ):
@@ -879,6 +955,52 @@ class SchemaValidationUnitTests(test_utils.GenericTestBase):
         self.assertFalse(is_valid_username_string('oppia'))
         self.assertFalse(is_valid_username_string(''))
 
+    def test_has_expected_subtitled_content_length(self) -> None:
+        """Checks whether the given subtitled content does not exceed the
+        given length.
+
+        Returns:
+            bool. A boolean value representing whether the content matches
+            the given max length.
+        """
+        has_expected_subtitled_content_length = (
+            schema_utils.get_validator('has_expected_subtitled_content_length'))
+
+        obj = {
+            'content_id': 'id',
+            'unicode_str': 'Continueeeeeeeeeeeeeeee'
+        }
+        self.assertFalse(has_expected_subtitled_content_length(obj, 20))
+
+        obj['unicode_str'] = 'Continue'
+        self.assertTrue(has_expected_subtitled_content_length(obj, 20))
+
+    def test_has_unique_subtitled_contents(self) -> None:
+        """Checks whether the subtitled html content has unique value or not.
+
+        Returns:
+            bool. A boolean value representing whether the content has unique
+            value.
+        """
+        has_unique_subtitled_contents = (
+            schema_utils.get_validator('has_unique_subtitled_contents')
+        )
+
+        obj_list = [
+            {
+                'content_id': 'id_1',
+                'html': '<p>1</p>'
+            },
+            {
+                'content_id': 'id_2',
+                'html': '<p>1</p>'
+            }
+        ]
+        self.assertFalse(has_unique_subtitled_contents(obj_list))
+
+        obj_list[1]['html'] = '<p>2</p>'
+        self.assertTrue(has_unique_subtitled_contents(obj_list))
+
     def test_has_length(self) -> None:
         """Tests if static method has_length returns true iff
         given list has length of the given value.
@@ -894,8 +1016,8 @@ class SchemaValidationUnitTests(test_utils.GenericTestBase):
 class SchemaNormalizationUnitTests(test_utils.GenericTestBase):
     """Test schema-based normalization of objects."""
 
-    # `schema` has recursive type definition, and currently mypy does not
-    # support it, hence we are using type Any here.
+    # Here we use type Any because `schema` has recursive type definition,
+    # and currently mypy does not support it, hence we are using type Any here.
     # See - https://github.com/python/mypy/issues/731
     # `mappings` has type Tuple[Any, Any] because objects for normalization and
     # normalized objects can have any type.
@@ -928,7 +1050,7 @@ class SchemaNormalizationUnitTests(test_utils.GenericTestBase):
                 schema_utils.normalize_against_schema(raw_value, schema),
                 expected_value)
         for value, error_msg in invalid_items_with_error_messages:
-            with self.assertRaisesRegexp(Exception, error_msg): # type: ignore[no-untyped-call]
+            with self.assertRaisesRegex(Exception, error_msg):
                 schema_utils.normalize_against_schema(value, schema)
 
     def test_float_schema(self) -> None:
@@ -960,9 +1082,7 @@ class SchemaNormalizationUnitTests(test_utils.GenericTestBase):
             'type': schema_utils.SCHEMA_TYPE_UNICODE_OR_NONE,
         }
         mappings = [('a', 'a'), ('', ''), (b'bytes', 'bytes'), (None, None)]
-        # Type Any used because its passed as an argument to check_normalization
-        # method defined above.
-        invalid_values_with_error_messages: List[Tuple[List[Any], str]] = [
+        invalid_values_with_error_messages: List[Tuple[List[str], str]] = [
             ([], r'Expected unicode string or None, received'),
         ]
         self.check_normalization(
@@ -1163,6 +1283,55 @@ class SchemaNormalizationUnitTests(test_utils.GenericTestBase):
         self.check_normalization(
             schema, mappings, invalid_values_with_error_messages)
 
+    def test_dict_with_variable_key_schema(self) -> None:
+        schema = {
+            'type': schema_utils.SCHEMA_TYPE_DICT_WITH_VARIABLE_NO_OF_KEYS,
+            'keys': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            },
+            'values': {
+                'schema': {
+                    'type': schema_utils.SCHEMA_TYPE_LIST,
+                    'items': {
+                        'type': schema_utils.SCHEMA_TYPE_INT
+                    },
+                    'len': 2
+                }
+            }
+        }
+
+        mappings = [({
+                'skills_id1': [1.2, 3],
+                'skills_id2': [2.0, 0]
+            }, {
+                'skills_id1': [1, 3],
+                'skills_id2': [2, 0]
+            }), ({
+                'skills_id1': ['45', 2],
+                'skills_id2': [23, 3]
+            }, {
+                'skills_id1': [45, 2],
+                'skills_id2': [23, 3]
+            }), ({
+                'skills_id1': [1, 2],
+                'skills_id2': [2, 3]
+            }, {
+                'skills_id1': [1, 2],
+                'skills_id2': [2, 3]
+            })]
+        invalid_values_with_error_messages = [
+            ([1, 2], re.escape('Expected dict, received [1, 2]')),
+            ({1: 2, 'topic_id1': 3}, 'Expected string, received 1'),
+            ({'topics_id1': 1}, 'Expected list, received 1'),
+            (None, 'Expected dict, received None'),
+            ({'skill_id1': [45, 2, 34]}, 'Expected length of 2 got 3')
+        ]
+
+        self.check_normalization(
+            schema, mappings, invalid_values_with_error_messages)
+
     def test_string_schema(self) -> None:
         schema = {
             'type': schema_utils.SCHEMA_TYPE_BASESTRING,
@@ -1196,29 +1365,6 @@ class SchemaNormalizationUnitTests(test_utils.GenericTestBase):
                 'arg_a': 'arbitary_argument_a'
             }, 'Missing arg_b in argument.')
         ]
-
-        self.check_normalization(
-            schema, mappings, invalid_values_with_error_messages)
-
-    def test_object_dict_schema_with_object_class_key(self) -> None:
-        schema = {
-            'type': SCHEMA_TYPE_OBJECT_DICT,
-            'object_class': ValidateClassForTesting
-        }
-
-        mappings = [
-            ({
-                'arg_a': 'arbitary_argument_a',
-                'arg_b': 'arbitary_argument_b'
-            }, {
-                'arg_a': 'arbitary_argument_a',
-                'arg_b': 'arbitary_argument_b'
-            })
-        ]
-
-        # Type Any used because its passed as an argument to check_normalization
-        # method defined above.
-        invalid_values_with_error_messages: List[Tuple[Any, str]] = []
 
         self.check_normalization(
             schema, mappings, invalid_values_with_error_messages)
@@ -1279,12 +1425,12 @@ class SchemaNormalizationUnitTests(test_utils.GenericTestBase):
         """Tests if class method get of Normalizers raises exception when given
         an invalid normalizer id.
         """
-        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception,
             'Invalid normalizer id: some invalid normalizer method name'):
             schema_utils.Normalizers.get('some invalid normalizer method name')
 
-        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'Invalid normalizer id: normalize_space'):
             # Test substring of an actual id.
             schema_utils.Normalizers.get('normalize_space')
@@ -1318,31 +1464,57 @@ class SchemaNormalizationUnitTests(test_utils.GenericTestBase):
 
         # Raise AssertionError if string does not start with http:// or
         # https://.
-        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             AssertionError,
             'Invalid URL: Sanitized URL should start with \'http://\' or'
             ' \'https://\'; received oppia.org'):
             sanitize_url('oppia.org')
 
-        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             AssertionError,
             'Invalid URL: Sanitized URL should start with \'http://\' or'
             ' \'https://\'; received www.oppia.org'):
             sanitize_url('www.oppia.org')
 
 
-# We are only concerned with dictionary keys here and the method should work
-# regardless of dictionary value type, hence using type Any for it.
-def validation_method_for_testing(obj: Dict[str, Any]) -> None:
+class ValidateArgumentHavingSpecificClass(test_utils.GenericTestBase):
+    """Test class is to validate the arguments which have a corresponding domain
+    class representation in the codebase. This test class is written uniquely
+    because it returns an object which is different from all other cases.
+    """
+
+    def test_object_dict_schema_with_object_class_key(self) -> None:
+        schema = {
+            'type': SCHEMA_TYPE_OBJECT_DICT,
+            'object_class': ValidateClassForTesting
+        }
+
+        sample_dict = {
+            'arg_a': 'arbitary_argument_a',
+            'arg_b': 'arbitary_argument_b'
+        }
+        arg1 = schema_utils.normalize_against_schema(sample_dict, schema)
+        arg2 = ValidateClassForTesting.from_dict(sample_dict)
+        self.assertEqual(arg1.arg_a, arg2.arg_a)
+
+
+def validation_method_for_testing(obj: Dict[str, str]) -> Dict[str, str]:
     """Method to test 'validation_method' key of schema.
 
     Args:
         obj: dict. Dictionary form of the argument.
+
+    Returns:
+        dict(str, str). Returns a dict value after validation.
+
+    Raises:
+        Exception. If any one argument is missing.
     """
     if 'arg_a' not in obj:
         raise Exception('Missing arg_a in argument.')
     if 'arg_b' not in obj:
         raise Exception('Missing arg_b in argument.')
+    return obj
 
 
 class ValidateClassForTesting:

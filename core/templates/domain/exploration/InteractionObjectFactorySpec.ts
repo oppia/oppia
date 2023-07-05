@@ -22,7 +22,7 @@ import { AnswerGroupObjectFactory, AnswerGroupBackendDict } from
   'domain/exploration/AnswerGroupObjectFactory';
 import { CamelCaseToHyphensPipe } from
   'filters/string-utility-filters/camel-case-to-hyphens.pipe';
-import { HintBackendDict, HintObjectFactory } from 'domain/exploration/HintObjectFactory';
+import { Hint, HintBackendDict } from 'domain/exploration/hint-object.model';
 import { InteractionObjectFactory, Interaction, InteractionBackendDict } from
   'domain/exploration/InteractionObjectFactory';
 import { OutcomeBackendDict, OutcomeObjectFactory } from
@@ -39,7 +39,6 @@ describe('Interaction object factory', () => {
   let iof: InteractionObjectFactory;
   let oof: OutcomeObjectFactory;
   let agof: AnswerGroupObjectFactory;
-  let hof: HintObjectFactory;
   let sof: SolutionObjectFactory;
   let answerGroupsDict: AnswerGroupBackendDict[];
   let defaultOutcomeDict: OutcomeBackendDict;
@@ -54,10 +53,10 @@ describe('Interaction object factory', () => {
     iof = TestBed.inject(InteractionObjectFactory);
     oof = TestBed.inject(OutcomeObjectFactory);
     agof = TestBed.inject(AnswerGroupObjectFactory);
-    hof = TestBed.inject(HintObjectFactory);
     sof = TestBed.inject(SolutionObjectFactory);
     defaultOutcomeDict = {
       dest: 'dest_default',
+      dest_if_really_stuck: null,
       feedback: {
         content_id: 'default_outcome',
         html: ''
@@ -71,6 +70,7 @@ describe('Interaction object factory', () => {
       rule_specs: [],
       outcome: {
         dest: 'dest_1',
+        dest_if_really_stuck: null,
         feedback: {
           content_id: 'outcome_1',
           html: ''
@@ -117,7 +117,10 @@ describe('Interaction object factory', () => {
             unicode_str: 'Enter text'
           }
         },
-        rows: { value: 1 }
+        rows: { value: 1 },
+        catchMisspellings: {
+          value: false
+        }
       },
       default_outcome: defaultOutcomeDict,
       hints: hintsDict,
@@ -136,6 +139,9 @@ describe('Interaction object factory', () => {
       },
       rows: {
         value: 1
+      },
+      catchMisspellings: {
+        value: false
       }
     });
   });
@@ -475,6 +481,7 @@ describe('Interaction object factory', () => {
       rule_specs: [],
       outcome: {
         dest: 'dest_3',
+        dest_if_really_stuck: null,
         feedback: {
           content_id: 'outcome_3',
           html: ''
@@ -491,6 +498,7 @@ describe('Interaction object factory', () => {
       rule_specs: [],
       outcome: {
         dest: 'dest_1',
+        dest_if_really_stuck: null,
         feedback: {
           content_id: 'outcome_1',
           html: ''
@@ -514,6 +522,7 @@ describe('Interaction object factory', () => {
 
     const newDefaultOutcomeDict = {
       dest: 'dest_default_new',
+      dest_if_really_stuck: null,
       feedback: {
         content_id: 'default_outcome_new',
         html: ''
@@ -527,6 +536,7 @@ describe('Interaction object factory', () => {
     expect(testInteraction.defaultOutcome).toEqual(
       oof.createFromBackendDict({
         dest: 'dest_default',
+        dest_if_really_stuck: null,
         feedback: {
           content_id: 'default_outcome',
           html: ''
@@ -553,7 +563,10 @@ describe('Interaction object factory', () => {
       placeholder: {
         value: new SubtitledUnicode('Enter text', 'ca_placeholder_0')
       },
-      rows: { value: 1 }
+      rows: { value: 1 },
+      catchMisspellings: {
+        value: false
+      }
     });
     testInteraction.setCustomizationArgs(newCustomizationArgs);
     expect(testInteraction.customizationArgs).toEqual(newCustomizationArgs);
@@ -593,10 +606,10 @@ describe('Interaction object factory', () => {
         content_id: 'content_id_new'
       }
     };
-    const newHint = hof.createFromBackendDict(newHintDict);
+    const newHint = Hint.createFromBackendDict(newHintDict);
     expect(testInteraction.hints).toEqual(hintsDict.map(
       (hintDict: HintBackendDict) => {
-        return hof.createFromBackendDict(hintDict);
+        return Hint.createFromBackendDict(hintDict);
       }
     ));
     testInteraction.setHints([newHint]);
@@ -610,6 +623,7 @@ describe('Interaction object factory', () => {
       rule_specs: [],
       outcome: {
         dest: 'dest_1_new',
+        dest_if_really_stuck: null,
         feedback: {
           content_id: 'outcome_1_new',
           html: ''
@@ -624,6 +638,7 @@ describe('Interaction object factory', () => {
     }];
     const newDefaultOutcome = {
       dest: 'dest_default_new',
+      dest_if_really_stuck: null,
       feedback: {
         content_id: 'default_outcome_new',
         html: ''
@@ -789,8 +804,11 @@ describe('Interaction object factory', () => {
         }]
       }
     };
-
-    expect(Interaction.getCustomizationArgContentIds(ca)).toEqual(
+    let contentIds = Interaction.getCustomizationArgContents(ca).map(
+      (content) => {
+        return content.contentId;
+      });
+    expect(contentIds).toEqual(
       ['ca_dummyCustArg_content_0', 'ca_dummyCustArg_content_1']);
   });
 
@@ -805,7 +823,7 @@ describe('Interaction object factory', () => {
         const caSpecs = InteractionSpecsConstants.INTERACTION_SPECS[
           interactionId].customization_arg_specs;
         caSpecs.forEach(
-          (caSpec: { name: string; 'default_value': Object; }) => {
+          (caSpec: { name: string; 'default_value': Object }) => {
             defaultCa[caSpec.name] = {value: caSpec.default_value};
           }
         );

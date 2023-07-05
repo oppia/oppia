@@ -22,14 +22,26 @@ import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 import { UrlService } from 'services/contextual/url.service';
 
+import resourceHashes from 'utility/hashes';
+const hashes = {
+  '/hash_test.html': 'ijklmopq',
+  '/path_test/hash_test.html': '123456789',
+  '/hash_test.min.js': 'zyx12345',
+  '/assets_test/hash_test.json': '987654321',
+  '/pages_test/hash_test.html': 'abcd12345',
+  '/images/hash_test.png': '98765fghij',
+  '/videos/hash_test.mp4': '12345cxz',
+  '/audio/hash_test.mp3': '12345abc',
+  '/interactions/interTest/static/interTest.png': '123654789'
+};
 describe('URL Interpolation Service', () => {
-  let hashes = require('hashes.json');
   let uis: UrlInterpolationService;
   let urlService: UrlService;
   let mockLocation: Pick<Location, 'origin'>;
   let _alertsService: AlertsService;
   let alertsObject: Record<'alertsService', AlertsService>;
   beforeEach(() => {
+    spyOnProperty(resourceHashes, 'hashes', 'get').and.returnValue(hashes);
     mockLocation = {
       origin: 'http://sample.com'
     };
@@ -81,7 +93,8 @@ describe('URL Interpolation Service', () => {
     expect(
       // This throws "Type 'string' is not assignable to type
       // 'InterpolationValuesType'." We need to suppress this error
-      // because of the need to test validations.
+      // because of the need to test validations. This is done because
+      // we need to test the validations of the interpolateUrl function.
       // @ts-ignore
       uis.interpolateUrl.bind(alertsObject, '/test_url/<param>', 'value')
     ).toThrowError(
@@ -90,7 +103,8 @@ describe('URL Interpolation Service', () => {
     expect(
       // This throws "Type 'string[]' is not assignable to type
       // 'InterpolationValuesType'." We need to suppress this error
-      // because of the need to test validations.
+      // because of the need to test validations. This is done because
+      // we need to test the validations of the interpolateUrl function.
       // @ts-ignore
       uis.interpolateUrl.bind(alertsObject, '/test_url/<param>', ['value'])
     ).toThrowError(
@@ -230,7 +244,8 @@ describe('URL Interpolation Service', () => {
   it('should throw an error for non-string parameters', () => {
     // This throws "Type 'number' is not assignable to type 'string'
     // ." We need to suppress this error because of the need to test
-    // validations on invalid parameters.
+    // validations on invalid parameters. The test is still valid because
+    // the error is thrown by the function.
     // @ts-ignore
     expect(uis.interpolateUrl.bind(uis, '/test_url/<page>', {
       page: 0
@@ -239,7 +254,8 @@ describe('URL Interpolation Service', () => {
       'but received: {page: 0}');
     // This throws "Type '{}' is not assignable to type 'string'
     // ." We need to suppress this error because of the need to test
-    // validations on invalid parameters.
+    // validations on invalid parameters. The test is still valid because
+    // the error is thrown by the function.
     // @ts-ignore
     expect(uis.interpolateUrl.bind(uis, '/test_url/<page>', {
       page: {}
@@ -248,7 +264,8 @@ describe('URL Interpolation Service', () => {
       'but received: {page: {}}');
     // This throws "Type '[]' is not assignable to type 'string'
     // ." We need to suppress this error because of the need to test
-    // validations on invalid parameters.
+    // validations on invalid parameters. The test is still valid because
+    // the error is thrown by the function.
     // @ts-ignore
     expect(uis.interpolateUrl.bind(uis, '/test_url/<page>', {
       page: []
@@ -257,7 +274,10 @@ describe('URL Interpolation Service', () => {
       'but received: {page: []}');
     // This throws "Type 'RegExp' is not assignable to type 'string'
     // ." We need to suppress this error because of the need to test
-    // validations on invalid parameters.
+    // validations on invalid parameters. The test is still valid because
+    // the error is thrown by the function. We need to suppress this error
+    // because of the need to test validations on invalid parameters. The
+    // test is still valid because the error is thrown by the function.
     // @ts-ignore
     expect(uis.interpolateUrl.bind(uis, '/test_url/<page>', {
       page: /abc/
@@ -274,6 +294,14 @@ describe('URL Interpolation Service', () => {
     expect(uis.getStaticImageUrl('/hash_test.png')).toBe(
       '/build/assets/images/hash_test.' + hashes['/images/hash_test.png'] +
         '.png');
+
+    expect(uis.getStaticAudioUrl('/test.mp3')).toBe(
+      '/build/assets/audio/test.mp3');
+    expect(uis.getStaticAudioUrl('/test_url/test.mp3')).toBe(
+      '/build/assets/audio/test_url/test.mp3');
+    expect(uis.getStaticAudioUrl('/hash_test.mp3')).toBe(
+      '/build/assets/audio/hash_test.' + hashes['/audio/hash_test.mp3'] +
+        '.mp3');
 
     expect(uis.getStaticVideoUrl('/test.mp4')).toBe(
       '/build/assets/videos/test.mp4');
@@ -326,6 +354,9 @@ describe('URL Interpolation Service', () => {
     expect(uis.getStaticImageUrl.bind(uis, '')).toThrowError(
       'Empty path passed in method.');
 
+    expect(uis.getStaticAudioUrl.bind(uis, '')).toThrowError(
+      'Empty path passed in method.');
+
     expect(uis.getStaticVideoUrl.bind(uis, '')).toThrowError(
       'Empty path passed in method.');
 
@@ -348,6 +379,12 @@ describe('URL Interpolation Service', () => {
         'Path must start with \'\/\': \'' + 'test_fail.png' + '\'.');
       expect(uis.getStaticImageUrl.bind(uis, 'test_url/fail.png')).toThrowError(
         'Path must start with \'\/\': \'' + 'test_url/fail.png' + '\'.');
+
+      expect(uis.getStaticAudioUrl.bind(uis, 'test_fail.mp3')).toThrowError(
+        'Path must start with \'\/\': \'' + 'test_fail.mp3' + '\'.');
+      expect(uis.getStaticAudioUrl.bind(uis, 'test_url/fail.mp3'))
+        .toThrowError(
+          'Path must start with \'\/\': \'' + 'test_url/fail.mp3' + '\'.');
 
       expect(uis.getStaticVideoUrl.bind(uis, 'test_fail.png'))
         .toThrowError(

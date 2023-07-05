@@ -22,13 +22,14 @@ import { TestBed } from '@angular/core/testing';
 import { CamelCaseToHyphensPipe } from
   'filters/string-utility-filters/camel-case-to-hyphens.pipe';
 import { ContextService } from 'services/context.service';
-import { ExplorationObjectFactory } from
+import { ExplorationBackendDict, ExplorationObjectFactory } from
   'domain/exploration/ExplorationObjectFactory';
 import { ExtractImageFilenamesFromModelService } from
   // eslint-disable-next-line max-len
   'pages/exploration-player-page/services/extract-image-filenames-from-model.service';
-import { ContentTranslationManagerService } from 'pages/exploration-player-page/services/content-translation-manager.service';
-import { SkillObjectFactory } from 'domain/skill/SkillObjectFactory';
+
+import { SkillBackendDict, SkillObjectFactory } from 'domain/skill/SkillObjectFactory';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 
 
 describe('Extracting Image file names in the state service', () => {
@@ -36,36 +37,31 @@ describe('Extracting Image file names in the state service', () => {
   let eof: ExplorationObjectFactory;
   let sof: SkillObjectFactory;
   let ecs: ContextService;
-  let ctms: ContentTranslationManagerService;
-  let explorationDict;
-  let ImageFilenamesInExploration;
-  let skillDict;
+  let explorationDict: ExplorationBackendDict;
+  let ImageFilenamesInExploration: { [x: string]: string[] };
+  let skillDict: SkillBackendDict;
   let expectedImageFilenamesInSkill: string[];
   beforeEach(() => {
     TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
       providers: [CamelCaseToHyphensPipe]
     });
     eof = TestBed.inject(ExplorationObjectFactory);
     ecs = TestBed.inject(ContextService);
     eifms = TestBed.inject(ExtractImageFilenamesFromModelService);
-    ctms = TestBed.inject(ContentTranslationManagerService);
     sof = TestBed.inject(SkillObjectFactory);
     spyOn(ecs, 'getExplorationId').and.returnValue('1');
-    spyOn(ctms, 'getTranslatedHtml').and.callFake(
-      (unusedWrittenTranslations, unusedLanguageCode, content) => {
-        return content.html;
-      });
 
     explorationDict = {
-      id: 1,
+      correctness_feedback_enabled: false,
+      draft_changes: [],
+      is_version_of_draft_valid: false,
+      language_code: 'en',
+      draft_change_list_id: 0,
       title: 'My Title',
-      category: 'Art',
-      objective: 'Your objective',
-      tags: [],
-      blurb: '',
-      author_notes: '',
-      states_schema_version: 15,
+      next_content_id_index: 3,
       init_state_name: 'Introduction',
+      auto_tts_enabled: false,
       states: {
         'State 1': {
           param_changes: [],
@@ -87,7 +83,11 @@ describe('Extracting Image file names in the state service', () => {
                 html: ''
               },
               dest: 'State 3',
-              param_changes: []
+              dest_if_really_stuck: null,
+              param_changes: [],
+              labelled_as_correct: false,
+              refresher_exploration_id: null,
+              missing_prerequisite_skill_id: null
             },
             confirmed_unclassified_answers: [],
             customization_args: {
@@ -103,16 +103,9 @@ describe('Extracting Image file names in the state service', () => {
             hints: []
           },
           linked_skill_id: null,
-          next_content_id_index: 1,
           solicit_answer_details: false,
-          written_translations: {
-            translations_mapping: {
-              content: {},
-              ca_buttonText_0: {},
-              default_outcome: {}
-            }
-          },
-          classifier_model_id: null
+          classifier_model_id: null,
+          card_is_checkpoint: false
         },
         'State 3': {
           param_changes: [],
@@ -140,15 +133,9 @@ describe('Extracting Image file names in the state service', () => {
             hints: []
           },
           linked_skill_id: null,
-          next_content_id_index: 0,
           solicit_answer_details: false,
-          written_translations: {
-            translations_mapping: {
-              content: {},
-              default_outcome: {}
-            }
-          },
-          classifier_model_id: null
+          classifier_model_id: null,
+          card_is_checkpoint: false
         },
         Introduction: {
           classifier_model_id: null,
@@ -169,10 +156,15 @@ describe('Extracting Image file names in the state service', () => {
             id: 'MultipleChoiceInput',
             default_outcome: {
               dest: 'Introduction',
+              dest_if_really_stuck: null,
               feedback: {
                 content_id: 'default_outcome',
                 html: 'Try Again!'
-              }
+              },
+              labelled_as_correct: false,
+              param_changes: [],
+              refresher_exploration_id: null,
+              missing_prerequisite_skill_id: null
             },
             confirmed_unclassified_answers: [],
             customization_args: {
@@ -193,9 +185,9 @@ describe('Extracting Image file names in the state service', () => {
             },
             answer_groups: [
               {
-                labelled_as_correct: false,
                 outcome: {
                   dest: 'State 4',
+                  dest_if_really_stuck: null,
                   feedback: {
                     content_id: 'feedback_1',
                     html: '<p>We are going to ItemSelection' +
@@ -204,46 +196,44 @@ describe('Extracting Image file names in the state service', () => {
                           '</oppia-noninteractive-image></p>'
                   },
                   param_changes: [],
-                  refresher_exploration_id: null
+                  refresher_exploration_id: null,
+                  missing_prerequisite_skill_id: null,
+                  labelled_as_correct: false
                 },
                 rule_specs: [{
                   rule_type: 'Equals',
                   inputs: {x: 0}
                 }],
+                tagged_skill_misconception_id: null,
+                training_data: []
               },
               {
-                labelled_as_correct: false,
                 outcome: {
                   dest: 'State 5',
+                  dest_if_really_stuck: null,
                   feedback: {
                     content_id: 'feedback_2',
                     html: "Let's go to state 5 ImageAndRegion"
                   },
                   param_changes: [],
-                  refresher_exploration_id: null
+                  refresher_exploration_id: null,
+                  missing_prerequisite_skill_id: null,
+                  labelled_as_correct: false
                 },
                 rule_specs: [{
                   rule_type: 'Equals',
                   inputs: {x: 1}
                 }],
+                tagged_skill_misconception_id: null,
+                training_data: []
               }
             ],
             hints: [],
             solution: null
           },
           linked_skill_id: null,
-          next_content_id_index: 5,
           solicit_answer_details: false,
-          written_translations: {
-            translations_mapping: {
-              content: {},
-              ca_choices_3: {},
-              ca_choices_4: {},
-              default_outcome: {},
-              feedback_1: {},
-              feedback_2: {}
-            }
-          }
+          card_is_checkpoint: false
         },
         'State 4': {
           param_changes: [],
@@ -272,9 +262,13 @@ describe('Extracting Image file names in the state service', () => {
                       '</oppia-noninteractive-image></p>'
               },
               dest: 'State 4',
-              param_changes: []
+              dest_if_really_stuck: null,
+              param_changes: [],
+              labelled_as_correct: false,
+              refresher_exploration_id: null,
+              missing_prerequisite_skill_id: null
             },
-            confirmed_unclassifies_answers: [],
+            confirmed_unclassified_answers: [],
             customization_args: {
               minAllowableSelectionCount: {
                 value: 1
@@ -300,15 +294,17 @@ describe('Extracting Image file names in the state service', () => {
             solution: null,
             answer_groups: [
               {
-                labelled_as_correct: false,
                 outcome: {
                   dest: 'State 6',
+                  dest_if_really_stuck: null,
                   feedback: {
                     content_id: 'feedback_1',
                     html: "It is choice number 1. Let's go to the Text Input"
                   },
                   param_changes: [],
-                  refresher_exploration_id: null
+                  refresher_exploration_id: null,
+                  labelled_as_correct: false,
+                  missing_prerequisite_skill_id: null
                 },
                 rule_specs: [{
                   rule_type: 'Equals',
@@ -320,17 +316,21 @@ describe('Extracting Image file names in the state service', () => {
                     ]
                   }
                 }],
+                tagged_skill_misconception_id: null,
+                training_data: []
               },
               {
-                labelled_as_correct: true,
                 outcome: {
                   dest: 'State 1',
+                  dest_if_really_stuck: null,
                   feedback: {
                     content_id: 'feedback_2',
                     html: 'It is choice number 2'
                   },
                   param_changes: [],
-                  refresher_exploration_id: null
+                  refresher_exploration_id: null,
+                  labelled_as_correct: true,
+                  missing_prerequisite_skill_id: null
                 },
                 rule_specs: [{
                   rule_type: 'Equals',
@@ -342,22 +342,15 @@ describe('Extracting Image file names in the state service', () => {
                     ]
                   }
                 }],
+                tagged_skill_misconception_id: null,
+                training_data: []
               }
             ]
           },
           linked_skill_id: null,
-          next_content_id_index: 5,
           solicit_answer_details: false,
-          written_translations: {
-            translations_mapping: {
-              content: {},
-              ca_choices_3: {},
-              ca_choices_4: {},
-              default_outcome: {},
-              feedback_1: {},
-              feedback_2: {}
-            }
-          }
+          classifier_model_id: null,
+          card_is_checkpoint: false
         },
         'State 5': {
           classifier_model_id: null,
@@ -382,94 +375,119 @@ describe('Extracting Image file names in the state service', () => {
             confirmed_unclassified_answers: [],
             default_outcome: {
               dest: 'State 5',
+              dest_if_really_stuck: null,
               feedback: {
                 content_id: 'content',
                 html: 'Try Again!'
-              }
+              },
+              param_changes: [],
+              refresher_exploration_id: null,
+              labelled_as_correct: true,
+              missing_prerequisite_skill_id: null
             },
             answer_groups: [
               {
-                labelled_as_correct: false,
                 outcome: {
                   dest: 'State 5',
+                  dest_if_really_stuck: null,
                   feedback: {
                     content_id: 'feeedback_1',
                     html: '<p>That is the class definition. Try again.</p>'
                   },
                   param_changes: [],
-                  refresher_exploration_id: null
+                  refresher_exploration_id: null,
+                  labelled_as_correct: false,
+                  missing_prerequisite_skill_id: null
                 },
                 rule_specs: [{
                   rule_type: 'IsInRegion',
                   inputs: { x: 'classdef' }
-                }]
+                }],
+                tagged_skill_misconception_id: null,
+                training_data: []
               },
               {
-                labelled_as_correct: false,
                 outcome: {
                   dest: 'State 5',
+                  dest_if_really_stuck: null,
                   feedback: {
                     content_id: 'feeedback_2',
                     html: '<p>That is a function, which is close to what you' +
                           'are looking for. Try again!</p>'
                   },
                   param_changes: [],
-                  refresher_exploration_id: null
+                  refresher_exploration_id: null,
+                  labelled_as_correct: false,
+                  missing_prerequisite_skill_id: null
                 },
                 rule_specs: [{
                   rule_type: 'IsInRegion',
                   inputs: { x: 'instancefunc' }
-                }]
+                }],
+                tagged_skill_misconception_id: null,
+                training_data: []
               },
               {
-                labelled_as_correct: false,
                 outcome: {
                   dest: 'State 5',
+                  dest_if_really_stuck: null,
                   feedback: {
                     content_id: 'feeedback_3',
                     html: '<p>That is the class docstring. Try again.</p>'
                   },
                   param_changes: [],
-                  refresher_exploration_id: null
+                  refresher_exploration_id: null,
+                  labelled_as_correct: false,
+                  missing_prerequisite_skill_id: null
                 },
                 rule_specs: [{
                   rule_type: 'IsInRegion',
                   inputs: { x: 'docstring' }
-                }]
+                }],
+                tagged_skill_misconception_id: null,
+                training_data: []
               },
               {
-                labelled_as_correct: false,
                 outcome: {
                   dest: 'State 5',
+                  dest_if_really_stuck: null,
                   feedback: {
                     content_id: 'feeedback_4',
                     html: "<p>That's a classmethod. It does execute code," +
                           "but it doesn't construct anything. Try again!</p>"
                   },
                   param_changes: [],
-                  refresher_exploration_id: null
+                  refresher_exploration_id: null,
+                  labelled_as_correct: false,
+                  missing_prerequisite_skill_id: null
                 },
                 rule_specs: [{
                   rule_type: 'IsInRegion',
                   inputs: { x: 'classfunc' }
-                }]
+                }],
+                tagged_skill_misconception_id: null,
+                training_data: []
               },
               {
-                labelled_as_correct: false,
                 outcome: {
                   dest: 'State 1',
+                  dest_if_really_stuck: null,
                   feedback: {
                     content_id: 'feeedback_5',
                     html: '<p>You found it! This is the code responsible for' +
                           'constructing a new class object.</p>'
                   },
                   param_changes: [],
-                  refresher_exploration_id: null
+                  refresher_exploration_id: null,
+                  labelled_as_correct: false,
+                  missing_prerequisite_skill_id: null
                 },
                 rule_specs: [{
                   rule_type: 'IsInRegion',
                   inputs: { x: 'ctor' }
-                }]
+                }],
+                tagged_skill_misconception_id: null,
+                training_data: []
               }
             ],
             customization_args: {
@@ -536,17 +554,8 @@ describe('Extracting Image file names in the state service', () => {
             solution: null
           },
           solicit_answer_details: false,
-          written_translations: {
-            translations_mapping: {
-              content: {},
-              default_outcome: {},
-              feedback_1: {},
-              feedback_2: {},
-              feedback_3: {},
-              feedback_4: {},
-              feedback_5: {}
-            }
-          }
+          linked_skill_id: null,
+          card_is_checkpoint: false,
         },
         'State 6': {
           param_changes: [],
@@ -568,13 +577,15 @@ describe('Extracting Image file names in the state service', () => {
             id: 'TextInput',
             default_outcome: {
               dest: 'State 6',
+              dest_if_really_stuck: null,
               feedback: {
                 content_id: 'default_outcome',
                 html: '<p>Try again.</p>'
               },
               labelled_as_correct: false,
               param_changes: [],
-              refresher_exploration_id: null
+              refresher_exploration_id: null,
+              missing_prerequisite_skill_id: null
             },
             confirmed_unclassified_answers: [],
             customization_args: {
@@ -586,6 +597,9 @@ describe('Extracting Image file names in the state service', () => {
                   content_id: 'ca_placeholder_3',
                   unicode_str: ''
                 }
+              },
+              catchMisspellings: {
+                value: false
               }
             },
             answer_groups: [{
@@ -598,14 +612,18 @@ describe('Extracting Image file names in the state service', () => {
               }],
               outcome: {
                 dest: 'State 1',
+                dest_if_really_stuck: null,
                 feedback: {
                   content_id: 'feedback_1',
                   html: "<p>Let's go to State 1</p>"
                 },
                 labelled_as_correct: false,
                 param_changes: [],
-                refresher_exploration_id: null
-              }
+                refresher_exploration_id: null,
+                missing_prerequisite_skill_id: null
+              },
+              tagged_skill_misconception_id: null,
+              training_data: []
             }, {
               rule_specs: [{
                 rule_type: 'Contains',
@@ -616,6 +634,7 @@ describe('Extracting Image file names in the state service', () => {
               }],
               outcome: {
                 dest: 'State 1',
+                dest_if_really_stuck: null,
                 feedback: {
                   content_id: 'feedback_2',
                   html: '<p>Let\'s go to State 1</p><oppia-noninteractive-mat' +
@@ -627,8 +646,11 @@ describe('Extracting Image file names in the state service', () => {
                 },
                 labelled_as_correct: false,
                 param_changes: [],
-                refresher_exploration_id: null
-              }
+                refresher_exploration_id: null,
+                missing_prerequisite_skill_id: null
+              },
+              tagged_skill_misconception_id: null,
+              training_data: []
             }],
             hints: [{
               hint_content: {
@@ -650,20 +672,9 @@ describe('Extracting Image file names in the state service', () => {
             },
           },
           linked_skill_id: null,
-          next_content_id_index: 4,
           solicit_answer_details: false,
-          written_translations: {
-            translations_mapping: {
-              content: {},
-              ca_placeholder_3: {},
-              default_outcome: {},
-              feedback_1: {},
-              feedback_2: {},
-              hint_1: {},
-              solution: {}
-            }
-          },
-          classifier_model_id: null
+          classifier_model_id: null,
+          card_is_checkpoint: false
         },
         'State 7': {
           param_changes: [],
@@ -708,9 +719,13 @@ describe('Extracting Image file names in the state service', () => {
                 html: '<p>Try again!</p>'
               },
               dest: 'State 4',
-              param_changes: []
+              dest_if_really_stuck: null,
+              param_changes: [],
+              labelled_as_correct: false,
+              refresher_exploration_id: null,
+              missing_prerequisite_skill_id: null
             },
-            confirmed_unclassifies_answers: [],
+            confirmed_unclassified_answers: [],
             customization_args: {
               minAllowableSelectionCount: {
                 value: 1
@@ -732,15 +747,17 @@ describe('Extracting Image file names in the state service', () => {
             solution: null,
             answer_groups: [
               {
-                labelled_as_correct: false,
                 outcome: {
                   dest: 'State 7',
+                  dest_if_really_stuck: null,
                   feedback: {
                     content_id: 'feedback_1',
                     html: 'It is choice number 1.'
                   },
                   param_changes: [],
-                  refresher_exploration_id: null
+                  refresher_exploration_id: null,
+                  labelled_as_correct: false,
+                  missing_prerequisite_skill_id: null
                 },
                 rule_specs: [{
                   rule_type: 'Equals',
@@ -750,17 +767,21 @@ describe('Extracting Image file names in the state service', () => {
                     ]
                   }
                 }],
+                tagged_skill_misconception_id: null,
+                training_data: []
               },
               {
-                labelled_as_correct: true,
                 outcome: {
                   dest: 'State 1',
+                  dest_if_really_stuck: null,
                   feedback: {
                     content_id: 'feedback_2',
                     html: 'It is choice number 2'
                   },
                   param_changes: [],
-                  refresher_exploration_id: null
+                  refresher_exploration_id: null,
+                  labelled_as_correct: false,
+                  missing_prerequisite_skill_id: null
                 },
                 rule_specs: [{
                   rule_type: 'Equals',
@@ -770,26 +791,36 @@ describe('Extracting Image file names in the state service', () => {
                     ]
                   }
                 }],
+                tagged_skill_misconception_id: null,
+                training_data: []
               }
             ]
           },
-          next_content_id_index: 5,
           solicit_answer_details: false,
-          written_translations: {
-            translations_mapping: {
-              content: {},
-              ca_choices_3: {},
-              ca_choices_4: {},
-              default_outcome: {},
-              feedback_1: {},
-              feedback_2: {}
-            }
-          }
+          classifier_model_id: null,
+          card_is_checkpoint: false,
+          linked_skill_id: null
         }
       },
       param_specs: {},
       param_changes: [],
-      version: 1
+      version: 1,
+      exploration_metadata: {
+        title: 'Exploration',
+        category: 'Algebra',
+        objective: 'To learn',
+        language_code: 'en',
+        tags: [],
+        blurb: '',
+        author_notes: '',
+        states_schema_version: 50,
+        init_state_name: 'Introduction',
+        param_specs: {},
+        param_changes: [],
+        auto_tts_enabled: false,
+        correctness_feedback_enabled: true,
+        edits_allowed: true
+      }
     };
 
     ImageFilenamesInExploration = {
@@ -808,7 +839,7 @@ describe('Extracting Image file names in the state service', () => {
     };
 
     const misconceptionDict1 = {
-      id: '2',
+      id: 2,
       name: 'test name 1',
       notes: (
         '<p><oppia-noninteractive-image alt-with-value="&amp;' +
@@ -828,7 +859,7 @@ describe('Extracting Image file names in the state service', () => {
     };
 
     const misconceptionDict2 = {
-      id: '4',
+      id: 4,
       name: 'test name 2',
       notes: (
         '<p><oppia-noninteractive-image alt-with-value="&amp;' +
@@ -936,6 +967,9 @@ describe('Extracting Image file names in the state service', () => {
       language_code: 'en',
       version: 3,
       prerequisite_skill_ids: ['skill_1'],
+      all_questions_merged: false,
+      next_misconception_id: 0,
+      superseding_skill_id: ''
     };
     expectedImageFilenamesInSkill = [
       'misconception-dict-1-notes.png',

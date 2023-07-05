@@ -7,9 +7,8 @@ from google.cloud import datastore
 from redis import StrictRedis
 
 from typing import (
-    Any, Callable, Dict, Generic, Iterable, Iterator, List, Optional, Sequence,
-    Type, TypeVar, Tuple, Union, overload)
-from typing_extensions import Literal
+    Any, Callable, Dict, Generic, Iterable, Iterator, List, Literal, Optional,
+    Sequence, Type, TypeVar, Tuple, Union, overload)
 
 TYPE_MODEL = TypeVar('TYPE_MODEL', bound='Model')
 
@@ -55,6 +54,8 @@ def delete_multi(keys: Sequence[Key], **ctx_options: Any) -> List[None]: ...
 
 # Property Stubs
 class Property(object):
+    _name: str
+    _repeated: bool
     def __init__(
         self, name: Optional[str] = ..., indexed: Optional[bool] = ...,
         repeated: Optional[bool] = ..., required: Optional[bool] = ...,

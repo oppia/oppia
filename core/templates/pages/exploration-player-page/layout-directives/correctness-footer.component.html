@@ -18,8 +18,8 @@
     <div class="sprinkle-dot dot16"></div>
     <div class="sprinkle-dot dot17"></div>
     <div class="sprinkle-dot dot18"></div>
-    <i class="material-icons tick-symbol">&#xE86C;</i>
-    <span class="inner-content protractor-test-correct-feedback">
+    <i class="fas fa-check-circle tick-symbol"></i>
+    <span class="inner-content e2e-test-correct-feedback">
       <span [innerHTML]="'I18N_CORRECT_FEEDBACK' | translate"></span>
     </span>
   </div>
@@ -46,10 +46,10 @@
     -ms-animation-timing-function: linear;
     background-color: rgb(224, 245, 236);
     border: 2px;
-    border-color: #00B269;
+    border-color: #00b269;
     border-radius: 3px;
     border-style: solid;
-    color: #00B269;
+    color: #00b269;
     font-family: Roboto, arial, sans-serif;
     font-size: 20px;
     font-style: normal;
@@ -66,11 +66,12 @@
   }
 
   .inner-container-alignment {
-    padding-left: 87px;
+    padding-left: 30px;
     padding-right: 30px;
   }
   .tick-symbol {
-    font-size: 50px;
+    font-size: 42px;
+    vertical-align: middle;
   }
 
   .inner-content {
@@ -424,13 +425,13 @@
      when under 520px to prevent pushing things offscreen. */
   @media(max-width: 500px) {
     .inner-container {
-      min-width: 100vw;
+      min-width: 250px;
     }
   }
 
   @media(max-width: 959px) {
     .inner-container-alignment {
-      padding-left: 0;
+      padding-left: 30px;
       padding-right: 30px;
     }
 

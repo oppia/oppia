@@ -28,7 +28,7 @@ import { NumericInputValidationService } from
   'interactions/NumericInput/directives/numeric-input-validation.service';
 import { Outcome, OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory';
-import { Rule, RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
+import { Rule } from 'domain/exploration/rule.model';
 
 import { AppConstants } from 'app.constants';
 import { Warning } from 'interactions/base-interaction-validation.service';
@@ -36,21 +36,20 @@ import { Warning } from 'interactions/base-interaction-validation.service';
 describe('NumericInputValidationService', () => {
   let validatorService: NumericInputValidationService;
   let WARNING_TYPES: typeof AppConstants.WARNING_TYPES;
-
   let currentState: string;
   let answerGroups: AnswerGroup[], goodDefaultOutcome: Outcome,
     customizationArgs: NumericInputCustomizationArgs;
   let equalsZeroRule: Rule, equalsZeroRuleLessThanZero: Rule,
     betweenNegativeOneAndOneRule: Rule,
-    betweenFourAndTwoRule: Rule, lessThanOneRule: Rule,
-    lessThanOneRuleLessThanZero: Rule,
+    betweenOneAndOneRule: Rule, betweenFourAndTwoRule: Rule,
+    lessThanOneRule: Rule, lessThanOneRuleLessThanZero: Rule,
     greaterThanNegativeOneRule: Rule, lessThanOrEqualToOneRule: Rule,
     lessThanOrEqualToOneRuleLessThanZero: Rule,
     greaterThanOrEqualToNegativeOneRule: Rule,
     zeroWithinToleranceOfOneRule: Rule,
-    zeroWithinToleranceOfOneRuleLessThanZero: Rule;
-  let oof: OutcomeObjectFactory, agof: AnswerGroupObjectFactory,
-    rof: RuleObjectFactory;
+    zeroWithinToleranceOfOneRuleLessThanZero: Rule,
+    nonPositiveToleranceRule: Rule;
+  let oof: OutcomeObjectFactory, agof: AnswerGroupObjectFactory;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -62,7 +61,6 @@ describe('NumericInputValidationService', () => {
     WARNING_TYPES = AppConstants.WARNING_TYPES;
     oof = TestBed.inject(OutcomeObjectFactory);
     agof = TestBed.inject(AnswerGroupObjectFactory);
-    rof = TestBed.inject(RuleObjectFactory);
 
     customizationArgs = {
       requireNonnegativeInput: {
@@ -72,6 +70,7 @@ describe('NumericInputValidationService', () => {
     currentState = 'First State';
     goodDefaultOutcome = oof.createFromBackendDict({
       dest: 'Second State',
+      dest_if_really_stuck: null,
       feedback: {
         content_id: '',
         html: ''
@@ -81,51 +80,58 @@ describe('NumericInputValidationService', () => {
       refresher_exploration_id: null,
       missing_prerequisite_skill_id: null
     });
-    equalsZeroRule = rof.createFromBackendDict({
+    equalsZeroRule = Rule.createFromBackendDict({
       rule_type: 'Equals',
       inputs: {
         x: 0
       }
     }, 'NumericInput');
-    betweenNegativeOneAndOneRule = rof.createFromBackendDict({
+    betweenNegativeOneAndOneRule = Rule.createFromBackendDict({
       rule_type: 'IsInclusivelyBetween',
       inputs: {
         a: -1,
         b: 1
       }
     }, 'NumericInput');
-    betweenFourAndTwoRule = rof.createFromBackendDict({
+    betweenOneAndOneRule = Rule.createFromBackendDict({
+      rule_type: 'IsInclusivelyBetween',
+      inputs: {
+        a: 1,
+        b: 1
+      }
+    }, 'NumericInput');
+    betweenFourAndTwoRule = Rule.createFromBackendDict({
       rule_type: 'IsInclusivelyBetween',
       inputs: {
         a: 4,
         b: 2
       }
     }, 'NumericInput');
-    lessThanOneRule = rof.createFromBackendDict({
+    lessThanOneRule = Rule.createFromBackendDict({
       rule_type: 'IsLessThan',
       inputs: {
         x: 1
       }
     }, 'NumericInput');
-    greaterThanNegativeOneRule = rof.createFromBackendDict({
+    greaterThanNegativeOneRule = Rule.createFromBackendDict({
       rule_type: 'IsGreaterThan',
       inputs: {
         x: -1
       }
     }, 'NumericInput');
-    lessThanOrEqualToOneRule = rof.createFromBackendDict({
+    lessThanOrEqualToOneRule = Rule.createFromBackendDict({
       rule_type: 'IsLessThanOrEqualTo',
       inputs: {
         x: 1
       }
     }, 'NumericInput');
-    greaterThanOrEqualToNegativeOneRule = rof.createFromBackendDict({
+    greaterThanOrEqualToNegativeOneRule = Rule.createFromBackendDict({
       rule_type: 'IsGreaterThanOrEqualTo',
       inputs: {
         x: -1
       }
     }, 'NumericInput');
-    zeroWithinToleranceOfOneRule = rof.createFromBackendDict({
+    zeroWithinToleranceOfOneRule = Rule.createFromBackendDict({
       rule_type: 'IsWithinTolerance',
       inputs: {
         x: 0,
@@ -133,26 +139,34 @@ describe('NumericInputValidationService', () => {
       },
     }, 'NumericInput');
     zeroWithinToleranceOfOneRuleLessThanZero =
-      rof.createFromBackendDict({
+      Rule.createFromBackendDict({
         rule_type: 'IsWithinTolerance',
         inputs: {
           x: -2,
           tol: 1
         }
       }, 'NumericInput');
-    lessThanOneRuleLessThanZero = rof.createFromBackendDict({
+    nonPositiveToleranceRule =
+      Rule.createFromBackendDict({
+        rule_type: 'IsWithinTolerance',
+        inputs: {
+          x: 2,
+          tol: -1
+        }
+      }, 'NumericInput');
+    lessThanOneRuleLessThanZero = Rule.createFromBackendDict({
       rule_type: 'IsLessThan',
       inputs: {
         x: -1
       }
     }, 'NumericInput');
-    equalsZeroRuleLessThanZero = rof.createFromBackendDict({
+    equalsZeroRuleLessThanZero = Rule.createFromBackendDict({
       rule_type: 'Equals',
       inputs: {
         x: -1
       }
     }, 'NumericInput');
-    lessThanOrEqualToOneRuleLessThanZero = rof.createFromBackendDict({
+    lessThanOrEqualToOneRuleLessThanZero = Rule.createFromBackendDict({
       rule_type: 'IsLessThanOrEqualTo',
       inputs: {
         x: -1
@@ -171,10 +185,23 @@ describe('NumericInputValidationService', () => {
       currentState, customizationArgs, answerGroups, goodDefaultOutcome);
     expect(warnings).toEqual([{
       type: WARNING_TYPES.ERROR,
-      message: 'Rule 2 upper bound of the range should be greater than' +
-      ' or equal to zero.'
+      message: 'Learner answer 2 upper bound of the range should be ' +
+      'greater than or equal to zero.'
     }]);
   });
+
+  it('should show warning if tolerance is not positive for IsWithinTolerance',
+    () => {
+      answerGroups[0].rules = [nonPositiveToleranceRule];
+
+      var warnings = validatorService.getAllWarnings(
+        currentState, customizationArgs, answerGroups, goodDefaultOutcome);
+
+      expect(warnings).toEqual([{
+        type: WARNING_TYPES.ERROR,
+        message: 'Learner answer 1 tolerance must be a positive value.'
+      }]);
+    });
 
   it('should show warning if input less than zero for IsWithinTolerance',
     () => {
@@ -184,8 +211,8 @@ describe('NumericInputValidationService', () => {
       expect(customizationArgs.requireNonnegativeInput.value).toBe(true);
       expect(warnings).toEqual([{
         type: WARNING_TYPES.ERROR,
-        message: 'Rule 1 Upper bound of the tolerance range should ' +
-        'be greater than or equal to zero.'
+        message: 'Learner answer 1 Upper bound of the tolerance ' +
+        'range should be greater than or equal to zero.'
       }]);
     });
 
@@ -196,7 +223,8 @@ describe('NumericInputValidationService', () => {
     expect(customizationArgs.requireNonnegativeInput.value).toBe(true);
     expect(warnings).toEqual([{
       type: WARNING_TYPES.ERROR,
-      message: 'Rule 1 input should be greater than or equal to zero.'
+      message: 'Learner answer 1 input should be greater than ' +
+      'or equal to zero.'
     }]);
   });
 
@@ -207,7 +235,8 @@ describe('NumericInputValidationService', () => {
     expect(customizationArgs.requireNonnegativeInput.value).toBe(true);
     expect(warnings).toEqual([{
       type: WARNING_TYPES.ERROR,
-      message: 'Rule 1 input should be greater than or equal to zero.'
+      message: 'Learner answer 1 input should be greater than ' +
+      'or equal to zero.'
     }]);
   });
 
@@ -219,20 +248,27 @@ describe('NumericInputValidationService', () => {
       expect(customizationArgs.requireNonnegativeInput.value).toBe(true);
       expect(warnings).toEqual([{
         type: WARNING_TYPES.ERROR,
-        message: 'Rule 1 input should be greater than or equal to zero.'
+        message: 'Learner answer 1 input should be greater than ' +
+        'or equal to zero.'
       }]);
     });
 
   it('should raise warning for IsInclusivelyBetween rule ' +
   'caused by incorrect range',
   () => {
-    answerGroups[0].rules = [betweenFourAndTwoRule];
+    answerGroups[0].rules = [betweenOneAndOneRule, betweenFourAndTwoRule];
+
     var warnings = validatorService.getAllWarnings(
       currentState, customizationArgs, answerGroups, goodDefaultOutcome);
+
     expect(warnings).toEqual([{
       type: WARNING_TYPES.ERROR,
-      message: 'In Rule 1 from answer group 1, Please ensure ' +
-      'that the second number ' + 'is greater than the first number.'
+      message: 'In learner answer 1 from Oppia response 1, Please ensure ' +
+      'that the second number is greater than the first number.'
+    }, {
+      type: WARNING_TYPES.ERROR,
+      message: 'In learner answer 2 from Oppia response 1, Please ensure ' +
+      'that the second number is greater than the first number.'
     }]);
   });
 
@@ -242,12 +278,12 @@ describe('NumericInputValidationService', () => {
       currentState, customizationArgs, answerGroups, goodDefaultOutcome);
     expect(warnings).toEqual([{
       type: WARNING_TYPES.ERROR,
-      message: 'Rule 1 upper bound of the range should be greater than or' +
-      ' equal to zero.'
+      message: 'Learner answer 1 upper bound of the range should be ' +
+      'greater than or equal to zero.'
     }, {
       type: WARNING_TYPES.ERROR,
-      message: 'Rule 2 from answer group 1 will never be matched ' +
-        'because it is made redundant by rule 1 from answer group 1.'
+      message: 'Learner answer 2 from Oppia response 1 will never be matched' +
+        ' because it is made redundant by answer 1 from response 1.'
     }]);
   });
 
@@ -257,8 +293,8 @@ describe('NumericInputValidationService', () => {
       currentState, customizationArgs, answerGroups, goodDefaultOutcome);
     expect(warnings).toEqual([{
       type: WARNING_TYPES.ERROR,
-      message: 'Rule 2 from answer group 1 will never be matched ' +
-        'because it is made redundant by rule 1 from answer group 1.'
+      message: 'Learner answer 2 from Oppia response 1 will never be matched' +
+      ' because it is made redundant by answer 1 from response 1.'
     }]);
   });
 
@@ -270,12 +306,12 @@ describe('NumericInputValidationService', () => {
       currentState, customizationArgs, answerGroups, goodDefaultOutcome);
     expect(warnings).toEqual([{
       type: WARNING_TYPES.ERROR,
-      message: 'Rule 1 upper bound of the range should be greater than' +
-      ' or equal to zero.'
+      message: 'Learner answer 1 upper bound of the range should be ' +
+      'greater than or equal to zero.'
     }, {
       type: WARNING_TYPES.ERROR,
-      message: 'Rule 1 from answer group 2 will never be matched ' +
-        'because it is made redundant by rule 1 from answer group 1.'
+      message: 'Learner answer 1 from Oppia response 2 will never be matched' +
+      ' because it is made redundant by answer 1 from response 1.'
     }]);
   });
 
@@ -287,16 +323,16 @@ describe('NumericInputValidationService', () => {
         currentState, customizationArgs, answerGroups, goodDefaultOutcome);
       expect(warnings).toEqual([{
         type: WARNING_TYPES.ERROR,
-        message: 'Rule 2 from answer group 1 will never be matched ' +
-          'because it is made redundant by rule 1 from answer group 1.'
+        message: 'Learner answer 2 from Oppia response 1 will never be ' +
+        'matched because it is made redundant by answer 1 from response 1.'
       }]);
       answerGroups[0].rules = [greaterThanNegativeOneRule, equalsZeroRule];
       warnings = validatorService.getAllWarnings(
         currentState, customizationArgs, answerGroups, goodDefaultOutcome);
       expect(warnings).toEqual([{
         type: WARNING_TYPES.ERROR,
-        message: 'Rule 2 from answer group 1 will never be matched ' +
-          'because it is made redundant by rule 1 from answer group 1.'
+        message: 'Learner answer 2 from Oppia response 1 will never be ' +
+        'matched because it is made redundant by answer 1 from response 1.'
       }]);
     });
 
@@ -308,8 +344,8 @@ describe('NumericInputValidationService', () => {
         currentState, customizationArgs, answerGroups, goodDefaultOutcome);
       expect(warnings).toEqual([{
         type: WARNING_TYPES.ERROR,
-        message: 'Rule 2 from answer group 1 will never be matched ' +
-          'because it is made redundant by rule 1 from answer group 1.'
+        message: 'Learner answer 2 from Oppia response 1 will never be ' +
+        'matched because it is made redundant by answer 1 from response 1.'
       }]);
       answerGroups[0].rules = [
         greaterThanOrEqualToNegativeOneRule, equalsZeroRule
@@ -318,8 +354,8 @@ describe('NumericInputValidationService', () => {
         currentState, customizationArgs, answerGroups, goodDefaultOutcome);
       expect(warnings).toEqual([{
         type: WARNING_TYPES.ERROR,
-        message: 'Rule 2 from answer group 1 will never be matched ' +
-          'because it is made redundant by rule 1 from answer group 1.'
+        message: 'Learner answer 2 from Oppia response 1 will never be ' +
+        'matched because it is made redundant by answer 1 from response 1.'
       }]);
     });
 
@@ -330,29 +366,65 @@ describe('NumericInputValidationService', () => {
         currentState, customizationArgs, answerGroups, goodDefaultOutcome);
       expect(warnings).toEqual([{
         type: WARNING_TYPES.ERROR,
-        message: 'Rule 2 from answer group 1 will never be matched ' +
-          'because it is made redundant by rule 1 from answer group 1.'
+        message: 'Learner answer 2 from Oppia response 1 will never be ' +
+        'matched because it is made redundant by answer 1 from response 1.'
       }]);
     });
 
+  it('should generate errors for string representation of the input', ()=>{
+    expect(validatorService.validateNumericString('12.f3', '.')).toEqual(
+      'I18N_INTERACTIONS_NUMERIC_INPUT_NO_INVALID_CHARS'
+    );
+    expect(validatorService.validateNumericString('12.', '.')).toEqual(
+      'I18N_INTERACTIONS_NUMERIC_INPUT_NO_TRAILING_DECIMAL'
+    );
+    expect(validatorService.validateNumericString('12.22.1', '.')).toEqual(
+      'I18N_INTERACTIONS_NUMERIC_INPUT_ATMOST_1_DECIMAL'
+    );
+    expect(validatorService.validateNumericString('12-', '.')).toEqual(
+      'I18N_INTERACTIONS_NUMERIC_INPUT_MINUS_AT_BEGINNING'
+    );
+    expect(validatorService.validateNumericString('--12', '.')).toEqual(
+      'I18N_INTERACTIONS_NUMERIC_INPUT_ATMOST_1_MINUS'
+    );
+    expect(validatorService.validateNumericString('12e12e', '.')).toEqual(
+      'I18N_INTERACTIONS_NUMERIC_INPUT_ATMOST_1_EXPONENT'
+    );
+  });
+
   it('should generate errors in the given input', () => {
-    expect(validatorService.getErrorString(1200000000E+27, false)).toEqual(
-      'The answer can contain at most 15 digits (0-9) or symbols (. or -).');
-    expect(validatorService.getErrorString(1200000000E-27, false)).toEqual(
-      'The answer can contain at most 15 digits (0-9) or symbols (. or -).');
-    expect(validatorService.getErrorString(999999999999999, false)).toEqual(
+    expect(
+      validatorService.validateNumber(-999999999, true)).toEqual(
+      'I18N_INTERACTIONS_NUMERIC_INPUT_LESS_THAN_ZERO');
+    expect(
+      validatorService.validateNumber(1200000000e+27, false)).toEqual(
+      'I18N_INTERACTIONS_NUMERIC_INPUT_GREATER_THAN_15_DIGITS_DOT');
+    expect(
+      validatorService.validateNumber(1200000000e-27, false, ',')).toEqual(
+      'I18N_INTERACTIONS_NUMERIC_INPUT_GREATER_THAN_15_DIGITS_COMMA');
+    expect(
+      validatorService.validateNumber(999999999999999, false)).toEqual(
       undefined);
-    expect(validatorService.getErrorString(99.9999999999999, false)).toEqual(
+    expect(
+      validatorService.validateNumber(99.9999999999999, false)).toEqual(
       undefined);
-    expect(validatorService.getErrorString(-9.9999999999999, false)).toEqual(
+    expect(
+      validatorService.validateNumber(-9.9999999999999, false)).toEqual(
       undefined);
-    expect(validatorService.getErrorString(2.2, false)).toEqual(undefined);
-    expect(validatorService.getErrorString(-2.2, false)).toEqual(undefined);
-    expect(validatorService.getErrorString(34.56, false)).toEqual(undefined);
-    expect(validatorService.getErrorString(99999999999999, true)).toEqual(
+    expect(
+      validatorService.validateNumber(2.2, false)).toEqual(undefined);
+    expect(
+      validatorService.validateNumber(-2.2, false)).toEqual(undefined);
+    expect(
+      validatorService.validateNumber(34.56, false)).toEqual(undefined);
+    expect(
+      validatorService.validateNumber(99999999999999, true)).toEqual(
       undefined);
-    expect(validatorService.getErrorString(9999999999999999, true)).toEqual(
-      'The answer should be greater than or equal to zero and can contain' +
-      ' at most 15 digits (0-9) or symbols(.).');
+    expect(
+      validatorService.validateNumber(-99999999999999, true)).toEqual(
+      'I18N_INTERACTIONS_NUMERIC_INPUT_LESS_THAN_ZERO');
+    expect(
+      validatorService.validateNumber(Number('wqw'), true)).toEqual(
+      'I18N_INTERACTIONS_NUMERIC_INPUT_INVALID_NUMBER');
   });
 });

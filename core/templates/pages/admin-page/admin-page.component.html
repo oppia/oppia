@@ -2,7 +2,7 @@
 
 <div align="center"
      *ngIf="statusMessage"
-     class="oppia-status-message-container protractor-test-status-message">
+     class="oppia-status-message-container e2e-test-status-message">
   {{ statusMessage }}
 </div>
 <br>
@@ -19,11 +19,12 @@
                           (setStatusMessage)="setStatusMessage($event)">
   </oppia-admin-config-tab>
 
-  <admin-features-tab *ngIf="isFeaturesTabOpen()"
-                      (setStatusMessage)="setStatusMessage($event)">
-  </admin-features-tab>
+  <oppia-admin-platform-parameters-tab *ngIf="isPlatformParamsTabOpen()"
+                                       (setStatusMessage)="setStatusMessage($event)">
+  </oppia-admin-platform-parameters-tab>
 
-  <oppia-admin-roles-tab *ngIf="isRolesTabOpen()">
+  <oppia-admin-roles-tab *ngIf="isRolesTabOpen()"
+                         (setStatusMessage)="setStatusMessage($event)">
   </oppia-admin-roles-tab>
 
   <oppia-admin-misc-tab *ngIf="isMiscTabOpen()"
@@ -33,10 +34,6 @@
 
 <div *ngIf="inDevMode" class="oppia-dev-mode">
   Dev Mode
-</div>
-
-<div *ngIf="isDummyFeatureEnabled()" class="oppia-dev-mode protractor-test-angularjs-dummy-feature-indicator">
-  AngularJS: Dummy Feature Enabled
 </div>
 
 <style>
@@ -51,8 +48,5 @@
     position: fixed;
     right: 30px;
     z-index: 3000;
-  }
-  .protractor-test-angularjs-dummy-feature-indicator {
-    bottom: 50px;
   }
 </style>

@@ -74,17 +74,26 @@ describe('Admin config tab component ', () => {
     configProperties: {
       configProperty1: {
         description: 'description1',
-        schema: null,
+        schema: {
+          type: 'custom',
+          obj_type: 'CustomType',
+        },
         value: 'val1'
       },
       configProperty2: {
         description: 'description2',
-        schema: null,
+        schema: {
+          type: 'custom',
+          obj_type: 'CustomType',
+        },
         value: 'val2'
       },
       configProperty3: {
         description: 'description3',
-        schema: null,
+        schema: {
+          type: 'custom',
+          obj_type: 'CustomType',
+        },
         value: 'val3'
       }
     },
@@ -93,7 +102,7 @@ describe('Admin config tab component ', () => {
       MODERATOR: 'moderator'
     },
     topicSummaries: [],
-    featureFlags: []
+    platformParameters: []
   };
 
   beforeEach(() => {
@@ -124,9 +133,9 @@ describe('Admin config tab component ', () => {
     adminTaskManagerService = TestBed.inject(AdminTaskManagerService);
 
     statusMessageSpy = spyOn(component.setStatusMessage, 'emit')
-      .and.returnValue(null);
-    spyOn(adminTaskManagerService, 'startTask').and.returnValue(null);
-    spyOn(adminTaskManagerService, 'finishTask').and.returnValue(null);
+      .and.callThrough();
+    spyOn(adminTaskManagerService, 'startTask').and.callThrough();
+    spyOn(adminTaskManagerService, 'finishTask').and.callThrough();
     spyOn(adminBackendApiService, 'getDataAsync').and.resolveTo(adminPageData);
     confirmSpy = spyOn(mockWindowRef.nativeWindow, 'confirm');
   });

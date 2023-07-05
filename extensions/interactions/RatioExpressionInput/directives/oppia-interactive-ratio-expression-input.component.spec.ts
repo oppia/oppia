@@ -17,145 +17,163 @@
  * component.
  */
 
-import { Ratio } from 'domain/objects/ratio.model';
+import { async, ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
+import { InteractiveRatioExpressionInputComponent } from './oppia-interactive-ratio-expression-input.component';
+import { InteractionAttributesExtractorService } from 'interactions/interaction-attributes-extractor.service';
+import { CurrentInteractionService } from 'pages/exploration-player-page/services/current-interaction.service';
+import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { MockTranslatePipe } from 'tests/unit-test-utils';
+import { InteractionSpecsKey } from 'pages/interaction-specs.constants';
+import { RatioInputAnswer } from 'interactions/answer-defs';
 
-require(
-  'interactions/RatioExpressionInput/directives/' +
-  'oppia-interactive-ratio-expression-input.component.ts');
+describe('InteractiveRatioExpressionInput', () => {
+  let component: InteractiveRatioExpressionInputComponent;
+  let fixture: ComponentFixture<InteractiveRatioExpressionInputComponent>;
+  let currentInteractionService: CurrentInteractionService;
 
-describe('RatioExpressionInputInteractive', function() {
-  let ctrl = null, $scope = null, $rootScope = null;
+  class MockInteractionAttributesExtractorService {
+    getValuesFromAttributes(
+        interactionId: InteractionSpecsKey, attributes: Record<string, string>
+    ) {
+      return {
+        numberOfTerms: {
+          value: JSON.parse(attributes.numberOfTermsWithValue)
+        },
+        placeholder: {
+          value: {
+            unicode: attributes.placeholderWithValue}
+        },
+      };
+    }
+  }
+
   let mockCurrentInteractionService = {
-    onSubmit: function(answer, rulesService) {},
-    registerCurrentInteraction: function(submitAnswerFn, isAnswerValid) {
+    updateViewWithNewAnswer: () => {},
+    onSubmit: (
+        answer: RatioInputAnswer, rulesService: CurrentInteractionService
+    ) => {},
+    registerCurrentInteraction: (
+        submitAnswerFn: Function, validateExpressionFn: Function) => {
       submitAnswerFn();
+      validateExpressionFn();
     }
   };
-  let mockRatioExpressionInputRulesService = {};
-  let mockInteractionAttributesExtractorService = {
-    getValuesFromAttributes: function(interactionId, attrs) {
-      return attrs;
-    }
-  };
+
+  beforeEach(async(() => {
+    TestBed.configureTestingModule({
+      declarations: [
+        InteractiveRatioExpressionInputComponent,
+        MockTranslatePipe
+      ],
+      imports: [],
+      providers: [
+        {
+          provide: InteractionAttributesExtractorService,
+          useClass: MockInteractionAttributesExtractorService
+        },
+        {
+          provide: CurrentInteractionService,
+          useValue: mockCurrentInteractionService
+        }
+      ],
+      schemas: [NO_ERRORS_SCHEMA]
+    }).compileComponents();
+  }));
 
   describe('without saved solution', function() {
-    beforeEach(angular.mock.module('oppia'));
-    beforeEach(angular.mock.module('oppia', function($provide) {
-      $provide.value('Ratio', Ratio);
-      $provide.value(
-        'CurrentInteractionService', mockCurrentInteractionService);
-      $provide.value(
-        'RatioExpressionInputRulesService',
-        mockRatioExpressionInputRulesService);
-      $provide.value(
-        'InteractionAttributesExtractorService',
-        mockInteractionAttributesExtractorService);
-      $provide.value('$attrs', {
-        placeholder: {
-          unicode: 'Enter ratio here'
-        },
-        numberOfTerms: 3,
-        labelForFocusTarget: 'label'
-      });
-    }));
-    beforeEach(angular.mock.inject(function($injector, $componentController) {
-      $rootScope = $injector.get('$rootScope');
-      $scope = $rootScope.$new();
-      ctrl = $componentController('oppiaInteractiveRatioExpressionInput');
-      ctrl.RatioExpressionInputForm = {
-        answer: {
-          $invalid: false,
-          $setValidity: function(errorType, valid) {
-            this.$invalid = !valid;
-          }
-        }
-      };
-    }));
+    beforeEach(() => {
+      currentInteractionService = TestBed.inject(CurrentInteractionService);
+      fixture = (
+        TestBed.createComponent(InteractiveRatioExpressionInputComponent));
+      component = fixture.componentInstance;
+      component.numberOfTermsWithValue = '3';
+      component.placeholderWithValue = 'Enter ratio here';
+      component.errorMessageI18nKey = '';
+      component.labelForFocusTarget = 'label';
+      component.answer = '';
+      component.isValid = true;
+    });
 
     it('should init the component', function() {
-      spyOn(mockCurrentInteractionService, 'registerCurrentInteraction');
-      ctrl.$onInit();
-      expect(ctrl.answer).toEqual('');
-      expect(ctrl.labelForFocusTarget).toEqual('label');
-      expect(ctrl.placeholder).toEqual('Enter ratio here');
-      expect(ctrl.expectedNumberOfTerms).toEqual(3);
-      expect(ctrl.RATIO_EXPRESSION_INPUT_FORM_SCHEMA).toEqual({
-        type: 'unicode',
-        ui_config: {}
-      });
-      expect(ctrl.getWarningText()).toEqual('');
+      spyOn(currentInteractionService, 'registerCurrentInteraction');
+
+      component.ngOnInit();
+
+      expect(component.answer).toEqual('');
+      expect(component.placeholder).toEqual('Enter ratio here');
+      expect(component.expectedNumberOfTerms).toEqual(3);
       expect(
-        mockCurrentInteractionService.registerCurrentInteraction
+        currentInteractionService.registerCurrentInteraction
       ).toHaveBeenCalled();
     });
 
-    it('should return valid answer before the form is initialized', function() {
-      ctrl.RatioExpressionInputForm = undefined;
-      expect(ctrl.isAnswerValid()).toBe(true);
-    });
-
     it('should raise error if invalid answer is submitted', function() {
-      ctrl.$onInit();
-      ctrl.answer = '2:3';
-      ctrl.RatioExpressionInputForm.$invalid = false;
-      spyOn(mockCurrentInteractionService, 'onSubmit');
-      ctrl.submitAnswer(ctrl.answer);
-      expect(ctrl.getWarningText()).toEqual(
-        'The creator has specified the number of terms in the answer to be 3.');
-      expect(mockCurrentInteractionService.onSubmit).not.toHaveBeenCalled();
-      expect(ctrl.isAnswerValid()).toBe(false);
+      component.ngOnInit();
+      component.answer = '2:3';
+      component.isValid = false;
+      spyOn(currentInteractionService, 'onSubmit');
+      component.submitAnswer();
+      expect(component.errorMessageI18nKey).toEqual(
+        'I18N_INTERACTIONS_TERMS_LIMIT');
+      expect(currentInteractionService.onSubmit).not.toHaveBeenCalled();
+      expect(component.isAnswerValid()).toBe(false);
     });
 
     it('should submit the answer if valid', function() {
-      ctrl.$onInit();
-      ctrl.answer = '2:3:4';
-      $scope.$apply();
-      spyOn(mockCurrentInteractionService, 'onSubmit');
-      ctrl.submitAnswer('2:3:4');
+      component.ngOnInit();
+      component.answer = '2:3:4';
+      spyOn(currentInteractionService, 'onSubmit');
+      component.submitAnswer();
       expect(
-        mockCurrentInteractionService.onSubmit).toHaveBeenCalled();
-      expect(ctrl.isAnswerValid()).toBe(true);
+        currentInteractionService.onSubmit).toHaveBeenCalled();
+      expect(component.isAnswerValid()).toBe(true);
     });
   });
 
   describe('with saved solution', function() {
-    beforeEach(angular.mock.module('oppia'));
-    beforeEach(angular.mock.module('oppia', function($provide) {
-      $provide.value('Ratio', Ratio);
-      $provide.value(
-        'CurrentInteractionService', mockCurrentInteractionService);
-      $provide.value(
-        'RatioExpressionInputRulesService',
-        mockRatioExpressionInputRulesService);
-      $provide.value(
-        'InteractionAttributesExtractorService',
-        mockInteractionAttributesExtractorService);
-      $provide.value('$attrs', {
-        placeholder: {
-          unicode: 'Enter ratio here'
-        },
-        numberOfTerms: 3,
-        labelForFocusTarget: 'label',
-      });
-    }));
-    beforeEach(angular.mock.inject(function($injector, $componentController) {
-      $rootScope = $injector.get('$rootScope');
-      $scope = $rootScope.$new();
-      ctrl = $componentController('oppiaInteractiveRatioExpressionInput');
-      ctrl.savedSolution = [1, 2, 3];
-      ctrl.RatioExpressionInputForm = {
-        answer: {
-          $invalid: false,
-          $setValidity: function(errorType, valid) {
-            this.$invalid = !valid;
-          }
-        }
-      };
-    }));
+    beforeEach(() => {
+      currentInteractionService = TestBed.inject(CurrentInteractionService);
+      fixture = (
+        TestBed.createComponent(InteractiveRatioExpressionInputComponent));
+      component = fixture.componentInstance;
+      component.numberOfTermsWithValue = '3';
+      component.placeholderWithValue = 'Enter ratio here';
+      component.errorMessageI18nKey = '';
+      component.labelForFocusTarget = 'label';
+      component.answer = '';
+      component.savedSolution = [1, 2, 3];
+      component.isValid = true;
+    });
 
     it('should populate answer with solution if provided', function() {
-      ctrl.$onInit();
-      expect(ctrl.answer).toEqual('1:2:3');
+      component.ngOnInit();
+      expect(component.answer).toEqual('1:2:3');
+    });
+
+    it('should not display error message before user' +
+    ' submit answer', fakeAsync(() => {
+      component.answer = '1';
+      component.answerValueChanged();
+      component.answer = '1:2:3';
+      component.isValid = false;
+      component.errorMessageI18nKey = 'error';
+
+      component.answerValueChanged();
+      tick(150);
+
+      expect(component.errorMessageI18nKey).toBe('');
+      expect(component.isValid).toBe(true);
+    }));
+
+    it('should unsubscribe when component is destroyed', function() {
+      spyOn(component.componentSubscriptions, 'unsubscribe').and.callThrough();
+
+      expect(component.componentSubscriptions.closed).toBe(false);
+
+      component.ngOnDestroy();
+
+      expect(component.componentSubscriptions.unsubscribe).toHaveBeenCalled();
+      expect(component.componentSubscriptions.closed).toBe(true);
     });
   });
 });

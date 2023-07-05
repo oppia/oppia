@@ -23,21 +23,24 @@ import { FocusManagerService } from 'services/stateful/focus-manager.service';
 import { UserService } from 'services/user.service';
 import { FeedbackPopupBackendApiService } from '../services/feedback-popup-backend-api.service';
 import { PlayerPositionService } from '../services/player-position.service';
-import constants from 'assets/constants';
+import { AppConstants } from 'app.constants';
 
 @Component({
   selector: 'oppia-feedback-popup',
   templateUrl: './feedback-popup.component.html'
 })
 export class FeedbackPopupComponent {
-  feedbackUrl: string;
+  // These properties below are initialized using Angular lifecycle hooks
+  // where we need to do non-null assertion. For more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  feedbackUrl!: string;
+  feedbackPopoverId!: string;
+  feedbackTitle!: string;
   feedbackText: string = '';
   isSubmitterAnonymized: boolean = false;
-  isLoggedIn: boolean;
-  feedbackPopoverId: string;
-  feedbackTitle: string;
+  isLoggedIn: boolean = false;
   feedbackSubmitted: boolean = false;
-  MAX_REVIEW_MESSAGE_LENGTH = constants.MAX_REVIEW_MESSAGE_LENGTH;
+  MAX_REVIEW_MESSAGE_LENGTH = AppConstants.MAX_REVIEW_MESSAGE_LENGTH;
   @Output() closePopover: EventEmitter<void> = new EventEmitter();
 
   constructor(

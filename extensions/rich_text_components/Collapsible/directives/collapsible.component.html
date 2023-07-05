@@ -2,7 +2,7 @@
   <ngb-panel id="toggle-1">
     <ng-template ngbPanelHeader let-opened="opened">
       <div class="panel-title fx-row d-flex justify-content-between" (click)="acc.toggle('toggle-1')">
-        <div class="protractor-test-collapsible-heading fx-main-start fx-cross-center"> {{ heading }}</div>
+        <div class="e2e-test-collapsible-heading fx-main-start fx-cross-center"> {{ heading }}</div>
         <div class="fx-main-end fx-cross-center">
           <i class="material-icons md-18"> {{ opened ? '&#xE15C;' : '&#xE147;' }}</i>
         </div>
@@ -10,8 +10,8 @@
     </ng-template>
     <ng-template ngbPanelContent>
       <div class="protractor-panel-body">
-        <angular-html-bind-wrapper classStr="protractor-test-collapsible-content" [htmlData]="content">
-        </angular-html-bind-wrapper>
+        <oppia-rte-output-display class="e2e-test-collapsible-content" [rteString]="content">
+        </oppia-rte-output-display>
       </div>
     </ng-template>
   </ngb-panel>

@@ -1,9 +1,29 @@
-<div dir="auto" *ngIf="storyTitle" class="nav navbar-nav oppia-navbar-breadcrumb oppia-story-viewer-nav-breadcrumb">
+<div dir="auto" *ngIf="storyTitle && !isLanguageRTL()" class="nav navbar-nav oppia-navbar-breadcrumb oppia-story-viewer-nav-breadcrumb">
   <div class="oppia-story-viewer-nav-separator"></div>
   <div class="oppia-story-viewer-nav-labels-container">
-    <p class="oppia-story-navbar-title">{{ storyTitle }}</p>
-    <a class="oppia-story-navbar-topic" [href]="getTopicUrl()">{{ topicName }}</a>
+    <p class="oppia-story-navbar-title">
+      <span *ngIf="!isHackyStoryTitleTranslationDisplayed()">{{ storyTitle }}</span>
+      <span *ngIf="isHackyStoryTitleTranslationDisplayed()">{{ storyTitleTranslationKey | translate }}</span>
+    </p>
+    <a class="oppia-story-navbar-topic" [href]="getTopicUrl()">
+      <span *ngIf="!isHackyTopicNameTranslationDisplayed()">{{ topicName }}</span>
+      <span *ngIf="isHackyTopicNameTranslationDisplayed()">{{ topicNameTranslationKey | translate }}</span>
+    </a>
   </div>
+</div>
+
+<div dir="auto" *ngIf="storyTitle && isLanguageRTL()" class="nav navbar-nav oppia-navbar-breadcrumb oppia-story-viewer-nav-breadcrumb">
+  <div class="oppia-story-viewer-nav-labels-container">
+    <p class="oppia-story-navbar-title">
+      <span *ngIf="!isHackyStoryTitleTranslationDisplayed()">{{ storyTitle }}</span>
+      <span *ngIf="isHackyStoryTitleTranslationDisplayed()">{{ storyTitleTranslationKey | translate }}</span>
+    </p>
+    <a class="oppia-story-navbar-topic" [href]="getTopicUrl()">
+      <span *ngIf="!isHackyTopicNameTranslationDisplayed()">{{ topicName }}</span>
+      <span *ngIf="isHackyTopicNameTranslationDisplayed()">{{ topicNameTranslationKey | translate }}</span>
+    </a>
+  </div>
+  <div class="oppia-story-viewer-nav-separator"></div>
 </div>
 
 <style>
@@ -32,6 +52,7 @@
   .oppia-story-viewer-nav-separator {
     background-color: white;
     height: 80%;
+    margin-left: 12px;
     margin-right: 12px;
     width: 1px;
   }

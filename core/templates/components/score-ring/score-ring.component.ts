@@ -16,7 +16,7 @@
  * @fileoverview Component for the animated score ring.
  */
 
-import { Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
+import { Component, Input, OnChanges, AfterViewInit, ViewChild, ElementRef, SimpleChanges } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { QuestionPlayerConstants } from '../question-directives/question-player/question-player.constants';
 
@@ -24,18 +24,24 @@ import { QuestionPlayerConstants } from '../question-directives/question-player/
   selector: 'oppia-score-ring',
   templateUrl: './score-ring.component.html'
 })
-export class ScoreRingComponent implements OnInit, OnChanges {
+export class ScoreRingComponent implements AfterViewInit, OnChanges {
   constructor() {}
-  @Input() score;
-  @Input() testIsPassed: boolean;
-  circle: SVGCircleElement;
-  radius: number;
-  circumference: number;
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  @Input() score!: number;
+  @Input() testIsPassed!: boolean;
+  @ViewChild('scoreRing') scoreRingElement!: ElementRef<SVGCircleElement>;
+  circle!: SVGCircleElement;
+  radius!: number;
+  circumference!: number;
   COLORS_FOR_PASS_FAIL_MODE = QuestionPlayerConstants.COLORS_FOR_PASS_FAIL_MODE;
 
   setScore(percent: number): void {
-    const offset = this.circumference - percent / 100 * this.circumference;
-    this.circle.style.strokeDashoffset = offset.toString();
+    setTimeout(() => {
+      const offset = this.circumference - percent / 100 * this.circumference;
+      this.circle.style.strokeDashoffset = offset.toString();
+    }, 2000);
   }
 
   getScoreRingColor(): string {
@@ -66,14 +72,22 @@ export class ScoreRingComponent implements OnInit, OnChanges {
     }
   }
 
-  ngOnInit(): void {
-    this.circle = (
-      document.querySelector('.score-ring-circle') as SVGCircleElement);
+  ngAfterViewInit(): void {
+    this.circle = this.scoreRingElement.nativeElement;
     this.radius = this.circle.r.baseVal.value;
     this.circumference = (this.radius * 2 * Math.PI);
+
     this.circle.style.strokeDasharray = (
       `${this.circumference} ${this.circumference}`);
     this.circle.style.strokeDashoffset = this.circumference.toString();
+    // A reflow needs to be triggered so that the browser picks up the
+    // assigned starting values of stroke-dashoffset and stroke-dasharray before
+    // setting the transition-duration value to '5s', else the ring can be seen
+    // animating down to the starting position.
+    // clientHeight property triggers a reflow.
+    this.circle.clientHeight;
+    this.circle.style.transitionDuration = '5s';
+    this.setScore(this.score);
   }
 }
 

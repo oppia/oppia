@@ -18,54 +18,46 @@
 
 from __future__ import annotations
 
+import datetime
+
+from core import feconf
 from core.constants import constants
 from core.platform import models
 
-from typing import Dict, List, Optional
+from typing import Dict, Final, List, Optional
 
 MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import base_models
     from mypy_imports import datastore_services
 
-(base_models,) = models.Registry.import_models([models.NAMES.base_model])
+(base_models,) = models.Registry.import_models([models.Names.BASE_MODEL])
 
 datastore_services = models.Registry.import_datastore_services()
 
-TASK_ENTITY_TYPE_EXPLORATION = constants.TASK_ENTITY_TYPE_EXPLORATION
-TASK_ENTITY_TYPES = (
-    TASK_ENTITY_TYPE_EXPLORATION,
+TASK_ENTITY_TYPES: Final = (
+    constants.TASK_ENTITY_TYPE_EXPLORATION,
 )
 
-TASK_STATUS_OPEN = constants.TASK_STATUS_OPEN
-TASK_STATUS_OBSOLETE = constants.TASK_STATUS_OBSOLETE
-TASK_STATUS_RESOLVED = constants.TASK_STATUS_RESOLVED
-TASK_STATUS_CHOICES = (
-    TASK_STATUS_OPEN,
-    TASK_STATUS_OBSOLETE,
-    TASK_STATUS_RESOLVED,
+TASK_STATUS_CHOICES: Final = (
+    constants.TASK_STATUS_OPEN,
+    constants.TASK_STATUS_OBSOLETE,
+    constants.TASK_STATUS_RESOLVED,
 )
 
-TASK_TARGET_TYPE_STATE = constants.TASK_TARGET_TYPE_STATE
-TASK_TARGET_TYPES = (
-    TASK_TARGET_TYPE_STATE,
+TASK_TARGET_TYPES: Final = (
+    constants.TASK_TARGET_TYPE_STATE,
 )
 
-TASK_TYPE_HIGH_BOUNCE_RATE = constants.TASK_TYPE_HIGH_BOUNCE_RATE
-TASK_TYPE_INEFFECTIVE_FEEDBACK_LOOP = (
-    constants.TASK_TYPE_INEFFECTIVE_FEEDBACK_LOOP)
-TASK_TYPE_NEEDS_GUIDING_RESPONSES = constants.TASK_TYPE_NEEDS_GUIDING_RESPONSES
-TASK_TYPE_SUCCESSIVE_INCORRECT_ANSWERS = (
-    constants.TASK_TYPE_SUCCESSIVE_INCORRECT_ANSWERS)
-TASK_TYPES = (
-    TASK_TYPE_HIGH_BOUNCE_RATE,
-    TASK_TYPE_INEFFECTIVE_FEEDBACK_LOOP,
-    TASK_TYPE_SUCCESSIVE_INCORRECT_ANSWERS,
-    TASK_TYPE_NEEDS_GUIDING_RESPONSES,
+TASK_TYPES: Final = (
+    constants.TASK_TYPE_HIGH_BOUNCE_RATE,
+    constants.TASK_TYPE_INEFFECTIVE_FEEDBACK_LOOP,
+    constants.TASK_TYPE_SUCCESSIVE_INCORRECT_ANSWERS,
+    constants.TASK_TYPE_NEEDS_GUIDING_RESPONSES,
 )
 
 
-class TaskEntryModel(base_models.BaseModel):
+class ExplorationStatsTaskEntryModel(base_models.BaseModel):
     """Model representation of an actionable task from the improvements tab.
 
     The ID of a task has the form: "[entity_type].[entity_id].[entity_version].
@@ -114,7 +106,8 @@ class TaskEntryModel(base_models.BaseModel):
 
     @classmethod
     def has_reference_to_user_id(cls, user_id: str) -> bool:
-        """Check whether any TaskEntryModel references the given user.
+        """Check whether any ExplorationStatsTaskEntryModel references
+        the given user.
 
         Args:
             user_id: str. The ID of the user whose data should be checked.
@@ -126,18 +119,14 @@ class TaskEntryModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:
-        """Model contains data to delete corresponding to a user:
+        """Model contains data to pseudonymize corresponding to a user:
         resolver_id field.
-
-        It is okay to delete task entries since, after they are resolved, they
-        only act as a historical record. The removal just removes the historical
-        record.
         """
-        return base_models.DELETION_POLICY.DELETE
+        return base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE
 
     @classmethod
     def apply_deletion_policy(cls, user_id: str) -> None:
-        """Delete instances of TaskEntryModel for the user.
+        """Delete instances of ExplorationStatsTaskEntryModel for the user.
 
         Args:
             user_id: str. The ID of the user whose data should be deleted.
@@ -160,7 +149,8 @@ class TaskEntryModel(base_models.BaseModel):
     @classmethod
     def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
         """Model contains data to export corresponding to a user:
-        TaskEntryModel contains the ID of the user that acted on a task.
+        ExplorationStatsTaskEntryModel contains the ID of the user that acted
+        on a task.
         """
         return dict(super(cls, cls).get_export_policy(), **{
             'composite_entity_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -190,18 +180,19 @@ class TaskEntryModel(base_models.BaseModel):
 
     @staticmethod
     def export_data(user_id: str) -> Dict[str, List[str]]:
-        """Returns the user-relevant properties of TaskEntryModels.
+        """Returns the user-relevant properties of
+        ExplorationStatsTaskEntryModels.
 
         Args:
             user_id: str. The ID of the user whose data should be exported.
 
         Returns:
-            dict. The user-relevant properties of TaskEntryModel in a dict
-            format. In this case, we are returning all the ids of the tasks
-            which were closed by this user.
+            dict. The user-relevant properties of ExplorationStatsTaskEntryModel
+            in a dict format. In this case, we are returning all the ids of the
+            tasks which were closed by this user.
         """
-        task_ids_resolved_by_user = TaskEntryModel.query(
-            TaskEntryModel.resolver_id == user_id)
+        task_ids_resolved_by_user = ExplorationStatsTaskEntryModel.query(
+            ExplorationStatsTaskEntryModel.resolver_id == user_id)
         return {
             'task_ids_resolved_by_user': (
                 [t.id for t in task_ids_resolved_by_user]),
@@ -215,13 +206,13 @@ class TaskEntryModel(base_models.BaseModel):
 
     @classmethod
     def generate_task_id(
-            cls,
-            entity_type: str,
-            entity_id: str,
-            entity_version: int,
-            task_type: str,
-            target_type: str,
-            target_id: str
+        cls,
+        entity_type: str,
+        entity_id: str,
+        entity_version: int,
+        task_type: str,
+        target_type: str,
+        target_id: str
     ) -> str:
         """Generates a new task entry ID.
 
@@ -237,16 +228,16 @@ class TaskEntryModel(base_models.BaseModel):
         Returns:
             str. The ID for the given task.
         """
-        return '%s.%s.%d.%s.%s.%s' % (
+        return feconf.TASK_ENTRY_ID_TEMPLATE % (
             entity_type, entity_id, entity_version, task_type, target_type,
             target_id)
 
     @classmethod
     def generate_composite_entity_id(
-            cls,
-            entity_type: str,
-            entity_id: str,
-            entity_version: int
+        cls,
+        entity_type: str,
+        entity_id: str,
+        entity_version: int
     ) -> str:
         """Generates a new composite_entity_id value.
 
@@ -259,21 +250,22 @@ class TaskEntryModel(base_models.BaseModel):
         Returns:
             str. The composite_entity_id for the given task.
         """
-        return '%s.%s.%d' % (entity_type, entity_id, entity_version)
+        return feconf.COMPOSITE_ENTITY_ID_TEMPLATE % (
+            entity_type, entity_id, entity_version)
 
     @classmethod
     def create(
-            cls,
-            entity_type: str,
-            entity_id: str,
-            entity_version: int,
-            task_type: str,
-            target_type: str,
-            target_id: str,
-            issue_description: Optional[str] = None,
-            status: str = TASK_STATUS_OBSOLETE,
-            resolver_id: Optional[str] = None,
-            resolved_on: Optional[str] = None
+        cls,
+        entity_type: str,
+        entity_id: str,
+        entity_version: int,
+        task_type: str,
+        target_type: str,
+        target_id: str,
+        issue_description: Optional[str] = None,
+        status: str = constants.TASK_STATUS_OBSOLETE,
+        resolver_id: Optional[str] = None,
+        resolved_on: Optional[datetime.datetime] = None
     ) -> str:
         """Creates a new task entry and puts it in storage.
 
@@ -289,8 +281,8 @@ class TaskEntryModel(base_models.BaseModel):
                 the task was created.
             status: str. Tracks the state/progress of a task entry.
             resolver_id: str. ID of the user who closed the task, if any.
-            resolved_on: str. The date and time at which a task was closed or
-                deprecated.
+            resolved_on: datetime. The date and time at which a task was closed
+                or deprecated.
 
         Returns:
             str. The ID of the new task.

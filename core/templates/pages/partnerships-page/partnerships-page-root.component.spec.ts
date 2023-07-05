@@ -55,8 +55,11 @@ describe('Partnerships Page Root', () => {
 
   it('should initialize', () => {
     spyOn(pageHeadService, 'updateTitleAndMetaTags');
+
     component.ngOnInit();
+
     expect(pageHeadService.updateTitleAndMetaTags).toHaveBeenCalledWith(
-      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.PARTNERSHIPS);
+      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.PARTNERSHIPS.TITLE,
+      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.PARTNERSHIPS.META);
   });
 });

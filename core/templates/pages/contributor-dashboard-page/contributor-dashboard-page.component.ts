@@ -16,208 +16,227 @@
  * @fileoverview Component for the contributor dashboard page.
  */
 
-require('base-components/base-content.component.ts');
-require(
-  'components/common-layout-directives/common-elements/' +
-  'background-banner.component.ts');
-require(
-  'components/common-layout-directives/common-elements/' +
-  'lazy-loading.component.ts');
-require(
-  'pages/contributor-dashboard-page/contributions-and-review/' +
-  'contributions-and-review.component.ts');
-require(
-  'pages/contributor-dashboard-page/translation-language-selector/' +
-  'translation-language-selector.component.ts');
-require(
-  'pages/contributor-dashboard-page/translation-topic-selector/' +
-  'translation-topic-selector.component.ts');
-require(
-  'pages/contributor-dashboard-page/question-opportunities/' +
-  'question-opportunities.component.ts');
-require(
-  'pages/contributor-dashboard-page/translation-opportunities/' +
-  'translation-opportunities.component.ts');
-require(
-  'pages/contributor-dashboard-page/voiceover-opportunities/' +
-  'voiceover-opportunities.component.ts');
-require('services/stateful/focus-manager.service.ts');
-require('domain/utilities/language-util.service.ts');
-require('domain/utilities/url-interpolation.service.ts');
-require('services/local-storage.service.ts');
-require('services/user.service.ts');
+import { AppConstants } from 'app.constants';
+import { Component, OnInit } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
+import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
+import { LanguageUtilService } from 'domain/utilities/language-util.service';
+import { ContributorDashboardConstants, ContributorDashboardTabsDetails } from 'pages/contributor-dashboard-page/contributor-dashboard-page.constants';
+import { ContributionAndReviewService } from './services/contribution-and-review.service';
+import { ContributionOpportunitiesService } from './services/contribution-opportunities.service';
+import { FocusManagerService } from 'services/stateful/focus-manager.service';
+import { LocalStorageService } from 'services/local-storage.service';
+import { TranslationLanguageService } from 'pages/exploration-editor-page/translation-tab/services/translation-language.service';
+import { TranslationTopicService } from 'pages/exploration-editor-page/translation-tab/services/translation-topic.service';
+import { UserService } from 'services/user.service';
+import { WindowRef } from 'services/contextual/window-ref.service';
 
-require(
-  // eslint-disable-next-line max-len
-  'pages/contributor-dashboard-page/contributor-dashboard-page.constants.ajs.ts');
+@Component({
+  selector: 'contributor-dashboard-page',
+  templateUrl: './contributor-dashboard-page.component.html'
+})
+export class ContributorDashboardPageComponent
+  implements OnInit {
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  defaultHeaderVisible!: boolean;
+  profilePicturePngDataUrl!: string;
+  profilePictureWebpDataUrl!: string;
+  userInfoIsLoading!: boolean;
+  userIsLoggedIn!: boolean;
+  userIsReviewer!: boolean;
+  userCanReviewTranslationSuggestionsInLanguages!: string[];
+  userCanReviewVoiceoverSuggestionsInLanguages!: string[];
+  userCanReviewQuestions!: boolean;
+  tabsDetails!: ContributorDashboardTabsDetails;
+  OPPIA_AVATAR_IMAGE_URL!: string;
+  languageCode!: string;
+  topicName!: string;
+  activeTabName!: string;
+  // The following property is set to null when the
+  // user is not logged in.
+  username: string | null = null;
 
-angular.module('oppia').component('contributorDashboardPage', {
-  template: require('./contributor-dashboard-page.component.html'),
-  controller: [
-    '$rootScope', '$timeout', 'ContributionOpportunitiesService',
-    'FocusManagerService', 'LanguageUtilService', 'LocalStorageService',
-    'TranslationLanguageService', 'TranslationTopicService',
-    'UrlInterpolationService', 'UserService', 'WindowRef',
-    'CONTRIBUTOR_DASHBOARD_TABS_DETAILS', 'DEFAULT_OPPORTUNITY_TOPIC_NAME',
-    'OPPIA_AVATAR_LINK_URL',
-    function(
-        $rootScope, $timeout, ContributionOpportunitiesService,
-        FocusManagerService, LanguageUtilService, LocalStorageService,
-        TranslationLanguageService, TranslationTopicService,
-        UrlInterpolationService, UserService, WindowRef,
-        CONTRIBUTOR_DASHBOARD_TABS_DETAILS, DEFAULT_OPPORTUNITY_TOPIC_NAME,
-        OPPIA_AVATAR_LINK_URL) {
-      var ctrl = this;
+  constructor(
+    private contributionAndReviewService: ContributionAndReviewService,
+    private contributionOpportunitiesService: ContributionOpportunitiesService,
+    private focusManagerService: FocusManagerService,
+    private languageUtilService: LanguageUtilService,
+    private localStorageService: LocalStorageService,
+    private translationLanguageService: TranslationLanguageService,
+    private translationTopicService: TranslationTopicService,
+    private urlInterpolationService: UrlInterpolationService,
+    private userService: UserService,
+    private windowRef: WindowRef,
+  ) {}
 
+  onTabClick(activeTabName: string): void {
+    this.activeTabName = activeTabName;
 
-      var getLanguageDescriptions = function(languageCodes) {
-        var languageDescriptions = [];
-        languageCodes.forEach(function(languageCode) {
-          languageDescriptions.push(
-            LanguageUtilService.getAudioLanguageDescription(
-              languageCode));
-        });
-        return languageDescriptions;
-      };
-
-      ctrl.languageCode = TranslationLanguageService.getActiveLanguageCode();
-
-      ctrl.onChangeLanguage = function(languageCode: string) {
-        ctrl.languageCode = languageCode;
-        TranslationLanguageService.setActiveLanguageCode(ctrl.languageCode);
-        LocalStorageService.updateLastSelectedTranslationLanguageCode(
-          ctrl.languageCode);
-        $rootScope.$applyAsync();
-      };
-
-      ctrl.showLanguageSelector = function() {
-        var activeTabDetail = ctrl.tabsDetails[ctrl.activeTabName];
-        return activeTabDetail.customizationOptions.includes('language');
-      };
-
-      ctrl.onChangeTopic = function(topicName: string) {
-        ctrl.topicName = topicName;
-        TranslationTopicService.setActiveTopicName(ctrl.topicName);
-        LocalStorageService.updateLastSelectedTranslationTopicName(
-          ctrl.topicName);
-        $rootScope.$applyAsync();
-      };
-
-      ctrl.showTopicSelector = function() {
-        var activeTabDetail = ctrl.tabsDetails[ctrl.activeTabName];
-        return activeTabDetail.customizationOptions.includes('topic');
-      };
-
-      ctrl.onTabClick = function(activeTabName) {
-        ctrl.activeTabName = activeTabName;
-        // The $timeout is required to ensure that focus is applied only
-        // after all the functions in main thread have executed.
-        if (ctrl.activeTabName === 'translateTextTab') {
-          $timeout(() => {
-            FocusManagerService.setFocusWithoutScroll('selectLangDropDown');
-          }, 5);
-        }
-      };
-
-      ctrl.$onInit = function() {
-        ctrl.profilePictureDataUrl = null;
-        ctrl.username = null;
-        ctrl.userInfoIsLoading = true;
-        ctrl.userIsLoggedIn = false;
-        ctrl.userIsReviewer = false;
-        ctrl.userCanReviewTranslationSuggestionsInLanguages = [];
-        ctrl.userCanReviewVoiceoverSuggestionsInLanguages = [];
-        ctrl.userCanReviewQuestions = false;
-        ctrl.defaultHeaderVisible = true;
-
-        var prevSelectedTopicName = (
-          LocalStorageService.getLastSelectedTranslationTopicName());
-
-        WindowRef.nativeWindow.addEventListener('scroll', function() {
-          ctrl.scrollFunction();
-        });
-
-        ctrl.scrollFunction = function() {
-          if (WindowRef.nativeWindow.pageYOffset >= 5) {
-            ctrl.defaultHeaderVisible = false;
-          } else {
-            ctrl.defaultHeaderVisible = true;
-          }
-          // TODO(#8521): Remove the use of $rootScope.$apply()
-          // once the controller is migrated to angular.
-          $rootScope.$applyAsync();
-        };
-
-        UserService.getProfileImageDataUrlAsync().then(
-          function(dataUrl) {
-            ctrl.profilePictureDataUrl = dataUrl;
-            // TODO(#8521): Remove the use of $rootScope.$apply()
-            // once the controller is migrated to angular.
-            $rootScope.$applyAsync();
-          });
-
-        UserService.getUserContributionRightsDataAsync().then(
-          function(userContributionRights) {
-            ctrl.userCanReviewTranslationSuggestionsInLanguages = (
-              getLanguageDescriptions(
-                userContributionRights
-                  .can_review_translation_for_language_codes));
-
-            ctrl.userCanReviewVoiceoverSuggestionsInLanguages = (
-              getLanguageDescriptions(
-                userContributionRights
-                  .can_review_voiceover_for_language_codes));
-
-            ctrl.userCanReviewQuestions = (
-              userContributionRights.can_review_questions);
-
-            ctrl.userIsReviewer = (
-              ctrl.userCanReviewTranslationSuggestionsInLanguages
-                .length > 0 ||
-              ctrl.userCanReviewVoiceoverSuggestionsInLanguages
-                .length > 0 ||
-              ctrl.userCanReviewQuestions);
-
-            ctrl.tabsDetails.submitQuestionTab.enabled = (
-              userContributionRights.can_suggest_questions);
-            // TODO(#8521): Remove the use of $rootScope.$apply()
-            // once the controller is migrated to angular.
-            $rootScope.$applyAsync();
-          });
-
-        UserService.getUserInfoAsync().then(function(userInfo) {
-          ctrl.userInfoIsLoading = false;
-          if (userInfo.isLoggedIn()) {
-            ctrl.userIsLoggedIn = true;
-            ctrl.username = userInfo.getUsername();
-          } else {
-            ctrl.userIsLoggedIn = false;
-            ctrl.username = '';
-          }
-          // TODO(#8521): Remove the use of $rootScope.$apply()
-          // once the controller is migrated to angular.
-          $rootScope.$applyAsync();
-        });
-
-        ctrl.topicName = DEFAULT_OPPORTUNITY_TOPIC_NAME;
-        TranslationTopicService.setActiveTopicName(ctrl.topicName);
-
-        ContributionOpportunitiesService.getAllTopicNamesAsync()
-          .then(function(topicNames) {
-            if (topicNames.indexOf(prevSelectedTopicName) !== -1) {
-              ctrl.topicName = prevSelectedTopicName;
-              TranslationTopicService.setActiveTopicName(ctrl.topicName);
-            }
-            $rootScope.$applyAsync();
-          });
-
-        ctrl.activeTabName = 'myContributionTab';
-        ctrl.tabsDetails = CONTRIBUTOR_DASHBOARD_TABS_DETAILS;
-        ctrl.OPPIA_AVATAR_LINK_URL = OPPIA_AVATAR_LINK_URL;
-        ctrl.OPPIA_AVATAR_IMAGE_URL = (
-          UrlInterpolationService.getStaticImageUrl(
-            '/avatar/oppia_avatar_100px.svg'));
-      };
+    // The setTimeout is required to ensure that focus is applied only
+    // after all the functions in main thread have executed.
+    if (this.activeTabName === 'translateTextTab') {
+      setTimeout(() => {
+        this.focusManagerService.setFocusWithoutScroll('selectLangDropDown');
+      }, 5);
     }
-  ]
-});
+  }
+
+  provideLanguageForProtractorClass(languageDescription: string): string {
+    const lang = languageDescription.split(' ').join('-').toLowerCase();
+    return lang.replace(/\(?\)?/g, '');
+  }
+
+  onChangeLanguage(languageCode: string): void {
+    this.languageCode = languageCode;
+    this.translationLanguageService.setActiveLanguageCode(this.languageCode);
+    this.localStorageService.updateLastSelectedTranslationLanguageCode(
+      this.languageCode);
+  }
+
+  showLanguageSelector(): boolean {
+    const activeTabDetail = this.tabsDetails[
+      this.activeTabName as keyof ContributorDashboardTabsDetails];
+    return activeTabDetail.customizationOptions.includes('language');
+  }
+
+  onChangeTopic(topicName: string): void {
+    this.topicName = topicName;
+    this.translationTopicService.setActiveTopicName(this.topicName);
+    this.localStorageService.updateLastSelectedTranslationTopicName(
+      this.topicName);
+  }
+
+  showTopicSelector(): boolean {
+    const activeTabDetail = this.tabsDetails[
+      this.activeTabName as keyof ContributorDashboardTabsDetails];
+    const activeSuggestionType =
+      this.contributionAndReviewService.getActiveSuggestionType();
+    const activeTabType = this.contributionAndReviewService.getActiveTabType();
+    return activeTabDetail.customizationOptions.includes('topic') ||
+      (
+        activeTabType === 'reviews' &&
+        activeSuggestionType === 'translate_content' &&
+        this.activeTabName !== 'submitQuestionTab'
+      );
+  }
+
+  scrollFunction(): void {
+    if (this.windowRef.nativeWindow.pageYOffset >= 80) {
+      this.defaultHeaderVisible = false;
+    } else {
+      this.defaultHeaderVisible = true;
+    }
+  }
+
+  getLanguageDescriptions(languageCodes: string[]): string[] {
+    const languageDescriptions: string[] = [];
+    languageCodes.forEach((languageCode) => {
+      languageDescriptions.push(
+        this.languageUtilService.getAudioLanguageDescription(
+          languageCode));
+    });
+    return languageDescriptions;
+  }
+
+  ngOnInit(): void {
+    this.username = '';
+    this.userInfoIsLoading = true;
+    this.userIsLoggedIn = false;
+    this.userIsReviewer = false;
+    this.userCanReviewTranslationSuggestionsInLanguages = [];
+    this.userCanReviewVoiceoverSuggestionsInLanguages = [];
+    this.userCanReviewQuestions = false;
+    this.defaultHeaderVisible = true;
+
+    const prevSelectedTopicName = (
+      this.localStorageService.getLastSelectedTranslationTopicName());
+
+    this.windowRef.nativeWindow.addEventListener('scroll', () => {
+      this.scrollFunction();
+    });
+
+    this.userService.getUserContributionRightsDataAsync().then(
+      (userContributionRights) => {
+        if (userContributionRights === null) {
+          throw new Error('User contribution rights not found.');
+        }
+        this.userCanReviewTranslationSuggestionsInLanguages = (
+          this.getLanguageDescriptions(
+            userContributionRights
+              .can_review_translation_for_language_codes));
+
+        this.userCanReviewVoiceoverSuggestionsInLanguages = (
+          this.getLanguageDescriptions(
+            userContributionRights
+              .can_review_voiceover_for_language_codes));
+
+        this.userCanReviewQuestions = (
+          userContributionRights.can_review_questions);
+
+        this.userIsReviewer = (
+          this.userCanReviewTranslationSuggestionsInLanguages
+            .length > 0 ||
+          this.userCanReviewVoiceoverSuggestionsInLanguages
+            .length > 0 ||
+          this.userCanReviewQuestions);
+
+        this.tabsDetails.submitQuestionTab.enabled = (
+          userContributionRights.can_suggest_questions);
+      });
+
+    this.userService.getUserInfoAsync().then((userInfo) => {
+      this.userInfoIsLoading = false;
+      this.profilePictureWebpDataUrl = (
+        this.urlInterpolationService.getStaticImageUrl(
+          AppConstants.DEFAULT_PROFILE_IMAGE_WEBP_PATH));
+      this.profilePicturePngDataUrl = (
+        this.urlInterpolationService.getStaticImageUrl(
+          AppConstants.DEFAULT_PROFILE_IMAGE_PNG_PATH));
+      if (userInfo.isLoggedIn()) {
+        this.userIsLoggedIn = true;
+        this.username = userInfo.getUsername();
+        if (this.username !== null) {
+          [this.profilePicturePngDataUrl, this.profilePictureWebpDataUrl] = (
+            this.userService.getProfileImageDataUrl(this.username));
+        }
+      } else {
+        this.userIsLoggedIn = false;
+        this.username = '';
+      }
+    });
+
+    this.contributionOpportunitiesService.getTranslatableTopicNamesAsync()
+      .then((topicNames) => {
+        // TODO(#15710): Set default active topic to 'All'.
+        if (topicNames.length <= 0) {
+          return;
+        }
+        this.topicName = topicNames[0];
+        if (
+          prevSelectedTopicName &&
+          topicNames.indexOf(prevSelectedTopicName) !== -1
+        ) {
+          this.topicName = prevSelectedTopicName;
+        }
+        this.translationTopicService.setActiveTopicName(this.topicName);
+      });
+
+    this.activeTabName = 'myContributionTab';
+
+    this.tabsDetails = {
+      ...ContributorDashboardConstants.CONTRIBUTOR_DASHBOARD_TABS_DETAILS
+    // TODO(#13015): Remove use of unknown as a type.
+    } as unknown as ContributorDashboardTabsDetails;
+    this.OPPIA_AVATAR_IMAGE_URL = (
+      this.urlInterpolationService.getStaticImageUrl(
+        '/avatar/oppia_avatar_100px.svg'));
+    this.languageCode = this.translationLanguageService.getActiveLanguageCode();
+  }
+}
+
+angular.module('oppia').directive('contributorDashboardPage',
+  downgradeComponent({
+    component: ContributorDashboardPageComponent
+  }) as angular.IDirectiveFactory);

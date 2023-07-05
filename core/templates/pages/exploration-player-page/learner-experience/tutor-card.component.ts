@@ -16,13 +16,15 @@
  * @fileoverview Component for the Tutor Card.
  */
 
-import { Component, Input } from '@angular/core';
+import { Component, Input, SimpleChanges, ViewChild, Renderer2 } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
+import { TranslateService } from '@ngx-translate/core';
 import { AppConstants } from 'app.constants';
 import { BindableVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
 import { StateCard } from 'domain/state_card/state-card.model';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import cloneDeep from 'lodash/cloneDeep';
+import isEqual from 'lodash/isEqual';
 import { Subscription } from 'rxjs';
 import { AudioBarStatusService } from 'services/audio-bar-status.service';
 import { AudioPlayerService } from 'services/audio-player.service';
@@ -41,29 +43,103 @@ import { ExplorationPlayerStateService } from '../services/exploration-player-st
 import { LearnerAnswerInfoService } from '../services/learner-answer-info.service';
 import { PlayerPositionService } from '../services/player-position.service';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
+import { animate, keyframes, state, style, transition, trigger } from '@angular/animations';
+import { CollectionSummary } from 'domain/collection/collection-summary.model';
+import { LearnerExplorationSummary } from 'domain/summary/learner-exploration-summary.model';
+import { EndChapterCheckMarkComponent } from './end-chapter-check-mark.component';
+import { EndChapterConfettiComponent } from './end-chapter-confetti.component';
+import { PlatformFeatureService } from 'services/platform-feature.service';
+import { QuestionPlayerConfig } from './ratings-and-recommendations.component';
+
+const CHECK_MARK_HIDE_DELAY_IN_MSECS = 500;
+const REDUCED_MOTION_ANIMATION_DURATION_IN_MSECS = 2000;
+const CONFETTI_ANIMATION_DELAY_IN_MSECS = 2000;
+const STANDARD_ANIMATION_DURATION_IN_MSECS = 4000;
+const MILESTONE_SPECIFIC_COMPLETED_CHAPTER_COUNTS = [1, 5, 10, 25, 50];
+
+import './tutor-card.component.css';
+
 
 @Component({
   selector: 'oppia-tutor-card',
   templateUrl: './tutor-card.component.html',
+  styleUrls: ['./tutor-card.component.css'],
+  animations: [
+    trigger('expandInOut', [
+      state('in', style({
+        overflow: 'visible',
+        height: '*'
+      })),
+      state('out', style({
+        overflow: 'hidden',
+        height: '0px',
+        display: 'none'
+      })),
+      transition('in => out', animate('500ms ease-in-out')),
+      transition('out => in', [
+        style({ display: 'block' }),
+        animate('500ms ease-in-out')
+      ])
+    ]),
+    trigger('fadeInOut', [
+      transition('void => *', []),
+      transition('* <=> *', [
+        style({ opacity: 0 }),
+        animate('1s ease', keyframes([
+          style({ opacity: 0 }),
+          style({ opacity: 1 })
+        ]))
+      ])
+    ])
+  ]
 })
 export class TutorCardComponent {
-  @Input() displayedCard: StateCard;
-  @Input() startCardChangeAnimation: boolean;
-  @Input() avatarImageIsShown: boolean;
-  directiveSubscriptions = new Subscription();
-  private _editorPreviewMode: boolean;
-  arePreviousResponsesShown: boolean = false;
-  lastAnswer: string;
-  conceptCardIsBeingShown: boolean;
-  interactionIsActive: boolean;
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  @ViewChild('checkMark') checkMarkComponent!: EndChapterCheckMarkComponent;
+  @ViewChild('confetti') confettiComponent!: EndChapterConfettiComponent;
+  @Input() displayedCard!: StateCard;
+  @Input() displayedCardWasCompletedInPrevSession!: boolean;
+  @Input() startCardChangeAnimation!: boolean;
+  @Input() avatarImageIsShown!: boolean;
+  @Input() shouldHideInteraction!: boolean;
+  @Input() userIsLoggedIn!: boolean;
+  @Input() explorationIsInPreviewMode!: boolean;
+  @Input() questionPlayerConfig!: QuestionPlayerConfig;
+  @Input() collectionSummary!: CollectionSummary;
+  @Input() isRefresherExploration!: boolean;
+  @Input() recommendedExplorationSummaries!: LearnerExplorationSummary[];
+  @Input() parentExplorationIds!: string[];
+  @Input() inStoryMode!: boolean;
+  @Input() nextLessonLink!: string;
+  @Input() completedChaptersCount!: number;
+  @Input() milestoneMessageIsToBeDisplayed!: boolean;
+  @Input() feedbackIsEnabled!: boolean;
+  @Input() learnerCanOnlyAttemptQuestionOnce!: boolean;
+  @Input() inputOutputHistoryIsShown!: boolean;
+  @Input() checkpointCelebrationModalIsEnabled!: boolean;
+  private _editorPreviewMode!: boolean;
+  lastAnswer!: { answerDetails: string } | string | null;
+  conceptCardIsBeingShown!: boolean;
+  interactionIsActive!: boolean;
   waitingForOppiaFeedback: boolean = false;
-  interactionInstructions: string;
-  contentAudioTranslations: BindableVoiceovers;
-  isIframed: boolean;
-  getCanAskLearnerForAnswerInfo: () => boolean;
-  OPPIA_AVATAR_IMAGE_URL: string;
-  OPPIA_AVATAR_LINK_URL: string;
-  profilePicture: string;
+  interactionInstructions!: string | null;
+  contentAudioTranslations!: BindableVoiceovers;
+  isIframed!: boolean;
+  getCanAskLearnerForAnswerInfo!: () => boolean;
+  OPPIA_AVATAR_IMAGE_URL!: string;
+  profilePicturePngDataUrl!: string;
+  profilePictureWebpDataUrl!: string;
+  directiveSubscriptions = new Subscription();
+  arePreviousResponsesShown: boolean = false;
+  nextMilestoneChapterCount: number | null = null;
+  checkMarkHidden: boolean = true;
+  animationHasPlayedOnce: boolean = false;
+  checkMarkSkipped: boolean = false;
+  confettiAnimationTimeout!: NodeJS.Timeout;
+  skipClickListener: Function | null = null;
+  username!: string | null;
 
   constructor(
     private audioBarStatusService: AudioBarStatusService,
@@ -82,39 +158,46 @@ export class TutorCardComponent {
     private urlService: UrlService,
     private userService: UserService,
     private windowDimensionsService: WindowDimensionsService,
-    private windowRef: WindowRef
+    private windowRef: WindowRef,
+    public platformFeatureService: PlatformFeatureService,
+    private renderer: Renderer2,
+    private translateService: TranslateService
   ) {}
+
+  async getUserInfoAsync(): Promise<void> {
+    const userInfo = await this.userService.getUserInfoAsync();
+    this.username = userInfo.getUsername();
+    if (!this._editorPreviewMode) {
+      if (this.username !== null) {
+        [this.profilePicturePngDataUrl, this.profilePictureWebpDataUrl] = (
+          this.userService.getProfileImageDataUrl(this.username));
+      } else {
+        this.profilePictureWebpDataUrl = (
+          this.urlInterpolationService.getStaticImageUrl(
+            AppConstants.DEFAULT_PROFILE_IMAGE_WEBP_PATH));
+        this.profilePicturePngDataUrl = (
+          this.urlInterpolationService.getStaticImageUrl(
+            AppConstants.DEFAULT_PROFILE_IMAGE_PNG_PATH));
+      }
+    } else {
+      this.profilePictureWebpDataUrl = (
+        this.urlInterpolationService.getStaticImageUrl(
+          AppConstants.DEFAULT_PROFILE_IMAGE_WEBP_PATH));
+      this.profilePicturePngDataUrl = (
+        this.urlInterpolationService.getStaticImageUrl(
+          AppConstants.DEFAULT_PROFILE_IMAGE_PNG_PATH));
+    }
+  }
 
   ngOnInit(): void {
     this._editorPreviewMode = this.contextService.isInExplorationEditorPage();
+    this.getUserInfoAsync();
     this.isIframed = this.urlService.isIframed();
     this.getCanAskLearnerForAnswerInfo = (
       this.learnerAnswerInfoService.getCanAskLearnerForAnswerInfo);
     this.OPPIA_AVATAR_IMAGE_URL = (
       this.urlInterpolationService
         .getStaticImageUrl('/avatar/oppia_avatar_100px.svg'));
-    this.OPPIA_AVATAR_LINK_URL = AppConstants.OPPIA_AVATAR_LINK_URL;
-
-    this.profilePicture = this.urlInterpolationService
-      .getStaticImageUrl('/avatar/user_blue_72px.png');
-
-    if (!this._editorPreviewMode) {
-      this.userService.getProfileImageDataUrlAsync().then((dataUrl) => {
-        this.profilePicture = dataUrl;
-      });
-    } else {
-      this.profilePicture = (
-        this.urlInterpolationService.getStaticImageUrl(
-          AppConstants.DEFAULT_PROFILE_IMAGE_PATH));
-    }
-
-    this.directiveSubscriptions.add(
-      this.playerPositionService.onActiveCardChanged.subscribe(
-        () => {
-          this.updateDisplayedCard();
-        }
-      )
-    );
 
     this.directiveSubscriptions.add(
       this.explorationPlayerStateService.onOppiaFeedbackAvailable.subscribe(
@@ -132,11 +215,133 @@ export class TutorCardComponent {
         }
       )
     );
-    this.updateDisplayedCard();
   }
 
   ngOnDestroy(): void {
     this.directiveSubscriptions.unsubscribe();
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (
+      changes.displayedCard &&
+      !isEqual(
+        changes.displayedCard.previousValue,
+        changes.displayedCard.currentValue)) {
+      this.updateDisplayedCard();
+    }
+    if (
+      this.platformFeatureService.status.EndChapterCelebration.isEnabled &&
+      this.isOnTerminalCard() &&
+      !this.animationHasPlayedOnce &&
+      this.inStoryMode
+    ) {
+      this.triggerCelebratoryAnimation();
+    }
+  }
+
+  triggerCelebratoryAnimation(): void {
+    this.checkMarkHidden = false;
+    this.checkMarkComponent.animateCheckMark();
+    this.skipClickListener = this.renderer.listen(
+      'document', 'click', () => {
+        clearTimeout(this.confettiAnimationTimeout);
+        this.checkMarkSkipped = true;
+        setTimeout(() => {
+          this.checkMarkHidden = true;
+        }, CHECK_MARK_HIDE_DELAY_IN_MSECS);
+      });
+    this.animationHasPlayedOnce = true;
+    let mediaQuery =
+      this.windowRef.nativeWindow.matchMedia('(prefers-reduced-motion)');
+    if (mediaQuery.matches) {
+      setTimeout(() => {
+        this.checkMarkSkipped = true;
+        setTimeout(() => {
+          this.checkMarkHidden = true;
+          if (this.skipClickListener) {
+            this.skipClickListener();
+          }
+          this.skipClickListener = null;
+        }, CHECK_MARK_HIDE_DELAY_IN_MSECS);
+      }, REDUCED_MOTION_ANIMATION_DURATION_IN_MSECS);
+    } else {
+      this.confettiAnimationTimeout = setTimeout(() => {
+        this.confettiComponent.animateConfetti();
+      }, CONFETTI_ANIMATION_DELAY_IN_MSECS);
+      setTimeout(() => {
+        this.checkMarkHidden = true;
+        if (this.skipClickListener) {
+          this.skipClickListener();
+        }
+        this.skipClickListener = null;
+      }, STANDARD_ANIMATION_DURATION_IN_MSECS);
+    }
+  }
+
+  generateMilestoneMessage(): string {
+    if (!this.inStoryMode ||
+        !this.milestoneMessageIsToBeDisplayed ||
+        !this.completedChaptersCount ||
+        !MILESTONE_SPECIFIC_COMPLETED_CHAPTER_COUNTS.includes(
+          this.completedChaptersCount)) {
+      return '';
+    }
+    let chapterCountMessageIndex = (
+      MILESTONE_SPECIFIC_COMPLETED_CHAPTER_COUNTS.indexOf(
+        this.completedChaptersCount)) + 1;
+    let milestoneMessageTranslationKey = (
+      'I18N_END_CHAPTER_MILESTONE_MESSAGE_' + chapterCountMessageIndex);
+    return this.translateService.instant(milestoneMessageTranslationKey);
+  }
+
+  setNextMilestoneAndCheckIfProgressBarIsShown(): boolean {
+    if (
+      !this.inStoryMode ||
+      this.isCompletedChaptersCountGreaterThanLastMilestone() ||
+      this.isMilestoneReachedAndMilestoneMessageToBeDisplayed()
+    ) {
+      this.nextMilestoneChapterCount = null;
+      return false;
+    }
+
+    if (
+      !this.milestoneMessageIsToBeDisplayed &&
+      MILESTONE_SPECIFIC_COMPLETED_CHAPTER_COUNTS.includes(
+        this.completedChaptersCount)
+    ) {
+      let chapterCountIndex = (
+        MILESTONE_SPECIFIC_COMPLETED_CHAPTER_COUNTS.indexOf(
+          this.completedChaptersCount));
+      this.nextMilestoneChapterCount = (
+        MILESTONE_SPECIFIC_COMPLETED_CHAPTER_COUNTS[chapterCountIndex + 1]);
+      return true;
+    }
+
+    for (let milestoneCount of MILESTONE_SPECIFIC_COMPLETED_CHAPTER_COUNTS) {
+      if (milestoneCount > this.completedChaptersCount) {
+        this.nextMilestoneChapterCount = milestoneCount;
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  isMilestoneReachedAndMilestoneMessageToBeDisplayed(): boolean {
+    return (
+      this.milestoneMessageIsToBeDisplayed &&
+      MILESTONE_SPECIFIC_COMPLETED_CHAPTER_COUNTS.includes(
+        this.completedChaptersCount
+      )
+    );
+  }
+
+  isCompletedChaptersCountGreaterThanLastMilestone(): boolean {
+    return this.completedChaptersCount > 50;
+  }
+
+  getStaticImageUrl(imagePath: string): string {
+    return this.urlInterpolationService.getStaticImageUrl(imagePath);
   }
 
   isAudioBarExpandedOnMobileDevice(): boolean {
@@ -193,7 +398,8 @@ export class TutorCardComponent {
     return this.displayedCard.isInteractionInline();
   }
 
-  getContentAudioHighlightClass(): Object {
+  // This function returns null if audio is not available.
+  getContentAudioHighlightClass(): string | null {
     if (this.audioTranslationManagerService
       .getCurrentComponentName() ===
       AppConstants.COMPONENT_NAME_CONTENT &&
@@ -201,6 +407,7 @@ export class TutorCardComponent {
       this.autogeneratedAudioPlayerService.isPlaying())) {
       return ExplorationPlayerConstants.AUDIO_HIGHLIGHT_CSS_CLASS;
     }
+    return null;
   }
 
   getContentFocusLabel(index: number): string {

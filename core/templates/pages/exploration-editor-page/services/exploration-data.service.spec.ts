@@ -25,29 +25,47 @@ import { LoggerService } from 'services/contextual/logger.service';
 import { CsrfTokenService } from 'services/csrf-token.service';
 import { UrlService } from 'services/contextual/url.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
-import { ExplorationDraft } from 'domain/exploration/exploration-draft.model';
+import { ExplorationChange, ExplorationDraft } from 'domain/exploration/exploration-draft.model';
 import { ExplorationBackendDict } from 'domain/exploration/ExplorationObjectFactory';
 import { FetchExplorationBackendResponse } from 'domain/exploration/read-only-exploration-backend-api.service';
 
 describe('Exploration data service', function() {
-  let eds: ExplorationDataService = null;
-  let eebas: EditableExplorationBackendApiService = null;
-  let lss: LocalStorageService = null;
-  let ls: LoggerService = null;
+  let eds: ExplorationDataService;
+  let eebas: EditableExplorationBackendApiService;
+  let lss: LocalStorageService;
+  let ls: LoggerService;
   let httpTestingController: HttpTestingController;
-  let csrfService: CsrfTokenService = null;
+  let csrfService: CsrfTokenService;
   let sampleDataResults: ExplorationBackendDict = {
     draft_change_list_id: 3,
     version: 1,
+    auto_tts_enabled: false,
     draft_changes: [],
     is_version_of_draft_valid: true,
+    next_content_id_index: 1,
     init_state_name: 'init',
     param_changes: [],
     param_specs: {randomProp: {obj_type: 'randomVal'}},
     states: {},
     title: 'Test Exploration',
     language_code: 'en',
-    correctness_feedback_enabled: false
+    correctness_feedback_enabled: false,
+    exploration_metadata: {
+      title: 'Exploration',
+      category: 'Algebra',
+      objective: 'To learn',
+      language_code: 'en',
+      tags: [],
+      blurb: '',
+      author_notes: '',
+      states_schema_version: 50,
+      init_state_name: 'Introduction',
+      param_specs: {},
+      param_changes: [],
+      auto_tts_enabled: false,
+      correctness_feedback_enabled: true,
+      edits_allowed: true
+    }
   };
   let sampleExploration: FetchExplorationBackendResponse = {
     can_edit: true,
@@ -91,6 +109,7 @@ describe('Exploration data service', function() {
         }
       });
     }
+
     async updateExplorationAsync() {
       return new Promise((resolve, reject) => {
         if (this.resolve) {
@@ -171,6 +190,49 @@ describe('Exploration data service', function() {
       expect(errorCallback).toHaveBeenCalled();
     }
   ));
+
+  it('should trigger errorcallback handler when version number is undefined',
+    fakeAsync(() => {
+      let dataResults: ExplorationBackendDict = {
+        draft_change_list_id: 3,
+        version: undefined,
+        auto_tts_enabled: false,
+        draft_changes: [],
+        is_version_of_draft_valid: true,
+        init_state_name: 'init',
+        param_changes: [],
+        param_specs: {randomProp: {obj_type: 'randomVal'}},
+        states: {},
+        title: 'Test Exploration',
+        language_code: 'en',
+        next_content_id_index: 5,
+        correctness_feedback_enabled: false,
+        exploration_metadata: {
+          title: 'Exploration',
+          category: 'Algebra',
+          objective: 'To learn',
+          language_code: 'en',
+          tags: [],
+          blurb: '',
+          author_notes: '',
+          states_schema_version: 50,
+          init_state_name: 'Introduction',
+          param_specs: {},
+          param_changes: [],
+          auto_tts_enabled: false,
+          correctness_feedback_enabled: true,
+          edits_allowed: true
+        }
+      };
+      eds.data = dataResults;
+      const errorCallback = jasmine.createSpy('error');
+      const successCallback = jasmine.createSpy('success');
+      eds.autosaveChangeListAsync([], successCallback, errorCallback);
+
+      flushMicrotasks();
+      expect(successCallback).not.toHaveBeenCalled();
+      expect(errorCallback).toHaveBeenCalled();
+    }));
 
   it('should autosave draft changes when draft ids match', fakeAsync(() => {
     const errorCallback = jasmine.createSpy('error');
@@ -299,7 +361,7 @@ describe('Exploration data service', function() {
     const explorationDraft: ExplorationDraft = new ExplorationDraft([], 1);
     spyOn(explorationDraft, 'isValid').and.callFake(() => true);
     spyOn(lss, 'getExplorationDraft').and.returnValue(explorationDraft);
-    const changeList = [];
+    const changeList: ExplorationChange[] = [];
     eds.getDataAsync(errorCallback).then(data => {
       expect(data).toEqual(sampleDataResults);
       expect(errorCallback).not.toHaveBeenCalled();
@@ -326,7 +388,7 @@ describe('Exploration data service', function() {
     const explorationDraft: ExplorationDraft = new ExplorationDraft([], 1);
     spyOn(explorationDraft, 'isValid').and.callFake(() => false);
     spyOn(lss, 'getExplorationDraft').and.returnValue(explorationDraft);
-    const changeList = [];
+    const changeList: ExplorationChange[] = [];
     let toBeResolved = false;
     // The data.exploration won't receive a value.
     spyOn(eebas, 'updateExplorationAsync').and.callFake(
@@ -361,7 +423,7 @@ describe('Exploration data service', function() {
       const explorationDraft: ExplorationDraft = new ExplorationDraft([], 1);
       spyOn(explorationDraft, 'isValid').and.callFake(() => true);
       spyOn(lss, 'getExplorationDraft').and.returnValue(explorationDraft);
-      const changeList = [];
+      const changeList: ExplorationChange[] = [];
       eds.getDataAsync(errorCallback).then(function(data) {
         expect(data).toEqual(sampleDataResults);
         expect(errorCallback).not.toHaveBeenCalled();
@@ -386,9 +448,9 @@ describe('Exploration data service', function() {
 });
 
 describe('Exploration data service', function() {
-  var eds = null;
+  var eds: ExplorationDataService;
   var ls = null;
-  var logErrorSpy;
+  var logErrorSpy: jasmine.Spy;
   var pathname = '/exploration/0';
 
   beforeEach(() => {
@@ -410,12 +472,10 @@ describe('Exploration data service', function() {
   });
 
   it('should throw error when pathname is not valid', () => {
+    var errorCallback = jasmine.createSpy('error');
+    eds.getDataAsync(errorCallback);
+
     expect(logErrorSpy).toHaveBeenCalledWith(
       'Unexpected call to ExplorationDataService for pathname: ' + pathname);
-
-    var errorCallback = jasmine.createSpy('error');
-    expect(function() {
-      eds.getData(errorCallback);
-    }).toThrowError('eds.getData is not a function');
   });
 });

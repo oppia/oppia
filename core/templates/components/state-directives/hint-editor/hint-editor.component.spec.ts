@@ -16,144 +16,130 @@
  * @fileoverview Unit test for Hint Editor Component.
  */
 
-import { EventEmitter } from '@angular/core';
-import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
+import { EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
+import { ComponentFixture, waitForAsync, TestBed, fakeAsync, tick } from '@angular/core/testing';
+import { HintEditorComponent } from './hint-editor.component';
+import { ContextService } from 'services/context.service';
+import { EditabilityService } from 'services/editability.service';
+import { ExternalSaveService } from 'services/external-save.service';
+import { Hint } from 'domain/exploration/hint-object.model';
+import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 
 describe('HintEditorComponent', () => {
-  let ctrl = null;
-  let $rootScope = null;
-  let $scope = null;
+  let component: HintEditorComponent;
+  let fixture: ComponentFixture<HintEditorComponent>;
+  let editabilityService: EditabilityService;
+  let externalSaveService: ExternalSaveService;
 
-  let EditabilityService = null;
-  let ExternalSaveService = null;
-
-  beforeEach(angular.mock.module('oppia'));
-  importAllAngularServices();
-
-  beforeEach(angular.mock.inject(function($injector, $componentController) {
-    $rootScope = $injector.get('$rootScope');
-    $scope = $rootScope.$new();
-
-    EditabilityService = $injector.get('EditabilityService');
-    ExternalSaveService = $injector.get('ExternalSaveService');
-
-    ctrl = $componentController('hintEditor', {
-      $scope: $scope
-    }, {
-      getOnSaveFn: () => {
-        return () => {};
-      },
-      showMarkAllAudioAsNeedingUpdateModalIfRequired: () => {}
-    });
+  beforeEach(waitForAsync(() => {
+    TestBed.configureTestingModule({
+      declarations: [
+        HintEditorComponent
+      ],
+      providers: [
+        ContextService,
+        EditabilityService,
+        ExternalSaveService,
+      ],
+      schemas: [NO_ERRORS_SCHEMA]
+    }).compileComponents();
   }));
 
+  beforeEach(() => {
+    fixture = TestBed.createComponent(HintEditorComponent);
+    component = fixture.componentInstance;
+
+    editabilityService = TestBed.inject(EditabilityService);
+    externalSaveService = TestBed.inject(ExternalSaveService);
+
+    component.hint = new Hint(
+      SubtitledHtml.createDefault('html text', 'contentID'));
+
+    fixture.detectChanges();
+  });
+
   afterEach(() => {
-    ctrl.$onDestroy();
+    component.ngOnDestroy();
   });
 
   it('should set component properties on initialization', () => {
-    spyOn(EditabilityService, 'isEditable').and.returnValue(true);
+    spyOn(editabilityService, 'isEditable').and.returnValue(true);
 
-    expect(ctrl.hintMemento).toBe(undefined);
-    expect(ctrl.isEditable).toBe(undefined);
-    expect(ctrl.hintEditorIsOpen).toBe(undefined);
+    component.ngOnInit();
 
-    ctrl.$onInit();
-
-    expect(ctrl.hintMemento).toBe(null);
-    expect(ctrl.isEditable).toBe(true);
-    expect(ctrl.hintEditorIsOpen).toBe(false);
+    expect(component.isEditable).toBe(true);
+    expect(component.hintEditorIsOpen).toBe(false);
   });
 
-  it('should save hint when external save event is triggered', () => {
+  it('should save hint when external save event is triggered', fakeAsync(() => {
     let onExternalSaveEmitter = new EventEmitter();
-    spyOnProperty(ExternalSaveService, 'onExternalSave')
+    spyOnProperty(externalSaveService, 'onExternalSave')
       .and.returnValue(onExternalSaveEmitter);
-    spyOn(ctrl, 'showMarkAllAudioAsNeedingUpdateModalIfRequired');
+    component.ngOnInit();
 
-    ctrl.$onInit();
-
-    ctrl.hintEditorIsOpen = true;
-    ctrl.editHintForm = {
-      $valid: true
-    };
-    ctrl.hintMemento = {
-      hintContent: {
-        html: '<p> Hint </p>'
-      }
-    };
-    ctrl.hint = {
-      hintContent: {
-        contentId: 'contentID',
-        html: '<p> Hint Changed </p>'
-      }
-    };
+    component.hintEditorIsOpen = true;
+    component.hint = new Hint(
+      SubtitledHtml.createDefault('change', 'data'));
+    component.hintMemento = new Hint(
+      SubtitledHtml.createDefault('html text', 'contentID'));
 
     onExternalSaveEmitter.emit();
-    $scope.$apply();
-
-    expect(ctrl.showMarkAllAudioAsNeedingUpdateModalIfRequired)
-      .toHaveBeenCalledWith(['contentID']);
-  });
+    tick();
+  }));
 
   it('should open hint editor when user clicks on \'Edit hint\'', () => {
-    ctrl.isEditable = true;
-    ctrl.hintMemento = {
-      hintContent: {
-        html: '<p> Hint Original</p>'
-      }
-    };
-    ctrl.hint = {
-      hintContent: {
-        html: '<p> Hint After Edit </p>'
-      }
-    };
-    ctrl.hintEditor = false;
+    component.isEditable = true;
+    component.hintMemento = new Hint(
+      SubtitledHtml.createDefault('html text', 'contentID'));
+    component.hint = new Hint(
+      SubtitledHtml.createDefault('html text edited', 'contentID'));
+    component.hintEditorIsOpen = false;
 
-    ctrl.openHintEditor();
+    component.openHintEditor();
 
-    expect(ctrl.hintMemento).toEqual(ctrl.hint);
-    expect(ctrl.hintEditorIsOpen).toBe(true);
+    expect(component.hintMemento).toEqual(component.hint);
+    expect(component.hintEditorIsOpen).toBe(true);
   });
 
   it('should cancel hint edit if user clicks on \'Cancel\'', () => {
-    ctrl.hintEditorIsOpen = true;
-    ctrl.hintMemento = {
-      hintContent: {
-        html: '<p> Hint Original</p>'
-      }
-    };
-    ctrl.hint = {
-      hintContent: {
-        contentId: 'contentID',
-        html: '<p> Hint After Edit </p>'
-      }
-    };
+    jasmine.createSpy('valid').and.returnValue(true);
 
-    ctrl.cancelThisHintEdit();
+    component.hintEditorIsOpen = true;
+    const earlierHint = component.hintMemento = new Hint(
+      SubtitledHtml.createDefault('html text', 'contentID'));
+    component.hint = new Hint(
+      SubtitledHtml.createDefault('html text edited', 'contentID'));
 
-    expect(ctrl.hint.hintContent).toEqual({
-      html: '<p> Hint Original</p>'
-    });
-    expect(ctrl.hintMemento).toBe(null);
-    expect(ctrl.hintEditorIsOpen).toBe(false);
+    component.cancelThisHintEdit();
+
+    expect(component.hint.hintContent).toEqual(earlierHint.hintContent);
+    expect(component.hintEditorIsOpen).toBe(false);
   });
 
-  it('should check if hint length exceeded 500 characters', () => {
-    var hintText = 'This is a hint ';
+  it('should check if hint HTML length exceeds 500 characters', () => {
+    component.hint = new Hint(
+      SubtitledHtml.createDefault('a'.repeat(500), 'contentID'));
+    expect(component.isHintLengthExceeded()).toBe(false);
 
-    ctrl.hint = {
-      hintContent: {
-        _html: '<p> ' + hintText + ' </p>'
+    component.hint = new Hint(
+      SubtitledHtml.createDefault('a'.repeat(501), 'contentID'));
+    expect(component.isHintLengthExceeded()).toBe(true);
+  });
+
+  it('should check if hint HTML is updating', () => {
+    const schema = component.HINT_FORM_SCHEMA = {
+      type: 'html',
+      ui_config: {
+        hide_complex_extensions: true
       }
     };
-    expect(ctrl.isHintLengthExceeded()).toBe(false);
 
-    ctrl.hint = {
-      hintContent: {
-        _html: '<p> ' + hintText.repeat(35) + ' </p>'
-      }
-    };
-    expect(ctrl.isHintLengthExceeded()).toBe(true);
+    expect(component.getSchema()).toBe(schema);
+
+    component.hint.hintContent._html = 'html';
+    expect(component.hint.hintContent._html).toBe('html');
+
+    component.updateHintContentHtml('html update');
+    expect(component.hint.hintContent._html).toBe('html update');
   });
 });

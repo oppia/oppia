@@ -1,56 +1,55 @@
 <div class="h-100">
-  <div ng-if="!$ctrl.hintEditorIsOpen"
+  <div *ngIf="!hintEditorIsOpen"
        class="h-100"
-       ng-attr-title="<[$ctrl.isEditable ? 'Edit hint' : '']>">
+       [attr.title]="isEditable ? 'Edit hint' : ''">
     <div class="oppia-readonly-rule-tile"
-         ng-class="{'oppia-editable-section': $ctrl.isEditable}">
+        [ngClass]="{'oppia-editable-section': isEditable}">
       <div class="oppia-rule-preview oppia-transition-200">
-        <div class="oppia-click-to-start-editing protractor-test-open-hint-editor"
-             ng-if="$ctrl.isEditable" ng-click="$ctrl.openHintEditor()">
-          <i ng-if="$ctrl.isEditable"
-             class="material-icons oppia-editor-edit-icon float-right"
-             title="Edit Hint">&#xE254;
+        <div class="oppia-click-to-start-editing e2e-test-open-hint-editor"
+             *ngIf="isEditable" (click)="openHintEditor()">
+          <i *ngIf="isEditable"
+             class="fas fa-pen oppia-editor-edit-icon float-right"
+             title="Edit Hint">
           </i>
         </div>
 
-        <strong>Hint #<[$ctrl.getIndexPlusOne()]> is...</strong>
+        <strong>Hint #{{indexPlusOne}} is...</strong>
         <span>
-          <angular-html-bind class="oppia-rte-editor" html-data="$ctrl.hint.hintContent.html">
-          </angular-html-bind>
+          <oppia-rte-output-display class="oppia-rte-editor"
+                                    [rteString]="hint.hintContent.html">
+          </oppia-rte-output-display>
         </span>
       </div>
     </div>
   </div>
 
-  <div ng-if="$ctrl.isEditable && $ctrl.hintEditorIsOpen">
-    <form role="form"
-          class="form-inline"
-          name="$ctrl.editHintForm"
-          ng-submit="$ctrl.saveThisHint()">
+  <div *ngIf="isEditable && hintEditorIsOpen">
+    <div class="form-inline">
       <div class="oppia-rule-details-header">
-        <strong>Hint #<[$ctrl.getIndexPlusOne()]> is...</strong>
+        <strong>Hint # {{indexPlusOne}} is...</strong>
         <!-- TODO(sll): Find a way to do this without resorting to private properties like _html -->
-        <schema-based-editor schema="$ctrl.HINT_FORM_SCHEMA"
-                             local-value="$ctrl.hint.hintContent._html">
+        <schema-based-editor [schema]="getSchema()"
+                             [localValue]="hint.hintContent._html"
+                             (localValueChange)="updateHintContentHtml($event)">
         </schema-based-editor>
       </div>
-    </form>
+    </div>
 
-    <div ng-if="$ctrl.isHintLengthExceeded()" class="oppia-length-validation-error">
+    <div *ngIf="isHintLengthExceeded()" class="oppia-length-validation-error">
       The hint length is too long. Please use at most 500 characters.
     </div>
 
     <div class="oppia-rule-save-cancel-buttons">
-      <div class="float-right">
+      <div class="modal-footer">
         <button type="button"
-                class="btn btn-secondary protractor-test-cancel-hint-edit"
-                ng-click="$ctrl.cancelThisHintEdit()">
+                class="btn btn-secondary e2e-test-cancel-hint-edit"
+                (click)="cancelThisHintEdit()">
           Cancel
         </button>
         <button type="button"
-                class="btn btn-success protractor-test-save-hint-edit"
-                ng-disabled="!$ctrl.hint.hintContent.html || $ctrl.editHintForm.$invalid || $ctrl.isHintLengthExceeded()"
-                ng-click="$ctrl.saveThisHint()">
+                class="btn btn-success e2e-test-save-hint-edit"
+                [disabled]="!hint.hintContent.html || editHintForm.invalid || isHintLengthExceeded()"
+                (click)="saveThisHint()">
           Save
         </button>
       </div>
@@ -59,3 +58,14 @@
     </div>
   </div>
 </div>
+
+<style>
+  .oppia-rule-preview {
+    position: relative;
+  }
+
+  .oppia-click-to-start-editing {
+    position: absolute;
+    right: 30px;
+  }
+</style>

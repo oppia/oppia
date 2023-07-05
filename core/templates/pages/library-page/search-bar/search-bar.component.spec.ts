@@ -24,6 +24,7 @@ import { HttpClientTestingModule } from
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { SearchBarComponent } from 'pages/library-page/search-bar/search-bar.component';
 import { WindowRef } from 'services/contextual/window-ref.service';
+import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 import { NavigationService } from 'services/navigation.service';
 import { ClassroomBackendApiService } from 'domain/classroom/classroom-backend-api.service';
 import { FormsModule } from '@angular/forms';
@@ -53,9 +54,15 @@ class MockWindowRef {
       }
     },
     history: {
-      pushState(data, title: string, url?: string | null) {}
+      pushState(data: string, title: string, url?: string | null) {}
     }
   };
+}
+
+class MockWindowDimensionsService {
+  getWidth(): number {
+    return 766;
+  }
 }
 
 class MockTranslateService {
@@ -99,6 +106,7 @@ describe('Search bar component', () => {
   let languageUtilService: LanguageUtilService;
   let constructTranslationIdsService: ConstructTranslationIdsService;
   let windowRef: MockWindowRef;
+  let windowDimensionsService: WindowDimensionsService;
   let urlService: UrlService;
   let component: SearchBarComponent;
   let fixture: ComponentFixture<SearchBarComponent>;
@@ -129,6 +137,10 @@ describe('Search bar component', () => {
         {
           provide: NavigationService,
           useClass: MockNavigationService
+        },
+        {
+          provide: WindowDimensionsService,
+          useClass: MockWindowDimensionsService
         }
       ],
     }).compileComponents();
@@ -182,6 +194,7 @@ describe('Search bar component', () => {
     classroomBackendApiService = TestBed.inject(ClassroomBackendApiService);
     navigationService = TestBed.inject(NavigationService);
     windowRef = TestBed.inject(WindowRef);
+    windowDimensionsService = TestBed.inject(WindowDimensionsService);
     spyOnProperty(
       classroomBackendApiService,
       'onInitializeTranslation').and.returnValue(initTranslationEmitter);
@@ -198,6 +211,25 @@ describe('Search bar component', () => {
 
     component.ngOnInit();
     fixture.detectChanges();
+  });
+
+  it('should determine if mobile view is active', () => {
+    const windowWidthSpy =
+      spyOn(windowDimensionsService, 'getWidth').and.returnValue(766);
+    expect(component.isMobileViewActive()).toBe(true);
+    windowWidthSpy.and.returnValue(1000);
+    expect(component.isMobileViewActive()).toBe(false);
+  });
+
+  it('should determine if search button should be present', () => {
+    spyOn(component, 'isMobileViewActive').and.returnValue(false);
+    component.classroomPageIsActive = true;
+    component.isSearchButtonActive();
+    expect(component.searchButtonIsActive).toBe(true);
+
+    component.classroomPageIsActive = false;
+    component.isSearchButtonActive();
+    expect(component.searchButtonIsActive).toBe(false);
   });
 
   it('should update selection details if selected languages' +
@@ -218,7 +250,7 @@ describe('Search bar component', () => {
   });
 
   it ('should search', () => {
-    component.classroomPageIsActive = true;
+    component.searchButtonIsActive = true;
     const search = {
       target: {
         value: 'search'
@@ -227,13 +259,18 @@ describe('Search bar component', () => {
     component.searchToBeExec(search);
 
     spyOn(component.searchQueryChanged, 'next');
-    component.classroomPageIsActive = false;
+    component.searchButtonIsActive = false;
     component.searchToBeExec(search);
     expect(component.searchQueryChanged.next).toHaveBeenCalled();
   });
 
   it ('should open submenu', () => {
     spyOn(navigationService, 'openSubmenu');
+    // This throws "Argument of type 'null' is not assignable to parameter of
+    // type 'KeyboardEvent'." We need to suppress this error because of the
+    // need to test validations. This throws an error only in the frontend
+    // unit tests.
+    // @ts-ignore
     component.openSubmenu(null, null);
     expect(navigationService.openSubmenu).toHaveBeenCalled();
   });
@@ -242,6 +279,11 @@ describe('Search bar component', () => {
     spyOn(navigationService, 'onMenuKeypress');
     let activeMenuName = 'test_menu';
     navigationService.activeMenuName = activeMenuName;
+    // This throws "Argument of type 'null' is not assignable to parameter of
+    // type 'KeyboardEvent'." We need to suppress this error because of the
+    // need to test validations. This throws an error only in the frontend
+    // unit tests.
+    // @ts-ignore
     component.onMenuKeypress(null, null, null);
     expect(component.activeMenuName).toEqual(activeMenuName);
   });
@@ -339,7 +381,7 @@ describe('Search bar component', () => {
     spyOn(component, 'updateSearchFieldsBasedOnUrlQuery');
     spyOn(searchService.onSearchBarLoaded, 'emit');
     spyOn(i18nLanguageCodeService.onPreferredLanguageCodesLoaded, 'subscribe')
-      .and.callFake((callb) => {
+      .and.callFake((callb: (arg0: string[]) => void) => {
         callb(['en', 'es']);
         callb(['en', 'es']);
         return null;
@@ -349,15 +391,15 @@ describe('Search bar component', () => {
       return null;
     });
     spyOn(classroomBackendApiService.onInitializeTranslation, 'subscribe')
-      .and.callFake((callb) => {
+      .and.callFake((callb: () => void) => {
         callb();
         return null;
       });
     spyOn(urlService, 'getUrlParams').and.returnValue({ q: '' });
     component.searchQueryChanged = {
-      pipe: (param1, parm2) => {
+      pipe: (param1: string, parm2: string) => {
         return {
-          subscribe(callb) {
+          subscribe(callb: () => void) {
             callb();
           }
         };
@@ -385,6 +427,10 @@ describe('Search bar component', () => {
   });
 
   it('should open sub menu', () => {
+    // This throws "Argument of type 'null' is not assignable to parameter of
+    // type 'KeyboardEvent'." We need to suppress this error because of the
+    // need to test validations.
+    // @ts-ignore
     component.openSubmenu(null, null);
   });
 });

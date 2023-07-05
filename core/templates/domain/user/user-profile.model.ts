@@ -30,7 +30,6 @@ export interface UserProfileBackendDict {
   // The time in milliseconds when the user first contributed to Oppia.
   // This property is initially set as null for a new user .
   'first_contribution_msec': number | null;
-  'profile_picture_data_url': string;
   'user_impact_score': number;
   'is_already_subscribed': boolean;
   'is_user_visiting_own_profile': boolean;
@@ -46,7 +45,6 @@ export class UserProfile {
     public userBio: string,
     public subjectInterests: string[],
     public firstContributionMsec: number | null,
-    public profilePictureDataUrl: string,
     public userImpactScore: number,
     public isAlreadySubscribed: boolean,
     public isUserVisitingOwnProfile: boolean,
@@ -63,7 +61,6 @@ export class UserProfile {
       backendDict.user_bio,
       backendDict.subject_interests,
       backendDict.first_contribution_msec,
-      backendDict.profile_picture_data_url,
       backendDict.user_impact_score,
       backendDict.is_already_subscribed,
       backendDict.is_user_visiting_own_profile,

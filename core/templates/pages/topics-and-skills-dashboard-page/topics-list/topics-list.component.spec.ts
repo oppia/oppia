@@ -62,7 +62,7 @@ describe('Topics List Component', () => {
 
   class MockNgbModal {
     modalRef: MockNgbRef = new MockNgbRef();
-    open(content, options): MockNgbRef {
+    open(content: string, options: string[]): MockNgbRef {
       return this.modalRef;
     }
   }

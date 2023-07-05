@@ -22,6 +22,7 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 
 import { TakeBreakModalComponent } from
   './take-break-modal.component';
+import { MockTranslatePipe } from 'tests/unit-test-utils';
 
 class MockActiveModal {
   dismiss(): void {
@@ -40,7 +41,7 @@ describe('TakeBreakModalComponent', function() {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [TakeBreakModalComponent],
+      declarations: [MockTranslatePipe, TakeBreakModalComponent],
       providers: [
         {
           provide: NgbActiveModal,

@@ -1,0 +1,42 @@
+<div class="oppia-invite-learners">
+  <div class="form-group">
+    <b><span class="oppia-learner-group-invite-search-title" translate="I18N_LEARNER_GROUP_INVITE_LEARNERS_BY_USERNAME"></span></b>
+    <div class="oppia-search-bar-input-field-container">
+      <input type="text"
+             class="form-control oppia-search-bar-text-input"
+             [ngClass]="{'input-invalid': errorMessage && searchedUsername}"
+             [placeholder]="'I18N_LEARNER_GROUP_INVITE_LEARNERS_PLACEHOLDER_TEXT' | translate"
+             [(ngModel)]="searchedUsername"
+             [ngModelOptions]="{ updateOn: 'blur', standalone:'true' }"
+             aria-label="Search bar"
+             (keydown.enter)="onSearchQueryChangeExec($event.target.value)">
+      <button type="submit"
+              class="btn oppia-search-bar-button"
+              (click)="onSearchQueryChangeExec(searchedUsername)">
+        + &nbsp; <span class="invite-learner-button-text" translate="I18N_LEARNER_GROUP_INVITE_LEARNER_BUTTON_TEXT"></span>
+      </button>
+    </div>
+    <div class="oppia-search-bar-error-message" *ngIf="errorMessage && searchedUsername">
+      <span [innerHTML]="errorMessage"></span>
+    </div>
+  </div>
+  <div class="invited-learners-container">
+    <div class="invited-learners-title">
+      <span translate="I18N_LEARNER_GROUP_INVITE_LIST_TEXT"></span>
+    </div>
+    <div class="invited-learners-inner-container">
+      <div class="invited-learner-card" *ngFor="let userInfo of invitedUsersInfo">
+        <picture>
+          <source type="image/webp" [srcset]="getProfileImageWebpDataUrl(userInfo.username)">
+          <source type="image/png" [srcset]="getProfileImagePngDataUrl(userInfo.username)">
+          <img [src]="getProfileImagePngDataUrl(userInfo.username)" alt="User profile picture">
+        </picture>
+        <div>{{userInfo.username}}</div>
+        <i class="fa fa-times close-button" (click)="removeInvitedLearner(userInfo.username)"></i>
+      </div>
+      <div *ngIf="!invitedUsersInfo.length" class="oppia-no-learners-invited">
+        <span translate="I18N_LEARNER_GROUP_NO_LEARNERS_INVITED"></span>
+      </div>
+    </div>
+  </div>
+</div>

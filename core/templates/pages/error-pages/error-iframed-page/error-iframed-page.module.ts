@@ -29,6 +29,7 @@ import { ErrorIframedPageRootComponent } from './error-iframed-root.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ToastrModule } from 'ngx-toastr';
 import { MyHammerConfig, toastrConfig } from 'pages/oppia-root/app.module';
+import { AppErrorHandlerProvider } from 'pages/oppia-root/app-error-handler';
 
 
 @NgModule({
@@ -60,7 +61,8 @@ import { MyHammerConfig, toastrConfig } from 'pages/oppia-root/app.module';
     {
       provide: HAMMER_GESTURE_CONFIG,
       useClass: MyHammerConfig
-    }
+    },
+    AppErrorHandlerProvider,
   ],
   bootstrap: [ErrorIframedPageRootComponent]
 })

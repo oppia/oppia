@@ -226,7 +226,7 @@ class CancelJobTests(test_utils.GenericTestBase):
     def test_sync_job(self) -> None:
         self.run_model.dataflow_job_id = None
 
-        with self.assertRaisesRegexp(ValueError, 'must not be None'): # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(ValueError, 'must not be None'):
             jobs_manager.cancel_job(self.run_model)
 
     def test_job_with_cancelling_status(self) -> None:

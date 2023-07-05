@@ -35,6 +35,7 @@ import { AlertsService } from 'services/alerts.service';
 import { MatIconModule } from '@angular/material/icon';
 import { MatCardModule } from '@angular/material/card';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 
 describe('View beam job output dialog', () => {
   const beamJobRun = new BeamJobRun('123', 'FooJob', 'DONE', 0, 0, false);
@@ -53,6 +54,7 @@ describe('View beam job output dialog', () => {
         ViewBeamJobOutputDialogComponent,
       ],
       imports: [
+        HttpClientTestingModule,
         BrowserDynamicTestingModule,
         ClipboardModule,
         MatButtonModule,
@@ -67,13 +69,7 @@ describe('View beam job output dialog', () => {
       providers: [
         { provide: MAT_DIALOG_DATA, useValue: beamJobRun },
         { provide: MatDialogRef, useValue: mockDialogRef },
-        {
-          provide: ReleaseCoordinatorBackendApiService,
-          useValue: jasmine.createSpyObj<ReleaseCoordinatorBackendApiService>(
-            'ReleaseCoordinatorBackendApiService', null, {
-              getBeamJobRunOutput: _ => of(new BeamJobRunResult('', ''))
-            }),
-        },
+        ReleaseCoordinatorBackendApiService,
       ],
     });
     // NOTE: This allows tests to compile the DOM of each dialog component.

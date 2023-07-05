@@ -28,6 +28,7 @@ import { AppConstants } from 'app.constants';
 export class TermsPageComponent {
   PAGES_REGISTERED_WITH_FRONTEND = (
     AppConstants.PAGES_REGISTERED_WITH_FRONTEND);
+
   scrollTo(el: HTMLElement): void {
     el.scrollIntoView({behavior: 'smooth'});
   }

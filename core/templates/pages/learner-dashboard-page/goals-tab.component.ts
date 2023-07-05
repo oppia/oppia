@@ -16,8 +16,8 @@
  * @fileoverview Component for goals tab in the Learner Dashboard page.
  */
 
-import constants from 'assets/constants';
-import { Component, Input, OnInit } from '@angular/core';
+import { AppConstants } from 'app.constants';
+import { Component, ElementRef, HostListener, Input, OnInit, ViewChild } from '@angular/core';
 import { LearnerTopicSummary } from 'domain/topic/learner-topic-summary.model';
 import { LearnerDashboardActivityBackendApiService } from 'domain/learner_dashboard/learner-dashboard-activity-backend-api.service';
 import { LearnerDashboardActivityIds } from 'domain/learner_dashboard/learner-dashboard-activity-ids.model';
@@ -27,31 +27,45 @@ import { LearnerDashboardPageConstants } from './learner-dashboard-page.constant
 import { DeviceInfoService } from 'services/contextual/device-info.service';
 import { Subscription } from 'rxjs';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
+import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 
- @Component({
-   selector: 'oppia-goals-tab',
-   templateUrl: './goals-tab.component.html'
- })
+import './goals-tab.component.css';
+
+@Component({
+  selector: 'oppia-goals-tab',
+  templateUrl: './goals-tab.component.html',
+  styleUrls: ['./goals-tab.component.css']
+})
 export class GoalsTabComponent implements OnInit {
   constructor(
     private windowDimensionService: WindowDimensionsService,
     private urlInterpolationService: UrlInterpolationService,
-    private learnerDashboardActivityBackendApiService: (
-      LearnerDashboardActivityBackendApiService),
+    private i18nLanguageCodeService: I18nLanguageCodeService,
+    private learnerDashboardActivityBackendApiService:
+      LearnerDashboardActivityBackendApiService,
     private deviceInfoService: DeviceInfoService) {
   }
-  @Input() currentGoals: LearnerTopicSummary[];
-  @Input() editGoals: LearnerTopicSummary[];
-  @Input() completedGoals: LearnerTopicSummary[];
-  @Input() untrackedTopics: Record<string, LearnerTopicSummary[]>;
-  @Input() partiallyLearntTopicsList: LearnerTopicSummary[];
-  @Input() learntToPartiallyLearntTopics: string[];
-  learnerDashboardActivityIds: LearnerDashboardActivityIds;
-  MAX_CURRENT_GOALS_LENGTH: number;
+
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  @Input() currentGoals!: LearnerTopicSummary[];
+  @Input() editGoals!: LearnerTopicSummary[];
+  @Input() completedGoals!: LearnerTopicSummary[];
+  @Input() untrackedTopics!: Record<string, LearnerTopicSummary[]>;
+  @Input() partiallyLearntTopicsList!: LearnerTopicSummary[];
+  @Input() learntToPartiallyLearntTopics!: string[];
+
+  // Child dropdown is undefined because initially it is in closed state using
+  // the following property: {'static' = false}.
+  @ViewChild('dropdown', {'static': false}) dropdownRef: ElementRef | undefined;
+  learnerDashboardActivityIds!: LearnerDashboardActivityIds;
+  MAX_CURRENT_GOALS_LENGTH!: number;
+  currentGoalsStoryIsShown!: boolean[];
+  showThreeDotsDropdown!: boolean[];
   pawImageUrl: string = '';
   bookImageUrl: string = '';
   starImageUrl: string = '';
-  currentGoalsStoryIsShown: boolean[];
   topicBelongToCurrentGoals: boolean[] = [];
   topicIdsInCompletedGoals: string[] = [];
   topicIdsInCurrentGoals: string[] = [];
@@ -62,7 +76,9 @@ export class GoalsTabComponent implements OnInit {
     COMPLETED: 1,
     NEITHER: 2
   };
-  activityType: string = constants.ACTIVITY_TYPE_LEARN_TOPIC;
+
+  indexOfSelectedTopic: number = -1;
+  activityType: string = AppConstants.ACTIVITY_TYPE_LEARN_TOPIC;
   editGoalsTopicPageUrl: string[] = [];
   completedGoalsTopicPageUrl: string[] = [];
   editGoalsTopicClassification: number[] = [];
@@ -71,8 +87,10 @@ export class GoalsTabComponent implements OnInit {
   directiveSubscriptions = new Subscription();
 
   ngOnInit(): void {
-    this.MAX_CURRENT_GOALS_LENGTH = constants.MAX_CURRENT_GOALS_COUNT;
+    this.MAX_CURRENT_GOALS_LENGTH = AppConstants.MAX_CURRENT_GOALS_COUNT;
     this.currentGoalsStoryIsShown = [];
+    this.showThreeDotsDropdown = [];
+    this.currentGoalsStoryIsShown[0] = true;
     this.pawImageUrl = this.getStaticImageUrl('/learner_dashboard/paw.svg');
     this.bookImageUrl = this.getStaticImageUrl(
       '/learner_dashboard/book_icon.png');
@@ -135,7 +153,7 @@ export class GoalsTabComponent implements OnInit {
     return false;
   }
 
-  toggleStory(index: string): void {
+  toggleStory(index: number): void {
     this.currentGoalsStoryIsShown[index] = !(
       this.currentGoalsStoryIsShown[index]);
   }
@@ -144,7 +162,7 @@ export class GoalsTabComponent implements OnInit {
       topic: LearnerTopicSummary, topicId: string,
       index: number): Promise<void> {
     var activityId = topicId;
-    var activityType = constants.ACTIVITY_TYPE_LEARN_TOPIC;
+    var activityType = AppConstants.ACTIVITY_TYPE_LEARN_TOPIC;
     if (!this.topicIdsInCurrentGoals.includes(activityId)) {
       var isSuccessfullyAdded = (
         await this.learnerDashboardActivityBackendApiService.addToLearnerGoals(
@@ -168,6 +186,31 @@ export class GoalsTabComponent implements OnInit {
             }
           }
         }
+      }
+    }
+  }
+
+  toggleThreeDotsDropdown(index: number): void {
+    this.showThreeDotsDropdown[index] = !this.showThreeDotsDropdown[index];
+    if (this.indexOfSelectedTopic !== index) {
+      this.indexOfSelectedTopic = index;
+    } else {
+      this.indexOfSelectedTopic = -1;
+    }
+    return;
+  }
+
+  /**
+   * Close dropdown when outside elements are clicked
+   * @param event mouse click event
+   */
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent): void {
+    const targetElement = event.target as HTMLElement;
+    for (let i = 0; i < this.currentGoals.length; i++) {
+      if (targetElement &&
+          this.showThreeDotsDropdown[i]) {
+        this.showThreeDotsDropdown[i] = false;
       }
     }
   }

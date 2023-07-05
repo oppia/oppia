@@ -35,7 +35,8 @@ export class CancelBeamJobDialogComponent {
   constructor(
       @Inject(MAT_DIALOG_DATA) public beamJobRun: BeamJobRun,
       private matDialogRef:
-        MatDialogRef<CancelBeamJobDialogComponent, BeamJobRun>,
+        // JobRun may be null if the job failed to cancel.
+        MatDialogRef<CancelBeamJobDialogComponent, BeamJobRun | null>,
       private alertsService: AlertsService,
       private backendApiService: ReleaseCoordinatorBackendApiService) {}
 

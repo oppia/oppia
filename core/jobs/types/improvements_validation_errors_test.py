@@ -22,15 +22,19 @@ from core.jobs.types import base_validation_errors_test
 from core.jobs.types import improvements_validation_errors
 from core.platform import models
 
+MYPY = False
+if MYPY: # pragma: no cover
+    from mypy_imports import improvements_models
+
 (improvements_models,) = models.Registry.import_models(
-    [models.NAMES.improvements])
+    [models.Names.IMPROVEMENTS])
 
 
 class InvalidCompositeEntityErrorTests(
         base_validation_errors_test.AuditErrorsTestBase):
 
-    def test_message(self):
-        model = improvements_models.TaskEntryModel(
+    def test_message(self) -> None:
+        model = improvements_models.ExplorationStatsTaskEntryModel(
             id='23',
             entity_id='999',
             entity_type='exploration',
@@ -48,5 +52,6 @@ class InvalidCompositeEntityErrorTests(
 
         self.assertEqual(
             error.stderr,
-            'InvalidCompositeEntityError in TaskEntryModel(id="23"): model '
+            'InvalidCompositeEntityError in '
+            'ExplorationStatsTaskEntryModel(id="23"): model '
             'has invalid composite entity %s' % model.composite_entity_id)

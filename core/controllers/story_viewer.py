@@ -32,8 +32,19 @@ from core.domain import story_services
 from core.domain import summary_services
 from core.domain import topic_fetchers
 
+from typing import Dict, List, Optional, Tuple
 
-class StoryPageDataHandler(base.BaseHandler):
+
+class FrontendStoryNodeDict(story_domain.StoryNodeDict):
+    """Dictionary representing the StoryNode domain object for frontend."""
+
+    completed: bool
+    exp_summary_dict: summary_services.DisplayableExplorationSummaryDict
+
+
+class StoryPageDataHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
     """Manages the data that needs to be displayed to a learner on the
     story viewer page.
     """
@@ -44,23 +55,32 @@ class StoryPageDataHandler(base.BaseHandler):
         'topic_url_fragment': constants.SCHEMA_FOR_TOPIC_URL_FRAGMENTS,
         'story_url_fragment': constants.SCHEMA_FOR_STORY_URL_FRAGMENTS,
     }
-    HANDLER_ARGS_SCHEMAS = {
-        'GET': {},
-    }
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.can_access_story_viewer_page
-    def get(self, story_id):
-        """Handles GET requests."""
+    def get(self, story_id: str) -> None:
+        """Retrieves and organizes the data needed to display a story.
+
+        Args:
+            story_id: str. The story ID.
+        """
         story = story_fetchers.get_story_by_id(story_id)
         topic_id = story.corresponding_topic_id
         topic_name = topic_fetchers.get_topic_by_id(topic_id).name
 
+        completed_nodes = (
+            story_fetchers.get_completed_nodes_in_story(self.user_id, story_id)
+            if self.user_id else []
+        )
         completed_node_ids = [
-            completed_node.id for completed_node in
-            story_fetchers.get_completed_nodes_in_story(self.user_id, story_id)]
-
-        ordered_node_dicts = [
-            node.to_dict() for node in story.story_contents.get_ordered_nodes()
+            completed_node.id for completed_node in completed_nodes
+        ]
+        # Here we use MyPy ignore because we are explicitly changing
+        # the type from the list of 'StoryNodeDict' to the list of
+        # 'FrontendStoryNodeDict', and this is done because below we
+        # are adding new keys that are not defined on the 'StoryNodeDict'.
+        ordered_node_dicts: List[FrontendStoryNodeDict] = [
+            node.to_dict() for node in story.story_contents.get_ordered_nodes()  # type: ignore[misc]
         ]
         for node in ordered_node_dicts:
             node['completed'] = False
@@ -68,7 +88,9 @@ class StoryPageDataHandler(base.BaseHandler):
                 node['completed'] = True
 
         exp_ids = [
-            node['exploration_id'] for node in ordered_node_dicts]
+            node['exploration_id'] for node in ordered_node_dicts
+            if node['exploration_id'] is not None
+        ]
         exp_summary_dicts = (
             summary_services.get_displayable_exp_summary_dicts_matching_ids(
                 exp_ids, user=self.user))
@@ -87,7 +109,7 @@ class StoryPageDataHandler(base.BaseHandler):
         self.render_json(self.values)
 
 
-class StoryProgressHandler(base.BaseHandler):
+class StoryProgressHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     """Marks a story node as completed after completing and returns exp ID of
     next chapter (if applicable).
     """
@@ -107,14 +129,20 @@ class StoryProgressHandler(base.BaseHandler):
             }
         }
     }
-    HANDLER_ARGS_SCHEMAS = {
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {
         'GET': {},
         'POST': {}
     }
 
     def _record_node_completion(
-            self, story_id, node_id, completed_node_ids, ordered_nodes):
+        self,
+        story_id: str,
+        node_id: str,
+        completed_node_ids: List[str],
+        ordered_nodes: List[story_domain.StoryNode]
+    ) -> Tuple[List[str], Optional[str], List[str]]:
         """Records node completion."""
+        assert self.user_id is not None
         if not constants.ENABLE_NEW_STRUCTURE_VIEWER_UPDATES:
             raise self.PageNotFoundException
 
@@ -131,26 +159,35 @@ class StoryProgressHandler(base.BaseHandler):
                 self.user_id, story_id, node_id)
 
             completed_nodes = story_fetchers.get_completed_nodes_in_story(
-                self.user_id, story_id)
+                self.user_id, story_id
+            ) if self.user_id else []
             completed_node_ids = [
                 completed_node.id for completed_node in completed_nodes]
 
             for node in ordered_nodes:
                 if node.id not in completed_node_ids:
-                    next_exp_ids = [node.exploration_id]
+                    next_exp_ids = (
+                        [node.exploration_id] if node.exploration_id else []
+                    )
                     next_node_id = node.id
                     break
         return (next_exp_ids, next_node_id, completed_node_ids)
 
-    @acl_decorators.can_access_story_viewer_page
-    def get(self, story_id, node_id):
-        """Handles GET requests."""
+    @acl_decorators.can_access_story_viewer_page_as_logged_in_user
+    def get(self, story_id: str, node_id: str) -> None:
+        """Redirects the user to the next appropriate node or the story page.
+
+        Args:
+            story_id: str. The story ID.
+            node_id: str. The node ID.
+        """
         (
             _, _, classroom_url_fragment, topic_url_fragment,
             story_url_fragment, node_id) = self.request.path.split('/')
         story = story_fetchers.get_story_by_id(story_id)
         completed_nodes = story_fetchers.get_completed_nodes_in_story(
-            self.user_id, story_id)
+            self.user_id, story_id
+        ) if self.user_id else []
         ordered_nodes = story.story_contents.get_ordered_nodes()
 
         # In case the user is a returning user and has completed nodes in the
@@ -187,8 +224,15 @@ class StoryProgressHandler(base.BaseHandler):
 
         self.redirect(redirect_url)
 
-    @acl_decorators.can_access_story_viewer_page
-    def post(self, story_id, node_id):
+    @acl_decorators.can_access_story_viewer_page_as_logged_in_user
+    def post(self, story_id: str, node_id: str) -> None:
+        """Records the completion of a specific node within a story.
+
+        Args:
+            story_id: str. The story ID.
+            node_id: str. The node ID.
+        """
+        assert self.user_id is not None
         story = story_fetchers.get_story_by_id(story_id)
         if story is None:
             logging.error(
@@ -247,8 +291,8 @@ class StoryProgressHandler(base.BaseHandler):
             learner_progress_services.get_all_completed_story_ids(
                 self.user_id))
         story_ids_in_topic = []
-        for story in topic.canonical_story_references:
-            story_ids_in_topic.append(story.story_id)
+        for story_reference in topic.canonical_story_references:
+            story_ids_in_topic.append(story_reference.story_id)
 
         is_topic_completed = set(story_ids_in_topic).intersection(
             set(completed_story_ids))
@@ -262,7 +306,7 @@ class StoryProgressHandler(base.BaseHandler):
             learner_progress_services.mark_topic_as_learnt(
                 self.user_id, topic.id)
 
-        return self.render_json({
+        self.render_json({
             'summaries': exp_summaries,
             'ready_for_review_test': ready_for_review_test,
             'next_node_id': next_node_id

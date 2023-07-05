@@ -28,7 +28,7 @@ describe('Blog Post update service', () => {
     blogPostUpdateService = TestBed.inject(BlogPostUpdateService);
     let sampleBlogPostBackendDict = {
       id: 'sampleId',
-      author_username: 'testUsername',
+      displayed_author_name: 'testUsername',
       title: 'sampleTitle',
       content: '<p>Hello</p>',
       thumbnail_filename: 'image',

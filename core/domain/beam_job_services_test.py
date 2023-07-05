@@ -18,9 +18,9 @@
 
 from __future__ import annotations
 
+import datetime
 import itertools
 
-from core import python_utils
 from core.domain import beam_job_domain
 from core.domain import beam_job_services
 from core.jobs import base_jobs
@@ -37,7 +37,7 @@ MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import beam_job_models
 
-(beam_job_models,) = models.Registry.import_models([models.NAMES.beam_job])
+(beam_job_models,) = models.Registry.import_models([models.Names.BEAM_JOB])
 
 
 class NoOpJob(base_jobs.JobBase):
@@ -51,14 +51,14 @@ class BeamJobServicesTests(test_utils.TestBase):
 
     def test_gets_jobs_from_registry(self) -> None:
         beam_jobs = beam_job_services.get_beam_jobs()
-        self.assertItemsEqual( # type: ignore[no-untyped-call]
+        self.assertItemsEqual(
             [j.name for j in beam_jobs], jobs_registry.get_all_job_names())
 
 
 class BeamJobRunServicesTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
-        super(BeamJobRunServicesTests, self).setUp()
+        super().setUp()
         self._id_iter = (str(i) for i in itertools.count())
 
     def create_beam_job_run_model(
@@ -111,7 +111,7 @@ class BeamJobRunServicesTests(test_utils.GenericTestBase):
         # instead. Reference: https://github.com/python/mypy/issues/9590.
         by_id = lambda model: model.id
         run_models = sorted(beam_job_run_models, key=by_id)
-        for i, (run, model) in enumerate(python_utils.ZIP(runs, run_models)):
+        for i, (run, model) in enumerate(zip(runs, run_models)):
             with self.subTest('i=%d' % i):
                 self.assertEqual(run.job_id, model.id)
                 self.assertEqual(run.job_name, model.job_name)
@@ -142,7 +142,7 @@ class BeamJobRunServicesTests(test_utils.GenericTestBase):
             run.to_dict())
 
     def test_run_beam_job_without_args_raises_an_exception(self) -> None:
-        with self.assertRaisesRegexp(ValueError, 'Must specify the job'): # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(ValueError, 'Must specify the job'):
             beam_job_services.run_beam_job()
 
     def test_cancel_beam_job(self) -> None:
@@ -153,15 +153,16 @@ class BeamJobRunServicesTests(test_utils.GenericTestBase):
         with self.swap_to_always_return(jobs_manager, 'cancel_job'):
             run = beam_job_services.cancel_beam_job(model.id)
 
-        self.assertEquals(
+        self.assertEqual(
             run.to_dict(),
             beam_job_services.get_beam_job_run_from_model(model).to_dict())
 
     def test_cancel_beam_job_which_does_not_exist_raises_an_error(self) -> None:
         with self.swap_to_always_return(jobs_manager, 'cancel_job'):
-            self.assertRaisesRegexp( # type: ignore[no-untyped-call]
-                ValueError, 'No such job',
-                lambda: beam_job_services.cancel_beam_job('123'))
+            with self.assertRaisesRegex(
+                ValueError, 'No such job'
+            ):
+                beam_job_services.cancel_beam_job('123')
 
     def test_cancel_beam_job_which_has_no_dataflow_job_id_raises_an_error(
         self
@@ -171,9 +172,10 @@ class BeamJobRunServicesTests(test_utils.GenericTestBase):
         model.put()
 
         with self.swap_to_always_return(jobs_manager, 'cancel_job'):
-            self.assertRaisesRegexp( # type: ignore[no-untyped-call]
-                ValueError, 'cannot be cancelled',
-                lambda: beam_job_services.cancel_beam_job(model.id))
+            with self.assertRaisesRegex(
+                ValueError, 'cannot be cancelled'
+            ):
+                beam_job_services.cancel_beam_job(model.id)
 
     def test_get_beam_job_runs(self) -> None:
         beam_job_run_models = [
@@ -233,6 +235,132 @@ class BeamJobRunServicesTests(test_utils.GenericTestBase):
         self.assertEqual(result.stdout, 'abc')
         self.assertEqual(result.stderr, '123')
 
+    def test_is_state_terminal(self) -> None:
+
+        now = datetime.datetime.utcnow()
+
+        cancelled_beam_job_run = beam_job_domain.BeamJobRun(
+            '123',
+            'FooJob',
+            beam_job_models.BeamJobState.CANCELLED.value,
+            now,
+            now,
+            True
+        )
+        drained_beam_job_run = beam_job_domain.BeamJobRun(
+            '123',
+            'FooJob',
+            beam_job_models.BeamJobState.DRAINED.value,
+            now,
+            now,
+            True
+        )
+        updated_beam_job_run = beam_job_domain.BeamJobRun(
+            '123',
+            'FooJob',
+            beam_job_models.BeamJobState.UPDATED.value,
+            now,
+            now,
+            True
+        )
+        done_beam_job_run = beam_job_domain.BeamJobRun(
+            '123',
+            'FooJob',
+            beam_job_models.BeamJobState.DONE.value,
+            now,
+            now,
+            True
+        )
+        failed_beam_job_run = beam_job_domain.BeamJobRun(
+            '123',
+            'FooJob',
+            beam_job_models.BeamJobState.FAILED.value,
+            now,
+            now,
+            True
+        )
+        cancelling_beam_job_run = beam_job_domain.BeamJobRun(
+            '123',
+            'FooJob',
+            beam_job_models.BeamJobState.CANCELLING.value,
+            now,
+            now,
+            True
+        )
+        draining_beam_job_run = beam_job_domain.BeamJobRun(
+            '123',
+            'FooJob',
+            beam_job_models.BeamJobState.DRAINING.value,
+            now,
+            now,
+            True
+        )
+        pending_beam_job_run = beam_job_domain.BeamJobRun(
+            '123',
+            'FooJob',
+            beam_job_models.BeamJobState.PENDING.value,
+            now,
+            now,
+            True
+        )
+        running_beam_job_run = beam_job_domain.BeamJobRun(
+            '123',
+            'FooJob',
+            beam_job_models.BeamJobState.RUNNING.value,
+            now,
+            now,
+            True
+        )
+        stopped_beam_job_run = beam_job_domain.BeamJobRun(
+            '123',
+            'FooJob',
+            beam_job_models.BeamJobState.STOPPED.value,
+            now,
+            now, True
+        )
+        unknown_beam_job_run = beam_job_domain.BeamJobRun(
+            '123',
+            'FooJob',
+            beam_job_models.BeamJobState.UNKNOWN.value,
+            now,
+            now,
+            True
+        )
+
+        self.assertTrue(beam_job_services.is_state_terminal(
+            cancelled_beam_job_run.job_state
+        ))
+        self.assertTrue(beam_job_services.is_state_terminal(
+            drained_beam_job_run.job_state
+        ))
+        self.assertTrue(beam_job_services.is_state_terminal(
+            updated_beam_job_run.job_state
+        ))
+        self.assertTrue(beam_job_services.is_state_terminal(
+            done_beam_job_run.job_state
+        ))
+        self.assertTrue(beam_job_services.is_state_terminal(
+            failed_beam_job_run.job_state
+        ))
+        self.assertFalse(beam_job_services.is_state_terminal(
+            cancelling_beam_job_run.job_state
+        ))
+        self.assertFalse(beam_job_services.is_state_terminal(
+            draining_beam_job_run.job_state
+        ))
+        self.assertFalse(beam_job_services.is_state_terminal(
+            pending_beam_job_run.job_state
+        ))
+        self.assertFalse(beam_job_services.is_state_terminal(
+            running_beam_job_run.job_state
+        ))
+        self.assertFalse(beam_job_services.is_state_terminal(
+            stopped_beam_job_run.job_state
+        ))
+        self.assertFalse(beam_job_services.is_state_terminal(
+            unknown_beam_job_run.job_state
+        ))
+
 
 class GetBeamJobRunResultTests(test_utils.GenericTestBase):
 
@@ -259,7 +387,7 @@ class GetBeamJobRunResultTests(test_utils.GenericTestBase):
 
         beam_job_run_result = beam_job_services.get_beam_job_run_result('123')
 
-        self.assertItemsEqual( # type: ignore[no-untyped-call]
+        self.assertItemsEqual(
             beam_job_run_result.stdout.split('\n'), ['abc', 'def'])
-        self.assertItemsEqual( # type: ignore[no-untyped-call]
+        self.assertItemsEqual(
             beam_job_run_result.stderr.split('\n'), ['123', '456'])

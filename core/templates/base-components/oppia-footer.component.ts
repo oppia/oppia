@@ -17,17 +17,42 @@
  */
 
 import { Component } from '@angular/core';
+import { Router } from '@angular/router';
 import { downgradeComponent } from '@angular/upgrade/static';
+import { PlatformFeatureService } from 'services/platform-feature.service';
+
 import { AppConstants } from 'app.constants';
+import './oppia-footer.component.css';
+
 
 @Component({
   selector: 'oppia-footer',
-  templateUrl: './oppia-footer.component.html'
+  templateUrl: './oppia-footer.component.html',
+  styleUrls: ['./oppia-footer.component.css']
 })
 export class OppiaFooterComponent {
   siteFeedbackFormUrl: string = AppConstants.SITE_FEEDBACK_FORM_URL;
   PAGES_REGISTERED_WITH_FRONTEND = (
     AppConstants.PAGES_REGISTERED_WITH_FRONTEND);
+
+  BRANCH_NAME = AppConstants.BRANCH_NAME;
+
+  SHORT_COMMIT_HASH = AppConstants.SHORT_COMMIT_HASH;
+
+  versionInformationIsShown: boolean = this.router.url === '/about';
+
+  constructor(
+    private platformFeatureService: PlatformFeatureService,
+    private router: Router
+  ) {}
+
+  getOppiaBlogUrl(): string {
+    if (this.platformFeatureService.status.BlogPages.isEnabled) {
+      return '/blog';
+    } else {
+      return 'https://medium.com/oppia-org';
+    }
+  }
 }
 
 angular.module('oppia').directive('oppiaFooter',

@@ -22,12 +22,11 @@ import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
 import { PretestQuestionBackendApiService } from
   'domain/question/pretest-question-backend-api.service';
-import { QuestionObjectFactory } from
+import { QuestionBackendDict, QuestionObjectFactory } from
   'domain/question/QuestionObjectFactory';
 
 describe('Pretest question backend API service', function() {
-  let pretestQuestionBackendApiService:
-    PretestQuestionBackendApiService = null;
+  let pretestQuestionBackendApiService: PretestQuestionBackendApiService;
   let httpTestingController: HttpTestingController;
   let questionObjectFactory: QuestionObjectFactory;
 
@@ -39,25 +38,16 @@ describe('Pretest question backend API service', function() {
       question_state_data: {
         classifier_model_id: null,
         param_changes: [],
-        next_content_id_index: 1,
         solicit_answer_details: false,
         content: {
           content_id: '1',
           html: 'Question 1'
         },
-        written_translations: {
-          translations_mapping: {
-            1: {},
-            ca_placeholder_0: {},
-            feedback_id: {},
-            solution: {},
-            hint_1: {}
-          }
-        },
         interaction: {
           answer_groups: [{
             outcome: {
               dest: 'State 1',
+              dest_if_really_stuck: null,
               feedback: {
                 content_id: 'feedback_1',
                 html: '<p>Try Again.</p>'
@@ -71,12 +61,13 @@ describe('Pretest question backend API service', function() {
               rule_type: 'Equals',
               inputs: {x: 0}
             }],
-            training_data: null,
+            training_data: [],
             tagged_skill_misconception_id: null,
           },
           {
             outcome: {
               dest: 'State 2',
+              dest_if_really_stuck: null,
               feedback: {
                 content_id: 'feedback_2',
                 html: '<p>Try Again.</p>'
@@ -94,7 +85,8 @@ describe('Pretest question backend API service', function() {
             tagged_skill_misconception_id: 'misconceptionId',
           }],
           default_outcome: {
-            dest: null,
+            dest: 'default',
+            dest_if_really_stuck: null,
             labelled_as_correct: true,
             missing_prerequisite_skill_id: null,
             refresher_exploration_id: null,
@@ -114,6 +106,9 @@ describe('Pretest question backend API service', function() {
                 unicode_str: '',
                 content_id: 'ca_placeholder_0'
               }
+            },
+            catchMisspellings: {
+              value: false
             }
           },
           confirmed_unclassified_answers: [],
@@ -150,26 +145,27 @@ describe('Pretest question backend API service', function() {
       version: 1,
       question_state_data_schema_version: 0,
       linked_skill_ids: [],
+      next_content_id_index: 1,
       inapplicable_skill_misconception_ids: []
     }]
   };
 
-  var sampleDataResultsObjects = null;
+  var sampleDataResultsObjects: {pretest_question_objects: {}};
 
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
       providers: [PretestQuestionBackendApiService]
     });
-    pretestQuestionBackendApiService = TestBed.get(
+    pretestQuestionBackendApiService = TestBed.inject(
       PretestQuestionBackendApiService);
-    httpTestingController = TestBed.get(HttpTestingController);
-    questionObjectFactory = TestBed.get(QuestionObjectFactory);
+    httpTestingController = TestBed.inject(HttpTestingController);
+    questionObjectFactory = TestBed.inject(QuestionObjectFactory);
 
     sampleDataResultsObjects = {
       pretest_question_objects: [
         questionObjectFactory.createFromBackendDict(
-          responseDictionaries.pretest_question_dicts[0])
+          responseDictionaries.pretest_question_dicts[0] as QuestionBackendDict)
       ]
     };
   });
@@ -226,7 +222,7 @@ describe('Pretest question backend API service', function() {
     let successHandler = jasmine.createSpy('success');
     let failHandler = jasmine.createSpy('fail');
     let invalidUrl = '-invalid-url-';
-    let emptyList = [];
+    let emptyList: string[] = [];
 
     pretestQuestionBackendApiService.fetchPretestQuestionsAsync(
       'expId', invalidUrl).then(successHandler, failHandler);

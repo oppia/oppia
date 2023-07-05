@@ -22,13 +22,18 @@
 
 import { Component, EventEmitter, Input, OnInit, Output, SimpleChanges } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
-import { Subscription } from 'rxjs';
+import { Subject, Subscription } from 'rxjs';
+import { debounceTime } from 'rxjs/operators';
 
 import { AlertsService } from 'services/alerts.service';
 import { ExternalRteSaveService } from 'services/external-rte-save.service';
 import { ImageUploadHelperService } from 'services/image-upload-helper.service';
 import { SvgSanitizerService } from 'services/svg-sanitizer.service';
-import 'mathjaxConfig.ts';
+
+// Relative path used as an work around to get the angular compiler and webpack
+// build to not complain.
+// TODO(#16309): Fix relative imports.
+import '../../../core/templates/mathjaxConfig';
 
 interface MathExpression {
   'svg_filename': string;
@@ -44,12 +49,13 @@ interface MathExpression {
 })
 export class MathExpressionContentEditorComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks
-  // and we need to do non-null assertion, for more information see
+  // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() modalId!: symbol;
   @Input() alwaysEditable: boolean = false;
   @Input() value!: MathExpression;
   @Output() valueChanged = new EventEmitter();
+  debouncedUpdate$: Subject<string> = new Subject();
   numberOfElementsInQueue!: number;
   svgString!: string;
   placeholderText = '\\frac{x}{y}';
@@ -72,6 +78,14 @@ export class MathExpressionContentEditorComponent implements OnInit {
     // that an existing math expression is being edited. In this case, the
     // editor template can be initialised with the actual values instead of
     // default ones.
+    if (!this.value) {
+      this.value = {
+        raw_latex: '',
+        svg_filename: '',
+        svgFile: '',
+        mathExpressionSvgIsBeingProcessed: false
+      };
+    }
     if (this.value.svg_filename && this.value.raw_latex) {
       this.localValue.label = this.value.raw_latex;
       this.value.mathExpressionSvgIsBeingProcessed = false;
@@ -80,6 +94,9 @@ export class MathExpressionContentEditorComponent implements OnInit {
       this.value.mathExpressionSvgIsBeingProcessed = true;
     }
     this.valueChanged.emit(this.value);
+    if (this.value.raw_latex) {
+      this.localValue.label = this.value.raw_latex;
+    }
     this.directiveSubscriptions.add(
       this.externalRteSaveService.onExternalRteSave.subscribe(() => {
         this.processAndSaveSvg();
@@ -88,7 +105,13 @@ export class MathExpressionContentEditorComponent implements OnInit {
         }
       })
     );
-
+    this.directiveSubscriptions.add(
+      this.debouncedUpdate$.pipe(
+        debounceTime(300)
+      ).subscribe((newValue) => {
+        this.updateLocalValue(newValue);
+      })
+    );
     if (!this.alwaysEditable) {
       this.closeEditor();
     }
@@ -134,6 +157,7 @@ export class MathExpressionContentEditorComponent implements OnInit {
       }
     });
   }
+
   // This method cleans the SVG string and generates a filename before
   // the SVG can be saved to the backend in the RteHelperModalController.
   // The method doesn't save the SVG to the backend, it just updates
@@ -171,6 +195,7 @@ export class MathExpressionContentEditorComponent implements OnInit {
   }
 
   updateLocalValue(newValue: string): void {
+    this.localValue.label = newValue;
     this.value.mathExpressionSvgIsBeingProcessed = true;
     this.value.raw_latex = newValue;
     this.valueChanged.emit(this.value);
@@ -206,10 +231,11 @@ export class MathExpressionContentEditorComponent implements OnInit {
   ngOnChanges(changes: SimpleChanges): void {
     if (changes.value &&
       changes.value.currentValue.raw_latex !==
-      changes.value.previousValue.raw_latex) {
+      changes.value.previousValue?.raw_latex) {
       this.localValue = {
         label: this.value.raw_latex || '',
       };
+      this.convertLatexStringToSvg(this.localValue.label);
     }
   }
 

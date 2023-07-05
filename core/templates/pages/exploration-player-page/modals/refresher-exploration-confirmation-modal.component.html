@@ -1,18 +1,20 @@
-<div class="oppia-learner-refresher-exploration-confirmation-title">Would you like a refresher?</div>
+<div class="oppia-learner-refresher-exploration-confirmation-title">
+  {{ 'I18N_REFRESHER_EXPLORATION_MODAL_TITLE' | translate }}
+</div>
 
 <div class="modal-body">
   <span class="oppia-learner-refresher-exploration-confirmation-body">
-    It looks like you're having some trouble with this question. Would you
-    like to try a short exploration to refresh your memory, and return
-    here after you've completed that?
+    {{ 'I18N_REFRESHER_EXPLORATION_MODAL_BODY' | translate }}
   </span>
 </div>
 <div class="modal-footer">
-  <button class="oppia-learner-got-it-button protractor-test-learner-got-it-button protractor-test-cancel-redirection-button md-button md-default-theme "
-          (click)="cancel()">No
+  <button class="oppia-learner-got-it-button e2e-test-learner-got-it-button e2e-test-cancel-redirection-button md-button md-default-theme "
+          (click)="cancel()">
+    {{ 'I18N_NO' | translate }}
   </button>
-  <button class="oppia-learner-got-it-button protractor-test-learner-got-it-button protractor-test-confirm-redirection-button md-button md-default-theme "
-          (click)="confirmRedirect()">Yes
+  <button class="oppia-learner-got-it-button e2e-test-learner-got-it-button e2e-test-confirm-redirection-button md-button md-default-theme "
+          (click)="confirmRedirect()">
+    {{ 'I18N_YES' | translate }}
   </button>
 </div>
 <span class="clearfix"></span>
@@ -23,7 +25,7 @@
   }
 
   .oppia-learner-refresher-exploration-confirmation-title {
-    color: #00786D;
+    color: #00786d;
     font-family: 'Capriola', Roboto, arial, sans-serif;
     font-size: 1.25em;
     font-weight: bold;

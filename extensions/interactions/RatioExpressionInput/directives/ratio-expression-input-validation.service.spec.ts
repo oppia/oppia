@@ -25,8 +25,8 @@ import { RatioExpressionInputValidationService } from
   'interactions/RatioExpressionInput/directives/ratio-expression-input-validation.service';
 import { Outcome, OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory';
-import { Rule, RuleObjectFactory } from
-  'domain/exploration/RuleObjectFactory';
+import { Rule } from
+  'domain/exploration/rule.model';
 import { SubtitledUnicode } from
   'domain/exploration/SubtitledUnicodeObjectFactory';
 import { RatioExpressionInputCustomizationArgs } from
@@ -43,8 +43,7 @@ describe('RatioExpressionInputValidationService', () => {
   let equals: Rule, isEquivalent: Rule;
   let hasNumberOfTermsEqualTo: Rule, hasSpecificTermEqualTo: Rule;
   let customizationArgs: RatioExpressionInputCustomizationArgs;
-  let oof: OutcomeObjectFactory, agof: AnswerGroupObjectFactory,
-    rof: RuleObjectFactory;
+  let oof: OutcomeObjectFactory, agof: AnswerGroupObjectFactory;
   let warnings;
 
   beforeEach(() => {
@@ -55,12 +54,12 @@ describe('RatioExpressionInputValidationService', () => {
     validatorService = TestBed.get(RatioExpressionInputValidationService);
     oof = TestBed.get(OutcomeObjectFactory);
     agof = TestBed.get(AnswerGroupObjectFactory);
-    rof = TestBed.get(RuleObjectFactory);
     WARNING_TYPES = AppConstants.WARNING_TYPES;
 
     currentState = 'First State';
     goodDefaultOutcome = oof.createFromBackendDict({
       dest: 'Second State',
+      dest_if_really_stuck: null,
       feedback: {
         html: '',
         content_id: ''
@@ -80,28 +79,28 @@ describe('RatioExpressionInputValidationService', () => {
       }
     };
 
-    isEquivalent = rof.createFromBackendDict({
+    isEquivalent = Rule.createFromBackendDict({
       rule_type: 'IsEquivalent',
       inputs: {
         x: [1, 2, 3]
       }
     }, 'RatioExpressionInput');
 
-    equals = rof.createFromBackendDict({
+    equals = Rule.createFromBackendDict({
       rule_type: 'Equals',
       inputs: {
         x: [1, 2, 3]
       }
     }, 'RatioExpressionInput');
 
-    hasNumberOfTermsEqualTo = rof.createFromBackendDict({
+    hasNumberOfTermsEqualTo = Rule.createFromBackendDict({
       rule_type: 'HasNumberOfTermsEqualTo',
       inputs: {
         y: 3
       }
     }, 'RatioExpressionInput');
 
-    hasSpecificTermEqualTo = rof.createFromBackendDict({
+    hasSpecificTermEqualTo = Rule.createFromBackendDict({
       rule_type: 'HasSpecificTermEqualTo',
       inputs: {
         x: 1, y: 1
@@ -134,12 +133,12 @@ describe('RatioExpressionInputValidationService', () => {
       currentState, customizationArgs, answerGroups, goodDefaultOutcome);
     expect(warnings).toEqual([{
       type: WARNING_TYPES.ERROR,
-      message: 'Rule 2 from answer group 1 will never be matched because' +
-      ' it is preceded by a \'Equals\' rule with a matching' +
-      ' input.'
+      message: 'Learner answer 2 from Oppia response 1 will never be ' +
+      'matched because it is preceded by a \'Equals\' ' +
+      'answer with a matching input.'
     }]);
 
-    let isEquivalentNonSimplified = rof.createFromBackendDict({
+    let isEquivalentNonSimplified = Rule.createFromBackendDict({
       rule_type: 'IsEquivalent',
       inputs: {
         x: [2, 4, 6]
@@ -153,12 +152,12 @@ describe('RatioExpressionInputValidationService', () => {
       currentState, customizationArgs, answerGroups, goodDefaultOutcome);
     expect(warnings).toEqual([{
       type: WARNING_TYPES.ERROR,
-      message: 'Rule 2 from answer group 1 will never be matched because' +
-      ' it is preceded by a \'IsEquivalent\' rule with a matching' +
-      ' input.'
+      message: 'Learner answer 2 from Oppia response 1 will never be ' +
+      'matched because it is preceded by a \'IsEquivalent\' ' +
+      'answer with a matching input.'
     }]);
 
-    let equalFourTerms = rof.createFromBackendDict({
+    let equalFourTerms = Rule.createFromBackendDict({
       rule_type: 'Equals',
       inputs: {
         x: [1, 2, 3, 4]
@@ -172,13 +171,13 @@ describe('RatioExpressionInputValidationService', () => {
       currentState, customizationArgs, answerGroups, goodDefaultOutcome);
     expect(warnings).toEqual([{
       type: WARNING_TYPES.ERROR,
-      message: 'Rule 2 from answer group 1 will never be matched because ' +
-      'the \'HasNumberOfTermsEqualTo\' rule is preceded by a rule with a ' +
-      'matching input.'
+      message: 'Learner answer 2 from Oppia response 1 will never be ' +
+      'matched because it is preceded by a \'HasNumberOfTermsEqualTo\' ' +
+      'answer with a matching input.'
     }, {
       type: WARNING_TYPES.ERROR,
-      message: 'Rule 3 from answer group 1 will never be matched because' +
-      ' it has differing number of terms than required.'
+      message: 'Learner answer 3 from Oppia response 1 will never be matched' +
+      ' because it has differing number of terms than required.'
     }]);
 
     // The second rule will never get matched.
@@ -188,18 +187,18 @@ describe('RatioExpressionInputValidationService', () => {
       currentState, customizationArgs, answerGroups, goodDefaultOutcome);
     expect(warnings).toEqual([{
       type: WARNING_TYPES.ERROR,
-      message: 'Rule 2 from answer group 1 will never be matched because ' +
-      'it is preceded by a \'HasNumberOfTermsEqualTo\' rule with a ' +
-      'matching input.'
+      message: 'Learner answer 2 from Oppia response 1 will never be ' +
+      'matched because it is preceded by a \'HasNumberOfTermsEqualTo\' ' +
+      'answer with a matching input.'
     }]);
 
-    let equalsTwoTerms = rof.createFromBackendDict({
+    let equalsTwoTerms = Rule.createFromBackendDict({
       rule_type: 'Equals',
       inputs: {
         x: [1, 2]
       }
     }, 'RatioExpressionInput');
-    let hasNumberOfTermsEqualToLength2 = rof.createFromBackendDict({
+    let hasNumberOfTermsEqualToLength2 = Rule.createFromBackendDict({
       rule_type: 'HasNumberOfTermsEqualTo',
       inputs: {
         y: 2
@@ -213,12 +212,12 @@ describe('RatioExpressionInputValidationService', () => {
       currentState, customizationArgs, answerGroups, goodDefaultOutcome);
     expect(warnings).toEqual([{
       type: WARNING_TYPES.ERROR,
-      message: 'Rule 1 from answer group 1 will never be matched because' +
-      ' it has differing number of terms than required.'
+      message: 'Learner answer 1 from Oppia response 1 will never be matched' +
+      ' because it has differing number of terms than required.'
     }, {
       type: WARNING_TYPES.ERROR,
-      message: 'Rule 3 from answer group 1 will never be matched because' +
-      ' it has differing number of terms than required.'
+      message: 'Learner answer 3 from Oppia response 1 will never be matched' +
+      ' because it has differing number of terms than required.'
     }]);
 
     // The second rule will never get matched.
@@ -228,12 +227,12 @@ describe('RatioExpressionInputValidationService', () => {
       currentState, customizationArgs, answerGroups, goodDefaultOutcome);
     expect(warnings).toEqual([{
       type: WARNING_TYPES.ERROR,
-      message: 'Rule 2 from answer group 1 will never be matched because ' +
-      'it is preceded by a \'HasSpecificTermEqualTo\' rule with a ' +
-      'matching input.'
+      message: 'Learner answer 2 from Oppia response 1 will never be ' +
+      'matched because it is preceded by a \'HasSpecificTermEqualTo\' ' +
+      'answer with a matching input.'
     }]);
 
-    let invalidHasSpecificTermEqualTo = rof.createFromBackendDict({
+    let invalidHasSpecificTermEqualTo = Rule.createFromBackendDict({
       rule_type: 'HasSpecificTermEqualTo',
       inputs: {
         x: 4, y: 1
@@ -245,8 +244,8 @@ describe('RatioExpressionInputValidationService', () => {
       goodDefaultOutcome);
     expect(warnings).toEqual([{
       type: WARNING_TYPES.ERROR,
-      message: 'Rule 1 from answer group 1 will never be matched because ' +
-      'it expects more terms than the answer allows.'
+      message: 'Learner answer 1 from Oppia response 1 will never be matched' +
+      ' because it expects more terms than the answer allows.'
     }]);
   });
 
@@ -306,7 +305,7 @@ describe('RatioExpressionInputValidationService', () => {
 
   it('should not throw warnings on HasSpecificTermEqualTo when term number ' +
       'equals the expected number of terms', () => {
-    let validHasSpecificTermEqualTo = rof.createFromBackendDict({
+    let validHasSpecificTermEqualTo = Rule.createFromBackendDict({
       rule_type: 'HasSpecificTermEqualTo',
       inputs: {
         x: 3, y: 1
@@ -321,7 +320,7 @@ describe('RatioExpressionInputValidationService', () => {
 
   it('should not throw warnings on HasSpecificTermEqualTo when expected ' +
       'number of terms is set to 0', () => {
-    let validHasSpecificTermEqualTo = rof.createFromBackendDict({
+    let validHasSpecificTermEqualTo = Rule.createFromBackendDict({
       rule_type: 'HasSpecificTermEqualTo',
       inputs: {
         x: 3, y: 1

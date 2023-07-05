@@ -23,14 +23,7 @@ import datetime
 from core import utils
 from core.domain import beam_job_domain
 from core.jobs.batch_jobs import model_validation_jobs
-from core.platform import models
 from core.tests import test_utils
-
-MYPY = False
-if MYPY:  # pragma: no cover
-    from mypy_imports import beam_job_models
-
-(beam_job_models,) = models.Registry.import_models([models.NAMES.beam_job])
 
 
 class BeamJobTests(test_utils.TestBase):
@@ -41,53 +34,6 @@ class BeamJobTests(test_utils.TestBase):
         job = beam_job_domain.BeamJob(
             model_validation_jobs.AuditAllStorageModelsJob)
         self.assertEqual(job.name, 'AuditAllStorageModelsJob')
-
-    def test_in_terminal_state(self) -> None:
-        cancelled_beam_job_run = beam_job_domain.BeamJobRun(
-            '123', 'FooJob', beam_job_models.BeamJobState.CANCELLED.value,
-            self.NOW, self.NOW, True)
-        drained_beam_job_run = beam_job_domain.BeamJobRun(
-            '123', 'FooJob', beam_job_models.BeamJobState.DRAINED.value,
-            self.NOW, self.NOW, True)
-        updated_beam_job_run = beam_job_domain.BeamJobRun(
-            '123', 'FooJob', beam_job_models.BeamJobState.UPDATED.value,
-            self.NOW, self.NOW, True)
-        done_beam_job_run = beam_job_domain.BeamJobRun(
-            '123', 'FooJob', beam_job_models.BeamJobState.DONE.value,
-            self.NOW, self.NOW, True)
-        failed_beam_job_run = beam_job_domain.BeamJobRun(
-            '123', 'FooJob', beam_job_models.BeamJobState.FAILED.value,
-            self.NOW, self.NOW, True)
-        cancelling_beam_job_run = beam_job_domain.BeamJobRun(
-            '123', 'FooJob', beam_job_models.BeamJobState.CANCELLING.value,
-            self.NOW, self.NOW, True)
-        draining_beam_job_run = beam_job_domain.BeamJobRun(
-            '123', 'FooJob', beam_job_models.BeamJobState.DRAINING.value,
-            self.NOW, self.NOW, True)
-        pending_beam_job_run = beam_job_domain.BeamJobRun(
-            '123', 'FooJob', beam_job_models.BeamJobState.PENDING.value,
-            self.NOW, self.NOW, True)
-        running_beam_job_run = beam_job_domain.BeamJobRun(
-            '123', 'FooJob', beam_job_models.BeamJobState.RUNNING.value,
-            self.NOW, self.NOW, True)
-        stopped_beam_job_run = beam_job_domain.BeamJobRun(
-            '123', 'FooJob', beam_job_models.BeamJobState.STOPPED.value,
-            self.NOW, self.NOW, True)
-        unknown_beam_job_run = beam_job_domain.BeamJobRun(
-            '123', 'FooJob', beam_job_models.BeamJobState.UNKNOWN.value,
-            self.NOW, self.NOW, True)
-
-        self.assertTrue(cancelled_beam_job_run.in_terminal_state)
-        self.assertTrue(drained_beam_job_run.in_terminal_state)
-        self.assertTrue(updated_beam_job_run.in_terminal_state)
-        self.assertTrue(done_beam_job_run.in_terminal_state)
-        self.assertTrue(failed_beam_job_run.in_terminal_state)
-        self.assertFalse(cancelling_beam_job_run.in_terminal_state)
-        self.assertFalse(draining_beam_job_run.in_terminal_state)
-        self.assertFalse(pending_beam_job_run.in_terminal_state)
-        self.assertFalse(running_beam_job_run.in_terminal_state)
-        self.assertFalse(stopped_beam_job_run.in_terminal_state)
-        self.assertFalse(unknown_beam_job_run.in_terminal_state)
 
     def test_to_dict(self) -> None:
         job = beam_job_domain.BeamJob(

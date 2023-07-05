@@ -22,20 +22,21 @@ from __future__ import annotations
 import argparse
 import contextlib
 import time
+from typing import Iterator, Optional, Sequence
 
-
+# Do not import any Oppia modules here,
+# import them below the "install_third_party_libs.main()" line.
 from . import install_third_party_libs
 # This installs third party libraries before importing other files or importing
-# libraries that use the builtins python module (e.g. build, python_utils).
+# libraries that use the builtins python module (e.g. build).
 install_third_party_libs.main()
 
 from . import build # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 from . import common # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
+from . import extend_index_yaml # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 from . import servers # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 
 from core.constants import constants # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
-from core import python_utils # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
-
 
 _PARSER = argparse.ArgumentParser(
     description="""
@@ -81,7 +82,7 @@ PORT_NUMBER_FOR_GAE_SERVER = 8181
 
 
 @contextlib.contextmanager
-def alert_on_exit():
+def alert_on_exit() -> Iterator[None]:
     """Context manager that alerts developers to wait for a graceful shutdown.
 
     Yields:
@@ -90,7 +91,7 @@ def alert_on_exit():
     try:
         yield
     finally:
-        python_utils.PRINT(
+        print(
             '\n\n'
             # ANSI escape sequence for bright yellow text color.
             '\033[93m'
@@ -104,9 +105,9 @@ def alert_on_exit():
         time.sleep(5)
 
 
-def notify_about_successful_shutdown():
+def notify_about_successful_shutdown() -> None:
     """Notifies developers that the servers have shutdown gracefully."""
-    python_utils.PRINT(
+    print(
         '\n\n'
         # ANSI escape sequence for bright green text color.
         '\033[92m'
@@ -119,7 +120,13 @@ def notify_about_successful_shutdown():
         '\n\n')
 
 
-def main(args=None):
+def call_extend_index_yaml() -> None:
+    """Calls the extend_index_yaml.py script."""
+    print('\033[94m' + 'Extending index.yaml...' + '\033[0m')
+    extend_index_yaml.main()
+
+
+def main(args: Optional[Sequence[str]] = None) -> None:
     """Starts up a development server running Oppia."""
     parsed_args = _PARSER.parse_args(args=args)
 
@@ -136,6 +143,7 @@ def main(args=None):
     with contextlib.ExitStack() as stack, alert_on_exit():
         # ExitStack unwinds in reverse-order, so this will be the final action.
         stack.callback(notify_about_successful_shutdown)
+        stack.callback(call_extend_index_yaml)
 
         build_args = []
         if parsed_args.prod_env:
@@ -145,7 +153,7 @@ def main(args=None):
         if parsed_args.source_maps:
             build_args.append('--source_maps')
         build.main(args=build_args)
-        stack.callback(build.set_constants_to_default)
+        stack.callback(common.set_constants_to_default)
 
         stack.enter_context(servers.managed_redis_server())
         stack.enter_context(servers.managed_elasticsearch_dev_server())
@@ -158,6 +166,10 @@ def main(args=None):
 
         # NOTE: When prod_env=True the Webpack compiler is run by build.main().
         if not parsed_args.prod_env:
+            # We need to create an empty hashes.json file for the build so that
+            # we don't get the error "assets/hashes.json file doesn't exist".
+            build.save_hashes_to_file({})
+            stack.enter_context(servers.managed_ng_build(watch_mode=True))
             stack.enter_context(servers.managed_webpack_compiler(
                 use_prod_env=False, use_source_maps=parsed_args.source_maps,
                 watch_mode=True))
@@ -170,11 +182,7 @@ def main(args=None):
             skip_sdk_update_check=True,
             port=PORT_NUMBER_FOR_GAE_SERVER))
 
-        managed_web_browser = (
-            None if parsed_args.no_browser else
-            servers.create_managed_web_browser(PORT_NUMBER_FOR_GAE_SERVER))
-
-        if managed_web_browser is None:
+        if parsed_args.no_browser:
             common.print_each_string_after_two_new_lines([
                 'INFORMATION',
                 'Local development server is ready! You can access it by '
@@ -182,16 +190,30 @@ def main(args=None):
                 'browser.' % PORT_NUMBER_FOR_GAE_SERVER,
             ])
         else:
-            common.print_each_string_after_two_new_lines([
-                'INFORMATION',
-                'Local development server is ready! Opening a default web '
-                'browser window pointing to it: '
-                'http://localhost:%s/' % PORT_NUMBER_FOR_GAE_SERVER,
-            ])
-            stack.enter_context(managed_web_browser)
+            try:
+                stack.enter_context(servers.create_managed_web_browser(
+                    PORT_NUMBER_FOR_GAE_SERVER))
+                common.print_each_string_after_two_new_lines([
+                    'INFORMATION',
+                    'Local development server is ready! Opening a default web '
+                    'browser window pointing to it: '
+                    'http://localhost:%s/' % PORT_NUMBER_FOR_GAE_SERVER,
+                ])
+            except Exception as error:
+                common.print_each_string_after_two_new_lines([
+                    'ERROR',
+                    'Error occurred while attempting to automatically launch '
+                    'the web browser: %s' % error,
+                ])
+                common.print_each_string_after_two_new_lines([
+                    'INFORMATION',
+                    'Local development server is ready! You can access it by '
+                    'navigating to http://localhost:%s/ in a web '
+                    'browser.' % PORT_NUMBER_FOR_GAE_SERVER,
+                ])
 
         dev_appserver.wait()
 
 
-if __name__ == '__main__':
+if __name__ == '__main__':  # pragma: no cover
     main()

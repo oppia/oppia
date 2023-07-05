@@ -16,39 +16,46 @@
  * @fileoverview Root component for pending account deletion Page.
  */
 
-import { Component } from '@angular/core';
+import { Component, OnDestroy } from '@angular/core';
+import { TranslateService } from '@ngx-translate/core';
+import { Subscription } from 'rxjs';
+
 import { AppConstants } from 'app.constants';
-import { AccessValidationBackendApiService } from 'pages/oppia-root/routing/access-validation-backend-api.service';
-import { LoaderService } from 'services/loader.service';
 import { PageHeadService } from 'services/page-head.service';
 
 @Component({
   selector: 'oppia-pending-account-deletion-page-root',
   templateUrl: './pending-account-deletion-page-root.component.html'
 })
-export class PendingAccountDeletionPageRootComponent {
+export class PendingAccountDeletionPageRootComponent implements OnDestroy {
+  directiveSubscriptions = new Subscription();
   pageIsShown: boolean = false;
   errorPageIsShown: boolean = false;
 
   constructor(
-    private accessValidationBackendApiService:
-      AccessValidationBackendApiService,
-    private loaderService: LoaderService,
-    private pageHeadService: PageHeadService
+    private pageHeadService: PageHeadService,
+    private translateService: TranslateService
   ) {}
 
-  ngOnInit(): void {
+  setPageTitleAndMetaTags(): void {
+    let pendingAccountDeletionPage =
+      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.PENDING_ACCOUNT_DELETION;
+    let translatedTitle = this.translateService.instant(
+      pendingAccountDeletionPage.TITLE);
     this.pageHeadService.updateTitleAndMetaTags(
-      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.PENDING_ACCOUNT_DELETION);
+      translatedTitle, pendingAccountDeletionPage.META);
+  }
 
-    this.loaderService.showLoadingScreen('Loading');
-    this.accessValidationBackendApiService.accountDeletionIsEnabled()
-      .then((resp) => {
-        this.pageIsShown = true;
-      }, (err) => {
-        this.errorPageIsShown = true;
-      }).then(() => {
-        this.loaderService.hideLoadingScreen();
-      });
+  ngOnInit(): void {
+    this.directiveSubscriptions.add(
+      this.translateService.onLangChange.subscribe(() => {
+        this.setPageTitleAndMetaTags();
+      })
+    );
+    this.pageIsShown = true;
+  }
+
+  ngOnDestroy(): void {
+    this.directiveSubscriptions.unsubscribe();
   }
 }

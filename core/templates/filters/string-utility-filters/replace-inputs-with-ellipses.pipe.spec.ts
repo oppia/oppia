@@ -20,7 +20,7 @@ import { ReplaceInputsWithEllipsesPipe } from
   'filters/string-utility-filters/replace-inputs-with-ellipses.pipe';
 
 describe('Testing filters', function() {
-  let pipe: ReplaceInputsWithEllipsesPipe = null;
+  let pipe: ReplaceInputsWithEllipsesPipe;
   beforeEach(() => {
     pipe = new ReplaceInputsWithEllipsesPipe();
   });
@@ -31,7 +31,15 @@ describe('Testing filters', function() {
 
   it('should convert {{...}} tags to ...', () => {
     expect(pipe.transform('')).toEqual('');
+    // This throws "Type null is not assignable to type
+    // 'string'." We need to suppress this error
+    // because of the need to test validations.
+    // @ts-ignore
     expect(pipe.transform(null)).toEqual('');
+    // This throws "Type null is not assignable to type
+    // 'string'." We need to suppress this error
+    // because of the need to test validations.
+    // @ts-ignore
     expect(pipe.transform(undefined)).toEqual('');
     expect(pipe.transform('hello')).toEqual('hello');
     expect(pipe.transform('{{hello}}')).toEqual('...');

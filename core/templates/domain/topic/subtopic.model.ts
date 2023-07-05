@@ -19,7 +19,7 @@
 
 import { ShortSkillSummary } from 'domain/skill/short-skill-summary.model';
 
-import constants from 'assets/constants';
+import { AppConstants } from 'app.constants';
 
 export interface SubtopicBackendDict {
   'id': number;
@@ -96,7 +96,7 @@ export class Subtopic {
   validate(): string[] {
     let issues: string[] = [];
     const VALID_URL_FRAGMENT_REGEX = new RegExp(
-      constants.VALID_URL_FRAGMENT_REGEX);
+      AppConstants.VALID_URL_FRAGMENT_REGEX);
     if (
       this._urlFragment &&
       !VALID_URL_FRAGMENT_REGEX.test(this._urlFragment)

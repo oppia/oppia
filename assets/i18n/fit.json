@@ -78,7 +78,7 @@
 	"I18N_FOOTER_OPPIA_FOUNDATION": "Oppia Foundation",
 	"I18N_FOOTER_TERMS_OF_SERVICE": "Käyttöehdot",
 	"I18N_FORMS_TYPE_NUMBER": "Kirjoita numero",
-	"I18N_FORMS_TYPE_NUMBER_AT_LEAST": "Ole hyvä ja syötä numero joka oon vähintään <[minValue]>.",
+	"I18N_FORMS_TYPE_NUMBER_AT_LEAST": "Ole hyvä ja syötä numero joka oon vähintänsä <[minValue]>.",
 	"I18N_FORMS_TYPE_NUMBER_AT_MOST": "Ole hyvä syötä numero joka oon enintään <[maxValue]>",
 	"I18N_GET_STARTED_PAGE_TITLE": "Aloita",
 	"I18N_INTERACTIONS_FRACTIONS_INPUT_PLACEHOLDER": "Anna murtoluku muodossa \"x/y\", tai sekaluku muodossa \"A x/y\".",

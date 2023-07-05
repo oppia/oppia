@@ -2,7 +2,7 @@
   "ImageClickInput": {
     "can_have_solution": false,
     "show_generic_submit_button": false,
-    "instructions": "Click on the image",
+    "instructions": "I18N_INTERACTIONS_IMAGE_CLICK_INSTRUCTION",
     "is_trainable": false,
     "narrow_instructions": "View image",
     "description": "Allows learners to click on regions of an image.",
@@ -97,9 +97,8 @@
     "default_outcome_heading": null,
     "rule_descriptions": {
       "MatchesExactlyWith": "matches exactly with {{x|NumericExpression}}",
-      "IsEquivalentTo": "is equivalent to {{x|NumericExpression}}",
-      "ContainsSomeOf": "contains at least one of the terms present in {{x|NumericExpression}}",
-      "OmitsSomeOf": "omits at least one of the terms present in {{x|NumericExpression}}"
+      "MatchesUpToTrivialManipulations": "matches {{x|NumericExpression}}, taking into account commutativity and associativity",
+      "IsEquivalentTo": "is equivalent to {{x|NumericExpression}}"
     }
   },
   "NumericInput": {
@@ -138,9 +137,9 @@
   "DragAndDropSortInput": {
     "can_have_solution": true,
     "show_generic_submit_button": true,
-    "instructions": "Drag and drop items",
+    "instructions": "I18N_INTERACTIONS_DRAG_AND_DROP_INSTRUCTION",
     "is_trainable": false,
-    "narrow_instructions": "Drag and drop items",
+    "narrow_instructions": "I18N_INTERACTIONS_DRAG_AND_DROP_INSTRUCTION",
     "description": "Allows learners to drag and drop items for sorting.",
     "needs_summary": true,
     "name": "Drag And Drop Sort",
@@ -156,6 +155,9 @@
           "items": {
             "type": "custom",
             "obj_type": "SubtitledHtml",
+            "validators": [{
+              "id": "has_subtitled_html_non_empty"
+            }],
             "replacement_ui_config": {
               "html": {
                 "hide_complex_extensions": true,
@@ -166,8 +168,11 @@
           "type": "list",
           "validators": [
             {
-              "min_value": 1,
+              "min_value": 2,
               "id": "has_length_at_least"
+            },
+            {
+              "id": "has_unique_subtitled_contents"
             }
           ],
           "ui_config": {
@@ -201,7 +206,7 @@
   },
   "ItemSelectionInput": {
     "can_have_solution": false,
-    "show_generic_submit_button": false,
+    "show_generic_submit_button": true,
     "instructions": null,
     "is_trainable": false,
     "narrow_instructions": null,
@@ -214,7 +219,7 @@
     "id": "ItemSelectionInput",
     "customization_arg_specs": [
       {
-        "description": "Minimum number of selections permitted.",
+        "description": "Minimum number of selections permitted",
         "name": "minAllowableSelectionCount",
         "schema": {
           "type": "int",
@@ -248,6 +253,9 @@
           "items": {
             "type": "custom",
             "obj_type": "SubtitledHtml",
+            "validators": [{
+              "id": "has_subtitled_html_non_empty"
+            }],
             "replacement_ui_config": {
               "html": {
                 "hide_complex_extensions": true,
@@ -256,6 +264,9 @@
             }
           },
           "type": "list",
+          "validators": [{
+            "id": "has_unique_subtitled_contents"
+          }],
           "ui_config": {
             "add_element_text": "Add item for selection"
           }
@@ -291,7 +302,11 @@
         "name": "buttonText",
         "schema": {
           "type": "custom",
-          "obj_type": "SubtitledUnicode"
+          "obj_type": "SubtitledUnicode",
+          "validators": [{
+            "id": "has_expected_subtitled_content_length",
+            "max_value": 20
+          }]
         },
         "default_value": {
           "content_id": null,
@@ -306,9 +321,9 @@
   "GraphInput": {
     "can_have_solution": true,
     "show_generic_submit_button": true,
-    "instructions": "Create a graph",
+    "instructions": "I18N_INTERACTIONS_GRAPH_INPUT_INSTRUCTION",
     "is_trainable": false,
-    "narrow_instructions": "View graph",
+    "narrow_instructions": "I18N_INTERACTIONS_GRAPH_INPUT_NARROW_INSTRUCTION",
     "description": "Allows learners to create and manipulate graphs.",
     "needs_summary": true,
     "name": "Graph Theory",
@@ -501,9 +516,9 @@
   "CodeRepl": {
     "can_have_solution": true,
     "show_generic_submit_button": true,
-    "instructions": "Type code in the editor",
+    "instructions": "I18N_INTERACTIONS_CODE_REPL_INSTRUCTION",
     "is_trainable": true,
-    "narrow_instructions": "Go to code editor",
+    "narrow_instructions": "I18N_INTERACTIONS_CODE_REPL_NARROW_INSTRUCTION",
     "description": "Allows learners to enter code and get it evaluated.",
     "needs_summary": true,
     "name": "Code Editor",
@@ -585,9 +600,9 @@
     "customization_arg_specs": [
       {
         "description": "Shortcut variables that the learner can access in the on-screen keyboard. (The order of these variables will be reflected in the learner's keyboard)",
-        "name": "customOskLetters",
+        "name": "allowedVariables",
         "schema": {
-          "obj_type": "CustomOskLetters",
+          "obj_type": "AllowedVariables",
           "type": "custom"
         },
         "default_value": []
@@ -605,15 +620,13 @@
     "default_outcome_heading": null,
     "rule_descriptions": {
       "MatchesExactlyWith": "matches exactly with {{x|MathEquation}} {{y|PositionOfTerms}}",
-      "IsEquivalentTo": "is equivalent to {{x|MathEquation}}",
-      "ContainsSomeOf": "contains at least one of the terms present in {{x|MathEquation}} {{y|PositionOfTerms}}",
-      "OmitsSomeOf": "omits at least one of the terms present in {{x|MathEquation}} {{y|PositionOfTerms}}",
-      "MatchesWithGeneralForm": "matches the form of {{x|MathEquation}} with placeholders {{y|SetOfAlgebraicIdentifier}}"
+      "MatchesUpToTrivialManipulations": "matches {{x|MathEquation}} {{y|PositionOfTerms}}, taking into account commutativity and associativity",
+      "IsEquivalentTo": "is equivalent to {{x|MathEquation}}"
     }
   },
   "MultipleChoiceInput": {
     "can_have_solution": false,
-    "show_generic_submit_button": false,
+    "show_generic_submit_button": true,
     "instructions": null,
     "is_trainable": false,
     "narrow_instructions": null,
@@ -632,6 +645,9 @@
           "items": {
             "type": "custom",
             "obj_type": "SubtitledHtml",
+            "validators": [{
+              "id": "has_subtitled_html_non_empty"
+            }],
             "replacement_ui_config": {
               "html": {
                 "hide_complex_extensions": true,
@@ -644,6 +660,9 @@
             {
               "min_value": 1,
               "id": "has_length_at_least"
+            },
+            {
+              "id": "has_unique_subtitled_contents"
             }
           ],
           "ui_config": {
@@ -672,9 +691,9 @@
   "PencilCodeEditor": {
     "can_have_solution": true,
     "show_generic_submit_button": false,
-    "instructions": "Edit the code. Click 'Play' to check it!",
+    "instructions": "I18N_INTERACTIONS_PENCILCODE_INSTRUCTION",
     "is_trainable": false,
-    "narrow_instructions": "Show code editor",
+    "narrow_instructions": "I18N_INTERACTIONS_PENCILCODE_NARROW_INSTRUCTION",
     "description": "Allows learners to edit code in Pencil Code.",
     "needs_summary": true,
     "name": "Pencil Code Editor",
@@ -750,8 +769,14 @@
           ]
         },
         "default_value": 1
-      }
-    ],
+    }, {
+      "description": "Catch Misspellings (Detect if answer is misspelled and nudge the learner to correct the misspelling)",
+      "name": "catchMisspellings",
+      "schema": {
+        "type": "bool"
+      },
+     "default_value": false
+    }],
     "is_terminal": false,
     "default_outcome_heading": null,
     "rule_descriptions": {
@@ -764,9 +789,9 @@
   "InteractiveMap": {
     "can_have_solution": false,
     "show_generic_submit_button": false,
-    "instructions": "Click on the map",
+    "instructions": "I18N_INTERACTIONS_MAP_INSTRUCTION",
     "is_trainable": false,
-    "narrow_instructions": "View map",
+    "narrow_instructions": "I18N_INTERACTIONS_MAP_NARROW_INSTRUCTION",
     "description": "Allows learners to specify a position on a world map.",
     "needs_summary": true,
     "name": "World Map",
@@ -830,9 +855,9 @@
   "MusicNotesInput": {
     "can_have_solution": true,
     "show_generic_submit_button": true,
-    "instructions": "Drag notes to the staff to form a sequence",
+    "instructions": "I18N_INTERACTIONS_MUSIC_INSTRUCTION",
     "is_trainable": false,
-    "narrow_instructions": "Show music staff",
+    "narrow_instructions": "I18N_INTERACTIONS_MUSIC_NARROW_INSTRUCTION",
     "description": "Allows learners to drag and drop notes onto the lines of a music staff.",
     "needs_summary": true,
     "name": "Music Notes Input",
@@ -887,9 +912,9 @@
     "customization_arg_specs": [
       {
         "description": "Shortcut variables that the learner can access in the on-screen keyboard. (The order of these variables will be reflected in the learner's keyboard)",
-        "name": "customOskLetters",
+        "name": "allowedVariables",
         "schema": {
-          "obj_type": "CustomOskLetters",
+          "obj_type": "AllowedVariables",
           "type": "custom"
         },
         "default_value": []
@@ -907,10 +932,8 @@
     "default_outcome_heading": null,
     "rule_descriptions": {
       "MatchesExactlyWith": "matches exactly with {{x|AlgebraicExpression}}",
-      "IsEquivalentTo": "is equivalent to {{x|AlgebraicExpression}}",
-      "ContainsSomeOf": "contains at least one of the terms present in {{x|AlgebraicExpression}}",
-      "OmitsSomeOf": "omits at least one of the terms present in {{x|AlgebraicExpression}}",
-      "MatchesWithGeneralForm": "matches the form of {{x|AlgebraicExpression}} with placeholders {{y|SetOfAlgebraicIdentifier}}"
+      "MatchesUpToTrivialManipulations": "matches {{x|AlgebraicExpression}}, taking into account commutativity and associativity",
+      "IsEquivalentTo": "is equivalent to {{x|AlgebraicExpression}}"
     }
   },
   "FractionInput": {

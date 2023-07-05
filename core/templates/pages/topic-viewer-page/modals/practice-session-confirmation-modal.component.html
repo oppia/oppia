@@ -1,0 +1,38 @@
+<div class="modal-container">
+  <div class="modal-header">
+    <h2 class="modal-title" [textContent]="'I18N_TOPIC_VIEWER_PRACTICE_SESSION_BETA_NOTICE_MODAL_TITLE' | translate"></h2>
+  </div>
+  <div class="modal-body">
+    <p [textContent]="'I18N_TOPIC_VIEWER_PRACTICE_SESSION_BETA_NOTICE_MODAL_MESSAGE' | translate"></p>
+  </div>
+  <div class="modal-footer">
+    <button type="button"
+            (click)="cancel()"
+            class="btn practice-session-btn-cancel"
+            [textContent]="'I18N_MODAL_CANCEL_BUTTON' | translate">
+    </button>
+    <button type="button"
+            (click)="confirm()"
+            class="btn practice-session-btn-continue"
+            [textContent]="'I18N_MODAL_CONTINUE_BUTTON' | translate">
+    </button>
+  </div>
+</div>
+
+<style>
+  .modal-container {
+    padding: 10px;
+  }
+  .practice-session-btn-continue {
+    background-color: #00645c;
+    border-color: #00645c;
+    color: #fff;
+    font-weight: bold;
+  }
+  .practice-session-btn-cancel {
+    background-color: #fff;
+    border-color: #00645c;
+    color: #00645c;
+    font-weight: bold;
+  }
+</style>

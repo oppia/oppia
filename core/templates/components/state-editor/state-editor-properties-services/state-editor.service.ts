@@ -25,7 +25,7 @@ import { EventEmitter, Injectable } from '@angular/core';
 
 import { AnswerGroup } from
   'domain/exploration/AnswerGroupObjectFactory';
-import { Hint } from 'domain/exploration/HintObjectFactory';
+import { Hint } from 'domain/exploration/hint-object.model';
 import { SubtitledHtml } from
   'domain/exploration/subtitled-html.model';
 import {
@@ -59,19 +59,24 @@ export class StateEditorService {
   private _stateEditorInitializedEventEmitter = new EventEmitter<State>();
   private _stateEditorDirectiveInitializedEventEmitter =
     new EventEmitter<void>();
+
   private _interactionEditorInitializedEventEmitter = new EventEmitter<void>();
   private _showTranslationTabBusyModalEventEmitter = new EventEmitter<void>();
   private _refreshStateTranslationEventEmitter = new EventEmitter<void>();
-  private _updateAnswerChoicesEventEmitter = new EventEmitter<AnswerChoice[]>();
+  private _updateAnswerChoicesEventEmitter =
+    new EventEmitter<AnswerChoice[]>();
+
   private _saveOutcomeDestDetailsEventEmitter = new EventEmitter<void>();
+  private _saveOutcomeDestIfStuckDetailsEventEmitter = new EventEmitter<void>();
   private _handleCustomArgsUpdateEventEmitter =
     new EventEmitter<AnswerChoice[]>();
+
   private _stateNamesChangedEventEmitter = new EventEmitter<void>();
   private _objectFormValidityChangeEventEmitter = new EventEmitter<boolean>();
 
   activeStateName: string | null = null;
   // These properties are initialized using Angular lifecycle hooks
-  // and we need to do non-null assertion, for more information see
+  // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   // Currently, the only place where this is used in the state editor
   // is in solution verification. So, once the interaction is set in this
@@ -83,7 +88,7 @@ export class StateEditorService {
   correctnessFeedbackEnabled: boolean = false;
   inQuestionMode: boolean = false;
   misconceptionsBySkill: {} = {};
-  explorationIsWhitelisted: boolean = false;
+  explorationIsCurated: boolean = false;
   solicitAnswerDetails: boolean = false;
   cardIsCheckpoint: boolean = false;
   stateContentEditorInitialised: boolean = false;
@@ -150,12 +155,8 @@ export class StateEditorService {
     this.activeStateName = newActiveStateName;
   }
 
-  isExplorationWhitelisted(): boolean {
-    return this.explorationIsWhitelisted;
-  }
-
-  updateExplorationWhitelistedStatus(value: boolean): void {
-    this.explorationIsWhitelisted = value;
+  isExplorationCurated(): boolean {
+    return this.explorationIsCurated;
   }
 
   setMisconceptionsBySkill(newMisconceptionsBySkill: {}): void {
@@ -344,6 +345,10 @@ export class StateEditorService {
 
   get onSaveOutcomeDestDetails(): EventEmitter<void> {
     return this._saveOutcomeDestDetailsEventEmitter;
+  }
+
+  get onSaveOutcomeDestIfStuckDetails(): EventEmitter<void> {
+    return this._saveOutcomeDestIfStuckDetailsEventEmitter;
   }
 
   get onHandleCustomArgsUpdate(): EventEmitter<AnswerChoice[]> {

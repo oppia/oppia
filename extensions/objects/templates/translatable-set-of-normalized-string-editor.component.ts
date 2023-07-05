@@ -15,24 +15,27 @@
 /**
  * @fileoverview Directive for translatable set of normalized string editor.
  */
-import { ChangeDetectorRef, Component, EventEmitter, Input, Output } from '@angular/core';
+import { ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
+
+export interface TranslatableSetOfStringSchema {
+  type: string;
+  items: { type: string };
+  validators: { id: string }[];
+}
 
 @Component({
   selector: 'translatable-set-of-normalized-string-editor',
   templateUrl: './translatable-set-of-normalized-string-editor.component.html'
 })
-export class TranslatableSetOfNormalizedStringEditorComponent {
+export class TranslatableSetOfNormalizedStringEditorComponent
+  implements OnInit {
   // This property is initialized using Angular lifecycle hooks
-  // and we need to do non-null assertion, for more information see
+  // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() value!: { normalizedStrSet: string };
   @Output() valueChanged = new EventEmitter();
-  schema: {
-    type: string;
-    items: { type: string; };
-    validators: { id: string; }[];
-  } = {
+  schema: TranslatableSetOfStringSchema = {
     type: 'list',
     items: {
       type: 'unicode'
@@ -44,6 +47,14 @@ export class TranslatableSetOfNormalizedStringEditorComponent {
 
   constructor(private changeDetectorRef: ChangeDetectorRef) { }
 
+  ngOnInit(): void {
+    if (this.value === undefined) {
+      this.value = {
+        normalizedStrSet: ''
+      };
+    }
+  }
+
   updateValue(val: string): void {
     if (this.value.normalizedStrSet === val) {
       return;
@@ -53,11 +64,7 @@ export class TranslatableSetOfNormalizedStringEditorComponent {
     this.changeDetectorRef.detectChanges();
   }
 
-  getSchema(): {
-    type: string;
-    items: { type: string; };
-    validators: { id: string; }[];
-    } {
+  getSchema(): TranslatableSetOfStringSchema {
     return this.schema;
   }
 }

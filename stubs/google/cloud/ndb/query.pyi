@@ -1,8 +1,7 @@
 from . import Cursor, Key, TYPE_MODEL, Property
 from typing import (
-    Any, Iterator, List, Optional, Sequence, TypeVar, Tuple, Union,
+    Any, Iterator, List, Literal, Optional, Sequence, TypeVar, Tuple, Union,
     overload)
-from typing_extensions import Literal
 
 _T = TypeVar('_T', covariant=True)
 
@@ -61,6 +60,7 @@ class Query:
     default_options: QueryOptions
     def __init__(self, **kwds: Any) -> None: ...
     def filter(self, *args: Any) -> Query: ...
+    def iter(self, **kwargs: Any) -> Iterator[Any]: ...
     def order(self, *args: Any) -> Query: ...
     def __iter__(self) -> Iterator[Any]: ...
     @overload
@@ -86,6 +86,12 @@ class Query:
         self, keys_only: Literal[True], **q_options: Any
     ) -> Optional[Key]: ...
     def count(self, limit: Optional[int] = ..., **q_options: Any) -> int: ...
+    @overload
+    def fetch_page(
+        self,
+        page_size: int,
+        start_cursor: Optional[Cursor],
+    ) -> Tuple[Sequence[TYPE_MODEL], Cursor, bool]: ...
     @overload
     def fetch_page(
         self,

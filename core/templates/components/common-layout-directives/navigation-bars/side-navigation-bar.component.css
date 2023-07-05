@@ -1,0 +1,220 @@
+/*
+  NOTE to developers: We generate RTL CSS from this file in the webpack
+  compilation, here are sme additional rules that can be added to the CSS files:
+  https://rtlcss.com/learn/usage-guide/control-directives .
+*/
+.oppia-sidebar-menu {
+  background: #fff;
+  height: 100%;
+  left: 0;
+  position: fixed;
+  top: 0;
+  -ms-transform: translate(-100%, 0);
+  -webkit-transform: translate3d(-100%, 0, 0);
+  transform: translate3d(-100%, 0, 0);
+  width: 100%;
+  z-index: 100;
+}
+.oppia-sidebar-menu-transition {
+  -webkit-transition: all 0.5s;
+  transition: all 0.5s;
+}
+.oppia-sidebar-menu::after {
+  background: rgba(0,0,0,0.2);
+  content: '';
+  height: 100%;
+  opacity: 1;
+  position: absolute;
+  right: 0;
+  top: 0;
+  -webkit-transition: opacity 0.5s;
+  transition: opacity 0.5s;
+  width: 100%;
+}
+.oppia-sidebar-menu-icon {
+  float: right;
+  height: 22px;
+  margin: 0 35px 3px 6px;
+  transition-duration: 0.5s;
+  vertical-align: middle;
+  width: 22px;
+}
+.oppia-sidebar-menu ul {
+  font-size: 16px;
+  list-style: none;
+  margin-bottom: 0;
+  padding-left: 0;
+  padding-top: 0;
+}
+.oppia-sidebar-menu hr {
+  margin-bottom: 0;
+  margin-top: 0;
+}
+.oppia-sidebar-menu .oppia-sidebar-section-header {
+  color: #888;
+  display: block;
+  margin-left: 10px;
+  padding: 1em 0 0 0;
+  text-decoration: none;
+}
+.oppia-sidebar-menu a,
+.oppia-sidebar-expandalbe-button {
+  color: #333;
+  display: block;
+  padding: 1em 0 1em 18px;
+  text-decoration: none;
+}
+.oppia-sidebar-menu a:hover,
+.oppia-sidebar-menu a:focus {
+  background: rgb(243, 248, 255);
+}
+.oppia-sidebar-menu li.active a {
+  background: rgba(243, 248, 255, 0.5);
+}
+.oppia-sidebar-logo-container {
+  color: #333;
+  margin: 0 auto;
+  width: 120px;
+}
+.oppia-sidebar-header {
+  background: #eee;
+  border-bottom: 1px solid #ccc;
+  height: 56px;
+  padding-top: 6px;
+}
+.oppia-sidebar-menu-icon.fa {
+  font-size: 24px;
+}
+.oppia-sidebar-menu-open {
+  box-shadow: 1px 0 3px rgba(0,0,0,0.12), 1px 0 2px rgba(0,0,0,0.24);
+  height: 100vh;
+  overflow-y: scroll;
+  -ms-transform: translate(0, 0);
+  -webkit-transform: translate3d(0, 0, 0);
+  transform: translate3d(0, 0, 0);
+  visibility: visible;
+}
+.oppia-sidebar-menu-open::after {
+  height: 0;
+  opacity: 0;
+  -webkit-transition: opacity 0.5s, width 0.1s 0.5s, height 0.1s 0.5s;
+  transition: opacity 0.5s, width 0.1s 0.5s, height 0.1s 0.5s;
+  width: 0;
+}
+.oppia-sidebar-submenu-icon {
+  height: 22px;
+  margin: 0 6px 3px -3px;
+  transition-duration: 0.5s;
+  vertical-align: middle;
+  width: 22px;
+}
+.oppia-sidebar-submenu-text {
+  color: #767676;
+  font-family: "Roboto", Arial, sans-serif;
+  margin-left: 26px;
+  margin-right: 26px;
+}
+.oppia-sidebar-submenu-upperborder {
+  border-top: 1px solid #efeded;
+}
+.oppia-sidebar-menu-icon-transition {
+  transform: rotate(-180deg);
+}
+.oppia-sidebar-learn-subtext {
+  color: #767676;
+  font-family: "Roboto", Arial, sans-serif;
+  margin-top: 2px;
+  width: 75%;
+}
+.oppia-sidebar-menu li {
+  border-bottom: 1px solid #e3e3e3;
+}
+oppia-side-navigation-bar.oppia-submenu-image-position {
+  float: right;
+  margin-right: 5%;
+  margin-top: 2.5%;
+}
+oppia-side-navigation-bar.oppia-submenu-image {
+  height: 80px;
+  width: 64.54px;
+}
+oppia-side-navigation-bar.oppia-community-library-section {
+  background: #ededed;
+  border-radius: 0 0 8px 8px;
+  -webkit-box-shadow: 0 8px 6px -6px black;
+  -moz-box-shadow: 0 8px 6px -6px black;
+  box-shadow: 0 8px 6px -6px grey;
+}
+.learn-submenu-links {
+  color: #00645c;
+}
+.oppia-sidebar-menu span {
+  font-family: "Roboto", Arial, sans-serif;
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 500;
+  letter-spacing: 0.3px;
+  line-height: 16px;
+}
+.oppia-sidebar-submenu-toggle {
+  border-bottom: 2px solid #27ae60;
+}
+.submenu-notop-margin {
+  margin-top: -10px;
+}
+.oppia-sidebar-menu i.expand-icon {
+  color: #27ae60;
+}
+.oppia-sidebar-menu i.partnerships-icon {
+  color: #f2994a;
+}
+.oppia-sidebar-menu i.volunteer-icon {
+  color: #2d9cdb;
+}
+.oppia-sidebar-menu i.donate-icon {
+  color: #eb5757;
+}
+.oppia-sidebar-menu i.contact-icon {
+  color: #b4bbc4;
+}
+.oppia-sidebar-menu-open .oppia-sidebar-menu {
+  box-shadow: 1px 0 3px rgba(0,0,0,0.12), 1px 0 2px rgba(0,0,0,0.24);
+  height: 110vh;
+  overflow-y: scroll;
+  -ms-transform: translate(0, 0);
+  -webkit-transform: translate3d(0, 0, 0);
+  transform: translate3d(0, 0, 0);
+  visibility: visible;
+}
+.oppia-sidebar-menu-open .oppia-sidebar-menu::after {
+  height: 0;
+  opacity: 0;
+  -webkit-transition: opacity 0.5s, width 0.1s 0.5s, height 0.1s 0.5s;
+  transition: opacity 0.5s, width 0.1s 0.5s, height 0.1s 0.5s;
+  width: 0;
+}
+
+/*
+  Note that adding "overflow-y: scroll;" will break infinite scrolling in the
+  search results page.
+*/
+oppia-side-navigation-bar.oppia-content-container {
+  height: 100%;
+  left: 0;
+  position: relative;
+  -webkit-transition: -webkit-transform 0.5s;
+  transition: transform 0.5s;
+}
+
+.oppia-sidebar-menu-open .oppia-content-container::after {
+  height: 100%;
+  opacity: 1;
+  -webkit-transition: opacity 0.5s;
+  transition: opacity 0.5s;
+  width: 100%;
+}
+.oppia-sidebar-menu-closed .oppia-content-container::after {
+  opacity: 0;
+  -webkit-transition: opacity 0.5s;
+  transition: opacity 0.5s;
+}

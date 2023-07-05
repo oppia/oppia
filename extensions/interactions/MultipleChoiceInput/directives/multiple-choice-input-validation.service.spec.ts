@@ -25,7 +25,7 @@ import { MultipleChoiceInputCustomizationArgs } from
 import { MultipleChoiceInputValidationService } from 'interactions/MultipleChoiceInput/directives/multiple-choice-input-validation.service';
 import { Outcome, OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory';
-import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
+import { Rule } from 'domain/exploration/rule.model';
 import { SubtitledHtml } from
   'domain/exploration/subtitled-html.model';
 
@@ -40,7 +40,6 @@ describe('MultipleChoiceInputValidationService', () => {
   let validatorService: MultipleChoiceInputValidationService,
     customizationArguments: MultipleChoiceInputCustomizationArgs;
   let oof: OutcomeObjectFactory, agof: AnswerGroupObjectFactory;
-  let rof: RuleObjectFactory;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -51,11 +50,11 @@ describe('MultipleChoiceInputValidationService', () => {
     WARNING_TYPES = AppConstants.WARNING_TYPES;
     oof = TestBed.get(OutcomeObjectFactory);
     agof = TestBed.get(AnswerGroupObjectFactory);
-    rof = TestBed.get(RuleObjectFactory);
     currentState = 'First State';
 
     goodDefaultOutcome = oof.createFromBackendDict({
       dest: 'Second State',
+      dest_if_really_stuck: null,
       feedback: {
         html: '',
         content_id: ''
@@ -68,6 +67,7 @@ describe('MultipleChoiceInputValidationService', () => {
 
     badOutcome = oof.createFromBackendDict({
       dest: currentState,
+      dest_if_really_stuck: null,
       feedback: {
         html: '',
         content_id: ''
@@ -114,7 +114,8 @@ describe('MultipleChoiceInputValidationService', () => {
           x: 3
         }
       }].map(
-        ruleDict => rof.createFromBackendDict(ruleDict, 'MultipleChoiceInput')),
+        ruleDict => Rule.createFromBackendDict(
+          ruleDict, 'MultipleChoiceInput')),
       goodDefaultOutcome,
       [],
       null)];
@@ -140,7 +141,7 @@ describe('MultipleChoiceInputValidationService', () => {
       'Expected customization arguments to have property: choices');
   });
 
-  it('should expect at least four choices', () => {
+  it('should expect at least two choices', () => {
     customizationArguments.choices.value = [
       new SubtitledHtml('1', '')
     ];
@@ -149,7 +150,7 @@ describe('MultipleChoiceInputValidationService', () => {
       currentState, customizationArguments, [], goodDefaultOutcome);
     expect(warnings).toEqual([{
       type: WARNING_TYPES.CRITICAL,
-      message: 'Please enter at least four choices.'
+      message: 'Please enter at least 2 choices.'
     }]);
   });
 
@@ -181,7 +182,8 @@ describe('MultipleChoiceInputValidationService', () => {
         goodDefaultOutcome);
       expect(warnings).toEqual([{
         type: WARNING_TYPES.CRITICAL,
-        message: 'Please ensure rule 1 in group 1 refers to a valid choice.'
+        message: 'Please ensure learner answer 1 in Oppia response 1 refers ' +
+        'to a valid choice.'
       }]);
 
       goodAnswerGroups[0].rules[0].inputs.x = 1;
@@ -193,8 +195,9 @@ describe('MultipleChoiceInputValidationService', () => {
       expect(warnings).toEqual([{
         type: WARNING_TYPES.CRITICAL,
         message: (
-          'Please ensure rule 2 in group 1 is not equaling the same ' +
-          'multiple choice option as another rule.')
+          'Please ensure learner answer 2 in Oppia response 1 is not ' +
+          'equaling the same multiple choice option as another ' +
+          'learner answer.')
       }]);
     });
 

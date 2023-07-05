@@ -18,34 +18,35 @@
 
 import { ChangeDetectorRef, Component, EventEmitter, Input, Output } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
-import constants from 'assets/constants';
+import { AppConstants } from 'app.constants';
 import { SkillCreationService } from 'components/entity-creation-services/skill-creation.service';
 import { Rubric } from 'domain/skill/rubric.model';
 import { TopicsAndSkillsDashboardPageConstants } from 'pages/topics-and-skills-dashboard-page/topics-and-skills-dashboard-page.constants';
 
+
 interface Explanation {
-  [key: string]: string[]
+  [key: string]: string[];
 }
 
 interface ExplanationFormSchema {
-  type: string,
-  'ui_config': object
+  type: string;
+  'ui_config': object;
 }
 
 interface RubricsOptions {
-  id: number,
-  difficulty: string
+  id: number;
+  difficulty: string;
 }
 
 interface RubricData {
-  difficulty: string,
-  data: string[]
+  difficulty: string;
+  data: string[];
 }
 
 interface SkillDescriptionStatusValuesInterface {
-  STATUS_CHANGED: string,
-  STATUS_UNCHANGED: string,
-  STATUS_DISABLED: string
+  STATUS_CHANGED: string;
+  STATUS_UNCHANGED: string;
+  STATUS_DISABLED: string;
 }
 
 @Component({
@@ -53,22 +54,33 @@ interface SkillDescriptionStatusValuesInterface {
   templateUrl: './rubrics-editor.component.html'
 })
 export class RubricsEditorComponent {
-  @Input() rubrics: Rubric[];
-  @Input() newSkillBeingCreated: boolean;
-  @Output() saveRubric: EventEmitter<unknown> = (
+  @Output() saveRubric: EventEmitter<RubricData> = (
     new EventEmitter());
+
+  // These properties below are initialized using Angular lifecycle hooks
+  // where we need to do non-null assertion. For more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  @Input() rubrics!: Rubric[];
+  @Input() newSkillBeingCreated!: boolean;
+  selectedRubricIndex!: number;
+  rubricsOptions!: RubricsOptions[];
+  rubric!: Rubric;
+
   skillDescriptionStatusValues: SkillDescriptionStatusValuesInterface = (
     TopicsAndSkillsDashboardPageConstants.SKILL_DESCRIPTION_STATUS_VALUES);
+
   skillDifficultyMedium: string = (
-    constants.SKILL_DIFFICULTY_MEDIUM);
-  explanationsMemento: object = {};
-  explanationEditorIsOpen: object = {};
+    AppConstants.SKILL_DIFFICULTY_MEDIUM);
+
+  explanationsMemento: Record<string, string[]> = {};
+  explanationEditorIsOpen: Record<string, boolean[]> = {};
   editableExplanations: Explanation = {};
-  selectedRubricIndex: number;
   EXPLANATION_FORM_SCHEMA: ExplanationFormSchema = {type: 'html',
     ui_config: {}};
-  rubricsOptions: RubricsOptions[];
-  rubric: Rubric;
+
+  maximumNumberofExplanations: number = 10;
+  maximumCharacterLengthOfExplanation: number = 300;
+  MEDIUM_EXPLANATION_INDEX: number = 1;
 
   constructor(
     private skillCreationService: SkillCreationService,
@@ -93,6 +105,29 @@ export class RubricsEditorComponent {
 
   isExplanationValid(difficulty: string, index: number): boolean {
     return Boolean(this.editableExplanations[difficulty][index]);
+  }
+
+  isExplanationLengthValid(difficulty: string, idx: number): boolean {
+    return this.editableExplanations[difficulty][idx].length <=
+    this.maximumCharacterLengthOfExplanation;
+  }
+
+  isMediumLevelExplanationValid(): boolean {
+    // Checking if medium level rubrics have at least one explantion.
+    return (
+      this.rubrics[this.MEDIUM_EXPLANATION_INDEX] &&
+      this.rubrics[this.MEDIUM_EXPLANATION_INDEX].getExplanations().length >=
+      1);
+  }
+
+  hasReachedExplanationCountLimit(): boolean {
+    let totalExplanations: number = 0;
+    for (let difficulty in this.editableExplanations) {
+      if (this.editableExplanations[difficulty]) {
+        totalExplanations += this.editableExplanations[difficulty].length;
+      }
+    }
+    return totalExplanations >= this.maximumNumberofExplanations;
   }
 
   updateExplanation($event: string, idx: number): void {
@@ -139,8 +174,8 @@ export class RubricsEditorComponent {
       data: this.editableExplanations[difficulty]
     };
     this.saveRubric.emit(rubricData);
-    this.explanationsMemento[difficulty] =
-    [...this.editableExplanations[difficulty]];
+    this.explanationsMemento[difficulty] = [
+      ...this.editableExplanations[difficulty]];
     this.explanationEditorIsOpen[
       difficulty][
       this.editableExplanations[difficulty].length - 1] = true;
@@ -157,8 +192,8 @@ export class RubricsEditorComponent {
       data: this.editableExplanations[difficulty]
     };
     this.saveRubric.emit(rubricData);
-    this.explanationsMemento[difficulty] =
-    [...this.editableExplanations[difficulty]];
+    this.explanationsMemento[difficulty] = [
+      ...this.editableExplanations[difficulty]];
   }
 
 
@@ -182,7 +217,6 @@ export class RubricsEditorComponent {
         Array(explanations.length).fill(false));
       this.editableExplanations[difficulty] = [...explanations];
     }
-    this.selectedRubricIndex = null;
     this.rubricsOptions = [
       {id: 0, difficulty: 'Easy'},
       {id: 1, difficulty: 'Medium'},

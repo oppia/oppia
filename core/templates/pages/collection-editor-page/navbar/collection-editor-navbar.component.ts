@@ -37,10 +37,13 @@ import { CollectionEditorSaveModalComponent } from '../modals/collection-editor-
 })
 export class CollectionEditorNavbarComponent {
   directiveSubscriptions = new Subscription();
-  collectionRights: CollectionRights;
-  validationIssues: string[];
-  collection: Collection;
-  collectionId: string;
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  collectionRights!: CollectionRights;
+  validationIssues!: string[];
+  collection!: Collection;
+  collectionId!: string;
   editButtonHovering: boolean = false;
   playerButtonHovering: boolean = false;
 
@@ -128,7 +131,7 @@ export class CollectionEditorNavbarComponent {
 
   isCollectionPublishable(): boolean {
     return (
-      this.collectionRights.isPrivate() &&
+      Boolean(this.collectionRights.isPrivate()) &&
       this.getChangeListCount() === 0 &&
       this.validationIssues.length === 0);
   }

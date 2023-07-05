@@ -57,6 +57,10 @@ import {
   CreatorSummaryBackendDict,
   ProfileSummary,
 } from 'domain/user/profile-summary.model';
+import {
+  ShortLearnerGroupSummary,
+  ShortLearnerGroupSummaryBackendDict
+} from 'domain/learner_group/short-learner-group-summary.model';
 import { FeedbackMessageSummaryBackendDict } from 'domain/feedback_message/feedback-message-summary.model';
 import { AppConstants } from 'app.constants';
 
@@ -84,7 +88,7 @@ interface LearnerDashboardCollectionsDataBackendDict {
 }
 
 
-interface LearnerDashboardExplorationsDataBackendDict {
+export interface LearnerDashboardExplorationsDataBackendDict {
   'completed_explorations_list': LearnerExplorationSummaryBackendDict[];
   'incomplete_explorations_list': LearnerExplorationSummaryBackendDict[];
   'exploration_playlist': LearnerExplorationSummaryBackendDict[];
@@ -96,8 +100,17 @@ interface LearnerDashboardExplorationsDataBackendDict {
 interface LearnerDashboardFeedbackUpdatesDataBackendDict {
   'number_of_unread_threads': number;
   'thread_summaries': FeedbackThreadSummaryBackendDict[];
+  'paginated_threads_list': FeedbackThreadSummaryBackendDict[][];
 }
 
+interface LearnerCompletedChaptersCountDataBackendDict {
+  'completed_chapters_count': number;
+}
+
+interface LearnerDashboardLearnerGroupsBackendDict {
+  'learner_groups_joined': ShortLearnerGroupSummaryBackendDict[];
+  'invited_to_learner_groups': ShortLearnerGroupSummaryBackendDict[];
+}
 
 interface LearnerDashboardTopicsAndStoriesData {
   completedStoriesList: StorySummary[];
@@ -132,12 +145,25 @@ interface LearnerDashboardExplorationsData {
 interface LearnerDashboardFeedbackUpdatesData {
   numberOfUnreadThreads: number;
   threadSummaries: FeedbackThreadSummary[];
+  paginatedThreadsList: FeedbackThreadSummaryBackendDict[][];
 }
 
+interface LearnerCompletedChaptersCountData {
+  completedChaptersCount: number;
+}
+
+interface LearnerDashboardLearnerGroups {
+  learnerGroupsJoined: ShortLearnerGroupSummary[];
+  invitedToLearnerGroups: ShortLearnerGroupSummary[];
+}
 
 export interface AddMessagePayload {
-  'updated_status': boolean,
-  'updated_subject': string,
+  'updated_status': boolean;
+  // Subject for frontend instances of thread message domain objects
+  // are null and are only required to be supplied if the message is first
+  // message of the thread. Otherwise, these properties are only non-null
+  // when the subject changes.
+  'updated_subject': string | null;
   'text': string;
 }
 
@@ -150,7 +176,7 @@ export interface SubtopicMasteryDict {
 }
 
 interface MessageSummaryList {
-  'message_summary_list': FeedbackMessageSummaryBackendDict[]
+  'message_summary_list': FeedbackMessageSummaryBackendDict[];
 }
 
 @Injectable({
@@ -268,11 +294,16 @@ export class LearnerDashboardBackendApiService {
     });
   }
 
-  async _fetchLearnerDashboardFeedbackUpdatesDataAsync():
+  async _fetchLearnerDashboardFeedbackUpdatesDataAsync(
+      paginatedThreadsList: FeedbackThreadSummaryBackendDict[][]
+  ):
   Promise<LearnerDashboardFeedbackUpdatesData> {
     return new Promise((resolve, reject) => {
-      this.http.get<LearnerDashboardFeedbackUpdatesDataBackendDict>(
-        '/learnerdashboardfeedbackupdateshandler/data').toPromise().then(
+      this.http.post<LearnerDashboardFeedbackUpdatesDataBackendDict>(
+        '/learnerdashboardfeedbackupdateshandler/data',
+        {
+          paginated_threads_list: paginatedThreadsList
+        }).toPromise().then(
         dashboardData => {
           resolve({
             numberOfUnreadThreads: dashboardData.number_of_unread_threads,
@@ -280,6 +311,23 @@ export class LearnerDashboardBackendApiService {
               dashboardData.thread_summaries.map(
                 threadSummary => FeedbackThreadSummary
                   .createFromBackendDict(threadSummary))),
+            paginatedThreadsList: dashboardData.paginated_threads_list
+          });
+        }, errorResponse => {
+          reject(errorResponse.status);
+        });
+    });
+  }
+
+  async _fetchLearnerCompletedChaptersCountDataAsync():
+  Promise<LearnerCompletedChaptersCountData> {
+    return new Promise((resolve, reject) => {
+      this.http.get<LearnerCompletedChaptersCountDataBackendDict>(
+        '/learnercompletedchapterscounthandler/data').toPromise().then(
+        chapterCompletionData => {
+          resolve({
+            completedChaptersCount: (
+              chapterCompletionData.completed_chapters_count)
           });
         }, errorResponse => {
           reject(errorResponse.status);
@@ -291,7 +339,7 @@ export class LearnerDashboardBackendApiService {
       untrackedTopics: Record<string,
       LearnerTopicSummaryBackendDict[]>): Record<string,
       LearnerTopicSummary[]> {
-    var topics = {};
+    var topics: Record<string, LearnerTopicSummary[]> = {};
     for (var i in untrackedTopics) {
       topics[i] = untrackedTopics[i].map(
         topicSummary => LearnerTopicSummary.createFromBackendDict(
@@ -315,9 +363,17 @@ export class LearnerDashboardBackendApiService {
     return this._fetchLearnerDashboardExplorationsDataAsync();
   }
 
-  async fetchLearnerDashboardFeedbackUpdatesDataAsync():
+  async fetchLearnerDashboardFeedbackUpdatesDataAsync(
+      paginatedThreadsList: FeedbackThreadSummaryBackendDict[][] = []
+  ):
   Promise<LearnerDashboardFeedbackUpdatesData> {
-    return this._fetchLearnerDashboardFeedbackUpdatesDataAsync();
+    return this._fetchLearnerDashboardFeedbackUpdatesDataAsync(
+      paginatedThreadsList);
+  }
+
+  async fetchLearnerCompletedChaptersCountDataAsync():
+  Promise<LearnerCompletedChaptersCountData> {
+    return this._fetchLearnerCompletedChaptersCountDataAsync();
   }
 
   async addNewMessageAsync(
@@ -345,12 +401,12 @@ export class LearnerDashboardBackendApiService {
   }
 
   async _fetchSubtopicMastery(
-      topicIds: string): Promise<Record<string,
-    SubtopicMasterySummaryBackendDict>> {
+      topicIds: string[]
+  ): Promise<Record<string, SubtopicMasterySummaryBackendDict>> {
     return new Promise((resolve, reject) => {
       this.http.get<SubtopicMasteryDict>(
         AppConstants.SUBTOPIC_MASTERY_DATA_URL_TEMPLATE, {
-          params: { comma_separated_topic_ids: topicIds }}).toPromise()
+          params: { selected_topic_ids: JSON.stringify(topicIds) }}).toPromise()
         .then(response => {
           resolve(response.subtopic_mastery_dict);
         }, errorResponse => {
@@ -359,9 +415,36 @@ export class LearnerDashboardBackendApiService {
     });
   }
 
-  async fetchSubtopicMastery(topicIds: string): Promise<Record<string,
-    SubtopicMasterySummaryBackendDict>> {
+  async fetchSubtopicMastery(
+      topicIds: string[]
+  ): Promise<Record<string, SubtopicMasterySummaryBackendDict>> {
     return this._fetchSubtopicMastery(topicIds);
+  }
+
+  async _fetchLearnerDashboardLearnerGroupsAsync():
+  Promise<LearnerDashboardLearnerGroups> {
+    return new Promise((resolve, reject) => {
+      this.http.get<LearnerDashboardLearnerGroupsBackendDict>(
+        '/learner_dashboard_learner_groups_handler'
+      ).toPromise().then(dashboardData => {
+        resolve(
+          {
+            learnerGroupsJoined: (
+              dashboardData.learner_groups_joined.map(
+                shortLearnerGroupSummary => ShortLearnerGroupSummary
+                  .createFromBackendDict(shortLearnerGroupSummary))),
+            invitedToLearnerGroups: (
+              dashboardData.invited_to_learner_groups.map(
+                shortLearnerGroupSummary => ShortLearnerGroupSummary
+                  .createFromBackendDict(shortLearnerGroupSummary)))
+          });
+      });
+    });
+  }
+
+  async fetchLearnerDashboardLearnerGroupsAsync():
+  Promise<LearnerDashboardLearnerGroups> {
+    return this._fetchLearnerDashboardLearnerGroupsAsync();
   }
 }
 

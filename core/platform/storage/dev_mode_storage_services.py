@@ -20,7 +20,7 @@ from __future__ import annotations
 
 from core.platform.storage import cloud_storage_emulator
 
-from typing import List, Union
+from typing import List, Optional, Union
 
 CLIENT = cloud_storage_emulator.CloudStorageEmulator()
 
@@ -58,7 +58,7 @@ def commit(
         unused_bucket_name: str,
         filepath: str,
         raw_bytes: Union[bytes, str],
-        mimetype: str
+        mimetype: Optional[str]
 ) -> None:
     """Commits bytes to the relevant file.
 
@@ -66,7 +66,7 @@ def commit(
         unused_bucket_name: str. Unused name of the GCS bucket.
         filepath: str. The path to the relevant file.
         raw_bytes: bytes|str. The content to be stored in the file.
-        mimetype: str. The content-type of the file.
+        mimetype: Optional[str]. The content-type of the file.
     """
     # TODO(#13500): Refactor this method that only bytes are passed
     # into raw_bytes.
@@ -96,6 +96,9 @@ def copy(
             folder.
         dest_assets_path: str. The path to the relevant file within the entity's
             assets folder.
+
+    Raises:
+        Exception. Source asset does not exist.
     """
     src_blob = CLIENT.get_blob(source_assets_path)
     if src_blob is None:

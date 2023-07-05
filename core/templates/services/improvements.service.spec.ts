@@ -56,11 +56,15 @@ describe('ImprovementsService', () => {
                 unicode_str: 'Type your answer here.',
                 content_id: ''
               }
+            },
+            catchMisspellings: {
+              value: false
             }
           },
           answer_groups: [],
           default_outcome: {
             dest: 'Introduction',
+            dest_if_really_stuck: null,
             feedback: {
               content_id: 'default_outcome',
               html: ''
@@ -75,7 +79,6 @@ describe('ImprovementsService', () => {
           solution: null
         },
         linked_skill_id: null,
-        next_content_id_index: 0,
         param_changes: [],
         recorded_voiceovers: {
           voiceovers_mapping: {
@@ -84,13 +87,7 @@ describe('ImprovementsService', () => {
           }
         },
         solicit_answer_details: false,
-        card_is_checkpoint: false,
-        written_translations: {
-          translations_mapping: {
-            content: {},
-            default_outcome: {}
-          }
-        }
+        card_is_checkpoint: false
       };
 
       let mockState = stateObjectFactory.createFromBackendDict(
@@ -123,6 +120,7 @@ describe('ImprovementsService', () => {
           answer_groups: [],
           default_outcome: {
             dest: 'Introduction',
+            dest_if_really_stuck: null,
             feedback: {
               content_id: 'default_outcome',
               html: ''
@@ -137,7 +135,6 @@ describe('ImprovementsService', () => {
           solution: null
         },
         linked_skill_id: null,
-        next_content_id_index: 0,
         param_changes: [],
         recorded_voiceovers: {
           voiceovers_mapping: {
@@ -146,13 +143,7 @@ describe('ImprovementsService', () => {
           }
         },
         solicit_answer_details: false,
-        card_is_checkpoint: false,
-        written_translations: {
-          translations_mapping: {
-            content: {},
-            default_outcome: {}
-          }
-        }
+        card_is_checkpoint: false
       };
 
       let mockState = stateObjectFactory.createFromBackendDict(
@@ -185,6 +176,7 @@ describe('ImprovementsService', () => {
           answer_groups: [],
           default_outcome: {
             dest: 'Introduction',
+            dest_if_really_stuck: null,
             feedback: {
               content_id: 'default_outcome',
               html: ''
@@ -199,7 +191,6 @@ describe('ImprovementsService', () => {
           solution: null
         },
         linked_skill_id: null,
-        next_content_id_index: 0,
         param_changes: [],
         recorded_voiceovers: {
           voiceovers_mapping: {
@@ -208,13 +199,7 @@ describe('ImprovementsService', () => {
           }
         },
         solicit_answer_details: false,
-        card_is_checkpoint: false,
-        written_translations: {
-          translations_mapping: {
-            content: {},
-            default_outcome: {}
-          }
-        }
+        card_is_checkpoint: false
       };
 
       let mockState = stateObjectFactory.createFromBackendDict(

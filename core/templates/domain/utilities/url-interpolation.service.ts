@@ -25,12 +25,12 @@ import { UrlService } from 'services/contextual/url.service';
 import { UtilsService } from 'services/utils.service';
 
 import { AppConstants } from 'app.constants';
-const hashes = require('hashes.json');
+import resourceHashes from 'utility/hashes';
 
 // This makes the InterpolationValuesType like a dict whose keys and values both
 // are string.
 export interface InterpolationValuesType {
-  [param: string]: string
+  [param: string]: string;
 }
 
 @Injectable({
@@ -46,6 +46,10 @@ export class UrlInterpolationService {
     return AppConstants.DEV_MODE;
   }
 
+  /**
+   * @param {string} resourcePath - A resource path relative to a subfolder
+   * in /.
+   */
   validateResourcePath(resourcePath: string): void {
     if (!resourcePath) {
       this.alertsService.fatalWarning('Empty path passed in method.');
@@ -60,10 +64,12 @@ export class UrlInterpolationService {
   }
 
   /**
-   * Given a resource path relative to subfolder in /,
-   * returns resource path with cache slug.
+   * @param {string} resourcePath - A resource path relative to a subfolder
+   * in /.
+   * @return {string} The resource path with cache slug.
    */
   _getUrlWithSlug(resourcePath: string): string {
+    const hashes = resourceHashes.hashes;
     if (!this.DEV_MODE) {
       if (hashes[resourcePath]) {
         let index = resourcePath.lastIndexOf('.');
@@ -76,8 +82,9 @@ export class UrlInterpolationService {
   }
 
   /**
-   * Given a resource path relative to subfolder in /,
-   * returns complete resource path with cache slug and prefixed with url
+   * @param {string} prefix - The url prefix.
+   * @param {string} path - A resource path relative to a subfolder.
+   * @return {string} The complete url path with cache slug and prefix
    * depending on dev/prod mode.
    */
   _getCompleteUrl(prefix: string, path: string): string {
@@ -89,8 +96,9 @@ export class UrlInterpolationService {
   }
 
   /**
-   * Given a resource path relative to extensions folder,
-   * returns the complete url path to that resource.
+   * @param {string} resourcePath - A resource path relative to extensions
+   * folder.
+   * @return {string} The complete url path to that resource.
    */
   getExtensionResourceUrl(resourcePath: string): string {
     this.validateResourcePath(resourcePath);
@@ -98,21 +106,17 @@ export class UrlInterpolationService {
   }
 
   /**
-   * Given a formatted URL, interpolates the URL by inserting values the URL
-   * needs using the interpolationValues object. For example, urlTemplate
+   * Interpolate a URL by inserting values the URL needs using an object. If a
+   * URL requires a value which is not keyed within the object, the function
+   * execution will stop after throwing an error.
+   * @param {string} urlTemplate - A formatted URL. For example, urlTemplate
    * might be:
-   *
-   *   /createhandler/resolved_answers/<exploration_id>/<escaped_state_name>
-   *
-   * interpolationValues is an object whose keys are variables within the
-   * URL. For the above example, interpolationValues may look something
-   * like:
-   *
-   *   { 'exploration_id': '0', 'escaped_state_name': 'InputBinaryNumber' }
-   *
-   * If a URL requires a value which is not keyed within the
-   * interpolationValues object, the function execution will stop
-   * after throwing an error.
+   *    /createhandler/resolved_answers/<exploration_id>/<escaped_state_name>
+   * @param {InterpolationValuesType} interpolationValues - An object whose keys
+   * are variables within the URL. For the above example, interpolationValues
+   * may look something like:
+   *    { 'exploration_id': '0', 'escaped_state_name': 'InputBinaryNumber' }
+   * @return {string} The URL interpolated with the interpolationValues object.
    */
   interpolateUrl(
       urlTemplate: string,
@@ -179,8 +183,9 @@ export class UrlInterpolationService {
   }
 
   /**
-   * Given an image path relative to /assets/images folder,
-   * returns the complete url path to that image.
+   * @param {string} imagePath - An image path relative to /assets/images
+   * folder.
+   * @return {string} The complete url path to that image.
    */
   getStaticImageUrl(imagePath: string): string {
     this.validateResourcePath(imagePath);
@@ -188,8 +193,8 @@ export class UrlInterpolationService {
   }
 
   /**
-   * Given a video path relative to /assets/videos folder,
-   * returns the complete url path to that image.
+   * @param {string} videoPath - A video path relative to /assets/videos folder.
+   * @return {string} The complete url path to that image.
    */
   getStaticVideoUrl(videoPath: string): string {
     this.validateResourcePath(videoPath);
@@ -197,14 +202,28 @@ export class UrlInterpolationService {
   }
 
   /**
-   * Given a path relative to /assets folder, returns the complete url path
-   * to that asset.
+   * @param {string} audioPath - An audio path relative to /assets/audio folder.
+   * @return {string} The complete url path to that audio.
+   */
+  getStaticAudioUrl(audioPath: string): string {
+    this.validateResourcePath(audioPath);
+    return this._getCompleteUrl('/assets', '/audio' + audioPath);
+  }
+
+  /**
+   * @param {string} assetPath - A asset path relative to /assets folder.
+   * @return {string} The complete url path to that asset.
    */
   getStaticAssetUrl(assetPath: string): string {
     this.validateResourcePath(assetPath);
     return this._getCompleteUrl('/assets', assetPath);
   }
 
+  /**
+   * @param {string} path - A complete url path to an asset.
+   * @return {string} The url including the current url origin and the complete
+   * url path.
+   */
   getFullStaticAssetUrl(path: string): string {
     this.validateResourcePath(path);
     if (this.DEV_MODE) {
@@ -215,8 +234,9 @@ export class UrlInterpolationService {
   }
 
   /**
-   * Given an interaction id, returns the complete url path to
-   * the thumbnail image for the interaction.
+   * @param {string} interactionId - An interaction id.
+   * @return {string} The complete url path to the thumbnail image for the
+   * interaction.
    */
   getInteractionThumbnailImageUrl(interactionId: string): string {
     if (!interactionId) {
@@ -228,8 +248,8 @@ export class UrlInterpolationService {
   }
 
   /**
-   * Given a directive path relative to head folder,
-   * returns the complete url path to that directive.
+   * @param {string} path - A directive path relative to head folder.
+   * @return {string} The complete url path to that directive.
    */
   getDirectiveTemplateUrl(path: string): string {
     this.validateResourcePath(path);

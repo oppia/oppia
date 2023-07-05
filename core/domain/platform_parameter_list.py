@@ -18,27 +18,159 @@
 
 from __future__ import annotations
 
-from core import python_utils
+import enum
+
 from core.domain import platform_parameter_domain
 from core.domain import platform_parameter_registry as registry
 
 Registry = registry.Registry
-FEATURE_STAGES = platform_parameter_domain.FEATURE_STAGES # pylint: disable=invalid-name
-DATA_TYPES = platform_parameter_domain.DATA_TYPES # pylint: disable=invalid-name
 
-PARAM_NAMES = python_utils.create_enum( # pylint: disable=invalid-name
-    'dummy_feature', 'dummy_parameter')
+
+class ParamNames(enum.Enum):
+    """Enum for parameter names."""
+
+    DUMMY_FEATURE_FLAG_FOR_E2E_TESTS = 'dummy_feature_flag_for_e2e_tests'
+    DUMMY_PARAMETER = 'dummy_parameter'
+
+    END_CHAPTER_CELEBRATION = 'end_chapter_celebration'
+    CHECKPOINT_CELEBRATION = 'checkpoint_celebration'
+    CONTRIBUTOR_DASHBOARD_ACCOMPLISHMENTS = (
+        'contributor_dashboard_accomplishments')
+    ANDROID_BETA_LANDING_PAGE = 'android_beta_landing_page'
+    BLOG_PAGES = 'blog_pages'
+    DIAGNOSTIC_TEST = 'diagnostic_test'
+    SERIAL_CHAPTER_LAUNCH_CURRICULUM_ADMIN_VIEW = (
+        'serial_chapter_launch_curriculum_admin_view')
+    SHOW_REDESIGNED_LEARNER_DASHBOARD = (
+        'show_redesigned_learner_dashboard')
+    SHOW_TRANSLATION_SIZE = 'show_translation_size'
+    IS_IMPROVEMENTS_TAB_ENABLED = 'is_improvements_tab_enabled'
+    LEARNER_GROUPS_ARE_ENABLED = 'learner_groups_are_enabled'
+
+    PROMO_BAR_ENABLED = 'promo_bar_enabled'
+    PROMO_BAR_MESSAGE = 'promo_bar_message'
+    ALWAYS_ASK_LEARNERS_FOR_ANSWER_DETAILS = (
+        'always_ask_learners_for_answer_details')
+    HIGH_BOUNCE_RATE_TASK_STATE_BOUNCE_RATE_CREATION_THRESHOLD = (
+        'high_bounce_rate_task_state_bounce_rate_creation_threshold')
+    HIGH_BOUNCE_RATE_TASK_STATE_BOUNCE_RATE_OBSOLETION_THRESHOLD = (
+        'high_bounce_rate_task_state_bounce_rate_obsoletion_threshold')
+    HIGH_BOUNCE_RATE_TASK_MINIMUM_EXPLORATION_STARTS = (
+        'high_bounce_rate_task_minimum_exploration_starts')
+
 
 # Platform parameters should all be defined below.
 
 Registry.create_feature_flag(
-    PARAM_NAMES.dummy_feature,
-    'This is a dummy feature flag.',
-    FEATURE_STAGES.dev,
+    ParamNames.DUMMY_FEATURE_FLAG_FOR_E2E_TESTS,
+    'This is a dummy feature flag for the e2e tests.',
+    platform_parameter_domain.FeatureStages.PROD,
 )
 
 Registry.create_platform_parameter(
-    PARAM_NAMES.dummy_parameter,
+    ParamNames.DUMMY_PARAMETER,
     'This is a dummy platform parameter.',
-    DATA_TYPES.string
+    platform_parameter_domain.DataTypes.STRING
+)
+
+Registry.create_feature_flag(
+    ParamNames.END_CHAPTER_CELEBRATION,
+    'This flag is for the end chapter celebration feature.',
+    platform_parameter_domain.FeatureStages.PROD,
+)
+
+Registry.create_feature_flag(
+    ParamNames.CHECKPOINT_CELEBRATION,
+    'This flag is for the checkpoint celebration feature.',
+    platform_parameter_domain.FeatureStages.PROD,
+)
+
+Registry.create_feature_flag(
+    ParamNames.CONTRIBUTOR_DASHBOARD_ACCOMPLISHMENTS,
+    'This flag enables showing per-contributor accomplishments on the' +
+    ' contributor dashboard.',
+    platform_parameter_domain.FeatureStages.PROD,
+)
+
+Registry.create_feature_flag(
+    ParamNames.ANDROID_BETA_LANDING_PAGE,
+    'This flag is for Android beta promo landing page.',
+    platform_parameter_domain.FeatureStages.PROD)
+
+Registry.create_feature_flag(
+    ParamNames.BLOG_PAGES,
+    'This flag is for blog home page, blog author profile page and blog post' +
+    ' page.',
+    platform_parameter_domain.FeatureStages.PROD)
+
+Registry.create_feature_flag(
+    ParamNames.DIAGNOSTIC_TEST,
+    'This flag is for the diagnostic test functionality.',
+    platform_parameter_domain.FeatureStages.PROD)
+
+Registry.create_feature_flag(
+    ParamNames.SERIAL_CHAPTER_LAUNCH_CURRICULUM_ADMIN_VIEW,
+    'This flag is for serial chapter launch feature and making changes only' +
+    'in the curriculum admin view.',
+    platform_parameter_domain.FeatureStages.DEV)
+
+Registry.create_feature_flag(
+    ParamNames.SHOW_REDESIGNED_LEARNER_DASHBOARD,
+    'This flag is to show redesigned learner dashboard.',
+    platform_parameter_domain.FeatureStages.DEV)
+
+Registry.create_feature_flag(
+    ParamNames.SHOW_TRANSLATION_SIZE,
+    'This flag is to show translation size on translation cards in' +
+    'contributor dashboard.',
+    platform_parameter_domain.FeatureStages.DEV)
+
+Registry.create_feature_flag(
+    ParamNames.IS_IMPROVEMENTS_TAB_ENABLED,
+    'Exposes the Improvements Tab for creators in the exploration editor.',
+    platform_parameter_domain.FeatureStages.PROD)
+
+Registry.create_feature_flag(
+    ParamNames.LEARNER_GROUPS_ARE_ENABLED,
+    'Enable learner groups feature',
+    platform_parameter_domain.FeatureStages.PROD)
+
+Registry.create_platform_parameter(
+    ParamNames.PROMO_BAR_ENABLED,
+    'Whether the promo bar should be enabled for all users',
+    platform_parameter_domain.DataTypes.BOOL
+)
+
+Registry.create_platform_parameter(
+    ParamNames.PROMO_BAR_MESSAGE,
+    'The message to show to all users if the promo bar is enabled',
+    platform_parameter_domain.DataTypes.STRING
+)
+
+Registry.create_platform_parameter(
+    ParamNames.ALWAYS_ASK_LEARNERS_FOR_ANSWER_DETAILS,
+    'Always ask learners for answer details. For testing -- do not use',
+    platform_parameter_domain.DataTypes.BOOL
+)
+
+Registry.create_platform_parameter(
+    ParamNames.HIGH_BOUNCE_RATE_TASK_STATE_BOUNCE_RATE_CREATION_THRESHOLD,
+    'The bounce-rate a state must exceed to create a new improvements task.',
+    platform_parameter_domain.DataTypes.NUMBER,
+    default=0.20
+)
+
+Registry.create_platform_parameter(
+    ParamNames.HIGH_BOUNCE_RATE_TASK_STATE_BOUNCE_RATE_OBSOLETION_THRESHOLD,
+    'The bounce-rate a state must exceed to create a new improvements task.',
+    platform_parameter_domain.DataTypes.NUMBER,
+    default=0.20
+)
+
+Registry.create_platform_parameter(
+    ParamNames.HIGH_BOUNCE_RATE_TASK_MINIMUM_EXPLORATION_STARTS,
+    'The minimum number of times an exploration is started before it can '
+    'generate high bounce-rate improvements tasks.',
+    platform_parameter_domain.DataTypes.NUMBER,
+    default=100
 )

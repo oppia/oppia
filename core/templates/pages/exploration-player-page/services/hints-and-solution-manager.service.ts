@@ -19,7 +19,7 @@
 import { EventEmitter, Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
-import { Hint } from 'domain/exploration/HintObjectFactory';
+import { Hint } from 'domain/exploration/hint-object.model';
 import { Solution } from 'domain/exploration/SolutionObjectFactory';
 import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 import { ExplorationPlayerConstants } from 'pages/exploration-player-page/exploration-player-page.constants';
@@ -30,18 +30,20 @@ import { PlayerPositionService } from 'pages/exploration-player-page/services/pl
 })
 export class HintsAndSolutionManagerService {
   // This in initialized using the the class methods
-  // and we need to do non-null assertion, for more information see
+  // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   solutionForLatestCard!: Solution;
   // The following are set to null when the timeouts are cleared
   // or when the service is reset.
   timeout: NodeJS.Timeout | null = null;
   tooltipTimeout: NodeJS.Timeout | null = null;
+  solutionTooltipTimeout: NodeJS.Timeout | null = null;
 
   ACCELERATED_HINT_WAIT_TIME_MSEC: number = 10000;
-  WAIT_FOR_TOOLTIP_TO_BE_SHOWN_MSEC: number = 20000;
+  WAIT_FOR_TOOLTIP_TO_BE_SHOWN_MSEC: number = 500;
 
   _solutionViewedEventEmitter = new EventEmitter();
+  _learnerReallyStuckEventEmitter = new EventEmitter();
   private _timeoutElapsedEventEmitter = new EventEmitter();
   onTimeoutElapsed$ = this._timeoutElapsedEventEmitter.asObservable();
 
@@ -51,16 +53,27 @@ export class HintsAndSolutionManagerService {
   solutionConsumed: boolean = false;
   hintsForLatestCard: Hint[] = [];
   wrongAnswersSinceLastHintConsumed: number = 0;
+  wrongAnswersAfterHintsExhausted: number = 0;
   correctAnswerSubmitted: boolean = false;
 
   _hintConsumedEventEmitter = new EventEmitter();
+  _hintsExhaustedEventEmitter = new EventEmitter();
 
-  // Variable tooltipIsOpen is a flag which says that the tooltip is currently
-  // visible to the learner.
+  // Variable tooltipIsOpen is a flag which says that the hint tooltip is
+  // currently visible to the learner.
   tooltipIsOpen: boolean = false;
-  // This is set to true as soon as a hint/solution is clicked or when the
+
+  // Variable solutionTooltipIsOpen is a flag which says that the solution
+  // tooltip is currently visible to the learner.
+  solutionTooltipIsOpen: boolean = false;
+
+  // This is set to true as soon as a hint is clicked or when the
   // tooltip has been triggered.
   hintsDiscovered: boolean = false;
+
+  // This is set to true as soon as the solution icon is clicked or when the
+  // tooltip has been triggered.
+  solutionDiscovered: boolean = false;
 
   constructor(private playerPositionService: PlayerPositionService) {
     // TODO(#10904): Refactor to move subscriptions into components.
@@ -68,6 +81,7 @@ export class HintsAndSolutionManagerService {
       () => {
         this.correctAnswerSubmitted = true;
         this.tooltipIsOpen = false;
+        this.solutionTooltipIsOpen = false;
       }
     );
   }
@@ -84,7 +98,13 @@ export class HintsAndSolutionManagerService {
   showTooltip(): void {
     this.tooltipIsOpen = true;
     this.hintsDiscovered = true;
-    this._timeoutElapsedEventEmitter.next();
+    this._timeoutElapsedEventEmitter.emit();
+  }
+
+  showSolutionTooltip(): void {
+    this.solutionTooltipIsOpen = true;
+    this.solutionDiscovered = true;
+    this._timeoutElapsedEventEmitter.emit();
   }
 
   releaseHint(): void {
@@ -95,12 +115,21 @@ export class HintsAndSolutionManagerService {
           this.showTooltip.bind(this), this.WAIT_FOR_TOOLTIP_TO_BE_SHOWN_MSEC);
       }
     }
-    this._timeoutElapsedEventEmitter.next();
+    this._timeoutElapsedEventEmitter.emit();
   }
+
+  // To be called from conversation-skin component
+  // when no separate path for the stuck learner exists.
   releaseSolution(): void {
     this.solutionReleased = true;
-    this._timeoutElapsedEventEmitter.next();
+    if (!this.solutionDiscovered && !this.solutionTooltipTimeout) {
+      this.solutionTooltipTimeout = setTimeout(
+        this.showSolutionTooltip.bind(this),
+        this.WAIT_FOR_TOOLTIP_TO_BE_SHOWN_MSEC);
+    }
+    this._timeoutElapsedEventEmitter.emit();
   }
+
   accelerateHintRelease(): void {
     this.enqueueTimeout(this.releaseHint, this.ACCELERATED_HINT_WAIT_TIME_MSEC);
   }
@@ -108,6 +137,7 @@ export class HintsAndSolutionManagerService {
   areAllHintsExhausted(): boolean {
     return this.numHintsReleased === this.hintsForLatestCard.length;
   }
+
   isAHintWaitingToBeViewed(): boolean {
     return this.numHintsConsumed < this.numHintsReleased;
   }
@@ -126,8 +156,8 @@ export class HintsAndSolutionManagerService {
     let funcToEnqueue = null;
     if (!this.areAllHintsExhausted()) {
       funcToEnqueue = this.releaseHint;
-    } else if (!!this.solutionForLatestCard && !this.solutionReleased) {
-      funcToEnqueue = this.releaseSolution;
+    } else {
+      this._hintsExhaustedEventEmitter.emit();
     }
     if (funcToEnqueue) {
       this.enqueueTimeout(
@@ -144,6 +174,7 @@ export class HintsAndSolutionManagerService {
     this.hintsForLatestCard = newHints;
     this.solutionForLatestCard = newSolution;
     this.wrongAnswersSinceLastHintConsumed = 0;
+    this.wrongAnswersAfterHintsExhausted = 0;
     this.correctAnswerSubmitted = false;
     if (this.timeout) {
       clearTimeout(this.timeout);
@@ -153,6 +184,10 @@ export class HintsAndSolutionManagerService {
       clearTimeout(this.tooltipTimeout);
       this.tooltipTimeout = null;
     }
+    if (this.solutionTooltipTimeout) {
+      clearTimeout(this.solutionTooltipTimeout);
+      this.solutionTooltipTimeout = null;
+    }
 
     if (this.hintsForLatestCard.length > 0) {
       this.enqueueTimeout(
@@ -160,6 +195,7 @@ export class HintsAndSolutionManagerService {
         ExplorationPlayerConstants.WAIT_FOR_FIRST_HINT_MSEC);
     }
   }
+
   // WARNING: This method has a side-effect. If the retrieved hint is a
   // pending hint that's being viewed, it starts the timer for the next
   // hint.
@@ -177,12 +213,11 @@ export class HintsAndSolutionManagerService {
   }
 
   displaySolution(): Solution {
-    this.hintsDiscovered = true;
     this.solutionConsumed = true;
     this._solutionViewedEventEmitter.emit();
-    if (this.tooltipTimeout) {
-      clearTimeout(this.tooltipTimeout);
-      this.tooltipTimeout = null;
+    if (this.solutionTooltipTimeout) {
+      clearTimeout(this.solutionTooltipTimeout);
+      this.solutionTooltipTimeout = null;
     }
     return this.solutionForLatestCard;
   }
@@ -201,6 +236,10 @@ export class HintsAndSolutionManagerService {
 
   isHintTooltipOpen(): boolean {
     return this.tooltipIsOpen;
+  }
+
+  isSolutionTooltipOpen(): boolean {
+    return this.solutionTooltipIsOpen;
   }
 
   isSolutionViewable(): boolean {
@@ -227,15 +266,28 @@ export class HintsAndSolutionManagerService {
         this.wrongAnswersSinceLastHintConsumed >= 1) {
         this.accelerateHintRelease();
       }
+    } else if (this.getNumHints()) {
+      this.wrongAnswersAfterHintsExhausted++;
+      if (this.wrongAnswersAfterHintsExhausted > 2) {
+        this._learnerReallyStuckEventEmitter.emit();
+      }
     }
   }
 
-  get onSolutionViewedEventEmitter(): EventEmitter<unknown> {
+  get onSolutionViewedEventEmitter(): EventEmitter<void> {
     return this._solutionViewedEventEmitter;
   }
 
-  get onHintConsumed(): EventEmitter<unknown> {
+  get onHintConsumed(): EventEmitter<void> {
     return this._hintConsumedEventEmitter;
+  }
+
+  get onHintsExhausted(): EventEmitter<string> {
+    return this._hintsExhaustedEventEmitter;
+  }
+
+  get onLearnerReallyStuck(): EventEmitter<string> {
+    return this._learnerReallyStuckEventEmitter;
   }
 }
 

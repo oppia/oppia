@@ -30,10 +30,13 @@ import { PageTitleService } from 'services/page-title.service';
 import { SidebarStatusService } from 'services/sidebar-status.service';
 import { BackgroundMaskService } from 'services/stateful/background-mask.service';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
+import { NavigationEnd, Router } from '@angular/router';
+import './base-content.component.css';
 
 @Component({
   selector: 'oppia-base-content',
-  templateUrl: './base-content.component.html'
+  templateUrl: './base-content.component.html',
+  styleUrls: ['./base-content.component.css']
 })
 export class BaseContentComponent {
   loadingMessage: string = '';
@@ -55,10 +58,20 @@ export class BaseContentComponent {
     private sidebarStatusService: SidebarStatusService,
     private urlService: UrlService,
     private cookieService: CookieService,
-    private i18nLanguageCodeService: I18nLanguageCodeService
-  ) {}
+    private i18nLanguageCodeService: I18nLanguageCodeService,
+    private router: Router
+  ) { }
 
   ngOnInit(): void {
+    /**
+     * Scroll to the top of the page while navigating
+     * through the static pages.
+     */
+    this.router.events.subscribe((evt) => {
+      if (evt instanceof NavigationEnd) {
+        window.scrollTo(0, 0);
+      }
+    });
     /**
      * Redirect any developers using the old appspot URL to the
      * test server (see issue #7867 for details).
@@ -177,7 +190,15 @@ export class BaseContentComponent {
 @Directive({
   selector: 'navbar-breadcrumb'
 })
-export class BaseContentNavBarBreadCrumbDirective {}
+export class BaseContentNavBarBreadCrumbDirective { }
+
+/**
+ * This directive is used as selector for nav options transclusion.
+ */
+@Directive({
+  selector: 'nav-options'
+})
+export class BaseContentNavOptionsDirective { }
 
 /**
  * This directive is used as selector for navbar pre logo action transclusion.
@@ -185,7 +206,7 @@ export class BaseContentNavBarBreadCrumbDirective {}
 @Directive({
   selector: 'navbar-pre-logo-action'
 })
-export class BaseContentNavBarPreLogoActionDirective {}
+export class BaseContentNavBarPreLogoActionDirective { }
 
 
 /**
@@ -194,7 +215,7 @@ export class BaseContentNavBarPreLogoActionDirective {}
 @Directive({
   selector: 'page-footer'
 })
-export class BaseContentPageFooterDirective {}
+export class BaseContentPageFooterDirective { }
 
 angular.module('oppia').directive('oppiaBaseContent',
   downgradeComponent({

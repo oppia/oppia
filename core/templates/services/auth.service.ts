@@ -28,8 +28,9 @@ import { AppConstants } from 'app.constants';
 import { AuthBackendApiService } from 'services/auth-backend-api.service';
 
 abstract class AuthServiceImpl {
-  abstract getRedirectResultAsync():
-   Promise<firebase.auth.UserCredential | null>;
+  abstract getRedirectResultAsync(): Promise<
+    firebase.auth.UserCredential | null
+  >;
   abstract signInWithRedirectAsync(): Promise<void>;
   abstract signOutAsync(): Promise<void>;
 }
@@ -163,6 +164,10 @@ export class AuthService {
         this.creds = await this.angularFireAuth.signInWithEmailAndPassword(
           email, password);
       }
+    // We use unknown type because we are unsure of the type of error
+    // that was thrown. Since the catch block cannot identify the
+    // specific type of error, we are unable to further optimise the
+    // code by introducing more types of errors.
     } catch (err: unknown) {
       if ((err as firebase.auth.Error).code === 'auth/user-not-found') {
         if (this.angularFireAuth !== null) {

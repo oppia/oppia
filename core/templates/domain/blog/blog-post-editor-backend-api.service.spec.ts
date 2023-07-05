@@ -36,15 +36,14 @@ describe('Blog Post Editor backend api service', () => {
   let blogPostEditorBackendResponse = {
     blog_post_dict: {
       id: 'sampleBlogId',
-      author_username: 'test_user',
+      displayed_author_name: 'test_user',
       title: 'sample_title',
       content: '<p>hello</p>',
       thumbnail_filename: 'image',
       tags: ['learners', 'news'],
       url_fragment: 'sample#url'
     },
-    username: 'test_user',
-    profile_picture_data_url: 'image',
+    displayed_author_name: 'test_user',
     max_no_of_tags: 2,
     list_of_default_tags: ['learners', 'news'],
   };
@@ -59,9 +58,7 @@ describe('Blog Post Editor backend api service', () => {
     successHandler = jasmine.createSpy('success');
     failHandler = jasmine.createSpy('fail');
     blogPostEditorDataObject = {
-      username: blogPostEditorBackendResponse.username,
-      profilePictureDataUrl: (
-        blogPostEditorBackendResponse.profile_picture_data_url),
+      displayedAuthorName: blogPostEditorBackendResponse.displayed_author_name,
       maxNumOfTags: blogPostEditorBackendResponse.max_no_of_tags,
       listOfDefaulTags: blogPostEditorBackendResponse.list_of_default_tags,
       blogPostDict: BlogPostData.createFromBackendDict(
@@ -240,4 +237,44 @@ describe('Blog Post Editor backend api service', () => {
       expect(failHandler).toHaveBeenCalledWith(
         'Error updating blog post thumbnail.');
     }));
+
+  it('should use the rejection handler when checking for blog post title' +
+  ' uniqueness fails.', fakeAsync(() => {
+    bpebas.doesPostWithGivenTitleAlreadyExistAsync(
+      'sampleBlogId', 'sampleTitle').then(successHandler, failHandler);
+
+    let req = httpTestingController.expectOne(
+      '/blogtitlehandler/data/sampleBlogId?title=sampleTitle');
+    expect(req.request.method).toEqual('GET');
+    req.flush({
+      error: 'Error checking for blog posts with same title.'
+    }, {
+      status: 500,
+      statusText: 'Error checking for blog posts with same title.'
+    });
+
+    flushMicrotasks();
+
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalledWith(
+      'Error checking for blog posts with same title.');
+  }));
+
+  it('should check for blog post title uniqueness successfully',
+    fakeAsync(() => {
+      bpebas.doesPostWithGivenTitleAlreadyExistAsync(
+        'sampleBlogId', 'sampleTitle').then(successHandler, failHandler);
+      let req = httpTestingController.expectOne(
+        '/blogtitlehandler/data/sampleBlogId?title=sampleTitle');
+      expect(req.request.method).toEqual('GET');
+      req.flush({
+        blog_post_exists: true
+      });
+
+      flushMicrotasks();
+
+      expect(successHandler).toHaveBeenCalled();
+      expect(failHandler).not.toHaveBeenCalled();
+    })
+  );
 });

@@ -20,40 +20,43 @@ from __future__ import annotations
 
 from core import schema_utils
 from core import utils
+from core.domain import state_domain
+from extensions import domain
 
+from typing import Dict, List, Mapping, Optional, Union
 
-def get_full_customization_args(customization_args, ca_specs):
-    """Populates the given customization_args dict with default values
-    if any of the expected customization_args are missing.
+MYPY = False
+if MYPY:  # pragma: no cover
+    AcceptableCustomizationArgsTypes = Union[
+        str,
+        int,
+        bool,
+        List[str],
+        domain.GraphDict,
+        Dict[str, Optional[str]],
+        List[state_domain.SubtitledHtml],
+        List[state_domain.SubtitledHtmlDict],
+        state_domain.SubtitledHtmlDict,
+        state_domain.SubtitledUnicodeDict,
+        state_domain.SubtitledUnicode,
+        domain.ImageAndRegionDict,
+        domain.CustomizationArgSubtitledUnicodeDefaultDict,
+        List[domain.CustomizationArgSubtitledUnicodeDefaultDict],
+        None
+    ]
 
-    Args:
-        customization_args: dict. The customization dict. The keys are names
-            of customization_args and the values are dicts with a
-            single key, 'value', whose corresponding value is the value of
-            the customization arg.
-        ca_specs: list(dict). List of spec dictionaries. Is used to check if
-            some keys are missing in customization_args. Dicts have the
-            following structure:
-                - name: str. The customization variable name.
-                - description: str. The customization variable description.
-                - default_value: *. The default value of the customization
-                    variable.
-
-    Returns:
-        dict. The customization_args dict where missing keys are populated
-        with the default values.
-    """
-    for ca_spec in ca_specs:
-        if ca_spec.name not in customization_args:
-            customization_args[ca_spec.name] = {
-                'value': ca_spec.default_value
-            }
-    return customization_args
+    CustomizationArgsDictType = Mapping[
+        str, Mapping[str, AcceptableCustomizationArgsTypes]
+    ]
 
 
 def validate_customization_args_and_values(
-        item_name, item_type, customization_args,
-        ca_specs_to_validate_against, fail_on_validation_errors=False):
+    item_name: str,
+    item_type: str,
+    customization_args: CustomizationArgsDictType,
+    ca_specs_to_validate_against: List[domain.CustomizationArgSpec],
+    fail_on_validation_errors: bool = False
+) -> None:
     """Validates the given `customization_args` dict against the specs set
     out in 'ca_specs_to_validate_against'. 'item_name' and 'item_type' are
     used to populate any error messages that arise during validation.

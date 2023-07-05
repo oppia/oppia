@@ -23,11 +23,12 @@ import re
 
 from core import constants
 from core import feconf
-from core import python_utils
 from core import utils
 from extensions.objects.models import objects
 
 import bs4
+
+from typing import Any, Dict, List, Union
 
 
 class BaseRteComponent:
@@ -39,7 +40,7 @@ class BaseRteComponent:
 
     package, filepath = os.path.split(feconf.RTE_EXTENSIONS_DEFINITIONS_PATH)
     rich_text_component_specs = constants.parse_json_from_ts(
-        python_utils.get_package_file_contents(package, filepath))
+        constants.get_package_file_contents(package, filepath))
 
     obj_types_to_obj_classes = {
         'unicode': objects.UnicodeString,
@@ -54,8 +55,13 @@ class BaseRteComponent:
         'SkillSelector': objects.SkillSelector
     }
 
+    # TODO(#16047): Here we use type Any because BaseRteComponent class is not
+    # implemented according to the strict typing which forces us to use Any
+    # here so that MyPy does not throw errors for different types of values
+    # used in sub-classes. Once this BaseRteComponent is refactored, we can
+    # remove type Any from here.
     @classmethod
-    def validate(cls, value_dict):
+    def validate(cls, value_dict: Any) -> None:
         """Validates customization args for a rich text component.
 
         Raises:
@@ -97,7 +103,7 @@ class Collapsible(BaseRteComponent):
     """Class for Collapsible component."""
 
     @classmethod
-    def validate(cls, value_dict):
+    def validate(cls, value_dict: Dict[str, str]) -> None:
         """Validates Collapsible component."""
         super(Collapsible, cls).validate(value_dict)
         content = value_dict['content-with-value']
@@ -114,7 +120,7 @@ class Image(BaseRteComponent):
     """Class for Image component."""
 
     @classmethod
-    def validate(cls, value_dict):
+    def validate(cls, value_dict: Dict[str, str]) -> None:
         """Validates Image component."""
         super(Image, cls).validate(value_dict)
         filename_re = r'^[A-Za-z0-9+/_-]*\.((png)|(jpeg)|(gif)|(jpg))$'
@@ -133,7 +139,7 @@ class Math(BaseRteComponent):
     """Class for Math component."""
 
     @classmethod
-    def validate(cls, value_dict):
+    def validate(cls, value_dict: Dict[str, Dict[str, str]]) -> None:
         """Validates Math component."""
         super(Math, cls).validate(value_dict)
         filename_pattern_regex = constants.constants.MATH_SVG_FILENAME_REGEX
@@ -154,7 +160,7 @@ class Tabs(BaseRteComponent):
     """Class for Tabs component."""
 
     @classmethod
-    def validate(cls, value_dict):
+    def validate(cls, value_dict: Dict[str, List[Dict[str, str]]]) -> None:
         """Validates Tab component."""
         super(Tabs, cls).validate(value_dict)
         tab_contents = value_dict['tab_contents-with-value']
@@ -173,9 +179,10 @@ class Video(BaseRteComponent):
     """Class for Video component."""
 
     @classmethod
-    def validate(cls, value_dict):
+    def validate(cls, value_dict: Dict[str, Union[str, int, bool]]) -> None:
         """Validates Image component."""
         super(Video, cls).validate(value_dict)
         video_id = value_dict['video_id-with-value']
+        assert isinstance(video_id, str)
         if len(video_id) != 11:
             raise utils.ValidationError('Video id length is not 11')

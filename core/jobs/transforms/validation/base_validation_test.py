@@ -22,6 +22,7 @@ import re
 
 from core import feconf
 from core.domain import change_domain
+from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import state_domain
 from core.jobs import job_test_utils
@@ -31,20 +32,29 @@ from core.platform import models
 
 import apache_beam as beam
 
-(base_models, exp_models) = models.Registry.import_models(
-    [models.NAMES.base_model, models.NAMES.exploration])
+from typing import Type
+
+MYPY = False
+if MYPY:  # pragma: no cover
+    from mypy_imports import base_models
+    from mypy_imports import exp_models
+
+(base_models, exp_models) = models.Registry.import_models([
+    models.Names.BASE_MODEL,
+    models.Names.EXPLORATION
+])
 
 
 class MockDomainObject(base_models.BaseModel):
 
-    def validate(self, strict=True):
+    def validate(self, strict: bool = True) -> None:
         """Mock validate function."""
         pass
 
 
 class ValidateDeletedTests(job_test_utils.PipelinedTestBase):
 
-    def test_process_reports_error_for_old_deleted_model(self):
+    def test_process_reports_error_for_old_deleted_model(self) -> None:
         expired_model = base_models.BaseModel(
             id='123',
             deleted=True,
@@ -64,7 +74,7 @@ class ValidateDeletedTests(job_test_utils.PipelinedTestBase):
 
 class ValidateModelTimeFieldTests(job_test_utils.PipelinedTestBase):
 
-    def test_process_reports_model_timestamp_relationship_error(self):
+    def test_process_reports_model_timestamp_relationship_error(self) -> None:
         invalid_timestamp = base_models.BaseModel(
             id='123',
             created_on=self.NOW,
@@ -81,7 +91,7 @@ class ValidateModelTimeFieldTests(job_test_utils.PipelinedTestBase):
                 invalid_timestamp),
         ])
 
-    def test_process_reports_model_mutated_during_job_error(self):
+    def test_process_reports_model_mutated_during_job_error(self) -> None:
         invalid_timestamp = base_models.BaseModel(
             id='124',
             created_on=self.NOW,
@@ -101,7 +111,7 @@ class ValidateModelTimeFieldTests(job_test_utils.PipelinedTestBase):
 
 class ValidateModelIdTests(job_test_utils.PipelinedTestBase):
 
-    def test_validate_model_id(self):
+    def test_validate_model_id(self) -> None:
         invalid_id_model = base_models.BaseModel(
             id='123@?!*',
             created_on=self.YEAR_AGO,
@@ -122,7 +132,7 @@ class ValidateModelIdTests(job_test_utils.PipelinedTestBase):
 
 class ValidatePostCommitIsInvalidTests(job_test_utils.PipelinedTestBase):
 
-    def test_validate_post_commit_is_invalid(self):
+    def test_validate_post_commit_is_invalid(self) -> None:
         invalid_commit_status = base_models.BaseCommitLogEntryModel(
             id='123',
             created_on=self.YEAR_AGO,
@@ -147,7 +157,9 @@ class ValidatePostCommitIsInvalidTests(job_test_utils.PipelinedTestBase):
 
 class ValidatePostCommitIsPrivateTests(job_test_utils.PipelinedTestBase):
 
-    def test_validate_post_commit_is_private_when_status_is_public(self):
+    def test_validate_post_commit_is_private_when_status_is_public(
+        self
+    ) -> None:
         invalid_commit_status = base_models.BaseCommitLogEntryModel(
             id='123',
             created_on=self.YEAR_AGO,
@@ -169,7 +181,9 @@ class ValidatePostCommitIsPrivateTests(job_test_utils.PipelinedTestBase):
                 invalid_commit_status),
         ])
 
-    def test_validate_post_commit_is_private_when_status_is_private(self):
+    def test_validate_post_commit_is_private_when_status_is_private(
+        self
+    ) -> None:
         invalid_commit_status = base_models.BaseCommitLogEntryModel(
             id='123',
             created_on=self.YEAR_AGO,
@@ -194,7 +208,7 @@ class ValidatePostCommitIsPrivateTests(job_test_utils.PipelinedTestBase):
 
 class ValidatePostCommitIsPublicTests(job_test_utils.PipelinedTestBase):
 
-    def test_validate_post_commit_is_public_when_status_is_public(self):
+    def test_validate_post_commit_is_public_when_status_is_public(self) -> None:
         invalid_commit_status = base_models.BaseCommitLogEntryModel(
             id='123',
             created_on=self.YEAR_AGO,
@@ -213,7 +227,9 @@ class ValidatePostCommitIsPublicTests(job_test_utils.PipelinedTestBase):
 
         self.assert_pcoll_empty(output)
 
-    def test_validate_post_commit_is_public_when_status_is_private(self):
+    def test_validate_post_commit_is_public_when_status_is_private(
+        self
+    ) -> None:
         invalid_commit_status = base_models.BaseCommitLogEntryModel(
             id='123',
             created_on=self.YEAR_AGO,
@@ -235,7 +251,7 @@ class ValidatePostCommitIsPublicTests(job_test_utils.PipelinedTestBase):
                 invalid_commit_status),
         ])
 
-    def test_validate_post_commit_is_public_raise_exception(self):
+    def test_validate_post_commit_is_public_raise_exception(self) -> None:
         invalid_commit_status = base_models.BaseCommitLogEntryModel(
             id='123',
             created_on=self.YEAR_AGO,
@@ -259,51 +275,109 @@ class ValidatePostCommitIsPublicTests(job_test_utils.PipelinedTestBase):
 
 
 class MockValidateModelDomainObjectInstancesWithNeutral(
-        base_validation.ValidateModelDomainObjectInstances):
-    def _get_model_domain_object_instance(self, item): # pylint: disable=unused-argument
+    base_validation.ValidateModelDomainObjectInstances[base_models.BaseModel]
+):
+    def _get_model_domain_object_instance(
+        self, _: base_models.BaseModel
+    ) -> MockDomainObject:
+        """Method redefined for testing purpose returning instance of
+        MockDomainObject.
+        """
         return MockDomainObject()
 
-    def _get_domain_object_validation_type(self, item): # pylint: disable=unused-argument
-        return base_validation.VALIDATION_MODES.neutral
+    def _get_domain_object_validation_type(
+        self, _: base_models.BaseModel
+    ) -> base_validation.ValidationModes:
+        """Method redefined for testing purpose returning neutral mode
+        of validation.
+        """
+        return base_validation.ValidationModes.NEUTRAL
 
 
 class MockValidateModelDomainObjectInstancesWithStrict(
-        base_validation.ValidateModelDomainObjectInstances):
-    def _get_model_domain_object_instance(self, item): # pylint: disable=unused-argument
+    base_validation.ValidateModelDomainObjectInstances[base_models.BaseModel]
+):
+    def _get_model_domain_object_instance(
+        self, _: base_models.BaseModel
+    ) -> MockDomainObject:
+        """Method redefined for testing purpose returning instance of
+        MockDomainObject.
+        """
         return MockDomainObject()
 
-    def _get_domain_object_validation_type(self, item): # pylint: disable=unused-argument
-        return base_validation.VALIDATION_MODES.strict
+    def _get_domain_object_validation_type(
+        self, _: base_models.BaseModel
+    ) -> base_validation.ValidationModes:
+        """Method redefined for testing purpose returning strict mode
+        of validation.
+        """
+        return base_validation.ValidationModes.STRICT
 
 
 class MockValidateModelDomainObjectInstancesWithNonStrict(
-        base_validation.ValidateModelDomainObjectInstances):
-    def _get_model_domain_object_instance(self, item): # pylint: disable=unused-argument
+    base_validation.ValidateModelDomainObjectInstances[base_models.BaseModel]
+):
+    def _get_model_domain_object_instance(
+        self, _: base_models.BaseModel
+    ) -> MockDomainObject:
+        """Method redefined for testing purpose returning instance of
+        MockDomainObject.
+        """
         return MockDomainObject()
 
-    def _get_domain_object_validation_type(self, item): # pylint: disable=unused-argument
-        return base_validation.VALIDATION_MODES.non_strict
+    def _get_domain_object_validation_type(
+        self, _: base_models.BaseModel
+    ) -> base_validation.ValidationModes:
+        """Method redefined for testing purpose returning non-strict mode
+        of validation.
+        """
+        return base_validation.ValidationModes.NON_STRICT
 
 
 class MockValidateModelDomainObjectInstancesWithInvalid(
-        base_validation.ValidateModelDomainObjectInstances):
-    def _get_model_domain_object_instance(self, item): # pylint: disable=unused-argument
+    base_validation.ValidateModelDomainObjectInstances[base_models.BaseModel]
+):
+    def _get_model_domain_object_instance(
+        self, _: base_models.BaseModel
+    ) -> MockDomainObject:
+        """Method redefined for testing purpose returning instance of
+        MockDomainObject.
+        """
         return MockDomainObject()
 
-    def _get_domain_object_validation_type(self, item): # pylint: disable=unused-argument
+    # Here we use MyPy ignore because the signature of this method doesn't
+    # match with super class's _get_domain_object_validation_type method,
+    # because in super class's method we are returning 'ValidationModes' Enum
+    # and here for testing purposes we are returning string value. So, due
+    # to this conflict in return types, a conflict in signatures occurred
+    # which causes MyPy to throw an error. Thus, to avoid the error, we
+    # used ignore here.
+    def _get_domain_object_validation_type(  # type: ignore[override]
+        self, _: base_models.BaseModel
+    ) -> str:
+        """Method redefined for testing purpose returning string literal,
+        to check error 'Invalid validation type for domain object'.
+        """
         return 'invalid'
 
 
 class MockValidateExplorationModelDomainObjectInstances(
-        base_validation.ValidateModelDomainObjectInstances):
-    def _get_model_domain_object_instance(self, item):
+    base_validation.ValidateModelDomainObjectInstances[
+        exp_models.ExplorationModel
+    ]
+):
+    def _get_model_domain_object_instance(
+        self, item: exp_models.ExplorationModel
+    ) -> exp_domain.Exploration:
+        """Returns an Exploration domain object given an exploration
+        model loaded from the datastore.
+        """
         return exp_fetchers.get_exploration_from_model(item)
 
 
 class ValidateModelDomainObjectInstancesTests(job_test_utils.PipelinedTestBase):
 
-    def test_validation_type_for_domain_object(
-            self):
+    def test_validation_type_for_domain_object(self) -> None:
         model = base_models.BaseModel(
             id='mock-123',
             deleted=False,
@@ -320,7 +394,8 @@ class ValidateModelDomainObjectInstancesTests(job_test_utils.PipelinedTestBase):
         self.assert_pcoll_equal(output, [])
 
     def test_validation_type_for_domain_object_with_neutral_type(
-            self):
+        self
+    ) -> None:
         model = base_models.BaseModel(
             id='mock-123',
             deleted=False,
@@ -337,7 +412,8 @@ class ValidateModelDomainObjectInstancesTests(job_test_utils.PipelinedTestBase):
         self.assert_pcoll_equal(output, [])
 
     def test_validation_type_for_domain_object_with_strict_type(
-            self):
+        self
+    ) -> None:
         model = base_models.BaseModel(
             id='mock-123',
             deleted=False,
@@ -354,7 +430,8 @@ class ValidateModelDomainObjectInstancesTests(job_test_utils.PipelinedTestBase):
         self.assert_pcoll_equal(output, [])
 
     def test_validation_type_for_domain_object_with_non_strict_type(
-            self):
+        self
+    ) -> None:
         model = base_models.BaseModel(
             id='mock-123',
             deleted=False,
@@ -371,7 +448,8 @@ class ValidateModelDomainObjectInstancesTests(job_test_utils.PipelinedTestBase):
         self.assert_pcoll_equal(output, [])
 
     def test_error_is_raised_with_invalid_validation_type_for_domain_object(
-            self):
+        self
+    ) -> None:
         model = base_models.BaseModel(
             id='mock-123',
             deleted=False,
@@ -388,7 +466,7 @@ class ValidateModelDomainObjectInstancesTests(job_test_utils.PipelinedTestBase):
                 model, 'Invalid validation type for domain object: invalid')
         ])
 
-    def test_validation_type_for_exploration_domain_object(self):
+    def test_validation_type_for_exploration_domain_object(self) -> None:
         model_instance1 = exp_models.ExplorationModel(
             id='mock-123',
             title='title',
@@ -398,10 +476,13 @@ class ValidateModelDomainObjectInstancesTests(job_test_utils.PipelinedTestBase):
             states={
                 feconf.DEFAULT_INIT_STATE_NAME: (
                     state_domain.State.create_default_state(
-                        feconf.DEFAULT_INIT_STATE_NAME, is_initial_state=True
+                        feconf.DEFAULT_INIT_STATE_NAME,
+                        'content_0', 'default_outcome_1',
+                        is_initial_state=True
                     ).to_dict()),
             },
             states_schema_version=feconf.CURRENT_STATE_SCHEMA_VERSION,
+            next_content_id_index=2,
             created_on=self.YEAR_AGO,
             last_updated=self.NOW
         )
@@ -415,10 +496,12 @@ class ValidateModelDomainObjectInstancesTests(job_test_utils.PipelinedTestBase):
             states={
                 feconf.DEFAULT_INIT_STATE_NAME: (
                     state_domain.State.create_default_state(
-                        'end', is_initial_state=True
+                        'end', 'content_0', 'default_outcome_1',
+                        is_initial_state=True
                     ).to_dict()),
             },
             states_schema_version=feconf.CURRENT_STATE_SCHEMA_VERSION,
+            next_content_id_index=2,
             created_on=self.YEAR_AGO,
             last_updated=self.NOW
         )
@@ -437,7 +520,7 @@ class ValidateModelDomainObjectInstancesTests(job_test_utils.PipelinedTestBase):
 
 class ValidateCommitTypeTests(job_test_utils.PipelinedTestBase):
 
-    def test_validate_commit_type(self):
+    def test_validate_commit_type(self) -> None:
         invalid_commit_type_model = base_models.BaseCommitLogEntryModel(
             id='123',
             created_on=self.YEAR_AGO,
@@ -460,28 +543,55 @@ class ValidateCommitTypeTests(job_test_utils.PipelinedTestBase):
 
 
 class MockValidateCommitCmdsSchema(
-        base_validation.BaseValidateCommitCmdsSchema):
+    base_validation.BaseValidateCommitCmdsSchema[base_models.BaseModel]
+):
 
-    def process(self, input_model):
+    # Here we use MyPy ignore because the signature of this method
+    # doesn't match with super class's process() method, because in
+    # in super class's process() method we are returning CommitCmdsValidateError
+    # and here for testing purposes we are returning 'None'. So, due
+    # to this conflict in return types, a conflict in signatures occurred
+    # which causes to MyPy throw an error. Thus, to avoid the error,
+    # we used ignore here.
+    def process(  # type: ignore[override]
+        self, input_model: base_models.BaseModel
+    ) -> None:
+        """Method defined to check that error is displayed when
+        _get_change_domain_class() method is missing from the
+        derived class.
+        """
         self._get_change_domain_class(input_model)
 
 
 class MockValidateCommitCmdsSchemaChangeDomain(
-        base_validation.BaseValidateCommitCmdsSchema):
+    base_validation.BaseValidateCommitCmdsSchema[base_models.BaseModel]
+):
 
-    def _get_change_domain_class(self, item):
+    # Here we use MyPy ignore because the signature of this method doesn't
+    # match with super class's `_get_change_domain_class()` method, because
+    # in super class's method we are returning Type[BaseChange] and here for
+    # testing purposes we are returning 'None'. So, due to this conflict in
+    # return types, a conflict in signatures occurred which causes MyPy to
+    # throw an error. Thus, to avoid the error, we used ignore here.
+    def _get_change_domain_class(self, _: base_models.BaseModel) -> None:  # type: ignore[override]
+        """Method defined for testing purpose."""
         pass
 
 
-class MockValidateWrongSchema(base_validation.BaseValidateCommitCmdsSchema):
+class MockValidateWrongSchema(
+    base_validation.BaseValidateCommitCmdsSchema[base_models.BaseModel]
+):
 
-    def _get_change_domain_class(self, item): # pylint: disable=unused-argument
+    def _get_change_domain_class(
+        self, _: base_models.BaseModel
+    ) -> Type[change_domain.BaseChange]:
+        """Method defined for testing purpose returning BaseChange class."""
         return change_domain.BaseChange
 
 
 class ValidateCommitCmdsSchemaTests(job_test_utils.PipelinedTestBase):
 
-    def test_validate_none_commit(self):
+    def test_validate_none_commit(self) -> None:
         invalid_commit_cmd_model = base_models.BaseCommitLogEntryModel(
             id='invalid',
             created_on=self.YEAR_AGO,
@@ -501,7 +611,7 @@ class ValidateCommitCmdsSchemaTests(job_test_utils.PipelinedTestBase):
             base_validation_errors.CommitCmdsNoneError(invalid_commit_cmd_model)
         ])
 
-    def test_validate_wrong_commit_cmd_missing(self):
+    def test_validate_wrong_commit_cmd_missing(self) -> None:
         invalid_commit_cmd_model = base_models.BaseCommitLogEntryModel(
             id='invalid',
             created_on=self.YEAR_AGO,
@@ -524,7 +634,7 @@ class ValidateCommitCmdsSchemaTests(job_test_utils.PipelinedTestBase):
                 'Missing cmd key in change dict')
         ])
 
-    def test_validate_wrong_commit_cmd(self):
+    def test_validate_wrong_commit_cmd(self) -> None:
         invalid_commit_cmd_model = base_models.BaseCommitLogEntryModel(
             id='invalid',
             created_on=self.YEAR_AGO,
@@ -547,7 +657,7 @@ class ValidateCommitCmdsSchemaTests(job_test_utils.PipelinedTestBase):
                 'Command invalid_test_command is not allowed')
         ])
 
-    def test_validate_raise_not_implemented(self):
+    def test_validate_raise_not_implemented(self) -> None:
         invalid_commit_cmd_model = base_models.BaseCommitLogEntryModel(
             id='123',
             created_on=self.YEAR_AGO,
@@ -557,7 +667,7 @@ class ValidateCommitCmdsSchemaTests(job_test_utils.PipelinedTestBase):
             post_commit_status='',
             commit_cmds=[{}])
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             NotImplementedError,
             re.escape(
                 'The _get_change_domain_class() method is missing from the '
@@ -566,7 +676,7 @@ class ValidateCommitCmdsSchemaTests(job_test_utils.PipelinedTestBase):
         ):
             MockValidateCommitCmdsSchema().process(invalid_commit_cmd_model)
 
-    def test_validate_commit_cmds(self):
+    def test_validate_commit_cmds(self) -> None:
         invalid_commit_cmd_model = base_models.BaseCommitLogEntryModel(
             id='123',
             created_on=self.YEAR_AGO,

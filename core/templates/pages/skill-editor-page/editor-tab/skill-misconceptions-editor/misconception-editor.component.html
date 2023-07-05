@@ -1,0 +1,162 @@
+<style>
+  misconception-editor .oppia-misconception-editor-section {
+    padding-bottom: 10px;
+  }
+</style>
+
+<div class="h-100">
+  <div class="oppia-misconception-editor-section">
+
+    <div *ngIf="!nameEditorIsOpen"
+         class="h-100"
+         title="Misconception Name">
+      <div class="oppia-readonly-rule-tile"
+           [ngClass]="{'oppia-editable-section': isEditable}">
+        <div class="oppia-rule-preview">
+          <div class="oppia-click-to-start-editing" (click)="openNameEditor()">
+            <i *ngIf="isEditable"
+               class="fas fa-pencil-alt oppia-editor-edit-icon float-right"
+               title="Edit Misconception Name">
+            </i>
+          </div>
+
+          <strong>Misconception Name</strong>
+          <div>
+            <oppia-rte-output-display [rteString]="container.misconceptionName"></oppia-rte-output-display>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div *ngIf="isEditable && nameEditorIsOpen">
+      <div class="oppia-rule-details-header">
+        <strong>Misconception Name</strong>
+        <input class="form-control" type="text" [(ngModel)]="container.misconceptionName" maxlength="{{ MAX_CHARS_IN_MISCONCEPTION_NAME }}">
+        <span *ngIf="container.misconceptionName.length === MAX_CHARS_IN_MISCONCEPTION_NAME" class="form-text oppia-form-error-text">
+          <em>Please use at most {{ MAX_CHARS_IN_MISCONCEPTION_NAME }} characters.</em>
+        </span>
+      </div>
+
+      <div class="oppia-rule-save-cancel-buttons">
+        <div class="modal-footer">
+          <button type="button"
+                  class="btn btn-secondary"
+                  (click)="cancelEditName()">
+            Cancel
+          </button>
+          <button type="button"
+                  class="btn btn-success"
+                  [disabled]="!container.misconceptionName"
+                  (click)="saveName()">
+            Save
+          </button>
+        </div>
+        <div class="oppia-clear"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="oppia-misconception-editor-section">
+    <div *ngIf="!notesEditorIsOpen"
+         class="h-100"
+         title="Misconception Notes">
+      <div class="oppia-readonly-rule-tile"
+           [ngClass]="{'oppia-editable-section': isEditable}">
+        <div class="oppia-rule-preview">
+          <div class="oppia-click-to-start-editing" (click)="openNotesEditor()">
+            <i *ngIf="isEditable"
+               class="fas fa-pencil-alt oppia-editor-edit-icon float-right"
+               title="Edit Misconception Notes">
+            </i>
+          </div>
+
+          <strong>Notes for Creator</strong>
+          <div *ngIf="!container.misconceptionNotes">
+            <span class="oppia-placeholder">
+              Click here to add additional notes for question creators to understand how handling this misconception is useful for the skill being tested.
+            </span>
+          </div>
+          <div>
+            <oppia-rte-output-display [rteString]="container.misconceptionNotes"></oppia-rte-output-display>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div *ngIf="notesEditorIsOpen && isEditable">
+      <div class="oppia-rule-details-header">
+        <strong>Notes for Creator</strong>
+        <schema-based-editor [schema]="NOTES_FORM_SCHEMA"
+                             [(localValue)]="container.misconceptionNotes">
+        </schema-based-editor>
+      </div>
+
+      <div class="oppia-rule-save-cancel-buttons">
+        <div class="modal-footer">
+          <button type="button"
+                  class="btn btn-secondary"
+                  (click)="cancelEditNotes()">
+            Cancel
+          </button>
+          <button type="button"
+                  class="btn btn-success"
+                  (click)="saveNotes()">
+            Save
+          </button>
+        </div>
+        <div class="oppia-clear"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="oppia-misconception-editor-section">
+    <div *ngIf="!feedbackEditorIsOpen"
+         class="h-100"
+         title="Misconception Feedback">
+      <div class="oppia-readonly-rule-tile"
+           [ngClass]="{'oppia-editable-section': isEditable}">
+        <div class="oppia-rule-preview">
+          <div class="oppia-click-to-start-editing" (click)="openFeedbackEditor()">
+            <i *ngIf="isEditable"
+               class="fas fa-pencil-alt  oppia-editor-edit-icon float-right"
+               title="Edit Misconception Feedback">
+            </i>
+          </div>
+
+          <strong>Feedback for Learner</strong>
+          <oppia-rte-output-display [rteString]="container.misconceptionFeedback"></oppia-rte-output-display>
+        </div>
+      </div>
+    </div>
+
+    <div *ngIf="feedbackEditorIsOpen && isEditable">
+      <div class="oppia-rule-details-header">
+        <strong>Feedback for Learner</strong>
+        <schema-based-editor [schema]="FEEDBACK_FORM_SCHEMA"
+                             [(localValue)]="container.misconceptionFeedback">
+        </schema-based-editor>
+      </div>
+
+      <div class="oppia-rule-save-cancel-buttons">
+        <div class="modal-footer">
+          <button type="button"
+                  class="btn btn-secondary"
+                  (click)="cancelEditFeedback()">
+            Cancel
+          </button>
+          <button type="button"
+                  class="btn btn-success"
+                  [disabled]="!container.misconceptionFeedback"
+                  (click)="saveFeedback()">
+            Save
+          </button>
+        </div>
+        <div class="oppia-clear"></div>
+      </div>
+    </div>
+  </div>
+  <div class="oppia-misconception-editor-section">
+    <strong>Should a response to this misconception be enforced on every question linked to this skill?</strong>
+    <input type="checkbox" (change)="updateMustBeAddressed()" [(ngModel)]="container.misconceptionMustBeAddressed">
+  </div>
+</div>

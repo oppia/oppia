@@ -1,3 +1,5 @@
+from core.domain import auth_domain
+
 import datetime
 from typing import Any, Dict, List, Optional, Sequence, Union
 
@@ -20,7 +22,6 @@ class UserRecord:
 
     @property
     def disabled(self) -> bool: ...
-
 
 class ImportUserRecord:
     @property
@@ -82,6 +83,9 @@ def create_session_cookie(
 ) -> str: ...
 
 
+def create_user(**kwargs: Any) -> UserRecord: ...
+
+
 def update_user(uid: str, **kwargs: Any) -> None: ...
 
 
@@ -110,7 +114,7 @@ def verify_session_cookie(
         session_cookie: str,
         check_revoked: bool = ...,
         app: Optional[App] = ...
-) -> Dict[str, Any]: ...
+) -> auth_domain.AuthClaimsDict: ...
 
 
 class UserNotFoundError(Exception): ...
@@ -126,6 +130,9 @@ class InvalidIdTokenError(Exception): ...
 
 
 class UidAlreadyExistsError(Exception): ...
+
+
+class UserDisabledError(Exception): ...
 
 
 class InternalError(Exception): ...

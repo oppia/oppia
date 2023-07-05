@@ -18,54 +18,63 @@
 
 from __future__ import annotations
 
+import io
 import multiprocessing
 import os
 
-from core import python_utils
+from core import utils
 from core.tests import test_utils
+
+from typing import Final, List, Tuple
 
 from . import other_files_linter
 from . import pre_commit_linter
 
-NAME_SPACE = multiprocessing.Manager().Namespace()
-PROCESSES = multiprocessing.Manager().dict()
+NAME_SPACE: Final = multiprocessing.Manager().Namespace()
 NAME_SPACE.files = pre_commit_linter.FileCache()
-FILE_CACHE = NAME_SPACE.files
+FILE_CACHE: Final = NAME_SPACE.files
 
-LINTER_TESTS_DIR = os.path.join(os.getcwd(), 'scripts', 'linters', 'test_files')
+LINTER_TESTS_DIR: Final = os.path.join(
+    os.getcwd(), 'scripts', 'linters', 'test_files'
+)
 
 
 class CustomLintChecksManagerTests(test_utils.LinterTestBase):
     """Tests for CustomLintChecksManager."""
 
-    def setUp(self):
-        super(CustomLintChecksManagerTests, self).setUp()
+    def setUp(self) -> None:
+        super().setUp()
         self.verbose_mode_enabled = False
-        self.dependencies_file = python_utils.string_io(
-            buffer_value='{\"dependencies\":{\"frontend\":{\"guppy\":'
+        self.dependencies_file = io.StringIO(
+            '{\"dependencies\":{\"frontend\":{\"guppy\":'
             '{\"version\": \"0.1\"},\"skulpt-dist\":{\"version\": \"0.2\"}'
             ',\"midiJs\":{\"version\": \"0.4\"}}}}')
-        self.package_file = python_utils.string_io(
-            buffer_value='{\"dependencies\":{\"nerdamer\":\"^0.6\"}}')
+        self.package_file = io.StringIO(
+            '{\"dependencies\":{\"nerdamer\":\"^0.6\"}}')
         self.files_in_typings_dir = [
             'guppy-defs-0.1.d.ts',
             'skulpt-defs-0.2.d.ts',
             'midi-defs-0.4.d.ts',
             'nerdamer-defs-0.6.d.ts'
         ]
-        def mock_open_file(path, unused_permissions):
+        def mock_open_file(
+            path: str, unused_permissions: List[str]
+        ) -> io.StringIO:
             if path == other_files_linter.DEPENDENCIES_JSON_FILE_PATH:
-                return self.dependencies_file
+                file = self.dependencies_file
             elif path == other_files_linter.PACKAGE_JSON_FILE_PATH:
-                return self.package_file
-        def mock_listdir(unused_path):
+                file = self.package_file
+            return file
+        def mock_listdir(unused_path: str) -> List[str]:
             return self.files_in_typings_dir
         self.open_file_swap = self.swap(
-            python_utils, 'open_file', mock_open_file)
+            utils, 'open_file', mock_open_file)
         self.listdir_swap = self.swap(os, 'listdir', mock_listdir)
 
-    def test_check_valid_pattern_in_app_dev_yaml(self):
-        def mock_readlines(unused_self, unused_filepath):
+    def test_check_valid_pattern_in_app_dev_yaml(self) -> None:
+        def mock_readlines(
+            unused_self: str, unused_filepath: str
+        ) -> Tuple[str, ...]:
             return (
                 '# Just a comment',
                 '# Third party files:',
@@ -82,8 +91,10 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
             self.assertEqual('App dev file', error_messages.name)
             self.assertFalse(error_messages.failed)
 
-    def test_check_invalid_pattern_in_app_dev_yaml(self):
-        def mock_readlines(unused_self, unused_filepath):
+    def test_check_invalid_pattern_in_app_dev_yaml(self) -> None:
+        def mock_readlines(
+            unused_self: str, unused_filepath: str
+        ) -> Tuple[str, ...]:
             return (
                 '# Third party files:', '- third_party/static/bootstrap-4.3/')
 
@@ -99,8 +110,10 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
         self.assertEqual('App dev file', error_messages.name)
         self.assertTrue(error_messages.failed)
 
-    def test_check_valid_pattern(self):
-        def mock_readlines(unused_self, unused_filepath):
+    def test_check_valid_pattern(self) -> None:
+        def mock_readlines(
+            unused_self: str, unused_filepath: str
+        ) -> Tuple[str, ...]:
             return (
                 '// This is a comment.',
                 'plugins: [',
@@ -126,8 +139,10 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
         self.assertEqual('Webpack config file', error_messages.name)
         self.assertFalse(error_messages.failed)
 
-    def test_check_invalid_pattern_with_some_keys_missing(self):
-        def mock_readlines(unused_self, unused_filepath):
+    def test_check_invalid_pattern_with_some_keys_missing(self) -> None:
+        def mock_readlines(
+            unused_self: str, unused_filepath: str
+        ) -> Tuple[str, ...]:
             return (
                 'plugins: [',
                 '   new HtmlWebpackPlugin({',
@@ -151,8 +166,10 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
         self.assertEqual('Webpack config file', error_messages.name)
         self.assertTrue(error_messages.failed)
 
-    def test_check_invalid_pattern_without_all_keys(self):
-        def mock_readlines(unused_self, unused_filepath):
+    def test_check_invalid_pattern_without_all_keys(self) -> None:
+        def mock_readlines(
+            unused_self: str, unused_filepath: str
+        ) -> Tuple[str, ...]:
             return (
                 'plugins: [',
                 '   new HtmlWebpackPlugin({',
@@ -174,7 +191,7 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
         self.assertEqual('Webpack config file', error_messages.name)
         self.assertTrue(error_messages.failed)
 
-    def test_check_third_party_libs_type_defs(self):
+    def test_check_third_party_libs_type_defs(self) -> None:
         expected_error_messages = [
             'SUCCESS  Third party type defs check passed']
         with self.open_file_swap, self.listdir_swap:
@@ -185,7 +202,7 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
         self.assertEqual('Third party type defs', error_messages.name)
         self.assertFalse(error_messages.failed)
 
-    def test_check_third_party_libs_type_defs_verbose(self):
+    def test_check_third_party_libs_type_defs_verbose(self) -> None:
         self.verbose_mode_enabled = True
         expected_error_messages = [
             'SUCCESS  Third party type defs check passed']
@@ -197,7 +214,7 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
             self.assertEqual('Third party type defs', error_messages.name)
             self.assertFalse(error_messages.failed)
 
-    def test_check_third_party_libs_type_defs_multiple(self):
+    def test_check_third_party_libs_type_defs_multiple(self) -> None:
         self.files_in_typings_dir.append('guppy-defs-0.2.d.ts')
         expected_error_messages = 'FAILED  Third party type defs check failed'
         with self.open_file_swap, self.listdir_swap, self.print_swap:
@@ -211,7 +228,7 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
             self.assertEqual('Third party type defs', error_messages.name)
             self.assertTrue(error_messages.failed)
 
-    def test_check_third_party_libs_type_defs_no_type_defs(self):
+    def test_check_third_party_libs_type_defs_no_type_defs(self) -> None:
         self.files_in_typings_dir = [
             'skulpt-defs-0.2.d.ts',
             'math-expressions-defs-0.3.d.ts',
@@ -230,7 +247,7 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
             self.assertEqual('Third party type defs', error_messages.name)
             self.assertTrue(error_messages.failed)
 
-    def test_check_third_party_libs_type_defs_wrong_version(self):
+    def test_check_third_party_libs_type_defs_wrong_version(self) -> None:
         self.files_in_typings_dir = [
             'guppy-defs-0.2.d.ts',
             'skulpt-defs-0.2.d.ts',
@@ -252,44 +269,11 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
             self.assertEqual('Third party type defs', error_messages.name)
             self.assertTrue(error_messages.failed)
 
-    def test_check_valid_strict_checks(self):
-        strict_ts_config_path_swap = self.swap(
-            other_files_linter,
-            'STRICT_TS_CONFIG_FILEPATH',
-            os.path.join(LINTER_TESTS_DIR, 'valid_strict_ts_config.json'))
-        expected_error_messages = (
-            'SUCCESS  Sorted strict TS config check passed')
-        with strict_ts_config_path_swap, self.print_swap:
-            error_messages = other_files_linter.CustomLintChecksManager(
-                FILE_CACHE).check_filenames_in_tsconfig_strict_are_sorted()
-            self.assertEqual(
-                error_messages.get_report()[0], expected_error_messages)
-            self.assertEqual('Sorted strict TS config', error_messages.name)
-            self.assertFalse(error_messages.failed)
-
-    def test_check_invalid_strict_checks(self):
-        strict_ts_config_path_swap = self.swap(
-            other_files_linter,
-            'STRICT_TS_CONFIG_FILEPATH',
-            os.path.join(LINTER_TESTS_DIR, 'invalid_strict_ts_config.json'))
-        expected_error_messages = 'FAILED  Sorted strict TS config check failed'
-        with strict_ts_config_path_swap, self.print_swap:
-            error_messages = other_files_linter.CustomLintChecksManager(
-                FILE_CACHE).check_filenames_in_tsconfig_strict_are_sorted()
-            self.assertEqual(
-                error_messages.get_report()[1], expected_error_messages)
-            self.assert_same_list_elements(
-                ['Files in %s are not alphabetically sorted.' % (
-                    other_files_linter.STRICT_TS_CONFIG_FILE_NAME)],
-                error_messages.get_report())
-            self.assertEqual('Sorted strict TS config', error_messages.name)
-            self.assertTrue(error_messages.failed)
-
-    def test_check_github_workflows_use_merge_action_checks(self):
-        def mock_listdir(unused_path):
+    def test_check_github_workflows_use_merge_action_checks(self) -> None:
+        def mock_listdir(unused_path: str) -> List[str]:
             return ['pass.yml', 'fail.yml', 'README']
 
-        def mock_read(path):
+        def mock_read(path: str) -> str:
             if path.endswith('pass.yml'):
                 return '\n'.join([
                     'name: Passing workflow file',
@@ -338,12 +322,12 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
                 FILE_CACHE).check_github_workflows_use_merge_action()
             self.assertEqual(task_results.get_report(), expected)
 
-    def test_perform_all_lint_checks(self):
+    def test_perform_all_lint_checks(self) -> None:
         lint_task_report = other_files_linter.CustomLintChecksManager(
             FILE_CACHE).perform_all_lint_checks()
         self.assertTrue(isinstance(lint_task_report, list))
 
-    def test_get_linters_with_success(self):
+    def test_get_linters_with_success(self) -> None:
         custom_linter, third_party_linter = (
             other_files_linter.get_linters(FILE_CACHE))
         self.assertTrue(

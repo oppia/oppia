@@ -17,7 +17,7 @@
  */
 
 import { Subscription } from 'rxjs';
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, EventEmitter, OnDestroy, OnInit, Output } from '@angular/core';
 import { SkillUpdateService } from 'domain/skill/skill-update.service';
 import { SkillEditorStateService } from 'pages/skill-editor-page/services/skill-editor-state.service';
 import { Skill, SkillObjectFactory } from 'domain/skill/SkillObjectFactory';
@@ -30,14 +30,19 @@ import { SkillRights } from 'domain/skill/skill-rights.model';
   templateUrl: './skill-description-editor.component.html'
 })
 export class SkillDescriptionEditorComponent implements OnInit, OnDestroy {
+  @Output() onSaveDescription = new EventEmitter<void>();
   errorMsg: string = '';
   directiveSubscriptions = new Subscription();
   MAX_CHARS_IN_SKILL_DESCRIPTION = (
     AppConstants.MAX_CHARS_IN_SKILL_DESCRIPTION);
-  skillRights: SkillRights = null;
-  skill: Skill = null;
-  skillDescriptionEditorIsShown: boolean = null;
-  tmpSkillDescription: string = null;
+
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  skillRights!: SkillRights;
+  skill!: Skill;
+  tmpSkillDescription!: string;
+  skillDescriptionEditorIsShown: boolean = false;
   constructor(
     private skillUpdateService: SkillUpdateService,
     private skillEditorStateService: SkillEditorStateService,
@@ -62,6 +67,7 @@ export class SkillDescriptionEditorComponent implements OnInit, OnDestroy {
       this.skillUpdateService.setSkillDescription(
         this.skill,
         newSkillDescription);
+      this.onSaveDescription.emit();
     } else {
       this.errorMsg = (
         'Please use a non-empty description consisting of ' +

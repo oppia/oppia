@@ -56,7 +56,19 @@ describe('ShortResponseMultipleChoiceInputComponent', () => {
       .createComponent(ShortResponseMultipleChoiceInputComponent);
     component = fixture.componentInstance;
     component.answer = '1';
-    component.choices = '["opt1", "opt2", "opt3", "opt4"]';
+    component.choices = '[{' +
+      '"_html": "opt1",' +
+      '"_contentId": "ca_choices_1"' +
+    '}, {' +
+      '"_html": "opt2",' +
+      '"_contentId": "ca_choices_2"' +
+    '}, {' +
+      '"_html": "opt3",' +
+      '"_contentId": "ca_choices_3"' +
+    '}, {' +
+      '"_html": "opt4",' +
+      '"_contentId": "ca_choices_4"' +
+    '}]';
   });
 
   it('should initialise component when user submits answer', () => {

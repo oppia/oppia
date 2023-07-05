@@ -16,11 +16,13 @@
 
 from __future__ import annotations
 
+import builtins
 import collections
 import os
 
-from core import python_utils
 from core.tests import test_utils
+
+from typing import List
 
 from . import create_topological_sort_of_all_services
 
@@ -32,9 +34,9 @@ class TopologicalSortTests(test_utils.GenericTestBase):
     on dependencies.
     """
 
-    def test_dfs_with_connected_graph(self):
-        topo_sort_stack = []
-        visit_stack = []
+    def test_dfs_with_connected_graph(self) -> None:
+        topo_sort_stack: List[str] = []
+        visit_stack: List[str] = []
         adj_list = collections.defaultdict(list)
         adj_list['A'] = ['B', 'C']
         adj_list['C'] = ['D']
@@ -43,11 +45,11 @@ class TopologicalSortTests(test_utils.GenericTestBase):
         self.assertEqual(topo_sort_stack, ['B', 'D', 'C', 'A'])
         self.assertEqual(visit_stack, ['A', 'B', 'C', 'D'])
 
-    def test_make_graph(self):
+    def test_make_graph(self) -> None:
         with self.swap(
             create_topological_sort_of_all_services, 'DIRECTORY_NAMES',
             MOCK_DIRECTORY_NAMES):
-            adj_list, node_set = (
+            adj_list, node_list = (
                 create_topological_sort_of_all_services.make_graph())
 
             expected_adj_list = {
@@ -69,15 +71,15 @@ class TopologicalSortTests(test_utils.GenericTestBase):
                 self.assertEqual(
                     sorted(adj_list[key]), sorted(expected_adj_list[key]))
 
-            self.assertEqual(node_set, expected_node_set)
+            self.assertEqual(set(node_list), expected_node_set)
 
-    def test_complete_process(self):
+    def test_complete_process(self) -> None:
         actual_output = []
 
-        def mock_print(val):
+        def mock_print(val: str) -> None:
             actual_output.append(val)
 
-        print_swap = self.swap(python_utils, 'PRINT', mock_print)
+        print_swap = self.swap(builtins, 'print', mock_print)
         dir_names_swap = self.swap(
             create_topological_sort_of_all_services, 'DIRECTORY_NAMES',
             MOCK_DIRECTORY_NAMES)

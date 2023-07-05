@@ -49,6 +49,8 @@
 	"I18N_DASHBOARD_TABLE_HEADING_UNRESOLVED_ANSWERS": "Uløste svar",
 	"I18N_DIRECTIVES_DRAG_IMAGE_HERE": "Dra et bilde til dette området",
 	"I18N_DIRECTIVES_UPLOAD_A_FILE": "Last opp en fil",
+	"I18N_END_CHAPTER_MILESTONE_MESSAGE_1": "Du har akkurat ferdiglest ditt første kapittel!",
+	"I18N_END_EXPLORATION_RECOMMENDATION_MESSAGE": "Her er hva du kan gjøre videre!",
 	"I18N_ERROR_HEADER_400": "400-feil",
 	"I18N_ERROR_HEADER_401": "401-feil",
 	"I18N_ERROR_HEADER_404": "404-feil",

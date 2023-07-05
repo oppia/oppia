@@ -25,6 +25,7 @@ import {
   Output } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { AlertsService } from 'services/alerts.service';
+import { SchemaDefaultValue } from 'services/schema-default-value.service';
 
 interface MusicPhraseSchema {
   type: string;
@@ -32,8 +33,8 @@ interface MusicPhraseSchema {
     type: string;
     choices: string[];
   };
-  'ui_config': {'add_element_text': string;};
-  validators: { id: string; 'max_value': number; }[];
+  'ui_config': { 'add_element_text': string };
+  validators: { id: string; 'max_value': number }[];
 }
 
 @Component({
@@ -43,7 +44,7 @@ interface MusicPhraseSchema {
 })
 export class MusicPhraseEditorComponent implements OnInit {
   @Input() modalId!: symbol;
-  @Input() value!: unknown;
+  @Input() value!: SchemaDefaultValue;
 
   @Output() valueChanged = new EventEmitter();
 
@@ -54,10 +55,12 @@ export class MusicPhraseEditorComponent implements OnInit {
   get localValue(): string[] {
     return this._proxy;
   }
+
   set localValue(val: string[]) {
     this._localValue = val;
     this._createProxy();
   }
+
   // The maximum number of notes allowed in a music phrase.
   _MAX_NOTES_IN_PHRASE = 8;
   schema: MusicPhraseSchema = {
@@ -77,6 +80,7 @@ export class MusicPhraseEditorComponent implements OnInit {
       max_value: this._MAX_NOTES_IN_PHRASE
     }]
   };
+
   constructor(private alertsService: AlertsService) {
     this._createProxy();
   }

@@ -23,6 +23,8 @@ import { HttpClientModule } from '@angular/common/http';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { platformFeatureInitFactory, PlatformFeatureService } from
   'services/platform-feature.service';
+import { RouterModule } from '@angular/router';
+import { APP_BASE_HREF } from '@angular/common';
 
 import { OppiaAngularRootComponent } from
   'components/oppia-angular-root.component';
@@ -30,35 +32,37 @@ import { SharedComponentsModule } from 'components/shared-component.module';
 import { TopicViewerNavbarBreadcrumbComponent } from
   // eslint-disable-next-line max-len
   'pages/topic-viewer-page/navbar-breadcrumb/topic-viewer-navbar-breadcrumb.component';
-import { StoriesListComponent } from
-  'pages/topic-viewer-page/stories-list/topic-viewer-stories-list.component';
-import { SubtopicsListComponent } from
-  'pages/topic-viewer-page/subtopics-list/subtopics-list.component';
 import { RequestInterceptor } from 'services/request-interceptor.service';
 import { TopicViewerPageComponent } from
   'pages/topic-viewer-page/topic-viewer-page.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MyHammerConfig, toastrConfig } from 'pages/oppia-root/app.module';
+import { PracticeSessionConfirmationModal } from './modals/practice-session-confirmation-modal.component';
+import {SmartRouterModule} from 'hybrid-router-module-provider';
+import { AppErrorHandlerProvider } from 'pages/oppia-root/app-error-handler';
 
 @NgModule({
   imports: [
     BrowserModule,
     BrowserAnimationsModule,
     HttpClientModule,
+    // TODO(#13443): Remove smart router module provider once all pages are
+    // migrated to angular router.
+    SmartRouterModule,
+    RouterModule.forRoot([]),
     SharedComponentsModule,
+    TopicPlayerViewerCommonModule,
     ToastrModule.forRoot(toastrConfig)
   ],
   declarations: [
-    StoriesListComponent,
-    SubtopicsListComponent,
     TopicViewerNavbarBreadcrumbComponent,
-    TopicViewerPageComponent
+    TopicViewerPageComponent,
+    PracticeSessionConfirmationModal
   ],
   entryComponents: [
-    StoriesListComponent,
-    SubtopicsListComponent,
     TopicViewerNavbarBreadcrumbComponent,
-    TopicViewerPageComponent
+    TopicViewerPageComponent,
+    PracticeSessionConfirmationModal
   ],
   providers: [
     {
@@ -75,6 +79,11 @@ import { MyHammerConfig, toastrConfig } from 'pages/oppia-root/app.module';
     {
       provide: HAMMER_GESTURE_CONFIG,
       useClass: MyHammerConfig
+    },
+    AppErrorHandlerProvider,
+    {
+      provide: APP_BASE_HREF,
+      useValue: '/'
     }
   ]
 })
@@ -86,6 +95,7 @@ class TopicViewerPageModule {
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { downgradeModule } from '@angular/upgrade/static';
 import { ToastrModule } from 'ngx-toastr';
+import { TopicPlayerViewerCommonModule } from './topic-viewer-player-common.module';
 
 const bootstrapFnAsync = async(extraProviders: StaticProvider[]) => {
   const platformRef = platformBrowserDynamic(extraProviders);

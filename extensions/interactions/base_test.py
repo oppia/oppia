@@ -25,8 +25,8 @@ import re
 import string
 import struct
 
+from core import constants
 from core import feconf
-from core import python_utils
 from core import schema_utils
 from core import schema_utils_test
 from core import utils
@@ -35,16 +35,19 @@ from core.domain import exp_services
 from core.domain import interaction_registry
 from core.domain import object_registry
 from core.tests import test_utils
+from extensions import domain
 from extensions.interactions import base
+
+from typing import Any, Dict, Final, List, Literal, Set, Tuple, Type
 
 # File names ending in any of these suffixes will be ignored when checking the
 # validity of interaction definitions.
-IGNORED_FILE_SUFFIXES = ['.pyc', '.DS_Store', '.swp']
+IGNORED_FILE_SUFFIXES: Final = ['.pyc', '.DS_Store', '.swp']
 # Expected dimensions for an interaction thumbnail PNG image.
-INTERACTION_THUMBNAIL_WIDTH_PX = 178
-INTERACTION_THUMBNAIL_HEIGHT_PX = 146
-TEXT_INPUT_ID = 'TextInput'
-INTERACTIONS_THAT_USE_COMPONENTS = [
+INTERACTION_THUMBNAIL_WIDTH_PX: Final = 178
+INTERACTION_THUMBNAIL_HEIGHT_PX: Final = 146
+TEXT_INPUT_ID: Final = 'TextInput'
+INTERACTIONS_THAT_USE_COMPONENTS: Final = [
     'AlgebraicExpressionInput',
     'Continue',
     'CodeRepl',
@@ -57,16 +60,17 @@ INTERACTIONS_THAT_USE_COMPONENTS = [
     'ItemSelectionInput',
     'MathEquationInput',
     'MultipleChoiceInput',
+    'MusicNotesInput',
     'NumericExpressionInput',
-    'RatioExpressionInput',
     'NumericInput',
     'NumberWithUnits',
+    'PencilCodeEditor',
+    'RatioExpressionInput',
     'SetInput',
     'TextInput',
-    'MathEquationInput'
 ]
 
-_INTERACTION_CONFIG_SCHEMA = [
+_INTERACTION_CONFIG_SCHEMA: Final = [
     ('name', str),
     ('display_mode', str),
     ('description', str),
@@ -75,10 +79,18 @@ _INTERACTION_CONFIG_SCHEMA = [
     ('show_generic_submit_button', bool)]
 
 
+AnswerVisualizationsDictKeys = Literal[
+    'id',
+    'options',
+    'calculation_id',
+    'addressed_info_is_supported'
+]
+
+
 class InteractionAnswerUnitTests(test_utils.GenericTestBase):
     """Test the answer object and type properties of an interaction object."""
 
-    def test_rules_property(self):
+    def test_rules_property(self) -> None:
         """Test that answer normalization behaves as expected."""
         interaction = base.BaseInteraction()
         interaction.answer_type = None
@@ -87,22 +99,25 @@ class InteractionAnswerUnitTests(test_utils.GenericTestBase):
         interaction.answer_type = 'NonnegativeInt'
         interaction.normalize_answer('15')
 
-        with self.assertRaisesRegexp(Exception, 'not a valid object class'):
+        with self.assertRaisesRegex(Exception, 'not a valid object class'):
             interaction.answer_type = 'FakeObjType'
             interaction.normalize_answer('15')
 
-    def test_get_rule_description_with_invalid_rule_name_raises_error(self):
+    def test_get_rule_description_with_invalid_rule_name_raises_error(
+        self
+    ) -> None:
         interaction = interaction_registry.Registry.get_interaction_by_id(
             'CodeRepl')
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, 'Could not find rule with name invalid_rule_name'):
             interaction.get_rule_description('invalid_rule_name')
 
     def test_get_rule_param_type_with_invalid_rule_param_name_raises_error(
-            self):
+        self
+    ) -> None:
         interaction = interaction_registry.Registry.get_interaction_by_id(
             'CodeRepl')
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception,
             'Rule CodeEquals has no param called invalid_rule_param_name'):
             interaction.get_rule_param_type(
@@ -112,15 +127,37 @@ class InteractionAnswerUnitTests(test_utils.GenericTestBase):
 class InteractionUnitTests(test_utils.GenericTestBase):
     """Test that the default interactions are valid."""
 
-    def _is_camel_cased(self, name):
+    def _is_camel_cased(self, name: str) -> bool:
         """Check whether a name is in CamelCase."""
-        return name and (name[0] in string.ascii_uppercase)
+        return bool(name and (name[0] in string.ascii_uppercase))
 
-    def _is_alphanumeric_string(self, input_string):
+    def _is_alphanumeric_string(self, input_string: str) -> bool:
         """Check whether a string is alphanumeric."""
         return bool(re.compile('^[a-zA-Z0-9_]+$').match(input_string))
 
-    def _validate_customization_arg_specs(self, customization_args):
+    # Here we use type Any because the schema has type Any included and this
+    # is just a helper function which requires `schema` as an arguments.
+    def _set_expect_invalid_default_value(
+        self, schema: Dict[str, Any], value: bool = False
+    ) -> None:
+        """Helper function to set expect_invalid_default_value to avoid
+        schema validations for the default value.
+
+        Args:
+            schema: Dict[str, Any]. The schema that needs to be validated.
+            value: bool. The boolean value that needs to be set.
+        """
+        if 'validators' in schema:
+            for validator in schema['validators']:
+                validator['expect_invalid_default_value'] = value
+        if 'items' in schema:
+            if 'validators' in schema['items']:
+                for item_validator in schema['items']['validators']:
+                    item_validator['expect_invalid_default_value'] = value
+
+    def _validate_customization_arg_specs(
+        self, customization_args: List[domain.CustomizationArgSpec]
+    ) -> None:
         """Validates the customization arg specs for the interaction.
 
         Args:
@@ -137,6 +174,7 @@ class InteractionUnitTests(test_utils.GenericTestBase):
             self.assertGreater(len(ca_spec.description), 0)
 
             schema_utils_test.validate_schema(ca_spec.schema)
+            self._set_expect_invalid_default_value(ca_spec.schema, True)
             self.assertEqual(
                 ca_spec.default_value,
                 schema_utils.normalize_against_schema(
@@ -148,19 +186,28 @@ class InteractionUnitTests(test_utils.GenericTestBase):
                 self.assertEqual(
                     ca_spec.default_value,
                     obj_class.normalize(ca_spec.default_value))
+            self._set_expect_invalid_default_value(ca_spec.schema, False)
 
-    def _validate_answer_visualization_specs(self, answer_visualization_specs):
+    def _validate_answer_visualization_specs(
+        self,
+        answer_visualization_specs: List[base.AnswerVisualizationSpecsDict]
+    ) -> None:
         """Validates all the answer_visualization_specs for the interaction.
 
         Args:
             answer_visualization_specs: list(dict(str, *)). The answer
                 visualization specs to be validated.
         """
-        _answer_visualizations_specs_schema = [
+        # Here we use object because every in-built type is inherited from
+        # object class.
+        _answer_visualizations_specs_schema: List[
+            Tuple[AnswerVisualizationsDictKeys, Type[object]]
+        ] = [
             ('id', str),
             ('options', dict),
             ('calculation_id', str),
-            ('addressed_info_is_supported', bool)]
+            ('addressed_info_is_supported', bool)
+        ]
         _answer_visualization_keys = [
             item[0] for item in _answer_visualizations_specs_schema]
 
@@ -172,7 +219,7 @@ class InteractionUnitTests(test_utils.GenericTestBase):
                 if item_type == str:
                     self.assertTrue(spec[key])
 
-    def _listdir_omit_ignored(self, directory):
+    def _listdir_omit_ignored(self, directory: str) -> List[str]:
         """List all files and directories within 'directory', omitting the ones
         whose name ends in one of the IGNORED_FILE_SUFFIXES.
         """
@@ -184,7 +231,7 @@ class InteractionUnitTests(test_utils.GenericTestBase):
             ]
         return names
 
-    def _get_linear_interaction_ids(self):
+    def _get_linear_interaction_ids(self) -> List[str]:
         """Returns the ids of all linear interactions.
 
         Returns:
@@ -197,7 +244,7 @@ class InteractionUnitTests(test_utils.GenericTestBase):
             if interaction_registry.Registry.get_interaction_by_id(
                 interaction_id).is_linear]
 
-    def test_interaction_properties(self):
+    def test_interaction_properties(self) -> None:
         """Test the standard properties of interactions."""
 
         interaction = interaction_registry.Registry.get_interaction_by_id(
@@ -232,17 +279,31 @@ class InteractionUnitTests(test_utils.GenericTestBase):
                 'schema': {
                     'type': 'int',
                     'validators': [{
+                        'expect_invalid_default_value': False,
                         'id': 'is_at_least', 'min_value': 1
                     }, {
+                        'expect_invalid_default_value': False,
                         'id': 'is_at_most', 'max_value': 10
                     }]
                 },
                 'default_value': 1,
-            }])
+            }, {
+                'name': 'catchMisspellings',
+                'description': 'Catch Misspellings (Detect if answer is' +
+                ' misspelled and nudge the learner to correct the' +
+                ' misspelling)',
+                'schema': {
+                    'type': 'bool'
+                },
+                'default_value': False
+            }
+        ])
 
-    def test_interaction_rules(self):
+    def test_interaction_rules(self) -> None:
         """Tests the interaction rules."""
-        def _check_num_interaction_rules(interaction_id, expected_num):
+        def _check_num_interaction_rules(
+            interaction_id: str, expected_num: int
+        ) -> None:
             """Checks the number of rules in the interaction corresponding to
             the given interaction id.
 
@@ -258,10 +319,10 @@ class InteractionUnitTests(test_utils.GenericTestBase):
         _check_num_interaction_rules('MultipleChoiceInput', 1)
         _check_num_interaction_rules('NumericInput', 7)
         _check_num_interaction_rules('Continue', 0)
-        with self.assertRaisesRegexp(KeyError, '\'FakeObjType\''):
+        with self.assertRaisesRegex(KeyError, '\'FakeObjType\''):
             _check_num_interaction_rules('FakeObjType', 0)
 
-    def test_interaction_rule_descriptions_in_dict(self):
+    def test_interaction_rule_descriptions_in_dict(self) -> None:
         """Tests the interaction rule descriptions in dict format."""
         interaction = interaction_registry.Registry.get_interaction_by_id(
             'NumericInput')
@@ -276,7 +337,7 @@ class InteractionUnitTests(test_utils.GenericTestBase):
             'IsWithinTolerance': 'is within {{tol|Real}} of {{x|Real}}'
         })
 
-    def test_html_field_types_to_rule_specs_mapping_are_valid(self):
+    def test_html_field_types_to_rule_specs_mapping_are_valid(self) -> None:
         """Test that the structure of the file html_field_types_to_rule_specs.
         json are valid. This test ensures that whenever any new type of
         interaction or rule type with HTML string is added, the file
@@ -285,7 +346,7 @@ class InteractionUnitTests(test_utils.GenericTestBase):
         # The file having the information about the assembly of the html in the
         # rule specs.
         html_field_types_to_rule_specs_dict = json.loads(
-            python_utils.get_package_file_contents(
+            constants.get_package_file_contents(
                 'extensions',
                 feconf.HTML_FIELD_TYPES_TO_RULE_SPECS_EXTENSIONS_MODULE_PATH))
 
@@ -293,12 +354,14 @@ class InteractionUnitTests(test_utils.GenericTestBase):
         # Contents of the file html_field_types_to_rule_specs.json will be
         # verified against this file.
         rule_descriptions_dict = json.loads(
-            python_utils.get_package_file_contents(
+            constants.get_package_file_contents(
                 'extensions', feconf.RULES_DESCRIPTIONS_EXTENSIONS_MODULE_PATH))
 
         # In the following part, we generate the html_field_types_to_rule_specs
         # dict based on the values in the rule_descriptions.json file.
-        generated_html_field_types_dict = (
+        generated_html_field_types_dict: Dict[
+            str, Dict[str, Dict[str, Dict[str, Dict[str, Set[str]]]]]
+        ] = (
             collections.defaultdict(lambda: collections.defaultdict(
                 lambda: collections.defaultdict(lambda: collections.defaultdict(
                     lambda: collections.defaultdict(set))))))
@@ -324,7 +387,7 @@ class InteractionUnitTests(test_utils.GenericTestBase):
                 # description.
                 input_variables_with_html_type = (
                     re.findall(r'{{([a-z])\|([^}]*)}', description))
-                input_variables = set()
+                input_variables: Set[str] = set()
                 input_variables_to_html_type_mapping_dict = (
                     collections.defaultdict(set))
                 for value in input_variables_with_html_type:
@@ -369,7 +432,7 @@ class InteractionUnitTests(test_utils.GenericTestBase):
             html_field_types_to_rule_specs_dict,
             dict(generated_html_field_types_dict))
 
-    def test_default_interactions_are_valid(self):
+    def test_default_interactions_are_valid(self) -> None:
         """Test that the default interactions are valid."""
 
         all_interaction_ids = (
@@ -389,6 +452,7 @@ class InteractionUnitTests(test_utils.GenericTestBase):
             # The interaction directory should contain the following files:
             #  Required:
             #    * A python file called {InteractionName}.py.
+            #    * A python test file called {InteractionName}_test.py.
             #    * An __init__.py file used to import the Python file.
             #    * A TypeScript file called {InteractionName}.ts.
             #    * If migrated to Angular2+, a module.ts file called
@@ -397,7 +461,7 @@ class InteractionUnitTests(test_utils.GenericTestBase):
             #      for directives
             #    * A directory named 'static' containing at least a .png file.
             #  Optional:
-            #    * A JS file called protractor.js.
+            #    * A JS file called webdriverio.js.
             interaction_dir_contents = (
                 self._listdir_omit_ignored(interaction_dir))
 
@@ -405,7 +469,7 @@ class InteractionUnitTests(test_utils.GenericTestBase):
 
             try:
                 self.assertTrue(os.path.isfile(os.path.join(
-                    interaction_dir, 'protractor.js')))
+                    interaction_dir, 'webdriverio.js')))
                 interaction_dir_optional_dirs_and_files_count += 1
             except Exception:
                 pass
@@ -435,7 +499,7 @@ class InteractionUnitTests(test_utils.GenericTestBase):
                 pass
 
             self.assertEqual(
-                interaction_dir_optional_dirs_and_files_count + 5,
+                interaction_dir_optional_dirs_and_files_count + 6,
                 len(interaction_dir_contents)
             )
 
@@ -546,7 +610,7 @@ class InteractionUnitTests(test_utils.GenericTestBase):
             png_file = os.path.join(
                 interaction_dir, 'static', '%s.png' % interaction_id)
             self.assertTrue(os.path.isfile(png_file))
-            with python_utils.open_file(png_file, 'rb', encoding=None) as f:
+            with utils.open_file(png_file, 'rb', encoding=None) as f:
                 img_data = f.read()
                 width, height = struct.unpack('>LL', img_data[16:24])
                 self.assertEqual(int(width), INTERACTION_THUMBNAIL_WIDTH_PX)
@@ -644,6 +708,10 @@ class InteractionUnitTests(test_utils.GenericTestBase):
             else:
                 # Check that the answer_type corresponds to a valid object
                 # class.
+                # Ruling out the possibility of None answer_type for mypy type
+                # checking, because in the above 'if' clause we are already
+                # checking for None answer_type.
+                assert interaction.answer_type is not None
                 object_registry.Registry.get_object_class_by_type(
                     interaction.answer_type)
 
@@ -715,7 +783,9 @@ class InteractionUnitTests(test_utils.GenericTestBase):
                     self.assertIn(
                         param_obj_cls.__name__, default_object_values)
 
-    def test_trainable_interactions_have_more_than_just_a_classifier(self):
+    def test_trainable_interactions_have_more_than_just_a_classifier(
+        self
+    ) -> None:
         """This ensures that trainable interactions cannot only have a soft
         rule, as that would break frontend functionality (users would not be
         able to create manual answer groups).
@@ -732,13 +802,30 @@ class InteractionUnitTests(test_utils.GenericTestBase):
                         'Expected trainable interaction to have more '
                         'classifier: %s' % interaction_id))
 
-    def test_linear_interactions(self):
+    def test_get_interaction_dependency_ids_correctly(self) -> None:
+        all_interaction_ids = (
+            interaction_registry.Registry.get_all_interaction_ids())
+
+        for interaction_id in all_interaction_ids:
+            interaction = interaction_registry.Registry.get_interaction_by_id(
+                interaction_id)
+            # '_dependency_ids' is a private attribute of Base Interaction
+            # which gets overwritten by the derived interactions. To access it,
+            # we use the property 'dependency_ids'. To check if the property
+            # returns correctly, we are accessing private attribute for this
+            # test.
+            self.assertEqual(
+                interaction.dependency_ids, interaction._dependency_ids) # pylint: disable=protected-access
+
+    def test_linear_interactions(self) -> None:
         """Sanity-check for the number of linear interactions."""
 
         actual_linear_interaction_ids = self._get_linear_interaction_ids()
         self.assertEqual(len(actual_linear_interaction_ids), 1)
 
-    def test_linear_interaction_ids_list_matches_linear_interactions(self):
+    def test_linear_interaction_ids_list_matches_linear_interactions(
+        self
+    ) -> None:
         """Sanity-check the feconf constant which lists all linear interaction
         IDs.
         """
@@ -750,9 +837,9 @@ class InteractionUnitTests(test_utils.GenericTestBase):
 class InteractionDemoExplorationUnitTests(test_utils.GenericTestBase):
     """Test that the interaction demo exploration covers all interactions."""
 
-    _DEMO_EXPLORATION_ID = '16'
+    _DEMO_EXPLORATION_ID: Final = '16'
 
-    def test_interactions_demo_exploration(self):
+    def test_interactions_demo_exploration(self) -> None:
         exp_services.load_demo(self._DEMO_EXPLORATION_ID)
         exploration = exp_fetchers.get_exploration_by_id(
             self._DEMO_EXPLORATION_ID)

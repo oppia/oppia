@@ -20,23 +20,19 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
 import { AlertsService } from 'services/alerts.service';
-import { AnswerClassificationResult }
-  from 'domain/classifier/answer-classification-result.model';
+import { AnswerClassificationResult } from 'domain/classifier/answer-classification-result.model';
 import { AnswerGroup } from 'domain/exploration/AnswerGroupObjectFactory';
 import { AppService } from 'services/app.service';
-import { ExplorationPlayerConstants } from
-  'pages/exploration-player-page/exploration-player-page.constants';
-import { InteractionAnswer } from 'interactions/answer-defs';
+import { ExplorationPlayerConstants } from 'pages/exploration-player-page/exploration-player-page.constants';
+import { InteractionAnswer, TextInputAnswer } from 'interactions/answer-defs';
 import { Interaction } from 'domain/exploration/InteractionObjectFactory';
 import { InteractionSpecsService } from 'services/interaction-specs.service';
 import { Outcome } from 'domain/exploration/OutcomeObjectFactory';
-import { PredictionAlgorithmRegistryService }
-  // eslint-disable-next-line max-len
-  from 'pages/exploration-player-page/services/prediction-algorithm-registry.service';
+import { PredictionAlgorithmRegistryService } from 'pages/exploration-player-page/services/prediction-algorithm-registry.service';
 import { State } from 'domain/state/StateObjectFactory';
-import { StateClassifierMappingService } from
-  'pages/exploration-player-page/services/state-classifier-mapping.service';
-import { InteractionRuleInputs } from 'interactions/rule-input-defs';
+import { StateClassifierMappingService } from 'pages/exploration-player-page/services/state-classifier-mapping.service';
+import { InteractionRuleInputs, TranslatableSetOfNormalizedString } from 'interactions/rule-input-defs';
+
 
 export interface InteractionRulesService {
   [ruleName: string]: (
@@ -68,8 +64,9 @@ export class AnswerClassificationService {
   private classifyAnswer(
       answer: InteractionAnswer,
       answerGroups: AnswerGroup[],
-      defaultOutcome: Outcome,
-      interactionRulesService): AnswerClassificationResult {
+      defaultOutcome: Outcome | null,
+      interactionRulesService: InteractionRulesService
+  ): AnswerClassificationResult {
     // Find the first group that contains a rule which returns true
     // TODO(bhenning): Implement training data classification.
     for (var i = 0; i < answerGroups.length; ++i) {
@@ -93,6 +90,8 @@ export class AnswerClassificationService {
     } else {
       this.alertsService.addWarning(
         'Something went wrong with the exploration.');
+      throw new Error(
+        'No defaultOutcome was available to classify the answer.');
     }
   }
 
@@ -133,9 +132,12 @@ export class AnswerClassificationService {
 
     const ruleBasedOutcomeIsDefault = (
       answerClassificationResult.outcome === defaultOutcome);
-    const interactionIsTrainable =
-      this.interactionSpecsService.isInteractionTrainable(
-        interactionInOldState.id);
+    let interactionIsTrainable = false;
+    if (interactionInOldState.id !== null) {
+      interactionIsTrainable = (
+        this.interactionSpecsService.isInteractionTrainable(
+          interactionInOldState.id));
+    }
 
     if (ruleBasedOutcomeIsDefault && interactionIsTrainable) {
       for (var i = 0; i < answerGroups.length; ++i) {
@@ -167,7 +169,7 @@ export class AnswerClassificationService {
             if (predictedAnswerGroupIndex === -1) {
               answerClassificationResult = (
                 new AnswerClassificationResult(
-                  defaultOutcome, answerGroups.length, 0,
+                  defaultOutcome as Outcome, answerGroups.length, 0,
                   ExplorationPlayerConstants.DEFAULT_OUTCOME_CLASSIFICATION));
             } else {
               answerClassificationResult = (
@@ -182,6 +184,75 @@ export class AnswerClassificationService {
     }
 
     return answerClassificationResult;
+  }
+
+  checkForMisspellings(
+      answer: TextInputAnswer, inputStrings: string[]
+  ): boolean {
+    const normalizedAnswer = answer.toLowerCase();
+    const normalizedInput = inputStrings.map(
+      input => input.toLowerCase());
+    return normalizedInput.some(
+      input => this.checkEditDistance(
+        input, normalizedAnswer,
+        ExplorationPlayerConstants.THRESHOLD_EDIT_DISTANCE_FOR_MISSPELLINGS));
+  }
+
+  checkEditDistance(
+      inputString: string,
+      matchString: string,
+      requiredEditDistance: number
+  ): boolean {
+    if (inputString === matchString) {
+      return true;
+    }
+    var editDistance = [];
+    for (var i = 0; i <= inputString.length; i++) {
+      editDistance.push([i]);
+    }
+    for (var j = 1; j <= matchString.length; j++) {
+      editDistance[0].push(j);
+    }
+    for (var i = 1; i <= inputString.length; i++) {
+      for (var j = 1; j <= matchString.length; j++) {
+        if (inputString.charAt(i - 1) === matchString.charAt(j - 1)) {
+          editDistance[i][j] = editDistance[i - 1][j - 1];
+        } else {
+          editDistance[i][j] = Math.min(
+            editDistance[i - 1][j - 1], editDistance[i][j - 1],
+            editDistance[i - 1][j]) + 1;
+        }
+      }
+    }
+    return (
+      editDistance[inputString.length][matchString.length] <=
+      requiredEditDistance);
+  }
+
+  isAnswerOnlyMisspelled(
+      interaction: Interaction,
+      answer: string
+  ): boolean {
+    var answerIsMisspelled = false;
+    const answerGroups = interaction.answerGroups;
+    for (var i = 0; i < answerGroups.length; ++i) {
+      const answerGroup = answerGroups[i];
+      if (answerGroup.outcome.labelledAsCorrect) {
+        for (var j = 0; j < answerGroup.rules.length; ++j) {
+          let rule = answerGroup.rules[j];
+          let inputStrings = (
+            rule.inputs.x as TranslatableSetOfNormalizedString)
+            .normalizedStrSet;
+          if (this.checkForMisspellings(
+            answer,
+            inputStrings
+          )) {
+            return true;
+          }
+        }
+      }
+    }
+    return answerIsMisspelled;
   }
 
   isClassifiedExplicitlyOrGoesToNewState(

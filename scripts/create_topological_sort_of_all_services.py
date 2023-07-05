@@ -22,25 +22,23 @@ from __future__ import annotations
 
 import collections
 import os
-import sys
-from core import python_utils
 
-_PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
+from core import utils
 
-_PATHS_TO_INSERT = [
-    os.path.join(_PARENT_DIR, 'oppia_tools', 'esprima-4.0.1'),
-]
+import esprima
+from typing import Dict, List, Tuple
 
-for path in _PATHS_TO_INSERT:
-    sys.path.insert(0, path)
-
-import esprima # isort:skip  pylint: disable=wrong-import-position
 
 DIRECTORY_NAMES = ['core/templates', 'extensions']
 SERVICE_FILES_SUFFICES = ('.service.ts', 'Service.ts', 'Factory.ts')
 
 
-def dfs(node, topo_sort_stack, adj_list, visit_stack):
+def dfs(
+    node: str,
+    topo_sort_stack: List[str],
+    adj_list: Dict[str, List[str]],
+    visit_stack: List[str]
+) -> None:
     """Depth First Search starting with node.
 
     Args:
@@ -58,23 +56,23 @@ def dfs(node, topo_sort_stack, adj_list, visit_stack):
     topo_sort_stack.append(node)
 
 
-def make_graph():
+def make_graph() -> Tuple[Dict[str, List[str]], List[str]]:
     """Creates an adjaceny list considering services as node and dependencies
     as edges.
 
     Returns:
-        tuple(dict, set(str)). Adjancency list of the graph formed with
-        services as nodes and dependencies as edges, set of all the services.
+        tuple(dict, list(str)). Adjancency list of the graph formed with
+        services as nodes and dependencies as edges, list of all the services.
     """
     adj_list = collections.defaultdict(list)
-    nodes_set = set()
+    nodes_list = []
     for dirname in DIRECTORY_NAMES:
         for root, _, filenames in os.walk(dirname):
             for filename in filenames:
                 if filename.endswith(SERVICE_FILES_SUFFICES):
-                    nodes_set.add(filename)
+                    nodes_list.append(filename)
                     filepath = os.path.join(root, filename)
-                    with python_utils.open_file(filepath, 'r') as f:
+                    with utils.open_file(filepath, 'r') as f:
                         file_lines = f.readlines()
 
                     dep_lines = ''
@@ -107,41 +105,43 @@ def make_graph():
                     parsed_script = esprima.parseScript(dep_lines, comment=True)
                     parsed_nodes = parsed_script.body
                     for parsed_node in parsed_nodes:
-                        # For require statements.
-                        if parsed_node.type == 'ExpressionStatement' and (
-                                parsed_node.expression.callee.name == (
-                                    'require')):
-                            arguments = parsed_node.expression.arguments
-                            for argument in arguments:
-                                dep_path = argument.value
-                                if argument.operator == '+':
-                                    dep_path = (
-                                        argument.left.value +
-                                        argument.right.value)
-                                if not dep_path.endswith('.ts'):
-                                    dep_path = dep_path + '.ts'
-                                if dep_path.endswith(SERVICE_FILES_SUFFICES):
-                                    dep_name = os.path.basename(dep_path)
-                                    adj_list[dep_name].append(filename)
+                        # We make sure that 'dep_lines' contains only the
+                        # expressions beginning with the 'require' keyword.
+                        # Hence the below assert statements always hold.
+                        assert parsed_node.type == 'ExpressionStatement'
+                        assert parsed_node.expression.callee.name == (
+                            'require')
+                        arguments = parsed_node.expression.arguments
+                        for argument in arguments:
+                            dep_path = argument.value
+                            if argument.operator == '+':
+                                dep_path = (
+                                    argument.left.value +
+                                    argument.right.value)
+                            if not dep_path.endswith('.ts'):
+                                dep_path = dep_path + '.ts'
+                            if dep_path.endswith(SERVICE_FILES_SUFFICES):
+                                dep_name = os.path.basename(dep_path)
+                                adj_list[dep_name].append(filename)
 
-    return (adj_list, nodes_set)
+    return (adj_list, nodes_list)
 
 
-def main():
+def main() -> None:
     """Prints the topological order of the services based on the
     dependencies.
     """
-    adj_list, nodes_set = make_graph()
-    visit_stack = []
-    topo_sort_stack = []
-
-    for unchecked_node in nodes_set:
+    adj_list, nodes_list = make_graph()
+    visit_stack: List[str] = []
+    topo_sort_stack: List[str] = []
+    nodes_list.sort()
+    for unchecked_node in nodes_list:
         if unchecked_node not in visit_stack:
             dfs(unchecked_node, topo_sort_stack, adj_list, visit_stack)
 
     topo_sort_stack.reverse()
     for service in topo_sort_stack:
-        python_utils.PRINT(service)
+        print(service)
 
 
 # The 'no coverage' pragma is used as this line is un-testable. This is because

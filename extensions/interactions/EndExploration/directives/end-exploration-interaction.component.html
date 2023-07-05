@@ -1,5 +1,5 @@
-<div ng-if="$ctrl.isInEditorPage" class="oppia-error-message-text">
-  <span><[$ctrl.errorMessage]></span>
+<div *ngIf="isInEditorPage" class="oppia-error-message-text">
+  <span>{{ errorMessage }}</span>
 </div>
 
 <style>

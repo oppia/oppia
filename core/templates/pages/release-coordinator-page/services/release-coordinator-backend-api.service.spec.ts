@@ -20,9 +20,7 @@ import { HttpClientTestingModule, HttpTestingController } from
   '@angular/common/http/testing';
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
-import { JobsData, JobsDataBackendDict, ReleaseCoordinatorBackendApiService } from './release-coordinator-backend-api.service';
-import { Job } from 'domain/admin/job.model';
-import { JobStatusSummary } from 'domain/admin/job-status-summary.model';
+import { ReleaseCoordinatorBackendApiService } from './release-coordinator-backend-api.service';
 import { CsrfTokenService } from 'services/csrf-token.service';
 import { BeamJobRun } from 'domain/jobs/beam-job-run.model';
 import { BeamJob } from 'domain/jobs/beam-job.model';
@@ -31,17 +29,9 @@ import { BeamJobRunResult } from 'domain/jobs/beam-job-run-result.model';
 describe('Release coordinator backend api service', () => {
   let rcbas: ReleaseCoordinatorBackendApiService;
   let httpTestingController: HttpTestingController;
-  let csrfService: CsrfTokenService = null;
-  let successHandler = null;
-  let failHandler = null;
-  let jobsDataBackendResponse: JobsDataBackendDict = {
-    unfinished_job_data: [],
-    one_off_job_status_summaries: [],
-    human_readable_current_time: 'June 03 15:31:20',
-    audit_job_status_summaries: [],
-    recent_job_data: [],
-  };
-  let jobsData: JobsData;
+  let csrfService: CsrfTokenService;
+  let successHandler: jasmine.Spy<jasmine.Func>;
+  let failHandler: jasmine.Spy<jasmine.Func>;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -53,20 +43,6 @@ describe('Release coordinator backend api service', () => {
     csrfService = TestBed.get(CsrfTokenService);
     successHandler = jasmine.createSpy('success');
     failHandler = jasmine.createSpy('fail');
-    jobsData = {
-      oneOffJobStatusSummaries:
-       jobsDataBackendResponse.one_off_job_status_summaries.map(
-         JobStatusSummary.createFromBackendDict),
-      humanReadableCurrentTime:
-       jobsDataBackendResponse.human_readable_current_time,
-      auditJobStatusSummaries:
-       jobsDataBackendResponse.audit_job_status_summaries.map(
-         JobStatusSummary.createFromBackendDict),
-      unfinishedJobData: jobsDataBackendResponse.unfinished_job_data.map(
-        Job.createFromBackendDict),
-      recentJobData: jobsDataBackendResponse.recent_job_data.map(
-        Job.createFromBackendDict),
-    };
 
     spyOn(csrfService, 'getTokenAsync').and.callFake(async() => {
       return Promise.resolve('sample-csrf-token');
@@ -76,132 +52,6 @@ describe('Release coordinator backend api service', () => {
   afterEach(() => {
     httpTestingController.verify();
   });
-
-  it('should fetch the jobs data', fakeAsync(() => {
-    rcbas.getJobsDataAsync().then((adminData) => {
-      expect(adminData).toEqual(jobsData);
-    });
-
-    let req = httpTestingController.expectOne('/jobshandler');
-    expect(req.request.method).toEqual('GET');
-    req.flush(jobsDataBackendResponse);
-
-    flushMicrotasks();
-  }));
-
-  it('should use the rejection handler if the backend request failed.',
-    fakeAsync(() => {
-      rcbas.getJobsDataAsync().then(successHandler, failHandler);
-
-      var req = httpTestingController.expectOne(
-        '/jobshandler');
-      expect(req.request.method).toEqual('GET');
-
-      req.flush({
-        error: 'Some error in the backend.'
-      }, {
-        status: 500, statusText: 'Internal Server Error'
-      });
-      flushMicrotasks();
-
-      expect(successHandler).not.toHaveBeenCalled();
-      expect(failHandler).toHaveBeenCalledWith('Some error in the backend.');
-    })
-  );
-
-  it('should request to start a new job when calling startNewJobAsync',
-    fakeAsync(() => {
-      let jobType = 'ActivityContributorsSummaryOneOffJob';
-      let payload = {
-        action: 'start_new_job',
-        job_type: jobType
-      };
-      rcbas.startNewJobAsync(jobType).then(successHandler, failHandler);
-
-      let req = httpTestingController.expectOne('/jobshandler');
-      expect(req.request.method).toEqual('POST');
-      expect(req.request.body).toEqual(payload);
-      req.flush(200);
-      flushMicrotasks();
-
-      expect(successHandler).toHaveBeenCalled();
-      expect(failHandler).not.toHaveBeenCalled();
-    }));
-
-  it('should request to cancel the job given its id' +
-   'and type when calling cancelJobAsync', fakeAsync(() => {
-    let jobId = 'AuditContributorsOneOffJob-1608291840709-843';
-    let jobType = 'AuditContributorsOneOffJob';
-    let payload = {
-      action: 'cancel_job',
-      job_id: jobId,
-      job_type: jobType
-    };
-    rcbas.cancelJobAsync(jobId, jobType).then(successHandler, failHandler);
-
-    let req = httpTestingController.expectOne('/jobshandler');
-    expect(req.request.method).toEqual('POST');
-    expect(req.request.body).toEqual(payload);
-    req.flush(200);
-    flushMicrotasks();
-
-    expect(successHandler).toHaveBeenCalled();
-    expect(failHandler).not.toHaveBeenCalled();
-  }));
-
-  it('should request to show the output of valid' +
-   'jobs when calling showJobOutputAsync', fakeAsync(() => {
-    let jobId = 'UserSettingsModelAuditOneOffJob-1609088541992-314';
-    let adminJobOutputUrl = '/joboutputhandler?job_id=' +
-     'UserSettingsModelAuditOneOffJob-1609088541992-314';
-    let jobOutput = {output: ['[u\'fully-validated UserSettingsModel\', 1]']};
-    rcbas.fetchJobOutputAsync(jobId).then(successHandler, failHandler);
-
-    let req = httpTestingController.expectOne(adminJobOutputUrl);
-    expect(req.request.method).toEqual('GET');
-    req.flush(jobOutput);
-    flushMicrotasks();
-
-    expect(successHandler).toHaveBeenCalledWith(jobOutput.output);
-    expect(failHandler).not.toHaveBeenCalled();
-  }));
-
-  it('should request to show the sorted output of valid' +
-   'jobs when calling showJobOutputAsync', fakeAsync(() => {
-    let jobId = 'UserSettingsModelAuditOneOffJob-1609088541992-314';
-    let adminJobOutputUrl = '/joboutputhandler?job_id=' +
-     'UserSettingsModelAuditOneOffJob-1609088541992-314';
-    let jobOutput = {output: ['[u\'SUCCESS_KEPT\', 1]',
-      '[u\'SUCCESS_DELETED\', 1]']};
-    rcbas.fetchJobOutputAsync(jobId).then(successHandler, failHandler);
-
-    let req = httpTestingController.expectOne(adminJobOutputUrl);
-    expect(req.request.method).toEqual('GET');
-    req.flush(jobOutput);
-    flushMicrotasks();
-
-    expect(successHandler).toHaveBeenCalledWith(jobOutput.output.sort());
-    expect(failHandler).not.toHaveBeenCalled();
-  }));
-
-  it('should fail to show the output of invalid' +
-   'jobs when calling showJobOutputAsync', fakeAsync(() => {
-    let jobId = 'Invalid jobId';
-    let adminJobOutputUrl = '/joboutputhandler?job_id=Invalid%20jobId';
-    rcbas.fetchJobOutputAsync(jobId).then(successHandler, failHandler);
-
-    let req = httpTestingController.expectOne(adminJobOutputUrl);
-    expect(req.request.method).toEqual('GET');
-    req.flush({
-      error: 'Internal Server Error'
-    }, {
-      status: 500, statusText: 'NoneType object has no attribute output'
-    });
-    flushMicrotasks();
-
-    expect(successHandler).not.toHaveBeenCalled();
-    expect(failHandler).toHaveBeenCalledWith('Internal Server Error');
-  }));
 
   it('should flush the memory cache when calling' +
    'flushMemoryCacheAsync', fakeAsync(() => {

@@ -1,0 +1,74 @@
+<div class="modal-header">
+  <h3 *ngIf="topicsAssignmentsAreFetched">
+    Are you sure you want to remove the question from this skill?
+  </h3>
+  <h3 *ngIf="!topicsAssignmentsAreFetched">
+    Checking whether the question can be removed ...
+  </h3>
+</div>
+<div class="loading-spinner" *ngIf="!topicsAssignmentsAreFetched">
+  <mat-spinner [diameter]="30"></mat-spinner>
+</div>
+<div class="modal-body" *ngIf="!questionRemovalIsAllowed">
+  <div *ngIf="!canEditQuestion">
+    <p>User does not have enough rights to remove the question.</p>
+  </div>
+  <div *ngIf="canEditQuestion">
+    <p>
+      The question cannot be removed because the given skill is assigned to
+      the diagnostic
+      <span *ngIf="topicsCount === 1">test</span>
+      <span *ngIf="topicsCount > 1">tests</span>
+      of the following
+      <span *ngIf="topicsCount === 1">topic,</span>
+      <span *ngIf="topicsCount > 1">topics,</span>
+      and there are only 2 questions or fewer available for that skill.
+    </p>
+    <ul>
+      <li *ngFor="let topic of topicNameToTopicId | keyvalue">
+        <a [href]="getTopicEditorUrl(topic.value)" target="_blank" rel="noopener">
+          {{ topic.key }}
+        </a>
+      </li>
+    </ul>
+    <p>
+      Please remove the skill from the above
+      <span *ngIf="topicsCount === 1">topic</span>
+      <span *ngIf="topicsCount > 1">topics</span>
+      first, then perform this operation.
+    </p>
+  </div>
+</div>
+<div class="modal-footer">
+  <button class="btn btn-secondary" (click)="cancel()">Cancel</button>
+  <button class="btn btn-danger"
+          (click)="confirm()"
+          [disabled]="!topicsAssignmentsAreFetched"
+          *ngIf="questionRemovalIsAllowed">
+    <span>Remove Question</span>
+  </button>
+</div>
+
+<style>
+  .loading-spinner {
+    margin-left: 45%;
+  }
+  @media screen and (max-width: 768px) {
+    .remove-question-skill-link-modal .modal-dialog {
+      border: 0;
+      border-radius: 0;
+      margin: 0 auto;
+      padding: 0;
+      width: 95vw;
+    }
+    .remove-question-skill-link-modal .modal-header {
+      display: inline-block;
+      padding: 10px 15px;
+    }
+    .remove-question-skill-link-modal .modal-content {
+      border: 0;
+      border-radius: 0;
+      top: 20vh;
+    }
+  }
+</style>

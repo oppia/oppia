@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for state interaction stats service.
  */
 
-import { TestBed, flushMicrotasks, fakeAsync } from '@angular/core/testing';
+import { TestBed, flushMicrotasks, fakeAsync, tick } from '@angular/core/testing';
 import { HttpClientTestingModule, HttpTestingController } from
   '@angular/common/http/testing';
 
@@ -82,13 +82,14 @@ describe('State Interaction Stats Service', () => {
             }],
             outcome: {
               dest: 'Me Llamo',
+              dest_if_really_stuck: null,
               feedback: {content_id: 'feedback_1', html: '¡Buen trabajo!'},
               labelled_as_correct: true,
               param_changes: [],
               refresher_exploration_id: null,
               missing_prerequisite_skill_id: null,
             },
-            training_data: null,
+            training_data: [],
             tagged_skill_misconception_id: null,
           },
           {
@@ -101,13 +102,14 @@ describe('State Interaction Stats Service', () => {
             }],
             outcome: {
               dest: 'Me Llamo',
+              dest_if_really_stuck: null,
               feedback: {content_id: 'feedback_1', html: '¡Buen trabajo!'},
               labelled_as_correct: true,
               param_changes: [],
               refresher_exploration_id: null,
               missing_prerequisite_skill_id: null,
             },
-            training_data: null,
+            training_data: [],
             tagged_skill_misconception_id: null,
           },
           {
@@ -120,13 +122,14 @@ describe('State Interaction Stats Service', () => {
             }],
             outcome: {
               dest: 'Me Llamo',
+              dest_if_really_stuck: null,
               feedback: {content_id: 'feedback_1', html: '¡Buen trabajo!'},
               labelled_as_correct: true,
               param_changes: [],
               refresher_exploration_id: null,
               missing_prerequisite_skill_id: null,
             },
-            training_data: null,
+            training_data: [],
             tagged_skill_misconception_id: null,
           }
         ],
@@ -138,10 +141,14 @@ describe('State Interaction Stats Service', () => {
               unicode_str: ''
             }
           },
-          rows: { value: 1 }
+          rows: { value: 1 },
+          catchMisspellings: {
+            value: false
+          }
         },
         default_outcome: {
           dest: 'Hola',
+          dest_if_really_stuck: null,
           feedback: {content_id: 'default_outcome', html: ''},
           labelled_as_correct: true,
           param_changes: [],
@@ -162,11 +169,7 @@ describe('State Interaction Stats Service', () => {
       param_changes: [],
       solicit_answer_details: false,
       card_is_checkpoint: false,
-      written_translations: {
-        translations_mapping: {}
-      },
       linked_skill_id: null,
-      next_content_id_index: 0
     };
 
     mockState = stateObjectFactory.createFromBackendDict('Hola', stateDict);
@@ -177,6 +180,26 @@ describe('State Interaction Stats Service', () => {
       stateInteractionStatsService.stateSupportsImprovementsOverview(mockState)
     ).toBeTrue();
   });
+
+  it('should throw error if state name does not exist',
+    fakeAsync(async() => {
+      mockState.name = null;
+
+      expect(() => {
+        stateInteractionStatsService.computeStatsAsync(expId, mockState);
+        tick();
+      }).toThrowError();
+    }));
+
+  it('should throw error if interaction id does not exist',
+    fakeAsync(async() => {
+      mockState.interaction.id = null;
+
+      expect(() => {
+        stateInteractionStatsService.computeStatsAsync(expId, mockState);
+        tick();
+      }).toThrowError();
+    }));
 
   describe('when gathering stats from the backend', () => {
     it('should provide cached results after first call', fakeAsync(() => {

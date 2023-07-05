@@ -19,7 +19,6 @@
 import 'core-js/es7/reflect';
 import 'zone.js';
 
-import 'angular-ui-sortable';
 import uiValidate from 'angular-ui-validate';
 import 'third-party-imports/ui-codemirror.import';
 import 'third-party-imports/ui-tree.import';
@@ -27,7 +26,7 @@ import 'third-party-imports/ui-tree.import';
 angular.module('oppia', [
   require('angular-cookies'), 'ngAnimate',
   'ngMaterial', 'ngSanitize', 'ngTouch', 'pascalprecht.translate',
-  'ui.bootstrap', 'ui.sortable', 'ui.tree', uiValidate
+  'ui.bootstrap', 'ui.tree', uiValidate
 ]);
 
 require('Polyfills.ts');
@@ -38,5 +37,5 @@ require('pages/skill-editor-page/skill-editor-page.module.ts');
 require('App.ts');
 require('base-components/oppia-root.directive.ts');
 
-require('pages/skill-editor-page/navbar/skill-editor-navbar.directive.ts');
+require('pages/skill-editor-page/navbar/skill-editor-navbar.component.ts');
 require('pages/skill-editor-page/skill-editor-page.component.ts');

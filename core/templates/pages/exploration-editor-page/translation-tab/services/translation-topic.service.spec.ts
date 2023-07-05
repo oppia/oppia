@@ -29,10 +29,10 @@ import { fakeAsync, TestBed } from '@angular/core/testing';
 
 
 describe('Translation topic service', () => {
-  var $flushPendingTasks = null;
+  let $flushPendingTasks: () => void;
   let $q = null;
 
-  let loggerService: LoggerService = null;
+  let loggerService: LoggerService;
   let translationTopicService: TranslationTopicService;
   let contributionOpportunitiesService: ContributionOpportunitiesService;
 
@@ -48,7 +48,7 @@ describe('Translation topic service', () => {
     translationTopicService = TestBed.get(TranslationTopicService);
     contributionOpportunitiesService = TestBed.get(
       ContributionOpportunitiesService);
-    spyOn(contributionOpportunitiesService, 'getAllTopicNamesAsync')
+    spyOn(contributionOpportunitiesService, 'getTranslatableTopicNamesAsync')
       .and.returnValue($q.resolve(['Topic 1', 'Topic 2']));
   }));
 
@@ -66,15 +66,20 @@ describe('Translation topic service', () => {
       translationTopicService.setActiveTopicName('Topic 3');
       $flushPendingTasks();
       expect(
-        translationTopicService.getActiveTopicName()).toBeNull();
+        translationTopicService.getActiveTopicName()).toBeUndefined();
       expect(logErrorSpy).toHaveBeenCalledWith(
         'Invalid active topic name: Topic 3'
       );
 
+      // This throws "Argument of type 'null' is not assignable to parameter
+      // of type 'string'" We need to suppress this error because of the need
+      // to test validations. This error is thrown because the topic name is
+      // null.
+      // @ts-ignore
       translationTopicService.setActiveTopicName(null);
       $flushPendingTasks();
       expect(
-        translationTopicService.getActiveTopicName()).toBeNull();
+        translationTopicService.getActiveTopicName()).toBeUndefined();
     });
 
     it('should emit the new topic name', () => {

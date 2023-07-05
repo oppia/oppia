@@ -17,7 +17,7 @@
  */
 
 import { Component, NO_ERRORS_SCHEMA } from '@angular/core';
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { SaveValidationFailModalComponent } from './save-validation-fail-modal.component';
@@ -54,9 +54,8 @@ class MockWindowRef {
         if (this._hashChange === null) {
           return;
         }
-        this._hashChange();
       },
-      reload: (val) => val
+      reload: (val: number) => val
     },
     get onhashchange() {
       return this.location._hashChange;
@@ -66,6 +65,7 @@ class MockWindowRef {
       this.location._hashChange = val;
     }
   };
+
   get nativeWindow() {
     return this._window;
   }
@@ -106,23 +106,27 @@ describe('Save Validation Fail Modal Component', () => {
     fixture.detectChanges();
   });
 
-  it('should refresh page when modal is closed', () => {
+  it('should refresh page when modal is closed', fakeAsync(() => {
     const reloadSpy = jasmine.createSpy('reload');
     const dismissSpy = spyOn(ngbActiveModal, 'dismiss').and.callThrough();
 
     spyOnProperty(windowRef, 'nativeWindow').and.returnValue({
       location: {
-        reload: reloadSpy
-      }
+        _hash: '',
+        _hashChange: null,
+        hash: '',
+        reload: reloadSpy,
+      },
+      onhashchange: null,
     });
 
     component.closeAndRefresh();
 
-    waitForAsync(() => {
-      expect(dismissSpy).toHaveBeenCalledWith('cancel');
-      expect(reloadSpy).toHaveBeenCalled();
-    });
-  });
+    tick(20);
+
+    expect(dismissSpy).toHaveBeenCalledWith('cancel');
+    expect(reloadSpy).toHaveBeenCalled();
+  }));
 
 
   it('should contain correct modal header', () => {

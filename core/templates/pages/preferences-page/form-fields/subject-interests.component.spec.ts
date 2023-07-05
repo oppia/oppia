@@ -21,6 +21,7 @@ import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MaterialModule } from 'modules/material.module';
+import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { SubjectInterestsComponent } from './subject-interests.component';
 
 describe('Subject interests form field Component', () => {
@@ -36,6 +37,7 @@ describe('Subject interests form field Component', () => {
         ReactiveFormsModule
       ],
       declarations: [
+        MockTranslatePipe,
         SubjectInterestsComponent
       ]
     }).compileComponents();

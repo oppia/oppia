@@ -1,0 +1,247 @@
+.oppia-learner-group-preferences {
+  margin: 40px auto 0;
+  margin-bottom: 40px;
+  text-align: left;
+  width: 80%;
+}
+
+.oppia-learner-group-preferences .preferences-tab-title-section {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.oppia-learner-group-preferences .preferences-tab-title {
+  color: #00645c;
+  font-size: 24px;
+  font-weight: 500;
+  line-height: 36px;
+}
+
+.oppia-learner-group-preferences .delete-group-button {
+  background: transparent;
+  border: solid 1.5px #a53417;
+  border-radius: 4px;
+  color: #a53417;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 700;
+  padding: 6px 26px;
+  text-align: center;
+}
+
+.oppia-learner-group-preferences .preferences-tab-sections {
+  background: #fff;
+  border-radius: 4px;
+  box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.1);
+  padding: 30px;
+}
+
+.oppia-learner-group-preferences .preferences-tab-sections-header {
+  border-bottom: 1px solid #e6e6e6;
+  display: flex;
+  justify-content: space-around;
+}
+
+.oppia-learner-group-preferences .preferences-tab-sections-header-title {
+  cursor: pointer;
+  font-weight: 500;
+  padding-bottom: 10px;
+}
+
+.oppia-learner-group-preferences .preferences-tab-sections-header-title.active {
+  border-bottom: 3px solid #33978f;
+  color: #015952;
+}
+
+.oppia-learner-group-preferences .preferences-tab-sections .btn-primary {
+  background: #00609c;
+  font-size: 18px;
+  font-weight: 500;
+  justify-self: right;
+  margin-top: 40px;
+  padding: 7px 36px;
+}
+
+.oppia-learner-group-preferences .preferences-tab-sections .group-details-save-button {
+  background: #27635c;
+}
+
+.oppia-learner-group-preferences .edit-learner-group-details-section,
+.oppia-learner-group-preferences .edit-learner-group-learners-section {
+  display: grid;
+  margin-top: 40px;
+}
+
+.oppia-learner-group-preferences .edit-learner-group-learners-section .btn-primary {
+  margin-top: unset;
+}
+
+.invite-learners-modal .modal-body {
+  padding: 30px;
+}
+
+.invite-learners-modal .modal-footer {
+  border-top: unset;
+  padding: 0 30px 30px;
+}
+
+.invite-learners-modal .modal-dialog {
+  margin: 200px auto;
+}
+
+.oppia-learner-group-preferences .group-learners-title {
+  color: #00609c;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.oppia-learner-group-preferences .current-group-learners {
+  margin-bottom: 20px;
+}
+
+.oppia-learner-group-preferences .group-learners-card {
+  align-items: center;
+  border: 1px solid #e6e6e6;
+  border-radius: 4px;
+  box-shadow: 3px 3px 6px rgb(0 0 0 / 5%);
+  display: flex;
+  font-weight: 500;
+  gap: 10px;
+  justify-content: space-between;
+  margin-top: 8px;
+  padding: 10px 30px;
+}
+
+.oppia-learner-group-preferences .group-learners-card .group-learners-card-avatar {
+  border-radius: 50%;
+  height: 40px;
+  width: 40px;
+}
+
+.oppia-learner-group-preferences .group-learners-card-info {
+  align-items: center;
+  display: flex;
+  font-size: 14px;
+  gap: 10px;
+}
+
+.oppia-learner-group-preferences .group-learners-card-buttons {
+  display: flex;
+  font-size: 14px;
+  gap: 20px;
+}
+
+.oppia-learner-group-preferences .group-learners-card-button {
+  align-items: center;
+  color: #00609c;
+  cursor: pointer;
+  display: flex;
+  font-size: 14px;
+  gap: 5px;
+}
+
+.oppia-learner-group-preferences .current-group-learners .group-learners-card {
+  background: #e5eef4;
+  border-color: #e5eef4;
+}
+
+.oppia-learner-group-preferences .no-learners-text {
+  color: #9e9e9e;
+  font-size: 14px;
+  margin-top: 20px;
+  text-align: center;
+}
+
+.remove-learner-modal .modal-dialog,
+.withdraw-learner-invitation-modal .modal-dialog,
+.invite-successful-modal .modal-dialog,
+.delete-learner-group-modal .modal-dialog {
+  margin: 200px auto;
+}
+
+.remove-learner-modal .modal-header,
+.withdraw-learner-invitation-modal .modal-header,
+.delete-learner-group-modal .modal-header {
+  border-bottom: unset;
+  padding-left: 40px
+}
+
+.remove-learner-modal .modal-body,
+.withdraw-learner-invitation-modal .modal-body,
+.delete-learner-group-modal .modal-body {
+  padding: 0 40px 30px;
+}
+
+.remove-learner-modal .modal-footer,
+.withdraw-learner-invitation-modal .modal-footer,
+.delete-learner-group-modal .modal-footer {
+  border-top: unset;
+  padding-bottom: 40px;
+  padding-right: 40px;
+}
+
+.invite-successful-modal .modal-content,
+.invite-successful-modal .modal-dialog {
+  min-width: unset;
+}
+
+.invite-successful-modal .modal-header {
+  border-bottom: unset;
+  min-height: unset;
+  padding: unset;
+}
+
+.invite-successful-modal .modal-body {
+  padding: 50px;
+}
+
+.invite-successful-modal .close {
+  cursor: pointer;
+  font-size: 2.7rem;
+  font-weight: 400;
+  position: absolute;
+  right: 15px;
+  top: 15px;
+}
+
+@media screen and (max-width: 940px) {
+  .oppia-learner-group-preferences {
+    width: 90%;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .oppia-learner-group-preferences {
+    background: #fff;
+    margin-top: 0;
+    padding: 20px;
+    width: 100%;
+  }
+
+  .oppia-learner-group-preferences .preferences-tab-title {
+    font-size: 20px;
+    line-height: 28px;
+  }
+
+  .oppia-learner-group-preferences .preferences-tab-sections {
+    box-shadow: unset;
+    padding: unset;
+  }
+
+  .oppia-learner-group-preferences .current-group-learners {
+    margin-top: 20px;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .oppia-learner-group-preferences .preferences-tab-title {
+    display: none;
+  }
+
+  .oppia-learner-group-preferences .delete-group-button-container,
+  .oppia-learner-group-preferences .delete-group-button {
+    width: 100%;
+  }
+}

@@ -24,7 +24,7 @@ import { FractionInputValidationService } from
   'interactions/FractionInput/directives/fraction-input-validation.service';
 import { Outcome, OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory';
-import { Rule, RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
+import { Rule } from 'domain/exploration/rule.model';
 import { TestBed } from '@angular/core/testing';
 import { FractionInputCustomizationArgs } from 'interactions/customization-args-defs';
 import { FractionDict } from 'domain/objects/fraction.model';
@@ -54,13 +54,11 @@ describe('FractionInputValidationService', () => {
         numerator: number, denominator: number) => FractionDict;
   let oof: OutcomeObjectFactory;
   let agof: AnswerGroupObjectFactory;
-  let rof: RuleObjectFactory;
 
   beforeEach(() => {
     validatorService = TestBed.inject(FractionInputValidationService);
     oof = TestBed.inject(OutcomeObjectFactory);
     agof = TestBed.inject(AnswerGroupObjectFactory);
-    rof = TestBed.inject(RuleObjectFactory);
     WARNING_TYPES = AppConstants.WARNING_TYPES;
 
     createFractionDict = (
@@ -92,6 +90,7 @@ describe('FractionInputValidationService', () => {
     currentState = 'First State';
     goodDefaultOutcome = oof.createFromBackendDict({
       dest: 'Second State',
+      dest_if_really_stuck: null,
       feedback: {
         html: '',
         content_id: ''
@@ -102,133 +101,133 @@ describe('FractionInputValidationService', () => {
       missing_prerequisite_skill_id: null
     });
 
-    equalsOneRule = rof.createFromBackendDict({
+    equalsOneRule = Rule.createFromBackendDict({
       rule_type: 'IsExactlyEqualTo',
       inputs: {
         f: createFractionDict(false, 0, 1, 1)
       }
     }, 'FractionInput');
 
-    equalsThreeByTwoRule = rof.createFromBackendDict({
+    equalsThreeByTwoRule = Rule.createFromBackendDict({
       rule_type: 'IsExactlyEqualTo',
       inputs: {
         f: createFractionDict(false, 0, 3, 2)
       }
     }, 'FractionInput');
 
-    equalsOneAndHalfRule = rof.createFromBackendDict({
+    equalsOneAndHalfRule = Rule.createFromBackendDict({
       rule_type: 'IsExactlyEqualTo',
       inputs: {
         f: createFractionDict(false, 1, 1, 2)
       }
     }, 'FractionInput');
 
-    greaterThanMinusOneRule = rof.createFromBackendDict({
+    greaterThanMinusOneRule = Rule.createFromBackendDict({
       rule_type: 'IsGreaterThan',
       inputs: {
         f: createFractionDict(true, 0, 1, 1)
       }
     }, 'FractionInput');
 
-    integerPartEqualsOne = rof.createFromBackendDict({
+    integerPartEqualsOne = Rule.createFromBackendDict({
       rule_type: 'HasIntegerPartEqualTo',
       inputs: {
         x: 1
       }
     }, 'FractionInput');
 
-    integerPartEqualsZero = rof.createFromBackendDict({
+    integerPartEqualsZero = Rule.createFromBackendDict({
       rule_type: 'HasIntegerPartEqualTo',
       inputs: {
         x: 0
       }
     }, 'FractionInput');
 
-    lessThanTwoRule = rof.createFromBackendDict({
+    lessThanTwoRule = Rule.createFromBackendDict({
       rule_type: 'IsLessThan',
       inputs: {
         f: createFractionDict(false, 0, 2, 1)
       }
     }, 'FractionInput');
 
-    equivalentToOneRule = rof.createFromBackendDict({
+    equivalentToOneRule = Rule.createFromBackendDict({
       rule_type: 'IsEquivalentTo',
       inputs: {
         f: createFractionDict(false, 0, 10, 10)
       }
     }, 'FractionInput');
 
-    equivalentToOneAndSimplestFormRule = rof.createFromBackendDict({
+    equivalentToOneAndSimplestFormRule = Rule.createFromBackendDict({
       rule_type: 'IsEquivalentToAndInSimplestForm',
       inputs: {
         f: createFractionDict(false, 0, 10, 10)
       }
     }, 'FractionInput');
 
-    exactlyEqualToOneAndNotInSimplestFormRule = rof.createFromBackendDict({
+    exactlyEqualToOneAndNotInSimplestFormRule = Rule.createFromBackendDict({
       rule_type: 'IsExactlyEqualTo',
       inputs: {
         f: createFractionDict(false, 0, 10, 10)
       }
     }, 'FractionInput');
 
-    nonIntegerRule = rof.createFromBackendDict({
+    nonIntegerRule = Rule.createFromBackendDict({
       rule_type: 'HasNumeratorEqualTo',
       inputs: {
         x: 0.5
       }
     }, 'FractionInput');
 
-    zeroDenominatorRule = rof.createFromBackendDict({
+    zeroDenominatorRule = Rule.createFromBackendDict({
       rule_type: 'HasDenominatorEqualTo',
       inputs: {
         x: 0
       }
     }, 'FractionInput');
 
-    numeratorEqualsFiveRule = rof.createFromBackendDict({
+    numeratorEqualsFiveRule = Rule.createFromBackendDict({
       rule_type: 'HasNumeratorEqualTo',
       inputs: {
         x: 5
       }
     }, 'FractionInput');
 
-    denominatorEqualsFiveRule = rof.createFromBackendDict({
+    denominatorEqualsFiveRule = Rule.createFromBackendDict({
       rule_type: 'HasDenominatorEqualTo',
       inputs: {
         x: 5
       }
     }, 'FractionInput');
 
-    HasFractionalPartExactlyEqualToTwoFifthsRule = rof.createFromBackendDict({
+    HasFractionalPartExactlyEqualToTwoFifthsRule = Rule.createFromBackendDict({
       rule_type: 'HasFractionalPartExactlyEqualTo',
       inputs: {
         f: createFractionDict(false, 0, 2, 5)
       }
     }, 'FractionInput');
 
-    HasFractionalPartExactlyEqualToOneAndHalfRule = rof.createFromBackendDict({
+    HasFractionalPartExactlyEqualToOneAndHalfRule = Rule.createFromBackendDict({
       rule_type: 'HasFractionalPartExactlyEqualTo',
       inputs: {
         f: createFractionDict(false, 1, 1, 2)
       }
     }, 'FractionInput');
 
-    HasFractionalPartExactlyEqualToNegativeValue = rof.createFromBackendDict({
+    HasFractionalPartExactlyEqualToNegativeValue = Rule.createFromBackendDict({
       rule_type: 'HasFractionalPartExactlyEqualTo',
       inputs: {
         f: createFractionDict(true, 0, 1, 2)
       }
     }, 'FractionInput');
 
-    HasFractionalPartExactlyEqualToThreeHalfs = rof.createFromBackendDict({
+    HasFractionalPartExactlyEqualToThreeHalfs = Rule.createFromBackendDict({
       rule_type: 'HasFractionalPartExactlyEqualTo',
       inputs: {
         f: createFractionDict(false, 0, 3, 2)
       }
     }, 'FractionInput');
 
-    HasNoFractionalPart = rof.createFromBackendDict({
+    HasNoFractionalPart = Rule.createFromBackendDict({
       rule_type: 'HasNoFractionalPart',
       inputs: {
         f: createFractionDict(false, 2, 0, 1)
@@ -257,8 +256,8 @@ describe('FractionInputValidationService', () => {
       goodDefaultOutcome);
     expect(warnings).toEqual([{
       type: WARNING_TYPES.ERROR,
-      message: 'Rule 2 from answer group 1 will never be matched ' +
-        'because it is made redundant by rule 1 from answer group 1.'
+      message: 'Learner answer 2 from Oppia response 1 will never be matched' +
+        ' because it is made redundant by answer 1 from Oppia response 1.'
     }]);
   });
 
@@ -284,8 +283,9 @@ describe('FractionInputValidationService', () => {
       goodDefaultOutcome);
     expect(warnings).toEqual([{
       type: WARNING_TYPES.ERROR,
-      message: 'Rule 2 from answer group 1 will never be matched ' +
-        'because it is made redundant by rule 1 from answer group 1.'
+      message: 'Learner answer 2 from Oppia response 1 will never be ' +
+        'matched because it is made redundant by answer 1 from ' +
+        'Oppia response 1.'
     }]);
 
     answerGroups[0].rules = [equivalentToOneAndSimplestFormRule, equalsOneRule];
@@ -294,8 +294,9 @@ describe('FractionInputValidationService', () => {
       goodDefaultOutcome);
     expect(warnings).toEqual([{
       type: WARNING_TYPES.ERROR,
-      message: 'Rule 2 from answer group 1 will never be matched ' +
-        'because it is made redundant by rule 1 from answer group 1.'
+      message: 'Learner answer 2 from Oppia response 1 will never be ' +
+        'matched because it is made redundant by answer 1 from ' +
+        'Oppia response 1.'
     }]);
   });
 
@@ -308,8 +309,9 @@ describe('FractionInputValidationService', () => {
       goodDefaultOutcome);
     expect(warnings).toEqual([{
       type: WARNING_TYPES.ERROR,
-      message: 'Rule 1 from answer group 2 will never be matched ' +
-        'because it is made redundant by rule 1 from answer group 1.'
+      message: 'Learner answer 1 from Oppia response 2 will never be ' +
+        'matched because it is made redundant by answer 1 from ' +
+        'Oppia response 1.'
     }]);
   });
 
@@ -321,8 +323,9 @@ describe('FractionInputValidationService', () => {
         goodDefaultOutcome);
       expect(warnings).toEqual([{
         type: WARNING_TYPES.ERROR,
-        message: 'Rule 2 from answer group 1 will never be matched ' +
-          'because it is made redundant by rule 1 from answer group 1.'
+        message: 'Learner answer 2 from Oppia response 1 will never be ' +
+        'matched because it is made redundant by answer 1 from ' +
+        'Oppia response 1.'
       }]);
     });
 
@@ -333,7 +336,7 @@ describe('FractionInputValidationService', () => {
       goodDefaultOutcome);
     expect(warnings).toEqual([{
       type: WARNING_TYPES.ERROR,
-      message: 'Rule 1 from answer group 1 will never be matched ' +
+      message: 'Learner answer 1 from Oppia response 1 will never be matched ' +
         'because it is not in simplest form.'
     }]);
   });
@@ -346,7 +349,7 @@ describe('FractionInputValidationService', () => {
     expect(warnings).toEqual([{
       type: WARNING_TYPES.ERROR,
       message: (
-        'Rule ' + 1 + ' from answer group ' +
+        'Learner answer ' + 1 + ' from Oppia response ' +
         1 + ' is invalid: input should be an ' +
         'integer.')
     }]);
@@ -361,7 +364,7 @@ describe('FractionInputValidationService', () => {
     expect(warnings).toEqual([{
       type: WARNING_TYPES.ERROR,
       message: (
-        'Rule ' + 1 + ' from answer group ' +
+        'Learner answer ' + 1 + ' from Oppia response ' +
         1 + ' is invalid: input should be an ' +
         'integer.')
     }]);
@@ -376,7 +379,7 @@ describe('FractionInputValidationService', () => {
     expect(warnings).toEqual([{
       type: WARNING_TYPES.ERROR,
       message: (
-        'Rule ' + 1 + ' from answer group ' +
+        'Learner answer ' + 1 + ' from Oppia response ' +
         1 + ' is invalid: input should be an ' +
         'integer.')
     }]);
@@ -390,7 +393,7 @@ describe('FractionInputValidationService', () => {
     expect(warnings).toEqual([{
       type: WARNING_TYPES.ERROR,
       message: (
-        'Rule ' + 1 + ' from answer group ' +
+        'Learner answer ' + 1 + ' from Oppia response ' +
         1 + ' is invalid: denominator should be ' +
         'greater than zero.')
     }]);
@@ -406,7 +409,7 @@ describe('FractionInputValidationService', () => {
       expect(warnings).toEqual([{
         type: WARNING_TYPES.ERROR,
         message: (
-          'Rule ' + 1 + ' from answer group ' +
+          'Learner answer ' + 1 + ' from Oppia response ' +
           1 + ' will never be matched because it is an ' +
           'improper fraction')
       }]);
@@ -422,7 +425,7 @@ describe('FractionInputValidationService', () => {
       expect(warnings).toEqual([{
         type: WARNING_TYPES.ERROR,
         message: (
-          'Rule ' + 1 + ' from answer group ' +
+          'Learner answer ' + 1 + ' from Oppia response ' +
           1 + ' will never be matched because it has a ' +
           'non zero integer part')
       }]);
@@ -448,7 +451,7 @@ describe('FractionInputValidationService', () => {
     expect(warnings).toEqual([{
       type: WARNING_TYPES.ERROR,
       message: (
-        'Rule ' + 1 + ' from answer group ' +
+        'Learner answer ' + 1 + ' from Oppia response ' +
         1 + ' will never be matched because integer part ' +
         'has to be zero')
     }]);
@@ -498,7 +501,7 @@ describe('FractionInputValidationService', () => {
       expect(warnings).toEqual([{
         type: WARNING_TYPES.ERROR,
         message: (
-          'Rule 1 from answer group 1 is invalid as ' +
+          'Learner answer 1 from Oppia response 1 is invalid as ' +
           'integer part should be zero')
       }]);
 
@@ -510,7 +513,7 @@ describe('FractionInputValidationService', () => {
       expect(warnings).toEqual([{
         type: WARNING_TYPES.ERROR,
         message: (
-          'Rule 1 from answer group 1 is invalid as ' +
+          'Learner answer 1 from Oppia response 1 is invalid as ' +
           'improper fractions are not allowed')
       }]);
 
@@ -521,7 +524,7 @@ describe('FractionInputValidationService', () => {
       expect(warnings).toEqual([{
         type: WARNING_TYPES.ERROR,
         message: (
-          'Rule 1 from answer group 1 is invalid as ' +
+          'Learner answer 1 from Oppia response 1 is invalid as ' +
           'sign should be positive')
       }]);
 
@@ -541,8 +544,9 @@ describe('FractionInputValidationService', () => {
       expect(warnings).toEqual([{
         type: WARNING_TYPES.ERROR,
         message: (
-          'Rule 1 from answer group 2 will never be matched because it ' +
-          'is made redundant by rule 1 from answer group 1.')
+          'Learner answer 1 from Oppia response 2 will never be ' +
+          'matched because it is made redundant by ' +
+          'answer 1 from Oppia response 1.')
       }]);
     });
 });

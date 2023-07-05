@@ -1,0 +1,95 @@
+.oppia-visualization-sorted-tiles {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.oppia-visualization-sorted-tile {
+  border-radius: 27px;
+  display: inline-block;
+  min-width: 100px;
+  padding: 5px 6px;
+}
+.oppia-visualization-sorted-tile .oppia-visualization-sorted-tile-content {
+  background: #f5f5f5;
+  border-radius: 27px;
+  margin: 0;
+  max-height: 250px;
+  max-width: 175px;
+  padding: 22px 24px;
+  position: relative;
+}
+.oppia-visualization-sorted-tile.selected {
+  background: rgba(65, 152, 137, 0.07);
+}
+.oppia-visualization-sorted-tile.selected .oppia-visualization-sorted-tile-content {
+  background: #e4f1ef;
+}
+.oppia-visualization-sorted-tile-answer {
+  color: rgba(0, 0, 0, 0.87);
+  font-family: "Roboto", Arial, sans-serif;
+  font-size: 14px;
+  letter-spacing: 0.22px;
+  line-height: 16px;
+  max-height: 185px;
+  overflow: hidden;
+  position: relative;
+}
+.oppia-visualization-sorted-tile-answer img {
+  height: auto !important;
+  max-width: 100% !important;
+}
+.oppia-visualization-sorted-tile-answer > .more {
+  background-image: linear-gradient(transparent, #f5f5f5, #f5f5f5);
+  bottom: 0;
+  height: 32px;
+  padding-top: 16px;
+  position: absolute;
+  text-align: right;
+  width: 100%;
+}
+.selected .oppia-visualization-sorted-tile-answer > .more {
+  background-image: linear-gradient(transparent, #e4f1ef, #e4f1ef);
+}
+.oppia-visualization-sorted-tile-answer > .more > a {
+  color: #6ba49b;
+  font-family: "Roboto", Arial, sans-serif;
+  font-size: 14px;
+  font-style: normal;
+  font-weight: normal;
+  letter-spacing: 0.21875px;
+  line-height: 16px;
+}
+.oppia-visualization-sorted-tile-frequency {
+  color: rgba(0, 0, 0, 0.54);
+  font-family: "Roboto", Arial, sans-serif;
+  font-size: 14px;
+  letter-spacing: 0.24px;
+  line-height: 16px;
+  margin-top: 5px;
+}
+.oppia-visualization-sorted-tile-tooltip {
+  bottom: -12px;
+  left: 0;
+  position: absolute;
+  text-align: center;
+  z-index: 1;
+}
+.oppia-visualization-sorted-tile-tooltip > i.arrow-up {
+  border-bottom: 6px solid #323232;
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
+  height: 0;
+  width: 0;
+}
+.oppia-visualization-sorted-tile-tooltip > p.frequency {
+  background: #323232;
+  box-shadow: 0 6px 6px rgba(0, 0, 0, 0.24), 0 0 6px rgba(0, 0, 0, 0.12);
+  color: rgba(255, 255, 255, 0.7);
+  font-family: "Roboto", Arial, sans-serif;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 500;
+  letter-spacing: 0.2px;
+  line-height: 14px;
+  padding: 6px 12px;
+}

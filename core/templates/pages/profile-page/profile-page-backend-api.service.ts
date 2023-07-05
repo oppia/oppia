@@ -27,6 +27,7 @@ import { UrlInterpolationService } from
 import { UrlService } from 'services/contextual/url.service';
 import { UserProfile, UserProfileBackendDict } from
   'domain/user/user-profile.model';
+import { UserService } from 'services/user.service';
 
 @Injectable({
   providedIn: 'root'
@@ -35,7 +36,8 @@ export class ProfilePageBackendApiService {
   constructor(
     private urlInterpolationService: UrlInterpolationService,
     private http: HttpClient,
-    private urlService: UrlService
+    private urlService: UrlService,
+    private userService: UserService
   ) {}
 
   async _postSubscribeAsync(creatorUsername: string): Promise<void> {

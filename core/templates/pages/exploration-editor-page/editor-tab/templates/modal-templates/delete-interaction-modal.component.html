@@ -1,0 +1,18 @@
+<div class="modal-header">
+  <h3>Delete Interaction</h3>
+</div>
+
+<div class="modal-body">
+  <p>
+    Are you sure you want to delete this interaction? This will also clear
+    all its responses.
+  </p>
+</div>
+
+<div class="modal-footer">
+  <button class="btn btn-secondary" (click)="cancel()">Cancel</button>
+  <button class="btn btn-danger e2e-test-confirm-delete-interaction"
+          (click)="confirm()">
+    Delete Interaction
+  </button>
+</div>

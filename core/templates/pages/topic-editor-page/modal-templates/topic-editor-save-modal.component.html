@@ -1,0 +1,20 @@
+<div class="modal-header">
+  <h3>
+    <span *ngIf="!isTopicPublished">Save Draft</span>
+    <span *ngIf="isTopicPublished">Publish Changes</span>
+  </h3>
+</div>
+<div class="modal-body oppia-long-text">
+  <p>
+    <span *ngIf="!isTopicPublished">(Optional)</span>
+    Please enter a brief description of what you have changed:
+    <textarea rows="3" cols="50" [attr.maxlength]="MAX_COMMIT_MESSAGE_LENGTH" [(ngModel)]="commitMessage" class="e2e-test-commit-message-input" autofocus></textarea>
+  </p>
+</div>
+<div class="modal-footer">
+  <button class="btn btn-secondary" (click)="cancel()" type="button">Cancel</button>
+  <button class="btn btn-success e2e-test-close-save-modal-button" [disabled]="!commitMessage && isTopicPublished" (click)="confirm(commitMessage || '')">
+    <span *ngIf="!isTopicPublished">Save Draft</span>
+    <span *ngIf="isTopicPublished">Publish Changes</span>
+  </button>
+</div>

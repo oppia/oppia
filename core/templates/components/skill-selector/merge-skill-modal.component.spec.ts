@@ -16,6 +16,7 @@
  * @fileoverview Unit tests for Merge Skill Modal.
  */
 
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { FormsModule } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
@@ -36,7 +37,8 @@ describe('Merge Skill Modal', () => {
         MatCardModule,
         MatRadioModule,
         MatCheckboxModule,
-        FormsModule
+        FormsModule,
+        HttpClientTestingModule
       ],
       declarations: [
         MergeSkillModalComponent,
@@ -51,8 +53,7 @@ describe('Merge Skill Modal', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(MergeSkillModalComponent);
     componentInstance = fixture.componentInstance;
-    ngbActiveModal = (TestBed.inject(NgbActiveModal) as unknown) as
-      jasmine.SpyObj<NgbActiveModal>;
+    ngbActiveModal = TestBed.inject(NgbActiveModal);
   });
 
   it('should be defined', () => {

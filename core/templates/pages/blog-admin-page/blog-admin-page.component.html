@@ -33,7 +33,12 @@
                 </select>
               </div>
             </div>
-            <button type="submit" class="btn btn-success" [disabled]="!formData.updateRole.isValid()" value="update role">Update Role</button>
+            <button type="submit"
+                    class="btn btn-success oppia-blog-admin-update-role-button"
+                    [disabled]="!formData.updateRole.isValid()"
+                    value="update role">
+              Update Role
+            </button>
           </form>
         </mat-card>
 
@@ -52,8 +57,10 @@
               </div>
             </div>
             <button type="submit"
-                    class="btn btn-success"
-                    [disabled]="!formData.removeEditorRole.isValid()" value="update role">Remove Blog Editor
+                    class="btn btn-success oppia-blog-admin-remove-blog-editor-button"
+                    [disabled]="!formData.removeEditorRole.isValid()"
+                    value="update role">
+              Remove Blog Editor
             </button>
           </form>
         </mat-card>
@@ -68,7 +75,7 @@
                   <em>{{ property.value.description }}</em>
                 </span>
                 <span class="col-lg-6 col-md-6 col-sm-6">
-                  <schema-based-editor [schema]="getSchemaCallback(property.value.schema)" [(localValue)]="property.value.value">
+                  <schema-based-editor [schema]="property.value.schema" [(ngModel)]="property.value.value">
                   </schema-based-editor>
                 </span>
                 <span class="col-lg-2 col-md-2 col-sm-2">

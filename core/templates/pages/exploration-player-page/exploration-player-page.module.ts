@@ -16,112 +16,72 @@
  * @fileoverview Module for the exploration player page.
  */
 
-import { APP_INITIALIZER, NgModule, StaticProvider } from '@angular/core';
-import { BrowserModule, HAMMER_GESTURE_CONFIG } from '@angular/platform-browser';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { HttpClientModule } from '@angular/common/http';
-import { HTTP_INTERCEPTORS } from '@angular/common/http';
+import { NgModule } from '@angular/core';
 import { NgbModalModule, NgbPopoverModule } from '@ng-bootstrap/ng-bootstrap';
-import { RequestInterceptor } from 'services/request-interceptor.service';
+import { CommonModule } from '@angular/common';
+import { ExplorationPlayerViewerCommonModule } from './exploration-player-viewer-common.module';
 import { SharedComponentsModule } from 'components/shared-component.module';
-import { OppiaAngularRootComponent } from
-  'components/oppia-angular-root.component';
-import { platformFeatureInitFactory, PlatformFeatureService } from
-  'services/platform-feature.service';
-import { SwitchContentLanguageRefreshRequiredModalComponent } from
-  // eslint-disable-next-line max-len
-  'pages/exploration-player-page/switch-content-language-refresh-required-modal.component';
 import { InteractionExtensionsModule } from 'interactions/interactions.module';
 import { MatButtonModule } from '@angular/material/button';
 import { LearnerLocalNavComponent } from './layout-directives/learner-local-nav.component';
 import { FlagExplorationModalComponent } from './modals/flag-exploration-modal.component';
-import { FeedbackPopupComponent } from './layout-directives/feedback-popup.component';
 import { ExplorationSuccessfullyFlaggedModalComponent } from './modals/exploration-successfully-flagged-modal.component';
-import { LearnerAnswerInfoCard } from './learner-experience/learner-answer-info-card.component';
 import { LearnerViewInfoComponent } from './layout-directives/learner-view-info.component';
-import { InformationCardModalComponent } from './templates/information-card-modal.component';
 import { MaterialModule } from 'modules/material.module';
 import { RefresherExplorationConfirmationModal } from './modals/refresher-exploration-confirmation-modal.component';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { MyHammerConfig, toastrConfig } from 'pages/oppia-root/app.module';
+import { ExplorationPlayerPageComponent } from './exploration-player-page.component';
+import { LessonInformationCardModalComponent } from './templates/lesson-information-card-modal.component';
+import { ExplorationPlayerPageRoutingModule } from './exploration-player-page-routing.module';
+import { ExplorationPlayerPageRootComponent } from './exploration-player-page-root.component';
+import { ProgressReminderModalComponent } from './templates/progress-reminder-modal.component';
+import { HintAndSolutionModalService } from './services/hint-and-solution-modal.service';
+import { FatigueDetectionService } from './services/fatigue-detection.service';
+
+import 'third-party-imports/guppy.import';
+import 'third-party-imports/midi-js.import';
+import 'third-party-imports/skulpt.import';
+import { ToastrModule } from 'ngx-toastr';
+import { toastrConfig } from 'pages/oppia-root/app.module';
 
 @NgModule({
   imports: [
-    BrowserModule,
-    BrowserAnimationsModule,
-    HttpClientModule,
+    CommonModule,
+    ExplorationPlayerPageRoutingModule,
     InteractionExtensionsModule,
     MatButtonModule,
     NgbModalModule,
     MaterialModule,
     NgbPopoverModule,
+    ExplorationPlayerViewerCommonModule,
     SharedComponentsModule,
-    NgbPopoverModule,
-    ToastrModule.forRoot(toastrConfig)
+    ToastrModule,
+    ToastrModule.forRoot(toastrConfig),
   ],
   declarations: [
-    SwitchContentLanguageRefreshRequiredModalComponent,
-    LearnerAnswerInfoCard,
+    ExplorationPlayerPageComponent,
+    ExplorationPlayerPageRootComponent,
     ExplorationSuccessfullyFlaggedModalComponent,
-    InformationCardModalComponent,
+    LessonInformationCardModalComponent,
+    ProgressReminderModalComponent,
     FlagExplorationModalComponent,
     LearnerLocalNavComponent,
-    FeedbackPopupComponent,
     LearnerViewInfoComponent,
     RefresherExplorationConfirmationModal,
   ],
   entryComponents: [
-    SwitchContentLanguageRefreshRequiredModalComponent,
+    ExplorationPlayerPageComponent,
+    ExplorationPlayerPageRootComponent,
     ExplorationSuccessfullyFlaggedModalComponent,
-    InformationCardModalComponent,
+    LessonInformationCardModalComponent,
+    ProgressReminderModalComponent,
     FlagExplorationModalComponent,
     LearnerLocalNavComponent,
-    FeedbackPopupComponent,
-    LearnerAnswerInfoCard,
     LearnerViewInfoComponent,
     RefresherExplorationConfirmationModal,
   ],
   providers: [
-    {
-      provide: HTTP_INTERCEPTORS,
-      useClass: RequestInterceptor,
-      multi: true
-    },
-    {
-      provide: APP_INITIALIZER,
-      useFactory: platformFeatureInitFactory,
-      deps: [PlatformFeatureService],
-      multi: true
-    },
-    {
-      provide: HAMMER_GESTURE_CONFIG,
-      useClass: MyHammerConfig
-    }
+    HintAndSolutionModalService,
+    FatigueDetectionService,
   ]
 })
-class ExplorationPlayerPageModule {
-  // Empty placeholder method to satisfy the `Compiler`.
-  ngDoBootstrap() {}
-}
-
-import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
-import { downgradeModule } from '@angular/upgrade/static';
-import { ToastrModule } from 'ngx-toastr';
-
-const bootstrapFnAsync = async(extraProviders: StaticProvider[]) => {
-  const platformRef = platformBrowserDynamic(extraProviders);
-  return platformRef.bootstrapModule(ExplorationPlayerPageModule);
-};
-const downgradedModule = downgradeModule(bootstrapFnAsync);
-
-declare var angular: ng.IAngularStatic;
-
-angular.module('oppia').requires.push(downgradedModule);
-
-angular.module('oppia').directive(
-  // This directive is the downgraded version of the Angular component to
-  // bootstrap the Angular 8.
-  'oppiaAngularRoot',
-  downgradeComponent({
-    component: OppiaAngularRootComponent
-  }) as angular.IDirectiveFactory);
+export class ExplorationPlayerPageModule {}

@@ -18,15 +18,18 @@
 
 from __future__ import annotations
 
+from core.domain import exp_domain
+from core.domain import exp_fetchers
 from core.domain import recommendations_services
 from core.jobs import base_jobs
 from core.jobs.io import ndb_io
+from core.jobs.transforms import job_result_transforms
 from core.jobs.types import job_run_result
 from core.platform import models
 
 import apache_beam as beam
 
-from typing import Dict, Iterable, List, Tuple, Union, cast
+from typing import Dict, Final, Iterable, List, Tuple, Union
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -34,15 +37,16 @@ if MYPY: # pragma: no cover
     from mypy_imports import exp_models
     from mypy_imports import recommendations_models
 
-(exp_models, recommendations_models) = models.Registry.import_models(
-    [models.NAMES.exploration, models.NAMES.recommendations])
+(exp_models, recommendations_models) = models.Registry.import_models([
+    models.Names.EXPLORATION, models.Names.RECOMMENDATIONS
+])
 
 datastore_services = models.Registry.import_datastore_services()
 
-MAX_RECOMMENDATIONS = 10
+MAX_RECOMMENDATIONS: Final = 10
 # Note: There is a threshold so that bad recommendations will be
 # discarded even if an exploration has few similar explorations.
-SIMILARITY_SCORE_THRESHOLD = 3.0
+SIMILARITY_SCORE_THRESHOLD: Final = 3.0
 
 
 class ComputeExplorationRecommendationsJob(base_jobs.JobBase):
@@ -57,16 +61,18 @@ class ComputeExplorationRecommendationsJob(base_jobs.JobBase):
             the Elastic Search.
         """
 
-        exp_summary_models = (
+        exp_summary_objects = (
             self.pipeline
             | 'Get all non-deleted models' >> (
                 ndb_io.GetModels(exp_models.ExpSummaryModel.get_all()))
+            | 'Convert ExpSummaryModels to domain objects' >> beam.Map(
+                exp_fetchers.get_exploration_summary_from_model)
         )
 
-        exp_summary_iter = beam.pvalue.AsIter(exp_summary_models)
+        exp_summary_iter = beam.pvalue.AsIter(exp_summary_objects)
 
         exp_recommendations_models = (
-            exp_summary_models
+            exp_summary_objects
             | 'Compute similarity' >> beam.ParDo(
                 ComputeSimilarity(), exp_summary_iter)
             | 'Group similarities per exploration ID' >> beam.GroupByKey()
@@ -84,17 +90,13 @@ class ComputeExplorationRecommendationsJob(base_jobs.JobBase):
 
         return (
             exp_recommendations_models
-            | 'Count all new models' >> beam.combiners.Count.Globally()
-            | 'Only create result for new models when > 0' >> (
-                beam.Filter(lambda x: x > 0))
-            | 'Create result for new models' >> beam.Map(
-                lambda x: job_run_result.JobRunResult(
-                    stdout='SUCCESS %s' % x))
+            | 'Create job run result' >> (
+                job_result_transforms.CountObjectsToJobRunResult())
         )
 
     @staticmethod
     def _sort_and_slice_similarities(
-            similarities: Iterable[Dict[str, Union[str, float]]]
+        similarities: Iterable[Dict[str, Union[str, float]]]
     ) -> List[str]:
         """Sorts similarities of explorations and slices them to
         a maximum length.
@@ -117,7 +119,7 @@ class ComputeExplorationRecommendationsJob(base_jobs.JobBase):
 
     @staticmethod
     def _create_recommendation(
-            exp_id: str, recommended_exp_ids: Iterable[str]
+        exp_id: str, recommended_exp_ids: Iterable[str]
     ) -> recommendations_models.ExplorationRecommendationsModel:
         """Creates exploration recommendation model.
 
@@ -138,21 +140,25 @@ class ComputeExplorationRecommendationsJob(base_jobs.JobBase):
         return exp_recommendation_model
 
 
+# TODO(#15613): Here we use MyPy ignore because the incomplete typing of
+# apache_beam library and absences of stubs in Typeshed, forces MyPy to
+# assume that DoFn class is of type Any. Thus to avoid MyPy's error (Class
+# cannot subclass 'DoFn' (has type 'Any')), we added an ignore here.
 class ComputeSimilarity(beam.DoFn):  # type: ignore[misc]
     """DoFn to compute similarities between exploration."""
 
     def process(
         self,
-        ref_exp_summary_model: datastore_services.Model,
-        compared_exp_summary_models: Iterable[datastore_services.Model]
+        ref_exp_summary: exp_domain.ExplorationSummary,
+        compared_exp_summaries: Iterable[exp_domain.ExplorationSummary]
     ) -> Iterable[Tuple[str, Dict[str, Union[str, float]]]]:
         """Compute similarities between exploraitons.
 
         Args:
-            ref_exp_summary_model: ExpSummaryModel. Reference exploration
+            ref_exp_summary: ExplorationSummary. Reference exploration
                 summary. We are trying to find explorations similar to this
                 reference summary.
-            compared_exp_summary_models: list(ExpSummaryModel). List of other
+            compared_exp_summaries: list(ExplorationSummary). List of other
                 explorations summaries against which we compare the reference
                 summary.
 
@@ -164,23 +170,17 @@ class ComputeSimilarity(beam.DoFn):  # type: ignore[misc]
                 similarity_score: float. The similarity score for
                     the exploration.
         """
-        ref_exp_summary_model = cast(
-            exp_models.ExpSummaryModel, ref_exp_summary_model)
         with datastore_services.get_ndb_context():
-            for compared_exp_summary_model in compared_exp_summary_models:
-                compared_exp_summary_model = cast(
-                    exp_models.ExpSummaryModel,
-                    compared_exp_summary_model
-                )
-                if compared_exp_summary_model.id == ref_exp_summary_model.id:
+            for compared_exp_summary in compared_exp_summaries:
+                if compared_exp_summary.id == ref_exp_summary.id:
                     continue
-                similarity_score = recommendations_services.get_item_similarity( # type: ignore[no-untyped-call]
-                    ref_exp_summary_model, compared_exp_summary_model
+                similarity_score = recommendations_services.get_item_similarity(
+                    ref_exp_summary, compared_exp_summary
                 )
                 if similarity_score >= SIMILARITY_SCORE_THRESHOLD:
                     yield (
-                        ref_exp_summary_model.id, {
+                        ref_exp_summary.id, {
                             'similarity_score': similarity_score,
-                            'exp_id': compared_exp_summary_model.id
+                            'exp_id': compared_exp_summary.id
                         }
                     )

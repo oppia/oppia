@@ -30,8 +30,8 @@ export interface ExplorationLanguageInfo {
    * and the audio language description to display (displayed) for the
    * _languagesInExploration property.
    */
-  value: string,
-  displayed: string
+  value: string;
+  displayed: string;
 }
 
 @Injectable({

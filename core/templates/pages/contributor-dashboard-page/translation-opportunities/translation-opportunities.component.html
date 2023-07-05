@@ -1,20 +1,16 @@
 <div *ngIf="languageSelected">
   <oppia-opportunities-list [loadOpportunities]="loadOpportunitiesAsync.bind(this)"
-                      (clickActionButton)="onClickButton($event)"
-                      [loadMoreOpportunities]="loadMoreOpportunitiesAsync.bind(this)"
-                      [progressBarRequired]="true"
-                      [opportunityType]="opportunityType">
+                            (clickActionButton)="onClickButton($event)"
+                            [loadMoreOpportunities]="loadMoreOpportunitiesAsync.bind(this)"
+                            [progressBarRequired]="true"
+                            [opportunityType]="opportunityType">
   </oppia-opportunities-list>
 </div>
 <div *ngIf="!languageSelected" class="oppia-language-required-message-container">
   <div class="oppia-mascot-avatar-container">
-    <a [ngClass]="{'oppia-disabled-image-link': OPPIA_AVATAR_LINK_URL === null}"
-       [href]="OPPIA_AVATAR_LINK_URL"
-       rel="noopener"
-       target="_blank">
-      <img class="oppia-mascot-avatar"
-           [src]="OPPIA_AVATAR_IMAGE_URL" alt="">
-    </a>
+    <img class="oppia-mascot-avatar"
+         [src]="OPPIA_AVATAR_IMAGE_URL"
+         alt="">
   </div>
   <div class="oppia-language-required-message">
     Oops! You haven't selected a language yet.
@@ -33,6 +29,7 @@
     justify-content: center;
     margin: auto;
     min-height: 40vh;
+    padding: 25px;
     width: 75%;
   }
   .oppia-language-required-message {

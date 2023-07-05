@@ -43,7 +43,7 @@ describe('SkillEditorNavbarBreadcrumbComponent', () => {
     skillObjectFactory = TestBed.inject(SkillObjectFactory);
     skillEditorStateService = TestBed.inject(SkillEditorStateService);
     let misconceptionDict1 = {
-      id: '2',
+      id: 2,
       name: 'test name',
       notes: 'test notes',
       feedback: 'test feedback',

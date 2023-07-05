@@ -1,0 +1,128 @@
+<div class="oppia-editor-card-with-avatar oppia-mobile-collapsible-card">
+  <div class="oppia-editor-card-body">
+    <div class="oppia-editor-card-section skill-misconception-content">
+      <div class="oppia-misconception-card-header oppia-mobile-collapsible-card-header" (click)="toggleMisconceptionLists()">
+        <strong class="heading-text">Misconceptions</strong>
+        <i class="fa fa-caret-down"
+           *ngIf="!misconceptionsListIsShown"
+           [attr.aria-hidden]="true">
+        </i>
+        <i class="fa fa-caret-up"
+           *ngIf="misconceptionsListIsShown"
+           [attr.aria-hidden]="true">
+        </i>
+      </div>
+      <div *ngIf="misconceptionsListIsShown" class="oppia-mobile-collapsible-card-content">
+        <div class="helper-text">
+          <span>
+            <i>
+              These misconceptions represent common mistakes that are made by students when trying to apply this skill.
+            </i>
+          </span>
+        </div>
+        <div *ngIf="misconceptions.length > 0" class="oppia-option-list-container e2e-test-misconception-list-container">
+          <ul class="oppia-skill-misconception-card-preview oppia-option-list nav-stacked nav-pills">
+            <li *ngFor="let misconception of misconceptions; index as i"
+                [ngClass]="{'active': activeMisconceptionIndex === i, 'last-element': i === misconceptions.length - 1}"
+                class="oppia-rule-block oppia-prevent-selection oppia-misconception-list-item e2e-test-misconception-list-item">
+              <a (click)="changeActiveMisconceptionIndex(i)"
+                 class="oppia-rule-tab e2e-test-misconception-{{ i }} oppia-skill-misconception-card-preview-list"
+                 [ngClass]="{'oppia-rule-tab-active': activeMisconceptionIndex === i}">
+                <oppia-summary-list-header [index]="i"
+                                           [disableSorting]="true"
+                                           [summary]="getMisconceptionSummary(misconception)"
+                                           [shortSummary]="getMisconceptionSummary(misconception)"
+                                           [isActive]="i === activeMisconceptionIndex"
+                                           [isDeleteAvailable]="isEditable"
+                                           (summaryDelete)="openDeleteMisconceptionModal($event.index, $event.event)">
+                </oppia-summary-list-header>
+              </a>
+
+              <div *ngIf="activeMisconceptionIndex === i">
+                <div class="oppia-editor-card-section">
+                  <oppia-misconception-editor [misconception]="skill.findMisconceptionById(misconception.getId())"
+                                              [getIndex]="i"
+                                              [isEditable]="isEditable"
+                                              (onMisconceptionChange)="onMisconceptionChange()">
+                  </oppia-misconception-editor>
+                </div>
+              </div>
+            </li>
+          </ul>
+        </div>
+        <button type="button"
+                class="btn add-skill-misconception-button skill-editor-add-btn e2e-test-add-misconception-modal-button"
+                (click)="openAddMisconceptionModal()">
+          + ADD MISCONCEPTION
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+<style>
+  .last-element {
+    border-bottom: 1px solid #ccc;
+  }
+
+  .add-skill-misconception-button {
+    background-color: #058ca6;
+    color: #fff;
+  }
+
+  .helper-text {
+    color: #595959;
+  }
+
+  .helper-text span {
+    font-size: 13px;
+  }
+
+  .heading-text {
+    font-size: 16px;
+  }
+
+  .oppia-misconception-card-header {
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .oppia-misconception-card-header i {
+    display: none;
+  }
+
+  .oppia-option-list-container {
+    padding-bottom: 10px;
+  }
+
+  .oppia-misconception-list-item {
+    margin-top: 0;
+  }
+
+  .oppia-skill-misconception-card-preview-list {
+    display: block;
+  }
+
+  .oppia-skill-misconception-card-preview {
+    list-style: none;
+    margin-bottom: 0;
+    padding-left: 0;
+    padding-right: 0;
+    position: relative;
+    vertical-align: top;
+    width: 100%;
+  }
+
+  .oppia-skill-misconception-card-preview > li {
+    display: block;
+    position: relative;
+  }
+
+  @media screen and (max-width: 768px) {
+    .oppia-misconception-card-header i {
+      display: block;
+    }
+    .skill-misconception-content {
+      padding: 0;
+    }
+  }
+</style>

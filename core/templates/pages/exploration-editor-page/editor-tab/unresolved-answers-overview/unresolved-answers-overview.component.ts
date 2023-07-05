@@ -16,109 +16,113 @@
  * @fileoverview Component for the state graph visualization.
  */
 
-require(
-  'components/common-layout-directives/common-elements/' +
-  'loading-dots.component.ts');
-require(
-  'pages/exploration-editor-page/editor-tab/templates/modal-templates/' +
-  'teach-oppia-modal.controller.ts');
+import { Component, OnInit } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import INTERACTION_SPECS from 'interactions/interaction_specs.json';
+import { AppConstants } from 'app.constants';
+import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
+import { StateInteractionIdService } from 'components/state-editor/state-editor-properties-services/state-interaction-id.service';
+import { ExplorationStatesService } from 'pages/exploration-editor-page/services/exploration-states.service';
+import { EditabilityService } from 'services/editability.service';
+import { ImprovementsService } from 'services/improvements.service';
+import { StateTopAnswersStatsService } from 'services/state-top-answers-stats.service';
+import { TeachOppiaModalComponent } from '../templates/modal-templates/teach-oppia-modal.component';
+import { AnswerStats } from 'domain/exploration/answer-stats.model';
+import { ExternalSaveService } from 'services/external-save.service';
+import { InteractionSpecsKey } from 'pages/interaction-specs.constants';
 
-require('domain/utilities/url-interpolation.service.ts');
-require('pages/exploration-editor-page/services/exploration-rights.service.ts');
-require('pages/exploration-editor-page/services/exploration-states.service.ts');
-require(
-  'components/state-editor/state-editor-properties-services/' +
-  'state-editor.service.ts');
-require(
-  'components/state-editor/state-editor-properties-services/' +
-  'state-interaction-id.service');
-require(
-  'components/state-editor/state-editor-properties-services/' +
-  'state-property.service.ts');
-require('filters/truncate-input-based-on-interaction-answer-type.filter.ts');
-require('services/editability.service.ts');
-require('services/improvements.service.ts');
-require('services/state-top-answers-stats.service.ts');
-require('services/external-save.service.ts');
+@Component({
+  selector: 'oppia-unresolved-answers-overview',
+  templateUrl: './unresolved-answers-overview.component.html'
+})
 
-require(
-  'pages/exploration-editor-page/exploration-editor-page.constants.ajs.ts');
+export class UnresolvedAnswersOverviewComponent
+  implements OnInit {
+  // These properties below are initialized using Angular lifecycle hooks
+  // where we need to do non-null assertion. For more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  unresolvedAnswersOverviewIsShown!: boolean;
+  SHOW_TRAINABLE_UNRESOLVED_ANSWERS!: boolean;
 
-angular.module('oppia').component('unresolvedAnswersOverview', {
-  template: require('./unresolved-answers-overview.component.html'),
-  controller: [
-    '$scope', '$uibModal', 'EditabilityService',
-    'ExplorationStatesService', 'ExternalSaveService',
-    'ImprovementsService', 'StateEditorService',
-    'StateInteractionIdService', 'StateTopAnswersStatsService',
-    'INTERACTION_SPECS',
-    'SHOW_TRAINABLE_UNRESOLVED_ANSWERS',
-    function(
-        $scope, $uibModal, EditabilityService,
-        ExplorationStatesService, ExternalSaveService,
-        ImprovementsService, StateEditorService,
-        StateInteractionIdService, StateTopAnswersStatsService,
-        INTERACTION_SPECS,
-        SHOW_TRAINABLE_UNRESOLVED_ANSWERS) {
-      var ctrl = this;
+  constructor(
+    private editabilityService: EditabilityService,
+    private explorationStatesService: ExplorationStatesService,
+    private externalSaveService: ExternalSaveService,
+    private improvementsService: ImprovementsService,
+    private ngbModal: NgbModal,
+    private stateEditorService: StateEditorService,
+    private stateInteractionIdService: StateInteractionIdService,
+    private stateTopAnswersStatsService: StateTopAnswersStatsService,
+  ) { }
 
-      var isStateRequiredToBeResolved = function(stateName) {
-        return ImprovementsService
-          .isStateForcedToResolveOutstandingUnaddressedAnswers(
-            ExplorationStatesService.getState(stateName));
-      };
+  isStateRequiredToBeResolved(stateName: string): boolean {
+    return this.improvementsService
+      .isStateForcedToResolveOutstandingUnaddressedAnswers(
+        this.explorationStatesService.getState(stateName));
+  }
 
-      $scope.isUnresolvedAnswersOverviewShown = function() {
-        var activeStateName = StateEditorService.getActiveStateName();
-        return StateTopAnswersStatsService.hasStateStats(activeStateName) &&
-          isStateRequiredToBeResolved(activeStateName);
-      };
-
-      $scope.getCurrentInteractionId = function() {
-        return StateInteractionIdService.savedMemento;
-      };
-
-      $scope.isCurrentInteractionLinear = function() {
-        var interactionId = $scope.getCurrentInteractionId();
-        return interactionId && INTERACTION_SPECS[interactionId].is_linear;
-      };
-
-      $scope.isCurrentInteractionTrainable = function() {
-        var interactionId = $scope.getCurrentInteractionId();
-        return (
-          interactionId &&
-          INTERACTION_SPECS[interactionId].is_trainable);
-      };
-
-      $scope.isEditableOutsideTutorialMode = function() {
-        return EditabilityService.isEditableOutsideTutorialMode();
-      };
-
-      $scope.openTeachOppiaModal = function() {
-        ExternalSaveService.onExternalSave.emit();
-
-        $uibModal.open({
-          template: require(
-            'pages/exploration-editor-page/editor-tab/templates/' +
-            'modal-templates/teach-oppia-modal.template.html'),
-          backdrop: 'static',
-          controller: 'TeachOppiaModalController'
-        }).result.then(function() {}, function() {
-          // Note to developers:
-          // This callback is triggered when the Cancel button is clicked.
-          // No further action is needed.
-        });
-      };
-
-      $scope.getUnresolvedStateStats = function() {
-        return StateTopAnswersStatsService.getUnresolvedStateStats(
-          StateEditorService.getActiveStateName());
-      };
-      ctrl.$onInit = function() {
-        $scope.unresolvedAnswersOverviewIsShown = false;
-        $scope.SHOW_TRAINABLE_UNRESOLVED_ANSWERS = (
-          SHOW_TRAINABLE_UNRESOLVED_ANSWERS);
-      };
+  isUnresolvedAnswersOverviewShown(): boolean {
+    let activeStateName = this.stateEditorService.getActiveStateName();
+    if (activeStateName === null) {
+      return false;
     }
-  ]
-});
+    return this.stateTopAnswersStatsService.hasStateStats(activeStateName) &&
+      this.isStateRequiredToBeResolved(activeStateName);
+  }
+
+  getCurrentInteractionId(): string {
+    return this.stateInteractionIdService.savedMemento;
+  }
+
+  isCurrentInteractionLinear(): boolean {
+    let interactionId = this.getCurrentInteractionId();
+    return Boolean(interactionId) && INTERACTION_SPECS[
+      interactionId as InteractionSpecsKey
+    ].is_linear;
+  }
+
+  isCurrentInteractionTrainable(): boolean {
+    let interactionId = this.getCurrentInteractionId();
+    return (
+      Boolean(interactionId) &&
+      INTERACTION_SPECS[
+        interactionId as InteractionSpecsKey
+      ].is_trainable);
+  }
+
+  isEditableOutsideTutorialMode(): boolean {
+    return this.editabilityService.isEditableOutsideTutorialMode();
+  }
+
+  openTeachOppiaModal(): void {
+    this.externalSaveService.onExternalSave.emit();
+
+    this.ngbModal.open(TeachOppiaModalComponent, {
+      backdrop: 'static'
+    }).result.then(() => {}, () => {
+      // Note to developers:
+      // This callback is triggered when the Cancel button is clicked.
+      // No further action is needed.
+    });
+  }
+
+  getUnresolvedStateStats(): AnswerStats[] {
+    let stateName = this.stateEditorService.getActiveStateName();
+    if (stateName === null) {
+      throw new Error('State name should not be null.');
+    }
+    return this.stateTopAnswersStatsService.getUnresolvedStateStats(stateName);
+  }
+
+  ngOnInit(): void {
+    this.unresolvedAnswersOverviewIsShown = false;
+    this.SHOW_TRAINABLE_UNRESOLVED_ANSWERS = (
+      AppConstants.SHOW_TRAINABLE_UNRESOLVED_ANSWERS);
+  }
+}
+
+angular.module('oppia').directive('oppiaUnresolvedAnswersOverview',
+  downgradeComponent({
+    component: UnresolvedAnswersOverviewComponent
+  }) as angular.IDirectiveFactory);

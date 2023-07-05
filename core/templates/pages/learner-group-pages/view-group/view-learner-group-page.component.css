@@ -1,0 +1,190 @@
+.oppia-view-learner-group {
+  text-align: left;
+}
+
+.oppia-dashboard-view-tabs-container {
+  background: #fff;
+  margin: auto;
+  margin-top: 20px;
+  max-width: 940px;
+  padding: 15px 0;
+  width: 80%;
+}
+
+.oppia-dashboard-view-content-container {
+  margin: auto;
+  max-width: 940px;
+  overflow: auto;
+  width: 80%;
+}
+
+.oppia-view-learner-group .learner-group-card-container {
+  background: #e5eef4;
+}
+
+.oppia-view-learner-group .group-info-container {
+  align-items: flex-start;
+  display: flex;
+  justify-content: space-between;
+  margin: auto;
+  max-width: 940px;
+  padding: 40px 0;
+  width: 80%;
+}
+
+.oppia-view-learner-group .group-cta-buttons-container {
+  display: grid;
+  grid-gap: 15px;
+}
+
+.oppia-view-learner-group .group-cta-buttons-container .btn-primary {
+  background: #00609c;
+  border: 1px solid #00609c;
+  border-radius: 4px;
+  color: #fff;
+  padding: 8px 20px;
+}
+
+.oppia-view-learner-group .group-cta-buttons-container .btn-danger {
+  background: transparent;
+  border: 1px solid #c30000;
+  border-radius: 4px;
+  color: #c30000;
+  padding: 8px 20px;
+}
+
+.oppia-view-learner-group .group-info {
+  display: grid;
+  grid-gap: 6px;
+}
+
+.oppia-view-learner-group .group-info-title {
+  color: #27635c;
+  font-size: 24px;
+}
+
+.oppia-view-learner-group .group-info-description {
+  color: #757575;
+  font-size: 14px;
+}
+
+.oppia-view-learner-group .oppia-dashboard-view-tabs {
+  display: flex;
+  justify-content: space-around;
+}
+
+.oppia-view-learner-group .oppia-dashboard-view-tabs-item {
+  cursor: pointer;
+  padding-bottom: 4px;
+}
+
+.oppia-view-learner-group .oppia-dashboard-view-tabs-item.active {
+  border-bottom: 3px solid #27635c;
+  color: #27635c;
+}
+
+.oppia-view-learner-group .learner-group-overview-summary-card {
+  background: #fff;
+  display: grid;
+  grid-gap: 25px;
+  margin: 40px auto 0;
+  padding: 25px;
+}
+
+.oppia-view-learner-group .learner-group-overview-summary-card-title {
+  color: #27635c;
+  font-size: 18px;
+}
+
+.oppia-view-learner-group .learner-group-overview-summary-card-content {
+  display: flex;
+  gap: 20px;
+}
+
+.oppia-view-learner-group .learner-group-overview-summary-card-content .stories-count,
+.oppia-view-learner-group .learner-group-overview-summary-card-content .skills-count {
+  color: #27635c;
+}
+
+.oppia-view-learner-group .learner-group-overview-summary-card .assigned-stories-info,
+.oppia-view-learner-group .learner-group-overview-summary-card .assigned-skills-info {
+  border: solid 1px #27635c;
+  border-radius: 4px;
+  font-size: 16px;
+  padding: 10px 30px;
+  text-align: center;
+}
+
+.learner-group-preferences-modal .modal-dialog {
+  margin: 150px auto;
+}
+
+.exit-learner-group-modal .modal-dialog {
+  margin: 200px auto;
+}
+
+.exit-learner-group-modal .modal-header {
+  border-bottom: unset;
+  padding-left: 40px
+}
+
+.exit-learner-group-modal .modal-body,
+.learner-group-preferences-modal .modal-body {
+  padding: 0 40px 30px;
+}
+
+.exit-learner-group-modal .modal-footer,
+.learner-group-preferences-modal .modal-footer {
+  border-top: unset;
+  padding-bottom: 40px;
+  padding-right: 40px;
+}
+
+.learner-group-preferences-modal .modal-header {
+  border-bottom: unset;
+  font-size: 24px;
+  padding: 25px 40px 15px 40px;
+}
+
+.learner-group-preferences-modal .modal-header-title {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.learner-group-preferences-modal .modal-body .mat-radio-button {
+  display: unset;
+}
+
+.learner-group-preferences-modal .modal-body .mat-radio-label {
+  white-space: unset;
+}
+
+@media screen and (max-width: 540px) {
+  .oppia-view-learner-group .learner-group-overview-summary-card-content {
+    display: grid;
+  }
+
+  .oppia-dashboard-view-tabs-container,
+  .oppia-dashboard-view-content-container {
+    width: 90%;
+  }
+
+  .oppia-view-learner-group .group-info-container {
+    display: grid;
+    grid-gap: 20px;
+    justify-content: center;
+    text-align: center;
+    width: 90%;
+  }
+
+  .oppia-view-learner-group .group-cta-buttons-container {
+    display: flex;
+  }
+
+  .oppia-view-learner-group .group-cta-buttons-container .btn-primary,
+  .oppia-view-learner-group .group-cta-buttons-container .btn-danger {
+    font-size: 14px;
+    padding: 7px 12px;
+  }
+}

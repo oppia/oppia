@@ -19,6 +19,7 @@
 from __future__ import annotations
 
 import contextlib
+import logging
 
 from core.platform import models
 
@@ -29,7 +30,7 @@ from typing import (
 
 MYPY = False
 if MYPY: # pragma: no cover
-    from mypy_imports import base_models  # pylint: disable=unused-import
+    from mypy_imports import base_models
     from mypy_imports import transaction_services
 
 transaction_services = models.Registry.import_transaction_services()
@@ -52,6 +53,7 @@ StringProperty = ndb.StringProperty
 TextProperty = ndb.TextProperty
 
 TYPE_MODEL_SUBCLASS = TypeVar('TYPE_MODEL_SUBCLASS', bound=Model) # pylint: disable=invalid-name
+MAX_GET_RETRIES = 3
 
 CLIENT = ndb.Client()
 
@@ -85,8 +87,17 @@ def get_multi(keys: List[Key]) -> List[Optional[TYPE_MODEL_SUBCLASS]]:
     Returns:
         list(datastore_services.Model | None). List whose items are either a
         Model instance or None if the corresponding key wasn't found.
+
+    Raises:
+        Exception. If ndb.get_multi fails for MAX_GET_RETRIES.
     """
-    return ndb.get_multi(keys)
+    for unused_i in range(0, MAX_GET_RETRIES):
+        try:
+            return ndb.get_multi(keys)
+        except Exception as e:
+            logging.exception('Exception raised: %s', e)
+            continue
+    raise Exception('get_multi failed after %s retries' % MAX_GET_RETRIES)
 
 
 def update_timestamps_multi(
@@ -145,7 +156,7 @@ def delete_multi(keys: Sequence[Key]) -> List[None]:
     return ndb.delete_multi(keys)
 
 
-# Here Any is used in the type annotation because it mimics the types defined in
+# Here we use type Any because it mimics the types defined in
 # the stubs for this library.
 def query_everything(**kwargs: Dict[str, Any]) -> Query:
     """Returns a query that targets every single entity in the datastore.

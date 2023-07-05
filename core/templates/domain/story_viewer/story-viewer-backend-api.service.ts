@@ -32,6 +32,10 @@ import { StoryViewerDomainConstants } from
   'domain/story_viewer/story-viewer-domain.constants';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
+import {
+  ChapterProgressSummary,
+  ChapterProgressSummaryBackendDict
+} from 'domain/exploration/chapter-progress-summary.model';
 
 interface StoryChapterCompletionBackendResponse {
   'next_node_id': string;
@@ -133,6 +137,35 @@ export class StoryViewerBackendApiService {
       this._recordChapterCompletion(
         topicUrlFragment, classroomUrlFragment, storyUrlFragment,
         nodeId, resolve, reject);
+    });
+  }
+
+  async fetchProgressInStoriesChapters(
+      username: string,
+      storyIds: string[]
+  ): Promise<ChapterProgressSummary[]> {
+    return new Promise((resolve, reject) => {
+      const chaptersProgressUrl = (
+        this.urlInterpolationService.interpolateUrl(
+          '/user_progress_in_stories_chapters_handler/<username>', {
+            username: username
+          }
+        )
+      );
+
+      this.http.get<ChapterProgressSummaryBackendDict[]>(
+        chaptersProgressUrl, {
+          params: {
+            story_ids: JSON.stringify(storyIds)
+          }
+        }).toPromise().then(chaptersProgressInfo => {
+        resolve(
+          chaptersProgressInfo.map(
+            progressInfo => ChapterProgressSummary.createFromBackendDict(
+              progressInfo)
+          )
+        );
+      });
     });
   }
 

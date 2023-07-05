@@ -18,12 +18,17 @@
 
 from __future__ import annotations
 
+import urllib
+
 from core import feconf
-from core import python_utils
+from core import utils
+from core.platform import models
 from core.platform.email import mailgun_email_services
 from core.tests import test_utils
 
 from typing import Dict, Tuple
+
+secrets_services = models.Registry.import_secrets_services()
 
 MailgunQueryType = Tuple[str, bytes, Dict[str, str]]
 
@@ -31,8 +36,22 @@ MailgunQueryType = Tuple[str, bytes, Dict[str, str]]
 class EmailTests(test_utils.GenericTestBase):
     """Tests for sending emails."""
 
+    def setUp(self) -> None:
+        super().setUp()
+        self.swapped_request = lambda *args: args
+        self.swap_api_key_secrets_return_none = self.swap_to_always_return(
+            secrets_services, 'get_secret', None)
+        self.swap_api_key_secrets_return_secret = self.swap_with_checks(
+            secrets_services,
+            'get_secret',
+            lambda _: 'key',
+            expected_args=[
+                ('MAILGUN_API_KEY',),
+            ]
+        )
+
     class Response:
-        """Class to mock python_utils.url_open responses."""
+        """Class to mock utils.url_open responses."""
 
         def __init__(
             self, url: MailgunQueryType, expected_url: MailgunQueryType
@@ -48,7 +67,9 @@ class EmailTests(test_utils.GenericTestBase):
             """
             return 200 if self.url == self.expected_url else 500
 
-    def test_send_email_to_mailgun(self) -> None:
+    def test_send_email_to_mailgun_without_bcc_reply_to_and_recipients(
+        self
+    ) -> None:
         """Test for sending HTTP POST request."""
         # Test sending email without bcc, reply_to or recipient_variables.
         expected_query_url: MailgunQueryType = (
@@ -62,22 +83,23 @@ class EmailTests(test_utils.GenericTestBase):
             {'Authorization': 'Basic YXBpOmtleQ=='}
         )
         swapped_urlopen = lambda x: self.Response(x, expected_query_url)
-        swapped_request = lambda *args: args
-        swap_urlopen_context = self.swap(
-            python_utils, 'url_open', swapped_urlopen)
-        swap_request_context = self.swap(
-            python_utils, 'url_request', swapped_request)
-        swap_api = self.swap(feconf, 'MAILGUN_API_KEY', 'key')
-        swap_domain = self.swap(feconf, 'MAILGUN_DOMAIN_NAME', 'domain')
-        with swap_urlopen_context, swap_request_context, swap_api, swap_domain:
-            resp = mailgun_email_services.send_email_to_recipients(
-                'a@a.com',
-                ['b@b.com'],
-                'Hola 😂 - invitation to collaborate',
-                'plaintext_body 😂',
-                'Hi abc,<br> 😂')
-            self.assertTrue(resp)
 
+        swap_urlopen_context = self.swap(
+            utils, 'url_open', swapped_urlopen)
+        swap_request_context = self.swap(
+            urllib.request, 'Request', self.swapped_request)
+        swap_domain = self.swap(feconf, 'MAILGUN_DOMAIN_NAME', 'domain')
+        with self.swap_api_key_secrets_return_secret, swap_urlopen_context:
+            with swap_request_context, swap_domain:
+                resp = mailgun_email_services.send_email_to_recipients(
+                    'a@a.com',
+                    ['b@b.com'],
+                    'Hola 😂 - invitation to collaborate',
+                    'plaintext_body 😂',
+                    'Hi abc,<br> 😂')
+                self.assertTrue(resp)
+
+    def test_send_email_to_mailgun_with_bcc_and_recipient(self) -> None:
         # Test sending email with single bcc and single recipient email.
         expected_query_url = (
             'https://api.mailgun.net/v3/domain/messages',
@@ -93,23 +115,24 @@ class EmailTests(test_utils.GenericTestBase):
             {'Authorization': 'Basic YXBpOmtleQ=='})
         swapped_urlopen = lambda x: self.Response(x, expected_query_url)
         swap_urlopen_context = self.swap(
-            python_utils, 'url_open', swapped_urlopen)
+            utils, 'url_open', swapped_urlopen)
         swap_request_context = self.swap(
-            python_utils, 'url_request', swapped_request)
-        swap_api = self.swap(feconf, 'MAILGUN_API_KEY', 'key')
+            urllib.request, 'Request', self.swapped_request)
         swap_domain = self.swap(feconf, 'MAILGUN_DOMAIN_NAME', 'domain')
-        with swap_urlopen_context, swap_request_context, swap_api, swap_domain:
-            resp = mailgun_email_services.send_email_to_recipients(
-                'a@a.com',
-                ['b@b.com'],
-                'Hola 😂 - invitation to collaborate',
-                'plaintext_body 😂',
-                'Hi abc,<br> 😂',
-                bcc=['c@c.com'],
-                reply_to='abc',
-                recipient_variables={'b@b.com': {'first': 'Bob', 'id': 1}})
-            self.assertTrue(resp)
+        with self.swap_api_key_secrets_return_secret, swap_urlopen_context:
+            with swap_request_context, swap_domain:
+                resp = mailgun_email_services.send_email_to_recipients(
+                    'a@a.com',
+                    ['b@b.com'],
+                    'Hola 😂 - invitation to collaborate',
+                    'plaintext_body 😂',
+                    'Hi abc,<br> 😂',
+                    bcc=['c@c.com'],
+                    reply_to='abc',
+                    recipient_variables={'b@b.com': {'first': 'Bob', 'id': 1}})
+                self.assertTrue(resp)
 
+    def test_send_email_to_mailgun_with_bcc_and_recipients(self) -> None:
         # Test sending email with single bcc, and multiple recipient emails
         # differentiated by recipient_variables ids.
         expected_query_url = (
@@ -126,22 +149,25 @@ class EmailTests(test_utils.GenericTestBase):
             {'Authorization': 'Basic YXBpOmtleQ=='})
         swapped_urlopen = lambda x: self.Response(x, expected_query_url)
         swap_urlopen_context = self.swap(
-            python_utils, 'url_open', swapped_urlopen)
+            utils, 'url_open', swapped_urlopen)
         swap_request_context = self.swap(
-            python_utils, 'url_request', swapped_request)
-        swap_api = self.swap(feconf, 'MAILGUN_API_KEY', 'key')
+            urllib.request, 'Request', self.swapped_request)
         swap_domain = self.swap(feconf, 'MAILGUN_DOMAIN_NAME', 'domain')
-        with swap_urlopen_context, swap_request_context, swap_api, swap_domain:
-            resp = mailgun_email_services.send_email_to_recipients(
-                'a@a.com',
-                ['b@b.com'],
-                'Hola 😂 - invitation to collaborate',
-                'plaintext_body 😂',
-                'Hi abc,<br> 😂',
-                bcc=['c@c.com', 'd@d.com'],
-                reply_to='abc',
-                recipient_variables=({'b@b.com': {'first': 'Bob', 'id': 1}}))
-            self.assertTrue(resp)
+        with self.swap_api_key_secrets_return_secret, swap_urlopen_context:
+            with swap_request_context, swap_domain:
+                resp = mailgun_email_services.send_email_to_recipients(
+                    'a@a.com',
+                    ['b@b.com'],
+                    'Hola 😂 - invitation to collaborate',
+                    'plaintext_body 😂',
+                    'Hi abc,<br> 😂',
+                    bcc=['c@c.com', 'd@d.com'],
+                    reply_to='abc',
+                    recipient_variables=({
+                        'b@b.com': {'first': 'Bob', 'id': 1}
+                    })
+                )
+                self.assertTrue(resp)
 
     def test_batch_send_to_mailgun(self) -> None:
         """Test for sending HTTP POST request."""
@@ -157,46 +183,56 @@ class EmailTests(test_utils.GenericTestBase):
         swapped_urlopen = lambda x: self.Response(x, expected_query_url)
         swapped_request = lambda *args: args
         swap_urlopen_context = self.swap(
-            python_utils, 'url_open', swapped_urlopen)
+            utils, 'url_open', swapped_urlopen)
         swap_request_context = self.swap(
-            python_utils, 'url_request', swapped_request)
-        swap_api = self.swap(feconf, 'MAILGUN_API_KEY', 'key')
+            urllib.request, 'Request', swapped_request)
         swap_domain = self.swap(feconf, 'MAILGUN_DOMAIN_NAME', 'domain')
-        with swap_urlopen_context, swap_request_context, swap_api, swap_domain:
-            resp = mailgun_email_services.send_email_to_recipients(
-                'a@a.com',
-                ['b@b.com', 'c@c.com', 'd@d.com'],
-                'Hola 😂 - invitation to collaborate',
-                'plaintext_body 😂',
-                'Hi abc,<br> 😂')
-            self.assertTrue(resp)
+        with self.swap_api_key_secrets_return_secret, swap_urlopen_context:
+            with swap_request_context, swap_domain:
+                resp = mailgun_email_services.send_email_to_recipients(
+                    'a@a.com',
+                    ['b@b.com', 'c@c.com', 'd@d.com'],
+                    'Hola 😂 - invitation to collaborate',
+                    'plaintext_body 😂',
+                    'Hi abc,<br> 😂')
+                self.assertTrue(resp)
 
-    def test_mailgun_key_or_domain_name_not_set_raises_exception(self) -> None:
+    def test_mailgun_key_not_set_raises_exception(self) -> None:
         """Test that exceptions are raised when API key or domain name are
         unset.
         """
         # Testing no mailgun api key.
-        mailgun_exception = self.assertRaisesRegexp( # type: ignore[no-untyped-call]
+        mailgun_exception = self.assertRaisesRegex(
             Exception, 'Mailgun API key is not available.')
-        with mailgun_exception:
-            mailgun_email_services.send_email_to_recipients(
-                'a@a.com',
-                ['b@b.com', 'c@c.com', 'd@d.com'],
-                'Hola 😂 - invitation to collaborate',
-                'plaintext_body 😂',
-                'Hi abc,<br> 😂')
+        with self.swap_api_key_secrets_return_none, mailgun_exception:
+            with self.capture_logging() as logs:
+                mailgun_email_services.send_email_to_recipients(
+                    'a@a.com',
+                    ['b@b.com', 'c@c.com', 'd@d.com'],
+                    'Hola 😂 - invitation to collaborate',
+                    'plaintext_body 😂',
+                    'Hi abc,<br> 😂')
+                self.assertIn(
+                    'Cloud Secret Manager is not able to get MAILGUN_API_KEY.',
+                    logs
+                )
 
+    def test_mailgun_domain_name_not_set_raises_exception(self) -> None:
         # Testing no mailgun domain name.
-        swap_api = self.swap(feconf, 'MAILGUN_API_KEY', 'key')
-        mailgun_exception = self.assertRaisesRegexp( # type: ignore[no-untyped-call]
+        mailgun_exception = self.assertRaisesRegex(
             Exception, 'Mailgun domain name is not set.')
-        with swap_api, mailgun_exception:
-            mailgun_email_services.send_email_to_recipients(
-                'a@a.com',
-                ['b@b.com', 'c@c.com', 'd@d.com'],
-                'Hola 😂 - invitation to collaborate',
-                'plaintext_body 😂',
-                'Hi abc,<br> 😂')
+        with self.swap_api_key_secrets_return_secret, mailgun_exception:
+            with self.capture_logging() as logs:
+                mailgun_email_services.send_email_to_recipients(
+                    'a@a.com',
+                    ['b@b.com', 'c@c.com', 'd@d.com'],
+                    'Hola 😂 - invitation to collaborate',
+                    'plaintext_body 😂',
+                    'Hi abc,<br> 😂')
+                self.assertIn(
+                    'Cloud Secret Manager is not able to get MAILGUN_API_KEY.',
+                    logs
+                )
 
     def test_invalid_status_code_returns_false(self) -> None:
         expected_query_url: MailgunQueryType = (
@@ -211,19 +247,22 @@ class EmailTests(test_utils.GenericTestBase):
         swapped_request = lambda *args: args
         swapped_urlopen = lambda x: self.Response(x, expected_query_url)
         swap_urlopen_context = self.swap(
-            python_utils, 'url_open', swapped_urlopen)
+            utils, 'url_open', swapped_urlopen)
         swap_request_context = self.swap(
-            python_utils, 'url_request', swapped_request)
-        swap_api = self.swap(feconf, 'MAILGUN_API_KEY', 'key')
+            urllib.request, 'Request', swapped_request)
         swap_domain = self.swap(feconf, 'MAILGUN_DOMAIN_NAME', 'domain')
-        with swap_urlopen_context, swap_request_context, swap_api, swap_domain:
-            resp = mailgun_email_services.send_email_to_recipients(
-                'a@a.com',
-                ['b@b.com'],
-                'Hola 😂 - invitation to collaborate',
-                'plaintext_body 😂',
-                'Hi abc,<br> 😂',
-                bcc=['c@c.com', 'd@d.com'],
-                reply_to='abc',
-                recipient_variables=({'b@b.com': {'first': 'Bob', 'id': 1}}))
-            self.assertFalse(resp)
+        with self.swap_api_key_secrets_return_secret, swap_urlopen_context:
+            with swap_request_context, swap_domain:
+                resp = mailgun_email_services.send_email_to_recipients(
+                    'a@a.com',
+                    ['b@b.com'],
+                    'Hola 😂 - invitation to collaborate',
+                    'plaintext_body 😂',
+                    'Hi abc,<br> 😂',
+                    bcc=['c@c.com', 'd@d.com'],
+                    reply_to='abc',
+                    recipient_variables=({
+                        'b@b.com': {'first': 'Bob', 'id': 1}
+                    })
+                )
+                self.assertFalse(resp)

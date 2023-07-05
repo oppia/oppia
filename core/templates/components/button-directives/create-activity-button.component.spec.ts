@@ -43,6 +43,7 @@ class MockWindowRef {
     },
     gtag: () => {}
   };
+
   get nativeWindow() {
     return this._window;
   }
@@ -89,6 +90,7 @@ describe('CreateActivityButtonComponent', () => {
     isBlogAdmin: () => false,
     isBlogPostEditor: () => false,
     isQuestionAdmin: () => false,
+    isQuestionCoordinator: () => false,
     canCreateCollections: () => true,
     getPreferredSiteLanguageCode: () =>'en',
     getUsername: () => 'username1',
@@ -113,6 +115,7 @@ describe('CreateActivityButtonComponent', () => {
     isTopicManager: () => false,
     isTranslationAdmin: () => false,
     isQuestionAdmin: () => false,
+    isQuestionCoordinator: () => false,
     isBlogAdmin: () => false,
     isBlogPostEditor: () => false,
     canCreateCollections: () => false,
@@ -192,8 +195,11 @@ describe('CreateActivityButtonComponent', () => {
       spyOn(urlService, 'getPathname').and.returnValue('not/creator-dashboard');
       spyOnProperty(windowRef, 'nativeWindow').and.returnValue({
         location: {
-          replace: (val: string) => {}
-        }
+          _href: '',
+          href: '',
+          replace: (val: string) => {},
+        },
+        gtag: () => '',
       });
       const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
         return ({
@@ -250,6 +256,15 @@ describe('CreateActivityButtonComponent', () => {
       );
       expect(component.creationInProgress).toBe(false);
     }));
+
+    it('should create new exploration when clicked on CREATE' +
+    ' EXPLORATION button', () => {
+      spyOn(
+        explorationCreationService, 'createNewExploration');
+      component.createNewExploration();
+      expect(
+        explorationCreationService.createNewExploration).toHaveBeenCalled();
+    });
   });
 
   describe('when user cannot create collection', () => {

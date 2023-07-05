@@ -17,6 +17,7 @@
  */
 
 import { Injectable } from '@angular/core';
+
 import { PageTitleService } from 'services/page-title.service';
 import { MetaAttribute, MetaTagCustomizationService } from './contextual/meta-tag-customization.service';
 
@@ -24,12 +25,6 @@ interface MetaTagData {
   readonly PROPERTY_TYPE: string;
   readonly PROPERTY_VALUE: string;
   readonly CONTENT: string;
-}
-
-interface PageMetadata {
-  readonly ROUTE: string;
-  readonly TITLE: string;
-  readonly META: readonly MetaTagData[];
 }
 
 @Injectable({
@@ -41,16 +36,17 @@ export class PageHeadService {
     private metaTagCustomizationService: MetaTagCustomizationService
   ) {}
 
-  updateTitleAndMetaTags(pageMetadata: PageMetadata): void {
+  updateTitleAndMetaTags(
+      pageTitle: string, pageMetaAttributes: readonly MetaTagData[]): void {
     // Update default title.
-    this.pageTitleService.setDocumentTitle(pageMetadata.TITLE);
+    this.pageTitleService.setDocumentTitle(pageTitle);
 
     let metaAttributes: MetaAttribute[] = [];
-    for (let i = 0; i < pageMetadata.META.length; i++) {
+    for (let i = 0; i < pageMetaAttributes.length; i++) {
       metaAttributes.push({
-        propertyType: pageMetadata.META[i].PROPERTY_TYPE,
-        propertyValue: pageMetadata.META[i].PROPERTY_VALUE,
-        content: pageMetadata.META[i].CONTENT
+        propertyType: pageMetaAttributes[i].PROPERTY_TYPE,
+        propertyValue: pageMetaAttributes[i].PROPERTY_VALUE,
+        content: pageMetaAttributes[i].CONTENT
       });
     }
     // Update meta tags.

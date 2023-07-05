@@ -22,6 +22,7 @@ import { Subtopic } from 'domain/topic/subtopic.model';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { AssetsBackendApiService } from 'services/assets-backend-api.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
+import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { SubtopicSummaryTileComponent } from './subtopic-summary-tile.component';
 
@@ -37,6 +38,7 @@ describe('SubtopicSummaryTileComponent', () => {
   let abas: AssetsBackendApiService;
   let windowRef: WindowRef;
   let urlInterpolationService: UrlInterpolationService;
+  let i18nLanguageCodeService: I18nLanguageCodeService;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -60,6 +62,7 @@ describe('SubtopicSummaryTileComponent', () => {
     abas = TestBed.inject(AssetsBackendApiService);
     windowRef = TestBed.inject(WindowRef);
     urlInterpolationService = TestBed.inject(UrlInterpolationService);
+    i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
 
     component.subtopic = Subtopic.create({
       id: 1,
@@ -76,30 +79,50 @@ describe('SubtopicSummaryTileComponent', () => {
   });
 
   it('should set component properties on initialization', () => {
-    expect(component.thumbnailBgColor).toBe(undefined);
-    expect(component.subtopicTitle).toBe(undefined);
-    expect(component.thumbnailUrl).toBe(undefined);
-
     spyOn(abas, 'getThumbnailUrlForPreview').and.returnValue('/thumbnail/url');
+    spyOn(i18nLanguageCodeService, 'getSubtopicTranslationKey')
+      .and.returnValue('I18N_SUBTOPIC_123abcd_title_TITLE');
 
     component.ngOnInit();
 
-    expect(component.thumbnailBgColor).toBe('#a11f40');
     expect(component.subtopicTitle).toBe('Title');
     expect(component.thumbnailUrl).toBe('/thumbnail/url');
+    expect(component.subtopicTitleTranslationKey).toBe(
+      'I18N_SUBTOPIC_123abcd_title_TITLE');
   });
 
-  it('should set thumbnail url as null if thumbnail is not present', () => {
-    spyOn(component.subtopic, 'getThumbnailFilename').and.returnValue(null);
+  it('should check if subtopic translation is displayed correctly', () => {
+    spyOn(abas, 'getThumbnailUrlForPreview').and.returnValue('/thumbnail/url');
+    spyOn(i18nLanguageCodeService, 'getSubtopicTranslationKey')
+      .and.returnValue('I18N_SUBTOPIC_123abcd_test_TITLE');
+    spyOn(i18nLanguageCodeService, 'isCurrentLanguageEnglish')
+      .and.returnValue(false);
+    spyOn(i18nLanguageCodeService, 'isHackyTranslationAvailable')
+      .and.returnValue(true);
 
     component.ngOnInit();
 
-    expect(component.thumbnailUrl).toBe(null);
+    expect(component.subtopicTitleTranslationKey).toBe(
+      'I18N_SUBTOPIC_123abcd_test_TITLE');
+    let hackySubtopicTitleTranslationIsDisplayed =
+      component.isHackySubtopicTitleTranslationDisplayed();
+    expect(hackySubtopicTitleTranslationIsDisplayed).toBe(true);
+  });
+
+  it('should throw error if subtopic url is null', () => {
+    spyOn(abas, 'getThumbnailUrlForPreview').and.returnValue('/thumbnail/url');
+    spyOn(i18nLanguageCodeService, 'getSubtopicTranslationKey')
+      .and.returnValue('I18N_SUBTOPIC_123abcd_title_TITLE');
+    component.subtopic = Subtopic.createFromTitle(1, 'Title');
+
+    expect(() => {
+      component.ngOnInit();
+    }).toThrowError('Expected subtopic to have a URL fragment');
   });
 
   it('should not open subtopic page if classroom or topic url' +
     ' does not exist', () => {
-    component.classroomUrlFragment = null;
+    component.subtopic = Subtopic.createFromTitle(1, 'Title');
     expect(component.openSubtopicPage()).toBe(undefined);
   });
 

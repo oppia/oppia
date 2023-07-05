@@ -22,9 +22,9 @@ import { AnswerGroup, AnswerGroupObjectFactory } from 'domain/exploration/Answer
 import { AppConstants } from 'app.constants';
 import { InteractionSpecsConstants } from 'pages/interaction-specs.constants';
 import { Outcome, OutcomeObjectFactory } from 'domain/exploration/OutcomeObjectFactory';
-import { Rule, RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
+import { Rule } from 'domain/exploration/rule.model';
 import { SubtitledUnicode } from 'domain/exploration/SubtitledUnicodeObjectFactory';
-import { TextInputValidationService, Validators } from 'interactions/TextInput/directives/text-input-validation.service';
+import { TextInputValidationService, Validator } from 'interactions/TextInput/directives/text-input-validation.service';
 import { TextInputCustomizationArgs } from 'interactions/customization-args-defs';
 
 describe('TextInputValidationService', () => {
@@ -41,7 +41,6 @@ describe('TextInputValidationService', () => {
   let goodDefaultOutcome: Outcome;
   let oof: OutcomeObjectFactory;
   let agof: AnswerGroupObjectFactory;
-  let rof: RuleObjectFactory;
 
   let createAnswerGroupByRules: (rules: Rule[]) => AnswerGroup;
 
@@ -49,18 +48,18 @@ describe('TextInputValidationService', () => {
     validatorService = TestBed.inject(TextInputValidationService);
     oof = TestBed.inject(OutcomeObjectFactory);
     agof = TestBed.inject(AnswerGroupObjectFactory);
-    rof = TestBed.inject(RuleObjectFactory);
     WARNING_TYPES = AppConstants.WARNING_TYPES;
     let customizationArgSpecs =
      INTERACTION_SPECS.TextInput.customization_arg_specs;
     let rowsSpecs = customizationArgSpecs[1];
-    const validators = rowsSpecs.schema.validators as Validators[];
+    const validators = rowsSpecs.schema.validators as Validator[];
     minRows = validators[0].min_value;
     maxRows = validators[1].max_value;
 
     currentState = 'First State';
     goodDefaultOutcome = oof.createFromBackendDict({
       dest: 'Second State',
+      dest_if_really_stuck: null,
       feedback: {
         html: '',
         content_id: null
@@ -77,6 +76,9 @@ describe('TextInputValidationService', () => {
       },
       rows: {
         value: 1
+      },
+      catchMisspellings: {
+        value: false
       }
     };
 
@@ -154,7 +156,7 @@ describe('TextInputValidationService', () => {
     let answerGroups = [
       createAnswerGroupByRules(
         [
-          rof.createFromBackendDict({
+          Rule.createFromBackendDict({
             rule_type: 'Equals',
             inputs: {
               x: {
@@ -163,7 +165,7 @@ describe('TextInputValidationService', () => {
               }
             }
           }, 'TextInput'),
-          rof.createFromBackendDict({
+          Rule.createFromBackendDict({
             rule_type: 'Equals',
             inputs: {
               x: {
@@ -180,8 +182,8 @@ describe('TextInputValidationService', () => {
       goodDefaultOutcome);
     expect(warnings).toEqual([{
       type: WARNING_TYPES.ERROR,
-      message: 'Answer group 1 has multiple rules with ' +
-        'the same type \'Equals\' within the same group.'
+      message: 'Oppia response 1 has multiple learner answers with ' +
+        'the same type \'Equals\' within the same response.'
     }]);
   });
 
@@ -189,7 +191,7 @@ describe('TextInputValidationService', () => {
     let answerGroups = [
       createAnswerGroupByRules(
         [
-          rof.createFromBackendDict({
+          Rule.createFromBackendDict({
             rule_type: 'Contains',
             inputs: {
               x: {
@@ -202,7 +204,7 @@ describe('TextInputValidationService', () => {
       ),
       createAnswerGroupByRules(
         [
-          rof.createFromBackendDict({
+          Rule.createFromBackendDict({
             rule_type: 'Contains',
             inputs: {
               x: {
@@ -219,14 +221,15 @@ describe('TextInputValidationService', () => {
       goodDefaultOutcome);
     expect(warnings).toEqual([{
       type: WARNING_TYPES.ERROR,
-      message: 'Rule 1 from answer group 2 will never be matched because it' +
-      ' is preceded by a \'Contains\' rule with a matching input.'
+      message: 'Learner answer 1 from Oppia response 2 will never be ' +
+      'matched because it is preceded by a \'Contains\' answer ' +
+      'with a matching input.'
     }]);
 
     answerGroups = [
       createAnswerGroupByRules(
         [
-          rof.createFromBackendDict({
+          Rule.createFromBackendDict({
             rule_type: 'Contains',
             inputs: {
               x: {
@@ -239,7 +242,7 @@ describe('TextInputValidationService', () => {
       ),
       createAnswerGroupByRules(
         [
-          rof.createFromBackendDict({
+          Rule.createFromBackendDict({
             rule_type: 'Contains',
             inputs: {
               x: {
@@ -256,14 +259,15 @@ describe('TextInputValidationService', () => {
       goodDefaultOutcome);
     expect(warnings).toEqual([{
       type: WARNING_TYPES.ERROR,
-      message: 'Rule 1 from answer group 2 will never be matched because it' +
-      ' is preceded by a \'Contains\' rule with a matching input.'
+      message: 'Learner answer 1 from Oppia response 2 will never be ' +
+      'matched because it is preceded by a \'Contains\' answer ' +
+      'with a matching input.'
     }]);
 
     answerGroups = [
       createAnswerGroupByRules(
         [
-          rof.createFromBackendDict({
+          Rule.createFromBackendDict({
             rule_type: 'Contains',
             inputs: {
               x: {
@@ -276,7 +280,7 @@ describe('TextInputValidationService', () => {
       ),
       createAnswerGroupByRules(
         [
-          rof.createFromBackendDict({
+          Rule.createFromBackendDict({
             rule_type: 'Contains',
             inputs: {
               x: {
@@ -293,8 +297,9 @@ describe('TextInputValidationService', () => {
       goodDefaultOutcome);
     expect(warnings).toEqual([{
       type: WARNING_TYPES.ERROR,
-      message: 'Rule 1 from answer group 2 will never be matched because it' +
-      ' is preceded by a \'Contains\' rule with a matching input.'
+      message: 'Learner answer 1 from Oppia response 2 will never be ' +
+      'matched because it is preceded by a \'Contains\' answer ' +
+      'with a matching input.'
     }]);
   });
 
@@ -302,7 +307,7 @@ describe('TextInputValidationService', () => {
     let answerGroups = [
       createAnswerGroupByRules(
         [
-          rof.createFromBackendDict({
+          Rule.createFromBackendDict({
             rule_type: 'StartsWith',
             inputs: {
               x: {
@@ -315,7 +320,7 @@ describe('TextInputValidationService', () => {
       ),
       createAnswerGroupByRules(
         [
-          rof.createFromBackendDict({
+          Rule.createFromBackendDict({
             rule_type: 'StartsWith',
             inputs: {
               x: {
@@ -332,14 +337,15 @@ describe('TextInputValidationService', () => {
       goodDefaultOutcome);
     expect(warnings).toEqual([{
       type: WARNING_TYPES.ERROR,
-      message: 'Rule 1 from answer group 2 will never be matched because it' +
-      ' is preceded by a \'StartsWith\' rule with a matching prefix.'
+      message: 'Learner answer 1 from Oppia response 2 will never be matched' +
+      ' because it is preceded by a \'StartsWith\' answer' +
+      ' with a matching prefix.'
     }]);
 
     answerGroups = [
       createAnswerGroupByRules(
         [
-          rof.createFromBackendDict({
+          Rule.createFromBackendDict({
             rule_type: 'StartsWith',
             inputs: {
               x: {
@@ -352,7 +358,7 @@ describe('TextInputValidationService', () => {
       ),
       createAnswerGroupByRules(
         [
-          rof.createFromBackendDict({
+          Rule.createFromBackendDict({
             rule_type: 'StartsWith',
             inputs: {
               x: {
@@ -369,14 +375,15 @@ describe('TextInputValidationService', () => {
       goodDefaultOutcome);
     expect(warnings).toEqual([{
       type: WARNING_TYPES.ERROR,
-      message: 'Rule 1 from answer group 2 will never be matched because it' +
-      ' is preceded by a \'StartsWith\' rule with a matching prefix.'
+      message: 'Learner answer 1 from Oppia response 2 will never be matched' +
+      ' because it is preceded by a \'StartsWith\' answer' +
+      ' with a matching prefix.'
     }]);
 
     answerGroups = [
       createAnswerGroupByRules(
         [
-          rof.createFromBackendDict({
+          Rule.createFromBackendDict({
             rule_type: 'Contains',
             inputs: {
               x: {
@@ -389,7 +396,7 @@ describe('TextInputValidationService', () => {
       ),
       createAnswerGroupByRules(
         [
-          rof.createFromBackendDict({
+          Rule.createFromBackendDict({
             rule_type: 'StartsWith',
             inputs: {
               x: {
@@ -406,8 +413,9 @@ describe('TextInputValidationService', () => {
       goodDefaultOutcome);
     expect(warnings).toEqual([{
       type: WARNING_TYPES.ERROR,
-      message: 'Rule 1 from answer group 2 will never be matched because it' +
-      ' is preceded by a \'StartsWith\' rule with a matching prefix.'
+      message: 'Learner answer 1 from Oppia response 2 will never be matched' +
+      ' because it is preceded by a \'StartsWith\' answer' +
+      ' with a matching prefix.'
     }]);
   });
 
@@ -415,7 +423,7 @@ describe('TextInputValidationService', () => {
     let answerGroups = [
       createAnswerGroupByRules(
         [
-          rof.createFromBackendDict({
+          Rule.createFromBackendDict({
             rule_type: 'Equals',
             inputs: {
               x: {
@@ -428,7 +436,7 @@ describe('TextInputValidationService', () => {
       ),
       createAnswerGroupByRules(
         [
-          rof.createFromBackendDict({
+          Rule.createFromBackendDict({
             rule_type: 'Equals',
             inputs: {
               x: {
@@ -445,14 +453,15 @@ describe('TextInputValidationService', () => {
       goodDefaultOutcome);
     expect(warnings).toEqual([{
       type: WARNING_TYPES.ERROR,
-      message: 'Rule 1 from answer group 2 will never be matched because it' +
-      ' is preceded by a \'Equals\' rule with a matching input.'
+      message: 'Learner answer 1 from Oppia response 2 will never be matched' +
+      ' because it is preceded by a \'Equals\' answer' +
+      ' with a matching input.'
     }]);
 
     answerGroups = [
       createAnswerGroupByRules(
         [
-          rof.createFromBackendDict({
+          Rule.createFromBackendDict({
             rule_type: 'FuzzyEquals',
             inputs: {
               x: {
@@ -465,7 +474,7 @@ describe('TextInputValidationService', () => {
       ),
       createAnswerGroupByRules(
         [
-          rof.createFromBackendDict({
+          Rule.createFromBackendDict({
             rule_type: 'Equals',
             inputs: {
               x: {
@@ -482,8 +491,9 @@ describe('TextInputValidationService', () => {
       goodDefaultOutcome);
     expect(warnings).toEqual([{
       type: WARNING_TYPES.ERROR,
-      message: 'Rule 1 from answer group 2 will never be matched because it' +
-      ' is preceded by a \'FuzzyEquals\' rule with a matching input.'
+      message: 'Learner answer 1 from Oppia response 2 will never be matched' +
+      ' because it is preceded by a \'FuzzyEquals\' answer' +
+      ' with a matching input.'
     }]);
   });
 
@@ -491,7 +501,7 @@ describe('TextInputValidationService', () => {
     let answerGroups = [
       createAnswerGroupByRules(
         [
-          rof.createFromBackendDict({
+          Rule.createFromBackendDict({
             rule_type: 'FuzzyEquals',
             inputs: {
               x: {
@@ -504,7 +514,7 @@ describe('TextInputValidationService', () => {
       ),
       createAnswerGroupByRules(
         [
-          rof.createFromBackendDict({
+          Rule.createFromBackendDict({
             rule_type: 'FuzzyEquals',
             inputs: {
               x: {
@@ -521,14 +531,15 @@ describe('TextInputValidationService', () => {
       goodDefaultOutcome);
     expect(warnings).toEqual([{
       type: WARNING_TYPES.ERROR,
-      message: 'Rule 1 from answer group 2 will never be matched because it' +
-      ' is preceded by a \'FuzzyEquals\' rule with a matching input.'
+      message: 'Learner answer 1 from Oppia response 2 will never be matched' +
+      ' because it is preceded by a \'FuzzyEquals\' answer' +
+      ' with a matching input.'
     }]);
 
     answerGroups = [
       createAnswerGroupByRules(
         [
-          rof.createFromBackendDict({
+          Rule.createFromBackendDict({
             rule_type: 'FuzzyEquals',
             inputs: {
               x: {
@@ -541,7 +552,7 @@ describe('TextInputValidationService', () => {
       ),
       createAnswerGroupByRules(
         [
-          rof.createFromBackendDict({
+          Rule.createFromBackendDict({
             rule_type: 'FuzzyEquals',
             inputs: {
               x: {
@@ -558,8 +569,9 @@ describe('TextInputValidationService', () => {
       goodDefaultOutcome);
     expect(warnings).toEqual([{
       type: WARNING_TYPES.ERROR,
-      message: 'Rule 1 from answer group 2 will never be matched because it' +
-      ' is preceded by a \'FuzzyEquals\' rule with a matching input.'
+      message: 'Learner answer 1 from Oppia response 2 will never be matched' +
+      ' because it is preceded by a \'FuzzyEquals\' answer' +
+      ' with a matching input.'
     }]);
   });
 });

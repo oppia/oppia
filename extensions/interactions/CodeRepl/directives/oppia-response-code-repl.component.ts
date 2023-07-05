@@ -24,8 +24,11 @@ import { downgradeComponent } from '@angular/upgrade/static';
 import { HtmlEscaperService } from 'services/html-escaper.service';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
 
-interface Answer {
+export interface Answer {
   error: string;
+  code: string;
+  output: string;
+  evaluation: string;
 }
 
 @Component({
@@ -34,11 +37,11 @@ interface Answer {
   styleUrls: []
 })
 export class ResponseCodeReplComponent implements OnInit {
-  @Input('answer') answerWithValue!: string;
+  @Input() answer!: string;
   // These properties are initialized using Angular lifecycle hooks
-  // and we need to do non-null assertion, for more information see
+  // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
-  answer!: Answer;
+  escapedAnswer!: Answer;
   errorFocusLabel!: string;
   constructor(
     private htmlEscaperService: HtmlEscaperService,
@@ -46,9 +49,9 @@ export class ResponseCodeReplComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    this.answer = this.htmlEscaperService.escapedJsonToObj(
-      this.answerWithValue) as Answer;
-    if (this.answer.error) {
+    this.escapedAnswer = this.htmlEscaperService.escapedJsonToObj(
+      this.answer) as Answer;
+    if (this.escapedAnswer.error) {
       this.errorFocusLabel = this.focusManagerService.generateFocusLabel();
       this.focusManagerService.setFocus(this.errorFocusLabel);
     }

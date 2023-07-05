@@ -32,11 +32,42 @@ export const ExplorationPlayerConstants = {
   // and the appearance of the hint.
   DELAY_FOR_HINT_FEEDBACK_MSEC: 100,
 
+  // The enforced waiting period before the concept card
+  // icon appears.
+  WAIT_FOR_CONCEPT_CARD_MSEC: 60000,
+
+  // The time delay after all the hints are exhausted, or after
+  // the concept card is used. This is the stage when the learner
+  // is said to be really stuck.
+  WAIT_BEFORE_RESPONSE_FOR_STUCK_LEARNER_MSEC: 150000,
+
+  // The time delay after all the hints are exhausted, or after
+  // the concept card is used. This is the stage when the learner
+  // is said to be really stuck.
+  WAIT_BEFORE_REALLY_STUCK_MSEC: 160000,
+
+  // The threshold for incorrect answers submitted after either
+  // exhausting all the hints, or after using the concept card,
+  // after which the learner is said to be really stuck.
+  MAX_INCORRECT_ANSWERS_BEFORE_REALLY_STUCK: 3,
+
+  MAX_INCORRECT_ANSWERS_BEFORE_RELEASING_SOLUTION: 3,
+
   // Array of i18n IDs for the possible hint request strings.
   HINT_REQUEST_STRING_I18N_IDS: [
     'I18N_PLAYER_HINT_REQUEST_STRING_1',
     'I18N_PLAYER_HINT_REQUEST_STRING_2',
     'I18N_PLAYER_HINT_REQUEST_STRING_3'],
+
+  // Array of i18n IDs for nudging the learner towards checking the spelling.
+  I18N_ANSWER_MISSPELLED_RESPONSE_TEXT_IDS: [
+    'I18N_ANSWER_MISSPELLED_RESPONSE_TEXT_0',
+    'I18N_ANSWER_MISSPELLED_RESPONSE_TEXT_1',
+    'I18N_ANSWER_MISSPELLED_RESPONSE_TEXT_2'
+  ],
+
+  // Threshold value of edit distance for judging an answer as a misspelling.
+  THRESHOLD_EDIT_DISTANCE_FOR_MISSPELLINGS: 2,
 
   /* This should match the CSS class defined in the tutor card directive. */
   AUDIO_HIGHLIGHT_CSS_CLASS: 'conversation-skin-audio-highlight',
@@ -54,11 +85,11 @@ export const ExplorationPlayerConstants = {
   DEFAULT_OUTCOME_CLASSIFICATION: 'default_outcome',
 
   EXPLORATION_MODE: {
+    DIAGNOSTIC_TEST_PLAYER: 'diagnostic_test_player',
     EXPLORATION: 'exploration',
     PRETEST: 'pretest',
     QUESTION_PLAYER: 'question_player',
     STORY_CHAPTER: 'story_chapter',
-    OTHER: 'other'
   },
 
   STATS_EVENT_TYPES: {

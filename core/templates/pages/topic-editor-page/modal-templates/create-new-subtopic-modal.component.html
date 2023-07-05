@@ -1,0 +1,143 @@
+<div class="oppia-create-new-subtopic-container">
+  <div class="modal-header">
+    <h3>
+      Create New Subtopic
+    </h3>
+  </div>
+  <div>
+    <div class="modal-body new-subtopic-editor e2e-test-new-subtopic-editor">
+      <div class="create-new-subtopic-input-field">
+        <div>
+          <strong>Title*</strong>
+        </div>
+        <input class="form-control oppia-new-subtopic-editable-field e2e-test-new-subtopic-title-field required"
+               placeholder="Enter a brief description for the subtopic that students can easily understand, e.g. 'Adding Fractions'"
+               [(ngModel)]="subtopicTitle" (change)="resetErrorMsg()" maxlength="{{MAX_CHARS_IN_SUBTOPIC_TITLE}}" autofocus>
+        <span class="oppia-input-box-subtitle">
+          <em>
+            Subtopic title should be at most {{MAX_CHARS_IN_SUBTOPIC_TITLE}} characters.
+          </em>
+        </span>
+        <span class="form-text error-msg" *ngIf="errorMsg">
+          <em>{{errorMsg}}</em>
+        </span>
+      </div>
+      <div>
+        <strong>Enter the url fragment for the subtopic*</strong>
+      </div>
+      <input class="form-control oppia-new-subtopic-editable-field e2e-test-new-subtopic-url-fragment-field"
+             [ngClass]="{'is-invalid': editableUrlFragment && (!isUrlFragmentValid() || subtopicUrlFragmentExists)}"
+             placeholder="Enter a url fragment for the subtopic."
+             [(ngModel)]="editableUrlFragment" (change)="checkSubtopicExistence()" maxlength="{{MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT}}">
+      <span class="oppia-input-box-subtitle">
+        <em>
+          The subtopic URL fragment is used to uniquely access the subtopic viewer page. It should consist of one or more hyphen-separated words, all in lowercase, with at most {{MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT}} characters in total and must be unique across the topic. Please use meaningful keywords, and avoid using words like "and", "of", or "the".
+          This subtopic can be accessed at the following URL:<br>
+          {{hostname}}/learn/{{classroomUrlFragment}}/{{this.topic.getUrlFragment()}}/revision/{{editableUrlFragment}}
+        </em>
+      </span>
+      <div class="oppia-input-box-subtitle text-danger" *ngIf="editableUrlFragment && subtopicUrlFragmentExists">
+        <em>The subtopic url fragment is not unique.</em>
+      </div>
+
+      <div class="create-new-subtopic-input-field create-new-subtopic-content">
+        <div>
+          <strong>Explanation of the subtopic*</strong>
+        </div>
+        <div class="description-editor e2e-test-subtopic-description-editor" *ngIf="schemaEditorIsShown">
+          <div class="oppia-editor-card-body" >
+            <schema-based-editor [schema]="getSchema()"
+                                 class="e2e-test-create-subtopic-page-content"
+                                 [localValue]="htmlData"
+                                 (localValueChange)="localValueChange($event)">
+            </schema-based-editor>
+          </div>
+        </div>
+
+        <div *ngIf="!schemaEditorIsShown" (click)="showSchemaEditor()" class="e2e-test-show-schema-editor">
+          <span class="oppia-placeholder">
+              Give a description or explanation of the subtopic.
+            <i class="fa fa-pen"></i>
+          </span>
+        </div>
+      </div>
+
+      <div class="thumbnail-editor e2e-test-subtopic-thumbnail e2e-test-photo-button create-new-subtopic-input-field">
+        <strong>Thubmnail Image*</strong>
+        <oppia-thumbnail-uploader (updateFilename)="updateSubtopicThumbnailFilename($event)"
+                                  [useLocalStorage]="false"
+                                  [bgColor]="editableThumbnailBgColor"
+                                  (updateBgColor)="updateSubtopicThumbnailBgColor($event)"
+                                  [allowedBgColors]="allowedBgColors"
+                                  [aspectRatio]="'4:3'"
+                                  [previewTitle]="subtopicTitle"
+                                  previewDescriptionBgColor="#BE563C">
+        </oppia-thumbnail-uploader>
+      </div>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button class="btn btn-secondary" (click)="cancel()" type="button">Cancel</button>
+    <button class="btn btn-success e2e-test-confirm-subtopic-creation-button"
+            type="submit" [disabled]="!isSubtopicValid() || subtopicUrlFragmentExists" (click)="save()">
+      Create Subtopic
+    </button>
+  </div>
+</div>
+<style>
+  .new-subtopic-editor .form-text {
+    margin-left: 37.5%;
+    margin-top: -3%;
+  }
+  .new-subtopic-editor .thumbnail-editor {
+    margin: 25px 0;
+  }
+  .new-subtopic-editor .description-editor {
+    margin: 10px 0 0;
+  }
+  .new-subtopic-editor .error-msg {
+    color: #f00;
+    font-size: smaller;
+    margin: 10px 0 0;
+  }
+  .oppia-create-new-subtopic-container .create-new-subtopic-content {
+    margin: 15px 0;
+  }
+  .oppia-create-new-subtopic-container .oppia-new-subtopic-editable-field {
+    font-size: 12px;
+  }
+  @media screen and (max-width: 768px) {
+    .create-new-subtopic .modal-dialog {
+      border: 0;
+      border-radius: 0;
+      margin: 0;
+      padding: 0;
+      width: 100vw;
+    }
+    .create-new-subtopic .modal-content {
+      border: 0;
+      border-radius: 0;
+      height: 100vh;
+      overflow: auto;
+    }
+    .create-new-subtopic .modal-header {
+      align-items: center;
+      background-color: #00609c;
+      display: flex;
+    }
+    .create-new-subtopic .modal-header h3 {
+      color: #fff;
+    }
+    .create-new-subtopic .create-new-subtopic-input-field {
+      margin: 25px 0;
+    }
+    .create-new-subtopic .modal-close-button {
+      color: #fff;
+      display: block;
+      font-size: 20px;
+    }
+    .create-new-subtopic .ng-touched.ng-empty.required {
+     outline: 1px solid #f00;
+    }
+  }
+</style>

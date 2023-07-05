@@ -28,6 +28,7 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MaterialModule } from 'modules/material.module';
 import { FormsModule } from '@angular/forms';
+import { LearnerExplorationSummaryBackendDict } from 'domain/summary/learner-exploration-summary.model';
 
 describe('Collection node editor component ', () => {
   let component: CollectionNodeEditorComponent;
@@ -36,8 +37,9 @@ describe('Collection node editor component ', () => {
   let alertsService: AlertsService;
   let collectionEditorStateService: CollectionEditorStateService;
 
-  let sampleCollection = null;
-  let learnerExplorationSummaryBackendDict = null;
+  let sampleCollection: Collection;
+  let learnerExplorationSummaryBackendDict:
+    LearnerExplorationSummaryBackendDict;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
@@ -82,7 +84,7 @@ describe('Collection node editor component ', () => {
       objective: 'Test Objective',
       status: 'public',
       tags: [],
-      thumbnail_bg_color: '#cd672b',
+      thumbnail_bg_color: '#cc4b00',
       thumbnail_icon_url: '/subjects/Algebra.svg',
       title: 'a title'
     };
@@ -137,7 +139,7 @@ describe('Collection node editor component ', () => {
     spyOn(collectionLinearizerService, 'removeCollectionNode')
       .and.returnValue(false);
     let alertsSpy = spyOn(alertsService, 'fatalWarning')
-      .and.returnValue(null);
+      .and.returnValue();
 
     component.deleteNode();
 
@@ -160,7 +162,7 @@ describe('Collection node editor component ', () => {
     spyOn(collectionLinearizerService, 'shiftNodeLeft')
       .and.returnValue(false);
     let alertsSpy = spyOn(alertsService, 'fatalWarning')
-      .and.returnValue(null);
+      .and.returnValue();
 
     component.shiftNodeLeft();
 
@@ -183,7 +185,7 @@ describe('Collection node editor component ', () => {
     spyOn(collectionLinearizerService, 'shiftNodeRight')
       .and.returnValue(false);
     let alertsSpy = spyOn(alertsService, 'fatalWarning')
-      .and.returnValue(null);
+      .and.returnValue();
 
     component.shiftNodeRight();
 

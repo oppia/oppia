@@ -23,12 +23,14 @@ import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 import { UrlService } from 'services/contextual/url.service';
 import { CollectionFooterComponent } from './collection-footer.component';
+import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 
 describe('Collection footer component', () => {
   let urlInterpolationService: UrlInterpolationService;
   let urlService: UrlService;
   let component: CollectionFooterComponent;
   let fixture: ComponentFixture<CollectionFooterComponent>;
+  let i18nLanguageCodeService: I18nLanguageCodeService;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -51,6 +53,10 @@ describe('Collection footer component', () => {
     component = fixture.componentInstance;
     urlInterpolationService = TestBed.inject(UrlInterpolationService);
     urlService = TestBed.inject(UrlService);
+    i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
+
+    spyOn(i18nLanguageCodeService, 'isCurrentLanguageRTL').and.returnValue(
+      true);
   });
 
   beforeEach(() => {

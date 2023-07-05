@@ -18,7 +18,7 @@
 
 const { merge } = require('webpack-merge');
 const common = require('./webpack.common.config.ts');
-const path = require('path');
+var path = require('path');
 
 module.exports = merge(common, {
   mode: 'development',

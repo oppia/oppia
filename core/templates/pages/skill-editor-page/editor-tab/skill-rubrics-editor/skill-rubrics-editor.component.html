@@ -1,47 +1,47 @@
-<md-card class="oppia-editor-card-with-avatar oppia-mobile-collapsible-card oppia-rubrics-editor-card">
+<div class="oppia-editor-card-with-avatar oppia-mobile-collapsible-card oppia-rubrics-editor-card">
   <div class="oppia-editor-card-body">
     <div class="oppia-editor-card-section edit-rubrics-header">
-      <div class="oppia-skill-rubrics-header oppia-mobile-collapsible-card-header" ng-click="toggleRubricsList()">
+      <div class="oppia-skill-rubrics-header oppia-mobile-collapsible-card-header" (click)="toggleRubricsList()">
         <strong>Rubrics</strong>
         <i class="fa fa-caret-down"
-           ng-if="!rubricsListIsShown"
+           *ngIf="!rubricsListIsShown"
            aria-hidden="true">
         </i>
         <i class="fa fa-caret-up"
-           ng-if="rubricsListIsShown"
+           *ngIf="rubricsListIsShown"
            aria-hidden="true">
         </i>
       </div>
-      <div ng-if="rubricsListIsShown" class="oppia-mobile-collapsible-card-content">
+      <div *ngIf="rubricsListIsShown" class="oppia-mobile-collapsible-card-content">
         <oppia-rubrics-editor [rubrics]="skill.getRubrics()"
-                              (save-rubric)="onSaveRubric($event.difficulty, $event.data)"
-                              [new-skill-being-created]="false">
+                              (saveRubric)="onSaveRubric($event.difficulty, $event.data)"
+                              [newSkillBeingCreated]="false">
         </oppia-rubrics-editor>
       </div>
     </div>
   </div>
-</md-card>
+</div>
 
 <style>
-  skill-rubrics-editor .edit-rubrics-header strong {
+  .edit-rubrics-header strong {
     font-size: 16px;
   }
-  skill-rubrics-editor .oppia-skill-rubrics-header {
+  .oppia-skill-rubrics-header {
     display: flex;
     justify-content: space-between;
   }
-  skill-rubrics-editor .oppia-skill-rubrics-header i {
+  .oppia-skill-rubrics-header i {
     display: none;
   }
-  skill-rubrics-editor .oppia-rubrics-editor-card {
+  .oppia-rubrics-editor-card {
     margin-bottom: 5vh;
   }
 
   @media screen and (max-width: 768px) {
-    skill-rubrics-editor .oppia-skill-rubrics-header i {
+    .oppia-skill-rubrics-header i {
       display: block;
     }
-    skill-rubrics-editor .edit-rubrics-header {
+    .edit-rubrics-header {
       padding: 0;
     }
   }

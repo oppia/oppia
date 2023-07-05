@@ -19,6 +19,7 @@
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { Rubric } from 'domain/skill/rubric.model';
 import { SkillCreationBackendApiService } from 'domain/skill/skill-creation-backend-api.service';
 import { TopicsAndSkillsDashboardBackendApiService } from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
@@ -36,10 +37,10 @@ describe('Create New Skill Modal Service', () => {
   let mockSkillCreationBackendApiService: MockSkillCreationBackendApiService;
 
   class MockNgbModal {
-    open(content, options) {
+    open(content: string, options: string[]) {
       return {
         result: {
-          then: (callb) => {
+          then: (callb: (result: {}) => void) => {
             let result = {
               rubrics: {
                 rubric1: {
@@ -56,10 +57,10 @@ describe('Create New Skill Modal Service', () => {
 
   class MockSkillCreationBackendApiService {
     throwError: boolean = false;
-    message: string;
+    message!: string;
     createSkillAsync(
         description: string,
-        rubrics,
+        rubrics: Rubric[],
         explanation: string,
         topicsIds: string[],
         imagesData: ImageData[]
@@ -121,19 +122,25 @@ describe('Create New Skill Modal Service', () => {
   beforeEach(() => {
     createNewSkillModalService = TestBed.inject(CreateNewSkillModalService);
     alertsService = TestBed.inject(AlertsService);
-    alertsService = (alertsService as unknown) as
-      jasmine.SpyObj<AlertsService>;
+    alertsService = alertsService as jasmine.SpyObj<AlertsService>;
     imageLocalStorageService = TestBed.inject(ImageLocalStorageService);
-    imageLocalStorageService = (imageLocalStorageService as unknown) as
+    imageLocalStorageService = imageLocalStorageService as
       jasmine.SpyObj<ImageLocalStorageService>;
     topicsAndSkillsDashboardBackendApiService =
     TestBed.inject(TopicsAndSkillsDashboardBackendApiService);
-    topicsAndSkillsDashboardBackendApiService =
-    (topicsAndSkillsDashboardBackendApiService as unknown) as jasmine
-    .SpyObj<TopicsAndSkillsDashboardBackendApiService>;
-    mockSkillCreationBackendApiService =
-    (TestBed.inject(SkillCreationBackendApiService) as unknown) as
-    MockSkillCreationBackendApiService;
+    topicsAndSkillsDashboardBackendApiService = (
+      topicsAndSkillsDashboardBackendApiService as
+      jasmine.SpyObj<TopicsAndSkillsDashboardBackendApiService>
+    );
+    mockSkillCreationBackendApiService = (
+      // This throws "Type 'MockSkillCreationBackendApiService' is not
+      // assignable to type desire". We need to suppress this error because of
+      // the need to test validations. This happens because the
+      // MockSkillCreationBackendApiService is a class and not an interface.
+      // @ts-ignore
+      TestBed.inject(SkillCreationBackendApiService) as
+      MockSkillCreationBackendApiService
+    );
   });
 
   it('should not create new skill when skill creation is in progress', () => {
@@ -146,7 +153,7 @@ describe('Create New Skill Modal Service', () => {
   it('should create new skill', fakeAsync(() => {
     spyOn(alertsService, 'clearWarnings');
     spyOn(imageLocalStorageService, 'getStoredImagesData').and
-      .returnValue(null);
+      .returnValue([]);
     spyOn(imageLocalStorageService, 'flushStoredImagesData');
     spyOn(
       topicsAndSkillsDashboardBackendApiService.
@@ -167,7 +174,7 @@ describe('Create New Skill Modal Service', () => {
     spyOn(alertsService, 'clearWarnings');
     spyOn(alertsService, 'addWarning');
     spyOn(imageLocalStorageService, 'getStoredImagesData').and
-      .returnValue(null);
+      .returnValue([]);
     mockSkillCreationBackendApiService.throwError = true;
     let message = 'error_message';
     mockSkillCreationBackendApiService.message = message;

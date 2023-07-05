@@ -13,74 +13,67 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for the state translation status graph.
+ * @fileoverview Compoennt for the state translation status graph.
  */
 
-require(
-  'pages/exploration-editor-page/editor-tab/graph-directives/' +
-  'state-graph-visualization.directive.ts');
+import { Component, Input } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
+import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
+import { StateRecordedVoiceoversService } from 'components/state-editor/state-editor-properties-services/state-recorded-voiceovers.service';
+import { ExplorationStatesService } from 'pages/exploration-editor-page/services/exploration-states.service';
+import { GraphDataService } from 'pages/exploration-editor-page/services/graph-data.service';
+import { RouterService } from 'pages/exploration-editor-page/services/router.service';
+import { TranslationStatusService } from '../services/translation-status.service';
 
-require('domain/utilities/url-interpolation.service.ts');
-require('pages/exploration-editor-page/services/exploration-states.service.ts');
-require('pages/exploration-editor-page/services/graph-data.service.ts');
-require(
-  'pages/exploration-editor-page/translation-tab/services/' +
-  'translation-status.service.ts');
-require(
-  'components/state-editor/state-editor-properties-services/' +
-  'state-editor.service.ts');
-require(
-  'components/state-editor/state-editor-properties-services/' +
-  'state-property.service.ts');
-require(
-  'components/state-editor/state-editor-properties-services/' +
-  'state-recorded-voiceovers.service.ts');
-require(
-  'components/state-editor/state-editor-properties-services/' +
-  'state-written-translations.service.ts');
+@Component({
+  selector: 'oppia-state-translation-status-graph',
+  templateUrl: './state-translation-status-graph.component.html'
+})
+export class StateTranslationStatusGraphComponent {
+  // This property is initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  @Input() isTranslationTabBusy!: boolean;
 
-angular.module('oppia').component('stateTranslationStatusGraph', {
-  bindings: {
-    isTranslationTabBusy: '='
-  },
-  template: require('./state-translation-status-graph.component.html'),
-  controller: [
-    '$scope', 'ExplorationStatesService', 'GraphDataService',
-    'StateEditorService', 'StateRecordedVoiceoversService',
-    'StateWrittenTranslationsService', 'TranslationStatusService',
-    function(
-        $scope, ExplorationStatesService, GraphDataService,
-        StateEditorService, StateRecordedVoiceoversService,
-        StateWrittenTranslationsService, TranslationStatusService) {
-      var ctrl = this;
+  constructor(
+    private explorationStatesService: ExplorationStatesService,
+    private graphDataService: GraphDataService,
+    private stateEditorService: StateEditorService,
+    private routerService: RouterService,
+    private stateRecordedVoiceoversService: StateRecordedVoiceoversService,
+    private translationStatusService: TranslationStatusService
+  ) { }
 
-      $scope.getGraphData = function() {
-        return GraphDataService.getGraphData();
-      };
-      $scope.nodeColors = function() {
-        return TranslationStatusService.getAllStateStatusColors();
-      };
-      $scope.getActiveStateName = function() {
-        return StateEditorService.getActiveStateName();
-      };
-      $scope.onClickStateInMap = function(newStateName) {
-        if (ctrl.isTranslationTabBusy) {
-          StateEditorService.onShowTranslationTabBusyModal.emit();
-          return;
-        }
-        StateEditorService.setActiveStateName(newStateName);
-        var stateName = StateEditorService.getActiveStateName();
-        var stateData = ExplorationStatesService.getState(stateName);
-        if (stateName && stateData) {
-          StateRecordedVoiceoversService.init(
-            StateEditorService.getActiveStateName(),
-            stateData.recordedVoiceovers);
-          StateWrittenTranslationsService.init(
-            StateEditorService.getActiveStateName(),
-            stateData.writtenTranslations);
-          StateEditorService.onRefreshStateTranslation.emit();
-        }
-      };
+  nodeColors(): object {
+    return this.translationStatusService.getAllStateStatusColors();
+  }
+
+  getActiveStateName(): string | null {
+    return this.stateEditorService.getActiveStateName();
+  }
+
+  onClickStateInMap(newStateName: string): void {
+    if (this.isTranslationTabBusy) {
+      this.stateEditorService.onShowTranslationTabBusyModal.emit();
+      return;
     }
-  ]
-});
+    this.stateEditorService.setActiveStateName(newStateName);
+    let stateName = this.stateEditorService.getActiveStateName();
+    if (!stateName) {
+      throw new Error('Active state name cannot be null.');
+    }
+    let stateData = this.explorationStatesService.getState(stateName);
+
+    if (stateName && stateData) {
+      this.stateRecordedVoiceoversService.init(
+        stateName, stateData.recordedVoiceovers);
+      this.stateEditorService.onRefreshStateTranslation.emit();
+    }
+    this.routerService.onCenterGraph.emit();
+  }
+}
+
+angular.module('oppia').directive('oppiaStateTranslationStatusGraph',
+  downgradeComponent({
+    component: StateTranslationStatusGraphComponent
+  }) as angular.IDirectiveFactory);

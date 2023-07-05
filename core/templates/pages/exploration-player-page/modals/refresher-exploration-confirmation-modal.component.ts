@@ -31,7 +31,10 @@ import { ExplorationEngineService } from '../services/exploration-engine.service
 export class RefresherExplorationConfirmationModal
   extends ConfirmOrCancelModal {
   confirmRedirectEventEmitter: EventEmitter<void> = new EventEmitter();
-  refresherExplorationId: string;
+  // This property is initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  refresherExplorationId!: string;
   constructor(
       private ngbActiveModal: NgbActiveModal,
       private windowRef: WindowRef,

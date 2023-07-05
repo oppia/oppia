@@ -1,0 +1,125 @@
+{
+  "compilerOptions": {
+    "allowJs": true,
+    "skipLibCheck": true,
+    "downlevelIteration": true,
+    "lib": [
+      "es2017",
+      "dom",
+      "webworker"
+    ],
+    "module": "es2020",
+    "noImplicitUseStrict": true,
+    "outDir": "local_compiled_js_for_test",
+    "rootDir": ".",
+    "target": "es6",
+    "sourceMap": true,
+    "typeRoots": [
+      "./node_modules/@types"
+    ],
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "resolveJsonModule": true,
+    "moduleResolution": "node",
+    "baseUrl": ".",
+    "paths": {
+      "analytics-constants": [
+        "assets/analytics-constants.json"
+      ],
+      "app.constants": [
+        "core/templates/app.constants"
+      ],
+      "google-analytics.initializer": [
+        "core/templates/google-analytics.initializer"
+      ],
+      "hybrid-router-module-provider": [
+        "core/templates/hybrid-router-module-provider"
+      ],
+      "app-events/*": [
+        "core/templates/app-events/*"
+      ],
+      "base-components/*": [
+        "core/templates/base-components/*"
+      ],
+      "components/*": [
+        "core/templates/components/*"
+      ],
+      "directives/*": [
+        "core/templates/directives/*"
+      ],
+      "domain/*": [
+        "core/templates/domain/*"
+      ],
+      "expressions/*": [
+        "core/templates/expressions/*"
+      ],
+      "i18n/*": [
+        "core/templates/i18n/*"
+      ],
+      "modules/*": [
+        "core/templates/modules/*"
+      ],
+      "pages/*": [
+        "core/templates/pages/*"
+      ],
+      "services/*": [
+        "core/templates/services/*"
+      ],
+      "classifiers/*": [
+        "extensions/classifiers/*"
+      ],
+      "interactions/*": [
+        "extensions/interactions/*"
+      ],
+      "rich_text_components/*": [
+        "extensions/rich_text_components/*"
+      ],
+      "objects/*": [
+        "extensions/objects/*"
+      ],
+      "filters/*": [
+        "core/templates/filters/*"
+      ],
+      "static/*": [
+        "third_party/static/*"
+      ],
+      "tests/*": [
+        "core/templates/tests/*"
+      ],
+      "stream": [
+        "./node_modules/stream-browserify"
+      ],
+      "zlib": [
+        "./node_modules/browserify-zlib"
+      ],
+      "path": [
+        "./node_modules/path-browserify"
+      ],
+      "utility/*": [
+        "core/templates/utility/*"
+      ],
+      "visualizations/*": [
+        "extensions/visualizations/*"
+      ],
+      "value_generators/*": [
+        "extensions/value_generators/*"
+      ]
+    }
+  },
+  "files": [
+    "assets/constants.ts",
+    "assets/rich_text_components_definitions.ts",
+    "src/main.ts",
+    "core/tests/karma.conf.ts"
+  ],
+  "include": [
+    "core",
+    "extensions",
+    "typings"
+  ],
+  "exclude": [
+    "core/tests"
+  ]
+}

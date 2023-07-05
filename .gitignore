@@ -22,6 +22,10 @@ core/templates/prod/*
 webpack_bundles/*
 core/tests/.browserstack.env
 node_modules/*
+# .angular is temp folder used by angular to put logs and other artefacts.
+.angular/*
+# dist is our angular build folder output.
+dist/*
 .coverage*
 !.coveragerc
 coverage.xml
@@ -48,6 +52,8 @@ yarn-error.log
 .lighthouseci
 .direnv/*
 .envrc
+portserver.socket
+temp-tsconfig-strict.json
 
 # Oppia uses cache slugs for various resources and we need separate resource
 # directories for dev and prod. Resource directories for prod are generated
@@ -63,4 +69,3 @@ dump.rdb
 ui-debug.log
 firebase-debug.log
 debug.log
-.python-version

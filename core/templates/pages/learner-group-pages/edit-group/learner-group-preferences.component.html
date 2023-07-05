@@ -1,0 +1,105 @@
+<div class="oppia-learner-group-preferences">
+  <div class="preferences-tab-title-section">
+    <div class="preferences-tab-title">
+      <span translate="I18N_LEARNER_GROUP_PREFERENCE"></span>
+    </div>
+    <div class="delete-group-button-container">
+      <div class="btn btn-danger delete-group-button oppia-autofocus" (click)="deleteLearnerGroup()">
+        <span translate="I18N_DELETE_LEARNER_GROUP"></span>
+      </div>
+    </div>
+  </div>
+  <div class="preferences-tab-sections">
+    <div class="preferences-tab-sections-header">
+      <div class="preferences-tab-sections-header-title"
+           [ngClass]="{'active': isTabActive(EDIT_PREFERENCES_SECTIONS_I18N_IDS.GROUP_DETAILS)}"
+           (click)="setActiveTab(EDIT_PREFERENCES_SECTIONS_I18N_IDS.GROUP_DETAILS)">
+        <span translate="I18N_LEARNER_GROUP_GROUP_DETAILS_SECTION"></span>
+      </div>
+      <div class="preferences-tab-sections-header-title"
+           [ngClass]="{'active': isTabActive(EDIT_PREFERENCES_SECTIONS_I18N_IDS.GROUP_LEARNERS)}"
+           (click)="setActiveTab(EDIT_PREFERENCES_SECTIONS_I18N_IDS.GROUP_LEARNERS)">
+        <span [innerHTML]="'I18N_LEARNER_GROUP_LEARNERS_SECTION' | translate: {learnersCount: 0, messageFormat: true}"></span>
+      </div>
+    </div>
+    <div *ngIf="isTabActive(EDIT_PREFERENCES_SECTIONS_I18N_IDS.GROUP_DETAILS)" class="edit-learner-group-details-section">
+      <oppia-learner-group-details [learnerGroupTitle]="learnerGroup.title"
+                                   [learnerGroupDescription]="learnerGroup.description"
+                                   [readOnlyMode]="isReadOnlyModeActive()"
+                                   (updateLearnerGroupTitle)="updateLearnerGroupTitle($event)"
+                                   (updateLearnerGroupDesc)="updateLearnerGroupDesc($event)">
+      </oppia-learner-group-details>
+      <button class="btn btn-primary group-details-edit-button"
+              *ngIf="isReadOnlyModeActive()"
+              (click)="toggleReadOnlyMode()">
+        <span translate="I18N_PLAYER_EDIT_TOOLTIP"></span>
+      </button>
+      <button class="btn btn-primary group-details-save-button"
+              *ngIf="!isReadOnlyModeActive()"
+              (click)="saveLearnerGroupInfo()">
+        <span translate="I18N_ADD_NEW_SYLLABUS_DONE_BUTTON_TEXT"></span>
+      </button>
+    </div>
+    <div *ngIf="isTabActive(EDIT_PREFERENCES_SECTIONS_I18N_IDS.GROUP_LEARNERS)" class="edit-learner-group-learners-section">
+      <button class="btn btn-primary add-new-learner-button"
+              (click)="openInviteLearnersModal()">
+        + <span translate="I18N_LEARNER_GROUP_INVITE_LEARNERS"></span>
+      </button>
+      <div class="current-group-learners" *ngIf="learnerGroup">
+        <span class="group-learners-title">Current Group Learners({{learnerGroup.learnerUsernames.length}})</span>
+        <div class="group-learners-card" *ngFor="let learnerInfo of currentLearnersInfo">
+          <div class="group-learners-card-info">
+            <picture>
+              <source type="image/webp"
+                      [srcset]="getProfileImageWebpDataUrl(learnerInfo.username)">
+              <source type="image/png"
+                      [srcset]="getProfileImagePngDataUrl(learnerInfo.username)">
+              <img class="group-learners-card-avatar"
+                   [src]="getProfileImagePngDataUrl(learnerInfo.username)">
+            </picture>
+            <span>{{learnerInfo.username}}</span>
+          </div>
+          <div class="group-learners-card-button">
+            <span (click)="openRemoveLearnerFromGroupModal(learnerInfo)">
+              <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 11 11" fill="none">
+                <path d="M10.0234 0.871094L0.996712 9.89077" stroke="#00609C" stroke-width="1.5" stroke-linecap="round"/>
+                <path d="M10.0234 9.89077L0.996712 0.871093" stroke="#00609C" stroke-width="1.5" stroke-linecap="round"/>
+              </svg>
+            </span>
+          </div>
+        </div>
+        <div *ngIf="currentLearnersInfo.length === 0" class="no-learners-text">
+          {{'I18N_LEARNER_GROUP_NO_LEARNERS_HAVE_JOINED' | translate}}
+        </div>
+      </div>
+      <div class="invited-group-learners" *ngIf="learnerGroup">
+        <span class="group-learners-title">Invites Pending({{learnerGroup.invitedLearnerUsernames.length}})</span>
+        <div class="group-learners-card" *ngFor="let learnerInfo of invitedLearnersInfo">
+          <div class="group-learners-card-info">
+            <picture>
+              <source type="image/webp"
+                      [srcset]="getProfileImageWebpDataUrl(learnerInfo.username)">
+              <source type="image/png"
+                      [srcset]="getProfileImagePngDataUrl(learnerInfo.username)">
+              <img class="group-learners-card-avatar"
+                   [src]="getProfileImagePngDataUrl(learnerInfo.username)"
+                   alt="User profile picture">
+            </picture>
+            <span>{{learnerInfo.username}}</span>
+          </div>
+          <div class="group-learners-card-buttons">
+            <div class="group-learners-card-button" (click)="openWithdrawLearnerInvitationModal(learnerInfo)">
+              <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 11 11" fill="none">
+                <path d="M10.0234 0.871094L0.996712 9.89077" stroke="#00609C" stroke-width="1.5" stroke-linecap="round"/>
+                <path d="M10.0234 9.89077L0.996712 0.871093" stroke="#00609C" stroke-width="1.5" stroke-linecap="round"/>
+              </svg>
+            </div>
+          </div>
+        </div>
+        <div *ngIf="invitedLearnersInfo.length === 0" class="no-learners-text">
+          {{'I18N_LEARNER_GROUP_NO_LEARNERS_INVITED' | translate}}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

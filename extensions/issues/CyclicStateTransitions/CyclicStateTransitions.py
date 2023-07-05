@@ -20,13 +20,19 @@ from __future__ import annotations
 
 from extensions.issues import base
 
+from typing import List
+
+MYPY = False
+if MYPY:  # pragma: no cover
+    from extensions import domain
+
 
 class CyclicStateTransitions(base.BaseExplorationIssueSpec):
     """Issue that's recorded when the learner transitions between states in a
     cyclic manner multiple times.
     """
 
-    _customization_arg_specs = [{
+    _customization_arg_specs: List[domain.CustomizationArgSpecsDict] = [{
         'name': 'state_names',
         'description': 'List of state names',
         'schema': {

@@ -1,4 +1,4 @@
-<div class="oppia-share-publish-modal protractor-test-share-publish-modal">
+<div class="oppia-share-publish-modal e2e-test-share-publish-modal">
   <div class="modal-header oppia-share-publish-header">
     <img [src]="congratsImgUrl">
     <h3>Awesome!</h3>
@@ -9,16 +9,15 @@
       Now that you're a published Oppia teacher, you can share your creation.
     </p>
     <div class="oppia-share-publish-link">
-      Here's your exploration link: <br>
-      <div (click)="selectText($event)">{{explorationLink}}</div>
-      <span *ngIf="explorationLinkCopied">Copied<i class="fa fa-check" aria-hidden="true"></i></span>
+      <p>Here's your exploration link:</p>
     </div>
-    <sharing-links layoutType="row"
+    <oppia-copy-url [urlToCopy]="explorationLink"></oppia-copy-url>
+    <sharing-links layoutType="row post-publish-modal-sharing-links"
                    layoutAlignType="center center"
                    shareType="exploration"
                    [explorationId]="explorationId">
     </sharing-links>
-    <button class="btn btn-secondary oppia-share-publish-close protractor-test-share-publish-close"
+    <button class="btn btn-secondary oppia-share-publish-close e2e-test-share-publish-close"
             (click)="cancel()">
       Close
     </button>
@@ -44,7 +43,7 @@
   }
 
   .oppia-share-publish-modal .oppia-share-publish-close:hover {
-    background-color: #05beb2;
+    background-color: #004d45;
     color: #fff;
   }
 
@@ -55,7 +54,7 @@
   }
 
   .oppia-share-publish-modal .oppia-share-publish-header h3 {
-    color: #FFF;
+    color: #fff;
     font-size: 1.3em;
   }
 
@@ -67,23 +66,17 @@
     display: inline;
   }
 
-  .oppia-share-publish-body .oppia-share-publish-link div {
-    background-color: #fcfcfc;
-    border: 1px solid #d9d9d9;
-    border-radius: 4px;
-    cursor: pointer;
-    display: inline-block;
-    margin-bottom: 2px;
-    margin-top: 10px;
-    max-width: 350px;
-    overflow: hidden;
-    padding: 10px;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+  .oppia-share-publish-body .oppia-share-publish-link .oppia-share-link-container {
+    align-items: flex-end;
+    display: flex;
+    justify-content: space-evenly;
+    margin: 10px;
   }
 
-  .oppia-share-publish-body .oppia-share-publish-link div:hover {
-    background-color: #f9f9f9;
+  .oppia-share-publish-body .oppia-share-publish-link div {
+    border-radius: 4px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   .oppia-share-publish-body .oppia-share-publish-link span {
@@ -93,7 +86,7 @@
   }
 
   .oppia-share-publish-body .oppia-share-publish-link i {
-    color: #3F9187;
+    color: #3f9187;
     padding-left: 6px;
   }
 </style>

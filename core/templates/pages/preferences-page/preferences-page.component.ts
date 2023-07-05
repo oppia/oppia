@@ -19,18 +19,25 @@
 import { Component } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+
 import { AppConstants } from 'app.constants';
 import { LanguageIdAndText, LanguageUtilService } from 'domain/utilities/language-util.service';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { AlertsService } from 'services/alerts.service';
-import { WindowRef } from 'services/contextual/window-ref.service';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
+import { ImageLocalStorageService } from 'services/image-local-storage.service';
+import { ImageUploadHelperService } from 'services/image-upload-helper.service';
 import { LoaderService } from 'services/loader.service';
 import { PreventPageUnloadEventService } from 'services/prevent-page-unload-event.service';
 import { EmailPreferencesBackendDict, SubscriptionSummary, UserBackendApiService } from 'services/user-backend-api.service';
 import { UserService } from 'services/user.service';
+import { WindowRef } from 'services/contextual/window-ref.service';
+
 import { EditProfilePictureModalComponent } from './modal-templates/edit-profile-picture-modal.component';
+import { AssetsBackendApiService } from 'services/assets-backend-api.service';
 require('cropperjs/dist/cropper.min.css');
+
+import './preferences-page.component.css';
 
 interface AudioLangaugeChoice {
   id: string;
@@ -39,17 +46,19 @@ interface AudioLangaugeChoice {
 
 @Component({
   selector: 'oppia-preferences-page',
-  templateUrl: './preferences-page.component.html'
+  templateUrl: './preferences-page.component.html',
+  styleUrls: ['./preferences-page.component.css']
 })
 export class PreferencesPageComponent {
   // These properties are initialized using Angular lifecycle hooks
-  // and we need to do non-null assertion, for more information see
+  // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   subjectInterests!: string;
   preferredLanguageCodes!: string[];
   preferredSiteLanguageCode!: string;
   preferredAudioLanguageCode!: string;
-  profilePictureDataUrl!: string;
+  profilePicturePngDataUrl!: string;
+  profilePictureWebpDataUrl!: string;
   AUDIO_LANGUAGE_CHOICES!: AudioLangaugeChoice[];
   userBio!: string;
   defaultDashboard!: string;
@@ -63,6 +72,7 @@ export class PreferencesPageComponent {
   SITE_LANGUAGE_CHOICES!: typeof AppConstants.SUPPORTED_SITE_LANGUAGES;
   DASHBOARD_TYPE_CREATOR = AppConstants.DASHBOARD_TYPE_CREATOR;
   DASHBOARD_TYPE_LEARNER = AppConstants.DASHBOARD_TYPE_LEARNER;
+  DASHBOARD_TYPE_CONTRIBUTOR = AppConstants.DASHBOARD_TYPE_CONTRIBUTOR;
   subjectInterestsChangeAtLeastOnce: boolean = false;
   exportingData: boolean = false;
   hasPageLoaded: boolean = false;
@@ -70,18 +80,18 @@ export class PreferencesPageComponent {
   canReceiveEditorRoleEmail: boolean = false;
   canReceiveSubscriptionEmail: boolean = false;
   canReceiveFeedbackMessageEmail: boolean = false;
-  userCanDeleteAccount: boolean = false;
   showEmailSignupLink: boolean = false;
   emailSignupLink: string = AppConstants.BULK_EMAIL_SERVICE_SIGNUP_URL;
   PAGES_REGISTERED_WITH_FRONTEND = (
     AppConstants.PAGES_REGISTERED_WITH_FRONTEND);
-  userCanExportAccount: boolean = false;
 
   constructor(
     private ngbModal: NgbModal,
     private windowRef: WindowRef,
     private alertsService: AlertsService,
     private i18nLanguageCodeService: I18nLanguageCodeService,
+    private imageLocalStorageService: ImageLocalStorageService,
+    private imageUploadHelperService: ImageUploadHelperService,
     private languageUtilService: LanguageUtilService,
     private loaderService: LoaderService,
     private preventPageUnloadEventService: PreventPageUnloadEventService,
@@ -175,23 +185,65 @@ export class PreferencesPageComponent {
     }
   }
 
+  private saveProfileImage(newProfilePictureDataUrl: string): void {
+    if (AssetsBackendApiService.EMULATOR_MODE) {
+      this._saveProfileImageToLocalStorage(newProfilePictureDataUrl);
+    } else {
+      this._postProfileImageToServer(newProfilePictureDataUrl);
+    }
+  }
+
+  private _saveProfileImageToLocalStorage(image: string): void {
+    const newImageFile = (
+      this.imageUploadHelperService.convertImageDataToImageFile(image));
+    if (newImageFile === null) {
+      this.alertsService.addWarning('Image uploaded is not valid.');
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = () => {
+      const imageData = reader.result as string;
+      this.imageLocalStorageService.saveImage(
+        this.username + '_profile_picture.png', imageData);
+    };
+    reader.readAsDataURL(newImageFile);
+    // The reload is needed in order to update the profile picture
+    // in the top-right corner.
+    this.windowRef.nativeWindow.location.reload();
+  }
+
+  private _postProfileImageToServer(image: string): void {
+    this.userService.setProfileImageDataUrlAsync(image).then(() => {
+      // The reload is needed in order to update the profile picture
+      // in the top-right corner.
+      this.windowRef.nativeWindow.location.reload();
+    });
+  }
+
   showEditProfilePictureModal(): void {
     let modalRef = this.ngbModal.open(EditProfilePictureModalComponent, {
       backdrop: 'static'
     });
 
     modalRef.result.then((newProfilePictureDataUrl) => {
-      this.userService.setProfileImageDataUrlAsync(newProfilePictureDataUrl)
-        .then(() => {
-          // The reload is needed in order to update the profile picture
-          // in the top-right corner.
-          this.windowRef.nativeWindow.location.reload();
-        });
+      this.saveProfileImage(newProfilePictureDataUrl);
     }, () => {
       // Note to developers:
       // This callback is triggered when the Cancel button is clicked.
       // No further action is needed.
     });
+  }
+
+  getProfileImagePngDataUrl(username: string): string {
+    let [pngImageUrl, _] = this.userService.getProfileImageDataUrl(
+      username);
+    return pngImageUrl;
+  }
+
+  getProfileImageWebpDataUrl(username: string): string {
+    let [_, webpImageUrl] = this.userService.getProfileImageDataUrl(
+      username);
+    return webpImageUrl;
   }
 
   ngOnInit(): void {
@@ -200,6 +252,17 @@ export class PreferencesPageComponent {
     userInfoPromise.then((userInfo) => {
       this.username = userInfo.getUsername();
       this.email = userInfo.getEmail();
+      if (this.username !== null) {
+        [this.profilePicturePngDataUrl, this.profilePictureWebpDataUrl] = (
+          this.userService.getProfileImageDataUrl(this.username));
+      } else {
+        this.profilePictureWebpDataUrl = (
+          this.urlInterpolationService.getStaticImageUrl(
+            AppConstants.DEFAULT_PROFILE_IMAGE_WEBP_PATH));
+        this.profilePicturePngDataUrl = (
+          this.urlInterpolationService.getStaticImageUrl(
+            AppConstants.DEFAULT_PROFILE_IMAGE_PNG_PATH));
+      }
     });
 
     this.AUDIO_LANGUAGE_CHOICES = AppConstants.SUPPORTED_AUDIO_LANGUAGES.map(
@@ -214,13 +277,10 @@ export class PreferencesPageComponent {
     this.hasPageLoaded = false;
 
     let preferencesPromise = this.userBackendApiService.getPreferencesAsync();
-
     preferencesPromise.then((data) => {
       this.userBio = data.user_bio;
       this.subjectInterests = data.subject_interests;
       this.preferredLanguageCodes = data.preferred_language_codes;
-      this.profilePictureDataUrl = decodeURIComponent(
-        data.profile_picture_data_url);
       this.defaultDashboard = data.default_dashboard;
       this.canReceiveEmailUpdates = data.can_receive_email_updates;
       this.canReceiveEditorRoleEmail =
@@ -234,10 +294,6 @@ export class PreferencesPageComponent {
       this.preferredAudioLanguageCode =
         data.preferred_audio_language_code;
       this.subscriptionList = data.subscription_list;
-      this.subscriptionList.forEach((subscription) => {
-        subscription.creator_picture_data_url = (
-          decodeURIComponent(subscription.creator_picture_data_url));
-      });
       this.hasPageLoaded = true;
     });
 
@@ -245,8 +301,6 @@ export class PreferencesPageComponent {
       this.loaderService.hideLoadingScreen();
     });
 
-    this.userCanDeleteAccount = AppConstants.ENABLE_ACCOUNT_DELETION;
-    this.userCanExportAccount = AppConstants.ENABLE_ACCOUNT_EXPORT;
     this.subjectInterestsChangeAtLeastOnce = false;
     this.TAG_REGEX_STRING = '^[a-z ]+$';
     this.LANGUAGE_CHOICES = this.languageUtilService.getLanguageIdsAndTexts();

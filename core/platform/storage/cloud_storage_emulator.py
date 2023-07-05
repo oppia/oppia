@@ -38,11 +38,11 @@ class EmulatorBlob:
     """Object for storing the file data."""
 
     def __init__(
-            self,
-            name: str,
-            data: Union[bytes, str],
-            content_type: Optional[str]
-    ):
+        self,
+        name: str,
+        data: Union[bytes, str],
+        content_type: Optional[str]
+    ) -> None:
         """Initialize blob.
 
         Args:
@@ -52,6 +52,9 @@ class EmulatorBlob:
                 from Cloud Storage as bytes.
             content_type: str|None. The content type of the blob. It should
                 be in the MIME format.
+
+        Raises:
+            Exception. Content type contains unknown MIME type.
         """
         self._name = name
         # TODO(#13500): Refactor this method that only bytes are passed
@@ -71,6 +74,11 @@ class EmulatorBlob:
         # this set. Only then can this exception be removed.
         elif content_type == 'audio/mp3':
             self._content_type = content_type
+        # Currently 'image/webp' is not recognized as a valid MIME type.
+        # To verify it is a valid type you can visit
+        # https://datatracker.ietf.org/doc/html/draft-zern-webp#section-6.1.
+        elif content_type == 'image/webp':
+            self._content_type = content_type
         else:
             if mimetypes.guess_extension(content_type) is None:
                 raise Exception('Content type contains unknown MIME type.')
@@ -78,7 +86,7 @@ class EmulatorBlob:
 
     @classmethod
     def create_copy(
-            cls, original_blob: EmulatorBlob, new_name: str
+        cls, original_blob: EmulatorBlob, new_name: str
     ) -> EmulatorBlob:
         """Create new instance of EmulatorBlob with the same values.
 
@@ -158,6 +166,8 @@ class EmulatorBlob:
         """
         return self._raw_bytes
 
+    # Here we use object because we want to allow every object with which
+    # we can compare.
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, self.__class__):
             return False

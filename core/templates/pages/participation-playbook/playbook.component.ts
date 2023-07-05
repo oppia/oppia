@@ -25,10 +25,13 @@ import { UrlInterpolationService } from
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
 
+import './playbook.component.css';
+
+
 @Component({
   selector: 'participation-playbook',
   templateUrl: './playbook.component.html',
-  styleUrls: []
+  styleUrls: ['./playbook.component.css']
 })
 export class PlaybookPageComponent implements OnInit {
   TAB_ID_PARTICIPATION: string = 'participation';
@@ -39,7 +42,7 @@ export class PlaybookPageComponent implements OnInit {
   constructor(
     private siteAnalyticsService: SiteAnalyticsService,
     private urlInterpolationService: UrlInterpolationService,
-    private windowRef: WindowRef
+    private windowRef: WindowRef,
   ) {}
 
   ngOnInit(): void {}

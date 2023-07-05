@@ -1,20 +1,20 @@
 <style>
   .oppia-roles-container {
+    align-content: space-around;
+    align-items: center;
+    background-color: rgba(204, 204, 204, 0.438);
     display: flex;
     flex-wrap: wrap;
     justify-content: space-between;
-    align-items: center;
-    background-color: rgba(204, 204, 204, 0.438);
-    align-content: space-around;
     padding: 10px;
   }
   .oppia-role-container {
-    margin: 10px 0;
-    text-align: justify;
+    align-items: center;
     display: flex;
     flex-direction: column;
-    align-items: center;
+    margin: 10px 0;
     min-width: 100px;
+    text-align: justify;
   }
   .oppia-role-avatar {
     display: block;
@@ -26,8 +26,8 @@
     margin-top: 10px;
   }
   .oppia-actions-container {
-    min-height: 200px;
     margin-top: 50px;
+    min-height: 200px;
   }
   .oppia-selected-role {
     background: #aaa;
@@ -36,6 +36,16 @@
   .oppia-usernames-loading-spinner {
     height: 200px;
     padding: 25% 40%;
+  }
+  .oppia-option-list {
+    display: flex;
+    flex-wrap: wrap;
+    list-style: none;
+    margin-bottom: 0;
+    padding-left: 0;
+    padding-right: 0;
+    position: relative;
+    vertical-align: top;
   }
 </style>
 
@@ -48,7 +58,7 @@
 
 <div class="oppia-actions-container">
   <div class="font-weight-bold mb-3">{{ humanReadableRoles[activeRole] | titlecase }}:</div>
-  <ul class="nav nav-tabs">
+  <ul class="oppia-option-list nav-tabs">
     <li class="nav-item">
       <button class="nav-link"
               [ngClass]="activeTab===TAB_ACTIONS ? 'active' : ''"
@@ -58,8 +68,8 @@
     </li>
     <li class="nav-item">
       <button class="nav-link"
-              [ngClass]="activeTab===TAB_ASSIGNED_USER ? 'active' : ''"
-              (click)="activeTab=TAB_ASSIGNED_USER; showAssignedUsers()"
+              [ngClass]="activeTab===TAB_ASSIGNED_USERS ? 'active' : ''"
+              (click)="activeTab=TAB_ASSIGNED_USERS; showAssignedUsers()"
               [class.disabled]="viewableRoles.includes(activeRole) ? null : true">
         Assigned users
       </button>
@@ -74,7 +84,7 @@
         <li *ngFor="let action of roleToReadableActions[activeRole]">{{ action }}</li>
       </ul>
     </div>
-    <div *ngIf="activeTab===TAB_ASSIGNED_USER" class="container">
+    <div *ngIf="activeTab===TAB_ASSIGNED_USERS" class="container">
       <div class="oppia-usernames-loading-spinner" *ngIf="loadingAssignedUsernames">
         <mat-spinner class="center-block" [diameter]="40"></mat-spinner>
       </div>

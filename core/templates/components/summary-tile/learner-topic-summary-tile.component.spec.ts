@@ -73,7 +73,12 @@ describe('Learner Topic Summary Tile Component', () => {
       outline: 'Outline',
       exploration_id: null,
       outline_is_finalized: false,
-      thumbnail_bg_color: '#a33f40'
+      thumbnail_bg_color: '#a33f40',
+      status: 'Published',
+      planned_publication_date_msecs: 100,
+      last_modified_msecs: 100,
+      first_publication_date_msecs: 200,
+      unpublishing_reason: null
     };
     const learnerTopicSummaryBackendDict = {
       id: 'sample_topic_id',
@@ -147,7 +152,12 @@ describe('Learner Topic Summary Tile Component', () => {
       outline: 'Outline',
       exploration_id: null,
       outline_is_finalized: false,
-      thumbnail_bg_color: '#a33f40'
+      thumbnail_bg_color: '#a33f40',
+      status: 'Published',
+      planned_publication_date_msecs: 100,
+      last_modified_msecs: 100,
+      first_publication_date_msecs: 200,
+      unpublishing_reason: null
     };
     const learnerTopicSummaryBackendDict = {
       id: 'sample_topic_id',
@@ -159,7 +169,7 @@ describe('Learner Topic Summary Tile Component', () => {
       total_published_node_count: 2,
       thumbnail_filename: 'image.svg',
       thumbnail_bg_color: '#C6DCDA',
-      classroom: null,
+      classroom: '',
       practice_tab_is_displayed: false,
       canonical_story_summary_dict: [{
         id: '0',
@@ -173,7 +183,7 @@ describe('Learner Topic Summary Tile Component', () => {
         url_fragment: 'story-title',
         all_node_dicts: [nodeDict]
       }],
-      url_fragment: null,
+      url_fragment: '',
       subtopics: [subtopic],
       degrees_of_mastery: {
         skill_id_1: 0.5,

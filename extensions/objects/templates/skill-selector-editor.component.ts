@@ -30,13 +30,19 @@ import { ContextService } from 'services/context.service';
   templateUrl: './skill-selector-editor.component.html'
 })
 export class SkillSelectorEditorComponent implements OnInit, OnDestroy {
-  @Input() modalId;
-  @Input() value;
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  @Input() modalId!: symbol;
+  @Input() value!: string;
   @Output() valueChanged = new EventEmitter();
+  initialEntityId!: string;
+  initialEntityType?: string;
   skills: SkillBackendDict[] = [];
   showLoading = false;
   skillsToShow: SkillBackendDict[] = [];
   eventBusGroup: EventBusGroup;
+  skillFilterText: string = '';
   constructor(
     private contextService: ContextService,
     private eventBusService: EventBusService,
@@ -45,7 +51,7 @@ export class SkillSelectorEditorComponent implements OnInit, OnDestroy {
     this.eventBusGroup = new EventBusGroup(this.eventBusService);
   }
 
-  private filterSkills(skillSelector: string): void {
+  filterSkills(skillSelector: string): void {
     if (skillSelector === '') {
       this.skillsToShow = this.skills;
     }
@@ -71,6 +77,8 @@ export class SkillSelectorEditorComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.showLoading = true;
     this.skills = [];
+    this.initialEntityId = this.contextService.getEntityId();
+    this.initialEntityType = this.contextService.getEntityType();
     if (this.value) {
       this.contextService.setCustomEntityContext(
         AppConstants.ENTITY_TYPE.SKILL, this.value);
@@ -94,6 +102,17 @@ export class SkillSelectorEditorComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.contextService.removeCustomEntityContext();
+    /**
+     * Restore the entity context to that of the state before the skill selector
+     * editor was initialized. This prevents change of context issues in calling
+     * components once the editor is closed, e.g. uploading images in the
+     * question editor.
+     * See issue #16985 for detailed discussion.
+     */
+    if (this.initialEntityId && this.initialEntityType) {
+      this.contextService.setCustomEntityContext(
+        this.initialEntityType, this.initialEntityId);
+    }
   }
 }
 

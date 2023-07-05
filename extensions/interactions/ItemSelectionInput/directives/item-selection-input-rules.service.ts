@@ -39,6 +39,7 @@ export class ItemSelectionInputRulesService {
     return normalizedAnswer.length === normalizedInput.length &&
     normalizedAnswer.every(val => normalizedInput.includes(val));
   }
+
   ContainsAtLeastOneOf(
       answer: ItemSelectionAnswer,
       inputs: ItemSelectionRuleInputs): boolean {
@@ -47,6 +48,7 @@ export class ItemSelectionInputRulesService {
       inputs.x);
     return normalizedAnswer.some(val => normalizedInput.includes(val));
   }
+
   // TODO(wxy): migrate the name of this rule to OmitsAtLeastOneOf, keeping
   // in sync with the backend migration of the same rule.
   DoesNotContainAtLeastOneOf(
@@ -57,6 +59,7 @@ export class ItemSelectionInputRulesService {
       inputs.x);
     return normalizedInput.some(val => !normalizedAnswer.includes(val));
   }
+
   // This function checks if the answer
   // given by the user is a subset of the correct answers.
   IsProperSubsetOf(

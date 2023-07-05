@@ -43,7 +43,8 @@ describe('Url Service', () => {
     urlService = TestBed.get(UrlService);
     windowRef = TestBed.get(WindowRef);
     spyOnProperty(windowRef, 'nativeWindow').and.callFake(() => ({
-      location: mockLocation}));
+      location: mockLocation as Location
+    } as Window));
   });
 
   it('should return correct query value list for each query field', () => {
@@ -137,6 +138,41 @@ describe('Url Service', () => {
     expect(function() {
       urlService.getBlogPostIdFromUrl();
     }).toThrowError('Invalid Blog Post Id.');
+  });
+
+  it('should correctly retrieve blog post url from url', () => {
+    mockLocation.pathname = '/blog/sample-blog-post-123';
+    expect(urlService.getBlogPostUrlFromUrl()).toBe('sample-blog-post-123');
+
+    mockLocation.pathname = '/blog/invalid/blog-post-1234';
+    expect(function() {
+      urlService.getBlogPostUrlFromUrl();
+    }).toThrowError('Invalid Blog Post Url.');
+
+    mockLocation.pathname = '/invalid/blog-post-1234';
+    expect(function() {
+      urlService.getBlogPostUrlFromUrl();
+    }).toThrowError('Invalid Blog Post Url.');
+  });
+
+  it('should correctly retrieve author username from url', () => {
+    // Checking with valid blog author profile page url.
+    mockLocation.pathname = '/blog/author/username';
+    expect(urlService.getBlogAuthorUsernameFromUrl()).toBe('username');
+
+    // Checking with invalid blog author profile page url. The url has extra an
+    // url segment.
+    mockLocation.pathname = '/blog/author/invalid/username';
+    expect(function() {
+      urlService.getBlogAuthorUsernameFromUrl();
+    }).toThrowError('Invalid Blog Author Profile Page Url.');
+
+    // Checking with invalid blog author profile page url. The url does not
+    // start with 'blog/author'.
+    mockLocation.pathname = 'blog/invalid/username';
+    expect(function() {
+      urlService.getBlogAuthorUsernameFromUrl();
+    }).toThrowError('Invalid Blog Author Profile Page Url.');
   });
 
   it('should correctly retrieve story url fragment from url', () => {
@@ -354,6 +390,17 @@ describe('Url Service', () => {
 
     mockLocation.search = '?another=1';
     expect(urlService.getExplorationVersionFromUrl()).toBe(null);
+  });
+
+  it('should correctly retrieve unique progress ID from the URL', () => {
+    mockLocation.search = '?pid=123456';
+    expect(urlService.getPidFromUrl()).toBe('123456');
+
+    mockLocation.search = '?someparam=otherval&pid=123456';
+    expect(urlService.getPidFromUrl()).toBe('123456');
+
+    mockLocation.search = '?another=1';
+    expect(urlService.getPidFromUrl()).toBe(null);
   });
 
   it('should correctly retrieve username from url', () => {

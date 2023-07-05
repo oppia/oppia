@@ -30,11 +30,16 @@ import { AppConstants } from 'app.constants';
   templateUrl: './admin-navbar.component.html',
 })
 export class AdminNavbarComponent implements OnInit {
-  profilePictureDataUrl: string = '';
-  imagePath: string;
-  username: string = '';
-  isModerator: boolean = null;
-  isSuperAdmin: boolean = null;
+  // This property is initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  imagePath!: string;
+  // Username is set to null if the user is not logged in.
+  username: string | null = null;
+  profilePicturePngDataUrl!: string;
+  profilePictureWebpDataUrl!: string;
+  isModerator: boolean = false;
+  isSuperAdmin: boolean = false;
   profileUrl: string = '';
   ADMIN_TAB_URLS = AdminPageConstants.ADMIN_TAB_URLS;
   logoutUrl = '/' + AppConstants.PAGES_REGISTERED_WITH_FRONTEND.LOGOUT.ROUTE;
@@ -61,8 +66,8 @@ export class AdminNavbarComponent implements OnInit {
     return this.adminRouterService.isConfigTabOpen();
   }
 
-  isFeaturesTabOpen(): boolean {
-    return this.adminRouterService.isFeaturesTabOpen();
+  isPlatformParamsTabOpen(): boolean {
+    return this.adminRouterService.isPlatformParamsTabOpen();
   }
 
   isRolesTabOpen(): boolean {
@@ -89,15 +94,13 @@ export class AdminNavbarComponent implements OnInit {
     return this.dropdownMenuIsActive = false;
   }
 
-  async getProfileImageDataAsync(): Promise<void> {
-    let dataUrl = await this.userService.getProfileImageDataUrlAsync();
-    this.profilePictureDataUrl = decodeURIComponent(dataUrl);
-  }
-
   async getUserInfoAsync(): Promise<void> {
     const userInfo = await this.userService.getUserInfoAsync();
-
     this.username = userInfo.getUsername();
+
+    if (this.username === null) {
+      throw new Error('Cannot fetch username.');
+    }
     this.isModerator = userInfo.isModerator();
     this.isSuperAdmin = userInfo.isSuperAdmin();
 
@@ -107,10 +110,11 @@ export class AdminNavbarComponent implements OnInit {
           username: this.username
         })
     );
+    [this.profilePicturePngDataUrl, this.profilePictureWebpDataUrl] = (
+      this.userService.getProfileImageDataUrl(this.username));
   }
 
   ngOnInit(): void {
-    this.getProfileImageDataAsync();
     this.getUserInfoAsync();
   }
 }

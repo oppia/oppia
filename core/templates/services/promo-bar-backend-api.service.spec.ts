@@ -25,7 +25,7 @@ import { ServicesConstants } from './services.constants';
 describe('Promo bar backend api service', () => {
   const initialValue = ServicesConstants.ENABLE_PROMO_BAR;
   let promoBarBackendApiService:
-    PromoBarBackendApiService = null;
+    PromoBarBackendApiService;
   let httpTestingController: HttpTestingController;
   let promoBar = {
     promoBarEnabled: true,
@@ -88,7 +88,7 @@ describe('Promo bar backend api service', () => {
     })
   );
 
-  it('should make request to update promo bar config data',
+  it('should make request to update promo bar platform param data',
     fakeAsync(() => {
       let successHandler = jasmine.createSpy('success');
       let failHandler = jasmine.createSpy('fail');
@@ -110,7 +110,7 @@ describe('Promo bar backend api service', () => {
     })
   );
 
-  it('should make request to update promo bar config data',
+  it('should make request to update promo bar platform param data',
     fakeAsync(() => {
       let successHandler = jasmine.createSpy('success');
       let failHandler = jasmine.createSpy('fail');

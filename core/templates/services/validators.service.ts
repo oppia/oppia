@@ -24,7 +24,6 @@ import { AlertsService } from 'services/alerts.service';
 import { AppConstants } from 'app.constants';
 import { NormalizeWhitespacePipe } from
   'filters/string-utility-filters/normalize-whitespace.pipe';
-import constants from 'assets/constants';
 
 @Injectable({
   providedIn: 'root'
@@ -33,6 +32,7 @@ export class ValidatorsService {
   constructor(
     private alerts: AlertsService,
     private whitespacefilter: NormalizeWhitespacePipe) {}
+
   /**
    * Checks whether an entity name is valid, and displays a warning message
    * if it isn't.
@@ -65,6 +65,7 @@ export class ValidatorsService {
     }
     return true;
   }
+
   isValidExplorationTitle(input: string, showWarnings: boolean): boolean {
     if (!this.isValidEntityName(input, showWarnings, false)) {
       return false;
@@ -80,6 +81,7 @@ export class ValidatorsService {
 
     return true;
   }
+
   // NB: this does not check whether the card name already exists in the
   // states dict.
   isValidStateName(input: string, showWarnings: boolean): boolean {
@@ -97,6 +99,7 @@ export class ValidatorsService {
 
     return true;
   }
+
   isNonempty(input: string, showWarnings: boolean): boolean {
     if (!input) {
       if (showWarnings) {
@@ -108,6 +111,7 @@ export class ValidatorsService {
     }
     return true;
   }
+
   isValidExplorationId(input: string, showWarnings: boolean): boolean {
     // Exploration IDs are urlsafe base64-encoded.
     var VALID_ID_CHARS_REGEX = /^[a-zA-Z0-9_\-]+$/g;
@@ -119,14 +123,15 @@ export class ValidatorsService {
     }
     return true;
   }
+
   isValidReviewMessage(input: string, showWarnings: boolean): boolean {
     if (!input) {
       return true;
     }
-    if (input.length > constants.MAX_REVIEW_MESSAGE_LENGTH && showWarnings) {
+    if (input.length > AppConstants.MAX_REVIEW_MESSAGE_LENGTH && showWarnings) {
       this.alerts.addWarning(
         'Review message should be at most ' +
-        constants.MAX_REVIEW_MESSAGE_LENGTH + ' characters long.');
+        AppConstants.MAX_REVIEW_MESSAGE_LENGTH + ' characters long.');
       return false;
     }
     return true;

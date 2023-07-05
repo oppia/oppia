@@ -4,6 +4,9 @@
     <loc>https://www.oppia.org/</loc>
   </url>
   <url>
+    <loc>https://www.oppia.org/android</loc>
+  </url>
+  <url>
     <loc>https://www.oppia.org/donate</loc>
   </url>
   <url>
@@ -26,6 +29,9 @@
   </url>
   <url>
     <loc>https://www.oppia.org/community-library</loc>
+  </url>
+  <url>
+    <loc>https://www.oppia.org/blog</loc>
   </url>
   <url>
     <loc>https://www.oppia.org/contact</loc>

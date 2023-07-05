@@ -23,9 +23,9 @@ import { FocusManagerService } from 'services/stateful/focus-manager.service';
 import { PlayerPositionService } from '../services/player-position.service';
 
 export interface FlagExplorationModalResult {
-  'report_type': boolean,
-  'report_text': string,
-  state: string
+  'report_type': boolean;
+  'report_text': string;
+  state: string;
 }
 
 @Component({
@@ -33,10 +33,13 @@ export interface FlagExplorationModalResult {
   templateUrl: './flag-exploration-modal.component.html'
 })
 export class FlagExplorationModalComponent extends ConfirmOrCancelModal {
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  flagMessage!: string;
+  stateName!: string;
   flagMessageTextareaIsShown: boolean = false;
-  stateName: string;
-  flag: boolean;
-  flagMessage: string;
+  flag: boolean = false;
 
   constructor(
     private ngbActiveModal: NgbActiveModal,

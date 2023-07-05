@@ -50,6 +50,11 @@ export const AppConstants = {
   EXPLORATION_DATA_URL_TEMPLATE: '/explorehandler/init/<exploration_id>',
   EXPLORATION_VERSION_DATA_URL_TEMPLATE: (
     '/explorehandler/init/<exploration_id>?v=<version>'),
+  ENTITY_TRANSLATIONS_HANDLER_URL_TEMPLATE: (
+    '/entity_translations_handler/<entity_type>/<entity_id>/<entity_version>/' +
+    '<language_code>'),
+  EXPLORATION_PROGRESS_PID_URL_TEMPLATE: (
+    '/explorehandler/init/<exploration_id>?pid=<pid>'),
 
   WARNING_TYPES: {
     // These must be fixed before the exploration can be saved.
@@ -69,6 +74,8 @@ export const AppConstants = {
     INCORRECT_SOLUTION: 'The current solution does not lead to another card.',
     UNRESOLVED_ANSWER:
       'There is an answer among the top 10 which has no explicit feedback.',
+    INVALID_REDIRECTION: 'Learner should not be directed back by more than' +
+      ' 3 cards in the lesson.'
   },
 
   CHECKPOINT_ERROR_MESSAGES: {
@@ -86,6 +93,7 @@ export const AppConstants = {
 
   // We use a slash because this character is forbidden in a state name.
   PLACEHOLDER_OUTCOME_DEST: '/',
+  PLACEHOLDER_OUTCOME_DEST_IF_STUCK: '/',
   INTERACTION_DISPLAY_MODE_INLINE: 'inline',
   LOADING_INDICATOR_URL: '/activity/loadingIndicator.gif',
   OBJECT_EDITOR_URL_PREFIX: '/object_editor_template/',
@@ -100,6 +108,14 @@ export const AppConstants = {
     UNICODE_STRING: 'UnicodeString',
   },
 
+  // Flag to toggle the support for a new state to direct the learners
+  // to if they get stuck.
+  DEST_IF_REALLY_STUCK_FEAT_ENABLED: false,
+
+  INTERACTION_NAMES: {
+    TEXT_INPUT: 'TextInput'
+  },
+
   // The maximum number of nodes to show in a row of the state graph.
   MAX_NODES_PER_ROW: 4,
   // The following variable must be at least 3. It represents the maximum
@@ -109,6 +125,10 @@ export const AppConstants = {
   // If an $http request fails with the following error codes, a warning is
   // displayed.
   FATAL_ERROR_CODES: [400, 401, 404, 500],
+
+  // Maximum number of states the learner can be directed back from a state
+  // by an editor in an exploration.
+  MAX_CARD_COUNT_FOR_VALID_REDIRECTION: 3,
 
   // Do not modify these, for backwards-compatibility reasons. These strings are
   // used to identify components, to generate content ids, and to determine what
@@ -146,7 +166,9 @@ export const AppConstants = {
 
   SITE_NAME: 'Oppia.org',
 
-  DEFAULT_PROFILE_IMAGE_PATH: '/avatar/user_blue_72px.webp',
+  DEFAULT_PROFILE_IMAGE_WEBP_PATH: '/avatar/user_blue_150px.webp',
+
+  DEFAULT_PROFILE_IMAGE_PNG_PATH: '/avatar/user_blue_150px.png',
 
   // TODO(vojtechjelinek): Move these to separate file later, after we establish
   // process to follow for Angular constants (#6731).
@@ -187,5 +209,33 @@ export const AppConstants = {
 
   IMAGE_SAVE_DESTINATION_SERVER: 'imageSaveDestinationServer',
   IMAGE_SAVE_DESTINATION_LOCAL_STORAGE:
-    'imageSaveDestinationLocalStorage'
+    'imageSaveDestinationLocalStorage',
+  SVG_MIME_TYPE: 'data:image/svg+xml',
+
+  CONTRIBUTION_STATS_TYPE_TRANSLATION: 'translation',
+  CONTRIBUTION_STATS_TYPE_QUESTION: 'question',
+  CONTRIBUTION_STATS_SUBTYPE_SUBMISSION: 'submission',
+  CONTRIBUTION_STATS_SUBTYPE_REVIEW: 'review',
+  CONTRIBUTION_STATS_SUBTYPE_CORRECTION: 'correction',
+  CONTRIBUTION_STATS_TYPES: {
+    TRANSLATION_CONTRIBUTION: {
+      NAME: 'translationContribution',
+      DISPLAY_NAME: 'Translation Contributions'
+    },
+    TRANSLATION_REVIEW: {
+      NAME: 'translationReview',
+      DISPLAY_NAME: 'Translation Reviews'
+    },
+    QUESTION_CONTRIBUTION: {
+      NAME: 'questionContribution',
+      DISPLAY_NAME: 'Question Contributions'
+    },
+    QUESTION_REVIEW: {
+      NAME: 'questionReview',
+      DISPLAY_NAME: 'Question Reviews'
+    }
+  },
+  CONTRIBUTOR_BADGE_INITIAL_LEVELS: [1, 10, 20, 50, 100, 200, 300, 400, 500],
+  CONTRIBUTOR_CERTIFICATE_LOGO:
+    '/assets/images/contributor_dashboard/oppia-logo.jpg',
 } as const;

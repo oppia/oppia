@@ -29,7 +29,7 @@ import { StateParamChangesEditorComponent } from
 let component: StateParamChangesEditorComponent;
 let fixture: ComponentFixture<StateParamChangesEditorComponent>;
 describe('State Param Changes Editor directive', () => {
-  let stateParamChangesService: StateParamChangesService = null;
+  let stateParamChangesService: StateParamChangesService;
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       declarations: [StateParamChangesEditorComponent],

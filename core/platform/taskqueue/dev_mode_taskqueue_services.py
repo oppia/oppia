@@ -18,20 +18,22 @@
 
 from __future__ import annotations
 
-import datetime  # pylint: disable=unused-import
 import os
 
 from core import feconf
 from core.platform.taskqueue import cloud_tasks_emulator
 
 import requests
-from typing import Any, Dict, Optional
+from typing import TYPE_CHECKING, Any, Dict, Optional
+
+if TYPE_CHECKING:  # pragma: no cover
+    import datetime
 
 GOOGLE_APP_ENGINE_PORT = os.environ['PORT'] if 'PORT' in os.environ else '8181'
 
 
-# In the type annotation below, payload is of type Dict[str, Any] because
-# the payload here has no constraints.
+# Here we use type Any because the payload here has no constraints, so that's
+# why payload is annotated with 'Dict[str, Any]' type.
 def _task_handler(
         url: str,
         payload: Dict[str, Any],
@@ -68,8 +70,8 @@ def _task_handler(
 CLIENT = cloud_tasks_emulator.Emulator(task_handler=_task_handler)
 
 
-# In the type annotation below, payload is of type Dict[str, Any] because
-# the payload here has no constraints.
+# Here we use type Any because the payload here has no constraints, so that's
+# why payload is annotated with 'Dict[str, Any]' type.
 def create_http_task(
         queue_name: str,
         url: str,

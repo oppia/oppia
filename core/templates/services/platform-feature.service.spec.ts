@@ -48,13 +48,15 @@ describe('PlatformFeatureService', () => {
   const clearStaticProperties = () => {
     // This throws "Type 'null' is not assignable to type 'FeatureStatusSummary'
     // ." We need to suppress this error because of the need to manually clear
-    // the state of PlatformFeatureService after each test.
+    // the state of PlatformFeatureService after each test. This is because
+    // PlatformFeatureService is a singleton service.
     // @ts-ignore
     PlatformFeatureService.featureStatusSummary = null;
     PlatformFeatureService._isInitializedWithError = false;
     // This throws "Type 'null' is not assignable to type 'Promise<void>'."
     // We need to suppress this error because of the need to manually clear the
-    // state of PlatformFeatureService after each test.
+    // state of PlatformFeatureService after each test. This is because
+    // PlatformFeatureService is a singleton service.
     // @ts-ignore
     PlatformFeatureService.initializationPromise = null;
   };
@@ -89,7 +91,7 @@ describe('PlatformFeatureService', () => {
           return userAgent;
         }
       }
-    });
+    } as unknown as Window);
     mockSessionStore = (obj: object) => {
       Object.assign(store, obj);
     };
@@ -101,7 +103,7 @@ describe('PlatformFeatureService', () => {
 
     apiSpy = spyOn(apiService, 'fetchFeatureFlags').and.resolveTo(
       FeatureStatusSummary.createFromBackendDict({
-        [FeatureNames.DummyFeature]: true,
+        [FeatureNames.DummyFeatureFlagForE2ETests]: true,
       })
     );
   });
@@ -119,59 +121,8 @@ describe('PlatformFeatureService', () => {
       expect(apiService.fetchFeatureFlags).toHaveBeenCalled();
       expect(successHandler).toHaveBeenCalled();
       expect(failHandler).not.toHaveBeenCalled();
-      expect(platformFeatureService.isInitialzedWithError).toBeFalse();
+      expect(platformFeatureService.isInitializedWithError).toBeFalse();
     }));
-
-    it('should save results in sessionStorage after loading.', fakeAsync(() => {
-      const sessionId = 'session_id';
-      mockCookie(`session=${sessionId}`);
-      platformFeatureService = TestBed.inject(PlatformFeatureService);
-
-      const timestamp = Date.now();
-
-      flushMicrotasks();
-
-      expect(apiService.fetchFeatureFlags).toHaveBeenCalled();
-      const sessionItem = (
-        windowRef.nativeWindow.sessionStorage.getItem('SAVED_FEATURE_FLAGS'));
-      expect(sessionItem).not.toBeNull();
-      if (sessionItem !== null) {
-        expect(JSON.parse(sessionItem)).toEqual({
-          timestamp: timestamp,
-          sessionId: sessionId,
-          featureStatusSummary: {
-            [FeatureNames.DummyFeature]: true,
-          }
-        });
-      }
-      expect(platformFeatureService.isInitialzedWithError).toBeFalse();
-    }));
-
-    it('should load from sessionStorage if there are valid results.', fakeAsync(
-      () => {
-        const sessionId = 'session_id';
-        mockCookie(`session=${sessionId}`);
-        mockSessionStore({
-          SAVED_FEATURE_FLAGS: JSON.stringify({
-            sessionId: sessionId,
-            timestamp: Date.now(),
-            featureStatusSummary: {
-              [FeatureNames.DummyFeature]: true,
-            }
-          })
-        });
-
-        // Ticks 60 secs, as stored results are valid for 12 hrs, the results
-        // should still be valid.
-        tick(60 * 1000);
-        platformFeatureService = TestBed.inject(PlatformFeatureService);
-
-        flushMicrotasks();
-
-        expect(apiService.fetchFeatureFlags).not.toHaveBeenCalled();
-        expect(platformFeatureService.isInitialzedWithError).toBeFalse();
-      })
-    );
 
     it('should load from server if saved results have expired.',
       fakeAsync(() => {
@@ -182,7 +133,7 @@ describe('PlatformFeatureService', () => {
             sessionId: sessionId,
             timestamp: Date.now(),
             featureStatusSummary: {
-              [FeatureNames.DummyFeature]: true,
+              [FeatureNames.DummyFeatureFlagForE2ETests]: true,
             }
           })
         });
@@ -195,37 +146,7 @@ describe('PlatformFeatureService', () => {
         flushMicrotasks();
 
         expect(apiService.fetchFeatureFlags).toHaveBeenCalled();
-        expect(platformFeatureService.isInitialzedWithError).toBeFalse();
-      })
-    );
-
-    it(
-      'should load from server if sessionId of saved result does not match.',
-      fakeAsync(() => {
-        const sessionId = 'session_id';
-        mockCookie(`session=${sessionId}`);
-        mockSessionStore({
-          SAVED_FEATURE_FLAGS: JSON.stringify({
-            sessionId: 'different session id',
-            timestamp: Date.now(),
-            featureStatusSummary: {
-              [FeatureNames.DummyFeature]: true,
-            }
-          })
-        });
-
-        platformFeatureService = TestBed.inject(PlatformFeatureService);
-
-        flushMicrotasks();
-
-        expect(apiService.fetchFeatureFlags).toHaveBeenCalled();
-        const sessionItem = (
-          windowRef.nativeWindow.sessionStorage.getItem('SAVED_FEATURE_FLAGS'));
-        expect(sessionItem).not.toBeNull();
-        if (sessionItem !== null) {
-          expect(JSON.parse(sessionItem).sessionId).toEqual(sessionId);
-        }
-        expect(platformFeatureService.isInitialzedWithError).toBeFalse();
+        expect(platformFeatureService.isInitializedWithError).toBeFalse();
       })
     );
 
@@ -246,7 +167,7 @@ describe('PlatformFeatureService', () => {
       flushMicrotasks();
 
       expect(apiService.fetchFeatureFlags).toHaveBeenCalled();
-      expect(platformFeatureService.isInitialzedWithError).toBeFalse();
+      expect(platformFeatureService.isInitializedWithError).toBeFalse();
     }));
 
     it('should request only once if there are more than one call to ' +
@@ -259,7 +180,7 @@ describe('PlatformFeatureService', () => {
       flushMicrotasks();
 
       expect(apiService.fetchFeatureFlags).toHaveBeenCalledTimes(1);
-      expect(platformFeatureService.isInitialzedWithError).toBeFalse();
+      expect(platformFeatureService.isInitializedWithError).toBeFalse();
     }));
 
     it('should disable all features when loading fails.', fakeAsync(() => {
@@ -270,9 +191,9 @@ describe('PlatformFeatureService', () => {
       flushMicrotasks();
 
       expect(
-        platformFeatureService.status.DummyFeature.isEnabled
+        platformFeatureService.status.DummyFeatureFlagForE2ETests.isEnabled
       ).toBeFalse();
-      expect(platformFeatureService.isInitialzedWithError).toBeTrue();
+      expect(platformFeatureService.isInitializedWithError).toBeTrue();
     }));
 
     it('should skip on the signup page', fakeAsync(() => {
@@ -294,16 +215,17 @@ describe('PlatformFeatureService', () => {
       flushMicrotasks();
 
       expect(
-        platformFeatureService.status.DummyFeature.isEnabled
+        platformFeatureService.status.DummyFeatureFlagForE2ETests.isEnabled
       ).toBeTrue();
-      expect(platformFeatureService.isInitialzedWithError).toBeFalse();
+      expect(platformFeatureService.isInitializedWithError).toBeFalse();
     }));
 
     it('should throw error when accessed before initialization.', fakeAsync(
       () => {
         platformFeatureService = TestBed.inject(PlatformFeatureService);
         expect(
-          () => platformFeatureService.status.DummyFeature.isEnabled
+          () => (
+            platformFeatureService.status.DummyFeatureFlagForE2ETests.isEnabled)
         ).toThrowError(
           'The platform feature service has not been initialized.');
       })

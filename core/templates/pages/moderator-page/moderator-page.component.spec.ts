@@ -16,11 +16,10 @@
  * @fileoverview Unit tests for Moderator Page Component.
  */
 
+import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, fakeAsync, TestBed, waitForAsync }
   from '@angular/core/testing';
 import { NgbNavModule } from '@ng-bootstrap/ng-bootstrap';
-import { SchemaBasedEditorDirective }
-  from 'components/forms/schema-based-editors/schema-based-editor.directive';
 import { ThreadMessage, ThreadMessageBackendDict }
   from 'domain/feedback_message/ThreadMessage.model';
 import { AlertsService } from 'services/alerts.service';
@@ -119,28 +118,28 @@ describe('Moderator Page Component', () => {
         NgbNavModule
       ],
       declarations: [
-        ModeratorPageComponent,
-        SchemaBasedEditorDirective
+        ModeratorPageComponent
       ],
       providers: [
         {
           provide: ModeratorPageBackendApiService,
           useClass: MockModeratorPageBackendApiService
         }
-      ]
+      ],
+      schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
   }));
 
   beforeEach(() => {
     fixture = TestBed.createComponent(ModeratorPageComponent);
     componentInstance = fixture.componentInstance;
-    loaderService = (TestBed.inject(LoaderService) as unknown) as
+    loaderService = (TestBed.inject(LoaderService)) as
       jasmine.SpyObj<LoaderService>;
     datetimeFormatService = (
-      TestBed.inject(DateTimeFormatService) as unknown) as
+      TestBed.inject(DateTimeFormatService)) as
       jasmine.SpyObj<DateTimeFormatService>;
     alertsService = (
-      TestBed.inject(AlertsService) as unknown) as
+      TestBed.inject(AlertsService)) as
       jasmine.SpyObj<AlertsService>;
   });
 

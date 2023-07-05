@@ -29,6 +29,7 @@ import { BeamJob } from 'domain/jobs/beam-job.model';
 import { StartNewBeamJobDialogComponent } from 'pages/release-coordinator-page/components/start-new-beam-job-dialog.component';
 import { ReleaseCoordinatorBackendApiService } from 'pages/release-coordinator-page/services/release-coordinator-backend-api.service';
 import { AlertsService } from 'services/alerts.service';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 
 describe('Start new beam job dialog', () => {
   const beamJob = new BeamJob('FooJob');
@@ -48,6 +49,7 @@ describe('Start new beam job dialog', () => {
         StartNewBeamJobDialogComponent,
       ],
       imports: [
+        HttpClientTestingModule,
         MatDialogModule,
         MatButtonModule,
         MatProgressBarModule,
@@ -57,13 +59,7 @@ describe('Start new beam job dialog', () => {
       providers: [
         { provide: MAT_DIALOG_DATA, useValue: beamJob },
         { provide: MatDialogRef, useValue: mockDialogRef },
-        {
-          provide: ReleaseCoordinatorBackendApiService,
-          useValue: jasmine.createSpyObj<ReleaseCoordinatorBackendApiService>(
-            'ReleaseCoordinatorBackendApiService', null, {
-              startNewBeamJob: _ => of(null)
-            }),
-        },
+        ReleaseCoordinatorBackendApiService,
       ],
     });
     // NOTE: This allows tests to compile the DOM of each dialog component.

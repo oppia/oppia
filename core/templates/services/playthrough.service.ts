@@ -39,13 +39,15 @@ import { Stopwatch } from 'domain/utilities/stopwatch.model';
 class CyclicStateTransitionsTracker {
   /** A path of visited states without any repeats. */
   private pathOfVisitedStates: string[];
+  // This property is initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   /** The most recently discovered cycle of visited states. */
-  private cycleOfVisitedStates: string[];
+  private cycleOfVisitedStates!: string[];
   private numLoops: number;
 
   constructor(initStateName: string) {
     this.pathOfVisitedStates = [initStateName];
-    this.cycleOfVisitedStates = null;
     this.numLoops = 0;
   }
 
@@ -114,12 +116,14 @@ class CyclicStateTransitionsTracker {
 }
 
 class EarlyQuitTracker {
-  private stateName: string = null;
-  private expDurationInSecs: number = null;
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  private stateName!: string;
+  private expDurationInSecs!: number;
 
   foundAnIssue(): boolean {
     return (
-      this.expDurationInSecs !== null &&
       this.expDurationInSecs < ServicesConstants.EARLY_QUIT_THRESHOLD_IN_SECS);
   }
 
@@ -171,16 +175,18 @@ class MultipleIncorrectAnswersTracker {
   providedIn: 'root'
 })
 export class PlaythroughService {
-  private explorationId: string = null;
-  private explorationVersion: number = null;
-  private learnerIsInSamplePopulation: boolean = null;
-
-  private eqTracker: EarlyQuitTracker = null;
-  private cstTracker: CyclicStateTransitionsTracker = null;
-  private misTracker: MultipleIncorrectAnswersTracker = null;
-  private recordedLearnerActions: LearnerAction[] = null;
-  private playthroughStopwatch: Stopwatch = null;
-  private playthroughDurationInSecs: number = null;
+  // These properties are initialized using initSession method
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  private explorationId!: string;
+  private explorationVersion!: number;
+  private eqTracker!: EarlyQuitTracker;
+  private cstTracker!: CyclicStateTransitionsTracker;
+  private misTracker!: MultipleIncorrectAnswersTracker;
+  private recordedLearnerActions!: LearnerAction[];
+  private playthroughStopwatch!: Stopwatch;
+  private playthroughDurationInSecs!: number;
+  private learnerIsInSamplePopulation: boolean = false;
 
   constructor(
       private explorationFeaturesService: ExplorationFeaturesService,
@@ -250,7 +256,8 @@ export class PlaythroughService {
         time_spent_in_state_in_msecs: {value: 1000 * timeSpentInStateSecs}
       }));
 
-    this.playthroughDurationInSecs = this.playthroughStopwatch.getTimeInSecs();
+    this.playthroughDurationInSecs = (
+      this.playthroughStopwatch.getTimeInSecs());
     this.eqTracker.recordExplorationQuit(
       stateName, this.playthroughDurationInSecs);
   }
@@ -304,8 +311,11 @@ export class PlaythroughService {
 
   private hasRecordingBegun(): boolean {
     return (
-      this.isPlaythroughRecordingEnabled() &&
-      this.recordedLearnerActions !== null);
+      // Check this.recordedLearnerActions because
+      // it could be null before recording begun.
+      this.recordedLearnerActions &&
+      this.isPlaythroughRecordingEnabled()
+    );
   }
 
   private hasRecordingFinished(): boolean {

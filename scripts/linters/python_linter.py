@@ -18,36 +18,25 @@
 
 from __future__ import annotations
 
+import ast
 import io
 import os
 import re
-import sys
 
-from core import python_utils
+import isort.api
+import pycodestyle
+from pylint import lint
+from pylint.reporters import text
+from typing import List, Tuple
 
 from . import linter_utils
-from .. import common
 from .. import concurrent_task_utils
 
-_PATHS_TO_INSERT = [
-    common.PYLINT_PATH,
-    common.PYCODESTYLE_PATH,
-    common.PYLINT_QUOTES_PATH,
-    common.ISORT_PATH,
-]
-for path in _PATHS_TO_INSERT:
-    sys.path.insert(1, path)
 
-from pylint import lint  # isort:skip  pylint: disable=wrong-import-order, wrong-import-position
-from pylint.reporters import text  # isort:skip  pylint: disable=wrong-import-order, wrong-import-position
-import isort.api  # isort:skip  pylint: disable=wrong-import-order, wrong-import-position
-import pycodestyle # isort:skip  pylint: disable=wrong-import-order, wrong-import-position
-
-
-class ThirdPartyPythonLintChecksManager:
+class ThirdPartyPythonLintChecksManager(linter_utils.BaseLinter):
     """Manages all the third party Python linting functions."""
 
-    def __init__(self, files_to_lint):
+    def __init__(self, files_to_lint: List[str]) -> None:
         """Constructs a ThirdPartyPythonLintChecksManager object.
 
         Args:
@@ -56,12 +45,12 @@ class ThirdPartyPythonLintChecksManager:
         self.files_to_lint = files_to_lint
 
     @property
-    def all_filepaths(self):
+    def all_filepaths(self) -> List[str]:
         """Return all filepaths."""
         return self.files_to_lint
 
     @staticmethod
-    def get_trimmed_error_output(lint_message):
+    def get_trimmed_error_output(lint_message: str) -> str:
         """Remove extra bits from pylint error messages.
 
         Args:
@@ -85,7 +74,7 @@ class ThirdPartyPythonLintChecksManager:
 
         return trimmed_lint_message
 
-    def lint_py_files(self):
+    def lint_py_files(self) -> concurrent_task_utils.TaskResult:
         """Prints a list of lint errors in the given list of Python files.
 
         Returns:
@@ -115,7 +104,7 @@ class ThirdPartyPythonLintChecksManager:
             current_files_to_lint = files_to_lint[
                 current_batch_start_index: current_batch_end_index]
 
-            pylint_report = python_utils.string_io()
+            pylint_report = io.StringIO()
             pylinter = lint.Run(
                 current_files_to_lint + [config_pylint],
                 reporter=text.TextReporter(pylint_report),
@@ -150,7 +139,7 @@ class ThirdPartyPythonLintChecksManager:
         return concurrent_task_utils.TaskResult(
             name, errors_found, error_messages, full_error_messages)
 
-    def check_import_order(self):
+    def check_import_order(self) -> concurrent_task_utils.TaskResult:
         """This function is used to check that each file
         has imports placed in alphabetical order.
 
@@ -162,7 +151,7 @@ class ThirdPartyPythonLintChecksManager:
         error_messages = []
         files_to_check = self.all_filepaths
         failed = False
-        stdout = python_utils.string_io()
+        stdout = io.StringIO()
         with linter_utils.redirect_stdout(stdout):
             for filepath in files_to_check:
                 # This line prints the error message along with file path
@@ -177,7 +166,9 @@ class ThirdPartyPythonLintChecksManager:
         return concurrent_task_utils.TaskResult(
             name, failed, error_messages, error_messages)
 
-    def perform_all_lint_checks(self):
+    def perform_all_lint_checks(
+        self
+    ) -> List[concurrent_task_utils.TaskResult]:
         """Perform all the lint checks and returns the messages returned by all
         the checks.
 
@@ -192,13 +183,76 @@ class ThirdPartyPythonLintChecksManager:
                     'Python lint', False, [],
                     ['There are no Python files to lint.'])]
 
+        batch_jobs_dir: str = (
+            os.path.join(os.getcwd(), 'core', 'jobs', 'batch_jobs')
+        )
+        jobs_registry: str = (
+            os.path.join(os.getcwd(), 'core', 'jobs', 'registry.py')
+        )
+
         linter_stdout.append(self.lint_py_files())
         linter_stdout.append(self.check_import_order())
+        linter_stdout.append(check_jobs_imports(
+            batch_jobs_dir, jobs_registry)
+        )
 
         return linter_stdout
 
 
-def get_linters(files_to_lint):
+def check_jobs_imports(
+    batch_jobs_dir: str, jobs_registry: str
+) -> concurrent_task_utils.TaskResult:
+    """This function is used to check that all `jobs.batch_jobs.*_jobs` are
+    imported in `jobs.registry`.
+
+    Args:
+        batch_jobs_dir: str. The path to the batch_jobs directory.
+        jobs_registry: str. The path to the jobs registry file.
+
+    Returns:
+        TaskResult. A TaskResult object representing the result of the lint
+        check.
+    """
+    jobs_files: List[str] = [
+        filename.split('.')[0] for filename in os.listdir(batch_jobs_dir)
+        if filename.endswith('_jobs.py')
+    ]
+
+    with open(jobs_registry, 'r', encoding='utf-8') as file:
+        contents = file.read()
+    tree = ast.parse(contents)
+
+    imports: List[str] = []
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Import):
+            for n in node.names:
+                imports.append(n.name.split('.')[-1])
+        elif isinstance(node, ast.ImportFrom):
+            for alias in node.names:
+                imports.append(alias.name)
+
+    missing_imports: List[str] = []
+    for job_file in jobs_files:
+        if job_file not in imports:
+            missing_imports.append(job_file)
+
+    error_messages: List[str] = []
+    if missing_imports:
+        error_message = 'Following jobs should be imported in %s:\n%s' % (
+            os.path.relpath(jobs_registry), (', '.join(missing_imports))
+        )
+        error_messages.append(error_message)
+    return concurrent_task_utils.TaskResult(
+        'Check jobs imports in jobs registry',
+        bool(missing_imports),
+        error_messages,
+        error_messages
+    )
+
+
+def get_linters(
+    files_to_lint: List[str]
+) -> Tuple[None, ThirdPartyPythonLintChecksManager]:
     """Creates ThirdPartyPythonLintChecksManager and returns it.
 
     Args:

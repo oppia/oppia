@@ -1,4 +1,4 @@
-<div class="audio-header" *ngIf="isAudioBarAvailable()"
+<div tabindex="0" aria-label="audio menu" class="audio-header" *ngIf="isAudioBarAvailable()"
      [ngClass]="{'audio-header-margin': explorationPlayerModeIsActive}" headroom>
   <div *ngIf="audioBarIsExpanded" class="audio-bar-expanded" headroom>
     <div class="audio-controls" [ngClass]="{'audio-controls-margin': progressBarIsShown}">
@@ -10,11 +10,11 @@
               <span class="oppia-five-icon">5</span>
             </span>
           </a>
-          <a (click)="onPlayButtonClicked()"
+          <a (click)="onPlayButtonClicked()" (keydown.enter)="onPlayButtonClicked()"
              [ngbTooltip]="!isAudioAvailableInCurrentLanguage() ? ('I18N_PLAYER_AUDIO_NOT_AVAILABLE_IN' | translate:{languageDescription:getCurrentAudioLanguageDescription()}) : ''"
              placement="right">
-            <i class="fas oppia-audio-controls-button-icon" tabindex="0"
-               [ngClass]="{'fa-ellipsis-h': audioLoadingIndicatorIsShown, 'fa-play-circle protractor-test-play-circle': !isAudioPlaying(), 'fa-pause-circle protractor-test-pause-circle': isAudioPlaying(), 'audio-controls-audio-not-available': !isAudioAvailableInCurrentLanguage() || audioIsLoading}">
+            <i class="fas oppia-audio-controls-button-icon" tabindex="0" aria-label="Press enter to Listen to the Lesson"
+               [ngClass]="{'fa-ellipsis-h': audioLoadingIndicatorIsShown, 'fa-play-circle e2e-test-play-circle': !isAudioPlaying(), 'fa-pause-circle e2e-test-pause-circle': isAudioPlaying(), 'audio-controls-audio-not-available': !isAudioAvailableInCurrentLanguage() || audioIsLoading}">
             </i>
           </a>
           <a (click)="onForwardButtonClicked()">
@@ -47,7 +47,7 @@
           <span class="audio-controls-message">&zwnj;</span>
         </div>
         <div class="oppia-audio-header-select">
-          <select class="audio-language-select protractor-test-audio-lang-select"
+          <select class="audio-language-select e2e-test-audio-lang-select"
                   [(ngModel)]="selectedLanguage.value"
                   (change)="onNewLanguageSelected()">
             <option *ngFor="let opt of languagesInExploration" [value]="opt.value">{{ opt.displayed }}</option>
@@ -66,8 +66,9 @@
   <div class="audio-expand-button audio-toggle-button"
        *ngIf="!audioBarIsExpanded"
        (click)="expandAudioBar()"
+       (keydown.enter)="expandAudioBar()"
        aria-label="Audio menu expand">
-    <div class="container protractor-test-audio-bar">
+    <div class="container e2e-test-audio-bar">
       <div class="row">
         <div class="col-lg-6 px-0 mt-1 ml-2">
           <span class="audio-expand-button-text">
@@ -75,10 +76,10 @@
           </span>
         </div>
         <div class="col-lg-3 col-6 px-0 mt-lg-2">
-          <i class="audio-expand-icon fas fa-headphones-alt"></i>
+          <i tabindex="0" aria-label="headphone icon" class="audio-expand-icon fas fa-headphones-alt"></i>
         </div>
         <div class="col-lg-2 col-6 px-0 mt-lg-1">
-          <i class="audio-expand-icon fas fa-sort-down"></i>
+          <i tabindex="0" aria-label="Press Enter to expand the audio menu" class="audio-expand-icon fas fa-sort-down"></i>
         </div>
       </div>
     </div>
@@ -139,7 +140,7 @@
   }
 
   .audio-toggle-button {
-    background-color: #0D48A1;
+    background-color: #0d48a1;
     border-bottom-left-radius: 15px;
     border-bottom-right-radius: 15px;
     color: white;
@@ -161,7 +162,7 @@
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
-    width: 560px;
+    width: 700px;
   }
   .oppia-replay-white-circle {
     display: inline-block;
@@ -208,11 +209,11 @@
 
   .audio-controls {
     align-items: center;
-    background-color: #0D48A1;
+    background-color: #0d48a1;
     display: flex;
     flex-direction: row;
     flex-wrap: nowrap;
-    height: 44px;
+    height: 70px;
     justify-content: center;
     padding: 0 4px;
     transition: margin-top 200ms linear;
@@ -249,6 +250,7 @@
     color: white;
     font-size: 10px;
     font-style: italic;
+    vertical-align: 29px;
   }
 
   .audio-header {
@@ -277,13 +279,15 @@
   .audio-language-select {
     border-radius: 9px;
     font-size: 15px;
+    margin-bottom: 15px;
     margin-left: 5px;
-    padding-left: 3px;
+    padding-left: 2px;
+    padding-top: 2px;
   }
 
   .slider-section {
+    line-height: 0px;
     transform: translateY(10px);
-    width: 50%;
   }
 
   .audio-bar-nav-up {
@@ -294,7 +298,7 @@
     margin-top: -270px;
   }
 
-  @media screen and (max-width: 768px) {
+  @media screen and (max-width: 370px) {
     .oppia-audio-header-control-buttons {
       justify-content: space-evenly;
     }

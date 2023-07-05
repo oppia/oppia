@@ -1,0 +1,59 @@
+/*
+  NOTE to developers: We generate RTL CSS from this file in the webpack
+  compilation, here are sme additional rules that can be added to the CSS files:
+  https://rtlcss.com/learn/usage-guide/control-directives .
+*/
+
+oppia-supplemental-card .conversation-skin-help-card {
+  background: #fff;
+  border-radius: 2px;
+  /* We move the help card lower so that it does not block
+      the terminal output in the CodeRepl interaction.
+  */
+  box-shadow: 0 1px 2px rgba(0,0,0,0.24), 0 1px 3px rgba(0,0,0,0.12);
+  min-height: 50px;
+  opacity: 1;
+  padding: 12px;
+  right: -42px;
+  text-align: left;
+  transition: all 350ms;
+  /* The z-index value of leaflet map attribution is 1000, to make it go lower
+      in stack we have used 1001.
+  */
+  z-index: 1001;
+}
+
+oppia-supplemental-card .conversation-skin-help-card.ng-enter,
+oppia-supplemental-card .conversation-skin-help-card.ng-leave-active {
+  opacity: 0;
+  transform: translateX(200px);
+}
+
+oppia-supplemental-card .help-card-standard {
+  /* Use margin-bottom to make sure the help card doesn't get hidden behind the footer. */
+  margin-bottom: 80px;
+  position: absolute;
+}
+
+oppia-supplemental-card .conversation-skin-help-card .conversation-skin-oppia-avatar {
+  right: -15px;
+  top: 12px;
+}
+
+oppia-supplemental-card .conversation-skin-close-help-card-button {
+  background: none;
+  border: 0;
+  color: #000;
+  cursor: pointer;
+  height: 24px;
+  opacity: 0.5;
+  position: absolute;
+  right: 2px;
+  top: 2px;
+  width: 24px;
+  z-index: 200;
+}
+
+oppia-supplemental-card .conversation-skin-supplemental-card {
+  background-color: #fff;
+}

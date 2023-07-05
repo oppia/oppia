@@ -37,6 +37,8 @@ describe('Lost Change Object Factory', () => {
     const lostChange = lcof.createNew({
       cmd: 'add_state',
       state_name: 'State name',
+      content_id_for_state_content: 'content_0',
+      content_id_for_default_outcome: 'default_outcome_1'
     });
 
     expect(lostChange.cmd).toBe('add_state');
@@ -173,6 +175,7 @@ describe('Lost Change Object Factory', () => {
       new_value: {
         outcome: oof.createFromBackendDict({
           dest: 'outcome 2',
+          dest_if_really_stuck: null,
           feedback: {
             content_id: 'feedback_2',
             html: 'Html'
@@ -196,6 +199,7 @@ describe('Lost Change Object Factory', () => {
       old_value: {
         outcome: oof.createFromBackendDict({
           dest: 'outcome 1',
+          dest_if_really_stuck: null,
           feedback: {
             content_id: 'feedback_2',
             html: 'Html'
@@ -206,6 +210,7 @@ describe('Lost Change Object Factory', () => {
           missing_prerequisite_skill_id: null
         }),
         dest: 'default',
+        dest_if_really_stuck: null,
         feedback: new SubtitledHtml('<p>HTML</p>', '12'),
         html: '<p>Correct</p>',
         rules: [{
@@ -231,6 +236,7 @@ describe('Lost Change Object Factory', () => {
       new_value: {
         outcome: undefined,
         dest: 'dest2',
+        dest_if_really_stuck: null,
         feedback: new SubtitledHtml('<p>HTML</p>', '12'),
         html: '',
         rules: [{
@@ -244,6 +250,7 @@ describe('Lost Change Object Factory', () => {
       old_value: {
         outcome: undefined,
         dest: 'dest1',
+        dest_if_really_stuck: null,
         feedback: new SubtitledHtml('<p>HTML</p>', '12'),
         html: '',
         rules: [{
@@ -266,6 +273,7 @@ describe('Lost Change Object Factory', () => {
       new_value: {
         outcome: oof.createFromBackendDict({
           dest: 'outcome 2',
+          dest_if_really_stuck: null,
           feedback: {
             content_id: 'feedback_1',
             html: 'Html'
@@ -276,6 +284,7 @@ describe('Lost Change Object Factory', () => {
           missing_prerequisite_skill_id: null
         }),
         dest: 'dest2',
+        dest_if_really_stuck: null,
         feedback: new SubtitledHtml('<p>HTML</p>', '12'),
         html: '',
         rules: [{
@@ -289,6 +298,7 @@ describe('Lost Change Object Factory', () => {
       old_value: {
         outcome: oof.createFromBackendDict({
           dest: 'outcome 1',
+          dest_if_really_stuck: null,
           feedback: {
             content_id: 'feedback_1',
             html: 'Html'
@@ -299,6 +309,7 @@ describe('Lost Change Object Factory', () => {
           missing_prerequisite_skill_id: null
         }),
         dest: 'dest1',
+        dest_if_really_stuck: null,
         feedback: new SubtitledHtml('<p>HTML</p>', '12'),
         html: '',
         rules: [{

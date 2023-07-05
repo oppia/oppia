@@ -115,8 +115,7 @@ export class QuestionPlayerEngineService {
     const initialCard =
       StateCard.createNewCard(
         null, questionHtml, interactionHtml, interaction,
-        initialState.recordedVoiceovers,
-        initialState.writtenTranslations, initialState.content.contentId,
+        initialState.recordedVoiceovers, initialState.content.contentId,
         this.audioTranslationLanguageService);
     successCallback(initialCard, nextFocusLabel);
   }
@@ -142,7 +141,7 @@ export class QuestionPlayerEngineService {
   init(
       questionObjects: Question[],
       successCallback: (initialCard: StateCard, nextFocusLabel: string) => void,
-      errorCallback: () => void): void {
+      errorCallback?: () => void): void {
     this.contextService.setQuestionPlayerIsOpen();
     this.setAnswerIsBeingProcessed(false);
     let currentIndex = questionObjects.length;
@@ -168,6 +167,8 @@ export class QuestionPlayerEngineService {
 
   recordNewCardAdded(): void {
     this.currentIndex = this.nextIndex;
+    this.contextService.setCustomEntityContext(
+      AppConstants.ENTITY_TYPE.QUESTION, this.getCurrentQuestionId());
   }
 
   getCurrentIndex(): number {
@@ -229,6 +230,7 @@ export class QuestionPlayerEngineService {
           wasOldStateInitial,
           isFirstHit,
           isFinalQuestion: boolean,
+          nextCardIfReallyStuck: null,
           focusLabel: string) => void): boolean {
     if (this.answerIsBeingProcessed) {
       return;
@@ -302,32 +304,25 @@ export class QuestionPlayerEngineService {
 
     const _nextFocusLabel = this.focusManagerService.generateFocusLabel();
     let nextCard = null;
+    let nextCardIfReallyStuck = null;
     if (!isFinalQuestion) {
       let nextInteractionHtml = this.getNextInteractionHtml(_nextFocusLabel);
 
       questionHtml = questionHtml + this.getRandomSuffix();
       nextInteractionHtml = nextInteractionHtml + this.getRandomSuffix();
-      if (!onSameCard) {
-        this.contextService.setCustomEntityContext(
-          AppConstants.ENTITY_TYPE.QUESTION,
-          this.questions[this.nextIndex].getId());
-      }
       nextCard = StateCard.createNewCard(
         'true', questionHtml, nextInteractionHtml,
         this.getNextStateData().interaction,
         this.getNextStateData().recordedVoiceovers,
-        this.getNextStateData().writtenTranslations,
         this.getNextStateData().content.contentId,
         this.audioTranslationLanguageService
       );
-    } else if (!onSameCard) {
-      this.contextService.removeCustomEntityContext();
     }
     successCallback(
       nextCard, refreshInteraction, feedbackHtml,
       feedbackAudioTranslations,
       null, null, onSameCard, taggedSkillMisconceptionId,
-      null, null, isFinalQuestion, _nextFocusLabel);
+      null, null, isFinalQuestion, nextCardIfReallyStuck, _nextFocusLabel);
     return answerIsCorrect;
   }
 }

@@ -26,17 +26,20 @@ following Python types: bool, dict, float, int, list, unicode.
 
 from __future__ import annotations
 
+import io
 import numbers
 import re
 import urllib
 
 from core import feconf
-from core import python_utils
 from core import utils
 from core.constants import constants
 from core.domain import expression_parser
 from core.domain import html_cleaner
 from core.domain import user_domain
+from extensions.objects.models import objects
+
+import mutagen
 
 from typing import Any, Callable, Dict, List, Optional, cast
 
@@ -47,16 +50,20 @@ SCHEMA_KEY_TYPE = 'type'
 SCHEMA_KEY_POST_NORMALIZERS = 'post_normalizers'
 SCHEMA_KEY_CHOICES = 'choices'
 SCHEMA_KEY_NAME = 'name'
+SCHEMA_KEY_KEYS = 'keys'
+SCHEMA_KEY_VALUES = 'values'
 SCHEMA_KEY_SCHEMA = 'schema'
 SCHEMA_KEY_OBJ_TYPE = 'obj_type'
 SCHEMA_KEY_VALIDATORS = 'validators'
 SCHEMA_KEY_DEFAULT_VALUE = 'default_value'
 SCHEMA_KEY_OBJECT_CLASS = 'object_class'
 SCHEMA_KEY_VALIDATION_METHOD = 'validation_method'
+SCHEMA_KEY_OPTIONS = 'options'
 
 SCHEMA_TYPE_BOOL = 'bool'
 SCHEMA_TYPE_CUSTOM = 'custom'
 SCHEMA_TYPE_DICT = 'dict'
+SCHEMA_TYPE_DICT_WITH_VARIABLE_NO_OF_KEYS = 'variable_keys_dict'
 SCHEMA_TYPE_FLOAT = 'float'
 SCHEMA_TYPE_HTML = 'html'
 SCHEMA_TYPE_INT = 'int'
@@ -65,15 +72,28 @@ SCHEMA_TYPE_UNICODE = 'unicode'
 SCHEMA_TYPE_BASESTRING = 'basestring'
 SCHEMA_TYPE_UNICODE_OR_NONE = 'unicode_or_none'
 SCHEMA_TYPE_OBJECT_DICT = 'object_dict'
+SCHEMA_TYPE_WEAK_MULTIPLE = 'weak_multiple'
 
 SCHEMA_OBJ_TYPE_SUBTITLED_HTML = 'SubtitledHtml'
 SCHEMA_OBJ_TYPE_SUBTITLED_UNICODE = 'SubtitledUnicode'
+ALL_SCHEMAS: Dict[str, type] = {
+    SCHEMA_TYPE_BOOL: bool,
+    SCHEMA_TYPE_DICT: dict,
+    SCHEMA_TYPE_DICT_WITH_VARIABLE_NO_OF_KEYS: dict,
+    SCHEMA_TYPE_FLOAT: float,
+    SCHEMA_TYPE_HTML: str,
+    SCHEMA_TYPE_INT: int,
+    SCHEMA_TYPE_LIST: list,
+    SCHEMA_TYPE_UNICODE: str,
+    SCHEMA_TYPE_BASESTRING: str,
+    SCHEMA_TYPE_UNICODE_OR_NONE: str
+}
 
 EMAIL_REGEX = r'[\w\.\+\-]+\@[\w]+\.[a-z]{2,3}'
 
 
-# Using Dict[str, Any] here for schema because the following schema can have a
-# recursive structure and mypy doesn't support recursive type currently.
+# Here we use type Any because the following schema can have a recursive
+# structure and mypy doesn't support recursive type currently.
 # See: https://github.com/python/mypy/issues/731
 def normalize_against_schema(
         obj: Any,
@@ -96,11 +116,22 @@ def normalize_against_schema(
         *. The normalized object.
 
     Raises:
-        AssertionError. The object fails to validate against the schema.
+        Exception. The object fails to validate against the schema.
+        AssertionError. The validation for schema validators fails.
     """
+    # Here we use type Any because 'normalized_obj' can be of type int, str,
+    # Dict, List and other types too.
     normalized_obj: Any = None
 
-    if schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_BOOL:
+    if schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_WEAK_MULTIPLE:
+        for i in schema[SCHEMA_KEY_OPTIONS]:
+            if isinstance(obj, ALL_SCHEMAS[i]):
+                normalized_obj = obj
+                break
+        if normalized_obj is None:
+            raise Exception(
+                'Type of %s is not present in options' % obj)
+    elif schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_BOOL:
         assert isinstance(obj, bool), ('Expected bool, received %s' % obj)
         normalized_obj = obj
     elif schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_CUSTOM:
@@ -108,7 +139,7 @@ def normalize_against_schema(
         # TODO(sll): Either get rid of custom objects or find a way to merge
         # them into the schema framework -- probably the latter.
         from core.domain import object_registry
-        obj_class = object_registry.Registry.get_object_class_by_type( # type: ignore[no-untyped-call]
+        obj_class = object_registry.Registry.get_object_class_by_type(
             schema[SCHEMA_KEY_OBJ_TYPE])
         if not apply_custom_validators:
             normalized_obj = normalize_against_schema(
@@ -134,21 +165,35 @@ def normalize_against_schema(
                 prop[SCHEMA_KEY_SCHEMA],
                 global_validators=global_validators
             )
+    elif schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_DICT_WITH_VARIABLE_NO_OF_KEYS:
+        assert isinstance(obj, dict), ('Expected dict, received %s' % obj)
+        normalized_obj = {}
+        for key, value in obj.items():
+            normalized_key = normalize_against_schema(
+                key, schema[SCHEMA_KEY_KEYS][SCHEMA_KEY_SCHEMA],
+                global_validators=global_validators
+            )
+            normalized_obj[normalized_key] = normalize_against_schema(
+                value, schema[SCHEMA_KEY_VALUES][SCHEMA_KEY_SCHEMA],
+                global_validators=global_validators
+            )
     elif schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_FLOAT:
+        if isinstance(obj, bool):
+            raise Exception('Expected float, received %s' % obj)
         try:
             obj = float(obj)
-        except Exception:
+        except Exception as e:
             raise Exception('Could not convert %s to float: %s' % (
-                type(obj).__name__, obj))
+                type(obj).__name__, obj)) from e
         assert isinstance(obj, numbers.Real), (
             'Expected float, received %s' % obj)
         normalized_obj = obj
     elif schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_INT:
         try:
             obj = int(obj)
-        except Exception:
+        except Exception as e:
             raise Exception('Could not convert %s to int: %s' % (
-                type(obj).__name__, obj))
+                type(obj).__name__, obj)) from e
         assert isinstance(obj, numbers.Integral), (
             'Expected int, received %s' % obj)
         assert isinstance(obj, int), ('Expected int, received %s' % obj)
@@ -163,7 +208,7 @@ def normalize_against_schema(
             obj = str(obj)
         assert isinstance(obj, str), (
             'Expected unicode, received %s' % obj)
-        normalized_obj = html_cleaner.clean(obj) # type: ignore[no-untyped-call]
+        normalized_obj = html_cleaner.clean(obj)
     elif schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_LIST:
         assert isinstance(obj, list), ('Expected list, received %s' % obj)
         item_schema = schema[SCHEMA_KEY_ITEMS]
@@ -173,7 +218,9 @@ def normalize_against_schema(
                     schema[SCHEMA_KEY_LEN], len(obj)))
         normalized_obj = [
             normalize_against_schema(
-                item, item_schema, global_validators=global_validators
+                item,
+                item_schema,
+                global_validators=global_validators
             ) for item in obj
         ]
     elif schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_BASESTRING:
@@ -219,11 +266,12 @@ def normalize_against_schema(
             validate_class = schema[SCHEMA_KEY_OBJECT_CLASS]
             domain_object = validate_class.from_dict(obj)
             domain_object.validate()
+            normalized_obj = domain_object
         else:
             validation_method = schema[SCHEMA_KEY_VALIDATION_METHOD]
-            validation_method(obj)
+            normalized_obj = validation_method(obj)
 
-        normalized_obj = obj
+        return normalized_obj
     else:
         raise Exception('Invalid schema type: %s' % schema[SCHEMA_KEY_TYPE])
 
@@ -246,11 +294,21 @@ def normalize_against_schema(
         if SCHEMA_KEY_VALIDATORS in schema:
             for validator in schema[SCHEMA_KEY_VALIDATORS]:
                 kwargs = dict(validator)
+                expect_invalid_default_value = False
+                if 'expect_invalid_default_value' in kwargs:
+                    expect_invalid_default_value = kwargs[
+                        'expect_invalid_default_value']
+                    del kwargs['expect_invalid_default_value']
                 del kwargs['id']
-                assert get_validator(
-                    validator['id'])(normalized_obj, **kwargs), (
+                validator_func = get_validator(validator['id'])
+                if (
+                    not validator_func(normalized_obj, **kwargs) and
+                    not expect_invalid_default_value
+                ):
+                    raise AssertionError(
                         'Validation failed: %s (%s) for object %s' % (
-                            validator['id'], kwargs, normalized_obj))
+                            validator['id'], kwargs, normalized_obj)
+                    )
 
     if global_validators is not None:
         for validator in global_validators:
@@ -311,7 +369,7 @@ class Normalizers:
         """
         if not hasattr(cls, normalizer_id):
             raise Exception('Invalid normalizer id: %s' % normalizer_id)
-        # Using a cast here because the return value of getattr() method is
+        # Here we use cast because the return value of getattr() method is
         # dynamic and mypy will assume it to be Any otherwise.
         return cast(Callable[..., str], getattr(cls, normalizer_id))
 
@@ -334,15 +392,15 @@ class Normalizers:
         if obj == '':
             return obj
         url_components = urllib.parse.urlsplit(obj)
-        quoted_url_components = (
-            urllib.parse.quote(component) for component in url_components)
-        raw = python_utils.url_unsplit(quoted_url_components) # type: ignore[no-untyped-call]
+        quoted_url_components = [
+            urllib.parse.quote(component) for component in url_components]
+        raw = urllib.parse.urlunsplit(quoted_url_components)
 
-        acceptable = html_cleaner.filter_a('a', 'href', obj) # type: ignore[no-untyped-call]
+        acceptable = html_cleaner.filter_a('a', 'href', obj)
         assert acceptable, (
             'Invalid URL: Sanitized URL should start with '
             '\'http://\' or \'https://\'; received %s' % raw)
-        return raw # type: ignore[no-any-return]
+        return raw
 
     @staticmethod
     def normalize_spaces(obj: str) -> str:
@@ -383,10 +441,13 @@ class _Validators:
         Returns:
             function. The validator method corresponding to the specified
             validator_id.
+
+        Raises:
+            Exception. Given validator method is invalid.
         """
         if not hasattr(cls, validator_id):
             raise Exception('Invalid validator id: %s' % validator_id)
-        # Using a cast here because the return value of getattr() method is
+        # Here we use cast because the return value of getattr() method is
         # dynamic and mypy will assume it to be Any otherwise.
         return cast(Callable[..., bool], getattr(cls, validator_id))
 
@@ -499,11 +560,11 @@ class _Validators:
         return obj <= max_value
 
     @staticmethod
-    def does_not_contain_email(obj: object) -> bool:
+    def does_not_contain_email(obj: str) -> bool:
         """Ensures that obj doesn't contain a valid email.
 
         Args:
-            obj: object. The object to validate.
+            obj: str. The object to validate.
 
         Returns:
             bool. Whether the given object doesn't contain a valid email.
@@ -541,14 +602,13 @@ class _Validators:
         if len(obj) == 0:
             return True
 
-        if not expression_parser.is_valid_expression(obj): # type: ignore[no-untyped-call]
+        if not expression_parser.is_valid_expression(obj):
             return False
 
-        expression_is_algebraic = expression_parser.is_algebraic(obj) # type: ignore[no-untyped-call]
-        # If the algebraic flag is true, expression_is_algebraic should
-        # also be true, otherwise both should be false which would imply
-        # that the expression is numeric.
-        return not algebraic ^ expression_is_algebraic
+        expression_contains_at_least_one_variable = (
+            expression_parser.contains_at_least_one_variable(obj))
+        # This ensures that numeric expressions don't contain variables.
+        return algebraic or not expression_contains_at_least_one_variable
 
     @staticmethod
     def is_valid_algebraic_expression(obj: str) -> bool:
@@ -593,25 +653,24 @@ class _Validators:
 
         is_valid_algebraic_expression = get_validator(
             'is_valid_algebraic_expression')
-        is_valid_numeric_expression = get_validator(
-            'is_valid_numeric_expression')
         lhs, rhs = obj.split('=')
 
         # Both sides have to be valid expressions and at least one of them has
-        # to be a valid algebraic expression.
-        lhs_is_algebraically_valid = is_valid_algebraic_expression(lhs)
-        rhs_is_algebraically_valid = is_valid_algebraic_expression(rhs)
+        # to have at least one variable.
+        lhs_is_valid = is_valid_algebraic_expression(lhs)
+        rhs_is_valid = is_valid_algebraic_expression(rhs)
 
-        lhs_is_numerically_valid = is_valid_numeric_expression(lhs)
-        rhs_is_numerically_valid = is_valid_numeric_expression(rhs)
+        if not lhs_is_valid or not rhs_is_valid:
+            return False
 
-        if lhs_is_algebraically_valid and rhs_is_algebraically_valid:
-            return True
-        if lhs_is_algebraically_valid and rhs_is_numerically_valid:
-            return True
-        if lhs_is_numerically_valid and rhs_is_algebraically_valid:
-            return True
-        return False
+        lhs_contains_variable = (
+            expression_parser.contains_at_least_one_variable(lhs))
+        rhs_contains_variable = (
+            expression_parser.contains_at_least_one_variable(rhs))
+
+        if not lhs_contains_variable and not rhs_contains_variable:
+            return False
+        return True
 
     @staticmethod
     def is_supported_audio_language_code(obj: str) -> bool:
@@ -681,3 +740,92 @@ class _Validators:
             return True
         except utils.ValidationError:
             return False
+
+    @staticmethod
+    def has_expected_subtitled_content_length(
+        obj: objects.SubtitledUnicode, max_value: int
+    ) -> bool:
+        """Checks if the given subtitled content length is within max value.
+
+        Args:
+            obj: objects.SubtitledUnicode. The object to verify.
+            max_value: int. The maximum allowed value for the obj.
+
+        Returns:
+            bool. Whether the given object has length atmost the max_value.
+        """
+        # Ruling out the possibility of different types for mypy type checking.
+        assert isinstance(obj, dict)
+        return len(obj['unicode_str']) <= max_value
+
+    @staticmethod
+    def has_subtitled_html_non_empty(obj: objects.SubtitledHtml) -> bool:
+        """Checks if the given subtitled html content is empty
+
+        Args:
+            obj: objects.SubtitledHtml. The object to verify.
+
+        Returns:
+            bool. Whether the given object is empty.
+        """
+        # Ruling out the possibility of different types for mypy type checking.
+        assert isinstance(obj, dict)
+        return obj['html'] not in ('', '<p></p>')
+
+    @staticmethod
+    def has_unique_subtitled_contents(
+        obj: List[objects.SubtitledHtml]
+    ) -> bool:
+        """Checks if the given subtitled html content is uniquified.
+
+        Args:
+            obj: List[objects.SubtitledHtml]. The list of SubtitledHtml
+                content.
+
+        Returns:
+            bool. Returns True if the content inside the list is uniquified.
+        """
+        seen_choices = []
+        for choice in obj:
+            # Ruling out the possibility of different types for mypy type
+            # checking.
+            assert isinstance(choice, dict)
+            if choice['html'] in seen_choices:
+                return False
+            seen_choices.append(choice['html'])
+        return True
+
+    @staticmethod
+    def is_valid_audio_file(obj: bytes) -> bool:
+        """Checks if given audio file is a valid audio file.
+
+        Args:
+            obj: str. The raw audio file to validate.
+
+        Returns:
+            bool. Returns True if obj is a valid audio file.
+
+        Raises:
+            Exception. The obj is not a valid audio file.
+        """
+        if not obj:
+            raise Exception('No audio supplied')
+        tempbuffer = io.BytesIO()
+        tempbuffer.write(obj)
+        tempbuffer.seek(0)
+
+        # .mp3 is the only allowed extension.
+        extension = 'mp3'
+        try:
+            audio = mutagen.mp3.MP3(tempbuffer)
+        except mutagen.MutagenError as e:
+            raise Exception(
+                'Audio not recognized as a %s file' % extension
+            ) from e
+
+        if audio.info.length > feconf.MAX_AUDIO_FILE_LENGTH_SEC:
+            raise Exception(
+                'Audio files must be under %s seconds in length. The uploaded '
+                'file is %.2f seconds long.' % (
+                    feconf.MAX_AUDIO_FILE_LENGTH_SEC, audio.info.length))
+        return True

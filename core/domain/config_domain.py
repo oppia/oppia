@@ -18,15 +18,49 @@
 
 from __future__ import annotations
 
-from core import feconf
 from core import schema_utils
 from core.constants import constants
-from core.domain import caching_services
 from core.domain import change_domain
-from core.platform import models
+
+from typing import (
+    Any, Dict, List, Literal, Optional, Sequence, TypedDict, Union, overload
+)
+
+from core.domain import caching_services  # pylint: disable=invalid-import-from # isort:skip
+from core.platform import models  # pylint: disable=invalid-import-from # isort:skip
+
+# TODO(#14537): Refactor this file and remove imports marked
+# with 'invalid-import-from'.
+
+
+MYPY = False
+if MYPY: # pragma: no cover
+    from mypy_imports import config_models
+    from mypy_imports import suggestion_models
 
 (config_models, suggestion_models,) = models.Registry.import_models(
-    [models.NAMES.config, models.NAMES.suggestion])
+    [models.Names.CONFIG, models.Names.SUGGESTION])
+
+AllowedDefaultValueTypes = Union[
+    str,
+    bool,
+    float,
+    Dict[str, str],
+    List[str],
+    List[Dict[str, Sequence[str]]],
+    List[Dict[str, str]]
+]
+
+
+class ConfigPropertySchemaDict(TypedDict):
+    """Type representing the config property's schema dictionary."""
+
+    # Here we use type Any because the general structure of schemas are like
+    # {string : (string, dict, list[dict], variables defined in other modules)}.
+    schema: Dict[str, Any]
+    description: str
+    value: AllowedDefaultValueTypes
+
 
 CMD_CHANGE_PROPERTY_VALUE = 'change_property_value'
 
@@ -112,30 +146,8 @@ SET_OF_CLASSROOM_DICTS_SCHEMA = {
     }
 }
 
-VMID_SHARED_SECRET_KEY_SCHEMA = {
-    'type': schema_utils.SCHEMA_TYPE_LIST,
-    'items': {
-        'type': schema_utils.SCHEMA_TYPE_DICT,
-        'properties': [{
-            'name': 'vm_id',
-            'schema': {
-                'type': schema_utils.SCHEMA_TYPE_UNICODE
-            }
-        }, {
-            'name': 'shared_secret_key',
-            'schema': {
-                'type': schema_utils.SCHEMA_TYPE_UNICODE
-            }
-        }]
-    }
-}
-
 BOOL_SCHEMA = {
     'type': schema_utils.SCHEMA_TYPE_BOOL
-}
-
-UNICODE_SCHEMA = {
-    'type': schema_utils.SCHEMA_TYPE_UNICODE
 }
 
 FLOAT_SCHEMA = {
@@ -163,8 +175,18 @@ class ConfigPropertyChange(change_domain.BaseChange):
         'name': CMD_CHANGE_PROPERTY_VALUE,
         'required_attribute_names': ['new_value'],
         'optional_attribute_names': [],
-        'user_id_attribute_names': []
+        'user_id_attribute_names': [],
+        'allowed_values': {},
+        'deprecated_values': {}
     }]
+
+
+class ChangePropertyValueCmd(ConfigPropertyChange):
+    """Class representing the ConfigPropertyChange's
+    CMD_CHANGE_PROPERTY_VALUE command.
+    """
+
+    new_value: str
 
 
 class ConfigProperty:
@@ -177,6 +199,7 @@ class ConfigProperty:
     - admin_ids.
     - admin_usernames.
     - allow_yaml_file_upload.
+    - always_ask_learners_for_answer_details.
     - banned_usernames.
     - banner_alt_text.
     - before_end_body_tag_hook.
@@ -191,10 +214,19 @@ class ConfigProperty:
     - editor_page_announcement.
     - editor_prerequisites_agreement.
     - embedded_google_group_url.
+    - featured_translation_languages.
     - full_site_url.
+    - high_bounce_rate_task_minimum_exploration_starts.
+    - high_bounce_rate_task_state_bounce_rate_creation_threshold.
+    - high_bounce_rate_task_state_bounce_rate_obsoletion_threshold.
+    - is_improvements_tab_enabled.
+    - learner_groups_are_enabled.
+    - list_of_default_tags_for_blog_post.
     - moderator_ids.
     - moderator_request_forum_url.
     - moderator_usernames.
+    - promo_bar_enabled.
+    - promo_bar_message.
     - publicize_exploration_email_html_body.
     - sharing_options.
     - sharing_options_twitter_text.
@@ -205,10 +237,21 @@ class ConfigProperty:
     - splash_page_exploration_version.
     - splash_page_youtube_video_id.
     - ssl_challenge_responses.
+    - vmid_shared_secret_key_mapping.
     - whitelisted_email_senders.
+    - whitelisted_exploration_ids_for_playthroughs.
     """
 
-    def __init__(self, name, schema, description, default_value):
+    # Here we use type Any because the general structure of schemas are like
+    # {string : (string, dict, list[dict], variables defined in other modules)}.
+    # So, Any type has to be used in constructor for the type of schema.
+    def __init__(
+        self,
+        name: str,
+        schema: Dict[str, Any],
+        description: str,
+        default_value: AllowedDefaultValueTypes
+    ) -> None:
         if Registry.get_config_property(name):
             raise Exception('Property with name %s already exists' % name)
 
@@ -220,31 +263,36 @@ class ConfigProperty:
         Registry.init_config_property(self.name, self)
 
     @property
-    def name(self):
+    def name(self) -> str:
         """Returns the name of the configuration property."""
 
         return self._name
 
+    # Here we use type Any because this function returns general structured
+    # schemas whose values can vary from int to complex Dicts.
     @property
-    def schema(self):
+    def schema(self) -> Dict[str, Any]:
         """Returns the schema of the configuration property."""
 
         return self._schema
 
     @property
-    def description(self):
+    def description(self) -> str:
         """Returns the description of the configuration property."""
 
         return self._description
 
     @property
-    def default_value(self):
+    def default_value(self) -> AllowedDefaultValueTypes:
         """Returns the default value of the configuration property."""
 
         return self._default_value
 
+    # Here we use type Any because this function returns latest value of
+    # configuration property from memcache, datastore, or default value.
+    # so, if function returns datastore's value it should return Any.
     @property
-    def value(self):
+    def value(self) -> Any:
         """Get the latest value from memcache, datastore, or use default."""
 
         memcached_items = caching_services.get_multi(
@@ -264,7 +312,9 @@ class ConfigProperty:
 
         return self.default_value
 
-    def set_value(self, committer_id, raw_value):
+    def set_value(
+        self, committer_id: str, raw_value: Union[str, List[str]]
+    ) -> None:
         """Sets the value of the property. In general, this should not be
         called directly -- use config_services.set_property() instead.
         """
@@ -290,7 +340,9 @@ class ConfigProperty:
                 model_instance.id: model_instance.value
             })
 
-    def normalize(self, value):
+    def normalize(
+        self, value: AllowedDefaultValueTypes
+    ) -> AllowedDefaultValueTypes:
         """Validates the given object using the schema and normalizes if
         necessary.
 
@@ -301,8 +353,12 @@ class ConfigProperty:
             instance. The normalized object.
         """
         email_validators = [{'id': 'does_not_contain_email'}]
-        return schema_utils.normalize_against_schema(
-            value, self._schema, global_validators=email_validators)
+        normalized_value: AllowedDefaultValueTypes = (
+            schema_utils.normalize_against_schema(
+                value, self._schema, global_validators=email_validators
+            )
+        )
+        return normalized_value
 
 
 class Registry:
@@ -310,10 +366,10 @@ class Registry:
 
     # The keys of _config_registry are the property names, and the values are
     # ConfigProperty instances.
-    _config_registry = {}
+    _config_registry: Dict[str, ConfigProperty] = {}
 
     @classmethod
-    def init_config_property(cls, name, instance):
+    def init_config_property(cls, name: str, instance: ConfigProperty) -> None:
         """Initializes _config_registry with keys as the property names and
         values as instances of the specified property.
 
@@ -323,27 +379,57 @@ class Registry:
         """
         cls._config_registry[name] = instance
 
+    @overload
     @classmethod
-    def get_config_property(cls, name):
+    def get_config_property(
+        cls, name: str
+    ) -> Optional[ConfigProperty]: ...
+
+    @overload
+    @classmethod
+    def get_config_property(
+        cls, name: str, *, strict: Literal[True]
+    ) -> ConfigProperty: ...
+
+    @overload
+    @classmethod
+    def get_config_property(
+        cls, name: str, *, strict: Literal[False]
+    ) -> Optional[ConfigProperty]: ...
+
+    @classmethod
+    def get_config_property(
+        cls, name: str, strict: bool = False
+    ) -> Optional[ConfigProperty]:
         """Returns the instance of the specified name of the configuration
         property.
 
         Args:
             name: str. The name of the configuration property.
+            strict: bool. Whether to fail noisily if no config property exist.
 
         Returns:
             instance. The instance of the specified configuration property.
+
+        Raises:
+            Exception. No config property exist for the given property name.
         """
-        return cls._config_registry.get(name)
+        config_property = cls._config_registry.get(name)
+        if strict and config_property is None:
+            raise Exception(
+                'No config property exists for the given property name: %s'
+                % name
+            )
+        return config_property
 
     @classmethod
-    def get_config_property_schemas(cls):
+    def get_config_property_schemas(cls) -> Dict[str, ConfigPropertySchemaDict]:
         """Return a dict of editable config property schemas.
 
         The keys of the dict are config property names. The values are dicts
         with the following keys: schema, description, value.
         """
-        schemas_dict = {}
+        schemas_dict: Dict[str, ConfigPropertySchemaDict] = {}
 
         for (property_name, instance) in cls._config_registry.items():
             schemas_dict[property_name] = {
@@ -355,7 +441,7 @@ class Registry:
         return schemas_dict
 
     @classmethod
-    def get_all_config_property_names(cls):
+    def get_all_config_property_names(cls) -> List[str]:
         """Return a list of all the config property names.
 
         Returns:
@@ -364,29 +450,9 @@ class Registry:
         return list(cls._config_registry)
 
 
-PROMO_BAR_ENABLED = ConfigProperty(
-    'promo_bar_enabled', BOOL_SCHEMA,
-    'Whether the promo bar should be enabled for all users', False)
-PROMO_BAR_MESSAGE = ConfigProperty(
-    'promo_bar_message', UNICODE_SCHEMA,
-    'The message to show to all users if the promo bar is enabled', '')
-
-VMID_SHARED_SECRET_KEY_MAPPING = ConfigProperty(
-    'vmid_shared_secret_key_mapping', VMID_SHARED_SECRET_KEY_SCHEMA,
-    'VMID and shared secret key corresponding to that VM',
-    [{
-        'vm_id': feconf.DEFAULT_VM_ID,
-        'shared_secret_key': feconf.DEFAULT_VM_SHARED_SECRET
-    }])
-
-WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS = ConfigProperty(
-    'whitelisted_exploration_ids_for_playthroughs',
-    SET_OF_STRINGS_SCHEMA,
-    'The set of exploration IDs for recording playthrough issues', [
-        'umPkwp0L1M0-', 'MjZzEVOG47_1', '9trAQhj6uUC2', 'rfX8jNkPnA-1',
-        '0FBWxCE5egOw', '670bU6d9JGBh', 'aHikhPlxYgOH', '-tMgcP1i_4au',
-        'zW39GLG_BdN2', 'Xa3B_io-2WI5', '6Q6IyIDkjpYC', 'osw1m5Q3jK41'])
-
+# Add classroom name to SEARCH_DROPDOWN_CLASSROOMS in constants.ts file
+# to add that classroom to learner group syllabus filter whenever a new
+# classroom is added.
 CLASSROOM_PAGES_DATA = ConfigProperty(
     'classroom_pages_data', SET_OF_CLASSROOM_DICTS_SCHEMA,
     'The details for each classroom page.', [{
@@ -402,44 +468,19 @@ RECORD_PLAYTHROUGH_PROBABILITY = ConfigProperty(
     'record_playthrough_probability', FLOAT_SCHEMA,
     'The probability of recording playthroughs', 0.2)
 
-IS_IMPROVEMENTS_TAB_ENABLED = ConfigProperty(
-    'is_improvements_tab_enabled', BOOL_SCHEMA,
-    'Exposes the Improvements Tab for creators in the exploration editor.',
-    False)
-
-ALWAYS_ASK_LEARNERS_FOR_ANSWER_DETAILS = ConfigProperty(
-    'always_ask_learners_for_answer_details', BOOL_SCHEMA,
-    'Always ask learners for answer details. For testing -- do not use',
-    False)
+# TODO(#15682): Implement user checkpoints feature flag using feature-gating
+# service.
+CHECKPOINTS_FEATURE_IS_ENABLED = ConfigProperty(
+    'checkpoints_feature_is_enabled', BOOL_SCHEMA,
+    'Enable checkpoints feature.', False)
 
 CLASSROOM_PROMOS_ARE_ENABLED = ConfigProperty(
     'classroom_promos_are_enabled', BOOL_SCHEMA,
     'Show classroom promos.', False)
 
-FEATURED_TRANSLATION_LANGUAGES = ConfigProperty(
-    'featured_translation_languages',
-    LIST_OF_FEATURED_TRANSLATION_LANGUAGES_DICTS_SCHEMA,
-    'Featured Translation Languages', []
-)
-
-HIGH_BOUNCE_RATE_TASK_STATE_BOUNCE_RATE_CREATION_THRESHOLD = ConfigProperty(
-    'high_bounce_rate_task_state_bounce_rate_creation_threshold',
-    FLOAT_SCHEMA,
-    'The bounce-rate a state must exceed to create a new improvements task.',
-    0.20)
-
-HIGH_BOUNCE_RATE_TASK_STATE_BOUNCE_RATE_OBSOLETION_THRESHOLD = ConfigProperty(
-    'high_bounce_rate_task_state_bounce_rate_obsoletion_threshold',
-    FLOAT_SCHEMA,
-    'The bounce-rate a state must fall under to discard its improvement task.',
-    0.20)
-
-HIGH_BOUNCE_RATE_TASK_MINIMUM_EXPLORATION_STARTS = ConfigProperty(
-    'high_bounce_rate_task_minimum_exploration_starts',
-    INT_SCHEMA,
-    'The minimum number of times an exploration is started before it can '
-    'generate high bounce-rate improvements tasks.',
-    100)
+BATCH_INDEX_FOR_MAILCHIMP = ConfigProperty(
+    'batch_index_for_mailchimp', INT_SCHEMA,
+    'Index of batch to populate mailchimp database.', 0)
 
 MAX_NUMBER_OF_SVGS_IN_MATH_SVGS_BATCH = ConfigProperty(
     'max_number_of_svgs_in_math_svgs_batch',
@@ -461,16 +502,6 @@ MAX_NUMBER_OF_TAGS_ASSIGNED_TO_BLOG_POST = ConfigProperty(
     'The maximum number of tags that can be selected to categorize the blog'
     ' post',
     10
-)
-
-LIST_OF_DEFAULT_TAGS_FOR_BLOG_POST = ConfigProperty(
-    'list_of_default_tags_for_blog_post',
-    SET_OF_STRINGS_SCHEMA,
-    'The list of tags available to a blog post editor for categorizing the blog'
-    ' post.',
-    ['News', 'International', 'Educators', 'Learners', 'Community',
-     'Partnerships', 'Volunteer', 'Stories', 'Languages', 'New features',
-     'New lessons', 'Software development', 'Content']
 )
 
 CONTRIBUTOR_DASHBOARD_IS_ENABLED = ConfigProperty(

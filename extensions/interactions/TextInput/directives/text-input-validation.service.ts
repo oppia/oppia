@@ -50,11 +50,11 @@ export type RequireOnlyOne<T, Keys extends keyof T> =
        & Partial<Record<Exclude<Keys, K>, undefined>>
      }[Keys];
 
-export type Validators = RequireOnlyOne<MinMaxValue, 'min_value' | 'max_value'>;
+export type Validator = RequireOnlyOne<MinMaxValue, 'min_value' | 'max_value'>;
 
 interface Warning {
-  type: string,
-  message: string
+  type: string;
+  message: string;
 }
 
 @Injectable({
@@ -94,7 +94,7 @@ export class TextInputValidationService {
       let textSpecs = InteractionSpecsConstants.INTERACTION_SPECS.TextInput;
       let customizationArgSpecs = textSpecs.customization_arg_specs;
       let rowsSpecs = customizationArgSpecs[1];
-      let validators = rowsSpecs.schema.validators as Validators[];
+      let validators = rowsSpecs.schema.validators as Validator[];
       let minRows = validators[0].min_value;
       let maxRows = validators[1].max_value;
       if ((maxRows && minRows) && (rows < minRows || rows > maxRows)) {
@@ -140,8 +140,9 @@ export class TextInputValidationService {
           warningsList.push({
             type: AppConstants.WARNING_TYPES.ERROR,
             message: (
-              `Answer group ${answerGroupIndex + 1} has multiple rules with ` +
-              `the same type \'${rule.type}\' within the same group.`
+              `Oppia response ${answerGroupIndex + 1} has multiple learner ` +
+              `answers with the same type \'${rule.type}\' within the same ` +
+              'response.'
             )
           });
         }
@@ -162,9 +163,9 @@ export class TextInputValidationService {
           if (hasCollision || seenStringsStartsWith.includes('')) {
             warningsList.push({
               type: AppConstants.WARNING_TYPES.ERROR,
-              message: `Rule ${ruleIndex + 1} from answer group ` +
-                `${answerGroupIndex + 1} will never be matched because it ` +
-                'is preceded by a \'Contains\' rule with a matching input.'
+              message: `Learner answer ${ruleIndex + 1} from Oppia response ` +
+              `${answerGroupIndex + 1} will never be matched because it ` +
+              'is preceded by a \'Contains\' answer with a matching input.'
             });
           }
 
@@ -182,9 +183,9 @@ export class TextInputValidationService {
           if (hasCollision) {
             warningsList.push({
               type: AppConstants.WARNING_TYPES.ERROR,
-              message: `Rule ${ruleIndex + 1} from answer group ` +
-                `${answerGroupIndex + 1} will never be matched because it ` +
-                'is preceded by a \'StartsWith\' rule with a matching prefix.'
+              message: `Learner answer ${ruleIndex + 1} from Oppia response ` +
+              `${answerGroupIndex + 1} will never be matched because it ` +
+              'is preceded by a \'StartsWith\' answer with a matching prefix.'
             });
           }
           seenStringsStartsWith.push(...currentStrings);
@@ -193,23 +194,25 @@ export class TextInputValidationService {
             (seenString) => textInputRulesService.Equals(
               seenString, {x: {
                 contentId: null, normalizedStrSet: currentStrings
-              }}))) {
+              },
+              contentId: null}))) {
             warningsList.push({
               type: AppConstants.WARNING_TYPES.ERROR,
-              message: `Rule ${ruleIndex + 1} from answer group ` +
-                `${answerGroupIndex + 1} will never be matched because it ` +
-                'is preceded by a \'Equals\' rule with a matching input.'
+              message: `Learner answer ${ruleIndex + 1} from Oppia response ` +
+              `${answerGroupIndex + 1} will never be matched because it ` +
+              'is preceded by a \'Equals\' answer with a matching input.'
             });
           } else if (seenStringsFuzzyEquals.some(
             (seenString) => textInputRulesService.FuzzyEquals(
               seenString, {x: {
                 contentId: null, normalizedStrSet: currentStrings
-              }}))) {
+              },
+              contentId: null}))) {
             warningsList.push({
               type: AppConstants.WARNING_TYPES.ERROR,
-              message: `Rule ${ruleIndex + 1} from answer group ` +
-                `${answerGroupIndex + 1} will never be matched because it ` +
-                'is preceded by a \'FuzzyEquals\' rule with a matching input.'
+              message: `Learner answer ${ruleIndex + 1} from Oppia response ` +
+              `${answerGroupIndex + 1} will never be matched because it ` +
+              'is preceded by a \'FuzzyEquals\' answer with a matching input.'
             });
           }
           seenStringsEquals.push(...currentStrings);
@@ -218,12 +221,13 @@ export class TextInputValidationService {
             (seenString) => textInputRulesService.FuzzyEquals(
               seenString, {x: {
                 contentId: null, normalizedStrSet: currentStrings
-              }}))) {
+              },
+              contentId: null}))) {
             warningsList.push({
               type: AppConstants.WARNING_TYPES.ERROR,
-              message: `Rule ${ruleIndex + 1} from answer group ` +
-                `${answerGroupIndex + 1} will never be matched because it ` +
-                'is preceded by a \'FuzzyEquals\' rule with a matching input.'
+              message: `Learner answer ${ruleIndex + 1} from Oppia response ` +
+              `${answerGroupIndex + 1} will never be matched because it ` +
+              'is preceded by a \'FuzzyEquals\' answer with a matching input.'
             });
           }
           seenStringsFuzzyEquals.push(...currentStrings);

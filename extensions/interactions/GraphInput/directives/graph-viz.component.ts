@@ -22,6 +22,7 @@
 
 import {
   AfterViewInit,
+  ChangeDetectorRef,
   Component,
   ElementRef,
   EventEmitter,
@@ -30,6 +31,7 @@ import {
   OnInit,
   Output
 } from '@angular/core';
+import { isNumber } from 'angular';
 import { GraphAnswer } from 'interactions/answer-defs';
 import { InteractionsExtensionsConstants } from 'interactions/interactions-extension.constants';
 import { PlayerPositionService } from 'pages/exploration-player-page/services/player-position.service';
@@ -43,7 +45,7 @@ import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 
 const debounce = (delay: number = 5): MethodDecorator => {
   return function(
-      target: unknown, propertyKey: string, descriptor: PropertyDescriptor) {
+      target: string, propertyKey: string, descriptor: PropertyDescriptor) {
     const original = descriptor.value;
     const key = `__timeout__${propertyKey}`;
 
@@ -58,7 +60,7 @@ const debounce = (delay: number = 5): MethodDecorator => {
 interface GraphButton {
   text: string;
   description: string;
-  mode: number
+  mode: number;
 }
 
 interface GraphOption {
@@ -92,6 +94,7 @@ export class GraphVizComponent implements OnInit, AfterViewInit {
     ADD_VERTEX: 2,
     DELETE: 3
   };
+
   // Styling functions.
   DELETE_COLOR = 'red';
   HOVER_COLOR = 'aqua';
@@ -122,6 +125,7 @@ export class GraphVizComponent implements OnInit, AfterViewInit {
     mouseDragStartX: 0,
     mouseDragStartY: 0
   };
+
   selectedEdgeWeightValue: number | string;
   buttons: GraphButton[] = [];
   private vizContainer: SVGSVGElement[];
@@ -129,10 +133,10 @@ export class GraphVizComponent implements OnInit, AfterViewInit {
   shouldShowWrongWeightWarning: boolean;
   VERTEX_RADIUS: number;
   EDGE_WIDTH: number;
-  vizWidth: SVGAnimatedLength;
   graphOptions: GraphOption[];
   svgViewBox: string;
   constructor(
+    private changeDetectorRef: ChangeDetectorRef,
     private deviceInfoService: DeviceInfoService,
     private element: ElementRef,
     private focusManagerService: FocusManagerService,
@@ -162,7 +166,6 @@ export class GraphVizComponent implements OnInit, AfterViewInit {
   ngAfterViewInit(): void {
     this.vizContainer = this.element.nativeElement.querySelectorAll(
       '.oppia-graph-viz-svg');
-    this.vizWidth = this.vizContainer[0].width;
 
     this.graphOptions = [{
       text: 'Labeled',
@@ -184,13 +187,14 @@ export class GraphVizComponent implements OnInit, AfterViewInit {
       boundingBox.height + boundingBox.y,
       svgContainer.getAttribute('height'));
     this.svgViewBox = (
-      0 + ' ' + 0 + ' ' + (boundingBox.width + boundingBox.x) +
-        ' ' + (viewBoxHeight));
-    // Initial value of SVG view box.
+      `0 0 ${svgContainer.width.baseVal.value} ${viewBoxHeight}`
+    );
 
+    // Initial value of SVG view box.
     if (this.interactionIsActive) {
       this.init();
     }
+    this.changeDetectorRef.detectChanges();
   }
 
   getEdgeColor(index: number): string {
@@ -491,6 +495,7 @@ export class GraphVizComponent implements OnInit, AfterViewInit {
       this.beginEditEdgeWeight(index);
     }
   }
+
   onClickEdgeWeight(index: number): void {
     if (this.graph.isWeighted && this.canEditEdgeWeight) {
       this.beginEditEdgeWeight(index);
@@ -650,7 +655,7 @@ export class GraphVizComponent implements OnInit, AfterViewInit {
     if (weight === null) {
       this.selectedEdgeWeightValue = '';
     }
-    if (angular.isNumber(weight)) {
+    if (isNumber(weight)) {
       this.selectedEdgeWeightValue = weight;
     }
   }
@@ -660,7 +665,7 @@ export class GraphVizComponent implements OnInit, AfterViewInit {
   }
 
   onUpdateEdgeWeight(): void {
-    if (angular.isNumber(this.selectedEdgeWeightValue)) {
+    if (isNumber(this.selectedEdgeWeightValue)) {
       this.graph.edges[this.state.selectedEdge].weight = (
         this.selectedEdgeWeightValue);
       this.graphChange.emit(this.graph);

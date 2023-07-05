@@ -35,6 +35,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 
 import { SharedComponentsModule } from 'components/shared-component.module';
 import { BeamJobsTabComponent } from 'pages/release-coordinator-page/beam-jobs-tab/beam-jobs-tab.component';
+import { FeaturesTabComponent } from 'pages/release-coordinator-page/features-tab/features-tab.component';
 import { CancelBeamJobDialogComponent } from 'pages/release-coordinator-page/components/cancel-beam-job-dialog.component';
 import { StartNewBeamJobDialogComponent } from 'pages/release-coordinator-page/components/start-new-beam-job-dialog.component';
 import { ViewBeamJobOutputDialogComponent } from 'pages/release-coordinator-page/components/view-beam-job-output-dialog.component';
@@ -43,6 +44,7 @@ import { ReleaseCoordinatorPageComponent } from 'pages/release-coordinator-page/
 import { ReleaseCoordinatorPageRootComponent } from './release-coordinator-page-root.component';
 import { ReleaseCoordinatorPageRoutingModule } from './release-coordinator-page-routing.module';
 import { Error404PageModule } from 'pages/error-pages/error-404/error-404-page.module';
+import { SmartRouterModule } from 'hybrid-router-module-provider';
 
 @NgModule({
   imports: [
@@ -63,6 +65,9 @@ import { Error404PageModule } from 'pages/error-pages/error-404/error-404-page.m
     MatTooltipModule,
     ReactiveFormsModule,
     SharedComponentsModule,
+    // TODO(#13443): Remove smart router module provider once all pages are
+    // migrated to angular router.
+    SmartRouterModule,
     ReleaseCoordinatorPageRoutingModule,
     Error404PageModule
   ],
@@ -74,6 +79,7 @@ import { Error404PageModule } from 'pages/error-pages/error-404/error-404-page.m
     ReleaseCoordinatorPageRootComponent,
     StartNewBeamJobDialogComponent,
     ViewBeamJobOutputDialogComponent,
+    FeaturesTabComponent,
   ],
   entryComponents: [
     CancelBeamJobDialogComponent,
@@ -82,6 +88,7 @@ import { Error404PageModule } from 'pages/error-pages/error-404/error-404-page.m
     ReleaseCoordinatorPageRootComponent,
     StartNewBeamJobDialogComponent,
     ViewBeamJobOutputDialogComponent,
+    FeaturesTabComponent,
   ]
 })
 export class ReleaseCoordinatorPageModule {}

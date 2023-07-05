@@ -22,10 +22,10 @@ import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
 import { Exploration, ExplorationBackendDict, ExplorationObjectFactory } from
   'domain/exploration/ExplorationObjectFactory';
-import { ContentTranslationManagerService } from 'pages/exploration-player-page/services/content-translation-manager.service';
 import { ImagePreloaderService } from
   'pages/exploration-player-page/services/image-preloader.service';
 import { AssetsBackendApiService } from 'services/assets-backend-api.service';
+import { EntityTranslationsService } from 'services/entity-translations.services';
 import { ContextService } from 'services/context.service';
 import { SvgSanitizerService } from 'services/svg-sanitizer.service';
 
@@ -45,7 +45,7 @@ describe('Image preloader service', () => {
   let imagePreloaderService: ImagePreloaderService;
   let explorationObjectFactory: ExplorationObjectFactory;
   let contextService: ContextService;
-  let ctms: ContentTranslationManagerService;
+  let entityTranslationsService: EntityTranslationsService;
   let svgSanitizerService: SvgSanitizerService;
 
 
@@ -56,6 +56,8 @@ describe('Image preloader service', () => {
     is_version_of_draft_valid: true,
     language_code: 'en',
     title: 'My Title',
+    draft_change_list_id: 0,
+    next_content_id_index: 5,
     init_state_name: initStateName,
     states: {
       'State 1': {
@@ -78,6 +80,7 @@ describe('Image preloader service', () => {
               html: ''
             },
             dest: 'State 3',
+            dest_if_really_stuck: null,
             param_changes: [],
             labelled_as_correct: null,
             refresher_exploration_id: null,
@@ -98,15 +101,8 @@ describe('Image preloader service', () => {
         },
         solicit_answer_details: false,
         card_is_checkpoint: false,
-        written_translations: {
-          translations_mapping: {
-            content: {},
-            default_outcome: {}
-          }
-        },
         linked_skill_id: null,
         classifier_model_id: null,
-        next_content_id_index: null,
       },
       'State 3': {
         param_changes: [],
@@ -134,14 +130,8 @@ describe('Image preloader service', () => {
         },
         solicit_answer_details: false,
         card_is_checkpoint: false,
-        written_translations: {
-          translations_mapping: {
-            content: {}
-          }
-        },
         linked_skill_id: null,
         classifier_model_id: null,
-        next_content_id_index: null,
       },
       [initStateName]: {
         classifier_model_id: null,
@@ -162,6 +152,7 @@ describe('Image preloader service', () => {
           id: 'MultipleChoiceInput',
           default_outcome: {
             dest: initStateName,
+            dest_if_really_stuck: null,
             feedback: {
               content_id: 'default_outcome',
               html: 'Try Again!'
@@ -194,6 +185,7 @@ describe('Image preloader service', () => {
             {
               outcome: {
                 dest: 'State 6',
+                dest_if_really_stuck: null,
                 feedback: {
                   content_id: 'feedback_1',
                   html: '<p>We are going to ItemSelection' +
@@ -216,6 +208,7 @@ describe('Image preloader service', () => {
             {
               outcome: {
                 dest: 'State 1',
+                dest_if_really_stuck: null,
                 feedback: {
                   content_id: 'feedback_2',
                   html: "Let's go to state 1 ImageAndRegion"
@@ -238,16 +231,7 @@ describe('Image preloader service', () => {
         },
         solicit_answer_details: false,
         card_is_checkpoint: true,
-        written_translations: {
-          translations_mapping: {
-            content: {},
-            default_outcome: {},
-            feedback_1: {},
-            feedback_2: {}
-          }
-        },
         linked_skill_id: null,
-        next_content_id_index: null,
       },
       'State 6': {
         param_changes: [],
@@ -268,6 +252,7 @@ describe('Image preloader service', () => {
           id: 'TextInput',
           default_outcome: {
             dest: 'State 6',
+            dest_if_really_stuck: null,
             feedback: {
               content_id: 'default_outcome',
               html: ''
@@ -287,6 +272,9 @@ describe('Image preloader service', () => {
                 unicode_str: '',
                 content_id: ''
               }
+            },
+            catchMisspellings: {
+              value: false
             }
           },
           answer_groups: [{
@@ -299,6 +287,7 @@ describe('Image preloader service', () => {
             }],
             outcome: {
               dest: 'State 1',
+              dest_if_really_stuck: null,
               feedback: {
                 content_id: 'feedback_1',
                 html: "<p>Let's go to State 1</p>"
@@ -320,6 +309,7 @@ describe('Image preloader service', () => {
             }],
             outcome: {
               dest: 'State 1',
+              dest_if_really_stuck: null,
               feedback: {
                 content_id: 'feedback_2',
                 html: "<p>Let's go to State 1</p>"
@@ -344,32 +334,39 @@ describe('Image preloader service', () => {
         },
         solicit_answer_details: false,
         card_is_checkpoint: false,
-        written_translations: {
-          translations_mapping: {
-            content: {},
-            default_outcome: {},
-            feedback_1: {},
-            feedback_2: {},
-            hint_1: {}
-          }
-        },
         linked_skill_id: null,
         classifier_model_id: null,
-        next_content_id_index: null,
       }
     },
     param_specs: {},
     param_changes: [],
-  };
+    exploration_metadata: {
+      title: 'Exploration',
+      category: 'Algebra',
+      objective: 'To learn',
+      language_code: 'en',
+      tags: [],
+      blurb: '',
+      author_notes: '',
+      states_schema_version: 50,
+      init_state_name: 'Introduction',
+      param_specs: {},
+      param_changes: [],
+      auto_tts_enabled: false,
+      correctness_feedback_enabled: true,
+      edits_allowed: true
+    }
+  } as unknown as ExplorationBackendDict;
   class mockReaderObject {
     result = null;
-    onloadend = null;
+    onloadend: () => string;
     constructor() {
       this.onloadend = () => {
         return 'Fake onload executed';
       };
     }
-    readAsDataURL(file) {
+
+    readAsDataURL(file: File) {
       this.onloadend();
       return 'The file is loaded';
     }
@@ -397,15 +394,15 @@ describe('Image preloader service', () => {
     explorationObjectFactory = TestBed.get(ExplorationObjectFactory);
     contextService = TestBed.get(ContextService);
     assetsBackendApiService = TestBed.get(AssetsBackendApiService);
-    ctms = TestBed.get(ContentTranslationManagerService);
+    entityTranslationsService = TestBed.get(EntityTranslationsService);
     svgSanitizerService = TestBed.inject(SvgSanitizerService);
 
     spyOn(contextService, 'getExplorationId').and.returnValue('1');
     spyOn(contextService, 'getEntityType').and.returnValue('exploration');
     spyOn(contextService, 'getEntityId').and.returnValue('1');
-    spyOn(ctms, 'getTranslatedHtml').and.callFake(
-      (unusedWrittenTranslations, unusedLanguageCode, content) => {
-        return content.html;
+    spyOn(entityTranslationsService, 'getHtmlTranslations').and.callFake(
+      (unusedLanguageCode, unusedContentIds) => {
+        return [];
       });
 
     exploration = (

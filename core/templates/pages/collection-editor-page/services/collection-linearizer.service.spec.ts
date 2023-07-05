@@ -19,13 +19,14 @@
 import { TestBed } from '@angular/core/testing';
 import { CollectionNode, CollectionNodeBackendDict } from 'domain/collection/collection-node.model';
 import { Collection } from 'domain/collection/collection.model';
+import { LearnerExplorationSummaryBackendDict } from 'domain/summary/learner-exploration-summary.model';
 import { CollectionLinearizerService } from './collection-linearizer.service';
 
 describe('Collection linearizer service', () => {
   let collectionLinearizerService: CollectionLinearizerService;
-  let firstCollectionNode;
-  let secondCollectionNode;
-  let thirdCollectionNode;
+  let firstCollectionNode: CollectionNode;
+  let secondCollectionNode: CollectionNode;
+  let thirdCollectionNode: CollectionNode;
 
   beforeEach(() => {
     collectionLinearizerService = TestBed.inject(CollectionLinearizerService);
@@ -183,7 +184,8 @@ describe('Collection linearizer service', () => {
       collectionLinearizerService.appendCollectionNode(
         collection,
         'exp_id0',
-        firstCollectionNode.getExplorationSummaryObject());
+        firstCollectionNode.getExplorationSummaryObject() as
+        LearnerExplorationSummaryBackendDict);
       firstCollectionNode = collection.getCollectionNodeByExplorationId(
         'exp_id0');
       expect(
@@ -208,7 +210,9 @@ describe('Collection linearizer service', () => {
           collection)).toEqual(
         [firstCollectionNode, secondCollectionNode, thirdCollectionNode]);
       collectionLinearizerService.appendCollectionNode(
-        collection, 'exp_id3', newCollectionNode.getExplorationSummaryObject());
+        collection, 'exp_id3',
+        newCollectionNode.getExplorationSummaryObject() as
+        LearnerExplorationSummaryBackendDict);
       newCollectionNode = collection.getCollectionNodeByExplorationId(
         'exp_id3');
       expect(

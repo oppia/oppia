@@ -1,9 +1,13 @@
 <div class="progress-tab">
-  <div class="skill-proficiency" [ngClass]="{'empty-section': emptySkillProficiency}" [ngStyle]="{'margin-top': windowIsNarrow? '35px': '64px'}" *ngIf="!windowIsNarrow || (windowIsNarrow && activeSubsection === LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.SKILL_PROFICIENCY)">
+  <div tabindex="0"
+       class="skill-proficiency"
+       [ngClass]="{'empty-section': emptySkillProficiency}"
+       [ngStyle]="{'margin-top': windowIsNarrow? '35px': '64px'}"
+       *ngIf="!windowIsNarrow || (windowIsNarrow && activeSubsection === LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.SKILL_PROFICIENCY)">
     <div class="skill-proficiency-heading">
-      <p class="skill-proficiency-title" [innerHTML]="'I18N_LEARNER_DASHBOARD_SKILL_PROFICIENCY_SECTION' | translate">
+      <p class="skill-proficiency-title" [innerHTML]="'I18N_LEARNER_DASHBOARD_SKILL_PROGRESS_SECTION' | translate">
       </p>
-      <a class="info-tooltip" href="#/">
+      <a aria-label="Progress" class="info-tooltip" href="#/">
         <img [src]="getStaticImageUrl('/learner_dashboard/info.svg')" alt="info image" class="oppia-svg-info-image" *ngIf="!emptySkillProficiency">
         <span>
           <div class="badge-info">
@@ -51,11 +55,24 @@
           <img [src]="silverBadgeImageUrl" alt="silver badge image" class="oppia-badge-image-for-topic" *ngIf="tile[0] >= 80 && tile[0] <= 99">
           <img [src]="bronzeBadgeImageUrl" alt="bronze badge image" class="oppia-badge-image-for-topic" *ngIf="tile[0] >= 60 && tile[0] <= 79">
           <img [src]="emptyBadgeImageUrl" alt="bronze badge image" class="oppia-badge-image-for-topic" *ngIf="tile[0] > 0 && tile[0] <= 59">
-          <span class="skill-proficiency-topic-title protractor-test-skill-proficiency-topic-title" [ngStyle]="tile[0] === 0 && {'left': '51px'}">
+          <span class="skill-proficiency-topic-title e2e-test-skill-proficiency-topic-title" [ngStyle]="tile[0] === 0 && {'left': '51px'}">
           {{tile[1].name}}
           </span>
-          <img [src]="getStaticImageUrl('/learner_dashboard/dropdown.svg')" alt="dropdown image" class="oppia-svg-dropdown-image" (click)="showSkills(i)" *ngIf="!displaySkills[i]">
-          <img [src]="getStaticImageUrl('/learner_dashboard/up.svg')" alt="up image" class="oppia-svg-up-image" (click)="showSkills(i)" *ngIf="displaySkills[i]">
+          <img [src]="getStaticImageUrl('/learner_dashboard/dropdown.svg')"
+               alt="dropdown button"
+               class="oppia-svg-dropdown-image"
+               role="button" tabindex="0"
+               (keydown.enter)="showSkills(i)"
+               (click)="showSkills(i)"
+               *ngIf="!displaySkills[i]">
+          <img [src]="getStaticImageUrl('/learner_dashboard/up.svg')"
+               alt="up button"
+               class="oppia-svg-up-image"
+               role="button"
+               tabindex="0"
+               (keydown.enter)="showSkills(i)"
+               (click)="showSkills(i)"
+               *ngIf="displaySkills[i]">
           <div *ngIf="tile[0] > 0">
             <div class="circle-border" [ngStyle]="{'background-image': calculateCircularProgress(i)}">
               <div class="circle">
@@ -82,7 +99,7 @@
       </div>
     </div>
   </div>
-  <div class="completed-stories" [ngStyle]="windowIsNarrow && {'margin-top': '35px'}"
+  <div tabindex="0" class="completed-stories" [ngStyle]="windowIsNarrow && {'margin-top': '35px'}"
        *ngIf="(!windowIsNarrow && completedStoriesList.length !== 0) || (windowIsNarrow && completedStoriesList.length !== 0 && activeSubsection === LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.STORIES)">
     <div class="completed-stories-heading">
       <p class="completed-stories-title" [innerHTML]="'I18N_LEARNER_DASHBOARD_STORIES_COMPLETED_SECTION' | translate">
@@ -102,7 +119,7 @@
       </div>
     </div>
   </div>
-  <div class="empty-completed-stories" [ngStyle]="windowIsNarrow && {'margin-top': '35px'}"
+  <div tabindex="0" class="empty-completed-stories" [ngStyle]="windowIsNarrow && {'margin-top': '35px'}"
     *ngIf="windowIsNarrow && completedStoriesList.length === 0 && activeSubsection === LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.STORIES">
     <div class="completed-stories-heading">
       <p class="completed-stories-title" [innerHTML]="'I18N_LEARNER_DASHBOARD_STORIES_COMPLETED_SECTION' | translate">
@@ -145,7 +162,7 @@
     width: 736px;
   }
   #setting-a-goal-link {
-    color: #00645C;
+    color: #00645c;
     font-weight: bold;
   }
   .progress-tab .empty-section {
@@ -154,7 +171,7 @@
   .progress-tab .completed-stories .completed-stories-title,
   .progress-tab .empty-completed-stories .completed-stories-title,
   .progress-tab .skill-proficiency-title {
-    color: #00645C;
+    color: #00645c;
     display: inline-block;
     font-family: "Capriola", "Roboto", Arial, sans-serif;
     font-size: 24px;
@@ -202,7 +219,7 @@
   }
   .progress-tab .progress-text {
     bottom: 20px;
-    color: #00645C;
+    color: #00645c;
     float: right;
     font-size: 14px;
     letter-spacing: 0;
@@ -222,7 +239,7 @@
     width: 16px;
   }
   .progress-tab .circle-border {
-    background-color: #00645C;
+    background-color: #00645c;
     border-radius: 100%;
     bottom: 24px;
     display: inline-block;
@@ -255,7 +272,7 @@
     margin: 0 8px 8px 0;
   }
   .progress-tab .info-tooltip:hover span {
-    border: 0.5px solid #CCC;
+    border: 0.5px solid #ccc;
     border-radius: 4px;
     box-shadow: 0 3px 6px #00000029;
     display: block;

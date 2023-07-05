@@ -21,18 +21,23 @@ import os
 import subprocess
 import sys
 
-from core import python_utils
+# TODO(#15567): This can be removed after Literal in utils.py is loaded
+# from typing instead of typing_extensions, this will be possible after
+# we migrate to Python 3.8.
+from scripts import common  # isort:skip pylint: disable=wrong-import-position, unused-import
 
-from . import build
-from . import check_frontend_test_coverage
-from . import common
-from . import install_third_party_libs
+from typing import Optional, Sequence  # isort:skip
+
+from . import build  # isort:skip
+from . import check_frontend_test_coverage  # isort:skip
+from . import install_third_party_libs  # isort:skip
 
 # These is a relative path from the oppia/ folder. They are relative because the
 # dtslint command prepends the current working directory to the path, even if
 # the given path is absolute.
 DTSLINT_TYPE_TESTS_DIR_RELATIVE_PATH = os.path.join('typings', 'tests')
 TYPESCRIPT_DIR_RELATIVE_PATH = os.path.join('node_modules', 'typescript', 'lib')
+MAX_ATTEMPTS = 2
 
 _PARSER = argparse.ArgumentParser(
     description="""
@@ -64,14 +69,19 @@ _PARSER.add_argument(
     action='store_true')
 _PARSER.add_argument(
     '--check_coverage',
-    help='option; if specified, checks frontend test coverage',
+    help='optional; if specified, checks frontend test coverage',
+    action='store_true'
+)
+_PARSER.add_argument(
+    '--download_combined_frontend_spec_file',
+    help='optional; if specifided, downloads the combined frontend file',
     action='store_true'
 )
 
 
-def run_dtslint_type_tests():
+def run_dtslint_type_tests() -> None:
     """Runs the dtslint type tests in typings/tests."""
-    python_utils.PRINT('Running dtslint type tests.')
+    print('Running dtslint type tests.')
 
     # Pass the local version of typescript. Otherwise, dtslint will download and
     # install all versions of typescript.
@@ -81,6 +91,9 @@ def run_dtslint_type_tests():
            TYPESCRIPT_DIR_RELATIVE_PATH]
     task = subprocess.Popen(cmd, stdout=subprocess.PIPE)
     output_lines = []
+    # The value of `process.stdout` should not be None since we passed
+    # the `stdout=subprocess.PIPE` argument to `Popen`.
+    assert task.stdout is not None
     # Reads and prints realtime output from the subprocess until it terminates.
     while True:
         line = task.stdout.readline()
@@ -88,14 +101,14 @@ def run_dtslint_type_tests():
         if len(line) == 0 and task.poll() is not None:
             break
         if line:
-            python_utils.PRINT(line, end='')
+            print(line, end='')
             output_lines.append(line)
-    python_utils.PRINT('Done!')
+    print('Done!')
     if task.returncode:
         sys.exit('The dtslint (type tests) failed.')
 
 
-def main(args=None):
+def main(args: Optional[Sequence[str]] = None) -> None:
     """Runs the frontend tests."""
     parsed_args = _PARSER.parse_args(args=args)
 
@@ -106,6 +119,10 @@ def main(args=None):
     if not parsed_args.skip_install:
         install_third_party_libs.main()
 
+    common.setup_chrome_bin_env_variable()
+    # We need to create an empty hashes.json file for the build so that
+    # we don't get the error "assets/hashes.json file doesn't exist".
+    build.save_hashes_to_file({})
     common.print_each_string_after_two_new_lines([
         'View interactive frontend test coverage reports by navigating to',
         '../karma_coverage_reports',
@@ -117,7 +134,7 @@ def main(args=None):
             os.path.join(common.NODE_MODULES_PATH, 'karma', 'bin', 'karma'),
             'start', os.path.join('core', 'tests', 'karma.conf.ts')]
     if parsed_args.run_minified_tests:
-        python_utils.PRINT('Running test in production environment')
+        print('Running test in production environment')
 
         build.main(args=['--prod_env', '--minify_third_party_libs_only'])
 
@@ -128,32 +145,72 @@ def main(args=None):
     if parsed_args.verbose:
         cmd.append('--terminalEnabled')
 
-    task = subprocess.Popen(cmd, stdout=subprocess.PIPE)
-    output_lines = []
-    # Reads and prints realtime output from the subprocess until it terminates.
-    while True:
-        line = task.stdout.readline()
-        # No more output from the subprocess, and the subprocess has ended.
-        if len(line) == 0 and task.poll() is not None:
+    for attempt in range(MAX_ATTEMPTS):
+        print(f'Attempt {attempt + 1} of {MAX_ATTEMPTS}')
+        task = subprocess.Popen(cmd, stdout=subprocess.PIPE)
+        output_lines = []
+        # The value of `process.stdout` should not be None since we passed
+        # the `stdout=subprocess.PIPE` argument to `Popen`.
+        assert task.stdout is not None
+        # Prevents the wget command from running multiple times.
+        combined_spec_file_started_downloading = False
+        # This variable will be used to define the wget command to download
+        # the combined-test.spec.js file.
+        download_task = None
+        # Reads and prints realtime output from the subprocess until it
+        # terminates.
+        while True:
+            line = task.stdout.readline()
+            # No more output from the subprocess, and the subprocess has ended.
+            if len(line) == 0 and task.poll() is not None:
+                break
+            # Suppressing the karma web-server logs.
+            if line and not '[web-server]:' in line.decode('utf-8'):
+                # Standard output is in bytes, we need to decode
+                # the line to print it.
+                print(line.decode('utf-8'), end='')
+                output_lines.append(line)
+            # Download the combined-tests.js file from the web-server.
+            if ('Executed' in line.decode('utf-8') and
+                not combined_spec_file_started_downloading and
+                parsed_args.download_combined_frontend_spec_file):
+                download_task = subprocess.Popen(
+                    ['wget',
+                    'http://localhost:9876/base/core/templates/' +
+                    'combined-tests.spec.js',
+                    '-P',
+                    os.path.join('../karma_coverage_reports')])
+                # Wait for the wget command to download the
+                # combined-tests.spec.js file to complete.
+                download_task.wait()
+                combined_spec_file_started_downloading = True
+        # Standard output is in bytes, we need to decode the line to print it.
+        concatenated_output = ''.join(
+            line.decode('utf-8') for line in output_lines)
+        if download_task:
+            # The result of the download is printed at the end for
+            # easy access to it.
+            if download_task.returncode:
+                print('Failed to download the combined-tests.spec.js file.')
+            else:
+                print(
+                    'Downloaded the combined-tests.spec.js file and stored'
+                    'in ../karma_coverage_reports')
+        print('Done!')
+
+        if 'Trying to get the Angular injector' in concatenated_output:
+            print(
+                'If you run into the error "Trying to get the Angular '
+                'injector", please see https://github.com/oppia/oppia/wiki/'
+                'Frontend-unit-tests-guide#how-to-handle-common-errors'
+                ' for details on how to fix it.')
+
+        if 'Disconnected , because no message' in concatenated_output:
+            print(
+                'Detected chrome disconnected flake (#16607), so rerunning '
+                'if attempts allow.')
+        else:
             break
-        # Suppressing the karma web-server logs.
-        if line and not '[web-server]:' in line.decode('utf-8'):
-            # Standard output is in bytes, we need to decode
-            # the line to print it.
-            python_utils.PRINT(line.decode('utf-8'), end='')
-            output_lines.append(line)
-    # Standard output is in bytes, we need to decode the line to print it.
-    concatenated_output = ''.join(
-        line.decode('utf-8') for line in output_lines)
-
-    python_utils.PRINT('Done!')
-
-    if 'Trying to get the Angular injector' in concatenated_output:
-        python_utils.PRINT(
-            'If you run into the error "Trying to get the Angular injector",'
-            ' please see https://github.com/oppia/oppia/wiki/'
-            'Frontend-unit-tests-guide#how-to-handle-common-errors'
-            ' for details on how to fix it.')
 
     if parsed_args.check_coverage:
         if task.returncode:
@@ -166,5 +223,5 @@ def main(args=None):
         sys.exit(task.returncode)
 
 
-if __name__ == '__main__':
+if __name__ == '__main__':  # pragma: no cover
     main()

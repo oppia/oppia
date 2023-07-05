@@ -22,7 +22,6 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { UserInfo, UserInfoBackendDict } from 'domain/user/user-info.model';
 
 export interface SubscriptionSummary {
-  'creator_picture_data_url': string;
   'creator_username': string;
   'creator_impact': number;
 }
@@ -38,7 +37,6 @@ interface NonEmailPreferencesBackendDict {
   'preferred_language_codes': string[];
   'preferred_site_language_code': string;
   'preferred_audio_language_code': string;
-  'profile_picture_data_url': string;
   'default_dashboard': string;
   'user_bio': string;
   'subject_interests': string;
@@ -59,7 +57,7 @@ export type PreferencesBackendDict = (
 );
 
 export interface UpdatePreferencesResponse {
-  'bulk_email_signup_message_should_be_shown': boolean
+  'bulk_email_signup_message_should_be_shown': boolean;
 }
 
 interface LoginUrlResponseDict {
@@ -70,6 +68,7 @@ export interface UserContributionRightsDataBackendDict {
   'can_review_translation_for_language_codes': string[];
   'can_review_voiceover_for_language_codes': string[];
   'can_review_questions': boolean;
+  'can_suggest_questions': boolean;
 }
 
 @Injectable({
@@ -77,13 +76,14 @@ export interface UserContributionRightsDataBackendDict {
 })
 export class UserBackendApiService {
   constructor(
-    private http: HttpClient) {}
+    private http: HttpClient
+  ) {}
 
   private USER_INFO_URL = '/userinfohandler';
-  private PROFILE_PICTURE_URL = '/preferenceshandler/profile_picture';
   private PREFERENCES_DATA_URL = '/preferenceshandler/data';
   private USER_CONTRIBUTION_RIGHTS_DATA_URL = (
     '/usercontributionrightsdatahandler');
+
   private SITE_LANGUAGE_URL = '/save_site_language';
 
   async getUserInfoAsync(): Promise<UserInfo> {
@@ -92,14 +92,6 @@ export class UserBackendApiService {
       (backendDict) => {
         return backendDict.user_is_logged_in ? UserInfo.createFromBackendDict(
           backendDict) : UserInfo.createDefault();
-      });
-  }
-
-  async getProfileImageDataUrlAsync(defaultUrl: string): Promise<string> {
-    return this.http.get<PreferencesBackendDict>(
-      this.PROFILE_PICTURE_URL).toPromise().then(
-      (backendDict) => {
-        return backendDict.profile_picture_data_url || defaultUrl;
       });
   }
 

@@ -26,12 +26,14 @@ import { SaveValidationFailModalComponent } from '../modal-templates/save-valida
 import { LostChangesModalComponent } from '../modal-templates/lost-changes-modal.component';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { LostChange } from 'domain/exploration/LostChangeObjectFactory';
+import { ExplorationChange } from 'domain/exploration/exploration-draft.model';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AutosaveInfoModalsService {
   private _isModalOpen: boolean = false;
+  isLostChangesModalOpen: boolean = false;
 
   constructor(
     private localStorageService: LocalStorageService,
@@ -54,24 +56,32 @@ export class AutosaveInfoModalsService {
     return this._isModalOpen;
   }
 
-  showVersionMismatchModal(lostChanges: LostChange[]): void {
-    const modelRef = this.ngbModal.open(
-      SaveVersionMismatchModalComponent, {
-        backdrop: 'static',
-        keyboard: false
+  showVersionMismatchModal(
+      lostChanges: LostChange[] | ExplorationChange[]): void {
+    if (!this.isLostChangesModalOpen) {
+      this.isLostChangesModalOpen = true;
+
+      const modelRef = this.ngbModal.open(
+        SaveVersionMismatchModalComponent, {
+          backdrop: 'static',
+          keyboard: false
+        });
+      modelRef.componentInstance.lostChanges = lostChanges;
+      modelRef.result.then(() => {
+        this._isModalOpen = false;
+        this.isLostChangesModalOpen = false;
+      }, () => {
+        this._isModalOpen = false;
+        this.isLostChangesModalOpen = false;
       });
-    modelRef.componentInstance.lostChanges = lostChanges;
-    modelRef.result.then(() => {
-      this._isModalOpen = false;
-    }, () => {
-      this._isModalOpen = false;
-    });
+    }
 
     this._isModalOpen = true;
   }
 
   showLostChangesModal(
-      lostChanges: LostChange[], explorationId: string): void {
+      lostChanges: LostChange[] | ExplorationChange[],
+      explorationId: string): void {
     const modelRef = this.ngbModal.open(
       LostChangesModalComponent, {
         backdrop: 'static',

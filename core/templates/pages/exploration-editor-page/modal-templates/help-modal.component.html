@@ -1,0 +1,66 @@
+<div class="modal-body oppia-long-text">
+  <div class="oppia-help-modal-header-container">
+    <h1>Need Help?</h1>
+  </div>
+  <p>
+    Check out the resources in our help center or
+    take a tour of the exploration editor.
+  </p>
+  <a href="https://oppia.github.io/#/" target="_blank" rel="noopener" class="btn oppia-help-modal-button oppia-help-dismiss" (click)="goToHelpCenter()">Visit the Help Center</a>
+  <button class="btn oppia-help-modal-button oppia-autofocus" (click)="beginEditorTutorial()">Take the Tour</button>
+  <button class="btn oppia-help-modal-button" (click)="beginTranslationTutorial()" autofocus>Translation Tour</button>
+</div>
+<style>
+  .oppia-help-modal-header-container {
+    text-align: center;
+  }
+
+  .modal-body {
+    height: 100%;
+    margin: 5% auto;
+    width: 90%;
+  }
+
+  .modal-content {
+    border-radius: 0;
+    height: 100%;
+  }
+
+  .modal-dialog {
+    height: 330px;
+  }
+
+  .oppia-help-modal-button {
+    background-color: #015c53;
+    border-radius: 4px;
+    color: #fff;
+    font-family: "Roboto", Arial, sans-serif;
+    font-size: 14px;
+    margin-right: 10px;
+    margin-top: 10px;
+    text-transform: uppercase;
+    width: 220px;
+  }
+  .oppia-help-modal-button:hover,
+  .oppia-autofocus {
+    background-color: rgba(5, 190, 178, 1);
+    color: #fff;
+  }
+
+  @media (max-width: 760px) {
+    .modal-dialog {
+      margin: 10% auto;
+      width: 80%;
+    }
+  }
+
+  @media (max-width: 550px) {
+    .oppia-help-dismiss {
+      margin-bottom: 1em;
+    }
+
+    .oppia-help-modal-button {
+      width: 100%;
+    }
+  }
+</style>

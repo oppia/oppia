@@ -22,11 +22,12 @@ import { MatCardModule } from '@angular/material/card';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatRadioModule } from '@angular/material/radio';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { SelectSkillModalComponent } from './select-skill-modal.component';
+import { CategorizedSkills, SelectSkillModalComponent } from './select-skill-modal.component';
 import { SkillSelectorComponent } from './skill-selector.component';
-import { SkillsCategorizedByTopics } from 'pages/topics-and-skills-dashboard-page/skills-list/skills-list.component';
-import { ShortSkillSummary, ShortSkillSummaryBackendDict } from 'domain/skill/short-skill-summary.model';
-import { SkillSummary, SkillSummaryBackendDict } from 'domain/skill/skill-summary.model';
+import { SkillSummaryBackendDict } from 'domain/skill/skill-summary.model';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { ShortSkillSummary } from 'domain/skill/short-skill-summary.model';
+import { MaterialModule } from 'modules/material.module';
 
 
 describe('Select Skill Modal', () => {
@@ -34,31 +35,29 @@ describe('Select Skill Modal', () => {
   let componentInstance: SelectSkillModalComponent;
   let ngbActiveModal: NgbActiveModal;
   let allowSkillsFromOtherTopics: boolean;
-  let shortSkillSummaryBackendDict: ShortSkillSummaryBackendDict = {
-    skill_id: '1',
-    skill_description: 'description1'
-  };
-  let shortSkillSummary: ShortSkillSummary = (
-    ShortSkillSummary.createFromBackendDict(shortSkillSummaryBackendDict));
-  let categorizedSkills: SkillsCategorizedByTopics = {
-    'Dummy Topic': {
-      Subtopic1: [shortSkillSummary]
-    }
-  };
   let skillsInSameTopicCount: number = 3;
   let skillSummaryBackendDict: SkillSummaryBackendDict = {
     id: '3',
     description: 'description3',
     language_code: 'language_code',
     version: 1,
-    misconception_count: null,
-    worked_examples_count: null,
+    misconception_count: 0,
+    worked_examples_count: 0,
     skill_model_created_on: 2,
     skill_model_last_updated: 3
   };
-  let untriagedSkillSummaries: SkillSummary[] = (
-    [SkillSummary.createFromBackendDict(skillSummaryBackendDict)]);
+  let shortSkillSummary: SkillSummaryBackendDict = skillSummaryBackendDict;
+  let categorizedSkills: CategorizedSkills = {
+    'Dummy Topic': {
+      Subtopic1: [shortSkillSummary]
+    }
+  };
+  let untriagedSkillSummaries: SkillSummaryBackendDict[] = [
+    skillSummaryBackendDict
+  ];
   let skillSummaries: SkillSummaryBackendDict[] = [skillSummaryBackendDict];
+  let associatedSkillSummaries: ShortSkillSummary[];
+
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -66,7 +65,9 @@ describe('Select Skill Modal', () => {
         MatCardModule,
         MatRadioModule,
         MatCheckboxModule,
-        FormsModule
+        MaterialModule,
+        FormsModule,
+        HttpClientTestingModule
       ],
       declarations: [
         SelectSkillModalComponent,
@@ -86,13 +87,14 @@ describe('Select Skill Modal', () => {
     componentInstance.skillsInSameTopicCount = skillsInSameTopicCount;
     componentInstance.skillSummaries = skillSummaries;
     componentInstance.untriagedSkillSummaries = untriagedSkillSummaries;
+    componentInstance.associatedSkillSummaries = associatedSkillSummaries;
     ngbActiveModal = TestBed.inject(NgbActiveModal);
   });
 
   it('should close modal on confirm', () => {
     spyOn(ngbActiveModal, 'close');
     componentInstance.selectedSkillId = '2';
-    let totalSkills = [];
+    let totalSkills: SkillSummaryBackendDict[] = [];
     if (componentInstance.skillSummaries) {
       totalSkills = [...componentInstance.skillSummaries];
     }
@@ -115,5 +117,25 @@ describe('Select Skill Modal', () => {
   it('should set selected skill id', () => {
     componentInstance.setSelectedSkillId('skill_id');
     expect(componentInstance.selectedSkillId).toEqual('skill_id');
+  });
+
+  it('should disable Save button if skill is already linked', () => {
+    componentInstance.associatedSkillSummaries = [
+      ShortSkillSummary.createFromBackendDict({
+        skill_id: 'skillId1',
+        skill_description: 'Skill Description'
+      }),
+      ShortSkillSummary.createFromBackendDict({
+        skill_id: 'skillId2',
+        skill_description: 'Skill Description'
+      })
+    ];
+
+    componentInstance.setSelectedSkillId('skillId1');
+    expect(componentInstance.isSaveButtonEnabled()).toBe(false);
+
+    // Selecting a skill which is not already linked.
+    componentInstance.setSelectedSkillId('skillId3');
+    expect(componentInstance.isSaveButtonEnabled()).toBe(true);
   });
 });

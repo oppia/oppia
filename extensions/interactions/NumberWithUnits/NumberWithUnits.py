@@ -17,21 +17,27 @@ from __future__ import annotations
 
 from extensions.interactions import base
 
+from typing import List, Optional
+
+MYPY = False
+if MYPY:  # pragma: no cover
+    from extensions import domain
+
 
 class NumberWithUnits(base.BaseInteraction):
     """Interaction for number with units."""
 
-    name = 'Number With Units'
-    description = 'Allows learners to enter number with units.'
-    display_mode = base.DISPLAY_MODE_INLINE
-    is_trainable = False
-    _dependency_ids = []
-    answer_type = 'NumberWithUnits'
-    instructions = None
-    narrow_instructions = None
-    needs_summary = False
-    can_have_solution = True
-    show_generic_submit_button = True
+    name: str = 'Number With Units'
+    description: str = 'Allows learners to enter number with units.'
+    display_mode: str = base.DISPLAY_MODE_INLINE
+    is_trainable: bool = False
+    _dependency_ids: List[str] = []
+    answer_type: str = 'NumberWithUnits'
+    instructions: Optional[str] = None
+    narrow_instructions: Optional[str] = None
+    needs_summary: bool = False
+    can_have_solution: bool = True
+    show_generic_submit_button: bool = True
 
-    _customization_arg_specs = []
-    _answer_visualization_specs = []
+    _customization_arg_specs: List[domain.CustomizationArgSpecsDict] = []
+    _answer_visualization_specs: List[base.AnswerVisualizationSpecsDict] = []

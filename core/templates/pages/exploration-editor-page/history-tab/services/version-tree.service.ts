@@ -42,7 +42,7 @@ interface ExplorationSnapshots {
 })
 export class VersionTreeService {
   // These properties are initialized using init method
-  // and we need to do non-null assertion, for more information see
+  // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   private _snapshots!: ExplorationSnapshots;
   private _treeParents!: Record<number, number>;
@@ -82,7 +82,7 @@ export class VersionTreeService {
    * in general or reverted version if commit is a reversion.
    * The parent of the root (version 1) is -1.
    */
-  getVersionTree(): {} {
+  getVersionTree(): Record<number, number> {
     if (this._treeParents === undefined) {
       throw new Error('version tree not initialized.');
     }

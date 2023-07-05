@@ -1,21 +1,11 @@
+<!--
+  Note: Please avoid adding newlines or spaces between the {{linkText}}
+  and opening or closing tag. This would make unnecessary spaces
+  appear at the beginning or end of the link text.
+-->
 <a href="#"
    (click)="openConceptCard($event)"
-   class="protractor-test-concept-card-link concept-card-link"
+   class="e2e-test-concept-card-link concept-card-link"
    rel="noopener"
-   ngbTooltip="Open Concept Card">{{ linkText }}
-</a>
-
-<style>
-  /*
-    Following change is required so as to prevent multi-word texts from being
-    split into multiple lines in the link text in the editor and shouldn't be
-    removed.
-  */
-  .cke_widget_oppiaskillreview /deep/ {
-    display: inline;
-  }
-  .concept-card-link {
-    display: inline-block;
-    padding-right: 4px;
-  }
-</style>
+   ngbTooltip="Open Concept Card"
+>{{ linkText }}</a>

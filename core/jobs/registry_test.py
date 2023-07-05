@@ -22,46 +22,49 @@ from core.jobs import base_jobs
 from core.jobs import registry
 from core.tests import test_utils
 
-from typing import Type
-
 
 class RegistryTests(test_utils.TestBase):
 
+    unique_obj = object()
+
+    # Here we use object because we need to mock the behavior of
+    # 'registry.get_all_jobs' method.
+    @classmethod
+    def get_all_jobs_mock(cls) -> object:
+        """Returns the unique_obj."""
+        return cls.unique_obj
+
+    # Here we use object because we need to mock the behavior of
+    # 'registry.get_all_jobs_names' method.
+    @classmethod
+    def get_all_job_names_mock(cls) -> object:
+        """Returns the unique_obj."""
+        return cls.unique_obj
+
+    # Here we use object because we need to mock the behavior of
+    # 'registry.get_job_class_by_name' method.
+    @classmethod
+    def get_job_class_by_name_mock(cls, unused_name: str) -> object:
+        """Returns the unique_obj."""
+        return cls.unique_obj
+
     def test_get_all_jobs_returns_value_from_job_metaclass(self) -> None:
-        unique_obj = object()
-
-        @classmethod # type: ignore[misc]
-        def get_all_jobs_mock(
-            unused_cls: Type[base_jobs.JobMetaclass]
-        ) -> object:
-            """Returns the unique_obj."""
-            return unique_obj
-
         get_all_jobs_swap = self.swap(
-            base_jobs.JobMetaclass, 'get_all_jobs', get_all_jobs_mock)
+            base_jobs.JobMetaclass, 'get_all_jobs', self.get_all_jobs_mock)
 
         with get_all_jobs_swap:
-            self.assertIs(registry.get_all_jobs(), unique_obj)
+            self.assertIs(registry.get_all_jobs(), self.unique_obj)
 
     def test_get_all_jobs_never_returns_an_empty_list(self) -> None:
         self.assertNotEqual(registry.get_all_jobs(), [])
 
     def test_get_all_job_names_returns_value_from_job_metaclass(self) -> None:
-        unique_obj = object()
-
-        @classmethod # type: ignore[misc]
-        def get_all_job_names_mock(
-            unused_cls: Type[base_jobs.JobMetaclass]
-        ) -> object:
-            """Returns the unique_obj."""
-            return unique_obj
-
         get_all_job_names_swap = self.swap(
             base_jobs.JobMetaclass,
-            'get_all_job_names', get_all_job_names_mock)
+            'get_all_job_names', self.get_all_job_names_mock)
 
         with get_all_job_names_swap:
-            self.assertIs(registry.get_all_job_names(), unique_obj)
+            self.assertIs(registry.get_all_job_names(), self.unique_obj)
 
     def test_get_all_job_names_never_returns_an_empty_list(self) -> None:
         self.assertNotEqual(registry.get_all_job_names(), [])
@@ -69,20 +72,10 @@ class RegistryTests(test_utils.TestBase):
     def test_get_job_class_by_name_returns_value_from_job_metaclass(
         self
     ) -> None:
-        unique_obj = object()
-
-        @classmethod # type: ignore[misc]
-        def get_job_class_by_name_mock(
-            unused_cls: Type[base_jobs.JobMetaclass],
-            unused_name: str
-        ) -> object:
-            """Returns the unique_obj."""
-            return unique_obj
-
         get_job_class_by_name_swap = self.swap(
             base_jobs.JobMetaclass,
-            'get_job_class_by_name', get_job_class_by_name_mock)
+            'get_job_class_by_name', self.get_job_class_by_name_mock)
 
         with get_job_class_by_name_swap:
             self.assertIs(
-                registry.get_job_class_by_name('arbitrary'), unique_obj)
+                registry.get_job_class_by_name('arbitrary'), self.unique_obj)

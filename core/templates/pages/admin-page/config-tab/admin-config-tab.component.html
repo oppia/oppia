@@ -2,12 +2,12 @@
   <h3>Configuration properties</h3>
   <div class="container ml-0" *ngIf="isNonemptyObject(configProperties)">
     <div *ngFor="let property of configProperties | keyvalue">
-      <div class="row protractor-test-config-property oppia-description-text-container">
+      <div class="row e2e-test-config-property oppia-description-text-container">
         <span class="col-lg-2 col-md-2 col-sm-2">
-          <em class="protractor-test-config-title">{{ property.value.description }}</em>
+          <em class="e2e-test-config-title">{{ property.value.description }}</em>
         </span>
         <span class="col-lg-6 col-md-6 col-sm-6">
-          <schema-based-editor [schema]="getSchemaCallback(property.value.schema)" [(localValue)]="property.value.value">
+          <schema-based-editor [schema]="property.value.schema" [(ngModel)]="property.value.value">
           </schema-based-editor>
         </span>
         <span class="col-lg-2 col-md-2 col-sm-2">
@@ -18,7 +18,7 @@
       </div>
     </div>
 
-    <button (click)="saveConfigProperties()" class="protractor-test-save-all-configs">Save</button>
+    <button (click)="saveConfigProperties()" class="e2e-test-save-all-configs">Save</button>
     <button (click)="reloadConfigProperties()">Undo changes</button>
   </div>
 

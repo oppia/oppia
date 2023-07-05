@@ -26,24 +26,32 @@ import { InteractionCustomizationArgs, InteractionCustomizationArgsBackendDict }
 import { InteractionObjectFactory } from
   'domain/exploration/InteractionObjectFactory';
 import { InteractionSpecsConstants, InteractionSpecsKey } from 'pages/interaction-specs.constants';
+import { CustomizationArgSpecsInterface } from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/customize-interaction-modal.component';
 
 @Injectable({
   providedIn: 'root'
 })
 export class InteractionAttributesExtractorService {
   private readonly migratedInteractions: string[] = [
+    'CodeRepl',
     'Continue',
+    'EndExploration',
+    'DragAndDropSortInput',
     'FractionInput',
     'GraphInput',
     'ImageClickInput',
-    'CodeRepl',
+    'InteractiveMap',
+    'ItemSelectionInput',
+    'MathEquationInput',
+    'MultipleChoiceInput',
+    'MusicNotesInput',
+    'NumberWithUnits',
     'NumericExpressionInput',
     'NumericInput',
-    'InteractiveMap',
-    'MultipleChoiceInput',
+    'PencilCodeEditor',
+    'RatioExpressionInput',
     'SetInput',
     'TextInput',
-    'MathEquationInput'
   ];
 
   constructor(
@@ -52,15 +60,16 @@ export class InteractionAttributesExtractorService {
   ) {}
 
   getValuesFromAttributes(
-      interactionId: InteractionSpecsKey, attributes: Object
+      interactionId: InteractionSpecsKey, attributes: Record<string, string>
   ): InteractionCustomizationArgs {
     const caBackendDict: InteractionCustomizationArgsBackendDict = {};
     const caSpecs = (
       InteractionSpecsConstants.INTERACTION_SPECS[
-        interactionId].customization_arg_specs);
+        interactionId
+      ].customization_arg_specs) as CustomizationArgSpecsInterface[];
     caSpecs.forEach(caSpec => {
       const caName = caSpec.name;
-      const attributesKey = `${caName}WithValue` as keyof typeof attributes;
+      const attributesKey: string = `${caName}WithValue`;
       Object.defineProperty(caBackendDict, caName, {
         value: {
           value: this.htmlEscaperService.escapedJsonToObj(
@@ -73,20 +82,7 @@ export class InteractionAttributesExtractorService {
 
     const ca = this.interactionFactory.convertFromCustomizationArgsBackendDict(
       interactionId, caBackendDict);
-    if (this.migratedInteractions.indexOf(interactionId) >= 0) {
-      return ca;
-    }
-    const caValues: InteractionCustomizationArgs = {};
-    const caKeys = Object.keys(ca) as (keyof InteractionCustomizationArgs)[];
-    caKeys.forEach(caName => {
-      const attr = ca[caName] as { value: Object };
-      Object.defineProperty(caValues, caName, {
-        value: attr.value,
-        enumerable: true
-      });
-    });
-
-    return caValues;
+    return ca;
   }
 }
 angular.module('oppia').factory(

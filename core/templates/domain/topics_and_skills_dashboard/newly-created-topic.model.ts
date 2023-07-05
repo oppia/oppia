@@ -23,16 +23,25 @@ export class NewlyCreatedTopic {
   name: string;
   description: string;
   urlFragment: string;
+  pageTitleFragment: string;
   /**
    * @param {String} name - name of the topic.
    * @param {String} description - description of the topic.
    * @param {String} urlFragment - url fragment of the topic.
+   * @param {String} pageTitleFragment - page title fragment of the topic.
    */
-  constructor(name: string, description: string, urlFragment: string) {
+  constructor(
+      name: string,
+      description: string,
+      urlFragment: string,
+      pageTitleFragment: string
+  ) {
     this.name = name;
     this.description = description;
     this.urlFragment = urlFragment;
+    this.pageTitleFragment = pageTitleFragment;
   }
+
   /**
    * @returns {Boolean} - A boolean indicating if the topic is valid.
    */
@@ -40,16 +49,24 @@ export class NewlyCreatedTopic {
     let validUrlFragmentRegex = new RegExp(
       AppConstants.VALID_URL_FRAGMENT_REGEX);
     let urlFragmentCharLimit = AppConstants.MAX_CHARS_IN_TOPIC_URL_FRAGMENT;
+    let titleFragMaxLimit = (
+      AppConstants.MAX_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB);
+    let titleFragMinLimit = (
+      AppConstants.MIN_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB);
     return Boolean(
       this.name && this.description && this.urlFragment &&
       validUrlFragmentRegex.test(this.urlFragment) &&
-      this.urlFragment.length <= urlFragmentCharLimit);
+      this.urlFragment.length <= urlFragmentCharLimit &&
+      this.pageTitleFragment &&
+      this.pageTitleFragment.length >= titleFragMinLimit &&
+      this.pageTitleFragment.length <= titleFragMaxLimit
+    );
   }
 
   /**
    * @returns {NewlyCreatedTopic} - A new NewlyCreatedTopic instance.
    */
   static createDefault(): NewlyCreatedTopic {
-    return new NewlyCreatedTopic('', '', '');
+    return new NewlyCreatedTopic('', '', '', '');
   }
 }

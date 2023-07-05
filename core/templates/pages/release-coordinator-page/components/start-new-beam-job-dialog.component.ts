@@ -38,7 +38,8 @@ export class StartNewBeamJobDialogComponent {
   constructor(
       @Inject(MAT_DIALOG_DATA) public beamJob: BeamJob,
       private matDialogRef:
-        MatDialogRef<StartNewBeamJobDialogComponent, BeamJobRun>,
+        // JobRun may be null if the job failed to start.
+        MatDialogRef<StartNewBeamJobDialogComponent, BeamJobRun | null>,
       private alertsService: AlertsService,
       private backendApiService: ReleaseCoordinatorBackendApiService) {}
 

@@ -25,7 +25,7 @@ import { EditableTopicBackendApiService, FetchTopicResponse, UpdateTopicResponse
 import { SubtopicPage, SubtopicPageBackendDict } from 'domain/topic/subtopic-page.model';
 import { TopicRightsBackendApiService } from 'domain/topic/topic-rights-backend-api.service';
 import { TopicRights, TopicRightsBackendDict } from 'domain/topic/topic-rights.model';
-import { TopicBackendDict, TopicObjectFactory } from 'domain/topic/TopicObjectFactory';
+import { TopicBackendDict, Topic } from 'domain/topic/topic-object.model';
 import { AlertsService } from 'services/alerts.service';
 import { TopicEditorStateService } from './topic-editor-state.service';
 
@@ -34,7 +34,6 @@ describe('Topic editor state service', () => {
   let mockEditableTopicBackendApiService: MockEditableTopicBackendApiService;
   let alertsService: AlertsService;
   let undoRedoService: UndoRedoService;
-  let topicObjectFactory: TopicObjectFactory;
   let editableStoryBackendApiService: EditableStoryBackendApiService;
 
   let skillCreationIsAllowed: boolean = true;
@@ -116,7 +115,7 @@ describe('Topic editor state service', () => {
               ]
             }
           ],
-          skill_id_2: null
+          skill_id_2: []
         },
         skillIdToDescriptionDict: {
           skill_id_1: 'Description 1',
@@ -162,7 +161,6 @@ describe('Topic editor state service', () => {
           provide: EditableTopicBackendApiService,
           useClass: MockEditableTopicBackendApiService
         },
-        TopicObjectFactory,
         {
           provide: TopicRightsBackendApiService,
           useClass: MockTopicRightsBackendApiService
@@ -175,14 +173,18 @@ describe('Topic editor state service', () => {
   beforeEach(() => {
     undoRedoService = TestBed.inject(UndoRedoService);
     topicEditorStateService = TestBed.inject(TopicEditorStateService);
+    // This throws "Type 'EditableTopicBackendApiService' is not
+    // assignable to type desire". We need to suppress this error because of
+    // the need to test validations. This is because the backend api service
+    // returns an unknown type.
+    // @ts-ignore
     mockEditableTopicBackendApiService = (TestBed.inject(
-      EditableTopicBackendApiService) as unknown) as
+      EditableTopicBackendApiService)) as
       jasmine.SpyObj<MockEditableTopicBackendApiService>;
     editableStoryBackendApiService =
       TestBed.inject(EditableStoryBackendApiService);
     alertsService = (TestBed.inject(AlertsService) as unknown) as
       jasmine.SpyObj<AlertsService>;
-    topicObjectFactory = TestBed.inject(TopicObjectFactory);
 
     topicDict = {
       id: 'topic_id',
@@ -201,7 +203,8 @@ describe('Topic editor state service', () => {
       url_fragment: 'fragment',
       practice_tab_is_displayed: true,
       meta_tag_content: 'content',
-      page_title_fragment_for_web: 'title_fragment'
+      page_title_fragment_for_web: 'title_fragment',
+      skill_ids_for_diagnostic_test: []
     };
     storySummaryBackendDict = {
       id: 'id',
@@ -285,6 +288,21 @@ describe('Topic editor state service', () => {
     spyOn(mockEditableTopicBackendApiService, 'fetchSubtopicPageAsync')
       .and.returnValue(Promise.reject());
     spyOn(alertsService, 'addWarning');
+    // This throws "Argument of type 'null' is not assignable to parameter of
+    // type 'string'" We need to suppress this error because of the need to test
+    // validations. This is because the backend api service returns an unknown
+    // type.
+    // @ts-ignore
+    topicEditorStateService.loadSubtopicPage(null, null);
+    tick();
+    expect(alertsService.addWarning).toHaveBeenCalledWith(
+      'There was an error when loading the topic.');
+  }));
+
+  it('should show error when loading subtopic page fails', fakeAsync(() => {
+    spyOn(mockEditableTopicBackendApiService, 'fetchSubtopicPageAsync')
+      .and.returnValue(Promise.reject());
+    spyOn(alertsService, 'addWarning');
     topicEditorStateService.loadSubtopicPage('1', 2);
     tick();
     expect(alertsService.addWarning).toHaveBeenCalledWith(
@@ -295,7 +313,7 @@ describe('Topic editor state service', () => {
     spyOn(mockEditableTopicBackendApiService, 'fetchSubtopicPageAsync')
       .and.returnValue(Promise.reject());
     spyOn(alertsService, 'addWarning');
-    topicEditorStateService.loadSubtopicPage(null, 2);
+    topicEditorStateService.loadSubtopicPage('', 2);
     tick();
     expect(alertsService.addWarning).toHaveBeenCalledWith(
       'There was an error when loading the topic.');
@@ -317,14 +335,14 @@ describe('Topic editor state service', () => {
   }));
 
   it('should set topic', () => {
-    let topic = topicObjectFactory.create(topicDict, {});
+    let topic = Topic.create(topicDict, {});
     topicEditorStateService.setTopic(topic);
     expect(topicEditorStateService.getTopic()).toEqual(topic);
   });
 
   it('should delete subtopic page when user deletes subtopic', fakeAsync(() => {
     topicDict.id = 'topic_id1234';
-    let topic = topicObjectFactory.create(topicDict, {});
+    let topic = Topic.create(topicDict, {});
     topicEditorStateService.setTopic(topic);
     subtopicPage.id = 'topic_id1234-0';
     topicEditorStateService.setSubtopicPage(
@@ -362,7 +380,7 @@ describe('Topic editor state service', () => {
     spyOn(editableStoryBackendApiService, 'deleteStoryAsync').and
       .callThrough();
     var successCallback = jasmine.createSpy('successCallback');
-    let topic = topicObjectFactory.create(topicDict, {});
+    let topic = Topic.create(topicDict, {});
     topicEditorStateService.setTopic(topic);
 
     topicEditorStateService.saveTopic('Commit Message', successCallback);
@@ -395,7 +413,7 @@ describe('Topic editor state service', () => {
         .returnValue(Promise.reject());
       spyOn(alertsService, 'addWarning');
       var successCallback = jasmine.createSpy('successCallback');
-      let topic = topicObjectFactory.create(topicDict, {});
+      let topic = Topic.create(topicDict, {});
       topicEditorStateService.setTopic(topic);
 
       topicEditorStateService.saveTopic('Commit Message', successCallback);
@@ -419,7 +437,7 @@ describe('Topic editor state service', () => {
     spyOn(undoRedoService, 'hasChanges').and.returnValue(false);
     spyOn(mockEditableTopicBackendApiService, 'updateTopicAsync');
 
-    let topic = topicObjectFactory.create(topicDict, {});
+    let topic = Topic.create(topicDict, {});
     topicEditorStateService.setTopic(topic);
 
     topicEditorStateService.saveTopic('Commit Message', () => {});
@@ -444,7 +462,7 @@ describe('Topic editor state service', () => {
   }));
 
   it('should set topic rights when called', () => {
-    let topic = topicObjectFactory.create(topicDict, {});
+    let topic = Topic.create(topicDict, {});
     topicEditorStateService.setTopic(topic);
     expect(topicEditorStateService.getTopicRights()).toEqual(
       TopicRights.createFromBackendDict({
@@ -505,23 +523,70 @@ describe('Topic editor state service', () => {
 
   it('should update existence of topic url fragment', fakeAsync(() => {
     topicEditorStateService.updateExistenceOfTopicUrlFragment(
-      'test_topic', () => {});
+      'test_topic', () => {}, () => {});
     tick();
     expect(topicEditorStateService.getTopicWithUrlFragmentExists()).toBeTrue();
   }));
 
-  it('should show error when updation of topic url fragment', fakeAsync(() => {
+  it('should not show error when updation of topic url fragment failed' +
+     'with 400 status code', fakeAsync(() => {
+    let errorResponse = {
+      headers: {
+        normalizedNames: {},
+        lazyUpdate: null
+      },
+      status: 400,
+      statusText: 'Bad Request',
+      url: '',
+      ok: false,
+      name: 'HttpErrorResponse',
+      message: 'Http failure response for test url: 400 Bad Request',
+      error: {
+        error: 'Error: Bad request to server',
+        status_code: 400
+      }
+    };
+
     spyOn(alertsService, 'addWarning');
     spyOn(
       mockEditableTopicBackendApiService, 'doesTopicWithUrlFragmentExistAsync')
-      .and.returnValue(Promise.reject());
+      .and.returnValue(Promise.reject(errorResponse));
 
     topicEditorStateService.updateExistenceOfTopicUrlFragment(
-      'test_topic', () => {});
+      'test_topic', () => {}, () => {});
+    tick();
+    expect(alertsService.addWarning).not.toHaveBeenCalled();
+  }));
+
+  it('should not show error when updation of topic url fragment failed' +
+     'with 400 status code', fakeAsync(() => {
+    let errorResponse = {
+      headers: {
+        normalizedNames: {},
+        lazyUpdate: null
+      },
+      status: 500,
+      statusText: 'Error: Failed to check topic url fragment.',
+      url: '',
+      ok: false,
+      name: 'HttpErrorResponse',
+      message: 'Http failure response for test url: 500' +
+               'Error: Failed to check topic url fragment.',
+      error: {
+        error: 'Error: Failed to check topic url fragment.',
+        status_code: 500
+      }
+    };
+
+    spyOn(alertsService, 'addWarning');
+    spyOn(
+      mockEditableTopicBackendApiService, 'doesTopicWithUrlFragmentExistAsync')
+      .and.returnValue(Promise.reject(errorResponse));
+
+    topicEditorStateService.updateExistenceOfTopicUrlFragment(
+      'test_topic', () => {}, () => {});
     tick();
     expect(alertsService.addWarning).toHaveBeenCalledWith(
-      'There was an error when checking if the topic url fragment ' +
-        'exists for another topic.'
-    );
+      errorResponse.message);
   }));
 });

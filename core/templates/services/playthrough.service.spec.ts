@@ -30,10 +30,10 @@ import { PlaythroughBackendApiService } from
 import { Stopwatch } from 'domain/utilities/stopwatch.model';
 
 describe('PlaythroughService', () => {
-  let explorationFeaturesService: ExplorationFeaturesService = null;
-  let learnerActionObjectFactory: LearnerActionObjectFactory = null;
-  let playthroughBackendApiService: PlaythroughBackendApiService = null;
-  let playthroughService: PlaythroughService = null;
+  let explorationFeaturesService: ExplorationFeaturesService;
+  let learnerActionObjectFactory: LearnerActionObjectFactory;
+  let playthroughBackendApiService: PlaythroughBackendApiService;
+  let playthroughService: PlaythroughService;
 
   // NOTE TO DEVELOPERS: For the following 3 "record" functions, it is the test
   // writer's responsibility to create a "sensible" set of transitions.
@@ -82,7 +82,9 @@ describe('PlaythroughService', () => {
     spyOn(Stopwatch, 'create').and.returnValue(mockStopwatch);
   };
 
-  const spyOnStorePlaythrough = (callback: (p: Playthrough) => void = null) => {
+  const spyOnStorePlaythrough = (
+      callback: ((p: Playthrough) => void) | null = null
+  ) => {
     if (callback) {
       return spyOn(playthroughBackendApiService, 'storePlaythroughAsync')
         .and.callFake(async(p: Playthrough, _: number) => callback(p));

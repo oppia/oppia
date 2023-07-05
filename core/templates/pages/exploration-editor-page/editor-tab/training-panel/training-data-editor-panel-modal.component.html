@@ -1,0 +1,125 @@
+<div class="modal-header">
+  <h3>Training Data</h3>
+</div>
+
+<div class="modal-body training-data-editor">
+  <div>
+    <div class="add-new-answer">
+      <p class="training-data-answer-label"> Add New Answer </p>
+      <oppia-test-interaction-panel [inputTemplate]="inputTemplate" [stateName]="stateName">
+      </oppia-test-interaction-panel>
+      <div *ngIf="newAnswerIsAlreadyResolved">
+        <div>
+          <span><strong>If Oppia encounters the answer:</strong></span>
+        </div>
+
+        <div>
+          <div>
+            <oppia-interaction-display [htmlData]="newAnswerTemplate"></oppia-interaction-display>
+          </div>
+        </div>
+
+        <br>
+
+        <div>
+          <span><strong>it will reply with:</strong></span>
+        </div>
+
+        <div>
+          <span *ngIf="!newAnswerFeedback.isEmpty()">
+            <oppia-interaction-display [htmlData]="newAnswerFeedback.html"></oppia-interaction-display>
+          </span>
+          <span *ngIf="newAnswerFeedback.isEmpty()">
+            <em>Nothing</em>
+          </span>
+        </div>
+
+        <br>
+
+        <div>
+          <span><strong>and then direct the learner to: </strong></span>
+          <span>
+            <oppia-interaction-display [htmlData]="newAnswerOutcomeDest"></oppia-interaction-display>
+          </span>
+        </div>
+
+        <br>
+
+        <div>
+          <span>
+            <strong>This is due to a specific rule and therefore cannot be trained. If you do not think this is
+              right, you should change the rule directly referring to this answer.
+            </strong>
+          </span>
+        </div>
+      </div>
+    </div>
+    <div class="training-data-answers-list">
+      <p class="training-data-answer-label"> Training Data Answers </p>
+      <div *ngIf="trainingData.length === 0">
+        Try adding answers to training data to see them here.
+      </div>
+      <div *ngIf="!answerGroupHasNonEmptyRules && (trainingData.length === 1)">
+        <div class="training-data-answer">
+          <div class="training-data-answer-html">
+            <oppia-interaction-display [htmlData]="trainingData[0].answerTemplate"></oppia-interaction-display>
+          </div>
+        </div>
+      </div>
+      <div *ngIf="(answerGroupHasNonEmptyRules && (trainingData.length > 0)) || (trainingData.length > 1)">
+        <div *ngFor="let answer of trainingData; let index = index" class="training-data-answer">
+          <div class="training-data-answer-html" (click)="openTrainUnresolvedAnswerModal(index)">
+            <oppia-interaction-display [htmlData]="answer.answerTemplate"></oppia-interaction-display>
+          </div>
+          <span class="oppia-delete-response-button oppia-transition-200 e2e-test-delete-response"
+                (click)="removeAnswerFromTrainingData(index)">
+            <i class="material-icons md-24"></i>
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-footer">
+  <button class="btn btn-secondary" (click)="exit()">Exit</button>
+</div>
+
+<style>
+  .training-data-editor .training-data-answer {
+    border: black solid 1px;
+    border-radius: 5px;
+    margin-top: 1%;
+    padding: 1%;
+  }
+
+  .training-data-editor .training-data-answer-html {
+    display: inline-block;
+    width: 93%;
+  }
+
+  .training-data-editor .oppia-delete-response-button {
+    float: right;
+  }
+
+  .training-data-editor .add-new-answer {
+    max-height: 210px;
+    overflow: auto;
+    padding-bottom: 2%;
+  }
+
+  .training-data-editor .training-data-answers-list {
+    border-top: solid lightgray 2px;
+    max-height: 210px;
+    overflow: auto;
+    padding-top: 2%;
+  }
+
+  .training-data-editor .training-data-answer-label {
+    font-size: 1.3em;
+  }
+
+  .training-data-editor .training-data-answer:hover {
+    background-color: #d3d3d32e;
+  }
+</style>

@@ -7,48 +7,48 @@
     margin-top: 20px;
   }
   .oppia-flex {
+    align-items: center;
     display: flex;
     justify-content: flex-start;
-    align-items: center;
   }
   .oppia-roles-editor-container {
+    align-items: center;
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
-    align-items: center;
     margin-top: 50px;
   }
   .oppia-roles-editor-form-container {
     width: 100%;
   }
   .oppia-username-form {
+    align-items: center;
     display: flex;
     justify-content: flex-start;
-    align-items: center;
   }
   .oppia-roles-edit-container {
     min-height: 100px;
     width: 100%;
   }
   .oppia-roles-editor-card {
-    padding: 70px 70px 40px 70px;
     min-height: 250px;
+    padding: 70px 70px 40px 70px;
   }
   .oppia-user-role {
-    width: 75%;
-    justify-content: space-between;
     display: flex;
+    justify-content: space-between;
+    width: 75%;
   }
   .oppia-user-role:hover {
     background-color: #ccc;
   }
   .oppia-user-role-description:before {
-    content: "\2B24";
-    color: black;
-    padding-right: 6px;
-    font-size: 10px;
-    position: relative;
     bottom: 3px;
+    color: black;
+    content: "\2B24";
+    font-size: 10px;
+    padding-right: 6px;
+    position: relative;
   }
   .oppia-progress-spinner {
     align-items: center;
@@ -60,22 +60,22 @@
     margin-top: 20px;
   }
   .oppia-red-button {
-    background-color: #B03900;
+    background-color: #b03900;
     color: #fff;
   }
   .oppia-red-link {
-    color: #B03900;
+    color: #b03900;
   }
 </style>
 
-<div class="container-fluid roles-editor protractor-test-roles-tab-container">
+<div class="container-fluid roles-editor e2e-test-roles-tab-container">
   <div class="row">
     <div class="col-md-8 oppia-roles-editor-container">
       <h2>Role editor</h2>
       <div class="oppia-username-form">
         <mat-form-field class="example-form-field">
           <input matInput
-                 class="protractor-test-username-for-role-editor"
+                 class="e2e-test-username-for-role-editor"
                  type="text"
                  placeholder="Username"
                  [(ngModel)]="username"
@@ -86,7 +86,7 @@
         </mat-form-field>
         <button mat-icon-button
                 color="primary"
-                class="protractor-test-role-edit-button"
+                class="e2e-test-role-edit-button"
                 *ngIf="username && !rolesFetched"
                 (click)="startEditing()">
           <mat-icon aria-label="Example icon-button with a heart icon">edit</mat-icon>
@@ -98,7 +98,7 @@
         <mat-card *ngIf="roleIsCurrentlyBeingEdited && !rolesFetched" class="oppia-roles-editor-card">
           <mat-spinner class="mx-auto" [diameter]="30"></mat-spinner>
         </mat-card>
-        <div *ngIf="roleIsCurrentlyBeingEdited && rolesFetched" class="protractor-test-roles-editor-card-container">
+        <div *ngIf="roleIsCurrentlyBeingEdited && rolesFetched" class="e2e-test-roles-editor-card-container">
           <mat-card *ngIf="userIsBanned" class="oppia-roles-editor-card">
             <div class="d-flex flex-column align-items-center">
               <h3>User "{{ username }}" is banned from the application.</h3>
@@ -127,17 +127,17 @@
             <mat-list>
               <mat-list-item  class="oppia-flex"  *ngFor="let role of userRoles">
                 <div class="d-flex align-items-center oppia-user-role">
-                  <span class="oppia-user-role-description protractor-test-user-role-description">
+                  <span class="oppia-user-role-description e2e-test-user-role-description">
                     <strong>{{ HUMAN_READABLE_ROLES[role] | titlecase }}</strong>
                   </span>
-                  <div class="oppia-progress-spinner protractor-test-progress-spinner" *ngIf="roleCurrentlyBeingUpdatedInBackend === role">
+                  <div class="oppia-progress-spinner e2e-test-progress-spinner" *ngIf="roleCurrentlyBeingUpdatedInBackend === role">
                     <mat-spinner [diameter]="24"></mat-spinner>
                   </div>
                   <div class="d-flex" *ngIf="roleCurrentlyBeingUpdatedInBackend !== role">
                     <button *ngIf="role === 'TOPIC_MANAGER'" mat-button matSuffix mat-icon-button aria-label="Clear" (click)="openTopicManagerRoleEditor()">
                       <mat-icon matListIcon>edit</mat-icon>
                     </button>
-                    <div class="protractor-test-{{HUMAN_READABLE_ROLES[role].split(' ').join('-')}}-remove-button-container">
+                    <div class="e2e-test-{{HUMAN_READABLE_ROLES[role].split(' ').join('-')}}-remove-button-container">
                       <button *ngIf="VIEWABLE_ROLES.includes(role)"
                               mat-button matSuffix mat-icon-button
                               aria-label="Clear"
@@ -151,7 +151,7 @@
               <mat-list-item *ngIf="roleSelectorIsShown">
                 <span class="oppia-user-role-description">
                   <mat-form-field>
-                    <mat-select (selectionChange)="addNewRole($event.value)" class="protractor-test-new-role-selector">
+                    <mat-select (selectionChange)="addNewRole($event.value)" class="e2e-test-new-role-selector">
                       <mat-option [value]="role" *ngFor="let role of possibleRolesToAdd">
                         {{HUMAN_READABLE_ROLES[role]}}
                       </mat-option>
@@ -161,7 +161,7 @@
               </mat-list-item>
             </mat-list>
             <button mat-button
-                    class="oppia-add-role-button protractor-test-add-new-role-button"
+                    class="oppia-add-role-button e2e-test-add-new-role-button"
                     color="primary"
                     (click)="showNewRoleSelector()"
                     *ngIf="!roleSelectorIsShown">
@@ -176,7 +176,7 @@
     </div>
 
     <div class="col-md-4">
-      <div class="oppia-page-card oppia-long-text" *ngIf="roleToActions !== null">
+      <div class="oppia-page-card oppia-long-text" *ngIf="roleToActions !== undefined">
         <legend class="text-center">Roles</legend>
         <oppia-roles-and-actions-visualizer [roleToActions]="roleToActions" [viewableRoles]="VIEWABLE_ROLES" [humanReadableRoles]="HUMAN_READABLE_ROLES"></oppia-roles-and-actions-visualizer>
       </div>

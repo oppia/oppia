@@ -62,6 +62,7 @@ export class SVMPredictionService {
     }
     return kvalues;
   }
+
   // Find multiclass probabilities.
   // NOTE: This function is implemented as it is given in LibSVM.
   // For more information on exact approach used, read following paper:

@@ -38,7 +38,7 @@ import {
 
 // eslint-disable-next-line @typescript-eslint/consistent-type-definitions
 type RecommendationsUrlParams = {
-  'stringified_author_recommended_ids': string;
+  'author_recommended_ids': string;
   'collection_id'?: string;
   'story_id'?: string;
   'current_node_id'?: string;
@@ -67,7 +67,7 @@ export class ExplorationRecommendationsBackendApiService {
       explorationId: string
   ): Promise<LearnerExplorationSummary[]> {
     let recommendationsUrlParams: RecommendationsUrlParams = {
-      stringified_author_recommended_ids: JSON.stringify(
+      author_recommended_ids: JSON.stringify(
         authorRecommendedExpIds),
       include_system_recommendations: includeSystemRecommendations,
     };
@@ -85,7 +85,7 @@ export class ExplorationRecommendationsBackendApiService {
     return this.http.get<RecommendedExplorationSummariesBackendDict>(
       '/explorehandler/recommendations/' + explorationId, {
         params: recommendationsUrlParams
-      }).toPromise().then(backendDict => backendDict.summaries.map(
+      } as Object).toPromise().then(backendDict => backendDict.summaries.map(
       summaryDict => LearnerExplorationSummary.createFromBackendDict(
         summaryDict)));
   }

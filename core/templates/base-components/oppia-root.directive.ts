@@ -23,7 +23,7 @@ import { OppiaAngularRootComponent } from
 import { angularServices } from 'services/angular-services.index';
 
 angular.module('oppia').directive('oppiaRoot', [
-  '$translate', 'RteHelperService', function($translate, RteHelperService) {
+  '$translate', function($translate) {
     return {
       template: require('./oppia-root.directive.html'),
       scope: {},
@@ -32,9 +32,8 @@ angular.module('oppia').directive('oppiaRoot', [
       controller: ['$scope',
         function($scope) {
           $scope.initialized = false;
-          OppiaAngularRootComponent.rteHelperService = RteHelperService;
           $scope.onInit = function() {
-            const map: Record<string, unknown[]> = {};
+            const map: Record<string, Object[]> = {};
             for (let [serviceName, serviceType] of angularServices) {
               map[serviceName] = [serviceType];
             }
@@ -50,7 +49,6 @@ angular.module('oppia').directive('oppiaRoot', [
               'BrowserCheckerService',
               'ClassroomBackendApiService', 'CodeReplRulesService',
               'CollectionCreationBackendService', 'ComputeGraphService',
-              'ConceptCardObjectFactory',
               'CreatorDashboardBackendApiService',
               'CurrentInteractionService', 'DateTimeFormatService',
               'DebouncerService',
@@ -93,13 +91,10 @@ angular.module('oppia').directive('oppiaRoot', [
               'StateClassifierMappingService', 'StateInteractionStatsService',
               'StateObjectFactory', 'StateTopAnswersStatsBackendApiService',
               'StateTopAnswersStatsService', 'StatesObjectFactory',
-              'StoryContentsObjectFactory',
-              'StoryObjectFactory',
               'StoryViewerBackendApiService',
               'SubtopicViewerBackendApiService',
-              'SuggestionThreadObjectFactory',
               'SuggestionsService', 'TextInputRulesService',
-              'ThreadStatusDisplayService', 'TopicObjectFactory',
+              'ThreadStatusDisplayService',
               'TopicViewerBackendApiService',
               'TranslationLanguageService', 'UrlInterpolationService',
               'UrlService',

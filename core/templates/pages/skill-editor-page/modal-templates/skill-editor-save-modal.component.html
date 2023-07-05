@@ -1,0 +1,24 @@
+<div class="modal-header">
+  <h3>
+    Publish Changes
+  </h3>
+</div>
+<div class="modal-body oppia-long-text">
+  <p>
+    Please enter a brief description of what you have changed:
+    <textarea rows="3"
+              cols="50"
+              [attr.maxlength]="MAX_COMMIT_MESSAGE_LENGTH"
+              [(ngModel)]="commitMessage"
+              (ngModelChange)="updateSaveDraftButton()"
+              class="e2e-test-commit-message-input"
+              autofocus>
+    </textarea>
+  </p>
+</div>
+<div class="modal-footer">
+  <button class="btn btn-secondary" (click)="cancel()" type="button">Cancel</button>
+  <button class="btn btn-success e2e-test-close-save-modal-button" [disabled]="!commitMessage" (click)="confirm(commitMessage)">
+    <span>Publish Changes</span>
+  </button>
+</div>

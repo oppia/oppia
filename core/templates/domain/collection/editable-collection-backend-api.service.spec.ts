@@ -25,7 +25,7 @@ import { Collection } from 'domain/collection/collection.model';
 
 describe('Editable collection backend API service', () => {
   let editableCollectionBackendApiService:
-    EditableCollectionBackendApiService = null;
+    EditableCollectionBackendApiService;
   let httpTestingController: HttpTestingController;
   // Sample collection object returnable from the backend.
   let sampleDataResults = {
@@ -46,7 +46,7 @@ describe('Editable collection backend API service', () => {
           thumbnail_icon_url: '/subjects/Algebra.svg',
           human_readable_contributors_summary: {},
           language_code: 'en',
-          thumbnail_bg_color: '#cd672b',
+          thumbnail_bg_color: '#cc4b00',
           created_on_msec: 1591296635736.666,
           ratings: {
             1: 0,
@@ -135,7 +135,24 @@ describe('Editable collection backend API service', () => {
     fakeAsync(() => {
       let successHandler = jasmine.createSpy('success');
       let failHandler = jasmine.createSpy('fail');
-      let collection: Collection = null;
+      let sampleCollectionBackendObject = {
+        id: 'sample_collection_id',
+        title: 'a title',
+        objective: 'an objective',
+        category: 'a category',
+        version: 1,
+        nodes: [],
+        language_code: null,
+        tags: null,
+        schema_version: null,
+        playthrough_dict: {
+          next_exploration_id: 'expId',
+          completed_exploration_ids: ['expId2']
+        }
+      };
+      let collection: Collection = Collection.create(
+        sampleCollectionBackendObject);
+
       let collectionDict = sampleDataResults;
       // Loading a collection the first time should fetch it from the backend.
       editableCollectionBackendApiService.fetchCollectionAsync('0').then(
@@ -176,7 +193,23 @@ describe('Editable collection backend API service', () => {
     fakeAsync(() => {
       let successHandler = jasmine.createSpy('success');
       let failHandler = jasmine.createSpy('fail');
-      let collection: Collection = null;
+      let sampleCollectionBackendObject = {
+        id: 'sample_collection_id',
+        title: 'a title',
+        objective: 'an objective',
+        category: 'a category',
+        version: 1,
+        nodes: [],
+        language_code: null,
+        tags: null,
+        schema_version: null,
+        playthrough_dict: {
+          next_exploration_id: 'expId',
+          completed_exploration_ids: ['expId2']
+        }
+      };
+      let collection: Collection = Collection.create(
+        sampleCollectionBackendObject);
       let collectionDict = sampleDataResults;
       // Loading a collection the first time should fetch it from the backend.
       editableCollectionBackendApiService.fetchCollectionAsync('1').then(

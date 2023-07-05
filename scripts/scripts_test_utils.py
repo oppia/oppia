@@ -22,6 +22,7 @@ import io
 import signal
 
 import psutil
+from typing import List, Optional, Tuple
 
 
 class PopenStub:
@@ -56,9 +57,19 @@ class PopenStub:
     """
 
     def __init__(
-            self, pid=1, name='process', stdout=b'', stderr=b'',
-            reject_signal=False, reject_terminate=False, reject_kill=False,
-            alive=True, unresponsive=False, return_code=0, child_procs=None):
+        self,
+        pid: int = 1,
+        name: str = 'process',
+        stdout: bytes = b'',
+        stderr: bytes = b'',
+        reject_signal: bool = False,
+        reject_terminate: bool = False,
+        reject_kill: bool = False,
+        alive: bool = True,
+        unresponsive: bool = False,
+        return_code: int = 0,
+        child_procs: Optional[List[PopenStub]] = None
+    ) -> None:
         """Initializes a new PopenStub instance.
 
         Args:
@@ -80,7 +91,7 @@ class PopenStub:
         self.stdout = io.BytesIO(stdout)
         self.stderr = io.BytesIO(stderr)
         self.poll_count = 0
-        self.signals_received = []
+        self.signals_received: List[int] = []
         self.terminate_count = 0
         self.kill_count = 0
         self.alive = alive
@@ -94,7 +105,7 @@ class PopenStub:
         self._return_code = return_code
 
     @property
-    def returncode(self):
+    def returncode(self) -> int:
         """Returns the return code of the process.
 
         Returns:
@@ -103,7 +114,7 @@ class PopenStub:
         return self._return_code
 
     @returncode.setter
-    def returncode(self, return_code):
+    def returncode(self, return_code: int) -> None:
         """Assigns a return code to the process.
 
         Args:
@@ -111,7 +122,7 @@ class PopenStub:
         """
         self._return_code = return_code
 
-    def is_running(self):
+    def is_running(self) -> bool:
         """Returns whether the process is running.
 
         Returns:
@@ -120,7 +131,7 @@ class PopenStub:
         """
         return self.alive
 
-    def name(self):
+    def name(self) -> str:
         """Returns the name of the process.
 
         Returns:
@@ -128,7 +139,7 @@ class PopenStub:
         """
         return self._name
 
-    def children(self, recursive=False):
+    def children(self, recursive: bool = False) -> List[PopenStub]:
         """Returns the children spawned by this process.
 
         Args:
@@ -145,7 +156,7 @@ class PopenStub:
                 children.extend(child.children(recursive=True))
         return children
 
-    def terminate(self):
+    def terminate(self) -> None:
         """Increment terminate_count.
 
         Mocks the process being terminated.
@@ -157,7 +168,7 @@ class PopenStub:
             return
         self._exit(return_code=1)
 
-    def kill(self):
+    def kill(self) -> None:
         """Increment kill_count.
 
         NOTE: kill() does not respect self.unresponsive.
@@ -169,7 +180,7 @@ class PopenStub:
             raise OSError('rejected')
         self._exit(return_code=1)
 
-    def send_signal(self, signal_number):
+    def send_signal(self, signal_number: int) -> None:
         """Append signal to self.signals_received.
 
         Mocks receiving a process signal. If a SIGINT signal is received (e.g.
@@ -177,6 +188,9 @@ class PopenStub:
 
         Args:
             signal_number: int. The number of the received signal.
+
+        Raises:
+            OSError. The SIGINT signal rejected.
         """
         self.signals_received.append(signal_number)
         if self.reject_signal:
@@ -184,7 +198,7 @@ class PopenStub:
         if signal_number == signal.SIGINT and not self.unresponsive:
             self._exit(return_code=1)
 
-    def poll(self):
+    def poll(self) -> Optional[int]:
         """Increment poll_count.
 
         Mocks checking whether the process is still alive.
@@ -196,7 +210,7 @@ class PopenStub:
         self.poll_count += 1
         return None if self.alive else self._return_code
 
-    def wait(self, timeout=None): # pylint: disable=unused-argument
+    def wait(self, timeout: Optional[int] = None) -> None: # pylint: disable=unused-argument
         """Wait for the process completion.
 
         Mocks the process waiting for completion before it continues execution.
@@ -206,6 +220,9 @@ class PopenStub:
         Args:
             timeout: int|None. Time to wait before raising an exception, or None
                 to wait indefinitely.
+
+        Raises:
+            RuntimeError. The PopenStub has entered an infinite loop.
         """
         if not self.alive:
             return
@@ -217,7 +234,7 @@ class PopenStub:
         else:
             raise RuntimeError('PopenStub has entered an infinite loop')
 
-    def communicate(self, input=b''): # pylint: disable=unused-argument, redefined-builtin
+    def communicate(self, input: bytes = b'') -> Tuple[bytes, bytes]: # pylint: disable=unused-argument, redefined-builtin
         """Mocks an interaction with the process.
 
         Args:
@@ -226,6 +243,9 @@ class PopenStub:
         Returns:
             tuple(bytes, bytes). The stdout and stderr of the process,
             respectively.
+
+        Raises:
+            RuntimeError. The PopenStub has entered an infinite loop.
         """
         if not self.alive:
             return self.stdout.getvalue(), self.stderr.getvalue()
@@ -237,7 +257,7 @@ class PopenStub:
         else:
             raise RuntimeError('PopenStub has entered an infinite loop')
 
-    def _exit(self, return_code=None):
+    def _exit(self, return_code: Optional[int] = None) -> None:
         """Simulates the end of the process.
 
         Args:

@@ -1,0 +1,29 @@
+<div *ngIf="canShowExploreVersionHistoryButton();" class="explore-version-history-container">
+  <div>
+    This card was last edited by <strong>{{ getLastEditedCommitterUsername() }}</strong> at <strong>version {{ getLastEditedVersionNumber() + 1 }}</strong> of the exploration.
+    <a class="text-primary explore-version-history-button" (click)="onClickExploreVersionHistoryButton()">See commit history</a>.
+  </div>
+</div>
+<div *ngIf="!canShowExploreVersionHistoryButton()" class="explore-version-history-container">
+  <span *ngIf="!validationErrorIsShown">No changes have been made after the initial commit to this state.</span>
+  <span *ngIf="validationErrorIsShown" class="error-message">
+    Unable to display the version history due to an error loading the exploration data.
+  </span>
+</div>
+
+<style>
+  .explore-version-history-container {
+    background-color: white;
+    border-radius: 5px;
+    box-shadow: 0 2px 1px -1px #0003, 0 1px 1px 0 #00000024, 0 1px 3px 0 #0000001f;
+    margin-bottom: 10px;
+    margin-top: 10px;
+    padding: 8px;
+  }
+  .explore-version-history-button {
+    font-weight: bold;
+  }
+  .error-message {
+    color: #f00;
+  }
+</style>

@@ -54,10 +54,10 @@
 <div class="release-coordinator-navbar">
   <nav class="navbar navbar-default navbar-light oppia-navbar oppia-prevent-selection oppia-navbar-release-coordinator" role="navigation">
     <div class="navbar-container oppia-navbar-container">
-      <div class="navbar-header protractor-test-navbar-header float-left">
+      <div class="navbar-header e2e-test-navbar-header float-left">
         <a class="oppia-navbar-brand-name oppia-transition-200 float-left"
            href="/community-library"
-           routerLink="/community-library">
+           smartRouterLink="/community-library">
           <picture>
             <source type="image/webp" [srcset]="logoWebpImageSrc">
             <source type="image/png" [srcset]="logoPngImageSrc">
@@ -89,6 +89,17 @@
                 </a>
               </li>
               <li class="nav-item oppia-clickable-navbar-element float-right">
+                <a class="nav-link oppia-navbar-tab e2e-test-features-tab"
+                   (click)="switchTab(TAB_ID_FEATURES)"
+                   href="#"
+                   [ngClass]="{ 'active': activeTab == TAB_ID_FEATURES }"
+                   ngbTooltip="Features"
+                   placement="bottom"
+                   container="body">
+                  Features
+                </a>
+              </li>
+              <li class="nav-item oppia-clickable-navbar-element float-right">
                 <a class="nav-link oppia-navbar-tab"
                    (click)="switchTab(TAB_ID_MISC)"
                    href="#"
@@ -104,22 +115,19 @@
           <li>
             <ul class="nav oppia-navbar-tabs-release-coordinator">
               <li ngbDropdown class="nav-item dropdown float-right" [ngClass]="{'open' : profileDropdownIsActive}">
-                <a ngbDropdownToggle class="nav-link oppia-navbar-dropdown-toggle protractor-test-navbar-dropdown-toggle"
+                <a ngbDropdownToggle class="nav-link oppia-navbar-dropdown-toggle e2e-test-navbar-dropdown-toggle"
                    data-toggle="dropdown"
                    (mouseenter)="activateProfileDropdown()"
                    (mouseleave)="deactivateProfileDropdown()">
-                  <span *ngIf="profilePictureDataUrl">
-                      <!--
-                        Lighthouse flags <img> elements that don't have alt attributes:
-                        If the image acts as decoration and does not provide any useful content, give it an empty alt=""
-                        https://web.dev/image-alt/?utm_source=lighthouse&utm_medium=devtools#how-to-add-alternative-text-to-images
-                      -->
-                    <img [src]="profilePictureDataUrl"
+                  <picture *ngIf="profilePicturePngDataUrl">
+                    <source type="image/webp" [srcset]="profilePictureWebpDataUrl">
+                    <source type="image/png" [srcset]="profilePicturePngDataUrl">
+                    <img [src]="profilePicturePngDataUrl"
                          class="oppia-navbar-profile-picture rounded-circle"
-                         alt="">
-                  </span>
-                  <div *ngIf="!profilePictureDataUrl" class="dropdown-toggle">
-                    <i class="material-icons md-40 oppia-dropdown-toggle-icon">&#xE853;</i>
+                         alt="User profile picture">
+                  </picture>
+                  <div *ngIf="!profilePicturePngDataUrl" class="dropdown-toggle">
+                    <i class="fas fa-user-circle md-40 oppia-dropdown-toggle-icon"></i>
                   </div>
                 </a>
                 <ul ngbDropdownMenu class="dropdown-menu dropdown-menu oppia-navbar-dropdown"
@@ -127,33 +135,29 @@
                     (mouseenter)="activateProfileDropdown()"
                     (mouseleave)="deactivateProfileDropdown()">
                   <li>
-                    <a (click)="onMouseoutProfilePictureOrDropdown($event)"
-                       [href]="profileUrl"
+                    <a [href]="profileUrl"
                        class="dropdown-item oppia-dropdown-item-text">
                       <strong>{{ username }}</strong>
                     </a>
                   </li>
                   <hr class="oppia-top-right-menu-item-separator">
                   <li>
-                    <a (click)="onMouseoutProfilePictureOrDropdown($event)"
-                       href="/creator-dashboard"
+                    <a href="/creator-dashboard"
                        class="dropdown-item oppia-dropdown-item-text">
                       Creator Dashboard
                     </a>
                   </li>
                   <li>
-                    <a (click)="onMouseoutProfilePictureOrDropdown($event)"
-                       href="/preferences"
-                       [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.PREFERENCES.ROUTE"
+                    <a href="/preferences"
+                       [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.PREFERENCES.ROUTE"
                        class="dropdown-item oppia-dropdown-item-text">
                       Preferences
                     </a>
                   </li>
                   <hr class="oppia-top-right-menu-item-separator">
                   <li>
-                    <a (click)="onMouseoutProfilePictureOrDropdown($event)"
-                       [href]="logoutUrl"
-                       [routerLink]="logoutUrl"
+                    <a [href]="logoutUrl"
+                       [smartRouterLink]="logoutUrl"
                        class="dropdown-item oppia-dropdown-item-text">
                       Logout
                     </a>

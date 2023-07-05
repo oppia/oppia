@@ -56,11 +56,19 @@ describe('Learner View Rating Service', () => {
     ' when calling \'submitUserRating\'', fakeAsync(() => {
     let userRatingSpy = spyOn(
       learnerViewRatingBackendApiService, 'submitUserRatingAsync')
-      .and.resolveTo(null);
+      .and.resolveTo();
 
     learnerViewRatingService.submitUserRating(2);
     tick();
 
     expect(userRatingSpy).toHaveBeenCalled();
   }));
+
+  it('should test getters', () => {
+    let userRating = 4;
+    learnerViewRatingService.userRating = userRating;
+
+    expect(learnerViewRatingService.getUserRating()).toEqual(userRating);
+    expect(learnerViewRatingService.onRatingUpdated).toBeDefined();
+  });
 });

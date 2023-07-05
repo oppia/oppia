@@ -16,7 +16,10 @@
  * @fileoverview Root component for Teach Page.
  */
 
-import { Component } from '@angular/core';
+import { Component, OnDestroy } from '@angular/core';
+import { TranslateService } from '@ngx-translate/core';
+import { Subscription } from 'rxjs';
+
 import { AppConstants } from 'app.constants';
 import { PageHeadService } from 'services/page-head.service';
 
@@ -24,13 +27,30 @@ import { PageHeadService } from 'services/page-head.service';
   selector: 'oppia-teach-page-root',
   templateUrl: './teach-page-root.component.html'
 })
-export class TeachPageRootComponent {
+export class TeachPageRootComponent implements OnDestroy {
+  directiveSubscriptions = new Subscription();
   constructor(
-    private pageHeadService: PageHeadService
+    private pageHeadService: PageHeadService,
+    private translateService: TranslateService
   ) {}
 
-  ngOnInit(): void {
+  setPageTitleAndMetaTags(): void {
+    let translatedTitle = this.translateService.instant(
+      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.TEACH.TITLE);
     this.pageHeadService.updateTitleAndMetaTags(
-      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.TEACH);
+      translatedTitle,
+      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.TEACH.META);
+  }
+
+  ngOnInit(): void {
+    this.directiveSubscriptions.add(
+      this.translateService.onLangChange.subscribe(() => {
+        this.setPageTitleAndMetaTags();
+      })
+    );
+  }
+
+  ngOnDestroy(): void {
+    this.directiveSubscriptions.unsubscribe();
   }
 }

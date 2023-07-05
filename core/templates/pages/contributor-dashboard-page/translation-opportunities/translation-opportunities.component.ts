@@ -28,7 +28,6 @@ import { UserService } from 'services/user.service';
 import { TranslationModalComponent, TranslationOpportunity } from '../modal-templates/translation-modal.component';
 import { ContributionOpportunitiesService, ExplorationOpportunitiesDict } from '../services/contribution-opportunities.service';
 import { TranslateTextService } from '../services/translate-text.service';
-import { AppConstants } from 'app.constants';
 
 @Component({
   selector: 'oppia-translation-opportunities',
@@ -36,11 +35,9 @@ import { AppConstants } from 'app.constants';
 })
 export class TranslationOpportunitiesComponent {
   // These properties are initialized using Angular lifecycle hooks
-  // and we need to do non-null assertion, for more information see
+  // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   OPPIA_AVATAR_IMAGE_URL!: string;
-  // This constant is defined as null at AppConstants.
-  OPPIA_AVATAR_LINK_URL!: string | null;
 
   allOpportunities: {[id: string]: TranslationOpportunity} = {};
   userIsLoggedIn = false;
@@ -70,6 +67,7 @@ export class TranslationOpportunitiesComponent {
     more: boolean;
   } {
     const opportunitiesDicts: TranslationOpportunity[] = [];
+    const untranslatableOpportunitiesDicts: TranslationOpportunity[] = [];
     for (const index in opportunities) {
       const opportunity = opportunities[index];
       const subheading = opportunity.getOpportunitySubheading();
@@ -89,8 +87,14 @@ export class TranslationOpportunitiesComponent {
         translationsCount: opportunity.getTranslationsCount(languageCode)
       };
       this.allOpportunities[opportunityDict.id] = opportunityDict;
-      opportunitiesDicts.push(opportunityDict);
+      if (opportunityDict.translationsCount +
+          opportunityDict.inReviewCount === opportunityDict.totalCount) {
+        untranslatableOpportunitiesDicts.push(opportunityDict);
+      } else {
+        opportunitiesDicts.push(opportunityDict);
+      }
     }
+    opportunitiesDicts.push(...untranslatableOpportunitiesDicts);
     return {opportunitiesDicts, more};
   }
 
@@ -126,7 +130,6 @@ export class TranslationOpportunitiesComponent {
     if (this.translationLanguageService.getActiveLanguageCode()) {
       this.languageSelected = true;
     } else {
-      this.OPPIA_AVATAR_LINK_URL = AppConstants.OPPIA_AVATAR_LINK_URL;
       this.OPPIA_AVATAR_IMAGE_URL = (
         this.urlInterpolationService.getStaticImageUrl(
           '/avatar/oppia_avatar_100px.svg'));

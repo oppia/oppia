@@ -24,20 +24,25 @@ import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 import { UrlService } from 'services/contextual/url.service';
 
+import './collection-footer.component.css';
+
+
 @Component({
   selector: 'collection-footer',
   templateUrl: './collection-footer.component.html',
-  styleUrls: []
+  styleUrls: ['./collection-footer.component.css']
 })
 export class CollectionFooterComponent implements OnInit {
   collectionId: string = '';
   constructor(
     private urlInterpolationService: UrlInterpolationService,
-    private urlService: UrlService) {
-  }
+    private urlService: UrlService
+  ) {}
+
   ngOnInit(): void {
     this.collectionId = this.urlService.getCollectionIdFromUrl();
   }
+
   getStaticImageUrl(imagePath: string): string {
     return this.urlInterpolationService.getStaticImageUrl(imagePath);
   }

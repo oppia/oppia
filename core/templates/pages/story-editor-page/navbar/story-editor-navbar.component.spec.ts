@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for the story editor navbar component.
  */
 
-import { Story, StoryBackendDict, StoryObjectFactory } from 'domain/story/StoryObjectFactory';
+import { Story, StoryBackendDict } from 'domain/story/story.model';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { UndoRedoService } from 'domain/editor/undo_redo/undo-redo.service';
@@ -31,8 +31,8 @@ import { BrowserDynamicTestingModule } from '@angular/platform-browser-dynamic/t
 import { NgbModal, NgbModalRef, NgbModule } from '@ng-bootstrap/ng-bootstrap';
 
 class MockNgbModalRef {
-  componentInstance: {
-    bindedMessage: null
+  componentInstance!: {
+    bindedMessage: null;
   };
 }
 
@@ -41,7 +41,6 @@ describe('Story editor navbar component', () => {
   let fixture: ComponentFixture<StoryEditorNavbarComponent>;
   let story: Story;
   let alertsService: AlertsService;
-  let storyObjectFactory = null;
   let storyEditorStateService: StoryEditorStateService;
   let undoRedoService: UndoRedoService;
   let editableStoryBackendApiService: EditableStoryBackendApiService;
@@ -56,7 +55,6 @@ describe('Story editor navbar component', () => {
         StoryEditorUnpublishModalComponent
       ],
       providers: [
-        StoryObjectFactory,
         StoryEditorStateService,
         StoryEditorNavigationService,
         UndoRedoService,
@@ -78,7 +76,6 @@ describe('Story editor navbar component', () => {
     undoRedoService = TestBed.inject(UndoRedoService);
     storyEditorStateService = TestBed.inject(StoryEditorStateService);
     undoRedoService = TestBed.inject(UndoRedoService);
-    storyObjectFactory = TestBed.inject(StoryObjectFactory);
     ngbModal = TestBed.inject(NgbModal);
     editableStoryBackendApiService = TestBed.inject(
       EditableStoryBackendApiService);
@@ -101,7 +98,12 @@ describe('Story editor navbar component', () => {
           exploration_id: 'exp_1',
           outline_is_finalized: false,
           thumbnail_filename: 'img.png',
-          thumbnail_bg_color: '#a33f40'
+          thumbnail_bg_color: '#a33f40',
+          status: 'Published',
+          planned_publication_date_msecs: 100,
+          last_modified_msecs: 100,
+          first_publication_date_msecs: 100,
+          unpublishing_reason: null
         }, {
           title: 'title_2',
           description: 'description_2',
@@ -113,7 +115,12 @@ describe('Story editor navbar component', () => {
           exploration_id: 'exp_2',
           outline_is_finalized: false,
           thumbnail_filename: 'img2.png',
-          thumbnail_bg_color: '#a33f40'
+          thumbnail_bg_color: '#a33f40',
+          status: 'Published',
+          planned_publication_date_msecs: 100,
+          last_modified_msecs: 100,
+          first_publication_date_msecs: 100,
+          unpublishing_reason: null
         }],
       },
       language_code: 'en',
@@ -157,7 +164,7 @@ describe('Story editor navbar component', () => {
       'title name is empty', () => {
       // Setting story title to be empty.
       storyBackendDict.title = '';
-      story = storyObjectFactory.createFromBackendDict(storyBackendDict);
+      story = Story.createFromBackendDict(storyBackendDict);
       let mockStoryInitializedEventEmitter = new EventEmitter();
 
       spyOnProperty(storyEditorStateService, 'onStoryInitialized')
@@ -180,8 +187,8 @@ describe('Story editor navbar component', () => {
     it('should show validation error when url ' +
       'fragment is empty', () => {
       // Setting url fragment to be empty.
-      storyBackendDict.url_fragment = null;
-      story = storyObjectFactory.createFromBackendDict(storyBackendDict);
+      storyBackendDict.url_fragment = '';
+      story = Story.createFromBackendDict(storyBackendDict);
       let mockStoryInitializedEventEmitter = new EventEmitter();
 
       spyOn(storyEditorStateService, 'getStory').and.returnValue(story);
@@ -202,7 +209,7 @@ describe('Story editor navbar component', () => {
 
     it('should show validation error when we ' +
       'try to add url fragment if it already exists', () => {
-      story = storyObjectFactory.createFromBackendDict(storyBackendDict);
+      story = Story.createFromBackendDict(storyBackendDict);
       let mockStoryReinitializedEventEmitter = new EventEmitter();
 
       spyOn(storyEditorStateService, 'getStory').and.returnValue(story);
@@ -227,7 +234,7 @@ describe('Story editor navbar component', () => {
       'does not have any linked exploration', fakeAsync(() => {
       // Setting exploration ID to be empty.
       storyBackendDict.story_contents.nodes[0].exploration_id = null;
-      story = storyObjectFactory.createFromBackendDict(storyBackendDict);
+      story = Story.createFromBackendDict(storyBackendDict);
       let mockStoryReinitializedEventEmitter = new EventEmitter();
 
       spyOn(storyEditorStateService, 'getStory').and.returnValue(story);
@@ -251,7 +258,7 @@ describe('Story editor navbar component', () => {
 
     it('should validate story without any validation errors ' +
       'on initialization', () => {
-      story = storyObjectFactory.createFromBackendDict(storyBackendDict);
+      story = Story.createFromBackendDict(storyBackendDict);
       let mockStoryInitializedEventEmitter = new EventEmitter();
 
       spyOn(storyEditorStateService, 'getStory').and.returnValue(story);
@@ -271,7 +278,7 @@ describe('Story editor navbar component', () => {
 
     it('should validate story without any validation errors ' +
       'on reinitalization', () => {
-      story = storyObjectFactory.createFromBackendDict(storyBackendDict);
+      story = Story.createFromBackendDict(storyBackendDict);
       let mockStoryReinitializedEventEmitter = new EventEmitter();
 
       spyOnProperty(storyEditorStateService, 'onStoryReinitialized')
@@ -291,7 +298,7 @@ describe('Story editor navbar component', () => {
 
     it('should validate story without any validation errors ' +
       'when undo operation is performed', () => {
-      story = storyObjectFactory.createFromBackendDict(storyBackendDict);
+      story = Story.createFromBackendDict(storyBackendDict);
       let mockUndoRedoChangeEventEmitter = new EventEmitter();
 
       spyOn(storyEditorStateService, 'getStory').and.returnValue(story);
@@ -311,14 +318,13 @@ describe('Story editor navbar component', () => {
   });
 
   it('should unpublish story', fakeAsync(() => {
-    story = storyObjectFactory.createFromBackendDict(storyBackendDict);
+    story = Story.createFromBackendDict(storyBackendDict);
     let mockStoryInitializedEventEmitter = new EventEmitter();
 
     spyOn(storyEditorStateService, 'getStory').and.returnValue(story);
     spyOnProperty(storyEditorStateService, 'onStoryInitialized')
       .and.returnValue(mockStoryInitializedEventEmitter);
     const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
-      setTimeout(opt.beforeDismiss);
       return ({
         result: Promise.resolve('success')
       } as NgbModalRef);
@@ -328,7 +334,7 @@ describe('Story editor navbar component', () => {
     mockStoryInitializedEventEmitter.emit();
     fixture.detectChanges();
 
-    expect(component.storyIsPublished).toBe(undefined);
+    expect(component.storyIsPublished).toBeFalse();
 
     storyEditorStateService.setStory(story);
     fixture.detectChanges();
@@ -377,7 +383,7 @@ describe('Story editor navbar component', () => {
   });
 
   it('should navigate to main tab in story editor page', () => {
-    expect(component.activeTab).toBe(undefined);
+    expect(component.activeTab).toBeUndefined();
 
     component.selectMainTab();
 
@@ -385,7 +391,7 @@ describe('Story editor navbar component', () => {
   });
 
   it('should navigate to preview tab in story editor page', () => {
-    expect(component.activeTab).toBe(undefined);
+    expect(component.activeTab).toBeUndefined();
 
     component.selectPreviewTab();
 
@@ -393,11 +399,12 @@ describe('Story editor navbar component', () => {
   });
 
   it('should discard changes', () => {
-    story = storyObjectFactory.createFromBackendDict(storyBackendDict);
+    story = Story.createFromBackendDict(storyBackendDict);
+    spyOn(storyEditorStateService, 'getStory').and.returnValue(story);
 
     component.story = story;
     let clearChangesSpy = spyOn(
-      undoRedoService, 'clearChanges').and.returnValue();
+      undoRedoService, 'clearChanges').and.callThrough();
 
     component.discardChanges();
 
@@ -409,7 +416,7 @@ describe('Story editor navbar component', () => {
       'clicking save draft button', fakeAsync(() => {
       const commitMessage = 'commitMessage';
 
-      story = storyObjectFactory.createFromBackendDict(storyBackendDict);
+      story = Story.createFromBackendDict(storyBackendDict);
       let mockStoryInitializedEventEmitter = new EventEmitter();
 
       spyOn(storyEditorStateService, 'getStory').and.returnValue(story);
@@ -424,7 +431,6 @@ describe('Story editor navbar component', () => {
           return true;
         });
       const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
-        setTimeout(opt.beforeDismiss);
         return (
           { componentInstance: MockNgbModalRef,
             result: Promise.resolve(commitMessage)
@@ -449,7 +455,7 @@ describe('Story editor navbar component', () => {
 
     it('should show error message if the story was not saved' +
       'on clicking save draft button', fakeAsync(() => {
-      story = storyObjectFactory.createFromBackendDict(storyBackendDict);
+      story = Story.createFromBackendDict(storyBackendDict);
       const commitMessage = null;
       let mockStoryInitializedEventEmitter = new EventEmitter();
 
@@ -457,7 +463,7 @@ describe('Story editor navbar component', () => {
       spyOnProperty(storyEditorStateService, 'onStoryInitialized')
         .and.returnValue(mockStoryInitializedEventEmitter);
       const alertsSpy = spyOn(
-        alertsService, 'addInfoMessage').and.returnValue(null);
+        alertsService, 'addInfoMessage').and.callThrough();
       const saveChangesSpy = spyOn(
         storyEditorStateService, 'saveStory')
         .and.callFake((commitMessage, successCallback, errorCallback) => {
@@ -469,7 +475,6 @@ describe('Story editor navbar component', () => {
           return true;
         });
       const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
-        setTimeout(opt.beforeDismiss);
         return (
           { componentInstance: MockNgbModalRef,
             result: Promise.resolve(commitMessage)
@@ -484,7 +489,7 @@ describe('Story editor navbar component', () => {
       expect(modalSpy).not.toHaveBeenCalled();
       expect(saveChangesSpy).not.toHaveBeenCalled();
 
-      component.commitMessage = null;
+      component.commitMessage = '';
       component.saveChanges();
       tick();
       fixture.detectChanges();
@@ -496,7 +501,7 @@ describe('Story editor navbar component', () => {
     }));
 
     it('should not save story on clicking cancel button', fakeAsync(() => {
-      story = storyObjectFactory.createFromBackendDict(storyBackendDict);
+      story = Story.createFromBackendDict(storyBackendDict);
       let mockStoryInitializedEventEmitter = new EventEmitter();
 
       spyOn(storyEditorStateService, 'getStory').and.returnValue(story);
@@ -513,7 +518,6 @@ describe('Story editor navbar component', () => {
           return true;
         });
       const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
-        setTimeout(opt.beforeDismiss);
         return (
           { componentInstance: MockNgbModalRef,
             result: Promise.reject()

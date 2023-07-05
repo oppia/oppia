@@ -19,9 +19,9 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 
 interface Language {
-  id: string,
-  text: string,
-  dir: string
+  id: string;
+  text: string;
+  dir: string;
 }
 
 @Component({
@@ -30,13 +30,14 @@ interface Language {
 })
 export class PreferredSiteLanguageSelectorComponent {
   // These properties are initialized using Angular lifecycle hooks
-  // and we need to do non-null assertion, for more information see
+  // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() preferredLanguageCode!: string;
   @Input() choices!: Language[];
   @Input() entity!: string;
   @Output() preferredLanguageCodeChange: EventEmitter<string> = (
     new EventEmitter());
+
   filteredChoices!: Language[];
 
   ngOnInit(): void {

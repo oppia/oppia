@@ -5,119 +5,153 @@
         <div class="improvements-tab-overview-header">
           <h1 class="improvements-tab-header-title">Overview</h1>
           <a class="improvements-tab-view-resolved-tasks" href="#">
-            <img class="improvements-tab-time-machine" ng-src="<[$ctrl.timeMachineImageUrl]>">
+            <img class="improvements-tab-time-machine" [src]="timeMachineImageUrl">
             <span class="improvements-tab-text">View Resolved Tasks</span>
-            <i class="material-icons improvements-tab-chevron-right-icon">chevron_right</i>
+            <i class="material-icons improvements-tab-chevron-right-icon">
+              chevron_right
+            </i>
           </a>
         </div>
         <div class="improvements-tab-overview-body">
           <div class="improvements-tab-summary">
             <div class="improvements-pending-summary">
-              <strong class="improvements-tab-count"><[$ctrl.getNumTasks()]></strong>
+              <strong class="improvements-tab-count">
+                {{ getNumTasks() }}
+              </strong>
               <p class="improvements-tab-units"
-                 ng-pluralize count="$ctrl.getNumTasks()"
-                 when="{'one': 'Improvement pending', 'other': 'Total Improvements pending'}">
+                 [ngPlural]="getNumTasks()">
+                <ng-template ngPluralCase="one">
+                  Improvement pending
+                </ng-template>
+                <ng-template ngPluralCase="other">
+                  Total Improvements pending
+                </ng-template>
               </p>
             </div>
             <div class="improvements-tab-exploration-health-summary"
-                 ng-class="['improvements-tab-' + $ctrl.getExplorationHealth()]">
+                 [ngClass]="['improvements-tab-' + getExplorationHealth()]">
               <span class="improvements-tab-outer-dot">
                 <span class="improvements-tab-inner-dot">&nbsp;</span>
               </span>
-              <p class="improvements-tab-exploration-health protractor-test-improvements-tab-health"
-                 ng-bind="$ctrl.getExplorationHealth()">
+              <p class="improvements-tab-exploration-health e2e-test-improvements-tab-health"
+                 [innerText]="getExplorationHealth()">
               </p>
             </div>
           </div>
-          <ul class="improvements-tab-navigation" ng-if="$ctrl.getNumTasks() > 0">
-            <li class="improvements-tab-navigation-item" ng-if="$ctrl.getNumExpLevelTasks() > 0">
+          <ul class="improvements-tab-navigation" *ngIf="getNumTasks() > 0">
+            <li class="improvements-tab-navigation-item"
+                *ngIf="getNumExpLevelTasks() > 0">
               <a class="improvements-tab-task-scope" href="#">
                 <span class="improvements-tab-dot-warning">&nbsp;</span>
                 <strong class="improvements-tab-scope-number">
-                  <[$ctrl.getNumExpLevelTasks()]>
+                  {{ getNumExpLevelTasks() }}
                 </strong>
-                <span class="improvements-tab-scope-content">exploration-level</span>
-                <i class="material-icons improvements-tab-chevron-right-icon">chevron_right</i>
+                <span class="improvements-tab-scope-content">
+                  exploration-level
+                </span>
+                <i class="material-icons improvements-tab-chevron-right-icon">
+                  chevron_right
+                </i>
               </a>
             </li>
             <li class="improvements-tab-navigation-item"
-                ng-if="$ctrl.getNumConceptLevelTasks() > 0">
+                *ngIf="getNumConceptLevelTasks() > 0">
               <a class="improvements-tab-task-scope" href="#">
                 <span class="improvements-tab-dot-warning">&nbsp;</span>
                 <strong class="improvements-tab-scope-number">
-                  <[$ctrl.getNumConceptLevelTasks()]>
+                  {{ getNumConceptLevelTasks() }}
                 </strong>
-                <span class="improvements-tab-scope-content">concept-level</span>
-                <i class="material-icons improvements-tab-chevron-right-icon">chevron_right</i>
+                <span class="improvements-tab-scope-content">
+                  concept-level
+                </span>
+                <i class="material-icons improvements-tab-chevron-right-icon">
+                  chevron_right
+                </i>
               </a>
             </li>
-            <li class="improvements-tab-navigation-item" ng-if="$ctrl.getNumCardLevelTasks() > 0">
-              <a class="improvements-tab-task-scope" href="#card-level-improvements" target="_self">
-                <span ng-class="'improvements-tab-dot-' + $ctrl.getExplorationHealth()">
+            <li class="improvements-tab-navigation-item" *ngIf="getNumCardLevelTasks() > 0">
+              <a class="improvements-tab-task-scope"
+                 href="#card-level-improvements"
+                 target="_self">
+                <span [ngClass]="'improvements-tab-dot-' + getExplorationHealth()">
                   &nbsp;
                 </span>
                 <strong class="improvements-tab-scope-number">
-                  <[$ctrl.getNumCardLevelTasks()]>
+                  {{ getNumCardLevelTasks() }}
                 </strong>
-                <span class="improvements-tab-scope-content">card-level</span>
-                <i class="material-icons improvements-tab-chevron-right-icon">chevron_right</i>
+                <span class="improvements-tab-scope-content">
+                  card-level
+                </span>
+                <i class="material-icons improvements-tab-chevron-right-icon">
+                  chevron_right
+                </i>
               </a>
             </li>
           </ul>
         </div>
       </div>
       <div class="improvements-tab-completion-rate">
-        <oppia-completion-graph [completion-rate]="$ctrl.completionRate"></oppia-completion-graph>
-        <p class="improvements-tab-value"><[$ctrl.completionRateAsPercent]></p>
-        <p class="improvements-tab-label">Exploration Completion Rate</p>
+        <oppia-completion-graph [completionRate]="completionRate"></oppia-completion-graph>
+        <p class="improvements-tab-value">
+          {{ completionRateAsPercent }}
+        </p>
+        <p class="improvements-tab-label">
+          Exploration Completion Rate
+        </p>
       </div>
     </div>
   </div>
   <div class="improvements-tab-body">
-    <div class="improvements-tab-level" ng-if="$ctrl.getNumCardLevelTasks() > 0">
-      <div class="improvements-tab-level-header" name="card-level-improvements">
+    <div class="improvements-tab-level"
+         *ngIf="getNumCardLevelTasks() > 0">
+      <div class="improvements-tab-level-header"
+           name="card-level-improvements">
         card-level improvements
       </div>
       <hr>
-      <div class="improvements-tab-state-groups protractor-test-improvements-tab-state-group"
-           ng-repeat="stateTasks in $ctrl.allStateTasks track by stateTasks.stateName"
-           ng-if="$ctrl.getNumCardLevelTasksForState(stateTasks.stateName) > 0">
-        <div class="improvements-tab-state-header">
-          <div class="improvements-tab-collapse-arrow">
-            <a class="improvements-tab-collapse-arrow-button"
-               ng-click="$ctrl.toggleStateTasks(stateTasks.stateName)">
-              <i class="material-icons">
-                keyboard_arrow_<[$ctrl.isStateTasksVisible(stateTasks.stateName) ? 'down' : 'up']>
-              </i>
-            </a>
-          </div>
-          <div class="improvements-tab-state-details">
-            <div class="improvements-tab-state-link">
-              <a class="improvements-tab-state-link-a"
-                 ng-click="$ctrl.navigateToStateEditor(stateTasks.stateName)">
-                <[stateTasks.stateName]>
+      <div *ngFor="let stateTasks of allStateTasks;index as index">
+        <div class="improvements-tab-state-groups e2e-test-improvements-tab-state-group"
+             *ngIf="getNumCardLevelTasksForState(stateTasks.stateName) > 0">
+          <div class="improvements-tab-state-header">
+            <div class="improvements-tab-collapse-arrow">
+              <a class="improvements-tab-collapse-arrow-button"
+                 (click)="toggleStateTasks(stateTasks.stateName)">
+                <i class="material-icons">
+                  keyboard_arrow_{{isStateTasksVisible(stateTasks.stateName) ? 'down' : 'up'}}
+                </i>
               </a>
             </div>
-            <div class="improvements-tab-state-stats">
-              <div class="improvements-tab-state-retention">
-                <[$ctrl.getStateRetentionPercent(stateTasks.stateName)]> Current Retention
+            <div class="improvements-tab-state-details">
+              <div class="improvements-tab-state-link">
+                <a class="improvements-tab-state-link-a"
+                   (click)="navigateToStateEditor(stateTasks.stateName)">
+                  {{ stateTasks.stateName }}
+                </a>
               </div>
-              <div class="improvements-tab-state-num-issues">
-                <strong><[$ctrl.getNumCardLevelTasksForState(stateTasks.stateName)]></strong>
-                <span ng-pluralize count="$ctrl.getNumCardLevelTasksForState(stateTasks.stateName)"
-                      when="{'one': 'issue found', 'other': 'issues found'}">
-                </span>
+              <div class="improvements-tab-state-stats">
+                <div class="improvements-tab-state-retention">
+                  {{ getStateRetentionPercent(stateTasks.stateName) }} Current Retention
+                </div>
+                <div class="improvements-tab-state-num-issues">
+                  <strong>
+                    {{ getNumCardLevelTasksForState(stateTasks.stateName) }}
+                  </strong>
+                  <span [ngPlural]="getNumCardLevelTasksForState(stateTasks.stateName)">
+                    <ng-template ngPluralCase="one">issue found</ng-template>
+                    <ng-template ngPluralCase="other">issues found</ng-template>
+                  </span>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-        <hr>
-        <div class="improvements-tab-state-body"
-             ng-show="$ctrl.isStateTasksVisible(stateTasks.stateName)">
-          <needs-guiding-responses-task ng-if="stateTasks.ngrTask.isOpen()"
-                                        task="stateTasks.ngrTask"
-                                        stats="stateTasks.supportingStats">
-          </needs-guiding-responses-task>
+          <hr>
+          <div class="improvements-tab-state-body"
+               [hidden]="!(isStateTasksVisible(stateTasks.stateName))">
+            <oppia-needs-guiding-responses-task *ngIf="stateTasks.ngrTask.isOpen()"
+                                                [task]="stateTasks.ngrTask"
+                                                [stats]="stateTasks.supportingStats">
+            </oppia-needs-guiding-responses-task>
+          </div>
         </div>
       </div>
     </div>
@@ -126,7 +160,7 @@
 
 <style>
   .improvements-tab-container {
-    background-color: #EEE;
+    background-color: #eee;
     font-family: 'Roboto', Arial, sans-serif;
     margin: 0;
     overflow: scroll;
@@ -225,7 +259,7 @@
   }
 
   .improvements-tab-overview-header a.improvements-tab-view-resolved-tasks {
-    color: #00829B;
+    color: #00829b;
     display: inline-flex;
     font-family: 'Roboto', Arial, sans-serif;
     font-size: 14px;
@@ -249,7 +283,7 @@
   }
 
   .improvements-tab-overview-header a.improvements-tab-view-resolved-tasks span.improvements-tab-text {
-    color: #00829B;
+    color: #00829b;
     display: inline-block;
     font-family: 'Roboto', Arial, sans-serif;
     font-size: 14px;
@@ -270,7 +304,7 @@
   }
 
   .improvements-tab-overview-body {
-    background-color: #F5F5F5;
+    background-color: #f5f5f5;
     border: 1px solid rgba(0,0,0,0.06);
     border-radius: 2px;
     box-sizing: border-box;
@@ -372,11 +406,11 @@
   }
 
   .improvements-tab-summary div.improvements-tab-exploration-health-summary.improvements-tab-warning span.improvements-tab-outer-dot span.improvements-tab-inner-dot {
-    background-color: #F2A900;
+    background-color: #f2a900;
   }
 
   .improvements-tab-summary div.improvements-tab-exploration-health-summary.improvements-tab-warning p.improvements-tab-exploration-health {
-    color: #F2A900;
+    color: #f2a900;
   }
 
   .improvements-tab-summary div.improvements-tab-exploration-health-summary.improvements-tab-critical span.improvements-tab-outer-dot {
@@ -384,11 +418,11 @@
   }
 
   .improvements-tab-summary div.improvements-tab-exploration-health-summary.improvements-tab-critical span.improvements-tab-outer-dot span.improvements-tab-inner-dot {
-    background-color: #D10B23;
+    background-color: #d10b23;
   }
 
   .improvements-tab-summary div.improvements-tab-exploration-health-summary.improvements-tab-critical p.improvements-tab-exploration-health {
-    color: #D10B23;
+    color: #d10b23;
   }
 
   .improvements-tab-navigation {
@@ -406,7 +440,7 @@
 
   .improvements-tab-navigation-item {
     align-items: center;
-    background-color: #F5F5F5;
+    background-color: #f5f5f5;
     display: flex;
     flex: 1 1 auto;
     list-style: none;
@@ -417,7 +451,7 @@
   }
 
   .improvements-tab-navigation-item a.improvements-tab-task-scope {
-    color: #00829B;
+    color: #00829b;
     display: inline-flex;
     font-family: 'Roboto', Arial, sans-serif;
     font-size: 14px;
@@ -439,7 +473,7 @@
   }
 
   .improvements-tab-navigation-item span.improvements-tab-dot-warning {
-    background-color: #F2A900;
+    background-color: #f2a900;
     border-radius: 50%;
     display: inline-block;
     height: 8px;
@@ -448,7 +482,7 @@
   }
 
   .improvements-tab-navigation-item span.improvements-tab-dot-critical {
-    background-color: #D10B23;
+    background-color: #d10b23;
     border-radius: 50%;
     display: inline-block;
     height: 8px;
@@ -476,7 +510,7 @@
   }
 
   .improvements-tab-body {
-    background-color: #EEE;
+    background-color: #eee;
     margin: 66px auto;
     max-width: 1238px;
     padding: 0;
@@ -538,7 +572,7 @@
   }
 
   .improvements-tab-state-link {
-    color: #004C76;
+    color: #004c76;
     flex-grow: 0;
     font-family: 'Roboto', Arial, sans-serif;
     font-size: 18px;
@@ -604,7 +638,7 @@
   }
 
   .improvements-tab-task-health-bar.improvements-tab-critical {
-    background: #D10B23;
+    background: #d10b23;
   }
 
   .improvements-tab-task-overview {
@@ -641,7 +675,7 @@
   }
 
   .improvements-tab-task-details {
-    background: #FFF;
+    background: #fff;
     box-shadow: 0 0 2px rgba(0, 0, 0, 0.12), 0 2px 2px rgba(0, 0, 0, 0.24);
     flex-grow: 1;
     margin-left: 28px;
@@ -663,7 +697,7 @@
   }
 
   .improvements-tab-task-actions {
-    color: #00829B;
+    color: #00829b;
     font-family: 'Roboto', Arial, sans-serif;
     font-size: 16px;
     font-style: normal;
@@ -681,8 +715,8 @@
   }
 
   .improvements-tab-task-suggestions {
-    background: #E7EBEC;
-    border: 1px solid #E0E0E0;
+    background: #e7ebec;
+    border: 1px solid #e0e0e0;
     box-sizing: border-box;
     flex-grow: 0;
     width: 300px;

@@ -27,6 +27,7 @@ import { SubtopicViewerBackendApiService } from
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 import { UrlService } from 'services/contextual/url.service';
+import { I18nLanguageCodeService, TranslationKeyType } from 'services/i18n-language-code.service';
 
 @Component({
   selector: 'subtopic-viewer-navbar-breadcrumb',
@@ -34,16 +35,23 @@ import { UrlService } from 'services/contextual/url.service';
   styleUrls: []
 })
 export class SubtopicViewerNavbarBreadcrumbComponent implements OnInit {
-  topicUrlFragment: string;
-  classroomUrlFragment: string;
-  subtopicTitle: string;
-  topicName: string;
-  subtopicUrlFragment: string;
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  topicUrlFragment!: string;
+  classroomUrlFragment!: string;
+  subtopicTitle!: string;
+  subtopicTitleTranslationKey!: string;
+  topicName!: string;
+  topicNameTranslationKey!: string;
+  subtopicUrlFragment!: string;
   constructor(
     private subtopicViewerBackendApiService: SubtopicViewerBackendApiService,
     private urlInterpolationService: UrlInterpolationService,
-    private urlService: UrlService
+    private urlService: UrlService,
+    private i18nLanguageCodeService: I18nLanguageCodeService
   ) {}
+
   ngOnInit(): void {
     this.topicUrlFragment = (
       this.urlService.getTopicUrlFragmentFromLearnerUrl());
@@ -57,15 +65,46 @@ export class SubtopicViewerNavbarBreadcrumbComponent implements OnInit {
       this.subtopicUrlFragment).then(
       (subtopicDataObject: ReadOnlySubtopicPageData) => {
         this.subtopicTitle = subtopicDataObject.getSubtopicTitle();
+        this.subtopicTitleTranslationKey = (
+          this.i18nLanguageCodeService.getSubtopicTranslationKey(
+            subtopicDataObject.getParentTopicId(),
+            this.subtopicUrlFragment,
+            TranslationKeyType.TITLE
+          )
+        );
         this.topicName = subtopicDataObject.getParentTopicName();
-      });
+        this.topicNameTranslationKey = (
+          this.i18nLanguageCodeService.getTopicTranslationKey(
+            subtopicDataObject.getParentTopicId(),
+            TranslationKeyType.TITLE
+          )
+        );
+      }
+    );
   }
+
   getTopicUrl(): string {
     return this.urlInterpolationService.interpolateUrl(
       ClassroomDomainConstants.TOPIC_VIEWER_REVISION_URL_TEMPLATE, {
         topic_url_fragment: this.topicUrlFragment,
         classroom_url_fragment: this.classroomUrlFragment
       });
+  }
+
+  isHackyTopicNameTranslationDisplayed(): boolean {
+    return (
+      this.i18nLanguageCodeService.isHackyTranslationAvailable(
+        this.topicNameTranslationKey
+      ) && !this.i18nLanguageCodeService.isCurrentLanguageEnglish()
+    );
+  }
+
+  isHackySubtopicTitleTranslationDisplayed(): boolean {
+    return (
+      this.i18nLanguageCodeService.isHackyTranslationAvailable(
+        this.subtopicTitleTranslationKey
+      ) && !this.i18nLanguageCodeService.isCurrentLanguageEnglish()
+    );
   }
 }
 

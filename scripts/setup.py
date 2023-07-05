@@ -21,20 +21,19 @@ import os
 import subprocess
 import sys
 import tarfile
-import urllib.request as urlrequest
 
-from core import python_utils
+from typing import Final, List, Optional
 
 from . import clean
 from . import common
 
-_PARSER = argparse.ArgumentParser(
+_PARSER: Final = argparse.ArgumentParser(
     description="""
 Python execution environent set up for all scripts.
 """)
 
 
-def create_directory(directory_path):
+def create_directory(directory_path: str) -> None:
     """Creates a new directory. Does not do anything if directory already
     exists.
 
@@ -49,10 +48,10 @@ def create_directory(directory_path):
 # This function takes a command for python as its only input.
 # It checks this input for a specific version of python and returns false
 # if it does not match the expected prefix.
-def test_python_version():
-    running_python_version = '{0[0]}.{0[1]}'.format(sys.version_info)
-    if running_python_version != '3.7':
-        python_utils.PRINT('Please use Python 3.7. Exiting...')
+def test_python_version() -> None:
+    running_python_version = '{0[0]}.{0[1]}.{0[2]}'.format(sys.version_info)
+    if running_python_version != '3.8.15':
+        print('Please use Python 3.8.15. Exiting...')
         # If OS is Windows, print helpful error message about adding Python to
         # path.
         if common.is_windows_os():
@@ -88,7 +87,7 @@ def test_python_version():
         sys.exit(1)
 
 
-def download_and_install_package(url_to_retrieve, filename):
+def download_and_install_package(url_to_retrieve: str, filename: str) -> None:
     """Downloads and installs package in Oppia tools directory.
 
     Args:
@@ -96,7 +95,7 @@ def download_and_install_package(url_to_retrieve, filename):
             downloaded.
         filename: string. The name of the tar file.
     """
-    urlrequest.urlretrieve(url_to_retrieve, filename=filename)
+    common.url_retrieve(url_to_retrieve, filename)
     tar = tarfile.open(name=filename)
     tar.extractall(path=common.OPPIA_TOOLS_DIR)
     tar.close()
@@ -104,7 +103,7 @@ def download_and_install_package(url_to_retrieve, filename):
     os.remove(filename)
 
 
-def rename_yarn_folder(filename, path):
+def rename_yarn_folder(filename: str, path: str) -> None:
     """Removes the `v` from the yarn folder name.
 
     Args:
@@ -117,7 +116,7 @@ def rename_yarn_folder(filename, path):
         os.rename(path + '/' + old_name, path + '/' + new_name)
 
 
-def download_and_install_node():
+def download_and_install_node() -> None:
     """Download and install node to Oppia tools directory."""
     outfile_name = 'node-download'
 
@@ -132,7 +131,7 @@ def download_and_install_node():
             common.NODE_VERSION, architecture)
         url_to_retrieve = 'https://nodejs.org/dist/v%s/%s%s' % (
             common.NODE_VERSION, node_file_name, extension)
-        urlrequest.urlretrieve(url_to_retrieve, filename=outfile_name)
+        common.url_retrieve(url_to_retrieve, outfile_name)
         subprocess.check_call(
             ['powershell.exe', '-c', 'expand-archive',
              outfile_name, '-DestinationPath',
@@ -144,6 +143,10 @@ def download_and_install_node():
                 node_file_name = 'node-v%s-darwin-x64' % (common.NODE_VERSION)
             elif common.is_linux_os():
                 node_file_name = 'node-v%s-linux-x64' % (common.NODE_VERSION)
+            # Oppia only suppports windows, mac and linux operating systems.
+            else:
+                raise Exception(
+                    'System\'s Operating System is not compatible.')
         else:
             node_file_name = 'node-v%s' % common.NODE_VERSION
         download_and_install_package(
@@ -159,19 +162,17 @@ def download_and_install_node():
             subprocess.check_call(['make'])
 
 
-def main(args=None):
+def main(args: Optional[List[str]] = None) -> None:
     """Runs the script to setup Oppia."""
     unused_parsed_args = _PARSER.parse_args(args=args)
     test_python_version()
 
     # The second option allows this script to also be run from deployment
     # folders.
-    if not os.getcwd().endswith('oppia') and not os.getcwd().endswith(
-            'deploy-'):
-        python_utils.PRINT('')
-        python_utils.PRINT(
-            'WARNING   This script should be run from the oppia/ root folder.')
-        python_utils.PRINT('')
+    if not os.getcwd().endswith(('oppia', 'deploy-')):
+        print('')
+        print('WARNING This script should be run from the oppia/ root folder.')
+        print('')
         raise Exception('Invalid root directory.')
 
     # Set COMMON_DIR to the absolute path of the directory above OPPIA_DIR. This
@@ -193,10 +194,9 @@ def main(args=None):
         'the start.py script.\n')
 
     # Download and install node.js.
-    python_utils.PRINT(
-        'Checking if node.js is installed in %s' % common.OPPIA_TOOLS_DIR)
+    print('Checking if node.js is installed in %s' % common.OPPIA_TOOLS_DIR)
     if not os.path.exists(common.NODE_PATH):
-        python_utils.PRINT('Installing Node.js')
+        print('Installing Node.js')
         download_and_install_node()
     # Change ownership of node_modules.
     # Note: on some machines, these commands seem to take quite a long time.
@@ -205,10 +205,9 @@ def main(args=None):
         common.recursive_chmod(common.NODE_MODULES_PATH, 0o744)
 
     # Download and install yarn.
-    python_utils.PRINT(
-        'Checking if yarn is installed in %s' % common.OPPIA_TOOLS_DIR)
+    print('Checking if yarn is installed in %s' % common.OPPIA_TOOLS_DIR)
     if not os.path.exists(common.YARN_PATH):
-        python_utils.PRINT('Removing package-lock.json')
+        print('Removing package-lock.json')
         clean.delete_file('package-lock.json')
         common.print_each_string_after_two_new_lines([
             'Installing yarn',
@@ -222,45 +221,7 @@ def main(args=None):
             'https://github.com/yarnpkg/yarn/releases/download/v%s/%s'
             % (common.YARN_VERSION, yarn_file_name), yarn_file_name)
 
-    # Adjust path to support the default Chrome locations for Unix, Windows and
-    # Mac OS.
-    if os.path.isfile('/usr/bin/google-chrome'):
-        # Unix.
-        chrome_bin = '/usr/bin/google-chrome'
-    elif os.path.isfile('/usr/bin/chromium-browser'):
-        # Unix.
-        chrome_bin = '/usr/bin/chromium-browser'
-    elif os.path.isfile('/usr/bin/brave'):
-        # Arch Linux.
-        chrome_bin = '/usr/bin/brave'
-    elif os.path.isfile('/usr/bin/chromium'):
-        # Arch Linux.
-        chrome_bin = '/usr/bin/chromium'
-    elif os.path.isfile(
-            '/c/Program Files (x86)/Google/Chrome/Application/chrome.exe'):
-        # Windows.
-        chrome_bin = (
-            '/c/Program Files (x86)/Google/Chrome/Application/chrome.exe')
-    elif os.path.isfile(
-            'c:\\Program Files (x86)\\Google\\Chrome\\Application\\Chrome.exe'):
-        chrome_bin = (
-            'c:\\Program Files (x86)\\Google\\Chrome\\Application\\Chrome.exe')
-    elif os.path.isfile(
-            '/mnt/c/Program Files (x86)/Google/Chrome/Application/chrome.exe'):
-        # WSL.
-        chrome_bin = (
-            '/mnt/c/Program Files (x86)/Google/Chrome/Application/chrome.exe')
-    elif os.path.isfile(
-            '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'):
-        # Mac OS.
-        chrome_bin = (
-            '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome')
-    else:
-        python_utils.PRINT('Chrome is not found, stopping ...')
-        raise Exception('Chrome not found.')
-
-    os.environ['CHROME_BIN'] = chrome_bin
-    python_utils.PRINT('Environment setup completed.')
+    print('Environment setup completed.')
 
 
 # The 'no coverage' pragma is used as this line is un-testable. This is because

@@ -87,12 +87,67 @@ describe('Solution object factory', () => {
     });
 
     it('should create summary correctly', () => {
-      expect(solution.getSummary('GraphInput')).toEqual(
+      const graphInputCustomizationArgs = {
+        graph: {
+          value: { },
+        },
+        canAddVertex: {
+          value: true,
+        },
+        canDeleteVertex: {
+          value: true,
+        },
+        canEditVertexLabel: {
+          value: true,
+        },
+        canMoveVertex: {
+          value: true,
+        },
+        canAddEdge: {
+          value: true,
+        },
+        canDeleteEdge: {
+          value: true,
+        },
+        canEditEdgeWeight: {
+          value: true,
+        }
+      };
+      expect(solution.getSummary(
+        'GraphInput', graphInputCustomizationArgs)).toEqual(
         'One solution is "[Graph]". This is the explanation to the answer.');
-      expect(solution.getSummary('MusicNotesInput')).toEqual(
+      const musicNotesInputCustomizationArgs = {
+        sequenceToGuess: {
+          value: [{
+            readableNoteName: 'name',
+            noteDuration: {
+              num: 1,
+              den: 1
+            }}]
+        },
+        initialSequence: {
+          value: [{
+            readableNoteName: 'name',
+            noteDuration: {
+              num: 1,
+              den: 1
+            }}]
+        }
+      };
+      expect(solution.getSummary(
+        'MusicNotesInput', musicNotesInputCustomizationArgs)).toEqual(
         'One solution is "[Music Notes]". This is the explanation to the' +
         ' answer.');
-      expect(solution.getSummary('TextInput')).toEqual(
+      const textInputCustomizationArgs = {
+        placeholder: {
+          value: { }
+        },
+        rows: {
+          value: 1
+        }
+      };
+      expect(solution.getSummary(
+        'TextInput', textInputCustomizationArgs)).toEqual(
         'One solution is "&quot;This is a correct answer!&quot;". ' +
         'This is the explanation to the answer.');
 
@@ -102,7 +157,22 @@ describe('Solution object factory', () => {
         evaluation: '',
         output: ''
       });
-      expect(solution.getSummary('CodeRepl')).toEqual(
+      const codeReplCustomizationArgs = {
+        language: {
+          value: 'lang'
+        },
+        placeholder: {
+          value: 'placeholder'
+        },
+        preCode: {
+          value: 'preCode'
+        },
+        postCode: {
+          value: 'postCode'
+        }
+      };
+      expect(solution.getSummary(
+        'CodeRepl', codeReplCustomizationArgs)).toEqual(
         'One solution is "a=10". This is the explanation to the answer.');
 
       solution.setCorrectAnswer({
@@ -111,7 +181,22 @@ describe('Solution object factory', () => {
         numerator: 1,
         denominator: 6
       });
-      expect(solution.getSummary('FractionInput')).toEqual(
+      const fractionInputCustomizationArgs = {
+        requireSimplestForm: {
+          value: true
+        },
+        allowImproperFraction: {
+          value: true
+        },
+        allowNonzeroIntegerPart: {
+          value: true
+        },
+        customPlaceholder: {
+          value: { }
+        }
+      };
+      expect(solution.getSummary(
+        'FractionInput', fractionInputCustomizationArgs)).toEqual(
         'One solution is "1/6". This is the explanation to the answer.');
 
       solution.setCorrectAnswer({
@@ -125,30 +210,46 @@ describe('Solution object factory', () => {
         },
         units: []
       });
-      expect(solution.getSummary('NumberWithUnits')).toEqual(
+      const numberWithUnitsCustomizationArgs = { };
+      expect(solution.getSummary(
+        'NumberWithUnits', numberWithUnitsCustomizationArgs)).toEqual(
         'One solution is "1". This is the explanation to the answer.');
 
       solution.setCorrectAnswer([
-        ['<p>1</p>', '<b>3</b>'],
-        ['c', '<oppia-noninteractive-math></oppia-noninteractive-math>']
+        ['content_id_1', 'content_id_3'],
+        ['content_id_2']
       ]);
-      expect(solution.getSummary('DragAndDropSortInput')).toEqual(
-        'One solution is "[[1,3],[c,[Math]]]". This is the explanation to ' +
-        'the answer.');
+      const dragAndDropCustomizationArgs = {
+        choices: {
+          value: [
+            new SubtitledHtml('html_1', 'content_id_1'),
+            new SubtitledHtml('html_2', 'content_id_2'),
+            new SubtitledHtml('html_3', 'content_id_3')
+          ]
+        }
+      };
+
+      expect(
+        solution.getSummary(
+          'DragAndDropSortInput', dragAndDropCustomizationArgs)
+      ).toEqual(
+        'One solution is "[[html_1,html_3],[html_2]]". ' +
+        'This is the explanation to the answer.');
     });
 
     it('should get oppia short answer', () => {
       const interaction = new Interaction([], [], {
         choices: {
-          value: [new SubtitledHtml('This is a choice', '')]
+          value: [new SubtitledHtml('This is a choice', 'id1')]
         }
       }, null, [], '0', null);
       const expectedShortAnswerHtml = {
         prefix: 'One',
-        answer: '<oppia-short-response-0 ' +
-          'answer="&amp;quot;This is a correct answer!&amp;quot;" ' +
-          'choices="[&amp;quot;This is a choice&amp;quot;]">' +
-          '</oppia-short-response-0>'
+        answer: '<oppia-short-response-0 answer="&amp;quot;' +
+        'This is a correct answer!&amp;quot;" choices="' +
+        '[{&amp;quot;_html&amp;quot;:&amp;quot;This is a choice' +
+        '&amp;quot;,&amp;quot;_contentId&amp;quot;:' +
+        '&amp;quot;id1&amp;quot;}]"></oppia-short-response-0>'
       };
 
       expect(solution.getOppiaShortAnswerResponseHtml(interaction)).toEqual(
@@ -178,7 +279,7 @@ describe('Solution object factory', () => {
       });
 
       expect(solution.answerIsExclusive).toBe(true);
-      expect(solution.getSummary('TestInput')).toEqual(
+      expect(solution.getSummary('TestInput', {})).toEqual(
         'The only solution is "&quot;This is a correct answer!&quot;". ' +
         'This is the explanation to the answer.');
     });
@@ -193,7 +294,7 @@ describe('Solution object factory', () => {
       expect(solution.explanation).toBe(newExplanation);
       expect(solution.getOppiaSolutionExplanationResponseHtml()).toBe(
         newExplanation.html);
-      expect(solution.getSummary('TestInput')).toEqual(
+      expect(solution.getSummary('TestInput', {})).toEqual(
         'One solution is "&quot;This is a correct answer!&quot;". ' +
         'This is the new explanation to the answer.');
     });

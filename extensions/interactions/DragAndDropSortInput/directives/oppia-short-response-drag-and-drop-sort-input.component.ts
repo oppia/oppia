@@ -16,25 +16,54 @@
  * @fileoverview Component for the DragAndDropSortInput short response.
  */
 
-require('services/html-escaper.service.ts');
+import { Component, Input, OnInit } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
+import { HtmlEscaperService } from 'services/html-escaper.service';
+import { DragAndDropAnswer } from 'interactions/answer-defs';
 
-angular.module('oppia').component('oppiaShortResponseDragAndDropSortInput', {
-  template: require(
-    './drag-and-drop-sort-input-short-response.component.html'),
-  controllerAs: '$ctrl',
-  controller: ['$attrs', 'HtmlEscaperService',
-    function($attrs, HtmlEscaperService) {
-      var ctrl = this;
-      ctrl.chooseItemType = (index) => {
-        return (
-          index === 0 ?
-          'drag-and-drop-response-item' :
-          'drag-and-drop-response-subitem'
-        );
-      };
-      ctrl.$onInit = function() {
-        ctrl.answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
-        ctrl.isAnswerLengthGreaterThanZero = ctrl.answer.length > 0;
-      };
-    }]
-});
+@Component({
+  selector: 'oppia-short-response-drag-and-drop-sort-input',
+  templateUrl: './drag-and-drop-sort-input-short-response.component.html',
+  styleUrls: []
+})
+export class ShortResponseDragAndDropSortInputComponent implements OnInit {
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  @Input() answer!: string;
+  @Input() choices!: string;
+  responseList!: DragAndDropAnswer;
+  isAnswerLengthGreaterThanZero: boolean = false;
+
+  constructor(private htmlEscaperService: HtmlEscaperService) {}
+
+  ngOnInit(): void {
+    // Obtain the contentIds of the options in the correct order.
+    const _answer = this.htmlEscaperService.escapedJsonToObj(
+      this.answer) as DragAndDropAnswer;
+    this.isAnswerLengthGreaterThanZero = _answer.length > 0;
+    const _choices = this.htmlEscaperService.escapedJsonToObj(
+      this.choices) as { _html: string; _contentId: string }[];
+
+    const choicesContentIds = _choices.map(choice => choice._contentId);
+
+    // Obtain the answer html (in the correct order) using the contentIds.
+    this.responseList = _answer.map(optionListAtPosition => {
+      return optionListAtPosition.map(
+        contentId => _choices[choicesContentIds.indexOf(contentId)]._html);
+    });
+  }
+
+  chooseItemType(index: number): string {
+    return (
+      index === 0 ?
+      'drag-and-drop-response-item' :
+      'drag-and-drop-response-subitem'
+    );
+  }
+}
+
+angular.module('oppia').directive(
+  'oppiaShortResponseDragAndDropSortInput', downgradeComponent({
+    component: ShortResponseDragAndDropSortInputComponent
+  }) as angular.IDirectiveFactory);

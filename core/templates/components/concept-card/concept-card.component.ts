@@ -19,21 +19,24 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { ConceptCardBackendApiService } from 'domain/skill/concept-card-backend-api.service';
-import { ConceptCard } from 'domain/skill/ConceptCardObjectFactory';
+import { ConceptCard } from 'domain/skill/concept-card.model';
 
 @Component({
   selector: 'oppia-concept-card',
   templateUrl: './concept-card.component.html'
 })
 export class ConceptCardComponent implements OnInit {
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() skillIds!: string[];
   @Input() index!: number;
+  currentConceptCard!: ConceptCard;
+  loadingMessage!: string;
+  skillDeletedMessage!: string;
   conceptsCards: ConceptCard[] = [];
-  currentConceptCard: ConceptCard;
   numberOfWorkedExamplesShown: number = 0;
-  loadingMessage: string;
-  skillDeletedMessage: string;
-  explanationIsShown: boolean;
+  explanationIsShown: boolean = false;
 
 
   constructor(

@@ -1,0 +1,57 @@
+<div class="modal-header">
+  <svg xmlns="http://www.w3.org/2000/svg" width="120" height="120" viewBox="0 0 120 120" fill="none">
+    <path opacity="0.5" d="M108 60C108 72.7304 102.943 84.9394 93.9411 93.9411C84.9394 102.943 72.7304 108 60 108C47.2696 108 35.0606 102.943 26.0589
+          93.9411C17.0571 84.9394 12 72.7304 12 60C12 47.2696 17.0571 35.0606 26.0589 26.0589C35.0606 17.0571 47.2696 12 60 12C64.56 12 69 12.66 73.2
+          13.86L82.62 4.44C75.66 1.56 68.04 0 60 0C52.1207 0 44.3185 1.55195 37.039 4.56723C29.7595 7.58251 23.1451 12.0021 17.5736 17.5736C6.32141
+          28.8258 0 44.087 0 60C0 75.913 6.32141 91.1742 17.5736 102.426C23.1451 107.998 29.7595 112.417 37.039 115.433C44.3185
+          118.448 52.1207 120 60 120C75.913 120 91.1742 113.679 102.426 102.426C113.679 91.1742 120 75.913 120 60H108Z"
+          fill="#27635C"
+    />
+    <path opacity="0.9" d="M39.6631 48.4805L31.2031 57.0005L58.2031 84.0005L118.203 24.0005L109.743 15.4805L58.2031 67.0205L39.6631 48.4805Z" fill="#27635C"/>
+  </svg>
+</div>
+
+<div class="modal-body">
+  <p class="add-syllabus-success-message">You have successfully added {{itemsAddedCount}}
+    <span *ngIf="itemsAddedCount === 1">item </span>
+    <span *ngIf="itemsAddedCount > 1">items </span>
+    into the syllabus!
+  </p>
+</div>
+
+<div class="modal-footer">
+  <button class="btn btn-primary" (click)="confirm()">Finished!</button>
+  <div class="continue-to-edit" (click)="cancel()">Continue to edit</div>
+</div>
+
+<style>
+  .add-syllabus-success-message {
+    font-weight: 500;
+    text-align: center;
+  }
+
+  .btn-primary {
+    background-color: #00645c;
+    border: solid 1px #00645c;
+    font-size: 18px;
+    font-weight: 500;
+    margin-bottom: 24px;
+    margin-right: 0;
+    padding: 6px 16px;
+  }
+
+  .continue-to-edit {
+    color: #00645c;
+    cursor: pointer;
+    font-weight: 500;
+    text-decoration: underline;
+  }
+
+  .modal-footer {
+    border-top: unset;
+    display: block;
+    padding-bottom: 40px;
+    padding-top: 20px;
+    text-align: center;
+  }
+</style>

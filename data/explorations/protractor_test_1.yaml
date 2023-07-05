@@ -3,6 +3,7 @@ auto_tts_enabled: true
 blurb: ''
 category: Mathematics
 correctness_feedback_enabled: false
+edits_allowed: true
 init_state_name: Intro
 language_code: en
 objective: learn how to count permutations accurately and systematically

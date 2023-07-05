@@ -21,7 +21,7 @@ link before completing the signup process, they will be logged out.
                    [(ngModel)]="username"
                    [ngModelOptions]="{ standalone: true }"
                    id="username"
-                   class="form-control oppia-username-input protractor-test-username-input"
+                   class="form-control oppia-username-input e2e-test-username-input"
                    (blur)="onUsernameInputFormBlur(username)"
                    (change)="updateWarningText(username)"
                    oppiaFocusOn="usernameInputField"
@@ -119,7 +119,7 @@ link before completing the signup process, they will be logged out.
           <input type="checkbox"
                  [(ngModel)]="hasAgreedToLatestTerms"
                  [ngModelOptions]="{standalone: true}"
-                 class="protractor-test-agree-to-terms-checkbox"
+                 class="oppia-checkbox-margin e2e-test-agree-to-terms-checkbox"
                  id="terms-checkbox">
           <span innerHTML="{{ 'I18N_SIGNUP_AGREE_LICENSE_DESCRIPTION' | translate: { sitename: siteName } }}">
           </span>
@@ -129,7 +129,7 @@ link before completing the signup process, they will be logged out.
       <br>
 
       <button type="submit"
-              class="btn btn-success protractor-test-register-user"
+              class="btn btn-success e2e-test-register-user"
               [disabled]="warningI18nCode || !hasAgreedToLatestTerms || submissionInProcess || usernameCheckIsInProgress"
               (click)="submitPrerequisitesForm(hasAgreedToLatestTerms, username, canReceiveEmailUpdates)"
               translate="I18N_SIGNUP_BUTTON_SUBMIT"
@@ -161,5 +161,8 @@ link before completing the signup process, they will be logged out.
   }
   .oppia-signup-site-description-text {
     font-size: 1em;
+  }
+  .oppia-checkbox-margin {
+    margin-right: 6px;
   }
 </style>

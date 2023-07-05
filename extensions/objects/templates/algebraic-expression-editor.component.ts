@@ -29,6 +29,7 @@ import { DeviceInfoService } from 'services/contextual/device-info.service';
 import { GuppyConfigurationService } from 'services/guppy-configuration.service';
 import { GuppyInitializationService } from 'services/guppy-initialization.service';
 import { MathInteractionsService } from 'services/math-interactions.service';
+import { TranslateService } from '@ngx-translate/core';
 
 interface FocusObj {
   focused: boolean;
@@ -40,7 +41,7 @@ interface FocusObj {
 })
 export class AlgebraicExpressionEditorComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks
-  // and we need to do non-null assertion, for more information see
+  // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() modalId!: symbol;
   @Input() value!: string;
@@ -56,7 +57,8 @@ export class AlgebraicExpressionEditorComponent implements OnInit {
     private guppyConfigurationService: GuppyConfigurationService,
     private guppyInitializationService: GuppyInitializationService,
     private mathInteractionsService: MathInteractionsService,
-    private eventBusService: EventBusService
+    private eventBusService: EventBusService,
+    private translateService: TranslateService
   ) {
     this.eventBusGroup = new EventBusGroup(this.eventBusService);
   }
@@ -68,50 +70,28 @@ export class AlgebraicExpressionEditorComponent implements OnInit {
     }
     this.currentValue = this.value;
     this.guppyConfigurationService.init();
+    let translatedPlaceholder = this.translateService.instant(
+      AppConstants.MATH_INTERACTION_PLACEHOLDERS.AlgebraicExpressionInput);
     this.guppyInitializationService.init(
-      'guppy-div-creator',
-      AppConstants.MATH_INTERACTION_PLACEHOLDERS.AlgebraicExpressionInput,
-      this.value);
-    let eventType = (
-      this.deviceInfoService.isMobileUserAgent() &&
-      this.deviceInfoService.hasTouchEvents()) ? 'focus' : 'change';
-    if (eventType === 'focus') {
-      // We need the 'focus' event while using the on screen keyboard (only
-      // for touch-based devices) to capture input from user and the 'change'
-      // event while using the normal keyboard.
-      Guppy.event('focus', (focusObj: FocusObj) => {
-        const activeGuppyObject = (
-          this.guppyInitializationService.findActiveGuppyObject());
-        if (activeGuppyObject !== undefined) {
-          this.hasBeenTouched = true;
-          this.currentValue = activeGuppyObject.guppyInstance.asciimath();
-        }
-        if (!focusObj.focused) {
-          this.isCurrentAnswerValid();
-        }
-      });
-    } else {
-      // We need the 'focus' event while using the on screen keyboard (only
-      // for touch-based devices) to capture input from user and the 'change'
-      // event while using the normal keyboard.
-      Guppy.event('change', (focusObj: FocusObj) => {
-        const activeGuppyObject = (
-          this.guppyInitializationService.findActiveGuppyObject());
-        if (activeGuppyObject !== undefined) {
-          this.hasBeenTouched = true;
-          this.currentValue = activeGuppyObject.guppyInstance.asciimath();
-          this.isCurrentAnswerValid();
-        }
-        if (!focusObj.focused) {
-          this.isCurrentAnswerValid();
-        }
-      });
-      Guppy.event('focus', (focusObj: FocusObj) => {
-        if (!focusObj.focused) {
-          this.isCurrentAnswerValid();
-        }
-      });
-    }
+      'guppy-div-creator', translatedPlaceholder, this.value);
+
+    Guppy.event('change', (focusObj: FocusObj) => {
+      const activeGuppyObject = (
+        this.guppyInitializationService.findActiveGuppyObject());
+      if (activeGuppyObject !== undefined) {
+        this.hasBeenTouched = true;
+        this.currentValue = activeGuppyObject.guppyInstance.asciimath();
+        this.isCurrentAnswerValid();
+      }
+      if (!focusObj.focused) {
+        this.isCurrentAnswerValid();
+      }
+    });
+    Guppy.event('focus', (focusObj: FocusObj) => {
+      if (!focusObj.focused) {
+        this.isCurrentAnswerValid();
+      }
+    });
   }
 
   isCurrentAnswerValid(): boolean {
@@ -122,7 +102,7 @@ export class AlgebraicExpressionEditorComponent implements OnInit {
     const answerIsValid = (
       this.mathInteractionsService.validateAlgebraicExpression(
         this.currentValue,
-        this.guppyInitializationService.getCustomOskLetters()));
+        this.guppyInitializationService.getAllowedVariables()));
     if (this.guppyInitializationService.findActiveGuppyObject() === undefined) {
       // The warnings should only be displayed when the editor is inactive
       // focus, i.e., the user is done typing.

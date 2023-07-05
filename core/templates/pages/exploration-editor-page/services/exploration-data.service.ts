@@ -41,11 +41,14 @@ export interface DraftAutoSaveResponse {
   providedIn: 'root'
 })
 export class ExplorationDataService {
-  draftChangeListId: number | null = null;
-  explorationDraftAutosaveUrl: string;
-  explorationId: string;
-  resolvedAnswersUrlPrefix: string;
-  data: ExplorationBackendDict;
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  draftChangeListId!: number;
+  explorationDraftAutosaveUrl!: string;
+  explorationId!: string;
+  resolvedAnswersUrlPrefix!: string;
+  data!: ExplorationBackendDict;
 
   constructor(
     private alertsService: AlertsService,
@@ -73,11 +76,6 @@ export class ExplorationDataService {
     if (!explorationId) {
       this.loggerService.error(
         'Unexpected call to ExplorationDataService for pathname: ' + pathname);
-      this.autosaveChangeListAsync = undefined;
-      this.discardDraftAsync = undefined;
-      this.getDataAsync = undefined;
-      this.getLastSavedDataAsync = undefined;
-      this.save = undefined;
     } else {
       this.explorationId = explorationId;
       this.resolvedAnswersUrlPrefix = (
@@ -91,6 +89,9 @@ export class ExplorationDataService {
       changeList: ExplorationChange[]): Promise<DraftAutoSaveResponse> {
     this.localStorageService.saveExplorationDraft(
       this.explorationId, changeList, this.draftChangeListId);
+    if (!this.data.version) {
+      throw new Error('Version cannot be undefined');
+    }
     return this.explorationDataBackendApiService.saveChangeList(
       this.explorationDraftAutosaveUrl,
       changeList,
@@ -189,6 +190,7 @@ export class ExplorationDataService {
       return response.exploration;
     });
   }
+
   /**
    * Saves the exploration to the backend, and, on a success callback,
    * updates the local copy of the exploration data.
@@ -205,24 +207,27 @@ export class ExplorationDataService {
       successCallback: (
         isDraftVersionvalid: boolean,
         draftChanges: ExplorationChange[]) => void,
-      errorCallback: () => void): void {
+      errorCallback: (errorResponse?: object) => void): void {
+    let dataVersion = 1;
+    if (this.data && this.data.version !== undefined) {
+      dataVersion = this.data.version;
+    }
     this.editableExplorationBackendApiService.updateExplorationAsync(
       this.explorationId,
-    this.data ? this.data.version : null,
-    commitMessage, changeList).then(
-      response => {
-        this.alertsService.clearWarnings();
-        this.data = response;
-        if (successCallback) {
-          successCallback(
-            response.is_version_of_draft_valid,
-            response.draft_changes);
-        }
-      }, () => {
-        if (errorCallback) {
-          errorCallback();
-        }
+      dataVersion, commitMessage, changeList
+    ).then(response => {
+      this.alertsService.clearWarnings();
+      this.data = response;
+      if (successCallback) {
+        successCallback(
+          response.is_version_of_draft_valid,
+          response.draft_changes);
       }
+    }, (response) => {
+      if (errorCallback) {
+        errorCallback(response);
+      }
+    }
     );
   }
 }

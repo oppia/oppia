@@ -22,17 +22,21 @@ from core import feconf
 from core import utils
 from core.platform import models
 
-from typing import Any, Dict, List, Optional, Sequence, Tuple, Union
+from typing import Dict, Final, List, Optional, Sequence, Tuple, Union
 
 MYPY = False
 if MYPY: # pragma: no cover
+    # Here, we are importing 'classifier_domain' and 'classifier_services'
+    # only for type checking.
+    from core.domain import classifier_domain  # pylint: disable=invalid-import # isort:skip
+    from core.domain import classifier_services  # pylint: disable=invalid-import # isort:skip
     from mypy_imports import base_models
     from mypy_imports import datastore_services
 
-(base_models,) = models.Registry.import_models([models.NAMES.base_model])
+(base_models,) = models.Registry.import_models([models.Names.BASE_MODEL])
 datastore_services = models.Registry.import_datastore_services()
 
-NEW_AND_PENDING_TRAINING_JOBS_FETCH_LIMIT = 100
+NEW_AND_PENDING_TRAINING_JOBS_FETCH_LIMIT: Final = 100
 
 TrainingDataUnionType = Union[
     Dict[str, Union[int, List[str]]],
@@ -107,7 +111,7 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
         })
 
     @classmethod
-    def _generate_id(cls, exp_id: str) -> str:
+    def generate_id(cls, exp_id: str) -> str:
         """Generates a unique id for the training job of the form
         '[exp_id].[random hash of 16 chars]'.
 
@@ -137,16 +141,16 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
 
     @classmethod
     def create(
-            cls,
-            algorithm_id: str,
-            interaction_id: str,
-            exp_id: str,
-            exp_version: int,
-            next_scheduled_check_time: datetime.datetime,
-            training_data: TrainingDataUnionType,
-            state_name: str,
-            status: str,
-            algorithm_version: int
+        cls,
+        algorithm_id: str,
+        interaction_id: str,
+        exp_id: str,
+        exp_version: int,
+        next_scheduled_check_time: datetime.datetime,
+        training_data: TrainingDataUnionType,
+        state_name: str,
+        status: str,
+        algorithm_version: int
     ) -> str:
         """Creates a new ClassifierTrainingJobModel entry.
 
@@ -173,7 +177,7 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
             Exception. A model with the same ID already exists.
         """
 
-        instance_id = cls._generate_id(exp_id)
+        instance_id = cls.generate_id(exp_id)
         training_job_instance = cls(
             id=instance_id, algorithm_id=algorithm_id,
             interaction_id=interaction_id,
@@ -191,7 +195,7 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
 
     @classmethod
     def query_new_and_pending_training_jobs(
-            cls, offset: int
+        cls, offset: int
     ) -> Tuple[Sequence[ClassifierTrainingJobModel], int]:
         """Gets the next 10 jobs which are either in status "new" or "pending",
         ordered by their next_scheduled_check_time attribute.
@@ -224,10 +228,10 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
         offset = offset + len(classifier_job_models)
         return classifier_job_models, offset
 
-    # TODO(#13523): Change 'job_dict' to domain object/TypedDict to
-    # remove Any from type-annotation below.
     @classmethod
-    def create_multi(cls, job_dicts_list: List[Dict[str, Any]]) -> List[str]:
+    def create_multi(
+        cls, job_dicts_list: List[classifier_services.JobInfoDict]
+    ) -> List[str]:
         """Creates multiple new  ClassifierTrainingJobModel entries.
 
         Args:
@@ -240,7 +244,7 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
         job_models = []
         job_ids = []
         for job_dict in job_dicts_list:
-            instance_id = cls._generate_id(job_dict['exp_id'])
+            instance_id = cls.generate_id(job_dict['exp_id'])
             training_job_instance = cls(
                 id=instance_id, algorithm_id=job_dict['algorithm_id'],
                 interaction_id=job_dict['interaction_id'],
@@ -301,11 +305,11 @@ class StateTrainingJobsMappingModel(base_models.BaseModel):
         })
 
     @classmethod
-    def _generate_id(
-            cls,
-            exp_id: str,
-            exp_version: int,
-            state_name: str
+    def get_entity_id(
+        cls,
+        exp_id: str,
+        exp_version: int,
+        state_name: str
     ) -> str:
         """Generates a unique ID for the Classifier Exploration Mapping of the
         form [exp_id].[exp_version].[state_name].
@@ -342,7 +346,7 @@ class StateTrainingJobsMappingModel(base_models.BaseModel):
         """
         mapping_ids = []
         for state_name in state_names:
-            mapping_id = cls._generate_id(exp_id, exp_version, state_name)
+            mapping_id = cls.get_entity_id(exp_id, exp_version, state_name)
             mapping_ids.append(mapping_id)
         mapping_instances = cls.get_multi(mapping_ids)
         return mapping_instances
@@ -366,17 +370,17 @@ class StateTrainingJobsMappingModel(base_models.BaseModel):
             for the classifier exploration mapping. It returns None if the no
             entry for given <exp_id, exp_version, state_name> is found.
         """
-        mapping_id = cls._generate_id(exp_id, exp_version, state_name)
+        mapping_id = cls.get_entity_id(exp_id, exp_version, state_name)
         model = cls.get_by_id(mapping_id)
         return model
 
     @classmethod
     def create(
-            cls,
-            exp_id: str,
-            exp_version: int,
-            state_name: str,
-            algorithm_ids_to_job_ids: Dict[str, str]
+        cls,
+        exp_id: str,
+        exp_version: int,
+        state_name: str,
+        algorithm_ids_to_job_ids: Dict[str, str]
     ) -> str:
         """Creates a new ClassifierExplorationMappingModel entry.
 
@@ -397,7 +401,7 @@ class StateTrainingJobsMappingModel(base_models.BaseModel):
             Exception. A model with the same ID already exists.
         """
 
-        instance_id = cls._generate_id(exp_id, exp_version, state_name)
+        instance_id = cls.get_entity_id(exp_id, exp_version, state_name)
         if not cls.get_by_id(instance_id):
             mapping_instance = cls(
                 id=instance_id, exp_id=exp_id, exp_version=exp_version,
@@ -411,8 +415,10 @@ class StateTrainingJobsMappingModel(base_models.BaseModel):
 
     @classmethod
     def create_multi(
-            cls,
-            state_training_jobs_mappings: List[StateTrainingJobsMappingModel]
+        cls,
+        state_training_jobs_mappings: List[
+            classifier_domain.StateTrainingJobsMapping
+        ]
     ) -> List[str]:
         """Creates multiple new StateTrainingJobsMappingModel entries.
 
@@ -426,7 +432,7 @@ class StateTrainingJobsMappingModel(base_models.BaseModel):
         mapping_models = []
         mapping_ids = []
         for state_training_job_mapping in state_training_jobs_mappings:
-            instance_id = cls._generate_id(
+            instance_id = cls.get_entity_id(
                 state_training_job_mapping.exp_id,
                 state_training_job_mapping.exp_version,
                 state_training_job_mapping.state_name)

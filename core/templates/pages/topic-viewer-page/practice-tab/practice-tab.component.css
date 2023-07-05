@@ -1,0 +1,193 @@
+/*
+  NOTE to developers: We generate RTL CSS from this file in the webpack
+  compilation, here are sme additional rules that can be added to the CSS files:
+  https://rtlcss.com/learn/usage-guide/control-directives .
+*/
+.practice-tab .oppia-practice-tab-container .oppia-page-card {
+  border-radius: 0.25em;
+  margin-top: 10em;
+  padding-bottom: 7.5vh;
+  padding-left: 48px;
+  padding-right: 48px;
+  width: 550px;
+}
+
+.practice-tab .practice-tab-for-learner-dashboard .oppia-page-card {
+  box-shadow: none;
+  margin-bottom: 0;
+  margin-top: 0;
+  padding-right: 0;
+  position: relative;
+  right: 41px;
+  width: 691px;
+}
+
+.practice-tab .practice-tab-for-learner-dashboard .capsule-progress {
+  background: transparent;
+  border: 1px solid black;
+  border-radius: 80px;
+  float: right;
+  height: 16px;
+  margin: 0 auto;
+  position: relative;
+  top: 12px;
+  width: 256px;
+}
+
+.practice-tab .practice-tab-for-learner-dashboard .subtopic-mastery {
+  bottom: 2.2px;
+  color: #333;
+  float: right;
+  font-size: 13px;
+  font-style: italic;
+  position: relative;
+  right: 6px;
+  z-index: 2;
+}
+
+.practice-tab .practice-tab-for-learner-dashboard .subtopic-title {
+  color: #333;
+  font-size: 18px;
+}
+
+.practice-tab-subtopic-item {
+  margin: 5px 0;
+}
+
+.practice-tab .practice-tab-for-learner-dashboard .practice-tab-subtopic-item {
+  border-bottom: 1px solid #ccc;
+  margin-bottom: 0;
+  padding-bottom: 14px;
+}
+
+.practice-tab .practice-tab-for-learner-dashboard .card-actions {
+  border-bottom: 1px solid;
+}
+
+.practice-button-background-status-complete {
+  background-color: #00645c;
+}
+
+.practice-button-background-status-pending {
+  background-color: rgba(0, 0, 0, .26);
+  box-shadow: none;
+}
+
+.practice-tab .practice-session-button {
+  align-self: center;
+  border-radius: 0.4em;
+  color: white;
+  font-family: "Roboto", Arial, sans-serif;
+  height: 36px;
+  margin-top: 20px;
+  text-transform: uppercase;
+  width: 200px;
+}
+
+.practice-tab .practice-session-button:disabled {
+  background-color: rgba(0, 0, 0, .26);
+  box-shadow: none;
+  color: rgba(0, 0, 0, .26);
+}
+
+.practice-tab .practice-tab-for-learner-dashboard .full-width .practice-session-button {
+  bottom: 21px;
+  position: relative;
+}
+
+.practice-tab .font-heavy {
+  font-size: medium;
+  font-weight: bold;
+  letter-spacing: 0.0625em;
+}
+
+.practice-tab .tab-title {
+  margin: .83em 0;
+}
+
+.beta-label {
+  background-color: #00645c;
+  color: white;
+  font-size: 13px;
+  margin: 0;
+  padding: 5px 12px;
+  position: absolute;
+  right: 0;
+}
+
+.beta-label:hover {
+  background-color: #003d38;
+}
+
+@media (max-width: 1024px) {
+  .practice-tab .oppia-practice-tab-container .oppia-page-card {
+    width: 60vw;
+  }
+}
+
+@media (max-width: 500px) {
+  .practice-tab .oppia-practice-tab-container .oppia-page-card {
+    padding: 15px 24px 64px 24px;
+    width: 90vw;
+  }
+  .practice-tab .practice-tab-for-learner-dashboard .oppia-page-card {
+    right: 38px;
+    width: 69vw;
+  }
+  .practice-tab .practice-tab-for-learner-dashboard .capsule-progress {
+    height: 13px;
+    right: -5px;
+    width: 215px;
+  }
+  .practice-tab .practice-tab-for-learner-dashboard .subtopic-mastery {
+    font-size: 10px;
+  }
+  .practice-tab .practice-tab-for-learner-dashboard .practice-tab-subtopic-item {
+    padding-bottom: 44px;
+  }
+  .practice-tab .practice-tab-for-learner-dashboard .practice-tab-mat-checkbox {
+    display: block;
+  }
+  .practice-tab .practice-tab-for-learner-dashboard .card-actions {
+    left: 10px;
+    position: relative;
+  }
+}
+
+.practice-tab .mat-button {
+  align-self: center;
+  border-radius: 0.4em;
+  color: white;
+  font-family: "Roboto", Arial, sans-serif;
+  margin-top: 20px;
+  text-transform: uppercase;
+  width: 200px;
+}
+
+.practice-tab .practice-tab-mat-checkbox .mat-label {
+  margin-top: -1px;
+  vertical-align: top;
+}
+
+.practice-tab .practice-session-button .question-status-spinner {
+  margin: 0 auto;
+}
+
+.practice-tab .practice-tab-mat-checkbox {
+  margin-top: 1vh;
+}
+
+.practice-tab .full-width {
+  text-align: center;
+  width: 100%;
+}
+
+.practice-tab .practice-content {
+  font-family: "Roboto", Arial, sans-serif;
+  font-size: 1.2em;
+  margin-bottom: 2.5vh;
+}
+
+.practice-tab .oppia-topic-viewer-container .background-banner-position {
+  position: inherit;
+}

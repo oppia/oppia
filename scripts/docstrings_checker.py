@@ -18,25 +18,15 @@
 
 from __future__ import annotations
 
-import ast
-import os
 import re
-import sys
 
-from core import python_utils
-from scripts import common
-
-_PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
-_PYLINT_PATH = os.path.join(
-    _PARENT_DIR, 'oppia_tools', 'pylint-%s' % common.PYLINT_VERSION)
-sys.path.insert(0, _PYLINT_PATH)
-
-import astroid # isort:skip  pylint: disable=wrong-import-order, wrong-import-position
-from pylint.checkers import utils # isort:skip  pylint: disable=wrong-import-order, wrong-import-position
-from pylint.extensions import _check_docs_utils # isort:skip  pylint: disable=wrong-import-order, wrong-import-position
+import astroid
+from pylint.checkers import utils
+from pylint.extensions import _check_docs_utils
+from typing import Optional, Set
 
 
-def space_indentation(s):
+def space_indentation(s: str) -> int:
     """The number of leading spaces in a string
 
     Args:
@@ -48,11 +38,11 @@ def space_indentation(s):
     return len(s) - len(s.lstrip(' '))
 
 
-def get_setters_property_name(node):
+def get_setters_property_name(node: astroid.FunctionDef) -> Optional[str]:
     """Get the name of the property that the given node is a setter for.
 
     Args:
-        node: str. The node to get the property name for.
+        node: astroid.FunctionDef. The node to get the property name for.
 
     Returns:
         str|None. The name of the property that the node is a setter for,
@@ -61,13 +51,17 @@ def get_setters_property_name(node):
     decorator_nodes = node.decorators.nodes if node.decorators else []
     for decorator_node in decorator_nodes:
         if (isinstance(decorator_node, astroid.Attribute) and
-                decorator_node.attrname == 'setter' and
-                isinstance(decorator_node.expr, astroid.Name)):
-            return decorator_node.expr.name
+            decorator_node.attrname == 'setter' and
+            isinstance(decorator_node.expr, astroid.Name)
+        ):
+            decorator_name: Optional[str] = decorator_node.expr.name
+            return decorator_name
     return None
 
 
-def get_setters_property(node):
+def get_setters_property(
+    node: astroid.FunctionDef
+) -> Optional[astroid.FunctionDef]:
     """Get the property node for the given setter node.
 
     Args:
@@ -91,7 +85,7 @@ def get_setters_property(node):
     return setters_property
 
 
-def returns_something(return_node):
+def returns_something(return_node: astroid.Return) -> bool:
     """Check if a return node returns a value other than None.
 
     Args:
@@ -109,7 +103,7 @@ def returns_something(return_node):
     return not (isinstance(returns, astroid.Const) and returns.value is None)
 
 
-def possible_exc_types(node):
+def possible_exc_types(node: astroid.NodeNG) -> Set[str]:
     """Gets all of the possible raised exception types for the given raise node.
     Caught exception types are ignored.
 
@@ -147,9 +141,9 @@ def possible_exc_types(node):
 
         if handler and handler.type:
             inferred_excs = astroid.unpack_infer(handler.type)
-            excs = (
+            excs = [
                 exc.name for exc in inferred_excs
-                if exc is not astroid.Uninferable)
+                if exc is not astroid.Uninferable]
 
     try:
         return set(
@@ -159,7 +153,7 @@ def possible_exc_types(node):
         return set()
 
 
-def docstringify(docstring):
+def docstringify(docstring: str) -> _check_docs_utils.Docstring:
     """Converts a docstring in its str form to its Docstring object
     as defined in the pylint library.
 
@@ -178,7 +172,13 @@ def docstringify(docstring):
     return _check_docs_utils.Docstring(docstring)
 
 
-class GoogleDocstring(_check_docs_utils.GoogleDocstring):
+# TODO(#16567): Here we use MyPy ignore because of the incomplete typing of
+# pylint library and absences of stubs in pylint, forces MyPy to
+# assume that BaseChecker class has attributes of type Any.
+# Thus to avoid MyPy's error
+# (Class cannot subclass 'BaseChecker' (has type 'Any')),
+# we added an ignore here.
+class GoogleDocstring(_check_docs_utils.GoogleDocstring):  # type: ignore[misc]
     """Class for checking whether docstrings follow the Google Python Style
     Guide.
     """
@@ -214,107 +214,3 @@ class GoogleDocstring(_check_docs_utils.GoogleDocstring):
     """.format(
         type=re_multiple_type,
     ), flags=re.X | re.S | re.M)
-
-
-class ASTDocStringChecker:
-    """Checks that docstrings meet the code style."""
-
-    def __init__(self):
-        pass
-
-    @classmethod
-    def get_args_list_from_function_definition(cls, function_node):
-        """Extracts the arguments from a function definition.
-        Ignores class specific arguments (self and cls).
-
-        Args:
-            function_node: ast.FunctionDef. Represents a function.
-
-        Returns:
-            list(str). The args for a function as listed in the function
-            definition.
-        """
-        # Ignore self and cls args.
-        args_to_ignore = ['self', 'cls']
-        return python_utils.get_args_of_function_node(
-            function_node, args_to_ignore)
-
-    @classmethod
-    def build_regex_from_args(cls, function_args):
-        """Builds a regex string from a function's arguments to match against
-        the docstring. Ensures the docstring contains an 'Args' header, and
-        each of the arguments are listed, followed by a colon, separated by new
-        lines, and are listed in the correct order.
-
-        Args:
-            function_args: list(str). The arguments for a function.
-
-        Returns:
-            str. A regex that checks for an "Arg" header and then each arg term
-            with a colon in order with any characters in between.
-            The resulting regex looks like this (the backslashes are escaped):
-                (Args:)[\\S\\s]*(arg_name0:)[\\S\\s]*(arg_name1:)
-            If passed an empty list, returns None.
-        """
-        if len(function_args) > 0:
-            formatted_args = ['({}:)'.format(arg) for arg in function_args]
-            return r'(Args:)[\S\s]*' + r'[\S\s]*'.join(formatted_args)
-
-    @classmethod
-    def compare_arg_order(cls, func_def_args, docstring):
-        """Compares the arguments listed in the function definition and
-        docstring, and raises errors if there are missing or mis-ordered
-        arguments in the docstring.
-
-        Args:
-            func_def_args: list(str). The args as listed in the function
-                definition.
-            docstring: str. The contents of the docstring under the Args
-                header.
-
-        Returns:
-            list(str). Each str contains an error message. If no linting
-            errors were found, the list will be empty.
-        """
-        results = []
-
-        # If there is no docstring or it doesn't have an Args section, exit
-        # without errors.
-        if docstring is None or 'Args' not in docstring:
-            return results
-
-        # First check that each arg is in the docstring.
-        for arg_name in func_def_args:
-            arg_name_colon = arg_name + ':'
-            if arg_name_colon not in docstring:
-                if arg_name not in docstring:
-                    results.append('Arg missing from docstring: {}'.format(
-                        arg_name))
-                else:
-                    results.append('Arg not followed by colon: {}'.format(
-                        arg_name))
-        # Only check ordering if there's more than one argument in the
-        # function definition, and no other errors have been found.
-        if len(func_def_args) > 0 and len(results) == 0:
-            regex_pattern = cls.build_regex_from_args(func_def_args)
-            regex_result = re.search(regex_pattern, docstring)
-            if regex_result is None:
-                results.append('Arg ordering error in docstring.')
-        return results
-
-    @classmethod
-    def check_docstrings_arg_order(cls, function_node):
-        """Extracts the arguments from a function definition.
-
-        Args:
-            function_node: ast node object. Represents a function.
-
-        Returns:
-            list(str). List of docstring errors associated with
-            the function. If the function has no errors, the list is empty.
-        """
-        func_def_args = cls.get_args_list_from_function_definition(
-            function_node)
-        docstring = ast.get_docstring(function_node)
-        func_result = cls.compare_arg_order(func_def_args, docstring)
-        return func_result

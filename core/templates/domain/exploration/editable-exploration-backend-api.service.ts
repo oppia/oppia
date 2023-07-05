@@ -35,6 +35,7 @@ export class EditableExplorationBackendApiService {
     private readOnlyExplorationBackendApiService:
       ReadOnlyExplorationBackendApiService,
     private urlInterpolationService: UrlInterpolationService) {}
+
   private async _fetchExplorationAsync(
       explorationId: string,
       applyDraft: boolean): Promise<ExplorationBackendDict> {
@@ -121,6 +122,78 @@ export class EditableExplorationBackendApiService {
       changeList: ExplorationChange[]): Promise<ExplorationBackendDict> {
     return this._updateExplorationAsync(
       explorationId, explorationVersion, commitMessage, changeList);
+  }
+
+  async recordMostRecentlyReachedCheckpointAsync(
+      explorationId: string,
+      mostRecentlyReachedCheckpointExpVersion: number,
+      mostRecentlyReachedCheckpointStateName: string,
+      isUserLoggedIn: boolean,
+      uniqueProgressUrlId: string | null = null
+  ): Promise<void> {
+    let requestUrl = '';
+    if (isUserLoggedIn) {
+      requestUrl = '/explorehandler/checkpoint_reached/' + explorationId;
+      return this.httpClient.put<void>(requestUrl, {
+        most_recently_reached_checkpoint_exp_version:
+          mostRecentlyReachedCheckpointExpVersion,
+        most_recently_reached_checkpoint_state_name:
+          mostRecentlyReachedCheckpointStateName
+      }).toPromise();
+    } else if (!isUserLoggedIn && uniqueProgressUrlId) {
+      requestUrl = (
+        '/explorehandler/checkpoint_reached_by_logged_out_user/' +
+        explorationId);
+      return this.httpClient.put<void>(requestUrl, {
+        unique_progress_url_id: uniqueProgressUrlId,
+        most_recently_reached_checkpoint_exp_version:
+          mostRecentlyReachedCheckpointExpVersion,
+        most_recently_reached_checkpoint_state_name:
+          mostRecentlyReachedCheckpointStateName
+      }).toPromise();
+    }
+  }
+
+  async recordProgressAndFetchUniqueProgressIdOfLoggedOutLearner(
+      explorationId: string,
+      mostRecentlyReachedCheckpointExpVersion: number,
+      mostRecentlyReachedCheckpointStateName: string,
+  ): Promise< {'unique_progress_url_id': string} > {
+    const requestUrl =
+      '/explorehandler/checkpoint_reached_by_logged_out_user/' + explorationId;
+    return this.httpClient.post<{'unique_progress_url_id': string}>(
+      requestUrl, {
+        most_recently_reached_checkpoint_exp_version:
+          mostRecentlyReachedCheckpointExpVersion,
+        most_recently_reached_checkpoint_state_name:
+          mostRecentlyReachedCheckpointStateName
+      }).toPromise();
+  }
+
+  async changeLoggedOutProgressToLoggedInProgressAsync(
+      explorationId: string,
+      uniqueProgressUrlId: string
+  ): Promise<void> {
+    const requestUrl =
+      '/sync_logged_out_and_logged_in_progress/' + explorationId;
+    return this.httpClient.post<void>(requestUrl, {
+      unique_progress_url_id: uniqueProgressUrlId
+    }).toPromise();
+  }
+
+  async resetExplorationProgressAsync(explorationId: string): Promise<void> {
+    const requestUrl =
+      '/explorehandler/restart/' + explorationId;
+    return this.httpClient.put<void>(requestUrl, {
+      most_recently_reached_checkpoint_state_name: null
+    }).toPromise();
+  }
+
+  async recordLearnerHasViewedLessonInfoModalOnce(): Promise<void> {
+    const requestUrl = '/userinfohandler/data';
+    return this.httpClient.put<void>(requestUrl, {
+      user_has_viewed_lesson_info_modal_once: true
+    }).toPromise();
   }
 
   /**

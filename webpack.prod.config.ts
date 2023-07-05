@@ -16,9 +16,12 @@
  * @fileoverview Production environment config file for Webpack.
  */
 
-const { merge } = require('webpack-merge');
-const common = require('./webpack.common.config.ts');
-const path = require('path');
+var { merge } = require('webpack-merge');
+var common = require('./webpack.common.config.ts');
+var path = require('path');
+var webpack = require('webpack');
+var analyticsConstants = require('./assets/analytics-constants.json');
+
 
 module.exports = merge(common, {
   mode: 'production',
@@ -26,5 +29,16 @@ module.exports = merge(common, {
     filename: '[name].[contenthash].bundle.js',
     path: path.resolve(__dirname, 'backend_prod_files/webpack_bundles'),
     publicPath: '/build/webpack_bundles/'
-  }
+  },
+  plugins: [
+    // This plugin performs a direct text replacement, so the value given to it
+    // must include the surrounding quotes. This is done using JSON.stringify.
+    // See https://webpack.js.org/plugins/define-plugin/
+    new webpack.DefinePlugin({
+      GA_ANALYTICS_ID: JSON.stringify(analyticsConstants.GA_ANALYTICS_ID),
+      SITE_NAME_FOR_ANALYTICS: JSON.stringify(
+        analyticsConstants.SITE_NAME_FOR_ANALYTICS
+      ),
+    })
+  ]
 });

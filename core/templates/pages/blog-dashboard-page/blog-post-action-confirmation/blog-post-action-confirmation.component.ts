@@ -29,7 +29,10 @@ import { BlogDashboardPageConstants } from 'pages/blog-dashboard-page/blog-dashb
 })
 export class BlogPostActionConfirmationModalComponent
   extends ConfirmOrCancelModal implements OnInit {
-  blogPostAction: string;
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  blogPostAction!: string;
   constructor(
       ngbActiveModal: NgbActiveModal,
       private blogDashboardPageService: BlogDashboardPageService,

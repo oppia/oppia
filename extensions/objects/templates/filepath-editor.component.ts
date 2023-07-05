@@ -16,7 +16,7 @@
  * @fileoverview Component for filepath editor.
  */
 
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, SimpleChanges } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 
 @Component({
@@ -26,7 +26,7 @@ import { downgradeComponent } from '@angular/upgrade/static';
 })
 export class FilepathEditorComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks
-  // and we need to do non-null assertion, for more information see
+  // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() modalId!: symbol;
   @Input() value!: string;
@@ -42,24 +42,46 @@ export class FilepathEditorComponent implements OnInit {
     }
     if (this.value.endsWith('.svg')) {
       this.svgEditorIsShown = true;
+      this.imageEditorIsShown = false;
     } else {
+      this.svgEditorIsShown = false;
       this.imageEditorIsShown = true;
     }
+  }
+
+  resetEditor(): void {
+    this.svgEditorIsShown = false;
+    this.imageEditorIsShown = false;
+    this.value = '';
+    this.validityChange.emit({ empty: false });
+    return;
   }
 
   valueHasChanged(event: string): void {
     this.valueChanged.emit(event);
   }
+
   validityHasChanged(event: Record<'empty', boolean>): void {
     this.validityChange.emit(event);
   }
+
   onClickCreateImage(): void {
     this.svgEditorIsShown = true;
     this.imageEditorIsShown = false;
   }
+
   onClickUploadImage(): void {
     this.imageEditorIsShown = true;
     this.svgEditorIsShown = false;
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (
+      changes.value &&
+      changes.value.currentValue !== changes.value.previousValue
+    ) {
+      this.ngOnInit();
+    }
   }
 }
 

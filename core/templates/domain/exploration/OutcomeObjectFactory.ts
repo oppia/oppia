@@ -26,9 +26,11 @@ import {
 } from 'domain/exploration/subtitled-html.model';
 import { ParamChangeBackendDict } from
   'domain/exploration/ParamChangeObjectFactory';
+import { BaseTranslatableObject } from 'domain/objects/BaseTranslatableObject.model';
 
 export interface OutcomeBackendDict {
   'dest': string;
+  'dest_if_really_stuck': string | null;
   'feedback': SubtitledHtmlBackendDict;
   'labelled_as_correct': boolean;
   'param_changes': readonly ParamChangeBackendDict[];
@@ -36,24 +38,33 @@ export interface OutcomeBackendDict {
   'missing_prerequisite_skill_id': string | null;
 }
 
-export class Outcome {
+export class Outcome extends BaseTranslatableObject {
   dest: string;
+  destIfReallyStuck: string | null;
   feedback: SubtitledHtml;
   labelledAsCorrect: boolean;
   paramChanges: readonly ParamChangeBackendDict[];
   refresherExplorationId: string | null;
   missingPrerequisiteSkillId: string | null;
   constructor(
-      dest: string, feedback: SubtitledHtml, labelledAsCorrect: boolean,
+      dest: string, destIfReallyStuck: string | null, feedback: SubtitledHtml,
+      labelledAsCorrect: boolean,
       paramChanges: readonly ParamChangeBackendDict[],
       refresherExplorationId: string | null,
       missingPrerequisiteSkillId: string | null) {
+    super();
+
     this.dest = dest;
+    this.destIfReallyStuck = destIfReallyStuck;
     this.feedback = feedback;
     this.labelledAsCorrect = labelledAsCorrect;
     this.paramChanges = paramChanges;
     this.refresherExplorationId = refresherExplorationId;
     this.missingPrerequisiteSkillId = missingPrerequisiteSkillId;
+  }
+
+  getTranslatableFields(): SubtitledHtml[] {
+    return [this.feedback];
   }
 
   setDestination(newValue: string): void {
@@ -63,6 +74,7 @@ export class Outcome {
   toBackendDict(): OutcomeBackendDict {
     return {
       dest: this.dest,
+      dest_if_really_stuck: this.destIfReallyStuck,
       feedback: this.feedback.toBackendDict(),
       labelled_as_correct: this.labelledAsCorrect,
       param_changes: this.paramChanges,
@@ -96,9 +108,11 @@ export class OutcomeObjectFactory {
 
   createNew(
       dest: string, feedbackTextId: string, feedbackText: string,
-      paramChanges: readonly ParamChangeBackendDict[]): Outcome {
+      paramChanges: readonly ParamChangeBackendDict[]
+  ): Outcome {
     return new Outcome(
       dest,
+      null,
       SubtitledHtml.createDefault(
         feedbackText, feedbackTextId),
       false,
@@ -110,6 +124,7 @@ export class OutcomeObjectFactory {
   createFromBackendDict(outcomeDict: OutcomeBackendDict): Outcome {
     return new Outcome(
       outcomeDict.dest,
+      outcomeDict.dest_if_really_stuck,
       SubtitledHtml.createFromBackendDict(
         outcomeDict.feedback),
       outcomeDict.labelled_as_correct,

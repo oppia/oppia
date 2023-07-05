@@ -22,7 +22,13 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 export class ConfirmOrCancelModal {
   constructor(protected modalInstance: NgbActiveModal) {}
 
-  confirm<T>(value: T): void {
+  /**
+   * Function called upon an affirmative user action.
+   * @param value: Value with which the user confirms the action.
+   * Some actions don't require a value when confirming hence this arg is
+   * optional.
+   */
+  confirm<T>(value?: T): void {
     this.modalInstance.close(value);
   }
 

@@ -44,10 +44,12 @@ describe('NumericExpressionEditor', () => {
     asciimath() {
       return 'Dummy value';
     }
+
     configure(name: string, val: Object): void {}
     static event(name: string, handler: Function): void {
       handler({focused: MockGuppy.focused});
     }
+
     static configure(name: string, val: Object): void {}
     static 'remove_global_symbol'(symbol: string): void {}
     static 'add_global_symbol'(name: string, symbol: Object): void {}
@@ -63,7 +65,7 @@ describe('NumericExpressionEditor', () => {
     component = fixture.componentInstance;
     guppyInitializationService = TestBed.inject(GuppyInitializationService);
     deviceInfoService = TestBed.inject(DeviceInfoService);
-    window.Guppy = MockGuppy;
+    window.Guppy = MockGuppy as unknown as Guppy;
   })));
 
   afterEach(() => {
@@ -96,6 +98,8 @@ describe('NumericExpressionEditor', () => {
       mockGuppyObject as GuppyObject);
     // This throws "Type 'null' is not assignable to type 'string'".
     // We need to suppress this error because we are testing validations here.
+    // Validation here refers to the 'if' checks defined in ngOnInit() which
+    // replaces 'value' with empty strings if null or undefined.
     // @ts-ignore
     component.value = null;
     MockGuppy.focused = false;

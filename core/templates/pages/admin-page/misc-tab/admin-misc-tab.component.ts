@@ -32,38 +32,45 @@ export class AdminMiscTabComponent {
   @Output() setStatusMessage: EventEmitter<string> = new EventEmitter();
   DATA_EXTRACTION_QUERY_HANDLER_URL: string = (
     '/explorationdataextractionhandler');
+
   irreversibleActionMessage: string = (
     'This action is irreversible. Are you sure?');
+
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  dataExtractionQueryStatusMessage!: string;
+  oldUsername!: string;
+  newUsername!: string;
+  usernameToGrant!: string;
+  usernameToRevoke!: string;
+  userIdToGet!: string;
+  userIdToDelete!: string;
+  usernameToDelete!: string;
+  expVersion!: number;
+  stateName!: string;
+  numAnswers!: number;
+  expId!: string;
+  topicIdForRegeneratingOpportunities!: string;
+  expIdToRollback!: string;
+  blogPostId!: string;
+  authorUsername!: string;
+  publishedOn!: string;
+  showDataExtractionQueryStatus: boolean = false;
   MAX_USERNAME_LENGTH: number = AppConstants.MAX_USERNAME_LENGTH;
-  showDataExtractionQueryStatus: boolean;
-  dataExtractionQueryStatusMessage: string;
-  oldUsername: string;
-  newUsername: string;
-  usernameToGrant: string;
-  usernameToRevoke: string;
-  userIdToGet: string;
-  userIdToDelete: string;
-  usernameToDelete: string;
-  expVersion: number;
-  stateName: string;
-  numAnswers: number;
-  expId: string;
-  topicIdForRegeneratingOpportunities: string;
-  blogPostId: string;
-  authorUsername: string;
-  publishedOn: string;
+  message: string = '';
 
   constructor(
-    private windowRef: WindowRef,
     private adminBackendApiService: AdminBackendApiService,
-    private adminTaskManagerService: AdminTaskManagerService
+    private adminTaskManagerService: AdminTaskManagerService,
+    private windowRef: WindowRef
   ) {}
 
   clearSearchIndex(): void {
-    if (this.adminTaskManagerService.isTaskRunning()) {
-      return;
-    }
-    if (!this.windowRef.nativeWindow.confirm(this.irreversibleActionMessage)) {
+    if (
+      this.adminTaskManagerService.isTaskRunning() ||
+      !this.windowRef.nativeWindow.confirm(this.irreversibleActionMessage)
+    ) {
       return;
     }
 
@@ -81,10 +88,10 @@ export class AdminMiscTabComponent {
   }
 
   regenerateOpportunitiesRelatedToTopic(): void {
-    if (this.adminTaskManagerService.isTaskRunning()) {
-      return;
-    }
-    if (!this.windowRef.nativeWindow.confirm(this.irreversibleActionMessage)) {
+    if (
+      this.adminTaskManagerService.isTaskRunning() ||
+      !this.windowRef.nativeWindow.confirm(this.irreversibleActionMessage)
+    ) {
       return;
     }
     this.setStatusMessage.emit('Regenerating opportunities...');
@@ -98,10 +105,38 @@ export class AdminMiscTabComponent {
     });
   }
 
+  rollbackExploration(): void {
+    if (
+      this.adminTaskManagerService.isTaskRunning() ||
+      !this.windowRef.nativeWindow.confirm(this.irreversibleActionMessage)
+    ) {
+      return;
+    }
+    this.setStatusMessage.emit(
+      `Rollingback exploration ${this.expIdToRollback}...`);
+    this.adminBackendApiService.rollbackExplorationToSafeState(
+      this.expIdToRollback
+    ).then(response => {
+      this.setStatusMessage.emit(
+        'Exploration rolledback to version: ' + response);
+    }, errorResponse => {
+      this.setStatusMessage.emit('Server error: ' + errorResponse);
+    });
+  }
+
   uploadTopicSimilaritiesFile(): void {
-    let file = (
-      document.getElementById(
-        'topicSimilaritiesFile') as HTMLInputElement).files[0];
+    // 'getElementById' can return null if the element provided as
+    // an argument is invalid.
+    let element = document.getElementById(
+      'topicSimilaritiesFile'
+    ) as HTMLInputElement;
+    if (element === null) {
+      throw new Error('No element with id topicSimilaritiesFile found.');
+    }
+    if (element.files === null) {
+      throw new Error('No files found.');
+    }
+    let file = element.files[0];
     let reader = new FileReader();
     reader.onload = (e) => {
       let data = (e.target as FileReader).result;

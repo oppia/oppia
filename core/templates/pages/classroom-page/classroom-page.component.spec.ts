@@ -17,8 +17,10 @@
  */
 
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { NO_ERRORS_SCHEMA, EventEmitter } from '@angular/core';
 import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
+import { TranslateService } from '@ngx-translate/core';
+
 import { ClassroomBackendApiService } from 'domain/classroom/classroom-backend-api.service';
 import { ClassroomData } from 'domain/classroom/classroom-data.model';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
@@ -26,16 +28,33 @@ import { CapitalizePipe } from 'filters/string-utility-filters/capitalize.pipe';
 import { AccessValidationBackendApiService } from 'pages/oppia-root/routing/access-validation-backend-api.service';
 import { AlertsService } from 'services/alerts.service';
 import { UrlService } from 'services/contextual/url.service';
+import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { LoaderService } from 'services/loader.service';
 import { PageTitleService } from 'services/page-title.service';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { ClassroomPageComponent } from './classroom-page.component';
+import { PlatformFeatureService } from 'services/platform-feature.service';
 
 class MockCapitalizePipe {
   transform(input: string): string {
     return input;
   }
+}
+
+class MockTranslateService {
+  onLangChange: EventEmitter<string> = new EventEmitter();
+  instant(key: string, interpolateParams?: Object): string {
+    return key;
+  }
+}
+
+class MockPlatformFeatureService {
+  status = {
+    DiagnosticTest: {
+      isEnabled: false
+    }
+  };
 }
 
 describe('Classroom Page Component', () => {
@@ -49,6 +68,9 @@ describe('Classroom Page Component', () => {
   let siteAnalyticsService: SiteAnalyticsService;
   let alertsService: AlertsService;
   let accessValidationBackendApiService: AccessValidationBackendApiService;
+  let i18nLanguageCodeService: I18nLanguageCodeService;
+  let translateService: TranslateService;
+  let mockPlatformFeatureService = new MockPlatformFeatureService();
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -64,6 +86,14 @@ describe('Classroom Page Component', () => {
         {
           provide: CapitalizePipe,
           useClass: MockCapitalizePipe
+        },
+        {
+          provide: TranslateService,
+          useClass: MockTranslateService
+        },
+        {
+          provide: PlatformFeatureService,
+          useValue: mockPlatformFeatureService
         },
         ClassroomBackendApiService,
         LoaderService,
@@ -86,8 +116,13 @@ describe('Classroom Page Component', () => {
     pageTitleService = TestBed.inject(PageTitleService);
     siteAnalyticsService = TestBed.inject(SiteAnalyticsService);
     alertsService = TestBed.inject(AlertsService);
+    i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
     accessValidationBackendApiService = TestBed.inject(
       AccessValidationBackendApiService);
+    translateService = TestBed.inject(TranslateService);
+
+    spyOn(i18nLanguageCodeService, 'isCurrentLanguageRTL').and.returnValue(
+      true);
   });
 
   it('should create', () => {
@@ -109,12 +144,35 @@ describe('Classroom Page Component', () => {
     spyOn(urlInterpolationService, 'getStaticImageUrl')
       .and.returnValue(bannerImageUrl);
     spyOn(loaderService, 'showLoadingScreen');
-    spyOn(pageTitleService, 'setDocumentTitle');
+    spyOn(component, 'setPageTitle');
+    spyOn(component, 'subscribeToOnLangChange');
     spyOn(loaderService, 'hideLoadingScreen');
     spyOn(classroomBackendApiService.onInitializeTranslation, 'emit');
     spyOn(siteAnalyticsService, 'registerClassroomPageViewed');
+    let topicSummaryDicts = [{
+      id: 'topic1',
+      name: 'Topic name',
+      description: 'Topic description',
+      canonical_story_count: 4,
+      subtopic_count: 5,
+      total_skill_count: 20,
+      uncategorized_skill_count: 5,
+      thumbnail_filename: 'image.svg',
+      thumbnail_bg_color: '#C6DCDA',
+      language_code: 'en',
+      version: 1,
+      additional_story_count: 0,
+      total_published_node_count: 4,
+      topic_model_created_on: 20160101,
+      topic_model_last_updated: 20160110,
+      can_edit_topic: true,
+      is_published: true,
+      url_fragment: 'some-url-fragment',
+      classroom: 'math'
+    }];
+
     let classroomData = ClassroomData.createFromBackendData(
-      'Math', [], 'Course details', 'Topics covered');
+      'Math', topicSummaryDicts, 'Course details', 'Topics covered');
     spyOn(accessValidationBackendApiService, 'validateAccessToClassroomPage')
       .and.returnValues(
         Promise.reject(),
@@ -122,7 +180,12 @@ describe('Classroom Page Component', () => {
       );
     spyOn(classroomBackendApiService, 'fetchClassroomDataAsync')
       .and.returnValue(Promise.resolve(classroomData));
-
+    spyOn(i18nLanguageCodeService, 'getClassroomTranslationKey')
+      .and.returnValue('I18N_CLASSROOM_MATH_TITLE');
+    spyOn(i18nLanguageCodeService, 'isHackyTranslationAvailable')
+      .and.returnValue(true);
+    spyOn(i18nLanguageCodeService, 'isCurrentLanguageEnglish')
+      .and.returnValue(false);
     component.ngOnInit();
     tick();
     tick();
@@ -133,7 +196,11 @@ describe('Classroom Page Component', () => {
       .toHaveBeenCalled();
     expect(component.classroomData).toEqual(classroomData);
     expect(component.classroomDisplayName).toEqual(classroomData.getName());
-    expect(pageTitleService.setDocumentTitle).toHaveBeenCalled();
+    expect(component.classroomNameTranslationKey).toBe(
+      'I18N_CLASSROOM_MATH_TITLE');
+    expect(component.isHackyClassroomTranslationDisplayed()).toBe(true);
+    expect(component.setPageTitle).toHaveBeenCalled();
+    expect(component.subscribeToOnLangChange).toHaveBeenCalled();
     expect(loaderService.hideLoadingScreen).toHaveBeenCalled();
     expect(classroomBackendApiService.onInitializeTranslation.emit)
       .toHaveBeenCalled();
@@ -164,4 +231,44 @@ describe('Classroom Page Component', () => {
       expect(alertsService.addWarning).toHaveBeenCalledWith(
         'Failed to get dashboard data');
     }));
+
+  it('should obtain translated page title whenever the selected' +
+  'language changes', () => {
+    component.subscribeToOnLangChange();
+    spyOn(component, 'setPageTitle');
+    translateService.onLangChange.emit();
+
+    expect(component.directiveSubscriptions.closed).toBe(false);
+    expect(component.setPageTitle).toHaveBeenCalled();
+  });
+
+  it('should set new page title', () => {
+    spyOn(translateService, 'instant').and.callThrough();
+    spyOn(pageTitleService, 'setDocumentTitle');
+    component.classroomDisplayName = 'dummy_name';
+    component.setPageTitle();
+
+    expect(translateService.instant).toHaveBeenCalledWith(
+      'I18N_CLASSROOM_PAGE_TITLE', {
+        classroomName: 'dummy_name'
+      });
+    expect(pageTitleService.setDocumentTitle).toHaveBeenCalledWith(
+      'I18N_CLASSROOM_PAGE_TITLE');
+  });
+
+  it('should unsubscribe on component destruction', () => {
+    component.subscribeToOnLangChange();
+    expect(component.directiveSubscriptions.closed).toBe(false);
+    component.ngOnDestroy();
+
+    expect(component.directiveSubscriptions.closed).toBe(true);
+  });
+
+  it('should return correct value for diagnostic test feature flag', () => {
+    expect(component.isDiagnosticTestFeatureFlagEnabled()).toBeFalse();
+
+    mockPlatformFeatureService.status.DiagnosticTest.isEnabled = true;
+
+    expect(component.isDiagnosticTestFeatureFlagEnabled()).toBeTrue();
+  });
 });

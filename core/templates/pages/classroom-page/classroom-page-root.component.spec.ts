@@ -18,6 +18,8 @@
 
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+
+import { AppConstants } from 'app.constants';
 import { PageHeadService } from 'services/page-head.service';
 
 import { MockTranslatePipe } from 'tests/unit-test-utils';
@@ -54,7 +56,11 @@ describe('Classroom Root Page', () => {
 
   it('should initialize', () => {
     spyOn(pageHeadService, 'updateTitleAndMetaTags');
+
     component.ngOnInit();
-    expect(pageHeadService.updateTitleAndMetaTags).toHaveBeenCalled();
+
+    expect(pageHeadService.updateTitleAndMetaTags).toHaveBeenCalledWith(
+      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.CLASSROOM.TITLE,
+      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.CLASSROOM.META);
   });
 });

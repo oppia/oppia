@@ -25,11 +25,11 @@ import { LearnerExplorationSummaryBackendDict } from 'domain/summary/learner-exp
 import { BackendChangeObject, Change } from 'domain/editor/undo_redo/change.model';
 
 describe('Collection update service', () => {
-  let collectionUpdateService: CollectionUpdateService = null;
-  let undoRedoService: UndoRedoService = null;
+  let collectionUpdateService: CollectionUpdateService;
+  let undoRedoService: UndoRedoService;
   let learnerExplorationSummaryBackendDict:
-    LearnerExplorationSummaryBackendDict = null;
-  let _sampleCollection: Collection = null;
+    LearnerExplorationSummaryBackendDict;
+  let _sampleCollection: Collection;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -60,7 +60,7 @@ describe('Collection update service', () => {
       objective: 'Test Objective',
       status: 'public',
       tags: [],
-      thumbnail_bg_color: '#cd672b',
+      thumbnail_bg_color: '#cc4b00',
       thumbnail_icon_url: '/subjects/Algebra.svg',
       title: 'a title'
     };

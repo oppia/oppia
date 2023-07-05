@@ -20,14 +20,22 @@ from core import utils
 from core.platform import models
 from core.tests import test_utils
 
-(base_models, beam_job_models) = models.Registry.import_models(
-    [models.NAMES.base_model, models.NAMES.beam_job])
+MYPY = False
+if MYPY: # pragma: no cover
+    from mypy_imports import base_models
+    from mypy_imports import beam_job_models
+
+(base_models, beam_job_models) = models.Registry.import_models([
+    models.Names.BASE_MODEL, models.Names.BEAM_JOB
+])
 
 
 class BeamJobRunModelTest(test_utils.GenericTestBase):
     """Tests for BeamJobRunModel."""
 
-    def test_get_new_id_raises_error_after_too_many_failed_attempts(self):
+    def test_get_new_id_raises_error_after_too_many_failed_attempts(
+        self
+    ) -> None:
         model = beam_job_models.BeamJobRunModel(
             id=beam_job_models.BeamJobRunModel.get_new_id(), job_name='FooJob',
             latest_job_state=beam_job_models.BeamJobState.RUNNING.value)
@@ -38,22 +46,23 @@ class BeamJobRunModelTest(test_utils.GenericTestBase):
             utils, 'convert_to_hash', value=model.id)
 
         with collision_context:
-            self.assertRaisesRegexp(
+            with self.assertRaisesRegex(
                 RuntimeError,
-                r'Failed to generate a unique ID after \d+ attempts',
-                beam_job_models.BeamJobRunModel.get_new_id)
+                r'Failed to generate a unique ID after \d+ attempts'
+            ):
+                beam_job_models.BeamJobRunModel.get_new_id()
 
-    def test_get_deletion_policy(self):
+    def test_get_deletion_policy(self) -> None:
         self.assertEqual(
             beam_job_models.BeamJobRunModel.get_deletion_policy(),
             base_models.DELETION_POLICY.NOT_APPLICABLE)
 
-    def test_get_model_association_to_user(self):
+    def test_get_model_association_to_user(self) -> None:
         self.assertEqual(
             beam_job_models.BeamJobRunModel.get_model_association_to_user(),
             base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER)
 
-    def test_get_export_policy(self):
+    def test_get_export_policy(self) -> None:
         export_policy = beam_job_models.BeamJobRunModel.get_export_policy()
         self.assertEqual(
             export_policy['dataflow_job_id'],
@@ -69,7 +78,9 @@ class BeamJobRunModelTest(test_utils.GenericTestBase):
 class BeamJobRunResultModelTest(test_utils.GenericTestBase):
     """Tests for BeamJobRunResultModel."""
 
-    def test_get_new_id_raises_error_after_too_many_failed_attempts(self):
+    def test_get_new_id_raises_error_after_too_many_failed_attempts(
+        self
+    ) -> None:
         model = beam_job_models.BeamJobRunResultModel(
             id=beam_job_models.BeamJobRunResultModel.get_new_id(), job_id='123')
         model.update_timestamps()
@@ -79,23 +90,24 @@ class BeamJobRunResultModelTest(test_utils.GenericTestBase):
             utils, 'convert_to_hash', value=model.id)
 
         with collision_context:
-            self.assertRaisesRegexp(
+            with self.assertRaisesRegex(
                 RuntimeError,
-                r'Failed to generate a unique ID after \d+ attempts',
-                beam_job_models.BeamJobRunResultModel.get_new_id)
+                r'Failed to generate a unique ID after \d+ attempts'
+            ):
+                beam_job_models.BeamJobRunResultModel.get_new_id()
 
-    def test_get_deletion_policy(self):
+    def test_get_deletion_policy(self) -> None:
         self.assertEqual(
             beam_job_models.BeamJobRunResultModel.get_deletion_policy(),
             base_models.DELETION_POLICY.NOT_APPLICABLE)
 
-    def test_get_model_association_to_user(self):
+    def test_get_model_association_to_user(self) -> None:
         self.assertEqual(
             beam_job_models.BeamJobRunResultModel
             .get_model_association_to_user(),
             base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER)
 
-    def test_get_export_policy(self):
+    def test_get_export_policy(self) -> None:
         export_policy = (
             beam_job_models.BeamJobRunResultModel.get_export_policy())
         self.assertEqual(

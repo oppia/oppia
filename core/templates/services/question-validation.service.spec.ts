@@ -18,17 +18,17 @@
 
 import { TestBed } from '@angular/core/testing';
 import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
-import { QuestionObjectFactory } from 'domain/question/QuestionObjectFactory';
-import { MisconceptionObjectFactory } from 'domain/skill/MisconceptionObjectFactory';
+import { QuestionBackendDict, QuestionObjectFactory } from 'domain/question/QuestionObjectFactory';
+import { MisconceptionObjectFactory, MisconceptionSkillMap } from 'domain/skill/MisconceptionObjectFactory';
 import { QuestionValidationService } from './question-validation.service';
 
 describe('Question Validation Service', () => {
   let misconceptionObjectFactory: MisconceptionObjectFactory;
-  let mockMisconceptionObject;
-  let mockQuestionDict;
+  let mockMisconceptionObject: MisconceptionSkillMap;
+  let mockQuestionDict: QuestionBackendDict;
   let questionObjectFactory: QuestionObjectFactory;
   let qvs: QuestionValidationService;
-  let ses;
+  let ses: StateEditorService;
 
   beforeEach(() => {
     misconceptionObjectFactory = TestBed.inject(MisconceptionObjectFactory);
@@ -50,6 +50,7 @@ describe('Question Validation Service', () => {
           answer_groups: [{
             outcome: {
               dest: 'outcome 1',
+              dest_if_really_stuck: null,
               feedback: {
                 content_id: 'content_5',
                 html: ''
@@ -66,6 +67,7 @@ describe('Question Validation Service', () => {
           }, {
             outcome: {
               dest: 'outcome 1',
+              dest_if_really_stuck: null,
               feedback: {
                 content_id: 'content_5',
                 html: ''
@@ -92,6 +94,7 @@ describe('Question Validation Service', () => {
           },
           default_outcome: {
             dest: null,
+            dest_if_really_stuck: null,
             feedback: {
               html: 'Correct Answer',
               content_id: 'content_2'
@@ -127,28 +130,19 @@ describe('Question Validation Service', () => {
             content_5: {}
           }
         },
-        written_translations: {
-          translations_mapping: {
-            content_1: {},
-            content_2: {},
-            content_3: {},
-            content_4: {},
-            content_5: {}
-          }
-        },
         solicit_answer_details: false
       },
       language_code: 'en',
       version: 1,
       linked_skill_ids: ['abc'],
       inapplicable_skill_misconception_ids: ['abc-2']
-    };
+    } as unknown as QuestionBackendDict;
     mockMisconceptionObject = {
       abc: [
         misconceptionObjectFactory.create(
-          '1', 'misc1', 'notes1', 'feedback1', true),
+          1, 'misc1', 'notes1', 'feedback1', true),
         misconceptionObjectFactory.create(
-          '2', 'misc2', 'notes2', 'feedback1', false)
+          2, 'misc2', 'notes2', 'feedback1', false)
       ]
     };
   });
@@ -172,7 +166,7 @@ describe('Question Validation Service', () => {
   });
 
   it('should return false if solution is invalid', () => {
-    ses.isCurrentSolutionValid.and.returnValue(false);
+    ses.isCurrentSolutionValid = () => false;
     expect(
       qvs.isQuestionValid(
         questionObjectFactory.createFromBackendDict(mockQuestionDict),
@@ -183,5 +177,9 @@ describe('Question Validation Service', () => {
     let question = questionObjectFactory.createFromBackendDict(
       mockQuestionDict);
     expect(qvs.isQuestionValid(question, mockMisconceptionObject)).toBeTrue();
+  });
+
+  it('should return false if question is not valid', () => {
+    expect(qvs.isQuestionValid(undefined, mockMisconceptionObject)).toBeFalse();
   });
 });

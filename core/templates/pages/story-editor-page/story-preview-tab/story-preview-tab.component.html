@@ -66,7 +66,7 @@
           <svg xmlns="http://www.w3.org/1600/svg"
                xmlns:xlink="http://www.w3.org/1999/xlink"
                version="1.1"
-               viewBox="0 0 192 108" preserveAspectRatio="xMidYMid Meet">
+               viewBox="0 0 192 108" preserveAspectRatio="xMidYMid meet">
             <defs>
               <pattern id="image2{{i}}" patternUnits="userSpaceOnUse" height="108" width="192">
                 <rect width="192"
@@ -83,14 +83,13 @@
                 </image>
               </pattern>
             </defs>
-            <a xlink:href="getExplorationUrl(node)">
-              <rect width="192"
-                    height="108"
-                    x="0"
-                    y="0"
-                    attr.fill="url(#image2{{i}})">
-              </rect>
-            </a>
+            <rect [attr.href]="getExplorationUrl(node)"
+                  width="192"
+                  height="108"
+                  x="0"
+                  y="0"
+                  attr.fill="url(#image2{{i}})">
+            </rect>
           </svg>
         </div>
         <div class="story-text">
@@ -109,7 +108,7 @@
 </div>
 <style>
   .parent-container {
-    background-color: #FFF;
+    background-color: #fff;
     border-radius: 4px;
     box-shadow: 0 0 8px 6px rgba(0, 0, 0, 0.05);
     margin: 0 auto;
@@ -127,7 +126,7 @@
     display: none;
   }
   .oppia-story-viewer-title {
-    color: #00645C;
+    color: #00645c;
     font-family: Capriola, Roboto, Arial, sans-serif;
     font-size: 2.4em;
     font-weight: 500;
@@ -218,7 +217,7 @@
       margin-right: 0;
     }
     .oppia-story-viewer-mobile-card-content {
-      border: 2px solid #009C8A;
+      border: 2px solid #009c8a;
       border-radius: 4px;
       display: block;
       margin: 0 0 40px;
@@ -226,12 +225,12 @@
     }
     .chapter-complete-icon {
       bottom: 10px;
-      color: #009C8A;
+      color: #009c8a;
       position: absolute;
       right: 10px;
     }
     .story-thumbnail-image {
-      border-bottom: 2px solid #009C8A;
+      border-bottom: 2px solid #009c8a;
     }
     .oppia-chapter-title {
       display: block;

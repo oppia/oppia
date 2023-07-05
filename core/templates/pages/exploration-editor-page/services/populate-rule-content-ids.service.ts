@@ -22,7 +22,7 @@ import { Injectable } from '@angular/core';
 import { AppConstants } from 'app.constants';
 import { BaseTranslatableObject } from 'interactions/rule-input-defs';
 import { GenerateContentIdService } from 'services/generate-content-id.service';
-import { Rule } from 'domain/exploration/RuleObjectFactory';
+import { Rule } from 'domain/exploration/rule.model';
 
 @Injectable({
   providedIn: 'root'
@@ -46,16 +46,19 @@ export class PopulateRuleContentIdsService {
     }
 
     Object.keys(inputTypes).forEach(inputName => {
+      const ruleInput = inputs[inputName] as BaseTranslatableObject;
+      // All rules input types which are translatable are subclasses of
+      // BaseTranslatableObject having dict structure with contentId
+      // as a key.
       const hasContentId = (
-        inputTypes[inputName].indexOf('Translatable') === 0);
+        ruleInput && ruleInput.hasOwnProperty('contentId'));
       if (!hasContentId) {
         return;
       }
-      const inputValue = inputs[inputName] as BaseTranslatableObject;
-      const needsContentId = inputValue.contentId === null;
+      const needsContentId = ruleInput.contentId === null;
 
       if (needsContentId) {
-        inputValue.contentId = (
+        ruleInput.contentId = (
           this.generateContentIdService.getNextStateId(
             `${AppConstants.COMPONENT_NAME_RULE_INPUT}`));
       }

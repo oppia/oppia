@@ -24,6 +24,8 @@ import { InteractiveGraphInput } from './oppia-interactive-graph-input.component
 import { TranslateModule } from '@ngx-translate/core';
 import { PlayerPositionService } from 'pages/exploration-player-page/services/player-position.service';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
+import { GraphAnswer } from 'interactions/answer-defs';
+import { InteractionSpecsKey } from 'pages/interaction-specs.constants';
 
 describe('InteractiveGraphInput', () => {
   let component: InteractiveGraphInput;
@@ -34,7 +36,9 @@ describe('InteractiveGraphInput', () => {
   let i18nLanguageCodeService: I18nLanguageCodeService;
 
   class mockInteractionAttributesExtractorService {
-    getValuesFromAttributes(interactionId, attributes) {
+    getValuesFromAttributes(
+        interactionId: InteractionSpecsKey, attributes: Record<string, string>
+    ) {
       return {
         graph: {
           value: JSON.parse(attributes.graphWithValue)
@@ -66,8 +70,10 @@ describe('InteractiveGraphInput', () => {
 
   let mockCurrentInteractionService = {
     updateViewWithNewAnswer: () => {},
-    onSubmit: (answer, rulesService) => {},
-    registerCurrentInteraction: (submitAnswerFn, validateExpressionFn) => {
+    onSubmit: (
+        answer: GraphAnswer, rulesService: CurrentInteractionService) => {},
+    registerCurrentInteraction: (
+        submitAnswerFn: Function, validateExpressionFn: Function) => {
       submitAnswerFn();
       validateExpressionFn();
     }
@@ -260,7 +266,7 @@ describe('InteractiveGraphInput', () => {
   });
 
   it('should get RTL language status correctly', () => {
-    expect(component.isLanguageRTL()).toEqual(true);
+    expect(component.isLanguageRTL()).toBeTrue();
   });
 
   it('should set the last answer given by the user as the graph when the' +
@@ -389,6 +395,10 @@ describe('InteractiveGraphInput', () => {
   });
 
   it('should return false when a invalid graph is passed', () => {
+    // This throws "Type null is not assignable to type
+    // 'GraphAnswer'." We need to suppress this error
+    // because of the need to test validations.
+    // @ts-ignore
     component.graph = null;
 
     expect(component.validityCheckFn()).toBe(false);

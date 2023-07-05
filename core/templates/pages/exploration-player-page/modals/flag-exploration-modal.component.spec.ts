@@ -64,10 +64,8 @@ describe('Flag Exploration modal', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(FlagExplorationModalComponent);
     component = fixture.componentInstance;
-    focusManagerService = (TestBed.inject(FocusManagerService) as unknown) as
-      jasmine.SpyObj<FocusManagerService>;
-    ngbActiveModal = (TestBed.inject(NgbActiveModal) as unknown) as
-          jasmine.SpyObj<NgbActiveModal>;
+    focusManagerService = TestBed.inject(FocusManagerService);
+    ngbActiveModal = TestBed.inject(NgbActiveModal);
   });
 
   it('should create', () => {

@@ -53,6 +53,7 @@ describe('EndExplorationValidationService', () => {
 
     badOutcome = oof.createFromBackendDict({
       dest: currentState,
+      dest_if_really_stuck: null,
       feedback: {
         html: '',
         content_id: ''
@@ -73,6 +74,7 @@ describe('EndExplorationValidationService', () => {
       [],
       oof.createFromBackendDict({
         dest: 'Second State',
+        dest_if_really_stuck: null,
         feedback: {
           html: '',
           content_id: ''
@@ -87,12 +89,12 @@ describe('EndExplorationValidationService', () => {
     )];
   });
 
-  it('should not have warnings for no answer groups or no default outcome',
-    () => {
-      var warnings = validatorService.getAllWarnings(
-        currentState, customizationArguments, [], null);
-      expect(warnings).toEqual([]);
-    });
+  it('should not have warnings when the EndExploration object does not have ' +
+    'answer groups or a default outcome or empty recommended exp IDs', () => {
+    var warnings = validatorService.getAllWarnings(
+      currentState, customizationArguments, [], null);
+    expect(warnings).toEqual([]);
+  });
 
   it('should have warnings for any answer groups or default outcome',
     () => {
@@ -102,13 +104,31 @@ describe('EndExplorationValidationService', () => {
         type: WARNING_TYPES.ERROR,
         message: (
           'Please make sure end exploration interactions do not ' +
-          'have any answer groups.')
+          'have any Oppia responses.')
       }, {
         type: WARNING_TYPES.ERROR,
         message: (
           'Please make sure end exploration interactions do not ' +
           'have a default outcome.')
       }]);
+    });
+
+  it('should have warnings if a recommended exploration id is empty',
+    () => {
+      let badCustomizationArguments = {
+        recommendedExplorationIds: {
+          value: ['ExpID0', '']
+        }
+      };
+      let invalidExplorationIdsWarning = {
+        type: WARNING_TYPES.ERROR,
+        message: 'Recommended exploration ID must be non-empty.'
+      };
+
+      var warnings = validatorService.getAllWarnings(
+        currentState, badCustomizationArguments, [], null);
+
+      expect(warnings).toEqual([invalidExplorationIdsWarning]);
     });
 
   it('should throw for missing recommendations argument', () => {

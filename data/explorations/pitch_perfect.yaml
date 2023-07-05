@@ -3,6 +3,7 @@ auto_tts_enabled: true
 blurb: ''
 category: Music
 correctness_feedback_enabled: false
+edits_allowed: true
 init_state_name: Pitch Trainer-1
 language_code: en
 objective: practice listening to and transcribing musical pitches

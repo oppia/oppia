@@ -28,6 +28,8 @@ from core.controllers import base
 from core.controllers import domain_objects_validator as validation_method
 from core.domain import auth_services
 from core.domain import blog_services
+from core.domain import classroom_config_domain
+from core.domain import classroom_config_services
 from core.domain import collection_services
 from core.domain import config_domain
 from core.domain import config_services
@@ -35,9 +37,12 @@ from core.domain import email_manager
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
+from core.domain import fs_services
 from core.domain import opportunity_services
 from core.domain import platform_feature_services as feature_services
 from core.domain import platform_parameter_domain as parameter_domain
+from core.domain import platform_parameter_list
+from core.domain import platform_parameter_registry as registry
 from core.domain import question_domain
 from core.domain import question_services
 from core.domain import recommendations_services
@@ -55,28 +60,79 @@ from core.domain import subtopic_page_services
 from core.domain import topic_domain
 from core.domain import topic_fetchers
 from core.domain import topic_services
+from core.domain import translation_domain
 from core.domain import user_services
 from core.domain import wipeout_service
 
+from typing import Dict, List, Optional, TypedDict, Union, cast
 
-class AdminPage(base.BaseHandler):
+# Platform paramters that we plan to show on the the release-coordinator page.
+PLATFORM_PARAMS_TO_SHOW_IN_RC_PAGE = set([
+    platform_parameter_list.ParamNames.PROMO_BAR_ENABLED.value,
+    platform_parameter_list.ParamNames.PROMO_BAR_MESSAGE.value
+])
+
+
+class ClassroomPageDataDict(TypedDict):
+    """Dict representation of classroom page's data dictionary."""
+
+    course_details: str
+    name: str
+    topic_ids: List[str]
+    topic_list_intro: str
+    url_fragment: str
+
+
+AllowedAdminConfigPropertyValueTypes = Union[
+    str, bool, float, Dict[str, str], List[str], ClassroomPageDataDict
+]
+
+
+class AdminPage(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
     """Admin page shown in the App Engine admin console."""
 
-    URL_PATH_ARGS_SCHEMAS = {}
-    HANDLER_ARGS_SCHEMAS = {'GET': {}}
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.can_access_admin_page
-    def get(self):
-        """Handles GET requests."""
+    def get(self) -> None:
+        """Renders the admin page."""
 
         self.render_template('admin-page.mainpage.html')
 
 
-class AdminHandler(base.BaseHandler):
+class AdminHandlerNormalizePayloadDict(TypedDict):
+    """Dict representation of AdminHandler's normalized_payload
+    dictionary.
+    """
+
+    action: Optional[str]
+    exploration_id: Optional[str]
+    collection_id: Optional[str]
+    num_dummy_exps_to_generate: Optional[int]
+    num_dummy_exps_to_publish: Optional[int]
+    new_config_property_values: Optional[
+        Dict[str, AllowedAdminConfigPropertyValueTypes]
+    ]
+    config_property_id: Optional[str]
+    data: Optional[str]
+    topic_id: Optional[str]
+    platform_param_name: Optional[str]
+    commit_message: Optional[str]
+    new_rules: Optional[List[parameter_domain.PlatformParameterRule]]
+    exp_id: Optional[str]
+    default_value: Dict[str, parameter_domain.PlatformDataTypes]
+
+
+class AdminHandler(
+    base.BaseHandler[AdminHandlerNormalizePayloadDict, Dict[str, str]]
+):
     """Handler for the admin page."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-    URL_PATH_ARGS_SCHEMAS = {}
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
     HANDLER_ARGS_SCHEMAS = {
         'GET': {},
         'POST': {
@@ -88,10 +144,12 @@ class AdminHandler(base.BaseHandler):
                         'generate_dummy_explorations', 'clear_search_index',
                         'generate_dummy_new_structures_data',
                         'generate_dummy_new_skill_data',
+                        'generate_dummy_classroom',
                         'save_config_properties', 'revert_config_property',
                         'upload_topic_similarities',
                         'regenerate_topic_related_opportunities',
-                        'update_feature_flag_rules'
+                        'update_platform_parameter_rules',
+                        'rollback_exploration_to_safe_state'
                     ]
                 },
                 # TODO(#13331): Remove default_value when it is confirmed that,
@@ -149,7 +207,7 @@ class AdminHandler(base.BaseHandler):
                 },
                 'default_value': None
             },
-            'feature_name': {
+            'platform_param_name': {
                 'schema': {
                     'type': 'basestring'
                 },
@@ -170,31 +228,50 @@ class AdminHandler(base.BaseHandler):
                     }
                 },
                 'default_value': None
+            },
+            'exp_id': {
+                'schema': {
+                    'type': 'basestring'
+                },
+                'default_value': None
+            },
+            'default_value': {
+                'schema': {
+                    'type': 'object_dict',
+                    'validation_method': (
+                        validation_method.
+                        validate_new_default_value_of_platform_parameter)
+                },
+                'default_value': None
             }
         }
     }
 
     @acl_decorators.can_access_admin_page
-    def get(self):
-        """Handles GET requests."""
+    def get(self) -> None:
+        """Populates the data on the admin page."""
         demo_exploration_ids = list(feconf.DEMO_EXPLORATIONS.keys())
 
         topic_summaries = topic_fetchers.get_all_topic_summaries()
         topic_summary_dicts = [
             summary.to_dict() for summary in topic_summaries]
 
-        feature_flag_dicts = feature_services.get_all_feature_flag_dicts()
+        platform_params_dicts = (
+            feature_services.
+            get_all_platform_parameters_except_feature_flag_dicts()
+        )
+        # Removes promo-bar related platform params as promo-bar is handled by
+        # release coordinators in /release-coordinator page.
+        platform_params_dicts = [
+            param for param in platform_params_dicts
+            if param['name'] not in PLATFORM_PARAMS_TO_SHOW_IN_RC_PAGE
+        ]
 
         config_properties = config_domain.Registry.get_config_property_schemas()
-        # Removes promo-bar related configs as promo-bar is handled by
-        # release coordinators in /release-coordinator page.
-        del config_properties['promo_bar_enabled']
-        del config_properties['promo_bar_message']
 
         # Remove blog related configs as they will be handled by 'blog admins'
         # on blog admin page.
         del config_properties['max_number_of_tags_assigned_to_blog_post']
-        del config_properties['list_of_default_tags_for_blog_post']
 
         self.render_json({
             'config_properties': config_properties,
@@ -206,43 +283,104 @@ class AdminHandler(base.BaseHandler):
             'human_readable_roles': role_services.HUMAN_READABLE_ROLES,
             'role_to_actions': role_services.get_role_actions(),
             'topic_summaries': topic_summary_dicts,
-            'feature_flags': feature_flag_dicts,
+            'platform_params_dicts': platform_params_dicts,
         })
 
     @acl_decorators.can_access_admin_page
-    def post(self):
-        """Handles POST requests."""
+    def post(self) -> None:
+        """Performs a series of actions based on the action parameter on the
+        admin page.
+
+        Raises:
+            Exception. The exploration_id must be provided when the action
+                is reload_exploration.
+            Exception. The collection_id must be provided when the action
+                is reload_collection.
+            Exception. The num_dummy_exps_to_generate must be provided when
+                the action is generate_dummy_explorations.
+            Exception. The num_dummy_exps_to_publish must be provided when
+                the action is generate_dummy_explorations.
+            InvalidInputException. Generate count cannot be less than publish
+                count.
+            Exception. The new_config_property_values must be provided
+                when the action is save_config_properties.
+            Exception. The config_property_id must be provided when the
+                action is revert_config_property.
+            Exception. The data must be provided when the action is
+                upload_topic_similarities.
+            Exception. The topic_id must be provided when the action is
+                regenerate_topic_related_opportunities.
+            Exception. The exp_id' must be provided when the action is
+                rollback_exploration_to_safe_state.
+            Exception. The feature_name must be provided when the action
+                is update_feature_flag_rules.
+            Exception. The new_rules must be provided when the action is
+                update_feature_flag_rules.
+            Exception. The commit_message must be provided when the action
+                is update_feature_flag_rules.
+            InvalidInputException. The input provided is not valid.
+        """
+        assert self.user_id is not None
+        assert self.normalized_payload is not None
         action = self.normalized_payload.get('action')
         try:
             result = {}
             if action == 'reload_exploration':
                 exploration_id = self.normalized_payload.get('exploration_id')
+                if exploration_id is None:
+                    raise Exception(
+                        'The \'exploration_id\' must be provided when the'
+                        ' action is reload_exploration.'
+                    )
                 self._reload_exploration(exploration_id)
             elif action == 'reload_collection':
                 collection_id = self.normalized_payload.get('collection_id')
+                if collection_id is None:
+                    raise Exception(
+                        'The \'collection_id\' must be provided when the'
+                        ' action is reload_collection.'
+                    )
                 self._reload_collection(collection_id)
             elif action == 'generate_dummy_explorations':
                 num_dummy_exps_to_generate = self.normalized_payload.get(
                     'num_dummy_exps_to_generate')
+                if num_dummy_exps_to_generate is None:
+                    raise Exception(
+                        'The \'num_dummy_exps_to_generate\' must be provided'
+                        ' when the action is generate_dummy_explorations.'
+                    )
                 num_dummy_exps_to_publish = self.normalized_payload.get(
                     'num_dummy_exps_to_publish')
+                if num_dummy_exps_to_publish is None:
+                    raise Exception(
+                        'The \'num_dummy_exps_to_publish\' must be provided'
+                        ' when the action is generate_dummy_explorations.'
+                    )
 
                 if num_dummy_exps_to_generate < num_dummy_exps_to_publish:
                     raise self.InvalidInputException(
                         'Generate count cannot be less than publish count')
-                else:
-                    self._generate_dummy_explorations(
-                        num_dummy_exps_to_generate, num_dummy_exps_to_publish)
+
+                self._generate_dummy_explorations(
+                    num_dummy_exps_to_generate, num_dummy_exps_to_publish)
             elif action == 'clear_search_index':
                 search_services.clear_collection_search_index()
                 search_services.clear_exploration_search_index()
+                search_services.clear_blog_post_summaries_search_index()
             elif action == 'generate_dummy_new_structures_data':
                 self._load_dummy_new_structures_data()
             elif action == 'generate_dummy_new_skill_data':
                 self._generate_dummy_skill_and_questions()
+            elif action == 'generate_dummy_classroom':
+                self._generate_dummy_classroom()
             elif action == 'save_config_properties':
                 new_config_property_values = self.normalized_payload.get(
                     'new_config_property_values')
+                if new_config_property_values is None:
+                    raise Exception(
+                        'The \'new_config_property_values\' must be provided'
+                        ' when the action is save_config_properties.'
+                    )
                 logging.info(
                     '[ADMIN] %s saved config property values: %s' %
                     (self.user_id, new_config_property_values))
@@ -251,6 +389,11 @@ class AdminHandler(base.BaseHandler):
             elif action == 'revert_config_property':
                 config_property_id = self.normalized_payload.get(
                     'config_property_id')
+                if config_property_id is None:
+                    raise Exception(
+                        'The \'config_property_id\' must be provided'
+                        ' when the action is revert_config_property.'
+                    )
                 logging.info(
                     '[ADMIN] %s reverted config property: %s' %
                     (self.user_id, config_property_id))
@@ -258,9 +401,19 @@ class AdminHandler(base.BaseHandler):
                     self.user_id, config_property_id)
             elif action == 'upload_topic_similarities':
                 data = self.normalized_payload.get('data')
+                if data is None:
+                    raise Exception(
+                        'The \'data\' must be provided when the action'
+                        ' is upload_topic_similarities.'
+                    )
                 recommendations_services.update_topic_similarities(data)
             elif action == 'regenerate_topic_related_opportunities':
                 topic_id = self.normalized_payload.get('topic_id')
+                if topic_id is None:
+                    raise Exception(
+                        'The \'topic_id\' must be provided when the action'
+                        ' is regenerate_topic_related_opportunities.'
+                    )
                 opportunities_count = (
                     opportunity_services
                     .regenerate_opportunities_related_to_topic(
@@ -268,29 +421,71 @@ class AdminHandler(base.BaseHandler):
                 result = {
                     'opportunities_count': opportunities_count
                 }
-            elif action == 'update_feature_flag_rules':
-                feature_name = self.normalized_payload.get('feature_name')
-                new_rule_dicts = self.normalized_payload.get('new_rules')
+            elif action == 'rollback_exploration_to_safe_state':
+                exp_id = self.normalized_payload.get('exp_id')
+                if exp_id is None:
+                    raise Exception(
+                        'The \'exp_id\' must be provided when the action'
+                        ' is rollback_exploration_to_safe_state.'
+                    )
+                version = (
+                    exp_services.rollback_exploration_to_safe_state(exp_id))
+                result = {
+                    'version': version
+                }
+            else:
+                # The handler schema defines the possible values of 'action'.
+                # If 'action' has a value other than those defined in the
+                # schema, a Bad Request error will be thrown. Hence, 'action'
+                # must be 'update_platform_parameter_rules' if this branch is
+                # executed.
+                assert action == 'update_platform_parameter_rules'
+                platform_param_name = self.normalized_payload.get(
+                    'platform_param_name'
+                )
+                if platform_param_name is None:
+                    raise Exception(
+                        'The \'platform_param_name\' must be provided when '
+                        'the action is update_platform_parameter_rules.'
+                    )
+                new_rules = self.normalized_payload.get('new_rules')
+                if new_rules is None:
+                    raise Exception(
+                        'The \'new_rules\' must be provided when the action'
+                        ' is update_platform_parameter_rules.'
+                    )
                 commit_message = self.normalized_payload.get('commit_message')
+                if commit_message is None:
+                    raise Exception(
+                        'The \'commit_message\' must be provided when the '
+                        'action is update_platform_parameter_rules.'
+                    )
+                default_value = self.normalized_payload.get('default_value')
+                assert default_value is not None
 
                 try:
-                    feature_services.update_feature_flag_rules(
-                        feature_name, self.user_id, commit_message,
-                        new_rule_dicts)
+                    registry.Registry.update_platform_parameter(
+                        platform_param_name, self.user_id, commit_message,
+                        new_rules,
+                        default_value['value']
+                    )
                 except (
-                        utils.ValidationError,
-                        feature_services.FeatureFlagNotFoundException) as e:
+                    utils.ValidationError,
+                    feature_services.PlatformParameterNotFoundException
+                ) as e:
                     raise self.InvalidInputException(e)
+
+                new_rule_dicts = [rule.to_dict() for rule in new_rules]
                 logging.info(
                     '[ADMIN] %s updated feature %s with new rules: '
-                    '%s.' % (self.user_id, feature_name, new_rule_dicts))
+                    '%s.' % (self.user_id, platform_param_name, new_rule_dicts))
             self.render_json(result)
         except Exception as e:
             logging.exception('[ADMIN] %s', e)
             self.render_json({'error': str(e)})
             raise e
 
-    def _reload_exploration(self, exploration_id):
+    def _reload_exploration(self, exploration_id: str) -> None:
         """Reloads the exploration in dev_mode corresponding to the given
         exploration id.
 
@@ -311,7 +506,11 @@ class AdminHandler(base.BaseHandler):
             raise Exception('Cannot reload an exploration in production.')
 
     def _create_dummy_question(
-            self, question_id, question_content, linked_skill_ids):
+        self,
+        question_id: str,
+        question_content: str,
+        linked_skill_ids: List[str]
+    ) -> question_domain.Question:
         """Creates a dummy question object with the given question ID.
 
         Args:
@@ -323,39 +522,47 @@ class AdminHandler(base.BaseHandler):
         Returns:
             Question. The dummy question with given values.
         """
+        content_id_generator = translation_domain.ContentIdGenerator()
+
         state = state_domain.State.create_default_state(
-            'ABC', is_initial_state=True)
+            'ABC',
+            content_id_generator.generate(
+                translation_domain.ContentType.CONTENT),
+            content_id_generator.generate(
+                translation_domain.ContentType.DEFAULT_OUTCOME),
+            is_initial_state=True)
+
         state.update_interaction_id('TextInput')
         state.update_interaction_customization_args({
             'placeholder': {
                 'value': {
-                    'content_id': 'ca_placeholder_0',
+                    'content_id': content_id_generator.generate(
+                        translation_domain.ContentType.CUSTOMIZATION_ARG
+                    ),
                     'unicode_str': ''
                 }
             },
-            'rows': {'value': 1}
+            'rows': {'value': 1},
+            'catchMisspellings': {
+                'value': False
+            }
         })
 
-        state.update_next_content_id_index(1)
         state.update_linked_skill_id(None)
-        state.update_content(state_domain.SubtitledHtml('1', question_content))
-        recorded_voiceovers = state_domain.RecordedVoiceovers({})
-        written_translations = state_domain.WrittenTranslations({})
-        recorded_voiceovers.add_content_id_for_voiceover('ca_placeholder_0')
-        recorded_voiceovers.add_content_id_for_voiceover('1')
-        recorded_voiceovers.add_content_id_for_voiceover('default_outcome')
-        written_translations.add_content_id_for_translation('ca_placeholder_0')
-        written_translations.add_content_id_for_translation('1')
-        written_translations.add_content_id_for_translation('default_outcome')
+        state.update_content(state_domain.SubtitledHtml(
+            'content_0', question_content))
 
-        state.update_recorded_voiceovers(recorded_voiceovers)
-        state.update_written_translations(written_translations)
         solution = state_domain.Solution(
             'TextInput', False, 'Solution', state_domain.SubtitledHtml(
-                'solution', '<p>This is a solution.</p>'))
+                content_id_generator.generate(
+                    translation_domain.ContentType.SOLUTION),
+                '<p>This is a solution.</p>'))
         hints_list = [
             state_domain.Hint(
-                state_domain.SubtitledHtml('hint_1', '<p>This is a hint.</p>')
+                state_domain.SubtitledHtml(
+                    content_id_generator.generate(
+                        translation_domain.ContentType.HINT),
+                    '<p>This is a hint.</p>')
             )
         ]
 
@@ -363,18 +570,24 @@ class AdminHandler(base.BaseHandler):
         state.update_interaction_hints(hints_list)
         state.update_interaction_default_outcome(
             state_domain.Outcome(
-                None, state_domain.SubtitledHtml(
-                    'feedback_id', '<p>Dummy Feedback</p>'),
+                None, None,
+                state_domain.SubtitledHtml(
+                    content_id_generator.generate(
+                        translation_domain.ContentType.DEFAULT_OUTCOME),
+                    '<p>Dummy Feedback</p>'),
                 True, [], None, None
             )
         )
         question = question_domain.Question(
             question_id, state,
             feconf.CURRENT_STATE_SCHEMA_VERSION,
-            constants.DEFAULT_LANGUAGE_CODE, 0, linked_skill_ids, [])
+            constants.DEFAULT_LANGUAGE_CODE, 0, linked_skill_ids, [],
+            content_id_generator.next_content_id_index)
         return question
 
-    def _create_dummy_skill(self, skill_id, skill_description, explanation):
+    def _create_dummy_skill(
+        self, skill_id: str, skill_description: str, explanation: str
+    ) -> skill_domain.Skill:
         """Creates a dummy skill object with the given values.
 
         Args:
@@ -397,7 +610,7 @@ class AdminHandler(base.BaseHandler):
         skill.update_explanation(state_domain.SubtitledHtml('1', explanation))
         return skill
 
-    def _load_dummy_new_structures_data(self):
+    def _load_dummy_new_structures_data(self) -> None:
         """Loads the database with two topics (one of which is empty), a story
         and three skills in the topic (two of them in a subtopic) and a question
         attached to each skill.
@@ -406,6 +619,7 @@ class AdminHandler(base.BaseHandler):
             Exception. Cannot load new structures data in production mode.
             Exception. User does not have enough rights to generate data.
         """
+        assert self.user_id is not None
         if constants.DEV_MODE:
             if feconf.ROLE_ID_CURRICULUM_ADMIN not in self.user.roles:
                 raise Exception(
@@ -445,15 +659,17 @@ class AdminHandler(base.BaseHandler):
                 self.user_id, question_id_3, skill_id_3, 0.7)
 
             topic_1 = topic_domain.Topic.create_default_topic(
-                topic_id_1, 'Dummy Topic 1', 'dummy-topic-one', 'description')
+                topic_id_1, 'Dummy Topic 1', 'dummy-topic-one', 'description',
+                'fragm')
             topic_2 = topic_domain.Topic.create_default_topic(
-                topic_id_2, 'Empty Topic', 'empty-topic', 'description')
+                topic_id_2, 'Empty Topic', 'empty-topic', 'description',
+                'fragm')
 
             topic_1.add_canonical_story(story_id)
             topic_1.add_uncategorized_skill_id(skill_id_1)
             topic_1.add_uncategorized_skill_id(skill_id_2)
             topic_1.add_uncategorized_skill_id(skill_id_3)
-            topic_1.add_subtopic(1, 'Dummy Subtopic Title')
+            topic_1.add_subtopic(1, 'Dummy Subtopic Title', 'dummysubtopic')
             topic_1.move_skill_id_to_subtopic(None, 1, skill_id_2)
             topic_1.move_skill_id_to_subtopic(None, 1, skill_id_3)
 
@@ -462,11 +678,11 @@ class AdminHandler(base.BaseHandler):
                     1, topic_id_1))
             # These explorations were chosen since they pass the validations
             # for published stories.
-            self._reload_exploration('15')
+            self._reload_exploration('6')
             self._reload_exploration('25')
             self._reload_exploration('13')
             exp_services.update_exploration(
-                self.user_id, '15', [exp_domain.ExplorationChange({
+                self.user_id, '6', [exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
                     'property_name': 'correctness_feedback_enabled',
                     'new_value': True
@@ -489,7 +705,7 @@ class AdminHandler(base.BaseHandler):
                 topic_id_1, 'help-jamie-win-arcade')
 
             story_node_dicts = [{
-                'exp_id': '15',
+                'exp_id': '6',
                 'title': 'What are the place values?',
                 'description': 'Jaime learns the place value of each digit ' +
                                'in a big number.'
@@ -505,7 +721,9 @@ class AdminHandler(base.BaseHandler):
                                'greater than another number.'
             }]
 
-            def generate_dummy_story_nodes(node_id, exp_id, title, description):
+            def generate_dummy_story_nodes(
+                node_id: int, exp_id: str, title: str, description: str
+            ) -> None:
                 """Generates and connects sequential story nodes.
 
                 Args:
@@ -514,7 +732,7 @@ class AdminHandler(base.BaseHandler):
                     title: str. The title of the story node.
                     description: str. The description of the story node.
                 """
-
+                assert self.user_id is not None
                 story.add_node(
                     '%s%d' % (story_domain.NODE_ID_PREFIX, node_id),
                     title)
@@ -550,7 +768,8 @@ class AdminHandler(base.BaseHandler):
                 [topic_domain.TopicChange({
                     'cmd': topic_domain.CMD_ADD_SUBTOPIC,
                     'subtopic_id': 1,
-                    'title': 'Dummy Subtopic Title'
+                    'title': 'Dummy Subtopic Title',
+                    'url_fragment': 'dummy-fragment'
                 })]
             )
 
@@ -563,7 +782,7 @@ class AdminHandler(base.BaseHandler):
         else:
             raise Exception('Cannot load new structures data in production.')
 
-    def _generate_dummy_skill_and_questions(self):
+    def _generate_dummy_skill_and_questions(self) -> None:
         """Generate and loads the database with a skill and 15 questions
         linked to the skill.
 
@@ -571,6 +790,7 @@ class AdminHandler(base.BaseHandler):
             Exception. Cannot load new structures data in production mode.
             Exception. User does not have enough rights to generate data.
         """
+        assert self.user_id is not None
         if constants.DEV_MODE:
             if feconf.ROLE_ID_CURRICULUM_ADMIN not in self.user.roles:
                 raise Exception(
@@ -594,7 +814,7 @@ class AdminHandler(base.BaseHandler):
         else:
             raise Exception('Cannot generate dummy skills in production.')
 
-    def _reload_collection(self, collection_id):
+    def _reload_collection(self, collection_id: str) -> None:
         """Reloads the collection in dev_mode corresponding to the given
         collection id.
 
@@ -604,6 +824,7 @@ class AdminHandler(base.BaseHandler):
         Raises:
             Exception. Cannot reload a collection in production.
         """
+        assert self.user_id is not None
         if constants.DEV_MODE:
             logging.info(
                 '[ADMIN] %s reloaded collection %s' %
@@ -615,7 +836,8 @@ class AdminHandler(base.BaseHandler):
             raise Exception('Cannot reload a collection in production.')
 
     def _generate_dummy_explorations(
-            self, num_dummy_exps_to_generate, num_dummy_exps_to_publish):
+        self, num_dummy_exps_to_generate: int, num_dummy_exps_to_publish: int
+    ) -> None:
         """Generates and publishes the given number of dummy explorations.
 
         Args:
@@ -627,7 +849,7 @@ class AdminHandler(base.BaseHandler):
         Raises:
             Exception. Environment is not DEVMODE.
         """
-
+        assert self.user_id is not None
         if constants.DEV_MODE:
             logging.info(
                 '[ADMIN] %s generated %s number of dummy explorations' %
@@ -654,12 +876,313 @@ class AdminHandler(base.BaseHandler):
         else:
             raise Exception('Cannot generate dummy explorations in production.')
 
+    def _generate_dummy_classroom(self) -> None:
+        """Generate and loads the database with a classroom.
 
-class AdminRoleHandler(base.BaseHandler):
+        Raises:
+            Exception. Cannot generate dummy classroom in production.
+            Exception. User does not have enough rights to generate data.
+        """
+        assert self.user_id is not None
+        if constants.DEV_MODE:
+            if feconf.ROLE_ID_CURRICULUM_ADMIN not in self.user.roles:
+                raise Exception(
+                    'User does not have enough rights to generate data.')
+            logging.info(
+                '[ADMIN] %s generated dummy classroom.' % self.user_id)
+
+            topic_id_1 = topic_fetchers.get_new_topic_id()
+            topic_id_2 = topic_fetchers.get_new_topic_id()
+            topic_id_3 = topic_fetchers.get_new_topic_id()
+            topic_id_4 = topic_fetchers.get_new_topic_id()
+            topic_id_5 = topic_fetchers.get_new_topic_id()
+
+            skill_id_1 = skill_services.get_new_skill_id()
+            skill_id_2 = skill_services.get_new_skill_id()
+            skill_id_3 = skill_services.get_new_skill_id()
+            skill_id_4 = skill_services.get_new_skill_id()
+            skill_id_5 = skill_services.get_new_skill_id()
+
+            question_id_1 = question_services.get_new_question_id()
+            question_id_2 = question_services.get_new_question_id()
+            question_id_3 = question_services.get_new_question_id()
+            question_id_4 = question_services.get_new_question_id()
+            question_id_5 = question_services.get_new_question_id()
+            question_id_6 = question_services.get_new_question_id()
+            question_id_7 = question_services.get_new_question_id()
+            question_id_8 = question_services.get_new_question_id()
+            question_id_9 = question_services.get_new_question_id()
+            question_id_10 = question_services.get_new_question_id()
+            question_id_11 = question_services.get_new_question_id()
+            question_id_12 = question_services.get_new_question_id()
+            question_id_13 = question_services.get_new_question_id()
+            question_id_14 = question_services.get_new_question_id()
+            question_id_15 = question_services.get_new_question_id()
+
+            question_1 = self._create_dummy_question(
+                question_id_1, 'Question 1', [skill_id_1])
+            question_2 = self._create_dummy_question(
+                question_id_2, 'Question 2', [skill_id_1])
+            question_3 = self._create_dummy_question(
+                question_id_3, 'Question 3', [skill_id_1])
+            question_4 = self._create_dummy_question(
+                question_id_4, 'Question 4', [skill_id_2])
+            question_5 = self._create_dummy_question(
+                question_id_5, 'Question 5', [skill_id_2])
+            question_6 = self._create_dummy_question(
+                question_id_6, 'Question 6', [skill_id_2])
+            question_7 = self._create_dummy_question(
+                question_id_7, 'Question 7', [skill_id_3])
+            question_8 = self._create_dummy_question(
+                question_id_8, 'Question 8', [skill_id_3])
+            question_9 = self._create_dummy_question(
+                question_id_9, 'Question 9', [skill_id_3])
+            question_10 = self._create_dummy_question(
+                question_id_10, 'Question 10', [skill_id_4])
+            question_11 = self._create_dummy_question(
+                question_id_11, 'Question 11', [skill_id_4])
+            question_12 = self._create_dummy_question(
+                question_id_12, 'Question 12', [skill_id_4])
+            question_13 = self._create_dummy_question(
+                question_id_13, 'Question 13', [skill_id_5])
+            question_14 = self._create_dummy_question(
+                question_id_14, 'Question 14', [skill_id_5])
+            question_15 = self._create_dummy_question(
+                question_id_15, 'Question 15', [skill_id_5])
+
+            topic_1 = topic_domain.Topic.create_default_topic(
+                topic_id_1, 'Addition', 'add', 'description', 'fragm')
+            topic_1.skill_ids_for_diagnostic_test = [skill_id_1]
+            topic_1.thumbnail_filename = 'thumbnail.svg'
+            topic_1.thumbnail_bg_color = '#C6DCDA'
+            topic_1.subtopics = [
+                topic_domain.Subtopic(
+                    1, 'Title', [skill_id_1], 'image.svg',
+                    constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
+                    'dummy-subtopic-three')]
+            topic_1.next_subtopic_id = 2
+
+            topic_2 = topic_domain.Topic.create_default_topic(
+                topic_id_2, 'Subtraction', 'subtraction',
+                'description', 'fragm'
+            )
+            topic_2.skill_ids_for_diagnostic_test = [skill_id_2]
+            topic_2.thumbnail_filename = 'thumbnail.svg'
+            topic_2.thumbnail_bg_color = '#C6DCDA'
+            topic_2.subtopics = [
+                topic_domain.Subtopic(
+                    1, 'Title', [skill_id_2], 'image.svg',
+                    constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
+                    'dummy-subtopic-three')]
+            topic_2.next_subtopic_id = 2
+
+            topic_3 = topic_domain.Topic.create_default_topic(
+                topic_id_3, 'Multiplication', 'multiplication',
+                'description', 'fragm'
+            )
+            topic_3.skill_ids_for_diagnostic_test = [skill_id_3]
+            topic_3.thumbnail_filename = 'thumbnail.svg'
+            topic_3.thumbnail_bg_color = '#C6DCDA'
+            topic_3.subtopics = [
+                topic_domain.Subtopic(
+                    1, 'Title', [skill_id_3], 'image.svg',
+                    constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
+                    'dummy-subtopic-three')]
+            topic_3.next_subtopic_id = 2
+
+            topic_4 = topic_domain.Topic.create_default_topic(
+                topic_id_4, 'Division', 'division', 'description', 'fragm')
+            topic_4.skill_ids_for_diagnostic_test = [skill_id_4]
+            topic_4.thumbnail_filename = 'thumbnail.svg'
+            topic_4.thumbnail_bg_color = '#C6DCDA'
+            topic_4.subtopics = [
+                topic_domain.Subtopic(
+                    1, 'Title', [skill_id_4], 'image.svg',
+                    constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
+                    'dummy-subtopic-three')]
+            topic_4.next_subtopic_id = 2
+
+            topic_5 = topic_domain.Topic.create_default_topic(
+                topic_id_5, 'Fraction', 'fraction', 'description', 'fragm')
+            topic_5.skill_ids_for_diagnostic_test = [skill_id_5]
+            topic_5.thumbnail_filename = 'thumbnail.svg'
+            topic_5.thumbnail_bg_color = '#C6DCDA'
+            topic_5.subtopics = [
+                topic_domain.Subtopic(
+                    1, 'Title', [skill_id_5], 'image.svg',
+                    constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
+                    'dummy-subtopic-three')]
+            topic_5.next_subtopic_id = 2
+
+            skill_1 = self._create_dummy_skill(
+                skill_id_1, 'Skill1', '<p>Dummy Explanation 1</p>')
+            skill_2 = self._create_dummy_skill(
+                skill_id_2, 'Skill2', '<p>Dummy Explanation 2</p>')
+            skill_3 = self._create_dummy_skill(
+                skill_id_3, 'Skill3', '<p>Dummy Explanation 3</p>')
+            skill_4 = self._create_dummy_skill(
+                skill_id_4, 'Skill4', '<p>Dummy Explanation 4</p>')
+            skill_5 = self._create_dummy_skill(
+                skill_id_5, 'Skill5', '<p>Dummy Explanation 5</p>')
+
+            question_services.add_question(self.user_id, question_1)
+            question_services.add_question(self.user_id, question_2)
+            question_services.add_question(self.user_id, question_3)
+            question_services.add_question(self.user_id, question_4)
+            question_services.add_question(self.user_id, question_5)
+            question_services.add_question(self.user_id, question_6)
+            question_services.add_question(self.user_id, question_7)
+            question_services.add_question(self.user_id, question_8)
+            question_services.add_question(self.user_id, question_9)
+            question_services.add_question(self.user_id, question_10)
+            question_services.add_question(self.user_id, question_11)
+            question_services.add_question(self.user_id, question_12)
+            question_services.add_question(self.user_id, question_13)
+            question_services.add_question(self.user_id, question_14)
+            question_services.add_question(self.user_id, question_15)
+
+            skill_services.save_new_skill(self.user_id, skill_1)
+            skill_services.save_new_skill(self.user_id, skill_2)
+            skill_services.save_new_skill(self.user_id, skill_3)
+            skill_services.save_new_skill(self.user_id, skill_4)
+            skill_services.save_new_skill(self.user_id, skill_5)
+
+            topic_services.save_new_topic(self.user_id, topic_1)
+            topic_services.publish_topic(topic_id_1, self.user_id)
+
+            topic_services.save_new_topic(self.user_id, topic_2)
+            topic_services.publish_topic(topic_id_2, self.user_id)
+
+            topic_services.save_new_topic(self.user_id, topic_3)
+            topic_services.publish_topic(topic_id_3, self.user_id)
+
+            topic_services.save_new_topic(self.user_id, topic_4)
+            topic_services.publish_topic(topic_id_4, self.user_id)
+
+            topic_services.save_new_topic(self.user_id, topic_5)
+            topic_services.publish_topic(topic_id_5, self.user_id)
+
+            question_services.create_new_question_skill_link(
+                self.user_id, question_id_1, skill_id_1, 0.5)
+            question_services.create_new_question_skill_link(
+                self.user_id, question_id_2, skill_id_1, 0.5)
+            question_services.create_new_question_skill_link(
+                self.user_id, question_id_3, skill_id_1, 0.5)
+            question_services.create_new_question_skill_link(
+                self.user_id, question_id_4, skill_id_2, 0.5)
+            question_services.create_new_question_skill_link(
+                self.user_id, question_id_5, skill_id_2, 0.5)
+            question_services.create_new_question_skill_link(
+                self.user_id, question_id_6, skill_id_2, 0.5)
+            question_services.create_new_question_skill_link(
+                self.user_id, question_id_7, skill_id_3, 0.5)
+            question_services.create_new_question_skill_link(
+                self.user_id, question_id_8, skill_id_3, 0.5)
+            question_services.create_new_question_skill_link(
+                self.user_id, question_id_9, skill_id_3, 0.5)
+            question_services.create_new_question_skill_link(
+                self.user_id, question_id_10, skill_id_4, 0.5)
+            question_services.create_new_question_skill_link(
+                self.user_id, question_id_11, skill_id_4, 0.5)
+            question_services.create_new_question_skill_link(
+                self.user_id, question_id_12, skill_id_4, 0.5)
+            question_services.create_new_question_skill_link(
+                self.user_id, question_id_13, skill_id_5, 0.5)
+            question_services.create_new_question_skill_link(
+                self.user_id, question_id_14, skill_id_5, 0.5)
+            question_services.create_new_question_skill_link(
+                self.user_id, question_id_15, skill_id_5, 0.5)
+
+            classroom_id_1 = classroom_config_services.get_new_classroom_id()
+
+            classroom_name_1 = 'Math'
+
+            classroom_url_fragment_1 = 'math'
+
+            topic_dependency_for_classroom_1: Dict[str, list[str]] = {
+                topic_id_1: [],
+                topic_id_2: [topic_id_1],
+                topic_id_3: [topic_id_1],
+                topic_id_4: [topic_id_2],
+                topic_id_5: [topic_id_2, topic_id_3]
+            }
+
+            classroom_dict_1: classroom_config_domain.ClassroomDict = {
+                'classroom_id': classroom_id_1,
+                'name': classroom_name_1,
+                'url_fragment': classroom_url_fragment_1,
+                'course_details': '',
+                'topic_list_intro': '',
+                'topic_id_to_prerequisite_topic_ids': (
+                    topic_dependency_for_classroom_1)
+            }
+
+            classroom_1 = classroom_config_domain.Classroom.from_dict(
+                classroom_dict_1)
+
+            classroom_config_services.update_or_create_classroom_model(
+                classroom_1)
+
+            classroom_pages_data = [{
+                'name': 'math',
+                'url_fragment': 'math',
+                'course_details': '',
+                'topic_list_intro': '',
+                'topic_ids': [
+                    topic_id_1,
+                    topic_id_2,
+                    topic_id_3,
+                    topic_id_4,
+                    topic_id_5
+                ],
+            }]
+            config_services.set_property(
+                self.user_id, 'classroom_pages_data', classroom_pages_data)
+        else:
+            raise Exception('Cannot generate dummy classroom in production.')
+
+
+class AdminRoleHandlerNormalizedGetRequestDict(TypedDict):
+    """Dict representation of AdminRoleHandler's GET normalized_request
+    dictionary.
+    """
+
+    filter_criterion: str
+    role: Optional[str]
+    username: Optional[str]
+
+
+class AdminRoleHandlerNormalizedDeleteRequestDict(TypedDict):
+    """Dict representation of AdminRoleHandler's DELETE normalized_request
+    dictionary.
+    """
+
+    role: str
+    username: str
+
+
+class AdminRoleHandlerNormalizedPayloadDict(TypedDict):
+    """Dict representation of AdminRoleHandler's normalized_payload
+    dictionary.
+    """
+
+    role: str
+    username: str
+
+
+class AdminRoleHandler(
+    base.BaseHandler[
+        AdminRoleHandlerNormalizedPayloadDict,
+        Union[
+            AdminRoleHandlerNormalizedGetRequestDict,
+            AdminRoleHandlerNormalizedDeleteRequestDict
+        ]
+    ]
+):
     """Handler for roles tab of admin page. Used to view and update roles."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-    URL_PATH_ARGS_SCHEMAS = {}
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
     HANDLER_ARGS_SCHEMAS = {
         'GET': {
             'filter_criterion': {
@@ -714,22 +1237,60 @@ class AdminRoleHandler(base.BaseHandler):
     }
 
     @acl_decorators.can_access_admin_page
-    def get(self):
-        filter_criterion = self.normalized_request.get(
-            'filter_criterion')
+    def get(self) -> None:
+        """Retrieves information about users based on different filter
+        criteria to populate the roles tab.
+
+        Raises:
+            Exception. The role must be provided when the filter criterion
+                is 'role'.
+            Exception. The username must be provided when the filter
+                criterion is 'username'.
+            InvalidInputException. User with given username does not exist.
+        """
+        assert self.user_id is not None
+        # Here we use cast because we are narrowing down the type of
+        # 'normalized_request' from Union of request TypedDicts to a
+        # particular TypedDict that was defined according to the schemas.
+        # So that the type of fetched values is not considered as Any type.
+        request_data = cast(
+            AdminRoleHandlerNormalizedGetRequestDict,
+            self.normalized_request
+        )
+        filter_criterion = request_data['filter_criterion']
         if filter_criterion == feconf.USER_FILTER_CRITERION_ROLE:
-            role = self.normalized_request.get(
-                feconf.USER_FILTER_CRITERION_ROLE)
+            role = request_data.get(feconf.USER_FILTER_CRITERION_ROLE)
+            if role is None:
+                raise Exception(
+                    'The role must be provided when the filter criterion '
+                    'is \'role\'.'
+                )
             role_services.log_role_query(
                 self.user_id, feconf.ROLE_ACTION_VIEW_BY_ROLE,
                 role=role)
             self.render_json({
-                'usernames': user_services.get_usernames_by_role(role)
+                'usernames': (
+                    user_services.get_usernames_by_role(role) if role else []
+                )
             })
-        elif filter_criterion == feconf.USER_FILTER_CRITERION_USERNAME:
-            username = self.normalized_request.get(
+        else:
+            # The handler schema defines the possible values of
+            # 'filter_criterion'. If 'filter_criterion' has a value other than
+            # those defined in the schema, a Bad Request error will be thrown.
+            # Hence, 'filter_criterion' must be
+            # 'feconf.USER_FILTER_CRITERION_USERNAME' if this branch is
+            # executed.
+            assert filter_criterion == (
                 feconf.USER_FILTER_CRITERION_USERNAME)
-            user_id = user_services.get_user_id_from_username(username)
+            username = request_data.get(feconf.USER_FILTER_CRITERION_USERNAME)
+            if username is None:
+                raise Exception(
+                    'The username must be provided when the filter criterion '
+                    'is \'username\'.'
+                )
+            user_id = (
+                user_services.get_user_id_from_username(username)
+            )
             role_services.log_role_query(
                 self.user_id, feconf.ROLE_ACTION_VIEW_BY_USERNAME,
                 username=username)
@@ -752,9 +1313,16 @@ class AdminRoleHandler(base.BaseHandler):
             self.render_json(user_roles_dict)
 
     @acl_decorators.can_access_admin_page
-    def put(self):
-        username = self.payload.get('username')
-        role = self.payload.get('role')
+    def put(self) -> None:
+        """Adds a role to a user.
+
+        Raises:
+            InvalidInputException. User with given username does not exist.
+            InvalidInputException. Unsupported role for this handler.
+        """
+        assert self.normalized_payload is not None
+        username = self.normalized_payload['username']
+        role = self.normalized_payload['role']
         user_settings = user_services.get_user_settings_from_username(username)
 
         if user_settings is None:
@@ -772,9 +1340,22 @@ class AdminRoleHandler(base.BaseHandler):
         self.render_json({})
 
     @acl_decorators.can_access_admin_page
-    def delete(self):
-        username = self.request.get('username')
-        role = self.request.get('role')
+    def delete(self) -> None:
+        """Removes a role from a user.
+
+        Raises:
+            InvalidInputException. User with given username does not exist.
+        """
+        # Here we use cast because we are narrowing down the type of
+        # 'normalized_request' from Union of request TypedDicts to a
+        # particular TypedDict that was defined according to the schemas.
+        # So that the type of fetched values is not considered as Any type.
+        request_data = cast(
+            AdminRoleHandlerNormalizedDeleteRequestDict,
+            self.normalized_request
+        )
+        username = request_data['username']
+        role = request_data['role']
 
         user_id = user_services.get_user_id_from_username(username)
         if user_id is None:
@@ -789,11 +1370,25 @@ class AdminRoleHandler(base.BaseHandler):
         self.render_json({})
 
 
-class TopicManagerRoleHandler(base.BaseHandler):
+class TopicManagerRoleHandlerNormalizedPayloadDict(TypedDict):
+    """Dict representation of TopicManagerRoleHandler's normalized_payload
+    dictionary.
+    """
+
+    username: str
+    action: str
+    topic_id: str
+
+
+class TopicManagerRoleHandler(
+    base.BaseHandler[
+        TopicManagerRoleHandlerNormalizedPayloadDict, Dict[str, str]
+    ]
+):
     """Handler to assign or deassigning manager to a topic."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-    URL_PATH_ARGS_SCHEMAS = {}
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
     HANDLER_ARGS_SCHEMAS = {
         'PUT': {
             'username': {
@@ -816,10 +1411,17 @@ class TopicManagerRoleHandler(base.BaseHandler):
     }
 
     @acl_decorators.can_access_admin_page
-    def put(self):
-        username = self.normalized_payload.get('username')
-        action = self.normalized_payload.get('action')
-        topic_id = self.normalized_payload.get('topic_id')
+    def put(self) -> None:
+        """Adds or removes the topic-manager role for a user in the context
+        of a specific topic.
+
+        Raises:
+            InvalidInputException. User with given username does not exist.
+        """
+        assert self.normalized_payload is not None
+        username = self.normalized_payload['username']
+        action = self.normalized_payload['action']
+        topic_id = self.normalized_payload['topic_id']
 
         user_settings = user_services.get_user_settings_from_username(username)
 
@@ -837,22 +1439,51 @@ class TopicManagerRoleHandler(base.BaseHandler):
             topic_services.assign_role(
                 user_services.get_system_user(),
                 topic_manager, topic_domain.ROLE_MANAGER, topic_id)
-        elif action == 'deassign':
+        else:
+            # The handler schema defines the possible values of 'action'.
+            # If 'action' has a value other than those defined in the schema,
+            # a Bad Request error will be thrown. Hence, 'action' must be
+            # 'deassign' if this branch is executed.
+            assert action == 'deassign'
             topic_services.deassign_manager_role_from_topic(
                 user_services.get_system_user(), user_id, topic_id)
 
-            if not topic_fetchers.get_topic_rights_with_user(user_id):
-                user_services.remove_user_role(
-                    user_id, feconf.ROLE_ID_TOPIC_MANAGER)
+            # The case where user does not have manager rights it will be
+            # caught before in topic_services.deassign_manager_role_from_topic
+            # method.
+            assert not topic_fetchers.get_topic_rights_with_user(user_id)
+            user_services.remove_user_role(
+                user_id, feconf.ROLE_ID_TOPIC_MANAGER)
 
         self.render_json({})
 
 
-class BannedUsersHandler(base.BaseHandler):
+class BannedUsersHandlerNormalizedPayloadDict(TypedDict):
+    """Dict representation of BannedUsersHandler's normalized_payload
+    dictionary.
+    """
+
+    username: str
+
+
+class BannedUsersHandlerNormalizedRequestDict(TypedDict):
+    """Dict representation of BannedUsersHandler's normalized_request
+    dictionary.
+    """
+
+    username: str
+
+
+class BannedUsersHandler(
+    base.BaseHandler[
+        BannedUsersHandlerNormalizedPayloadDict,
+        BannedUsersHandlerNormalizedRequestDict
+    ]
+):
     """Handler to ban and unban users."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-    URL_PATH_ARGS_SCHEMAS = {}
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
     HANDLER_ARGS_SCHEMAS = {
         'PUT': {
             'username': {
@@ -871,8 +1502,14 @@ class BannedUsersHandler(base.BaseHandler):
     }
 
     @acl_decorators.can_access_admin_page
-    def put(self):
-        username = self.normalized_payload.get('username')
+    def put(self) -> None:
+        """Marks a user as banned.
+
+        Raises:
+            InvalidInputException. User with given username does not exist.
+        """
+        assert self.normalized_payload is not None
+        username = self.normalized_payload['username']
         user_id = user_services.get_user_id_from_username(username)
 
         if user_id is None:
@@ -884,8 +1521,14 @@ class BannedUsersHandler(base.BaseHandler):
         self.render_json({})
 
     @acl_decorators.can_access_admin_page
-    def delete(self):
-        username = self.normalized_request.get('username')
+    def delete(self) -> None:
+        """Removes the banned status of the user.
+
+        Raises:
+            InvalidInputException. User with given username does not exist.
+        """
+        assert self.normalized_request is not None
+        username = self.normalized_request['username']
         user_id = user_services.get_user_id_from_username(username)
 
         if user_id is None:
@@ -896,12 +1539,33 @@ class BannedUsersHandler(base.BaseHandler):
         self.render_json({})
 
 
-class AdminSuperAdminPrivilegesHandler(base.BaseHandler):
+class AdminSuperAdminPrivilegesHandlerNormalizedPayloadDict(TypedDict):
+    """Dict representation of AdminSuperAdminPrivilegesHandler's
+    normalized_payload dictionary.
+    """
+
+    username: str
+
+
+class AdminSuperAdminPrivilegesHandlerNormalizedRequestDict(TypedDict):
+    """Dict representation of AdminSuperAdminPrivilegesHandler's
+    normalized_request dictionary.
+    """
+
+    username: str
+
+
+class AdminSuperAdminPrivilegesHandler(
+    base.BaseHandler[
+        AdminSuperAdminPrivilegesHandlerNormalizedPayloadDict,
+        AdminSuperAdminPrivilegesHandlerNormalizedRequestDict
+    ]
+):
     """Handler for granting a user super admin privileges."""
 
     PUT_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     DELETE_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-    URL_PATH_ARGS_SCHEMAS = {}
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
     HANDLER_ARGS_SCHEMAS = {
         'PUT': {
             'username': {
@@ -920,12 +1584,19 @@ class AdminSuperAdminPrivilegesHandler(base.BaseHandler):
     }
 
     @acl_decorators.can_access_admin_page
-    def put(self):
+    def put(self) -> None:
+        """Grants super admin privileges to a user.
+
+        Raises:
+            UnauthorizedUserException. Only the default system admin can
+                manage super admins.
+            InvalidInputException. No such user exists.
+        """
+        assert self.normalized_payload is not None
         if self.email != feconf.ADMIN_EMAIL_ADDRESS:
             raise self.UnauthorizedUserException(
                 'Only the default system admin can manage super admins')
-
-        username = self.normalized_payload.get('username')
+        username = self.normalized_payload['username']
 
         user_id = user_services.get_user_id_from_username(username)
         if user_id is None:
@@ -935,12 +1606,21 @@ class AdminSuperAdminPrivilegesHandler(base.BaseHandler):
         self.render_json(self.values)
 
     @acl_decorators.can_access_admin_page
-    def delete(self):
+    def delete(self) -> None:
+        """Revokes super admin privileges from a user.
+
+        Raises:
+            UnauthorizedUserException. Only the default system admin can
+                manage super admins.
+            InvalidInputException. No such user exists.
+            InvalidInputException. Cannot revoke privileges from the default
+                super admin account.
+        """
+        assert self.normalized_request is not None
         if self.email != feconf.ADMIN_EMAIL_ADDRESS:
             raise self.UnauthorizedUserException(
                 'Only the default system admin can manage super admins')
-
-        username = self.normalized_request.get('username')
+        username = self.normalized_request['username']
 
         user_settings = user_services.get_user_settings_from_username(username)
         if user_settings is None:
@@ -954,15 +1634,18 @@ class AdminSuperAdminPrivilegesHandler(base.BaseHandler):
         self.render_json(self.values)
 
 
-class AdminTopicsCsvFileDownloader(base.BaseHandler):
+class AdminTopicsCsvFileDownloader(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
     """Retrieves topic similarity data for download."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_DOWNLOADABLE
-    URL_PATH_ARGS_SCHEMAS = {}
-    HANDLER_ARGS_SCHEMAS = {'GET': {}}
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.can_access_admin_page
-    def get(self):
+    def get(self) -> None:
+        """Generates a CSV file containing topic similarities."""
         topic_similarities = (
             recommendations_services.get_topic_similarities_as_csv()
         )
@@ -975,11 +1658,26 @@ class AdminTopicsCsvFileDownloader(base.BaseHandler):
         )
 
 
-class DataExtractionQueryHandler(base.BaseHandler):
+class DataExtractionQueryHandlerNormalizedRequestDict(TypedDict):
+    """Dict representation of DataExtractionQueryHandler's
+    normalized_request dictionary.
+    """
+
+    exp_id: str
+    exp_version: int
+    state_name: str
+    num_answers: int
+
+
+class DataExtractionQueryHandler(
+    base.BaseHandler[
+        Dict[str, str], DataExtractionQueryHandlerNormalizedRequestDict
+    ]
+):
     """Handler for data extraction query."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-    URL_PATH_ARGS_SCHEMAS = {}
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
     HANDLER_ARGS_SCHEMAS = {
         'GET': {
             'exp_id': {
@@ -1006,9 +1704,18 @@ class DataExtractionQueryHandler(base.BaseHandler):
     }
 
     @acl_decorators.can_access_admin_page
-    def get(self):
-        exp_id = self.normalized_request.get('exp_id')
-        exp_version = self.normalized_request.get('exp_version')
+    def get(self) -> None:
+        """Retrieves a specified number of submitted answers for a particular
+        state within an exploration.
+
+        Raises:
+            InvalidInputException. Entity not found.
+            InvalidInputException. Exploration does not have such state.
+            Exception. No state answer exists.
+        """
+        assert self.normalized_request is not None
+        exp_id = self.normalized_request['exp_id']
+        exp_version = self.normalized_request['exp_version']
 
         exploration = exp_fetchers.get_exploration_by_id(
             exp_id, strict=False, version=exp_version)
@@ -1017,8 +1724,8 @@ class DataExtractionQueryHandler(base.BaseHandler):
                 'Entity for exploration with id %s and version %s not found.'
                 % (exp_id, exp_version))
 
-        state_name = self.normalized_request.get('state_name')
-        num_answers = self.normalized_request.get('num_answers')
+        state_name = self.normalized_request['state_name']
+        num_answers = self.normalized_request['num_answers']
 
         if state_name not in exploration.states:
             raise self.InvalidInputException(
@@ -1027,6 +1734,13 @@ class DataExtractionQueryHandler(base.BaseHandler):
 
         state_answers = stats_services.get_state_answers(
             exp_id, exp_version, state_name)
+        if state_answers is None:
+            raise Exception(
+                'No state answer exists for the given exp_id: %s,'
+                ' exp_version: %s and state_name: %s' %
+                (exp_id, exp_version, state_name)
+
+            )
         extracted_answers = state_answers.get_submitted_answer_dict_list()
 
         if num_answers > 0:
@@ -1038,15 +1752,24 @@ class DataExtractionQueryHandler(base.BaseHandler):
         self.render_json(response)
 
 
-class SendDummyMailToAdminHandler(base.BaseHandler):
+class SendDummyMailToAdminHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
     """This function handles sending test emails."""
 
-    URL_PATH_ARGS_SCHEMAS = {}
-    HANDLER_ARGS_SCHEMAS = {'POST': {}}
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'POST': {}}
 
     @acl_decorators.can_access_admin_page
-    def post(self):
+    def post(self) -> None:
+        """Sends a dummy email to the admin if the application is
+        configured to send emails.
+
+        Raises:
+            InvalidInputException. This app cannot send emails.
+        """
         username = self.username
+        assert username is not None
         if feconf.CAN_SEND_EMAILS:
             email_manager.send_dummy_mail_to_admin(username)
             self.render_json({})
@@ -1054,10 +1777,23 @@ class SendDummyMailToAdminHandler(base.BaseHandler):
             raise self.InvalidInputException('This app cannot send emails.')
 
 
-class UpdateUsernameHandler(base.BaseHandler):
+class UpdateUsernameHandlerNormalizedPayloadDict(TypedDict):
+    """Dict representation of UpdateUsernameHandler's
+    normalized_payload dictionary.
+    """
+
+    old_username: str
+    new_username: str
+
+
+class UpdateUsernameHandler(
+    base.BaseHandler[
+        UpdateUsernameHandlerNormalizedPayloadDict, Dict[str, str]
+    ]
+):
     """Handler for renaming usernames."""
 
-    URL_PATH_ARGS_SCHEMAS = {}
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
     HANDLER_ARGS_SCHEMAS = {
         'PUT': {
             'old_username': {
@@ -1078,9 +1814,20 @@ class UpdateUsernameHandler(base.BaseHandler):
     }
 
     @acl_decorators.can_access_admin_page
-    def put(self):
-        old_username = self.normalized_payload.get('old_username')
-        new_username = self.normalized_payload.get('new_username')
+    def put(self) -> None:
+        """Updates the username for a user.
+
+        Raises:
+            InvalidInputException. Invalid username.
+            InvalidInputException. The user does not have a profile picture
+                with png extension.
+            InvalidInputException. The user does not have a profile picture
+                with webp extension.
+        """
+        assert self.user_id is not None
+        assert self.normalized_payload is not None
+        old_username = self.normalized_payload['old_username']
+        new_username = self.normalized_payload['new_username']
 
         user_id = user_services.get_user_id_from_username(old_username)
         if user_id is None:
@@ -1090,34 +1837,78 @@ class UpdateUsernameHandler(base.BaseHandler):
         if user_services.is_username_taken(new_username):
             raise self.InvalidInputException('Username already taken.')
 
+        # Update profile picture.
+        old_fs = fs_services.GcsFileSystem(
+            feconf.ENTITY_TYPE_USER, old_username)
+        new_fs = fs_services.GcsFileSystem(
+            feconf.ENTITY_TYPE_USER, new_username)
+
+        if not old_fs.isfile('profile_picture.png'):
+            raise self.InvalidInputException(
+                'The user with username %s does not have a '
+                'profile picture with png extension.' % old_username
+            )
+
+        if not old_fs.isfile('profile_picture.webp'):
+            raise self.InvalidInputException(
+                'The user with username %s does not have a '
+                'profile picture with webp extension.' % old_username
+            )
+
+        image_png = old_fs.get('profile_picture.png')
+        old_fs.delete('profile_picture.png')
+        new_fs.commit(
+            'profile_picture.png', image_png, mimetype='image/png')
+
+        image_webp = old_fs.get('profile_picture.webp')
+        old_fs.delete('profile_picture.webp')
+        new_fs.commit(
+            'profile_picture.webp', image_webp, mimetype='image/webp')
+
         user_services.set_username(user_id, new_username)
         user_services.log_username_change(
             self.user_id, old_username, new_username)
+
         self.render_json({})
 
 
-class NumberOfDeletionRequestsHandler(base.BaseHandler):
+class NumberOfDeletionRequestsHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
     """Handler for getting the number of pending deletion requests via admin
     page.
     """
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-    URL_PATH_ARGS_SCHEMAS = {}
-    HANDLER_ARGS_SCHEMAS = {'GET': {}}
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.can_access_admin_page
-    def get(self):
+    def get(self) -> None:
+        """Retrieves the number of pending deletion requests for models."""
         self.render_json({
             'number_of_pending_deletion_models': (
                 wipeout_service.get_number_of_pending_deletion_requests())
         })
 
 
-class VerifyUserModelsDeletedHandler(base.BaseHandler):
+class VerifyUserModelsDeletedHandlerNormalizedRequestDict(TypedDict):
+    """Dict representation of VerifyUserModelsDeletedHandler's
+    normalized_request dictionary.
+    """
+
+    user_id: str
+
+
+class VerifyUserModelsDeletedHandler(
+    base.BaseHandler[
+        Dict[str, str], VerifyUserModelsDeletedHandlerNormalizedRequestDict
+    ]
+):
     """Handler for getting whether any models exist for specific user ID."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-    URL_PATH_ARGS_SCHEMAS = {}
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
     HANDLER_ARGS_SCHEMAS = {
         'GET': {
             'user_id': {
@@ -1129,18 +1920,35 @@ class VerifyUserModelsDeletedHandler(base.BaseHandler):
     }
 
     @acl_decorators.can_access_admin_page
-    def get(self):
-        user_id = self.normalized_request.get('user_id')
+    def get(self) -> None:
+        """Checks if a user with a specific user_id has been deleted and
+        if there are related models or not.
+        """
+        assert self.normalized_request is not None
+        user_id = self.normalized_request['user_id']
 
         user_is_deleted = wipeout_service.verify_user_deleted(
             user_id, include_delete_at_end_models=True)
         self.render_json({'related_models_exist': not user_is_deleted})
 
 
-class DeleteUserHandler(base.BaseHandler):
+class DeleteUserHandlerNormalizedRequestDict(TypedDict):
+    """Dict representation of DeleteUserHandler's
+    normalized_request dictionary.
+    """
+
+    user_id: str
+    username: str
+
+
+class DeleteUserHandler(
+    base.BaseHandler[
+        Dict[str, str], DeleteUserHandlerNormalizedRequestDict
+    ]
+):
     """Handler for deleting a user with specific ID."""
 
-    URL_PATH_ARGS_SCHEMAS = {}
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
     HANDLER_ARGS_SCHEMAS = {
         'DELETE': {
             'user_id': {
@@ -1157,9 +1965,17 @@ class DeleteUserHandler(base.BaseHandler):
     }
 
     @acl_decorators.can_delete_any_user
-    def delete(self):
-        user_id = self.normalized_request.get('user_id')
-        username = self.normalized_request.get('username')
+    def delete(self) -> None:
+        """Initiates the pre-deletion process for a user.
+
+        Raises:
+            InvalidInputException. The username doesn't belong to any user.
+            InvalidInputException. The user ID retrieved from the username
+                and the user ID provided by admin differ.
+        """
+        assert self.normalized_request is not None
+        user_id = self.normalized_request['user_id']
+        username = self.normalized_request['username']
 
         user_id_from_username = (
             user_services.get_user_id_from_username(username))
@@ -1176,11 +1992,25 @@ class DeleteUserHandler(base.BaseHandler):
         self.render_json({'success': True})
 
 
-class UpdateBlogPostHandler(base.BaseHandler):
+class UpdateBlogPostHandlerNormalizedPayloadDict(TypedDict):
+    """Dict representation of UpdateBlogPostHandler's
+    normalized_payload dictionary.
+    """
+
+    blog_post_id: str
+    author_username: str
+    published_on: str
+
+
+class UpdateBlogPostHandler(
+    base.BaseHandler[
+        UpdateBlogPostHandlerNormalizedPayloadDict, Dict[str, str]
+    ]
+):
     """Handler for changing author ids and published on date in
     blog posts."""
 
-    URL_PATH_ARGS_SCHEMAS = {}
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
     HANDLER_ARGS_SCHEMAS = {
         'PUT': {
             'blog_post_id': {
@@ -1206,10 +2036,20 @@ class UpdateBlogPostHandler(base.BaseHandler):
     }
 
     @acl_decorators.can_access_admin_page
-    def put(self):
-        blog_post_id = self.normalized_payload.get('blog_post_id')
-        author_username = self.normalized_payload.get('author_username')
-        published_on = self.normalized_payload.get('published_on')
+    def put(self) -> None:
+        """Updates the author and published date of a blog post.
+
+        Raises:
+            InvalidInputException. Invalid username.
+            InvalidInputException. User does not have enough rights to be
+                blog post author.
+            PageNotFoundException. The blog post with the given id or url
+                doesn't exist.
+        """
+        assert self.normalized_payload is not None
+        blog_post_id = self.normalized_payload['blog_post_id']
+        author_username = self.normalized_payload['author_username']
+        published_on = self.normalized_payload['published_on']
 
         author_id = user_services.get_user_id_from_username(author_username)
         if author_id is None:

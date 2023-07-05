@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 /**
- * @fileoverview Unit test for CollectionCreationBackendApiService.
+ * @fileoverview Unit test for ExplorationCreationBackendApiService.
  */
 
 import { HttpClientTestingModule, HttpTestingController } from
@@ -20,7 +20,8 @@ import { HttpClientTestingModule, HttpTestingController } from
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 import { ExplorationCreationBackendApiService } from 'components/entity-creation-services/exploration-creation-backend-api.service';
 
-describe('Collection Creation backend api service', () => {
+
+describe('ExplorationCreationBackendApiService', () => {
   let explorationCreationBackendApiService:
     ExplorationCreationBackendApiService;
   let httpTestingController: HttpTestingController;
@@ -32,34 +33,34 @@ describe('Collection Creation backend api service', () => {
       imports: [HttpClientTestingModule]
     });
 
-    explorationCreationBackendApiService = TestBed.get(
+    explorationCreationBackendApiService = TestBed.inject(
       ExplorationCreationBackendApiService);
-    httpTestingController = TestBed.get(HttpTestingController);
+    httpTestingController = TestBed.inject(HttpTestingController);
   });
 
   afterEach(() => {
     httpTestingController.verify();
   });
 
-  it('should successfully create a new exploration and' +
-    'obtain the exploration ID',
-  fakeAsync(() => {
-    let successHandler = jasmine.createSpy('success');
-    let failHandler = jasmine.createSpy('fail');
+  it(
+    'should successfully create new exploration and obtain the exploration ID',
+    fakeAsync(() => {
+      let successHandler = jasmine.createSpy('success');
+      let failHandler = jasmine.createSpy('fail');
 
-    explorationCreationBackendApiService.registerNewExplorationAsync({}).then(
-      successHandler, failHandler);
+      explorationCreationBackendApiService.registerNewExplorationAsync({}).then(
+        successHandler, failHandler);
 
-    let req = httpTestingController.expectOne(
-      '/contributehandler/create_new');
-    expect(req.request.method).toEqual('POST');
-    req.flush({exploration_id: SAMPLE_EXPLORATION_ID});
+      let req = httpTestingController.expectOne(
+        '/contributehandler/create_new');
+      expect(req.request.method).toEqual('POST');
+      req.flush({exploration_id: SAMPLE_EXPLORATION_ID});
 
-    flushMicrotasks();
+      flushMicrotasks();
 
-    expect(successHandler).toHaveBeenCalled();
-    expect(failHandler).not.toHaveBeenCalled();
-  })
+      expect(successHandler).toHaveBeenCalled();
+      expect(failHandler).not.toHaveBeenCalled();
+    })
   );
 
   it('should fail to create a new exploration and call the fail handler',
@@ -85,6 +86,36 @@ describe('Collection Creation backend api service', () => {
       expect(successHandler).not.toHaveBeenCalled();
       expect(failHandler).toHaveBeenCalledWith(
         'Error creating a new exploration.');
+    })
+  );
+
+  it(
+    'should successfully upload new exploration and obtain the exploration ID',
+    fakeAsync(() => {
+      expectAsync(
+        explorationCreationBackendApiService.uploadExploration('yaml')
+      ).toBeResolvedTo({explorationId: SAMPLE_EXPLORATION_ID});
+
+      let req = httpTestingController.expectOne('contributehandler/upload');
+      expect(req.request.method).toEqual('POST');
+      req.flush({exploration_id: SAMPLE_EXPLORATION_ID});
+
+      flushMicrotasks();
+    })
+  );
+
+  it(
+    'should fail to upload new exploration and reject the promise',
+    fakeAsync(() => {
+      expectAsync(
+        explorationCreationBackendApiService.uploadExploration('yaml')
+      ).toBeRejected();
+
+      let req = httpTestingController.expectOne('contributehandler/upload');
+      expect(req.request.method).toEqual('POST');
+      req.error(new ErrorEvent('Error creating a new exploration.'));
+
+      flushMicrotasks();
     })
   );
 });

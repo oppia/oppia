@@ -24,30 +24,18 @@ Usage: Run this script from your oppia root folder:
 from __future__ import annotations
 
 import argparse
-import getpass
 import os
 import re
-import sys
 
-from core import python_utils
-from .. import common
+from core import utils
+from scripts import common
 
-_PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
-_PY_GITHUB_PATH = os.path.join(
-    _PARENT_DIR, 'oppia_tools', 'PyGithub-%s' % common.PYGITHUB_VERSION)
-sys.path.insert(0, _PY_GITHUB_PATH)
+from typing import Final, List, Optional
 
-import github  # isort:skip pylint: disable=wrong-import-position
+FECONF_REGEX: Final = '^([A-Z_]+ = ).*$'
+CONSTANTS_REGEX: Final = '^(  "[A-Z_]+": ).*$'
 
-CONSTANTS_CONFIG_PATH = os.path.join(
-    os.getcwd(), os.pardir, 'release-scripts', 'constants_updates.config')
-FECONF_REGEX = '^([A-Z_]+ = ).*$'
-CONSTANTS_REGEX = '^(  "[A-Z_]+": ).*$'
-TERMS_PAGE_FOLDER_URL = (
-    'https://github.com/oppia/oppia/commits/develop/core/'
-    'templates/pages/terms-page')
-
-_PARSER = argparse.ArgumentParser(description='Updates configs.')
+_PARSER: Final = argparse.ArgumentParser(description='Updates configs.')
 _PARSER.add_argument(
     '--release_dir_path',
     dest='release_dir_path',
@@ -63,16 +51,11 @@ _PARSER.add_argument(
     dest='personal_access_token',
     help='The personal access token for the GitHub id of user.',
     default=None)
-_PARSER.add_argument(
-    '--prompt_for_mailgun_and_terms_update',
-    action='store_true',
-    default=False,
-    dest='prompt_for_mailgun_and_terms_update',
-    help='Whether to update mailgun api and last updated time for terms page.')
 
 
 def apply_changes_based_on_config(
-        local_filepath, config_filepath, expected_config_line_regex):
+    local_filepath: str, config_filepath: str, expected_config_line_regex: str
+) -> None:
     """Updates the local file based on the deployment configuration specified
     in the config file.
 
@@ -84,11 +67,14 @@ def apply_changes_based_on_config(
         expected_config_line_regex: str. The regex to use to verify each line
             of the config file. It should have a single group, which
             corresponds to the prefix to extract.
+
+    Raises:
+        Exception. Line(s) in config file are not matching with the regex.
     """
-    with python_utils.open_file(config_filepath, 'r') as config_file:
+    with utils.open_file(config_filepath, 'r') as config_file:
         config_lines = config_file.read().splitlines()
 
-    with python_utils.open_file(local_filepath, 'r') as local_file:
+    with utils.open_file(local_filepath, 'r') as local_file:
         local_lines = local_file.read().splitlines()
 
     local_filename = os.path.basename(local_filepath)
@@ -107,158 +93,144 @@ def apply_changes_based_on_config(
             line_number for (line_number, line) in enumerate(local_lines)
             if line.startswith(match_result.group(1))]
         assert len(matching_local_line_numbers) == 1, (
-            'Could not find correct number of lines in %s matching: %s' %
-            (local_filename, config_line))
+            'Could not find correct number of lines in %s matching: %s, %s' %
+            (local_filename, config_line, matching_local_line_numbers))
         local_line_numbers.append(matching_local_line_numbers[0])
 
     # Then, apply the changes.
     for index, config_line in enumerate(config_lines):
         local_lines[local_line_numbers[index]] = config_line
 
-    with python_utils.open_file(local_filepath, 'w') as writable_local_file:
+    with utils.open_file(local_filepath, 'w') as writable_local_file:
         writable_local_file.write('\n'.join(local_lines) + '\n')
 
 
-def check_updates_to_terms_of_service(
-        release_feconf_path, personal_access_token):
-    """Checks if updates are made to terms of service and updates
-    REGISTRATION_PAGE_LAST_UPDATED_UTC in feconf.py if there are updates.
+def update_app_yaml(
+    release_app_dev_yaml_path: str, feconf_config_path: str
+) -> None:
+    """Updates app.yaml file with more strict CORS HTTP header.
 
     Args:
-        release_feconf_path: str. The path to feconf file in release
-            directory.
-        personal_access_token: str. The personal access token for the
-            GitHub id of user.
+        release_app_dev_yaml_path: str. Absolute path of the app_dev.yaml file.
+        feconf_config_path: str. Absolute path of the feconf config file.
+
+    Raises:
+        Exception. No OPPIA_SITE_URL key found.
     """
-    g = github.Github(personal_access_token)
-    repo = g.get_organization('oppia').get_repo('oppia')
+    with utils.open_file(feconf_config_path, 'r') as feconf_config_file:
+        feconf_config_contents = feconf_config_file.read()
 
-    common.open_new_tab_in_browser_if_possible(TERMS_PAGE_FOLDER_URL)
-    python_utils.PRINT(
-        'Are the terms of service changed? Check commits/changes made '
-        'to the files in: core/templates/pages/terms-page. '
-        'Enter y/ye/yes if they are changed else enter n/no.')
-    terms_of_service_are_changed = input().lower()
-    while terms_of_service_are_changed not in ['y', 'ye', 'yes', 'n', 'no']:
-        python_utils.PRINT(
-            'Invalid Input: %s. Please enter yes or no.' % (
-                terms_of_service_are_changed))
-        terms_of_service_are_changed = input().lower()
+    with utils.open_file(release_app_dev_yaml_path, 'r') as app_yaml_file:
+        app_yaml_contents = app_yaml_file.read()
 
-    if terms_of_service_are_changed in (
-            common.AFFIRMATIVE_CONFIRMATIONS):
-        python_utils.PRINT(
-            'Enter sha of the commit which changed the terms of service.')
-        commit_sha = input().lstrip().rstrip()
-        commit_time = repo.get_commit(commit_sha).commit.committer.date
-        time_tuple = (
-            commit_time.year, commit_time.month, commit_time.day,
-            commit_time.hour, commit_time.minute, commit_time.second)
-        feconf_lines = []
-        with python_utils.open_file(release_feconf_path, 'r') as f:
-            feconf_lines = f.readlines()
-        with python_utils.open_file(release_feconf_path, 'w') as f:
-            for line in feconf_lines:
-                if line.startswith('REGISTRATION_PAGE_LAST_UPDATED_UTC'):
-                    line = (
-                        'REGISTRATION_PAGE_LAST_UPDATED_UTC = '
-                        'datetime.datetime(%s, %s, %s, %s, %s, %s)\n' % (
-                            time_tuple))
-                f.write(line)
-
-
-def verify_feconf(release_feconf_path, verify_email_api_keys):
-    """Verifies that feconf is updated correctly to include
-    mailgun api key, mailchimp api key and redishost.
-
-    Args:
-        release_feconf_path: str. The path to feconf file in release
-            directory.
-        verify_email_api_keys: bool. Whether to verify both mailgun and
-            mailchimp api keys.
-    """
-    feconf_contents = python_utils.open_file(
-        release_feconf_path, 'r').read()
-    if verify_email_api_keys and (
-            'MAILGUN_API_KEY' not in feconf_contents or
-            'MAILGUN_API_KEY = None' in feconf_contents):
-        raise Exception('The mailgun API key must be added before deployment.')
-
-    if verify_email_api_keys and (
-            'MAILCHIMP_API_KEY' not in feconf_contents or
-            'MAILCHIMP_API_KEY = None' in feconf_contents):
+    oppia_site_url_searched_key = re.search(
+        r'OPPIA_SITE_URL = \'(.*)\'', feconf_config_contents)
+    if oppia_site_url_searched_key is None:
         raise Exception(
-            'The mailchimp API key must be added before deployment.')
+            'Error: No OPPIA_SITE_URL key found.'
+        )
+    project_origin = oppia_site_url_searched_key.group(1)
+    access_control_allow_origin_header = (
+        'Access-Control-Allow-Origin: %s' % project_origin)
 
-    if ('REDISHOST' not in feconf_contents or
-            'REDISHOST = \'localhost\'' in feconf_contents):
+    edited_app_yaml_contents, _ = re.subn(
+        r'Access-Control-Allow-Origin: \"\*\"',
+        access_control_allow_origin_header,
+        app_yaml_contents
+    )
+
+    with utils.open_file(release_app_dev_yaml_path, 'w') as app_yaml_file:
+        app_yaml_file.write(edited_app_yaml_contents)
+
+
+def verify_config_files(
+    release_feconf_path: str, release_app_dev_yaml_path: str
+) -> None:
+    """Verifies that feconf is updated correctly to include
+    redishost and app.yaml to include correct headers.
+
+    Args:
+        release_feconf_path: str. The path to feconf file in release
+            directory.
+        release_app_dev_yaml_path: str. The path to app_dev.yaml file in release
+            directory.
+
+    Raises:
+        Exception. REDISHOST not updated before deployment.
+        Exception. Access-Control-Allow-Origin not updated to specific origin
+            before deployment.
+    """
+    feconf_contents = utils.open_file(release_feconf_path, 'r').read()
+    if (
+        'REDISHOST' not in feconf_contents or
+        'REDISHOST = \'localhost\'' in feconf_contents
+    ):
         raise Exception('REDISHOST must be updated before deployment.')
 
+    with utils.open_file(release_app_dev_yaml_path, 'r') as app_yaml_file:
+        app_yaml_contents = app_yaml_file.read()
 
-def add_mailgun_api_key(release_feconf_path):
-    """Adds mailgun api key to feconf config file.
-
-    Args:
-        release_feconf_path: str. The path to feconf file in release
-            directory.
-    """
-    mailgun_api_key = getpass.getpass(
-        prompt=('Enter mailgun api key from the release process doc.'))
-    mailgun_api_key = mailgun_api_key.strip()
-
-    while re.match('^key-[a-z0-9]{32}$', mailgun_api_key) is None:
-        mailgun_api_key = getpass.getpass(
-            prompt=(
-                'You have entered an invalid mailgun api '
-                'key: %s, please retry.' % mailgun_api_key))
-        mailgun_api_key = mailgun_api_key.strip()
-
-    feconf_lines = []
-    with python_utils.open_file(release_feconf_path, 'r') as f:
-        feconf_lines = f.readlines()
-
-    assert 'MAILGUN_API_KEY = None\n' in feconf_lines, 'Missing mailgun API key'
-
-    with python_utils.open_file(release_feconf_path, 'w') as f:
-        for line in feconf_lines:
-            if line == 'MAILGUN_API_KEY = None\n':
-                line = line.replace('None', '\'%s\'' % mailgun_api_key)
-            f.write(line)
+    if 'Access-Control-Allow-Origin: \"*\"' in app_yaml_contents:
+        raise Exception(
+            '\'Access-Control-Allow-Origin: "*"\' must be updated to '
+            'a specific origin before deployment.'
+        )
 
 
-def add_mailchimp_api_key(release_feconf_path):
-    """Adds mailchimp api key to feconf config file.
+def update_analytics_constants_based_on_config(
+    release_analytics_constants_path: str,
+    analytics_constants_config_path: str
+) -> None:
+    """Updates the GA4 and UA IDs in the analytics constants JSON file.
 
     Args:
-        release_feconf_path: str. The path to feconf file in release
-            directory.
+        release_analytics_constants_path: str. The path to constants file.
+        analytics_constants_config_path: str. The path to constants config file.
+
+    Raises:
+        Exception. No GA_ANALYTICS_ID key found.
+        Exception. No SITE_NAME_FOR_ANALYTICS key found.
+        Exception. No CAN_SEND_ANALYTICS_EVENTS key found.
     """
-    mailchimp_api_key = getpass.getpass(
-        prompt=('Enter mailchimp api key from the release process doc.'))
-    mailchimp_api_key = mailchimp_api_key.strip()
+    with utils.open_file(analytics_constants_config_path, 'r') as config_file:
+        config_file_contents = config_file.read()
+    ga_analytics_searched_key = re.search(
+        r'"GA_ANALYTICS_ID": "(.*)"', config_file_contents)
+    if ga_analytics_searched_key is None:
+        raise Exception(
+            'Error: No GA_ANALYTICS_ID key found.'
+        )
+    ga_analytics_id = ga_analytics_searched_key.group(1)
+    site_name_for_analytics_searched_key = re.search(
+        r'"SITE_NAME_FOR_ANALYTICS": "(.*)"', config_file_contents)
+    if site_name_for_analytics_searched_key is None:
+        raise Exception(
+            'Error: No SITE_NAME_FOR_ANALYTICS key found.'
+        )
+    site_name_for_analytics = site_name_for_analytics_searched_key.group(1)
+    can_send_analytics_events_searched_key = re.search(
+        r'"CAN_SEND_ANALYTICS_EVENTS": (true|false)',
+        config_file_contents)
+    if can_send_analytics_events_searched_key is None:
+        raise Exception(
+            'Error: No CAN_SEND_ANALYTICS_EVENTS key found.'
+        )
+    can_send_analytics_events = can_send_analytics_events_searched_key.group(1)
+    common.inplace_replace_file(
+        release_analytics_constants_path,
+        '"GA_ANALYTICS_ID": ""',
+        '"GA_ANALYTICS_ID": "%s"' % ga_analytics_id)
+    common.inplace_replace_file(
+        release_analytics_constants_path,
+        '"SITE_NAME_FOR_ANALYTICS": ""',
+        '"SITE_NAME_FOR_ANALYTICS": "%s"' % site_name_for_analytics)
+    common.inplace_replace_file(
+        release_analytics_constants_path,
+        '"CAN_SEND_ANALYTICS_EVENTS": false',
+        '"CAN_SEND_ANALYTICS_EVENTS": %s' % can_send_analytics_events)
 
-    while re.match('^[a-z0-9]{32}-us18$', mailchimp_api_key) is None:
-        mailchimp_api_key = getpass.getpass(
-            prompt=(
-                'You have entered an invalid mailchimp api '
-                'key: %s, please retry.' % mailchimp_api_key))
-        mailchimp_api_key = mailchimp_api_key.strip()
 
-    feconf_lines = []
-    with python_utils.open_file(release_feconf_path, 'r') as f:
-        feconf_lines = f.readlines()
-
-    error_text = 'Missing mailchimp API key'
-    assert 'MAILCHIMP_API_KEY = None\n' in feconf_lines, error_text
-
-    with python_utils.open_file(release_feconf_path, 'w') as f:
-        for line in feconf_lines:
-            if line == 'MAILCHIMP_API_KEY = None\n':
-                line = line.replace('None', '\'%s\'' % mailchimp_api_key)
-            f.write(line)
-
-
-def main(args=None):
+def main(args: Optional[List[str]] = None) -> None:
     """Updates the files corresponding to LOCAL_FECONF_PATH and
     LOCAL_CONSTANTS_PATH after doing the prerequisite checks.
     """
@@ -269,28 +241,27 @@ def main(args=None):
         options.deploy_data_path, 'feconf_updates.config')
     constants_config_path = os.path.join(
         options.deploy_data_path, 'constants_updates.config')
+    analytics_constants_config_path = os.path.join(
+        options.deploy_data_path, 'analytics_constants_updates.config')
 
     release_feconf_path = os.path.join(
         options.release_dir_path, common.FECONF_PATH)
     release_constants_path = os.path.join(
         options.release_dir_path, common.CONSTANTS_FILE_PATH)
-
-    if options.prompt_for_mailgun_and_terms_update:
-        try:
-            python_utils.url_open(TERMS_PAGE_FOLDER_URL)
-        except Exception:
-            raise Exception('Terms mainpage does not exist on Github.')
-        add_mailgun_api_key(release_feconf_path)
-        add_mailchimp_api_key(release_feconf_path)
-        check_updates_to_terms_of_service(
-            release_feconf_path, options.personal_access_token)
+    release_app_dev_yaml_path = os.path.join(
+        options.release_dir_path, common.APP_DEV_YAML_PATH)
+    release_analytics_constants_path = os.path.join(
+        options.release_dir_path, common.ANALYTICS_CONSTANTS_FILE_PATH)
 
     apply_changes_based_on_config(
         release_feconf_path, feconf_config_path, FECONF_REGEX)
     apply_changes_based_on_config(
         release_constants_path, constants_config_path, CONSTANTS_REGEX)
-    verify_feconf(
-        release_feconf_path, options.prompt_for_mailgun_and_terms_update)
+    update_app_yaml(release_app_dev_yaml_path, feconf_config_path)
+    update_analytics_constants_based_on_config(
+        release_analytics_constants_path,
+        analytics_constants_config_path)
+    verify_config_files(release_feconf_path, release_app_dev_yaml_path)
 
 
 # The 'no coverage' pragma is used as this line is un-testable. This is because

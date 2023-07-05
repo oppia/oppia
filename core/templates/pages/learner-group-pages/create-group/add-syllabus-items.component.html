@@ -1,0 +1,204 @@
+<div class="oppia-add-learner-group-syllabus">
+  <div class="add-learner-group-syllabus-desc-text">
+    <span translate="I18N_ADD_SYLLABUS_DESCRIPTION_TEXT"></span>
+  </div>
+  <div class="added-syllabus-container">
+    <div class="added-syllabus-item-card" *ngFor="let storySummary of syllabusStorySummaries">
+      <div class="syllabus-item-image" [ngStyle]="{'background-color': storySummary.getThumbnailBgColor()}">
+        <img class="thumbnail-image syllabus-item-image" [src]="getStoryThumbnailUrl(storySummary)">
+      </div>
+      <div class="syllabus-item-title">{{ storySummary.getTitle() }}</div>
+      <span class="remove-syllabus" (click)="removeStoryFromSyllabus(storySummary.getId())"></span>
+    </div>
+    <div class="added-syllabus-item-card" *ngFor="let subtopicSummary of syllabusSubtopicSummaries">
+      <div class="syllabus-item-image" [ngStyle]="{'background-color': subtopicSummary.thumbnailBgColor}">
+        <img class="thumbnail-image syllabus-item-image" [src]="getSubtopicThumbnailUrl(subtopicSummary)">
+      </div>
+      <div class="syllabus-item-title">{{ subtopicSummary.subtopicTitle }}</div>
+      <span class="remove-syllabus" (click)="removeSubtopicFromSyllabus(subtopicSummary.subtopicPageId)"></span>
+    </div>
+    <div *ngIf="syllabusStorySummaries.length == 0 && syllabusSubtopicSummaries.length == 0" class="no-syllabus-items-text">
+      <span translate="I18N_LEARNER_GROUP_NO_ITEMS_ADDED"></span>
+    </div>
+  </div>
+  <div class="learner-group-syllabus-filters-container">
+    <div class="oppia-same-row-container oppia-search-box-container">
+      <form class="search-bar-float-left oppia-search-bar-form" role="search">
+        <div class="form-group">
+          <div class="input-group">
+            <input type="text"
+                   class="form-control oppia-search-bar-text-input protractor-test-search-input"
+                   [placeholder]="searchBarPlaceholder"
+                   [(ngModel)]="searchQuery"
+                   (ngModelChange)="onSearchQueryChangeExec()"
+                   [ngModelOptions]="{ updateOn: 'blur', standalone:'true' }"
+                   aria-label="Search bar"
+                   (keydown.enter)="$event.target.blur()"
+                   (input)="searchToBeExec($event)">
+          </div>
+        </div>
+      </form>
+    </div>
+
+    <div class="oppia-same-row-container oppia-search-filter">
+      <div ngbDropdown class="search-bar-float-left oppia-search-bar-type-selector dropdown" autoClose="outside">
+        <button ngbDropdownToggle
+                (click)="openSubmenu($event, 'type')"
+                type="button"
+                class="btn oppia-search-bar-type-input dropdown-toggle"
+                title="{{ selectionDetails.types.description | translate }}">
+          {{ typeButtonText | truncate:14 }}
+        </button>
+        <ul ngbDropdownMenu
+            class="oppia-search-bar-dropdown-menu oppia-search-bar-dropdown-menu-section dropdown-menu"
+            role="menu">
+          <ng-container *ngFor="let item of selectionDetails.types.masterList">
+            <li ngbDropdownItem>
+              <a (click)="toggleSelection('types', item.id)" *ngIf="!first && !last" class="dropdown-item">
+                <span class="protractor-test-deselected">{{ item.text | translate }}</span>
+                <i *ngIf="selectionDetails.types.selection === item.id" class="material-icons md-18 float-right oppia-search-bar-type-selection-symbol">&#xE876;</i>
+              </a>
+              <a (click)="toggleSelection('types', item.id)" *ngIf="first" class="dropdown-item">
+                <span class="protractor-test-deselected">{{ item.text | translate }}</span>
+                <i *ngIf="selectionDetails.types.selection === item.id" class="material-icons md-18 float-right oppia-search-bar-type-selection-symbol">&#xE876;</i>
+              </a>
+              <a (click)="toggleSelection('types', item.id)" *ngIf="last" class="dropdown-item">
+                <span class="protractor-test-deselected">{{ item.text | translate }}</span>
+                <i *ngIf="selectionDetails.types.selection === item.id" class="material-icons md-18 float-right oppia-search-bar-type-selection-symbol">&#xE876;</i>
+              </a>
+            </li>
+          </ng-container>
+        </ul>
+      </div>
+    </div>
+
+    <div class="oppia-same-row-container oppia-search-filter">
+      <div ngbDropdown class="search-bar-float-left oppia-search-bar-category-selector dropdown" autoClose="outside">
+        <button ngbDropdownToggle
+                (click)="openSubmenu($event, 'category')"
+                type="button"
+                class="btn oppia-search-bar-category-input dropdown-toggle"
+                title="{{ selectionDetails.categories.description | translate }}">
+          {{ categoryButtonText | truncate:14 }}
+        </button>
+        <ul ngbDropdownMenu
+            class="oppia-search-bar-dropdown-menu oppia-search-bar-dropdown-menu-section dropdown-menu"
+            role="menu">
+          <ng-container *ngFor="let item of selectionDetails.categories.masterList">
+            <li ngbDropdownItem>
+              <a (click)="toggleSelection('categories', item.id)" *ngIf="!first && !last" class="dropdown-item">
+                <span class="protractor-test-deselected">{{ item.text | translate }}</span>
+                <i *ngIf="selectionDetails.categories.selection === item.id" class="material-icons md-18 float-right oppia-search-bar-category-selection-symbol">&#xE876;</i>
+              </a>
+              <a (click)="toggleSelection('categories', item.id)" *ngIf="first" class="dropdown-item">
+                <span class="protractor-test-deselected">{{ item.text | translate }}</span>
+                <i *ngIf="selectionDetails.categories.selection === item.id" class="material-icons md-18 float-right oppia-search-bar-category-selection-symbol">&#xE876;</i>
+              </a>
+              <a (click)="toggleSelection('categories', item.id)" *ngIf="last" class="dropdown-item">
+                <span class="protractor-test-deselected">{{ item.text | translate }}</span>
+                <i *ngIf="selectionDetails.categories.selection === item.id" class="material-icons md-18 float-right oppia-search-bar-category-selection-symbol">&#xE876;</i>
+              </a>
+            </li>
+          </ng-container>
+        </ul>
+      </div>
+    </div>
+
+    <div class="oppia-same-row-container oppia-search-filter">
+      <div ngbDropdown class="search-bar-float-left oppia-search-bar-language-selector protractor-test-search-bar-language-selector dropdown" autoClose="outside">
+        <button ngbDropdownToggle
+                (click)="openSubmenu($event, 'language')"
+                type="button"
+                class="btn protractor-test-search-bar-dropdown-toggle oppia-search-bar-language-input dropdown-toggle language-dropdown-toggle"
+                title="{{selectionDetails.languageCodes.description | translate}}">
+          {{ languageButtonText | truncate:14 }}
+        </button>
+        <ul ngbDropdownMenu class="oppia-search-bar-dropdown-menu-section dropdown-menu"
+            role="menu">
+          <ng-container *ngFor="let item of selectionDetails.languageCodes.masterList">
+            <li ngbDropdownItem>
+              <a (click)="toggleSelection('languageCodes', item.id)" *ngIf="!first && !last" class="dropdown-item">
+                <span class="protractor-test-deselected">{{ item.text | translate }}</span>
+                <i *ngIf="selectionDetails.languageCodes.selection === item.id" class="material-icons md-18  float-right oppia-search-bar-category-selection-symbol">&#xE876;</i>
+              </a>
+              <a (click)="toggleSelection('languageCodes', item.id)" *ngIf="first" class="dropdown-item">
+                <span class="protractor-test-deselected">{{ item.text | translate }}</span>
+                <i *ngIf="selectionDetails.languageCodes.selection === item.id" class="material-icons md-18  float-right oppia-search-bar-category-selection-symbol">&#xE876;</i>
+              </a>
+              <a (click)="toggleSelection('languageCodes', item.id)" *ngIf="last"
+                 class="dropdown-item">
+                <span class="protractor-test-deselected">{{ item.text | translate }}</span>
+                <i *ngIf="selectionDetails.languageCodes.selection === item.id" class="material-icons md-18  float-right oppia-search-bar-category-selection-symbol">&#xE876;</i>
+              </a>
+            </li>
+          </ng-container>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="filtered-syllabus-items-container">
+    <div *ngIf="!isSearchInProgress() && storySummaries.length > 0">
+      <div class="syllabus-item-card" *ngFor="let storySummary of storySummaries">
+        <div class="syllabus-item-image-title-container">
+          <div class="syllabus-item-image" [ngStyle]="{'background-color': storySummary.getThumbnailBgColor()}">
+            <img class="thumbnail-image syllabus-item-image" [src]="getStoryThumbnailUrl(storySummary)">
+          </div>
+          <div class="syllabus-item-title-container">
+            <div class="syllabus-item-title-info">{{ storySummary.getTopicName() }}
+              <span class="syllabus-item-type-pill"> {{ storySummary.getNodeTitles().length }} Lessons</span>
+            </div>
+            <div class="syllabus-item-title">{{ storySummary.getTitle() }}</div>
+          </div>
+        </div>
+        <div class="syllabus-item-cta-buttons-container">
+          <button class="btn btn-primary syllabus-item-details-cta-button">
+            <span translate="I18N_LEARNER_GROUP_STORY_VIEW_DETAILS"></span>
+          </button>
+          <button *ngIf="!isStoryPartOfAddedSyllabus(storySummary.getId()) && !isStoryPartOfGroupSyllabus(storySummary.getId())"
+                  class="btn btn-primary syllabus-item-add-cta-button"
+                  (click)="addStoryToSyllabus(storySummary)">
+            <span translate="I18N_LEARNER_GROUP_ADD_TO_SYLLABUS"></span>
+          </button>
+          <button *ngIf="isStoryPartOfAddedSyllabus(storySummary.getId())" class="btn btn-secondary syllabus-item-add-cta-button disabled">
+            <span translate="I18N_LEARNER_GROUP_ITEM_ADDED_TO_SYLLABUS"></span>
+          </button>
+          <button *ngIf="isStoryPartOfGroupSyllabus(storySummary.getId())" class="btn btn-secondary syllabus-item-added-cta-button disabled">
+            <span translate="I18N_LEARNER_GROUP_ITEM_ALREADY_ADDED_TO_SYLLABUS"></span>
+          </button>
+        </div>
+      </div>
+    </div>
+    <div *ngIf="!isSearchInProgress() && subtopicSummaries.length > 0">
+      <div class="syllabus-item-card" *ngFor="let subtopicSummary of subtopicSummaries">
+        <div class="syllabus-item-image-title-container">
+          <div class="syllabus-item-image" [ngStyle]="{'background-color': subtopicSummary.thumbnailBgColor}">
+            <img class="thumbnail-image syllabus-item-image" [src]="getSubtopicThumbnailUrl(subtopicSummary)">
+          </div>
+          <div class="syllabus-item-title-container">
+            <div class="syllabus-item-title-info">{{ subtopicSummary.parentTopicName }}  <span class="syllabus-item-type-pill">Skills</span> </div>
+            <div class="syllabus-item-title">{{ subtopicSummary.subtopicTitle }}</div>
+          </div>
+        </div>
+        <div class="syllabus-item-cta-buttons-container">
+          <button *ngIf="!isSubtopicPartOfAddedSyllabus(subtopicSummary.subtopicPageId) && !isSubtopicPartOfGroupSyllabus(subtopicSummary.subtopicPageId)"
+                  class="btn btn-primary syllabus-item-add-cta-button"
+                  (click)="addSubtopicToSyllabus(subtopicSummary)">
+            <span translate="I18N_LEARNER_GROUP_ADD_TO_SYLLABUS"></span>
+          </button>
+          <button *ngIf="isSubtopicPartOfAddedSyllabus(subtopicSummary.subtopicPageId)" class="btn btn-secondary syllabus-item-add-cta-button disabled">
+            <span translate="I18N_LEARNER_GROUP_ITEM_ADDED_TO_SYLLABUS"></span>
+          </button>
+          <button *ngIf="isSubtopicPartOfGroupSyllabus(subtopicSummary.subtopicPageId)" class="btn btn-secondary syllabus-item-added-cta-button disabled">
+            <span translate="I18N_LEARNER_GROUP_ITEM_ALREADY_ADDED_TO_SYLLABUS"></span>
+          </button>
+        </div>
+      </div>
+    </div>
+    <div *ngIf="isSearchInProgress()" class="oppia-search-spinner">
+      <i class="material-icons md-18 oppia-animate-spin">&#xE863;</i>
+    </div>
+    <div *ngIf="isValidSearch() && !searchIsInProgress && storySummaries.length == 0 && subtopicSummaries.length == 0" class="no-results-container">
+      <div class="no-results-message"><span translate="I18N_LEARNER_GROUP_NO_RESULTS_FOUND"></span></div>
+    </div>
+  </div>
+</div>

@@ -18,219 +18,237 @@
 
 from __future__ import annotations
 
-import ast
-import contextlib
-import unittest
-
+from core.tests import test_utils
 from . import docstrings_checker  # isort:skip
 
 import astroid  # isort:skip
 from pylint.checkers import utils # isort:skip
 
 
-class ASTDocstringsCheckerTest(unittest.TestCase):
+class DocstringsCheckerTest(test_utils.GenericTestBase):
     """Class for testing the docstrings_checker script."""
 
-    def test_build_regex_from_args_one_arg(self):
-        docstring_checker = docstrings_checker.ASTDocStringChecker()
-        args = ['arg_name0']
-        expected_result = r'(Args:)[\S\s]*(arg_name0:)'
-        result = docstring_checker.build_regex_from_args(args)
-        self.assertEqual(result, expected_result)
-
-    def test_build_regex_from_args_multiple_args(self):
-        docstring_checker = docstrings_checker.ASTDocStringChecker()
-        args = ['arg_name0', 'arg_name1']
-        expected_result = r'(Args:)[\S\s]*(arg_name0:)[\S\s]*(arg_name1:)'
-        result = docstring_checker.build_regex_from_args(args)
-        self.assertEqual(result, expected_result)
-
-    def test_build_regex_from_args_empty_list_returns_none(self):
-        docstring_checker = docstrings_checker.ASTDocStringChecker()
-        args = []
-        expected_result = None
-        result = docstring_checker.build_regex_from_args(args)
-        self.assertEqual(result, expected_result)
-
-    def test_compare_arg_order_one_matching_arg_returns_empty_list(self):
-        docstring_checker = docstrings_checker.ASTDocStringChecker()
-        func_args = ['arg_name']
-        docstring_args = """Description
-            Args:
-                arg_name: description
-            """
-        expected_result = []
-        result = docstring_checker.compare_arg_order(func_args, docstring_args)
-        self.assertEqual(result, expected_result)
-
-    def test_compare_arg_order_no_colon_returns_error(self):
-        docstring_checker = docstrings_checker.ASTDocStringChecker()
-        func_args = ['arg_name']
-        docstring_args = """Description
-            Args:
-                arg_name
-            """
-        expected_result = ['Arg not followed by colon: arg_name']
-        result = docstring_checker.compare_arg_order(func_args, docstring_args)
-        self.assertEqual(result, expected_result)
-
-    def test_compare_arg_order_two_matching_ordered_args_success(self):
-        docstring_checker = docstrings_checker.ASTDocStringChecker()
-        func_args = ['arg_name1', 'arg_name2']
-        docstring_args = """Description
-            Args:
-                arg_name1: description,
-                arg_name2: description
-            """
-        expected_result = []
-        result = docstring_checker.compare_arg_order(func_args, docstring_args)
-        self.assertEqual(result, expected_result)
-
-    def test_compare_arg_order_empty_docstring_exits_without_error(self):
-        docstring_checker = docstrings_checker.ASTDocStringChecker()
-        func_args = ['arg_name1']
-        docstring_args = ''
-        expected_result = []
-        result = docstring_checker.compare_arg_order(func_args, docstring_args)
-        self.assertEqual(result, expected_result)
-
-    def test_compare_arg_order_no_arg_header_exits_without_error(self):
-        docstring_checker = docstrings_checker.ASTDocStringChecker()
-        func_args = ['arg_name1']
-        docstring_args = 'I only have a description.'
-        expected_result = []
-        result = docstring_checker.compare_arg_order(func_args, docstring_args)
-        self.assertEqual(result, expected_result)
-
-    def test_compare_arg_order_missing_arg_returns_arg(self):
-        docstring_checker = docstrings_checker.ASTDocStringChecker()
-        func_args = ['arg_name1', 'arg_name2']
-        docstring_args = """Description
-            Args:
-                arg_name1: description
-            """
-        expected_result = ['Arg missing from docstring: arg_name2']
-        result = docstring_checker.compare_arg_order(func_args, docstring_args)
-        self.assertEqual(result, expected_result)
-
-    def test_compare_arg_order_missing_first_arg_returns_one_error(self):
-        docstring_checker = docstrings_checker.ASTDocStringChecker()
-        func_args = ['arg_name1', 'arg_name2']
-        docstring_args = """Description
-            Args:
-                arg_name2: description
-            """
-        expected_result = ['Arg missing from docstring: arg_name1']
-        result = docstring_checker.compare_arg_order(func_args, docstring_args)
-        self.assertEqual(result, expected_result)
-
-    def test_compare_arg_order_misordered_args_returns_one_error(self):
-        docstring_checker = docstrings_checker.ASTDocStringChecker()
-        func_args = ['arg_name1', 'arg_name2']
-        docstring_args = """Description
-            Args:
-                arg_name2: description
-                arg_name1: description
-            """
-        expected_result = ['Arg ordering error in docstring.']
-        result = docstring_checker.compare_arg_order(func_args, docstring_args)
-        self.assertEqual(result, expected_result)
-
-    def test_compare_arg_order_mention_arg_without_colon_has_no_effect(self):
-        docstring_checker = docstrings_checker.ASTDocStringChecker()
-        func_args = ['arg_name1', 'arg_name2']
-        docstring_args = """Description
-            Args:
-                arg_name1: description involving arg_name2,
-                arg_name2: description involving arg_name1
-            """
-        expected_result = []
-        result = docstring_checker.compare_arg_order(func_args, docstring_args)
-        self.assertEqual(result, expected_result)
-
-    def test_compare_arg_order_arg_substring_not_confused(self):
-        docstring_checker = docstrings_checker.ASTDocStringChecker()
-        func_args = ['this_has_a_substring', 'intermediate_arg', 'substring']
-        docstring_args = """Description
-            Args:
-                this_has_a_substring: description,
-                intermediate_arg: description,
-                substring: description
-            """
-        expected_result = []
-        result = docstring_checker.compare_arg_order(func_args, docstring_args)
-        self.assertEqual(result, expected_result)
-
-    def test_compare_arg_order_multi_line_descriptions_success(self):
-        docstring_checker = docstrings_checker.ASTDocStringChecker()
-        func_args = ['arg_name1', 'arg_name2']
-        docstring_args = """Description
-            Args:
-                arg_name1: description that goes on for a
-                    long time.
-                arg_name2: description
-            """
-        expected_result = []
-        result = docstring_checker.compare_arg_order(func_args, docstring_args)
-        self.assertEqual(result, expected_result)
-
-    def test_space_indentation(self):
+    def test_space_indentation(self) -> None:
         sample_string = '     This is a sample string.'
-        self.assertEqual(docstrings_checker.space_indentation(sample_string), 5)
+        self.assertEqual(
+            docstrings_checker.space_indentation(sample_string), 5
+        )
 
-    def test_check_docstrings_arg_order(self):
-        docstring_checker = docstrings_checker.ASTDocStringChecker()
-
-        ast_file = ast.walk(ast.parse(
+    def test_get_setters_property_name_with_setter(self) -> None:
+        setter_node = astroid.extract_node(
             """
-def func(test_var_one, test_var_two): #@
-    \"\"\"Function to test docstring parameters.
+        @test.setter
+        def func():
+            pass
+        """)
+        property_name = docstrings_checker.get_setters_property_name(
+            setter_node)
+        self.assertEqual(property_name, 'test')
 
-    Args:
-        test_var_one: int. First test variable.
-        test_var_two: str. Second test variable.
-
-    Returns:
-        int. The test result.
-    \"\"\"
-    result = test_var_one + test_var_two
-    return result"""))
-
-        func_defs = [n for n in ast_file if isinstance(n, ast.FunctionDef)]
-        self.assertEqual(len(func_defs), 1)
-
-        func_result = docstring_checker.check_docstrings_arg_order(func_defs[0])
-        self.assertEqual(func_result, [])
-
-    def test_possible_exc_types_with_inference_error(self):
-
-        @contextlib.contextmanager
-        def swap(obj, attr, newvalue):
-            """Swap an object's attribute value within the context of a
-            'with' statement. The object can be anything that supports
-            getattr and setattr, such as class instances, modules, etc.
+    def test_get_setters_property_name_without_setter(self) -> None:
+        none_node = astroid.extract_node(
             """
-            original = getattr(obj, attr)
-            setattr(obj, attr, newvalue)
-            try:
-                yield
-            finally:
-                setattr(obj, attr, original)
+        @attribute
+        def func():
+            pass
+        """)
+        none_return = docstrings_checker.get_setters_property_name(none_node)
+        self.assertEqual(none_return, None)
 
+    def test_get_setters_property_with_setter_and_property(self) -> None:
+        node = astroid.extract_node(
+            """
+        class TestClass():
+            @test.setter
+            @property
+            def func():
+                pass
+        """)
+
+        temp = node.getattr('func')
+        setter_property = docstrings_checker.get_setters_property(temp[0])
+        self.assertEqual(isinstance(setter_property, astroid.FunctionDef), True)
+
+    def test_get_setters_property_with_setter_no_property(self) -> None:
+        testnode2 = astroid.extract_node(
+            """
+        class TestClass():
+            @test.setter
+            def func():
+                pass
+        """)
+
+        temp = testnode2.getattr('func')
+        setter_property = docstrings_checker.get_setters_property(temp[0])
+        self.assertEqual(setter_property, None)
+
+    def test_get_setters_property_no_class(self) -> None:
+        testnode3 = astroid.extract_node(
+            """
+        @test.setter
+        def func():
+            pass
+        """)
+
+        setter_property = docstrings_checker.get_setters_property(testnode3)
+        self.assertEqual(setter_property, None)
+
+    def test_get_setters_property_no_setter_no_property(self) -> None:
+        testnode4 = astroid.extract_node(
+            """
+        class TestClass():
+            def func():
+                pass
+        """)
+
+        temp = testnode4.getattr('func')
+        setter_property = docstrings_checker.get_setters_property(temp[0])
+        self.assertEqual(setter_property, None)
+
+    def test_returns_something_with_value_retur(self) -> None:
+        return_node = astroid.extract_node(
+            """
+        return True
+        """)
+
+        self.assertEqual(
+            docstrings_checker.returns_something(return_node),
+            True)
+
+    def test_returns_something_with_none_return(self) -> None:
+        return_none_node = astroid.extract_node(
+            """
+        return None
+        """)
+
+        self.assertEqual(
+            docstrings_checker.returns_something(return_none_node),
+            False)
+
+    def test_returns_something_with_empty_return(self) -> None:
+        none_return_node = astroid.extract_node(
+            """
+        return
+        """)
+
+        self.assertEqual(
+            docstrings_checker.returns_something(none_return_node),
+            False)
+
+    def test_possible_exc_types_with_valid_name(self) -> None:
+        raise_node = astroid.extract_node(
+            """
+        def func():
+            raise IndexError #@
+        """)
+
+        exceptions = docstrings_checker.possible_exc_types(raise_node)
+        self.assertEqual(exceptions, set(['IndexError']))
+
+    def test_possible_exc_types_with_invalid_name(self) -> None:
+        raise_node = astroid.extract_node(
+            """
+        def func():
+            raise AInvalidError #@
+        """)
+
+        exceptions = docstrings_checker.possible_exc_types(raise_node)
+        self.assertEqual(exceptions, set([]))
+
+    def test_possible_exc_types_with_function_call_no_return(self) -> None:
+        raise_node = astroid.extract_node(
+            """
+        def testFunc():
+            pass
+
+        def func():
+            raise testFunc() #@
+        """)
+
+        excpetions = docstrings_checker.possible_exc_types(raise_node)
+        self.assertEqual(excpetions, set([]))
+
+    def test_possible_exc_types_with_function_call_valid_errors(self) -> None:
+        raise_node = astroid.extract_node(
+            """
+        def testFunc():
+            if True:
+                return IndexError
+            else:
+                return ValueError
+
+        def func():
+            raise testFunc() #@
+        """)
+
+        excpetions = docstrings_checker.possible_exc_types(raise_node)
+        self.assertEqual(excpetions, set(['IndexError', 'ValueError']))
+
+    def test_possible_exc_types_with_function_call_invalid_error(self) -> None:
+        raise_node = astroid.extract_node(
+            """
+        def testFunc():
+            return AInvalidError
+
+        def func():
+            raise testFunc() #@
+        """)
+
+        excpetions = docstrings_checker.possible_exc_types(raise_node)
+        self.assertEqual(excpetions, set([]))
+
+    def test_possible_exc_types_with_return_out_of_frame(self) -> None:
+        raise_node = astroid.extract_node(
+            """
+        def testFunc():
+            def inner():
+                return IndexError
+
+            pass
+
+        def func():
+            raise testFunc() #@
+        """)
+
+        exceptions = docstrings_checker.possible_exc_types(raise_node)
+        self.assertEqual(exceptions, set([]))
+
+    def test_possible_exc_types_with_undefined_function_call(self) -> None:
+        raise_node = astroid.extract_node(
+            """
+        def func():
+            raise testFunc() #@
+        """)
+
+        excpetions = docstrings_checker.possible_exc_types(raise_node)
+        self.assertEqual(excpetions, set([]))
+
+    def test_possible_exc_types_with_constaint_raise(self) -> None:
+        raise_node = astroid.extract_node(
+            """
+        def func():
+            raise True #@
+        """)
+
+        exceptions = docstrings_checker.possible_exc_types(raise_node)
+        self.assertEqual(exceptions, set([]))
+
+    def test_possible_exc_types_with_inference_error(self) -> None:
         raise_node = astroid.extract_node(
             """
         def func():
             raise Exception('An exception.') #@
         """)
-        node_ignores_exception_swap = swap(
+        node_ignores_exception_swap = self.swap(
             utils, 'node_ignores_exception',
-            lambda _, __: (_ for _ in ()).throw(astroid.InferenceError()))
+            lambda _, __: (_ for _ in ()).throw(astroid.InferenceError())
+        )
 
         with node_ignores_exception_swap:
             exceptions = docstrings_checker.possible_exc_types(raise_node)
         self.assertEqual(exceptions, set([]))
 
-    def test_possible_exc_types_with_exception_message(self):
+    def test_possible_exc_types_with_exception_message(self) -> None:
         raise_node = astroid.extract_node(
             """
         def func():
@@ -241,7 +259,7 @@ def func(test_var_one, test_var_two): #@
         exceptions = docstrings_checker.possible_exc_types(raise_node)
         self.assertEqual(exceptions, set(['Exception']))
 
-    def test_possible_exc_types_with_no_exception(self):
+    def test_possible_exc_types_with_no_exception(self) -> None:
         raise_node = astroid.extract_node(
             """
         def func():
@@ -252,7 +270,7 @@ def func(test_var_one, test_var_two): #@
         exceptions = docstrings_checker.possible_exc_types(raise_node)
         self.assertEqual(exceptions, set([]))
 
-    def test_possible_exc_types_with_exception_inside_function(self):
+    def test_possible_exc_types_with_exception_inside_function(self) -> None:
         raise_node = astroid.extract_node(
             """
         def func():
@@ -264,3 +282,26 @@ def func(test_var_one, test_var_two): #@
 
         exceptions = docstrings_checker.possible_exc_types(raise_node)
         self.assertEqual(exceptions, set(['Exception']))
+
+    def test_docstringify_with_valid_docstring(self) -> None:
+        valid_docstring = """Docstring that is correctly formated
+            according to the Google Python Style Guide.
+
+            Args:
+                test_value: bool. Just a test argument.
+            """
+        is_valid = isinstance(
+            docstrings_checker.docstringify(valid_docstring),
+            docstrings_checker.GoogleDocstring)
+
+        self.assertEqual(is_valid, True)
+
+    def test_docstringify_with_invalid_docstring(self) -> None:
+        invalid_docstring = """Docstring that is incorrectly
+            formated according to the Google Python Style Guide.
+            """
+        is_valid = isinstance(
+            docstrings_checker.docstringify(invalid_docstring),
+            docstrings_checker.GoogleDocstring)
+
+        self.assertEqual(is_valid, False)

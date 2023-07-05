@@ -19,98 +19,20 @@ Do not use this module anywhere else in the code base!
 
 from __future__ import annotations
 
+import abc
 import collections
 import contextlib
-import functools
-import inspect
 import shutil
 import sys
 import tempfile
-import threading
 
-from core import python_utils
+from typing import Dict, Iterator, List, Optional, TextIO
 
-
-def memoize(func):
-    """Decorator which provides thread-safe, cached-access to the return values
-    of function calls.
-
-    NOTE: This function uses dicts to manage the cache. This means that all
-    values provided as arguments to func *must be hashable!*
-
-    Args:
-        func: callable. The callable function that is going to be run in
-            thread-safe, cached-access environment.
-
-    Returns:
-        callable. The same func, but calls to it using the same arguments are
-        made exactly once.
-    """
-    key_locks = {}
-    lock_for_key_locks = threading.Lock()
-    def threadsafe_access(key):
-        """Returns a threading.Lock unique to the given key.
-
-        Args:
-            key: *. A hashable value.
-
-        Returns:
-            threading.Lock. A lock unique to the given key.
-        """
-        # Use double-checked locking to prevent race-conditions.
-        if key not in key_locks:
-            with lock_for_key_locks:
-                if key not in key_locks:
-                    key_locks[key] = threading.Lock()
-        return key_locks[key]
-
-    cache = {}
-    def get_from_cache(key, factory):
-        """Returns and associates a factory-provided value to the given key if a
-        value isn't associated to it yet. Otherwise, returns the pre-existing
-        associated value.
-
-        Args:
-            key: *. A hashable value.
-            factory: callable. A value producer that takes no arguments.
-
-        Returns:
-            *. The result of factory(), or the last value to be associated to
-            key.
-        """
-        if key in cache:
-            return cache[key]
-        with threadsafe_access(key):
-            if key not in cache:
-                cache[key] = factory()
-        return cache[key]
-
-    # In order to allow calls to functions with default arguments to use the
-    # same hash as calls which explicitly supply them, we fetch those default
-    # values and use them to build the kwargs that func will actually see.
-    arg_names, _, _, defaults = inspect.getargspec(func)
-    defaults = defaults if defaults is not None else ()
-    default_func_kwargs = dict(
-        python_utils.ZIP(arg_names[-len(defaults):], defaults))
-
-    @functools.wraps(func)
-    def memoized_func(*args, **kwargs):
-        """The same func, but calls to it using the same argument values are
-        made exactly once.
-
-        Returns:
-            function(*). The value of func(*args, **kwargs).
-        """
-        func_kwargs = default_func_kwargs.copy()
-        func_kwargs.update(kwargs)
-        key = (tuple(args), tuple(sorted(func_kwargs.items())))
-        return get_from_cache(key, lambda: func(*args, **kwargs))
-
-    return memoized_func
+from .. import concurrent_task_utils
 
 
 @contextlib.contextmanager
-def redirect_stdout(new_target):
+def redirect_stdout(new_target: TextIO) -> Iterator[TextIO]:
     """Redirect stdout to the new target.
 
     Args:
@@ -127,7 +49,7 @@ def redirect_stdout(new_target):
         sys.stdout = old_target
 
 
-def get_duplicates_from_list_of_strings(strings):
+def get_duplicates_from_list_of_strings(strings: List[str]) -> List[str]:
     """Returns a list of duplicate strings in the list of given strings.
 
     Args:
@@ -138,7 +60,7 @@ def get_duplicates_from_list_of_strings(strings):
         strings.
     """
     duplicates = []
-    item_count_map = collections.defaultdict(int)
+    item_count_map: Dict[str, int] = collections.defaultdict(int)
     for string in strings:
         item_count_map[string] += 1
         # Counting as duplicate once it's appeared twice in the list.
@@ -149,7 +71,9 @@ def get_duplicates_from_list_of_strings(strings):
 
 
 @contextlib.contextmanager
-def temp_dir(suffix='', prefix='', parent=None):
+def temp_dir(
+    suffix: str = '', prefix: str = '', parent: Optional[str] = None
+) -> Iterator[str]:
     """Creates a temporary directory which is only usable in a `with` context.
 
     Args:
@@ -168,21 +92,35 @@ def temp_dir(suffix='', prefix='', parent=None):
         shutil.rmtree(new_dir)
 
 
-def print_failure_message(failure_message):
+def print_failure_message(failure_message: str) -> None:
     """Prints the given failure message in red color.
 
     Args:
         failure_message: str. The failure message to print.
     """
     # \033[91m is the ANSI escape sequences for red color.
-    python_utils.PRINT('\033[91m' + failure_message + '\033[0m')
+    print('\033[91m' + failure_message + '\033[0m')
 
 
-def print_success_message(success_message):
+def print_success_message(success_message: str) -> None:
     """Prints the given success_message in red color.
 
     Args:
         success_message: str. The success message to print.
     """
     # \033[91m is the ANSI escape sequences for green color.
-    python_utils.PRINT('\033[92m' + success_message + '\033[0m')
+    print('\033[92m' + success_message + '\033[0m')
+
+
+class BaseLinter(abc.ABC):
+    """Base abstract linter manager for all linters."""
+
+    @abc.abstractmethod
+    def perform_all_lint_checks(self) -> List[concurrent_task_utils.TaskResult]:
+        """Perform all the lint checks and returns the messages returned by all
+        the checks.
+
+        Returns:
+            list(TaskResult). A list of TaskResult objects representing the
+            results of the lint checks.
+        """

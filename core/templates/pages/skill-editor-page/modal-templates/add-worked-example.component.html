@@ -1,0 +1,39 @@
+<div class="modal-header e2e-test-add-worked-example-modal">
+  <h3>Add Worked Example</h3>
+</div>
+
+<div class="modal-body">
+  <form name="addWorkedExampleForm.workedExampleTextForm"
+        class="form-inline">
+    <div class="oppia-rule-details-header">
+      <strong>Example Question</strong>
+      <schema-based-editor class="e2e-test-worked-example-question"
+                           [schema]="getSchema()"
+                           [localValue]="tmpWorkedExampleQuestionHtml"
+                           (localValueChange)="this.updateLocalQues($event)">
+      </schema-based-editor>
+      <div class="worked-example-explanation-section">
+        <strong>Example Explanation</strong>
+        <schema-based-editor class="e2e-test-worked-example-explanation"
+                             [schema]="getSchema()"
+                             [localValue]="tmpWorkedExampleExplanationHtml"
+                             (localValueChange)="this.updateLocalExp($event)">
+        </schema-based-editor>
+      </div>
+    </div>
+  </form>
+</div>
+
+<div class="modal-footer">
+  <button class="btn btn-secondary" (click)="cancel()" type="button">Cancel</button>
+  <button class="btn btn-success e2e-test-save-worked-example-button"
+          (click)="saveWorkedExample()"
+          [disabled]="!(tmpWorkedExampleQuestionHtml && tmpWorkedExampleExplanationHtml)">
+  Save
+  </button>
+</div>
+<style>
+  .worked-example-explanation-section {
+    margin-top: 2.5vh;
+  }
+</style>

@@ -71,7 +71,7 @@
           <br>
           <br>
 
-          <schema-based-editor [schema]="getSchema.bind(this)"
+          <schema-based-editor [schema]="getSchema()"
                                [localValue]="displayedFeaturedActivityReferences"
                                (localValueChange)="updateDisplayedFeaturedActivityReferences($event)">
           </schema-based-editor>

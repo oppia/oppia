@@ -13,28 +13,47 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for the ItemSelectionInput short response.
+ * @fileoverview Component for the ItemSelectionInput short response.
  *
  * IMPORTANT NOTE: The naming convention for customization args that are passed
  * into the directive is: the name of the parameter, followed by 'With',
  * followed by the name of the arg.
  */
 
-require('services/html-escaper.service.ts');
+import { Component, Input, OnInit } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
+import { HtmlEscaperService } from 'services/html-escaper.service';
 
-angular.module('oppia').component('oppiaShortResponseItemSelectionInput', {
-  template: require('./item-selection-input-short-response.component.html'),
-  controllerAs: '$ctrl',
-  controller: ['$attrs', 'HtmlEscaperService',
-    function($attrs, HtmlEscaperService) {
-      var ctrl = this;
-      ctrl.$onInit = function() {
-        const choices = HtmlEscaperService.escapedJsonToObj($attrs.choices);
-        const answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
+@Component({
+  selector: 'oppia-short-response-item-selection-input',
+  templateUrl: './item-selection-input-short-response.component.html',
+  styleUrls: []
+})
+export class ShortResponseItemSelectionInputComponent implements OnInit {
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  @Input() answer!: string;
+  @Input() choices!: string;
+  responses!: string[];
 
-        const choicesContentIds = choices.map(choice => choice._contentId);
-        ctrl.answer = answer.map(
-          contentId => choices[choicesContentIds.indexOf(contentId)]._html);
-      };
-    }]
-});
+  constructor(private htmlEscaperService: HtmlEscaperService) {}
+
+  ngOnInit(): void {
+    const answer = this.htmlEscaperService.escapedJsonToObj(
+      this.answer
+    ) as string[];
+    const choices = this.htmlEscaperService.escapedJsonToObj(
+      this.choices
+    ) as { _html: string; _contentId: string }[];
+
+    const choicesContentIds = choices.map(choice => choice._contentId);
+    this.responses = answer.map(
+      contentId => choices[choicesContentIds.indexOf(contentId)]._html);
+  }
+}
+
+angular.module('oppia').directive(
+  'oppiaShortResponseItemSelectionInput', downgradeComponent({
+    component: ShortResponseItemSelectionInputComponent
+  }) as angular.IDirectiveFactory);

@@ -22,8 +22,12 @@ import { BlogCardPreviewModalComponent } from './blog-card-preview-modal.compone
 import { BlogDashboardPageService } from 'pages/blog-dashboard-page/services/blog-dashboard-page.service';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { TruncatePipe } from 'filters/string-utility-filters/truncate.pipe';
+// This throws "TS2307". We need to
+// suppress this error because rte-text-components are not strictly typed yet.
+// @ts-ignore
+import { RichTextComponentsModule } from 'rich_text_components/rich-text-components.module';
 import { Pipe } from '@angular/core';
-import { BlogPostData } from 'domain/blog/blog-post.model';
+import { BlogPostBackendDict, BlogPostData } from 'domain/blog/blog-post.model';
 import { BlogPostSummary } from 'domain/blog/blog-post-summary.model';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
@@ -53,16 +57,16 @@ describe('Blog Card Preview Modal Component', () => {
   let blogDashboardPageService: BlogDashboardPageService;
   let fixture: ComponentFixture<BlogCardPreviewModalComponent>;
   let blogPostData: BlogPostData;
-  let sampleBlogPostBackendDict = {
+  let sampleBlogPostBackendDict: BlogPostBackendDict = {
     id: 'sampleBlogId',
-    author_username: 'test_user',
+    displayed_author_name: 'test_user',
     title: 'sample_title',
-    content: '<p>hello</p>',
+    content: '<p>hello</p><strong>HEllo</strong>',
     thumbnail_filename: 'image.png',
     tags: ['learners', 'news'],
     url_fragment: 'sample#url',
     last_updated: '11/21/2014, 09:45:00',
-    published_on: null,
+    published_on: '',
   };
 
   beforeEach(waitForAsync(() => {
@@ -72,6 +76,7 @@ describe('Blog Card Preview Modal Component', () => {
         NgbModalModule,
         MatCardModule,
         MatIconModule,
+        RichTextComponentsModule,
       ],
       declarations: [
         BlogCardPreviewModalComponent,
@@ -96,27 +101,26 @@ describe('Blog Card Preview Modal Component', () => {
   }));
 
   it('should initialize correctly when blog post is not published', () => {
-    sampleBlogPostBackendDict.published_on = null;
+    sampleBlogPostBackendDict.published_on = '';
     blogPostData = BlogPostData.createFromBackendDict(
       sampleBlogPostBackendDict);
     let expectedBlogPostSummary = new BlogPostSummary (
       blogPostData.id,
-      blogPostData.authorUsername,
+      '',
+      blogPostData.displayedAuthorName,
       blogPostData.title,
-      '<p>hello</p>',
+      '<p>hello</p> ',
       blogPostData.tags,
       blogPostData.thumbnailFilename,
       blogPostData.urlFragment,
       blogPostData.lastUpdated,
       blogPostData.lastUpdated);
     blogDashboardPageService.blogPostData = blogPostData;
-    blogDashboardPageService.authorPictureUrl = 'sample-url';
 
     component.ngOnInit();
 
     expect(component.blogPostSummary).toEqual(
       expectedBlogPostSummary);
-    expect(component.profilePicUrl).toBe('sample-url');
   });
 
   it('should initialize correctly when blog post is published', () => {
@@ -125,21 +129,20 @@ describe('Blog Card Preview Modal Component', () => {
       sampleBlogPostBackendDict);
     let expectedBlogPostSummary = new BlogPostSummary (
       blogPostData.id,
-      blogPostData.authorUsername,
+      '',
+      blogPostData.displayedAuthorName,
       blogPostData.title,
-      '<p>hello</p>',
+      '<p>hello</p> ',
       blogPostData.tags,
       blogPostData.thumbnailFilename,
       blogPostData.urlFragment,
       blogPostData.lastUpdated,
       blogPostData.publishedOn);
     blogDashboardPageService.blogPostData = blogPostData;
-    blogDashboardPageService.authorPictureUrl = 'sample-url';
 
     component.ngOnInit();
 
     expect(component.blogPostSummary).toEqual(
       expectedBlogPostSummary);
-    expect(component.profilePicUrl).toBe('sample-url');
   });
 });

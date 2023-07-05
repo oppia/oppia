@@ -29,6 +29,7 @@ describe('Suggestion data model', () => {
       status: 'accepted',
       author_name: 'author',
       change: {
+        skill_id: 'skill_id',
         cmd: 'edit_state_property',
         property_name: 'content',
         state_name: 'state_1',

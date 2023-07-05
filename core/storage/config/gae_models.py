@@ -21,10 +21,13 @@ from __future__ import annotations
 from core.platform import models
 import core.storage.base_model.gae_models as base_models
 
-from typing import Any, Dict, List
+from typing import Dict, List
 
 MYPY = False
 if MYPY: # pragma: no cover
+    # Here, we are importing 'platform_parameter_domain' only for type checking.
+    from core.domain import platform_parameter_domain  # pylint: disable=invalid-import # isort:skip
+    from mypy_imports import base_models
     from mypy_imports import datastore_services
 
 datastore_services = models.Registry.import_datastore_services()
@@ -76,17 +79,15 @@ class ConfigPropertyModel(base_models.VersionedModel):
             'value': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
 
-    # TODO(#13523): Change 'commit_cmds' to domain object/TypedDict to
-    # remove Any from type-annotation below.
-    # We have ignored [override] here because the signature of this method
+    # Here we use MyPy ignore because the signature of this method
     # doesn't match with VersionedModel.commit().
     # https://mypy.readthedocs.io/en/stable/error_code_list.html#check-validity-of-overrides-override
     def commit( # type: ignore[override]
-            self,
-            committer_id: str,
-            commit_cmds: List[Dict[str, Any]]
+        self,
+        committer_id: str,
+        commit_cmds: base_models.AllowedCommitCmdsListType
     ) -> None:
-        super(ConfigPropertyModel, self).commit(committer_id, '', commit_cmds)
+        super().commit(committer_id, '', commit_cmds)
 
 
 class PlatformParameterSnapshotMetadataModel(
@@ -119,6 +120,7 @@ class PlatformParameterModel(base_models.VersionedModel):
     rules = datastore_services.JsonProperty(repeated=True)
     rule_schema_version = (
         datastore_services.IntegerProperty(required=True, indexed=True))
+    default_value = datastore_services.JsonProperty()
 
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:
@@ -136,17 +138,17 @@ class PlatformParameterModel(base_models.VersionedModel):
         """Model doesn't contain any data directly corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'rules': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'rule_schema_version': base_models.EXPORT_POLICY.NOT_APPLICABLE
+            'rule_schema_version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'default_value': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
 
-    # TODO(#13523): Change 'rule_dicts' to domain object/TypedDict to
-    # remove Any from type-annotation below.
     @classmethod
     def create(
         cls,
         param_name: str,
-        rule_dicts: List[Dict[str, Any]],
-        rule_schema_version: int
+        rule_dicts: List[platform_parameter_domain.PlatformParameterRuleDict],
+        rule_schema_version: int,
+        default_value: platform_parameter_domain.PlatformDataTypes
     ) -> PlatformParameterModel:
         """Creates a PlatformParameterModel instance.
 
@@ -161,9 +163,13 @@ class PlatformParameterModel(base_models.VersionedModel):
                         PlatformParameterFilter objects, having the following
                         structure:
                             - type: str. The type of the filter.
-                            - value: *. The value of the filter to match
-                                against.
+                            - conditions: list((str, str)). Each element of the
+                                list is a 2-tuple (op, value), where op is the
+                                operator for comparison and value is the value
+                                used for comparison.
             rule_schema_version: int. The schema version for the rule dicts.
+            default_value: PlatformDataTypes. The default value of the platform
+                parameter.
 
         Returns:
             PlatformParameterModel. The created PlatformParameterModel
@@ -172,4 +178,5 @@ class PlatformParameterModel(base_models.VersionedModel):
         return cls(
             id=param_name,
             rules=rule_dicts,
-            rule_schema_version=rule_schema_version)
+            rule_schema_version=rule_schema_version,
+            default_value=default_value)

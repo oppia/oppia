@@ -22,9 +22,10 @@ import { ExplorationPropertyService } from 'pages/exploration-editor-page/servic
 import { ChangeListService } from 'pages/exploration-editor-page/services/change-list.service';
 
 import { ParamChangesObjectFactory } from 'domain/exploration/ParamChangesObjectFactory';
-import { ParamSpecsObjectFactory } from 'domain/exploration/ParamSpecsObjectFactory';
+import { ParamSpecs, ParamSpecsObjectFactory } from 'domain/exploration/ParamSpecsObjectFactory';
 import { ParamSpecObjectFactory } from 'domain/exploration/ParamSpecObjectFactory';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { ParamChange } from 'domain/exploration/ParamChangeObjectFactory';
 
 describe('Exploration Property Service', () => {
   let explorationPropertyService: ExplorationPropertyService;
@@ -32,7 +33,7 @@ describe('Exploration Property Service', () => {
   let paramSpecsObjectFactory: ParamSpecsObjectFactory;
   let paramSpecObjectFactory: ParamSpecObjectFactory;
   let changeListService: ChangeListService;
-  let editExplorationPropertySpy;
+  let editExplorationPropertySpy: jasmine.Spy;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -46,7 +47,7 @@ describe('Exploration Property Service', () => {
     paramSpecObjectFactory = TestBed.inject(ParamSpecObjectFactory);
 
     editExplorationPropertySpy = spyOn(
-      changeListService, 'editExplorationProperty').and.returnValue(null);
+      changeListService, 'editExplorationProperty').and.returnValue();
   });
 
   it('should create a new exploration properties object', function() {
@@ -63,11 +64,11 @@ describe('Exploration Property Service', () => {
   it('should overrides _normalize and _isValid methods', function() {
     let childToOverride = Object.create(explorationPropertyService);
 
-    childToOverride._isValid = function(value) {
+    childToOverride._isValid = function(value: string) {
       return !!value;
     };
 
-    childToOverride._normalize = function(value) {
+    childToOverride._normalize = function(value: string) {
       return value;
     };
 
@@ -84,6 +85,8 @@ describe('Exploration Property Service', () => {
   });
 
   it('should save the displayed value when init is not called', () => {
+    explorationPropertyService.propertyName = null;
+
     expect(() => {
       explorationPropertyService.saveDisplayedValue();
     }).toThrowError('Exploration property name cannot be null.');
@@ -98,7 +101,7 @@ describe('Exploration Property Service', () => {
     let child = Object.create(explorationPropertyService);
     child.propertyName = 'property_1';
 
-    child._isValid = function(value) {
+    child._isValid = function(value: string) {
       if (!value) {
         throw new Error('this.displayed should have a valid value.');
       }
@@ -119,9 +122,9 @@ describe('Exploration Property Service', () => {
   it('should save displayed value when is ParamChanges object', function() {
     let child = Object.create(explorationPropertyService);
     child.propertyName = 'param_changes';
-    child._normalize = function(paramChanges) {
+    child._normalize = function(paramChanges: ParamChange[]) {
       // Changing paramChanges so hasChanged() turns to be true on line 87.
-      paramChanges.forEach(function(paramChange) {
+      paramChanges.forEach(function(paramChange: ParamChange) {
         paramChange.resetCustomizationArgs();
       });
       return paramChanges;
@@ -155,7 +158,7 @@ describe('Exploration Property Service', () => {
   it('should save displayed value when is ParamSpecs object', function() {
     let child = Object.create(explorationPropertyService);
     child.propertyName = 'param_specs';
-    child._normalize = function(paramSpecs) {
+    child._normalize = function(paramSpecs: ParamSpecs) {
       // Changing paramSpecs so hasChanged() turns to be true on line 87.
       let paramSpec = paramSpecObjectFactory.createDefault();
       paramSpecs.addParamIfNew('z', paramSpec);

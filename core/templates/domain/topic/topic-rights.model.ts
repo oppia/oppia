@@ -38,15 +38,19 @@ export class TopicRights {
   canEditTopic(): boolean {
     return this._canEditTopic;
   }
+
   isPublished(): boolean {
     return this._published;
   }
+
   canPublishTopic(): boolean {
     return this._canPublishTopic;
   }
+
   canEditName(): boolean {
     return this._canPublishTopic;
   }
+
   markTopicAsPublished(): void {
     if (this._canPublishTopic) {
       this._published = true;
@@ -54,6 +58,7 @@ export class TopicRights {
       throw new Error('User is not allowed to publish this topic.');
     }
   }
+
   markTopicAsUnpublished(): void {
     if (this._canPublishTopic) {
       this._published = false;
@@ -61,6 +66,7 @@ export class TopicRights {
       throw new Error('User is not allowed to unpublish this topic.');
     }
   }
+
   // Reassigns all values within this topic to match the existing
   // topic rights. This is performed as a deep copy such that none of the
   // internal, bindable objects are changed within this topic rights.
@@ -79,13 +85,5 @@ export class TopicRights {
       topicRightsBackendObject.can_publish_topic,
       topicRightsBackendObject.can_edit_topic
     );
-  }
-
-  // This creates an interstitial topic rights object which acts as a
-  // placeholder until the actual topic rights object is fetched from
-  // the backend. Since it is acting as a placeholder, it should be valid and
-  // hence the most restrictive rights are given to the object.
-  static createInterstitialRights(): TopicRights {
-    return new TopicRights(false, false, false);
   }
 }

@@ -29,13 +29,18 @@ import time
 from core import feconf
 from core.platform import models
 
-(audit_models,) = models.Registry.import_models([models.NAMES.audit])
+from typing import Dict, List, Optional
+
+MYPY = False
+if MYPY: # pragma: no cover
+    from mypy_imports import audit_models
+
+(audit_models,) = models.Registry.import_models([models.Names.AUDIT])
 
 # Actions that can be performed in the system.
 ACTION_ACCEPT_ANY_SUGGESTION = 'ACCEPT_ANY_SUGGESTION'
-ACTION_ACCEPT_ANY_VOICEOVER_APPLICATION = (
-    'ACTION_ACCEPT_ANY_VOICEOVER_APPLICATION')
 ACTION_ACCESS_CREATOR_DASHBOARD = 'ACCESS_CREATOR_DASHBOARD'
+ACTION_ACCESS_CLASSROOM_ADMIN_PAGE = 'ACCESS_CLASSROOM_ADMIN_PAGE'
 ACTION_ACCESS_LEARNER_DASHBOARD = 'ACCESS_LEARNER_DASHBOARD'
 ACTION_ACCESS_MODERATOR_PAGE = 'ACCESS_MODERATOR_PAGE'
 ACTION_ACCESS_RELEASE_COORDINATOR_PAGE = 'ACCESS_RELEASE_COORDINATOR_PAGE'
@@ -90,13 +95,13 @@ ACTION_PUBLISH_OWNED_ACTIVITY = 'PUBLISH_OWNED_ACTIVITY'
 ACTION_PUBLISH_OWNED_SKILL = 'PUBLISH_OWNED_SKILL'
 ACTION_RATE_ANY_PUBLIC_EXPLORATION = 'RATE_ANY_PUBLIC_EXPLORATION'
 ACTION_SEND_MODERATOR_EMAILS = 'SEND_MODERATOR_EMAILS'
-ACTION_SUBMIT_VOICEOVER_APPLICATION = 'ACTION_SUBMIT_VOICEOVER_APPLICATION'
 ACTION_SUBSCRIBE_TO_USERS = 'SUBSCRIBE_TO_USERS'
 ACTION_SUGGEST_CHANGES = 'SUGGEST_CHANGES'
 ACTION_UNPUBLISH_ANY_PUBLIC_ACTIVITY = 'UNPUBLISH_ANY_PUBLIC_ACTIVITY'
 ACTION_VISIT_ANY_QUESTION_EDITOR_PAGE = 'VISIT_ANY_QUESTION_EDITOR_PAGE'
 ACTION_VISIT_ANY_TOPIC_EDITOR_PAGE = 'VISIT_ANY_TOPIC_EDITOR_PAGE'
 ACTION_CAN_MANAGE_VOICE_ARTIST = 'CAN_MANAGE_VOICE_ARTIST'
+ACTION_ACCESS_LEARNER_GROUPS = 'ACCESS_LEARNER_GROUPS'
 
 # Users can be updated to the following list of role IDs via admin interface.
 #
@@ -113,6 +118,7 @@ UPDATABLE_ROLES = [
     feconf.ROLE_ID_RELEASE_COORDINATOR,
     feconf.ROLE_ID_TOPIC_MANAGER,
     feconf.ROLE_ID_TRANSLATION_ADMIN,
+    feconf.ROLE_ID_QUESTION_COORDINATOR,
 ]
 
 # Users can be viewed by following list of role IDs via admin interface.
@@ -130,6 +136,7 @@ VIEWABLE_ROLES = [
     feconf.ROLE_ID_TOPIC_MANAGER,
     feconf.ROLE_ID_TRANSLATION_ADMIN,
     feconf.ROLE_ID_VOICEOVER_ADMIN,
+    feconf.ROLE_ID_QUESTION_COORDINATOR,
 ]
 
 # The string corresponding to role IDs that should be visible to admin.
@@ -147,6 +154,7 @@ HUMAN_READABLE_ROLES = {
     feconf.ROLE_ID_TOPIC_MANAGER: 'topic manager',
     feconf.ROLE_ID_TRANSLATION_ADMIN: 'translation admin',
     feconf.ROLE_ID_VOICEOVER_ADMIN: 'voiceover admin',
+    feconf.ROLE_ID_QUESTION_COORDINATOR: 'question coordinator'
 }
 
 
@@ -154,8 +162,8 @@ HUMAN_READABLE_ROLES = {
 _ROLE_ACTIONS = {
     feconf.ROLE_ID_CURRICULUM_ADMIN: [
         ACTION_ACCEPT_ANY_SUGGESTION,
-        ACTION_ACCEPT_ANY_VOICEOVER_APPLICATION,
         ACTION_ACCESS_TOPICS_AND_SKILLS_DASHBOARD,
+        ACTION_ACCESS_CLASSROOM_ADMIN_PAGE,
         ACTION_CHANGE_STORY_STATUS,
         ACTION_CHANGE_TOPIC_STATUS,
         ACTION_CREATE_NEW_SKILL,
@@ -186,6 +194,7 @@ _ROLE_ACTIONS = {
     feconf.ROLE_ID_FULL_USER: [
         ACTION_ACCESS_CREATOR_DASHBOARD,
         ACTION_ACCESS_LEARNER_DASHBOARD,
+        ACTION_ACCESS_LEARNER_GROUPS,
         ACTION_CREATE_EXPLORATION,
         ACTION_DELETE_OWNED_PRIVATE_ACTIVITY,
         ACTION_EDIT_OWNED_ACTIVITY,
@@ -196,8 +205,7 @@ _ROLE_ACTIONS = {
         ACTION_PUBLISH_OWNED_ACTIVITY,
         ACTION_RATE_ANY_PUBLIC_EXPLORATION,
         ACTION_SUBSCRIBE_TO_USERS,
-        ACTION_SUGGEST_CHANGES,
-        ACTION_SUBMIT_VOICEOVER_APPLICATION
+        ACTION_SUGGEST_CHANGES
     ],
     feconf.ROLE_ID_GUEST: [
         ACTION_PLAY_ANY_PUBLIC_ACTIVITY
@@ -251,11 +259,15 @@ _ROLE_ACTIONS = {
     ],
     feconf.ROLE_ID_BLOG_POST_EDITOR: [
         ACTION_ACCESS_BLOG_DASHBOARD
+    ],
+    feconf.ROLE_ID_QUESTION_COORDINATOR: [
+        ACTION_ACCESS_CONTRIBUTOR_DASHBOARD_ADMIN_PAGE,
+        ACTION_MANAGE_QUESTION_CONTRIBUTOR_ROLES
     ]
 }
 
 
-def get_all_actions(roles):
+def get_all_actions(roles: List[str]) -> List[str]:
     """Returns a list of all actions that can be performed by the given role.
 
     Args:
@@ -277,7 +289,7 @@ def get_all_actions(roles):
     return list(role_actions)
 
 
-def get_role_actions():
+def get_role_actions() -> Dict[str, List[str]]:
     """Returns the possible role to actions items in the application.
 
     Returns:
@@ -287,7 +299,12 @@ def get_role_actions():
     return copy.deepcopy(_ROLE_ACTIONS)
 
 
-def log_role_query(user_id, intent, role=None, username=None):
+def log_role_query(
+    user_id: str,
+    intent: str,
+    role: Optional[str] = None,
+    username: Optional[str] = None
+) -> None:
     """Stores the query to role structure in RoleQueryAuditModel."""
     model_id = '%s.%s.%s.%s' % (
         user_id, int(math.floor(time.time())), intent, random.randint(0, 1000)

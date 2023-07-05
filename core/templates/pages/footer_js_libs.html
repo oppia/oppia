@@ -1,3 +1,6 @@
+<!-- NOTE: Please contact @vojtechjelinek or @srijanreddy98 before modifying the file.
+     This is to ensure that all footer/header libs are properly synced across these five files:
+     index.html, index.prod.html, header_css_libs.html, header_js_libs.html and footer_js_libs.html-->
 @load('base-components/no-script.template.html')
 
 <!-- This code is used for inserting webpack bundles
@@ -5,6 +8,27 @@
 <% for (var chunk in htmlWebpackPlugin.files.js) { %>
   <script src="<%= htmlWebpackPlugin.files.js[chunk] %>"></script>
 <% } %>
+
+<script>
+  // Here we look for statically inserted CSS bundles and transform them to RTL
+  // version depending on key-value stored on the local storage.
+  let linkHrefs = [
+    <% for (var chunk in htmlWebpackPlugin.files.css) { %>
+      "<%= htmlWebpackPlugin.files.css[chunk] %>",
+    <% } %>
+  ];
+  let rtl = localStorage.getItem('direction') === 'rtl';
+  for (let linkHref of linkHrefs) {
+    if (rtl) {
+      linkHref = linkHref.replace('.css', '.rtl.css');
+    }
+    let cssLink = document.createElement('link');
+    cssLink.rel = 'stylesheet';
+    cssLink.href = linkHref;
+    document.head.appendChild(cssLink);
+  }
+</script>
+
 
 <% if (htmlWebpackPlugin.options.hybrid && webpackConfig.mode == 'production') { %>
   <script src="/third_party/generated/js/third_party.min.js"></script>

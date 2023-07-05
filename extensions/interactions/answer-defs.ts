@@ -75,11 +75,11 @@ export type MathEquationAnswer = string;
 export type MultipleChoiceAnswer = number;
 
 export interface MusicNotesAnswer {
-  readableNoteName: string,
+  readableNoteName: string;
   noteDuration: {
-    num: number,
-    den: number
-  }
+    num: number;
+    den: number;
+  };
 }
 
 export interface NumberWithUnitsAnswer {
@@ -125,4 +125,5 @@ export type InteractionAnswer = (
   RatioInputAnswer |
   SetInputAnswer |
   TextInputAnswer |
+  MusicNotesAnswer[] |
   MathEquationAnswer);

@@ -19,54 +19,86 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { StateCard } from 'domain/state_card/state-card.model';
-import { BrowserCheckerService } from 'domain/utilities/browser-checker.service';
-import { InteractionSpecsConstants } from 'pages/interaction-specs.constants';
+import { InteractionSpecsConstants, InteractionSpecsKey } from 'pages/interaction-specs.constants';
 import { Subscription } from 'rxjs';
 import { UrlService } from 'services/contextual/url.service';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
 import { ExplorationPlayerConstants } from '../exploration-player-page.constants';
-import { ExplorationEngineService } from '../services/exploration-engine.service';
 import { ExplorationPlayerStateService } from '../services/exploration-player-state.service';
 import { PlayerPositionService } from '../services/player-position.service';
 import { PlayerTranscriptService } from '../services/player-transcript.service';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { SchemaFormSubmittedService } from 'services/schema-form-submitted.service';
+import { animate, keyframes, style, transition, trigger } from '@angular/animations';
+import { ContentTranslationManagerService } from '../services/content-translation-manager.service';
+
+import './progress-nav.component.css';
+import { InteractionCustomizationArgs } from 'interactions/customization-args-defs';
+
 
 @Component({
   selector: 'oppia-progress-nav',
-  templateUrl: './progress-nav.component.html'
+  templateUrl: './progress-nav.component.html',
+  styleUrls: ['./progress-nav.component.css'],
+  animations: [
+    trigger('fadeInOut', [
+      transition('void => *', []),
+      transition('* <=> *', [
+        style({ opacity: 0 }),
+        animate('1s ease', keyframes([
+          style({ opacity: 0 }),
+          style({ opacity: 1 })
+        ]))
+      ])
+    ])
+  ]
 })
 export class ProgressNavComponent {
-  @Input() isLearnAgainButton: () => void;
-  @Input() displayedCard: StateCard;
-  @Input() submitButtonIsShown: boolean;
-  @Input() submitButtonIsDisabled: boolean;
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  @Input() isLearnAgainButton!: boolean;
+  @Input() displayedCard!: StateCard;
+  @Input() submitButtonIsShown!: boolean;
+  @Input() showContinueToReviseButton!: boolean;
+  @Input() navigationThroughCardHistoryIsEnabled!: boolean;
+  @Input() skipButtonIsShown!: boolean;
+  displayedCardIndex!: number;
+  hasPrevious!: boolean;
+  hasNext!: boolean;
+  conceptCardIsBeingShown!: boolean;
+  interactionCustomizationArgs!: InteractionCustomizationArgs | null;
+  interactionId!: string | null;
+  helpCardHasContinueButton!: boolean;
+  isIframed!: boolean;
+  lastDisplayedCard!: StateCard;
+  explorationId!: string;
+  newCardStateName!: string;
+  currentCardIndex!: number;
   @Output() submit: EventEmitter<void> = (
     new EventEmitter());
+
   @Output() clickContinueButton: EventEmitter<void> = (
     new EventEmitter());
 
+  @Output() clickContinueToReviseButton: EventEmitter<void> = (
+    new EventEmitter());
+
+  @Output() changeCard: EventEmitter<number> = new EventEmitter();
+
+  @Output() skipQuestion: EventEmitter<void> = new EventEmitter();
+
   directiveSubscriptions = new Subscription();
-  transcriptLength = 0;
-  interactionIsInline = true;
-  CONTINUE_BUTTON_FOCUS_LABEL = (
+  transcriptLength: number = 0;
+  interactionIsInline: boolean = true;
+  CONTINUE_BUTTON_FOCUS_LABEL: string = (
     ExplorationPlayerConstants.CONTINUE_BUTTON_FOCUS_LABEL);
-  SHOW_SUBMIT_INTERACTIONS_ONLY_FOR_MOBILE = [
+
+  SHOW_SUBMIT_INTERACTIONS_ONLY_FOR_MOBILE: string[] = [
     'ItemSelectionInput', 'MultipleChoiceInput'];
-  displayedCardIndex: number;
-  hasPrevious: boolean;
-  hasNext: boolean;
-  conceptCardIsBeingShown: boolean;
-  interactionCustomizationArgs;
-  interactionId: string;
-  helpCardHasContinueButton: boolean;
-  isIframed: boolean;
-  lastDisplayedCard: StateCard;
 
   constructor(
-    private browserCheckerService: BrowserCheckerService,
-    private explorationEngineService: ExplorationEngineService,
     private explorationPlayerStateService: ExplorationPlayerStateService,
     private focusManagerService: FocusManagerService,
     private i18nLanguageCodeService: I18nLanguageCodeService,
@@ -74,7 +106,8 @@ export class ProgressNavComponent {
     private playerTranscriptService: PlayerTranscriptService,
     private urlService: UrlService,
     private schemaFormSubmittedService: SchemaFormSubmittedService,
-    private windowDimensionsService: WindowDimensionsService
+    private windowDimensionsService: WindowDimensionsService,
+    private contentTranslationManagerService: ContentTranslationManagerService,
   ) {}
 
   ngOnChanges(): void {
@@ -84,18 +117,8 @@ export class ProgressNavComponent {
     }
   }
 
-  isLanguageRTL(): boolean {
-    return this.i18nLanguageCodeService.isCurrentLanguageRTL();
-  }
-
   ngOnInit(): void {
     this.isIframed = this.urlService.isIframed();
-    this.directiveSubscriptions.add(
-      this.playerPositionService.displayedCardIndexChangedEventEmitter
-        .subscribe((index) => {
-          this.updateDisplayedCardInfo();
-        })
-    );
 
     this.directiveSubscriptions.add(
       this.playerPositionService.onHelpCardAvailable.subscribe(
@@ -111,10 +134,17 @@ export class ProgressNavComponent {
         }
       )
     );
+    this.directiveSubscriptions.add(
+      this.contentTranslationManagerService.onStateCardContentUpdate.subscribe(
+        () => {
+          this.updateDisplayedCardInfo();
+        }
+      )
+    );
+  }
 
-    if (this.playerPositionService.getDisplayedCardIndex() > -1) {
-      this.updateDisplayedCardInfo();
-    }
+  skipCurrentQuestion(): void {
+    this.skipQuestion.emit();
   }
 
   ngOnDestroy(): void {
@@ -129,9 +159,12 @@ export class ProgressNavComponent {
     this.hasNext = !this.playerTranscriptService.isLastCard(
       this.displayedCardIndex);
     this.explorationPlayerStateService.isInQuestionMode();
+
     this.conceptCardIsBeingShown = (
       this.displayedCard.getStateName() === null &&
-      !this.explorationPlayerStateService.isInQuestionMode());
+        !this.explorationPlayerStateService.isPresentingIsolatedQuestions()
+    );
+
     if (!this.conceptCardIsBeingShown) {
       this.interactionIsInline = this.displayedCard.isInteractionInline();
       this.interactionCustomizationArgs = this.displayedCard
@@ -147,47 +180,34 @@ export class ProgressNavComponent {
       }
     }
     this.helpCardHasContinueButton = false;
+    this.newCardStateName = this.displayedCard.getStateName();
   }
 
   doesInteractionHaveNavSubmitButton(): boolean {
     try {
       return (
         Boolean(this.interactionId) &&
-        InteractionSpecsConstants.INTERACTION_SPECS[this.interactionId].
-          show_generic_submit_button);
-    } catch (e) {
+        InteractionSpecsConstants.INTERACTION_SPECS[
+          this.interactionId as InteractionSpecsKey
+        ].show_generic_submit_button);
+    // We use unknown type because we are unsure of the type of error
+    // that was thrown. Since the catch block cannot identify the
+    // specific type of error, we are unable to further optimise the
+    // code by introducing more types of errors.
+    } catch (e: unknown) {
       let additionalInfo = (
         '\nSubmit button debug logs:\ninterationId: ' +
         this.interactionId);
-      e.message += additionalInfo;
+      if (e instanceof Error) {
+        e.message += additionalInfo;
+      }
       throw e;
     }
   }
 
-  doesInteractionHaveSpecialCaseForMobile(): boolean {
-    // The submit button should be shown:
-    // 1. In mobile mode, if the current interaction is either
-    //    ItemSelectionInput or MultipleChoiceInput.
-    // 2. In desktop mode, if the current interaction is
-    //    ItemSelectionInput with maximum selectable choices > 1.
-    if (this.browserCheckerService.isMobileDevice()) {
-      return (this.SHOW_SUBMIT_INTERACTIONS_ONLY_FOR_MOBILE.indexOf(
-        this.interactionId) >= 0);
-    } else {
-      return (
-        this.interactionId === 'ItemSelectionInput' &&
-              this.interactionCustomizationArgs
-                .maxAllowableSelectionCount.value > 1);
-    }
-  }
-
-  changeCard(index: number): void {
+  validateIndexAndChangeCard(index: number): void {
     if (index >= 0 && index < this.transcriptLength) {
-      this.playerPositionService.recordNavigationButtonClick();
-      this.playerPositionService.setDisplayedCardIndex(index);
-      this.explorationEngineService.onUpdateActiveStateIfInEditor.emit(
-        this.playerPositionService.getCurrentStateName());
-      this.playerPositionService.changeCurrentQuestion(index);
+      this.changeCard.emit(index);
     } else {
       throw new Error('Target card index out of bounds.');
     }
@@ -201,10 +221,6 @@ export class ProgressNavComponent {
   }
 
   shouldGenericSubmitButtonBeShown(): boolean {
-    if (this.doesInteractionHaveSpecialCaseForMobile()) {
-      return true;
-    }
-
     return (this.doesInteractionHaveNavSubmitButton() && (
       this.interactionIsInline ||
       !this.canWindowShowTwoCards()

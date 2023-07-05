@@ -20,24 +20,30 @@ from __future__ import annotations
 
 from extensions.interactions import base
 
+from typing import List, Optional
+
+MYPY = False
+if MYPY:  # pragma: no cover
+    from extensions import domain
+
 
 class SetInput(base.BaseInteraction):
     """Interaction for input of an unordered set of strings."""
 
-    name = 'Set Input'
-    description = 'Allows learners to enter an unordered set of strings.'
-    display_mode = base.DISPLAY_MODE_INLINE
-    _dependency_ids = []
-    answer_type = 'SetOfUnicodeString'
-    instructions = None
-    narrow_instructions = None
-    needs_summary = False
-    can_have_solution = True
-    show_generic_submit_button = True
+    name: str = 'Set Input'
+    description: str = 'Allows learners to enter an unordered set of strings.'
+    display_mode: str = base.DISPLAY_MODE_INLINE
+    _dependency_ids: List[str] = []
+    answer_type: str = 'SetOfUnicodeString'
+    instructions: Optional[str] = None
+    narrow_instructions: Optional[str] = None
+    needs_summary: bool = False
+    can_have_solution: bool = True
+    show_generic_submit_button: bool = True
 
     # NB: There used to be a UnicodeString-typed parameter here called
     # 'element_type'. This has since been removed.
-    _customization_arg_specs = [{
+    _customization_arg_specs: List[domain.CustomizationArgSpecsDict] = [{
         'name': 'buttonText',
         'description': 'Label for the \'Add Item\' button',
         'schema': {
@@ -50,7 +56,7 @@ class SetInput(base.BaseInteraction):
         }
     }]
 
-    _answer_visualization_specs = [{
+    _answer_visualization_specs: List[base.AnswerVisualizationSpecsDict] = [{
         # Table with answer counts for top N answers.
         'id': 'FrequencyTable',
         'options': {

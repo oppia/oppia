@@ -33,17 +33,19 @@ module.exports = {
         {
           'matchingUrlPattern': 'http://[^/]+/learner-dashboard$',
           'assertions': {
-            'uses-webp-images': [
+            'errors-in-console': ['error', {'minScore': 1}],
+            'modern-image-formats': [
               'error', {'maxLength': 0, 'strategy': 'pessimistic'}
             ],
             // We need to use passive event listeners on this page so that
             // the page works correctly.
             'uses-passive-event-listeners': ['error', {'minScore': 0}],
-            // Sign up redirects logged in user to learner dashboard page.
+            // Sign up redirects logged-in user to learner dashboard page.
             // Learner dashboard Page cannot be preloaded.
             'uses-rel-preload': ['error', {'minScore': 0}],
             'deprecations': ['error', {'minScore': 1}],
-            'redirects': ['error', {'minScore': 0}]
+            'redirects': ['error', {'minScore': 0}],
+            'uses-responsive-images': ['error', {'minScore': 0.8}]
           }
         },
         {
@@ -85,20 +87,20 @@ module.exports = {
         {
           'matchingUrlPattern': 'http://[^/]+/create/.*$',
           'assertions': {
+            'errors-in-console': ['error', {'minScore': 1}],
             // TODO(#13465): Change this maxLength to 0 once images are migrated.
-            'uses-webp-images': [
+            'modern-image-formats': [
               'error', {'maxLength': 3, 'strategy': 'pessimistic'}
             ],
             // We need to use passive event listeners on this page so that
             // the page works correctly.
             'uses-passive-event-listeners': ['error', {'minScore': 0}],
             // MIDI library uses some deprecated API.
-            'deprecations': ['error', {'minScore': 0}]
+            'deprecations': ['error', {'minScore': 0}],
+            'uses-rel-preload': ['error', {'minScore': 1}],
+            'redirects': ['error', {'minScore': 1}],
+            'uses-responsive-images': ['error', {'minScore': 1}]
           }
-        },
-        {
-          'matchingUrlPattern': 'http://[^/]+/collection_editor/create/.*$',
-          'assertions': baseConfig['basePerformanceAssertions']
         },
         {
           'matchingUrlPattern': 'http://[^/]+/topic_editor/.*$',

@@ -20,16 +20,18 @@ import 'zone.js';
 
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
-import { DynamicContentModule } from 'components/angular-html-bind/dynamic-content.module';
+import { DynamicContentModule } from 'components/interaction-display/dynamic-content.module';
 import { InteractiveMultipleChoiceInputComponent } from './directives/oppia-interactive-multiple-choice-input.component';
 import { ResponseMultipleChoiceInputComponent } from './directives/oppia-response-multiple-choice-input.component';
 import { ShortResponseMultipleChoiceInputComponent } from './directives/oppia-short-response-multiple-choice-input.component';
 import { TranslateModule } from '@ngx-translate/core';
+import { RichTextComponentsModule } from 'rich_text_components/rich-text-components.module';
 
 @NgModule({
   imports: [
     CommonModule,
     DynamicContentModule,
+    RichTextComponentsModule,
     TranslateModule
   ],
   declarations: [

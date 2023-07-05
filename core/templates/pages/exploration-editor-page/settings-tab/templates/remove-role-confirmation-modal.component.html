@@ -1,0 +1,21 @@
+<div class="modal-header">
+  <h3 class="oppia-remove-role-confirmation-modal-header">Are you sure?</h3>
+</div>
+
+<div class="modal-body oppia-remove-role-confirmation-modal-body">
+  <p>Are you sure you want to remove <strong>{{username}}</strong> from the role of <strong>{{role}}</strong>?</p>
+</div>
+
+<div class="modal-footer">
+  <button class="btn btn-secondary" (click)="cancel()">Cancel</button>
+  <button class="btn btn-danger e2e-test-really-delete-exploration-button" (click)="confirm()">Remove user</button>
+</div>
+
+<style>
+  .oppia-remove-role-confirmation-modal-header {
+    margin: 2% auto;
+  }
+  .oppia-remove-role-confirmation-modal-body {
+    margin: 30px 0;
+  }
+</style>

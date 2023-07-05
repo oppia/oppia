@@ -16,33 +16,38 @@
  * @fileoverview Unit tests for classroom page component.
  */
 
-import { TestBed, async, ComponentFixture } from '@angular/core/testing';
+import { TestBed, ComponentFixture, waitForAsync } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { UrlService } from 'services/contextual/url.service';
 import { TopicViewerBackendApiService } from
   'domain/topic_viewer/topic-viewer-backend-api.service';
-import { ReadOnlyTopicObjectFactory } from
+import { ReadOnlyTopicBackendDict, ReadOnlyTopicObjectFactory } from
   'domain/topic_viewer/read-only-topic-object.factory';
-import { TopicViewerNavbarBreadcrumbComponent } from
-  // eslint-disable-next-line max-len
-  'pages/topic-viewer-page/navbar-breadcrumb/topic-viewer-navbar-breadcrumb.component';
+import { TopicViewerNavbarBreadcrumbComponent } from 'pages/topic-viewer-page/navbar-breadcrumb/topic-viewer-navbar-breadcrumb.component';
+import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
+import { MockTranslatePipe } from 'tests/unit-test-utils';
 
 describe('Topic viewer navbar breadcrumb component', () => {
   let component: TopicViewerNavbarBreadcrumbComponent;
   let fixture: ComponentFixture<TopicViewerNavbarBreadcrumbComponent>;
   let readOnlyTopicObjectFactory = null;
   let topicViewerBackendApiService = null;
+  let i18nLanguageCodeService: I18nLanguageCodeService;
   let urlService = null;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      declarations: [TopicViewerNavbarBreadcrumbComponent],
+      declarations: [
+        MockTranslatePipe,
+        TopicViewerNavbarBreadcrumbComponent
+      ],
     }).compileComponents();
 
-    readOnlyTopicObjectFactory = TestBed.get(ReadOnlyTopicObjectFactory);
-    topicViewerBackendApiService = TestBed.get(TopicViewerBackendApiService);
-    urlService = TestBed.get(UrlService);
+    readOnlyTopicObjectFactory = TestBed.inject(ReadOnlyTopicObjectFactory);
+    topicViewerBackendApiService = TestBed.inject(TopicViewerBackendApiService);
+    i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
+    urlService = TestBed.inject(UrlService);
 
     spyOn(urlService, 'getTopicUrlFragmentFromLearnerUrl').and.returnValue(
       'topic1');
@@ -60,8 +65,10 @@ describe('Topic viewer navbar breadcrumb component', () => {
         topic_name: 'Topic Name 1',
         topic_id: 'topic1',
         topic_description: 'Description',
-        practice_tab_is_displayed: false
-      }));
+        practice_tab_is_displayed: false,
+        meta_tag_content: 'content',
+        page_title_fragment_for_web: 'title',
+      } as ReadOnlyTopicBackendDict));
   }));
 
   beforeEach(() => {
@@ -71,11 +78,30 @@ describe('Topic viewer navbar breadcrumb component', () => {
   });
 
   it('should set topic name using the data retrieved from the backend',
-    async(() => {
+    waitForAsync(() => {
       component.ngOnInit();
       fixture.whenStable().then(() => {
         fixture.detectChanges();
         expect(component.topicName).toBe('Topic Name 1');
       });
     }));
+
+  it('should set topic name translation key and check whether hacky ' +
+    'translations are displayed or not correctly', waitForAsync(() => {
+    component.ngOnInit();
+    fixture.whenStable().then(() => {
+      fixture.detectChanges();
+      expect(component.topicNameTranslationKey)
+        .toBe('I18N_TOPIC_topic1_TITLE');
+
+      spyOn(i18nLanguageCodeService, 'isHackyTranslationAvailable')
+        .and.returnValue(true);
+      spyOn(i18nLanguageCodeService, 'isCurrentLanguageEnglish')
+        .and.returnValue(false);
+
+      let hackyTopicNameTranslationIsDisplayed =
+        component.isHackyTopicNameTranslationDisplayed();
+      expect(hackyTopicNameTranslationIsDisplayed).toBe(true);
+    });
+  }));
 });

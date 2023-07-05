@@ -44,7 +44,7 @@ export class SkillMasteryBackendApiService {
     this.httpClient.get<SkillMasteryBackendResponse>(
       SkillDomainConstants.SKILL_MASTERY_DATA_URL_TEMPLATE, {
         params: {
-          comma_separated_skill_ids: skillIds.join(',')
+          selected_skill_ids: JSON.stringify(skillIds)
         }
       }).toPromise().then(response => {
       if (successCallback) {

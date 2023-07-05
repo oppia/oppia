@@ -33,9 +33,11 @@ if MYPY: # pragma: no cover
 
 datastore_services = models.Registry.import_datastore_services()
 
-(base_models,) = models.Registry.import_models([models.NAMES.base_model])
+(base_models,) = models.Registry.import_models([models.Names.BASE_MODEL])
 
 
+# Here we use type Any because argument 'new_values' can accept arbitrary
+# number of keyword args with different types of values.
 def clone_model(
     model: datastore_services.TYPE_MODEL_SUBCLASS, **new_values: Any
 ) -> datastore_services.TYPE_MODEL_SUBCLASS:
@@ -145,6 +147,8 @@ def get_model_id(model: datastore_services.Model) -> Optional[str]:
         raise TypeError('%r is not a model instance' % model)
 
 
+# Here we use type Any because this method can return a property from a
+# model and that property can be of any type.
 def get_model_property(
     model: datastore_services.Model, property_name: str
 ) -> Any:
@@ -182,9 +186,9 @@ def get_beam_entity_from_ndb_model(
     # We use private _entity_to_ds_entity here because it provides
     # a functionality that we need and writing it ourselves would be
     # too complicated.
-    return beam_datastore_types.Entity.from_client_entity(
-        ndb_model._entity_to_ds_entity(model) # pylint: disable=protected-access
-    )
+    with datastore_services.get_ndb_context():
+        model_to_put = ndb_model._entity_to_ds_entity(model)  # pylint: disable=protected-access
+    return beam_datastore_types.Entity.from_client_entity(model_to_put)
 
 
 def get_ndb_model_from_beam_entity(
@@ -276,6 +280,9 @@ def get_beam_query_from_ndb_query(
         filters=filters, order=order)
 
 
+# Here we use type Any because this method can return a list of tuples
+# in which we have a property values from a model and those property values
+# can be of any type.
 def _get_beam_filters_from_ndb_node(
     node: ndb_query.Node
 ) -> Tuple[Tuple[str, str, Any], ...]:
@@ -287,7 +294,13 @@ def _get_beam_filters_from_ndb_node(
     Returns:
         tuple(tuple(str, str, *)). The equivalent Apache Beam filters. Items
         are: (property name, comparison operator, property value).
+
+    Raises:
+        TypeError. These `!=`, `IN`, and `OR` are forbidden filters.
     """
+    # Here we use type Any because this list can contain tuples of
+    # format (property name, comparison operator, property value)
+    # and here property value can be of any type.
     beam_filters: List[Tuple[str, str, Any]] = []
 
     if isinstance(node, ndb_query.ConjunctionNode):

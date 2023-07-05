@@ -23,7 +23,7 @@ describe('Blog Post Object Factory', () => {
   beforeEach(() => {
     let sampleBlogPostBackendDict = {
       id: 'sampleId',
-      author_username: 'testUsername',
+      displayed_author_name: 'testUsername',
       title: 'sampleTitle',
       content: '<p>Hello</p>',
       thumbnail_filename: 'image',
@@ -34,6 +34,7 @@ describe('Blog Post Object Factory', () => {
     };
     sampleBlogPostData = BlogPostData.createFromBackendDict(
       sampleBlogPostBackendDict);
+    sampleBlogPostData.titleIsDuplicate = false;
   });
 
   it('should not find issues with a valid blog post', () => {
@@ -52,6 +53,26 @@ describe('Blog Post Object Factory', () => {
     sampleBlogPostData.title = 'aa';
     expect(sampleBlogPostData.validate()).toEqual([
       'Blog Post title should not be less than 5 characters.',
+      'Blog Post content should not be empty.'
+    ]);
+
+    sampleBlogPostData.title = 'aa'.repeat(65);
+    expect(sampleBlogPostData.validate()).toEqual([
+      'Blog Post title should not be more than 65 characters.',
+      'Blog Post content should not be empty.'
+    ]);
+
+    // Title contains invalid special characters. Only hyphens(-), ampersand(&)
+    // and colon(:) are allowed.
+    sampleBlogPostData.title = 'invalid chars#';
+    expect(sampleBlogPostData.validate()).toEqual([
+      'Blog Post title contains invalid characters.',
+      'Blog Post content should not be empty.'
+    ]);
+
+    sampleBlogPostData.titleIsDuplicate = true;
+    expect(sampleBlogPostData.validate()).toEqual([
+      'Blog Post with the given title already exists.',
       'Blog Post content should not be empty.'
     ]);
   });
@@ -84,6 +105,25 @@ describe('Blog Post Object Factory', () => {
       'Blog Post should have atleast one tag linked to it.',
       'Blog Post content should not be empty.',
     ]);
+
+    // Title contains invalid special characters. Only hyphens(-), ampersand(&)
+    // and colon (:) are allowed.
+    sampleBlogPostData.title = 'invalid chars#';
+
+    expect(sampleBlogPostData.prepublishValidate(maxTags)).toEqual([
+      'Blog Post title contains invalid characters.',
+      'Blog Post should have a thumbnail.',
+      'Blog Post should have atleast one tag linked to it.',
+      'Blog Post content should not be empty.',
+    ]);
+
+    sampleBlogPostData.titleIsDuplicate = true;
+    expect(sampleBlogPostData.prepublishValidate(maxTags)).toEqual([
+      'Blog Post with the given title already exists.',
+      'Blog Post should have a thumbnail.',
+      'Blog Post should have atleast one tag linked to it.',
+      'Blog Post content should not be empty.',
+    ]);
   });
 
   it('should correctly set tags in the blog post when tags are changed', () => {
@@ -95,25 +135,15 @@ describe('Blog Post Object Factory', () => {
   it('should raise correct validation issues for' +
     ' exceeding property limits', () => {
     sampleBlogPostData.addTag('Learner');
-    sampleBlogPostData.title = 'Title exceeding character limit of 40' +
-      ' characters should raise error.';
+    sampleBlogPostData.title = (
+      'Title exceeding character limit of 65 characters should raise error'
+    );
     let maxTags = 1;
 
     expect(sampleBlogPostData.prepublishValidate(maxTags)).toEqual([
-      'Blog Post title should not exceed 40 characters.',
+      'Blog Post title should not exceed 65 characters.',
       'Blog Post should atmost have 1 tag(s) linked to it.'
     ]);
-  });
-
-  it('should be able to create an interstitial blog post object', () => {
-    let blogPost = BlogPostData.createInterstitialBlogPost();
-    expect(blogPost.id).toEqual(null);
-    expect(blogPost.authorUsername).toEqual('loading');
-    expect(blogPost.title).toEqual('Blog Post Title loading');
-    expect(blogPost.content).toEqual('');
-    expect(blogPost.tags).toEqual([]);
-    expect(blogPost.thumbnailFilename).toEqual(null);
-    expect(blogPost.urlFragment).toEqual('Url Fragment loading');
   });
 
   it('should return correct property values', () => {

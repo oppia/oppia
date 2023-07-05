@@ -20,7 +20,7 @@
 import { AppConstants } from 'app.constants';
 export interface BlogPostBackendDict {
   'id': string ;
-  'author_username': string;
+  'displayed_author_name': string;
   'title': string;
   'content': string;
   'thumbnail_filename': string | null;
@@ -30,12 +30,8 @@ export interface BlogPostBackendDict {
   'published_on'?: string;
 }
 export class BlogPostData {
-  // TODO(#13637): Remove the use of interstitial blog post
-  // The 'id' and 'thumbnailFilename' is 'null' for an interstitial
-  // blog post that is displayed in the editor until the actual
-  // is fetched from the backend.
-  _id: string | null;
-  _authorUsername: string;
+  _id: string;
+  _displayedAuthorName: string;
   _title: string;
   _content: string;
   _tags: string[];
@@ -43,9 +39,10 @@ export class BlogPostData {
   _urlFragment: string;
   _lastUpdated?: string;
   _publishedOn?: string;
+  _titleIsDuplicate: boolean;
   constructor(
-      id: string | null,
-      authorUsername: string,
+      id: string,
+      displayedAuthorName: string,
       title: string,
       content: string,
       tags: string[],
@@ -54,7 +51,7 @@ export class BlogPostData {
       lastUpdated?: string,
       publishedOn?: string) {
     this._id = id;
-    this._authorUsername = authorUsername;
+    this._displayedAuthorName = displayedAuthorName;
     this._title = title;
     this._content = content;
     this._tags = tags;
@@ -62,14 +59,15 @@ export class BlogPostData {
     this._urlFragment = urlFragment;
     this._lastUpdated = lastUpdated;
     this._publishedOn = publishedOn;
+    this._titleIsDuplicate = false;
   }
 
-  get id(): string | null {
+  get id(): string {
     return this._id;
   }
 
-  get authorUsername(): string {
-    return this._authorUsername;
+  get displayedAuthorName(): string {
+    return this._displayedAuthorName;
   }
 
   get lastUpdated(): string | undefined {
@@ -94,6 +92,14 @@ export class BlogPostData {
 
   set tags(tags: string[]) {
     this._tags = tags;
+  }
+
+  set titleIsDuplicate(titleIsDuplicate: boolean) {
+    this._titleIsDuplicate = titleIsDuplicate;
+  }
+
+  get titleIsDuplicate(): boolean {
+    return this._titleIsDuplicate;
   }
 
   addTag(tag: string): void {
@@ -127,13 +133,28 @@ export class BlogPostData {
 
   validate(): string[] {
     let issues = [];
-    if (this._title === '') {
+    let validTitleRegex: RegExp = new RegExp(
+      AppConstants.VALID_BLOG_POST_TITLE_REGEX
+    );
+    if (this._titleIsDuplicate) {
+      issues.push(
+        'Blog Post with the given title already exists.');
+    } else if (this._title === '') {
       issues.push(
         'Blog Post title should not be empty.');
+    } else if (!validTitleRegex.test(this._title)) {
+      issues.push(
+        'Blog Post title contains invalid characters.'
+      );
     } else if (this._title.length < AppConstants.MIN_CHARS_IN_BLOG_POST_TITLE) {
       issues.push(
         'Blog Post title should not be less than ' +
         `${AppConstants.MIN_CHARS_IN_BLOG_POST_TITLE} characters.`
+      );
+    } else if (this._title.length > AppConstants.MAX_CHARS_IN_BLOG_POST_TITLE) {
+      issues.push(
+        'Blog Post title should not be more than ' +
+        `${AppConstants.MAX_CHARS_IN_BLOG_POST_TITLE} characters.`
       );
     }
     if (this._content === '') {
@@ -145,9 +166,19 @@ export class BlogPostData {
 
   prepublishValidate(maxTags: number): string[] {
     let issues = [];
-    if (this._title === '') {
+    let validTitleRegex: RegExp = new RegExp(
+      AppConstants.VALID_BLOG_POST_TITLE_REGEX
+    );
+    if (this._titleIsDuplicate) {
+      issues.push(
+        'Blog Post with the given title already exists.');
+    } else if (this._title === '') {
       issues.push(
         'Blog Post title should not be empty.');
+    } else if (!validTitleRegex.test(this._title)) {
+      issues.push(
+        'Blog Post title contains invalid characters.'
+      );
     } else if (this._title.length > AppConstants.MAX_CHARS_IN_BLOG_POST_TITLE) {
       issues.push(
         'Blog Post title should not exceed ' +
@@ -177,11 +208,12 @@ export class BlogPostData {
     }
     return issues;
   }
+
   static createFromBackendDict(
       blogPostBackendDict: BlogPostBackendDict): BlogPostData {
     return new BlogPostData (
       blogPostBackendDict.id,
-      blogPostBackendDict.author_username,
+      blogPostBackendDict.displayed_author_name,
       blogPostBackendDict.title,
       blogPostBackendDict.content,
       blogPostBackendDict.tags,
@@ -189,14 +221,5 @@ export class BlogPostData {
       blogPostBackendDict.url_fragment,
       blogPostBackendDict.last_updated,
       blogPostBackendDict.published_on);
-  }
-
-  // Create an interstitial blog post that would be displayed in the editor
-  // until the actual blog post is fetched from the backend.
-  static createInterstitialBlogPost(): BlogPostData {
-    return new BlogPostData (
-      null, 'loading', 'Blog Post Title loading', '', [],
-      null, 'Url Fragment loading'
-    );
   }
 }

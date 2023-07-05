@@ -1,0 +1,44 @@
+<background-banner></background-banner>
+<div class="oppia-facilitator-dashboard position-relative">
+  <div class="oppia-facilitator-dashboard-container-card">
+    <div class="oppia-facilitator-dashboard-title">
+      <span translate="I18N_TOPNAV_FACILITATOR_DASHBOARD"></span>
+    </div>
+    <div class="oppia-learner-groups-section">
+      <div class="oppia-learner-groups-section-title-container">
+        <div class="oppia-learner-groups-section-title">
+          <span translate="I18N_LEARNER_GROUPS_SECTION_TITLE"></span>
+        </div>
+        <div *ngIf="shortLearnerGroupSummaries.length > 0">
+          <a [href]="createLearnerGroupPageUrl" class="btn oppia-create-new-learner-group-button oppia-autofocus">
+            <span translate="I18N_CREATE_LEARNER_GROUP"></span>
+          </a>
+        </div>
+      </div>
+      <div class="oppia-empty-learner-groups-container" *ngIf="shortLearnerGroupSummaries.length == 0">
+        <div class="oppia-empty-learner-groups-message">
+          <span translate="I18N_EMPTY_LEARNER_GROUPS_MESSAGE"></span>
+        </div>
+        <a [href]="createLearnerGroupPageUrl" class="btn oppia-create-new-learner-group-button oppia-autofocus">
+          <span translate="I18N_CREATE_LEARNER_GROUP"></span>
+        </a>
+      </div>
+      <div class="oppia-learner-group-summary-cards-container"
+           *ngIf="shortLearnerGroupSummaries.length > 0">
+        <div class="oppia-learner-group-summary-card"
+             *ngFor="let learnerGroupSummary of shortLearnerGroupSummaries">
+          <a [href]="getLearnerGroupPageUrl(learnerGroupSummary.id)" class="oppia-learner-group-summary-card-info">
+            <div class="oppia-learner-group-summary-card-title">
+              {{learnerGroupSummary.title}}
+            </div>
+            <div class="oppia-learner-group-summary-card-learners">
+              <span>{{learnerGroupSummary.learnersCount}} &nbsp;</span>
+              <span [innerHTML]="'I18N_LEARNER_GROUP_LEARNERS'  | translate:{learnersCount: learnerGroupSummary.learnersCount, messageFormat: true}"></span>
+            </div>
+            <i class="fa fa-chevron-right"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

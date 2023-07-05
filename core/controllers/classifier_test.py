@@ -23,7 +23,7 @@ import json
 import os
 
 from core import feconf
-from core import python_utils
+from core import utils
 from core.constants import constants
 from core.domain import classifier_services
 from core.domain import config_domain
@@ -37,31 +37,40 @@ from core.tests import test_utils
 from proto_files import text_classifier_pb2
 from proto_files import training_job_response_payload_pb2
 
-(classifier_models,) = models.Registry.import_models([models.NAMES.classifier])
+from typing import Dict, List, Optional, Tuple, Union
+
+MYPY = False
+if MYPY:  # pragma: no cover
+    from mypy_imports import classifier_models
+
+secrets_services = models.Registry.import_secrets_services()
+
+(classifier_models,) = models.Registry.import_models([models.Names.CLASSIFIER])
 
 
 class TrainedClassifierHandlerTests(test_utils.ClassifierTestBase):
     """Test the handler for storing job result of training job."""
 
-    def setUp(self):
-        super(TrainedClassifierHandlerTests, self).setUp()
+    def setUp(self) -> None:
+        super().setUp()
 
         self.exp_id = 'exp_id1'
         self.title = 'Testing Classifier storing'
         self.category = 'Test'
         yaml_path = os.path.join(
             feconf.TESTS_DATA_DIR, 'string_classifier_test.yaml')
-        with python_utils.open_file(yaml_path, 'r') as yaml_file:
+        with utils.open_file(yaml_path, 'r') as yaml_file:
             self.yaml_content = yaml_file.read()
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.signup('moderator@example.com', 'mod')
 
-        assets_list = []
+        assets_list: List[Tuple[str, bytes]] = []
         with self.swap(feconf, 'ENABLE_ML_CLASSIFIERS', True):
             exp_services.save_new_exploration_from_yaml_and_assets(
                 feconf.SYSTEM_COMMITTER_ID, self.yaml_content, self.exp_id,
                 assets_list)
         self.exploration = exp_fetchers.get_exploration_by_id(self.exp_id)
+        assert self.exploration.states['Home'].interaction.id is not None
         self.algorithm_id = feconf.INTERACTION_CLASSIFIER_MAPPING[
             self.exploration.states['Home'].interaction.id]['algorithm_id']
         self.algorithm_version = feconf.INTERACTION_CLASSIFIER_MAPPING[
@@ -90,13 +99,14 @@ class TrainedClassifierHandlerTests(test_utils.ClassifierTestBase):
                 self.exp_id, self.exploration.version, 'Home',
                 self.algorithm_id))
         self.assertIsNotNone(classifier_training_job)
+        assert classifier_training_job is not None
         self.job_id = classifier_training_job.job_id
 
         # TODO(pranavsid98): Replace the three commands below with
         # mark_training_job_pending after Giritheja's PR gets merged.
         classifier_training_job_model = (
             classifier_models.ClassifierTrainingJobModel.get(
-                self.job_id, strict=False))
+                self.job_id, strict=True))
         classifier_training_job_model.status = (
             feconf.TRAINING_JOB_STATUS_PENDING)
         classifier_training_job_model.update_timestamps()
@@ -135,16 +145,38 @@ class TrainedClassifierHandlerTests(test_utils.ClassifierTestBase):
                     'utf-8'),
                 self.payload_for_fetching_next_job_request['vm_id']))
 
-    def test_trained_classifier_handler(self):
+    def _mock_get_secret(self, name: str) -> Optional[str]:
+        """Mock for the get_secret function.
+
+        Args:
+            name: str. The name of the secret to retrieve the value.
+
+        Returns:
+            Optional[str]. The value of the secret.
+        """
+        if name == 'VM_ID':
+            return 'vm_default'
+        elif name == 'SHARED_SECRET_KEY':
+            return '1a2b3c4e'
+        return None
+
+    def test_trained_classifier_handler(self) -> None:
         # Normal end-to-end test.
-        self.post_blob(
-            '/ml/trainedclassifierhandler',
-            self.payload_proto.SerializeToString(), expected_status_int=200)
+        with self.swap_with_checks(
+            secrets_services,
+            'get_secret',
+            self._mock_get_secret,
+            expected_args=[('VM_ID',), ('SHARED_SECRET_KEY',)],
+        ):
+            self.post_blob(
+                '/ml/trainedclassifierhandler',
+                self.payload_proto.SerializeToString(), expected_status_int=200)
         classifier_training_job = (
             classifier_services.get_classifier_training_job(
                 self.exp_id, self.exploration.version, 'Home',
                 self.algorithm_id))
         self.assertIsNotNone(classifier_training_job)
+        assert classifier_training_job is not None
         classifier_data = (
             self._get_classifier_data_from_classifier_training_job(
                 classifier_training_job))
@@ -154,15 +186,15 @@ class TrainedClassifierHandlerTests(test_utils.ClassifierTestBase):
             classifier_training_job.status,
             feconf.TRAINING_JOB_STATUS_COMPLETE)
 
-    def test_email_sent_on_failed_job(self):
+    def test_email_sent_on_failed_job(self) -> None:
 
         class FakeTrainingJob:
             """Fake training class to invoke failed job functions."""
 
-            def __init__(self):
+            def __init__(self) -> None:
                 self.status = feconf.TRAINING_JOB_STATUS_FAILED
 
-        def mock_get_classifier_training_job_by_id(_):
+        def mock_get_classifier_training_job_by_id(_: str) -> FakeTrainingJob:
             return FakeTrainingJob()
 
         can_send_emails_ctx = self.swap(
@@ -175,6 +207,7 @@ class TrainedClassifierHandlerTests(test_utils.ClassifierTestBase):
             mock_get_classifier_training_job_by_id)
         config_property = config_domain.Registry.get_config_property(
             'notification_user_ids_for_failed_tasks')
+        assert config_property is not None
         config_property.set_value(
             'committer_id',
             [self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)])
@@ -204,10 +237,16 @@ class TrainedClassifierHandlerTests(test_utils.ClassifierTestBase):
                 self.assertEqual(len(messages), 0)
 
                 # Post ML Job.
-                self.post_blob(
-                    '/ml/trainedclassifierhandler',
-                    self.payload_proto.SerializeToString(),
-                    expected_status_int=500)
+                with self.swap_with_checks(
+                    secrets_services,
+                    'get_secret',
+                    self._mock_get_secret,
+                    expected_args=[('VM_ID',), ('SHARED_SECRET_KEY',)],
+                ):
+                    self.post_blob(
+                        '/ml/trainedclassifierhandler',
+                        self.payload_proto.SerializeToString(),
+                        expected_status_int=500)
                 # Check that there are now emails sent.
                 messages = self._get_sent_email_messages(
                     feconf.ADMIN_EMAIL_ADDRESS)
@@ -219,35 +258,47 @@ class TrainedClassifierHandlerTests(test_utils.ClassifierTestBase):
                 self.assertEqual(len(messages), 1)
                 self.assertEqual(messages[0].subject, expected_subject)
 
-    def test_error_on_prod_mode_and_default_vm_id(self):
+    def test_error_on_prod_mode_and_default_vm_id(self) -> None:
         # Turn off DEV_MODE.
         with self.swap(constants, 'DEV_MODE', False):
             self.post_blob(
                 '/ml/trainedclassifierhandler',
                 self.payload_proto.SerializeToString(), expected_status_int=401)
 
-    def test_error_on_different_signatures(self):
+    def test_error_on_different_signatures(self) -> None:
         # Altering data to result in different signatures.
         self.payload_proto.job_result.job_id = 'different_job_id'
-        self.post_blob(
-            '/ml/trainedclassifierhandler',
-            self.payload_proto.SerializeToString(), expected_status_int=401)
+        with self.swap_with_checks(
+            secrets_services,
+            'get_secret',
+            self._mock_get_secret,
+            expected_args=[('VM_ID',), ('SHARED_SECRET_KEY',)],
+        ):
+            self.post_blob(
+                '/ml/trainedclassifierhandler',
+                self.payload_proto.SerializeToString(), expected_status_int=401)
 
-    def test_error_on_invalid_classifier_data_in_message(self):
+    def test_error_on_invalid_classifier_data_in_message(self) -> None:
         # Altering message dict to result in invalid dict.
         self.payload_proto.job_result.ClearField('classifier_frozen_model')
         self.payload_proto.signature = classifier_services.generate_signature(
             self.secret.encode('utf-8'),
             self.payload_proto.job_result.SerializeToString(),
             self.payload_proto.vm_id)
-        self.post_blob(
-            '/ml/trainedclassifierhandler',
-            self.payload_proto.SerializeToString(), expected_status_int=400)
+        with self.swap_with_checks(
+            secrets_services,
+            'get_secret',
+            self._mock_get_secret,
+            expected_args=[('VM_ID',), ('SHARED_SECRET_KEY',)],
+        ):
+            self.post_blob(
+                '/ml/trainedclassifierhandler',
+                self.payload_proto.SerializeToString(), expected_status_int=400)
 
-    def test_error_on_failed_training_job_status(self):
+    def test_error_on_failed_training_job_status(self) -> None:
         classifier_training_job_model = (
             classifier_models.ClassifierTrainingJobModel.get(
-                self.job_id, strict=False))
+                self.job_id, strict=True))
         classifier_training_job_model.status = (
             feconf.TRAINING_JOB_STATUS_FAILED)
         classifier_training_job_model.update_timestamps()
@@ -257,10 +308,10 @@ class TrainedClassifierHandlerTests(test_utils.ClassifierTestBase):
             '/ml/trainedclassifierhandler',
             self.payload_proto.SerializeToString(), expected_status_int=500)
 
-    def test_error_on_exception_in_store_classifier_data(self):
+    def test_error_on_exception_in_store_classifier_data(self) -> None:
         classifier_training_job_model = (
             classifier_models.ClassifierTrainingJobModel.get(
-                self.job_id, strict=False))
+                self.job_id, strict=True))
         classifier_training_job_model.state_name = 'invalid_state'
         classifier_training_job_model.update_timestamps()
         classifier_training_job_model.put()
@@ -269,14 +320,21 @@ class TrainedClassifierHandlerTests(test_utils.ClassifierTestBase):
             '/ml/trainedclassifierhandler',
             self.payload_proto.SerializeToString(), expected_status_int=500)
 
-    def test_get_trained_classifier_handler(self):
-        self.post_blob(
-            '/ml/trainedclassifierhandler',
-            self.payload_proto.SerializeToString(), expected_status_int=200)
+    def test_get_trained_classifier_handler(self) -> None:
+        with self.swap_with_checks(
+            secrets_services,
+            'get_secret',
+            self._mock_get_secret,
+            expected_args=[('VM_ID',), ('SHARED_SECRET_KEY',)],
+        ):
+            self.post_blob(
+                '/ml/trainedclassifierhandler',
+                self.payload_proto.SerializeToString(), expected_status_int=200)
         classifier_training_job = (
             classifier_services.get_classifier_training_job(
                 self.exp_id, self.exploration.version, 'Home',
                 self.algorithm_id))
+        assert classifier_training_job is not None
 
         params = {
             'exploration_id': self.exp_id,
@@ -290,10 +348,18 @@ class TrainedClassifierHandlerTests(test_utils.ClassifierTestBase):
             response['gcs_filename'],
             classifier_training_job.classifier_data_filename)
 
-    def test_error_on_incorrect_exploration_id_for_retrieving_model(self):
-        self.post_blob(
-            '/ml/trainedclassifierhandler',
-            self.payload_proto.SerializeToString(), expected_status_int=200)
+    def test_error_on_incorrect_exploration_id_for_retrieving_model(
+        self
+    ) -> None:
+        with self.swap_with_checks(
+            secrets_services,
+            'get_secret',
+            self._mock_get_secret,
+            expected_args=[('VM_ID',), ('SHARED_SECRET_KEY',)],
+        ):
+            self.post_blob(
+                '/ml/trainedclassifierhandler',
+                self.payload_proto.SerializeToString(), expected_status_int=200)
 
         params = {
             'exploration_id': 'fake_exp',
@@ -304,10 +370,18 @@ class TrainedClassifierHandlerTests(test_utils.ClassifierTestBase):
             '/ml/trainedclassifierhandler', params=params,
             expected_status_int=400)
 
-    def test_error_on_incorrect_state_name_for_retrieving_model(self):
-        self.post_blob(
-            '/ml/trainedclassifierhandler',
-            self.payload_proto.SerializeToString(), expected_status_int=200)
+    def test_error_on_incorrect_state_name_for_retrieving_model(
+        self
+    ) -> None:
+        with self.swap_with_checks(
+            secrets_services,
+            'get_secret',
+            self._mock_get_secret,
+            expected_args=[('VM_ID',), ('SHARED_SECRET_KEY',)],
+        ):
+            self.post_blob(
+                '/ml/trainedclassifierhandler',
+                self.payload_proto.SerializeToString(), expected_status_int=200)
 
         params = {
             'exploration_id': self.exp_id,
@@ -318,10 +392,18 @@ class TrainedClassifierHandlerTests(test_utils.ClassifierTestBase):
             '/ml/trainedclassifierhandler', params=params,
             expected_status_int=400)
 
-    def test_error_on_incorrect_exp_version_for_retrieving_model(self):
-        self.post_blob(
-            '/ml/trainedclassifierhandler',
-            self.payload_proto.SerializeToString(), expected_status_int=200)
+    def test_error_on_incorrect_exp_version_for_retrieving_model(
+        self
+    ) -> None:
+        with self.swap_with_checks(
+            secrets_services,
+            'get_secret',
+            self._mock_get_secret,
+            expected_args=[('VM_ID',), ('SHARED_SECRET_KEY',)],
+        ):
+            self.post_blob(
+                '/ml/trainedclassifierhandler',
+                self.payload_proto.SerializeToString(), expected_status_int=200)
 
         params = {
             'exploration_id': self.exp_id,
@@ -332,7 +414,9 @@ class TrainedClassifierHandlerTests(test_utils.ClassifierTestBase):
             '/ml/trainedclassifierhandler', params=params,
             expected_status_int=400)
 
-    def test_error_on_incomplete_training_job_for_retrieving_model(self):
+    def test_error_on_incomplete_training_job_for_retrieving_model(
+        self
+    ) -> None:
         params = {
             'exploration_id': self.exp_id,
             'exploration_version': self.exploration.version,
@@ -342,7 +426,9 @@ class TrainedClassifierHandlerTests(test_utils.ClassifierTestBase):
             '/ml/trainedclassifierhandler', params=params,
             expected_status_int=404)
 
-    def test_error_on_no_training_job_mapping_for_retrieving_model(self):
+    def test_error_on_no_training_job_mapping_for_retrieving_model(
+        self
+    ) -> None:
         new_exp_id = 'new_exp'
         new_exp = self.save_new_default_exploration(
             new_exp_id, feconf.SYSTEM_COMMITTER_ID, title='New title')
@@ -366,7 +452,10 @@ class TrainedClassifierHandlerTests(test_utils.ClassifierTestBase):
                             'unicode_str': ''
                         }
                     },
-                    'rows': {'value': 1}
+                    'rows': {'value': 1},
+                    'catchMisspellings': {
+                        'value': False
+                    }
                 }
             })]
 
@@ -384,7 +473,7 @@ class TrainedClassifierHandlerTests(test_utils.ClassifierTestBase):
             '/ml/trainedclassifierhandler', params=params,
             expected_status_int=400)
 
-    def test_error_on_no_training_job_for_retrieving_model(self):
+    def test_error_on_no_training_job_for_retrieving_model(self) -> None:
         new_exp_id = 'new_exp'
         new_exp = self.save_new_default_exploration(
             new_exp_id, feconf.SYSTEM_COMMITTER_ID, title='New title')
@@ -422,7 +511,7 @@ class TrainedClassifierHandlerTests(test_utils.ClassifierTestBase):
             '/ml/trainedclassifierhandler', params=params,
             expected_status_int=404)
 
-    def test_training_job_migration_on_algorithm_id_change(self):
+    def test_training_job_migration_on_algorithm_id_change(self) -> None:
         params = {
             'exploration_id': self.exp_id,
             'exploration_version': self.exploration.version,
@@ -446,17 +535,26 @@ class TrainedClassifierHandlerTests(test_utils.ClassifierTestBase):
         state_training_jobs_mapping = (
             classifier_services.get_state_training_jobs_mapping(
                 self.exp_id, self.exploration.version, 'Home'))
+        assert state_training_jobs_mapping is not None
         self.assertIn(
             'NewTextClassifier',
             state_training_jobs_mapping.algorithm_ids_to_job_ids)
 
+        swap_secret = self.swap_with_checks(
+            secrets_services,
+            'get_secret',
+            self._mock_get_secret,
+            expected_args=[('VM_ID',), ('SHARED_SECRET_KEY',)],
+        )
+
         with self.swap(
             feconf, 'INTERACTION_CLASSIFIER_MAPPING',
             interaction_classifier_mapping):
-            json_response = self.post_json(
-                '/ml/nextjobhandler',
-                self.payload_for_fetching_next_job_request,
-                expected_status_int=200)
+            with swap_secret:
+                json_response = self.post_json(
+                    '/ml/nextjobhandler',
+                    self.payload_for_fetching_next_job_request,
+                    expected_status_int=200)
 
         self.assertEqual(
             state_training_jobs_mapping.algorithm_ids_to_job_ids[
@@ -466,10 +564,16 @@ class TrainedClassifierHandlerTests(test_utils.ClassifierTestBase):
         self.assertEqual(json_response['algorithm_id'], 'NewTextClassifier')
         self.assertEqual(json_response['algorithm_version'], 1)
 
-    def test_training_job_migration_on_algorithm_version_change(self):
-        self.post_blob(
-            '/ml/trainedclassifierhandler',
-            self.payload_proto.SerializeToString(), expected_status_int=200)
+    def test_training_job_migration_on_algorithm_version_change(self) -> None:
+        with self.swap_with_checks(
+            secrets_services,
+            'get_secret',
+            self._mock_get_secret,
+            expected_args=[('VM_ID',), ('SHARED_SECRET_KEY',)],
+        ):
+            self.post_blob(
+                '/ml/trainedclassifierhandler',
+                self.payload_proto.SerializeToString(), expected_status_int=200)
 
         params = {
             'exploration_id': self.exp_id,
@@ -493,17 +597,26 @@ class TrainedClassifierHandlerTests(test_utils.ClassifierTestBase):
         state_training_jobs_mapping = (
             classifier_services.get_state_training_jobs_mapping(
                 self.exp_id, self.exploration.version, 'Home'))
+        assert state_training_jobs_mapping is not None
         self.assertIn(
             'TextClassifier',
             state_training_jobs_mapping.algorithm_ids_to_job_ids)
 
+        swap_secret = self.swap_with_checks(
+            secrets_services,
+            'get_secret',
+            self._mock_get_secret,
+            expected_args=[('VM_ID',), ('SHARED_SECRET_KEY',)],
+        )
+
         with self.swap(
             feconf, 'INTERACTION_CLASSIFIER_MAPPING',
             interaction_classifier_mapping):
-            json_response = self.post_json(
-                '/ml/nextjobhandler',
-                self.payload_for_fetching_next_job_request,
-                expected_status_int=200)
+            with swap_secret:
+                json_response = self.post_json(
+                    '/ml/nextjobhandler',
+                    self.payload_for_fetching_next_job_request,
+                    expected_status_int=200)
 
         self.assertEqual(
             state_training_jobs_mapping.algorithm_ids_to_job_ids[
@@ -517,8 +630,8 @@ class TrainedClassifierHandlerTests(test_utils.ClassifierTestBase):
 class NextJobHandlerTest(test_utils.GenericTestBase):
     """Test the handler for fetching next training job."""
 
-    def setUp(self):
-        super(NextJobHandlerTest, self).setUp()
+    def setUp(self) -> None:
+        super().setUp()
 
         self.exp_id = 'exp_id1'
         self.title = 'Testing Classifier storing'
@@ -528,7 +641,7 @@ class NextJobHandlerTest(test_utils.GenericTestBase):
             interaction_id]['algorithm_id']
         self.algorithm_version = feconf.INTERACTION_CLASSIFIER_MAPPING[
             interaction_id]['algorithm_version']
-        self.training_data = [
+        self.training_data: List[Dict[str, Union[int, List[str]]]] = [
             {
                 u'answer_group_index': 1,
                 u'answers': [u'a1', u'a2']
@@ -563,11 +676,30 @@ class NextJobHandlerTest(test_utils.GenericTestBase):
             self.payload['message'].encode('utf-8'),
             self.payload['vm_id'])
 
-    def test_next_job_handler(self):
-        json_response = self.post_json(
-            '/ml/nextjobhandler', self.payload, expected_status_int=200)
+    def test_next_job_handler(self) -> None:
+        def _mock_get_secret(name: str) -> Optional[str]:
+            if name == 'VM_ID':
+                return 'vm_default'
+            elif name == 'SHARED_SECRET_KEY':
+                return '1a2b3c4e'
+            return None
+
+        with self.swap_with_checks(
+            secrets_services,
+            'get_secret',
+            _mock_get_secret,
+            expected_args=[('VM_ID',), ('SHARED_SECRET_KEY',)],
+        ):
+            json_response = self.post_json(
+                '/ml/nextjobhandler', self.payload, expected_status_int=200)
         self.assertEqual(json_response, self.expected_response)
         classifier_services.mark_training_jobs_failed([self.job_id])
-        json_response = self.post_json(
-            '/ml/nextjobhandler', self.payload, expected_status_int=200)
+        with self.swap_with_checks(
+            secrets_services,
+            'get_secret',
+            _mock_get_secret,
+            expected_args=[('VM_ID',), ('SHARED_SECRET_KEY',)],
+        ):
+            json_response = self.post_json(
+                '/ml/nextjobhandler', self.payload, expected_status_int=200)
         self.assertEqual(json_response, {})

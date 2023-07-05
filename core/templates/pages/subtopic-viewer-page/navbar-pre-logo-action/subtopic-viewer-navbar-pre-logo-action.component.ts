@@ -30,12 +30,16 @@ import { UrlService } from 'services/contextual/url.service';
   styleUrls: []
 })
 export class SubtopicViewerNavbarPreLogoActionComponent implements OnInit {
-  topicUrlFragment: string;
-  topicUrl: string;
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  topicUrlFragment!: string;
+  topicUrl!: string;
   constructor(
     private urlService: UrlService,
     private urlInterpolationService: UrlInterpolationService
   ) {}
+
   ngOnInit(): void {
     this.topicUrlFragment = (
       this.urlService.getTopicUrlFragmentFromLearnerUrl());

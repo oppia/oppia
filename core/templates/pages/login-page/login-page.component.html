@@ -9,7 +9,7 @@
         <mat-form-field appearance="fill">
           <mat-label>Enter an email</mat-label>
 
-          <input class="protractor-test-sign-in-email-input"
+          <input class="e2e-test-sign-in-email-input"
                  matInput [formControl]="email" [matAutocomplete]="auto">
 
           <mat-autocomplete #auto="matAutocomplete">
@@ -34,7 +34,7 @@
       </mat-card-content>
 
       <mat-card-actions align="end">
-        <button color="primary" type="submit" class="protractor-test-sign-in-button"
+        <button color="primary" type="submit" class="e2e-test-sign-in-button"
                 mat-raised-button [disabled]="email.invalid || email.value === ''">
           Sign In
         </button>

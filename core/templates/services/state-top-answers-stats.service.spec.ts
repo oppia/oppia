@@ -25,7 +25,7 @@ import { AnswerStats } from
 import { AnswerStatsBackendDict } from
   'domain/exploration/visualization-info.model';
 import { StateBackendDict } from 'domain/state/StateObjectFactory';
-import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
+import { Rule } from 'domain/exploration/rule.model';
 import { StateTopAnswersStats } from
   'domain/statistics/state-top-answers-stats-object.factory';
 import { StateTopAnswersStatsService } from
@@ -38,7 +38,6 @@ import { States, StatesObjectFactory } from
 const joC = jasmine.objectContaining;
 
 describe('StateTopAnswersStatsService', () => {
-  let ruleObjectFactory: RuleObjectFactory;
   let stateTopAnswersStatsBackendApiService:
     StateTopAnswersStatsBackendApiService;
   let stateTopAnswersStatsService: StateTopAnswersStatsService;
@@ -47,7 +46,6 @@ describe('StateTopAnswersStatsService', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({imports: [HttpClientTestingModule]});
 
-    ruleObjectFactory = TestBed.get(RuleObjectFactory);
     stateTopAnswersStatsBackendApiService = (
       TestBed.get(StateTopAnswersStatsBackendApiService));
     stateTopAnswersStatsService = TestBed.get(StateTopAnswersStatsService);
@@ -59,7 +57,6 @@ describe('StateTopAnswersStatsService', () => {
   const stateBackendDict: StateBackendDict = {
     content: {content_id: 'content', html: 'Say "hello" in Spanish!'},
     linked_skill_id: null,
-    next_content_id_index: 0,
     param_changes: [],
     interaction: {
       answer_groups: [{
@@ -72,17 +69,19 @@ describe('StateTopAnswersStatsService', () => {
         }],
         outcome: {
           dest: 'Me Llamo',
+          dest_if_really_stuck: null,
           feedback: {content_id: 'feedback_1', html: '¡Buen trabajo!'},
           labelled_as_correct: true,
           param_changes: [],
           refresher_exploration_id: null,
           missing_prerequisite_skill_id: null,
         },
-        training_data: null,
+        training_data: [],
         tagged_skill_misconception_id: null,
       }],
       default_outcome: {
         dest: 'Hola',
+        dest_if_really_stuck: null,
         feedback: {content_id: 'default_outcome', html: 'Try again!'},
         labelled_as_correct: false,
         param_changes: [],
@@ -99,7 +98,10 @@ describe('StateTopAnswersStatsService', () => {
             unicode_str: ''
           }
         },
-        rows: { value: 1 }
+        rows: { value: 1 },
+        catchMisspellings: {
+          value: false
+        }
       },
       solution: null,
     },
@@ -113,13 +115,6 @@ describe('StateTopAnswersStatsService', () => {
     },
     solicit_answer_details: false,
     card_is_checkpoint: false,
-    written_translations: {
-      translations_mapping: {
-        content: {},
-        default_outcome: {},
-        feedback_1: {},
-      },
-    },
   };
 
   const makeStates = (statesBackendDict = {Hola: stateBackendDict}): States => {
@@ -295,6 +290,8 @@ describe('StateTopAnswersStatsService', () => {
 
     expect(() => stateTopAnswersStatsService.getStateStats('Hola'))
       .toThrowError('Hola does not exist.');
+    expect(() => stateTopAnswersStatsService.onStateRenamed('Hola', 'Bonjour'))
+      .toThrowError('Hola does not exist.');
   }));
 
   it('should recognize newly resolved answers', fakeAsync(async() => {
@@ -311,7 +308,7 @@ describe('StateTopAnswersStatsService', () => {
 
     const updatedState = states.getState('Hola');
     updatedState.interaction.answerGroups[0].rules.push(
-      ruleObjectFactory.createFromBackendDict(
+      Rule.createFromBackendDict(
         {
           rule_type: 'Contains',
           inputs: {
@@ -340,7 +337,7 @@ describe('StateTopAnswersStatsService', () => {
 
       const updatedState = states.getState('Hola');
       updatedState.interaction.answerGroups[0].rules.push(
-        ruleObjectFactory.createFromBackendDict(
+        Rule.createFromBackendDict(
           {
             rule_type: 'Equals',
             inputs: {
@@ -379,7 +376,7 @@ describe('StateTopAnswersStatsService', () => {
 
     const updatedState = states.getState('Hola');
     updatedState.interaction.answerGroups[0].rules = [
-      ruleObjectFactory.createFromBackendDict(
+      Rule.createFromBackendDict(
         {
           rule_type: 'Contains',
           inputs: {
@@ -403,7 +400,7 @@ describe('StateTopAnswersStatsService', () => {
 
     const updatedState = states.getState('Hola');
     updatedState.interaction.answerGroups[0].rules.push(
-      ruleObjectFactory.createFromBackendDict(
+      Rule.createFromBackendDict(
         {
           rule_type: 'Contains',
           inputs: {
@@ -421,6 +418,23 @@ describe('StateTopAnswersStatsService', () => {
     }).toThrowError('Hola does not exist.');
   }));
 
+  it('should throw error if Interaction id does not exist',
+    fakeAsync(async() => {
+      const states = makeStates();
+      spyOnBackendApiFetchStatsAsync(
+        'Hola', [{answer: 'adios', frequency: 3, is_addressed: false}]);
+      stateTopAnswersStatsService.initAsync(expId, states);
+      flushMicrotasks();
+      await stateTopAnswersStatsService.getInitPromiseAsync();
+
+      const updatedState = states.getState('Hola');
+      updatedState.interaction.id = null;
+
+      expect(() => {
+        stateTopAnswersStatsService.onStateInteractionSaved(updatedState);
+      }).toThrowError('Interaction ID cannot be null.');
+    }));
+
   it('should getTopAnswersByStateNameAsync', fakeAsync(() => {
     const states = makeStates();
     spyOnBackendApiFetchStatsAsync('Hola', [
@@ -432,7 +446,8 @@ describe('StateTopAnswersStatsService', () => {
 
     flushMicrotasks();
 
-    stateTopAnswersStatsService.getTopAnswersByStateNameAsync().then(
+    stateTopAnswersStatsService.getTopAnswersByStateNameAsync(
+      expId, states).then(
       (data) => {
         expect(data.get('Hola')).toEqual([
           new AnswerStats('hola', 'hola', 7, true),

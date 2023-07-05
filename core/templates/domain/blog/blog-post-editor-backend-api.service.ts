@@ -23,11 +23,8 @@ import { UrlInterpolationService } from 'domain/utilities/url-interpolation.serv
 import { HttpClient } from '@angular/common/http';
 import { BlogDashboardPageConstants } from 'pages/blog-dashboard-page/blog-dashboard-page.constants';
 import { BlogPostChangeDict } from 'domain/blog/blog-post-update.service';
+import { ImagesData } from 'services/image-local-storage.service';
 
-interface ImageData {
-  filename: string;
-  imageBlob: Blob;
-}
 
 interface BlogPostUpdateBackendDict {
   'blog_post': BlogPostBackendDict;
@@ -43,16 +40,18 @@ interface DeleteBlogPostBackendResponse {
 
 interface BlogPostEditorBackendResponse {
   'blog_post_dict': BlogPostBackendDict;
-  'username': string;
-  'profile_picture_data_url': string;
+  'displayed_author_name': string;
   'max_no_of_tags': number;
   'list_of_default_tags': string[];
 }
 
+interface DoesBlogPostWithTitleExistBackendResponse {
+  'blog_post_exists': boolean;
+}
+
 export interface BlogPostEditorData {
   blogPostDict: BlogPostData;
-  username: string;
-  profilePictureDataUrl: string;
+  displayedAuthorName: string;
   maxNumOfTags: number;
   listOfDefaulTags: string[];
 }
@@ -77,11 +76,10 @@ export class BlogPostEditorBackendApiService {
         blogPostDataUrl).toPromise().then(
         (response) => {
           resolve({
-            username: response.username,
+            displayedAuthorName: response.displayed_author_name,
             blogPostDict: BlogPostData.createFromBackendDict(
               response.blog_post_dict),
             maxNumOfTags: response.max_no_of_tags,
-            profilePictureDataUrl: response.profile_picture_data_url,
             listOfDefaulTags: response.list_of_default_tags,
           });
         }, (errorResponse) => {
@@ -135,7 +133,7 @@ export class BlogPostEditorBackendApiService {
   }
 
   async postThumbnailDataAsync(
-      blogPostId: string, imagesData: ImageData[]): Promise<void> {
+      blogPostId: string, imagesData: ImagesData[]): Promise<void> {
     return new Promise((resolve, reject) => {
       const blogPostDataUrl = this.urlInterpolationService.interpolateUrl(
         BlogDashboardPageConstants.BLOG_EDITOR_DATA_URL_TEMPLATE, {
@@ -145,11 +143,38 @@ export class BlogPostEditorBackendApiService {
       let payload = {
         thumbnail_filename: imagesData[0].filename,
       };
-      body.append('image', imagesData[0].imageBlob);
+      let imageBlob = imagesData[0].imageBlob;
+      if (imageBlob) {
+        body.append('image', imageBlob);
+      }
       body.append('payload', JSON.stringify(payload));
       this.http.post(blogPostDataUrl, body).toPromise().then(
         () => {
           resolve();
+        }, (errorResponse) => {
+          reject(errorResponse.error.error);
+        }
+      );
+    });
+  }
+
+  async doesPostWithGivenTitleAlreadyExistAsync(
+      blogPostId: string, title: string
+  ): Promise<boolean> {
+    const blogPostDataUrl = this.urlInterpolationService.interpolateUrl(
+      BlogDashboardPageConstants.BLOG_POST_TITLE_HANDLER_URL_TEMPLATE, {
+        blog_post_id: blogPostId
+      });
+    return new Promise((resolve, reject) => {
+      this.http.get<DoesBlogPostWithTitleExistBackendResponse>(
+        blogPostDataUrl, {
+          params: {
+            title: title
+          },
+        }
+      ).toPromise().then(
+        (response) => {
+          resolve(response.blog_post_exists);
         }, (errorResponse) => {
           reject(errorResponse.error.error);
         }

@@ -26,7 +26,7 @@ from core import feconf
 from core import utils
 from core.platform import models
 
-from typing import Any, Dict, List, Optional, Sequence, Tuple, cast
+from typing import Dict, Final, List, Optional, Sequence, Tuple
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -43,30 +43,32 @@ if MYPY: # pragma: no cover
     from mypy_imports import datastore_services
     from mypy_imports import transaction_services
 
-(base_models,) = models.Registry.import_models([models.NAMES.base_model])
+(base_models,) = models.Registry.import_models([models.Names.BASE_MODEL])
 
 datastore_services = models.Registry.import_datastore_services()
 transaction_services = models.Registry.import_transaction_services()
 
-CURRENT_ACTION_SCHEMA_VERSION = 1
-CURRENT_ISSUE_SCHEMA_VERSION = 1
+CURRENT_ACTION_SCHEMA_VERSION: Final = 1
+CURRENT_ISSUE_SCHEMA_VERSION: Final = 1
 
-ACTION_TYPE_EXPLORATION_START = 'ExplorationStart'
-ACTION_TYPE_ANSWER_SUBMIT = 'AnswerSubmit'
-ACTION_TYPE_EXPLORATION_QUIT = 'ExplorationQuit'
+ACTION_TYPE_EXPLORATION_START: Final = 'ExplorationStart'
+ACTION_TYPE_ANSWER_SUBMIT: Final = 'AnswerSubmit'
+ACTION_TYPE_EXPLORATION_QUIT: Final = 'ExplorationQuit'
 
-ISSUE_TYPE_EARLY_QUIT = 'EarlyQuit'
-ISSUE_TYPE_MULTIPLE_INCORRECT_SUBMISSIONS = 'MultipleIncorrectSubmissions'
-ISSUE_TYPE_CYCLIC_STATE_TRANSITIONS = 'CyclicStateTransitions'
+ISSUE_TYPE_EARLY_QUIT: Final = 'EarlyQuit'
+ISSUE_TYPE_MULTIPLE_INCORRECT_SUBMISSIONS: Final = (
+    'MultipleIncorrectSubmissions'
+)
+ISSUE_TYPE_CYCLIC_STATE_TRANSITIONS: Final = 'CyclicStateTransitions'
 
 # Types of allowed issues.
-ALLOWED_ISSUE_TYPES = [
+ALLOWED_ISSUE_TYPES: Final = [
     ISSUE_TYPE_EARLY_QUIT,
     ISSUE_TYPE_MULTIPLE_INCORRECT_SUBMISSIONS,
     ISSUE_TYPE_CYCLIC_STATE_TRANSITIONS
 ]
 # Types of allowed learner actions.
-ALLOWED_ACTION_TYPES = [
+ALLOWED_ACTION_TYPES: Final = [
     ACTION_TYPE_EXPLORATION_START,
     ACTION_TYPE_ANSWER_SUBMIT,
     ACTION_TYPE_EXPLORATION_QUIT
@@ -74,8 +76,9 @@ ALLOWED_ACTION_TYPES = [
 
 # The entity types for which the LearnerAnswerDetailsModel instance
 # can be created.
-ALLOWED_ENTITY_TYPES = [
-    feconf.ENTITY_TYPE_EXPLORATION, feconf.ENTITY_TYPE_QUESTION]
+ALLOWED_ENTITY_TYPES: Final = [
+    feconf.ENTITY_TYPE_EXPLORATION, feconf.ENTITY_TYPE_QUESTION
+]
 
 
 class StateCounterModel(base_models.BaseModel):
@@ -445,14 +448,14 @@ class StartExplorationEventLogEntryModel(base_models.BaseModel):
     # feel free to remove this comment once you've done so.
     @classmethod
     def create(
-            cls,
-            exp_id: str,
-            exp_version: int,
-            state_name: str,
-            session_id: str,
-            params: Dict[str, str],
-            play_type: str,
-            unused_version: int = 1
+        cls,
+        exp_id: str,
+        exp_version: int,
+        state_name: str,
+        session_id: str,
+        params: Dict[str, str],
+        play_type: str,
+        unused_version: int = 1
     ) -> str:
         """Creates a new start exploration event and then writes it to
         the datastore.
@@ -600,15 +603,15 @@ class MaybeLeaveExplorationEventLogEntryModel(base_models.BaseModel):
     # feel free to remove this comment once you've done so.
     @classmethod
     def create(
-            cls,
-            exp_id: str,
-            exp_version: int,
-            state_name: str,
-            session_id: str,
-            client_time_spent_in_secs: float,
-            params: Dict[str, str],
-            play_type: str
-    ) -> None:
+        cls,
+        exp_id: str,
+        exp_version: int,
+        state_name: str,
+        session_id: str,
+        client_time_spent_in_secs: float,
+        params: Dict[str, str],
+        play_type: str
+    ) -> str:
         """Creates a new leave exploration event and then writes it
         to the datastore.
 
@@ -622,6 +625,9 @@ class MaybeLeaveExplorationEventLogEntryModel(base_models.BaseModel):
             params: dict. Current parameter values, map of parameter name
                 to value.
             play_type: str. Type of play-through.
+
+        Returns:
+            str. New unique ID for this entity instance.
         """
         # TODO(sll): Some events currently do not have an entity ID that was
         # set using this method; it was randomly set instead due to an error.
@@ -641,6 +647,7 @@ class MaybeLeaveExplorationEventLogEntryModel(base_models.BaseModel):
             event_schema_version=feconf.CURRENT_EVENT_MODELS_SCHEMA_VERSION)
         leave_event_entity.update_timestamps()
         leave_event_entity.put()
+        return entity_id
 
     @staticmethod
     def get_model_association_to_user(
@@ -746,14 +753,14 @@ class CompleteExplorationEventLogEntryModel(base_models.BaseModel):
     # feel free to remove this comment once you've done so.
     @classmethod
     def create(
-            cls,
-            exp_id: str,
-            exp_version: int,
-            state_name: str,
-            session_id: str,
-            client_time_spent_in_secs: float,
-            params: Dict[str, str],
-            play_type: str
+        cls,
+        exp_id: str,
+        exp_version: int,
+        state_name: str,
+        session_id: str,
+        client_time_spent_in_secs: float,
+        params: Dict[str, str],
+        play_type: str
     ) -> str:
         """Creates a new exploration completion event and then writes it
         to the datastore.
@@ -849,7 +856,7 @@ class RateExplorationEventLogEntryModel(base_models.BaseModel):
             user_id: str. ID of the user.
 
         Returns:
-            str. New unique ID for this entity class.
+            str. New unique ID for this entity instance.
         """
         timestamp = datetime.datetime.utcnow()
         return cls.get_new_id('%s:%s:%s' % (
@@ -859,12 +866,12 @@ class RateExplorationEventLogEntryModel(base_models.BaseModel):
 
     @classmethod
     def create(
-            cls,
-            exp_id: str,
-            user_id: str,
-            rating: int,
-            old_rating: Optional[int]
-    ) -> None:
+        cls,
+        exp_id: str,
+        user_id: str,
+        rating: int,
+        old_rating: Optional[int]
+    ) -> str:
         """Creates a new rate exploration event and then writes it to the
         datastore.
 
@@ -874,6 +881,9 @@ class RateExplorationEventLogEntryModel(base_models.BaseModel):
             rating: int. Value of rating assigned to exploration.
             old_rating: int or None. Will be None if the user rates an
                 exploration for the first time.
+
+        Returns:
+            str. New unique ID for this entity instance.
         """
         entity_id = cls.get_new_event_entity_id(
             exp_id, user_id)
@@ -885,6 +895,7 @@ class RateExplorationEventLogEntryModel(base_models.BaseModel):
             old_rating=old_rating,
             event_schema_version=feconf.CURRENT_EVENT_MODELS_SCHEMA_VERSION
         ).put()
+        return entity_id
 
     @staticmethod
     def get_model_association_to_user(
@@ -974,13 +985,13 @@ class StateHitEventLogEntryModel(base_models.BaseModel):
     # feel free to remove this comment once you've done so.
     @classmethod
     def create(
-            cls,
-            exp_id: str,
-            exp_version: int,
-            state_name: str,
-            session_id: str,
-            params: Dict[str, str],
-            play_type: str
+        cls,
+        exp_id: str,
+        exp_version: int,
+        state_name: str,
+        session_id: str,
+        params: Dict[str, str],
+        play_type: str
     ) -> str:
         """Creates a new state hit event entity and then writes
         it to the datastore.
@@ -1070,12 +1081,12 @@ class StateCompleteEventLogEntryModel(base_models.BaseModel):
 
     @classmethod
     def create(
-            cls,
-            exp_id: str,
-            exp_version: int,
-            state_name: str,
-            session_id: str,
-            time_spent_in_state_secs: float
+        cls,
+        exp_id: str,
+        exp_version: int,
+        state_name: str,
+        session_id: str,
+        time_spent_in_state_secs: float
     ) -> str:
         """Creates a new state complete event."""
         entity_id = cls.get_new_event_entity_id(
@@ -1148,13 +1159,13 @@ class LeaveForRefresherExplorationEventLogEntryModel(base_models.BaseModel):
 
     @classmethod
     def create(
-            cls,
-            exp_id: str,
-            refresher_exp_id: str,
-            exp_version: int,
-            state_name: str,
-            session_id: str,
-            time_spent_in_state_secs: float
+        cls,
+        exp_id: str,
+        refresher_exp_id: str,
+        exp_version: int,
+        state_name: str,
+        session_id: str,
+        time_spent_in_state_secs: float
     ) -> str:
         """Creates a new leave for refresher exploration event."""
         entity_id = cls.get_new_event_entity_id(
@@ -1273,20 +1284,18 @@ class ExplorationStatsModel(base_models.BaseModel):
         exploration_stats_model = cls.get(instance_id, strict=False)
         return exploration_stats_model
 
-    # TODO(#13523): Change 'state_stats_mapping' to TypedDict/Domain Object
-    # to remove Any used below.
     @classmethod
     def create(
-            cls,
-            exp_id: str,
-            exp_version: int,
-            num_starts_v1: int,
-            num_starts_v2: int,
-            num_actual_starts_v1: int,
-            num_actual_starts_v2: int,
-            num_completions_v1: int,
-            num_completions_v2: int,
-            state_stats_mapping: Dict[str, Any]
+        cls,
+        exp_id: str,
+        exp_version: int,
+        num_starts_v1: int,
+        num_starts_v2: int,
+        num_actual_starts_v1: int,
+        num_actual_starts_v2: int,
+        num_completions_v1: int,
+        num_completions_v2: int,
+        state_stats_mapping: Dict[str, Dict[str, int]]
     ) -> str:
         """Creates an ExplorationStatsModel instance and writes it to the
         datastore.
@@ -1438,14 +1447,12 @@ class ExplorationIssuesModel(base_models.BaseModel):
         instance_id = cls.get_entity_id(exp_id, exp_version)
         return cls.get(instance_id, strict=False)
 
-    # TODO(#13523): Change 'unresolved_issues' to TypedDict/Domain Object
-    # to remove Any used below.
     @classmethod
     def create(
-            cls,
-            exp_id: str,
-            exp_version: int,
-            unresolved_issues: List[Dict[str, Any]]
+        cls,
+        exp_id: str,
+        exp_version: int,
+        unresolved_issues: List[stats_domain.ExplorationIssueDict]
     ) -> str:
         """Creates an ExplorationIssuesModel instance and writes it to the
         datastore.
@@ -1554,16 +1561,16 @@ class PlaythroughModel(base_models.BaseModel):
             'The id generator for PlaythroughModel is producing too many '
             'collisions.')
 
-    # TODO(#13523): Change 'issue_customization_args' and 'actions' to
-    # TypedDict/Domain Object to remove Any used below.
     @classmethod
     def create(
-            cls,
-            exp_id: str,
-            exp_version: int,
-            issue_type: str,
-            issue_customization_args: Dict[str, Any],
-            actions: List[Dict[str, Any]]
+        cls,
+        exp_id: str,
+        exp_version: int,
+        issue_type: str,
+        issue_customization_args: (
+            stats_domain.IssuesCustomizationArgsDictType
+        ),
+        actions: List[stats_domain.LearnerActionDict]
     ) -> str:
         """Creates a PlaythroughModel instance and writes it to the
         datastore.
@@ -1732,7 +1739,7 @@ class LearnerAnswerDetailsModel(base_models.BaseModel):
             state_reference=state_reference,
             interaction_id=interaction_id,
             learner_answer_info_list=[
-                learner_answer_info.to_dict() # type: ignore[no-untyped-call]
+                learner_answer_info.to_dict()
                 for learner_answer_info in learner_answer_info_list
             ],
             learner_answer_info_schema_version=(
@@ -1835,12 +1842,12 @@ class ExplorationAnnotationsModel(base_models.BaseMapReduceBatchResultsModel):
 
     @classmethod
     def create(
-            cls,
-            exp_id: str,
-            version: str,
-            num_starts: int,
-            num_completions: int,
-            state_hit_counts: Dict[str, int]
+        cls,
+        exp_id: str,
+        version: str,
+        num_starts: int,
+        num_completions: int,
+        state_hit_counts: Dict[str, int]
     ) -> None:
         """Creates a new ExplorationAnnotationsModel and
         then writes it to the datastore.
@@ -2051,8 +2058,14 @@ class StateAnswersModel(base_models.BaseModel):
                         shard_id)
                     for shard_id in range(
                         1, main_shard.shard_count + 1)]
-                all_models += cast(
-                    List[StateAnswersModel], cls.get_multi(shard_ids))
+                state_answer_models = cls.get_multi(shard_ids)
+                for state_answer_model in state_answer_models:
+                    # Filtering out the None cases for MyPy type checking,
+                    # because shard deletion is not supported and we expect
+                    # main_shard.shard_count to be present, since the master
+                    # model keeps track of the number of shards explicitly.
+                    assert state_answer_model is not None
+                    all_models.append(state_answer_model)
             return all_models
         else:
             return None
@@ -2060,12 +2073,14 @@ class StateAnswersModel(base_models.BaseModel):
     @classmethod
     @transaction_services.run_in_transaction_wrapper
     def _insert_submitted_answers_unsafe_transactional(
-            cls,
-            exploration_id: str,
-            exploration_version: int,
-            state_name: str,
-            interaction_id: str,
-            new_submitted_answer_dict_list: List[Dict[str, str]]
+        cls,
+        exploration_id: str,
+        exploration_version: int,
+        state_name: str,
+        interaction_id: str,
+        new_submitted_answer_dict_list: List[
+            stats_domain.SubmittedAnswerDict
+        ]
     ) -> None:
         """See the insert_submitted_answers for general documentation of what
         this method does. It's only safe to call this method from within a
@@ -2162,16 +2177,16 @@ class StateAnswersModel(base_models.BaseModel):
         cls.update_timestamps_multi(entities_to_put)
         cls.put_multi(entities_to_put)
 
-    # TODO(#13523): Change 'new_submitted_answer' to TypedDict/Domain Object
-    # to remove Any used below.
     @classmethod
     def insert_submitted_answers(
-            cls,
-            exploration_id: str,
-            exploration_version: int,
-            state_name: str,
-            interaction_id: str,
-            new_submitted_answer_dict_list: List[Dict[str, Any]]
+        cls,
+        exploration_id: str,
+        exploration_version: int,
+        state_name: str,
+        interaction_id: str,
+        new_submitted_answer_dict_list: List[
+            stats_domain.SubmittedAnswerDict
+        ]
     ) -> None:
         """Given an exploration ID, version, state name, and interaction ID,
         attempt to insert a list of specified SubmittedAnswers into this model,
@@ -2198,11 +2213,11 @@ class StateAnswersModel(base_models.BaseModel):
 
     @classmethod
     def _get_entity_id(
-            cls,
-            exploration_id: str,
-            exploration_version: int,
-            state_name: str,
-            shard_id: int
+        cls,
+        exploration_id: str,
+        exploration_version: int,
+        state_name: str,
+        shard_id: int
     ) -> str:
         """Returns the entity_id of a StateAnswersModel based on it's
         exp_id, state_name, exploration_version and shard_id.
@@ -2223,15 +2238,13 @@ class StateAnswersModel(base_models.BaseModel):
             str(shard_id)
         ])
 
-    # TODO(#13523): Change answer lists to TypedDict/Domain Object
-    # to remove Any used below.
     @classmethod
     def _shard_answers(
-            cls,
-            current_answer_list: List[Dict[str, Any]],
-            current_answer_list_size: int,
-            new_answer_list: List[Dict[str, Any]]
-    ) -> Tuple[List[List[Dict[str, Any]]], List[int]]:
+        cls,
+        current_answer_list: List[stats_domain.SubmittedAnswerDict],
+        current_answer_list_size: int,
+        new_answer_list: List[stats_domain.SubmittedAnswerDict]
+    ) -> Tuple[List[List[stats_domain.SubmittedAnswerDict]], List[int]]:
         """Given a current answer list which can fit within one NDB entity and
         a list of new answers which need to try and fit in the current answer
         list, shard the answers such that a list of answer lists are returned.
@@ -2278,10 +2291,10 @@ class StateAnswersModel(base_models.BaseModel):
                 sharded_answer_list_sizes.append(answer_size)
         return sharded_answer_lists, sharded_answer_list_sizes
 
-    # TODO(#13523): Change answer dict to TypedDict/Domain Object
-    # to remove Any used below.
     @classmethod
-    def _get_answer_dict_size(cls, answer_dict: Dict[str, Any]) -> int:
+    def _get_answer_dict_size(
+        cls, answer_dict: stats_domain.SubmittedAnswerDict
+    ) -> int:
         """Returns a size overestimate (in bytes) of the given answer dict.
 
         Args:

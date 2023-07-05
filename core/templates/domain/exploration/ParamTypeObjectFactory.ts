@@ -31,7 +31,7 @@ interface TypeDefinitionObject {
 }
 
 interface RegistryType {
-    [key: string]: ParamType
+    [key: string]: ParamType;
 }
 
 export class ParamType {

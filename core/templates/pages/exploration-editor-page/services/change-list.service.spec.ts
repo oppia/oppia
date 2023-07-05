@@ -55,42 +55,66 @@ class MockWindowRef {
       onLine: true
     }
   };
+
   get nativeWindow() {
     return this._window;
   }
 }
 
 class MockExplorationDataService1 {
-  explorationId: 0;
-  autosaveChangeListAsync(changeList, successCb, errorCb) {
+  explorationId!: 0;
+  autosaveChangeListAsync(
+      changeList: string[],
+      successCb: (
+        arg0: {
+          changes_are_mergeable: boolean;
+          is_version_of_draft_valid: boolean;
+        }) => void,
+      errorCb: () => void
+  ) {
     successCb({
       changes_are_mergeable: true,
       is_version_of_draft_valid: false,
     });
   }
+
   discardDraftAsync() {
     return;
   }
 }
 
 class MockExplorationDataService2 {
-  explorationId: 0;
-  autosaveChangeListAsync(changeList, successCb, errorCb) {
+  explorationId!: 0;
+  autosaveChangeListAsync(
+      changeList: string[],
+      successCb: (
+        arg0: {
+          changes_are_mergeable: boolean;
+          is_version_of_draft_valid: boolean;
+        }) => void,
+      errorCb: () => void
+  ) {
     successCb({
       changes_are_mergeable: false,
       is_version_of_draft_valid: false,
     });
   }
+
   discardDraftAsync() {
     return;
   }
 }
 
 class MockExplorationDataService3 {
-  explorationId: 0;
-  autosaveChangeListAsync(changeList, successCb, errorCb) {
+  explorationId!: 0;
+  autosaveChangeListAsync(
+      changeList: string[],
+      successCb: () => void,
+      errorCb: () => void
+  ) {
     errorCb();
   }
+
   discardDraftAsync() {
     return;
   }
@@ -111,10 +135,10 @@ describe('Change List Service when changes are mergable', () => {
   let alertsService: AlertsService;
   let mockWindowRef: MockWindowRef;
   let internetConnectivityService: InternetConnectivityService;
-  let autosaveInfoModalsService: AutosaveInfoModalsService = null;
+  let autosaveInfoModalsService: AutosaveInfoModalsService;
 
-  let alertsSpy = null;
-  let mockExplorationDataService = null;
+  let alertsSpy: jasmine.Spy;
+  let mockExplorationDataService: MockExplorationDataService1;
   let mockEventEmitter = new EventEmitter();
 
   beforeEach(async(() => {
@@ -148,11 +172,11 @@ describe('Change List Service when changes are mergable', () => {
     alertsService = TestBed.inject(AlertsService);
 
     spyOn(autosaveInfoModalsService, 'showVersionMismatchModal')
-      .and.returnValue(null);
+      .and.returnValue();
     spyOn(autosaveInfoModalsService, 'showNonStrictValidationFailModal')
-      .and.returnValue(null);
+      .and.returnValue();
     alertsSpy = spyOn(alertsService, 'addWarning')
-      .and.returnValue(null);
+      .and.returnValue();
   });
 
   it('should set loading message when initialized', () => {
@@ -163,7 +187,7 @@ describe('Change List Service when changes are mergable', () => {
 
   it('should save changes after deleting a state ' +
     'when calling \'deleteState\'', fakeAsync(() => {
-    changeListService.changeListAddedTimeoutId = 10;
+    changeListService.changeListAddedTimeoutId = setTimeout(() => {}, 10);
     changeListService.explorationChangeList.length = 0;
     let saveSpy = spyOn(
       changeListService.autosaveInProgressEventEmitter, 'emit')
@@ -177,21 +201,65 @@ describe('Change List Service when changes are mergable', () => {
 
   it('should save changes after adding a state ' +
     'when calling \'addState\'', fakeAsync(() => {
-    changeListService.changeListAddedTimeoutId = 10;
+    changeListService.changeListAddedTimeoutId = setTimeout(() => {}, 10);
     changeListService.explorationChangeList.length = 0;
     let saveSpy = spyOn(
       changeListService.autosaveInProgressEventEmitter, 'emit')
       .and.callThrough();
 
-    changeListService.addState('state');
+    changeListService.addState('state', 'content_1', 'dafault_outcome_4');
     flush();
 
     expect(saveSpy).toHaveBeenCalled();
   }));
 
+  it('should add Written Translation', fakeAsync(() => {
+    changeListService.changeListAddedTimeoutId = setTimeout(() => {}, 10);
+    changeListService.explorationChangeList.length = 0;
+    changeListService.loadingMessage = '';
+    changeListService.addWrittenTranslation(
+      'contentId', 'dataFormat',
+      'languageCode', 'stateName', 'translationHtml');
+
+    let saveSpy = spyOn(
+      changeListService.autosaveInProgressEventEmitter, 'emit')
+      .and.callThrough();
+
+    changeListService.addState('state', 'content_1', 'dafault_outcome_4');
+    flush();
+
+    expect(saveSpy).toHaveBeenCalled();
+  }));
+
+  it('should add change for markTranslationsAsNeedingUpdate', fakeAsync(() => {
+    changeListService.changeListAddedTimeoutId = setTimeout(() => { }, 10);
+    changeListService.explorationChangeList.length = 0;
+    changeListService.loadingMessage = '';
+    let saveSpy = spyOn(
+      changeListService.autosaveInProgressEventEmitter, 'emit')
+      .and.callThrough();
+
+    changeListService.markTranslationsAsNeedingUpdate('content_id_1');
+    flush();
+    expect(saveSpy).toHaveBeenCalled();
+  }));
+
+  it('should add change for removeTranslations', fakeAsync(() => {
+    changeListService.changeListAddedTimeoutId = setTimeout(() => { }, 10);
+    changeListService.explorationChangeList.length = 0;
+    changeListService.loadingMessage = '';
+    let saveSpy = spyOn(
+      changeListService.autosaveInProgressEventEmitter, 'emit')
+      .and.callThrough();
+
+    changeListService.removeTranslations('content_id_1');
+    flush();
+    expect(saveSpy).toHaveBeenCalled();
+  }));
+
   it('should save changes after renaming a state ' +
     'when calling \'renameState\'', fakeAsync(() => {
-    changeListService.changeListAddedTimeoutId = 10;
+    changeListService.changeListAddedTimeoutId = setTimeout(() => {}, 10);
     changeListService.explorationChangeList.length = 0;
     let saveSpy = spyOn(
       changeListService.autosaveInProgressEventEmitter, 'emit')
@@ -205,7 +273,7 @@ describe('Change List Service when changes are mergable', () => {
 
   it('should save changes after editing exploration property ' +
     'when calling \'editExplorationProperty\'', fakeAsync(() => {
-    changeListService.changeListAddedTimeoutId = 10;
+    changeListService.changeListAddedTimeoutId = setTimeout(() => {}, 10);
     changeListService.explorationChangeList.length = 0;
     let saveSpy = spyOn(
       changeListService.autosaveInProgressEventEmitter, 'emit')
@@ -220,7 +288,7 @@ describe('Change List Service when changes are mergable', () => {
 
   it('should save changes after editing state property ' +
     'when calling \'editExplorationProperty\'', fakeAsync(() => {
-    changeListService.changeListAddedTimeoutId = 10;
+    changeListService.changeListAddedTimeoutId = setTimeout(() => {}, 10);
     changeListService.explorationChangeList.length = 0;
     let saveSpy = spyOn(
       changeListService.autosaveInProgressEventEmitter, 'emit')
@@ -284,6 +352,10 @@ describe('Change List Service when changes are mergable', () => {
   it('should show alert message if we try to edit ' +
     'an state with invalid property', () => {
     changeListService.editStateProperty(
+      // This throws "Argument of type 'prop1' is not assignable to parameter
+      // of type 'StatePropertyNames'.". We need to suppress this error because
+      // we want to test passing wrong values.
+      // @ts-expect-error
       'stateName', 'prop1', 'oldValue', 'newValue');
 
     expect(alertsSpy).toHaveBeenCalledWith(
@@ -300,30 +372,16 @@ describe('Change List Service when changes are mergable', () => {
     expect(changeListService.isExplorationLockedForEditing())
       .toBe(false);
   });
-
-  it('should mark translation as needing update', () => {
-    expect(changeListService.getChangeList()[0]).toEqual(undefined);
-
-    changeListService.markTranslationAsNeedingUpdate(
-      'content', 'ar', 'Introduction');
-
-    expect(changeListService.getChangeList()[0]).toEqual({
-      cmd: 'mark_written_translation_as_needing_update',
-      content_id: 'content',
-      language_code: 'ar',
-      state_name: 'Introduction'
-    });
-  });
 });
 
 describe('Change List Service when changes are not mergable', () => {
   let changeListService: ChangeListService;
   let alertsService: AlertsService;
   let mockWindowRef: MockWindowRef;
-  let autosaveInfoModalsService: AutosaveInfoModalsService = null;
+  let autosaveInfoModalsService: AutosaveInfoModalsService;
 
-  let alertsSpy = null;
-  let mockExplorationDataService = null;
+  let alertsSpy: jasmine.Spy;
+  let mockExplorationDataService: MockExplorationDataService1;
 
   beforeEach(async(() => {
     mockWindowRef = new MockWindowRef();
@@ -349,17 +407,17 @@ describe('Change List Service when changes are not mergable', () => {
     alertsService = TestBed.inject(AlertsService);
 
     spyOn(autosaveInfoModalsService, 'showVersionMismatchModal')
-      .and.returnValue(null);
+      .and.returnValue();
     spyOn(autosaveInfoModalsService, 'showNonStrictValidationFailModal')
-      .and.returnValue(null);
+      .and.returnValue();
     alertsSpy = spyOn(alertsService, 'addWarning')
-      .and.returnValue(null);
+      .and.returnValue();
   });
 
   it('should undo and save changes when calling \'undoLastChange\'', () => {
     let saveSpy = spyOn(
       changeListService.autosaveInProgressEventEmitter, 'emit')
-      .and.returnValue(null);
+      .and.returnValue();
     changeListService.explorationChangeList.length = 2;
 
     changeListService.undoLastChange();
@@ -383,9 +441,9 @@ describe('Change List Service when internet is available', () => {
   let mockWindowRef: MockWindowRef;
   let onInternetStateChangeEventEmitter = new EventEmitter();
 
-  let alertsSpy = null;
-  let mockExplorationDataService = null;
-  let mockAutosaveInfoModalsService = null;
+  let alertsSpy: jasmine.Spy;
+  let mockExplorationDataService: MockExplorationDataService3;
+  let mockAutosaveInfoModalsService: MockAutosaveInfoModalsService;
 
   beforeEach(async(() => {
     mockWindowRef = new MockWindowRef();
@@ -423,16 +481,18 @@ describe('Change List Service when internet is available', () => {
     changeListService = TestBed.inject(ChangeListService);
     alertsService = TestBed.inject(AlertsService);
     alertsSpy = spyOn(alertsService, 'addWarning')
-      .and.returnValue(null);
+      .and.returnValue();
   });
 
   it('should undo and save changes when calling \'undoLastChange\'', () => {
     let saveSpy = spyOn(
       changeListService.autosaveInProgressEventEmitter, 'emit')
-      .and.returnValue(null);
+      .and.returnValue();
     changeListService.temporaryListOfChanges = [{
       cmd: 'add_state',
-      state_name: 'stateName'
+      state_name: 'stateName',
+      content_id_for_state_content: 'content_0',
+      content_id_for_default_outcome: 'default_outcome_1'
     }];
     changeListService.explorationChangeList.length = 2;
 
@@ -445,7 +505,9 @@ describe('Change List Service when internet is available', () => {
   it('should not undo changes when there are no changes', () => {
     changeListService.temporaryListOfChanges = [{
       cmd: 'add_state',
-      state_name: 'stateName'
+      state_name: 'stateName',
+      content_id_for_state_content: 'content_0',
+      content_id_for_default_outcome: 'default_outcome_1'
     }];
 
     changeListService.undoLastChange();

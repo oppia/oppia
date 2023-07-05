@@ -1,28 +1,53 @@
-<div class="form-inline oppia-form-inline protractor-test-dest-bubble">
+<div class="form-inline oppia-form-inline e2e-test-dest-bubble">
   <div class="oppia-rule-details-header">
-    <strong ng-if="$ctrl.outcomeHasFeedback">And afterwards, directs the learner to...</strong>
-    <strong ng-if="!$ctrl.outcomeHasFeedback">Oppia directs the learner to...</strong>
+    <strong *ngIf="outcomeHasFeedback">And afterwards, directs the learner to...</strong>
+    <strong *ngIf="!outcomeHasFeedback">Oppia directs the learner to...</strong>
   </div>
   <div class="form-group oppia-form-group">
     <span>
-      <select class="form-control oppia-form-control" ng-model="$ctrl.outcome.dest" ng-options="choice.id as choice.text for choice in $ctrl.destChoices" ng-change="$ctrl.onDestSelectorChange()">
+      <select class="form-control oppia-form-control e2e-test-destination-selector-dropdown"
+              [(ngModel)]="outcome.dest"
+              (ngModelChange)="onDestSelectorChange()">
+        <option class="e2e-test-afterward-dest-selector" *ngFor="let choice of destinationChoices" [value]="choice.id">{{ choice.text }}</option>
       </select>
     </span>
   </div>
-  <ng-form name="newStateNameForm">
-    <span ng-if="$ctrl.isCreatingNewState($ctrl.outcome)">
-      <input type="text" focus-on="$ctrl.newStateNameInputField" name="newStateName" ng-model="$ctrl.outcome.newStateName" maxlength="{{$ctrl.maxLen}}" class="form-control protractor-test-add-state-input" tabindex="0" aria-invalid="false" ng-pattern="$ctrl.newStateNamePattern" required>
+  <form #newStateNameForm="ngForm" class="e2e-test-dest-form">
+    <span *ngIf="isCreatingNewState()">
+      <input class="form-control e2e-test-add-state-input"
+             type="text"
+             name="newStateNameInput"
+             [ngModel]="outcomeNewStateName"
+             (ngModelChange)="updateChanges($event)"
+             [oppiaFocusOn]="newStateNameInputField"
+             [attr.maxlength]="maxLen"
+             [pattern]="newStateNamePattern"
+             tabindex="0"
+             [attr.aria-invalid]="false" required>
     </span>
-    <p ng-show="newStateNameForm.newStateName.$error.pattern" class="form-text oppia-form-error oppia-form-error-text">Please pick a card name consisting of alphanumeric characters, spaces and/or hyphens.</p>
-  </ng-form>
+  </form>
+  <p [hidden]="newStateNameForm.form.valid ||  outcomeNewStateName === undefined" class="form-text oppia-form-error oppia-form-error-text">Please pick a card name consisting of alphanumeric characters, spaces and/or hyphens.</p>
 
-  <div ng-if="$ctrl.isSelfLoop() && $ctrl.canEditRefresherExplorationId" class="oppia-id-text">
+  <div *ngIf="isSelfLoop() && canEditRefresherExplorationId && !!outcome.refresherExplorationId" class="oppia-id-text">
     <b>Refresher exploration ID (optional):</b>
-    <input type="text" name="refresherExplorationId" ng-model="$ctrl.outcome.refresherExplorationId" class="form-control protractor-test-add-refresher-exploration-id" tabindex="0" aria-invalid="false" ng-pattern="$ctrl.globalIdPattern">
+    <input type="text"
+           class="form-control e2e-test-add-refresher-exploration-id"
+           [(ngModel)]="outcome.refresherExplorationId"
+           [pattern]="explorationAndSkillIdPattern"
+           tabindex="0"
+           [attr.aria-invalid]="false">
+    <div class="refresher-error-message">
+      Refresher exploration id should be removed.
+    </div>
   </div>
-  <div class="oppia-id-text" ng-if="$ctrl.canAddPrerequisiteSkill">
+  <div class="oppia-id-text" *ngIf="canAddPrerequisiteSkill">
     <b>Prerequisite skill ID (optional):&nbsp;</b>
-    <input type="text" name="missingPrerequisiteSkillId" ng-model="$ctrl.outcome.missingPrerequisiteSkillId" class="form-control" tabindex="0" aria-invalid="false" ng-model-options="{allowInvalid: true}" ng-pattern="$ctrl.explorationAndSkillIdPattern">
+    <input class="form-control"
+           type="text"
+           [(ngModel)]="outcome.missingPrerequisiteSkillId"
+           tabindex="0"
+           [attr.aria-invalid]="false"
+           [ngModelOptions]="{allowInvalid: true}">
     <p class="oppia-prerequisite-explanation-text">
       <i> Mention the skill that this state requires so that a learner who is stuck in the state can quickly learn the
           required material and continue with the exploration.
@@ -32,22 +57,27 @@
 </div>
 
 <style>
-  outcome-destination-editor .oppia-form-inline {
+  .oppia-form-inline {
     margin-bottom: 10px;
   }
-  outcome-destination-editor .oppia-form-group {
+  .oppia-form-group {
     font-size: 1.1em;
   }
-  outcome-destination-editor .form-control.oppia-form-control {
+  .form-control.oppia-form-control {
     width: 200px;
   }
-  outcome-destination-editor .oppia-form-error-text {
+  .oppia-form-error-text {
     font-size: 0.85em;
   }
-  outcome-destination-editor .oppia-id-text {
+  .oppia-id-text {
     margin-top: 12px;
   }
-  outcome-destination-editor .oppia-prerequisite-explanation-text {
+  .oppia-prerequisite-explanation-text {
+    font-size: 0.8em;
+  }
+  .refresher-error-message {
+    color: #f00;
+    display: block;
     font-size: 0.8em;
   }
 </style>

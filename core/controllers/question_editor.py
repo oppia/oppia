@@ -17,7 +17,7 @@ and are created.
 """
 
 from __future__ import annotations
-
+import json
 import logging
 
 from core import feconf
@@ -26,20 +26,32 @@ from core.constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import fs_services
-from core.domain import html_cleaner
 from core.domain import image_validation_services
 from core.domain import question_domain
 from core.domain import question_services
 from core.domain import skill_domain
 from core.domain import skill_fetchers
 
+from typing import Dict, List, TypedDict
 
-class QuestionCreationHandler(base.BaseHandler):
+SCHEMA_FOR_QUESTION_ID = {
+    'type': 'basestring',
+    'validators': [{
+        'id': 'is_regex_matched',
+        'regex_pattern': constants.ENTITY_ID_REGEX
+    }]
+}
+
+
+class QuestionCreationHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
     """A handler that creates the question model given a question dict."""
 
     @acl_decorators.can_manage_question_skill_status
-    def post(self):
+    def post(self) -> None:
         """Handles POST requests."""
+        assert self.user_id is not None
         skill_ids = self.payload.get('skill_ids')
 
         if not skill_ids:
@@ -94,10 +106,9 @@ class QuestionCreationHandler(base.BaseHandler):
         try:
             skill_difficulties = [
                 float(difficulty) for difficulty in skill_difficulties]
-        except (ValueError, TypeError):
+        except (ValueError, TypeError) as e:
             raise self.InvalidInputException(
-                'Skill difficulties must be a float value')
-
+                'Skill difficulties must be a float value') from e
         if any((
                 difficulty < 0 or difficulty > 1)
                for difficulty in skill_difficulties):
@@ -110,33 +121,38 @@ class QuestionCreationHandler(base.BaseHandler):
             question.id,
             skill_ids,
             skill_difficulties)
-        html_list = question.question_state_data.get_all_html_content_strings()
-        filenames = (
-            html_cleaner.get_image_filenames_from_html_strings(html_list))
         image_validation_error_message_suffix = (
             'Please go to the question editor for question with id %s and edit '
             'the image.' % question.id)
-        for filename in filenames:
-            image = self.request.get(filename)
-            if not image:
-                logging.exception(
-                    'Image not provided for file with name %s when the question'
-                    ' with id %s was created.' % (filename, question.id))
-                raise self.InvalidInputException(
-                    'No image data provided for file with name %s. %s'
-                    % (filename, image_validation_error_message_suffix))
-            try:
-                file_format = (
-                    image_validation_services.validate_image_and_filename(
-                        image, filename))
-            except utils.ValidationError as e:
-                e = '%s %s' % (e, image_validation_error_message_suffix)
-                raise self.InvalidInputException(e)
-            image_is_compressible = (
-                file_format in feconf.COMPRESSIBLE_IMAGE_FORMATS)
-            fs_services.save_original_and_compressed_versions_of_image(
-                filename, feconf.ENTITY_TYPE_QUESTION, question.id, image,
-                'image', image_is_compressible)
+
+        filenames = self.payload.get('filenames')
+
+        if filenames:
+            filenames_list = json.loads(filenames)
+            for filename in filenames_list:
+                index = filenames_list.index(filename)
+                image = self.request.get(f'image{index}')
+                if not image:
+                    logging.exception(
+                        'Image not provided for file with'
+                        ' name %s when the question'
+                        ' with id %s was created.' % (filename, question.id))
+                    raise self.InvalidInputException(
+                        'No image data provided for file with name %s. %s'
+                        % (filename, image_validation_error_message_suffix))
+                try:
+                    file_format = (
+                        image_validation_services.validate_image_and_filename(
+                            image, filename))
+                except utils.ValidationError as e:
+                    raise self.InvalidInputException(
+                        '%s %s' % (e, image_validation_error_message_suffix)
+                    )
+                image_is_compressible = (
+                    file_format in feconf.COMPRESSIBLE_IMAGE_FORMATS)
+                fs_services.save_original_and_compressed_versions_of_image(
+                    filename, feconf.ENTITY_TYPE_QUESTION, question.id, image,
+                    'image', image_is_compressible)
 
         self.values.update({
             'question_id': question.id
@@ -144,23 +160,90 @@ class QuestionCreationHandler(base.BaseHandler):
         self.render_json(self.values)
 
 
-class QuestionSkillLinkHandler(base.BaseHandler):
+class SkillIdTaskDict(TypedDict):
+    """Type for the dict representation of tasks which is associated
+    with a particular skill id.
+    """
+
+    id: str
+    task: str
+    difficulty: float
+
+
+class QuestionSkillLinkHandlerNormalizedPayloadDict(TypedDict):
+    """Dict representation of QuestionSkillLinkHandler's
+    normalized_payload dictionary.
+    """
+
+    skill_ids_task_list: List[SkillIdTaskDict]
+
+
+class QuestionSkillLinkHandler(
+    base.BaseHandler[
+        QuestionSkillLinkHandlerNormalizedPayloadDict, Dict[str, str]
+    ]
+):
     """A handler for linking and unlinking questions to or from a skill."""
 
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {
+        'question_id': {
+            'schema': SCHEMA_FOR_QUESTION_ID
+        }
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'PUT': {
+            'skill_ids_task_list': {
+                'schema': {
+                    'type': 'list',
+                    'items': {
+                        'type': 'dict',
+                        'properties': [{
+                            'name': 'id',
+                            'schema': {
+                                'type': 'basestring',
+                                'validators': [{
+                                    'id': 'is_regex_matched',
+                                    'regex_pattern': constants.ENTITY_ID_REGEX
+                                }]
+                            }
+                        }, {
+                            'name': 'task',
+                            'schema': {
+                                'type': 'unicode',
+                                'choices': [
+                                    'remove', 'add', 'update_difficulty'
+                                ]
+                            }
+                        }, {
+                            'name': 'difficulty',
+                            'schema': {
+                                'type': 'float',
+                                'validators': [{
+                                    'id': 'is_at_least',
+                                    'min_value': 0
+                                }, {
+                                    'id': 'is_at_most',
+                                    'max_value': 1
+                                }]
+                            }
+                        }]
+                    }
+                }
+            }
+        }
+    }
+
     @acl_decorators.can_manage_question_skill_status
-    def put(self, question_id):
+    def put(self, question_id: str) -> None:
         """Updates the QuestionSkillLink models with respect to the given
         question.
         """
-        skill_ids_task_list = self.payload.get('skill_ids_task_list')
-        if skill_ids_task_list is None:
-            raise self.InvalidInputException(
-                'Missing fields \'skill_ids_task_list\'in payload')
+        assert self.user_id is not None
+        assert self.normalized_payload is not None
+        skill_ids_task_list = self.normalized_payload['skill_ids_task_list']
 
         for task_dict in skill_ids_task_list:
-            if not 'id' in task_dict:
-                raise self.InvalidInputException(
-                    'Missing skill ID.')
             if task_dict['task'] == 'remove':
                 question_services.delete_question_skill_link(
                     self.user_id, question_id, task_dict['id'])
@@ -168,26 +251,75 @@ class QuestionSkillLinkHandler(base.BaseHandler):
                 question_services.create_new_question_skill_link(
                     self.user_id, question_id, task_dict['id'],
                     task_dict['difficulty'])
-            elif task_dict['task'] == 'update_difficulty':
+            else:
+                assert task_dict['task'] == 'update_difficulty'
                 question_services.update_question_skill_link_difficulty(
                     question_id, task_dict['id'],
-                    float(task_dict['difficulty']))
-            else:
-                raise self.InvalidInputException('Invalid task.')
+                    task_dict['difficulty']
+                )
 
         self.render_json(self.values)
 
 
-class EditableQuestionDataHandler(base.BaseHandler):
+class EditableQuestionDataHandlerNormalizedPayloadDict(TypedDict):
+    """Dict representation of EditableQuestionDataHandler's
+    normalized_payload dictionary.
+    """
+
+    version: int
+    commit_message: str
+    change_list: List[question_domain.QuestionChange]
+
+
+class EditableQuestionDataHandler(
+    base.BaseHandler[
+        EditableQuestionDataHandlerNormalizedPayloadDict, Dict[str, str]
+    ]
+):
     """A data handler for questions which supports writing."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {
+        'question_id': {
+            'schema': SCHEMA_FOR_QUESTION_ID
+        }
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {},
+        'PUT': {
+            'version': {
+                'schema': {
+                    'type': 'int'
+                }
+            },
+            'commit_message': {
+                'schema': {
+                    'type': 'basestring',
+                    'validators': [{
+                        'id': 'has_length_at_most',
+                        'max_value': constants.MAX_COMMIT_MESSAGE_LENGTH
+                    }]
+                }
+            },
+            'change_list': {
+                'schema': {
+                    'type': 'list',
+                    'items': {
+                        'type': 'object_dict',
+                        'object_class': question_domain.QuestionChange
+                    }
+                }
+            }
+        },
+        'DELETE': {}
+    }
 
     @acl_decorators.can_view_question_editor
-    def get(self, question_id):
+    def get(self, question_id: str) -> None:
         """Gets the data for the question overview page."""
+        assert self.user_id is not None
         question = question_services.get_question_by_id(
-            question_id, strict=False)
+            question_id, strict=True)
 
         associated_skill_dicts = [
             skill.to_dict() for skill in skill_fetchers.get_multi_skills(
@@ -200,35 +332,24 @@ class EditableQuestionDataHandler(base.BaseHandler):
         self.render_json(self.values)
 
     @acl_decorators.can_edit_question
-    def put(self, question_id):
+    def put(self, question_id: str) -> None:
         """Updates properties of the given question."""
-        commit_message = self.payload.get('commit_message')
-
-        if not commit_message:
-            raise self.PageNotFoundException
-
-        if (commit_message is not None and
-                len(commit_message) > constants.MAX_COMMIT_MESSAGE_LENGTH):
-            raise self.InvalidInputException(
-                'Commit messages must be at most %s characters long.'
-                % constants.MAX_COMMIT_MESSAGE_LENGTH)
-
-        if not self.payload.get('change_list'):
-            raise self.PageNotFoundException
-        change_list = [
-            question_domain.QuestionChange(change)
-            for change in self.payload.get('change_list')
-        ]
-
+        assert self.user_id is not None
+        assert self.normalized_payload is not None
+        commit_message = self.normalized_payload['commit_message']
+        change_list = self.normalized_payload['change_list']
+        version = self.normalized_payload['version']
         for change in change_list:
             if (
                     change.cmd ==
                     question_domain.CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION):
-                raise self.InvalidInputException
+                raise self.InvalidInputException(
+                    'Cannot create a new fully specified question'
+                )
 
         question_services.update_question(
             self.user_id, question_id, change_list,
-            commit_message)
+            commit_message, version)
 
         question_dict = question_services.get_question_by_id(
             question_id).to_dict()
@@ -237,8 +358,9 @@ class EditableQuestionDataHandler(base.BaseHandler):
         })
 
     @acl_decorators.can_delete_question
-    def delete(self, question_id):
+    def delete(self, question_id: str) -> None:
         """Handles Delete requests."""
+        assert self.user_id is not None
         question = question_services.get_question_by_id(
             question_id, strict=False)
         if question is None:

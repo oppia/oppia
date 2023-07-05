@@ -1,0 +1,441 @@
+<div  class="oppia-drop-area" *ngIf="dropAreaIsAccessible">
+  <div class="oppia-blur-background"></div>
+  <div class="oppia-drop-area-message" >Drop your file here!</div>
+</div>
+<div  class="oppia-drop-area" *ngIf="userIsGuest">
+  <div class="oppia-blur-background"></div>
+  <div class="oppia-drop-area-message-for-guest-users">Please log in to upload audio files.</div>
+</div>
+<div class="oppia-audio-recording-bar" [hidden]="!((!isAudioAvailable || audioIsUpdating) && !selectedRecording)">
+  <div class="oppia-content-wrapper">
+    <button class="btn oppia-audio-button oppia-audio-bar-button-transition" disabled>
+      <i class="fas fa-play oppia-play-icon"></i>
+    </button>
+  </div>
+  <div class="d-block d-xl-none oppia-content-wrapper oppia-audio-bar-info">
+    <div class="padding-small-screen">
+      <div *ngIf="!cannotRecord && !checkingMicrophonePermission">
+        <span *ngIf="canVoiceover"> Press <i class="fas fa-microphone"></i>  to record.</span>
+      </div>
+      <div *ngIf="checkingMicrophonePermission">
+        Loading microphone.<loading-dots></loading-dots>
+      </div>
+      <div *ngIf="recordingPermissionDenied && cannotRecord">
+        Permission needed for recording.
+      </div>
+      <div *ngIf="unsupportedBrowser && cannotRecord">
+        Microphone is not supported.
+      </div>
+    </div>
+  </div>
+  <div class="d-none d-xl-block oppia-content-wrapper oppia-audio-bar-info">
+    <div class="padding-large-screen">
+      <div *ngIf="!cannotRecord && !checkingMicrophonePermission">
+        No audio recorded.<span *ngIf="canVoiceover"> Press <i class="fas fa-microphone"></i>  to start recording.</span>
+      </div>
+      <div *ngIf="checkingMicrophonePermission">
+        Loading microphone.<loading-dots></loading-dots>
+      </div>
+      <div *ngIf="recordingPermissionDenied && cannotRecord">
+        You need to grant permission for this application to use your microphone.
+      </div>
+      <div *ngIf="unsupportedBrowser && cannotRecord">
+        Sorry, your browser does not support recording feature.
+      </div>
+    </div>
+  </div>
+  <div class="oppia-content-wrapper">
+    <button class="btn oppia-audio-button oppia-audio-bar-button-transition e2e-test-accessibility-translation-start-record"
+            [ngbTooltip]="'Record'"
+            placement="bottom"
+            (click)="checkAndStartRecording()"
+            [hidden]="!canVoiceover || cannotRecord"
+            aria-label="Start recording"
+            for="Recording">
+      <i class="fas fa-microphone oppia-microphone-icon"></i>
+    </button>
+  </div>
+  <div class="oppia-content-wrapper">
+    <button class="btn oppia-audio-button oppia-audio-bar-button-transition e2e-test-upload-audio-button e2e-test-accessibility-translation-upload-audio"
+            [ngbTooltip]="'Upload'"
+            placement="bottom"
+            (click)="openAddAudioTranslationModal(null)"
+            [hidden]="!canVoiceover"
+            aria-label="Upload voiceovered file">
+      <i class="fas fa-upload"></i>
+    </button>
+  </div>
+</div>
+<div class="oppia-audio-recording-bar" [hidden]="!(selectedRecording  && !audioIsCurrentlyBeingSaved)">
+  <div class="oppia-content-wrapper">
+    <button class="btn oppia-audio-button oppia-audio-bar-button-transition e2e-test-accessibility-translation-play-recorded-audio"
+            (click)="playAndPauseUnsavedAudio()"
+            [disabled]="voiceoverRecorder.status().isRecording"
+            aria-label="Play recorded audio">
+      <div *ngIf="unsavedAudioIsPlaying">
+        <i class="fas fa-pause"></i>
+      </div>
+      <div *ngIf="!unsavedAudioIsPlaying">
+        <i class="fas fa-play oppia-play-icon"></i>
+      </div>
+    </button>
+  </div>
+  <div class="oppia-content-wrapper oppia-flex-1-wrapper">
+    <div class="oppia-audio-visualiser">
+      <div class="oppia-mp3-converting" *ngIf="voiceoverRecorder.status().isRecording">
+        Recording audio<loading-dots></loading-dots>
+      </div>
+      <div id="visualized" #visualized class="oppia-audio-wave-view" *ngIf="!voiceoverRecorder.status().isRecording && !audioIsCurrentlyBeingSaved">
+      </div>
+    </div>
+  </div>
+  <div class="oppia-content-wrapper" *ngIf="voiceoverRecorder.status().isRecording">
+    <div class="oppia-recording-timer">
+      {{ recordingDate | formatTime }} / {{ recordingTimeLimit | formatTime }}
+    </div>
+  </div>
+  <div class="oppia-content-wrapper" *ngIf="voiceoverRecorder.status().isRecording">
+    <button class="btn oppia-audio-button oppia-audio-bar-button-transition e2e-test-stop-record-button"
+            [ngbTooltip]="'Stop'"
+            placement="bottom"
+            (click)="stopRecording()"
+            aria-label="Stop recording">
+      <i class="fas fa-stop"></i>
+    </button>
+  </div>
+  <div class="oppia-content-wrapper">
+    <button class="btn oppia-audio-action-button oppia-audio-bar-button-transition"
+            *ngIf="!voiceoverRecorder.status().isRecording && audioBlob"
+            (click)="reRecord()"
+            aria-label="Record again">
+      Re-take
+    </button>
+  </div>
+  <div class="oppia-content-wrapper" *ngIf="!voiceoverRecorder.status().isRecording && audioBlob">
+    <button class="btn oppia-audio-action-button oppia-audio-bar-button-transition e2e-test-confirm-record"
+            (click)="saveRecordedAudio()"
+            aria-label="Save the recorded audio">
+      Confirm
+    </button>
+  </div>
+  <div class="oppia-content-wrapper" *ngIf="!voiceoverRecorder.status().isRecording && audioBlob">
+    <button class="btn oppia-cancel-button oppia-audio-bar-button-transition"
+            (click)="cancelRecording()"
+            aria-label="Cancel the recorded audio">
+      Cancel
+    </button>
+  </div>
+</div>
+<div class="oppia-audio-recording-bar" *ngIf="audioIsCurrentlyBeingSaved">
+  <div class="oppia-content-wrapper">
+    <button class="btn oppia-audio-button oppia-audio-bar-button-transition" disabled>
+      <i class="fas fa-play oppia-play-icon"></i>
+    </button>
+  </div>
+  <div class="oppia-content-wrapper oppia-flex-1-wrapper">
+    <div class="oppia-audio-bar-info">
+      <div>Saving<loading-dots></loading-dots></div>
+    </div>
+  </div>
+</div>
+<div *ngIf="isAudioAvailable && !audioIsUpdating" class="oppia-audio-recording-bar">
+  <div class="oppia-content-wrapper">
+    <button class="btn oppia-audio-button oppia-audio-bar-button-transition e2e-test-play-pause-audio-button"
+            (click)="playPauseUploadedAudioTranslation()">
+      <div *ngIf="!isPlayingUploadedAudio()">
+        <i class="fas fa-play oppia-play-icon"></i>
+      </div>
+      <div *ngIf="isPlayingUploadedAudio()">
+        <i class="fas fa-pause"></i>
+      </div>
+    </button>
+  </div>
+  <div class="oppia-slider-section oppia-content-wrapper fx-main-center fx-cross-center full-height">
+    <div *ngIf="audioLoadingIndicatorIsShown">
+      <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+    </div>
+    <div *ngIf="!audioLoadingIndicatorIsShown" class="fx-row fx-main-center fx-cross-center">
+      <oppia-audio-slider class="full-width"
+                          [value]="audioPlayerService.getCurrentTime()"
+                          [max]="durationSecs"
+                          (valueChange)="setProgress($event)"
+                          [thumbLabel]="true"
+                          aria-label="audio-slider">
+      </oppia-audio-slider>
+    </div>
+  </div>
+  <div class="oppia-content-wrapper oppia-recording-timer">
+    <div *ngIf="isAudioAvailable && audioIsLoading">
+      {{ startingDuration | formatTime }} / {{ durationSecs | formatTime }}
+    </div>
+    <div *ngIf="audioTimerIsShown && !audioIsLoading">
+      {{ audioPlayerService.getCurrentTime() | formatTime }} / {{ durationSecs | formatTime }}
+    </div>
+    <div *ngIf="!audioTimerIsShown && !audioIsLoading">
+       -- / --
+    </div>
+  </div>
+  <div class="oppia-content-wrapper">
+    <button class="btn oppia-audio-button oppia-audio-bar-button-transition e2e-test-upload-audio-button"
+            [ngbTooltip]="'Upload audio'"
+            placement="bottom"
+            [hidden]="!canVoiceover"
+            (click)="openAddAudioTranslationModal()">
+      <i class="fas fa-upload oppia-upload-icon"></i>
+    </button>
+  </div>
+  <div class="oppia-content-wrapper">
+    <button class="btn oppia-audio-button oppia-audio-bar-button-transition e2e-test-delete-record"
+            [ngbTooltip]="'Delete'"
+            placement="bottom"
+            [hidden]="!canVoiceover"
+            (click)="openDeleteAudioTranslationModal()">
+      <i class="fas fa-trash oppia-delete-icon"></i>
+    </button>
+  </div>
+  <div class="oppia-content-wrapper" *ngIf="!audioNeedsUpdate">
+    <button class="btn oppia-audio-button oppia-audio-bar-button-transition"
+            [ngbTooltip]="'Audio needs update'"
+            placement="bottom"
+            [hidden]="!canVoiceover"
+            (click)="toggleAudioNeedsUpdate()">
+      <i class="fas fa-exclamation-triangle"></i>
+    </button>
+  </div>
+  <div class="oppia-content-wrapper" *ngIf="audioNeedsUpdate">
+    <button class="btn oppia-audio-button audio-update-needed-button oppia-audio-bar-button-transition"
+            [ngbTooltip]="'Audio does not need update'"
+            placement="bottom"
+            [hidden]="!canVoiceover"
+            (click)="toggleAudioNeedsUpdate()">
+      <i class="fas fa-exclamation-triangle"></i>
+    </button>
+  </div>
+</div>
+<div class="oppia-translation-bottom-right-container" *ngIf="showRecorderWarning">
+  <span>
+    <strong>Warning: </strong>Don't navigate to other tabs of this page before saving recorded audio, otherwise the recorded audio will be lost.
+  </span>
+</div>
+<div class="oppia-translation-bottom-proTip" *ngIf="canVoiceover && !showRecorderWarning && !audioBlob && !isAudioAvailable">
+  <div class="alert alert-secondary">
+    <strong>ProTips</strong>
+    <div>Use the "R" key to start/stop recording.</div>
+    <div>Use a dedicated microphone for best results.</div>
+  </div>
+</div>
+
+<style>
+  .oppia-drop-area {
+    border: 3px dashed #aaa;
+    height: 80%;
+    position: absolute;
+    top: 10%;
+    width: 100%;
+    z-index: 100;
+  }
+  .oppia-blur-background {
+    background-color: #fff;
+    height: 100%;
+    opacity: 0.8;
+    position: absolute;
+    width: 100%;
+  }
+  .oppia-drop-area-message {
+    font-size: 36px;
+    height: 100%;
+    padding: 20%;
+    position: absolute;
+    text-align: center;
+    width: 100%;
+  }
+  .oppia-drop-area-message-for-guest-users {
+    color: #aaa;
+    font-size: 36px;
+    height: 100%;
+    padding: 20%;
+    position: absolute;
+    text-align: center;
+    width: 100%;
+  }
+  .oppia-audio-recording-bar {
+    align-items: center;
+    background-color: #f7f7f7;
+    display: flex;
+    height: 100%;
+    padding: 0 10px;
+    width: 100%;
+  }
+  .audioRecorder {
+    align-items: center;
+    display: flex;
+  }
+  .audioRecorder > div:first-child {
+    width: 0 !important;
+  }
+  .oppia-content-wrapper {
+    margin: 0 5px;
+  }
+  .oppia-audio-bar-info {
+    background-color: #009688;
+    border-radius: 3px;
+    color: white;
+    flex: 1;
+    font-size: 12px;
+    height: 38px;
+    line-height: 27px;
+    text-align: center;
+  }
+  .oppia-audio-bar-info .padding-small-screen {
+    font-size: 11px;
+    padding: 5px 2px;
+  }
+  .oppia-audio-bar-info .padding-large-screen {
+    padding: 5px 20px;
+  }
+  .oppia-audio-button {
+    background-color: #009688;
+    border-radius: 20px;
+    color: white;
+    padding-left: 10px;
+    width: 36px;
+  }
+  .oppia-audio-bar-button-transition {
+    -webkit-transition: background-color .2s cubic-bezier(.35,0,.25,1);
+    -moz-transition: background-color .2s cubic-bezier(.35,0,.25,1);
+    -o-transition: background-color .2s cubic-bezier(.35,0,.25,1);
+    transition: background-color .2s cubic-bezier(.35,0,.25,1);
+  }
+  .oppia-audio-action-button {
+    background-color: #009688;
+    border-radius: 3px;
+    color: white;
+    padding-left: 6px;
+    width: 68px;
+  }
+  .oppia-cancel-button {
+    background-color: #009688;
+    border-radius: 3px;
+    color: white;
+    padding-left: 6px;
+    width: 57px;
+  }
+  .oppia-audio-button:hover, .oppia-audio-action-button:hover, .oppia-cancel-button:hover {
+    background-color: #01675d;
+    color: white;
+  }
+  .oppia-audio-button[disabled] {
+    background-color: #009688;
+    pointer-events: auto;
+  }
+  .oppia-audio-button:focus {
+    color: white;
+  }
+  .oppia-audio-visualiser {
+    flex: 1;
+    height: 38px;
+  }
+  .oppia-flex-1-wrapper {
+    flex: 1;
+  }
+  .oppia-mp3-converting {
+    background-color: #009688;
+    border-radius: 3px;
+    color: white;
+    flex: 1;
+    font-size: 12px;
+    height: 38px;
+    line-height: 27px;
+    padding: 5px 40px;
+    text-align: center;
+  }
+  .oppia-recording-timer {
+    font-size: 14px;
+    text-align: center;
+    width: 83px;
+  }
+  .oppia-slider-section {
+    background-color: #009688;
+    border-radius: 3px;
+    color: white;
+    flex: 1;
+    font-size: 12px;
+    height: 38px;
+    padding: 0 15px;
+    text-align: center;
+  }
+  .oppia-translation-bottom-right-container {
+    color: #ce133b;
+    font-size: 12px;
+    letter-spacing: 0.5px;
+    position: relative;
+    text-align: center;
+    top: 10px;
+  }
+  .oppia-translation-bottom-proTip {
+    color: #000;
+    font-size: 12px;
+    letter-spacing: 0.5px;
+    position: relative;
+    text-align: center;
+    top: 10px;
+  }
+  .oppia-microphone-icon {
+    padding-left: 1px;
+  }
+  .oppia-play-icon {
+    padding-left: 2px;
+  }
+  .oppia-delete-icon {
+    padding-left: 1px;
+  }
+  audio-translation-bar .audio-update-needed-button {
+    background-color: red;
+  }
+  audio-translation-bar .tooltip-inner {
+  max-width: none;
+  white-space: nowrap;
+  }
+  audio-translation-bar md-progress-linear {
+    height: 38px;
+    padding-top: 12px;
+  }
+  audio-translation-bar md-progress-linear.md-default-theme .md-container {
+    background-color: #f8f8f8;
+  }
+  audio-translation-bar md-progress-linear.md-default-theme .md-bar {
+    background-color: #009688;
+  }
+  audio-translation-bar md-slider {
+    height: 38px;
+  }
+  audio-translation-bar md-slider .md-track-container {
+    height: 1px;
+    top: 18px !important;
+  }
+  audio-translation-bar md-slider .md-track {
+    background-color: #f8f8f8;
+  }
+  audio-translation-bar md-slider.md-default-theme .md-track-fill {
+    background-color: #009688;
+  }
+  audio-translation-bar .md-thumb-container {
+    left: 4px;
+    top: -5px;
+  }
+  audio-translation-bar md-slider.md-default-theme .md-thumb:after {
+    background-color: #009688;
+    border-color: #ccc;
+  }
+  audio-translation-bar canvas {
+    background: #e4e1d1;
+    border-radius: 3px;
+    max-width: unset;
+  }
+  .full-width {
+    width: 100%;
+  }
+  .full-height {
+    height: 100%;
+  }
+</style>

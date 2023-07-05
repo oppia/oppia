@@ -26,6 +26,9 @@ import { ImagePreloaderService } from 'pages/exploration-player-page/services/im
 import { EventEmitter } from '@angular/core';
 import { PlayerPositionService } from 'pages/exploration-player-page/services/player-position.service';
 import { CurrentInteractionService } from 'pages/exploration-player-page/services/current-interaction.service';
+import { AppConstants } from 'app.constants';
+import { ImageLocalStorageService } from 'services/image-local-storage.service';
+import { SvgSanitizerService } from 'services/svg-sanitizer.service';
 
 describe('InteractiveImageClickInput', () => {
   let fixture: ComponentFixture<InteractiveImageClickInput>;
@@ -35,6 +38,8 @@ describe('InteractiveImageClickInput', () => {
   let currentInteractionService: CurrentInteractionService;
   let mockNewCardAvailableEmitter = new EventEmitter();
   let playerPositionService: PlayerPositionService;
+  let imageLocalStorageService: ImageLocalStorageService;
+  let svgSanitizerService: SvgSanitizerService;
   let imageUrl = '/assetsdevhandler/exploration/expId/assets/image/' +
   'img_20210616_110856_oxqveyuhr3_height_778_width_441.svg';
 
@@ -76,10 +81,12 @@ describe('InteractiveImageClickInput', () => {
   }));
 
   beforeEach(() => {
-    imagePreloaderService = TestBed.get(ImagePreloaderService);
+    imagePreloaderService = TestBed.inject(ImagePreloaderService);
     contextService = TestBed.inject(ContextService);
     currentInteractionService = TestBed.inject(CurrentInteractionService);
-    playerPositionService = TestBed.get(PlayerPositionService);
+    playerPositionService = TestBed.inject(PlayerPositionService);
+    imageLocalStorageService = TestBed.inject(ImageLocalStorageService);
+    svgSanitizerService = TestBed.inject(SvgSanitizerService);
     fixture = TestBed.createComponent(InteractiveImageClickInput);
     component = fixture.componentInstance;
 
@@ -198,6 +205,40 @@ describe('InteractiveImageClickInput', () => {
     expect(component.updateCurrentlyHoveredRegions).toHaveBeenCalled();
     expect(currentInteractionService.registerCurrentInteraction)
       .toHaveBeenCalledWith(null, null);
+  });
+
+  it('should initialize when interaction is added in an editor with the ' +
+  'image save destination set to local storage and image is an SVG', () => {
+    spyOn(component, 'loadImage');
+    spyOn(component, 'updateCurrentlyHoveredRegions');
+    spyOn(currentInteractionService, 'registerCurrentInteraction');
+    spyOn(contextService, 'getImageSaveDestination').and.returnValue(
+      AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE);
+    spyOn(imageLocalStorageService, 'isInStorage').and.returnValue(true);
+    spyOn(imageLocalStorageService, 'getRawImageData').and.returnValue(
+      'data:image/svg+xml;abc%20dummy%img');
+    spyOn(svgSanitizerService, 'getTrustedSvgResourceUrl');
+
+    component.ngOnInit();
+
+    expect(svgSanitizerService.getTrustedSvgResourceUrl).toHaveBeenCalled();
+  });
+
+  it('should initialize when interaction is added in an editor with the ' +
+  'image save destination set to local storage and image is not SVG', () => {
+    spyOn(component, 'loadImage');
+    spyOn(component, 'updateCurrentlyHoveredRegions');
+    spyOn(currentInteractionService, 'registerCurrentInteraction');
+    spyOn(contextService, 'getImageSaveDestination').and.returnValue(
+      AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE);
+    spyOn(imageLocalStorageService, 'isInStorage').and.returnValue(true);
+    spyOn(imageLocalStorageService, 'getRawImageData').and.returnValue(
+      'data:image/png;abc%20dummy%img');
+    spyOn(svgSanitizerService, 'getTrustedSvgResourceUrl');
+
+    component.ngOnInit();
+
+    expect(svgSanitizerService.getTrustedSvgResourceUrl).not.toHaveBeenCalled();
   });
 
   it('should initialize when interaction is played in the exploration' +
@@ -391,8 +432,8 @@ describe('InteractiveImageClickInput', () => {
           height: 200
         }]));
     spyOn(component, 'updateCurrentlyHoveredRegions').and.callThrough();
-    spyOnProperty(MouseEvent.prototype, 'pageX', 'get').and.returnValue(290);
-    spyOnProperty(MouseEvent.prototype, 'pageY', 'get').and.returnValue(260);
+    spyOnProperty(MouseEvent.prototype, 'clientX', 'get').and.returnValue(290);
+    spyOnProperty(MouseEvent.prototype, 'clientY', 'get').and.returnValue(260);
     let evt = new MouseEvent('Mousemove');
     component.lastAnswer = null;
     component.ngOnInit();
@@ -415,8 +456,8 @@ describe('InteractiveImageClickInput', () => {
   it('should not check if mouse is over region when interaction is not' +
   ' active', () => {
     spyOn(component, 'updateCurrentlyHoveredRegions').and.callThrough();
-    spyOnProperty(MouseEvent.prototype, 'pageX', 'get').and.returnValue(290);
-    spyOnProperty(MouseEvent.prototype, 'pageY', 'get').and.returnValue(260);
+    spyOnProperty(MouseEvent.prototype, 'clientX', 'get').and.returnValue(290);
+    spyOnProperty(MouseEvent.prototype, 'clientY', 'get').and.returnValue(260);
     let evt = new MouseEvent('Mousemove');
     component.lastAnswer.clickPosition = [0.4, 0.4];
     component.ngOnInit();

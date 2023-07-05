@@ -1,20 +1,23 @@
-# [Oppia](https://www.oppia.org) [![Actions](https://github.com/oppia/oppia/workflows/End-to-End%20tests/badge.svg?branch=develop)](https://github.com/oppia/oppia/actions?query=branch%3Adevelop+workflow%3A%22End-to-End+tests%22) [![CircleCI](https://circleci.com/gh/oppia/oppia/tree/develop.svg?style=svg)](https://circleci.com/gh/oppia/oppia/tree/develop) [![Join the chat at https://gitter.im/oppia/oppia-chat](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/oppia/oppia-chat?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+# [Oppia](https://www.oppia.org) [![End-to-End and Lighthouse CI performance tests](https://github.com/oppia/oppia/actions/workflows/e2e_and%20lighthouse_performance_tests.yml/badge.svg)](https://github.com/oppia/oppia/actions/workflows/e2e_and%20lighthouse_performance_tests.yml)
 
 Oppia is an online learning tool that enables anyone to easily create and share interactive activities (called 'explorations'). These activities simulate a one-on-one conversation with a tutor, making it possible for students to learn by doing while getting feedback.
 
 In addition to developing the Oppia platform, the team is also developing and piloting a set of free and effective [lessons](https://www.oppia.org/fractions) on basic mathematics. These lessons are targeted at learners who lack access to educational resources.
 
-Oppia is written using Python and AngularJS, and is built on top of Google App Engine.
+Oppia is written using Python and AngularJS, and is built on top of Google App Engine. See also:
 
   * [Oppia.org community site](https://www.oppia.org)
   * [User Documentation](https://oppia.github.io/)
   * [Contributors' wiki](https://github.com/oppia/oppia/wiki)
-  * [Developer mailing list](http://groups.google.com/group/oppia-dev)
+  * [GitHub Discussions](https://github.com/oppia/oppia/discussions)
+  * [Developer announcements](http://groups.google.com/group/oppia-dev)
   * [File an issue](https://github.com/oppia/oppia/issues/new/choose)
+
+You can also sign up to our [email newsletter](https://shorturl.at/CHPY6) for news and updates about the overall Oppia project.
 
 <p align="center">
   <a href="http://www.youtube.com/watch?v=Ntcw0H0hwPU" target="_blank" rel="noopener">
-    <img src="https://cloud.githubusercontent.com/assets/8845039/16814722/b219cac0-4954-11e6-9573-c37557d1b410.png">
+    <img src="https://user-images.githubusercontent.com/30050862/228266651-1270bedc-658a-40d8-8ab4-16b63de4deaf.png">
   </a>
 </p>
 
@@ -29,6 +32,8 @@ The Oppia project is built by the community for the community. We welcome contri
 You can help with Oppia's development in many ways, including art, coding, design and documentation.
   * **Developers**: please see [this wiki page](https://github.com/oppia/oppia/wiki/Contributing-code-to-Oppia#setting-things-up) for instructions on how to set things up and commit changes.
   * **All other contributors**: please see our [general contributor guidelines](https://github.com/oppia/oppia/wiki).
+
+If you'd like to donate to support our work, you can do so [here](https://www.oppia.org/donate).
 
 
 ## Support
@@ -45,9 +50,15 @@ The Oppia code is released under the [Apache v2 license](https://github.com/oppi
 
 ## Keeping in touch
 
-  * [Blog](https://medium.com/oppia-org)
-  * [Discussion forum](http://groups.google.com/group/oppia)
+  * [Discussion forum](https://github.com/oppia/oppia/discussions)
   * [Announcements mailing list](http://groups.google.com/group/oppia-announce)
-  * Social media: [YouTube](https://www.youtube.com/channel/UC5c1G7BNDCfv1rczcBp9FPw), [FB](https://www.facebook.com/oppiaorg), [Twitter](https://twitter.com/oppiaorg)
 
-We also have public chat rooms on Gitter: [https://gitter.im/oppia/oppia-chat](https://gitter.im/oppia/oppia-chat). Drop by and say hello!
+## Social Media
+[<img height="30" src="https://img.shields.io/badge/twitter-1DA1F2.svg?&style=for-the-badge&logo=twitter&logoColor=white" />][twitter] [<img height="30" src="https://img.shields.io/badge/linkedin-0077B5.svg?&style=for-the-badge&logo=linkedin&logoColor=white" />][LinkedIn] [<img height="30" src = "https://img.shields.io/badge/facebook-1877F2.svg?&style=for-the-badge&logo=facebook&logoColor=white">][Facebook] [<img height="30" src = "https://img.shields.io/badge/medium-12100E.svg?&style=for-the-badge&logo=medium&logoColor=white">][medium] [<img height="30" src = "https://img.shields.io/badge/oppia.org%20youtube-FF0000.svg?&style=for-the-badge&logo=youtube&logoColor=white">][oppia-org-youtube] [<img height="30" src = "https://img.shields.io/badge/oppia%20dev%20youtube-FF0000.svg?&style=for-the-badge&logo=youtube&logoColor=white">][dev-youtube]
+
+[twitter]: https://twitter.com/oppiaorg
+[linkedIn]: https://www.linkedin.com/company/oppia-org/
+[medium]: https://medium.com/@oppia.org
+[facebook]: https://www.facebook.com/oppiaorg/
+[oppia-org-youtube]: https://www.youtube.com/channel/UC5c1G7BNDCfv1rczcBp9FPw
+[dev-youtube]: https://www.youtube.com/channel/UCsrAX-oeqm0-NIQzQrdiUkQ

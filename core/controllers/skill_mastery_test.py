@@ -16,21 +16,24 @@
 
 from __future__ import annotations
 
+import json
+
 from core import feconf
-from core import python_utils
 from core.domain import skill_services
 from core.domain import topic_domain
 from core.domain import topic_fetchers
 from core.domain import topic_services
 from core.tests import test_utils
 
+from typing import Dict
+
 
 class SkillMasteryDataHandlerTest(test_utils.GenericTestBase):
     """Tests update skill mastery degree."""
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Completes the setup for SkillMasteryDataHandler."""
-        super(SkillMasteryDataHandlerTest, self).setUp()
+        super().setUp()
         self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
         self.user_id = self.get_user_id_from_email(self.NEW_USER_EMAIL)
 
@@ -44,7 +47,7 @@ class SkillMasteryDataHandlerTest(test_utils.GenericTestBase):
         self.degree_of_mastery_1 = 0.3
         self.degree_of_mastery_2 = 0.5
 
-    def test_get_with_valid_skill_ids_list(self):
+    def test_get_with_valid_skill_ids_list(self) -> None:
         skill_services.create_user_skill_mastery(
             self.user_id, self.skill_id_1, self.degree_of_mastery_1)
         skill_services.create_user_skill_mastery(
@@ -56,7 +59,7 @@ class SkillMasteryDataHandlerTest(test_utils.GenericTestBase):
         response_json = self.get_json(
             '%s' % feconf.SKILL_MASTERY_DATA_URL,
             params={
-                'comma_separated_skill_ids': ','.join(skill_ids)
+                'selected_skill_ids': json.dumps(skill_ids)
             })
         degrees_of_mastery = {
             self.skill_id_1: self.degree_of_mastery_1,
@@ -67,7 +70,7 @@ class SkillMasteryDataHandlerTest(test_utils.GenericTestBase):
 
         self.logout()
 
-    def test_get_with_skill_without_skill_mastery(self):
+    def test_get_with_skill_without_skill_mastery(self) -> None:
         skill_services.create_user_skill_mastery(
             self.user_id, self.skill_id_1, self.degree_of_mastery_1)
 
@@ -77,7 +80,7 @@ class SkillMasteryDataHandlerTest(test_utils.GenericTestBase):
         response_json = self.get_json(
             '%s' % feconf.SKILL_MASTERY_DATA_URL,
             params={
-                'comma_separated_skill_ids': ','.join(skill_ids)
+                'selected_skill_ids': json.dumps(skill_ids)
             })
         degrees_of_mastery = {
             self.skill_id_1: self.degree_of_mastery_1,
@@ -88,7 +91,7 @@ class SkillMasteryDataHandlerTest(test_utils.GenericTestBase):
 
         self.logout()
 
-    def test_get_with_no_skill_ids_returns_400(self):
+    def test_get_with_no_skill_ids_returns_400(self) -> None:
         self.login(self.NEW_USER_EMAIL)
         json_response = self.get_json(
             '%s' % feconf.SKILL_MASTERY_DATA_URL,
@@ -96,18 +99,18 @@ class SkillMasteryDataHandlerTest(test_utils.GenericTestBase):
 
         self.assertEqual(
             json_response['error'],
-            'Expected request to contain parameter comma_separated_skill_ids.')
+            'Missing key in handler args: selected_skill_ids.')
 
         self.logout()
 
-    def test_get_with_invalid_skill_ids_returns_400(self):
+    def test_get_with_invalid_skill_ids_returns_400(self) -> None:
         skill_ids = ['invalid_skill_id']
 
         self.login(self.NEW_USER_EMAIL)
         json_response = self.get_json(
             '%s' % feconf.SKILL_MASTERY_DATA_URL,
             params={
-                'comma_separated_skill_ids': ','.join(skill_ids)
+                'selected_skill_ids': json.dumps(skill_ids)
             }, expected_status_int=400)
 
         self.assertEqual(
@@ -116,7 +119,7 @@ class SkillMasteryDataHandlerTest(test_utils.GenericTestBase):
 
         self.logout()
 
-    def test_get_with_nonexistent_skill_ids_returns_404(self):
+    def test_get_with_nonexistent_skill_ids_returns_404(self) -> None:
         skill_id_3 = skill_services.get_new_skill_id()
         skill_ids = [self.skill_id_1, skill_id_3]
 
@@ -124,12 +127,12 @@ class SkillMasteryDataHandlerTest(test_utils.GenericTestBase):
         self.get_json(
             '%s' % feconf.SKILL_MASTERY_DATA_URL,
             params={
-                'comma_separated_skill_ids': ','.join(skill_ids)
+                'selected_skill_ids': json.dumps(skill_ids)
             }, expected_status_int=404)
 
         self.logout()
 
-    def test_put_with_valid_skill_mastery_dict(self):
+    def test_put_with_valid_skill_mastery_dict(self) -> None:
         skill_services.create_user_skill_mastery(
             self.user_id, self.skill_id_1, self.degree_of_mastery_1)
         skill_services.create_user_skill_mastery(
@@ -160,7 +163,7 @@ class SkillMasteryDataHandlerTest(test_utils.GenericTestBase):
 
         self.logout()
 
-    def test_put_with_skill_with_no_skill_mastery(self):
+    def test_put_with_skill_with_no_skill_mastery(self) -> None:
         skill_services.create_user_skill_mastery(
             self.user_id, self.skill_id_1, self.degree_of_mastery_1)
 
@@ -189,7 +192,7 @@ class SkillMasteryDataHandlerTest(test_utils.GenericTestBase):
 
         self.logout()
 
-    def test_put_with_skill_mastery_lower_than_zero(self):
+    def test_put_with_skill_mastery_lower_than_zero(self) -> None:
         skill_services.create_user_skill_mastery(
             self.user_id, self.skill_id_1, self.degree_of_mastery_1)
         skill_services.create_user_skill_mastery(
@@ -220,7 +223,7 @@ class SkillMasteryDataHandlerTest(test_utils.GenericTestBase):
 
         self.logout()
 
-    def test_put_with_skill_mastery_higher_than_one(self):
+    def test_put_with_skill_mastery_higher_than_one(self) -> None:
         skill_services.create_user_skill_mastery(
             self.user_id, self.skill_id_1, self.degree_of_mastery_1)
         skill_services.create_user_skill_mastery(
@@ -251,7 +254,7 @@ class SkillMasteryDataHandlerTest(test_utils.GenericTestBase):
 
         self.logout()
 
-    def test_put_with_invalid_type_returns_400(self):
+    def test_put_with_invalid_type_returns_400(self) -> None:
         payload = {}
         mastery_change_per_skill = [self.skill_id_1, self.skill_id_2]
         payload['mastery_change_per_skill'] = mastery_change_per_skill
@@ -264,13 +267,14 @@ class SkillMasteryDataHandlerTest(test_utils.GenericTestBase):
 
         self.assertEqual(
             json_response['error'],
-            'Expected payload to contain mastery_change_per_skill as a dict.'
+            'Schema validation for \'mastery_change_per_skill\' failed: ' +
+            'Expected dict, received %s' % (mastery_change_per_skill)
         )
 
         self.logout()
 
-    def test_put_with_no_mastery_change_per_skill_returns_400(self):
-        payload = {}
+    def test_put_with_no_mastery_change_per_skill_returns_400(self) -> None:
+        payload: Dict[str, str] = {}
 
         self.login(self.NEW_USER_EMAIL)
         csrf_token = self.get_new_csrf_token()
@@ -280,12 +284,12 @@ class SkillMasteryDataHandlerTest(test_utils.GenericTestBase):
 
         self.assertEqual(
             json_response['error'],
-            'Expected payload to contain mastery_change_per_skill as a dict.'
+            'Missing key in handler args: mastery_change_per_skill.'
         )
 
         self.logout()
 
-    def test_put_with_invalid_skill_ids_returns_400(self):
+    def test_put_with_invalid_skill_ids_returns_400(self) -> None:
         payload = {}
         mastery_change_per_skill = {
             'invalid_skill_id': 0.3
@@ -303,7 +307,7 @@ class SkillMasteryDataHandlerTest(test_utils.GenericTestBase):
 
         self.logout()
 
-    def test_put_with_nonexistent_skill_ids_returns_404(self):
+    def test_put_with_nonexistent_skill_ids_returns_404(self) -> None:
         skill_id_3 = skill_services.get_new_skill_id()
         payload = {}
         mastery_change_per_skill = {
@@ -321,7 +325,9 @@ class SkillMasteryDataHandlerTest(test_utils.GenericTestBase):
 
         self.logout()
 
-    def test_put_with_invalid_type_of_degree_of_mastery_returns_400(self):
+    def test_put_with_invalid_type_of_degree_of_mastery_returns_400(
+        self
+    ) -> None:
         payload = {}
         mastery_change_per_skill = {
             self.skill_id_1: 0.1,
@@ -337,8 +343,8 @@ class SkillMasteryDataHandlerTest(test_utils.GenericTestBase):
 
         self.assertEqual(
             json_response['error'],
-            'Expected degree of mastery of skill %s to be a number, '
-            'received %s.' % (self.skill_id_2, '{}'))
+            'Schema validation for \'mastery_change_per_skill\' failed: ' +
+            'Could not convert dict to float: {}')
 
         mastery_change_per_skill = {
             self.skill_id_1: 0.1,
@@ -352,12 +358,12 @@ class SkillMasteryDataHandlerTest(test_utils.GenericTestBase):
 
         self.assertEqual(
             json_response['error'],
-            'Expected degree of mastery of skill %s to be a number, '
-            'received %s.' % (self.skill_id_2, 'True'))
+           'Schema validation for \'mastery_change_per_skill\' failed: ' +
+           'Expected float, received True')
 
         self.logout()
 
-    def test_put_with_no_logged_in_user_returns_401(self):
+    def test_put_with_no_logged_in_user_returns_401(self) -> None:
         payload = {}
         mastery_change_per_skill = {
             self.skill_id_1: 0.3,
@@ -378,9 +384,9 @@ class SkillMasteryDataHandlerTest(test_utils.GenericTestBase):
 class SubtopicMasteryDataHandlerTest(test_utils.GenericTestBase):
     """Tests get subtopic mastery degree."""
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Completes the setup for SubtopicMasteryDataHandler."""
-        super(SubtopicMasteryDataHandlerTest, self).setUp()
+        super().setUp()
         self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
         self.user_id = self.get_user_id_from_email(self.NEW_USER_EMAIL)
         self.set_curriculum_admins([self.NEW_USER_USERNAME])
@@ -411,7 +417,7 @@ class SubtopicMasteryDataHandlerTest(test_utils.GenericTestBase):
         self.degree_of_mastery_5 = 0.9
         self.degree_of_mastery_6 = 0.6
 
-    def test_get_with_valid_topic_ids(self):
+    def test_get_with_valid_topic_ids(self) -> None:
         topic_id_1 = topic_fetchers.get_new_topic_id()
         topic_id_2 = topic_fetchers.get_new_topic_id()
 
@@ -436,7 +442,8 @@ class SubtopicMasteryDataHandlerTest(test_utils.GenericTestBase):
         changelist = [topic_domain.TopicChange({
             'cmd': topic_domain.CMD_ADD_SUBTOPIC,
             'title': 'Title 1',
-            'subtopic_id': 1
+            'subtopic_id': 1,
+            'url_fragment': 'subtopic-one'
         }), topic_domain.TopicChange({
             'cmd': topic_domain.CMD_UPDATE_SUBTOPIC_PROPERTY,
             'property_name': (
@@ -457,7 +464,8 @@ class SubtopicMasteryDataHandlerTest(test_utils.GenericTestBase):
         }), topic_domain.TopicChange({
             'cmd': topic_domain.CMD_ADD_SUBTOPIC,
             'title': 'Title 2',
-            'subtopic_id': 2
+            'subtopic_id': 2,
+            'url_fragment': 'subtopic-two'
         }), topic_domain.TopicChange({
             'cmd': topic_domain.CMD_UPDATE_SUBTOPIC_PROPERTY,
             'property_name': (
@@ -478,7 +486,8 @@ class SubtopicMasteryDataHandlerTest(test_utils.GenericTestBase):
         changelist = [topic_domain.TopicChange({
             'cmd': topic_domain.CMD_ADD_SUBTOPIC,
             'title': 'Title 1',
-            'subtopic_id': 1
+            'subtopic_id': 1,
+            'url_fragment': 'subtopic-one'
         }), topic_domain.TopicChange({
             'cmd': topic_domain.CMD_UPDATE_SUBTOPIC_PROPERTY,
             'property_name': (
@@ -499,7 +508,8 @@ class SubtopicMasteryDataHandlerTest(test_utils.GenericTestBase):
         }), topic_domain.TopicChange({
             'cmd': topic_domain.CMD_ADD_SUBTOPIC,
             'title': 'Title 2',
-            'subtopic_id': 2
+            'subtopic_id': 2,
+            'url_fragment': 'subtopic-two'
         }), topic_domain.TopicChange({
             'cmd': topic_domain.CMD_UPDATE_SUBTOPIC_PROPERTY,
             'property_name': (
@@ -528,12 +538,13 @@ class SubtopicMasteryDataHandlerTest(test_utils.GenericTestBase):
 
         # First case: One subtopic mastery doesn't exist.
         response_json = self.get_json(
-            '%s' % feconf.SUBTOPIC_MASTERY_DATA_URL, params={
-                'comma_separated_topic_ids': ','.join([topic_id_1, topic_id_2])
+            '%s' % feconf.SUBTOPIC_MASTERY_DATA_URL,
+            params={
+                'selected_topic_ids': json.dumps([
+                    topic_id_1, topic_id_2])
             })
         degrees_of_mastery_1 = {
-            u'1': python_utils.divide(
-                self.degree_of_mastery_1 + self.degree_of_mastery_2, 2)
+            u'1': (self.degree_of_mastery_1 + self.degree_of_mastery_2) / 2
         }
         degrees_of_mastery_2 = {
             u'2': self.degree_of_mastery_5
@@ -548,12 +559,13 @@ class SubtopicMasteryDataHandlerTest(test_utils.GenericTestBase):
         skill_services.create_user_skill_mastery(
             self.user_id, self.skill_id_3, self.degree_of_mastery_3)
         response_json = self.get_json(
-            '%s' % feconf.SUBTOPIC_MASTERY_DATA_URL, params={
-                'comma_separated_topic_ids': ','.join([topic_id_1, topic_id_2])
+            '%s' % feconf.SUBTOPIC_MASTERY_DATA_URL,
+            params={
+                'selected_topic_ids': json.dumps([
+                    topic_id_1, topic_id_2])
             })
         degrees_of_mastery_1 = {
-            u'1': python_utils.divide(
-                self.degree_of_mastery_1 + self.degree_of_mastery_2, 2),
+            u'1': (self.degree_of_mastery_1 + self.degree_of_mastery_2) / 2,
             u'2': self.degree_of_mastery_3
         }
         degrees_of_mastery_2 = {
@@ -571,16 +583,15 @@ class SubtopicMasteryDataHandlerTest(test_utils.GenericTestBase):
             self.user_id, self.skill_id_4, self.degree_of_mastery_4)
         response_json = self.get_json(
             '%s' % feconf.SUBTOPIC_MASTERY_DATA_URL, params={
-                'comma_separated_topic_ids': ','.join([topic_id_1, topic_id_2])
+                'selected_topic_ids': json.dumps([
+                    topic_id_1, topic_id_2])
             })
         degrees_of_mastery_1 = {
-            u'1': python_utils.divide(
-                self.degree_of_mastery_1 + self.degree_of_mastery_2, 2),
+            u'1': (self.degree_of_mastery_1 + self.degree_of_mastery_2) / 2,
             u'2': self.degree_of_mastery_3
         }
         degrees_of_mastery_2 = {
-            u'1': python_utils.divide(
-                self.degree_of_mastery_3 + self.degree_of_mastery_4, 2),
+            u'1': (self.degree_of_mastery_3 + self.degree_of_mastery_4) / 2,
             u'2': self.degree_of_mastery_5
         }
         self.assertEqual(
@@ -590,20 +601,22 @@ class SubtopicMasteryDataHandlerTest(test_utils.GenericTestBase):
             })
         self.logout()
 
-    def test_get_with_invalid_topic_id_returns_400(self):
+    def test_get_with_invalid_topic_id_returns_400(self) -> None:
         self.login(self.NEW_USER_EMAIL)
         response_json = self.get_json(
-            '%s' % feconf.SUBTOPIC_MASTERY_DATA_URL, params={
-                'comma_separated_topic_ids': 'invalid_topic_id'
+            '%s' % feconf.SUBTOPIC_MASTERY_DATA_URL,
+            params={
+                'selected_topic_ids': 'invalid_topic_id'
             }, expected_status_int=400)
 
         self.assertEqual(
             response_json['error'],
-            'Invalid topic ID invalid_topic_id')
+            'Schema validation for \'selected_topic_ids\' failed: '
+            'Expecting value: line 1 column 1 (char 0)')
 
         self.logout()
 
-    def test_get_with_no_topic_ids_returns_400(self):
+    def test_get_with_no_topic_ids_returns_400(self) -> None:
         self.login(self.NEW_USER_EMAIL)
         json_response = self.get_json(
             '%s' % feconf.SUBTOPIC_MASTERY_DATA_URL,
@@ -611,6 +624,27 @@ class SubtopicMasteryDataHandlerTest(test_utils.GenericTestBase):
 
         self.assertEqual(
             json_response['error'],
-            'Missing key in handler args: comma_separated_topic_ids.')
+            'Missing key in handler args: selected_topic_ids.')
+
+        self.logout()
+
+    def test_with_delete_topic_id(self) -> None:
+        self.login(self.NEW_USER_EMAIL)
+        topic_id_1 = topic_fetchers.get_new_topic_id()
+        topic_id_2 = topic_fetchers.get_new_topic_id()
+
+        with self.swap_to_always_return(
+            topic_fetchers, 'get_topics_by_ids', [None, 'random_topic']
+        ):
+            json_response = self.get_json(
+                '%s' % feconf.SUBTOPIC_MASTERY_DATA_URL,
+                params={
+                    'selected_topic_ids': json.dumps([topic_id_1, topic_id_2])
+                },
+                expected_status_int=400
+            )
+
+            self.assertEqual(
+                json_response['error'], 'Invalid topic ID %s' % topic_id_1)
 
         self.logout()

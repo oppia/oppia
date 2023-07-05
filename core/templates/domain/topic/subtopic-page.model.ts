@@ -38,7 +38,6 @@ export class SubtopicPage {
     private languageCode: string,
   ) {}
 
-  // Returns the id of the subtopic page.
   getId(): string {
     return this.id;
   }
@@ -47,12 +46,10 @@ export class SubtopicPage {
     this.id = id;
   }
 
-  // Returns the topic id that the subtopic page is linked to.
   getTopicId(): string {
     return this.topicId;
   }
 
-  // Returns the page data for the subtopic page.
   getPageContents(): SubtopicPageContents {
     return this.pageContents;
   }
@@ -93,11 +90,5 @@ export class SubtopicPage {
       this.getSubtopicPageId(topicId, subtopicId),
       topicId, SubtopicPageContents.createDefault(),
       'en');
-  }
-
-  // Create an interstitial subtopic page that would be displayed in the
-  // editor until the actual subtopic page is fetched from the backend.
-  static createInterstitialSubtopicPage(): SubtopicPage {
-    return new SubtopicPage(null, null, null, 'en');
   }
 }

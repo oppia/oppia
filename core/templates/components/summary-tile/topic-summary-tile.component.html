@@ -1,7 +1,7 @@
 <div class="topic-card"
      [ngStyle]="{background: topicSummary.getThumbnailBgColor(), 'pointer-events': !isPublished ? 'none' : 'auto'}"
      [ngClass]="{'faded-topic-card': !isPublished}">
-  <a [href]="getTopicPageUrl()" class="protractor-test-topic-link">
+  <a [href]="getTopicPageUrl()" class="e2e-test-topic-link">
     <div class="topic-thumbnail">
       <span class="topic-coming-soon" *ngIf="!isPublished">
         {{ 'I18N_CLASSROOM_PAGE_COMING_SOON' | translate }}
@@ -11,7 +11,12 @@
       </picture>
     </div>
     <div class="topic-details" [ngStyle]="{'background-color': getDarkerThumbnailBgColor()}" ng-class="{'mask-effect': !isPublished}">
-      <span class="topic-name">{{ topicSummary.getName() }}</span>
+      <span class="topic-name e2e-test-topic-name" *ngIf="!isHackyTopicNameTranslationDisplayed()">
+        {{ topicSummary.getName() }}
+      </span>
+      <span class="topic-name e2e-test-topic-name" *ngIf="isHackyTopicNameTranslationDisplayed()">
+        {{ topicNameTranslationKey | translate }}
+      </span>
       {{ topicSummary.getTotalPublishedNodeCount() }}
       <span *ngIf="topicSummary.getTotalPublishedNodeCount() === 1">
         <span>{{ 'I18N_TOPIC_VIEWER_LESSON' | translate }}</span>
@@ -49,9 +54,9 @@
   }
 
   .topic-card .topic-coming-soon {
-    background-image: linear-gradient(to right, #7659B6, #674172);
+    background-image: linear-gradient(to right, #7659b6, #674172);
     border-radius: 0 0.2em 0 0.6em;
-    color: #FFF;
+    color: #fff;
     display: block;
     font-size: 1em;
     margin-left: 4em;

@@ -3,6 +3,7 @@ auto_tts_enabled: true
 blurb: ''
 category: Welcome
 correctness_feedback_enabled: false
+edits_allowed: true
 init_state_name: Start
 language_code: en
 objective: part of demonstrating the functionality of collections

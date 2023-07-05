@@ -68,11 +68,15 @@ describe('Learner answer info service', () =>{
               unicode_str: ''
             }
           },
-          rows: { value: 1 }
+          rows: { value: 1 },
+          catchMisspellings: {
+            value: false
+          }
         },
         answer_groups: [{
           outcome: {
             dest: 'outcome 1',
+            dest_if_really_stuck: null,
             feedback: {
               content_id: 'feedback_1',
               html: ''
@@ -96,6 +100,7 @@ describe('Learner answer info service', () =>{
         }, {
           outcome: {
             dest: 'outcome 2',
+            dest_if_really_stuck: null,
             feedback: {
               content_id: 'feedback_2',
               html: ''
@@ -135,6 +140,7 @@ describe('Learner answer info service', () =>{
         }],
         default_outcome: {
           dest: 'default',
+          dest_if_really_stuck: null,
           feedback: {
             content_id: 'default_outcome',
             html: ''
@@ -151,17 +157,8 @@ describe('Learner answer info service', () =>{
       param_changes: [],
       solicit_answer_details: true,
       card_is_checkpoint: false,
-      written_translations: {
-        translations_mapping: {
-          content: {},
-          default_outcome: {},
-          feedback_1: {},
-          feedback_2: {}
-        }
-      },
       linked_skill_id: null,
       classifier_model_id: '',
-      next_content_id_index: null
     };
 
     sof = TestBed.get(StateObjectFactory);

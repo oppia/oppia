@@ -24,7 +24,7 @@ import { ChangeListService } from './change-list.service';
 import { LoggerService } from 'services/contextual/logger.service';
 import { ContextService } from 'services/context.service';
 
-import constants from 'assets/constants';
+import { AppConstants } from 'app.constants';
 
 @Injectable({
   providedIn: 'root'
@@ -39,24 +39,27 @@ export class ExplorationLanguageCodeService extends ExplorationPropertyService {
   ) {
     super(alertsService, changeListService, loggerService);
   }
+
   // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
   getSupportedContentLanguages() {
     if (this.contextService.isExplorationLinkedToStory()) {
-      return constants.SUPPORTED_CONTENT_LANGUAGES_FOR_ANDROID;
+      return AppConstants.SUPPORTED_CONTENT_LANGUAGES_FOR_ANDROID;
     }
-    return constants.SUPPORTED_CONTENT_LANGUAGES;
+    return AppConstants.SUPPORTED_CONTENT_LANGUAGES;
   }
+
   // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
   getCurrentLanguageDescription() {
-    for (var i = 0; i < constants.SUPPORTED_CONTENT_LANGUAGES.length; i++) {
-      if (constants.SUPPORTED_CONTENT_LANGUAGES[i].code === this.displayed) {
-        return constants.SUPPORTED_CONTENT_LANGUAGES[i].description;
+    for (var i = 0; i < AppConstants.SUPPORTED_CONTENT_LANGUAGES.length; i++) {
+      if (AppConstants.SUPPORTED_CONTENT_LANGUAGES[i].code === this.displayed) {
+        return AppConstants.SUPPORTED_CONTENT_LANGUAGES[i].description;
       }
     }
   }
+
   // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-  _isValid(value) {
-    return constants.SUPPORTED_CONTENT_LANGUAGES.some((elt) => {
+  _isValid(value: string) {
+    return AppConstants.SUPPORTED_CONTENT_LANGUAGES.some((elt) => {
       return elt.code === value;
     });
   }

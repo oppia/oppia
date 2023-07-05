@@ -18,14 +18,20 @@
 
 import { EventEmitter } from '@angular/core';
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-import { Story, StoryObjectFactory } from 'domain/story/StoryObjectFactory';
+import { Story } from 'domain/story/story.model';
 import { StoryEditorStateService } from '../services/story-editor-state.service';
 import { StoryEditorNavbarBreadcrumbComponent } from './story-editor-navbar-breadcrumb.component';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
-import { StorySavePendingChangesModalComponent } from '../modal-templates/story-save-pending-changes-modal.component';
+import { SavePendingChangesModalComponent } from 'components/save-pending-changes/save-pending-changes-modal.component';
 import { UndoRedoService } from 'domain/editor/undo_redo/undo-redo.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
+
+class MockNgbModalRef {
+  componentInstance!: {
+    body: 'xyz';
+  };
+}
 
 describe('StoryEditorNavbarBreadcrumbComponent', () => {
   let component: StoryEditorNavbarBreadcrumbComponent;
@@ -33,7 +39,6 @@ describe('StoryEditorNavbarBreadcrumbComponent', () => {
   let storyEditorStateService: StoryEditorStateService;
   let story: Story;
   let ngbModal: NgbModal;
-  let storyObjectFactory: StoryObjectFactory;
   let undoRedoService: UndoRedoService;
   let windowRef: WindowRef;
 
@@ -49,13 +54,11 @@ describe('StoryEditorNavbarBreadcrumbComponent', () => {
     fixture = TestBed.createComponent(StoryEditorNavbarBreadcrumbComponent);
     component = fixture.componentInstance;
     storyEditorStateService = TestBed.get(StoryEditorStateService);
-    storyObjectFactory = TestBed.inject(StoryObjectFactory);
     ngbModal = TestBed.inject(NgbModal);
     undoRedoService = TestBed.get(UndoRedoService);
-    windowRef = (TestBed.inject(WindowRef) as unknown) as
-      jasmine.SpyObj<WindowRef>;
+    windowRef = TestBed.inject(WindowRef) as jasmine.SpyObj<WindowRef>;
 
-    story = storyObjectFactory.createFromBackendDict({
+    story = Story.createFromBackendDict({
       id: 'storyId_0',
       title: 'Story title',
       description: 'Story Description',
@@ -74,7 +77,12 @@ describe('StoryEditorNavbarBreadcrumbComponent', () => {
           exploration_id: 'exp_1',
           outline_is_finalized: false,
           thumbnail_filename: 'img.png',
-          thumbnail_bg_color: '#a33f40'
+          thumbnail_bg_color: '#a33f40',
+          status: 'Published',
+          planned_publication_date_msecs: 100,
+          last_modified_msecs: 100,
+          first_publication_date_msecs: 200,
+          unpublishing_reason: null
         }, {
           title: 'title_2',
           description: 'description_2',
@@ -86,7 +94,12 @@ describe('StoryEditorNavbarBreadcrumbComponent', () => {
           exploration_id: 'exp_2',
           outline_is_finalized: false,
           thumbnail_filename: 'img2.png',
-          thumbnail_bg_color: '#a33f40'
+          thumbnail_bg_color: '#a33f40',
+          status: 'Published',
+          planned_publication_date_msecs: 100,
+          last_modified_msecs: 100,
+          first_publication_date_msecs: 200,
+          unpublishing_reason: null
         }],
       },
       language_code: 'en',
@@ -132,6 +145,7 @@ describe('StoryEditorNavbarBreadcrumbComponent', () => {
   ' with unsaved changes', () => {
     spyOn(ngbModal, 'open').and.returnValue(
       {
+        componentInstance: MockNgbModalRef,
         result: Promise.resolve()
       } as NgbModalRef
     );
@@ -140,12 +154,13 @@ describe('StoryEditorNavbarBreadcrumbComponent', () => {
     component.returnToTopicEditorPage();
 
     expect(ngbModal.open).toHaveBeenCalledWith(
-      StorySavePendingChangesModalComponent, { backdrop: true });
+      SavePendingChangesModalComponent, { backdrop: true });
   });
 
   it('should close save pending changes modal when user clicks cancel', () => {
     spyOn(ngbModal, 'open').and.returnValue(
       {
+        componentInstance: MockNgbModalRef,
         result: Promise.reject()
       } as NgbModalRef
     );
@@ -154,6 +169,6 @@ describe('StoryEditorNavbarBreadcrumbComponent', () => {
     component.returnToTopicEditorPage();
 
     expect(ngbModal.open).toHaveBeenCalledWith(
-      StorySavePendingChangesModalComponent, { backdrop: true });
+      SavePendingChangesModalComponent, { backdrop: true });
   });
 });

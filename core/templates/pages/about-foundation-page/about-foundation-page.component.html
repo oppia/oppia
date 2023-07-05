@@ -1,4 +1,4 @@
-<div class="about-foundation-page protractor-test-about-foundation-page">
+<div class="about-foundation-page e2e-test-about-foundation-page">
   <div class="oppia-about-foundation-hero-card">
     <div class="oppia-about-foundation-image-overlay">
       <div class="oppia-about-foundation-hero-content">
@@ -43,18 +43,22 @@
       </div>
     </div>
     <div class="col-lg-4 oppia-about-foundation-image-with-caption">
-      <picture>
-        <source type="image/webp"
-                [srcset]="'/assets/images/about_foundation/equity-infographic-3-we-need-data.webp'">
-        <source type="image/jpg"
-                [srcset]="'/assets/images/equity-infographic-3-we-need-data.jpg'">
-        <img alt="Education Equality Infographic"
-             class="oppia-about-foundation-page-equality-infographic"
-             src="/assets/images/about_foundation/equity-infographic-3-we-need-data.jpg">
-      </picture>
-      <a href="http://uis.unesco.org/en/news/new-report-how-measure-equity-education">
-        Source: UNESCO
-      </a>
+      <figure>
+        <picture>
+          <source type="image/webp"
+                  [srcset]="'/assets/images/about_foundation/equity-infographic-3-we-need-data.webp'">
+          <source type="image/jpg"
+                  [srcset]="'/assets/images/equity-infographic-3-we-need-data.jpg'">
+          <img alt="Education Equality Infographic"
+               class="oppia-about-foundation-page-equality-infographic"
+               src="/assets/images/about_foundation/equity-infographic-3-we-need-data.jpg">
+        </picture>
+        <figcaption>
+          <a href="http://uis.unesco.org/en/news/new-report-how-measure-equity-education">
+            Source: UNESCO
+          </a>
+        </figcaption>
+      </figure>
     </div>
   </div>
 
@@ -105,7 +109,7 @@
         </p>
       </div>
       <div class="row">
-        <button class="btn" (click)="learnMoreAboutOppia()">
+        <button class="btn">
           <a href="/about"
              target="_blank"
              rel="noopener">
@@ -153,7 +157,7 @@
         </p>
       </div>
       <div class="row">
-        <button class="btn" (click)="becomeAVolunteer()">
+        <button class="btn">
           <a href="/volunteer"
              target="_blank"
              rel="noopener">
@@ -216,14 +220,14 @@
   }
 
   .oppia-about-foundation-hero-content h1 {
-    color: #FFF;
+    color: #fff;
     font-size: 40px;
     font-weight: 700;
     text-transform: uppercase;
   }
 
   .oppia-about-foundation-hero-content h3 {
-    color: #FFF;
+    color: #fff;
     font-size: 25px;
     margin: 1em auto;
     width: 45%;
@@ -246,7 +250,7 @@
   }
 
   .oppia-about-foundation-info-card-white {
-    background-color: #FFF;
+    background-color: #fff;
     padding: 5em 10em;
   }
 
@@ -282,7 +286,9 @@
     text-decoration: underline;
   }
 
-
+  figcaption {
+    text-align: center;
+  }
   .oppia-about-foundation-page-equality-infographic {
     margin-bottom: 10px;
     max-height: 320px;
@@ -294,7 +300,7 @@
   }
 
   .oppia-about-foundation-info-card-gray {
-    background-color: #F4F4F4;
+    background-color: #f4f4f4;
     padding: 5em 10em;
   }
 

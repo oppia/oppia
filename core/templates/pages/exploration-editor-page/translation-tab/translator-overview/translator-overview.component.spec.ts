@@ -16,205 +16,317 @@
  * @fileoverview Unit tests for translatorOverview.
  */
 
-import { EventEmitter } from '@angular/core';
+import { EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { TestBed } from '@angular/core/testing';
-
+import { ComponentFixture, discardPeriodicTasks, fakeAsync, flush, TestBed, waitForAsync } from '@angular/core/testing';
 import { LanguageUtilService } from 'domain/utilities/language-util.service';
-import { StateWrittenTranslationsService } from
-  // eslint-disable-next-line max-len
-  'components/state-editor/state-editor-properties-services/state-written-translations.service';
-import { StateRecordedVoiceoversService } from
-  // eslint-disable-next-line max-len
-  'components/state-editor/state-editor-properties-services/state-recorded-voiceovers.service';
-import { StateEditorRefreshService } from
-  'pages/exploration-editor-page/services/state-editor-refresh.service';
-import { ReadOnlyExplorationBackendApiService } from
-  'domain/exploration/read-only-exploration-backend-api.service';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// the code corresponding to the spec is upgraded to Angular 8.
-import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
-// ^^^ This block is to be removed.
+import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
+import { ExplorationLanguageCodeService } from 'pages/exploration-editor-page/services/exploration-language-code.service';
+import { RouterService } from 'pages/exploration-editor-page/services/router.service';
+import { GraphDataService } from 'pages/exploration-editor-page/services/graph-data.service';
+import { TranslationLanguageService } from '../services/translation-language.service';
+import { TranslationStatusService } from '../services/translation-status.service';
+import { TranslationTabActiveModeService } from '../services/translation-tab-active-mode.service';
+import { TranslatorOverviewComponent } from './translator-overview.component';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { WindowRef } from 'services/contextual/window-ref.service';
+import { ContextService } from 'services/context.service';
+import { EntityTranslationsService } from 'services/entity-translations.services';
+import { UserExplorationPermissionsService } from '../../services/user-exploration-permissions.service';
 
-var MockWindow = function() {
-  var language = 'en';
-  this.localStorage = {
-    getItem: () => language,
-    setItem: (_, lang) => {
-      language = lang;
-    }
-  };
-};
+class MockNgbModal {
+  open() {
+    return {
+      result: Promise.resolve()
+    };
+  }
+}
 
-describe('Translator Overview component', function() {
-  var ctrl = null;
-  var $rootScope = null;
-  var $scope = null;
-  var explorationLanguageCodeService = null;
-  var languageUtilService = null;
-  var stateEditorService = null;
-  var translationLanguageService = null;
-  var translationStatusService = null;
-  var translationTabActiveModeService = null;
-  var explorationLanguageCode = 'hi';
-  var focusManagerService = null;
-  var routerService = null;
+describe('Translator Overview component', () => {
+  let component: TranslatorOverviewComponent;
+  let contextService: ContextService;
+  let fixture: ComponentFixture<TranslatorOverviewComponent>;
+  let explorationLanguageCodeService: ExplorationLanguageCodeService;
+  let languageUtilService: LanguageUtilService;
+  let stateEditorService: StateEditorService;
+  let translationLanguageService: TranslationLanguageService;
+  let translationStatusService: TranslationStatusService;
+  let graphDataService: GraphDataService;
+  let translationTabActiveModeService: TranslationTabActiveModeService;
+  let explorationLanguageCode: string = 'hi';
+  let focusManagerService: FocusManagerService;
+  let routerService: RouterService;
+  let entityTranslationsService: EntityTranslationsService;
+  let userExplorationPermissionsService: UserExplorationPermissionsService;
 
-  var mockWindow = null;
-  beforeEach(angular.mock.module('oppia'));
-
-  importAllAngularServices();
-
-  beforeEach(function() {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule]
-    });
-
-    languageUtilService = TestBed.get(LanguageUtilService);
-    focusManagerService = TestBed.get(FocusManagerService);
-  });
-
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('LanguageUtilService', languageUtilService);
-    $provide.value(
-      'ReadOnlyExplorationBackendApiService',
-      TestBed.get(ReadOnlyExplorationBackendApiService));
-    $provide.value(
-      'StateRecordedVoiceoversService',
-      TestBed.get(StateRecordedVoiceoversService));
-    $provide.value(
-      'StateEditorRefreshService', TestBed.get(StateEditorRefreshService));
-    $provide.value(
-      'StateWrittenTranslationsService',
-      TestBed.get(StateWrittenTranslationsService));
-    mockWindow = new MockWindow();
-    $provide.value('$window', mockWindow);
+      imports: [HttpClientTestingModule],
+      declarations: [
+        TranslatorOverviewComponent
+      ],
+      providers: [
+        ExplorationLanguageCodeService,
+        {
+          provide: NgbModal,
+          useClass: MockNgbModal
+        },
+        WindowRef
+      ],
+      schemas: [NO_ERRORS_SCHEMA]
+    }).compileComponents();
   }));
 
-  beforeEach(angular.mock.inject(function($injector, $componentController) {
-    $rootScope = $injector.get('$rootScope');
-    explorationLanguageCodeService = $injector.get(
-      'ExplorationLanguageCodeService');
-    stateEditorService = $injector.get('StateEditorService');
-    translationLanguageService = $injector.get('TranslationLanguageService');
-    translationStatusService = $injector.get('TranslationStatusService');
-    translationTabActiveModeService = $injector.get(
-      'TranslationTabActiveModeService');
-    focusManagerService = $injector.get('FocusManagerService');
-    routerService = $injector.get('RouterService');
+  beforeEach(fakeAsync(() => {
+    fixture = TestBed.createComponent(TranslatorOverviewComponent);
+    component = fixture.componentInstance;
+
+    contextService = TestBed.inject(ContextService);
+    languageUtilService = TestBed.inject(LanguageUtilService);
+    focusManagerService = TestBed.inject(FocusManagerService);
+    explorationLanguageCodeService = TestBed.inject(
+      ExplorationLanguageCodeService);
+    stateEditorService = TestBed.inject(StateEditorService);
+    translationLanguageService = TestBed.inject(TranslationLanguageService);
+    translationStatusService = TestBed.inject(TranslationStatusService);
+    graphDataService = TestBed.inject(GraphDataService);
+    translationTabActiveModeService = TestBed.inject(
+      TranslationTabActiveModeService);
+    focusManagerService = TestBed.inject(FocusManagerService);
+    routerService = TestBed.inject(RouterService);
+    entityTranslationsService = TestBed.inject(EntityTranslationsService);
+    userExplorationPermissionsService = TestBed.inject(
+      UserExplorationPermissionsService);
 
     spyOn(translationTabActiveModeService, 'isTranslationModeActive').and
       .returnValue(true);
     spyOn(translationTabActiveModeService, 'isVoiceoverModeActive').and
       .returnValue(true);
+    spyOn(entityTranslationsService, 'getEntityTranslationsAsync')
+      .and.resolveTo();
 
     explorationLanguageCodeService.init(explorationLanguageCode);
+    component.isTranslationTabBusy = false;
 
-    $scope = $rootScope.$new();
-    ctrl = $componentController('translatorOverview', {
-      $rootScope: $rootScope,
-      $scope: $scope,
-      LanguageUtilService: languageUtilService
-    }, {
-      isTranslationTabBusy: false
-    });
-    ctrl.$onInit();
+    component.ngOnInit();
+    fixture.detectChanges();
+
+    flush();
+    discardPeriodicTasks();
+    expect(
+      entityTranslationsService.getEntityTranslationsAsync
+    ).toHaveBeenCalled();
   }));
 
-  it('should initialize $scope properties after controller is initialized',
-    function() {
-      expect($scope.languageCode).toBe('en');
-      expect($scope.inTranslationMode).toBe(true);
-      expect($scope.inVoiceoverMode).toBe(true);
-      expect($scope.languageCodesAndDescriptions.length).toBe(
+  afterEach(fakeAsync(() => {
+    flush();
+    discardPeriodicTasks();
+  }));
+
+  it('should initialize component properties after controller is initialized',
+    () => {
+      spyOn(userExplorationPermissionsService, 'getPermissionsAsync').and
+        .returnValue(Promise.resolve({
+          canUnpublish: false,
+          canReleaseOwnership: false,
+          canPublish: false,
+          canVoiceover: true,
+          canDelete: false,
+          canModifyRoles: false,
+          canEdit: false,
+          canManageVoiceArtist: false
+        }));
+      spyOn(contextService, 'isExplorationLinkedToStory').and.returnValue(true);
+      component.canShowTabModeSwitcher();
+
+      expect(component.inTranslationMode).toBe(true);
+      expect(component.inVoiceoverMode).toBe(true);
+      expect(component.languageCodesAndDescriptions.length).toBe(
         languageUtilService.getAllVoiceoverLanguageCodes().length - 1);
       expect(languageUtilService.getAllVoiceoverLanguageCodes()).toContain(
         explorationLanguageCode);
-      expect($scope.languageCodesAndDescriptions).not.toContain({
+      expect(component.languageCodesAndDescriptions).not.toContain({
         id: explorationLanguageCode,
         description: languageUtilService.getAudioLanguageDescription(
           explorationLanguageCode)
       });
     });
 
-  it('should show tab mode switcher when language code is different' +
-    ' from exploration\'s language code', function() {
-    expect($scope.canShowTabModeSwitcher()).toBe(true);
-  });
-
   it('should change to voiceover active mode when changing translation tab',
-    function() {
+    fakeAsync(() => {
+      spyOn(userExplorationPermissionsService, 'getPermissionsAsync').and
+        .returnValue(Promise.resolve({
+          canUnpublish: false,
+          canReleaseOwnership: false,
+          canPublish: false,
+          canVoiceover: true,
+          canDelete: false,
+          canModifyRoles: false,
+          canEdit: false,
+          canManageVoiceArtist: false
+        }));
       spyOn(translationTabActiveModeService, 'activateVoiceoverMode');
-      $scope.changeActiveMode('Voiceover');
+      spyOn(translationStatusService, 'refresh');
+
+      component.changeActiveMode('Voiceover');
 
       expect(translationTabActiveModeService.activateVoiceoverMode)
         .toHaveBeenCalled();
-    });
+      expect(translationStatusService.refresh).toHaveBeenCalled();
+
+      flush();
+      discardPeriodicTasks();
+    })
+  );
 
   it('should change to translation active mode when changing translation tab',
-    function() {
+    fakeAsync(() => {
+      spyOn(userExplorationPermissionsService, 'getPermissionsAsync').and
+        .returnValue(Promise.resolve({
+          canUnpublish: false,
+          canReleaseOwnership: false,
+          canPublish: false,
+          canVoiceover: true,
+          canDelete: false,
+          canModifyRoles: false,
+          canEdit: false,
+          canManageVoiceArtist: false
+        }));
       spyOn(translationTabActiveModeService, 'activateTranslationMode');
-      $scope.changeActiveMode('Translate');
+      spyOn(graphDataService, 'recompute');
+      spyOn(translationStatusService, 'refresh');
+
+      component.changeActiveMode('Translate');
 
       expect(translationTabActiveModeService.activateTranslationMode)
         .toHaveBeenCalled();
-    });
+      expect(translationStatusService.refresh).toHaveBeenCalled();
+
+      flush();
+      discardPeriodicTasks();
+      expect(graphDataService.recompute).toHaveBeenCalled();
+    })
+  );
 
   it('should change translation language when translation tab is not busy',
-    function() {
+    fakeAsync(() => {
+      spyOn(userExplorationPermissionsService, 'getPermissionsAsync').and
+        .returnValue(Promise.resolve({
+          canUnpublish: false,
+          canReleaseOwnership: false,
+          canPublish: false,
+          canVoiceover: true,
+          canDelete: false,
+          canModifyRoles: false,
+          canEdit: false,
+          canManageVoiceArtist: false
+        }));
       spyOn(translationLanguageService, 'setActiveLanguageCode');
-      $scope.languageCode = 'es';
-      $scope.changeTranslationLanguage();
+      component.languageCode = 'es';
+      component.changeTranslationLanguage();
+
+      flush();
+      discardPeriodicTasks();
       expect(translationLanguageService.setActiveLanguageCode)
         .toHaveBeenCalled();
-      expect(mockWindow.localStorage.getItem()).toBe('es');
-    });
+    })
+  );
 
   it('should not change translation language when translation tab is busy',
-    function() {
-      ctrl.isTranslationTabBusy = true;
-      var showTranslationTabBusyModalEmitter = new EventEmitter();
+    fakeAsync(() => {
+      spyOn(userExplorationPermissionsService, 'getPermissionsAsync').and
+        .returnValue(Promise.resolve({
+          canUnpublish: false,
+          canReleaseOwnership: false,
+          canPublish: false,
+          canVoiceover: true,
+          canDelete: false,
+          canModifyRoles: false,
+          canEdit: false,
+          canManageVoiceArtist: false
+        }));
+      component.isTranslationTabBusy = true;
+      let showTranslationTabBusyModalEmitter = new EventEmitter();
       spyOn(showTranslationTabBusyModalEmitter, 'emit');
       spyOnProperty(stateEditorService, 'onShowTranslationTabBusyModal').and
         .returnValue(showTranslationTabBusyModalEmitter);
-      $scope.changeTranslationLanguage();
+      component.changeTranslationLanguage();
 
-      expect($scope.languageCode).toBe('en');
+      flush();
+      discardPeriodicTasks();
       expect(showTranslationTabBusyModalEmitter.emit).toHaveBeenCalled();
 
       // Reset value for isTranslationTabBusy.
-      ctrl.isTranslationTabBusy = false;
-    });
+      component.isTranslationTabBusy = false;
+    }));
 
   it('should get translation bar progress data when there are more' +
-    ' than 1 item to be translated', function() {
+    ' than 1 item to be translated', () => {
+    spyOn(userExplorationPermissionsService, 'getPermissionsAsync').and
+      .returnValue(Promise.resolve({
+        canUnpublish: false,
+        canReleaseOwnership: false,
+        canPublish: false,
+        canVoiceover: true,
+        canDelete: false,
+        canModifyRoles: false,
+        canEdit: false,
+        canManageVoiceArtist: false
+      }));
     spyOn(translationStatusService, 'getExplorationContentRequiredCount').and
       .returnValue(3);
     spyOn(translationStatusService, 'getExplorationContentNotAvailableCount')
       .and.returnValue(1);
-    $scope.getTranslationProgressStyle();
-    expect($scope.getTranslationProgressAriaLabel()).toBe(
+    component.getTranslationProgressStyle();
+    expect(component.getTranslationProgressAriaLabel()).toBe(
       '2 items translated out of 3 items');
   });
 
   it('should get translation bar progress data when there is 1 item to be' +
-    ' translated', function() {
+    ' translated', () => {
+    spyOn(userExplorationPermissionsService, 'getPermissionsAsync').and
+      .returnValue(Promise.resolve({
+        canUnpublish: false,
+        canReleaseOwnership: false,
+        canPublish: false,
+        canVoiceover: true,
+        canDelete: false,
+        canModifyRoles: false,
+        canEdit: false,
+        canManageVoiceArtist: false
+      }));
     spyOn(translationStatusService, 'getExplorationContentRequiredCount')
       .and.returnValue(2);
     spyOn(translationStatusService, 'getExplorationContentNotAvailableCount')
       .and.returnValue(1);
-    $scope.getTranslationProgressStyle();
-    expect($scope.getTranslationProgressAriaLabel()).toBe(
+    component.getTranslationProgressStyle();
+    expect(component.getTranslationProgressAriaLabel()).toBe(
       '1 item translated out of 2 items');
   });
 
   it('should apply autofocus to history tab element when tab is switched',
-    function() {
+    fakeAsync(() => {
+      spyOn(userExplorationPermissionsService, 'getPermissionsAsync').and
+        .returnValue(Promise.resolve({
+          canUnpublish: false,
+          canReleaseOwnership: false,
+          canPublish: false,
+          canVoiceover: true,
+          canDelete: false,
+          canModifyRoles: false,
+          canEdit: false,
+          canManageVoiceArtist: false
+        }));
       spyOn(routerService, 'getActiveTabName').and.returnValue('translation');
       spyOn(focusManagerService, 'setFocus');
-      ctrl.$onInit();
+
+      component.ngOnInit();
+
+      flush();
+      discardPeriodicTasks();
+
       expect(focusManagerService.setFocus).toHaveBeenCalledWith(
         'audioTranslationLanguageCodeField');
-    });
+    }));
 });

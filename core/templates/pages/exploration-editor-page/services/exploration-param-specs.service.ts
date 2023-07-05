@@ -17,13 +17,32 @@
  * the specification of the parameters.
  */
 
-require(
-  'pages/exploration-editor-page/services/exploration-property.service.ts');
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { ExplorationPropertyService } from 'pages/exploration-editor-page/services/exploration-property.service';
+import { AlertsService } from 'services/alerts.service';
+import { ChangeListService } from './change-list.service';
+import { LoggerService } from 'services/contextual/logger.service';
+import { ParamSpecs } from 'domain/exploration/ParamSpecsObjectFactory';
 
-angular.module('oppia').factory('ExplorationParamSpecsService', [
-  'ExplorationPropertyService', function(ExplorationPropertyService) {
-    var child = Object.create(ExplorationPropertyService);
-    child.propertyName = 'param_specs';
-    return child;
+@Injectable({
+  providedIn: 'root'
+})
+export class ExplorationParamSpecsService extends
+  ExplorationPropertyService {
+  propertyName: string = 'param_specs';
+  // This property is initialized using init method and we need to do
+  // non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  savedMemento!: ParamSpecs;
+  constructor(
+    protected alertsService: AlertsService,
+    protected changeListService: ChangeListService,
+    protected loggerService: LoggerService
+  ) {
+    super(alertsService, changeListService, loggerService);
   }
-]);
+}
+
+angular.module('oppia').factory('ExplorationParamSpecsService',
+  downgradeInjectable(ExplorationParamSpecsService));

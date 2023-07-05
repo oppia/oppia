@@ -79,8 +79,26 @@ describe('ListOfSetsOfTranslatableHtmlContentIdsEditorComponent', () => {
     ];
   });
 
+  it('should return empty list when there is no response', () => {
+    spyOn(component.valueChanged, 'emit');
+    // This throws "Type 'undefined' is not assignable to type 'string[][]'."
+    // We need to suppress this error because of the need to test validations.
+    // This throws an error because the value is undefined.
+    // @ts-ignore
+    component.value = undefined;
+
+    component.ngOnInit();
+
+    expect(component.value).toEqual(
+      [['ca_choices_1'], ['ca_choices_2'], ['ca_choices_3'], ['ca_choices_4']]);
+  });
+
   it('should initialise component when user adds response', () => {
     spyOn(component.valueChanged, 'emit');
+    // This throws "Type 'undefined' is not assignable to type 'string[]'."
+    // We need to suppress this error because of the need to test validations.
+    // This throws an error because the value is undefined.
+    // @ts-ignore
     component.value = [undefined];
 
     component.ngOnInit();
@@ -161,6 +179,8 @@ describe('ListOfSetsOfTranslatableHtmlContentIdsEditorComponent', () => {
   });
 
   it('should rearrage choices when user changes position of choices', () => {
+    component.ngOnInit();
+
     component.choices = [
       {
         id: '<p>choice1</p>',
@@ -233,6 +253,10 @@ describe('ListOfSetsOfTranslatableHtmlContentIdsEditorComponent', () => {
       'ca_choices_3',
       'ca_choices_4'
     ];
+    // This throws "Type 'undefined' is not assignable to type 'string[]'."
+    // We need to suppress this error because of the need to test validations.
+    // This throws an error because the value is undefined.
+    // @ts-ignore
     component.value[3] = undefined;
 
     component.selectItem(3);

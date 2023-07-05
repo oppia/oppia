@@ -51,5 +51,6 @@ describe('Profile Page Navbar Component', function() {
     () => {
       component.ngOnInit();
       expect(component.username).toBe('username1');
-    });
+    }
+  );
 });

@@ -170,6 +170,10 @@ describe('NoninteractiveSkillreview', () => {
     try {
       component.openConceptCard(e);
       flush();
+    // We use unknown type because we are unsure of the type of error
+    // that was thrown. Since the catch block cannot identify the
+    // specific type of error, we are unable to further optimise the
+    // code by introducing more types of errors.
     } catch (e: unknown) {
       error = e as Error;
       expect(error.message.indexOf('Error: close') !== -1).toBeTrue();
@@ -179,6 +183,11 @@ describe('NoninteractiveSkillreview', () => {
 
   it('should not open modal when ck Editor copy mode is active',
     fakeAsync(() => {
+      // This throws "Type object is not assignable to type
+      // 'MouseEvent'." We need to suppress this error
+      // because of the need to test validations. This
+      // throws an error only in the test environment.
+      // @ts-ignore
       let e = {
         currentTarget: {
           offsetParent: {
@@ -187,7 +196,7 @@ describe('NoninteractiveSkillreview', () => {
             }
           }
         }
-      } as unknown as MouseEvent;
+      } as MouseEvent;
       const modalSpy = spyOn(ngbModal, 'open');
       ckEditorCopyContentService.copyModeActive = true;
 

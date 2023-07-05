@@ -25,13 +25,14 @@ import { ReadOnlySubtopicPageData } from
 
 describe('Subtopic data object factory', () => {
   describe('subtopic data object factory', () => {
-    var _sampleSubtopicData = null;
+    var _sampleSubtopicData: ReadOnlySubtopicPageData;
 
     beforeEach(() => {
       var sampleSubtopicDataBackendDict = {
         topic_id: 'topic_id',
         topic_name: 'topic',
         next_subtopic_dict: null,
+        prev_subtopic_dict: null,
         subtopic_title: 'sample_title',
         page_contents: {
           subtitled_html: {

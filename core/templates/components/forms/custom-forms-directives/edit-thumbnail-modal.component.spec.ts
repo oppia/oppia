@@ -44,6 +44,7 @@ describe('Edit Thumbnail Modal Component', () => {
   let component: EditThumbnailModalComponent;
   let fixture: ComponentFixture<EditThumbnailModalComponent>;
   let ngbActiveModal: NgbActiveModal;
+  let svgSanitizerService: SvgSanitizerService;
   let closeSpy: jasmine.Spy;
   let dismissSpy: jasmine.Spy;
 
@@ -55,6 +56,7 @@ describe('Edit Thumbnail Modal Component', () => {
         return 'Fake onload executed';
       };
     }
+
     readAsDataURL(file: File) {
       this.onload();
       return 'The file is loaded';
@@ -69,16 +71,17 @@ describe('Edit Thumbnail Modal Component', () => {
         return 'Fake onload executed';
       };
     }
+
     set src(url: string) {
       this.onload();
     }
   }
 
-  let mockSvgSanitizerService = {
-    getInvalidSvgTagsAndAttrsFromDataUri: (dataUri: string) => {
-      return { tags: ['script'], attrs: [] };
-    },
-  };
+  const fileContent = (
+    'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjA' +
+    'wMC9zdmciICB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCI+PGNpcmNsZSBjeD0iNTAiIGN5' +
+    'PSI1MCIgcj0iNDAiIHN0cm9rZT0iZ3JlZW4iIHN0cm9rZS13aWR0aD0iNCIgZmlsbD0ie' +
+    'WVsbG93IiAvPjwvc3ZnPg==');
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -88,13 +91,10 @@ describe('Edit Thumbnail Modal Component', () => {
         MockTranslatePipe
       ],
       providers: [
+        SvgSanitizerService,
         {
           provide: NgbActiveModal,
           useClass: MockActiveModal
-        },
-        {
-          provide: SvgSanitizerService,
-          useValue: mockSvgSanitizerService
         }
       ],
       schemas: [NO_ERRORS_SCHEMA]
@@ -102,6 +102,7 @@ describe('Edit Thumbnail Modal Component', () => {
     fixture = TestBed.createComponent(EditThumbnailModalComponent);
     component = fixture.componentInstance;
     ngbActiveModal = TestBed.inject(NgbActiveModal);
+    svgSanitizerService = TestBed.inject(SvgSanitizerService);
     closeSpy = spyOn(ngbActiveModal, 'close').and.callThrough();
     dismissSpy = spyOn(ngbActiveModal, 'dismiss').and.callThrough();
     // This throws "Argument of type 'mockImageObject' is not assignable to
@@ -124,12 +125,10 @@ describe('Edit Thumbnail Modal Component', () => {
     ' svg file', () => {
     spyOn(component, 'isUploadedImageSvg').and.returnValue(true);
     spyOn(component, 'isValidFilename').and.returnValue(true);
-    const resetSpy = spyOn(component, 'reset').and.callThrough();
-    let fileContent = (
-      'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjA' +
-      'wMC9zdmciICB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCI+PGNpcmNsZSBjeD0iNTAiIGN5' +
-      'PSI1MCIgcj0iNDAiIHN0cm9rZT0iZ3JlZW4iIHN0cm9rZS13aWR0aD0iNCIgZmlsbD0ie' +
-      'WVsbG93IiAvPjwvc3ZnPg==');
+    spyOn(svgSanitizerService, 'getInvalidSvgTagsAndAttrsFromDataUri')
+      .and.returnValue({ tags: [], attrs: [] });
+    spyOn(svgSanitizerService, 'removeAllInvalidTagsAndAttributes')
+      .and.returnValue(fileContent);
     let file = new File([fileContent], 'circle.svg', {type: 'image/svg'});
     component.invalidImageWarningIsShown = false;
     component.invalidFilenameWarningIsShown = false;
@@ -139,9 +138,6 @@ describe('Edit Thumbnail Modal Component', () => {
     component.onFileChanged(file);
     expect(component.invalidImageWarningIsShown).toBe(false);
     expect(component.invalidFilenameWarningIsShown).toBe(false);
-    expect(component.tags).toEqual(['script']);
-    expect(component.attrs).toEqual([]);
-    expect(resetSpy).toHaveBeenCalled();
   });
 
   it('should not load file if it is not a svg type', () => {
@@ -192,10 +188,14 @@ describe('Edit Thumbnail Modal Component', () => {
     expect(component.invalidImageWarningIsShown).toBeFalse();
   });
 
-  it('should update bgColor on initialization of modal', () => {
+  it('should update bgColor on changing background color', () => {
     component.bgColor = '#FFFFFF';
-    component.ngOnInit();
-    expect(component.updateBackgroundColor).toHaveBeenCalled();
+    component.thumbnailHasChanged = false;
+
+    component.updateBackgroundColor('#B3D8F1');
+
+    expect(component.bgColor).toBe('#B3D8F1');
+    expect(component.thumbnailHasChanged).toBeTrue();
   });
 
   it('should check for uploaded image to be svg', () => {
@@ -235,6 +235,7 @@ describe('Edit Thumbnail Modal Component', () => {
   });
 
   it('should close the modal when clicking on Add Thumbnail Button', () => {
+    component.thumbnailHasChanged = true;
     component.uploadedImage = 'uploaded_img.svg';
     component.bgColor = '#fff';
     component.openInUploadMode = false;
@@ -243,6 +244,7 @@ describe('Edit Thumbnail Modal Component', () => {
       width: 180
     };
     component.confirm();
+    expect(component.thumbnailHasChanged).toBeFalse();
     expect(closeSpy).toHaveBeenCalledWith({
       newThumbnailDataUrl: 'uploaded_img.svg',
       newBgColor: '#fff',
@@ -257,5 +259,20 @@ describe('Edit Thumbnail Modal Component', () => {
   it('should close the modal on clicking cancel button', () => {
     component.cancel();
     expect(dismissSpy).toHaveBeenCalled();
+  });
+
+  it('should disable \'Add Thumbnail\' button unless a new image is' +
+    ' uploaded', () => {
+    spyOn(component, 'isUploadedImageSvg').and.returnValue(true);
+    spyOn(component, 'isValidFilename').and.returnValue(true);
+    spyOn(svgSanitizerService, 'getInvalidSvgTagsAndAttrsFromDataUri')
+      .and.returnValue({ tags: [], attrs: [] });
+    spyOn(svgSanitizerService, 'removeAllInvalidTagsAndAttributes')
+      .and.returnValue(fileContent);
+    let file = new File([fileContent], 'triangle.svg', {type: 'image/svg'});
+    component.uploadedImageMimeType = 'image/svg+xml';
+    expect(component.thumbnailHasChanged).toBeFalse();
+    component.onFileChanged(file);
+    expect(component.thumbnailHasChanged).toBeTrue();
   });
 });

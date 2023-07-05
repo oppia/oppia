@@ -22,7 +22,8 @@ import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angul
 import { MatTabsModule } from '@angular/material/tabs';
 import { CapitalizePipe } from 'filters/string-utility-filters/capitalize.pipe';
 import { MockTranslatePipe, MockCapitalizePipe } from 'tests/unit-test-utils';
-import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
+import { NgbModal, NgbModalModule, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { BlogAuthorDetailsEditorComponent } from './modal-templates/author-detail-editor-modal.component';
 import { LoaderService } from 'services/loader.service';
 import { AlertsService } from 'services/alerts.service';
 import { BlogDashboardBackendApiService } from 'domain/blog/blog-dashboard-backend-api.service';
@@ -32,6 +33,8 @@ import { BlogDashboardPageComponent } from './blog-dashboard-page.component';
 import { BlogPostSummary } from 'domain/blog/blog-post-summary.model';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 import { of } from 'rxjs';
+import { UserService } from 'services/user.service';
+import { UserInfo } from 'domain/user/user-info.model';
 
 describe('Blog Dashboard Page Component', () => {
   let alertsService: AlertsService;
@@ -41,18 +44,28 @@ describe('Blog Dashboard Page Component', () => {
   let fixture: ComponentFixture<BlogDashboardPageComponent>;
   let loaderService: LoaderService;
   let mockWindowRef: MockWindowRef;
-  let urlInterpolationService: UrlInterpolationService;
   let windowDimensionsService: WindowDimensionsService;
   let resizeEvent = new Event('resize');
+  let ngbModal: NgbModal;
+  let userService: UserService;
+  let blogDashboardData = {
+    displayedAuthorName: 'test_user',
+    authorBio: '',
+    numOfPublishedBlogPosts: 0,
+    numOfDraftBlogPosts: 0,
+    publishedBlogPostSummaryDicts: [],
+    draftBlogPostSummaryDicts: [],
+  };
 
   class MockWindowRef {
     nativeWindow = {
       location: {
         href: '',
         hash: '/',
+        _hashChange: null,
         reload: () => {}
       },
-      open: (url) => {},
+      open: (url: string) => {},
       onhashchange() {
         return this.location._hashChange;
       },
@@ -63,10 +76,12 @@ describe('Blog Dashboard Page Component', () => {
     TestBed.configureTestingModule({
       imports: [
         HttpClientTestingModule,
-        MatTabsModule
+        MatTabsModule,
+        NgbModalModule,
       ],
       declarations: [
         BlogDashboardPageComponent,
+        BlogAuthorDetailsEditorComponent,
         MockTranslatePipe
       ],
       providers: [
@@ -89,7 +104,6 @@ describe('Blog Dashboard Page Component', () => {
         BlogDashboardBackendApiService,
         BlogDashboardPageService,
         LoaderService,
-        UrlInterpolationService,
       ],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
@@ -98,7 +112,7 @@ describe('Blog Dashboard Page Component', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(BlogDashboardPageComponent);
     component = fixture.componentInstance;
-    urlInterpolationService = TestBed.inject(UrlInterpolationService);
+    ngbModal = TestBed.inject(NgbModal);
     mockWindowRef = TestBed.inject(WindowRef) as unknown as MockWindowRef;
     blogDashboardPageService = TestBed.inject(BlogDashboardPageService);
     loaderService = TestBed.inject(LoaderService);
@@ -106,6 +120,7 @@ describe('Blog Dashboard Page Component', () => {
       BlogDashboardBackendApiService);
     windowDimensionsService = TestBed.inject(WindowDimensionsService);
     alertsService = TestBed.inject(AlertsService);
+    userService = TestBed.inject(UserService);
     component.ngOnInit();
   });
 
@@ -170,21 +185,29 @@ describe('Blog Dashboard Page Component', () => {
     }));
 
   it('should initialize main tab', fakeAsync(() => {
-    let defaultImageUrl = 'banner_image_url';
-    let blogDashboardData = {
-      username: 'test_user',
-      profilePictureDataUrl: 'sample_url',
-      numOfPublishedBlogPosts: 0,
-      numOfDraftBlogPosts: 0,
-      publishedBlogPostSummaryDicts: [],
-      draftBlogPostSummaryDicts: [],
+    const sampleUserInfoBackendObject = {
+      roles: ['USER_ROLE'],
+      is_moderator: false,
+      is_curriculum_admin: false,
+      is_super_admin: false,
+      is_topic_manager: false,
+      can_create_collections: true,
+      preferred_site_language_code: null,
+      username: 'tester',
+      email: 'test@test.com',
+      user_is_logged_in: true
     };
-    spyOn(urlInterpolationService, 'getStaticImageUrl')
-      .and.returnValue(defaultImageUrl);
+    const sampleUserInfo = UserInfo.createFromBackendDict(
+      sampleUserInfoBackendObject);
+    spyOn(userService, 'getProfileImageDataUrl').and.returnValue(
+      ['default-image-url-png', 'default-image-url-webp']);
+    spyOn(component, 'showAuthorDetailsEditor');
     spyOn(loaderService, 'showLoadingScreen');
     spyOn(loaderService, 'hideLoadingScreen');
     spyOn(blogDashboardBackendApiService, 'fetchBlogDashboardDataAsync')
       .and.returnValue(Promise.resolve(blogDashboardData));
+    spyOn(userService, 'getUserInfoAsync').and.returnValue(
+      Promise.resolve(sampleUserInfo));
 
     component.initMainTab();
     // As loading screen should be shown irrespective of the response
@@ -194,20 +217,42 @@ describe('Blog Dashboard Page Component', () => {
     tick();
 
     expect(component.blogDashboardData).toEqual(blogDashboardData);
-    expect(component.DEFAULT_PROFILE_PICTURE_URL).toEqual(defaultImageUrl);
     expect(blogDashboardBackendApiService.fetchBlogDashboardDataAsync)
       .toHaveBeenCalled();
-    expect(component.authorProfilePictureUrl).toEqual('sample_url');
+    expect(component.authorProfilePicPngUrl).toEqual('default-image-url-png');
+    expect(component.authorProfilePicWebpUrl).toEqual(
+      'default-image-url-webp');
+    expect(component.showAuthorDetailsEditor).toHaveBeenCalled();
     expect(loaderService.hideLoadingScreen).toHaveBeenCalled();
     expect(windowDimensionsService.isWindowNarrow()).toHaveBeenCalled;
     expect(component.windowIsNarrow).toBe(true);
   }));
 
+  it('should set default profile pictures when username is null',
+    fakeAsync(() => {
+      let userInfo = {
+        getUsername: () => null,
+        isSuperAdmin: () => true
+      };
+      spyOn(component, 'showAuthorDetailsEditor');
+      spyOn(loaderService, 'showLoadingScreen');
+      spyOn(loaderService, 'hideLoadingScreen');
+      spyOn(blogDashboardBackendApiService, 'fetchBlogDashboardDataAsync')
+        .and.returnValue(Promise.resolve(blogDashboardData));
+      spyOn(userService, 'getUserInfoAsync')
+        .and.resolveTo(userInfo as UserInfo);
+
+      component.initMainTab();
+      tick();
+
+      expect(component.authorProfilePicPngUrl).toEqual(
+        '/assets/images/avatar/user_blue_150px.png');
+      expect(component.authorProfilePicWebpUrl).toEqual(
+        '/assets/images/avatar/user_blue_150px.webp');
+    }));
+
   it('should display alert when unable to fetch blog dashboard data',
     fakeAsync(() => {
-      let defaultImageUrl = 'banner_image_url';
-      spyOn(urlInterpolationService, 'getStaticImageUrl')
-        .and.returnValue(defaultImageUrl);
       spyOn(loaderService, 'showLoadingScreen');
       spyOn(blogDashboardBackendApiService, 'fetchBlogDashboardDataAsync')
         .and.returnValue(Promise.reject(500));
@@ -216,7 +261,6 @@ describe('Blog Dashboard Page Component', () => {
       component.ngOnInit();
       tick();
 
-      expect(component.DEFAULT_PROFILE_PICTURE_URL).toEqual(defaultImageUrl);
       expect(loaderService.showLoadingScreen).toHaveBeenCalled();
       expect(blogDashboardBackendApiService.fetchBlogDashboardDataAsync)
         .toHaveBeenCalled();
@@ -260,7 +304,8 @@ describe('Blog Dashboard Page Component', () => {
   ' add it to drafts list', () => {
     let summaryObject = BlogPostSummary.createFromBackendDict(
       { id: 'sampleId',
-        author_username: 'test_user',
+        author_username: 'test_username',
+        displayed_author_name: 'test_user',
         title: 'Title',
         summary: 'Hello World',
         tags: ['news'],
@@ -270,8 +315,8 @@ describe('Blog Dashboard Page Component', () => {
         published_on: '3232323',
       });
     let blogDashboardData = {
-      username: 'test_user',
-      profilePictureDataUrl: 'sample_url',
+      displayedAuthorName: 'test_user',
+      authorBio: 'bio',
       numOfPublishedBlogPosts: 1,
       numOfDraftBlogPosts: 0,
       publishedBlogPostSummaryDicts: [summaryObject],
@@ -295,7 +340,8 @@ describe('Blog Dashboard Page Component', () => {
   'published blog post is deleted', () => {
     let summaryObject = BlogPostSummary.createFromBackendDict(
       { id: 'sampleId',
-        author_username: 'test_user',
+        author_username: 'test_username',
+        displayed_author_name: 'test_user',
         title: 'Title',
         summary: 'Hello World',
         tags: ['news'],
@@ -305,8 +351,8 @@ describe('Blog Dashboard Page Component', () => {
         published_on: '3232323',
       });
     let blogDashboardData = {
-      username: 'test_user',
-      profilePictureDataUrl: 'sample_url',
+      displayedAuthorName: 'test_user',
+      authorBio: 'Bio',
       numOfPublishedBlogPosts: 0,
       numOfDraftBlogPosts: 0,
       publishedBlogPostSummaryDicts: [summaryObject],
@@ -325,7 +371,8 @@ describe('Blog Dashboard Page Component', () => {
   'draft blog post is deleted', () => {
     let summaryObject = BlogPostSummary.createFromBackendDict(
       { id: 'sampleId',
-        author_username: 'test_user',
+        author_username: 'test_username',
+        displayed_author_name: 'test_user',
         title: 'Title',
         summary: 'Hello World',
         tags: ['news'],
@@ -335,8 +382,8 @@ describe('Blog Dashboard Page Component', () => {
         published_on: '3232323',
       });
     let blogDashboardData = {
-      username: 'test_user',
-      profilePictureDataUrl: 'sample_url',
+      displayedAuthorName: 'test_user',
+      authorBio: 'Bio',
       numOfPublishedBlogPosts: 0,
       numOfDraftBlogPosts: 0,
       publishedBlogPostSummaryDicts: [],
@@ -349,4 +396,88 @@ describe('Blog Dashboard Page Component', () => {
     expect(component.blogDashboardData.draftBlogPostSummaryDicts).toEqual(
       []);
   });
+
+  it('should display alert when unable to update author details', fakeAsync(
+    () => {
+      component.authorName = 'new username';
+      component.authorBio = 'Oppia Blog Author';
+      spyOn(blogDashboardBackendApiService, 'updateAuthorDetailsAsync')
+        .and.returnValue(Promise.reject(
+          'Server responded with backend error.'));
+      spyOn(alertsService, 'addWarning');
+
+      component.updateAuthorDetails();
+      tick();
+
+      expect(blogDashboardBackendApiService.updateAuthorDetailsAsync)
+        .toHaveBeenCalled();
+      expect(alertsService.addWarning).toHaveBeenCalledWith(
+        'Unable to update author details. Error: Server responded with' +
+        ' backend error.');
+    })
+  );
+
+  it('should successfully update author details', fakeAsync(() => {
+    component.authorName = 'new username';
+    component.authorBio = 'Oppia Blog Author';
+    let BlogAuthorDetails = {
+      displayedAuthorName: 'new username',
+      authorBio: 'Oppia Blog Author'
+    };
+    spyOn(blogDashboardBackendApiService, 'updateAuthorDetailsAsync')
+      .and.returnValue(Promise.resolve(BlogAuthorDetails));
+    spyOn(alertsService, 'addSuccessMessage');
+
+    component.updateAuthorDetails();
+    tick();
+
+    expect(blogDashboardBackendApiService.updateAuthorDetailsAsync)
+      .toHaveBeenCalled();
+    expect(alertsService.addSuccessMessage).toHaveBeenCalledWith(
+      'Author Details saved successfully.');
+  }));
+
+  it('should cancel updating author details', fakeAsync(() => {
+    spyOn(ngbModal, 'open').and.returnValue({
+      componentInstance: {
+        authorName: '',
+        authorBio: ''
+      },
+      result: Promise.reject()
+    } as NgbModalRef);
+    spyOn(component, 'updateAuthorDetails');
+    component.authorBio = '';
+    component.authorName = 'test username';
+
+    component.showAuthorDetailsEditor();
+    tick();
+
+    expect(component.updateAuthorDetails).not.toHaveBeenCalled();
+  }));
+
+  it('should successfully place call to update author details', fakeAsync(
+    () => {
+      component.authorBio = '';
+      component.authorName = 'test username';
+      let updatedAuthorDetails = {
+        authorName: 'username',
+        authorBio: 'general bio'
+      };
+      spyOn(ngbModal, 'open').and.returnValue({
+        componentInstance: {
+          authorName: '',
+          authorBio: ''
+        },
+        result: Promise.resolve(updatedAuthorDetails)
+      } as NgbModalRef);
+      spyOn(component, 'updateAuthorDetails');
+
+      component.showAuthorDetailsEditor();
+      tick();
+
+      expect(component.updateAuthorDetails).toHaveBeenCalled();
+      expect(component.authorBio).toBe('general bio');
+      expect(component.authorName).toBe('username');
+    })
+  );
 });

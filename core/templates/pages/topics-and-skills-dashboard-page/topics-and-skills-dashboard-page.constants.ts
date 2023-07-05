@@ -15,7 +15,7 @@
 /**
  * @fileoverview Constants for the topics and skills dashboard.
  */
-import constants from 'assets/constants';
+import { AppConstants } from 'app.constants';
 
 export enum ETopicSortOptions {
   IncreasingCreatedOn = 'Newly Created',
@@ -37,8 +37,8 @@ export const TopicsAndSkillsDashboardPageConstants = {
     STATUS_DISABLED: 'disabled'
   },
   TOPIC_SORT_OPTIONS: (
-    constants.TOPIC_SKILL_DASHBOARD_SORT_OPTIONS),
+    AppConstants.TOPIC_SKILL_DASHBOARD_SORT_OPTIONS),
   TOPIC_PUBLISHED_OPTIONS: ETopicPublishedOptions,
   TOPIC_FILTER_CLASSROOM_ALL: 'All',
-  SKILL_STATUS_OPTIONS: constants.SKILL_STATUS_OPTIONS
+  SKILL_STATUS_OPTIONS: AppConstants.SKILL_STATUS_OPTIONS
 } as const;

@@ -1,0 +1,93 @@
+<div class="oppia-learner-group-view-assigned-syllabus">
+  <div *ngIf="learnerGroup" class="assigned-syllabus-tab-title-section">
+    <div class="assigned-syllabus-tab-title">
+      <span translate="I18N_ASSIGNED_STORIES_AND_SKILLS"></span>
+    </div>
+  </div>
+  <div *ngIf="learnerGroup" class="learner-group-assigned-syllabus">
+    <div *ngFor="let displayedItem of displayOrderOfSyllabusItems">
+      <div *ngIf="isDisplayedItemStory(displayedItem)" class="assigned-sylabus-card">
+        <div class="assigned-syllabus-item-image" [ngStyle]="{'background-color': storySummaries[getIndexToDisplay(displayedItem)].getThumbnailBgColor()}">
+          <img class="thumbnail-image assigned-syllabus-item-image" [src]="getStoryThumbnailUrl(storySummaries[getIndexToDisplay(displayedItem)])">
+          <div class="type-tag-pill">
+            {{ 'I18N_TOPIC_VIEWER_LESSONS' | translate }}
+            <div class="type-tag-pill-design"></div>
+          </div>
+        </div>
+        <div class="assigned-syllabus-info">
+          <div class="same-row-container">
+            <div class="assigned-syllabus-topic-info">
+              <span class="assigned-syllabus-topic-title">
+                {{ storySummaries[getIndexToDisplay(displayedItem)].getTopicName() }}
+              </span>
+              <span> &#183; {{ storySummaries[getIndexToDisplay(displayedItem)].getNodeTitles().length }} Chapters</span>
+            </div>
+            <div class="progress-circle-container">
+              <div class="circle-border"
+                   [ngStyle]="{'background-image': calculateCircularProgressCss(getProgressOfStory(storySummaries[getIndexToDisplay(displayedItem)]))}">
+                <div class="circle">
+                </div>
+              </div>
+              <span class="progress-text">
+                <span class="progress-translate" [innerHTML]="'I18N_LEARNER_DASHBOARD_SUBTOPIC_PROGRESS' | translate"></span>
+                {{ getProgressOfStory(storySummaries[getIndexToDisplay(displayedItem)]) }}%
+              </span>
+            </div>
+          </div>
+          <div class="assigned-syllabus-card-title">
+            <a [href]="getStoryLink(storySummaries[getIndexToDisplay(displayedItem)])">
+              {{ storySummaries[getIndexToDisplay(displayedItem)].getTitle() }}
+            </a>
+          </div>
+          <div class="assigned-syllabus-card-description">
+            <a [href]="getStoryNodeLink(storySummaries[getIndexToDisplay(displayedItem)])"
+               class="btn-primary" *ngIf="storySummaries[getIndexToDisplay(displayedItem)].getCompletedNodeTitles().length == 0">
+              <span translate="I18N_GET_STARTED_PAGE_HEADING"></span>
+            </a>
+            <a [href]="getStoryNodeLink(storySummaries[getIndexToDisplay(displayedItem)])"
+               class="btn-primary" *ngIf="storySummaries[getIndexToDisplay(displayedItem)].getCompletedNodeTitles().length > 0">
+              <span translate="I18N_PLAYER_CONTINUE_BUTTON"></span>
+            </a>
+          </div>
+        </div>
+      </div>
+      <div *ngIf="isDisplayedItemSubtopic(displayedItem)" class="assigned-sylabus-card">
+        <div class="assigned-syllabus-item-image" [ngStyle]="{'background-color': subtopicSummaries[getIndexToDisplay(displayedItem)].thumbnailBgColor}">
+          <img class="thumbnail-image assigned-syllabus-item-image" [src]="getSubtopicThumbnailUrl(subtopicSummaries[getIndexToDisplay(displayedItem)])">
+          <div class="type-tag-pill">{{ 'I18N_SYLLABUS_SKILL_TITLE' | translate }}</div>
+        </div>
+        <div class="assigned-syllabus-info">
+          <div class="same-row-container">
+            <div class="assigned-syllabus-topic-info assigned-syllabus-topic-title">
+              {{ subtopicSummaries[getIndexToDisplay(displayedItem)].parentTopicName }}
+            </div>
+            <div class="progress-circle-container">
+              <div class="circle-border"
+                   [ngStyle]="{'background-image': calculateCircularProgressCss(subtopicSummaries[getIndexToDisplay(displayedItem)].subtopicMastery * 100)}">
+                <div class="circle">
+                </div>
+              </div>
+              <span class="progress-text">
+                {{ getSubtopicMasteryLevel(subtopicSummaries[getIndexToDisplay(displayedItem)]) | translate }}
+              </span>
+            </div>
+          </div>
+          <div class="assigned-syllabus-card-title">
+            <span>{{ subtopicSummaries[getIndexToDisplay(displayedItem)].subtopicTitle }}</span>
+          </div>
+          <div class="assigned-syllabus-card-description">
+            <a [href]="getPracticeSessionLink(subtopicSummaries[getIndexToDisplay(displayedItem)])"
+               class="btn-primary">
+              <span translate="I18N_PRACTICE_SESSION_START_BUTTON_TEXT"></span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div *ngIf="displayOrderOfSyllabusItems && displayOrderOfSyllabusItems.length === 0">
+      <div class="assigned-syllabus-empty-message">
+        <span translate="I18N_ASSIGNED_STORIES_AND_SKILLS_EMPTY_MESSAGE"></span>
+      </div>
+    </div>
+  </div>
+</div>

@@ -20,6 +20,7 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { CollectionNode } from 'domain/collection/collection-node.model';
+import { CollectionPlaythrough } from 'domain/collection/collection-playthrough.model';
 import { Collection } from 'domain/collection/collection.model';
 import { CollectionEditorStateService } from '../services/collection-editor-state.service';
 import { CollectionLinearizerService } from '../services/collection-linearizer.service';
@@ -32,7 +33,8 @@ describe('Collection editor tab component', () => {
   let collectionEditorStateService: CollectionEditorStateService;
   let collectionLinearizerService: CollectionLinearizerService;
 
-  let mockCollection = new Collection('', '', '', '', [], null, '', 0, 1, []);
+  let mockCollection = new Collection(
+    '', '', '', '', [], new CollectionPlaythrough(null, []), '', 0, 1, []);
 
 
   beforeEach(waitForAsync(() => {

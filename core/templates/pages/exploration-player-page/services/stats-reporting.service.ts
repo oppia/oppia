@@ -49,29 +49,32 @@ export class StatsReportingService {
     this.refreshAggregatedStats();
   }
 
-  explorationId: string = null;
-  explorationTitle: string = null;
-  explorationVersion: number = null;
-  sessionId: string = null;
-  stateStopwatch: Stopwatch = null;
-  optionalCollectionId: string = null;
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  explorationId!: string;
+  explorationTitle!: string;
+  explorationVersion!: number;
+  sessionId!: string;
+  stateStopwatch!: Stopwatch;
+  optionalCollectionId!: string;
+  currentStateName!: string;
+  nextExpId!: string;
+  previousStateName!: string;
+  nextStateName!: string;
+  topicName!: string;
+  private editorPreviewMode: boolean = false;
+  private questionPlayerMode: boolean = false;
   statesVisited: Set<string> = new Set();
   explorationStarted: boolean = false;
   explorationActuallyStarted: boolean = false;
   explorationIsComplete: boolean = false;
-  currentStateName: string = null;
-  nextExpId: string = null;
-  previousStateName: string = null;
-  nextStateName: string = null;
-  topicName: string = null;
-  private editorPreviewMode: boolean = null;
-  private questionPlayerMode: boolean = null;
   private MINIMUM_NUMBER_OF_VISITED_STATES = 3;
 
   // The following dict will contain all stats data accumulated over the
   // interval time and will be reset when the dict is sent to backend for
   // recording.
-  aggregatedStats: AggregatedStats = null;
+  aggregatedStats!: AggregatedStats;
 
   private refreshAggregatedStats(): void {
     this.aggregatedStats = {
@@ -199,7 +202,7 @@ export class StatsReportingService {
       });
 
     this.statesVisited.add(stateName);
-    this.siteAnalyticsService.registerNewCard(1);
+    this.siteAnalyticsService.registerNewCard(1, this.explorationId);
 
     this.stateStopwatch.reset();
     this.explorationStarted = true;
@@ -274,7 +277,8 @@ export class StatsReportingService {
   // on the oldStateName.
   recordStateTransition(
       oldStateName: string, newStateName: string, answer: string,
-      oldParams: Object, isFirstHit: boolean): void {
+      oldParams: Object, isFirstHit: boolean,
+      chapterNumber: string, cardCount: string, language: string): void {
     this.createDefaultStateStatsMappingIfMissing(newStateName);
     this.aggregatedStats.state_stats_mapping[
       newStateName].total_hit_count += 1;
@@ -313,14 +317,31 @@ export class StatsReportingService {
     if (!this.statesVisited.has(newStateName)) {
       this.statesVisited.add(newStateName);
       this.siteAnalyticsService.registerNewCard(
-        this.statesVisited.size);
+        this.statesVisited.size,
+        this.explorationId);
     }
     let numberOfStatesVisited = this.statesVisited.size;
     if (numberOfStatesVisited === this.MINIMUM_NUMBER_OF_VISITED_STATES) {
       let urlParams = this.urlService.getUrlParams();
+      this.siteAnalyticsService.registerLessonEngagedWithEvent(
+        this.explorationId,
+        language
+      );
       if (urlParams.hasOwnProperty('classroom_url_fragment')) {
-        this.siteAnalyticsService.registerClassroomLessonActiveUse(
-          this.topicName, this.explorationId);
+        this.siteAnalyticsService.registerClassroomLessonEngagedWithEvent(
+          urlParams.classroom_url_fragment,
+          this.topicName,
+          this.explorationTitle,
+          this.explorationId,
+          chapterNumber,
+          cardCount,
+          language
+        );
+      } else {
+        this.siteAnalyticsService.registerCommunityLessonEngagedWithEvent(
+          this.explorationId,
+          language
+        );
       }
       this.siteAnalyticsService.registerLessonActiveUse();
     }
@@ -351,7 +372,13 @@ export class StatsReportingService {
 
   // The type of params is declared as Object since it can vary depending
   // on the stateName.
-  recordExplorationCompleted(stateName: string, params: Object): void {
+  recordExplorationCompleted(
+      stateName: string,
+      params: Object,
+      chapterNumber: string,
+      cardCount: string,
+      language: string
+  ): void {
     this.aggregatedStats.num_completions += 1;
     this.currentStateName = stateName;
 
@@ -381,7 +408,18 @@ export class StatsReportingService {
     let urlParams = this.urlService.getUrlParams();
     if (urlParams.hasOwnProperty('classroom_url_fragment')) {
       this.siteAnalyticsService.registerCuratedLessonCompleted(
-        this.topicName, this.explorationId);
+        urlParams.classroom_url_fragment,
+        this.topicName,
+        this.explorationTitle,
+        this.explorationId,
+        chapterNumber,
+        cardCount,
+        language
+      );
+    } else {
+      this.siteAnalyticsService.registerCommunityLessonCompleted(
+        this.explorationId
+      );
     }
 
     this.postStatsToBackend();

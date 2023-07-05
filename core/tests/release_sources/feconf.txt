@@ -25,7 +25,4 @@ ADMIN_EMAIL_ADDRESS = 'adm@example.com'
 SYSTEM_EMAIL_ADDRESS = 'sys@example.com'
 NOREPLY_EMAIL_ADDRESS = 'norep@example.com'
 
-MAILGUN_API_KEY = None
-MAILCHIMP_API_KEY = None
-
 OPPIA_VERSION = '3.1.4'

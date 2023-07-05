@@ -1,0 +1,164 @@
+<div class="learner-topic-goals-summary-tile" *ngIf="incompleteStoryNodes.length > 0">
+  <mat-card class="oppia-story-dashboard-card" (mouseenter)="cardIsHovered=true" (mouseleave)="cardIsHovered=false">
+    <a [href]="getStoryNodeLink()" target="{{ openInNewWindow ? '_blank' : '_self' }}" class="oppia-story-link">
+      <div class="story-card">
+        <div class="oppia-title-section" [ngStyle]="{'background-color': thumbnailBgColor}">
+          <!-- We add an empty alt text so that the screen reader does not read the thumbnail image filename and ignores it as the thumbnail does not convey any significant information. -->
+          <img alt="" class="oppia-thumbnail-image" [src]="thumbnailUrl" [attr.style]="isCardHovered()">
+          <div class="oppia-story-completion">
+            <img [src]="starImageUrl" alt="star image" class="oppia-svg-star-image" *ngIf="storyCompleted">
+            <p class="oppia-percent-story-completed" [ngClass]="{'oppia-story-completed-percent': storyCompleted}">
+              {{storyProgress}}% Complete
+            </p>
+          </div>
+        </div>
+        <div class="oppia-summary-section">
+          <span class="oppia-story-node-title e2e-test-story-node-name-in-learner-topic-goals-summary-tile">
+            {{storyNodeTitle}}
+          </span>
+          <span class="oppia-story-title e2e-test-story-name-in-learner-topic-goals-summary-tile">
+            {{storyName}}
+          </span>
+        </div>
+      </div>
+      <div class="continue-button" *ngIf="isCardHovered()">
+        <p class="continue-button-text">
+          Continue
+        </p>
+      </div>
+    </a>
+  </mat-card>
+</div>
+<style>
+  .learner-topic-goals-summary-tile .oppia-story-node-title {
+    color: #333;
+    display: inline-block;
+    font-size: 16px;
+    height: 40px;
+    letter-spacing: 0;
+    margin: 8px 8px 0 8px;
+    opacity: 1;
+    text-align: left;
+  }
+  .learner-topic-goals-summary-tile .next-incomplete-chapter {
+    color: #333;
+    font-size: 17px;
+    font-weight: 500;
+    margin: 24px 0 12px 6px;
+    text-align: left;
+  }
+  .learner-topic-goals-summary-tile .continue-button {
+    background: #00645c 0% 0% no-repeat padding-box;
+    border-radius: 4px;
+    bottom: 217px;
+    box-shadow: 0 2px 2px #0000003d;
+    display: none;
+    height: 28px;
+    left: 40px;
+    position: relative;
+    width: 112px;
+  }
+  .learner-topic-goals-summary-tile .continue-button-text {
+    color: #fff;
+    font-size: 14px;
+    left: 1px;
+    letter-spacing: 0;
+    position: relative;
+    text-align: center;
+    text-transform: uppercase;
+    top: 6px;
+  }
+  .learner-topic-goals-summary-tile .oppia-story-completion {
+    background: #000c 0% 0% no-repeat padding-box;
+    border-radius: 2px;
+    bottom: 23px;
+    float: right;
+    height: 19px;
+    margin: 0 8px 0 8px;
+    position: relative;
+    right: 4px;
+    text-align: left;
+    width: 90px;
+  }
+  .learner-topic-goals-summary-tile .story-completion {
+    bottom: 52px;
+  }
+  .learner-topic-goals-summary-tile .oppia-svg-star-image {
+    bottom: 3px;
+    filter: invert(95%) sepia(49%) saturate(2374%) hue-rotate(320deg) brightness(91%) contrast(89%);
+    left: 3px;
+    position: relative;
+    width: 11px;
+  }
+  .learner-topic-goals-summary-tile .oppia-story-link {
+    text-decoration: none;
+  }
+  .learner-topic-goals-summary-tile .story-card {
+    height: 100%;
+  }
+  .learner-topic-goals-summary-tile .oppia-summary-section {
+    position: absolute;
+    width: 100%;
+  }
+  .learner-topic-goals-summary-tile .oppia-story-title {
+    color: #333;
+    display: block;
+    font-size: 14px;
+    font-weight: 300;
+    height: 16px;
+    letter-spacing: 0.05px;
+    margin: 4px 8px 12px 8px;
+    padding-bottom: 12px;
+    text-align: left;
+    text-transform: uppercase;
+    width: 188px;
+  }
+  .learner-topic-goals-summary-tile .oppia-story-completed-percent {
+    bottom: 24px;
+    color: #fff;
+    font-size: 10px;
+    left: 11px;
+    letter-spacing: 0;
+    margin: 2px;
+    padding: 2px;
+    position: relative;
+    width: 100%;
+  }
+  .learner-topic-goals-summary-tile .oppia-percent-story-completed {
+    color: #fff;
+    font-size: 10px;
+    letter-spacing: 0;
+    margin: 2px;
+    padding: 2px;
+    width: 100%;
+  }
+  .learner-topic-goals-summary-tile .oppia-story-dashboard-card {
+    border-radius: 4px;
+    box-shadow: 0 3px 6px #00000029;
+    display: inline-block;
+    height: 270px;
+    margin: 0 2px 30px 6px;
+    padding: 0;
+    position: relative;
+    width: 192px;
+    z-index: 5;
+  }
+  .learner-topic-goals-summary-tile .oppia-title-section {
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
+    height: 144px;
+    width: 192px;
+  }
+  .learner-topic-goals-summary-tile .oppia-thumbnail-image {
+    height: 144px;
+    width: 192px;
+  }
+  .learner-topic-goals-summary-tile .oppia-story-dashboard-card .continue-button:hover {
+    display: block;
+    float: left;
+  }
+  .learner-topic-goals-summary-tile .oppia-story-dashboard-card:hover .continue-button {
+    display: block;
+    float: left;
+  }
+</style>

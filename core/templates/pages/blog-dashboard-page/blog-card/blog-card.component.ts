@@ -21,7 +21,11 @@ import { AppConstants } from 'app.constants';
 import { BlogPostSummary } from 'domain/blog/blog-post-summary.model';
 import { AssetsBackendApiService } from 'services/assets-backend-api.service';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
+import { BlogPostPageConstants } from 'pages/blog-post-page/blog-post-page.constants';
+import { WindowRef } from 'services/contextual/window-ref.service';
+import { ContextService } from 'services/context.service';
 import dayjs from 'dayjs';
+import { UserService } from 'services/user.service';
 
 @Component({
   selector: 'oppia-blog-card',
@@ -29,18 +33,22 @@ import dayjs from 'dayjs';
 })
 export class BlogCardComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks
-  // and we need to do non-null assertion, for more information see
+  // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() blogPostSummary!: BlogPostSummary;
-  @Input() authorProfilePicDataUrl!: string;
-  authorProfilePictureUrl!: string;
-  DEFAULT_PROFILE_PICTURE_URL: string = '';
+  @Input() shownOnblogPostPage!: boolean;
+  authorProfilePicPngUrl!: string;
+  authorProfilePicWebpUrl!: string;
   thumbnailUrl: string = '';
   publishedDateString: string = '';
+  blogCardPreviewModeIsActive: boolean = false;
 
   constructor(
+    private windowRef: WindowRef,
     private assetsBackendApiService: AssetsBackendApiService,
     private urlInterpolationService: UrlInterpolationService,
+    private contextService: ContextService,
+    private userService: UserService
   ) {}
 
   ngOnInit(): void {
@@ -50,19 +58,30 @@ export class BlogCardComponent implements OnInit {
           AppConstants.ENTITY_TYPE.BLOG_POST, this.blogPostSummary.id,
           this.blogPostSummary.thumbnailFilename);
     }
-    this.DEFAULT_PROFILE_PICTURE_URL = this.urlInterpolationService
-      .getStaticImageUrl('/general/no_profile_picture.png');
-    this.authorProfilePictureUrl = decodeURIComponent((
-      this.authorProfilePicDataUrl || this.DEFAULT_PROFILE_PICTURE_URL));
+    [this.authorProfilePicPngUrl, this.authorProfilePicWebpUrl] = (
+      this.userService.getProfileImageDataUrl(
+        this.blogPostSummary.authorUsername));
     const publishedOn = this.blogPostSummary.publishedOn;
     if (publishedOn === undefined) {
       throw new Error('Blog Post Summary published date is not defined');
     }
     this.publishedDateString = this.getDateStringInWords(publishedOn);
+    this.blogCardPreviewModeIsActive = (
+      this.contextService.isInBlogPostEditorPage());
   }
 
   getDateStringInWords(naiveDate: string): string {
     return dayjs(
       naiveDate.split(',')[0], 'MM-DD-YYYY').format('MMMM D, YYYY');
+  }
+
+  navigateToBlogPostPage(): void {
+    if (!this.blogCardPreviewModeIsActive) {
+      let blogPostUrl = this.urlInterpolationService.interpolateUrl(
+        BlogPostPageConstants.BLOG_POST_PAGE_URL_TEMPLATE,
+        { blog_post_url: this.blogPostSummary.urlFragment }
+      );
+      this.windowRef.nativeWindow.location.href = blogPostUrl;
+    }
   }
 }

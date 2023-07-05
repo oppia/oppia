@@ -26,7 +26,7 @@
             matSuffix
             class="job-start-button"
             color="primary"
-            [disabled]="selectedJob === null"
+            [disabled]="selectedJob === undefined"
             (click)="onStartNewClick($event)">
       <mat-icon>play_arrow</mat-icon>
     </button>

@@ -42,6 +42,7 @@ export class CodeReplRulesService {
       this.codeNormalizer.getNormalizedCode(inputs.x);
     return normalizedCode === normalizedExpectedCode;
   }
+
   CodeContains(
       answer: CodeReplAnswer,
       inputs: CodeReplRuleInputs): boolean {
@@ -51,6 +52,7 @@ export class CodeReplRulesService {
       this.codeNormalizer.getNormalizedCode(inputs.x);
     return normalizedCode.indexOf(normalizedSnippet) !== -1;
   }
+
   CodeDoesNotContain(
       answer: CodeReplAnswer,
       inputs: CodeReplRuleInputs): boolean {
@@ -60,6 +62,7 @@ export class CodeReplRulesService {
       this.codeNormalizer.getNormalizedCode(inputs.x);
     return normalizedCode.indexOf(normalizedSnippet) === -1;
   }
+
   OutputContains(
       answer: CodeReplAnswer,
       inputs: CodeReplRuleInputs): boolean {
@@ -67,6 +70,7 @@ export class CodeReplRulesService {
     var normalizedSnippet = this.normalizeWhitespace.transform(inputs.x);
     return normalizedOutput.indexOf(normalizedSnippet) !== -1;
   }
+
   OutputEquals(
       answer: CodeReplAnswer,
       inputs: CodeReplRuleInputs): boolean {
@@ -75,9 +79,11 @@ export class CodeReplRulesService {
       this.normalizeWhitespace.transform(inputs.x);
     return normalizedOutput === normalizedExpectedOutput;
   }
+
   ResultsInError(answer: CodeReplAnswer): boolean {
     return !!(answer.error.trim());
   }
+
   ErrorContains(
       answer: CodeReplAnswer,
       inputs: CodeReplRuleInputs): boolean {

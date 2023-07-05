@@ -20,7 +20,6 @@ import { APP_BASE_HREF } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { Route, RouterModule } from '@angular/router';
 import { AppConstants } from 'app.constants';
-import { CanAccessSplashPageGuard } from './guards/can-access-splash-page.guard';
 
 
 // All paths must be defined in constants.ts file.
@@ -38,10 +37,23 @@ const routes: Route[] = [
       .then(m => m.AboutFoundationPageModule)
   },
   {
-    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.CLASSROOM.ROUTE,
-    pathMatch: 'full',
-    loadChildren: () => import('pages/classroom-page/classroom-page.module')
-      .then(m => m.ClassroomPageModule)
+    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.EXPLORATION_PLAYER.ROUTE,
+    loadChildren: () => import(
+      'pages/exploration-player-page/exploration-player-page.module')
+      .then(m => m.ExplorationPlayerPageModule)
+  },
+  {
+    path: (
+      AppConstants.PAGES_REGISTERED_WITH_FRONTEND
+        .EXPLORATION_PLAYER_EMBED.ROUTE),
+    loadChildren: () => import(
+      'pages/exploration-player-page/exploration-player-page.module')
+      .then(m => m.ExplorationPlayerPageModule)
+  },
+  {
+    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ANDROID.ROUTE,
+    loadChildren: () => import('pages/android-page/android-page.module')
+      .then(m => m.AndroidPageModule)
   },
   {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.DELETE_ACCOUNT.ROUTE,
@@ -52,8 +64,8 @@ const routes: Route[] = [
   },
   {
     path: (
-      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.PENDING_ACCOUNT_DELETION
-        .ROUTE),
+      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.PENDING_ACCOUNT_DELETION.ROUTE
+    ),
     loadChildren: () => import(
       'pages/pending-account-deletion-page/' +
       'pending-account-deletion-page.module')
@@ -72,8 +84,8 @@ const routes: Route[] = [
   },
   {
     path: (
-      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.RELEASE_COORDINATOR_PAGE
-        .ROUTE),
+      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.RELEASE_COORDINATOR_PAGE.ROUTE
+    ),
     loadChildren: () => import(
       'pages/release-coordinator-page/release-coordinator-page.module')
       .then(m => m.ReleaseCoordinatorPageModule)
@@ -93,7 +105,8 @@ const routes: Route[] = [
   {
     path: (
       AppConstants.PAGES_REGISTERED_WITH_FRONTEND.LIBRARY_RECENTLY_PUBLISHED
-        .ROUTE),
+        .ROUTE
+    ),
     pathMatch: 'full',
     loadChildren: () => import('pages/library-page/library-page.module')
       .then(m => m.LibraryPageModule)
@@ -103,13 +116,6 @@ const routes: Route[] = [
     pathMatch: 'full',
     loadChildren: () => import('pages/library-page/library-page.module')
       .then(m => m.LibraryPageModule)
-  },
-  {
-    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.SPLASH.ROUTE,
-    pathMatch: 'full',
-    canLoad: [CanAccessSplashPageGuard],
-    loadChildren: () => import('pages/splash-page/splash-page.module')
-      .then(m => m.SplashPageModule)
   },
   {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.STORY_VIEWER.ROUTE,
@@ -189,6 +195,49 @@ const routes: Route[] = [
     loadChildren: () => import(
       'pages/volunteer-page/volunteer-page.module')
       .then(m => m.VolunteerPageModule)
+  },
+  {
+    path: (
+      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.LEARNER_GROUP_VIEWER.ROUTE
+    ),
+    pathMatch: 'full',
+    loadChildren: () => import(
+      'pages/learner-group-pages/view-group/view-learner-group-page.module')
+      .then(m => m.ViewLearnerGroupPageModule)
+  },
+  {
+    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.BLOG_HOMEPAGE.ROUTE,
+    pathMatch: 'full',
+    loadChildren: () => import(
+      'pages/blog-home-page/blog-home-page.module')
+      .then(m => m.BlogHomePageModule)
+  },
+  {
+    path: (
+      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.BLOG_HOMEPAGE_SEARCH.ROUTE
+    ),
+    pathMatch: 'full',
+    loadChildren: () => import(
+      'pages/blog-home-page/blog-home-page.module')
+      .then(m => m.BlogHomePageModule)
+  },
+  {
+    path: (
+      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.BLOG_AUTHOR_PROFILE_PAGE.ROUTE
+    ),
+    pathMatch: 'full',
+    loadChildren: () => import(
+      'pages/blog-author-profile-page/blog-author-profile-page.module')
+      .then(m => m.BlogAuthorProfilePageModule)
+  },
+  {
+    path: (
+      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.BLOG_POST_PAGE.ROUTE
+    ),
+    pathMatch: 'full',
+    loadChildren: () => import(
+      'pages/blog-post-page/blog-post-page.module')
+      .then(m => m.BlogPostPageModule)
   }
 ];
 

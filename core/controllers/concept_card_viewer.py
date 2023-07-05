@@ -21,32 +21,34 @@ from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import skill_fetchers
 
+from typing import Dict, List
 
-class ConceptCardDataHandler(base.BaseHandler):
+
+class ConceptCardDataHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
     """A card that shows the explanation of a skill's concept."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS = {
-        'comma_separated_skill_ids': {
+        'selected_skill_ids': {
             'schema': {
-                'type': 'basestring'
+                'type': 'custom',
+                'obj_type': 'JsonEncodedInString'
             }
         }
     }
-    HANDLER_ARGS_SCHEMAS = {
-        'GET': {}
-    }
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.can_view_skills
-    def get(self, comma_separated_skill_ids):
+    def get(self, selected_skill_ids: List[str]) -> None:
         """Handles GET requests.
 
         Args:
-            comma_separated_skill_ids: str. Comma separated IDs of skills.
+            selected_skill_ids: list(str). List of skill ids.
         """
 
-        skill_ids = comma_separated_skill_ids.split(',')
-        skills = skill_fetchers.get_multi_skills(skill_ids)
+        skills = skill_fetchers.get_multi_skills(selected_skill_ids)
 
         concept_card_dicts = []
         for skill in skills:

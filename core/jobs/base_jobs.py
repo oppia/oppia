@@ -60,7 +60,7 @@ from core.jobs.types import job_run_result
 
 import apache_beam as beam
 
-from typing import Any, Dict, List, Tuple, Type, cast # isort: skip
+from typing import Dict, List, Tuple, Type, cast # isort: skip
 
 
 class JobMetaclass(type):
@@ -79,7 +79,7 @@ class JobMetaclass(type):
             cls: Type[JobMetaclass],
             name: str,
             bases: Tuple[type, ...],
-            namespace: Dict[str, Any]
+            namespace: Dict[str, str]
     ) -> JobMetaclass:
         """Creates a new job class with type `JobMetaclass`.
 
@@ -102,6 +102,11 @@ class JobMetaclass(type):
 
         Returns:
             class. The new class instance.
+
+        Raises:
+            TypeError. The given name is already in use.
+            TypeError. The given name must end with "Job".
+            TypeError. The class with the given name must inherit from JobBase.
         """
         if name in cls._JOB_REGISTRY:
             collision = cls._JOB_REGISTRY[name]
@@ -110,6 +115,10 @@ class JobMetaclass(type):
 
         job_cls = super(JobMetaclass, cls).__new__(cls, name, bases, namespace)
 
+        # Here we use cast because the return value of '__new__' method
+        # is 'type' but we want to return a more narrower type 'JobMetaclass'.
+        # So, to narrow down the type from 'type' to 'JobMetaclass', we used
+        # cast here.
         if name == 'JobBase':
             return cast(JobMetaclass, job_cls)
 
@@ -123,6 +132,10 @@ class JobMetaclass(type):
             else:
                 raise TypeError('%s must inherit from JobBase' % name)
 
+        # Here we use cast because the return value of '__new__' method
+        # is 'type' but we want to return a more narrower type 'JobMetaclass'.
+        # So, to narrow down the type from 'type' to 'JobMetaclass', we used
+        # cast here.
         return cast(JobMetaclass, job_cls)
 
     @classmethod
@@ -153,6 +166,9 @@ class JobMetaclass(type):
 
         Returns:
             class. The class associated to the given job name.
+
+        Raises:
+            ValueError. Given job name is not registered as a job.
         """
         if job_name not in cls._JOB_REGISTRY:
             raise ValueError('%s is not registered as a job' % job_name)

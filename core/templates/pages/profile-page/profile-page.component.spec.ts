@@ -27,12 +27,13 @@ import { UserService } from 'services/user.service';
 import { CsrfTokenService } from 'services/csrf-token.service';
 import { DateTimeFormatService } from 'services/date-time-format.service';
 import { LoggerService } from 'services/contextual/logger.service';
-import { UserProfile, UserProfileBackendDict } from 'domain/user/user-profile.model';
+import { UserProfile } from 'domain/user/user-profile.model';
 import { MatCardModule } from '@angular/material/card';
 import { TruncatePipe } from 'filters/string-utility-filters/truncate.pipe';
 import { LoaderService } from 'services/loader.service';
 import { LearnerExplorationSummary } from 'domain/summary/learner-exploration-summary.model';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
+import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 
 describe('Profile page', () => {
   let fixture: ComponentFixture<ProfilePageComponent>;
@@ -44,6 +45,7 @@ describe('Profile page', () => {
   let loggerService: LoggerService;
   let mockWindowRef: MockWindowRef;
   let profilePageBackendApiService: ProfilePageBackendApiService;
+  let i18nLanguageCodeService: I18nLanguageCodeService;
 
   let profileData = UserProfile.createFromBackendDict({
     username: '',
@@ -61,7 +63,7 @@ describe('Profile page', () => {
       thumbnail_icon_url: '/subjects/Algebra.svg',
       human_readable_contributors_summary: {},
       language_code: 'en',
-      thumbnail_bg_color: '#cd672b',
+      thumbnail_bg_color: '#cc4b00',
       created_on_msec: 1591296635736.666,
       ratings: {
         1: 0,
@@ -87,7 +89,7 @@ describe('Profile page', () => {
       thumbnail_icon_url: '/subjects/Algebra.svg',
       human_readable_contributors_summary: {},
       language_code: 'en',
-      thumbnail_bg_color: '#cd672b',
+      thumbnail_bg_color: '#cc4b00',
       created_on_msec: 1591296635736.666,
       ratings: {
         1: 0,
@@ -103,7 +105,6 @@ describe('Profile page', () => {
       title: 'Test Title'
     }],
     subject_interests: [],
-    profile_picture_data_url: 'image',
   });
 
   class MockWindowRef {
@@ -182,6 +183,12 @@ describe('Profile page', () => {
       jasmine.SpyObj<ProfilePageBackendApiService>);
     spyOn(csrfTokenService, 'getTokenAsync').and.returnValue(
       Promise.resolve('sample-csrf-token'));
+    i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
+
+    spyOn(i18nLanguageCodeService, 'isCurrentLanguageRTL').and.returnValue(
+      true);
+    spyOn(userService, 'getProfileImageDataUrl').and.returnValue(
+      ['default-image-url-png', 'default-image-url-webp']);
   });
 
   afterEach(() => {
@@ -199,6 +206,10 @@ describe('Profile page', () => {
       profileData.profileIsOfCurrentUser);
     expect(componentInstance.updateSubscriptionButtonPopoverText)
       .toHaveBeenCalled();
+    expect(componentInstance.profilePicturePngDataUrl).toEqual(
+      'default-image-url-png');
+    expect(componentInstance.profilePictureWebpDataUrl).toEqual(
+      'default-image-url-webp');
     expect(loaderService.hideLoadingScreen).toHaveBeenCalled();
   }));
 
@@ -229,7 +240,7 @@ describe('Profile page', () => {
     ' page is not provided', fakeAsync(() => {
     spyOn(mockWindowRef.nativeWindow.location, 'reload');
     spyOn(userService, 'getLoginUrlAsync').and.returnValue(
-      Promise.resolve(null));
+      Promise.resolve(''));
 
     componentInstance.ngOnInit();
     tick();
@@ -255,8 +266,12 @@ describe('Profile page', () => {
       user_impact_score: 100,
       created_exp_summary_dicts: [],
       edited_exp_summary_dicts: [],
-      is_already_subscribed: false
-    } as UserProfileBackendDict);
+      is_already_subscribed: false,
+      profile_is_of_current_user: false,
+      is_user_visiting_own_profile: false,
+      first_contribution_msec: null,
+      subject_interests: [],
+    });
     spyOn(profilePageBackendApiService, 'fetchProfileDataAsync')
       .and.returnValue(Promise.resolve(profileDataLocal));
     componentInstance.ngOnInit();
@@ -299,7 +314,7 @@ describe('Profile page', () => {
           thumbnail_icon_url: '/subjects/Algebra.svg',
           human_readable_contributors_summary: {},
           language_code: 'en',
-          thumbnail_bg_color: '#cd672b',
+          thumbnail_bg_color: '#cc4b00',
           created_on_msec: 1591296635736.666,
           ratings: {
             1: 0,
@@ -318,7 +333,6 @@ describe('Profile page', () => {
         first_contribution_msec: null,
         edited_exp_summary_dicts: [],
         subject_interests: [],
-        profile_picture_data_url: 'image',
       });
       spyOn(profilePageBackendApiService, 'fetchProfileDataAsync')
         .and.returnValue(Promise.resolve(profileDataLocal));
@@ -341,7 +355,6 @@ describe('Profile page', () => {
         first_contribution_msec: null,
         edited_exp_summary_dicts: [],
         subject_interests: [],
-        profile_picture_data_url: 'image',
       });
 
       for (let i = 0; i < 5; i++) {
@@ -355,7 +368,7 @@ describe('Profile page', () => {
             thumbnail_icon_url: '/subjects/Algebra.svg',
             human_readable_contributors_summary: {},
             language_code: 'en',
-            thumbnail_bg_color: '#cd672b',
+            thumbnail_bg_color: '#cc4b00',
             created_on_msec: 1591296635736.666,
             ratings: {
               1: 0,
@@ -392,7 +405,7 @@ describe('Profile page', () => {
           thumbnail_icon_url: '/subjects/Algebra.svg',
           human_readable_contributors_summary: {},
           language_code: 'en',
-          thumbnail_bg_color: '#cd672b',
+          thumbnail_bg_color: '#cc4b00',
           created_on_msec: 1591296635736.666,
           ratings: {
             1: 0,
@@ -419,7 +432,7 @@ describe('Profile page', () => {
         thumbnail_icon_url: '/subjects/Algebra.svg',
         human_readable_contributors_summary: {},
         language_code: 'en',
-        thumbnail_bg_color: '#cd672b',
+        thumbnail_bg_color: '#cc4b00',
         created_on_msec: 1591296635736.666,
         ratings: {
           1: 0,
@@ -445,7 +458,7 @@ describe('Profile page', () => {
         thumbnail_icon_url: '/subjects/Algebra.svg',
         human_readable_contributors_summary: {},
         language_code: 'en',
-        thumbnail_bg_color: '#cd672b',
+        thumbnail_bg_color: '#cc4b00',
         created_on_msec: 1591296635736.666,
         ratings: {
           1: 0,
@@ -471,7 +484,7 @@ describe('Profile page', () => {
         thumbnail_icon_url: '/subjects/Algebra.svg',
         human_readable_contributors_summary: {},
         language_code: 'en',
-        thumbnail_bg_color: '#cd672b',
+        thumbnail_bg_color: '#cc4b00',
         created_on_msec: 1591296635736.666,
         ratings: {
           1: 0,
@@ -497,7 +510,7 @@ describe('Profile page', () => {
         thumbnail_icon_url: '/subjects/Algebra.svg',
         human_readable_contributors_summary: {},
         language_code: 'en',
-        thumbnail_bg_color: '#cd672b',
+        thumbnail_bg_color: '#cc4b00',
         created_on_msec: 1591296635736.666,
         ratings: {
           1: 0,
@@ -523,7 +536,7 @@ describe('Profile page', () => {
         thumbnail_icon_url: '/subjects/Algebra.svg',
         human_readable_contributors_summary: {},
         language_code: 'en',
-        thumbnail_bg_color: '#cd672b',
+        thumbnail_bg_color: '#cc4b00',
         created_on_msec: 1591296635736.666,
         ratings: {
           1: 0,

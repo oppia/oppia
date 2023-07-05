@@ -24,8 +24,13 @@ from core.domain import user_query_services
 from core.platform import models
 from core.tests import test_utils
 
+MYPY = False
+if MYPY:  # pragma: no cover
+    from mypy_imports import email_models
+    from mypy_imports import user_models
+
 (email_models, user_models) = models.Registry.import_models([
-    models.NAMES.email, models.NAMES.user])
+    models.Names.EMAIL, models.Names.USER])
 
 
 class UserQueryServicesTests(test_utils.GenericTestBase):
@@ -33,8 +38,8 @@ class UserQueryServicesTests(test_utils.GenericTestBase):
     USER_QUERY_1_ID = 'user_query_1_id'
     USER_QUERY_2_ID = 'user_query_2_id'
 
-    def setUp(self):
-        super(UserQueryServicesTests, self).setUp()
+    def setUp(self) -> None:
+        super().setUp()
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.admin_user_id = (
             self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL))
@@ -62,9 +67,11 @@ class UserQueryServicesTests(test_utils.GenericTestBase):
         self.user_query_model_2.update_timestamps()
         self.user_query_model_2.put()
 
-    def test_get_user_query_returns_user_query(self):
+    def test_get_user_query_returns_user_query(self) -> None:
         user_query = user_query_services.get_user_query(self.USER_QUERY_1_ID)
 
+        # Ruling out the possibility of None for mypy type checking.
+        assert user_query is not None
         self.assertEqual(self.user_query_model_1.id, user_query.id)
         self.assertEqual(
             self.user_query_model_1.inactive_in_last_n_days,
@@ -97,7 +104,7 @@ class UserQueryServicesTests(test_utils.GenericTestBase):
         self.assertEqual(
             self.user_query_model_1.deleted, user_query.deleted)
 
-    def test_get_recent_user_queries_returns_recent_user_queries(self):
+    def test_get_recent_user_queries_returns_recent_user_queries(self) -> None:
         user_queries, _ = user_query_services.get_recent_user_queries(5, None)
 
         self.assertEqual(self.user_query_model_1.id, user_queries[1].id)
@@ -113,7 +120,7 @@ class UserQueryServicesTests(test_utils.GenericTestBase):
         self.assertEqual(
             self.user_query_model_2.query_status, user_queries[0].status)
 
-    def test_save_new_query_model(self):
+    def test_save_new_query_model(self) -> None:
         query_param = {
             'inactive_in_last_n_days': 10,
             'created_at_least_n_exps': 5,
@@ -124,6 +131,8 @@ class UserQueryServicesTests(test_utils.GenericTestBase):
 
         query_model = user_models.UserQueryModel.get(user_query_id)
 
+        # Ruling out the possibility of None for mypy type checking.
+        assert query_model is not None
         self.assertEqual(query_model.submitter_id, self.admin_user_id)
         self.assertEqual(
             query_model.inactive_in_last_n_days,
@@ -138,9 +147,11 @@ class UserQueryServicesTests(test_utils.GenericTestBase):
         self.assertIsNone(query_model.edited_at_least_n_exps)
         self.assertIsNone(query_model.edited_fewer_than_n_exps)
 
-    def test_archive_user_query_archives_user_query(self):
+    def test_archive_user_query_archives_user_query(self) -> None:
         original_user_query = (
             user_query_services.get_user_query(self.USER_QUERY_1_ID))
+        # Ruling out the possibility of None for mypy type checking.
+        assert original_user_query is not None
         user_query_services.archive_user_query(original_user_query.id)
 
         archived_user_query_model = (
@@ -150,7 +161,7 @@ class UserQueryServicesTests(test_utils.GenericTestBase):
             feconf.USER_QUERY_STATUS_ARCHIVED)
         self.assertTrue(archived_user_query_model.deleted)
 
-    def test_send_email_to_qualified_users(self):
+    def test_send_email_to_qualified_users(self) -> None:
         self.assertIsNone(
             user_models.UserBulkEmailsModel.get(self.new_user_id, strict=False))
         self.assertIsNone(
@@ -190,6 +201,8 @@ class UserQueryServicesTests(test_utils.GenericTestBase):
 
         new_user_bulk_email_model = user_models.UserBulkEmailsModel.get(
             self.new_user_id)
+        # Ruling out the possibility of None for mypy type checking.
+        assert new_user_bulk_email_model is not None
         self.assertIsNotNone(
             email_models.BulkEmailModel.get(
                 new_user_bulk_email_model.sent_email_model_ids[0]))

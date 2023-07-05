@@ -3,17 +3,11 @@
     "MatchesExactlyWith": {
       "description": "matches exactly with {{x|AlgebraicExpression}}"
     },
+    "MatchesUpToTrivialManipulations": {
+      "description": "matches {{x|AlgebraicExpression}}, taking into account commutativity and associativity"
+    },
     "IsEquivalentTo": {
       "description": "is equivalent to {{x|AlgebraicExpression}}"
-    },
-    "ContainsSomeOf": {
-      "description": "contains at least one of the terms present in {{x|AlgebraicExpression}}"
-    },
-    "OmitsSomeOf": {
-      "description": "omits at least one of the terms present in {{x|AlgebraicExpression}}"
-    },
-    "MatchesWithGeneralForm": {
-      "description": "matches the form of {{x|AlgebraicExpression}} with placeholders {{y|SetOfAlgebraicIdentifier}}"
     }
   },
   "CodeRepl": {
@@ -123,17 +117,11 @@
     "MatchesExactlyWith": {
       "description": "matches exactly with {{x|MathEquation}} {{y|PositionOfTerms}}"
     },
+    "MatchesUpToTrivialManipulations": {
+      "description": "matches {{x|MathEquation}} {{y|PositionOfTerms}}, taking into account commutativity and associativity"
+    },
     "IsEquivalentTo": {
       "description": "is equivalent to {{x|MathEquation}}"
-    },
-    "ContainsSomeOf": {
-      "description": "contains at least one of the terms present in {{x|MathEquation}} {{y|PositionOfTerms}}"
-    },
-    "OmitsSomeOf": {
-      "description": "omits at least one of the terms present in {{x|MathEquation}} {{y|PositionOfTerms}}"
-    },
-    "MatchesWithGeneralForm": {
-      "description": "matches the form of {{x|MathEquation}} with placeholders {{y|SetOfAlgebraicIdentifier}}"
     }
   },
   "MultipleChoiceInput": {
@@ -173,14 +161,11 @@
     "MatchesExactlyWith": {
       "description": "matches exactly with {{x|NumericExpression}}"
     },
+    "MatchesUpToTrivialManipulations": {
+      "description": "matches {{x|NumericExpression}}, taking into account commutativity and associativity"
+    },
     "IsEquivalentTo": {
       "description": "is equivalent to {{x|NumericExpression}}"
-    },
-    "ContainsSomeOf": {
-      "description": "contains at least one of the terms present in {{x|NumericExpression}}"
-    },
-    "OmitsSomeOf": {
-      "description": "omits at least one of the terms present in {{x|NumericExpression}}"
     }
   },
   "NumericInput": {

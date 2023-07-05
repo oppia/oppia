@@ -1,0 +1,71 @@
+/*
+  NOTE to developers: We generate RTL CSS from this file in the webpack
+  compilation, here are some additional rules that can be added to the CSS files:
+  https://rtlcss.com/learn/usage-guide/control-directives .
+*/
+oppia-exploration-summary-tile .oppia-exploration-dashboard-card {
+  position: relative;
+  text-align: left;
+  width: 198px;
+  z-index: 5;
+}
+
+oppia-exploration-summary-tile .oppia-play-exploration-button {
+  display: block;
+  margin: auto;
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+  touch-action: pan-y;
+  -webkit-user-drag: none;
+  user-select: none;
+}
+
+oppia-exploration-summary-tile .oppia-return-to-parent-button {
+  margin-top: 12px;
+}
+
+/*
+  The comment in the section below is an rtlcss value directive mentioned here:
+  https://rtlcss.com/learn/usage-guide/value-directives/, which tells rtlcss
+  to replace the value of the input style to whatever is specified in the
+  comment.
+*/
+oppia-exploration-summary-tile .oppia-arrow-icon {
+  font-size: 19px;
+  padding-top: 1.5px;
+  -moz-transform: scaleX(1) /*rtl:scaleX(-1)*/;
+  -o-transform: scaleX(1) /*rtl:scaleX(-1)*/;
+  -webkit-transform: scaleX(1) /*rtl:scaleX(-1)*/;
+  transform: scaleX(1) /*rtl:scaleX(-1)*/;
+}
+
+oppia-exploration-summary-tile .oppia-learner-confirm-button {
+  background: #0d48a1;
+  color: #fff;
+  font-size: 16px;
+  line-height: 22px;
+  padding: 6px 12px;
+}
+
+oppia-exploration-summary-tile .mobile-activity-summary-card {
+  box-shadow: slategrey 2px 4px 4px 0;
+  padding: 0 0 0 0;
+  width: 340px;
+}
+
+oppia-exploration-summary-tile .mobile-exploration-card-image-container {
+  align-self: center;
+  width: 63px;
+}
+
+oppia-exploration-summary-tile .mobile-exploration-card-image {
+  height: 100%;
+  width: auto;
+}
+
+oppia-exploration-summary-tile .views-text {
+  margin-left: 6px;
+}
+
+oppia-exploration-summary-tile .thumbnail-image {
+  display: block;
+}

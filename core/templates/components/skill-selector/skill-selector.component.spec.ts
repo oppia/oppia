@@ -12,10 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { ShortSkillSummary } from 'domain/skill/short-skill-summary.model';
 import { SkillSummary } from 'domain/skill/skill-summary.model';
+import { UserService } from 'services/user.service';
 import { SkillSelectorComponent } from './skill-selector.component';
 
 
@@ -26,10 +28,19 @@ import { SkillSelectorComponent } from './skill-selector.component';
 describe('SkillSelectorComponent', () => {
   let component: SkillSelectorComponent;
   let fixture: ComponentFixture<SkillSelectorComponent>;
+  let userService: UserService;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [SkillSelectorComponent],
+      imports: [
+        HttpClientTestingModule
+      ],
+      declarations: [
+        SkillSelectorComponent
+      ],
+      providers: [
+        UserService
+      ],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
   }));
@@ -37,6 +48,13 @@ describe('SkillSelectorComponent', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(SkillSelectorComponent);
     component = fixture.componentInstance;
+    userService = TestBed.inject(UserService);
+  });
+
+  beforeEach(() => {
+    spyOn(
+      userService, 'canUserAccessTopicsAndSkillsDashboard'
+    ).and.returnValue(Promise.resolve(true));
   });
 
   it('should initialize topic and subtopic filters to unchecked state', () => {

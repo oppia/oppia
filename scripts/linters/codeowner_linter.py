@@ -22,28 +22,27 @@ import glob
 import os
 import subprocess
 
+from typing import Final, Iterator, List, Tuple
+
+from . import linter_utils
 from .. import concurrent_task_utils
 
-CODEOWNER_FILEPATH = '.github/CODEOWNERS'
+MYPY = False
+if MYPY:  # pragma: no cover
+    from scripts.linters import pre_commit_linter
+
+CODEOWNER_FILEPATH: Final = '.github/CODEOWNERS'
 
 # This list needs to be in sync with the important patterns in the CODEOWNERS
 # file.
-CODEOWNER_IMPORTANT_PATHS = [
-    '/core/templates/services/svg-sanitizer.service.ts',
-    '/scripts/linters/warranted_angular_security_bypasses.py',
-    '/core/controllers/access_validators*.py',
-    '/core/controllers/acl_decorators*.py',
-    '/core/controllers/android_e2e_config*.py',
-    '/core/controllers/base*.py',
-    '/core/domain/html*.py',
-    '/core/domain/rights_manager*.py',
-    '/core/domain/role_services*.py',
-    '/core/domain/user*.py',
+CODEOWNER_IMPORTANT_PATHS: Final = [
     '/core/storage/',
     '/dependencies.json',
     '/package.json',
     '/requirements.txt',
     '/requirements.in',
+    '/requirements_dev.txt',
+    '/requirements_dev.in',
     '/yarn.lock',
     '/scripts/install_third_party_libs.py',
     '/.github/',
@@ -51,13 +50,34 @@ CODEOWNER_IMPORTANT_PATHS = [
     '/.github/stale.yml',
     '/.github/workflows/',
     '/core/android_validation_constants*.py',
-    '/extensions/interactions/rule_templates.json']
+    '/extensions/interactions/rule_templates.json',
+    '/core/templates/services/svg-sanitizer.service.ts',
+    '/scripts/linters/warranted_angular_security_bypasses.py',
+    '/core/controllers/access_validators*.py',
+    '/core/controllers/acl_decorators*.py',
+    '/core/controllers/android*.py',
+    '/core/controllers/base*.py',
+    '/core/domain/android*.py',
+    '/core/domain/html*.py',
+    '/core/domain/rights_manager*.py',
+    '/core/domain/role_services*.py',
+    '/core/domain/user*.py',
+    '/AUTHORS',
+    '/CONTRIBUTORS',
+    '/LICENSE',
+    '/NOTICE',
+    '/core/templates/pages/terms-page/terms-page.component.html',
+    '/core/templates/pages/privacy-page/privacy-page.component.html',
+    '/core/templates/pages/license-page/license-page.component.html',
+    '/core/domain/takeout_*.py',
+    '/core/domain/wipeout_*.py',
+]
 
 
-class CodeownerLintChecksManager:
+class CodeownerLintChecksManager(linter_utils.BaseLinter):
     """Manages codeowner checks."""
 
-    def __init__(self, file_cache):
+    def __init__(self, file_cache: pre_commit_linter.FileCache) -> None:
         """Constructs a CodeownerLintChecksManager object.
 
         Args:
@@ -65,10 +85,12 @@ class CodeownerLintChecksManager:
                 file content.
         """
         self.file_cache = file_cache
-        self.error_messages = []
+        self.error_messages: List[str] = []
         self.failed = False
 
-    def _walk_with_gitignore(self, root, exclude_dirs):
+    def _walk_with_gitignore(
+        self, root: str, exclude_dirs: List[str]
+    ) -> Iterator[List[str]]:
         """A walk function similar to os.walk but this would ignore the files
         and directories which is not tracked by git. Also, this will ignore the
         directories mentioned in exclude_dirs.
@@ -99,7 +121,7 @@ class CodeownerLintChecksManager:
                 for x in self._walk_with_gitignore(dir_path, exclude_dirs):
                     yield x
 
-    def _is_path_ignored(self, path_to_check):
+    def _is_path_ignored(self, path_to_check: str) -> bool:
         """Checks whether the given path is ignored by git.
 
         Args:
@@ -116,7 +138,7 @@ class CodeownerLintChecksManager:
 
         return subprocess.call(command) == 0
 
-    def _is_path_contains_frontend_specs(self, path_to_check):
+    def _is_path_contains_frontend_specs(self, path_to_check: str) -> bool:
         """Checks whether if a path contains all spec files.
 
         Args:
@@ -128,17 +150,14 @@ class CodeownerLintChecksManager:
         return '*.spec.ts' in path_to_check or '*Spec.ts' in path_to_check
 
     def _check_for_important_patterns_at_bottom_of_codeowners(
-            self, important_patterns):
+        self, important_patterns: List[str]
+    ) -> None:
         """Checks that the most important patterns are at the bottom
         of the CODEOWNERS file.
 
-        Arguments:
+        Args:
             important_patterns: list(str). List of the important
                 patterns for CODEOWNERS file.
-
-        Returns:
-            tuple(bool, str). A 2-tuple of whether the CODEOWNERS "important
-            pattern" check fails and failed messages list.
         """
         # Check that there are no duplicate elements in the lists.
         important_patterns_set = set(important_patterns)
@@ -181,7 +200,7 @@ class CodeownerLintChecksManager:
             self.error_messages.append(error_message)
             self.failed = True
 
-    def check_codeowner_file(self):
+    def check_codeowner_file(self) -> concurrent_task_utils.TaskResult:
         """Checks the CODEOWNERS file for any uncovered dirs/files and also
         checks that every pattern in the CODEOWNERS file matches at least one
         file/dir. Note that this checks the CODEOWNERS file according to the
@@ -321,7 +340,7 @@ class CodeownerLintChecksManager:
         return concurrent_task_utils.TaskResult(
             name, self.failed, self.error_messages, self.error_messages)
 
-    def perform_all_lint_checks(self):
+    def perform_all_lint_checks(self) -> List[concurrent_task_utils.TaskResult]:
         """Perform all the lint checks and returns the messages returned by all
         the checks.
 
@@ -333,7 +352,9 @@ class CodeownerLintChecksManager:
         return [self.check_codeowner_file()]
 
 
-def get_linters(file_cache):
+def get_linters(
+    file_cache: pre_commit_linter.FileCache
+) -> Tuple[CodeownerLintChecksManager, None]:
     """Creates CodeownerLintChecksManager object and returns it.
 
     Args:

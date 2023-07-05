@@ -2,7 +2,7 @@
   <div class="d-flex flex-column-reverse">
     <span class="oppia-cke-offline-warning" *ngIf="!connectedToInternet">* Tools with dark background can not be used when offline.</span>
   </div>
-  <div contenteditable="true" class="oppia-rte-resizer oppia-rte protractor-test-rte"></div>
+  <div contenteditable="true" class="oppia-rte-resizer oppia-rte e2e-test-rte" #oppiaRTE></div>
 </div>
 
 <style>
@@ -14,5 +14,10 @@
     color: #5a5a5a;
     font-size: small;
     padding: 0 3px;
+  }
+  @media screen and (max-width: 700px) {
+    .oppia-rte {
+      font-size: 16px;
+    }
   }
 </style>

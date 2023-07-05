@@ -19,7 +19,6 @@
 import 'core-js/es7/reflect';
 import 'zone.js';
 
-import 'angular-ui-sortable';
 import uiValidate from 'angular-ui-validate';
 import ngInfiniteScroll from 'ng-infinite-scroll';
 import 'third-party-imports/ui-tree.import';
@@ -27,7 +26,7 @@ import 'third-party-imports/ui-tree.import';
 angular.module('oppia', [
   require('angular-cookies'), 'ngAnimate', ngInfiniteScroll,
   'ngMaterial', 'ngSanitize', 'ngTouch', 'pascalprecht.translate',
-  'ui.bootstrap', 'ui.sortable', 'ui.tree', uiValidate
+  'ui.bootstrap', 'ui.tree', uiValidate
 ]);
 
 require(

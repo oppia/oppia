@@ -16,4 +16,4 @@
  * @fileoverview This file imports the gif-frames library.
  */
 
-window.GifFrames = require('gif-frames');
+(window as Window).GifFrames = require('gif-frames');

@@ -29,19 +29,29 @@ import { Subscription } from 'rxjs';
 import { ContextService } from 'services/context.service';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 
+import './hint-and-solution-buttons.component.css';
+
+
 @Component({
   selector: 'oppia-hint-and-solution-buttons',
-  templateUrl: './hint-and-solution-buttons.component.html'
+  templateUrl: './hint-and-solution-buttons.component.html',
+  styleUrls: ['./hint-and-solution-buttons.component.css']
 })
 export class HintAndSolutionButtonsComponent implements OnInit, OnDestroy {
   directiveSubscriptions = new Subscription();
-  private _editorPreviewMode: boolean;
+  // These properties below are initialized using Angular lifecycle hooks
+  // where we need to do non-null assertion. For more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  private _editorPreviewMode!: boolean;
+  // Active hint index is null when no hint is active. Otherwise, it is the
+  // index of the active hint.
+  activeHintIndex!: number | null;
+  displayedCard!: StateCard;
   hintIndexes: number[] = [];
-  activeHintIndex: number;
   solutionModalIsActive: boolean = false;
-  displayedCard: StateCard;
   currentlyOnLatestCard: boolean = true;
   isVisible: boolean = true;
+  isTooltipForSolutionVisible: boolean = true;
 
   constructor(
     private changeDetectorRef: ChangeDetectorRef,
@@ -62,8 +72,11 @@ export class HintAndSolutionButtonsComponent implements OnInit, OnDestroy {
       this.playerPositionService.onNewCardOpened.subscribe(
         (newCard: StateCard) => {
           this.displayedCard = newCard;
-          this.hintsAndSolutionManagerService.reset(
-            newCard.getHints(), newCard.getSolution());
+          const solution = newCard.getSolution();
+          if (solution) {
+            this.hintsAndSolutionManagerService.reset(
+              newCard.getHints(), solution);
+          }
           this.resetLocalHintsArray();
         }
       )
@@ -161,6 +174,10 @@ export class HintAndSolutionButtonsComponent implements OnInit, OnDestroy {
 
   isTooltipVisible(): boolean {
     return this.hintsAndSolutionManagerService.isHintTooltipOpen();
+  }
+
+  isSolutionTooltipVisible(): boolean {
+    return this.hintsAndSolutionManagerService.isSolutionTooltipOpen();
   }
 
   isHintConsumed(hintIndex: number): boolean {

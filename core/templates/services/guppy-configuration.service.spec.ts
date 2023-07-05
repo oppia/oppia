@@ -25,7 +25,7 @@ import { GuppyConfigurationService } from
 
 declare global {
   interface Window {
-    Guppy: Object;
+    Guppy: Guppy;
   }
 }
 
@@ -35,10 +35,12 @@ class MockGuppy {
   asciimath(): string {
     return 'Dummy value';
   }
+
   configure(name: string, val: Object): void {}
   static event(name: string, handler: Function): void {
     handler({focused: true});
   }
+
   static configure(name: string, val: Object): void {}
   static 'remove_global_symbol'(symbol: string): void {}
   static 'add_global_symbol'(name: string, symbol: Object): void {}
@@ -72,7 +74,7 @@ let guppyConfigurationService: GuppyConfigurationService;
 describe('GuppyConfigurationService', () => {
   beforeEach(() => {
     guppyConfigurationService = TestBed.get(GuppyConfigurationService);
-    window.Guppy = MockGuppy;
+    window.Guppy = MockGuppy as unknown as Guppy;
   });
 
   describe('Individual service', () => {
@@ -105,7 +107,7 @@ describe('GuppyConfigurationService', () => {
         }
       ).compileComponents();
       guppyConfigurationService = TestBed.get(GuppyConfigurationService);
-      window.Guppy = MockGuppy;
+      window.Guppy = MockGuppy as unknown as Guppy;
     }));
     beforeEach(() => {
       fixture = TestBed.createComponent(

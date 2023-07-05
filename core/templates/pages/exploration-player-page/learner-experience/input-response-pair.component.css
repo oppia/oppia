@@ -1,0 +1,84 @@
+/*
+  NOTE to developers: We generate RTL CSS from this file in the webpack
+  compilation, here are sme additional rules that can be added to the CSS files:
+  https://rtlcss.com/learn/usage-guide/control-directives .
+*/
+
+.conversation-skin-learner-answer-container,
+.conversation-skin-oppia-feedback-container {
+  padding: 0 20px;
+  position: relative;
+}
+
+.conversation-skin-learner-answer-container {
+  text-align: right;
+}
+
+.conversation-skin-learner-answer-container .conversation-skin-user-avatar {
+  border: 2px solid #094142;
+  height: 100px;
+  right: -98px;
+  top: -33px;
+  width: 100px;
+}
+
+oppia-input-response-pair .oppia-popover {
+  cursor: pointer;
+}
+.oppia-answer-popup-container .oppia-answer-popup {
+  max-height: 300px;
+  overflow-y: scroll;
+}
+
+.conversation-skin-feedback-dot-one,
+.conversation-skin-feedback-dot-two,
+.conversation-skin-feedback-dot-three {
+  background-color: #666;
+  display: inline-block;
+  height: 2px;
+  width: 2px;
+}
+
+.conversation-skin-feedback-dot-one {
+  -webkit-animation: dot 1.0s infinite;
+  -moz-animation: dot 1.0s infinite;
+  animation: dot 1.0s infinite;
+  -webkit-animation-delay: 0.0s;
+  -moz-animation-delay: 0.0s;
+  animation-delay: 0.0s;
+  opacity: 0;
+}
+
+.conversation-skin-feedback-dot-two {
+  -webkit-animation: dot 1.0s infinite;
+  -moz-animation: dot 1.0s infinite;
+  animation: dot 1.0s infinite;
+  -webkit-animation-delay: 0.2s;
+  -moz-animation-delay: 0.2s;
+  animation-delay: 0.2s;
+  opacity: 0;
+}
+
+.conversation-skin-feedback-dot-three {
+  -webkit-animation: dot 1.0s infinite;
+  -moz-animation: dot 1.0s infinite;
+  animation: dot 1.0s infinite;
+  -webkit-animation-delay: 0.4s;
+  -moz-animation-delay: 0.4s;
+  animation-delay: 0.4s;
+  opacity: 0;
+}
+
+.conversation-skin-oppia-feedback.ng-enter {
+  opacity: 0;
+  -webkit-transition: all .5s;
+  transition: all .5s;
+}
+
+.conversation-skin-oppia-feedback.ng-enter.ng-enter-active {
+  opacity: 1;
+}
+
+.conversation-skin-oppia-avatar {
+  left: -87px;
+}

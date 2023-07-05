@@ -1,0 +1,124 @@
+<div class="oppia-learner-group-learner-specific-progress">
+  <div class="oppia-learner-group-learners-progress-overview">
+    <div class="overview-tab-sections">
+      <div class="overview-tab-sections-header">
+        <div class="overview-tab-sections-header-title"
+             [ngClass]="{'active': isTabActive(EDIT_OVERVIEW_SECTIONS_I18N_IDS.SKILLS_ANALYSIS)}"
+             (click)="setActiveTab(EDIT_OVERVIEW_SECTIONS_I18N_IDS.SKILLS_ANALYSIS)">
+          <span translate="I18N_LEARNER_GROUP_SKILLS_ANALYSIS_SECTION"></span>
+        </div>
+        <div class="overview-tab-sections-header-title"
+             [ngClass]="{'active': isTabActive(EDIT_OVERVIEW_SECTIONS_I18N_IDS.PROGRESS_IN_STORIES)}"
+             (click)="setActiveTab(EDIT_OVERVIEW_SECTIONS_I18N_IDS.PROGRESS_IN_STORIES)">
+          <span translate="I18N_LEARNER_GROUP_PROGRESS_IN_STORIES_SECTION"></span>
+        </div>
+      </div>
+      <div class="skill-analysis-tab overview-tab-sections-subtab" *ngIf="isTabActive(EDIT_OVERVIEW_SECTIONS_I18N_IDS.SKILLS_ANALYSIS)">
+        <div class="tab-description">
+          <span>{{ learnerProgress.username }}'s {{ 'I18N_LEARNER_GROUP_SKILLS_ANALYSIS_SECTION' | translate }}</span>
+          <div *ngIf="learnerProgress" class="all-subtopics-progress">
+            <div *ngFor="let topicName of topicNames" class="progress-dropdown">
+              <mat-accordion>
+                <mat-expansion-panel hideToggle expanded>
+                  <mat-expansion-panel-header>
+                    <mat-panel-title>
+                      <div class="story-info-summary-container">
+                        <span class="subtopic-title">{{ topicName }}
+                          <span *ngIf="getStrugglingWithSubtopicsCount(topicName) > 0" class="warning-pill">{{ getStrugglingWithSubtopicsCount(topicName) }}</span>
+                        </span>
+                        <div class="drop-icon">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 17 17" fill="none">
+                            <path d="M15.1414 8.06956L8.07031 15.1406" stroke="#333333" stroke-width="2" stroke-linecap="round"/>
+                            <path d="M0.999244 8.06956L8.07031 15.1406" stroke="#333333" stroke-width="2" stroke-linecap="round"/>
+                          </svg>
+                        </div>
+                      </div>
+                    </mat-panel-title>
+                  </mat-expansion-panel-header>
+                  <div *ngFor="let subtopicProgress of learnerProgress.subtopicsProgress; let idx = index;">
+                    <div *ngIf="subtopicProgress.parentTopicName === topicName">
+                      <div class="subtopic-progress-card">
+                        <div *ngIf="subtopicProgress.subtopicMastery && subtopicProgress.subtopicMastery < 0.6" class="struggling-with-subtopic">
+                          <span [innerHTML]="'I18N_STRUGGLING_WITH_SKILL' | translate: { username: learnerProgress.username }"></span>
+                        </div>
+                        <div class="subtopic-progress-info">
+                          <div class="subtopic-title">{{ subtopicProgress.subtopicTitle }}</div>
+                          <div class="subtopic-progress" [ngClass]="{'no-progress': !subtopicProgress.subtopicMastery}">
+                            <div *ngIf="!subtopicProgress.subtopicMastery">
+                              &#8212; {{ 'I18N_LEARNER_GROUP_SYLLABUS_ITEM_NOT_STARTED_YET' | translate }} &#8212;
+                            </div>
+                            <div *ngIf="subtopicProgress.subtopicMastery" class="subtopic-progress-bar">
+                              <div class="subtopic-progress-bar-fill" [ngStyle]="{'width': (subtopicProgress.subtopicMastery*100) + '%'}"></div>
+                            </div>
+                            <span *ngIf="subtopicProgress.subtopicMastery">
+                              <span *ngIf="subtopicProgress.subtopicMastery === 1" translate="I18N_SKILL_LEVEL_PROFICIENT"></span>
+                              <span *ngIf="subtopicProgress.subtopicMastery < 0.6" translate="I18N_SKILL_LEVEL_NEEDS_WORK"></span>
+                              <span *ngIf="subtopicProgress.subtopicMastery >= 0.6 && subtopicProgress.subtopicMastery < 0.8" translate="I18N_SKILL_LEVEL_BEGINNER"></span>
+                              <span *ngIf="subtopicProgress.subtopicMastery >= 0.8 && subtopicProgress.subtopicMastery < 1" translate="I18N_SKILL_LEVEL_INTERMIDIATE"></span>
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </mat-expansion-panel>
+              </mat-accordion>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="stories-progress-tab overview-tab-sections-subtab" *ngIf="isTabActive(EDIT_OVERVIEW_SECTIONS_I18N_IDS.PROGRESS_IN_STORIES)">
+        <span class="tab-description">{{ learnerProgress.username }}'s {{ 'I18N_LEARNER_GROUP_USER_STORIES_PROGRESS' | translate }}</span>
+        <div *ngIf="learnerProgress" class="all-stories-progress">
+          <div *ngFor="let storyProgress of learnerProgress.storiesProgress; let storyIndex = index" class="progress-dropdown story-progress-dropdown">
+            <mat-accordion>
+              <mat-expansion-panel hideToggle expanded>
+                <mat-expansion-panel-header>
+                  <mat-panel-title>
+                    <div class="story-info-summary-container">
+                      <div class="story-info-summary">
+                        <div class="story-title">
+                          {{ storyProgress.getTitle() }} | {{ storyProgress.getNodeTitles().length }} {{ 'I18N_LEARNER_GROUP_SYLLABUS_LESSONS' | translate }}
+                        </div>
+                      </div>
+                      <div class="drop-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 17 17" fill="none">
+                          <path d="M15.1414 8.06956L8.07031 15.1406" stroke="#333333" stroke-width="2" stroke-linecap="round"/>
+                          <path d="M0.999244 8.06956L8.07031 15.1406" stroke="#333333" stroke-width="2" stroke-linecap="round"/>
+                        </svg>
+                      </div>
+                    </div>
+                  </mat-panel-title>
+                </mat-expansion-panel-header>
+                <div *ngFor="let chapterName of storyProgress.getNodeTitles(); let idx = index;">
+                  <div class="story-chapter-progress">
+                    <div class="chapter-title">
+                      <span>{{ 'I18N_TOPIC_VIEWER_LESSON' | translate }} {{ idx+1 }}: {{ chapterName }}</span>
+                    </div>
+                    <div class="chapter-progress-container" *ngIf="storiesChaptersProgress">
+                      <span *ngIf="getVisitedCheckpointsCount(storyIndex, idx) > 0"
+                            class="chapter-progress-percentage">
+                        {{ getCompletedProgressBarWidth(storyIndex, idx) }}%
+                        <span translate="I18N_LEARNER_GROUP_SYLLABUS_COMPLETION"></span>
+                        &nbsp;
+                      </span>
+                      <div *ngIf="getVisitedCheckpointsCount(storyIndex, idx) > 0"
+                           class="chapter-progress-bar">
+                        <div class="chapter-progress-bar-fill"
+                             [style.width.%]="getCompletedProgressBarWidth(storyIndex, idx)">
+                        </div>
+                      </div>
+                      <div *ngIf="getVisitedCheckpointsCount(storyIndex, idx) === 0" class="chapter-not-started">
+                        &#8212; {{ 'I18N_LEARNER_GROUP_SYLLABUS_ITEM_NOT_STARTED_YET' | translate }} &#8212;
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </mat-expansion-panel>
+            </mat-accordion>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -48,7 +48,7 @@ interface ExplorationCompletedData {
 }
 
 interface ExplorationResetData {
-  stateName: string
+  stateName: string;
 }
 
 interface MessageValidatorsType {
@@ -245,10 +245,10 @@ export class MessengerService {
         this.loggerService.info(payload.toString());
 
         let objToSendToParent: {
-          title: string,
-          payload: PayloadType
-          sourceTagId: string | null,
-          secret: string | null
+          title: string;
+          payload: PayloadType;
+          sourceTagId: string | null;
+          secret: string | null;
         } = {
           title: messageTitle,
           payload: payload,

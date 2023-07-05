@@ -16,7 +16,7 @@
  * @fileoverview Service to send changes to a topic to the backend.
  */
 
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
@@ -27,7 +27,7 @@ import { SkillSummaryBackendDict } from 'domain/skill/skill-summary.model';
 import { StorySummaryBackendDict } from 'domain/story/story-summary.model';
 import { SkillIdToDescriptionMap } from 'domain/topic/subtopic.model';
 import { SubtopicPageBackendDict } from 'domain/topic/subtopic-page.model';
-import { TopicBackendDict } from 'domain/topic/TopicObjectFactory';
+import { TopicBackendDict } from 'domain/topic/topic-object.model';
 import { TopicDomainConstants } from 'domain/topic/topic-domain.constants';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 
@@ -99,6 +99,16 @@ interface DoesTopicWithNameExistBackendResponse {
   'topic_name_exists': boolean;
 }
 
+interface TopicIdToTopicNameBackendResponse {
+  'topic_id_to_topic_name': {
+    [topicId: string]: string;
+  };
+}
+
+export interface TopicIdToTopicNameResponse {
+    [topicId: string]: string;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -109,8 +119,9 @@ export class EditableTopicBackendApiService {
 
   private _fetchTopic(
       topicId: string,
-      successCallback: (value?: FetchTopicResponse) => void,
-      errorCallback: (reason?: string) => void): void {
+      successCallback: (value: FetchTopicResponse) => void,
+      errorCallback: (reason: string) => void
+  ): void {
     let topicDataUrl = this.urlInterpolationService.interpolateUrl(
       AppConstants.EDITABLE_TOPIC_DATA_URL_TEMPLATE, {
         topic_id: topicId
@@ -143,8 +154,9 @@ export class EditableTopicBackendApiService {
 
   private _fetchStories(
       topicId: string,
-      successCallback: (value?: StorySummaryBackendDict[]) => void,
-      errorCallback: (reason?: string) => void): void {
+      successCallback: (value: StorySummaryBackendDict[]) => void,
+      errorCallback: (reason: string) => void
+  ): void {
     let storiesDataUrl = this.urlInterpolationService.interpolateUrl(
       TopicDomainConstants.TOPIC_EDITOR_STORY_URL_TEMPLATE, {
         topic_id: topicId
@@ -164,8 +176,9 @@ export class EditableTopicBackendApiService {
   private _fetchSubtopicPage(
       topicId: string,
       subtopicId: number,
-      successCallback: (value?: SubtopicPageBackendDict) => void,
-      errorCallback: (reason?: string) => void): void {
+      successCallback: (value: SubtopicPageBackendDict) => void,
+      errorCallback: (reason: string) => void
+  ): void {
     let subtopicPageDataUrl = this.urlInterpolationService.interpolateUrl(
       AppConstants.SUBTOPIC_PAGE_EDITOR_DATA_URL_TEMPLATE, {
         topic_id: topicId,
@@ -185,8 +198,9 @@ export class EditableTopicBackendApiService {
 
   private _deleteTopic(
       topicId: string,
-      successCallback: (value?: number) => void,
-      errorCallback: (reason?: string) => void): void {
+      successCallback: (value: number) => void,
+      errorCallback: (reason: string) => void
+  ): void {
     let topicDataUrl = this.urlInterpolationService.interpolateUrl(
       AppConstants.EDITABLE_TOPIC_DATA_URL_TEMPLATE, {
         topic_id: topicId
@@ -206,8 +220,9 @@ export class EditableTopicBackendApiService {
       topicVersion: number,
       commitMessage: string,
       changeList: BackendChangeObject[],
-      successCallback: (value?: UpdateTopicResponse) => void,
-      errorCallback: (reason?: string) => void): void {
+      successCallback: (value: UpdateTopicResponse) => void,
+      errorCallback: (reason: string) => void
+  ): void {
     let editableTopicDataUrl = this.urlInterpolationService.interpolateUrl(
       AppConstants.EDITABLE_TOPIC_DATA_URL_TEMPLATE, {
         topic_id: topicId
@@ -236,8 +251,9 @@ export class EditableTopicBackendApiService {
 
   private _doesTopicWithUrlFragmentExist(
       topicUrlFragment: string,
-      successCallback: (value?: boolean) => void,
-      errorCallback: (reason?: string) => void): void {
+      successCallback: (value: boolean) => void,
+      errorCallback: (errorResponse: HttpErrorResponse) => void
+  ): void {
     let topicUrlFragmentUrl = this.urlInterpolationService.interpolateUrl(
       TopicDomainConstants.TOPIC_URL_FRAGMENT_HANDLER_URL_TEMPLATE, {
         topic_url_fragment: topicUrlFragment
@@ -248,14 +264,15 @@ export class EditableTopicBackendApiService {
         successCallback(response.topic_url_fragment_exists);
       }
     }, (errorResponse) => {
-      errorCallback(errorResponse.error);
+      errorCallback(errorResponse);
     });
   }
 
   private _doesTopicWithNameExist(
       topicName: string,
-      successCallback: (value?: boolean) => void,
-      errorCallback: (reason?: string) => void): void {
+      successCallback: (value: boolean) => void,
+      errorCallback: (reason: string) => void
+  ): void {
     let topicNameUrl = this.urlInterpolationService.interpolateUrl(
       TopicDomainConstants.TOPIC_NAME_HANDLER_URL_TEMPLATE, {
         topic_name: topicName
@@ -329,6 +346,36 @@ export class EditableTopicBackendApiService {
        Promise<boolean> {
     return new Promise((resolve, reject) => {
       this._doesTopicWithUrlFragmentExist(topicUrlFragment, resolve, reject);
+    });
+  }
+
+  private _getTopicIdToTopicName(
+      topicIds: string[],
+      successCallback: (value: TopicIdToTopicNameResponse) => void,
+      errorCallback: (reason: string) => void
+  ): void {
+    const topicIdToTopicNameUrl = this.urlInterpolationService.interpolateUrl(
+      '/topic_id_to_topic_name_handler/?' +
+      'comma_separated_topic_ids=<comma_separated_topic_ids>', {
+        comma_separated_topic_ids: topicIds.join(',')
+      });
+
+    this.http.get<TopicIdToTopicNameBackendResponse>(topicIdToTopicNameUrl)
+      .toPromise().then((response) => {
+        if (successCallback) {
+          successCallback(
+            response.topic_id_to_topic_name
+          );
+        }
+      }, (errorResponse) => {
+        errorCallback(errorResponse.error.error);
+      });
+  }
+
+  async getTopicIdToTopicNameAsync(topicIds: string[]):
+      Promise<TopicIdToTopicNameResponse> {
+    return new Promise((resolve, reject) => {
+      this._getTopicIdToTopicName(topicIds, resolve, reject);
     });
   }
 }

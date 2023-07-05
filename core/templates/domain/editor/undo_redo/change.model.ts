@@ -32,12 +32,12 @@ import { StateBackendDict } from
 import { SubtitledHtmlBackendDict } from
   'domain/exploration/subtitled-html.model';
 import { WorkedExampleBackendDict } from
-  'domain/skill/WorkedExampleObjectFactory';
+  'domain/skill/worked-example.model';
 import { Collection } from 'domain/collection/collection.model';
 import { Question } from 'domain/question/QuestionObjectFactory';
 import { Skill } from 'domain/skill/SkillObjectFactory';
-import { Story } from 'domain/story/StoryObjectFactory';
-import { Topic } from 'domain/topic/TopicObjectFactory';
+import { Story } from 'domain/story/story.model';
+import { Topic } from 'domain/topic/topic-object.model';
 import { SubtopicPage } from 'domain/topic/subtopic-page.model';
 
 interface CollectionTitleChange {
@@ -138,7 +138,7 @@ interface SkillMisconceptionNameChange {
   'property_name': 'name';
   'new_value': string;
   'old_value': string;
-  'misconception_id': string;
+  'misconception_id': number;
 }
 
 interface SkillMisconceptionMustBeAddressedChange {
@@ -146,7 +146,7 @@ interface SkillMisconceptionMustBeAddressedChange {
   'property_name': 'must_be_addressed';
   'new_value': boolean;
   'old_value': boolean;
-  'misconception_id': string;
+  'misconception_id': number;
 }
 
 interface SkillMisconceptionsNotesChange {
@@ -154,7 +154,7 @@ interface SkillMisconceptionsNotesChange {
   'property_name': 'notes';
   'new_value': string;
   'old_value': string;
-  'misconception_id': string;
+  'misconception_id': number;
 }
 
 interface SkillMisconceptionsFeedbackChange {
@@ -162,7 +162,7 @@ interface SkillMisconceptionsFeedbackChange {
   'property_name': 'feedback';
   'new_value': string;
   'old_value': string;
-  'misconception_id': string;
+  'misconception_id': number;
 }
 
 type SkillMisconceptionPropertyChange = (
@@ -202,7 +202,7 @@ interface SkillAddMisconceptionChange {
 
 interface SkillDeleteMisconceptionChange {
   'cmd': 'delete_skill_misconception';
-  'misconception_id': string;
+  'misconception_id': number;
 }
 
 interface SkillAddPrerequisiteChange {
@@ -357,6 +357,46 @@ interface StoryNodeDestinationIdsChange {
   'node_id': string;
 }
 
+interface StoryNodeStatusChange {
+  'cmd': 'update_story_node_property';
+  'property_name': 'status';
+  'new_value': string;
+  'old_value': string;
+  'node_id': string;
+}
+
+interface StoryNodePlannedPublicationDateMsecsChange {
+  'cmd': 'update_story_node_property';
+  'property_name': 'planned_publication_date_msecs';
+  'new_value': number;
+  'old_value': number;
+  'node_id': string;
+}
+
+interface StoryNodeLastModifiedMsecsChange {
+  'cmd': 'update_story_node_property';
+  'property_name': 'last_modified_msecs';
+  'new_value': number;
+  'old_value': number;
+  'node_id': string;
+}
+
+interface StoryNodeFirstPublicationDateMsecsChange {
+  'cmd': 'update_story_node_property';
+  'property_name': 'first_publication_date_msecs';
+  'new_value': number;
+  'old_value': number;
+  'node_id': string;
+}
+
+interface StoryNodeUnpublishingReasonChange {
+  'cmd': 'update_story_node_property';
+  'property_name': 'unpublishing_reason';
+  'new_value': string;
+  'old_value': string;
+  'node_id': string;
+}
+
 interface StoryNodePrerequisiteSkillsChange {
   'cmd': 'update_story_node_property';
   'property_name': 'prerequisite_skill_ids';
@@ -382,7 +422,13 @@ type StoryNodePropertyChange = (
   StoryNodeExplorationIdChange |
   StoryNodeDestinationIdsChange |
   StoryNodePrerequisiteSkillsChange |
-  StoryNodeAcequiredSkillsChange);
+  StoryNodeAcequiredSkillsChange |
+  StoryNodeStatusChange |
+  StoryNodePlannedPublicationDateMsecsChange |
+  StoryNodeLastModifiedMsecsChange |
+  StoryNodeFirstPublicationDateMsecsChange |
+  StoryNodeUnpublishingReasonChange
+  );
 
 interface StoryAddNodeChange {
   'cmd': 'add_story_node';
@@ -473,10 +519,17 @@ interface TopicLanguageCodeChange {
 }
 
 interface TopicPageTitleFragmentForWebChange {
-  'cmd': 'update_topic_property',
-  'property_name': 'page_title_fragment_for_web',
+  'cmd': 'update_topic_property';
+  'property_name': 'page_title_fragment_for_web';
   'new_value': string;
   'old_value': string;
+}
+
+interface TopicSkillForDiagnosticTestChange {
+  'cmd': 'update_topic_property';
+  'property_name': 'skill_ids_for_diagnostic_test';
+  'new_value': string[];
+  'old_value': string[];
 }
 
 type TopicPropertyChange = (
@@ -489,7 +542,8 @@ type TopicPropertyChange = (
   TopicUrlFragmentChange |
   TopicMetaTagContentChange |
   TopicLanguageCodeChange |
-  TopicPageTitleFragmentForWebChange);
+  TopicPageTitleFragmentForWebChange |
+  TopicSkillForDiagnosticTestChange);
 
 interface TopicSubtopicThumbnailFilenameChange {
   'cmd': 'update_subtopic_property';
@@ -553,11 +607,12 @@ interface TopicAddSubtopicChange {
   'cmd': 'add_subtopic';
   'subtopic_id': number;
   'title': string;
+  'url_fragment': string;
 }
 
 interface TopicAddUncategorizedSkillId {
-  'cmd': 'add_uncategorized_skill_id',
-  'new_uncategorized_skill_id': string
+  'cmd': 'add_uncategorized_skill_id';
+  'new_uncategorized_skill_id': string;
 }
 
 interface TopicDeleteSubtopicChange {
@@ -648,6 +703,7 @@ export class Change {
   _applyChangeToObject: (
     backendChangeObject: BackendChangeObject,
     domainObject: DomainObject) => void;
+
   _reverseChangeToObject: (
     backendChangeObject: BackendChangeObject,
     domainObject: DomainObject) => void;

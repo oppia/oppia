@@ -32,6 +32,7 @@ import { MaterialModule } from 'modules/material.module';
 import { FormsModule } from '@angular/forms';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { Component, EventEmitter, NO_ERRORS_SCHEMA, Pipe } from '@angular/core';
+import { TranslateService } from '@ngx-translate/core';
 
 import { AlertsService } from 'services/alerts.service';
 import { CsrfTokenService } from 'services/csrf-token.service';
@@ -52,6 +53,10 @@ import { NonExistentTopicsAndStories } from 'domain/learner_dashboard/non-existe
 import { NonExistentCollections } from 'domain/learner_dashboard/non-existent-collections.model';
 import { NonExistentExplorations } from 'domain/learner_dashboard/non-existent-explorations.model';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
+import { PageTitleService } from 'services/page-title.service';
+import { LearnerGroupBackendApiService } from 'domain/learner_group/learner-group-backend-api.service';
+import { UrlService } from 'services/contextual/url.service';
+import { UserInfo } from 'domain/user/user-info.model';
 
 @Pipe({name: 'slice'})
 class MockSlicePipe {
@@ -72,6 +77,13 @@ class MockLearnerDashboardActivityBackendApiService {
     return new Promise((resolve, reject) => {
       resolve();
     });
+  }
+}
+
+class MockTranslateService {
+  onLangChange: EventEmitter<string> = new EventEmitter();
+  instant(key: string): string {
+    return key;
   }
 }
 
@@ -106,8 +118,10 @@ describe('Learner dashboard page', () => {
   let windowDimensionsService: WindowDimensionsService;
   let mockResizeEmitter: EventEmitter<void>;
   let userService: UserService = null;
-
-  let profilePictureDataUrl = 'profile-picture-url';
+  let translateService: TranslateService = null;
+  let pageTitleService: PageTitleService = null;
+  let learnerGroupBackendApiService: LearnerGroupBackendApiService;
+  let urlService: UrlService;
 
   let explorationDict: ExplorationBackendDict = {
     init_state_name: 'Introduction',
@@ -121,7 +135,24 @@ describe('Learner dashboard page', () => {
     version: 1,
     draft_change_list_id: 3,
     title: 'Test Exploration',
-
+    next_content_id_index: 3,
+    auto_tts_enabled: true,
+    exploration_metadata: {
+      title: 'Exploration',
+      category: 'Algebra',
+      objective: 'To learn',
+      language_code: 'en',
+      tags: [],
+      blurb: '',
+      author_notes: '',
+      states_schema_version: 50,
+      init_state_name: 'Introduction',
+      param_specs: {},
+      param_changes: [],
+      auto_tts_enabled: false,
+      correctness_feedback_enabled: true,
+      edits_allowed: true
+    }
   };
 
   let titleList = [
@@ -196,22 +227,18 @@ describe('Learner dashboard page', () => {
 
   let subscriptionsList = [{
     creator_impact: 0,
-    creator_picture_data_url: 'creatorA-url',
     creator_username: 'Bucky',
   },
   {
     creator_impact: 1,
-    creator_picture_data_url: 'creatorB-url',
     creator_username: 'Arrow',
   },
   {
     creator_impact: 3,
-    creator_picture_data_url: 'creatorD-url',
     creator_username: 'Deadpool',
   },
   {
     creator_impact: 2,
-    creator_picture_data_url: 'creatorC-url',
     creator_username: 'Captain America',
   }];
 
@@ -299,6 +326,7 @@ describe('Learner dashboard page', () => {
     isBlogAdmin: () => false,
     isBlogPostEditor: () => false,
     isQuestionAdmin: () => false,
+    isQuestionCoordinator: () => false,
     canCreateCollections: () => true,
     getPreferredSiteLanguageCode: () =>'en',
     getUsername: () => 'username1',
@@ -347,6 +375,11 @@ describe('Learner dashboard page', () => {
           SuggestionModalForLearnerDashboardService,
           UrlInterpolationService,
           UserService,
+          PageTitleService,
+          {
+            provide: TranslateService,
+            useClass: MockTranslateService
+          }
         ],
         schemas: [NO_ERRORS_SCHEMA]
       }).compileComponents();
@@ -367,6 +400,15 @@ describe('Learner dashboard page', () => {
       suggestionModalForLearnerDashboardService =
         TestBed.inject(SuggestionModalForLearnerDashboardService);
       userService = TestBed.inject(UserService);
+      translateService = TestBed.inject(TranslateService);
+      pageTitleService = TestBed.inject(PageTitleService);
+      urlService = TestBed.inject(UrlService);
+      learnerGroupBackendApiService = TestBed.inject(
+        LearnerGroupBackendApiService);
+
+      const mockElement = document.createElement('div');
+      mockElement.className = 'oppia-exploration-title';
+      document.body.appendChild(mockElement);
 
       spyOn(csrfTokenService, 'getTokenAsync').and.callFake(async() => {
         return Promise.resolve('sample-csrf-token');
@@ -408,7 +450,7 @@ describe('Learner dashboard page', () => {
             Object.assign(collectionDict, {
               title: titleList[i],
               category: categoryList[i]
-            }) as unknown as CollectionBackendDict
+            }) as CollectionBackendDict
           ));
         learnerDashboardCollectionsData.collection_playlist[i] = ({
           id: Number(i + 1).toString()
@@ -425,19 +467,12 @@ describe('Learner dashboard page', () => {
               // (1 to 8 is the complete collections).
               id: Number(i + 9).toString(),
               title: 'Collection Title ' + (i + 7),
-            }) as unknown as CollectionBackendDict
+            }) as CollectionBackendDict
           ));
       }
 
-      spyOn(userService, 'getProfileImageDataUrlAsync').and
-        .callFake(async() => {
-          return Promise.resolve(profilePictureDataUrl);
-        });
-
-      spyOn(userService, 'getUserInfoAsync').and
-        .callFake(async() => {
-          return Promise.resolve(userInfo);
-        });
+      spyOn(userService, 'getProfileImageDataUrl').and.returnValue(
+        ['profile-image-url-png', 'profile-image-url-webp']);
 
       spyOn(
         learnerDashboardBackendApiService,
@@ -486,8 +521,16 @@ describe('Learner dashboard page', () => {
           threadSummaries: (
             learnerDashboardFeedbackUpdatesData.thread_summaries.map(
               threadSummary => FeedbackThreadSummary
-                .createFromBackendDict(threadSummary)))
+                .createFromBackendDict(threadSummary))),
+          paginatedThreadsList: []
         }));
+
+      spyOn(learnerGroupBackendApiService, 'isLearnerGroupFeatureEnabledAsync')
+        .and.returnValue(Promise.resolve(true));
+
+      spyOn(urlService, 'getUrlParams').and.returnValue({
+        active_tab: 'learner-groups',
+      });
 
       component.ngOnInit();
       flush();
@@ -497,13 +540,42 @@ describe('Learner dashboard page', () => {
 
     it('should initialize correctly component properties after its' +
     ' initialization and get data from backend', fakeAsync(() => {
-      expect(component.profilePictureDataUrl).toBe(profilePictureDataUrl);
+      spyOn(userService, 'getUserInfoAsync').and
+        .callFake(async() => {
+          return Promise.resolve(userInfo);
+        });
+      component.ngOnInit();
+      flush();
+
+      expect(component.profilePicturePngDataUrl).toEqual(
+        'profile-image-url-png');
+      expect(component.profilePictureWebpDataUrl).toEqual(
+        'profile-image-url-webp');
       expect(component.username).toBe(userInfo.getUsername());
       expect(component.windowIsNarrow).toBeTrue();
     }));
 
+    it('should get default profile pictures when username is null',
+      fakeAsync(() => {
+        let userInfo = {
+          getUsername: () => null,
+          isSuperAdmin: () => true,
+          getEmail: () => 'test_email@example.com'
+        };
+        spyOn(userService, 'getUserInfoAsync')
+          .and.resolveTo(userInfo as UserInfo);
+        component.ngOnInit();
+        flush();
+
+        expect(component.profilePicturePngDataUrl).toEqual(
+          '/assets/images/avatar/user_blue_150px.png');
+        expect(component.profilePictureWebpDataUrl).toEqual(
+          '/assets/images/avatar/user_blue_150px.webp');
+      }));
+
     it('should check whether window is narrow on resizing the screen', () => {
       spyOn(windowDimensionsService, 'isWindowNarrow').and.returnValue(false);
+
       expect(component.windowIsNarrow).toBeTrue();
 
       mockResizeEmitter.emit();
@@ -513,15 +585,61 @@ describe('Learner dashboard page', () => {
 
     it('should set focus without scroll on browse lesson btn', fakeAsync(() => {
       const focusSpy = spyOn(focusManagerService, 'setFocusWithoutScroll');
+      spyOn(userService, 'getUserInfoAsync').and
+        .callFake(async() => {
+          return Promise.resolve(userInfo);
+        });
+
       component.ngOnInit();
       flush();
+
       expect(focusSpy).toHaveBeenCalledWith('ourLessonsBtn');
     }));
 
+    it('should subscribe to onLangChange upon initialisation and set page ' +
+    'title whenever language changes', fakeAsync(() => {
+      spyOn(component.directiveSubscriptions, 'add');
+      spyOn(translateService.onLangChange, 'subscribe');
+      spyOn(component, 'setPageTitle');
+
+      component.ngOnInit();
+      flush();
+
+      expect(component.directiveSubscriptions.add).toHaveBeenCalled();
+      expect(translateService.onLangChange.subscribe).toHaveBeenCalled();
+
+      translateService.onLangChange.emit();
+
+      expect(component.setPageTitle).toHaveBeenCalled();
+    }));
+
+    it('should obtain translated page title and set it', () => {
+      spyOn(translateService, 'instant').and.callThrough();
+      spyOn(pageTitleService, 'setDocumentTitle');
+
+      component.setPageTitle();
+
+      expect(translateService.instant).toHaveBeenCalledWith(
+        'I18N_LEARNER_DASHBOARD_PAGE_TITLE');
+      expect(pageTitleService.setDocumentTitle).toHaveBeenCalledWith(
+        'I18N_LEARNER_DASHBOARD_PAGE_TITLE');
+    });
+
     it('should get static image url', () => {
       let imagePath = '/path/to/image.png';
+
       expect(component.getStaticImageUrl(imagePath)).toBe(
         '/assets/images/path/to/image.png');
+    });
+
+    it('should get user profile image png data url correctly', () => {
+      expect(component.getauthorPicturePngDataUrl('username')).toBe(
+        'profile-image-url-png');
+    });
+
+    it('should get user profile image webp data url correctly', () => {
+      expect(component.getauthorPictureWebpDataUrl('username')).toBe(
+        'profile-image-url-webp');
     });
 
     it('should toggle active subsection type when changing subsection type',
@@ -533,6 +651,7 @@ describe('Learner dashboard page', () => {
 
         let newActiveSubsection2 = 'I18N_DASHBOARD_SKILL_PROFICIENCY';
         component.setActiveSubsection(newActiveSubsection2);
+
         expect(component.activeSubsection).toBe(newActiveSubsection2);
       });
 
@@ -545,13 +664,16 @@ describe('Learner dashboard page', () => {
       ' changing sorting type', () => {
       expect(component.isCurrentFeedbackSortDescending).toBe(true);
       expect(component.currentFeedbackThreadsSortType).toBe('lastUpdatedMsecs');
+
       component.setFeedbackSortingOptions('lastUpdatedMsecs');
+
       expect(component.isCurrentFeedbackSortDescending).toBe(false);
     });
 
     it('should change feedback sorting options by exploration when changing' +
       ' sorting type', () => {
       component.setFeedbackSortingOptions('exploration');
+
       expect(component.currentFeedbackThreadsSortType).toBe('exploration');
       expect(component.isCurrentFeedbackSortDescending).toBe(true);
     });
@@ -570,7 +692,7 @@ describe('Learner dashboard page', () => {
 
       const feedbackListNameNodes =
         fixture.debugElement.nativeElement
-          .querySelectorAll('.protractor-test-feedback-exploration');
+          .querySelectorAll('.e2e-test-feedback-exploration');
 
       // The forEach loop is being used here because
       // getValueOfSubscriptionSortKey is used in a *ngFor directive.
@@ -601,6 +723,7 @@ describe('Learner dashboard page', () => {
         .toBe('lastUpdatedMsecs');
 
       component.setFeedbackSortingOptions('lastUpdatedMsecs');
+
       expect(component.isCurrentFeedbackSortDescending).toBeFalse();
 
       tick();
@@ -608,7 +731,7 @@ describe('Learner dashboard page', () => {
 
       const feedbackListNameNodes =
         fixture.debugElement.nativeElement
-          .querySelectorAll('.protractor-test-feedback-exploration');
+          .querySelectorAll('.e2e-test-feedback-exploration');
 
       // The forEach loop is being used here because
       // getValueOfSubscriptionSortKey is used in a *ngFor directive.
@@ -639,6 +762,7 @@ describe('Learner dashboard page', () => {
         .toBe('lastUpdatedMsecs');
 
       component.setFeedbackSortingOptions('explorationTitle');
+
       expect(component.currentFeedbackThreadsSortType)
         .toBe('explorationTitle');
       expect(component.getValueOfFeedbackThreadSortKey())
@@ -649,7 +773,7 @@ describe('Learner dashboard page', () => {
 
       const feedbackListNameNodes =
         fixture.debugElement.nativeElement
-          .querySelectorAll('.protractor-test-feedback-exploration');
+          .querySelectorAll('.e2e-test-feedback-exploration');
 
       // The forEach loop is being used here because
       // getValueOfSubscriptionSortKey is used in a *ngFor directive.
@@ -680,12 +804,14 @@ describe('Learner dashboard page', () => {
         .toBe('lastUpdatedMsecs');
 
       component.setFeedbackSortingOptions('explorationTitle');
+
       expect(component.currentFeedbackThreadsSortType)
         .toBe('explorationTitle');
       expect(component.getValueOfFeedbackThreadSortKey())
         .toBe('explorationTitle');
 
       component.setFeedbackSortingOptions('explorationTitle');
+
       expect(component.isCurrentFeedbackSortDescending).toBeFalse();
 
       tick();
@@ -693,7 +819,7 @@ describe('Learner dashboard page', () => {
 
       const feedbackListNameNodes =
         fixture.debugElement.nativeElement
-          .querySelectorAll('.protractor-test-feedback-exploration');
+          .querySelectorAll('.e2e-test-feedback-exploration');
 
       // The forEach loop is being used here because
       // getValueOfSubscriptionSortKey is used in a *ngFor directive.
@@ -728,18 +854,22 @@ describe('Learner dashboard page', () => {
         current_content_html: 'A orange',
         description: 'Suggestion for english grammar',
         author_username: 'username2',
-        author_picture_data_url: 'foo',
         created_on_msecs: 1200
       }];
       const threadSpy = spyOn(
         learnerDashboardBackendApiService, 'onClickThreadAsync')
         .and.returnValue(Promise.resolve(threadMessages));
 
+      const focusSpy = spyOn(
+        (document.querySelector(
+          '.oppia-exploration-title') as HTMLElement), 'focus');
+
       expect(component.numberOfUnreadThreads).toBe(10);
       expect(component.loadingFeedbacks).toBe(false);
 
       component.onClickThread(
         threadStatus, explorationId, threadId, explorationTitle);
+
       expect(component.loadingFeedbacks).toBe(true);
 
       tick();
@@ -750,6 +880,7 @@ describe('Learner dashboard page', () => {
       expect(component.numberOfUnreadThreads).toBe(6);
       expect(component.messageSummaries.length).toBe(1);
       expect(threadSpy).toHaveBeenCalled();
+      expect(focusSpy).toHaveBeenCalled();
     }));
 
     it('should set a new section as active when fetching message summary' +
@@ -766,7 +897,6 @@ describe('Learner dashboard page', () => {
         current_content_html: 'A orange',
         description: 'Suggestion for english grammar',
         author_username: 'username2',
-        author_picture_data_url: 'foo',
         created_on_msecs: 1200
       }];
       const threadSpy = spyOn(
@@ -778,6 +908,7 @@ describe('Learner dashboard page', () => {
 
       component.onClickThread(
         threadStatus, explorationId, threadId, explorationTitle);
+
       expect(component.loadingFeedbacks).toBe(true);
 
       tick();
@@ -816,7 +947,6 @@ describe('Learner dashboard page', () => {
           current_content_html: 'A orange',
           description: 'Suggestion for english grammar',
           author_username: 'username2',
-          author_picture_data_url: 'foo',
           created_on_msecs: 1200
         }];
 
@@ -829,6 +959,7 @@ describe('Learner dashboard page', () => {
 
         component.onClickThread(
           threadStatus, explorationId, threadId, explorationTitle);
+
         expect(component.loadingFeedbacks).toBe(true);
 
         tick();
@@ -841,8 +972,8 @@ describe('Learner dashboard page', () => {
         expect(threadSpy).toHaveBeenCalled();
 
         component.showAllThreads();
-        expect(component.feedbackThreadActive).toBe(false);
 
+        expect(component.feedbackThreadActive).toBe(false);
         expect(component.numberOfUnreadThreads).toBe(6);
       }));
 
@@ -861,7 +992,6 @@ describe('Learner dashboard page', () => {
           current_content_html: 'A orange',
           description: 'Suggestion for english grammar',
           author_username: 'username2',
-          author_picture_data_url: 'foo',
           created_on_msecs: 1200
         }];
 
@@ -878,6 +1008,7 @@ describe('Learner dashboard page', () => {
 
         component.onClickThread(
           threadStatus, explorationId, threadId, explorationTitle);
+
         expect(component.loadingFeedbacks).toBe(true);
 
         tick();
@@ -890,6 +1021,7 @@ describe('Learner dashboard page', () => {
         expect(threadSpy).toHaveBeenCalled();
 
         component.addNewMessage(threadId, message);
+
         expect(component.messageSendingInProgress).toBe(true);
 
         tick();
@@ -903,6 +1035,7 @@ describe('Learner dashboard page', () => {
       () => {
         spyOn(suggestionModalForLearnerDashboardService, 'showSuggestionModal')
           .and.returnValue(null);
+
         let newContent = 'New content';
         let oldContent = 'Old content';
         let description = 'Description';
@@ -935,6 +1068,7 @@ describe('Learner dashboard page', () => {
         let NOW_MILLIS = 1617393321345;
         spyOn(dateTimeFormatService, 'getLocaleAbbreviatedDatetimeString')
           .withArgs(NOW_MILLIS).and.returnValue('4/2/2021');
+
         expect(component.getLocaleAbbreviatedDatetimeString(NOW_MILLIS))
           .toBe('4/2/2021');
       });
@@ -972,7 +1106,12 @@ describe('Learner dashboard page', () => {
           AlertsService,
           CsrfTokenService,
           LearnerDashboardBackendApiService,
-          UserService
+          UserService,
+          PageTitleService,
+          {
+            provide: TranslateService,
+            useClass: MockTranslateService
+          }
         ],
         schemas: [NO_ERRORS_SCHEMA]
       }).compileComponents();
@@ -986,12 +1125,14 @@ describe('Learner dashboard page', () => {
       learnerDashboardBackendApiService =
         TestBed.inject(LearnerDashboardBackendApiService);
       userService = TestBed.inject(UserService);
+      translateService = TestBed.inject(TranslateService);
+      pageTitleService = TestBed.inject(PageTitleService);
 
       spyOn(csrfTokenService, 'getTokenAsync').and.returnValue(
         Promise.resolve('sample-csrf-token'));
 
-      spyOn(userService, 'getProfileImageDataUrlAsync')
-        .and.returnValue(Promise.resolve(profilePictureDataUrl));
+      spyOn(userService, 'getProfileImageDataUrl').and.returnValue(
+        ['default-image-url-png', 'default-image-url-webp']);
 
       spyOn(userService, 'getUserInfoAsync').and.returnValue(
         Promise.resolve(userInfo));
@@ -1003,7 +1144,7 @@ describe('Learner dashboard page', () => {
         learnerDashboardBackendApiService,
         'fetchLearnerDashboardTopicsAndStoriesDataAsync')
         .and.rejectWith(404);
-      const alertsSpy = spyOn(alertsService, 'addWarning').and.returnValue();
+      const alertsSpy = spyOn(alertsService, 'addWarning').and.callThrough();
 
       component.ngOnInit();
 
@@ -1022,7 +1163,7 @@ describe('Learner dashboard page', () => {
         learnerDashboardBackendApiService,
         'fetchLearnerDashboardCollectionsDataAsync')
         .and.rejectWith(404);
-      const alertsSpy = spyOn(alertsService, 'addWarning').and.returnValue();
+      const alertsSpy = spyOn(alertsService, 'addWarning').and.callThrough();
 
       let newActiveSectionName = 'I18N_DASHBOARD_LESSONS';
       component.setActiveSubsection(newActiveSectionName);
@@ -1042,7 +1183,7 @@ describe('Learner dashboard page', () => {
         learnerDashboardBackendApiService,
         'fetchLearnerDashboardExplorationsDataAsync')
         .and.rejectWith(404);
-      const alertsSpy = spyOn(alertsService, 'addWarning').and.returnValue();
+      const alertsSpy = spyOn(alertsService, 'addWarning').and.callThrough();
 
       let newActiveSectionName = 'I18N_DASHBOARD_LESSONS';
       component.setActiveSubsection(newActiveSectionName);
@@ -1128,7 +1269,7 @@ describe('Learner dashboard page', () => {
         learnerDashboardBackendApiService,
         'fetchLearnerDashboardCollectionsDataAsync')
         .and.rejectWith(404);
-      const alertsSpy = spyOn(alertsService, 'addWarning').and.returnValue();
+      const alertsSpy = spyOn(alertsService, 'addWarning').and.callThrough();
 
       let newActiveSectionName = (
         'I18N_LEARNER_DASHBOARD_COMMUNITY_LESSONS_SECTION');
@@ -1149,7 +1290,7 @@ describe('Learner dashboard page', () => {
         learnerDashboardBackendApiService,
         'fetchLearnerDashboardExplorationsDataAsync')
         .and.rejectWith(404);
-      const alertsSpy = spyOn(alertsService, 'addWarning').and.returnValue();
+      const alertsSpy = spyOn(alertsService, 'addWarning').and.callThrough();
 
       let newActiveSectionName = (
         'I18N_LEARNER_DASHBOARD_COMMUNITY_LESSONS_SECTION');
@@ -1236,7 +1377,7 @@ describe('Learner dashboard page', () => {
           learnerDashboardBackendApiService,
           'fetchLearnerDashboardFeedbackUpdatesDataAsync')
           .and.rejectWith(404);
-        const alertsSpy = spyOn(alertsService, 'addWarning').and.returnValue();
+        const alertsSpy = spyOn(alertsService, 'addWarning').and.callThrough();
 
         component.ngOnInit();
 
@@ -1247,5 +1388,13 @@ describe('Learner dashboard page', () => {
           'Failed to get learner dashboard feedback updates data');
         expect(fetchDataSpy).toHaveBeenCalled();
       }));
+
+    it('should unsubscribe upon component destruction', () => {
+      spyOn(component.directiveSubscriptions, 'unsubscribe');
+
+      component.ngOnDestroy();
+
+      expect(component.directiveSubscriptions.unsubscribe).toHaveBeenCalled();
+    });
   });
 });

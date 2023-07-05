@@ -19,7 +19,7 @@
 import { TopicRights } from 'domain/topic/topic-rights.model';
 
 describe('Topic rights model', () => {
-  let sampleTopicRights: TopicRights = null;
+  let sampleTopicRights: TopicRights;
 
   beforeEach(() => {
     var initialTopicRightsBackendObject = {
@@ -67,8 +67,7 @@ describe('Topic rights model', () => {
   });
 
   it('should create an empty topic rights object', () => {
-    var emptyTopicRightsBackendObject = (
-      TopicRights.createInterstitialRights());
+    let emptyTopicRightsBackendObject = new TopicRights(false, false, false);
 
     expect(emptyTopicRightsBackendObject.isPublished()).toEqual(false);
     expect(emptyTopicRightsBackendObject.canEditTopic()).toEqual(false);
@@ -76,8 +75,7 @@ describe('Topic rights model', () => {
   });
 
   it('should make a copy from another topic rights', () => {
-    var emptyTopicRightsBackendObject = (
-      TopicRights.createInterstitialRights());
+    let emptyTopicRightsBackendObject = new TopicRights(false, false, false);
 
     emptyTopicRightsBackendObject.copyFromTopicRights(sampleTopicRights);
 

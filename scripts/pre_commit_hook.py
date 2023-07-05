@@ -29,33 +29,40 @@ but it will have no effect.
 from __future__ import annotations
 
 import argparse
+import json
 import os
 import shutil
 import subprocess
 import sys
 
-sys.path.append(os.getcwd())
-from core import python_utils  # isort:skip  # pylint: disable=wrong-import-position
-from scripts import common  # isort:skip # pylint: disable=wrong-import-position
+from typing import Final, List, Optional, Tuple
 
-FECONF_FILEPATH = os.path.join('core', 'feconf.py')
-CONSTANTS_FILEPATH = os.path.join('.', 'assets', 'constants.ts')
-KEYS_UPDATED_IN_FECONF = [
+# TODO(#15567): The order can be fixed after Literal in utils.py is loaded
+# from typing instead of typing_extensions, this will be possible after
+# we migrate to Python 3.8.
+sys.path.append(os.getcwd())
+from scripts import common  # isort:skip # pylint: disable=wrong-import-position
+from core import utils  # isort:skip # pylint: disable=wrong-import-position
+
+FECONF_FILEPATH: Final = os.path.join('core', 'feconf.py')
+CONSTANTS_FILEPATH: Final = os.path.join('.', 'assets', 'constants.ts')
+RELEASE_CONSTANTS_FILEPATH: Final = os.path.join(
+    '.', 'assets', 'release_constants.json')
+KEYS_UPDATED_IN_FECONF: Final = [
     b'INCOMING_EMAILS_DOMAIN_NAME', b'ADMIN_EMAIL_ADDRESS',
     b'SYSTEM_EMAIL_ADDRESS', b'NOREPLY_EMAIL_ADDRESS', b'CAN_SEND_EMAILS',
     b'CAN_SEND_EDITOR_ROLE_EMAILS', b'CAN_SEND_FEEDBACK_MESSAGE_EMAILS',
     b'CAN_SEND_SUBSCRIPTION_EMAILS', b'DEFAULT_EMAIL_UPDATES_PREFERENCE',
     b'REQUIRE_EMAIL_ON_MODERATOR_ACTION', b'EMAIL_SERVICE_PROVIDER',
     b'SYSTEM_EMAIL_NAME', b'MAILGUN_DOMAIN_NAME']
-KEYS_UPDATED_IN_CONSTANTS = [
-    b'CAN_SEND_ANALYTICS_EVENTS', b'SITE_FEEDBACK_FORM_URL',
-    b'ANALYTICS_ID', b'SITE_NAME_FOR_ANALYTICS', b'FIREBASE_CONFIG_API_KEY',
+KEYS_UPDATED_IN_CONSTANTS: Final = [
+    b'SITE_FEEDBACK_FORM_URL', b'FIREBASE_CONFIG_API_KEY',
     b'FIREBASE_CONFIG_APP_ID', b'FIREBASE_CONFIG_AUTH_DOMAIN',
     b'FIREBASE_CONFIG_MESSAGING_SENDER_ID', b'FIREBASE_CONFIG_PROJECT_ID',
     b'FIREBASE_CONFIG_STORAGE_BUCKET', b'FIREBASE_CONFIG_GOOGLE_CLIENT_ID']
 
 
-def install_hook():
+def install_hook() -> None:
     """Installs the pre_commit_hook script and makes it executable.
     It ensures that oppia/ is the root folder.
 
@@ -69,7 +76,7 @@ def install_hook():
     file_is_symlink = os.path.islink(pre_commit_file)
     file_exists = os.path.exists(pre_commit_file)
     if file_is_symlink and file_exists:
-        python_utils.PRINT('Symlink already exists')
+        print('Symlink already exists')
     else:
         # This is needed, because otherwise some systems symlink/copy the .pyc
         # file instead of the .py file.
@@ -77,26 +84,26 @@ def install_hook():
         # If its a broken symlink, delete it.
         if file_is_symlink and not file_exists:
             os.unlink(pre_commit_file)
-            python_utils.PRINT('Removing broken symlink')
+            print('Removing broken symlink')
         try:
             os.symlink(os.path.abspath(this_file), pre_commit_file)
-            python_utils.PRINT('Created symlink in .git/hooks directory')
+            print('Created symlink in .git/hooks directory')
         # Raises AttributeError on windows, OSError added as failsafe.
         except (OSError, AttributeError):
             shutil.copy(this_file, pre_commit_file)
-            python_utils.PRINT('Copied file to .git/hooks directory')
+            print('Copied file to .git/hooks directory')
 
-    python_utils.PRINT('Making pre-commit hook file executable ...')
+    print('Making pre-commit hook file executable ...')
     if not common.is_windows_os():
         _, err_chmod_cmd = start_subprocess_for_result(chmod_cmd)
 
         if not err_chmod_cmd:
-            python_utils.PRINT('pre-commit hook file is now executable!')
+            print('pre-commit hook file is now executable!')
         else:
             raise ValueError(err_chmod_cmd)
 
 
-def start_subprocess_for_result(cmd):
+def start_subprocess_for_result(cmd: List[str]) -> Tuple[bytes, bytes]:
     """Starts subprocess and returns (stdout, stderr)."""
     task = subprocess.Popen(
         cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -104,7 +111,7 @@ def start_subprocess_for_result(cmd):
     return out, err
 
 
-def does_diff_include_package_lock_file():
+def does_diff_include_package_lock_file() -> bool:
     """Checks whether the diff includes package-lock.json.
 
     Returns:
@@ -124,7 +131,7 @@ def does_diff_include_package_lock_file():
         raise ValueError(err)
 
 
-def does_current_folder_contain_have_package_lock_file():
+def does_current_folder_contain_have_package_lock_file() -> bool:
     """Checks whether package-lock.json exists in the current folder.
 
     Returns:
@@ -133,7 +140,7 @@ def does_current_folder_contain_have_package_lock_file():
     return os.path.isfile('package-lock.json')
 
 
-def check_changes(filetype):
+def check_changes(filetype: str) -> bool:
     """Checks if diff in feconf or constants file includes
     changes made for release.
 
@@ -161,7 +168,7 @@ def check_changes(filetype):
     return True
 
 
-def check_changes_in_config():
+def check_changes_in_config() -> None:
     """Checks whether feconf and assets have changes made for release
     deployment.
 
@@ -179,7 +186,28 @@ def check_changes_in_config():
                 CONSTANTS_FILEPATH))
 
 
-def main(args=None):
+def check_changes_in_gcloud_path() -> None:
+    """Checks that the gcloud path in common.py matches with the path in
+    release_constants.json.
+
+    Raises:
+        Exception. The gcloud path in common.py does not match with the path
+            in release_constants.json.
+    """
+    with utils.open_file(RELEASE_CONSTANTS_FILEPATH, 'r') as f:
+        release_constants_gcloud_path = json.loads(f.read())['GCLOUD_PATH']
+
+    if not (
+            os.path.exists(release_constants_gcloud_path) and
+            os.path.samefile(release_constants_gcloud_path, common.GCLOUD_PATH)
+    ):
+        raise Exception(
+            'The gcloud path in common.py: %s should match the path in '
+            'release_constants.json: %s. Please fix.' % (
+                common.GCLOUD_PATH, release_constants_gcloud_path))
+
+
+def main(args: Optional[List[str]] = None) -> None:
     """Main method for pre-commit hook that checks files added/modified
     in a commit.
     """
@@ -187,20 +215,22 @@ def main(args=None):
     parser.add_argument(
         '--install', action='store_true', default=False,
         help='Install pre_commit_hook to the .git/hooks dir')
-    args = parser.parse_args(args=args)
-    if args.install:
+    parsed_args = parser.parse_args(args=args)
+    if parsed_args.install:
         install_hook()
         return
 
-    python_utils.PRINT('Running pre-commit check for feconf and constants ...')
+    print('Running pre-commit check for feconf and constants ...')
     check_changes_in_config()
-    python_utils.PRINT('Running pre-commit check for package-lock.json ...')
+    print('Running pre-commit check for gcloud path changes...')
+    check_changes_in_gcloud_path()
+    print('Running pre-commit check for package-lock.json ...')
     if does_diff_include_package_lock_file() and (
             does_current_folder_contain_have_package_lock_file()):
         # The following message is necessary since there git commit aborts
         # quietly when the status is non-zero.
-        python_utils.PRINT('-----------COMMIT ABORTED-----------')
-        python_utils.PRINT(
+        print('-----------COMMIT ABORTED-----------')
+        print(
             'Oppia utilize Yarn to manage node packages. Please delete '
             'package-lock.json, revert the changes in package.json, and use '
             'yarn to add, update, or delete the packages. For more information '

@@ -36,7 +36,7 @@ describe('Blog Post Page service', () => {
         hash: '/',
         reload: () => {}
       },
-      open: (url) => {},
+      open: (url: string) => {},
       onhashchange() {},
     };
   }
@@ -184,16 +184,10 @@ describe('Blog Post Page service', () => {
     expect(blogDashboardPageService.blogPostId).toEqual('abc123456abc');
   });
 
-  it('should set and retrieve author picture url correctly', () => {
-    blogDashboardPageService.authorPictureUrl = 'sample.png';
-
-    expect(blogDashboardPageService.authorPictureUrl).toEqual('sample.png');
-  });
-
   it('should set and retrieve blog post data correctly', () => {
     let summaryObject = BlogPostData.createFromBackendDict(
       { id: 'sampleId',
-        author_username: 'test_user',
+        displayed_author_name: 'test_user',
         title: 'Title',
         content: 'Hello World',
         tags: ['news'],

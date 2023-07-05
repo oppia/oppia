@@ -28,13 +28,21 @@ from core.tests import test_utils
 
 import webapp2
 
-auth_models, = models.Registry.import_models([models.NAMES.auth])
+MYPY = False
+if MYPY:  # pragma: no cover
+    from mypy_imports import auth_models
+    from mypy_imports import platform_auth_services
+
+auth_models, = (
+    models.Registry.import_models([models.Names.AUTH]))
+
+platform_auth_services = models.Registry.import_auth_services()
 
 
 class AuthServicesTests(test_utils.GenericTestBase):
 
-    def setUp(self):
-        super(AuthServicesTests, self).setUp()
+    def setUp(self) -> None:
+        super().setUp()
 
         self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
         self.full_user_id = self.get_user_id_from_email(self.NEW_USER_EMAIL)
@@ -42,14 +50,14 @@ class AuthServicesTests(test_utils.GenericTestBase):
 
         self.modifiable_full_user_data = user_domain.ModifiableUserData(
             'full_user_1', '12345', [constants.DEFAULT_LANGUAGE_CODE],
-            None, None, user_id=self.full_user_id)
+            None, None, None, user_id=self.full_user_id)
         self.modifiable_profile_user_data = [
             user_domain.ModifiableUserData(
                 'profile_user_1', '12345', [constants.DEFAULT_LANGUAGE_CODE],
-                None, None),
+                None, None, None),
             user_domain.ModifiableUserData(
                 'profile_user_2', '12345', [constants.DEFAULT_LANGUAGE_CODE],
-                None, None),
+                None, None, None),
         ]
 
         user_services.update_multiple_users_data(
@@ -60,7 +68,7 @@ class AuthServicesTests(test_utils.GenericTestBase):
         self.profile_user_1_id = profile_users[0].user_id
         self.profile_user_2_id = profile_users[1].user_id
 
-    def test_create_profile_user_auth_details(self):
+    def test_create_profile_user_auth_details(self) -> None:
         user_auth_details = auth_services.create_profile_user_auth_details(
             'uid', 'pid')
 
@@ -71,17 +79,20 @@ class AuthServicesTests(test_utils.GenericTestBase):
         self.assertFalse(user_auth_details.deleted)
 
     def test_create_profile_user_auth_details_with_self_as_parent_is_error(
-            self):
-        with self.assertRaisesRegexp(ValueError, 'cannot be its own parent'):
+        self
+    ) -> None:
+        with self.assertRaisesRegex(ValueError, 'cannot be its own parent'):
             auth_services.create_profile_user_auth_details('uid', 'uid')
 
-    def test_get_all_profiles_for_parent_user_id_returns_all_profiles(self):
+    def test_get_all_profiles_for_parent_user_id_returns_all_profiles(
+        self
+    ) -> None:
         self.assertItemsEqual(
             auth_services.get_all_profiles_by_parent_user_id(self.full_user_id),
             [auth_models.UserAuthDetailsModel.get(self.profile_user_1_id),
              auth_models.UserAuthDetailsModel.get(self.profile_user_2_id)])
 
-    def test_get_auth_claims_from_request(self):
+    def test_get_auth_claims_from_request(self) -> None:
         request = webapp2.Request.blank('/')
 
         self.assertIsNone(auth_services.get_auth_claims_from_request(request))
@@ -103,7 +114,7 @@ class AuthServicesTests(test_utils.GenericTestBase):
 
         self.assertIsNone(auth_services.get_auth_claims_from_request(request))
 
-    def test_mark_user_for_deletion_will_force_auth_id_to_be_none(self):
+    def test_mark_user_for_deletion_will_force_auth_id_to_be_none(self) -> None:
         self.assertIsNotNone(
             auth_services.get_auth_id_from_user_id(self.full_user_id))
 
@@ -112,20 +123,20 @@ class AuthServicesTests(test_utils.GenericTestBase):
         self.assertIsNone(
             auth_services.get_auth_id_from_user_id(self.full_user_id))
 
-    def test_get_association_that_is_present(self):
+    def test_get_association_that_is_present(self) -> None:
         auth_services.associate_auth_id_with_user_id(
             auth_domain.AuthIdUserIdPair('aid', 'uid'))
 
         self.assertEqual(auth_services.get_user_id_from_auth_id('aid'), 'uid')
         self.assertEqual(auth_services.get_auth_id_from_user_id('uid'), 'aid')
 
-    def test_get_association_that_is_missing(self):
+    def test_get_association_that_is_missing(self) -> None:
         self.assertIsNone(
             auth_services.get_user_id_from_auth_id('does_not_exist'))
         self.assertIsNone(
             auth_services.get_auth_id_from_user_id('does_not_exist'))
 
-    def test_get_multi_associations_with_all_present(self):
+    def test_get_multi_associations_with_all_present(self) -> None:
         auth_services.associate_auth_id_with_user_id(
             auth_domain.AuthIdUserIdPair('aid1', 'uid1'))
         auth_services.associate_auth_id_with_user_id(
@@ -142,7 +153,7 @@ class AuthServicesTests(test_utils.GenericTestBase):
                 ['uid1', 'uid2', 'uid3']),
             ['aid1', 'aid2', 'aid3'])
 
-    def test_get_multi_associations_with_one_missing(self):
+    def test_get_multi_associations_with_one_missing(self) -> None:
         auth_services.associate_auth_id_with_user_id(
             auth_domain.AuthIdUserIdPair('aid1', 'uid1'))
         # The aid2 <-> uid2 association is missing.
@@ -158,22 +169,24 @@ class AuthServicesTests(test_utils.GenericTestBase):
                 ['uid1', 'uid2', 'uid3']),
             ['aid1', None, 'aid3'])
 
-    def test_associate_auth_id_with_user_id_without_collision(self):
+    def test_associate_auth_id_with_user_id_without_collision(self) -> None:
         auth_services.associate_auth_id_with_user_id(
             auth_domain.AuthIdUserIdPair('aid', 'uid'))
 
         self.assertEqual(auth_services.get_user_id_from_auth_id('aid'), 'uid')
         self.assertEqual(auth_services.get_auth_id_from_user_id('uid'), 'aid')
 
-    def test_associate_auth_id_with_user_id_with_collision_raises(self):
+    def test_associate_auth_id_with_user_id_with_collision_raises(self) -> None:
         auth_services.associate_auth_id_with_user_id(
             auth_domain.AuthIdUserIdPair('aid', 'uid'))
 
-        with self.assertRaisesRegexp(Exception, 'already associated'):
+        with self.assertRaisesRegex(Exception, 'already associated'):
             auth_services.associate_auth_id_with_user_id(
                 auth_domain.AuthIdUserIdPair('aid', 'uid'))
 
-    def test_associate_multi_auth_ids_with_user_ids_without_collisions(self):
+    def test_associate_multi_auth_ids_with_user_ids_without_collisions(
+        self
+    ) -> None:
         auth_services.associate_multi_auth_ids_with_user_ids(
             [auth_domain.AuthIdUserIdPair('aid1', 'uid1'),
              auth_domain.AuthIdUserIdPair('aid2', 'uid2'),
@@ -185,28 +198,30 @@ class AuthServicesTests(test_utils.GenericTestBase):
              auth_services.get_user_id_from_auth_id('aid3')],
             ['uid1', 'uid2', 'uid3'])
 
-    def test_associate_multi_auth_ids_with_user_ids_with_collision_raises(self):
+    def test_associate_multi_auth_ids_with_user_ids_with_collision_raises(
+        self
+    ) -> None:
         auth_services.associate_auth_id_with_user_id(
             auth_domain.AuthIdUserIdPair('aid1', 'uid1'))
 
-        with self.assertRaisesRegexp(Exception, 'already associated'):
+        with self.assertRaisesRegex(Exception, 'already associated'):
             auth_services.associate_multi_auth_ids_with_user_ids(
                 [auth_domain.AuthIdUserIdPair('aid1', 'uid1'),
                  auth_domain.AuthIdUserIdPair('aid2', 'uid2'),
                  auth_domain.AuthIdUserIdPair('aid3', 'uid3')])
 
-    def test_present_association_is_not_considered_to_be_deleted(self):
+    def test_present_association_is_not_considered_to_be_deleted(self) -> None:
         auth_services.associate_auth_id_with_user_id(
             auth_domain.AuthIdUserIdPair('aid', 'uid'))
         self.assertFalse(
             auth_services.verify_external_auth_associations_are_deleted('uid'))
 
-    def test_missing_association_is_considered_to_be_deleted(self):
+    def test_missing_association_is_considered_to_be_deleted(self) -> None:
         self.assertTrue(
             auth_services.verify_external_auth_associations_are_deleted(
                 'does_not_exist'))
 
-    def test_delete_association_when_it_is_present(self):
+    def test_delete_association_when_it_is_present(self) -> None:
         self.assertFalse(
             auth_services.verify_external_auth_associations_are_deleted(
                 self.full_user_id))
@@ -217,6 +232,60 @@ class AuthServicesTests(test_utils.GenericTestBase):
             auth_services.verify_external_auth_associations_are_deleted(
                 self.full_user_id))
 
-    def test_delete_association_when_it_is_missing_does_not_raise(self):
+    def test_delete_association_when_it_is_missing_does_not_raise(self) -> None:
         # Should not raise.
         auth_services.delete_external_auth_associations('does_not_exist')
+
+    def test_auth_session_established_or_destoryed(self) -> None:
+        auth_section = []
+        def mock_establish_auth_session(
+            _: webapp2.Request,
+            __: webapp2.Response
+        ) -> None:
+            auth_section.append('established')
+
+        def mock_destroy_auth_session(
+            _: webapp2.Response
+        ) -> None:
+            auth_section.remove('established')
+
+        with self.swap(
+            platform_auth_services,
+            'establish_auth_session',
+            mock_establish_auth_session
+        ):
+            auth_services.establish_auth_session(
+                webapp2.Request.blank('/'),
+                webapp2.Response()
+            )
+            self.assertEqual(['established'], auth_section)
+        with self.swap(
+            platform_auth_services,
+            'destroy_auth_session',
+            mock_destroy_auth_session
+        ):
+            auth_services.destroy_auth_session(webapp2.Response())
+            self.assertEqual([], auth_section)
+
+    def test_super_admin_granted_or_revoked(self) -> None:
+        super_admin_privilage = []
+        def mock_grant_super_admin_privileges(uid: str) -> None:
+            super_admin_privilage.append(uid)
+
+        def mock_revoke_super_admin_privileges(uid: str) -> None:
+            super_admin_privilage.remove(uid)
+
+        with self.swap(
+            platform_auth_services,
+            'grant_super_admin_privileges',
+            mock_grant_super_admin_privileges
+        ):
+            auth_services.grant_super_admin_privileges('uid1')
+            self.assertEqual(['uid1'], super_admin_privilage)
+        with self.swap(
+            platform_auth_services,
+            'revoke_super_admin_privileges',
+            mock_revoke_super_admin_privileges
+        ):
+            auth_services.revoke_super_admin_privileges('uid1')
+            self.assertEqual([], super_admin_privilage)

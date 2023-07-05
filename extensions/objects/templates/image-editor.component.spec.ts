@@ -16,9 +16,9 @@
  * @fileoverview Unit tests for the image editor.
  */
 
-import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { ComponentFixture, waitForAsync, TestBed, tick, fakeAsync } from '@angular/core/testing';
+import { ComponentFixture, waitForAsync, TestBed, tick, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 import { ImageEditorComponent } from './image-editor.component';
 import { ImageUploadHelperService } from 'services/image-upload-helper.service';
 import { ContextService } from 'services/context.service';
@@ -26,9 +26,9 @@ import { ImagePreloaderService } from 'pages/exploration-player-page/services/im
 import { AppConstants } from 'app.constants';
 import { ImageLocalStorageService } from 'services/image-local-storage.service';
 import { AlertsService } from 'services/alerts.service';
-import { CsrfTokenService } from 'services/csrf-token.service';
 import { SimpleChanges } from '@angular/core';
 import { SvgSanitizerService } from 'services/svg-sanitizer.service';
+import { MockTranslatePipe } from 'tests/unit-test-utils';
 let gifshot = require('gifshot');
 
 declare global {
@@ -40,13 +40,13 @@ declare global {
 describe('ImageEditor', () => {
   let component: ImageEditorComponent;
   let fixture: ComponentFixture<ImageEditorComponent>;
-  let csrfTokenService: CsrfTokenService;
   let contextService: ContextService;
   let imagePreloaderService: ImagePreloaderService;
   let imageUploadHelperService: ImageUploadHelperService;
   let imageLocalStorageService: ImageLocalStorageService;
   let alertsService: AlertsService;
   let svgSanitizerService: SvgSanitizerService;
+  let httpTestingController: HttpTestingController;
   let dimensionsOfImage = {
     width: 450,
     height: 350
@@ -330,6 +330,7 @@ describe('ImageEditor', () => {
         return 'Fake onload executed';
       };
     }
+
     readAsDataURL(file) {
       this.onload();
       return 'The file is loaded';
@@ -344,9 +345,11 @@ describe('ImageEditor', () => {
         return 'Fake onload executed';
       };
     }
+
     set src(url) {
       this.onload();
     }
+
     addEventListener(txt, func, bool) {
       func();
     }
@@ -356,7 +359,10 @@ describe('ImageEditor', () => {
     TestBed.configureTestingModule(
       {
         imports: [HttpClientTestingModule],
-        declarations: [ImageEditorComponent],
+        declarations: [
+          ImageEditorComponent,
+          MockTranslatePipe
+        ],
         providers: [
           {
             provide: ImageUploadHelperService,
@@ -369,15 +375,14 @@ describe('ImageEditor', () => {
   }));
 
   beforeEach(() => {
+    httpTestingController = TestBed.inject(HttpTestingController);
     svgSanitizerService = TestBed.inject(SvgSanitizerService);
     alertsService = TestBed.inject(AlertsService);
     imageUploadHelperService = TestBed.inject(ImageUploadHelperService);
     imageLocalStorageService = TestBed.inject(ImageLocalStorageService);
-    csrfTokenService = TestBed.inject(CsrfTokenService);
     imagePreloaderService = TestBed.inject(ImagePreloaderService);
     contextService = TestBed.inject(ContextService);
-    fixture = TestBed.createComponent(
-      ImageEditorComponent);
+    fixture = TestBed.createComponent(ImageEditorComponent);
     component = fixture.componentInstance;
     spyOn(contextService, 'getEntityId').and.returnValue('2');
     spyOn(contextService, 'getEntityType').and.returnValue('question');
@@ -1510,16 +1515,12 @@ describe('ImageEditor', () => {
     expect(component.userIsResizingCropArea).toBe(false);
   });
 
-  it('should get dynamic styles for the main container when called', () => {
-    expect(component.getMainContainerDynamicStyles()).toBe('width: 490px');
-  });
-
   it('should show border for the image container when user has not' +
   ' uploaded a file', () => {
     component.data.mode = component.MODE_EMPTY;
 
     expect(component.getImageContainerDynamicStyles())
-      .toBe('border: 1px dotted #888');
+      .toBe('border: 1px dotted #888; width: 100%');
   });
 
   it('should not show border for the image container when user has' +
@@ -1528,7 +1529,7 @@ describe('ImageEditor', () => {
     expect(component.data.mode).toBe(component.MODE_UPLOADED);
 
     expect(component.getImageContainerDynamicStyles())
-      .toBe('border: none');
+      .toBe('border: none; width: 490px');
   });
 
   it('should not show tool bar when the user is cropping', () => {
@@ -1648,6 +1649,10 @@ describe('ImageEditor', () => {
     component.data = { mode: component.MODE_EMPTY, metadata: {}, crop: true };
     spyOn(svgSanitizerService, 'getTrustedSvgResourceUrl').and.returnValue(
       dataSvg.uploadedImageData);
+    spyOn(svgSanitizerService, 'getInvalidSvgTagsAndAttrsFromDataUri')
+      .and.returnValue({ tags: [], attrs: [] });
+    spyOn(svgSanitizerService, 'removeAllInvalidTagsAndAttributes')
+      .and.returnValue(dataSvg.uploadedImageData.toString());
 
     component.onFileChanged(dataSvg.uploadedFile);
 
@@ -1791,7 +1796,7 @@ describe('ImageEditor', () => {
       frameInfo: {
         disposal: 1
       },
-    }] as unknown as never);
+    }] as never);
     // This throws an error "Type '{ lastModified: number; name:
     // string; size: number; type: string; }' is missing the following
     // properties from type 'File': arrayBuffer, slice, stream, text"
@@ -2047,65 +2052,66 @@ describe('ImageEditor', () => {
   it('should alert user with parsed error if it fails to post' +
   ' image to server when user savesimage', fakeAsync(() => {
     spyOn(alertsService, 'addWarning');
-    spyOn(csrfTokenService, 'getTokenAsync')
-      .and.resolveTo('sample-csrf-token');
     spyOn(imagePreloaderService, 'getDimensionsOfImage')
       .and.returnValue({width: 490, height: 327});
-    // @ts-ignore in order to ignore JQuery properties that should
-    // be declared.
-    spyOn($, 'ajax').and.callFake(() => {
-      let d = $.Deferred();
-      d.reject({
-        responseText: ')]}\',\n{"error": "Failed to upload exploration"}'
-      });
-      return d.promise();
-    });
 
     let dimensions = {width: 490, height: 327};
 
     let resampledFile = localConvertImageDataToImageFile(
       component.data.metadata.uploadedImageData);
 
-    component.postImageToServer(
-      dimensions, resampledFile, 'gif');
-    tick();
+    component.postImageToServer(dimensions, resampledFile, 'gif');
+    tick(200);
+
+    let req = httpTestingController.expectOne(
+      '/createhandler/imageupload/question/2'
+    );
+    expect(req.request.method).toEqual('POST');
+    req.flush('Failed to upload image', {
+      status: 500,
+      statusText: 'Failed to upload image'
+    });
+
+    tick(100);
 
     expect(alertsService.addWarning)
-      .toHaveBeenCalledWith('Failed to upload exploration');
+      .toHaveBeenCalledWith('Failed to upload image');
+
+    httpTestingController.verify();
   }));
 
-  it('should alert user with defualt error if it fails to post' +
+  it('should alert user with default error if it fails to post' +
   ' image to server when user savesimage', fakeAsync(() => {
     spyOn(alertsService, 'addWarning');
-    spyOn(csrfTokenService, 'getTokenAsync')
-      .and.resolveTo('sample-csrf-token');
     spyOn(imagePreloaderService, 'getDimensionsOfImage')
       .and.returnValue({width: 490, height: 327});
-    // @ts-ignore in order to ignore JQuery properties that should
-    // be declared.
-    spyOn($, 'ajax').and.callFake(() => {
-      let d = $.Deferred();
-      d.reject({
-        responseText: ')]}\',\n{"error": null}'
-      });
-      return d.promise();
-    });
 
     let dimensions = {width: 490, height: 327};
-
     let resampledFile = localConvertImageDataToImageFile(
       component.data.metadata.uploadedImageData);
 
-    component.postImageToServer(
-      dimensions, resampledFile, 'gif');
-    tick();
+    component.postImageToServer(dimensions, resampledFile, 'gif');
+    tick(200);
+
+    let req = httpTestingController.expectOne(
+      '/createhandler/imageupload/question/2'
+    );
+    expect(req.request.method).toEqual('POST');
+    req.flush(null, {
+      status: 500,
+      statusText: null
+    });
+
+    flushMicrotasks();
+    tick(100);
 
     expect(alertsService.addWarning)
       .toHaveBeenCalledWith('Error communicating with server.');
+    httpTestingController.verify();
   }));
 
   it('should save uploaded gif when user clicks \`Use Image\`' +
-  ' button', (done) => {
+  ' button', fakeAsync(() => {
     spyOnProperty(MouseEvent.prototype, 'offsetX').and.returnValue(360);
     spyOnProperty(MouseEvent.prototype, 'offsetY').and.returnValue(420);
     spyOnProperty(MouseEvent.prototype, 'target').and.returnValue({
@@ -2121,11 +2127,23 @@ describe('ImageEditor', () => {
     spyOn(gifshot, 'createGIF').and.callFake((obj, func) => {
       func(obj);
     });
+    spyOn(window, 'GifFrames').and.resolveTo([{
+      getImage: () => {
+        return {
+          toDataURL: () => {
+            return {
+              image: dataGif.uploadedImageData
+            };
+          }
+        };
+      },
+      frameInfo: {
+        disposal: 1
+      },
+    }] as never);
+
     spyOn(component, 'saveImage').and.callThrough();
     spyOn(component, 'validateProcessedFilesize').and.stub();
-    spyOn(csrfTokenService, 'getTokenAsync').and.callFake(async() => {
-      return Promise.resolve('sample-csrf-token');
-    });
     spyOn(contextService, 'getImageSaveDestination').and.returnValue(
       AppConstants.IMAGE_SAVE_DESTINATION_SERVER);
     // This throws an error "Type '{ lastModified: number; name:
@@ -2135,31 +2153,25 @@ describe('ImageEditor', () => {
     // below.
     // @ts-expect-error
     component.data.metadata = dataGif;
-    // This throws "Argument of type '(options: any)' is not
-    // assignable to parameter of type 'jqXHR<any>'.". We need to suppress
-    // this error because we need to mock $.ajax to this function for
-    // testing purposes.
-    // @ts-expect-error
-    spyOn($, 'ajax').and.callFake((options: Promise) => {
-      let d = $.Deferred();
-      d.resolve(
-        options.dataFilter(
-          '12345{"filename":' +
-          ' "img_20210701_185457_qgrrul296o_height_200_width_260.gif"}'
-        )
-      );
-      return d.promise();
-    });
 
     component.saveUploadedFile();
+    tick(200);
 
-    setTimeout(() => {
-      expect(component.validateProcessedFilesize).toHaveBeenCalled();
-      expect(component.saveImage).toHaveBeenCalled();
-      expect(component.data.mode).toBe(component.MODE_SAVED);
-      done();
-    }, 150);
-  });
+    let req = httpTestingController.expectOne(
+      '/createhandler/imageupload/question/2'
+    );
+    expect(req.request.method).toEqual('POST');
+    req.flush({
+      filename: 'img_20210701_185457_qgrrul296o_height_200_width_260.gif'
+    });
+    httpTestingController.verify();
+
+    tick(100);
+
+    expect(component.validateProcessedFilesize).toHaveBeenCalled();
+    expect(component.saveImage).toHaveBeenCalled();
+    expect(component.data.mode).toBe(component.MODE_SAVED);
+  }));
 
   it('should not save uploaded gif when file size over 100 KB', (done) => {
     spyOnProperty(MouseEvent.prototype, 'offsetX').and.returnValue(360);
@@ -2202,7 +2214,7 @@ describe('ImageEditor', () => {
   });
 
   it('should alert user if resampled gif file is not obtained when the user' +
-  ' saves image', (done) => {
+  ' saves image', fakeAsync(() => {
     spyOn(alertsService, 'addWarning');
     spyOnProperty(MouseEvent.prototype, 'offsetX').and.returnValue(360);
     spyOnProperty(MouseEvent.prototype, 'offsetY').and.returnValue(420);
@@ -2219,13 +2231,24 @@ describe('ImageEditor', () => {
     spyOn(gifshot, 'createGIF').and.callFake((obj, func) => {
       func(obj);
     });
+    spyOn(window, 'GifFrames').and.resolveTo([{
+      getImage: () => {
+        return {
+          toDataURL: () => {
+            return {
+              image: dataGif.uploadedImageData
+            };
+          }
+        };
+      },
+      frameInfo: {
+        disposal: 1
+      },
+    }] as never);
     spyOn(component, 'saveImage').and.callThrough();
     spyOn(component, 'validateProcessedFilesize').and.stub();
     spyOn(contextService, 'getImageSaveDestination').and.returnValue(
       AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE);
-    spyOn(csrfTokenService, 'getTokenAsync').and.callFake(async() => {
-      return Promise.resolve('sample-csrf-token');
-    });
     // This throws an error "Type '{ lastModified: number; name:
     // string; size: number; type: string; }' is missing the following
     // properties from type 'File': arrayBuffer, slice, stream, text"
@@ -2233,33 +2256,17 @@ describe('ImageEditor', () => {
     // below.
     // @ts-expect-error
     component.data.metadata = dataGif;
-    // This throws "Argument of type '(options: any)' is not
-    // assignable to parameter of type 'jqXHR<any>'.". We need to suppress
-    // this error because we need to mock $.ajax to this function for
-    // testing purposes.
-    // @ts-expect-error
-    spyOn($, 'ajax').and.callFake((options: Promise) => {
-      let d = $.Deferred();
-      d.resolve(
-        options.dataFilter(
-          '12345{"filename":' +
-          ' "img_20210701_185457_qgrrul296o_height_200_width_260.gif"}'
-        )
-      );
-      return d.promise();
-    });
+
     spyOn(imageUploadHelperService, 'convertImageDataToImageFile')
       .and.returnValue(null);
 
     component.saveUploadedFile();
+    tick();
 
-    setTimeout(() => {
-      expect(alertsService.addWarning)
-        .toHaveBeenCalledWith('Could not get resampled file.');
-      expect(component.data.mode).toBe(component.MODE_UPLOADED);
-      done();
-    }, 150);
-  });
+    expect(alertsService.addWarning)
+      .toHaveBeenCalledWith('Could not get resampled file.');
+    expect(component.data.mode).toBe(component.MODE_UPLOADED);
+  }));
 
   it('should save uploaded svg when user clicks \`Use Image\`' +
   ' button', () => {
@@ -2278,8 +2285,6 @@ describe('ImageEditor', () => {
     spyOn(contextService, 'getImageSaveDestination').and.returnValue(
       AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE);
     spyOn(component, 'setSavedImageFilename').and.callThrough();
-    spyOn(csrfTokenService, 'getTokenAsync')
-      .and.resolveTo('sample-csrf-token');
     spyOn(component, 'saveImage').and.callThrough();
 
     component.saveUploadedFile();
@@ -2323,8 +2328,6 @@ describe('ImageEditor', () => {
     );
     spyOn(contextService, 'getImageSaveDestination').and.returnValue(
       AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE);
-    spyOn(csrfTokenService, 'getTokenAsync')
-      .and.resolveTo('sample-csrf-token');
     spyOn(component, 'saveImage').and.callThrough();
     // This throws an error "Type '{ lastModified: number; name:
     // string; size: number; type: string; }' is missing the following
@@ -2340,7 +2343,7 @@ describe('ImageEditor', () => {
     expect(component.data.mode).toBe(component.MODE_SAVED);
   });
 
-  it('should not save uploaded png when file size over 100 KB', () => {
+  it('should not save uploaded png when file size is over 100 KB', () => {
     spyOnProperty(MouseEvent.prototype, 'offsetX').and.returnValue(360);
     spyOnProperty(MouseEvent.prototype, 'offsetY').and.returnValue(420);
     spyOnProperty(MouseEvent.prototype, 'target').and.returnValue({
@@ -2396,7 +2399,120 @@ describe('ImageEditor', () => {
     component.saveUploadedFile();
 
     expect(component.saveImage).not.toHaveBeenCalled();
+    expect(component.processedImageIsTooLarge).toBeTrue();
     expect(component.data.mode).toBe(component.MODE_UPLOADED);
+  });
+
+  it('should not save uploaded png when file size is over 1 MB even for' +
+  'entity type beign blog post', () => {
+    spyOnProperty(MouseEvent.prototype, 'offsetX').and.returnValue(360);
+    spyOnProperty(MouseEvent.prototype, 'offsetY').and.returnValue(420);
+    spyOnProperty(MouseEvent.prototype, 'target').and.returnValue({
+      offsetLeft: 0,
+      offsetTop: 0,
+      offsetParent: null,
+      classList: {
+        contains: (text) => {
+          return false;
+        }
+      }
+    });
+    spyOn(document, 'createElement').and.callFake(
+      jasmine.createSpy('createElement').and.returnValue(
+        {
+          width: 0,
+          height: 0,
+          getContext: (txt) => {
+            return {
+              drawImage: (txt, x, y) => {
+                return;
+              }
+            };
+          },
+          toDataURL: (str, x) => {
+            return component.data.metadata.uploadedImageData;
+          }
+        }
+      )
+    );
+    spyOn(component, 'saveImage');
+    component.data.metadata = {
+    // This throws an error "Type '{ lastModified: number; name:
+    // string; size: number; type: string; }' is missing the following
+    // properties from type 'File': arrayBuffer, slice, stream, text"
+    // We need to suppress this error because we only need the values given
+    // below.
+    // @ts-expect-error
+      uploadedFile: {
+        lastModified: 1622307491398,
+        name: '2442125.png',
+        size: 10241024,
+        type: 'image/png'
+      },
+      uploadedImageData:
+        btoa('data:image/png;base64,' + Array(10241024).join('a')),
+      originalWidth: 360,
+      originalHeight: 360,
+      savedImageFilename: 'saved_file_name.gif',
+      savedImageUrl: 'assets/images'
+    };
+
+    component.saveUploadedFile();
+
+    expect(component.saveImage).not.toHaveBeenCalled();
+    expect(component.processedImageIsTooLarge).toBeTrue();
+    expect(component.data.mode).toBe(component.MODE_UPLOADED);
+  });
+
+  it('should save uploaded png when file size is over 100 KB but less then 1' +
+  'MB incase the entity type of image is blog post.', () => {
+    spyOnProperty(MouseEvent.prototype, 'offsetX').and.returnValue(360);
+    spyOnProperty(MouseEvent.prototype, 'offsetY').and.returnValue(420);
+    spyOnProperty(MouseEvent.prototype, 'target').and.returnValue({
+      offsetLeft: 0,
+      offsetTop: 0,
+      offsetParent: null,
+      classList: {
+        contains: (text) => {
+          return false;
+        }
+      }
+    });
+    spyOn(document, 'createElement').and.callFake(
+      jasmine.createSpy('createElement').and.returnValue(
+        {
+          width: 0,
+          height: 0,
+          getContext: (txt) => {
+            return {
+              drawImage: (txt, x, y) => {
+                return;
+              }
+            };
+          },
+          toDataURL: (str, x) => {
+            return component.data.metadata.uploadedImageData;
+          }
+        }
+      )
+    );
+    spyOn(contextService, 'getImageSaveDestination').and.returnValue(
+      AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE);
+    spyOn(component, 'saveImage').and.callThrough();
+    // This throws an error "Type '{ lastModified: number; name:
+    // string; size: number; type: string; }' is missing the following
+    // properties from type 'File': arrayBuffer, slice, stream, text"
+    // We need to suppress this error because we only need the values given
+    // below.
+    // @ts-expect-error
+    component.data.metadata = dataPng;
+    component.entityType = AppConstants.ENTITY_TYPE.BLOG_POST;
+
+    component.saveUploadedFile();
+
+    expect(component.saveImage).toHaveBeenCalled();
+    expect(component.processedImageIsTooLarge).toBeFalse();
+    expect(component.data.mode).toBe(component.MODE_SAVED);
   });
 
   it('should alert user if resampled png file is not obtained when the user' +

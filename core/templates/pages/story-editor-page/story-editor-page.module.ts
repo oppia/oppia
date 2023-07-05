@@ -21,6 +21,9 @@ import { BrowserModule, HAMMER_GESTURE_CONFIG } from '@angular/platform-browser'
 import { downgradeComponent } from '@angular/upgrade/static';
 import { HttpClientModule } from '@angular/common/http';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
+import { RouterModule } from '@angular/router';
+import { APP_BASE_HREF } from '@angular/common';
+
 import { RequestInterceptor } from 'services/request-interceptor.service';
 import { SharedComponentsModule } from 'components/shared-component.module';
 import { OppiaAngularRootComponent } from
@@ -29,36 +32,57 @@ import { platformFeatureInitFactory, PlatformFeatureService } from
   'services/platform-feature.service';
 import { StoryEditorNavbarComponent } from './navbar/story-editor-navbar.component';
 import { StoryEditorNavbarBreadcrumbComponent } from './navbar/story-editor-navbar-breadcrumb.component';
-import { StorySavePendingChangesModalComponent } from './modal-templates/story-save-pending-changes-modal.component';
 import { StoryEditorSaveModalComponent } from './modal-templates/story-editor-save-modal.component';
 import { StoryEditorUnpublishModalComponent } from './modal-templates/story-editor-unpublish-modal.component';
 import { StoryPreviewTabComponent } from './story-preview-tab/story-preview-tab.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MyHammerConfig, toastrConfig } from 'pages/oppia-root/app.module';
+import { SmartRouterModule } from 'hybrid-router-module-provider';
+import { AppErrorHandlerProvider } from 'pages/oppia-root/app-error-handler';
+import { StoryNodeEditorComponent } from './editor-tab/story-node-editor.component';
+import { ChapterEditorTabComponent } from './chapter-editor/chapter-editor-tab.component';
+import { StoryEditorComponent } from './editor-tab/story-editor.component';
+import { StoryEditorPageComponent } from './story-editor-page.component';
+import { DeleteChapterModalComponent } from './modal-templates/delete-chapter-modal.component';
+import { NewChapterTitleModalComponent } from './modal-templates/new-chapter-title-modal.component';
 
 @NgModule({
   imports: [
     BrowserModule,
     BrowserAnimationsModule,
     HttpClientModule,
+    // TODO(#13443): Remove smart router module provider once all pages are
+    // migrated to angular router.
+    SmartRouterModule,
+    RouterModule.forRoot([]),
     SharedComponentsModule,
     ToastrModule.forRoot(toastrConfig)
   ],
   declarations: [
     StoryEditorNavbarBreadcrumbComponent,
-    StorySavePendingChangesModalComponent,
     StoryEditorSaveModalComponent,
     StoryEditorUnpublishModalComponent,
     StoryEditorNavbarComponent,
-    StoryPreviewTabComponent
+    StoryNodeEditorComponent,
+    StoryPreviewTabComponent,
+    ChapterEditorTabComponent,
+    StoryEditorComponent,
+    NewChapterTitleModalComponent,
+    StoryEditorPageComponent,
+    DeleteChapterModalComponent
   ],
   entryComponents: [
     StoryEditorNavbarBreadcrumbComponent,
-    StorySavePendingChangesModalComponent,
     StoryEditorSaveModalComponent,
     StoryEditorUnpublishModalComponent,
     StoryEditorNavbarComponent,
-    StoryPreviewTabComponent
+    StoryNodeEditorComponent,
+    StoryPreviewTabComponent,
+    ChapterEditorTabComponent,
+    StoryEditorComponent,
+    NewChapterTitleModalComponent,
+    StoryEditorPageComponent,
+    DeleteChapterModalComponent
   ],
   providers: [
     {
@@ -75,6 +99,11 @@ import { MyHammerConfig, toastrConfig } from 'pages/oppia-root/app.module';
     {
       provide: HAMMER_GESTURE_CONFIG,
       useClass: MyHammerConfig
+    },
+    AppErrorHandlerProvider,
+    {
+      provide: APP_BASE_HREF,
+      useValue: '/'
     }
   ]
 })

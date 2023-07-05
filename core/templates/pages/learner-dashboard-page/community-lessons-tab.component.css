@@ -1,0 +1,311 @@
+/*
+  NOTE to developers: We generate RTL CSS from this file in the webpack
+  compilation, here are sme additional rules that can be added to the CSS files:
+  https://rtlcss.com/learn/usage-guide/control-directives .
+*/
+.community-lessons-section,
+.playlist-section,
+.subscriptions-section {
+  background-color: #fff;
+  border-radius: 4px;
+  box-shadow: 0 0 4px #0000001a;
+  margin-bottom: 25px;
+  min-height: 215px;
+  opacity: 1;
+  padding: 0 0 30px 0;
+  width: 726px;
+}
+.community-lessons-section .summary-container,
+.playlist-section .summary-container,
+.subscriptions-section .summary-container {
+  margin: auto;
+  width: 656px;
+}
+.community-lessons-section .oppia-dashboard-intro-button,
+.playlist-section .oppia-dashboard-intro-button,
+.subscriptions-section .oppia-dashboard-intro-button {
+  left: 40px;
+  position: relative;
+}
+.community-lessons-section .pagination,
+.playlist-section .pagination {
+  bottom: 10px;
+  display: block;
+  list-style: none;
+  padding-left: 0;
+  position: relative;
+  text-align: end;
+  width: 250px;
+}
+.community-lessons-section .pagination-bottom,
+.playlist-section .pagination-bottom {
+  bottom: 10px;
+  display: block;
+  list-style: none;
+  padding-top: 25px;
+  position: relative;
+  right: 41px;
+  text-align: end;
+}
+.community-lessons-section .pagination-dot,
+.playlist-section .pagination-dot {
+  background-color: rgba(65, 152, 137, 0.15);
+  border-radius: 50%;
+  bottom: 4px;
+  display: inline-block;
+  height: 25px;
+  margin: 0 10px;
+  position: relative;
+  width: 25px;
+}
+.community-lessons-section .pagination-number,
+.playlist-section .pagination-number {
+  color: black;
+  font-size: 15px;
+  margin: 0 7px;
+  opacity: 1;
+  position: relative;
+  right: 1px;
+}
+.community-lessons-section .pagination-arrow,
+.playlist-section .pagination-arrow {
+  color: #ccc;
+  font-size: 25px;
+}
+.community-lessons-section .dropbtn {
+  background-color: #fff;
+  border: 1px solid;
+  bottom: 23px;
+  font-size: 14px;
+  height: 24px;
+  margin-bottom: 20px;
+  position: relative;
+  right: -163px;
+  width: 104px;
+}
+.community-lessons-section .dropdown-icon {
+  float: right;
+  position: relative;
+  right: 5px;
+  top: 2px;
+}
+.community-lessons-section .dropdown {
+  display: inline-block;
+  height: 0;
+  position: relative;
+}
+.community-lessons-section .view-text {
+  bottom: 22px;
+  float: right;
+  font-size: 16px;
+  font-weight: 500;
+  position: relative;
+}
+.community-lessons-section .dropdown-content {
+  background-color: #fff;
+  box-shadow: 0 8px 16px 0 rgb(0 0 0 / 20%);
+  display: none;
+  max-width: 104px;
+  z-index: 1;
+}
+.community-lessons-section .dropdown-content a {
+  color: black;
+  display: block;
+  padding: 12px 16px;
+  text-decoration: none;
+}
+.community-lessons-section .dropdown-content a:hover {
+  background-color: #ddd;
+}
+.community-lessons-section .dropdown:hover .dropdown-content {
+  bottom: 43px;
+  display: block;
+  left: 164px;
+  margin-right: 0;
+  padding: 10px;
+  position: relative;
+}
+.community-lessons-section .lessons-title,
+.playlist-section .lessons-title,
+.subscriptions-section .lessons-title {
+  color: #00645c;
+  font-family: "Capriola", "Roboto", Arial, sans-serif;
+  font-size: 24px;
+  letter-spacing: 0;
+  margin-bottom: 0;
+  opacity: 1;
+  padding: 34px 40px;
+  text-align: left;
+}
+.community-lessons-section .oppia-summary-tile-container,
+.playlist-section .oppia-summary-tile-container {
+  display: inline-block;
+  padding: 0 10px 30px 0;
+}
+.community-lessons-section .empty-section,
+.playlist-section .empty-section,
+.subscriptions-section .empty-section {
+  font-size: 16px;
+  font-weight: inherit;
+  padding: 0 113px 0 40px;
+}
+.community-lessons-section .remove-icon,
+.playlist-section .remove-icon {
+  color: white;
+  float: right;
+  font-size: 20px;
+  left: -7px;
+  margin-left: -26px;
+  margin-top: 10px;
+  position: relative;
+  width: 18px;
+  z-index: 20;
+}
+.subscriptions-section .oppia-impact-text {
+  font-size: 14.5px;
+}
+.subscriptions-section .oppia-subscription-card {
+  background-color: #fff;
+  display: inline-block;
+  height: 90px;
+  margin: 8px 4px;
+  padding: 0;
+  width: 191px;
+}
+.community-lessons-section .oppia-learner-dashboard-nonexistent-exploration,
+.playlist-section .oppia-learner-dashboard-nonexistent-exploration {
+  display: block;
+  padding: 5px 7.5px;
+}
+.community-lessons-section .oppia-mobile-view-icon {
+  margin-right: 16px;
+}
+.subscriptions-section .oppia-subscription-container-list {
+  margin: 0 8px 0 4px;
+  padding: 0 10px 30px 0;
+  width: 197px;
+}
+.subscriptions-section .oppia-subscriptions-container {
+  margin: auto;
+  width: 656px;
+}
+.subscriptions-section .oppia-subscription-name {
+  font-size: 17.5px;
+  margin-bottom: 5px;
+}
+.community-lessons-section .oppia-toggle-button-section,
+.playlist-section .oppia-toggle-button-section,
+.subscriptions-section .oppia-toggle-button-section {
+  margin: auto;
+  padding: 0 98px;
+  width: 50%;
+}
+.community-lessons-section .oppia-toggle-btn,
+.playlist-section .oppia-toggle-btn,
+.subscriptions-section .oppia-toggle-btn {
+  color: #00645c;
+  font-size: 18px;
+  font-weight: 500;
+  letter-spacing: 0;
+  opacity: 1;
+  text-align: center;
+  text-transform: uppercase;
+}
+.community-lessons-section .sub-section-title {
+  color: #333;
+  font-size: 20px;
+  font-weight: 500;
+  letter-spacing: 0;
+  margin-bottom: 0;
+  opacity: 1;
+  padding: 0 0 12px 40px;
+  text-align: left;
+}
+@media screen and (max-width: 767px) {
+  .community-lessons-section,
+  .playlist-section,
+  .subscriptions-section {
+    margin: auto;
+    margin-bottom: 20px;
+    width: 296px;
+  }
+  .community-lessons-section {
+    margin-top: 35px;
+  }
+  .community-lessons-section .summary-container,
+  .playlist-section .summary-container,
+  .subscriptions-section .summary-container {
+    width: 256px;
+  }
+  .community-lessons-section .oppia-summary-tile-container,
+  .playlist-section .oppia-summary-tile-container {
+    width: 272px;
+  }
+  .community-lessons-section .oppia-mobile-summary-tile-container {
+    padding: 13px;
+    width: 310px;
+  }
+  .community-lessons-section .empty-section,
+  .playlist-section .empty-section,
+  .subscriptions-section .empty-section {
+    padding: 0 40px;
+  }
+  .community-lessons-section .lessons-title,
+  .playlist-section .lessons-title,
+  .subscriptions-section .lessons-title {
+    font-size: 17px;
+    padding: 34px 24px;
+  }
+  .subscriptions-section .oppia-subscriptions-container {
+    width: 205px;
+  }
+  .community-lessons-section .remove-icon,
+  .playlist-section .remove-icon {
+    left: -70px;
+    top: 1px;
+  }
+  .community-lessons-section .oppia-learner-dashboard-icon {
+    right: 44px;
+    top: 12px;
+  }
+}
+@media screen and (min-width: 768px) and (max-width: 800px) {
+  .community-lessons-section,
+  .playlist-section,
+  .subscriptions-section {
+    right: 117px;
+    width: 726px;
+  }
+}
+@media screen and (min-width: 768px) and (max-width: 1200px) {
+  .community-lessons-section,
+  .playlist-section,
+  .subscriptions-section {
+    width: 726px;
+  }
+  .community-lessons-section {
+    margin-top: 35px;
+  }
+  .community-lessons-mobile-view {
+    display: flex;
+    margin: auto;
+    width: 650px;
+  }
+  .community-lessons-section .pagination-bottom,
+  .playlist-section .pagination-bottom {
+    display: none;
+  }
+  .community-lessons-section .oppia-mobile-summary-tile-container {
+    padding: 0 5px;
+  }
+  .community-lessons-section .pagination,
+  .playlist-section .pagination {
+    width: 670px;
+  }
+  .community-lessons-section .dropbtn {
+    left: 595px;
+  }
+  .community-lessons-section .dropdown:hover .dropdown-content {
+    left: 595px;
+  }
+}

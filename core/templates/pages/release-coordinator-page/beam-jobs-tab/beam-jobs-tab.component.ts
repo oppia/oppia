@@ -46,14 +46,17 @@ export class BeamJobsTabComponent implements OnInit, OnDestroy {
   jobNameControl = new FormControl('');
 
   dataIsReady = false;
-  beamJobs: BeamJob[] = null;
-  selectedJob: BeamJob = null;
-
+  // This property is initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  beamJobs!: BeamJob[];
+  filteredJobNames!: Observable<string[]>;
+  filteredBeamJobRuns!: Observable<BeamJobRun[]>;
+  beamJobRunsRefreshIntervalSubscription!: Subscription;
+  // Selected job is undefined if no job is selected.
+  selectedJob: BeamJob | undefined = undefined;
   jobNames = new BehaviorSubject<string[]>([]);
   beamJobRuns = new BehaviorSubject<BeamJobRun[]>([]);
-  filteredJobNames: Observable<string[]>;
-  filteredBeamJobRuns: Observable<BeamJobRun[]>;
-  beamJobRunsRefreshIntervalSubscription: Subscription;
 
   constructor(
       private backendApiService: ReleaseCoordinatorBackendApiService,
@@ -81,7 +84,7 @@ export class BeamJobsTabComponent implements OnInit, OnDestroy {
 
     jobNameInputChanges.subscribe(input => {
       if (this.selectedJob?.name !== input) {
-        this.selectedJob = null;
+        this.selectedJob = undefined;
       }
     });
 

@@ -17,7 +17,6 @@
 from __future__ import annotations
 
 from core import feconf
-from core import python_utils
 from core import utils
 from core.constants import constants
 from core.controllers import acl_decorators
@@ -25,47 +24,78 @@ from core.controllers import base
 from core.domain import exp_fetchers
 from core.domain import feedback_services
 from core.domain import learner_progress_services
+from core.domain import story_fetchers
 from core.domain import subscription_services
+from core.domain import suggestion_registry
 from core.domain import suggestion_services
 from core.domain import summary_services
 from core.domain import user_services
 
+from typing import Dict, List, Optional, TypedDict, Union
 
-class OldLearnerDashboardRedirectPage(base.BaseHandler):
+
+class MessageSummaryDict(TypedDict):
+    """Dict representation of author's messages summary."""
+
+    message_id: int
+    text: str
+    updated_status: str
+    author_username: Optional[str]
+    created_on_msecs: float
+
+
+class SuggestionSummaryDict(TypedDict):
+    """Dict representation of suggestion's summary."""
+
+    suggestion_html: str
+    current_content_html: str
+    description: str
+    author_username: Optional[str]
+    created_on_msecs: float
+
+
+class OldLearnerDashboardRedirectPage(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
     """Redirects the old learner dashboard URL to the new one."""
 
-    URL_PATH_ARGS_SCHEMAS = {}
-    HANDLER_ARGS_SCHEMAS = {'GET': {}}
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.open_access
-    def get(self):
+    def get(self) -> None:
         """Handles GET requests."""
         self.redirect(feconf.LEARNER_DASHBOARD_URL, permanent=True)
 
 
-class LearnerDashboardPage(base.BaseHandler):
+class LearnerDashboardPage(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
     """Page showing the user's learner dashboard."""
 
-    URL_PATH_ARGS_SCHEMAS = {}
-    HANDLER_ARGS_SCHEMAS = {'GET': {}}
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.can_access_learner_dashboard
-    def get(self):
+    def get(self) -> None:
         """Handles GET requests."""
         self.render_template('learner-dashboard-page.mainpage.html')
 
 
-class LearnerDashboardTopicsAndStoriesProgressHandler(base.BaseHandler):
+class LearnerDashboardTopicsAndStoriesProgressHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
     """Provides data of the user's topics and stories for the learner
     dashboard page."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-    URL_PATH_ARGS_SCHEMAS = {}
-    HANDLER_ARGS_SCHEMAS = {'GET': {}}
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.can_access_learner_dashboard
-    def get(self):
+    def get(self) -> None:
         """Handles GET requests."""
+        assert self.user_id is not None
         (
             learner_progress_in_topics_and_stories,
             number_of_nonexistent_topics_and_stories) = (
@@ -129,17 +159,54 @@ class LearnerDashboardTopicsAndStoriesProgressHandler(base.BaseHandler):
         self.render_json(self.values)
 
 
-class LearnerDashboardCollectionsProgressHandler(base.BaseHandler):
+class LearnerCompletedChaptersCountHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
+    """Provides the number of chapters completed by the user."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
+
+    @acl_decorators.can_access_learner_dashboard
+    def get(self) -> None:
+        """Handles GET requests."""
+        assert self.user_id is not None
+        learner_progress_in_topics_and_stories = (
+            learner_progress_services.get_topics_and_stories_progress(
+                self.user_id)[0])
+
+        all_topic_summary_dicts = (
+            learner_progress_services.get_displayable_topic_summary_dicts(
+                self.user_id,
+                learner_progress_in_topics_and_stories.all_topic_summaries))
+
+        completed_chapters_count = 0
+        for topic in all_topic_summary_dicts:
+            for story in topic['canonical_story_summary_dict']:
+                completed_chapters_count += (
+                    len(story_fetchers.get_completed_nodes_in_story(
+                        self.user_id, story['id'])))
+
+        self.render_json({
+            'completed_chapters_count': completed_chapters_count,
+        })
+
+
+class LearnerDashboardCollectionsProgressHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
     """Provides data of the user's collections for the learner
     dashboard page."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-    URL_PATH_ARGS_SCHEMAS = {}
-    HANDLER_ARGS_SCHEMAS = {'GET': {}}
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.can_access_learner_dashboard
-    def get(self):
+    def get(self) -> None:
         """Handles GET requests."""
+        assert self.user_id is not None
         (
             learner_progress, number_of_nonexistent_collections) = (
                 learner_progress_services.get_collection_progress(self.user_id))
@@ -167,16 +234,19 @@ class LearnerDashboardCollectionsProgressHandler(base.BaseHandler):
         self.render_json(self.values)
 
 
-class LearnerDashboardExplorationsProgressHandler(base.BaseHandler):
+class LearnerDashboardExplorationsProgressHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
     """Provides data for the user's learner dashboard page."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-    URL_PATH_ARGS_SCHEMAS = {}
-    HANDLER_ARGS_SCHEMAS = {'GET': {}}
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.can_access_learner_dashboard
-    def get(self):
+    def get(self) -> None:
         """Handles GET requests."""
+        assert self.user_id is not None
         (
             learner_progress, number_of_nonexistent_explorations) = (
                 learner_progress_services.get_exploration_progress(
@@ -197,13 +267,12 @@ class LearnerDashboardExplorationsProgressHandler(base.BaseHandler):
         creators_subscribed_to = (
             subscription_services.get_all_creators_subscribed_to(self.user_id))
         creators_settings = user_services.get_users_settings(
-            creators_subscribed_to)
+            creators_subscribed_to, strict=True
+        )
         subscription_list = []
 
         for index, creator_settings in enumerate(creators_settings):
             subscription_summary = {
-                'creator_picture_data_url': (
-                    creator_settings.profile_picture_data_url),
                 'creator_username': creator_settings.username,
                 'creator_impact': (
                     user_services.get_user_impact_score(
@@ -223,34 +292,77 @@ class LearnerDashboardExplorationsProgressHandler(base.BaseHandler):
         self.render_json(self.values)
 
 
-class LearnerDashboardFeedbackUpdatesHandler(base.BaseHandler):
+class LearnerDashboardFeedbackUpdatesHandlerNormalizedPayloadDict(TypedDict):
+    """Dict representation of LearnerDashboardFeedbackUpdatesHandler's
+    normalized_payload dictionary.
+    """
+
+    paginated_threads_list: List[List[str]]
+
+
+class LearnerDashboardFeedbackUpdatesHandler(
+    base.BaseHandler[
+        LearnerDashboardFeedbackUpdatesHandlerNormalizedPayloadDict,
+        Dict[str, str]
+    ]
+):
     """Provides data for the user's learner dashboard page."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-    URL_PATH_ARGS_SCHEMAS = {}
-    HANDLER_ARGS_SCHEMAS = {'GET': {}}
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS = {
+            'POST': {
+                'paginated_threads_list': {
+                    'schema': {
+                        'type': 'list',
+                        'items': {
+                            'type': 'list',
+                            'items': {
+                                'type': 'basestring'
+                            },
+                        },
+                    },
+                    'default_value': []
+                }
+            }
+        }
 
     @acl_decorators.can_access_learner_dashboard
-    def get(self):
-        """Handles GET requests."""
-
-        full_thread_ids = subscription_services.get_all_threads_subscribed_to(
-            self.user_id)
-        if len(full_thread_ids) > 0:
+    def post(self) -> None:
+        """Handles POST requests."""
+        assert self.user_id is not None
+        assert self.normalized_payload is not None
+        if len(self.normalized_payload['paginated_threads_list']) == 0:
+            full_thread_ids = (
+                subscription_services.get_all_threads_subscribed_to(
+                    self.user_id))
+            paginated_threads_list = [
+                full_thread_ids[index: index + 100]
+                for index in range(0, len(full_thread_ids), 100)]
+        else:
+            paginated_threads_list = self.normalized_payload[
+                'paginated_threads_list']
+        if (
+            len(paginated_threads_list) > 0 and
+            len(paginated_threads_list[0]) > 0
+        ):
             thread_summaries, number_of_unread_threads = (
                 feedback_services.get_exp_thread_summaries(
-                    self.user_id, full_thread_ids))
+                    self.user_id, paginated_threads_list[0]))
         else:
             thread_summaries, number_of_unread_threads = [], 0
 
         self.values.update({
             'thread_summaries': [s.to_dict() for s in thread_summaries],
             'number_of_unread_threads': number_of_unread_threads,
+            'paginated_threads_list': paginated_threads_list[1:]
         })
         self.render_json(self.values)
 
 
-class LearnerDashboardIdsHandler(base.BaseHandler):
+class LearnerDashboardIdsHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
     """Gets the progress of the learner.
 
     Gets the ids of all explorations, collections, topics and stories
@@ -258,14 +370,14 @@ class LearnerDashboardIdsHandler(base.BaseHandler):
     and the activities present in the playlist.
     """
 
-    URL_PATH_ARGS_SCHEMAS = {}
-    HANDLER_ARGS_SCHEMAS = {'GET': {}}
-
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.can_access_learner_dashboard
-    def get(self):
+    def get(self) -> None:
         """Handles GET requests."""
+        assert self.user_id is not None
         learner_dashboard_activities = (
             learner_progress_services.get_learner_dashboard_activities(
                 self.user_id))
@@ -277,7 +389,9 @@ class LearnerDashboardIdsHandler(base.BaseHandler):
         self.render_json(self.values)
 
 
-class LearnerDashboardFeedbackThreadHandler(base.BaseHandler):
+class LearnerDashboardFeedbackThreadHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
     """Gets all the messages in a thread."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -292,36 +406,50 @@ class LearnerDashboardFeedbackThreadHandler(base.BaseHandler):
             }
         }
     }
-    HANDLER_ARGS_SCHEMAS = {'GET': {}}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.can_access_learner_dashboard
-    def get(self, thread_id):
+    def get(self, thread_id: str) -> None:
         """Handles GET requests."""
+        assert self.user_id is not None
         messages = feedback_services.get_messages(thread_id)
         author_ids = [m.author_id for m in messages]
-        authors_settings = user_services.get_users_settings(author_ids)
+        authors_settings = list(user_services.get_users_settings(author_ids))
 
         message_ids = [m.message_id for m in messages]
         feedback_services.update_messages_read_by_the_user(
             self.user_id, thread_id, message_ids)
 
-        message_summary_list = []
-        suggestion = suggestion_services.get_suggestion_by_id(thread_id)
+        message_summary_list: List[
+            Union[MessageSummaryDict, SuggestionSummaryDict]
+        ] = []
+        suggestion = suggestion_services.get_suggestion_by_id(
+            thread_id, strict=False
+        )
         suggestion_thread = feedback_services.get_thread(thread_id)
 
         exploration_id = feedback_services.get_exp_id_from_thread_id(thread_id)
         if suggestion:
+            suggestion_author_setting = user_services.get_user_settings(
+                author_ids[0], strict=True
+            )
+            if not isinstance(
+                suggestion,
+                suggestion_registry.SuggestionEditStateContent
+            ):
+                raise Exception(
+                    'No edit state content suggestion found for the given '
+                    'thread_id: %s' % thread_id
+                )
             exploration = exp_fetchers.get_exploration_by_id(exploration_id)
             current_content_html = (
                 exploration.states[
                     suggestion.change.state_name].content.html)
-            suggestion_summary = {
+            suggestion_summary: SuggestionSummaryDict = {
                 'suggestion_html': suggestion.change.new_value['html'],
                 'current_content_html': current_content_html,
                 'description': suggestion_thread.subject,
-                'author_username': authors_settings[0].username,
-                'author_picture_data_url': (
-                    authors_settings[0].profile_picture_data_url),
+                'author_username': suggestion_author_setting.username,
                 'created_on_msecs': utils.get_time_in_millisecs(
                     messages[0].created_on)
             }
@@ -329,22 +457,18 @@ class LearnerDashboardFeedbackThreadHandler(base.BaseHandler):
             messages.pop(0)
             authors_settings.pop(0)
 
-        for m, author_settings in python_utils.ZIP(messages, authors_settings):
+        for m, author_settings in zip(messages, authors_settings):
 
             if author_settings is None:
                 author_username = None
-                author_picture_data_url = None
             else:
                 author_username = author_settings.username
-                author_picture_data_url = (
-                    author_settings.profile_picture_data_url)
 
-            message_summary = {
+            message_summary: MessageSummaryDict = {
                 'message_id': m.message_id,
                 'text': m.text,
                 'updated_status': m.updated_status,
                 'author_username': author_username,
-                'author_picture_data_url': author_picture_data_url,
                 'created_on_msecs': utils.get_time_in_millisecs(m.created_on)
             }
             message_summary_list.append(message_summary)

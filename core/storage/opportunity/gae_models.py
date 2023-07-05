@@ -27,7 +27,7 @@ if MYPY: # pragma: no cover
     from mypy_imports import base_models
     from mypy_imports import datastore_services
 
-(base_models,) = models.Registry.import_models([models.NAMES.base_model])
+(base_models,) = models.Registry.import_models([models.Names.BASE_MODEL])
 
 datastore_services = models.Registry.import_datastore_services()
 
@@ -89,11 +89,11 @@ class ExplorationOpportunitySummaryModel(base_models.BaseModel):
     # tuple(list, str|None, bool) to a domain object.
     @classmethod
     def get_all_translation_opportunities(
-            cls,
-            page_size: int,
-            urlsafe_start_cursor: Optional[str],
-            language_code: str,
-            topic_name: str
+        cls,
+        page_size: int,
+        urlsafe_start_cursor: Optional[str],
+        language_code: str,
+        topic_name: Optional[str]
     ) -> Tuple[
         Sequence[ExplorationOpportunitySummaryModel], Optional[str], bool
     ]:
@@ -159,69 +159,6 @@ class ExplorationOpportunitySummaryModel(base_models.BaseModel):
             more_results
         )
 
-    # TODO(#13523): Change the return value of the function below from
-    # tuple(list, str|None, bool) to a domain object.
-    @classmethod
-    def get_all_voiceover_opportunities(
-        cls,
-        page_size: int,
-        urlsafe_start_cursor: Optional[str],
-        language_code: str
-    ) -> Tuple[
-        Sequence[ExplorationOpportunitySummaryModel], Optional[str], bool
-    ]:
-        """Returns a list of opportunities available for voiceover in a
-        specific language.
-
-        Args:
-            page_size: int. The maximum number of entities to be returned.
-            urlsafe_start_cursor: str or None. If provided, the list of
-                returned entities starts from this datastore cursor.
-                Otherwise, the returned entities start from the beginning
-                of the full list of entities.
-            language_code: str. The language for which voiceover opportunities
-                to be fetched.
-
-        Returns:
-            3-tuple of (results, cursor, more). As described in fetch_page() at:
-            https://developers.google.com/appengine/docs/python/ndb/queryclass,
-            where:
-                results: list(ExplorationOpportunitySummaryModel). A list
-                    of query results.
-                cursor: str or None. A query cursor pointing to the next
-                    batch of results. If there are no more results, this might
-                    be None.
-                more: bool. If True, there are (probably) more results after
-                    this batch. If False, there are no further results after
-                    this batch.
-        """
-        start_cursor = datastore_services.make_cursor(
-            urlsafe_cursor=urlsafe_start_cursor)
-
-        language_created_on_query = cls.query(
-            cls.language_codes_needing_voice_artists == language_code
-        ).order(cls.created_on)
-
-        fetch_result: Tuple[
-            Sequence[ExplorationOpportunitySummaryModel],
-            datastore_services.Cursor,
-            bool
-        ] = language_created_on_query.fetch_page(
-            page_size, start_cursor=start_cursor)
-        results, cursor, _ = fetch_result
-        # TODO(#13462): Refactor this so that we don't do the lookup.
-        # Do a forward lookup so that we can know if there are more values.
-        fetch_result = language_created_on_query.fetch_page(
-            page_size + 1, start_cursor=start_cursor)
-        plus_one_query_models, _, _ = fetch_result
-        more_results = len(plus_one_query_models) == page_size + 1
-        # The urlsafe returns bytes and we need to decode them to string.
-        return (
-            results,
-            (cursor.urlsafe().decode('utf-8') if cursor else None),
-            more_results
-        )
-
     @classmethod
     def get_by_topic(
         cls, topic_id: str
@@ -233,12 +170,6 @@ class ExplorationOpportunitySummaryModel(base_models.BaseModel):
             ExplorationOpportunitySummaryModel having given topic_id.
         """
         return cls.query(cls.topic_id == topic_id).fetch()
-
-    @classmethod
-    def delete_all(cls) -> None:
-        """Deletes all entities of this class."""
-        keys = cls.query().fetch(keys_only=True)
-        datastore_services.delete_multi(keys)
 
 
 class SkillOpportunityModel(base_models.BaseModel):
@@ -325,9 +256,3 @@ class SkillOpportunityModel(base_models.BaseModel):
             (cursor.urlsafe().decode('utf-8') if cursor else None),
             more_results
         )
-
-    @classmethod
-    def delete_all(cls) -> None:
-        """Deletes all entities of this class."""
-        keys = cls.query().fetch(keys_only=True)
-        datastore_services.delete_multi(keys)

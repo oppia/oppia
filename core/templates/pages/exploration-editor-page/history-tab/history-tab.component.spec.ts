@@ -16,52 +16,44 @@
  * @fileoverview Unit tests for the exploration history tab.
  */
 
-import { EventEmitter } from '@angular/core';
-import { AnswerGroupObjectFactory } from
-  'domain/exploration/AnswerGroupObjectFactory';
+import { EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
 import { EditabilityService } from 'services/editability.service';
-import { HintObjectFactory } from 'domain/exploration/HintObjectFactory';
-import { OutcomeObjectFactory } from
-  'domain/exploration/OutcomeObjectFactory';
-import { ParamChangeObjectFactory } from
-  'domain/exploration/ParamChangeObjectFactory';
-import { ParamChangesObjectFactory } from
-  'domain/exploration/ParamChangesObjectFactory';
-import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
-import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory';
-import { VersionTreeService } from
-  'pages/exploration-editor-page/history-tab/services/version-tree.service';
-import { WrittenTranslationObjectFactory } from
-  'domain/exploration/WrittenTranslationObjectFactory';
-import { WrittenTranslationsObjectFactory } from
-  'domain/exploration/WrittenTranslationsObjectFactory';
-import { TestBed } from '@angular/core/testing';
-import { ExplorationDiffService } from '../services/exploration-diff.service';
-import { StatesObjectFactory } from 'domain/exploration/StatesObjectFactory';
-import { CsrfTokenService } from 'services/csrf-token.service';
+import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
 import { DateTimeFormatService } from 'services/date-time-format.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
-import { ReadOnlyExplorationBackendApiService } from
-  'domain/exploration/read-only-exploration-backend-api.service';
-import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
+import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { HistoryTabComponent } from './history-tab.component';
+import { HistoryTabBackendApiService } from '../services/history-tab-backend-api.service';
+import { CompareVersionsService } from './services/compare-versions.service';
+import { ExplorationDataService } from '../services/exploration-data.service';
+import { RouterService } from '../services/router.service';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 
-describe('History tab component', function() {
-  var ctrl = null;
-  var $q = null;
-  var $rootScope = null;
-  var $scope = null;
-  var $uibModal = null;
-  var compareVersionsService = null;
-  var editabilityService = null;
-  var csrfTokenService = null;
-  var dateTimeFormatService = null;
-  var windowRef = null;
-  var historyTabBackendApiService = null;
+class MockNgbModalRef {
+  componentInstance: {
+    version: null;
+  };
+}
 
-  var mockRefreshVersionHistoryEmitter = new EventEmitter();
+class MockNgbModal {
+  open(): Promise<void> {
+    return Promise.resolve();
+  }
+}
 
-  var explorationId = 'exp1';
-  var snapshots = [{
+describe('History tab component', () => {
+  let component: HistoryTabComponent;
+  let fixture: ComponentFixture<HistoryTabComponent>;
+  let ngbModal: NgbModal;
+  let compareVersionsService: CompareVersionsService;
+  let editabilityService: EditabilityService;
+  let dateTimeFormatService: DateTimeFormatService;
+  let windowRef: WindowRef;
+  let historyTabBackendApiService: HistoryTabBackendApiService;
+
+  let mockRefreshVersionHistoryEmitter = new EventEmitter();
+  let explorationId = 'exp1';
+  let snapshots = [{
     commit_message: 'This is the commit message',
     committer_id: 'committer_3',
     commit_type: '',
@@ -77,140 +69,209 @@ describe('History tab component', function() {
     commit_cmds: []
   }];
 
-  importAllAngularServices();
-
-  beforeEach(function() {
-    dateTimeFormatService = TestBed.get(DateTimeFormatService);
-    editabilityService = TestBed.get(EditabilityService);
-    windowRef = TestBed.get(WindowRef);
-  });
-
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value(
-      'AnswerGroupObjectFactory', TestBed.get(AnswerGroupObjectFactory));
-    $provide.value('CsrfTokenService', TestBed.get(CsrfTokenService));
-    $provide.value('EditabilityService', TestBed.get(EditabilityService));
-    $provide.value(
-      'ExplorationDiffService', TestBed.get(ExplorationDiffService));
-    $provide.value('StatesObjectFactory', TestBed.get(StatesObjectFactory));
-    $provide.value(
-      'HintObjectFactory', TestBed.get(HintObjectFactory));
-    $provide.value(
-      'OutcomeObjectFactory', TestBed.get(OutcomeObjectFactory));
-    $provide.value(
-      'ParamChangeObjectFactory', TestBed.get(ParamChangeObjectFactory));
-    $provide.value(
-      'ParamChangesObjectFactory', TestBed.get(ParamChangesObjectFactory));
-    $provide.value('RuleObjectFactory', TestBed.get(RuleObjectFactory));
-    $provide.value('UnitsObjectFactory', TestBed.get(UnitsObjectFactory));
-    $provide.value('VersionTreeService', TestBed.get(VersionTreeService));
-    $provide.value(
-      'WrittenTranslationObjectFactory',
-      TestBed.get(WrittenTranslationObjectFactory));
-    $provide.value(
-      'WrittenTranslationsObjectFactory',
-      TestBed.get(WrittenTranslationsObjectFactory));
-    $provide.value('ExplorationDataService', {
-      explorationId: explorationId,
-      data: {
-        version: 2
-      },
-      getDataAsync: () => $q.resolve({
-        version: 2,
-      })
-    });
-    $provide.value('RouterService', {
-      onRefreshVersionHistory: mockRefreshVersionHistoryEmitter,
-      getActiveTabName() {
-        return ('main');
-      },
-    });
-    $provide.value(
-      'ReadOnlyExplorationBackendApiService',
-      TestBed.get(ReadOnlyExplorationBackendApiService));
+  beforeEach(waitForAsync(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
+      declarations: [
+        HistoryTabComponent
+      ],
+      providers: [
+        {
+          provide: NgbModal,
+          useClass: MockNgbModal
+        },
+        {
+          provide: ExplorationDataService,
+          useValue: {
+            explorationId: explorationId,
+            data: {
+              version: 2
+            },
+            getDataAsync: () => Promise.resolve({
+              version: 2,
+            })
+          }
+        },
+        {
+          provide: RouterService,
+          useValue: {
+            onRefreshVersionHistory: mockRefreshVersionHistoryEmitter,
+            getActiveTabName() {
+              return ('main');
+            }
+          }
+        }
+      ],
+      schemas: [NO_ERRORS_SCHEMA]
+    }).compileComponents();
   }));
 
-  beforeEach(angular.mock.inject(function($injector, $componentController) {
-    $q = $injector.get('$q');
-    $rootScope = $injector.get('$rootScope');
-    $uibModal = $injector.get('$uibModal');
-    compareVersionsService = $injector.get('CompareVersionsService');
-    csrfTokenService = $injector.get('CsrfTokenService');
-    historyTabBackendApiService = $injector.get('HistoryTabBackendApiService');
-    spyOn(csrfTokenService, 'getTokenAsync')
-      .and.returnValue($q.resolve('sample-csrf-token'));
+  beforeEach(() => {
+    fixture = TestBed.createComponent(HistoryTabComponent);
+    component = fixture.componentInstance;
+
+    dateTimeFormatService = TestBed.inject(DateTimeFormatService);
+    editabilityService = TestBed.inject(EditabilityService);
+    windowRef = TestBed.inject(WindowRef);
+    ngbModal = TestBed.inject(NgbModal);
+    compareVersionsService = TestBed.inject(CompareVersionsService);
+    historyTabBackendApiService = TestBed.inject(HistoryTabBackendApiService);
+
     spyOn(dateTimeFormatService, 'getLocaleDateTimeHourString')
       .and.returnValue('11/21/2014');
+    fixture.detectChanges();
 
-    $scope = $rootScope.$new();
-    ctrl = $componentController('historyTab', {
-      $scope: $scope,
-      DateTimeFormatService: dateTimeFormatService,
-      EditabilityService: editabilityService,
-      WindowRef: windowRef
-    });
-    ctrl.$onInit();
-  }));
+    component.diffData = {
+      v1Metadata: null,
+      v2Metadata: null,
+    };
+    component.compareVersionMetadata = {
+      earlierVersion: 2,
+      laterVersion: 3
+    };
+    component.selectedVersionsArray = [1, 4];
+    component.ngOnInit();
+  });
 
   afterEach(() => {
-    ctrl.$onDestroy();
+    component.ngOnDestroy();
   });
 
   it('should initialize controller properties after its initialization',
-    function() {
-      expect(ctrl.explorationId).toBe(explorationId);
-      expect(ctrl.explorationAllSnapshotsUrl).toBe(
+    () => {
+      expect(component.explorationId).toBe(explorationId);
+      expect(component.explorationAllSnapshotsUrl).toBe(
         '/createhandler/snapshots/exp1');
-      expect(ctrl.revertExplorationUrl).toBe('/createhandler/revert/exp1');
-      expect(ctrl.explorationDownloadUrl).toBe('/createhandler/download/exp1');
+      expect(component.revertExplorationUrl).toBe('/createhandler/revert/exp1');
+      expect(component.explorationDownloadUrl)
+        .toBe('/createhandler/download/exp1');
 
-      expect(ctrl.explorationVersionMetadata).toBe(null);
-      expect(ctrl.versionCheckboxArray).toEqual([]);
-      expect(ctrl.displayedCurrentPageNumber).toBe(1);
-      expect(ctrl.versionNumbersToDisplay).toEqual([]);
+      expect(component.explorationVersionMetadata).toBe(null);
+      expect(component.versionCheckboxArray).toEqual([]);
+      expect(component.displayedCurrentPageNumber).toBe(1);
+      expect(component.versionNumbersToDisplay).toEqual([]);
     });
 
   it('should refresh version history when refreshVersionHistory flag is' +
-    ' broadcasted and force refresh is true', function() {
+    ' broadcasted and force refresh is true', fakeAsync(() => {
     spyOn(
       historyTabBackendApiService, 'getData')
-      .and.returnValue($q.resolve({
+      .and.returnValue(Promise.resolve({
+        summaries: [],
         snapshots: snapshots
       }));
 
-    ctrl.refreshVersionHistory();
-    $rootScope.$apply();
+    component.refreshVersionHistory();
 
-    var data = {
+    let data = {
       forceRefresh: true
     };
 
     mockRefreshVersionHistoryEmitter.emit(data);
-    $scope.$apply();
+    tick();
 
-    expect(ctrl.currentVersion).toBe(2);
-    expect(ctrl.hideHistoryGraph).toBe(true);
-    expect(ctrl.comparisonsAreDisabled).toBe(false);
-  });
+    expect(component.currentVersion).toBe(2);
+    expect(component.hideHistoryGraph).toBe(true);
+    expect(component.comparisonsAreDisabled).toBe(false);
+  }));
 
-  it('should compare selected versions successfully', function() {
+  it('should compare selected versions successfully', fakeAsync(() => {
+    component.selectedVersionsArray = [3, 4, 5, 6];
+    spyOn(component, 'changeCompareVersion').and.stub();
+    component.comparisonsAreDisabled = false;
+    component.explorationSnapshots = [
+      {
+        version_number: 1,
+        committer_id: 'committer_id',
+        created_on_ms: 10,
+        commit_cmds: null,
+        commit_type: null,
+        commit_message: 'message',
+      },
+      {
+        version_number: 1,
+        committer_id: 'committer_id',
+        created_on_ms: 10,
+        commit_cmds: null,
+        commit_type: null,
+        commit_message: 'message',
+      },
+      {
+        version_number: 1,
+        committer_id: 'committer_id',
+        created_on_ms: 10,
+        commit_cmds: null,
+        commit_type: null,
+        commit_message: 'message',
+      }
+    ];
+
     spyOn(
       historyTabBackendApiService, 'getData')
-      .and.returnValue($q.resolve({
+      .and.returnValue(Promise.resolve({
+        summaries: [],
         snapshots: snapshots
       }));
 
-    ctrl.refreshVersionHistory();
-    $scope.$apply();
+    component.refreshVersionHistory();
 
-    ctrl.changeSelectedVersions({
+    component.changeSelectedVersions({
+      versionNumber: 1,
+      committerId: 'committer_3',
+      createdOnMsecsStr: '11/21/2014',
+      commitMessage: 'This is the commit message',
+    }, 1);
+
+    component.changeSelectedVersions({
+      versionNumber: 2,
+      committerId: 'committer_3',
+      createdOnMsecsStr: '11/21/2014',
+      commitMessage: 'This is the commit message',
+    }, 2);
+
+    spyOn(compareVersionsService, 'getDiffGraphData').and.returnValue(
+      Promise.resolve(null));
+
+    component.compareSelectedVersions();
+    component.changeCompareVersion();
+
+    tick();
+
+    expect(component.hideHistoryGraph).toBe(true);
+    expect(component.diffData).toEqual({ v1Metadata: null, v2Metadata: null });
+
+    expect(component.earlierVersionHeader).toBe(
+      undefined);
+    expect(component.laterVersionHeader).toBe(
+      undefined);
+  }));
+
+  it('should show exploration metadata diff modal', () => {
+    spyOn(component, 'changeItemsPerPage').and.stub();
+    spyOn(
+      historyTabBackendApiService, 'getData')
+      .and.returnValue(Promise.resolve({
+        summaries: [],
+        snapshots: snapshots
+      }));
+
+    component.VERSIONS_PER_PAGE = 2;
+    component.paginator({
+      previousPageIndex: 0,
+      pageIndex: 0,
+      pageSize: 0,
+      length: 0,
+    });
+    component.refreshVersionHistory();
+
+    component.changeSelectedVersions({
       committerId: 'committer_3',
       createdOnMsecsStr: '11/21/2014',
       commitMessage: 'This is the commit message',
       versionNumber: 1
     }, 1);
 
-    ctrl.changeSelectedVersions({
+    component.changeSelectedVersions({
       committerId: 'committer_3',
       createdOnMsecsStr: '11/21/2014',
       commitMessage: 'This is the commit message',
@@ -218,84 +279,148 @@ describe('History tab component', function() {
     }, 2);
 
     spyOn(compareVersionsService, 'getDiffGraphData').and.returnValue(
-      $q.resolve({}));
-    ctrl.compareSelectedVersions();
-    ctrl.changeCompareVersion();
-    $scope.$apply();
+      Promise.resolve(null));
+    component.compareSelectedVersions();
+    component.changeCompareVersion();
 
-    expect(ctrl.hideHistoryGraph).toBe(false);
-    expect(ctrl.diffData).toEqual({});
+    const spyObj = spyOn(ngbModal, 'open').and.callFake(() => {
+      return {
+        componentInstance: {
+          oldMetadata: null,
+          newMetadata: null,
+          headers: null,
+        },
+        result: Promise.resolve()
+      } as NgbModalRef;
+    });
 
-    expect(ctrl.earlierVersionHeader).toBe(
-      'Revision #1 by committer_3 (11/21/2014):' +
-        ' This is the commit message');
-    expect(ctrl.laterVersionHeader).toBe(
-      'Revision #2 by committer_3 (11/21/2014):' +
-        ' This is the commit message 2');
+    component.diffData = {
+      v1Metadata: null,
+      v2Metadata: null,
+    };
+    component.showExplorationMetadataDiffModal();
+
+    expect(spyObj).toHaveBeenCalled();
   });
 
-  it('should open a new tab for download exploration with version', function() {
+  it('should open a new tab for download exploration with version', () => {
     spyOnProperty(windowRef, 'nativeWindow').and.returnValue({
       open: jasmine.createSpy('open', () => {})
     });
-    ctrl.downloadExplorationWithVersion(1);
+    component.downloadExplorationWithVersion(1);
 
     expect(windowRef.nativeWindow.open).toHaveBeenCalledWith(
       '/createhandler/download/exp1?v=1', '&output_format=zip');
   });
 
-  it('should open revert exploration modal', function() {
-    spyOn($uibModal, 'open').and.callThrough();
+  it('should open check revert exploration modal', () => {
+    spyOn(ngbModal, 'open').and.returnValue(
+      {
+        componentInstance: new MockNgbModalRef(),
+        result: Promise.resolve()
+      } as NgbModalRef
+    );
 
-    ctrl.showRevertExplorationModal();
+    component.showCheckRevertExplorationModal(1);
 
-    expect($uibModal.open).toHaveBeenCalled();
+    expect(ngbModal.open).toHaveBeenCalled();
   });
 
-  it('should reload page when closing revert exploration modal', function() {
-    spyOnProperty(windowRef, 'nativeWindow').and.returnValue({
-      location: {
-        reload: jasmine.createSpy('reload', () => {})
-      }
-    });
-    spyOn($uibModal, 'open').and.returnValue({
-      result: $q.resolve(1)
-    });
+  it('should not open revert exploration model when exploration is invalid',
+    fakeAsync(() => {
+      spyOn(ngbModal, 'open').and.returnValue(
+        {
+          componentInstance: new MockNgbModalRef(),
+          result: Promise.resolve(1),
+          close: () => {}
+        } as NgbModalRef
+      );
+      spyOn(component, 'showRevertExplorationModal');
+      const historyBackendCall = spyOn(
+        historyTabBackendApiService, 'getCheckRevertValidData'
+      ).and.returnValue(Promise.resolve({valid: false, details: 'details'}));
 
-    var spyObj = spyOn(
-      historyTabBackendApiService, 'postData'
-    ).and.returnValue($q.resolve());
+      component.showCheckRevertExplorationModal(1);
+      tick();
 
-    ctrl.showRevertExplorationModal(1);
-    $rootScope.$apply();
-    expect(spyObj).toHaveBeenCalled();
-    expect(windowRef.nativeWindow.location.reload).toHaveBeenCalled();
-  });
 
-  it('should not reload page when dismissing revert exploration modal',
-    function() {
+      expect(historyBackendCall).toHaveBeenCalled();
+      expect(component.showRevertExplorationModal).not.toHaveBeenCalled();
+    }));
+
+  it('should open revert exploration modal when exploration is valid',
+    fakeAsync(() => {
+      spyOn(ngbModal, 'open').and.returnValue(
+        {
+          componentInstance: new MockNgbModalRef(),
+          result: Promise.resolve(1),
+          close: () => {}
+        } as NgbModalRef
+      );
+      spyOn(component, 'showRevertExplorationModal');
+      const historyBackendCall = spyOn(
+        historyTabBackendApiService, 'getCheckRevertValidData'
+      ).and.returnValue(Promise.resolve({valid: true, details: null}));
+
+      component.showCheckRevertExplorationModal(1);
+      tick();
+
+
+      expect(historyBackendCall).toHaveBeenCalled();
+      expect(component.showRevertExplorationModal).toHaveBeenCalled();
+    }));
+
+  it('should reload page when closing revert exploration modal',
+    fakeAsync(() => {
       spyOnProperty(windowRef, 'nativeWindow').and.returnValue({
         location: {
           reload: jasmine.createSpy('reload', () => {})
         }
       });
-      spyOn($uibModal, 'open').and.returnValue({
-        result: $q.reject()
-      });
+      spyOn(ngbModal, 'open').and.returnValue(
+        {
+          componentInstance: new MockNgbModalRef(),
+          result: Promise.resolve(1)
+        } as NgbModalRef
+      );
 
-      ctrl.showRevertExplorationModal(1);
-      $scope.$apply();
+      let spyObj = spyOn(
+        historyTabBackendApiService, 'postData'
+      ).and.returnValue(Promise.resolve(null));
+
+      component.showRevertExplorationModal(1);
+      tick();
+
+      expect(spyObj).toHaveBeenCalled();
+      expect(windowRef.nativeWindow.location.reload).toHaveBeenCalled();
+    }));
+
+  it('should not reload page when dismissing revert exploration modal',
+    () => {
+      spyOnProperty(windowRef, 'nativeWindow').and.returnValue({
+        location: {
+          reload: jasmine.createSpy('reload', () => {})
+        }
+      });
+      spyOn(ngbModal, 'open').and.returnValue(
+        {
+          componentInstance: new MockNgbModalRef(),
+          result: Promise.reject()
+        } as NgbModalRef
+      );
+
+      component.showRevertExplorationModal(1);
 
       expect(windowRef.nativeWindow.location.reload).not.toHaveBeenCalled();
     });
 
-  it('should return if the content is editable', function() {
+  it('should return if the content is editable', () => {
     spyOn(editabilityService, 'isEditable').and.returnValue(false);
-    expect(ctrl.isEditable()).toEqual(false);
+    expect(component.isEditable()).toEqual(false);
   });
 
-  it('should filter the history by username', function() {
-    var snapshots = [{
+  it('should filter the history by username', () => {
+    let snapshots = [{
       commit_message: 'This is the commit message',
       committerId: 'committer_3',
       commit_type: '',
@@ -317,29 +442,29 @@ describe('History tab component', function() {
       created_on_ms: 1416563100000,
       commit_cmds: []
     }];
-    ctrl.totalExplorationVersionMetadata = snapshots;
-    ctrl.username = '';
-    ctrl.filterByUsername();
-    expect(ctrl.explorationVersionMetadata).toEqual(snapshots);
+    component.totalExplorationVersionMetadata = snapshots;
+    component.username = '';
+    component.filterByUsername();
+    expect(component.explorationVersionMetadata).toEqual(snapshots);
 
-    ctrl.username = 'committer_3';
-    ctrl.filterByUsername();
-    expect(ctrl.explorationVersionMetadata).toEqual(
+    component.username = 'committer_3';
+    component.filterByUsername();
+    expect(component.explorationVersionMetadata).toEqual(
       [snapshots[0], snapshots[1]]);
 
-    ctrl.username = 'committer_1';
-    ctrl.filterByUsername();
-    expect(ctrl.explorationVersionMetadata).toEqual([snapshots[2]]);
+    component.username = 'committer_1';
+    component.filterByUsername();
+    expect(component.explorationVersionMetadata).toEqual([snapshots[2]]);
   });
 
-  it('should reset the graph', function() {
-    ctrl.hideHistoryGraph = false;
-    ctrl.resetGraph();
-    expect(ctrl.hideHistoryGraph).toBe(true);
+  it('should reset the graph', () => {
+    component.hideHistoryGraph = false;
+    component.resetGraph();
+    expect(component.hideHistoryGraph).toBe(true);
   });
 
-  it('should reverse the array when the date filter is applied', function() {
-    var snapshots = [{
+  it('should reverse the array when the date filter is applied', () => {
+    let snapshots = [{
       commit_message: 'This is the commit message',
       committerId: 'committer_3',
       commit_type: '',
@@ -361,20 +486,24 @@ describe('History tab component', function() {
       created_on_ms: 1416563100000,
       commit_cmds: []
     }];
-    ctrl.explorationVersionMetadata = snapshots;
-    ctrl.reverseDateOrder();
-    expect(ctrl.explorationVersionMetadata[0].version_number).toEqual(3);
-    expect(ctrl.explorationVersionMetadata[2].version_number).toEqual(1);
+    component.explorationVersionMetadata = snapshots;
+    component.reverseDateOrder();
+    expect(component.explorationVersionMetadata[0].version_number).toEqual(3);
+    expect(component.explorationVersionMetadata[2].version_number).toEqual(1);
 
-    ctrl.reverseDateOrder();
-    expect(ctrl.explorationVersionMetadata[0].version_number).toEqual(1);
-    expect(ctrl.explorationVersionMetadata[2].version_number).toEqual(3);
+    component.reverseDateOrder();
+    expect(component.explorationVersionMetadata[0].version_number).toEqual(1);
+    expect(component.explorationVersionMetadata[2].version_number).toEqual(3);
   });
 
-  it('should find the versions to compare', function() {
-    ctrl.selectedVersionsArray = [1, 4];
-    ctrl.compareVersionMetadata = {};
-    ctrl.totalExplorationVersionMetadata = [
+  it('should find the versions to compare', fakeAsync(() => {
+    spyOn(component, 'getVersionHeader').and.stub();
+    spyOn(compareVersionsService, 'getDiffGraphData').and.returnValue(
+      Promise.resolve(null));
+
+    component.selectedVersionsArray = [1, 4];
+    component.compareVersionMetadata = {};
+    component.totalExplorationVersionMetadata = [
       {
         committerId: '1',
         createdOnMsecsStr: 10,
@@ -396,26 +525,29 @@ describe('History tab component', function() {
         commitMessage: 'commit message 4',
         versionNumber: 4
       }];
-    ctrl.changeCompareVersion();
-    expect(ctrl.compareVersionMetadata.earlierVersion).toEqual(
-      ctrl.totalExplorationVersionMetadata[0]);
-    expect(ctrl.compareVersionMetadata.laterVersion).toEqual(
-      ctrl.totalExplorationVersionMetadata[3]);
+    component.changeCompareVersion();
+    tick();
+    expect(component.compareVersionMetadata.earlierVersion).toEqual(
+      component.totalExplorationVersionMetadata[0]);
+    expect(component.compareVersionMetadata.laterVersion).toEqual(
+      component.totalExplorationVersionMetadata[3]);
 
-    ctrl.selectedVersionsArray = [2, 4];
+    component.selectedVersionsArray = [2, 4];
 
-    ctrl.changeCompareVersion();
-    expect(ctrl.compareVersionMetadata.earlierVersion).toEqual(
-      ctrl.totalExplorationVersionMetadata[1]);
-    expect(ctrl.compareVersionMetadata.laterVersion).toEqual(
-      ctrl.totalExplorationVersionMetadata[3]);
+    component.changeCompareVersion();
+    tick();
+    expect(component.compareVersionMetadata.earlierVersion).toEqual(
+      component.totalExplorationVersionMetadata[1]);
+    expect(component.compareVersionMetadata.laterVersion).toEqual(
+      component.totalExplorationVersionMetadata[3]);
 
-    ctrl.selectedVersionsArray = [2, 3];
+    component.selectedVersionsArray = [2, 3];
 
-    ctrl.changeCompareVersion();
-    expect(ctrl.compareVersionMetadata.earlierVersion).toEqual(
-      ctrl.totalExplorationVersionMetadata[1]);
-    expect(ctrl.compareVersionMetadata.laterVersion).toEqual(
-      ctrl.totalExplorationVersionMetadata[2]);
-  });
+    component.changeCompareVersion();
+    tick();
+    expect(component.compareVersionMetadata.earlierVersion).toEqual(
+      component.totalExplorationVersionMetadata[1]);
+    expect(component.compareVersionMetadata.laterVersion).toEqual(
+      component.totalExplorationVersionMetadata[2]);
+  }));
 });

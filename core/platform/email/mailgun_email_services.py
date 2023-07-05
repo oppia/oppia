@@ -22,21 +22,28 @@ import base64
 import urllib
 
 from core import feconf
-from core import python_utils
+from core import utils
+from core.platform import models
 
 from typing import Dict, List, Optional, Union
 
+MYPY = False
+if MYPY: # pragma: no cover
+    from mypy_imports import secrets_services
+
+secrets_services = models.Registry.import_secrets_services()
+
 
 def send_email_to_recipients(
-        sender_email: str,
-        recipient_emails: List[str],
-        subject: str,
-        plaintext_body: str,
-        html_body: str,
-        bcc: Optional[List[str]] = None,
-        reply_to: Optional[str] = None,
-        recipient_variables: Optional[
-            Dict[str, Dict[str, Union[str, float]]]] = None
+    sender_email: str,
+    recipient_emails: List[str],
+    subject: str,
+    plaintext_body: str,
+    html_body: str,
+    bcc: Optional[List[str]] = None,
+    reply_to: Optional[str] = None,
+    recipient_variables: Optional[
+        Dict[str, Dict[str, Union[str, float]]]] = None
 ) -> bool:
     """Send POST HTTP request to mailgun api. This method is adopted from
     the requests library's post method.
@@ -77,7 +84,9 @@ def send_email_to_recipients(
     Returns:
         bool. Whether the emails are sent successfully.
     """
-    if not feconf.MAILGUN_API_KEY:
+    mailgun_api_key: Optional[str] = secrets_services.get_secret(
+        'MAILGUN_API_KEY')
+    if mailgun_api_key is None:
         raise Exception('Mailgun API key is not available.')
 
     if not feconf.MAILGUN_DOMAIN_NAME:
@@ -114,19 +123,19 @@ def send_email_to_recipients(
         # the MAILGUN_API_KEY to bytes, then decode the returned bytes back
         # to string.
         base64_mailgun_api_key = base64.b64encode(
-            b'api:%b' % feconf.MAILGUN_API_KEY.encode('utf-8')
+            b'api:%b' % mailgun_api_key.encode('utf-8')
         ).strip().decode('utf-8')
         auth_str = 'Basic %s' % base64_mailgun_api_key
         header = {'Authorization': auth_str}
-        server = (
-            ('https://api.mailgun.net/v3/%s/messages')
-            % feconf.MAILGUN_DOMAIN_NAME)
+        server = 'https://api.mailgun.net/v3/%s/messages' % (
+            feconf.MAILGUN_DOMAIN_NAME
+        )
         # The 'ascii' is used here, because only ASCII char are allowed in url,
         # also the docs recommend this approach:
         # https://docs.python.org/3.7/library/urllib.request.html#urllib-examples
         encoded_url = urllib.parse.urlencode(data).encode('ascii')
-        req = python_utils.url_request(server, encoded_url, header)
-        resp = python_utils.url_open(req)
+        req = urllib.request.Request(server, encoded_url, header)
+        resp = utils.url_open(req)
         # The function url_open returns a file_like object that can be queried
         # for the status code of the url query. If it is not 200, the mail query
         # failed so we return False (this function did not complete

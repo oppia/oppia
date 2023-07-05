@@ -33,11 +33,14 @@ import { MathInteractionsService } from 'services/math-interactions.service';
 import { Outcome } from
   'domain/exploration/OutcomeObjectFactory';
 import { AppConstants } from 'app.constants';
+import { NumericExpressionInputRulesService } from 'interactions/NumericExpressionInput/directives/numeric-expression-input-rules.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AlgebraicExpressionInputValidationService {
+  private supportedFunctionNames = AppConstants.SUPPORTED_FUNCTION_NAMES;
+
   constructor(
       private baseInteractionValidationServiceInstance:
         baseInteractionValidationService) {}
@@ -47,7 +50,7 @@ export class AlgebraicExpressionInputValidationService {
     let warningsList = [];
 
     let allowedLettersLimit = AppConstants.MAX_CUSTOM_LETTERS_FOR_OSK;
-    if (customizationArgs.customOskLetters.value.length > allowedLettersLimit) {
+    if (customizationArgs.allowedVariables.value.length > allowedLettersLimit) {
       warningsList.push({
         type: AppConstants.WARNING_TYPES.ERROR,
         message: (
@@ -64,7 +67,10 @@ export class AlgebraicExpressionInputValidationService {
       customizationArgs: AlgebraicExpressionInputCustomizationArgs,
       answerGroups: AnswerGroup[], defaultOutcome: Outcome): Warning[] {
     let warningsList: Warning[] = [];
-    let algebraicRulesService = new AlgebraicExpressionInputRulesService();
+    let algebraicRulesService = new AlgebraicExpressionInputRulesService(
+      new MathInteractionsService(),
+      new NumericExpressionInputRulesService()
+    );
     let mathInteractionsService = new MathInteractionsService();
 
     warningsList = warningsList.concat(
@@ -91,6 +97,22 @@ export class AlgebraicExpressionInputValidationService {
         // Explicitly inserting '*' signs wherever necessary.
         currentInput = mathInteractionsService.insertMultiplicationSigns(
           currentInput);
+
+        let unsupportedFunctions = (
+          mathInteractionsService.checkUnsupportedFunctions(currentInput));
+        if (unsupportedFunctions.length > 0) {
+          warningsList.push({
+            type: AppConstants.WARNING_TYPES.ERROR,
+            message: (
+              'Input for learner answer ' + (j + 1) + ' from Oppia response ' +
+              (i + 1) + ' uses these function(s) that aren\'t supported: ' +
+              '[' + unsupportedFunctions + ']' +
+              ' The supported functions are: ' +
+              '[' + this.supportedFunctionNames + ']'
+            )
+          });
+        }
+
         let currentRuleType = rules[j].type as string;
 
         for (let variable of nerdamer(currentInput).variables()) {
@@ -111,9 +133,10 @@ export class AlgebraicExpressionInputValidationService {
             warningsList.push({
               type: AppConstants.WARNING_TYPES.ERROR,
               message: (
-                'Rule ' + (j + 1) + ' from answer group ' + (i + 1) +
-                ' will never be matched because it is preceded ' +
-                'by an \'IsEquivalentTo\' rule with a matching input.')
+                'Learner answer ' + (j + 1) + ' from Oppia ' +
+                'response ' + (i + 1) + ' will never be matched because it ' +
+                'is preceded by an \'IsEquivalentTo\' answer ' +
+                'with a matching input.')
             });
           } else if (currentRuleType === 'MatchesExactlyWith' && (
             algebraicRulesService.MatchesExactlyWith(
@@ -123,9 +146,10 @@ export class AlgebraicExpressionInputValidationService {
             warningsList.push({
               type: AppConstants.WARNING_TYPES.ERROR,
               message: (
-                'Rule ' + (j + 1) + ' from answer group ' + (i + 1) +
-                ' will never be matched because it is preceded ' +
-                'by a \'MatchesExactlyWith\' rule with a matching input.')
+                'Learner answer ' + (j + 1) + ' from Oppia ' +
+                'response ' + (i + 1) + ' will never be matched because it ' +
+                'is preceded by a \'MatchesExactlyWith\' answer ' +
+                'with a matching input.')
             });
           }
         }
@@ -143,7 +167,7 @@ export class AlgebraicExpressionInputValidationService {
       if (variable.length > 1) {
         variable = greekSymbols[greekLetters.indexOf(variable)];
       }
-      if (customizationArgs.customOskLetters.value.indexOf(variable) === -1) {
+      if (customizationArgs.allowedVariables.value.indexOf(variable) === -1) {
         if (missingVariables.indexOf(variable) === -1) {
           missingVariables.push(variable);
         }
@@ -154,8 +178,9 @@ export class AlgebraicExpressionInputValidationService {
       warningsList.push({
         type: AppConstants.WARNING_TYPES.ERROR,
         message: (
-          'The following variables are present in some of the answer groups ' +
-          'but are missing from the custom letters list: ' + missingVariables)
+          'The following variables are present in some of the Oppia ' +
+          'responses but are missing from the custom letters list: ' +
+          missingVariables)
       });
     }
 

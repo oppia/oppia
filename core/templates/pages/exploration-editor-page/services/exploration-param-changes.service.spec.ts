@@ -16,28 +16,23 @@
  * @fileoverview Unit tests for the ExplorationParamChangesService.
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// the code corresponding to the spec is upgraded to Angular 8.
-import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
-// ^^^ This block is to be removed.
+import { TestBed } from '@angular/core/testing';
+import { ExplorationParamChangesService } from './exploration-param-changes.service';
+import { ExplorationPropertyService } from './exploration-property.service';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 
-require(
-  'pages/exploration-editor-page/' +
-  'services/exploration-param-changes.service.ts');
+describe('Exploration Param Specs Service', () => {
+  let epcs: ExplorationParamChangesService;
 
-describe('Exploration Param Changes Service', function() {
-  var epcs = null;
-
-  beforeEach(function() {
-    angular.mock.module('oppia');
-  });
-
-  importAllAngularServices();
-
-  beforeEach(function() {
-    angular.mock.inject(function($injector) {
-      epcs = $injector.get('ExplorationParamChangesService');
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
+      providers: [
+        ExplorationPropertyService
+      ]
     });
+
+    epcs = TestBed.inject(ExplorationParamChangesService);
   });
 
   it('should test the child object properties', function() {

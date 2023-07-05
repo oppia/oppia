@@ -23,18 +23,31 @@ import re
 import shutil
 import signal
 import subprocess
-import sys
 import threading
 
 from core import feconf
-from core import python_utils
+from core import utils
 from scripts import common
 
+import psutil
 
+from typing import (
+    Any, Callable, ContextManager, Dict, Iterator, List, Optional, Sequence,
+    Union
+)
+
+
+# Here we use type Any because the argument 'popen_kwargs' can accept an
+# arbitrary number of keyword arguments with different types of values.
 @contextlib.contextmanager
 def managed_process(
-        command_args, human_readable_name='Process', shell=False,
-        timeout_secs=60, **popen_kwargs):
+    command_args: Sequence[Union[int, str]],
+    human_readable_name: str = 'Process',
+    shell: bool = False,
+    timeout_secs: int = 60,
+    raise_on_nonzero_exit: bool = True,
+    **popen_kwargs: Any
+) -> Iterator[psutil.Process]:
     """Context manager for starting and stopping a process gracefully.
 
     Args:
@@ -53,17 +66,19 @@ def managed_process(
         timeout_secs: int. The time allotted for the managed process and its
             descendants to terminate themselves. After the timeout, any
             remaining processes will be killed abruptly.
+        raise_on_nonzero_exit: bool. If True, raise an Exception when the
+            managed process has a nonzero exit code. If False, no Exception is
+            raised, and it is the caller's responsibility to handle the error.
         **popen_kwargs: dict(str: *). Same kwargs as `subprocess.Popen`.
 
     Yields:
         psutil.Process. The process managed by the context manager.
-    """
-    # TODO(#11549): Move this to top of the file.
-    if common.PSUTIL_DIR not in sys.path:
-        sys.path.insert(1, common.PSUTIL_DIR)
-    import psutil
 
-    get_proc_info = lambda p: (
+    Raises:
+        Exception. The process exited unexpectedly (only raised if
+            raise_on_nonzero_exit is True).
+    """
+    get_proc_info: Callable[[psutil.Process], str] = lambda p: (
         '%s(name="%s", pid=%d)' % (human_readable_name, p.name(), p.pid)
         if p.is_running() else '%s(pid=%d)' % (human_readable_name, p.pid))
 
@@ -73,14 +88,16 @@ def managed_process(
     command = ' '.join(non_empty_args) if shell else list(non_empty_args)
     human_readable_command = command if shell else ' '.join(command)
     msg = 'Starting new %s: %s' % (human_readable_name, human_readable_command)
-    python_utils.PRINT(msg)
+    print(msg)
     popen_proc = psutil.Popen(command, shell=shell, **popen_kwargs)
 
     try:
         yield popen_proc
     finally:
-        python_utils.PRINT('Stopping %s...' % get_proc_info(popen_proc))
+        proc_name = get_proc_info(popen_proc)
+        print('Stopping %s...' % proc_name)
         procs_still_alive = [popen_proc]
+
         try:
             if popen_proc.is_running():
                 # Children must be terminated before the parent, otherwise they
@@ -100,7 +117,7 @@ def managed_process(
             procs_gone, procs_still_alive = (
                 psutil.wait_procs(procs_to_kill, timeout=timeout_secs))
             for proc in procs_still_alive:
-                logging.warn('Forced to kill %s!' % get_proc_info(proc))
+                logging.warning('Forced to kill %s!' % get_proc_info(proc))
                 proc.kill()
             for proc in procs_gone:
                 logging.info('%s has already ended.' % get_proc_info(proc))
@@ -110,13 +127,32 @@ def managed_process(
             logging.exception(
                 'Failed to stop %s gracefully!' % get_proc_info(popen_proc))
 
+        exit_code = popen_proc.returncode
+        # Note that negative values indicate termination by a signal: SIGTERM,
+        # SIGINT, etc. Also, exit code 143 indicates that the process received
+        # a SIGTERM from the OS, and it succeeded in gracefully terminating.
+        if (
+            exit_code is not None and exit_code > 0 and exit_code != 143
+            and raise_on_nonzero_exit
+        ):
+            raise Exception(
+                'Process %s exited unexpectedly with exit code %s' %
+                (proc_name, exit_code))
+
 
 @contextlib.contextmanager
 def managed_dev_appserver(
-        app_yaml_path, env=None, log_level='info',
-        host='0.0.0.0', port=8080, admin_host='0.0.0.0', admin_port=8000,
-        enable_host_checking=True, automatic_restart=False,
-        skip_sdk_update_check=False):
+    app_yaml_path: str,
+    env: Optional[Dict[str, str]] = None,
+    log_level: str = 'info',
+    host: str = '0.0.0.0',
+    port: int = 8080,
+    admin_host: str = '0.0.0.0',
+    admin_port: int = 8000,
+    enable_host_checking: bool = True,
+    automatic_restart: bool = False,
+    skip_sdk_update_check: bool = False
+) -> Iterator[psutil.Process]:
     """Returns a context manager to start up and shut down a GAE dev appserver.
 
     Args:
@@ -143,7 +179,7 @@ def managed_dev_appserver(
     Yields:
         psutil.Process. The dev_appserver process.
     """
-    dev_appserver_args = [
+    dev_appserver_args: List[Union[str, int]] = [
         common.CURRENT_PYTHON_BIN,
         common.DEV_APPSERVER_PATH,
         '--host', host,
@@ -165,14 +201,16 @@ def managed_dev_appserver(
             dev_appserver_args,
             human_readable_name='GAE Development Server',
             shell=True,
-            env=env
+            env=env,
         ))
         common.wait_for_port_to_be_in_use(port)
         yield proc
 
 
 @contextlib.contextmanager
-def managed_firebase_auth_emulator(recover_users=False):
+def managed_firebase_auth_emulator(
+    recover_users: bool = False
+) -> Iterator[psutil.Process]:
     """Returns a context manager to manage the Firebase auth emulator.
 
     Args:
@@ -203,7 +241,7 @@ def managed_firebase_auth_emulator(recover_users=False):
 
 
 @contextlib.contextmanager
-def managed_elasticsearch_dev_server():
+def managed_elasticsearch_dev_server() -> Iterator[psutil.Process]:
     """Returns a context manager for ElasticSearch server for running tests
     in development mode and running a local dev server. This is only required
     in a development environment.
@@ -215,10 +253,17 @@ def managed_elasticsearch_dev_server():
     if os.path.exists(common.ES_PATH_DATA_DIR):
         shutil.rmtree(common.ES_PATH_DATA_DIR)
 
-    # -q is the quiet flag.
-    es_args = ['%s/bin/elasticsearch' % common.ES_PATH, '-q']
+    es_args = [
+        '%s/bin/elasticsearch' % common.ES_PATH,
+        # -q is the quiet flag.
+        '-q'
+    ]
     # Override the default path to ElasticSearch config files.
-    es_env = {'ES_PATH_CONF': common.ES_PATH_CONFIG_DIR}
+    es_env = {
+        'ES_PATH_CONF': common.ES_PATH_CONFIG_DIR,
+        # Set the minimum heap size to 100 MB and maximum to 500 MB.
+        'ES_JAVA_OPTS': '-Xms100m -Xmx500m'
+    }
     # OK to use shell=True here because we are passing string literals and
     # constants, so there is no risk of a shell-injection attack.
     proc_context = managed_process(
@@ -230,7 +275,9 @@ def managed_elasticsearch_dev_server():
 
 
 @contextlib.contextmanager
-def managed_cloud_datastore_emulator(clear_datastore=False):
+def managed_cloud_datastore_emulator(
+    clear_datastore: bool = False
+) -> Iterator[psutil.Process]:
     """Returns a context manager for the Cloud Datastore emulator.
 
     Args:
@@ -293,7 +340,7 @@ def managed_cloud_datastore_emulator(clear_datastore=False):
 
 
 @contextlib.contextmanager
-def managed_redis_server():
+def managed_redis_server() -> Iterator[psutil.Process]:
     """Run the redis server within a context manager that ends it gracefully."""
     if common.is_windows_os():
         raise Exception(
@@ -320,37 +367,108 @@ def managed_redis_server():
             subprocess.check_call([common.REDIS_CLI_PATH, 'shutdown', 'nosave'])
 
 
-def create_managed_web_browser(port):
-    """Returns a context manager for a web browser targeting the given port on
+def create_managed_web_browser(
+    port: int
+) -> ContextManager[psutil.Process]:
+    """Returns a ContextManager for a web browser targeting the given port on
     localhost. If a web browser cannot be opened on the current system by Oppia,
-    then returns None instead.
+    then raises an exception.
 
     Args:
         port: int. The port number to open in the web browser.
 
     Returns:
-        context manager|None. The context manager to a web browser window, or
-        None if the current operating system does not support web browsers.
+        ContextManager. The ContextManager to a web browser window if the
+        current operating system can be identified and a web browser can be
+        launched automatically.
+
+    Raises:
+        Exception. Unable to launch the web browser (this happens when the
+            Operating System cannot be identified).
     """
     url = 'http://localhost:%s/' % port
     human_readable_name = 'Web Browser'
     if common.is_linux_os():
-        if any(re.match('.*VBOX.*', d) for d in os.listdir('/dev/disk/by-id/')):
-            return None
-        else:
-            return managed_process(
-                ['xdg-open', url], human_readable_name=human_readable_name)
+        return managed_process(
+            ['xdg-open', url], human_readable_name=human_readable_name)
     elif common.is_mac_os():
         return managed_process(
             ['open', url], human_readable_name=human_readable_name)
     else:
-        return None
+        raise Exception(
+            'Unable to identify the Operating System and therefore, unable to '
+            'launch the web browser.')
+
+
+@contextlib.contextmanager
+def managed_ng_build(
+    *, use_prod_env: bool = False, watch_mode: bool = False
+) -> Iterator[psutil.Process]:
+    """Returns context manager to start/stop the ng compiler gracefully.
+
+    Args:
+        use_prod_env: bool. Whether to compile for use in production.
+        watch_mode: bool. Run the compiler in watch mode, which rebuilds on file
+            change.
+
+    Yields:
+        psutil.Process. The ng compiler process.
+
+    Raises:
+        OSError. First build never completed.
+    """
+    compiler_args = [common.NG_BIN_PATH, 'build']
+    if use_prod_env:
+        compiler_args.append('--prod')
+    if watch_mode:
+        compiler_args.append('--watch')
+    with contextlib.ExitStack() as exit_stack:
+        # OK to use shell=True here because we are passing string literals and
+        # constants, so there is no risk of a shell-injection attack.
+        proc = exit_stack.enter_context(managed_process(
+            compiler_args,
+            human_readable_name='Angular Compiler',
+            shell=True,
+            # Capture compiler's output to detect when builds have completed.
+            stdout=subprocess.PIPE
+        ))
+
+        read_line_func: Callable[[], Optional[bytes]] = (
+            lambda: proc.stdout.readline() or None
+        )
+        if watch_mode:
+            for line in iter(read_line_func, None):
+                common.write_stdout_safe(line)
+                # Message printed when a compilation has succeeded. We break
+                # after the first one to ensure the site is ready to be visited.
+                if b'Build at: ' in line:
+                    break
+            else:
+                # If none of the lines contained the string 'Built at',
+                # raise an error because a build hasn't finished successfully.
+                raise IOError('First build never completed')
+
+        def print_proc_output() -> None:
+            """Prints the proc's output until it is exhausted."""
+            for line in iter(read_line_func, None):
+                common.write_stdout_safe(line)
+
+        # Start a thread to print the rest of the compiler's output to stdout.
+        printer_thread = threading.Thread(target=print_proc_output)
+        printer_thread.start()
+        exit_stack.callback(printer_thread.join)
+
+        yield proc
 
 
 @contextlib.contextmanager
 def managed_webpack_compiler(
-        config_path=None, use_prod_env=False, use_source_maps=False,
-        watch_mode=False, max_old_space_size=None):
+    config_path: Optional[str] = None,
+    use_prod_env: bool = False,
+    use_source_maps: bool = False,
+    watch_mode: bool = False,
+    max_old_space_size: Optional[int] = None
+) -> Iterator[psutil.Process]:
     """Returns context manager to start/stop the webpack compiler gracefully.
 
     Args:
@@ -369,6 +487,9 @@ def managed_webpack_compiler(
 
     Yields:
         psutil.Process. The Webpack compiler process.
+
+    Raises:
+        OSError. First build never completed.
     """
     if config_path is not None:
         pass
@@ -390,17 +511,22 @@ def managed_webpack_compiler(
         compiler_args.insert(1, '--max-old-space-size=%d' % max_old_space_size)
     if watch_mode:
         compiler_args.extend(['--color', '--watch', '--progress'])
-
     with contextlib.ExitStack() as exit_stack:
         # OK to use shell=True here because we are passing string literals and
         # constants, so there is no risk of a shell-injection attack.
         proc = exit_stack.enter_context(managed_process(
-            compiler_args, human_readable_name='Webpack Compiler', shell=True,
+            compiler_args,
+            human_readable_name='Webpack Compiler',
+            shell=True,
             # Capture compiler's output to detect when builds have completed.
-            stdout=subprocess.PIPE))
+            stdout=subprocess.PIPE
+        ))
 
+        read_line_func: Callable[[], Optional[bytes]] = (
+            lambda: proc.stdout.readline() or None
+        )
         if watch_mode:
-            for line in iter(lambda: proc.stdout.readline() or None, None):
+            for line in iter(read_line_func, None):
                 common.write_stdout_safe(line)
                 # Message printed when a compilation has succeeded. We break
                 # after the first one to ensure the site is ready to be visited.
@@ -411,9 +537,9 @@ def managed_webpack_compiler(
                 # raise an error because a build hasn't finished successfully.
                 raise IOError('First build never completed')
 
-        def print_proc_output():
+        def print_proc_output() -> None:
             """Prints the proc's output until it is exhausted."""
-            for line in iter(lambda: proc.stdout.readline() or None, None):
+            for line in iter(read_line_func, None):
                 common.write_stdout_safe(line)
 
         # Start a thread to print the rest of the compiler's output to stdout.
@@ -424,8 +550,46 @@ def managed_webpack_compiler(
         yield proc
 
 
+def get_chrome_version() -> str:
+    """Returns the version of Chrome installed on the system."""
+
+    # Although there are spaces between Google and Chrome in the path, we
+    # don't need to escape them for Popen (as opposed to on the terminal, in
+    # which case we would need to escape them for the command to run).
+    chrome_command = (
+        '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
+        if common.is_mac_os() else 'google-chrome')
+    try:
+        output = subprocess.check_output([chrome_command, '--version'])
+    except OSError as e:
+        # For the error message on macOS, we need to add the backslashes in.
+        # This is because it is likely that a user will try to run the
+        # command on their terminal and, as mentioned above, the macOS
+        # chrome version command has spaces in the path which need to be
+        # escaped for successful terminal use.
+        raise Exception(
+            'Failed to execute "%s --version" command. This is used to '
+            'determine the chromedriver version to use. Please set the '
+            'chromedriver version manually using the '
+            '--chrome_driver_version flag. To determine the '
+            'chromedriver version to be used, please follow the '
+            'instructions mentioned in the following URL:\n'
+            'https://chromedriver.chromium.org/downloads/version-selection'
+            % chrome_command.replace(' ', r'\ ')) from e
+
+    installed_version_parts = b''.join(re.findall(rb'[0-9.]', output))
+    installed_version = '.'.join(
+        installed_version_parts.decode('utf-8').split('.')[:-1])
+    response = utils.url_open(
+        'https://chromedriver.storage.googleapis.com/LATEST_RELEASE_%s' % (
+            installed_version))
+    chrome_version: str = response.read().decode('utf-8')
+
+    return chrome_version
+
+
 @contextlib.contextmanager
-def managed_portserver():
+def managed_portserver() -> Iterator[psutil.Process]:
     """Returns context manager to start/stop the portserver gracefully.
 
     The portserver listens at PORTSERVER_SOCKET_FILEPATH and allocates free
@@ -442,15 +606,6 @@ def managed_portserver():
     Yields:
         psutil.Popen. The Popen subprocess object.
     """
-    # TODO(#11549): Move this to top of the file.
-    if common.PSUTIL_DIR not in sys.path:
-        # Our unit tests already configure sys.path correctly, but the
-        # standalone scripts do not. Because of this, the following line cannot
-        # be covered. This is fine since we want to cleanup this code anyway in
-        # #11549.
-        sys.path.insert(1, common.PSUTIL_DIR) # pragma: nocover
-    import psutil
-
     # Check if a socket file exists. This file can exist when previous instance
     # of the portserver did not close properly. We need to remove as otherwise
     # the portserver will fail to start.
@@ -491,144 +646,133 @@ def managed_portserver():
 
 
 @contextlib.contextmanager
-def managed_webdriver_server(chrome_version=None):
-    """Returns context manager to start/stop the Webdriver server gracefully.
-
-    This context manager updates Google Chrome before starting the server.
-
-    Args:
-        chrome_version: str|None. The version of Google Chrome to run the tests
-            on. If None, then the currently-installed version of Google Chrome
-            is used instead.
-
-    Yields:
-        psutil.Process. The Webdriver process.
-    """
-    if chrome_version is None:
-        # Although there are spaces between Google and Chrome in the path, we
-        # don't need to escape them for Popen (as opposed to on the terminal, in
-        # which case we would need to escape them for the command to run).
-        chrome_command = (
-            '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
-            if common.is_mac_os() else 'google-chrome')
-        try:
-            output = subprocess.check_output([chrome_command, '--version'])
-        except OSError:
-            # For the error message on macOS, we need to add the backslashes in.
-            # This is because it is likely that a user will try to run the
-            # command on their terminal and, as mentioned above, the macOS
-            # chrome version command has spaces in the path which need to be
-            # escaped for successful terminal use.
-            raise Exception(
-                'Failed to execute "%s --version" command. This is used to '
-                'determine the chromedriver version to use. Please set the '
-                'chromedriver version manually using the '
-                '--chrome_driver_version flag. To determine the '
-                'chromedriver version to be used, please follow the '
-                'instructions mentioned in the following URL:\n'
-                'https://chromedriver.chromium.org/downloads/version-selection'
-                % chrome_command.replace(' ', r'\ '))
-
-        installed_version_parts = b''.join(re.findall(rb'[0-9.]', output))
-        installed_version = '.'.join(
-            installed_version_parts.decode('utf-8').split('.')[:-1])
-        response = python_utils.url_open(
-            'https://chromedriver.storage.googleapis.com/LATEST_RELEASE_%s' % (
-                installed_version))
-        chrome_version = response.read().decode('utf-8')
-
-    python_utils.PRINT('\n\nCHROME VERSION: %s' % chrome_version)
-    subprocess.check_call([
-        common.NODE_BIN_PATH, common.WEBDRIVER_MANAGER_BIN_PATH, 'update',
-        '--versions.chrome', chrome_version,
-    ])
-
-    with contextlib.ExitStack() as exit_stack:
-        if common.is_windows_os():
-            # NOTE: webdriver-manager (version 13.0.0) uses `os.arch()` to
-            # determine the architecture of the operating system, however, this
-            # function can only be used to determine the architecture of the
-            # machine that compiled `node`. In the case of Windows, we are using
-            # the portable version, which was compiled on `ia32` machine so that
-            # is the value returned by this `os.arch` function. Unfortunately,
-            # webdriver-manager seems to assume that Windows wouldn't run on the
-            # ia32 architecture, so its help function used to determine download
-            # link returns null for this, which means that the application has
-            # no idea about where to download the correct version.
-            #
-            # https://github.com/angular/webdriver-manager/blob/b7539a5a3897a8a76abae7245f0de8175718b142/lib/provider/chromedriver.ts#L16
-            # https://github.com/angular/webdriver-manager/blob/b7539a5a3897a8a76abae7245f0de8175718b142/lib/provider/geckodriver.ts#L21
-            # https://github.com/angular/webdriver-manager/blob/b7539a5a3897a8a76abae7245f0de8175718b142/lib/provider/chromedriver.ts#L167
-            # https://github.com/nodejs/node/issues/17036
-            regex_pattern = re.escape('this.osArch = os.arch();')
-            arch = 'x64' if common.is_x64_architecture() else 'x86'
-            replacement_string = 'this.osArch = "%s";' % arch
-            exit_stack.enter_context(common.inplace_replace_file_context(
-                common.CHROME_PROVIDER_FILE_PATH, regex_pattern,
-                replacement_string))
-            exit_stack.enter_context(common.inplace_replace_file_context(
-                common.GECKO_PROVIDER_FILE_PATH, regex_pattern,
-                replacement_string))
-
-        # OK to use shell=True here because we are passing string literals and
-        # constants, so there is no risk of a shell-injection attack.
-        proc = exit_stack.enter_context(managed_process([
-            common.NODE_BIN_PATH, common.WEBDRIVER_MANAGER_BIN_PATH, 'start',
-            '--versions.chrome', chrome_version, '--quiet', '--standalone',
-        ], human_readable_name='Webdriver manager', shell=True))
-
-        common.wait_for_port_to_be_in_use(4444)
-
-        yield proc
-
-
-@contextlib.contextmanager
-def managed_protractor_server(
-        suite_name='full', dev_mode=True, debug_mode=False,
-        sharding_instances=1, **kwargs):
-    """Returns context manager to start/stop the Protractor server gracefully.
+def managed_webdriverio_server(
+    suite_name: str = 'full',
+    dev_mode: bool = True,
+    debug_mode: bool = False,
+    sharding_instances: int = 1,
+    chrome_version: Optional[str] = None,
+    mobile: bool = False,
+    stdout: int = subprocess.PIPE
+) -> Iterator[psutil.Process]:
+    """Returns context manager to start/stop the WebdriverIO server gracefully.
 
     Args:
         suite_name: str. The suite name whose tests should be run. If the value
             is `full`, all tests will run.
         dev_mode: bool. Whether the test is running on dev_mode.
-        debug_mode: bool. Whether to run the protractor tests in debugging mode.
-            Read the following instructions to learn how to run e2e tests in
-            debugging mode:
-            https://www.protractortest.org/#/debugging#disabled-control-flow.
+        debug_mode: bool. Whether to run the webdriverio tests in debugging
+            mode. Read the following instructions to learn how to run e2e
+            tests in debugging mode:
+            https://webdriver.io/docs/debugging/#the-debug-command.
         sharding_instances: int. How many sharding instances to be running.
-        **kwargs: dict(str: *). Keyword arguments passed to psutil.Popen.
+        chrome_version: str|None. The version of Google Chrome to run the tests
+            on. If None, then the currently-installed version of Google Chrome
+            is used instead.
+        stdout: int. This parameter specifies the executed program's standard
+            output file handle.
+        mobile: bool. Whether to run the webdriverio tests in mobile mode.
 
     Yields:
-        psutil.Process. The protractor process.
+        psutil.Process. The webdriverio process.
+
+    Raises:
+        ValueError. Number of sharding instances are less than 0.
     """
     if sharding_instances <= 0:
         raise ValueError('Sharding instance should be larger than 0')
 
-    protractor_args = [
-        common.NODE_BIN_PATH,
+    if chrome_version is None:
+        chrome_version = get_chrome_version()
+
+    if mobile:
+        os.environ['MOBILE'] = 'true'
+    else:
+        os.environ['MOBILE'] = 'false'
+
+    webdriverio_args = [
+        common.NPX_BIN_PATH,
         # This flag ensures tests fail if the `waitFor()` calls time out.
         '--unhandled-rejections=strict',
-        common.PROTRACTOR_BIN_PATH, common.PROTRACTOR_CONFIG_FILE_PATH,
+        common.NODEMODULES_WDIO_BIN_PATH, common.WEBDRIVERIO_CONFIG_FILE_PATH,
+        '--suite', suite_name, chrome_version,
         '--params.devMode=%s' % dev_mode,
-        '--suite', suite_name,
     ]
 
-    if debug_mode:
-        # NOTE: This is a flag for Node.js, not Protractor, so we insert it
-        # immediately after NODE_BIN_PATH.
-        protractor_args.insert(1, '--inspect-brk')
-
+    # Capabilities in wdio.conf.js are added as an array of object,
+    # so in order to set the value of maxmium instances of chrome
+    # in wdio.conf.js, we need to provide the index of the capability
+    # at which chrome is present, i.e. 0.
     if sharding_instances > 1:
-        protractor_args.extend([
-            '--capabilities.shardTestFiles=True',
-            '--capabilities.maxInstances=%d' % sharding_instances,
-        ])
+        webdriverio_args.extend([
+           '--capabilities[0].maxInstances=%d' % sharding_instances,
+       ])
+
+    if debug_mode:
+        webdriverio_args.insert(0, 'DEBUG=true')
 
     # OK to use shell=True here because we are passing string literals and
     # constants, so there is no risk of a shell-injection attack.
-    managed_protractor_proc = managed_process(
-        protractor_args, human_readable_name='Protractor Server', shell=True,
-        **kwargs)
-    with managed_protractor_proc as proc:
+    managed_webdriverio_proc = managed_process(
+        webdriverio_args, human_readable_name='WebdriverIO Server', shell=True,
+        raise_on_nonzero_exit=False, stdout=stdout)
+
+    try:
+        with managed_webdriverio_proc as proc:
+            yield proc
+    finally:
+        del os.environ['MOBILE']
+
+
+@contextlib.contextmanager
+def managed_acceptance_tests_server(
+    suite_name: str,
+    stdout: int = subprocess.PIPE,
+) -> Iterator[psutil.Process]:
+    """Returns context manager to start/stop the acceptance tests
+    server gracefully. If the suite_name is not in the list of the
+    acceptance tests suite names, then raises an exception.
+
+    Args:
+        suite_name: str. The suite name whose tests should be run.
+        stdout: int. This parameter specifies the executed program's standard
+            output file handle.
+
+    Yields:
+        psutil.Process. The jasmine testing process.
+
+    Raises:
+        Exception. The suite_name is not in the list of the acceptance tests
+            suite names.
+    """
+    nodemodules_jasmine_bin_path = os.path.join(
+        common.NODE_MODULES_PATH, '.bin', 'jasmine')
+    puppeteer_acceptance_tests_dir_path = os.path.join(
+        common.CURR_DIR, 'core', 'tests', 'puppeteer-acceptance-tests')
+    spec_dir_path = os.path.join(
+        puppeteer_acceptance_tests_dir_path, 'spec')
+    jasmine_config_file_path = os.path.join(
+        puppeteer_acceptance_tests_dir_path, 'jasmine.json')
+
+    acceptance_tests_args = [
+        nodemodules_jasmine_bin_path,
+        '--config="%s"' % jasmine_config_file_path,
+        '%s' % os.path.join(spec_dir_path, suite_name)
+    ]
+
+    if suite_name not in common.ACCEPTANCE_TESTS_SUITE_NAMES:
+        raise Exception('Invalid suite name: %s' % suite_name)
+
+    # OK to use shell=True here because we are passing string literals,
+    # and verifying that the passed suite-name are within the list of
+    # the suites we have, so there is no risk of a shell-injection attack.
+    managed_acceptance_tests_proc = managed_process(
+        acceptance_tests_args,
+        human_readable_name='Acceptance Tests Server',
+        shell=True,
+        raise_on_nonzero_exit=False,
+        stdout=stdout,
+    )
+
+    with managed_acceptance_tests_proc as proc:
         yield proc

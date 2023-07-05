@@ -21,31 +21,38 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 import { State, StateBackendDict, StateObjectFactory }
   from 'domain/state/StateObjectFactory';
-import INTERACTION_SPECS from 'interactions/interaction_specs.json';
-import constants from 'assets/constants';
+import { AppConstants } from 'app.constants';
+import { MisconceptionSkillMap } from 'domain/skill/MisconceptionObjectFactory';
+import { InteractionSpecsConstants, InteractionSpecsKey } from 'pages/interaction-specs.constants';
 
+/* Null in ID denotes a new question whose ID is yet
+  to be set, this ID is later set in backend API service. */
 export interface QuestionBackendDict {
-  'id': string;
-  'question_state_data': StateBackendDict,
+  'id': string | null;
+  'question_state_data': StateBackendDict;
   'question_state_data_schema_version': number;
   'language_code': string;
   'version': number;
   'linked_skill_ids': string[];
   'inapplicable_skill_misconception_ids': string[];
+  'next_content_id_index': number;
 }
 
 export class Question {
-  _id: string;
+  // A null '_id' indicates that the 'Question' has been created
+  // but not saved.
+  _id: string | null;
   _stateData: State;
   _languageCode: string;
   _version: number;
   _linkedSkillIds: string[];
   _inapplicableSkillMisconceptionIds: string[];
+  _nextContentIdIndex: number;
 
   constructor(
-      id: string, stateData: State, languageCode: string,
+      id: string | null, stateData: State, languageCode: string,
       version: number, linkedSkillIds: string[],
-      inapplicableSkillMisconceptionIds: string[]) {
+      inapplicableSkillMisconceptionIds: string[], nextContentIdIndex: number) {
     this._id = id;
     this._stateData = stateData;
     this._languageCode = languageCode;
@@ -53,9 +60,12 @@ export class Question {
     this._linkedSkillIds = linkedSkillIds;
     this._inapplicableSkillMisconceptionIds = (
       inapplicableSkillMisconceptionIds);
+    this._nextContentIdIndex = nextContentIdIndex;
   }
 
-  getId(): string {
+  // Some methods have either string or null return value,
+  // because when we create default question their fields get null value.
+  getId(): string | null {
     return this._id;
   }
 
@@ -97,8 +107,18 @@ export class Question {
       inapplicableSkillMisconceptionIds);
   }
 
-  getValidationErrorMessage(): string {
+  getNextContentIdIndex(): number {
+    return this._nextContentIdIndex;
+  }
+
+  setNextContentIdIndex(nextContentIdIndex: number): void {
+    this._nextContentIdIndex = nextContentIdIndex;
+  }
+
+  // Returns 'null' when the message is valid.
+  getValidationErrorMessage(): string | null {
     var interaction = this._stateData.interaction;
+    var interactionId = interaction.id as InteractionSpecsKey;
     var questionContent = this._stateData.content._html;
     if (questionContent.length === 0) {
       return 'Please enter a question.';
@@ -106,17 +126,20 @@ export class Question {
     if (interaction.id === null) {
       return 'An interaction must be specified';
     }
-
-    if (interaction.defaultOutcome.feedback._html.length === 0) {
+    if (
+      interaction.defaultOutcome?.feedback._html.length === 0
+    ) {
       return 'Please enter a feedback for the default outcome.';
     }
-
     if (interaction.hints.length === 0) {
       return 'At least 1 hint should be specified';
     }
     if (
       !interaction.solution &&
-      INTERACTION_SPECS[interaction.id].can_have_solution) {
+      InteractionSpecsConstants.INTERACTION_SPECS[
+        interactionId
+      ].can_have_solution
+    ) {
       return 'A solution must be specified';
     }
     var answerGroups = this._stateData.interaction.answerGroups;
@@ -133,19 +156,29 @@ export class Question {
     return null;
   }
 
-  getUnaddressedMisconceptionNames(misconceptionsBySkill: {}): string[] {
+  getUnaddressedMisconceptionNames(
+      misconceptionsBySkill: MisconceptionSkillMap = {}
+  ): string[] {
     var answerGroups = this._stateData.interaction.answerGroups;
-    var taggedSkillMisconceptionIds = {};
+    var taggedSkillMisconceptionIds: Record<string, boolean> = {};
     for (var i = 0; i < answerGroups.length; i++) {
       if (!answerGroups[i].outcome.labelledAsCorrect &&
-          answerGroups[i].taggedSkillMisconceptionId !== null) {
-        taggedSkillMisconceptionIds[
-          answerGroups[i].taggedSkillMisconceptionId] = true;
+        answerGroups[i].taggedSkillMisconceptionId !== null) {
+          type MisconceptionId = keyof typeof taggedSkillMisconceptionIds;
+          var misconceptionId = (
+            answerGroups[i].taggedSkillMisconceptionId as MisconceptionId
+          );
+          taggedSkillMisconceptionIds[misconceptionId] = true;
       }
     }
-    var unaddressedMisconceptionNames = [];
+    var unaddressedMisconceptionNames: string[] = [];
     var self = this;
-    Object.keys(misconceptionsBySkill).forEach(function(skillId) {
+    type MisconceptionsBySkillKeys = (keyof typeof misconceptionsBySkill)[];
+    var misconceptionsBySkillKeys = (
+      Object.keys(misconceptionsBySkill) as MisconceptionsBySkillKeys
+    );
+
+    misconceptionsBySkillKeys.forEach(function(skillId) {
       for (var i = 0; i < misconceptionsBySkill[skillId].length; i++) {
         var skillMisconceptionIdIsNotApplicable = (
           self._inapplicableSkillMisconceptionIds.includes(
@@ -167,7 +200,7 @@ export class Question {
   }
 
   toBackendDict(isNewQuestion: boolean): QuestionBackendDict {
-    var questionBackendDict = {
+    var questionBackendDict: QuestionBackendDict = {
       id: null,
       question_state_data: this._stateData.toBackendDict(),
       question_state_data_schema_version: this._version,
@@ -175,6 +208,7 @@ export class Question {
       linked_skill_ids: this._linkedSkillIds,
       inapplicable_skill_misconception_ids: (
         this._inapplicableSkillMisconceptionIds),
+      next_content_id_index: this._nextContentIdIndex,
       version: 0,
     };
     if (!isNewQuestion) {
@@ -192,10 +226,14 @@ export class QuestionObjectFactory {
   constructor(
     private stateObject: StateObjectFactory) {}
 
+  // TODO(#14312): Remove the createDefaultQuestion so that full question can be
+  // created from start.
+  // Create a default question until the actual question is saved.
   createDefaultQuestion(skillIds: string[]): Question {
     return new Question(
-      null, this.stateObject.createDefaultState(null),
-      constants.DEFAULT_LANGUAGE_CODE, 1, skillIds, []);
+      null, this.stateObject.createDefaultState(
+        null, 'content_0', 'default_outcome_1'),
+      AppConstants.DEFAULT_LANGUAGE_CODE, 1, skillIds, [], 2);
   }
 
   createFromBackendDict(questionBackendDict: QuestionBackendDict): Question {
@@ -205,7 +243,8 @@ export class QuestionObjectFactory {
         'question', questionBackendDict.question_state_data),
       questionBackendDict.language_code, questionBackendDict.version,
       questionBackendDict.linked_skill_ids,
-      questionBackendDict.inapplicable_skill_misconception_ids
+      questionBackendDict.inapplicable_skill_misconception_ids,
+      questionBackendDict.next_content_id_index
     );
   }
 }

@@ -73,6 +73,7 @@ export class SubtopicPageContents {
       recorded_voiceovers: this._recordedVoiceovers.toBackendDict()
     };
   }
+
   static createDefault(): SubtopicPageContents {
     var recordedVoiceovers = RecordedVoiceovers.createEmpty();
     recordedVoiceovers.addContentId('content');

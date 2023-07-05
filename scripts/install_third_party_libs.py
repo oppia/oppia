@@ -21,79 +21,62 @@ import os
 import pathlib
 import shutil
 import subprocess
-import sys
-import urllib.request as urlrequest
 import zipfile
+from scripts import install_python_dev_dependencies
+from typing import Final, List
 
-TOOLS_DIR = os.path.join(os.pardir, 'oppia_tools')
-
-# These libraries need to be installed before running or importing any script.
-
-PREREQUISITES = [
-    ('pyyaml', '5.4.1', os.path.join(TOOLS_DIR, 'pyyaml-5.4.1')),
-    ('future', '0.18.2', os.path.join('third_party', 'python_libs')),
-    ('six', '1.16.0', os.path.join('third_party', 'python_libs')),
-    ('certifi', '2021.5.30', os.path.join(
-        TOOLS_DIR, 'certifi-2021.5.30')),
-]
-
-for package_name, version_number, target_path in PREREQUISITES:
-    command_text = [
-        sys.executable, '-m', 'pip', 'install', '%s==%s'
-        % (package_name, version_number), '--target', target_path]
-    uextention_text = ['--user', '--prefix=', '--system']
-    current_process = subprocess.Popen(
-        command_text, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    output_stderr = current_process.communicate()[1]  # pylint: disable=invalid-name
-    if b'can\'t combine user with prefix' in output_stderr:
-        subprocess.check_call(command_text + uextention_text)
-
-
-from core import python_utils  # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
+install_python_dev_dependencies.main(['--assert_compiled'])
 
 from . import common  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
-from . import install_backend_python_libs  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 from . import install_third_party  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 from . import pre_commit_hook  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 from . import pre_push_hook  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 from . import setup  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 from . import setup_gae  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 
-_PARSER = argparse.ArgumentParser(
+from core import utils  # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
+
+_PARSER: Final = argparse.ArgumentParser(
     description="""
 Installation script for Oppia third-party libraries.
 """)
 
 # Download locations for buf binary.
-BUF_BASE_URL = (
+BUF_BASE_URL: Final = (
     'https://github.com/bufbuild/buf/releases/download/v0.29.0/')
 
-BUF_LINUX_FILES = [
+BUF_LINUX_FILES: Final = [
     'buf-Linux-x86_64', 'protoc-gen-buf-check-lint-Linux-x86_64',
     'protoc-gen-buf-check-breaking-Linux-x86_64']
-BUF_DARWIN_FILES = [
+BUF_DARWIN_FILES: Final = [
     'buf-Darwin-x86_64', 'protoc-gen-buf-check-lint-Darwin-x86_64',
     'protoc-gen-buf-check-breaking-Darwin-x86_64']
 
 # Download URL of protoc compiler.
-PROTOC_URL = (
+PROTOC_URL: Final = (
     'https://github.com/protocolbuffers/protobuf/releases/download/v%s' %
     common.PROTOC_VERSION)
-PROTOC_LINUX_FILE = 'protoc-%s-linux-x86_64.zip' % (common.PROTOC_VERSION)
-PROTOC_DARWIN_FILE = 'protoc-%s-osx-x86_64.zip' % (common.PROTOC_VERSION)
+PROTOC_LINUX_FILE: Final = 'protoc-%s-linux-x86_64.zip' % (
+    common.PROTOC_VERSION
+)
+PROTOC_DARWIN_FILE: Final = 'protoc-%s-osx-x86_64.zip' % (
+    common.PROTOC_VERSION
+)
 
 # Path of the buf executable.
-BUF_DIR = os.path.join(
+BUF_DIR: Final = os.path.join(
     common.OPPIA_TOOLS_DIR, 'buf-%s' % common.BUF_VERSION)
-PROTOC_DIR = os.path.join(BUF_DIR, 'protoc')
+PROTOC_DIR: Final = os.path.join(BUF_DIR, 'protoc')
 # Path of files which needs to be compiled by protobuf.
-PROTO_FILES_PATHS = [
+PROTO_FILES_PATHS: Final = [
     os.path.join(common.THIRD_PARTY_DIR, 'oppia-ml-proto-0.0.0')]
 # Path to typescript plugin required to compile ts compatible files from proto.
-PROTOC_GEN_TS_PATH = os.path.join(common.NODE_MODULES_PATH, 'protoc-gen-ts')
+PROTOC_GEN_TS_PATH: Final = os.path.join(
+    common.NODE_MODULES_PATH, 'protoc-gen-ts'
+)
 
 
-def tweak_yarn_executable():
+def tweak_yarn_executable() -> None:
     """When yarn is run on Windows, the file yarn will be executed by default.
     However, this file is a bash script, and can't be executed directly on
     Windows. So, to prevent Windows automatically executing it by default
@@ -106,14 +89,14 @@ def tweak_yarn_executable():
         os.rename(origin_file_path, renamed_file_path)
 
 
-def get_yarn_command():
+def get_yarn_command() -> str:
     """Get the executable file for yarn."""
     if common.is_windows_os():
         return 'yarn.cmd'
     return 'yarn'
 
 
-def install_buf_and_protoc():
+def install_buf_and_protoc() -> None:
     """Installs buf and protoc for Linux or Darwin, depending upon the
     platform.
     """
@@ -128,21 +111,21 @@ def install_buf_and_protoc():
 
     common.ensure_directory_exists(BUF_DIR)
     for bin_file in buf_files:
-        urlrequest.urlretrieve('%s/%s' % (
-            BUF_BASE_URL, bin_file), filename=os.path.join(BUF_DIR, bin_file))
-    urlrequest.urlretrieve('%s/%s' % (
-        PROTOC_URL, protoc_file), filename=os.path.join(BUF_DIR, protoc_file))
+        common.url_retrieve('%s/%s' % (
+            BUF_BASE_URL, bin_file), os.path.join(BUF_DIR, bin_file))
+    common.url_retrieve('%s/%s' % (
+        PROTOC_URL, protoc_file), os.path.join(BUF_DIR, protoc_file))
     try:
         with zipfile.ZipFile(os.path.join(BUF_DIR, protoc_file), 'r') as zfile:
             zfile.extractall(path=PROTOC_DIR)
         os.remove(os.path.join(BUF_DIR, protoc_file))
-    except Exception:
-        raise Exception('Error installing protoc binary')
+    except Exception as e:
+        raise Exception('Error installing protoc binary') from e
     common.recursive_chmod(buf_path, 0o744)
     common.recursive_chmod(protoc_path, 0o744)
 
 
-def compile_protobuf_files(proto_files_paths):
+def compile_protobuf_files(proto_files_paths: List[str]) -> None:
     """Compiles protobuf files using buf.
 
     Raises:
@@ -162,9 +145,9 @@ def compile_protobuf_files(proto_files_paths):
             env=proto_env)
         stdout, stderr = process.communicate()
         if process.returncode == 0:
-            python_utils.PRINT(stdout)
+            print(stdout)
         else:
-            python_utils.PRINT(stderr)
+            print(stderr)
             raise Exception('Error compiling proto files at %s' % path)
 
     # Since there is no simple configuration for imports when using protobuf to
@@ -175,79 +158,17 @@ def compile_protobuf_files(proto_files_paths):
     for p in compiled_protobuf_dir.iterdir():
         if p.suffix == '.py':
             common.inplace_replace_file(
-                p.absolute(),
+                p.absolute().as_posix(),
                 r'^import (\w*_pb2 as)', r'from proto_files import \1')
-
-
-def ensure_pip_library_is_installed(package, version, path):
-    """Installs the pip library after ensuring its not already installed.
-
-    Args:
-        package: str. The package name.
-        version: str. The package version.
-        path: str. The installation path for the package.
-    """
-    python_utils.PRINT(
-        'Checking if %s is installed in %s' % (package, path))
-
-    exact_lib_path = os.path.join(path, '%s-%s' % (package, version))
-    if not os.path.exists(exact_lib_path):
-        python_utils.PRINT('Installing %s' % package)
-        install_backend_python_libs.pip_install(
-            '%s==%s' % (package, version), exact_lib_path)
-
-
-def ensure_system_python_libraries_are_installed(package, version):
-    """Installs the pip library with the corresponding version to the system
-    globally. This is necessary because the development application server
-    requires certain libraries on the host machine.
-
-    Args:
-        package: str. The package name.
-        version: str. The package version.
-    """
-    python_utils.PRINT(
-        'Checking if %s is installed.' % (package))
-    install_backend_python_libs.pip_install_to_system(package, version)
 
 
 def main() -> None:
     """Install third-party libraries for Oppia."""
     setup.main(args=[])
     setup_gae.main(args=[])
-    # These system python libraries are REQUIRED to start the development server
-    # and cannot be added to oppia_tools because the dev_appserver python script
-    # looks for them in the default system paths when it is run. Therefore, we
-    # must install these libraries to the developer's computer.
-    system_pip_dependencies = [
-        ('enum34', common.ENUM_VERSION),
-        ('protobuf', common.PROTOBUF_VERSION),
-        ('grpcio', common.GRPCIO_VERSION),
-    ]
-    local_pip_dependencies = [
-        ('coverage', common.COVERAGE_VERSION, common.OPPIA_TOOLS_DIR),
-        ('pylint', common.PYLINT_VERSION, common.OPPIA_TOOLS_DIR),
-        ('Pillow', common.PILLOW_VERSION, common.OPPIA_TOOLS_DIR),
-        ('pylint-quotes', common.PYLINT_QUOTES_VERSION, common.OPPIA_TOOLS_DIR),
-        ('webtest', common.WEBTEST_VERSION, common.OPPIA_TOOLS_DIR),
-        ('isort', common.ISORT_VERSION, common.OPPIA_TOOLS_DIR),
-        ('pycodestyle', common.PYCODESTYLE_VERSION, common.OPPIA_TOOLS_DIR),
-        ('esprima', common.ESPRIMA_VERSION, common.OPPIA_TOOLS_DIR),
-        ('PyGithub', common.PYGITHUB_VERSION, common.OPPIA_TOOLS_DIR),
-        ('protobuf', common.PROTOBUF_VERSION, common.OPPIA_TOOLS_DIR),
-        ('psutil', common.PSUTIL_VERSION, common.OPPIA_TOOLS_DIR),
-        ('pip-tools', common.PIP_TOOLS_VERSION, common.OPPIA_TOOLS_DIR),
-        ('setuptools', common.SETUPTOOLS_VERSION, common.OPPIA_TOOLS_DIR),
-    ]
-
-    for package, version, path in local_pip_dependencies:
-        ensure_pip_library_is_installed(package, version, path)
-
-    for package, version in system_pip_dependencies:
-        ensure_system_python_libraries_are_installed(package, version)
 
     # Download and install required JS and zip files.
-    python_utils.PRINT('Installing third-party JS libraries and zip files.')
+    print('Installing third-party JS libraries and zip files.')
     install_third_party.main(args=[])
 
     # The following steps solves the problem of multiple google paths confusing
@@ -257,8 +178,7 @@ def main() -> None:
     # so we must combine the two modules into one. We solve this by copying the
     # Google Cloud SDK libraries that we need into the correct google
     # module directory in the 'third_party/python_libs' directory.
-    python_utils.PRINT(
-        'Copying Google Cloud SDK modules to third_party/python_libs...')
+    print('Copying Google Cloud SDK modules to third_party/python_libs...')
     correct_google_path = os.path.join(
         common.THIRD_PARTY_PYTHON_LIBS_DIR, 'google')
     if not os.path.isdir(correct_google_path):
@@ -288,12 +208,12 @@ def main() -> None:
     # __init__.py files (python requires modules to have __init__.py files in
     # in order to recognize them as modules and import them):
     # https://github.com/googleapis/python-ndb/issues/518
-    python_utils.PRINT(
+    print(
         'Checking that all google library modules contain __init__.py files...')
     for path_list in os.walk(correct_google_path):
         root_path = path_list[0]
         if not root_path.endswith('__pycache__'):
-            with python_utils.open_file(
+            with utils.open_file(
                 os.path.join(root_path, '__init__.py'), 'a'):
                 # If the file doesn't exist, it is created. If it does exist,
                 # this open does nothing.
@@ -306,20 +226,20 @@ def main() -> None:
     subprocess.check_call([get_yarn_command(), 'install', '--pure-lockfile'])
 
     # Compile protobuf files.
-    python_utils.PRINT('Installing buf and protoc binary.')
+    print('Installing buf and protoc binary.')
     install_buf_and_protoc()
-    python_utils.PRINT('Compiling protobuf files.')
+    print('Compiling protobuf files.')
     compile_protobuf_files(PROTO_FILES_PATHS)
 
     # Install pre-commit script.
-    python_utils.PRINT('Installing pre-commit hook for git')
+    print('Installing pre-commit hook for git')
     pre_commit_hook.main(args=['--install'])
 
     # TODO(#8112): Once pre_commit_linter is working correctly, this
     # condition should be removed.
     if not common.is_windows_os():
         # Install pre-push script.
-        python_utils.PRINT('Installing pre-push hook for git')
+        print('Installing pre-push hook for git')
         pre_push_hook.main(args=['--install'])
 
 

@@ -17,7 +17,7 @@
  */
 
 angular.module('oppia').filter('capitalize', [function() {
-  return function(input) {
+  return function(input: string) {
     if (!input) {
       return input;
     }

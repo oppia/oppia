@@ -18,7 +18,7 @@
 import { Component, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 
-import splashConstants from 'assets/constants';
+import { AppConstants } from 'app.constants';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
@@ -27,13 +27,15 @@ import { WindowDimensionsService } from 'services/contextual/window-dimensions.s
 import { LoaderService } from 'services/loader.service';
 import { UserService } from 'services/user.service';
 import { Subscription } from 'rxjs';
+import { PlatformFeatureService } from 'services/platform-feature.service';
 
 export interface Testimonial {
-  quote: string,
-  studentDetails: string,
-  imageUrl: string,
-  imageUrlWebp: string,
-  borderPresent: boolean
+  quote: string;
+  studentDetails: string;
+  imageUrl: string;
+  imageUrlWebp: string;
+  borderPresent: boolean;
+  altText: string;
 }
 
 @Component({
@@ -43,15 +45,22 @@ export interface Testimonial {
 })
 
 export class TeachPageComponent implements OnInit {
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  classroomUrlFragment!: string;
+  classroomUrl!: string;
+  displayedTestimonialId!: number;
+  libraryUrl!: string;
+  testimonialCount!: number;
+  testimonials: Testimonial[] = [];
   isWindowNarrow: boolean = false;
-  classroomUrlFragment: string;
-  classroomUrl: string;
-  displayedTestimonialId: number;
-  libraryUrl: string;
-  testimonialCount: number;
-  testimonials = [];
-  userIsLoggedIn: boolean = null;
+  userIsLoggedIn: boolean = false;
   directiveSubscriptions = new Subscription();
+  androidPageIsEnabled: boolean = (
+    this.platformFeatureService.status.AndroidBetaLandingPage.isEnabled
+  );
+
   constructor(
     private siteAnalyticsService: SiteAnalyticsService,
     private urlInterpolationService: UrlInterpolationService,
@@ -59,6 +68,7 @@ export class TeachPageComponent implements OnInit {
     private windowRef: WindowRef,
     private userService: UserService,
     private loaderService: LoaderService,
+    private platformFeatureService: PlatformFeatureService
   ) {}
 
   ngOnInit(): void {
@@ -68,7 +78,7 @@ export class TeachPageComponent implements OnInit {
     this.testimonials = this.getTestimonials();
     this.classroomUrl = this.urlInterpolationService.interpolateUrl(
       '/learn/<classroomUrlFragment>', {
-        classroomUrlFragment: splashConstants.DEFAULT_CLASSROOM_URL_FRAGMENT
+        classroomUrlFragment: AppConstants.DEFAULT_CLASSROOM_URL_FRAGMENT
       });
     this.libraryUrl = '/community-library';
     this.loaderService.showLoadingScreen('Loading');
@@ -82,6 +92,7 @@ export class TeachPageComponent implements OnInit {
         this.isWindowNarrow = this.windowDimensionService.isWindowNarrow();
       }));
   }
+
   // TODO(#11657): Extract the testimonials code into a separate component.
   // The 2 functions below are to cycle between values:
   // 0 to (testimonialCount - 1) for displayedTestimonialId.
@@ -101,26 +112,34 @@ export class TeachPageComponent implements OnInit {
       this.displayedTestimonialId + this.testimonialCount - 1) %
       this.testimonialCount;
   }
+
   getTestimonials(): [Testimonial, Testimonial, Testimonial] {
     return [{
       quote: 'I18N_TEACH_TESTIMONIAL_1',
       studentDetails: 'I18N_TEACH_STUDENT_DETAILS_1',
       imageUrl: '/teach/riya.jpg',
       imageUrlWebp: '/teach/riya.webp',
-      borderPresent: true
+      borderPresent: true,
+      altText: 'Photo of Riya'
     }, {
       quote: 'I18N_TEACH_TESTIMONIAL_2',
       studentDetails: 'I18N_TEACH_STUDENT_DETAILS_2',
       imageUrl: '/teach/awad.jpg',
       imageUrlWebp: '/teach/awad.webp',
-      borderPresent: true
+      borderPresent: true,
+      altText: 'Photo of Awad'
     }, {
       quote: 'I18N_TEACH_TESTIMONIAL_3',
       studentDetails: 'I18N_TEACH_STUDENT_DETAILS_3',
       imageUrl: '/teach/himanshu.jpg',
       imageUrlWebp: '/teach/himanshu.webp',
-      borderPresent: true
+      borderPresent: true,
+      altText: 'Photo of Himanshu'
     }];
+  }
+
+  onClickAccessAndroidButton(): void {
+    this.windowRef.nativeWindow.location.href = '/android';
   }
 
   onClickStartLearningButton(): void {

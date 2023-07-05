@@ -1,0 +1,77 @@
+<div class="oppia-uid-copy">
+  <span class="oppia-unique-progress-id">{{ urlToCopy }}</span>
+  <span class="oppia-uid-btn-container" [ngClass]="{ 'oppia-copy-tooltip-margin' : showTooltip }">
+    <span class="oppia-uid-btn-message-box" *ngIf="showTooltip">{{ 'I18N_SAVE_PROGRESS_COPY_TOOLTIP' | translate }}</span>
+    <div class="oppia-uid-btn-message-arrow" *ngIf="showTooltip"></div>
+    <button type="button" class="btn btn-secondary oppia-uid-copy-btn" (click)="copyUrlButton()">{{ 'I18N_SAVE_PROGRESS_BUTTON_TEXT' | translate }}</button>
+  </span>
+</div>
+
+
+<style>
+  .oppia-uid-copy {
+    align-items: flex-end;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    margin-bottom: 30px;
+    padding: 0 20px 0 20px;
+    width: 100%;
+  }
+
+  .oppia-unique-progress-id {
+    align-items: center;
+    border: 1px solid black;
+    border-radius: 5px;
+    display: flex;
+    flex-direction: row;
+    height: 100%;
+    padding: 5px;
+    width: 350px;
+    word-break: break-word;
+  }
+
+  .oppia-uid-btn-container {
+    margin-left: 2%;
+    position: relative;
+    width: 24%;
+  }
+
+  .oppia-copy-tooltip-margin {
+    margin-top: -33px;
+  }
+
+  .oppia-uid-btn-message-box {
+    background-color: #00645c;
+    border-radius: 4px;
+    color: #fff;
+    cursor: default;
+    font-size: 14px;
+    font-style: Roboto, Arial, sans-serif;
+    padding: 8px 10px;
+    position: relative;
+    top: -5px;
+  }
+
+  .oppia-uid-btn-message-arrow {
+    background-color: #00645c;
+    color: #fff;
+    cursor: default;
+    height: 10px;
+    position: relative;
+    right: -45px;
+    top: -7px;
+    transform: rotate(45deg);
+    width: 10px;
+  }
+
+  .oppia-uid-copy-btn {
+    box-shadow: 1px 1px 2px 0 rgba(0, 100, 92, 0.8);
+    color: #00645c;
+    font-family: Roboto, sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    margin: 0 auto;
+    width: 100px;
+  }
+</style>

@@ -31,7 +31,10 @@ import { LoggerService } from 'services/contextual/logger.service';
   providedIn: 'root'
 })
 export class TranslationTopicService {
-  private activeTopicName: string = null;
+  // This property is initialized using async methods
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  private activeTopicName!: string;
   private _activeTopicChangedEventEmitter = new EventEmitter<void>();
 
   constructor(
@@ -43,7 +46,7 @@ export class TranslationTopicService {
   }
 
   setActiveTopicName(newActiveTopicName: string): void {
-    this.ContributionOpportunitiesService.getAllTopicNamesAsync()
+    this.ContributionOpportunitiesService.getTranslatableTopicNamesAsync()
       .then((data) => {
         if (newActiveTopicName !== 'All' &&
             data.indexOf(newActiveTopicName) < 0) {

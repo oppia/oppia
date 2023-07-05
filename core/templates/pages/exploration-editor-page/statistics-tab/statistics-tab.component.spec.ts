@@ -16,263 +16,440 @@
  * @fileoverview Unit tests for statisticsTab.
  */
 
-import { TestBed } from '@angular/core/testing';
+import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { ExplorationStatsService } from 'services/exploration-stats.service';
-import { StateInteractionStatsService } from
+import { StateInteractionStats, StateInteractionStatsService } from
   'services/state-interaction-stats.service';
-import { StatesObjectFactory } from 'domain/exploration/StatesObjectFactory';
+import { States, StatesObjectFactory } from 'domain/exploration/StatesObjectFactory';
 import { AlertsService } from 'services/alerts.service';
 import { ComputeGraphService } from 'services/compute-graph.service';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { EventEmitter } from '@angular/core';
-import { ReadOnlyExplorationBackendApiService } from
-  'domain/exploration/read-only-exploration-backend-api.service';
+import { EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
+import { FetchExplorationBackendResponse, ReadOnlyExplorationBackendApiService } from 'domain/exploration/read-only-exploration-backend-api.service';
+import { RouterService } from '../services/router.service';
+import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { FormsModule } from '@angular/forms';
+import { StatisticsTabComponent } from './statistics-tab.component';
+import { ExplorationDataService } from '../services/exploration-data.service';
+import { ExplorationStats } from 'domain/statistics/exploration-stats.model';
+import { StateStatsModalComponent } from './templates/state-stats-modal.component';
 
-class MockRouterService {
-  private refreshStatisticsTabEventEmitter: EventEmitter<void>;
-  get onRefreshStatisticsTab() {
-    return this.refreshStatisticsTabEventEmitter;
+describe('Statistics Tab Component', () => {
+  let component: StatisticsTabComponent;
+  let fixture: ComponentFixture<StatisticsTabComponent>;
+  let ngbModal: NgbModal;
+  let alertsService: AlertsService;
+  let computeGraphService: ComputeGraphService;
+  let explorationStatsService: ExplorationStatsService;
+  let readOnlyExplorationBackendApiService:
+     ReadOnlyExplorationBackendApiService;
+  let stateInteractionStatsService: StateInteractionStatsService;
+  let statesObjectFactory: StatesObjectFactory;
+  let refreshStatisticsTabEventEmitter = new EventEmitter();
+
+  class MockRouterService {
+    onRefreshStatisticsTab = refreshStatisticsTabEventEmitter;
   }
-  set refreshStatisticsTabEmitter(val) {
-    this.refreshStatisticsTabEventEmitter = val;
-  }
-}
 
-describe('Statistics Tab Component', function() {
-  var ctrl = null;
-  var $q = null;
-  var $rootScope = null;
-  var $scope = null;
-  var $uibModal = null;
-  var alertsService = null;
-  var computeGraphService = null;
-  var explorationStatsService = null;
-  var readOnlyExplorationBackendApiService = null;
-  var stateInteractionStatsService = null;
-  var statesObjectFactory = null;
-  var routerService = null;
+  let explorationId = 'exp1';
 
-  var explorationId = 'exp1';
-  var state = {
-    classifier_model_id: '1',
-    content: {
-      content_id: 'content1',
-      html: 'This is a html text'
-    },
-    interaction: {
-      id: 'Continue',
-      answer_groups: [{
-        outcome: {
-          dest: 'outcome 1',
-          feedback: {
-            content_id: 'content2',
-            html: ''
-          },
-          labelled_as_correct: true,
-          param_changes: [],
-          refresher_exploration_id: null
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [
+        HttpClientTestingModule,
+        FormsModule,
+      ],
+      declarations: [
+        StateStatsModalComponent,
+        StatisticsTabComponent
+      ],
+      providers: [
+        {
+          provide: ExplorationDataService,
+          useValue: {
+            explorationId: explorationId
+          }
         },
-        rule_specs: [],
-        tagged_skill_misconception_id: ''
-      }, {
-        outcome: {
-          dest: 'outcome 2',
-          feedback: {
-            content_id: 'content3',
-            html: ''
+        {
+          provide: RouterService,
+          useClass: MockRouterService
+        }
+      ],
+      schemas: [NO_ERRORS_SCHEMA]
+    }).compileComponents();
+  });
+
+  beforeEach(() => {
+    fixture = TestBed.createComponent(
+      StatisticsTabComponent);
+    component = fixture.componentInstance;
+
+    alertsService = TestBed.inject(AlertsService);
+    explorationStatsService = TestBed.inject(ExplorationStatsService);
+    stateInteractionStatsService = TestBed.inject(StateInteractionStatsService);
+    ngbModal = TestBed.inject(NgbModal);
+    readOnlyExplorationBackendApiService = TestBed.inject(
+      ReadOnlyExplorationBackendApiService);
+    statesObjectFactory = TestBed.inject(
+      StatesObjectFactory);
+    computeGraphService = TestBed.inject(
+      ComputeGraphService);
+
+    // This throws "Argument of type 'null' is not assignable to
+    // parameter of type 'State'." We need to suppress this error
+    // because of the need to test validations. This throws an
+    // error because the state with name 'Introduction' is not
+    // present in the states object.
+    // @ts-ignore
+    spyOn(statesObjectFactory, 'createFromBackendDict').and.returnValue(null);
+
+    let explorationDict = {
+      states: {
+        Start: {
+          classifier_model_id: null,
+          recorded_voiceovers: {
+            voiceovers_mapping: {
+              ca_placeholder_0: {},
+              feedback_1: {},
+              rule_input_2: {},
+              content: {},
+              default_outcome: {}
+            }
           },
-          labelled_as_correct: true,
+          solicit_answer_details: false,
+          interaction: {
+            solution: null,
+            confirmed_unclassified_answers: [],
+            id: 'TextInput',
+            hints: [],
+            customization_args: {
+              rows: {
+                value: 1
+              },
+              placeholder: {
+                value: {
+                  unicode_str: '',
+                  content_id: 'ca_placeholder_0'
+                }
+              }
+            },
+            answer_groups: [
+              {
+                outcome: {
+                  missing_prerequisite_skill_id: null,
+                  refresher_exploration_id: null,
+                  labelled_as_correct: false,
+                  feedback: {
+                    content_id: 'feedback_1',
+                    html: '<p>Good Job</p>'
+                  },
+                  param_changes: [],
+                  dest_if_really_stuck: null,
+                  dest: 'Mid'
+                },
+                training_data: [],
+                rule_specs: [
+                  {
+                    inputs: {
+                      x: {
+                        normalizedStrSet: [
+                          'answer'
+                        ],
+                        contentId: 'rule_input_2'
+                      }
+                    },
+                    rule_type: 'FuzzyEquals'
+                  }
+                ],
+                tagged_skill_misconception_id: null
+              }
+            ],
+            default_outcome: {
+              missing_prerequisite_skill_id: null,
+              refresher_exploration_id: null,
+              labelled_as_correct: false,
+              feedback: {
+                content_id: 'default_outcome',
+                html: '<p>Try again.</p>'
+              },
+              param_changes: [],
+              dest_if_really_stuck: null,
+              dest: 'Start'
+            }
+          },
           param_changes: [],
-          refresher_exploration_id: null
+          card_is_checkpoint: true,
+          linked_skill_id: null,
+          content: {
+            content_id: 'content',
+            html: '<p>First Question</p>'
+          }
         },
-        rule_specs: [],
-        tagged_skill_misconception_id: ''
-      }],
-      confirmed_unclassified_answers: null,
-      customization_args: {
-        buttonText: {
-          value: {
-            content_id: 'ca_buttonText_0',
-            unicode_str: 'Continue'
+        End: {
+          classifier_model_id: null,
+          recorded_voiceovers: {
+            voiceovers_mapping: {
+              content: {}
+            }
+          },
+          solicit_answer_details: false,
+          interaction: {
+            solution: null,
+            confirmed_unclassified_answers: [],
+            id: 'EndExploration',
+            hints: [],
+            customization_args: {
+              recommendedExplorationIds: {
+                value: ['recommnendedExplorationId']
+              }
+            },
+            answer_groups: [],
+            default_outcome: null
+          },
+          param_changes: [],
+          card_is_checkpoint: false,
+          linked_skill_id: null,
+          content: {
+            content_id: 'content',
+            html: 'Congratulations, you have finished!'
+          }
+        },
+        Mid: {
+          classifier_model_id: null,
+          recorded_voiceovers: {
+            voiceovers_mapping: {
+              ca_placeholder_0: {},
+              feedback_1: {},
+              rule_input_2: {},
+              content: {},
+              default_outcome: {}
+            }
+          },
+          solicit_answer_details: false,
+          interaction: {
+            solution: null,
+            confirmed_unclassified_answers: [],
+            id: 'TextInput',
+            hints: [],
+            customization_args: {
+              rows: {
+                value: 1
+              },
+              placeholder: {
+                value: {
+                  unicode_str: '',
+                  content_id: 'ca_placeholder_0'
+                }
+              }
+            },
+            answer_groups: [
+              {
+                outcome: {
+                  missing_prerequisite_skill_id: null,
+                  refresher_exploration_id: null,
+                  labelled_as_correct: false,
+                  feedback: {
+                    content_id: 'feedback_1',
+                    html: ' <p>Good Job</p>'
+                  },
+                  param_changes: [],
+                  dest_if_really_stuck: null,
+                  dest: 'End'
+                },
+                training_data: [],
+                rule_specs: [
+                  {
+                    inputs: {
+                      x: {
+                        normalizedStrSet: [
+                          'answer'
+                        ],
+                        contentId: 'rule_input_2'
+                      }
+                    },
+                    rule_type: 'FuzzyEquals'
+                  }
+                ],
+                tagged_skill_misconception_id: null
+              }
+            ],
+            default_outcome: {
+              missing_prerequisite_skill_id: null,
+              refresher_exploration_id: null,
+              labelled_as_correct: false,
+              feedback: {
+                content_id: 'default_outcome',
+                html: '<p>try again.</p>'
+              },
+              param_changes: [],
+              dest_if_really_stuck: null,
+              dest: 'Mid'
+            }
+          },
+          param_changes: [],
+          card_is_checkpoint: false,
+          linked_skill_id: null,
+          content: {
+            content_id: 'content',
+            html: '<p>Second Question</p>'
           }
         }
       },
-      hints: [],
-      solution: {
-        answer_is_exclusive: false,
-        correct_answer: 'This is the correct answer',
-        explanation: {
-          content_id: 'content1',
-          html: 'This is a html text'
-        }
-      }
-    },
-    linked_skill_id: null,
-    next_content_id_index: 0,
-    param_changes: [],
-    recorded_voiceovers: {
-      voiceovers_mapping: {}
-    },
-    solicit_answer_details: true,
-    written_translations: {
-      translations_mapping: {}
-    }
-  };
+      auto_tts_enabled: true,
+      version: 2,
+      draft_change_list_id: 9,
+      is_version_of_draft_valid: null,
+      title: 'Exploration',
+      language_code: 'en',
+      correctness_feedback_enabled: true,
+      init_state_name: 'Start',
+      param_changes: [],
+      param_specs: null,
+      draft_changes: null,
+    };
 
-  beforeEach(angular.mock.module('oppia'));
+    let explorationResponse: FetchExplorationBackendResponse = {
+      exploration_id: 'exp_id',
+      is_logged_in: true,
+      session_id: 'KERH',
+      exploration: {
+        init_state_name: 'Start',
+        param_changes: [],
+        param_specs: {},
+        title: 'Exploration',
+        language_code: 'en',
+        correctness_feedback_enabled: true,
+        objective: 'To learn',
+        states: explorationDict.states,
+        next_content_id_index: 6
+      },
+      exploration_metadata: {
+        title: 'Exploration',
+        category: 'Algebra',
+        objective: 'To learn',
+        language_code: 'en',
+        tags: [],
+        blurb: '',
+        author_notes: '',
+        states_schema_version: 50,
+        init_state_name: 'Introduction',
+        param_specs: {},
+        param_changes: [],
+        auto_tts_enabled: false,
+        correctness_feedback_enabled: true,
+        edits_allowed: true
+      },
+      version: 2,
+      can_edit: true,
+      preferred_audio_language_code: 'en',
+      preferred_language_codes: [],
+      auto_tts_enabled: true,
+      correctness_feedback_enabled: true,
+      record_playthrough_probability: 1,
+      draft_change_list_id: 0,
+      has_viewed_lesson_info_modal_once: false,
+      furthest_reached_checkpoint_exp_version: 1,
+      furthest_reached_checkpoint_state_name: 'End',
+      most_recently_reached_checkpoint_state_name: 'Mid',
+      most_recently_reached_checkpoint_exp_version: 2,
+      displayable_language_codes: []
+    };
+    spyOn(readOnlyExplorationBackendApiService, 'loadLatestExplorationAsync')
+      .and.returnValue(Promise.resolve(explorationResponse));
 
-  beforeEach(function() {
-    TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule]
-    });
-    alertsService = TestBed.get(AlertsService);
-    computeGraphService = TestBed.get(ComputeGraphService);
-    explorationStatsService = TestBed.get(ExplorationStatsService);
-    stateInteractionStatsService = TestBed.get(StateInteractionStatsService);
-    statesObjectFactory = TestBed.get(StatesObjectFactory);
-    routerService = new MockRouterService();
-  });
-
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('ExplorationDataService', {
-      explorationId: explorationId
-    });
-    $provide.value(
-      'ReadOnlyExplorationBackendApiService',
-      TestBed.get(ReadOnlyExplorationBackendApiService));
-  }));
-
-  beforeEach(angular.mock.inject(function($injector, $componentController) {
-    $q = $injector.get('$q');
-    $rootScope = $injector.get('$rootScope');
-    $uibModal = $injector.get('$uibModal');
-    readOnlyExplorationBackendApiService = $injector.get(
-      'ReadOnlyExplorationBackendApiService');
-
-    spyOn(
-      readOnlyExplorationBackendApiService, 'loadLatestExplorationAsync').and
-      .returnValue($q.resolve({
-        exploration: {
-          init_state_name: 'State1',
-          states: {
-            State1: state
-          }
-        }
-      }));
     spyOn(explorationStatsService, 'getExplorationStatsAsync').and.returnValue(
-      $q.resolve({
+      Promise.resolve({
         numStarts: 20,
         numActualStarts: 10,
         numCompletions: 5,
-      }));
-    spyOn(stateInteractionStatsService, 'computeStatsAsync').and.returnValue(
-      $q.resolve({
-        visualizationsInfo: {}
-      }));
+      } as ExplorationStats));
 
-    routerService.refreshStatisticsTabEmitter = new EventEmitter();
-    $scope = $rootScope.$new();
-    ctrl = $componentController('statisticsTab', {
-      $scope: $scope,
-      AlertsService: alertsService,
-      ComputeGraphService: computeGraphService,
-      ExplorationStatsService: explorationStatsService,
-      RouterService: routerService,
-      StateInteractionStatsService: stateInteractionStatsService,
-      StatesObjectFactory: statesObjectFactory
-    });
-    ctrl.$onInit();
-  }));
+    spyOn(stateInteractionStatsService, 'computeStatsAsync').and.returnValue(
+      Promise.resolve({
+        visualizationsInfo: {}
+      } as StateInteractionStats));
+
+    spyOn (computeGraphService, 'compute').and.stub();
+    component.states = {
+      getState: (name: string) => {
+        return {
+          interaction: {
+            customizationArgs: null,
+          }
+        };
+      }
+    } as unknown as States;
+
+    component.expStats = {
+      getStateStats: (name: string) => null
+    } as unknown as ExplorationStats;
+
+    component.ngOnInit();
+  });
 
   afterEach(() => {
-    ctrl.$onDestroy();
+    component.ngOnDestroy();
   });
 
   it('should initialize controller properties after its initialization',
-    function() {
-      expect(ctrl.stateStatsModalIsOpen).toBe(false);
-      expect($scope.explorationHasBeenVisited).toBe(false);
+    () => {
+      expect(component.stateStatsModalIsOpen).toBe(false);
+      expect(component.explorationHasBeenVisited).toBe(false);
     });
 
   it('should refresh exploration statistics when broadcasting' +
-    ' refreshStatisticsTab', function() {
-    routerService.onRefreshStatisticsTab.emit();
+     ' refreshStatisticsTab', fakeAsync(() => {
+    refreshStatisticsTabEventEmitter.emit();
+    tick();
 
-    // Resolve promise.
-    $scope.$apply();
-
-    expect($scope.statsGraphData).toEqual({
-      finalStateIds: [],
-      initStateId: 'State1',
-      links: [{
-        source: 'State1',
-        target: 'outcome 1'
-      }, {
-        source: 'State1',
-        target: 'outcome 2'
-      }],
-      nodes: {
-        State1: 'State1'
-      }
-    });
-    expect($scope.pieChartData).toEqual([
+    expect(component.statsGraphData).toEqual(undefined);
+    expect(component.pieChartData).toEqual([
       ['Type', 'Number'],
       ['Completions', 5],
       ['Non-Completions', 5]
     ]);
-    expect($scope.numPassersby).toBe(10);
-    expect($scope.explorationHasBeenVisited).toBe(true);
-  });
-
-  it('should open state stats modal', function() {
-    routerService.onRefreshStatisticsTab.emit();
-
-    // Resolve promise.
-    $scope.$apply();
-
-    spyOn($uibModal, 'open').and.callThrough();
-    $scope.onClickStateInStatsGraph('State1');
-    expect(ctrl.stateStatsModalIsOpen).toBe(true);
-
-    $scope.$apply();
-
-    expect($uibModal.open).toHaveBeenCalled();
-  });
+    expect(component.numPassersby).toBe(10);
+    expect(component.explorationHasBeenVisited).toBe(true);
+  }));
 
   it('should open state stats modal and close it when clicking in stats' +
-    ' graph', function() {
-    routerService.onRefreshStatisticsTab.emit();
+     ' graph', fakeAsync(() => {
+    tick();
 
-    // Resolve promise.
-    $scope.$apply();
+    spyOn(ngbModal, 'open').and.returnValue({
+      componentInstance: {
+        interactionArgs: '',
+        stateName: 'stateName',
+        visualizationsInfo: '',
+        stateStats: false
+      },
+      result: Promise.resolve()
+    } as NgbModalRef);
+    tick();
 
-    spyOn($uibModal, 'open').and.returnValue({
-      result: $q.resolve()
-    });
-    $scope.onClickStateInStatsGraph('State1');
-    expect(ctrl.stateStatsModalIsOpen).toBe(true);
-    $scope.$apply();
+    component.onClickStateInStatsGraph('id');
+    tick();
 
-    expect(ctrl.stateStatsModalIsOpen).toBe(false);
-  });
+    expect(component.stateStatsModalIsOpen).toBe(false);
+  }));
 
   it('should open state stats modal and dismiss it when clicking in' +
-    ' stats graph', function() {
-    routerService.onRefreshStatisticsTab.emit();
-
-    // Resolve promise.
-    $scope.$apply();
-
-    spyOn($uibModal, 'open').and.returnValue({
-      result: $q.reject()
-    });
+     ' stats graph', fakeAsync(() => {
+    spyOn(ngbModal, 'open').and.returnValue({
+      componentInstance: {
+        interactionArgs: '',
+        stateName: 'stateName',
+        visualizationsInfo: '',
+        stateStats: false
+      },
+      result: Promise.reject()
+    } as NgbModalRef);
     spyOn(alertsService, 'clearWarnings');
 
-    $scope.onClickStateInStatsGraph('State1');
-    expect(ctrl.stateStatsModalIsOpen).toBe(true);
-    $scope.$apply();
+    component.onClickStateInStatsGraph('State1');
+    tick();
 
+    expect(component.stateStatsModalIsOpen).toBe(false);
     expect(alertsService.clearWarnings).toHaveBeenCalled();
-    expect(ctrl.stateStatsModalIsOpen).toBe(false);
-  });
+  }));
 });
