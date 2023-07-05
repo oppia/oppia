@@ -625,7 +625,7 @@ def get_time_in_millisecs(datetime_obj: datetime.datetime) -> float:
 
 def convert_millisecs_time_to_datetime_object(
         date_time_msecs: float) -> datetime.datetime:
-    """Returns date time object from the date time in milliseconds.
+    """Returns the datetime object from the given date time in milliseconds.
 
     Args:
         date_time_msecs: float. Date time represented in milliseconds.

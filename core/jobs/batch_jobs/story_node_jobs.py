@@ -43,12 +43,16 @@ datastore_services = models.Registry.import_datastore_services()
 
 
 class PopulateStoryNodeJob(base_jobs.JobBase):
-    """Job that migrates story nodes, for serial chapter launch feature"""
+    """Job that populates the story nodes with 5 new fields, namely: status,
+    planned_publication_date_msecs, last_modified_msecs,
+    first_publication_date_msecs and unpublishing_reason for serial chapter
+    launch feature.
+    """
 
     DATASTORE_UPDATES_ALLOWED = True
 
     def _update_story_node(
-            self, story_model: story_models.StoryModel
+        self, story_model: story_models.StoryModel
     ) -> result.Result[
         story_models.StoryModel,
         Tuple[str, Exception]

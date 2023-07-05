@@ -1917,7 +1917,7 @@ class Story:
         """Updates the status of a given node
 
         Args:
-            node_id: str. The id of the node.
+            node_id: str. The Id of the node.
             new_status: str. The new publication status of the node.
         """
         node_index = self.story_contents.get_node_index(node_id)
@@ -1929,9 +1929,9 @@ class Story:
         """Updates the planned publication date of a given node
 
         Args:
-            node_id: str. The id of the node.
+            node_id: str. The Id of the node.
             new_planned_publication_date_msecs: float. The planned publication
-                date for the node in miliseconds.
+                date of the node in miliseconds.
         """
         node_index = self.story_contents.get_node_index(node_id)
         self.story_contents.nodes[node_index].planned_publication_date = (
@@ -1943,9 +1943,9 @@ class Story:
         """Updates the last modified of a given node
 
         Args:
-            node_id: str. The id of the node.
+            node_id: str. The Id of the node.
             new_last_modified_msecs: float. The last modified date time
-                for the node in miliseconds.
+                of the node in miliseconds.
         """
         node_index = self.story_contents.get_node_index(node_id)
         self.story_contents.nodes[node_index].last_modified = (
@@ -1957,7 +1957,7 @@ class Story:
         """Updates the first publication date of a given node.
 
         Args:
-            node_id: str. The id of the node.
+            node_id: str. The Id of the node.
             new_publication_date_msecs: float. The first publication date
                 of the node in miliseconds.
         """
@@ -1971,7 +1971,7 @@ class Story:
         """Updates the unpublishing reason of a given node.
 
         Args:
-            node_id: str. The id of the node.
+            node_id: str. The Id of the node.
             new_unpublishing_reason: str. The reason behind unpublishing
                 this node.
         """
