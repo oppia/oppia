@@ -68,6 +68,7 @@ export class CarouselBarComponent implements OnInit {
        carouselSelector.scrollTo(0, 0);
        this.carouselScrollPositionPx = 0;
        this.disableLeftButton = true;
+       this.disableRightButton = false;
        this.windowIsNarrow = this.windowDimensionService.isWindowNarrow();
      }));
  }
