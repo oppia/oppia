@@ -1273,7 +1273,6 @@ span.sort-explorations-select .sort-order {
   width: 200px;
 }
 .oppia-dashboard-intro-button:hover,
-.oppia-dashboard-intro-button:focus,
 .oppia-dashboard-intro-button:active {
   background-color: rgba(5, 190, 178, 1);
   color: #fff;
