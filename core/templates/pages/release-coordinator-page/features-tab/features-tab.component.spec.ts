@@ -317,6 +317,23 @@ describe('Release coordinator page feature tab', function() {
     });
   });
 
+  describe('.saveDefaultValueToStorage', () => {
+    it('should save the changes', fakeAsync(() => {
+      component.saveDefaultValueToStorage();
+
+      expect(updateApiSpy).toHaveBeenCalled();
+    }));
+
+    it('should not proceed if the user doesn\'t confirm', fakeAsync(() => {
+      mockConfirmResult(false);
+      component.saveDefaultValueToStorage();
+
+      flushMicrotasks();
+
+      expect(updateApiSpy).not.toHaveBeenCalled();
+    }));
+  });
+
   describe('.getFeatureValidOnCurrentServer', () => {
     let featureFlagDevStage = PlatformParameter.createFromBackendDict({
       data_type: 'bool',
@@ -427,7 +444,8 @@ describe('Release coordinator page feature tab', function() {
       flushMicrotasks();
 
       expect(updateApiSpy).toHaveBeenCalledWith(
-        featureFlag.name, 'mock msg', featureFlag.rules);
+        featureFlag.name, 'mock msg', featureFlag.rules,
+        featureFlag.defaultValue);
       expect(setStatusSpy).toHaveBeenCalledWith('Saved successfully.');
     }));
 
@@ -608,12 +626,12 @@ describe('Release coordinator page feature tab', function() {
     });
   });
 
-  describe('.isFeatureFlagRulesChanged', () => {
+  describe('.isFeatureFlagChanged', () => {
     it('should return false if the feature is the same as the backup instance',
       () => {
         const featureFlag = component.featureFlags[0];
 
-        expect(component.isFeatureFlagRulesChanged(featureFlag))
+        expect(component.isFeatureFlagChanged(featureFlag))
           .toBeFalse();
       }
     );
@@ -625,10 +643,19 @@ describe('Release coordinator page feature tab', function() {
 
         component.addNewRuleToTop(featureFlag);
 
-        expect(component.isFeatureFlagRulesChanged(featureFlag))
+        expect(component.isFeatureFlagChanged(featureFlag))
           .toBeTrue();
       }
     );
+
+    it('should return true if the feature default value is different from ' +
+    'the backup instance', () => {
+      let featureFlag = component.featureFlags[0];
+      featureFlag.defaultValue = true;
+
+      expect(component.isFeatureFlagChanged(featureFlag))
+        .toBeTrue();
+    });
 
     it('should throw error if the feature username is not found', () => {
       const featureFlag = PlatformParameter.createFromBackendDict({
@@ -661,7 +688,7 @@ describe('Release coordinator page feature tab', function() {
       });
 
       expect(() => {
-        component.isFeatureFlagRulesChanged(featureFlag);
+        component.isFeatureFlagChanged(featureFlag);
       }).toThrowError();
     });
   });
