@@ -610,8 +610,10 @@ def _send_email(
     """
 
     if sender_name is None:
-        sender_name = platform_feature_services.get_platform_parameter_value(
+        email_sender_name = platform_feature_services.get_platform_parameter_value(
             EMAIL_SENDER_NAME.name)
+        assert isinstance(email_sender_name, str)
+        sender_name = email_sender_name
 
     require_sender_id_is_valid(intent, sender_id)
 
