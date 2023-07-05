@@ -422,5 +422,5 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
 
         with validate_swap, return_json_swap, download_files_swap:
             with unzip_files_swap, untar_files_swap:
-                install_dependencies_json_packages.main(args=[])
+                install_dependencies_json_packages.main()
         self.assertEqual(check_function_calls, expected_check_function_calls)

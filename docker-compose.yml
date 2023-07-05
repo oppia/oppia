@@ -122,7 +122,7 @@ services:
       '
 
   firebase:
-    image: node:16.13.0-alpine
+    image: node@sha256:48650ae5c5dc9fbd0d0559fd1248e779f7214ba99434420a089bc7853aeefb65
     container_name: oppia-firebase-emulator
     ports:
       - "9099:9099"

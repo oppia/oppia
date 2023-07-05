@@ -33,8 +33,9 @@ from core import utils
 from scripts import common
 
 import rcssmin
-from typing import (Deque, Dict, List, Optional, Sequence, TextIO, Tuple,
-                    TypedDict)
+from typing import (
+    Deque, Dict, List, Optional, Sequence, TextIO, Tuple, TypedDict
+)
 
 if not feconf.OPPIA_IS_DOCKERIZED:
     from scripts import install_python_dev_dependencies

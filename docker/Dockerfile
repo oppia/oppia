@@ -1,9 +1,8 @@
-FROM --platform=linux/amd64 node:16.13.0 AS frontend
+FROM --platform=linux/amd64 node@sha256:1d35d3b639b639fb55d955d271c1da97d9e730c7dc0b9bae352a63c50b7c12c1 AS frontend
 
 WORKDIR /app/oppia
 
 RUN apt-get update -y && apt-get upgrade -y \
-    chromium \
     curl \
     git \
     npm
