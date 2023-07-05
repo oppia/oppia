@@ -48,7 +48,7 @@
       <div>
         <a [href]="getClassroomLink(item.key)" target="{{ openInNewWindow ? '_blank' : '_self' }}"
           class="oppia-classroom-link">
-          <div class="classroom-card">
+          <div class="classroom-button">
             <p class="classroom-text">
               <span [innerHTML]="'I18N_VIEW_ALL_TOPICS' | translate: {classroomName: item.key}"></span>
             </p>
@@ -59,7 +59,7 @@
   </div>
 
 
-  <div tabindex="0" class="topic-suggested-for-you subhash">
+  <!-- <div tabindex="0" class="topic-suggested-for-you subhash">
     <p class="suggested-for-you-heading" [innerHTML]="'I18N_LEARNER_DASHBOARD_LEARN_SOMETHING_NEW_SECTION' | translate">
     </p>
     <div *ngFor="let item of untrackedTopics | keyvalue" class="untracked-topics">
@@ -80,7 +80,7 @@
         </a>
       </div>
     </div>
-  </div>
+  </div> -->
 
   <!-- <div tabindex="0" class="empty-suggested-for-you learn-something-new-section"
     *ngIf="!isNonemptyObject(untrackedTopics) && continueWhereYouLeftOffList.length === 0">

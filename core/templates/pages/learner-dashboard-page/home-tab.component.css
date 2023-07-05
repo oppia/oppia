@@ -47,7 +47,7 @@
   font-size: 18px;
   padding-top: 32px;
 }
-.home-tab .topic-suggested-for-you .classroom-card {
+.home-tab .topic-suggested-for-you .classroom-button {
   border: 1px solid #205D86;
   border-radius: 4px;
   height: 44px;
@@ -84,9 +84,10 @@
   background-color: #fff;
   border-radius: 4px;
   box-shadow: 0 0 4px #0000001a;
-  margin: 18px 0 25px 0;
+  margin: 18px 0 25px 12px;
   min-height: 206px;
-  padding: 32px 30px 30px 40px;
+  padding: 8px;
+  /* padding: 32px 30px 30px 40px; */
   /* width: 736px; */
 }
 .home-tab .suggested-for-you .suggested-for-you-section {
@@ -162,8 +163,8 @@
   }
   .home-tab .continue-where-you-left-off, .home-tab .suggested-for-you,
   .home-tab .topic-suggested-for-you {
-    margin-left: auto;
-    width: 465px;
+    margin-left: 12px;
+    /* width: 465px; */
   }
   .home-tab .continue-where-you-left-off .continue-where-you-left-off-heading,
   .home-tab .suggested-for-you .suggested-for-you-heading {
@@ -197,9 +198,10 @@
   .home-tab .continue-where-you-left-off,
   .home-tab .suggested-for-you,
   .home-tab .topic-suggested-for-you {
-    margin: 18px 0 25px 0;
-    padding: 40px 0 20px 32px;
-    width: 500px;
+    margin: 18px 0 25px 12px;
+    /* padding: 40px 0 20px 32px; */
+    padding: 8px;
+    /* width: 500px; */
   }
   .home-tab .continue-where-you-left-off .continue-where-you-left-off-heading,
   .home-tab .suggested-for-you .suggested-for-you-heading {
@@ -220,12 +222,16 @@
 @media(max-width: 500px) {
   .home-tab .continue-where-you-left-off, .home-tab .suggested-for-you,
   .home-tab .topic-suggested-for-you {
-    margin-left: auto;
-    width: 335px;
+    margin-left: 12px;
+    /* width: 335px; */
   }
 
   .home-tab .suggested-for-you .topic-summary-tile-scroll {
     width: 265px;
+  }
+
+  .home-tab .topic-suggested-for-you .classroom-button {
+    width: 291px;
   }
 
   .home-tab .greeting {
