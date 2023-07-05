@@ -191,7 +191,7 @@ describe('Enable correctness feedback and set correctness', function() {
     });
 
   it('should show Learn Again button correctly', async function() {
-    await workflow.createExploration(true);
+    await workflow.createExploration(false);
     await explorationEditorPage.navigateToSettingsTab();
     await explorationEditorSettingsTab.setTitle(explorationTitle);
     await explorationEditorSettingsTab.setCategory('Algorithm');
