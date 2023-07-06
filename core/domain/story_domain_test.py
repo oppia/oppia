@@ -765,6 +765,16 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         self._assert_validation_error(
             'Chapter thumbnail background color is not specified.')
 
+    def test_node_status_validation(self) -> None:
+        self.story.story_contents.nodes[0].status = 'Complete'
+        self._assert_validation_error(
+            'Chapter status cannot be Complete')
+
+    def test_node_unpublishing_reason_validation(self) -> None:
+        self.story.story_contents.nodes[0].unpublishing_reason = 'Outdated'
+        self._assert_validation_error(
+            'Chapter unpublishing reason cannot be Outdated')
+
     def test_nodes_validation(self) -> None:
         self.story.story_contents.initial_node_id = 'node_10'
         self._assert_validation_error('Expected starting node to exist')
@@ -804,11 +814,11 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
                 'outline': 'Outline',
                 'outline_is_finalized': False,
                 'exploration_id': 'exploration_id',
-                'status': 'Published',
-                'planned_publication_date_msecs': 100,
-                'last_modified_msecs': 100,
-                'first_publication_date_msecs': 100,
-                'unpublishing_reason': None
+                'status': None,
+                'planned_publication_date_msecs': None,
+                'last_modified_msecs': None,
+                'first_publication_date_msecs': None,
+                'unpublishing_reason': 'BAD_CONTENT'
             })
         ]
         self._assert_validation_error('Expected all destination nodes to exist')
@@ -874,6 +884,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         self.story.update_node_thumbnail_bg_color('node_1', 'Red')
         self.assertEqual(
             self.story.story_contents.nodes[0].thumbnail_bg_color, 'Red')
+        self.story.update_node_thumbnail_bg_color('node_1', '#F8BF74')
 
         # TODO(#13059): Here we use MyPy ignore because after we fully type the
         # codebase we plan to get rid of the tests that intentionally test wrong
@@ -881,6 +892,50 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         self.story.story_contents.nodes[0].thumbnail_filename = []  # type: ignore[assignment]
         self._assert_validation_error(
             'Expected thumbnail filename to be a string, received')
+        self.story.story_contents.nodes[0].thumbnail_filename = 'test.svg'
+
+        # TODO(#13059): Here we use MyPy ignore because after we fully type the
+        # codebase we plan to get rid of the tests that intentionally test wrong
+        # inputs that we can normally catch by typing.
+        self.story.story_contents.nodes[0].status = 2  # type: ignore[assignment]
+        self._assert_validation_error(
+            'Expected status to be a string, received 2')
+        self.story.story_contents.nodes[0].status = 'Draft'
+
+        # TODO(#13059): Here we use MyPy ignore because after we fully type the
+        # codebase we plan to get rid of the tests that intentionally test wrong
+        # inputs that we can normally catch by typing.
+        self.story.story_contents.nodes[0].planned_publication_date = '10 July'  # type: ignore[assignment]
+        self._assert_validation_error(
+            'Expected planned publication date to be a datetime, received '
+            '10 July')
+        self.story.story_contents.nodes[0].planned_publication_date = (
+            datetime.datetime.now())
+
+        # TODO(#13059): Here we use MyPy ignore because after we fully type the
+        # codebase we plan to get rid of the tests that intentionally test wrong
+        # inputs that we can normally catch by typing.
+        self.story.story_contents.nodes[0].last_modified = 1  # type: ignore[assignment]
+        self._assert_validation_error(
+            'Expected last modified to be a datetime, received 1')
+        self.story.story_contents.nodes[0].last_modified = (
+            datetime.datetime.now())
+
+        # TODO(#13059): Here we use MyPy ignore because after we fully type the
+        # codebase we plan to get rid of the tests that intentionally test wrong
+        # inputs that we can normally catch by typing.
+        self.story.story_contents.nodes[0].first_publication_date = 1  # type: ignore[assignment]
+        self._assert_validation_error(
+            'Expected first publication date to be a datetime, received 1')
+        self.story.story_contents.nodes[0].first_publication_date = None
+
+    def test_valididate_non_string_unpublishing_reason(self) -> None:
+        # TODO(#13059): Here we use MyPy ignore because after we fully type the
+        # codebase we plan to get rid of the tests that intentionally test wrong
+        # inputs that we can normally catch by typing.
+        self.story.story_contents.nodes[0].unpublishing_reason = 1  # type: ignore[assignment]
+        self._assert_validation_error(
+            'Expected unpublishing reason to be string, received 1')
 
     def test_acquired_prerequisite_skill_intersection_validation(self) -> None:
         self.story.story_contents.nodes[0].prerequisite_skill_ids = [

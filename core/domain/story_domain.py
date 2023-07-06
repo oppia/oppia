@@ -632,6 +632,32 @@ class StoryNode:
         return thumbnail_bg_color in constants.ALLOWED_THUMBNAIL_BG_COLORS[
             'chapter']
 
+    @classmethod
+    def require_valid_status(cls, status: str) -> bool:
+        """Checks whether the status of the story node is valid.
+
+        Args:
+            status: str. The status to validate.
+
+        Returns:
+            bool. Whether the status is valid or not.
+        """
+        return status in constants.ALLOWED_STORYNODE_STATUS
+
+    @classmethod
+    def require_valid_unpublishing_reason(
+        cls, unpublishing_reason: str) -> bool:
+        """Checks whether the unpublishing reason of the story node is valid.
+
+        Args:
+            unpublishing_reason: str. The unpublishing reason to validate.
+
+        Returns:
+            bool. Whether the unpublishing reason is valid or not.
+        """
+        return unpublishing_reason in (
+            constants.ALLOWED_STORYNODE_UNPUBLISHING_REASONS)
+
     def to_dict(self) -> StoryNodeDict:
         """Returns a dict representing this StoryNode domain object.
 
@@ -651,11 +677,16 @@ class StoryNode:
             'outline': self.outline,
             'outline_is_finalized': self.outline_is_finalized,
             'exploration_id': self.exploration_id,
-            'status': None,
-            'planned_publication_date_msecs': None,
-            'last_modified_msecs': None,
-            'first_publication_date_msecs': None,
-            'unpublishing_reason': None
+            'status': self.status,
+            'planned_publication_date_msecs': utils.get_time_in_millisecs(
+                self.planned_publication_date) if self.planned_publication_date
+                else None,
+            'last_modified_msecs': utils.get_time_in_millisecs(
+                self.last_modified) if self.last_modified else None,
+            'first_publication_date_msecs': utils.get_time_in_millisecs(
+                self.first_publication_date) if self.first_publication_date
+                else None,
+            'unpublishing_reason': self.unpublishing_reason
         }
 
     @classmethod
@@ -668,6 +699,18 @@ class StoryNode:
         Returns:
             StoryNode. The corresponding StoryNode domain object.
         """
+        planned_publication_date_msecs = (
+            node_dict['planned_publication_date_msecs'] if
+            'planned_publication_date_msecs' in node_dict and
+            node_dict['planned_publication_date_msecs'] else None)
+        last_modified_msecs = (
+                node_dict['last_modified_msecs'] if
+                'last_modified_msecs' in node_dict and
+                node_dict['last_modified_msecs'] else None)
+        first_publication_date_msecs = (
+                node_dict['first_publication_date_msecs'] if
+                'first_publication_date_msecs' in node_dict and
+                node_dict['first_publication_date_msecs'] else None)
         node = cls(
             node_dict['id'],
             node_dict['title'],
@@ -681,8 +724,17 @@ class StoryNode:
             node_dict['outline'],
             node_dict['outline_is_finalized'],
             node_dict['exploration_id'],
-            None, None, None,
-            None, None
+            node_dict['status'],
+            utils.convert_millisecs_time_to_datetime_object(
+                planned_publication_date_msecs) if
+                planned_publication_date_msecs else None,
+            utils.convert_millisecs_time_to_datetime_object(
+                last_modified_msecs) if
+                last_modified_msecs else None,
+            utils.convert_millisecs_time_to_datetime_object(
+                first_publication_date_msecs) if
+                first_publication_date_msecs else None,
+            node_dict['unpublishing_reason']
         )
         return node
 
@@ -820,6 +872,44 @@ class StoryNode:
             if node_id == self.id:
                 raise utils.ValidationError(
                     'The story node with ID %s points to itself.' % node_id)
+
+        if self.status:
+            if not isinstance(self.status, str):
+                raise utils.ValidationError(
+                    'Expected status to be a string, received %s' %
+                    self.status)
+            if not self.require_valid_status(self.status):
+                raise utils.ValidationError(
+                    'Chapter status cannot be %s ' % self.status)
+
+        if self.planned_publication_date and (
+            not isinstance(self.planned_publication_date, datetime.datetime)):
+            raise utils.ValidationError(
+                'Expected planned publication date to be a datetime, '
+                'received %s' % self.planned_publication_date)
+
+        if self.last_modified and (
+            not isinstance(self.last_modified, datetime.datetime)):
+            raise utils.ValidationError(
+                'Expected last modified to be a datetime, '
+                'received %s' % self.last_modified)
+
+        if self.first_publication_date and (
+            not isinstance(self.first_publication_date, datetime.datetime)):
+            raise utils.ValidationError(
+                'Expected first publication date to be a datetime, '
+                'received %s' % self.first_publication_date)
+
+        if self.unpublishing_reason:
+            if not isinstance(self.unpublishing_reason, str):
+                raise utils.ValidationError(
+                    'Expected unpublishing reason to be string, received %s' %
+                    self.unpublishing_reason)
+            if not self.require_valid_unpublishing_reason(
+                self.unpublishing_reason):
+                raise utils.ValidationError(
+                    'Chapter unpublishing reason cannot be %s ' %
+                    self.unpublishing_reason)
 
 
 class StoryContentsDict(TypedDict):
