@@ -59,6 +59,7 @@ ALL_PLATFORM_PARAMS_EXCEPT_FEATURE_FLAGS: List[
             ALWAYS_ASK_LEARNERS_FOR_ANSWER_DETAILS
         ),
         platform_parameter_list.ParamNames.DUMMY_PARAMETER,
+        platform_feature_list.ParamNames.EMAIL_FOOTER,
         platform_feature_list.ParamNames.EMAIL_SENDER_NAME,
         (
             platform_parameter_list.ParamNames.

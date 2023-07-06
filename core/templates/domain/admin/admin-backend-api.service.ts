@@ -99,7 +99,6 @@ export interface ConfigPropertyValues {
   'classroom_promos_are_enabled': boolean;
   'contributor_dashboard_is_enabled': boolean;
   'contributor_dashboard_reviewer_emails_is_enabled': boolean;
-  'email_footer': string;
   'enable_admin_notifications_for_reviewer_shortage': boolean;
   'max_number_of_explorations_in_math_svgs_batch': number;
   'max_number_of_suggestions_per_reviewer': number;

@@ -56,6 +56,7 @@ class ParamNames(enum.Enum):
     HIGH_BOUNCE_RATE_TASK_MINIMUM_EXPLORATION_STARTS = (
         'high_bounce_rate_task_minimum_exploration_starts')
     EMAIL_SENDER_NAME = 'email_sender_name'
+    EMAIL_FOOTER = 'email_footer'
 
 
 # Platform parameters should all be defined below.
