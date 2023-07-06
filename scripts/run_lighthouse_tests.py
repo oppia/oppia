@@ -69,8 +69,13 @@ _PARSER.add_argument(
 _PARSER.add_argument(
     '--shard', help='Sets the shard for the lighthouse tests',
     required=True, choices=['1', '2'])
+
 _PARSER.add_argument(
     '--skip_build', help='Sets whether to skip webpack build',
+    action='store_true')
+
+_PARSER.add_argument(
+    '--record_screen', help='Sets whether lighthouse screen-records tests',
     action='store_true')
 
 
@@ -208,7 +213,22 @@ def main(args: Optional[List[str]] = None) -> None:
         build.main(args=[])
         common.run_ng_compilation()
         run_webpack_compilation()
+    
+    if parsed_args.record_screen:
+        # Start ffmpeg screen record.
+        import asyncio
+        from ffmpeg import Progress
+        from ffmpeg.asyncio import FFmpeg
 
+        dir_path = os.path.join(os.getcwd(), '..', '..', 'webdriverio-video/')
+        os.mkdir(dir_path)
+        video_path = os.path.join(dir_path, 'lhci.mp4')
+        ffmpeg = (
+            FFmpeg()
+            .input(format='x11grab', framerate=30, filename='desktop')
+            .output(
+            crf='0', preset='ultrafast', filename=video_path, c='libx264')
+            )
     with contextlib.ExitStack() as stack:
         stack.enter_context(servers.managed_redis_server())
         stack.enter_context(servers.managed_elasticsearch_dev_server())
@@ -222,6 +242,10 @@ def main(args: Optional[List[str]] = None) -> None:
             port=GOOGLE_APP_ENGINE_PORT,
             log_level='critical',
             skip_sdk_update_check=True))
+
+        if parsed_args.record_screen:
+            run_lighthouse_puppeteer_script()
+            run_lighthouse_checks(lighthouse_mode, parsed_args.shard)
 
         run_lighthouse_puppeteer_script()
         run_lighthouse_checks(lighthouse_mode, parsed_args.shard)

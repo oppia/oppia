@@ -28,6 +28,7 @@ mutagen==1.45.1
 pillow==9.0.1
 pylatexenc==2.10
 pytest==6.2.5
+python-ffmpeg==2.0.4
 PyYAML==6.0
 redis==3.5.3
 requests==2.26.0
