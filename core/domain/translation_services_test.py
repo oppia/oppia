@@ -405,6 +405,30 @@ class EntityTranslationServicesTest(test_utils.GenericTestBase):
             'ar' in [et.language_code for et in entity_translation_models]
         )
 
+    def test_invalid_translation_change_raise_error(self) -> None:
+        translation_services.add_new_translation(
+            feconf.TranslatableEntityType.EXPLORATION, self.EXP_ID, 5, 'hi',
+            'content_5', translation_domain.TranslatedContent(
+                'Translations in Hindi!',
+                translation_domain.TranslatableContentFormat.HTML,
+                False
+            )
+        )
+
+        self.exp.version = 6
+        change_list = [exp_domain.ExplorationChange({
+            'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+            'property_name': 'title',
+            'new_value': 'A new title'
+        })]
+        with self.assertRaises(
+            Exception,
+            'Invalid translation change cmd: edit_exploration_property'
+        ):
+            translation_services.compute_translation_related_change(
+                self.exp, change_list
+            )
+
     def test_get_displayable_translation_languages_returns_correct_items(
         self
     ) -> None:

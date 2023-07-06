@@ -158,6 +158,9 @@ def _apply_changes(
         elif change.cmd == exp_domain.CMD_MARK_TRANSLATIONS_NEEDS_UPDATE:
             entity_translation.mark_translations_needs_update(
                 [change.content_id])
+        else:
+            raise Exception(
+                'Invalid translation change cmd: %s' % change.cmd)
 
     entity_translation.validate()
 
@@ -178,6 +181,9 @@ def compute_translation_related_change(
         Tuple(list(EntityTranslationsModel), dict(str, int)). A tuple containing
         list of new EntityTranslationsModel and a dict with count of translated
         contents as value and the languages as key.
+
+    Raises:
+        Exception. Invalid translation change cmd.
     """
     language_code_to_entity_translation = {
         entity_translation.language_code: entity_translation
