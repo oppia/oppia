@@ -41,6 +41,8 @@ class ParamNames(enum.Enum):
     DIAGNOSTIC_TEST = 'diagnostic_test'
     SERIAL_CHAPTER_LAUNCH_CURRICULUM_ADMIN_VIEW = (
         'serial_chapter_launch_curriculum_admin_view')
+    SHOW_REDESIGNED_LEARNER_DASHBOARD = (
+        'show_redesigned_learner_dashboard')
     SHOW_TRANSLATION_SIZE = 'show_translation_size'
     SHOW_FEEDBACK_UPDATES_IN_PROFILE_PIC_DROPDOWN = (
         'show_feedback_updates_in_profile_pic_dropdown')
@@ -111,6 +113,11 @@ Registry.create_feature_flag(
     ParamNames.SERIAL_CHAPTER_LAUNCH_CURRICULUM_ADMIN_VIEW,
     'This flag is for serial chapter launch feature and making changes only' +
     'in the curriculum admin view.',
+    platform_parameter_domain.FeatureStages.DEV)
+
+Registry.create_feature_flag(
+    ParamNames.SHOW_REDESIGNED_LEARNER_DASHBOARD,
+    'This flag is to show redesigned learner dashboard.',
     platform_parameter_domain.FeatureStages.DEV)
 
 Registry.create_feature_flag(
