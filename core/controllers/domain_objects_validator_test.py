@@ -165,7 +165,8 @@ class ValidateNewPlatformParamsValueForBlogAdminTests(
         }
         with self.assertRaisesRegex(
             Exception, 'The value of platform parameter max_number_of_tags_'
-            'assigned_to_blog_post is of type str, expected it to be number'
+            'assigned_to_blog_post is of type \'str\', expected it to be '
+            'of type \'number\''
         ):
             (
                 domain_objects_validator.

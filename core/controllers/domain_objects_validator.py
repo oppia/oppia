@@ -154,8 +154,8 @@ def validate_platform_params_values_for_blog_admin(
             (isinstance(value, int) and parameter.data_type == 'number')
         ):
             raise Exception(
-                'The value of platform parameter %s is of type %s, '
-                'expected it to be %s' % (
+                'The value of platform parameter %s is of type \'%s\', '
+                'expected it to be of type \'%s\'' % (
                     param_name, value, parameter.data_type)
             )
 

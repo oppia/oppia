@@ -288,5 +288,5 @@ class BlogAdminHandlerTest(test_utils.GenericTestBase):
         self.assertEqual(
             response_dict['error'], 'Schema validation for \'new_platform_'
             'parameter_values\' failed: The value of platform parameter '
-            'max_number_of_tags_assigned_to_blog_post is of type string, '
-            'expected it to be number')
+            'max_number_of_tags_assigned_to_blog_post is of type \'string\', '
+            'expected it to be of type \'number\'')

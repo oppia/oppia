@@ -36,16 +36,6 @@ BLOG_POST_EDITOR: Final = feconf.ROLE_ID_BLOG_POST_EDITOR
 BLOG_ADMIN: Final = feconf.ROLE_ID_BLOG_ADMIN
 
 
-class PlatformParamBlogAdminSchemaDict(TypedDict):
-    """Type representing the platform parameter's schema dictionary to display
-    on the blog admin page.
-    """
-
-    schema: Dict[str, str]
-    description: str
-    value: platform_parameter_domain.PlatformDataTypes
-
-
 class BlogAdminPage(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     """Blog Admin Page  Handler to render the frontend template."""
 

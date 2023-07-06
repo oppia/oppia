@@ -32,6 +32,7 @@ docstrings in this file.
 
 from __future__ import annotations
 
+import copy
 from core import feconf
 from core import platform_feature_list
 from core.constants import constants
@@ -94,6 +95,12 @@ ALL_PLATFORM_PARAMS_EXCEPT_FEATURE_FLAGS: List[
         platform_parameter_list.ParamNames.PROMO_BAR_ENABLED,
         platform_parameter_list.ParamNames.PROMO_BAR_MESSAGE,
     ]
+
+DATA_TYPE_TO_SCHEMA: Dict[str, str] = {
+    'number': 'float',
+    'string': 'unicode',
+    'bool': 'bool'
+}
 
 
 class FeatureFlagNotFoundException(Exception):
@@ -352,11 +359,17 @@ def get_platform_parameter_schema(param_name: str) -> Dict[str, str]:
     Returns:
         Dict[str, str]. The schema of the platform parameter according
         to the data_type.
+
+    Raise:
+        Exception. The platform parameter does not have valid data type.
     """
     parameter = registry.Registry.get_platform_parameter(param_name)
-    if parameter.data_type == 'string':
-        return {'type': 'unicode'}
-    elif parameter.data_type == 'number':
-        return {'type': 'float'}
+    if DATA_TYPE_TO_SCHEMA.get(parameter.data_type) is not None:
+        schema = copy.deepcopy(DATA_TYPE_TO_SCHEMA[parameter.data_type])
+        return {'type': schema}
     else:
-        return {'type': parameter.data_type}
+        raise Exception(
+            'The %s platform parameter does not have a valid '
+            'data type, must be one of %s inorder to get schema.' % (
+                parameter.name, platform_parameter_domain.DataTypes)
+        )

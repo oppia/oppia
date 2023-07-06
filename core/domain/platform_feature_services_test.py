@@ -499,3 +499,31 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
             {'type': 'float'},
             feature_services.get_platform_parameter_schema(self.param_c.name)
         )
+
+    def test_raise_exception_when_invalid_data_type_trying_to_get_schema(
+        self) -> None:
+        param_dict = {
+            'name': 'param_name',
+            'description': 'param description',
+            'data_type': 'unknown',
+            'rules': [],
+            'rule_schema_version': (
+                feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION),
+            'default_value': 'abc',
+            'is_feature': False,
+            'feature_stage': None
+        }
+        parameter = platform_parameter_domain.PlatformParameter.from_dict(
+            param_dict)
+        swap_get_platform_parameter = self.swap_to_always_return(
+            registry.Registry,
+            'get_platform_parameter',
+            parameter
+        )
+
+        with swap_get_platform_parameter, self.assertRaisesRegex(Exception, (
+            'The %s platform parameter does not have a valid '
+            'data type, must be one of %s inorder to get schema.' % (
+                parameter.name, platform_parameter_domain.DataTypes)
+        )):
+            feature_services.get_platform_parameter_schema(parameter.name)
