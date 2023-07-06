@@ -1141,7 +1141,7 @@ def send_feedback_message_email(
 
     email_subject = email_subject_template % (
         (count_messages, 's') if count_messages > 1 else ('a', ''))
-    
+
     email_footer = platform_feature_services.get_platform_parameter_value(
         EMAIL_FOOTER.name)
 
@@ -2001,7 +2001,7 @@ def send_mail_to_notify_contributor_dashboard_reviewers(
             suggestion_descriptions.append(
                 _create_html_for_reviewable_suggestion_email_info(
                     reviewer_suggestion_email_info))
-            
+
         email_footer = platform_feature_services.get_platform_parameter_value(
             EMAIL_FOOTER.name)
 
