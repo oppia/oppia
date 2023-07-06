@@ -223,10 +223,11 @@
   }
 }
 
-@media(max-width: 500px) {
+@media(max-width: 639px) {
   .home-tab .continue-where-you-left-off, .home-tab .suggested-for-you,
   .home-tab .topic-suggested-for-you {
     margin-left: 12px;
+    padding: 8px;
     /* width: 335px; */
   }
 
