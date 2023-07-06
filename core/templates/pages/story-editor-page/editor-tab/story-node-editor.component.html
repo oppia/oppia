@@ -1,3 +1,7 @@
+<div *ngIf="plannedPublicationDateIsInPast"
+     class="oppia-error-message-container">
+     Planned Publication Date cannot be in the past.
+</div>
 <div class="story-node">
   <div class="story-node-content-container">
     <div class="story-node-content">
@@ -63,6 +67,12 @@
                 <em>Please enter a valid exploration id.</em>
               </span>
             </form>
+          </div>
+          <div class="story-node-planned-publication-date" *ngIf="isSerialChapterFeatureFlagEnabled()">
+            <label for="storyNodePlannedPublicationDate" class="form-heading">Planned Publication Date*</label>
+            <input id="storyNodePlannedPublicationDate" type="date" class="form-control"
+                   [(ngModel)]="editablePlannedPublicationDate"
+                   (blur)="updatePlannedPublicationDate(editablePlannedPublicationDate)">
           </div>
           <div class="e2e-test-story-node-thumbnail">
             <label class="form-heading">Thumbnail Image*</label>
@@ -260,7 +270,8 @@
       </div>
     </div>
     <div class="story-node-content-info">
-      <mat-card class="oppia-page-card oppia-long-text story-node-card story-node-input-card oppia-mobile-collapsible-card">
+      <mat-card class="oppia-page-card oppia-long-text story-node-card story-node-input-card oppia-mobile-collapsible-card"
+                *ngIf="!isSerialChapterFeatureFlagEnabled()">
         <div class="story-node-header oppia-mobile-collapsible-card-header" (click)="toggleChapterTodoCard()">
           <span>To-Do List</span>
           <i class="fa fa-caret-down"
@@ -287,6 +298,65 @@
             <i class="fa fa-minus" *ngIf="!currentDescription"></i>
             <i class="fa fa-check todo-completed" *ngIf="currentDescription"></i>
             <span>Create a chapter description</span>
+          </div>
+        </div>
+      </mat-card>
+
+      <mat-card class="oppia-page-card checklist-container oppia-long-text story-node-card story-node-input-card oppia-mobile-collapsible-card"
+                *ngIf="isSerialChapterFeatureFlagEnabled()">
+        <div class="story-node-header oppia-mobile-collapsible-card-header" (click)="toggleChapterTodoCard()">
+          <span>Chapter Publication Checklist</span>
+          <i class="fa fa-caret-down"
+             *ngIf="!chapterTodoCardIsShown"
+             aria-hidden="true">
+          </i>
+          <i class="fa fa-caret-up"
+             *ngIf="chapterTodoCardIsShown"
+             aria-hidden="true">
+          </i>
+        </div>
+        <div class="chapter-card-inputs checklist-items oppia-mobile-collapsible-card-content" *ngIf="chapterTodoCardIsShown">
+          <div class="todo-item-container">
+            <div>
+              <i class="fa fa-exclamation-triangle" *ngIf="!currentTitle"></i>
+              <i class="fa fa-check todo-completed" *ngIf="currentTitle"></i>
+            </div>
+            <span class="checklist-item-name">Title</span>
+          </div>
+          <div class="todo-item-container">
+            <div>
+              <i class="fa fa-exclamation-triangle" *ngIf="!currentDescription"></i>
+              <i class="fa fa-check todo-completed" *ngIf="currentDescription"></i>
+            </div>
+            <span class="checklist-item-name">Chapter Description</span>
+          </div>
+          <div class="todo-item-container">
+            <div>
+              <i class="fa fa-exclamation-triangle" *ngIf="!explorationId"></i>
+              <i class="fa fa-check todo-completed" *ngIf="explorationId"></i>
+            </div>
+            <span class="checklist-item-name">Exploration ID</span>
+          </div>
+          <div class="todo-item-container">
+            <div>
+              <i class="fa fa-exclamation-triangle" *ngIf="!(editableThumbnailBgColor || editableThumbnailFilename)">
+              </i>
+              <i class="fa fa-check todo-completed" *ngIf="editableThumbnailBgColor || editableThumbnailFilename">
+              </i>
+            </div>
+            <span class="checklist-item-name">Thumbnail Image</span>
+          </div>
+          <div class="todo-item-container">
+            <div>
+              <i class="fa fa-exclamation-triangle" *ngIf="!outlineIsFinalized"></i>
+              <i class="fa fa-check todo-completed" *ngIf="outlineIsFinalized"></i>
+            </div>
+            <span class="checklist-item-name">Chapter Outline</span>
+          </div>
+          <div class="todo-item-container">
+            <i class="fa fa-exclamation-triangle" *ngIf="!plannedPublicationDate"></i>
+            <i class="fa fa-check todo-completed" *ngIf="plannedPublicationDate"></i>
+            <span class="checklist-item-name">Planned Publication Date</span>
           </div>
         </div>
       </mat-card>
@@ -319,8 +389,18 @@
     margin-top: 0;
     padding: 0;
   }
+  .checklist-container {
+    padding: 10px;
+  }
   .chapter-card-inputs {
     padding: 30px 55px 30px 45px;
+  }
+  .checklist-items .todo-item-container {
+    display: flex;
+    margin-bottom: 10%;
+  }
+  .checklist-items .todo-item-container .checklist-item-name {
+    margin-left: 10%;
   }
   .story-node-header {
     margin-bottom: 0;
@@ -328,7 +408,7 @@
     padding-top: 35px;
   }
   .story-node-header span {
-    font-size: 17px;
+    font-size: 20px;
     font-weight: bold;
   }
   .story-node-header i {
@@ -391,7 +471,8 @@
   }
   .story-node-title,
   .story-node-description,
-  .story-node-exploration {
+  .story-node-exploration,
+  .story-node-planned-publication-date {
     margin-bottom: 25px;
   }
   .todo-item-container {
@@ -405,6 +486,17 @@
   }
   .story-skill-mobile {
     display: none;
+  }
+  .oppia-error-message-container {
+    background-color: #fff;
+    border: 1px solid #00376d;
+    bottom: 30px;
+    max-width: 30%;
+    padding: 5px;
+    position: fixed;
+    right: 30px;
+    text-align: center;
+    z-index: 3000;
   }
   @media screen and (max-width: 768px) {
     .story-node-content-container {
@@ -420,6 +512,9 @@
     }
     .chapter-card-inputs {
       padding: 20px 26px 15px;
+    }
+    .checklist-items .todo-item-container {
+      margin-bottom: 5%;
     }
     .story-node-content-info {
       margin-right: 0;
