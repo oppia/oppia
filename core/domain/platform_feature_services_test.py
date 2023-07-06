@@ -513,8 +513,11 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
             'is_feature': False,
             'feature_stage': None
         }
+        # Here we use MyPy ignore because we want to create a platform parameter
+        # with an invalid 'data_type' field to test that the exception
+        # gets raised.
         parameter = platform_parameter_domain.PlatformParameter.from_dict(
-            param_dict)
+            param_dict) # type: ignore[arg-type]
         swap_get_platform_parameter = self.swap_to_always_return(
             registry.Registry,
             'get_platform_parameter',
