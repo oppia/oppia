@@ -360,7 +360,7 @@ def get_platform_parameter_schema(param_name: str) -> Dict[str, str]:
         Dict[str, str]. The schema of the platform parameter according
         to the data_type.
 
-    Raise:
+    Raises:
         Exception. The platform parameter does not have valid data type.
     """
     parameter = registry.Registry.get_platform_parameter(param_name)
