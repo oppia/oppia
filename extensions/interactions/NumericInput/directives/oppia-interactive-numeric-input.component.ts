@@ -76,7 +76,7 @@ export class InteractiveNumericInput implements OnInit {
   submitAnswer(answer: number | string): void {
     if (typeof answer !== 'number' &&
       this.currentInteractionService.showNoResponseError()) {
-      this.errorMessageI18nKey = 'Enter a number to continue';
+      this.errorMessageI18nKey = 'I18N_INTERACTIONS_NUMERIC_INPUT_NO_RESPONSE';
       return;
     }
 

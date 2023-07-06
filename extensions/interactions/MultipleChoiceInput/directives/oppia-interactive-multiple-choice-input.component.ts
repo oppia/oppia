@@ -156,7 +156,8 @@ export class InteractiveMultipleChoiceInputComponent implements OnInit {
   submitAnswer(): void {
     if (this.answer === null) {
       if (this.currentInteractionService.showNoResponseError()) {
-        this.errorMessageI18nKey = 'Choose an answer to continue';
+        this.errorMessageI18nKey =
+        'I18N_INTERACTIONS_ITEM_SELECTION_NO_RESPONSE';
       }
       return;
     }

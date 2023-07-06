@@ -125,7 +125,7 @@ export class InteractiveTextInputComponent implements OnInit {
   submitAnswer(answer: string): void {
     if (!answer) {
       if (this.currentInteractionService.showNoResponseError()) {
-        this.errorMessageI18nKey = 'Enter an answer to continue';
+        this.errorMessageI18nKey = 'I18N_INTERACTIONS_INPUT_NO_RESPONSE';
       }
       return;
     }

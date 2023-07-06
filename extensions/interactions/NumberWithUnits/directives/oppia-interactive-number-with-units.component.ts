@@ -110,7 +110,7 @@ export class InteractiveNumberWithUnitsComponent
     try {
       if (this.answer.trim() === '' &&
           this.currentInteractionService.showNoResponseError()) {
-        this.errorMessageI18nKey = 'Enter an answer to continue';
+        this.errorMessageI18nKey = 'I18N_INTERACTIONS_INPUT_NO_RESPONSE';
         return;
       }
       const numberWithUnits = (
