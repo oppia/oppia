@@ -8,6 +8,9 @@
             <i class="fas fa-sync oppia-animate-spin"></i>
           </span>
         </div>
+        <span *ngIf="isMobileViewActive()" class="search-icon-in-mobileview">
+          <i class="fas fal fa-search ram"></i>
+        </span>
         <input type="text"
                class="form-control oppia-search-bar-input oppia-search-bar-text-input e2e-test-search-input"
                [placeholder]="searchBarPlaceholder"
@@ -30,7 +33,7 @@
             type="button"
             class="btn e2e-test-search-bar-dropdown-toggle oppia-search-bar-dropdown-toggle oppia-search-bar-input oppia-search-bar-category-input dropdown-toggle"
             title="{{ selectionDetails.categories.description | translate }}">
-      <i *ngIf="isMobileViewActive()" class="fas fa-shapes category-selector-icon"></i>
+      <i *ngIf="learnerDashboardSearch || isMobileViewActive()" class="fas fa-shapes category-selector-icon"></i>
       <span class="btn-text">
         {{ categoryButtonText | truncate:14 }}
       </span>
@@ -90,7 +93,7 @@
             type="button"
             class="btn e2e-test-search-bar-dropdown-toggle oppia-search-bar-input oppia-search-bar-language-input dropdown-toggle language-dropdown-toggle oppia-search-bar-dropdown-toggle-button"
             title="{{selectionDetails.languageCodes.description | translate}}">
-      <i *ngIf="isMobileViewActive()" class="fas fa-globe language-selector-icon"></i>
+      <i *ngIf="learnerDashboardSearch || isMobileViewActive()" class="fas fa-globe language-selector-icon"></i>
       <span class="btn-text">
         {{ languageButtonText | truncate:14 }}
       </span>
@@ -148,3 +151,19 @@
     </div>
   </div>
 </div>
+
+<style>
+  .search-icon-in-mobileview {
+    position: relative;
+    left: -16px;
+    border: 1px solid green;
+    border-right: none;
+    border-top-left-radius: 4px;
+    border-bottom-left-radius: 4px;
+  }
+  .ram {
+    padding: 7px 0px 7px 7px;
+    font-size: 24px;
+    color: #205D86;
+  }
+</style>

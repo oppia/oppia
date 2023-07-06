@@ -70,6 +70,7 @@ export class SearchBarComponent implements OnInit, OnDestroy {
   translationData: Record<string, number> = {};
   activeMenuName: string = '';
   @Input() enableDropup: boolean = false;
+  @Input() learnerDashboardSearch: boolean = false;
 
   constructor(
     private i18nLanguageCodeService: I18nLanguageCodeService,
@@ -89,7 +90,7 @@ export class SearchBarComponent implements OnInit, OnDestroy {
   }
 
   isMobileViewActive(): boolean {
-    return this.windowDimensionsService.getWidth() <= 766;
+    return this.windowDimensionsService.getWidth() <= 639;
   }
 
   isSearchButtonActive(): boolean {
