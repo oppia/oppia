@@ -185,8 +185,8 @@ describe('InteractiveTextInputComponent', () => {
     component.submitAnswer('');
 
     expect(currentInteractionService.onSubmit).not.toHaveBeenCalled();
-    expect(
-      component.errorMessageI18nKey).toEqual('Enter an answer to continue');
+    expect(component.errorMessageI18nKey).toEqual(
+      'I18N_INTERACTIONS_INPUT_NO_RESPONSE');
   });
 
   it('should update answer and reset error when user types answer', () => {

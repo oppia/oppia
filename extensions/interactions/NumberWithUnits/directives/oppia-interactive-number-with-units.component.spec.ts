@@ -212,7 +212,8 @@ describe('Number with units interaction component', () => {
 
     component.submitAnswer();
 
-    expect(component.errorMessageI18nKey).toBe('Enter an answer to continue');
+    expect(component.errorMessageI18nKey).toBe(
+      'I18N_INTERACTIONS_INPUT_NO_RESPONSE');
     expect(
       currentInteractionService.showNoResponseError).toHaveBeenCalledTimes(1);
   });

@@ -213,7 +213,8 @@ describe('InteractiveNumericInput', () => {
     component.requireNonnegativeInput = false;
     component.submitAnswer('');
 
-    expect(component.errorMessageI18nKey).toBe('Enter a number to continue');
+    expect(component.errorMessageI18nKey).toBe(
+      'I18N_INTERACTIONS_NUMERIC_INPUT_NO_RESPONSE');
     expect(onSubmitSpy).not.toHaveBeenCalled();
   });
 });

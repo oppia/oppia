@@ -311,7 +311,7 @@ describe('InteractiveMultipleChoiceInputComponent', () => {
     component.submitAnswer();
 
     expect(currentInteractionService.onSubmit).not.toHaveBeenCalled();
-    expect(
-      component.errorMessageI18nKey).toEqual('Choose an answer to continue');
+    expect(component.errorMessageI18nKey).toEqual(
+      'I18N_INTERACTIONS_ITEM_SELECTION_NO_RESPONSE');
   });
 });
