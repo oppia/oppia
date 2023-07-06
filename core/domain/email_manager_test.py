@@ -816,16 +816,6 @@ class SignupEmailTests(test_utils.EmailTestBase):
         )
 
     def test_contents_of_signup_email_are_correct(self) -> None:
-        new_filters = [
-            {
-                'type': 'server_mode',
-                'conditions': [
-                    [
-                        '=', platform_parameter_domain.ServerMode.DEV.value
-                    ]
-                ],
-            }
-        ]
         with self.swap(feconf, 'CAN_SEND_EMAILS', True):
             platform_parameter_registry.Registry.update_platform_parameter(
                 email_manager.EMAIL_SENDER_NAME.name,
@@ -833,7 +823,20 @@ class SignupEmailTests(test_utils.EmailTestBase):
                 'Update sender name',
                 [
                     platform_parameter_domain.PlatformParameterRule.from_dict({
-                        'filters': new_filters,
+                        'filters': [
+                            {
+                                'type': 'server_mode',
+                                'conditions': [
+                                    [
+                                        '=',
+                                        (
+                                            platform_parameter_domain.
+                                            ServerMode.DEV.value
+                                        )
+                                    ]
+                                ],
+                            }
+                        ],
                         'value_when_matched': 'Email Sender'
                     })
                 ],
@@ -845,7 +848,20 @@ class SignupEmailTests(test_utils.EmailTestBase):
                 'Update email footer',
                 [
                     platform_parameter_domain.PlatformParameterRule.from_dict({
-                        'filters': new_filters,
+                        'filters': [
+                            {
+                                'type': 'server_mode',
+                                'conditions': [
+                                    [
+                                        '=',
+                                        (
+                                            platform_parameter_domain.
+                                            ServerMode.DEV.value
+                                        )
+                                    ]
+                                ],
+                            }
+                        ],
                         'value_when_matched': self.new_footer
                     })
                 ],
@@ -997,16 +1013,6 @@ class SignupEmailTests(test_utils.EmailTestBase):
             self.assertEqual(1, len(messages))
 
     def test_record_of_sent_email_is_written_to_datastore(self) -> None:
-        new_filters = [
-            {
-                'type': 'server_mode',
-                'conditions': [
-                    [
-                        '=', platform_parameter_domain.ServerMode.DEV.value
-                    ]
-                ],
-            }
-        ]
         with self.swap(feconf, 'CAN_SEND_EMAILS', True):
             platform_parameter_registry.Registry.update_platform_parameter(
                 email_manager.EMAIL_SENDER_NAME.name,
@@ -1014,7 +1020,20 @@ class SignupEmailTests(test_utils.EmailTestBase):
                 'Update sender name',
                 [
                     platform_parameter_domain.PlatformParameterRule.from_dict({
-                        'filters': new_filters,
+                        'filters': [
+                            {
+                                'type': 'server_mode',
+                                'conditions': [
+                                    [
+                                        '=',
+                                        (
+                                            platform_parameter_domain.
+                                            ServerMode.DEV.value
+                                        )
+                                    ]
+                                ],
+                            }
+                        ],
                         'value_when_matched': 'Email Sender'
                     })
                 ],
@@ -1026,7 +1045,20 @@ class SignupEmailTests(test_utils.EmailTestBase):
                 'Update email footer',
                 [
                     platform_parameter_domain.PlatformParameterRule.from_dict({
-                        'filters': new_filters,
+                        'filters': [
+                            {
+                                'type': 'server_mode',
+                                'conditions': [
+                                    [
+                                        '=',
+                                        (
+                                            platform_parameter_domain.
+                                            ServerMode.DEV.value
+                                        )
+                                    ]
+                                ],
+                            }
+                        ],
                         'value_when_matched': self.new_footer
                     })
                 ],
