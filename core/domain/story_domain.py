@@ -724,7 +724,7 @@ class StoryNode:
             node_dict['outline'],
             node_dict['outline_is_finalized'],
             node_dict['exploration_id'],
-            node_dict['status'],
+            node_dict['status'] if 'status' in node_dict else None,
             utils.convert_millisecs_time_to_datetime_object(
                 planned_publication_date_msecs) if
                 planned_publication_date_msecs else None,
@@ -734,7 +734,8 @@ class StoryNode:
             utils.convert_millisecs_time_to_datetime_object(
                 first_publication_date_msecs) if
                 first_publication_date_msecs else None,
-            node_dict['unpublishing_reason']
+            node_dict['unpublishing_reason'] if
+            'unpublishing_reason' in node_dict else None
         )
         return node
 
