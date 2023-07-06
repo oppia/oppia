@@ -421,7 +421,7 @@ class EntityTranslationServicesTest(test_utils.GenericTestBase):
             'property_name': 'title',
             'new_value': 'A new title'
         })]
-        with self.assertRaises(
+        with self.assertRaisesRegex(
             Exception,
             'Invalid translation change cmd: edit_exploration_property'
         ):

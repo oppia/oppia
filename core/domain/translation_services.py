@@ -135,6 +135,9 @@ def _apply_changes(
         entity_translation: EntityTranslation. The entity translation object.
         translation_changes: list(ExplorationChange). The list of changes to be
             applied.
+
+    Raises:
+        Exception. Invalid translation change cmd.
     """
     for change in translation_changes:
         if change.cmd == exp_domain.CMD_EDIT_TRANSLATION:
@@ -181,9 +184,6 @@ def compute_translation_related_change(
         Tuple(list(EntityTranslationsModel), dict(str, int)). A tuple containing
         list of new EntityTranslationsModel and a dict with count of translated
         contents as value and the languages as key.
-
-    Raises:
-        Exception. Invalid translation change cmd.
     """
     language_code_to_entity_translation = {
         entity_translation.language_code: entity_translation
