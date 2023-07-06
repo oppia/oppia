@@ -34,7 +34,8 @@ export enum FeatureNames {
   'serial_chapter_launch_curriculum_admin_view',
   ShowTranslationSize = 'show_translation_size',
   IsImprovementsTabEnabled = 'is_improvements_tab_enabled',
-  LearnerGroupsAreEnabled = 'learner_groups_are_enabled'
+  LearnerGroupsAreEnabled = 'learner_groups_are_enabled',
+  CD_NEW_UI = 'cd_new_ui'
 }
 
 export interface FeatureStatusSummaryBackendDict {
