@@ -137,7 +137,6 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
     'I18N_TOPNAV_ABOUT', 'I18N_TOPNAV_LIBRARY',
     'I18N_TOPNAV_HOME'];
 
-  CLASSROOM_PROMOS_ARE_ENABLED = false;
   LEARNER_GROUPS_FEATURE_IS_ENABLED = false;
   googleSignInIconUrl = this.urlInterpolationService.getStaticImageUrl(
     '/google_signin_buttons/google_signin.svg');
@@ -205,34 +204,30 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
         this.LEARNER_GROUPS_FEATURE_IS_ENABLED = featureIsEnabled;
       });
 
-    let service = this.classroomBackendApiService;
-    service.fetchClassroomPromosAreEnabledStatusAsync().then(
-      (classroomPromosAreEnabled) => {
-        this.CLASSROOM_PROMOS_ARE_ENABLED = classroomPromosAreEnabled;
-        if (classroomPromosAreEnabled) {
-          this.accessValidationBackendApiService.validateAccessToClassroomPage(
-            this.DEFAULT_CLASSROOM_URL_FRAGMENT).then(()=>{
-            this.classroomBackendApiService.fetchClassroomDataAsync(
-              this.DEFAULT_CLASSROOM_URL_FRAGMENT)
-              .then((classroomData) => {
-                this.classroomData = classroomData.getTopicSummaries();
-                this.classroomBackendApiService.onInitializeTranslation.emit();
-                // Store hacky tranlation keys of topics.
-                for (let i = 0; i < this.classroomData.length; i++) {
-                  let topicSummary = this.classroomData[i];
-                  let hackyTopicTranslationKey = (
-                    this.i18nLanguageCodeService.getTopicTranslationKey(
-                      topicSummary.getId(), TranslationKeyType.TITLE
-                    )
-                  );
-                  this.topicTitlesTranslationKeys.push(
-                    hackyTopicTranslationKey
-                  );
-                }
-              });
-          });
-        }
-      });
+    // TODO(#18362): Resolve the console error on the signup page and then
+    // add the error catch block to the 'validateAccessToClassroomPage'
+    // and 'fetchClassroomDataAsync'.
+    this.accessValidationBackendApiService.validateAccessToClassroomPage(
+      this.DEFAULT_CLASSROOM_URL_FRAGMENT).then(()=>{
+      this.classroomBackendApiService.fetchClassroomDataAsync(
+        this.DEFAULT_CLASSROOM_URL_FRAGMENT)
+        .then((classroomData) => {
+          this.classroomData = classroomData.getTopicSummaries();
+          this.classroomBackendApiService.onInitializeTranslation.emit();
+          // Store hacky tranlation keys of topics.
+          for (let i = 0; i < this.classroomData.length; i++) {
+            let topicSummary = this.classroomData[i];
+            let hackyTopicTranslationKey = (
+              this.i18nLanguageCodeService.getTopicTranslationKey(
+                topicSummary.getId(), TranslationKeyType.TITLE
+              )
+            );
+            this.topicTitlesTranslationKeys.push(
+              hackyTopicTranslationKey
+            );
+          }
+        });
+    });
     // Inside a setTimeout function call, 'this' points to the global object.
     // To access the context in which the setTimeout call is made, we need to
     // first save a reference to that context in a variable, and then use that
@@ -350,7 +345,7 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
     this.donateMenuOffset = this
       .getDropdownOffset('.donate-tab', 286);
     this.learnDropdownOffset = this.getDropdownOffset(
-      '.learn-tab', (this.CLASSROOM_PROMOS_ARE_ENABLED) ? 688 : 300);
+      '.learn-tab', 688);
     // https://stackoverflow.com/questions/34364880/expression-has-changed-after-it-was-checked
     this.changeDetectorRef.detectChanges();
   }

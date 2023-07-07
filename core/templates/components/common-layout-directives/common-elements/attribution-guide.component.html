@@ -27,7 +27,7 @@
         {{getPageUrl()}}
       </a>.
     </div>
-    <a *ngIf="generateAttibutionIsAllowed" class="oppia-attribution-link oppia-attribution-guide-text" href="#" (click)="showAttributionModal()">
+    <a *ngIf="generateAttibutionIsAllowed" class="oppia-attribution-link oppia-attribution-guide-text e2e-test-generate-attribution" href="#" (click)="showAttributionModal()">
       <span [innerHTML]="'I18N_GENERATE_ATTRIBUTION' | translate"></span>
     </a>
   </div>

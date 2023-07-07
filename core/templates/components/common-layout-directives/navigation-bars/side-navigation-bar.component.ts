@@ -43,7 +43,6 @@ export class SideNavigationBarComponent {
   currentUrl!: string;
   classroomData: CreatorTopicSummary[] = [];
   topicTitlesTranslationKeys: string[] = [];
-  CLASSROOM_PROMOS_ARE_ENABLED: boolean = false;
   getinvolvedSubmenuIsShown: boolean = false;
   learnSubmenuIsShown: boolean = true;
   userIsLoggedIn!: boolean;
@@ -71,34 +70,30 @@ export class SideNavigationBarComponent {
   ngOnInit(): void {
     this.currentUrl = this.windowRef.nativeWindow.location.pathname;
 
-    let service = this.classroomBackendApiService;
-    service.fetchClassroomPromosAreEnabledStatusAsync().then(
-      classroomPromosAreEnabled => {
-        this.CLASSROOM_PROMOS_ARE_ENABLED = classroomPromosAreEnabled;
-        if (classroomPromosAreEnabled) {
-          this.accessValidationBackendApiService.validateAccessToClassroomPage(
-            this.DEFAULT_CLASSROOM_URL_FRAGMENT).then(()=>{
-            this.classroomBackendApiService.fetchClassroomDataAsync(
-              this.DEFAULT_CLASSROOM_URL_FRAGMENT)
-              .then((classroomData) => {
-                this.classroomData = classroomData.getTopicSummaries();
-                this.classroomBackendApiService.onInitializeTranslation.emit();
-                // Store hacky tranlation keys of topics.
-                for (let i = 0; i < this.classroomData.length; i++) {
-                  let topicSummary = this.classroomData[i];
-                  let hackyTopicTranslationKey = (
-                    this.i18nLanguageCodeService.getTopicTranslationKey(
-                      topicSummary.getId(), TranslationKeyType.TITLE
-                    )
-                  );
-                  this.topicTitlesTranslationKeys.push(
-                    hackyTopicTranslationKey
-                  );
-                }
-              });
-          });
-        }
-      });
+    // TODO(#18362): Resolve the console error on the signup page and then
+    // add the error catch block to the 'validateAccessToClassroomPage'
+    // and 'fetchClassroomDataAsync'.
+    this.accessValidationBackendApiService.validateAccessToClassroomPage(
+      this.DEFAULT_CLASSROOM_URL_FRAGMENT).then(()=>{
+      this.classroomBackendApiService.fetchClassroomDataAsync(
+        this.DEFAULT_CLASSROOM_URL_FRAGMENT)
+        .then((classroomData) => {
+          this.classroomData = classroomData.getTopicSummaries();
+          this.classroomBackendApiService.onInitializeTranslation.emit();
+          // Store hacky tranlation keys of topics.
+          for (let i = 0; i < this.classroomData.length; i++) {
+            let topicSummary = this.classroomData[i];
+            let hackyTopicTranslationKey = (
+              this.i18nLanguageCodeService.getTopicTranslationKey(
+                topicSummary.getId(), TranslationKeyType.TITLE
+              )
+            );
+            this.topicTitlesTranslationKeys.push(
+              hackyTopicTranslationKey
+            );
+          }
+        });
+    });
 
     this.userService.getUserInfoAsync().then((userInfo) => {
       this.userIsLoggedIn = userInfo.isLoggedIn();

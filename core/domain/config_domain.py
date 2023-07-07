@@ -204,11 +204,15 @@ class ConfigProperty:
     - banner_alt_text.
     - before_end_body_tag_hook.
     - before_end_head_tag_hook.
+    - batch_index_for_mailchimp
     - carousel_slides_config.
+    - checkpoints_feature_is_enabled.
     - classroom_page_is_accessible.
+    - classroom_promos_are_enabled.
     - collection_editor_whitelist.
     - contact_email_address.
     - contribute_gallery_page_announcement.
+    - contributor_dashboard_is_enabled.
     - default_twitter_share_message_editor.
     - disabled_explorations.
     - editor_page_announcement.
@@ -222,6 +226,8 @@ class ConfigProperty:
     - is_improvements_tab_enabled.
     - learner_groups_are_enabled.
     - list_of_default_tags_for_blog_post.
+    - max_number_of_explorations_in_math_svgs_batch.
+    - max_number_of_svgs_in_math_svgs_batch.
     - moderator_ids.
     - moderator_request_forum_url.
     - moderator_usernames.
@@ -468,34 +474,6 @@ RECORD_PLAYTHROUGH_PROBABILITY = ConfigProperty(
     'record_playthrough_probability', FLOAT_SCHEMA,
     'The probability of recording playthroughs', 0.2)
 
-# TODO(#15682): Implement user checkpoints feature flag using feature-gating
-# service.
-CHECKPOINTS_FEATURE_IS_ENABLED = ConfigProperty(
-    'checkpoints_feature_is_enabled', BOOL_SCHEMA,
-    'Enable checkpoints feature.', False)
-
-CLASSROOM_PROMOS_ARE_ENABLED = ConfigProperty(
-    'classroom_promos_are_enabled', BOOL_SCHEMA,
-    'Show classroom promos.', False)
-
-BATCH_INDEX_FOR_MAILCHIMP = ConfigProperty(
-    'batch_index_for_mailchimp', INT_SCHEMA,
-    'Index of batch to populate mailchimp database.', 0)
-
-MAX_NUMBER_OF_SVGS_IN_MATH_SVGS_BATCH = ConfigProperty(
-    'max_number_of_svgs_in_math_svgs_batch',
-    INT_SCHEMA,
-    'The maximum number of Math SVGs that can be send in a batch of math rich '
-    'text svgs.',
-    25)
-
-MAX_NUMBER_OF_EXPLORATIONS_IN_MATH_SVGS_BATCH = ConfigProperty(
-    'max_number_of_explorations_in_math_svgs_batch',
-    INT_SCHEMA,
-    'The maximum number of explorations that can be send in a batch of math '
-    'rich text svgs.',
-    2)
-
 MAX_NUMBER_OF_TAGS_ASSIGNED_TO_BLOG_POST = ConfigProperty(
     'max_number_of_tags_assigned_to_blog_post',
     POSITIVE_INT_SCHEMA,
@@ -503,10 +481,6 @@ MAX_NUMBER_OF_TAGS_ASSIGNED_TO_BLOG_POST = ConfigProperty(
     ' post',
     10
 )
-
-CONTRIBUTOR_DASHBOARD_IS_ENABLED = ConfigProperty(
-    'contributor_dashboard_is_enabled', BOOL_SCHEMA,
-    'Enable contributor dashboard page. The default value is true.', True)
 
 CONTRIBUTOR_DASHBOARD_REVIEWER_EMAILS_IS_ENABLED = ConfigProperty(
     'contributor_dashboard_reviewer_emails_is_enabled', BOOL_SCHEMA,

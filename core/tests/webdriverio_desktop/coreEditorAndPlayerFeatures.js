@@ -261,6 +261,7 @@ describe('Enable correctness feedback and set correctness', function() {
     await explorationPlayerPage.expectNextCardButtonTextToBe('LEARN AGAIN');
     await explorationPlayerPage.clickThroughToNextCard();
 
+    await explorationPlayerPage.dismissLessonInfoTooltip();
     await explorationPlayerPage.submitAnswer.apply(null, correctOptions[0]);
     await explorationPlayerPage.expectNextCardButtonTextToBe('CONTINUE');
     await explorationPlayerPage.clickThroughToNextCard();

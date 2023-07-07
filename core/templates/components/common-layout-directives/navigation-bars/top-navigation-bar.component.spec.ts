@@ -463,18 +463,6 @@ describe('TopNavigationBarComponent', () => {
     expect(component.LEARNER_GROUPS_FEATURE_IS_ENABLED).toBe(true);
   }));
 
-  it('should check if classroom promos are enabled', fakeAsync(() => {
-    spyOn(component, 'truncateNavbar').and.stub();
-    spyOn(
-      classroomBackendApiService, 'fetchClassroomPromosAreEnabledStatusAsync')
-      .and.resolveTo(true);
-
-    component.ngOnInit();
-    tick();
-
-    expect(component.CLASSROOM_PROMOS_ARE_ENABLED).toBe(true);
-  }));
-
   it('should change current language code on' +
     ' I18nLanguageCode change', fakeAsync(() => {
     let onI18nLanguageCodeChangeEmitter = new EventEmitter();
@@ -593,40 +581,35 @@ describe('TopNavigationBarComponent', () => {
     expect(component.donateMenuOffset).toBe(-10);
   }));
 
-  it('should fetch classroom data when classroomPromos are enabled',
-    fakeAsync(() => {
-      spyOn(
-        classroomBackendApiService,
-        'fetchClassroomPromosAreEnabledStatusAsync').
-        and.resolveTo(true);
-      spyOn(accessValidationBackendApiService, 'validateAccessToClassroomPage')
-        .and.returnValue(Promise.resolve());
+  it('should fetch classroom data', fakeAsync(() => {
+    spyOn(accessValidationBackendApiService, 'validateAccessToClassroomPage')
+      .and.returnValue(Promise.resolve());
 
-      let cData1: CreatorTopicSummary = new CreatorTopicSummary(
-        'dummy', 'addition', 3, 3, 3, 3, 1,
-        'en', 'dummy', 1, 1, 1, 1, true,
-        true, 'math', 'public/img.webp', 'red', 'add');
-      let cData2: CreatorTopicSummary = new CreatorTopicSummary(
-        'dummy2', 'division', 2, 2, 3, 3, 0,
-        'es', 'dummy2', 1, 1, 1, 1, true,
-        true, 'math', 'public/img1.png', 'green', 'div');
+    let cData1: CreatorTopicSummary = new CreatorTopicSummary(
+      'dummy', 'addition', 3, 3, 3, 3, 1,
+      'en', 'dummy', 1, 1, 1, 1, true,
+      true, 'math', 'public/img.webp', 'red', 'add');
+    let cData2: CreatorTopicSummary = new CreatorTopicSummary(
+      'dummy2', 'division', 2, 2, 3, 3, 0,
+      'es', 'dummy2', 1, 1, 1, 1, true,
+      true, 'math', 'public/img1.png', 'green', 'div');
 
-      let array: CreatorTopicSummary[] = [cData1, cData2];
-      let classroomData = new ClassroomData('test', array, 'dummy', 'dummy');
-      let topicTitlesTranslationKeys: string[] =
-        ['I18N_TOPIC_dummy_TITLE', 'I18N_TOPIC_dummy2_TITLE'];
-      spyOn(
-        classroomBackendApiService, 'fetchClassroomDataAsync')
-        .and.resolveTo(classroomData);
+    let array: CreatorTopicSummary[] = [cData1, cData2];
+    let classroomData = new ClassroomData('test', array, 'dummy', 'dummy');
+    let topicTitlesTranslationKeys: string[] =
+      ['I18N_TOPIC_dummy_TITLE', 'I18N_TOPIC_dummy2_TITLE'];
+    spyOn(
+      classroomBackendApiService, 'fetchClassroomDataAsync')
+      .and.resolveTo(classroomData);
 
-      component.ngOnInit();
+    component.ngOnInit();
 
-      tick();
+    tick();
 
-      expect(component.classroomData).toEqual(array);
-      expect(component.topicTitlesTranslationKeys).toEqual(
-        topicTitlesTranslationKeys);
-    }));
+    expect(component.classroomData).toEqual(array);
+    expect(component.topicTitlesTranslationKeys).toEqual(
+      topicTitlesTranslationKeys);
+  }));
 
   it('should check whether hacky translations are displayed or not', () => {
     spyOn(i18nLanguageCodeService, 'isHackyTranslationAvailable')

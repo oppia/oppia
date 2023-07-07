@@ -23,7 +23,6 @@ from core.controllers import base
 from core.domain import classroom_config_domain
 from core.domain import classroom_config_services
 from core.domain import classroom_services
-from core.domain import config_domain
 from core.domain import topic_domain
 from core.domain import topic_fetchers
 
@@ -123,27 +122,6 @@ class ClassroomDataHandler(
             'name': classroom.name
         })
         self.render_json(self.values)
-
-
-class ClassroomPromosStatusHandler(
-    base.BaseHandler[Dict[str, str], Dict[str, str]]
-):
-    """The handler for checking whether the classroom promos are enabled."""
-
-    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-    # This prevents partially logged in user from being logged out
-    # during user registration.
-    REDIRECT_UNFINISHED_SIGNUPS = False
-    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
-    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
-
-    @acl_decorators.open_access
-    def get(self) -> None:
-        """Retrives the status of classroom promos."""
-        self.render_json({
-            'classroom_promos_are_enabled': (
-                config_domain.CLASSROOM_PROMOS_ARE_ENABLED.value)
-        })
 
 
 class DefaultClassroomRedirectPage(

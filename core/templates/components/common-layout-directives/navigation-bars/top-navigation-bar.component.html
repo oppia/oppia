@@ -91,15 +91,14 @@
           </a>
           <ul ngbDropdownMenu
               [ngStyle]="{'left.px': learnDropdownOffset}"
-              [ngClass]="{'classroom-disabled': !CLASSROOM_PROMOS_ARE_ENABLED, 'classroom-enabled': CLASSROOM_PROMOS_ARE_ENABLED}"
-              class="dropdown-menu oppia-navbar-dropdown learn-dropdown-menu"
+              class="dropdown-menu oppia-navbar-dropdown learn-dropdown-menu classroom-enabled"
               (mouseover)="openSubmenu($event, 'learnMenu')"
               (mouseleave)="closeSubmenuIfNotMobile($event)"
               role="menu"
               autofocus>
             <li class="nav-item">
               <div class="nav-item-main d-flex">
-                <a *ngIf="CLASSROOM_PROMOS_ARE_ENABLED" class="nav-item-left d-flex flex-column justify-content-between"
+                <a class="nav-item-left d-flex flex-column justify-content-between"
                    tabindex="0" href="/learn/{{DEFAULT_CLASSROOM_URL_FRAGMENT}}"
                    (click)="navigateToClassroomPage('/learn/' + DEFAULT_CLASSROOM_URL_FRAGMENT)">
                   <div class="nav-item-top d-flex justify-content-between">

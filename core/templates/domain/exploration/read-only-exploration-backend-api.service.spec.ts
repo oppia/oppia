@@ -452,47 +452,4 @@ describe('Read only exploration backend API service', () => {
     roebas.deleteExplorationFromCache('0');
     expect(roebas.isCached('0')).toBe(false);
   }));
-
-  it('should handle successCallback for fetch checkpoints feature status',
-    fakeAsync(() => {
-      let successHandler = jasmine.createSpy('success');
-      let failHandler = jasmine.createSpy('fail');
-
-      roebas.fetchCheckpointsFeatureIsEnabledStatus().then(
-        successHandler, failHandler);
-
-      let req = httpTestingController.expectOne(
-        '/checkpoints_feature_status_handler');
-      expect(req.request.method).toEqual('GET');
-      req.flush({checkpoints_feature_is_enabled: false});
-
-      flushMicrotasks();
-
-      expect(successHandler).toHaveBeenCalledWith(false);
-      expect(failHandler).not.toHaveBeenCalled();
-    })
-  );
-
-  it('should handle errorCallback for fetch checkpoints feature status',
-    fakeAsync(() => {
-      let successHandler = jasmine.createSpy('success');
-      let failHandler = jasmine.createSpy('fail');
-
-      roebas.fetchCheckpointsFeatureIsEnabledStatus().then(
-        successHandler, failHandler);
-
-      let req = httpTestingController.expectOne(
-        '/checkpoints_feature_status_handler');
-      expect(req.request.method).toEqual('GET');
-      req.flush('Invalid request', {
-        status: 400,
-        statusText: 'Invalid request'
-      });
-
-      flushMicrotasks();
-
-      expect(successHandler).not.toHaveBeenCalled();
-      expect(failHandler).toHaveBeenCalled();
-    })
-  );
 });
