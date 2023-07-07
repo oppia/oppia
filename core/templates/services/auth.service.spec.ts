@@ -24,7 +24,7 @@ import { AuthService } from 'services/auth.service';
 import { AuthBackendApiService } from 'services/auth-backend-api.service';
 import firebase from 'firebase';
 
-fdescribe('Auth service', function() {
+describe('Auth service', function() {
   let authService: AuthService;
   let email: string;
   let password: string;
