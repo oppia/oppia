@@ -7,21 +7,25 @@ services:
       dockerfile: ./docker/Dockerfile
     container_name: oppia-angular-build
     volumes:
-      - shared_root_dir:/app/oppia
-    environment:
-      - production=false
-      - NODE_ENV=development
-      - oppia_is_dockerized=true
+      - .:/app/oppia
+      - shared_node_modules:/app/oppia/node_modules
+      - shared_third_party:/app/oppia/third_party
+      - shared_proto_files:/app/oppia/proto_files
+      - shared_js_ts_proto_files:/app/oppia/extensions/classifiers/proto
+      - shared_assets_dir:/app/oppia/assets
+      - shared_angular_build:/app/oppia/dist
     healthcheck:
       test: test "$(ls -A /app/oppia/dist)" || exit 1
       timeout: 30s
       interval: 30s
       retries: 5
       start_period: 20m
-    entrypoint: >
+    # added max-old-space-size to avoid out of memory error, check this link for more info
+    # https://stackoverflow.com/questions/62663167/dockerizing-react-in-production-mode-fatal-error-ineffective-mark-compacts-nea
+    command: >
       sh -c '
         trap "rm /app/oppia/node_modules/@angular/compiler-cli/ngcc/__ngcc_lock_file__" EXIT
-        /app/oppia/node_modules/.bin/ng build --watch
+        export NODE_OPTIONS=--max_old_space_size=4096 && /app/oppia/node_modules/.bin/ng build --watch
       '
 
   webpack-compiler:
@@ -30,23 +34,27 @@ services:
       dockerfile: ./docker/Dockerfile
     container_name: oppia-webpack-compiler
     volumes:
-      - shared_root_dir:/app/oppia
-    environment:
-      - oppia_is_dockerized=true
+      - .:/app/oppia
+      - shared_node_modules:/app/oppia/node_modules
+      - shared_third_party:/app/oppia/third_party
+      - shared_proto_files:/app/oppia/proto_files
+      - shared_js_ts_proto_files:/app/oppia/extensions/classifiers/proto
+      - shared_assets_dir:/app/oppia/assets
+      - shared_webpack_bundles:/app/oppia/webpack_bundles
     healthcheck:
       test: test "$(ls -A /app/oppia/webpack_bundles)" || exit 1
       timeout: 30s
       interval: 30s
       retries: 5
       start_period: 20m
-    entrypoint: >
-      sh -c '
-        node /app/oppia/node_modules/webpack/bin/webpack.js \
-        --config /app/oppia/webpack.dev.config.ts \
-        --watch \
-        --color \
-        --progress
-      '
+    entrypoint: node
+    command:
+      - "/app/oppia/node_modules/webpack/bin/webpack.js"
+      - "--config"
+      - "/app/oppia/webpack.dev.config.ts"
+      - "--watch"
+      - "--color"
+      - "--progress"
 
   google_app_engine:
     build:
@@ -57,7 +65,14 @@ services:
       - "8181:8181"
       - "8000:8000"
     volumes:
-      - shared_root_dir:/app/oppia
+      - .:/app/oppia
+      - shared_proto_files:/app/oppia/proto_files
+      - shared_third_party:/app/oppia/third_party
+      - shared_node_modules:/app/oppia/node_modules
+      - shared_js_ts_proto_files:/app/oppia/extensions/classifiers/proto
+      - shared_assets_dir:/app/oppia/assets
+      - shared_angular_build:/app/oppia/dist
+      - shared_webpack_bundles:/app/oppia/webpack_bundles
     environment:
       - CLOUDSDK_CORE_DISABLE_PROMPTS=1
       - oppia_is_dockerized=true
@@ -76,16 +91,16 @@ services:
       interval: 30s
       retries: 5
       start_period: 20m
-    entrypoint: >
-      sh -c '
-        /google-cloud-sdk/bin/dev_appserver.py /app/oppia/app_dev_docker.yaml \
-        --runtime python38 \
-        --host=0.0.0.0 \
-        --port=8181 \
-        --admin_host=0.0.0.0 \
-        --admin_port=8000 \
-        --skip_sdk_update_check=True
-      '
+    entrypoint: /google-cloud-sdk/bin/dev_appserver.py
+    command: 
+      - "/app/oppia/app_dev_docker.yaml"
+      - "--runtime"
+      - "python38"
+      - "--host=0.0.0.0"
+      - "--port=8181"
+      - "--admin_host=0.0.0.0"
+      - "--admin_port=8000"
+      - "--skip_sdk_update_check=True"
 
   datastore:
     build:
@@ -94,11 +109,8 @@ services:
     container_name: oppia-cloud-datastore
     ports:
       - "8089:8089"
-    volumes:
-      - shared_root_dir:/app/oppia
     environment:
       - CLOUDSDK_CORE_DISABLE_PROMPTS=1
-      - oppia_is_dockerized=true
     depends_on:
       angular-build:
         condition: service_healthy
@@ -110,16 +122,20 @@ services:
       interval: 2m
       retries: 5
       start_period: 20m
-    entrypoint: >
-      sh -c '
-        /google-cloud-sdk/bin/gcloud beta emulators datastore start \
-        --project dev-project-id \
-        --data-dir /app/cloud_datastore_emulator_cache \
-        --host-port 0.0.0.0:8089 \
-        --consistency=1.0 \
-        --quiet \
-        --no-store-on-disk
-      '
+    entrypoint: /google-cloud-sdk/bin/gcloud
+    command:
+      - "beta"
+      - "emulators"
+      - "datastore"
+      - "start"
+      - "--project"
+      - "dev-project-id"
+      - "--data-dir"
+      - "/app/cloud_datastore_emulator_cache"
+      - "--host-port=0.0.0.0:8089"
+      - "--consistency=1.0"
+      - "--quiet"
+      - "--no-store-on-disk"
 
   firebase:
     image: node@sha256:48650ae5c5dc9fbd0d0559fd1248e779f7214ba99434420a089bc7853aeefb65
@@ -128,24 +144,22 @@ services:
       - "9099:9099"
       - "4000:4000"
     volumes:
-      - shared_root_dir:/app/oppia
+      - ./.firebase.json:/app/oppia/.firebase.json
+      - shared_node_modules:/app/oppia/node_modules
     healthcheck:
       test: wget --spider http://localhost:4000/auth/ && echo 'y' | /app/oppia/node_modules/firebase-tools/lib/bin/firebase.js emulators:export /app/firebase_emulator_cache --project=dev-project-id || exit 1
       timeout: 20s
       interval: 20s
       retries: 5
-    environment:
-      - oppia_is_dockerized=true
-    entrypoint: >
-      sh -c '
-        /app/oppia/node_modules/firebase-tools/lib/bin/firebase.js \
-        emulators:start \
-        --only auth \
-        --project=dev-project-id \
-        --config=/app/oppia/.firebase.json \
-        --import=/app/firebase_emulator_cache \
-        --export-on-exit=/app/firebase_emulator_cache
-      '  
+    entrypoint: /app/oppia/node_modules/firebase-tools/lib/bin/firebase.js
+    command:
+      - "emulators:start"
+      - "--only"
+      - "auth"
+      - "--project=dev-project-id"
+      - "--config=/app/oppia/.firebase.json"
+      - "--import=/app/firebase_emulator_cache"
+      - "--export-on-exit=/app/firebase_emulator_cache"
 
   redis:
     image: redis@sha256:aebc052b5a7f50d79f00a4deee22109e2ecf22f439140a03f2c9770055ffec7b
@@ -154,7 +168,6 @@ services:
       - "6379:6379"
     environment:
       - PATH=/usr/local/bin/
-      - oppia_is_dockerized=true
     volumes:
       - oppia_redis_dump:/app/oppia/dump.db
       - ./redis_docker.conf:/app/oppia/redis_docker.conf
@@ -174,7 +187,6 @@ services:
       - ES_JAVA_OPTS=-Xms100m -Xmx500m
       - ES_PATH_CONF=/usr/share/elasticsearch/config
       - discovery.type=single-node
-      - oppia_is_dockerized=true
     depends_on:
       datastore:
         condition: service_healthy
@@ -187,5 +199,11 @@ services:
     command: elasticsearch -q
 
 volumes:
-  shared_root_dir:
+  shared_node_modules:
+  shared_proto_files:
+  shared_js_ts_proto_files:
+  shared_third_party:
+  shared_assets_dir:
+  shared_angular_build:
+  shared_webpack_bundles:
   oppia_redis_dump:
