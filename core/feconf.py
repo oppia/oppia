@@ -544,6 +544,8 @@ ES_USERNAME = None
 # root folder. Specifically, REDISPORT should always be the same as the port in
 # redis.conf.
 # TODO(#18260): Change this when we permanently move to the Dockerized Setup.
+# For the developers who want to use the docker setup,
+# they need to set the 'localhost' below to 'redis'
 REDISHOST = 'localhost'
 REDISPORT = 6379
 

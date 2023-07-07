@@ -39,6 +39,9 @@ secrets_services = models.Registry.import_secrets_services()
 # where loading a exploration from local yaml file takes
 # longer than ElasticSearch expects.
 ES = elasticsearch.Elasticsearch(
+    # TODO(#18260): Change this when we permanently move to the Dockerized Setup.
+    # For the developers who want to use the docker setup,
+    # they need to set the 'localhost' below to 'elasticsearch'
     ('localhost:%s' % feconf.ES_LOCALHOST_PORT)
     if feconf.ES_CLOUD_ID is None else None,
     cloud_id=feconf.ES_CLOUD_ID,
