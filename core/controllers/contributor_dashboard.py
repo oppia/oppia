@@ -146,8 +146,6 @@ class ContributionOpportunitiesHandler(
             InvalidInputException. If language code is None.
         """
         assert self.normalized_request is not None
-        if not config_domain.CONTRIBUTOR_DASHBOARD_IS_ENABLED.value:
-            raise self.PageNotFoundException
         search_cursor = self.normalized_request.get('cursor')
         language_code = self.normalized_request.get('language_code')
 
