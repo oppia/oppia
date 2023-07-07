@@ -21,7 +21,7 @@ from core import utils
 from core.constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
-from core.domain import contributor_admin_dashboard_services
+from core.domain import contribution_stats_services
 from core.domain import email_manager
 from core.domain import suggestion_registry
 from core.domain import suggestion_services
@@ -646,7 +646,7 @@ class ContributorDashboardAdminStatsHandler(
         if contribution_type == feconf.CONTRIBUTION_TYPE_TRANSLATION:
             if contribution_subtype == feconf.CONTRIBUTION_SUBTYPE_SUBMISSION:
                 translation_submitter_stats, next_offset, more = (
-                    contributor_admin_dashboard_services
+                    contribution_stats_services
                     .get_translation_submitter_total_stats(
                         page_size,
                         offset,
@@ -665,7 +665,7 @@ class ContributorDashboardAdminStatsHandler(
 
             else:
                 translation_reviewer_stats, next_offset, more = (
-                    contributor_admin_dashboard_services
+                    contribution_stats_services
                     .get_translation_reviewer_total_stats(
                         page_size,
                         offset,
@@ -684,7 +684,7 @@ class ContributorDashboardAdminStatsHandler(
         else:
             if contribution_subtype == feconf.CONTRIBUTION_SUBTYPE_SUBMISSION:
                 question_submitter_stats, next_offset, more = (
-                    contributor_admin_dashboard_services
+                    contribution_stats_services
                     .get_question_submitter_total_stats(
                         page_size,
                         offset,
@@ -702,7 +702,7 @@ class ContributorDashboardAdminStatsHandler(
 
             else:
                 question_reviewer_stats, next_offset, more = (
-                    contributor_admin_dashboard_services
+                    contribution_stats_services
                     .get_question_reviewer_total_stats(
                         page_size,
                         offset,
