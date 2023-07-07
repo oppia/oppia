@@ -134,6 +134,7 @@ services:
       - "--no-store-on-disk"
 
   firebase:
+    # node:16.13.0
     image: node@sha256:48650ae5c5dc9fbd0d0559fd1248e779f7214ba99434420a089bc7853aeefb65
     container_name: oppia-firebase-emulator
     ports:
@@ -161,6 +162,7 @@ services:
       - "--export-on-exit=/app/firebase_emulator_cache"
 
   redis:
+    # redis:6.2.4
     image: redis@sha256:aebc052b5a7f50d79f00a4deee22109e2ecf22f439140a03f2c9770055ffec7b
     container_name: oppia-redis
     ports:
@@ -178,6 +180,7 @@ services:
     command: redis-server /app/oppia/redis_docker.conf
 
   elasticsearch:
+    # elasticsearch:7.17.0
     image: elasticsearch@sha256:fa7141154a7e14df214e42f08c333702403eb88c02ba44e79322a1f42d733013
     container_name: oppia-elasticsearch
     ports:
