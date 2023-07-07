@@ -337,7 +337,8 @@ def get_translation_reviewer_total_stats(
 
     translation_reviewer_stats = [
         get_translation_reviewer_total_stats_from_model(model)
-        for model in translation_reviewer_models]
+        for model in translation_reviewer_models
+    ]
 
     return (
         translation_reviewer_stats,
