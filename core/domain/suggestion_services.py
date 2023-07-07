@@ -25,7 +25,7 @@ import re
 
 from core import feconf
 from core.constants import constants
-from core.domain import contributor_admin_dashboard_services
+from core.domain import contribution_stats_services
 from core.domain import email_manager
 from core.domain import exp_fetchers
 from core.domain import feedback_services
@@ -2726,7 +2726,7 @@ def update_translation_contribution_stats_at_submission(
         )
     else:
         translation_submitter_total_stat = (
-            contributor_admin_dashboard_services
+            contribution_stats_services
             .get_translation_submitter_total_stats_from_model(
                 translation_submitter_total_stat_model
              )
@@ -2866,7 +2866,7 @@ def update_translation_contribution_stats_at_review(
         )
     else:
         translation_submitter_total_stat = (
-            contributor_admin_dashboard_services
+            contribution_stats_services
             .get_translation_submitter_total_stats_from_model(
                 translation_submitter_total_stat_model)
         )
@@ -2995,7 +2995,7 @@ def update_translation_review_stats(
         )
     else:
         translation_reviewer_total_stat = (
-            contributor_admin_dashboard_services
+            contribution_stats_services
             .get_translation_reviewer_total_stats_from_model(
                 translation_reviewer_total_stat_model))
 
@@ -3120,7 +3120,7 @@ def update_question_contribution_stats_at_submission(
             continue
 
         question_submitter_total_stat = (
-            contributor_admin_dashboard_services
+            contribution_stats_services
             .get_question_submitter_total_stats_from_model(
                 question_submitter_total_stat_model))
 
@@ -3234,7 +3234,7 @@ def update_question_contribution_stats_at_review(
             continue
 
         question_submitter_total_stat = (
-            contributor_admin_dashboard_services
+            contribution_stats_services
             .get_question_submitter_total_stats_from_model(
                 question_submitter_total_stat_model))
 
@@ -3342,7 +3342,7 @@ def update_question_review_stats(
             continue
 
         question_reviewer_total_stat = (
-            contributor_admin_dashboard_services
+            contribution_stats_services
             .get_question_reviewer_total_stats_from_model(
                 question_reviewer_total_stat_model))
 
