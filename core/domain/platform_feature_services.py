@@ -175,8 +175,7 @@ def update_feature_flag(
     feature_name: str,
     committer_id: str,
     commit_message: str,
-    new_rules: List[platform_parameter_domain.PlatformParameterRule],
-    default_value: bool
+    new_rules: List[platform_parameter_domain.PlatformParameterRule]
 ) -> None:
     """Updates the feature flag's rules.
 
@@ -186,7 +185,6 @@ def update_feature_flag(
         commit_message: str. The commit message.
         new_rules: list(PlatformParameterRule). A list of PlatformParameterRule
             objects to update.
-        default_value: bool. The default value of the feature flag.
 
     Raises:
         FeatureFlagNotFoundException. The feature_name is not registered in
@@ -197,7 +195,7 @@ def update_feature_flag(
             'Unknown feature flag: %s.' % feature_name)
 
     registry.Registry.update_platform_parameter(
-        feature_name, committer_id, commit_message, new_rules, default_value)
+        feature_name, committer_id, commit_message, new_rules)
 
 
 def get_server_mode() -> platform_parameter_domain.ServerMode:

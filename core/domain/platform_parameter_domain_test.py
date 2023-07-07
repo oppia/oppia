@@ -1679,6 +1679,24 @@ class PlatformParameterTests(test_utils.GenericTestBase):
             'Expected bool, received \'222\' in value_when_matched'):
             param.validate()
 
+    def test_validate_feature_flag_with_default_value_as_true_raises_exception(
+        self) -> None:
+        param = parameter_domain.PlatformParameter.from_dict({
+            'name': 'parameter_a',
+            'description': 'for test',
+            'data_type': 'bool',
+            'rules': [],
+            'rule_schema_version': (
+                feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION),
+            'default_value': True,
+            'is_feature': True,
+            'feature_stage': ServerMode.DEV.value,
+        })
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Feature flag is not allowed to have default value as True.'):
+            param.validate()
+
     def test_validate_with_inconsistent_default_value_type_raises_exception(
         self
     ) -> None:

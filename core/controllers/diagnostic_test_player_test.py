@@ -50,8 +50,7 @@ class DiagnosticTestLandingPageTest(test_utils.GenericTestBase):
             platform_parameter_list.ParamNames.DIAGNOSTIC_TEST.value,
             self.owner_id,
             'test update',
-            [],
-            False
+            []
         )
         self.get_html_response(
             feconf.DIAGNOSTIC_TEST_PLAYER_PAGE_URL,
@@ -74,8 +73,7 @@ class DiagnosticTestLandingPageTest(test_utils.GenericTestBase):
                     'filters': [],
                     'value_when_matched': True
                 })
-            ],
-            False
+            ]
         )
         self.get_html_response(
             feconf.DIAGNOSTIC_TEST_PLAYER_PAGE_URL,

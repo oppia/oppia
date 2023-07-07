@@ -339,7 +339,7 @@ class PlatformParameterFilter:
         Raises:
             Exception. Given operator is not supported.
         """
-        if self._type in ['platform_type', 'browser_type'] and op != '=':
+        if self._type in {'platform_type', 'browser_type'} and op != '=':
             raise Exception(
                 'Unsupported comparison operator \'%s\' for %s filter, '
                 'expected one of %s.' % (
@@ -865,14 +865,14 @@ class PlatformParameter:
         """
         if context.is_valid:
             if self._is_feature:
-                server_mode = self._get_server_mode().value
+                server_mode = self._get_server_mode()
                 if (
-                    server_mode == ServerMode.TEST.value and
+                    server_mode == ServerMode.TEST and
                     self._feature_stage == ServerMode.DEV.value
                 ):
                     return False
                 if (
-                    server_mode == ServerMode.PROD.value and
+                    server_mode == ServerMode.PROD and
                     self._feature_stage in (
                         ServerMode.DEV.value, ServerMode.TEST.value)
                 ):
@@ -904,6 +904,10 @@ class PlatformParameter:
         """Validates the PlatformParameter domain object that is a feature
         flag.
         """
+        if self._default_value is True:
+            raise utils.ValidationError(
+                'Feature flag is not allowed to have default value as True.'
+            )
         if self._data_type != DataTypes.BOOL.value:
             raise utils.ValidationError(
                 'Data type of feature flags must be bool, got \'%s\' '
@@ -916,23 +920,23 @@ class PlatformParameter:
                 'Invalid feature stage, got \'%s\', expected one of %s.' % (
                     self._feature_stage, ALLOWED_FEATURE_STAGES))
 
-        server_mode = self._get_server_mode().value
+        server_mode = self._get_server_mode()
         if (
-            server_mode == ServerMode.TEST.value and
+            server_mode == ServerMode.TEST and
             self._feature_stage == ServerMode.DEV.value
         ):
             raise utils.ValidationError(
                 'Feature in %s stage cannot be updated in %s environment.' % (
-                    self._feature_stage, server_mode
+                    self._feature_stage, server_mode.value
                 )
             )
         if (
-            server_mode == ServerMode.PROD.value and
+            server_mode == ServerMode.PROD and
             self._feature_stage in (ServerMode.DEV.value, ServerMode.TEST.value)
         ):
             raise utils.ValidationError(
                 'Feature in %s stage cannot be updated in %s environment.' % (
-                    self._feature_stage, server_mode
+                    self._feature_stage, server_mode.value
                 )
             )
 

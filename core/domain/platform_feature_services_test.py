@@ -353,8 +353,7 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
                     'filters': [],
                     'value_when_matched': False
                 })
-            ],
-            False
+            ]
         )
 
         with self.swap(constants, 'DEV_MODE', True):
@@ -373,8 +372,7 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
                     platform_parameter_domain.PlatformParameterRule.from_dict(
                         {'filters': [], 'value_when_matched': False}
                     ),
-                ],
-                False
+                ]
             )
 
     def test_update_feature_flag_with_invalid_rules_raises_error(
@@ -399,8 +397,7 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
                     platform_parameter_domain.PlatformParameterRule.from_dict({
                         'filters': [], 'value_when_matched': False
                     })
-                ],
-                False
+                ]
             )
 
     def test_all_platform_params_should_appear_once_in_features_or_in_params_list( # pylint: disable=line-too-long

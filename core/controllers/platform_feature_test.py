@@ -209,7 +209,7 @@ class PlatformFeatureDummyHandlerTest(test_utils.GenericTestBase):
         feature_services.update_feature_flag(
             param_list.ParamNames.DUMMY_FEATURE_FLAG_FOR_E2E_TESTS.value,
             self.user_id,
-            'clear rule', [], False
+            'clear rule', []
         )
 
         super().tearDown()
@@ -224,8 +224,7 @@ class PlatformFeatureDummyHandlerTest(test_utils.GenericTestBase):
             [param_domain.PlatformParameterRule.from_dict({
                 'value_when_matched': feature_is_enabled,
                 'filters': []
-            })],
-            False
+            })]
         )
 
     def _mock_dummy_feature_stage(

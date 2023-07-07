@@ -212,7 +212,7 @@ export class FeaturesTabComponent implements OnInit {
       feature: PlatformParameter, commitMessage: string): Promise<void> {
     try {
       await this.apiService.updateFeatureFlag(
-        feature.name, commitMessage, feature.rules, feature.defaultValue);
+        feature.name, commitMessage, feature.rules);
 
       this.featureFlagNameToBackupMap.set(feature.name, cloneDeep(feature));
 
@@ -263,7 +263,6 @@ export class FeaturesTabComponent implements OnInit {
 
     if (backup) {
       featureFlag.rules = cloneDeep(backup.rules);
-      featureFlag.defaultValue = backup.defaultValue;
     }
   }
 
@@ -278,9 +277,7 @@ export class FeaturesTabComponent implements OnInit {
     if (original === undefined) {
       throw new Error('Backup not found for feature flag: ' + feature.name);
     }
-    return (
-      !isEqual(original.rules, feature.rules) ||
-      !isEqual(original.defaultValue, feature.defaultValue)
+    return !isEqual(original.rules, feature.rules
     );
   }
 

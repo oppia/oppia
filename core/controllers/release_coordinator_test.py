@@ -215,8 +215,7 @@ class FeatureFlagsHandlerTest(test_utils.GenericTestBase):
                     'action': 'update_feature_flag',
                     'feature_name': feature.name,
                     'new_rules': new_rule_dicts,
-                    'commit_message': 'test update feature',
-                    'default_value': False
+                    'commit_message': 'test update feature'
                 }, csrf_token=csrf_token)
 
             rule_dicts = [
@@ -246,8 +245,7 @@ class FeatureFlagsHandlerTest(test_utils.GenericTestBase):
                     'action': 'update_feature_flag',
                     'feature_name': 'test_feature_1',
                     'new_rules': [],
-                    'commit_message': 'test update feature',
-                    'default_value': False
+                    'commit_message': 'test update feature'
                 },
                 csrf_token=csrf_token,
                 expected_status_int=400
@@ -288,8 +286,7 @@ class FeatureFlagsHandlerTest(test_utils.GenericTestBase):
                     'action': 'update_feature_flag',
                     'feature_name': feature.name,
                     'new_rules': new_rule_dicts,
-                    'commit_message': 'test update feature',
-                    'default_value': False
+                    'commit_message': 'test update feature'
                 },
                 csrf_token=csrf_token,
                 expected_status_int=400
@@ -328,8 +325,7 @@ class FeatureFlagsHandlerTest(test_utils.GenericTestBase):
                     'action': 'update_feature_flag',
                     'feature_name': ParamNames.TEST_FEATURE_2.value,
                     'new_rules': [],
-                    'commit_message': 'test update feature',
-                    'default_value': False
+                    'commit_message': 'test update feature'
                 },
                 csrf_token=csrf_token,
                 expected_status_int=500
