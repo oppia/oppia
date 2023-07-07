@@ -338,13 +338,13 @@ export class InteractiveImageClickInput implements OnInit, OnDestroy {
       case 'Enter':
         this.onClickImage();
         break;
-    };
+    }
     this.updateDotPosition(event);
 
     this.currentlyHoveredRegions = [];
     this.updateCurrentlyHoveredRegions();
     event.preventDefault();
-  }
+  };
 
   ngOnDestroy(): void {
     this.componentSubscriptions.unsubscribe();
