@@ -213,7 +213,7 @@ class Registry:
         # Create a temporary param instance with new rules for validation,
         # if the new rules are invalid, an exception will be raised in
         # validate() method.
-        if default_value == None:
+        if default_value is None:
             default_value = param.default_value
         new_rule_dicts = [rules.to_dict() for rules in new_rules]
         param_dict = param.to_dict()

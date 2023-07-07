@@ -277,8 +277,7 @@ export class FeaturesTabComponent implements OnInit {
     if (original === undefined) {
       throw new Error('Backup not found for feature flag: ' + feature.name);
     }
-    return !isEqual(original.rules, feature.rules
-    );
+    return !isEqual(original.rules, feature.rules);
   }
 
   /**
