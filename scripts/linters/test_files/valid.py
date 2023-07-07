@@ -18,9 +18,6 @@
 python_linter_test.py. This file contain valid python syntax.
 """
 
-# Note: Make sure to import every job from the core/jobs/batch_jobs directory
-# into this file.
-# Failure to import will cause the test_valid_job_imports linter test to fail.
 from __future__ import annotations
 from core.jobs.batch_jobs import blog_post_search_indexing_jobs      # pylint: disable=unused-import  # isort: skip
 from core.jobs.batch_jobs import blog_validation_jobs                # pylint: disable=unused-import  # isort: skip
@@ -41,7 +38,6 @@ from core.jobs.batch_jobs import suggestion_migration_jobs   # pylint: disable=u
 from core.jobs.batch_jobs import translation_migration_jobs         # pylint: disable=unused-import  # isort: skip
 from core.jobs.batch_jobs import user_stats_computation_jobs         # pylint: disable=unused-import  # isort: skip
 from core.jobs.batch_jobs import math_interactions_audit_jobs        # pylint: disable=unused-import  # isort: skip
-from core.jobs.batch_jobs import mailchimp_population_jobs           # pylint: disable=unused-import  # isort: skip
 from core.jobs.batch_jobs import (                                   # pylint: disable=unused-import  # isort: skip
       exp_version_history_computation_job)
 from core.jobs.batch_jobs import (                                   # pylint: disable=unused-import  # isort: skip
@@ -50,7 +46,6 @@ from core.jobs.batch_jobs import (                                   # pylint: d
     remove_profile_picture_data_url_field_jobs)
 from core.jobs.batch_jobs import (                                   # pylint: disable=unused-import  # isort: skip
     story_node_jobs)
-from core.jobs.batch_jobs import contributor_admin_stats_jobs        # pylint: disable=unused-import  # isort: skip
 
 
 class FakeClass:

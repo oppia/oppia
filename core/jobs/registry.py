@@ -62,7 +62,6 @@ from core.jobs.batch_jobs import suggestion_migration_jobs   # pylint: disable=u
 from core.jobs.batch_jobs import translation_migration_jobs         # pylint: disable=unused-import  # isort: skip
 from core.jobs.batch_jobs import user_stats_computation_jobs         # pylint: disable=unused-import  # isort: skip
 from core.jobs.batch_jobs import math_interactions_audit_jobs        # pylint: disable=unused-import  # isort: skip
-from core.jobs.batch_jobs import mailchimp_population_jobs           # pylint: disable=unused-import  # isort: skip
 from core.jobs.batch_jobs import (                                   # pylint: disable=unused-import  # isort: skip
       exp_version_history_computation_job)
 from core.jobs.batch_jobs import (                                   # pylint: disable=unused-import  # isort: skip
@@ -71,7 +70,6 @@ from core.jobs.batch_jobs import (                                   # pylint: d
     remove_profile_picture_data_url_field_jobs)
 from core.jobs.batch_jobs import (                                   # pylint: disable=unused-import  # isort: skip
     story_node_jobs)
-from core.jobs.batch_jobs import contributor_admin_stats_jobs        # pylint: disable=unused-import  # isort: skip
 
 
 def get_all_jobs() -> List[Type[base_jobs.JobBase]]:
