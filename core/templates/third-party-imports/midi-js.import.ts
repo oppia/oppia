@@ -21,7 +21,7 @@ window.Base64Binary = require('/node_modules/midi/inc/shim/Base64binary.js');
 
 $(document).ready(function() {
   MIDI.loadPlugin({
-    soundfontUrl: '/assets/audio/soundfont/',
+    soundfontUrl: '/dist/oppia-angular/midi/examples/soundfont/',
     instrument: 'acoustic_grand_piano',
     callback: function() {}
   });
