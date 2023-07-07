@@ -2726,7 +2726,9 @@ def update_translation_contribution_stats_at_submission(
         translation_submitter_total_stat = (
             contributor_admin_dashboard_services
             .get_translation_submitter_total_stats_from_model(
-                translation_submitter_total_stat_model))
+                translation_submitter_total_stat_model
+             )
+         )
 
         if topic_id not in (
             translation_submitter_total_stat
