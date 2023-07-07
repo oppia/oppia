@@ -65,11 +65,11 @@ ALL_PLATFORM_PARAMS_EXCEPT_FEATURE_FLAGS: List[
         ),
         platform_parameter_list.ParamNames.DUMMY_PARAMETER,
         (
-            platform_feature_list.ParamNames.
+            platform_parameter_list.ParamNames.
             ENABLE_ADMIN_NOTIFICATIONS_FOR_REVIEWER_SHORTAGE
         ),
         (
-            platform_feature_list.ParamNames.
+            platform_parameter_list.ParamNames.
             ENABLE_ADMIN_NOTIFICATIONS_FOR_SUGGESTIONS_NEEDING_REVIEW
         ),
         (
@@ -85,11 +85,11 @@ ALL_PLATFORM_PARAMS_EXCEPT_FEATURE_FLAGS: List[
             HIGH_BOUNCE_RATE_TASK_MINIMUM_EXPLORATION_STARTS
         ),
         (
-            platform_feature_list.ParamNames.
+            platform_parameter_list.ParamNames.
             MAX_NUMBER_OF_TAGS_ASSIGNED_TO_BLOG_POST
         ),
         (
-            platform_feature_list.ParamNames.
+            platform_parameter_list.ParamNames.
             MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER
         ),
         platform_parameter_list.ParamNames.PROMO_BAR_ENABLED,
