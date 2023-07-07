@@ -96,6 +96,8 @@ SUGGESTION_EMPHASIZED_TEXT_GETTER_FUNCTIONS: Dict[str, Callable[..., str]] = {
     feconf.SUGGESTION_TYPE_ADD_QUESTION: SUGGESTION_ADD_QUESTION_HTML
 }
 
+RECENT_REVIEW_OUTCOMES_LIMIT: Final = 100
+
 
 @overload
 def create_suggestion(
@@ -3484,7 +3486,7 @@ def increment_translation_submitter_total_stats_at_review(
         if (
                 len(translation_submitter_total_stat
                     .recent_review_outcomes)
-                > 99
+                >= RECENT_REVIEW_OUTCOMES_LIMIT
             ):
             oldest_outcome = (
                 translation_submitter_total_stat
@@ -3505,7 +3507,7 @@ def increment_translation_submitter_total_stats_at_review(
         if (
                 len(translation_submitter_total_stat
                     .recent_review_outcomes)
-                > 99
+                >= RECENT_REVIEW_OUTCOMES_LIMIT
             ):
             oldest_outcome = (
                 translation_submitter_total_stat
@@ -3595,7 +3597,7 @@ def increment_question_submitter_total_stats_at_review(
         if (
                 len(question_submitter_total_stat
                     .recent_review_outcomes)
-                > 99
+                >= RECENT_REVIEW_OUTCOMES_LIMIT
             ):
             oldest_outcome = (
                 question_submitter_total_stat
@@ -3614,7 +3616,7 @@ def increment_question_submitter_total_stats_at_review(
         if (
                 len(question_submitter_total_stat
                     .recent_review_outcomes)
-                > 99
+                >= RECENT_REVIEW_OUTCOMES_LIMIT
             ):
             oldest_outcome = (
                 question_submitter_total_stat
