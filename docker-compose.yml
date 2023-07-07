@@ -143,8 +143,6 @@ services:
     volumes:
       - ./.firebase.json:/app/oppia/.firebase.json
       - shared_node_modules:/app/oppia/node_modules
-    environment:
-      - oppia_is_dockerized=true
     healthcheck:
       test: wget --spider http://localhost:4000/auth/ && echo 'y' | /app/oppia/node_modules/firebase-tools/lib/bin/firebase.js emulators:export /app/firebase_emulator_cache --project=dev-project-id || exit 1
       timeout: 20s
