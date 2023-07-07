@@ -27,6 +27,11 @@
               "src/favicon.ico",
               "src/assets"
             ],
+            // {
+            //   "glob": "**/*",
+            //   "input": "node_modules/@pdftron/webviewer",
+            //   "output": "src/assets"
+            // }
             "styles": [
               "core/templates/css/oppia.css",
               "core/templates/css/oppia-material.css"

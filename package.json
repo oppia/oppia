@@ -173,6 +173,7 @@
     "gif-frames": "^1.0.1",
     "gifshot": "^0.4.5",
     "globalthis": "^1.0.2",
+    "guppy-dev": "git+https://github.com/oppia/guppy#f509e",
     "hammerjs": "^2.0.8",
     "hash-wasm": "^4.4.1",
     "headroom.js": "^0.12.0",
