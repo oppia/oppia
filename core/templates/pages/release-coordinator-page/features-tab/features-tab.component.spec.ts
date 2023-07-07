@@ -444,8 +444,7 @@ describe('Release coordinator page feature tab', function() {
       flushMicrotasks();
 
       expect(updateApiSpy).toHaveBeenCalledWith(
-        featureFlag.name, 'mock msg', featureFlag.rules,
-        featureFlag.defaultValue);
+        featureFlag.name, 'mock msg', featureFlag.rules);
       expect(setStatusSpy).toHaveBeenCalledWith('Saved successfully.');
     }));
 
@@ -593,15 +592,6 @@ describe('Release coordinator page feature tab', function() {
           .toBeTrue();
       }
     );
-
-    it('should return true if the feature default value is different from ' +
-    'the backup instance', () => {
-      let featureFlag = component.featureFlags[0];
-      featureFlag.defaultValue = true;
-
-      expect(component.isFeatureFlagChanged(featureFlag))
-        .toBeTrue();
-    });
 
     it('should throw error if the feature username is not found', () => {
       const featureFlag = PlatformParameter.createFromBackendDict({
