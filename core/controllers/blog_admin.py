@@ -138,7 +138,7 @@ class BlogAdminHandler(
                 'The new_platform_parameter_values cannot be None when the'
                 ' action is save_platform_parameters.'
             )
-        for (name, value) in new_platform_parameter_values.items():
+        for name, value in new_platform_parameter_values.items():
             param = platform_parameter_registry.Registry.get_platform_parameter(
                 name)
             rules_for_platform_parameter = [

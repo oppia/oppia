@@ -129,37 +129,7 @@ def validate_platform_params_values_for_blog_admin(
         Exception. The max_number_of_tags_assigned_to_blog_post platform
             parameter has incoming value less than or equal to 0.
     """
-
-    def _validate_parameter_value_as_per_its_data_type(
-        param_name: str, value: platform_parameter_domain.PlatformDataTypes
-    ) -> None:
-        """Validates the type of incoming value of platform parameter
-        with the data_type.
-
-        Args:
-            param_name: str. The name of the platform parameter.
-            value: PlatformDataTypes. The incoming value of the platform
-                parameter.
-
-        Raises:
-            Exception. The type of incoming value is not same as the data_type.
-        """
-        parameter = platform_parameter_registry.Registry.get_platform_parameter(
-            param_name)
-
-        if not (
-            (isinstance(value, bool) and parameter.data_type == 'bool') or
-            (isinstance(value, str) and parameter.data_type == 'string') or
-            (isinstance(value, float) and parameter.data_type == 'number') or
-            (isinstance(value, int) and parameter.data_type == 'number')
-        ):
-            raise Exception(
-                'The value of platform parameter %s is of type \'%s\', '
-                'expected it to be of type \'%s\'' % (
-                    param_name, value, parameter.data_type)
-            )
-
-    for (name, value) in new_platform_parameter_values.items():
+    for name, value in new_platform_parameter_values.items():
         if not isinstance(name, str):
             raise Exception(
                 'Platform parameter name should be a string, received'
@@ -172,7 +142,20 @@ def validate_platform_params_values_for_blog_admin(
                     name, str(platform_parameter_domain.PlatformDataTypes))
             )
 
-        _validate_parameter_value_as_per_its_data_type(name, value)
+        parameter = platform_parameter_registry.Registry.get_platform_parameter(
+            name)
+
+        if not (
+            (isinstance(value, bool) and parameter.data_type == 'bool') or
+            (isinstance(value, str) and parameter.data_type == 'string') or
+            (isinstance(value, float) and parameter.data_type == 'number') or
+            (isinstance(value, int) and parameter.data_type == 'number')
+        ):
+            raise Exception(
+                'The value of platform parameter %s is of type \'%s\', '
+                'expected it to be of type \'%s\'' % (
+                    name, value, parameter.data_type)
+            )
 
         if (
             name ==
