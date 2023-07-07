@@ -66,7 +66,7 @@ _DEPENDENCY_SOURCE_PACKAGE: Final = 'package.json'
 
 WORKFLOWS_DIR: Final = os.path.join(os.getcwd(), '.github', 'workflows')
 WORKFLOW_FILENAME_REGEX: Final = r'\.(yaml)|(yml)$'
-GIT_COMMIT_HASH_REGEX: Final = r'\#(.*)'
+GIT_COMMIT_HASH_REGEX: Final = r'^git+https://github.com/.*#(.*)'
 MERGE_STEP: Final = {'uses': './.github/actions/merge'}
 WORKFLOWS_EXEMPT_FROM_MERGE_REQUIREMENT: Final = (
     'backend_tests.yml',
@@ -194,10 +194,10 @@ class CustomLintChecksManager(linter_utils.BaseLinter):
                 # In cases where the version is in the form of git commit hashes
                 # such as 'git+https://github.com/username/repo#commit-hash',
                 # we extract the commit hash and use it as the version.
-                elif lib_version.startswith('git+https://github.com/'):
-                    match = re.search(GIT_COMMIT_HASH_REGEX, lib_version)
-                    if match:
-                        lib_version = match.group(1)
+                elif re.search(GIT_COMMIT_HASH_REGEX, lib_version):
+                    lib_version = re.search(
+                        GIT_COMMIT_HASH_REGEX, lib_version).group(1)
+                    print('shivv', lib_version)
 
             prefix_name = third_party_lib['type_defs_filename_prefix']
 
