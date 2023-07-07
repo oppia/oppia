@@ -23,7 +23,6 @@ import { TranslateService } from '@ngx-translate/core';
 import { Subscription } from 'rxjs';
 
 import { AppConstants } from 'app.constants';
-import { ClassroomBackendApiService } from 'domain/classroom/classroom-backend-api.service';
 import { CollectionSummaryBackendDict } from 'domain/collection/collection-summary.model';
 import { CreatorExplorationSummaryBackendDict } from 'domain/summary/creator-exploration-summary.model';
 import { UserInfo } from 'domain/user/user-info.model';
@@ -79,7 +78,6 @@ describe('Library Page Component', () => {
   let componentInstance: LibraryPageComponent;
   let loaderService: LoaderService;
   let urlInterpolationService: UrlInterpolationService;
-  let classroomBackendApiService: ClassroomBackendApiService;
   let pageTitleService: PageTitleService;
   let libraryPageBackendApiService: LibraryPageBackendApiService;
   let i18nLanguageCodeService: I18nLanguageCodeService;
@@ -213,7 +211,6 @@ describe('Library Page Component', () => {
           provide: WindowDimensionsService,
           useClass: MockWindowDimensionsService
         },
-        ClassroomBackendApiService,
         PageTitleService,
         {
           provide: TranslateService,
@@ -229,7 +226,6 @@ describe('Library Page Component', () => {
     componentInstance = fixture.componentInstance;
     loaderService = TestBed.inject(LoaderService);
     urlInterpolationService = TestBed.inject(UrlInterpolationService);
-    classroomBackendApiService = TestBed.inject(ClassroomBackendApiService);
     pageTitleService = TestBed.inject(PageTitleService);
     translateService = TestBed.inject(TranslateService);
     libraryPageBackendApiService = TestBed.inject(LibraryPageBackendApiService);
@@ -252,9 +248,6 @@ describe('Library Page Component', () => {
   it('should initialize', fakeAsync(() => {
     spyOn(loaderService, 'showLoadingScreen');
     spyOn(urlInterpolationService, 'getStaticImageUrl');
-    spyOn(
-      classroomBackendApiService, 'fetchClassroomPromosAreEnabledStatusAsync')
-      .and.returnValue(Promise.resolve(true));
     spyOn(translateService.onLangChange, 'subscribe');
     spyOn(libraryPageBackendApiService, 'fetchLibraryGroupDataAsync')
       .and.returnValue(Promise.resolve({
@@ -271,9 +264,6 @@ describe('Library Page Component', () => {
     tick();
     expect(loaderService.showLoadingScreen).toHaveBeenCalledWith(
       'I18N_LIBRARY_LOADING');
-    expect(classroomBackendApiService.fetchClassroomPromosAreEnabledStatusAsync)
-      .toHaveBeenCalled();
-    expect(componentInstance.CLASSROOM_PROMOS_ARE_ENABLED).toBeTrue();
     expect(translateService.onLangChange.subscribe).toHaveBeenCalled();
     expect(libraryPageBackendApiService.fetchLibraryGroupDataAsync)
       .toHaveBeenCalled();
@@ -286,9 +276,6 @@ describe('Library Page Component', () => {
   it('should initialize for non group pages', fakeAsync(() => {
     spyOn(loaderService, 'showLoadingScreen');
     spyOn(urlInterpolationService, 'getStaticImageUrl');
-    spyOn(
-      classroomBackendApiService, 'fetchClassroomPromosAreEnabledStatusAsync')
-      .and.returnValue(Promise.resolve(true));
     spyOn(translateService.onLangChange, 'subscribe');
     windowRef.nativeWindow.location.pathname = '/community-library';
     fixture.detectChanges();
@@ -316,8 +303,6 @@ describe('Library Page Component', () => {
     tick(4000);
     expect(loaderService.showLoadingScreen).toHaveBeenCalled();
     expect(urlInterpolationService.getStaticImageUrl).toHaveBeenCalled();
-    expect(classroomBackendApiService.fetchClassroomPromosAreEnabledStatusAsync)
-      .toHaveBeenCalled();
     expect(translateService.onLangChange.subscribe).toHaveBeenCalled();
     expect(libraryPageBackendApiService.fetchLibraryIndexDataAsync)
       .toHaveBeenCalled();
@@ -330,9 +315,6 @@ describe('Library Page Component', () => {
     fakeAsync(() => {
       spyOn(loaderService, 'showLoadingScreen');
       spyOn(urlInterpolationService, 'getStaticImageUrl');
-      spyOn(
-        classroomBackendApiService, 'fetchClassroomPromosAreEnabledStatusAsync')
-        .and.returnValue(Promise.resolve(true));
       spyOn(translateService.onLangChange, 'subscribe');
       windowRef.nativeWindow.location.pathname = '/community-library';
       fixture.detectChanges();
@@ -359,9 +341,6 @@ describe('Library Page Component', () => {
       tick(4000);
       expect(loaderService.showLoadingScreen).toHaveBeenCalled();
       expect(urlInterpolationService.getStaticImageUrl).toHaveBeenCalled();
-      expect(
-        classroomBackendApiService.fetchClassroomPromosAreEnabledStatusAsync)
-        .toHaveBeenCalled();
       expect(translateService.onLangChange.subscribe).toHaveBeenCalled();
       expect(userService.getUserInfoAsync).toHaveBeenCalled();
       expect(loggerService.error).toHaveBeenCalledWith(
@@ -375,9 +354,6 @@ describe('Library Page Component', () => {
   it('should log when invalid path is used', fakeAsync(() => {
     spyOn(loaderService, 'showLoadingScreen');
     spyOn(urlInterpolationService, 'getStaticImageUrl');
-    spyOn(
-      classroomBackendApiService, 'fetchClassroomPromosAreEnabledStatusAsync')
-      .and.returnValue(Promise.resolve(true));
     spyOn(translateService.onLangChange, 'subscribe');
     windowRef.nativeWindow.location.pathname = '/not-valid';
     fixture.detectChanges();
@@ -398,9 +374,6 @@ describe('Library Page Component', () => {
     tick(4000);
     expect(loaderService.showLoadingScreen).toHaveBeenCalled();
     expect(urlInterpolationService.getStaticImageUrl).toHaveBeenCalled();
-    expect(
-      classroomBackendApiService.fetchClassroomPromosAreEnabledStatusAsync)
-      .toHaveBeenCalled();
     expect(translateService.onLangChange.subscribe).toHaveBeenCalled();
     expect(userService.getUserInfoAsync).toHaveBeenCalled();
     expect(loggerService.error).toHaveBeenCalled();
