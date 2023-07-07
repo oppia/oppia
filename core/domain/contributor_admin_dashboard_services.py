@@ -451,7 +451,8 @@ def get_question_reviewer_total_stats(
 
     question_reviewer_stats = [
         get_question_reviewer_total_stats_from_model(model)
-        for model in question_reviewer_models]
+        for model in question_reviewer_models
+    ]
 
     return (
         question_reviewer_stats,
