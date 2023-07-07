@@ -83,11 +83,12 @@ def run_lighthouse_puppeteer_script(
         vid_popen: Optional[subprocess.Popen[bytes]]=None) -> None: # pylint: disable=unsubscriptable-object
 
     """Runs puppeteer script to collect dynamic urls.
+
     Args:
         vid_popen: subprocess.Popen. If not None, holds subprocess for ffmpeg
             screen recording.
     """
-    
+
     puppeteer_path = (
         os.path.join('core', 'tests', 'puppeteer', 'lighthouse_setup.js'))
     bash_command = [common.NODE_BIN_PATH, puppeteer_path]
@@ -243,15 +244,16 @@ def main(args: Optional[List[str]] = None) -> None:
         build.main(args=[])
         common.run_ng_compilation()
         run_webpack_compilation()
-    
+
     if parsed_args.record_screen:
-        # Start ffmpeg screen record via Popen
+        # Start ffmpeg screen record via Popen.
         dir_path = os.path.join(os.getcwd(), '..', '..', 'webdriverio-video/')
         os.mkdir(dir_path)
         video_path = os.path.join(dir_path, 'lhci.mp4')
-        vid_popen = subprocess.Popen(['ffmpeg', '-framerate', '25', '-f',
-                                'x11grab', '-i', ':0', video_path])
-        
+        vid_popen = subprocess.Popen([
+            'ffmpeg', '-framerate', '25', '-f',
+            'x11grab', '-i', ':0', video_path])
+
     with contextlib.ExitStack() as stack:
         stack.enter_context(servers.managed_redis_server())
         stack.enter_context(servers.managed_elasticsearch_dev_server())
