@@ -391,7 +391,6 @@ export class GraphVizComponent implements OnInit, AfterViewInit {
   // function to clear bits of this.state
   // (e.g. currentlyDraggedVertex, addEdgeVertex).
 
-  // ---- Vertex events ----
   onClickVertex(index: number): void {
     if (this.state.currentMode === this._MODES.DELETE) {
       if (this.canDeleteVertex) {
@@ -403,25 +402,20 @@ export class GraphVizComponent implements OnInit, AfterViewInit {
         this.canEditVertexLabel) {
       this.beginEditVertexLabel(index);
     }
-    if (this.isMobile) {
-      this.state.hoveredVertex = index;
-      if (this.state.addEdgeVertex === null &&
-          this.state.currentlyDraggedVertex === null) {
-        this.onTouchInitialVertex(index);
+  
+    if (this.state.addEdgeVertex === null &&
+        this.state.currentlyDraggedVertex === null) {
+      this.onInitialVertex(index);
+    } else {
+      if (this.state.addEdgeVertex === index) {
+        this.onSameVertexClick(index);
       } else {
-        if (this.state.addEdgeVertex === index) {
-          this.state.hoveredVertex = null;
-          this.helpText =
-            'I18N_INTERACTIONS_GRAPH_EDGE_INITIAL_HELPTEXT';
-          this.state.addEdgeVertex = null;
-          return;
-        }
-        this.onTouchFinalVertex(index);
+        this.onFinalVertex(index);
       }
     }
   }
-
-  onTouchInitialVertex(index: number): void {
+  
+  onInitialVertex(index: number): void {
     if (this.state.currentMode === this._MODES.ADD_EDGE) {
       if (this.canAddEdge) {
         this.beginAddEdge(index);
@@ -434,11 +428,16 @@ export class GraphVizComponent implements OnInit, AfterViewInit {
       }
     }
   }
-
-  onTouchFinalVertex(index: number): void {
+  
+  onSameVertexClick(index: number): void {
+    this.state.hoveredVertex = null;
+    this.helpText = 'I18N_INTERACTIONS_GRAPH_EDGE_INITIAL_HELPTEXT';
+    this.state.addEdgeVertex = null;
+  }
+  
+  onFinalVertex(index: number): void {
     if (this.state.currentMode === this._MODES.ADD_EDGE) {
-      this.tryAddEdge(
-        this.state.addEdgeVertex, index);
+      this.tryAddEdge(this.state.addEdgeVertex, index);
       this.endAddEdge();
       this.state.hoveredVertex = null;
       this.helpText = 'I18N_INTERACTIONS_GRAPH_EDGE_INITIAL_HELPTEXT';
@@ -446,11 +445,72 @@ export class GraphVizComponent implements OnInit, AfterViewInit {
       if (this.state.currentlyDraggedVertex !== null) {
         this.endDragVertex();
         this.state.hoveredVertex = null;
-        this.helpText =
-          'I18N_INTERACTIONS_GRAPH_MOVE_INITIAL_HELPTEXT';
+        this.helpText = 'I18N_INTERACTIONS_GRAPH_MOVE_INITIAL_HELPTEXT';
       }
     }
   }
+  
+
+  // ---- Vertex events ----
+  // onClickVertex(index: number): void {
+  //   if (this.state.currentMode === this._MODES.DELETE) {
+  //     if (this.canDeleteVertex) {
+  //       this.deleteVertex(index);
+  //     }
+  //   }
+  //   if (this.state.currentMode !== this._MODES.DELETE &&
+  //       this.graph.isLabeled &&
+  //       this.canEditVertexLabel) {
+  //     this.beginEditVertexLabel(index);
+  //   }
+  //   if (this.isMobile) {
+  //     this.state.hoveredVertex = index;
+  //     if (this.state.addEdgeVertex === null &&
+  //         this.state.currentlyDraggedVertex === null) {
+  //       this.onTouchInitialVertex(index);
+  //     } else {
+  //       if (this.state.addEdgeVertex === index) {
+  //         this.state.hoveredVertex = null;
+  //         this.helpText =
+  //           'I18N_INTERACTIONS_GRAPH_EDGE_INITIAL_HELPTEXT';
+  //         this.state.addEdgeVertex = null;
+  //         return;
+  //       }
+  //       this.onTouchFinalVertex(index);
+  //     }
+  //   }
+  // }
+
+  // onTouchInitialVertex(index: number): void {
+  //   if (this.state.currentMode === this._MODES.ADD_EDGE) {
+  //     if (this.canAddEdge) {
+  //       this.beginAddEdge(index);
+  //       this.helpText = 'I18N_INTERACTIONS_GRAPH_EDGE_FINAL_HELPTEXT';
+  //     }
+  //   } else if (this.state.currentMode === this._MODES.MOVE) {
+  //     if (this.canMoveVertex) {
+  //       this.beginDragVertex(index);
+  //       this.helpText = 'I18N_INTERACTIONS_GRAPH_MOVE_FINAL_HELPTEXT';
+  //     }
+  //   }
+  // }
+
+  // onTouchFinalVertex(index: number): void {
+  //   if (this.state.currentMode === this._MODES.ADD_EDGE) {
+  //     this.tryAddEdge(
+  //       this.state.addEdgeVertex, index);
+  //     this.endAddEdge();
+  //     this.state.hoveredVertex = null;
+  //     this.helpText = 'I18N_INTERACTIONS_GRAPH_EDGE_INITIAL_HELPTEXT';
+  //   } else if (this.state.currentMode === this._MODES.MOVE) {
+  //     if (this.state.currentlyDraggedVertex !== null) {
+  //       this.endDragVertex();
+  //       this.state.hoveredVertex = null;
+  //       this.helpText =
+  //         'I18N_INTERACTIONS_GRAPH_MOVE_INITIAL_HELPTEXT';
+  //     }
+  //   }
+  // }
 
   onMousedownVertex(index: number): void {
     if (this.isMobile) {
