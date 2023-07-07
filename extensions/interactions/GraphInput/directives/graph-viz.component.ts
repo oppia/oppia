@@ -402,7 +402,7 @@ export class GraphVizComponent implements OnInit, AfterViewInit {
         this.canEditVertexLabel) {
       this.beginEditVertexLabel(index);
     }
-  
+
     if (this.state.addEdgeVertex === null &&
         this.state.currentlyDraggedVertex === null) {
       this.onInitialVertex(index);
@@ -414,7 +414,7 @@ export class GraphVizComponent implements OnInit, AfterViewInit {
       }
     }
   }
-  
+
   onInitialVertex(index: number): void {
     if (this.state.currentMode === this._MODES.ADD_EDGE) {
       if (this.canAddEdge) {
@@ -428,13 +428,13 @@ export class GraphVizComponent implements OnInit, AfterViewInit {
       }
     }
   }
-  
+
   onSameVertexClick(index: number): void {
     this.state.hoveredVertex = null;
     this.helpText = 'I18N_INTERACTIONS_GRAPH_EDGE_INITIAL_HELPTEXT';
     this.state.addEdgeVertex = null;
   }
-  
+
   onFinalVertex(index: number): void {
     if (this.state.currentMode === this._MODES.ADD_EDGE) {
       this.tryAddEdge(this.state.addEdgeVertex, index);
@@ -449,7 +449,7 @@ export class GraphVizComponent implements OnInit, AfterViewInit {
       }
     }
   }
-  
+
 
   // ---- Vertex events ----
   // onClickVertex(index: number): void {

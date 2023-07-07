@@ -285,9 +285,11 @@ export class InteractiveImageClickInput implements OnInit, OnDestroy {
     const imageRect = image.getBoundingClientRect();
     const imageStyles = window.getComputedStyle(image);
 
-    if(event instanceof MouseEvent){
-      this.dotCoordinateX = event.clientX - imageRect.left + parseFloat(imageStyles.marginLeft) + 8;
-      this.dotCoordinateY = event.clientY - imageRect.top + parseFloat(imageStyles.marginTop) + 8;
+    if (event instanceof MouseEvent) {
+      this.dotCoordinateX = 
+       event.clientX - imageRect.left + parseFloat(imageStyles.marginLeft) + 8;
+      this.dotCoordinateY = 
+       event.clientY - imageRect.top + parseFloat(imageStyles.marginTop) + 8;
     }
 
     dot.style.top = this.dotCoordinateY + 'px';
@@ -303,7 +305,7 @@ export class InteractiveImageClickInput implements OnInit, OnDestroy {
     if (!this.interactionIsActive) {
       return;
     }
-    this.updateDotPosition(event)
+    this.updateDotPosition(event);
     this.currentlyHoveredRegions = [];
     this.updateCurrentlyHoveredRegions();
   }
@@ -334,10 +336,9 @@ export class InteractiveImageClickInput implements OnInit, OnDestroy {
         this.dotCoordinateY += stepSize;
         break;
       case 'Enter':
-        this.onClickImage()
+        this.onClickImage();
         break;
     }
-    
     this.updateDotPosition(event);
 
     this.currentlyHoveredRegions = [];
