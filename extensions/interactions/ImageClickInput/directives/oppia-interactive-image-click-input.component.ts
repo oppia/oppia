@@ -286,9 +286,9 @@ export class InteractiveImageClickInput implements OnInit, OnDestroy {
     const imageStyles = window.getComputedStyle(image);
 
     if (event instanceof MouseEvent) {
-      this.dotCoordinateX = 
+      this.dotCoordinateX =
        event.clientX - imageRect.left + parseFloat(imageStyles.marginLeft) + 8;
-      this.dotCoordinateY = 
+      this.dotCoordinateY =
        event.clientY - imageRect.top + parseFloat(imageStyles.marginTop) + 8;
     }
 
@@ -319,7 +319,7 @@ export class InteractiveImageClickInput implements OnInit, OnDestroy {
       answer, this.imageClickInputRulesService);
   }
 
-  handleKeyDown = (event: KeyboardEvent) => {
+  handleKeyDown = (event: KeyboardEvent): void => {
     const stepSize = 10;
 
     switch (event.key) {
