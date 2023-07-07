@@ -545,7 +545,7 @@ ES_USERNAME = None
 # redis.conf.
 # TODO(#18260): Change this when we permanently move to the Dockerized Setup.
 # For the developers who want to use the docker setup,
-# they need to set the 'localhost' below to 'redis'
+# they need to set the 'localhost' below to 'redis'.
 REDISHOST = 'localhost'
 REDISPORT = 6379
 
