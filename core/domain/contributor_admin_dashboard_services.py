@@ -396,7 +396,8 @@ def get_question_submitter_total_stats(
 
     question_submitter_stats = [
         get_question_submitter_total_stats_from_model(model)
-        for model in question_submitter_models]
+        for model in question_submitter_models
+    ]
 
     return (
         question_submitter_stats,
