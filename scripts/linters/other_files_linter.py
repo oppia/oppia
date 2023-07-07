@@ -66,7 +66,7 @@ _DEPENDENCY_SOURCE_PACKAGE: Final = 'package.json'
 
 WORKFLOWS_DIR: Final = os.path.join(os.getcwd(), '.github', 'workflows')
 WORKFLOW_FILENAME_REGEX: Final = r'\.(yaml)|(yml)$'
-GIT_COMMIT_HASH_REGEX: Final = r'^git+https://github.com/.*#(.*)'
+GIT_COMMIT_HASH_REGEX: Final = r'^git\+https:\/\/github\.com\/.*#(.*)$'
 MERGE_STEP: Final = {'uses': './.github/actions/merge'}
 WORKFLOWS_EXEMPT_FROM_MERGE_REQUIREMENT: Final = (
     'backend_tests.yml',
