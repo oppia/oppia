@@ -81,10 +81,6 @@ services:
         condition: service_healthy
       webpack-compiler:
         condition: service_healthy
-      firebase:
-        condition: service_healthy
-      redis:  
-        condition: service_healthy
     healthcheck:
       test: curl -f http://localhost:8181/ || exit 1
       timeout: 10s
@@ -188,7 +184,9 @@ services:
       - ES_PATH_CONF=/usr/share/elasticsearch/config
       - discovery.type=single-node
     depends_on:
-      datastore:
+      angular-build:
+        condition: service_healthy
+      webpack-compiler:
         condition: service_healthy
     healthcheck:
       test: curl -f http://localhost:9200/ || exit 1

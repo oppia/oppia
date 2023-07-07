@@ -533,8 +533,6 @@ VALID_MAILCHIMP_FIELD_KEYS = ['NAME']
 # Valid Mailchimp tags.
 VALID_MAILCHIMP_TAGS = ['Account', 'Android', 'Web']
 
-# TODO(#18260): Change this when we permanently move to the Dockerized Setup.
-ES_HOST = 'localhost'
 ES_LOCALHOST_PORT = 9200
 # NOTE TO RELEASE COORDINATORS: Replace this with the correct ElasticSearch
 # auth information during deployment.
