@@ -33,6 +33,7 @@ export enum FeatureNames {
   SerialChapterLaunchCurriculumAdminView =
   'serial_chapter_launch_curriculum_admin_view',
   ShowTranslationSize = 'show_translation_size',
+  ShowRedesignedLearnerDashboard = 'show_redesigned_learner_dashboard',
   IsImprovementsTabEnabled = 'is_improvements_tab_enabled',
   LearnerGroupsAreEnabled = 'learner_groups_are_enabled'
 }
