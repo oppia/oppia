@@ -194,8 +194,11 @@ def update_feature_flag(
         raise FeatureFlagNotFoundException(
             'Unknown feature flag: %s.' % feature_name)
 
+    # The default value of a feature flag is always False and that
+    # is why we are explicitly passing default_value as False.
     registry.Registry.update_platform_parameter(
-        feature_name, committer_id, commit_message, new_rules)
+        feature_name, committer_id, commit_message, new_rules,
+        default_value=False)
 
 
 def get_server_mode() -> platform_parameter_domain.ServerMode:

@@ -194,8 +194,7 @@ class Registry:
         committer_id: str,
         commit_message: str,
         new_rules: List[platform_parameter_domain.PlatformParameterRule],
-        default_value: Optional[
-            platform_parameter_domain.PlatformDataTypes] = None
+        default_value: platform_parameter_domain.PlatformDataTypes
     ) -> None:
         """Updates the platform parameter with new rules.
 
@@ -213,8 +212,6 @@ class Registry:
         # Create a temporary param instance with new rules for validation,
         # if the new rules are invalid, an exception will be raised in
         # validate() method.
-        if default_value is None:
-            default_value = param.default_value
         new_rule_dicts = [rules.to_dict() for rules in new_rules]
         param_dict = param.to_dict()
         param_dict['rules'] = new_rule_dicts

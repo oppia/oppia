@@ -339,7 +339,7 @@ class PlatformParameterFilter:
         Raises:
             Exception. Given operator is not supported.
         """
-        if self._type in {'platform_type', 'browser_type'} and op != '=':
+        if self._type in ('platform_type', 'browser_type') and op != '=':
             raise Exception(
                 'Unsupported comparison operator \'%s\' for %s filter, '
                 'expected one of %s.' % (
