@@ -35,6 +35,7 @@
     </div>
   </div>
 
+
   <div tabindex="0" class="topic-suggested-for-you shivam">
     <p class="suggested-for-you-heading" [innerHTML]="'I18N_LEARNER_DASHBOARD_LEARN_SOMETHING_NEW_SECTION' | translate">
     </p>
@@ -45,8 +46,8 @@
         </div>
       </div>
     </div> -->
-    <div class="search-container">
-     <div class="search">
+    <div class="oppia-learner-dashboard-search-container">
+     <div class="oppia-learner-dashboard-search-section">
       <oppia-search-bar [enableDropup]="false" [learnerDashboardSearch]="true"></oppia-search-bar>
      </div>
     </div>
@@ -68,8 +69,61 @@
         </a>
       </div>
     </div>
+    <div class="community-lessons-playlist-section playlist" *ngIf="totalLessonsInPlaylist.length !== 0">
+      <div class="summary-container">
+        <oppia-carousel-bar [carouselClassname]="'.playlist '">
+          <div *ngFor="let summaryTile of displayLessonsInPlaylist" class="oppia-summary-tile-container"
+            (mouseenter)="summaryTile.toggle = !summaryTile.toggle"
+            (mouseleave)="summaryTile.toggle = !summaryTile.toggle">
+  
+            <div *ngIf="getTileType(summaryTile) === 'exploration'">
+              <i class="remove-icon fa fa-times"
+              *ngIf="summaryTile.toggle || windowIsNarrow"
+              aria-hidden="true"
+              (click)="openRemoveActivityModal('I18N_LEARNER_DASHBOARD_PLAYLIST_SECTION', 'I18N_DASHBOARD_EXPLORATIONS', summaryTile)"
+                ngbTooltip="Remove"
+                container="body"
+                placement="top">
+              </i>
+              <oppia-exploration-summary-tile
+                [explorationId]="summaryTile.id"
+                [explorationTitle]="summaryTile.title"
+                [objective]="summaryTile.objective" 
+                [category]="summaryTile.category"
+                [displayAreaIsLearnerDashboard]="true" 
+                [thumbnailIconUrl]="summaryTile.thumbnailIconUrl"
+                [thumbnailBgColor]="summaryTile.thumbnailBgColor">
+              </oppia-exploration-summary-tile>
+            </div>
+            <div *ngIf="getTileType(summaryTile) === 'collection'">
+              <i class="remove-icon fa fa-times" 
+              *ngIf="summaryTile.toggle || windowIsNarrow" 
+              aria-hidden="true"
+              (click)="openRemoveActivityModal('I18N_LEARNER_DASHBOARD_PLAYLIST_SECTION', 'I18N_DASHBOARD_COLLECTIONS', summaryTile)"
+                ngbTooltip="Remove" 
+                container="body" 
+                placement="top">
+              </i>
+              <oppia-collection-summary-tile 
+                [getCollectionId]="summaryTile.id" 
+                [getCollectionTitle]="summaryTile.title"
+                [getLastUpdatedMsec]="summaryTile.lastUpdatedMsec" 
+                [getObjective]="summaryTile.objective"
+                [getNodeCount]="summaryTile.nodeCount" 
+                [getCategory]="summaryTile.category"
+                [getThumbnailIconUrl]="summaryTile.thumbnailIconUrl" 
+                [getThumbnailBgColor]="summaryTile.thumbnailBgColor">
+              </oppia-collection-summary-tile>
+            </div>
+          </div>
+        </oppia-carousel-bar>
+      </div>
+    </div>
   </div>
-
+ 
+  <div class="shreeram">
+ shreeram
+  </div>
 
   <!-- <div tabindex="0" class="topic-suggested-for-you subhash">
     <p class="suggested-for-you-heading" [innerHTML]="'I18N_LEARNER_DASHBOARD_LEARN_SOMETHING_NEW_SECTION' | translate">
@@ -103,62 +157,4 @@
       </p>
     </div>
   </div> -->
-  <div class="playlist-section" *ngIf="totalLessonsInPlaylist.length !== 0">
-    <div class="summary-container">
-      <oppia-carousel-bar>
-        <div *ngFor="let summaryTile of displayLessonsInPlaylist" class="oppia-summary-tile-container"
-          (mouseenter)="summaryTile.toggle = !summaryTile.toggle"
-          (mouseleave)="summaryTile.toggle = !summaryTile.toggle">
-
-          <div *ngIf="getTileType(summaryTile) === 'exploration'">
-            <i class="remove-icon fa fa-times"
-            *ngIf="summaryTile.toggle || windowIsNarrow"
-            aria-hidden="true"
-            (click)="openRemoveActivityModal('I18N_LEARNER_DASHBOARD_PLAYLIST_SECTION', 'I18N_DASHBOARD_EXPLORATIONS', summaryTile)"
-              ngbTooltip="Remove"
-              container="body"
-              placement="top">
-            </i>
-            <oppia-exploration-summary-tile
-              [explorationId]="summaryTile.id"
-              [explorationTitle]="summaryTile.title"
-              [objective]="summaryTile.objective" 
-              [category]="summaryTile.category"
-              [displayAreaIsLearnerDashboard]="true" 
-              [thumbnailIconUrl]="summaryTile.thumbnailIconUrl"
-              [thumbnailBgColor]="summaryTile.thumbnailBgColor">
-            </oppia-exploration-summary-tile>
-          </div>
-          <div *ngIf="getTileType(summaryTile) === 'collection'">
-            <i class="remove-icon fa fa-times" 
-            *ngIf="summaryTile.toggle || windowIsNarrow" 
-            aria-hidden="true"
-            (click)="openRemoveActivityModal('I18N_LEARNER_DASHBOARD_PLAYLIST_SECTION', 'I18N_DASHBOARD_COLLECTIONS', summaryTile)"
-              ngbTooltip="Remove" 
-              container="body" 
-              placement="top">
-            </i>
-            <oppia-collection-summary-tile 
-              [getCollectionId]="summaryTile.id" 
-              [getCollectionTitle]="summaryTile.title"
-              [getLastUpdatedMsec]="summaryTile.lastUpdatedMsec" 
-              [getObjective]="summaryTile.objective"
-              [getNodeCount]="summaryTile.nodeCount" 
-              [getCategory]="summaryTile.category"
-              [getThumbnailIconUrl]="summaryTile.thumbnailIconUrl" 
-              [getThumbnailBgColor]="summaryTile.thumbnailBgColor">
-            </oppia-collection-summary-tile>
-          </div>
-        </div>
-      </oppia-carousel-bar>
-    </div>
-  </div>
 </div>
-
-<style>
-  .search {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
-</style>

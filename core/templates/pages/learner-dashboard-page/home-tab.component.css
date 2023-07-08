@@ -31,8 +31,9 @@
   display: inline-block;
   padding-right: 20px;
 }
-.home-tab .suggested-for-you .untracked-topics {
-  width: fit-content;
+.home-tab .topic-suggested-for-you .untracked-topics {
+  /* width: fit-content; */
+  margin-bottom: 24px;
 }
 .home-tab .continue-where-you-left-off .continue-where-you-left-off-heading,
 .home-tab .suggested-for-you .suggested-for-you-heading,
@@ -99,25 +100,23 @@
   padding-right: 30px;
   width: 228px;
 }
-.home-tab .playlist-section {
+.home-tab .community-lessons-playlist-section {
   background-color: #fff;
   border-radius: 4px;
-  box-shadow: 0 0 4px #0000001a;
-  margin-bottom: 25px;
   min-height: 215px;
   opacity: 1;
-  padding: 0 0 30px 0;
+  /* padding: 16px; */
   width: auto;
 }
-.home-tab .playlist-section .summary-container {
+.home-tab .community-lessons-playlist-section .summary-container {
   margin: auto;
   width: auto;
 }
-.home-tab .playlist-section .oppia-summary-tile-container {
+.home-tab .community-lessons-playlist-section .oppia-summary-tile-container {
   display: inline-block;
-  padding: 0 10px 30px 0;
+  /* padding: 0 10px 30px 0; */
 }
-.home-tab .playlist-section .remove-icon {
+.home-tab .community-lessons-playlist-section .remove-icon {
   color: white;
   float: right;
   font-size: 20px;
@@ -133,6 +132,12 @@
   display: flex;
   justify-content: center;
 }
+.home-tab .oppia-learner-dashboard-search-section {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
 @media screen and (max-width: 1200px) {
   .home-tab .greeting {
     margin-left: 0;
@@ -158,6 +163,9 @@
   .home-tab .continue-where-you-left-off .continue-where-you-left-off-scroll::-webkit-scrollbar:horizontal,
   .home-tab .suggested-for-you .topic-summary-tile-scroll::-webkit-scrollbar:horizontal {
     height: 5px;
+  }
+  .home-tab .untracked-topics {
+    margin-bottom: 20px;
   }
 }
 @media screen and (max-width: 767px) {
@@ -192,6 +200,12 @@
   .home-tab .suggested-for-you .topic-summary-tile-scroll {
     overflow: scroll;
     width: 305px;
+  }
+  .home-tab .oppia-learner-dashboard-search-container {
+    margin-bottom: 45px;
+  }
+  .home-tab .untracked-topics {
+    margin-bottom: 32px;
   }
 }
 @media screen and (min-width: 768px) and (max-width: 1000px) {
