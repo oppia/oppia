@@ -246,7 +246,7 @@ def main(args: Optional[List[str]] = None) -> None:
         run_webpack_compilation()
 
     if parsed_args.record_screen:
-        dir_path = os.path.join(os.getcwd(), '..', '..', 'webdriverio-video/')
+        dir_path = os.path.join(os.getcwd(), '..', 'ffmpeg-video/')
         os.mkdir(dir_path)
         video_path = os.path.join(dir_path, 'lhci.mp4')
         print('Starting ffmpeg for screen recording.')

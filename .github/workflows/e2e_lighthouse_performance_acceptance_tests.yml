@@ -280,18 +280,12 @@ jobs:
         run: xvfb-run -a --server-args="-screen 0, 1285x1000x24" python -m scripts.run_lighthouse_tests --mode performance --shard ${{ matrix.shard }} --skip_build --record_screen
         env:
           VIDEO_RECORDING_IS_ENABLED: 0
-      - name: Uploading webdriverio-video as Artifacts
+      - name: Uploading ffmpeg video as Artifacts
         # if: ${{ failure() }}
         uses: actions/upload-artifact@v3
         with: 
-          name: webdriverio-video
-          path: /home/runner/work/oppia/webdriverio-video
-      - name: Uploading webpack bundles as an artifact
-        # if: ${{ failure() }}
-        uses: actions/upload-artifact@v3
-        with:
-          name: webpack-bundles
-          path: /home/runner/work/oppia/oppia/build
+          name: ffmpeg-video
+          path: /home/runner/work/oppia/ffmpeg-video
       - name: Report failure if failed on oppia/oppia develop branch
         if: ${{ failure() && github.event_name == 'push' && github.repository == 'oppia/oppia' && github.ref == 'refs/heads/develop'}}
         uses: ./.github/actions/send-webhook-notification
