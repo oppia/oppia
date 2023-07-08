@@ -70,11 +70,6 @@ export interface ModelsRelatedToUserBackendResponse {
   'related_models_exist': boolean;
 }
 
-export interface SignupEmailContent {
-  'html_body': string;
-  'subject': string;
-}
-
 export interface ClassroomPageData {
   'name': string;
   'topic_ids': string[];
@@ -107,7 +102,6 @@ export interface ConfigPropertyValues {
   'notify_admins_suggestions_waiting_too_long_is_enabled': boolean;
   'oppia_csrf_secret': string;
   'record_playthrough_probability': number;
-  'signup_email_content': SignupEmailContent;
   'unpublish_exploration_email_html_body': string;
 }
 

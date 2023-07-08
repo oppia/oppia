@@ -190,17 +190,26 @@ _PLACEHOLDER_HTML_BODY: Final = (
     'THIS IS A <b>PLACEHOLDER</b> AND SHOULD BE REPLACED.'
 )
 
-SIGNUP_EMAIL_CONTENT: config_domain.ConfigProperty = (
-    config_domain.ConfigProperty(
-        'signup_email_content', EMAIL_CONTENT_SCHEMA,
+SIGNUP_EMAIL_SUBJECT_CONTENT: platform_parameter_domain.PlatformParameter = (
+    Registry.create_platform_parameter(
+        platform_parameter_list.ParamNames.SIGNUP_EMAIL_SUBJECT_CONTENT,
+        'Content of email sent after a new user signs up. Set the email '
+        'subject. These emails are only sent if the functionality is enabled in '
+        'feconf.py.',
+        platform_parameter_domain.DataTypes.STRING,
+        default=_PLACEHOLDER_SUBJECT
+    )
+)
+
+SIGNUP_EMAIL_BODY_CONTENT: platform_parameter_domain.PlatformParameter = (
+    Registry.create_platform_parameter(
+        platform_parameter_list.ParamNames.SIGNUP_EMAIL_BODY_CONTENT,
         'Content of email sent after a new user signs up. (The email body '
         'should be written with HTML and not include a salutation or footer.) '
         'These emails are only sent if the functionality is enabled in '
         'feconf.py.',
-        {
-            'subject': _PLACEHOLDER_SUBJECT,
-            'html_body': _PLACEHOLDER_HTML_BODY,
-        }
+        platform_parameter_domain.DataTypes.STRING,
+        default=_PLACEHOLDER_HTML_BODY
     )
 )
 
@@ -805,32 +814,43 @@ def send_post_signup_email(
         test_for_duplicate_email: bool. For testing duplicate emails.
     """
 
+    email_subject_content = (
+        platform_feature_services.get_platform_parameter_value(
+            SIGNUP_EMAIL_SUBJECT_CONTENT.name)
+    )
+    email_body_content = (
+        platform_feature_services.get_platform_parameter_value(
+            SIGNUP_EMAIL_BODY_CONTENT.name)
+    )
     if not test_for_duplicate_email:
-        for key, content in SIGNUP_EMAIL_CONTENT.value.items():
-            email_content_default_value = SIGNUP_EMAIL_CONTENT.default_value
-            # Here, we used assert to narrow down the type from various allowed
-            # default types to Dict[str, str] and we are sure that it is always
-            # going to be Dict type because at the time of initialization of
-            # SIGNUP_EMAIL_CONTENT we are providing Dict as a default value.
-            assert isinstance(email_content_default_value, dict)
-            if content == email_content_default_value[key]:
-                logging.error(
-                    'Please ensure that the value for the admin config '
-                    'property SIGNUP_EMAIL_CONTENT is set, before allowing '
-                    'post-signup emails to be sent.')
-                return
+        email_subject_content_default_value = (
+            SIGNUP_EMAIL_SUBJECT_CONTENT.default_value)
+        email_body_content_default_value = (
+            SIGNUP_EMAIL_BODY_CONTENT.default_value)
+        if email_subject_content_default_value == email_subject_content:
+            logging.error(
+                'Please ensure that the value for the admin platform '
+                'property SIGNUP_EMAIL_SUBJECT_CONTENT is set, before allowing '
+                'post-signup emails to be sent.'
+            )
+            return
+        if email_body_content_default_value == email_body_content:
+            logging.error(
+                'Please ensure that the value for the admin platform '
+                'property SIGNUP_EMAIL_BODY_CONTENT is set, before allowing '
+                'post-signup emails to be sent.'
+            )
+            return
 
     recipient_username = user_services.get_username(user_id)
-    email_subject = SIGNUP_EMAIL_CONTENT.value['subject']
     email_footer = platform_feature_services.get_platform_parameter_value(
         EMAIL_FOOTER.name)
     email_body = 'Hi %s,<br><br>%s<br><br>%s' % (
-        recipient_username, SIGNUP_EMAIL_CONTENT.value['html_body'],
-        email_footer)
+        recipient_username, email_body_content, email_footer)
 
     _send_email(
         user_id, feconf.SYSTEM_COMMITTER_ID, feconf.EMAIL_INTENT_SIGNUP,
-        email_subject, email_body, feconf.NOREPLY_EMAIL_ADDRESS)
+        email_subject_content, email_body, feconf.NOREPLY_EMAIL_ADDRESS)
 
 
 def get_moderator_unpublish_exploration_email() -> str:

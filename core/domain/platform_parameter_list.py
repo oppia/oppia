@@ -59,6 +59,8 @@ class ParamNames(enum.Enum):
         'high_bounce_rate_task_minimum_exploration_starts')
     EMAIL_SENDER_NAME = 'email_sender_name'
     EMAIL_FOOTER = 'email_footer'
+    SIGNUP_EMAIL_SUBJECT_CONTENT = 'signup_email_subject_content'
+    SIGNUP_EMAIL_BODY_CONTENT = 'signup_email_body_content'
 
 
 # Platform parameters should all be defined below.

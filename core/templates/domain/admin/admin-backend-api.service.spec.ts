@@ -118,10 +118,6 @@ describe('Admin backend api service', () => {
     notify_admins_suggestions_waiting_too_long_is_enabled: false,
     oppia_csrf_secret: 'H62T5aIngXb1PB6arDkFrAnxakpQ=',
     record_playthrough_probability: 0.2,
-    signup_email_content: {
-      subject: 'THIS IS A PLACEHOLDER.',
-      html_body: 'THIS IS A <b>PLACEHOLDER</b> AND SHOULD BE REPLACED.'
-    },
     unpublish_exploration_email_html_body: 'test'
   };
 

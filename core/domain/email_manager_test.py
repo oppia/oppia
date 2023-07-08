@@ -590,12 +590,10 @@ class SignupEmailTests(test_utils.EmailTestBase):
         self.new_footer = (
             'Unsubscribe from emails at your '
             '<a href="https://www.site.com/prefs">Preferences page</a>.')
-        self.new_email_content = {
-            'subject': 'Welcome!',
-            'html_body': (
-                'Here is some HTML text.<br>'
-                'With a <b>bold</b> bit and an <i>italic</i> bit.<br>')
-        }
+        self.new_email_subject_content = 'Welcome!'
+        self.new_email_body_content = (
+            'Here is some HTML text.<br>'
+            'With a <b>bold</b> bit and an <i>italic</i> bit.<br>')
 
         self.expected_text_email_content = (
             'Hi editor,\n'
@@ -615,6 +613,103 @@ class SignupEmailTests(test_utils.EmailTestBase):
             'Unsubscribe from emails at your '
             '<a href="https://www.site.com/prefs">Preferences page</a>.')
 
+    def _set_signup_email_content_platform_parameter(
+        self,
+        new_email_subject_content: str,
+        new_email_body_content: str
+    ) -> None:
+        """Sets email content platform parameters.
+
+        Args:
+            new_email_subject_content: str. The email subject.
+            new_email_body_content: str. The email body.
+        """
+        platform_parameter_registry.Registry.update_platform_parameter(
+            email_manager.SIGNUP_EMAIL_SUBJECT_CONTENT.name,
+            self.admin_id,
+            'Updating email subject.',
+            [
+                platform_parameter_domain.PlatformParameterRule.from_dict({
+                    'filters': [
+                        {
+                            'type': 'server_mode',
+                            'conditions': [
+                                [
+                                    '=',
+                                    (
+                                        platform_parameter_domain.
+                                        ServerMode.DEV.value
+                                    )
+                                ]
+                            ],
+                        }
+                    ],
+                    'value_when_matched': new_email_subject_content
+                })
+            ],
+            email_manager.SIGNUP_EMAIL_SUBJECT_CONTENT.default_value
+        )
+        platform_parameter_registry.Registry.update_platform_parameter(
+            email_manager.SIGNUP_EMAIL_BODY_CONTENT.name,
+            self.admin_id,
+            'Updating email body.',
+            [
+                platform_parameter_domain.PlatformParameterRule.from_dict({
+                    'filters': [
+                        {
+                            'type': 'server_mode',
+                            'conditions': [
+                                [
+                                    '=',
+                                    (
+                                        platform_parameter_domain.
+                                        ServerMode.DEV.value
+                                    )
+                                ]
+                            ],
+                        }
+                    ],
+                    'value_when_matched': new_email_body_content
+                })
+            ],
+            email_manager.SIGNUP_EMAIL_BODY_CONTENT.default_value
+        )
+
+    def _reset_signup_email_content_platform_parameters(self) -> None:
+        """Resets email content platform parameters."""
+        platform_parameter_registry.Registry.update_platform_parameter(
+            email_manager.SIGNUP_EMAIL_SUBJECT_CONTENT.name,
+            self.admin_id,
+            'Resetting email subject.',
+            [],
+            email_manager.SIGNUP_EMAIL_SUBJECT_CONTENT.default_value
+        )
+        platform_parameter_registry.Registry.update_platform_parameter(
+            email_manager.SIGNUP_EMAIL_BODY_CONTENT.name,
+            self.admin_id,
+            'Resetting email body.',
+            [],
+            email_manager.SIGNUP_EMAIL_BODY_CONTENT.default_value
+        )
+
+    def _reset_the_email_platform_params_value(self) -> None:
+        """Resets the email name and footer platform parameters."""
+        platform_parameter_registry.Registry.update_platform_parameter(
+            email_manager.EMAIL_SENDER_NAME.name,
+            self.admin_id,
+            'Reset the sender name to default',
+            [],
+            email_manager.EMAIL_SENDER_NAME.default_value
+        )
+
+        platform_parameter_registry.Registry.update_platform_parameter(
+            email_manager.EMAIL_FOOTER.name,
+            self.admin_id,
+            'Reset the email footer to default',
+            [],
+            email_manager.EMAIL_FOOTER.default_value
+        )
+
     def test_email_not_sent_if_config_does_not_permit_it(self) -> None:
         swap_get_platform_parameter_value_return_email_footer = (
             self.swap_to_always_return(
@@ -626,10 +721,8 @@ class SignupEmailTests(test_utils.EmailTestBase):
         with swap_get_platform_parameter_value_return_email_footer, self.swap(
             feconf, 'CAN_SEND_EMAILS', False
         ):
-            config_services.set_property(
-                self.admin_id, email_manager.SIGNUP_EMAIL_CONTENT.name,
-                self.new_email_content)
-
+            self._set_signup_email_content_platform_parameter(
+                self.new_email_subject_content, self.new_email_body_content)
             self.login(self.EDITOR_EMAIL)
             self.get_html_response(feconf.SIGNUP_URL + '?return_url=/')
             csrf_token = self.get_new_csrf_token()
@@ -650,8 +743,9 @@ class SignupEmailTests(test_utils.EmailTestBase):
             # Check that no email was sent.
             messages = self._get_sent_email_messages(self.EDITOR_EMAIL)
             self.assertEqual(0, len(messages))
+            self._reset_signup_email_content_platform_parameters()
 
-    def test_email_not_sent_if_content_config_is_not_modified(self) -> None:
+    def test_email_not_sent_if_content_parameter_is_not_modified(self) -> None:
         can_send_emails_ctx = self.swap(feconf, 'CAN_SEND_EMAILS', True)
 
         log_new_error_counter = test_utils.CallCounter(logging.error)
@@ -684,9 +778,10 @@ class SignupEmailTests(test_utils.EmailTestBase):
                 self.assertEqual(log_new_error_counter.times_called, 1)
                 self.assertEqual(
                     logs[0],
-                    'Please ensure that the value for the admin config '
-                    'property SIGNUP_EMAIL_CONTENT is set, before allowing '
-                    'post-signup emails to be sent.')
+                    'Please ensure that the value for the admin platform '
+                    'property SIGNUP_EMAIL_SUBJECT_CONTENT is set, before '
+                    'allowing post-signup emails to be sent.'
+                )
 
                 # Check that no email was sent.
                 messages = self._get_sent_email_messages(self.EDITOR_EMAIL)
@@ -697,17 +792,31 @@ class SignupEmailTests(test_utils.EmailTestBase):
     ) -> None:
         can_send_emails_ctx = self.swap(feconf, 'CAN_SEND_EMAILS', True)
 
-        # Ruling out the possibility of any other type for mypy type checking.
-        assert isinstance(
-            email_manager.SIGNUP_EMAIL_CONTENT.default_value, dict
+        platform_parameter_registry.Registry.update_platform_parameter(
+            email_manager.SIGNUP_EMAIL_SUBJECT_CONTENT.name,
+            self.admin_id,
+            'Updating email subject.',
+            [
+                platform_parameter_domain.PlatformParameterRule.from_dict({
+                    'filters': [
+                        {
+                            'type': 'server_mode',
+                            'conditions': [
+                                [
+                                    '=',
+                                    (
+                                        platform_parameter_domain.
+                                        ServerMode.DEV.value
+                                    )
+                                ]
+                            ],
+                        }
+                    ],
+                    'value_when_matched': self.new_email_subject_content
+                })
+            ],
+            email_manager.SIGNUP_EMAIL_SUBJECT_CONTENT.default_value
         )
-        config_services.set_property(
-            self.admin_id, email_manager.SIGNUP_EMAIL_CONTENT.name, {
-                'subject': (
-                    email_manager.SIGNUP_EMAIL_CONTENT.default_value[
-                        'subject']),
-                'html_body': 'New HTML body.',
-            })
 
         log_new_error_counter = test_utils.CallCounter(logging.error)
         log_new_error_ctx = self.swap(
@@ -739,22 +848,20 @@ class SignupEmailTests(test_utils.EmailTestBase):
                 self.assertEqual(log_new_error_counter.times_called, 1)
                 self.assertEqual(
                     logs[0],
-                    'Please ensure that the value for the admin config '
-                    'property SIGNUP_EMAIL_CONTENT is set, before allowing '
-                    'post-signup emails to be sent.')
+                    'Please ensure that the value for the admin platform '
+                    'property SIGNUP_EMAIL_BODY_CONTENT is set, before '
+                    'allowing post-signup emails to be sent.'
+                )
 
                 # Check that no email was sent.
                 messages = self._get_sent_email_messages(self.EDITOR_EMAIL)
                 self.assertEqual(0, len(messages))
+        self._reset_signup_email_content_platform_parameters()
 
     def test_email_with_bad_content_is_not_sent(self) -> None:
         can_send_emails_ctx = self.swap(feconf, 'CAN_SEND_EMAILS', True)
-
-        config_services.set_property(
-            self.admin_id, email_manager.SIGNUP_EMAIL_CONTENT.name, {
-                'subject': 'New email subject',
-                'html_body': 'New HTML body.<script>alert(3);</script>',
-            })
+        self._set_signup_email_content_platform_parameter(
+            'New email subject', 'New HTML body.<script>alert(3);</script>')
 
         log_new_error_counter = test_utils.CallCounter(logging.error)
         log_new_error_ctx = self.swap(
@@ -791,29 +898,7 @@ class SignupEmailTests(test_utils.EmailTestBase):
                 # Check that no email was sent.
                 messages = self._get_sent_email_messages(self.EDITOR_EMAIL)
                 self.assertEqual(0, len(messages))
-
-    def _reset_the_email_platform_params_value(self, commiter_id: str) -> None:
-        """Resets the email platform parameters.
-
-        Args:
-            commiter_id: str. The id of the user that is resetting the platform
-                parameter.
-        """
-        platform_parameter_registry.Registry.update_platform_parameter(
-            email_manager.EMAIL_SENDER_NAME.name,
-            commiter_id,
-            'Reset the sender name to default',
-            [],
-            email_manager.EMAIL_SENDER_NAME.default_value
-        )
-
-        platform_parameter_registry.Registry.update_platform_parameter(
-            email_manager.EMAIL_FOOTER.name,
-            commiter_id,
-            'Reset the email footer to default',
-            [],
-            email_manager.EMAIL_FOOTER.default_value
-        )
+        self._reset_signup_email_content_platform_parameters()
 
     def test_contents_of_signup_email_are_correct(self) -> None:
         with self.swap(feconf, 'CAN_SEND_EMAILS', True):
@@ -867,9 +952,8 @@ class SignupEmailTests(test_utils.EmailTestBase):
                 ],
                 email_manager.EMAIL_FOOTER.default_value
             )
-            config_services.set_property(
-                self.admin_id, email_manager.SIGNUP_EMAIL_CONTENT.name,
-                self.new_email_content)
+            self._set_signup_email_content_platform_parameter(
+                self.new_email_subject_content, self.new_email_body_content)
 
             self.login(self.EDITOR_EMAIL)
             self.get_html_response(feconf.SIGNUP_URL + '?return_url=/')
@@ -899,7 +983,8 @@ class SignupEmailTests(test_utils.EmailTestBase):
             self.assertEqual(messages[0].subject, 'Welcome!')
             self.assertEqual(messages[0].body, self.expected_text_email_content)
             self.assertEqual(messages[0].html, self.expected_html_email_content)
-            self._reset_the_email_platform_params_value(self.admin_id)
+            self._reset_the_email_platform_params_value()
+            self._reset_signup_email_content_platform_parameters()
 
     def test_email_only_sent_once_for_repeated_signups_by_same_user(
         self
@@ -914,9 +999,8 @@ class SignupEmailTests(test_utils.EmailTestBase):
         with swap_get_platform_parameter_value_return_email_footer, self.swap(
             feconf, 'CAN_SEND_EMAILS', True
         ):
-            config_services.set_property(
-                self.admin_id, email_manager.SIGNUP_EMAIL_CONTENT.name,
-                self.new_email_content)
+            self._set_signup_email_content_platform_parameter(
+                self.new_email_subject_content, self.new_email_body_content)
 
             self.login(self.EDITOR_EMAIL)
             self.get_html_response(feconf.SIGNUP_URL + '?return_url=/')
@@ -956,6 +1040,7 @@ class SignupEmailTests(test_utils.EmailTestBase):
             # Check that no new email was sent.
             messages = self._get_sent_email_messages(self.EDITOR_EMAIL)
             self.assertEqual(1, len(messages))
+            self._reset_signup_email_content_platform_parameters()
 
     def test_email_only_sent_if_signup_was_successful(self) -> None:
         swap_get_platform_parameter_value_return_email_footer = (
@@ -968,9 +1053,8 @@ class SignupEmailTests(test_utils.EmailTestBase):
         with swap_get_platform_parameter_value_return_email_footer, self.swap(
             feconf, 'CAN_SEND_EMAILS', True
         ):
-            config_services.set_property(
-                self.admin_id, email_manager.SIGNUP_EMAIL_CONTENT.name,
-                self.new_email_content)
+            self._set_signup_email_content_platform_parameter(
+                self.new_email_subject_content, self.new_email_body_content)
 
             self.login(self.EDITOR_EMAIL)
             self.get_html_response(feconf.SIGNUP_URL + '?return_url=/')
@@ -1011,6 +1095,7 @@ class SignupEmailTests(test_utils.EmailTestBase):
             # Check that a new email was sent.
             messages = self._get_sent_email_messages(self.EDITOR_EMAIL)
             self.assertEqual(1, len(messages))
+            self._reset_signup_email_content_platform_parameters()
 
     def test_record_of_sent_email_is_written_to_datastore(self) -> None:
         with self.swap(feconf, 'CAN_SEND_EMAILS', True):
@@ -1064,9 +1149,8 @@ class SignupEmailTests(test_utils.EmailTestBase):
                 ],
                 email_manager.EMAIL_FOOTER.default_value
             )
-            config_services.set_property(
-                self.admin_id, email_manager.SIGNUP_EMAIL_CONTENT.name,
-                self.new_email_content)
+            self._set_signup_email_content_platform_parameter(
+                self.new_email_subject_content, self.new_email_body_content)
 
             all_models: Sequence[
                 email_models.SentEmailModel
@@ -1116,7 +1200,8 @@ class SignupEmailTests(test_utils.EmailTestBase):
             self.assertEqual(sent_email_model.subject, 'Welcome!')
             self.assertEqual(
                 sent_email_model.html_body, self.expected_html_email_content)
-            self._reset_the_email_platform_params_value(self.admin_id)
+            self._reset_the_email_platform_params_value()
+            self._reset_signup_email_content_platform_parameters()
 
 
 class DuplicateEmailTests(test_utils.EmailTestBase):

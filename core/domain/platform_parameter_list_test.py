@@ -54,7 +54,9 @@ class ExistingPlatformParameterValidityTests(test_utils.GenericTestBase):
                             'promo_bar_message',
                             'serial_chapter_launch_curriculum_admin_view',
                             'show_redesigned_learner_dashboard',
-                            'show_translation_size']
+                            'show_translation_size',
+                            'signup_email_body_content',
+                            'signup_email_subject_content']
 
     def test_all_defined_parameters_are_valid(self) -> None:
         all_names = params.Registry.get_all_platform_parameter_names()
