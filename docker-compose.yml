@@ -135,7 +135,7 @@ services:
 
   firebase:
     # node:16.13.0
-    image: node@sha256:48650ae5c5dc9fbd0d0559fd1248e779f7214ba99434420a089bc7853aeefb65
+    image: node@sha256:dfa34389d7202cbe7fa82869b9f4c6743c428e8f624136ea8b1783b7aa854fcd
     container_name: oppia-firebase-emulator
     ports:
       - "9099:9099"
@@ -161,7 +161,7 @@ services:
 
   redis:
     # redis:6.2.4
-    image: redis@sha256:aebc052b5a7f50d79f00a4deee22109e2ecf22f439140a03f2c9770055ffec7b
+    image: redis@sha256:27fd246b9b12b62eeca9f9521ef863278eb11151a5d3d6523c34585fe83df4b3
     container_name: oppia-redis
     ports:
       - "6379:6379"
