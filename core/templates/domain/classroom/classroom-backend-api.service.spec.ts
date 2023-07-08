@@ -160,51 +160,6 @@ describe('Classroom backend API service', function() {
     })
   );
 
-  it('should handle successCallback for fetch classroom page is shown status',
-    fakeAsync(() => {
-      let successHandler = jasmine.createSpy('success');
-      let failHandler = jasmine.createSpy('fail');
-
-      let service = classroomBackendApiService;
-      service.fetchClassroomPromosAreEnabledStatusAsync().then(
-        successHandler, failHandler);
-
-      let req = httpTestingController.expectOne(
-        '/classroom_promos_status_handler');
-      expect(req.request.method).toEqual('GET');
-      req.flush({classroom_promos_are_enabled: false});
-
-      flushMicrotasks();
-
-      expect(successHandler).toHaveBeenCalledWith(false);
-      expect(failHandler).not.toHaveBeenCalled();
-    })
-  );
-
-  it('should handle errorCallback for fetch classroom page is shown status',
-    fakeAsync(() => {
-      let successHandler = jasmine.createSpy('success');
-      let failHandler = jasmine.createSpy('fail');
-
-      let service = classroomBackendApiService;
-      service.fetchClassroomPromosAreEnabledStatusAsync().then(
-        successHandler, failHandler);
-
-      let req = httpTestingController.expectOne(
-        '/classroom_promos_status_handler');
-      expect(req.request.method).toEqual('GET');
-      req.flush('Invalid request', {
-        status: 400,
-        statusText: 'Invalid request'
-      });
-
-      flushMicrotasks();
-
-      expect(successHandler).not.toHaveBeenCalled();
-      expect(failHandler).toHaveBeenCalled();
-    })
-  );
-
   it('should create new classroom id', fakeAsync(() => {
     let successHandler = jasmine.createSpy('success');
     let failHandler = jasmine.createSpy('fail');
