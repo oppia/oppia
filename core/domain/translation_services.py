@@ -129,7 +129,7 @@ def _apply_changes(
     entity_translation: translation_domain.EntityTranslation,
     translation_changes: List[exp_domain.ExplorationChange]
 ) -> None:
-    """Applies the changes to the entity_translations object.
+    """Applies the changes to the entity_translation object.
 
     Args:
         entity_translation: EntityTranslation. The entity translation object.

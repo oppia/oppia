@@ -217,6 +217,7 @@ class EntityTranslationServicesTest(test_utils.GenericTestBase):
                 False
             )
         )
+
         entity_translation_models: Sequence[
             translation_models.EntityTranslationsModel
         ] = translation_models.EntityTranslationsModel.get_all().fetch()
@@ -227,6 +228,7 @@ class EntityTranslationServicesTest(test_utils.GenericTestBase):
             list(entity_translation_model.translations.keys()),
             ['content_5', 'content_6']
         )
+
         self.exp.version = 6
         change_list = [exp_domain.ExplorationChange({
             'cmd': exp_domain.CMD_REMOVE_TRANSLATIONS,
@@ -287,6 +289,7 @@ class EntityTranslationServicesTest(test_utils.GenericTestBase):
                 self.exp, change_list
             )
         )
+
         self.assertEqual(len(entity_translation_models), 1)
         entity_translation = entity_translation_models[0]
         self.assertItemsEqual(
@@ -344,6 +347,7 @@ class EntityTranslationServicesTest(test_utils.GenericTestBase):
                 self.exp, change_list
             )
         )
+
         self.assertEqual(len(entity_translation_models), 1)
         entity_translation = entity_translation_models[0]
         self.assertEqual(
@@ -399,8 +403,8 @@ class EntityTranslationServicesTest(test_utils.GenericTestBase):
                 self.exp, change_list
             )
         )
-        self.assertEqual(len(entity_translation_models), 2)
 
+        self.assertEqual(len(entity_translation_models), 2)
         self.assertTrue(
             'ar' in [et.language_code for et in entity_translation_models]
         )
@@ -414,13 +418,13 @@ class EntityTranslationServicesTest(test_utils.GenericTestBase):
                 False
             )
         )
-
         self.exp.version = 6
         change_list = [exp_domain.ExplorationChange({
             'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
             'property_name': 'title',
             'new_value': 'A new title'
         })]
+
         with self.assertRaisesRegex(
             Exception,
             'Invalid translation change cmd: edit_exploration_property'
