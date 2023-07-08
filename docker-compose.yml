@@ -19,7 +19,7 @@ services:
       timeout: 30s
       interval: 30s
       retries: 5
-      start_period: 20m
+      start_period: 5m
     # added max-old-space-size to avoid out of memory error, check this link for more info
     # https://stackoverflow.com/questions/62663167/dockerizing-react-in-production-mode-fatal-error-ineffective-mark-compacts-nea
     command: >
@@ -46,7 +46,7 @@ services:
       timeout: 30s
       interval: 30s
       retries: 5
-      start_period: 20m
+      start_period: 5m
     entrypoint: node
     command:
       - "/app/oppia/node_modules/webpack/bin/webpack.js"
@@ -86,7 +86,7 @@ services:
       timeout: 10s
       interval: 30s
       retries: 5
-      start_period: 20m
+      start_period: 7m
     entrypoint: /google-cloud-sdk/bin/dev_appserver.py
     command: 
       - "/app/oppia/app_dev_docker.yaml"
@@ -117,7 +117,7 @@ services:
       timeout: 10s
       interval: 2m
       retries: 5
-      start_period: 20m
+      start_period: 7m
     entrypoint: /google-cloud-sdk/bin/gcloud
     command:
       - "beta"
@@ -197,7 +197,7 @@ services:
       timeout: 10s
       interval: 1m
       retries: 5
-      start_period: 20m
+      start_period: 5m
     command: elasticsearch -q
 
 volumes:
