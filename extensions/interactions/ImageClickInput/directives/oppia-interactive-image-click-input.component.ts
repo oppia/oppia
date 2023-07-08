@@ -73,8 +73,8 @@ export class InteractiveImageClickInput implements OnInit, OnDestroy {
   imageContainerStyle: { height: string; width?: string };
   loadingIndicatorStyle: { height: string; width?: string };
   allRegions: LabeledRegion[];
-  dotCoordinateX: number;
-  dotCoordinateY: number;
+  dotCoordinateX: number = 0;
+  dotCoordinateY: number = 0;
   constructor(
     private assetsBackendApiService: AssetsBackendApiService,
     private contextService: ContextService,
@@ -278,7 +278,7 @@ export class InteractiveImageClickInput implements OnInit, OnDestroy {
   }
 
   updateDotPosition(event: MouseEvent | KeyboardEvent): void {
-    const dot = document.getElementById('dot') as HTMLDivElement;
+    const dot = document.querySelector('.accessibility-dot') as HTMLDivElement;
     const images = this.el.nativeElement.querySelectorAll(
       '.oppia-image-click-img');
     const image: HTMLImageElement = images[0];

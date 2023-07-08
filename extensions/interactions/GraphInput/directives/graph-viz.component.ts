@@ -84,6 +84,8 @@ export class GraphVizComponent implements OnInit, AfterViewInit {
   @Input() canEditEdgeWeight: boolean;
   @Input() interactionIsActive: boolean;
   @Input() canEditOptions: boolean;
+  dotCoordinateX: number = 0;
+  dotCoordinateY: number = 0;
 
   @Output() graphChange: EventEmitter<GraphAnswer> = new EventEmitter();
   isMobile: boolean = false;
@@ -197,6 +199,39 @@ export class GraphVizComponent implements OnInit, AfterViewInit {
     this.changeDetectorRef.detectChanges();
   }
 
+  handleKeyDown(event: KeyboardEvent) {
+    if (this.state.currentMode == 2 && !this.isButtonOnTopOfDot()) {
+      const stepSize = 10;
+
+      switch (event.key) {
+        case 'ArrowLeft':
+          event.preventDefault();
+          this.dotCoordinateX -= stepSize;
+          break;
+        case 'ArrowUp':
+          event.preventDefault();
+          this.dotCoordinateY -= stepSize;
+          break;
+        case 'ArrowRight':
+          event.preventDefault();
+          this.dotCoordinateX += stepSize;
+          break;
+        case 'ArrowDown':
+          event.preventDefault();
+          this.dotCoordinateY += stepSize;
+          break;
+        case 'Enter':
+          this.onClickGraphSVG();
+      }
+      const dot = document.querySelector('.accessibility-dot') as HTMLDivElement;
+      dot.style.top = this.dotCoordinateY + 'px';
+      dot.style.left = this.dotCoordinateX + 'px';
+    }
+    else {
+      return
+    }
+  }
+
   getEdgeColor(index: number): string {
     if (!this.interactionIsActive) {
       return this.DEFAULT_COLOR;
@@ -258,8 +293,24 @@ export class GraphVizComponent implements OnInit, AfterViewInit {
     pt.y = event.clientY;
     const svgp = pt.matrixTransform(
       this.vizContainer[0].getScreenCTM().inverse());
-    this.state.mouseX = svgp.x;
-    this.state.mouseY = svgp.y;
+      this.state.mouseX = svgp.x;
+      this.state.mouseY = svgp.y;
+    if (this.state.currentMode == 2){
+      const dot = document.querySelector('.accessibility-dot') as HTMLDivElement;
+      const graphArea = this.element.nativeElement.querySelector(
+        '.oppia-graph-viz-svg');
+      const graphAreaRect = graphArea.getBoundingClientRect();
+  
+      if (event instanceof MouseEvent) {
+        this.dotCoordinateX =
+         event.clientX - graphAreaRect.left;
+        this.dotCoordinateY =
+         event.clientY - graphAreaRect.top;
+         dot.style.top = this.dotCoordinateY + 'px';
+         dot.style.left = this.dotCoordinateX + 'px';
+      }
+  
+    }
     // We use vertexDragStartX/Y and mouseDragStartX/Y to make
     // mouse-dragging by label more natural, by moving the vertex
     // according to the difference from the original position.
@@ -277,15 +328,50 @@ export class GraphVizComponent implements OnInit, AfterViewInit {
     }
   }
 
+  isButtonOnTopOfDot() {
+    const dotElement = document.querySelector('.accessibility-dot') as HTMLDivElement;
+    const buttonElements = document.querySelectorAll('[class^="e2e-test-"][class$="-button"]');
+  
+    if (!dotElement || !buttonElements || buttonElements.length === 0) {
+      return false;
+    }
+  
+    const dotRect = dotElement.getBoundingClientRect();
+    const dotTop = dotRect.top;
+    const dotBottom = dotRect.bottom;
+    const dotLeft = dotRect.left;
+    const dotRight = dotRect.right;
+  
+    for (let i = 0; i < buttonElements.length; i++) {
+      const buttonRect = buttonElements[i].getBoundingClientRect();
+      const buttonTop = buttonRect.top;
+      const buttonBottom = buttonRect.bottom;
+      const buttonLeft = buttonRect.left;
+      const buttonRight = buttonRect.right;
+  
+      if (
+        buttonTop <= dotTop &&
+        buttonBottom >= dotBottom &&
+        buttonLeft <= dotLeft &&
+        buttonRight >= dotRight
+      ) {
+        buttonElements[i].dispatchEvent(new MouseEvent('click'));
+        return true;
+      }
+    }
+    return false;
+  }
+  
+  
   onClickGraphSVG(): void {
     if (!this.interactionIsActive) {
       return;
     }
     if (this.state.currentMode === this._MODES.ADD_VERTEX &&
-        this.canAddVertex) {
+        this.canAddVertex && !this.isButtonOnTopOfDot()) {
       this.graph.vertices.push({
-        x: this.state.mouseX,
-        y: this.state.mouseY,
+        x: this.dotCoordinateX,
+        y: this.dotCoordinateY,
         label: ''
       });
       this.graphChange.emit(this.graph);
@@ -391,6 +477,7 @@ export class GraphVizComponent implements OnInit, AfterViewInit {
   // function to clear bits of this.state
   // (e.g. currentlyDraggedVertex, addEdgeVertex).
 
+  // ---- Vertex events ----
   onClickVertex(index: number): void {
     if (this.state.currentMode === this._MODES.DELETE) {
       if (this.canDeleteVertex) {
@@ -402,20 +489,31 @@ export class GraphVizComponent implements OnInit, AfterViewInit {
         this.canEditVertexLabel) {
       this.beginEditVertexLabel(index);
     }
-
-    if (this.state.addEdgeVertex === null &&
-        this.state.currentlyDraggedVertex === null) {
-      this.onInitialVertex(index);
-    } else {
-      if (this.state.addEdgeVertex === index) {
-        this.onSameVertexClick(index);
+      this.state.hoveredVertex = index;
+      if (this.state.addEdgeVertex === null &&
+          this.state.currentlyDraggedVertex === null) {
+        this.onTouchInitialVertex(index);
       } else {
-        this.onFinalVertex(index);
+        if (this.state.addEdgeVertex === index) {
+          this.state.hoveredVertex = null;
+          this.helpText =
+            'I18N_INTERACTIONS_GRAPH_EDGE_INITIAL_HELPTEXT';
+          this.state.addEdgeVertex = null;
+          return;
+        }
+        this.onTouchFinalVertex(index);
       }
-    }
   }
 
-  onInitialVertex(index: number): void {
+  onFocusVertex(index: number): void {
+    this.state.hoveredVertex = index;
+  }
+  
+  onBlurVertex(index: number): void {
+    this.onMouseleaveVertex(index);
+  }
+
+  onTouchInitialVertex(index: number): void {
     if (this.state.currentMode === this._MODES.ADD_EDGE) {
       if (this.canAddEdge) {
         this.beginAddEdge(index);
@@ -429,15 +527,10 @@ export class GraphVizComponent implements OnInit, AfterViewInit {
     }
   }
 
-  onSameVertexClick(index: number): void {
-    this.state.hoveredVertex = null;
-    this.helpText = 'I18N_INTERACTIONS_GRAPH_EDGE_INITIAL_HELPTEXT';
-    this.state.addEdgeVertex = null;
-  }
-
-  onFinalVertex(index: number): void {
+  onTouchFinalVertex(index: number): void {
     if (this.state.currentMode === this._MODES.ADD_EDGE) {
-      this.tryAddEdge(this.state.addEdgeVertex, index);
+      this.tryAddEdge(
+        this.state.addEdgeVertex, index);
       this.endAddEdge();
       this.state.hoveredVertex = null;
       this.helpText = 'I18N_INTERACTIONS_GRAPH_EDGE_INITIAL_HELPTEXT';
@@ -445,72 +538,11 @@ export class GraphVizComponent implements OnInit, AfterViewInit {
       if (this.state.currentlyDraggedVertex !== null) {
         this.endDragVertex();
         this.state.hoveredVertex = null;
-        this.helpText = 'I18N_INTERACTIONS_GRAPH_MOVE_INITIAL_HELPTEXT';
+        this.helpText =
+          'I18N_INTERACTIONS_GRAPH_MOVE_INITIAL_HELPTEXT';
       }
     }
   }
-
-
-  // ---- Vertex events ----
-  // onClickVertex(index: number): void {
-  //   if (this.state.currentMode === this._MODES.DELETE) {
-  //     if (this.canDeleteVertex) {
-  //       this.deleteVertex(index);
-  //     }
-  //   }
-  //   if (this.state.currentMode !== this._MODES.DELETE &&
-  //       this.graph.isLabeled &&
-  //       this.canEditVertexLabel) {
-  //     this.beginEditVertexLabel(index);
-  //   }
-  //   if (this.isMobile) {
-  //     this.state.hoveredVertex = index;
-  //     if (this.state.addEdgeVertex === null &&
-  //         this.state.currentlyDraggedVertex === null) {
-  //       this.onTouchInitialVertex(index);
-  //     } else {
-  //       if (this.state.addEdgeVertex === index) {
-  //         this.state.hoveredVertex = null;
-  //         this.helpText =
-  //           'I18N_INTERACTIONS_GRAPH_EDGE_INITIAL_HELPTEXT';
-  //         this.state.addEdgeVertex = null;
-  //         return;
-  //       }
-  //       this.onTouchFinalVertex(index);
-  //     }
-  //   }
-  // }
-
-  // onTouchInitialVertex(index: number): void {
-  //   if (this.state.currentMode === this._MODES.ADD_EDGE) {
-  //     if (this.canAddEdge) {
-  //       this.beginAddEdge(index);
-  //       this.helpText = 'I18N_INTERACTIONS_GRAPH_EDGE_FINAL_HELPTEXT';
-  //     }
-  //   } else if (this.state.currentMode === this._MODES.MOVE) {
-  //     if (this.canMoveVertex) {
-  //       this.beginDragVertex(index);
-  //       this.helpText = 'I18N_INTERACTIONS_GRAPH_MOVE_FINAL_HELPTEXT';
-  //     }
-  //   }
-  // }
-
-  // onTouchFinalVertex(index: number): void {
-  //   if (this.state.currentMode === this._MODES.ADD_EDGE) {
-  //     this.tryAddEdge(
-  //       this.state.addEdgeVertex, index);
-  //     this.endAddEdge();
-  //     this.state.hoveredVertex = null;
-  //     this.helpText = 'I18N_INTERACTIONS_GRAPH_EDGE_INITIAL_HELPTEXT';
-  //   } else if (this.state.currentMode === this._MODES.MOVE) {
-  //     if (this.state.currentlyDraggedVertex !== null) {
-  //       this.endDragVertex();
-  //       this.state.hoveredVertex = null;
-  //       this.helpText =
-  //         'I18N_INTERACTIONS_GRAPH_MOVE_INITIAL_HELPTEXT';
-  //     }
-  //   }
-  // }
 
   onMousedownVertex(index: number): void {
     if (this.isMobile) {

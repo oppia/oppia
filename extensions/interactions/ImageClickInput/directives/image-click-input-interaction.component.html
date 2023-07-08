@@ -24,7 +24,7 @@
     width: 10px;
     z-index: 10;
   }
-  #dot {
+  .accessibility-dot {
     background: red;
     border: 1px solid #000;
     border-radius: 50%;
@@ -68,7 +68,7 @@
          (keydown)="handleKeyDown($event)"
          (mousemove)="onMousemoveImage($event)"
          (style)="imageContainerStyle">
-    <div id="dot" (click)="onClickImage()">
+    <div class="accessibility-dot" (click)="onClickImage()">
     </div>
     <div *ngIf="highlightRegionsOnHover">
       <div *ngFor="let region of allRegions; let idx = index"

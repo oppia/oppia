@@ -3,6 +3,7 @@
     background-color: white;
     border: 1px solid black;
     cursor: default;
+    position: relative;
   }
   .oppia-graph-button-label {
     font-family: 'Font Awesome 5 Free', Arial, sans-serif;
@@ -24,6 +25,16 @@
   .graph-viz .oppia-update-button-container {
     float: right;
     height: 35px;
+  }
+  .accessibility-dot {
+    background: red;
+    border: 1px solid #000;
+    border-radius: 50%;
+    height: 10px;
+    position: absolute;
+    transform: translate(-50%, -50%);
+    width: 10px;
+    z-index: 10;
   }
 </style>
 <div class="graph-viz">
@@ -62,10 +73,11 @@
         </ng-container>
       </svg>
 
-      <g *ngFor="let button of buttons; let idx = index">
+      <g *ngFor="let button of buttons; let idx = index" #optionButtons>
         <rect attr.class="e2e-test-{{(button.description | translate).replace(' ','-')}}-button"
               tabindex="0"
               width="140"
+              (keydown)="handleKeyDown($event)"
               height="30"
               x="10"
               attr.y="{{10 + 50 * idx}}"
@@ -147,9 +159,10 @@
         <circle attr.class="e2e-test-graph-vertex-{{idx}}"
                 (mouseenter)="state.hoveredVertex = idx"
                 (mouseleave)="onMouseleaveVertex(idx)"
+                (focus)="onFocusVertex(idx)"
+                (blur)="onBlurVertex(idx)"
                 (click)="onClickVertex(idx)"
                 (keydown.enter)="onClickVertex(idx)"
-
                 tabindex="0"
                 (mousedown)="onMousedownVertex(idx)"
                 attr.style="{{'fill: ' + getVertexColor(idx)}}"
@@ -159,6 +172,7 @@
         </circle>
       </g>
     </svg>
+    <div class="accessibility-dot" (click)="onClickGraphSVG()"  (keydown.enter)="onClickGraphSVG()" *ngIf="state.currentMode === 2">
   </div>
   <div [hidden]="isMobile">
       {{helpText | translate}}
