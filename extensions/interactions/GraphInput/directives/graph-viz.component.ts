@@ -199,7 +199,7 @@ export class GraphVizComponent implements OnInit, AfterViewInit {
     this.changeDetectorRef.detectChanges();
   }
 
-  handleKeyDown(event: KeyboardEvent) {
+  handleKeyDown(event: KeyboardEvent): void {
     if (this.state.currentMode == 2 && !this.isButtonOnTopOfDot()) {
       const stepSize = 10;
 
@@ -228,7 +228,7 @@ export class GraphVizComponent implements OnInit, AfterViewInit {
       dot.style.left = this.dotCoordinateX + 'px';
     }
     else {
-      return
+      return;
     }
   }
 
@@ -293,23 +293,23 @@ export class GraphVizComponent implements OnInit, AfterViewInit {
     pt.y = event.clientY;
     const svgp = pt.matrixTransform(
       this.vizContainer[0].getScreenCTM().inverse());
-      this.state.mouseX = svgp.x;
-      this.state.mouseY = svgp.y;
-    if (this.state.currentMode == 2){
-      const dot = document.querySelector('.accessibility-dot') as HTMLDivElement;
+    this.state.mouseX = svgp.x;
+    this.state.mouseY = svgp.y;
+    if (this.state.currentMode === 2) {
+      const dot = document.querySelector(
+        '.accessibility-dot') as HTMLDivElement;
       const graphArea = this.element.nativeElement.querySelector(
         '.oppia-graph-viz-svg');
       const graphAreaRect = graphArea.getBoundingClientRect();
-  
+
       if (event instanceof MouseEvent) {
         this.dotCoordinateX =
          event.clientX - graphAreaRect.left;
         this.dotCoordinateY =
          event.clientY - graphAreaRect.top;
-         dot.style.top = this.dotCoordinateY + 'px';
-         dot.style.left = this.dotCoordinateX + 'px';
+        dot.style.top = this.dotCoordinateY + 'px';
+        dot.style.left = this.dotCoordinateX + 'px';
       }
-  
     }
     // We use vertexDragStartX/Y and mouseDragStartX/Y to make
     // mouse-dragging by label more natural, by moving the vertex
@@ -328,27 +328,29 @@ export class GraphVizComponent implements OnInit, AfterViewInit {
     }
   }
 
-  isButtonOnTopOfDot() {
-    const dotElement = document.querySelector('.accessibility-dot') as HTMLDivElement;
-    const buttonElements = document.querySelectorAll('[class^="e2e-test-"][class$="-button"]');
-  
+  isButtonOnTopOfDot(): boolean {
+    const dotElement = document.querySelector(
+      '.accessibility-dot') as HTMLDivElement;
+    const buttonElements = document.querySelectorAll(
+     '[class^="e2e-test-"][class$="-button"]');
+
     if (!dotElement || !buttonElements || buttonElements.length === 0) {
       return false;
     }
-  
+
     const dotRect = dotElement.getBoundingClientRect();
     const dotTop = dotRect.top;
     const dotBottom = dotRect.bottom;
     const dotLeft = dotRect.left;
     const dotRight = dotRect.right;
-  
+
     for (let i = 0; i < buttonElements.length; i++) {
       const buttonRect = buttonElements[i].getBoundingClientRect();
       const buttonTop = buttonRect.top;
       const buttonBottom = buttonRect.bottom;
       const buttonLeft = buttonRect.left;
       const buttonRight = buttonRect.right;
-  
+
       if (
         buttonTop <= dotTop &&
         buttonBottom >= dotBottom &&
@@ -361,8 +363,7 @@ export class GraphVizComponent implements OnInit, AfterViewInit {
     }
     return false;
   }
-  
-  
+
   onClickGraphSVG(): void {
     if (!this.interactionIsActive) {
       return;
@@ -489,11 +490,11 @@ export class GraphVizComponent implements OnInit, AfterViewInit {
         this.canEditVertexLabel) {
       this.beginEditVertexLabel(index);
     }
-      this.state.hoveredVertex = index;
-      if (this.state.addEdgeVertex === null &&
-          this.state.currentlyDraggedVertex === null) {
-        this.onTouchInitialVertex(index);
-      } else {
+    this.state.hoveredVertex = index;
+    if (this.state.addEdgeVertex === null &&
+        this.state.currentlyDraggedVertex === null) {
+      this.onTouchInitialVertex(index);
+    } else {
         if (this.state.addEdgeVertex === index) {
           this.state.hoveredVertex = null;
           this.helpText =
@@ -501,14 +502,14 @@ export class GraphVizComponent implements OnInit, AfterViewInit {
           this.state.addEdgeVertex = null;
           return;
         }
-        this.onTouchFinalVertex(index);
-      }
+      this.onTouchFinalVertex(index);
+    }
   }
 
   onFocusVertex(index: number): void {
     this.state.hoveredVertex = index;
   }
-  
+
   onBlurVertex(index: number): void {
     this.onMouseleaveVertex(index);
   }
