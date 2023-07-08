@@ -818,6 +818,11 @@ def send_post_signup_email(
         platform_feature_services.get_platform_parameter_value(
             SIGNUP_EMAIL_SUBJECT_CONTENT.name)
     )
+    # Here we use assert because the get_platform_parameter_value returns
+    # value of type platform_parameter_domain.PlatformDataTypes and we
+    # are sure that email_subject_content is of type str. This helps us
+    # avoid the mypy error.
+    assert isinstance(email_subject_content, str)
     email_body_content = (
         platform_feature_services.get_platform_parameter_value(
             SIGNUP_EMAIL_BODY_CONTENT.name)
