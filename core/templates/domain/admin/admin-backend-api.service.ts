@@ -98,7 +98,6 @@ export interface ConfigPropertyValues {
   'notify_admins_suggestions_waiting_too_long_is_enabled': boolean;
   'oppia_csrf_secret': string;
   'record_playthrough_probability': number;
-  'unpublish_exploration_email_html_body': string;
 }
 
 export interface AdminPageDataBackendDict {

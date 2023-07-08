@@ -61,6 +61,8 @@ class ParamNames(enum.Enum):
     EMAIL_FOOTER = 'email_footer'
     SIGNUP_EMAIL_SUBJECT_CONTENT = 'signup_email_subject_content'
     SIGNUP_EMAIL_BODY_CONTENT = 'signup_email_body_content'
+    UNPUBLISH_EXPLORATION_EMAIL_HTML_BODY = (
+        'unpublish_exploration_email_html_body')
 
 
 # Platform parameters should all be defined below.

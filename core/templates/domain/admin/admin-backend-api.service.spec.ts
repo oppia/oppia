@@ -113,8 +113,7 @@ describe('Admin backend api service', () => {
     notification_user_ids_for_failed_tasks: [],
     notify_admins_suggestions_waiting_too_long_is_enabled: false,
     oppia_csrf_secret: 'H62T5aIngXb1PB6arDkFrAnxakpQ=',
-    record_playthrough_probability: 0.2,
-    unpublish_exploration_email_html_body: 'test'
+    record_playthrough_probability: 0.2
   };
 
   beforeEach(() => {

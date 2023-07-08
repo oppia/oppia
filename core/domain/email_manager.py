@@ -248,17 +248,23 @@ EDITOR_ROLE_EMAIL_RIGHTS_FOR_ROLE: Dict[str, str] = {
     EXPLORATION_ROLE_PLAYTESTER: _EDITOR_ROLE_EMAIL_HTML_RIGHTS['can_play']
 }
 
-UNPUBLISH_EXPLORATION_EMAIL_HTML_BODY: config_domain.ConfigProperty = (
-    config_domain.ConfigProperty(
-        'unpublish_exploration_email_html_body', EMAIL_HTML_BODY_SCHEMA,
-        'Default content for the email sent after an exploration is unpublished'
-        ' by a moderator. These emails are only sent if the functionality is '
-        'enabled in feconf.py. Leave this field blank if emails should not be '
-        'sent.',
-        'I\'m writing to inform you that I have unpublished the above '
-        'exploration.'
+UNPUBLISH_EXPLORATION_EMAIL_HTML_BODY: (
+    platform_parameter_domain.PlatformParameter) = (
+        Registry.create_platform_parameter(
+            (
+                platform_parameter_list.ParamNames.
+                UNPUBLISH_EXPLORATION_EMAIL_HTML_BODY
+            ),
+            'Default content for the email sent after an exploration is '
+            'unpublished by a moderator. These emails are only sent if the '
+            'functionality is enabled in feconf.py. Leave this field blank '
+            'if emails should not be sent.',
+            platform_parameter_domain.DataTypes.STRING,
+            default=(
+                'I\'m writing to inform you that I have unpublished the above '
+                'exploration.')
+        )
     )
-)
 
 NOTIFICATION_USER_IDS_FOR_FAILED_TASKS_DEFAULT_VALUE: List[str] = []
 
@@ -874,15 +880,13 @@ def get_moderator_unpublish_exploration_email() -> str:
     except utils.ValidationError:
         return ''
 
-    config_prop = config_domain.Registry.get_config_property(
-        'unpublish_exploration_email_html_body'
+    unpublish_exp_email_html_body = (
+        platform_feature_services.get_platform_parameter_value(
+            UNPUBLISH_EXPLORATION_EMAIL_HTML_BODY.name)
     )
-    # Ruling out the possibility of None for mypy type checking.
-    assert config_prop is not None
-    config_prop_value = config_prop.value
     # Ruling out the possibility of Any for mypy type checking.
-    assert isinstance(config_prop_value, str)
-    return config_prop_value
+    assert isinstance(unpublish_exp_email_html_body, str)
+    return unpublish_exp_email_html_body
 
 
 def require_moderator_email_prereqs_are_satisfied() -> None:

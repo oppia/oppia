@@ -76,7 +76,8 @@ ALL_PLATFORM_PARAMS_EXCEPT_FEATURE_FLAGS: List[
         platform_parameter_list.ParamNames.PROMO_BAR_ENABLED,
         platform_parameter_list.ParamNames.PROMO_BAR_MESSAGE,
         platform_parameter_list.ParamNames.SIGNUP_EMAIL_BODY_CONTENT,
-        platform_parameter_list.ParamNames.SIGNUP_EMAIL_SUBJECT_CONTENT
+        platform_parameter_list.ParamNames.SIGNUP_EMAIL_SUBJECT_CONTENT,
+        platform_parameter_list.ParamNames.UNPUBLISH_EXPLORATION_EMAIL_HTML_BODY
     ]
 
 
