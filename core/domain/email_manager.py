@@ -194,8 +194,8 @@ SIGNUP_EMAIL_SUBJECT_CONTENT: platform_parameter_domain.PlatformParameter = (
     Registry.create_platform_parameter(
         platform_parameter_list.ParamNames.SIGNUP_EMAIL_SUBJECT_CONTENT,
         'Content of email sent after a new user signs up. Set the email '
-        'subject. These emails are only sent if the functionality is enabled in '
-        'feconf.py.',
+        'subject. These emails are only sent if the functionality is enabled '
+        'in feconf.py.',
         platform_parameter_domain.DataTypes.STRING,
         default=_PLACEHOLDER_SUBJECT
     )
