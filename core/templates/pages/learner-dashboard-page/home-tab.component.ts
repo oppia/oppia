@@ -136,7 +136,7 @@ export class HomeTabComponent {
           (storyCompletedNodeCount / stotyNodeCount) * 100);
         let learnerGroupsTitle =
         this.mappedStoryIdToLearnerGroupsTitle.get(storySummary.getId());
-        console.error('I am a home tab .....')
+        console.error('I am a home tab .....');
         var storyData: storySummaryTile = {
           topicName: topicSummaryTile.name,
           storySummary: storySummary,
