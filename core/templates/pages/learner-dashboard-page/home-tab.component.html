@@ -20,7 +20,7 @@
         </p>
       </a>
     </div> -->
-    <div class="continue-where-you-left-off-scroll">
+    <!-- <div class="continue-where-you-left-off-scroll">
       <div class="continue-where-you-left-off-section" *ngIf="continueWhereYouLeftOffList.length !== 0"
         [ngStyle]="windowIsNarrow && {'width': width + 'px'}">
         <div *ngFor="let topicSummaryTile of continueWhereYouLeftOffList" class="topic-summary">
@@ -31,6 +31,40 @@
             </oppia-learner-story-summary-tile>
           </div>
         </div>
+      </div>
+    </div> -->
+    <div class="continue-where-you-left-off-scroll">
+      <div class="continue-where-you-left-off-section" *ngIf="continueWhereYouLeftOffList.length !== 0">
+        <div *ngIf="storyInProgress.length !== 0" class="continue-where-you-left-off-story-in-progress">
+          <div *ngFor="let storySummaryTile of storyInProgress">
+            <oppia-learner-story-summary-tile
+            [storySummary]="storySummaryTile.storySummary"
+            [displayArea]="'homeTab'"
+            [topicName]="storySummaryTile.topicName"
+            [markTileAsGoal]="storySummaryTile.markTileAsGoal"
+            [learnerGroupTitle]="storySummaryTile.learnerGroupTitle">
+          </oppia-learner-story-summary-tile>
+          </div>
+        </div>
+        <div *ngIf="storyInRecommended.length !== 0" class="continue-where-you-left-off-story-in-recommended">
+          <div *ngFor="let storySummaryTile of storyInRecommended">
+            <oppia-learner-story-summary-tile
+            [storySummary]="storySummaryTile.storySummary"
+            [displayArea]="'homeTab'"
+            [topicName]="storySummaryTile.topicName"
+            [markTileAsGoal]="storySummaryTile.markTileAsGoal"
+            [learnerGroupTitle]="storySummaryTile.learnerGroupTitle">
+          </oppia-learner-story-summary-tile>
+          </div>
+        </div>
+        <!-- <div *ngFor="let topicSummaryTile of continueWhereYouLeftOffList" class="topic-summary">
+          <div *ngFor="let storySummaryTile of topicSummaryTile.canonicalStorySummaryDicts; let i = index"
+            class="story-summary-tile">
+            <oppia-learner-story-summary-tile [storySummary]="storySummaryTile" [displayArea]="'homeTab'"
+              [topicName]="topicSummaryTile.name">
+            </oppia-learner-story-summary-tile>
+          </div>
+        </div> -->
       </div>
     </div>
   </div>

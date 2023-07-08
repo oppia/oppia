@@ -37,6 +37,8 @@ export class LearnerStorySummaryTileComponent implements OnInit {
   @Input() storySummary!: StorySummary;
   @Input() displayArea!: string;
   @Input() topicName!: string;
+  @Input() markTileAsGoal!: boolean;
+  @Input() learnerGroupTitle!: string;
   nodeCount!: number;
   completedNodeCount!: number;
   storyProgress!: number;

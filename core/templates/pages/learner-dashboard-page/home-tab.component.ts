@@ -34,7 +34,6 @@ import './home-tab.component.css';
 interface storySummaryTile {
   topicName: string;
   storySummary: StorySummary;
-  storyProgress: number;
   markTileAsGoal: boolean;
   learnerGroupTitle: string;
 }
@@ -134,16 +133,19 @@ export class HomeTabComponent {
 
         let storyProgress = Math.floor(
           (storyCompletedNodeCount / stotyNodeCount) * 100);
-        let learnerGroupsTitle =
-        this.mappedStoryIdToLearnerGroupsTitle.get(storySummary.getId());
+
         console.error('I am a home tab .....');
         var storyData: storySummaryTile = {
           topicName: topicSummaryTile.name,
           storySummary: storySummary,
-          storyProgress: storyProgress,
           markTileAsGoal: currentGoalsIds.includes(topicSummaryTile.id),
-          learnerGroupTitle: learnerGroupsTitle[0]
+          learnerGroupTitle: ''
         };
+        let learnerGroupsTitle =
+        this.mappedStoryIdToLearnerGroupsTitle.get(storySummary.getId());
+        if (learnerGroupsTitle.length !== 0) {
+          storyData.learnerGroupTitle = learnerGroupsTitle[0];
+        }
         console.error(storyData, 'story data');
         if (storyProgress !== 0) {
           this.storyInProgress.push(storyData);
