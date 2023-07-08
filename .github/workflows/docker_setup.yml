@@ -35,13 +35,13 @@ jobs:
 
       - name: Checking server reachability
         run: |
-          for i in {1..5}; do
+          for i in {1..20}; do
             if curl -s http://localhost:8181/; then
               echo ---Dev-server is up---
               exit 0
             else
               echo ---Retrying in 5mins---
-              sleep 300
+              sleep 30
             fi
           done
           echo ---Dev-server is not started after all retries---
