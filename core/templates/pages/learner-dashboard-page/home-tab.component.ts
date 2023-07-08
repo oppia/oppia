@@ -24,18 +24,19 @@ import { UrlInterpolationService } from 'domain/utilities/url-interpolation.serv
 import { Subscription } from 'rxjs';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
-
-import './home-tab.component.css';
 import { StorySummary } from 'domain/story/story-summary.model';
 import { LearnerExplorationSummary } from 'domain/summary/learner-exploration-summary.model';
 import { CollectionSummary } from 'domain/collection/collection-summary.model';
 import { LearnerDashboardActivityBackendApiService } from 'domain/learner_dashboard/learner-dashboard-activity-backend-api.service';
+
+import './home-tab.component.css';
 
 interface storySummaryTile {
   topicName: string;
   storySummary: StorySummary;
   storyProgress: number;
   markTileAsGoal: boolean;
+  learnerGroupTitle: string;
 }
  @Component({
    selector: 'oppia-home-tab',
@@ -54,6 +55,7 @@ export class HomeTabComponent {
   @Input() username!: string;
   @Input() explorationPlaylist!: LearnerExplorationSummary[];
   @Input() collectionPlaylist!: CollectionSummary[];
+  @Input() mappedStoryIdToLearnerGroupsTitle!: Map<string, string[]>;
 
   carouselClassname: string = 'home-tab';
   currentGoalsLength!: number;
@@ -132,14 +134,17 @@ export class HomeTabComponent {
 
         let storyProgress = Math.floor(
           (storyCompletedNodeCount / stotyNodeCount) * 100);
-
+        let learnerGroupsTitle =
+        this.mappedStoryIdToLearnerGroupsTitle.get(storySummary.getId());
+        console.error('I am a home tab .....')
         var storyData: storySummaryTile = {
           topicName: topicSummaryTile.name,
           storySummary: storySummary,
           storyProgress: storyProgress,
-          markTileAsGoal: currentGoalsIds.includes(topicSummaryTile.id)
+          markTileAsGoal: currentGoalsIds.includes(topicSummaryTile.id),
+          learnerGroupTitle: learnerGroupsTitle[0]
         };
-
+        console.error(storyData, 'story data');
         if (storyProgress !== 0) {
           this.storyInProgress.push(storyData);
         } else {

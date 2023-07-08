@@ -1,4 +1,4 @@
-// Copyright 2020 The Oppia Authors. All Rights Reserved.
+// Copyright 2021 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,49 +12,81 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+
 /**
- * @fileoverview Component for home tab in the Learner Dashboard page.
+ * @fileoverview Component for the learner dashboard.
  */
 
+import { Component, OnInit } from '@angular/core';
+import { trigger, state, style, transition,
+  animate, group } from '@angular/animations';
+import { TranslateService } from '@ngx-translate/core';
+import { Subscription } from 'rxjs';
 
-import { Component } from '@angular/core';
-
-import './new-learner-dashboard.component.css';
-import { LearnerDashboardPageConstants } from './learner-dashboard-page.constants';
 import { AppConstants } from 'app.constants';
 import { LearnerExplorationSummary } from 'domain/summary/learner-exploration-summary.model';
-import { TranslateService } from '@ngx-translate/core';
 import { CollectionSummary } from 'domain/collection/collection-summary.model';
-import { FeedbackMessageSummary } from 'domain/feedback_message/feedback-message-summary.model';
-import { FeedbackThreadSummary, FeedbackThreadSummaryBackendDict } from 'domain/feedback_thread/feedback-thread-summary.model';
-import { LearnerDashboardBackendApiService } from 'domain/learner_dashboard/learner-dashboard-backend-api.service';
-import { LearnerGroupBackendApiService } from 'domain/learner_group/learner-group-backend-api.service';
-import { StorySummary } from 'domain/story/story-summary.model';
-import { LearnerTopicSummary } from 'domain/topic/learner-topic-summary.model';
 import { ProfileSummary } from 'domain/user/profile-summary.model';
+import { LearnerDashboardBackendApiService } from 'domain/learner_dashboard/learner-dashboard-backend-api.service';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { ThreadStatusDisplayService } from 'pages/exploration-editor-page/feedback-tab/services/thread-status-display.service';
-import { Subscription } from 'rxjs';
+import { SuggestionModalForLearnerDashboardService } from 'pages/learner-dashboard-page/suggestion-modal/suggestion-modal-for-learner-dashboard.service';
+import { LearnerDashboardPageConstants } from 'pages/learner-dashboard-page/learner-dashboard-page.constants';
 import { AlertsService } from 'services/alerts.service';
-import { UrlService } from 'services/contextual/url.service';
-import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 import { DateTimeFormatService } from 'services/date-time-format.service';
-import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { LoaderService } from 'services/loader.service';
-import { PageTitleService } from 'services/page-title.service';
-import { FocusManagerService } from 'services/stateful/focus-manager.service';
 import { UserService } from 'services/user.service';
-import { SuggestionModalForLearnerDashboardService } from './suggestion-modal/suggestion-modal-for-learner-dashboard.service';
+import { FocusManagerService } from 'services/stateful/focus-manager.service';
+import { StorySummary } from 'domain/story/story-summary.model';
+import { LearnerTopicSummary } from 'domain/topic/learner-topic-summary.model';
+import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
+import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
+import { PageTitleService } from 'services/page-title.service';
+import { LearnerGroupBackendApiService } from 'domain/learner_group/learner-group-backend-api.service';
+import { UrlService } from 'services/contextual/url.service';
 
- @Component({
-   selector: 'oppia-new-learner-dashboard',
-   templateUrl: './new-learner-dashboard.component.html',
-   styleUrls: ['./new-learner-dashboard.component.css']
- })
-export class NewLearnerDashboardComponent {
-  FEEDBACK_THREADS_SORT_BY_KEYS_AND_I18N_IDS = (
-    LearnerDashboardPageConstants.FEEDBACK_THREADS_SORT_BY_KEYS_AND_I18N_IDS);
+import './new-learner-dashboard.component.css';
 
+@Component({
+  selector: 'oppia-new-learner-dashboard',
+  templateUrl: './new-learner-dashboard.component.html',
+  styleUrls: ['./new-learner-dashboard.component.css'],
+  animations: [
+    trigger('slideInOut', [
+      state('true', style({
+        'max-height': '500px', opacity: '1', visibility: 'visible'
+      })),
+      state('false', style({
+        'max-height': '0px', opacity: '0', visibility: 'hidden'
+      })),
+      transition('true => false', [group([
+        animate('500ms ease-in-out', style({
+          opacity: '0'
+        })),
+        animate('500ms ease-in-out', style({
+          'max-height': '0px'
+        })),
+        animate('500ms ease-in-out', style({
+          visibility: 'hidden'
+        }))
+      ]
+      )]),
+      transition('false => true', [group([
+        animate('500ms ease-in-out', style({
+          visibility: 'visible'
+        })),
+        animate('500ms ease-in-out', style({
+          'max-height': '500px'
+        })),
+        animate('500ms ease-in-out', style({
+          opacity: '1'
+        }))
+      ]
+      )])
+    ])
+  ]
+})
+export class NewLearnerDashboardComponent implements OnInit {
   LEARNER_DASHBOARD_SECTION_I18N_IDS = (
     LearnerDashboardPageConstants.LEARNER_DASHBOARD_SECTION_I18N_IDS);
 
@@ -68,9 +100,6 @@ export class NewLearnerDashboardComponent {
   // These properties below are initialized using Angular lifecycle hooks
   // where we need to do non-null assertion. For more information see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
-  threadIndex!: number;
-  isCurrentFeedbackSortDescending!: boolean;
-  currentFeedbackThreadsSortType!: string;
 
   completedExplorationsList!: LearnerExplorationSummary[];
   completedCollectionsList!: CollectionSummary[];
@@ -86,29 +115,18 @@ export class NewLearnerDashboardComponent {
 
   completedToIncompleteCollections!: string[];
   learntToPartiallyLearntTopics!: string[];
-  threadSummaries: FeedbackThreadSummary[] = [];
   numberOfUnreadThreads!: number;
   explorationPlaylist!: LearnerExplorationSummary[];
   collectionPlaylist!: CollectionSummary[];
+  mappedStoryIdToLearnerGroupsTitle: Map<string, string[]> = new Map();
   activeSection!: string;
   activeSubsection!: string;
-  feedbackThreadActive!: boolean;
-  paginatedThreadsList: FeedbackThreadSummaryBackendDict[][] = [];
 
-  messageSendingInProgress!: boolean;
   profilePicturePngDataUrl!: string;
   profilePictureWebpDataUrl!: string;
-  newMessage!: {
-    'text': string | null;
-  };
 
-  loadingFeedbacks!: boolean;
   explorationTitle!: string;
-  threadStatus!: string;
   explorationId!: string;
-  threadId!: string;
-  messageSummaries!: FeedbackMessageSummary[];
-  threadSummary!: FeedbackThreadSummary;
   communityLibraryUrl = (
     '/' + AppConstants.PAGES_REGISTERED_WITH_FRONTEND.LIBRARY_INDEX.ROUTE);
 
@@ -205,65 +223,39 @@ export class NewLearnerDashboardComponent {
       }
     );
 
-    // Let dashboardCollectionsDataPromise = (
-    //   this.learnerDashboardBackendApiService
-    //     .fetchLearnerDashboardCollectionsDataAsync());
-    // dashboardCollectionsDataPromise.then(
-    //   responseData => {
-    //     this.completedCollectionsList = (
-    //       responseData.completedCollectionsList);
-    //     this.incompleteCollectionsList = (
-    //       responseData.incompleteCollectionsList);
-    //     this.completedToIncompleteCollections = (
-    //       responseData.completedToIncompleteCollections);
-    //     this.collectionPlaylist = responseData.collectionPlaylist;
-    //   }, errorResponseStatus => {
-    //     if (
-    //       AppConstants.FATAL_ERROR_CODES.indexOf(errorResponseStatus
-    //       ) !== -1) {
-    //       this.alertsService.addWarning(
-    //         'Failed to get learner dashboard collections data');
-    //     }
-    //   }
-    // );
-
-    // let dashboardExplorationsDataPromise = (
-    //   this.learnerDashboardBackendApiService
-    //     .fetchLearnerDashboardExplorationsDataAsync());
-    // dashboardExplorationsDataPromise.then(
-    //   responseData => {
-    //     this.completedExplorationsList = (
-    //       responseData.completedExplorationsList);
-    //     this.incompleteExplorationsList = (
-    //       responseData.incompleteExplorationsList);
-    //     this.subscriptionsList = responseData.subscriptionList;
-    //     this.explorationPlaylist = responseData.explorationPlaylist;
-    //   }, errorResponseStatus => {
-    //     if (
-    //       AppConstants.FATAL_ERROR_CODES.indexOf(errorResponseStatus
-    //       ) !== -1) {
-    //       this.alertsService.addWarning(
-    //         'Failed to get learner dashboard explorations data');
-    //     }
-    //   }
-    // );
-
     let learnerGroupFeatureIsEnabledPromise = (
       this.learnerGroupBackendApiService.isLearnerGroupFeatureEnabledAsync()
     );
     learnerGroupFeatureIsEnabledPromise.then(featureIsEnabled => {
       this.LEARNER_GROUP_FEATURE_IS_ENABLED = featureIsEnabled;
+      this.learnerDashboardBackendApiService
+        .fetchLearnerDashboardLearnerGroupsAsync().then(
+          (learnerDashboardLearnerGroups) => {
+            let learnerGroupsJoined = (
+              learnerDashboardLearnerGroups.learnerGroupsJoined);
+            console.error(learnerGroupsJoined, 'group joined bhole');
+            for (var learnerGroup of learnerGroupsJoined) {
+              let title = learnerGroup.title;
+              let storyIds = learnerGroup.storyIds;
+              for (var storyId of storyIds) {
+                if (this.mappedStoryIdToLearnerGroupsTitle.has(storyId)) {
+                  this.mappedStoryIdToLearnerGroupsTitle.
+                    get(storyId).push(title);
+                } else {
+                  this.mappedStoryIdToLearnerGroupsTitle.set(storyId, [title]);
+                }
+              }
+            }
+          }
+        );
+      console.error(this.mappedStoryIdToLearnerGroupsTitle, 'lllsssssss');
     });
 
-    // This.fetchFeedbackUpdates();
-    setTimeout(() => {
-      this.fetchCommunityLessonsData();
-    }, 1000);
 
     Promise.all([
       userInfoPromise,
       dashboardTopicAndStoriesDataPromise,
-      learnerGroupFeatureIsEnabledPromise,
+      learnerGroupFeatureIsEnabledPromise
     ]).then(() => {
       setTimeout(() => {
         this.loaderService.hideLoadingScreen();
@@ -274,11 +266,6 @@ export class NewLearnerDashboardComponent {
       // This is placed here in order to satisfy Unit tests.
     });
 
-    this.loadingFeedbacks = false;
-
-    this.newMessage = {
-      text: ''
-    };
 
     this.windowIsNarrow = this.windowDimensionService.isWindowNarrow();
     this.directiveSubscriptions.add(
@@ -314,95 +301,6 @@ export class NewLearnerDashboardComponent {
     this.pageTitleService.setDocumentTitle(translatedTitle);
   }
 
-  fetchFeedbackUpdates(): void {
-    this.loadingIndicatorIsShown = true;
-    let dashboardFeedbackUpdatesDataPromise = (
-      this.learnerDashboardBackendApiService
-        .fetchLearnerDashboardFeedbackUpdatesDataAsync(
-          this.paginatedThreadsList));
-    dashboardFeedbackUpdatesDataPromise.then(
-      responseData => {
-        this.isCurrentFeedbackSortDescending = true;
-        this.currentFeedbackThreadsSortType = (
-          LearnerDashboardPageConstants
-            .FEEDBACK_THREADS_SORT_BY_KEYS_AND_I18N_IDS.LAST_UPDATED.key);
-        this.threadSummaries = [
-          ... this.threadSummaries,
-          ... responseData.threadSummaries];
-        this.paginatedThreadsList = responseData.paginatedThreadsList;
-        this.numberOfUnreadThreads =
-          responseData.numberOfUnreadThreads;
-        this.feedbackThreadActive = false;
-        this.loadingIndicatorIsShown = false;
-      }, errorResponseStatus => {
-        this.loadingIndicatorIsShown = false;
-        if (
-          AppConstants.FATAL_ERROR_CODES.indexOf(errorResponseStatus) !== -1) {
-          this.alertsService.addWarning(
-            'Failed to get learner dashboard feedback updates data');
-        }
-      }
-    );
-  }
-
-  fetchCommunityLessonsData(): void {
-    this.loaderService.showLoadingScreen('Loading');
-    let dashboardCollectionsDataPromise = (
-      this.learnerDashboardBackendApiService
-        .fetchLearnerDashboardCollectionsDataAsync());
-    dashboardCollectionsDataPromise.then(
-      responseData => {
-        this.completedCollectionsList = (
-          responseData.completedCollectionsList);
-        this.incompleteCollectionsList = (
-          responseData.incompleteCollectionsList);
-        this.completedToIncompleteCollections = (
-          responseData.completedToIncompleteCollections);
-        this.collectionPlaylist = responseData.collectionPlaylist;
-      }, errorResponseStatus => {
-        if (
-          AppConstants.FATAL_ERROR_CODES.indexOf(errorResponseStatus
-          ) !== -1) {
-          this.alertsService.addWarning(
-            'Failed to get learner dashboard collections data');
-        }
-      }
-    );
-
-    let dashboardExplorationsDataPromise = (
-      this.learnerDashboardBackendApiService
-        .fetchLearnerDashboardExplorationsDataAsync());
-    dashboardExplorationsDataPromise.then(
-      responseData => {
-        this.completedExplorationsList = (
-          responseData.completedExplorationsList);
-        this.incompleteExplorationsList = (
-          responseData.incompleteExplorationsList);
-        this.subscriptionsList = responseData.subscriptionList;
-        this.explorationPlaylist = responseData.explorationPlaylist;
-      }, errorResponseStatus => {
-        if (
-          AppConstants.FATAL_ERROR_CODES.indexOf(errorResponseStatus
-          ) !== -1) {
-          this.alertsService.addWarning(
-            'Failed to get learner dashboard explorations data');
-        }
-      }
-    );
-    Promise.all([
-      dashboardCollectionsDataPromise,
-      dashboardExplorationsDataPromise,
-    ]).then(() => {
-      setTimeout(() => {
-        this.loaderService.hideLoadingScreen();
-        this.communtiyLessonsDataLoaded = true;
-        // So that focus is applied after the loading screen has dissapeared.
-        this.focusManagerService.setFocusWithoutScroll('ourLessonsBtn');
-      }, 0);
-    }).catch(errorResponse => {
-      // This is placed here in order to satisfy Unit tests.
-    });
-  }
 
   getStaticImageUrl(imagePath: string): string {
     return this.urlInterpolationService.getStaticImageUrl(imagePath);
@@ -469,12 +367,6 @@ export class NewLearnerDashboardComponent {
       }).catch(errorResponse => {
         // This is placed here in order to satisfy Unit tests.
       });
-    }
-    if (this.activeSection ===
-      LearnerDashboardPageConstants
-        .LEARNER_DASHBOARD_SECTION_I18N_IDS.FEEDBACK &&
-      this.feedbackThreadActive === true) {
-      this.feedbackThreadActive = false;
     }
   }
 
@@ -551,96 +443,6 @@ export class NewLearnerDashboardComponent {
     } else {
       return 'none';
     }
-  }
-
-  setFeedbackSortingOptions(sortType: string): void {
-    if (sortType === this.currentFeedbackThreadsSortType) {
-      this.isCurrentFeedbackSortDescending = (
-        !this.isCurrentFeedbackSortDescending);
-    } else {
-      this.currentFeedbackThreadsSortType = sortType;
-    }
-  }
-
-  getValueOfFeedbackThreadSortKey(): string {
-    // 'Last Updated' is the default sorting operation
-    // so we will return 'lastUpdatedMsecs' to SortByPipe when Last Updated
-    // option is selected in the drop down menu.
-    return this.currentFeedbackThreadsSortType;
-  }
-
-  onClickThread(
-      threadStatus: string, explorationId: string,
-      threadId: string, explorationTitle: string): void {
-    this.loadingFeedbacks = true;
-    let threadDataUrl = this.urlInterpolationService.interpolateUrl(
-      '/learnerdashboardthreadhandler/<threadId>', {
-        threadId: threadId
-      });
-    this.explorationTitle = explorationTitle;
-    this.feedbackThreadActive = true;
-    this.threadStatus = threadStatus;
-    this.explorationId = explorationId;
-    this.threadId = threadId;
-
-    for (let index = 0; index < this.threadSummaries.length; index++) {
-      if (this.threadSummaries[index].threadId === threadId) {
-        this.threadIndex = index;
-        let threadSummary = this.threadSummaries[index];
-        if (!threadSummary.lastMessageIsRead) {
-          this.numberOfUnreadThreads -= 1;
-        }
-        threadSummary.markTheLastTwoMessagesAsRead();
-      }
-    }
-
-    this.learnerDashboardBackendApiService.onClickThreadAsync(threadDataUrl)
-      .then((messageSummaryList) => {
-        let messageSummaryDicts = messageSummaryList;
-        this.messageSummaries = [];
-        for (let index = 0; index < messageSummaryDicts.length; index++) {
-          this.messageSummaries.push(
-            FeedbackMessageSummary.createFromBackendDict(
-              messageSummaryDicts[index]));
-        }
-        this.loadingFeedbacks = false;
-
-        const explorationTitleReference = document
-          .querySelector('.oppia-exploration-title');
-        if (explorationTitleReference instanceof HTMLElement) {
-          explorationTitleReference.focus();
-        }
-      });
-  }
-
-  showAllThreads(): void {
-    this.feedbackThreadActive = false;
-  }
-
-  addNewMessage(threadId: string, newMessage: string): void {
-    let url = this.urlInterpolationService.interpolateUrl(
-      '/threadhandler/<threadId>', {
-        threadId: threadId
-      });
-    let payload = {
-      updated_status: false,
-      updated_subject: null,
-      text: newMessage
-    };
-    this.messageSendingInProgress = true;
-    this.learnerDashboardBackendApiService
-      .addNewMessageAsync(url, payload).then(() => {
-        this.threadSummary = this.threadSummaries[this.threadIndex];
-        this.threadSummary.appendNewMessage(
-          newMessage, this.username);
-        this.messageSendingInProgress = false;
-        this.newMessage.text = null;
-        let newMessageSummary = (
-          FeedbackMessageSummary.createNewMessage(
-            this.threadSummary.totalMessageCount, newMessage,
-            this.username));
-        this.messageSummaries.push(newMessageSummary);
-      });
   }
 
   showSuggestionModal(
