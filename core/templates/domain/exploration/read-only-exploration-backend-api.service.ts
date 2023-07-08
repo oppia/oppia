@@ -29,6 +29,10 @@ import { UrlInterpolationService } from 'domain/utilities/url-interpolation.serv
 import { ExplorationMetadataBackendDict } from './ExplorationMetadataObjectFactory';
 import { VersionedExplorationCachingService } from 'pages/exploration-editor-page/services/versioned-exploration-caching.service';
 import { UrlService } from 'services/contextual/url.service';
+import {
+  ChapterProgressSummary,
+  ChapterProgressSummaryBackendDict
+} from 'domain/exploration/chapter-progress-summary.model';
 
 export interface ReadOnlyExplorationBackendDict {
   'init_state_name': string;
@@ -235,6 +239,34 @@ export class ReadOnlyExplorationBackendApiService {
    */
   clearExplorationCache(): void {
     this._explorationCache = {};
+  }
+
+  /**
+   * Retrives the Progress of exploratin
+   * chapters are nothing but exploration.
+   * The exploration used in story are called chapters.
+   * To reduce the code redundacy, ChapterProgressSummay Model is used.
+   */
+
+  async fetchProgressInExplorationsOrChapters(
+      expIds: string[]
+  ): Promise<ChapterProgressSummary[]> {
+    return new Promise((resolve, reject) => {
+      const explorationProgressUrl = ('/user_progress_in_explorations_handler');
+      this.http.get<ChapterProgressSummaryBackendDict[]>(
+        explorationProgressUrl, {
+          params: {
+            exp_ids: JSON.stringify(expIds)
+          }
+        }).toPromise().then(explorationProgressInfo => {
+        resolve(
+          explorationProgressInfo.map(
+            progressInfo => ChapterProgressSummary.createFromBackendDict(
+              progressInfo)
+          )
+        );
+      });
+    });
   }
 
   /**

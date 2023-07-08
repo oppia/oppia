@@ -17,6 +17,7 @@
 from __future__ import annotations
 
 import datetime
+import json
 
 from core import feconf
 from core import utils
@@ -36,6 +37,7 @@ from core.domain import suggestion_services
 from core.domain import topic_domain
 from core.domain import topic_services
 from core.platform import models
+from core.domain import user_services
 from core.tests import test_utils
 
 from typing import Dict, Final, Union
@@ -1111,4 +1113,46 @@ class LearnerDashboardFeedbackThreadHandlerTests(test_utils.GenericTestBase):
             messages_summary['current_content_html'], current_content_html)
         self.assertEqual(
             messages_summary['description'], suggestion_thread.subject)
+        self.logout()
+
+
+class LearnerExplorationProgressHandlerTests(test_utils.GenericTestBase):
+    """Tests for Learner Exploration Progress Handler."""
+
+    EXP_ID_1: Final = 'EXP_ID_1'
+    EXP_TITLE_1: Final = 'Exploration title 1'
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
+
+        self.USER_ID = self.get_user_id_from_email(self.NEW_USER_EMAIL)
+        self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
+
+        self.exp_id = exp_fetchers.get_new_exploration_id()
+        self.save_new_valid_exploration(self.exp_id, self.USER_ID)
+
+    def test_get_learner_exploration_progress(self) -> None:
+        self.login(self.NEW_USER_EMAIL)
+
+        user_services.update_learner_checkpoint_progress(
+            self.USER_ID, self.exp_id, 'Introduction', 1)
+
+        params = {
+            'exp_ids': json.dumps([self.exp_id])
+        }
+        response = self.get_json(
+            '/user_progress_in_explorations_handler', params=params)
+
+        self.assertEqual(len(response), 1)
+        self.assertEqual(response[0]['exploration_id'], self.exp_id)
+        self.assertEqual(response[0]['visited_checkpoints_count'], 1)
+        self.assertEqual(response[0]['total_checkpoints_count'], 1)
+
         self.logout()

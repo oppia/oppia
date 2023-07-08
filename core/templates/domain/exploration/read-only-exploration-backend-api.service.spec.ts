@@ -23,6 +23,8 @@ import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 import { ReadOnlyExplorationBackendApiService, FetchExplorationBackendResponse } from
   'domain/exploration/read-only-exploration-backend-api.service';
 import { VersionedExplorationCachingService } from 'pages/exploration-editor-page/services/versioned-exploration-caching.service';
+import { ChapterProgressSummary } from
+  'domain/exploration/chapter-progress-summary.model';
 
 describe('Read only exploration backend API service', () => {
   let roebas: ReadOnlyExplorationBackendApiService;
@@ -452,4 +454,48 @@ describe('Read only exploration backend API service', () => {
     roebas.deleteExplorationFromCache('0');
     expect(roebas.isCached('0')).toBe(false);
   }));
+
+  it('should successfully fetch learners progress in stories chapters',
+    fakeAsync(() => {
+      var successHandler = jasmine.createSpy('success');
+      var failHandler = jasmine.createSpy('fail');
+
+      const CHAPTERS_PROGRESS_SUMMARY_URL = (
+        '/user_progress_in_explorations_handler');
+
+      const chapterProgressSummaryDicts = [
+        {
+          total_checkpoints_count: 6,
+          visited_checkpoints_count: 5
+        },
+        {
+          total_checkpoints_count: 3,
+          visited_checkpoints_count: 0
+        },
+        {
+          total_checkpoints_count: 4,
+          visited_checkpoints_count: 4
+        },
+      ];
+
+      roebas.
+        fetchProgressInExplorationsOrChapters(['exp_id_1', 'exp_id_2'])
+        .then(successHandler, failHandler);
+
+      var req = httpTestingController.expectOne(
+        CHAPTERS_PROGRESS_SUMMARY_URL +
+        '?exp_ids=%5B%22exp_id_1%22,%22exp_id_2%22%5D');
+      expect(req.request.method).toEqual('GET');
+      req.flush(chapterProgressSummaryDicts);
+
+      flushMicrotasks();
+
+      expect(successHandler).toHaveBeenCalledWith(
+        chapterProgressSummaryDicts.map(
+          progressInfoDict => ChapterProgressSummary.createFromBackendDict(
+            progressInfoDict)
+        ));
+      expect(failHandler).not.toHaveBeenCalled();
+    })
+  );
 });

@@ -6723,3 +6723,12 @@ class ExplorationVersionHistory:
             ),
             'committer_ids': self.committer_ids
         }
+
+
+class ExplorationProgressSummaryDict(TypedDict):
+    """Dictionary representation of a ExplorationProgressSummary object.
+    """
+
+    exploration_id: str
+    visited_checkpoints_count: int
+    total_checkpoints_count: int

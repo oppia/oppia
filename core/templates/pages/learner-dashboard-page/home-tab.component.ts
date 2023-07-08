@@ -28,6 +28,9 @@ import { StorySummary } from 'domain/story/story-summary.model';
 import { LearnerExplorationSummary } from 'domain/summary/learner-exploration-summary.model';
 import { CollectionSummary } from 'domain/collection/collection-summary.model';
 import { LearnerDashboardActivityBackendApiService } from 'domain/learner_dashboard/learner-dashboard-activity-backend-api.service';
+import { StoryViewerBackendApiService } from 'domain/story_viewer/story-viewer-backend-api.service';
+import { ChapterProgressSummary } from 'domain/exploration/chapter-progress-summary.model';
+import { ReadOnlyExplorationBackendApiService } from 'domain/exploration/read-only-exploration-backend-api.service';
 
 import './home-tab.component.css';
 
@@ -55,6 +58,9 @@ export class HomeTabComponent {
   @Input() explorationPlaylist!: LearnerExplorationSummary[];
   @Input() collectionPlaylist!: CollectionSummary[];
   @Input() mappedStoryIdToLearnerGroupsTitle!: Map<string, string[]>;
+
+  explorationProgress!: ChapterProgressSummary[];
+  expIds: string[] = ['AfEoLA8IrHv1'];
 
   carouselClassname: string = 'home-tab';
   currentGoalsLength!: number;
@@ -86,6 +92,9 @@ export class HomeTabComponent {
     LearnerDashboardActivityBackendApiService,
     private windowDimensionService: WindowDimensionsService,
     private urlInterpolationService: UrlInterpolationService,
+    private readOnlyExplorationBackendApiService:
+    ReadOnlyExplorationBackendApiService,
+    private storyViewerBackendApiService: StoryViewerBackendApiService,
   ) {}
 
   ngOnInit(): void {
@@ -156,6 +165,14 @@ export class HomeTabComponent {
     }
 
     console.error(this.displayLessonsInPlaylist, 'playlist data');
+
+    this.readOnlyExplorationBackendApiService.
+      fetchProgressInExplorationsOrChapters(
+        this.expIds
+      ).then(explorationProgress => {
+        this.explorationProgress = explorationProgress;
+        console.error(explorationProgress, 'progressof exploration .....');
+      });
 
     this.windowIsNarrow = this.windowDimensionService.isWindowNarrow();
     this.directiveSubscriptions.add(

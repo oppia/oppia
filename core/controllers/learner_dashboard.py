@@ -476,3 +476,57 @@ class LearnerDashboardFeedbackThreadHandler(
         self.render_json({
             'message_summary_list': message_summary_list
         })
+
+
+class LearnerExplorationProgressHandlerNormalizedRequestDict(TypedDict):
+    """Dict representation of LearnerExplorationProgressHandler's
+    normalized_request dictionary.
+    """
+
+    exp_ids: List[str]
+
+
+class LearnerExplorationProgressHandler(
+    base.BaseHandler[
+        List[str],
+        LearnerExplorationProgressHandlerNormalizedRequestDict
+    ]
+):
+    """Handles fetching progress of a user in all exploration"""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS: List[str] = {}
+
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {
+            'exp_ids': {
+                'schema': {
+                    'type': 'custom',
+                    'obj_type': 'JsonEncodedInString'
+                }
+            }
+        }
+    }
+
+    # TODO(#16539): Change the type of value that is rendered to JSON,
+    # because currently `render_json` can only accept Dict or TypedDict
+    # types of values but in this handler we are rendering List
+    # value. Also, once the value type is changed, please remove
+    # List[Mapping[str, Any]] from render_json's argument type.
+    @acl_decorators.can_access_learner_dashboard
+    def get(self) -> None:
+        """Handles GET requests."""
+        assert self.normalized_request is not None
+        exp_ids = self.normalized_request['exp_ids']
+        user_id = self.user_id
+        if user_id is None:
+            raise Exception(
+                'No learner user_id found for the given learner username: %s' %
+                self.username
+            )
+
+        exploration_progress = (
+            exp_fetchers.get_user_progress_in_exploration(
+                user_id, exp_ids))
+
+        self.render_json(exploration_progress)
