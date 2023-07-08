@@ -637,7 +637,7 @@ describe('TopNavigationBarComponent', () => {
 
     component.userIsLoggedIn = true;
     component.ngOnInit();
-    tick(1010);
+    tick();
     fixture.detectChanges();
 
     expect(alertsSpy).toHaveBeenCalledWith(

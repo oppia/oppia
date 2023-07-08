@@ -834,7 +834,7 @@ describe('Feedback updates page', () => {
         expect(alertsSpy).toHaveBeenCalledWith(
           'Failed to get feedback updates data');
         expect(fetchDataSpy).toHaveBeenCalled();
-        tick(1000);
+        flush();
       }));
 
     it('should unsubscribe upon component destruction', () => {
