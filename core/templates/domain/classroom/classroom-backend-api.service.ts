@@ -30,10 +30,6 @@ import { CreatorTopicSummaryBackendDict } from
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 
-interface ClassroomPromosStatusBackendDict {
-  'classroom_promos_are_enabled': boolean;
-}
-
 interface ClassroomDataBackendDict {
   'name': string;
   'topic_summary_dicts': CreatorTopicSummaryBackendDict[];
@@ -136,35 +132,11 @@ export class ClassroomBackendApiService {
     });
   }
 
-  _fetchClassroomPromosAreEnabledStatus(
-      successCallback: (value: boolean) => void,
-      errorCallback: (reason: string) => void): void {
-    const classroomPromosAreEnabledStatusHandlerUrl = (
-      '/classroom_promos_status_handler');
-
-    this.http.get<ClassroomPromosStatusBackendDict>(
-      classroomPromosAreEnabledStatusHandlerUrl).toPromise().then(data => {
-      if (successCallback) {
-        successCallback(data.classroom_promos_are_enabled);
-      }
-    }, errorResponse => {
-      if (errorCallback) {
-        errorCallback(errorResponse.error.error);
-      }
-    });
-  }
-
   async fetchClassroomDataAsync(
       classroomUrlFragment: string
   ): Promise<ClassroomData> {
     return new Promise((resolve, reject) => {
       this._fetchClassroomData(classroomUrlFragment, resolve, reject);
-    });
-  }
-
-  async fetchClassroomPromosAreEnabledStatusAsync(): Promise<boolean> {
-    return new Promise((resolve, reject) => {
-      this._fetchClassroomPromosAreEnabledStatus(resolve, reject);
     });
   }
 
