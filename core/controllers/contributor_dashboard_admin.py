@@ -559,12 +559,20 @@ class ContributorDashboardAdminStatsHandler(
         'contribution_type': {
             'schema': {
                 'type': 'basestring'
-            }
+            },
+            'choices': [
+                feconf.CONTRIBUTION_TYPE_TRANSLATION,
+                feconf.CONTRIBUTION_TYPE_QUESTION
+            ]
         },
         'contribution_subtype': {
             'schema': {
                 'type': 'basestring'
-            }
+            },
+            'choices': [
+                feconf.CONTRIBUTION_SUBTYPE_SUBMISSION,
+                feconf.CONTRIBUTION_SUBTYPE_REVIEW
+            ]
         }
     }
     HANDLER_ARGS_SCHEMAS = {
@@ -573,18 +581,29 @@ class ContributorDashboardAdminStatsHandler(
                 'schema': {
                     'type': 'int'
                 },
+                'validators': [{
+                    'id': 'is_at_least',
+                    'min_value': 0
+                }],
                 'default_value': 20
             },
             'offset': {
                 'schema': {
                     'type': 'int'
-                }
+                },
+                'validators': [{
+                    'id': 'is_at_least',
+                    'min_value': 0
+                }]
             },
             'language_code': {
                 'schema': {
                     'type': 'basestring'
                 },
-                'default_value': None
+                'default_value': None,
+                'validators': [{
+                    'id': 'is_supported_audio_language_code'
+                }]
             },
             'sort_by': {
                 'schema': {
@@ -606,6 +625,10 @@ class ContributorDashboardAdminStatsHandler(
                 'schema': {
                     'type': 'int'
                 },
+                'validators': [{
+                    'id': 'is_at_least',
+                    'min_value': 0
+                }],
                 'default_value': None
             }
         }
