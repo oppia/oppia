@@ -13,7 +13,9 @@ COPY package.json .
 COPY scripts/linters/custom_eslint_checks ./scripts/linters/custom_eslint_checks
 
 RUN npm install -g yarn@1.22.15 --force
-# mathjs ESOCKETTIMEDOUT error fix -- https://stackoverflow.com/questions/55845756/esockettimedout-error-while-yarn-install-command
+# mathjs ESOCKETTIMEDOUT error - there are cases reported for mathjs package when timeout happens while
+# downloading the package using `yarn install` command.
+# The solution is to increase the network timeout, so that the package is downloaded successfully.
 RUN yarn install --network-timeout 1000000
 
 
