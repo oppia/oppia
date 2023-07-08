@@ -246,10 +246,10 @@ def main(args: Optional[List[str]] = None) -> None:
         run_webpack_compilation()
 
     if parsed_args.record_screen:
-        # Start ffmpeg screen record via Popen.
         dir_path = os.path.join(os.getcwd(), '..', '..', 'webdriverio-video/')
         os.mkdir(dir_path)
         video_path = os.path.join(dir_path, 'lhci.mp4')
+        print('Starting ffmpeg for screen recording.')
         vid_popen = subprocess.Popen([
             'ffmpeg', '-framerate', '25', '-f',
             'x11grab', '-i', ':0', video_path])
@@ -269,7 +269,9 @@ def main(args: Optional[List[str]] = None) -> None:
             skip_sdk_update_check=True))
 
         if parsed_args.record_screen:
+            print('Starting puppeteer scrupt with screen recording.')
             run_lighthouse_puppeteer_script(vid_popen)
+            print('Starting LHCI checks with screen recording.')
             run_lighthouse_checks(
                 lighthouse_mode, parsed_args.shard, vid_popen, video_path)
         else:
