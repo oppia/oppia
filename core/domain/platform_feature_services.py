@@ -96,7 +96,7 @@ ALL_PLATFORM_PARAMS_EXCEPT_FEATURE_FLAGS: List[
         platform_parameter_list.ParamNames.PROMO_BAR_MESSAGE,
     ]
 
-DATA_TYPE_TO_SCHEMA: Dict[str, str] = {
+DATA_TYPE_TO_SCHEMA_TYPE: Dict[str, str] = {
     'number': 'float',
     'string': 'unicode',
     'bool': 'bool'
@@ -364,12 +364,14 @@ def get_platform_parameter_schema(param_name: str) -> Dict[str, str]:
         Exception. The platform parameter does not have valid data type.
     """
     parameter = registry.Registry.get_platform_parameter(param_name)
-    if DATA_TYPE_TO_SCHEMA.get(parameter.data_type) is not None:
-        schema = copy.deepcopy(DATA_TYPE_TO_SCHEMA[parameter.data_type])
-        return {'type': schema}
+    if DATA_TYPE_TO_SCHEMA_TYPE.get(parameter.data_type) is not None:
+        schema_type = copy.deepcopy(
+            DATA_TYPE_TO_SCHEMA_TYPE[parameter.data_type])
+        return {'type': schema_type}
     else:
         raise Exception(
-            'The %s platform parameter does not have a valid '
-            'data type, must be one of %s inorder to get schema.' % (
-                parameter.name, platform_parameter_domain.DataTypes)
+            'The %s platform parameter has a data type of %s which is not '
+            'valid. Please use one of these data types instead: %s.' % (
+                parameter.name, parameter.data_type,
+                platform_parameter_domain.PlatformDataTypes)
         )

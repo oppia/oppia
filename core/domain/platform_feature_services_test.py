@@ -525,8 +525,8 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
         )
 
         with swap_get_platform_parameter, self.assertRaisesRegex(Exception, (
-            'The %s platform parameter does not have a valid '
-            'data type, must be one of %s inorder to get schema.' % (
-                parameter.name, platform_parameter_domain.DataTypes)
+            'The param_name platform parameter has a data type of unknown '
+            'which is not valid. Please use one of these data types instead: '
+            'typing.Union\\[str, int, bool, float].'
         )):
             feature_services.get_platform_parameter_schema(parameter.name)

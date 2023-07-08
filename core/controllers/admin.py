@@ -72,7 +72,7 @@ PLATFORM_PARAMS_TO_SHOW_IN_RC_PAGE = set([
     platform_parameter_list.ParamNames.PROMO_BAR_MESSAGE.value
 ])
 
-# Platfor parameters that we plan to show on the blog admin page.
+# Platform parameters that we plan to show on the blog admin page.
 PLATFORM_PARAMS_TO_SHOW_IN_BLOG_ADMIN_PAGE = set([
     (
         platform_parameter_list.ParamNames.
