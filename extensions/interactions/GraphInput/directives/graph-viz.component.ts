@@ -200,7 +200,7 @@ export class GraphVizComponent implements OnInit, AfterViewInit {
   }
 
   handleKeyDown(event: KeyboardEvent): void {
-    if (this.state.currentMode == 2 && !this.isButtonOnTopOfDot()) {
+    if (this.state.currentMode === 2 && !this.isButtonOnTopOfDot()) {
       const stepSize = 10;
 
       switch (event.key) {
@@ -223,11 +223,11 @@ export class GraphVizComponent implements OnInit, AfterViewInit {
         case 'Enter':
           this.onClickGraphSVG();
       }
-      const dot = document.querySelector('.accessibility-dot') as HTMLDivElement;
+      const dot = document.querySelector(
+        '.accessibility-dot') as HTMLDivElement;
       dot.style.top = this.dotCoordinateY + 'px';
       dot.style.left = this.dotCoordinateX + 'px';
-    }
-    else {
+    } else {
       return;
     }
   }
@@ -332,7 +332,7 @@ export class GraphVizComponent implements OnInit, AfterViewInit {
     const dotElement = document.querySelector(
       '.accessibility-dot') as HTMLDivElement;
     const buttonElements = document.querySelectorAll(
-     '[class^="e2e-test-"][class$="-button"]');
+      '[class^="e2e-test-"][class$="-button"]');
 
     if (!dotElement || !buttonElements || buttonElements.length === 0) {
       return false;
@@ -495,13 +495,13 @@ export class GraphVizComponent implements OnInit, AfterViewInit {
         this.state.currentlyDraggedVertex === null) {
       this.onTouchInitialVertex(index);
     } else {
-        if (this.state.addEdgeVertex === index) {
-          this.state.hoveredVertex = null;
-          this.helpText =
-            'I18N_INTERACTIONS_GRAPH_EDGE_INITIAL_HELPTEXT';
-          this.state.addEdgeVertex = null;
-          return;
-        }
+       if (this.state.addEdgeVertex === index) {
+        this.state.hoveredVertex = null;
+        this.helpText =
+         'I18N_INTERACTIONS_GRAPH_EDGE_INITIAL_HELPTEXT';
+        this.state.addEdgeVertex = null;
+        return;
+      }
       this.onTouchFinalVertex(index);
     }
   }
