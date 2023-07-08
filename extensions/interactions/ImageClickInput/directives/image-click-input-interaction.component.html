@@ -66,9 +66,10 @@
          class="oppia-image-click-img"
          tabindex="0"
          (keydown)="handleKeyDown($event)"
+         (click)="onClickImage()"
          (mousemove)="onMousemoveImage($event)"
          (style)="imageContainerStyle">
-    <div class="accessibility-dot" (click)="onClickImage()">
+    <div class="accessibility-dot" (click)="onClickImage()" *ngIf="!isMobile">
     </div>
     <div *ngIf="highlightRegionsOnHover">
       <div *ngFor="let region of allRegions; let idx = index"

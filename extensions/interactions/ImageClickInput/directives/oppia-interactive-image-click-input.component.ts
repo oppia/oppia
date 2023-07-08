@@ -37,6 +37,7 @@ import { ImageLocalStorageService } from 'services/image-local-storage.service';
 import { ServicesConstants } from 'services/services.constants';
 import { SvgSanitizerService } from 'services/svg-sanitizer.service';
 import { ImageClickInputRulesService } from './image-click-input-rules.service';
+import { DeviceInfoService } from 'services/contextual/device-info.service';
 
 interface RectangleRegion extends ImagePoint {
   height: number;
@@ -75,10 +76,12 @@ export class InteractiveImageClickInput implements OnInit, OnDestroy {
   allRegions: LabeledRegion[];
   dotCoordinateX: number = 0;
   dotCoordinateY: number = 0;
+  isMobile: boolean = false;
   constructor(
     private assetsBackendApiService: AssetsBackendApiService,
     private contextService: ContextService,
     private currentInteractionService: CurrentInteractionService,
+    private deviceInfoService: DeviceInfoService,
     private el: ElementRef,
     private imageClickInputRulesService: ImageClickInputRulesService,
     private imagePreloaderService: ImagePreloaderService,
@@ -194,6 +197,10 @@ export class InteractiveImageClickInput implements OnInit, OnDestroy {
       this.mouseY = this.lastAnswer.clickPosition[1];
       this.updateCurrentlyHoveredRegions();
     }
+    this.isMobile = false;
+    if (this.deviceInfoService.isMobileDevice()) {
+      this.isMobile = true;
+    }
 
     this.currentInteractionService.registerCurrentInteraction(null, null);
   }
@@ -278,12 +285,19 @@ export class InteractiveImageClickInput implements OnInit, OnDestroy {
   }
 
   updateDotPosition(event: MouseEvent | KeyboardEvent): void {
-    const dot = document.querySelector('.accessibility-dot') as HTMLDivElement;
     const images = this.el.nativeElement.querySelectorAll(
       '.oppia-image-click-img');
     const image: HTMLImageElement = images[0];
     const imageRect = image.getBoundingClientRect();
     const imageStyles = window.getComputedStyle(image);
+    if (this.isMobile && event instanceof MouseEvent) {
+      this.mouseX = (
+        (event.clientX - image.getBoundingClientRect().left) / image.width);
+      this.mouseY = (
+        (event.clientY - image.getBoundingClientRect().top) / image.height);
+      return;
+    }
+    const dot = document.querySelector('.accessibility-dot') as HTMLDivElement;
 
     if (event instanceof MouseEvent) {
       this.dotCoordinateX =
