@@ -23,6 +23,7 @@ export interface ShortLearnerGroupSummaryBackendDict {
   description: string;
   facilitator_usernames: string[];
   learners_count: number;
+  story_ids: string[];
 }
 
 export class ShortLearnerGroupSummary {
@@ -31,19 +32,22 @@ export class ShortLearnerGroupSummary {
   _description: string;
   _facilitatorUsernames: string[];
   _learnersCount: number;
+  _storyIds: string[];
 
   constructor(
       id: string,
       title: string,
       description: string,
       facilitatorUsernames: string[],
-      learnersCount: number
+      learnersCount: number,
+      storyIds: string[]
   ) {
     this._id = id;
     this._title = title;
     this._description = description;
     this._facilitatorUsernames = facilitatorUsernames;
     this._learnersCount = learnersCount;
+    this._storyIds = storyIds;
   }
 
   get id(): string {
@@ -66,6 +70,10 @@ export class ShortLearnerGroupSummary {
     return this._learnersCount;
   }
 
+  get storyIds(): string[] {
+    return this._storyIds;
+  }
+
   static createFromBackendDict(
       shortLearnerGroupBackendDict: ShortLearnerGroupSummaryBackendDict
   ): ShortLearnerGroupSummary {
@@ -74,7 +82,8 @@ export class ShortLearnerGroupSummary {
       shortLearnerGroupBackendDict.title,
       shortLearnerGroupBackendDict.description,
       shortLearnerGroupBackendDict.facilitator_usernames,
-      shortLearnerGroupBackendDict.learners_count
+      shortLearnerGroupBackendDict.learners_count,
+      shortLearnerGroupBackendDict.story_ids
     );
   }
 }

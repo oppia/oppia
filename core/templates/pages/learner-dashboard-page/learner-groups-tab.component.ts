@@ -64,6 +64,7 @@ export class LearnerGroupsTabComponent {
         (learnerDashboardLearnerGroups) => {
           this.learnerGroupsJoined = (
             learnerDashboardLearnerGroups.learnerGroupsJoined);
+          console.error(this.learnerGroupsJoined, 'group joined bhole');
           this.invitedToLearnerGroups = (
             learnerDashboardLearnerGroups.invitedToLearnerGroups);
         }
@@ -166,7 +167,8 @@ export class LearnerGroupsTabComponent {
         let acceptedLearnerGroupSummary = new ShortLearnerGroupSummary(
           learnerGroup.id, learnerGroup.title, learnerGroup.description,
           learnerGroup.facilitatorUsernames,
-          learnerGroup.learnerUsernames.length
+          learnerGroup.learnerUsernames.length,
+          learnerGroup.storyIds
         );
         this.invitedToLearnerGroups = this.invitedToLearnerGroups.filter(
           (invitedGroup) => invitedGroup.id !== learnerGroupSummary.id

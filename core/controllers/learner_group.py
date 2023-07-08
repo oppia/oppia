@@ -1136,7 +1136,8 @@ class LearnerDashboardLearnerGroupsHandler(
                 'description': learner_group.description,
                 'facilitator_usernames': user_services.get_usernames(
                     learner_group.facilitator_user_ids),
-                'learners_count': len(learner_group.learner_user_ids)
+                'learners_count': len(learner_group.learner_user_ids),
+                'story_ids': learner_group.story_ids
             })
 
         self.render_json({
