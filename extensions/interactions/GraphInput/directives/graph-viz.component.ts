@@ -495,7 +495,7 @@ export class GraphVizComponent implements OnInit, AfterViewInit {
         this.state.currentlyDraggedVertex === null) {
       this.onTouchInitialVertex(index);
     } else {
-       if (this.state.addEdgeVertex === index) {
+      if (this.state.addEdgeVertex === index) {
         this.state.hoveredVertex = null;
         this.helpText =
          'I18N_INTERACTIONS_GRAPH_EDGE_INITIAL_HELPTEXT';
