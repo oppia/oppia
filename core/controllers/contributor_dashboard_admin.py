@@ -642,10 +642,10 @@ class ContributorDashboardAdminStatsHandler(
     ) -> None:
         """Handles POST requests."""
 
-        if contribution_type not in [
+        if contribution_type not in {
             feconf.CONTRIBUTION_TYPE_TRANSLATION,
             feconf.CONTRIBUTION_TYPE_QUESTION
-        ]:
+        }:
             raise self.InvalidInputException(
                 'Invalid contribution type %s.' % (contribution_type)
             )
