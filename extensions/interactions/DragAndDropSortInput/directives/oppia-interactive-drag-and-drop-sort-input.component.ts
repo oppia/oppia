@@ -78,7 +78,10 @@ export class InteractiveDragAndDropSortInputComponent implements OnInit {
   }
 
   setFocus(): void {
-    this.listItems.toArray()[this.activeItem].nativeElement.focus();
+    const listArray = this.listItems.toArray();
+    if (listArray.length > 0) {
+      listArray[this.activeItem]?.nativeElement.focus();
+    }
   }
 
 
