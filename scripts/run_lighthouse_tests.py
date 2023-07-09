@@ -249,13 +249,13 @@ def main(args: Optional[List[str]] = None) -> None:
         run_webpack_compilation()
 
     if parsed_args.record_screen:
-        dir_path = os.path.join(os.getcwd(), '..', 'ffmpeg-video/')
+        dir_path = os.path.join(os.getcwd(), 'ffmpeg-video')
         os.mkdir(dir_path)
-        video_path = os.path.join(dir_path, 'lhci.mp4')
+        vid_path = os.path.join(dir_path, 'lhci.mp4')
         print('Starting ffmpeg for screen recording.')
         vid_popen = subprocess.Popen([
             'ffmpeg', '-framerate', '25', '-f',
-            'x11grab', '-i', ':0', video_path],
+            'x11grab', '-i', ':0', vid_path],
             stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
     with contextlib.ExitStack() as stack:
@@ -277,7 +277,7 @@ def main(args: Optional[List[str]] = None) -> None:
             run_lighthouse_puppeteer_script(vid_popen)
             print('Starting LHCI checks with screen recording.')
             run_lighthouse_checks(
-                lighthouse_mode, parsed_args.shard, vid_popen, video_path)
+                lighthouse_mode, parsed_args.shard, vid_popen, vid_path)
         else:
             run_lighthouse_puppeteer_script()
             run_lighthouse_checks(lighthouse_mode, parsed_args.shard)
