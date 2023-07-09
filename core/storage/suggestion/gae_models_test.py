@@ -3459,25 +3459,27 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
                 num_days_since_last_activity=7,
                 language_code='es'
             ))
+        self.assertEqual(len(sorted_results), 1)
         self.assertEqual(sorted_results[0].id, 'model_1')
         self.assertFalse(more)
-        self.assertEqual(next_offset, 1)
+        self.assertEqual(next_offset, 3)
 
         # Check for last activity under 90 days.
         sorted_results, next_offset, more = (
             suggestion_models.TranslationSubmitterTotalContributionStatsModel
             .fetch_page(
-                page_size=1,
+                page_size=2,
                 offset=0,
                 sort_by=None,
                 topic_ids=None,
                 num_days_since_last_activity=90,
                 language_code='es'
             ))
-        self.assertEqual(len(sorted_results), 1)
+        self.assertEqual(len(sorted_results), 2)
         self.assertEqual(sorted_results[0].id, 'model_2')
-        self.assertTrue(more)
-        self.assertEqual(next_offset, 1)
+        self.assertEqual(sorted_results[1].id, 'model_1')
+        self.assertFalse(more)
+        self.assertEqual(next_offset, 3)
 
         # Check for no sorted_results in given time.
         sorted_results, next_offset, more = (
@@ -3492,7 +3494,7 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
             ))
         self.assertEqual(len(sorted_results), 0)
         self.assertFalse(more)
-        self.assertEqual(next_offset, 0)
+        self.assertEqual(next_offset, 1)
 
     def test_fetch_page_with_sorting_and_filtering(self) -> None:
         suggestion_models.TranslationSubmitterTotalContributionStatsModel(
@@ -4322,22 +4324,23 @@ class TranslationReviewerTotalContributionStatsModelUnitTests(
         self.assertEqual(len(sorted_results), 1)
         self.assertEqual(sorted_results[0].id, 'model_3')
         self.assertFalse(more)
-        self.assertEqual(next_offset, 1)
+        self.assertEqual(next_offset, 3)
 
         # Check for num_days_since_last_activity filter within 90 days.
         sorted_results, next_offset, more = (
             suggestion_models.TranslationReviewerTotalContributionStatsModel
             .fetch_page(
                 page_size=4,
-                offset=1,
+                offset=0,
                 sort_by=None,
                 num_days_since_last_activity=90,
                 language_code='es'
             ))
-        self.assertEqual(len(sorted_results), 1)
-        self.assertEqual(sorted_results[0].id, 'model_2')
+        self.assertEqual(len(sorted_results), 2)
+        self.assertEqual(sorted_results[0].id, 'model_3')
+        self.assertEqual(sorted_results[1].id, 'model_2')
         self.assertFalse(more)
-        self.assertEqual(next_offset, 2)
+        self.assertEqual(next_offset, 3)
 
         # Check for no sorted_results within 7 days.
         sorted_results, next_offset, more = (
@@ -4351,7 +4354,7 @@ class TranslationReviewerTotalContributionStatsModelUnitTests(
             ))
         self.assertEqual(len(sorted_results), 0)
         self.assertFalse(more)
-        self.assertEqual(next_offset, 0)
+        self.assertEqual(next_offset, 1)
 
     def test_fetch_page_with_sorting_and_filtering(self) -> None:
         suggestion_models.TranslationReviewerTotalContributionStatsModel(
@@ -4457,7 +4460,7 @@ class TranslationReviewerTotalContributionStatsModelUnitTests(
         self.assertEqual(len(sorted_results), 1)
         self.assertEqual(sorted_results[0].id, 'model_1')
         self.assertFalse(more)
-        self.assertEqual(next_offset, 1)
+        self.assertEqual(next_offset, 3)
 
     def test_fetch_page_with_pagination(self) -> None:
         suggestion_models.TranslationReviewerTotalContributionStatsModel(
@@ -4632,7 +4635,7 @@ class TranslationReviewerTotalContributionStatsModelUnitTests(
             ))
         self.assertEqual(sorted_results[0].id, 'model_2')
         self.assertFalse(more)
-        self.assertEqual(next_offset, 2)
+        self.assertEqual(next_offset, 3)
 
         # Check for last_acitvity filter within 90 days.
         sorted_results, next_offset, more = (
@@ -4661,7 +4664,7 @@ class TranslationReviewerTotalContributionStatsModelUnitTests(
             ))
         self.assertEqual(len(sorted_results), 0)
         self.assertFalse(more)
-        self.assertEqual(next_offset, 0)
+        self.assertEqual(next_offset, 1)
 
     def test_apply_deletion_policy(self) -> None:
         suggestion_models.TranslationReviewerTotalContributionStatsModel.create(
@@ -5154,21 +5157,22 @@ class QuestionSubmitterTotalContributionStatsModelUnitTests(
         self.assertEqual(len(sorted_results), 1)
         self.assertEqual(sorted_results[0].id, 'model_4')
         self.assertFalse(more)
-        self.assertEqual(next_offset, 1)
+        self.assertEqual(next_offset, 4)
 
         # Check for num_days_since_last_activity under 90 days.
         sorted_results, next_offset, more = (
             suggestion_models.QuestionSubmitterTotalContributionStatsModel
             .fetch_page(
                 page_size=2,
-                offset=1,
+                offset=0,
                 sort_by=None,
                 topic_ids=None,
                 num_days_since_last_activity=90
             ))
-        self.assertEqual(len(sorted_results), 1)
-        self.assertEqual(sorted_results[0].id, 'model_3')
-        self.assertFalse(more)
+        self.assertEqual(len(sorted_results), 2)
+        self.assertEqual(sorted_results[0].id, 'model_4')
+        self.assertEqual(sorted_results[1].id, 'model_3')
+        self.assertTrue(more)
         self.assertEqual(next_offset, 2)
 
         # Check for no sorted_results in given time.
@@ -5292,7 +5296,7 @@ class QuestionSubmitterTotalContributionStatsModelUnitTests(
         self.assertEqual(sorted_results[0].id, 'model_3')
         self.assertEqual(sorted_results[1].id, 'model_4')
         self.assertFalse(more)
-        self.assertEqual(next_offset, 2)
+        self.assertEqual(next_offset, 4)
 
     def test_fetch_page_with_pagination(self) -> None:
         suggestion_models.QuestionSubmitterTotalContributionStatsModel(
@@ -5708,20 +5712,21 @@ class QuestionReviewerTotalContributionStatsModelUnitTests(
         self.assertEqual(len(sorted_results), 1)
         self.assertEqual(sorted_results[0].id, 'model_3')
         self.assertFalse(more)
-        self.assertEqual(next_offset, 1)
+        self.assertEqual(next_offset, 3)
 
         # Check for num_days_since_last_activity filter within 90 days.
         sorted_results, next_offset, more = (
             suggestion_models.QuestionReviewerTotalContributionStatsModel
             .fetch_page(
                 page_size=2,
-                offset=1,
+                offset=0,
                 sort_by=None,
                 num_days_since_last_activity=90
             ))
-        self.assertEqual(len(sorted_results), 1)
-        self.assertEqual(sorted_results[0].id, 'model_2')
-        self.assertFalse(more)
+        self.assertEqual(len(sorted_results), 2)
+        self.assertEqual(sorted_results[0].id, 'model_3')
+        self.assertEqual(sorted_results[1].id, 'model_2')
+        self.assertTrue(more)
         self.assertEqual(next_offset, 2)
 
         # Check for no sorted_results within 1 day.
@@ -5735,7 +5740,7 @@ class QuestionReviewerTotalContributionStatsModelUnitTests(
             ))
         self.assertEqual(len(sorted_results), 0)
         self.assertFalse(more)
-        self.assertEqual(next_offset, 0)
+        self.assertEqual(next_offset, 3)
 
     def test_fetch_page_with_sorting_and_filtering(self) -> None:
         suggestion_models.QuestionReviewerTotalContributionStatsModel(
@@ -5799,7 +5804,7 @@ class QuestionReviewerTotalContributionStatsModelUnitTests(
         self.assertEqual(sorted_results[0].id, 'model_2')
         self.assertEqual(sorted_results[1].id, 'model_3')
         self.assertFalse(more)
-        self.assertEqual(next_offset, 2)
+        self.assertEqual(next_offset, 3)
 
         # Check for num_days_since_last_activity filter within 7 days
         # and IncreasingReviewedQuestions sort.
@@ -5815,7 +5820,7 @@ class QuestionReviewerTotalContributionStatsModelUnitTests(
         self.assertEqual(len(sorted_results), 1)
         self.assertEqual(sorted_results[0].id, 'model_3')
         self.assertFalse(more)
-        self.assertEqual(next_offset, 1)
+        self.assertEqual(next_offset, 3)
 
         # Check for num_days_since_last_activity filter within 90 days
         # and IncreasingLastActivity sort.
