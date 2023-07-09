@@ -354,6 +354,7 @@
 }
 .oppia-top-navigation-bar .oppia-navbar-profile {
   float: right;
+  margin-top: 1px;
 }
 .oppia-top-navigation-bar .oppia-navbar-role-indicator {
   background-color: #f7a541;
