@@ -175,7 +175,7 @@ services:
     environment:
       - PATH=/usr/local/bin/
     volumes:
-      - redis_dump:/data/dump.db
+      - redis_dump:/app/oppia/dump.db
       - ./redis_docker.conf:/app/oppia/redis_docker.conf
     healthcheck:
       test: redis-cli ping
