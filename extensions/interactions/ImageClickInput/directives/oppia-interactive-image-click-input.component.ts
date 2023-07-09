@@ -289,7 +289,6 @@ export class InteractiveImageClickInput implements OnInit, OnDestroy {
       '.oppia-image-click-img');
     const image: HTMLImageElement = images[0];
     const imageRect = image.getBoundingClientRect();
-    const imageStyles = window.getComputedStyle(image);
     if (this.isMobile && event instanceof MouseEvent) {
       this.mouseX = (
         (event.clientX - image.getBoundingClientRect().left) / image.width);
@@ -301,9 +300,9 @@ export class InteractiveImageClickInput implements OnInit, OnDestroy {
 
     if (event instanceof MouseEvent) {
       this.dotCoordinateX =
-       event.clientX - imageRect.left + parseFloat(imageStyles.marginLeft) + 8;
+       event.clientX - imageRect.left + parseFloat(image.style.marginLeft) + 8;
       this.dotCoordinateY =
-       event.clientY - imageRect.top + parseFloat(imageStyles.marginTop) + 8;
+       event.clientY - imageRect.top + parseFloat(image.style.marginTop) + 8;
     }
 
     dot.style.top = this.dotCoordinateY + 'px';

@@ -497,9 +497,11 @@ export class GraphVizComponent implements OnInit, AfterViewInit {
     } else {
       if (this.state.addEdgeVertex === index) {
         this.state.hoveredVertex = null;
-        this.helpText =
-         'I18N_INTERACTIONS_GRAPH_EDGE_INITIAL_HELPTEXT';
-        this.state.addEdgeVertex = null;
+        if (this.isMobile) {
+          this.helpText =
+           'I18N_INTERACTIONS_GRAPH_EDGE_INITIAL_HELPTEXT';
+          this.state.addEdgeVertex = null;
+        }
         return;
       }
       this.onTouchFinalVertex(index);
@@ -518,12 +520,16 @@ export class GraphVizComponent implements OnInit, AfterViewInit {
     if (this.state.currentMode === this._MODES.ADD_EDGE) {
       if (this.canAddEdge) {
         this.beginAddEdge(index);
-        this.helpText = 'I18N_INTERACTIONS_GRAPH_EDGE_FINAL_HELPTEXT';
+        if (this.isMobile) {
+          this.helpText = 'I18N_INTERACTIONS_GRAPH_EDGE_FINAL_HELPTEXT';
+        }
       }
     } else if (this.state.currentMode === this._MODES.MOVE) {
       if (this.canMoveVertex) {
         this.beginDragVertex(index);
-        this.helpText = 'I18N_INTERACTIONS_GRAPH_MOVE_FINAL_HELPTEXT';
+        if (this.isMobile) {
+          this.helpText = 'I18N_INTERACTIONS_GRAPH_MOVE_FINAL_HELPTEXT';
+        }
       }
     }
   }
@@ -534,13 +540,17 @@ export class GraphVizComponent implements OnInit, AfterViewInit {
         this.state.addEdgeVertex, index);
       this.endAddEdge();
       this.state.hoveredVertex = null;
-      this.helpText = 'I18N_INTERACTIONS_GRAPH_EDGE_INITIAL_HELPTEXT';
+      if (this.isMobile) {
+        this.helpText = 'I18N_INTERACTIONS_GRAPH_EDGE_INITIAL_HELPTEXT';
+      }
     } else if (this.state.currentMode === this._MODES.MOVE) {
       if (this.state.currentlyDraggedVertex !== null) {
         this.endDragVertex();
         this.state.hoveredVertex = null;
-        this.helpText =
-          'I18N_INTERACTIONS_GRAPH_MOVE_INITIAL_HELPTEXT';
+        if (this.isMobile) {
+          this.helpText =
+            'I18N_INTERACTIONS_GRAPH_MOVE_INITIAL_HELPTEXT';
+        }
       }
     }
   }
