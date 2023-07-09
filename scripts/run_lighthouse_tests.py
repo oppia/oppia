@@ -116,7 +116,7 @@ def run_lighthouse_puppeteer_script(
         print('Puppeteer script failed. More details can be found above.')
         if vid_popen:
             vid_popen.terminate()
-            vid_popen.wait()
+            process.communicate()
             print('Saved video of failed script.')
 
         sys.exit(1)
@@ -192,7 +192,7 @@ def run_lighthouse_checks(
         print('Lighthouse checks completed successfully.')
         if vid_popen:
             vid_popen.terminate()
-            vid_popen.wait()
+            vid_popen.communicate()
             if vid_path is not None and os.path.isfile(vid_path):
                 print('Lighthouse video saved at', vid_path)
             else:
@@ -213,7 +213,7 @@ def run_lighthouse_checks(
         print('Lighthouse checks failed. More details can be found above.')
         if vid_popen:
             vid_popen.terminate()
-            vid_popen.wait()
+            vid_popen.communicate()
             print('Lighthouse video saved at', vid_path)
         sys.exit(1)
 
@@ -255,7 +255,8 @@ def main(args: Optional[List[str]] = None) -> None:
         print('Starting ffmpeg for screen recording.')
         vid_popen = subprocess.Popen([
             'ffmpeg', '-framerate', '25', '-f',
-            'x11grab', '-i', ':0', video_path])
+            'x11grab', '-i', ':0', video_path],
+            stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
     with contextlib.ExitStack() as stack:
         stack.enter_context(servers.managed_redis_server())
