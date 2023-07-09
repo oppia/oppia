@@ -5,7 +5,7 @@ services:
     build:
       context: .
       dockerfile: ./docker/Dockerfile
-      target: frontend
+      # target: frontend
     container_name: oppia-angular-build
     volumes:
       - .:/app/oppia
@@ -32,7 +32,7 @@ services:
     build:
       context: .
       dockerfile: ./docker/Dockerfile
-      target: frontend
+      # target: frontend
     container_name: oppia-webpack-compiler
     volumes:
       - .:/app/oppia
