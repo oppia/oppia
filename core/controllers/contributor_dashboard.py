@@ -70,15 +70,6 @@ class ContributorDashboardPage(
 
     @acl_decorators.open_access
     def get(self) -> None:
-        """Handles GET requests
-
-        Raises:
-            PageNotFoundException. If the contributor dashboard is not enabled.
-        """
-        # TODO(#7402): Serve this page statically through app.yaml once
-        # the CONTRIBUTOR_DASHBOARD_ENABLED flag is removed.
-        if not config_domain.CONTRIBUTOR_DASHBOARD_IS_ENABLED.value:
-            raise self.PageNotFoundException
         self.render_template('contributor-dashboard-page.mainpage.html')
 
 
