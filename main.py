@@ -609,9 +609,6 @@ URLS = [
         release_coordinator.FeatureFlagsHandler),
 
     get_redirect_route(
-        '/checkpoints_feature_status_handler',
-        reader.CheckpointsFeatureStatusHandler),
-    get_redirect_route(
         r'%s/<exploration_id>' % feconf.EXPLORATION_URL_PREFIX,
         reader.ExplorationPage),
     get_redirect_route(
@@ -922,10 +919,6 @@ URLS = [
         r'%s/<story_id>' %
         feconf.VALIDATE_STORY_EXPLORATIONS_URL_PREFIX,
         story_editor.ValidateExplorationsHandler),
-
-    get_redirect_route(
-        '/classroom_promos_status_handler',
-        classroom.ClassroomPromosStatusHandler),
 
     get_redirect_route(r'/emaildashboard', email_dashboard.EmailDashboardPage),
     get_redirect_route(
