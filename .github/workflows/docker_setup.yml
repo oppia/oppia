@@ -23,10 +23,10 @@ jobs:
 
       - uses: ./.github/actions/merge
 
-#       - name: Build Images
-#         run: |
-#           echo ---Building Docker Images---
-#           docker compose build
+      - name: Build Images
+        run: |
+          echo ---Building Docker Images---
+          docker compose build
           
       - name: Start Containers
         run: |
