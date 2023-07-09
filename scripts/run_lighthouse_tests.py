@@ -193,7 +193,10 @@ def run_lighthouse_checks(
         if vid_popen:
             vid_popen.terminate()
             vid_popen.wait()
-            print('Lighthouse video saved at', vid_path)
+            if os.path.isfile(vid_path):
+                print('Lighthouse video saved at', vid_path)
+            else:
+                print('Resulting path', vid_path, 'does not have file.')
         # If vid_path:.
         # Os.remove(vid_path).
         # Print('Corresponding video has been deleted.').

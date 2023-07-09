@@ -285,7 +285,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with: 
           name: ffmpeg-video
-          path: /home/runner/work/oppia/ffmpeg-video
+          path: /home/runner/work/oppia/ffmpeg-video/lhci.mp4
       - name: Report failure if failed on oppia/oppia develop branch
         if: ${{ failure() && github.event_name == 'push' && github.repository == 'oppia/oppia' && github.ref == 'refs/heads/develop'}}
         uses: ./.github/actions/send-webhook-notification
