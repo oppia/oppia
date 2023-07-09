@@ -1,6 +1,6 @@
 <background-banner></background-banner>
 <div class="oppia-subtopic-viewer-container">
-  <div class="oppia-subtopic-viewer-container-card">
+  <div class="oppia-subtopic-viewer-container-card" tabindex="0">
     <div class="oppia-topic-title">
       <span *ngIf="!isHackyTopicTitleTranslationDisplayed()">
         {{ parentTopicTitle }}
@@ -31,13 +31,13 @@
     <div class="next-subtopic-section">
       <p *ngIf="nextSubtopic"
          class="oppia-subtopic-next-subtopic-label"
-         [innerHTML]="'I18N_SUBTOPIC_VIEWER_NEXT_SKILL' | translate">
-         Next Skill:
+         [innerHTML]="'I18N_SUBTOPIC_VIEWER_NEXT_SKILL' | translate"
+         tabindex="0">
       </p>
       <p *ngIf="prevSubtopic"
          class="oppia-subtopic-next-subtopic-label"
-         [innerHTML]="'I18N_SUBTOPIC_VIEWER_PREVIOUS_SKILL' | translate">
-         Previous Skill:
+         [innerHTML]="'I18N_SUBTOPIC_VIEWER_PREVIOUS_SKILL' | translate"
+         tabindex="0">
       </p>
       <oppia-subtopic-summary-tile [topicUrlFragment]="topicUrlFragment"
                                    [classroomUrlFragment]="classroomUrlFragment"

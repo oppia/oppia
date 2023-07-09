@@ -23,11 +23,9 @@ import { Story } from 'domain/story/story.model';
 import { StoryBackendDict } from 'domain/story/story.model';
 import { EditableStoryBackendApiService } from 'domain/story/editable-story-backend-api.service';
 import { StoryEditorStateService } from 'pages/story-editor-page/services/story-editor-state.service';
-import { importAllAngularServices, TranslatorProviderForTests } from 'tests/unit-test-utils.ajs';
+import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 import { AlertsService } from 'services/alerts.service';
 import { StoryUpdateService } from 'domain/story/story-update.service';
-
-require('domain/story/story-update.service.ts');
 
 class MockEditableStoryBackendApiService {
   newBackendStoryObject!: StoryBackendDict;
@@ -103,9 +101,6 @@ describe('Story editor state service', () => {
 
   const storyInitializedSpy = jasmine.createSpy('storyInitialized');
   const storyReinitializedSpy = jasmine.createSpy('storyReinitialized');
-
-  beforeEach(
-    angular.mock.module('oppia', TranslatorProviderForTests));
 
   beforeEach(() => {
     fakeEditableStoryBackendApiService = (
@@ -547,6 +542,19 @@ describe('Story editor state service', () => {
     storyEditorStateService.resetExpIdsChanged();
 
     expect(storyEditorStateService.areAnyExpIdsChanged()).toBeFalse();
+  });
+
+  it('should set current node as publishable', () => {
+    storyEditorStateService._currentNodeIsPublishable = false;
+    storyEditorStateService.setCurrentNodeAsPublishable(true);
+    expect(storyEditorStateService._currentNodeIsPublishable).toBe(true);
+  });
+
+  it('should return if current node is publishable', () => {
+    storyEditorStateService._currentNodeIsPublishable = false;
+    expect(storyEditorStateService.isCurrentNodePublishable()).toBe(false);
+    storyEditorStateService._currentNodeIsPublishable = true;
+    expect(storyEditorStateService.isCurrentNodePublishable()).toBe(true);
   });
 
   it('should return skill summaries when called', fakeAsync(() => {
