@@ -649,10 +649,10 @@ class ContributorDashboardAdminStatsHandler(
             raise self.InvalidInputException(
                 'Invalid contribution type %s.' % (contribution_type)
             )
-        if contribution_subtype not in [
+        if contribution_subtype not in {
             feconf.CONTRIBUTION_SUBTYPE_SUBMISSION,
             feconf.CONTRIBUTION_SUBTYPE_REVIEW
-        ]:
+        }:
             raise self.InvalidInputException(
                 'Invalid contribution subtype %s.' % (contribution_subtype)
             )
