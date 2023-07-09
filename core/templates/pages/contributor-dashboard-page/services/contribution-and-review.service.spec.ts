@@ -598,7 +598,7 @@ describe('Contribution and review service', () => {
   fdescribe('sort translation suggestions', () => {
     it('should sort translation cards within each state based' +
     'on type and index', () => {
-      const translationCards = [
+      const translationCards: SuggestionBackendDict[] = [
         {
           suggestion_type: 'suggestion',
           suggestion_id: 'id',
