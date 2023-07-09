@@ -5,12 +5,12 @@ services:
     build:
       context: .
       dockerfile: ./docker/Dockerfile
+      target: frontend
     container_name: oppia-angular-build
     volumes:
       - .:/app/oppia
       - shared_node_modules:/app/oppia/node_modules
       - shared_third_party:/app/oppia/third_party
-      - shared_proto_files:/app/oppia/proto_files
       - shared_js_ts_proto_files:/app/oppia/extensions/classifiers/proto
       - shared_assets_dir:/app/oppia/assets
       - shared_angular_build:/app/oppia/dist
@@ -32,12 +32,12 @@ services:
     build:
       context: .
       dockerfile: ./docker/Dockerfile
+      target: frontend
     container_name: oppia-webpack-compiler
     volumes:
       - .:/app/oppia
       - shared_node_modules:/app/oppia/node_modules
       - shared_third_party:/app/oppia/third_party
-      - shared_proto_files:/app/oppia/proto_files
       - shared_js_ts_proto_files:/app/oppia/extensions/classifiers/proto
       - shared_assets_dir:/app/oppia/assets
       - shared_webpack_bundles:/app/oppia/webpack_bundles
@@ -56,10 +56,11 @@ services:
       - "--color"
       - "--progress"
 
-  google_app_engine:
+  google-app-engine:
     build:
       context: .
       dockerfile: ./docker/Dockerfile
+      target: backend
     container_name: oppia-app-engine
     ports:
       - "8181:8181"
@@ -102,6 +103,7 @@ services:
     build:
       context: .
       dockerfile: ./docker/Dockerfile
+      target: backend
     container_name: oppia-cloud-datastore
     ports:
       - "8089:8089"
