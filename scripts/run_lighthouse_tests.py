@@ -193,7 +193,7 @@ def run_lighthouse_checks(
         if vid_popen:
             vid_popen.terminate()
             vid_popen.wait()
-            if vid_path != None and os.path.isfile(vid_path):
+            if vid_path is not None and os.path.isfile(vid_path):
                 print('Lighthouse video saved at', vid_path)
             else:
                 print('Resulting path', vid_path, 'does not have file.')
