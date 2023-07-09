@@ -109,6 +109,8 @@ services:
       - "8089:8089"
     environment:
       - CLOUDSDK_CORE_DISABLE_PROMPTS=1
+    volumes:
+      - cloud_datastore_emulator_cache:/app/cloud_datastore_emulator_cache
     depends_on:
       angular-build:
         condition: service_healthy
@@ -145,6 +147,7 @@ services:
     volumes:
       - ./.firebase.json:/app/oppia/.firebase.json
       - shared_node_modules:/app/oppia/node_modules
+      - firebase_emulator_cache:/app/firebase_emulator_cache
     healthcheck:
       test: wget --spider http://localhost:4000/auth/ && echo 'y' | /app/oppia/node_modules/firebase-tools/lib/bin/firebase.js emulators:export /app/firebase_emulator_cache --project=dev-project-id || exit 1
       timeout: 20s
@@ -211,3 +214,5 @@ volumes:
   shared_angular_build:
   shared_webpack_bundles:
   oppia_redis_dump:
+  firebase_emulator_cache:
+  cloud_datastore_emulator_cache:
