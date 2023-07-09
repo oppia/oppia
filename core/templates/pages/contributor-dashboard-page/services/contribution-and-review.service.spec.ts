@@ -600,40 +600,82 @@ describe('Contribution and review service', () => {
     'on type and index', () => {
       const translationCards = [
         {
+          suggestion_type: 'suggestion',
+          suggestion_id: 'id',
+          target_type: 'exploration',
+          target_id: '1',
+          status: 'review',
+          author_name: 'author',
           change: {
             state_name: 'First State',
             content_id: 'feedback_2'
-          }
+          },
+          last_updated_msecs: 0,
         },
         {
+          suggestion_type: 'suggestion',
+          suggestion_id: 'id',
+          target_type: 'exploration',
+          target_id: '1',
+          status: 'review',
+          author_name: 'author',
           change: {
             state_name: 'End State',
             content_id: 'hints_1'
-          }
+          },
+          last_updated_msecs: 0,
         },
         {
+          suggestion_type: 'suggestion',
+          suggestion_id: 'id',
+          target_type: 'exploration',
+          target_id: '1',
+          status: 'review',
+          author_name: 'author',
           change: {
             state_name: 'First State',
             content_id: 'content_3'
-          }
+          },
+          last_updated_msecs: 0,
         },
         {
+          suggestion_type: 'suggestion',
+          suggestion_id: 'id',
+          target_type: 'exploration',
+          target_id: '1',
+          status: 'review',
+          author_name: 'author',
           change: {
             state_name: 'End State',
             content_id: 'interaction_1'
-          }
+          },
+          last_updated_msecs: 0,
         },
         {
+          suggestion_type: 'suggestion',
+          suggestion_id: 'id',
+          target_type: 'exploration',
+          target_id: '1',
+          status: 'review',
+          author_name: 'author',
           change: {
             state_name: 'First State',
             content_id: 'content_1'
-          }
+          },
+          last_updated_msecs: 0,
         },
         {
+          suggestion_type: 'suggestion',
+          suggestion_id: 'id',
+          target_type: 'exploration',
+          target_id: '1',
+          status: 'review',
+          author_name: 'author',
           change: {
             state_name: 'End State',
             content_id: 'content_2'
-          }
+          },
+          last_updated_msecs: 0,
         }
       ];
 
@@ -720,40 +762,82 @@ describe('Contribution and review service', () => {
 
       expect(sortedTranslationCards).toEqual([
         {
+          suggestion_type: 'suggestion',
+          suggestion_id: 'id',
+          target_type: 'exploration',
+          target_id: '1',
+          status: 'review',
+          author_name: 'author',
           change: {
             state_name: 'First State',
             content_id: 'content_1'
-          }
+          },
+          last_updated_msecs: 0,
         },
         {
+          suggestion_type: 'suggestion',
+          suggestion_id: 'id',
+          target_type: 'exploration',
+          target_id: '1',
+          status: 'review',
+          author_name: 'author',
           change: {
             state_name: 'First State',
             content_id: 'content_3'
-          }
+          },
+          last_updated_msecs: 0,
         },
         {
+          suggestion_type: 'suggestion',
+          suggestion_id: 'id',
+          target_type: 'exploration',
+          target_id: '1',
+          status: 'review',
+          author_name: 'author',
           change: {
             state_name: 'First State',
             content_id: 'feedback_2'
-          }
+          },
+          last_updated_msecs: 0,
         },
         {
+          suggestion_type: 'suggestion',
+          suggestion_id: 'id',
+          target_type: 'exploration',
+          target_id: '1',
+          status: 'review',
+          author_name: 'author',
           change: {
             state_name: 'End State',
             content_id: 'content_2'
-          }
+          },
+          last_updated_msecs: 0,
         },
         {
+          suggestion_type: 'suggestion',
+          suggestion_id: 'id',
+          target_type: 'exploration',
+          target_id: '1',
+          status: 'review',
+          author_name: 'author',
           change: {
             state_name: 'End State',
             content_id: 'interaction_1'
-          }
+          },
+          last_updated_msecs: 0,
         },
         {
+          suggestion_type: 'suggestion',
+          suggestion_id: 'id',
+          target_type: 'exploration',
+          target_id: '1',
+          status: 'review',
+          author_name: 'author',
           change: {
             state_name: 'End State',
             content_id: 'hints_1'
-          }
+          },
+          last_updated_msecs: 0,
         }
       ]);
     });
