@@ -196,6 +196,10 @@ class CustomLintChecksManager(linter_utils.BaseLinter):
                 # we extract the commit hash and use it as the version.
                 elif re.search(GIT_COMMIT_HASH_REGEX, lib_version):
                     match = re.search(GIT_COMMIT_HASH_REGEX, lib_version)
+                    # We must verify that the match is not None because
+                    # re.search() returns None when no match is found. Although
+                    # we already check this in the elif statement, the mypy type
+                    # check fails, so we need to include this check here.
                     if match:
                         lib_version = match.group(1)
 
