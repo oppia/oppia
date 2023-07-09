@@ -72,6 +72,10 @@ describe('FeedbackUpdates Page Root', () => {
     translateService = TestBed.inject(TranslateService);
   });
 
+  afterEach(() => {
+    component.ngOnDestroy();
+  });
+
   it('should successfully instantiate the component',
     () => {
       expect(component).toBeDefined();

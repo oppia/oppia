@@ -411,19 +411,9 @@ describe('Feedback updates page', () => {
       // The forEach loop is being used here because
       // getValueOfSubscriptionSortKey is used in a *ngFor directive.
       // Note that given subscription list is not sorted.
-      feedbackListNameNodes.forEach((titleNode, index: number) => {
-        if (index === 0) {
-          expect(titleNode.innerText).toContain('Biology');
-        }
-        if (index === 1) {
-          expect(titleNode.innerText).toContain('Algebra');
-        }
-        if (index === 2) {
-          expect(titleNode.innerText).toContain('Three Balls');
-        }
-        if (index === 3) {
-          expect(titleNode.innerText).toContain('Zebra');
-        }
+      const expectedInnerText = ['Biology', 'Algebra', 'Three Balls', 'Zebra'];
+      feedbackListNameNodes.forEach((titleNode, index) => {
+        expect(titleNode.innerText).toContain(expectedInnerText[index]);
       });
     }));
 
@@ -451,19 +441,9 @@ describe('Feedback updates page', () => {
       // The forEach loop is being used here because
       // getValueOfSubscriptionSortKey is used in a *ngFor directive.
       // Note that given subscription list is not sorted.
-      feedbackListNameNodes.forEach((titleNode, index: number) => {
-        if (index === 0) {
-          expect(titleNode.innerText).toContain('Zebra');
-        }
-        if (index === 1) {
-          expect(titleNode.innerText).toContain('Three Balls');
-        }
-        if (index === 2) {
-          expect(titleNode.innerText).toContain('Algebra');
-        }
-        if (index === 3) {
-          expect(titleNode.innerText).toContain('Biology');
-        }
+      const expectedInnerText = ['Zebra', 'Three Balls', 'Algebra', 'Biology'];
+      feedbackListNameNodes.forEach((titleNode, index) => {
+        expect(titleNode.innerText).toContain(expectedInnerText[index]);
       });
     }));
 
@@ -494,19 +474,9 @@ describe('Feedback updates page', () => {
       // The forEach loop is being used here because
       // getValueOfSubscriptionSortKey is used in a *ngFor directive.
       // Note that given subscription list is not sorted.
-      feedbackListNameNodes.forEach((titleNode, index: number) => {
-        if (index === 0) {
-          expect(titleNode.innerText).toContain('Algebra');
-        }
-        if (index === 1) {
-          expect(titleNode.innerText).toContain('Biology');
-        }
-        if (index === 2) {
-          expect(titleNode.innerText).toContain('Three Balls');
-        }
-        if (index === 3) {
-          expect(titleNode.innerText).toContain('Zebra');
-        }
+      const expectedInnerText = ['Algebra', 'Biology', 'Three Balls', 'zebra'];
+      feedbackListNameNodes.forEach((titleNode, index) => {
+        expect(titleNode.innerText).toContain(expectedInnerText[index]);
       });
     }));
 
@@ -541,19 +511,9 @@ describe('Feedback updates page', () => {
       // The forEach loop is being used here because
       // getValueOfSubscriptionSortKey is used in a *ngFor directive.
       // Note that given subscription list is not sorted.
-      feedbackListNameNodes.forEach((titleNode, index: number) => {
-        if (index === 0) {
-          expect(titleNode.innerText).toContain('Zebra');
-        }
-        if (index === 1) {
-          expect(titleNode.innerText).toContain('Three Balls');
-        }
-        if (index === 2) {
-          expect(titleNode.innerText).toContain('Biology');
-        }
-        if (index === 3) {
-          expect(titleNode.innerText).toContain('Algebra');
-        }
+      const expectedInnerText = ['Zebra', 'Three Balls', 'Biology', 'Algebra'];
+      feedbackListNameNodes.forEach((titleNode, index) => {
+        expect(titleNode.innerText).toContain(expectedInnerText[index]);
       });
     }));
 
@@ -817,6 +777,10 @@ describe('Feedback updates page', () => {
       spyOn(userService, 'getUserInfoAsync').and.returnValue(
         Promise.resolve(userInfo as UserInfo));
     }));
+
+    afterEach(() => {
+      component.ngOnDestroy();
+    });
 
     it('should show an alert warning when fails to get feedback updates data',
       fakeAsync(() => {
