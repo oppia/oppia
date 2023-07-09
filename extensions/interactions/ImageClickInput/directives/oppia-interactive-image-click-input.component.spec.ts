@@ -487,6 +487,10 @@ describe('InteractiveImageClickInput', () => {
               return new DOMRect(300, 300, 300, 300);
             }
           },
+          style: {
+            marginLeft: '10px',
+            marginTop: '20px'
+          },
           getBoundingClientRect: () => {
             return new DOMRect(200, 200, 200, 200);
           },

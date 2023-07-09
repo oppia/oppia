@@ -802,8 +802,8 @@ describe('GraphVizComponent', () => {
         label: ''
       },
       {
-        x: 0,
-        y: 0,
+        x: 20,
+        y: 20,
         label: ''
       }
     ]);
