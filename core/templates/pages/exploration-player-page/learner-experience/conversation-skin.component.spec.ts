@@ -579,11 +579,6 @@ describe('Conversation skin component', () => {
       LearnerDashboardBackendApiService);
     audioTranslationLanguageService = TestBed.inject(
       AudioTranslationLanguageService);
-
-    spyOn(
-      readOnlyExplorationBackendApiService,
-      'fetchCheckpointsFeatureIsEnabledStatus'
-    ).and.returnValue(Promise.resolve(true));
   }));
 
   it('should create && adjust page height on resize of window',
@@ -1288,7 +1283,6 @@ describe('Conversation skin component', () => {
     componentInstance.isLoggedIn = true;
     componentInstance.isIframed = false;
     componentInstance.alertMessageTimeout = 5;
-    componentInstance.CHECKPOINTS_FEATURE_IS_ENABLED = true;
 
     componentInstance.initializePage();
     tick(100);
@@ -1300,7 +1294,6 @@ describe('Conversation skin component', () => {
 
   it('should display the exploration after the the progress reminder modal' +
    'has loaded', () => {
-    componentInstance.CHECKPOINTS_FEATURE_IS_ENABLED = true;
     spyOn(contextService, 'isInExplorationEditorPage').and.returnValue(false);
     spyOn(contextService, 'isInExplorationPlayerPage').and.returnValue(true);
     spyOn(urlService, 'getCollectionIdFromExplorationUrl').and.returnValue(
@@ -2008,7 +2001,6 @@ describe('Conversation skin component', () => {
       .and.returnValues(false, false, false, true);
     spyOn(componentInstance, 'initLearnerAnswerInfoService');
     spyOn(explorationEngineService, 'getState');
-    spyOn(componentInstance, 'alwaysAskLearnerForAnswerDetails');
     spyOn(numberAttemptsService, 'submitAttempt');
     spyOn(playerTranscriptService, 'addNewInput');
     spyOn(componentInstance, 'getCanAskLearnerForAnswerInfo').and.returnValues(
