@@ -258,7 +258,8 @@ export class ContributionAndReviewService {
 
   // Function to sort translation cards by state.
   sortTranslationSuggestionsByState(
-      translationSuggestions: SuggestionBackendDict[],
+      // eslint-disable-next-line
+      translationSuggestions: any[],
       states: States,
       initStateName: string | null
   ): SuggestionBackendDict[] {
