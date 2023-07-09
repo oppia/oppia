@@ -432,7 +432,8 @@ describe('InteractiveImageClickInput', () => {
           height: 200
         }]));
 
-    const styleMock = jasmine.createSpyObj<CSSStyleDeclaration>('CSSStyleDeclaration', [
+    const styleMock = jasmine.createSpyObj<CSSStyleDeclaration>(
+      'CSSStyleDeclaration', [
       'marginLeft',
       'marginTop',
       'width',
