@@ -431,12 +431,19 @@ describe('InteractiveImageClickInput', () => {
           width: 200,
           height: 200
         }]));
-    spyOn(window, 'getComputedStyle').and.returnValue({
-      marginLeft: '0px',
-      marginTop: '0px',
-      width: '0px',
-      height: '0px'
-    } as CSSStyleDeclaration);
+
+    const styleMock = jasmine.createSpyObj<CSSStyleDeclaration>('CSSStyleDeclaration', [
+      'marginLeft',
+      'marginTop',
+      'width',
+      'height'
+    ]);
+    styleMock.marginLeft = '0px';
+    styleMock.marginTop = '0px';
+    styleMock.width = '0px';
+    styleMock.height = '0px';
+    spyOn(window, 'getComputedStyle').and.returnValue(styleMock);
+
     spyOn(component, 'updateCurrentlyHoveredRegions').and.callThrough();
     spyOnProperty(MouseEvent.prototype, 'clientX', 'get').and.returnValue(290);
     spyOnProperty(MouseEvent.prototype, 'clientY', 'get').and.returnValue(260);
