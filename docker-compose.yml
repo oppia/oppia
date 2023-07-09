@@ -175,7 +175,7 @@ services:
     environment:
       - PATH=/usr/local/bin/
     volumes:
-      - oppia_redis_dump:/app/oppia/dump.db
+      - redis_dump:/data/dump.db
       - ./redis_docker.conf:/app/oppia/redis_docker.conf
     healthcheck:
       test: redis-cli ping
@@ -214,6 +214,6 @@ volumes:
   shared_assets_dir:
   shared_angular_build:
   shared_webpack_bundles:
-  oppia_redis_dump:
+  redis_dump:
   firebase_emulator_cache:
   cloud_datastore_emulator_cache:
