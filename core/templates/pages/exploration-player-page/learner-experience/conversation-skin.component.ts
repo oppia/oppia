@@ -163,7 +163,6 @@ export class ConversationSkinComponent {
   // Until the response is received, it remains undefined.
   completedChaptersCount: number | undefined;
   chapterIsCompletedForTheFirstTime: boolean = false;
-  CHECKPOINTS_FEATURE_IS_ENABLED: boolean = false;
   pidInUrl: string;
   submitButtonIsDisabled = true;
   solutionForState: Solution | null = null;
@@ -252,13 +251,6 @@ export class ConversationSkinComponent {
 
     this.collectionId = this.urlService.getCollectionIdFromExplorationUrl();
     this.pidInUrl = this.urlService.getPidFromUrl();
-
-    this.readOnlyExplorationBackendApiService
-      .fetchCheckpointsFeatureIsEnabledStatus().then(
-        (checkpointsFeatureIsEnabled) => {
-          this.CHECKPOINTS_FEATURE_IS_ENABLED = checkpointsFeatureIsEnabled;
-        }
-      );
 
     if (this.collectionId) {
       this.readOnlyCollectionBackendApiService.loadCollectionAsync(
@@ -425,8 +417,7 @@ export class ConversationSkinComponent {
           let isLoggedOutProgressTracked = (
             this.explorationPlayerStateService
               .isLoggedOutLearnerProgressTracked());
-          if (this.CHECKPOINTS_FEATURE_IS_ENABLED && !this.isLoggedIn &&
-            !isLoggedOutProgressTracked) {
+          if (!this.isLoggedIn && !isLoggedOutProgressTracked) {
             let confirmationMessage = (
               'Please save your progress before navigating away from the' +
               ' page; else, you will lose your exploration progress.');
@@ -473,8 +464,7 @@ export class ConversationSkinComponent {
       this.fetchCompletedChaptersCount();
 
       // We do not save checkpoints progress for iframes.
-      if (this.CHECKPOINTS_FEATURE_IS_ENABLED &&
-        !this.isIframed && !this._editorPreviewMode &&
+      if (!this.isIframed && !this._editorPreviewMode &&
         !this.explorationPlayerStateService.isInQuestionPlayerMode()) {
         // For the first state which is always a checkpoint.
         let firstStateName: string;
@@ -838,8 +828,7 @@ export class ConversationSkinComponent {
     let index = this.playerPositionService.getDisplayedCardIndex();
     this.displayedCard = this.playerTranscriptService.getCard(index);
 
-    if (this.CHECKPOINTS_FEATURE_IS_ENABLED && index > 0 &&
-      !this.isIframed && !this._editorPreviewMode &&
+    if (index > 0 && !this.isIframed && !this._editorPreviewMode &&
       !this.explorationPlayerStateService.isInQuestionPlayerMode()) {
       let currentState = this.explorationEngineService.getState();
       let currentStateName = currentState.name;
@@ -1142,22 +1131,18 @@ export class ConversationSkinComponent {
         this.nextCard.getStateName());
     }
 
-    if (this.CHECKPOINTS_FEATURE_IS_ENABLED) {
-      // We do not store checkpoints progress for iframes hence we do not
-      // need to consider redirecting the user to the most recently
-      // reached checkpoint on exploration initial load in that case.
-      if (!this.isIframed && !this._editorPreviewMode &&
-          !this.explorationPlayerStateService.isInQuestionPlayerMode()) {
-        // Navigate the learner to the most recently reached checkpoint state.
-        this._navigateToMostRecentlyReachedCheckpoint();
-      }
+    // We do not store checkpoints progress for iframes hence we do not
+    // need to consider redirecting the user to the most recently
+    // reached checkpoint on exploration initial load in that case.
+    if (!this.isIframed && !this._editorPreviewMode &&
+        !this.explorationPlayerStateService.isInQuestionPlayerMode()) {
+      // Navigate the learner to the most recently reached checkpoint state.
+      this._navigateToMostRecentlyReachedCheckpoint();
     }
+    this.hasFullyLoaded = true;
 
     this.focusManagerService.setFocusIfOnDesktop(focusLabel);
     this.loaderService.hideLoadingScreen();
-    if (!this.CHECKPOINTS_FEATURE_IS_ENABLED) {
-      this.hasFullyLoaded = true;
-    }
 
     // If the exploration is embedded, use the url language code
     // as site language. If the url language code is not supported
