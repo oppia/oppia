@@ -88,7 +88,7 @@ export class GraphVizComponent implements OnInit, AfterViewInit {
   dotCoordinateY: number = 0;
 
   @Output() graphChange: EventEmitter<GraphAnswer> = new EventEmitter();
-  isMobile: boolean = false;
+  usingMobileDevice: boolean = false;
   helpText: string = '';
   _MODES = {
     MOVE: 0,
@@ -159,10 +159,7 @@ export class GraphVizComponent implements OnInit, AfterViewInit {
     this.selectedEdgeWeightValue = 0;
     this.shouldShowWrongWeightWarning = false;
 
-    this.isMobile = false;
-    if (this.deviceInfoService.isMobileDevice()) {
-      this.isMobile = true;
-    }
+    this.usingMobileDevice = !!this.deviceInfoService.isMobileDevice();
   }
 
   ngAfterViewInit(): void {
@@ -420,7 +417,7 @@ export class GraphVizComponent implements OnInit, AfterViewInit {
   init(): void {
     this.initButtons();
     this.state.currentMode = this.buttons[0].mode;
-    if (this.isMobile) {
+    if (this.usingMobileDevice) {
       if (this.state.currentMode === this._MODES.ADD_EDGE) {
         this.helpText =
           'I18N_INTERACTIONS_GRAPH_EDGE_INITIAL_HELPTEXT';
@@ -446,7 +443,7 @@ export class GraphVizComponent implements OnInit, AfterViewInit {
 
   setMode(mode: number): void {
     this.state.currentMode = mode;
-    if (this.isMobile) {
+    if (this.usingMobileDevice) {
       if (this.state.currentMode === this._MODES.ADD_EDGE) {
         this.helpText =
           'I18N_INTERACTIONS_GRAPH_EDGE_INITIAL_HELPTEXT';
@@ -497,7 +494,7 @@ export class GraphVizComponent implements OnInit, AfterViewInit {
     } else {
       if (this.state.addEdgeVertex === index) {
         this.state.hoveredVertex = null;
-        if (this.isMobile) {
+        if (this.usingMobileDevice) {
           this.helpText =
            'I18N_INTERACTIONS_GRAPH_EDGE_INITIAL_HELPTEXT';
           this.state.addEdgeVertex = null;
@@ -520,14 +517,14 @@ export class GraphVizComponent implements OnInit, AfterViewInit {
     if (this.state.currentMode === this._MODES.ADD_EDGE) {
       if (this.canAddEdge) {
         this.beginAddEdge(index);
-        if (this.isMobile) {
+        if (this.usingMobileDevice) {
           this.helpText = 'I18N_INTERACTIONS_GRAPH_EDGE_FINAL_HELPTEXT';
         }
       }
     } else if (this.state.currentMode === this._MODES.MOVE) {
       if (this.canMoveVertex) {
         this.beginDragVertex(index);
-        if (this.isMobile) {
+        if (this.usingMobileDevice) {
           this.helpText = 'I18N_INTERACTIONS_GRAPH_MOVE_FINAL_HELPTEXT';
         }
       }
@@ -540,14 +537,14 @@ export class GraphVizComponent implements OnInit, AfterViewInit {
         this.state.addEdgeVertex, index);
       this.endAddEdge();
       this.state.hoveredVertex = null;
-      if (this.isMobile) {
+      if (this.usingMobileDevice) {
         this.helpText = 'I18N_INTERACTIONS_GRAPH_EDGE_INITIAL_HELPTEXT';
       }
     } else if (this.state.currentMode === this._MODES.MOVE) {
       if (this.state.currentlyDraggedVertex !== null) {
         this.endDragVertex();
         this.state.hoveredVertex = null;
-        if (this.isMobile) {
+        if (this.usingMobileDevice) {
           this.helpText =
             'I18N_INTERACTIONS_GRAPH_MOVE_INITIAL_HELPTEXT';
         }
@@ -556,7 +553,7 @@ export class GraphVizComponent implements OnInit, AfterViewInit {
   }
 
   onMousedownVertex(index: number): void {
-    if (this.isMobile) {
+    if (this.usingMobileDevice) {
       return;
     }
     if (this.state.currentMode === this._MODES.ADD_EDGE) {
@@ -571,7 +568,7 @@ export class GraphVizComponent implements OnInit, AfterViewInit {
   }
 
   onMouseleaveVertex(index: number): void {
-    if (this.isMobile) {
+    if (this.usingMobileDevice) {
       return;
     }
     this.state.hoveredVertex = (
@@ -609,7 +606,7 @@ export class GraphVizComponent implements OnInit, AfterViewInit {
   @HostListener('document:mouseup', ['$event'])
   @debounce()
   onMouseupDocument(): void {
-    if (this.isMobile) {
+    if (this.usingMobileDevice) {
       return;
     }
     if (this.state.currentMode === this._MODES.ADD_EDGE) {

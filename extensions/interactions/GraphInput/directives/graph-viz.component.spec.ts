@@ -142,16 +142,16 @@ describe('GraphVizComponent', () => {
     expect(component.EDGE_WIDTH).toBe(graphDetailService.EDGE_WIDTH);
     expect(component.selectedEdgeWeightValue).toBe(0);
     expect(component.shouldShowWrongWeightWarning).toBe(false);
-    expect(component.isMobile).toBe(false);
+    expect(component.usingMobileDevice).toBe(false);
   });
 
-  it('should set isMobile to true on initailisation if device' +
+  it('should set usingMobileDevice to true on initailisation if device' +
   ' used by the user is a mobile', () => {
     spyOn(deviceInfoService, 'isMobileDevice').and.returnValue(true);
 
     component.ngOnInit();
 
-    expect(component.isMobile).toBe(true);
+    expect(component.usingMobileDevice).toBe(true);
   });
 
   it('should reset current mode when user submits answer', () => {
@@ -340,7 +340,7 @@ describe('GraphVizComponent', () => {
     component.canAddVertex = false;
     component.canDeleteVertex = false;
     component.canDeleteEdge = false;
-    component.isMobile = true;
+    component.usingMobileDevice = true;
     component.helpText = null;
 
     expect(component.state.currentMode).toBe(component._MODES.MOVE);
@@ -355,7 +355,7 @@ describe('GraphVizComponent', () => {
       mode: component._MODES.ADD_EDGE
     });
     expect(component.state.currentMode).toBe(component._MODES.ADD_EDGE);
-    expect(component.isMobile).toBe(true);
+    expect(component.usingMobileDevice).toBe(true);
     expect(component.helpText)
       .toBe('I18N_INTERACTIONS_GRAPH_EDGE_INITIAL_HELPTEXT');
   });
@@ -368,7 +368,7 @@ describe('GraphVizComponent', () => {
     component.canAddVertex = false;
     component.canDeleteVertex = false;
     component.canDeleteEdge = false;
-    component.isMobile = true;
+    component.usingMobileDevice = true;
     component.helpText = null;
     component.state.currentMode = component._MODES.ADD_EDGE;
 
@@ -384,8 +384,8 @@ describe('GraphVizComponent', () => {
     });
     expect(component.state.currentMode).toBe(component._MODES.MOVE);
     // The help text must be displayed only if the user is using a mobile.
-    // Therefore we check that the value of isMobile is true.
-    expect(component.isMobile).toBe(true);
+    // Therefore we check that the value of usingMobileDevice is true.
+    expect(component.usingMobileDevice).toBe(true);
     expect(component.helpText)
       .toBe('I18N_INTERACTIONS_GRAPH_MOVE_INITIAL_HELPTEXT');
   });
@@ -395,7 +395,7 @@ describe('GraphVizComponent', () => {
     spyOn(component, 'initButtons').and.callThrough();
     component.canAddEdge = false;
     component.canMoveVertex = false;
-    component.isMobile = true;
+    component.usingMobileDevice = true;
     component.helpText = null;
 
     expect(component.buttons).toEqual([]);
@@ -411,23 +411,23 @@ describe('GraphVizComponent', () => {
     expect(component.state.currentMode).toBe(component._MODES.ADD_VERTEX);
     expect(component.initButtons).toHaveBeenCalled();
     // The help text must be displayed only if the user is using a mobile.
-    // Therefore we check that the value of isMobile is true.
-    expect(component.isMobile).toBe(true);
+    // Therefore we check that the value of usingMobileDevice is true.
+    expect(component.usingMobileDevice).toBe(true);
     expect(component.helpText).toBe('');
   });
 
   it('should not set help text when user is not in mobile', () => {
     spyOn(component, 'initButtons').and.callThrough();
-    component.isMobile = false;
+    component.usingMobileDevice = false;
     component.helpText = null;
 
     component.init();
 
     expect(component.initButtons).toHaveBeenCalled();
     // The help text must be displayed only if the user is using a mobile.
-    // Therefore we check that the value of isMobile is false to make sure that
+    // Therefore we check that the value of usingMobileDevice is false to make sure that
     // the help text was not set.
-    expect(component.isMobile).toBe(false);
+    expect(component.usingMobileDevice).toBe(false);
     expect(component.helpText).toBe('');
   });
 
@@ -1076,7 +1076,7 @@ describe('GraphVizComponent', () => {
 
   it('should set helkp text for move button if user is using a mobile', () => {
     spyOn(Event.prototype, 'preventDefault');
-    component.isMobile = true;
+    component.usingMobileDevice = true;
 
     expect(component.helpText).toBe('');
 
@@ -1123,7 +1123,7 @@ describe('GraphVizComponent', () => {
 
   it('should set help text for add edge button if user is using mobile', () => {
     spyOn(Event.prototype, 'preventDefault');
-    component.isMobile = true;
+    component.usingMobileDevice = true;
 
     expect(component.helpText).toBe('');
 
@@ -1171,7 +1171,7 @@ describe('GraphVizComponent', () => {
   it('should set help text to null for add vertex button if user is' +
   ' using mobile', () => {
     spyOn(Event.prototype, 'preventDefault');
-    component.isMobile = true;
+    component.usingMobileDevice = true;
 
     expect(component.helpText).toBe('');
 
@@ -1218,7 +1218,7 @@ describe('GraphVizComponent', () => {
   it('should set help text to null for delete button if user is' +
   ' using mobile', () => {
     spyOn(Event.prototype, 'preventDefault');
-    component.isMobile = true;
+    component.usingMobileDevice = true;
 
     expect(component.helpText).toBe('');
 
@@ -1308,7 +1308,7 @@ describe('GraphVizComponent', () => {
 
   it('should start adding edge when user clicks a vertex in a mobile', () => {
     component.state.currentMode = component._MODES.ADD_EDGE;
-    component.isMobile = true;
+    component.usingMobileDevice = true;
     spyOn(component, 'onTouchInitialVertex').and.callThrough();
     spyOn(component, 'beginAddEdge').and.callThrough();
 
@@ -1328,7 +1328,7 @@ describe('GraphVizComponent', () => {
 
   it('should move vertex when user clicks a vertex in a mobile', () => {
     component.state.currentMode = component._MODES.MOVE;
-    component.isMobile = true;
+    component.usingMobileDevice = true;
     component.state.mouseX = 20;
     component.state.mouseY = 20;
     spyOn(component, 'onTouchInitialVertex').and.callThrough();
@@ -1360,7 +1360,7 @@ describe('GraphVizComponent', () => {
   ' mobile', () => {
     component.state.addEdgeVertex = 0;
     component.state.hoveredVertex = 1;
-    component.isMobile = true;
+    component.usingMobileDevice = true;
 
     expect(component.helpText).toBe('');
 
@@ -1378,7 +1378,7 @@ describe('GraphVizComponent', () => {
     component.state.addEdgeVertex = 1;
     component.state.hoveredVertex = 1;
     component.state.currentlyDraggedVertex = 1;
-    component.isMobile = true;
+    component.usingMobileDevice = true;
     spyOn(component, 'onTouchFinalVertex').and.callThrough();
     spyOn(component, 'endDragVertex').and.callThrough();
 
@@ -1399,7 +1399,7 @@ describe('GraphVizComponent', () => {
     component.state.addEdgeVertex = 1;
     component.state.hoveredVertex = 1;
     component.state.currentlyDraggedVertex = 1;
-    component.isMobile = true;
+    component.usingMobileDevice = true;
     spyOn(component, 'onTouchFinalVertex').and.callThrough();
     spyOn(component, 'tryAddEdge').and.callThrough();
     spyOn(component, 'endAddEdge').and.callThrough();
@@ -1424,7 +1424,7 @@ describe('GraphVizComponent', () => {
 
     component.onMousedownVertex(0);
 
-    expect(component.isMobile).toBe(false);
+    expect(component.usingMobileDevice).toBe(false);
     expect(component.canAddEdge).toBe(true);
     expect(component.beginAddEdge).toHaveBeenCalledWith(0);
     expect(component.state.addEdgeVertex).toBe(0);
@@ -1445,7 +1445,7 @@ describe('GraphVizComponent', () => {
 
     component.onMousedownVertex(0);
 
-    expect(component.isMobile).toBe(false);
+    expect(component.usingMobileDevice).toBe(false);
     expect(component.canMoveVertex).toBe(true);
     expect(component.beginDragVertex).toHaveBeenCalledWith(0);
     expect(component.state.currentlyDraggedVertex).toBe(0);
@@ -1456,7 +1456,7 @@ describe('GraphVizComponent', () => {
   });
 
   it('should not run onMousedownVertex when user uses a mobile phone', () => {
-    component.isMobile = true;
+    component.usingMobileDevice = true;
     spyOn(component, 'beginAddEdge');
     spyOn(component, 'beginDragVertex');
 
@@ -1464,13 +1464,13 @@ describe('GraphVizComponent', () => {
 
     component.onMousedownVertex(0);
 
-    expect(component.isMobile).toBe(true);
+    expect(component.usingMobileDevice).toBe(true);
     expect(component.beginAddEdge).not.toHaveBeenCalled();
     expect(component.beginDragVertex).not.toHaveBeenCalled();
   });
 
   it('should not run onMouseleaveVertex when user uses a mobile phone', () => {
-    component.isMobile = true;
+    component.usingMobileDevice = true;
 
     expect(component.state.hoveredVertex).toBeNull();
 
@@ -1560,7 +1560,7 @@ describe('GraphVizComponent', () => {
 
   // This function only executes on mouse actions.
   it('should not add edge when user is using a mobile', () => {
-    component.isMobile = true;
+    component.usingMobileDevice = true;
     spyOn(component, 'tryAddEdge');
     spyOn(component, 'endAddEdge');
     spyOn(component, 'endDragVertex');
@@ -1579,7 +1579,7 @@ describe('GraphVizComponent', () => {
       component.state.addEdgeVertex = 0;
       spyOn(component, 'tryAddEdge').and.callThrough();
 
-      expect(component.isMobile).toBe(false);
+      expect(component.usingMobileDevice).toBe(false);
       expect(component.graph.edges).toEqual([
         {
           src: 0,
@@ -1623,7 +1623,7 @@ describe('GraphVizComponent', () => {
       component.state.addEdgeVertex = 0;
       spyOn(component, 'tryAddEdge').and.callThrough();
 
-      expect(component.isMobile).toBe(false);
+      expect(component.usingMobileDevice).toBe(false);
       expect(component.graph.edges).toEqual([
         {
           src: 0,
@@ -1662,7 +1662,7 @@ describe('GraphVizComponent', () => {
       component.state.addEdgeVertex = 0;
       spyOn(component, 'tryAddEdge').and.callThrough();
 
-      expect(component.isMobile).toBe(false);
+      expect(component.usingMobileDevice).toBe(false);
       expect(component.graph.edges).toEqual([
         {
           src: 0,
@@ -1702,7 +1702,7 @@ describe('GraphVizComponent', () => {
     spyOn(component, 'tryAddEdge').and.callThrough();
     spyOn(component, 'endAddEdge').and.callThrough();
 
-    expect(component.isMobile).toBe(false);
+    expect(component.usingMobileDevice).toBe(false);
     expect(component.graph.edges).toEqual([
       {
         src: 0,

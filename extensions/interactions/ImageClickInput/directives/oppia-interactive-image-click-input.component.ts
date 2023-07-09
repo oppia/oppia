@@ -76,7 +76,7 @@ export class InteractiveImageClickInput implements OnInit, OnDestroy {
   allRegions: LabeledRegion[];
   dotCoordinateX: number = 0;
   dotCoordinateY: number = 0;
-  isMobile: boolean = false;
+  usingMobileDevice: boolean = false;
   constructor(
     private assetsBackendApiService: AssetsBackendApiService,
     private contextService: ContextService,
@@ -197,10 +197,7 @@ export class InteractiveImageClickInput implements OnInit, OnDestroy {
       this.mouseY = this.lastAnswer.clickPosition[1];
       this.updateCurrentlyHoveredRegions();
     }
-    this.isMobile = false;
-    if (this.deviceInfoService.isMobileDevice()) {
-      this.isMobile = true;
-    }
+    this.usingMobileDevice = !!this.deviceInfoService.isMobileDevice();
 
     this.currentInteractionService.registerCurrentInteraction(null, null);
   }
@@ -290,7 +287,7 @@ export class InteractiveImageClickInput implements OnInit, OnDestroy {
     const image: HTMLImageElement = images[0];
     const imageRect = image.getBoundingClientRect();
     const imageStyles = window.getComputedStyle(image);
-    if (this.isMobile && event instanceof MouseEvent) {
+    if (this.usingMobileDevice && event instanceof MouseEvent) {
       this.mouseX = (
         (event.clientX - image.getBoundingClientRect().left) / image.width);
       this.mouseY = (

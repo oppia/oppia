@@ -106,7 +106,7 @@
         </text>
       </g>
 
-      <line *ngIf="state.addEdgeVertex !== null && !isMobile"
+      <line *ngIf="state.addEdgeVertex !== null && !usingMobileDevice"
             [attr.x1]="graph?.vertices[state.addEdgeVertex].x"
             [attr.y1]="graph?.vertices[state.addEdgeVertex].y"
             [attr.x2]="state.mouseX"
@@ -174,7 +174,7 @@
     </svg>
     <div class="accessibility-dot" (click)="onClickGraphSVG()"  (keydown.enter)="onClickGraphSVG()" *ngIf="state.currentMode === 2"></div>
   </div>
-  <div [hidden]="isMobile">
+  <div [hidden]="usingMobileDevice">
       {{helpText | translate}}
   </div>
   <br>

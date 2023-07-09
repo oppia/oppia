@@ -69,7 +69,7 @@
          (click)="onClickImage()"
          (mousemove)="onMousemoveImage($event)"
          (style)="imageContainerStyle">
-    <div class="accessibility-dot" (click)="onClickImage()" *ngIf="!isMobile">
+    <div class="accessibility-dot" (click)="onClickImage()" *ngIf="!usingMobileDevice">
     </div>
     <div *ngIf="highlightRegionsOnHover">
       <div *ngFor="let region of allRegions; let idx = index"
