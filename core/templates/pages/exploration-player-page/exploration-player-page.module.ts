@@ -39,8 +39,7 @@ import { FatigueDetectionService } from './services/fatigue-detection.service';
 
 import 'third-party-imports/guppy.import';
 import 'third-party-imports/midi-js.import';
-import 'skulpt-dist/skulpt.min.js';
-import 'skulpt-dist/skulpt-stdlib.js';
+import 'third-party-imports/skulpt.import';
 import { ToastrModule } from 'ngx-toastr';
 import { toastrConfig } from 'pages/oppia-root/app.module';
 

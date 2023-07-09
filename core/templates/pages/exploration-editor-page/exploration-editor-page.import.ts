@@ -23,8 +23,7 @@ import 'zone.js';
 import uiValidate from 'angular-ui-validate';
 import 'third-party-imports/guppy.import';
 import 'third-party-imports/midi-js.import';
-import 'skulpt-dist/skulpt.min.js';
-import 'skulpt-dist/skulpt-stdlib.js';
+import 'third-party-imports/skulpt.import';
 import 'third-party-imports/ui-tree.import';
 
 angular.module('oppia', [
