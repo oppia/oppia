@@ -5,7 +5,6 @@ services:
     build:
       context: .
       dockerfile: ./docker/Dockerfile
-      # target: frontend
     container_name: oppia-angular-build
     volumes:
       - .:/app/oppia
@@ -32,7 +31,6 @@ services:
     build:
       context: .
       dockerfile: ./docker/Dockerfile
-      # target: frontend
     container_name: oppia-webpack-compiler
     volumes:
       - .:/app/oppia
@@ -136,8 +134,7 @@ services:
       - "--no-store-on-disk"
 
   firebase:
-    # node:16.13.0
-    image: node@sha256:dfa34389d7202cbe7fa82869b9f4c6743c428e8f624136ea8b1783b7aa854fcd
+    image: node:16.13.0-alpine
     container_name: oppia-firebase-emulator
     ports:
       - "9099:9099"
@@ -163,8 +160,7 @@ services:
       - "--export-on-exit=/app/firebase_emulator_cache"
 
   redis:
-    # redis:6.2.4
-    image: redis@sha256:27fd246b9b12b62eeca9f9521ef863278eb11151a5d3d6523c34585fe83df4b3
+    image: redis:6.2.4
     container_name: oppia-redis
     ports:
       - "6379:6379"
@@ -181,8 +177,7 @@ services:
     command: redis-server /app/oppia/redis_docker.conf
 
   elasticsearch:
-    # elasticsearch:7.17.0
-    image: elasticsearch@sha256:fa7141154a7e14df214e42f08c333702403eb88c02ba44e79322a1f42d733013
+    image: elasticsearch:7.17.0
     container_name: oppia-elasticsearch
     ports:
       - "9200:9200"

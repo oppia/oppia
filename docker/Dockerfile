@@ -1,5 +1,4 @@
-# node:16.13.0
-FROM --platform=linux/amd64 node@sha256:fc9d89b3ca185a65d0e3bef332a173799088338dfd79c77b2440c7cb387ad2e9 AS frontend
+FROM --platform=linux/amd64 node:16.13.0 AS frontend
 
 WORKDIR /app/oppia
 
