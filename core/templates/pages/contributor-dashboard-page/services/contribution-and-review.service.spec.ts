@@ -24,12 +24,15 @@ import { UrlInterpolationService } from 'domain/utilities/url-interpolation.serv
 import { ContributionAndReviewBackendApiService }
   from './contribution-and-review-backend-api.service';
 import { SuggestionBackendDict } from 'domain/suggestion/suggestion.model';
+import { StateObjectsBackendDict } from 'domain/exploration/StatesObjectFactory';
+import { StatesObjectFactory } from 'domain/exploration/StatesObjectFactory';
 
 describe('Contribution and review service', () => {
   let cars: ContributionAndReviewService;
   let carbas: ContributionAndReviewBackendApiService;
   let fetchSuggestionsAsyncSpy: jasmine.Spy;
   let downloadContributorCertificateAsyncSpy: jasmine.Spy;
+  let statesObjectFactory: StatesObjectFactory;
 
   const suggestion1 = {
     suggestion_id: 'suggestion_id_1',
@@ -101,12 +104,14 @@ describe('Contribution and review service', () => {
       imports: [HttpClientTestingModule],
       providers: [
         UrlInterpolationService,
-        ContributionAndReviewBackendApiService
+        ContributionAndReviewBackendApiService,
+        StatesObjectFactory
       ]
     });
     cars = TestBed.inject(ContributionAndReviewService);
     carbas = TestBed.inject(ContributionAndReviewBackendApiService);
     fetchSuggestionsAsyncSpy = spyOn(carbas, 'fetchSuggestionsAsync');
+    statesObjectFactory =  TestBed.inject(StatesObjectFactory)
     downloadContributorCertificateAsyncSpy = spyOn(
       carbas, 'downloadContributorCertificateAsync');
   });
@@ -588,5 +593,170 @@ describe('Contribution and review service', () => {
       expect(onSuccess).not.toHaveBeenCalled();
       expect(onFailure).toHaveBeenCalledWith('pqr');
     }));
+  });
+
+  fdescribe('sort translation suggestions', () => {
+    it('should sort translation cards within each state based' +
+    'on type and index', () => {
+      const translationCards = [
+        {
+          change: {
+            state_name: 'First State',
+            content_id: 'feedback_2'
+          }
+        },
+        {
+          change: {
+            state_name: 'End State',
+            content_id: 'hints_1'
+          }
+        },
+        {
+          change: {
+            state_name: 'First State',
+            content_id: 'content_3'
+          }
+        },
+        {
+          change: {
+            state_name: 'End State',
+            content_id: 'interaction_1'
+          }
+        },
+        {
+          change: {
+            state_name: 'First State',
+            content_id: 'content_1'
+          }
+        },
+        {
+          change: {
+            state_name: 'End State',
+            content_id: 'content_2'
+          }
+        }
+      ];
+
+      const statesBackendDict: StateObjectsBackendDict = {
+        'First State': {
+          classifier_model_id: null,
+          content: {
+            content_id: 'content',
+            html: ''
+          },
+          recorded_voiceovers: {
+            voiceovers_mapping: {
+              content: {},
+              default_outcome: {}
+            }
+          },
+          interaction: {
+            answer_groups: [],
+            confirmed_unclassified_answers: [],
+            customization_args: {
+              buttonText: {
+                value: 'Continue'
+              }
+            },
+            default_outcome: {
+              dest: 'End State',
+              dest_if_really_stuck: null,
+              feedback: {
+                content_id: 'default_outcome',
+                html: ''
+              },
+              param_changes: [],
+              labelled_as_correct: true,
+              refresher_exploration_id: null,
+              missing_prerequisite_skill_id: null
+            },
+            hints: [],
+            solution: null,
+            id: 'Continue'
+          },
+          linked_skill_id: null,
+          param_changes: [],
+          solicit_answer_details: false,
+          card_is_checkpoint: true
+        },
+        'End State': {
+          classifier_model_id: null,
+          content: {
+            content_id: 'content',
+            html: ''
+          },
+          recorded_voiceovers: {
+            voiceovers_mapping: {
+              content: {},
+              default_outcome: {}
+            }
+          },
+          interaction: {
+            answer_groups: [],
+            confirmed_unclassified_answers: [],
+            customization_args: {
+              recommendedExplorationIds: {
+                value: []
+              }
+            },
+            default_outcome: null,
+            hints: [],
+            solution: null,
+            id: 'EndExploration'
+          },
+          linked_skill_id: null,
+          param_changes: [],
+          solicit_answer_details: false,
+          card_is_checkpoint: false
+        }
+      }
+
+      const states = statesObjectFactory.createFromBackendDict(
+        statesBackendDict)
+      const initStateName = 'First State';
+
+      const sortedTranslationCards = cars.sortTranslationSuggestionsByState(
+        translationCards, states, initStateName);
+
+      expect(sortedTranslationCards).toEqual([
+        {
+          change: {
+            state_name: 'First State',
+            content_id: 'content_1'
+          }
+        },
+        {
+          change: {
+            state_name: 'First State',
+            content_id: 'content_3'
+          }
+        },
+        {
+          change: {
+            state_name: 'First State',
+            content_id: 'feedback_2'
+          }
+        },
+        {
+          change: {
+            state_name: 'End State',
+            content_id: 'content_2'
+          }
+        },
+        {
+          change: {
+            state_name: 'End State',
+            content_id: 'interaction_1'
+          }
+        },
+        {
+          change: {
+            state_name: 'End State',
+            content_id: 'hints_1'
+          }
+        }
+      ]);
+    });
+    
   });
 });
