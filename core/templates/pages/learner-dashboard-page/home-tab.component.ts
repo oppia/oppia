@@ -107,6 +107,7 @@ export class HomeTabComponent {
         ...this.explorationPlaylist, ...this.collectionPlaylist);
 
       this.displayLessonsInPlaylist = this.totalLessonsInPlaylist;
+      console.error(this.displayLessonsInPlaylist, 'playlist data');
       this.startIndexInPlaylist = 0;
       this.endIndexInPlaylist = this.totalLessonsInPlaylist.length;
     }, 2000);
@@ -161,7 +162,6 @@ export class HomeTabComponent {
       }
     }
 
-    console.error(this.displayLessonsInPlaylist, 'playlist data');
 
     this.readOnlyExplorationBackendApiService.
       fetchProgressInExplorationsOrChapters(

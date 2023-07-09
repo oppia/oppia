@@ -98,12 +98,12 @@ oppia-exploration-summary-tile .oppia-exploration-objective-title {
   display: -webkit-box;
   font-family: "Roboto", Arial, sans-serif;
   font-size: 0.85em;
-  height: 70px;
-  -webkit-line-clamp: 3;
+  height: 30px;
+  -webkit-line-clamp: 2;
   line-height: 1.26;
   max-height: 4.71em;
   overflow: hidden;
-  padding: 12px;
+  /* padding: 12px; */
   text-overflow: ellipsis;
   word-break: break-word;
   color: #333;
@@ -172,9 +172,9 @@ oppia-exploration-summary-tile .oppia-svg-star-image {
 oppia-exploration-summary-tile .oppia-exploration-link {
   text-decoration: none;
 }
-oppia-exploration-summary-tile .exploration-card {
+/* oppia-exploration-summary-tile .exploration-card {
   height: 100%;
-}
+} */
 oppia-exploration-summary-tile .oppia-summary-section {
   position: absolute;
   width: 100%;
@@ -216,11 +216,15 @@ oppia-exploration-summary-tile .oppia-exploration-learner-dashboard-card {
   box-shadow: 0 3px 6px #00000029;
   display: inline-block;
   height: 286px;
-  /* margin: 0 2px 30px 6px; */
+  margin: 0 2px 1px 6px;
   padding: 0;
   position: relative;
   width: 216px;
   z-index: 5;
+}
+oppia-exploration-summary-tile .oppia-exploration-card-footer {
+  position: relative;
+  display: flex;
 }
 oppia-exploration-summary-tile .oppia-title-section {
   border-top-left-radius: 4px;
