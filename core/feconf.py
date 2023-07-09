@@ -533,6 +533,7 @@ VALID_MAILCHIMP_FIELD_KEYS = ['NAME']
 # Valid Mailchimp tags.
 VALID_MAILCHIMP_TAGS = ['Account', 'Android', 'Web']
 
+ES_HOST = 'elasticsearch' if OPPIA_IS_DOCKERIZED else 'localhost'
 ES_LOCALHOST_PORT = 9200
 # NOTE TO RELEASE COORDINATORS: Replace this with the correct ElasticSearch
 # auth information during deployment.
@@ -543,10 +544,7 @@ ES_USERNAME = None
 # Port when switching to prod server. Keep this in sync with redis.conf in the
 # root folder. Specifically, REDISPORT should always be the same as the port in
 # redis.conf.
-# TODO(#18260): Change this when we permanently move to the Dockerized Setup.
-# For the developers who want to use the docker setup,
-# they need to set the 'localhost' below to 'redis'.
-REDISHOST = 'localhost'
+REDISHOST = 'redis' if OPPIA_IS_DOCKERIZED else 'localhost'
 REDISPORT = 6379
 
 # The DB numbers for various Redis instances that Oppia uses. Do not reuse these

@@ -120,6 +120,7 @@ vpc_access_connector:
   name: projects/PROJECT_ID/locations/us-central1/connectors/oppia-redis-connector-1
 
 env_variables:
+  oppia_is_dockerized: "true"
   PYTHONHTTPSVERIFY: 1
 # GAE_USE_SOCKETS_HTTPLIB is needed for the redis connector in the Python 2
 # runtime. More information can be found here:
