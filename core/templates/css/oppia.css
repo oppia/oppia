@@ -2433,7 +2433,7 @@ div#ng-curtain {
   /* This is larger than the editor tutorial's z-index, but smaller than
      the z-index for Bootstrap modals.
   */
-  z-index: 1005;
+  z-index: 1015;
 }
 
 .oppia-top-of-page-padding {
