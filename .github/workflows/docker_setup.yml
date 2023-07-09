@@ -40,7 +40,7 @@ jobs:
               echo ---Dev-server is up---
               exit 0
             else
-              echo ---Retrying in 5mins---
+              echo ---Retrying in 30 seconds---
               sleep 30
             fi
           done
