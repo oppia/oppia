@@ -425,8 +425,8 @@ describe('GraphVizComponent', () => {
 
     expect(component.initButtons).toHaveBeenCalled();
     // The help text must be displayed only if the user is using a mobile.
-    // Therefore we check that the value of usingMobileDevice is false to make sure that
-    // the help text was not set.
+    // Therefore we check that the value of usingMobileDevice is false
+    // to make sure that the help text was not set.
     expect(component.usingMobileDevice).toBe(false);
     expect(component.helpText).toBe('');
   });

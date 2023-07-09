@@ -434,7 +434,7 @@ describe('InteractiveImageClickInput', () => {
     spyOn(window, 'getComputedStyle').and.returnValue({
       marginLeft: '0px',
       marginTop: '0px'
-    } as CSSStyleDeclaration); 
+    } as CSSStyleDeclaration);
     spyOn(component, 'updateCurrentlyHoveredRegions').and.callThrough();
     spyOnProperty(MouseEvent.prototype, 'clientX', 'get').and.returnValue(290);
     spyOnProperty(MouseEvent.prototype, 'clientY', 'get').and.returnValue(260);
