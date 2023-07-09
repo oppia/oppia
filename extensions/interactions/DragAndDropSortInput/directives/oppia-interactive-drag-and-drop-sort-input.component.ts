@@ -67,13 +67,13 @@ export class InteractiveDragAndDropSortInputComponent implements OnInit {
     private interactionAttributesExtractorService:
       InteractionAttributesExtractorService) {}
 
-  ngAfterViewInit():void {
+  ngAfterViewInit(): void {
     this.listSubscription = this.listItems.changes.subscribe((_) => {
       this.setFocus();
     });
   }
 
-  ngOnDestroy():void {
+  ngOnDestroy(): void {
     this.listSubscription.unsubscribe();
   }
 
@@ -177,18 +177,22 @@ export class InteractiveDragAndDropSortInputComponent implements OnInit {
     let newIndex = currentIndex;
     if (event.key === 'ArrowDown') {
       event.preventDefault();
-      if(this.activeItem != this.listItems.length -1){
+      if (this.activeItem !== this.listItems.length - 1) {
         newIndex += 1;
-        moveItemInArray(this.singleItemInSamePositionArray, 
-          currentIndex, newIndex);
+        moveItemInArray(
+          this.singleItemInSamePositionArray,
+          currentIndex,
+          newIndex);
       }
     }
     if (event.key === 'ArrowUp') {
       event.preventDefault();
-      if(this.activeItem != 0){
+      if (this.activeItem !== 0) {
         newIndex -= 1;
-        moveItemInArray(this.singleItemInSamePositionArray, 
-          currentIndex, newIndex);
+        moveItemInArray(
+          this.singleItemInSamePositionArray,
+          currentIndex,
+          newIndex);
       }
     }
 
