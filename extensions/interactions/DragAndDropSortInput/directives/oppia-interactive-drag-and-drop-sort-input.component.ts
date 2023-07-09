@@ -55,9 +55,8 @@ export class InteractiveDragAndDropSortInputComponent implements OnInit {
   highlightedGroup: number = -1;
   noShow: number = -1;
   rootHeight: number = 40;
-  activeItem: number;
-  listSubscription: Subscription;
-
+  activeItem!: number;
+  listSubscription!: Subscription;
   @ViewChildren('listItem') listItems: QueryList<ElementRef>;
 
   constructor(
