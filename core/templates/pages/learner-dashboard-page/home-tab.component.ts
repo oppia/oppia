@@ -60,7 +60,7 @@ export class HomeTabComponent {
   @Input() mappedStoryIdToLearnerGroupsTitle!: Map<string, string[]>;
 
   explorationProgress!: ChapterProgressSummary[];
-  expIds: string[] = ['AfEoLA8IrHv1'];
+  expIds: string[] = ['fcQEebaQ7iBO'];
 
   carouselClassname: string = 'home-tab';
   currentGoalsLength!: number;
@@ -133,7 +133,6 @@ export class HomeTabComponent {
         currentGoalsIds.push(goal.id);
       }
     }
-
     for (var topicSummaryTile of this.continueWhereYouLeftOffList) {
       for (var storySummary of topicSummaryTile.canonicalStorySummaryDicts) {
         let stotyNodeCount = storySummary.getNodeTitles().length;
@@ -143,19 +142,17 @@ export class HomeTabComponent {
         let storyProgress = Math.floor(
           (storyCompletedNodeCount / stotyNodeCount) * 100);
 
-        console.error('I am a home tab .....');
         var storyData: storySummaryTile = {
           topicName: topicSummaryTile.name,
           storySummary: storySummary,
           markTileAsGoal: currentGoalsIds.includes(topicSummaryTile.id),
           learnerGroupTitle: ''
         };
-        let learnerGroupsTitle =
-        this.mappedStoryIdToLearnerGroupsTitle.get(storySummary.getId());
-        if (learnerGroupsTitle.length !== 0) {
+        if (this.mappedStoryIdToLearnerGroupsTitle.size !== 0) {
+          let learnerGroupsTitle =
+          this.mappedStoryIdToLearnerGroupsTitle.get(storySummary.getId());
           storyData.learnerGroupTitle = learnerGroupsTitle[0];
         }
-        console.error(storyData, 'story data');
         if (storyProgress !== 0) {
           this.storyInProgress.push(storyData);
         } else {
