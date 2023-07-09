@@ -60,7 +60,6 @@ services:
     build:
       context: .
       dockerfile: ./docker/Dockerfile
-      target: backend
     container_name: oppia-app-engine
     ports:
       - "8181:8181"
@@ -103,7 +102,6 @@ services:
     build:
       context: .
       dockerfile: ./docker/Dockerfile
-      target: backend
     container_name: oppia-cloud-datastore
     ports:
       - "8089:8089"
