@@ -94,7 +94,6 @@ export interface ConfigPropertyValues {
   'contributor_dashboard_reviewer_emails_is_enabled': boolean;
   'enable_admin_notifications_for_reviewer_shortage': boolean;
   'max_number_of_suggestions_per_reviewer': number;
-  'notification_user_ids_for_failed_tasks': string[];
   'notify_admins_suggestions_waiting_too_long_is_enabled': boolean;
   'oppia_csrf_secret': string;
   'record_playthrough_probability': number;

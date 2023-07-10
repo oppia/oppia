@@ -22,7 +22,6 @@ import types
 
 from core import feconf
 from core.constants import constants
-from core.domain import config_domain
 from core.domain import config_services
 from core.domain import email_manager
 from core.domain import exp_domain
@@ -65,23 +64,14 @@ class FailedMLTest(test_utils.EmailTestBase):
             feconf, 'CAN_SEND_EMAILS', True)
         self.can_send_feedback_email_ctx = self.swap(
             feconf, 'CAN_SEND_FEEDBACK_MESSAGE_EMAILS', True)
-        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
-        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
-        config_property = config_domain.Registry.get_config_property(
-            'notification_user_ids_for_failed_tasks')
-        # Ruling out the possibility of None for mypy type checking.
-        assert config_property is not None
-        config_property.set_value(
-            'committer_id', [self.get_user_id_from_email(
-                self.CURRICULUM_ADMIN_EMAIL)])
+        self.signup(
+            feconf.ADMIN_EMAIL_ADDRESS, self.CURRICULUM_ADMIN_USERNAME, True)
+        self.login(feconf.ADMIN_EMAIL_ADDRESS, is_super_admin=True)
 
     def test_send_failed_ml_email(self) -> None:
         with self.can_send_emails_ctx, self.can_send_feedback_email_ctx:
             # Make sure there are no emails already sent.
             messages = self._get_sent_email_messages(feconf.ADMIN_EMAIL_ADDRESS)
-            self.assertEqual(len(messages), 0)
-            messages = (
-                self._get_sent_email_messages(self.CURRICULUM_ADMIN_EMAIL))
             self.assertEqual(len(messages), 0)
 
             # Send job failure email with mock Job ID.
@@ -90,10 +80,6 @@ class FailedMLTest(test_utils.EmailTestBase):
             # Make sure emails are sent.
             messages = self._get_sent_email_messages(feconf.ADMIN_EMAIL_ADDRESS)
             expected_subject = 'Failed ML Job'
-            self.assertEqual(len(messages), 1)
-            self.assertEqual(messages[0].subject, expected_subject)
-            messages = (
-                self._get_sent_email_messages(self.CURRICULUM_ADMIN_EMAIL))
             self.assertEqual(len(messages), 1)
             self.assertEqual(messages[0].subject, expected_subject)
 

@@ -114,55 +114,6 @@ REMOVED_REVIEWER_EMAIL_DATA: Dict[str, Dict[str, str]] = {
     }
 }
 
-NOTIFICATION_USER_IDS_LIST_SCHEMA: Dict[
-    str,
-    Union[
-        str,
-        Dict[str, Union[str, List[Dict[str, str]]]],
-        List[Dict[str, Union[str, int]]]
-    ]
-] = {
-    'type': schema_utils.SCHEMA_TYPE_LIST,
-    'items': {
-        'type': schema_utils.SCHEMA_TYPE_UNICODE,
-        'validators': [{
-            'id': 'is_valid_user_id',
-        }]
-    },
-    'validators': [{
-        'id': 'has_length_at_most',
-        'max_value': 5
-    }, {
-        'id': 'is_uniquified',
-    }]
-}
-
-EMAIL_HTML_BODY_SCHEMA: Dict[str, Union[str, Dict[str, int]]] = {
-    'type': schema_utils.SCHEMA_TYPE_UNICODE,
-    'ui_config': {
-        'rows': 20,
-    }
-}
-
-EMAIL_CONTENT_SCHEMA: Dict[
-    str,
-    Union[
-        str,
-        List[Dict[str, Union[str, Dict[str, Union[str, Dict[str, int]]]]]]
-    ]
-] = {
-    'type': schema_utils.SCHEMA_TYPE_DICT,
-    'properties': [{
-        'name': 'subject',
-        'schema': {
-            'type': schema_utils.SCHEMA_TYPE_UNICODE,
-        },
-    }, {
-        'name': 'html_body',
-        'schema': EMAIL_HTML_BODY_SCHEMA,
-    }],
-}
-
 EMAIL_SENDER_NAME: platform_parameter_domain.PlatformParameter = (
     Registry.create_platform_parameter(
         platform_parameter_list.ParamNames.EMAIL_SENDER_NAME,
@@ -171,6 +122,7 @@ EMAIL_SENDER_NAME: platform_parameter_domain.PlatformParameter = (
         default='Site Admin'
     )
 )
+
 EMAIL_FOOTER: platform_parameter_domain.PlatformParameter = (
     Registry.create_platform_parameter(
         platform_parameter_list.ParamNames.EMAIL_FOOTER,
@@ -265,17 +217,6 @@ UNPUBLISH_EXPLORATION_EMAIL_HTML_BODY: (
                 'exploration.')
         )
     )
-
-NOTIFICATION_USER_IDS_FOR_FAILED_TASKS_DEFAULT_VALUE: List[str] = []
-
-NOTIFICATION_USER_IDS_FOR_FAILED_TASKS: config_domain.ConfigProperty = (
-    config_domain.ConfigProperty(
-        'notification_user_ids_for_failed_tasks',
-        NOTIFICATION_USER_IDS_LIST_SCHEMA,
-        'User IDs to notify if an ML training task fails',
-        NOTIFICATION_USER_IDS_FOR_FAILED_TASKS_DEFAULT_VALUE
-    )
-)
 
 CONTRIBUTOR_DASHBOARD_REVIEWER_NOTIFICATION_EMAIL_DATA: Dict[str, str] = {
     'email_body_template': (
@@ -550,6 +491,8 @@ SENDER_VALIDATORS: Dict[str, Union[bool, Callable[[str], bool]]] = {
     feconf.BULK_EMAIL_INTENT_LEARNER_REENGAGEMENT: (
         lambda x: x == feconf.SYSTEM_COMMITTER_ID),
     feconf.BULK_EMAIL_INTENT_TEST: (
+        lambda x: x == feconf.SYSTEM_COMMITTER_ID),
+    feconf.EMAIL_INTENT_ML_JOB_FAILURE: (
         lambda x: x == feconf.SYSTEM_COMMITTER_ID)
 }
 
@@ -746,8 +689,7 @@ def _send_bulk_mail(
 
 
 def send_job_failure_email(job_id: str) -> None:
-    """Sends an email to admin email as well as any email addresses
-    specificed on the admin config page.
+    """Sends an email to admin regarding the ML job failure.
 
     Args:
         job_id: str. The Job ID of the failing job.
@@ -757,17 +699,15 @@ def send_job_failure_email(job_id: str) -> None:
         'ML job %s has failed. For more information,'
         'please visit the admin page at:\n'
         'https://www.oppia.org/admin#/jobs') % job_id)
-    send_mail_to_admin(mail_subject, mail_body)
-    recipient_ids = (
-        NOTIFICATION_USER_IDS_FOR_FAILED_TASKS.value)
-    bulk_email_model_id = email_models.BulkEmailModel.get_new_id('')
-    if recipient_ids:
-        _send_bulk_mail(
-            recipient_ids, feconf.SYSTEM_COMMITTER_ID,
-            feconf.BULK_EMAIL_INTENT_ML_JOB_FAILURE, mail_subject, mail_body,
-            feconf.SYSTEM_EMAIL_ADDRESS, feconf.SYSTEM_EMAIL_NAME,
-            bulk_email_model_id
-        )
+    recipient_id = user_services.get_user_settings_from_email(
+        feconf.ADMIN_EMAIL_ADDRESS).user_id
+    _send_email(
+        recipient_id, feconf.SYSTEM_COMMITTER_ID,
+        feconf.EMAIL_INTENT_ML_JOB_FAILURE,
+        mail_subject, mail_body,
+        feconf.SYSTEM_EMAIL_ADDRESS, False,
+        feconf.SYSTEM_EMAIL_NAME
+    )
 
 
 def send_dummy_mail_to_admin(username: str) -> None:

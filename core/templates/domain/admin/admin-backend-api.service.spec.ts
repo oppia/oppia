@@ -110,7 +110,6 @@ describe('Admin backend api service', () => {
     contributor_dashboard_reviewer_emails_is_enabled: true,
     enable_admin_notifications_for_reviewer_shortage: false,
     max_number_of_suggestions_per_reviewer: 5,
-    notification_user_ids_for_failed_tasks: [],
     notify_admins_suggestions_waiting_too_long_is_enabled: false,
     oppia_csrf_secret: 'H62T5aIngXb1PB6arDkFrAnxakpQ=',
     record_playthrough_probability: 0.2
