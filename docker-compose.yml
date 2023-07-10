@@ -13,6 +13,8 @@ services:
       - shared_js_ts_proto_files:/app/oppia/extensions/classifiers/proto
       - shared_assets_dir:/app/oppia/assets
       - shared_angular_build:/app/oppia/dist
+    environment:
+      - NODE_OPTIONS=--max_old_space_size=4096
     healthcheck:
       test: test "$(ls -A /app/oppia/dist)" || exit 1
       timeout: 30s
@@ -24,7 +26,7 @@ services:
     command: >
       sh -c '
         trap "rm /app/oppia/node_modules/@angular/compiler-cli/ngcc/__ngcc_lock_file__" EXIT
-        export NODE_OPTIONS=--max_old_space_size=4096 && /app/oppia/node_modules/.bin/ng build --watch
+        /app/oppia/node_modules/.bin/ng build --watch
       '
 
   webpack-compiler:
