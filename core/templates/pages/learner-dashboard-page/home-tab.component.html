@@ -106,7 +106,7 @@
     <div class="community-lessons-playlist-section playlist" *ngIf="totalLessonsInPlaylist.length !== 0">
       <div class="summary-container">
         <oppia-carousel-bar [carouselClassname]="'.playlist '">
-          <div *ngFor="let summaryTile of displayLessonsInPlaylist" class="oppia-summary-tile-container"
+          <div *ngFor="let summaryTile of totalLessonsInPlaylist" class="oppia-summary-tile-container"
             (mouseenter)="summaryTile.toggle = !summaryTile.toggle"
             (mouseleave)="summaryTile.toggle = !summaryTile.toggle">
   
@@ -141,6 +141,7 @@
               <oppia-collection-summary-tile 
                 [getCollectionId]="summaryTile.id" 
                 [getCollectionTitle]="summaryTile.title"
+                [displayAreaIsLearnerDashboard]="true"
                 [getLastUpdatedMsec]="summaryTile.lastUpdatedMsec" 
                 [getObjective]="summaryTile.objective"
                 [getNodeCount]="summaryTile.nodeCount" 

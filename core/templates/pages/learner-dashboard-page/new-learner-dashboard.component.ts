@@ -118,7 +118,7 @@ export class NewLearnerDashboardComponent implements OnInit {
   numberOfUnreadThreads!: number;
   explorationPlaylist!: LearnerExplorationSummary[];
   collectionPlaylist!: CollectionSummary[];
-  mappedStoryIdToLearnerGroupsTitle: Map<string, string[]> = new Map();
+  storyIdToLearnerGroupsTitleMap: Map<string, string[]> = new Map();
   activeSection!: string;
   activeSubsection!: string;
 
@@ -238,17 +238,17 @@ export class NewLearnerDashboardComponent implements OnInit {
               let title = learnerGroup.title;
               let storyIds = learnerGroup.storyIds;
               for (var storyId of storyIds) {
-                if (this.mappedStoryIdToLearnerGroupsTitle.has(storyId)) {
-                  this.mappedStoryIdToLearnerGroupsTitle.
+                if (this.storyIdToLearnerGroupsTitleMap.has(storyId)) {
+                  this.storyIdToLearnerGroupsTitleMap.
                     get(storyId).push(title);
                 } else {
-                  this.mappedStoryIdToLearnerGroupsTitle.set(storyId, [title]);
+                  this.storyIdToLearnerGroupsTitleMap.set(storyId, [title]);
                 }
               }
             }
           }
         );
-      console.error(this.mappedStoryIdToLearnerGroupsTitle, 'lllsssssss');
+      console.error(this.storyIdToLearnerGroupsTitleMap, 'lllsssssss');
     });
 
 

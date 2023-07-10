@@ -1,4 +1,4 @@
-<div *ngIf="false">
+<div *ngIf="!displayAreaIsLearnerDashboard">
 <div *ngIf="!mobileCardToBeShown">
   <oppia-learner-dashboard-icons *ngIf="showLearnerDashboardIconsIfPossible && userIsLoggedIn"
                                 [activityType]="activityTypeCollection"
@@ -87,7 +87,7 @@
   </mat-card>
 </div>
 </div>
-<div *ngIf="true">
+<div *ngIf="displayAreaIsLearnerDashboard">
     <mat-card class="oppia-collection-dashboard-card" [attr.style]="isButtonHovered()">
         <div>
         <div class="collection-card">

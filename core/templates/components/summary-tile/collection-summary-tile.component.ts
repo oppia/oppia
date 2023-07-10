@@ -53,6 +53,8 @@ export class CollectionSummaryTileComponent implements OnInit, OnDestroy {
   @Input() isContainerNarrow: boolean = false;
   @Input() isOwnedByCurrentUser: boolean = false;
   @Input() mobileCutoffPx!: number;
+  @Input() displayAreaIsLearnerDashboard: boolean = false;
+
 
   userIsLoggedIn: boolean = false;
   collectionIsCurrentlyHoveredOver: boolean = false;

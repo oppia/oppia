@@ -78,8 +78,6 @@ export class HomeTabComponent {
   windowIsNarrow: boolean = false;
   storyInProgress: storySummaryTile[] = [];
   storyInRecommended: storySummaryTile[] = [];
-  displayLessonsInPlaylist: (
-    LearnerExplorationSummary | CollectionSummary)[] = [];
 
   totalLessonsInPlaylist: (
       LearnerExplorationSummary | CollectionSummary)[] = [];
@@ -106,8 +104,7 @@ export class HomeTabComponent {
       this.totalLessonsInPlaylist.push(
         ...this.explorationPlaylist, ...this.collectionPlaylist);
 
-      this.displayLessonsInPlaylist = this.totalLessonsInPlaylist;
-      console.error(this.displayLessonsInPlaylist, 'playlist data');
+      console.error(this.totalLessonsInPlaylist, 'playlist data');
       this.startIndexInPlaylist = 0;
       this.endIndexInPlaylist = this.totalLessonsInPlaylist.length;
     }, 2000);

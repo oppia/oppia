@@ -355,6 +355,8 @@ export class CollectionPlayerPageComponent implements OnInit, OnDestroy {
     this.readOnlyCollectionBackendApiService.loadCollectionAsync(
       this.collectionId).then(
       (collection) => {
+        console.error(collection, 'collection');
+        console.error(collection.getCollectionNodes(), 'collection nodes');
         this.updateCollection(collection);
         // The onLangChange event is initially fired before the collection is
         // loaded. Hence the first setpageTitle() call needs to made
