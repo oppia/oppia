@@ -308,9 +308,8 @@ export class ContributionAndReviewService {
             hints: 4,
             solution: 5
           };
-          return order[type] !== undefined ?
-          order[type] :
-          Number.MAX_SAFE_INTEGER;
+          return order.hasOwnProperty(type) ?
+          order[type] : Number.MAX_SAFE_INTEGER;
         };
 
         const cardATypeOrder = getTypeOrder(cardA.change.content_id);
