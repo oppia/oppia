@@ -17,6 +17,9 @@
   padding: 32px 0 30px 40px;
   /* width: 736px; */
 }
+.home-tab .continue-where-you-left-off-section {
+  display: flex;
+}
 .home-tab .suggested-for-you .classroom-name {
   color: #333;
   font-size: 19px;

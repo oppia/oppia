@@ -56,6 +56,8 @@ export class HomeTabComponent {
   @Input() untrackedTopics!: Record<string, LearnerTopicSummary[]>;
   @Input() username!: string;
   @Input() explorationPlaylist!: LearnerExplorationSummary[];
+  @Input() incompleteExplorationsList!: LearnerExplorationSummary[];
+  @Input() completedExplorationsList!: LearnerExplorationSummary[];
   @Input() collectionPlaylist!: CollectionSummary[];
   @Input() storyIdToLearnerGroupsTitleMap!: Map<string, string[]>;
 
@@ -76,8 +78,12 @@ export class HomeTabComponent {
   storyInProgress: storySummaryTile[] = [];
   storyInRecommended: storySummaryTile[] = [];
   expIds: string[] = [];
+  completedExpIds: string[] = [];
   explorationToProgressMap: Map<string, number> = new Map();
-  // ExplorationsProgressSummary!: ChapterProgressSummary[];
+  totalExploration: LearnerExplorationSummary[] = [];
+  storyExplorationProgressList: (
+    LearnerExplorationSummary | storySummaryTile)[] = [];
+  // ExplorationsProgressSummary!: Ch apterProgressSummary[];
 
 
   totalLessonsInPlaylist: (
@@ -109,7 +115,11 @@ export class HomeTabComponent {
       this.startIndexInPlaylist = 0;
       this.endIndexInPlaylist = this.totalLessonsInPlaylist.length;
     }, 2000);
-
+    this.totalExploration.push(
+      ...this.explorationPlaylist, ...this.incompleteExplorationsList);
+    console.error(this.totalExploration, 'total exp');
+    console.error(this.incompleteExplorationsList, 'incomple');
+    console.error(this.explorationPlaylist, 'exp playlist');
     this.width = this.widthConst * (this.currentGoals.length);
     var allGoals = [...this.currentGoals, ...this.partiallyLearntTopicsList];
     this.currentGoalsLength = this.currentGoals.length;
@@ -159,24 +169,34 @@ export class HomeTabComponent {
         }
       }
     }
-
-    if (this.explorationPlaylist.length !== 0) {
-      for (var exp of this.explorationPlaylist) {
-        this.expIds.push(exp.id);
+    this.storyExplorationProgressList.push(
+      ...this.storyInProgress, ...this.incompleteExplorationsList);
+    console.error(this.storyExplorationProgressList, 'story exp proge');
+    // For (var tl of this.storyExplorationProgressList) {
+    //   console.error(this.getstoryExplorationTileType(tl), 'tile type..');
+    // }
+    for (var exp of this.completedExplorationsList) {
+      this.completedExpIds.push(exp.id);
+    }
+    console.error(this.totalExploration.length, 'leeengthhhhh');
+    if (this.totalExploration.length !== 0) {
+      let expIds = [];
+      for (var exp of this.totalExploration) {
+        expIds.push(exp.id);
       }
 
       this.readOnlyExplorationBackendApiService.
         fetchProgressInExplorationsOrChapters(
-          this.expIds
+          expIds
         ).then(explorationsProgressSummary => {
           let explorationsProgress = explorationsProgressSummary;
 
           if (explorationsProgress.length !== 0) {
             console.error('178...');
-            for (let i = 0; i < this.expIds.length; i++) {
+            for (let i = 0; i < expIds.length; i++) {
               let progress =
-          this.calculateExplorationProgress(explorationsProgress[i]);
-              this.explorationToProgressMap.set(this.expIds[i], progress);
+          this.calculateExplorationProgress(explorationsProgress[i], expIds[i]);
+              this.explorationToProgressMap.set(expIds[i], progress);
             }
             console.error(this.explorationToProgressMap, 'progress map');
           }
@@ -185,19 +205,6 @@ export class HomeTabComponent {
             explorationsProgressSummary, 'progressof exploration .....');
         });
     }
-
-    // Console.error('176 line');
-    // console.error(this.explorationsProgressSummary, 'exp progfsldnlfs');
-    // if (this.explorationsProgressSummary.length !== 0) {
-    //   console.error('178...');
-    //   for (let i = 0; i < this.expIds.length; i++) {
-    //     let progress =
-    //       this.calculateExplorationProgress(
-    //         this.explorationsProgressSummary[i]);
-    //     this.explorationToProgressMap.set(this.expIds[i], progress);
-    //   }
-    //   console.error(this.explorationToProgressMap, 'progress map');
-    // }
 
     this.windowIsNarrow = this.windowDimensionService.isWindowNarrow();
     this.directiveSubscriptions.add(
@@ -213,14 +220,32 @@ export class HomeTabComponent {
     return 'collection';
   }
 
-  calculateExplorationProgress(explorationProgress: ChapterProgressSummary):
-   number {
+  calculateExplorationProgress(
+      explorationProgress: ChapterProgressSummary, expId: string): number {
     let totalCheckpoints = explorationProgress.totalCheckpoints;
     let visitedCheckpoints = explorationProgress.visitedCheckpoints;
+
+    if (this.completedExpIds.includes(expId)) {
+      return 100;
+    }
+
+    if (visitedCheckpoints === 1 && totalCheckpoints === 1) {
+      return 0;
+    }
+
     console.error(visitedCheckpoints, 'visited check[points..');
+    console.error(totalCheckpoints, 'total checkkk');
     let progress = (visitedCheckpoints / totalCheckpoints) * 100;
     console.error(progress, 'progressssss');
     return progress;
+  }
+
+  getstoryExplorationTileType(
+      tile: LearnerExplorationSummary | storySummaryTile): string {
+    if (tile instanceof LearnerExplorationSummary) {
+      return 'exploration';
+    }
+    return 'story';
   }
 
   getTimeOfDay(): string {
