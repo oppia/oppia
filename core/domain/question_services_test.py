@@ -667,6 +667,33 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
             'object has no attribute \'cmd\' %s '
             'invalid_change_list' % self.question_id)
 
+    def test_cannot_update_question_with_mismatch_of_versions(
+        self
+    ) -> None:
+        changelist = [question_domain.QuestionChange({
+            'cmd': 'update_question_property',
+            'property_name': 'language_code',
+            'new_value': 'bn',
+            'old_value': 'en'
+        })]
+        with self.assertRaisesRegex(
+            Exception,
+            'Trying to update version 2 of question from version 1, '
+            'which is too old. Please reload the page and try again.'):
+            question_services.update_question(
+                self.editor_id, self.question_id_2,
+                changelist, 'change language_code', 2)
+
+        question_model = question_models.QuestionModel.get(self.question_id_2)
+        question_model.version = 100
+        with self.assertRaisesRegex(
+            Exception,
+            'Unexpected error: trying to update version 1 of question '
+            'from version 100. Please reload the page and try again.'):
+            question_services.update_question(
+                self.editor_id, self.question_id_2,
+                changelist, 'change language_code', 1)
+
     def test_replace_skill_id_for_all_questions(self) -> None:
         question_id_2 = question_services.get_new_question_id()
         content_id_generator = translation_domain.ContentIdGenerator()

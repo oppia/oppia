@@ -354,8 +354,14 @@ describe('Exploration Summary Tile Component', () => {
 
     spyOnProperty(windowRef, 'nativeWindow').and.returnValue({
       location: {
-        href: '/parent/id/1'
-      }
+        _hash: '',
+        _hashChange: null,
+        _href: '',
+        hash: '',
+        href: '/parent/id/1',
+        reload: (val: string) => '',
+      },
+      onhashchange: null,
     });
 
     component.loadParentExploration();

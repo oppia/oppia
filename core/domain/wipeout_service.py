@@ -28,6 +28,7 @@ from core.domain import collection_services
 from core.domain import email_manager
 from core.domain import exp_fetchers
 from core.domain import exp_services
+from core.domain import fs_services
 from core.domain import rights_domain
 from core.domain import rights_manager
 from core.domain import taskqueue_services
@@ -101,6 +102,7 @@ def get_pending_deletion_request(
         user_models.PendingDeletionRequestModel.get_by_id(user_id))
     return wipeout_domain.PendingDeletionRequest(
         pending_deletion_request_model.id,
+        pending_deletion_request_model.username,
         pending_deletion_request_model.email,
         pending_deletion_request_model.normalized_long_term_username,
         pending_deletion_request_model.deletion_complete,
@@ -137,6 +139,7 @@ def save_pending_deletion_requests(
             pending_deletion_request_models, pending_deletion_requests):
         deletion_request.validate()
         deletion_request_dict = {
+            'username': deletion_request.username,
             'email': deletion_request.email,
             'normalized_long_term_username': (
                 deletion_request.normalized_long_term_username),
@@ -191,6 +194,7 @@ def pre_delete_user(user_id: str) -> None:
         pending_deletion_requests.append(
             wipeout_domain.PendingDeletionRequest.create_default(
                 profile_id,
+                profile_user_settings.username,
                 profile_user_settings.email
             )
         )
@@ -224,6 +228,7 @@ def pre_delete_user(user_id: str) -> None:
     pending_deletion_requests.append(
         wipeout_domain.PendingDeletionRequest.create_default(
             user_id,
+            user_settings.username,
             user_settings.email,
             normalized_long_term_username=normalized_long_term_username
         )
@@ -380,6 +385,38 @@ def _delete_models_with_delete_at_end_policy(user_id: str) -> None:
             model_class.apply_deletion_policy(user_id)
 
 
+def _delete_profile_picture(
+    pending_deletion_request: wipeout_domain.PendingDeletionRequest
+) -> None:
+    """Verify that the profile picture is deleted.
+
+    Args:
+        pending_deletion_request: PendingDeletionRequest. The pending deletion
+            request object for which to delete or pseudonymize all the models.
+    """
+    username = pending_deletion_request.username
+    # Ruling out the possibility of different types for mypy type checking.
+    assert isinstance(username, str)
+    fs = fs_services.GcsFileSystem(feconf.ENTITY_TYPE_USER, username)
+    filename_png = 'profile_picture.png'
+    filename_webp = 'profile_picture.webp'
+    if fs.isfile(filename_png):
+        fs.delete(filename_png)
+    else:
+        logging.error(
+            '%s Profile picture of username %s in .png format does not exists.'
+            % (WIPEOUT_LOGS_PREFIX, username)
+        )
+
+    if fs.isfile(filename_webp):
+        fs.delete(filename_webp)
+    else:
+        logging.error(
+            '%s Profile picture of username %s in .webp format does not '
+            'exists.' % (WIPEOUT_LOGS_PREFIX, username)
+        )
+
+
 def delete_user(
     pending_deletion_request: wipeout_domain.PendingDeletionRequest
 ) -> None:
@@ -476,8 +513,38 @@ def delete_user(
             ['manager_ids'])
         _pseudonymize_blog_post_models(pending_deletion_request)
         _pseudonymize_version_history_models(pending_deletion_request)
+        _delete_profile_picture(pending_deletion_request)
     _delete_models(user_id, models.Names.EMAIL)
     _delete_models(user_id, models.Names.LEARNER_GROUP)
+
+
+def _verify_profile_picture_is_deleted(username: str) -> bool:
+    """Verify that the profile picture is deleted.
+
+    Args:
+        username: str. The username of the user.
+
+    Returns:
+        bool. True when the profile picture is deleted else False.
+    """
+    fs = fs_services.GcsFileSystem(feconf.ENTITY_TYPE_USER, username)
+    filename_png = 'profile_picture.png'
+    filename_webp = 'profile_picture.webp'
+    all_profile_images_deleted = True
+    if fs.isfile(filename_png):
+        logging.error(
+            '%s Profile picture in .png format is not deleted for user having '
+            'username %s.' % (WIPEOUT_LOGS_PREFIX, username)
+        )
+        all_profile_images_deleted = False
+    elif fs.isfile(filename_webp):
+        logging.error(
+            '%s Profile picture in .webp format is not deleted for user having '
+            'username %s.' % (WIPEOUT_LOGS_PREFIX, username)
+        )
+        all_profile_images_deleted = False
+
+    return all_profile_images_deleted
 
 
 def verify_user_deleted(
@@ -504,6 +571,14 @@ def verify_user_deleted(
     if not include_delete_at_end_models:
         policies_not_to_verify.append(
             base_models.DELETION_POLICY.DELETE_AT_END)
+
+        # Verify if user profile picture is deleted.
+        user_settings_model = user_models.UserSettingsModel.get_by_id(user_id)
+        username = user_settings_model.username
+        user_roles = user_settings_model.roles
+        if feconf.ROLE_ID_MOBILE_LEARNER not in user_roles:
+            if not _verify_profile_picture_is_deleted(username):
+                return False
 
     user_is_verified = True
     for model_class in models.Registry.get_all_storage_model_classes():

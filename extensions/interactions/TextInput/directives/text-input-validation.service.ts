@@ -140,8 +140,9 @@ export class TextInputValidationService {
           warningsList.push({
             type: AppConstants.WARNING_TYPES.ERROR,
             message: (
-              `Answer group ${answerGroupIndex + 1} has multiple rules with ` +
-              `the same type \'${rule.type}\' within the same group.`
+              `Oppia response ${answerGroupIndex + 1} has multiple learner ` +
+              `answers with the same type \'${rule.type}\' within the same ` +
+              'response.'
             )
           });
         }
@@ -162,9 +163,9 @@ export class TextInputValidationService {
           if (hasCollision || seenStringsStartsWith.includes('')) {
             warningsList.push({
               type: AppConstants.WARNING_TYPES.ERROR,
-              message: `Rule ${ruleIndex + 1} from answer group ` +
-                `${answerGroupIndex + 1} will never be matched because it ` +
-                'is preceded by a \'Contains\' rule with a matching input.'
+              message: `Learner answer ${ruleIndex + 1} from Oppia response ` +
+              `${answerGroupIndex + 1} will never be matched because it ` +
+              'is preceded by a \'Contains\' answer with a matching input.'
             });
           }
 
@@ -182,9 +183,9 @@ export class TextInputValidationService {
           if (hasCollision) {
             warningsList.push({
               type: AppConstants.WARNING_TYPES.ERROR,
-              message: `Rule ${ruleIndex + 1} from answer group ` +
-                `${answerGroupIndex + 1} will never be matched because it ` +
-                'is preceded by a \'StartsWith\' rule with a matching prefix.'
+              message: `Learner answer ${ruleIndex + 1} from Oppia response ` +
+              `${answerGroupIndex + 1} will never be matched because it ` +
+              'is preceded by a \'StartsWith\' answer with a matching prefix.'
             });
           }
           seenStringsStartsWith.push(...currentStrings);
@@ -197,9 +198,9 @@ export class TextInputValidationService {
               contentId: null}))) {
             warningsList.push({
               type: AppConstants.WARNING_TYPES.ERROR,
-              message: `Rule ${ruleIndex + 1} from answer group ` +
-                `${answerGroupIndex + 1} will never be matched because it ` +
-                'is preceded by a \'Equals\' rule with a matching input.'
+              message: `Learner answer ${ruleIndex + 1} from Oppia response ` +
+              `${answerGroupIndex + 1} will never be matched because it ` +
+              'is preceded by a \'Equals\' answer with a matching input.'
             });
           } else if (seenStringsFuzzyEquals.some(
             (seenString) => textInputRulesService.FuzzyEquals(
@@ -209,9 +210,9 @@ export class TextInputValidationService {
               contentId: null}))) {
             warningsList.push({
               type: AppConstants.WARNING_TYPES.ERROR,
-              message: `Rule ${ruleIndex + 1} from answer group ` +
-                `${answerGroupIndex + 1} will never be matched because it ` +
-                'is preceded by a \'FuzzyEquals\' rule with a matching input.'
+              message: `Learner answer ${ruleIndex + 1} from Oppia response ` +
+              `${answerGroupIndex + 1} will never be matched because it ` +
+              'is preceded by a \'FuzzyEquals\' answer with a matching input.'
             });
           }
           seenStringsEquals.push(...currentStrings);
@@ -224,9 +225,9 @@ export class TextInputValidationService {
               contentId: null}))) {
             warningsList.push({
               type: AppConstants.WARNING_TYPES.ERROR,
-              message: `Rule ${ruleIndex + 1} from answer group ` +
-                `${answerGroupIndex + 1} will never be matched because it ` +
-                'is preceded by a \'FuzzyEquals\' rule with a matching input.'
+              message: `Learner answer ${ruleIndex + 1} from Oppia response ` +
+              `${answerGroupIndex + 1} will never be matched because it ` +
+              'is preceded by a \'FuzzyEquals\' answer with a matching input.'
             });
           }
           seenStringsFuzzyEquals.push(...currentStrings);

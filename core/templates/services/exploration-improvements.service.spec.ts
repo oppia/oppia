@@ -205,7 +205,6 @@ describe('Exploration Improvements Service', () => {
     stassGetTopAnswersByStateNameAsyncSpy.and.returnValue(Promise.resolve(
       new Map()));
 
-    explorationImprovementsService.ngOnInit();
     explorationStatesService.init(statesBackendDict, false);
   });
 
@@ -413,7 +412,6 @@ describe('Exploration Improvements Service', () => {
         issue_description: null,
         resolved_on_msecs: null,
         resolver_username: null,
-        resolver_profile_picture_data_url: null,
       });
       eibasGetTasksAsyncSpy.and.returnValue(Promise.resolve(
         new ExplorationImprovementsResponse([hbrTask], new Map())));

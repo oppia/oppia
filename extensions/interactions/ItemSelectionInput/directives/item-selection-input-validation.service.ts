@@ -155,8 +155,8 @@ export class ItemSelectionInputValidationService {
                 warningsList.push({
                   type: AppConstants.WARNING_TYPES.ERROR,
                   message: (
-                    'In answer group ' + (answerIndex + 1) + ', ' +
-                    'rule ' + (ruleIndex + 1) + ', ' +
+                    'In Oppia Response ' + (answerIndex + 1) + ', ' +
+                    'Learner answer ' + (ruleIndex + 1) + ', ' +
                     'please select only one answer choice.')
                 });
               }
@@ -203,7 +203,7 @@ export class ItemSelectionInputValidationService {
             warningsList.push({
               type: AppConstants.WARNING_TYPES.ERROR,
               message: (
-                `Rule ${(ruleIndex + 1)} from answer group ` +
+                `Learner answer ${(ruleIndex + 1)} from Oppia response ` +
                 `${(answerIndex + 1)} options do not match customization ` +
                 'argument choices.')
             });
@@ -214,9 +214,9 @@ export class ItemSelectionInputValidationService {
               warningsList.push({
                 type: AppConstants.WARNING_TYPES.ERROR,
                 message: (
-                  'In answer group ' + (answerIndex + 1) + ', ' +
-                  'rule ' + (ruleIndex + 1) + ', the "proper subset" ' +
-                  'rule must include at least 2 options.')
+                  'In Oppia response ' + (answerIndex + 1) + ', ' +
+                  'learner answer ' + (ruleIndex + 1) + ', the "proper ' +
+                  'subset" learner answer must include at least 2 options.')
               });
             }
           } else if (rule.type === 'Equals') {
@@ -225,10 +225,10 @@ export class ItemSelectionInputValidationService {
               warningsList.push({
                 type: AppConstants.WARNING_TYPES.ERROR,
                 message: (
-                  'In answer group ' + (answerIndex + 1) + ', ' +
-                  'rule ' + (ruleIndex + 1) + ', the number of correct ' +
-                  'options in the "Equals" rule should be between ' +
-                    minAllowedCount + ' and ' + maxAllowedCount +
+                  'In Oppia response ' + (answerIndex + 1) + ', ' +
+                  'Learner answer ' + (ruleIndex + 1) + ', the number of ' +
+                  'correct options in the "Equals" learner answer should be ' +
+                  'between ' + minAllowedCount + ' and ' + maxAllowedCount +
                   ' (the minimum and maximum allowed selection counts).')
               });
             }
@@ -239,9 +239,9 @@ export class ItemSelectionInputValidationService {
             warningsList.push({
               type: AppConstants.WARNING_TYPES.ERROR,
               message: (
-                'In answer group ' + (answerIndex + 1) + ', rule ' +
-                (ruleIndex + 1) + ', the "ContainsAtLeastOneOf" rule ' +
-                'should have at least one option.')
+                'In Oppia response ' + (answerIndex + 1) + ', learner answer ' +
+                (ruleIndex + 1) + ', the "ContainsAtLeastOneOf" learner ' +
+                'answer should have at least one option.')
             });
           }
         }

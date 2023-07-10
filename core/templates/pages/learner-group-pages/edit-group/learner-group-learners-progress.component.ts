@@ -24,6 +24,7 @@ import { LearnerGroupUserProgress } from 'domain/learner_group/learner-group-use
 import { LearnerGroupData } from 'domain/learner_group/learner-group.model';
 import { StoryViewerBackendApiService } from 'domain/story_viewer/story-viewer-backend-api.service';
 import { NavigationService } from 'services/navigation.service';
+import { UserService } from 'services/user.service';
 
 import './learner-group-learners-progress.component.css';
 
@@ -46,7 +47,8 @@ export class LearnerGroupLearnersProgressComponent implements OnInit {
     private learnerGroupSyllabusBackendApiService:
       LearnerGroupSyllabusBackendApiService,
     private navigationService: NavigationService,
-    private storyViewerBackendApiService: StoryViewerBackendApiService
+    private storyViewerBackendApiService: StoryViewerBackendApiService,
+    private userService: UserService
   ) {}
 
   ngOnInit(): void {
@@ -89,8 +91,16 @@ export class LearnerGroupLearnersProgressComponent implements OnInit {
     return strugglingSubtopicsCount;
   }
 
-  getProfileImageDataUrl(dataUrl: string): string {
-    return decodeURIComponent(dataUrl);
+  getProfileImagePngDataUrl(username: string): string {
+    let [pngImageUrl, _] = this.userService.getProfileImageDataUrl(
+      username);
+    return pngImageUrl;
+  }
+
+  getProfileImageWebpDataUrl(username: string): string {
+    let [_, webpImageUrl] = this.userService.getProfileImageDataUrl(
+      username);
+    return webpImageUrl;
   }
 
   activateLearnerSpecificView(

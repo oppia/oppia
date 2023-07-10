@@ -74,6 +74,7 @@ from core.platform.search import elastic_search_services
 from core.platform.taskqueue import cloud_tasks_emulator
 import main
 from proto_files import text_classifier_pb2
+from scripts import common
 
 import elasticsearch
 import requests_mock
@@ -285,7 +286,11 @@ def check_image_png_or_webp(image_string: str) -> bool:
 
 
 def get_storage_model_module_names() -> Iterator[models.Names]:
-    """Get all module names in storage."""
+    """Get all model names in storage.
+
+    Yields:
+        Names. The model with all model names in storage.
+    """
     # As models.Names is an enum, it cannot be iterated over. So we use the
     # __dict__ property which can be iterated over.
     for name in models.Names:
@@ -293,7 +298,11 @@ def get_storage_model_module_names() -> Iterator[models.Names]:
 
 
 def get_storage_model_classes() -> Iterator[Type[base_models.BaseModel]]:
-    """Get all model classes in storage."""
+    """Get all model classes in storage.
+
+    Yields:
+        BaseModel. The model with all model classes in storage.
+    """
     for module_name in get_storage_model_module_names():
         (module,) = models.Registry.import_models([module_name])
         for member_name, member_obj in inspect.getmembers(module):
@@ -1208,6 +1217,9 @@ class TestBase(unittest.TestCase):
     def log_line(self, line: str) -> None:
         """Print the line with a prefix that can be identified by the script
         that calls the test.
+
+        Args:
+            line: str. The log line.
         """
         # We are using the b' prefix as all the stdouts are in bytes.
         print(b'%s%s' % (LOG_LINE_PREFIX, line.encode()))
@@ -1228,6 +1240,17 @@ class TestBase(unittest.TestCase):
         Note that the list of parameter changes is ordered. Parameter changes
         later in the list may depend on parameter changes that have been set
         earlier in the same list.
+
+        Args:
+            param_dict: dict. The old param dict.
+            param_changes: list. The param changes to use for the update.
+            exp_param_specs: dict. The expected param specifications.
+
+        Returns:
+            dict. The updated param dict.
+
+        Raises:
+            Exception. Parameter not found.
         """
         new_param_dict = copy.deepcopy(param_dict)
         for param_change in param_changes:
@@ -1250,6 +1273,12 @@ class TestBase(unittest.TestCase):
     def get_static_asset_url(self, asset_suffix: str) -> str:
         """Returns the relative path for the asset, appending it to the
         corresponding cache slug. asset_suffix should have a leading slash.
+
+        Args:
+            asset_suffix: str. The asset suffix to append to the cache slug.
+
+        Returns:
+            str. The relative path for the asset.
         """
         return '/assets%s%s' % (utils.get_asset_dir_prefix(), asset_suffix)
 
@@ -1842,11 +1871,20 @@ class AppEngineTestBase(TestBase):
         storage_services.CLIENT.namespace = self.id()
         # Set up apps for testing.
         self.testapp = webtest.TestApp(main.app_without_context)
+        # Mock set_constans_to_default method to throw an exception.
+        # Don't directly change constants file in the test.
+        # Mock this method again in your test.
+        self.contextManager = self.swap(
+            common, 'set_constants_to_default',
+            self.mock_set_constants_to_default)
+        self.contextManager.__enter__()
 
     def tearDown(self) -> None:
         datastore_services.delete_multi(
             list(datastore_services.query_everything().iter(keys_only=True)))
         storage_services.CLIENT.reset()
+        if hasattr(self, 'contextManager'):
+            self.contextManager.__exit__(None, None, None)
         super().tearDown()
 
     def run(self, result: Optional[unittest.TestResult] = None) -> None:
@@ -1916,6 +1954,13 @@ class AppEngineTestBase(TestBase):
         return self._platform_taskqueue_services_stub.get_pending_tasks(
             queue_name=queue_name)
 
+    def mock_set_constants_to_default(self) -> None:
+        """Change constants file in the test could lead to other
+        tests fail. Mock set_constants_to_default method in your test
+        will suppress this exception.
+        """
+        raise Exception('Please mock this method in the test.')
+
 
 class GenericTestBase(AppEngineTestBase):
     """Base test class with common/generic helper methods.
@@ -1945,6 +1990,8 @@ class GenericTestBase(AppEngineTestBase):
     BLOG_ADMIN_USERNAME: Final = 'blogadm'
     BLOG_EDITOR_EMAIL: Final = 'blogeditor@example.com'
     BLOG_EDITOR_USERNAME: Final = 'blogeditor'
+    CLASSROOM_ADMIN_EMAIL: Final = 'classroomadmin@example.com'
+    CLASSROOM_ADMIN_USERNAME: Final = 'classroomadm'
     MODERATOR_EMAIL: Final = 'moderator@example.com'
     MODERATOR_USERNAME: Final = 'moderator'
     RELEASE_COORDINATOR_EMAIL: Final = 'releasecoordinator@example.com'
@@ -2253,6 +2300,7 @@ states:
 states_schema_version: %d
 tags: []
 title: Title
+version: 1
 """) % (
     feconf.DEFAULT_INIT_STATE_NAME,
     exp_domain.Exploration.CURRENT_EXP_SCHEMA_VERSION,
@@ -2792,7 +2840,15 @@ title: Title
     def _parse_json_response(
         self, json_response: webtest.TestResponse, expect_errors: bool
     ) -> Any:
-        """Convert a JSON server response to an object (such as a dict)."""
+        """Convert a JSON server response to an object (such as a dict).
+
+        Args:
+            json_response: webtest.TestResponse. The test reponse.
+            expect_errors: bool. Whether errors are expected.
+
+        Returns:
+            dict. A json response from the server except the XSSI_PREFIX.
+        """
         if expect_errors:
             self.assertTrue(json_response.status_int >= 400)
         else:
@@ -2816,7 +2872,17 @@ title: Title
         expected_status_int: int = 200,
         headers: Optional[Dict[str, str]] = None
     ) -> Any:
-        """Get a JSON response, transformed to a Python object."""
+        """Get a JSON response, transformed to a Python object.
+
+        Args:
+            url: str. The url to make a request for.
+            params: Dict[str, Any]. The arguments to be sent over.
+            expected_status_int: int. The expetected response status.
+            headers: Dict[str, str]. The headers used in the request.
+
+        Returns:
+            dict. A json response from the server.
+        """
         if params is not None:
             self.assertIsInstance(params, dict)
 
@@ -3016,6 +3082,17 @@ title: Title
     ) -> webtest.TestApp:
         """Posts an object to the server by JSON with the specific headers
         specified; return the received object.
+
+        Args:
+            url: str. The url to post an object to.
+            payload: dict. The dictionary which needs to be sent.
+            headers: dict. The headers set in the request.
+            csrf_token: str. The csrf token to identify the user.
+            expect_errors: bool. Whether errors are expected.
+            expected_status_int: int. The expected status code.
+
+        Returns:
+            webtest.TestApp. The respose of the post task request.
         """
         if csrf_token:
             payload['csrf_token'] = csrf_token
@@ -3037,7 +3114,18 @@ title: Title
         csrf_token: Optional[str] = None,
         expected_status_int: int = 200
     ) -> Dict[str, Any]:
-        """PUT an object to the server with JSON and return the response."""
+        """PUT an object to the server with JSON and return the response.
+
+        Args:
+            url: str. The url of where to put the object.
+            payload: dict. The dictionary to be sent over to the handler.
+            csrf_token: str. The csrf token to use.
+            expected_status_int: int. The integer status code to expect. Will be
+                200 if not specified.
+
+        Returns:
+            dict. A json dict response from the server.
+        """
         params = {'payload': json.dumps(payload)}
         if csrf_token:
             params['csrf_token'] = csrf_token

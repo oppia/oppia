@@ -24,7 +24,7 @@ import { downgradeComponent } from '@angular/upgrade/static';
 import { Component, Input, OnInit } from '@angular/core';
 import { HtmlEscaperService } from 'services/html-escaper.service';
 
-interface Answer {
+export interface Answer {
   code: string;
 }
 
@@ -33,18 +33,19 @@ interface Answer {
   templateUrl: './pencil-code-editor-response.component.html'
 })
 export class ResponePencilCodeEditor implements OnInit {
-  @Input() answer: Answer;
-  answerCode: string;
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  @Input() answer!: string;
+  answerCode!: string;
 
   constructor(
     private htmlEscaperService: HtmlEscaperService
   ) {}
 
-  // TODO(#13015): Remove use of unknown as a type.
   ngOnInit(): void {
     this.answerCode = (
-      (this.htmlEscaperService.escapedJsonToObj(
-        (this.answer) as unknown as string) as Answer).code);
+      (this.htmlEscaperService.escapedJsonToObj(this.answer) as Answer).code);
   }
 }
 

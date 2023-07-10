@@ -60,15 +60,15 @@ describe('OnScreenKeyboard', function() {
 
   it('should correctly identify keyboard events', function() {
     component.lettersAreLowercase = true;
-    component.keyDownCallBack({key: 'Shift'} as unknown as KeyboardEvent);
+    component.keyDownCallBack({key: 'Shift'} as KeyboardEvent);
     expect(component.lettersAreLowercase).toBeFalse();
-    component.keyUpCallBack({key: 'Shift'} as unknown as KeyboardEvent);
+    component.keyUpCallBack({key: 'Shift'} as KeyboardEvent);
     expect(component.lettersAreLowercase).toBeTrue();
 
     component.value = ['x'];
-    component.keyDownCallBack({key: 'Backspace'} as unknown as KeyboardEvent);
+    component.keyDownCallBack({key: 'Backspace'} as KeyboardEvent);
     expect(component.value.length).toBe(0);
-    component.keyDownCallBack({key: 'x'} as unknown as KeyboardEvent);
+    component.keyDownCallBack({key: 'x'} as KeyboardEvent);
     let event: Event = new KeyboardEvent('keydown', {
       code: 'a'
     });

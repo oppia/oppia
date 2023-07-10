@@ -6,7 +6,7 @@
       {{explanationPopupContent}}
     </span>
   </div>
-  <div class="oppia-translation-language-selector-inner-container" (click)="toggleDropdown()">
+  <div class="oppia-translation-language-selector-inner-container" (click)="toggleDropdown()" tabindex="0" (keydown.enter)="toggleDropdown()">
     <span class="oppia-language-selector-label e2e-test-language-selector-selected">
       {{languageSelection}}
     </span>
@@ -30,7 +30,9 @@
         <div *ngFor="let featuredOption of featuredLanguages; index as i">
           <div class="oppia-translation-language-selector-dropdown-option e2e-test-featured-language"
                *ngIf="languageIdToDescription[featuredOption.languageCode]"
+               tabindex="0"
                (click)="selectOption(featuredOption.languageCode)"
+               (keydown.enter)="selectOption(featuredOption.languageCode)"
                [ngClass]="{'oppia-translation-language-selector-dropdown-option-selected' : featuredOption.languageCode === activeLanguageCode}">
             <span class="material-icons oppia-translation-language-selector-info-icon e2e-test-featured-language-tooltip"
                   *ngIf="featuredOption.explanation"
@@ -48,6 +50,8 @@
       <div class="oppia-translation-language-selector-dropdown-option e2e-test-language-selector-option"
            *ngFor="let option of filteredOptions"
            (click)="selectOption(option.id)"
+           (keydown.enter)="selectOption(option.id)"
+           tabindex="0"
            [ngClass]="{'oppia-translation-language-selector-dropdown-option-selected' : option.id === activeLanguageCode}">
         {{option.description}}
       </div>
@@ -147,6 +151,7 @@
 
   .oppia-translation-language-selector-featured-tooltip {
     position: relative;
+    z-index: 2;
   }
 
   .oppia-translation-language-selector-featured-tooltip .oppia-translation-language-selector-featured-tooltip-content {

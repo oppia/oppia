@@ -31,6 +31,8 @@ export class YamlService {
     return yaml.dump(objectToBeStringified);
   }
 
+  // Unknown has been used here becuase of use of dependency yaml load.
+  // The return type of yaml load is unknown.
   parse(yamlStringToBeParsed: string): unknown {
     return yaml.load(yamlStringToBeParsed);
   }

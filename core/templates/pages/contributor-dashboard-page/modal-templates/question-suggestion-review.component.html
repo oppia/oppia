@@ -1,6 +1,6 @@
 <div class="modal-header e2e-test-question-suggestion-review-modal-header">
   <div>
-    <h3 class="oppia-question-header">
+    <h3 class="oppia-question-header" tabindex="0">
       {{questionHeader}}
     </h3>
     <h3 class="oppia-mobile-question-header" title="{{questionHeader}}">
@@ -20,7 +20,7 @@
 </div>
 
 <div class="modal-body">
-  <div class="oppia-question-details">
+  <div class="oppia-question-details" tabindex="0">
     <strong class="oppia-difficulty-title">
       Selected Difficulty: {{skillDifficultyLabel}}
     </strong>
@@ -42,14 +42,16 @@
                            [questionStateData]="questionStateData"
                            [question]="question"
                            [userCanEditQuestion]="canEditQuestion"
-                           (questionChange)="questionChanged()">
+                           (questionChange)="questionChanged()"
+                           tabindex="0">
     </oppia-question-editor>
   </div>
   <section [hidden]="!reviewable"
            class="oppia-reviewer-actions">
     <div class="oppia-suggestion-review-message">
-      Review message (required if rejecting):
+      <label for="question-review-message">Review message (required if rejecting):</label>
       <textarea class="e2e-test-suggestion-review-message w-100"
+                id="question-review-message"
                 rows="3"
                 [(ngModel)]="reviewMessage">
       </textarea>
@@ -57,6 +59,9 @@
   </section>
   <div [hidden]="!(!reviewable && suggestionIsRejected)"
        class="oppia-suggestion-review-message">
+    <strong>Reviewer: </strong>
+    {{reviewer}}
+    <br>
     <strong>Review message: </strong>
     <div class="oppia-review-message">
       {{reviewMessage}}
@@ -70,7 +75,7 @@
       <button class="btn btn-danger e2e-test-question-suggestion-review-reject-button"
               *ngIf="reviewable"
               [disabled]="reviewMessage.length == 0"
-              (click)="reject()">Reject
+              (click)="reject(reviewMessage)">Reject
       </button>
     </div>
     <div tooltip-placement="bottom">
@@ -106,7 +111,10 @@
 
 <style>
   .oppia-close-button-position {
-    top: 3px;
+    font-size: 2.5rem;
+    position: absolute;
+    right: 20px;
+    top: 12px;
   }
   .oppia-review-message {
     border: 1px solid #ccc;

@@ -21,7 +21,6 @@ import { ChangeDetectorRef, NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { WindowRef } from 'services/contextual/window-ref.service';
-import { PlatformFeatureService } from 'services/platform-feature.service';
 import { AdminPageComponent } from './admin-page.component';
 import { AdminRouterService } from './services/admin-router.service';
 
@@ -46,16 +45,6 @@ class MockWindowRef {
   };
 }
 
-class MockPlatformFeatureService {
-  get status() {
-    return {
-      DummyFeature: {
-        isEnabled: true
-      }
-    };
-  }
-}
-
 describe('Admin Page component ', () => {
   let component: AdminPageComponent;
   let fixture: ComponentFixture<AdminPageComponent>;
@@ -74,10 +63,6 @@ describe('Admin Page component ', () => {
         {
           provide: WindowRef,
           useValue: mockWindowRef
-        },
-        {
-          provide: PlatformFeatureService,
-          useClass: MockPlatformFeatureService
         }
       ],
       schemas: [NO_ERRORS_SCHEMA]
@@ -111,11 +96,11 @@ describe('Admin Page component ', () => {
     expect(result).toBe(true);
   });
 
-  it('should check whether the admin features tab is open', () => {
-    // Setting admin features tab to be open.
-    spyOn(adminRouterService, 'isFeaturesTabOpen').and.returnValue(true);
+  it('should check whether the admin platform params tab is open', () => {
+    // Setting admin platform params tab to be open.
+    spyOn(adminRouterService, 'isPlatformParamsTabOpen').and.returnValue(true);
 
-    let result = component.isFeaturesTabOpen();
+    let result = component.isPlatformParamsTabOpen();
 
     expect(result).toBe(true);
   });
@@ -146,12 +131,5 @@ describe('Admin Page component ', () => {
     component.setStatusMessage('message');
 
     expect(component.statusMessage).toBe('message');
-  });
-
-  it('should check whether the dummy features enabled', () => {
-    let result = component.isDummyFeatureEnabled();
-
-    // Mocked 'PlatformFeatureService.status' method to return true.
-    expect(result).toBe(true);
   });
 });

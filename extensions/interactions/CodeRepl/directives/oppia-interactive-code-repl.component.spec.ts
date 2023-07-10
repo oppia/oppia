@@ -201,9 +201,6 @@ describe('InteractiveCodeReplComponent', () => {
 
   it('should customize editor with editor options when the exploration player' +
   ' loads', () => {
-    // The values cannot be tested since all the variables are private in the
-    // editorOptions Object. Therefore, the arguments passed to various
-    // functions tested instead.
     let cm = {
       replaceSelection: (spaces) => {
         expect(spaces).toBe('  ');
@@ -290,7 +287,7 @@ describe('InteractiveCodeReplComponent', () => {
         },
         addLineClass: (num, txt1, txt2) => {}
       }
-    } as unknown as CodemirrorComponent;
+    } as CodemirrorComponent;
 
     component.ngAfterViewInit();
     tick();

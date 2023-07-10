@@ -23,7 +23,6 @@ import { downgradeComponent } from '@angular/upgrade/static';
 
 import { CurrentInteractionService } from 'pages/exploration-player-page/services/current-interaction.service';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
-import { InteractionRulesService } from 'pages/exploration-player-page/services/answer-classification.service';
 
 import { NumberWithUnitsAnswer, InteractionAnswer } from 'interactions/answer-defs';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
@@ -111,10 +110,9 @@ export class InteractiveNumberWithUnitsComponent
     try {
       const numberWithUnits = (
         this.numberWithUnitsObjectFactory.fromRawInputString(this.answer));
-      // TODO(#13015): Remove use of unknown as a type.
       this.currentInteractionService.onSubmit(
         numberWithUnits,
-        this.numberWithUnitsRulesService as unknown as InteractionRulesService);
+        this.numberWithUnitsRulesService as NumberWithUnitsRulesService);
     } catch (parsingError) {
       if (parsingError instanceof Error) {
         this.errorMessageI18nKey = parsingError.message;

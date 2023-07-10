@@ -33,7 +33,7 @@ import { InteractionCustomizationArgs } from 'interactions/customization-args-de
 import { Outcome } from 'domain/exploration/OutcomeObjectFactory';
 import { AnswerGroup } from 'domain/exploration/AnswerGroupObjectFactory';
 import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
-import { Hint } from 'domain/exploration/HintObjectFactory';
+import { Hint } from 'domain/exploration/hint-object.model';
 import { Solution } from 'domain/exploration/SolutionObjectFactory';
 import { StateCardIsCheckpointService } from 'components/state-editor/state-editor-properties-services/state-card-is-checkpoint.service';
 import { ExplorationInitStateNameService } from '../services/exploration-init-state-name.service';
@@ -117,7 +117,7 @@ export class ExplorationEditorTabComponent
           // This code make the joyride visible over navbar
           // by overriding the properties of joyride-step__holder class.
           document.querySelector<HTMLElement>(
-            '.joyride-step__holder').style.zIndex = '1007';
+            '.joyride-step__holder').style.zIndex = '1020';
 
           if (value.number === 2) {
             $('html, body').animate({

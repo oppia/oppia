@@ -56,7 +56,19 @@ _PARSER.add_argument(
 def create_test_suites(
     test_target: Optional[str] = None
 ) -> List[unittest.TestSuite]:
-    """Creates test suites. If test_dir is None, runs all tests."""
+    """Creates test suites. If test_target is None, runs all tests.
+
+    Args:
+        test_target: str. The name of the test script.
+            Default to None if not specified.
+
+    Returns:
+        list. A list of tests within the test script.
+
+    Raises:
+        Exception. The delimeter in the test_target should be a dot (.)
+    """
+
     if test_target and '/' in test_target:
         raise Exception('The delimiter in test_target should be a dot (.)')
 
@@ -70,14 +82,20 @@ def create_test_suites(
             top_level_dir=CURR_DIR
         )
     )
-
     return [master_test_suite]
 
 
 def main(args: Optional[List[str]] = None) -> None:
-    """Runs the tests."""
-    parsed_args = _PARSER.parse_args(args=args)
+    """Runs the tests.
 
+    Args:
+        args: list. A list of arguments to parse.
+
+    Raises:
+        Exception. Directory invalid_path does not exist.
+    """
+
+    parsed_args = _PARSER.parse_args(args=args)
     for directory in common.DIRS_TO_ADD_TO_SYS_PATH:
         if not os.path.exists(os.path.dirname(directory)):
             raise Exception('Directory %s does not exist.' % directory)

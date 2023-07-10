@@ -22,7 +22,7 @@ import { AudioTranslationLanguageService } from
   'pages/exploration-player-page/services/audio-translation-language.service';
 import { CamelCaseToHyphensPipe } from
   'filters/string-utility-filters/camel-case-to-hyphens.pipe';
-import { Interaction, InteractionBackendDict, InteractionObjectFactory } from
+import { InteractionBackendDict, InteractionObjectFactory } from
   'domain/exploration/InteractionObjectFactory';
 import { StateCard } from
   'domain/state_card/state-card.model';
@@ -31,13 +31,12 @@ import { SubtitledUnicode } from
 import { RecordedVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
 import { Voiceover } from 'domain/exploration/voiceover.model';
 import { InteractionCustomizationArgs } from 'interactions/customization-args-defs';
-import { HintObjectFactory } from 'domain/exploration/HintObjectFactory';
+import { Hint } from 'domain/exploration/hint-object.model';
 import { SolutionObjectFactory } from 'domain/exploration/SolutionObjectFactory';
 
 
 describe('State card object factory', () => {
   let interactionObjectFactory: InteractionObjectFactory;
-  let hintObjectFactory: HintObjectFactory;
   let solutionObjectFactory: SolutionObjectFactory;
   let audioTranslationLanguageService: AudioTranslationLanguageService;
   let _sampleCard1: StateCard;
@@ -49,7 +48,6 @@ describe('State card object factory', () => {
     });
 
     interactionObjectFactory = TestBed.inject(InteractionObjectFactory);
-    hintObjectFactory = TestBed.inject(HintObjectFactory);
     solutionObjectFactory = TestBed.inject(SolutionObjectFactory);
     audioTranslationLanguageService = TestBed.inject(
       AudioTranslationLanguageService);
@@ -122,10 +120,11 @@ describe('State card object factory', () => {
       }),
       'content', audioTranslationLanguageService);
     _sampleCard2 = StateCard.createNewCard(
-      'State 2', '<p>Content</p>', '',
-      // Use unknown type conversion to test that the interaction is not
-      // required to be a string.
-      null as unknown as Interaction, null as unknown as RecordedVoiceovers,
+      // This throws "Type null is not assignable to type
+      // 'Interaction'." We need to suppress this error
+      // because of the need to test validations.
+      // @ts-ignore
+      'State 2', '<p>Content</p>', '', null, null,
       'content', audioTranslationLanguageService);
   });
 
@@ -289,7 +288,7 @@ describe('State card object factory', () => {
 
   it('should get all the hints from interaction', () => {
     let expectedResult = [
-      hintObjectFactory.createFromBackendDict({
+      Hint.createFromBackendDict({
         hint_content: {
           content_id: 'abc',
           html: 'hint 1'

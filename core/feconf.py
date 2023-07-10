@@ -253,6 +253,7 @@ ENTITY_TYPE_TOPIC = 'topic'
 ENTITY_TYPE_SKILL = 'skill'
 ENTITY_TYPE_STORY = 'story'
 ENTITY_TYPE_QUESTION = 'question'
+ENTITY_TYPE_USER = 'user'
 
 DIAGNOSTIC_TEST_QUESTION_TYPE_MAIN = 'main_question'
 DIAGNOSTIC_TEST_QUESTION_TYPE_BACKUP = 'backup_question'
@@ -555,12 +556,16 @@ STORAGE_EMULATOR_REDIS_DB_INDEX = 2
 OPPIA_PROJECT_ID = 'dev-project-id'
 GOOGLE_APP_ENGINE_REGION = 'us-central1'
 
+# This flag is used for distinguishing the prod/test environments for feature
+# gating.
+ENV_IS_OPPIA_ORG_PRODUCTION_SERVER = bool(OPPIA_PROJECT_ID == 'oppiaserver')
+
 # NOTE TO RELEASE COORDINATORS: Replace these GCS bucket paths with real prod
 # buckets. It's OK for them to be the same.
 DATAFLOW_TEMP_LOCATION = 'gs://todo/todo'
 DATAFLOW_STAGING_LOCATION = 'gs://todo/todo'
 
-OPPIA_VERSION = '3.2.9'
+OPPIA_VERSION = '3.3.1'
 OPPIA_PYTHON_PACKAGE_PATH = './build/oppia-beam-job-%s.tar.gz' % OPPIA_VERSION
 
 # Committer id for system actions. The username for the system committer
@@ -942,6 +947,7 @@ EXPLORATION_STATUS_PREFIX = '/createhandler/status'
 EXPLORATION_SUMMARIES_DATA_URL = '/explorationsummarieshandler/data'
 EXPLORATION_URL_PREFIX = '/explore'
 EXPLORATION_URL_EMBED_PREFIX = '/embed/exploration'
+FEATURE_FLAGS_URL = '/feature_flags'
 FEEDBACK_STATS_URL_PREFIX = '/feedbackstatshandler'
 FEEDBACK_THREAD_URL_PREFIX = '/threadhandler'
 FEEDBACK_THREADLIST_URL_PREFIX = '/threadlisthandler'
@@ -1205,6 +1211,7 @@ ROLE_ID_RELEASE_COORDINATOR = 'RELEASE_COORDINATOR'
 ROLE_ID_TOPIC_MANAGER = 'TOPIC_MANAGER'
 ROLE_ID_TRANSLATION_ADMIN = 'TRANSLATION_ADMIN'
 ROLE_ID_VOICEOVER_ADMIN = 'VOICEOVER_ADMIN'
+ROLE_ID_QUESTION_COORDINATOR = 'QUESTION_COORDINATOR'
 
 ALLOWED_DEFAULT_USER_ROLES_ON_REGISTRATION = [
     ROLE_ID_FULL_USER, ROLE_ID_MOBILE_LEARNER]
@@ -1222,7 +1229,8 @@ ALLOWED_USER_ROLES = [
     ROLE_ID_RELEASE_COORDINATOR,
     ROLE_ID_TOPIC_MANAGER,
     ROLE_ID_TRANSLATION_ADMIN,
-    ROLE_ID_VOICEOVER_ADMIN
+    ROLE_ID_VOICEOVER_ADMIN,
+    ROLE_ID_QUESTION_COORDINATOR
 ]
 
 # Intent of the User making query to role structure via admin interface. Used

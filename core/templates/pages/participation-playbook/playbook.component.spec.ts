@@ -103,8 +103,13 @@ describe('Playbook Page', () => {
     component.ngOnInit();
     spyOnProperty(windowRef, 'nativeWindow').and.returnValue({
       location: {
-        href: ''
-      }
+        hash: '',
+        hashChange: null,
+        href: '',
+        reload: (val: string) => '',
+      },
+      onhashchange: null,
+      gtag: () => {},
     });
     component.onApplyToTeachWithOppia();
     tick(150);

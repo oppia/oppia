@@ -23,7 +23,7 @@ import { GuppyInitializationService } from
 
 declare global {
   interface Window {
-    Guppy: Object;
+    Guppy: Guppy;
   }
 }
 
@@ -55,7 +55,7 @@ describe('GuppyInitializationService', () => {
 
   beforeEach(() => {
     guppyInitializationService = TestBed.inject(GuppyInitializationService);
-    window.Guppy = MockGuppy;
+    window.Guppy = MockGuppy as unknown as Guppy;
   });
 
   it('should assign a random id to the guppy divs', function() {

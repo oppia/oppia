@@ -28,7 +28,7 @@ var BlogDashboardPage = function() {
   var blogAuthorDetailsModalBioField = $('.e2e-test-blog-author-bio-field');
   var blogAuthorDetailsModalNameField = $('.e2e-test-blog-author-name-field');
   var saveAuthorDetailsButton = $('.e2e-test-save-author-details-button');
-  var currUserProfilePhoto = $('.e2e-test-profile-current-user-photo');
+  var userProfilePhoto = $('.e2e-test-profile-user-photo');
   var createBlogPostButton = $('.e2e-test-create-blog-post-button');
   var editBlogPostButton = $('.e2e-test-edit-blog-post-button');
   var unpublishBlogPostButton = $('.e2e-test-unpublish-blog-post-button');
@@ -103,7 +103,7 @@ var BlogDashboardPage = function() {
   this.showAndCloseBlogCardPreview = async function() {
     await action.click('Preview Button', blogCardPreviewButton);
     await waitFor.visibilityOf(
-      currUserProfilePhoto,
+      userProfilePhoto,
       'Current user profile photo taking too long to display');
     await waitFor.visibilityOf(
       currUsername,
@@ -356,7 +356,7 @@ var BlogDashboardPage = function() {
 
   this.expectCurrUserToHaveProfilePhoto = async function() {
     await waitFor.visibilityOf(
-      currUserProfilePhoto,
+      userProfilePhoto,
       'Current user profile photo taking too long to display');
   };
 

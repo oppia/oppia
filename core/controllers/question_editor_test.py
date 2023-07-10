@@ -15,7 +15,7 @@
 """Tests for the Question Editor controller."""
 
 from __future__ import annotations
-
+import json
 import os
 
 from core import feconf
@@ -380,7 +380,8 @@ class QuestionCreationHandlerTest(BaseQuestionEditorControllerTests):
         post_data = {
             'question_dict': question_dict,
             'skill_ids': [self.skill_id],
-            'skill_difficulties': [0.6]
+            'skill_difficulties': [0.6],
+            'filenames': json.dumps(['img.png'])
         }
 
         with utils.open_file(
@@ -391,7 +392,7 @@ class QuestionCreationHandlerTest(BaseQuestionEditorControllerTests):
         self.post_json(
             feconf.NEW_QUESTION_URL, post_data,
             csrf_token=csrf_token,
-            upload_files=[(filename, filename, raw_image)]
+            upload_files=[('image0', filename, raw_image)]
         )
         all_models = question_models.QuestionModel.get_all()
         questions = [
@@ -421,7 +422,8 @@ class QuestionCreationHandlerTest(BaseQuestionEditorControllerTests):
         post_data = {
             'question_dict': question_dict,
             'skill_ids': [self.skill_id],
-            'skill_difficulties': [0.6]
+            'skill_difficulties': [0.6],
+            'filenames': json.dumps(['img.svg'])
         }
 
         response_dict = self.post_json(
@@ -438,7 +440,7 @@ class QuestionCreationHandlerTest(BaseQuestionEditorControllerTests):
             feconf.NEW_QUESTION_URL, post_data,
             csrf_token=csrf_token,
             upload_files=[
-                ('img.svg', 'img.svg', large_image)
+                ('image0', 'img.svg', large_image)
             ], expected_status_int=400)
         self.assertIn(
             'Image exceeds file size limit of 100 KB.',
@@ -745,7 +747,8 @@ class EditableQuestionDataHandlerTest(BaseQuestionEditorControllerTests):
         }]
         payload = {
             'change_list': change_list,
-            'commit_message': ('a' * (constants.MAX_COMMIT_MESSAGE_LENGTH + 1))
+            'commit_message': ('a' * (constants.MAX_COMMIT_MESSAGE_LENGTH + 1)),
+            'version': 2
         }
 
         self.login(self.CURRICULUM_ADMIN_EMAIL)
@@ -779,7 +782,8 @@ class EditableQuestionDataHandlerTest(BaseQuestionEditorControllerTests):
         }]
         payload = {
             'change_list': change_list,
-            'commit_message': 'update question data'
+            'commit_message': 'update question data',
+            'version': 1
         }
 
         self.login(self.CURRICULUM_ADMIN_EMAIL)
@@ -826,7 +830,8 @@ class EditableQuestionDataHandlerTest(BaseQuestionEditorControllerTests):
         }]
         payload = {
             'change_list': change_list,
-            'commit_message': 'update question data'
+            'commit_message': 'update question data',
+            'version': 1
         }
 
         self.login(self.TOPIC_MANAGER_EMAIL)
@@ -871,13 +876,17 @@ class EditableQuestionDataHandlerTest(BaseQuestionEditorControllerTests):
         }]
         payload = {
             'change_list': change_list,
-            'commit_message': 'update question data'
+            'commit_message': 'update question data',
+            'version': 1
         }
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
-        self.put_json(
+        response_json = self.put_json(
             '%s/%s' % (
                 feconf.QUESTION_EDITOR_DATA_URL_PREFIX, self.question_id),
             payload,
             csrf_token=csrf_token, expected_status_int=400)
+        self.assertEqual(
+            response_json['error'],
+            'Cannot create a new fully specified question')
         self.logout()

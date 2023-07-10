@@ -100,7 +100,6 @@ angular.module('oppia').config([
       'AlertsService',
       'TranslationFileHashLoaderBackendApiService',
       'UrlInterpolationService',
-      'RteHelperService',
       'HtmlEscaperService',
       'ContextService'
     ];
@@ -110,7 +109,7 @@ angular.module('oppia').config([
       }
     }
     OppiaAngularRootComponent.contextService = (
-      ugs.ContextService as unknown as ContextService);
+      ugs.ContextService as ContextService);
     // Refer: https://docs.angularjs.org/guide/migration
     // #migrate1.5to1.6-ng-services-$location
     // The default hash-prefix used for URLs has changed from

@@ -26,7 +26,6 @@ import re
 from core import feconf
 from core.constants import constants
 from core.domain import email_manager
-from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import feedback_services
 from core.domain import html_cleaner
@@ -617,19 +616,23 @@ def get_all_stale_suggestion_ids() -> List[str]:
 
 
 def _update_suggestion(
-    suggestion: suggestion_registry.BaseSuggestion
+    suggestion: suggestion_registry.BaseSuggestion,
+    validate_suggestion: bool = True
 ) -> None:
     """Updates the given suggestion.
 
     Args:
         suggestion: Suggestion. The suggestion to be updated.
+        validate_suggestion: bool. Whether to validate the suggestion before
+            saving it.
     """
-    _update_suggestions([suggestion])
+    _update_suggestions([suggestion], validate_suggestion=validate_suggestion)
 
 
 def _update_suggestions(
     suggestions: List[suggestion_registry.BaseSuggestion],
-    update_last_updated_time: bool = True
+    update_last_updated_time: bool = True,
+    validate_suggestion: bool = True
 ) -> None:
     """Updates the given suggestions.
 
@@ -637,12 +640,19 @@ def _update_suggestions(
         suggestions: list(Suggestion). The suggestions to be updated.
         update_last_updated_time: bool. Whether to update the last_updated
             field of the suggestions.
+        validate_suggestion: bool. Whether to validate the suggestions before
+            saving them.
     """
     suggestion_ids = []
 
-    for suggestion in suggestions:
-        suggestion.validate()
-        suggestion_ids.append(suggestion.suggestion_id)
+    if validate_suggestion:
+        for suggestion in suggestions:
+            suggestion.validate()
+            suggestion_ids.append(suggestion.suggestion_id)
+    else:
+        suggestion_ids = [
+            suggestion.suggestion_id for suggestion in suggestions
+        ]
 
     suggestion_models_to_update_with_none = (
         suggestion_models.GeneralSuggestionModel.get_multi(suggestion_ids)
@@ -843,7 +853,7 @@ def reject_suggestions(
         suggestion.set_suggestion_status_to_rejected()
         suggestion.set_final_reviewer_id(reviewer_id)
 
-    _update_suggestions(suggestions)
+    _update_suggestions(suggestions, validate_suggestion=False)
 
     # Update the community contribution stats so that the number of suggestions
     # that are in review decreases, since these suggestions are no longer in
@@ -900,6 +910,29 @@ def auto_reject_translation_suggestions_for_exp_ids(exp_ids: List[str]) -> None:
     reject_suggestions(
         suggestion_ids, feconf.SUGGESTION_BOT_USER_ID,
         suggestion_models.INVALID_STORY_REJECT_TRANSLATION_SUGGESTIONS_MSG)
+
+
+def auto_reject_translation_suggestions_for_content_ids(
+    exp_id: str,
+    content_ids: Set[str]
+) -> None:
+    """Rejects all translation suggestions with target ID matching the supplied
+    exploration ID and change content ID matching one of the supplied content
+    IDs. These suggestions are being rejected because their corresponding
+    exploration content was deleted. Reviewer ID is set to
+    SUGGESTION_BOT_USER_ID.
+
+    Args:
+        exp_id: str. The exploration ID.
+        content_ids: list(str). The list of exploration content IDs.
+    """
+    obsolete_suggestion_ids = [
+        suggestion.suggestion_id
+        for suggestion in get_translation_suggestions_in_review(exp_id)
+        if suggestion.change.content_id in content_ids]
+    reject_suggestions(
+        obsolete_suggestion_ids, feconf.SUGGESTION_BOT_USER_ID,
+        constants.OBSOLETE_TRANSLATION_SUGGESTION_REVIEW_MSG)
 
 
 def resubmit_rejected_suggestion(
@@ -1162,6 +1195,29 @@ def get_translation_suggestions_waiting_longest_for_review(
     return translation_suggestions
 
 
+def get_translation_suggestions_in_review(
+    exp_id: str
+) -> List[suggestion_registry.BaseSuggestion]:
+    """Returns translation suggestions in-review by exploration ID.
+
+    Args:
+        exp_id: str. Exploration ID.
+
+    Returns:
+        list(Suggestion). A list of translation suggestions in-review with
+        target_id == exp_id.
+    """
+    suggestion_models_in_review = (
+        suggestion_models.GeneralSuggestionModel
+        .get_in_review_translation_suggestions_by_exp_id(
+            exp_id)
+    )
+    return [
+        get_suggestion_from_model(model)
+        for model in suggestion_models_in_review
+    ]
+
+
 def get_translation_suggestions_in_review_by_exploration(
     exp_id: str, language_code: str
 ) -> List[suggestion_registry.BaseSuggestion]:
@@ -1214,14 +1270,11 @@ def get_translation_suggestions_in_review_by_exp_ids(
     ]
 
 
-def get_suggestions_with_translatable_explorations(
+def get_suggestions_with_editable_explorations(
     suggestions: Sequence[suggestion_registry.SuggestionTranslateContent]
 ) -> Sequence[suggestion_registry.SuggestionTranslateContent]:
     """Filters the supplied suggestions for those suggestions that have
-    translatable exploration content. That is, the following are true:
-    - The suggestion's change content corresponds to an existing exploration
-    content card.
-    - The suggestion's corresponding exploration allows edits.
+    explorations that allow edits.
 
     Args:
         suggestions: list(Suggestion). List of translation suggestions to
@@ -1230,44 +1283,13 @@ def get_suggestions_with_translatable_explorations(
     Returns:
         list(Suggestion). List of filtered translation suggestions.
     """
-
-    def _has_translatable_exploration(
-        suggestion: suggestion_registry.SuggestionTranslateContent,
-        suggestion_exp_id_to_exp: Dict[str, exp_domain.Exploration]
-    ) -> bool:
-        """Returns whether the supplied suggestion corresponds to a translatable
-        exploration content card.
-
-        Args:
-            suggestion: Suggestion. Translation suggestion domain object to
-                check.
-            suggestion_exp_id_to_exp: dict(str, Exploration). Dictionary mapping
-                suggestion target exploration IDs to their corresponding
-                Exploration domain objects.
-
-        Returns:
-            bool. Whether the supplied suggestion corresponds to a translatable
-            exploration content card.
-        """
-        exploration = suggestion_exp_id_to_exp[suggestion.target_id]
-        content_id_exists = False
-
-        # Checks whether the suggestion's change content still exists in the
-        # corresponding exploration.
-        # For more details, see https://github.com/oppia/oppia/issues/14339.
-        if suggestion.change.state_name in exploration.states:
-            content_id_exists = exploration.states[
-                suggestion.change.state_name].has_content_id(
-                    suggestion.change.content_id)
-        return content_id_exists and exploration.edits_allowed
-
     suggestion_exp_ids = {
         suggestion.target_id for suggestion in suggestions}
     suggestion_exp_id_to_exp = exp_fetchers.get_multiple_explorations_by_id(
         list(suggestion_exp_ids))
     return list(filter(
-        lambda suggestion: _has_translatable_exploration(
-            suggestion, suggestion_exp_id_to_exp),
+        lambda suggestion: suggestion_exp_id_to_exp[
+            suggestion.target_id].edits_allowed,
         suggestions))
 
 

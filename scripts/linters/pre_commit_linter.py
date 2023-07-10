@@ -86,7 +86,7 @@ from .. import install_third_party_libs  # isort:skip
 OTHER_SHARD_NAME = 'other'
 
 # Shards are specified by a mapping from shard name to a list of the
-# paths in that shard. For exaple, `'1': ['core/domain/']` will create a
+# paths in that shard. For example, `'1': ['core/domain/']` will create a
 # shard named `'1'` that contains all the files under core/domain/. A
 # shard name matching OTHER_SHARD_NAME includes all files not under
 # another shard.  Currently we are not sharding the lint checks, so the

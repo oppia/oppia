@@ -26,7 +26,11 @@
     </div>
     <div class="invited-learners-inner-container">
       <div class="invited-learner-card" *ngFor="let userInfo of invitedUsersInfo">
-        <img [src]="getProfileImageDataUrl(userInfo.userProfilePictureUrl)">
+        <picture>
+          <source type="image/webp" [srcset]="getProfileImageWebpDataUrl(userInfo.username)">
+          <source type="image/png" [srcset]="getProfileImagePngDataUrl(userInfo.username)">
+          <img [src]="getProfileImagePngDataUrl(userInfo.username)" alt="User profile picture">
+        </picture>
         <div>{{userInfo.username}}</div>
         <i class="fa fa-times close-button" (click)="removeInvitedLearner(userInfo.username)"></i>
       </div>

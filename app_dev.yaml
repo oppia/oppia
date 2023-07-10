@@ -26,9 +26,6 @@ handlers:
   static_files: assets/sitemap.xml
   upload: assets/sitemap.xml
   secure: always
-- url: /mapreduce/pipeline/images
-  static_dir: third_party/gae-mapreduce-1.9.22.0/mapreduce/lib/pipeline/ui/images
-  secure: always
 - url: /build
   static_dir: build
   secure: always
@@ -142,3 +139,4 @@ env_variables:
   DATASTORE_HOST: "http://localhost:8089"
   DATASTORE_PROJECT_ID: "dev-project-id"
   DATASTORE_USE_PROJECT_ID_AS_APP_ID: "true"
+  SECRETS: "{\"ANDROID_BUILD_SECRET\": \"android-build-secret\", \"VM_ID\": \"vm_default\", \"SHARED_SECRET_KEY\": \"1a2b3c4e\"}"

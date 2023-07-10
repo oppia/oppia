@@ -143,9 +143,9 @@ export class RatioExpressionInputValidationService {
               warningsList.push({
                 type: AppConstants.WARNING_TYPES.ERROR,
                 message: (
-                  `Rule ${j + 1} from answer group ${i + 1} will never be` +
-                  ' matched because it has differing number of terms than ' +
-                  'required.'
+                  `Learner answer ${j + 1} from Oppia response ${i + 1} ` +
+                  'will never be matched because it has differing number ' +
+                  'of terms than required.'
                 )
               });
             }
@@ -160,9 +160,9 @@ export class RatioExpressionInputValidationService {
               warningsList.push({
                 type: AppConstants.WARNING_TYPES.ERROR,
                 message: (
-                  `Rule ${j + 1} from answer group ${i + 1} will never be` +
-                  ' matched because it expects more terms than the answer ' +
-                  'allows.'
+                  `Learner answer ${j + 1} from Oppia response ${i + 1} ` +
+                  'will never be matched because it expects more terms ' +
+                  'than the answer allows.'
                 )
               });
             }
@@ -172,9 +172,9 @@ export class RatioExpressionInputValidationService {
               warningsList.push({
                 type: AppConstants.WARNING_TYPES.ERROR,
                 message: (
-                  `Rule ${j + 1} from answer group ${i + 1} will never be` +
-                  ' matched because it has differing number of terms than ' +
-                  'required.'
+                  `Learner answer ${j + 1} from Oppia response ${i + 1} ` +
+                  'will never be matched because it has differing ' +
+                  'number of terms than required.'
                 )
               });
             }
@@ -207,9 +207,9 @@ export class RatioExpressionInputValidationService {
             warningsList.push({
               type: AppConstants.WARNING_TYPES.ERROR,
               message: (
-                `Rule ${j + 1} from answer group ${i + 1} will never` +
-                ' be matched because it is preceded by a \'Equals\' rule with' +
-                ' a matching input.')
+                `Learner answer ${j + 1} from Oppia response ${i + 1} will ` +
+                'never be matched because it is preceded by a \'Equals\' ' +
+                'answer with a matching input.')
             });
           } else if (
             seenRuleType === 'HasSpecificTermEqualTo' &&
@@ -222,9 +222,9 @@ export class RatioExpressionInputValidationService {
             warningsList.push({
               type: AppConstants.WARNING_TYPES.ERROR,
               message: (
-                `Rule ${j + 1} from answer group ${i + 1} will never` +
-                ' be matched because it is preceded by a' +
-                ' \'HasSpecificTermEqualTo\' rule with a matching input.')
+                `Learner answer ${j + 1} from Oppia response ${i + 1} will ` +
+                'never be matched because it is preceded by a ' +
+                '\'HasSpecificTermEqualTo\' answer with a matching input.')
             });
           } else if (
             seenRuleType === 'IsEquivalent' &&
@@ -237,9 +237,9 @@ export class RatioExpressionInputValidationService {
             warningsList.push({
               type: AppConstants.WARNING_TYPES.ERROR,
               message: (
-                `Rule ${j + 1} from answer group ${i + 1} will never` +
-                ' be matched because it is preceded by a \'IsEquivalent\'' +
-                ' rule with a matching input.')
+                `Learner answer ${j + 1} from Oppia response ${i + 1} will ` +
+                'never be matched because it is preceded by a ' +
+                '\'IsEquivalent\' answer with a matching input.')
             });
           } else if (
             seenRuleType === 'HasNumberOfTermsEqualTo' &&
@@ -253,9 +253,9 @@ export class RatioExpressionInputValidationService {
             warningsList.push({
               type: AppConstants.WARNING_TYPES.ERROR,
               message: (
-                `Rule ${j + 1} from answer group ${i + 1} will never` +
-                ' be matched because the \'HasNumberOfTermsEqualTo\' ' +
-                'rule is preceded by a rule with a matching input.')
+                `Learner answer ${j + 1} from Oppia response ${i + 1} will ` +
+                'never be matched because it is preceded by a ' +
+                '\'HasNumberOfTermsEqualTo\' answer with a matching input.')
             });
           } else if (
             currentRuleType === 'HasNumberOfTermsEqualTo' &&
@@ -264,9 +264,9 @@ export class RatioExpressionInputValidationService {
             warningsList.push({
               type: AppConstants.WARNING_TYPES.ERROR,
               message: (
-                `Rule ${j + 1} from answer group ${i + 1} will never` +
-                ' be matched because it is preceded by a ' +
-                '\'HasNumberOfTermsEqualTo\' rule with a matching input.')
+                `Learner answer ${j + 1} from Oppia response ${i + 1} will ` +
+                'never be matched because it is preceded by a ' +
+                '\'HasNumberOfTermsEqualTo\' answer with a matching input.')
             });
           }
         }

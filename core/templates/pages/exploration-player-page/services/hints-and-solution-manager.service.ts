@@ -19,7 +19,7 @@
 import { EventEmitter, Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
-import { Hint } from 'domain/exploration/HintObjectFactory';
+import { Hint } from 'domain/exploration/hint-object.model';
 import { Solution } from 'domain/exploration/SolutionObjectFactory';
 import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 import { ExplorationPlayerConstants } from 'pages/exploration-player-page/exploration-player-page.constants';
@@ -282,11 +282,11 @@ export class HintsAndSolutionManagerService {
     return this._hintConsumedEventEmitter;
   }
 
-  get onHintsExhausted(): EventEmitter<unknown> {
+  get onHintsExhausted(): EventEmitter<string> {
     return this._hintsExhaustedEventEmitter;
   }
 
-  get onLearnerReallyStuck(): EventEmitter<unknown> {
+  get onLearnerReallyStuck(): EventEmitter<string> {
     return this._learnerReallyStuckEventEmitter;
   }
 }

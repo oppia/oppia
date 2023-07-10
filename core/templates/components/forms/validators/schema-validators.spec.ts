@@ -17,20 +17,21 @@
  */
 
 import { AbstractControl, ValidationErrors } from '@angular/forms';
+import { SchemaDefaultValue } from 'services/schema-default-value.service';
 import { SchemaValidators } from './schema-validators';
 
 class MockFormControl extends AbstractControl {
-  value: unknown = '1';
+  value: SchemaDefaultValue = '1';
 
-  patchValue(value: unknown, options?: Object): void {
+  patchValue(value: SchemaDefaultValue, options?: Object): void {
     return;
   }
 
-  reset(value?: unknown, options?: Object): void {
+  reset(value?: SchemaDefaultValue, options?: Object): void {
     return;
   }
 
-  setValue(value: unknown, options?: Object): void {
+  setValue(value: SchemaDefaultValue, options?: Object): void {
     this.value = value;
   }
 }

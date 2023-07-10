@@ -49,16 +49,16 @@ describe('Window Dimensions Service', () => {
     });
 
     it('should get window width by clientWidth', () => {
-      spyOnProperty(wr.nativeWindow, 'innerWidth').and.returnValue(null);
+      spyOnProperty(wr.nativeWindow, 'innerWidth').and.returnValue(0);
       spyOnProperty(wr.nativeWindow.document.documentElement, 'clientWidth')
         .and.returnValue(1000);
       expect(wds.getWidth()).toEqual(1000);
     });
 
     it('should get window width by document clientWidth', () => {
-      spyOnProperty(wr.nativeWindow, 'innerWidth').and.returnValue(null);
+      spyOnProperty(wr.nativeWindow, 'innerWidth').and.returnValue(0);
       spyOnProperty(wr.nativeWindow.document.documentElement, 'clientWidth')
-        .and.returnValue(null);
+        .and.returnValue(0);
       spyOnProperty(wr.nativeWindow.document.body, 'clientWidth')
         .and.returnValue(1000);
       expect(wds.getWidth()).toEqual(1000);
@@ -72,16 +72,16 @@ describe('Window Dimensions Service', () => {
     });
 
     it('should get window Height by clientHeight', () => {
-      spyOnProperty(wr.nativeWindow, 'innerHeight').and.returnValue(null);
+      spyOnProperty(wr.nativeWindow, 'innerHeight').and.returnValue(0);
       spyOnProperty(wr.nativeWindow.document.documentElement, 'clientHeight')
         .and.returnValue(1000);
       expect(wds.getHeight()).toEqual(1000);
     });
 
     it('should get window Height by document clientHeight', () => {
-      spyOnProperty(wr.nativeWindow, 'innerHeight').and.returnValue(null);
+      spyOnProperty(wr.nativeWindow, 'innerHeight').and.returnValue(0);
       spyOnProperty(wr.nativeWindow.document.documentElement, 'clientHeight')
-        .and.returnValue(null);
+        .and.returnValue(0);
       spyOnProperty(wr.nativeWindow.document.body, 'clientHeight')
         .and.returnValue(1000);
       expect(wds.getHeight()).toEqual(1000);

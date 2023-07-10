@@ -183,7 +183,7 @@ describe('InteractiveInteractiveMapComponent', () => {
         lat: 60,
         lng: 65
       }
-    } as unknown as LeafletMouseEvent;
+    } as LeafletMouseEvent;
     component.ngOnInit();
     component.interactionIsActive = true;
 
@@ -204,7 +204,7 @@ describe('InteractiveInteractiveMapComponent', () => {
         lat: 60,
         lng: 65
       }
-    } as unknown as LeafletMouseEvent;
+    } as LeafletMouseEvent;
     component.ngOnInit();
     component.interactionIsActive = false;
 

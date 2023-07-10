@@ -26,12 +26,14 @@ require('filters/string-utility-filters/capitalize.filter.ts');
 describe('Testing filters', function() {
   var filterName = 'capitalize';
   beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
-  }));
+  beforeEach(angular.mock.module(
+    'oppia',
+    function($provide: { value: (arg0: string, arg1: string) => void }) {
+      var ugs = new UpgradedServices();
+      for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
+        $provide.value(key, value as string);
+      }
+    }));
 
   it('should have all expected filters', angular.mock.inject(function($filter) {
     expect($filter(filterName)).not.toEqual(null);

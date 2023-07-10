@@ -35,6 +35,7 @@ class PendingDeletionRequest:
     def __init__(
         self,
         user_id: str,
+        username: Optional[str],
         email: str,
         normalized_long_term_username: Optional[str],
         deletion_complete: bool,
@@ -44,6 +45,7 @@ class PendingDeletionRequest:
 
         Args:
             user_id: str. The ID of the user who is being deleted.
+            username: str. The username of the  user who is being deleted.
             email: str. The email of the user who is being deleted.
             normalized_long_term_username: str|None. The normalized username of
                 the user who is being deleted. Can be None when the user was on
@@ -54,6 +56,7 @@ class PendingDeletionRequest:
                 Mapping between the entity IDs and pseudonymized user IDs.
         """
         self.user_id = user_id
+        self.username = username
         self.email = email
         self.normalized_long_term_username = normalized_long_term_username
         self.deletion_complete = deletion_complete
@@ -63,6 +66,7 @@ class PendingDeletionRequest:
     def create_default(
         cls,
         user_id: str,
+        username: Optional[str],
         email: str,
         normalized_long_term_username: Optional[str] = None
     ) -> PendingDeletionRequest:
@@ -70,6 +74,7 @@ class PendingDeletionRequest:
 
         Args:
             user_id: str. The ID of the user who is being deleted.
+            username: str. The username of the  user who is being deleted.
             email: str. The email of the user who is being deleted.
             normalized_long_term_username: str|None. The normalized username of
                 the user who is being deleted. Can be None when the user was on
@@ -81,7 +86,7 @@ class PendingDeletionRequest:
             domain object.
         """
         return cls(
-            user_id, email, normalized_long_term_username, False, {})
+            user_id, username, email, normalized_long_term_username, False, {})
 
     def validate(self) -> None:
         """Checks that the domain object is valid.

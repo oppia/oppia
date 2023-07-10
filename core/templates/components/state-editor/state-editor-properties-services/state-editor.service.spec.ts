@@ -22,7 +22,7 @@ import { StateEditorService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-editor.service';
 import { AnswerGroupObjectFactory } from 'domain/exploration/AnswerGroupObjectFactory';
-import { HintObjectFactory } from 'domain/exploration/HintObjectFactory';
+import { Hint } from 'domain/exploration/hint-object.model';
 import { Interaction, InteractionObjectFactory } from 'domain/exploration/InteractionObjectFactory';
 import { OutcomeObjectFactory } from 'domain/exploration/OutcomeObjectFactory';
 import { SolutionObjectFactory } from 'domain/exploration/SolutionObjectFactory';
@@ -35,7 +35,6 @@ describe('Editor state service', () => {
   let ecs: StateEditorService;
   let suof: SubtitledUnicodeObjectFactory;
   let sof: SolutionObjectFactory;
-  let hof: HintObjectFactory;
   let interactionObjectFactory: InteractionObjectFactory;
   let answerGroupObjectFactory: AnswerGroupObjectFactory;
   let outcomeObjectFactory: OutcomeObjectFactory;
@@ -61,7 +60,6 @@ describe('Editor state service', () => {
     ecs = TestBed.inject(StateEditorService);
     suof = TestBed.inject(SubtitledUnicodeObjectFactory);
     sof = TestBed.inject(SolutionObjectFactory);
-    hof = TestBed.inject(HintObjectFactory);
     interactionObjectFactory = TestBed.inject(InteractionObjectFactory);
     answerGroupObjectFactory = TestBed.inject(AnswerGroupObjectFactory);
     outcomeObjectFactory = TestBed.inject(OutcomeObjectFactory);
@@ -304,12 +302,12 @@ describe('Editor state service', () => {
     })).toBeNull();
   });
 
-  it('should return if exploration is whitelisted or not', () => {
-    expect(ecs.isExplorationWhitelisted()).toBeFalse();
-    ecs.explorationIsWhitelisted = true;
-    expect(ecs.isExplorationWhitelisted()).toBeTrue();
-    ecs.explorationIsWhitelisted = false;
-    expect(ecs.isExplorationWhitelisted()).toBeFalse();
+  it('should return if exploration is curated or not', () => {
+    expect(ecs.isExplorationCurated()).toBeFalse();
+    ecs.explorationIsCurated = true;
+    expect(ecs.isExplorationCurated()).toBeTrue();
+    ecs.explorationIsCurated = false;
+    expect(ecs.isExplorationCurated()).toBeFalse();
   });
 
   it('should initialise state content editor', () => {
@@ -393,14 +391,6 @@ describe('Editor state service', () => {
     expect(ecs.stateResponsesInitialised).toBeTrue();
     expect(ecs.stateEditorDirectiveInitialised).toBeTrue();
     expect(ecs.checkEventListenerRegistrationStatus()).toBeTrue();
-  });
-
-  it('should update exploration whitelisted status', () => {
-    expect(ecs.isExplorationWhitelisted()).toBeFalse();
-    ecs.updateExplorationWhitelistedStatus(true);
-    expect(ecs.isExplorationWhitelisted()).toBeTrue();
-    ecs.updateExplorationWhitelistedStatus(false);
-    expect(ecs.isExplorationWhitelisted()).toBeFalse();
   });
 
   it('should set interaction', () => {
@@ -508,7 +498,7 @@ describe('Editor state service', () => {
   });
 
   it('should set interaction hints', () => {
-    let newHints = [hof.createFromBackendDict({
+    let newHints = [Hint.createFromBackendDict({
       hint_content: {
         content_id: '',
         html: 'This is a hint'

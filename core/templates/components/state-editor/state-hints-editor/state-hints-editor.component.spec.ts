@@ -29,7 +29,7 @@ import { StateInteractionIdService } from '../state-editor-properties-services/s
 import { StateSolutionService } from '../state-editor-properties-services/state-solution.service';
 import { AlertsService } from 'services/alerts.service';
 import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
-import { Hint, HintBackendDict, HintObjectFactory } from 'domain/exploration/HintObjectFactory';
+import { Hint, HintBackendDict } from 'domain/exploration/hint-object.model';
 import { SolutionObjectFactory } from 'domain/exploration/SolutionObjectFactory';
 import { CdkDragSortEvent } from '@angular/cdk/drag-drop';
 
@@ -105,7 +105,6 @@ describe('StateHintsEditorComponent', () => {
   let alertsService: AlertsService;
   let solutionObjectFactory: SolutionObjectFactory;
   let ngbModalSpy: jasmine.Spy;
-  let hintObjectFactory: HintObjectFactory;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -125,7 +124,6 @@ describe('StateHintsEditorComponent', () => {
         StateSolutionService,
         AlertsService,
         SolutionObjectFactory,
-        HintObjectFactory
       ],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
@@ -143,7 +141,6 @@ describe('StateHintsEditorComponent', () => {
     ngbModal = TestBed.inject(NgbModal);
     alertsService = TestBed.inject(AlertsService);
     solutionObjectFactory = TestBed.inject(SolutionObjectFactory);
-    hintObjectFactory = TestBed.inject(HintObjectFactory);
 
     stateSolutionService.savedMemento = solutionObjectFactory.createNew(
       true, 'correct_answer', '<p> Hint Index 0 </p>', '0'
@@ -225,7 +222,7 @@ describe('StateHintsEditorComponent', () => {
   });
 
   it('should get hint summary when hint is given', () => {
-    let hint = hintObjectFactory.createNew('id', 'Hint');
+    let hint = Hint.createNew('id', 'Hint');
 
     expect(component.getHintSummary(hint)).toBe('Hint');
   });

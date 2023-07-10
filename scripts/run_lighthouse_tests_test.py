@@ -318,3 +318,41 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
         self.assertIn('Building files in production mode.', self.print_arr)
         self.assertIn(
             'Puppeteer script completed successfully.', self.print_arr)
+
+    def test_run_lighthouse_tests_skipping_webpack_build_in_performance_mode(
+        self) -> None:
+        class MockTask:
+            returncode = 0
+            def communicate(self) -> tuple[bytes, bytes]:   # pylint: disable=missing-docstring
+                return (
+                    b'Task output',
+                    b'No error.')
+
+        swap_run_lighthouse_tests = self.swap_with_checks(
+            run_lighthouse_tests, 'run_lighthouse_checks',
+            lambda *unused_args: None,
+            expected_args=(('performance', '1'),))
+        def mock_popen(*unused_args: str, **unused_kwargs: str) -> MockTask:  # pylint: disable=unused-argument
+            return MockTask()
+        swap_popen = self.swap(
+            subprocess, 'Popen', mock_popen)
+        swap_isdir = self.swap(
+            os.path, 'isdir', lambda _: True)
+        swap_build = self.swap_with_checks(
+                    build, 'main', lambda args: None,
+                    expected_kwargs=[{'args': []}])
+        swap_emulator_mode = self.swap(constants, 'EMULATOR_MODE', False)
+
+        with swap_popen, self.swap_webpack_compiler, swap_isdir, swap_build:
+            with self.swap_elasticsearch_dev_server, self.swap_dev_appserver:
+                with self.swap_ng_build, swap_emulator_mode, self.print_swap:
+                    with self.swap_redis_server, swap_run_lighthouse_tests:
+                        run_lighthouse_tests.main(
+                            args=['--mode', 'performance',
+                                '--shard', '1', '--skip_build'])
+
+        self.assertIn(
+            'Building files in production mode skipping webpack build.',
+            self.print_arr)
+        self.assertIn(
+            'Puppeteer script completed successfully.', self.print_arr)

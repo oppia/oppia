@@ -233,7 +233,7 @@ export class TranslationModalComponent {
     this.computePanelOverflowState();
   }
 
-  ngAfterViewChecked(): void {
+  ngAfterContentChecked(): void {
     this.computeTranslationEditorOverflowState();
   }
 
@@ -269,6 +269,9 @@ export class TranslationModalComponent {
 
   close(): void {
     this.activeModal.close();
+
+    // Reset copyMode to the default value and avoid console errors.
+    this.ckEditorCopyContentService.copyModeActive = false;
   }
 
   getHtmlSchema(): HTMLSchema {

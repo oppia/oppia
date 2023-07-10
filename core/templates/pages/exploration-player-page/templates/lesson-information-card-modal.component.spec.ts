@@ -120,6 +120,7 @@ describe('Lesson Information card modal component', () => {
   let expId = 'expId';
   let expTitle = 'Exploration Title';
   let expDesc = 'Exploration Objective';
+  let expCategory = 'Exploration Category';
   let rating: ExplorationRatings;
 
   beforeEach(waitForAsync(() => {
@@ -160,7 +161,7 @@ describe('Lesson Information card modal component', () => {
     componentInstance = fixture.componentInstance;
 
     componentInstance.expInfo = {
-      category: '',
+      category: expCategory,
       community_owned: true,
       activity_type: '',
       last_updated_msec: 0,
@@ -213,6 +214,7 @@ describe('Lesson Information card modal component', () => {
     expect(componentInstance.explorationId).toEqual(expId);
     expect(componentInstance.expTitle).toEqual(expTitle);
     expect(componentInstance.expDesc).toEqual(expDesc);
+    expect(componentInstance.expCategory).toEqual(expCategory);
     expect(componentInstance.averageRating).toBe(3);
     expect(componentInstance.numViews).toBe(100);
     expect(componentInstance.lastUpdatedString).toBe('June 28');
@@ -433,5 +435,33 @@ describe('Lesson Information card modal component', () => {
     componentInstance.closeSaveProgressMenu();
 
     expect(componentInstance.saveProgressMenuIsShown).toBeFalse();
+  });
+
+  it('should return 0% when no checkpoints are completed', () => {
+    componentInstance.completedCheckpointsCount = 0;
+    componentInstance.checkpointCount = 5;
+
+    expect(componentInstance.getProgressPercentage()).toEqual('0');
+  });
+
+  it('should return 100% when all checkpoints are completed', () => {
+    componentInstance.completedCheckpointsCount = 5;
+    componentInstance.checkpointCount = 5;
+
+    expect(componentInstance.getProgressPercentage()).toEqual('100');
+  });
+
+  it('should return the correct percentage for 25% progress', () => {
+    componentInstance.completedCheckpointsCount = 1;
+    componentInstance.checkpointCount = 4;
+
+    expect(componentInstance.getProgressPercentage()).toEqual('25');
+  });
+
+  it('should round down to the nearest whole number', () => {
+    componentInstance.completedCheckpointsCount = 2;
+    componentInstance.checkpointCount = 7;
+
+    expect(componentInstance.getProgressPercentage()).toEqual('28');
   });
 });

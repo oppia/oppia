@@ -18,6 +18,7 @@
 import { ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { AbstractControl, ControlValueAccessor, ValidationErrors, Validator } from '@angular/forms';
 import { downgradeComponent } from '@angular/upgrade/static';
+import { SchemaDefaultValue } from 'services/schema-default-value.service';
 interface RealSchema {
   type: string;
 }
@@ -37,8 +38,7 @@ export class RealEditorComponent
     type: 'float'
   };
 
-  // TODO(#13015): Remove use of unknown as a type.
-  onChange: (_: unknown) => void = () => {};
+  onChange: (_: SchemaDefaultValue) => void = () => {};
   onTouch: () => void = () => {};
   onValidatorChange: () => void = () => {};
 

@@ -56,7 +56,7 @@ export class FractionInputValidationService {
     return {
       type: AppConstants.WARNING_TYPES.ERROR,
       message: (
-        'Rule ' + (j + 1) + ' from answer group ' +
+        'Learner answer ' + (j + 1) + ' from Oppia response ' +
         (i + 1) + ' is invalid: input should be an ' +
         'integer.')
     };
@@ -162,7 +162,7 @@ export class FractionInputValidationService {
                 warningsList.push({
                   type: AppConstants.WARNING_TYPES.ERROR,
                   message: (
-                    'Rule ' + (j + 1) + ' from answer group ' +
+                    'Learner answer ' + (j + 1) + ' from Oppia response ' +
                     (i + 1) +
                     ' will never be matched because it is not ' +
                     'in simplest form.')
@@ -176,7 +176,7 @@ export class FractionInputValidationService {
                 warningsList.push({
                   type: AppConstants.WARNING_TYPES.ERROR,
                   message: (
-                    'Rule ' + (j + 1) + ' from answer group ' +
+                    'Learner answer ' + (j + 1) + ' from Oppia response ' +
                     (i + 1) +
                     ' will never be matched because it is an ' +
                     'improper fraction')
@@ -190,7 +190,7 @@ export class FractionInputValidationService {
                 warningsList.push({
                   type: AppConstants.WARNING_TYPES.ERROR,
                   message: (
-                    'Rule ' + (j + 1) + ' from answer group ' +
+                    'Learner answer ' + (j + 1) + ' from Oppia response ' +
                     (i + 1) +
                     ' will never be matched because it has a ' +
                     'non zero integer part')
@@ -223,7 +223,7 @@ export class FractionInputValidationService {
               warningsList.push({
                 type: AppConstants.WARNING_TYPES.ERROR,
                 message: (
-                  'Rule ' + (j + 1) + ' from answer group ' +
+                  'Learner answer ' + (j + 1) + ' from Oppia response ' +
                   (i + 1) +
                   ' will never be matched because integer part ' +
                   'has to be zero')
@@ -241,7 +241,7 @@ export class FractionInputValidationService {
               warningsList.push({
                 type: AppConstants.WARNING_TYPES.ERROR,
                 message: (
-                  'Rule ' + (j + 1) + ' from answer group ' +
+                  'Learner answer ' + (j + 1) + ' from Oppia response ' +
                   (i + 1) + ' is invalid: denominator ' +
                   'should be greater than zero.')
               });
@@ -253,7 +253,7 @@ export class FractionInputValidationService {
               warningsList.push({
                 type: AppConstants.WARNING_TYPES.ERROR,
                 message: (
-                  'Rule ' + (j + 1) + ' from answer group ' +
+                  'Learner answer ' + (j + 1) + ' from Oppia response ' +
                   (i + 1) +
                   ' is invalid as integer part should be zero')
               });
@@ -262,7 +262,7 @@ export class FractionInputValidationService {
               warningsList.push({
                 type: AppConstants.WARNING_TYPES.ERROR,
                 message: (
-                  'Rule ' + (j + 1) + ' from answer group ' +
+                  'Learner answer ' + (j + 1) + ' from Oppia response ' +
                   (i + 1) +
                   ' is invalid as sign should be positive')
               });
@@ -274,7 +274,7 @@ export class FractionInputValidationService {
                 warningsList.push({
                   type: AppConstants.WARNING_TYPES.ERROR,
                   message: (
-                    'Rule ' + (j + 1) + ' from answer group ' +
+                    'Learner answer ' + (j + 1) + ' from Oppia response ' +
                     (i + 1) +
                     ' is invalid as improper fractions are not allowed')
                 });
@@ -292,10 +292,10 @@ export class FractionInputValidationService {
               warningsList.push({
                 type: AppConstants.WARNING_TYPES.ERROR,
                 message: (
-                  'Rule ' + (j + 1) + ' from answer group ' +
+                  'Learner answer ' + (j + 1) + ' from Oppia response ' +
                   (i + 1) + ' will never be matched because it ' +
-                  'is made redundant by rule ' + (ranges[k].ruleIndex + 1) +
-                  ' from answer group ' + (ranges[k].answerGroupIndex + 1) +
+                  'is made redundant by answer ' + (ranges[k].ruleIndex + 1) +
+                  ' from Oppia response ' + (ranges[k].answerGroupIndex + 1) +
                   '.')
               });
             }
@@ -310,11 +310,11 @@ export class FractionInputValidationService {
               warningsList.push({
                 type: AppConstants.WARNING_TYPES.ERROR,
                 message: (
-                  'Rule ' + (j + 1) + ' from answer group ' +
+                  'Learner answer ' + (j + 1) + ' from Oppia response ' +
                   (i + 1) + ' will never be matched because it ' +
-                  'is made redundant by rule ' +
+                  'is made redundant by answer ' +
                   (matchedDenominators[k].ruleIndex + 1) +
-                  ' from answer group ' +
+                  ' from Oppia response ' +
                   (matchedDenominators[k].answerGroupIndex + 1) + '.')
               });
             }

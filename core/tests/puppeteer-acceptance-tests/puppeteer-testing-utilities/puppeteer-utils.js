@@ -20,6 +20,14 @@ const puppeteer = require('puppeteer');
 const testConstants = require('./test-constants.js');
 
 const LABEL_FOR_SUBMIT_BUTTON = 'Submit and start contributing';
+/** We accept the empty message because this is what is sent on
+ * 'beforeunload' due to an issue with Chromium (see
+ * https://github.com/puppeteer/puppeteer/issues/3725). */
+const acceptedBrowserAlerts = [
+  '',
+  'Changes that you made may not be saved.',
+  'This action is irreversible. Are you sure?'
+];
 
 module.exports = class baseUser {
   constructor() {
@@ -36,19 +44,23 @@ module.exports = class baseUser {
   async openBrowser() {
     await puppeteer
       .launch({
+        /** TODO(#17761): Right now some acceptance tests are failing on
+         * headless mode. As per the expected behavior we need to make sure
+         * every test passes on both modes. */
+        headless: false,
         args: ['--start-fullscreen', '--use-fake-ui-for-media-stream']
       })
       .then(async(browser) => {
         this.browserObject = browser;
         this.page = await browser.newPage();
         await this.page.setViewport({ width: 0, height: 0 });
-        // We are doing this generically because the on-alert behaviour needs
-        // to be defined through an event listener, and Puppeteer does not
-        // support handling these alerts on a case-by-case basis.
-        // See (https://github.com/puppeteer/puppeteer/blob/v0.12.0/docs/api.md#class-dialog)
-        // for more information.
         this.page.on('dialog', async(dialog) => {
-          await dialog.accept();
+          const alertText = dialog.message();
+          if (acceptedBrowserAlerts.includes(alertText)) {
+            await dialog.accept();
+          } else {
+            throw new Error(`Unexpected alert: ${alertText}`);
+          }
         });
       });
 

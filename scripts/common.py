@@ -36,7 +36,7 @@ from urllib import request as urlrequest
 from core import constants
 from scripts import servers
 
-from typing import Dict, Generator, List, Optional, Union
+from typing import Dict, Final, Generator, List, Optional, Union
 
 # Add third_party to path. Some scripts access feconf even before
 # python_libs is added to path.
@@ -209,6 +209,19 @@ CHROME_PATHS = [
     '/mnt/c/Program Files (x86)/Google/Chrome/Application/chrome.exe',
     # Mac OS.
     '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
+]
+
+ACCEPTANCE_TESTS_SUITE_NAMES = [
+    'blog-admin-tests/assign-roles-to-users-and-change-tag-properties.spec.js',
+    'blog-editor-tests/check-blog-editor-unable-to-publish-' +
+    'duplicate-blog-post.spec.js'
+]
+
+GAE_PORT_FOR_E2E_TESTING: Final = 9001
+ELASTICSEARCH_SERVER_PORT: Final = 9200
+PORTS_USED_BY_OPPIA_PROCESSES_IN_LOCAL_E2E_TESTING: Final = [
+    GAE_PORT_FOR_E2E_TESTING,
+    ELASTICSEARCH_SERVER_PORT,
 ]
 
 
@@ -912,3 +925,106 @@ def run_ng_compilation() -> None:
     if not os.path.isdir(ng_bundles_dir_name):
         print('Failed to complete ng build compilation, exiting...')
         sys.exit(1)
+
+
+def set_constants_to_default() -> None:
+    """Set variables in constants.ts and feconf.py to default values."""
+    modify_constants(
+        prod_env=False,
+        emulator_mode=True,
+        maintenance_mode=False,
+        version_info_must_be_set=False
+        )
+
+
+def modify_constants(
+    prod_env: bool = False,
+    emulator_mode: bool = True,
+    maintenance_mode: bool = False,
+    version_info_must_be_set: bool = True
+) -> None:
+    """Modify constants.ts and feconf.py.
+
+    Args:
+        prod_env: bool. Whether the server is started in prod mode.
+        emulator_mode: bool. Whether the server is started in emulator mode.
+        maintenance_mode: bool. Whether the site should be put into
+            the maintenance mode.
+        version_info_must_be_set: bool. Whether the version info must be set.
+    """
+    dev_mode_variable = (
+        '"DEV_MODE": false' if prod_env else '"DEV_MODE": true')
+    inplace_replace_file(
+        CONSTANTS_FILE_PATH,
+        r'"DEV_MODE": (true|false)',
+        dev_mode_variable,
+        expected_number_of_replacements=1
+    )
+    emulator_mode_variable = (
+        '"EMULATOR_MODE": true' if emulator_mode else '"EMULATOR_MODE": false')
+    inplace_replace_file(
+        CONSTANTS_FILE_PATH,
+        r'"EMULATOR_MODE": (true|false)',
+        emulator_mode_variable,
+        expected_number_of_replacements=1
+    )
+
+    enable_maintenance_mode_variable = (
+        'ENABLE_MAINTENANCE_MODE = %s' % str(maintenance_mode))
+    inplace_replace_file(
+        FECONF_PATH,
+        r'ENABLE_MAINTENANCE_MODE = (True|False)',
+        enable_maintenance_mode_variable,
+        expected_number_of_replacements=1
+    )
+
+    branch_name_variable = (
+        '"BRANCH_NAME": "%s"'
+        % (
+            subprocess.check_output(
+                ['git', 'rev-parse', '--abbrev-ref', 'HEAD'],
+                encoding='utf-8'
+            ).strip().split('\n', maxsplit=1)[0]
+            if version_info_must_be_set else ''
+        )
+    )
+    inplace_replace_file(
+        CONSTANTS_FILE_PATH,
+        r'"BRANCH_NAME": ".*"',
+        branch_name_variable,
+        expected_number_of_replacements=1
+    )
+
+    short_commit_hash_variable = (
+        '"SHORT_COMMIT_HASH": "%s"'
+        % (
+            subprocess.check_output(
+                ['git', 'rev-parse', '--short', 'HEAD'],
+                encoding='utf-8'
+            ).strip().split('\n', maxsplit=1)[0]
+            if version_info_must_be_set else ''
+        )
+    )
+    inplace_replace_file(
+        CONSTANTS_FILE_PATH,
+        r'"SHORT_COMMIT_HASH": ".*"',
+        short_commit_hash_variable,
+        expected_number_of_replacements=1
+    )
+
+
+def is_oppia_server_already_running() -> bool:
+    """Check if the ports are taken by any other processes. If any one of
+    them is taken, it may indicate there is already one Oppia instance running.
+
+    Returns:
+        bool. Whether there is a running Oppia instance.
+    """
+    for port in PORTS_USED_BY_OPPIA_PROCESSES_IN_LOCAL_E2E_TESTING:
+        if is_port_in_use(port):
+            print(
+                'There is already a server running on localhost:%s. '
+                'Please terminate it before running the end-to-end tests. '
+                'Exiting.' % port)
+            return True
+    return False

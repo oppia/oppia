@@ -114,7 +114,8 @@ describe('Training Panel Component', () => {
     component.addingNewResponse = false;
     // This throws "Argument of type 'null' is not assignable to parameter of
     // type 'InteractionAnswer'." We need to suppress this error because of the
-    // need to test validations.
+    // need to test validations. This error is thrown because the answer is
+    // null.
     // @ts-ignore
     component.answer = null;
     component.ngOnInit();

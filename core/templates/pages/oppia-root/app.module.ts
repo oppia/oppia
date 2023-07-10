@@ -36,6 +36,10 @@ import { ToastrModule } from 'ngx-toastr';
 import { AngularFireAuth, AngularFireAuthModule, USE_EMULATOR } from '@angular/fire/auth';
 import { AngularFireModule } from '@angular/fire';
 import { AuthService } from 'services/auth.service';
+// This throws "TS2307". We need to
+// suppress this error because hammer come from hammerjs
+// dependency. We can't import it directly.
+// @ts-ignore
 import * as hammer from 'hammerjs';
 import { AppErrorHandlerProvider } from './app-error-handler';
 import { I18nModule } from 'i18n/i18n.module';

@@ -268,7 +268,8 @@ describe('Search bar component', () => {
     spyOn(navigationService, 'openSubmenu');
     // This throws "Argument of type 'null' is not assignable to parameter of
     // type 'KeyboardEvent'." We need to suppress this error because of the
-    // need to test validations.
+    // need to test validations. This throws an error only in the frontend
+    // unit tests.
     // @ts-ignore
     component.openSubmenu(null, null);
     expect(navigationService.openSubmenu).toHaveBeenCalled();
@@ -280,7 +281,8 @@ describe('Search bar component', () => {
     navigationService.activeMenuName = activeMenuName;
     // This throws "Argument of type 'null' is not assignable to parameter of
     // type 'KeyboardEvent'." We need to suppress this error because of the
-    // need to test validations.
+    // need to test validations. This throws an error only in the frontend
+    // unit tests.
     // @ts-ignore
     component.onMenuKeypress(null, null, null);
     expect(component.activeMenuName).toEqual(activeMenuName);

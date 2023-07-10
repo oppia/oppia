@@ -84,7 +84,7 @@
     </div>
     <div class="vertical-toolbar">
       <div>
-        <button class="icon-tool toolbar-button thin-button"
+        <button aria-label="Pencil" tabindex="0" class="icon-tool toolbar-button thin-button"
                 [ngClass]="{'disabled' : !isPencilEnabled()}"
                 (click)="togglePencilDrawing()"
                 placement="left"
@@ -92,7 +92,7 @@
                 [disabled]="!isPencilEnabled()">
           <i class="fas fa-pencil-alt"></i>
         </button>
-        <button class="icon-tool toolbar-button thin-button e2e-test-create-line"
+        <button aria-label="Line" tabindex="0" class="icon-tool toolbar-button thin-button e2e-test-create-line"
                 [ngClass]="{'disabled' : !areAllToolsEnabled()}"
                 (click)="createLine()"
                 placement="right"
@@ -100,7 +100,7 @@
                 [disabled]="!areAllToolsEnabled()">
           <i class="fas fa-slash oppia-slash-icon"></i>
         </button>
-        <button class="icon-tool toolbar-button thin-button e2e-test-create-rectangle"
+        <button aria-label="Rectangle" tabindex="0" class="icon-tool toolbar-button thin-button e2e-test-create-rectangle"
                 [ngClass]="{'disabled' : !areAllToolsEnabled()}"
                 (click)="createRect()"
                 placement="left"
@@ -108,7 +108,7 @@
                 [disabled]="!areAllToolsEnabled()">
           <i class="far fa-square"></i>
         </button>
-        <button class="icon-tool toolbar-button thin-button e2e-test-create-circle"
+        <button aria-label="Circle" tabindex="0" class="icon-tool toolbar-button thin-button e2e-test-create-circle"
                 [ngClass]="{'disabled' : !areAllToolsEnabled()}"
                 (click)="createCircle()"
                 placement="right"
@@ -116,7 +116,7 @@
                 [disabled]="!areAllToolsEnabled()">
           <i class="far fa-circle"></i>
         </button>
-        <button class="icon-tool toolbar-button thin-button e2e-test-create-text"
+        <button aria-label="Text" tabindex="0" class="icon-tool toolbar-button thin-button e2e-test-create-text"
                 [ngClass]="{'disabled' : !areAllToolsEnabled()}"
                 (click)="createText()"
                 placement="left"
@@ -124,21 +124,21 @@
                 [disabled]="!areAllToolsEnabled()">
           <i class="fas fa-font"></i>
         </button>
-        <button class="icon-tool toolbar-button thin-button oppia-closed-polygon-icon"
+        <button tabindex="0" aria-label="Closed Polygon" class="icon-tool toolbar-button thin-button oppia-closed-polygon-icon"
         [ngClass]="{'disabled' : !isClosedPolygonEnabled()}"
                 (click)="createClosedPolygon()"
                 placement="right"
                 ngbTooltip="Closed Polygon"
                 [disabled]="!isClosedPolygonEnabled()">
         </button>
-        <button class="icon-tool toolbar-button thin-button oppia-open-polygon-icon"
+        <button aria-label="Open polygon" tabindex="0" class="icon-tool toolbar-button thin-button oppia-open-polygon-icon"
         [ngClass]="{'disabled' : !isOpenPolygonEnabled()}"
                 (click)="createOpenPolygon()"
                 placement="left"
                 ngbTooltip="Open Polygon"
                 [disabled]="!isOpenPolygonEnabled()">
         </button>
-        <button class="icon-tool toolbar-button thin-button e2e-test-create-bezier"
+        <button aria-label="Quadratic Bezier curve" tabindex="0" class="icon-tool toolbar-button thin-button e2e-test-create-bezier"
                 [ngClass]="{'disabled' : !(areAllToolsEnabled() || isDrawModeBezier())}"
                 (click)="createQuadraticBezier()"
                 placement="right"
@@ -146,7 +146,7 @@
                 [disabled]="!(areAllToolsEnabled() || isDrawModeBezier())">
           <i class="fas fa-bezier-curve bezier-curve"></i>
         </button>
-        <button class="icon-tool toolbar-button thin-button e2e-test-create-piechart"
+        <button aria-label="pie chart" tabindex="0" class="icon-tool toolbar-button thin-button e2e-test-create-piechart"
                 [ngClass]="{'disabled' : !isPieChartEnabled()}"
                 (click)="createPieChart()"
                 placement="left"
@@ -154,7 +154,7 @@
                 [disabled]="!isPieChartEnabled()">
           <i class="fas fa-chart-pie pie-chart"></i>
         </button>
-        <button class="icon-tool toolbar-button thin-button e2e-test-create-svgupload"
+        <button aria-label="upload SVG" tabindex="0" class="icon-tool toolbar-button thin-button e2e-test-create-svgupload"
                 [ngClass]="{'disabled' : !isSvgUploadEnabled()}"
                 (click)="uploadSvgFile()"
                 placement="right"
@@ -164,21 +164,21 @@
         </button>
         <div class="vert-bottom-toolbar">
           <div>
-            <div class="color-well">
+            <div aria-label="Stroke" tabindex="0" class="color-well">
               <div>Stroke</div>
               <div id="stroke-color" class="colorPicker" placement="right" ngbTooltip="Stroke Color">
                 <div id="top-stroke-alpha" class="alphaSquare top"></div>
                 <div id="bottom-stroke-alpha" class="alphaSquare bottom"></div>
               </div>
             </div>
-            <div class="color-well">
+            <div aria-label="fill" tabindex="0" class="color-well">
               <div>Fill</div>
               <div id="fill-color" class="colorPicker" placement="right" ngbTooltip="Fill Color">
                 <div id="top-fill-alpha" class="alphaSquare top"></div>
                 <div id="bottom-fill-alpha" class="alphaSquare bottom"></div>
               </div>
             </div>
-            <div class="color-well">
+            <div aria-label="bg" tabindex="0" class="color-well">
               <div>bg</div>
               <div id="bg-color" class="colorPicker" placement="right" ngbTooltip="Background Color">
                 <div id="top-bg-alpha" class="alphaSquare top"></div>
@@ -187,39 +187,39 @@
             </div>
           </div>
           <div>
-            <button class="icon-tool toolbar-button thin-button oppia-bring-forward-icon"
+            <button aria-label="Bring Forward" tabindex="0" class="icon-tool toolbar-button thin-button oppia-bring-forward-icon"
                     [ngClass]="{'disabled' : !objectIsSelected}"
                     (click)="bringObjectForward()"
                     placement="left"
                     ngbTooltip="Bring Forward"
                     [disabled]="!objectIsSelected">
             </button>
-            <button class="icon-tool toolbar-button thin-button oppia-send-backward-icon"
+            <button aria-label="Send Backward" tabindex="0" class="icon-tool toolbar-button thin-button oppia-send-backward-icon"
                     [ngClass]="{'disabled' : !objectIsSelected}"
                     (click)="sendObjectBackward()"
                     placement="right"
                     ngbTooltip="Send Backward"
                     [disabled]="!objectIsSelected">
             </button>
-            <button class="icon-tool toolbar-button thin-button"
+            <button aria-label="Undo" tabindex="0" class="icon-tool toolbar-button thin-button"
                     [ngClass]="{'disabled' : !isUndoEnabled()}"
                     (click)="onUndo()"
                     [disabled]="!isUndoEnabled()">
               <i class="fas fa-undo"></i>
             </button>
-            <button class="icon-tool toolbar-button thin-button"
+            <button aria-label="Redo" tabindex="0" class="icon-tool toolbar-button thin-button"
                     [ngClass]="{'disabled' : !isRedoEnabled()}"
                     (click)="onRedo()"
                     [disabled]="!isRedoEnabled()">
               <i class="fas fa-redo"></i>
             </button>
           </div>
-          <button class="toolbar-button fat-button"
+          <button aria-label="Remove" tabindex="0" class="toolbar-button fat-button"
                   (click)="removeShape()"
                   [disabled]="!objectIsSelected">
             Remove
           </button>
-          <button class="toolbar-button fat-button"
+          <button aria-label="Clear" tabindex="0" class="toolbar-button fat-button"
                   (click)="onClear()"
                   [disabled]="!isClearEnabled()">
             Clear

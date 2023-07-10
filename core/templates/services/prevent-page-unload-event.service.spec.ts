@@ -53,7 +53,7 @@ describe ('Prevent page unload event service', function() {
         }
       }
     }
-  };
+  } as Window;
 
   it('should adding listener', () => {
     expect(preventPageUnloadEventService.isListenerActive()).toBeFalse();
@@ -130,7 +130,9 @@ describe ('Prevent page unload event service', function() {
     spyOn(reloadEvt, 'preventDefault');
 
     // This throws "Expected 0 arguments, but got 1.". We need to suppress this
-    // error because the nativeWindow is mocked and allows 1 argument.
+    // error because the nativeWindow is mocked and allows 1 argument. This
+    // error is thrown because the nativeWindow is not mocked in the
+    // preventPageUnloadEventService.
     // @ts-ignore
     windowRef.nativeWindow.location.reload(validationCallback());
 

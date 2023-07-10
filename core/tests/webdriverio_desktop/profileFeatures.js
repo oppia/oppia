@@ -49,7 +49,7 @@ describe('Un-customized profile page', function() {
   async function() {
     await users.login(TEST_EMAIL);
     await profilePage.get(TEST_USERNAME);
-    await profilePage.expectCurrUserToHaveProfilePhoto();
+    await profilePage.expectUserToHaveProfilePhoto();
     await profilePage.expectUserToHaveBio(DEFAULT_BIO);
     await profilePage.expectUserToHaveNoInterests();
     await profilePage.expectUserToHaveInterestPlaceholder(
@@ -62,7 +62,7 @@ describe('Un-customized profile page', function() {
     'logged out',
   async function() {
     await profilePage.get(TEST_USERNAME);
-    await profilePage.expectOtherUserToHaveProfilePhoto();
+    await profilePage.expectUserToHaveProfilePhoto();
     await profilePage.expectUserToHaveBio(DEFAULT_BIO);
     await profilePage.expectUserToHaveNoInterests();
     await profilePage.expectUserToHaveInterestPlaceholder(
@@ -99,7 +99,7 @@ describe('Customized profile page for current user', function() {
     async function() {
       await users.login(TEST_EMAIL);
       await profilePage.get(TEST_USERNAME);
-      await profilePage.expectCurrUserToHaveProfilePhoto();
+      await profilePage.expectUserToHaveProfilePhoto();
       await profilePage.expectUserToHaveBio(TEST_BIO);
       await profilePage.expectUserToHaveInterests(TEST_INTERESTS);
       await profilePage.expectUserToNotHaveInterestPlaceholder();
@@ -109,7 +109,7 @@ describe('Customized profile page for current user', function() {
   it('should display default photo, custom bio, and interests when logged out',
     async function() {
       await profilePage.get(TEST_USERNAME);
-      await profilePage.expectOtherUserToHaveProfilePhoto();
+      await profilePage.expectUserToHaveProfilePhoto();
       await profilePage.expectUserToHaveBio(TEST_BIO);
       await profilePage.expectUserToHaveInterests(TEST_INTERESTS);
       await profilePage.expectUserToNotHaveInterestPlaceholder();

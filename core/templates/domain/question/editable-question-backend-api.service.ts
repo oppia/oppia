@@ -77,18 +77,18 @@ export class EditableQuestionBackendApiService {
       errorCallback: (reason?: string) => void
   ): Promise<void> {
     return new Promise((resolve, reject) => {
+      let body = new FormData();
+      let filenames = imagesData.map(obj => obj.filename);
+      let imageBlobs = imagesData.map(obj => obj.imageBlob);
       let postData = {
         question_dict: questionObject,
         skill_ids: skillIds,
-        skill_difficulties: skillDifficulties
+        skill_difficulties: skillDifficulties,
+        filenames: JSON.stringify(filenames)
       };
-
-      let body = new FormData();
       body.append('payload', JSON.stringify(postData));
-      let filenames = imagesData.map(obj => obj.filename);
-      let imageBlobs = imagesData.map(obj => obj.imageBlob);
       for (let idx in imageBlobs) {
-        body.append(filenames[idx], imageBlobs[idx]);
+        body.append(`image${idx}`, imageBlobs[idx]);
       }
       this.http.post<CreateQuestionResponseBackendDict>(
         QuestionDomainConstants.QUESTION_CREATION_URL, body).toPromise()

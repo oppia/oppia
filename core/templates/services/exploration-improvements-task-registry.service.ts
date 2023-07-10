@@ -382,23 +382,23 @@ export class ExplorationImprovementsTaskRegistryService {
     for (const task of openTasks) {
       const stateNameReferences = (
         stateNameReferencesByTaskType.get(task.taskType));
-      if ((stateNameReferences as Set<unknown>).has(task.targetId)) {
+      if ((stateNameReferences as Set<string>).has(task.targetId)) {
         throw new Error(
           'Found duplicate task of type "' + task.taskType + '" targeting ' +
           'state "' + task.targetId + '"');
       } else {
-        (stateNameReferences as Set<unknown>).add(task.targetId);
+        (stateNameReferences as Set<string>).add(task.targetId);
       }
     }
     for (const [stateName, taskTypes] of resolvedTaskTypesByStateName) {
       for (const taskType of taskTypes) {
         const stateNameReferences = stateNameReferencesByTaskType.get(taskType);
-        if ((stateNameReferences as Set<unknown>).has(stateName)) {
+        if ((stateNameReferences as Set<string>).has(stateName)) {
           throw new Error(
             'Found duplicate task of type "' + taskType + '" targeting state ' +
             '"' + stateName + '"');
         } else {
-          (stateNameReferences as Set<unknown>).add(stateName);
+          (stateNameReferences as Set<string>).add(stateName);
         }
       }
     }

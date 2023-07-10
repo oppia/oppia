@@ -429,6 +429,13 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         self._assert_question_domain_validation_error(
             'Expected at least one answer group to have a correct answer')
 
+        state.interaction.default_outcome.dest_if_really_stuck = None
+        state.interaction.default_outcome.labelled_as_correct = False
+        state.interaction.default_outcome.refresher_exploration_id = 'Not None'
+        self._assert_question_domain_validation_error(
+            'refresher_exploration_id should be None for '
+            'Question default outcome.')
+
     def test_strict_validation_for_answer_groups(self) -> None:
         """Test to verify validate method of Question domain object with
         strict as True for interaction with answer group.
@@ -497,6 +504,34 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         self._assert_question_domain_validation_error(
             'Expected all answer groups to have destination for the '
             'stuck learner as None.')
+
+        state.interaction.answer_groups = [
+            state_domain.AnswerGroup.from_dict({
+                'outcome': {
+                    'dest': None,
+                    'dest_if_really_stuck': None,
+                    'feedback': {
+                        'content_id': 'feedback_1',
+                        'html': '<p>Feedback</p>'
+                    },
+                    'labelled_as_correct': True,
+                    'param_changes': [],
+                    'refresher_exploration_id': 'not None',
+                    'missing_prerequisite_skill_id': None
+                },
+                'rule_specs': [{
+                    'inputs': {
+                        'x': rule_spec_input_test_dict
+                    },
+                    'rule_type': 'Contains'
+                }],
+                'training_data': [],
+                'tagged_skill_misconception_id': None
+            })
+        ]
+
+        self._assert_question_domain_validation_error(
+            'refresher_exploration_id should be None for Question outcome.')
 
     # TODO(#13059): Here we use MyPy ignore because after we fully type the
     # codebase we plan to get rid of the tests that intentionally test wrong
@@ -2272,7 +2307,8 @@ class QuestionSummaryTest(test_utils.GenericTestBase):
             interaction_id='TextInput',
             question_model_created_on=self.fake_date_created,
             question_model_last_updated=self.fake_date_updated,
-            misconception_ids=['skill1-1', 'skill2-2']
+            misconception_ids=['skill1-1', 'skill2-2'],
+            version=1
         )
 
     def test_to_dict(self) -> None:
@@ -2287,7 +2323,8 @@ class QuestionSummaryTest(test_utils.GenericTestBase):
                 self.fake_date_updated),
             'created_on_msec': utils.get_time_in_millisecs(
                 self.fake_date_created),
-            'misconception_ids': ['skill1-1', 'skill2-2']
+            'misconception_ids': ['skill1-1', 'skill2-2'],
+            'version': 1
         }
 
         self.assertEqual(expected_object_dict, self.observed_object.to_dict())
@@ -2371,6 +2408,25 @@ class QuestionSummaryTest(test_utils.GenericTestBase):
             utils.ValidationError,
             'Expected misconception ids to be a list of strings, '
             'received 123'):
+            self.observed_object.validate()
+
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
+    def test_validate_invalid_version(self) -> None:
+        """Test to verify that the validation fails when
+        version value is an invalid.
+        """
+        self.observed_object.version = -2
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Expected version to be non-negative, received -2'):
+            self.observed_object.validate()
+
+        self.observed_object.version = 'invalid' # type: ignore[assignment]
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Expected version to be int, received invalid'):
             self.observed_object.validate()
 
 

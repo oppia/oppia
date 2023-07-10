@@ -162,16 +162,19 @@ describe('GraphInputValidationService', () => {
       goodDefaultOutcome);
     expect(warnings).toEqual([{
       type: WARNING_TYPES.CRITICAL,
-      message: 'The graph used in the rule 1 in group 1 exceeds supported ' +
-          'maximum number of vertices of 10 for isomorphism check.'
+      message: 'The graph used in the learner answer 1 in Oppia response ' +
+          '1 exceeds supported maximum number of vertices of ' +
+          '10 for isomorphism check.'
     }, {
       type: WARNING_TYPES.CRITICAL,
-      message: 'The graph used in the rule 2 in group 1 exceeds supported ' +
-          'maximum number of vertices of 10 for isomorphism check.'
+      message: 'The graph used in the learner answer 2 in Oppia response ' +
+          '1 exceeds supported maximum number of vertices of ' +
+          '10 for isomorphism check.'
     }, {
       type: WARNING_TYPES.CRITICAL,
-      message: 'The graph used in the rule 1 in group 2 exceeds supported ' +
-          'maximum number of vertices of 10 for isomorphism check.'
+      message: 'The graph used in the learner answer 1 in Oppia response ' +
+          '2 exceeds supported maximum number of vertices of ' +
+          '10 for isomorphism check.'
     }]);
   });
 
@@ -236,12 +239,12 @@ describe('GraphInputValidationService', () => {
     expect(warnings).toEqual([{
       type: AppConstants.WARNING_TYPES.CRITICAL,
       message: (
-        'The graph used in the rule 1 in group 1 ' +
+        'The graph used in the learner answer 1 in Oppia response 1 ' +
         'exceeds supported maximum number of vertices of 50.')
     }, {
       type: AppConstants.WARNING_TYPES.CRITICAL,
       message: (
-        'The graph used in the rule 1 in group 2 ' +
+        'The graph used in the learner answer 1 in Oppia response 2 ' +
         'exceeds supported maximum number of vertices of 50.')
     }]);
   });
@@ -259,11 +262,11 @@ describe('GraphInputValidationService', () => {
     expect(warnings).toEqual([{
       type: AppConstants.WARNING_TYPES.CRITICAL,
       message: (
-        'The rule 1 in group 1 is invalid.')
+        'Learner answer 1 in Oppia response 1 is invalid.')
     }, {
       type: AppConstants.WARNING_TYPES.CRITICAL,
       message: (
-        'The rule 1 in group 2 is invalid.')
+        'Learner answer 1 in Oppia response 2 is invalid.')
     }]);
   });
 });

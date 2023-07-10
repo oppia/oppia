@@ -30,7 +30,7 @@
     </picture>
   </a>
 </div>
-<div class="nav-mobile-header-text-container oppia-top-navigation-bar">
+<div *ngIf="!windowIsNarrow" class="nav-mobile-header-text-container oppia-top-navigation-bar">
   <span *ngIf="headerText?.length"
         class="nav-mobile-header-editor">
     {{ headerText }}
@@ -55,10 +55,10 @@
             class="nav-item  oppia-navbar-clickable-dropdown e2e-test-home-oppia-list-item">
           <a (keydown)="onMenuKeypress($event, 'homeMenu', {shiftTab: ACTION_CLOSE, enter: ACTION_OPEN})"
              class="nav-link oppia-navbar-tab"
-             role="menuitem"
              aria-haspopup="true"
              aria-expanded="false"
              aria-hidden="false"
+             aria-label="Home"
              tabindex="0"
              href="/"
              [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.SPLASH.ROUTE"
@@ -76,10 +76,11 @@
           <a ngbDropdownToggle
              (keydown)="onMenuKeypress($event, 'learnMenu', {shiftTab: ACTION_CLOSE, enter: ACTION_OPEN})"
              class="nav-link oppia-navbar-tab dropdown-toggle learn-tab"
-             role="menuitem"
              aria-haspopup="true"
              aria-expanded="false"
              aria-hidden="false"
+             aria-label="learn"
+             role="button"
              tabindex="0"
              (mouseover)="openSubmenu($event, 'learnMenu')"
              (mouseleave)="closeSubmenuIfNotMobile($event)"
@@ -90,15 +91,14 @@
           </a>
           <ul ngbDropdownMenu
               [ngStyle]="{'left.px': learnDropdownOffset}"
-              [ngClass]="{'classroom-disabled': !CLASSROOM_PROMOS_ARE_ENABLED, 'classroom-enabled': CLASSROOM_PROMOS_ARE_ENABLED}"
-              class="dropdown-menu oppia-navbar-dropdown learn-dropdown-menu"
+              class="dropdown-menu oppia-navbar-dropdown learn-dropdown-menu classroom-enabled"
               (mouseover)="openSubmenu($event, 'learnMenu')"
               (mouseleave)="closeSubmenuIfNotMobile($event)"
               role="menu"
               autofocus>
             <li class="nav-item">
               <div class="nav-item-main d-flex">
-                <a *ngIf="CLASSROOM_PROMOS_ARE_ENABLED" class="nav-item-left d-flex flex-column justify-content-between"
+                <a class="nav-item-left d-flex flex-column justify-content-between"
                    tabindex="0" href="/learn/{{DEFAULT_CLASSROOM_URL_FRAGMENT}}"
                    (click)="navigateToClassroomPage('/learn/' + DEFAULT_CLASSROOM_URL_FRAGMENT)">
                   <div class="nav-item-top d-flex justify-content-between">
@@ -109,12 +109,6 @@
                            class="nav-item-left-head underline" tabindex="0">
                            {{ 'I18N_TOPNAV_CLASSROOM_BASIC_MATHS' | translate }}
                         </a>
-                        <div (keydown)="onMenuKeypress($event, 'learnMenu', {shiftTab: ACTION_CLOSE, enter: ACTION_CLOSE})"
-                             class="nav-item-left-head">
-                          <span class="underline">
-                            {{ 'I18N_TOPNAV_CLASSROOM_BASIC_MATHS' | translate }}
-                          </span>
-                        </div>
                       </div>
                       <div class="des">
                         {{ 'I18N_TOPNAV_LEARN_DESCRIPTION_1' | translate }}
@@ -209,6 +203,7 @@
              class="nav-link oppia-navbar-tab dropdown-toggle"
              aria-haspopup="true"
              aria-expanded="false"
+             role="button"
              tabindex="0"
              (mouseover)="openSubmenu($event, 'aboutMenu')"
              (mouseleave)="closeSubmenuIfNotMobile($event)"
@@ -266,6 +261,7 @@
              aria-haspopup="true"
              aria-expanded="false"
              tabindex="0"
+             role="button"
              (mouseover)="openSubmenu($event, 'getInvolvedMenu')"
              (mouseleave)="closeSubmenuIfNotMobile($event)"
              autofocus>
@@ -366,7 +362,7 @@
       </ul>
     </li>
   </ul>
-  <ul class="nav oppia-navbar-nav oppia-navbar-profile">
+  <ul class="nav oppia-navbar-nav oppia-navbar-tabs oppia-navbar-profile">
     <li ngbDropdown class="nav-item oppia-navbar-clickable-dropdown dropdown" *ngIf="showLanguageSelector"
         [ngClass]="{'open': activeMenuName === 'languageMenu'}"
         (mouseover)="openSubmenu($event, 'languageMenu')"
@@ -411,16 +407,19 @@
          aria-expanded="false"
          aria-label="User Menu"
          tabindex="0"
+         role="button"
          (mouseover)="openSubmenu($event, 'profileMenu')"
          (mouseleave)="closeSubmenuIfNotMobile($event)"
          autofocus>
         <div class="oppia-navbar-profile-picture-container dropdown-toggle">
-          <span *ngIf="profilePictureDataUrl">
-            <img [src]="profilePictureDataUrl"
+          <picture *ngIf="profilePicturePngDataUrl">
+            <source type="image/webp" [srcset]="profilePictureWebpDataUrl">
+            <source type="image/png" [srcset]="profilePicturePngDataUrl">
+            <img [src]="profilePicturePngDataUrl"
                  class="oppia-navbar-profile-picture rounded-circle"
                  alt="User Avatar">
-          </span>
-          <span *ngIf="!profilePictureDataUrl">
+          </picture>
+          <span *ngIf="!profilePicturePngDataUrl">
             <i class="fas fa-user-circle oppia-user-avatar-icon">
             </i>
             <span class="oppia-icon-accessibility-label">

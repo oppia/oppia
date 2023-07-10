@@ -76,7 +76,7 @@ interface SuggestionChangeDict {
 interface ActiveSuggestionDict {
   'author_name': string;
   'change': SuggestionChangeDict;
-  'exploration_content_html': string | string[];
+  'exploration_content_html': string | string[] | null;
   'language_code': string;
   'last_updated_msecs': number;
   'status': string;
@@ -107,6 +107,7 @@ export class QuestionSuggestionReviewModalComponent
   @Input() suggestionId!: string;
   @Input() misconceptionsBySkill!: MisconceptionSkillMap;
   reviewMessage!: string;
+  reviewer!: string;
   questionStateData!: State;
   canEditQuestion!: boolean;
   skillDifficultyLabel!: string;
@@ -315,8 +316,11 @@ export class QuestionSuggestionReviewModalComponent
     return this.threadDataBackendApiService.fetchMessagesAsync(
       threadId).then((response) => {
       const threadMessageBackendDicts = response.messages;
-      this.reviewMessage = threadMessageBackendDicts.map(
-        m => ThreadMessage.createFromBackendDict(m))[1].text;
+      const reviewThreadMessage = ThreadMessage.createFromBackendDict(
+        threadMessageBackendDicts[1]
+      );
+      this.reviewMessage = reviewThreadMessage.text;
+      this.reviewer = reviewThreadMessage.authorUsername;
     });
   }
 

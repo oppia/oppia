@@ -89,6 +89,17 @@
                 </a>
               </li>
               <li class="nav-item oppia-clickable-navbar-element float-right">
+                <a class="nav-link oppia-navbar-tab e2e-test-features-tab"
+                   (click)="switchTab(TAB_ID_FEATURES)"
+                   href="#"
+                   [ngClass]="{ 'active': activeTab == TAB_ID_FEATURES }"
+                   ngbTooltip="Features"
+                   placement="bottom"
+                   container="body">
+                  Features
+                </a>
+              </li>
+              <li class="nav-item oppia-clickable-navbar-element float-right">
                 <a class="nav-link oppia-navbar-tab"
                    (click)="switchTab(TAB_ID_MISC)"
                    href="#"
@@ -108,17 +119,14 @@
                    data-toggle="dropdown"
                    (mouseenter)="activateProfileDropdown()"
                    (mouseleave)="deactivateProfileDropdown()">
-                  <span *ngIf="profilePictureDataUrl">
-                      <!--
-                        Lighthouse flags <img> elements that don't have alt attributes:
-                        If the image acts as decoration and does not provide any useful content, give it an empty alt=""
-                        https://web.dev/image-alt/?utm_source=lighthouse&utm_medium=devtools#how-to-add-alternative-text-to-images
-                      -->
-                    <img [src]="profilePictureDataUrl"
+                  <picture *ngIf="profilePicturePngDataUrl">
+                    <source type="image/webp" [srcset]="profilePictureWebpDataUrl">
+                    <source type="image/png" [srcset]="profilePicturePngDataUrl">
+                    <img [src]="profilePicturePngDataUrl"
                          class="oppia-navbar-profile-picture rounded-circle"
-                         alt="">
-                  </span>
-                  <div *ngIf="!profilePictureDataUrl" class="dropdown-toggle">
+                         alt="User profile picture">
+                  </picture>
+                  <div *ngIf="!profilePicturePngDataUrl" class="dropdown-toggle">
                     <i class="fas fa-user-circle md-40 oppia-dropdown-toggle-icon"></i>
                   </div>
                 </a>

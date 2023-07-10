@@ -16,7 +16,6 @@
  * @fileoverview Unit tests for LearnerDashboardIconsComponent.
  */
 
-import { SimpleChanges } from '@angular/core';
 import { async, ComponentFixture, fakeAsync, flushMicrotasks, TestBed, tick } from
   '@angular/core/testing';
 
@@ -123,52 +122,6 @@ describe('Learner Dashboard Icons Component', () => {
   }
   ));
 
-  it('should update hover state on changes', fakeAsync(() => {
-    let updateHoverStateSpy = spyOn(
-      component, 'setHoverState');
-    const changes: SimpleChanges = {
-      activityActive: {
-        previousValue: false,
-        currentValue: true,
-        firstChange: false,
-        isFirstChange: () => false
-      }
-    };
-    component.ngOnChanges(changes);
-    expect(updateHoverStateSpy).toHaveBeenCalled();
-  }));
-
-  it('should get value of activityActive', fakeAsync(() => {
-    component.activityIsCurrentlyHoveredOver = false;
-    const activityActiveSpy = spyOnProperty(
-      component, 'activityActive', 'get')
-      .and.callThrough();
-    let getActivityActive = component.activityActive;
-
-    fixture.detectChanges();
-
-    expect(getActivityActive).toBe(false);
-    expect(activityActiveSpy).toHaveBeenCalled();
-  }
-  ));
-
-  it('should set value of activityActive', fakeAsync(() => {
-    component.activityIsCurrentlyHoveredOver = false;
-    const activityActiveSpy = spyOnProperty(
-      component, 'activityActive', 'set')
-      .and.callThrough();
-
-    component.activityActive = true;
-    let setActivityActive = component.activityActive;
-
-    fixture.detectChanges();
-
-    expect(setActivityActive).toBe(true);
-    expect(component.activityIsCurrentlyHoveredOver).toBe(true);
-    expect(activityActiveSpy).toHaveBeenCalled();
-  }
-  ));
-
   it('should enable the tooltip', () => {
     component.enablePlaylistTooltip();
     expect(component.playlistTooltipIsEnabled).toBe(true);
@@ -178,18 +131,6 @@ describe('Learner Dashboard Icons Component', () => {
   it('should disable the tooltip', () => {
     component.disablePlaylistTooltip();
     expect(component.playlistTooltipIsEnabled).toBe(false);
-  }
-  );
-
-  it('should set hover state to true', () => {
-    component.setHoverState(true);
-    expect(component.activityIsCurrentlyHoveredOver).toBe(true);
-  }
-  );
-
-  it('should set hover state to false', () => {
-    component.setHoverState(false);
-    expect(component.activityIsCurrentlyHoveredOver).toBe(false);
   }
   );
 

@@ -1,11 +1,12 @@
 <i class="oppia-learner-dashboard-icon far fa-clock e2e-test-add-to-playlist-btn"
    *ngIf="isAddToPlaylistIconShown"
-   [hidden]="!(canActivityBeAddedToLearnerPlaylist(activityId) && !isContainerNarrow)" (click)="addToLearnerPlaylist(activityId, activityType)"
-   (mouseenter)="setHoverState(true)" (mouseleave)="setHoverState(false)"
-   aria-hidden="true"
+   [hidden]="!(canActivityBeAddedToLearnerPlaylist(activityId) && !isContainerNarrow)"
+   (click)="addToLearnerPlaylist(activityId, activityType)"
+   tabindex="0"
    ngbTooltip="{{ 'I18N_LIBRARY_ADD_TO_LEARNER_PLAYLIST' | translate }}"
    container="body"
-   placement="left">
+   placement="left"
+   aria-label="Add the following activity to your playlist button">
 </i>
 <div *ngIf="canActivityBeAddedToLearnerPlaylist(activityId) && isContainerNarrow && isAddToPlaylistIconShown">
   <div class="dropdown oppia-learner-dashboard-icon" ngbDropdown>
@@ -20,26 +21,29 @@
 <i class="oppia-learner-dashboard-icon far fa-clock"
    *ngIf="belongsToLearnerPlaylist()"
    (click)="removeFromLearnerPlaylist(activityId, activityTitle, activityType)"
-   aria-hidden="true"
+   tabindex="0"
    (mouseleave)="enablePlaylistTooltip()"
    ngbTooltip="{{ 'I18N_LIBRARY_ACTIVITY_IN_LEARNER_PLAYLIST' | translate }}"
    container="body"
-   placement="left">
+   placement="left"
+   aria-label="Following activity already added to playlist">
 </i>
 <i class="oppia-learner-dashboard-icon far fa-check-circle"
    *ngIf="belongsToCompletedActivities()"
-   aria-hidden="true"
+   tabindex="0"
    ngbTooltip="{{ 'I18N_LIBRARY_ACTIVITY_COMPLETED_ICON' | translate }}"
    container="body"
-   placement="left">
+   placement="left"
+   aria-label="You have completed this activity">
 </i>
 <i class="oppia-learner-dashboard-icon fas fa-spinner"
    *ngIf="belongsToIncompleteActivities()"
-   aria-hidden="true"
+   tabindex="0"
    ngbTooltip="{{ 'I18N_LIBRARY_INCOMPLETE_ACTIVITY_ICON' | translate }}"
    container="body"
    tooltipClass="library-incomplete-activity-tooltip"
-   placement="left">
+   placement="left"
+   aria-label="You're partway through this activity.">
 </i>
 <style>
   .library-incomplete-activity-tooltip .tooltip-inner {

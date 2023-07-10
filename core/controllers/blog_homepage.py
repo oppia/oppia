@@ -25,7 +25,6 @@ from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import blog_domain
 from core.domain import blog_services
-from core.domain import config_domain
 from core.domain import user_services
 
 from typing import Dict, Final, List, Optional, Tuple, TypedDict
@@ -45,7 +44,6 @@ class BlogCardSummaryDict(TypedDict):
     title: str
     summary: str
     author_username: Optional[str]
-    profile_pic_url: Optional[str]
     url_fragment: str
     tags: List[str]
     thumbnail_filename: Optional[str]
@@ -93,7 +91,6 @@ def _get_blog_card_summary_dicts_for_homepage(
                 'title': summary_dict['title'],
                 'summary': summary_dict['summary'],
                 'author_username': user_settings.username,
-                'profile_pic_url': user_settings.profile_picture_data_url,
                 'tags': summary_dict['tags'],
                 'thumbnail_filename': summary_dict['thumbnail_filename'],
                 'url_fragment': summary_dict['url_fragment'],
@@ -107,7 +104,6 @@ def _get_blog_card_summary_dicts_for_homepage(
                 'title': summary_dict['title'],
                 'summary': summary_dict['summary'],
                 'author_username': 'author account deleted',
-                'profile_pic_url': None,
                 'tags': summary_dict['tags'],
                 'thumbnail_filename': summary_dict['thumbnail_filename'],
                 'url_fragment': summary_dict['url_fragment'],
@@ -191,7 +187,7 @@ class BlogHomepageDataHandler(
 
     @acl_decorators.open_access
     def get(self) -> None:
-        """Handles GET requests."""
+        """Retrieves blog post summaries for the blog homepage."""
         assert self.normalized_request is not None
         offset = int(self.normalized_request['offset'])
         published_post_summaries = (
@@ -215,9 +211,7 @@ class BlogHomepageDataHandler(
                 blog_services
                 .get_total_number_of_published_blog_post_summaries()
             )
-            list_of_default_tags = config_domain.Registry.get_config_property(
-                'list_of_default_tags_for_blog_post', strict=True
-            ).value
+            list_of_default_tags = constants.LIST_OF_DEFAULT_TAGS_FOR_BLOG_POST
             self.values.update({
                 'no_of_blog_post_summaries': (
                     number_of_published_blog_post_summaries),
@@ -252,7 +246,15 @@ class BlogPostDataHandler(
 
     @acl_decorators.open_access
     def get(self, blog_post_url: str) -> None:
-        """Handles GET requests."""
+        """Retrieves a specific blog post and its related recommendations.
+
+        Args:
+            blog_post_url: str. The URL of the blog post.
+
+        Raises:
+            PageNotFoundException. The blog post page with the given url
+                doesn't exist.
+        """
         blog_post = blog_services.get_blog_post_by_url_fragment(blog_post_url)
         if not blog_post:
             raise self.PageNotFoundException(
@@ -261,11 +263,8 @@ class BlogPostDataHandler(
         user_settings = user_services.get_user_settings(
             blog_post.author_id, strict=False)
         if user_settings:
-            profile_picture_data_url = (
-                user_settings.profile_picture_data_url)
             author_username = user_settings.username
         else:
-            profile_picture_data_url = None
             author_username = 'author account deleted'
         author_details = blog_services.get_blog_author_details(
             blog_post.author_id)
@@ -327,7 +326,6 @@ class BlogPostDataHandler(
 
         self.values.update({
             'author_username': author_username,
-            'profile_picture_data_url': profile_picture_data_url,
             'blog_post_dict': authors_blog_post_dict,
             'summary_dicts': _get_blog_card_summary_dicts_for_homepage(
                 summaries[:MAX_POSTS_TO_RECOMMEND_AT_END_OF_BLOG_POST])
@@ -360,7 +358,14 @@ class AuthorsPageHandler(
 
     @acl_decorators.open_access
     def get(self, author_username: str) -> None:
-        """Handles GET requests."""
+        """Retrieves blog post summaries and specific author details.
+
+        Args:
+            author_username: str. The username of the author.
+
+        Raises:
+            Exception. No user settings found for the given author_username.
+        """
         assert self.normalized_request is not None
         offset = int(self.normalized_request['offset'])
 
@@ -396,8 +401,6 @@ class AuthorsPageHandler(
 
         self.values.update({
             'author_details': author_details,
-            'profile_picture_data_url': (
-                user_settings.profile_picture_data_url),
             'no_of_blog_post_summaries': num_of_published_blog_post_summaries,
             'summary_dicts': blog_post_summary_dicts
         })
@@ -457,7 +460,7 @@ class BlogPostSearchHandler(
 
     @acl_decorators.open_access
     def get(self) -> None:
-        """Handles GET requests."""
+        """Searches for blog posts based on a query and tags."""
         assert self.normalized_request is not None
         query_string = utils.get_formatted_query_string(
             self.normalized_request['q']
@@ -481,9 +484,7 @@ class BlogPostSearchHandler(
         )
         blog_post_summary_dicts = (
             _get_blog_card_summary_dicts_for_homepage(blog_post_summaries))
-        list_of_default_tags = config_domain.Registry.get_config_property(
-            'list_of_default_tags_for_blog_post', strict=True
-        ).value
+        list_of_default_tags = constants.LIST_OF_DEFAULT_TAGS_FOR_BLOG_POST
 
         self.values.update({
             'blog_post_summaries_list': blog_post_summary_dicts,

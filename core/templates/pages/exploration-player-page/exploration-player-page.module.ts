@@ -35,6 +35,7 @@ import { ExplorationPlayerPageRoutingModule } from './exploration-player-page-ro
 import { ExplorationPlayerPageRootComponent } from './exploration-player-page-root.component';
 import { ProgressReminderModalComponent } from './templates/progress-reminder-modal.component';
 import { HintAndSolutionModalService } from './services/hint-and-solution-modal.service';
+import { FatigueDetectionService } from './services/fatigue-detection.service';
 
 import 'third-party-imports/guppy.import';
 import 'third-party-imports/midi-js.import';
@@ -79,7 +80,8 @@ import { toastrConfig } from 'pages/oppia-root/app.module';
     RefresherExplorationConfirmationModal,
   ],
   providers: [
-    HintAndSolutionModalService
+    HintAndSolutionModalService,
+    FatigueDetectionService,
   ]
 })
 export class ExplorationPlayerPageModule {}

@@ -90,7 +90,7 @@ describe('AudioPlayerService', () => {
         duration: () => {
           return 30;
         }
-      } as unknown as Howl);
+      } as Howl);
       spyOn(assetsBackendApiService, 'loadAudio').and.returnValue(
         Promise.resolve({
           data: new Blob(),
@@ -339,7 +339,7 @@ describe('AudioPlayerService', () => {
         playing: () => {
           return true;
         }
-      } as unknown as Howl);
+      } as Howl);
       spyOn(assetsBackendApiService, 'loadAudio').and.returnValue(
         Promise.resolve({
           data: new Blob(),
@@ -437,7 +437,7 @@ describe('AudioPlayerService', () => {
           func();
         }
       }
-    } as unknown as Howl);
+    } as Howl);
     spyOn(assetsBackendApiService, 'loadAudio').and.returnValue(
       Promise.resolve({
         data: new Blob(),

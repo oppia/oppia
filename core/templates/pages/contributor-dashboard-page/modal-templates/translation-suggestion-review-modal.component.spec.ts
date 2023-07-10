@@ -21,6 +21,7 @@ import { ComponentFixture, fakeAsync, flush, TestBed, tick, waitForAsync } from 
 import { TranslationSuggestionReviewModalComponent } from './translation-suggestion-review-modal.component';
 import { ChangeDetectorRef, ElementRef, NO_ERRORS_SCHEMA } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import { AppConstants } from 'app.constants';
 import { AlertsService } from 'services/alerts.service';
 import { ContributionAndReviewService } from '../services/contribution-and-review.service';
 import { LanguageUtilService } from 'domain/utilities/language-util.service';
@@ -260,8 +261,6 @@ describe('Translation Suggestion Review Modal Component', function() {
       expect(component.reviewMessage).toBe('');
       // Suggestion 1's exploration_content_html matches its content_html.
       expect(component.hasExplorationContentChanged()).toBe(false);
-      expect(component.displayExplorationContent()).toEqual(
-        suggestion1.change.content_html);
 
       spyOn(
         siteAnalyticsService,
@@ -285,15 +284,13 @@ describe('Translation Suggestion Review Modal Component', function() {
       // Suggestion 2's exploration_content_html does not match its
       // content_html.
       expect(component.hasExplorationContentChanged()).toBe(true);
-      expect(component.displayExplorationContent()).toEqual(
-        suggestion2.exploration_content_html);
       expect(
         siteAnalyticsService.registerContributorDashboardAcceptSuggestion)
         .toHaveBeenCalledWith('Translation');
       expect(contributionAndReviewService.reviewExplorationSuggestion)
         .toHaveBeenCalledWith(
           '1', 'suggestion_1', 'accept', 'Review message example: ' +
-          'This suggestion was submitted with reviewer edits.',
+          '(Note: This suggestion was submitted with reviewer edits.)',
           'hint section of "StateName" card',
           jasmine.any(Function), jasmine.any(Function));
 
@@ -311,6 +308,39 @@ describe('Translation Suggestion Review Modal Component', function() {
           jasmine.any(Function));
       expect(activeModal.close).toHaveBeenCalledWith([
         'suggestion_1', 'suggestion_2']);
+    });
+
+    it('should set suggestion review message to auto-generated note when ' +
+      'suggestion is accepted with edits and no user-supplied review message',
+    function() {
+      component.ngOnInit();
+      expect(component.activeSuggestionId).toBe('suggestion_1');
+      expect(component.activeSuggestion).toEqual(suggestion1);
+      expect(component.reviewable).toBe(reviewable);
+      expect(component.reviewMessage).toBe('');
+
+      spyOn(
+        siteAnalyticsService,
+        'registerContributorDashboardAcceptSuggestion');
+      spyOn(contributionAndReviewService, 'reviewExplorationSuggestion')
+        .and.callFake((
+            targetId, suggestionId, action, reviewMessage, commitMessage,
+            successCallback, errorCallback) => {
+          return Promise.resolve(successCallback(suggestionId));
+        });
+
+      component.translationUpdated = true;
+      component.acceptAndReviewNext();
+
+      expect(
+        siteAnalyticsService.registerContributorDashboardAcceptSuggestion)
+        .toHaveBeenCalledWith('Translation');
+      expect(contributionAndReviewService.reviewExplorationSuggestion)
+        .toHaveBeenCalledWith(
+          '1', 'suggestion_1', 'accept',
+          '(Note: This suggestion was submitted with reviewer edits.)',
+          'hint section of "StateName" card', jasmine.any(Function),
+          jasmine.any(Function));
     });
 
     it('should reject suggestion in suggestion modal service when clicking ' +
@@ -566,6 +596,27 @@ describe('Translation Suggestion Review Modal Component', function() {
       status: 'status',
       target_type: 'target_type',
     };
+    const suggestion3Obsolete = {
+      suggestion_id: 'suggestion_3',
+      target_id: '3',
+      suggestion_type: 'translate_content',
+      change: {
+        content_id: 'hint_1',
+        content_html: 'Translation',
+        translation_html: 'Tradução',
+        state_name: 'StateName',
+        cmd: 'edit_state_property',
+        data_format: 'html',
+        language_code: 'language_code',
+      },
+      // This suggestion is obsolete.
+      exploration_content_html: null,
+      author_name: 'author_name',
+      language_code: 'language_code',
+      last_updated_msecs: 1559074000000,
+      status: 'status',
+      target_type: 'target_type',
+    };
 
     const contribution1 = {
       suggestion: suggestion1,
@@ -583,10 +634,19 @@ describe('Translation Suggestion Review Modal Component', function() {
         chapter_title: 'chapter_2'
       }
     };
+    const contribution3 = {
+      suggestion: suggestion3Obsolete,
+      details: {
+        topic_name: 'topic_3',
+        story_title: 'story_3',
+        chapter_title: 'chapter_3'
+      }
+    };
 
     const suggestionIdToContribution = {
       suggestion_1: contribution1,
-      suggestion_2: contribution2
+      suggestion_2: contribution2,
+      suggestion_3: contribution3
     };
 
     beforeEach(() => {
@@ -610,7 +670,7 @@ describe('Translation Suggestion Review Modal Component', function() {
           updated_subject: '',
         },
         {
-          author_username: '',
+          author_username: 'Reviewer',
           created_on_msecs: 0,
           entity_type: '',
           entity_id: '',
@@ -637,6 +697,7 @@ describe('Translation Suggestion Review Modal Component', function() {
         expect(component.hasExplorationContentChanged()).toBe(true);
         expect(fetchMessagesAsyncSpy).toHaveBeenCalledWith('suggestion_1');
         expect(component.reviewMessage).toBe('Review Message');
+        expect(component.reviewer).toBe('Reviewer');
       }));
 
     it('should correctly determine whether the panel data is overflowing',
@@ -673,11 +734,34 @@ describe('Translation Suggestion Review Modal Component', function() {
 
       expect(component.computePanelOverflowState).toHaveBeenCalled();
     });
+
+    it('should set Obsolete review message for obsolete suggestions',
+      fakeAsync(function() {
+        const fetchMessagesAsyncSpy = spyOn(
+          threadDataBackendApiService, 'fetchMessagesAsync')
+          .and.returnValue(Promise.resolve({messages: []}));
+        component.initialSuggestionId = 'suggestion_3';
+
+        component.ngOnInit();
+        component.refreshActiveContributionState();
+        tick();
+
+        expect(component.activeSuggestionId).toBe('suggestion_3');
+        expect(component.activeSuggestion).toEqual(suggestion3Obsolete);
+        expect(component.reviewable).toBe(reviewable);
+        expect(component.subheading).toBe('topic_3 / story_3 / chapter_3');
+        // Suggestion 3's exploration_content_html does not match its
+        // content_html.
+        expect(component.hasExplorationContentChanged()).toBe(true);
+        expect(fetchMessagesAsyncSpy).toHaveBeenCalledWith('suggestion_3');
+        expect(component.reviewMessage).toBe(
+          AppConstants.OBSOLETE_TRANSLATION_SUGGESTION_REVIEW_MSG);
+      }));
   });
 
   describe('when reviewing suggestions' +
     ' with deleted opportunites', function() {
-    const reviewable = false;
+    const reviewable = true;
     const subheading = 'topic_1 / story_1 / chapter_1';
 
     const suggestion1 = {

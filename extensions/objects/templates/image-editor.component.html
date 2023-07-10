@@ -74,7 +74,7 @@
     <div *ngIf="isImageUploaded()" class="filepath-editor-save-box">
       <button *ngIf="!imageIsUploading; else Loading"
               type="button"
-              class="btn btn-success filepath-editor-use"
+              class="btn btn-success filepath-editor-use e2e-test-use-image"
               (click)="saveUploadedFile()"
               [disabled]="isUserCropping()">
         Use This Image

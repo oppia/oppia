@@ -31,6 +31,7 @@ import {
   OnInit,
   Output
 } from '@angular/core';
+import { isNumber } from 'angular';
 import { GraphAnswer } from 'interactions/answer-defs';
 import { InteractionsExtensionsConstants } from 'interactions/interactions-extension.constants';
 import { PlayerPositionService } from 'pages/exploration-player-page/services/player-position.service';
@@ -44,7 +45,7 @@ import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 
 const debounce = (delay: number = 5): MethodDecorator => {
   return function(
-      target: unknown, propertyKey: string, descriptor: PropertyDescriptor) {
+      target: string, propertyKey: string, descriptor: PropertyDescriptor) {
     const original = descriptor.value;
     const key = `__timeout__${propertyKey}`;
 
@@ -654,7 +655,7 @@ export class GraphVizComponent implements OnInit, AfterViewInit {
     if (weight === null) {
       this.selectedEdgeWeightValue = '';
     }
-    if (angular.isNumber(weight)) {
+    if (isNumber(weight)) {
       this.selectedEdgeWeightValue = weight;
     }
   }
@@ -664,7 +665,7 @@ export class GraphVizComponent implements OnInit, AfterViewInit {
   }
 
   onUpdateEdgeWeight(): void {
-    if (angular.isNumber(this.selectedEdgeWeightValue)) {
+    if (isNumber(this.selectedEdgeWeightValue)) {
       this.graph.edges[this.state.selectedEdge].weight = (
         this.selectedEdgeWeightValue);
       this.graphChange.emit(this.graph);

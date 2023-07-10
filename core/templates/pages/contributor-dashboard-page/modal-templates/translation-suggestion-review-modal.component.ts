@@ -64,7 +64,7 @@ interface SuggestionChangeDict {
 interface ActiveSuggestionDict {
   'author_name': string;
   'change': SuggestionChangeDict;
-  'exploration_content_html': string | string[];
+  'exploration_content_html': string | string[] | null;
   'language_code': string;
   'last_updated_msecs': number;
   'status': string;
@@ -103,7 +103,7 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
   contentHtml!: string | string[];
   editedContent!: EditedContentDict;
   errorMessage!: string;
-  explorationContentHtml!: string | string[];
+  explorationContentHtml!: string | string[] | null;
   finalCommitMessage!: string;
   initialSuggestionId!: string;
   languageCode!: string;
@@ -115,7 +115,9 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
   isLastItem!: boolean;
   isFirstItem: boolean = true;
   reviewMessage!: string;
+  reviewer!: string;
   status!: string;
+  heading: string = 'Your Translation Contributions';
   subheading!: string;
   suggestionIdToContribution!: Record<string, ActiveContributionDict>;
   translationHtml!: string;
@@ -189,6 +191,7 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
     if (this.reviewable) {
       this.siteAnalyticsService
         .registerContributorDashboardViewSuggestionForReview('Translation');
+      this.heading = 'Review Translation Contributions';
     }
     delete this.suggestionIdToContribution[this.initialSuggestionId];
     this.remainingContributionIds = Object.keys(
@@ -256,10 +259,6 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
             author_name
         );
       });
-    this.reviewMessage = '';
-    if (!this.reviewable) {
-      this._getThreadMessagesAsync(this.activeSuggestionId);
-    }
     this.isContentExpanded = false;
     this.isTranslationExpanded = false;
     this.errorMessage = '';
@@ -287,6 +286,18 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
       this.activeSuggestion.change.data_format ===
         'set_of_unicode_string'
     );
+    this.reviewMessage = '';
+    if (!this.reviewable) {
+      this._getThreadMessagesAsync(this.activeSuggestionId).then(() => {
+        // No review message and no exploration content means the suggestion
+        // became obsolete and was auto-rejected in a batch job. See issue
+        // #16022.
+        if (!this.reviewMessage && !this.explorationContentHtml) {
+          this.reviewMessage = (
+            AppConstants.OBSOLETE_TRANSLATION_SUGGESTION_REVIEW_MSG);
+        }
+      });
+    }
     setTimeout(() => {
       this.computePanelOverflowState();
     }, 0);
@@ -354,6 +365,7 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
     // a review message the second element of the threadMessages
     // array contains the actual review message.
     if (threadMessages[1] !== undefined) {
+      this.reviewer = threadMessages[1].authorUsername;
       this.reviewMessage = threadMessages[1].text;
     }
   }
@@ -408,10 +420,11 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
 
   acceptAndReviewNext(): void {
     this.finalCommitMessage = this.generateCommitMessage();
-    if (this.translationUpdated) {
-      this.reviewMessage = this.reviewMessage + ': This suggestion' +
-        ' was submitted with reviewer edits.';
-    }
+    const reviewMessageForSubmitter = this.reviewMessage + (
+      this.translationUpdated ? (
+        (this.reviewMessage.length > 0 ? ': ' : '') +
+        '(Note: This suggestion was submitted with reviewer edits.)') :
+      '');
     this.resolvingSuggestion = true;
     this.siteAnalyticsService.registerContributorDashboardAcceptSuggestion(
       'Translation');
@@ -419,7 +432,7 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
     this.contributionAndReviewService.reviewExplorationSuggestion(
       this.activeSuggestion.target_id, this.activeSuggestionId,
       AppConstants.ACTION_ACCEPT_SUGGESTION,
-      this.reviewMessage, this.finalCommitMessage,
+      reviewMessageForSubmitter, this.finalCommitMessage,
       this.resolveSuggestionAndUpdateModal.bind(this),
       (errorMessage) => {
         this.rejectAndReviewNext(`Invalid Suggestion: ${errorMessage}`);
@@ -452,15 +465,6 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
     }
   }
 
-  // Returns the HTML content representing the most up-to-date exploration
-  // content for the active suggestion.
-  displayExplorationContent(): string | string[] {
-    return (
-      this.hasExplorationContentChanged() ?
-      this.explorationContentHtml :
-      this.contentHtml);
-  }
-
   // Returns whether the active suggestion's exploration_content_html
   // differs from the content_html of the suggestion's change object.
   hasExplorationContentChanged(): boolean {
@@ -469,7 +473,9 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
   }
 
   isHtmlContentEqual(
-      first: string | string[], second: string | string[]): boolean {
+      first: string | string[] | null,
+      second: string | string[] | null
+  ): boolean {
     if (Array.isArray(first) && Array.isArray(second)) {
       // Check equality of all array elements.
       return (

@@ -26,12 +26,12 @@ import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 
 interface ExplorationFeaturesBackendDict {
-  'is_exploration_whitelisted': boolean;
+  'exploration_is_curated': boolean;
   'always_ask_learners_for_answer_details': boolean;
 }
 
 export interface ExplorationFeatures {
-  isExplorationWhitelisted: boolean;
+  explorationIsCurated: boolean;
   alwaysAskLearnersForAnswerDetails: boolean;
 }
 
@@ -51,7 +51,7 @@ export class ExplorationFeaturesBackendApiService {
         {exploration_id: explorationId}
       ) as string
     ).toPromise().then(response => ({
-      isExplorationWhitelisted: response.is_exploration_whitelisted,
+      explorationIsCurated: response.exploration_is_curated,
       alwaysAskLearnersForAnswerDetails: (
         response.always_ask_learners_for_answer_details),
     }), errorResponse => {

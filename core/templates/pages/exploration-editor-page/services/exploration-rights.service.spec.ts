@@ -36,7 +36,6 @@ describe('Exploration rights service', () => {
   let clearWarningsSpy: jasmine.Spy;
   let successHandler: jasmine.Spy;
   let failHandler: jasmine.Spy;
-  let alertsService: AlertsService;
   let serviceData: ExplorationRightsBackendData = {
     rights: {
       owner_names: ['abc'],
@@ -54,7 +53,6 @@ describe('Exploration rights service', () => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
       providers: [
-        AlertsService,
         {
           provide: ExplorationDataService,
           useValue: {
@@ -84,7 +82,6 @@ describe('Exploration rights service', () => {
     clearWarningsSpy = spyOn(als, 'clearWarnings').and.callThrough();
     successHandler = jasmine.createSpy('success');
     failHandler = jasmine.createSpy('fail');
-    alertsService = TestBed.inject(AlertsService);
   });
 
   afterEach(() => {
@@ -301,26 +298,6 @@ describe('Exploration rights service', () => {
     expect(ers.voiceArtistNames).toEqual(['voiceArtist']);
   }));
 
-  it('should reject handler when saving a voice artist fails', fakeAsync(() => {
-    spyOn(
-      explorationRightsBackendApiService,
-      'assignVoiceArtistRoleAsyncPostData').and.returnValue(
-      Promise.reject());
-    spyOn(alertsService, 'addWarning').and.callThrough();
-
-    ers.assignVoiceArtistRoleAsync('voiceArtist').then(
-      successHandler, failHandler);
-    tick();
-
-    expect(
-      explorationRightsBackendApiService
-        .assignVoiceArtistRoleAsyncPostData
-    ).toHaveBeenCalled();
-    expect(alertsService.addWarning).toHaveBeenCalledWith(
-      'Could not assign voice artist to private activity.'
-    );
-  }));
-
   it('should remove existing voice artist', fakeAsync(() => {
     serviceData.rights.voice_artist_names = [];
 
@@ -341,6 +318,29 @@ describe('Exploration rights service', () => {
     expect(failHandler).not.toHaveBeenCalled();
 
     expect(ers.voiceArtistNames).toEqual([]);
+  }));
+
+  it('should reject handler when saving a voice artist fails', fakeAsync(() => {
+    const errorMessage = 'An error occurred while assigning voice artist role.';
+    const responseError = { error: { error: errorMessage } };
+    spyOn(
+      explorationRightsBackendApiService,
+      'assignVoiceArtistRoleAsyncPostData').and.returnValue(
+      Promise.reject(responseError));
+    spyOn(als, 'addWarning');
+
+    ers.assignVoiceArtistRoleAsync('voiceArtist').then(
+      successHandler, failHandler);
+    tick();
+
+    expect(
+      explorationRightsBackendApiService
+        .assignVoiceArtistRoleAsyncPostData
+    ).toHaveBeenCalled();
+
+    expect(als.addWarning).toHaveBeenCalledWith(
+      errorMessage
+    );
   }));
 
   it('should check user already has roles', () => {

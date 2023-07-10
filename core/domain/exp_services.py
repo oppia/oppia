@@ -59,6 +59,7 @@ from core.domain import search_services
 from core.domain import state_domain
 from core.domain import stats_domain
 from core.domain import stats_services
+from core.domain import suggestion_services
 from core.domain import taskqueue_services
 from core.domain import translation_services
 from core.domain import user_domain
@@ -2051,11 +2052,6 @@ def compute_models_to_put_when_saving_new_exp_version(
 
     Raises:
         ValueError. No commit message is supplied and the exploration is public.
-        ValueError. The update is due to a suggestion and the commit message is
-            invalid.
-        ValueError. The update is not due to a suggestion, and the commit
-            message starts with the same prefix as the commit message for
-            accepted suggestions.
 
     Returns:
         list(BaseModel). A list of the models that were updated.
@@ -2120,6 +2116,17 @@ def compute_models_to_put_when_saving_new_exp_version(
         )
     )
     models_to_put.extend(new_translation_models)
+    # Auto-reject any pending translation suggestions that are now obsolete due
+    # to the corresponding content being deleted. See issue #16022 for context.
+    # TODO(#16022): Refactor to compute the suggestion, suggestion stats, and
+    # feedback message models that are put to the datastore during the
+    # suggestion rejection flow instead of applying the datastore changes here.
+    if len(content_ids_corresponding_translations_to_remove) > 0:
+        (
+            suggestion_services
+            .auto_reject_translation_suggestions_for_content_ids(
+                exploration_id,
+                content_ids_corresponding_translations_to_remove))
 
     exp_user_data_model_to_put = get_exp_user_data_model_with_draft_discarded(
         exploration_id, committer_id

@@ -19,7 +19,6 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { StateCard } from 'domain/state_card/state-card.model';
-import { BrowserCheckerService } from 'domain/utilities/browser-checker.service';
 import { InteractionSpecsConstants, InteractionSpecsKey } from 'pages/interaction-specs.constants';
 import { Subscription } from 'rxjs';
 import { UrlService } from 'services/contextual/url.service';
@@ -35,7 +34,7 @@ import { animate, keyframes, style, transition, trigger } from '@angular/animati
 import { ContentTranslationManagerService } from '../services/content-translation-manager.service';
 
 import './progress-nav.component.css';
-import { InteractionCustomizationArgs, ItemSelectionInputCustomizationArgs } from 'interactions/customization-args-defs';
+import { InteractionCustomizationArgs } from 'interactions/customization-args-defs';
 
 
 @Component({
@@ -100,7 +99,6 @@ export class ProgressNavComponent {
     'ItemSelectionInput', 'MultipleChoiceInput'];
 
   constructor(
-    private browserCheckerService: BrowserCheckerService,
     private explorationPlayerStateService: ExplorationPlayerStateService,
     private focusManagerService: FocusManagerService,
     private i18nLanguageCodeService: I18nLanguageCodeService,
@@ -192,8 +190,10 @@ export class ProgressNavComponent {
         InteractionSpecsConstants.INTERACTION_SPECS[
           this.interactionId as InteractionSpecsKey
         ].show_generic_submit_button);
-    // The type of error 'e' is unknown because anything can be throw
-    // in TypeScript. We need to make sure to check the type of 'e'.
+    // We use unknown type because we are unsure of the type of error
+    // that was thrown. Since the catch block cannot identify the
+    // specific type of error, we are unable to further optimise the
+    // code by introducing more types of errors.
     } catch (e: unknown) {
       let additionalInfo = (
         '\nSubmit button debug logs:\ninterationId: ' +
@@ -202,28 +202,6 @@ export class ProgressNavComponent {
         e.message += additionalInfo;
       }
       throw e;
-    }
-  }
-
-  doesInteractionHaveSpecialCaseForMobile(): boolean {
-    // The submit button should be shown:
-    // 1. In mobile mode, if the current interaction is either
-    //    ItemSelectionInput or MultipleChoiceInput.
-    // 2. In desktop mode, if the current interaction is
-    //    ItemSelectionInput with maximum selectable choices > 1.
-    if (this.browserCheckerService.isMobileDevice()) {
-      return (
-        !this.interactionId ||
-        this.SHOW_SUBMIT_INTERACTIONS_ONLY_FOR_MOBILE.indexOf(
-          this.interactionId) >= 0);
-    } else {
-      let interactionCustomizationArgs = (
-        this.interactionCustomizationArgs as
-          ItemSelectionInputCustomizationArgs);
-      return (
-        this.interactionId === 'ItemSelectionInput' &&
-              interactionCustomizationArgs
-                .maxAllowableSelectionCount.value > 1);
     }
   }
 
@@ -243,10 +221,6 @@ export class ProgressNavComponent {
   }
 
   shouldGenericSubmitButtonBeShown(): boolean {
-    if (this.doesInteractionHaveSpecialCaseForMobile()) {
-      return true;
-    }
-
     return (this.doesInteractionHaveNavSubmitButton() && (
       this.interactionIsInline ||
       !this.canWindowShowTwoCards()

@@ -29,6 +29,7 @@ import { LearnerGroupAllLearnersInfo } from 'domain/learner_group/learner-group-
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { LoaderService } from 'services/loader.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
+import { UserService } from 'services/user.service';
 
 @Pipe({name: 'truncate'})
 class MockTrunctePipe {
@@ -53,6 +54,7 @@ describe('LearnerGroupPreferencesComponent', () => {
   let ngbModal: NgbModal;
   let loaderService: LoaderService;
   let windowRef: MockWindowRef;
+  let userService: UserService;
 
   const learnerGroupBackendDict = {
     id: 'groupId',
@@ -92,9 +94,12 @@ describe('LearnerGroupPreferencesComponent', () => {
     ngbModal = TestBed.inject(NgbModal);
     loaderService = TestBed.inject(LoaderService);
     fixture = TestBed.createComponent(LearnerGroupPreferencesComponent);
+    userService = TestBed.inject(UserService);
     component = fixture.componentInstance;
 
     component.learnerGroup = learnerGroup;
+    spyOn(userService, 'getProfileImageDataUrl').and.returnValue(
+      ['default-image-url-png', 'default-image-url-webp']);
   });
 
   it('should set active tab and check if tab is active correctly', () => {
@@ -141,33 +146,27 @@ describe('LearnerGroupPreferencesComponent', () => {
   it('should initialize', fakeAsync(() => {
     const learnerInfo1 = LearnerGroupUserInfo.createFromBackendDict({
       username: 'username1',
-      profile_picture_data_url: 'picture',
       error: ''
     });
     const learnerInfo2 = LearnerGroupUserInfo.createFromBackendDict({
       username: 'username2',
-      profile_picture_data_url: 'picture2',
       error: ''
     });
     const learnerInfo3 = LearnerGroupUserInfo.createFromBackendDict({
       username: 'user3',
-      profile_picture_data_url: 'picture3',
       error: ''
     });
     const allLearnersInfo = LearnerGroupAllLearnersInfo.createFromBackendDict({
       learners_info: [{
         username: 'user3',
-        profile_picture_data_url: 'picture3',
         error: ''
       }],
       invited_learners_info: [{
         username: 'username1',
-        profile_picture_data_url: 'picture',
         error: ''
       },
       {
         username: 'username2',
-        profile_picture_data_url: 'picture2',
         error: ''
       }]
     });
@@ -218,9 +217,14 @@ describe('LearnerGroupPreferencesComponent', () => {
     expect(component.invitedLearners).toEqual(['username1', 'username2']);
   });
 
-  it('should get user profile image data url correctly', () => {
-    const dataUrl = '%2Fimages%2Furl%2F1';
-    expect(component.getProfileImageDataUrl(dataUrl)).toBe('/images/url/1');
+  it('should get user profile image png data url correctly', () => {
+    expect(component.getProfileImagePngDataUrl('username')).toBe(
+      'default-image-url-png');
+  });
+
+  it('should get user profile image webp data url correctly', () => {
+    expect(component.getProfileImageWebpDataUrl('username')).toBe(
+      'default-image-url-webp');
   });
 
   it('should open invite learners modal successfully', fakeAsync(() => {
@@ -238,7 +242,6 @@ describe('LearnerGroupPreferencesComponent', () => {
       demoLearnerGroupBackendDict);
     const newLearnerInfo = LearnerGroupUserInfo.createFromBackendDict({
       username: 'username1',
-      profile_picture_data_url: 'picture',
       error: ''
     });
 
@@ -289,7 +292,6 @@ describe('LearnerGroupPreferencesComponent', () => {
         demoLearnerGroupBackendDict);
       const learnerInfo = LearnerGroupUserInfo.createFromBackendDict({
         username: 'user3',
-        profile_picture_data_url: 'picture',
         error: ''
       });
 
@@ -331,7 +333,6 @@ describe('LearnerGroupPreferencesComponent', () => {
         demoLearnerGroupBackendDict);
       const newLearnerInfo = LearnerGroupUserInfo.createFromBackendDict({
         username: 'username1',
-        profile_picture_data_url: 'picture',
         error: ''
       });
 
@@ -383,7 +384,6 @@ describe('LearnerGroupPreferencesComponent', () => {
         demoLearnerGroupBackendDict);
       const learnerInfo = LearnerGroupUserInfo.createFromBackendDict({
         username: 'user3',
-        profile_picture_data_url: 'picture',
         error: ''
       });
 
@@ -426,7 +426,6 @@ describe('LearnerGroupPreferencesComponent', () => {
         demoLearnerGroupBackendDict);
       const learnerInfo = LearnerGroupUserInfo.createFromBackendDict({
         username: 'user3',
-        profile_picture_data_url: 'picture',
         error: ''
       });
 

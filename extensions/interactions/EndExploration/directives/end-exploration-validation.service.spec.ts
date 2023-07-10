@@ -104,7 +104,7 @@ describe('EndExplorationValidationService', () => {
         type: WARNING_TYPES.ERROR,
         message: (
           'Please make sure end exploration interactions do not ' +
-          'have any answer groups.')
+          'have any Oppia responses.')
       }, {
         type: WARNING_TYPES.ERROR,
         message: (

@@ -180,7 +180,7 @@
     </form>
   </md-card>
 
-  <md-card class="oppia-page-card oppia-long-text">
+  <md-card class="oppia-page-card oppia-long-text" ng-if="$ctrl.UserIsTranslationAdmin">
     <form class="form-horizontal"
           ng-submit="$ctrl.submitViewTranslationContributionStatsForm($ctrl.formData.viewTranslationContributionStats)">
       <legend class="text-center">View Translation Contribution Stats</legend>

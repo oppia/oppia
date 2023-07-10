@@ -38,7 +38,6 @@ export interface BlogAuthorProfilePageBackendResponse {
   'author_details': BlogAuthorDetailsBackendDict;
   'no_of_blog_post_summaries': number;
   'summary_dicts': BlogPostSummaryBackendDict[];
-  'profile_picture_data_url': string;
 }
 
 export interface SearchResponseBackendDict {
@@ -49,7 +48,6 @@ export interface SearchResponseBackendDict {
 
 export interface BlogPostPageBackendResponse {
   'author_username': string;
-  'profile_picture_data_url': string;
   'blog_post_dict': BlogPostBackendDict;
   'summary_dicts': BlogPostSummaryBackendDict[];
 }
@@ -68,7 +66,6 @@ export interface BlogHomePageData {
 
 export interface BlogPostPageData {
   authorUsername: string;
-  profilePictureDataUrl: string;
   blogPostDict: BlogPostData;
   summaryDicts: BlogPostSummary[];
 }
@@ -78,7 +75,6 @@ export interface BlogAuthorProfilePageData {
   authorBio: string;
   numOfBlogPostSummaries: number;
   blogPostSummaries: BlogPostSummary[];
-  profilePictureDataUrl: string;
 }
 
 @Injectable({
@@ -134,8 +130,7 @@ export class BlogHomePageBackendApiService {
                 return BlogPostSummary.createFromBackendDict(blogPostSummary);
               })),
           displayedAuthorName: response.author_details.displayed_author_name,
-          authorBio: response.author_details.author_bio,
-          profilePictureDataUrl: response.profile_picture_data_url
+          authorBio: response.author_details.author_bio
         });
       }, errorResponse => {
         reject(errorResponse);
@@ -175,7 +170,6 @@ export class BlogHomePageBackendApiService {
         .then(response => {
           resolve({
             authorUsername: response.author_username,
-            profilePictureDataUrl: response.profile_picture_data_url,
             summaryDicts: (
               response.summary_dicts.map(
                 blogPostSummary => {

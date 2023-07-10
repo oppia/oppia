@@ -63,7 +63,7 @@ describe('Profile page', () => {
       thumbnail_icon_url: '/subjects/Algebra.svg',
       human_readable_contributors_summary: {},
       language_code: 'en',
-      thumbnail_bg_color: '#cd672b',
+      thumbnail_bg_color: '#cc4b00',
       created_on_msec: 1591296635736.666,
       ratings: {
         1: 0,
@@ -89,7 +89,7 @@ describe('Profile page', () => {
       thumbnail_icon_url: '/subjects/Algebra.svg',
       human_readable_contributors_summary: {},
       language_code: 'en',
-      thumbnail_bg_color: '#cd672b',
+      thumbnail_bg_color: '#cc4b00',
       created_on_msec: 1591296635736.666,
       ratings: {
         1: 0,
@@ -105,7 +105,6 @@ describe('Profile page', () => {
       title: 'Test Title'
     }],
     subject_interests: [],
-    profile_picture_data_url: 'image',
   });
 
   class MockWindowRef {
@@ -188,6 +187,8 @@ describe('Profile page', () => {
 
     spyOn(i18nLanguageCodeService, 'isCurrentLanguageRTL').and.returnValue(
       true);
+    spyOn(userService, 'getProfileImageDataUrl').and.returnValue(
+      ['default-image-url-png', 'default-image-url-webp']);
   });
 
   afterEach(() => {
@@ -205,6 +206,10 @@ describe('Profile page', () => {
       profileData.profileIsOfCurrentUser);
     expect(componentInstance.updateSubscriptionButtonPopoverText)
       .toHaveBeenCalled();
+    expect(componentInstance.profilePicturePngDataUrl).toEqual(
+      'default-image-url-png');
+    expect(componentInstance.profilePictureWebpDataUrl).toEqual(
+      'default-image-url-webp');
     expect(loaderService.hideLoadingScreen).toHaveBeenCalled();
   }));
 
@@ -266,7 +271,6 @@ describe('Profile page', () => {
       is_user_visiting_own_profile: false,
       first_contribution_msec: null,
       subject_interests: [],
-      profile_picture_data_url: '',
     });
     spyOn(profilePageBackendApiService, 'fetchProfileDataAsync')
       .and.returnValue(Promise.resolve(profileDataLocal));
@@ -310,7 +314,7 @@ describe('Profile page', () => {
           thumbnail_icon_url: '/subjects/Algebra.svg',
           human_readable_contributors_summary: {},
           language_code: 'en',
-          thumbnail_bg_color: '#cd672b',
+          thumbnail_bg_color: '#cc4b00',
           created_on_msec: 1591296635736.666,
           ratings: {
             1: 0,
@@ -329,7 +333,6 @@ describe('Profile page', () => {
         first_contribution_msec: null,
         edited_exp_summary_dicts: [],
         subject_interests: [],
-        profile_picture_data_url: 'image',
       });
       spyOn(profilePageBackendApiService, 'fetchProfileDataAsync')
         .and.returnValue(Promise.resolve(profileDataLocal));
@@ -352,7 +355,6 @@ describe('Profile page', () => {
         first_contribution_msec: null,
         edited_exp_summary_dicts: [],
         subject_interests: [],
-        profile_picture_data_url: 'image',
       });
 
       for (let i = 0; i < 5; i++) {
@@ -366,7 +368,7 @@ describe('Profile page', () => {
             thumbnail_icon_url: '/subjects/Algebra.svg',
             human_readable_contributors_summary: {},
             language_code: 'en',
-            thumbnail_bg_color: '#cd672b',
+            thumbnail_bg_color: '#cc4b00',
             created_on_msec: 1591296635736.666,
             ratings: {
               1: 0,
@@ -403,7 +405,7 @@ describe('Profile page', () => {
           thumbnail_icon_url: '/subjects/Algebra.svg',
           human_readable_contributors_summary: {},
           language_code: 'en',
-          thumbnail_bg_color: '#cd672b',
+          thumbnail_bg_color: '#cc4b00',
           created_on_msec: 1591296635736.666,
           ratings: {
             1: 0,
@@ -430,7 +432,7 @@ describe('Profile page', () => {
         thumbnail_icon_url: '/subjects/Algebra.svg',
         human_readable_contributors_summary: {},
         language_code: 'en',
-        thumbnail_bg_color: '#cd672b',
+        thumbnail_bg_color: '#cc4b00',
         created_on_msec: 1591296635736.666,
         ratings: {
           1: 0,
@@ -456,7 +458,7 @@ describe('Profile page', () => {
         thumbnail_icon_url: '/subjects/Algebra.svg',
         human_readable_contributors_summary: {},
         language_code: 'en',
-        thumbnail_bg_color: '#cd672b',
+        thumbnail_bg_color: '#cc4b00',
         created_on_msec: 1591296635736.666,
         ratings: {
           1: 0,
@@ -482,7 +484,7 @@ describe('Profile page', () => {
         thumbnail_icon_url: '/subjects/Algebra.svg',
         human_readable_contributors_summary: {},
         language_code: 'en',
-        thumbnail_bg_color: '#cd672b',
+        thumbnail_bg_color: '#cc4b00',
         created_on_msec: 1591296635736.666,
         ratings: {
           1: 0,
@@ -508,7 +510,7 @@ describe('Profile page', () => {
         thumbnail_icon_url: '/subjects/Algebra.svg',
         human_readable_contributors_summary: {},
         language_code: 'en',
-        thumbnail_bg_color: '#cd672b',
+        thumbnail_bg_color: '#cc4b00',
         created_on_msec: 1591296635736.666,
         ratings: {
           1: 0,
@@ -534,7 +536,7 @@ describe('Profile page', () => {
         thumbnail_icon_url: '/subjects/Algebra.svg',
         human_readable_contributors_summary: {},
         language_code: 'en',
-        thumbnail_bg_color: '#cd672b',
+        thumbnail_bg_color: '#cc4b00',
         created_on_msec: 1591296635736.666,
         ratings: {
           1: 0,

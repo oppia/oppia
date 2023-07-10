@@ -78,6 +78,8 @@ describe('Creator Dashboard Page Component', () => {
 
     spyOn(csrfService, 'getTokenAsync').and.returnValue(
       Promise.resolve('sample-csrf-token'));
+    spyOn(userService, 'getProfileImageDataUrl').and.returnValue(
+      ['default-image-url-png', 'default-image-url-webp']);
 
     // This approach was choosen because spyOn() doesn't work on properties
     // that doesn't have a get access type.
@@ -143,6 +145,16 @@ describe('Creator Dashboard Page Component', () => {
       explorationCreationService.createNewExploration).toHaveBeenCalled();
   });
 
+  it('should get user profile image png data url correctly', () => {
+    expect(component.getProfileImagePngDataUrl('username')).toBe(
+      'default-image-url-png');
+  });
+
+  it('should get user profile image webp data url correctly', () => {
+    expect(component.getProfileImageWebpDataUrl('username')).toBe(
+      'default-image-url-webp');
+  });
+
   describe('when fetching dashboard successfully and on explorations tab',
     () => {
       let dashboardData = {
@@ -167,7 +179,7 @@ describe('Creator Dashboard Page Component', () => {
             language_code: 'en',
             objective: 'To test exploration recommendations',
             id: 'hi27Jix1QGbT',
-            thumbnail_bg_color: '#cd672b',
+            thumbnail_bg_color: '#cc4b00',
             activity_type: 'exploration',
             ratings: {
               1: 0,
@@ -427,7 +439,7 @@ describe('Creator Dashboard Page Component', () => {
         id: '44LKoKLlIbGe',
         thumbnail_icon_url: '/subjects/Algebra.svg',
         language_code: 'en',
-        thumbnail_bg_color: '#cd672b',
+        thumbnail_bg_color: '#cc4b00',
         created_on: 1591296635736.666,
         status: 'public',
         category: 'Algebra',
@@ -451,13 +463,25 @@ describe('Creator Dashboard Page Component', () => {
 
     beforeEach(waitForAsync(() => {
       spyOn(creatorDashboardBackendApiService, 'fetchDashboardDataAsync')
+        // This throws "Type object is not assignable to type
+        // 'CreatorDashboardData'." We need to suppress this error
+        // because of the need to test validations. This throws an
+        // error only in the case of strict checks and we need to
+        // suppress this error because the case where the returned
+        // data is an empty object is also important to test.
+        // @ts-ignore
         .and.returnValue(Promise.resolve({
           dashboardStats: CreatorDashboardStats
             .createFromBackendDict(dashboardData.dashboard_stats),
           // Because lastWeekStats may be null.
           lastWeekStats: dashboardData.last_week_stats ? (
-            CreatorDashboardStats
-              .createFromBackendDict(dashboardData.last_week_stats)) : null,
+            CreatorDashboardStats.createFromBackendDict(
+              // This throws "Argument of type 'null' is not assignable to
+              // parameter of type 'object'." We need to suppress this error
+              // because of the need to test validations.
+              // @ts-ignore
+              dashboardData.last_week_stats)
+            ) : null,
           displayPreference: dashboardData.display_preference,
           subscribersList: dashboardData.subscribers_list.map(
             subscriber => ProfileSummary
@@ -466,10 +490,24 @@ describe('Creator Dashboard Page Component', () => {
             expSummary => CreatorExplorationSummary
               .createFromBackendDict(expSummary)),
           collectionsList: dashboardData.collections_list.map(
-            (collectionSummary: unknown) => CollectionSummary
+            // This throws "Type object is not assignable to type
+            // 'CreatorDashboardData'." We need to suppress this error
+            // because of the need to test validations. This throws an
+            // error only in the case of strict checks and we need to
+            // suppress this error because the case where the returned
+            // data is an empty object is also important to test.
+            // @ts-ignore
+            (collectionSummary: CollectionSummary) => CollectionSummary
               .createFromBackendDict(
+                // This throws "Type object is not assignable to type
+                // 'CreatorDashboardData'." We need to suppress this error
+                // because of the need to test validations. This throws an
+                // error only in the case of strict checks and we need to
+                // suppress this error because the case where the returned
+                // data is an empty object is also important to test.
+                // @ts-ignore
                 collectionSummary as CollectionSummaryBackendDict))
-        } as unknown as CreatorDashboardData));
+        } as CreatorDashboardData));
 
       component.ngOnInit();
     }));

@@ -16,7 +16,7 @@
  * @fileoverview Component for showing learner dashboard icons.
  */
 
-import { Component, OnInit, OnChanges, SimpleChanges, Input } from '@angular/core';
+import { Component, OnInit, Input } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 
 import { AppConstants } from 'app.constants';
@@ -33,7 +33,7 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
   selector: 'oppia-learner-dashboard-icons',
   templateUrl: './learner-dashboard-icons.component.html',
 })
-export class LearnerDashboardIconsComponent implements OnInit, OnChanges {
+export class LearnerDashboardIconsComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
@@ -45,14 +45,6 @@ export class LearnerDashboardIconsComponent implements OnInit, OnChanges {
   learnerDashboardActivityIds!: LearnerDashboardActivityIds;
   activityIsCurrentlyHoveredOver: boolean = true;
   playlistTooltipIsEnabled: boolean = false;
-  @Input()
-  get activityActive(): boolean {
-    return this.activityIsCurrentlyHoveredOver;
-  }
-
-  set activityActive(hoverState: boolean) {
-    this.activityIsCurrentlyHoveredOver = hoverState;
-  }
 
   constructor(
     private learnerDashboardIdsBackendApiService:
@@ -71,11 +63,6 @@ export class LearnerDashboardIconsComponent implements OnInit, OnChanges {
       );
   }
 
-  ngOnChanges(changes: SimpleChanges): void {
-    if (changes.activityActive !== undefined) {
-      this.setHoverState(changes.activityActive.currentValue);
-    }
-  }
 
   enablePlaylistTooltip(): void {
     this.playlistTooltipIsEnabled = true;
@@ -85,24 +72,15 @@ export class LearnerDashboardIconsComponent implements OnInit, OnChanges {
     this.playlistTooltipIsEnabled = false;
   }
 
-  setHoverState(hoverState: boolean): void {
-    this.activityIsCurrentlyHoveredOver = hoverState;
-  }
 
   canActivityBeAddedToLearnerPlaylist(activityId: string): boolean {
     if (this.learnerDashboardActivityIds) {
       if (this.learnerDashboardActivityIds.includesActivity(
         activityId)) {
         return false;
-      } else {
-        if (this.isContainerNarrow) {
-          return true;
-        } else {
-          return this.activityIsCurrentlyHoveredOver;
-        }
       }
     }
-    return false;
+    return true;
   }
 
   belongsToLearnerPlaylist(): boolean {

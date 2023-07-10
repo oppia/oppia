@@ -112,10 +112,7 @@ def get_subtopic_page_by_id(
 
 @overload
 def get_subtopic_page_by_id(
-    topic_id: str,
-    subtopic_id: int,
-    *,
-    strict: Literal[True]
+    topic_id: str, subtopic_id: int, *, version: int
 ) -> subtopic_page_domain.SubtopicPage: ...
 
 
@@ -124,7 +121,18 @@ def get_subtopic_page_by_id(
     topic_id: str,
     subtopic_id: int,
     *,
-    strict: Literal[False]
+    strict: Literal[True],
+    version: Optional[int] = ...
+) -> subtopic_page_domain.SubtopicPage: ...
+
+
+@overload
+def get_subtopic_page_by_id(
+    topic_id: str,
+    subtopic_id: int,
+    *,
+    strict: Literal[False],
+    version: Optional[int] = ...
 ) -> Optional[subtopic_page_domain.SubtopicPage]: ...
 
 
@@ -133,14 +141,16 @@ def get_subtopic_page_by_id(
     topic_id: str,
     subtopic_id: int,
     *,
-    strict: bool = ...
+    strict: bool = ...,
+    version: Optional[int] = ...
 ) -> Optional[subtopic_page_domain.SubtopicPage]: ...
 
 
 def get_subtopic_page_by_id(
     topic_id: str,
     subtopic_id: int,
-    strict: bool = True
+    strict: bool = True,
+    version: Optional[int] = None
 ) -> Optional[subtopic_page_domain.SubtopicPage]:
     """Returns a domain object representing a subtopic page.
 
@@ -149,6 +159,7 @@ def get_subtopic_page_by_id(
         subtopic_id: int. The id of the subtopic.
         strict: bool. Whether to fail noisily if no subtopic page with the given
             id exists in the datastore.
+        version: str or None. The version number of the subtopic page.
 
     Returns:
         SubtopicPage or None. The domain object representing a subtopic page
@@ -157,7 +168,7 @@ def get_subtopic_page_by_id(
     subtopic_page_id = subtopic_page_domain.SubtopicPage.get_subtopic_page_id(
         topic_id, subtopic_id)
     subtopic_page_model = subtopic_models.SubtopicPageModel.get(
-        subtopic_page_id, strict=strict)
+        subtopic_page_id, strict=strict, version=version)
     if subtopic_page_model:
         subtopic_page = get_subtopic_page_from_model(subtopic_page_model)
         return subtopic_page

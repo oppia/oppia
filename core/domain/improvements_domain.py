@@ -39,7 +39,6 @@ class TaskEntryDict(TypedDict):
     issue_description: Optional[str]
     status: str
     resolver_username: Optional[str]
-    resolver_profile_picture_data_url: Optional[str]
     resolved_on_msecs: Optional[float]
 
 
@@ -163,9 +162,6 @@ class TaskEntry:
                 status: str. Tracks the state/progress of the task entry.
                 resolver_username: str|None. Username of the user who resolved
                     the task when status is resolved. Otherwise None.
-                resolver_profile_picture_data_url: str|None. Profile picture
-                    URL of the user who resolved the task when status is
-                    resolved. Otherwise None.
                 resolved_on_msecs: float|None. Time in
                     milliseconds since epoch at which the task was resolved
                     when status is resolved. Otherwise None.
@@ -181,7 +177,6 @@ class TaskEntry:
             'issue_description': self.issue_description,
             'status': self.status,
             'resolver_username': None,
-            'resolver_profile_picture_data_url': None,
             'resolved_on_msecs': (
                 None if not self.resolved_on
                 else utils.get_time_in_millisecs(self.resolved_on)),

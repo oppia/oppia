@@ -27,12 +27,14 @@
           <div class="oppia-outer-container">
             <div class="oppia-user-and-rights">
               <div class="oppia-profile-details-container">
-                <span *ngIf="profilePictureDataUrl">
-                  <img [src]="profilePictureDataUrl"
+                <picture *ngIf="profilePicturePngDataUrl">
+                  <source type="image/webp" [srcset]="profilePictureWebpDataUrl">
+                  <source type="image/png" [srcset]="profilePicturePngDataUrl">
+                  <img [src]="profilePicturePngDataUrl"
                        class="rounded-circle"
                        alt="User Avatar">
-                </span>
-                <span *ngIf="!profilePictureDataUrl">
+                </picture>
+                <span *ngIf="!profilePicturePngDataUrl">
                   <i class="fas fa-user-circle oppia-profile-picture-icon"></i>
                 </span>
               </div>
@@ -65,6 +67,7 @@
                   </h1>
                 </div>
                 <div class="oppia-review-right-details-container e2e-test-review-rights"
+                     tabindex="0"
                      *ngIf="userIsReviewer">
                   <strong>Review rights:</strong>
                   <div *ngIf="userCanReviewTranslationSuggestionsInLanguages.length > 0">
@@ -128,14 +131,14 @@
                  *ngIf="showLanguageSelector() || showTopicSelector()">
               <div class="oppia-dashboard-language-container"
                    *ngIf="showLanguageSelector()">
-                <div class="oppia-dashboard-language-container-label">Translate to</div>
+                <div class="oppia-dashboard-language-container-label" tabindex="0">Translate to</div>
                 <translation-language-selector class="oppia-language-selector"
                                                [activeLanguageCode]="languageCode"
                                                (setActiveLanguageCode)="onChangeLanguage($event)">
                 </translation-language-selector>
               </div>
               <div class="oppia-dashboard-topic-container" *ngIf="showTopicSelector()">
-                <div class="oppia-dashboard-topic-container-label">Subject</div>
+                <div class="oppia-dashboard-topic-container-label" tabindex="0">Subject</div>
                 <translation-topic-selector class="oppia-topic-selector"
                                             [activeTopicName]="topicName"
                                             (setActiveTopicName)="onChangeTopic($event)">
@@ -152,12 +155,14 @@
              *ngIf="activeTabName === 'myContributionTab'">
           <div class="oppia-collapsed-user-info">
             <div class="oppia-profile-details-container">
-              <span *ngIf="profilePictureDataUrl">
-                <img [src]="profilePictureDataUrl"
+              <picture *ngIf="profilePicturePngDataUrl">
+                <source type="image/webp" [srcset]="profilePictureWebpDataUrl">
+                <source type="image/png" [srcset]="profilePicturePngDataUrl">
+                <img [src]="profilePicturePngDataUrl"
                      class="rounded-circle collapsed-oppia-contributor-img"
                      alt="User Avatar">
-              </span>
-              <span *ngIf="!profilePictureDataUrl">
+              </picture>
+              <span *ngIf="!profilePicturePngDataUrl">
                 <i class="fas fa-user-circle oppia-profile-picture-icon collapsed-oppia-contributor-img"></i>
               </span>
             </div>
@@ -248,6 +253,9 @@
 <style>
   .oppia-tabs-container {
     text-align: center;
+  }
+  .oppia-tabs-container a:focus-visible {
+    border: 3px dotted black;
   }
   .oppia-language-container {
     display: flex;

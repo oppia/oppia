@@ -12,6 +12,7 @@
        (click)="navigateToMainTab()">
     </i>
     {{ topic.getName() }} (v{{ topic.getVersion() }})
+    <i *ngIf="!topicRights.canEditTopic()">( View only mode, you don't have rights to edit this topic)</i>
   </span>
 </div>
 <style>

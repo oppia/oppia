@@ -155,11 +155,13 @@ describe('InteractiveMapValidationService', () => {
       expect(warnings).toEqual([{
         type: WARNING_TYPES.CRITICAL,
         message: (
-          'Please ensure that rule 1 in group 1 refers to a valid distance.')
+          'Please ensure that learner answer 1 in Oppia response 1 refers ' +
+          'to a valid distance.')
       }, {
         type: WARNING_TYPES.CRITICAL,
         message: (
-          'Please ensure that rule 2 in group 1 refers to a valid distance.')
+          'Please ensure that learner answer 2 in Oppia response 1 refers ' +
+          'to a valid distance.')
       }]);
     }
   );

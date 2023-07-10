@@ -40,6 +40,8 @@ import { ClassroomData } from 'domain/classroom/classroom-data.model';
 import { AccessValidationBackendApiService } from 'pages/oppia-root/routing/access-validation-backend-api.service';
 import { PlatformFeatureService } from 'services/platform-feature.service';
 import { LearnerGroupBackendApiService } from 'domain/learner_group/learner-group-backend-api.service';
+import { AppConstants } from 'app.constants';
+import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 
 class MockPlatformFeatureService {
   status = {
@@ -102,6 +104,7 @@ describe('TopNavigationBarComponent', () => {
   let i18nLanguageCodeService: I18nLanguageCodeService;
   let i18nService: I18nService;
   let mockPlatformFeatureService = new MockPlatformFeatureService();
+  let urlInterpolationService: UrlInterpolationService;
 
   let mockResizeEmitter: EventEmitter<void>;
 
@@ -163,9 +166,12 @@ describe('TopNavigationBarComponent', () => {
     i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
     accessValidationBackendApiService = TestBed
       .inject(AccessValidationBackendApiService);
+    urlInterpolationService = TestBed.inject(UrlInterpolationService);
 
     spyOn(searchService, 'onSearchBarLoaded')
       .and.returnValue(new EventEmitter<string>());
+    spyOn(userService, 'getProfileImageDataUrl').and.returnValue(
+      ['default-image-url-png', 'default-image-url-webp']);
   });
 
   it('should truncate navbar after search bar is loaded', fakeAsync(() => {
@@ -436,17 +442,6 @@ describe('TopNavigationBarComponent', () => {
     });
   }));
 
-  it('should get profile image data asynchronously', fakeAsync(() => {
-    spyOn(userService, 'getProfileImageDataUrlAsync')
-      .and.resolveTo('%2Fimages%2Furl%2F1');
-    expect(component.profilePictureDataUrl).toBe(undefined);
-
-    component.getProfileImageDataAsync();
-    tick();
-
-    expect(component.profilePictureDataUrl).toBe('/images/url/1');
-  }));
-
   it('should change the language when user clicks on new language' +
     ' from dropdown', () => {
     let langCode = 'hi';
@@ -466,18 +461,6 @@ describe('TopNavigationBarComponent', () => {
     tick();
 
     expect(component.LEARNER_GROUPS_FEATURE_IS_ENABLED).toBe(true);
-  }));
-
-  it('should check if classroom promos are enabled', fakeAsync(() => {
-    spyOn(component, 'truncateNavbar').and.stub();
-    spyOn(
-      classroomBackendApiService, 'fetchClassroomPromosAreEnabledStatusAsync')
-      .and.resolveTo(true);
-
-    component.ngOnInit();
-    tick();
-
-    expect(component.CLASSROOM_PROMOS_ARE_ENABLED).toBe(true);
   }));
 
   it('should change current language code on' +
@@ -525,7 +508,39 @@ describe('TopNavigationBarComponent', () => {
     expect(component.userIsLoggedIn).toBe(true);
     expect(component.username).toBe('username1');
     expect(component.profilePageUrl).toBe('/profile/username1');
+    expect(component.profilePicturePngDataUrl).toEqual(
+      'default-image-url-png');
+    expect(component.profilePictureWebpDataUrl).toEqual(
+      'default-image-url-webp');
   }));
+
+  it('should set default profile pictures when username is null',
+    fakeAsync(() => {
+      spyOn(component, 'truncateNavbar').and.stub();
+      let userInfo = {
+        isModerator: () => false,
+        isCurriculumAdmin: () => false,
+        isTopicManager: () => false,
+        isSuperAdmin: () => false,
+        isBlogAdmin: () => false,
+        isBlogPostEditor: () => false,
+        isLoggedIn: () => true,
+        getUsername: () => null
+      };
+
+      spyOn(userService, 'getUserInfoAsync')
+        .and.resolveTo(userInfo as UserInfo);
+
+      component.ngOnInit();
+      tick();
+
+      expect(component.profilePicturePngDataUrl).toBe(
+        urlInterpolationService.getStaticImageUrl(
+          AppConstants.DEFAULT_PROFILE_IMAGE_PNG_PATH));
+      expect(component.profilePictureWebpDataUrl).toBe(
+        urlInterpolationService.getStaticImageUrl(
+          AppConstants.DEFAULT_PROFILE_IMAGE_WEBP_PATH));
+    }));
 
   it('should return proper offset for dropdown', ()=>{
     var dummyElement = document.createElement('div');
@@ -566,40 +581,35 @@ describe('TopNavigationBarComponent', () => {
     expect(component.donateMenuOffset).toBe(-10);
   }));
 
-  it('should fetch classroom data when classroomPromos are enabled',
-    fakeAsync(() => {
-      spyOn(
-        classroomBackendApiService,
-        'fetchClassroomPromosAreEnabledStatusAsync').
-        and.resolveTo(true);
-      spyOn(accessValidationBackendApiService, 'validateAccessToClassroomPage')
-        .and.returnValue(Promise.resolve());
+  it('should fetch classroom data', fakeAsync(() => {
+    spyOn(accessValidationBackendApiService, 'validateAccessToClassroomPage')
+      .and.returnValue(Promise.resolve());
 
-      let cData1: CreatorTopicSummary = new CreatorTopicSummary(
-        'dummy', 'addition', 3, 3, 3, 3, 1,
-        'en', 'dummy', 1, 1, 1, 1, true,
-        true, 'math', 'public/img.webp', 'red', 'add');
-      let cData2: CreatorTopicSummary = new CreatorTopicSummary(
-        'dummy2', 'division', 2, 2, 3, 3, 0,
-        'es', 'dummy2', 1, 1, 1, 1, true,
-        true, 'math', 'public/img1.png', 'green', 'div');
+    let cData1: CreatorTopicSummary = new CreatorTopicSummary(
+      'dummy', 'addition', 3, 3, 3, 3, 1,
+      'en', 'dummy', 1, 1, 1, 1, true,
+      true, 'math', 'public/img.webp', 'red', 'add');
+    let cData2: CreatorTopicSummary = new CreatorTopicSummary(
+      'dummy2', 'division', 2, 2, 3, 3, 0,
+      'es', 'dummy2', 1, 1, 1, 1, true,
+      true, 'math', 'public/img1.png', 'green', 'div');
 
-      let array: CreatorTopicSummary[] = [cData1, cData2];
-      let classroomData = new ClassroomData('test', array, 'dummy', 'dummy');
-      let topicTitlesTranslationKeys: string[] =
-        ['I18N_TOPIC_dummy_TITLE', 'I18N_TOPIC_dummy2_TITLE'];
-      spyOn(
-        classroomBackendApiService, 'fetchClassroomDataAsync')
-        .and.resolveTo(classroomData);
+    let array: CreatorTopicSummary[] = [cData1, cData2];
+    let classroomData = new ClassroomData('test', array, 'dummy', 'dummy');
+    let topicTitlesTranslationKeys: string[] =
+      ['I18N_TOPIC_dummy_TITLE', 'I18N_TOPIC_dummy2_TITLE'];
+    spyOn(
+      classroomBackendApiService, 'fetchClassroomDataAsync')
+      .and.resolveTo(classroomData);
 
-      component.ngOnInit();
+    component.ngOnInit();
 
-      tick();
+    tick();
 
-      expect(component.classroomData).toEqual(array);
-      expect(component.topicTitlesTranslationKeys).toEqual(
-        topicTitlesTranslationKeys);
-    }));
+    expect(component.classroomData).toEqual(array);
+    expect(component.topicTitlesTranslationKeys).toEqual(
+      topicTitlesTranslationKeys);
+  }));
 
   it('should check whether hacky translations are displayed or not', () => {
     spyOn(i18nLanguageCodeService, 'isHackyTranslationAvailable')

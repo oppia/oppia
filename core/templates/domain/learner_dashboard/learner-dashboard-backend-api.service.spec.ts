@@ -285,7 +285,7 @@ describe('Learner Dashboard Backend API Service', () => {
   const sampleCollectionsDataResults = {
     completed_collections_list: [{
       status: 'public',
-      thumbnail_bg_color: '#d68453',
+      thumbnail_bg_color: '#ae511b',
       community_owned: false,
       created_on: 1558593739415.726,
       thumbnail_icon_url: '/subjects/Arithmetic.svg',
@@ -299,7 +299,7 @@ describe('Learner Dashboard Backend API Service', () => {
     }],
     collection_playlist: [{
       status: 'public',
-      thumbnail_bg_color: '#d68453',
+      thumbnail_bg_color: '#ae511b',
       community_owned: false,
       created_on: 1558593739415.726,
       thumbnail_icon_url: '/subjects/Arithmetic.svg',
@@ -313,7 +313,7 @@ describe('Learner Dashboard Backend API Service', () => {
     }],
     incomplete_collections_list: [{
       status: 'public',
-      thumbnail_bg_color: '#d68453',
+      thumbnail_bg_color: '#ae511b',
       community_owned: false,
       created_on: 1491118537846.88,
       thumbnail_icon_url: '/subjects/Arithmetic.svg',
@@ -362,7 +362,7 @@ describe('Learner Dashboard Backend API Service', () => {
       category: 'Arithmetic',
       created_on_msec: 1515553584276.8,
       community_owned: false,
-      thumbnail_bg_color: '#d68453',
+      thumbnail_bg_color: '#ae511b',
       title: 'Equality of Fractions (Recap)',
       num_views: 760,
       tags: [
@@ -445,7 +445,6 @@ describe('Learner Dashboard Backend API Service', () => {
     subscription_list: [{
       creator_username: 'user',
       creator_impact: 0,
-      creator_picture_data_url: 'path/to/img'
     }],
     user_email: 'user@example.com'
   };
@@ -819,7 +818,12 @@ describe('Learner Dashboard Backend API Service', () => {
       outline: 'Outline',
       exploration_id: null,
       outline_is_finalized: false,
-      thumbnail_bg_color: '#a33f40'
+      thumbnail_bg_color: '#a33f40',
+      status: 'Published',
+      planned_publication_date_msecs: 100,
+      last_modified_msecs: 100,
+      first_publication_date_msecs: 200,
+      unpublishing_reason: null
     };
 
     let sampleLearnerTopicSummaryBackendDict = {
@@ -908,8 +912,6 @@ describe('Learner Dashboard Backend API Service', () => {
 
     let url = '/threadhandler/exploration.4.Wfafsafd';
     let result = [{
-      author_picture_data_url:
-        'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAJYA',
       author_username: 'User',
       created_on_msecs: 1617712024611.706,
       message_id: 1,
@@ -928,8 +930,6 @@ describe('Learner Dashboard Backend API Service', () => {
     req.flush(
       {
         message_summary_list: [{
-          author_picture_data_url:
-            'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAJYA',
           author_username: 'User',
           created_on_msecs: 1617712024611.706,
           message_id: 1,

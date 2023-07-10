@@ -496,16 +496,6 @@ describe('Translation contribution featured languages', () => {
       contributorDashboardPage.getTranslateTextTab());
     await users.createAndLoginSuperAdminUser(
       'config@contributorDashboard.com', 'contributorDashboard');
-    var adminPage = new AdminPage.AdminPage();
-    await adminPage.editConfigProperty(
-      'Featured Translation Languages',
-      'List',
-      async function(elem) {
-        var featured = await elem.addItem('Dictionary');
-        await (await featured.editEntry(0, 'Unicode')).setValue('de');
-        await (await featured.editEntry(1, 'Unicode'))
-          .setValue('Partnership with ABC');
-      });
     await users.logout();
   });
 
@@ -515,15 +505,27 @@ describe('Translation contribution featured languages', () => {
   });
 
   it('should show correct featured languages', async function() {
+    let expectedFeaturedLanguages = [
+      'português (Portuguese)',
+      'العربية (Arabic)',
+      'Naijá (Nigerian Pidgin)',
+      'español (Spanish)',
+      'kiswahili (Swahili)',
+      'हिन्दी (Hindi)',
+      'Harshen Hausa (Hausa)',
+      'Ásụ̀sụ́ Ìgbò (Igbo)',
+      'Èdè Yoùbá (Yoruba)'
+    ];
     await contributorDashboardTranslateTextTab
-      .expectFeaturedLanguagesToBe(['Deutsch (German)']);
+      .expectFeaturedLanguagesToBe(expectedFeaturedLanguages);
   });
 
   it('should show correct explanation', async function() {
     await contributorDashboardTranslateTextTab
       .mouseoverFeaturedLanguageTooltip(0);
     await contributorDashboardTranslateTextTab
-      .expectFeaturedLanguageExplanationToBe('Partnership with ABC');
+      .expectFeaturedLanguageExplanationToBe(
+        'For learners in Brazil, Angola and Mozambique.');
   });
 
   afterEach(async function() {

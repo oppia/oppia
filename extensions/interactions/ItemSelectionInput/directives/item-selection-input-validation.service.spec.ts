@@ -243,7 +243,7 @@ describe('ItemSelectionInputValidationService', () => {
       }, {
         type: WARNING_TYPES.ERROR,
         message: (
-          'Rule 1 from answer group 1 options do not match ' +
+          'Learner answer 1 from Oppia response 1 options do not match ' +
           'customization argument choices.')
       }]);
     });
@@ -262,7 +262,7 @@ describe('ItemSelectionInputValidationService', () => {
     }, {
       type: WARNING_TYPES.ERROR,
       message: (
-        'Rule 1 from answer group 1 options do not match ' +
+        'Learner answer 1 from Oppia response 1 options do not match ' +
         'customization argument choices.')
     }]);
   });
@@ -291,8 +291,8 @@ describe('ItemSelectionInputValidationService', () => {
       expect(warnings).toEqual([{
         type: WARNING_TYPES.ERROR,
         message: (
-          'In answer group 1, ' +
-          'rule 1, the "proper subset" rule must include at least 2 options.')
+          'In Oppia response 1, learner answer 1, ' +
+          'the "proper subset" learner answer must include at least 2 options.')
       }]);
     });
 
@@ -309,9 +309,9 @@ describe('ItemSelectionInputValidationService', () => {
       expect(warnings).toEqual([{
         type: WARNING_TYPES.ERROR,
         message: (
-          'In answer group 1, rule 1, the number of correct options in ' +
-          'the "Equals" rule should be between 2 and 2 (the ' +
-          'minimum and maximum allowed selection counts).')
+          'In Oppia response 1, Learner answer 1, the number of correct ' +
+          'options in the "Equals" learner answer should be between 2 and 2 ' +
+          '(the minimum and maximum allowed selection counts).')
       }]);
     });
 
@@ -325,8 +325,8 @@ describe('ItemSelectionInputValidationService', () => {
       expect(warnings).toEqual([{
         type: WARNING_TYPES.ERROR,
         message: (
-          'In answer group 1, rule 1, the "ContainsAtLeastOneOf" rule ' +
-          'should have at least one option.')
+          'In Oppia response 1, learner answer 1, the "ContainsAtLeastOneOf"' +
+          ' learner answer should have at least one option.')
       }]);
     });
 
@@ -339,7 +339,7 @@ describe('ItemSelectionInputValidationService', () => {
     expect(warnings).toEqual([{
       type: WARNING_TYPES.ERROR,
       message: (
-        'Rule 1 from answer group 1 options do not match ' +
+        'Learner answer 1 from Oppia response 1 options do not match ' +
         'customization argument choices.')
     }]);
   });
@@ -369,27 +369,27 @@ describe('ItemSelectionInputValidationService', () => {
     expect(warnings).toEqual([{
       type: AppConstants.WARNING_TYPES.ERROR,
       message: (
-        'In answer group 1, rule 1, ' +
+        'In Oppia Response 1, Learner answer 1, ' +
         'please select only one answer choice.')
     }, {
       type: AppConstants.WARNING_TYPES.ERROR,
       message: (
-        'In answer group 1, rule 1, ' +
+        'In Oppia Response 1, Learner answer 1, ' +
         'please select only one answer choice.')
     }, {
       type: AppConstants.WARNING_TYPES.ERROR,
       message: (
-        'In answer group 1, ' +
-        'rule 1, the number of correct ' +
-        'options in the "Equals" rule should be between ' +
+        'In Oppia response 1, ' +
+        'Learner answer 1, the number of correct ' +
+        'options in the "Equals" learner answer should be between ' +
         '0 and 1' +
         ' (the minimum and maximum allowed selection counts).')
     }, {
       type: AppConstants.WARNING_TYPES.ERROR,
       message: (
-        'In answer group 1, ' +
-        'rule 1, the number of correct ' +
-        'options in the "Equals" rule should be between ' +
+        'In Oppia response 1, ' +
+        'Learner answer 1, the number of correct ' +
+        'options in the "Equals" learner answer should be between ' +
         '0 and 1' +
         ' (the minimum and maximum allowed selection counts).')
     }]);
@@ -443,7 +443,7 @@ describe('ItemSelectionInputValidationService', () => {
     expect(warnings).toEqual([{
       type: AppConstants.WARNING_TYPES.ERROR,
       message: (
-        'Please specify what Oppia should do in answer group 1.')
+        'Please specify what Oppia should do in Oppia response 1.')
     }, {
       type: AppConstants.WARNING_TYPES.ERROR,
       message: (
@@ -501,7 +501,7 @@ describe('ItemSelectionInputValidationService', () => {
     expect(warnings).toEqual([{
       type: AppConstants.WARNING_TYPES.ERROR,
       message: (
-        'Please specify what Oppia should do in answer group 1.')
+        'Please specify what Oppia should do in Oppia response 1.')
     }, {
       type: AppConstants.WARNING_TYPES.ERROR,
       message: (
@@ -510,12 +510,12 @@ describe('ItemSelectionInputValidationService', () => {
     }, {
       type: AppConstants.WARNING_TYPES.ERROR,
       message: (
-        'Rule 1 from answer group 1 options do not' +
+        'Learner answer 1 from Oppia response 1 options do not' +
         ' match customization argument choices.')
     }, {
       type: AppConstants.WARNING_TYPES.ERROR,
       message: (
-        'Rule 1 from answer group 1 options do not' +
+        'Learner answer 1 from Oppia response 1 options do not' +
         ' match customization argument choices.')
     }]);
   });
@@ -567,7 +567,7 @@ describe('ItemSelectionInputValidationService', () => {
     expect(warnings).toEqual([{
       type: AppConstants.WARNING_TYPES.ERROR,
       message: (
-        'Please specify what Oppia should do in answer group 1.')
+        'Please specify what Oppia should do in Oppia response 1.')
     }, {
       type: AppConstants.WARNING_TYPES.ERROR,
       message: (

@@ -1573,6 +1573,34 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
             question_suggestions[1].status,
             suggestion_models.STATUS_IN_REVIEW)
 
+    def test_get_translation_suggestions_in_review(self) -> None:
+        self._create_translation_suggestion_with_language_code('hi')
+        self._create_translation_suggestion_with_language_code('hi')
+
+        suggestions = (
+            suggestion_services
+            .get_translation_suggestions_in_review(self.target_id_1))
+
+        # Ruling out the possibility of None for mypy type checking.
+        assert suggestions[0] is not None
+        self.assertEqual(len(suggestions), 2)
+        self.assertEqual(suggestions[0].target_id, self.target_id_1)
+        self.assertEqual(
+            suggestions[0].suggestion_type,
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT)
+        self.assertEqual(
+            suggestions[0].status,
+            suggestion_models.STATUS_IN_REVIEW)
+        # Ruling out the possibility of None for mypy type checking.
+        assert suggestions[1] is not None
+        self.assertEqual(suggestions[1].target_id, self.target_id_1)
+        self.assertEqual(
+            suggestions[1].suggestion_type,
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT)
+        self.assertEqual(
+            suggestions[1].status,
+            suggestion_models.STATUS_IN_REVIEW)
+
     def test_get_translation_suggestions_in_review_by_exploration(self) -> None:
         self._create_translation_suggestion_with_language_code('hi')
         self._create_translation_suggestion_with_language_code('hi')
@@ -3265,6 +3293,27 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
         suggestion = suggestion_services.get_suggestion_by_id(suggestion_id)
         self.assertEqual(suggestion.status, suggestion_models.STATUS_ACCEPTED)
 
+    def test_auto_reject_translation_suggestions_for_content_ids(self) -> None:
+        with self.swap(
+            feedback_models.GeneralFeedbackThreadModel,
+            'generate_new_thread_id', self.mock_generate_new_thread_id):
+            self.create_translation_suggestion_associated_with_exp(
+                self.EXP_ID, self.author_id)
+        suggestion_id = self.THREAD_ID
+
+        suggestion_services.auto_reject_translation_suggestions_for_content_ids(
+            self.EXP_ID, {'content_0'})
+
+        thread_messages = feedback_services.get_messages(self.THREAD_ID)
+        last_message = thread_messages[len(thread_messages) - 1]
+        self.assertEqual(
+            last_message.text,
+            constants.OBSOLETE_TRANSLATION_SUGGESTION_REVIEW_MSG)
+        suggestion = suggestion_services.get_suggestion_by_id(suggestion_id)
+        self.assertEqual(
+            suggestion.final_reviewer_id, feconf.SUGGESTION_BOT_USER_ID)
+        self.assertEqual(suggestion.status, suggestion_models.STATUS_REJECTED)
+
     def test_delete_skill_rejects_question_suggestion(self) -> None:
         skill_id = skill_services.get_new_skill_id()
         self.save_new_skill(skill_id, self.author_id, description='description')
@@ -3389,39 +3438,18 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
 
         # Should return the created translation suggestion.
         filtered_translatable_suggestions = (
-            suggestion_services.get_suggestions_with_translatable_explorations(
+            suggestion_services.get_suggestions_with_editable_explorations(
                 translatable_suggestions
             )
         )
         self.assertEqual(len(filtered_translatable_suggestions), 1)
 
-        # Delete the exploration state corresponding to the translation
-        # suggestion.
-        init_state = exploration.states[exploration.init_state_name]
-        outcome_object = init_state.interaction.default_outcome
-        # Ruling out the possibility of None for mypy type checking.
-        assert outcome_object is not None
-        default_outcome_dict = outcome_object.to_dict()
-        default_outcome_dict['dest'] = 'End State'
-        exp_services.update_exploration(
-            self.owner_id, self.EXP_ID, [
-                exp_domain.ExplorationChange({
-                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                    'property_name': (
-                        exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME),
-                    'state_name': exploration.init_state_name,
-                    'new_value': default_outcome_dict
-                }),
-                exp_domain.ExplorationChange({
-                    'cmd': exp_domain.CMD_DELETE_STATE,
-                    'state_name': state_name,
-                }),
-            ], 'delete state')
+        # Disable exploration editing.
+        exp_services.set_exploration_edits_allowed(self.EXP_ID, False)
 
-        # The suggestion no longer corresponds to an existing exploration state,
-        # so it should not be returned.
+        # Should not return the created translation suggestion.
         filtered_translatable_suggestions = (
-            suggestion_services.get_suggestions_with_translatable_explorations(
+            suggestion_services.get_suggestions_with_editable_explorations(
                 translatable_suggestions
             )
         )

@@ -52,8 +52,6 @@ class ExplorationDisplayableSummariesTest(
     USER_C_EMAIL: Final = 'c@example.com'
     USER_D_EMAIL: Final = 'd@example.com'
 
-    USER_C_PROFILE_PICTURE: Final = 'c_profile_picture'
-
     EXP_ID_1: Final = 'eid1'
     EXP_ID_2: Final = 'eid2'
     EXP_ID_3: Final = 'eid3'
@@ -137,7 +135,7 @@ class ExplorationDisplayableSummariesTest(
         self.user_c_id = self.get_user_id_from_email(self.USER_C_EMAIL)
         self.user_d_id = self.get_user_id_from_email(self.USER_D_EMAIL)
         user_services.update_profile_picture_data_url(
-            self.user_c_id, self.USER_C_PROFILE_PICTURE)
+            self.user_c_id, user_services.DEFAULT_IDENTICON_DATA_URL)
 
         self.save_new_valid_exploration(self.EXP_ID_4, self.user_c_id)
         exp_services.update_exploration(
@@ -212,7 +210,7 @@ class ExplorationDisplayableSummariesTest(
             'ratings': feconf.get_empty_ratings(),
             'status': 'public',
             'tags': [],
-            'thumbnail_bg_color': '#cd672b',
+            'thumbnail_bg_color': '#cc4b00',
             'thumbnail_icon_url': '/subjects/Algebra.svg',
             'title': u'Exploration 2 Albert title',
         }
@@ -305,7 +303,7 @@ class LibraryGroupsTest(exp_services_test.ExplorationServicesUnitTests):
             'status': 'public',
             'ratings': {'1': 0, '2': 0, '3': 0, '4': 0, '5': 0},
             'thumbnail_icon_url': '/subjects/Algebra.svg',
-            'thumbnail_bg_color': '#cd672b',
+            'thumbnail_bg_color': '#cc4b00',
             'num_views': 0
         }
         expected_group = {
@@ -384,7 +382,7 @@ class FeaturedExplorationDisplayableSummariesTest(
         self.assertEqual(len(featured_activity_summaries), 1)
         self.assertDictContainsSubset({
             'status': 'public',
-            'thumbnail_bg_color': '#cd672b',
+            'thumbnail_bg_color': '#cc4b00',
             'community_owned': False,
             'tags': [],
             'thumbnail_icon_url': '/subjects/Algebra.svg',
@@ -721,7 +719,7 @@ class TopRatedExplorationDisplayableSummariesTest(
                 feconf.NUMBER_OF_TOP_RATED_EXPLORATIONS_FOR_LIBRARY_PAGE))
         expected_summary = {
             'status': u'public',
-            'thumbnail_bg_color': '#cd672b',
+            'thumbnail_bg_color': '#cc4b00',
             'community_owned': False,
             'tags': [],
             'language_code': constants.DEFAULT_LANGUAGE_CODE,
@@ -759,7 +757,7 @@ class TopRatedExplorationDisplayableSummariesTest(
 
         expected_summary = {
             'status': u'public',
-            'thumbnail_bg_color': '#cd672b',
+            'thumbnail_bg_color': '#cc4b00',
             'community_owned': False,
             'tags': [],
             'thumbnail_icon_url': '/subjects/Algebra.svg',
@@ -841,7 +839,7 @@ class RecentlyPublishedExplorationDisplayableSummariesTest(
                 feconf.RECENTLY_PUBLISHED_QUERY_LIMIT_FOR_LIBRARY_PAGE))
         test_summary_1 = {
             'status': 'public',
-            'thumbnail_bg_color': '#cd672b',
+            'thumbnail_bg_color': '#cc4b00',
             'community_owned': False,
             'tags': [],
             'thumbnail_icon_url': '/subjects/Algebra.svg',
@@ -855,7 +853,7 @@ class RecentlyPublishedExplorationDisplayableSummariesTest(
         }
         test_summary_2 = {
             'status': 'public',
-            'thumbnail_bg_color': '#cd672b',
+            'thumbnail_bg_color': '#cc4b00',
             'community_owned': False,
             'tags': [],
             'thumbnail_icon_url': '/subjects/Algebra.svg',
@@ -869,7 +867,7 @@ class RecentlyPublishedExplorationDisplayableSummariesTest(
         }
         test_summary_3 = {
             'status': 'public',
-            'thumbnail_bg_color': '#cd672b',
+            'thumbnail_bg_color': '#cc4b00',
             'community_owned': False,
             'tags': [],
             'thumbnail_icon_url': '/subjects/Algebra.svg',

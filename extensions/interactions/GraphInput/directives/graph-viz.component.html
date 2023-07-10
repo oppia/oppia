@@ -38,7 +38,7 @@
       <svg viewBox="0 0 90 250" width="100%" height="250" preserveAspectRatio="xMaxYMin meet">
         <text>{{canEditOptions}}</text>
         <ng-container *ngIf="canEditOptions">
-          <g *ngFor="let button of graphOptions; let idx = index">
+          <g *ngFor="let button of graphOptions; let idx = index" tabindex="0">
             <rect *ngIf="graph"
                   attr.class="{{button.text.toLowerCase()}}"
                   width="70"
@@ -61,7 +61,7 @@
         </ng-container>
       </svg>
 
-      <g *ngFor="let button of buttons; let idx = index">
+      <g *ngFor="let button of buttons; let idx = index" tabindex="0">
         <rect attr.class="e2e-test-{{(button.description | translate).replace(' ','-')}}-button"
               width="140"
               height="30"
@@ -74,7 +74,8 @@
               (mouseleave)="state.hoveredModeButton = (state.hoveredModeButton == button.mode) ? null : state.hoveredModeButton"
               [style.fill]="'white'"
               [style.stroke]="'black'"
-              style.strokeWidth="{{state.currentMode == button.mode ? '3' : '1'}}">
+              style.strokeWidth="{{state.currentMode == button.mode ? '3' : '1'}}"
+              [attr.aria-label]="button.description | translate">
         </rect>
         <text *ngIf="!isLanguageRTL()" class="oppia-graph-button-label unselectable-text unclickable-text" x="18" attr.y="{{32 + 50 * idx}}">
           {{button.text}}
@@ -97,7 +98,7 @@
             [attr.y2]="state.mouseY"
             [ngStyle]="{'stroke': 'black', 'stroke-width': EDGE_WIDTH}">
       </line>
-      <g *ngFor="let edge of graph?.edges; let idx = index">
+      <g *ngFor="let edge of graph?.edges; let idx = index" tabindex="0">
         <line class="e2e-test-graph-edge"
               (click)="onClickEdge(idx)"
               (mouseenter)="state.hoveredEdge = idx"

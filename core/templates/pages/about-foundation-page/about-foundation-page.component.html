@@ -43,18 +43,22 @@
       </div>
     </div>
     <div class="col-lg-4 oppia-about-foundation-image-with-caption">
-      <picture>
-        <source type="image/webp"
-                [srcset]="'/assets/images/about_foundation/equity-infographic-3-we-need-data.webp'">
-        <source type="image/jpg"
-                [srcset]="'/assets/images/equity-infographic-3-we-need-data.jpg'">
-        <img alt="Education Equality Infographic"
-             class="oppia-about-foundation-page-equality-infographic"
-             src="/assets/images/about_foundation/equity-infographic-3-we-need-data.jpg">
-      </picture>
-      <a href="http://uis.unesco.org/en/news/new-report-how-measure-equity-education">
-        Source: UNESCO
-      </a>
+      <figure>
+        <picture>
+          <source type="image/webp"
+                  [srcset]="'/assets/images/about_foundation/equity-infographic-3-we-need-data.webp'">
+          <source type="image/jpg"
+                  [srcset]="'/assets/images/equity-infographic-3-we-need-data.jpg'">
+          <img alt="Education Equality Infographic"
+               class="oppia-about-foundation-page-equality-infographic"
+               src="/assets/images/about_foundation/equity-infographic-3-we-need-data.jpg">
+        </picture>
+        <figcaption>
+          <a href="http://uis.unesco.org/en/news/new-report-how-measure-equity-education">
+            Source: UNESCO
+          </a>
+        </figcaption>
+      </figure>
     </div>
   </div>
 
@@ -282,7 +286,9 @@
     text-decoration: underline;
   }
 
-
+  figcaption {
+    text-align: center;
+  }
   .oppia-about-foundation-page-equality-infographic {
     margin-bottom: 10px;
     max-height: 320px;

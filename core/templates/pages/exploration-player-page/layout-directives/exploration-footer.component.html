@@ -1,5 +1,5 @@
 <div class="footer navbar-fixed-bottom oppia-exploration-footer" *ngIf="!iframed">
-  <div *ngIf="CHECKPOINTS_FEATURE_IS_ENABLED && !footerIsInQuestionPlayerMode && !hasLearnerHasViewedLessonInfoTooltip() && getMostRecentlyReachedCheckpointIndex() == 2">
+  <div *ngIf="!footerIsInQuestionPlayerMode && !hasLearnerHasViewedLessonInfoTooltip() && getMostRecentlyReachedCheckpointIndex() == 2">
     <div class="close-tooltip e2e-test-close-lesson-info-tooltip" (click)="learnerHasViewedLessonInfo()"></div>
     <div class="lesson-info-tooltip lesson-info-tooltip-add-ons"
          [innerHTML]="'I18N_LESSON_INFO_TOOLTIP_MESSAGE' | translate">
@@ -9,7 +9,7 @@
     <div [ngClass]="{'col-sm-5': isLanguageRTL(), 'col-sm-3': !isLanguageRTL()}">
       <button class="oppia-lesson-info"
               (click)="showInformationCard()"
-              *ngIf="CHECKPOINTS_FEATURE_IS_ENABLED && !footerIsInQuestionPlayerMode">
+              *ngIf="!footerIsInQuestionPlayerMode">
         <img [src]="getStaticImageUrl('/general/apple.svg')"
              class="exploration-footer-img"
              alt=""
@@ -31,21 +31,21 @@
       <div [ngClass]="{'float-left': isLanguageRTL(), 'float-right': !isLanguageRTL()}">
         <oppia-hint-and-solution-buttons *ngIf="!windowIsNarrow && hintsAndSolutionsAreSupported">
         </oppia-hint-and-solution-buttons>
+        <div class="hint-container">
+          <div class="hint-box hint-box-add-ons" *ngIf="isVisible && isTooltipVisible()">
+            <span [innerHTML]="'I18N_CONCEPT_CARD_NEED_HELP' | translate"></span>
+            <button type="button"
+                    class="btn close"
+                    aria-label="Close Concept Card Button"
+                    (click)="isVisible = !isVisible">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+        </div>
         <button *ngIf="isConceptCardButtonVisible()"
                 class="oppia-learner-hint-solution-button md-button md-default-theme e2e-test-view-hint"
                 (click)="showConceptCard()">
           <mat-icon>description</mat-icon>
-        </button>
-      </div>
-    </div>
-    <div class="hint-container">
-      <div class="hint-box hint-box-add-ons" *ngIf="isVisible && isTooltipVisible()">
-        <span [innerHTML]="'I18N_CONCEPT_CARD_NEED_HELP' | translate"></span>
-        <button type="button"
-                class="btn close"
-                aria-label="Close"
-                (click)="isVisible = !isVisible">
-          <span aria-hidden="true">&times;</span>
         </button>
       </div>
     </div>
@@ -119,6 +119,7 @@
     display: flex;
     font-size: 17px;
     height: 40px;
+    margin-right: 10px;
     min-width: 395px;
     padding: 20px 10px 20px 10px;
     position: relative;

@@ -284,8 +284,6 @@ class CreatorDashboardHandler(
         subscribers_list = []
         for index, subscriber_settings in enumerate(subscribers_settings):
             subscriber_summary = {
-                'subscriber_picture_data_url': (
-                    subscriber_settings.profile_picture_data_url),
                 'subscriber_username': subscriber_settings.username,
                 'subscriber_impact': (
                     user_services.get_user_impact_score(subscriber_ids[index]))
@@ -352,6 +350,7 @@ class CreatorDashboardHandler(
 
     @acl_decorators.can_access_creator_dashboard
     def post(self) -> None:
+        """Updates the creator dashboard display."""
         assert self.user_id is not None
         assert self.normalized_payload is not None
         creator_dashboard_display_pref = self.normalized_payload[

@@ -36,6 +36,7 @@ const blogDashboardUrl = testConstants.URLs.BlogDashboard;
 const blogAdminUrl = testConstants.URLs.BlogAdmin;
 const publishBlogPostButton = 'button.e2e-test-publish-blog-post-button';
 const addThumbnailImageButton = 'button.e2e-test-photo-upload-submit';
+const blogPostThumbnailImage = testConstants.images.blogPostThumbnailImage;
 
 const LABEL_FOR_NEW_BLOG_POST_CREATE_BUTTON = 'CREATE NEW BLOG POST';
 const LABEL_FOR_SAVE_BUTTON = 'Save';
@@ -43,8 +44,6 @@ const LABEL_FOR_DONE_BUTTON = 'DONE';
 const LABEL_FOR_SAVE_DRAFT_BUTTON = 'SAVE AS DRAFT';
 const LABEL_FOR_DELETE_BUTTON = 'Delete';
 const LABEL_FOR_CONFIRM_BUTTON = 'Confirm';
-const LABEL_FOR_ADD_THUMBNAIL_BUTTON = 'Add Thumbnail Image';
-const LABEL_FOR_ADD_ELEMENT_BUTTON = 'Add element';
 
 module.exports = class e2eBlogPostAdmin extends baseUser {
   /**
@@ -161,10 +160,10 @@ module.exports = class e2eBlogPostAdmin extends baseUser {
     await this.clickOn('button.mat-button-toggle-button');
     await this.expectPublishButtonToBeDisabled();
     await this.clickOn(thumbnailPhotoBox);
-    await this.uploadFile('../images/blog-post-thumbnail.svg');
+    await this.uploadFile(blogPostThumbnailImage);
     await this.page.waitForSelector(
       `${addThumbnailImageButton}:not([disabled])`);
-    await this.clickOn(LABEL_FOR_ADD_THUMBNAIL_BUTTON);
+    await this.clickOn(addThumbnailImageButton);
     await this.page.waitForSelector('body.modal-open', {hidden: true});
     await this.expectPublishButtonToBeDisabled();
 
@@ -189,10 +188,10 @@ module.exports = class e2eBlogPostAdmin extends baseUser {
     await this.clickOn('NEW POST');
     await this.clickOn('button.mat-button-toggle-button');
     await this.clickOn(thumbnailPhotoBox);
-    await this.uploadFile('../images/blog-post-thumbnail.svg');
+    await this.uploadFile(blogPostThumbnailImage);
     await this.page.waitForSelector(
       `${addThumbnailImageButton}:not([disabled])`);
-    await this.clickOn(LABEL_FOR_ADD_THUMBNAIL_BUTTON);
+    await this.clickOn(addThumbnailImageButton);
     await this.page.waitForSelector('body.modal-open', {hidden: true});
 
     await this.type(blogTitleInput, newBlogPostTitle);
@@ -401,54 +400,6 @@ module.exports = class e2eBlogPostAdmin extends baseUser {
     await this.goto(blogAdminUrl);
     await this.type(blogEditorUsernameInput, username);
     await this.clickOn('button.oppia-blog-admin-remove-blog-editor-button');
-  }
-
-  /**
-   * This function checks if the tag name exists in the blog taglist.
-   * @param {string} tagName - The name of the tag.
-   */
-  async expectTagToNotExistInBlogTags(tagName) {
-    await this.page.evaluate(async(tagName) => {
-      const tagList = document.getElementsByClassName('form-control');
-      for (let i = 0; i < tagList.length; i++) {
-        if (tagList[i].value === tagName) {
-          throw new Error(`Tag ${tagName} already exists in tag list!`);
-        }
-      }
-    }, tagName);
-    showMessage(`Tag with name ${tagName} does not exist in tag list!`);
-  }
-
-  /**
-   * This function adds a new tag in the blog taglist.
-   * @param {string} tagName - The name of the tag.
-   */
-  async addNewBlogTag(tagName) {
-    await this.clickOn(LABEL_FOR_ADD_ELEMENT_BUTTON);
-    await this.page.waitForTimeout(100);
-    await this.page.evaluate((tagName) => {
-      const tagList = document.getElementsByClassName('form-control');
-      tagList[tagList.length - 1].value = tagName;
-    }, tagName);
-    await this.clickOn(LABEL_FOR_SAVE_BUTTON);
-    showMessage(`Tag ${tagName} added in tag list successfully!`);
-  }
-
-  /**
-   * This function checks tag exists in the blog taglists.
-   * @param {string} tagName - The name of the tag.
-   */
-  async expectTagToExistInBlogTags(tagName) {
-    await this.page.evaluate(async(tagName) => {
-      const tagList = document.getElementsByClassName('form-control');
-      for (let i = 0; i < tagList.length; i++) {
-        if (tagList[i].value === tagName) {
-          return;
-        }
-      }
-      throw new Error(`Tag ${tagName} does not exist in tag list!`);
-    }, tagName);
-    showMessage(`Tag with name ${tagName} exists in tag list!`);
   }
 
   /**

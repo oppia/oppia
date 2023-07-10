@@ -31,7 +31,6 @@ import { ContributorDashboardAdminNavbarComponent } from './contributor-dashboar
 describe('Contributor dashboard admin navbar component', () => {
   let component: ContributorDashboardAdminNavbarComponent;
   let userService: UserService;
-  let userProfileImage = 'profile-data-url';
   let userInfo = {
     isModerator: () => true,
     getUsername: () => 'username1',
@@ -60,18 +59,20 @@ describe('Contributor dashboard admin navbar component', () => {
     component = fixture.componentInstance;
     userService = TestBed.get(UserService);
     fixture.detectChanges();
+    spyOn(userService, 'getProfileImageDataUrl').and.returnValue(
+      ['default-image-url-png', 'default-image-url-webp']);
   }));
 
   it('should initialize component properties correctly', fakeAsync(() => {
-    spyOn(userService, 'getProfileImageDataUrlAsync')
-      .and.resolveTo(userProfileImage);
     spyOn(userService, 'getUserInfoAsync')
       .and.resolveTo(userInfo);
 
     component.ngOnInit();
     tick();
 
-    expect(component.profilePictureDataUrl).toBe(userProfileImage);
+    expect(component.profilePicturePngDataUrl).toEqual('default-image-url-png');
+    expect(component.profilePictureWebpDataUrl).toEqual(
+      'default-image-url-webp');
     expect(component.username).toBe('username1');
     expect(component.profileUrl).toEqual(profileUrl);
     expect(component.logoutUrl).toEqual('/logout');
@@ -79,8 +80,6 @@ describe('Contributor dashboard admin navbar component', () => {
   }));
 
   it('should set profileDropdownIsActive to true', fakeAsync(() => {
-    spyOn(userService, 'getProfileImageDataUrlAsync')
-      .and.resolveTo(userProfileImage);
     spyOn(userService, 'getUserInfoAsync')
       .and.resolveTo(userInfo);
 
@@ -95,8 +94,6 @@ describe('Contributor dashboard admin navbar component', () => {
   }));
 
   it('should set profileDropdownIsActive to false', fakeAsync(() => {
-    spyOn(userService, 'getProfileImageDataUrlAsync')
-      .and.resolveTo(userProfileImage);
     spyOn(userService, 'getUserInfoAsync')
       .and.resolveTo(userInfo);
 

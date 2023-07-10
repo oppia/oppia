@@ -29,10 +29,10 @@ import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { BlogAuthorProfilePageData, BlogHomePageBackendApiService } from 'domain/blog/blog-homepage-backend-api.service';
 import { UrlService } from 'services/contextual/url.service';
 import { BlogCardComponent } from 'pages/blog-dashboard-page/blog-card/blog-card.component';
-import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { BlogAuthorProfilePageConstants } from './blog-author-profile-page.constants';
 import { BlogPostSummary, BlogPostSummaryBackendDict } from 'domain/blog/blog-post-summary.model';
 import { AlertsService } from 'services/alerts.service';
+import { UserService } from 'services/user.service';
 // This throws "TS2307". We need to
 // suppress this error because rte-text-components are not strictly typed yet.
 // @ts-ignore
@@ -56,12 +56,12 @@ describe('Blog home page component', () => {
   let windowDimensionsService: WindowDimensionsService;
   let urlService: UrlService;
   let loaderService: LoaderService;
-  let urlInterpolationService: UrlInterpolationService;
   let blogHomePageBackendApiService: BlogHomePageBackendApiService;
   let blogAuthorProfilePageDataObject: BlogAuthorProfilePageData;
   let blogPostSummaryObject: BlogPostSummary;
   let component: BlogAuthorProfilePageComponent;
   let fixture: ComponentFixture<BlogAuthorProfilePageComponent>;
+  let userService: UserService;
 
   let blogPostSummary: BlogPostSummaryBackendDict = {
     id: 'sampleBlogId',
@@ -74,7 +74,6 @@ describe('Blog home page component', () => {
     url_fragment: 'sample#url',
     last_updated: '3232323',
     published_on: '1212121',
-    profile_pic_url: 'sample_url',
   };
 
   beforeEach(waitForAsync(() => {
@@ -110,15 +109,14 @@ describe('Blog home page component', () => {
     blogHomePageBackendApiService = TestBed.inject(
       BlogHomePageBackendApiService);
     urlService = TestBed.inject(UrlService);
-    urlInterpolationService = TestBed.inject(UrlInterpolationService);
     loaderService = TestBed.inject(LoaderService);
+    userService = TestBed.inject(UserService);
     blogPostSummaryObject = BlogPostSummary.createFromBackendDict(
       blogPostSummary
     );
     blogAuthorProfilePageDataObject = {
       displayedAuthorName: 'author',
       authorBio: 'author Bio',
-      profilePictureDataUrl: 'sample-pic-url',
       numOfBlogPostSummaries: 0,
       blogPostSummaries: [],
     };
@@ -169,8 +167,8 @@ describe('Blog home page component', () => {
 
     spyOn(blogHomePageBackendApiService, 'fetchBlogAuthorProfilePageDataAsync')
       .and.returnValue(Promise.resolve(blogAuthorProfilePageDataObject));
-    spyOn(urlInterpolationService, 'getStaticImageUrl')
-      .and.returnValue('sample-url');
+    spyOn(userService, 'getProfileImageDataUrl').and.returnValue(
+      ['default-image-url-png', 'default-image-url-webp']);
 
     component.ngOnInit();
     component.loadInitialBlogAuthorProfilePageData();
@@ -185,8 +183,8 @@ describe('Blog home page component', () => {
     expect(component.authorName).toBe('author');
     expect(component.authorBio).toBe('author Bio');
     expect(component.blogPostSummaries).toEqual([blogPostSummaryObject]);
-    expect(component.DEFAULT_PROFILE_PICTURE_URL).toEqual('sample-url');
-    expect(component.authorProfilePicUrl).toBe('sample-pic-url');
+    expect(component.authorProfilePicPngUrl).toBe('default-image-url-png');
+    expect(component.authorProfilePicWebpUrl).toBe('default-image-url-webp');
     expect(loaderService.hideLoadingScreen).toHaveBeenCalled();
   }));
 

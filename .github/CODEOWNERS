@@ -137,7 +137,9 @@
 /core/templates/domain/opportunity/ @oppia/contributor-experience-team
 /core/templates/pages/contributor-dashboard-page/ @oppia/contributor-experience-team
 /core/templates/pages/contributor-dashboard-admin-page/ @oppia/contributor-experience-team
-/scripts/contributor_dashboard_debug.py @oppia/contributor-experience-team
+/scripts/populate_sample_contributor_data*.py @oppia/contributor-experience-team
+/core/templates/services/html-length.service.ts @oppia/contributor-experience-team
+/core/templates/services/html-length.service.spec.ts @oppia/contributor-experience-team
 
 
 # Core documentation
@@ -248,7 +250,8 @@
 # Forms pages.
 /core/templates/components/forms/ @oppia/lace-frontend-reviewers
 /core/templates/components/common-layout-directives/common-elements/confirmation-modal.template.html @oppia/lace-frontend-reviewers
-/core/templates/components/ck-editor-helpers/customize-rte-component-modal.template.html @oppia/lace-frontend-reviewers
+/core/templates/services/rte-helper-modal.component.html @oppia/lace-frontend-reviewers
+/core/templates/utility/forms.ts @oppia/lace-frontend-reviewers
 /core/templates/services/schema-default-value.service*.ts @oppia/lace-frontend-reviewers
 /core/templates/services/schema-form-submitted.service*.ts @oppia/lace-frontend-reviewers
 /core/templates/services/schema-undefined-last-element.service*.ts @oppia/lace-frontend-reviewers
@@ -444,7 +447,7 @@
 # Story project.
 /core/controllers/story*.py @oppia/lace-backend-reviewers
 /core/domain/story*.py @oppia/lace-backend-reviewers
-/core/templates/components/entity-creation-services/story-creation.service*.ts @oppia/lace-frontend-reviewers
+/core/templates/components/entity-creation-services/story-creation-backend-api.service*.ts @oppia/lace-frontend-reviewers
 /core/templates/domain/story/ @oppia/lace-frontend-reviewers
 /core/templates/domain/story_viewer/ @oppia/lace-frontend-reviewers
 /core/templates/pages/story-editor-page/ @oppia/lace-frontend-reviewers
@@ -669,7 +672,7 @@
 /core/domain/platform_parameter*.py @oppia/web-android-compatibility-reviewers
 /core/platform_feature*.py @oppia/web-android-compatibility-reviewers
 /core/templates/domain/platform_feature/ @oppia/web-android-compatibility-reviewers
-/core/templates/pages/admin-page/features-tab/ @oppia/web-android-compatibility-reviewers
+/core/templates/pages/release-coordinator-page/features-tab/ @oppia/web-android-compatibility-reviewers
 /core/templates/services/platform-feature*.ts @oppia/web-android-compatibility-reviewers
 
 
@@ -741,7 +744,8 @@
 /.github/stale.yml @oppia/dev-workflow-reviewers
 /.github/workflows/ @oppia/dev-workflow-reviewers @oppia/automated-qa-reviewers
 # Files needed by the Android team.
-/core/controllers/android_e2e_config*.py @oppia/web-android-compatibility-reviewers
+/core/controllers/android*.py @oppia/web-android-compatibility-reviewers
+/core/domain/android*.py @oppia/web-android-compatibility-reviewers
 /core/android_validation_constants*.py @oppia/web-android-compatibility-reviewers
 /extensions/interactions/rule_templates.json @oppia/web-android-compatibility-reviewers
 # Files owned by core reviewers.

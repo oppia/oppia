@@ -47,6 +47,7 @@ export class StoryEditorStateService {
   _skillSummaries: SkillSummaryBackendDict[] = [];
   _expIdsChanged: boolean = false;
   _storyWithUrlFragmentExists: boolean = false;
+  _currentNodeIsPublishable: boolean = false;
 
   _storyInitializedEventEmitter = new EventEmitter();
   _storyReinitializedEventEmitter = new EventEmitter();
@@ -282,19 +283,27 @@ export class StoryEditorStateService {
     return this._storyIsBeingSaved;
   }
 
-  get onStoryInitialized(): EventEmitter<unknown> {
+  setCurrentNodeAsPublishable(currentNodeIsPublishable: boolean): void {
+    this._currentNodeIsPublishable = currentNodeIsPublishable;
+  }
+
+  isCurrentNodePublishable(): boolean {
+    return this._currentNodeIsPublishable;
+  }
+
+  get onStoryInitialized(): EventEmitter<string> {
     return this._storyInitializedEventEmitter;
   }
 
-  get onStoryReinitialized(): EventEmitter<unknown> {
+  get onStoryReinitialized(): EventEmitter<string> {
     return this._storyReinitializedEventEmitter;
   }
 
-  get onViewStoryNodeEditor(): EventEmitter<unknown> {
+  get onViewStoryNodeEditor(): EventEmitter<string> {
     return this._viewStoryNodeEditorEventEmitter;
   }
 
-  get onRecalculateAvailableNodes(): EventEmitter<unknown> {
+  get onRecalculateAvailableNodes(): EventEmitter<string> {
     return this._recalculateAvailableNodesEventEmitter;
   }
 

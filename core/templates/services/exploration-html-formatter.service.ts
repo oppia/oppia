@@ -83,7 +83,7 @@ export class ExplorationHtmlFormatterService {
       interactionCustomizationArgs: InteractionCustomizationArgs,
       parentHasLastAnswerProperty: boolean,
       labelForFocusTarget: string | null,
-      savedSolution: 'savedMemento()' | null
+      savedSolution: 'savedSolution' | null
   ): string {
     let availableInteractionIds = Array.prototype.concat.apply(
       [],
@@ -105,7 +105,7 @@ export class ExplorationHtmlFormatterService {
     );
     // The setAttribute is safe because we verify that the savedSolution
     // is 'savedMemento()'.
-    if (savedSolution === 'savedMemento()') {
+    if (savedSolution === 'savedSolution') {
       // TODO(#12292): Refactor this once all interactions have been migrated to
       // Angular 2+, such that we don't need to parse the string in the
       // interaction directives/components.
@@ -152,7 +152,7 @@ export class ExplorationHtmlFormatterService {
     let interactionHtml = element.outerHTML;
     const tagEnd = '></oppia-interactive-' + htmlInteractionId + '>';
     let interactionHtmlWithoutEnd = interactionHtml.replace(tagEnd, '');
-    if (savedSolution === 'savedMemento()') {
+    if (savedSolution === 'savedSolution') {
       interactionHtmlWithoutEnd += ` [saved-solution]="${savedSolution}"`;
     }
     interactionHtmlWithoutEnd += ` [last-answer]="${lastAnswerPropValue}"`;

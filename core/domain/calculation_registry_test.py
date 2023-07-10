@@ -35,3 +35,20 @@ class CalculationRegistryTests(test_utils.GenericTestBase):
         with self.assertRaisesRegex(
             TypeError, '\'a\' is not a valid calculation id.'):
             calculation_registry.Registry.get_calculation_by_id('a')
+
+    def test_get_calculation_by_id_when_calculations_dict_have_calculation_id(
+        self) -> None:
+        # Top5AnswerFrequencies is not present in calculations_dict,
+        # So Top5AnswerFrequencies will be inserted into calculations_dict.
+        self.assertTrue(
+            isinstance(
+                calculation_registry.Registry.get_calculation_by_id(
+                    'Top5AnswerFrequencies'),
+                models.Top5AnswerFrequencies))
+        # Top5AnswerFrequencies is present in calculations_dict
+        # So Top5AnswerFrequencies will not be inserted again.
+        self.assertTrue(
+            isinstance(
+                calculation_registry.Registry.get_calculation_by_id(
+                    'Top5AnswerFrequencies'),
+                models.Top5AnswerFrequencies))

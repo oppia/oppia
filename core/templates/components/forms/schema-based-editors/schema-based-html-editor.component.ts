@@ -44,7 +44,7 @@ implements ControlValueAccessor, OnInit, Validator {
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() disabled!: boolean;
   @Input() labelForFocusTarget!: string;
-  @Input() uiConfig!: unknown;
+  @Input() uiConfig!: {'add_element_text': string};
   localValue!: string;
   onChange: (val: string) => void = () => {};
 
