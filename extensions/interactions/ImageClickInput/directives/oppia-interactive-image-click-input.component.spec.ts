@@ -464,8 +464,8 @@ describe('InteractiveImageClickInput', () => {
     // The mouseX and mouseY variables must be updated only
     // when the interaction is active.
     expect(component.interactionIsActive).toBe(true);
-    expect(component.mouseX).toBe(0.45);
-    expect(component.mouseY).toBe(0.3);
+    expect(component.dotCoordinateX).toBe(0.45);
+    expect(component.dotCoordinateY).toBe(0.3);
     expect(component.currentlyHoveredRegions).toEqual(['Region1']);
   });
 
