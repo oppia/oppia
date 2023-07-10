@@ -24,7 +24,7 @@
     width: 10px;
     z-index: 10;
   }
-  .accessibility-dot {
+  .oppia-select-image-region-cursor {
     background: red;
     border: 1px solid #000;
     border-radius: 50%;
@@ -69,7 +69,7 @@
          (click)="onClickImage()"
          (mousemove)="onMousemoveImage($event)"
          (style)="imageContainerStyle">
-    <div class="accessibility-dot" (click)="onClickImage()" *ngIf="!usingMobileDevice">
+    <div class="oppia-select-image-region-cursor" (click)="onClickImage()" *ngIf="!usingMobileDevice">
     </div>
     <div *ngIf="highlightRegionsOnHover">
       <div *ngFor="let region of allRegions; let idx = index"

@@ -294,7 +294,7 @@ export class InteractiveImageClickInput implements OnInit, OnDestroy {
         (event.clientY - image.getBoundingClientRect().top) / image.height);
       return;
     }
-    const dot = document.querySelector('.accessibility-dot') as HTMLDivElement;
+    const dot = document.querySelector('.oppia-select-image-region-cursor') as HTMLDivElement;
 
     if (event instanceof MouseEvent) {
       this.dotCoordinateX =

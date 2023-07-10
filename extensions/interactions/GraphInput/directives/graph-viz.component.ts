@@ -221,7 +221,7 @@ export class GraphVizComponent implements OnInit, AfterViewInit {
           this.onClickGraphSVG();
       }
       const dot = document.querySelector(
-        '.accessibility-dot') as HTMLDivElement;
+        '.oppia-add-node-cursor') as HTMLDivElement;
       dot.style.top = this.dotCoordinateY + 'px';
       dot.style.left = this.dotCoordinateX + 'px';
     } else {
@@ -294,7 +294,7 @@ export class GraphVizComponent implements OnInit, AfterViewInit {
     this.state.mouseY = svgp.y;
     if (this.state.currentMode === 2) {
       const dot = document.querySelector(
-        '.accessibility-dot') as HTMLDivElement;
+        '.oppia-add-node-cursor') as HTMLDivElement;
       const graphArea = this.element.nativeElement.querySelector(
         '.oppia-graph-viz-svg');
       const graphAreaRect = graphArea.getBoundingClientRect();
@@ -327,7 +327,7 @@ export class GraphVizComponent implements OnInit, AfterViewInit {
 
   isButtonOnTopOfDot(): boolean {
     const dotElement = document.querySelector(
-      '.accessibility-dot') as HTMLDivElement;
+      '.oppia-add-node-cursor') as HTMLDivElement;
     const buttonElements = document.querySelectorAll(
       '[class^="e2e-test-"][class$="-button"]');
 

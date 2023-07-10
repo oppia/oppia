@@ -26,7 +26,7 @@
     float: right;
     height: 35px;
   }
-  .accessibility-dot {
+  .oppia-add-node-cursor {
     background: red;
     border: 1px solid #000;
     border-radius: 50%;
@@ -172,7 +172,7 @@
         </circle>
       </g>
     </svg>
-    <div class="accessibility-dot" (click)="onClickGraphSVG()"  (keydown.enter)="onClickGraphSVG()" *ngIf="state.currentMode === 2"></div>
+    <div class="oppia-add-node-cursor" (click)="onClickGraphSVG()"  (keydown.enter)="onClickGraphSVG()" *ngIf="state.currentMode === 2"></div>
   </div>
   <div [hidden]="usingMobileDevice">
       {{helpText | translate}}
