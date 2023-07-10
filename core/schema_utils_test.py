@@ -1369,41 +1369,6 @@ class SchemaNormalizationUnitTests(test_utils.GenericTestBase):
         self.check_normalization(
             schema, mappings, invalid_values_with_error_messages)
 
-    def test_notification_user_ids_list_validator(self) -> None:
-        schema = email_manager.NOTIFICATION_USER_IDS_LIST_SCHEMA
-        valid_user_id_list = [
-            'uid_%s' % (chr(97 + i) * feconf.USER_ID_RANDOM_PART_LENGTH)
-            for i in range(0, 5)
-        ]
-        big_user_id_list = [
-            'uid_%s' % (chr(97 + i) * feconf.USER_ID_RANDOM_PART_LENGTH)
-            for i in range(0, 7)
-        ]
-        mappings = [
-            (
-                ['uid_%s' % ('a' * feconf.USER_ID_RANDOM_PART_LENGTH)],
-                ['uid_%s' % ('a' * feconf.USER_ID_RANDOM_PART_LENGTH)]
-            ),
-            (valid_user_id_list, valid_user_id_list)]
-        invalid_values_with_error_messages = [
-            (
-                ['uid_%s' % ('a' * 28)],
-                re.escape(
-                    'Validation failed: is_valid_user_id ({}) for '
-                    'object uid_%s' % ('a' * 28)
-                )
-            ),
-            (
-                big_user_id_list,
-                re.escape(
-                    'Validation failed: has_length_at_most '
-                    '({\'max_value\': 5}) for object ['
-                ) + '.*' + re.escape(']')
-            )
-        ]
-        self.check_normalization(
-            schema, mappings, invalid_values_with_error_messages)
-
     def test_normalize_spaces(self) -> None:
         """Test static method normalize_spaces; should collapse multiple
         spaces.

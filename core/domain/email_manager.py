@@ -698,10 +698,13 @@ def send_job_failure_email(job_id: str) -> None:
         'ML job %s has failed. For more information,'
         'please visit the admin page at:\n'
         'https://www.oppia.org/admin#/jobs') % job_id)
-    recipient_id = user_services.get_user_settings_from_email(
-        feconf.ADMIN_EMAIL_ADDRESS).user_id
+    admin_user_settings = user_services.get_user_settings_from_email(
+        feconf.ADMIN_EMAIL_ADDRESS)
+    # Rulling out the possibility of admin_user_settings is None for
+    # the mypy checks.
+    assert admin_user_settings is not None
     _send_email(
-        recipient_id, feconf.SYSTEM_COMMITTER_ID,
+        admin_user_settings.user_id, feconf.SYSTEM_COMMITTER_ID,
         feconf.EMAIL_INTENT_ML_JOB_FAILURE,
         mail_subject, mail_body,
         feconf.SYSTEM_EMAIL_ADDRESS, False,
