@@ -74,8 +74,8 @@ export class InteractiveImageClickInput implements OnInit, OnDestroy {
   imageContainerStyle: { height: string; width?: string };
   loadingIndicatorStyle: { height: string; width?: string };
   allRegions: LabeledRegion[];
-  dotCoordinateX: number = 0;
-  dotCoordinateY: number = 0;
+  dotCursorCoordinateX: number = 0;
+  dotCursorCoordinateY: number = 0;
   usingMobileDevice: boolean = false;
   constructor(
     private assetsBackendApiService: AssetsBackendApiService,
@@ -297,14 +297,14 @@ export class InteractiveImageClickInput implements OnInit, OnDestroy {
     const dot = document.querySelector('.oppia-select-image-region-cursor') as HTMLDivElement;
 
     if (event instanceof MouseEvent) {
-      this.dotCoordinateX =
+      this.dotCursorCoordinateX =
        event.clientX - imageRect.left + parseFloat(imageStyles.marginLeft) + 8;
-      this.dotCoordinateY =
+      this.dotCursorCoordinateY =
        event.clientY - imageRect.top + parseFloat(imageStyles.marginTop) + 8;
     }
 
-    dot.style.top = this.dotCoordinateY + 'px';
-    dot.style.left = this.dotCoordinateX + 'px';
+    dot.style.top = this.dotCursorCoordinateY + 'px';
+    dot.style.left = this.dotCursorCoordinateX + 'px';
     const dotRect = dot.getBoundingClientRect();
     this.mouseX = (
       (dotRect.left - image.getBoundingClientRect().left) / image.width);
@@ -335,16 +335,16 @@ export class InteractiveImageClickInput implements OnInit, OnDestroy {
 
     switch (event.key) {
       case 'ArrowLeft':
-        this.dotCoordinateX -= stepSizeInPx;
+        this.dotCursorCoordinateX -= stepSizeInPx;
         break;
       case 'ArrowUp':
-        this.dotCoordinateY -= stepSizeInPx;
+        this.dotCursorCoordinateY -= stepSizeInPx;
         break;
       case 'ArrowRight':
-        this.dotCoordinateX += stepSizeInPx;
+        this.dotCursorCoordinateX += stepSizeInPx;
         break;
       case 'ArrowDown':
-        this.dotCoordinateY += stepSizeInPx;
+        this.dotCursorCoordinateY += stepSizeInPx;
         break;
       case 'Enter':
         this.onClickImage();

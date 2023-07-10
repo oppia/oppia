@@ -747,8 +747,8 @@ describe('GraphVizComponent', () => {
   it('should add vertex when graph is clicked and interaction is' +
   ' active', () => {
     component.state.currentMode = component._MODES.ADD_VERTEX;
-    component.dotCoordinateX = 20;
-    component.dotCoordinateY = 20;
+    component.dotCursorCoordinateX = 20;
+    component.dotCursorCoordinateY = 20;
 
     expect(component.graph.vertices).toEqual([
       {

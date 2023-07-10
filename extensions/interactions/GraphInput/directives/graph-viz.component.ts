@@ -84,8 +84,8 @@ export class GraphVizComponent implements OnInit, AfterViewInit {
   @Input() canEditEdgeWeight: boolean;
   @Input() interactionIsActive: boolean;
   @Input() canEditOptions: boolean;
-  dotCoordinateX: number = 0;
-  dotCoordinateY: number = 0;
+  dotCursorCoordinateX: number = 0;
+  dotCursorCoordinateY: number = 0;
 
   @Output() graphChange: EventEmitter<GraphAnswer> = new EventEmitter();
   usingMobileDevice: boolean = false;
@@ -203,27 +203,27 @@ export class GraphVizComponent implements OnInit, AfterViewInit {
       switch (event.key) {
         case 'ArrowLeft':
           event.preventDefault();
-          this.dotCoordinateX -= stepSizeInPx;
+          this.dotCursorCoordinateX -= stepSizeInPx;
           break;
         case 'ArrowUp':
           event.preventDefault();
-          this.dotCoordinateY -= stepSizeInPx;
+          this.dotCursorCoordinateY -= stepSizeInPx;
           break;
         case 'ArrowRight':
           event.preventDefault();
-          this.dotCoordinateX += stepSizeInPx;
+          this.dotCursorCoordinateX += stepSizeInPx;
           break;
         case 'ArrowDown':
           event.preventDefault();
-          this.dotCoordinateY += stepSizeInPx;
+          this.dotCursorCoordinateY += stepSizeInPx;
           break;
         case 'Enter':
           this.onClickGraphSVG();
       }
       const dot = document.querySelector(
         '.oppia-add-node-cursor') as HTMLDivElement;
-      dot.style.top = this.dotCoordinateY + 'px';
-      dot.style.left = this.dotCoordinateX + 'px';
+      dot.style.top = this.dotCursorCoordinateY + 'px';
+      dot.style.left = this.dotCursorCoordinateX + 'px';
     } else {
       return;
     }
@@ -302,12 +302,12 @@ export class GraphVizComponent implements OnInit, AfterViewInit {
       const graphAreaRect = graphArea.getBoundingClientRect();
 
       if (event instanceof MouseEvent) {
-        this.dotCoordinateX =
+        this.dotCursorCoordinateX =
          event.clientX - graphAreaRect.left;
-        this.dotCoordinateY =
+        this.dotCursorCoordinateY =
          event.clientY - graphAreaRect.top;
-        dot.style.top = this.dotCoordinateY + 'px';
-        dot.style.left = this.dotCoordinateX + 'px';
+        dot.style.top = this.dotCursorCoordinateY + 'px';
+        dot.style.left = this.dotCursorCoordinateX + 'px';
       }
     }
     // We use vertexDragStartX/Y and mouseDragStartX/Y to make
@@ -370,8 +370,8 @@ export class GraphVizComponent implements OnInit, AfterViewInit {
     if (this.state.currentMode === this._MODES.ADD_VERTEX &&
         this.canAddVertex && !this.isButtonOnTopOfDot()) {
       this.graph.vertices.push({
-        x: this.dotCoordinateX,
-        y: this.dotCoordinateY,
+        x: this.dotCursorCoordinateX,
+        y: this.dotCursorCoordinateY,
         label: ''
       });
       this.graphChange.emit(this.graph);
