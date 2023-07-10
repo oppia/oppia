@@ -57,7 +57,7 @@ export class InteractiveDragAndDropSortInputComponent implements OnInit {
   rootHeight: number = 40;
   activeItem!: number;
   listSubscription!: Subscription;
-  @ViewChildren('listItem') listItems: QueryList<ElementRef>;
+  @ViewChildren('listItem') listItems!: QueryList<ElementRef>;
 
   constructor(
     private currentInteractionService: CurrentInteractionService,
