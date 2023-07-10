@@ -452,6 +452,7 @@ describe('InteractiveImageClickInput', () => {
     spyOnProperty(MouseEvent.prototype, 'clientY', 'get').and.returnValue(260);
     let evt = new MouseEvent('Mousemove');
     component.lastAnswer = null;
+    component.usingMobileDevice = true;
     component.ngOnInit();
 
     expect(component.interactionIsActive).toBe(true);
@@ -464,8 +465,8 @@ describe('InteractiveImageClickInput', () => {
     // The mouseX and mouseY variables must be updated only
     // when the interaction is active.
     expect(component.interactionIsActive).toBe(true);
-    expect(component.dotCoordinateX).toBe(0.45);
-    expect(component.dotCoordinateY).toBe(0.3);
+    expect(component.mouseX).toBe(0.45);
+    expect(component.mouseY).toBe(0.3);
     expect(component.currentlyHoveredRegions).toEqual(['Region1']);
   });
 
