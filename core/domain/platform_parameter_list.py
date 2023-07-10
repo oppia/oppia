@@ -63,6 +63,7 @@ class ParamNames(enum.Enum):
     SIGNUP_EMAIL_BODY_CONTENT = 'signup_email_body_content'
     UNPUBLISH_EXPLORATION_EMAIL_HTML_BODY = (
         'unpublish_exploration_email_html_body')
+    CSRF_SECRET = 'oppia_csrf_secret'
 
 
 # Platform parameters should all be defined below.

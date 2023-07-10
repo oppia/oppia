@@ -36,8 +36,11 @@ from core.controllers import payload_validator
 from core.domain import auth_domain
 from core.domain import auth_services
 from core.domain import classifier_domain
-from core.domain import config_domain
 from core.domain import config_services
+from core.domain import platform_feature_services
+from core.domain import platform_parameter_domain
+from core.domain import platform_parameter_list
+from core.domain import platform_parameter_registry
 from core.domain import user_services
 
 from typing import (
@@ -54,9 +57,14 @@ _NormalizedPayloadDictType = TypeVar('_NormalizedPayloadDictType')
 
 ONE_DAY_AGO_IN_SECS: Final = -24 * 60 * 60
 DEFAULT_CSRF_SECRET: Final = 'oppia csrf secret'
-CSRF_SECRET: Final = config_domain.ConfigProperty(
-    'oppia_csrf_secret', {'type': 'unicode'},
-    'Text used to encrypt CSRF tokens.', DEFAULT_CSRF_SECRET)
+CSRF_SECRET: Final = (
+    platform_parameter_registry.Registry.create_platform_parameter(
+        platform_parameter_list.ParamNames.CSRF_SECRET,
+        'Text used to encrypt CSRF tokens.',
+        platform_parameter_domain.DataTypes.STRING,
+        default=DEFAULT_CSRF_SECRET
+    )
+)
 
 # NOTE: These handlers manage user sessions and serve auth pages. Thus, we
 # should never reject or replace them when running in maintenance mode;
@@ -892,14 +900,40 @@ class CsrfTokenManager:
     def init_csrf_secret(cls) -> None:
         """Verify that non-default CSRF secret exists; creates one if not."""
 
+        csrf_value = platform_feature_services.get_platform_parameter_value(
+            CSRF_SECRET.name
+        )
         # Any non-default value is fine.
-        if CSRF_SECRET.value and CSRF_SECRET.value != DEFAULT_CSRF_SECRET:
+        if csrf_value != DEFAULT_CSRF_SECRET:
             return
 
         # Initialize to random value.
-        config_services.set_property(
-            feconf.SYSTEM_COMMITTER_ID, CSRF_SECRET.name,
-            base64.urlsafe_b64encode(os.urandom(20)))
+        platform_parameter_registry.Registry.update_platform_parameter(
+            CSRF_SECRET.name,
+            feconf.SYSTEM_COMMITTER_ID,
+            'Updating csrf secret value.',
+            [
+                platform_parameter_domain.PlatformParameterRule.from_dict({
+                    'filters': [
+                        {
+                            'type': 'server_mode',
+                            'conditions': [
+                                [
+                                    '=',
+                                    (
+                                        platform_parameter_domain.
+                                        ServerMode.DEV.value
+                                    )
+                                ]
+                            ],
+                        }
+                    ],
+                    'value_when_matched': str(
+                        base64.urlsafe_b64encode(os.urandom(20)))
+                })
+            ],
+            CSRF_SECRET.default_value
+        )
 
     @classmethod
     def _create_token(cls, user_id: Optional[str], issued_on: float) -> str:
@@ -923,8 +957,11 @@ class CsrfTokenManager:
         # Round time to seconds.
         issued_on_str = str(int(issued_on))
 
+        csrf_value = platform_feature_services.get_platform_parameter_value(
+            CSRF_SECRET.name
+        )
         digester = hmac.new(
-            key=CSRF_SECRET.value.encode('utf-8'),
+            key=csrf_value.encode('utf-8'),
             digestmod='md5'
         )
         digester.update(user_id.encode('utf-8'))

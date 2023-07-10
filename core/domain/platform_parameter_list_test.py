@@ -50,6 +50,7 @@ class ExistingPlatformParameterValidityTests(test_utils.GenericTestBase):
                             ),
                             'is_improvements_tab_enabled',
                             'learner_groups_are_enabled',
+                            'oppia_csrf_secret',
                             'promo_bar_enabled',
                             'promo_bar_message',
                             'serial_chapter_launch_curriculum_admin_view',

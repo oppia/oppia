@@ -39,6 +39,7 @@ from core.domain import auth_domain
 from core.domain import classifier_domain
 from core.domain import classifier_services
 from core.domain import exp_services
+from core.domain import platform_feature_services
 from core.domain import rights_manager
 from core.domain import taskqueue_services
 from core.domain import user_services
@@ -747,7 +748,10 @@ class CsrfTokenManagerTests(test_utils.GenericTestBase):
 
     def test_non_default_csrf_secret_is_used(self) -> None:
         base.CsrfTokenManager.create_csrf_token('uid')
-        self.assertNotEqual(base.CSRF_SECRET.value, base.DEFAULT_CSRF_SECRET)
+        csrf_value = platform_feature_services.get_platform_parameter_value(
+            base.CSRF_SECRET.name
+        )
+        self.assertNotEqual(csrf_value, base.DEFAULT_CSRF_SECRET)
 
     def test_token_expiry(self) -> None:
         # This can be any value.
