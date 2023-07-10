@@ -262,7 +262,8 @@ export class ContributionAndReviewService {
       translationSuggestions: any[],
       states: States,
       initStateName: string | null
-  ): SuggestionBackendDict[] {
+      // eslint-disable-next-line
+  ): any[] {
   // Obtain the state names in the order of content flow in the lesson.
 
     if (!initStateName) {
