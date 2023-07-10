@@ -300,7 +300,7 @@ export class ContributionAndReviewService {
           const type = (
             // Get the type prefix (e.g., feedback, hints).
             contentId.split('_')[0]);
-          const order = {
+            const order: { [key: string]: number } = {
             content: 0,
             interaction: 1,
             feedback: 2,
