@@ -79,12 +79,12 @@
             </div>
           </div>
           <div class="subtopic-html" tabindex="0">
-            <div  (click)="showSchemaEditor()" 
-                  class="e2e-test-edit-html-content"
-                  role="button"
-                  aria-label="Edit explanation of the subtopic"
-                  tabindex="0"
-                  (keydown.enter)="showSchemaEditor()">
+            <div (click)="showSchemaEditor()"
+                 class="e2e-test-edit-html-content"
+                 role="button"
+                 aria-label="Edit explanation of the subtopic"
+                 tabindex="0"
+                 (keydown.enter)="showSchemaEditor()">
               <p>
                 <strong>Explanation of the subtopic*</strong>
                 <i class="fa fa-pen edit-icon" *ngIf="!schemaEditorIsShown"></i>
