@@ -434,11 +434,13 @@ describe('InteractiveImageClickInput', () => {
 
     const styleMock = jasmine.createSpyObj<CSSStyleDeclaration>(
       'CSSStyleDeclaration', [
-      'marginLeft',
-      'marginTop',
-      'width',
-      'height'
-    ]);
+        'marginLeft',
+        'marginTop',
+        'width',
+        'height'
+      ]);
+    const dotMock = document.createElement('div');
+    spyOn(document, 'querySelector').and.returnValue(dotMock);
     styleMock.marginLeft = '0px';
     styleMock.marginTop = '0px';
     styleMock.width = '0px';
