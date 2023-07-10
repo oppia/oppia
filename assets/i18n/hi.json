@@ -523,6 +523,7 @@
 	"I18N_PROGRESS_REMINDER_MODAL_HEADER": "आपने <span class=\"completion-fraction\"><[progress]></span> पूरा कर लिया है और सन्दर्भ है",
 	"I18N_PROGRESS_REMINDER_RESTART_LESSON": "नहीं, वापस शुरुआत से चलें",
 	"I18N_PROGRESS_REMINDER_RESUME_LESSON": "हाँ, पाठ जारी रखें",
+	"I18N_QUESTION_ANSWERS_CORRECT": "सही उत्तर:",
 	"I18N_QUESTION_PLAYER_LEARN_MORE_ABOUT_SCORE": "अपने स्कोर के बारे में और जानें",
 	"I18N_QUESTION_PLAYER_MY_DASHBOARD": "मेरा डैशबोर्ड",
 	"I18N_QUESTION_PLAYER_NEW_SESSION": "नया सत्र",
