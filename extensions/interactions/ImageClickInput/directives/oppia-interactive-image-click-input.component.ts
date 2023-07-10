@@ -331,20 +331,20 @@ export class InteractiveImageClickInput implements OnInit, OnDestroy {
   }
 
   handleKeyDown = (event: KeyboardEvent): void => {
-    const stepSize = 10;
+    const stepSizeInPx = 10;
 
     switch (event.key) {
       case 'ArrowLeft':
-        this.dotCoordinateX -= stepSize;
+        this.dotCoordinateX -= stepSizeInPx;
         break;
       case 'ArrowUp':
-        this.dotCoordinateY -= stepSize;
+        this.dotCoordinateY -= stepSizeInPx;
         break;
       case 'ArrowRight':
-        this.dotCoordinateX += stepSize;
+        this.dotCoordinateX += stepSizeInPx;
         break;
       case 'ArrowDown':
-        this.dotCoordinateY += stepSize;
+        this.dotCoordinateY += stepSizeInPx;
         break;
       case 'Enter':
         this.onClickImage();

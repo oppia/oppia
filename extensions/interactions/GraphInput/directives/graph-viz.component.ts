@@ -198,24 +198,24 @@ export class GraphVizComponent implements OnInit, AfterViewInit {
 
   handleKeyDown(event: KeyboardEvent): void {
     if (this.state.currentMode === 2 && !this.isButtonOnTopOfDot()) {
-      const stepSize = 10;
+      const stepSizeInPx = 10;
 
       switch (event.key) {
         case 'ArrowLeft':
           event.preventDefault();
-          this.dotCoordinateX -= stepSize;
+          this.dotCoordinateX -= stepSizeInPx;
           break;
         case 'ArrowUp':
           event.preventDefault();
-          this.dotCoordinateY -= stepSize;
+          this.dotCoordinateY -= stepSizeInPx;
           break;
         case 'ArrowRight':
           event.preventDefault();
-          this.dotCoordinateX += stepSize;
+          this.dotCoordinateX += stepSizeInPx;
           break;
         case 'ArrowDown':
           event.preventDefault();
-          this.dotCoordinateY += stepSize;
+          this.dotCoordinateY += stepSizeInPx;
           break;
         case 'Enter':
           this.onClickGraphSVG();
