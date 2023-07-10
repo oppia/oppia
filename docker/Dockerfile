@@ -31,8 +31,6 @@ RUN apt-get update -y && apt-get upgrade -y \
     openjdk-11-jre \
     python2 \
     python3-matplotlib \
-    python3-setuptools \
-    python3-yaml \
     unzip \
     wget
 
@@ -107,7 +105,3 @@ RUN python -m scripts.build
 
 COPY --from=frontend /app/oppia/node_modules ./node_modules
 COPY . .
-
-EXPOSE 8089
-EXPOSE 8000
-EXPOSE 8181

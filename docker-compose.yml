@@ -5,6 +5,7 @@ services:
     build:
       context: .
       dockerfile: ./docker/Dockerfile
+      target: frontend
     container_name: oppia-angular-build
     volumes:
       - .:/app/oppia
@@ -21,8 +22,6 @@ services:
       interval: 30s
       retries: 5
       start_period: 5m
-    # added max-old-space-size to avoid out of memory error, check this link for more info
-    # https://stackoverflow.com/questions/62663167/dockerizing-react-in-production-mode-fatal-error-ineffective-mark-compacts-nea
     command: >
       sh -c '
         trap "rm /app/oppia/node_modules/@angular/compiler-cli/ngcc/__ngcc_lock_file__" EXIT
@@ -33,6 +32,7 @@ services:
     build:
       context: .
       dockerfile: ./docker/Dockerfile
+      target: frontend
     container_name: oppia-webpack-compiler
     volumes:
       - .:/app/oppia
@@ -60,6 +60,7 @@ services:
     build:
       context: .
       dockerfile: ./docker/Dockerfile
+      target: backend
     container_name: oppia-app-engine
     ports:
       - "8181:8181"
@@ -102,6 +103,7 @@ services:
     build:
       context: .
       dockerfile: ./docker/Dockerfile
+      target: backend
     container_name: oppia-cloud-datastore
     ports:
       - "8089:8089"
