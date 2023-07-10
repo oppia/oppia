@@ -57,10 +57,7 @@ export class HomeTabComponent {
   @Input() username!: string;
   @Input() explorationPlaylist!: LearnerExplorationSummary[];
   @Input() collectionPlaylist!: CollectionSummary[];
-  @Input() mappedStoryIdToLearnerGroupsTitle!: Map<string, string[]>;
-
-  explorationProgress!: ChapterProgressSummary[];
-  expIds: string[] = ['fcQEebaQ7iBO'];
+  @Input() storyIdToLearnerGroupsTitleMap!: Map<string, string[]>;
 
   carouselClassname: string = 'home-tab';
   currentGoalsLength!: number;
@@ -78,6 +75,10 @@ export class HomeTabComponent {
   windowIsNarrow: boolean = false;
   storyInProgress: storySummaryTile[] = [];
   storyInRecommended: storySummaryTile[] = [];
+  expIds: string[] = [];
+  explorationToProgressMap: Map<string, number> = new Map();
+  // ExplorationsProgressSummary!: ChapterProgressSummary[];
+
 
   totalLessonsInPlaylist: (
       LearnerExplorationSummary | CollectionSummary)[] = [];
@@ -146,9 +147,9 @@ export class HomeTabComponent {
           markTileAsGoal: currentGoalsIds.includes(topicSummaryTile.id),
           learnerGroupTitle: ''
         };
-        if (this.mappedStoryIdToLearnerGroupsTitle.size !== 0) {
+        if (this.storyIdToLearnerGroupsTitleMap.size !== 0) {
           let learnerGroupsTitle =
-          this.mappedStoryIdToLearnerGroupsTitle.get(storySummary.getId());
+          this.storyIdToLearnerGroupsTitleMap.get(storySummary.getId());
           storyData.learnerGroupTitle = learnerGroupsTitle[0];
         }
         if (storyProgress !== 0) {
@@ -159,14 +160,44 @@ export class HomeTabComponent {
       }
     }
 
+    if (this.explorationPlaylist.length !== 0) {
+      for (var exp of this.explorationPlaylist) {
+        this.expIds.push(exp.id);
+      }
 
-    this.readOnlyExplorationBackendApiService.
-      fetchProgressInExplorationsOrChapters(
-        this.expIds
-      ).then(explorationProgress => {
-        this.explorationProgress = explorationProgress;
-        console.error(explorationProgress, 'progressof exploration .....');
-      });
+      this.readOnlyExplorationBackendApiService.
+        fetchProgressInExplorationsOrChapters(
+          this.expIds
+        ).then(explorationsProgressSummary => {
+          let explorationsProgress = explorationsProgressSummary;
+
+          if (explorationsProgress.length !== 0) {
+            console.error('178...');
+            for (let i = 0; i < this.expIds.length; i++) {
+              let progress =
+          this.calculateExplorationProgress(explorationsProgress[i]);
+              this.explorationToProgressMap.set(this.expIds[i], progress);
+            }
+            console.error(this.explorationToProgressMap, 'progress map');
+          }
+
+          console.error(
+            explorationsProgressSummary, 'progressof exploration .....');
+        });
+    }
+
+    // Console.error('176 line');
+    // console.error(this.explorationsProgressSummary, 'exp progfsldnlfs');
+    // if (this.explorationsProgressSummary.length !== 0) {
+    //   console.error('178...');
+    //   for (let i = 0; i < this.expIds.length; i++) {
+    //     let progress =
+    //       this.calculateExplorationProgress(
+    //         this.explorationsProgressSummary[i]);
+    //     this.explorationToProgressMap.set(this.expIds[i], progress);
+    //   }
+    //   console.error(this.explorationToProgressMap, 'progress map');
+    // }
 
     this.windowIsNarrow = this.windowDimensionService.isWindowNarrow();
     this.directiveSubscriptions.add(
@@ -180,6 +211,16 @@ export class HomeTabComponent {
       return 'exploration';
     }
     return 'collection';
+  }
+
+  calculateExplorationProgress(explorationProgress: ChapterProgressSummary):
+   number {
+    let totalCheckpoints = explorationProgress.totalCheckpoints;
+    let visitedCheckpoints = explorationProgress.visitedCheckpoints;
+    console.error(visitedCheckpoints, 'visited check[points..');
+    let progress = (visitedCheckpoints / totalCheckpoints) * 100;
+    console.error(progress, 'progressssss');
+    return progress;
   }
 
   getTimeOfDay(): string {
