@@ -23,7 +23,7 @@ FROM --platform=linux/amd64 python:3.8.17-slim-buster AS backend
 
 WORKDIR /
 
-ENV oppia_is_dockerized="true"
+ENV OPPIA_IS_DOCKERIZED="true"
 
 # Installing the pre-requisites libs and dependencies
 RUN apt-get update -y && apt-get upgrade -y \

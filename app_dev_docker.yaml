@@ -120,7 +120,9 @@ vpc_access_connector:
   name: projects/PROJECT_ID/locations/us-central1/connectors/oppia-redis-connector-1
 
 env_variables:
-  oppia_is_dockerized: "true"
+# We need this env variable to be set to true so that the services that are executed
+# by the Google App Engine knows that they are running in the docker environment.
+  OPPIA_IS_DOCKERIZED: "true"
   PYTHONHTTPSVERIFY: 1
 # GAE_USE_SOCKETS_HTTPLIB is needed for the redis connector in the Python 2
 # runtime. More information can be found here:

@@ -76,7 +76,7 @@ services:
       - shared_webpack_bundles:/app/oppia/webpack_bundles
     environment:
       - CLOUDSDK_CORE_DISABLE_PROMPTS=1
-      - oppia_is_dockerized=true
+      - OPPIA_IS_DOCKERIZED=true
     depends_on:
       angular-build:
         condition: service_healthy
