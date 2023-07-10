@@ -959,6 +959,9 @@ class CsrfTokenManager:
         csrf_value = platform_feature_services.get_platform_parameter_value(
             CSRF_SECRET.name
         )
+        # Asserting the type of csrf_value platform param because we are sure
+        # that its value is of type string. This helps us avoid mypy error.
+        assert isinstance(csrf_value, str)
         digester = hmac.new(
             key=csrf_value.encode('utf-8'),
             digestmod='md5'
