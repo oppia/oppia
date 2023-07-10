@@ -83,17 +83,6 @@ describe('Checkpoints functionality', function() {
     await users.createAndLoginCurriculumAdminUser(
       'creator@storyViewer.com', 'creatorStoryViewer');
 
-    // The below lines of code enable the user checkpoints feature on the
-    // config tab. This is required to enable the lesson-info modal button
-    // on the exploration footer, which in turn is required to view the
-    // checkpoint message.
-    // This should be removed when the user checkpoints feature is no longer
-    // gated behind a config option.
-    await adminPage.editConfigProperty(
-      'Enable checkpoints feature.', 'Boolean',
-      async(elem) => await action.setValue(
-        'Enable checkpoints feature', elem, true, false));
-
     // The below lines enable the checkpoint_celebration flag in prod mode.
     // They should be removed after the checkpoint_celebration flag is
     // deprecated.
