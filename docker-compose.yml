@@ -147,7 +147,7 @@ services:
       - ./.firebase.json:/app/oppia/.firebase.json
       - shared_node_modules:/app/oppia/node_modules
       - firebase_emulator_cache:/app/firebase_emulator_cache
-    # TODO: The firebase service depends on the packages from node_modules that are being
+    # NOTE: The firebase service depends on the packages from node_modules that are being
     # installed in the Frontend Stage of Dockerfile. In future, we can remove the dependency
     # on Frontend Stage and install the required packages in this service itself.
     depends_on:

@@ -1,4 +1,4 @@
-# NOTE: This file is used within the Docker setup for local development.
+# TODO(#18260): This file is used within the Docker setup for local development.
 # Modify the `app_dev.yaml` file when we permanently switch to Docker.
 runtime: custom
 instance_class: F2
