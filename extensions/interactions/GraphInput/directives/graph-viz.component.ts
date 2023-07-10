@@ -292,6 +292,8 @@ export class GraphVizComponent implements OnInit, AfterViewInit {
       this.vizContainer[0].getScreenCTM().inverse());
     this.state.mouseX = svgp.x;
     this.state.mouseY = svgp.y;
+    // currentMode === 2 signifies that the the "add node" option in the graph is active, 
+    // that is when we show the oppia-add-node-cursor
     if (this.state.currentMode === 2) {
       const dot = document.querySelector(
         '.oppia-add-node-cursor') as HTMLDivElement;
