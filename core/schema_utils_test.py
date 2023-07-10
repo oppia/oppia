@@ -21,9 +21,7 @@ from __future__ import annotations
 import inspect
 import re
 
-from core import feconf
 from core import schema_utils
-from core.domain import email_manager
 from core.tests import test_utils
 
 from typing import Any, Dict, List, Tuple
