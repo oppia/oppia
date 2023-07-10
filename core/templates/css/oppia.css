@@ -1273,7 +1273,6 @@ span.sort-explorations-select .sort-order {
   width: 200px;
 }
 .oppia-dashboard-intro-button:hover,
-.oppia-dashboard-intro-button:focus,
 .oppia-dashboard-intro-button:active {
   background-color: rgba(5, 190, 178, 1);
   color: #fff;
@@ -2434,7 +2433,7 @@ div#ng-curtain {
   /* This is larger than the editor tutorial's z-index, but smaller than
      the z-index for Bootstrap modals.
   */
-  z-index: 1005;
+  z-index: 1015;
 }
 
 .oppia-top-of-page-padding {
