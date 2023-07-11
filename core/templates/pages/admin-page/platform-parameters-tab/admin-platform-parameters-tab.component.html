@@ -15,7 +15,7 @@
   <div class="row oppia-parameter-top-margin">
     <div class="col-2"><b>Default:</b></div>
     <div *ngIf="platformParameter.rules.length === 0" class="col-10">
-      <schema-based-editor [schema]="getPlatformParamSchema(platformParameter.dataType)" [(ngModel)]="platformParameter.defaultValue">
+      <schema-based-editor [schema]="getPlatformParamSchema(platformParameter.dataType, platformParameter.name)" [(ngModel)]="platformParameter.defaultValue">
       </schema-based-editor>
     </div>
     <div *ngIf="platformParameter.rules.length !== 0" class="col-10">{{platformParameter.defaultValue}}</div>
@@ -46,7 +46,7 @@
             <div class="row">
               <div class="col-2"><b>If Matched:</b></div>
               <div class="col-10">
-                <schema-based-editor [schema]="getPlatformParamSchema(platformParameter.dataType)" [(ngModel)]="rule.valueWhenMatched">
+                <schema-based-editor [schema]="getPlatformParamSchema(platformParameter.dataType, platformParameter.name)" [(ngModel)]="rule.valueWhenMatched">
                 </schema-based-editor>
               </div>
             </div>
