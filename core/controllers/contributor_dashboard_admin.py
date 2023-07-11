@@ -651,6 +651,11 @@ class ContributorDashboardAdminStatsHandler(
 
         if contribution_type == feconf.CONTRIBUTION_TYPE_TRANSLATION:
             if contribution_subtype == feconf.CONTRIBUTION_SUBTYPE_SUBMISSION:
+                # Asserting here because even though we are validating through
+                # schema mypy is assuming is can be None.
+                assert page_size is not None
+                assert offset is not None
+                assert language_code is not None
                 translation_submitter_stats, next_offset, more = (
                     contribution_stats_services
                     .get_translation_submitter_total_stats(
@@ -670,6 +675,11 @@ class ContributorDashboardAdminStatsHandler(
                 }
 
             else:
+                # Asserting here because even though we are validating through
+                # schema mypy is assuming is can be None.
+                assert page_size is not None
+                assert offset is not None
+                assert language_code is not None
                 translation_reviewer_stats, next_offset, more = (
                     contribution_stats_services
                     .get_translation_reviewer_total_stats(
@@ -689,6 +699,10 @@ class ContributorDashboardAdminStatsHandler(
 
         else:
             if contribution_subtype == feconf.CONTRIBUTION_SUBTYPE_SUBMISSION:
+                # Asserting here because even though we are validating through
+                # schema mypy is assuming is can be None.
+                assert page_size is not None
+                assert offset is not None
                 question_submitter_stats, next_offset, more = (
                     contribution_stats_services
                     .get_question_submitter_total_stats(
@@ -707,6 +721,10 @@ class ContributorDashboardAdminStatsHandler(
                 }
 
             else:
+                # Asserting here because even though we are validating through
+                # schema mypy is assuming is can be None.
+                assert page_size is not None
+                assert offset is not None
                 question_reviewer_stats, next_offset, more = (
                     contribution_stats_services
                     .get_question_reviewer_total_stats(
