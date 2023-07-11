@@ -113,7 +113,10 @@ class GenerateContributionStatsJobTests(job_test_utils.JobTestBase):
         opportunity_model.put()
 
         self.assert_job_output_is([
-            job_run_result.JobRunResult(stdout='SUCCESS: 1')
+            job_run_result.JobRunResult(
+                stdout='TOTAL PROCESSED TRANSLATION CONTRIBUTION STATS'
+                ' COUNT SUCCESS: 1'
+            )
         ])
 
         translation_stats_model = (
@@ -230,7 +233,10 @@ class GenerateContributionStatsJobTests(job_test_utils.JobTestBase):
         opportunity_model.put()
 
         self.assert_job_output_is([
-            job_run_result.JobRunResult(stdout='SUCCESS: 1')
+            job_run_result.JobRunResult(
+                stdout='TOTAL PROCESSED TRANSLATION CONTRIBUTION STATS'
+                ' COUNT SUCCESS: 1'
+            )
         ])
 
         translation_stats_model = (
@@ -302,7 +308,10 @@ class GenerateContributionStatsJobTests(job_test_utils.JobTestBase):
         opportunity_model.put()
 
         self.assert_job_output_is([
-            job_run_result.JobRunResult(stdout='SUCCESS: 1')
+            job_run_result.JobRunResult(
+                stdout='TOTAL PROCESSED TRANSLATION CONTRIBUTION STATS'
+                ' COUNT SUCCESS: 1'
+            )
         ])
 
         translation_stats_model = (
@@ -374,7 +383,10 @@ class GenerateContributionStatsJobTests(job_test_utils.JobTestBase):
         opportunity_model.put()
 
         self.assert_job_output_is([
-            job_run_result.JobRunResult(stdout='SUCCESS: 1')
+            job_run_result.JobRunResult(
+                stdout='TOTAL PROCESSED TRANSLATION CONTRIBUTION STATS'
+                ' COUNT SUCCESS: 1'
+            )
         ])
 
         translation_stats_model = (
@@ -447,8 +459,14 @@ class GenerateContributionStatsJobTests(job_test_utils.JobTestBase):
         opportunity_model.put()
 
         self.assert_job_output_is([
-            job_run_result.JobRunResult(stdout='SUCCESS: 1'),
-            job_run_result.JobRunResult(stdout='SUCCESS: 1')
+            job_run_result.JobRunResult(
+                stdout='TOTAL PROCESSED TRANSLATION CONTRIBUTION STATS'
+                ' COUNT SUCCESS: 1'
+            ),
+            job_run_result.JobRunResult(
+                stdout='TOTAL PROCESSED TRANSLATION REVIEW STATS'
+                ' COUNT SUCCESS: 1'
+            )
         ])
 
         translation_stats_model = (
@@ -617,8 +635,14 @@ class GenerateContributionStatsJobTests(job_test_utils.JobTestBase):
         second_suggestion_model.put()
 
         self.assert_job_output_is([
-            job_run_result.JobRunResult(stdout='SUCCESS: 1'),
-            job_run_result.JobRunResult(stdout='SUCCESS: 1')
+            job_run_result.JobRunResult(
+                stdout='TOTAL PROCESSED TRANSLATION CONTRIBUTION STATS'
+                ' COUNT SUCCESS: 1'
+            ),
+            job_run_result.JobRunResult(
+                stdout='TOTAL PROCESSED TRANSLATION REVIEW STATS'
+                ' COUNT SUCCESS: 1'
+            )
         ])
 
         translation_stats_model = (
@@ -749,8 +773,14 @@ class GenerateContributionStatsJobTests(job_test_utils.JobTestBase):
         second_suggestion_model.put()
 
         self.assert_job_output_is([
-            job_run_result.JobRunResult(stdout='SUCCESS: 2'),
-            job_run_result.JobRunResult(stdout='SUCCESS: 1')
+            job_run_result.JobRunResult(
+                stdout='TOTAL PROCESSED TRANSLATION CONTRIBUTION STATS'
+                ' COUNT SUCCESS: 2'
+            ),
+            job_run_result.JobRunResult(
+                stdout='TOTAL PROCESSED TRANSLATION REVIEW STATS'
+                ' COUNT SUCCESS: 1'
+            )
         ])
 
         first_translation_stats_model = (
@@ -1030,8 +1060,14 @@ class GenerateContributionStatsJobTests(job_test_utils.JobTestBase):
         topic_id = self._create_question()
 
         self.assert_job_output_is([
-            job_run_result.JobRunResult(stdout='SUCCESS: 1'),
-            job_run_result.JobRunResult(stdout='SUCCESS: 1')
+            job_run_result.JobRunResult(
+                stdout='TOTAL PROCESSED QUESTION CONTRIBUTION STATS'
+                ' COUNT SUCCESS: 1'
+            ),
+            job_run_result.JobRunResult(
+                stdout='TOTAL PROCESSED QUESTION REVIEW STATS'
+                ' COUNT SUCCESS: 1'
+            )
         ])
 
         question_stats_models = (
@@ -1158,7 +1194,10 @@ class GenerateContributionStatsJobTests(job_test_utils.JobTestBase):
             suggestion_1_model, suggestion_2_model])
 
         self.assert_job_output_is([
-            job_run_result.JobRunResult(stdout='SUCCESS: 1')
+            job_run_result.JobRunResult(
+                stdout='TOTAL PROCESSED TRANSLATION CONTRIBUTION STATS'
+                ' COUNT SUCCESS: 1'
+            )
         ])
 
         translation_stats_model = (
@@ -1258,7 +1297,10 @@ class AuditGenerateContributionStatsJobTests(job_test_utils.JobTestBase):
         opportunity_model.put()
 
         self.assert_job_output_is([
-            job_run_result.JobRunResult(stdout='SUCCESS: 1')
+            job_run_result.JobRunResult(
+                stdout='TOTAL PROCESSED TRANSLATION CONTRIBUTION STATS'
+                ' COUNT SUCCESS: 1'
+            )
         ])
 
         translation_stats_model = (
@@ -1351,7 +1393,10 @@ class AuditGenerateContributionStatsJobTests(job_test_utils.JobTestBase):
         opportunity_model.put()
 
         self.assert_job_output_is([
-            job_run_result.JobRunResult(stdout='SUCCESS: 1')
+            job_run_result.JobRunResult(
+                stdout='TOTAL PROCESSED TRANSLATION CONTRIBUTION STATS'
+                ' COUNT SUCCESS: 1'
+            )
         ])
 
         translation_stats_model = (
@@ -1399,7 +1444,10 @@ class AuditGenerateContributionStatsJobTests(job_test_utils.JobTestBase):
         opportunity_model.put()
 
         self.assert_job_output_is([
-            job_run_result.JobRunResult(stdout='SUCCESS: 1')
+            job_run_result.JobRunResult(
+                stdout='TOTAL PROCESSED TRANSLATION CONTRIBUTION STATS'
+                ' COUNT SUCCESS: 1'
+            )
         ])
 
         translation_stats_model = (
@@ -1447,7 +1495,10 @@ class AuditGenerateContributionStatsJobTests(job_test_utils.JobTestBase):
         opportunity_model.put()
 
         self.assert_job_output_is([
-            job_run_result.JobRunResult(stdout='SUCCESS: 1')
+            job_run_result.JobRunResult(
+                stdout='TOTAL PROCESSED TRANSLATION CONTRIBUTION STATS'
+                ' COUNT SUCCESS: 1'
+            )
         ])
 
         translation_stats_model = (
@@ -1496,8 +1547,14 @@ class AuditGenerateContributionStatsJobTests(job_test_utils.JobTestBase):
         opportunity_model.put()
 
         self.assert_job_output_is([
-            job_run_result.JobRunResult(stdout='SUCCESS: 1'),
-            job_run_result.JobRunResult(stdout='SUCCESS: 1')
+            job_run_result.JobRunResult(
+                stdout='TOTAL PROCESSED TRANSLATION CONTRIBUTION STATS'
+                ' COUNT SUCCESS: 1'
+            ),
+            job_run_result.JobRunResult(
+                stdout='TOTAL PROCESSED TRANSLATION REVIEW STATS'
+                ' COUNT SUCCESS: 1'
+            )
         ])
 
         translation_stats_model = (
@@ -1613,8 +1670,14 @@ class AuditGenerateContributionStatsJobTests(job_test_utils.JobTestBase):
         second_suggestion_model.put()
 
         self.assert_job_output_is([
-            job_run_result.JobRunResult(stdout='SUCCESS: 1'),
-            job_run_result.JobRunResult(stdout='SUCCESS: 1')
+            job_run_result.JobRunResult(
+                stdout='TOTAL PROCESSED TRANSLATION CONTRIBUTION STATS'
+                ' COUNT SUCCESS: 1'
+            ),
+            job_run_result.JobRunResult(
+                stdout='TOTAL PROCESSED TRANSLATION REVIEW STATS'
+                ' COUNT SUCCESS: 1'
+            )
         ])
 
         translation_stats_model = (
@@ -1691,8 +1754,14 @@ class AuditGenerateContributionStatsJobTests(job_test_utils.JobTestBase):
         second_suggestion_model.put()
 
         self.assert_job_output_is([
-            job_run_result.JobRunResult(stdout='SUCCESS: 2'),
-            job_run_result.JobRunResult(stdout='SUCCESS: 1')
+            job_run_result.JobRunResult(
+                stdout='TOTAL PROCESSED TRANSLATION CONTRIBUTION STATS'
+                ' COUNT SUCCESS: 2'
+            ),
+            job_run_result.JobRunResult(
+                stdout='TOTAL PROCESSED TRANSLATION REVIEW STATS'
+                ' COUNT SUCCESS: 1'
+            )
         ])
 
         first_translation_stats_model = (
@@ -1883,8 +1952,14 @@ class AuditGenerateContributionStatsJobTests(job_test_utils.JobTestBase):
         self._create_question()
 
         self.assert_job_output_is([
-            job_run_result.JobRunResult(stdout='SUCCESS: 1'),
-            job_run_result.JobRunResult(stdout='SUCCESS: 1')
+            job_run_result.JobRunResult(
+                stdout='TOTAL PROCESSED QUESTION CONTRIBUTION STATS'
+                ' COUNT SUCCESS: 1'
+            ),
+            job_run_result.JobRunResult(
+                stdout='TOTAL PROCESSED QUESTION REVIEW STATS'
+                ' COUNT SUCCESS: 1'
+            )
         ])
 
         question_stats_models = (
@@ -1961,7 +2036,10 @@ class AuditGenerateContributionStatsJobTests(job_test_utils.JobTestBase):
             suggestion_1_model, suggestion_2_model])
 
         self.assert_job_output_is([
-            job_run_result.JobRunResult(stdout='SUCCESS: 1')
+            job_run_result.JobRunResult(
+                stdout='TOTAL PROCESSED TRANSLATION CONTRIBUTION STATS'
+                ' COUNT SUCCESS: 1'
+            )
         ])
 
         translation_stats_model = (

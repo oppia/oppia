@@ -365,22 +365,30 @@ class GenerateContributionStatsJob(base_jobs.JobBase):
         user_stats_models_job_run_results = (
             user_contribution_stats_models
             | 'Create contribution job run result' >> (
-                job_result_transforms.CountObjectsToJobRunResult())
+                job_result_transforms.CountObjectsToJobRunResult(
+                    'TOTAL PROCESSED TRANSLATION CONTRIBUTION STATS COUNT'
+                ))
         )
         user_review_stats_models_job_run_results = (
             user_review_stats_models
             | 'Create review job run result' >> (
-                job_result_transforms.CountObjectsToJobRunResult())
+                job_result_transforms.CountObjectsToJobRunResult(
+                    'TOTAL PROCESSED TRANSLATION REVIEW STATS COUNT'
+                ))
         )
         user_question_contribution_stats_models_job_run_results = (
             user_question_contribution_stats_models
             | 'Create question contribution job run result' >> (
-                job_result_transforms.CountObjectsToJobRunResult())
+                job_result_transforms.CountObjectsToJobRunResult(
+                    'TOTAL PROCESSED QUESTION CONTRIBUTION STATS COUNT'
+                ))
         )
         user_question_review_stats_models_job_run_results = (
             user_question_review_stats_models
             | 'Create question review job run result' >> (
-                job_result_transforms.CountObjectsToJobRunResult())
+                job_result_transforms.CountObjectsToJobRunResult(
+                    'TOTAL PROCESSED QUESTION REVIEW STATS COUNT'
+                ))
         )
 
         return (
