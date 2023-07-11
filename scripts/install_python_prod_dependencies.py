@@ -538,8 +538,8 @@ def _pip_install_requirements(
     """
     verify_pip_is_installed()
     _run_pip_command([
-        'install', '--require-hashes', '--target', install_path,
-        '--no-dependencies', '--no-deps', '-r', requirements_path, '--upgrade'
+        'install', '--require-hashes', '--no-deps', '--target',
+        install_path, '--no-dependencies', '-r', requirements_path, '--upgrade'
     ])
 
 
