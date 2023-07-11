@@ -802,37 +802,6 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
         user_services.add_user_role(
             self.contributor_id, feconf.ROLE_ID_TRANSLATION_ADMIN)
 
-    def test_get_stats_with_invalid_contribution_type_raises_error(
-        self
-    ) -> None:
-        self.login(self.CONTRIBUTOR_EMAIL)
-        response = self.get_json(
-            '/contributor-dashboard-admin-stats/invalid/submission', {
-                'page_size': 2,
-                'offset': 1,
-                'language_code': self.SUGGESTION_LANGUAGE_CODE,
-                'sort_by': None,
-                'topic_ids': []
-            }, expected_status_int=500)
-
-        self.logout()
-
-    def test_get_stats_with_invalid_sub_contribution_type_raises_error(
-        self
-    ) -> None:
-        self.login(self.CONTRIBUTOR_EMAIL)
-        response = self.get_json(
-            '/contributor-dashboard-admin-stats/translation/invalid', {
-                'page_size': 2,
-                'offset': 1,
-                'language_code': self.SUGGESTION_LANGUAGE_CODE,
-                'sort_by': None,
-                'topic_ids': []
-            }, expected_status_int=500)
-
-        self.logout()
-
-    def test_get_translation_submitter_stats(self) -> None:
         suggestion_models.TranslationSubmitterTotalContributionStatsModel(
             id='model_1',
             language_code=self.SUGGESTION_LANGUAGE_CODE,
@@ -933,125 +902,6 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
                 datetime.date.today() - datetime.timedelta(125))
         ).put()
 
-        self.login(self.CONTRIBUTOR_EMAIL)
-
-        # Test with language filter and pagination.
-        response = self.get_json(
-            '/contributor-dashboard-admin-stats/translation/submission', {
-                'page_size': 2,
-                'offset': 1,
-                'language_code': self.SUGGESTION_LANGUAGE_CODE,
-                'topic_ids': []
-            })
-
-        self.assertEqual(
-            len(response['frontend_dicts']),
-            2
-        )
-        self.assertEqual(
-            response['frontend_dicts'][0]['contributor_id'],
-            'user3'
-        )
-        self.assertEqual(
-            response['next_offset'],
-            3
-        )
-        self.assertEqual(
-            response['more'],
-            True
-        )
-
-        # Test with sorting and pagination.
-        response = self.get_json(
-            '/contributor-dashboard-admin-stats/translation/submission', {
-                'page_size': 2,
-                'offset': 1,
-                'language_code': self.SUGGESTION_LANGUAGE_CODE,
-                'sort_by': 'IncreasingLastActivity',
-                'topic_ids': []
-            })
-
-        self.assertEqual(
-            len(response['frontend_dicts']),
-            2
-        )
-        self.assertEqual(
-            response['frontend_dicts'][0]['contributor_id'],
-            'user2'
-        )
-        self.assertEqual(
-            response['next_offset'],
-            3
-        )
-        self.assertEqual(
-            response['more'],
-            True
-        )
-
-        # Test with topic filter and pagination.
-        response = self.get_json(
-            '/contributor-dashboard-admin-stats/translation/submission', {
-                'page_size': 2,
-                'offset': 1,
-                'language_code': self.SUGGESTION_LANGUAGE_CODE,
-                'topic_ids': json.dumps(['topic1', 'topic2'])
-            })
-
-        self.assertEqual(
-            len(response['frontend_dicts']),
-            2
-        )
-        self.assertEqual(
-            response['frontend_dicts'][0]['contributor_id'],
-            'user3'
-        )
-        self.assertEqual(
-            response['frontend_dicts'][0]['last_contributed_in_days'],
-            95
-        )
-        self.assertEqual(
-            response['next_offset'],
-            3
-        )
-        self.assertEqual(
-            response['more'],
-            False
-        )
-
-        # Test with num_days_since_last_activity filter and pagination.
-        response = self.get_json(
-            '/contributor-dashboard-admin-stats/translation/submission', {
-                'page_size': 4,
-                'offset': 1,
-                'language_code': self.SUGGESTION_LANGUAGE_CODE,
-                'num_days_since_last_activity': 120,
-                'topic_ids': []
-            })
-
-        self.assertEqual(
-            len(response['frontend_dicts']),
-            3
-        )
-        self.assertEqual(
-            response['frontend_dicts'][0]['contributor_id'],
-            'user3'
-        )
-        self.assertEqual(
-            response['frontend_dicts'][1]['contributor_id'],
-            'user2'
-        )
-        self.assertEqual(
-            response['next_offset'],
-            4
-        )
-        self.assertEqual(
-            response['more'],
-            False
-        )
-
-        self.logout()
-
-    def test_get_translation_reviewer_stats(self) -> None:
         suggestion_models.TranslationReviewerTotalContributionStatsModel(
             id='model_1',
             language_code=self.SUGGESTION_LANGUAGE_CODE,
@@ -1125,95 +975,6 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
                 datetime.date.today() - datetime.timedelta(125))
         ).put()
 
-        self.login(self.CONTRIBUTOR_EMAIL)
-
-        # Test with language filter and pagination.
-        response = self.get_json(
-            '/contributor-dashboard-admin-stats/translation/review', {
-                'page_size': 2,
-                'offset': 1,
-                'language_code': self.SUGGESTION_LANGUAGE_CODE,
-                'topic_ids': []
-            })
-
-        self.assertEqual(
-            len(response['frontend_dicts']),
-            2
-        )
-        self.assertEqual(
-            response['frontend_dicts'][0]['contributor_id'],
-            'user3'
-        )
-        self.assertEqual(
-            response['next_offset'],
-            3
-        )
-        self.assertEqual(
-            response['more'],
-            True
-        )
-
-        # Test with sorting and pagination.
-        response = self.get_json(
-            '/contributor-dashboard-admin-stats/translation/review', {
-                'page_size': 2,
-                'offset': 1,
-                'language_code': self.SUGGESTION_LANGUAGE_CODE,
-                'sort_by': 'IncreasingLastActivity',
-                'topic_ids': []
-            })
-
-        self.assertEqual(
-            len(response['frontend_dicts']),
-            2
-        )
-        self.assertEqual(
-            response['frontend_dicts'][0]['contributor_id'],
-            'user2'
-        )
-        self.assertEqual(
-            response['next_offset'],
-            3
-        )
-        self.assertEqual(
-            response['more'],
-            True
-        )
-
-        # Test with num_days_since_last_activity filter and pagination.
-        response = self.get_json(
-            '/contributor-dashboard-admin-stats/translation/review', {
-                'page_size': 4,
-                'offset': 1,
-                'language_code': self.SUGGESTION_LANGUAGE_CODE,
-                'num_days_since_last_activity': 120,
-                'topic_ids': []
-            })
-
-        self.assertEqual(
-            len(response['frontend_dicts']),
-            3
-        )
-        self.assertEqual(
-            response['frontend_dicts'][0]['contributor_id'],
-            'user3'
-        )
-        self.assertEqual(
-            response['frontend_dicts'][1]['contributor_id'],
-            'user2'
-        )
-        self.assertEqual(
-            response['next_offset'],
-            4
-        )
-        self.assertEqual(
-            response['more'],
-            False
-        )
-
-        self.logout()
-
-    def test_get_question_submitter_stats(self) -> None:
         suggestion_models.QuestionSubmitterTotalContributionStatsModel(
             id='model_1',
             contributor_id='user1',
@@ -1287,125 +1048,6 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
                 datetime.date.today() - datetime.timedelta(125))
         ).put()
 
-        self.login(self.CONTRIBUTOR_EMAIL)
-
-        # Test pagination.
-        response = self.get_json(
-            '/contributor-dashboard-admin-stats/question/submission', {
-                'page_size': 2,
-                'offset': 1,
-                'language_code': None,
-                'topic_ids': []
-            })
-
-        self.assertEqual(
-            len(response['frontend_dicts']),
-            2
-        )
-        self.assertEqual(
-            response['frontend_dicts'][0]['contributor_id'],
-            'user3'
-        )
-        self.assertEqual(
-            response['next_offset'],
-            3
-        )
-        self.assertEqual(
-            response['more'],
-            True
-        )
-
-        # Test with sorting and pagination.
-        response = self.get_json(
-            '/contributor-dashboard-admin-stats/question/submission', {
-                'page_size': 2,
-                'offset': 1,
-                'language_code': None,
-                'sort_by': 'IncreasingLastActivity',
-                'topic_ids': []
-            })
-
-        self.assertEqual(
-            len(response['frontend_dicts']),
-            2
-        )
-        self.assertEqual(
-            response['frontend_dicts'][0]['contributor_id'],
-            'user2'
-        )
-        self.assertEqual(
-            response['next_offset'],
-            3
-        )
-        self.assertEqual(
-            response['more'],
-            True
-        )
-
-        # Test with topic filter and pagination.
-        response = self.get_json(
-            '/contributor-dashboard-admin-stats/question/submission', {
-                'page_size': 2,
-                'offset': 1,
-                'language_code': None,
-                'topic_ids': json.dumps(['topic1', 'topic2'])
-            })
-
-        self.assertEqual(
-            len(response['frontend_dicts']),
-            2
-        )
-        self.assertEqual(
-            response['frontend_dicts'][0]['contributor_id'],
-            'user3'
-        )
-        self.assertEqual(
-            response['frontend_dicts'][0]['last_contributed_in_days'],
-            95
-        )
-        self.assertEqual(
-            response['next_offset'],
-            3
-        )
-        self.assertEqual(
-            response['more'],
-            False
-        )
-
-        # Test with num_days_since_last_activity filter and pagination.
-        response = self.get_json(
-            '/contributor-dashboard-admin-stats/question/submission', {
-                'page_size': 4,
-                'offset': 1,
-                'language_code': None,
-                'num_days_since_last_activity': 120,
-                'topic_ids': []
-            })
-
-        self.assertEqual(
-            len(response['frontend_dicts']),
-            3
-        )
-        self.assertEqual(
-            response['frontend_dicts'][0]['contributor_id'],
-            'user3'
-        )
-        self.assertEqual(
-            response['frontend_dicts'][1]['contributor_id'],
-            'user2'
-        )
-        self.assertEqual(
-            response['next_offset'],
-            4
-        )
-        self.assertEqual(
-            response['more'],
-            False
-        )
-
-        self.logout()
-
-    def test_get_question_reviewer_stats(self) -> None:
         suggestion_models.QuestionReviewerTotalContributionStatsModel(
             id='model_1',
             contributor_id='user1',
@@ -1467,6 +1109,405 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
                 datetime.date.today() - datetime.timedelta(125))
         ).put()
 
+    def test_get_stats_with_invalid_contribution_type_raises_error(
+        self
+    ) -> None:
+        self.login(self.CONTRIBUTOR_EMAIL)
+        response = self.get_json(
+            '/contributor-dashboard-admin-stats/invalid/submission', {
+                'page_size': 2,
+                'offset': 1,
+                'language_code': self.SUGGESTION_LANGUAGE_CODE,
+                'sort_by': None,
+                'topic_ids': []
+            }, expected_status_int=500)
+
+        self.logout()
+
+    def test_get_stats_with_invalid_sub_contribution_type_raises_error(
+        self
+    ) -> None:
+        self.login(self.CONTRIBUTOR_EMAIL)
+        response = self.get_json(
+            '/contributor-dashboard-admin-stats/translation/invalid', {
+                'page_size': 2,
+                'offset': 1,
+                'language_code': self.SUGGESTION_LANGUAGE_CODE,
+                'sort_by': None,
+                'topic_ids': []
+            }, expected_status_int=500)
+
+        self.logout()
+
+    def test_get_translation_submitter_stats_for_pagination(self) -> None:
+
+        self.login(self.CONTRIBUTOR_EMAIL)
+
+        # Test with language filter and pagination.
+        response = self.get_json(
+            '/contributor-dashboard-admin-stats/translation/submission', {
+                'page_size': 2,
+                'offset': 1,
+                'language_code': self.SUGGESTION_LANGUAGE_CODE,
+                'topic_ids': []
+            })
+
+        self.assertEqual(
+            len(response['frontend_dicts']),
+            2
+        )
+        self.assertEqual(
+            response['frontend_dicts'][0]['contributor_id'],
+            'user3'
+        )
+        self.assertEqual(
+            response['next_offset'],
+            3
+        )
+        self.assertEqual(
+            response['more'],
+            True
+        )
+        self.logout()
+
+    def test_get_translation_submitter_stats_for_sorting(self) -> None:
+
+        self.login(self.CONTRIBUTOR_EMAIL)
+
+        # Test with sorting and pagination.
+        response = self.get_json(
+            '/contributor-dashboard-admin-stats/translation/submission', {
+                'page_size': 2,
+                'offset': 1,
+                'language_code': self.SUGGESTION_LANGUAGE_CODE,
+                'sort_by': 'IncreasingLastActivity',
+                'topic_ids': []
+            })
+
+        self.assertEqual(
+            len(response['frontend_dicts']),
+            2
+        )
+        self.assertEqual(
+            response['frontend_dicts'][0]['contributor_id'],
+            'user2'
+        )
+        self.assertEqual(
+            response['next_offset'],
+            3
+        )
+        self.assertEqual(
+            response['more'],
+            True
+        )
+        self.logout()
+
+    def test_get_translation_submitter_stats_for_topic_filter(self) -> None:
+
+        self.login(self.CONTRIBUTOR_EMAIL)
+
+        # Test with topic filter and pagination.
+        response = self.get_json(
+            '/contributor-dashboard-admin-stats/translation/submission', {
+                'page_size': 2,
+                'offset': 1,
+                'language_code': self.SUGGESTION_LANGUAGE_CODE,
+                'topic_ids': json.dumps(['topic1', 'topic2'])
+            })
+
+        self.assertEqual(
+            len(response['frontend_dicts']),
+            2
+        )
+        self.assertEqual(
+            response['frontend_dicts'][0]['contributor_id'],
+            'user3'
+        )
+        self.assertEqual(
+            response['frontend_dicts'][0]['last_contributed_in_days'],
+            95
+        )
+        self.assertEqual(
+            response['next_offset'],
+            3
+        )
+        self.assertEqual(
+            response['more'],
+            False
+        )
+        self.logout()
+
+    def test_get_translation_submitter_stats_for_last_activity_filter(self)->None:
+
+        self.login(self.CONTRIBUTOR_EMAIL)
+
+        # Test with num_days_since_last_activity filter and pagination.
+        response = self.get_json(
+            '/contributor-dashboard-admin-stats/translation/submission', {
+                'page_size': 4,
+                'offset': 1,
+                'language_code': self.SUGGESTION_LANGUAGE_CODE,
+                'num_days_since_last_activity': 120,
+                'topic_ids': []
+            })
+
+        self.assertEqual(
+            len(response['frontend_dicts']),
+            3
+        )
+        self.assertEqual(
+            response['frontend_dicts'][0]['contributor_id'],
+            'user3'
+        )
+        self.assertEqual(
+            response['frontend_dicts'][1]['contributor_id'],
+            'user2'
+        )
+        self.assertEqual(
+            response['next_offset'],
+            4
+        )
+        self.assertEqual(
+            response['more'],
+            False
+        )
+        self.logout()
+
+    def test_get_translation_reviewer_stats_for_pagination(self) -> None:
+
+        self.login(self.CONTRIBUTOR_EMAIL)
+
+        # Test with language filter and pagination.
+        response = self.get_json(
+            '/contributor-dashboard-admin-stats/translation/review', {
+                'page_size': 2,
+                'offset': 1,
+                'language_code': self.SUGGESTION_LANGUAGE_CODE,
+                'topic_ids': []
+            })
+
+        self.assertEqual(
+            len(response['frontend_dicts']),
+            2
+        )
+        self.assertEqual(
+            response['frontend_dicts'][0]['contributor_id'],
+            'user3'
+        )
+        self.assertEqual(
+            response['next_offset'],
+            3
+        )
+        self.assertEqual(
+            response['more'],
+            True
+        )
+        self.logout()
+
+    def test_get_translation_reviewer_stats_for_sorting(self) -> None:
+
+        self.login(self.CONTRIBUTOR_EMAIL)
+
+        # Test with sorting and pagination.
+        response = self.get_json(
+            '/contributor-dashboard-admin-stats/translation/review', {
+                'page_size': 2,
+                'offset': 1,
+                'language_code': self.SUGGESTION_LANGUAGE_CODE,
+                'sort_by': 'IncreasingLastActivity',
+                'topic_ids': []
+            })
+
+        self.assertEqual(
+            len(response['frontend_dicts']),
+            2
+        )
+        self.assertEqual(
+            response['frontend_dicts'][0]['contributor_id'],
+            'user2'
+        )
+        self.assertEqual(
+            response['next_offset'],
+            3
+        )
+        self.assertEqual(
+            response['more'],
+            True
+        )
+        self.logout()
+
+    def test_get_translation_reviewer_stats_for_last_activity_filter(self) -> None:
+
+        self.login(self.CONTRIBUTOR_EMAIL)
+
+        # Test with num_days_since_last_activity filter and pagination.
+        response = self.get_json(
+            '/contributor-dashboard-admin-stats/translation/review', {
+                'page_size': 4,
+                'offset': 1,
+                'language_code': self.SUGGESTION_LANGUAGE_CODE,
+                'num_days_since_last_activity': 120,
+                'topic_ids': []
+            })
+
+        self.assertEqual(
+            len(response['frontend_dicts']),
+            3
+        )
+        self.assertEqual(
+            response['frontend_dicts'][0]['contributor_id'],
+            'user3'
+        )
+        self.assertEqual(
+            response['frontend_dicts'][1]['contributor_id'],
+            'user2'
+        )
+        self.assertEqual(
+            response['next_offset'],
+            4
+        )
+        self.assertEqual(
+            response['more'],
+            False
+        )
+        self.logout()
+
+    def test_get_question_submitter_stats_for_pagination(self) -> None:
+
+        self.login(self.CONTRIBUTOR_EMAIL)
+
+        # Test pagination.
+        response = self.get_json(
+            '/contributor-dashboard-admin-stats/question/submission', {
+                'page_size': 2,
+                'offset': 1,
+                'language_code': None,
+                'topic_ids': []
+            })
+
+        self.assertEqual(
+            len(response['frontend_dicts']),
+            2
+        )
+        self.assertEqual(
+            response['frontend_dicts'][0]['contributor_id'],
+            'user3'
+        )
+        self.assertEqual(
+            response['next_offset'],
+            3
+        )
+        self.assertEqual(
+            response['more'],
+            True
+        )
+        self.logout()
+
+    def test_get_question_submitter_stats_for_sorting(self) -> None:
+
+        self.login(self.CONTRIBUTOR_EMAIL)
+
+        # Test with sorting and pagination.
+        response = self.get_json(
+            '/contributor-dashboard-admin-stats/question/submission', {
+                'page_size': 2,
+                'offset': 1,
+                'language_code': None,
+                'sort_by': 'IncreasingLastActivity',
+                'topic_ids': []
+            })
+
+        self.assertEqual(
+            len(response['frontend_dicts']),
+            2
+        )
+        self.assertEqual(
+            response['frontend_dicts'][0]['contributor_id'],
+            'user2'
+        )
+        self.assertEqual(
+            response['next_offset'],
+            3
+        )
+        self.assertEqual(
+            response['more'],
+            True
+        )
+        self.logout()
+
+    def test_get_question_submitter_stats_for_topic_filter(self) -> None:
+
+        self.login(self.CONTRIBUTOR_EMAIL)
+
+        # Test with topic filter and pagination.
+        response = self.get_json(
+            '/contributor-dashboard-admin-stats/question/submission', {
+                'page_size': 2,
+                'offset': 1,
+                'language_code': None,
+                'topic_ids': json.dumps(['topic1', 'topic2'])
+            })
+
+        self.assertEqual(
+            len(response['frontend_dicts']),
+            2
+        )
+        self.assertEqual(
+            response['frontend_dicts'][0]['contributor_id'],
+            'user3'
+        )
+        self.assertEqual(
+            response['frontend_dicts'][0]['last_contributed_in_days'],
+            95
+        )
+        self.assertEqual(
+            response['next_offset'],
+            3
+        )
+        self.assertEqual(
+            response['more'],
+            False
+        )
+        self.logout()
+
+    def test_get_question_submitter_stats_for_last_activity_filter(self) -> None:
+
+        self.login(self.CONTRIBUTOR_EMAIL)
+
+        # Test with num_days_since_last_activity filter and pagination.
+        response = self.get_json(
+            '/contributor-dashboard-admin-stats/question/submission', {
+                'page_size': 4,
+                'offset': 1,
+                'language_code': None,
+                'num_days_since_last_activity': 120,
+                'topic_ids': []
+            })
+
+        self.assertEqual(
+            len(response['frontend_dicts']),
+            3
+        )
+        self.assertEqual(
+            response['frontend_dicts'][0]['contributor_id'],
+            'user3'
+        )
+        self.assertEqual(
+            response['frontend_dicts'][1]['contributor_id'],
+            'user2'
+        )
+        self.assertEqual(
+            response['next_offset'],
+            4
+        )
+        self.assertEqual(
+            response['more'],
+            False
+        )
+        self.logout()
+
+    def test_get_question_reviewer_stats_for_pagination(self) -> None:
+
         self.login(self.CONTRIBUTOR_EMAIL)
 
         # Test pagination.
@@ -1494,6 +1535,11 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
             response['more'],
             True
         )
+        self.logout()
+
+    def test_get_question_reviewer_stats_for_sorting(self) -> None:
+
+        self.login(self.CONTRIBUTOR_EMAIL)
 
         # Test with sorting and pagination.
         response = self.get_json(
@@ -1521,6 +1567,11 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
             response['more'],
             True
         )
+        self.logout()
+
+    def test_get_question_reviewer_stats_for_last_activity_filter(self) -> None:
+
+        self.login(self.CONTRIBUTOR_EMAIL)
 
         # Test with num_days_since_last_activity filter and pagination.
         response = self.get_json(
@@ -1552,5 +1603,4 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
             response['more'],
             False
         )
-
         self.logout()
