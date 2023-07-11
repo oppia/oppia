@@ -599,9 +599,6 @@ export class ContributionsAndReview
       }
     ];
 
-    this.translationTopicService.setActiveTopicName(
-      ContributorDashboardConstants.DEFAULT_OPPORTUNITY_TOPIC_NAME);
-
     // Reset active exploration when changing topics.
     this.directiveSubscriptions.add(
       this.translationTopicService.onActiveTopicChanged.subscribe(
