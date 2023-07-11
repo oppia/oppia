@@ -56,8 +56,11 @@ COPY /extensions/classifiers/proto/ ./extensions/classifiers/proto/
 
 # Installing third party dependencies
 COPY scripts ./scripts
-COPY /core ./core
-COPY /assets ./assets
+COPY /core/utils.py ./core/utils.py
+COPY /core/feconf.py ./core/feconf.py
+COPY /core/constants.py ./core/constants.py
+COPY /assets/constants.ts ./assets/constants.ts
+COPY /assets/release_constants.json ./assets/release_constants.json
 COPY dependencies.json .
 
 # Installation for proto buf requires the third party dependencies to be installed (oppia-ml-proto)
