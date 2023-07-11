@@ -1069,8 +1069,9 @@ webob==1.8.7 \
 
 # The following packages are considered to be unsafe in a requirements file:
 setuptools==58.5.3 \
-    --hash=sha256:11e52c67415a381d10d6b462ced9cfb97066179f0e871399e006c4ab101fc85f \
-    --hash=sha256:baf1fdb41c6da4cd2eae722e135500da913332ab3f2f5c7d33af9b492acb5235
+    --hash=sha256:a481fbc56b33f5d8f6b33dce41482e64c68b668be44ff42922903b03872590bf \
+    --hash=sha256:dae6b934a965c8a59d6d230d3867ec408bb95e73bd538ff77e71fedf1eaca729
     # via
+    #   -r requirements.in
     #   google-auth
     #   gunicorn
