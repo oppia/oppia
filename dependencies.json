@@ -285,13 +285,6 @@
           "js": ["ui-bootstrap-tpls-2.5.0.js"]
         }
       },
-      "skulpt-dist": {
-        "version": "1.1.0",
-        "downloadFormat": "zip",
-        "url": "https://github.com/skulpt/skulpt-dist/archive/1.1.0.zip",
-        "rootDirPrefix": "skulpt-dist-",
-        "targetDirPrefix": "skulpt-dist-"
-      },
       "uiCodemirror": {
         "version": "5d04fa5c991f915e4578be5f1175e22d94696633",
         "downloadFormat": "zip",
