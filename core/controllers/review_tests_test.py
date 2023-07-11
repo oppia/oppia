@@ -69,7 +69,12 @@ class BaseReviewTestsControllerTests(test_utils.GenericTestBase):
             'prerequisite_skill_ids': [],
             'outline': '',
             'outline_is_finalized': False,
-            'exploration_id': self.exp_id
+            'exploration_id': self.exp_id,
+            'status': 'Draft',
+            'planned_publication_date_msecs': 100,
+            'last_modified_msecs': 100,
+            'first_publication_date_msecs': None,
+            'unpublishing_reason': None
         }
 
         self.save_new_skill('skill_id_1', self.admin_id, description='Skill 1')
@@ -169,7 +174,12 @@ class ReviewTestsPageDataHandlerTests(BaseReviewTestsControllerTests):
             'prerequisite_skill_ids': [],
             'outline': '',
             'outline_is_finalized': False,
-            'exploration_id': self.exp_id
+            'exploration_id': self.exp_id,
+            'status': 'Draft',
+            'planned_publication_date_msecs': 100,
+            'last_modified_msecs': 100,
+            'first_publication_date_msecs': None,
+            'unpublishing_reason': None
         }
         story = story_domain.Story.create_default_story(
             self.story_id_3, 'Public Story Title', 'Description', self.topic_id,

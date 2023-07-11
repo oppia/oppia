@@ -411,6 +411,10 @@ export default {
     "story": ["#F8BF74", "#D68F78", "#8EBBB6", "#B3D8F1"]
   },
 
+  "ALLOWED_STORYNODE_STATUS": ["Draft", "Ready To Publish", "Published"],
+  "ALLOWED_STORYNODE_UNPUBLISHING_REASONS": ["BAD_CONTENT",
+    "CHAPTER_NEEDS_SPLITTING"],
+
   "ALLOWED_IMAGE_FORMATS": ["svg", "png", "jpeg", "jpg", "gif"],
   "MAX_ALLOWED_IMAGE_SIZE_IN_KB_FOR_BLOG": 1024,
 

@@ -379,7 +379,12 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             'prerequisite_skill_ids': ['skill_1'],
             'outline': '',
             'outline_is_finalized': False,
-            'exploration_id': None
+            'exploration_id': None,
+            'status': 'Draft',
+            'planned_publication_date_msecs': 100,
+            'last_modified_msecs': 100,
+            'first_publication_date_msecs': None,
+            'unpublishing_reason': None
         }
         node_2: story_domain.StoryNodeDict = {
             'id': 'node_2',
@@ -394,7 +399,12 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             'prerequisite_skill_ids': ['skill_2'],
             'outline': '',
             'outline_is_finalized': False,
-            'exploration_id': None
+            'exploration_id': None,
+            'status': 'Draft',
+            'planned_publication_date_msecs': 100,
+            'last_modified_msecs': 100,
+            'first_publication_date_msecs': None,
+            'unpublishing_reason': None
         }
         node_3: story_domain.StoryNodeDict = {
             'id': 'node_3',
@@ -409,7 +419,12 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             'prerequisite_skill_ids': ['skill_4'],
             'outline': '',
             'outline_is_finalized': False,
-            'exploration_id': None
+            'exploration_id': None,
+            'status': 'Draft',
+            'planned_publication_date_msecs': 100,
+            'last_modified_msecs': 100,
+            'first_publication_date_msecs': None,
+            'unpublishing_reason': None
         }
         self.story.story_contents.initial_node_id = 'node_1'
         self.story.story_contents.nodes = [
@@ -441,7 +456,12 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             'prerequisite_skill_ids': ['skill_1'],
             'outline': '',
             'outline_is_finalized': False,
-            'exploration_id': None
+            'exploration_id': None,
+            'status': 'Draft',
+            'planned_publication_date_msecs': 100,
+            'last_modified_msecs': 100,
+            'first_publication_date_msecs': None,
+            'unpublishing_reason': None
         }
         node_2: story_domain.StoryNodeDict = {
             'id': 'node_2',
@@ -456,7 +476,12 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             'prerequisite_skill_ids': ['skill_2'],
             'outline': '',
             'outline_is_finalized': False,
-            'exploration_id': None
+            'exploration_id': None,
+            'status': 'Draft',
+            'planned_publication_date_msecs': 100,
+            'last_modified_msecs': 100,
+            'first_publication_date_msecs': None,
+            'unpublishing_reason': None
         }
         node_3: story_domain.StoryNodeDict = {
             'id': 'node_3',
@@ -471,7 +496,12 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             'prerequisite_skill_ids': ['skill_3'],
             'outline': '',
             'outline_is_finalized': False,
-            'exploration_id': None
+            'exploration_id': None,
+            'status': 'Draft',
+            'planned_publication_date_msecs': 100,
+            'last_modified_msecs': 100,
+            'first_publication_date_msecs': None,
+            'unpublishing_reason': None
         }
         self.story.story_contents.nodes = [
             story_domain.StoryNode.from_dict(node_1),
@@ -2058,7 +2088,12 @@ class StoryProgressUnitTests(test_utils.GenericTestBase):
             'prerequisite_skill_ids': [],
             'outline': '',
             'outline_is_finalized': False,
-            'exploration_id': None
+            'exploration_id': None,
+            'status': 'Draft',
+            'planned_publication_date_msecs': 100,
+            'last_modified_msecs': 100,
+            'first_publication_date_msecs': None,
+            'unpublishing_reason': None
         }
         self.node_2: story_domain.StoryNodeDict = {
             'id': self.NODE_ID_2,
@@ -2073,7 +2108,12 @@ class StoryProgressUnitTests(test_utils.GenericTestBase):
             'prerequisite_skill_ids': [],
             'outline': '',
             'outline_is_finalized': False,
-            'exploration_id': None
+            'exploration_id': None,
+            'status': 'Draft',
+            'planned_publication_date_msecs': 100,
+            'last_modified_msecs': 100,
+            'first_publication_date_msecs': None,
+            'unpublishing_reason': None
         }
         self.node_3: story_domain.StoryNodeDict = {
             'id': self.NODE_ID_3,
@@ -2088,7 +2128,12 @@ class StoryProgressUnitTests(test_utils.GenericTestBase):
             'prerequisite_skill_ids': [],
             'outline': '',
             'outline_is_finalized': False,
-            'exploration_id': None
+            'exploration_id': None,
+            'status': 'Draft',
+            'planned_publication_date_msecs': 100,
+            'last_modified_msecs': 100,
+            'first_publication_date_msecs': None,
+            'unpublishing_reason': None
         }
         self.node_4: story_domain.StoryNodeDict = {
             'id': self.NODE_ID_4,
@@ -2103,7 +2148,12 @@ class StoryProgressUnitTests(test_utils.GenericTestBase):
             'prerequisite_skill_ids': [],
             'outline': '',
             'outline_is_finalized': False,
-            'exploration_id': None
+            'exploration_id': None,
+            'status': 'Draft',
+            'planned_publication_date_msecs': 100,
+            'last_modified_msecs': 100,
+            'first_publication_date_msecs': None,
+            'unpublishing_reason': None
         }
         story.story_contents.nodes = [
             story_domain.StoryNode.from_dict(self.node_1),
