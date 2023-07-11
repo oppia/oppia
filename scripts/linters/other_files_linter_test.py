@@ -46,11 +46,12 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
         super().setUp()
         self.verbose_mode_enabled = False
         self.dependencies_file = io.StringIO(
-            '{"dependencies":{"frontend":{"guppy":{"version":"0.1"},'
-            '"midiJs":{"version":"0.4"}}}}'
+            '{"dependencies":{"frontend":{}}}'
         )
         self.package_file = io.StringIO(
-            '{"dependencies":{"nerdamer":"^0.6","skulpt-dist":"0.2"}}'
+            '{"dependencies":{"nerdamer":"^0.6","skulpt-dist":"0.2",'
+            '"guppy-dev":"git+https://github.com/oppia/guppy#f509e",'
+            '"midi": "git+https://github.com/oppia/miDI.js#c26eb"}}'
         )
 
         self.files_in_typings_dir = [

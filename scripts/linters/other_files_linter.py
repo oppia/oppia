@@ -91,8 +91,8 @@ THIRD_PARTY_LIBS: List[ThirdPartyLibDict] = [
     },
     {
         'name': 'MIDI',
-        'dependency_key': 'midiJs',
-        'dependency_source': _DEPENDENCY_SOURCE_DEPENDENCIES_JSON,
+        'dependency_key': 'midi',
+        'dependency_source': _DEPENDENCY_SOURCE_PACKAGE,
         'type_defs_filename_prefix': 'midi-defs-'
     },
     {
