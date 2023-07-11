@@ -2800,8 +2800,8 @@ def create_stats_for_new_translation_models(
         content_word_count: int. Word count of the suggestion.
 
     Returns:
-        dict(str: *). A Dict consisting of the tats data required to create a
-        new model.
+        tuple[int, int, int, int, int, list[str], int, float]. A tuple
+        consisting of the stats data required to create a new model.
     """
     accepted_translations_count = 0
     accepted_translation_word_count = 0
