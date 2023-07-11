@@ -2788,15 +2788,15 @@ def create_stats_for_new_translation_models(
     edited_by_reviewer: bool,
     content_word_count: int
 ) -> Dict[str, Union[List[str], int, float]]:
-    """Creates stats data to be used to create a new 
+    """Creates stats data to be used to create a new
     TranslationContributionStatsModel and
-    TranslationSubmitterTotalContributionStatsModel
+    TranslationSubmitterTotalContributionStatsModel.
 
     Args:
         suggestion_is_accepted: bool. Whether the suggestion is
-        accepted or rejected.
+            accepted or rejected.
         edited_by_reviewer: bool. If the suggestion is accepted with
-        reviewers edits.
+            reviewers edits.
         content_word_count: int. Word count of the suggestion.
 
     Returns:
