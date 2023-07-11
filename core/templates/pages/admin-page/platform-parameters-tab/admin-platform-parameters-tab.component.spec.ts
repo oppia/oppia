@@ -131,11 +131,11 @@ describe('Admin page platform parameters tab', () => {
 
     it('should return correct unicode schema for email_footer ' +
     'platform parameter', () => {
-      const schema = component.getPlatformParamSchema(
-        'string', 'email_footer');
-      expect(schema).toEqual(
-        {'type': 'unicode', 'ui_config': {'rows': 5}});
-    });
+        const schema = component.getPlatformParamSchema(
+          'string', 'email_footer');
+        expect(schema).toEqual(
+          {'type': 'unicode', 'ui_config': {'rows': 5}});
+      });
 
     it('should return correct unicode schema for signup_email_body_content ' +
     'platform parameter', () => {
