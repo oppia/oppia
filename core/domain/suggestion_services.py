@@ -2783,6 +2783,93 @@ def update_translation_contribution_stats_at_submission(
             [translation_contribution_stat])
 
 
+def create_stats_for_new_translation_models(
+    suggestion_is_accepted: bool,
+    edited_by_reviewer: bool,
+    content_word_count: int
+) -> Dict[str, Union[List[str], int, float]]:
+    accepted_translations_count = 0
+    accepted_translation_word_count = 0
+    rejected_translations_count = 0
+    rejected_translation_word_count = 0
+    accepted_translations_without_reviewer_edits_count = 0
+
+    if suggestion_is_accepted:
+        accepted_translations_count += 1
+        accepted_translation_word_count += content_word_count
+        recent_review_outcomes = [
+            suggestion_models.REVIEW_OUTCOME_ACCEPTED_WITH_EDITS]
+        recent_performance = 1
+        overall_accuracy = 100.0
+    else:
+        rejected_translations_count += 1
+        rejected_translation_word_count += content_word_count
+        recent_review_outcomes = List[
+            suggestion_models.REVIEW_OUTCOME_REJECTED]
+        recent_performance = -2
+        overall_accuracy = 0.0
+    if suggestion_is_accepted and not edited_by_reviewer:
+        accepted_translations_without_reviewer_edits_count += 1
+        recent_review_outcomes = List[
+            suggestion_models.REVIEW_OUTCOME_ACCEPTED]
+
+    return {
+        'accepted_translations_count': accepted_translations_count,
+        'accepted_translation_word_count': accepted_translation_word_count,
+        'rejected_translations_count': rejected_translations_count,
+        'rejected_translation_word_count': rejected_translation_word_count,
+        'accepted_translations_without_reviewer_edits_count': (
+            accepted_translations_without_reviewer_edits_count),
+        'recent_review_outcomes': recent_review_outcomes,
+        'recent_performance': recent_performance,
+        'overall_accuracy': overall_accuracy
+    }
+
+
+def create_stats_for_new_translation_models(
+    suggestion_is_accepted: bool,
+    edited_by_reviewer: bool,
+    content_word_count: int
+) -> Dict[str, Union[List[str], int, float]]:
+    accepted_translations_count = 0
+    accepted_translation_word_count = 0
+    rejected_translations_count = 0
+    rejected_translation_word_count = 0
+    accepted_translations_without_reviewer_edits_count = 0
+
+    if suggestion_is_accepted:
+        accepted_translations_count += 1
+        accepted_translation_word_count += content_word_count
+        recent_review_outcomes = [
+            suggestion_models.REVIEW_OUTCOME_ACCEPTED_WITH_EDITS]
+        recent_performance = 1
+        overall_accuracy = 100.0
+    else:
+        rejected_translations_count += 1
+        rejected_translation_word_count += content_word_count
+        recent_review_outcomes = List[
+            suggestion_models.REVIEW_OUTCOME_REJECTED]
+        recent_performance = -2
+        overall_accuracy = 0.0
+    if suggestion_is_accepted and not edited_by_reviewer:
+        accepted_translations_without_reviewer_edits_count += 1
+        recent_review_outcomes = List[
+            suggestion_models.REVIEW_OUTCOME_ACCEPTED]
+
+    return {
+        'accepted_translations_count': accepted_translations_count,
+        'accepted_translation_word_count': accepted_translation_word_count,
+        'rejected_translations_count': rejected_translations_count,
+        'rejected_translation_word_count': rejected_translation_word_count,
+        'accepted_translations_without_reviewer_edits_count': (
+            accepted_translations_without_reviewer_edits_count),
+        'recent_review_outcomes': recent_review_outcomes,
+        'recent_performance': recent_performance,
+        'overall_accuracy': overall_accuracy
+    }
+
+
+
 def update_translation_contribution_stats_at_review(
     suggestion: suggestion_registry.BaseSuggestion
 ) -> None:
@@ -2827,47 +2914,26 @@ def update_translation_contribution_stats_at_review(
             suggestion.change.language_code, suggestion.author_id
         ))
 
-    accepted_translations_count = 0
-    accepted_translation_word_count = 0
-    rejected_translations_count = 0
-    rejected_translation_word_count = 0
-    accepted_translations_without_reviewer_edits_count = 0
-
-    if suggestion_is_accepted:
-        accepted_translations_count += 1
-        accepted_translation_word_count += content_word_count
-        recent_review_outcomes = [
-            suggestion_models.REVIEW_OUTCOME_ACCEPTED_WITH_EDITS]
-        recent_performance = 1
-        overall_accuracy = 100.0
-    else:
-        rejected_translations_count += 1
-        rejected_translation_word_count += content_word_count
-        recent_review_outcomes = [
-            suggestion_models.REVIEW_OUTCOME_REJECTED]
-        recent_performance = -2
-        overall_accuracy = 0.0
-    if suggestion_is_accepted and not suggestion.edited_by_reviewer:
-        accepted_translations_without_reviewer_edits_count += 1
-        recent_review_outcomes = [
-            suggestion_models.REVIEW_OUTCOME_ACCEPTED]
-
     if translation_submitter_total_stat_model is None:
+        stat = create_stats_for_new_translation_models(
+            suggestion_is_accepted,
+            suggestion.edited_by_reviewer,
+            content_word_count)
         suggestion_models.TranslationSubmitterTotalContributionStatsModel.create( # pylint: disable=line-too-long
             language_code=suggestion.change.language_code,
             contributor_id=suggestion.author_id,
             topic_ids_with_translation_submissions=[topic_id],
-            recent_review_outcomes=recent_review_outcomes,
-            recent_performance=recent_performance,
-            overall_accuracy=overall_accuracy,
+            recent_review_outcomes=stat.recent_review_outcomes,
+            recent_performance=stat.recent_performance,
+            overall_accuracy=stat.overall_accuracy,
             submitted_translations_count=1,
             submitted_translation_word_count=content_word_count,
-            accepted_translations_count=accepted_translations_count,
+            accepted_translations_count=stat['accepted_translations_count'],
             accepted_translations_without_reviewer_edits_count=(
-                accepted_translations_without_reviewer_edits_count),
-            accepted_translation_word_count=accepted_translation_word_count,
-            rejected_translations_count=rejected_translations_count,
-            rejected_translation_word_count=rejected_translation_word_count,
+                stat['accepted_translations_without_reviewer_edits_count']),
+            accepted_translation_word_count=stat['accepted_translation_word_count'],
+            rejected_translations_count=stat['rejected_translations_count'],
+            rejected_translation_word_count=stat['rejected_translation_word_count'],
             first_contribution_date=suggestion.last_updated.date(),
             last_contribution_date=suggestion.last_updated.date()
         )
@@ -2892,18 +2958,22 @@ def update_translation_contribution_stats_at_review(
             translation_submitter_total_stat)
 
     if translation_contribution_stat_model is None:
+        stat = create_stats_for_new_translation_models(
+            suggestion_is_accepted,
+            suggestion.edited_by_reviewer,
+            content_word_count)
         suggestion_models.TranslationContributionStatsModel.create(
             language_code=suggestion.change.language_code,
             contributor_user_id=suggestion.author_id,
             topic_id=topic_id,
             submitted_translations_count=1,
             submitted_translation_word_count=content_word_count,
-            accepted_translations_count=accepted_translations_count,
+            accepted_translations_count=stat['accepted_translations_count'],
             accepted_translations_without_reviewer_edits_count=(
-                accepted_translations_without_reviewer_edits_count),
-            accepted_translation_word_count=accepted_translation_word_count,
-            rejected_translations_count=rejected_translations_count,
-            rejected_translation_word_count=rejected_translation_word_count,
+                stat['accepted_translations_without_reviewer_edits_count']),
+            accepted_translation_word_count=stat['accepted_translation_word_count'],
+            rejected_translations_count=stat['rejected_translations_count'],
+            rejected_translation_word_count=stat['rejected_translation_word_count'],
             contribution_dates=[suggestion.last_updated.date()]
         )
     else:
