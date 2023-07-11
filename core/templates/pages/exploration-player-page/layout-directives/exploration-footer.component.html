@@ -1,5 +1,5 @@
 <div class="footer navbar-fixed-bottom oppia-exploration-footer" *ngIf="!iframed">
-  <div *ngIf="CHECKPOINTS_FEATURE_IS_ENABLED && !footerIsInQuestionPlayerMode && !hasLearnerHasViewedLessonInfoTooltip() && getMostRecentlyReachedCheckpointIndex() == 2">
+  <div *ngIf="!footerIsInQuestionPlayerMode && !hasLearnerHasViewedLessonInfoTooltip() && getMostRecentlyReachedCheckpointIndex() == 2">
     <div class="close-tooltip e2e-test-close-lesson-info-tooltip" (click)="learnerHasViewedLessonInfo()"></div>
     <div class="lesson-info-tooltip lesson-info-tooltip-add-ons"
          [innerHTML]="'I18N_LESSON_INFO_TOOLTIP_MESSAGE' | translate">
@@ -9,7 +9,7 @@
     <div [ngClass]="{'col-sm-5': isLanguageRTL(), 'col-sm-3': !isLanguageRTL()}">
       <button class="oppia-lesson-info"
               (click)="showInformationCard()"
-              *ngIf="CHECKPOINTS_FEATURE_IS_ENABLED && !footerIsInQuestionPlayerMode">
+              *ngIf="!footerIsInQuestionPlayerMode">
         <img [src]="getStaticImageUrl('/general/apple.svg')"
              class="exploration-footer-img"
              alt=""
