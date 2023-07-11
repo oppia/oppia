@@ -17,8 +17,9 @@
                   <mat-card class="list-view-item">
                     <label class="oppia-subtopic-name-text">{{ subtopic.key }}</label>
                     <mat-radio-button class="oppia-skills-list-item e2e-test-skills-list-item" *ngFor="let skill of searchInSubtopicSkills(subtopic.value, skillFilterText)" [value]="skill.id" [disabled]="!userCanEditSkills" attr.aria-label="{{ skill.description }}">
-                      <span style="white-space: normal;">
+                      <span class="mat-radio-button-label">
                       {{ skill.description }}
+                      </span>
                     </mat-radio-button>
                   </mat-card>
                 </div>
@@ -33,8 +34,9 @@
               <mat-card class="list-view-item">
                 <label>
                   <mat-radio-button class="oppia-skills-list-item e2e-test-skills-list-item" *ngFor="let skill of searchInUntriagedSkillSummaries(skillFilterText)" [value]="skill.id" [disabled]="!userCanEditSkills" attr.aria-label="{{ skill.description }}">
-                    <span style="white-space: normal;">
+                    <span class="mat-radio-button-label">
                     {{ skill.description }}
+                    </span>
                   </mat-radio-button>
                 </label>
               </mat-card>
@@ -117,8 +119,13 @@
       max-height: initial;
     }
 
-    .skill-selector .oppia-topic-name-text{
+    .skill-selector .oppia-topic-name-text {
       word-break: break-word;
+    }
+
+    .skill-selector .mat-radio-button-label {
+      white-space: normal;
+      word-break: break-all;
     }
   }
 </style>
