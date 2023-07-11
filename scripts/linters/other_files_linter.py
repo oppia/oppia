@@ -66,6 +66,7 @@ _DEPENDENCY_SOURCE_PACKAGE: Final = 'package.json'
 
 WORKFLOWS_DIR: Final = os.path.join(os.getcwd(), '.github', 'workflows')
 WORKFLOW_FILENAME_REGEX: Final = r'\.(yaml)|(yml)$'
+GIT_COMMIT_HASH_REGEX: Final = r'^git\+https:\/\/github\.com\/.*#(.*)$'
 MERGE_STEP: Final = {'uses': './.github/actions/merge'}
 WORKFLOWS_EXEMPT_FROM_MERGE_REQUIREMENT: Final = (
     'backend_tests.yml',
@@ -85,7 +86,7 @@ THIRD_PARTY_LIBS: List[ThirdPartyLibDict] = [
     {
         'name': 'Skulpt',
         'dependency_key': 'skulpt-dist',
-        'dependency_source': _DEPENDENCY_SOURCE_DEPENDENCIES_JSON,
+        'dependency_source': _DEPENDENCY_SOURCE_PACKAGE,
         'type_defs_filename_prefix': 'skulpt-defs-'
     },
     {
@@ -190,6 +191,17 @@ class CustomLintChecksManager(linter_utils.BaseLinter):
 
                 if lib_version[0] == '^':
                     lib_version = lib_version[1:]
+                # In cases where the version is in the form of git commit hashes
+                # such as 'git+https://github.com/username/repo#commit-hash',
+                # we extract the commit hash and use it as the version.
+                elif re.search(GIT_COMMIT_HASH_REGEX, lib_version):
+                    match = re.search(GIT_COMMIT_HASH_REGEX, lib_version)
+                    # We must verify that the match is not None because
+                    # re.search() returns None when no match is found. Although
+                    # we already check this in the elif statement, the mypy type
+                    # check fails, so we need to include this check here.
+                    if match:
+                        lib_version = match.group(1)
 
             prefix_name = third_party_lib['type_defs_filename_prefix']
 
