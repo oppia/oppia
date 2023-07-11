@@ -49,19 +49,9 @@ if MYPY:  # pragma: no cover
 class ContributorDashboardPageTest(test_utils.GenericTestBase):
     """Test for showing contributor dashboard pages."""
 
-    def test_page_with_disabled_contributor_dashboard_leads_to_404(
+    def test_contributor_dashboard_page_loads_correctly(
         self
     ) -> None:
-        config_services.set_property(
-            'admin', 'contributor_dashboard_is_enabled', False)
-        self.get_html_response(
-            feconf.CONTRIBUTOR_DASHBOARD_URL, expected_status_int=404)
-
-    def test_page_with_enabled_contributor_dashboard_loads_correctly(
-        self
-    ) -> None:
-        config_services.set_property(
-            'admin', 'contributor_dashboard_is_enabled', True)
         response = self.get_html_response(feconf.CONTRIBUTOR_DASHBOARD_URL)
         response.mustcontain(
             '<contributor-dashboard-page></contributor-dashboard-page>')
@@ -176,23 +166,6 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             'translation_counts': {},
             'translation_in_review_counts': {}
         }
-        config_services.set_property(
-            'admin', 'contributor_dashboard_is_enabled', True)
-
-    def test_handler_with_disabled_dashboard_flag_raise_404(self) -> None:
-        config_services.set_property(
-            'admin', 'contributor_dashboard_is_enabled', True)
-
-        self.get_json(
-            '%s/skill' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL,
-            params={}, expected_status_int=200)
-
-        config_services.set_property(
-            'admin', 'contributor_dashboard_is_enabled', False)
-
-        self.get_json(
-            '%s/skill' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL,
-            params={}, expected_status_int=404)
 
     def test_get_skill_opportunity_data(self) -> None:
         response = self.get_json(
