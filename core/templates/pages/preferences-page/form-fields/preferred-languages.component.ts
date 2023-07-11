@@ -41,6 +41,15 @@ export class PreferredLanguagesComponent {
   removable = true;
   separatorKeysCodes: number[] = [ENTER];
   formCtrl = new FormControl();
+  filteredChoices: LanguageIdAndText[] = [];
+  searchQuery: string = '';
+
+  onInputBoxClick(): void {
+    setTimeout(() => {
+      this.searchQuery = '';
+      this.filteredChoices = this.choices;
+    });
+  }
 
   ngOnInit(): void {
     this.formCtrl.valueChanges.subscribe((value: string) => {
@@ -54,13 +63,12 @@ export class PreferredLanguagesComponent {
 
   validInput(value: string): boolean {
     let availableLanguage = false;
-    for (let i = 0; i < this.choices.length; i++) {
-      if (this.choices[i].id === value) {
+    for (let i = 0; i < this.filteredChoices.length; i++) {
+      if (this.filteredChoices[i].id === value) {
         availableLanguage = true;
         break;
       }
     }
-
     return availableLanguage &&
       this.preferredLanguages.indexOf(value) < 0 ? true : false;
   }
@@ -76,6 +84,8 @@ export class PreferredLanguagesComponent {
       this.preferredLanguagesChange.emit(this.preferredLanguages);
       this.languageInput.nativeElement.value = '';
     }
+    this.searchQuery = '';
+    this.filteredChoices = this.choices;
   }
 
   remove(fruit: string): void {
@@ -93,5 +103,15 @@ export class PreferredLanguagesComponent {
     } else {
       this.add(event.option);
     }
+  }
+
+  onSearchInputChange(): void {
+    this.filteredChoices = this.choices.filter(choice => {
+      let lowerSearchQuery = this.searchQuery.toLowerCase();
+      return (
+        choice.text.toLowerCase().includes(lowerSearchQuery) ||
+        choice.id.toLowerCase().includes(lowerSearchQuery)
+      );
+    });
   }
 }

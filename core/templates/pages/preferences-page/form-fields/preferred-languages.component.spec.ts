@@ -60,25 +60,20 @@ describe('Preferred Languages Component', () => {
       id: 'en',
       text: 'English'
     }];
-    componentInstance.formCtrl = {
-      valueChanges: {
-        subscribe(callb: (val: string) => void) {
-          callb(value);
-        }
-      }
-    } as FormControl;
+    componentInstance.formCtrl = new FormControl(value);
     componentInstance.ngOnInit();
+    fixture.detectChanges();
     expect(componentInstance.chipList.errorState).toBeFalse();
-    value = '';
-    componentInstance.formCtrl = {
-      valueChanges: {
-        subscribe(callb: (val: string) => void) {
-          callb(value);
-        }
-      }
-    } as FormControl;
+    const invalidValue = 'fr';
+    componentInstance.formCtrl.setValue(invalidValue);
     componentInstance.ngOnInit();
+    fixture.detectChanges();
     expect(componentInstance.chipList.errorState).toBeTrue();
+    const validValue = 'en';
+    componentInstance.formCtrl.setValue(validValue);
+    componentInstance.ngOnInit();
+    fixture.detectChanges();
+    expect(componentInstance.chipList.errorState).toBeFalse();
   });
 
   it('should validate input', () => {
@@ -87,7 +82,25 @@ describe('Preferred Languages Component', () => {
       id: 'en',
       text: 'English'
     }];
+    componentInstance.filteredChoices = [{
+      id: 'en',
+      text: 'English'
+    }];
     expect(componentInstance.validInput('en')).toBeTrue();
+  });
+
+
+  it('should filtered choices when input box is clicked', () => {
+    const mockChoices = [
+      { id: 'en', text: 'English ' },
+      { id: 'fr', text: 'French ' }
+    ];
+    componentInstance.choices = [...mockChoices];
+    componentInstance.onInputBoxClick();
+    setTimeout(() => {
+      expect(componentInstance.searchQuery).toEqual('');
+      expect(componentInstance.filteredChoices).toEqual(mockChoices);
+    });
   });
 
   it('should add language', () => {
