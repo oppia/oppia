@@ -1113,7 +1113,7 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
         self
     ) -> None:
         self.login(self.CONTRIBUTOR_EMAIL)
-        response = self.get_json(
+        self.get_json(
             '/contributor-dashboard-admin-stats/invalid/submission', {
                 'page_size': 2,
                 'offset': 1,
@@ -1128,7 +1128,7 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
         self
     ) -> None:
         self.login(self.CONTRIBUTOR_EMAIL)
-        response = self.get_json(
+        self.get_json(
             '/contributor-dashboard-admin-stats/translation/invalid', {
                 'page_size': 2,
                 'offset': 1,
@@ -1237,7 +1237,7 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
         )
         self.logout()
 
-    def test_get_translation_submitter_stats_for_last_activity_filter(self)->None:
+    def test_get_translation_submitter_stats_for_last_activity_filter(self) -> None: # pylint: disable=line-too-long
 
         self.login(self.CONTRIBUTOR_EMAIL)
 
@@ -1336,7 +1336,7 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
         )
         self.logout()
 
-    def test_get_translation_reviewer_stats_for_last_activity_filter(self) -> None:
+    def test_get_translation_reviewer_stats_for_last_activity_filter(self) -> None: # pylint: disable=line-too-long
 
         self.login(self.CONTRIBUTOR_EMAIL)
 
@@ -1470,7 +1470,7 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
         )
         self.logout()
 
-    def test_get_question_submitter_stats_for_last_activity_filter(self) -> None:
+    def test_get_question_submitter_stats_for_last_activity_filter(self) -> None: # pylint: disable=line-too-long
 
         self.login(self.CONTRIBUTOR_EMAIL)
 
@@ -1569,7 +1569,7 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
         )
         self.logout()
 
-    def test_get_question_reviewer_stats_for_last_activity_filter(self) -> None:
+    def test_get_question_reviewer_stats_for_last_activity_filter(self) -> None: # pylint: disable=line-too-long
 
         self.login(self.CONTRIBUTOR_EMAIL)
 
