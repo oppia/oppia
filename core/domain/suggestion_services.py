@@ -2507,6 +2507,10 @@ def _update_translation_submitter_total_stats_model(
             translation_submitter_total_stats.language_code,
             translation_submitter_total_stats.contributor_id)
 
+    # We assert here because we are calling this method only when the model
+    # exists. If model doesn't exist we create a new model in
+    # update_translation_contribution_stats_at_submission or
+    # update_translation_contribution_stats_at_review.
     assert stats_model is not None
     stats_model.topic_ids_with_translation_submissions = (
         translation_submitter_total_stats
@@ -2561,6 +2565,9 @@ def _update_translation_reviewer_total_stats_models(
         translation_reviewer_total_stat.language_code,
         translation_reviewer_total_stat.contributor_id)
 
+    # We assert here because we are calling this method only when the model
+    # exists. If model doesn't exist we create a new model in
+    # update_translation_review_stats.
     assert stats_model is not None
     stats_model.topic_ids_with_translation_reviews = (
         translation_reviewer_total_stat.topic_ids_with_translation_reviews)
