@@ -21,7 +21,7 @@ interface GuppyInitConfig {
     debug?: Function;
     error?: Function;
     focus?: Function;
-  }
+  };
   settings?: {
     xml_content?: string;
     autoreplace?: string;
@@ -30,7 +30,7 @@ interface GuppyInitConfig {
     blacklist?: string[];
     buttons?: string[];
     cliptype?: string;
-  }
+  };
   callback?: Function;
 }
 
@@ -100,9 +100,9 @@ declare namespace Guppy {
     name: string, symbol: Object, template?: string): void;
   export function get_loc(
     x: number, y: number, current_node?: Object, current_caret?: Object): {
-      current: Object,
-      caret: number,
-      pos: string
+      current: Object;
+      caret: number;
+      pos: string;
     };
   export let kb: Object;
   export function make_button(url: string, cb: Function): HTMLImageElement;

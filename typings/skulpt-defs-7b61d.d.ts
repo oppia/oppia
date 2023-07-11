@@ -32,7 +32,7 @@ interface SkulptPython {
 
 interface SkulptMappings {
   round$: {
-    classes: Object[],
+    classes: Object[];
     2: null;
     3: string;
   };
@@ -96,39 +96,39 @@ interface SkulptCompiled {
 }
 
 interface SkulptDunderToSkulpt {
-  '__eq__': 'ob$eq',
-  '__ne__': 'ob$ne',
-  '__lt__': 'ob$lt',
-  '__le__': 'ob$le',
-  '__gt__': 'ob$gt',
-  '__ge__': 'ob$ge',
-  '__hash__': 'tp$hash',
-  '__abs__': 'nb$abs',
-  '__neg__': 'nb$negative',
-  '__pos__': 'nb$positive',
-  '__int__': 'nb$int_',
-  '__long__': 'nb$lng',
-  '__float__': 'nb$float_',
-  '__add__': 'nb$add',
-  '__radd__': 'nb$reflected_add',
-  '__sub__': 'nb$subtract',
-  '__rsub__': 'nb$reflected_subtract',
-  '__mul__': 'nb$multiply',
-  '__rmul__': 'nb$reflected_multiply',
-  '__div__': 'nb$divide',
-  '__rdiv__': 'nb$reflected_divide',
-  '__floordiv__': 'nb$floor_divide',
-  '__rfloordiv__': 'nb$reflected_floor_divide',
-  '__mod__': 'nb$remainder',
-  '__rmod__': 'nb$reflected_remainder',
-  '__divmod__': 'nb$divmod',
-  '__rdivmod__': 'nb$reflected_divmod',
-  '__pow__': 'nb$power',
-  '__rpow__': 'nb$reflected_power',
-  '__contains__': 'sq$contains',
-  '__len__': ['sq$length', 1],
-  '__get__': ['tp$descr_get', 3],
-  '__set__': ['tp$descr_set', 3]
+  '__eq__': 'ob$eq';
+  '__ne__': 'ob$ne';
+  '__lt__': 'ob$lt';
+  '__le__': 'ob$le';
+  '__gt__': 'ob$gt';
+  '__ge__': 'ob$ge';
+  '__hash__': 'tp$hash';
+  '__abs__': 'nb$abs';
+  '__neg__': 'nb$negative';
+  '__pos__': 'nb$positive';
+  '__int__': 'nb$int_';
+  '__long__': 'nb$lng';
+  '__float__': 'nb$float_';
+  '__add__': 'nb$add';
+  '__radd__': 'nb$reflected_add';
+  '__sub__': 'nb$subtract';
+  '__rsub__': 'nb$reflected_subtract';
+  '__mul__': 'nb$multiply';
+  '__rmul__': 'nb$reflected_multiply';
+  '__div__': 'nb$divide';
+  '__rdiv__': 'nb$reflected_divide';
+  '__floordiv__': 'nb$floor_divide';
+  '__rfloordiv__': 'nb$reflected_floor_divide';
+  '__mod__': 'nb$remainder';
+  '__rmod__': 'nb$reflected_remainder';
+  '__divmod__': 'nb$divmod';
+  '__rdivmod__': 'nb$reflected_divmod';
+  '__pow__': 'nb$power';
+  '__rpow__': 'nb$reflected_power';
+  '__contains__': 'sq$contains';
+  '__len__': ['sq$length', 1];
+  '__get__': ['tp$descr_get', 3];
+  '__set__': ['tp$descr_set', 3];
 }
 
 interface SkulptFFI {
@@ -146,7 +146,7 @@ interface SkulptInternalPy {
     'src/classmethod.py': string;
     'src/property.py': string;
     'src/staticmethod.py': string;
-  }
+  };
 }
 
 interface SkulptMisceval {
