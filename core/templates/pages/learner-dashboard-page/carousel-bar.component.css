@@ -19,6 +19,7 @@ font-weight: 500;
 .tiles {
   display: flex;
   flex-wrap: nowrap;
+  gap: 16px;
   overflow: scroll;
 }
 
