@@ -1113,6 +1113,7 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
         self
     ) -> None:
         self.login(self.CONTRIBUTOR_EMAIL)
+
         self.get_json(
             '/contributor-dashboard-admin-stats/invalid/submission', {
                 'page_size': 2,
@@ -1121,13 +1122,13 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
                 'sort_by': None,
                 'topic_ids': []
             }, expected_status_int=500)
-
         self.logout()
 
     def test_get_stats_with_invalid_sub_contribution_type_raises_error(
         self
     ) -> None:
         self.login(self.CONTRIBUTOR_EMAIL)
+
         self.get_json(
             '/contributor-dashboard-admin-stats/translation/invalid', {
                 'page_size': 2,
@@ -1136,7 +1137,6 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
                 'sort_by': None,
                 'topic_ids': []
             }, expected_status_int=500)
-
         self.logout()
 
     def test_get_translation_submitter_stats_for_pagination(self) -> None:
@@ -1153,11 +1153,11 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
             })
 
         self.assertEqual(
-            len(response['frontend_dicts']),
+            len(response['stats']),
             2
         )
         self.assertEqual(
-            response['frontend_dicts'][0]['contributor_id'],
+            response['stats'][0]['contributor_id'],
             'user3'
         )
         self.assertEqual(
@@ -1185,11 +1185,11 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
             })
 
         self.assertEqual(
-            len(response['frontend_dicts']),
+            len(response['stats']),
             2
         )
         self.assertEqual(
-            response['frontend_dicts'][0]['contributor_id'],
+            response['stats'][0]['contributor_id'],
             'user2'
         )
         self.assertEqual(
@@ -1216,15 +1216,15 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
             })
 
         self.assertEqual(
-            len(response['frontend_dicts']),
+            len(response['stats']),
             2
         )
         self.assertEqual(
-            response['frontend_dicts'][0]['contributor_id'],
+            response['stats'][0]['contributor_id'],
             'user3'
         )
         self.assertEqual(
-            response['frontend_dicts'][0]['last_contributed_in_days'],
+            response['stats'][0]['last_contributed_in_days'],
             95
         )
         self.assertEqual(
@@ -1252,15 +1252,15 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
             })
 
         self.assertEqual(
-            len(response['frontend_dicts']),
+            len(response['stats']),
             3
         )
         self.assertEqual(
-            response['frontend_dicts'][0]['contributor_id'],
+            response['stats'][0]['contributor_id'],
             'user3'
         )
         self.assertEqual(
-            response['frontend_dicts'][1]['contributor_id'],
+            response['stats'][1]['contributor_id'],
             'user2'
         )
         self.assertEqual(
@@ -1287,11 +1287,11 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
             })
 
         self.assertEqual(
-            len(response['frontend_dicts']),
+            len(response['stats']),
             2
         )
         self.assertEqual(
-            response['frontend_dicts'][0]['contributor_id'],
+            response['stats'][0]['contributor_id'],
             'user3'
         )
         self.assertEqual(
@@ -1319,11 +1319,11 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
             })
 
         self.assertEqual(
-            len(response['frontend_dicts']),
+            len(response['stats']),
             2
         )
         self.assertEqual(
-            response['frontend_dicts'][0]['contributor_id'],
+            response['stats'][0]['contributor_id'],
             'user2'
         )
         self.assertEqual(
@@ -1351,15 +1351,15 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
             })
 
         self.assertEqual(
-            len(response['frontend_dicts']),
+            len(response['stats']),
             3
         )
         self.assertEqual(
-            response['frontend_dicts'][0]['contributor_id'],
+            response['stats'][0]['contributor_id'],
             'user3'
         )
         self.assertEqual(
-            response['frontend_dicts'][1]['contributor_id'],
+            response['stats'][1]['contributor_id'],
             'user2'
         )
         self.assertEqual(
@@ -1386,11 +1386,11 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
             })
 
         self.assertEqual(
-            len(response['frontend_dicts']),
+            len(response['stats']),
             2
         )
         self.assertEqual(
-            response['frontend_dicts'][0]['contributor_id'],
+            response['stats'][0]['contributor_id'],
             'user3'
         )
         self.assertEqual(
@@ -1418,11 +1418,11 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
             })
 
         self.assertEqual(
-            len(response['frontend_dicts']),
+            len(response['stats']),
             2
         )
         self.assertEqual(
-            response['frontend_dicts'][0]['contributor_id'],
+            response['stats'][0]['contributor_id'],
             'user2'
         )
         self.assertEqual(
@@ -1449,15 +1449,15 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
             })
 
         self.assertEqual(
-            len(response['frontend_dicts']),
+            len(response['stats']),
             2
         )
         self.assertEqual(
-            response['frontend_dicts'][0]['contributor_id'],
+            response['stats'][0]['contributor_id'],
             'user3'
         )
         self.assertEqual(
-            response['frontend_dicts'][0]['last_contributed_in_days'],
+            response['stats'][0]['last_contributed_in_days'],
             95
         )
         self.assertEqual(
@@ -1485,15 +1485,15 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
             })
 
         self.assertEqual(
-            len(response['frontend_dicts']),
+            len(response['stats']),
             3
         )
         self.assertEqual(
-            response['frontend_dicts'][0]['contributor_id'],
+            response['stats'][0]['contributor_id'],
             'user3'
         )
         self.assertEqual(
-            response['frontend_dicts'][1]['contributor_id'],
+            response['stats'][1]['contributor_id'],
             'user2'
         )
         self.assertEqual(
@@ -1520,11 +1520,11 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
             })
 
         self.assertEqual(
-            len(response['frontend_dicts']),
+            len(response['stats']),
             2
         )
         self.assertEqual(
-            response['frontend_dicts'][0]['contributor_id'],
+            response['stats'][0]['contributor_id'],
             'user3'
         )
         self.assertEqual(
@@ -1552,11 +1552,11 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
             })
 
         self.assertEqual(
-            len(response['frontend_dicts']),
+            len(response['stats']),
             2
         )
         self.assertEqual(
-            response['frontend_dicts'][0]['contributor_id'],
+            response['stats'][0]['contributor_id'],
             'user2'
         )
         self.assertEqual(
@@ -1584,15 +1584,15 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
             })
 
         self.assertEqual(
-            len(response['frontend_dicts']),
+            len(response['stats']),
             3
         )
         self.assertEqual(
-            response['frontend_dicts'][0]['contributor_id'],
+            response['stats'][0]['contributor_id'],
             'user3'
         )
         self.assertEqual(
-            response['frontend_dicts'][1]['contributor_id'],
+            response['stats'][1]['contributor_id'],
             'user2'
         )
         self.assertEqual(
