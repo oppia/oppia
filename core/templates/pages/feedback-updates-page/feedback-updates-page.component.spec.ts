@@ -177,6 +177,10 @@ describe('Feedback updates page', () => {
     isLoggedIn: () => true
   };
 
+  afterEach(() => {
+    component.ngOnDestroy();
+  });
+
   describe('when succesfully fetching feedback updates data', () => {
     beforeEach(async(() => {
       mockResizeEmitter = new EventEmitter();
@@ -412,8 +416,8 @@ describe('Feedback updates page', () => {
       // getValueOfSubscriptionSortKey is used in a *ngFor directive.
       // Note that given subscription list is not sorted.
       const expectedInnerText = ['Biology', 'Algebra', 'Three Balls', 'Zebra'];
-      feedbackListNameNodes.forEach((titleNode, index) => {
-        expect(titleNode.innerText).toContain(expectedInnerText[index]);
+      feedbackListNameNodes.forEach((titleNode, index: number) => {
+        expect(titleNode.innerText).toBe(expectedInnerText[index]);
       });
     }));
 
@@ -442,8 +446,8 @@ describe('Feedback updates page', () => {
       // getValueOfSubscriptionSortKey is used in a *ngFor directive.
       // Note that given subscription list is not sorted.
       const expectedInnerText = ['Zebra', 'Three Balls', 'Algebra', 'Biology'];
-      feedbackListNameNodes.forEach((titleNode, index) => {
-        expect(titleNode.innerText).toContain(expectedInnerText[index]);
+      feedbackListNameNodes.forEach((titleNode, index: number) => {
+        expect(titleNode.innerText).toBe(expectedInnerText[index]);
       });
     }));
 
@@ -475,8 +479,8 @@ describe('Feedback updates page', () => {
       // getValueOfSubscriptionSortKey is used in a *ngFor directive.
       // Note that given subscription list is not sorted.
       const expectedInnerText = ['Algebra', 'Biology', 'Three Balls', 'zebra'];
-      feedbackListNameNodes.forEach((titleNode, index) => {
-        expect(titleNode.innerText).toContain(expectedInnerText[index]);
+      feedbackListNameNodes.forEach((titleNode, index: number) => {
+        expect(titleNode.innerText).toBe(expectedInnerText[index]);
       });
     }));
 
@@ -512,8 +516,8 @@ describe('Feedback updates page', () => {
       // getValueOfSubscriptionSortKey is used in a *ngFor directive.
       // Note that given subscription list is not sorted.
       const expectedInnerText = ['Zebra', 'Three Balls', 'Biology', 'Algebra'];
-      feedbackListNameNodes.forEach((titleNode, index) => {
-        expect(titleNode.innerText).toContain(expectedInnerText[index]);
+      feedbackListNameNodes.forEach((titleNode, index: number) => {
+        expect(titleNode.innerText).toBe(expectedInnerText[index]);
       });
     }));
 

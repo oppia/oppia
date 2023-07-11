@@ -223,6 +223,10 @@ describe('TopNavigationBarComponent', () => {
       ['default-image-url-png', 'default-image-url-webp']);
   });
 
+  afterEach(() => {
+    component.ngOnDestroy();
+  });
+
   it('should truncate navbar after search bar is loaded', fakeAsync(() => {
     spyOn(component, 'truncateNavbar').and.stub();
 
@@ -236,6 +240,14 @@ describe('TopNavigationBarComponent', () => {
       expect(component.truncateNavbar).toHaveBeenCalled();
     });
   }));
+
+  it('should unsubscribe upon component destruction', () => {
+    spyOn(component.directiveSubscriptions, 'unsubscribe');
+
+    component.ngOnDestroy();
+
+    expect(component.directiveSubscriptions.unsubscribe).toHaveBeenCalled();
+  });
 
   it('should try displaying the hidden navbar elements if resized' +
     ' window is larger', fakeAsync(() => {
