@@ -131,18 +131,18 @@ describe('Admin page platform parameters tab', () => {
 
     it('should return correct unicode schema for email_footer ' +
     'platform parameter', () => {
-        const schema = component.getPlatformParamSchema(
-          'string', 'email_footer');
-        expect(schema).toEqual(
-          {'type': 'unicode', 'ui_config': {'rows': 5}});
-      });
+      const schema = component.getPlatformParamSchema(
+        'string', 'email_footer');
+      expect(schema).toEqual(
+        {type: 'unicode', ui_config: {'rows': 5}});
+    });
 
     it('should return correct unicode schema for signup_email_body_content ' +
     'platform parameter', () => {
       const schema = component.getPlatformParamSchema(
         'string', 'signup_email_body_content');
       expect(schema).toEqual(
-        {'type': 'unicode', 'ui_config': {'rows': 20}});
+        {type: 'unicode', ui_config: {'rows': 20}});
     });
 
     it('should return correct unicode schema for unpublish_exploration_email' +
@@ -150,7 +150,7 @@ describe('Admin page platform parameters tab', () => {
       const schema = component.getPlatformParamSchema(
         'string', 'unpublish_exploration_email_html_body');
       expect(schema).toEqual(
-        {'type': 'unicode', 'ui_config': {'rows': 20}});
+        {type: 'unicode', ui_config: {'rows': 20}});
     });
 
     it('should return float schema for number data type', () => {
