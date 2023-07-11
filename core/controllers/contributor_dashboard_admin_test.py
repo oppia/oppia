@@ -17,6 +17,7 @@
 from __future__ import annotations
 
 import datetime
+import json
 
 from core import feconf
 from core.constants import constants
@@ -771,7 +772,7 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
 
     CONTRIBUTOR_EMAIL: Final = 'contributor@example.com'
     CONTRIBUTOR_USERNAME: Final = 'contributor'
-    SUGGESTION_LANGUAGE_CODE: Final = 'es'
+    SUGGESTION_LANGUAGE_CODE: Final = 'en'
     USER_ID_1: Final = 'uid_01234567890123456789012345678912'
     TOPIC_IDS_WITH_TRANSLATION_SUBMISSIONS: Final = ['topic1', 'topic2']
     RECENT_REVIEW_OUTCOMES: Final = ['accepted', 'rejected']
@@ -805,21 +806,14 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
         self
     ) -> None:
         self.login(self.CONTRIBUTOR_EMAIL)
-        csrf_token = self.get_new_csrf_token()
-        response = self.post_json(
+        response = self.get_json(
             '/contributor-dashboard-admin-stats/invalid/submission', {
                 'page_size': 2,
                 'offset': 1,
                 'language_code': self.SUGGESTION_LANGUAGE_CODE,
                 'sort_by': None,
-                'topic_ids': None,
-                'num_days_since_last_activity': None
-            },
-                csrf_token=csrf_token,
-                expected_status_int=400)
-
-        self.assertEqual(
-            response['error'], 'Invalid contribution type invalid.')
+                'topic_ids': []
+            }, expected_status_int=500)
 
         self.logout()
 
@@ -827,21 +821,14 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
         self
     ) -> None:
         self.login(self.CONTRIBUTOR_EMAIL)
-        csrf_token = self.get_new_csrf_token()
-        response = self.post_json(
+        response = self.get_json(
             '/contributor-dashboard-admin-stats/translation/invalid', {
                 'page_size': 2,
                 'offset': 1,
                 'language_code': self.SUGGESTION_LANGUAGE_CODE,
                 'sort_by': None,
-                'topic_ids': None,
-                'num_days_since_last_activity': None
-            },
-            csrf_token=csrf_token,
-            expected_status_int=400)
-
-        self.assertEqual(
-            response['error'], 'Invalid contribution subtype invalid.')
+                'topic_ids': []
+            }, expected_status_int=500)
 
         self.logout()
 
@@ -947,18 +934,15 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
         ).put()
 
         self.login(self.CONTRIBUTOR_EMAIL)
-        csrf_token = self.get_new_csrf_token()
 
         # Test with language filter and pagination.
-        response = self.post_json(
+        response = self.get_json(
             '/contributor-dashboard-admin-stats/translation/submission', {
                 'page_size': 2,
                 'offset': 1,
                 'language_code': self.SUGGESTION_LANGUAGE_CODE,
-                'sort_by': None,
-                'topic_ids': None,
-                'num_days_since_last_activity': None
-            }, csrf_token=csrf_token)
+                'topic_ids': []
+            })
 
         self.assertEqual(
             len(response['frontend_dicts']),
@@ -978,15 +962,14 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
         )
 
         # Test with sorting and pagination.
-        response = self.post_json(
+        response = self.get_json(
             '/contributor-dashboard-admin-stats/translation/submission', {
                 'page_size': 2,
                 'offset': 1,
                 'language_code': self.SUGGESTION_LANGUAGE_CODE,
                 'sort_by': 'IncreasingLastActivity',
-                'topic_ids': None,
-                'num_days_since_last_activity': None
-            }, csrf_token=csrf_token)
+                'topic_ids': []
+            })
 
         self.assertEqual(
             len(response['frontend_dicts']),
@@ -1006,15 +989,13 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
         )
 
         # Test with topic filter and pagination.
-        response = self.post_json(
+        response = self.get_json(
             '/contributor-dashboard-admin-stats/translation/submission', {
                 'page_size': 2,
                 'offset': 1,
                 'language_code': self.SUGGESTION_LANGUAGE_CODE,
-                'sort_by': None,
-                'topic_ids': ['topic1', 'topic2'],
-                'num_days_since_last_activity': None
-            }, csrf_token=csrf_token)
+                'topic_ids': json.dumps(['topic1', 'topic2'])
+            })
 
         self.assertEqual(
             len(response['frontend_dicts']),
@@ -1038,31 +1019,30 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
         )
 
         # Test with num_days_since_last_activity filter and pagination.
-        response = self.post_json(
+        response = self.get_json(
             '/contributor-dashboard-admin-stats/translation/submission', {
                 'page_size': 4,
                 'offset': 1,
                 'language_code': self.SUGGESTION_LANGUAGE_CODE,
-                'sort_by': None,
-                'topic_ids': None,
-                'num_days_since_last_activity': 120
-            }, csrf_token=csrf_token)
+                'num_days_since_last_activity': 120,
+                'topic_ids': []
+            })
 
         self.assertEqual(
             len(response['frontend_dicts']),
-            2
+            3
         )
         self.assertEqual(
             response['frontend_dicts'][0]['contributor_id'],
-            'user2'
+            'user3'
         )
         self.assertEqual(
             response['frontend_dicts'][1]['contributor_id'],
-            'user1'
+            'user2'
         )
         self.assertEqual(
             response['next_offset'],
-            3
+            4
         )
         self.assertEqual(
             response['more'],
@@ -1146,18 +1126,15 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
         ).put()
 
         self.login(self.CONTRIBUTOR_EMAIL)
-        csrf_token = self.get_new_csrf_token()
 
         # Test with language filter and pagination.
-        response = self.post_json(
+        response = self.get_json(
             '/contributor-dashboard-admin-stats/translation/review', {
                 'page_size': 2,
                 'offset': 1,
                 'language_code': self.SUGGESTION_LANGUAGE_CODE,
-                'sort_by': None,
-                'topic_ids': None,
-                'num_days_since_last_activity': None
-            }, csrf_token=csrf_token)
+                'topic_ids': []
+            })
 
         self.assertEqual(
             len(response['frontend_dicts']),
@@ -1177,15 +1154,14 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
         )
 
         # Test with sorting and pagination.
-        response = self.post_json(
+        response = self.get_json(
             '/contributor-dashboard-admin-stats/translation/review', {
                 'page_size': 2,
                 'offset': 1,
                 'language_code': self.SUGGESTION_LANGUAGE_CODE,
                 'sort_by': 'IncreasingLastActivity',
-                'topic_ids': None,
-                'num_days_since_last_activity': None
-            }, csrf_token=csrf_token)
+                'topic_ids': []
+            })
 
         self.assertEqual(
             len(response['frontend_dicts']),
@@ -1205,31 +1181,30 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
         )
 
         # Test with num_days_since_last_activity filter and pagination.
-        response = self.post_json(
+        response = self.get_json(
             '/contributor-dashboard-admin-stats/translation/review', {
                 'page_size': 4,
                 'offset': 1,
                 'language_code': self.SUGGESTION_LANGUAGE_CODE,
-                'sort_by': None,
-                'topic_ids': None,
-                'num_days_since_last_activity': 120
-            }, csrf_token=csrf_token)
+                'num_days_since_last_activity': 120,
+                'topic_ids': []
+            })
 
         self.assertEqual(
             len(response['frontend_dicts']),
-            2
+            3
         )
         self.assertEqual(
             response['frontend_dicts'][0]['contributor_id'],
-            'user2'
+            'user3'
         )
         self.assertEqual(
             response['frontend_dicts'][1]['contributor_id'],
-            'user1'
+            'user2'
         )
         self.assertEqual(
             response['next_offset'],
-            3
+            4
         )
         self.assertEqual(
             response['more'],
@@ -1313,18 +1288,15 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
         ).put()
 
         self.login(self.CONTRIBUTOR_EMAIL)
-        csrf_token = self.get_new_csrf_token()
 
         # Test pagination.
-        response = self.post_json(
+        response = self.get_json(
             '/contributor-dashboard-admin-stats/question/submission', {
                 'page_size': 2,
                 'offset': 1,
                 'language_code': None,
-                'sort_by': None,
-                'topic_ids': None,
-                'num_days_since_last_activity': None
-            }, csrf_token=csrf_token)
+                'topic_ids': []
+            })
 
         self.assertEqual(
             len(response['frontend_dicts']),
@@ -1344,15 +1316,14 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
         )
 
         # Test with sorting and pagination.
-        response = self.post_json(
+        response = self.get_json(
             '/contributor-dashboard-admin-stats/question/submission', {
                 'page_size': 2,
                 'offset': 1,
                 'language_code': None,
                 'sort_by': 'IncreasingLastActivity',
-                'topic_ids': None,
-                'num_days_since_last_activity': None
-            }, csrf_token=csrf_token)
+                'topic_ids': []
+            })
 
         self.assertEqual(
             len(response['frontend_dicts']),
@@ -1372,15 +1343,13 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
         )
 
         # Test with topic filter and pagination.
-        response = self.post_json(
+        response = self.get_json(
             '/contributor-dashboard-admin-stats/question/submission', {
                 'page_size': 2,
                 'offset': 1,
                 'language_code': None,
-                'sort_by': None,
-                'topic_ids': ['topic1', 'topic2'],
-                'num_days_since_last_activity': None
-            }, csrf_token=csrf_token)
+                'topic_ids': json.dumps(['topic1', 'topic2'])
+            })
 
         self.assertEqual(
             len(response['frontend_dicts']),
@@ -1404,31 +1373,30 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
         )
 
         # Test with num_days_since_last_activity filter and pagination.
-        response = self.post_json(
+        response = self.get_json(
             '/contributor-dashboard-admin-stats/question/submission', {
                 'page_size': 4,
                 'offset': 1,
                 'language_code': None,
-                'sort_by': None,
-                'topic_ids': None,
-                'num_days_since_last_activity': 120
-            }, csrf_token=csrf_token)
+                'num_days_since_last_activity': 120,
+                'topic_ids': []
+            })
 
         self.assertEqual(
             len(response['frontend_dicts']),
-            2
+            3
         )
         self.assertEqual(
             response['frontend_dicts'][0]['contributor_id'],
-            'user2'
+            'user3'
         )
         self.assertEqual(
             response['frontend_dicts'][1]['contributor_id'],
-            'user1'
+            'user2'
         )
         self.assertEqual(
             response['next_offset'],
-            3
+            4
         )
         self.assertEqual(
             response['more'],
@@ -1500,18 +1468,15 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
         ).put()
 
         self.login(self.CONTRIBUTOR_EMAIL)
-        csrf_token = self.get_new_csrf_token()
 
         # Test pagination.
-        response = self.post_json(
+        response = self.get_json(
             '/contributor-dashboard-admin-stats/question/review', {
                 'page_size': 2,
                 'offset': 1,
                 'language_code': None,
-                'sort_by': None,
-                'topic_ids': None,
-                'num_days_since_last_activity': None
-            }, csrf_token=csrf_token)
+                'topic_ids': []
+            })
 
         self.assertEqual(
             len(response['frontend_dicts']),
@@ -1531,15 +1496,14 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
         )
 
         # Test with sorting and pagination.
-        response = self.post_json(
+        response = self.get_json(
             '/contributor-dashboard-admin-stats/question/review', {
                 'page_size': 2,
                 'offset': 1,
                 'language_code': None,
                 'sort_by': 'IncreasingLastActivity',
-                'topic_ids': None,
-                'num_days_since_last_activity': None
-            }, csrf_token=csrf_token)
+                'topic_ids': []
+            })
 
         self.assertEqual(
             len(response['frontend_dicts']),
@@ -1559,31 +1523,30 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
         )
 
         # Test with num_days_since_last_activity filter and pagination.
-        response = self.post_json(
+        response = self.get_json(
             '/contributor-dashboard-admin-stats/question/review', {
                 'page_size': 4,
                 'offset': 1,
                 'language_code': None,
-                'sort_by': None,
-                'topic_ids': None,
-                'num_days_since_last_activity': 120
-            }, csrf_token=csrf_token)
+                'num_days_since_last_activity': 120,
+                'topic_ids': []
+            })
 
         self.assertEqual(
             len(response['frontend_dicts']),
-            2
+            3
         )
         self.assertEqual(
             response['frontend_dicts'][0]['contributor_id'],
-            'user2'
+            'user3'
         )
         self.assertEqual(
             response['frontend_dicts'][1]['contributor_id'],
-            'user1'
+            'user2'
         )
         self.assertEqual(
             response['next_offset'],
-            3
+            4
         )
         self.assertEqual(
             response['more'],

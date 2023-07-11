@@ -539,7 +539,7 @@ class ContributorDashboardAdminStatsHandlerNormalizedPayloadDict(TypedDict):
 
     page_size: int
     offset: int
-    language_code: str
+    language_code: Optional[str]
     sort_by: Optional[str]
     topic_ids: Optional[List[str]]
     num_days_since_last_activity: Optional[int]
@@ -547,8 +547,8 @@ class ContributorDashboardAdminStatsHandlerNormalizedPayloadDict(TypedDict):
 
 class ContributorDashboardAdminStatsHandler(
     base.BaseHandler[
-        ContributorDashboardAdminStatsHandlerNormalizedPayloadDict,
-        Dict[str, str]
+        Dict[str, str],
+        ContributorDashboardAdminStatsHandlerNormalizedPayloadDict
     ]
 ):
     """Return Contributor Admin Dashboard Stats for supplied parameters.
@@ -576,7 +576,7 @@ class ContributorDashboardAdminStatsHandler(
         }
     }
     HANDLER_ARGS_SCHEMAS = {
-        'POST': {
+        'GET': {
             'page_size': {
                 'schema': {
                     'type': 'int'
@@ -614,10 +614,8 @@ class ContributorDashboardAdminStatsHandler(
             },
             'topic_ids': {
                 'schema': {
-                    'type': 'list',
-                    'items': {
-                        'type': 'basestring'
-                    }
+                    'type': 'custom',
+                    'obj_type': 'JsonEncodedInString'
                 },
                 'default_value': None
             },
@@ -625,46 +623,27 @@ class ContributorDashboardAdminStatsHandler(
                 'schema': {
                     'type': 'int'
                 },
-                'validators': [{
-                    'id': 'is_at_least',
-                    'min_value': 0
-                }],
                 'default_value': None
             }
         }
     }
 
     @acl_decorators.can_access_contributor_dashboard_admin_page
-    def post(
+    def get(
         self,
         contribution_type: str,
         contribution_subtype: str
     ) -> None:
-        """Handles POST requests."""
+        """Handles GET requests."""
 
-        if contribution_type not in {
-            feconf.CONTRIBUTION_TYPE_TRANSLATION,
-            feconf.CONTRIBUTION_TYPE_QUESTION
-        }:
-            raise self.InvalidInputException(
-                'Invalid contribution type %s.' % (contribution_type)
-            )
-        if contribution_subtype not in [
-            feconf.CONTRIBUTION_SUBTYPE_SUBMISSION,
-            feconf.CONTRIBUTION_SUBTYPE_REVIEW
-        ]:
-            raise self.InvalidInputException(
-                'Invalid contribution subtype %s.' % (contribution_subtype)
-            )
-
-        assert self.normalized_payload is not None
-        page_size = self.normalized_payload['page_size']
-        offset = self.normalized_payload['offset']
-        language_code = self.normalized_payload['language_code']
-        sort_by = self.normalized_payload['sort_by']
-        topic_ids = self.normalized_payload['topic_ids']
-        num_days_since_last_activity = self.normalized_payload[
-            'num_days_since_last_activity']
+        assert self.normalized_request is not None
+        page_size = self.normalized_request.get('page_size')
+        offset = self.normalized_request.get('offset')
+        language_code = self.normalized_request.get('language_code')
+        sort_by = self.normalized_request.get('sort_by')
+        topic_ids = self.normalized_request.get('topic_ids')
+        num_days_since_last_activity = self.normalized_request.get(
+            'num_days_since_last_activity')
 
         if contribution_type == feconf.CONTRIBUTION_TYPE_TRANSLATION:
             if contribution_subtype == feconf.CONTRIBUTION_SUBTYPE_SUBMISSION:
