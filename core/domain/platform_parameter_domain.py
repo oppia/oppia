@@ -41,9 +41,9 @@ class ServerMode(enum.Enum):
 
 FeatureStages = ServerMode
 
-# Union type defined from allowed types that a platform can contain
-# for it's data types.
-PlatformDataTypes = Union[str, int, bool]
+# Union type defined from allowed types that a platform parameter can contain
+# for its data types.
+PlatformDataTypes = Union[str, int, bool, float]
 
 
 class DataTypes(enum.Enum):
@@ -803,6 +803,15 @@ class PlatformParameter:
             *. The default value of the platform parameter.
         """
         return self._default_value
+
+    def set_default_value(self, default_value: PlatformDataTypes) -> None:
+        """Sets the default value of the PlatformParameter.
+
+        Args:
+            default_value: PlatformDataTypes. The new default value of the
+                parameter.
+        """
+        self._default_value = default_value
 
     @property
     def is_feature(self) -> bool:

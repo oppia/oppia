@@ -40,6 +40,7 @@ class UnsentFeedbackEmailHandler(
 
     @acl_decorators.can_perform_tasks_in_taskqueue
     def post(self) -> None:
+        """Processes feedback messages for a user."""
         payload = json.loads(self.request.body)
         user_id = payload['user_id']
         references = feedback_services.get_feedback_message_references(user_id)
@@ -118,6 +119,7 @@ class ContributorDashboardAchievementEmailHandler(
 
     @acl_decorators.can_perform_tasks_in_taskqueue
     def post(self) -> None:
+        """Sends an email notification to a contributor."""
         payload = json.loads(self.request.body)
         contributor_user_id = payload['contributor_user_id']
         contribution_type = payload['contribution_type']
@@ -141,6 +143,7 @@ class InstantFeedbackMessageEmailHandler(
 
     @acl_decorators.can_perform_tasks_in_taskqueue
     def post(self) -> None:
+        """Sends an email notification to a user."""
         payload = json.loads(self.request.body)
         user_id = payload['user_id']
         reference_dict = payload['reference_dict']
@@ -167,6 +170,7 @@ class FeedbackThreadStatusChangeEmailHandler(
 
     @acl_decorators.can_perform_tasks_in_taskqueue
     def post(self) -> None:
+        """Sends an email notification to a user."""
         payload = json.loads(self.request.body)
         user_id = payload['user_id']
         reference_dict = payload['reference_dict']
@@ -196,6 +200,7 @@ class FlagExplorationEmailHandler(
 
     @acl_decorators.can_perform_tasks_in_taskqueue
     def post(self) -> None:
+        """Sends an email notification to administrators."""
         payload = json.loads(self.request.body)
         exploration_id = payload['exploration_id']
         report_text = payload['report_text']
@@ -243,6 +248,14 @@ class DeferredTasksHandler(
 
     @acl_decorators.can_perform_tasks_in_taskqueue
     def post(self) -> None:
+        """Defers tasks for execution in the background.
+
+        Raises:
+            Exception. This request cannot defer tasks because it does not
+                contain a function identifier attribute (fn_identifier).
+                Deferred tasks must contain a function_identifier in the
+                payload.
+        """
         # The request body has bytes type, thus we need to decode it first.
         payload = json.loads(self.request.body.decode('utf-8'))
         if 'fn_identifier' not in payload:

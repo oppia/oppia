@@ -30,7 +30,7 @@ describe('Exploration summary model', () => {
       thumbnail_icon_url: '/subjects/Algebra.svg',
       human_readable_contributors_summary: {},
       language_code: 'en',
-      thumbnail_bg_color: '#cd672b',
+      thumbnail_bg_color: '#cc4b00',
       created_on_msec: 1591296635736.666,
       ratings: {
         1: 0,
@@ -57,7 +57,7 @@ describe('Exploration summary model', () => {
     expect(expSummaryObject.thumbnailIconUrl).toEqual('/subjects/Algebra.svg');
     expect(expSummaryObject.humanReadableContributorsSummary).toEqual({});
     expect(expSummaryObject.languageCode).toEqual('en');
-    expect(expSummaryObject.thumbnailBgColor).toEqual('#cd672b');
+    expect(expSummaryObject.thumbnailBgColor).toEqual('#cc4b00');
     expect(expSummaryObject.createdOnMsec).toEqual(1591296635736.666);
     expect(expSummaryObject.ratings).toEqual({
       1: 0,

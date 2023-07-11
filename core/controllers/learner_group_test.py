@@ -20,10 +20,9 @@ import json
 
 from core import feconf
 from core.constants import constants
-from core.domain import config_domain
-from core.domain import config_services
 from core.domain import learner_group_fetchers
 from core.domain import learner_group_services
+from core.domain import platform_feature_services
 from core.domain import skill_services
 from core.domain import story_domain
 from core.domain import story_fetchers
@@ -476,7 +475,12 @@ class LearnerGroupLearnerProgressHandlerTests(test_utils.GenericTestBase):
             'prerequisite_skill_ids': [],
             'outline': '',
             'outline_is_finalized': False,
-            'exploration_id': self.EXP_ID_1
+            'exploration_id': self.EXP_ID_1,
+            'status': 'Published',
+            'planned_publication_date_msecs': 100,
+            'last_modified_msecs': 100,
+            'first_publication_date_msecs': 200,
+            'unpublishing_reason': None
         }
         self.node_2: story_domain.StoryNodeDict = {
             'id': self.NODE_ID_2,
@@ -491,7 +495,12 @@ class LearnerGroupLearnerProgressHandlerTests(test_utils.GenericTestBase):
             'prerequisite_skill_ids': [],
             'outline': '',
             'outline_is_finalized': False,
-            'exploration_id': self.EXP_ID_0
+            'exploration_id': self.EXP_ID_0,
+            'status': 'Published',
+            'planned_publication_date_msecs': 100,
+            'last_modified_msecs': 100,
+            'first_publication_date_msecs': 200,
+            'unpublishing_reason': None
         }
         self.node_3: story_domain.StoryNodeDict = {
             'id': self.NODE_ID_3,
@@ -506,7 +515,12 @@ class LearnerGroupLearnerProgressHandlerTests(test_utils.GenericTestBase):
             'prerequisite_skill_ids': [],
             'outline': '',
             'outline_is_finalized': False,
-            'exploration_id': self.EXP_ID_7
+            'exploration_id': self.EXP_ID_7,
+            'status': 'Published',
+            'planned_publication_date_msecs': 100,
+            'last_modified_msecs': 100,
+            'first_publication_date_msecs': 200,
+            'unpublishing_reason': None
         }
         story.story_contents.nodes = [
             story_domain.StoryNode.from_dict(self.node_1),
@@ -709,7 +723,12 @@ class LearnerGroupLearnerSpecificProgressHandlerTests(
             'prerequisite_skill_ids': [],
             'outline': '',
             'outline_is_finalized': False,
-            'exploration_id': self.EXP_ID_1
+            'exploration_id': self.EXP_ID_1,
+            'status': 'Published',
+            'planned_publication_date_msecs': 100,
+            'last_modified_msecs': 100,
+            'first_publication_date_msecs': 200,
+            'unpublishing_reason': None
         }
         self.node_2: story_domain.StoryNodeDict = {
             'id': self.NODE_ID_2,
@@ -724,7 +743,12 @@ class LearnerGroupLearnerSpecificProgressHandlerTests(
             'prerequisite_skill_ids': [],
             'outline': '',
             'outline_is_finalized': False,
-            'exploration_id': self.EXP_ID_0
+            'exploration_id': self.EXP_ID_0,
+            'status': 'Published',
+            'planned_publication_date_msecs': 100,
+            'last_modified_msecs': 100,
+            'first_publication_date_msecs': 200,
+            'unpublishing_reason': None
         }
         story.story_contents.nodes = [
             story_domain.StoryNode.from_dict(self.node_1),
@@ -841,16 +865,25 @@ class CreateLearnerGroupPageTests(test_utils.GenericTestBase):
         self.login(self.NEW_USER_EMAIL)
 
     def test_page_with_disabled_learner_groups_leads_to_404(self) -> None:
-        config_services.set_property(
-            'admin', 'learner_groups_are_enabled', False)
-        self.get_html_response(
-            feconf.CREATE_LEARNER_GROUP_PAGE_URL, expected_status_int=404)
+        swap_is_feature_enabled = self.swap_to_always_return(
+            platform_feature_services,
+            'is_feature_enabled',
+            False
+        )
+        with swap_is_feature_enabled:
+            self.get_html_response(
+                feconf.CREATE_LEARNER_GROUP_PAGE_URL, expected_status_int=404)
         self.logout()
 
     def test_page_with_enabled_learner_groups_loads_correctly(self) -> None:
-        config_services.set_property(
-            'admin', 'learner_groups_are_enabled', True)
-        response = self.get_html_response(feconf.CREATE_LEARNER_GROUP_PAGE_URL)
+        swap_is_feature_enabled = self.swap_to_always_return(
+            platform_feature_services,
+            'is_feature_enabled',
+            True
+        )
+        with swap_is_feature_enabled:
+            response = self.get_html_response(
+                feconf.CREATE_LEARNER_GROUP_PAGE_URL)
         response.mustcontain(
             '<oppia-create-learner-group-page>'
             '</oppia-create-learner-group-page>')
@@ -866,17 +899,25 @@ class FacilitatorDashboardPageTests(test_utils.GenericTestBase):
         self.login(self.NEW_USER_EMAIL)
 
     def test_page_with_disabled_learner_groups_leads_to_404(self) -> None:
-        config_services.set_property(
-            'admin', 'learner_groups_are_enabled', False)
-        self.get_html_response(
-            feconf.FACILITATOR_DASHBOARD_PAGE_URL, expected_status_int=404)
+        swap_is_feature_enabled = self.swap_to_always_return(
+            platform_feature_services,
+            'is_feature_enabled',
+            False
+        )
+        with swap_is_feature_enabled:
+            self.get_html_response(
+                feconf.FACILITATOR_DASHBOARD_PAGE_URL, expected_status_int=404)
         self.logout()
 
     def test_page_with_enabled_learner_groups_loads_correctly(self) -> None:
-        config_services.set_property(
-            'admin', 'learner_groups_are_enabled', True)
-        response = self.get_html_response(
-            feconf.FACILITATOR_DASHBOARD_PAGE_URL)
+        swap_is_feature_enabled = self.swap_to_always_return(
+            platform_feature_services,
+            'is_feature_enabled',
+            True
+        )
+        with swap_is_feature_enabled:
+            response = self.get_html_response(
+                feconf.FACILITATOR_DASHBOARD_PAGE_URL)
         response.mustcontain(
             '<oppia-facilitator-dashboard-page>'
             '</oppia-facilitator-dashboard-page>')
@@ -986,20 +1027,28 @@ class EditLearnerGroupPageTests(test_utils.GenericTestBase):
             ['story_id_1'])
 
     def test_page_with_disabled_learner_groups_leads_to_404(self) -> None:
-        config_services.set_property(
-            'admin', 'learner_groups_are_enabled', False)
-        self.get_html_response(
-            '/edit-learner-group/%s' % self.learner_group_id,
-            expected_status_int=404)
+        swap_is_feature_enabled = self.swap_to_always_return(
+            platform_feature_services,
+            'is_feature_enabled',
+            False
+        )
+        with swap_is_feature_enabled:
+            self.get_html_response(
+                '/edit-learner-group/%s' % self.learner_group_id,
+                expected_status_int=404)
         self.logout()
 
     def test_page_with_enabled_learner_groups_loads_correctly_for_facilitator(
         self
     ) -> None:
-        config_services.set_property(
-            'admin', 'learner_groups_are_enabled', True)
-        response = self.get_html_response(
-            '/edit-learner-group/%s' % self.learner_group_id)
+        swap_is_feature_enabled = self.swap_to_always_return(
+            platform_feature_services,
+            'is_feature_enabled',
+            True
+        )
+        with swap_is_feature_enabled:
+            response = self.get_html_response(
+                '/edit-learner-group/%s' % self.learner_group_id)
         response.mustcontain(
             '<oppia-edit-learner-group-page>'
             '</oppia-edit-learner-group-page>')
@@ -1008,13 +1057,17 @@ class EditLearnerGroupPageTests(test_utils.GenericTestBase):
     def test_page_with_enabled_learner_groups_leads_to_404_for_non_facilitators(
         self
     ) -> None:
-        config_services.set_property(
-            'admin', 'learner_groups_are_enabled', True)
+        swap_is_feature_enabled = self.swap_to_always_return(
+            platform_feature_services,
+            'is_feature_enabled',
+            True
+        )
         self.logout()
         self.login(self.NEW_USER_EMAIL)
-        self.get_html_response(
-            '/edit-learner-group/%s' % self.learner_group_id,
-            expected_status_int=404)
+        with swap_is_feature_enabled:
+            self.get_html_response(
+                '/edit-learner-group/%s' % self.learner_group_id,
+                expected_status_int=404)
         self.logout()
 
 
@@ -1347,18 +1400,25 @@ class LearnerGroupsFeatureStatusHandlerTests(test_utils.GenericTestBase):
     """Unit test for LearnerGroupsFeatureStatusHandler."""
 
     def test_get_request_returns_correct_status(self) -> None:
-        self.set_config_property(
-            config_domain.LEARNER_GROUPS_ARE_ENABLED, False)
-
-        response = self.get_json('/learner_groups_feature_status_handler')
+        swap_is_feature_enabled_to_false = self.swap_to_always_return(
+            platform_feature_services,
+            'is_feature_enabled',
+            False
+        )
+        with swap_is_feature_enabled_to_false:
+            response = self.get_json('/learner_groups_feature_status_handler')
         self.assertEqual(
             response, {
                 'feature_is_enabled': False
             })
 
-        self.set_config_property(
-            config_domain.LEARNER_GROUPS_ARE_ENABLED, True)
-        response = self.get_json('/learner_groups_feature_status_handler')
+        swap_is_feature_enabled_to_true = self.swap_to_always_return(
+            platform_feature_services,
+            'is_feature_enabled',
+            True
+        )
+        with swap_is_feature_enabled_to_true:
+            response = self.get_json('/learner_groups_feature_status_handler')
         self.assertEqual(
             response, {
                 'feature_is_enabled': True,

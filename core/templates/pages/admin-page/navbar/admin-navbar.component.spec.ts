@@ -112,7 +112,7 @@ describe('Admin Navbar component', () => {
 
     expect(component.isActivitiesTabOpen()).toBe(true);
     expect(component.isConfigTabOpen()).toBe(false);
-    expect(component.isFeaturesTabOpen()).toBe(false);
+    expect(component.isPlatformParamsTabOpen()).toBe(false);
     expect(component.isRolesTabOpen()).toBe(false);
     expect(component.isMiscTabOpen()).toBe(false);
   }));
@@ -126,7 +126,7 @@ describe('Admin Navbar component', () => {
 
     expect(component.isActivitiesTabOpen()).toBe(true);
     expect(component.isConfigTabOpen()).toBe(false);
-    expect(component.isFeaturesTabOpen()).toBe(false);
+    expect(component.isPlatformParamsTabOpen()).toBe(false);
     expect(component.isRolesTabOpen()).toBe(false);
     expect(component.isMiscTabOpen()).toBe(false);
 
@@ -134,12 +134,12 @@ describe('Admin Navbar component', () => {
 
     expect(component.isActivitiesTabOpen()).toBe(false);
     expect(component.isConfigTabOpen()).toBe(true);
-    expect(component.isFeaturesTabOpen()).toBe(false);
+    expect(component.isPlatformParamsTabOpen()).toBe(false);
     expect(component.isRolesTabOpen()).toBe(false);
     expect(component.isMiscTabOpen()).toBe(false);
   }));
 
-  it('should be routed to the features tab', fakeAsync(() => {
+  it('should be routed to the platform params tab', fakeAsync(() => {
     spyOn(userService, 'getUserInfoAsync')
       .and.resolveTo(userInfo as UserInfo);
 
@@ -148,15 +148,15 @@ describe('Admin Navbar component', () => {
 
     expect(component.isActivitiesTabOpen()).toBe(true);
     expect(component.isConfigTabOpen()).toBe(false);
-    expect(component.isFeaturesTabOpen()).toBe(false);
+    expect(component.isPlatformParamsTabOpen()).toBe(false);
     expect(component.isRolesTabOpen()).toBe(false);
     expect(component.isMiscTabOpen()).toBe(false);
 
-    adminRouterService.showTab('#/features');
+    adminRouterService.showTab('#/platform-parameters');
 
     expect(component.isActivitiesTabOpen()).toBe(false);
     expect(component.isConfigTabOpen()).toBe(false);
-    expect(component.isFeaturesTabOpen()).toBe(true);
+    expect(component.isPlatformParamsTabOpen()).toBe(true);
     expect(component.isRolesTabOpen()).toBe(false);
     expect(component.isMiscTabOpen()).toBe(false);
   }));
@@ -170,7 +170,7 @@ describe('Admin Navbar component', () => {
 
     expect(component.isActivitiesTabOpen()).toBe(true);
     expect(component.isConfigTabOpen()).toBe(false);
-    expect(component.isFeaturesTabOpen()).toBe(false);
+    expect(component.isPlatformParamsTabOpen()).toBe(false);
     expect(component.isRolesTabOpen()).toBe(false);
     expect(component.isMiscTabOpen()).toBe(false);
 
@@ -178,7 +178,7 @@ describe('Admin Navbar component', () => {
 
     expect(component.isActivitiesTabOpen()).toBe(false);
     expect(component.isConfigTabOpen()).toBe(false);
-    expect(component.isFeaturesTabOpen()).toBe(false);
+    expect(component.isPlatformParamsTabOpen()).toBe(false);
     expect(component.isRolesTabOpen()).toBe(true);
     expect(component.isMiscTabOpen()).toBe(false);
   }));
@@ -192,7 +192,7 @@ describe('Admin Navbar component', () => {
 
     expect(component.isActivitiesTabOpen()).toBe(true);
     expect(component.isConfigTabOpen()).toBe(false);
-    expect(component.isFeaturesTabOpen()).toBe(false);
+    expect(component.isPlatformParamsTabOpen()).toBe(false);
     expect(component.isRolesTabOpen()).toBe(false);
     expect(component.isMiscTabOpen()).toBe(false);
 
@@ -200,7 +200,7 @@ describe('Admin Navbar component', () => {
 
     expect(component.isActivitiesTabOpen()).toBe(false);
     expect(component.isConfigTabOpen()).toBe(false);
-    expect(component.isFeaturesTabOpen()).toBe(false);
+    expect(component.isPlatformParamsTabOpen()).toBe(false);
     expect(component.isRolesTabOpen()).toBe(false);
     expect(component.isMiscTabOpen()).toBe(true);
   }));

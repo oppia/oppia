@@ -70,10 +70,6 @@ class ContributorDashboardPage(
 
     @acl_decorators.open_access
     def get(self) -> None:
-        # TODO(#7402): Serve this page statically through app.yaml once
-        # the CONTRIBUTOR_DASHBOARD_ENABLED flag is removed.
-        if not config_domain.CONTRIBUTOR_DASHBOARD_IS_ENABLED.value:
-            raise self.PageNotFoundException
         self.render_template('contributor-dashboard-page.mainpage.html')
 
 
@@ -132,8 +128,6 @@ class ContributionOpportunitiesHandler(
     def get(self, opportunity_type: str) -> None:
         """Handles GET requests."""
         assert self.normalized_request is not None
-        if not config_domain.CONTRIBUTOR_DASHBOARD_IS_ENABLED.value:
-            raise self.PageNotFoundException
         search_cursor = self.normalized_request.get('cursor')
         language_code = self.normalized_request.get('language_code')
 
@@ -315,7 +309,7 @@ class ReviewableOpportunitiesHandler(
 
     @acl_decorators.open_access
     def get(self) -> None:
-        """Handles GET requests."""
+        """Fetches reviewable translation suggestions."""
         assert self.normalized_request is not None
         topic_name = self.normalized_request.get('topic_name')
         language = self.normalized_request.get('language_code')
@@ -1006,7 +1000,12 @@ class ContributorCertificateHandler(
     def get(
         self, username: str, suggestion_type: str
     ) -> None:
-        """Handles GET requests."""
+        """Generates data for contributor certificates.
+
+        Args:
+            username: str. A user's username.
+            suggestion_type: str. The suggestion type.
+        """
         assert self.normalized_request is not None
         from_date = self.normalized_request['from_date']
         to_date = self.normalized_request['to_date']
@@ -1047,7 +1046,11 @@ class ContributorAllStatsSummariesHandler(
 
     @acl_decorators.can_fetch_all_contributor_dashboard_stats
     def get(self, username: str) -> None:
-        """Handles GET requests."""
+        """Fetches stats for given contributor.
+
+        Args:
+            username: str. A user's username.
+        """
         user_id = user_services.get_user_id_from_username(username)
         # Here we are sure that user_id will never be None, because
         # we are already handling the None case of user_id in
