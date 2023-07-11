@@ -623,6 +623,10 @@ class ContributorDashboardAdminStatsHandler(
                 'schema': {
                     'type': 'int'
                 },
+                'validators': [{
+                    'id': 'is_at_least',
+                    'min_value': 0
+                }],
                 'default_value': None
             }
         }
