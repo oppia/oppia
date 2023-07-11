@@ -342,6 +342,12 @@
                                 placeholder="{{ 'I18N_LEARNER_DASHBOARD_FEEDBACK_THREAD_DEFAULT_MESSAGE' | translate }}" [(ngModel)]="newMessage.text">
                       </textarea>
                     </div>
+                    <div class="feedback-thread-warning"
+                         *ngIf="feedbackThreadActive"
+                         tabindex="0">
+                      <i class="fas fa-exclamation-circle"></i>
+                      <span [innerHTML]="'I18N_LEARNER_DASHBOARD_FEEDBACK_THREAD_WARNING' | translate"></span>
+                    </div>
                     <div>
                       <button class="btn btn-success feedback-thread-new-message-send"
                               (click)="addNewMessage(threadId, newMessage.text)"
@@ -362,12 +368,6 @@
               </td>
             </tr>
           </table>
-          <div class="feedback-thread-warning"
-               *ngIf="feedbackThreadActive"
-               tabindex="0">
-            <i class="fas fa-exclamation-circle"></i>
-            <span [innerHTML]="'I18N_LEARNER_DASHBOARD_FEEDBACK_THREAD_WARNING' | translate"></span>
-          </div>
           <div class="oppia-learnerdashboard-pagination-container" *ngIf="paginatedThreadsList.length > 0">
             <button class="oppia-pagination-button" type="button" (click)="fetchFeedbackUpdates()">
               <span *ngIf="!loadingIndicatorIsShown">Show more</span>
