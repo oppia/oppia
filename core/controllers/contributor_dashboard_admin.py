@@ -664,7 +664,7 @@ class ContributorDashboardAdminStatsHandler(
                 translation_submitter_frontend_dicts = [stat.to_frontend_dict()
                     for stat in translation_submitter_stats]
                 response = {
-                    'frontend_dicts': translation_submitter_frontend_dicts,
+                    'stats': translation_submitter_frontend_dicts,
                     'next_offset': next_offset,
                     'more': more
                 }
@@ -682,7 +682,7 @@ class ContributorDashboardAdminStatsHandler(
                 translation_reviewer_frontend_dicts = [stat.to_frontend_dict()
                     for stat in translation_reviewer_stats]
                 response = {
-                    'frontend_dicts': translation_reviewer_frontend_dicts,
+                    'stats': translation_reviewer_frontend_dicts,
                     'next_offset': next_offset,
                     'more': more
                 }
@@ -701,7 +701,7 @@ class ContributorDashboardAdminStatsHandler(
                 question_submitter_frontend_dicts = [stat.to_frontend_dict()
                     for stat in question_submitter_stats]
                 response = {
-                    'frontend_dicts': question_submitter_frontend_dicts,
+                    'stats': question_submitter_frontend_dicts,
                     'next_offset': next_offset,
                     'more': more
                 }
@@ -718,7 +718,7 @@ class ContributorDashboardAdminStatsHandler(
                 question_reviewer_frontend_dicts = [stat.to_frontend_dict()
                     for stat in question_reviewer_stats]
                 response = {
-                    'frontend_dicts': question_reviewer_frontend_dicts,
+                    'stats': question_reviewer_frontend_dicts,
                     'next_offset': next_offset,
                     'more': more
                 }
