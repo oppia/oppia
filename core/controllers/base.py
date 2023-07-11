@@ -927,8 +927,8 @@ class CsrfTokenManager:
                             ],
                         }
                     ],
-                    'value_when_matched': str(
-                        base64.urlsafe_b64encode(os.urandom(20)))
+                    'value_when_matched': base64.urlsafe_b64encode(
+                        os.urandom(20)).decode()
                 })
             ],
             CSRF_SECRET.default_value
