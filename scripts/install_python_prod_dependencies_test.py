@@ -287,11 +287,13 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
             self.cmd_token_list,
             [
                 [
-                    'pip-compile', '--no-emit-index-url', 'requirements.in',
-                    '--output-file', 'requirements.txt',
+                    'pip-compile', '--generate-hashes', '--allow-unsafe',
+                    '--no-emit-index-url', 'requirements.in', '--output-file',
+                    'requirements.txt',
                 ],
                 [
-                    'python', '-m', 'pip', 'install', '--target',
+                    'python', '-m', 'pip', 'install', '--require-hashes',
+                    '--no-deps', '--target',
                     common.THIRD_PARTY_PYTHON_LIBS_DIR,
                     '--no-dependencies',
                     '-r', common.COMPILED_REQUIREMENTS_FILE_PATH,
@@ -336,8 +338,9 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
             self.cmd_token_list,
             [
                 [
-                    'pip-compile', '--no-emit-index-url', 'requirements.in',
-                    '--output-file', 'requirements.txt',
+                    'pip-compile', '--generate-hashes', '--allow-unsafe',
+                    '--no-emit-index-url', 'requirements.in', '--output-file',
+                    'requirements.txt',
                 ],
                 [
                     'python', '-m', 'pip', 'install',
@@ -416,11 +419,13 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
             self.cmd_token_list,
             [
                 [
-                    'pip-compile', '--no-emit-index-url', 'requirements.in',
-                    '--output-file', 'requirements.txt',
+                    'pip-compile', '--generate-hashes', '--allow-unsafe',
+                    '--no-emit-index-url', 'requirements.in', '--output-file',
+                    'requirements.txt',
                 ],
                 [
-                    'python', '-m', 'pip', 'install', '--target',
+                    'python', '-m', 'pip', 'install', '--require-hashes',
+                    '--no-deps', '--target',
                     common.THIRD_PARTY_PYTHON_LIBS_DIR,
                     '--no-dependencies', '-r',
                     common.COMPILED_REQUIREMENTS_FILE_PATH,
@@ -462,8 +467,9 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
 
         self.assertEqual(self.cmd_token_list, [
             [
-                'pip-compile', '--no-emit-index-url', 'requirements.in',
-                '--output-file', 'requirements.txt',
+                'pip-compile', '--generate-hashes', '--allow-unsafe',
+                '--no-emit-index-url', 'requirements.in', '--output-file',
+                'requirements.txt',
             ],
         ])
 
@@ -495,8 +501,9 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
 
         self.assertEqual(self.cmd_token_list, [
             [
-                'pip-compile', '--no-emit-index-url', 'requirements.in',
-                '--output-file', 'requirements.txt',
+                'pip-compile', '--generate-hashes', '--allow-unsafe',
+                '--no-emit-index-url', 'requirements.in', '--output-file',
+                'requirements.txt',
             ],
         ])
         self.assertEqual(print_statements, [
@@ -563,8 +570,9 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
             self.cmd_token_list,
             [
                 [
-                    'pip-compile', '--no-emit-index-url', 'requirements.in',
-                    '--output-file', 'requirements.txt',
+                    'pip-compile', '--generate-hashes', '--allow-unsafe',
+                    '--no-emit-index-url', 'requirements.in', '--output-file',
+                    'requirements.txt',
                 ],
                 [
                     'python', '-m', 'pip', 'install',

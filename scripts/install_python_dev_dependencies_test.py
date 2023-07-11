@@ -147,7 +147,10 @@ class InstallPythonDevDependenciesTests(test_utils.GenericTestBase):
 
         run_swap = self.swap_with_checks(
             subprocess, 'run', mock_run, expected_args=[
-                (['pip-sync', 'requirements_dev.txt'],),
+                (
+                    ['pip', 'install', '--require-hashes', '--no-deps', '-r',
+                    'requirements_dev.txt'],
+                ),
             ],
             expected_kwargs=[
                 {'check': True, 'encoding': 'utf-8'},
@@ -185,8 +188,9 @@ class InstallPythonDevDependenciesTests(test_utils.GenericTestBase):
         run_swap = self.swap_with_checks(
             subprocess, 'run', mock_run, expected_args=[
                 ([
-                    'pip-compile', '--no-emit-index-url', 'requirements_dev.in',
-                    '--output-file', 'requirements_dev.txt',
+                    'pip-compile', '--generate-hashes', '--no-emit-index-url',
+                    '--allow-unsafe', 'requirements_dev.in', '--output-file',
+                    'requirements_dev.txt',
                 ],),
             ],
             expected_kwargs=[
@@ -224,8 +228,9 @@ class InstallPythonDevDependenciesTests(test_utils.GenericTestBase):
         run_swap = self.swap_with_checks(
             subprocess, 'run', mock_run, expected_args=[
                 ([
-                    'pip-compile', '--no-emit-index-url', 'requirements_dev.in',
-                    '--output-file', 'requirements_dev.txt',
+                    'pip-compile', '--generate-hashes', '--no-emit-index-url',
+                    '--allow-unsafe', 'requirements_dev.in', '--output-file',
+                    'requirements_dev.txt',
                 ],),
             ],
             expected_kwargs=[
