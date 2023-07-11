@@ -17,6 +17,7 @@
  */
 
 import { Story, StoryBackendDict } from 'domain/story/story.model';
+import { StoryNode } from 'domain/story/story-node.model';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { UndoRedoService } from 'domain/editor/undo_redo/undo-redo.service';
@@ -29,10 +30,20 @@ import { EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
 import { StoryEditorNavigationService } from '../services/story-editor-navigation.service';
 import { BrowserDynamicTestingModule } from '@angular/platform-browser-dynamic/testing';
 import { NgbModal, NgbModalRef, NgbModule } from '@ng-bootstrap/ng-bootstrap';
+import { PlatformFeatureService } from '../../../services/platform-feature.service';
+import { StoryUpdateService } from 'domain/story/story-update.service';
 
 class MockNgbModalRef {
   componentInstance!: {
     bindedMessage: null;
+  };
+}
+
+class MockPlatformFeatureService {
+  status = {
+    SerialChapterLaunchCurriculumAdminView: {
+      isEnabled: false
+    }
   };
 }
 
@@ -42,9 +53,12 @@ describe('Story editor navbar component', () => {
   let story: Story;
   let alertsService: AlertsService;
   let storyEditorStateService: StoryEditorStateService;
+  let storyEditorNavigationService: StoryEditorNavigationService;
+  let storyUpdateService: StoryUpdateService;
   let undoRedoService: UndoRedoService;
   let editableStoryBackendApiService: EditableStoryBackendApiService;
   let ngbModal: NgbModal;
+  let mockPlatformFeatureService = new MockPlatformFeatureService();
   let storyBackendDict: StoryBackendDict;
 
   beforeEach(() => {
@@ -57,9 +71,14 @@ describe('Story editor navbar component', () => {
       providers: [
         StoryEditorStateService,
         StoryEditorNavigationService,
+        StoryUpdateService,
         UndoRedoService,
         EditableStoryBackendApiService,
-        AlertsService
+        AlertsService,
+        {
+          provide: PlatformFeatureService,
+          useValue: mockPlatformFeatureService
+        },
       ],
       schemas: [NO_ERRORS_SCHEMA]
     }).overrideModule(BrowserDynamicTestingModule, {
@@ -75,6 +94,9 @@ describe('Story editor navbar component', () => {
     alertsService = TestBed.inject(AlertsService);
     undoRedoService = TestBed.inject(UndoRedoService);
     storyEditorStateService = TestBed.inject(StoryEditorStateService);
+    storyEditorNavigationService = TestBed.inject(
+      StoryEditorNavigationService);
+    storyUpdateService = TestBed.inject(StoryUpdateService);
     undoRedoService = TestBed.inject(UndoRedoService);
     ngbModal = TestBed.inject(NgbModal);
     editableStoryBackendApiService = TestBed.inject(
@@ -116,7 +138,7 @@ describe('Story editor navbar component', () => {
           outline_is_finalized: false,
           thumbnail_filename: 'img2.png',
           thumbnail_bg_color: '#a33f40',
-          status: 'Published',
+          status: 'Ready To Publish',
           planned_publication_date_msecs: 100,
           last_modified_msecs: 100,
           first_publication_date_msecs: 100,
@@ -157,6 +179,47 @@ describe('Story editor navbar component', () => {
 
   afterEach(() => {
     component.ngOnDestroy();
+  });
+
+  it('should get status of Serial Chapter Launch Feature flag', () => {
+    expect(component.isSerialChapterFeatureFlagEnabled()).toEqual(false);
+
+    mockPlatformFeatureService.
+      status.SerialChapterLaunchCurriculumAdminView.isEnabled = true;
+    expect(component.isSerialChapterFeatureFlagEnabled()).toEqual(true);
+  });
+
+  it('should get if chapter is publishable', () => {
+    spyOn(
+      storyEditorStateService, 'isCurrentNodePublishable').
+      and.returnValue(true);
+    expect(component.isChapterPublishable()).toBe(true);
+
+    storyEditorStateService.isCurrentNodePublishable = jasmine.
+      createSpy().and.returnValue(false);
+    expect(component.isChapterPublishable()).toBe(false);
+  });
+
+  it('should get if publish button is disabled', () => {
+    spyOn(
+      storyEditorStateService, 'getNewChapterPublicationIsDisabled').
+      and.returnValue(true);
+    expect(component.isPublishButtonDisabled()).toBe(true);
+
+    storyEditorStateService.getNewChapterPublicationIsDisabled = jasmine.
+      createSpy().and.returnValue(false);
+    expect(component.isPublishButtonDisabled()).toBe(false);
+  });
+
+  it('should get if chapters are being published', () => {
+    spyOn(
+      storyEditorStateService, 'areChaptersBeingPublished').
+      and.returnValue(true);
+    expect(component.areChaptersBeingPublished()).toBe(true);
+
+    storyEditorStateService.areChaptersBeingPublished = jasmine.
+      createSpy().and.returnValue(false);
+    expect(component.areChaptersBeingPublished()).toBe(false);
   });
 
   describe('on initialization ', () => {
@@ -315,6 +378,24 @@ describe('Story editor navbar component', () => {
 
       expect(component.validationIssues.length).toBe(0);
     });
+
+    it('should get story node data when the tab is chapter editor', () => {
+      story = Story.createFromBackendDict(storyBackendDict);
+      let getStoryNodeSpy = spyOn(component, 'getStoryNodeData');
+      let mockStoryInitializedEventEmitter = new EventEmitter();
+      spyOnProperty(storyEditorStateService, 'onStoryInitialized').
+        and.returnValue(mockStoryInitializedEventEmitter);
+      spyOn(storyEditorStateService, 'getStory').and.returnValue(story);
+
+      component.ngOnInit();
+      fixture.detectChanges();
+
+      component.currentTab = 'chapter_editor';
+      mockStoryInitializedEventEmitter.emit();
+      fixture.detectChanges();
+
+      expect(getStoryNodeSpy).toHaveBeenCalled();
+    });
   });
 
   it('should unpublish story', fakeAsync(() => {
@@ -411,6 +492,38 @@ describe('Story editor navbar component', () => {
     expect(clearChangesSpy).toHaveBeenCalled();
   });
 
+  it('should set switch current tab', () => {
+    let mockStoryInitializedEventEmitter = new EventEmitter<string>();
+    spyOnProperty(storyEditorNavigationService, 'onChangeActiveTab')
+      .and.returnValue(mockStoryInitializedEventEmitter);
+    let getStoryNodeSpy = spyOn(component, 'getStoryNodeData');
+
+    component.ngOnInit();
+    fixture.detectChanges();
+    mockStoryInitializedEventEmitter.emit('chapter_editor');
+    fixture.detectChanges();
+
+    expect(component.currentTab).toBe('chapter_editor');
+    expect(getStoryNodeSpy).toHaveBeenCalled();
+
+    mockStoryInitializedEventEmitter.emit('story_editor');
+    fixture.detectChanges();
+
+    expect(component.currentTab).toBe('story_editor');
+  });
+
+  it('should get story node data', () => {
+    story = Story.createFromBackendDict(storyBackendDict);
+    component.story = story;
+    spyOn(storyEditorNavigationService, 'getChapterId').and.returnValue(
+      'node_1');
+
+    component.getStoryNodeData();
+
+    expect(component.storyNode).toEqual(StoryNode.createFromBackendDict(
+      storyBackendDict.story_contents.nodes[0]));
+  });
+
   describe('open a confirmation modal for saving changes ', () => {
     it('should save story successfully on' +
       'clicking save draft button', fakeAsync(() => {
@@ -451,6 +564,7 @@ describe('Story editor navbar component', () => {
 
       expect(modalSpy).toHaveBeenCalled();
       expect(saveChangesSpy).toHaveBeenCalled();
+      expect(component.chapterIsPublishedOrUnpublished).toBe(false);
     }));
 
     it('should show error message if the story was not saved' +
@@ -503,6 +617,7 @@ describe('Story editor navbar component', () => {
     it('should not save story on clicking cancel button', fakeAsync(() => {
       story = Story.createFromBackendDict(storyBackendDict);
       let mockStoryInitializedEventEmitter = new EventEmitter();
+      let discardChangesSpy = spyOn(component, 'discardChanges');
 
       spyOn(storyEditorStateService, 'getStory').and.returnValue(story);
       spyOnProperty(storyEditorStateService, 'onStoryInitialized')
@@ -523,6 +638,7 @@ describe('Story editor navbar component', () => {
             result: Promise.reject()
           } as NgbModalRef);
       });
+      component.chapterIsPublishedOrUnpublished = true;
 
       component.ngOnInit();
       mockStoryInitializedEventEmitter.emit();
@@ -538,8 +654,142 @@ describe('Story editor navbar component', () => {
 
       expect(modalSpy).toHaveBeenCalled();
       expect(saveChangesSpy).not.toHaveBeenCalled();
+      expect(discardChangesSpy).toHaveBeenCalled();
+      expect(component.chapterIsPublishedOrUnpublished).toBe(false);
     }));
   });
+
+  it('should change chapter status to Draft or Ready To Publish', () => {
+    component.storyNode = StoryNode.
+      createFromBackendDict(storyBackendDict.story_contents.nodes[1]);
+    component.story = Story.createFromBackendDict(storyBackendDict);
+    spyOn(storyEditorStateService, 'getStory').and.returnValue(
+      component.story);
+    let saveChapterSpy = spyOn(
+      storyEditorStateService, 'saveChapter').and.callThrough();
+    let storyNodeStatusSpy = spyOn(storyUpdateService, 'setStoryNodeStatus');
+    const saveChangesSpy = spyOn(
+      storyEditorStateService, 'saveStory')
+      .and.callFake((commitMessage, successCallback, errorCallback) => {
+        errorCallback(commitMessage);
+        return true;
+      });
+
+    component.changeChapterStatus('Draft');
+    expect(saveChapterSpy).toHaveBeenCalled();
+    expect(saveChangesSpy).toHaveBeenCalled();
+    expect(storyNodeStatusSpy).toHaveBeenCalledTimes(2);
+  });
+
+  it('should save changes in Ready To Publish chapter', fakeAsync(() => {
+    component.storyNode = StoryNode.createFromBackendDict(
+      storyBackendDict.story_contents.nodes[1]);
+    storyEditorStateService.isCurrentNodePublishable = jasmine.
+      createSpy().and.returnValue(true);
+    let saveChangesSpy = spyOn(component, 'saveChanges');
+    let storyNodeStatusSpy = spyOn(storyUpdateService, 'setStoryNodeStatus');
+    const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+      return (
+        { componentInstance: MockNgbModalRef,
+          result: Promise.resolve('BAD_CONTENT')
+        } as NgbModalRef);
+    });
+
+    component.saveChangesInReadyToPublishChapter();
+    expect(saveChangesSpy).toHaveBeenCalled();
+
+    storyEditorStateService.isCurrentNodePublishable = jasmine.
+      createSpy().and.returnValue(false);
+    component.saveChangesInReadyToPublishChapter();
+    tick();
+    expect(modalSpy).toHaveBeenCalled();
+    expect(storyNodeStatusSpy).toHaveBeenCalled();
+    expect(saveChangesSpy).toHaveBeenCalled();
+  }));
+
+  it('should publish chapters', () => {
+    component.story = Story.createFromBackendDict(storyBackendDict);
+    spyOn(
+      storyEditorStateService,
+      'getSelectedChapterIndexInPublishUptoDropdown').and.returnValue(1);
+    let storyNodeFirstPublicationDateSpy = spyOn(
+      storyUpdateService, 'setStoryNodeFirstPublicationDateMsecs');
+    let storyNodeStatusSpy = spyOn(storyUpdateService, 'setStoryNodeStatus');
+    let storyNodeUnpublishingReasonSpy = spyOn(
+      storyUpdateService, 'setStoryNodeUnpublishingReason');
+    let publishStorySpy = spyOn(component, 'publishStory');
+    let saveChangesSpy = spyOn(component, 'saveChanges');
+
+    component.changeChapterStatus('Published');
+    expect(storyNodeStatusSpy).toHaveBeenCalledTimes(1);
+    expect(storyNodeUnpublishingReasonSpy).toHaveBeenCalledTimes(1);
+    expect(saveChangesSpy).toHaveBeenCalled();
+
+
+    component.story.getStoryContents().getNodes()[0].
+      setStatus('Ready To Publish');
+    component.story.getStoryContents().getNodes()[0].
+      setFirstPublicationDateMsecs(null);
+
+    component.changeChapterStatus('Published');
+    expect(storyNodeStatusSpy).toHaveBeenCalledTimes(3);
+    expect(storyNodeUnpublishingReasonSpy).toHaveBeenCalledTimes(3);
+    expect(storyNodeFirstPublicationDateSpy).toHaveBeenCalledTimes(1);
+    expect(saveChangesSpy).toHaveBeenCalled();
+    expect(publishStorySpy).toHaveBeenCalled();
+  });
+
+  it('should unpublish chapters', fakeAsync(() => {
+    component.story = Story.createFromBackendDict(storyBackendDict);
+    spyOn(
+      storyEditorStateService,
+      'getSelectedChapterIndexInPublishUptoDropdown').and.returnValue(0);
+    let storyNodePlannedPublicationDateSpy = spyOn(
+      storyUpdateService, 'setStoryNodePlannedPublicationDateMsecs');
+    let storyNodeStatusSpy = spyOn(storyUpdateService, 'setStoryNodeStatus');
+    let storyNodeUnpublishingReasonSpy = spyOn(
+      storyUpdateService, 'setStoryNodeUnpublishingReason');
+    const saveChangesSpy = spyOn(
+      storyEditorStateService, 'saveStory')
+      .and.callFake((commitMessage, successCallback, errorCallback) => {
+        if (commitMessage !== null) {
+          successCallback();
+        } else {
+          errorCallback('Expected a commit message but received none.');
+        }
+        return true;
+      });
+    const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+      return (
+        { componentInstance: MockNgbModalRef,
+          result: Promise.resolve('BAD_CONTENT')
+        } as NgbModalRef);
+    });
+
+    component.story.getStoryContents().getNodes()[1].setStatus('Published');
+
+    component.changeChapterStatus('Published');
+    tick();
+
+    expect(modalSpy).toHaveBeenCalled();
+    expect(storyNodeStatusSpy).toHaveBeenCalledTimes(1);
+    expect(storyNodeUnpublishingReasonSpy).toHaveBeenCalledTimes(1);
+    expect(storyNodePlannedPublicationDateSpy).toHaveBeenCalledTimes(1);
+    expect(saveChangesSpy).toHaveBeenCalled();
+
+    component.story.getStoryContents().getNodes()[1].setStatus('Published');
+    component.story.getStoryContents().getNodes()[1].
+      setPlannedPublicationDateMsecs(null);
+
+    component.changeChapterStatus('Published');
+    tick();
+
+    expect(modalSpy).toHaveBeenCalled();
+    expect(storyNodeStatusSpy).toHaveBeenCalledTimes(2);
+    expect(storyNodeUnpublishingReasonSpy).toHaveBeenCalledTimes(2);
+    expect(storyNodePlannedPublicationDateSpy).toHaveBeenCalledTimes(1);
+    expect(saveChangesSpy).toHaveBeenCalled();
+  }));
 
   it('should return change list length', () => {
     spyOn(undoRedoService, 'getChangeCount').and.returnValue(10);

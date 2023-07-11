@@ -44,7 +44,11 @@ export class StoryEditorUnpublishModalComponent {
   }
 
   confirm(): void {
-    this.activeModal.close();
+    if (this.isSerialChapterFeatureFlagEnabled()) {
+      this.activeModal.close(this.unpublishingReason);
+    } else {
+      this.activeModal.close();
+    }
   }
 
   isSerialChapterFeatureFlagEnabled(): boolean {
