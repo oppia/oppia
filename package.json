@@ -198,6 +198,7 @@
     "requireindex": "^1.2.0",
     "rxjs": "^6.0.0",
     "rxjs-marbles": "^6.0.0",
+    "skulpt-dist": "git+https://github.com/skulpt/skulpt-dist#7b61d",
     "stream-browserify": "^3.0.0",
     "tslib": "^2.0.0",
     "vanilla-picker": "^2.10.1",
