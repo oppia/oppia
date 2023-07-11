@@ -7595,7 +7595,7 @@ espree@^9.4.0:
     acorn-jsx "^5.3.2"
     eslint-visitor-keys "^3.3.0"
 
-esprima@4.0.1, esprima@^4.0.0, esprima@^4.0.1, esprima@~4.0.0:
+esprima@^4.0.0, esprima@^4.0.1, esprima@~4.0.0:
   version "4.0.1"
   resolved "https://registry.yarnpkg.com/esprima/-/esprima-4.0.1.tgz#13b04cdb3e6c5d19df91ab6987a8695619b0aa71"
   integrity sha512-eGuFFw7Upda+g4p+QHvnW0RyTX/SVeJBDM/gCtMARO0cLuT2HcEKnTPvhjV6aGeqrCB/sbNop0Kszm0jsaWU4A==
@@ -9415,9 +9415,9 @@ html-webpack-plugin@^4.0.3:
     tapable "^1.1.3"
     util.promisify "1.0.0"
 
-"htmllint-cli@github:oppia/htmllint-cli#01a8b74":
+"htmllint-cli@git+https://github.com/oppia/htmllint-cli#01a8b74":
   version "0.0.7"
-  resolved "https://codeload.github.com/oppia/htmllint-cli/tar.gz/01a8b74ae7aaedeadba3d1d4d93a29807f6a52da"
+  resolved "git+https://github.com/oppia/htmllint-cli#01a8b74ae7aaedeadba3d1d4d93a29807f6a52da"
   dependencies:
     bluebird "^3.5.5"
     chalk "^2.4.2"
@@ -16002,6 +16002,10 @@ sisteransi@^1.0.5:
   version "1.0.5"
   resolved "https://registry.yarnpkg.com/sisteransi/-/sisteransi-1.0.5.tgz#134d681297756437cc05ca01370d3a7a571075ed"
   integrity sha512-bLGGlR1QxBcynn2d5YmDX4MGjlZvy2MRBDRNHLJ8VI6l6+9FUiyTFNJ0IveOSP0bcXgVDPRcfGqA0pjaqUpfVg==
+
+"skulpt-dist@git+https://github.com/skulpt/skulpt-dist#7b61d":
+  version "0.0.0"
+  resolved "git+https://github.com/skulpt/skulpt-dist#7b61d9bca2b8f18d4691c27de8262b281bb0e8a7"
 
 slash@^3.0.0:
   version "3.0.0"
