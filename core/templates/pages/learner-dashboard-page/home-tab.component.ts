@@ -83,7 +83,6 @@ export class HomeTabComponent {
   totalExploration: LearnerExplorationSummary[] = [];
   storyExplorationProgressList: (
     LearnerExplorationSummary | storySummaryTile)[] = [];
-  // ExplorationsProgressSummary!: Ch apterProgressSummary[];
 
 
   totalLessonsInPlaylist: (
@@ -110,15 +109,11 @@ export class HomeTabComponent {
       this.totalLessonsInPlaylist.push(
         ...this.explorationPlaylist, ...this.collectionPlaylist);
 
-      console.error(this.totalLessonsInPlaylist, 'playlist data');
       this.startIndexInPlaylist = 0;
       this.endIndexInPlaylist = this.totalLessonsInPlaylist.length;
     }, 2000);
     this.totalExploration.push(
       ...this.explorationPlaylist, ...this.incompleteExplorationsList);
-    console.error(this.totalExploration, 'total exp');
-    console.error(this.incompleteExplorationsList, 'incomple');
-    console.error(this.explorationPlaylist, 'exp playlist');
     this.width = this.widthConst * (this.currentGoals.length);
     var allGoals = [...this.currentGoals, ...this.partiallyLearntTopicsList];
     this.currentGoalsLength = this.currentGoals.length;
@@ -170,14 +165,10 @@ export class HomeTabComponent {
     }
     this.storyExplorationProgressList.push(
       ...this.storyInProgress, ...this.incompleteExplorationsList);
-    console.error(this.storyExplorationProgressList, 'story exp proge');
-    // For (var tl of this.storyExplorationProgressList) {
-    //   console.error(this.getstoryExplorationTileType(tl), 'tile type..');
-    // }
+
     for (var exp of this.completedExplorationsList) {
       this.completedExpIds.push(exp.id);
     }
-    console.error(this.totalExploration.length, 'leeengthhhhh');
     if (this.totalExploration.length !== 0) {
       let expIds = [];
       for (var exp of this.totalExploration) {
@@ -191,18 +182,13 @@ export class HomeTabComponent {
           let explorationsProgress = explorationsProgressSummary;
 
           if (explorationsProgress.length !== 0) {
-            console.error('178...');
             for (let i = 0; i < expIds.length; i++) {
               let progress =
           this.calculateExplorationProgress(explorationsProgress[i], expIds[i]);
               this.explorationToProgressMap.set(
                 expIds[i], Math.floor(progress));
             }
-            console.error(this.explorationToProgressMap, 'progress map');
           }
-
-          console.error(
-            explorationsProgressSummary, 'progressof exploration .....');
         });
     }
 
@@ -224,19 +210,13 @@ export class HomeTabComponent {
       explorationProgress: ChapterProgressSummary, expId: string): number {
     let totalCheckpoints = explorationProgress.totalCheckpoints;
     let visitedCheckpoints = explorationProgress.visitedCheckpoints;
-
     if (this.completedExpIds.includes(expId)) {
       return 100;
     }
-
     if (visitedCheckpoints === 1 && totalCheckpoints === 1) {
       return 0;
     }
-
-    console.error(visitedCheckpoints, 'visited check[points..');
-    console.error(totalCheckpoints, 'total checkkk');
     let progress = (visitedCheckpoints / totalCheckpoints) * 100;
-    console.error(progress, 'progressssss');
     return progress;
   }
 

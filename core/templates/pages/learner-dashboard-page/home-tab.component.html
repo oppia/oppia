@@ -8,32 +8,6 @@
       [innerHTML]="'I18N_LEARNER_DASHBOARD_CONTINUE_WHERE_YOU_LEFT_OFF_SECTION' | translate"
       *ngIf="continueWhereYouLeftOffList.length !== 0">
     </p>
-    <!-- <p class="continue-where-you-left-off-heading"
-       [innerHTML]="'I18N_LEARNER_DASHBOARD_EMPTY_CONTINUE_WHERE_YOU_LEFT_OFF_SECTION_HEADING' | translate"
-       *ngIf="continueWhereYouLeftOffList.length === 0">
-    </p> -->
-    <!-- <div class="empty-continue-where-you-left-off-section" *ngIf="continueWhereYouLeftOffList.length === 0">
-      <p [innerHTML]="'I18N_LEARNER_DASHBOARD_EMPTY_CONTINUE_WHERE_YOU_LEFT_OFF_SECTION' | translate" class="empty-continue-where-you-left-off-section-text">
-      </p>
-      <a id="setting-a-goal-link" (click)="changeActiveSection()">
-        <p [innerHTML]="'I18N_LEARNER_DASHBOARD_EMPTY_CONTINUE_WHERE_YOU_LEFT_OFF_SECTION_SET_A_GOAL' | translate" class="empty-continue-where-you-left-off-section-text">
-        </p>
-      </a>
-    </div> -->
-    <!-- <div class="continue-where-you-left-off-scroll">
-      <div class="continue-where-you-left-off-section" *ngIf="continueWhereYouLeftOffList.length !== 0"
-        [ngStyle]="windowIsNarrow && {'width': width + 'px'}">
-        <div *ngFor="let topicSummaryTile of continueWhereYouLeftOffList" class="topic-summary">
-          <div *ngFor="let storySummaryTile of topicSummaryTile.canonicalStorySummaryDicts; let i = index"
-            class="story-summary  7289836208            -tile">
-            <oppia-learner-story-summary-tile [storySummary]="storySummaryTile" [displayArea]="'homeTab'"
-              [topicName]="topicSummaryTile.name">
-            </oppia-learner-story-summary-tile>
-          </div>
-        </div>
-      </div>
-    </div> -->
-    <!-- <div class="continue-where-you-left-off-scroll"> -->
       <div class="continue-where-you-left-off-container">
       <div class="continue-where-you-left-off-section">
         <div *ngIf="storyExplorationProgressList.length !== 0" class="oppia-story-exploration-in-progress inprogress">
@@ -76,14 +50,6 @@
             </div>
           </oppia-carousel-bar>
         </div>
-        <!-- <div *ngFor="let topicSummaryTile of continueWhereYouLeftOffList" class="topic-summary">
-          <div *ngFor="let storySummaryTile of topicSummaryTile.canonicalStorySummaryDicts; let i = index"
-            class="story-summary-tile">
-            <oppia-learner-story-summary-tile [storySummary]="storySummaryTile" [displayArea]="'homeTab'"
-              [topicName]="topicSummaryTile.name">
-            </oppia-learner-story-summary-tile>
-          </div>
-        </div> -->
       </div>
     </div>
   </div>
@@ -92,13 +58,6 @@
   <div tabindex="0" class="topic-suggested-for-you shivam">
     <p class="suggested-for-you-heading" [innerHTML]="'I18N_LEARNER_DASHBOARD_LEARN_SOMETHING_NEW_SECTION' | translate">
     </p>
-    <!-- <div class="oppia-classroom-search-container">
-      <div class="oppia-classroom-search-section">
-        <div class="oppia-classroom-search-bar-container">
-          <oppia-search-bar [enableDropup]="true"></oppia-search-bar>
-        </div>
-      </div>
-    </div> -->
     <div class="oppia-learner-dashboard-search-container">
      <div class="oppia-learner-dashboard-search-section">
       <oppia-search-bar [enableDropup]="false" [learnerDashboardSearch]="true"></oppia-search-bar>
@@ -185,40 +144,4 @@
       </oppia-learner-groups-tab>
     </div>
   </div>
-
-  <div>
-   Jai shree ram!
-  </div>
-  <!-- <div tabindex="0" class="topic-suggested-for-you subhash">
-    <p class="suggested-for-you-heading" [innerHTML]="'I18N_LEARNER_DASHBOARD_LEARN_SOMETHING_NEW_SECTION' | translate">
-    </p>
-    <div *ngFor="let item of untrackedTopics | keyvalue" class="untracked-topics">
-      <oppia-carousel-bar [carouselClassname]="'.subhash '">
-        <div *ngFor="let topicSummaryTile of item.value" class="topic-summary-tile">
-          <oppia-learner-topic-summary-tile [topicSummary]="topicSummaryTile">
-          </oppia-learner-topic-summary-tile>
-        </div>
-      </oppia-carousel-bar>
-      <div>
-        <a [href]="getClassroomLink(item.key)" target="{{ openInNewWindow ? '_blank' : '_self' }}"
-          class="oppia-classroom-link">
-          <div class="classroom-card">
-            <p class="classroom-text">
-              <span [innerHTML]="'I18N_VIEW_ALL_TOPICS' | translate: {classroomName: item.key}"></span>
-            </p>
-          </div>
-        </a>
-      </div>
-    </div>
-  </div> -->
-
-  <!-- <div tabindex="0" class="empty-suggested-for-you learn-something-new-section"
-    *ngIf="!isNonemptyObject(untrackedTopics) && continueWhereYouLeftOffList.length === 0">
-    <p class="suggested-for-you-heading" [innerHTML]="'I18N_LEARNER_DASHBOARD_LEARN_SOMETHING_NEW_SECTION' | translate">
-    </p>
-    <div class="empty-suggested-for-you-section">
-      <p [innerHTML]="'I18N_LEARNER_DASHBOARD_EMPTY_SUGGESTED_FOR_YOU_SECTION' | translate">
-      </p>
-    </div>
-  </div> -->
 </div>

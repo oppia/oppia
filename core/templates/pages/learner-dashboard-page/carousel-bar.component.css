@@ -1,33 +1,33 @@
-.oppia-carousel-heading {
+.oppia-carousel-bar .oppia-carousel-heading {
 color: #333;
 font-family: Roboto;
 font-style: normal;
 font-weight: 500;
 }
 
-.oppia-carousel-head-content {
+.oppia-carousel-bar .oppia-carousel-head-content {
   display: flex;
   justify-content: space-between;
 }
 
-.oppia-carousel-button {
+.oppia-carousel-bar .oppia-carousel-button {
   display: flex;
   flex-wrap: nowrap;
   gap: 2px;
 }
 
-.tiles {
+.oppia-carousel-bar .tiles {
   display: flex;
   flex-wrap: nowrap;
   gap: 16px;
   overflow: scroll;
 }
 
-.tiles::-webkit-scrollbar {
+.oppia-carousel-bar .tiles::-webkit-scrollbar {
   display: none;
 }
 
-.oppia-carousel-scroller {
+.oppia-carousel-bar .oppia-carousel-scroller {
   border-radius: 4px;
   color: white;
   cursor: default;

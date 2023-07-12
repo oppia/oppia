@@ -82,15 +82,9 @@ export class CarouselBarComponent implements OnInit {
    let classname = this.carouselClassname + '.tiles';
    let carouselSelector = document.querySelector(classname) as HTMLElement;
    this.CarouselScrollWidthPx = carouselSelector.scrollWidth;
-   console.error(this.CarouselScrollWidthPx, 'scroll width ..');
    this.CarouselClientWidthPx = carouselSelector.clientWidth;
-   console.error(this.CarouselClientWidthPx, 'client Width ...');
 
    let direction = isLeftScroll ? -1 : 1;
-
-   console.error(direction * 210, 'directionn.......');
-   console.error(this.carouselScrollPositionPx, 'carousel scroll.* 210');
-
 
    if (this.scrollUntrackedTopics && ((this.carouselScrollPositionPx === 0) ||
      (this.carouselScrollPositionPx >
@@ -126,7 +120,6 @@ export class CarouselBarComponent implements OnInit {
    } else {
      this.disableRightButton = false;
    }
-   console.error(this.carouselScrollPositionPx, 'intial caro..posti..');
  }
 
  isScrollable(): boolean {

@@ -234,7 +234,6 @@ export class NewLearnerDashboardComponent implements OnInit {
           (learnerDashboardLearnerGroups) => {
             let learnerGroupsJoined = (
               learnerDashboardLearnerGroups.learnerGroupsJoined);
-            console.error(learnerGroupsJoined, 'group joined bhole');
             for (var learnerGroup of learnerGroupsJoined) {
               let title = learnerGroup.title;
               let storyIds = learnerGroup.storyIds;
@@ -249,7 +248,6 @@ export class NewLearnerDashboardComponent implements OnInit {
             }
           }
         );
-      console.error(this.storyIdToLearnerGroupsTitleMap, 'lllsssssss');
     });
 
 
@@ -270,12 +268,10 @@ export class NewLearnerDashboardComponent implements OnInit {
 
     this.windowIsNarrow = this.windowDimensionService.isWindowNarrow();
     this.TabletView = this.windowDimensionService.isTabletView();
-    console.error(this.TabletView, 'tablet view');
     this.directiveSubscriptions.add(
       this.windowDimensionService.getResizeEvent().subscribe(() => {
         this.windowIsNarrow = this.windowDimensionService.isWindowNarrow();
         this.TabletView = this.windowDimensionService.isTabletView();
-        console.error(this.TabletView, 'tablet view');
       }));
     this.directiveSubscriptions.add(
       this.translateService.onLangChange.subscribe(() => {

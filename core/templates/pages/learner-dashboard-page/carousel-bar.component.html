@@ -1,34 +1,36 @@
-<div class="oppia-coursel-container">
-    <div class="oppia-carousel-head">
-        <div class="oppia-carousel-head-content">
-            <span class="oppia-carousel-heading" [innerHTML]="'I18N_LEARNER_DASHBOARD_LEARN_SOMETHING_NEW_SECTION' | translate"></span>
-            <span class="oppia-carousel-button" *ngIf="isScrollable()">
-                <button class="oppia-carousel-scroller" (click)="scroll(true)"
-                [ngStyle]="{'background-color': disableLeftButton ? 'gray' : '#00645C'}"
-                    [disabled]="disableLeftButton">
-                    <i class="fas fal fa-angle-left"></i>
-                </button>
+<div class="oppia-carousel-bar">
+    <div class="oppia-coursel-container">
+        <div class="oppia-carousel-head">
+            <div class="oppia-carousel-head-content">
+                <span class="oppia-carousel-heading"
+                    [innerHTML]="'I18N_LEARNER_DASHBOARD_LEARN_SOMETHING_NEW_SECTION' | translate"></span>
+                <span class="oppia-carousel-button" *ngIf="isScrollable()">
+                    <button class="oppia-carousel-scroller" (click)="scroll(true)"
+                        [ngStyle]="{'background-color': disableLeftButton ? 'gray' : '#00645C'}"
+                        [disabled]="disableLeftButton">
+                        <i class="fas fal fa-angle-left"></i>
+                    </button>
 
-                <button class="oppia-carousel-scroller" (click)="scroll(false)"
-                    [disabled]="disableRightButton"
-                    [ngStyle]="{'background-color': disableRightButton ? 'gray' : '#00645C'}">
-                    <i class="fas fal fa-angle-right"></i>
-                </button>
-            </span>
+                    <button class="oppia-carousel-scroller" (click)="scroll(false)" [disabled]="disableRightButton"
+                        [ngStyle]="{'background-color': disableRightButton ? 'gray' : '#00645C'}">
+                        <i class="fas fal fa-angle-right"></i>
+                    </button>
+                </span>
+            </div>
         </div>
-    </div>
-    <hr>
-    <div class="oppia-carousel-content">
-        <div class="tiles">
-            <ng-content></ng-content>
+        <hr>
+        <div class="oppia-carousel-content">
+            <div class="tiles">
+                <ng-content></ng-content>
+            </div>
         </div>
     </div>
 </div>
-
 <style>
     .oppia-coursel-container {
         display: inline-grid;
     }
+
     .oppia-carousel-content {
         overflow: hidden;
     }
