@@ -609,163 +609,163 @@ describe('Contribution and review service', () => {
   });
 
   describe('sort translation suggestions', () => {
+    const translationCards = [
+      {
+        suggestion_type: 'suggestion',
+        suggestion_id: 'id',
+        target_type: 'exploration',
+        target_id: '1',
+        status: 'review',
+        author_name: 'author',
+        change: {
+          state_name: 'First State',
+          content_id: 'feedback_2'
+        },
+        last_updated_msecs: 0,
+      },
+      {
+        suggestion_type: 'suggestion',
+        suggestion_id: 'id',
+        target_type: 'exploration',
+        target_id: '1',
+        status: 'review',
+        author_name: 'author',
+        change: {
+          state_name: 'End State',
+          content_id: 'hints_1'
+        },
+        last_updated_msecs: 0,
+      },
+      {
+        suggestion_type: 'suggestion',
+        suggestion_id: 'id',
+        target_type: 'exploration',
+        target_id: '1',
+        status: 'review',
+        author_name: 'author',
+        change: {
+          state_name: 'First State',
+          content_id: 'content_3'
+        },
+        last_updated_msecs: 0,
+      },
+      {
+        suggestion_type: 'suggestion',
+        suggestion_id: 'id',
+        target_type: 'exploration',
+        target_id: '1',
+        status: 'review',
+        author_name: 'author',
+        change: {
+          state_name: 'End State',
+          content_id: 'interaction_1'
+        },
+        last_updated_msecs: 0,
+      },
+      {
+        suggestion_type: 'suggestion',
+        suggestion_id: 'id',
+        target_type: 'exploration',
+        target_id: '1',
+        status: 'review',
+        author_name: 'author',
+        change: {
+          state_name: 'First State',
+          content_id: 'content_1'
+        },
+        last_updated_msecs: 0,
+      },
+      {
+        suggestion_type: 'suggestion',
+        suggestion_id: 'id',
+        target_type: 'exploration',
+        target_id: '1',
+        status: 'review',
+        author_name: 'author',
+        change: {
+          state_name: 'End State',
+          content_id: 'content_2'
+        },
+        last_updated_msecs: 0,
+      }
+    ];
+
+    const statesBackendDict: StateObjectsBackendDict = {
+      'First State': {
+        classifier_model_id: null,
+        content: {
+          content_id: 'content',
+          html: ''
+        },
+        recorded_voiceovers: {
+          voiceovers_mapping: {
+            content: {},
+            default_outcome: {}
+          }
+        },
+        interaction: {
+          answer_groups: [],
+          confirmed_unclassified_answers: [],
+          customization_args: {
+            buttonText: {
+              value: 'Continue'
+            }
+          },
+          default_outcome: {
+            dest: 'End State',
+            dest_if_really_stuck: null,
+            feedback: {
+              content_id: 'default_outcome',
+              html: ''
+            },
+            param_changes: [],
+            labelled_as_correct: true,
+            refresher_exploration_id: null,
+            missing_prerequisite_skill_id: null
+          },
+          hints: [],
+          solution: null,
+          id: 'Continue'
+        },
+        linked_skill_id: null,
+        param_changes: [],
+        solicit_answer_details: false,
+        card_is_checkpoint: true
+      },
+      'End State': {
+        classifier_model_id: null,
+        content: {
+          content_id: 'content',
+          html: ''
+        },
+        recorded_voiceovers: {
+          voiceovers_mapping: {
+            content: {},
+            default_outcome: {}
+          }
+        },
+        interaction: {
+          answer_groups: [],
+          confirmed_unclassified_answers: [],
+          customization_args: {
+            recommendedExplorationIds: {
+              value: []
+            }
+          },
+          default_outcome: null,
+          hints: [],
+          solution: null,
+          id: 'EndExploration'
+        },
+        linked_skill_id: null,
+        param_changes: [],
+        solicit_answer_details: false,
+        card_is_checkpoint: false
+      }
+    }
+
     it('should sort translation cards within each state based' +
     'on type and index', () => {
-      const translationCards = [
-        {
-          suggestion_type: 'suggestion',
-          suggestion_id: 'id',
-          target_type: 'exploration',
-          target_id: '1',
-          status: 'review',
-          author_name: 'author',
-          change: {
-            state_name: 'First State',
-            content_id: 'feedback_2'
-          },
-          last_updated_msecs: 0,
-        },
-        {
-          suggestion_type: 'suggestion',
-          suggestion_id: 'id',
-          target_type: 'exploration',
-          target_id: '1',
-          status: 'review',
-          author_name: 'author',
-          change: {
-            state_name: 'End State',
-            content_id: 'hints_1'
-          },
-          last_updated_msecs: 0,
-        },
-        {
-          suggestion_type: 'suggestion',
-          suggestion_id: 'id',
-          target_type: 'exploration',
-          target_id: '1',
-          status: 'review',
-          author_name: 'author',
-          change: {
-            state_name: 'First State',
-            content_id: 'content_3'
-          },
-          last_updated_msecs: 0,
-        },
-        {
-          suggestion_type: 'suggestion',
-          suggestion_id: 'id',
-          target_type: 'exploration',
-          target_id: '1',
-          status: 'review',
-          author_name: 'author',
-          change: {
-            state_name: 'End State',
-            content_id: 'interaction_1'
-          },
-          last_updated_msecs: 0,
-        },
-        {
-          suggestion_type: 'suggestion',
-          suggestion_id: 'id',
-          target_type: 'exploration',
-          target_id: '1',
-          status: 'review',
-          author_name: 'author',
-          change: {
-            state_name: 'First State',
-            content_id: 'content_1'
-          },
-          last_updated_msecs: 0,
-        },
-        {
-          suggestion_type: 'suggestion',
-          suggestion_id: 'id',
-          target_type: 'exploration',
-          target_id: '1',
-          status: 'review',
-          author_name: 'author',
-          change: {
-            state_name: 'End State',
-            content_id: 'content_2'
-          },
-          last_updated_msecs: 0,
-        }
-      ];
-
-      const statesBackendDict: StateObjectsBackendDict = {
-        'First State': {
-          classifier_model_id: null,
-          content: {
-            content_id: 'content',
-            html: ''
-          },
-          recorded_voiceovers: {
-            voiceovers_mapping: {
-              content: {},
-              default_outcome: {}
-            }
-          },
-          interaction: {
-            answer_groups: [],
-            confirmed_unclassified_answers: [],
-            customization_args: {
-              buttonText: {
-                value: 'Continue'
-              }
-            },
-            default_outcome: {
-              dest: 'End State',
-              dest_if_really_stuck: null,
-              feedback: {
-                content_id: 'default_outcome',
-                html: ''
-              },
-              param_changes: [],
-              labelled_as_correct: true,
-              refresher_exploration_id: null,
-              missing_prerequisite_skill_id: null
-            },
-            hints: [],
-            solution: null,
-            id: 'Continue'
-          },
-          linked_skill_id: null,
-          param_changes: [],
-          solicit_answer_details: false,
-          card_is_checkpoint: true
-        },
-        'End State': {
-          classifier_model_id: null,
-          content: {
-            content_id: 'content',
-            html: ''
-          },
-          recorded_voiceovers: {
-            voiceovers_mapping: {
-              content: {},
-              default_outcome: {}
-            }
-          },
-          interaction: {
-            answer_groups: [],
-            confirmed_unclassified_answers: [],
-            customization_args: {
-              recommendedExplorationIds: {
-                value: []
-              }
-            },
-            default_outcome: null,
-            hints: [],
-            solution: null,
-            id: 'EndExploration'
-          },
-          linked_skill_id: null,
-          param_changes: [],
-          solicit_answer_details: false,
-          card_is_checkpoint: false
-        }
-      }
-
       const states = statesObjectFactory.createFromBackendDict(
         statesBackendDict)
       const initStateName = 'First State';
@@ -854,6 +854,18 @@ describe('Contribution and review service', () => {
         }
       ]);
     });
-    
+
+   it('should return suggestions as it is when initStateName is not defined', 
+   () => {
+    const initStateName = null;
+
+    const states = statesObjectFactory.createFromBackendDict(
+      statesBackendDict);
+
+    const sortedTranslationCards = cars.sortTranslationSuggestionsByState(
+      translationCards, states, initStateName);
+
+    expect(sortedTranslationCards).toEqual(translationCards);
+   });
   });
 });
