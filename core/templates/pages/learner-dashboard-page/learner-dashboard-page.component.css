@@ -61,11 +61,6 @@
   text-align: center;
 }
 
-oppia-learner-dashboard-page .empty-feedback-threads {
-  color: #333;
-  font-family: "Roboto", Arial, sans-serif;
-  font-size: 18px;
-}
 
 oppia-learner-dashboard-page .oppia-buttons {
   cursor: pointer;
@@ -162,45 +157,6 @@ oppia-learner-dashboard-page .oppia-svg-image {
   padding: 0 7.5px;
 }
 
-.oppia-learner-dashboard-feedback-section {
-  margin: 0 23px 0 0;
-}
-
-.oppia-learner-dashboard-feedback-section .table {
-  background-color: white;
-  margin-bottom: 10px;
-  margin-left: 6px;
-}
-
-oppia-learner-dashboard-page .oppia-feedback-section-top-margin {
-  margin-top: 64px;
-}
-
-.oppia-learner-dashboard-feedback-section .feedback-thread-message-count {
-  color: #757575;
-  font-size: 100.25%;
-}
-
-.oppia-learner-dashboard-feedback-section .feedback-message-spacing {
-  left: 3px;
-  padding: 0;
-  text-align: center;
-}
-
-.oppia-learner-dashboard-feedback-section .feedback-message-header {
-  display: inline-block;
-  text-align: center;
-  width: 8%;
-}
-
-.oppia-learner-dashboard-feedback-section .feedback-thread-new-message {
-  margin-right: 10px;
-}
-
-.oppia-learner-dashboard-feedback-section .feedback-thread-new-message-send {
-  margin: 6px 0 0 14px;
-}
-
 oppia-learner-dashboard-page .oppia-row {
   display: flex;
 }
@@ -229,34 +185,12 @@ oppia-learner-dashboard-page .oppia-updated-status {
   float: right;
   margin-right: 15px;
 }
-oppia-learner-dashboard-page .oppia-feedback-message-spacing {
-  width: 8%;
-}
+
 oppia-learner-dashboard-page .learner-groups-icon {
   font-size: 44px;
 }
 
 @media (max-width: 768px) {
-  .oppia-learner-dashboard-feedback-section .feedback-thread-new-message {
-    margin-left: 14px;
-  }
-
-  .oppia-learner-dashboard-feedback-section .feedback-message-author-name {
-    margin-left: 10px;
-  }
-
-  .oppia-learner-dashboard-feedback-section .feedback-thread-new-message-send {
-    margin: 6px 0 0 28px;
-  }
-
-  .oppia-learner-dashboard-feedback-section .feedback-thread-reply-box {
-    margin-top: 9px;
-  }
-
-  .oppia-learner-dashboard-feedback-section .feedback-thread-message-body {
-    margin-left: 43px;
-  }
-
   .oppia-learner-dashboard-container {
     margin-bottom: 0;
   }
@@ -289,28 +223,6 @@ oppia-learner-dashboard-page .learner-groups-icon {
   }
 }
 
-.oppia-learner-dashboard-feedback-section .col-sm-11 {
-  padding: 0 20px 0 0;
-}
-
-.oppia-learner-dashboard-feedback-section .feedback-thread-reply-box {
-  font-size: 1em;
-  height: 70px;
-  margin-left: 14px;
-  resize: vertical;
-}
-
-.oppia-learner-dashboard-feedback-section .feedback-thread-warning {
-  color: #0277bd;
-  margin-left: 4px;
-}
-
-.oppia-learner-dashboard-feedback-section .feedback-thread-learner-profile-pic {
-  margin-left: 26px;
-  margin-top: 4px;
-  min-width: 32px;
-}
-
 @media (max-width: 810px) {
   .sort-explorations-select.oppia-learner-dashboard-sort {
     padding: 0 0 6px 7.5px;
@@ -331,16 +243,6 @@ oppia-learner-dashboard-page .learner-groups-icon {
     margin: 0 2px 0 4px;
   }
 
-  .oppia-learner-dashboard-feedback-section .feedback-thread-reply-box {
-    font-size: 1em;
-    height: 70px;
-    margin-left: 14px;
-    resize: vertical;
-  }
-
-  .oppia-learner-dashboard-feedback-section .feedback-thread-learner-profile-pic {
-    margin-left: 15px;
-  }
 
   oppia-learner-dashboard-page .oppia-svg-image {
     height: 35px;
@@ -401,35 +303,6 @@ oppia-learner-dashboard-page .learner-groups-icon {
   margin-bottom: 38px;
   position: fixed;
   transform: translateY(-100%);
-}
-
-.oppia-learnerdashboard-pagination-container {
-  display: flex;
-  justify-content: space-around;
-  margin: 20px 0;
-  width: 100%;
-}
-oppia-learner-dashboard-page .oppia-pagination-button {
-  background-color: transparent;
-  border: none;
-  box-sizing: border-box;
-  color: #009688;
-  font-size: 18px;
-  font-weight: bold;
-  min-height: 40px;
-  min-width: 100px;
-  text-align: center;
-}
-
-.oppia-pagination-button:hover {
-  border: 2px solid #009688;
-  border-radius: 5px;
-}
-.oppia-pagination-button[disabled] {
-  color: #a9e5df;
-}
-.oppia-pagination-button[disabled]:hover {
-  border: none;
 }
 
 .oppia-diagram-spinning-button {
