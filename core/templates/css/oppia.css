@@ -1293,7 +1293,7 @@ span.sort-explorations-select .sort-order {
 
 .oppia-toast-container {
   position: fixed;
-  z-index: 1000;
+  z-index: 1020;
 }
 
 .oppia-toast-container * {
