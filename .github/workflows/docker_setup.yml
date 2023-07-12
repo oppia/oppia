@@ -31,8 +31,7 @@ jobs:
       - name: Start Containers
         run: |
           echo ---Starting Containers---
-          docker compose up angular-build -d
-          docker compose up webpack-compiler -d
+          docker compose up angular-build webpack-compiler -d
           docker compose up -d
 
       - name: Checking server reachability

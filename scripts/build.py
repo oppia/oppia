@@ -31,7 +31,6 @@ import threading
 from core import feconf
 from core import utils
 from scripts import common
-from scripts import install_dependencies_json_packages
 
 import rcssmin
 from typing import (
@@ -660,6 +659,37 @@ def minify_third_party_libs(third_party_directory_path: str) -> None:
     # Clean up un-minified third_party.js and third_party.css.
     safe_delete_file(third_party_js_filepath)
     safe_delete_file(third_party_css_filepath)
+
+
+def build_third_party_libs(third_party_directory_path: str) -> None:
+    """Joins all third party css files into single css file and js files into
+    single js file. Copies both files and all fonts into third party folder.
+    """
+
+    print('Building third party libs at %s' % third_party_directory_path)
+
+    third_party_js_filepath = os.path.join(
+        third_party_directory_path, THIRD_PARTY_JS_RELATIVE_FILEPATH)
+    third_party_css_filepath = os.path.join(
+        third_party_directory_path, THIRD_PARTY_CSS_RELATIVE_FILEPATH)
+    webfonts_dir = os.path.join(
+        third_party_directory_path, WEBFONTS_RELATIVE_DIRECTORY_PATH)
+
+    dependency_filepaths = get_dependencies_filepaths()
+    ensure_directory_exists(third_party_js_filepath)
+    with utils.open_file(
+        third_party_js_filepath, 'w+') as third_party_js_file:
+        _join_files(dependency_filepaths['js'], third_party_js_file)
+
+    ensure_directory_exists(third_party_css_filepath)
+    with utils.open_file(
+        third_party_css_filepath, 'w+') as third_party_css_file:
+        _join_files(dependency_filepaths['css'], third_party_css_file)
+
+    ensure_directory_exists(webfonts_dir)
+    _execute_tasks(
+        _generate_copy_tasks_for_fonts(
+            dependency_filepaths['fonts'], webfonts_dir))
 
 
 def build_using_ng() -> None:
@@ -1409,7 +1439,7 @@ def main(args: Optional[Sequence[str]] = None) -> None:
 
     # Regenerate /third_party/generated from scratch.
     safe_delete_directory_tree(THIRD_PARTY_GENERATED_DEV_DIR)
-    install_dependencies_json_packages.build_third_party_libs(
+    build_third_party_libs(
         THIRD_PARTY_GENERATED_DEV_DIR)
 
     # If minify_third_party_libs_only is set to True, skips the rest of the
