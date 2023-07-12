@@ -25,6 +25,7 @@ import { StorySummary } from 'domain/story/story-summary.model';
 import { TopicUpdateService } from 'domain/topic/topic-update.service';
 import { TopicEditorStoriesListComponent } from './topic-editor-stories-list.component';
 import { WindowRef } from 'services/contextual/window-ref.service';
+import { PlatformFeatureService } from '../../../services/platform-feature.service';
 
 class MockNgbModalRef {
   componentInstance: {
@@ -32,10 +33,19 @@ class MockNgbModalRef {
   };
 }
 
+class MockPlatformFeatureService {
+  status = {
+    SerialChapterLaunchCurriculumAdminView: {
+      isEnabled: false
+    }
+  };
+}
+
 describe('topicEditorStoriesList', () => {
   let component: TopicEditorStoriesListComponent;
   let fixture: ComponentFixture<TopicEditorStoriesListComponent>;
   let storySummaries;
+  let mockPlatformFeatureService = new MockPlatformFeatureService();
   let topicUpdateService: TopicUpdateService;
   let undoRedoService: UndoRedoService;
   let ngbModal: NgbModal;
@@ -48,6 +58,12 @@ describe('topicEditorStoriesList', () => {
       ],
       imports: [
         HttpClientTestingModule,
+      ],
+      providers: [
+        {
+          provide: PlatformFeatureService,
+          useValue: mockPlatformFeatureService
+        },
       ]
     });
   }));
@@ -85,6 +101,16 @@ describe('topicEditorStoriesList', () => {
     })];
   });
 
+  it('should get status of Serial Chapter Launch Feature flag', () => {
+    mockPlatformFeatureService.
+      status.SerialChapterLaunchCurriculumAdminView.isEnabled = false;
+    expect(component.isSerialChapterLaunchFeatureEnabled()).toEqual(false);
+
+    mockPlatformFeatureService.
+      status.SerialChapterLaunchCurriculumAdminView.isEnabled = true;
+    expect(component.isSerialChapterLaunchFeatureEnabled()).toEqual(true);
+  });
+
   it('should change list order properly', () => {
     spyOn(topicUpdateService, 'rearrangeCanonicalStory').and.stub();
 
@@ -99,10 +125,17 @@ describe('topicEditorStoriesList', () => {
   });
 
   it('should initialise component when list of stories is displayed', () => {
+    mockPlatformFeatureService.
+      status.SerialChapterLaunchCurriculumAdminView.isEnabled = false;
     component.ngOnInit();
-
     expect(component.STORY_TABLE_COLUMN_HEADINGS).toEqual([
       'title', 'node_count', 'publication_status']);
+
+    mockPlatformFeatureService.
+      status.SerialChapterLaunchCurriculumAdminView.isEnabled = true;
+    component.ngOnInit();
+    expect(component.STORY_TABLE_COLUMN_HEADINGS).toEqual([
+      'title', 'publication_status', 'node_count', 'notifications']);
   });
 
   it('should delete story when user deletes story', fakeAsync(() => {

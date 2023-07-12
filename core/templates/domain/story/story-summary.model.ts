@@ -32,6 +32,11 @@ export interface StorySummaryBackendDict {
   'completed_node_titles': string[];
   'url_fragment': string;
   'all_node_dicts': StoryNodeBackendDict[];
+  'published_chapters_count'?: number;
+  'total_chapters_count'?: number;
+  'upcoming_chapters_count'?: number;
+  'overdue_chapters_count'?: number;
+  'visited_chapter_titles'?: string[];
   // This property is optional because it is only present in the
   // story summary dict of learner dashboard page.
   'topic_name'?: string;
@@ -53,7 +58,12 @@ export class StorySummary {
     private _allNodes: StoryNode[],
     private _topicName: string | undefined,
     private _topicUrlFragment: string | undefined,
-    private _classroomUrlFragment: string | undefined
+    private _classroomUrlFragment: string | undefined,
+    private _publishedChaptersCount: number | undefined,
+    private _totalChaptersCount: number | undefined,
+    private _upcomingChaptersCount: number | undefined,
+    private _overdueChaptersCount: number | undefined,
+    private _visitedChapterTitles: string[] | undefined
   ) {}
 
   getId(): string {
@@ -112,6 +122,26 @@ export class StorySummary {
     return this._classroomUrlFragment;
   }
 
+  getPublishedChaptersCount(): number | undefined {
+    return this._publishedChaptersCount;
+  }
+
+  getTotalChaptersCount(): number | undefined {
+    return this._totalChaptersCount;
+  }
+
+  getUpcomingChaptersCount(): number | undefined {
+    return this._upcomingChaptersCount;
+  }
+
+  getOverdueChaptersCount(): number | undefined {
+    return this._overdueChaptersCount;
+  }
+
+  getVisitedChapterTitles(): string[] | undefined {
+    return this._visitedChapterTitles;
+  }
+
   static createFromBackendDict(
       storySummaryBackendDict: StorySummaryBackendDict): StorySummary {
     let allNodes = (
@@ -132,7 +162,12 @@ export class StorySummary {
       allNodes,
       storySummaryBackendDict.topic_name,
       storySummaryBackendDict.topic_url_fragment,
-      storySummaryBackendDict.classroom_url_fragment
+      storySummaryBackendDict.classroom_url_fragment,
+      storySummaryBackendDict.published_chapters_count,
+      storySummaryBackendDict.total_chapters_count,
+      storySummaryBackendDict.upcoming_chapters_count,
+      storySummaryBackendDict.overdue_chapters_count,
+      storySummaryBackendDict.visited_chapter_titles
     );
   }
 }

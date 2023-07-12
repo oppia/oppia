@@ -18,6 +18,7 @@ are created.
 
 from __future__ import annotations
 
+import datetime
 import logging
 
 from core import feconf
@@ -151,6 +152,23 @@ class TopicEditorStoryHandler(
 
         updated_canonical_story_summary_dicts = []
         for summary in canonical_story_summary_dicts:
+            story = story_fetchers.get_story_by_id(summary['id'])
+            nodes = story.story_contents.nodes
+            total_chapters_count = len(nodes)
+            published_chapters_count = len(
+                [node for node in nodes if
+                node.status == 'Published'])
+            upcoming_chapters_count = len(
+                [node for node in nodes if
+                node.planned_publication_date is not None and (
+                node.planned_publication_date - datetime.datetime.today()).
+                days < 14 and node.planned_publication_date >
+                datetime.datetime.today() and node.status != 'Published'])
+            overdue_chapters_count = len(
+                [node for node in nodes if
+                node.planned_publication_date is not None and
+                node.planned_publication_date < datetime.datetime.today() and
+                node.status != 'Published'])
             updated_canonical_story_summary_dict = {
                 'id': summary['id'],
                 'title': summary['title'],
@@ -166,7 +184,11 @@ class TopicEditorStoryHandler(
                 'story_is_published': (
                     story_id_to_publication_status_map[summary['id']]),
                 'completed_node_titles': [],
-                'all_node_dicts': []
+                'all_node_dicts': [],
+                'total_chapters_count': total_chapters_count,
+                'published_chapters_count': published_chapters_count,
+                'upcoming_chapters_count': upcoming_chapters_count,
+                'overdue_chapters_count': overdue_chapters_count
             }
             updated_canonical_story_summary_dicts.append(
                 updated_canonical_story_summary_dict
