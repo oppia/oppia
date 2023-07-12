@@ -31,13 +31,12 @@ import threading
 from core import feconf
 from core import utils
 from scripts import common
+from scripts import install_dependencies_json_packages
 
 import rcssmin
 from typing import (
     Deque, Dict, List, Optional, Sequence, TextIO, Tuple, TypedDict
 )
-
-from scripts import install_dependencies_json_packages
 
 if not feconf.OPPIA_IS_DOCKERIZED:
     from scripts import install_python_dev_dependencies
