@@ -131,19 +131,6 @@ describe('Contributor dashboard page', () => {
     }).toThrowError();
   }));
 
-  it('should scroll properly', () => {
-    spyOn(userService, 'getUserContributionRightsDataAsync')
-      .and.returnValue(Promise.resolve(userContributionRights));
-    const nativeWindowSpy = spyOnProperty(windowRef, 'nativeWindow');
-    nativeWindowSpy.and.returnValue({
-      pageYOffset: 11
-    } as Window);
-
-    component.scrollFunction();
-
-    expect(component.defaultHeaderVisible).toBeTrue();
-  });
-
   it('should set default profile pictures when username is null',
     fakeAsync(() => {
       spyOn(userService, 'getUserContributionRightsDataAsync')
@@ -321,34 +308,5 @@ describe('Contributor dashboard page', () => {
 
       expect(scrollSpy).toHaveBeenCalled();
     });
-
-    it('should show default header if window pageYOffset is ' +
-      'less than 80', function() {
-      spyOn(userService, 'getUserContributionRightsDataAsync')
-        .and.returnValue(Promise.resolve(userContributionRights));
-      const nativeWindowSpy = spyOnProperty(windowRef, 'nativeWindow');
-      nativeWindowSpy.and.returnValue({
-        pageYOffset: 79
-      } as Window);
-
-      component.scrollFunction();
-
-      expect(component.defaultHeaderVisible).toBe(true);
-    });
-
-    it('should show collapsed header if window pageYOffset is' +
-      ' scrolled greater than 80', fakeAsync(() => {
-      spyOn(userService, 'getUserContributionRightsDataAsync')
-        .and.returnValue(Promise.resolve(userContributionRights));
-      const nativeWindowSpy = spyOnProperty(windowRef, 'nativeWindow');
-      nativeWindowSpy.and.returnValue({
-        pageYOffset: 81
-      } as Window);
-
-      component.scrollFunction();
-      tick();
-
-      expect(component.defaultHeaderVisible).toBe(false);
-    }));
   });
 });
