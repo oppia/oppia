@@ -140,19 +140,78 @@ export class ContributionAndReviewService {
       fetcher.offset = 0;
       fetcher.suggestionIdToDetails = {};
     }
+    let explorationBackendResponse = null;
+    if (explorationId) {
+      explorationBackendResponse = await this.
+        readOnlyExplorationBackendApiService.
+        fetchExplorationAsync(explorationId, null);
+    }
     const currentCacheSize: number = Object.keys(
       fetcher.suggestionIdToDetails).length;
     return (
       this.contributionAndReviewBackendApiService.fetchSuggestionsAsync(
         fetcher.type,
-        // Fetch up to two pages at a time to compute if we have more results.
+        // If explorationId is given Fetch all the pages for sorting or else up to two pages
+        // at a time to compute if we have more results.
         // The first page of results is returned to the caller and the second
         // page is cached.
-        (AppConstants.OPPORTUNITIES_PAGE_SIZE * 2) - currentCacheSize,
+        explorationId? null : (AppConstants.OPPORTUNITIES_PAGE_SIZE * 2) - currentCacheSize,
         fetcher.offset,
         fetcher.sortKey,
         explorationId
       ).then((responseBody) => {
+        if (explorationBackendResponse) {
+          // Making a ExplorationBackendDict from the properties of exploration
+          // backend response object. This will be used to make a exploration
+          // object which has properties relevant for sorting.
+          const explorationBackendDict: ExplorationBackendDict = {
+            auto_tts_enabled: explorationBackendResponse.auto_tts_enabled,
+            correctness_feedback_enabled: explorationBackendResponse.
+              correctness_feedback_enabled,
+            draft_changes: [],
+            init_state_name: explorationBackendResponse.
+              exploration.init_state_name,
+            states: explorationBackendResponse.exploration.states,
+            param_changes: explorationBackendResponse.exploration.param_changes,
+            param_specs: explorationBackendResponse.exploration.param_specs,
+            title: explorationBackendResponse.exploration.title,
+            language_code: explorationBackendResponse.exploration.language_code,
+            next_content_id_index: explorationBackendResponse.
+              exploration.next_content_id_index,
+            exploration_metadata: explorationBackendResponse.
+              exploration_metadata,
+            is_version_of_draft_valid: false,
+            draft_change_list_id: explorationBackendResponse.
+              draft_change_list_id
+          };
+
+          const exploration: Exploration = this.explorationObjectFactory.
+          createFromBackendDict(
+            explorationBackendDict);
+
+          const sortedTranslationCards = this.sortTranslationSuggestionsByState(
+            responseBody.suggestions,
+            exploration.getStates(),
+            exploration.getInitialState().name)
+
+          responseBody.suggestions = sortedTranslationCards;
+          const responseSuggestionIdToDetails = fetcher.suggestionIdToDetails;
+          fetcher.suggestionIdToDetails = {};
+          const targetIdToDetails = responseBody.target_id_to_opportunity_dict;
+          responseBody.suggestions.forEach((suggestion) => {
+            const suggestionDetails = {
+            suggestion: suggestion,
+              details: targetIdToDetails[suggestion.target_id]};
+
+            responseSuggestionIdToDetails[suggestion.suggestion_id] = (
+              suggestionDetails);
+          });
+          return {
+            suggestionIdToDetails: responseSuggestionIdToDetails,
+            more: Object.keys(fetcher.suggestionIdToDetails).length > 0
+          };
+        }
+
         const responseSuggestionIdToDetails = fetcher.suggestionIdToDetails;
         fetcher.suggestionIdToDetails = {};
         const targetIdToDetails = responseBody.target_id_to_opportunity_dict;
@@ -180,80 +239,6 @@ export class ContributionAndReviewService {
         };
       })
     );
-  }
-
-  async fetchReviewableSuggestionsAsync(
-      fetcher: SuggestionFetcher,
-      shouldResetOffset: boolean,
-      explorationId: string
-  ): Promise<FetchSuggestionsResponse> {
-    if (shouldResetOffset) {
-      // Handle the case where we need to fetch starting from the beginning.
-      fetcher.offset = 0;
-      fetcher.suggestionIdToDetails = {};
-    }
-    const explorationBackendResponse = await this.
-      readOnlyExplorationBackendApiService.
-      fetchExplorationAsync(explorationId, null);
-    return (
-      this.contributionAndReviewBackendApiService.fetchSuggestionsAsync(
-        fetcher.type,
-        null,
-        fetcher.offset,
-        fetcher.sortKey,
-        explorationId
-      )).then((responseBody) => {
-      // Making a ExplorationBackendDict from the properties of exploration
-      // backend response object. This will be used to make a exploration
-      // object which has properties relevant for sorting.
-      const explorationBackendDict: ExplorationBackendDict = {
-        auto_tts_enabled: explorationBackendResponse.auto_tts_enabled,
-        correctness_feedback_enabled: explorationBackendResponse.
-          correctness_feedback_enabled,
-        draft_changes: [],
-        init_state_name: explorationBackendResponse.
-          exploration.init_state_name,
-        states: explorationBackendResponse.exploration.states,
-        param_changes: explorationBackendResponse.exploration.param_changes,
-        param_specs: explorationBackendResponse.exploration.param_specs,
-        title: explorationBackendResponse.exploration.title,
-        language_code: explorationBackendResponse.exploration.language_code,
-        next_content_id_index: explorationBackendResponse.
-          exploration.next_content_id_index,
-        exploration_metadata: explorationBackendResponse.
-          exploration_metadata,
-        is_version_of_draft_valid: false,
-        draft_change_list_id: explorationBackendResponse.
-          draft_change_list_id
-      };
-
-      const exploration: Exploration = this.explorationObjectFactory.
-        createFromBackendDict(
-          explorationBackendDict);
-
-      const sortedTranslationCards = this.sortTranslationSuggestionsByState(
-        responseBody.suggestions,
-        exploration.getStates(),
-        exploration.getInitialState().name,
-      );
-
-      responseBody.suggestions = sortedTranslationCards;
-      const responseSuggestionIdToDetails = fetcher.suggestionIdToDetails;
-      fetcher.suggestionIdToDetails = {};
-      const targetIdToDetails = responseBody.target_id_to_opportunity_dict;
-      responseBody.suggestions.forEach((suggestion) => {
-        const suggestionDetails = {
-          suggestion: suggestion,
-          details: targetIdToDetails[suggestion.target_id]
-        };
-        responseSuggestionIdToDetails[suggestion.suggestion_id] = (
-          suggestionDetails);
-      });
-      return {
-        suggestionIdToDetails: responseSuggestionIdToDetails,
-        more: Object.keys(fetcher.suggestionIdToDetails).length > 0
-      };
-    });
   }
 
   // Function to sort translation cards by state.
@@ -382,13 +367,7 @@ export class ContributionAndReviewService {
       explorationId?: string
   ): Promise<FetchSuggestionsResponse> {
     this.reviewableTranslationFetcher.sortKey = sortKey;
-    if (explorationId) {
-      return this.fetchReviewableSuggestionsAsync (
-        this.reviewableTranslationFetcher,
-        shouldResetOffset,
-        explorationId
-      );
-    }
+
     return this.fetchSuggestionsAsync(
       this.reviewableTranslationFetcher,
       shouldResetOffset,

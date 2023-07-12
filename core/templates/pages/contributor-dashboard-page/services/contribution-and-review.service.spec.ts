@@ -33,7 +33,6 @@ describe('Contribution and review service', () => {
   let fetchSuggestionsAsyncSpy: jasmine.Spy;
   let downloadContributorCertificateAsyncSpy: jasmine.Spy;
   let statesObjectFactory: StatesObjectFactory;
-  let fetchReviewableSuggestionsAsyncSpy: jasmine.Spy;
 
   const suggestion1 = {
     suggestion_id: 'suggestion_id_1',
@@ -112,7 +111,6 @@ describe('Contribution and review service', () => {
     cars = TestBed.inject(ContributionAndReviewService);
     carbas = TestBed.inject(ContributionAndReviewBackendApiService);
     fetchSuggestionsAsyncSpy = spyOn(carbas, 'fetchSuggestionsAsync');
-    fetchReviewableSuggestionsAsyncSpy = spyOn(carbas, 'fetchReviewableSuggestionsAsync')
     statesObjectFactory =  TestBed.inject(StatesObjectFactory)
     downloadContributorCertificateAsyncSpy = spyOn(
       carbas, 'downloadContributorCertificateAsync');
@@ -332,7 +330,7 @@ describe('Contribution and review service', () => {
 
         expect(fetchSuggestionsAsyncSpy).toHaveBeenCalled();
       });
-    it('should return translation suggestions', () => {
+    it('should return translation suggestions for given exploration_id', () => {
       fetchReviewableSuggestionsAsyncSpy.and.returnValue(
         Promise.resolve(backendFetchResponse));
 
