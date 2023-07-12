@@ -28,7 +28,6 @@ import { StorySummary } from 'domain/story/story-summary.model';
 import { LearnerExplorationSummary } from 'domain/summary/learner-exploration-summary.model';
 import { CollectionSummary } from 'domain/collection/collection-summary.model';
 import { LearnerDashboardActivityBackendApiService } from 'domain/learner_dashboard/learner-dashboard-activity-backend-api.service';
-import { StoryViewerBackendApiService } from 'domain/story_viewer/story-viewer-backend-api.service';
 import { ChapterProgressSummary } from 'domain/exploration/chapter-progress-summary.model';
 import { ReadOnlyExplorationBackendApiService } from 'domain/exploration/read-only-exploration-backend-api.service';
 
@@ -60,6 +59,7 @@ export class HomeTabComponent {
   @Input() completedExplorationsList!: LearnerExplorationSummary[];
   @Input() collectionPlaylist!: CollectionSummary[];
   @Input() storyIdToLearnerGroupsTitleMap!: Map<string, string[]>;
+  @Input() learnerGroupFeatureIsEnable: boolean = false;
 
   carouselClassname: string = 'home-tab';
   currentGoalsLength!: number;
@@ -99,7 +99,6 @@ export class HomeTabComponent {
     private urlInterpolationService: UrlInterpolationService,
     private readOnlyExplorationBackendApiService:
     ReadOnlyExplorationBackendApiService,
-    private storyViewerBackendApiService: StoryViewerBackendApiService,
   ) {}
 
   ngOnInit(): void {

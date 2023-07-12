@@ -178,10 +178,17 @@
     </div>
   </div>
  
-  <div class="shreeram">
- shreeram
+  <div class="oppia-learner-group-container">
+    <div *ngIf="learnerGroupFeatureIsEnable">
+      <oppia-learner-groups-tab [username]="username"
+                                (setActiveSection)="setActiveSection($event)">
+      </oppia-learner-groups-tab>
+    </div>
   </div>
 
+  <div>
+   Jai shree ram!
+  </div>
   <!-- <div tabindex="0" class="topic-suggested-for-you subhash">
     <p class="suggested-for-you-heading" [innerHTML]="'I18N_LEARNER_DASHBOARD_LEARN_SOMETHING_NEW_SECTION' | translate">
     </p>

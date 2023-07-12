@@ -126,8 +126,10 @@ export class ExplorationSummaryTileComponent implements OnInit, OnDestroy {
         return commitsOfContributor2 - commitsOfContributor1;
       }
     );
-    this.getStrokeDashOffSet =
+    setTimeout(() => {
+      this.getStrokeDashOffSet =
     this.getStrokeDashOffSetValue(this.explorationProgress);
+    }, 2000);
     this.isRefresherExploration = false;
     if (this.parentExplorationIds) {
       this.isRefresherExploration = (

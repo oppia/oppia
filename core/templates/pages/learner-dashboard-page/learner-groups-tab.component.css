@@ -8,19 +8,28 @@
   background-color: #fff;
   border-radius: 4px;
   box-shadow: 0 0 4px #0000001a;
-  margin: 18px 0 25px 0;
-  max-width: 736px;
-  min-height: 179px;
-  padding: 32px 30px 40px;
+  padding: 16px;
+  /* margin: 18px 0 25px 0; */
+
+  /* max-width: 736px; */
+  /* min-height: 179px; */
+  /* padding: 32px 30px 40px; */
+}
+
+.learner-groups-tab .oppia-learner-groups-buttons {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 11px;
 }
 
 .learner-groups-tab .invited-to-learner-groups-section {
   background-color: #fff;
   border-radius: 4px;
   box-shadow: 0 0 4px #0000001a;
-  margin: 18px 0 25px 0;
-  max-width: 736px;
-  min-height: 179px;
+  margin: 8px 0 24px 0;
+  /* max-width: 736px; */
+  /* min-height: 179px; */
 }
 
 .learner-groups-tab .invited-to-learner-groups-section .mat-expansion-panel-header {
@@ -32,9 +41,9 @@
 }
 
 .learner-groups-tab .learner-groups-section-heading {
-  color: #00645c;
-  font-size: 24px;
-  margin: 0;
+  color: #205D86;
+  font-size: 18px;
+  margin: 0 0 24px 0;
 }
 
 .learner-groups-tab .learner-groups-heading {
@@ -44,20 +53,20 @@
 }
 
 .learner-groups-tab .oppia-learner-group-summary-cards-container {
-  display: grid;
-  grid-gap: 20px;
+  /* display: grid; */
+  /* grid-gap: 20px; */
   margin-top: 10px;
 }
 
 .learner-groups-tab .oppia-learner-group-summary-card {
   align-items: center;
-  background: #fff;
+  background: #F2F4F7;
   border: 1px solid #e6e6e6;
   border-radius: 4px;
   box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.1);
   display: flex;
   justify-content: space-between;
-  padding: 20px 30px;
+  padding: 16px;
 }
 
 .learner-groups-tab .oppia-learner-group-summary-card .oppia-learner-group-summary-card-info {
@@ -84,19 +93,38 @@
 .learner-groups-tab .oppia-learner-group-summary-card-cta-buttons {
   align-items: center;
   display: flex;
-  gap: 40px;
+  gap: 11px;
 }
 
 .learner-groups-tab .learner-group-accept-invite-button {
-  color: #00645c;
+  border-radius: 4px;
+  background: #00645c;
+  color: white;
   cursor: pointer;
-  font-size: 22px;
+  display: flex;
+  padding: 10px 8px;
+  justify-content: center;
+  align-items: center;
+  font-size: 14px;
+  font-weight: 500;
+  width: 96px;
+  /* color: #00645c; */
 }
 
 .learner-groups-tab .learner-group-decline-invite-button {
-  color: #a53417;
+  border-radius: 4px;
+  border: 1px solid #00645c;
+  color: #00645C;
   cursor: pointer;
-  font-size: 23px;
+  display: flex;
+  height: 36px;
+  padding: 10px 8px;
+  justify-content: center;
+  align-items: center;
+  font-size: 14px;
+  font-weight: 500;
+  /* color: #a53417; */
+  width: 96px;
 }
 
 .learner-groups-tab .invited-groups-info-summary-container {
@@ -142,9 +170,15 @@
 }
 
 .learner-groups-tab .learner-group-view-details-button {
+  color: #00645C;
   cursor: pointer;
-  margin-right: 30px;
-  text-decoration: underline;
+  display: flex;
+  padding: 4px 8px;
+  align-items: flex-start;
+  font-size: 14px;
+  font-weight: 500;
+  /* margin-right: 30px; */
+  /* text-decoration: underline; */
 }
 
 .learner-groups-tab .learner-group-view-preferences-button {
@@ -236,12 +270,25 @@
 
   .learner-groups-tab .oppia-learner-group-summary-card {
     align-items: unset;
-    flex-direction: column;
+    /* flex-direction: column; */
     gap: 10px;
   }
 
   .learner-groups-tab .learner-group-view-details-button {
     font-size: 14px;
+    justify-content: flex-end;
     margin-right: 0;
+  }
+
+  .learner-groups-tab .oppia-learner-group-summary-card-cta-buttons {
+    align-items: center;
+    display: inline-grid;
+    gap: 11px;
+  }
+}
+
+@media (max-width: 1024px) {
+  .learner-groups-tab .learner-of-learner-groups-section {
+    margin-left: 12px;
   }
 }
