@@ -1411,7 +1411,6 @@ def main(args: Optional[Sequence[str]] = None) -> None:
     safe_delete_directory_tree(THIRD_PARTY_GENERATED_DEV_DIR)
     install_dependencies_json_packages.build_third_party_libs(
         THIRD_PARTY_GENERATED_DEV_DIR)
-    
 
     # If minify_third_party_libs_only is set to True, skips the rest of the
     # build process once third party libs are minified.

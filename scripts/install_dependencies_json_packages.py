@@ -407,7 +407,8 @@ def download_all_dependencies(filepath: str) -> None:
                 download_and_untar_files(
                     dependency_url, TARGET_DOWNLOAD_DIRS[data],
                     dependency_tar_root_name, dependency_target_root_name)
- 
+
+
 def build_third_party_libs(third_party_directory_path: str) -> None:
     """Joins all third party css files into single css file and js files into
     single js file. Copies both files and all fonts into third party folder.
