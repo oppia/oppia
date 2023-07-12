@@ -37,7 +37,7 @@ from typing import (
     Deque, Dict, List, Optional, Sequence, TextIO, Tuple, TypedDict
 )
 
-from scripts.install_dependencies_json_packages import build_third_party_libs
+from scripts import install_dependencies_json_packages
 
 if not feconf.OPPIA_IS_DOCKERIZED:
     from scripts import install_python_dev_dependencies
@@ -1410,7 +1410,8 @@ def main(args: Optional[Sequence[str]] = None) -> None:
 
     # Regenerate /third_party/generated from scratch.
     safe_delete_directory_tree(THIRD_PARTY_GENERATED_DEV_DIR)
-    build_third_party_libs(THIRD_PARTY_GENERATED_DEV_DIR)
+    install_dependencies_json_packages.build_third_party_libs(
+        THIRD_PARTY_GENERATED_DEV_DIR)
     
 
     # If minify_third_party_libs_only is set to True, skips the rest of the
