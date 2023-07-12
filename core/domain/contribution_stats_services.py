@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Funtions to get stats Displayed in contributor Admin Dashboard.
+"""Service methods for operating on contributor dashboard user stats.
 """
 
 from __future__ import annotations
