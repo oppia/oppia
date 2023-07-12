@@ -49,6 +49,11 @@ export class WindowDimensionsService {
     let NORMAL_NAVBAR_CUTOFF_WIDTH_PX = 768;
     return this.getWidth() <= NORMAL_NAVBAR_CUTOFF_WIDTH_PX;
   }
+
+  isTabletView(): boolean {
+    let TABLET_LANDSCAPE_CUTOFF_WIDTH_PX = 1024;
+    return this.getWidth() <= TABLET_LANDSCAPE_CUTOFF_WIDTH_PX;
+  }
 }
 
 angular.module('oppia').factory(

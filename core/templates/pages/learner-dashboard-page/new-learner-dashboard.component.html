@@ -1,11 +1,11 @@
 <div class="new-learner-dashboard">
-<div [ngStyle]="{'min-height': windowIsNarrow ? '85.5vh': 'auto'}"
+<div [ngStyle]="{'min-height': TabletView ? '85.5vh': 'auto'}"
      class="oppia-learner-dashboard-container position-relative">
   <div class="oppia-learner-dashboard-content-container oppia-row"
-       [ngStyle]="windowIsNarrow ? {'display': 'block'} : {'display': 'flex'}"
-       [ngClass]="{'oppia-learner-dashboard-mobile-mode': windowIsNarrow}">
+       [ngStyle]="TabletView ? {'display': 'block'} : {'display': 'flex'}"
+       [ngClass]="{'oppia-learner-dashboard-mobile-mode': TabletView}">
     <div class="oppia-learner-dashboard-side-content"
-         *ngIf="!windowIsNarrow">
+         *ngIf="!TabletView">
       <mat-card class="oppia-learner-dashboard-main-menu">
         <picture *ngIf="profilePicturePngDataUrl">
             <source type="image/webp" [srcset]="profilePictureWebpDataUrl">
@@ -47,7 +47,7 @@
         </h4>
       </mat-card>
     </div>
-    <footer class="oppia-learner-dashboard-buttons" *ngIf="windowIsNarrow">
+    <div class="oppia-learner-dashboard-buttons" *ngIf="TabletView">
       <mat-card class="oppia-learner-dashboard-button-menu d-flex justify-content-around">
         <div class="oppia-buttons" (click)="setActiveSection(LEARNER_DASHBOARD_SECTION_I18N_IDS.HOME)" [ngClass]="{'oppia-learner-dashboard-section-active-button': activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.HOME, 'oppia-learner-dashboard-section-not-active-button': activeSection !== LEARNER_DASHBOARD_SECTION_I18N_IDS.HOME}">
           <img [src]="homeImageUrl" alt="home image" class="oppia-svg-image">
@@ -66,11 +66,11 @@
           <span [innerHTML]="LEARNER_DASHBOARD_SECTION_I18N_IDS.LEARNER_GROUPS | translate" class="learner-groups-button"></span>
         </div> -->
       </mat-card>
-    </footer>
+    </div>
 
 
     <div class="oppia-learner-dashboard-main-content"
-         [ngClass]="{'oppia-learner-dashboard-mobile-mode': windowIsNarrow}">
+         [ngClass]="{'oppia-learner-dashboard-mobile-mode': TabletView}">
         <div *ngIf="activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.HOME">
           <oppia-home-tab [currentGoals]="topicsToLearn"
                           [goalTopics]="allTopics"
@@ -94,14 +94,14 @@
                            [learntToPartiallyLearntTopics]="learntToPartiallyLearntTopics">
           </oppia-goals-tab>
         </div>
-        <div *ngIf="activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.PROGRESS && !windowIsNarrow">
+        <div *ngIf="activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.PROGRESS && !TabletView">
           <oppia-progress-tab [completedStoriesList]="completedStoriesList"
                               [partiallyLearntTopicsList]="partiallyLearntTopicsList"
                               [learntTopicsList]="learntTopicsList"
                               (setActiveSection)="setActiveSection($event)">
           </oppia-progress-tab>
         </div>
-        <div *ngIf="activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.PROGRESS && windowIsNarrow">
+        <div *ngIf="activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.PROGRESS && TabletView">
           <oppia-progress-tab [completedStoriesList]="completedStoriesList"
                               [partiallyLearntTopicsList]="partiallyLearntTopicsList"
                               [learntTopicsList]="learntTopicsList"
@@ -113,7 +113,7 @@
                                     (setActiveSection)="setActiveSection($event)">
           </oppia-learner-groups-tab>
         </div>
-        <div *ngIf="((!windowIsNarrow && activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.COMMUNITY_LESSONS) || (windowIsNarrow && activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.PROGRESS && activeSubsection === LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.LESSONS)) && communtiyLessonsDataLoaded">
+        <div *ngIf="((!TabletView && activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.COMMUNITY_LESSONS) || (TabletView && activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.PROGRESS && activeSubsection === LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.LESSONS)) && communtiyLessonsDataLoaded">
           <oppia-community-lessons-tab [incompleteExplorationsList]="incompleteExplorationsList"
                                        [incompleteCollectionsList]="incompleteCollectionsList"
                                        [completedExplorationsList]="completedExplorationsList"

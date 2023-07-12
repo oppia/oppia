@@ -138,6 +138,7 @@ export class NewLearnerDashboardComponent implements OnInit {
   windowIsNarrow: boolean = false;
   directiveSubscriptions = new Subscription();
   LEARNER_GROUP_FEATURE_IS_ENABLED: boolean = false;
+  TabletView: boolean = false;
 
   constructor(
     private alertsService: AlertsService,
@@ -268,9 +269,13 @@ export class NewLearnerDashboardComponent implements OnInit {
 
 
     this.windowIsNarrow = this.windowDimensionService.isWindowNarrow();
+    this.TabletView = this.windowDimensionService.isTabletView();
+    console.error(this.TabletView, 'tablet view');
     this.directiveSubscriptions.add(
       this.windowDimensionService.getResizeEvent().subscribe(() => {
         this.windowIsNarrow = this.windowDimensionService.isWindowNarrow();
+        this.TabletView = this.windowDimensionService.isTabletView();
+        console.error(this.TabletView, 'tablet view');
       }));
     this.directiveSubscriptions.add(
       this.translateService.onLangChange.subscribe(() => {
