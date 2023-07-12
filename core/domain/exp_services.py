@@ -501,20 +501,9 @@ def apply_change_list(
                     change
                 )
                 exploration.delete_state(delete_state_cmd.state_name)
-                # Auto-reject any pending translation suggestions that are now
-                # obsolete due to the corresponding state being deleted.
-                # See issue #16022 for context.
-                (
-                    suggestion_services
-                    .auto_reject_translation_suggestions_for_state(
-                        exploration_id, delete_state_cmd.state_name)
-                )
             elif change.cmd == exp_domain.CMD_EDIT_STATE_PROPERTY:
                 state: state_domain.State = exploration.states[
                     change.state_name]
-                old_translatable_content_ids = (
-                    state.written_translations
-                    .get_content_ids_for_text_translation())
                 if (change.property_name ==
                         exp_domain.STATE_PROPERTY_PARAM_CHANGES):
                     # Here we use cast because this 'if' condition forces
@@ -723,19 +712,6 @@ def apply_change_list(
                         state_domain.RecordedVoiceovers.from_dict(
                             change.new_value))
                     state.update_recorded_voiceovers(recorded_voiceovers)
-                # Auto-reject any pending translation suggestions that are now
-                # obsolete due to the corresponding content being deleted.
-                # See issue #16022 for context.
-                new_translatable_content_ids = (
-                    state.written_translations
-                    .get_content_ids_for_text_translation())
-                deleted_content_ids = (
-                    set(old_translatable_content_ids) -
-                    set(new_translatable_content_ids))
-                (
-                    suggestion_services
-                    .auto_reject_translation_suggestions_for_content_ids(
-                        exploration_id, change.state_name, deleted_content_ids))
             elif change.cmd == exp_domain.CMD_EDIT_EXPLORATION_PROPERTY:
                 if change.property_name == 'title':
                     # Here we use cast because this 'if' condition forces
