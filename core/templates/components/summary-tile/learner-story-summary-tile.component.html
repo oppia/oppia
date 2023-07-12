@@ -1,39 +1,18 @@
 <div class="learner-story-summary-tile">
-  <!-- <div class="next-incomplete-chapter" *ngIf="isDisplayAreaHome()">
-    {{nextIncompleteNodeTitle}}
-  </div> -->
   <mat-card class="oppia-story-dashboard-card" [attr.style]="isButtonHovered()">
-  <!-- <mat-card class="oppia-story-dashboard-card" (mouseenter)="cardIsHovered=true" (mouseleave)="cardIsHovered=false"> -->
-    <!-- <a [href]="getStoryLink()" target="{{ openInNewWindow ? '_blank' : '_self' }}" class="oppia-story-link"> -->
-
         <div class="oppia-title-section" [ngStyle]="{'background-color': thumbnailBgColor}">
-          <!-- <img class="oppia-thumbnail-image" [src]="thumbnailUrl" [attr.style]="isCardHovered()"> -->
-            <!-- We add an empty alt text so that the screen reader does not read the thumbnail image filename and ignores it as the thumbnail does not convey any significant information. -->
           <img class="oppia-thumbnail-image" alt="" [src]="thumbnailUrl" [attr.style]="isButtonHovered()">
-          <!-- <div class="oppia-story-completion"> -->
-            <!-- <img [src]="starImageUrl" alt="star image" class="oppia-svg-star-image" *ngIf="storyCompleted"> -->
-            <!-- <p class="oppia-percent-story-completed" [ngClass]="{'oppia-story-completed-percent': storyCompleted}">
-              {{storyProgress}}% Complete
-            </p> -->
-          <!-- </div> -->
         </div>
         <div class="oppia-summary-section">
           <div class="next-incomplete-chapter" *ngIf="isDisplayAreaHome()">
             {{nextIncompleteNodeTitle}}
           </div>
-          <!-- <span class="next-incomplete-chapter" *ngIf="isDisplayAreaHome()">
-          </span> -->
           <div class="oppia-topic-title e2e-test-topic-name-in-learner-story-summary-tile">
             {{topicName}}
           </div>
-          <!-- <span class="oppia-topic-title e2e-test-topic-name-in-learner-story-summary-tile">
-          </span> -->
           <div class="oppia-story-title e2e-test-story-name-in-learner-story-summary-tile">
             {{storyTitle}}
           </div>
-          <!-- <span >
-          
-          </span> -->
         </div>
       <div class="story-card-footer">
         <span class="story-progress">
@@ -69,10 +48,7 @@
           </p>
           </a>
         </span>
-
       </div>
-
-    <!-- </a> -->
   </mat-card>
 </div>
 <style>
@@ -114,7 +90,6 @@
     font-family: Capriola,Roboto,Arial,sans-serif;
     font-size: 15px;
     font-weight: 400;
-    /* margin: 24px 0 12px 6px; */
     padding-left: 8px;
     text-align: left;
   }
@@ -123,8 +98,6 @@
     border: 1px solid #00645C;
     border-radius: 4px;
     bottom: 7px;
-    /* box-shadow: 0 2px 2px #0000003d; */
-    /* display: none; */
     height: 36px;
     left: 86px;
     position: absolute;
@@ -138,21 +111,8 @@
     letter-spacing: 0;
     position: relative;
     text-align: center;
-    /* text-transform: uppercase; */
     top: 10px;
   }
-  /* .learner-story-summary-tile .oppia-story-completion {
-    background: #000c 0% 0% no-repeat padding-box;
-    border-radius: 2px;
-    bottom: 23px;
-    float: right;
-    height: 19px;
-    margin: 0 8px 0 8px;
-    position: relative;
-    right: 4px;
-    text-align: left;
-    width: 90px;
-  } */
   .learner-story-summary-tile .story-completion {
     bottom: 52px;
   }
@@ -228,15 +188,9 @@
     width: 216px;
   }
   .learner-story-summary-tile .oppia-story-dashboard-card .continue-button:hover {
-    /* display: block;
-    float: left; */
     background-color: #35ada3;
   }
   .learner-story-summary-tile .story-card-footer {
     display: flex;
   }
-  /* .learner-story-summary-tile .oppia-story-dashboard-card:hover .continue-button {
-    display: block;
-    float: left;
-  } */
 </style>
