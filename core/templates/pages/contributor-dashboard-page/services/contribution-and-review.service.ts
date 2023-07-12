@@ -140,6 +140,7 @@ export class ContributionAndReviewService {
       fetcher.offset = 0;
       fetcher.suggestionIdToDetails = {};
     }
+    // eslint-disable-next-line
     let explorationBackendResponse = null;
     if (explorationId) {
       explorationBackendResponse = await this.

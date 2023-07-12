@@ -331,7 +331,7 @@ describe('Contribution and review service', () => {
         expect(fetchSuggestionsAsyncSpy).toHaveBeenCalled();
       });
     it('should return translation suggestions for given exploration_id', () => {
-      fetchReviewableSuggestionsAsyncSpy.and.returnValue(
+      fetchSuggestionsAsyncSpy.and.returnValue(
         Promise.resolve(backendFetchResponse));
 
       cars.getReviewableTranslationSuggestionsAsync(
