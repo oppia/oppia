@@ -337,7 +337,7 @@ describe('Contribution and review service', () => {
         Promise.resolve(backendFetchResponse));
 
       cars.getReviewableTranslationSuggestionsAsync(
-        true, 'skill_id_1', 'exp_1')
+        false, 'skill_id_1', 'exp_1')
         .then((response) => {
           expect(response.suggestionIdToDetails.suggestion_id_1)
             .toEqual(expectedSuggestionDict);
