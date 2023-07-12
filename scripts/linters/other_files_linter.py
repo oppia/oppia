@@ -181,12 +181,7 @@ class CustomLintChecksManager(linter_utils.BaseLinter):
         for third_party_lib in THIRD_PARTY_LIBS:
             lib_dependency_source = third_party_lib['dependency_source']
 
-            if lib_dependency_source == _DEPENDENCY_SOURCE_DEPENDENCIES_JSON:
-                lib_version = (
-                    dependencies_json[
-                        third_party_lib['dependency_key']]['version'])
-
-            elif lib_dependency_source == _DEPENDENCY_SOURCE_PACKAGE:
+            if lib_dependency_source == _DEPENDENCY_SOURCE_PACKAGE:
                 lib_version = package[third_party_lib['dependency_key']]
 
                 if lib_version[0] == '^':
