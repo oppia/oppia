@@ -389,8 +389,6 @@ export class TranslationModalComponent {
     switch (contentType) {
       case 'interaction':
         return interactionId + ' interaction';
-      case 'default_outcome':
-        return 'default outcome';
       case 'ca':
         // Customization_arg. This is typically a button label, input
         // placeholder text, or a multiple choice option.
