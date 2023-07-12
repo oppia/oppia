@@ -119,9 +119,8 @@ def compile_pip_requirements(
         old_compiled = f.read()
     subprocess.run(
         [
-            'pip-compile', '--generate-hashes', '--allow-unsafe',
-            '--no-emit-index-url', requirements_path, '--output-file',
-            compiled_path,
+            'pip-compile', '--generate-hashes', requirements_path,
+            '--output-file', compiled_path,
         ],
         check=True,
         encoding='utf-8',

@@ -54,9 +54,8 @@ class InstallThirdPartyLibsImportTests(test_utils.GenericTestBase):
             [
                 'pip-compile', '--no-emit-index-url', 'requirements_dev.in',
                 '--output-file', 'requirements_dev.txt',
-                'pip-compile', '--generate-hashes', '--allow-unsafe',
-                '--no-emit-index-url', 'requirements_dev.in', '--output-file',
-                'requirements_dev.txt',
+                'pip-compile', '--generate-hashes', 'requirements_dev.in',
+                '--output-file', 'requirements_dev.txt',
             ],
             [
                 'pip', 'install', '--require-hashes', '--no-deps',
