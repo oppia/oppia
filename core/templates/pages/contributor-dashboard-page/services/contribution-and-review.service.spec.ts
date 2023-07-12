@@ -33,6 +33,7 @@ describe('Contribution and review service', () => {
   let fetchSuggestionsAsyncSpy: jasmine.Spy;
   let downloadContributorCertificateAsyncSpy: jasmine.Spy;
   let statesObjectFactory: StatesObjectFactory;
+  let fetchReviewableSuggestionsAsyncSpy: jasmine.Spy;
 
   const suggestion1 = {
     suggestion_id: 'suggestion_id_1',
@@ -111,6 +112,7 @@ describe('Contribution and review service', () => {
     cars = TestBed.inject(ContributionAndReviewService);
     carbas = TestBed.inject(ContributionAndReviewBackendApiService);
     fetchSuggestionsAsyncSpy = spyOn(carbas, 'fetchSuggestionsAsync');
+    fetchReviewableSuggestionsAsyncSpy = spyOn(carbas, 'fetchReviewableSuggestionsAsync')
     statesObjectFactory =  TestBed.inject(StatesObjectFactory)
     downloadContributorCertificateAsyncSpy = spyOn(
       carbas, 'downloadContributorCertificateAsync');
@@ -330,6 +332,17 @@ describe('Contribution and review service', () => {
 
         expect(fetchSuggestionsAsyncSpy).toHaveBeenCalled();
       });
+    it('should return translation suggestions', () => {
+      fetchReviewableSuggestionsAsyncSpy.and.returnValue(
+        Promise.resolve(backendFetchResponse));
+
+      cars.getReviewableTranslationSuggestionsAsync(
+        true, 'skill_id_1', 'exp_1')
+        .then((response) => {
+          expect(response.suggestionIdToDetails.suggestion_id_1)
+            .toEqual(expectedSuggestionDict);
+        });
+    });
   });
 
   describe('reviewExplorationSuggestion', () => {
