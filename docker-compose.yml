@@ -20,7 +20,7 @@ services:
       timeout: 30s
       interval: 30s
       retries: 5
-      start_period: 5m
+      start_period: 10m
     command: >
       sh -c '
         trap "rm /app/oppia/node_modules/@angular/compiler-cli/ngcc/__ngcc_lock_file__" EXIT
@@ -44,7 +44,7 @@ services:
       timeout: 30s
       interval: 30s
       retries: 5
-      start_period: 5m
+      start_period: 10m
     entrypoint: node
     command:
       - "/app/oppia/node_modules/webpack/bin/webpack.js"
