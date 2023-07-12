@@ -169,9 +169,6 @@ class CustomLintChecksManager(linter_utils.BaseLinter):
         failed = False
         error_messages = []
 
-        dependencies_json = json.load(utils.open_file(
-            DEPENDENCIES_JSON_FILE_PATH, 'r'))['dependencies']['frontend']
-
         package = json.load(utils.open_file(
             PACKAGE_JSON_FILE_PATH, 'r'))['dependencies']
 
