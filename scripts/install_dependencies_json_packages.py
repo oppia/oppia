@@ -26,14 +26,20 @@ import urllib
 import zipfile
 
 from core import utils
+from scripts import build
 from typing import Dict, Final, List, Literal, TypedDict, cast
 
 from . import common
 
+DEPENDENCIES_FILE_PATH: Final = os.path.join(os.getcwd(), 'dependencies.json')
 TOOLS_DIR: Final = os.path.join('..', 'oppia_tools')
 THIRD_PARTY_DIR: Final = os.path.join('.', 'third_party')
+THIRD_PARTY_CSS_RELATIVE_FILEPATH = os.path.join('css', 'third_party.css')
+THIRD_PARTY_GENERATED_DEV_DIR = os.path.join('third_party', 'generated', '')
+THIRD_PARTY_JS_RELATIVE_FILEPATH = os.path.join('js', 'third_party.js')
 THIRD_PARTY_STATIC_DIR: Final = os.path.join(THIRD_PARTY_DIR, 'static')
-DEPENDENCIES_FILE_PATH: Final = os.path.join(os.getcwd(), 'dependencies.json')
+
+WEBFONTS_RELATIVE_DIRECTORY_PATH = os.path.join('webfonts', '')
 
 # Place to download zip files for temporary storage.
 TMP_UNZIP_PATH: Final = os.path.join('.', 'tmp_unzip.zip')
@@ -53,6 +59,14 @@ _DOWNLOAD_FORMAT_TAR: Final = 'tar'
 _DOWNLOAD_FORMAT_FILES: Final = 'files'
 
 DownloadFormatType = Literal['zip', 'files', 'tar']
+
+
+class DependencyBundleDict(TypedDict):
+    """Dictionary that represents dependency bundle."""
+
+    js: List[str]
+    css: List[str]
+    fontsPath: str
 
 
 class DownloadFormatToDependenciesKeysDict(TypedDict):
@@ -393,12 +407,43 @@ def download_all_dependencies(filepath: str) -> None:
                 download_and_untar_files(
                     dependency_url, TARGET_DOWNLOAD_DIRS[data],
                     dependency_tar_root_name, dependency_target_root_name)
+ 
+def build_third_party_libs(third_party_directory_path: str) -> None:
+    """Joins all third party css files into single css file and js files into
+    single js file. Copies both files and all fonts into third party folder.
+    """
+
+    print('Building third party libs at %s' % third_party_directory_path)
+
+    third_party_js_filepath = os.path.join(
+        third_party_directory_path, THIRD_PARTY_JS_RELATIVE_FILEPATH)
+    third_party_css_filepath = os.path.join(
+        third_party_directory_path, THIRD_PARTY_CSS_RELATIVE_FILEPATH)
+    webfonts_dir = os.path.join(
+        third_party_directory_path, WEBFONTS_RELATIVE_DIRECTORY_PATH)
+
+    dependency_filepaths = build.get_dependencies_filepaths()
+    build.ensure_directory_exists(third_party_js_filepath)
+    with utils.open_file(
+        third_party_js_filepath, 'w+') as third_party_js_file:
+        build._join_files(dependency_filepaths['js'], third_party_js_file)
+
+    build.ensure_directory_exists(third_party_css_filepath)
+    with utils.open_file(
+        third_party_css_filepath, 'w+') as third_party_css_file:
+        build._join_files(dependency_filepaths['css'], third_party_css_file)
+
+    build.ensure_directory_exists(webfonts_dir)
+    build._execute_tasks(
+        build._generate_copy_tasks_for_fonts(
+            dependency_filepaths['fonts'], webfonts_dir))
 
 
 def main() -> None:
     """Installs all the packages from the dependencies.json file."""
 
     download_all_dependencies(DEPENDENCIES_FILE_PATH)
+    build_third_party_libs(THIRD_PARTY_GENERATED_DEV_DIR)
 
 
 # The 'no coverage' pragma is used as this line is un-testable. This is because

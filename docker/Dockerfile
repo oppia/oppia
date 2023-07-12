@@ -61,11 +61,15 @@ COPY /core/feconf.py ./core/feconf.py
 COPY /core/constants.py ./core/constants.py
 COPY /assets/constants.ts ./assets/constants.ts
 COPY /assets/release_constants.json ./assets/release_constants.json
+COPY /assets/constants.ts ./assets/constants.ts
 COPY dependencies.json .
 
 # Installation for proto buf requires the third party dependencies to be installed (oppia-ml-proto)
 # This also downloads frontend dependencies, which should be removed once the dependencies.json is deprecated
 RUN python -m scripts.install_dependencies_json_packages
+RUN echo '{}' > hashes.json
+RUN sed -i 's/"DEV_MODE": [^,]*,/"DEV_MODE": true,/; s/"EMULATOR_MODE": [^,]*,/"EMULATOR_MODE": true,/' ./assets/constants.ts
+
 
 ENV BUF_LINUX_FILES="buf-Linux-x86_64 protoc-gen-buf-check-lint-Linux-x86_64 protoc-gen-buf-check-breaking-Linux-x86_64" \
     PROTOC_LINUX_FILE='protoc-3.13.0-linux-x86_64.zip' \
@@ -103,5 +107,3 @@ RUN /app/buf-0.29.0/protoc/bin/protoc \
     $PROTOC_FILES_PATH/*.proto
 
 RUN sed -i 's/import text_classifier_pb2 as text__classifier__pb2/from . import text_classifier_pb2 as text__classifier__pb2/' /app/oppia/proto_files/training_job_response_payload_pb2.py
-
-RUN python -m scripts.build
