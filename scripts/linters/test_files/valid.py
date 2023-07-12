@@ -18,7 +18,6 @@
 python_linter_test.py. This file contain valid python syntax.
 """
 
-
 from __future__ import annotations
 from core.jobs.batch_jobs import blog_post_search_indexing_jobs      # pylint: disable=unused-import  # isort: skip
 from core.jobs.batch_jobs import blog_validation_jobs                # pylint: disable=unused-import  # isort: skip
