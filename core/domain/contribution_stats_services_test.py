@@ -365,7 +365,7 @@ class ContributorAdminDashboardServicesUnitTest(test_utils.GenericTestBase):
             language_code='es',
             sort_by=None,
             topic_ids=None,
-            num_days_since_last_activity=90
+            max_days_since_last_activity=90
             )
         )
 
@@ -382,7 +382,7 @@ class ContributorAdminDashboardServicesUnitTest(test_utils.GenericTestBase):
             offset=1,
             language_code='es',
             sort_by=None,
-            num_days_since_last_activity=None
+            max_days_since_last_activity=None
             )
         )
 
@@ -399,7 +399,7 @@ class ContributorAdminDashboardServicesUnitTest(test_utils.GenericTestBase):
             offset=1,
             sort_by=None,
             topic_ids=None,
-            num_days_since_last_activity=None
+            max_days_since_last_activity=None
             )
         )
 
@@ -415,7 +415,7 @@ class ContributorAdminDashboardServicesUnitTest(test_utils.GenericTestBase):
             page_size=2,
             offset=1,
             sort_by=None,
-            num_days_since_last_activity=None
+            max_days_since_last_activity=None
             )
         )
 

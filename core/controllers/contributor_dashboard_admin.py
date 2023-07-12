@@ -542,7 +542,7 @@ class ContributorDashboardAdminStatsHandlerNormalizedPayloadDict(TypedDict):
     language_code: Optional[str]
     sort_by: Optional[str]
     topic_ids: Optional[List[str]]
-    num_days_since_last_activity: Optional[int]
+    max_days_since_last_activity: Optional[int]
 
 
 class ContributorDashboardAdminStatsHandler(
@@ -619,7 +619,7 @@ class ContributorDashboardAdminStatsHandler(
                 },
                 'default_value': None
             },
-            'num_days_since_last_activity': {
+            'max_days_since_last_activity': {
                 'schema': {
                     'type': 'int'
                 },
@@ -646,8 +646,8 @@ class ContributorDashboardAdminStatsHandler(
         language_code = self.normalized_request.get('language_code')
         sort_by = self.normalized_request.get('sort_by')
         topic_ids = self.normalized_request.get('topic_ids')
-        num_days_since_last_activity = self.normalized_request.get(
-            'num_days_since_last_activity')
+        max_days_since_last_activity = self.normalized_request.get(
+            'max_days_since_last_activity')
 
         if contribution_type == feconf.CONTRIBUTION_TYPE_TRANSLATION:
             if contribution_subtype == feconf.CONTRIBUTION_SUBTYPE_SUBMISSION:
@@ -664,7 +664,7 @@ class ContributorDashboardAdminStatsHandler(
                         language_code,
                         sort_by,
                         topic_ids,
-                        num_days_since_last_activity
+                        max_days_since_last_activity
                     ))
                 translation_submitter_frontend_dicts = [stat.to_frontend_dict()
                     for stat in translation_submitter_stats]
@@ -687,7 +687,7 @@ class ContributorDashboardAdminStatsHandler(
                         offset,
                         language_code,
                         sort_by,
-                        num_days_since_last_activity
+                        max_days_since_last_activity
                     ))
                 translation_reviewer_frontend_dicts = [stat.to_frontend_dict()
                     for stat in translation_reviewer_stats]
@@ -710,7 +710,7 @@ class ContributorDashboardAdminStatsHandler(
                         offset,
                         sort_by,
                         topic_ids,
-                        num_days_since_last_activity
+                        max_days_since_last_activity
                     ))
                 question_submitter_frontend_dicts = [stat.to_frontend_dict()
                     for stat in question_submitter_stats]
@@ -731,7 +731,7 @@ class ContributorDashboardAdminStatsHandler(
                         page_size,
                         offset,
                         sort_by,
-                        num_days_since_last_activity
+                        max_days_since_last_activity
                     ))
                 question_reviewer_frontend_dicts = [stat.to_frontend_dict()
                     for stat in question_reviewer_stats]
