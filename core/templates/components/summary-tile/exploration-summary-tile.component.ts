@@ -56,6 +56,7 @@ export class ExplorationSummaryTileComponent implements OnInit, OnDestroy {
   @Input() thumbnailIconUrl!: string;
   @Input() thumbnailBgColor!: string;
   @Input() displayAreaIsLearnerDashboard: boolean = false;
+  @Input() explorationProgress!: number;
   // If this is not null, the new exploration opens in a new window when
   // the summary tile is clicked.
   @Input() openInNewWindow!: string;
@@ -93,6 +94,8 @@ export class ExplorationSummaryTileComponent implements OnInit, OnDestroy {
   expTitleTranslationKey!: string;
   expObjectiveTranslationKey!: string;
   buttonIsHovered: boolean = false;
+  circumference = (18 * 2 * Math.PI);
+  getStrokeDashOffSet: number;
 
 
   constructor(
@@ -123,7 +126,8 @@ export class ExplorationSummaryTileComponent implements OnInit, OnDestroy {
         return commitsOfContributor2 - commitsOfContributor1;
       }
     );
-
+    this.getStrokeDashOffSet =
+    this.getStrokeDashOffSetValue(this.explorationProgress);
     this.isRefresherExploration = false;
     if (this.parentExplorationIds) {
       this.isRefresherExploration = (
@@ -263,6 +267,12 @@ export class ExplorationSummaryTileComponent implements OnInit, OnDestroy {
   getCompleteThumbnailIconUrl(): string {
     return this.urlInterpolationService.getStaticImageUrl(
       this.thumbnailIconUrl);
+  }
+
+  getStrokeDashOffSetValue(explorationProgress: number): number {
+    let segmentLength =
+    (this.circumference - (explorationProgress / 100) * this.circumference);
+    return segmentLength;
   }
 
   isHackyExpTitleTranslationDisplayed(): boolean {

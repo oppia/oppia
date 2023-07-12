@@ -52,7 +52,8 @@
                 <oppia-exploration-summary-tile
                 [explorationId]="summaryTile.id"
                 [explorationTitle]="summaryTile.title"
-                [objective]="summaryTile.objective" 
+                [objective]="summaryTile.objective"
+                [explorationProgress]="explorationToProgressMap.get(summaryTile.id)" 
                 [category]="summaryTile.category"
                 [displayAreaIsLearnerDashboard]="true" 
                 [thumbnailIconUrl]="summaryTile.thumbnailIconUrl"
@@ -142,9 +143,10 @@
               <oppia-exploration-summary-tile
                 [explorationId]="summaryTile.id"
                 [explorationTitle]="summaryTile.title"
-                [objective]="summaryTile.objective" 
+                [objective]="summaryTile.objective"
+                [explorationProgress]="explorationToProgressMap.get(summaryTile.id)"
                 [category]="summaryTile.category"
-                [displayAreaIsLearnerDashboard]="true" 
+                [displayAreaIsLearnerDashboard]="true"
                 [thumbnailIconUrl]="summaryTile.thumbnailIconUrl"
                 [thumbnailBgColor]="summaryTile.thumbnailBgColor">
               </oppia-exploration-summary-tile>

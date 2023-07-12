@@ -196,7 +196,8 @@ export class HomeTabComponent {
             for (let i = 0; i < expIds.length; i++) {
               let progress =
           this.calculateExplorationProgress(explorationsProgress[i], expIds[i]);
-              this.explorationToProgressMap.set(expIds[i], progress);
+              this.explorationToProgressMap.set(
+                expIds[i], Math.floor(progress));
             }
             console.error(this.explorationToProgressMap, 'progress map');
           }

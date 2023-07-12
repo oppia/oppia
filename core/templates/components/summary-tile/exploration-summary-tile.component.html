@@ -176,15 +176,18 @@
                   stroke-width="0.5"
                   font-size="0.9em"
                   transform="rotate(90)">
-              {{ storyProgress }}%
+              {{ explorationProgress }}%
             </text>
           </svg>
         </span>
         
         <span class="continue-button" (mouseenter)="buttonIsHovered=true" (mouseleave)="buttonIsHovered=false">
           <a [href]="getExplorationLink()" target="{{ openInNewWindow ? '_blank' : '_self' }}" class="oppia-exploration-link">
-          <p class="continue-button-text">
+          <p *ngIf="explorationProgress !== 0" class="continue-button-text">
             Resume
+          </p>
+          <p *ngIf="explorationProgress === 0" class="continue-button-text">
+            Start
           </p>
           </a>
         </span>
