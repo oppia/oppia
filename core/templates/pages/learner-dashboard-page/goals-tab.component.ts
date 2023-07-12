@@ -86,7 +86,6 @@ export class GoalsTabComponent implements OnInit {
   windowIsNarrow: boolean = false;
   directiveSubscriptions = new Subscription();
 
-
   ngOnInit(): void {
     this.MAX_CURRENT_GOALS_LENGTH = AppConstants.MAX_CURRENT_GOALS_COUNT;
     this.currentGoalsStoryIsShown = [];
