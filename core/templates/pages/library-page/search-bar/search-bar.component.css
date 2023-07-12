@@ -69,6 +69,7 @@ oppia-search-bar .oppia-navbar-button-container {
 }
 .input-group-addon.oppia-search-bar-icon {
   border-radius: 4px 0 0 4px;
+  color: #00609C;
   font-size: 20px;
   font-weight: normal;
   line-height: 1;
@@ -98,8 +99,8 @@ oppia-search-bar .oppia-navbar-button-container {
   color: #333;
 } */
 oppia-search-bar .oppia-input-group {
-  max-width: 375px;
-  width: 15em;
+  /* max-width: 375px; */
+  width: 52.5em;
 }
 .oppia-search-bar-dropdown-toggle {
   border-radius: 0;
@@ -189,6 +190,7 @@ oppia-search-bar .oppia-input-group {
   oppia-search-bar .oppia-input-group input {
     margin-left: -4.5vw;
   }
+
   /* .oppia-search-bar-input::-webkit-input-placeholder {
     color: #999;
   }
@@ -296,6 +298,12 @@ oppia-search-bar .oppia-input-group {
   }
 }
 
+/* @media (max-width: 1600px) {
+  oppia-search-bar .oppia-input-group {
+    width: 52.5em;
+  }
+} */
+
 .oppia-search-bar-input:focus {
   border-color: #66afe9;
   -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075),0 0 8px rgba(102,175,233,.6);
@@ -330,6 +338,18 @@ oppia-search-bar .oppia-input-group {
 @media (max-width: 378px) {
   .oppia-search-bar-form {
     padding-left: 0;
+  }
+}
+
+@media (max-width: 1280px) {
+  oppia-search-bar .oppia-input-group {
+    width: 39.5em;
+  }
+}
+
+@media (max-width: 900px) {
+  oppia-search-bar .oppia-input-group {
+    width: 23.5em;
   }
 }
 

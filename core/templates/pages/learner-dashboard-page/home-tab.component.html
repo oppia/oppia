@@ -104,7 +104,9 @@
      </div>
     </div>
     <div *ngFor="let item of untrackedTopics | keyvalue" class="untracked-topics">
-      <oppia-carousel-bar [carouselClassname]="'.shivam '">
+      <oppia-carousel-bar
+      [scrollUntrackedTopics]="true"
+      [carouselClassname]="'.shivam '">
         <div *ngFor="let topicSummaryTile of item.value" class="topic-summary-tile">
           <oppia-learner-topic-summary-tile [topicSummary]="topicSummaryTile">
           </oppia-learner-topic-summary-tile>

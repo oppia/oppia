@@ -2,7 +2,7 @@
     <div class="oppia-carousel-head">
         <div class="oppia-carousel-head-content">
             <span class="oppia-carousel-heading" [innerHTML]="'I18N_LEARNER_DASHBOARD_LEARN_SOMETHING_NEW_SECTION' | translate"></span>
-            <span class="oppia-carousel-button">
+            <span class="oppia-carousel-button" *ngIf="isScrollable()">
                 <button class="oppia-carousel-scroller" (click)="scroll(true)"
                 [ngStyle]="{'background-color': disableLeftButton ? 'gray' : '#00645C'}"
                     [disabled]="disableLeftButton">

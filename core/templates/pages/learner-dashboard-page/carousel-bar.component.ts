@@ -35,10 +35,11 @@ export class CarouselBarComponent implements OnInit {
   CarouselClientWidthPx: number;
   untrackedTopicTiles: boolean = true;
   carouselScrollPositionPx: number = 0;
-  scrollUntrackedTopics: boolean = true;
   disableLeftButton: boolean = true;
   disableRightButton: boolean = false;
  @Input() carouselClassname: string;
+ @Input() scrollUntrackedTopics: boolean = false;
+
  // These properties are initialized using Angular lifecycle hooks
  // and we need to do non-null assertion. For more information, see
  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
@@ -64,7 +65,9 @@ export class CarouselBarComponent implements OnInit {
    this.windowIsNarrow = this.windowDimensionService.isWindowNarrow();
    this.directiveSubscriptions.add(
      this.windowDimensionService.getResizeEvent().subscribe(() => {
-       let carouselSelector = document.querySelector('.tiles') as HTMLElement;
+       this.isScrollable();
+       let classname = this.carouselClassname + '.tiles';
+       let carouselSelector = document.querySelector(classname) as HTMLElement;
        carouselSelector.scrollTo(0, 0);
        this.carouselScrollPositionPx = 0;
        this.disableLeftButton = true;
@@ -124,5 +127,13 @@ export class CarouselBarComponent implements OnInit {
      this.disableRightButton = false;
    }
    console.error(this.carouselScrollPositionPx, 'intial caro..posti..');
+ }
+
+ isScrollable(): boolean {
+   let classname = this.carouselClassname + '.tiles';
+   let carouselSelector = document.querySelector(classname) as HTMLElement;
+   let carouselScrollWidthPx = carouselSelector.scrollWidth;
+   let carouselClientWidthPx = carouselSelector.clientWidth;
+   return (carouselScrollWidthPx > carouselClientWidthPx);
  }
 }

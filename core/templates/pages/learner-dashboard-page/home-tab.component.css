@@ -177,6 +177,13 @@
     margin-bottom: 20px;
   }
 }
+
+@media screen and (min-width: 1001px) and (max-width: 1281px) {
+  .home-tab .oppia-story-exploration-in-progress {
+    margin-right: 30px;
+  }
+}
+
 @media screen and (max-width: 767px) {
   .home-tab .greeting {
     font-size: 23px;
@@ -325,11 +332,11 @@
   }
 }
 
-@media(max-width: 1281px) {
+/* @media(max-width: 1281px) {
   .home-tab .oppia-story-exploration-in-progress {
     margin-right: 30px;
   }
-}
+} */
 
 @media(max-width: 1150px) {
   .oppia-topic-summary-tiles {
@@ -339,9 +346,9 @@
   .oppia-classroom-viewer-container .oppia-topic-summary-tiles {
     grid-template-columns: 180px 180px 180px;
   }
-  .home-tab .oppia-story-exploration-in-progress {
+  /* .home-tab .oppia-story-exploration-in-progress {
     margin-right: 0px;
-  }
+  } */
 
   /* .home-tab .oppia-classroom-viewer-container,
   .home-tab .oppia-classroom-search-section {
