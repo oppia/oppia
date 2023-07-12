@@ -55,9 +55,9 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
         )
 
         self.files_in_typings_dir = [
-            'guppy-defs-0.1.d.ts',
+            'guppy-defs-f509e.d.ts',
             'skulpt-defs-0.2.d.ts',
-            'midi-defs-0.4.d.ts',
+            'midi-defs-c26eb.d.ts',
             'nerdamer-defs-0.6.d.ts'
         ]
         def mock_open_file(
@@ -235,7 +235,7 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
         self.files_in_typings_dir = [
             'skulpt-defs-0.2.d.ts',
             'math-expressions-defs-0.3.d.ts',
-            'midi-defs-0.4.d.ts',
+            'midi-defs-c26eb.d.ts',
             'nerdamer-defs-0.6.d.ts'
         ]
         expected_error_messages = 'FAILED  Third party type defs check failed'
@@ -255,7 +255,7 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
             'guppy-defs-0.2.d.ts',
             'skulpt-defs-0.2.d.ts',
             'math-expressions-defs-0.3.d.ts',
-            'midi-defs-0.4.d.ts',
+            'midi-defs-c26eb.d.ts',
             'nerdamer-defs-0.6.d.ts'
         ]
         expected_error_messages = 'FAILED  Third party type defs check failed'
@@ -266,7 +266,7 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
                 error_messages.get_report()[1], expected_error_messages)
             self.assert_same_list_elements([
                 'Type definitions for Guppy are not up to date. The '
-                'current version of Guppy is 0.1 and the type definitions '
+                'current version of Guppy is f509e and the type definitions '
                 'are for version 0.2. Please refer typings/README.md '
                 'for more details.'], error_messages.get_report())
             self.assertEqual('Third party type defs', error_messages.name)
