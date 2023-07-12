@@ -1140,7 +1140,6 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
         self.logout()
 
     def test_get_translation_submitter_stats_for_pagination(self) -> None:
-
         self.login(self.CONTRIBUTOR_EMAIL)
 
         # Test with language filter and pagination.
@@ -1171,7 +1170,6 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
         self.logout()
 
     def test_get_translation_submitter_stats_for_sorting(self) -> None:
-
         self.login(self.CONTRIBUTOR_EMAIL)
 
         # Test with sorting and pagination.
@@ -1203,7 +1201,6 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
         self.logout()
 
     def test_get_translation_submitter_stats_for_topic_filter(self) -> None:
-
         self.login(self.CONTRIBUTOR_EMAIL)
 
         # Test with topic filter and pagination.
@@ -1237,8 +1234,9 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
         )
         self.logout()
 
-    def test_get_translation_submitter_stats_for_last_activity_filter(self) -> None: # pylint: disable=line-too-long
-
+    def test_get_translation_submitter_stats_for_last_activity_filter(
+        self
+    ) -> None:
         self.login(self.CONTRIBUTOR_EMAIL)
 
         # Test with num_days_since_last_activity filter and pagination.
@@ -1274,7 +1272,6 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
         self.logout()
 
     def test_get_translation_reviewer_stats_for_pagination(self) -> None:
-
         self.login(self.CONTRIBUTOR_EMAIL)
 
         # Test with language filter and pagination.
@@ -1305,7 +1302,6 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
         self.logout()
 
     def test_get_translation_reviewer_stats_for_sorting(self) -> None:
-
         self.login(self.CONTRIBUTOR_EMAIL)
 
         # Test with sorting and pagination.
@@ -1336,8 +1332,9 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
         )
         self.logout()
 
-    def test_get_translation_reviewer_stats_for_last_activity_filter(self) -> None: # pylint: disable=line-too-long
-
+    def test_get_translation_reviewer_stats_for_last_activity_filter(
+        self
+    ) -> None:
         self.login(self.CONTRIBUTOR_EMAIL)
 
         # Test with num_days_since_last_activity filter and pagination.
@@ -1373,7 +1370,6 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
         self.logout()
 
     def test_get_question_submitter_stats_for_pagination(self) -> None:
-
         self.login(self.CONTRIBUTOR_EMAIL)
 
         # Test pagination.
@@ -1404,7 +1400,6 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
         self.logout()
 
     def test_get_question_submitter_stats_for_sorting(self) -> None:
-
         self.login(self.CONTRIBUTOR_EMAIL)
 
         # Test with sorting and pagination.
@@ -1436,7 +1431,6 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
         self.logout()
 
     def test_get_question_submitter_stats_for_topic_filter(self) -> None:
-
         self.login(self.CONTRIBUTOR_EMAIL)
 
         # Test with topic filter and pagination.
@@ -1470,8 +1464,9 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
         )
         self.logout()
 
-    def test_get_question_submitter_stats_for_last_activity_filter(self) -> None: # pylint: disable=line-too-long
-
+    def test_get_question_submitter_stats_for_last_activity_filter(
+        self
+    ) -> None:
         self.login(self.CONTRIBUTOR_EMAIL)
 
         # Test with num_days_since_last_activity filter and pagination.
@@ -1507,7 +1502,6 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
         self.logout()
 
     def test_get_question_reviewer_stats_for_pagination(self) -> None:
-
         self.login(self.CONTRIBUTOR_EMAIL)
 
         # Test pagination.
@@ -1538,7 +1532,6 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
         self.logout()
 
     def test_get_question_reviewer_stats_for_sorting(self) -> None:
-
         self.login(self.CONTRIBUTOR_EMAIL)
 
         # Test with sorting and pagination.
@@ -1569,8 +1562,9 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
         )
         self.logout()
 
-    def test_get_question_reviewer_stats_for_last_activity_filter(self) -> None: # pylint: disable=line-too-long
-
+    def test_get_question_reviewer_stats_for_last_activity_filter(
+        self
+    ) -> None:
         self.login(self.CONTRIBUTOR_EMAIL)
 
         # Test with num_days_since_last_activity filter and pagination.
