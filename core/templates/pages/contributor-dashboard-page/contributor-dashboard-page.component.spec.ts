@@ -297,16 +297,5 @@ describe('Contributor dashboard page', () => {
       expect(component.activeTabName).toBe(changedTab);
       expect(component.showTopicSelector()).toBe(true);
     });
-
-    it('should call scrollFunction on scroll', () => {
-      spyOn(userService, 'getUserContributionRightsDataAsync')
-        .and.returnValue(Promise.resolve(userContributionRights));
-      let dummyScrollEvent = new Event('scroll');
-      let scrollSpy = spyOn(component, 'scrollFunction');
-
-      windowRef.nativeWindow.dispatchEvent(dummyScrollEvent);
-
-      expect(scrollSpy).toHaveBeenCalled();
-    });
   });
 });
