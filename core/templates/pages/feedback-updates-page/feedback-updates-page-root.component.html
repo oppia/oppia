@@ -1,0 +1,19 @@
+<oppia-angular-root *ngIf="pageIsShown">
+  <oppia-base-content>
+    <navbar-breadcrumb>
+      <ul class="nav navbar-nav oppia-navbar-breadcrumb">
+        <li>
+          <span class="oppia-navbar-breadcrumb-separator"></span>
+          <span>{{'I18N_FEEDBACK_UPDATES_BREADCRUMB' | translate }}</span>
+        </li>
+      </ul>
+    </navbar-breadcrumb>
+
+    <content>
+      <oppia-feedback-updates-page></oppia-feedback-updates-page>
+    </content>
+    <page-footer></page-footer>
+  </oppia-base-content>
+</oppia-angular-root>
+
+<oppia-error-page-root *ngIf="errorPageIsShown"></oppia-error-page-root>

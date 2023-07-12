@@ -6815,6 +6815,22 @@ export default {
         }
       ]
     },
+    "FEEDBACK_UPDATES": {
+      "ROUTE": "feedback-updates",
+      "TITLE": "Feedback Updates",
+      "META": [
+        {
+          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_VALUE": "description",
+          "CONTENT": "With Oppia,learn and give feedback to improve the lessons"
+        },
+        {
+          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_VALUE": "og:description",
+          "CONTENT": "With Oppia,learn and give feedback to improve the lessons"
+        }
+      ]
+    },
     "PROFILE": {
       "ROUTE": "profile/:username_fragment",
       "TITLE": "I18N_PROFILE_PAGE_TITLE",

@@ -300,6 +300,7 @@
         "scripts.docstrings_checker_test",
         "extensions.domain_test",
         "core.controllers.learner_dashboard_test",
+        "core.controllers.feedback_updates_test",
         "core.platform.storage.cloud_storage_emulator_test",
         "core.platform.storage.dev_mode_storage_services_test",
         "core.platform.storage.cloud_storage_services_test"

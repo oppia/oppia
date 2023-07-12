@@ -28,6 +28,7 @@ import { DebouncerService } from 'services/debouncer.service';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { UserService } from 'services/user.service';
 import { DeviceInfoService } from 'services/contextual/device-info.service';
+import { AlertsService } from 'services/alerts.service';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 import { SearchService } from 'services/search.service';
 import { EventToCodes, NavigationService } from 'services/navigation.service';
@@ -41,6 +42,8 @@ import { CreatorTopicSummary } from 'domain/topic/creator-topic-summary.model';
 import { AccessValidationBackendApiService } from 'pages/oppia-root/routing/access-validation-backend-api.service';
 import { PlatformFeatureService } from 'services/platform-feature.service';
 import { LearnerGroupBackendApiService } from 'domain/learner_group/learner-group-backend-api.service';
+import { FeedbackUpdatesBackendApiService } from 'domain/feedback_updates/feedback-updates-backend-api.service';
+import { FeedbackThreadSummaryBackendDict } from 'domain/feedback_thread/feedback-thread-summary.model';
 
 import './top-navigation-bar.component.css';
 
@@ -107,6 +110,9 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
   windowIsNarrow: boolean = false;
   profilePicturePngDataUrl!: string;
   profilePictureWebpDataUrl!: string;
+  unreadThreadsCount: number = 0;
+  paginatedThreadsList: FeedbackThreadSummaryBackendDict[][] = [];
+
 
   // The 'username', 'profilePageUrl' properties
   // are set using the asynchronous method getUserInfoAsync()
@@ -138,6 +144,7 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
     'I18N_TOPNAV_HOME'];
 
   LEARNER_GROUPS_FEATURE_IS_ENABLED = false;
+  FEEDBACK_UPDATES_IN_PROFILE_PIC_DROP_DOWN_IS_ENABLED = false;
   googleSignInIconUrl = this.urlInterpolationService.getStaticImageUrl(
     '/google_signin_buttons/google_signin.svg');
 
@@ -157,6 +164,9 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
     private contextService: ContextService,
     private i18nLanguageCodeService: I18nLanguageCodeService,
     private i18nService: I18nService,
+    private alertsService: AlertsService,
+    private feedbackUpdatesBackendApiService:
+    FeedbackUpdatesBackendApiService,
     private sidebarStatusService: SidebarStatusService,
     private urlInterpolationService: UrlInterpolationService,
     private debouncerService: DebouncerService,
@@ -204,6 +214,9 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
         this.LEARNER_GROUPS_FEATURE_IS_ENABLED = featureIsEnabled;
       });
 
+    this.FEEDBACK_UPDATES_IN_PROFILE_PIC_DROP_DOWN_IS_ENABLED =
+    this.isShowFeedbackUpdatesInProfilepicDropdownFeatureFlagEnable();
+
     // TODO(#18362): Resolve the console error on the signup page and then
     // add the error catch block to the 'validateAccessToClassroomPage'
     // and 'fetchClassroomDataAsync'.
@@ -228,6 +241,7 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
           }
         });
     });
+
     // Inside a setTimeout function call, 'this' points to the global object.
     // To access the context in which the setTimeout call is made, we need to
     // first save a reference to that context in a variable, and then use that
@@ -255,6 +269,25 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
       this.isBlogPostEditor = userInfo.isBlogPostEditor();
       this.userIsLoggedIn = userInfo.isLoggedIn();
       let usernameFromUserInfo = userInfo.getUsername();
+      if (this.userIsLoggedIn) {
+        let feedbackUpdatesDataPromise = (
+          this.feedbackUpdatesBackendApiService
+            .fetchFeedbackUpdatesDataAsync(
+              this.paginatedThreadsList));
+        feedbackUpdatesDataPromise.then(
+          responseData => {
+            this.unreadThreadsCount =
+              responseData.numberOfUnreadThreads;
+          }, errorResponseStatus => {
+            if (
+              AppConstants.FATAL_ERROR_CODES.
+                indexOf(errorResponseStatus) !== -1) {
+              this.alertsService.addWarning(
+                'Failed to get number of unread thread of feedback updates');
+            }
+          }
+        );
+      }
       if (usernameFromUserInfo) {
         this.username = usernameFromUserInfo;
         this.profilePageUrl = this.urlInterpolationService.interpolateUrl(
@@ -541,6 +574,12 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.directiveSubscriptions.unsubscribe();
+  }
+
+  isShowFeedbackUpdatesInProfilepicDropdownFeatureFlagEnable(): boolean {
+    return (
+      this.platformFeatureService.status.
+        ShowFeedbackUpdatesInProfilePicDropdownMenu.isEnabled);
   }
 }
 

@@ -2636,6 +2636,50 @@ def can_access_learner_dashboard(
     return test_can_access
 
 
+def can_access_feedback_updates(
+    handler: Callable[..., _GenericHandlerFunctionReturnType]
+) -> Callable[..., _GenericHandlerFunctionReturnType]:
+    """Decorator to check access to feedback updates.
+
+    Args:
+        handler: function. The function to be decorated.
+
+    Returns:
+        function. The newly decorated function that now also checks if
+        one can access the feedback updates.
+    """
+
+    # Here we use type Any because this method can accept arbitrary number of
+    # arguments with different types.
+    @functools.wraps(handler)
+    def test_can_access(
+        self: _SelfBaseHandlerType, **kwargs: Any
+    ) -> _GenericHandlerFunctionReturnType:
+        """Checks if the user can access the feedback updates.
+
+        Args:
+            **kwargs: *. Keyword arguments.
+
+        Returns:
+            *. The return value of the decorated function.
+
+        Raises:
+            NotLoggedInException. The user is not logged in.
+            UnauthorizedUserException. The user does not have
+                credentials to access the page.
+        """
+        if not self.user_id:
+            raise base.UserFacingExceptions.NotLoggedInException
+
+        if role_services.ACTION_ACCESS_FEEDBACK_UPDATES in self.user.actions:
+            return handler(self, **kwargs)
+        else:
+            raise self.UnauthorizedUserException(
+                'You do not have the credentials to access this page.')
+
+    return test_can_access
+
+
 def can_access_learner_groups(
     handler: Callable[..., _GenericHandlerFunctionReturnType]
 ) -> Callable[..., _GenericHandlerFunctionReturnType]:

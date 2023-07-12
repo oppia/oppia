@@ -30,9 +30,6 @@ var LearnerDashboardPage = function() {
   var completedGoalsTopicName = $('.e2e-test-completed-goals-topic-name');
   var currentGoalsTopicName = $('.e2e-test-topic-name-in-current-goals');
   var editGoalsTopicName = $('.e2e-test-topic-name-in-edit-goals');
-  var feedbackMessage = $('.e2e-test-feedback-message');
-  var feedbackSection = $('.e2e-test-feedback-section');
-  var feedbackThread = $('.e2e-test-feedback-thread');
   var goalsSection = $('.e2e-test-goals-section');
   var homeSection = $('.e2e-test-home-section');
   var incompleteCommunityLessonsSection = $(
@@ -55,10 +52,7 @@ var LearnerDashboardPage = function() {
   var topicNamesInLearnerStorySummaryTilesSelector = function() {
     return $$('.e2e-test-topic-name-in-learner-story-summary-tile');
   };
-  var feedbackExplorationTitleElement = $('.e2e-test-feedback-exploration');
-  var feedbackExplorationTitleSelector = function() {
-    return $$('.e2e-test-feedback-exploration');
-  };
+
   var subscriptionNameElement = $('.e2e-test-subscription-name');
   var subscriptionNameSelector = function() {
     return $$('.e2e-test-subscription-name');
@@ -87,14 +81,6 @@ var LearnerDashboardPage = function() {
       'Commmunity lesson section takes too long to appear'
     );
     await action.click('Community Lessons Section', communityLessonsSection);
-  };
-
-  this.navigateToFeedbackSection = async function() {
-    await action.click('Feedback Section', feedbackSection);
-  };
-
-  this.navigateToFeedbackThread = async function() {
-    await action.click('Feedback Thread', feedbackThread);
   };
 
   this.expectTitleOfCollectionSummaryTileToMatch = async function(title) {
@@ -226,20 +212,6 @@ var LearnerDashboardPage = function() {
       subscriptionName[lastElement],
       'Subscription Last Name takes too long to appear');
     expect(await subscriptionName[lastElement].getText()).toMatch(name);
-  };
-
-  this.expectFeedbackExplorationTitleToMatch = async function(title) {
-    await waitFor.visibilityOf(
-      feedbackExplorationTitleElement,
-      'Feedback Exploration Title takes too long to appear');
-    var feedbackExplorationTitle = await feedbackExplorationTitleSelector();
-    expect(await feedbackExplorationTitle[0].getText()).toMatch(title);
-  };
-
-  this.expectFeedbackMessageToMatch = async function(message) {
-    await waitFor.visibilityOf(
-      feedbackMessage, 'Feedback Message takes too long to appear');
-    expect(await feedbackMessage.getText()).toMatch(message);
   };
 
   this.navigateToCommunityLessonsAndCheckIncompleteExplorations = (

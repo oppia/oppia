@@ -138,38 +138,6 @@ describe('Learner dashboard functionality', function() {
     await users.logout();
   });
 
-  it('should display learner feedback threads', async function() {
-    await users.createUser(
-      'learner2@learnerDashboard.com', 'learner2learnerDashboard');
-    await users.createUser(
-      'feedbackAdm@learnerDashboard.com', 'feedbackAdmlearnerDashboard');
-    await users.login('feedbackAdm@learnerDashboard.com');
-    await workflow.createAndPublishExploration(
-      'BUS101',
-      'Business',
-      'Learn about different business regulations around the world.',
-      'English',
-      true
-    );
-    await users.logout();
-
-    await users.login('learner2@learnerDashboard.com');
-    var feedback = 'A good exploration. Would love to see a few ' +
-      'more questions';
-    await libraryPage.get();
-    await libraryPage.findExploration('BUS101');
-    await libraryPage.playExploration('BUS101');
-    await explorationPlayerPage.submitFeedback(feedback);
-
-    // Verify feedback thread is created.
-    await learnerDashboardPage.get();
-    await learnerDashboardPage.navigateToFeedbackSection();
-    await learnerDashboardPage.expectFeedbackExplorationTitleToMatch('BUS101');
-    await learnerDashboardPage.navigateToFeedbackThread();
-    await learnerDashboardPage.expectFeedbackMessageToMatch(feedback);
-    await users.logout();
-  });
-
   it('should add exploration to play later list', async function() {
     var EXPLORATION_FRACTION = 'fraction';
     var EXPLORATION_SINGING = 'singing';
