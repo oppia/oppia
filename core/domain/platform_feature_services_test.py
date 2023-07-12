@@ -205,7 +205,6 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
             context = feature_services.create_evaluation_context_for_client(
                 {
                     'platform_type': 'Android',
-                    'browser_type': None,
                     'app_version': '1.0.0',
                 }
             )
@@ -213,7 +212,6 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
                 context.server_mode,
                 FeatureStages.DEV)
             self.assertEqual(context.platform_type, 'Android')
-            self.assertEqual(context.browser_type, None)
             self.assertEqual(context.app_version, '1.0.0')
 
     def test_get_all_feature_flag_dicts_returns_correct_dicts(self) -> None:
@@ -232,7 +230,6 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
         with self.swap(constants, 'DEV_MODE', True):
             context = feature_services.create_evaluation_context_for_client({
                 'platform_type': 'Android',
-                'browser_type': None,
                 'app_version': '1.0.0',
             })
             self.assertEqual(
@@ -253,7 +250,6 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
         with constants_swap, env_swap:
             context = feature_services.create_evaluation_context_for_client({
                 'platform_type': 'Android',
-                'browser_type': None,
                 'app_version': '1.0.0',
             })
             self.assertEqual(
@@ -273,7 +269,6 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
         with constants_swap, env_swap:
             context = feature_services.create_evaluation_context_for_client({
                 'platform_type': 'Android',
-                'browser_type': None,
                 'app_version': '1.0.0',
             })
             self.assertEqual(

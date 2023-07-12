@@ -18,7 +18,6 @@
 
 export interface ClientContextBackendDict {
   'platform_type': string;
-  'browser_type': string;
 }
 
 /**
@@ -47,7 +46,6 @@ export class ClientContext {
   toBackendDict(): ClientContextBackendDict {
     return {
       platform_type: this.platformType,
-      browser_type: this.browserType,
     };
   }
 }
