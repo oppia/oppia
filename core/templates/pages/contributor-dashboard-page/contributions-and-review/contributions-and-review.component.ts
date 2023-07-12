@@ -402,11 +402,8 @@ export class ContributionsAndReview
     if (suggestion.suggestion_type === this.SUGGESTION_TYPE_TRANSLATE) {
       const suggestionIdToContribution = {};
       for (let suggestionId in this.contributions) {
-        if (this.contributions[suggestionId].suggestion.suggestion_type ===
-            this.SUGGESTION_TYPE_TRANSLATE) {
-          const contribution = this.contributions[suggestionId];
-          suggestionIdToContribution[suggestionId] = contribution;
-        }
+        const contribution = this.contributions[suggestionId];
+        suggestionIdToContribution[suggestionId] = contribution;
       }
       this.contextService.setCustomEntityContext(
         AppConstants.IMAGE_CONTEXT.EXPLORATION_SUGGESTIONS,
@@ -493,6 +490,7 @@ export class ContributionsAndReview
 
   loadContributions(shouldResetOffset: boolean):
     Promise<GetOpportunitiesResponse> {
+    this.contributions = {};
     if (!this.activeTabType || !this.activeTabSubtype) {
       return new Promise((resolve, reject) => {
         resolve({opportunitiesDicts: [], more: false});

@@ -81,6 +81,7 @@ describe('Contributions and review component', () => {
   var getUserCreatedTranslationSuggestionsAsyncSpy = null;
   var getReviewableQuestionSuggestionsAsyncSpy = null;
   var getReviewableTranslationSuggestionsAsyncSpy = null;
+  var getUserCreatedQuestionSuggestionsAsyncSpy = null;
   let getUserContributionRightsDataAsyncSpy = null;
   let formatRtePreviewPipe: FormatRtePreviewPipe;
   const mockActiveTopicEventEmitter = new EventEmitter();
@@ -316,7 +317,7 @@ describe('Contributions and review component', () => {
         },
         more: false,
       }));
-    spyOn(
+    getUserCreatedQuestionSuggestionsAsyncSpy = spyOn(
       contributionAndReviewService, 'getUserCreatedQuestionSuggestionsAsync')
       .and.returnValue(Promise.resolve({
         suggestionIdToDetails: {
@@ -1157,7 +1158,7 @@ describe('Contributions and review component', () => {
         });
       });
 
-      it('should load translation reviews', () => {
+      it('should load reviews, then contributions', fakeAsync(() => {
         getReviewableTranslationSuggestionsAsyncSpy.and.returnValue(
           Promise.resolve({
             suggestionIdToDetails: {
@@ -1173,31 +1174,73 @@ describe('Contributions and review component', () => {
                     state_name: null,
                     new_value: null,
                     old_value: null,
-                    content_html: 'Translation',
-                    translation_html: 'Tradução',
-                    skill_id: 'skill_id'
-                  },
-                  status: 'rejected',
-                  exploration_content_html: null
-                },
-                details: {
-                  topic_name: 'topic_name',
-                  story_title: 'story_title',
-                  chapter_title: 'chapter_title'
-                }
-              },
-              suggestion_2: {
-                suggestion: {
-                  target_type: null,
-                  author_name: null,
-                  last_updated_msecs: null,
-                  suggestion_id: 'suggestion_2',
-                  target_id: '2',
-                  suggestion_type: 'add_question',
-                  change: {
-                    state_name: null,
-                    new_value: null,
-                    old_value: null,
+                    question_dict: {
+                      id: '1',
+                      question_state_data: {
+                        content: {
+                          html: 'Question 2',
+                          content_id: 'content_2'
+                        },
+                        interaction: {
+                          answer_groups: [{
+                            outcome: {
+                              dest: 'outcome 1',
+                              dest_if_really_stuck: null,
+                              feedback: {
+                                content_id: 'content_1',
+                                html: ''
+                              },
+                              labelled_as_correct: true,
+                              param_changes: [],
+                              refresher_exploration_id: null
+                            },
+                            rule_specs: [],
+                          }],
+                          confirmed_unclassified_answers: [],
+                          customization_args: {
+                            placeholder: {
+                              value: {
+                                content_id: 'ca_placeholder_0',
+                                unicode_str: ''
+                              }
+                            },
+                            rows: { value: 1 },
+                            catchMisspellings: {
+                              value: false
+                            }
+                          },
+                          default_outcome: {
+                            dest: null,
+                            dest_if_really_stuck: null,
+                            feedback: {
+                              html: 'Correct Answer',
+                              content_id: 'content_2'
+                            },
+                            param_changes: [],
+                            labelled_as_correct: true
+                          },
+                          hints: [{
+                            hint_content: {
+                              html: 'Hint 1',
+                              content_id: 'content_3'
+                            }
+                          }],
+                          solution: {
+                            correct_answer: 'This is the correct answer',
+                            answer_is_exclusive: false,
+                            explanation: {
+                              html: 'Solution explanation',
+                              content_id: 'content_4'
+                            }
+                          },
+                          id: 'TextInput'
+                        },
+                        param_changes: [],
+                        recorded_voiceovers: {
+                          voiceovers_mapping: {}
+                        }
+                      },
+                    },
                     content_html: 'Translation',
                     translation_html: 'Tradução',
                     skill_id: 'skill_id'
@@ -1217,25 +1260,18 @@ describe('Contributions and review component', () => {
 
         component.switchToTab(
           component.TAB_TYPE_REVIEWS, 'translate_content');
-        // Set up contributions with a translation and a question.
+        // Set up contributions with a translation.
         component.loadContributions(null).then(({opportunitiesDicts, more}) => {
           expect(Object.keys(component.contributions)).toContain(
-            'suggestion_1', 'suggestion_2');
+            'suggestion_1');
           expect(opportunitiesDicts).toEqual([{
             id: 'suggestion_1',
             heading: 'Tradução',
             subheading: 'topic_name / story_title / chapter_title',
             labelText: 'Obsolete',
             labelColor: '#e76c8c',
-            actionButtonTitle: 'Review'
-          },
-          {
-            id: 'suggestion_2',
-            heading: 'Tradução',
-            subheading: 'topic_name / story_title / chapter_title',
-            labelText: 'Obsolete',
-            labelColor: '#e76c8c',
-            actionButtonTitle: 'Review'
+            actionButtonTitle: 'Review',
+            translationWordCount: undefined
           }]);
           expect(more).toEqual(false);
           // When opening the review modal for translations,
@@ -1256,6 +1292,73 @@ describe('Contributions and review component', () => {
                     state_name: null,
                     new_value: null,
                     old_value: null,
+                    question_dict: {
+                      id: '1',
+                      question_state_data: {
+                        content: {
+                          html: 'Question 2',
+                          content_id: 'content_2'
+                        },
+                        interaction: {
+                          answer_groups: [{
+                            outcome: {
+                              dest: 'outcome 1',
+                              dest_if_really_stuck: null,
+                              feedback: {
+                                content_id: 'content_1',
+                                html: ''
+                              },
+                              labelled_as_correct: true,
+                              param_changes: [],
+                              refresher_exploration_id: null
+                            },
+                            rule_specs: [],
+                          }],
+                          confirmed_unclassified_answers: [],
+                          customization_args: {
+                            placeholder: {
+                              value: {
+                                content_id: 'ca_placeholder_0',
+                                unicode_str: ''
+                              }
+                            },
+                            rows: { value: 1 },
+                            catchMisspellings: {
+                              value: false
+                            }
+                          },
+                          default_outcome: {
+                            dest: null,
+                            dest_if_really_stuck: null,
+                            feedback: {
+                              html: 'Correct Answer',
+                              content_id: 'content_2'
+                            },
+                            param_changes: [],
+                            labelled_as_correct: true
+                          },
+                          hints: [{
+                            hint_content: {
+                              html: 'Hint 1',
+                              content_id: 'content_3'
+                            }
+                          }],
+                          solution: {
+                            correct_answer: 'This is the correct answer',
+                            answer_is_exclusive: false,
+                            explanation: {
+                              html: 'Solution explanation',
+                              content_id: 'content_4'
+                            }
+                          },
+                          id: 'TextInput'
+                        },
+                        param_changes: [],
+                        recorded_voiceovers: {
+                          voiceovers_mapping: {}
+                        }
+                      },
+                    },
                     content_html: 'Translation',
                     translation_html: 'Tradução',
                     skill_id: 'skill_id'
@@ -1274,7 +1377,213 @@ describe('Contributions and review component', () => {
             true
             );
         });
-      });
+        // Wait for the first test to complete.
+        tick();
+        // Now load a question contribution.
+        getUserCreatedQuestionSuggestionsAsyncSpy.and.returnValue(
+          Promise.resolve({
+            suggestionIdToDetails: {
+              suggestion_2: {
+                suggestion: {
+                  target_type: null,
+                  author_name: null,
+                  last_updated_msecs: null,
+                  suggestion_id: 'suggestion_2',
+                  target_id: '1',
+                  suggestion_type: 'add_question',
+                  change: {
+                    state_name: null,
+                    new_value: null,
+                    old_value: null,
+                    skill_id: 'skill1',
+                    question_dict: {
+                      id: '1',
+                      question_state_data: {
+                        content: {
+                          html: 'Question 2',
+                          content_id: 'content_2'
+                        },
+                        interaction: {
+                          answer_groups: [{
+                            outcome: {
+                              dest: 'outcome 1',
+                              dest_if_really_stuck: null,
+                              feedback: {
+                                content_id: 'content_1',
+                                html: ''
+                              },
+                              labelled_as_correct: true,
+                              param_changes: [],
+                              refresher_exploration_id: null
+                            },
+                            rule_specs: [],
+                          }],
+                          confirmed_unclassified_answers: [],
+                          customization_args: {
+                            placeholder: {
+                              value: {
+                                content_id: 'ca_placeholder_0',
+                                unicode_str: ''
+                              }
+                            },
+                            rows: { value: 1 },
+                            catchMisspellings: {
+                              value: false
+                            }
+                          },
+                          default_outcome: {
+                            dest: null,
+                            dest_if_really_stuck: null,
+                            feedback: {
+                              html: 'Correct Answer',
+                              content_id: 'content_2'
+                            },
+                            param_changes: [],
+                            labelled_as_correct: true
+                          },
+                          hints: [{
+                            hint_content: {
+                              html: 'Hint 1',
+                              content_id: 'content_3'
+                            }
+                          }],
+                          solution: {
+                            correct_answer: 'This is the correct answer',
+                            answer_is_exclusive: false,
+                            explanation: {
+                              html: 'Solution explanation',
+                              content_id: 'content_4'
+                            }
+                          },
+                          id: 'TextInput'
+                        },
+                        param_changes: [],
+                        recorded_voiceovers: {
+                          voiceovers_mapping: {}
+                        }
+                      },
+                    }
+                  },
+                  status: 'accepted'
+                },
+                details: {
+                  skill_id: 'skill_1',
+                  skill_description: 'skill_1'
+                }
+              }
+            },
+            more: false
+          }));
+
+        component.switchToTab(
+          component.TAB_TYPE_CONTRIBUTIONS, 'add_question');
+        // Load contributions object with a question. This should also remove
+        // any existing data from the contributions object.
+        component.loadContributions(null).then(({opportunitiesDicts, more}) => {
+          expect(Object.keys(component.contributions)).toContain(
+            'suggestion_2');
+          expect(opportunitiesDicts).toEqual([
+            {
+              id: 'suggestion_2',
+              heading: 'Question 2',
+              subheading: 'skill_1',
+              labelText: 'Accepted',
+              labelColor: '#8ed274',
+              actionButtonTitle: 'View'
+            }]);
+          expect(more).toEqual(false);
+          // When opening the contribution modal for questions,
+          // only contribution questions should be shown.
+          spyOn(component, 'openQuestionSuggestionModal');
+          component.onClickViewSuggestion('suggestion_2');
+          expect(component.openQuestionSuggestionModal).
+            toHaveBeenCalledWith(
+              'suggestion_2', {
+                target_type: null,
+                author_name: null,
+                last_updated_msecs: null,
+                suggestion_id: 'suggestion_2',
+                target_id: '1',
+                suggestion_type: 'add_question',
+                change: {
+                  state_name: null,
+                  new_value: null,
+                  old_value: null,
+                  skill_id: 'skill1',
+                  question_dict: {
+                    id: '1',
+                    question_state_data: {
+                      content: {
+                        html: 'Question 2',
+                        content_id: 'content_2'
+                      },
+                      interaction: {
+                        answer_groups: [{
+                          outcome: {
+                            dest: 'outcome 1',
+                            dest_if_really_stuck: null,
+                            feedback: {
+                              content_id: 'content_1',
+                              html: ''
+                            },
+                            labelled_as_correct: true,
+                            param_changes: [],
+                            refresher_exploration_id: null
+                          },
+                          rule_specs: [],
+                        }],
+                        confirmed_unclassified_answers: [],
+                        customization_args: {
+                          placeholder: {
+                            value: {
+                              content_id: 'ca_placeholder_0',
+                              unicode_str: ''
+                            }
+                          },
+                          rows: { value: 1 },
+                          catchMisspellings: {
+                            value: false
+                          }
+                        },
+                        default_outcome: {
+                          dest: null,
+                          dest_if_really_stuck: null,
+                          feedback: {
+                            html: 'Correct Answer',
+                            content_id: 'content_2'
+                          },
+                          param_changes: [],
+                          labelled_as_correct: true
+                        },
+                        hints: [{
+                          hint_content: {
+                            html: 'Hint 1',
+                            content_id: 'content_3'
+                          }
+                        }],
+                        solution: {
+                          correct_answer: 'This is the correct answer',
+                          answer_is_exclusive: false,
+                          explanation: {
+                            html: 'Solution explanation',
+                            content_id: 'content_4'
+                          }
+                        },
+                        id: 'TextInput'
+                      },
+                      param_changes: [],
+                      recorded_voiceovers: {
+                        voiceovers_mapping: {}
+                      }
+                    },
+                  }
+                },
+                status: 'accepted'
+              },
+              false
+            );
+        });
+      }));
 
       it('should return empty list if tab is not initialized', () => {
         component.activeTabType = null;
