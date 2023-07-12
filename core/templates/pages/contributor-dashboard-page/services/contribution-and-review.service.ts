@@ -30,6 +30,7 @@ import { ComputeGraphService } from 'services/compute-graph.service';
 import { States } from 'domain/exploration/StatesObjectFactory';
 import { ExplorationObjectFactory, Exploration, ExplorationBackendDict }
   from 'domain/exploration/ExplorationObjectFactory';
+import {FetchExplorationBackendResponse} from 'domain/exploration/read-only-exploration-backend-api.service'
 
 export interface OpportunityDict {
   'skill_id': string;
@@ -140,9 +141,8 @@ export class ContributionAndReviewService {
       fetcher.offset = 0;
       fetcher.suggestionIdToDetails = {};
     }
-    // eslint-disable-next-line
-    let explorationBackendResponse = null;
-    if (explorationId) {
+    let explorationBackendResponse: FetchExplorationBackendResponse = null;
+    if (explorationId && fetcher === this.reviewableTranslationFetcher) {
       explorationBackendResponse = await this.
         readOnlyExplorationBackendApiService.
         fetchExplorationAsync(explorationId, null);
