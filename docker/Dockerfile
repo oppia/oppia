@@ -27,6 +27,7 @@ ENV OPPIA_IS_DOCKERIZED="true"
 
 # Installing the pre-requisites libs and dependencies
 RUN apt-get update -y && apt-get upgrade -y \
+    curl \
     npm \
     openjdk-11-jre \
     python2 \

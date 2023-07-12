@@ -12,7 +12,6 @@ services:
       - shared_node_modules:/app/oppia/node_modules
       - shared_third_party:/app/oppia/third_party
       - shared_js_ts_proto_files:/app/oppia/extensions/classifiers/proto
-      - shared_angular_build:/app/oppia/dist
     environment:
       - NODE_OPTIONS=--max_old_space_size=4096
     healthcheck:
@@ -38,7 +37,6 @@ services:
       - shared_node_modules:/app/oppia/node_modules
       - shared_third_party:/app/oppia/third_party
       - shared_js_ts_proto_files:/app/oppia/extensions/classifiers/proto
-      - shared_webpack_bundles:/app/oppia/webpack_bundles
     healthcheck:
       test: test "$(ls -A /app/oppia/webpack_bundles)" || exit 1
       timeout: 30s
@@ -68,8 +66,6 @@ services:
       - shared_proto_files:/app/oppia/proto_files
       - shared_third_party:/app/oppia/third_party
       - shared_js_ts_proto_files:/app/oppia/extensions/classifiers/proto
-      - shared_angular_build:/app/oppia/dist
-      - shared_webpack_bundles:/app/oppia/webpack_bundles
     environment:
       - CLOUDSDK_CORE_DISABLE_PROMPTS=1
       - OPPIA_IS_DOCKERIZED=true
@@ -77,6 +73,14 @@ services:
       angular-build:
         condition: service_healthy
       webpack-compiler:
+        condition: service_healthy
+      datastore:
+        condition: service_healthy
+      elasticsearch:
+        condition: service_healthy
+      firebase:
+        condition: service_healthy
+      redis:
         condition: service_healthy
     healthcheck:
       test: curl -f http://localhost:8181/ || exit 1
@@ -107,11 +111,6 @@ services:
       - CLOUDSDK_CORE_DISABLE_PROMPTS=1
     volumes:
       - cloud_datastore_emulator_cache:/app/cloud_datastore_emulator_cache
-    depends_on:
-      angular-build:
-        condition: service_healthy
-      webpack-compiler:
-        condition: service_healthy
     healthcheck:
       test: curl -f http://localhost:8089/ || exit 1
       timeout: 10s
@@ -193,11 +192,6 @@ services:
       - ES_JAVA_OPTS=-Xms100m -Xmx500m
       - ES_PATH_CONF=/usr/share/elasticsearch/config
       - discovery.type=single-node
-    depends_on:
-      angular-build:
-        condition: service_healthy
-      webpack-compiler:
-        condition: service_healthy
     healthcheck:
       test: curl -f http://localhost:9200/ || exit 1
       timeout: 10s
@@ -211,8 +205,6 @@ volumes:
   shared_proto_files:
   shared_js_ts_proto_files:
   shared_third_party:
-  shared_angular_build:
-  shared_webpack_bundles:
   redis_dump:
   firebase_emulator_cache:
   cloud_datastore_emulator_cache:
