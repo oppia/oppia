@@ -17,7 +17,7 @@
  */
 
 import 'midi/build/MIDI.js';
-window.Base64Binary = require('/node_modules/midi/inc/shim/Base64binary.js');
+window.Base64Binary = require('midi/inc/shim/Base64binary.js');
 
 $(document).ready(function() {
   MIDI.loadPlugin({
