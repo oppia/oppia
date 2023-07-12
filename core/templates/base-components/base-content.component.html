@@ -48,7 +48,7 @@
                 <oppia-top-navigation-bar [headerText]="getHeaderText()"
                                           [subheaderText]="getSubheaderText()">
                 </oppia-top-navigation-bar>
-                <div class="collapse d-lg-inline-flex navbar-collapse oppia-navbar-collapse ng-cloak disflx">
+                <div class="collapse d-lg-inline-flex navbar-collapse oppia-navbar-collapse ng-cloak flex-display">
                   <div [ngClass]="{'mr-auto': !isLanguageRTL(), 'ml-auto': isLanguageRTL()}">
                     <ng-content select="navbar-breadcrumb"></ng-content>
                   </div>
@@ -103,7 +103,10 @@
   </div>
 </main>
 <style>
-  .disflx {
+
+  @media screen and (min-width: 600px) {
+      .flex-display {
     display: flex !important;
-  }
+      }
+    }
 </style>
