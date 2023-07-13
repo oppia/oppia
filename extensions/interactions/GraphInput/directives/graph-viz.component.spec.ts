@@ -773,61 +773,11 @@ describe('GraphVizComponent', () => {
     component.dotCursor = new ElementRef(dotCursorElement);
     const dot = component.dotCursor.nativeElement;
     component.interactionIsActive = true;
-    component.state.currentMode = 2;
     component.dotCursorCoordinateX = 0;
     component.dotCursorCoordinateY = 0;
-
-    const graphAreaElement = document.createElement('div');
-    graphAreaElement.classList.add('oppia-graph-viz-svg');
-    graphAreaElement.style.position = 'absolute';
-    graphAreaElement.style.left = '0px';
-    graphAreaElement.style.top = '0px';
-    component.graphArea = new ElementRef(graphAreaElement);
-    const graphAreaRect = graphAreaElement.getBoundingClientRect();
-
-    spyOn(Element.prototype, 'querySelectorAll').and.callFake(
-      jasmine.createSpy('querySelectorAll').and.returnValue([{
-        width: {
-          baseVal: {
-            value: 120
-          }
-        },
-        getAttribute: (attr) => {
-          if (attr === 'height') {
-            return 250;
-          }
-        },
-        getBBox: () => {
-          return {
-            height: 120,
-            width: 527,
-            x: 144,
-            y: -14,
-          };
-        },
-        createSVGPoint: () => {
-          return {
-            matrixTransform: (matrix) => {
-              return {
-                x: 775,
-                y: 307
-              };
-            },
-            x: 0,
-            y: 0
-          };
-        },
-        getScreenCTM: () => {
-          return {
-            inverse: () => {
-              return;
-            }
-          };
-        },
-      }])
-    );
     
     component.ngAfterViewInit();
+    component.state.currentMode = 2;
     component.mousemoveGraphSVG(event);
 
     expect(component.dotCursorCoordinateX).toBe(event.clientX - graphAreaRect.left);
