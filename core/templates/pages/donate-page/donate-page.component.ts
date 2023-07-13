@@ -16,7 +16,7 @@
  * @fileoverview Component for the donate page.
  */
 
-import { Component, OnInit, OnDestroy, Renderer2} from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { TranslateService } from '@ngx-translate/core';
 import { Subscription } from 'rxjs';
@@ -35,7 +35,7 @@ import { AlertsService } from 'services/alerts.service';
 import { MailingListBackendApiService } from 'domain/mailing-list/mailing-list-backend-api.service';
 import { ThanksForDonatingModalComponent } from './thanks-for-donating-modal.component';
 import { ThanksForSubscribingModalComponent } from './thanks-for-subscribing-modal.component';
-
+import { InsertScriptService, KNOWN_SCRIPTS } from 'services/insert-script.service';
 @Component({
   selector: 'donate-page',
   templateUrl: './donate-page.component.html',
@@ -60,15 +60,11 @@ export class DonatePageComponent implements OnInit, OnDestroy {
     private alertsService: AlertsService,
     private mailingListBackendApiService: MailingListBackendApiService,
     private ngbModal: NgbModal,
-    private renderer2: Renderer2
+    private insertScriptService: InsertScriptService,
   ) {}
 
   ngOnInit(): void {
-    const scriptElement = document.createElement('script');
-    scriptElement.src = 'https://donorbox.org/widget.js';
-    scriptElement.setAttribute('paypalExpress', 'false');
-    scriptElement.async = true;
-    this.renderer2.appendChild(document.body, scriptElement);
+    this.insertScriptService.loadScript(KNOWN_SCRIPTS.DONORBOX);
     this.windowIsNarrow = this.windowDimensionService.isWindowNarrow();
     this.donateImgUrl = this.getStaticImageUrl('/general/opp_donate_text.svg');
     this.directiveSubscriptions.add(
