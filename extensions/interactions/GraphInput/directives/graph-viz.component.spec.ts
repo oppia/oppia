@@ -788,7 +788,7 @@ describe('GraphVizComponent', () => {
     component.dotCursorCoordinateX = 0;
     component.dotCursorCoordinateY = 0;
 
-    spyOn(component, 'graphArea').and.returnValue(mockGraphAreaElementRef);
+    component.graphArea = mockGraphAreaElementRef;
 
     component.mousemoveGraphSVG(event);
 
