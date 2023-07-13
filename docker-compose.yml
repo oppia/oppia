@@ -169,8 +169,6 @@ services:
   redis:
     image: redis:6.2.4
     container_name: oppia-redis
-    ports:
-      - "6379:6379"
     environment:
       - PATH=/usr/local/bin/
     volumes:
@@ -186,8 +184,6 @@ services:
   elasticsearch:
     image: elasticsearch:7.17.0
     container_name: oppia-elasticsearch
-    ports:
-      - "9200:9200"
     environment:
       - ES_JAVA_OPTS=-Xms100m -Xmx500m
       - ES_PATH_CONF=/usr/share/elasticsearch/config
