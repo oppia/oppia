@@ -769,12 +769,15 @@ describe('GraphVizComponent', () => {
 
     const graphAreaElement = document.createElement('div');
     graphAreaElement.classList.add('oppia-graph-viz-svg');
-    spyOn(component.element.nativeElement, 'querySelector')
-      .and.returnValue(graphAreaElement);
-    spyOn(graphAreaElement, 'getBoundingClientRect')
+    component.graphArea = new ElementRef(graphAreaElement);
+    const graph = component.graphArea.nativeElement;
+
+    spyOn(graph.nativeElement, 'getBoundingClientRect')
       .and.returnValue({ 
         left: 100,
-        top: 200 
+        top: 200,
+        right: 200,
+        bottom: 300
       });
 
     component.state.currentMode = 2;
@@ -793,7 +796,6 @@ describe('GraphVizComponent', () => {
 
     const dot = new ElementRef(document.createElement('div'));
     dot.nativeElement.classList.add('oppia-add-node-cursor');
-    spyOn(component, 'dotElement').and.returnValue(dot);
 
     const buttonElements = [
       new ElementRef(document.createElement('button')),
@@ -835,7 +837,6 @@ describe('GraphVizComponent', () => {
   it('should return false when no button is on top of dot', () => {
     const dot = new ElementRef(document.createElement('div'));
     dot.nativeElement.classList.add('oppia-add-node-cursor');
-    spyOn(component, 'dotElement').and.returnValue(dot);
 
     const buttonElements = [
       new ElementRef(document.createElement('button')),
