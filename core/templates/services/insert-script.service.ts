@@ -30,9 +30,7 @@ export class InsertScriptService {
   private loaded_scripts: Set<string> = new Set<string>();
   private renderer: Renderer2;
 
-  constructor(
-    rendererFactory: RendererFactory2,
-  ) {
+  constructor(rendererFactory: RendererFactory2) {
     this.renderer = rendererFactory.createRenderer(null, null);
   }
 
