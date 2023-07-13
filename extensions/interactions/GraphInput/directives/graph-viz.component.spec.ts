@@ -766,56 +766,22 @@ describe('GraphVizComponent', () => {
       clientX: 100,
       clientY: 100
     });
+    const dotCursorElement = document.createElement('div');
+    dotCursorElement.classList.add('oppia-add-node-cursor');
+    dotCursorElement.style.top = '0px';
+    dotCursorElement.style.left = '0px';
+    component.dotCursor = new ElementRef(dotCursorElement);
+    const dot = component.dotCursor.nativeElement;
     component.state.currentMode = 2;
-    const mockDotElementRef: ElementRef<HTMLDivElement> = {
-      nativeElement: {
-        style: {
-          top: '',
-          left: ''
-        }
-      }
-    };
-    const mockGraphAreaElementRef: ElementRef<HTMLElement> = {
-      nativeElement: {
-        getBoundingClientRect: () => {
-          return {
-            left: 0,
-            top: 0
-          };
-        }
-      }
-    };
-    const mockVizContainerElementRef: ElementRef<HTMLElement> = {
-      nativeElement: {
-        createSVGPoint: jasmine.createSpy().and.returnValue({
-          x: 0,
-          y: 0,
-          matrixTransform: jasmine.createSpy().and.returnValue({
-            x: 0,
-            y: 0
-          })
-        }),
-        getScreenCTM: jasmine.createSpy().and.returnValue({
-          inverse: jasmine.createSpy().and.returnValue({
-            matrixTransform: jasmine.createSpy().and.returnValue({
-              x: 0,
-              y: 0
-            })
-          })
-        })
-      }
-    };
     component.dotCursorCoordinateX = 0;
     component.dotCursorCoordinateY = 0;
-    component.vizContainer = mockVizContainerElementRef;
-    component.graphArea = mockGraphAreaElementRef;
 
     component.mousemoveGraphSVG(event);
 
     expect(component.dotCursorCoordinateX).toBe(100);
     expect(component.dotCursorCoordinateY).toBe(100);
-    expect(mockDotElementRef.nativeElement.style.top).toBe('100px');
-    expect(mockDotElementRef.nativeElement.style.left).toBe('100px');
+    expect(dot.style.top).toBe(component.dotCursorCoordinateY + 'px');
+    expect(dot.style.left).toBe(component.dotCursorCoordinateX + 'px');
   });
 
   it('should dispatch click event when button is on top of dot', () => {
