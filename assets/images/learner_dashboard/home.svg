@@ -1,1 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" height="24" width="24" fill="#000000" xmlns:v="https://vecta.io/nano"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+<!-- <svg xmlns="http://www.w3.org/2000/svg" height="24" width="24" fill="#000000" xmlns:v="https://vecta.io/nano"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg> -->
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+  <path d="M4 21.0078V9.00781L12 3.00781L20 9.00781V21.0078H14V14.0078H10V21.0078H4Z" fill="white"/>
+</svg>
