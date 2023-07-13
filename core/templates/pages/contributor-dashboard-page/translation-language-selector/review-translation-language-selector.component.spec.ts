@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for the translation language selector component.
  */
 
-import { ComponentFixture, fakeAsync, flush, TestBed, waitForAsync } from '@angular/core/testing';
+import { ComponentFixture, fakeAsync, tick, flush, TestBed, waitForAsync } from '@angular/core/testing';
 
 import { ReviewTranslationLanguageSelectorComponent } from
   // eslint-disable-next-line max-len
@@ -25,17 +25,21 @@ import { ContributionOpportunitiesBackendApiService } from
   // eslint-disable-next-line max-len
   'pages/contributor-dashboard-page/services/contribution-opportunities-backend-api.service';
 import { TranslationLanguageService } from 'pages/exploration-editor-page/translation-tab/services/translation-language.service';
-import { ElementRef, EventEmitter } from '@angular/core';
+import { UserService } from 'services/user.service';
+import { ElementRef, EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
 import { AppConstants } from 'app.constants';
 import { FormsModule } from '@angular/forms';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 
 describe('Review Translation language selector', () => {
   let component: ReviewTranslationLanguageSelectorComponent;
   let fixture: ComponentFixture<ReviewTranslationLanguageSelectorComponent>;
   let translationLanguageService: TranslationLanguageService;
+  let userService: UserService;
   const activeLanguageChangedEmitter = new EventEmitter();
 
   let preferredLanguageCode = 'en';
+  const translationReviewerLanguageCodes = ['en', 'es', 'fr'];
 
   const contributionOpportunitiesBackendApiServiceStub:
     Partial<ContributionOpportunitiesBackendApiService> = {
@@ -55,26 +59,38 @@ describe('Review Translation language selector', () => {
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [
+        HttpClientTestingModule,
         FormsModule,
       ],
       declarations: [ReviewTranslationLanguageSelectorComponent],
       providers: [{
         provide: ContributionOpportunitiesBackendApiService,
         useValue: contributionOpportunitiesBackendApiServiceStub
-      }]
+      }],
+      schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
   }));
 
-  beforeEach(() => {
+  beforeEach(fakeAsync(() => {
     fixture = TestBed.createComponent(
       ReviewTranslationLanguageSelectorComponent);
     translationLanguageService = TestBed.inject(TranslationLanguageService);
+    userService = TestBed.inject(UserService);
     component = fixture.componentInstance;
     component.activeLanguageCode = 'en';
     spyOnProperty(translationLanguageService, 'onActiveLanguageChanged').and
       .returnValue(activeLanguageChangedEmitter);
+    spyOn(userService, 'getUserContributionRightsDataAsync').and.resolveTo({
+      can_suggest_questions: false,
+      can_review_translation_for_language_codes: (
+        translationReviewerLanguageCodes),
+      can_review_voiceover_for_language_codes: [],
+      can_review_questions: false
+    });
+    component.ngOnInit();
+    tick();
     fixture.detectChanges();
-  });
+  }));
 
   beforeEach(() => {
     clickDropdown = () => {
@@ -102,12 +118,19 @@ describe('Review Translation language selector', () => {
     expect(component.languageIdToDescription.fr).toBe('français (French)');
   });
 
-  it('should correctly initialize dropdown activeLanguageCode', () => {
+  it('should correctly initialize dropdown activeLanguageCode', () => { 
     const dropdown = (
       fixture.nativeElement.querySelector(
         '.oppia-review-translation-language-selector-inner-container'));
 
     expect(dropdown.firstChild.textContent.trim()).toBe('English');
+  });
+
+  it('should only show language options that the user can review' +
+    ' translations', () => {
+    expect(component.options.map(opt => opt.id)).toEqual(
+      translationReviewerLanguageCodes);
+    expect(component.filteredOptions).toEqual(component.options);
   });
 
   it('should correctly show and hide the dropdown', fakeAsync(() => {
@@ -228,7 +251,6 @@ describe('Review Translation language selector', () => {
   });
 
   it('should toggle dropdown', fakeAsync(() => {
-    component.ngOnInit();
     component.filterDivRef = new ElementRef(document.createElement('div'));
     spyOn(component.filterDivRef.nativeElement, 'focus');
 
@@ -282,8 +304,6 @@ describe('Review Translation language selector', () => {
   }));
 
   it('should filter language options based on the filter text', () => {
-    component.ngOnInit();
-
     // Expect the full list of languages to be contained. Adding just 3 here as
     // the list of languages may grow overtime.
     expect(component.filteredOptions).toContain(
