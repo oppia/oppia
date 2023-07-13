@@ -262,7 +262,7 @@ oppia-search-bar .oppia-input-group {
     /* justify-content: space-between; */
   }
   .oppia-search-bar-dropdown-toggle-button::after {
-    /* color: black; */
+    color: white;
     font-size: 24px;
     margin-top: 7px;
   }

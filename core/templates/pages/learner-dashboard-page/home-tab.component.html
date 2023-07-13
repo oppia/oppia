@@ -1,9 +1,9 @@
 <div class="home-tab">
   <div tabindex="0" class="greeting" [ngStyle]="!windowIsNarrow && {'margin-top': '27px'}">
-    {{ getTimeOfDay() | translate }}, {{ username }}!
+    Welcome, {{ username }}!
   </div>
   <div tabindex="0" class="continue-where-you-left-off"
-    *ngIf="isNonemptyObject(untrackedTopics) || continueWhereYouLeftOffList.length !== 0">
+    *ngIf="continueWhereYouLeftOffList.length !== 0">
     <p class="continue-where-you-left-off-heading"
       [innerHTML]="'I18N_LEARNER_DASHBOARD_CONTINUE_WHERE_YOU_LEFT_OFF_SECTION' | translate"
       *ngIf="continueWhereYouLeftOffList.length !== 0">
