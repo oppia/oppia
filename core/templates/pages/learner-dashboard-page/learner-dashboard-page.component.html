@@ -38,13 +38,6 @@
             (keyup.enter)="setActiveSection(LEARNER_DASHBOARD_SECTION_I18N_IDS.COMMUNITY_LESSONS)">
           <span [innerHTML]="LEARNER_DASHBOARD_SECTION_I18N_IDS.COMMUNITY_LESSONS | translate"></span>
         </h4>
-        <h4 class="oppia-learner-dashboard-menu oppia-learner-dashborad-menu-hover e2e-test-feedback-section" tabindex="0"
-            [ngClass]="{'oppia-learner-dashboard-section-active': activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.FEEDBACK}"
-            (click)="setActiveSection(LEARNER_DASHBOARD_SECTION_I18N_IDS.FEEDBACK)"
-            (keyup.enter)="setActiveSection(LEARNER_DASHBOARD_SECTION_I18N_IDS.FEEDBACK)">
-          <span [innerHTML]="LEARNER_DASHBOARD_SECTION_I18N_IDS.FEEDBACK | translate"></span>
-          <span *ngIf="numberOfUnreadThreads !== 0">({{ numberOfUnreadThreads }})</span>
-        </h4>
       </mat-card>
     </div>
     <footer class="oppia-learner-dashboard-buttons" *ngIf="windowIsNarrow" headroom>
@@ -87,26 +80,6 @@
 
     <div class="col-md-8 oppia-learner-dashboard-main-content"
          [ngClass]="{'oppia-learner-dashboard-mobile-mode': windowIsNarrow}">
-      <div>
-        <span class="sort-explorations-select oppia-learner-dashboard-sort oppia-sort-options"
-              *ngIf="activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.FEEDBACK && threadSummaries.length !== 0 && !feedbackThreadActive"
-              [ngClass]="{'oppia-learner-dashboard-sort-mobile': windowIsNarrow}">
-          <p class="sort-by-text mt-0">Sort By</p>
-          <select [(ngModel)]="currentFeedbackThreadsSortType"
-                  class="sort-options oppia-sort-options"
-                  aria-label="Sort feedback by"
-                  (change)="setFeedbackSortingOptions(currentFeedbackThreadsSortType)">
-            <option *ngFor="let thread of FEEDBACK_THREADS_SORT_BY_KEYS_AND_I18N_IDS | keyvalue"
-                    [value]="thread.value['key']">
-              {{ thread.value['i18nId'] | translate }}
-            </option>
-          </select>
-          <span class="sort-order fas"
-                (click)="setFeedbackSortingOptions(currentFeedbackThreadsSortType)"
-                [ngClass]="isCurrentFeedbackSortDescending ? 'fa-long-arrow-alt-down':'fa-long-arrow-alt-up'">
-          </span>
-        </span>
-      </div>
       <div class="oppia-learner-dashboard-main-content-container d-flex"
            [ngClass]="{'pl-5': !windowIsNarrow, 'justify-content-center': windowIsNarrow}">
         <div *ngIf="activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.HOME">
@@ -157,7 +130,6 @@
                                        [completedToIncompleteCollections]="completedToIncompleteCollections">
           </oppia-community-lessons-tab>
         </div>
-
         <div *ngIf="activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.FEEDBACK"
              class="oppia-learner-dashboard-feedback-section oppia-feedback-section-top-margin w-100"
              [ngStyle]="threadSummaries.length !== 0 && {'cursor': 'pointer'}">

@@ -953,6 +953,10 @@ FEEDBACK_THREAD_URL_PREFIX = '/threadhandler'
 FEEDBACK_THREADLIST_URL_PREFIX = '/threadlisthandler'
 FEEDBACK_THREADLIST_URL_PREFIX_FOR_TOPICS = '/threadlisthandlerfortopic'
 FEEDBACK_THREAD_VIEW_EVENT_URL = '/feedbackhandler/thread_view_event'
+FEEDBACK_UPDATES_DATA_URL = (
+    '/feedbackupdateshandler/data')
+FEEDBACK_UPDATES_URL = '/feedbackupdates'
+FEEDBACK_UPDATES_THREAD_DATA_URL = '/feedbackupdatesthreadhandler'
 FETCH_SKILLS_URL_PREFIX = '/fetch_skills'
 FLAG_EXPLORATION_URL_PREFIX = '/flagexplorationhandler'
 FRACTIONS_LANDING_PAGE_URL = '/fractions'
@@ -971,10 +975,7 @@ LEARNER_DASHBOARD_COLLECTION_DATA_URL = (
     '/learnerdashboardcollectionsprogresshandler/data')
 LEARNER_DASHBOARD_EXPLORATION_DATA_URL = (
     '/learnerdashboardexplorationsprogresshandler/data')
-LEARNER_DASHBOARD_FEEDBACK_UPDATES_DATA_URL = (
-    '/learnerdashboardfeedbackupdateshandler/data')
 LEARNER_DASHBOARD_IDS_DATA_URL = '/learnerdashboardidshandler/data'
-LEARNER_DASHBOARD_FEEDBACK_THREAD_DATA_URL = '/learnerdashboardthreadhandler'
 LEARNER_GOALS_DATA_URL = '/learnergoalshandler'
 LEARNER_PLAYLIST_DATA_URL = '/learnerplaylistactivityhandler'
 LEARNER_INCOMPLETE_ACTIVITY_DATA_URL = '/learnerincompleteactivityhandler'
