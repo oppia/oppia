@@ -132,6 +132,7 @@
   }
   .new-learner-dashboard .oppia-learner-dashborad-tab-menu-hover:hover {
     border-radius: 4px;
+    background-color: #004D45;
   }
   
   .new-learner-dashboard .oppia-learner-dashboard-side-content {

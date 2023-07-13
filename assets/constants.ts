@@ -7077,6 +7077,6 @@ export default {
   ],
   "CONTRIBUTOR_CERTIFICATE_WIDTH": 1493,
   "CONTRIBUTOR_CERTIFICATE_HEIGHT": 1313,
-  "BRANCH_NAME": "",
-  "SHORT_COMMIT_HASH": ""
+  "BRANCH_NAME": "Redesign-home-tab-GSoC-M1.3",
+  "SHORT_COMMIT_HASH": "b67d0b9908"
 } as const;
