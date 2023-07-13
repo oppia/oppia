@@ -809,7 +809,7 @@ describe('GraphVizComponent', () => {
     ]);
   });
 
-  it('should update dotCursorCoordinateX, set style.top and style.left'+
+  it('should update dotCursorCoordinateX, set style.top and style.left' +
   ' when ArrowLeft key is pressed', () => {
     const event = new KeyboardEvent('keydown', { key: 'ArrowLeft' });
     const dot = component.dotCursor.nativeElement;
@@ -820,7 +820,7 @@ describe('GraphVizComponent', () => {
     expect(dot.style.left).toBe(component.dotCursorCoordinateX + 'px');
   });
 
-  it('should update dotCursorCoordinateY, set style.top and style.left'+
+  it('should update dotCursorCoordinateY, set style.top and style.left' +
   ' when ArrowUp key is pressed', () => {
     const event = new KeyboardEvent('keydown', { key: 'ArrowUp' });
     const dot = component.dotCursor.nativeElement;
