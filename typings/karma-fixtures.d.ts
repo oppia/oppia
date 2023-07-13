@@ -6,8 +6,8 @@ interface KNN {
   'fingerprint_data': {
     [key: number]: {
       class: number;
-      fingerprint: number[][]
-    }
+      fingerprint: number[][];
+    };
   };
   'token_to_id': {
     [key: string]: number;
@@ -35,7 +35,7 @@ interface SVM {
 type ClassifierAccuracyTest = {
   'answer_group_index': number;
   'answers': {
-    code: string
+    code: string;
   }[];
 }[];
 
@@ -195,7 +195,7 @@ interface RuleTemplates {
     StartsWith: RuleDescription;
     Contains: RuleDescription;
     FuzzyEquals: RuleDescription;
-  }
+  };
 }
 
 interface KarmaFixtures {
