@@ -5,8 +5,7 @@ WORKDIR /app/oppia
 RUN apt-get update -y && apt-get upgrade -y \
     chromium \
     curl \
-    git \
-    npm
+    git
 
 # Installing packages from the package.json file
 COPY package.json .
