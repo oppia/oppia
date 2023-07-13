@@ -772,7 +772,7 @@ describe('GraphVizComponent', () => {
     component.graphArea = new ElementRef(graphAreaElement);
     const graph = component.graphArea.nativeElement;
 
-    spyOn(graph.nativeElement, 'getBoundingClientRect')
+    spyOn(graph, 'getBoundingClientRect')
       .and.returnValue({ 
         left: 100,
         top: 200,
@@ -801,13 +801,13 @@ describe('GraphVizComponent', () => {
       new ElementRef(document.createElement('button')),
       new ElementRef(document.createElement('button'))
     ];
-    spyOn(component, 'buttonElements').and.returnValue(buttonElements);
 
-    spyOn(dot.nativeElement, 'getBoundingClientRect').and.returnValue({
-      top: 100,
-      bottom: 110,
-      left: 200,
-      right: 210
+    spyOn(dot.nativeElement, 'getBoundingClientRect')
+      .and.returnValue({
+        top: 100,
+        bottom: 110,
+        left: 200,
+        right: 210
     });
 
     spyOn(buttonElements[0].nativeElement, 'getBoundingClientRect')
@@ -842,7 +842,6 @@ describe('GraphVizComponent', () => {
       new ElementRef(document.createElement('button')),
       new ElementRef(document.createElement('button'))
     ];
-    spyOn(component, 'buttonElements').and.returnValue(buttonElements);
 
     spyOn(dot.nativeElement, 'getBoundingClientRect').and.returnValue({
       top: 100,
