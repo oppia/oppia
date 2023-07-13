@@ -21,7 +21,6 @@ from __future__ import annotations
 import enum
 
 from core import feconf
-from core import utils
 from core.constants import constants
 from core.domain import caching_services
 from core.domain import platform_feature_services as feature_services
@@ -368,7 +367,7 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
         with self.swap(constants, 'BRANCH_NAME', 'release-3-3-1-hotfix-5'):
             self.assertTrue(feature_services.get_platform_parameter_value(
                 self.param_c.name))
-            
+
         with self.swap(constants, 'BRANCH_NAME', 'release-3-3-1'):
             self.assertTrue(feature_services.get_platform_parameter_value(
                 self.param_c.name))
