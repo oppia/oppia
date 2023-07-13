@@ -294,11 +294,11 @@ export class GraphVizComponent implements OnInit, AfterViewInit {
     this.state.mouseY = svgp.y;
     // The condition: currentMode === 2 signifies that
     // the "add node" option in the graph is active.
-    // That is when we show the add node cursor
     if (this.state.currentMode === 2) {
       const dot = document.querySelector(
         '.oppia-add-node-cursor') as HTMLDivElement;
-      const graphAreaRect = this.graphArea.nativeElement.getBoundingClientRect();
+      const graphAreaRect =
+        this.graphArea.nativeElement.getBoundingClientRect();
 
       if (event instanceof MouseEvent) {
         this.dotCursorCoordinateX =

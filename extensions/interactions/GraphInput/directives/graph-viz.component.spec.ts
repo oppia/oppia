@@ -809,7 +809,8 @@ describe('GraphVizComponent', () => {
     ]);
   });
 
-  it('should update dotCursorCoordinateX, set style.top and style.left, and prevent default when ArrowLeft key is pressed', () => {
+  it('should update dotCursorCoordinateX, set style.top and style.left'+
+  ' when ArrowLeft key is pressed', () => {
     const event = new KeyboardEvent('keydown', { key: 'ArrowLeft' });
     const dot = component.dotCursor.nativeElement;
     component.handleKeyDown(event);
@@ -819,7 +820,8 @@ describe('GraphVizComponent', () => {
     expect(dot.style.left).toBe(component.dotCursorCoordinateX + 'px');
   });
 
-  it('should update dotCursorCoordinateY, set style.top and style.left, and prevent default when ArrowUp key is pressed', () => {
+  it('should update dotCursorCoordinateY, set style.top and style.left'+
+  ' when ArrowUp key is pressed', () => {
     const event = new KeyboardEvent('keydown', { key: 'ArrowUp' });
     const dot = component.dotCursor.nativeElement;
     component.handleKeyDown(event);
@@ -829,7 +831,8 @@ describe('GraphVizComponent', () => {
     expect(dot.style.left).toBe(component.dotCursorCoordinateX + 'px');
   });
 
-  it('should update dotCursorCoordinateX, set style.top and style.left, and prevent default when ArrowRight key is pressed', () => {
+  it('should update dotCursorCoordinateX, set style.top and style.left' +
+  'when ArrowRight key is pressed', () => {
     const event = new KeyboardEvent('keydown', { key: 'ArrowRight' });
     const dot = component.dotCursor.nativeElement;
     component.handleKeyDown(event);
@@ -839,7 +842,8 @@ describe('GraphVizComponent', () => {
     expect(dot.style.left).toBe(component.dotCursorCoordinateX + 'px');
   });
 
-  it('should update dotCursorCoordinateY, set style.top and style.left, and prevent default when ArrowDown key is pressed', () => {
+  it('should update dotCursorCoordinateY, set style.top and style.left' +
+  ' when ArrowDown key is pressed', () => {
     const event = new KeyboardEvent('keydown', { key: 'ArrowDown' });
     component.handleKeyDown(event);
     const dot = component.dotCursor.nativeElement;
@@ -849,7 +853,8 @@ describe('GraphVizComponent', () => {
     expect(dot.style.left).toBe(component.dotCursorCoordinateX + 'px');
   });
 
-  it('should not update dotCursorCoordinateX and dotCursorCoordinateY when currentMode is not 2', () => {
+  it('should not update dotCursorCoordinateX and dotCursorCoordinateY' +
+  ' when currentMode is not 2', () => {
     component.state.currentMode = 1;
     const event = new KeyboardEvent('keydown', { key: 'ArrowLeft' });
     const dot = component.dotCursor.nativeElement;
