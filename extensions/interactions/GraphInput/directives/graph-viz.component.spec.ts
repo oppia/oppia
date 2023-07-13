@@ -769,7 +769,6 @@ describe('GraphVizComponent', () => {
 
     const graphAreaElement = document.createElement('div');
     graphAreaElement.classList.add('oppia-graph-viz-svg');
-    component.graphArea = new ElementRef(graphAreaElement);
 
   
     component.state.currentMode = 2;
@@ -798,7 +797,7 @@ describe('GraphVizComponent', () => {
     buttonElement.style.left = dotElement.getBoundingClientRect().left + 'px';
     buttonElement.style.right = dotElement.getBoundingClientRect().right + 'px';
 
-    const isOnTop = isButtonOnTopOfDot();
+    const isOnTop = component.isButtonOnTopOfDot();
     expect(isOnTop).toBe(true);
     expect(buttonElements[i].dispatchEvent).toHaveBeenCalled();
     expect(buttonElements[i].click).toHaveBeenCalled();
@@ -815,7 +814,7 @@ describe('GraphVizComponent', () => {
     buttonElement.style.left = dotElement.getBoundingClientRect().left + 10;
     buttonElement.style.right = dotElement.getBoundingClientRect().right - 10;
 
-    const isOnTop = isButtonOnTopOfDot();
+    const isOnTop = component.isButtonOnTopOfDot();
     expect(isOnTop).toBe(false);
     expect(buttonElements[i].dispatchEvent).not.toHaveBeenCalled();
     expect(buttonElements[i].click).not.toHaveBeenCalled();
