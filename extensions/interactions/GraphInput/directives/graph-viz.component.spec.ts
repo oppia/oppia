@@ -909,9 +909,15 @@ describe('GraphVizComponent', () => {
   });
 
   it('should call onClickGraphSVG when Enter key is pressed', () => {
+    dotCursorElement.classList.add('oppia-add-node-cursor');
+    dotCursorElement.style.top = '0px';
+    dotCursorElement.style.left = '0px';
+    component.dotCursor = new ElementRef(dotCursorElement);
+    const dot = component.dotCursor.nativeElement;
+    component.state.currentMode = 2;
+
     const event = new KeyboardEvent('keydown', { key: 'Enter' });
     spyOn(component, 'onClickGraphSVG');
-    component.state.currentMode = 2;
 
     component.handleKeyDown(event);
 
