@@ -785,9 +785,39 @@ describe('GraphVizComponent', () => {
         }
       }
     };
+    const mockVizContainerElementRef: ElementRef<HTMLElement> = {
+      nativeElement: {
+        createSVGPoint: () => {
+          return {
+            x: 0,
+            y: 0,
+            matrixTransform: () => {
+              return {
+                x: 0,
+                y: 0
+              };
+            }
+          };
+        },
+        getScreenCTM: () => {
+          return {
+            inverse: () => {
+              return {
+                matrixTransform: () => {
+                  return {
+                    x: 0,
+                    y: 0
+                  };
+                }
+              };
+            }
+          };
+        }
+      }
+    };
     component.dotCursorCoordinateX = 0;
     component.dotCursorCoordinateY = 0;
-
+    component.vizContainer = mockVizContainerElementRef;
     component.graphArea = mockGraphAreaElementRef;
 
     component.mousemoveGraphSVG(event);
