@@ -1,8 +1,9 @@
-FROM --platform=linux/amd64 node:16.13.0 AS frontend
+FROM node:16.13.0 AS frontend
 
 WORKDIR /app/oppia
 
 RUN apt-get update -y && apt-get upgrade -y \
+    chromium \
     curl \
     git \
     npm
@@ -20,6 +21,8 @@ RUN yarn install --network-timeout 1000000
 
 # Added platform flag here because -- https://stackoverflow.com/questions/71040681/qemu-x86-64-could-not-open-lib64-ld-linux-x86-64-so-2-no-such-file-or-direc
 FROM --platform=linux/amd64 python:3.8.17-slim-buster AS backend
+
+ENV OPPIA_IS_DOCKERIZED="true"
 
 WORKDIR /
 
