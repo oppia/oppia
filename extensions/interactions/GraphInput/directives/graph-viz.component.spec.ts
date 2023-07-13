@@ -909,6 +909,7 @@ describe('GraphVizComponent', () => {
   });
 
   it('should call onClickGraphSVG when Enter key is pressed', () => {
+    const dotCursorElement = document.createElement('div');
     dotCursorElement.classList.add('oppia-add-node-cursor');
     dotCursorElement.style.top = '0px';
     dotCursorElement.style.left = '0px';
@@ -921,6 +922,10 @@ describe('GraphVizComponent', () => {
 
     component.handleKeyDown(event);
 
+    expect(component.dotCursorCoordinateX).toBe(0);
+    expect(component.dotCursorCoordinateY).toBe(0);
+    expect(dot.style.top).toBe(component.dotCursorCoordinateY + 'px');
+    expect(dot.style.left).toBe(component.dotCursorCoordinateX + 'px');
     expect(component.onClickGraphSVG).toHaveBeenCalled();
   });
 
