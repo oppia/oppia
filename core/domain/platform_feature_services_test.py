@@ -38,6 +38,7 @@ class ParamNames(enum.Enum):
     FEATURE_C = 'feature_c'
     PARAM_A = 'param_a'
     PARAM_B = 'param_b'
+    PARAM_C = 'param_c'
 
 
 ServerMode = platform_parameter_domain.ServerMode
@@ -57,8 +58,9 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
             registry.Registry.parameter_registry.copy())
         registry.Registry.parameter_registry.clear()
         # Parameter names that might be used in following tests.
-        param_names = ['param_a', 'param_b']
-        param_name_enums = [ParamNames.PARAM_A, ParamNames.PARAM_B]
+        param_names = ['param_a', 'param_b', 'param_c']
+        param_name_enums = [
+            ParamNames.PARAM_A, ParamNames.PARAM_B, ParamNames.PARAM_C]
         param_names_features = ['feature_a', 'feature_b', 'feature_c']
         param_name_enums_features = [
             ParamNames.FEATURE_A, ParamNames.FEATURE_B, ParamNames.FEATURE_C]
@@ -86,6 +88,11 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
             ParamNames.PARAM_B,
             'Parameter named b',
             platform_parameter_domain.DataTypes.BOOL)
+        self.param_c = registry.Registry.create_platform_parameter(
+            ParamNames.PARAM_C,
+            'Parameter named c',
+            platform_parameter_domain.DataTypes.BOOL)
+
         registry.Registry.update_platform_parameter(
             self.dev_feature.name, self.user_id, 'edit rules',
             [
@@ -180,6 +187,7 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
         expected_dicts = [
             self.param_a.to_dict(),
             self.param_b.to_dict(),
+            self.param_c.to_dict(),
         ]
         self.assertEqual(
             feature_services.
@@ -331,7 +339,41 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
                 self.assertTrue(
                     feature_services.is_feature_enabled(self.prod_feature.name))
 
-    def test_evaluate_feature_for_prod_server_matches_to_backend_filter(
+    def test_evaluation_context_for_app_version_works_as_expected(self) -> None:
+        self.assertFalse(feature_services.get_platform_parameter_value(
+            self.param_c.name))
+
+        registry.Registry.update_platform_parameter(
+            self.param_c.name, self.user_id, 'edit rules',
+            [
+                platform_parameter_domain.PlatformParameterRule.from_dict({
+                    'filters': [
+                        {
+                            'type': 'app_version',
+                            'conditions': [
+                                ['=', '3.3.1']
+                            ],
+                        }
+                    ],
+                    'value_when_matched': True
+                })
+            ],
+            False
+        )
+
+        with self.swap(constants, 'BRANCH_NAME', ''):
+            self.assertTrue(feature_services.get_platform_parameter_value(
+                self.param_c.name))
+
+        with self.swap(constants, 'BRANCH_NAME', 'release-3-3-1-hotfix-5'):
+            self.assertTrue(feature_services.get_platform_parameter_value(
+                self.param_c.name))
+            
+        with self.swap(constants, 'BRANCH_NAME', 'release-3-3-1'):
+            self.assertTrue(feature_services.get_platform_parameter_value(
+                self.param_c.name))
+
+    def test_evaluate_feature_for_prod_server_matches_to_web_filter(
         self
     ) -> None:
         registry.Registry.update_platform_parameter(
@@ -340,15 +382,9 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
                 platform_parameter_domain.PlatformParameterRule.from_dict({
                     'filters': [
                         {
-                            'type': 'server_mode',
-                            'conditions': [
-                                ['=', ServerMode.PROD.value]
-                            ],
-                        },
-                        {
                             'type': 'platform_type',
                             'conditions': [
-                                ['=', 'Backend']
+                                ['=', 'Web']
                             ],
                         }
                     ],
@@ -404,30 +440,6 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
                     platform_parameter_domain.PlatformParameterRule.from_dict(
                         {'filters': [], 'value_when_matched': False}
                     ),
-                ],
-                False
-            )
-
-    def test_update_feature_flag_with_invalid_rules_raises_error(
-        self
-    ) -> None:
-        with self.assertRaisesRegex(
-            utils.ValidationError, 'must have a server_mode filter'):
-            feature_services.update_feature_flag(
-                self.dev_feature.name, self.user_id, 'test update',
-                [
-                    platform_parameter_domain.PlatformParameterRule.from_dict({
-                        'filters': [
-                            {
-                                'type': 'app_version',
-                                'conditions': [['=', '1.2.3']]
-                            }
-                        ],
-                        'value_when_matched': True
-                    }),
-                    platform_parameter_domain.PlatformParameterRule.from_dict({
-                        'filters': [], 'value_when_matched': False
-                    })
                 ],
                 False
             )
