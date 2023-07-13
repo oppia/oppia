@@ -453,7 +453,7 @@ describe('InteractiveImageClickInput', () => {
     let evt = new MouseEvent('Mousemove');
     component.lastAnswer = null;
     component.ngOnInit();
-    
+
     component.usingMobileDevice = true;
     expect(component.interactionIsActive).toBe(true);
     expect(component.mouseX).toBe(0);
