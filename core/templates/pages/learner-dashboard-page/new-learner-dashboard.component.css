@@ -8,11 +8,6 @@
     margin: 0 auto 30px auto;
     text-align: left;
     max-width: 1480px;
-    /* display: flex;
-    flex-wrap: nowrap;
-    justify-content: center;
-    gap: 33px;
-    text-align: left; */
   }
 
 .new-learner-dashboard .oppia-learner-dashboard-content-container {
@@ -51,10 +46,6 @@
     filter: invert(1%) sepia(3%) saturate(11%) hue-rotate(341deg) brightness(101%) contrast(90%);
   }
   
-  /* .new-learner-dashboard .oppia-learner-dashboard-section-active-button {
-    filter: invert(12%) sepia(99%) saturate(4263%) hue-rotate(171deg) brightness(94%) contrast(101%);
-  } */
-
   .new-learner-dashboard .oppia-learner-dashboard-section-active-button-window-narrow {
     filter: invert(26%) sepia(109%) saturate(4263%) hue-rotate(41deg) brightness(65%) contrast(277%);
   }
@@ -100,34 +91,46 @@
     border-bottom: 2px solid #00645C;
   }
   .new-learner-dashboard  .oppia-svg-image {
-    display: block;
-    height: 48px;
-    margin: auto;
-    width: 64px;
+    height: 24px;
+    margin: 0;
+    width: 24px;
   }
-  
+
   .new-learner-dashboard .oppia-learner-dashboard-menu {
     border: 2px solid white;
     border-radius: 4px;
     cursor: pointer;
+    display: flex;
+    align-items: center;
     font-family: "Roboto", Arial, sans-serif;
-    font-size: 18px;
+    font-size: 16px;
+    gap: 12px;
     line-height: 0.9;
     margin: 10px 0;
-    padding: 14px 20px;
+    padding: 8px 12px;
   }
-  
+
   .new-learner-dashboard .oppia-learner-dashboard-menu:focus {
-    background-color: rgba(0, 100, 92, 0.1);
+    background-color: #fff;
   }
-  
-  .new-learner-dashboard .oppia-learner-dashboard-section-active {
-    background-color: #fff !important;
-    color: rgb(40,53,147);
-    border-radius: 8px;
+  /* .new-learner-dashboard .oppia-learner-dashboard-menu:focus {
+    background-color: #004D45;
+  } */
+
+  .new-learner-dashboard .oppia-learner-dashboard-menu-active {
+    background-color: #fff;
+    color: #205D86;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 12px;
+    border-radius: 4px;
+    box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
   }
-  
-  .new-learner-dashboard .oppia-learner-dashborad-menu-hover:hover {
+  .new-learner-dashboard .oppia-learner-dashboard-active-button-icon {
+    filter: invert(39%) sepia(109%) saturate(4263%) hue-rotate(200deg) brightness(53%) contrast(127%);
+  }
+  .new-learner-dashboard .oppia-learner-dashborad-tab-menu-hover:hover {
     border-radius: 4px;
   }
   
@@ -342,31 +345,7 @@
       color: #00645c;
     }
   } 
-  /* The css below helps in using headroom.js for footer. */
-  /* .oppia-learner-dashboard-buttons.headroom {
-    bottom: 0;
-    left: 0;
-    right: 0;
-  }
-  .oppia-learner-dashboard-buttons.headroom--top {
-    margin-bottom: 5px;
-  }
-  
-  .oppia-learner-dashboard-buttons.headroom--unfixed {
-    position: relative;
-    transform: translateY(0);
-  }
-  .oppia-learner-dashboard-buttons.headroom--scrolled {
-    transition: transform 200ms ease-in-out;
-  }
-  .oppia-learner-dashboard-buttons.headroom--unpinned {
-    bottom: -30px;
-  }
-  .oppia-learner-dashboard-buttons.headroom--pinned {
-    margin-bottom: 38px;
-    position: fixed;
-    transform: translateY(-100%);
-  } */
+
 
 
   
