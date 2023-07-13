@@ -206,13 +206,6 @@
         "targetDirPrefix": "angular-simple-logger-",
         "files": ["angular-simple-logger.min.js"]
       },
-      "guppy": {
-        "version": "f509e155dc66f6310737c328cbfbc35b85194be2",
-        "downloadFormat": "zip",
-        "url": "https://github.com/oppia/guppy/archive/f509e155dc66f6310737c328cbfbc35b85194be2.zip",
-        "rootDirPrefix": "guppy-",
-        "targetDir": "guppy-f509e1"
-      },
       "jquery": {
         "version": "3.5.1",
         "downloadFormat": "files",
@@ -242,13 +235,6 @@
         "url": "https://github.com/mathjax/MathJax/archive/2.7.5.zip",
         "rootDirPrefix": "MathJax-",
         "targetDirPrefix": "MathJax-"
-      },
-      "midiJs": {
-        "version": "c26ebb9baaf0abc060c8a13254dad283c6ee7304",
-        "downloadFormat": "zip",
-        "url": "https://github.com/oppia/MIDI.js/archive/c26ebb9baaf0abc060c8a13254dad283c6ee7304.zip",
-        "rootDirPrefix": "MIDI.js-",
-        "targetDir": "midi-js-c26ebb"
       },
       "select2": {
         "version": "4.0.3",
