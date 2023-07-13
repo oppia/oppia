@@ -60,7 +60,10 @@ COPY buf.gen.yaml .
 COPY /extensions/classifiers/proto/ ./extensions/classifiers/proto/
 
 # Installing third party dependencies
-COPY scripts ./scripts
+COPY scripts/install_dependencies_json_packages.py ./scripts/install_dependencies_json_packages.py
+COPY scripts/build.py ./scripts/build.py
+COPY scripts/common.py ./scripts/common.py
+COPY scripts/servers.py ./scripts/servers.py
 COPY /core/utils.py ./core/utils.py
 COPY /core/feconf.py ./core/feconf.py
 COPY /core/constants.py ./core/constants.py
