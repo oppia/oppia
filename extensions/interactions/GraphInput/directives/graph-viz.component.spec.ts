@@ -789,8 +789,6 @@ describe('GraphVizComponent', () => {
     expect(dot.style.left).toBe(component.dotCursorCoordinateX + 'px');
   });
 
-  import { ElementRef } from '@angular/core';
-
   it('should dispatch click event when button is on top of dot', () => {
 
     const dot = new ElementRef(document.createElement('div'));
