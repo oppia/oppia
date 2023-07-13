@@ -787,22 +787,22 @@ describe('GraphVizComponent', () => {
     };
     const mockVizContainerElementRef: ElementRef<HTMLElement> = {
       nativeElement: {
-        createSVGPoint: jest.fn(() => ({
+        createSVGPoint: jasmine.createSpy().and.returnValue({
           x: 0,
           y: 0,
-          matrixTransform: jest.fn(() => ({
+          matrixTransform: jasmine.createSpy().and.returnValue({
             x: 0,
             y: 0
-          }))
-        })),
-        getScreenCTM: jest.fn(() => ({
-          inverse: jest.fn(() => ({
-            matrixTransform: jest.fn(() => ({
+          })
+        }),
+        getScreenCTM: jasmine.createSpy().and.returnValue({
+          inverse: jasmine.createSpy().and.returnValue({
+            matrixTransform: jasmine.createSpy().and.returnValue({
               x: 0,
               y: 0
-            }))
-          }))
-        }))
+            })
+          })
+        })
       }
     };
     component.dotCursorCoordinateX = 0;
