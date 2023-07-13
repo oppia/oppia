@@ -772,11 +772,53 @@ describe('GraphVizComponent', () => {
     dotCursorElement.style.left = '0px';
     component.dotCursor = new ElementRef(dotCursorElement);
     const dot = component.dotCursor.nativeElement;
-    
-    component.ngAfterViewInit();
     component.state.currentMode = 2;
     component.dotCursorCoordinateX = 0;
     component.dotCursorCoordinateY = 0;
+
+    spyOn(Element.prototype, 'querySelectorAll').and.callFake(
+      jasmine.createSpy('querySelectorAll').and.returnValue([{
+        width: {
+          baseVal: {
+            value: 120
+          }
+        },
+        getAttribute: (attr) => {
+          if (attr === 'height') {
+            return 250;
+          }
+        },
+        getBBox: () => {
+          return {
+            height: 120,
+            width: 527,
+            x: 144,
+            y: -14,
+          };
+        },
+        createSVGPoint: () => {
+          return {
+            matrixTransform: (matrix) => {
+              return {
+                x: 775,
+                y: 307
+              };
+            },
+            x: 0,
+            y: 0
+          };
+        },
+        getScreenCTM: () => {
+          return {
+            inverse: () => {
+              return;
+            }
+          };
+        },
+      }])
+    );
+    
+    component.ngAfterViewInit();
     component.mousemoveGraphSVG(event);
 
     expect(component.dotCursorCoordinateX).toBe(100);
