@@ -770,102 +770,55 @@ describe('GraphVizComponent', () => {
     const graphAreaElement = document.createElement('div');
     graphAreaElement.classList.add('oppia-graph-viz-svg');
     component.graphArea = new ElementRef(graphAreaElement);
-    const graph = component.graphArea.nativeElement;
 
-    spyOn(graph, 'getBoundingClientRect')
-      .and.returnValue({ 
-        left: 100,
-        top: 200,
-        right: 200,
-        bottom: 300
-      });
-
-    component.state.currentMode = 2;
-    const event = new MouseEvent('mousemove', { clientX: 150, clientY: 250 });
-
-    component.mousemoveGraphSVG(event);
   
-    expect(component.dotCursorCoordinateX).toBe(50);
-    expect(component.dotCursorCoordinateY).toBe(50);
+    component.state.currentMode = 2;
+    let dummyMouseEvent = new MouseEvent('mousemove', {
+      clientX: 775,
+      clientY: 307
+    });
+
+    component.mousemoveGraphSVG(dummyMouseEvent);
+  
+    expect(component.dotCursorCoordinateX).toBe(775);
+    expect(component.dotCursorCoordinateY).toBe(307);
   
     expect(dot.style.top).toBe(component.dotCursorCoordinateY + 'px');
     expect(dot.style.left).toBe(component.dotCursorCoordinateX + 'px');
   });
 
-  it('should dispatch click event when button is on top of dot', () => {
+  it('should return true if the button is on top of the dot', () => {
+    const dotElement = document.createElement('div');
+    dotElement.classList.add('oppia-add-node-cursor');
 
-    const dot = new ElementRef(document.createElement('div'));
-    dot.nativeElement.classList.add('oppia-add-node-cursor');
+    const buttonElement = document.createElement('button');
+    buttonElement.classList.add('e2e-test-graph-button');
+    buttonElement.style.top = dotElement.getBoundingClientRect().top + 'px';
+    buttonElement.style.bottom = dotElement.getBoundingClientRect().bottom + 'px';
+    buttonElement.style.left = dotElement.getBoundingClientRect().left + 'px';
+    buttonElement.style.right = dotElement.getBoundingClientRect().right + 'px';
 
-    const buttonElements = [
-      new ElementRef(document.createElement('button')),
-      new ElementRef(document.createElement('button'))
-    ];
-
-    spyOn(dot.nativeElement, 'getBoundingClientRect')
-      .and.returnValue({
-        top: 100,
-        bottom: 110,
-        left: 200,
-        right: 210
-    });
-
-    spyOn(buttonElements[0].nativeElement, 'getBoundingClientRect')
-      .and.returnValue({
-        top: 105,
-        bottom: 135,
-        left: 205,
-        right: 275
-    });
-    spyOn(buttonElements[1].nativeElement, 'getBoundingClientRect')
-      .and.returnValue({
-        top: 50,
-        bottom: 80,
-        left: 150,
-        right: 220
-    });
-
-    spyOn(buttonElements[0].nativeElement, 'dispatchEvent');
-
-    const result = component.isButtonOnTopOfDot();
-
-    expect(result).toBe(true);
-    expect(buttonElements[0].nativeElement.dispatchEvent)
-      .toHaveBeenCalledWith(new MouseEvent('click'));
+    const isOnTop = isButtonOnTopOfDot();
+    expect(isOnTop).toBe(true);
+    expect(buttonElements[i].dispatchEvent).toHaveBeenCalled();
+    expect(buttonElements[i].click).toHaveBeenCalled();
   });
 
-  it('should return false when no button is on top of dot', () => {
-    const dot = new ElementRef(document.createElement('div'));
-    dot.nativeElement.classList.add('oppia-add-node-cursor');
+  it('should return false if the button is not on top of the dot', () => {
+    const dotElement = document.createElement('div');
+    dotElement.classList.add('oppia-add-node-cursor');
 
-    const buttonElements = [
-      new ElementRef(document.createElement('button')),
-      new ElementRef(document.createElement('button'))
-    ];
+    const buttonElement = document.createElement('button');
+    buttonElement.classList.add('e2e-test-graph-button');
+    buttonElement.style.top = dotElement.getBoundingClientRect().top + 10;
+    buttonElement.style.bottom = dotElement.getBoundingClientRect().bottom - 10;
+    buttonElement.style.left = dotElement.getBoundingClientRect().left + 10;
+    buttonElement.style.right = dotElement.getBoundingClientRect().right - 10;
 
-    spyOn(dot.nativeElement, 'getBoundingClientRect').and.returnValue({
-      top: 100,
-      bottom: 110,
-      left: 200,
-      right: 210
-    });
-
-    spyOn(buttonElements[0].nativeElement, 'getBoundingClientRect').and.returnValue({
-      top: 50,
-      bottom: 80,
-      left: 150,
-      right: 220
-    });
-    spyOn(buttonElements[1].nativeElement, 'getBoundingClientRect').and.returnValue({
-      top: 120,
-      bottom: 150,
-      left: 220,
-      right: 290
-    });
-
-    const result = component.isButtonOnTopOfDot();
-
-    expect(result).toBe(false);
+    const isOnTop = isButtonOnTopOfDot();
+    expect(isOnTop).toBe(false);
+    expect(buttonElements[i].dispatchEvent).not.toHaveBeenCalled();
+    expect(buttonElements[i].click).not.toHaveBeenCalled();
   });
 
   it('should add vertex when graph is clicked and interaction is' +

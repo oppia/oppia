@@ -299,15 +299,12 @@ export class GraphVizComponent implements OnInit, AfterViewInit {
         '.oppia-add-node-cursor') as HTMLDivElement;
       const graphAreaRect =
         this.graphArea.nativeElement.getBoundingClientRect();
-
-      if (event instanceof MouseEvent) {
-        this.dotCursorCoordinateX =
-         event.clientX - graphAreaRect.left;
-        this.dotCursorCoordinateY =
-         event.clientY - graphAreaRect.top;
-        dot.style.top = this.dotCursorCoordinateY + 'px';
-        dot.style.left = this.dotCursorCoordinateX + 'px';
-      }
+      this.dotCursorCoordinateX =
+        event.clientX - graphAreaRect.left;
+      this.dotCursorCoordinateY =
+        event.clientY - graphAreaRect.top;
+      dot.style.top = this.dotCursorCoordinateY + 'px';
+      dot.style.left = this.dotCursorCoordinateX + 'px';
     }
     // We use vertexDragStartX/Y and mouseDragStartX/Y to make
     // mouse-dragging by label more natural, by moving the vertex
