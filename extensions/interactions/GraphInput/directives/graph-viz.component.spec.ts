@@ -744,6 +744,132 @@ describe('GraphVizComponent', () => {
       });
   });
 
+  it('should set the hoveredVertex when focus gets on vertex', () => {
+    const index = 3;
+  
+    component.onFocusVertex(index);
+  
+    expect(component.state.hoveredVertex).toBe(index);
+  });
+  
+  it('should call onMouseleaveVertex when focus leaves the vertex is called', () => {
+    const index = 3;
+    spyOn(component, 'onMouseleaveVertex');
+  
+    component.onBlurVertex(index);
+  
+    expect(component.onMouseleaveVertex).toHaveBeenCalledWith(index);
+  });
+
+  it('should update dotCursor position when currentMode is 2', () => {
+    const dotCursorElement = document.createElement('div');
+    dotCursorElement.classList.add('oppia-add-node-cursor');
+    component.dotCursor = new ElementRef(dotCursorElement);
+    const dot = component.dotCursor.nativeElement;
+
+    const graphAreaElement = document.createElement('div');
+    graphAreaElement.classList.add('oppia-graph-viz-svg');
+    spyOn(component.element.nativeElement, 'querySelector')
+      .and.returnValue(graphAreaElement);
+    spyOn(graphAreaElement, 'getBoundingClientRect')
+      .and.returnValue({ 
+        left: 100,
+        top: 200 
+      });
+
+    component.state.currentMode = 2;
+    const event = new MouseEvent('mousemove', { clientX: 150, clientY: 250 });
+
+    component.mousemoveGraphSVG(event);
+  
+    expect(component.dotCursorCoordinateX).toBe(50);
+    expect(component.dotCursorCoordinateY).toBe(50);
+  
+    expect(dot.style.top).toBe(component.dotCursorCoordinateY + 'px');
+    expect(dot.style.left).toBe(component.dotCursorCoordinateX + 'px');
+  });
+
+  import { ElementRef } from '@angular/core';
+
+  it('should dispatch click event when button is on top of dot', () => {
+
+    const dot = new ElementRef(document.createElement('div'));
+    dot.nativeElement.classList.add('oppia-add-node-cursor');
+    spyOn(component, 'dotElement').and.returnValue(dot);
+
+    const buttonElements = [
+      new ElementRef(document.createElement('button')),
+      new ElementRef(document.createElement('button'))
+    ];
+    spyOn(component, 'buttonElements').and.returnValue(buttonElements);
+
+    spyOn(dot.nativeElement, 'getBoundingClientRect').and.returnValue({
+      top: 100,
+      bottom: 110,
+      left: 200,
+      right: 210
+    });
+
+    spyOn(buttonElements[0].nativeElement, 'getBoundingClientRect')
+      .and.returnValue({
+        top: 105,
+        bottom: 135,
+        left: 205,
+        right: 275
+    });
+    spyOn(buttonElements[1].nativeElement, 'getBoundingClientRect')
+      .and.returnValue({
+        top: 50,
+        bottom: 80,
+        left: 150,
+        right: 220
+    });
+
+    spyOn(buttonElements[0].nativeElement, 'dispatchEvent');
+
+    const result = component.isButtonOnTopOfDot();
+
+    expect(result).toBe(true);
+    expect(buttonElements[0].nativeElement.dispatchEvent)
+      .toHaveBeenCalledWith(new MouseEvent('click'));
+  });
+
+  it('should return false when no button is on top of dot', () => {
+    const dot = new ElementRef(document.createElement('div'));
+    dot.nativeElement.classList.add('oppia-add-node-cursor');
+    spyOn(component, 'dotElement').and.returnValue(dot);
+
+    const buttonElements = [
+      new ElementRef(document.createElement('button')),
+      new ElementRef(document.createElement('button'))
+    ];
+    spyOn(component, 'buttonElements').and.returnValue(buttonElements);
+
+    spyOn(dot.nativeElement, 'getBoundingClientRect').and.returnValue({
+      top: 100,
+      bottom: 110,
+      left: 200,
+      right: 210
+    });
+
+    spyOn(buttonElements[0].nativeElement, 'getBoundingClientRect').and.returnValue({
+      top: 50,
+      bottom: 80,
+      left: 150,
+      right: 220
+    });
+    spyOn(buttonElements[1].nativeElement, 'getBoundingClientRect').and.returnValue({
+      top: 120,
+      bottom: 150,
+      left: 220,
+      right: 290
+    });
+
+    const result = component.isButtonOnTopOfDot();
+
+    expect(result).toBe(false);
+  });
+
   it('should add vertex when graph is clicked and interaction is' +
   ' active', () => {
     component.state.currentMode = component._MODES.ADD_VERTEX;
