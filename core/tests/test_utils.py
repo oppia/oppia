@@ -2203,6 +2203,11 @@ class GenericTestBase(AppEngineTestBase):
             'thumbnail_filename': None,
             'thumbnail_bg_color': None,
             'thumbnail_size_in_bytes': None,
+            'status': None,
+            'planned_publication_date_msecs': None,
+            'last_modified_msecs': None,
+            'first_publication_date_msecs': None,
+            'unpublishing_reason': None
         }],
         'initial_node_id': 'node_1',
         'next_node_id': 'node_2',
