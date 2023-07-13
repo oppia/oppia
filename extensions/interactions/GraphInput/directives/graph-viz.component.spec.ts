@@ -898,7 +898,7 @@ describe('GraphVizComponent', () => {
     component.dotCursor = new ElementRef(dotCursorElement);
     const dot = component.dotCursor.nativeElement;
     component.state.currentMode = 1;
-    
+
     const event = new KeyboardEvent('keydown', { key: 'ArrowLeft' });
     component.handleKeyDown(event);
 
@@ -911,7 +911,10 @@ describe('GraphVizComponent', () => {
   it('should call onClickGraphSVG when Enter key is pressed', () => {
     const event = new KeyboardEvent('keydown', { key: 'Enter' });
     spyOn(component, 'onClickGraphSVG');
+    component.state.currentMode = 2;
+
     component.handleKeyDown(event);
+
     expect(component.onClickGraphSVG).toHaveBeenCalled();
   });
 
