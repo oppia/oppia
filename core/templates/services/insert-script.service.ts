@@ -1,23 +1,24 @@
 import { Injectable, Renderer2, RendererFactory2 } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
-import { Script } from 'vm';
 
 export enum KNOWN_SCRIPTS {
-  DONORBOX = "DONORBOX",
+  DONORBOX = 'DONORBOX',
 }
 
 @Injectable({
   providedIn: 'root'
 })
 export class InsertScriptService {
-  private loaded_scripts: Set<String> = new Set<String>();
+  private loaded_scripts: Set<string> = new Set<string>();
   private renderer: Renderer2;
+
   constructor(
     rendererFactory: RendererFactory2
   ) {
     this.renderer = rendererFactory.createRenderer(null, null);
   }
-  loadScript(script: KNOWN_SCRIPTS) : void {
+
+  loadScript(script: KNOWN_SCRIPTS): void {
     if (this.loaded_scripts.has(script)) {
       return;
     }
