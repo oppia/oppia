@@ -9,9 +9,9 @@ services:
     container_name: oppia-angular-build
     volumes:
       - .:/app/oppia
-      - shared_node_modules:/app/oppia/node_modules
-      - shared_third_party:/app/oppia/third_party
-      - shared_js_ts_proto_files:/app/oppia/extensions/classifiers/proto
+      - node_modules:/app/oppia/node_modules
+      - third_party:/app/oppia/third_party
+      - frontend_proto_files:/app/oppia/extensions/classifiers/proto
     environment:
       - NODE_OPTIONS=--max_old_space_size=4096
     healthcheck:
@@ -34,9 +34,9 @@ services:
     container_name: oppia-webpack-compiler
     volumes:
       - .:/app/oppia
-      - shared_node_modules:/app/oppia/node_modules
-      - shared_third_party:/app/oppia/third_party
-      - shared_js_ts_proto_files:/app/oppia/extensions/classifiers/proto
+      - node_modules:/app/oppia/node_modules
+      - third_party:/app/oppia/third_party
+      - frontend_proto_files:/app/oppia/extensions/classifiers/proto
     healthcheck:
       test: test "$(ls -A /app/oppia/webpack_bundles)" || exit 1
       timeout: 30s
@@ -63,9 +63,9 @@ services:
       - "8000:8000"
     volumes:
       - .:/app/oppia
-      - shared_proto_files:/app/oppia/proto_files
-      - shared_third_party:/app/oppia/third_party
-      - shared_js_ts_proto_files:/app/oppia/extensions/classifiers/proto
+      - proto_files:/app/oppia/proto_files
+      - third_party:/app/oppia/third_party
+      - frontend_proto_files:/app/oppia/extensions/classifiers/proto
     environment:
       - CLOUDSDK_CORE_DISABLE_PROMPTS=1
       - OPPIA_IS_DOCKERIZED=true
@@ -140,7 +140,7 @@ services:
       - "4000:4000"
     volumes:
       - ./.firebase.json:/app/oppia/.firebase.json
-      - shared_node_modules:/app/oppia/node_modules
+      - node_modules:/app/oppia/node_modules
       - firebase_emulator_cache:/app/firebase_emulator_cache
     # NOTE: The firebase service depends on the packages from node_modules that are being
     # installed in the Frontend Stage of Dockerfile. In future, we can remove the dependency
@@ -201,10 +201,10 @@ services:
     command: elasticsearch -q
 
 volumes:
-  shared_node_modules:
-  shared_proto_files:
-  shared_js_ts_proto_files:
-  shared_third_party:
+  node_modules:
+  proto_files:
+  frontend_proto_files:
+  third_party:
   redis_dump:
   firebase_emulator_cache:
   cloud_datastore_emulator_cache:
