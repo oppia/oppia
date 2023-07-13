@@ -18,7 +18,7 @@
 
 import { async, ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { GraphVizComponent } from './graph-viz.component';
-import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { ElementRef, NO_ERRORS_SCHEMA } from '@angular/core';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { GraphDetailService } from './graph-detail.service';
 import { DeviceInfoService } from 'services/contextual/device-info.service';
@@ -811,57 +811,99 @@ describe('GraphVizComponent', () => {
 
   it('should update dotCursorCoordinateX, set style.top and style.left' +
   ' when ArrowLeft key is pressed', () => {
-    const event = new KeyboardEvent('keydown', { key: 'ArrowLeft' });
+    const dotCursorElement = document.createElement('div');
+    dotCursorElement.classList.add('oppia-add-node-cursor');
+    dotCursorElement.style.top = '0px';
+    dotCursorElement.style.left = '0px';
+    component.dotCursor = new ElementRef(dotCursorElement);
     const dot = component.dotCursor.nativeElement;
-    component.handleKeyDown(event);
-    expect(component.dotCursorCoordinateX).toBe(-10);
+    component.state.currentMode = 2;
+    spyOn(component, 'isButtonOnTopOfDot').and.returnValue(false);
 
+
+    const event = new KeyboardEvent('keydown', { key: 'ArrowLeft' });
+    component.handleKeyDown(event);
+
+    expect(component.dotCursorCoordinateX).toBe(-10);
     expect(dot.style.top).toBe(component.dotCursorCoordinateY + 'px');
     expect(dot.style.left).toBe(component.dotCursorCoordinateX + 'px');
   });
 
   it('should update dotCursorCoordinateY, set style.top and style.left' +
   ' when ArrowUp key is pressed', () => {
-    const event = new KeyboardEvent('keydown', { key: 'ArrowUp' });
+    const dotCursorElement = document.createElement('div');
+    dotCursorElement.classList.add('oppia-add-node-cursor');
+    dotCursorElement.style.top = '0px';
+    dotCursorElement.style.left = '0px';
+    component.dotCursor = new ElementRef(dotCursorElement);
     const dot = component.dotCursor.nativeElement;
-    component.handleKeyDown(event);
-    expect(component.dotCursorCoordinateY).toBe(-10);
+    component.state.currentMode = 2;
+    spyOn(component, 'isButtonOnTopOfDot').and.returnValue(false);
 
+
+    const event = new KeyboardEvent('keydown', { key: 'ArrowUp' });
+    component.handleKeyDown(event);
+
+    expect(component.dotCursorCoordinateY).toBe(-10);
     expect(dot.style.top).toBe(component.dotCursorCoordinateY + 'px');
     expect(dot.style.left).toBe(component.dotCursorCoordinateX + 'px');
   });
 
   it('should update dotCursorCoordinateX, set style.top and style.left' +
   'when ArrowRight key is pressed', () => {
-    const event = new KeyboardEvent('keydown', { key: 'ArrowRight' });
+    const dotCursorElement = document.createElement('div');
+    dotCursorElement.classList.add('oppia-add-node-cursor');
+    dotCursorElement.style.top = '0px';
+    dotCursorElement.style.left = '0px';
+    component.dotCursor = new ElementRef(dotCursorElement);
     const dot = component.dotCursor.nativeElement;
-    component.handleKeyDown(event);
-    expect(component.dotCursorCoordinateX).toBe(10);
+    component.state.currentMode = 2;
+    spyOn(component, 'isButtonOnTopOfDot').and.returnValue(false);
 
+
+    const event = new KeyboardEvent('keydown', { key: 'ArrowRight' });
+    component.handleKeyDown(event);
+
+    expect(component.dotCursorCoordinateX).toBe(10);
     expect(dot.style.top).toBe(component.dotCursorCoordinateY + 'px');
     expect(dot.style.left).toBe(component.dotCursorCoordinateX + 'px');
   });
 
   it('should update dotCursorCoordinateY, set style.top and style.left' +
   ' when ArrowDown key is pressed', () => {
+    const dotCursorElement = document.createElement('div');
+    dotCursorElement.classList.add('oppia-add-node-cursor');
+    dotCursorElement.style.top = '0px';
+    dotCursorElement.style.left = '0px';
+    component.dotCursor = new ElementRef(dotCursorElement);
+    const dot = component.dotCursor.nativeElement;
+    component.state.currentMode = 2;
+    spyOn(component, 'isButtonOnTopOfDot').and.returnValue(false);
+
+
     const event = new KeyboardEvent('keydown', { key: 'ArrowDown' });
     component.handleKeyDown(event);
-    const dot = component.dotCursor.nativeElement;
-    expect(component.dotCursorCoordinateY).toBe(10);
 
+    expect(component.dotCursorCoordinateY).toBe(10);
     expect(dot.style.top).toBe(component.dotCursorCoordinateY + 'px');
     expect(dot.style.left).toBe(component.dotCursorCoordinateX + 'px');
   });
 
   it('should not update dotCursorCoordinateX and dotCursorCoordinateY' +
   ' when currentMode is not 2', () => {
-    component.state.currentMode = 1;
-    const event = new KeyboardEvent('keydown', { key: 'ArrowLeft' });
+    const dotCursorElement = document.createElement('div');
+    dotCursorElement.classList.add('oppia-add-node-cursor');
+    dotCursorElement.style.top = '0px';
+    dotCursorElement.style.left = '0px';
+    component.dotCursor = new ElementRef(dotCursorElement);
     const dot = component.dotCursor.nativeElement;
+    component.state.currentMode = 1;
+    
+    const event = new KeyboardEvent('keydown', { key: 'ArrowLeft' });
     component.handleKeyDown(event);
+
     expect(component.dotCursorCoordinateX).toBe(0);
     expect(component.dotCursorCoordinateY).toBe(0);
-
     expect(dot.style.top).toBe(component.dotCursorCoordinateY + 'px');
     expect(dot.style.left).toBe(component.dotCursorCoordinateX + 'px');
   });
