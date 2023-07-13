@@ -79,8 +79,8 @@ WORKFLOWS_EXEMPT_FROM_MERGE_REQUIREMENT: Final = (
 THIRD_PARTY_LIBS: List[ThirdPartyLibDict] = [
     {
         'name': 'Guppy',
-        'dependency_key': 'guppy',
-        'dependency_source': _DEPENDENCY_SOURCE_DEPENDENCIES_JSON,
+        'dependency_key': 'guppy-dev',
+        'dependency_source': _DEPENDENCY_SOURCE_PACKAGE,
         'type_defs_filename_prefix': 'guppy-defs-'
     },
     {
@@ -91,8 +91,8 @@ THIRD_PARTY_LIBS: List[ThirdPartyLibDict] = [
     },
     {
         'name': 'MIDI',
-        'dependency_key': 'midiJs',
-        'dependency_source': _DEPENDENCY_SOURCE_DEPENDENCIES_JSON,
+        'dependency_key': 'midi',
+        'dependency_source': _DEPENDENCY_SOURCE_PACKAGE,
         'type_defs_filename_prefix': 'midi-defs-'
     },
     {
@@ -169,9 +169,6 @@ class CustomLintChecksManager(linter_utils.BaseLinter):
         failed = False
         error_messages = []
 
-        dependencies_json = json.load(utils.open_file(
-            DEPENDENCIES_JSON_FILE_PATH, 'r'))['dependencies']['frontend']
-
         package = json.load(utils.open_file(
             PACKAGE_JSON_FILE_PATH, 'r'))['dependencies']
 
@@ -181,12 +178,7 @@ class CustomLintChecksManager(linter_utils.BaseLinter):
         for third_party_lib in THIRD_PARTY_LIBS:
             lib_dependency_source = third_party_lib['dependency_source']
 
-            if lib_dependency_source == _DEPENDENCY_SOURCE_DEPENDENCIES_JSON:
-                lib_version = (
-                    dependencies_json[
-                        third_party_lib['dependency_key']]['version'])
-
-            elif lib_dependency_source == _DEPENDENCY_SOURCE_PACKAGE:
+            if lib_dependency_source == _DEPENDENCY_SOURCE_PACKAGE:
                 lib_version = package[third_party_lib['dependency_key']]
 
                 if lib_version[0] == '^':
