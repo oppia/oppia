@@ -4,8 +4,7 @@ services:
   angular-build:
     build:
       context: .
-      dockerfile: ./docker/Dockerfile
-      target: frontend
+      dockerfile: ./docker/Dockerfile.frontend
     container_name: oppia-angular-build
     volumes:
       - .:/app/oppia
@@ -23,8 +22,7 @@ services:
   webpack-compiler:
     build:
       context: .
-      dockerfile: ./docker/Dockerfile
-      target: frontend
+      dockerfile: ./docker/Dockerfile.frontend
     container_name: oppia-webpack-compiler
     volumes:
       - .:/app/oppia
@@ -43,8 +41,7 @@ services:
   google-app-engine:
     build:
       context: .
-      dockerfile: ./docker/Dockerfile
-      target: backend
+      dockerfile: ./docker/Dockerfile.backend
     container_name: oppia-app-engine
     ports:
       - "8181:8181"
@@ -86,8 +83,7 @@ services:
   datastore:
     build:
       context: .
-      dockerfile: ./docker/Dockerfile
-      target: backend
+      dockerfile: ./docker/Dockerfile.backend
     container_name: oppia-cloud-datastore
     environment:
       - CLOUDSDK_CORE_DISABLE_PROMPTS=1

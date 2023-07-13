@@ -1,24 +1,3 @@
-FROM node:16.13.0 AS frontend
-
-WORKDIR /app/oppia
-
-RUN apt-get update -y && apt-get upgrade -y \
-    chromium \
-    curl \
-    git \
-    npm
-
-# Installing packages from the package.json file
-COPY package.json .
-COPY scripts/linters/custom_eslint_checks ./scripts/linters/custom_eslint_checks
-
-RUN npm install -g yarn@1.22.15 --force
-# mathjs ESOCKETTIMEDOUT error - there are cases reported for mathjs package when timeout happens while
-# downloading the package using `yarn install` command.
-# The solution is to increase the network timeout, so that the package is downloaded successfully.
-RUN yarn install --network-timeout 1000000
-
-
 # Added platform flag here because -- https://stackoverflow.com/questions/71040681/qemu-x86-64-could-not-open-lib64-ld-linux-x86-64-so-2-no-such-file-or-direc
 FROM --platform=linux/amd64 python:3.8.17-slim-buster AS backend
 
@@ -47,6 +26,30 @@ RUN wget -O gcloud-sdk.tar.gz https://dl.google.com/dl/cloudsdk/channels/rapid/d
 
 WORKDIR /app/oppia
 
+ENV BUF_LINUX_FILES="buf-Linux-x86_64 protoc-gen-buf-check-lint-Linux-x86_64 protoc-gen-buf-check-breaking-Linux-x86_64" \
+    PROTOC_LINUX_FILE='protoc-3.13.0-linux-x86_64.zip' \
+    BUF_DIR='/app/buf-0.29.0' \
+    PROTOC_DIR='/app/buf-0.29.0/protoc' \
+    BUF_BASE_URL='https://github.com/bufbuild/buf/releases/download/v0.29.0/' \
+    PROTOC_URL='https://github.com/protocolbuffers/protobuf/releases/download/v3.13.0' \
+    PROTOC_FILES_PATH='/app/oppia/third_party/oppia-ml-proto-0.0.0'
+
+RUN npm install protoc-gen-ts@0.3.4 google-protobuf@3.13.0 typescript@4.1.6
+
+# Download BUF_LINUX_FILES and PROTOC_LINUX_FILE
+RUN wget -P $BUF_DIR $PROTOC_URL/$PROTOC_LINUX_FILE
+RUN unzip $BUF_DIR/$PROTOC_LINUX_FILE -d $PROTOC_DIR \
+    && rm $BUF_DIR/$PROTOC_LINUX_FILE
+# Set the shell as /bin/bash explicitly. This is required to make use of the array syntax correctly
+SHELL ["/bin/bash", "-c"]
+RUN IFS=' ' read -ra BUF_FILES <<< "$BUF_LINUX_FILES"; \
+    for bin_file in "${BUF_FILES[@]}"; do \
+        wget -P $BUF_DIR $BUF_BASE_URL/$bin_file; \
+    done
+
+RUN chmod -R 744 $BUF_DIR \
+    && chmod -R 744 $PROTOC_DIR
+
 # Installing python dependencies from the requirements_dev.txt file
 COPY requirements_dev.txt .
 
@@ -70,32 +73,7 @@ COPY dependencies.json .
 RUN python -m scripts.install_dependencies_json_packages
 RUN python -m scripts.build
 
-ENV BUF_LINUX_FILES="buf-Linux-x86_64 protoc-gen-buf-check-lint-Linux-x86_64 protoc-gen-buf-check-breaking-Linux-x86_64" \
-    PROTOC_LINUX_FILE='protoc-3.13.0-linux-x86_64.zip' \
-    BUF_DIR='/app/buf-0.29.0' \
-    PROTOC_DIR='/app/buf-0.29.0/protoc' \
-    BUF_BASE_URL='https://github.com/bufbuild/buf/releases/download/v0.29.0/' \
-    PROTOC_URL='https://github.com/protocolbuffers/protobuf/releases/download/v3.13.0'
-
-# Download BUF_LINUX_FILES and PROTOC_LINUX_FILE
-# Set the shell as /bin/bash explicitly. This is required to make use of the array syntax correctly
-SHELL ["/bin/bash", "-c"]
-RUN IFS=' ' read -ra BUF_FILES <<< "$BUF_LINUX_FILES"; \
-    for bin_file in "${BUF_FILES[@]}"; do \
-        wget -P $BUF_DIR $BUF_BASE_URL/$bin_file; \
-    done
-
-RUN wget -P $BUF_DIR $PROTOC_URL/$PROTOC_LINUX_FILE
-RUN unzip $BUF_DIR/$PROTOC_LINUX_FILE -d $PROTOC_DIR \
-    && rm $BUF_DIR/$PROTOC_LINUX_FILE
-
-RUN chmod -R 744 $BUF_DIR \
-    && chmod -R 744 $PROTOC_DIR
-
 # Compiling the protobuf files
-ENV PROTOC_FILES_PATH='/app/oppia/third_party/oppia-ml-proto-0.0.0'
-
-RUN npm install protoc-gen-ts@0.3.4 google-protobuf@3.13.0 typescript@4.1.6
 RUN mkdir /app/oppia/proto_files
 RUN /app/buf-0.29.0/protoc/bin/protoc \
     --plugin=protoc-gen-ts=/app/oppia/node_modules/.bin/protoc-gen-ts \
