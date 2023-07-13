@@ -772,11 +772,11 @@ describe('GraphVizComponent', () => {
     dotCursorElement.style.left = '0px';
     component.dotCursor = new ElementRef(dotCursorElement);
     const dot = component.dotCursor.nativeElement;
+    
+    component.ngAfterViewInit();
     component.state.currentMode = 2;
     component.dotCursorCoordinateX = 0;
     component.dotCursorCoordinateY = 0;
-
-    component.ngAfterViewInit();
     component.mousemoveGraphSVG(event);
 
     expect(component.dotCursorCoordinateX).toBe(100);
