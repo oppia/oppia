@@ -321,7 +321,7 @@
 /core/templates/services/internet-connectivity.service*.ts @oppia/frontend-infrastructure-reviewers
 /core/templates/services/server-connection-backend-api.service*.ts @oppia/frontend-infrastructure-reviewers
 /core/templates/services/number-conversion.service*.ts @oppia/frontend-infrastructure-reviewers
-/core/templates/services/insert-script.service.ts oppia/frontend-infrastructure-reviewers
+/core/templates/services/insert-script.service.ts @oppia/frontend-infrastructure-reviewers
 
 # Global stylesheet.
 /core/templates/css/oppia.css @oppia/frontend-infrastructure-reviewers
@@ -768,4 +768,4 @@
 /core/templates/pages/license-page/license-page.component.html @oppia/core-reviewers
 /core/domain/takeout_*.py @oppia/core-reviewers
 /core/domain/wipeout_*.py @oppia/core-reviewers
-/core/templates/services/insert-script.service.ts oppia/core-reviewers
+/core/templates/services/insert-script.service.ts @oppia/core-reviewers

@@ -31,7 +31,7 @@ export class InsertScriptService {
   private renderer: Renderer2;
 
   constructor(
-    rendererFactory: RendererFactory2
+    rendererFactory: RendererFactory2,
   ) {
     this.renderer = rendererFactory.createRenderer(null, null);
   }
