@@ -716,7 +716,6 @@ describe('Translation Modal Component', () => {
         component.skipActiveTranslation();
         component.skipActiveTranslation();
         component.skipActiveTranslation();
-        component.skipActiveTranslation();
         component.activeWrittenTranslation = [
           'answero1', 'answero2', 'answero3'];
       });

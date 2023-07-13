@@ -16,7 +16,6 @@
  * @fileoverview Unit tests for contributor dashboard page component.
  */
 
-import { WindowRef } from 'services/contextual/window-ref.service';
 import { ComponentFixture, fakeAsync, flush, TestBed, tick, waitForAsync } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
@@ -46,7 +45,6 @@ describe('Contributor dashboard page', () => {
     can_suggest_questions: true,
   };
   let focusManagerService: FocusManagerService;
-  let windowRef: WindowRef;
   let getTranslatableTopicNamesAsyncSpy: jasmine.Spy;
   let getUserInfoAsyncSpy: jasmine.Spy;
   let urlInterpolationService: UrlInterpolationService;
@@ -62,8 +60,7 @@ describe('Contributor dashboard page', () => {
         UserService,
         TranslationLanguageService,
         TranslationTopicService,
-        ContributionOpportunitiesService,
-        WindowRef
+        ContributionOpportunitiesService
       ],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
@@ -76,7 +73,6 @@ describe('Contributor dashboard page', () => {
     contributionOpportunitiesService =
       TestBed.inject(ContributionOpportunitiesService);
     localStorageService = TestBed.inject(LocalStorageService);
-    windowRef = TestBed.inject(WindowRef);
     translationLanguageService = TestBed.inject(TranslationLanguageService);
     translationTopicService = TestBed.inject(TranslationTopicService);
     userService = TestBed.inject(UserService);
