@@ -1,3 +1,23 @@
+FROM node:16.13.0 AS frontend
+
+WORKDIR /app/oppia
+
+RUN apt-get update -y && apt-get upgrade -y \
+    chromium \
+    curl \
+    git
+
+# Installing packages from the package.json file
+COPY package.json .
+COPY scripts/linters/custom_eslint_checks ./scripts/linters/custom_eslint_checks
+
+RUN npm install -g yarn@1.22.15 --force
+# mathjs ESOCKETTIMEDOUT error - there are cases reported for mathjs package when timeout happens while
+# downloading the package using `yarn install` command.
+# The solution is to increase the network timeout, so that the package is downloaded successfully.
+RUN yarn install
+
+
 # Added platform flag here because -- https://stackoverflow.com/questions/71040681/qemu-x86-64-could-not-open-lib64-ld-linux-x86-64-so-2-no-such-file-or-direc
 FROM --platform=linux/amd64 python:3.8.17-slim-buster AS backend
 

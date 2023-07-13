@@ -4,13 +4,15 @@ services:
   angular-build:
     build:
       context: .
-      dockerfile: ./docker/Dockerfile.frontend
+      dockerfile: ./docker/Dockerfile
+      target: frontend
     container_name: oppia-angular-build
     volumes:
       - .:/app/oppia
       - node_modules:/app/oppia/node_modules
       - third_party:/app/oppia/third_party
       - frontend_proto_files:/app/oppia/extensions/classifiers/proto
+      - assets:/app/oppia/assets
     environment:
       - NODE_OPTIONS=--max_old_space_size=4096
     command: >
@@ -22,13 +24,15 @@ services:
   webpack-compiler:
     build:
       context: .
-      dockerfile: ./docker/Dockerfile.frontend
+      dockerfile: ./docker/Dockerfile
+      target: frontend
     container_name: oppia-webpack-compiler
     volumes:
       - .:/app/oppia
       - node_modules:/app/oppia/node_modules
       - third_party:/app/oppia/third_party
       - frontend_proto_files:/app/oppia/extensions/classifiers/proto
+      - assets:/app/oppia/assets
     command:
       - "npx"
       - "webpack"
@@ -41,7 +45,8 @@ services:
   dev-server:
     build:
       context: .
-      dockerfile: ./docker/Dockerfile.backend
+      dockerfile: ./docker/Dockerfile
+      target: backend
     container_name: oppia-dev-server
     ports:
       - "8181:8181"
@@ -51,6 +56,7 @@ services:
       - proto_files:/app/oppia/proto_files
       - frontend_proto_files:/app/oppia/extensions/classifiers/proto
       - third_party:/app/oppia/third_party
+      - assets:/app/oppia/assets
     environment:
       - CLOUDSDK_CORE_DISABLE_PROMPTS=1
     depends_on:
@@ -83,7 +89,8 @@ services:
   datastore:
     build:
       context: .
-      dockerfile: ./docker/Dockerfile.backend
+      dockerfile: ./docker/Dockerfile
+      target: backend
     container_name: oppia-cloud-datastore
     environment:
       - CLOUDSDK_CORE_DISABLE_PROMPTS=1
@@ -172,6 +179,7 @@ services:
     command: elasticsearch -q
 
 volumes:
+  assets:
   node_modules:
   proto_files:
   frontend_proto_files:
