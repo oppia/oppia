@@ -58,7 +58,7 @@ app_identity_services = models.Registry.import_app_identity_services()
 transaction_services = models.Registry.import_transaction_services()
 secrets_services = models.Registry.import_secrets_services()
 
-Registry = platform_parameter_registry.Registry
+PlatformParameterRegistry = platform_parameter_registry.Registry
 
 
 NEW_REVIEWER_EMAIL_DATA: Dict[str, Dict[str, str]] = {
@@ -114,7 +114,7 @@ REMOVED_REVIEWER_EMAIL_DATA: Dict[str, Dict[str, str]] = {
 }
 
 EMAIL_SENDER_NAME: platform_parameter_domain.PlatformParameter = (
-    Registry.create_platform_parameter(
+    PlatformParameterRegistry.create_platform_parameter(
         platform_parameter_list.ParamNames.EMAIL_SENDER_NAME,
         'The default sender name for outgoing emails.',
         platform_parameter_domain.DataTypes.STRING,
@@ -123,7 +123,7 @@ EMAIL_SENDER_NAME: platform_parameter_domain.PlatformParameter = (
 )
 
 EMAIL_FOOTER: platform_parameter_domain.PlatformParameter = (
-    Registry.create_platform_parameter(
+    PlatformParameterRegistry.create_platform_parameter(
         platform_parameter_list.ParamNames.EMAIL_FOOTER,
         'The footer to append to all outgoing emails. (This should '
         'be written in HTML and include an unsubscribe link.)',
@@ -142,7 +142,7 @@ _PLACEHOLDER_HTML_BODY: Final = (
 )
 
 SIGNUP_EMAIL_SUBJECT_CONTENT: platform_parameter_domain.PlatformParameter = (
-    Registry.create_platform_parameter(
+    PlatformParameterRegistry.create_platform_parameter(
         platform_parameter_list.ParamNames.SIGNUP_EMAIL_SUBJECT_CONTENT,
         'Content of email sent after a new user signs up. Set the email '
         'subject. These emails are only sent if the functionality is enabled '
@@ -153,7 +153,7 @@ SIGNUP_EMAIL_SUBJECT_CONTENT: platform_parameter_domain.PlatformParameter = (
 )
 
 SIGNUP_EMAIL_BODY_CONTENT: platform_parameter_domain.PlatformParameter = (
-    Registry.create_platform_parameter(
+    PlatformParameterRegistry.create_platform_parameter(
         platform_parameter_list.ParamNames.SIGNUP_EMAIL_BODY_CONTENT,
         'Content of email sent after a new user signs up. (The email body '
         'should be written with HTML and not include a salutation or footer.) '
@@ -201,7 +201,7 @@ EDITOR_ROLE_EMAIL_RIGHTS_FOR_ROLE: Dict[str, str] = {
 
 UNPUBLISH_EXPLORATION_EMAIL_HTML_BODY: (
     platform_parameter_domain.PlatformParameter) = (
-        Registry.create_platform_parameter(
+        PlatformParameterRegistry.create_platform_parameter(
             (
                 platform_parameter_list.ParamNames.
                 UNPUBLISH_EXPLORATION_EMAIL_HTML_BODY
