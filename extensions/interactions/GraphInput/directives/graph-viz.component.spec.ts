@@ -809,6 +809,65 @@ describe('GraphVizComponent', () => {
     ]);
   });
 
+  it('should update dotCursorCoordinateX, set style.top and style.left, and prevent default when ArrowLeft key is pressed', () => {
+    const event = new KeyboardEvent('keydown', { key: 'ArrowLeft' });
+    const dot = component.dotCursor.nativeElement;
+    component.handleKeyDown(event);
+    expect(component.dotCursorCoordinateX).toBe(-10);
+
+    expect(dot.style.top).toBe(component.dotCursorCoordinateY + 'px');
+    expect(dot.style.left).toBe(component.dotCursorCoordinateX + 'px');
+  });
+
+  it('should update dotCursorCoordinateY, set style.top and style.left, and prevent default when ArrowUp key is pressed', () => {
+    const event = new KeyboardEvent('keydown', { key: 'ArrowUp' });
+    const dot = component.dotCursor.nativeElement;
+    component.handleKeyDown(event);
+    expect(component.dotCursorCoordinateY).toBe(-10);
+
+    expect(dot.style.top).toBe(component.dotCursorCoordinateY + 'px');
+    expect(dot.style.left).toBe(component.dotCursorCoordinateX + 'px');
+  });
+
+  it('should update dotCursorCoordinateX, set style.top and style.left, and prevent default when ArrowRight key is pressed', () => {
+    const event = new KeyboardEvent('keydown', { key: 'ArrowRight' });
+    const dot = component.dotCursor.nativeElement;
+    component.handleKeyDown(event);
+    expect(component.dotCursorCoordinateX).toBe(10);
+
+    expect(dot.style.top).toBe(component.dotCursorCoordinateY + 'px');
+    expect(dot.style.left).toBe(component.dotCursorCoordinateX + 'px');
+  });
+
+  it('should update dotCursorCoordinateY, set style.top and style.left, and prevent default when ArrowDown key is pressed', () => {
+    const event = new KeyboardEvent('keydown', { key: 'ArrowDown' });
+    component.handleKeyDown(event);
+    const dot = component.dotCursor.nativeElement;
+    expect(component.dotCursorCoordinateY).toBe(10);
+
+    expect(dot.style.top).toBe(component.dotCursorCoordinateY + 'px');
+    expect(dot.style.left).toBe(component.dotCursorCoordinateX + 'px');
+  });
+
+  it('should not update dotCursorCoordinateX and dotCursorCoordinateY when currentMode is not 2', () => {
+    component.state.currentMode = 1;
+    const event = new KeyboardEvent('keydown', { key: 'ArrowLeft' });
+    const dot = component.dotCursor.nativeElement;
+    component.handleKeyDown(event);
+    expect(component.dotCursorCoordinateX).toBe(0);
+    expect(component.dotCursorCoordinateY).toBe(0);
+
+    expect(dot.style.top).toBe(component.dotCursorCoordinateY + 'px');
+    expect(dot.style.left).toBe(component.dotCursorCoordinateX + 'px');
+  });
+
+  it('should call onClickGraphSVG when Enter key is pressed', () => {
+    const event = new KeyboardEvent('keydown', { key: 'Enter' });
+    spyOn(component, 'onClickGraphSVG');
+    component.handleKeyDown(event);
+    expect(component.onClickGraphSVG).toHaveBeenCalled();
+  });
+
   it('should not add vertex when the user is not allowed to add a' +
   ' vertex', () => {
     component.state.currentMode = component._MODES.ADD_VERTEX;

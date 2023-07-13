@@ -29,7 +29,8 @@ import {
   HostListener,
   Input,
   OnInit,
-  Output
+  Output,
+  ViewChild
 } from '@angular/core';
 import { isNumber } from 'angular';
 import { GraphAnswer } from 'interactions/answer-defs';
@@ -84,6 +85,8 @@ export class GraphVizComponent implements OnInit, AfterViewInit {
   @Input() canEditEdgeWeight: boolean;
   @Input() interactionIsActive: boolean;
   @Input() canEditOptions: boolean;
+  @ViewChild('dotCursor') dotCursor!: ElementRef<HTMLDivElement>;
+  @ViewChild('graphArea') graphArea!: ElementRef<HTMLElement>;
   dotCursorCoordinateX: number = 0;
   dotCursorCoordinateY: number = 0;
 
@@ -220,12 +223,9 @@ export class GraphVizComponent implements OnInit, AfterViewInit {
         case 'Enter':
           this.onClickGraphSVG();
       }
-      const dot = document.querySelector(
-        '.oppia-add-node-cursor') as HTMLDivElement;
+      const dot = this.dotCursor.nativeElement;
       dot.style.top = this.dotCursorCoordinateY + 'px';
       dot.style.left = this.dotCursorCoordinateX + 'px';
-    } else {
-      return;
     }
   }
 
@@ -298,9 +298,7 @@ export class GraphVizComponent implements OnInit, AfterViewInit {
     if (this.state.currentMode === 2) {
       const dot = document.querySelector(
         '.oppia-add-node-cursor') as HTMLDivElement;
-      const graphArea = this.element.nativeElement.querySelector(
-        '.oppia-graph-viz-svg');
-      const graphAreaRect = graphArea.getBoundingClientRect();
+      const graphAreaRect = this.graphArea.nativeElement.getBoundingClientRect();
 
       if (event instanceof MouseEvent) {
         this.dotCursorCoordinateX =
