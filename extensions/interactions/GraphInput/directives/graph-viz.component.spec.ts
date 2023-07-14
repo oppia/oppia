@@ -808,8 +808,8 @@ describe('GraphVizComponent', () => {
     dotElement.classList.add('oppia-add-node-cursor');
 
     const buttonElements = [
-      new ElementRef(document.createElement('button')),
-      new ElementRef(document.createElement('button'))
+      document.createElement('button'),
+      document.createElement('button')
     ];
 
     buttonElements[0].classList.add('e2e-test-one-button');
