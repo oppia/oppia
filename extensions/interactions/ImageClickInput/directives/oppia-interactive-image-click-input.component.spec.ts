@@ -471,6 +471,82 @@ describe('InteractiveImageClickInput', () => {
     expect(component.currentlyHoveredRegions).toEqual(['Region1']);
   });
 
+  it('should update dotCursorCoordinateX, set style.top and style.left' +
+  ' when ArrowLeft key is pressed', () => {
+    spyOn(component, 'updateDotPosition');
+    spyOn(component, 'updateCurrentlyHoveredRegions');
+
+    component.dotCursorCoordinateX = 0;
+    component.dotCursorCoordinateY = 0;
+    component.currentlyHoveredRegions = ['region1', 'region2'];
+    const event = new KeyboardEvent('keydown', { key: 'ArrowLeft' });
+
+    component.handleKeyDown(event);
+
+    expect(component.dotCursorCoordinateX).toBe(-10);
+    expect(component.dotCursorCoordinateY).toBe(0);
+    expect(component.updateDotPosition).toHaveBeenCalledWith(event);
+    expect(component.updateCurrentlyHoveredRegions).toHaveBeenCalled();
+    expect(component.currentlyHoveredRegions).toEqual([]);
+  });
+
+  it('should update dotCursorCoordinateY, set style.top and style.left' +
+  ' when ArrowUp key is pressed', () => {
+    spyOn(component, 'updateDotPosition');
+    spyOn(component, 'updateCurrentlyHoveredRegions');
+
+    component.dotCursorCoordinateX = 0;
+    component.dotCursorCoordinateY = 0;
+    component.currentlyHoveredRegions = ['region1', 'region2'];
+    const event = new KeyboardEvent('keydown', { key: 'ArrowUp' });
+
+    component.handleKeyDown(event);
+
+    expect(component.dotCursorCoordinateX).toBe(0);
+    expect(component.dotCursorCoordinateY).toBe(-10);
+    expect(component.updateDotPosition).toHaveBeenCalledWith(event);
+    expect(component.updateCurrentlyHoveredRegions).toHaveBeenCalled();
+    expect(component.currentlyHoveredRegions).toEqual([]);
+  });
+
+  it('should update dotCursorCoordinateX, set style.top and style.left' +
+  'when ArrowRight key is pressed', () => {
+    spyOn(component, 'updateDotPosition');
+    spyOn(component, 'updateCurrentlyHoveredRegions');
+
+    component.dotCursorCoordinateX = 0;
+    component.dotCursorCoordinateY = 0;
+    component.currentlyHoveredRegions = ['region1', 'region2'];
+    const event = new KeyboardEvent('keydown', { key: 'ArrowRight' });
+
+    component.handleKeyDown(event);
+
+    expect(component.dotCursorCoordinateX).toBe(10);
+    expect(component.dotCursorCoordinateY).toBe(0);
+    expect(component.updateDotPosition).toHaveBeenCalledWith(event);
+    expect(component.updateCurrentlyHoveredRegions).toHaveBeenCalled();
+    expect(component.currentlyHoveredRegions).toEqual([]);
+  });
+
+  it('should update dotCursorCoordinateY, set style.top and style.left' +
+  ' when ArrowDown key is pressed', () => {
+    spyOn(component, 'updateDotPosition');
+    spyOn(component, 'updateCurrentlyHoveredRegions');
+
+    component.dotCursorCoordinateX = 0;
+    component.dotCursorCoordinateY = 0;
+    component.currentlyHoveredRegions = ['region1', 'region2'];
+    const event = new KeyboardEvent('keydown', { key: 'ArrowDown' });
+
+    component.handleKeyDown(event);
+
+    expect(component.dotCursorCoordinateX).toBe(0);
+    expect(component.dotCursorCoordinateY).toBe(10);
+    expect(component.updateDotPosition).toHaveBeenCalledWith(event);
+    expect(component.updateCurrentlyHoveredRegions).toHaveBeenCalled();
+    expect(component.currentlyHoveredRegions).toEqual([]);
+  });
+
   it('should not check if mouse is over region when interaction is not' +
   ' active', () => {
     spyOn(component, 'updateCurrentlyHoveredRegions').and.callThrough();
