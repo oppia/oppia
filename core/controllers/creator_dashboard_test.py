@@ -270,6 +270,14 @@ class CreatorDashboardHandlerTests(test_utils.GenericTestBase):
         def mock_get_thread_analytics_multi(
             unused_exploration_ids: List[str]
         ) -> List[feedback_domain.FeedbackAnalytics]:
+            """Mock function for 'get_thread_analytics_multi'.
+
+            Args:
+                unused_exploration_ids: list. List of exploration IDs (unused).
+
+            Returns:
+                list. List of FeedbackAnalytics objects.
+            """
             return [feedback_domain.FeedbackAnalytics(
                 feconf.ENTITY_TYPE_EXPLORATION, self.EXP_ID, 2, 3)]
 
