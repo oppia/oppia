@@ -107,13 +107,12 @@ class BuildTests(test_utils.GenericTestBase):
 
     def test_minify_and_create_sourcemap_under_docker_environment(self) -> None:
         """Tests _minify_and_create_sourcemap with an invalid filepath."""
-        feconf.OPPIA_IS_DOCKERIZED = True
         with self.assertRaisesRegex(
             subprocess.CalledProcessError,
             'returned non-zero exit status 1') as called_process:
-            build._minify_and_create_sourcemap(  # pylint: disable=protected-access
-                INVALID_INPUT_FILEPATH, INVALID_OUTPUT_FILEPATH)
-        feconf.OPPIA_IS_DOCKERIZED = False
+            with self.swap(feconf, 'OPPIA_IS_DOCKERIZED', True):
+                build._minify_and_create_sourcemap(  # pylint: disable=protected-access
+                    INVALID_INPUT_FILEPATH, INVALID_OUTPUT_FILEPATH)
         # Here we use MyPy ignore because the stubs of 'assertRaisesRegex' do
         # not contain any returncode attribute, so because of this MyPy throws
         # an '"Exception" has no attribute "returncode"' error. Thus to avoid
@@ -732,16 +731,12 @@ class BuildTests(test_utils.GenericTestBase):
         # silence the MyPy complaints `setattr` is used to set the attribute.
         setattr(
             app_dev_yaml_temp_file, 'name', mock_dev_yaml_filepath)
-        # TODO(#18260): Change this when we permanently move to
-        # the Dockerized Setup.
-        firebase_host = (
-            'firebase' if feconf.OPPIA_IS_DOCKERIZED else 'localhost'
-        )
         with utils.open_file(mock_dev_yaml_filepath, 'w') as tmp:
-            tmp.write('Some content in mock_app_dev.yaml\n')
-            tmp.write(
-                '  FIREBASE_AUTH_EMULATOR_HOST: "%s:9099"\n' % firebase_host)
-            tmp.write('version: default')
+            with self.swap(feconf, 'OPPIA_IS_DOCKERIZED', True):
+                tmp.write('Some content in mock_app_dev.yaml\n')
+                tmp.write(
+                    '  FIREBASE_AUTH_EMULATOR_HOST: "firebase:9099"\n')
+                tmp.write('version: default')
 
         app_yaml_temp_file = tempfile.NamedTemporaryFile()
         # Here MyPy assumes that the 'name' attribute is read-only. In order to
