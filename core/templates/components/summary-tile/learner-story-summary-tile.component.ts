@@ -50,6 +50,8 @@ export class LearnerStorySummaryTileComponent implements OnInit {
   starImageUrl!: string;
   storyCompleted: boolean = false;
   buttonIsHovered: boolean = false;
+  todolistImageUrl: string = '';
+  learnerGroupImageUrl: string = '';
   openInNewWindow = false;
   circumference = (18 * 2 * Math.PI);
   getStrokeDashOffSet: number;
@@ -106,7 +108,10 @@ export class LearnerStorySummaryTileComponent implements OnInit {
     if (this.storyProgress === 100) {
       this.storyCompleted = true;
     }
-
+    this.todolistImageUrl = this.getStaticImageUrl(
+      '/learner_dashboard/todolist.svg');
+    this.learnerGroupImageUrl = this.getStaticImageUrl(
+      '/learner_dashboard/learner-group-icon.svg');
     this.getStrokeDashOffSet =
     this.getStrokeDashOffSetValue(this.storyProgress);
 

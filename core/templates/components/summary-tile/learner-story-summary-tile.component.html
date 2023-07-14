@@ -1,6 +1,18 @@
 <div class="learner-story-summary-tile">
   <mat-card class="oppia-story-dashboard-card" [attr.style]="isButtonHovered()">
         <div class="oppia-title-section" [ngStyle]="{'background-color': thumbnailBgColor}">
+          <div class="oppia-story-tags">
+            <span *ngIf="true" class="oppia-learnergroup-title-tag">
+              <img [src]="learnerGroupImageUrl" alt="learnergroup image">
+              <span>
+                {{ learnerGroupTitle }}
+              </span>
+            </span>
+            <span *ngIf="markTileAsGoal" class="oppia-goal-tag">
+                <img [src]="todolistImageUrl" alt="todolist image" class="oppia-goal-svg-image">
+                <span>Goals</span>
+            </span>
+          </div>
           <img class="oppia-thumbnail-image" alt="" [src]="thumbnailUrl" [attr.style]="isButtonHovered()">
         </div>
         <div class="oppia-summary-section">
@@ -192,5 +204,40 @@
   }
   .learner-story-summary-tile .story-card-footer {
     display: flex;
+  }
+  .learner-story-summary-tile .oppia-goal-tag,
+  .learner-story-summary-tile .oppia-learnergroup-title-tag {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    border-radius: 4px;
+    background: rgba(255, 255, 255, 0.60);
+    backdrop-filter: blur(2px);
+    color: #333;
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 13px;
+    padding: 2px 4px;
+    text-transform: capitalize;
+  }
+  .learner-story-summary-tile .oppia-story-tags {
+    display: grid;
+    gap: 4px;
+    position: absolute;
+    left: 8px;
+    top: 8px;
+  }
+  .learner-story-summary-tile .oppia-goal-tag {
+    width: 64px;
+  }
+  .learner-story-summary-tile .oppia-learnergroup-title-tag {
+    width: 200px;
+  }
+  .learner-story-summary-tile .oppia-svg-image {
+    height: 20px;
+    width: 20px;
+  }
+  .learner-story-summary-tile .oppia-goal-svg-image {
+    filter: invert(27%) sepia(108%) saturate(4263%) hue-rotate(500deg) brightness(60%) contrast(131%);
   }
 </style>
