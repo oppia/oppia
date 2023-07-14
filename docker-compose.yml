@@ -88,7 +88,7 @@ services:
     container_name: oppia-cloud-datastore
     environment:
       - CLOUDSDK_CORE_DISABLE_PROMPTS=1
-      - DATASTORE_HOST='datastore'
+      - DATASTORE_HOST=datastore
     volumes:
       - cloud_datastore_emulator_cache:/app/cloud_datastore_emulator_cache
     healthcheck:
