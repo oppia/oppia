@@ -63,7 +63,7 @@
            class="e2e-test-editor-correctness-toggle mr-2"
            type="checkbox"
            [(ngModel)]="tmpOutcome.labelledAsCorrect">
-    <strong><label for="labelledAsCorrect">The answers in this group are correct</label></strong>
+    <strong><label class = "ans-correct-checkbox" for="labelledAsCorrect">The answers in this group are correct</label></strong>
   </div>
 
   <oppia-question-misconception-editor *ngIf="questionModeEnabled"
@@ -107,7 +107,15 @@
   .add-answer-group-modal .oppia-nothing-text {
     color: #888;
   }
+  @media screen and (max-width: 321px) {
+    .ans-correct-checkbox {
+      font-size: 13px;
+    }
+  }
   @media screen and (max-width: 768px) {
+    .ans-correct-checkbox {
+      font-size: 1.4rem;
+    }
     .oppia-click-to-start-editing {
       margin-top: 20px;
       position: relative;

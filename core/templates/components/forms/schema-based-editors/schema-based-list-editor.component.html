@@ -18,7 +18,7 @@
   }
 </style>
 <div class="schema-based-list-editor">
-  <form #listEditorForm="ngForm">
+  <form #listEditorForm="ngForm" class="add-element-btn-form">
     <table class="w-100">
       <tr *ngFor="let item of localValue; let idx = index" id="e2e-test-schema-based-list-editor-table-row">
         <td class="e2e-test-schema-based-list-editor-table-data">
@@ -59,3 +59,11 @@
     </div>
   </form>
 </div>
+<style>
+  @media screen and ((max-width: 691px) ) {
+    .add-element-btn-form {
+      margin: 1rem auto 10px auto;
+      }
+  }
+
+</style>
