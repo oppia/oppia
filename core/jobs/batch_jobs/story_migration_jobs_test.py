@@ -99,7 +99,12 @@ class MigrateStoryJobTests(job_test_utils.JobTestBase):
                 'prerequisite_skill_ids': [],
                 'outline': 'outline',
                 'outline_is_finalized': True,
-                'exploration_id': 'exp_id'
+                'exploration_id': 'exp_id',
+                'status': None,
+                'planned_publication_date_msecs': None,
+                'last_modified_msecs': None,
+                'first_publication_date_msecs': None,
+                'unpublishing_reason': None
             }],
             'initial_node_id': 'node_1111',
             'next_node_id': 'node_2222'
@@ -282,7 +287,12 @@ class AuditStoryMigrationJobTests(job_test_utils.JobTestBase):
                 'prerequisite_skill_ids': [],
                 'outline': 'outline',
                 'outline_is_finalized': True,
-                'exploration_id': 'exp_id'
+                'exploration_id': 'exp_id',
+                'status': 'Published',
+                'planned_publication_date_msecs': 100,
+                'last_modified_msecs': 100,
+                'first_publication_date_msecs': 200,
+                'unpublishing_reason': None
             }],
             'initial_node_id': 'node_1111',
             'next_node_id': 'node_2222'
