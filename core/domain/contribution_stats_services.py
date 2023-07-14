@@ -337,7 +337,8 @@ def get_translation_reviewer_total_stats(
 
     translation_reviewer_stats = [
         get_translation_reviewer_total_stats_from_model(model)
-        for model in translation_reviewer_models]
+        for model in translation_reviewer_models
+    ]
 
     return (
         translation_reviewer_stats,
@@ -395,7 +396,8 @@ def get_question_submitter_total_stats(
 
     question_submitter_stats = [
         get_question_submitter_total_stats_from_model(model)
-        for model in question_submitter_models]
+        for model in question_submitter_models
+    ]
 
     return (
         question_submitter_stats,
@@ -449,7 +451,8 @@ def get_question_reviewer_total_stats(
 
     question_reviewer_stats = [
         get_question_reviewer_total_stats_from_model(model)
-        for model in question_reviewer_models]
+        for model in question_reviewer_models
+    ]
 
     return (
         question_reviewer_stats,
