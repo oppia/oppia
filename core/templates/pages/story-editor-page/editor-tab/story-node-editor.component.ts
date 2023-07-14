@@ -32,6 +32,7 @@ import { WindowDimensionsService } from 'services/contextual/window-dimensions.s
 import { PageTitleService } from 'services/page-title.service';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
 import { StoryEditorStateService } from '../services/story-editor-state.service';
+import { PlatformFeatureService } from 'services/platform-feature.service';
 
 @Component({
   selector: 'oppia-story-node-editor',
@@ -48,6 +49,7 @@ export class StoryNodeEditorComponent implements OnInit, OnDestroy {
   @Input() destinationNodeIds: string[];
   @Input() prerequisiteSkillIds: string[];
   @Input() acquiredSkillIds: string[];
+  @Input() plannedPublicationDateMsecs: number;
 
   chapterPreviewCardIsShown = false;
   mainChapterCardIsShown = true;
@@ -79,6 +81,9 @@ export class StoryNodeEditorComponent implements OnInit, OnDestroy {
   expIdIsValid: boolean;
   invalidExpErrorIsShown: boolean;
   nodeTitleEditorIsShown: boolean;
+  plannedPublicationDate: Date | null;
+  editablePlannedPublicationDate: Date | null;
+  plannedPublicationDateIsInPast: boolean = false;
 
   OUTLINE_SCHEMA = {
     type: 'html',
@@ -108,8 +113,15 @@ export class StoryNodeEditorComponent implements OnInit, OnDestroy {
     private storyUpdateService: StoryUpdateService,
     private topicsAndSkillsDashboardBackendApiService:
     TopicsAndSkillsDashboardBackendApiService,
-    private windowDimensionsService: WindowDimensionsService
+    private windowDimensionsService: WindowDimensionsService,
+    private platformFeatureService: PlatformFeatureService
   ) {}
+
+  isSerialChapterFeatureFlagEnabled(): boolean {
+    return (
+      this.platformFeatureService.
+        status.SerialChapterLaunchCurriculumAdminView.isEnabled);
+  }
 
   private _init(): void {
     this.story = this.storyEditorStateService.getStory();
@@ -148,6 +160,11 @@ export class StoryNodeEditorComponent implements OnInit, OnDestroy {
     this.expIdIsValid = true;
     this.invalidExpErrorIsShown = false;
     this.nodeTitleEditorIsShown = false;
+    this.plannedPublicationDate = this.plannedPublicationDateMsecs ? new Date(
+      this.plannedPublicationDateMsecs) : null;
+    this.editablePlannedPublicationDate = this.plannedPublicationDate;
+
+    this.updateCurrentNodeIsPublishable();
   }
 
   getSkillEditorUrl(skillId: string): string {
@@ -194,6 +211,7 @@ export class StoryNodeEditorComponent implements OnInit, OnDestroy {
         this.storyUpdateService.setStoryNodeTitle(
           this.story, this.nodeId, newTitle);
         this.currentTitle = newTitle;
+        this.updateCurrentNodeIsPublishable();
       }
     }
   }
@@ -203,13 +221,51 @@ export class StoryNodeEditorComponent implements OnInit, OnDestroy {
       this.storyUpdateService.setStoryNodeDescription(
         this.story, this.nodeId, newDescription);
       this.currentDescription = newDescription;
+      this.updateCurrentNodeIsPublishable();
     }
+  }
+
+  updatePlannedPublicationDate(dateString: string | null): void {
+    let newPlannedPublicationDate = dateString ? new Date(dateString) : null;
+    const TOAST_MESSAGE_DISPLAY_TIME_MSEC = 5000;
+
+    if (newPlannedPublicationDate !== this.plannedPublicationDate) {
+      if (newPlannedPublicationDate) {
+        let currentDateTime = new Date();
+        if (newPlannedPublicationDate.getTime() < currentDateTime.getTime()) {
+          this.plannedPublicationDateIsInPast = true;
+          if (this.plannedPublicationDate) {
+            this.storyUpdateService.setStoryNodePlannedPublicationDateMsecs(
+              this.story, this.nodeId, null);
+          }
+          this.plannedPublicationDate = null;
+          this.editablePlannedPublicationDate = null;
+          setTimeout(() => {
+            this.plannedPublicationDateIsInPast = false;
+          }, TOAST_MESSAGE_DISPLAY_TIME_MSEC);
+          return;
+        } else if (this.plannedPublicationDate === null ||
+          this.plannedPublicationDate.getTime() !==
+          newPlannedPublicationDate.getTime()) {
+          this.storyUpdateService.setStoryNodePlannedPublicationDateMsecs(
+            this.story, this.nodeId, newPlannedPublicationDate.getTime());
+          this.plannedPublicationDate = newPlannedPublicationDate;
+        }
+      } else {
+        this.storyUpdateService.setStoryNodePlannedPublicationDateMsecs(
+          this.story, this.nodeId, null);
+        this.plannedPublicationDate = null;
+      }
+    }
+
+    this.updateCurrentNodeIsPublishable();
   }
 
   updateThumbnailFilename(newThumbnailFilename: string): void {
     if (newThumbnailFilename !== this.editableThumbnailFilename) {
       this.storyUpdateService.setStoryNodeThumbnailFilename(
         this.story, this.nodeId, newThumbnailFilename);
+      this.updateCurrentNodeIsPublishable();
     }
   }
 
@@ -218,6 +274,17 @@ export class StoryNodeEditorComponent implements OnInit, OnDestroy {
       this.storyUpdateService.setStoryNodeThumbnailBgColor(
         this.story, this.nodeId, newThumbnailBgColor);
       this.editableThumbnailBgColor = newThumbnailBgColor;
+      this.updateCurrentNodeIsPublishable();
+    }
+  }
+
+  updateCurrentNodeIsPublishable(): void {
+    if (this.currentTitle && this.currentDescription && this.explorationId &&
+      (this.editableThumbnailBgColor || this.editableThumbnailFilename) &&
+      this.outlineIsFinalized && this.plannedPublicationDate) {
+      this.storyEditorStateService.setCurrentNodeAsPublishable(true);
+    } else {
+      this.storyEditorStateService.setCurrentNodeAsPublishable(false);
     }
   }
 
@@ -227,6 +294,8 @@ export class StoryNodeEditorComponent implements OnInit, OnDestroy {
 
   finalizeOutline(): void {
     this.storyUpdateService.finalizeStoryNodeOutline(this.story, this.nodeId);
+    this.outlineIsFinalized = true;
+    this.updateCurrentNodeIsPublishable();
   }
 
   updateExplorationId(explorationId: string): void {
@@ -363,6 +432,8 @@ export class StoryNodeEditorComponent implements OnInit, OnDestroy {
 
   unfinalizeOutline(): void {
     this.storyUpdateService.unfinalizeStoryNodeOutline(this.story, this.nodeId);
+    this.outlineIsFinalized = false;
+    this.updateCurrentNodeIsPublishable();
   }
 
   openNodeTitleEditor(): void {
