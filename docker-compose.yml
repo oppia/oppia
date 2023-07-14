@@ -11,7 +11,6 @@ services:
       - node_modules:/app/oppia/node_modules
       - third_party:/app/oppia/third_party
       - frontend_proto_files:/app/oppia/extensions/classifiers/proto
-      - assets:/app/oppia/assets
     environment:
       - NODE_OPTIONS=--max_old_space_size=4096
     command: >
@@ -30,7 +29,6 @@ services:
       - node_modules:/app/oppia/node_modules
       - third_party:/app/oppia/third_party
       - frontend_proto_files:/app/oppia/extensions/classifiers/proto
-      - assets:/app/oppia/assets
     command:
       - "npx"
       - "webpack"
@@ -53,7 +51,6 @@ services:
       - proto_files:/app/oppia/proto_files
       - frontend_proto_files:/app/oppia/extensions/classifiers/proto
       - third_party:/app/oppia/third_party
-      - assets:/app/oppia/assets
     environment:
       - CLOUDSDK_CORE_DISABLE_PROMPTS=1
     depends_on:
@@ -69,19 +66,20 @@ services:
       interval: 30s
       retries: 5
       start_period: 7m
-    entrypoint: /google-cloud-sdk/bin/dev_appserver.py
-    command: 
-      - "/app/oppia/app_dev_docker.yaml"
-      - "--runtime"
-      - "python38"
-      - "--host=0.0.0.0"
-      - "--port=8181"
-      - "--admin_host=0.0.0.0"
-      - "--admin_port=8000"
-      - "--skip_sdk_update_check=true"
-      - "--automatic_restart=true"
-      - "--log_level=info"
-      - "--dev_appserver_log_level=info"
+    command: >
+      sh -c '
+        python -m scripts.build
+        /google-cloud-sdk/bin/dev_appserver.py /app/oppia/app_dev_docker.yaml \
+        --runtime=python38 \
+        --host=0.0.0.0 \
+        --port=8181 \
+        --admin_host=0.0.0.0 \
+        --admin_port=8000 \
+        --skip_sdk_update_check=true \
+        --automatic_restart=true \
+        --log_level=info \
+        --dev_appserver_log_level=info
+      '
 
   datastore:
     build:
@@ -175,7 +173,6 @@ services:
     command: elasticsearch -q
 
 volumes:
-  assets:
   node_modules:
   proto_files:
   frontend_proto_files:

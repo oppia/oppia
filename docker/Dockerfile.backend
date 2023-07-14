@@ -61,20 +61,11 @@ COPY /extensions/classifiers/proto/ ./extensions/classifiers/proto/
 
 # Installing third party dependencies
 COPY scripts/install_dependencies_json_packages.py ./scripts/install_dependencies_json_packages.py
-COPY scripts/build.py ./scripts/build.py
-COPY scripts/common.py ./scripts/common.py
-COPY scripts/servers.py ./scripts/servers.py
-COPY /core/utils.py ./core/utils.py
-COPY /core/feconf.py ./core/feconf.py
-COPY /core/constants.py ./core/constants.py
-COPY /assets/constants.ts ./assets/constants.ts
-COPY /assets/release_constants.json ./assets/release_constants.json
 COPY dependencies.json .
 
 # Installation for proto buf requires the third party dependencies to be installed (oppia-ml-proto)
 # This also downloads frontend dependencies, which should be removed once the dependencies.json is deprecated
 RUN python -m scripts.install_dependencies_json_packages
-RUN python -m scripts.build
 
 # Compiling the protobuf files
 RUN mkdir /app/oppia/proto_files
@@ -87,6 +78,3 @@ RUN /app/buf-0.29.0/protoc/bin/protoc \
     $PROTOC_FILES_PATH/*.proto
 
 RUN sed -i 's/import text_classifier_pb2 as text__classifier__pb2/from . import text_classifier_pb2 as text__classifier__pb2/' /app/oppia/proto_files/training_job_response_payload_pb2.py
-
-# Note for @Sandeep, we need to copy everything in this stage because we are sharing assets folder (some files are generated within it), so on line 90-91, we copy 2 files only and then in the shared vol it shows only 2 files with 1 generated file. So thats why we are copying everything here. also we are binding the local repo in the compose service vol, so it will handle the hot reloading.
-COPY assets/ ./assets/
