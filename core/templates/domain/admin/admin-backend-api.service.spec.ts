@@ -56,7 +56,11 @@ describe('Admin backend api service', () => {
         total_published_node_count: 0,
         can_edit_topic: true,
         is_published: false,
-        url_fragment: ''
+        url_fragment: '',
+        upcoming_chapters_count: 1,
+        overdue_chapters_count: 1,
+        total_chapters_counts: [5, 4],
+        published_chapters_counts: [3, 4]
       }
     ],
     updatable_roles: ['TOPIC_MANAGER'],

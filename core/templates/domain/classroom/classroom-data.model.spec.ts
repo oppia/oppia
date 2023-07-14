@@ -44,7 +44,11 @@ describe('Classroom data model', () => {
       can_edit_topic: true,
       is_published: true,
       url_fragment: 'some-url-fragment',
-      classroom: 'math'
+      classroom: 'math',
+      upcoming_chapters_count: 1,
+      overdue_chapters_count: 1,
+      total_chapters_counts: [5, 4],
+      published_chapters_counts: [3, 4]
     }];
   });
 

@@ -57,7 +57,11 @@ describe('Admin roles tab component ', function() {
     thumbnail_filename: 'image.svg',
     thumbnail_bg_color: '#C6DCDA',
     is_published: false,
-    can_edit_topic: true
+    can_edit_topic: true,
+    upcoming_chapters_count: 1,
+    overdue_chapters_count: 1,
+    total_chapters_counts: [5, 4],
+    published_chapters_counts: [3, 4]
   };
 
   const sampleTopicSummary: CreatorTopicSummary = (

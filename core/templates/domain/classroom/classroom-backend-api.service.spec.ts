@@ -46,7 +46,11 @@ describe('Classroom backend API service', function() {
     topic_model_last_updated: 3454354354,
     url_fragment: 'topic-name-one',
     can_edit_topic: false,
-    is_published: false
+    is_published: false,
+    upcoming_chapters_count: 1,
+    overdue_chapters_count: 1,
+    total_chapters_counts: [5, 4],
+    published_chapters_counts: [3, 4]
   };
   let secondTopicSummaryDict: CreatorTopicSummaryBackendDict = {
     id: 'topic2',
@@ -66,7 +70,11 @@ describe('Classroom backend API service', function() {
     topic_model_last_updated: 3454354354,
     url_fragment: 'topic-name-two',
     can_edit_topic: false,
-    is_published: false
+    is_published: false,
+    upcoming_chapters_count: 1,
+    overdue_chapters_count: 1,
+    total_chapters_counts: [5, 4],
+    published_chapters_counts: [3, 4]
   };
 
   let responseDictionaries = {

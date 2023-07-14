@@ -27,6 +27,18 @@ import { UrlInterpolationService } from 'domain/utilities/url-interpolation.serv
 import { AlertsService } from 'services/alerts.service';
 import { DeleteTopicModalComponent } from '../modals/delete-topic-modal.component';
 import { TopicsListComponent } from './topics-list.component';
+import { PlatformFeatureService } from
+  '../../../services/platform-feature.service';
+import { CreatorTopicSummary } from
+  'domain/topic/creator-topic-summary.model';
+
+class MockPlatformFeatureService {
+  status = {
+    SerialChapterLaunchCurriculumAdminView: {
+      isEnabled: false
+    }
+  };
+}
 
 describe('Topics List Component', () => {
   let fixture: ComponentFixture<TopicsListComponent>;
@@ -36,6 +48,7 @@ describe('Topics List Component', () => {
   let editableTopicBackendApiService: MockEditableBackendApiService;
   let topicsAndSkillsDashboardBackendApiService:
   TopicsAndSkillsDashboardBackendApiService;
+  let mockPlatformFeatureService = new MockPlatformFeatureService();
   let mockNgbModal: MockNgbModal;
   const topicId: string = 'topicId';
   const topicName: string = 'topic_name';
@@ -110,6 +123,10 @@ describe('Topics List Component', () => {
         {
           provide: NgbModal,
           useClass: MockNgbModal
+        },
+        {
+          provide: PlatformFeatureService,
+          useValue: mockPlatformFeatureService
         }
       ]
     }).compileComponents();
@@ -134,6 +151,19 @@ describe('Topics List Component', () => {
     topicsAndSkillsDashboardBackendApiService = (
       topicsAndSkillsDashboardBackendApiService as unknown) as
       jasmine.SpyObj<TopicsAndSkillsDashboardBackendApiService>;
+  });
+
+
+  it('should get status of Serial Chapter Launch Feature flag', () => {
+    mockPlatformFeatureService.
+      status.SerialChapterLaunchCurriculumAdminView.isEnabled = false;
+    expect(componentInstance.isSerialChapterLaunchFeatureEnabled()).
+      toEqual(false);
+
+    mockPlatformFeatureService.
+      status.SerialChapterLaunchCurriculumAdminView.isEnabled = true;
+    expect(componentInstance.isSerialChapterLaunchFeatureEnabled()).
+      toEqual(true);
   });
 
   it('should create', () => {
@@ -211,5 +241,55 @@ describe('Topics List Component', () => {
     spyOn(alertsService, 'addWarning');
     componentInstance.deleteTopic(topicId, topicName);
     expect(alertsService.addWarning).toHaveBeenCalledWith('error_message');
+  });
+
+  it('should update the displayed topics on applying filters', () => {
+    let topic1 = CreatorTopicSummary.createFromBackendDict({
+      topic_model_created_on: 1581839432987.596,
+      uncategorized_skill_count: 0,
+      canonical_story_count: 1,
+      id: 'wbL5aAyTWfOH1',
+      is_published: true,
+      total_skill_count: 10,
+      total_published_node_count: 6,
+      can_edit_topic: true,
+      topic_model_last_updated: 1581839492500.852,
+      additional_story_count: 0,
+      name: 'Alpha',
+      classroom: 'Math',
+      version: 1,
+      description: 'Alpha description',
+      subtopic_count: 0,
+      language_code: 'en',
+      url_fragment: 'alpha',
+      thumbnail_filename: 'image.svg',
+      thumbnail_bg_color: '#C6DCDA',
+      upcoming_chapters_count: 1,
+      overdue_chapters_count: 1,
+      total_chapters_counts: [5, 4],
+      published_chapters_counts: [3, 4]
+    });
+    componentInstance.topicSummaries = [topic1];
+
+    componentInstance.ngOnChanges();
+
+    expect(
+      componentInstance.fullyPublishedStoriesCounts.length).toBe(1);
+    expect(componentInstance.fullyPublishedStoriesCounts[0]).toBe(1);
+    expect(
+      componentInstance.partiallyPublishedStoriesCounts.length).toBe(1);
+    expect(
+      componentInstance.partiallyPublishedStoriesCounts[0]).toBe(1);
+    expect(
+      componentInstance.
+        totalChaptersInPartiallyPublishedStories.length).toBe(1);
+    expect(
+      componentInstance.totalChaptersInPartiallyPublishedStories[0]).toBe(5);
+    expect(
+      componentInstance.
+        publishedChaptersInPartiallyPublishedStories.length).toBe(1);
+    expect(
+      componentInstance.
+        publishedChaptersInPartiallyPublishedStories[0]).toBe(3);
   });
 });

@@ -19,6 +19,7 @@ are created.
 from __future__ import annotations
 
 import base64
+import datetime
 
 from core import android_validation_constants
 from core import feconf
@@ -36,6 +37,7 @@ from core.domain import skill_domain
 from core.domain import skill_fetchers
 from core.domain import skill_services
 from core.domain import state_domain
+from core.domain import story_fetchers
 from core.domain import topic_domain
 from core.domain import topic_fetchers
 from core.domain import topic_services
@@ -49,6 +51,10 @@ class FrontendTopicSummaryDict(topic_domain.TopicSummaryDict):
     is_published: bool
     can_edit_topic: bool
     classroom: Optional[str]
+    upcoming_chapters_count: int
+    overdue_chapters_count: int
+    total_chapters_counts: List[int]
+    published_chapters_counts: List[int]
 
 
 class TopicsAndSkillsDashboardPage(
@@ -117,6 +123,40 @@ class TopicsAndSkillsDashboardPageDataHandler(
         for topic_summary_dict in topic_summary_dicts:
             topic_summary_dict['classroom'] = topic_classroom_dict.get(
                 topic_summary_dict['id'], None)
+            topic = topic_fetchers.get_topic_by_id(topic_summary_dict['id'])
+            upcoming_chapters_count = 0
+            overdue_chapters_count = 0
+            total_chapters_counts = []
+            published_chapters_counts = []
+            for story_reference in topic.canonical_story_references:
+                story = story_fetchers.get_story_by_id(
+                    story_reference.story_id)
+                nodes = story.story_contents.nodes
+
+                total_chapters_count = len(nodes)
+                published_chapters_count = len(
+                    [node for node in nodes if
+                    node.status == 'Published'])
+                upcoming_chapters_count += len(
+                    [node for node in nodes if
+                    node.planned_publication_date is not None and (
+                    node.planned_publication_date - datetime.datetime.today()).
+                    days < 14 and node.planned_publication_date >
+                    datetime.datetime.today() and node.status != 'Published'])
+                overdue_chapters_count += len(
+                    [node for node in nodes if
+                    node.planned_publication_date is not None and
+                    node.planned_publication_date < datetime.datetime.today()
+                    and node.status != 'Published'])
+
+                total_chapters_counts.append(total_chapters_count)
+                published_chapters_counts.append(published_chapters_count)
+            topic_summary_dict.update({
+                'upcoming_chapters_count': upcoming_chapters_count,
+                'overdue_chapters_count': overdue_chapters_count,
+                'total_chapters_counts': total_chapters_counts,
+                'published_chapters_counts': published_chapters_counts
+            })
 
         mergeable_skill_summary_dicts = []
 
