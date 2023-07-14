@@ -30,9 +30,9 @@ describe('InsertScriptService', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       providers: [{
-          provide: Renderer2,
-          useValue: MockRenderer,
-        }]});
+        provide: Renderer2,
+        useValue: MockRenderer,
+      }]});
     insertScriptService = TestBed.get(InsertScriptService);
   });
 
