@@ -36,13 +36,12 @@ def main() -> None:
     with open('requirements.txt', encoding='utf-8') as requirements_txt: # pylint: disable=replace-disallowed-function-calls
         requirements_content = requirements_txt.read()
         modified_requirements_content = re.sub(
-            r'^\s*--hash=sha256:.*$', '',
-            requirements_content, flags=re.MULTILINE
+            r'^\s*--hash=sha256:.*$|\\$',
+            '',
+            requirements_content,
+            flags=re.MULTILINE
         )
 
-        modified_requirements_content = re.sub(
-            r'\\$', '', modified_requirements_content, flags=re.MULTILINE
-        )
         # The 'parse_requirements' returns a list of 'Requirement' objects.
         # We need to transform these to strings using the str() function.
         required_packages = [
