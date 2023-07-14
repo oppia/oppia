@@ -34,9 +34,9 @@ export class InsertScriptService {
     this.renderer = rendererFactory.createRenderer(null, null);
   }
 
-  loadScript(script: KNOWN_SCRIPTS): void {
+  loadScript(script: KNOWN_SCRIPTS): boolean {
     if (this.loaded_scripts.has(script)) {
-      return;
+      return false;
     }
     const scriptElement = document.createElement('script');
     switch (script) {
@@ -51,6 +51,7 @@ export class InsertScriptService {
         break;
       }
     }
+    return true;
   }
 }
 
