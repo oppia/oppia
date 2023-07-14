@@ -812,6 +812,9 @@ describe('GraphVizComponent', () => {
       new ElementRef(document.createElement('button'))
     ];
 
+    buttonElements[0].nativeElement.classList.add('e2e-test-one-button');
+    buttonElements[1].nativeElement.classList.add('e2e-test-two-button');
+
     spyOn(dot.nativeElement, 'getBoundingClientRect')
       .and.returnValue({
         top: 100,
@@ -822,9 +825,9 @@ describe('GraphVizComponent', () => {
 
     spyOn(buttonElements[0].nativeElement, 'getBoundingClientRect')
       .and.returnValue({
-        top: 105,
+        top: 90,
         bottom: 135,
-        left: 205,
+        left: 190,
         right: 275
     });
     spyOn(buttonElements[1].nativeElement, 'getBoundingClientRect')
