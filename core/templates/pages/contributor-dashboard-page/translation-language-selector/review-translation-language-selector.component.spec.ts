@@ -118,7 +118,7 @@ describe('Review Translation language selector', () => {
     expect(component.languageIdToDescription.fr).toBe('français (French)');
   });
 
-  it('should correctly initialize dropdown activeLanguageCode', () => { 
+  it('should correctly initialize dropdown activeLanguageCode', () => {
     const dropdown = (
       fixture.nativeElement.querySelector(
         '.oppia-review-translation-language-selector-inner-container'));
