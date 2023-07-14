@@ -110,6 +110,11 @@ class CreatorDashboardHandlerTests(test_utils.GenericTestBase):
     EXP_TITLE_3: Final = 'Exploration title 3'
 
     def setUp(self) -> None:
+        """Set up the test case.
+
+        Performs the necessary setup steps, including signing up users
+        and retrieving user information.
+        """
         super().setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.OWNER_EMAIL_1, self.OWNER_USERNAME_1)
@@ -127,6 +132,7 @@ class CreatorDashboardHandlerTests(test_utils.GenericTestBase):
         self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
 
     def test_no_explorations(self) -> None:
+        """Case to verify that the explorations list is empty for a user."""
         self.login(self.OWNER_EMAIL)
         response = self.get_json(feconf.CREATOR_DASHBOARD_DATA_URL)
         self.assertEqual(response['explorations_list'], [])
