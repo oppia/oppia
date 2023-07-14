@@ -844,7 +844,7 @@ describe('GraphVizComponent', () => {
     const result = component.isButtonOnTopOfDot();
 
     expect(result).toBe(true);
-    expect(buttonElements[0].nativeElement.dispatchEvent)
+    expect(buttonElements[0].dispatchEvent)
       .toHaveBeenCalledWith(new MouseEvent('click'));
   });
 
