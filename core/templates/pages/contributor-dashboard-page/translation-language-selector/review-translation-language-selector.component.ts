@@ -72,8 +72,8 @@ export class ReviewTranslationLanguageSelectorComponent implements OnInit {
     this.userService.getUserContributionRightsDataAsync()
       .then(userContributionRights => {
         if (!userContributionRights) {
-	  throw new Error('User contribution rights not found.');
-	}
+          throw new Error('User contribution rights not found.');
+        }
         this.filteredOptions = this.options = userContributionRights
           .can_review_translation_for_language_codes.map(languageCode => {
             const description = this.languageUtilService
