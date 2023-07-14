@@ -781,9 +781,15 @@ describe('GraphVizComponent', () => {
     component.dotCursorCoordinateX = 0;
     component.dotCursorCoordinateY = 0;
 
+    const graphAreaElement = document.createElement('div');
+    graphAreaElement.classList.add('oppia-graph-viz-svg');
+    graphAreaElement.style.position = 'absolute';
+    graphAreaElement.style.left = '0px';
+    graphAreaElement.style.top = '0px';
+
     const graphAreaRect = {
-      left: 9,
-      top: 4053.5
+      left: 0,
+      top: 0
     };
 
     component.mousemoveGraphSVG(event);
