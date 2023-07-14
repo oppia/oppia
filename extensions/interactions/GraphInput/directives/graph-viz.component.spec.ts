@@ -792,10 +792,12 @@ describe('GraphVizComponent', () => {
       top: 0
     };
 
+    component.graphArea = new ElementRef(graphAreaElement);
+
     component.mousemoveGraphSVG(event);
 
-    expect(component.dotCursorCoordinateX).toBe(event.clientX - graphAreaRect.left);
-    expect(component.dotCursorCoordinateY).toBe(event.clientY - graphAreaRect.top);
+    expect(component.dotCursorCoordinateX).toBe(100);
+    expect(component.dotCursorCoordinateY).toBe(100);
     expect(dotCursorElement.style.top).toBe(component.dotCursorCoordinateY + 'px');
     expect(dotCursorElement.style.left).toBe(component.dotCursorCoordinateX + 'px');
   });
