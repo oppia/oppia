@@ -85,18 +85,6 @@ const routes: Route[] = [
       .then(m => m.FeedbackUpdatesPageModule)
   },
   {
-    path: (
-      AppConstants
-        .PAGES_REGISTERED_WITH_FRONTEND.CONTRIBUTOR_ADMIN_DASHBOARD.ROUTE
-    ),
-    pathMatch: 'full',
-    loadChildren: () => import(
-      'pages/contributor-admin-dashboard-page/' +
-      'contributor-admin-dashboard-page.module'
-    )
-      .then(m => m.ContributorAdminDashboardPageModule)
-  },
-  {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.PROFILE.ROUTE,
     loadChildren: () => import('pages/profile-page/profile-page.module')
       .then(m => m.ProfilePageModule)

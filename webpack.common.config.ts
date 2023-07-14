@@ -84,9 +84,6 @@ module.exports = {
     contributor_dashboard_admin:
       commonPrefix + '/pages/contributor-dashboard-admin-page/' +
       'contributor-dashboard-admin-page.import.ts',
-    contributor_admin_dashboard:
-      commonPrefix + '/pages/contributor-admin-dashboard-page/' +
-      'contributor-admin-dashboard-page.import.ts',
     diagnostic_test_player_page:
       commonPrefix + '/pages/diagnostic-test-player-page/' +
       'diagnostic-test-player-page.import.ts',
@@ -299,17 +296,6 @@ module.exports = {
       template:
         commonPrefix + '/pages/contributor-dashboard-admin-page/' +
         'contributor-dashboard-admin-page.mainpage.html',
-      minify: htmlMinifyConfig,
-      inject: false
-    }),
-    new HtmlWebpackPlugin({
-      chunks: ['contributor_admin_dashboard'],
-      filename: 'contributor-admin-dashboard-page-root.component.html',
-      hybrid: true,
-      meta: defaultMeta,
-      template:
-        commonPrefix + '/pages/contributor-dashboard-admin-page/' +
-        'contributor-admin-dashboard-page-root.component.html',
       minify: htmlMinifyConfig,
       inject: false
     }),
