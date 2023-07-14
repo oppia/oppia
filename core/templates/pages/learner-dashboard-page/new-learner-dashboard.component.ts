@@ -250,11 +250,56 @@ export class NewLearnerDashboardComponent implements OnInit {
         );
     });
 
+    let dashboardCollectionsDataPromise = (
+      this.learnerDashboardBackendApiService
+        .fetchLearnerDashboardCollectionsDataAsync());
+    dashboardCollectionsDataPromise.then(
+      responseData => {
+        console.error(responseData, 'res of collec...');
+        this.completedCollectionsList = (
+          responseData.completedCollectionsList);
+        this.incompleteCollectionsList = (
+          responseData.incompleteCollectionsList);
+        this.completedToIncompleteCollections = (
+          responseData.completedToIncompleteCollections);
+        this.collectionPlaylist = responseData.collectionPlaylist;
+      }, errorResponseStatus => {
+        if (
+          AppConstants.FATAL_ERROR_CODES.indexOf(errorResponseStatus
+          ) !== -1) {
+          this.alertsService.addWarning(
+            'Failed to get learner dashboard collections data');
+        }
+      }
+    );
 
+    let dashboardExplorationsDataPromise = (
+      this.learnerDashboardBackendApiService
+        .fetchLearnerDashboardExplorationsDataAsync());
+    dashboardExplorationsDataPromise.then(
+      responseData => {
+        console.error(responseData, 'res of explora...');
+        this.completedExplorationsList = (
+          responseData.completedExplorationsList);
+        this.incompleteExplorationsList = (
+          responseData.incompleteExplorationsList);
+        this.subscriptionsList = responseData.subscriptionList;
+        this.explorationPlaylist = responseData.explorationPlaylist;
+      }, errorResponseStatus => {
+        if (
+          AppConstants.FATAL_ERROR_CODES.indexOf(errorResponseStatus
+          ) !== -1) {
+          this.alertsService.addWarning(
+            'Failed to get learner dashboard explorations data');
+        }
+      }
+    );
     Promise.all([
       userInfoPromise,
       dashboardTopicAndStoriesDataPromise,
-      learnerGroupFeatureIsEnabledPromise
+      learnerGroupFeatureIsEnabledPromise,
+      dashboardCollectionsDataPromise,
+      dashboardExplorationsDataPromise,
     ]).then(() => {
       setTimeout(() => {
         this.loaderService.hideLoadingScreen();

@@ -66,8 +66,6 @@ export class HomeTabComponent {
   classroomUrlFragment!: string;
   goalTopicsLength!: number;
   width!: number;
-  startIndexInPlaylist: number = 0;
-  endIndexInPlaylist: number = 3;
   noPlaylistActivity: boolean = false;
   showMoreInPlaylistSection: boolean = false;
   CLASSROOM_LINK_URL_TEMPLATE: string = '/learn/<classroom_url_fragment>';
@@ -101,19 +99,6 @@ export class HomeTabComponent {
   ) {}
 
   ngOnInit(): void {
-    setTimeout(() => {
-      this.noPlaylistActivity = (
-        (this.explorationPlaylist.length === 0) &&
-      (this.collectionPlaylist.length === 0));
-
-      this.totalLessonsInPlaylist.push(
-        ...this.explorationPlaylist, ...this.collectionPlaylist);
-
-      this.startIndexInPlaylist = 0;
-      this.endIndexInPlaylist = this.totalLessonsInPlaylist.length;
-    }, 2000);
-    this.totalExploration.push(
-      ...this.explorationPlaylist, ...this.incompleteExplorationsList);
     this.width = this.widthConst * (this.currentGoals.length);
     var allGoals = [...this.currentGoals, ...this.partiallyLearntTopicsList];
     this.currentGoalsLength = this.currentGoals.length;
@@ -163,6 +148,15 @@ export class HomeTabComponent {
         }
       }
     }
+    setTimeout(() => {
+      this.noPlaylistActivity = (
+        (this.explorationPlaylist.length === 0) &&
+    (this.collectionPlaylist.length === 0));
+      this.totalLessonsInPlaylist.push(
+        ...this.explorationPlaylist, ...this.collectionPlaylist);
+    }, 2000);
+    this.totalExploration.push(
+      ...this.explorationPlaylist, ...this.incompleteExplorationsList);
     this.storyExplorationProgressList.push(
       ...this.storyInProgress, ...this.incompleteExplorationsList);
 

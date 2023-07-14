@@ -5,6 +5,14 @@ font-style: normal;
 font-weight: 500;
 }
 
+.oppia-carousel-bar .oppia-carousel-content {
+  overflow: scroll;
+}
+
+.oppia-carousel-bar .oppia-coursel-container {
+  display: inline-grid;
+}
+
 .oppia-carousel-bar .oppia-carousel-head-content {
   display: flex;
   justify-content: space-between;
@@ -20,10 +28,10 @@ font-weight: 500;
   display: flex;
   flex-wrap: nowrap;
   gap: 16px;
-  overflow: scroll;
+  overflow: hidden;
 }
 
-.oppia-carousel-bar .tiles::-webkit-scrollbar {
+.oppia-carousel-bar .oppia-carousel-content::-webkit-scrollbar {
   display: none;
 }
 

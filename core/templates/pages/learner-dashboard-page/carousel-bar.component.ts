@@ -16,7 +16,7 @@
  * @fileoverview Component for Carouselbar in the Learner Dashboard page.
  */
 
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnInit, AfterViewInit } from '@angular/core';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { DeviceInfoService } from 'services/contextual/device-info.service';
 import { Subscription } from 'rxjs';
@@ -30,13 +30,14 @@ import './carousel-bar.component.css';
   templateUrl: './carousel-bar.component.html',
   styleUrls: ['./carousel-bar.component.css']
 })
-export class CarouselBarComponent implements OnInit {
+export class CarouselBarComponent implements AfterViewInit, OnInit {
   CarouselScrollWidthPx: number;
   CarouselClientWidthPx: number;
   untrackedTopicTiles: boolean = true;
   carouselScrollPositionPx: number = 0;
   disableLeftButton: boolean = true;
   disableRightButton: boolean = false;
+  isScrollable: boolean = false;
  @Input() carouselClassname: string;
  @Input() scrollUntrackedTopics: boolean = false;
 
@@ -65,18 +66,16 @@ export class CarouselBarComponent implements OnInit {
    this.windowIsNarrow = this.windowDimensionService.isWindowNarrow();
    this.directiveSubscriptions.add(
      this.windowDimensionService.getResizeEvent().subscribe(() => {
-       this.isScrollable();
-       let classname = this.carouselClassname + '.tiles';
-       let carouselSelector = document.querySelector(classname) as HTMLElement;
-       carouselSelector.scrollTo(0, 0);
-       this.carouselScrollPositionPx = 0;
-       this.disableLeftButton = true;
-       this.disableRightButton = false;
+       this.isScrollable = this.initCarousel();
        this.windowIsNarrow = this.windowDimensionService.isWindowNarrow();
      }));
  }
 
-
+ ngAfterViewInit(): void {
+   setTimeout(() => {
+     this.isScrollable = this.initCarousel();
+   });
+ }
 
  scroll(isLeftScroll: boolean): void {
    let classname = this.carouselClassname + '.tiles';
@@ -122,11 +121,18 @@ export class CarouselBarComponent implements OnInit {
    }
  }
 
- isScrollable(): boolean {
+ initCarousel(): boolean {
    let classname = this.carouselClassname + '.tiles';
    let carouselSelector = document.querySelector(classname) as HTMLElement;
-   let carouselScrollWidthPx = carouselSelector.scrollWidth;
-   let carouselClientWidthPx = carouselSelector.clientWidth;
-   return (carouselScrollWidthPx > carouselClientWidthPx);
+   this.carouselScrollPositionPx = 0;
+   this.disableLeftButton = true;
+   this.disableRightButton = false;
+   if (carouselSelector) {
+     carouselSelector.scrollTo(0, 0);
+     let carouselScrollWidthPx = carouselSelector.scrollWidth;
+     let carouselClientWidthPx = carouselSelector.clientWidth;
+     return (carouselScrollWidthPx > carouselClientWidthPx);
+   }
+   return false;
  }
 }

@@ -2,37 +2,29 @@
   <div tabindex="0" class="greeting" [ngStyle]="!windowIsNarrow && {'margin-top': '27px'}">
     Welcome, {{ username }}!
   </div>
-  <div tabindex="0" class="continue-where-you-left-off"
-    *ngIf="continueWhereYouLeftOffList.length !== 0">
+  <div tabindex="0" class="continue-where-you-left-off" *ngIf="continueWhereYouLeftOffList.length !== 0">
     <p class="continue-where-you-left-off-heading"
       [innerHTML]="'I18N_LEARNER_DASHBOARD_CONTINUE_WHERE_YOU_LEFT_OFF_SECTION' | translate"
       *ngIf="continueWhereYouLeftOffList.length !== 0">
     </p>
-      <div class="continue-where-you-left-off-container">
+    <div class="continue-where-you-left-off-container">
       <div class="continue-where-you-left-off-section">
         <div *ngIf="storyExplorationProgressList.length !== 0" class="oppia-story-exploration-in-progress inprogress">
           <oppia-carousel-bar [carouselClassname]="'.inprogress '">
             <div *ngFor="let summaryTile of storyExplorationProgressList">
               <div *ngIf="getstoryExplorationTileType(summaryTile) === 'story'">
-                <oppia-learner-story-summary-tile
-                [storySummary]="summaryTile.storySummary"
-                [displayArea]="'homeTab'"
-                [topicName]="summaryTile.topicName"
-                [markTileAsGoal]="summaryTile.markTileAsGoal"
-                [learnerGroupTitle]="summaryTile.learnerGroupTitle">
-              </oppia-learner-story-summary-tile>
+                <oppia-learner-story-summary-tile [storySummary]="summaryTile.storySummary" [displayArea]="'homeTab'"
+                  [topicName]="summaryTile.topicName" [markTileAsGoal]="summaryTile.markTileAsGoal"
+                  [learnerGroupTitle]="summaryTile.learnerGroupTitle">
+                </oppia-learner-story-summary-tile>
               </div>
               <div *ngIf="getstoryExplorationTileType(summaryTile) === 'exploration'">
-                <oppia-exploration-summary-tile
-                [explorationId]="summaryTile.id"
-                [explorationTitle]="summaryTile.title"
-                [objective]="summaryTile.objective"
-                [explorationProgress]="explorationToProgressMap.get(summaryTile.id)" 
-                [category]="summaryTile.category"
-                [displayAreaIsLearnerDashboard]="true" 
-                [thumbnailIconUrl]="summaryTile.thumbnailIconUrl"
-                [thumbnailBgColor]="summaryTile.thumbnailBgColor">
-              </oppia-exploration-summary-tile>
+                <oppia-exploration-summary-tile [explorationId]="summaryTile.id" [explorationTitle]="summaryTile.title"
+                  [objective]="summaryTile.objective"
+                  [explorationProgress]="explorationToProgressMap.get(summaryTile.id)" [category]="summaryTile.category"
+                  [displayAreaIsLearnerDashboard]="true" [thumbnailIconUrl]="summaryTile.thumbnailIconUrl"
+                  [thumbnailBgColor]="summaryTile.thumbnailBgColor">
+                </oppia-exploration-summary-tile>
               </div>
             </div>
           </oppia-carousel-bar>
@@ -40,13 +32,10 @@
         <div *ngIf="storyInRecommended.length !== 0" class="story-recommended recommended">
           <oppia-carousel-bar [carouselClassname]="'.recommended '">
             <div *ngFor="let storySummaryTile of storyInRecommended">
-              <oppia-learner-story-summary-tile
-              [storySummary]="storySummaryTile.storySummary"
-              [displayArea]="'homeTab'"
-              [topicName]="storySummaryTile.topicName"
-              [markTileAsGoal]="storySummaryTile.markTileAsGoal"
-              [learnerGroupTitle]="storySummaryTile.learnerGroupTitle">
-            </oppia-learner-story-summary-tile>
+              <oppia-learner-story-summary-tile [storySummary]="storySummaryTile.storySummary" [displayArea]="'homeTab'"
+                [topicName]="storySummaryTile.topicName" [markTileAsGoal]="storySummaryTile.markTileAsGoal"
+                [learnerGroupTitle]="storySummaryTile.learnerGroupTitle">
+              </oppia-learner-story-summary-tile>
             </div>
           </oppia-carousel-bar>
         </div>
@@ -59,14 +48,12 @@
     <p class="suggested-for-you-heading" [innerHTML]="'I18N_LEARNER_DASHBOARD_LEARN_SOMETHING_NEW_SECTION' | translate">
     </p>
     <div class="oppia-learner-dashboard-search-container">
-     <div class="oppia-learner-dashboard-search-section">
-      <oppia-search-bar [enableDropup]="false" [learnerDashboardSearch]="true"></oppia-search-bar>
-     </div>
+      <div class="oppia-learner-dashboard-search-section">
+        <oppia-search-bar [enableDropup]="false" [learnerDashboardSearch]="true"></oppia-search-bar>
+      </div>
     </div>
     <div *ngFor="let item of untrackedTopics | keyvalue" class="untracked-topics">
-      <oppia-carousel-bar
-      [scrollUntrackedTopics]="true"
-      [carouselClassname]="'.shivam '">
+      <oppia-carousel-bar [scrollUntrackedTopics]="true" [carouselClassname]="'.shivam '">
         <div *ngFor="let topicSummaryTile of item.value" class="topic-summary-tile">
           <oppia-learner-topic-summary-tile [topicSummary]="topicSummaryTile">
           </oppia-learner-topic-summary-tile>
@@ -89,45 +76,27 @@
           <div *ngFor="let summaryTile of totalLessonsInPlaylist" class="oppia-summary-tile-container"
             (mouseenter)="summaryTile.toggle = !summaryTile.toggle"
             (mouseleave)="summaryTile.toggle = !summaryTile.toggle">
-  
+
             <div *ngIf="getTileType(summaryTile) === 'exploration'">
-              <i class="remove-icon fa fa-times"
-              *ngIf="summaryTile.toggle || windowIsNarrow"
-              aria-hidden="true"
-              (click)="openRemoveActivityModal('I18N_LEARNER_DASHBOARD_PLAYLIST_SECTION', 'I18N_DASHBOARD_EXPLORATIONS', summaryTile)"
-                ngbTooltip="Remove"
-                container="body"
-                placement="top">
+              <i class="remove-icon fa fa-times" *ngIf="summaryTile.toggle || windowIsNarrow" aria-hidden="true"
+                (click)="openRemoveActivityModal('I18N_LEARNER_DASHBOARD_PLAYLIST_SECTION', 'I18N_DASHBOARD_EXPLORATIONS', summaryTile)"
+                ngbTooltip="Remove" container="body" placement="top">
               </i>
-              <oppia-exploration-summary-tile
-                [explorationId]="summaryTile.id"
-                [explorationTitle]="summaryTile.title"
-                [objective]="summaryTile.objective"
-                [explorationProgress]="explorationToProgressMap.get(summaryTile.id)"
-                [category]="summaryTile.category"
-                [displayAreaIsLearnerDashboard]="true"
-                [thumbnailIconUrl]="summaryTile.thumbnailIconUrl"
-                [thumbnailBgColor]="summaryTile.thumbnailBgColor">
+              <oppia-exploration-summary-tile [explorationId]="summaryTile.id" [explorationTitle]="summaryTile.title"
+                [objective]="summaryTile.objective" [explorationProgress]="explorationToProgressMap.get(summaryTile.id)"
+                [category]="summaryTile.category" [displayAreaIsLearnerDashboard]="true"
+                [thumbnailIconUrl]="summaryTile.thumbnailIconUrl" [thumbnailBgColor]="summaryTile.thumbnailBgColor">
               </oppia-exploration-summary-tile>
             </div>
             <div *ngIf="getTileType(summaryTile) === 'collection'">
-              <i class="remove-icon fa fa-times" 
-              *ngIf="summaryTile.toggle || windowIsNarrow" 
-              aria-hidden="true"
-              (click)="openRemoveActivityModal('I18N_LEARNER_DASHBOARD_PLAYLIST_SECTION', 'I18N_DASHBOARD_COLLECTIONS', summaryTile)"
-                ngbTooltip="Remove" 
-                container="body" 
-                placement="top">
+              <i class="remove-icon fa fa-times" *ngIf="summaryTile.toggle || windowIsNarrow" aria-hidden="true"
+                (click)="openRemoveActivityModal('I18N_LEARNER_DASHBOARD_PLAYLIST_SECTION', 'I18N_DASHBOARD_COLLECTIONS', summaryTile)"
+                ngbTooltip="Remove" container="body" placement="top">
               </i>
-              <oppia-collection-summary-tile 
-                [getCollectionId]="summaryTile.id" 
-                [getCollectionTitle]="summaryTile.title"
-                [displayAreaIsLearnerDashboard]="true"
-                [getLastUpdatedMsec]="summaryTile.lastUpdatedMsec" 
-                [getObjective]="summaryTile.objective"
-                [getNodeCount]="summaryTile.nodeCount" 
-                [getCategory]="summaryTile.category"
-                [getThumbnailIconUrl]="summaryTile.thumbnailIconUrl" 
+              <oppia-collection-summary-tile [getCollectionId]="summaryTile.id" [getCollectionTitle]="summaryTile.title"
+                [displayAreaIsLearnerDashboard]="true" [getLastUpdatedMsec]="summaryTile.lastUpdatedMsec"
+                [getObjective]="summaryTile.objective" [getNodeCount]="summaryTile.nodeCount"
+                [getCategory]="summaryTile.category" [getThumbnailIconUrl]="summaryTile.thumbnailIconUrl"
                 [getThumbnailBgColor]="summaryTile.thumbnailBgColor">
               </oppia-collection-summary-tile>
             </div>
@@ -136,11 +105,10 @@
       </div>
     </div>
   </div>
- 
+
   <div class="oppia-learner-group-container">
     <div *ngIf="learnerGroupFeatureIsEnable">
-      <oppia-learner-groups-tab [username]="username"
-                                (setActiveSection)="setActiveSection($event)">
+      <oppia-learner-groups-tab [username]="username" (setActiveSection)="setActiveSection($event)">
       </oppia-learner-groups-tab>
     </div>
   </div>

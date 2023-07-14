@@ -1016,9 +1016,9 @@ title: Old Title
 
 
 def test_get_user_progress_in_exploration(self) -> None:
-        auth_id = 'test_id'
-        username = 'testname'
-        user_email = 'test@email.com'
+        auth_id: str = 'test_id'
+        username: str = 'testname'
+        user_email: str = 'test@email.com'
         user_id = user_services.create_new_user(auth_id, user_email).user_id
         user_services.set_username(user_id, username)
         self.exp_id = exp_fetchers.get_new_exploration_id()
