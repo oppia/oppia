@@ -851,32 +851,41 @@ describe('GraphVizComponent', () => {
   });
 
   it('should return false when no button is on top of dot', () => {
-    const dot = new ElementRef(document.createElement('div'));
-    dot.nativeElement.classList.add('oppia-add-node-cursor');
+    const dotElement = document.createElement('div');
+    dotElement.classList.add('oppia-add-node-cursor');
 
     const buttonElements = [
-      new ElementRef(document.createElement('button')),
-      new ElementRef(document.createElement('button'))
+      document.createElement('button'),
+      document.createElement('button')
     ];
 
-    spyOn(dot.nativeElement, 'getBoundingClientRect').and.returnValue({
-      top: 100,
-      bottom: 110,
-      left: 200,
-      right: 210
+    buttonElements[0].classList.add('e2e-test-one-button');
+    buttonElements[1].classList.add('e2e-test-two-button');
+
+    spyOn(document, 'querySelector').and.returnValue(dotElement);
+    spyOn(document, 'querySelectorAll').and.returnValue(buttonElements);
+
+    spyOn(dotElement, 'getBoundingClientRect')
+      .and.returnValue({
+        top: 100,
+        bottom: 110,
+        left: 200,
+        right: 210
     });
 
-    spyOn(buttonElements[0].nativeElement, 'getBoundingClientRect').and.returnValue({
-      top: 50,
-      bottom: 80,
-      left: 150,
-      right: 220
+    spyOn(buttonElements[0], 'getBoundingClientRect')
+      .and.returnValue({
+        top: 50,
+        bottom: 80,
+        left: 150,
+        right: 220
     });
-    spyOn(buttonElements[1].nativeElement, 'getBoundingClientRect').and.returnValue({
-      top: 120,
-      bottom: 150,
-      left: 220,
-      right: 290
+    spyOn(buttonElements[1], 'getBoundingClientRect')
+      .and.returnValue({
+        top: 120,
+        bottom: 150,
+        left: 220,
+        right: 290
     });
 
     const result = component.isButtonOnTopOfDot();
