@@ -25,15 +25,15 @@ describe('InsertScriptService', () => {
     TestBed.configureTestingModule({
       providers: [
         Renderer2,
-      ]})
-      insertScriptService = TestBed.get(InsertScriptService);
-    });
-  
-    fit('should insert script into html', () => {
-      spyOn(insertScriptService.renderer, 'appendChild');
-      //first time load script
-      expect(insertScriptService.loadScript(KNOWN_SCRIPTS.DONORBOX)).toBe(true);
-      //load script again
-      expect(insertScriptService.loadScript(KNOWN_SCRIPTS.DONORBOX)).toBe(false);
-    });
+      ]});
+    insertScriptService = TestBed.get(InsertScriptService);
   });
+  
+  fit('should insert script into html', () => {
+    spyOn(insertScriptService.renderer, 'appendChild');
+    //first time load script
+    expect(insertScriptService.loadScript(KNOWN_SCRIPTS.DONORBOX)).toBe(true);
+    //load script again
+    expect(insertScriptService.loadScript(KNOWN_SCRIPTS.DONORBOX)).toBe(false);
+  });
+});
