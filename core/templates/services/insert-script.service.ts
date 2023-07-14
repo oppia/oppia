@@ -21,6 +21,7 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 
 export enum KNOWN_SCRIPTS {
   DONORBOX = 'DONORBOX',
+  UNKNOWN = 'UNKNOWN',
 }
 
 @Injectable({
