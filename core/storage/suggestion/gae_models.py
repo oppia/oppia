@@ -3278,7 +3278,7 @@ class QuestionReviewerTotalContributionStatsModel(base_models.BaseModel):
         Returns:
             3-tuple(sorted_results, next_offset, more). where:
                 sorted_results:
-                    list(TranslationSubmitterTotalContributionStatsModel).
+                    list(QuestionReviewerTotalContributionStatsModel).
                     The list of models which match the supplied
                     num_days_since_last_activity filters,
                     returned in the order specified by sort_by.
