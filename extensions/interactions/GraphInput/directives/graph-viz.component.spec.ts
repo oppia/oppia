@@ -766,6 +766,8 @@ describe('GraphVizComponent', () => {
       clientX: 100,
       clientY: 100
     });
+    component.ngAfterViewInit();
+    component.state.currentMode = 2;
     const dotCursorElement = document.createElement('div');
     dotCursorElement.classList.add('oppia-add-node-cursor');
     dotCursorElement.style.top = '0px';
@@ -775,9 +777,6 @@ describe('GraphVizComponent', () => {
     component.interactionIsActive = true;
     component.dotCursorCoordinateX = 0;
     component.dotCursorCoordinateY = 0;
-    
-    component.ngAfterViewInit();
-    component.state.currentMode = 2;
     component.mousemoveGraphSVG(event);
 
     expect(component.dotCursorCoordinateX).toBe(event.clientX - graphAreaRect.left);
