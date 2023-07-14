@@ -25,6 +25,7 @@ import re
 
 from core import feconf
 from core.constants import constants
+from core.domain import contribution_stats_services
 from core.domain import email_manager
 from core.domain import exp_fetchers
 from core.domain import feedback_services
@@ -41,9 +42,8 @@ from core.domain import user_services
 from core.platform import models
 
 from typing import (
-    Callable, Dict, Final, List, Literal, Mapping, Match, Optional,
-    Sequence, Set, Tuple, Union, cast, overload
-)
+    Callable, Dict, Final, List, Literal, Mapping, Match,
+    Optional, Sequence, Set, Tuple, Union, cast, overload)
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -95,6 +95,8 @@ SUGGESTION_EMPHASIZED_TEXT_GETTER_FUNCTIONS: Dict[str, Callable[..., str]] = {
     feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT: SUGGESTION_TRANSLATE_CONTENT_HTML,
     feconf.SUGGESTION_TYPE_ADD_QUESTION: SUGGESTION_ADD_QUESTION_HTML
 }
+
+RECENT_REVIEW_OUTCOMES_LIMIT: Final = 100
 
 
 @overload
@@ -2484,10 +2486,197 @@ def _update_question_review_stats_models(
         stats_models_to_update)
 
 
+def _update_translation_submitter_total_stats_model(
+    translation_submitter_total_stats:
+        suggestion_registry.TranslationSubmitterTotalContributionStats
+) -> None:
+    """Updates TranslationSubmitterTotalContributionStats
+    model for given translation submitter stats.
+
+    Args:
+        translation_submitter_total_stats:
+            TranslationSubmitterTotalContributionStats.
+            TranslationSubmitterTotalContributionStats domain object.
+
+    Raises:
+        Exception. Language is None.
+        Exception. Contributor user ID is None.
+    """
+
+    stats_model = suggestion_models.TranslationSubmitterTotalContributionStatsModel.get( # pylint: disable=line-too-long
+            translation_submitter_total_stats.language_code,
+            translation_submitter_total_stats.contributor_id)
+
+    # We assert here because we are calling this method only when the model
+    # exists. If model doesn't exist we create a new model in
+    # update_translation_contribution_stats_at_submission or
+    # update_translation_contribution_stats_at_review.
+    assert stats_model is not None
+    stats_model.topic_ids_with_translation_submissions = (
+        translation_submitter_total_stats
+        .topic_ids_with_translation_submissions)
+    stats_model.recent_review_outcomes = (
+        translation_submitter_total_stats.recent_review_outcomes)
+    stats_model.recent_performance = (
+        translation_submitter_total_stats.recent_performance)
+    stats_model.overall_accuracy = (
+        translation_submitter_total_stats.overall_accuracy)
+    stats_model.submitted_translations_count = (
+        translation_submitter_total_stats.submitted_translations_count)
+    stats_model.submitted_translation_word_count = (
+        translation_submitter_total_stats.submitted_translation_word_count)
+    stats_model.accepted_translations_count = (
+        translation_submitter_total_stats.accepted_translations_count)
+    stats_model.accepted_translations_without_reviewer_edits_count = (
+        translation_submitter_total_stats
+        .accepted_translations_without_reviewer_edits_count)
+    stats_model.accepted_translation_word_count = (
+        translation_submitter_total_stats.accepted_translation_word_count)
+    stats_model.rejected_translations_count = (
+        translation_submitter_total_stats.rejected_translations_count)
+    stats_model.rejected_translation_word_count = (
+        translation_submitter_total_stats.rejected_translation_word_count)
+    stats_model.first_contribution_date = (
+        translation_submitter_total_stats.first_contribution_date)
+    stats_model.last_contribution_date = (
+        translation_submitter_total_stats.last_contribution_date)
+
+    suggestion_models.TranslationSubmitterTotalContributionStatsModel.update_timestamps( # pylint: disable=line-too-long
+        stats_model,
+        update_last_updated_time=True)
+    suggestion_models.TranslationSubmitterTotalContributionStatsModel.put(
+        stats_model)
+
+
+def _update_translation_reviewer_total_stats_models(
+    translation_reviewer_total_stat:
+        suggestion_registry.TranslationReviewerTotalContributionStats
+) -> None:
+    """Updates TranslationReviewerTotalContributionStats
+    models for given translation review stats.
+
+    Args:
+        translation_reviewer_total_stat:
+            TranslationReviewerTotalContributionStats.
+            TranslationReviewerTotalContributionStats domain object.
+    """
+
+    stats_model = suggestion_models.TranslationReviewerTotalContributionStatsModel.get( # pylint: disable=line-too-long
+        translation_reviewer_total_stat.language_code,
+        translation_reviewer_total_stat.contributor_id)
+
+    # We assert here because we are calling this method only when the model
+    # exists. If model doesn't exist we create a new model in
+    # update_translation_review_stats.
+    assert stats_model is not None
+    stats_model.topic_ids_with_translation_reviews = (
+        translation_reviewer_total_stat.topic_ids_with_translation_reviews)
+    stats_model.reviewed_translations_count = (
+        translation_reviewer_total_stat.reviewed_translations_count)
+    stats_model.accepted_translations_count = (
+        translation_reviewer_total_stat.accepted_translations_count)
+    stats_model.accepted_translations_with_reviewer_edits_count = (
+        translation_reviewer_total_stat
+        .accepted_translations_with_reviewer_edits_count)
+    stats_model.accepted_translation_word_count = (
+        translation_reviewer_total_stat.accepted_translation_word_count)
+    stats_model.rejected_translations_count = (
+        translation_reviewer_total_stat.rejected_translations_count)
+    stats_model.first_contribution_date = (
+        translation_reviewer_total_stat.first_contribution_date)
+    stats_model.last_contribution_date = (
+        translation_reviewer_total_stat.last_contribution_date)
+
+    suggestion_models.TranslationReviewerTotalContributionStatsModel.update_timestamps( # pylint: disable=line-too-long
+        stats_model,
+        update_last_updated_time=True)
+    suggestion_models.TranslationReviewerTotalContributionStatsModel.put(
+        stats_model)
+
+
+def _update_question_submitter_total_stats_models(
+    question_submitter_total_stats:
+        suggestion_registry.QuestionSubmitterTotalContributionStats
+) -> None:
+    """Updates QuestionSubmitterTotalContributionStatsModel for given question
+    contribution stats.
+
+    Args:
+        question_submitter_total_stats: QuestionSubmitterTotalContributionStats.
+            A QuestionSubmitterTotalContributionStats domain object.
+    """
+    stats_model = suggestion_models.QuestionSubmitterTotalContributionStatsModel.get( # pylint: disable=line-too-long
+            question_submitter_total_stats.contributor_id)
+    stats_model.topic_ids_with_question_submissions = (
+        question_submitter_total_stats.topic_ids_with_question_submissions)
+    stats_model.recent_review_outcomes = (
+        question_submitter_total_stats.recent_review_outcomes)
+    stats_model.recent_performance = (
+        question_submitter_total_stats.recent_performance)
+    stats_model.overall_accuracy = (
+        question_submitter_total_stats.overall_accuracy)
+    stats_model.submitted_questions_count = (
+        question_submitter_total_stats.submitted_questions_count)
+    stats_model.accepted_questions_count = (
+        question_submitter_total_stats.accepted_questions_count)
+    stats_model.accepted_questions_without_reviewer_edits_count = (
+        question_submitter_total_stats
+        .accepted_questions_without_reviewer_edits_count)
+    stats_model.rejected_questions_count = (
+        question_submitter_total_stats.rejected_questions_count)
+    stats_model.first_contribution_date = (
+        question_submitter_total_stats.first_contribution_date)
+    stats_model.last_contribution_date = (
+        question_submitter_total_stats.last_contribution_date)
+
+    suggestion_models.QuestionSubmitterTotalContributionStatsModel.update_timestamps( # pylint: disable=line-too-long
+        stats_model,
+        update_last_updated_time=True)
+    suggestion_models.QuestionSubmitterTotalContributionStatsModel.put(
+        stats_model)
+
+
+def _update_question_reviewer_total_stats_models(
+    question_reviewer_total_stats:
+        suggestion_registry.QuestionReviewerTotalContributionStats
+) -> None:
+    """Updates QuestionReviewerTotalContributionStatsModel for given question
+    contribution stats.
+
+    Args:
+        question_reviewer_total_stats: QuestionReviewerTotalContributionStats.
+            A QuestionreviewerTotalContributionStats domain object.
+    """
+    stats_model = suggestion_models.QuestionReviewerTotalContributionStatsModel.get( # pylint: disable=line-too-long
+            question_reviewer_total_stats.contributor_id)
+    stats_model.topic_ids_with_question_reviews = (
+        question_reviewer_total_stats.topic_ids_with_question_reviews)
+    stats_model.reviewed_questions_count = (
+        question_reviewer_total_stats.reviewed_questions_count)
+    stats_model.accepted_questions_count = (
+        question_reviewer_total_stats.accepted_questions_count)
+    stats_model.accepted_questions_with_reviewer_edits_count = (
+        question_reviewer_total_stats
+        .accepted_questions_with_reviewer_edits_count)
+    stats_model.rejected_questions_count = (
+        question_reviewer_total_stats.rejected_questions_count)
+    stats_model.first_contribution_date = (
+        question_reviewer_total_stats.first_contribution_date)
+    stats_model.last_contribution_date = (
+        question_reviewer_total_stats.last_contribution_date)
+
+    suggestion_models.QuestionReviewerTotalContributionStatsModel.update_timestamps( # pylint: disable=line-too-long
+        stats_model,
+        update_last_updated_time=True)
+    suggestion_models.QuestionReviewerTotalContributionStatsModel.put(
+        stats_model)
+
+
 def update_translation_contribution_stats_at_submission(
     suggestion: suggestion_registry.BaseSuggestion
 ) -> None:
-    """Creates/updates TranslationContributionStatsModel model for
+    """Creates/updates TranslationContributionStatsModel and
+    TranslationSubmitterTotalContributionStatsModel model for
     given translation submitter when a translation is submitted.
 
     Args:
@@ -2518,6 +2707,53 @@ def update_translation_contribution_stats_at_submission(
             suggestion.change.language_code, suggestion.author_id, topic_id
         ))
 
+    translation_submitter_total_stat_model = (
+        suggestion_models.TranslationSubmitterTotalContributionStatsModel.get(
+            suggestion.change.language_code, suggestion.author_id
+        )
+    )
+
+    if translation_submitter_total_stat_model is None:
+        suggestion_models.TranslationSubmitterTotalContributionStatsModel.create( # pylint: disable=line-too-long
+            language_code=suggestion.change.language_code,
+            contributor_id=suggestion.author_id,
+            topic_ids_with_translation_submissions=[topic_id],
+            recent_review_outcomes=[],
+            recent_performance=0,
+            overall_accuracy=0.0,
+            submitted_translations_count=1,
+            submitted_translation_word_count=content_word_count,
+            accepted_translations_count=0,
+            accepted_translations_without_reviewer_edits_count=0,
+            accepted_translation_word_count=0,
+            rejected_translations_count=0,
+            rejected_translation_word_count=0,
+            first_contribution_date=suggestion.last_updated.date(),
+            last_contribution_date=suggestion.last_updated.date()
+        )
+    else:
+        translation_submitter_total_stat = (
+            contribution_stats_services
+            .get_translation_submitter_total_stats_from_model(
+                translation_submitter_total_stat_model
+             )
+         )
+
+        if topic_id not in (
+            translation_submitter_total_stat
+            .topic_ids_with_translation_submissions):
+            (
+                translation_submitter_total_stat
+                .topic_ids_with_translation_submissions).append(topic_id)
+        translation_submitter_total_stat.submitted_translations_count += 1
+        translation_submitter_total_stat.submitted_translation_word_count += (
+            content_word_count)
+        translation_submitter_total_stat.last_contribution_date = (
+            suggestion.last_updated.date())
+
+        _update_translation_submitter_total_stats_model(
+            translation_submitter_total_stat)
+
     if translation_contribution_stat_model is None:
         suggestion_models.TranslationContributionStatsModel.create(
             language_code=suggestion.change.language_code,
@@ -2547,10 +2783,68 @@ def update_translation_contribution_stats_at_submission(
             [translation_contribution_stat])
 
 
+def create_stats_for_new_translation_models(
+    suggestion_is_accepted: bool,
+    edited_by_reviewer: bool,
+    content_word_count: int
+) -> Tuple[int, int, int, int, int, List[str], int, float]:
+    """Creates stats data to be used to create a new
+    TranslationContributionStatsModel and
+    TranslationSubmitterTotalContributionStatsModel.
+
+    Args:
+        suggestion_is_accepted: bool. Whether the suggestion is
+            accepted or rejected.
+        edited_by_reviewer: bool. If the suggestion is accepted with
+            reviewers edits.
+        content_word_count: int. Word count of the suggestion.
+
+    Returns:
+        tuple[int, int, int, int, int, list[str], int, float]. A tuple
+        consisting of the stats data required to create a new model.
+    """
+    accepted_translations_count = 0
+    accepted_translation_word_count = 0
+    rejected_translations_count = 0
+    rejected_translation_word_count = 0
+    accepted_translations_without_reviewer_edits_count = 0
+
+    if suggestion_is_accepted:
+        accepted_translations_count += 1
+        accepted_translation_word_count += content_word_count
+        recent_review_outcomes = [
+            suggestion_models.REVIEW_OUTCOME_ACCEPTED_WITH_EDITS]
+        recent_performance = 1
+        overall_accuracy = 100.0
+    else:
+        rejected_translations_count += 1
+        rejected_translation_word_count += content_word_count
+        recent_review_outcomes = [
+            suggestion_models.REVIEW_OUTCOME_REJECTED]
+        recent_performance = -2
+        overall_accuracy = 0.0
+    if suggestion_is_accepted and not edited_by_reviewer:
+        accepted_translations_without_reviewer_edits_count += 1
+        recent_review_outcomes = [
+            suggestion_models.REVIEW_OUTCOME_ACCEPTED]
+
+    return (
+        accepted_translations_count,
+        accepted_translation_word_count,
+        rejected_translations_count,
+        rejected_translation_word_count,
+        accepted_translations_without_reviewer_edits_count,
+        recent_review_outcomes,
+        recent_performance,
+        overall_accuracy
+    )
+
+
 def update_translation_contribution_stats_at_review(
     suggestion: suggestion_registry.BaseSuggestion
 ) -> None:
-    """Creates/updates TranslationContributionStatsModel model for
+    """Creates/updates TranslationContributionStatsModel and
+    TranslationSubmitterTotalContributionStatsModel model for
     given translation submitter when a translation is reviewed.
 
     Args:
@@ -2585,22 +2879,77 @@ def update_translation_contribution_stats_at_review(
             suggestion.change.language_code, suggestion.author_id, topic_id
         ))
 
+    translation_submitter_total_stat_model = (
+        suggestion_models.TranslationSubmitterTotalContributionStatsModel.get(
+            suggestion.change.language_code, suggestion.author_id
+        ))
+
+    if translation_submitter_total_stat_model is None:
+        (
+            accepted_translations_count,
+            accepted_translation_word_count,
+            rejected_translations_count,
+            rejected_translation_word_count,
+            accepted_translations_without_reviewer_edits_count,
+            recent_review_outcomes,
+            recent_performance,
+            overall_accuracy
+        ) = create_stats_for_new_translation_models(
+            suggestion_is_accepted,
+            suggestion.edited_by_reviewer,
+            content_word_count)
+        suggestion_models.TranslationSubmitterTotalContributionStatsModel.create( # pylint: disable=line-too-long
+            language_code=suggestion.change.language_code,
+            contributor_id=suggestion.author_id,
+            topic_ids_with_translation_submissions=[topic_id],
+            recent_review_outcomes=recent_review_outcomes,
+            recent_performance=recent_performance,
+            overall_accuracy=overall_accuracy,
+            submitted_translations_count=1,
+            submitted_translation_word_count=content_word_count,
+            accepted_translations_count=accepted_translations_count,
+            accepted_translations_without_reviewer_edits_count=(
+                accepted_translations_without_reviewer_edits_count),
+            accepted_translation_word_count=accepted_translation_word_count,
+            rejected_translations_count=rejected_translations_count,
+            rejected_translation_word_count=rejected_translation_word_count,
+            first_contribution_date=suggestion.last_updated.date(),
+            last_contribution_date=suggestion.last_updated.date()
+        )
+    else:
+        translation_submitter_total_stat = (
+            contribution_stats_services
+            .get_translation_submitter_total_stats_from_model(
+                translation_submitter_total_stat_model)
+        )
+
+        if topic_id not in (
+            translation_submitter_total_stat
+            .topic_ids_with_translation_submissions):
+            (
+                translation_submitter_total_stat
+                .topic_ids_with_translation_submissions).append(topic_id)
+
+        increment_translation_submitter_total_stats_at_review(
+            translation_submitter_total_stat, content_word_count,
+            suggestion_is_accepted, suggestion.edited_by_reviewer)
+        _update_translation_submitter_total_stats_model(
+            translation_submitter_total_stat)
+
     if translation_contribution_stat_model is None:
-        accepted_translations_count = 0
-        accepted_translation_word_count = 0
-        rejected_translations_count = 0
-        rejected_translation_word_count = 0
-        accepted_translations_without_reviewer_edits_count = 0
-
-        if suggestion_is_accepted:
-            accepted_translations_count += 1
-            accepted_translation_word_count += content_word_count
-        else:
-            rejected_translations_count += 1
-            rejected_translation_word_count += content_word_count
-        if suggestion_is_accepted and not suggestion.edited_by_reviewer:
-            accepted_translations_without_reviewer_edits_count += 1
-
+        (
+            accepted_translations_count,
+            accepted_translation_word_count,
+            rejected_translations_count,
+            rejected_translation_word_count,
+            accepted_translations_without_reviewer_edits_count,
+            recent_review_outcomes,
+            recent_performance,
+            overall_accuracy
+        ) = create_stats_for_new_translation_models(
+            suggestion_is_accepted,
+            suggestion.edited_by_reviewer,
+            content_word_count)
         suggestion_models.TranslationContributionStatsModel.create(
             language_code=suggestion.change.language_code,
             contributor_user_id=suggestion.author_id,
@@ -2630,7 +2979,8 @@ def update_translation_contribution_stats_at_review(
 def update_translation_review_stats(
     suggestion: suggestion_registry.BaseSuggestion
 ) -> None:
-    """Creates/updates TranslationReviewStatsModel model for given translation
+    """Creates/updates TranslationReviewStatsModel
+    TranslationReviewerTotalContributionStatsModel model for given translation
     reviewer when a translation is reviewed.
 
     Args:
@@ -2675,6 +3025,61 @@ def update_translation_review_stats(
             topic_id
         ))
 
+    translation_reviewer_total_stat_model = (
+        suggestion_models.TranslationReviewerTotalContributionStatsModel.get(
+            suggestion.change.language_code, suggestion.final_reviewer_id
+        ))
+
+    if translation_reviewer_total_stat_model is None:
+        # This function is called when reviewing a translation and hence
+        # final_reviewer_id should not be None when the suggestion is
+        # up-to-date.
+        accepted_translations_count = 0
+        accepted_translations_with_reviewer_edits_count = 0
+        rejected_translation_count = 0
+        accepted_translation_word_count = 0
+        if suggestion_is_accepted:
+            accepted_translations_count += 1
+            accepted_translation_word_count = content_word_count
+        else:
+            rejected_translation_count += 1
+        if suggestion_is_accepted and suggestion.edited_by_reviewer:
+            accepted_translations_with_reviewer_edits_count += 1
+        suggestion_models.TranslationReviewerTotalContributionStatsModel.create(
+            language_code=suggestion.change.language_code,
+            contributor_id=suggestion.final_reviewer_id,
+            topic_ids_with_translation_reviews=[topic_id],
+            reviewed_translations_count=1,
+            accepted_translations_count=accepted_translations_count,
+            accepted_translations_with_reviewer_edits_count=(
+                accepted_translations_with_reviewer_edits_count),
+            accepted_translation_word_count=accepted_translation_word_count,
+            rejected_translations_count=rejected_translation_count,
+            first_contribution_date=suggestion.last_updated.date(),
+            last_contribution_date=suggestion.last_updated.date()
+        )
+    else:
+        translation_reviewer_total_stat = (
+            contribution_stats_services
+            .get_translation_reviewer_total_stats_from_model(
+                translation_reviewer_total_stat_model))
+
+        if topic_id not in (
+            translation_reviewer_total_stat
+            .topic_ids_with_translation_reviews):
+            (
+                translation_reviewer_total_stat
+                .topic_ids_with_translation_reviews
+            ).append(topic_id)
+
+        increment_translation_reviewer_total_stats(
+            translation_reviewer_total_stat, content_word_count,
+            suggestion.last_updated, suggestion_is_accepted,
+            suggestion.edited_by_reviewer
+        )
+        _update_translation_reviewer_total_stats_models(
+            translation_reviewer_total_stat)
+
     if translation_review_stat_model is None:
         # This function is called when reviewing a translation and hence
         # final_reviewer_id should not be None when the suggestion is
@@ -2718,7 +3123,8 @@ def update_translation_review_stats(
 def update_question_contribution_stats_at_submission(
     suggestion: suggestion_registry.BaseSuggestion
 ) -> None:
-    """Creates/updates QuestionContributionStatsModel model for given question
+    """Creates/updates QuestionContributionStatsModel and
+    QuestionSubmitterTotalContributionStatsModel models for given question
     submitter when a question is submitted.
 
     Args:
@@ -2754,11 +3160,55 @@ def update_question_contribution_stats_at_submission(
         _update_question_contribution_stats_models(
             [question_contribution_stat])
 
+    for topic in skill_services.get_all_topic_assignments_for_skill(
+        suggestion.target_id):
+        question_submitter_total_stat_model = (
+            suggestion_models.QuestionSubmitterTotalContributionStatsModel
+            .get_by_id(
+                suggestion.author_id
+            ))
+
+        if question_submitter_total_stat_model is None:
+            suggestion_models.QuestionSubmitterTotalContributionStatsModel.create( # pylint: disable=line-too-long
+                contributor_id=suggestion.author_id,
+                topic_ids_with_question_submissions=[topic.topic_id],
+                recent_review_outcomes=[],
+                recent_performance=0,
+                overall_accuracy=0.0,
+                submitted_questions_count=1,
+                accepted_questions_count=0,
+                accepted_questions_without_reviewer_edits_count=0,
+                rejected_questions_count=0,
+                first_contribution_date=suggestion.last_updated.date(),
+                last_contribution_date=suggestion.last_updated.date()
+            )
+            continue
+
+        question_submitter_total_stat = (
+            contribution_stats_services
+            .get_question_submitter_total_stats_from_model(
+                question_submitter_total_stat_model))
+
+        if topic.topic_id not in (
+            question_submitter_total_stat
+            .topic_ids_with_question_submissions):
+            (
+                question_submitter_total_stat
+                .topic_ids_with_question_submissions
+            ).append(topic.topic_id)
+        question_submitter_total_stat.submitted_questions_count += 1
+        question_submitter_total_stat.last_contribution_date = (
+            suggestion.last_updated.date())
+
+        _update_question_submitter_total_stats_models(
+            question_submitter_total_stat)
+
 
 def update_question_contribution_stats_at_review(
     suggestion: suggestion_registry.BaseSuggestion
 ) -> None:
-    """Creates/updates QuestionContributionStatsModel model for given question
+    """Creates/updates QuestionContributionStatsModel
+    QuestionSubmitterTotalContributionStatsModel models for given question
     submitter when a question is reviewed.
 
     Args:
@@ -2768,6 +3218,27 @@ def update_question_contribution_stats_at_review(
     suggestion_is_accepted = (
         suggestion.status == suggestion_models.STATUS_ACCEPTED
     )
+
+    accepted_questions_count = 0
+    accepted_questions_without_reviewer_edits_count = 0
+    rejected_questions_count = 0
+    if suggestion_is_accepted:
+        accepted_questions_count += 1
+        recent_review_outcomes = [
+            suggestion_models.REVIEW_OUTCOME_ACCEPTED_WITH_EDITS]
+        recent_performance = 1
+        overall_accuracy = 100.0
+    else:
+        rejected_questions_count += 1
+        recent_review_outcomes = [
+            suggestion_models.REVIEW_OUTCOME_REJECTED]
+        recent_performance = -2
+        overall_accuracy = 0.0
+    if suggestion_is_accepted and not suggestion.edited_by_reviewer:
+        accepted_questions_without_reviewer_edits_count += 1
+        recent_review_outcomes = [
+            suggestion_models.REVIEW_OUTCOME_ACCEPTED]
+
     for topic in skill_services.get_all_topic_assignments_for_skill(
         suggestion.target_id):
         question_contribution_stat_model = (
@@ -2776,12 +3247,6 @@ def update_question_contribution_stats_at_review(
             ))
 
         if question_contribution_stat_model is None:
-            accepted_questions_count = 0
-            accepted_questions_without_reviewer_edits_count = 0
-            if suggestion_is_accepted:
-                accepted_questions_count += 1
-            if suggestion_is_accepted and not suggestion.edited_by_reviewer:
-                accepted_questions_without_reviewer_edits_count += 1
             suggestion_models.QuestionContributionStatsModel.create(
                 contributor_user_id=suggestion.author_id,
                 topic_id=topic.topic_id,
@@ -2808,11 +3273,49 @@ def update_question_contribution_stats_at_review(
         _update_question_contribution_stats_models(
             [question_contribution_stat])
 
+    for topic in skill_services.get_all_topic_assignments_for_skill(
+        suggestion.target_id):
+        question_submitter_total_stat_model = (
+            suggestion_models.QuestionSubmitterTotalContributionStatsModel
+            .get_by_id(
+                suggestion.author_id
+            ))
+
+        if question_submitter_total_stat_model is None:
+            suggestion_models.QuestionSubmitterTotalContributionStatsModel.create( # pylint: disable=line-too-long
+                contributor_id=suggestion.author_id,
+                topic_ids_with_question_submissions=[topic.topic_id],
+                recent_review_outcomes=recent_review_outcomes,
+                recent_performance=recent_performance,
+                overall_accuracy=overall_accuracy,
+                submitted_questions_count=1,
+                accepted_questions_count=accepted_questions_count,
+                accepted_questions_without_reviewer_edits_count=(
+                    accepted_questions_without_reviewer_edits_count),
+                rejected_questions_count=rejected_questions_count,
+                first_contribution_date=suggestion.last_updated.date(),
+                last_contribution_date=suggestion.last_updated.date()
+            )
+            continue
+
+        question_submitter_total_stat = (
+            contribution_stats_services
+            .get_question_submitter_total_stats_from_model(
+                question_submitter_total_stat_model))
+
+        increment_question_submitter_total_stats_at_review(
+            question_submitter_total_stat,
+            suggestion_is_accepted, suggestion.edited_by_reviewer)
+
+        _update_question_submitter_total_stats_models(
+            question_submitter_total_stat)
+
 
 def update_question_review_stats(
     suggestion: suggestion_registry.BaseSuggestion
 ) -> None:
-    """Creates/updates QuestionReviewStatsModel model for given question
+    """Creates/updates QuestionReviewStatsModel and
+    QuestionReviewerTotalContributionStatsModel model for given question
     reviewer when a question is reviewed.
 
     Args:
@@ -2871,6 +3374,57 @@ def update_question_review_stats(
             suggestion_is_accepted,
             suggestion.edited_by_reviewer)
         _update_question_review_stats_models([question_review_stat])
+
+    for topic in skill_services.get_all_topic_assignments_for_skill(
+        suggestion.target_id):
+        question_reviewer_total_stat_model = (
+            suggestion_models.QuestionReviewerTotalContributionStatsModel
+            .get_by_id(
+                suggestion.final_reviewer_id
+            ))
+
+        if question_reviewer_total_stat_model is None:
+            accepted_questions_count = 0
+            accepted_questions_with_reviewer_edits_count = 0
+            rejected_questions_count = 0
+            if suggestion_is_accepted:
+                accepted_questions_count += 1
+            else:
+                rejected_questions_count += 1
+            if suggestion_is_accepted and suggestion.edited_by_reviewer:
+                accepted_questions_with_reviewer_edits_count += 1
+            suggestion_models.QuestionReviewerTotalContributionStatsModel.create( # pylint: disable=line-too-long
+                contributor_id=suggestion.final_reviewer_id,
+                topic_ids_with_question_reviews=[topic.topic_id],
+                reviewed_questions_count=1,
+                accepted_questions_count=accepted_questions_count,
+                accepted_questions_with_reviewer_edits_count=(
+                    accepted_questions_with_reviewer_edits_count),
+                rejected_questions_count=rejected_questions_count,
+                first_contribution_date=suggestion.last_updated.date(),
+                last_contribution_date=suggestion.last_updated.date()
+            )
+            continue
+
+        question_reviewer_total_stat = (
+            contribution_stats_services
+            .get_question_reviewer_total_stats_from_model(
+                question_reviewer_total_stat_model))
+
+        if topic.topic_id not in (
+            question_reviewer_total_stat
+            .topic_ids_with_question_reviews):
+            (
+                question_reviewer_total_stat
+                .topic_ids_with_question_reviews
+            ).append(topic.topic_id)
+
+        increment_question_reviewer_total_stats(
+            question_reviewer_total_stat, suggestion.last_updated,
+            suggestion_is_accepted,
+            suggestion.edited_by_reviewer)
+        _update_question_reviewer_total_stats_models(
+            question_reviewer_total_stat)
 
     update_question_contribution_stats_at_review(suggestion)
 
@@ -2962,6 +3516,221 @@ def increment_question_review_stats(
     if suggestion_is_accepted and edited_by_reviewer:
         question_review_stat.accepted_questions_with_reviewer_edits_count += 1
     question_review_stat.last_contribution_date = (
+        last_contribution_date.date())
+
+
+def increment_translation_submitter_total_stats_at_review(
+    translation_submitter_total_stat: (
+        suggestion_registry.TranslationSubmitterTotalContributionStats),
+    content_word_count: int,
+    suggestion_is_accepted: bool,
+    edited_by_reviewer: bool
+) -> None:
+    """Updates TranslationSubmitterTotalContributionStats object.
+
+    Args:
+        translation_submitter_total_stat:
+            TranslationSubmitterTotalContributionStats. The stats object to
+            update.
+        content_word_count: int. The number of words in the translation.
+        suggestion_is_accepted: bool. A flag that indicates whether the
+            suggestion is accepted.
+        edited_by_reviewer: bool. A flag that indicates whether the suggestion
+            is edited by the reviewer.
+    """
+    # Weights for calculating performance.
+    # recent_performance = accepted cards - 2 (rejected cards) in last
+    # 100 contributions.
+    if suggestion_is_accepted:
+        translation_submitter_total_stat.accepted_translations_count += 1
+        translation_submitter_total_stat.accepted_translation_word_count += (
+            content_word_count)
+        translation_submitter_total_stat.overall_accuracy = round((
+            translation_submitter_total_stat.accepted_translations_count
+            / translation_submitter_total_stat.submitted_translations_count
+        ), 3) * 100
+
+        if (
+                len(translation_submitter_total_stat
+                    .recent_review_outcomes)
+                >= RECENT_REVIEW_OUTCOMES_LIMIT
+            ):
+            oldest_outcome = (
+                translation_submitter_total_stat
+                .recent_review_outcomes).pop(0)
+            if oldest_outcome == suggestion_models.REVIEW_OUTCOME_REJECTED:
+                translation_submitter_total_stat.recent_performance += 3
+        else:
+            translation_submitter_total_stat.recent_performance += 1
+
+        translation_submitter_total_stat.recent_review_outcomes.append(
+            suggestion_models.REVIEW_OUTCOME_ACCEPTED_WITH_EDITS)
+
+    else:
+        translation_submitter_total_stat.rejected_translations_count += 1
+        translation_submitter_total_stat.rejected_translation_word_count += (
+            content_word_count)
+
+        if (
+                len(translation_submitter_total_stat
+                    .recent_review_outcomes)
+                >= RECENT_REVIEW_OUTCOMES_LIMIT
+            ):
+            oldest_outcome = (
+                translation_submitter_total_stat
+                .recent_review_outcomes).pop(0)
+            if oldest_outcome != suggestion_models.REVIEW_OUTCOME_REJECTED:
+                translation_submitter_total_stat.recent_performance -= 3
+        else:
+            translation_submitter_total_stat.recent_performance -= 2
+
+        translation_submitter_total_stat.recent_review_outcomes.append(
+            suggestion_models.REVIEW_OUTCOME_REJECTED)
+
+    if suggestion_is_accepted and not edited_by_reviewer:
+        translation_submitter_total_stat.accepted_translations_without_reviewer_edits_count += 1 # pylint: disable=line-too-long
+        (
+            translation_submitter_total_stat
+            .recent_review_outcomes
+        ).pop()
+        translation_submitter_total_stat.recent_review_outcomes.append(
+            suggestion_models.REVIEW_OUTCOME_ACCEPTED)
+
+
+def increment_translation_reviewer_total_stats(
+    translation_reviewer_total_stat:
+        suggestion_registry.TranslationReviewerTotalContributionStats,
+    content_word_count: int,
+    last_contribution_date: datetime.datetime,
+    suggestion_is_accepted: bool,
+    edited_by_reviewer: bool
+) -> None:
+    """Updates TranslationReviewerTotalContributionStats object.
+
+    Args:
+        translation_reviewer_total_stat:
+            TranslationReviewerTotalContributionStats. The stats object to
+            update.
+        content_word_count: int. The number of words in the translation.
+        last_contribution_date: datetime.datetime. The last updated date.
+        suggestion_is_accepted: bool. A flag that indicates whether the
+            suggestion is accepted.
+        edited_by_reviewer: bool. A flag that indicates whether the suggestion
+            is edited by the reviewer.
+    """
+    translation_reviewer_total_stat.reviewed_translations_count += 1
+    if suggestion_is_accepted:
+        translation_reviewer_total_stat.accepted_translations_count += 1
+        translation_reviewer_total_stat.accepted_translation_word_count += (
+            content_word_count)
+    else:
+        translation_reviewer_total_stat.rejected_translations_count += 1
+    if suggestion_is_accepted and edited_by_reviewer:
+        (
+            translation_reviewer_total_stat
+            .accepted_translations_with_reviewer_edits_count
+        ) += 1
+    translation_reviewer_total_stat.last_contribution_date = (
+        last_contribution_date.date())
+
+
+def increment_question_submitter_total_stats_at_review(
+    question_submitter_total_stat: (
+        suggestion_registry.QuestionSubmitterTotalContributionStats),
+    suggestion_is_accepted: bool,
+    edited_by_reviewer: bool
+) -> None:
+    """Updates QuestionSubmitterTotalContributionStats object.
+
+    Args:
+        question_submitter_total_stat:
+            QuestionSubmitterTotalContributionStats. The stats object to
+            update.
+        suggestion_is_accepted: bool. A flag that indicates whether the
+            suggestion is accepted.
+        edited_by_reviewer: bool. A flag that indicates whether the suggestion
+            is edited by the reviewer.
+    """
+    # Weights for calculating performance.
+    # recent_performance = accepted cards - 2 (rejected cards) in last
+    # 100 contributions.
+    if suggestion_is_accepted:
+        question_submitter_total_stat.accepted_questions_count += 1
+        question_submitter_total_stat.overall_accuracy = round((
+            question_submitter_total_stat.accepted_questions_count
+            / question_submitter_total_stat.submitted_questions_count
+        ), 3) * 100
+
+        if (
+                len(question_submitter_total_stat
+                    .recent_review_outcomes)
+                >= RECENT_REVIEW_OUTCOMES_LIMIT
+            ):
+            oldest_outcome = (
+                question_submitter_total_stat
+                .recent_review_outcomes).pop(0)
+            if oldest_outcome == suggestion_models.REVIEW_OUTCOME_REJECTED:
+                question_submitter_total_stat.recent_performance += 3
+        else:
+            question_submitter_total_stat.recent_performance += 1
+
+        question_submitter_total_stat.recent_review_outcomes.append(
+            suggestion_models.REVIEW_OUTCOME_ACCEPTED_WITH_EDITS)
+
+    else:
+        question_submitter_total_stat.rejected_questions_count += 1
+
+        if (
+                len(question_submitter_total_stat
+                    .recent_review_outcomes)
+                >= RECENT_REVIEW_OUTCOMES_LIMIT
+            ):
+            oldest_outcome = (
+                question_submitter_total_stat
+                .recent_review_outcomes).pop(0)
+            if oldest_outcome != suggestion_models.REVIEW_OUTCOME_REJECTED:
+                question_submitter_total_stat.recent_performance -= 3
+        else:
+            question_submitter_total_stat.recent_performance -= 2
+
+        question_submitter_total_stat.recent_review_outcomes.append(
+            suggestion_models.REVIEW_OUTCOME_REJECTED)
+
+    if suggestion_is_accepted and not edited_by_reviewer:
+        question_submitter_total_stat.accepted_questions_without_reviewer_edits_count += 1 # pylint: disable=line-too-long
+        (question_submitter_total_stat.recent_review_outcomes).pop()
+        (question_submitter_total_stat.recent_review_outcomes).append(
+            suggestion_models.REVIEW_OUTCOME_ACCEPTED)
+
+
+def increment_question_reviewer_total_stats(
+    question_reviewer_total_stat:
+        suggestion_registry.QuestionReviewerTotalContributionStats,
+    last_contribution_date: datetime.datetime,
+    suggestion_is_accepted: bool,
+    edited_by_reviewer: bool
+) -> None:
+    """Updates QuestionReviewerTotalContributionStats object.
+
+    Args:
+        question_reviewer_total_stat: QuestionReviewerTotalContributionStats.
+            The stats object to update.
+        last_contribution_date: datetime.datetime. The last updated date.
+        suggestion_is_accepted: bool. A flag that indicates whether the
+            suggestion is accepted.
+        edited_by_reviewer: bool. A flag that indicates whether the suggestion
+            is edited by the reviewer.
+    """
+    question_reviewer_total_stat.reviewed_questions_count += 1
+    if suggestion_is_accepted:
+        question_reviewer_total_stat.accepted_questions_count += 1
+    else:
+        question_reviewer_total_stat.rejected_questions_count += 1
+    if suggestion_is_accepted and edited_by_reviewer:
+        (
+            question_reviewer_total_stat
+            .accepted_questions_with_reviewer_edits_count) += 1
+    question_reviewer_total_stat.last_contribution_date = (
         last_contribution_date.date())
 
 
