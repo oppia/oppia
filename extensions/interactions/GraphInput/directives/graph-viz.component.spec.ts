@@ -781,10 +781,15 @@ describe('GraphVizComponent', () => {
     component.dotCursorCoordinateX = 0;
     component.dotCursorCoordinateY = 0;
 
+    const graphAreaRect = {
+      left: 9,
+      top: 4053.5
+    };
+
     component.mousemoveGraphSVG(event);
 
-    expect(component.dotCursorCoordinateX).toBe(event.clientX);
-    expect(component.dotCursorCoordinateY).toBe(event.clientY);
+    expect(component.dotCursorCoordinateX).toBe(event.clientX - graphAreaRect.left);
+    expect(component.dotCursorCoordinateY).toBe(event.clientY - graphAreaRect.top);
     expect(dotCursorElement.style.top).toBe(component.dotCursorCoordinateY + 'px');
     expect(dotCursorElement.style.left).toBe(component.dotCursorCoordinateX + 'px');
   });
