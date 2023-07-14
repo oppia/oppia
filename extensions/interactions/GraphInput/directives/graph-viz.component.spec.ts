@@ -766,20 +766,18 @@ describe('GraphVizComponent', () => {
       clientX: 100,
       clientY: 100
     });
-    component.state.currentMode = 2;
     const dotCursorElement = document.createElement('div');
     dotCursorElement.classList.add('oppia-add-node-cursor');
     dotCursorElement.style.top = '0px';
     dotCursorElement.style.left = '0px';
     component.dotCursor = new ElementRef(dotCursorElement);
-    component.dotCursor.nativeElement = dotCursorElement; // Assign nativeElement manually
+    component.dotCursor.nativeElement = dotCursorElement;
     const dot = component.dotCursor.nativeElement;
     component.interactionIsActive = true;
     component.dotCursorCoordinateX = 0;
     component.dotCursorCoordinateY = 0;
-
-    component.ngAfterViewInit();
-  
+    component.state.currentMode = 2;
+    
     const graphAreaElement = document.createElement('div');
     graphAreaElement.classList.add('oppia-graph-viz-svg');
     graphAreaElement.style.position = 'absolute';
