@@ -567,60 +567,63 @@ describe('InteractiveImageClickInput', () => {
     expect(component.currentlyHoveredRegions).toEqual([]);
   });
 
-  it('should update dotCursor position when mouse moves over image region', () => {
-    spyOn(Element.prototype, 'querySelectorAll').and.callFake(
-      jasmine.createSpy('querySelectorAll').and
-        .returnValue([{
-          parentElement: {
-            getBoundingClientRect: () => {
-              return new DOMRect(300, 300, 300, 300);
-            }
-          },
-          getBoundingClientRect: () => {
-            return new DOMRect(200, 200, 200, 200);
-          },
-          width: 200,
-          height: 200
-        }]));
+  it('should update dot position and styles', () => {
+    const imageElement = document.createElement('img');
+    imageElement.classList.add('oppia-image-click-img');
+    spyOn(imageElement, 'getBoundingClientRect').and.returnValue({
+      left: 100,
+      top: 200
+    });
+    spyOn(window, 'getComputedStyle').and.returnValue({
+      marginLeft: '10px',
+      marginTop: '20px'
+    });
 
-    const styleMock = jasmine.createSpyObj<CSSStyleDeclaration>(
-      'CSSStyleDeclaration', [
-        'marginLeft',
-        'marginTop',
-        'width',
-        'height'
-      ]);
-    const dotMock = document.createElement('div');
-    spyOn(document, 'querySelector').and.returnValue(dotMock);
-    styleMock.marginLeft = '0px';
-    styleMock.marginTop = '0px';
-    styleMock.width = '0px';
-    styleMock.height = '0px';
-    spyOn(window, 'getComputedStyle').and.returnValue(styleMock);
+    const dotElement = document.createElement('div');
+    dotElement.classList.add('oppia-select-image-region-cursor');
+    spyOn(dotElement, 'getBoundingClientRect').and.returnValue({
+      top: 100,
+      bottom: 110,
+      left: 200,
+      right: 210
+    });
 
-    spyOn(component, 'updateCurrentlyHoveredRegions').and.callThrough();
-    spyOnProperty(MouseEvent.prototype, 'clientX', 'get').and.returnValue(290);
-    spyOnProperty(MouseEvent.prototype, 'clientY', 'get').and.returnValue(260);
-    let evt = new MouseEvent('Mousemove');
-    component.lastAnswer = null;
+    const event = new MouseEvent('mousemove', {
+      clientX: 100,
+      clientY: 100
+    });
+  
+    component.el = {
+      nativeElement: {
+        querySelectorAll: () => [imageElement]
+      }
+    };
+  
+    spyOn(document, 'querySelector').and.returnValue(dotElement);
+
     component.ngOnInit();
-
     component.usingMobileDevice = false;
-    expect(component.interactionIsActive).toBe(true);
-    expect(component.mouseX).toBe(0);
-    expect(component.mouseY).toBe(0);
-    expect(component.currentlyHoveredRegions).toEqual([]);
-
-    component.onMousemoveImage(evt);
-
-    // The mouseX and mouseY variables must be updated only
-    // when the interaction is active.
-    expect(component.usingMobileDevice).toBe(true);
-    expect(component.interactionIsActive).toBe(true);
-    expect(component.mouseX).toBe(0.45);
-    expect(component.mouseY).toBe(0.3);
-    expect(component.currentlyHoveredRegions).toEqual(['Region1']);
-
+    component.updateDotPosition(event);
+  
+    expect(component.dotCursorCoordinateX).toBe(
+      event.clientX - imageElement.getBoundingClientRect().left + parseFloat(window.getComputedStyle(imageElement).marginLeft) + 8
+    );
+    expect(component.dotCursorCoordinateY).toBe(
+      event.clientY - imageElement.getBoundingClientRect().top + parseFloat(window.getComputedStyle(imageElement).marginTop) + 8
+    );
+  
+    expect(dotElement.style.top).toBe(component.dotCursorCoordinateY + 'px');
+    expect(dotElement.style.left).toBe(component.dotCursorCoordinateX + 'px');
+  
+    const dotRect = dotElement.getBoundingClientRect();
+    expect(component.mouseX).toBe(
+      (dotRect.left - imageElement.getBoundingClientRect().left) / imageElement.width
+    );
+    expect(component.mouseY).toBe(
+      (dotRect.top - imageElement.getBoundingClientRect().top) / imageElement.height
+    );
+  });
+  
   it('should not check if mouse is over region when interaction is not' +
   ' active', () => {
     spyOn(component, 'updateCurrentlyHoveredRegions').and.callThrough();
