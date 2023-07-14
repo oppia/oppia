@@ -28,12 +28,12 @@ describe('InsertScriptService', () => {
       ]});
     insertScriptService = TestBed.get(InsertScriptService);
   });
-  
-  fit('should insert script into html', () => {
+
+  it('should insert script into html', () => {
     spyOn(insertScriptService.renderer, 'appendChild');
-    //first time load script
+    // First time load script.
     expect(insertScriptService.loadScript(KNOWN_SCRIPTS.DONORBOX)).toBe(true);
-    //load script again
+    // Load script again.
     expect(insertScriptService.loadScript(KNOWN_SCRIPTS.DONORBOX)).toBe(false);
   });
 });
