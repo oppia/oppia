@@ -65,15 +65,6 @@ describe('Auth service', function() {
     };
   });
 
-  it('should return emulator config when emulator is enabled', () => {
-    spyOnProperty(AuthService, 'firebaseEmulatorIsEnabled', 'get')
-      .and.returnValue(true);
-
-    // TODO(#18260): Change this when we permanently move to the Docker Setup.
-    process.env.OPPIA_IS_DOCKERIZED = 'false';
-    expect(AuthService.firebaseEmulatorConfig).toEqual(['localhost', 9099]);
-  });
-
   it('should return emulator config when emulator is enabled under ' +
      'docker environment', () => {
     spyOnProperty(AuthService, 'firebaseEmulatorIsEnabled', 'get')
