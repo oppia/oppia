@@ -19,13 +19,14 @@ The package is built by running 'python setup.py sdist' in the build.py.
 """
 
 from __future__ import annotations
+
+import re
 import shutil
 import tempfile
 
 from core import feconf
 
 import pkg_resources
-import re
 import setuptools
 
 
@@ -35,19 +36,23 @@ def main() -> None:
     with open('requirements.txt', encoding='utf-8') as requirements_txt: # pylint: disable=replace-disallowed-function-calls
         requirements_content = requirements_txt.read()
         modified_requirements_content = re.sub(
-            r'--hash=sha256:.*?(?=\\)', '',
-            requirements_content, flags=re.DOTALL
+            r'^--hash=sha256:.*$',
+            '',
+            requirements_content,
+            flags=re.MULTILINE
         )
 
-        # Temporary file to write the modified requirements content.
-        with tempfile.NamedTemporaryFile(
-            mode='w', delete=False) as temp_file:
-            temp_file.write(modified_requirements_content)
+        print(modified_requirements_content)
 
-        # Replace original requirements file with the modified
-        # temporary file with no hashes.
-        shutil.copy2('requirements.txt', 'requirements.txt.bak')
-        shutil.move(temp_file.name, 'requirements.txt')
+        # # Temporary file to write the modified requirements content.
+        # with tempfile.NamedTemporaryFile(
+        #     mode='w', delete=False) as temp_file:
+        #     temp_file.write(modified_requirements_content)
+
+        # # Replace original requirements file with the modified
+        # # temporary file with no hashes.
+        # shutil.copy2('requirements.txt', 'requirements.txt.bak')
+        # shutil.move(temp_file.name, 'requirements.txt')
         # The 'parse_requirements' returns a list of 'Requirement' objects.
         # We need to transform these to strings using the str() function.
         required_packages = [
@@ -55,7 +60,7 @@ def main() -> None:
             for requirement in pkg_resources.parse_requirements(
                 requirements_txt)
         ]
-        shutil.move('requirements.txt.bak', 'requirements.txt')
+        # shutil.move('requirements.txt.bak', 'requirements.txt')
 
     setuptools.setup(
         name='oppia-beam-job',

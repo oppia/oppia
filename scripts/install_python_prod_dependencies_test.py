@@ -288,7 +288,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
             [
                 [
                     'pip-compile', '--no-emit-index-url',
-                    '--generate-hashes','requirements.in',
+                    '--generate-hashes', 'requirements.in',
                     '--output-file', 'requirements.txt',
                 ],
                 [
@@ -339,7 +339,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
             [
                 [
                     'pip-compile', '--no-emit-index-url',
-                    '--generate-hashes','requirements.in',
+                    '--generate-hashes', 'requirements.in',
                     '--output-file', 'requirements.txt',
                 ],
                 [
