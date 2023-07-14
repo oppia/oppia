@@ -60,7 +60,7 @@ class StartTests(test_utils.GenericTestBase):
             common, 'print_each_string_after_two_new_lines', mock_print)
         def mock_constants() -> None:
             print('mock_set_constants_to_default')
-        
+
         env = os.environ.copy()
         env['PIP_NO_DEPS'] = 'True'
         # We need to create a swap for install_third_party_libs because
