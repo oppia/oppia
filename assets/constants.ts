@@ -7100,6 +7100,6 @@ export default {
   ],
   "CONTRIBUTOR_CERTIFICATE_WIDTH": 1493,
   "CONTRIBUTOR_CERTIFICATE_HEIGHT": 1313,
-  "BRANCH_NAME": "blogdb-author-18629",
-  "SHORT_COMMIT_HASH": "3d1d9af3d0"
+  "BRANCH_NAME": "",
+  "SHORT_COMMIT_HASH": ""
 } as const;
