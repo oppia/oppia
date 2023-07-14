@@ -2003,28 +2003,6 @@ class ReviewableSuggestionEmailInfo:
         self.submission_datetime = submission_datetime
 
 
-class TranslationSubmitterTotalContributionStatsDict(TypedDict):
-    """Dictionary representing the TranslationSubmitterTotalContributionStats
-    object.
-    """
-
-    language_code: str
-    contributor_id: str
-    topic_ids_with_translation_submissions: List[str]
-    recent_review_outcomes: List[str]
-    recent_performance: int
-    overall_accuracy: float
-    submitted_translations_count: int
-    submitted_translation_word_count: int
-    accepted_translations_count: int
-    accepted_translations_without_reviewer_edits_count: int
-    accepted_translation_word_count: int
-    rejected_translations_count: int
-    rejected_translation_word_count: int
-    first_contribution_date: datetime.date
-    last_contribution_date: datetime.date
-
-
 class TranslationSubmitterTotalContributionStatsFrontendDict(TypedDict):
     """Dictionary representing the TranslationSubmitterTotalContributionStats
     object for frontend.
@@ -2121,23 +2099,6 @@ class TranslationSubmitterTotalContributionStats:
         }
 
 
-class TranslationReviewerTotalContributionStatsDict(TypedDict):
-    """Dictionary representing the TranslationReviewerTotalContributionStats
-    object.
-    """
-
-    language_code: str
-    contributor_id: str
-    topic_ids_with_translation_reviews: List[str]
-    reviewed_translations_count: int
-    accepted_translations_count: int
-    accepted_translations_with_reviewer_edits_count: int
-    accepted_translation_word_count: int
-    rejected_translations_count: int
-    first_contribution_date: datetime.date
-    last_contribution_date: datetime.date
-
-
 class TranslationReviewerTotalContributionStatsFrontendDict(TypedDict):
     """Dictionary representing the TranslationReviewerTotalContributionStats
     object for frontend.
@@ -2210,24 +2171,6 @@ class TranslationReviewerTotalContributionStats:
             'last_contributed_in_days': int(
                 (datetime.date.today() - self.last_contribution_date).days)
         }
-
-
-class QuestionSubmitterTotalContributionStatsDict(TypedDict):
-    """Dictionary representing the QuestionSubmitterTotalContributionStats
-    object.
-    """
-
-    contributor_id: str
-    topic_ids_with_question_submissions: List[str]
-    recent_review_outcomes: List[str]
-    recent_performance: int
-    overall_accuracy: float
-    submitted_questions_count: int
-    accepted_questions_count: int
-    accepted_questions_without_reviewer_edits_count: int
-    rejected_questions_count: int
-    first_contribution_date: datetime.date
-    last_contribution_date: datetime.date
 
 
 class QuestionSubmitterTotalContributionStatsFrontendDict(TypedDict):
@@ -2305,21 +2248,6 @@ class QuestionSubmitterTotalContributionStats:
             'last_contributed_in_days': int(
                 (datetime.date.today() - self.last_contribution_date).days)
         }
-
-
-class QuestionReviewerTotalContributionStatsDict(TypedDict):
-    """Dictionary representing the QuestionReviewerTotalContributionStats
-    object.
-    """
-
-    contributor_id: str
-    topic_ids_with_question_reviews: List[str]
-    reviewed_questions_count: int
-    accepted_questions_count: int
-    accepted_questions_with_reviewer_edits_count: int
-    rejected_questions_count: int
-    first_contribution_date: datetime.date
-    last_contribution_date: datetime.date
 
 
 class QuestionReviewerTotalContributionStatsFrontendDict(TypedDict):
