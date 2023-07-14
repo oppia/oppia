@@ -25,12 +25,13 @@ import ssl
 import sys
 import tarfile
 import urllib
-import zipfile
-
 from urllib import error as urlerror
 from urllib import request as urlrequest
+import zipfile
+
 import certifi
-from typing import BinaryIO, Dict, Final, List, Literal, TextIO, TypedDict, Union, cast, overload
+from typing import (BinaryIO, Dict, Final, List, Literal, TextIO, TypedDict,
+                    Union, cast, overload)
 
 DEPENDENCIES_FILE_PATH: Final = os.path.join(os.getcwd(), 'dependencies.json')
 TOOLS_DIR: Final = os.path.join('..', 'oppia_tools')
@@ -85,10 +86,12 @@ DOWNLOAD_FORMATS_TO_DEPENDENCIES_KEYS: Dict[
 TextModeTypes = Literal['r', 'w', 'a', 'x', 'r+', 'w+', 'a+']
 BinaryModeTypes = Literal['rb', 'wb', 'ab', 'xb', 'r+b', 'w+b', 'a+b', 'x+b']
 
+
 def ensure_directory_exists(d: str) -> None:
     """Creates the given directory if it does not already exist."""
     if not os.path.exists(d):
         os.makedirs(d)
+
 
 def url_retrieve(
         url: str, output_path: str, max_attempts: int = 2,
@@ -140,6 +143,7 @@ def url_retrieve(
         else:
             success = True
 
+
 def url_open(
     source_url: Union[str, urllib.request.Request]
 ) -> urllib.request._UrlopenRet:
@@ -155,6 +159,7 @@ def url_open(
     # check is refactored.
     context = ssl.create_default_context(cafile=certifi.where())
     return urllib.request.urlopen(source_url, context=context)
+
 
 # Here we use total=False since some fields in this dict
 # is optional/not required. There are possibilities that some fields
@@ -181,6 +186,7 @@ class DependenciesDict(TypedDict):
 
     dependencies: Dict[str, Dict[str, DependencyDict]]
 
+
 @overload
 def open_file(
     filename: str,
@@ -197,6 +203,7 @@ def open_file(
     encoding: Union[str, None] = 'utf-8',
     newline: Union[str, None] = None
 ) -> BinaryIO: ...
+
 
 def open_file(
     filename: str,
@@ -225,6 +232,7 @@ def open_file(
         open(filename, mode, encoding=encoding, newline=newline)
     )
     return file
+
 
 def download_files(
     source_url_root: str,
