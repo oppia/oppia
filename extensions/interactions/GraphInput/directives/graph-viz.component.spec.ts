@@ -777,6 +777,14 @@ describe('GraphVizComponent', () => {
     component.interactionIsActive = true;
     component.dotCursorCoordinateX = 0;
     component.dotCursorCoordinateY = 0;
+    const graphAreaElement = document.createElement('div');
+    graphAreaElement.classList.add('oppia-graph-viz-svg');
+    graphAreaElement.style.position = 'absolute';
+    graphAreaElement.style.left = '0px';
+    graphAreaElement.style.top = '0px';
+    component.graphArea = new ElementRef(graphAreaElement);
+    const graphAreaRect = graphAreaElement.getBoundingClientRect();
+
     component.mousemoveGraphSVG(event);
 
     expect(component.dotCursorCoordinateX).toBe(event.clientX - graphAreaRect.left);
