@@ -700,7 +700,9 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
         # regular letters, digits, periods, underscores, or hyphens and ending
         # with an optional suffix of the pattern [str] with no brackets inside
         # the outside brackets.
-        library_name_pattern = re.compile(r'^[a-zA-Z0-9_.-]+(\[[^\[^\]]+\])*$')
+        library_name_pattern = re.compile(
+            r'^[a-zA-Z0-9_.-]+(\[[^\[^\]]+\])*$|--hash=sha256:[a-zA-Z0-9]+'
+        )
         with utils.open_file(
             common.COMPILED_REQUIREMENTS_FILE_PATH, 'r') as f:
             lines = f.readlines()
