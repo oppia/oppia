@@ -19,14 +19,17 @@
 from __future__ import annotations
 
 import builtins
+import io
 import os
 import re
+import ssl
 import tarfile
 import tempfile
+from urllib import request as urlrequest
 import zipfile
 
 from core.tests import test_utils
-from typing import BinaryIO, Final, Tuple
+from typing import BinaryIO, Final, NoReturn, Tuple
 
 from . import install_dependencies_json_packages
 
@@ -430,3 +433,169 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
             with unzip_files_swap, untar_files_swap:
                 install_dependencies_json_packages.main()
         self.assertEqual(check_function_calls, expected_check_function_calls)
+
+    def test_url_open(self) -> None:
+        response = install_dependencies_json_packages.url_open(
+            'http://www.google.com')
+        self.assertEqual(response.getcode(), 200)
+        self.assertEqual(
+            response.url, 'http://www.google.com')
+
+    def _assert_ssl_context_matches_default(
+        self, context: ssl.SSLContext
+    ) -> None:
+        """Assert that an SSL context matches the default one.
+
+        If we create two default SSL contexts, they will evaluate as unequal
+        even though they are the same for our purposes. Therefore, this function
+        checks that the provided context has the same important security
+        properties as the default.
+
+        Args:
+            context: SSLContext. The context to compare.
+
+        Raises:
+            AssertionError. Raised if the contexts differ in any of their
+                important attributes or behaviors.
+        """
+        default_context = ssl.create_default_context()
+        for attribute in (
+            'verify_flags', 'verify_mode', 'protocol',
+            'hostname_checks_common_name', 'options', 'minimum_version',
+            'maximum_version', 'check_hostname'
+        ):
+            self.assertEqual(
+                getattr(context, attribute),
+                getattr(default_context, attribute)
+            )
+        for method in ('get_ca_certs', 'get_ciphers'):
+            self.assertEqual(
+                getattr(context, method)(),
+                getattr(default_context, method)()
+            )
+
+    def test_url_retrieve_with_successful_https_works(self) -> None:
+        with tempfile.TemporaryDirectory() as tempdir:
+            output_path = os.path.join(tempdir, 'buffer')
+            attempts = []
+            def mock_urlopen(
+                url: str, context: ssl.SSLContext
+            ) -> io.BufferedIOBase:
+                attempts.append(url)
+                self.assertLessEqual(len(attempts), 1)
+                self.assertEqual(url, 'https://example.com')
+                self._assert_ssl_context_matches_default(context)
+                return io.BytesIO(b'content')
+
+            urlopen_swap = self.swap(urlrequest, 'urlopen', mock_urlopen)
+
+            with urlopen_swap:
+                install_dependencies_json_packages.url_retrieve(
+                    'https://example.com', output_path)
+            with open(output_path, 'rb') as buffer:
+                self.assertEqual(buffer.read(), b'content')
+
+    def test_url_retrieve_with_successful_https_works_on_retry(self) -> None:
+        with tempfile.TemporaryDirectory() as tempdir:
+            output_path = os.path.join(tempdir, 'output')
+            attempts = []
+            def mock_urlopen(
+                url: str, context: ssl.SSLContext
+            ) -> io.BufferedIOBase:
+                attempts.append(url)
+                self.assertLessEqual(len(attempts), 2)
+                self.assertEqual(url, 'https://example.com')
+                self._assert_ssl_context_matches_default(context)
+                if len(attempts) == 1:
+                    raise ssl.SSLError()
+                return io.BytesIO(b'content')
+
+            urlopen_swap = self.swap(urlrequest, 'urlopen', mock_urlopen)
+
+            with urlopen_swap:
+                install_dependencies_json_packages.url_retrieve(
+                    'https://example.com', output_path)
+            with open(output_path, 'rb') as buffer:
+                self.assertEqual(buffer.read(), b'content')
+
+    def test_url_retrieve_runs_out_of_attempts(self) -> None:
+        attempts = []
+        def mock_open(_path: str, _options: str) -> NoReturn:
+            raise AssertionError('open() should not be called')
+        def mock_urlopen(
+            url: str, context: ssl.SSLContext
+        ) -> io.BufferedIOBase:
+            attempts.append(url)
+            self.assertLessEqual(len(attempts), 2)
+            self.assertEqual(url, 'https://example.com')
+            self._assert_ssl_context_matches_default(context)
+            raise ssl.SSLError('test_error')
+
+        open_swap = self.swap(builtins, 'open', mock_open)
+        urlopen_swap = self.swap(urlrequest, 'urlopen', mock_urlopen)
+
+        with open_swap, urlopen_swap:
+            with self.assertRaisesRegex(ssl.SSLError, 'test_error'):
+                install_dependencies_json_packages.url_retrieve(
+                    'https://example.com', 'test_path')
+
+    def test_url_retrieve_https_check_fails(self) -> None:
+        def mock_open(_path: str, _options: str) -> NoReturn:
+            raise AssertionError('open() should not be called')
+        def mock_urlopen(url: str, context: ssl.SSLContext) -> NoReturn:  # pylint: disable=unused-argument
+            raise AssertionError('urlopen() should not be called')
+
+        open_swap = self.swap(builtins, 'open', mock_open)
+        urlopen_swap = self.swap(urlrequest, 'urlopen', mock_urlopen)
+
+        with open_swap, urlopen_swap:
+            with self.assertRaisesRegex(
+                Exception, 'The URL http://example.com should use HTTPS.'
+            ):
+                install_dependencies_json_packages.url_retrieve(
+                    'http://example.com', 'test_path')
+
+    def test_url_retrieve_with_successful_http_works(self) -> None:
+        with tempfile.TemporaryDirectory() as tempdir:
+            output_path = os.path.join(tempdir, 'output')
+            attempts = []
+            def mock_urlopen(
+                url: str, context: ssl.SSLContext
+            ) -> io.BufferedIOBase:
+                attempts.append(url)
+                self.assertLessEqual(len(attempts), 1)
+                self.assertEqual(url, 'https://example.com')
+                self._assert_ssl_context_matches_default(context)
+                return io.BytesIO(b'content')
+
+            urlopen_swap = self.swap(urlrequest, 'urlopen', mock_urlopen)
+
+            with urlopen_swap:
+                install_dependencies_json_packages.url_retrieve(
+                    'https://example.com', output_path, enforce_https=False)
+            with open(output_path, 'rb') as buffer:
+                self.assertEqual(buffer.read(), b'content')
+
+    def test_ensure_directory_exists_with_existing_dir(self) -> None:
+        check_function_calls = {
+            'makedirs_gets_called': False
+        }
+        def mock_makedirs(unused_dirpath: str) -> None:
+            check_function_calls['makedirs_gets_called'] = True
+        with self.swap(os, 'makedirs', mock_makedirs):
+            install_dependencies_json_packages.ensure_directory_exists(
+                'assets')
+        self.assertEqual(
+            check_function_calls, {'makedirs_gets_called': False})
+
+    def test_ensure_directory_exists_with_non_existing_dir(self) -> None:
+        check_function_calls = {
+            'makedirs_gets_called': False
+        }
+        def mock_makedirs(unused_dirpath: str) -> None:
+            check_function_calls['makedirs_gets_called'] = True
+        with self.swap(os, 'makedirs', mock_makedirs):
+            install_dependencies_json_packages.ensure_directory_exists(
+                'test-dir')
+        self.assertEqual(
+            check_function_calls, {'makedirs_gets_called': True})
