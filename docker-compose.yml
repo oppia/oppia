@@ -65,7 +65,7 @@ services:
       timeout: 10s
       interval: 30s
       retries: 5
-      start_period: 7m
+      start_period: 5m
     command: >
       sh -c '
         python -m scripts.build
@@ -88,6 +88,7 @@ services:
     container_name: oppia-cloud-datastore
     environment:
       - CLOUDSDK_CORE_DISABLE_PROMPTS=1
+      - DATASTORE_HOST='datastore'
     volumes:
       - cloud_datastore_emulator_cache:/app/cloud_datastore_emulator_cache
     healthcheck:
@@ -95,7 +96,7 @@ services:
       timeout: 10s
       interval: 2m
       retries: 5
-      start_period: 7m
+      start_period: 5m
     entrypoint: /google-cloud-sdk/bin/gcloud
     command:
       - "beta"

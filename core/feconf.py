@@ -1362,9 +1362,7 @@ FIREBASE_ROLE_SUPER_ADMIN = 'super_admin'
 FIREBASE_AUTH_ID_REGEX = '^[A-Za-z0-9]{1,128}$'
 
 # TODO(#18260): Change this when we permanently move to the Dockerized Setup.
-CLOUD_DATASTORE_EMULATOR_HOST = (
-    'datastore' if OPPIA_IS_DOCKERIZED else 'localhost'
-)
+CLOUD_DATASTORE_EMULATOR_HOST = os.environ.get('DATASTORE_HOST', 'localhost')
 CLOUD_DATASTORE_EMULATOR_PORT = 8089
 
 FIREBASE_EMULATOR_CONFIG_PATH = '.firebase.json'
