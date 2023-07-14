@@ -383,7 +383,7 @@
           (mouseover)="openSubmenu($event, 'languageMenu')"
           (mouseleave)="closeSubmenuIfNotMobile($event)">
         <li class="nav-item" [ngClass]="'e2e-test-i18n-language-' + language.id" *ngFor="let language of supportedSiteLanguages">
-          <a (click)="changeLanguage(language.id)" tabindex="0" (keydown.enter)="changeLanguage(language.id)"
+          <a (click)="changeLanguage(language.id)" tabindex="0" [attr.aria-label]="language.ariaLabelInEnglish" (keydown.enter)="changeLanguage(language.id)"
              (keydown)="onMenuKeypress($event, 'languageMenu', {enter: ACTION_CLOSE})">
             <div class="language-element oppia-nav-right-dropdown" [ngClass]="{'language-element-selected': currentLanguageCode === language.id}">
               <span *ngIf="currentLanguageCode === language.id">
