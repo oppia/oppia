@@ -547,6 +547,80 @@ describe('InteractiveImageClickInput', () => {
     expect(component.currentlyHoveredRegions).toEqual([]);
   });
 
+  it('should click on graph when Enter key is pressed', () => {
+    spyOn(component, 'updateDotPosition');
+    spyOn(component, 'updateCurrentlyHoveredRegions');
+    spyOn(component, 'onClickImage');
+
+    component.dotCursorCoordinateX = 0;
+    component.dotCursorCoordinateY = 0;
+    component.currentlyHoveredRegions = ['region1', 'region2'];
+    const event = new KeyboardEvent('keydown', { key: 'Enter' });
+
+    component.handleKeyDown(event);
+
+    expect(component.dotCursorCoordinateX).toBe(0);
+    expect(component.dotCursorCoordinateY).toBe(10);
+    expect(component.onClickImage).toHaveBeenCalled();
+    expect(component.updateDotPosition).toHaveBeenCalledWith(event);
+    expect(component.updateCurrentlyHoveredRegions).toHaveBeenCalled();
+    expect(component.currentlyHoveredRegions).toEqual([]);
+  });
+
+  it('should update dotCursor position when mouse moves over image region', () => {
+    spyOn(Element.prototype, 'querySelectorAll').and.callFake(
+      jasmine.createSpy('querySelectorAll').and
+        .returnValue([{
+          parentElement: {
+            getBoundingClientRect: () => {
+              return new DOMRect(300, 300, 300, 300);
+            }
+          },
+          getBoundingClientRect: () => {
+            return new DOMRect(200, 200, 200, 200);
+          },
+          width: 200,
+          height: 200
+        }]));
+
+    const styleMock = jasmine.createSpyObj<CSSStyleDeclaration>(
+      'CSSStyleDeclaration', [
+        'marginLeft',
+        'marginTop',
+        'width',
+        'height'
+      ]);
+    const dotMock = document.createElement('div');
+    spyOn(document, 'querySelector').and.returnValue(dotMock);
+    styleMock.marginLeft = '0px';
+    styleMock.marginTop = '0px';
+    styleMock.width = '0px';
+    styleMock.height = '0px';
+    spyOn(window, 'getComputedStyle').and.returnValue(styleMock);
+
+    spyOn(component, 'updateCurrentlyHoveredRegions').and.callThrough();
+    spyOnProperty(MouseEvent.prototype, 'clientX', 'get').and.returnValue(290);
+    spyOnProperty(MouseEvent.prototype, 'clientY', 'get').and.returnValue(260);
+    let evt = new MouseEvent('Mousemove');
+    component.lastAnswer = null;
+    component.ngOnInit();
+
+    component.usingMobileDevice = false;
+    expect(component.interactionIsActive).toBe(true);
+    expect(component.mouseX).toBe(0);
+    expect(component.mouseY).toBe(0);
+    expect(component.currentlyHoveredRegions).toEqual([]);
+
+    component.onMousemoveImage(evt);
+
+    // The mouseX and mouseY variables must be updated only
+    // when the interaction is active.
+    expect(component.usingMobileDevice).toBe(true);
+    expect(component.interactionIsActive).toBe(true);
+    expect(component.mouseX).toBe(0.45);
+    expect(component.mouseY).toBe(0.3);
+    expect(component.currentlyHoveredRegions).toEqual(['Region1']);
+
   it('should not check if mouse is over region when interaction is not' +
   ' active', () => {
     spyOn(component, 'updateCurrentlyHoveredRegions').and.callThrough();
