@@ -841,6 +841,8 @@ describe('GraphVizComponent', () => {
         right: 220
     });
 
+    spyOn(buttonElements[0], 'dispatchEvent');
+
     const result = component.isButtonOnTopOfDot();
 
     expect(result).toBe(true);
