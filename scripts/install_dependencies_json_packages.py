@@ -30,8 +30,10 @@ from urllib import request as urlrequest
 import zipfile
 
 import certifi
-from typing import (BinaryIO, Dict, Final, List, Literal, TextIO, TypedDict,
-                    Union, cast, overload)
+from typing import (
+    BinaryIO, Dict, Final, List, Literal, TextIO, TypedDict,
+    Union, cast, overload
+)
 
 DEPENDENCIES_FILE_PATH: Final = os.path.join(os.getcwd(), 'dependencies.json')
 TOOLS_DIR: Final = os.path.join('..', 'oppia_tools')

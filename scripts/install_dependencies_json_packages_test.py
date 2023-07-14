@@ -25,11 +25,9 @@ import tarfile
 import tempfile
 import zipfile
 
-from core import utils
 from core.tests import test_utils
 from typing import BinaryIO, Final, Tuple
 
-from . import common
 from . import install_dependencies_json_packages
 
 RELEASE_TEST_DIR: Final = os.path.join('core', 'tests', 'release_sources', '')
@@ -79,12 +77,14 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
             install_dependencies_json_packages, 'TMP_UNZIP_PATH',
             MOCK_TMP_UNZIP_PATH)
         self. dir_exists_swap = self.swap(
-            common, 'ensure_directory_exists', mock_ensure_directory_exists)
+            install_dependencies_json_packages,
+            'ensure_directory_exists', mock_ensure_directory_exists)
         self.exists_swap = self.swap(os.path, 'exists', mock_exists)
         self.remove_swap = self.swap(os, 'remove', mock_remove)
         self.rename_swap = self.swap(os, 'rename', mock_rename)
         self.url_retrieve_swap = self.swap(
-            common, 'url_retrieve', mock_url_retrieve)
+            install_dependencies_json_packages, 'url_retrieve',
+            mock_url_retrieve)
         self.extract_swap = self.swap(
             zipfile.ZipFile, 'extractall', mock_extractall)
 
@@ -117,7 +117,8 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
 
         exists_swap = self.swap(os.path, 'exists', mock_exists)
         url_retrieve_swap = self.swap(
-            common, 'url_retrieve', mock_url_retrieve)
+            install_dependencies_json_packages, 'url_retrieve',
+            mock_url_retrieve)
         with self.dir_exists_swap, exists_swap, url_retrieve_swap:
             install_dependencies_json_packages.download_files(
                 'source_url', 'target_dir', ['file1', 'file2'])
@@ -158,11 +159,14 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
             # The function is used as follows: utils.url_open(req).read()
             # So, the mock returns a file object as a mock so that the read
             # function can work correctly.
-            file_obj = utils.open_file(MOCK_TMP_UNZIP_PATH, 'rb', None)
+            file_obj = install_dependencies_json_packages.open_file(
+                MOCK_TMP_UNZIP_PATH, 'rb', None)
             return file_obj
 
         exists_swap = self.swap(os.path, 'exists', mock_exists)
-        url_open_swap = self.swap(utils, 'url_open', mock_url_open)
+        url_open_swap = self.swap(
+            install_dependencies_json_packages, 'url_open',
+            mock_url_open)
         with exists_swap, self.dir_exists_swap, self.url_retrieve_swap:
             with self.remove_swap, self.rename_swap, self.extract_swap:
                 with url_open_swap:
@@ -198,7 +202,8 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
     def test_get_file_contents(self) -> None:
         temp_file = tempfile.NamedTemporaryFile().name
         actual_text = 'Testing install third party file.'
-        with utils.open_file(temp_file, 'w') as f:
+        with install_dependencies_json_packages.open_file(
+            temp_file, 'w') as f:
             f.write(actual_text)
         self.assertEqual(
             install_dependencies_json_packages.get_file_contents(temp_file),
@@ -207,7 +212,8 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
     def test_return_json(self) -> None:
         temp_file = tempfile.NamedTemporaryFile().name
         actual_text = '{"Testing": "install_dependencies_json_packages"}'
-        with utils.open_file(temp_file, 'w') as f:
+        with install_dependencies_json_packages.open_file(
+            temp_file, 'w') as f:
             f.write(actual_text)
         self.assertEqual(
             install_dependencies_json_packages.return_json(temp_file),
