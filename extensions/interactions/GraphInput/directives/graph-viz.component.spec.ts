@@ -804,18 +804,21 @@ describe('GraphVizComponent', () => {
 
   it('should dispatch click event when button is on top of dot', () => {
 
-    const dot = new ElementRef(document.createElement('div'));
-    dot.nativeElement.classList.add('oppia-add-node-cursor');
+    const dotElement = document.createElement('div');
+    dotElement.classList.add('oppia-add-node-cursor');
 
     const buttonElements = [
       new ElementRef(document.createElement('button')),
       new ElementRef(document.createElement('button'))
     ];
 
-    buttonElements[0].nativeElement.classList.add('e2e-test-one-button');
-    buttonElements[1].nativeElement.classList.add('e2e-test-two-button');
+    buttonElements[0].classList.add('e2e-test-one-button');
+    buttonElements[1].classList.add('e2e-test-two-button');
 
-    spyOn(dot.nativeElement, 'getBoundingClientRect')
+    spyOn(document, 'querySelector').and.returnValue(dotElement);
+    spyOn(document, 'querySelectorAll').and.returnValue(buttonElements);
+
+    spyOn(dotElement, 'getBoundingClientRect')
       .and.returnValue({
         top: 100,
         bottom: 110,
@@ -823,14 +826,14 @@ describe('GraphVizComponent', () => {
         right: 210
     });
 
-    spyOn(buttonElements[0].nativeElement, 'getBoundingClientRect')
+    spyOn(buttonElements[0], 'getBoundingClientRect')
       .and.returnValue({
         top: 90,
         bottom: 135,
         left: 190,
         right: 275
     });
-    spyOn(buttonElements[1].nativeElement, 'getBoundingClientRect')
+    spyOn(buttonElements[1], 'getBoundingClientRect')
       .and.returnValue({
         top: 50,
         bottom: 80,
@@ -838,7 +841,7 @@ describe('GraphVizComponent', () => {
         right: 220
     });
 
-    spyOn(buttonElements[0].nativeElement, 'dispatchEvent');
+    spyOn(buttonElements[0], 'dispatchEvent');
 
     const result = component.isButtonOnTopOfDot();
 
