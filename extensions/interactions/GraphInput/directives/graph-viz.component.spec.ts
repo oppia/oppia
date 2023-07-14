@@ -766,35 +766,32 @@ describe('GraphVizComponent', () => {
       clientX: 100,
       clientY: 100
     });
-    component.interactionIsActive = true;
-    component.dotCursorCoordinateX = 0;
-    component.dotCursorCoordinateY = 0;
-    
+    component.state.currentMode = 2;
     const dotCursorElement = document.createElement('div');
     dotCursorElement.classList.add('oppia-add-node-cursor');
     dotCursorElement.style.top = '0px';
     dotCursorElement.style.left = '0px';
-    component.dotCursor = {
-      nativeElement: dotCursorElement
-    };
-    
+    component.dotCursor = new ElementRef(dotCursorElement);
+    component.dotCursor.nativeElement = dotCursorElement; // Assign nativeElement manually
+    const dot = component.dotCursor.nativeElement;
+    component.interactionIsActive = true;
+    component.dotCursorCoordinateX = 0;
+    component.dotCursorCoordinateY = 0;
+
+    component.ngAfterViewInit();
+  
     const graphAreaElement = document.createElement('div');
     graphAreaElement.classList.add('oppia-graph-viz-svg');
     graphAreaElement.style.position = 'absolute';
     graphAreaElement.style.left = '0px';
     graphAreaElement.style.top = '0px';
-    component.graphArea = {
-      nativeElement: graphAreaElement
-    };
-    
-    component.ngAfterViewInit();
-    component.state.currentMode = 2;
+    component.graphArea = new ElementRef(graphAreaElement);
+    const graphAreaRect = graphAreaElement.getBoundingClientRect();
+  
     component.mousemoveGraphSVG(event);
   
-    const dot = component.dotCursor.nativeElement;
-  
-    expect(component.dotCursorCoordinateX).toBe(event.clientX);
-    expect(component.dotCursorCoordinateY).toBe(event.clientY);
+    expect(component.dotCursorCoordinateX).toBe(event.clientX - graphAreaRect.left);
+    expect(component.dotCursorCoordinateY).toBe(event.clientY - graphAreaRect.top);
     expect(dot.style.top).toBe(component.dotCursorCoordinateY + 'px');
     expect(dot.style.left).toBe(component.dotCursorCoordinateX + 'px');
   });
