@@ -48,7 +48,7 @@ export class InsertScriptService {
         this.loaded_scripts.add(script);
         break;
       default: {
-        break;
+        return false;
       }
     }
     return true;

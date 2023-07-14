@@ -27,6 +27,7 @@ class MockRenderer {
 
 describe('InsertScriptService', () => {
   let insertScriptService: InsertScriptService;
+  let UNKNOW_SCRIPT = '';
   beforeEach(() => {
     TestBed.configureTestingModule({
       providers: [{
@@ -41,5 +42,6 @@ describe('InsertScriptService', () => {
     expect(insertScriptService.loadScript(KNOWN_SCRIPTS.DONORBOX)).toBe(true);
     // Load script again.
     expect(insertScriptService.loadScript(KNOWN_SCRIPTS.DONORBOX)).toBe(false);
+    expect(insertScriptService.loadScript(UNKNOW_SCRIPT)).toBe(false);
   });
 });
