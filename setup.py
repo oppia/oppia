@@ -21,8 +21,6 @@ The package is built by running 'python setup.py sdist' in the build.py.
 from __future__ import annotations
 
 import re
-import shutil
-import tempfile
 
 from core import feconf
 
