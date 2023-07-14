@@ -30,6 +30,7 @@ from core.controllers import base
 from core.domain import android_services
 from core.domain import blog_services
 from core.domain import classifier_services
+from core.domain import classroom_config_services
 from core.domain import classroom_services
 from core.domain import email_manager
 from core.domain import feedback_services
@@ -187,7 +188,7 @@ def does_classroom_exist(
             Exception. This decorator is not expected to be used with other
                 handler types.
         """
-        classroom = classroom_services.get_classroom_by_url_fragment(
+        classroom = classroom_config_services.get_classroom_by_url_fragment(
             classroom_url_fragment)
 
         if not classroom:
