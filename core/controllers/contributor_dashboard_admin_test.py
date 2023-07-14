@@ -772,7 +772,7 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
 
     CONTRIBUTOR_EMAIL: Final = 'contributor@example.com'
     CONTRIBUTOR_USERNAME: Final = 'contributor'
-    SUGGESTION_LANGUAGE_CODE: Final = 'en'
+    SUGGESTION_LANGUAGE_CODE: Final = 'es'
     USER_ID_1: Final = 'uid_01234567890123456789012345678912'
     TOPIC_IDS_WITH_TRANSLATION_SUBMISSIONS: Final = ['topic1', 'topic2']
     RECENT_REVIEW_OUTCOMES: Final = ['accepted', 'rejected']
@@ -1121,7 +1121,7 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
                 'language_code': self.SUGGESTION_LANGUAGE_CODE,
                 'sort_by': None,
                 'topic_ids': []
-            }, expected_status_int=500)
+            }, expected_status_int=400)
         self.logout()
 
     def test_get_stats_with_invalid_sub_contribution_type_raises_error(
@@ -1136,7 +1136,7 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
                 'language_code': self.SUGGESTION_LANGUAGE_CODE,
                 'sort_by': None,
                 'topic_ids': []
-            }, expected_status_int=500)
+            }, expected_status_int=400)
         self.logout()
 
     def test_get_translation_submitter_stats_for_pagination(self) -> None:
@@ -1377,7 +1377,6 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
             '/contributor-dashboard-admin-stats/question/submission', {
                 'page_size': 2,
                 'offset': 1,
-                'language_code': None,
                 'topic_ids': []
             })
 
@@ -1407,7 +1406,6 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
             '/contributor-dashboard-admin-stats/question/submission', {
                 'page_size': 2,
                 'offset': 1,
-                'language_code': None,
                 'sort_by': 'IncreasingLastActivity',
                 'topic_ids': []
             })
@@ -1438,7 +1436,6 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
             '/contributor-dashboard-admin-stats/question/submission', {
                 'page_size': 2,
                 'offset': 1,
-                'language_code': None,
                 'topic_ids': json.dumps(['topic1', 'topic2'])
             })
 
@@ -1474,7 +1471,6 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
             '/contributor-dashboard-admin-stats/question/submission', {
                 'page_size': 4,
                 'offset': 1,
-                'language_code': None,
                 'max_days_since_last_activity': 120,
                 'topic_ids': []
             })
@@ -1509,7 +1505,6 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
             '/contributor-dashboard-admin-stats/question/review', {
                 'page_size': 2,
                 'offset': 1,
-                'language_code': None,
                 'topic_ids': []
             })
 
@@ -1539,7 +1534,6 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
             '/contributor-dashboard-admin-stats/question/review', {
                 'page_size': 2,
                 'offset': 1,
-                'language_code': None,
                 'sort_by': 'IncreasingLastActivity',
                 'topic_ids': []
             })
@@ -1572,7 +1566,6 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
             '/contributor-dashboard-admin-stats/question/review', {
                 'page_size': 4,
                 'offset': 1,
-                'language_code': None,
                 'max_days_since_last_activity': 120,
                 'topic_ids': []
             })

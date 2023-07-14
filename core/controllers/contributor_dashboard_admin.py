@@ -579,38 +579,38 @@ class ContributorDashboardAdminStatsHandler(
         'GET': {
             'page_size': {
                 'schema': {
-                    'type': 'int'
+                    'type': 'int',
+                    'validators': [{
+                        'id': 'is_at_least',
+                        'min_value': 0
+                    }],
                 },
-                'validators': [{
-                    'id': 'is_at_least',
-                    'min_value': 0
-                }],
                 'default_value': 20
             },
             'offset': {
                 'schema': {
-                    'type': 'int'
-                },
-                'validators': [{
-                    'id': 'is_at_least',
-                    'min_value': 0
-                }]
+                    'type': 'int',
+                    'validators': [{
+                        'id': 'is_at_least',
+                        'min_value': 0
+                    }]
+                }
             },
             'language_code': {
                 'schema': {
-                    'type': 'basestring'
+                    'type': 'basestring',
+                    'validators': [{
+                        'id': 'is_supported_audio_language_code'
+                    }]
                 },
-                'default_value': None,
-                'validators': [{
-                    'id': 'is_supported_audio_language_code'
-                }]
+                'default_value': None
             },
             'sort_by': {
                 'schema': {
-                    'type': 'basestring'
+                    'type': 'basestring',
+                    'choices': constants.CD_ADMIN_STATS_SORT_OPTIONS
                 },
-                'default_value': None,
-                'choices': constants.CD_ADMIN_STATS_SORT_OPTIONS
+                'default_value': None
             },
             'topic_ids': {
                 'schema': {
@@ -621,12 +621,12 @@ class ContributorDashboardAdminStatsHandler(
             },
             'max_days_since_last_activity': {
                 'schema': {
-                    'type': 'int'
+                    'type': 'int',
+                    'validators': [{
+                        'id': 'is_at_least',
+                        'min_value': 0
+                    }]
                 },
-                'validators': [{
-                    'id': 'is_at_least',
-                    'min_value': 0
-                }],
                 'default_value': None
             }
         }
