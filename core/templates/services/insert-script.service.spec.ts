@@ -19,18 +19,24 @@ import { Renderer2 } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { InsertScriptService, KNOWN_SCRIPTS } from 'services/insert-script.service';
 
+class MockRenderer {
+  appendChild() {
+    return;
+  }
+}
+
 describe('InsertScriptService', () => {
   let insertScriptService: InsertScriptService;
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [
-        Renderer2,
-      ]});
+      providers: [{
+          provide: Renderer2,
+          useValue: MockRenderer,
+        }]});
     insertScriptService = TestBed.get(InsertScriptService);
   });
 
   it('should insert script into html', () => {
-    spyOn(insertScriptService.renderer, 'appendChild');
     // First time load script.
     expect(insertScriptService.loadScript(KNOWN_SCRIPTS.DONORBOX)).toBe(true);
     // Load script again.
