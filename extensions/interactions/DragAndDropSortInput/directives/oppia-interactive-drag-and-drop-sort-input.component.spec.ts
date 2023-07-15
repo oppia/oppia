@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for the DragAndDropSortInput interaction.
  */
 
-import { NO_ERRORS_SCHEMA, ElementRef } from '@angular/core';
+import { NO_ERRORS_SCHEMA, ElementRef, QueryList } from '@angular/core';
 import { async, ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { InteractiveDragAndDropSortInputComponent } from './oppia-interactive-drag-and-drop-sort-input.component';
 import { CurrentInteractionService } from 'pages/exploration-player-page/services/current-interaction.service';
@@ -504,11 +504,11 @@ describe('Drag and drop sort input interactive component', () => {
     const event = new KeyboardEvent('keydown', { key: 'ArrowDown' });
     const currentIndex = 0;
     component.activeItem = 0;
-    component.listItems = [
+    component.listItems = new QueryList<ElementRef>([
       new ElementRef(document.createElement('div')),
       new ElementRef(document.createElement('div')),
       new ElementRef(document.createElement('div'))
-    ];
+    ]);
     component.singleItemInSamePositionArray = [
       '<p>choice 1</p>',
       '<p>choice 2</p>',
@@ -526,11 +526,11 @@ describe('Drag and drop sort input interactive component', () => {
     const event = new KeyboardEvent('keydown', { key: 'ArrowUp' });
     const currentIndex = 1;
     component.activeItem = 1;
-    component.listItems = [
+    component.listItems = new QueryList<ElementRef>([
       new ElementRef(document.createElement('div')),
       new ElementRef(document.createElement('div')),
       new ElementRef(document.createElement('div'))
-    ];
+    ]);
     component.singleItemInSamePositionArray = [
       '<p>choice 1</p>',
       '<p>choice 2</p>',
@@ -560,11 +560,11 @@ describe('Drag and drop sort input interactive component', () => {
     const event = new KeyboardEvent('keydown', { key: 'Tab', shiftKey: false });
     const currentIndex = 1;
     component.activeItem = 1;
-    component.listItems = [
+    component.listItems = new QueryList<ElementRef>([
       new ElementRef(document.createElement('div')),
       new ElementRef(document.createElement('div')),
       new ElementRef(document.createElement('div'))
-    ];
+    ]);
     spyOn(component, 'setFocus');
   
     component.handleKeyDown(event, currentIndex);
