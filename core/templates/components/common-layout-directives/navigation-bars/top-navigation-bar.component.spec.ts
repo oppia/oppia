@@ -18,7 +18,7 @@
 
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
-import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
+import { ComponentFixture, fakeAsync, flush, TestBed, tick, waitForAsync } from '@angular/core/testing';
 import { DeviceInfoService } from 'services/contextual/device-info.service';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
@@ -26,11 +26,15 @@ import { EventToCodes, NavigationService } from 'services/navigation.service';
 import { SearchService } from 'services/search.service';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { UserService } from 'services/user.service';
+import { AlertsService } from 'services/alerts.service';
 import { MockI18nService, MockTranslatePipe } from 'tests/unit-test-utils';
 import { TopNavigationBarComponent } from './top-navigation-bar.component';
 import { DebouncerService } from 'services/debouncer.service';
 import { SidebarStatusService } from 'services/sidebar-status.service';
 import { UserInfo } from 'domain/user/user-info.model';
+import { FeedbackUpdatesBackendApiService } from 'domain/feedback_updates/feedback-updates-backend-api.service';
+import { FeedbackThreadSummary } from
+  'domain/feedback_thread/feedback-thread-summary.model';
 import { ClassroomBackendApiService } from 'domain/classroom/classroom-backend-api.service';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { I18nService } from 'i18n/i18n.service';
@@ -49,6 +53,9 @@ class MockPlatformFeatureService {
       isEnabled: false
     },
     BlogPages: {
+      isEnabled: false
+    },
+    ShowFeedbackUpdatesInProfilePicDropdownMenu: {
       isEnabled: false
     }
   };
@@ -94,17 +101,54 @@ describe('TopNavigationBarComponent', () => {
   let searchService: SearchService;
   let wds: WindowDimensionsService;
   let userService: UserService;
+  let alertsService: AlertsService;
   let siteAnalyticsService: SiteAnalyticsService;
   let navigationService: NavigationService;
   let deviceInfoService: DeviceInfoService;
   let debouncerService: DebouncerService;
   let sidebarStatusService: SidebarStatusService;
+  let feedbackUpdatesBackendApiService:
+      FeedbackUpdatesBackendApiService;
   let classroomBackendApiService: ClassroomBackendApiService;
   let learnerGroupBackendApiService: LearnerGroupBackendApiService;
   let i18nLanguageCodeService: I18nLanguageCodeService;
   let i18nService: I18nService;
   let mockPlatformFeatureService = new MockPlatformFeatureService();
   let urlInterpolationService: UrlInterpolationService;
+
+  let threadSummaryList = [{
+    status: 'open',
+    original_author_id: '1',
+    last_updated_msecs: 1000,
+    last_message_text: 'Last Message',
+    total_message_count: 5,
+    last_message_is_read: false,
+    second_last_message_is_read: true,
+    author_last_message: '2',
+    author_second_last_message: 'Last Message',
+    exploration_title: 'Biology',
+    exploration_id: 'exp1',
+    thread_id: 'thread_1'
+  },
+  {
+    status: 'open',
+    original_author_id: '2',
+    last_updated_msecs: 1001,
+    last_message_text: 'Last Message',
+    total_message_count: 5,
+    last_message_is_read: false,
+    second_last_message_is_read: true,
+    author_last_message: '2',
+    author_second_last_message: 'Last Message',
+    exploration_title: 'Algebra',
+    exploration_id: 'exp1',
+    thread_id: 'thread_1'
+  }];
+
+  let FeedbackUpdatesData = {
+    thread_summaries: threadSummaryList,
+    number_of_unread_threads: 10
+  };
 
   let mockResizeEmitter: EventEmitter<void>;
 
@@ -122,6 +166,8 @@ describe('TopNavigationBarComponent', () => {
       providers: [
         NavigationService,
         CookieService,
+        AlertsService,
+        FeedbackUpdatesBackendApiService,
         UserService,
         {
           provide: I18nService,
@@ -160,6 +206,9 @@ describe('TopNavigationBarComponent', () => {
     debouncerService = TestBed.inject(DebouncerService);
     sidebarStatusService = TestBed.inject(SidebarStatusService);
     i18nService = TestBed.inject(I18nService);
+    feedbackUpdatesBackendApiService =
+        TestBed.inject(FeedbackUpdatesBackendApiService);
+    alertsService = TestBed.inject(AlertsService);
     classroomBackendApiService = TestBed.inject(ClassroomBackendApiService);
     learnerGroupBackendApiService = TestBed.inject(
       LearnerGroupBackendApiService);
@@ -172,6 +221,10 @@ describe('TopNavigationBarComponent', () => {
       .and.returnValue(new EventEmitter<string>());
     spyOn(userService, 'getProfileImageDataUrl').and.returnValue(
       ['default-image-url-png', 'default-image-url-webp']);
+  });
+
+  afterEach(() => {
+    component.ngOnDestroy();
   });
 
   it('should truncate navbar after search bar is loaded', fakeAsync(() => {
@@ -187,6 +240,14 @@ describe('TopNavigationBarComponent', () => {
       expect(component.truncateNavbar).toHaveBeenCalled();
     });
   }));
+
+  it('should unsubscribe upon component destruction', () => {
+    spyOn(component.directiveSubscriptions, 'unsubscribe');
+
+    component.ngOnDestroy();
+
+    expect(component.directiveSubscriptions.unsubscribe).toHaveBeenCalled();
+  });
 
   it('should try displaying the hidden navbar elements if resized' +
     ' window is larger', fakeAsync(() => {
@@ -542,6 +603,61 @@ describe('TopNavigationBarComponent', () => {
           AppConstants.DEFAULT_PROFILE_IMAGE_WEBP_PATH));
     }));
 
+  it('should fetch the number of unread feedback' +
+  'when user is logged In', fakeAsync(() => {
+    let userInfo = new UserInfo(
+      ['USER_ROLE'], true, false, false, false, true,
+      'en', 'username1', 'tester@example.com', true
+    );
+
+    spyOn(component, 'truncateNavbar').and.stub();
+    spyOn(userService, 'getUserInfoAsync').and.resolveTo(userInfo);
+    const fetchDataSpy = spyOn(
+      feedbackUpdatesBackendApiService,
+      'fetchFeedbackUpdatesDataAsync').and.returnValue(Promise.resolve({
+      numberOfUnreadThreads: FeedbackUpdatesData.
+        number_of_unread_threads,
+      threadSummaries: (
+        FeedbackUpdatesData.thread_summaries.map(
+          threadSummary => FeedbackThreadSummary
+            .createFromBackendDict(threadSummary))),
+      paginatedThreadsList: []
+    }));
+    component.userIsLoggedIn = true;
+
+    component.ngOnInit();
+    tick();
+
+    expect(component.unreadThreadsCount).toBe(10);
+    expect(fetchDataSpy).toHaveBeenCalled();
+  }));
+
+  it('should show an alert when fails to' +
+  'get the feedback updates data', fakeAsync(() => {
+    let userInfo = new UserInfo(
+      ['USER_ROLE'], true, false, false, false, true,
+      'en', 'username1', 'tester@example.com', true
+    );
+
+    spyOn(component, 'truncateNavbar').and.stub();
+    spyOn(userService, 'getUserInfoAsync').and.resolveTo(userInfo);
+    const fetchDataSpy = spyOn(
+      feedbackUpdatesBackendApiService,
+      'fetchFeedbackUpdatesDataAsync')
+      .and.rejectWith(404);
+    const alertsSpy = spyOn(alertsService, 'addWarning').and.callThrough();
+
+    component.userIsLoggedIn = true;
+    component.ngOnInit();
+    tick();
+    fixture.detectChanges();
+
+    expect(alertsSpy).toHaveBeenCalledWith(
+      'Failed to get number of unread thread of feedback updates');
+    expect(fetchDataSpy).toHaveBeenCalled();
+    flush();
+  }));
+
   it('should return proper offset for dropdown', ()=>{
     var dummyElement = document.createElement('div');
     spyOn(document, 'querySelector').and.returnValue(dummyElement);
@@ -650,4 +766,20 @@ describe('TopNavigationBarComponent', () => {
       expect(component.getOppiaBlogUrl()).toEqual(
         'https://medium.com/oppia-org');
     });
+
+  it('should return correct value for show feedback updates' +
+    'in profile pic drop down menu feature flag', () => {
+    expect(
+      component.
+        isShowFeedbackUpdatesInProfilepicDropdownFeatureFlagEnable())
+      .toBeFalse();
+
+    mockPlatformFeatureService.status.
+      ShowFeedbackUpdatesInProfilePicDropdownMenu.isEnabled = true;
+
+    expect(
+      component.
+        isShowFeedbackUpdatesInProfilepicDropdownFeatureFlagEnable())
+      .toBeTrue();
+  });
 });
