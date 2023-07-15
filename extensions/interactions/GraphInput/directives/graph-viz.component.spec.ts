@@ -773,7 +773,7 @@ describe('GraphVizComponent', () => {
     dotCursorElement.style.top = '0px';
     dotCursorElement.style.left = '0px';
 
-    component.dotCursor = new ElementRef(dotCursorElement)
+    component.dotCursor.nativeElement = dotCursorElement;
 
     component.ngAfterViewInit();
 
