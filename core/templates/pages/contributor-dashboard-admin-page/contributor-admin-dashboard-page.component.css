@@ -1,48 +1,84 @@
-table {
-    width: 100%;
+  .oppia-community-stats-value {
+    left: 0px;
+    top: 31px;
+    position: absolute;
+    color: #333333;
+    font-size: 32px;
+    font-family: Roboto;
+    font-weight: 500;
+    text-transform: capitalize;
+    word-wrap: break-word
   }
-  
-  tr.example-detail-row {
-    height: 0;
+  .oppia-community-stats-header {
+    left: 0px;
+    top: 0px;
+    position: absolute;
+    color: #667085;
+    font-size: 16px;
+    font-family: Roboto;
+    font-weight: 400;
+    text-transform: capitalize;
+    word-wrap: break-word
   }
-  
-  tr.example-element-row:not(.example-expanded-row):hover {
-    background: whitesmoke;
+  .oppia-vertical-ruler {
+    width: 66.03px;
+    height: 0px;
+    transform: rotate(-90deg);
+    transform-origin: 0 0;
+    opacity: 0.10;
+    border: 0.50px #333333 solid
   }
-  
-  tr.example-element-row:not(.example-expanded-row):active {
-    background: #efefef;
+  .oppia-header-stats-container {
+    width: 81px;
+    height: 69px;
+    position: relative
   }
-  
-  .example-element-row td {
-    border-bottom-width: 0;
+  .oppia-dashboard-title {
+    margin-bottom: 50px;
+    margin-top: 0;
   }
-  
-  .example-element-detail {
-    overflow: hidden;
+  .oppia-dashboard-title h1 {
+    color: #01645c;
+    display: inline;
+    font-family: 'Capriola', 'Roboto', Arial, sans-serif;
+    font-size: 3em;
+    margin-bottom: 25px;
+  }
+  .oppia-dashboard-title-desktop {
+    padding-top: 78.5px;
+  }
+  .oppia-dashboard-title-mobile {
+    padding-top: 15px;
+    text-align: center;
+  }
+  .stats-header {
+    color: #667085;
+    font-size: 16px;
+    font-family: Roboto;
+    font-weight: 400;
+    text-transform: capitalize;
+    word-wrap: break-word
+  }
+  .mat-card-content.stats-container {
+    padding: 1em;
+  }
+  .oppia-mat-card {
     display: flex;
+    justify-content: space-around;
+    align-items: baseline;
   }
   
-  .example-element-diagram {
-    min-width: 80px;
-    border: 2px solid black;
-    padding: 8px;
-    font-weight: lighter;
-    margin: 8px 0;
-    height: 104px;
+  @media(max-width: 815px) {
+    .oppia-dashboard-container {
+      padding-left: 10px;
+      padding-right: 10px;
+    }
   }
-  
-  .example-element-symbol {
-    font-weight: bold;
-    font-size: 40px;
-    line-height: normal;
+  @media(max-width: 316px) {
+    body {
+     width: fit-content;
+    }
+    .mat-card {
+     width: fit-content;
+    }
   }
-  
-  .example-element-description {
-    padding: 16px;
-  }
-  
-  .example-element-description-attribution {
-    opacity: 0.5;
-  }
-  
