@@ -500,6 +500,85 @@ describe('Drag and drop sort input interactive component', () => {
     });
   });
 
+  it('should increment newIndex and move item down when ArrowDown key is pressed and not at the last item', () => {
+    const event = new KeyboardEvent('keydown', { key: 'ArrowDown' });
+    spyOn(event, 'preventDefault');
+    const currentIndex = 0;
+    component.activeItem = 0;
+    component.listItems = ['item1', 'item2', 'item3'];
+    spyOn(component.singleItemInSamePositionArray, 'splice');
+    spyOn(component, 'moveItemInArray').and.callThrough();
+  
+    component.handleKeyDown(event, currentIndex);
+  
+    expect(event.preventDefault).toHaveBeenCalled();
+    expect(component.moveItemInArray).toHaveBeenCalledWith(
+      component.singleItemInSamePositionArray, currentIndex, currentIndex + 1
+    );
+    expect(component.activeItem).toBe(currentIndex + 1);
+  });
+  
+  it('should decrement newIndex and move item up when ArrowUp key is pressed and not at the first item', () => {
+    const event = new KeyboardEvent('keydown', { key: 'ArrowUp' });
+    spyOn(event, 'preventDefault');
+    const currentIndex = 1;
+    component.activeItem = 1;
+    component.listItems = ['item1', 'item2', 'item3'];
+    spyOn(component.singleItemInSamePositionArray, 'splice');
+    spyOn(component, 'moveItemInArray').and.callThrough();
+  
+    component.handleKeyDown(event, currentIndex);
+  
+    expect(event.preventDefault).toHaveBeenCalled();
+    expect(component.moveItemInArray).toHaveBeenCalledWith(
+      component.singleItemInSamePositionArray, currentIndex, currentIndex - 1
+    );
+    expect(component.activeItem).toBe(currentIndex - 1);
+  });
+  
+  it('should decrement newIndex when Shift + Tab keys are pressed and not at the first item', () => {
+    const event = new KeyboardEvent('keydown', { key: 'Tab', shiftKey: true });
+    spyOn(event, 'preventDefault');
+    const currentIndex = 1;
+    component.activeItem = 1;
+    spyOn(component, 'setFocus');
+  
+    component.handleKeyDown(event, currentIndex);
+  
+    expect(event.preventDefault).toHaveBeenCalled();
+    expect(component.setFocus).toHaveBeenCalled();
+    expect(component.activeItem).toBe(currentIndex - 1);
+  });
+  
+  it('should increment newIndex when Tab key is pressed and not at the last item', () => {
+    const event = new KeyboardEvent('keydown', { key: 'Tab', shiftKey: false });
+    spyOn(event, 'preventDefault');
+    const currentIndex = 1;
+    component.activeItem = 1;
+    component.listItems = ['item1', 'item2', 'item3'];
+    spyOn(component, 'setFocus');
+  
+    component.handleKeyDown(event, currentIndex);
+  
+    expect(event.preventDefault).toHaveBeenCalled();
+    expect(component.setFocus).toHaveBeenCalled();
+    expect(component.activeItem).toBe(currentIndex + 1);
+  });
+  
+  it('should not increment or decrement newIndex when Tab key is pressed and at the first or last item', () => {
+    const event = new KeyboardEvent('keydown', { key: 'Tab', shiftKey: false });
+    const currentIndex = 0;
+    component.activeItem = 0;
+    component.listItems = ['item1', 'item2'];
+    spyOn(component, 'setFocus');
+  
+    component.handleKeyDown(event, currentIndex);
+  
+    expect(component.setFocus).not.toHaveBeenCalled();
+    expect(component.activeItem).toBe(currentIndex);
+  });
+  
+
   describe('when multiple items in the same position are not allowed', () => {
     beforeEach(() => {
       fixture = TestBed.createComponent(
