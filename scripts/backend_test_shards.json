@@ -282,6 +282,7 @@
         "core.domain.translation_services_test",
         "core.storage.recommendations.gae_models_test",
         "scripts.linters.other_files_linter_test",
+        "scripts.install_dependencies_json_packages_test",
         "scripts.install_third_party_test",
         "scripts.check_frontend_test_coverage_test",
         "core.platform.models_test",
