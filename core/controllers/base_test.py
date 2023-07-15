@@ -39,7 +39,6 @@ from core.domain import auth_domain
 from core.domain import classifier_domain
 from core.domain import classifier_services
 from core.domain import exp_services
-from core.domain import platform_feature_services
 from core.domain import rights_manager
 from core.domain import taskqueue_services
 from core.domain import user_services
