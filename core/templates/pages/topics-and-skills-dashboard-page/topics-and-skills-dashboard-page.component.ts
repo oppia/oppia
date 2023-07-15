@@ -64,7 +64,8 @@ export class TopicsAndSkillsDashboardPageComponent {
   userCanDeleteSkill!: boolean;
 
   activeTab!: string;
-  filterBoxIsShown!: boolean;
+  filterBoxIsShown: boolean;
+  filterBoxNumber: number;
   filterObject!: TopicsAndSkillsDashboardFilter;
   fetchSkillsDebounced!: () => void;
   lastPage!: number;
@@ -102,6 +103,9 @@ export class TopicsAndSkillsDashboardPageComponent {
   ngOnInit(): void {
     this.activeTab = this.TAB_NAME_TOPICS;
     this.filterBoxIsShown = !this.windowDimensionsService.isWindowNarrow();
+    this.filterBoxNumber = (
+      this.windowDimensionsService
+        .isWindowNarrow()) ? 0 : 1;
     this.filterObject = TopicsAndSkillsDashboardFilter.createDefault();
 
     for (let key in TopicsAndSkillsDashboardPageConstants.TOPIC_SORT_OPTIONS) {
@@ -297,6 +301,11 @@ export class TopicsAndSkillsDashboardPageComponent {
 
   toggleFilterBox(): void {
     this.filterBoxIsShown = !this.filterBoxIsShown;
+    if (this.filterBoxNumber === 0) {
+      this.filterBoxNumber = 1;
+    } else if (this.filterBoxNumber === 1) {
+      this.filterBoxNumber = 0;
+    }
   }
 
   @HostListener('window:resize')

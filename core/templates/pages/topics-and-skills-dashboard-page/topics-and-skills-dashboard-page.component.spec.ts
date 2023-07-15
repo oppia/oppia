@@ -258,17 +258,22 @@ describe('Topics and skills dashboard page component', () => {
 
   it('should toggle filter box', () => {
     componentInstance.filterBoxIsShown = false;
+    componentInstance.filterBoxNumber = 0;
+
     componentInstance.toggleFilterBox();
     expect(componentInstance.filterBoxIsShown).toBeTrue();
+    expect(componentInstance.filterBoxNumber).toBe(1);
+
+    componentInstance.toggleFilterBox();
+    expect(componentInstance.filterBoxIsShown).toBeFalse();
+    expect(componentInstance.filterBoxNumber).toBe(0);
   });
 
   it('should display filter box on maximizing the window', () => {
     componentInstance.filterBoxIsShown = false;
-
     spyOn(windowDimensionsService, 'isWindowNarrow').and.returnValue(false);
 
     componentInstance.filterBoxOnResize();
-
     expect(componentInstance.filterBoxIsShown).toBeTrue();
   });
 
