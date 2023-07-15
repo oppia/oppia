@@ -24,6 +24,7 @@ import { WindowDimensionsService } from 'services/contextual/window-dimensions.s
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 
 import './carousel-bar.component.css';
+import { AppConstants } from 'app.constants';
 
 @Component({
   selector: 'oppia-carousel-bar',
@@ -59,15 +60,12 @@ export class CarouselBarComponent implements AfterViewInit, OnInit {
  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
 
 
- windowIsNarrow: boolean = false;
  directiveSubscriptions = new Subscription();
 
  ngOnInit(): void {
-   this.windowIsNarrow = this.windowDimensionService.isWindowNarrow();
    this.directiveSubscriptions.add(
      this.windowDimensionService.getResizeEvent().subscribe(() => {
        this.isScrollable = this.initCarousel();
-       this.windowIsNarrow = this.windowDimensionService.isWindowNarrow();
      }));
  }
 
@@ -83,24 +81,27 @@ export class CarouselBarComponent implements AfterViewInit, OnInit {
    this.CarouselScrollWidthPx = carouselSelector.scrollWidth;
    this.CarouselClientWidthPx = carouselSelector.clientWidth;
 
+   // eslint-disable-next-line oppia/comment-style
+   // True--left
+
    let direction = isLeftScroll ? -1 : 1;
 
    if (this.scrollUntrackedTopics && ((this.carouselScrollPositionPx === 0) ||
      (this.carouselScrollPositionPx >
        (this.CarouselScrollWidthPx - this.CarouselClientWidthPx)))) {
      this.carouselScrollPositionPx = this.carouselScrollPositionPx +
-        (direction * 190);
+        (direction * (AppConstants.UNTRACKED_TILE_SWAP_WIDTH_PX));
      carouselSelector.scrollBy({
        top: 0,
-       left: (direction * 190),
+       left: (direction * AppConstants.UNTRACKED_TILE_SWAP_WIDTH_PX),
        behavior: 'smooth',
      });
    } else {
      this.carouselScrollPositionPx = this.carouselScrollPositionPx +
-        (direction * 230);
+        (direction * (AppConstants.LEARNER_DASHBOARD_TILE_WIDTH_PX));
      carouselSelector.scrollBy({
        top: 0,
-       left: (direction * 230),
+       left: (direction * (AppConstants.LEARNER_DASHBOARD_TILE_WIDTH_PX)),
        behavior: 'smooth',
      });
    }
