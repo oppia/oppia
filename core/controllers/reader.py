@@ -2825,22 +2825,3 @@ class MetadataVersionHistoryHandler(
                 if metadata_in_previous_version is not None else None
             )
         })
-
-
-class CheckpointsFeatureStatusHandler(
-    base.BaseHandler[Dict[str, str], Dict[str, str]]
-):
-    """The handler for checking whether the checkpoints feature is enabled."""
-
-    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-
-    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
-    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
-
-    @acl_decorators.open_access
-    def get(self) -> None:
-        """Retrieves info if checkpoint feature is enabled."""
-        self.render_json({
-            'checkpoints_feature_is_enabled': (
-                config_domain.CHECKPOINTS_FEATURE_IS_ENABLED.value)
-        })

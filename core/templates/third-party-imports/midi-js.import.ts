@@ -16,12 +16,12 @@
  * @fileoverview This file imports the MIDI.js library.
  */
 
-require('static/midi-js-c26ebb/build/MIDI.js');
-window.Base64Binary = require('static/midi-js-c26ebb/inc/shim/Base64binary.js');
+import 'midi/build/MIDI.js';
+window.Base64Binary = require('midi/inc/shim/Base64binary.js');
 
 $(document).ready(function() {
   MIDI.loadPlugin({
-    soundfontUrl: '/third_party/static/midi-js-c26ebb/examples/soundfont/',
+    soundfontUrl: '/dist/oppia-angular/midi/examples/soundfont/',
     instrument: 'acoustic_grand_piano',
     callback: function() {}
   });

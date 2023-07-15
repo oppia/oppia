@@ -1861,6 +1861,32 @@ class PlatformParameterTests(test_utils.GenericTestBase):
         self.assertEqual(len(param.rules), 1)
         self.assertEqual(param.rules[0].to_dict(), new_rule_dict)
 
+    def test_set_default_value_correctly_changes_default_value(self) -> None:
+        param = parameter_domain.PlatformParameter.from_dict({
+            'name': 'parameter_a',
+            'description': 'for test',
+            'data_type': 'string',
+            'rules': [
+                {
+                    'filters': [
+                        {
+                            'type': 'server_mode',
+                            'conditions': [['=', 'dev']]
+                        }
+                    ],
+                    'value_when_matched': '222'
+                }
+            ],
+            'rule_schema_version': (
+                feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION),
+            'default_value': '333',
+            'is_feature': False,
+            'feature_stage': None
+        })
+        param.set_default_value('default')
+
+        self.assertEqual(param.default_value, 'default')
+
     def test_evaluate_with_matched_rule_returns_correct_value(self) -> None:
         parameter = parameter_domain.PlatformParameter.from_dict({
             'name': 'parameter_a',
