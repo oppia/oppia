@@ -123,216 +123,214 @@ describe('Review Translation language selector', () => {
       fixture.detectChanges();
     }));
 
-  it('should correctly initialize languageIdToDescription map', () => {
-    expect(component.languageIdToDescription.en).toBe('English');
-    expect(component.languageIdToDescription.fr).toBe('français (French)');
-  });
+    it('should correctly initialize languageIdToDescription map', () => {
+      expect(component.languageIdToDescription.en).toBe('English');
+      expect(component.languageIdToDescription.fr).toBe('français (French)');
+    });
 
-  it('should correctly initialize dropdown activeLanguageCode', () => {
-    const dropdown = (
-      fixture.nativeElement.querySelector(
-        '.oppia-review-translation-language-selector-inner-container'));
+    it('should correctly initialize dropdown activeLanguageCode', () => {
+      const dropdown = (
+        fixture.nativeElement.querySelector(
+          '.oppia-review-translation-language-selector-inner-container'));
 
-    expect(dropdown.firstChild.textContent.trim()).toBe('English');
-  });
+      expect(dropdown.firstChild.textContent.trim()).toBe('English');
+    });
 
-  it('should only show language options that the user can review' +
-    ' translations', () => {
-    expect(component.options.map(opt => opt.id)).toEqual(
-      translationReviewerLanguageCodes);
-    expect(component.filteredOptions).toEqual(component.options);
-  });
+    it('should only show language options that the user can review' +
+      ' translations', () => {
+      expect(component.options.map(opt => opt.id)).toEqual(
+        translationReviewerLanguageCodes);
+      expect(component.filteredOptions).toEqual(component.options);
+    });
 
-  it('should correctly show and hide the dropdown', fakeAsync(() => {
-    expect(component.dropdownShown).toBe(false);
-    expect(getDropdownOptionsContainer()).toBeFalsy();
+    it('should correctly show and hide the dropdown', fakeAsync(() => {
+      expect(component.dropdownShown).toBe(false);
+      expect(getDropdownOptionsContainer()).toBeFalsy();
 
-    clickDropdown();
-    expect(component.dropdownShown).toBe(true);
-    expect(getDropdownOptionsContainer()).toBeTruthy();
+      clickDropdown();
+      expect(component.dropdownShown).toBe(true);
+      expect(getDropdownOptionsContainer()).toBeTruthy();
 
-    clickDropdown();
-    expect(component.dropdownShown).toBe(false);
-    expect(getDropdownOptionsContainer()).toBeFalsy();
+      clickDropdown();
+      expect(component.dropdownShown).toBe(false);
+      expect(getDropdownOptionsContainer()).toBeFalsy();
 
-    clickDropdown();
-    expect(component.dropdownShown).toBe(true);
-    expect(getDropdownOptionsContainer()).toBeTruthy();
+      clickDropdown();
+      expect(component.dropdownShown).toBe(true);
+      expect(getDropdownOptionsContainer()).toBeTruthy();
 
-    let fakeClickAwayEvent = new MouseEvent('click');
-    Object.defineProperty(
-      fakeClickAwayEvent,
-      'target',
-      {value: document.createElement('div')});
-    component.onDocumentClick(fakeClickAwayEvent);
-    fixture.detectChanges();
-    expect(component.dropdownShown).toBe(false);
-    expect(getDropdownOptionsContainer()).toBeFalsy();
-  }));
+      let fakeClickAwayEvent = new MouseEvent('click');
+      Object.defineProperty(
+        fakeClickAwayEvent,
+        'target',
+        {value: document.createElement('div')});
+      component.onDocumentClick(fakeClickAwayEvent);
+      fixture.detectChanges();
+      expect(component.dropdownShown).toBe(false);
+      expect(getDropdownOptionsContainer()).toBeFalsy();
+    }));
 
-  it('should correctly select and indicate selection of an option', () => {
-    spyOn(component.setActiveLanguageCode, 'emit');
+    it('should correctly select and indicate selection of an option', () => {
+      spyOn(component.setActiveLanguageCode, 'emit');
 
-    component.selectOption('fr');
-    fixture.detectChanges();
+      component.selectOption('fr');
+      fixture.detectChanges();
 
-    expect(component.setActiveLanguageCode.emit).toHaveBeenCalledWith('fr');
-  });
+      expect(component.setActiveLanguageCode.emit).toHaveBeenCalledWith('fr');
+    });
 
-  it('should display the selected language when the language is already' +
-    ' selected', () => {
-    component.activeLanguageCode = 'en';
+    it('should display the selected language when the language is already' +
+      ' selected', () => {
+      component.activeLanguageCode = 'en';
 
-    component.ngOnInit();
+      component.ngOnInit();
 
-    expect(component.languageSelection).toBe('English');
-    expect(component.activeLanguageCode).toBe('en');
-  });
+      expect(component.languageSelection).toBe('English');
+      expect(component.activeLanguageCode).toBe('en');
+    });
 
-  it('should display the preferred language when the preferred' +
-    ' language is defined', fakeAsync(() => {
-    component.activeLanguageCode = null;
-    component.languageSelection = '';
-    preferredLanguageCode = 'en';
-    const languageDescription = AppConstants.SUPPORTED_AUDIO_LANGUAGES.find(
-      e => e.id === 'en')?.description ?? '';
+    it('should display the preferred language when the preferred' +
+      ' language is defined', fakeAsync(() => {
+      component.activeLanguageCode = null;
+      component.languageSelection = '';
+      preferredLanguageCode = 'en';
+      const languageDescription = AppConstants.SUPPORTED_AUDIO_LANGUAGES.find(
+        e => e.id === 'en')?.description ?? '';
 
-    spyOn(component.setActiveLanguageCode, 'emit').and.callFake(
-      (languageCode: string) => {
-        component.activeLanguageCode = languageCode;
+      spyOn(component.setActiveLanguageCode, 'emit').and.callFake(
+        (languageCode: string) => {
+          component.activeLanguageCode = languageCode;
+        });
+
+      component.ngOnInit();
+
+      fixture.whenStable().then(() => {
+        fixture.detectChanges();
+        expect(component.setActiveLanguageCode.emit)
+          .toHaveBeenCalledWith(preferredLanguageCode);
+        expect(component.activeLanguageCode).toBe(preferredLanguageCode);
+        expect(component.languageSelection).toBe(languageDescription);
+      });
+    }));
+
+    it('should ask user to select a language when the preferred' +
+      ' language is not defined', fakeAsync(() => {
+      preferredLanguageCode = '';
+      component.activeLanguageCode = null;
+      component.languageSelection = '';
+
+      component.ngOnInit();
+
+      fixture.detectChanges();
+      expect(component.languageSelection).toBe('Language');
+      expect(component.activeLanguageCode).toBe(null);
+    }));
+
+    it('should show the correct language when the language is changed'
+      , () => {
+        expect(component.languageSelection).toBe('English');
+        component.ngOnInit();
+        spyOn(
+          translationLanguageService, 'getActiveLanguageCode').and.returnValue(
+          'fr');
+
+        activeLanguageChangedEmitter.emit();
+
+        expect(component.languageSelection).toBe('français (French)');
       });
 
-    component.ngOnInit();
-
-    fixture.whenStable().then(() => {
-      fixture.detectChanges();
-      expect(component.setActiveLanguageCode.emit)
-        .toHaveBeenCalledWith(preferredLanguageCode);
-      expect(component.activeLanguageCode).toBe(preferredLanguageCode);
-      expect(component.languageSelection).toBe(languageDescription);
-    });
-  }));
-
-  it('should ask user to select a language when the preferred' +
-    ' language is not defined', fakeAsync(() => {
-    preferredLanguageCode = '';
-    component.activeLanguageCode = null;
-    component.languageSelection = '';
-
-    component.ngOnInit();
-
-    fixture.detectChanges();
-    expect(component.languageSelection).toBe('Language');
-    expect(component.activeLanguageCode).toBe(null);
-  }));
-
-  it('should show the correct language when the language is changed'
-    , () => {
-      expect(component.languageSelection).toBe('English');
-      component.ngOnInit();
+    it('should indicate selection and save the language' +
+      ' on selecting a new language', () => {
+      const selectedLanguage = 'fr';
+      spyOn(component.setActiveLanguageCode, 'emit');
       spyOn(
-        translationLanguageService, 'getActiveLanguageCode').and.returnValue(
-        'fr');
+        contributionOpportunitiesBackendApiServiceStub,
+        'savePreferredTranslationLanguageAsync' as never);
 
-      activeLanguageChangedEmitter.emit();
+      component.selectOption(selectedLanguage);
 
-      expect(component.languageSelection).toBe('français (French)');
+      fixture.whenStable().then(() => {
+        fixture.detectChanges();
+        expect(component.setActiveLanguageCode.emit).toHaveBeenCalledWith(
+          selectedLanguage);
+        expect(
+          contributionOpportunitiesBackendApiServiceStub
+            .savePreferredTranslationLanguageAsync).toHaveBeenCalledWith(
+          selectedLanguage);
+      });
     });
 
-  it('should indicate selection and save the language' +
-    ' on selecting a new language', () => {
-    const selectedLanguage = 'fr';
-    spyOn(component.setActiveLanguageCode, 'emit');
-    spyOn(
-      contributionOpportunitiesBackendApiServiceStub,
-      'savePreferredTranslationLanguageAsync' as never);
+    it('should toggle dropdown', fakeAsync(() => {
+      component.filterDivRef = new ElementRef(document.createElement('div'));
+      spyOn(component.filterDivRef.nativeElement, 'focus');
 
-    component.selectOption(selectedLanguage);
+      expect(component.dropdownShown).toBe(false);
+      expect(component.filteredOptions).toBe(component.options);
 
-    fixture.whenStable().then(() => {
+      // Open the dropdown.
+      component.toggleDropdown();
+      flush();
+
+      expect(component.dropdownShown).toBe(true);
+      expect(component.optionsFilter).toBe('');
+      expect(component.filteredOptions).toBe(component.options);
+      expect(component.filteredOptions).toContain(
+        {id: 'es', description: 'español (Spanish)'});
+      expect(component.filteredOptions).toContain(
+        {id: 'fr', description: 'français (French)'});
+      expect(component.filterDivRef.nativeElement.focus).toHaveBeenCalled();
+
+      // Type a filter query.
+      component.optionsFilter = 'sp';
+      component.filterOptions();
       fixture.detectChanges();
-      expect(component.setActiveLanguageCode.emit).toHaveBeenCalledWith(
-        selectedLanguage);
-      expect(
-        contributionOpportunitiesBackendApiServiceStub
-          .savePreferredTranslationLanguageAsync).toHaveBeenCalledWith(
-        selectedLanguage);
+
+      expect(component.filteredOptions).not.toBe(component.options);
+      expect(component.filteredOptions).toContain(
+        {id: 'es', description: 'español (Spanish)'});
+      expect(component.filteredOptions).not.toContain(
+        {id: 'fr', description: 'français (French)'});
+
+      // Close the dropdown.
+      component.toggleDropdown();
+      flush();
+
+      expect(component.dropdownShown).toBe(false);
+
+      spyOn(component.filterDivRef.nativeElement, 'focus');
+
+      // Open the dropdown.
+      component.toggleDropdown();
+      flush();
+
+      expect(component.dropdownShown).toBe(true);
+      expect(component.optionsFilter).toBe('');
+      expect(component.filteredOptions).toBe(component.options);
+      expect(component.filteredOptions).toContain(
+        {id: 'es', description: 'español (Spanish)'});
+      expect(component.filteredOptions).toContain(
+        {id: 'fr', description: 'français (French)'});
+      expect(component.filterDivRef.nativeElement.focus).toHaveBeenCalled();
+    }));
+
+    it('should filter language options based on the filter text', () => {
+      // Expect the full list of languages to be contained. Adding just 3 here
+      // as the list of languages may grow overtime.
+      expect(component.filteredOptions).toContain(
+        {id: 'en', description: 'English'});
+      expect(component.filteredOptions).toContain(
+        {id: 'es', description: 'español (Spanish)'});
+      expect(component.filteredOptions).toContain(
+        {id: 'fr', description: 'français (French)'});
+
+      component.optionsFilter = 'sp';
+      component.filterOptions();
+      fixture.detectChanges();
+
+      // Expect it to contain Spanish but not any of the other languages.
+      expect(component.filteredOptions).toEqual(
+        [{id: 'es', description: 'español (Spanish)'}]);
     });
-  });
-
-  it('should toggle dropdown', fakeAsync(() => {
-    component.filterDivRef = new ElementRef(document.createElement('div'));
-    spyOn(component.filterDivRef.nativeElement, 'focus');
-
-    expect(component.dropdownShown).toBe(false);
-    expect(component.filteredOptions).toBe(component.options);
-
-    // Open the dropdown.
-    component.toggleDropdown();
-    flush();
-
-    expect(component.dropdownShown).toBe(true);
-    expect(component.optionsFilter).toBe('');
-    expect(component.filteredOptions).toBe(component.options);
-    expect(component.filteredOptions).toContain(
-      {id: 'es', description: 'español (Spanish)'});
-    expect(component.filteredOptions).toContain(
-      {id: 'fr', description: 'français (French)'});
-    expect(component.filterDivRef.nativeElement.focus).toHaveBeenCalled();
-
-    // Type a filter query.
-    component.optionsFilter = 'sp';
-    component.filterOptions();
-    fixture.detectChanges();
-
-    expect(component.filteredOptions).not.toBe(component.options);
-    expect(component.filteredOptions).toContain(
-      {id: 'es', description: 'español (Spanish)'});
-    expect(component.filteredOptions).not.toContain(
-      {id: 'fr', description: 'français (French)'});
-
-    // Close the dropdown.
-    component.toggleDropdown();
-    flush();
-
-    expect(component.dropdownShown).toBe(false);
-
-    spyOn(component.filterDivRef.nativeElement, 'focus');
-
-    // Open the dropdown.
-    component.toggleDropdown();
-    flush();
-
-    expect(component.dropdownShown).toBe(true);
-    expect(component.optionsFilter).toBe('');
-    expect(component.filteredOptions).toBe(component.options);
-    expect(component.filteredOptions).toContain(
-      {id: 'es', description: 'español (Spanish)'});
-    expect(component.filteredOptions).toContain(
-      {id: 'fr', description: 'français (French)'});
-    expect(component.filterDivRef.nativeElement.focus).toHaveBeenCalled();
-  }));
-
-  it('should filter language options based on the filter text', () => {
-    // Expect the full list of languages to be contained. Adding just 3 here as
-    // the list of languages may grow overtime.
-    expect(component.filteredOptions).toContain(
-      {id: 'en', description: 'English'});
-    expect(component.filteredOptions).toContain(
-      {id: 'es', description: 'español (Spanish)'});
-    expect(component.filteredOptions).toContain(
-      {id: 'fr', description: 'français (French)'});
-
-
-    component.optionsFilter = 'sp';
-    component.filterOptions();
-    fixture.detectChanges();
-
-    // Expect it to contain Spanish but not any of the other languages.
-    expect(component.filteredOptions).toEqual(
-      [{id: 'es', description: 'español (Spanish)'}]);
-  });
-
   });
 
   describe('when the reviewer translation rights are not found', () => {
@@ -342,7 +340,7 @@ describe('Review Translation language selector', () => {
 
       expect(() => {
         component.ngOnInit();
-	tick();
+        tick();
       }).toThrowError();
     }));
   });
