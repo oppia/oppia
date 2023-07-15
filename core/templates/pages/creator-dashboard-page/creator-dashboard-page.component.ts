@@ -59,6 +59,7 @@ export class CreatorDashboardPageComponent {
   // 'lastWeekStats' is null for a new creator.
   lastWeekStats!: CreatorDashboardStats | null;
   dashboardStats!: CreatorDashboardStats;
+  dashbaordNumratings!: number | null;
   relativeChangeInTotalPlays!: number;
   getLocaleAbbreviatedDatetimeString!: (millisSinceEpoch: number) => string;
   getHumanReadableStatus!: (status: string) => string;
