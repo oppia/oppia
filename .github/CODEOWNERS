@@ -606,6 +606,7 @@
 /core/templates/domain/suggestion/ @oppia/contributor-experience-team
 /core/templates/services/suggestion-modal.service*.ts @oppia/contributor-experience-team
 /core/templates/services/suggestions.service*.ts @oppia/contributor-experience-team
+/core/domain/contribution_stats_services*.py @oppia/contributor-experience-team
 
 
 # Feedback project.
