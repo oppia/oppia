@@ -18,6 +18,10 @@
 
 from __future__ import annotations
 
+import base64
+import os
+
+from core.constants import constants
 from core.domain import auth_domain
 from core.platform import models
 from core.platform.auth import firebase_auth_services
@@ -282,3 +286,28 @@ def revoke_super_admin_privileges(user_id: str) -> None:
         user_id: str. The Oppia user ID to revoke privileges from.
     """
     firebase_auth_services.revoke_super_admin_privileges(user_id)
+
+
+def get_csrf_secret_model() -> Optional[auth_models.CsrfSecretModel]:
+    """Returns the CsrfSecretModel.
+
+    Returns:
+        Optional[auth_models.CsrfSecretModel]. Returns the CsrfSecretModel if
+        it exists otherwise None.
+    """
+    return auth_models.CsrfSecretModel.get(
+        constants.CSRF_SECRET_INSTANCE_ID, strict=False)
+
+
+def initialize_csrf_secret() -> None:
+    """Initializes the csrf secret."""
+    csrf_secret_model = get_csrf_secret_model()
+    # Any non-default value is fine.
+    if csrf_secret_model is not None:
+        return
+
+    # Initialize to random value.
+    auth_models.CsrfSecretModel(
+        id=constants.CSRF_SECRET_INSTANCE_ID,
+        oppia_csrf_secret=base64.urlsafe_b64encode(os.urandom(20)).decode()
+    ).put()

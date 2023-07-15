@@ -32,7 +32,6 @@ import urllib
 from core import feconf
 from core import handler_schema_constants
 from core import utils
-from core.constants import constants
 from core.controllers import payload_validator
 from core.domain import auth_domain
 from core.domain import auth_services
@@ -891,23 +890,6 @@ class CsrfTokenManager:
     _USER_ID_DEFAULT: Final = 'non_logged_in_user'
 
     @classmethod
-    def init_csrf_secret(cls) -> None:
-        """Verify that non-default CSRF secret exists; creates one if not."""
-
-        csrf_secret_model = auth_models.CsrfSecretModel.get(
-            constants.CSRF_SECRET_INSTANCE_ID, strict=False)
-
-        # Any non-default value is fine.
-        if csrf_secret_model is not None:
-            return
-
-        # Initialize to random value.
-        auth_models.CsrfSecretModel(
-            id=constants.CSRF_SECRET_INSTANCE_ID,
-            oppia_csrf_secret=base64.urlsafe_b64encode(os.urandom(20)).decode()
-        ).put()
-
-    @classmethod
     def _create_token(cls, user_id: Optional[str], issued_on: float) -> str:
         """Creates a new CSRF token.
 
@@ -918,7 +900,7 @@ class CsrfTokenManager:
         Returns:
             str. The generated CSRF token.
         """
-        cls.init_csrf_secret()
+        auth_services.initialize_csrf_secret()
 
         # The token has 4 parts: hash of the actor user id, hash of the page
         # name, hash of the time issued and plain text of the time issued.
@@ -929,8 +911,7 @@ class CsrfTokenManager:
         # Round time to seconds.
         issued_on_str = str(int(issued_on))
 
-        csrf_secret_model = auth_models.CsrfSecretModel.get(
-            constants.CSRF_SECRET_INSTANCE_ID, strict=False)
+        csrf_secret_model = auth_services.get_csrf_secret_model()
 
         digester = hmac.new(
             key=csrf_secret_model.oppia_csrf_secret.encode('utf-8'),
