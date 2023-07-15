@@ -55,12 +55,13 @@ class TrainedClassifierHandlerTests(test_utils.ClassifierTestBase):
         self.exp_id = 'exp_id1'
         self.title = 'Testing Classifier storing'
         self.category = 'Test'
+        self.ADMIN_USERNAME = 'admin_username'
         yaml_path = os.path.join(
             feconf.TESTS_DATA_DIR, 'string_classifier_test.yaml')
         with utils.open_file(yaml_path, 'r') as yaml_file:
             self.yaml_content = yaml_file.read()
         self.signup(
-            feconf.ADMIN_EMAIL_ADDRESS, self.CURRICULUM_ADMIN_USERNAME, True)
+            feconf.ADMIN_EMAIL_ADDRESS, self.ADMIN_USERNAME, True)
         self.login(feconf.ADMIN_EMAIL_ADDRESS, is_super_admin=True)
 
         assets_list: List[Tuple[str, bytes]] = []

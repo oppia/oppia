@@ -73,7 +73,6 @@ ALL_PLATFORM_PARAMS_EXCEPT_FEATURE_FLAGS: List[
             platform_parameter_list.ParamNames.
             HIGH_BOUNCE_RATE_TASK_MINIMUM_EXPLORATION_STARTS
         ),
-        platform_feature_list.ParamNames.CSRF_SECRET,
         platform_parameter_list.ParamNames.PROMO_BAR_ENABLED,
         platform_parameter_list.ParamNames.PROMO_BAR_MESSAGE,
         platform_parameter_list.ParamNames.SIGNUP_EMAIL_BODY_CONTENT,

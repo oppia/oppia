@@ -64,12 +64,12 @@ describe('Admin Data Service', () => {
     human_readable_current_time: 'June 03 15:31:20',
     demo_collections: [],
     config_properties: {
-      record_playthrough_probability: {
+      oppia_csrf_secret: {
         schema: {
-          type: 'float'
+          type: 'unicode'
         },
-        value: 0.2,
-        description: 'The record_playthrough_probability.'
+        value: '3WHOWnD3sy0r1wukJ2lX4vBS_YA=',
+        description: 'Text used to encrypt CSRF tokens.'
       }
     },
     demo_exploration_ids: ['19'],

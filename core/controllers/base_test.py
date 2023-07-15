@@ -748,10 +748,7 @@ class CsrfTokenManagerTests(test_utils.GenericTestBase):
 
     def test_non_default_csrf_secret_is_used(self) -> None:
         base.CsrfTokenManager.create_csrf_token('uid')
-        csrf_value = platform_feature_services.get_platform_parameter_value(
-            base.CSRF_SECRET.name
-        )
-        self.assertNotEqual(csrf_value, base.DEFAULT_CSRF_SECRET)
+        self.assertNotEqual(base.CSRF_SECRET.value, base.DEFAULT_CSRF_SECRET)
 
     def test_token_expiry(self) -> None:
         # This can be any value.

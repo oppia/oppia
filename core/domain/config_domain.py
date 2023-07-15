@@ -233,7 +233,6 @@ class ConfigProperty:
     - moderator_ids.
     - moderator_request_forum_url.
     - moderator_usernames.
-    - oppia_csrf_secret.
     - promo_bar_enabled.
     - promo_bar_message.
     - publicize_exploration_email_html_body.
