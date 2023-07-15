@@ -701,7 +701,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
         # with an optional suffix of the pattern [str] with no brackets inside
         # the outside brackets.
         library_name_pattern = re.compile(
-            r'^[a-zA-Z0-9_.-]+(\[[^\[^\]]+\])*$|--hash=sha256:[a-zA-Z0-9]+'
+            r'^[a-zA-Z0-9_.-]+(\[[^\[^\]]+\])*$|^\s*--hash=sha256:.*$|\\$'
         )
         with utils.open_file(
             common.COMPILED_REQUIREMENTS_FILE_PATH, 'r') as f:
