@@ -93,8 +93,12 @@ class ExplorationPage(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.can_play_exploration
-    def get(self) -> None:
-        """Handles GET requests."""
+    def get(self, unused_exploration_id: str) -> None:
+        """Handles GET requests.
+
+        Args:
+            unused_exploration_id: str. The exploration ID.
+        """
 
         self.render_template('exploration-editor-page.mainpage.html')
 
@@ -880,8 +884,12 @@ class StateYamlHandler(
     }
 
     @acl_decorators.can_play_exploration
-    def post(self) -> None:
-        """Handles POST requests."""
+    def post(self, unused_exploration_id: str) -> None:
+        """Handles POST requests.
+
+        Args:
+            unused_exploration_id: str. The exploration ID.
+        """
 
         assert self.normalized_payload is not None
         state_dict = self.normalized_payload['state_dict']
@@ -1170,11 +1178,12 @@ class FetchPlaythroughHandler(
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.can_view_exploration_stats
-    def get(self, playthrough_id: str) -> None:
+    def get(self, unused_exploration_id: str, playthrough_id: str) -> None:
         """Handles GET requests.
 
         Args:
             playthrough_id: str. The ID of the playthrough.
+            unused_exploration_id: str. The exploration ID.
 
         Raises:
             PageNotFoundException. The playthrough is invalid.
@@ -1394,8 +1403,12 @@ class StartedTutorialEventHandler(
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'POST': {}}
 
     @acl_decorators.can_play_exploration
-    def post(self) -> None:
-        """Handles GET requests."""
+    def post(self, unused_exploration_id: str) -> None:
+        """Handles GET requests.
+
+        Args:
+            unused_exploration_id: str. The exploration ID.
+        """
         assert self.user_id is not None
         user_services.record_user_started_state_editor_tutorial(self.user_id)
         self.render_json({})
@@ -1517,8 +1530,12 @@ class StateAnswerStatisticsHandler(
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.can_view_exploration_stats
-    def get(self) -> None:
-        """Handles GET requests."""
+    def get(self, unused_exploration_id: str) -> None:
+        """Handles GET requests.
+
+        Args:
+            unused_exploration_id: str. The exploration ID.
+        """
         # TODO(#11475): Return visualizations info based on Apache Beam job.
         self.render_json({'answers': {}, 'interaction_ids': {}})
 
@@ -1537,8 +1554,12 @@ class TopUnresolvedAnswersHandler(
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.can_edit_exploration
-    def get(self) -> None:
-        """Handles GET requests for unresolved answers."""
+    def get(self, unused_exploration_id: str) -> None:
+        """Handles GET requests for unresolved answers.
+
+        Args:
+            unused_exploration_id: str. The exploration ID.
+        """
         # TODO(#11475): Return visualizations info based on Apache Beam job.
         self.render_json({'unresolved_answers': []})
 
