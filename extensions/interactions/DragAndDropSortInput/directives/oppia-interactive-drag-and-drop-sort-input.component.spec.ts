@@ -560,16 +560,8 @@ describe('Drag and drop sort input interactive component', () => {
     const event = new KeyboardEvent('keydown', { key: 'Tab', shiftKey: false });
     const currentIndex = 1;
     component.activeItem = 1;
-    component.listItems = new QueryList<ElementRef>([
-      new ElementRef(document.createElement('div')),
-      new ElementRef(document.createElement('div')),
-      new ElementRef(document.createElement('div'))
-    ]);
-    component.singleItemInSamePositionArray = [
-      '<p>choice 1</p>',
-      '<p>choice 2</p>',
-      '<p>choice 3</p>'
-    ];
+    component.listItems.length = 2;
+
     spyOn(component, 'setFocus');
   
     component.handleKeyDown(event, currentIndex);
