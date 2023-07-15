@@ -114,9 +114,4 @@ export class PreferredLanguagesComponent implements AfterViewInit {
       );
     });
   }
-
-  updateSearchQuery(): void {
-    this.searchQuery = this.formCtrl.value;
-    this.onSearchInputChange();
-  }
 }
