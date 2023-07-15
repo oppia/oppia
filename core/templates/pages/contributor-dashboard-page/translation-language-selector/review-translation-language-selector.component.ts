@@ -27,7 +27,7 @@ import { ContributionOpportunitiesBackendApiService } from
   'pages/contributor-dashboard-page/services/contribution-opportunities-backend-api.service';
 import { LanguageUtilService } from 'domain/utilities/language-util.service';
 import { TranslationLanguageService } from 'pages/exploration-editor-page/translation-tab/services/translation-language.service';
-import { UserService } from 'services/user.service.ts';
+import { UserService } from 'services/user.service';
 
 interface Options {
   id: string;
@@ -73,7 +73,7 @@ export class ReviewTranslationLanguageSelectorComponent implements OnInit {
       .then(userContributionRights => {
         if (!userContributionRights) {
           throw new Error('User contribution rights not found.');
-        }
+	}
         this.filteredOptions = this.options = userContributionRights
           .can_review_translation_for_language_codes.map(languageCode => {
             const description = this.languageUtilService
@@ -81,10 +81,11 @@ export class ReviewTranslationLanguageSelectorComponent implements OnInit {
             this.languageIdToDescription[languageCode] = description;
             return { id: languageCode, description };
           });
-      });
+      }); 
 
     this.languageSelection = (
-      this.activeLanguageCode ?
+      (Object.keys(this.languageIdToDescription).length > 0 &&
+        this.activeLanguageCode) ?
       this.languageIdToDescription[this.activeLanguageCode] :
       'Language'
     );

@@ -39,7 +39,6 @@ describe('Review Translation language selector', () => {
   const activeLanguageChangedEmitter = new EventEmitter();
 
   let preferredLanguageCode = 'en';
-  const translationReviewerLanguageCodes = ['en', 'es', 'fr'];
 
   const contributionOpportunitiesBackendApiServiceStub:
     Partial<ContributionOpportunitiesBackendApiService> = {
@@ -63,15 +62,19 @@ describe('Review Translation language selector', () => {
         FormsModule,
       ],
       declarations: [ReviewTranslationLanguageSelectorComponent],
-      providers: [{
-        provide: ContributionOpportunitiesBackendApiService,
-        useValue: contributionOpportunitiesBackendApiServiceStub
-      }],
+      providers: [
+        TranslationLanguageService,
+        UserService,
+        {
+          provide: ContributionOpportunitiesBackendApiService,
+          useValue: contributionOpportunitiesBackendApiServiceStub
+        }
+      ],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
   }));
 
-  beforeEach(fakeAsync(() => {
+  beforeEach(() => {
     fixture = TestBed.createComponent(
       ReviewTranslationLanguageSelectorComponent);
     translationLanguageService = TestBed.inject(TranslationLanguageService);
@@ -80,17 +83,8 @@ describe('Review Translation language selector', () => {
     component.activeLanguageCode = 'en';
     spyOnProperty(translationLanguageService, 'onActiveLanguageChanged').and
       .returnValue(activeLanguageChangedEmitter);
-    spyOn(userService, 'getUserContributionRightsDataAsync').and.resolveTo({
-      can_suggest_questions: false,
-      can_review_translation_for_language_codes: (
-        translationReviewerLanguageCodes),
-      can_review_voiceover_for_language_codes: [],
-      can_review_questions: false
-    });
-    component.ngOnInit();
-    tick();
     fixture.detectChanges();
-  }));
+  });
 
   beforeEach(() => {
     clickDropdown = () => {
@@ -112,6 +106,22 @@ describe('Review Translation language selector', () => {
     preferredLanguageCode = 'en';
     component.activeLanguageCode = 'en';
   });
+
+  describe('when reviewer translation rights are found', () => {
+    const translationReviewerLanguageCodes = ['en', 'es', 'fr'];
+
+    beforeEach(fakeAsync(() => {
+      spyOn(userService, 'getUserContributionRightsDataAsync').and.resolveTo({
+        can_suggest_questions: false,
+        can_review_translation_for_language_codes: (
+          translationReviewerLanguageCodes),
+        can_review_voiceover_for_language_codes: [],
+        can_review_questions: false
+      });
+      component.ngOnInit();
+      tick();
+      fixture.detectChanges();
+    }));
 
   it('should correctly initialize languageIdToDescription map', () => {
     expect(component.languageIdToDescription.en).toBe('English');
@@ -321,5 +331,19 @@ describe('Review Translation language selector', () => {
     // Expect it to contain Spanish but not any of the other languages.
     expect(component.filteredOptions).toEqual(
       [{id: 'es', description: 'español (Spanish)'}]);
+  });
+
+  });
+
+  describe('when the reviewer translation rights are not found', () => {
+    it('should throw an error', fakeAsync(() => {
+      spyOn(userService, 'getUserContributionRightsDataAsync').and
+        .resolveTo(null);
+
+      expect(() => {
+        component.ngOnInit();
+	tick();
+      }).toThrowError();
+    }));
   });
 });
