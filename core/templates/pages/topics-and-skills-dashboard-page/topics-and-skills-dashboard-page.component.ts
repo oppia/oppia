@@ -64,8 +64,8 @@ export class TopicsAndSkillsDashboardPageComponent {
   userCanDeleteSkill!: boolean;
 
   activeTab!: string;
-  filterBoxIsShown: boolean;
-  filterBoxNumber: number;
+  filterBoxIsShown: boolean = false;
+  filterBoxNumber: number = 0;
   filterObject!: TopicsAndSkillsDashboardFilter;
   fetchSkillsDebounced!: () => void;
   lastPage!: number;
