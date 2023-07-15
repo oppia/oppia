@@ -47,10 +47,9 @@ def main() -> None:
         # We need to transform these to strings using the str() function.
         required_packages = [
             str(requirement)  # pylint: disable=replace-disallowed-function-calls
-            # TODO(#13528): Here we use MyPy ignore because we remove this test
-            # after the backend is fully type-annotated. Here ignore[arg-type]
-            # is used to test the constructor of ActivityReference for invalid
-            # argument type.
+            # Here we use MyPy ignore because mypy type hint on
+            # pkg_resources.parse_requirements is 'TextIO' only, which is wrong,
+            # it can also be a string.
             for requirement in pkg_resources.parse_requirements(modified_requirements_content)  # type: ignore[arg-type]
         ]
 
