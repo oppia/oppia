@@ -509,6 +509,11 @@ describe('Drag and drop sort input interactive component', () => {
       new ElementRef(document.createElement('div')),
       new ElementRef(document.createElement('div'))
     ]);
+    component.singleItemInSamePositionArray = [
+      '<p>choice 1</p>',
+      '<p>choice 2</p>',
+      '<p>choice 3</p>'
+    ];
     spyOn(component, 'setFocus');
 
     component.handleKeyDown(event, currentIndex);
@@ -526,6 +531,11 @@ describe('Drag and drop sort input interactive component', () => {
       new ElementRef(document.createElement('div')),
       new ElementRef(document.createElement('div'))
     ]);
+    component.singleItemInSamePositionArray = [
+      '<p>choice 1</p>',
+      '<p>choice 2</p>',
+      '<p>choice 3</p>'
+    ];
     spyOn(component, 'setFocus');
 
     component.handleKeyDown(event, currentIndex);
