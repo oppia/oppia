@@ -37,8 +37,6 @@ from core.controllers import payload_validator
 from core.domain import auth_domain
 from core.domain import auth_services
 from core.domain import classifier_domain
-from core.domain import config_domain
-from core.domain import config_services
 from core.domain import user_services
 from core.platform import models
 
