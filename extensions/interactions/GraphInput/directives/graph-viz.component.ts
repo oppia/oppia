@@ -295,7 +295,8 @@ export class GraphVizComponent implements OnInit, AfterViewInit {
     // The condition: currentMode === 2 signifies that
     // the "add node" option in the graph is active.
     if (this.state.currentMode === 2) {
-      const dot = this.dotCursor.nativeElement as HTMLDivElement;
+      const dot = document.querySelector(
+        '.oppia-add-node-cursor') as HTMLDivElement;
       const graphAreaRect =
         this.graphArea.nativeElement.getBoundingClientRect();
       this.dotCursorCoordinateX =
