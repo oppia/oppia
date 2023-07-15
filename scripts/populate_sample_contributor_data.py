@@ -45,9 +45,11 @@ import requests
 from typing import Dict, Final, List
 
 PORT_NUMBER_FOR_GAE_SERVER: Final = 8181
+# TODO(#18260): Change this when we permanently move to the Dockerized Setup.
 
+FIREBASE_HOST = '0.0.0.0' if feconf.OPPIA_IS_DOCKERIZED else 'localhost'
 FIREBASE_AUTH_EMULATOR_HOST: Final = (
-    'localhost:%s' % feconf.FIREBASE_EMULATOR_PORT)
+    '%s:%s' % (FIREBASE_HOST, feconf.FIREBASE_EMULATOR_PORT))
 FIREBASE_SIGN_IN_URL: Final = (
     'http://%s/identitytoolkit.googleapis.com/v1/accounts:signInWithPassword'
     % FIREBASE_AUTH_EMULATOR_HOST)

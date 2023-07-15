@@ -35,6 +35,7 @@ import time
 from urllib import request as urlrequest
 
 from core import constants
+from core import feconf
 from core import utils
 from core.tests import test_utils
 from scripts import install_python_dev_dependencies
@@ -44,7 +45,6 @@ import github
 from typing import Generator, List, Literal, NoReturn
 
 from . import common
-
 
 # Here we use MyPy ignore because the pool_size argument is required by
 # Requester.__init__(), but it is missing from the typing definition in
@@ -1281,6 +1281,72 @@ class CommonTests(test_utils.GenericTestBase):
         ):
             common.setup_chrome_bin_env_variable()
         self.assertIn('Chrome is not found, stopping...', print_arr)
+
+    def test_modify_constants_under_docker_env(self) -> None:
+        mock_constants_path = 'mock_app_dev.yaml'
+        mock_feconf_path = 'mock_app.yaml'
+        constants_path_swap = self.swap(
+            common, 'CONSTANTS_FILE_PATH', mock_constants_path)
+        feconf_path_swap = self.swap(common, 'FECONF_PATH', mock_feconf_path)
+
+        with self.swap(feconf, 'OPPIA_IS_DOCKERIZED', True):
+            def mock_check_output(
+                unused_cmd_tokens: List[str], encoding: str = 'utf-8'  # pylint: disable=unused-argument
+            ) -> str:
+                return 'test'
+            check_output_swap = self.swap(
+                subprocess, 'check_output', mock_check_output
+            )
+
+            constants_temp_file = tempfile.NamedTemporaryFile()
+            # Here MyPy assumes that the 'name' attribute is
+            # read-only. In order to silence the MyPy complaints
+            # `setattr` is used to set the attribute.
+            setattr(
+                constants_temp_file, 'name', mock_constants_path)
+            with utils.open_file(mock_constants_path, 'w') as tmp:
+                tmp.write('export = {\n')
+                tmp.write('  "DEV_MODE": true,\n')
+                tmp.write('  "EMULATOR_MODE": false,\n')
+                tmp.write('};')
+
+            feconf_temp_file = tempfile.NamedTemporaryFile()
+            # Here MyPy assumes that the 'name' attribute is
+            # read-only. In order to silence the MyPy complaints
+            # `setattr` is used to set the attribute.
+            setattr(feconf_temp_file, 'name', mock_feconf_path)
+            with utils.open_file(mock_feconf_path, 'w') as tmp:
+                tmp.write(u'ENABLE_MAINTENANCE_MODE = False')
+
+            with constants_path_swap, feconf_path_swap, check_output_swap:
+                common.modify_constants(prod_env=True, maintenance_mode=False)
+                with utils.open_file(
+                    mock_constants_path, 'r') as constants_file:
+                    self.assertEqual(
+                        constants_file.read(),
+                        'export = {\n'
+                        '  "DEV_MODE": false,\n'
+                        '  "EMULATOR_MODE": true,\n'
+                        '};')
+                with utils.open_file(mock_feconf_path, 'r') as feconf_file:
+                    self.assertEqual(
+                        feconf_file.read(), 'ENABLE_MAINTENANCE_MODE = False')
+
+                common.modify_constants(prod_env=False, maintenance_mode=True)
+                with utils.open_file(
+                    mock_constants_path, 'r') as constants_file:
+                    self.assertEqual(
+                        constants_file.read(),
+                        'export = {\n'
+                        '  "DEV_MODE": true,\n'
+                        '  "EMULATOR_MODE": true,\n'
+                        '};')
+                with utils.open_file(mock_feconf_path, 'r') as feconf_file:
+                    self.assertEqual(
+                        feconf_file.read(), 'ENABLE_MAINTENANCE_MODE = True')
+
+            constants_temp_file.close()
+            feconf_temp_file.close()
 
     def test_modify_constants(self) -> None:
         mock_constants_path = 'mock_app_dev.yaml'

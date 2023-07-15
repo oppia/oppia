@@ -1,0 +1,183 @@
+version: '3.8'
+
+services:
+  angular-build:
+    build:
+      context: .
+      dockerfile: ./docker/Dockerfile.frontend
+    container_name: oppia-angular-build
+    volumes:
+      - .:/app/oppia
+      - node_modules:/app/oppia/node_modules
+      - third_party:/app/oppia/third_party
+      - frontend_proto_files:/app/oppia/extensions/classifiers/proto
+    environment:
+      - NODE_OPTIONS=--max_old_space_size=4096
+    command: >
+      sh -c '
+        trap "rm /app/oppia/node_modules/@angular/compiler-cli/ngcc/__ngcc_lock_file__" EXIT
+        npx ng build --watch
+      '
+
+  webpack-compiler:
+    build:
+      context: .
+      dockerfile: ./docker/Dockerfile.frontend
+    container_name: oppia-webpack-compiler
+    volumes:
+      - .:/app/oppia
+      - node_modules:/app/oppia/node_modules
+      - third_party:/app/oppia/third_party
+      - frontend_proto_files:/app/oppia/extensions/classifiers/proto
+    command:
+      - "npx"
+      - "webpack"
+      - "--config"
+      - "/app/oppia/webpack.dev.config.ts"
+      - "--watch"
+      - "--color"
+      - "--progress"
+
+  dev-server:
+    build:
+      context: .
+      dockerfile: ./docker/Dockerfile.backend
+    container_name: oppia-dev-server
+    ports:
+      - "8181:8181"
+      - "8000:8000"
+    volumes:
+      - .:/app/oppia
+      - proto_files:/app/oppia/proto_files
+      - frontend_proto_files:/app/oppia/extensions/classifiers/proto
+      - third_party:/app/oppia/third_party
+    environment:
+      - CLOUDSDK_CORE_DISABLE_PROMPTS=1
+    depends_on:
+      - angular-build
+      - webpack-compiler
+      - datastore
+      - elasticsearch
+      - firebase
+      - redis
+    healthcheck:
+      test: curl -f http://localhost:8181/ || exit 1
+      timeout: 10s
+      interval: 30s
+      retries: 5
+      start_period: 5m
+    command: >
+      sh -c '
+        python -m scripts.build
+        /google-cloud-sdk/bin/dev_appserver.py /app/oppia/app_dev_docker.yaml \
+        --runtime=python38 \
+        --host=0.0.0.0 \
+        --port=8181 \
+        --admin_host=0.0.0.0 \
+        --admin_port=8000 \
+        --skip_sdk_update_check=true \
+        --automatic_restart=true \
+        --log_level=info \
+        --dev_appserver_log_level=info
+      '
+
+  datastore:
+    build:
+      context: .
+      dockerfile: ./docker/Dockerfile.backend
+    container_name: oppia-cloud-datastore
+    environment:
+      - CLOUDSDK_CORE_DISABLE_PROMPTS=1
+      - DATASTORE_HOST=datastore
+    volumes:
+      - cloud_datastore_emulator_cache:/app/cloud_datastore_emulator_cache
+    healthcheck:
+      test: curl -f http://localhost:8089/ || exit 1
+      timeout: 10s
+      interval: 2m
+      retries: 5
+      start_period: 5m
+    entrypoint: /google-cloud-sdk/bin/gcloud
+    command:
+      - "beta"
+      - "emulators"
+      - "datastore"
+      - "start"
+      - "--project"
+      - "dev-project-id"
+      - "--data-dir"
+      - "/app/cloud_datastore_emulator_cache"
+      - "--host-port=0.0.0.0:8089"
+      - "--consistency=1.0"
+      - "--quiet"
+      - "--no-store-on-disk"
+
+  firebase:
+    image: node:16.13.0-alpine
+    container_name: oppia-firebase-emulator
+    ports:
+      - "9099:9099"
+      - "4000:4000"
+    volumes:
+      - ./.firebase.json:/app/oppia/.firebase.json
+      # NOTE: The firebase service depends on the packages from node_modules that are being
+      # installed in the Frontend Stage of Dockerfile. In future, we can remove the dependency
+      # on Frontend Stage and install the required packages in this service itself.
+      - node_modules:/app/oppia/node_modules
+      - firebase_emulator_cache:/app/firebase_emulator_cache
+    depends_on:
+      - angular-build
+    healthcheck:
+      test: wget --spider http://localhost:4000/auth/ && echo 'y' | /app/oppia/node_modules/firebase-tools/lib/bin/firebase.js emulators:export /app/firebase_emulator_cache --project=dev-project-id || exit 1
+      timeout: 20s
+      interval: 20s
+      retries: 5
+    entrypoint:
+      - /app/oppia/node_modules/firebase-tools/lib/bin/firebase.js
+      - "emulators:start"
+      - "--only"
+      - "auth"
+      - "--project=dev-project-id"
+      - "--config=/app/oppia/.firebase.json"
+    command:
+      - "--import=/app/firebase_emulator_cache"
+      - "--export-on-exit=/app/firebase_emulator_cache"
+
+  redis:
+    image: redis:6.2.4
+    container_name: oppia-redis
+    environment:
+      - PATH=/usr/local/bin/
+    volumes:
+      - redis_dump:/data/dump.db
+      - ./redis_docker.conf:/app/oppia/redis_docker.conf
+    healthcheck:
+      test: redis-cli ping
+      timeout: 5s
+      interval: 30s
+      retries: 5
+    command: redis-server /app/oppia/redis_docker.conf
+
+  elasticsearch:
+    image: elasticsearch:7.17.0
+    container_name: oppia-elasticsearch
+    environment:
+      - ES_JAVA_OPTS=-Xms100m -Xmx500m
+      - ES_PATH_CONF=/usr/share/elasticsearch/config
+      - discovery.type=single-node
+    healthcheck:
+      test: curl -f http://localhost:9200/ || exit 1
+      timeout: 10s
+      interval: 1m
+      retries: 5
+      start_period: 5m
+    command: elasticsearch -q
+
+volumes:
+  node_modules:
+  proto_files:
+  frontend_proto_files:
+  third_party:
+  redis_dump:
+  firebase_emulator_cache:
+  cloud_datastore_emulator_cache:
