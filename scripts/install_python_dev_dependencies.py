@@ -87,8 +87,8 @@ def install_installation_tools() -> None:
 def install_dev_dependencies() -> None:
     """Install dev dependencies from COMPILED_REQUIREMENTS_DEV_FILE_PATH."""
     subprocess.run(
-        ['pip', 'install', '--require-hashes', '--no-deps', '-r',
-        COMPILED_REQUIREMENTS_DEV_FILE_PATH],
+        ['pip-sync', COMPILED_REQUIREMENTS_DEV_FILE_PATH, '--pip-args',
+        '--require-hashes --no-deps'],
         check=True,
         encoding='utf-8',
     )

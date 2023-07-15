@@ -148,8 +148,8 @@ class InstallPythonDevDependenciesTests(test_utils.GenericTestBase):
         run_swap = self.swap_with_checks(
             subprocess, 'run', mock_run, expected_args=[
                 (
-                    ['pip', 'install', '--require-hashes', '--no-deps', '-r',
-                    'requirements_dev.txt'],
+                    ['pip-sync', 'requirements_dev.txt',
+                    '--pip-args', '--require-hashes --no-deps'],
                 ),
             ],
             expected_kwargs=[

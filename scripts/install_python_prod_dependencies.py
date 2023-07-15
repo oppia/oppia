@@ -140,7 +140,7 @@ def _get_requirements_file_contents() -> Dict[str, str]:
         common.COMPILED_REQUIREMENTS_FILE_PATH, 'r') as f:
         trimmed_lines = (line.strip() for line in f.readlines())
         for line_num, line in enumerate(trimmed_lines, start=1):
-            if not line or line.startswith('#') or line.startswith('--'):
+            if not line or line.startswith('#') or line.startswith('--hash='):
                 continue
 
             if line.startswith('git'):

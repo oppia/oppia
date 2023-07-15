@@ -56,9 +56,7 @@ class InstallThirdPartyLibsImportTests(test_utils.GenericTestBase):
                 'requirements_dev.in', '--output-file',
                 'requirements_dev.txt',
             ],
-            [
-                'pip', 'install', '--require-hashes', '--no-deps',
-                '-r', 'requirements_dev.txt'
-            ]
+            ['pip-sync', 'requirements_dev.txt', '--pip-args',
+            '--require-hashes --no-deps'],
         ]
         self.assertEqual(commands, expected_commands)
