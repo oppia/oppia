@@ -47,7 +47,6 @@ from core.domain import caching_domain
 from core.domain import classifier_domain
 from core.domain import collection_domain
 from core.domain import collection_services
-from core.domain import config_domain
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
@@ -2515,22 +2514,6 @@ version: 1
         """Signs up a superadmin user. Must be called at the end of setUp()."""
         self.signup(self.SUPER_ADMIN_EMAIL, self.SUPER_ADMIN_USERNAME)
 
-    def set_config_property(
-        self,
-        config_obj: config_domain.ConfigProperty,
-        new_config_value: Union[str, List[str], bool, float]
-    ) -> None:
-        """Sets a given configuration object's value to the new value specified
-        using a POST request.
-        """
-        with self.super_admin_context():
-            self.post_json('/adminhandler', {
-                'action': 'save_config_properties',
-                'new_config_property_values': {
-                    config_obj.name: new_config_value,
-                },
-            }, csrf_token=self.get_new_csrf_token())
-
     def add_user_role(self, username: str, user_role: str) -> None:
         """Adds the given role to the user account with the given username.
 
@@ -3230,10 +3213,8 @@ version: 1
             # used by the tests. We raise an exception so that if an interaction
             # with dict type gets added and tested, this utility function will
             # fail noisily.
-            elif (  # pragma: no cover
-                schema['type'] == schema_utils.SCHEMA_TYPE_DICT
-            ):
-                raise NotImplementedError(
+            elif schema['type'] == schema_utils.SCHEMA_TYPE_DICT:
+                raise NotImplementedError(  # pragma: no cover
                     'GenericTestBase.set_interaction_for_state() does not '
                     'support dict types in interaction schemas. If you need to '
                     'test such an interaction, please update GenericTestBase '
