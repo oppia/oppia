@@ -114,6 +114,7 @@ class SkillEditorTest(BaseSkillEditorControllerTests):
         self.logout()
 
     def test_skill_editor_page_fails(self) -> None:
+        """Tests that a skill editor page cannot be found."""
         self.login(self.CURRICULUM_ADMIN_EMAIL)
 
         # Check GET returns 404 when cannot get skill by id.
@@ -130,6 +131,7 @@ class SkillRightsHandlerTest(BaseSkillEditorControllerTests):
         self.url = '%s/%s' % (feconf.SKILL_RIGHTS_URL_PREFIX, self.skill_id)
 
     def test_skill_rights_handler_succeeds(self) -> None:
+        """Tests that the skill rights handler works successfully."""
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         # Check that admins can access and edit in the editor page.
         self.get_json(self.url)
@@ -164,17 +166,22 @@ class EditableSkillDataHandlerTest(BaseSkillEditorControllerTests):
         }
 
     def test_cannot_get_skill_by_invalid_skill_id(self) -> None:
+        """Tests that a user cannot access a skill if the skill ID is
+        invalid.
+        """
         url_with_invalid_id = '%s/%s' % (
             feconf.SKILL_EDITOR_DATA_URL_PREFIX, 'invalidSkillId')
         self.get_json(url_with_invalid_id, expected_status_int=400)
 
     def test_guest_can_not_delete_skill(self) -> None:
+        """Tests that a guest user cannot delete a skill."""
         response = self.delete_json(self.url, expected_status_int=401)
         self.assertEqual(
             response['error'],
             'You must be logged in to access this resource.')
 
     def test_new_user_can_not_delete_skill(self) -> None:
+        """Tests that a new user cannot delete a skill."""
         self.login(self.NEW_USER_EMAIL)
 
         response = self.delete_json(self.url, expected_status_int=401)
@@ -185,6 +192,7 @@ class EditableSkillDataHandlerTest(BaseSkillEditorControllerTests):
         self.logout()
 
     def test_editable_skill_handler_get_succeeds(self) -> None:
+        """Tests that the editable skill handler works successfully."""
         self.login(self.NEW_USER_EMAIL)
         # Check that admins can access the editable skill data.
         json_response = self.get_json(self.url)
@@ -199,6 +207,9 @@ class EditableSkillDataHandlerTest(BaseSkillEditorControllerTests):
     def test_skill_which_is_assigned_to_topic_but_not_subtopic(
         self
     ) -> None:
+        """Tests retrieving editable skill data for a skill assigned to
+        a topic but not a subtopic.
+        """
         skill_id = skill_services.get_new_skill_id()
         self.save_new_skill(
             skill_id, self.admin_id, description='DescriptionSkill')
@@ -222,6 +233,9 @@ class EditableSkillDataHandlerTest(BaseSkillEditorControllerTests):
         self.logout()
 
     def test_skill_which_is_not_assigned_to_any_topic(self) -> None:
+        """Tests retrieving editable skill data for a skill not assigned to
+        any topic.
+        """
         skill_id = skill_services.get_new_skill_id()
         self.save_new_skill(
             skill_id, self.admin_id, description='DescriptionSkill')
@@ -237,6 +251,9 @@ class EditableSkillDataHandlerTest(BaseSkillEditorControllerTests):
         self.logout()
 
     def test_skill_which_is_assigned_to_multiple_topics(self) -> None:
+        """Tests retrieving editable skill data for a skill that is assigned
+        to multiple topics.
+        """
         skill_id = skill_services.get_new_skill_id()
         self.save_new_skill(
             skill_id, self.admin_id, description='DescriptionSkill')
@@ -281,6 +298,7 @@ class EditableSkillDataHandlerTest(BaseSkillEditorControllerTests):
         self.logout()
 
     def test_editable_skill_handler_get_fails(self) -> None:
+        """Tests that a user cannot access a deleted skill."""
         self.login(self.NEW_USER_EMAIL)
         # Check GET returns 404 when cannot get skill by id.
         self.delete_skill_model_and_memcache(self.admin_id, self.skill_id)
@@ -288,6 +306,7 @@ class EditableSkillDataHandlerTest(BaseSkillEditorControllerTests):
         self.logout()
 
     def test_editable_skill_handler_put_succeeds(self) -> None:
+        """Tests that a curriculum admin can update the editable skill."""
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
         # Check that admins can edit a skill.
