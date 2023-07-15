@@ -34,10 +34,6 @@ import {
   LearnerTopicSummaryBackendDict
 } from 'domain/topic/learner-topic-summary.model';
 import {
-  FeedbackThreadSummary,
-  FeedbackThreadSummaryBackendDict
-} from 'domain/feedback_thread/feedback-thread-summary.model';
-import {
   LearnerExplorationSummary,
   LearnerExplorationSummaryBackendDict,
 } from 'domain/summary/learner-exploration-summary.model';
@@ -61,7 +57,6 @@ import {
   ShortLearnerGroupSummary,
   ShortLearnerGroupSummaryBackendDict
 } from 'domain/learner_group/short-learner-group-summary.model';
-import { FeedbackMessageSummaryBackendDict } from 'domain/feedback_message/feedback-message-summary.model';
 import { AppConstants } from 'app.constants';
 
 
@@ -96,12 +91,6 @@ export interface LearnerDashboardExplorationsDataBackendDict {
   'subscription_list': CreatorSummaryBackendDict[];
 }
 
-
-interface LearnerDashboardFeedbackUpdatesDataBackendDict {
-  'number_of_unread_threads': number;
-  'thread_summaries': FeedbackThreadSummaryBackendDict[];
-  'paginated_threads_list': FeedbackThreadSummaryBackendDict[][];
-}
 
 interface LearnerCompletedChaptersCountDataBackendDict {
   'completed_chapters_count': number;
@@ -142,11 +131,6 @@ interface LearnerDashboardExplorationsData {
   subscriptionList: ProfileSummary[];
 }
 
-interface LearnerDashboardFeedbackUpdatesData {
-  numberOfUnreadThreads: number;
-  threadSummaries: FeedbackThreadSummary[];
-  paginatedThreadsList: FeedbackThreadSummaryBackendDict[][];
-}
 
 interface LearnerCompletedChaptersCountData {
   completedChaptersCount: number;
@@ -157,16 +141,6 @@ interface LearnerDashboardLearnerGroups {
   invitedToLearnerGroups: ShortLearnerGroupSummary[];
 }
 
-export interface AddMessagePayload {
-  'updated_status': boolean;
-  // Subject for frontend instances of thread message domain objects
-  // are null and are only required to be supplied if the message is first
-  // message of the thread. Otherwise, these properties are only non-null
-  // when the subject changes.
-  'updated_subject': string | null;
-  'text': string;
-}
-
 export interface SubtopicMasterySummaryBackendDict {
   [mastery: string]: number;
 }
@@ -175,9 +149,6 @@ export interface SubtopicMasteryDict {
   'subtopic_mastery_dict': Record<string, SubtopicMasterySummaryBackendDict>;
 }
 
-interface MessageSummaryList {
-  'message_summary_list': FeedbackMessageSummaryBackendDict[];
-}
 
 @Injectable({
   providedIn: 'root'
@@ -294,31 +265,6 @@ export class LearnerDashboardBackendApiService {
     });
   }
 
-  async _fetchLearnerDashboardFeedbackUpdatesDataAsync(
-      paginatedThreadsList: FeedbackThreadSummaryBackendDict[][]
-  ):
-  Promise<LearnerDashboardFeedbackUpdatesData> {
-    return new Promise((resolve, reject) => {
-      this.http.post<LearnerDashboardFeedbackUpdatesDataBackendDict>(
-        '/learnerdashboardfeedbackupdateshandler/data',
-        {
-          paginated_threads_list: paginatedThreadsList
-        }).toPromise().then(
-        dashboardData => {
-          resolve({
-            numberOfUnreadThreads: dashboardData.number_of_unread_threads,
-            threadSummaries: (
-              dashboardData.thread_summaries.map(
-                threadSummary => FeedbackThreadSummary
-                  .createFromBackendDict(threadSummary))),
-            paginatedThreadsList: dashboardData.paginated_threads_list
-          });
-        }, errorResponse => {
-          reject(errorResponse.status);
-        });
-    });
-  }
-
   async _fetchLearnerCompletedChaptersCountDataAsync():
   Promise<LearnerCompletedChaptersCountData> {
     return new Promise((resolve, reject) => {
@@ -363,41 +309,9 @@ export class LearnerDashboardBackendApiService {
     return this._fetchLearnerDashboardExplorationsDataAsync();
   }
 
-  async fetchLearnerDashboardFeedbackUpdatesDataAsync(
-      paginatedThreadsList: FeedbackThreadSummaryBackendDict[][] = []
-  ):
-  Promise<LearnerDashboardFeedbackUpdatesData> {
-    return this._fetchLearnerDashboardFeedbackUpdatesDataAsync(
-      paginatedThreadsList);
-  }
-
   async fetchLearnerCompletedChaptersCountDataAsync():
   Promise<LearnerCompletedChaptersCountData> {
     return this._fetchLearnerCompletedChaptersCountDataAsync();
-  }
-
-  async addNewMessageAsync(
-      url: string, payload: AddMessagePayload): Promise<void> {
-    return new Promise((resolve, reject) => {
-      this.http.post<void>(url, payload).toPromise()
-        .then(response => {
-          resolve(response);
-        }, errorResonse => {
-          reject(errorResonse.error.error);
-        });
-    });
-  }
-
-  async onClickThreadAsync(
-      threadDataUrl: string): Promise<FeedbackMessageSummaryBackendDict[]> {
-    return new Promise((resolve, reject) => {
-      this.http.get<MessageSummaryList>(
-        threadDataUrl).toPromise().then(response => {
-        resolve(response.message_summary_list);
-      }, errorResponse => {
-        reject(errorResponse.error.error);
-      });
-    });
   }
 
   async _fetchSubtopicMastery(
