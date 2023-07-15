@@ -33,6 +33,9 @@ def main() -> None:
     # Configure the required packages and scripts to install.
     with open('requirements.txt', encoding='utf-8') as requirements_txt: # pylint: disable=replace-disallowed-function-calls
         requirements_content = requirements_txt.read()
+        # Removing the hashes from the requirements.txt file because they are
+        # not supported by the 'pkg_resources.parse_requirements' function while
+        # parsing the requirements.
         modified_requirements_content = re.sub(
             r'^\s*--hash=sha256:.*$|\\$',
             '',
