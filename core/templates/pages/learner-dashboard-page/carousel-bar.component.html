@@ -2,8 +2,16 @@
     <div class="oppia-coursel-container">
         <div class="oppia-carousel-head">
             <div class="oppia-carousel-head-content">
-                <span class="oppia-carousel-heading"
-                    [innerHTML]="'I18N_LEARNER_DASHBOARD_LEARN_SOMETHING_NEW_SECTION' | translate"></span>
+                <span class="oppia-carousel-heading">
+                    <!-- <span
+                        [innerHTML]="'I18N_LEARNER_DASHBOARD_LEARN_SOMETHING_NEW_SECTION' | translate"></span> -->
+                    <span *ngIf="carouselHeading === LessonsinProgress">
+                        LessonsinProgress
+                    </span>
+                    <span *ngIf="carouselClassname === '.inprogress'">
+                        shree ram
+                    </span>
+                </span>
                 <span class="oppia-carousel-button" *ngIf="isScrollable">
                     <button class="oppia-carousel-scroller" (click)="scroll(true)"
                         [ngStyle]="{'background-color': disableLeftButton ? 'gray' : '#00645C'}"
@@ -18,7 +26,7 @@
                 </span>
             </div>
         </div>
-        <hr>
+        <span class="oppia-horizontal-line"></span>
         <div class="oppia-carousel-content">
             <div class="tiles">
                 <ng-content></ng-content>

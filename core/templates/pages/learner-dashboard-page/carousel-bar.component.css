@@ -49,3 +49,9 @@ font-weight: 500;
   padding: 0;
   position: relative;
 }
+
+.oppia-carousel-bar .oppia-horizontal-line {
+  border: 1px solid #00645C;
+  margin: 2px 0px 12px;
+  width: 100%;
+}

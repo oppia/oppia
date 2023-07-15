@@ -40,6 +40,7 @@ export class CarouselBarComponent implements AfterViewInit, OnInit {
   disableRightButton: boolean = false;
   isScrollable: boolean = false;
  @Input() carouselClassname: string;
+ @Input() carouselHeading: string;
  @Input() scrollUntrackedTopics: boolean = false;
 
  // These properties are initialized using Angular lifecycle hooks
@@ -72,6 +73,7 @@ export class CarouselBarComponent implements AfterViewInit, OnInit {
  ngAfterViewInit(): void {
    setTimeout(() => {
      this.isScrollable = this.initCarousel();
+     console.error(this.carouselClassname + 'ram', 'classname...');
    });
  }
 
@@ -80,9 +82,6 @@ export class CarouselBarComponent implements AfterViewInit, OnInit {
    let carouselSelector = document.querySelector(classname) as HTMLElement;
    this.CarouselScrollWidthPx = carouselSelector.scrollWidth;
    this.CarouselClientWidthPx = carouselSelector.clientWidth;
-
-   // eslint-disable-next-line oppia/comment-style
-   // True--left
 
    let direction = isLeftScroll ? -1 : 1;
 
