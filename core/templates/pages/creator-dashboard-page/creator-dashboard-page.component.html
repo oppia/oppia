@@ -226,7 +226,7 @@
               </a>
             </td>
             <td *ngIf="exploration.status !== 'private'">
-              <a [href]="getExplorationUrl(exploration.id)" 
+              <a [href]="getExplorationUrl(exploration.id)"
                  [attr.aria-label]="'Plays: ' + exploration.numViews"
                  class="oppia-dashboard-list-summary e2e-test-exp-summary-row-num-views">
                 {{ exploration.numViews }}
