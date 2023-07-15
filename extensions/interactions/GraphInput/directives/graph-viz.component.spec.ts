@@ -773,7 +773,7 @@ describe('GraphVizComponent', () => {
     dotCursorElement.style.top = '0px';
     dotCursorElement.style.left = '0px';
 
-    spyOn(document, 'querySelector').and.returnValue(dotCursorElement);
+    component.dotCursor = new ElementRef(dotCursorElement)
 
     component.ngAfterViewInit();
 
