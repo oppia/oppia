@@ -23,6 +23,7 @@ storage model to be changed without affecting this module and others above it.
 from __future__ import annotations
 
 import copy
+import datetime
 import logging
 
 from core import feconf
@@ -40,7 +41,7 @@ from core.domain import suggestion_services
 from core.domain import topic_fetchers
 from core.platform import models
 
-from typing import List, Sequence, Tuple, cast
+from typing import Dict, List, Sequence, Tuple, cast
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -967,3 +968,67 @@ def record_completed_node_in_story_context(
         progress_model.completed_node_ids.append(node_id)
         progress_model.update_timestamps()
         progress_model.put()
+
+
+def get_chapter_notification_dicts() -> Dict[str, List[Dict[
+    str, Sequence[str]]]]:
+    """Returns a dict of behind schedule and upcoming chapters."""
+    topic_models = topic_fetchers.get_all_topics()
+    overdue_stories_dicts = []
+    upcoming_stories_dicts = []
+    for topic_model in topic_models:
+        topic_rights = topic_fetchers.get_topic_rights(topic_model.id)
+        if topic_rights.topic_is_published:
+            canonical_story_ids = [story.story_id
+                for story in topic_model.canonical_story_references]
+            canonical_story_models = story_models.StoryModel.get_multi(
+                canonical_story_ids)
+
+            for story_model in canonical_story_models:
+                story = (
+                    story_fetchers.get_story_from_model(story_model) if
+                    story_model else None)
+                if story is None:
+                    continue
+                overdue_chapters = []
+                upcoming_chapters = []
+                for node in story.story_contents.nodes:
+                    if node.planned_publication_date is not None and ((
+                        node.planned_publication_date -
+                        datetime.datetime.today()).days < 14 and
+                        node.planned_publication_date >
+                        datetime.datetime.today() and
+                        node.status != 'Published'):
+                        upcoming_chapters.append(node.title)
+
+                    if node.planned_publication_date is not None and (
+                        node.planned_publication_date <
+                        datetime.datetime.today()
+                        and node.status != 'Published'):
+                        overdue_chapters.append(node.title)
+
+                if len(overdue_chapters):
+                    story_link = (
+                        'https://www.oppia.org/story_editor/%s' % story.id)
+                    overdue_stories_dicts.append({
+                        'story_name': story.title,
+                        'topic_name': topic_model.name,
+                        'story_link': story_link,
+                        'overdue_chapters': overdue_chapters
+                    })
+
+                if len(upcoming_chapters):
+                    story_link = (
+                        'https://www.oppia.org/story_editor/%s' % story.id)
+                    upcoming_stories_dicts.append({
+                        'story_name': story.title,
+                        'topic_name': topic_model.name,
+                        'story_link': story_link,
+                        'upcoming_chapters': upcoming_chapters
+                    })
+
+    chapter_notifications = {
+        'overdue_stories_dicts': overdue_stories_dicts,
+        'upcoming_stories_dicts': upcoming_stories_dicts
+    }
+    return chapter_notifications

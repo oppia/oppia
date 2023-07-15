@@ -266,6 +266,23 @@ CONTRIBUTOR_DASHBOARD_REVIEWER_NOTIFICATION_EMAIL_DATA: Dict[str, str] = {
     'email_subject': 'Contributor Dashboard Reviewer Opportunities'
 }
 
+CURRICULUM_ADMIN_CHAPTER_NOTIFICATION_EMAIL_DATA: Dict[str, str] = {
+    'overdue_chapters_template': (
+        'The following stories have unpublished chapters which are behind '
+        'schedule, please publish them or adjust the planned publication date.'
+        '<br><br>'
+        '<ol>%s</ol>'
+    ),
+    'upcoming_chapters_template': (
+        'The following stories have unpublished chapters which are due for '
+        'publication in the next 14 days, please ensure they are published '
+        'on or before the planned date or adjust the planned publication date.'
+        '<br><br>'
+        '<ol>%s</ol>'
+    ),
+    'email_subject': 'Chapter Publication Notifications'
+}
+
 HTML_FOR_SUGGESTION_DESCRIPTION: Dict[
     str, Dict[str, Union[str, Callable[[Dict[str, str]], Tuple[str, ...]]]]
 ] = {
@@ -2022,6 +2039,72 @@ def send_mail_to_notify_contributor_ranking_achievement(
             feconf.EMAIL_INTENT_NOTIFY_CONTRIBUTOR_DASHBOARD_ACHIEVEMENTS,
             email_template['email_subject'], email_body,
             feconf.NOREPLY_EMAIL_ADDRESS)
+
+
+def send_reminder_mail_to_notify_curriculum_admins(
+    curriculum_admin_ids: List[str],
+    overdue_stories_dicts: List[Dict[str, Sequence[str]]],
+    upcoming_stories_dicts: List[Dict[str, Sequence[str]]]) -> None:
+
+    """Sends an email to curriculum admins to notify them about the
+    behind schedule and upcoming chapters in all the topics.
+
+    Args:
+        curriculum_admin_ids: list(str). The user ids of the admins to notify.
+        overdue_stories_dicts: list(dict). A list of dictionaries containing the
+            information about the behind schedule chapters to be notified.
+        upcoming_stories_dicts: list(dict). A list of dictionaries containing
+            the information about the upcoming chapters to be notified.
+    """
+    if not feconf.CAN_SEND_EMAILS:
+        logging.error('This app cannot send emails to users.')
+        return
+    if not curriculum_admin_ids:
+        logging.error('There were no curriculum admins to notify.')
+        return
+
+    email_body_template = CURRICULUM_ADMIN_CHAPTER_NOTIFICATION_EMAIL_DATA
+    email_subject = CURRICULUM_ADMIN_CHAPTER_NOTIFICATION_EMAIL_DATA[
+        'email_subject']
+
+    email_body = 'Dear Curriculum Admin, <br><br>'
+
+    if len(overdue_stories_dicts):
+        overdue_stories_html = ''
+        for story_dict in overdue_stories_dicts:
+            story_html = '<li>%s (%s) - <a href=%s>Link</a><ul>' % (
+                story_dict['story_name'], story_dict['topic_name'],
+                story_dict['story_link'])
+            for chapter in story_dict['overdue_chapters']:
+                chapter_html = '<li>%s</li>' % chapter
+                story_html += chapter_html
+            story_html += '</ul></li>'
+            overdue_stories_html += story_html
+        email_body += email_body_template['overdue_chapters_template'] % (
+            overdue_stories_html)
+
+    if len(upcoming_stories_dicts):
+        upcoming_stories_html = ''
+        for story_dict in upcoming_stories_dicts:
+            story_html = '<li>%s (%s) - <a href="%s">Link</a><ul>' % (
+                story_dict['story_name'], story_dict['topic_name'],
+                story_dict['story_link'])
+            for chapter in story_dict['upcoming_chapters']:
+                chapter_html = '<li>%s</li>' % chapter
+                story_html += chapter_html
+            story_html += '</ul></li>'
+            upcoming_stories_html += story_html
+        email_body += email_body_template['upcoming_chapters_template'] % (
+            upcoming_stories_html)
+
+    email_body += 'Regards,<br> Oppia Foundation'
+
+    if len(overdue_stories_dicts) or len(upcoming_stories_dicts):
+        for admin_id in curriculum_admin_ids:
+            _send_email(
+                admin_id, feconf.SYSTEM_COMMITTER_ID,
+                feconf.EMAIL_INTENT_NOTIFY_CURRICULUM_ADMINS_CHAPTERS,
+                email_subject, email_body, feconf.NOREPLY_EMAIL_ADDRESS)
 
 
 def send_account_deleted_email(user_id: str, user_email: str) -> None:
