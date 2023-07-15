@@ -290,7 +290,7 @@ class AuthServicesTests(test_utils.GenericTestBase):
             auth_services.revoke_super_admin_privileges('uid1')
             self.assertEqual([], super_admin_privilage)
 
-    def test_get_csrf_secret_model_returns_None_when_no_models(self) -> None:
+    def test_get_csrf_secret_model_returns_none_when_no_models(self) -> None:
         self.assertIsNone(auth_services.get_csrf_secret_model())
 
     def test_csrf_secret_mode_is_initialized_correctly(self) -> None:

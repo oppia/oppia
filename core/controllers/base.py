@@ -37,7 +37,6 @@ from core.domain import auth_domain
 from core.domain import auth_services
 from core.domain import classifier_domain
 from core.domain import user_services
-from core.platform import models
 
 from typing import (
     Any, Dict, Final, Generic, Mapping, Optional, Sequence, TypedDict, TypeVar,
@@ -45,12 +44,6 @@ from typing import (
 )
 
 import webapp2
-
-MYPY = False
-if MYPY: # pragma: no cover
-    from mypy_imports import auth_models
-
-(auth_models,) = models.Registry.import_models([models.Names.AUTH])
 
 # Note: These private type variables are only defined to implement the Generic
 # typing structure of BaseHandler. So, do not make them public in the future.
