@@ -3217,12 +3217,19 @@ version: 1
                 for x in value:
                     traverse_schema_and_assign_content_ids(
                         x, schema['items'], ca_name)
-            elif schema['type'] == schema_utils.SCHEMA_TYPE_DICT:
-                for schema_property in schema['properties']:
-                    traverse_schema_and_assign_content_ids(
-                        schema['properties'][schema_property.name],
-                        schema_property['schema'],
-                        '%s_%s' % (ca_name, schema_property.name))
+            # We exclude this elif block from coverage because no interaction
+            # includes the dict type in its schema, so this block never gets
+            # used by the tests. We raise an exception so that if an interaction
+            # with dict type gets added and tested, this utility function will
+            # fail noisily.
+            elif (  # pragma: no cover
+                schema['type'] == schema_utils.SCHEMA_TYPE_DICT
+            ):
+                raise Exception(
+                    'GenericTestBase.set_interaction_for_state() does not '
+                    'support dict types in interaction schemas. If you need to '
+                    'test such an interaction, please update GenericTestBase '
+                    'to add support.')
 
         interaction = (
             interaction_registry.Registry.get_interaction_by_id(interaction_id))
