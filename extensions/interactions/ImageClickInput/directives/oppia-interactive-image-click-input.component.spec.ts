@@ -592,38 +592,42 @@ describe('InteractiveImageClickInput', () => {
       clientX: 100,
       clientY: 100
     });
-  
+
     component.el = {
       nativeElement: {
         querySelectorAll: () => [imageElement]
       }
     };
-  
+
     spyOn(document, 'querySelector').and.returnValue(dotElement);
 
     component.ngOnInit();
     component.usingMobileDevice = false;
     component.updateDotPosition(event);
-  
+
     expect(component.dotCursorCoordinateX).toBe(
-      event.clientX - imageElement.getBoundingClientRect().left + parseFloat(window.getComputedStyle(imageElement).marginLeft) + 8
+      event.clientX - imageElement.getBoundingClientRect().left +
+      parseFloat(window.getComputedStyle(imageElement).marginLeft) + 8
     );
     expect(component.dotCursorCoordinateY).toBe(
-      event.clientY - imageElement.getBoundingClientRect().top + parseFloat(window.getComputedStyle(imageElement).marginTop) + 8
+      event.clientY - imageElement.getBoundingClientRect().top +
+      parseFloat(window.getComputedStyle(imageElement).marginTop) + 8
     );
-  
+
     expect(dotElement.style.top).toBe(component.dotCursorCoordinateY + 'px');
     expect(dotElement.style.left).toBe(component.dotCursorCoordinateX + 'px');
-  
+
     const dotRect = dotElement.getBoundingClientRect();
     expect(component.mouseX).toBe(
-      (dotRect.left - imageElement.getBoundingClientRect().left) / imageElement.width
+      (dotRect.left - imageElement.getBoundingClientRect().left) /
+      imageElement.width
     );
     expect(component.mouseY).toBe(
-      (dotRect.top - imageElement.getBoundingClientRect().top) / imageElement.height
+      (dotRect.top - imageElement.getBoundingClientRect().top) /
+      imageElement.height
     );
   });
-  
+
   it('should not check if mouse is over region when interaction is not' +
   ' active', () => {
     spyOn(component, 'updateCurrentlyHoveredRegions').and.callThrough();

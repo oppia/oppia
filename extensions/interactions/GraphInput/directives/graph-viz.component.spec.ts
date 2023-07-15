@@ -746,18 +746,19 @@ describe('GraphVizComponent', () => {
 
   it('should set the hoveredVertex when focus gets on vertex', () => {
     const index = 3;
-  
+
     component.onFocusVertex(index);
-  
+
     expect(component.state.hoveredVertex).toBe(index);
   });
-  
-  it('should call onMouseleaveVertex when focus leaves the vertex is called', () => {
+
+  it('should call onMouseleaveVertex when focus leaves the vertex is' +
+  ' called', () => {
     const index = 3;
     spyOn(component, 'onMouseleaveVertex');
-  
+
     component.onBlurVertex(index);
-  
+
     expect(component.onMouseleaveVertex).toHaveBeenCalledWith(index);
   });
 
@@ -787,23 +788,19 @@ describe('GraphVizComponent', () => {
     graphAreaElement.style.left = '0px';
     graphAreaElement.style.top = '0px';
 
-    const graphAreaRect = {
-      left: 0,
-      top: 0
-    };
-
     component.graphArea = new ElementRef(graphAreaElement);
 
     component.mousemoveGraphSVG(event);
 
     expect(component.dotCursorCoordinateX).toBe(100);
     expect(component.dotCursorCoordinateY).toBe(100);
-    expect(dotCursorElement.style.top).toBe(component.dotCursorCoordinateY + 'px');
-    expect(dotCursorElement.style.left).toBe(component.dotCursorCoordinateX + 'px');
+    expect(dotCursorElement.style.top)
+      .toBe(component.dotCursorCoordinateY + 'px');
+    expect(dotCursorElement.style.left)
+      .toBe(component.dotCursorCoordinateX + 'px');
   });
 
   it('should dispatch click event when button is on top of dot', () => {
-
     const dotElement = document.createElement('div');
     dotElement.classList.add('oppia-add-node-cursor');
 
@@ -824,7 +821,7 @@ describe('GraphVizComponent', () => {
         bottom: 110,
         left: 200,
         right: 210
-    });
+      });
 
     spyOn(buttonElements[0], 'getBoundingClientRect')
       .and.returnValue({
@@ -832,14 +829,14 @@ describe('GraphVizComponent', () => {
         bottom: 135,
         left: 190,
         right: 275
-    });
+      });
     spyOn(buttonElements[1], 'getBoundingClientRect')
       .and.returnValue({
         top: 50,
         bottom: 80,
         left: 150,
         right: 220
-    });
+      });
 
     spyOn(buttonElements[0], 'dispatchEvent');
 
@@ -871,7 +868,7 @@ describe('GraphVizComponent', () => {
         bottom: 110,
         left: 200,
         right: 210
-    });
+      });
 
     spyOn(buttonElements[0], 'getBoundingClientRect')
       .and.returnValue({
@@ -879,14 +876,14 @@ describe('GraphVizComponent', () => {
         bottom: 80,
         left: 150,
         right: 220
-    });
+      });
     spyOn(buttonElements[1], 'getBoundingClientRect')
       .and.returnValue({
         top: 120,
         bottom: 150,
         left: 220,
         right: 290
-    });
+      });
 
     const result = component.isButtonOnTopOfDot();
 
