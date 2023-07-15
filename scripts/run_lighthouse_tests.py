@@ -20,6 +20,7 @@ from __future__ import annotations
 import argparse
 import contextlib
 import os
+import signal
 import subprocess
 import sys
 
@@ -80,13 +81,15 @@ _PARSER.add_argument(
 
 
 def run_lighthouse_puppeteer_script(
-        vid_popen: Optional[subprocess.Popen[bytes]]=None) -> None: # pylint: disable=unsubscriptable-object
+        vid_popen: Optional[subprocess.Popen[bytes]]=None, # pylint: disable=unsubscriptable-object
+        vid_path: Optional[str]=None) -> None:
 
     """Runs puppeteer script to collect dynamic urls.
 
     Args:
         vid_popen: subprocess.Popen. If not None, holds subprocess for ffmpeg
             screen recording.
+        vid_path: str. If not None, represents vid_popen output video path.
     """
 
     puppeteer_path = (
@@ -114,10 +117,13 @@ def run_lighthouse_puppeteer_script(
         # print it.
         print(stderr.decode('utf-8'))
         print('Puppeteer script failed. More details can be found above.')
-        if vid_popen:
-            vid_popen.terminate()
-            process.communicate()
-            print('Saved video of failed script.')
+        if vid_popen and vid_path:
+            vid_popen.send_signal(signal.SIGINT)
+            process.wait()
+            if os.path.isfile(vid_path):
+                print('Lighthouse video saved at', vid_path)
+            else:
+                print('Resulting path', vid_path, 'does not have file.')
 
         sys.exit(1)
 
@@ -190,10 +196,10 @@ def run_lighthouse_checks(
     stdout, stderr = process.communicate()
     if process.returncode == 0:
         print('Lighthouse checks completed successfully.')
-        if vid_popen:
-            vid_popen.terminate()
+        if vid_popen and vid_path:
+            vid_popen.send_signal(signal.SIGINT)
             vid_popen.communicate()
-            if vid_path is not None and os.path.isfile(vid_path):
+            if os.path.isfile(vid_path):
                 print('Lighthouse video saved at', vid_path)
             else:
                 print('Resulting path', vid_path, 'does not have file.')
@@ -211,10 +217,13 @@ def run_lighthouse_checks(
         # print it.
         print(stderr.decode('utf-8'))
         print('Lighthouse checks failed. More details can be found above.')
-        if vid_popen:
-            vid_popen.terminate()
-            vid_popen.communicate()
-            print('Lighthouse video saved at', vid_path)
+        if vid_popen and vid_path:
+            vid_popen.send_signal(signal.SIGINT)
+            vid_popen.wait()
+            if os.path.isfile(vid_path):
+                print('Lighthouse video saved at', vid_path)
+            else:
+                print('Resulting path', vid_path, 'does not have file.')
         sys.exit(1)
 
 
@@ -249,14 +258,13 @@ def main(args: Optional[List[str]] = None) -> None:
         run_webpack_compilation()
 
     if parsed_args.record_screen:
-        dir_path = os.path.join(os.getcwd(), 'ffmpeg-video')
+        dir_path = os.path.join(os.getcwd(), '..', 'ffmpeg-video')
         os.mkdir(dir_path)
         vid_path = os.path.join(dir_path, 'lhci.mp4')
         print('Starting ffmpeg for screen recording.')
         vid_popen = subprocess.Popen([
             'ffmpeg', '-framerate', '25', '-f',
-            'x11grab', '-i', ':0', vid_path],
-            stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            'x11grab', '-i', ':0.0', vid_path])
 
     with contextlib.ExitStack() as stack:
         stack.enter_context(servers.managed_redis_server())
@@ -273,8 +281,8 @@ def main(args: Optional[List[str]] = None) -> None:
             skip_sdk_update_check=True))
 
         if parsed_args.record_screen:
-            print('Starting puppeteer scrupt with screen recording.')
-            run_lighthouse_puppeteer_script(vid_popen)
+            print('Starting puppeteer script with screen recording.')
+            run_lighthouse_puppeteer_script(vid_popen, vid_path)
             print('Starting LHCI checks with screen recording.')
             run_lighthouse_checks(
                 lighthouse_mode, parsed_args.shard, vid_popen, vid_path)
