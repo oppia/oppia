@@ -45,6 +45,7 @@ from core.controllers import editor
 from core.controllers import email_dashboard
 from core.controllers import features
 from core.controllers import feedback
+from core.controllers import feedback_updates
 from core.controllers import improvements
 from core.controllers import incoming_app_feedback_report
 from core.controllers import learner_dashboard
@@ -490,15 +491,15 @@ URLS = [
         r'%s' % feconf.LEARNER_DASHBOARD_EXPLORATION_DATA_URL,
         learner_dashboard.LearnerDashboardExplorationsProgressHandler),
     get_redirect_route(
-        r'%s' % feconf.LEARNER_DASHBOARD_FEEDBACK_UPDATES_DATA_URL,
-        learner_dashboard.LearnerDashboardFeedbackUpdatesHandler),
+        r'%s' % feconf.FEEDBACK_UPDATES_DATA_URL,
+        feedback_updates.FeedbackUpdatesHandler),
     get_redirect_route(
         r'%s' % feconf.LEARNER_DASHBOARD_IDS_DATA_URL,
         learner_dashboard.LearnerDashboardIdsHandler),
     get_redirect_route(
         r'%s/<thread_id>' %
-        feconf.LEARNER_DASHBOARD_FEEDBACK_THREAD_DATA_URL,
-        learner_dashboard.LearnerDashboardFeedbackThreadHandler),
+        feconf.FEEDBACK_UPDATES_THREAD_DATA_URL,
+        feedback_updates.FeedbackThreadHandler),
     get_redirect_route(
         r'%s' % feconf.TOPICS_AND_SKILLS_DASHBOARD_URL,
         topics_and_skills_dashboard.TopicsAndSkillsDashboardPage),
