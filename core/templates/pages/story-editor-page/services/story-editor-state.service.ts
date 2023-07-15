@@ -47,6 +47,7 @@ export class StoryEditorStateService {
   _skillSummaries: SkillSummaryBackendDict[] = [];
   _expIdsChanged: boolean = false;
   _storyWithUrlFragmentExists: boolean = false;
+  _currentNodeIsPublishable: boolean = false;
 
   _storyInitializedEventEmitter = new EventEmitter();
   _storyReinitializedEventEmitter = new EventEmitter();
@@ -280,6 +281,14 @@ export class StoryEditorStateService {
    */
   isSavingStory(): boolean {
     return this._storyIsBeingSaved;
+  }
+
+  setCurrentNodeAsPublishable(currentNodeIsPublishable: boolean): void {
+    this._currentNodeIsPublishable = currentNodeIsPublishable;
+  }
+
+  isCurrentNodePublishable(): boolean {
+    return this._currentNodeIsPublishable;
   }
 
   get onStoryInitialized(): EventEmitter<string> {

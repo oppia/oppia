@@ -2193,6 +2193,11 @@ class GenericTestBase(AppEngineTestBase):
             'thumbnail_filename': None,
             'thumbnail_bg_color': None,
             'thumbnail_size_in_bytes': None,
+            'status': None,
+            'planned_publication_date_msecs': None,
+            'last_modified_msecs': None,
+            'first_publication_date_msecs': None,
+            'unpublishing_reason': None
         }],
         'initial_node_id': 'node_1',
         'next_node_id': 'node_2',
@@ -3199,6 +3204,9 @@ version: 1
                 schema: dict. The current traversed schema.
                 ca_name: str. The arg name which will be used for generating
                     content_id.
+
+            Raises:
+                NotImplementedError. The schema includes an unsupported type.
             """
             is_subtitled_html_spec = (
                 schema['type'] == schema_utils.SCHEMA_TYPE_CUSTOM and
@@ -3225,7 +3233,7 @@ version: 1
             elif (  # pragma: no cover
                 schema['type'] == schema_utils.SCHEMA_TYPE_DICT
             ):
-                raise Exception(
+                raise NotImplementedError(
                     'GenericTestBase.set_interaction_for_state() does not '
                     'support dict types in interaction schemas. If you need to '
                     'test such an interaction, please update GenericTestBase '

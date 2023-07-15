@@ -1,6 +1,6 @@
 <div #dropdown class="oppia-review-translation-language-selector-container e2e-test-language-selector">
 
-  <div class="oppia-review-translation-language-selector-inner-container" (click)="toggleDropdown()">
+  <div class="oppia-review-translation-language-selector-inner-container" (click)="toggleDropdown()" (keydown.enter)="toggleDropdown()" tabindex="0">
     <span class="oppia-language-selector-label e2e-test-language-selector-selected">
       {{languageSelection}}
     </span>
@@ -22,6 +22,8 @@
       <div class="oppia-review-translation-language-selector-dropdown-option e2e-test-language-selector-option"
            *ngFor="let option of filteredOptions"
            (click)="selectOption(option.id)"
+           (keydown.enter)="selectOption(option.id)"
+           tabindex="0"
            [ngClass]="{'oppia-review-translation-language-selector-dropdown-option-selected' : option.id === activeLanguageCode}">
         {{option.description}}
       </div>

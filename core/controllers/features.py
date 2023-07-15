@@ -20,8 +20,9 @@ from core import feconf
 from core.constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
-from core.domain import config_domain
 from core.domain import opportunity_services
+from core.domain import platform_feature_services
+from core.domain import platform_parameter_list
 
 from typing import Dict
 
@@ -57,5 +58,7 @@ class ExplorationFeaturesHandler(
                 opportunity_services.is_exploration_available_for_contribution(
                     exploration_id),
             'always_ask_learners_for_answer_details':
-                config_domain.ALWAYS_ASK_LEARNERS_FOR_ANSWER_DETAILS.value
+                platform_feature_services.get_platform_parameter_value(
+                    platform_parameter_list.ParamNames.
+                    ALWAYS_ASK_LEARNERS_FOR_ANSWER_DETAILS.value)
         })

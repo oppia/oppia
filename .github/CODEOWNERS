@@ -167,6 +167,8 @@
 /core/domain/subscription_services*.py @oppia/lace-backend-reviewers
 /core/templates/domain/creator_dashboard/ @oppia/lace-frontend-reviewers
 /core/templates/domain/email-dashboard/ @oppia/lace-frontend-reviewers
+/core/templates/domain/feedback_updates/feedback-updates-backend-api.service.ts @oppia/lace-frontend-reviewers
+/core/templates/domain/feedback_updates/feedback-updates-backend-api.service.spec.ts @oppia/lace-frontend-reviewers 
 /core/templates/domain/learner_dashboard/ @oppia/lace-frontend-reviewers
 /core/templates/pages/creator-dashboard-page/ @oppia/lace-frontend-reviewers
 /core/templates/pages/email-dashboard-pages/ @oppia/lace-frontend-reviewers
@@ -184,6 +186,10 @@
 /.pylintrc @oppia/dev-workflow-reviewers
 /.stylelintrc @oppia/dev-workflow-reviewers
 /.yarnrc @oppia/dev-workflow-reviewers
+/app_dev_docker.yaml @oppia/dev-workflow-reviewers
+/docker-compose.yml @oppia/dev-workflow-reviewers
+/docker/Dockerfile.frontend @oppia/dev-workflow-reviewers
+/docker/Dockerfile.backend @oppia/dev-workflow-reviewers
 /tox.ini @oppia/dev-workflow-reviewers
 /scripts/*.py @oppia/dev-workflow-reviewers
 /scripts/check_e2e_tests_are_captured_in_ci*.py @oppia/automated-qa-reviewers
@@ -250,7 +256,8 @@
 # Forms pages.
 /core/templates/components/forms/ @oppia/lace-frontend-reviewers
 /core/templates/components/common-layout-directives/common-elements/confirmation-modal.template.html @oppia/lace-frontend-reviewers
-/core/templates/components/ck-editor-helpers/customize-rte-component-modal.template.html @oppia/lace-frontend-reviewers
+/core/templates/services/rte-helper-modal.component.html @oppia/lace-frontend-reviewers
+/core/templates/utility/forms.ts @oppia/lace-frontend-reviewers
 /core/templates/services/schema-default-value.service*.ts @oppia/lace-frontend-reviewers
 /core/templates/services/schema-form-submitted.service*.ts @oppia/lace-frontend-reviewers
 /core/templates/services/schema-undefined-last-element.service*.ts @oppia/lace-frontend-reviewers
@@ -520,6 +527,7 @@
 /core/templates/services/interaction-specs.service*.ts @oppia/lace-frontend-reviewers
 /core/templates/services/translation-file-hash-loader-backend-api.service.ts @oppia/angular-migration-reviewers
 /redis.conf @oppia/data-and-stability-reviewers
+/redis_docker.conf @oppia/data-and-stability-reviewers
 /.firebase.json @oppia/data-and-stability-reviewers
 
 
@@ -603,6 +611,7 @@
 /core/templates/domain/suggestion/ @oppia/contributor-experience-team
 /core/templates/services/suggestion-modal.service*.ts @oppia/contributor-experience-team
 /core/templates/services/suggestions.service*.ts @oppia/contributor-experience-team
+/core/domain/contribution_stats_services*.py @oppia/contributor-experience-team
 
 
 # Feedback project.
@@ -622,6 +631,7 @@
 /core/templates/pages/delete-account-page/ @oppia/angular-migration-reviewers
 /core/templates/pages/donate-page/ @oppia/angular-migration-reviewers
 /core/templates/pages/error-pages/ @oppia/angular-migration-reviewers
+/core/templates/pages/feedback-updates-page/ @oppia/lace-frontend-reviewers
 /core/templates/pages/get-started-page/ @oppia/angular-migration-reviewers
 /core/templates/pages/landing-pages/ @oppia/angular-migration-reviewers
 /core/templates/pages/maintenance-page/ @oppia/angular-migration-reviewers

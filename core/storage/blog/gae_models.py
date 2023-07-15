@@ -57,6 +57,8 @@ class BlogPostModel(base_models.BaseModel):
     """Model to store blog post data. Functionality to allow authors to revert
     back to earlier versions is not being built in as we do not want to maintain
     commit history for blog post models. All models are therefore not versioned.
+    Note that blog post authors can always make edits directly to their post,
+    and re-publish it.
 
     The id of instances of this class is in the form of random hash of 12 chars.
     """
