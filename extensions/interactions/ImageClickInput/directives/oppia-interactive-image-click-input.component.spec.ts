@@ -560,7 +560,7 @@ describe('InteractiveImageClickInput', () => {
     component.handleKeyDown(event);
 
     expect(component.dotCursorCoordinateX).toBe(0);
-    expect(component.dotCursorCoordinateY).toBe(10);
+    expect(component.dotCursorCoordinateY).toBe(0);
     expect(component.onClickImage).toHaveBeenCalled();
     expect(component.updateDotPosition).toHaveBeenCalledWith(event);
     expect(component.updateCurrentlyHoveredRegions).toHaveBeenCalled();
