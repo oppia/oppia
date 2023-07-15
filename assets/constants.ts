@@ -7077,6 +7077,6 @@ export default {
   ],
   "CONTRIBUTOR_CERTIFICATE_WIDTH": 1493,
   "CONTRIBUTOR_CERTIFICATE_HEIGHT": 1313,
-  "BRANCH_NAME": "develop",
-  "SHORT_COMMIT_HASH": "d5ced9acad"
+  "BRANCH_NAME": "",
+  "SHORT_COMMIT_HASH": ""
 } as const;
