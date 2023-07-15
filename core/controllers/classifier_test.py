@@ -55,7 +55,7 @@ class TrainedClassifierHandlerTests(test_utils.ClassifierTestBase):
         self.exp_id = 'exp_id1'
         self.title = 'Testing Classifier storing'
         self.category = 'Test'
-        self.ADMIN_USERNAME = 'admin_username'
+        self.ADMIN_USERNAME = 'admusername'
         yaml_path = os.path.join(
             feconf.TESTS_DATA_DIR, 'string_classifier_test.yaml')
         with utils.open_file(yaml_path, 'r') as yaml_file:
