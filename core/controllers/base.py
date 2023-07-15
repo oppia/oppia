@@ -905,6 +905,9 @@ class CsrfTokenManager:
         issued_on_str = str(int(issued_on))
 
         csrf_secret_model = auth_services.get_csrf_secret_model()
+        # Rulling out the possibility of csrf_secret_model being None
+        # as we have initialized it above.
+        assert csrf_secret_model is not None
 
         digester = hmac.new(
             key=csrf_secret_model.oppia_csrf_secret.encode('utf-8'),
