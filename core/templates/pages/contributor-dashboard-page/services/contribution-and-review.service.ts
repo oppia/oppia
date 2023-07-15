@@ -24,6 +24,12 @@ import { ContributionAndReviewBackendApiService, ContributorCertificateResponse 
 import { SuggestionBackendDict } from 'domain/suggestion/suggestion.model';
 import { StateBackendDict } from 'domain/state/StateObjectFactory';
 import { ImagesData } from 'services/image-local-storage.service';
+import { ReadOnlyExplorationBackendApiService }
+  from 'domain/exploration/read-only-exploration-backend-api.service';
+import { ComputeGraphService } from 'services/compute-graph.service';
+import { States } from 'domain/exploration/StatesObjectFactory';
+import { ExplorationObjectFactory, Exploration, ExplorationBackendDict }
+  from 'domain/exploration/ExplorationObjectFactory';
 
 export interface OpportunityDict {
   'skill_id': string;
@@ -77,7 +83,13 @@ export class ContributionAndReviewService {
 
   constructor(
     private contributionAndReviewBackendApiService:
-      ContributionAndReviewBackendApiService
+      ContributionAndReviewBackendApiService,
+      private readOnlyExplorationBackendApiService:
+      ReadOnlyExplorationBackendApiService,
+    private computeGraphService:
+      ComputeGraphService,
+    private explorationObjectFactory:
+      ExplorationObjectFactory
   ) {}
 
   getActiveTabType(): string {
@@ -168,6 +180,175 @@ export class ContributionAndReviewService {
         };
       })
     );
+  }
+
+  async fetchTranslationSuggestionsAsync(
+      fetcher: SuggestionFetcher,
+      shouldResetOffset: boolean,
+      explorationId: string
+  ): Promise<FetchSuggestionsResponse> {
+    if (shouldResetOffset) {
+      // Handle the case where we need to fetch starting from the beginning.
+      fetcher.offset = 0;
+      fetcher.suggestionIdToDetails = {};
+    }
+    const explorationBackendResponse = await this.
+      readOnlyExplorationBackendApiService.fetchExplorationAsync(
+        explorationId, null);
+
+    return (
+      this.contributionAndReviewBackendApiService.fetchSuggestionsAsync(
+        fetcher.type,
+        // If explorationId is given Fetch all the pages for sorting
+        // or else up to two pages.
+        // at a time to compute if we have more results.
+        // The first page of results is returned to the caller and the second
+        // page is cached.
+        null,
+        fetcher.offset,
+        fetcher.sortKey,
+        explorationId
+      ).then((responseBody) => {
+        // Making a ExplorationBackendDict from the properties of exploration
+        // backend response object. This will be used to make a exploration
+        // object which has properties relevant for sorting.
+        const explorationBackendDict: ExplorationBackendDict = {
+          auto_tts_enabled: explorationBackendResponse.auto_tts_enabled,
+          correctness_feedback_enabled: explorationBackendResponse.
+            correctness_feedback_enabled,
+          draft_changes: [],
+          init_state_name: explorationBackendResponse.
+            exploration.init_state_name,
+          states: explorationBackendResponse.exploration.states,
+          param_changes: explorationBackendResponse.exploration.param_changes,
+          param_specs: explorationBackendResponse.exploration.param_specs,
+          title: explorationBackendResponse.exploration.title,
+          language_code: explorationBackendResponse.exploration.language_code,
+          next_content_id_index: explorationBackendResponse.
+            exploration.next_content_id_index,
+          exploration_metadata: explorationBackendResponse.
+            exploration_metadata,
+          is_version_of_draft_valid: false,
+          draft_change_list_id: explorationBackendResponse.
+            draft_change_list_id
+        };
+
+        const exploration: Exploration = this.explorationObjectFactory.
+          createFromBackendDict(explorationBackendDict);
+
+        const sortedTranslationCards = this.sortTranslationSuggestionsByState(
+          responseBody.suggestions,
+          exploration.getStates(),
+          exploration.getInitialState().name);
+
+        responseBody.suggestions = sortedTranslationCards;
+        const responseSuggestionIdToDetails = fetcher.suggestionIdToDetails;
+        fetcher.suggestionIdToDetails = {};
+        const targetIdToDetails = responseBody.target_id_to_opportunity_dict;
+        responseBody.suggestions.forEach((suggestion) => {
+          const suggestionDetails = {
+            suggestion: suggestion,
+            details: targetIdToDetails[suggestion.target_id]};
+
+          responseSuggestionIdToDetails[suggestion.suggestion_id] = (
+            suggestionDetails);
+        });
+        return {
+          suggestionIdToDetails: responseSuggestionIdToDetails,
+          more: Object.keys(fetcher.suggestionIdToDetails).length > 0
+        };
+      })
+    );
+  }
+
+  // Function to sort translation cards by state.
+  sortTranslationSuggestionsByState(
+      // eslint-disable-next-line
+      translationSuggestions: any[],
+      states: States,
+      initStateName: string | null
+      // eslint-disable-next-line
+  ): any[] {
+    // Obtain the state names in the order of content flow in the lesson.
+
+    if (!initStateName) {
+      return translationSuggestions;
+    }
+
+    const stateNamesInOrder = this.computeGraphService.
+      computeBfsTraversalOfStates(
+        initStateName,
+        states,
+        initStateName
+      );
+    //  Create an empty map to store translation cards for each state.
+    const translationSuggestionsByState = (
+      // eslint-disable-next-line
+      new Map<string, any[]>());
+
+    // Assign translation cards to the corresponding state in the map.
+    for (const translationSuggestion of translationSuggestions) {
+      const stateName = translationSuggestion.change.state_name;
+      const suggestionsForState = (
+        translationSuggestionsByState.get(stateName) || []);
+      suggestionsForState.push(translationSuggestion);
+      translationSuggestionsByState.set(stateName, suggestionsForState);
+    }
+
+    // Sort translation cards within each state based on the specified criteria
+    // in the order object.
+    for (const stateName of stateNamesInOrder) {
+      const cardsForState = translationSuggestionsByState.get(stateName) || [];
+
+      cardsForState.sort((cardA, cardB) => {
+        const getTypeOrder = (contentId: string): number => {
+          const type = (
+            // Get the type prefix (e.g., feedback, hints).
+            contentId.split('_')[0]);
+          const order: { [key: string]: number } = {
+            content: 0,
+            interaction: 1,
+            feedback: 2,
+            'default': 3, // Default is a keyword so '' is used in key.
+            hints: 4,
+            solution: 5
+          };
+          return order.hasOwnProperty(type) ?
+      order[type] : Number.MAX_SAFE_INTEGER;
+        };
+
+        const cardATypeOrder = getTypeOrder(cardA.change.content_id);
+        const cardBTypeOrder = getTypeOrder(cardB.change.content_id);
+        if (cardATypeOrder !== cardBTypeOrder) {
+          return cardATypeOrder - cardBTypeOrder;
+        } else {
+          const getIndex = (contentId: string) => {
+            const index = parseInt(contentId.split('_')[1]);
+            return isNaN(index) ? Number.MAX_SAFE_INTEGER : index;
+          };
+
+          const cardAIndex = getIndex(cardA.change.content_id);
+          const cardBIndex = getIndex(cardB.change.content_id);
+
+          if (cardAIndex !== cardBIndex) {
+            return cardAIndex - cardBIndex;
+          } else {
+            // If the indices are the same, sort by content_id.
+            return cardA.change.content_id.
+              localeCompare(cardB.change.content_id);
+          }
+        }
+      });
+      translationSuggestionsByState.set(stateName, cardsForState);
+    }
+
+    // Concatenate the lists of translation cards to create a sorted list.
+    const sortedTranslationCards: SuggestionBackendDict[] = [];
+    for (const stateName of stateNamesInOrder) {
+      const cardsForState = translationSuggestionsByState.get(stateName) || [];
+      sortedTranslationCards.push(...cardsForState);
+    }
+    return sortedTranslationCards;
   }
 
   async getUserCreatedQuestionSuggestionsAsync(
