@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for the DragAndDropSortInput interaction.
  */
 
-import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { NO_ERRORS_SCHEMA, QueryList } from '@angular/core';
 import { async, ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { InteractiveDragAndDropSortInputComponent } from './oppia-interactive-drag-and-drop-sort-input.component';
 import { CurrentInteractionService } from 'pages/exploration-player-page/services/current-interaction.service';
