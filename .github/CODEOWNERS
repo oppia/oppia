@@ -530,6 +530,7 @@
 /core/templates/services/translation-file-hash-loader-backend-api.service.ts @oppia/angular-migration-reviewers
 /redis.conf @oppia/data-and-stability-reviewers
 /redis_docker.conf @oppia/data-and-stability-reviewers
+/redis_docker.conf @oppia/data-and-stability-reviewers
 /.firebase.json @oppia/data-and-stability-reviewers
 
 
