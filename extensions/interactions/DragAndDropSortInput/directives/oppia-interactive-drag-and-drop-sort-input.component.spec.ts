@@ -504,7 +504,11 @@ describe('Drag and drop sort input interactive component', () => {
     const event = new KeyboardEvent('keydown', { key: 'ArrowDown' });
     const currentIndex = 0;
     component.activeItem = 0;
-    component.listItems = ['item1', 'item2', 'item3'];
+    component.listItems = new QueryList<ElementRef>([
+      new ElementRef(document.createElement('div')),
+      new ElementRef(document.createElement('div')),
+      new ElementRef(document.createElement('div'))
+    ]);
     spyOn(component, 'setFocus');
 
     component.handleKeyDown(event, currentIndex);
@@ -517,7 +521,11 @@ describe('Drag and drop sort input interactive component', () => {
     const event = new KeyboardEvent('keydown', { key: 'ArrowUp' });
     const currentIndex = 1;
     component.activeItem = 1;
-    component.listItems = ['item1', 'item2', 'item3'];
+    component.listItems = new QueryList<ElementRef>([
+      new ElementRef(document.createElement('div')),
+      new ElementRef(document.createElement('div')),
+      new ElementRef(document.createElement('div'))
+    ]);
     spyOn(component, 'setFocus');
 
     component.handleKeyDown(event, currentIndex);
@@ -542,7 +550,11 @@ describe('Drag and drop sort input interactive component', () => {
     const event = new KeyboardEvent('keydown', { key: 'Tab', shiftKey: false });
     const currentIndex = 1;
     component.activeItem = 1;
-    component.listItems = ['item1', 'item2', 'item3'];
+    component.listItems = new QueryList<ElementRef>([
+      new ElementRef(document.createElement('div')),
+      new ElementRef(document.createElement('div')),
+      new ElementRef(document.createElement('div'))
+    ]);
     spyOn(component, 'setFocus');
   
     component.handleKeyDown(event, currentIndex);
