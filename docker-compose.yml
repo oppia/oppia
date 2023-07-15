@@ -16,7 +16,8 @@ services:
     command: >
       sh -c '
         trap "rm /app/oppia/node_modules/@angular/compiler-cli/ngcc/__ngcc_lock_file__" EXIT
-        npx ng build --watch
+        npx ng build \
+        $([ "$prod_env" = "true" ] && echo "--prod" || echo "--watch")
       '
 
   webpack-compiler:
@@ -29,14 +30,17 @@ services:
       - node_modules:/app/oppia/node_modules
       - third_party:/app/oppia/third_party
       - frontend_proto_files:/app/oppia/extensions/classifiers/proto
-    command:
-      - "npx"
-      - "webpack"
-      - "--config"
-      - "/app/oppia/webpack.dev.config.ts"
-      - "--watch"
-      - "--color"
-      - "--progress"
+    command: >
+      sh -c '
+        npx \
+        ${prod_env:+ --max_old_space_size=8192} \
+        webpack \
+        --config \
+        $([ "$prod_env" = "true" ] && [ "$source_maps" = "true" ] && echo "/app/oppia/webpack.prod.sourcemap.config.ts") \
+        $([ "$prod_env" = "true" ] && [ "$source_maps" != "true" ] && echo "/app/oppia/webpack.prod.config.ts") \
+        $([ "$prod_env" != "true" ] && [ "$source_maps" = "true" ] && echo "/app/oppia/webpack.dev.sourcemap.config.ts --watch --color --progress") \
+        $([ "$prod_env" != "true" ] && [ "$source_maps" != "true" ] && echo "/app/oppia/webpack.dev.config.ts --watch --color --progress")
+      '
 
   dev-server:
     build:
@@ -68,17 +72,23 @@ services:
       start_period: 5m
     command: >
       sh -c '
-        python -m scripts.build
-        /google-cloud-sdk/bin/dev_appserver.py /app/oppia/app_dev_docker.yaml \
+        python -m scripts.build \
+        ${prod_env:+ --prod_env} \
+        ${maintenance_mode:+ --maintenance_mode} \
+        ${source_maps:+ --source_maps}
+
+        /google-cloud-sdk/bin/dev_appserver.py \
+        $([ "$prod_env" = "true" ] && echo "/app/oppia/app.yaml" || echo "/app/oppia/app_dev_docker.yaml") \
         --runtime=python38 \
         --host=0.0.0.0 \
         --port=8181 \
         --admin_host=0.0.0.0 \
         --admin_port=8000 \
         --skip_sdk_update_check=true \
-        --automatic_restart=true \
+        $([ "no_auto_restart" = "true" ] && echo "--automatic_restart=false" || echo "--automatic_restart=true") \
         --log_level=info \
-        --dev_appserver_log_level=info
+        --dev_appserver_log_level=info \
+        $([ "$disable_host_checking" != "true" ] && echo "--enable_host_checking")
       '
 
   datastore:
@@ -97,20 +107,17 @@ services:
       interval: 2m
       retries: 5
       start_period: 5m
-    entrypoint: /google-cloud-sdk/bin/gcloud
-    command:
-      - "beta"
-      - "emulators"
-      - "datastore"
-      - "start"
-      - "--project"
-      - "dev-project-id"
-      - "--data-dir"
-      - "/app/cloud_datastore_emulator_cache"
-      - "--host-port=0.0.0.0:8089"
-      - "--consistency=1.0"
-      - "--quiet"
-      - "--no-store-on-disk"
+    command: >
+      sh -c '
+        /google-cloud-sdk/bin/gcloud beta \
+        emulators datastore start \
+        --project=dev-project-id \
+        --data-dir=/app/cloud_datastore_emulator_cache \
+        --host-port=0.0.0.0:8089 \
+        --consistency=1.0 \
+        --quiet \
+        $([ "$save_datastore" != "true" ] && echo "--no-store-on-disk")
+      '
 
   firebase:
     image: node:16.13.0-alpine
@@ -132,16 +139,16 @@ services:
       timeout: 20s
       interval: 20s
       retries: 5
-    entrypoint:
-      - /app/oppia/node_modules/firebase-tools/lib/bin/firebase.js
-      - "emulators:start"
-      - "--only"
-      - "auth"
-      - "--project=dev-project-id"
-      - "--config=/app/oppia/.firebase.json"
-    command:
-      - "--import=/app/firebase_emulator_cache"
-      - "--export-on-exit=/app/firebase_emulator_cache"
+    command: >
+      sh -c '
+        /app/oppia/node_modules/firebase-tools/lib/bin/firebase.js \
+        emulators:start \
+        --only auth \
+        --project=dev-project-id \
+        --config=/app/oppia/.firebase.json \
+        ${save_datastore:+ --import=/app/firebase_emulator_cache} \
+        --export-on-exit=/app/firebase_emulator_cache
+      '
 
   redis:
     image: redis:6.2.4
