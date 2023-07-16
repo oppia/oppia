@@ -73,7 +73,6 @@ export class CarouselBarComponent implements AfterViewInit, OnInit {
  ngAfterViewInit(): void {
    setTimeout(() => {
      this.isScrollable = this.initCarousel();
-     console.error(this.carouselClassname + 'ram', 'classname...');
    });
  }
 

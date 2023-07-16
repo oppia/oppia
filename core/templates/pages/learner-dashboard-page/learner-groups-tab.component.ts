@@ -64,7 +64,7 @@ export class LearnerGroupsTabComponent {
         (learnerDashboardLearnerGroups) => {
           this.learnerGroupsJoined = (
             learnerDashboardLearnerGroups.learnerGroupsJoined);
-          console.error(this.learnerGroupsJoined, 'group joined bhole');
+          console.error(this.learnerGroupsJoined, 'groups joined');
           this.invitedToLearnerGroups = (
             learnerDashboardLearnerGroups.invitedToLearnerGroups);
         }
