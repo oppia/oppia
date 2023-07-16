@@ -278,7 +278,7 @@ jobs:
         run: sudo apt install ffmpeg
       - name: test for display number
         run: ps -ef|grep Xvfb
-      - name: test for display number 2 # TODO: remove this and one below
+      - name: test for display number 2
         run: xvfb-run -a --server-args="-screen 0, 1285x1000x24" echo $DISPLAY
       - name: Run Lighthouse performance checks shard
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
