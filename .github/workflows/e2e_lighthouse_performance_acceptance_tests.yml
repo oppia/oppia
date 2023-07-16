@@ -276,6 +276,10 @@ jobs:
         run: python -m scripts.install_chrome_for_ci
       - name: Install ffmpeg
         run: sudo apt install ffmpeg
+      - name: test for display number
+        run: ps -ef|grep Xvfb
+      - name: test for display number 2 # TODO: remove this and one below
+        run: xvfb-run -a --server-args="-screen 0, 1285x1000x24" echo $DISPLAY
       - name: Run Lighthouse performance checks shard
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
         run: xvfb-run -a --server-args="-screen 0, 1285x1000x24" python -m scripts.run_lighthouse_tests --mode performance --shard ${{ matrix.shard }} --skip_build --record_screen
