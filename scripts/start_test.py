@@ -15,6 +15,7 @@
 """Unit tests for scripts/start.py."""
 
 from __future__ import annotations
+import os
 
 from core.constants import constants
 from core.tests import test_utils
@@ -59,6 +60,9 @@ class StartTests(test_utils.GenericTestBase):
             common, 'print_each_string_after_two_new_lines', mock_print)
         def mock_constants() -> None:
             print('mock_set_constants_to_default')
+
+        env = os.environ.copy()
+        env['PIP_NO_DEPS'] = 'True'
         # We need to create a swap for install_third_party_libs because
         # scripts/start.py installs third party libraries whenever it is
         # imported.
@@ -99,7 +103,8 @@ class StartTests(test_utils.GenericTestBase):
                 'enable_host_checking': True,
                 'automatic_restart': True,
                 'skip_sdk_update_check': True,
-                'port': PORT_NUMBER_FOR_GAE_SERVER
+                'port': PORT_NUMBER_FOR_GAE_SERVER,
+                'env': env
             }])
         self.swap_create_server = self.swap_with_checks(
             servers, 'create_managed_web_browser',
