@@ -2,12 +2,12 @@ include .docker.env
 
 run-devserver:
   @echo "Updating the docker env variables..."
-  @echo "save_datastore        = $(save_datastore)"
-  @echo "disable_host_checking = $(disable_host_checking)"
-  @echo "no_auto_restart       = $(no_auto_restart)"
-  @echo "prod_env              = $(prod_env)"
-  @echo "maintenance_mode      = $(maintenance_mode)"
-  @echo "source_maps           = $(source_maps)"
+  @echo "    save_datastore        = $(save_datastore)"
+  @echo "    disable_host_checking = $(disable_host_checking)"
+  @echo "    no_auto_restart       = $(no_auto_restart)"
+  @echo "    prod_env              = $(prod_env)"
+  @echo "    maintenance_mode      = $(maintenance_mode)"
+  @echo "    source_maps           = $(source_maps)"
   save_datastore=$(save_datastore) \
   disable_host_checking=$(disable_host_checking) \
   no_auto_restart=$(no_auto_restart) \
