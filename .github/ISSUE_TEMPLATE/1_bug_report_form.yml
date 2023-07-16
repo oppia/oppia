@@ -20,7 +20,7 @@ body:
   - type: input
     attributes:
       label: URL of the page where the issue is observed.
-      description: URL of the specific page where you are experiencing the issue.
+      description: The URL of the specific page where you are experiencing the issue.
     validations:
       required: false 
   - type: textarea
