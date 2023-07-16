@@ -1856,34 +1856,6 @@ class ContributorAllStatsSummariesHandlerTest(test_utils.GenericTestBase):
                 '/contributorallstatssummaries/%s' % self.NEW_USER_USERNAME)
         self.assertEqual(response, {})
 
-    def test_raises_error_if_no_topic_id_associated_with_stats_object(
-        self
-    ) -> None:
-        self.login(self.OWNER_EMAIL)
-        user_id = user_services.get_user_id_from_username(self.OWNER_USERNAME)
-        assert user_id is not None
-        corrupt_stats = (
-            suggestion_services.get_all_translation_contribution_stats(
-                user_id
-            )
-        )
-        corrupt_stats[0].topic_id = None
-
-        swap_with_corrupt_data = self.swap_to_always_return(
-            suggestion_services,
-            'get_all_translation_contribution_stats',
-            corrupt_stats
-        )
-
-        with self.assertRaisesRegex(
-            Exception,
-            'No topic_id associated with stats: '
-            'TranslationContributionStats.'
-        ):
-            with swap_with_corrupt_data:
-                self.get_json(
-                    '/contributorallstatssummaries/%s' % self.OWNER_USERNAME)
-
     def test_get_all_stats(self) -> None:
         self.login(self.OWNER_EMAIL)
 

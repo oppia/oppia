@@ -20,8 +20,6 @@ import datetime
 
 from core import feconf
 from core.constants import constants
-from core.domain import suggestion_registry
-from core.domain import suggestion_services
 from core.domain import topic_domain
 from core.domain import topic_services
 from core.domain import user_services
@@ -702,64 +700,3 @@ class TranslationContributionStatsHandlerTest(test_utils.GenericTestBase):
             ]
         }
         self.assertEqual(response, expected_response)
-
-    def test_stats_data_not_calculated_without_topic_id_and_language_code(
-        self
-    ) -> None:
-        self.login(self.CONTRIBUTOR_EMAIL)
-        stats_dict_without_topic_id = [
-            suggestion_registry.TranslationContributionStats(
-                'es', self.CONTRIBUTOR_USERNAME, None, 2, 100, 1, 0, 50, 0, 0,
-                {
-                    datetime.date.fromtimestamp(1616173836),
-                    datetime.date.fromtimestamp(1616173837)
-                }
-            )
-        ]
-
-        swap_translation_contribution_stats = self.swap_to_always_return(
-            suggestion_services,
-            'get_all_translation_contribution_stats',
-            stats_dict_without_topic_id
-        )
-        with swap_translation_contribution_stats:
-            response = self.get_json(
-                '/translationcontributionstatshandler', params={
-                    'username': self.CONTRIBUTOR_USERNAME,
-                },
-                expected_status_int=500
-            )
-        self.assertEqual(
-            'There is no topic_id associated with the given '
-            'TranslationContributionStatsDict.',
-            response['error']
-        )
-
-        stats_dict_without_language_code = [
-            suggestion_registry.TranslationContributionStats(
-                None, self.CONTRIBUTOR_USERNAME, 'topic_id_1', 2, 100, 1, 0, 50,
-                0, 0,
-                {
-                    datetime.date.fromtimestamp(1616173836),
-                    datetime.date.fromtimestamp(1616173837)
-                }
-            )
-        ]
-
-        swap_translation_contribution_stats = self.swap_to_always_return(
-            suggestion_services,
-            'get_all_translation_contribution_stats',
-            stats_dict_without_language_code
-        )
-        with swap_translation_contribution_stats:
-            response = self.get_json(
-                '/translationcontributionstatshandler', params={
-                    'username': self.CONTRIBUTOR_USERNAME,
-                },
-                expected_status_int=500
-            )
-        self.assertEqual(
-            'No language_code found for the given '
-            'TranslationContributionStatsDict.',
-            response['error']
-        )

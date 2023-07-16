@@ -1400,9 +1400,9 @@ class CommunityContributionStats:
 class TranslationContributionStatsDict(TypedDict):
     """Dictionary representing the TranslationContributionStats object."""
 
-    language_code: Optional[str]
-    contributor_user_id: Optional[str]
-    topic_id: Optional[str]
+    language_code: str
+    contributor_user_id: str
+    topic_id: str
     submitted_translations_count: int
     submitted_translation_word_count: int
     accepted_translations_count: int
@@ -1418,8 +1418,8 @@ class TranslationContributionStatsFrontendDict(TypedDict):
     object for frontend.
     """
 
-    language_code: Optional[str]
-    topic_id: Optional[str]
+    language_code: str
+    topic_id: str
     submitted_translations_count: int
     submitted_translation_word_count: int
     accepted_translations_count: int
@@ -1436,9 +1436,9 @@ class TranslationContributionStats:
 
     def __init__(
         self,
-        language_code: Optional[str],
-        contributor_user_id: Optional[str],
-        topic_id: Optional[str],
+        language_code: str,
+        contributor_user_id: str,
+        topic_id: str,
         submitted_translations_count: int,
         submitted_translation_word_count: int,
         accepted_translations_count: int,
@@ -1461,32 +1461,6 @@ class TranslationContributionStats:
         self.rejected_translations_count = rejected_translations_count
         self.rejected_translation_word_count = rejected_translation_word_count
         self.contribution_dates = contribution_dates
-
-    @classmethod
-    def create_default(
-        cls,
-        language_code: Optional[str] = None,
-        contributor_user_id: Optional[str] = None,
-        topic_id: Optional[str] = None
-    ) -> TranslationContributionStats:
-        """Create default translation contribution stats.
-
-        Args:
-            language_code: str. The language code for which are these stats
-                generated.
-            contributor_user_id: str. User ID of the contributor to which
-                these stats belong.
-            topic_id: str. ID of the topic for which were
-                the translations created.
-
-        Returns:
-            TranslationContributionStats. Default translation contribution
-            stats.
-        """
-        return cls(
-            language_code, contributor_user_id, topic_id,
-            0, 0, 0, 0, 0, 0, 0, set()
-        )
 
     def to_dict(self) -> TranslationContributionStatsDict:
         """Returns a dict representation of a TranslationContributionStats
