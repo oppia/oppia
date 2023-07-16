@@ -4,128 +4,79 @@
     [ngClass]="{'oppia-dashboard-title-mobile': checkTabletView(), 'oppia-dashboard-title-desktop': !checkTabletView()}">
     <h1 tabindex="0">Contributor Admin Dashboard</h1>
   </div>
-  <div>
-    <mat-card layout="column" class="oppia-mat-card">
-        <mat-card-content layout="row" class="stats-container">
-          <div class="oppia-header-stats-container">
-            <div class="oppia-community-stats-header">translators</div>
-            <div class="oppia-community-stats-value">24</div>
-          </div>
-        </mat-card-content>
-        <mat-card-content>
-          <div class="oppia-vertical-ruler"></div>
-        </mat-card-content>
-        <mat-card-content layout="row" class="stats-container">
-          <div class="oppia-header-stats-container">
-            <div class="oppia-community-stats-header">translators</div>
-            <div class="oppia-community-stats-value">24</div>
-          </div>
-        </mat-card-content>
-        <mat-card-content>
-          <div class="oppia-vertical-ruler"></div>
-        </mat-card-content>
-        <mat-card-content layout="row" class="stats-container">
-          <div class="oppia-header-stats-container">
-            <div class="oppia-community-stats-header">translators</div>
-            <div class="oppia-community-stats-value">24</div>
-          </div>
-        </mat-card-content>
-        <mat-card-content>
-          <div class="oppia-vertical-ruler"></div>
-        </mat-card-content>
-        <mat-card-content layout="row" class="stats-container">
-          <div class="oppia-header-stats-container">
-            <div class="oppia-community-stats-header">translators</div>
-            <div class="oppia-community-stats-value">24</div>
-          </div>
-        </mat-card-content>
+  <div class="m-auto oppia-dashboard-aggregated-stats oppia-contributor-dashboard-main-content pt-1"
+  [ngClass]="{'oppia-contributor-dashboard-mobile-mode': checkMobileView()}">
+    <mat-card layout="row" class="oppia-mat-card">
+    <div class="translation-reviewer stats-card"  [attr.aria-label]="'Translation Reviewer ' + 24"
+          tabindex="0" >
+      <p class="stat-description">Translation<br>Reviewer</p>
+      <h2 class="stat-value-with-rating e2e-test-oppia-average-rating">
+          24
+      </h2>
+    </div>
+    <div class="question-reviewer stats-card"  [attr.aria-label]="'Question Reviewer ' + 24" tabindex="0">
+      <p class="stat-description">Questions<br>Reviewer</p>
+      <h2 class="stat-value-with-rating e2e-test-oppia-total-plays">
+          24
+      </h2>
+    </div>
+    <div class="language-coordinator stats-card" [attr.aria-label]="'Language Coordinators' + 24" tabindex="0">
+      <p class="stat-description">Language<br>Coordinator</p>
+      <h2 class="stat-value-with-rating e2e-test-oppia-open-feedback">
+          24
+      </h2>
+    </div>
+    <div class="question-coordinator stats-card" [attr.aria-label]="'Question Coordinator ' + 24" tabindex="0">
+      <p class="stat-description">Question<br>Coordinator</p>
+      <h2 class="stat-value-with-rating e2e-test-oppia-total-subscribers">
+          24
+      </h2>
+    </div>
     </mat-card>
   </div>
 </div>
-
-<style>
-  .oppia-community-stats-value {
-    left: 0px;
-    top: 31px;
-    position: absolute;
-    color: #333333;
-    font-size: 32px;
-    font-family: Roboto;
-    font-weight: 500;
-    text-transform: capitalize;
-    word-wrap: break-word
-  }
-  .oppia-community-stats-header {
-    left: 0px;
-    top: 0px;
-    position: absolute;
-    color: #667085;
-    font-size: 16px;
-    font-family: Roboto;
-    font-weight: 400;
-    text-transform: capitalize;
-    word-wrap: break-word
-  }
-  .oppia-vertical-ruler {
-    width: 66.03px;
-    height: 0px;
-    transform: rotate(-90deg);
-    transform-origin: 0 0;
-    opacity: 0.10;
-    border: 0.50px #333333 solid
-  }
-  .oppia-header-stats-container {
-    width: 81px;
-    height: 69px;
-    position: relative
-  }
-  .oppia-dashboard-title {
-    margin-bottom: 50px;
-    margin-top: 0;
-  }
-  .oppia-dashboard-title h1 {
-    color: #01645c;
-    display: inline;
-    font-family: 'Capriola', 'Roboto', Arial, sans-serif;
-    font-size: 3em;
-    margin-bottom: 25px;
-  }
-  .oppia-dashboard-title-desktop {
-    padding-top: 78.5px;
-  }
-  .oppia-dashboard-title-mobile {
-    padding-top: 15px;
-    text-align: center;
-  }
-  .stats-header {
-    color: #667085;
-    font-size: 16px;
-    font-family: Roboto;
-    font-weight: 400;
-    text-transform: capitalize;
-    word-wrap: break-word
-  }
-  .mat-card-content.stats-container {
-    padding: 1em;
-  }
-  .oppia-mat-card {
-    display: flex;
-    justify-content: space-around;
-    align-items: baseline;
-  }
-  
-  @media(max-width: 815px) {
-    .oppia-dashboard-container {
-      padding-left: 10px;
-      padding-right: 10px;
-    }
-  }
-  @media(max-width: 316px) {
-    body {
-     width: fit-content;
-    }
-    .mat-card {
-     width: fit-content;
-    }
-  }
-</style>
+<div class="dashboard-content">
+  <div class="dashboard-content-primary">
+    <div>
+      <ul class="dashboard-tabs e2e-test-topics-tab">
+        <li [ngClass]="{'dashboard-tabs-active': activeTab === TAB_NAME_TRANSLATION_SUBMITTER}">
+          <a class="dashboard-tabs-text e2e-test-topics-tab"
+             (click)="setActiveTab(TAB_NAME_TRANSLATION_SUBMITTER)">
+            Translation<br>Submitter 
+          </a>
+        </li>
+        <li [ngClass]="{'dashboard-tabs-active': activeTab === TAB_NAME_TRANSLATION_REVIEWER}">
+          <a class="dashboard-tabs-text e2e-test-skills-tab"
+             (click)="setActiveTab(TAB_NAME_TRANSLATION_REVIEWER)">
+            Translation<br>Reviewer
+          </a>
+        </li>
+        <li [ngClass]="{'dashboard-tabs-active': activeTab === TAB_NAME_QUESTION_SUBMITTER}">
+          <a class="dashboard-tabs-text e2e-test-skills-tab"
+             (click)="setActiveTab(TAB_NAME_QUESTION_SUBMITTER)">
+            Question<br>Submitter
+          </a>
+        </li>
+        <li [ngClass]="{'dashboard-tabs-active': activeTab === TAB_NAME_QUESTION_REVIEWER}">
+          <a class="dashboard-tabs-text e2e-test-skills-tab"
+             (click)="setActiveTab(TAB_NAME_QUESTION_REVIEWER)">
+            Question<br>Reviewer
+          </a>
+        </li>
+        <li [ngClass]="{'dashboard-tabs-active': activeTab === TAB_NAME_LANGUAGE_COORDINATOR}">
+          <a class="dashboard-tabs-text e2e-test-skills-tab"
+             (click)="setActiveTab(TAB_NAME_LANGUAGE_COORDINATOR)">
+            Language<br>Coordinator
+          </a>
+        </li>
+        <li [ngClass]="{'dashboard-tabs-active': activeTab === TAB_NAME_QUESTION_COORDINATOR}">
+          <a class="dashboard-tabs-text e2e-test-skills-tab"
+             (click)="setActiveTab(TAB_NAME_QUESTION_COORDINATOR)">
+            Question<br>Coordinator
+          </a>
+        </li>
+      </ul>
+    </div>
+    <translation-submitter-table [activeTab]="activeTab"></translation-submitter-table>
+  </div>
+</div>

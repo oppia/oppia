@@ -17,18 +17,18 @@
  * @fileoverview Component for the feedback Updates page.
  */
 
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { LoaderService } from 'services/loader.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
-import './contributor-admin-dashboard-page.component.css';
 import { animate, state, style, transition, trigger } from '@angular/animations';
+import './translation-submitter-table.component.css';
 
 @Component({
-  selector: 'contributor-admin-dashboard-page',
-  styleUrls: ['./contributor-admin-dashboard-page.component.css'],
-  templateUrl: './contributor-admin-dashboard-page.component.html',
+  selector: 'translation-submitter-table',
+  styleUrls: ['./translation-submitter-table.component.css'],
+  templateUrl: './translation-submitter-table.component.html',
   animations: [
     trigger('detailExpand', [
       state('collapsed', style({height: '0px', minHeight: '0'})),
@@ -39,17 +39,27 @@ import { animate, state, style, transition, trigger } from '@angular/animations'
     ]),
   ],
 })
-export class ContributorAdminDashboardPageComponent implements OnInit {
-  activeTab!: string;
+export class TanslationSubmitterTable implements OnInit {
+  @Input() activeTab: string;
+
+  columnsToDisplay = [
+    'User',
+    'Rank',
+    'Performace',
+    'Accuracy',
+    'Translated Cards',
+    'Last Translated(in days)',
+    'Role'
+  ];
+
+  expandedElement: PeriodicElement | null | [];
+
   TAB_NAME_TRANSLATION_SUBMITTER: string = 'translation_submitter';
   TAB_NAME_TRANSLATION_REVIEWER: string = 'translation_reviewer';
   TAB_NAME_QUESTION_SUBMITTER: string = 'question_submitter';
   TAB_NAME_QUESTION_REVIEWER: string = 'question_reviewer';
   TAB_NAME_LANGUAGE_COORDINATOR: string = 'language_coordinator';
   TAB_NAME_QUESTION_COORDINATOR: string = 'question_coordinator';
-  dataSource = ELEMENT_DATA;
-  columnsToDisplay = ['name', 'weight', 'symbol', 'position'];
-  expandedElement: PeriodicElement | null;
 
   constructor(
     private loaderService: LoaderService,
@@ -60,20 +70,51 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
   ngOnInit(): void {
     this.loaderService.showLoadingScreen('Loading');
 
-    this.activeTab = this.TAB_NAME_TRANSLATION_SUBMITTER;
-  }
-
-  checkTabletView(): boolean {
-    console.log((this.windowDimensionsService.getWidth() < 768));
-    return (this.windowDimensionsService.getWidth() < 768);
+    if (this.activeTab === this.TAB_NAME_TRANSLATION_SUBMITTER) {
+      this.columnsToDisplay = [
+        'User',
+        'Rank',
+        'Performace',
+        'Accuracy',
+        'Translated Cards',
+        'Last Translated(in days)',
+        'Role'
+      ];
+    } else if (this.activeTab === this.TAB_NAME_TRANSLATION_REVIEWER) {
+      this.columnsToDisplay = [
+        'User',
+        'Rank',
+        'Performace',
+        'Accuracy',
+        'Translated Cards',
+        'Last Translated(in days)',
+        'Role'
+      ];
+    } else if (this.activeTab === this.TAB_NAME_QUESTION_SUBMITTER) {
+      this.columnsToDisplay = [
+        'User',
+        'Rank',
+        'Performace',
+        'Accuracy',
+        'Translated Cards',
+        'Last Translated(in days)',
+        'Role'
+      ];
+    } else if (this.activeTab === this.TAB_NAME_QUESTION_REVIEWER) {
+      this.columnsToDisplay = [
+        'User',
+        'Rank',
+        'Performace',
+        'Accuracy',
+        'Translated Cards',
+        'Last Translated(in days)',
+        'Role'
+      ];
+    }
   }
 
   setActiveTab(tabName: string): void {
     this.activeTab = tabName;
-  }
-
-  checkMobileView(): boolean {
-    return (this.windowRef.nativeWindow.innerWidth < 500);
   }
 }
 
@@ -83,6 +124,51 @@ export interface PeriodicElement {
   weight: number;
   symbol: string;
   description: string;
+}
+
+interface Stats {
+  contributorUserId: string;
+  topicIds: string[];
+  firstContribution: string;
+  lastContributedIn: number;
+}
+
+interface TranslationSubmitterStats extends Stats {
+  languageCode: string;
+  recentPerformance: number;
+  overallAccuracy: number;
+  submittedTranslationsCount: number;
+  submittedTranslationWordCount: number;
+  acceptedTranslationsCount: number;
+  acceptedTranslationsWithoutReviewerEditsCount: number;
+  acceptedTranslationWordCount: number;
+  rejectedTranslationsCount: number;
+  rejectedTranslationWordCount: number;
+}
+
+interface TranslationReviewerStats extends Stats {
+  languageCode: string;
+  reviewedTranslationsCount: number;
+  acceptedTranslationsCount: number;
+  acceptedTranslationsWithReviewerEditsCount: number;
+  acceptedTranslationWordCount: number;
+  rejectedTranslationsCount: number;
+}
+
+interface QuestionSubmitterStats extends Stats {
+  recentPerformance: number;
+  overallAccuracy: number;
+  submittedQuestionsCount: number;
+  acceptedQuestionsCount: number;
+  acceptedQuestionsWithoutReviewerEditsCount: number;
+  rejectedQuestionsCount: number;
+}
+
+interface QuestionReviewerStats extends Stats {
+  reviewedQuestionsCount: number;
+  acceptedQuestionsCount: number;
+  acceptedQuestionsWithReviewerEditsCount: number;
+  rejectedQuestionsCount: number;
 }
 
 const ELEMENT_DATA: PeriodicElement[] = [
@@ -170,5 +256,5 @@ const ELEMENT_DATA: PeriodicElement[] = [
 
 angular.module('oppia').directive('contributorAdminDashboardPage',
   downgradeComponent({
-    component: ContributorAdminDashboardPageComponent
+    component: TanslationSubmitterTable
   }) as angular.IDirectiveFactory);

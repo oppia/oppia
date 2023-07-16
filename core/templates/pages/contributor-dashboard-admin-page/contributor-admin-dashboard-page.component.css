@@ -62,7 +62,7 @@
   .mat-card-content.stats-container {
     padding: 1em;
   }
-  .oppia-mat-card {
+  .mat-card.oppia-mat-card {
     display: flex;
     justify-content: space-around;
     align-items: baseline;
@@ -73,6 +73,10 @@
       padding-left: 10px;
       padding-right: 10px;
     }
+    .stats-card h2 {
+      font-size: 24px;
+      font-weight: 500;
+    }
   }
   @media(max-width: 316px) {
     body {
@@ -80,5 +84,160 @@
     }
     .mat-card {
      width: fit-content;
+    }
+  }
+  .oppia-contributor-dashboard-main-content {
+    width: 100%;
+  }
+  .oppia-contributor-dashboard-mobile-mode {
+    margin: auto;
+    width: 100%;
+  }
+  .oppia-contributor-dashboard-main-content .stats-card {
+    min-height: 63px;
+    position: relative;
+  }
+  .oppia-contributor-dashboard-main-content .stats-card .stat-description {
+    line-height: 1.646;
+    margin-bottom: 3em;
+    padding-right: 10px;
+  }
+  .oppia-contributor-dashboard-main-content .stats-card .stat-value-with-rating {
+    margin-top: 0;
+    position: absolute;
+    top: 0.75em;
+    padding-top: 1em;
+  }
+  .stats-card h2 {
+    font-size: 32px;
+    font-weight: 500;
+  }
+  @media(max-width: 464px) {
+    .oppia-contributor-dashboard-main-content .stats-card .stat-value-with-rating {
+      position: absolute;
+      top: 1.75em;
+    }
+  }
+   .dashboard-content {
+    flex-wrap: wrap;
+    justify-content: space-between;
+    margin: 0 auto;
+    padding-top: 50px;
+    width: 95%;
+  }
+   .dashboard-content-primary {
+    background-color: #fff;
+    border: 2px solid #aaaac1;
+    border-radius: 8px;
+    display: inline-block;
+    margin-bottom: 50px;
+    overflow: auto;
+    width: 100%;
+  }
+
+  .dashboard-tabs .dashboard-tabs-text {
+    border-bottom: 2px solid #aaaac1;
+    color: #00645d;
+    font-size: 16px;
+    padding: 10px;
+    text-decoration: none;
+    text-transform: uppercase;
+    width: 100%;
+  }
+
+  .dashboard-tabs-active .dashboard-tabs-text,
+  .dashboard-tabs-active .dashboard-tabs-text:hover {
+    background-color: #d8f4f2;
+    border-bottom: 4px solid #00645d;
+    border-radius: 0;
+    color: #00645d;
+  }
+   .dashboard-tabs .dashboard-tabs-text:hover {
+    color: #00645d;
+    font-size: 16px;
+    padding: 10px;
+    text-decoration: none;
+    text-transform: uppercase;
+    width: 100%;
+  }
+   .dashboard-tabs .dashboard-tabs-text:hover,
+   .dashboard-tabs .dashboard-tabs-text:focus {
+    text-decoration: none;
+  }
+  .dashboard-tabs {
+    display: flex;
+    flex-wrap: nowrap;
+    text-align: center;
+  }
+  .dashboard-tabs li {
+    display: flex;
+    display: -webkit-flex;
+    margin-bottom: 0;
+    width: 50%;
+  }
+  .dashboard-tabs {
+    display: flex;
+    display: -webkit-flex;
+    flex-wrap: nowrap;
+    margin: 0;
+    padding: 0;
+    text-align: center;
+  }
+  .dashboard-title {
+    color: #01645c;
+    font-family: Capriola, Roboto, Arial, sans-serif;
+    font-size: 3em;
+    margin-bottom: 25px;
+    margin-top: 0;
+    padding-top: 78.5px;
+    text-align: center;
+  }
+
+  @media only screen and (max-width: 830px) {
+     .dashboard-tabs {
+      box-shadow: 0 0 5px #333;
+    }
+     .dashboard-tabs li {
+      background-color: #00645c;
+      width: 50%;
+    }
+     .dashboard-tabs .dashboard-tabs-text,
+     .dashboard-tabs .dashboard-tabs-text:hover {
+      background-color: #00645c;
+      border-radius: 0;
+      color: #fff;
+    }
+     .dashboard-tabs-active .dashboard-tabs-text,
+     .dashboard-tabs-active .dashboard-tabs-text:hover {
+      background-color: #00645c;
+      border-bottom: 2px solid #fff;
+      border-radius: 0;
+      color: #fff;
+    }
+    .dashboard-content {
+      padding-top: 0;
+      width: 100%;
+    }
+    .dashboard-content-primary {
+      border: 0;
+      border-radius: 0;
+      width: 100%;
+    }
+    .dashboard-content-secondary {
+      margin-left: 0;
+      position: static;
+      width: 100%;
+    }
+  }
+  @media screen and (max-width: 1200px) {
+    .dashboard-content {
+      width: 100%;
+    }
+    .dashboard-content-primary {
+      width: 70%;
+    }
+    .dashboard-content-secondary {
+      display: inline-block;
+      width: 29%;
     }
   }

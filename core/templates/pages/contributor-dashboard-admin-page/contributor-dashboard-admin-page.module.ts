@@ -28,12 +28,14 @@ import { RouterModule } from '@angular/router';
 import { APP_BASE_HREF } from '@angular/common';
 import { MatTableModule } from '@angular/material/table';
 import { MatCardModule } from '@angular/material/card';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 import { RequestInterceptor } from 'services/request-interceptor.service';
 import { SharedComponentsModule } from 'components/shared-component.module';
 import { OppiaAngularRootComponent } from 'components/oppia-angular-root.component';
 import { ContributorDashboardAdminNavbarComponent } from './navbar/contributor-dashboard-admin-navbar.component';
 import { ContributorAdminDashboardPageComponent } from './contributor-admin-dashboard-page.component';
+import { TanslationSubmitterTable } from './contributor-dashboard-tables/translation-submitter-table.component';
 import { platformFeatureInitFactory, PlatformFeatureService } from 'services/platform-feature.service';
 import { SmartRouterModule } from 'hybrid-router-module-provider';
 import { ToastrModule } from 'ngx-toastr';
@@ -43,6 +45,7 @@ import { AppErrorHandlerProvider } from 'pages/oppia-root/app-error-handler';
 @NgModule({
   imports: [
     BrowserModule,
+    BrowserAnimationsModule,
     CommonModule,
     FormsModule,
     HttpClientModule,
@@ -58,11 +61,13 @@ import { AppErrorHandlerProvider } from 'pages/oppia-root/app-error-handler';
   ],
   declarations: [
     ContributorDashboardAdminNavbarComponent,
-    ContributorAdminDashboardPageComponent
+    ContributorAdminDashboardPageComponent,
+    TanslationSubmitterTable
   ],
   entryComponents: [
     ContributorDashboardAdminNavbarComponent,
-    ContributorAdminDashboardPageComponent
+    ContributorAdminDashboardPageComponent,
+    TanslationSubmitterTable
   ],
   providers: [
     {
