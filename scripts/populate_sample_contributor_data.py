@@ -70,7 +70,7 @@ CLASSROOM_NAME: Final = 'math'
 CLASSROOM_URL_FRAGMENT: Final = 'math'
 
 # Timeout for requests in seconds.
-TIMEOUT = 60
+TIMEOUT_SECS = 60
 
 
 class SampleDataInitializer:
@@ -152,7 +152,7 @@ class SampleDataInitializer:
                 'email': email,
                 'password': password
             },
-            timeout=TIMEOUT,
+            timeout=TIMEOUT_SECS,
         ).json()['idToken']
 
         return str(token_id)
@@ -174,7 +174,7 @@ class SampleDataInitializer:
                 'email': email,
                 'password': password
             },
-            timeout=TIMEOUT,
+            timeout=TIMEOUT_SECS,
         ).json()['idToken']
 
         return str(token_id)

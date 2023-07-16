@@ -75,7 +75,7 @@ LABEL_FOR_USER_BEING_DELETED: Final = '[User being deleted]'
 USERNAME_FOR_USER_BEING_DELETED: Final = 'UserBeingDeleted'
 
 # Timeout in seconds for requests.
-TIMEOUT = 60
+TIMEOUT_SECS = 60
 
 
 class DashboardStatsDict(TypedDict):
@@ -394,7 +394,7 @@ def fetch_gravatar(email: str) -> str:
     try:
         response = requests.get(
             gravatar_url, headers={b'Content-Type': b'image/png'},
-            allow_redirects=False, timeout=TIMEOUT)
+            allow_redirects=False, timeout=TIMEOUT_SECS)
     except Exception:
         logging.exception('Failed to fetch Gravatar from %s' % gravatar_url)
     else:

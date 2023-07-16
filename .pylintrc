@@ -46,7 +46,8 @@ module-rgx=[A-Za-z_][A-Za-z0-9_]*$
 no-docstring-rgx=test_[a-z_]*|[A-Za-z]*Tests|Mock[A-Za-z]*|mock_[a-z_]*|setUp|tearDown|__.*__
 
 # We allow more flexible type names than pylint normally allows. We allow
-# CamelCased types, with an optional underscore prefix.
+# CamelCased types, with an optional underscore prefix. Pylint pnormally
+# rohibits type names from ending in 'Type'.
 typevar-rgx=_?([A-Z][a-z0-9]+)+
 
 [DESIGN]

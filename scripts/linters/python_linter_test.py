@@ -73,9 +73,6 @@ class PythonLintChecksManagerTests(test_utils.LinterTestBase):
             python_linter.check_jobs_imports(
                 batch_jobs_dir, VALID_PY_JOBS_FILEPATH)
         )
-        print('DEBUGGING')
-        print(lint_task_report.get_report())
-        print('DEBUGGING')
         self.assertEqual(
             'SUCCESS  Check jobs imports in jobs registry check passed',
             lint_task_report.get_report()[-1])
