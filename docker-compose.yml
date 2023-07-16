@@ -73,9 +73,9 @@ services:
     command: >
       sh -c '
         python -m scripts.build \
-        ${prod_env:+ --prod_env} \
-        ${maintenance_mode:+ --maintenance_mode} \
-        ${source_maps:+ --source_maps}
+        $([ "$prod_env" = "true" ] && echo "--prod_env") \
+        $([ "$maintenance_mode" = "true" ] && echo "--maintenance_mode") \
+        $([ "$source_maps" = "true" ] && echo "--source_maps")
 
         /google-cloud-sdk/bin/dev_appserver.py \
         $([ "$prod_env" = "true" ] && echo "/app/oppia/app.yaml" || echo "/app/oppia/app_dev_docker.yaml") \
