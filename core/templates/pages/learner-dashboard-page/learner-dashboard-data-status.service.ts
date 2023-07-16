@@ -20,7 +20,6 @@
 
 import { EventEmitter, Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
-import { NonExistentCollections } from 'domain/learner_dashboard/non-existent-collections.model';
 import { NonExistentExplorations } from 'domain/learner_dashboard/non-existent-explorations.model';
 import { LearnerExplorationSummary } from 'domain/summary/learner-exploration-summary.model';
 import { ProfileSummary } from 'domain/user/profile-summary.model';
@@ -31,7 +30,6 @@ interface LearnerDashboardCollectionsData {
   incompleteCollectionsList: CollectionSummary[];
   collectionPlaylist: CollectionSummary[];
   completedToIncompleteCollections: string[];
-  numberOfNonexistentCollections: NonExistentCollections;
 }
 
 
@@ -63,27 +61,6 @@ export class LearnerDashboardDataStatusService {
   EventEmitter<LearnerDashboardCollectionsData> {
     return this._learnerDashboardCollectionsDataEventEmitter;
   }
-
-  // Private _diagnosticTestPlayerCompletedEventEmitter = (
-  //   new EventEmitter<string[]>());
-
-  // private _diagnosticTestPlayerProgressChangeEventEmitter = (
-  //   new EventEmitter<number>());
-
-  // private _diagnosticTestSkipQuestionEventEmitter = (
-  //   new EventEmitter<void>());
-
-  // get onDiagnosticTestSessionCompleted(): EventEmitter<string[]> {
-  //   return this._diagnosticTestPlayerCompletedEventEmitter;
-  // }
-
-  // get onDiagnosticTestSessionProgressChange(): EventEmitter<number> {
-  //   return this._diagnosticTestPlayerProgressChangeEventEmitter;
-  // }
-
-  // get onDiagnosticTestSkipButtonClick(): EventEmitter<void> {
-  //   return this._diagnosticTestSkipQuestionEventEmitter;
-  // }
 }
 
 angular.module('oppia').factory('DiagnosticTestPlayerStatusService',
