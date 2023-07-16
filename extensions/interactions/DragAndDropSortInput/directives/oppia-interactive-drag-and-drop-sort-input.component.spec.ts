@@ -556,7 +556,7 @@ describe('Drag and drop sort input interactive component', () => {
     expect(component.activeItem).toBe(currentIndex + 1);
   });
 
-  it('should  move item up when ArrowUp key is pressed', () => {
+  it('should move item up when ArrowUp key is pressed', () => {
     const event = new KeyboardEvent('keydown', { key: 'ArrowUp' });
     const currentIndex = 1;
     component.activeItem = 1;
@@ -590,7 +590,7 @@ describe('Drag and drop sort input interactive component', () => {
     expect(component.setFocus).toHaveBeenCalled();
     expect(component.activeItem).toBe(currentIndex - 1);
   });
-  
+
   it('should increment newIndex when Tab key is pressed', () => {
     const event = new KeyboardEvent('keydown', { key: 'Tab', shiftKey: false });
     const currentIndex = 1;
@@ -603,11 +603,7 @@ describe('Drag and drop sort input interactive component', () => {
     ]);
 
     spyOn(component, 'setFocus');
-    console.log("Before:");
-    console.log(component.activeItem, " < ", component.listItems.length - 1);
     component.handleKeyDown(event, currentIndex);
-    console.log("After:")
-    console.log(component.activeItem, " < ", component.listItems.length - 1)
     expect(component.setFocus).toHaveBeenCalled();
     expect(component.activeItem).toBe(currentIndex + 1);
   });
