@@ -60,12 +60,13 @@ class FailedMLTest(test_utils.EmailTestBase):
 
     def setUp(self) -> None:
         super().setUp()
+        self.ADMIN_USERNAME = 'admusername'
         self.can_send_emails_ctx = self.swap(
             feconf, 'CAN_SEND_EMAILS', True)
         self.can_send_feedback_email_ctx = self.swap(
             feconf, 'CAN_SEND_FEEDBACK_MESSAGE_EMAILS', True)
         self.signup(
-            feconf.ADMIN_EMAIL_ADDRESS, self.CURRICULUM_ADMIN_USERNAME, True)
+            feconf.ADMIN_EMAIL_ADDRESS, self.ADMIN_USERNAME, True)
         self.login(feconf.ADMIN_EMAIL_ADDRESS, is_super_admin=True)
 
     def test_send_failed_ml_email(self) -> None:
