@@ -80,7 +80,12 @@ describe('Story Preview tab', () => {
             exploration_id: 'exp_1',
             outline_is_finalized: false,
             thumbnail_filename: 'img.png',
-            thumbnail_bg_color: '#a33f40'
+            thumbnail_bg_color: '#a33f40',
+            status: 'Published',
+            planned_publication_date_msecs: 10,
+            last_modified_msecs: 20,
+            first_publication_date_msecs: 10,
+            unpublishing_reason: null
           }, {
             id: 'node_2',
             title: 'Title 2',
@@ -92,7 +97,12 @@ describe('Story Preview tab', () => {
             exploration_id: 'exp_2',
             outline_is_finalized: false,
             thumbnail_filename: 'img2.png',
-            thumbnail_bg_color: '#a33f40'
+            thumbnail_bg_color: '#a33f40',
+            status: 'Published',
+            planned_publication_date_msecs: 10,
+            last_modified_msecs: 20,
+            first_publication_date_msecs: 10,
+            unpublishing_reason: null
           }],
         next_node_id: 'node_3'
       },
