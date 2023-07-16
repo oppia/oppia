@@ -33,7 +33,7 @@ services:
     command: >
       sh -c '
         npx \
-        ${prod_env:+ --max_old_space_size=8192} \
+        $([ "$prod_env" = "true" ] && echo "--max_old_space_size=8192") \
         webpack \
         --config \
         $([ "$prod_env" = "true" ] && [ "$source_maps" = "true" ] && echo "/app/oppia/webpack.prod.sourcemap.config.ts") \
@@ -146,7 +146,7 @@ services:
         --only auth \
         --project=dev-project-id \
         --config=/app/oppia/.firebase.json \
-        ${save_datastore:+ --import=/app/firebase_emulator_cache} \
+        $([ "$save_datastore" = "true" ] && echo "--import=/app/firebase_emulator_cache") \
         --export-on-exit=/app/firebase_emulator_cache
       '
 
