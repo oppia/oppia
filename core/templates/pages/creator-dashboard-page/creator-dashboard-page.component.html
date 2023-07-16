@@ -14,12 +14,12 @@
            tabindex="0" >
         <p class="stat-description" [innerHTML]="'I18N_DASHBOARD_STATS_AVERAGE_RATING' | translate"></p>
         <h2 class="stat-value-with-rating e2e-test-oppia-average-rating"
-            aria-hidden="!dashboardStats.numRatings || relativeChangeInTotalPlays"
+            [attr.aria-hidden]="!dashboardStats.numRatings || relativeChangeInTotalPlays"
             [hidden]="!dashboardStats.numRatings || relativeChangeInTotalPlays">
             {{ dashboardStats.averageRatings || 'N/A' }}
         </h2>
         <h2 class="stat-value-without-rating"
-            aria-hidden="dashboardStats.numRatings || relativeChangeInTotalPlays"
+            [attr.aria-hidden]="dashboardStats.numRatings || relativeChangeInTotalPlays"
             [hidden]="dashboardStats.numRatings || relativeChangeInTotalPlays">
             {{ dashboardStats.averageRatings || 'N/A' }}
         </h2>
@@ -35,28 +35,28 @@
       <div class="total-plays stats-card" tabindex="0">
         <p class="stat-description" [innerHTML]="'I18N_DASHBOARD_STATS_TOTAL_PLAYS' | translate"></p>
         <h2 class="stat-value-with-rating e2e-test-oppia-total-plays"
-            aria-hidden="!dashboardStats.numRatings || relativeChangeInTotalPlays"
+            [attr.aria-hidden]="!dashboardStats.numRatings || relativeChangeInTotalPlays"
             [hidden]="!dashboardStats.numRatings || relativeChangeInTotalPlays">
             {{ dashboardStats.totalPlays }}
         </h2>
         <h2 class="stat-value-without-rating"
-            aria-hidden="dashboardStats.numRatings || relativeChangeInTotalPlays"
+            [attr.aria-hidden]="dashboardStats.numRatings || relativeChangeInTotalPlays"
             [hidden]="dashboardStats.numRatings || relativeChangeInTotalPlays">
             {{ dashboardStats.totalPlays }}
         </h2>
-        <p [hidden]="!relativeChangeInTotalPlays" aria-hidden="!relativeChangeInTotalPlays">
+        <p [hidden]="!relativeChangeInTotalPlays" [attr.aria-hidden]="!relativeChangeInTotalPlays">
           (+{{ relativeChangeInTotalPlays }} from last week)
         </p>
       </div>
       <div class="total-open-feedback stats-card" tabindex="0">
         <p class="stat-description" [innerHTML]="'I18N_DASHBOARD_STATS_OPEN_FEEDBACK' | translate"></p>
         <h2 class="stat-value-with-rating e2e-test-oppia-open-feedback"
-            aria-hidden="!dashboardStats.numRatings || relativeChangeInTotalPlays"
+            [attr.aria-hidden]="!dashboardStats.numRatings || relativeChangeInTotalPlays"
             [hidden]="!dashboardStats.numRatings || relativeChangeInTotalPlays">
             {{ dashboardStats.totalOpenFeedback }}
         </h2>
         <h2 class="stat-value-without-rating"
-            aria-hidden="dashboardStats.numRatings || relativeChangeInTotalPlays"
+            [attr.aria-hidden]="dashboardStats.numRatings || relativeChangeInTotalPlays"
             [hidden]="dashboardStats.numRatings || relativeChangeInTotalPlays">
           {{ dashboardStats.totalOpenFeedback }}
         </h2>
@@ -64,12 +64,12 @@
       <div class="total-open-feedback stats-card" tabindex="0">
         <p class="stat-description" [innerHTML]="'I18N_DASHBOARD_STATS_TOTAL_SUBSCRIBERS' | translate"></p>
         <h2 class="stat-value-with-rating e2e-test-oppia-total-subscribers"
-            aria-hidden="!dashboardStats.numRatings || relativeChangeInTotalPlays"
+            [attr.aria-hidden]="!dashboardStats.numRatings || relativeChangeInTotalPlays"
             [hidden]="!dashboardStats.numRatings || relativeChangeInTotalPlays">
             {{ subscribersList?.length }}
         </h2>
         <h2 class="stat-value-without-rating"
-            aria-hidden="dashboardStats.numRatings || relativeChangeInTotalPlays"
+            [attr.aria-hidden]="dashboardStats.numRatings || relativeChangeInTotalPlays"
             [hidden]="dashboardStats.numRatings || relativeChangeInTotalPlays">
             {{ subscribersList?.length }}
         </h2>
