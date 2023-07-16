@@ -1400,9 +1400,9 @@ class CommunityContributionStats:
 class TranslationContributionStatsDict(TypedDict):
     """Dictionary representing the TranslationContributionStats object."""
 
-    language_code: Optional[str]
-    contributor_user_id: Optional[str]
-    topic_id: Optional[str]
+    language_code: str
+    contributor_user_id: str
+    topic_id: str
     submitted_translations_count: int
     submitted_translation_word_count: int
     accepted_translations_count: int
@@ -1418,8 +1418,8 @@ class TranslationContributionStatsFrontendDict(TypedDict):
     object for frontend.
     """
 
-    language_code: Optional[str]
-    topic_id: Optional[str]
+    language_code: str
+    topic_id: str
     submitted_translations_count: int
     submitted_translation_word_count: int
     accepted_translations_count: int
@@ -1436,9 +1436,9 @@ class TranslationContributionStats:
 
     def __init__(
         self,
-        language_code: Optional[str],
-        contributor_user_id: Optional[str],
-        topic_id: Optional[str],
+        language_code: str,
+        contributor_user_id: str,
+        topic_id: str,
         submitted_translations_count: int,
         submitted_translation_word_count: int,
         accepted_translations_count: int,
@@ -1461,32 +1461,6 @@ class TranslationContributionStats:
         self.rejected_translations_count = rejected_translations_count
         self.rejected_translation_word_count = rejected_translation_word_count
         self.contribution_dates = contribution_dates
-
-    @classmethod
-    def create_default(
-        cls,
-        language_code: Optional[str] = None,
-        contributor_user_id: Optional[str] = None,
-        topic_id: Optional[str] = None
-    ) -> TranslationContributionStats:
-        """Create default translation contribution stats.
-
-        Args:
-            language_code: str. The language code for which are these stats
-                generated.
-            contributor_user_id: str. User ID of the contributor to which
-                these stats belong.
-            topic_id: str. ID of the topic for which were
-                the translations created.
-
-        Returns:
-            TranslationContributionStats. Default translation contribution
-            stats.
-        """
-        return cls(
-            language_code, contributor_user_id, topic_id,
-            0, 0, 0, 0, 0, 0, 0, set()
-        )
 
     def to_dict(self) -> TranslationContributionStatsDict:
         """Returns a dict representation of a TranslationContributionStats
@@ -2003,28 +1977,6 @@ class ReviewableSuggestionEmailInfo:
         self.submission_datetime = submission_datetime
 
 
-class TranslationSubmitterTotalContributionStatsDict(TypedDict):
-    """Dictionary representing the TranslationSubmitterTotalContributionStats
-    object.
-    """
-
-    language_code: str
-    contributor_id: str
-    topic_ids_with_translation_submissions: List[str]
-    recent_review_outcomes: List[str]
-    recent_performance: int
-    overall_accuracy: float
-    submitted_translations_count: int
-    submitted_translation_word_count: int
-    accepted_translations_count: int
-    accepted_translations_without_reviewer_edits_count: int
-    accepted_translation_word_count: int
-    rejected_translations_count: int
-    rejected_translation_word_count: int
-    first_contribution_date: datetime.date
-    last_contribution_date: datetime.date
-
-
 class TranslationSubmitterTotalContributionStatsFrontendDict(TypedDict):
     """Dictionary representing the TranslationSubmitterTotalContributionStats
     object for frontend.
@@ -2121,23 +2073,6 @@ class TranslationSubmitterTotalContributionStats:
         }
 
 
-class TranslationReviewerTotalContributionStatsDict(TypedDict):
-    """Dictionary representing the TranslationReviewerTotalContributionStats
-    object.
-    """
-
-    language_code: str
-    contributor_id: str
-    topic_ids_with_translation_reviews: List[str]
-    reviewed_translations_count: int
-    accepted_translations_count: int
-    accepted_translations_with_reviewer_edits_count: int
-    accepted_translation_word_count: int
-    rejected_translations_count: int
-    first_contribution_date: datetime.date
-    last_contribution_date: datetime.date
-
-
 class TranslationReviewerTotalContributionStatsFrontendDict(TypedDict):
     """Dictionary representing the TranslationReviewerTotalContributionStats
     object for frontend.
@@ -2210,24 +2145,6 @@ class TranslationReviewerTotalContributionStats:
             'last_contributed_in_days': int(
                 (datetime.date.today() - self.last_contribution_date).days)
         }
-
-
-class QuestionSubmitterTotalContributionStatsDict(TypedDict):
-    """Dictionary representing the QuestionSubmitterTotalContributionStats
-    object.
-    """
-
-    contributor_id: str
-    topic_ids_with_question_submissions: List[str]
-    recent_review_outcomes: List[str]
-    recent_performance: int
-    overall_accuracy: float
-    submitted_questions_count: int
-    accepted_questions_count: int
-    accepted_questions_without_reviewer_edits_count: int
-    rejected_questions_count: int
-    first_contribution_date: datetime.date
-    last_contribution_date: datetime.date
 
 
 class QuestionSubmitterTotalContributionStatsFrontendDict(TypedDict):
@@ -2305,21 +2222,6 @@ class QuestionSubmitterTotalContributionStats:
             'last_contributed_in_days': int(
                 (datetime.date.today() - self.last_contribution_date).days)
         }
-
-
-class QuestionReviewerTotalContributionStatsDict(TypedDict):
-    """Dictionary representing the QuestionReviewerTotalContributionStats
-    object.
-    """
-
-    contributor_id: str
-    topic_ids_with_question_reviews: List[str]
-    reviewed_questions_count: int
-    accepted_questions_count: int
-    accepted_questions_with_reviewer_edits_count: int
-    rejected_questions_count: int
-    first_contribution_date: datetime.date
-    last_contribution_date: datetime.date
 
 
 class QuestionReviewerTotalContributionStatsFrontendDict(TypedDict):

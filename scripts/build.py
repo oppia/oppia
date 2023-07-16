@@ -28,15 +28,19 @@ import subprocess
 import sys
 import threading
 
+from core import feconf
 from core import utils
 from scripts import common
-from scripts import install_python_dev_dependencies
-from scripts import install_third_party_libs
-from scripts import servers
 
 import rcssmin
 from typing import (
-    Deque, Dict, List, Optional, Sequence, TextIO, Tuple, TypedDict)
+    Deque, Dict, List, Optional, Sequence, TextIO, Tuple, TypedDict
+)
+
+if not feconf.OPPIA_IS_DOCKERIZED:
+    from scripts import install_python_dev_dependencies
+    from scripts import install_third_party_libs
+    from scripts import servers
 
 ASSETS_DEV_DIR = os.path.join('assets', '')
 ASSETS_OUT_DIR = os.path.join('build', 'assets', '')
@@ -141,7 +145,10 @@ FILEPATHS_PROVIDED_TO_FRONTEND = (
 
 HASH_BLOCK_SIZE = 2**20
 
-APP_DEV_YAML_FILEPATH = 'app_dev.yaml'
+APP_DEV_YAML_FILEPATH = (
+    'app_dev_docker.yaml' if feconf.OPPIA_IS_DOCKERIZED else 'app_dev.yaml'
+)
+
 APP_YAML_FILEPATH = 'app.yaml'
 
 MAX_OLD_SPACE_SIZE_FOR_WEBPACK_BUILD = 8192
@@ -233,7 +240,8 @@ def build_js_files(dev_mode: bool, source_maps: bool = False) -> None:
     else:
         main(args=[])
         common.run_ng_compilation()
-        run_webpack_compilation(source_maps=source_maps)
+        if not feconf.OPPIA_IS_DOCKERIZED:
+            run_webpack_compilation(source_maps=source_maps)
 
 
 def generate_app_yaml(deploy_mode: bool = False) -> None:
@@ -324,9 +332,22 @@ def _minify_and_create_sourcemap(
     """
     print('Minifying and creating sourcemap for %s' % source_path)
     source_map_properties = 'includeSources,url=\'third_party.min.js.map\''
+    # TODO(#18260): Change this when we permanently move to
+    # the Dockerized Setup.
     cmd = '%s %s %s -c -m --source-map %s -o %s ' % (
         common.NODE_BIN_PATH, UGLIFY_FILE, source_path,
         source_map_properties, target_file_path)
+    if feconf.OPPIA_IS_DOCKERIZED:
+        cmd = ''.join([
+            'bash', '-c',
+            'node /app/oppia/node_modules/uglify-js/bin/uglifyjs'
+            ' /app/oppia/third_party/generated/js/third_party.js'
+            ' -c -m --source-map %s -o /app/op0pia/third_party/'
+            'generated/js/third_party.min.js' % (
+                source_map_properties
+            )
+        ])
+
     subprocess.check_call(cmd, shell=True)
 
 
@@ -1418,7 +1439,8 @@ def main(args: Optional[Sequence[str]] = None) -> None:
 
     # Regenerate /third_party/generated from scratch.
     safe_delete_directory_tree(THIRD_PARTY_GENERATED_DEV_DIR)
-    build_third_party_libs(THIRD_PARTY_GENERATED_DEV_DIR)
+    build_third_party_libs(
+        THIRD_PARTY_GENERATED_DEV_DIR)
 
     # If minify_third_party_libs_only is set to True, skips the rest of the
     # build process once third party libs are minified.
@@ -1438,12 +1460,13 @@ def main(args: Optional[Sequence[str]] = None) -> None:
     if options.prod_env:
         minify_third_party_libs(THIRD_PARTY_GENERATED_DEV_DIR)
         hashes = generate_hashes()
-        generate_python_package()
-        if options.source_maps:
-            build_using_webpack(WEBPACK_PROD_SOURCE_MAPS_CONFIG)
-        else:
-            build_using_webpack(WEBPACK_PROD_CONFIG)
-        build_using_ng()
+        if not feconf.OPPIA_IS_DOCKERIZED:
+            generate_python_package()
+            if options.source_maps:
+                build_using_webpack(WEBPACK_PROD_SOURCE_MAPS_CONFIG)
+            else:
+                build_using_webpack(WEBPACK_PROD_CONFIG)
+            build_using_ng()
         generate_app_yaml(
             deploy_mode=options.deploy_mode)
         generate_build_directory(hashes)
