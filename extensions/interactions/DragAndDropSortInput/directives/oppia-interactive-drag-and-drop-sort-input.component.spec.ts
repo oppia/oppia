@@ -472,6 +472,33 @@ describe('Drag and drop sort input interactive component', () => {
       expect(component.dragStarted).toBeTrue();
     });
 
+    it('should set focus on list items change', () => {
+      spyOn(component, 'setFocus');
+
+      component.ngAfterViewInit();
+
+      component.listItems.notifyOnChanges();
+
+      expect(component.setFocus).toHaveBeenCalled();
+    });
+
+    it('should focus on the active item', () => {
+      component.activeItem = 0;
+
+      component.listItems = new QueryList<ElementRef<HTMLDivElement>>();
+      component.listItems.reset([
+        new ElementRef(document.createElement('div')),
+        new ElementRef(document.createElement('div')),
+        new ElementRef(document.createElement('div'))
+      ]);
+      const listItemElements = component.listItems.toArray();
+      spyOn(listItemElements[0].nativeElement, 'focus');
+
+      component.setFocus();
+
+      expect(listItemElements[0].nativeElement.focus).toHaveBeenCalled();
+    });
+
     it('should not hide item when drag is started', () => {
       component.dragStarted = true;
 
@@ -522,7 +549,7 @@ describe('Drag and drop sort input interactive component', () => {
     expect(component.setFocus).toHaveBeenCalled();
     expect(component.activeItem).toBe(currentIndex + 1);
   });
-  
+
   it('should  move item up when ArrowUp key is pressed', () => {
     const event = new KeyboardEvent('keydown', { key: 'ArrowUp' });
     const currentIndex = 1;
@@ -545,7 +572,7 @@ describe('Drag and drop sort input interactive component', () => {
     expect(component.setFocus).toHaveBeenCalled();
     expect(component.activeItem).toBe(currentIndex - 1);
   });
-  
+
   it('should decrement newIndex when Shift + Tab keys are pressed', () => {
     const event = new KeyboardEvent('keydown', { key: 'Tab', shiftKey: true });
     const currentIndex = 1;
