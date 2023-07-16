@@ -452,23 +452,12 @@ class TranslationContributionStatsHandler(
                     months of format: "%b %Y", e.g. "Jan 2021".
             Unnecessary keys language_code, topic_id, contribution_dates,
             contributor_user_id are consequently deleted.
-
-        Raises:
-            Exception. There is no topic_id associated with the given
-                TranslationContributionStatsDict.
-            Exception. No language_code found for the given
-                TranslationContributionStatsDict.
         """
         translation_contribution_stats_dicts = [
             stats.to_dict() for stats in translation_contribution_stats
         ]
         topic_ids: List[str] = []
         for stats_dict in translation_contribution_stats_dicts:
-            if stats_dict['topic_id'] is None:
-                raise Exception(
-                    'There is no topic_id associated with the given '
-                    'TranslationContributionStatsDict.'
-                )
             topic_ids.append(stats_dict['topic_id'])
         topic_summaries = topic_fetchers.get_multi_topic_summaries(topic_ids)
         topic_name_by_topic_id = {}
@@ -485,11 +474,6 @@ class TranslationContributionStatsHandler(
             # be None because above we are already handling the case of None
             # 'topic_id' by raising an exception.
             assert stats_dict['topic_id'] is not None
-            if stats_dict['language_code'] is None:
-                raise Exception(
-                    'No language_code found for the given '
-                    'TranslationContributionStatsDict.'
-                )
 
             response_translation_contribution_stats_dicts.append({
                 'submitted_translations_count': (
