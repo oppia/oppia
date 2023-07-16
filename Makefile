@@ -17,7 +17,7 @@ run-devserver:
 	docker compose up
 
 setup-devserver:
-	docker compose build
+  docker compose build
 
 clean:
 	docker compose down
@@ -25,8 +25,8 @@ clean:
 	docker volume rm oppia_cloud_datastore_emulator_cache oppia_firebase_emulator_cache oppia_proto_files oppia_frontend_proto_files oppia_node_modules oppia_redis_dump oppia_third_party
 
 terminal:
-	docker compose up -d
-	docker exec -it angular-build sh
+  docker compose up -d
+  docker exec -it angular-build sh
 
 stop-devserver:
-	docker compose down
+  docker compose down
