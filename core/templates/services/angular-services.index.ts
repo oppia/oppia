@@ -441,6 +441,7 @@ import { DiagnosticTestPlayerEngineService } from 'pages/exploration-player-page
 import { DiagnosticTestPlayerStatusService } from 'pages/diagnostic-test-player-page/diagnostic-test-player-status.service';
 import { RteHelperService } from 'services/rte-helper.service';
 import { HtmlLengthService } from 'services/html-length.service';
+import { LearnerDashboardDataStatusService } from 'pages/learner-dashboard-page/learner-dashboard-data-status.service';
 
 export const angularServices: [string, Type<{}>][] = [
   ['AccessValidationBackendApiService', AccessValidationBackendApiService],
@@ -661,6 +662,8 @@ export const angularServices: [string, Type<{}>][] = [
   ['LearnerDashboardBackendApiService', LearnerDashboardBackendApiService],
   ['LearnerDashboardIdsBackendApiService',
     LearnerDashboardIdsBackendApiService],
+  ['LearnerDashboardDataStatusService',
+    LearnerDashboardDataStatusService],
   ['LearnerLocalNavBackendApiService', LearnerLocalNavBackendApiService],
   ['LearnerParamsService', LearnerParamsService],
   ['LearnerDashboardActivityBackendApiService',
