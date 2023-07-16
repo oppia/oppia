@@ -474,6 +474,12 @@ describe('Drag and drop sort input interactive component', () => {
 
     it('should set focus on list items change', () => {
       spyOn(component, 'setFocus');
+      component.listItems = new QueryList<ElementRef<HTMLDivElement>>();
+      component.listItems.reset([
+        new ElementRef(document.createElement('div')),
+        new ElementRef(document.createElement('div')),
+        new ElementRef(document.createElement('div'))
+      ]);
 
       component.ngAfterViewInit();
 
