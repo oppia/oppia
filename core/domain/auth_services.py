@@ -21,7 +21,6 @@ from __future__ import annotations
 import base64
 import os
 
-from core.constants import constants
 from core.domain import auth_domain
 from core.platform import models
 from core.platform.auth import firebase_auth_services
