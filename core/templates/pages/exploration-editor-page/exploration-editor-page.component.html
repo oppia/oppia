@@ -43,8 +43,12 @@
         </li>
       </ul>
 
-      <ul [ngClass]="{'navbar-tab-active': getActiveTabName() === 'translation', 'oppia-disabled-tab': !connectedToInternet || editabilityService.isLockedByAdmin()}" id="tutorialTranslationTab" class="nav-item icon nav-list-item e2e-test-translation-tab"
-          (click)="!connectedToInternet || editabilityService.isLockedByAdmin() || selectTranslationTab()" [ngbTooltip]="'Translations does not work when offline.'" [disableTooltip]="connectedToInternet" placement="bottom">
+      <ul [ngClass]="{'navbar-tab-active': getActiveTabName() === 'translation', 'oppia-disabled-tab': !connectedToInternet || editabilityService.isLockedByAdmin()}"
+          id="tutorialTranslationTab"
+          class="nav-item icon nav-list-item e2e-test-translation-tab"
+          (click)="!connectedToInternet || editabilityService.isLockedByAdmin() || selectTranslationTab()" [ngbTooltip]="'Translations does not work when offline.'"
+          [disableTooltip]="connectedToInternet"
+          placement="bottom">
         <li class="nav-link navbar-tab"
             [ngbTooltip]="'Translations'"
             placement="bottom"
