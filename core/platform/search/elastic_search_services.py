@@ -39,7 +39,7 @@ secrets_services = models.Registry.import_secrets_services()
 # where loading a exploration from local yaml file takes
 # longer than ElasticSearch expects.
 ES = elasticsearch.Elasticsearch(
-    ('localhost:%s' % feconf.ES_LOCALHOST_PORT)
+    ('%s:%s' % (feconf.ES_HOST, feconf.ES_LOCALHOST_PORT))
     if feconf.ES_CLOUD_ID is None else None,
     cloud_id=feconf.ES_CLOUD_ID,
     http_auth=(

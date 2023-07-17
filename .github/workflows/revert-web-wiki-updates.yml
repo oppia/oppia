@@ -40,8 +40,16 @@ jobs:
           git revert --no-commit source/develop..origin/master
           msg_file=$(mktemp)
           echo "Reverting the following changes made through the web interface:\n" > $msg_file
-          git log soure/develop..origin/master | while read line; do echo "    ${line}"; done >> $msg_file
+          git log source/develop..origin/master | while read line; do echo "    ${line}"; done >> $msg_file
           git commit -F $msg_file
+      - name: Merge in development commits
+        if: ${{ steps.check-diff.outputs.diff != '' }}
+        # If a PR in the source repository was merged around the same time as a
+        # change was made to the wiki through the web interface, its deployment
+        # might fail before this job can revert the change. In that case, we
+        # need to merge in those un-deployed changes to both the source and
+        # deployment repositories.
+        run: git merge source/develop
       - name: Push to deployment repository
         if: ${{ steps.check-diff.outputs.diff != '' }}
         run: git push source master:develop
