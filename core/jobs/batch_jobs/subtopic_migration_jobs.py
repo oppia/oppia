@@ -187,7 +187,7 @@ class MigrateSubtopicPageModels(beam.PTransform):# type: ignore[misc]
         transformed_subtopic_objects_list = (
             subtopic_objects_list
             | 'Remove unmigrated subtopics' >> beam.Filter(
-                lambda x: len(x['subtopic_changes']) > 0 
+                lambda x: len(x['subtopic_changes']) > 0
                     and len(x['subtopic']) > 0)
             | 'Reorganize the subtopic objects' >> beam.Map(lambda objects: {
                     'subtopic_model': objects['subtopic_model'][0],
