@@ -274,11 +274,14 @@ def main(args: Optional[List[str]] = None) -> None:
             stack.enter_context(servers.managed_firebase_auth_emulator())
             stack.enter_context(servers.managed_cloud_datastore_emulator())
 
+        env = os.environ.copy()
+        env['PIP_NO_DEPS'] = 'True'
         stack.enter_context(servers.managed_dev_appserver(
             APP_YAML_FILENAMES[server_mode],
             port=GOOGLE_APP_ENGINE_PORT,
             log_level='critical',
-            skip_sdk_update_check=True))
+            skip_sdk_update_check=True,
+            env=env))
 
         if parsed_args.record_screen:
             print('Starting puppeteer script with screen recording.')
