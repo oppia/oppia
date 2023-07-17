@@ -13,12 +13,8 @@ services:
       - frontend_proto_files:/app/oppia/extensions/classifiers/proto
     environment:
       - NODE_OPTIONS=--max_old_space_size=4096
-    command: >
-      sh -c '
-        trap "rm /app/oppia/node_modules/@angular/compiler-cli/ngcc/__ngcc_lock_file__" EXIT
-        npx ng build \
-        $([ "$prod_env" = "true" ] && echo "--prod" || echo "--watch")
-      '
+      - prod_env=${prod_env}
+    command: bash /app/oppia/docker/angular-build.entrypoint.sh
 
   webpack-compiler:
     build:
@@ -30,17 +26,10 @@ services:
       - node_modules:/app/oppia/node_modules
       - third_party:/app/oppia/third_party
       - frontend_proto_files:/app/oppia/extensions/classifiers/proto
-    command: >
-      sh -c '
-        node \
-        $([ "$prod_env" = "true" ] && echo "--max_old_space_size=8192") \
-        /app/oppia/node_modules/webpack/bin/webpack.js \
-        --config \
-        $([ "$prod_env" = "true" ] && [ "$source_maps" = "true" ] && echo "/app/oppia/webpack.prod.sourcemap.config.ts") \
-        $([ "$prod_env" = "true" ] && [ "$source_maps" != "true" ] && echo "/app/oppia/webpack.prod.config.ts") \
-        $([ "$prod_env" != "true" ] && [ "$source_maps" = "true" ] && echo "/app/oppia/webpack.dev.sourcemap.config.ts --watch --color --progress") \
-        $([ "$prod_env" != "true" ] && [ "$source_maps" != "true" ] && echo "/app/oppia/webpack.dev.config.ts --watch --color --progress")
-      '
+    environment:
+      - prod_env=${prod_env}
+      - source_maps=${source_maps}
+    command: bash /app/oppia/docker/webpack-compiler.entrypoint.sh
 
   dev-server:
     build:
@@ -58,6 +47,11 @@ services:
     environment:
       - CLOUDSDK_CORE_DISABLE_PROMPTS=1
       - PIP_NO_DEPS=True
+      - prod_env=${prod_env}
+      - maintenance_mode=${maintenance_mode}
+      - source_maps=${source_maps}
+      - disable_host_checking=${disable_host_checking}
+      - no_auto_restart=${no_auto_restart}
     depends_on:
       - angular-build
       - webpack-compiler
@@ -71,26 +65,7 @@ services:
       interval: 30s
       retries: 5
       start_period: 5m
-    command: >
-      sh -c '
-        python -m scripts.build \
-        $([ "$prod_env" = "true" ] && echo "--prod_env") \
-        $([ "$maintenance_mode" = "true" ] && echo "--maintenance_mode") \
-        $([ "$source_maps" = "true" ] && echo "--source_maps")
-
-        /google-cloud-sdk/bin/dev_appserver.py \
-        $([ "$prod_env" = "true" ] && echo "/app/oppia/app.yaml" || echo "/app/oppia/app_dev_docker.yaml") \
-        --runtime=python38 \
-        --host=0.0.0.0 \
-        --port=8181 \
-        --admin_host=0.0.0.0 \
-        --admin_port=8000 \
-        --skip_sdk_update_check=true \
-        $([ "no_auto_restart" = "true" ] && echo "--automatic_restart=false" || echo "--automatic_restart=true") \
-        --log_level=info \
-        --dev_appserver_log_level=info \
-        $([ "$disable_host_checking" != "true" ] && echo "--enable_host_checking")
-      '
+    command: bash /app/oppia/docker/dev-server.entrypoint.sh
 
   datastore:
     build:
@@ -100,25 +75,17 @@ services:
     environment:
       - CLOUDSDK_CORE_DISABLE_PROMPTS=1
       - DATASTORE_HOST=datastore
+      - save_datastore=${save_datastore}
     volumes:
       - cloud_datastore_emulator_cache:/app/cloud_datastore_emulator_cache
+      - ./docker/datastore.entrypoint.sh:/app/oppia/docker/datastore.entrypoint.sh
     healthcheck:
       test: curl -f http://localhost:8089/ || exit 1
       timeout: 10s
       interval: 2m
       retries: 5
       start_period: 5m
-    command: >
-      sh -c '
-        /google-cloud-sdk/bin/gcloud beta \
-        emulators datastore start \
-        --project=dev-project-id \
-        --data-dir=/app/cloud_datastore_emulator_cache \
-        --host-port=0.0.0.0:8089 \
-        --consistency=1.0 \
-        --quiet \
-        $([ "$save_datastore" != "true" ] && echo "--no-store-on-disk")
-      '
+    command: bash /app/oppia/docker/datastore.entrypoint.sh
 
   firebase:
     image: node:16.13.0-alpine
@@ -128,11 +95,12 @@ services:
       - "4000:4000"
     volumes:
       - ./.firebase.json:/app/oppia/.firebase.json
-      # NOTE: The firebase service depends on the packages from node_modules that are being
-      # installed in the Frontend Stage of Dockerfile. In future, we can remove the dependency
-      # on Frontend Stage and install the required packages in this service itself.
       - node_modules:/app/oppia/node_modules
       - firebase_emulator_cache:/app/firebase_emulator_cache
+      - ./docker/firebase.entrypoint.sh:/app/oppia/docker/firebase.entrypoint.sh
+    # NOTE: The firebase service depends on the packages from node_modules that are being
+    # installed in the Frontend Stage of Dockerfile. In future, we can remove the dependency
+    # on Frontend Stage and install the required packages in this service itself.
     depends_on:
       - angular-build
     healthcheck:
@@ -140,16 +108,9 @@ services:
       timeout: 20s
       interval: 20s
       retries: 5
-    command: >
-      sh -c '
-        /app/oppia/node_modules/firebase-tools/lib/bin/firebase.js \
-        emulators:start \
-        --only auth \
-        --project=dev-project-id \
-        --config=/app/oppia/.firebase.json \
-        $([ "$save_datastore" = "true" ] && echo "--import=/app/firebase_emulator_cache") \
-        --export-on-exit=/app/firebase_emulator_cache
-      '
+    environment:
+      - save_datastore=${save_datastore}
+    command: sh /app/oppia/docker/firebase.entrypoint.sh
 
   redis:
     image: redis:6.2.4

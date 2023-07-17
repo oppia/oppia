@@ -189,8 +189,13 @@
 /.yarnrc @oppia/dev-workflow-reviewers
 /app_dev_docker.yaml @oppia/dev-workflow-reviewers
 /docker-compose.yml @oppia/dev-workflow-reviewers
-/docker/Dockerfile.frontend @oppia/dev-workflow-reviewers
+/docker/angular-build.entrypoint.sh @oppia/dev-workflow-reviewers
+/docker/datastore.entrypoint.sh @oppia/dev-workflow-reviewers
+/docker/dev-server.entrypoint.sh @oppia/dev-workflow-reviewers
 /docker/Dockerfile.backend @oppia/dev-workflow-reviewers
+/docker/Dockerfile.frontend @oppia/dev-workflow-reviewers
+/docker/firebase.entrypoint.sh @oppia/dev-workflow-reviewers
+/docker/webpack-compiler.entrypoint.sh @oppia/dev-workflow-reviewers
 /Makefile @oppia/dev-workflow-reviewers
 /tox.ini @oppia/dev-workflow-reviewers
 /scripts/*.py @oppia/dev-workflow-reviewers
