@@ -268,7 +268,6 @@ class MigrateSubtopicPageJob(base_jobs.JobBase):
             # Here, we are narrowing down the type from object to BaseModel.
             assert isinstance(model, base_models.BaseModel)
             models_to_put_values.append(model)
-            print(model)
         datastore_services.update_timestamps_multi(list(models_to_put_values))
         return models_to_put_values
 
