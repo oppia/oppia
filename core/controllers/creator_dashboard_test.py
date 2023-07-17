@@ -196,6 +196,7 @@ class CreatorDashboardHandlerTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_managers_can_see_explorations(self) -> None:
+        """Test case to verify that managers can see explorations."""
         self.save_new_default_exploration(
             self.EXP_ID, self.owner_id, title=self.EXP_TITLE)
         self.set_curriculum_admins([self.OWNER_USERNAME])
@@ -217,6 +218,7 @@ class CreatorDashboardHandlerTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_collaborators_can_see_explorations(self) -> None:
+        """Test to verify that collaborators can see explorations."""
         self.save_new_default_exploration(
             self.EXP_ID, self.owner_id, title=self.EXP_TITLE)
         rights_manager.assign_role_for_exploration(
@@ -241,6 +243,9 @@ class CreatorDashboardHandlerTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_viewer_cannot_see_explorations(self) -> None:
+        """Test to verify that a viewer cannot see any explorations
+        in the creator dashboard.
+        """
         self.save_new_default_exploration(
             self.EXP_ID, self.owner_id, title=self.EXP_TITLE)
         rights_manager.assign_role_for_exploration(
@@ -259,6 +264,7 @@ class CreatorDashboardHandlerTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_can_see_feedback_thread_counts(self) -> None:
+        """Test to verify that the user can see the feedback thread counts."""
         self.save_new_default_exploration(
             self.EXP_ID, self.owner_id, title=self.EXP_TITLE)
 
@@ -270,7 +276,9 @@ class CreatorDashboardHandlerTests(test_utils.GenericTestBase):
         def mock_get_thread_analytics_multi(
             unused_exploration_ids: List[str]
         ) -> List[feedback_domain.FeedbackAnalytics]:
-            """Mock function for 'get_thread_analytics_multi'.
+            """Mock function for 'get_thread_analytics_multi'
+            Note: Mock function is used for testing purposes to simulate
+            the behavior of the actual function.
 
             Args:
                 unused_exploration_ids: list. List of exploration IDs (unused).
@@ -291,6 +299,9 @@ class CreatorDashboardHandlerTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_can_see_subscribers(self) -> None:
+        """Test that a logged-in user can see the subscribers list
+        on the creator dashboard.
+        """
         self.login(self.OWNER_EMAIL)
 
         response = self.get_json(feconf.CREATOR_DASHBOARD_DATA_URL)
@@ -314,6 +325,9 @@ class CreatorDashboardHandlerTests(test_utils.GenericTestBase):
     def test_get_topic_summary_dicts_with_new_structure_players_enabled(
         self
     ) -> None:
+        """Test the 'get_topic_summary_dicts_with_new_structure_players_enabled'
+        function.
+        """
         self.login(self.OWNER_EMAIL)
         response = self.get_json(feconf.CREATOR_DASHBOARD_DATA_URL)
         self.assertEqual(len(response['topic_summary_dicts']), 0)
@@ -333,6 +347,9 @@ class CreatorDashboardHandlerTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_can_update_display_preference(self) -> None:
+        """Test case for updating the display preference
+        on the creator dashboard.
+        """
         self.login(self.OWNER_EMAIL)
         display_preference = self.get_json(
             feconf.CREATOR_DASHBOARD_DATA_URL)['display_preference']
@@ -348,6 +365,7 @@ class CreatorDashboardHandlerTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_can_create_collections(self) -> None:
+        """Test case to verify the creation of a collection."""
         self.set_collection_editors([self.OWNER_USERNAME])
         self.login(self.OWNER_EMAIL)
         csrf_token = self.get_new_csrf_token()
@@ -366,6 +384,7 @@ class CreatorDashboardHandlerTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_get_dashboard_stats(self) -> None:
+        """Test the 'get_dashboard_stats' function."""
         user_models.UserStatsModel(
             id=self.owner_id,
             total_plays=10,
@@ -384,6 +403,9 @@ class CreatorDashboardHandlerTests(test_utils.GenericTestBase):
         })
 
     def test_last_week_stats_produce_exception(self) -> None:
+        """Test case for ensuring last week stats produce
+        the expected exception.
+        """
         self.login(self.OWNER_EMAIL, is_super_admin=True)
 
         get_last_week_dashboard_stats_swap = self.swap(
@@ -411,6 +433,9 @@ class CreatorDashboardHandlerTests(test_utils.GenericTestBase):
         })
 
     def test_broken_last_week_stats_produce_exception(self) -> None:
+        """Test to validate that broken last week dashboard
+        stats produce an exception.
+        """
         self.login(self.OWNER_EMAIL, is_super_admin=True)
 
         get_last_week_dashboard_stats_swap = self.swap(
@@ -431,6 +456,7 @@ class CreatorDashboardHandlerTests(test_utils.GenericTestBase):
         self.assertIsNone(last_week_stats)
 
     def test_get_collections_list(self) -> None:
+        """"Test the 'get_collections_list' function."""
         self.set_collection_editors([self.OWNER_USERNAME])
         self.login(self.OWNER_EMAIL)
         collection_list = self.get_json(
@@ -449,6 +475,7 @@ class CreatorDashboardHandlerTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_get_suggestions_list(self) -> None:
+        """Test to verify the behavior of 'get_suggestions_list' function."""
         self.login(self.OWNER_EMAIL)
         suggestions = self.get_json(
             feconf.CREATOR_DASHBOARD_DATA_URL)['created_suggestions_list']
@@ -476,6 +503,7 @@ class CreatorDashboardHandlerTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_get_suggestions_to_review_list(self) -> None:
+        """Test case for the 'get_suggestions_list' function."""
         self.login(self.OWNER_EMAIL)
 
         suggestions = self.get_json(
@@ -523,6 +551,7 @@ class CreatorDashboardHandlerTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_creator_dashboard_page(self) -> None:
+        """Test case for checking the creator dashboard page title."""
         self.login(self.OWNER_EMAIL)
 
         response = self.get_html_response(feconf.CREATOR_DASHBOARD_URL)
