@@ -893,24 +893,19 @@ class CsrfTokenManager:
         Returns:
             str. The generated CSRF token.
         """
-        auth_services.initialize_csrf_secret()
-
         # The token has 4 parts: hash of the actor user id, hash of the page
         # name, hash of the time issued and plain text of the time issued.
 
         if user_id is None:
             user_id = cls._USER_ID_DEFAULT
 
+        csrf_secret = auth_services.get_csrf_secret_value()
+
         # Round time to seconds.
         issued_on_str = str(int(issued_on))
 
-        csrf_secret_model = auth_services.get_csrf_secret_model()
-        # Rulling out the possibility of csrf_secret_model being None
-        # as we have initialized it above.
-        assert csrf_secret_model is not None
-
         digester = hmac.new(
-            key=csrf_secret_model.oppia_csrf_secret.encode('utf-8'),
+            key=csrf_secret.encode('utf-8'),
             digestmod='md5'
         )
         digester.update(user_id.encode('utf-8'))

@@ -290,11 +290,29 @@ class AuthServicesTests(test_utils.GenericTestBase):
             auth_services.revoke_super_admin_privileges('uid1')
             self.assertEqual([], super_admin_privilage)
 
-    def test_get_csrf_secret_model_returns_none_when_no_models(self) -> None:
-        self.assertIsNone(auth_services.get_csrf_secret_model())
+    def test_get_csrf_secret_value_returns_when_no_models(self) -> None:
+        csrf_secret_model = auth_models.CsrfSecretModel.get(
+            auth_services.CSRF_SECRET_INSTANCE_ID, strict=False)
+        if csrf_secret_model is not None:
+            auth_models.CsrfSecretModel.delete(csrf_secret_model)
+        self.assertIsNone(auth_models.CsrfSecretModel.get(
+            auth_services.CSRF_SECRET_INSTANCE_ID, strict=False))
+
+        actual_csrf_secret_value = auth_services.get_csrf_secret_value()
+
+        expected_csrf_secret_value = auth_models.CsrfSecretModel.get(
+            auth_services.CSRF_SECRET_INSTANCE_ID, strict=False
+        ).oppia_csrf_secret
+        self.assertIsNotNone(expected_csrf_secret_value)
+        self.assertEqual(expected_csrf_secret_value, actual_csrf_secret_value)
 
     def test_csrf_secret_mode_is_initialized_correctly(self) -> None:
-        self.assertIsNone(auth_services.get_csrf_secret_model())
-        auth_services.initialize_csrf_secret()
+        self.assertIsNotNone(auth_models.CsrfSecretModel.get(
+            auth_services.CSRF_SECRET_INSTANCE_ID, strict=False))
 
-        self.assertIsNotNone(auth_services.get_csrf_secret_model())
+        actual_csrf_secret_value = auth_services.get_csrf_secret_value()
+
+        expected_csrf_secret_value = auth_models.CsrfSecretModel.get(
+            auth_services.CSRF_SECRET_INSTANCE_ID, strict=False
+        ).oppia_csrf_secret
+        self.assertEqual(expected_csrf_secret_value, actual_csrf_secret_value)

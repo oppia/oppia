@@ -26,7 +26,7 @@ from core.domain import auth_domain
 from core.platform import models
 from core.platform.auth import firebase_auth_services
 
-from typing import List, Optional
+from typing import Final, List, Optional
 import webapp2
 
 MYPY = False
@@ -37,6 +37,8 @@ if MYPY: # pragma: no cover
 auth_models, = models.Registry.import_models([models.Names.AUTH])
 
 platform_auth_services = models.Registry.import_auth_services()
+
+CSRF_SECRET_INSTANCE_ID: Final = 'csrf_secret'
 
 
 def create_profile_user_auth_details(
@@ -288,26 +290,24 @@ def revoke_super_admin_privileges(user_id: str) -> None:
     firebase_auth_services.revoke_super_admin_privileges(user_id)
 
 
-def get_csrf_secret_model() -> Optional[auth_models.CsrfSecretModel]:
-    """Returns the CsrfSecretModel.
+def get_csrf_secret_value() -> str:
+    """Returns the csrf secret value if it exists otherwise initializes it.
 
     Returns:
-        Optional[auth_models.CsrfSecretModel]. Returns the CsrfSecretModel if
-        it exists otherwise None.
+        str. Returns the csrf secret value.
     """
-    return auth_models.CsrfSecretModel.get(
-        constants.CSRF_SECRET_INSTANCE_ID, strict=False)
+    csrf_secret_model = auth_models.CsrfSecretModel.get(
+        CSRF_SECRET_INSTANCE_ID, strict=False)
 
-
-def initialize_csrf_secret() -> None:
-    """Initializes the csrf secret."""
-    csrf_secret_model = get_csrf_secret_model()
     # Any non-default value is fine.
     if csrf_secret_model is not None:
-        return
+        return csrf_secret_model.oppia_csrf_secret
 
     # Initialize to random value.
     auth_models.CsrfSecretModel(
-        id=constants.CSRF_SECRET_INSTANCE_ID,
+        id=CSRF_SECRET_INSTANCE_ID,
         oppia_csrf_secret=base64.urlsafe_b64encode(os.urandom(20)).decode()
     ).put()
+
+    return auth_models.CsrfSecretModel.get(
+        CSRF_SECRET_INSTANCE_ID, strict=False).oppia_csrf_secret

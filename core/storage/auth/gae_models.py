@@ -328,8 +328,8 @@ class FirebaseSeedModel(base_models.BaseModel):
 class CsrfSecretModel(base_models.BaseModel):
     """The value of the oppia's csrf secret value.
 
-    Instance of this class will have fix id which is
-    constants.CSRF_SECRET_INSTANCE_ID.
+    There is only one instance of this class, and it has a fixed ID, which is
+    auth_services.CSRF_SECRET_INSTANCE_ID.
     """
 
     # The csrf secret value.
