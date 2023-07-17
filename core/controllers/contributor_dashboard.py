@@ -70,10 +70,6 @@ class ContributorDashboardPage(
 
     @acl_decorators.open_access
     def get(self) -> None:
-        # TODO(#7402): Serve this page statically through app.yaml once
-        # the CONTRIBUTOR_DASHBOARD_ENABLED flag is removed.
-        if not config_domain.CONTRIBUTOR_DASHBOARD_IS_ENABLED.value:
-            raise self.PageNotFoundException
         self.render_template('contributor-dashboard-page.mainpage.html')
 
 
@@ -132,8 +128,6 @@ class ContributionOpportunitiesHandler(
     def get(self, opportunity_type: str) -> None:
         """Handles GET requests."""
         assert self.normalized_request is not None
-        if not config_domain.CONTRIBUTOR_DASHBOARD_IS_ENABLED.value:
-            raise self.PageNotFoundException
         search_cursor = self.normalized_request.get('cursor')
         language_code = self.normalized_request.get('language_code')
 
@@ -1111,12 +1105,7 @@ def _get_client_side_stats(
         stats.to_frontend_dict() for stats in backend_stats
     ]
     topic_ids = []
-    for index, stats_dict in enumerate(stats_dicts):
-        if stats_dict['topic_id'] is None:
-            raise Exception(
-                'No topic_id associated with stats: %s.' %
-                type(backend_stats[index]).__name__
-            )
+    for stats_dict in stats_dicts:
         topic_ids.append(stats_dict['topic_id'])
     topic_summaries = topic_fetchers.get_multi_topic_summaries(topic_ids)
     topic_name_by_topic_id = {
