@@ -1,0 +1,52 @@
+name: Docker Setup Test
+on:
+  merge_group:
+    types: [checks_requested]
+  push:
+    branches:
+      - develop
+      - release-*
+  pull_request:
+    branches:
+      - develop
+      - release-*
+
+jobs:
+  build:
+    runs-on:  ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-22.04]
+    steps:
+      - name: Checkout to the Oppia repository code
+        uses: actions/checkout@v3
+
+      - uses: ./.github/actions/merge
+
+      - name: Build Images
+        run: |
+          echo ---Building Docker Images---
+          docker compose build
+          
+      - name: Start Containers
+        run: |
+          echo ---Starting Containers---
+          docker compose up angular-build -d
+          docker compose up -d
+
+      - name: Checking server reachability
+        run: |
+          for i in {1..50}; do
+            if curl -s http://localhost:8181/; then
+              echo ---Dev-server is up---
+              exit 0
+            else
+              echo ---Retrying in 30 seconds---
+              sleep 30
+            fi
+          done
+          echo ---Dev-server is not started after all retries---
+          exit 1
+          
+      - name: Stop Containers
+        run: docker compose down
