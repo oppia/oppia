@@ -300,7 +300,14 @@ def get_csrf_secret_value() -> str:
 
     # Any non-default value is fine.
     if csrf_secret_model is not None:
-        return csrf_secret_model.oppia_csrf_secret
+        # Rulling out the possibility of csrf_secret_model being None in
+        # order to avoid mypy error.
+        assert csrf_secret_model is not None
+        csrf_secret_value = csrf_secret_model.oppia_csrf_secret
+        # Rulling out the possibility for csrf_secret_value of being type other
+        # than str in order to avoid mypy error.
+        assert isinstance(csrf_secret_value, str)
+        return csrf_secret_value
 
     # Initialize to random value.
     auth_models.CsrfSecretModel(
@@ -308,5 +315,9 @@ def get_csrf_secret_value() -> str:
         oppia_csrf_secret=base64.urlsafe_b64encode(os.urandom(20)).decode()
     ).put()
 
-    return auth_models.CsrfSecretModel.get(
-        CSRF_SECRET_INSTANCE_ID, strict=False).oppia_csrf_secret
+    csrf_secret_model = auth_models.CsrfSecretModel.get(
+        CSRF_SECRET_INSTANCE_ID, strict=False)
+    assert csrf_secret_model is not None
+    csrf_secret_value = csrf_secret_model.oppia_csrf_secret
+    assert isinstance(csrf_secret_value, str)
+    return csrf_secret_value

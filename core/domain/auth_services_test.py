@@ -300,11 +300,15 @@ class AuthServicesTests(test_utils.GenericTestBase):
 
         actual_csrf_secret_value = auth_services.get_csrf_secret_value()
 
-        expected_csrf_secret_value = auth_models.CsrfSecretModel.get(
+        expected_csrf_secret = auth_models.CsrfSecretModel.get(
             auth_services.CSRF_SECRET_INSTANCE_ID, strict=False
-        ).oppia_csrf_secret
-        self.assertIsNotNone(expected_csrf_secret_value)
-        self.assertEqual(expected_csrf_secret_value, actual_csrf_secret_value)
+        )
+        self.assertIsNotNone(expected_csrf_secret)
+        # Rulling out the possibility of csrf_secret_model being None in
+        # order to avoid mypy error.
+        assert expected_csrf_secret is not None
+        self.assertEqual(
+            expected_csrf_secret.oppia_csrf_secret, actual_csrf_secret_value)
 
     def test_csrf_secret_mode_is_initialized_correctly(self) -> None:
         self.assertIsNotNone(auth_models.CsrfSecretModel.get(
@@ -312,7 +316,11 @@ class AuthServicesTests(test_utils.GenericTestBase):
 
         actual_csrf_secret_value = auth_services.get_csrf_secret_value()
 
-        expected_csrf_secret_value = auth_models.CsrfSecretModel.get(
+        expected_csrf_secret = auth_models.CsrfSecretModel.get(
             auth_services.CSRF_SECRET_INSTANCE_ID, strict=False
-        ).oppia_csrf_secret
-        self.assertEqual(expected_csrf_secret_value, actual_csrf_secret_value)
+        )
+        # Rulling out the possibility of csrf_secret_model being None in
+        # order to avoid mypy error.
+        assert expected_csrf_secret is not None
+        self.assertEqual(
+            expected_csrf_secret.oppia_csrf_secret, actual_csrf_secret_value)
