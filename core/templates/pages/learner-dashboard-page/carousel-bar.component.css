@@ -38,7 +38,7 @@ font-weight: 500;
 .oppia-carousel-bar .oppia-carousel-scroller {
   border-radius: 4px;
   color: white;
-  cursor: default;
+  cursor: pointer;
   display: flex;
   justify-content: center;
   align-items: center;
