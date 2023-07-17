@@ -148,13 +148,13 @@ export class HomeTabComponent {
         }
       }
     }
-    setTimeout(() => {
-      this.noPlaylistActivity = (
-        (this.explorationPlaylist.length === 0) &&
+
+    this.noPlaylistActivity = (
+      (this.explorationPlaylist.length === 0) &&
     (this.collectionPlaylist.length === 0));
-      this.totalLessonsInPlaylist.push(
-        ...this.explorationPlaylist, ...this.collectionPlaylist);
-    }, 2000);
+    this.totalLessonsInPlaylist.push(
+      ...this.explorationPlaylist, ...this.collectionPlaylist);
+
     this.totalExploration.push(
       ...this.explorationPlaylist, ...this.incompleteExplorationsList);
     this.storyExplorationProgressList.push(

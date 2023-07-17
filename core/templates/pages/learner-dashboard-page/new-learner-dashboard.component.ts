@@ -204,9 +204,6 @@ export class NewLearnerDashboardComponent implements OnInit {
           responseData.allTopicsList);
         this.learntToPartiallyLearntTopics = (
           responseData.learntToPartiallyLearntTopics);
-        this.activeSection = (
-          LearnerDashboardPageConstants
-            .LEARNER_DASHBOARD_SECTION_I18N_IDS.HOME);
         this.activeSubsection = (
           LearnerDashboardPageConstants
             .LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.SKILL_PROFICIENCY
@@ -303,6 +300,9 @@ export class NewLearnerDashboardComponent implements OnInit {
     ]).then(() => {
       setTimeout(() => {
         this.loaderService.hideLoadingScreen();
+        this.activeSection = (
+          LearnerDashboardPageConstants
+            .LEARNER_DASHBOARD_SECTION_I18N_IDS.HOME);
         // So that focus is applied after the loading screen has dissapeared.
         this.focusManagerService.setFocusWithoutScroll('ourLessonsBtn');
       }, 0);

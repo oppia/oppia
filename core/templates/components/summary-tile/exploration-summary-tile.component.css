@@ -117,12 +117,12 @@ oppia-exploration-summary-tile .oppia-exploration-objective-title {
 }
 oppia-exploration-summary-tile .oppia-learner-dashboard-exploration-title {
   color: #00645C;
-  display: flex;
   font-family: Capriola,Roboto,Arial,sans-serif;
   font-size: 15px;
   font-weight: 400;
   padding-left: 8px;
   text-align: left;
+  word-wrap: break-word;
 }
 oppia-exploration-summary-tile .continue-button {
   background: white 0% 0% no-repeat padding-box;
