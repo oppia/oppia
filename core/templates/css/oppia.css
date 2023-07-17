@@ -502,7 +502,7 @@ input.ng-dirty.ng-invalid, textarea.ng-dirty.ng-invalid, md-input-group.md-defau
 }
 
 .oppia-form-error-container {
-  color: red;
+  color: #FF0000;
   margin-top: 5px;
 }
 
