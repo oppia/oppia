@@ -109,7 +109,7 @@ class BuildTests(test_utils.GenericTestBase):
         """Tests _minify_and_create_sourcemap with an invalid filepath."""
         with self.assertRaisesRegex(
             subprocess.CalledProcessError,
-            'returned non-zero exit status 1') as called_process:
+            'returned non-zero exit status 1'):
             with self.swap(feconf, 'OPPIA_IS_DOCKERIZED', True):
                 build._minify_and_create_sourcemap(  # pylint: disable=protected-access
                     INVALID_INPUT_FILEPATH, INVALID_OUTPUT_FILEPATH)
