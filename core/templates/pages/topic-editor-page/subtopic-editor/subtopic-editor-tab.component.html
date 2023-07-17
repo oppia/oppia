@@ -198,7 +198,13 @@
                 </a>
                 <div class="skill-options-box">
                   <span tabindex="0" [attr.aria-label]="'Number of questions: ' + skillQuestionCountDict[skillSummary.getId()]">{{ skillQuestionCountDict[skillSummary.getId()]  }}</span>
-                  <i class="fa fa-ellipsis-v" tabindex="0" (click)="showSkillEditOptions(idx)" role="button" aria-label="More options" (keydown.enter)="showSkillEditOptions(idx)"></i>
+                  <i class="fa fa-ellipsis-v"
+                     tabindex="0"
+                     (click)="showSkillEditOptions(idx)"
+                     role="button"
+                     aria-label="More options"
+                     (keydown.enter)="showSkillEditOptions(idx)">
+                  </i>
                 </div>
                 <div class="skill-option-box"
                      *ngIf="selectedSkillEditOptionsIndex === idx"
