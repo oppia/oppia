@@ -85,6 +85,8 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
 
         def mock_context_manager() -> MockCompilerContextManager:
             return MockCompilerContextManager()
+        env = os.environ.copy()
+        env['PIP_NO_DEPS'] = 'True'
         self.swap_ng_build = self.swap(
             servers, 'managed_ng_build', mock_context_manager)
         self.swap_webpack_compiler = self.swap(
@@ -103,7 +105,8 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
             expected_kwargs=[{
                 'port': GOOGLE_APP_ENGINE_PORT,
                 'log_level': 'critical',
-                'skip_sdk_update_check': True
+                'skip_sdk_update_check': True,
+                'env': env
             }])
 
     def test_run_lighthouse_puppeteer_script_successfully(self) -> None:
