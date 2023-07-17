@@ -478,6 +478,7 @@ def get_learner_group_syllabus_subtopic_page_summaries(
 
     return all_learner_group_subtopic_page_summaries
 
+
 def populate_subtopic_page_model_fields(
     subtopic_page_model: subtopic_models.SubtopicPageModel,
     subtopic_page: subtopic_page_domain.SubtopicPage
