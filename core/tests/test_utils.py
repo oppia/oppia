@@ -3208,6 +3208,15 @@ version: 1
                 for x in value:
                     traverse_schema_and_assign_content_ids(
                         x, schema['items'], ca_name)
+            elif schema['type'] in (
+                schema_utils.SCHEMA_TYPE_CUSTOM,
+                schema_utils.SCHEMA_TYPE_BOOL,
+                schema_utils.SCHEMA_TYPE_INT,
+                schema_utils.SCHEMA_TYPE_FLOAT,
+                schema_utils.SCHEMA_TYPE_UNICODE,
+            ):
+                # These types need no recursion.
+                pass
             # We exclude this else block from coverage because this block is
             # only meant to ensure that if a new type is added to interaction
             # schemas in the future, this utility function will fail noisily.
