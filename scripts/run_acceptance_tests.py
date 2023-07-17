@@ -99,6 +99,7 @@ def run_tests(args: argparse.Namespace) -> Tuple[List[bytes], int]:
             env={
                 **os.environ,
                 'PORTSERVER_ADDRESS': common.PORTSERVER_SOCKET_FILEPATH,
+                'PIP_NO_DEPS': 'True'
             }))
 
         proc = stack.enter_context(servers.managed_acceptance_tests_server(
