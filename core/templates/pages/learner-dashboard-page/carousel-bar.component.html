@@ -3,13 +3,13 @@
         <div class="oppia-carousel-head">
             <div class="oppia-carousel-head-content">
                 <span class="oppia-carousel-heading">
-                    <!-- <span
-                        [innerHTML]="'I18N_LEARNER_DASHBOARD_LEARN_SOMETHING_NEW_SECTION' | translate"></span> -->
-                    <span *ngIf="carouselHeading === LessonsinProgress">
-                        LessonsinProgress
+                     <span *ngIf="carouselHeading === 'I18N_LEARNER_DASHBOARD_LESSONS_IN_PROGRESS'" [innerHTML]="'I18N_LEARNER_DASHBOARD_LESSONS_IN_PROGRESS' | translate">
+                    </span> 
+                     <span *ngIf="carouselHeading === 'I18N_LEARNER_DASHBOARD_RECOMMENDED_FOR_YOU'" [innerHTML]="'I18N_LEARNER_DASHBOARD_RECOMMENDED_FOR_YOU' | translate">
                     </span>
-                    <span *ngIf="carouselClassname === '.inprogress'">
-                        shree ram
+                    <span *ngIf="carouselHeading === 'I18N_LEARNER_DASHBOARD_LESSONS_YOU_SAVED_FOR_LATER'" [innerHTML]="'I18N_LEARNER_DASHBOARD_LESSONS_YOU_SAVED_FOR_LATER' | translate">
+                    </span>
+                    <span *ngIf="carouselHeading === '118N_LEARNER_DASHBOARD_TOPICS_AVAILABLE_IN_OPPIA_CLASSROOM'" [innerHTML]="'118N_LEARNER_DASHBOARD_TOPICS_AVAILABLE_IN_OPPIA_CLASSROOM' | translate">
                     </span>
                 </span>
                 <span class="oppia-carousel-button" *ngIf="isScrollable">

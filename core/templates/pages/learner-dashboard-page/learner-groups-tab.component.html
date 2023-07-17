@@ -27,10 +27,10 @@
             </div>
             <div class="oppia-learner-groups-buttons">
               <div class="learner-group-accept-invite-button" (click)="acceptLearnerGroupInvitation(learnerGroupSummary)" >
-                   <span>Accept</span>
+                <span [innerHTML]="'I18N_LEARNER_GROUP_ACCEPT_INVITAITON' | translate"></span>
               </div>
               <div class="learner-group-decline-invite-button" (click)="declineLearnerGroupInvitation(learnerGroupSummary)">
-                <span>Decline</span>
+                <span [innerHTML]="'I18N_LEARNER_GROUP_DECLINE_INVITAITON' | translate"></span>
               </div>
             </div>
           </div>

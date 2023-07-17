@@ -1,6 +1,8 @@
 <div class="home-tab">
   <div tabindex="0" class="greeting" [ngStyle]="!windowIsNarrow && {'margin-top': '27px'}">
-    Welcome, {{ username }}!
+    <span class="suggested-for-you-heading" [innerHTML]="'I18N_LEARNER_DASHBOARD_WELCOME' | translate">
+    </span>
+    , {{ username }}!
   </div>
   <div tabindex="0" class="continue-where-you-left-off" *ngIf="continueWhereYouLeftOffList.length !== 0">
     <p class="continue-where-you-left-off-heading"
@@ -10,7 +12,7 @@
     <div class="continue-where-you-left-off-container">
       <div class="continue-where-you-left-off-section">
         <div *ngIf="storyExplorationProgressList.length !== 0" class="oppia-story-exploration-in-progress inprogress">
-          <oppia-carousel-bar [carouselClassname]="'.inprogress '" [carouselHeading]="LessonsinProgress">
+          <oppia-carousel-bar [carouselClassname]="'.inprogress '" [carouselHeading]="'I18N_LEARNER_DASHBOARD_LESSONS_IN_PROGRESS'">
             <div *ngFor="let summaryTile of storyExplorationProgressList">
               <div *ngIf="getstoryExplorationTileType(summaryTile) === 'story'">
                 <oppia-learner-story-summary-tile
@@ -37,7 +39,7 @@
           </oppia-carousel-bar>
         </div>
         <div *ngIf="storyInRecommended.length !== 0" class="story-recommended recommended">
-          <oppia-carousel-bar [carouselClassname]="'.recommended '">
+          <oppia-carousel-bar [carouselClassname]="'.recommended '" [carouselHeading]="'I18N_LEARNER_DASHBOARD_RECOMMENDED_FOR_YOU'">
             <div *ngFor="let storySummaryTile of storyInRecommended">
               <oppia-learner-story-summary-tile
                 [storySummary]="storySummaryTile.storySummary"
@@ -54,7 +56,7 @@
   </div>
 
 
-  <div tabindex="0" class="topic-suggested-for-you shivam">
+  <div tabindex="0" class="topic-suggested-for-you untracked">
     <p class="suggested-for-you-heading" [innerHTML]="'I18N_LEARNER_DASHBOARD_LEARN_SOMETHING_NEW_SECTION' | translate">
     </p>
     <div class="oppia-learner-dashboard-search-container">
@@ -63,7 +65,7 @@
       </div>
     </div>
     <div *ngFor="let item of untrackedTopics | keyvalue" class="untracked-topics">
-      <oppia-carousel-bar [scrollUntrackedTopics]="true" [carouselClassname]="'.shivam '">
+      <oppia-carousel-bar [scrollUntrackedTopics]="true" [carouselClassname]="'.untracked '" [carouselHeading]="'118N_LEARNER_DASHBOARD_TOPICS_AVAILABLE_IN_OPPIA_CLASSROOM'">
         <div *ngFor="let topicSummaryTile of item.value" class="topic-summary-tile">
           <oppia-learner-topic-summary-tile [topicSummary]="topicSummaryTile">
           </oppia-learner-topic-summary-tile>
@@ -82,7 +84,7 @@
     </div>
     <div class="community-lessons-playlist-section playlist" *ngIf="totalLessonsInPlaylist.length !== 0">
       <div class="summary-container">
-        <oppia-carousel-bar [carouselClassname]="'.playlist '">
+        <oppia-carousel-bar [carouselClassname]="'.playlist '" [carouselHeading]="'I18N_LEARNER_DASHBOARD_LESSONS_YOU_SAVED_FOR_LATER'">
           <div *ngFor="let summaryTile of totalLessonsInPlaylist" class="oppia-summary-tile-container"
             (mouseenter)="summaryTile.toggle = !summaryTile.toggle"
             (mouseleave)="summaryTile.toggle = !summaryTile.toggle">
