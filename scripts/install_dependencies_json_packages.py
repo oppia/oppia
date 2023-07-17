@@ -16,35 +16,32 @@
 
 from __future__ import annotations
 
-import argparse
 import contextlib
+from http import client
 import io
 import json
 import os
-import subprocess
+import ssl
 import sys
 import tarfile
 import urllib
+from urllib import error as urlerror
+from urllib import request as urlrequest
 import zipfile
 
-from core import utils
-from scripts import install_dependencies_json_packages
-from typing import Dict, Final, List, Literal, Optional, TypedDict, cast
+import certifi
+from typing import (
+    BinaryIO, Dict, Final, List, Literal, TextIO, TypedDict,
+    Union, cast, overload
+)
 
-from . import common
-from . import install_python_prod_dependencies
-
+DEPENDENCIES_FILE_PATH: Final = os.path.join(os.getcwd(), 'dependencies.json')
 TOOLS_DIR: Final = os.path.join('..', 'oppia_tools')
 THIRD_PARTY_DIR: Final = os.path.join('.', 'third_party')
 THIRD_PARTY_STATIC_DIR: Final = os.path.join(THIRD_PARTY_DIR, 'static')
-DEPENDENCIES_FILE_PATH: Final = os.path.join(os.getcwd(), 'dependencies.json')
 
 # Place to download zip files for temporary storage.
 TMP_UNZIP_PATH: Final = os.path.join('.', 'tmp_unzip.zip')
-
-
-# Check that the current directory is correct.
-common.require_cwd_to_be_oppia(allow_deploy_dir=True)
 
 TARGET_DOWNLOAD_DIRS: Final = {
     'proto': THIRD_PARTY_DIR,
@@ -88,10 +85,82 @@ DOWNLOAD_FORMATS_TO_DEPENDENCIES_KEYS: Dict[
     }
 }
 
-_PARSER = argparse.ArgumentParser(
-    description="""
-Installation script for Oppia third-party libraries.
-""")
+TextModeTypes = Literal['r', 'w', 'a', 'x', 'r+', 'w+', 'a+']
+BinaryModeTypes = Literal['rb', 'wb', 'ab', 'xb', 'r+b', 'w+b', 'a+b', 'x+b']
+
+
+def ensure_directory_exists(d: str) -> None:
+    """Creates the given directory if it does not already exist."""
+    if not os.path.exists(d):
+        os.makedirs(d)
+
+
+def url_retrieve(
+        url: str, output_path: str, max_attempts: int = 2,
+        enforce_https: bool = True
+) -> None:
+    """Retrieve a file from a URL and write the file to the file system.
+
+    Note that we use Python's recommended default settings for verifying SSL
+    connections, which are documented here:
+    https://docs.python.org/3/library/ssl.html#best-defaults.
+
+    Args:
+        url: str. The URL to retrieve the data from.
+        output_path: str. Path to the destination file where the data from the
+            URL will be written.
+        max_attempts: int. The maximum number of attempts that will be made to
+            download the data. For failures before the maximum number of
+            attempts, a message describing the error will be printed. Once the
+            maximum is hit, any errors will be raised.
+        enforce_https: bool. Whether to require that the provided URL starts
+            with 'https://' to ensure downloads are secure.
+
+    Raises:
+        Exception. Raised when the provided URL does not use HTTPS but
+            enforce_https is True.
+    """
+    failures = 0
+    success = False
+    if enforce_https and not url.startswith('https://'):
+        raise Exception(
+            'The URL %s should use HTTPS.' % url)
+    while not success and failures < max_attempts:
+        try:
+            with urlrequest.urlopen(
+                url, context=ssl.create_default_context()
+            ) as response:
+                with open(output_path, 'wb') as output_file:
+                    output_file.write(response.read())
+        except (
+            urlerror.URLError, ssl.SSLError, client.IncompleteRead
+        ) as exception:
+            failures += 1
+            print('Attempt %d of %d failed when downloading %s.' % (
+                failures, max_attempts, url))
+            if failures >= max_attempts:
+                raise exception
+            print('Error: %s' % exception)
+            print('Retrying download.')
+        else:
+            success = True
+
+
+def url_open(
+    source_url: Union[str, urllib.request.Request]
+) -> urllib.request._UrlopenRet:
+    """Opens a URL and returns the response.
+
+    Args:
+        source_url: Union[str, Request]. The URL.
+
+    Returns:
+        urlopen. The 'urlopen' object.
+    """
+    # TODO(#12912): Remove pylint disable after the arg-name-for-non-keyword-arg
+    # check is refactored.
+    context = ssl.create_default_context(cafile=certifi.where())
+    return urllib.request.urlopen(source_url, context=context)
 
 
 # Here we use total=False since some fields in this dict
@@ -120,6 +189,53 @@ class DependenciesDict(TypedDict):
     dependencies: Dict[str, Dict[str, DependencyDict]]
 
 
+@overload
+def open_file(
+    filename: str,
+    mode: TextModeTypes,
+    encoding: str = 'utf-8',
+    newline: Union[str, None] = None
+) -> TextIO: ...
+
+
+@overload
+def open_file(
+    filename: str,
+    mode: BinaryModeTypes,
+    encoding: Union[str, None] = 'utf-8',
+    newline: Union[str, None] = None
+) -> BinaryIO: ...
+
+
+def open_file(
+    filename: str,
+    mode: Union[TextModeTypes, BinaryModeTypes],
+    encoding: Union[str, None] = 'utf-8',
+    newline: Union[str, None] = None
+) -> Union[BinaryIO, TextIO]:
+    """Open file and return a corresponding file object.
+
+    Args:
+        filename: str. The file to be opened.
+        mode: Literal. Mode in which the file is opened.
+        encoding: str. Encoding in which the file is opened.
+        newline: None|str. Controls how universal newlines work.
+
+    Returns:
+        IO[Any]. The file object.
+
+    Raises:
+        FileNotFoundError. The file cannot be found.
+    """
+    # Here we use cast because we are narrowing down the type from IO[Any]
+    # to Union[BinaryIO, TextIO].
+    file = cast(
+        Union[BinaryIO, TextIO],
+        open(filename, mode, encoding=encoding, newline=newline)
+    )
+    return file
+
+
 def download_files(
     source_url_root: str,
     target_dir: str,
@@ -139,11 +255,11 @@ def download_files(
     """
     assert isinstance(source_filenames, list), (
         'Expected list of filenames, got \'%s\'' % source_filenames)
-    common.ensure_directory_exists(target_dir)
+    ensure_directory_exists(target_dir)
     for filename in source_filenames:
         if not os.path.exists(os.path.join(target_dir, filename)):
             print('Downloading file %s to %s ...' % (filename, target_dir))
-            common.url_retrieve(
+            url_retrieve(
                 '%s/%s' % (source_url_root, filename),
                 os.path.join(target_dir, filename))
 
@@ -176,9 +292,9 @@ def download_and_unzip_files(
     if not os.path.exists(os.path.join(target_parent_dir, target_root_name)):
         print('Downloading and unzipping file %s to %s ...' % (
             zip_root_name, target_parent_dir))
-        common.ensure_directory_exists(target_parent_dir)
+        ensure_directory_exists(target_parent_dir)
 
-        common.url_retrieve(source_url, TMP_UNZIP_PATH)
+        url_retrieve(source_url, TMP_UNZIP_PATH)
 
         try:
             with zipfile.ZipFile(TMP_UNZIP_PATH, 'r') as zfile:
@@ -193,7 +309,7 @@ def download_and_unzip_files(
             req.add_header('User-agent', 'python')
             # This is needed to get a seekable filestream that can be used
             # by zipfile.ZipFile.
-            file_stream = io.BytesIO(utils.url_open(req).read())
+            file_stream = io.BytesIO(url_open(req).read())
             with zipfile.ZipFile(file_stream, 'r') as zfile:
                 zfile.extractall(path=target_parent_dir)
 
@@ -231,9 +347,9 @@ def download_and_untar_files(
     if not os.path.exists(os.path.join(target_parent_dir, target_root_name)):
         print('Downloading and untarring file %s to %s ...' % (
             tar_root_name, target_parent_dir))
-        common.ensure_directory_exists(target_parent_dir)
+        ensure_directory_exists(target_parent_dir)
 
-        common.url_retrieve(source_url, TMP_UNZIP_PATH)
+        url_retrieve(source_url, TMP_UNZIP_PATH)
         with contextlib.closing(tarfile.open(
             name=TMP_UNZIP_PATH, mode='r:gz')) as tfile:
             tfile.extractall(target_parent_dir)
@@ -247,9 +363,9 @@ def download_and_untar_files(
         print('Download of %s succeeded.' % tar_root_name)
 
 
-def get_file_contents(filepath: str, mode: utils.TextModeTypes = 'r') -> str:
+def get_file_contents(filepath: str, mode: TextModeTypes = 'r') -> str:
     """Gets the contents of a file, given a relative filepath from oppia/."""
-    with utils.open_file(filepath, mode) as f:
+    with open_file(filepath, mode) as f:
         return f.read()
 
 
@@ -354,126 +470,60 @@ def validate_dependencies(filepath: str) -> None:
             test_dependencies_syntax(download_format, dependency_contents)
 
 
-def install_elasticsearch_dev_server() -> None:
-    """This installs a local ElasticSearch server to the oppia_tools
-    directory to be used by development servers and backend tests.
+def download_all_dependencies(filepath: str) -> None:
+    """This download all files to the required folders.
+
+    Args:
+        filepath: str. The path to the json file.
     """
-    try:
-        subprocess.call(
-            ['%s/bin/elasticsearch' % common.ES_PATH, '--version'],
-            stdin=subprocess.PIPE,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            # Set the minimum heap size to 100 MB and maximum to 500 MB.
-            env={'ES_JAVA_OPTS': '-Xms100m -Xmx500m'}
-        )
-        print('ElasticSearch is already installed.')
-        return
-    except OSError:
-        print('Installing ElasticSearch...')
+    validate_dependencies(filepath)
+    dependencies_data = return_json(filepath)
+    dependencies = dependencies_data['dependencies']
+    for data, dependency in dependencies.items():
+        for _, dependency_contents in dependency.items():
+            dependency_rev = dependency_contents['version']
+            dependency_url = dependency_contents['url']
+            download_format = dependency_contents['downloadFormat']
+            if download_format == _DOWNLOAD_FORMAT_FILES:
+                dependency_files = dependency_contents['files']
+                target_dirname = (
+                    dependency_contents['targetDirPrefix'] + dependency_rev)
+                dependency_dst = os.path.join(
+                    TARGET_DOWNLOAD_DIRS[data], target_dirname)
+                download_files(dependency_url, dependency_dst, dependency_files)
 
-    if common.is_mac_os() or common.is_linux_os():
-        file_ext = 'tar.gz'
-        def download_and_extract(*args: str) -> None:
-            """This downloads and extracts the elasticsearch files."""
-            download_and_untar_files(*args)
-    elif common.is_windows_os():
-        file_ext = 'zip'
-        def download_and_extract(*args: str) -> None:
-            """This downloads and extracts the elasticsearch files."""
-            download_and_unzip_files(*args)
-    else:
-        raise Exception('Unrecognized or unsupported operating system.')
+            elif download_format == _DOWNLOAD_FORMAT_ZIP:
+                if 'rootDir' in dependency_contents:
+                    dependency_zip_root_name = dependency_contents['rootDir']
+                else:
+                    dependency_zip_root_name = (
+                        dependency_contents['rootDirPrefix'] + dependency_rev)
 
-    download_and_extract(
-        'https://artifacts.elastic.co/downloads/elasticsearch/' +
-        'elasticsearch-%s-%s-x86_64.%s' % (
-            common.ELASTICSEARCH_VERSION,
-            common.OS_NAME.lower(),
-            file_ext
-        ),
-        TARGET_DOWNLOAD_DIRS['oppiaTools'],
-        'elasticsearch-%s' % common.ELASTICSEARCH_VERSION,
-        'elasticsearch-%s' % common.ELASTICSEARCH_VERSION
-    )
-    print('ElasticSearch installed successfully.')
+                if 'targetDir' in dependency_contents:
+                    dependency_target_root_name = (
+                        dependency_contents['targetDir'])
+                else:
+                    dependency_target_root_name = (
+                        dependency_contents['targetDirPrefix'] + dependency_rev)
+                download_and_unzip_files(
+                    dependency_url, TARGET_DOWNLOAD_DIRS[data],
+                    dependency_zip_root_name, dependency_target_root_name)
 
+            elif download_format == _DOWNLOAD_FORMAT_TAR:
+                dependency_tar_root_name = (
+                    dependency_contents['tarRootDirPrefix'] + dependency_rev)
 
-def install_redis_cli() -> None:
-    """This installs the redis-cli to the local oppia third_party directory so
-    that development servers and backend tests can make use of a local redis
-    cache. Redis-cli installed here (redis-cli-6.0.6) is different from the
-    redis package installed in dependencies.json (redis-3.5.3). The redis-3.5.3
-    package detailed in dependencies.json is the Python library that allows
-    users to communicate with any Redis cache using Python. The redis-cli-6.0.6
-    package installed in this function contains C++ scripts for the redis-cli
-    and redis-server programs detailed below.
-
-    The redis-cli program is the command line interface that serves up an
-    interpreter that allows users to connect to a redis database cache and
-    query the cache using the Redis CLI API. It also contains functionality to
-    shutdown the redis server. We need to install redis-cli separately from the
-    default installation of backend libraries since it is a system program and
-    we need to build the program files after the library is untarred.
-
-    The redis-server starts a Redis database on the local machine that can be
-    queried using either the Python redis library or the redis-cli interpreter.
-    """
-    try:
-        subprocess.call(
-            [common.REDIS_SERVER_PATH, '--version'],
-            stdin=subprocess.PIPE,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE)
-        print('Redis-cli is already installed.')
-    except OSError:
-        # The redis-cli is not installed, run the script to install it.
-        # NOTE: We do the installation here since we need to use make.
-        print('Installing redis-cli...')
-
-        download_and_untar_files(
-            ('https://download.redis.io/releases/redis-%s.tar.gz') %
-            common.REDIS_CLI_VERSION,
-            TARGET_DOWNLOAD_DIRS['oppiaTools'],
-            'redis-%s' % common.REDIS_CLI_VERSION,
-            'redis-cli-%s' % common.REDIS_CLI_VERSION)
-
-        # Temporarily change the working directory to redis-cli-6.0.6 so we can
-        # build the source code.
-        with common.CD(
-            os.path.join(
-                TARGET_DOWNLOAD_DIRS['oppiaTools'],
-                'redis-cli-%s' % common.REDIS_CLI_VERSION)):
-            # Build the scripts necessary to start the redis server.
-            # The make command only builds the C++ files in the src/ folder
-            # without modifying anything outside of the oppia root directory.
-            # It will build the redis-cli and redis-server files so that we can
-            # run the server from inside the oppia folder by executing the
-            # script src/redis-cli and src/redis-server.
-            subprocess.call(['make'])
-
-        # Make the scripts executable.
-        subprocess.call([
-            'chmod', '+x', common.REDIS_SERVER_PATH])
-        subprocess.call([
-            'chmod', '+x', common.REDIS_CLI_PATH])
-
-        print('Redis-cli installed successfully.')
+                dependency_target_root_name = (
+                    dependency_contents['targetDirPrefix'] + dependency_rev)
+                download_and_untar_files(
+                    dependency_url, TARGET_DOWNLOAD_DIRS[data],
+                    dependency_tar_root_name, dependency_target_root_name)
 
 
-def main(args: Optional[List[str]] = None) -> None:
-    """Installs all the third party libraries."""
-    if common.is_windows_os():
-        # The redis cli is not compatible with Windows machines.
-        raise Exception(
-            'The redis command line interface will not be installed because '
-            'your machine is on the Windows operating system.')
-    unused_parsed_args = _PARSER.parse_args(args=args)
-    install_python_prod_dependencies.main()
-    install_dependencies_json_packages.download_all_dependencies(
-        DEPENDENCIES_FILE_PATH)
-    install_redis_cli()
-    install_elasticsearch_dev_server()
+def main() -> None:
+    """Installs all the packages from the dependencies.json file."""
+
+    download_all_dependencies(DEPENDENCIES_FILE_PATH)
 
 
 # The 'no coverage' pragma is used as this line is un-testable. This is because
