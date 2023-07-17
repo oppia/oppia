@@ -175,7 +175,7 @@ def get_new_classroom_id() -> str:
     return classroom_models.ClassroomModel.generate_new_classroom_id()
 
 
-def _update_classroom(
+def update_classroom(
     classroom: classroom_config_domain.Classroom,
     classroom_model: classroom_models.ClassroomModel
 ) -> None:
@@ -198,7 +198,7 @@ def _update_classroom(
     classroom_model.put()
 
 
-def _create_new_classroom(
+def create_new_classroom(
     classroom: classroom_config_domain.Classroom
 ) -> None:
     """Creates a new classroom model from using the classroom domain object.
@@ -228,9 +228,9 @@ def update_or_create_classroom_model(
         classroom.classroom_id, strict=False)
 
     if model is None:
-        _create_new_classroom(classroom)
+        create_new_classroom(classroom)
     else:
-        _update_classroom(classroom, model)
+        update_classroom(classroom, model)
 
 
 def delete_classroom(classroom_id: str) -> None:

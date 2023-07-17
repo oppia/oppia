@@ -7062,5 +7062,5 @@ export default {
   "CONTRIBUTOR_CERTIFICATE_WIDTH": 1493,
   "CONTRIBUTOR_CERTIFICATE_HEIGHT": 1313,
   "BRANCH_NAME": "classroom_migration",
-  "SHORT_COMMIT_HASH": "e9ccb40b3e"
+  "SHORT_COMMIT_HASH": "0b90dca48a"
 } as const;
