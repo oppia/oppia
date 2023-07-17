@@ -87,7 +87,8 @@ def install_installation_tools() -> None:
 def install_dev_dependencies() -> None:
     """Install dev dependencies from COMPILED_REQUIREMENTS_DEV_FILE_PATH."""
     subprocess.run(
-        ['pip-sync', COMPILED_REQUIREMENTS_DEV_FILE_PATH],
+        ['pip-sync', COMPILED_REQUIREMENTS_DEV_FILE_PATH, '--pip-args',
+        '--require-hashes --no-deps'],
         check=True,
         encoding='utf-8',
     )
@@ -118,7 +119,8 @@ def compile_pip_requirements(
         old_compiled = f.read()
     subprocess.run(
         [
-            'pip-compile', '--no-emit-index-url', requirements_path,
+            'pip-compile', '--no-emit-index-url',
+            '--generate-hashes', requirements_path,
             '--output-file', compiled_path,
         ],
         check=True,
