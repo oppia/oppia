@@ -45,6 +45,7 @@ CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY: Final = 'update_subtopic_page_property'
 CMD_MIGRATE_SUBTOPIC_PAGE_CONTENTS_SCHEMA_TO_LATEST_VERSION: Final = (
     'migrate_subtopic_page_contents_schema_to_latest_version')
 
+
 class SubtopicPageChange(change_domain.BaseChange):
     """Domain object for changes made to subtopic_page object.
 

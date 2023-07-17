@@ -67,7 +67,7 @@ class MigrateSubtopicPageModels(beam.PTransform):# type: ignore[misc]
         Args:
             subtopic_page_id: str. The id of the subtopic.
             subtopic_page_model: SubtopicPageModel. The subtopic page model to
-            migrate.
+                migrate.
 
         Returns:
             Result((str, SubtopicPage), (str, Exception)). Result containing
@@ -97,7 +97,7 @@ class MigrateSubtopicPageModels(beam.PTransform):# type: ignore[misc]
         Args:
             subtopic_page_id: str. The ID of the subtopic page.
             subtopic_page_model: SubtopicPageModel. The subtopic for which to
-            generate the change objects.
+                generate the change objects.
 
         Yields:
             (str, SubtopicPageChange). Tuple containing subtopic page ID and
@@ -105,12 +105,13 @@ class MigrateSubtopicPageModels(beam.PTransform):# type: ignore[misc]
         """
         subtopic_page_version = (
             subtopic_page_model.page_contents_schema_version)
-        if subtopic_page_version < feconf.CURRENT_SUBTOPIC_PAGE_CONTENTS_SCHEMA_VERSION:
+        if subtopic_page_version < feconf.CURRENT_SUBTOPIC_PAGE_CONTENTS_SCHEMA_VERSION: # pylint: disable=line-too-long
             subtopic_change = subtopic_page_domain.SubtopicPageChange({
                 'cmd': (
-                    subtopic_page_domain.CMD_MIGRATE_SUBTOPIC_PAGE_CONTENTS_SCHEMA_TO_LATEST_VERSION),
+                    subtopic_page_domain.CMD_MIGRATE_SUBTOPIC_PAGE_CONTENTS_SCHEMA_TO_LATEST_VERSION), # pylint: disable=line-too-long
                 'from_version': subtopic_page_version,
-                'to_version': feconf.CURRENT_SUBTOPIC_PAGE_CONTENTS_SCHEMA_VERSION
+                'to_version': (
+                    feconf.CURRENT_SUBTOPIC_PAGE_CONTENTS_SCHEMA_VERSION)
             })
             yield (subtopic_page_id, subtopic_change)
 
@@ -238,11 +239,11 @@ class MigrateSubtopicPageJob(base_jobs.JobBase):
 
         Args:
             subtopic_page_model: SubtopicPageModel. The subtopic which should
-            be updated.
+                be updated.
             migrated_subtopic: SubtopicPage. The migrated subtopic page domain
-            object.
+                object.
             subtopic_page_change: SubtopicPageChange. The subtopic page changes
-            to apply.
+                to apply.
 
         Returns:
             sequence(BaseModel). Sequence of models which should be put into

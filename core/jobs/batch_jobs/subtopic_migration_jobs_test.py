@@ -17,22 +17,14 @@
 """Unit tests for jobs.batch_jobs.subtopic_migration_jobs."""
 
 from __future__ import annotations
-from curses.panel import version
-
-import datetime
 
 from core import feconf
-from core.constants import constants
 from core.domain import subtopic_page_domain
-from core.domain import subtopic_page_services
 from core.domain import topic_domain
-from core.domain import topic_fetchers
-from core.domain import topic_services
 from core.jobs import job_test_utils
 from core.jobs.batch_jobs import subtopic_migration_jobs
 from core.jobs.types import job_run_result
 from core.platform import models
-from core.tests import test_utils
 
 from typing import Type
 from typing_extensions import Final
@@ -96,7 +88,6 @@ class MigrateSubtopicPageJobTests(job_test_utils.JobTestBase):
         self.assertEqual(
             migrated_subtopic_model.page_contents_schema_version,
             feconf.CURRENT_SUBTOPIC_PAGE_CONTENTS_SCHEMA_VERSION)
-
 
     def test_broken_subtopic_leads_to_no_migration(self) -> None:
         first_unmigrated_subtopic_model = self.create_model(
@@ -280,4 +271,3 @@ class AuditSubtopicMigrationJobTests(job_test_utils.JobTestBase):
         migrated_subtopic_model = subtopic_models.SubtopicPageModel.get(
             self.SUBTOPIC_1_ID)
         self.assertEqual(migrated_subtopic_model.version, 1)
-
