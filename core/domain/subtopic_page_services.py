@@ -22,7 +22,7 @@ import copy
 
 from core import feconf
 from core.domain import change_domain
-from core.domain import classroom_services
+from core.domain import classroom_config_services
 from core.domain import learner_group_services
 from core.domain import skill_services
 from core.domain import subtopic_page_domain
@@ -433,7 +433,7 @@ def get_multi_users_subtopic_pages_progress(
                     'subtopic_mastery': subtopic_mastery,
                     'parent_topic_url_fragment': topic.url_fragment,
                     'classroom_url_fragment': (
-                        classroom_services
+                        classroom_config_services
                             .get_classroom_url_fragment_for_topic_id(
                                 topic.id))
                 })

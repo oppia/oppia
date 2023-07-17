@@ -109,6 +109,31 @@ class ClassroomServicesTests(test_utils.GenericTestBase):
             classroom_config_services.get_classroom_by_url_fragment(
                 'incorrect_url_fragment'))
 
+    def test_get_classroom_url_fragment_for_topic(self) -> None:
+        chemistry_classroom_dict: classroom_config_domain.ClassroomDict = {
+            'classroom_id': 'chem_classroom_id',
+            'name': 'chem',
+            'url_fragment': 'chem',
+            'course_details': 'Curated Chemistry foundations course.',
+            'topic_list_intro': 'Start from the basics with our first topic.',
+            'topic_id_to_prerequisite_topic_ids': {'topic_id_chem': []}
+        }
+        chemistry_classroom = classroom_config_domain.Classroom.from_dict(
+            chemistry_classroom_dict)
+        classroom_models.ClassroomModel.create(
+            chemistry_classroom.classroom_id,
+            chemistry_classroom.name,
+            chemistry_classroom.url_fragment,
+            chemistry_classroom.course_details,
+            chemistry_classroom.topic_list_intro,
+            chemistry_classroom.topic_id_to_prerequisite_topic_ids
+        )
+        classroom_url_fragment = (
+            classroom_config_services.
+            get_classroom_url_fragment_for_topic_id('topic_id_chem'))
+
+        self.assertEqual(classroom_url_fragment, 'chem')
+
     def test_get_all_classrooms(self) -> None:
         classrooms = classroom_config_services.get_all_classrooms()
         classroom_dicts = [classroom.to_dict() for classroom in classrooms]

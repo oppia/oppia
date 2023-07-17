@@ -31,7 +31,6 @@ from core.domain import android_services
 from core.domain import blog_services
 from core.domain import classifier_services
 from core.domain import classroom_config_services
-from core.domain import classroom_services
 from core.domain import email_manager
 from core.domain import feedback_services
 from core.domain import question_services
@@ -3834,7 +3833,7 @@ def can_access_topic_viewer_page(
             return None
 
         verified_classroom_url_fragment = (
-            classroom_services.get_classroom_url_fragment_for_topic_id(
+            classroom_config_services.get_classroom_url_fragment_for_topic_id(
                 topic.id))
         if classroom_url_fragment != verified_classroom_url_fragment:
             url_substring = topic_url_fragment
@@ -3938,8 +3937,8 @@ def can_access_story_viewer_page(
                 return None
 
             verified_classroom_url_fragment = (
-                classroom_services.get_classroom_url_fragment_for_topic_id(
-                    topic.id))
+                classroom_config_services
+                .get_classroom_url_fragment_for_topic_id(topic.id))
             if classroom_url_fragment != verified_classroom_url_fragment:
                 url_substring = '%s/story/%s' % (
                     topic_url_fragment, story_url_fragment)
@@ -4050,8 +4049,8 @@ def can_access_story_viewer_page_as_logged_in_user(
                 return None
 
             verified_classroom_url_fragment = (
-                classroom_services.get_classroom_url_fragment_for_topic_id(
-                    topic.id))
+                classroom_config_services
+                .get_classroom_url_fragment_for_topic_id(topic.id))
             if classroom_url_fragment != verified_classroom_url_fragment:
                 url_substring = '%s/story/%s' % (
                     topic_url_fragment, story_url_fragment)
@@ -4161,7 +4160,7 @@ def can_access_subtopic_viewer_page(
             return None
 
         verified_classroom_url_fragment = (
-            classroom_services.get_classroom_url_fragment_for_topic_id(
+            classroom_config_services.get_classroom_url_fragment_for_topic_id(
                 topic.id))
         if classroom_url_fragment != verified_classroom_url_fragment:
             url_substring = '%s/revision/%s' % (

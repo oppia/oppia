@@ -18,6 +18,7 @@
 
 from __future__ import annotations
 
+from core.constants import constants
 from core.domain import classroom_config_domain
 from core.platform import models
 
@@ -146,6 +147,23 @@ def get_classroom_by_url_fragment(
         return get_classroom_from_classroom_model(classroom_model)
     else:
         return None
+
+
+def get_classroom_url_fragment_for_topic_id(topic_id: str) -> str:
+    """Returns the classroom url fragment for the provided topic id.
+
+    Args:
+        topic_id: str. The topic id.
+
+    Returns:
+        str. Returns the classroom url fragment for a topic.
+    """
+    classrooms = get_all_classrooms()
+    for classroom in classrooms:
+        topic_ids = list(classroom.topic_id_to_prerequisite_topic_ids.keys())
+        if topic_id in topic_ids:
+            return classroom.url_fragment
+    return str(constants.CLASSROOM_URL_FRAGMENT_FOR_UNATTACHED_TOPICS)
 
 
 def get_new_classroom_id() -> str:

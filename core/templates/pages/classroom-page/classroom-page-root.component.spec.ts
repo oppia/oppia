@@ -24,11 +24,13 @@ import { PageHeadService } from 'services/page-head.service';
 
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { ClassroomPageRootComponent } from './classroom-page-root.component';
+import { AccessValidationBackendApiService } from 'pages/oppia-root/routing/access-validation-backend-api.service';
 
 describe('Classroom Root Page', () => {
   let fixture: ComponentFixture<ClassroomPageRootComponent>;
   let component: ClassroomPageRootComponent;
   let pageHeadService: PageHeadService;
+  let accessValidationBackendApiService: AccessValidationBackendApiService;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -47,16 +49,21 @@ describe('Classroom Root Page', () => {
     fixture = TestBed.createComponent(ClassroomPageRootComponent);
     component = fixture.componentInstance;
     pageHeadService = TestBed.inject(PageHeadService);
+    accessValidationBackendApiService = TestBed.inject(
+      AccessValidationBackendApiService);
   });
 
   it('should successfully instantiate the component',
     () => {
+      spyOn(accessValidationBackendApiService, 'validateAccessToClassroomPage')
+        .and.returnValue(Promise.resolve());
       expect(component).toBeDefined();
     });
 
   it('should initialize', () => {
     spyOn(pageHeadService, 'updateTitleAndMetaTags');
-
+    spyOn(accessValidationBackendApiService, 'validateAccessToClassroomPage')
+      .and.returnValue(Promise.resolve());
     component.ngOnInit();
 
     expect(pageHeadService.updateTitleAndMetaTags).toHaveBeenCalledWith(
