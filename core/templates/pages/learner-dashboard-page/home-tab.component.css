@@ -45,7 +45,7 @@
 .home-tab .topic-suggested-for-you .suggested-for-you-heading {
   color: #205D86;
   font-family: 'Capriola', 'Roboto', Arial, sans-serif;
-  font-size: 18px;
+  font-size: 24px;
   margin: 0;
 }
 .home-tab .continue-where-you-left-off .empty-continue-where-you-left-off-section {
@@ -56,7 +56,12 @@
 .home-tab .topic-suggested-for-you .classroom-button {
   border: 1px solid #205D86;
   border-radius: 4px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 4px;
   height: 44px;
+  margin-top: 20px;
   padding: 10px 0px;
   width: 344px;
 }
@@ -130,7 +135,7 @@
   z-index: 20;
 }
 .home-tab .oppia-learner-dashboard-search-container {
-  margin: 32px 0 54px 0;
+  margin: 23px 0 45px 0;
 }
 .home-tab .topic-suggested-for-you .oppia-learner-dashboard-search-bar-container {
   display: flex;
@@ -167,8 +172,8 @@
   .home-tab .suggested-for-you .topic-summary-tile-scroll::-webkit-scrollbar:horizontal {
     height: 5px;
   }
-  .home-tab .untracked-topics {
-    margin-bottom: 20px;
+  .home-tab .topic-suggested-for-you .untracked-topics {
+    margin-bottom: 24px;
   }
 }
 
@@ -182,6 +187,10 @@
   .home-tab .oppia-learner-dashboard-search-container {
     margin: 32px 0px 32px 0px;
   }
+  .home-tab .topic-suggested-for-you .classroom-button {
+    width: 367px;
+    background-color: #CADBDA;
+  }
 }
 @media screen and (max-width: 767px) {
   .home-tab .greeting {
@@ -194,7 +203,7 @@
   }
   .home-tab .continue-where-you-left-off .continue-where-you-left-off-heading,
   .home-tab .suggested-for-you .suggested-for-you-heading {
-    font-size: 20px;
+    font-size: 18px;
   }
   .home-tab .continue-where-you-left-off .continue-where-you-left-off-scroll {
     overflow: scroll;
@@ -238,7 +247,7 @@
   }
   .home-tab .continue-where-you-left-off .continue-where-you-left-off-heading,
   .home-tab .suggested-for-you .suggested-for-you-heading {
-    font-size: 20px;
+    font-size: 24px;
   }
   .home-tab .suggested-for-you .topic-summary-tile-scroll {
     overflow: scroll;
@@ -322,6 +331,18 @@
   }
 }
 
+@media (max-width: 750px) {
+  .home-tab .continue-where-you-left-off-container {
+    margin-top: 12px;
+  }
+  .home-tab .topic-suggested-for-you .classroom-text {
+    font-size: 13px;
+  }
+  .home-tab .topic-suggested-for-you .untracked-topics {
+    margin-bottom: 20px;
+  }
+}
+
 @media(max-width: 600px) {
   .home-tab .oppia-classroom-viewer-container {
     width: 85vw;
@@ -340,6 +361,7 @@
     margin-top: 24px;
   }
 }
+
 
 @media(max-width: 1150px) {
   .oppia-topic-summary-tiles {

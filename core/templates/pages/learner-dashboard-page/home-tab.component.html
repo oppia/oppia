@@ -75,8 +75,9 @@
         <a [href]="getClassroomLink(item.key)" target="{{ openInNewWindow ? '_blank' : '_self' }}"
           class="oppia-classroom-link">
           <div class="classroom-button">
+            <i class="fas fal fa-arrow-right"></i>
             <p class="classroom-text">
-              <span [innerHTML]="'I18N_VIEW_ALL_TOPICS' | translate: {classroomName: item.key}"></span>
+              <span [innerHTML]="'I18N_LEARNER_DASHBOARD_OR_EXPLORE_ALL_LESSONS_IN_CLASSROOM' | translate: {classroomName: item.key}"></span>
             </p>
           </div>
         </a>

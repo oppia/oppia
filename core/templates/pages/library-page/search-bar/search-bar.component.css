@@ -311,12 +311,39 @@ oppia-search-bar .oppia-input-group {
   outline: 0;
 }
 
+@media (max-width: 1511px) {
+  oppia-search-bar .oppia-input-group {
+    width: 40em;
+  }
+}
+
+@media (max-width: 1279px) {
+  oppia-search-bar .oppia-input-group {
+    width: 23.5em;
+  }
+}
+@media (max-width: 1024px) {
+  oppia-search-bar .oppia-input-group {
+    width: 39.5em;
+  }
+}
+
+/* @media (max-width: 1023px) {
+  oppia-search-bar .oppia-input-group {
+    width: em;
+  }
+} */
 @media (max-width: 629px) {
   .oppia-search-bar-category-selector {
     position: relative;
   }
 }
 
+@media (max-width: 1021px) {
+  oppia-search-bar .oppia-input-group {
+    width: 31.5em;
+  }
+}
 /* This rule targets only Firefox browsers. */
 @-moz-document url-prefix() {
   .oppia-search-bar-category-selection-symbol {
@@ -341,19 +368,13 @@ oppia-search-bar .oppia-input-group {
   }
 }
 
-@media (max-width: 1280px) {
-  oppia-search-bar .oppia-input-group {
-    width: 39.5em;
-  }
-}
-
 @media (max-width: 900px) {
   oppia-search-bar .oppia-input-group {
     width: 23.5em;
   }
 }
 
-@media (max-width: 700px) {
+@media (max-width: 750px) {
   oppia-search-bar .oppia-input-group {
     width: 15.5em;
   }

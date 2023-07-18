@@ -1,8 +1,8 @@
 <div class="learner-groups-tab" [ngStyle]="!windowIsNarrow && {'margin-top': '64px'}">
   <div class="learner-of-learner-groups-section">
-    <h3 class="learner-groups-section-heading">
+    <p class="learner-groups-section-heading">
       <span [innerHTML]="'I18N_LEARNER_DASHBOARD_LEARNER_GROUPS_SECTION' | translate"></span>
-    </h3>    
+    </p>    
     <div class="invited-groups-info-summary">
       <div class="learner-groups-heading">
         <span [innerHTML]="'I18N_LEARNER_DASHBOARD_LEARNER_GROUPS_SECTION_INVITATIONS' | translate"></span>
@@ -22,8 +22,7 @@
           </div>
           <div class="oppia-learner-group-summary-card-cta-buttons">
             <div class="learner-group-view-details-button" (click)="viewLearnerGroupDetails(learnerGroupSummary)">
-              <!-- <span [innerHTML]="'I18N_LEARNER_GROUP_VIEW_DETAILS' | translate"></span> -->
-              <span>More Info</span>
+              <span [innerHTML]="'I18N_LEARNER_GROUP_MORE_INFO' | translate"></span>
             </div>
             <div class="oppia-learner-groups-buttons">
               <div class="learner-group-accept-invite-button" (click)="acceptLearnerGroupInvitation(learnerGroupSummary)" >
