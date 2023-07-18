@@ -65,7 +65,6 @@ oppia-collection-summary-tile .total-circle {
 }
 
 oppia-collection-summary-tile .completed-circle {
-  stroke: #00645c;
   stroke-width: 3;
 }
 

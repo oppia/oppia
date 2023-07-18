@@ -27,12 +27,8 @@ import { UserService } from 'services/user.service';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 import { UrlService } from 'services/contextual/url.service';
 import { Subscription } from 'rxjs';
-import { CollectionPlayerBackendApiService } from 'pages/collection-player-page/services/collection-player-backend-api.service';
-import { ReadOnlyCollectionBackendApiService } from 'domain/collection/read-only-collection-backend-api.service';
-import { ReadOnlyExplorationBackendApiService } from 'domain/exploration/read-only-exploration-backend-api.service';
 
 import './collection-summary-tile.component.css';
-import { ChapterProgressSummary } from 'domain/exploration/chapter-progress-summary.model';
 
 @Component({
   selector: 'oppia-collection-summary-tile',
@@ -67,8 +63,7 @@ export class CollectionSummaryTileComponent implements OnInit, OnDestroy {
   buttonIsHovered!: boolean;
   mobileCardToBeShown: boolean = false;
   resizeSubscription!: Subscription;
-  explorationIds: string[] = [];
-  collectionProgress: number;
+  collectionProgress: number = 0;
   // A null value for 'relativeLastUpdatedDateTime' indicates that
   // getLastUpdatedMsecs received after component interactions
   // is empty or does not exist.
@@ -79,12 +74,6 @@ export class CollectionSummaryTileComponent implements OnInit, OnDestroy {
     private userService: UserService,
     private urlInterpolationService: UrlInterpolationService,
     private windowDimensionsService: WindowDimensionsService,
-    private collectionPlayerBackendApiService:
-    CollectionPlayerBackendApiService,
-    private readOnlyCollectionBackendApiService:
-    ReadOnlyCollectionBackendApiService,
-    private readOnlyExplorationBackendApiService:
-    ReadOnlyExplorationBackendApiService,
     private urlService: UrlService
   ) {}
 
@@ -95,33 +84,7 @@ export class CollectionSummaryTileComponent implements OnInit, OnDestroy {
     if (!this.mobileCutoffPx) {
       this.mobileCutoffPx = 0;
     }
-    this.readOnlyCollectionBackendApiService.loadCollectionAsync(
-      this.getCollectionId).then(
-      (collection) => {
-        let explorationIdToNodeIndex =
-        collection.explorationIdToNodeIndexMap;
-        var expIds = [];
-        for (const [key, _] of Object.entries(explorationIdToNodeIndex)) {
-          expIds.push(key);
-        }
 
-        this.readOnlyExplorationBackendApiService.
-          fetchProgressInExplorationsOrChapters(
-            expIds
-          ).then(explorationsProgressSummary => {
-            let explorationsProgress = explorationsProgressSummary;
-
-            if (explorationsProgress.length !== 0) {
-              let progress = 0;
-              for (let i = 0; i < explorationsProgress.length; i++) {
-                progress = progress +
-          this.calculateExplorationProgress(explorationsProgress[i]);
-              }
-              this.collectionProgress =
-              Math.floor(progress / explorationsProgress.length);
-            }
-          });
-      });
     this.checkIfMobileCardToBeShown();
     this.defaultEmptyTitle = CollectionSummaryTileConstants.DEFAULT_EMPTY_TITLE;
     this.activityTypeCollection = AppConstants.ACTIVITY_TYPE_COLLECTION;
@@ -144,18 +107,6 @@ export class CollectionSummaryTileComponent implements OnInit, OnDestroy {
     let currentPageUrl = this.urlService.getPathname();
     this.mobileCardToBeShown = (
       mobileViewActive && (currentPageUrl === '/community-library'));
-  }
-
-  calculateExplorationProgress(
-      explorationProgress: ChapterProgressSummary): number {
-    let totalCheckpoints = explorationProgress.totalCheckpoints;
-    let visitedCheckpoints = explorationProgress.visitedCheckpoints;
-    if ((visitedCheckpoints === 1 || visitedCheckpoints === 0) &&
-    (totalCheckpoints === 1)) {
-      return 0;
-    }
-    let progress = (visitedCheckpoints / totalCheckpoints) * 100;
-    return progress;
   }
 
   getLastUpdatedDatetime(): string {
