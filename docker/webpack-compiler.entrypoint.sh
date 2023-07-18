@@ -13,11 +13,25 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-node \
-$([ "$prod_env" = "true" ] && echo "--max_old_space_size=8192") \
-/app/oppia/node_modules/webpack/bin/webpack.js \
---config \
-$([ "$prod_env" = "true" ] && [ "$source_maps" = "true" ] && echo "/app/oppia/webpack.prod.sourcemap.config.ts") \
-$([ "$prod_env" = "true" ] && [ "$source_maps" != "true" ] && echo "/app/oppia/webpack.prod.config.ts") \
-$([ "$prod_env" != "true" ] && [ "$source_maps" = "true" ] && echo "/app/oppia/webpack.dev.sourcemap.config.ts --watch --color --progress") \
-$([ "$prod_env" != "true" ] && [ "$source_maps" != "true" ] && echo "/app/oppia/webpack.dev.config.ts --watch --color --progress")
+webpack_compiler_cmd="node"
+if [ "$prod_env" = "true" ]; then
+  webpack_compiler_cmd+=" --max_old_space_size=8192"
+fi
+webpack_compiler_cmd+=" /app/oppia/node_modules/webpack/bin/webpack.js \
+--config"
+
+if [ "$prod_env" = "true" ]; then
+  if [ "$source_maps" = "true" ]; then
+    webpack_compiler_cmd+=" /app/oppia/webpack.prod.sourcemap.config.ts"
+  else
+    webpack_compiler_cmd+=" /app/oppia/webpack.prod.config.ts"
+  fi
+else
+  if [ "$source_maps" = "true" ]; then
+    webpack_compiler_cmd+=" /app/oppia/webpack.dev.sourcemap.config.ts --watch --color --progress"
+  else
+    webpack_compiler_cmd+=" /app/oppia/webpack.dev.config.ts --watch --color --progress"
+  fi
+fi
+
+$webpack_compiler_cmd

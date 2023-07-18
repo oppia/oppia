@@ -13,20 +13,37 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-python -m scripts.build \
-$([ "$prod_env" = "true" ] && echo "--prod_env") \
-$([ "$maintenance_mode" = "true" ] && echo "--maintenance_mode") \
-$([ "$source_maps" = "true" ] && echo "--source_maps")
-
-/google-cloud-sdk/bin/dev_appserver.py \
-$([ "$prod_env" = "true" ] && echo "/app/oppia/app.yaml" || echo "/app/oppia/app_dev_docker.yaml") \
+build_cmd="python -m scripts.build"
+dev_appserver_cmd="/google-cloud-sdk/bin/dev_appserver.py \
 --runtime=python38 \
 --host=0.0.0.0 \
 --port=8181 \
 --admin_host=0.0.0.0 \
 --admin_port=8000 \
 --skip_sdk_update_check=true \
-$([ "no_auto_restart" = "true" ] && echo "--automatic_restart=false" || echo "--automatic_restart=true") \
 --log_level=info \
---dev_appserver_log_level=info \
-$([ "$disable_host_checking" != "true" ] && echo "--enable_host_checking")
+--dev_appserver_log_level=info"
+
+if [ "$prod_env" = "true" ]; then
+  build_cmd+=" --prod_env"
+  dev_appserver_cmd+=" /app/oppia/app.yaml"
+else
+  dev_appserver_cmd+=" /app/oppia/app_dev_docker.yaml"
+fi
+if [ "$maintenance_mode" = "true" ]; then
+  build_cmd+=" --maintenance_mode"
+fi
+if [ "$source_maps" = "true" ]; then
+  build_cmd+=" --source_maps"
+fi
+if [ "$disable_host_checking" != "true" ]; then
+  dev_appserver_cmd+=" --enable_host_checking"
+fi
+if [ "$no_auto_restart" = "true" ]; then
+  dev_appserver_cmd+=" --automatic_restart=false"
+else
+  dev_appserver_cmd+=" --automatic_restart=true"
+fi
+
+$build_cmd
+$dev_appserver_cmd

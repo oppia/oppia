@@ -13,11 +13,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-/google-cloud-sdk/bin/gcloud beta \
-emulators datastore start \
+datastore_cmd="/google-cloud-sdk/bin/gcloud beta emulators datastore start \
 --project=dev-project-id \
 --data-dir=/app/cloud_datastore_emulator_cache \
 --host-port=0.0.0.0:8089 \
 --consistency=1.0 \
---quiet \
-$([ "$save_datastore" != "true" ] && echo "--no-store-on-disk")
+--quiet"
+if [ "$save_datastore" != "true" ]; then
+  datastore_cmd+=" --no-store-on-disk"
+fi
+
+$datastore_cmd

@@ -14,5 +14,12 @@
 # limitations under the License.
 
 trap "rm /app/oppia/node_modules/@angular/compiler-cli/ngcc/__ngcc_lock_file__" EXIT
-npx ng build \
-$([ "$prod_env" = "true" ] && echo "--prod" || echo "--watch")
+
+ng_build_cmd="npx ng build"
+if [ "$prod_env" = "true" ]; then
+  ng_build_cmd+=" --prod"
+else
+  ng_build_cmd+=" --watch"
+fi
+
+$ng_build_cmd
