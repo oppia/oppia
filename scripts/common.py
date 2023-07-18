@@ -34,6 +34,7 @@ from urllib import error as urlerror
 from urllib import request as urlrequest
 
 from core import constants
+from core import feconf
 from scripts import servers
 
 from typing import Dict, Final, Generator, List, Optional, Union
@@ -977,6 +978,9 @@ def modify_constants(
         enable_maintenance_mode_variable,
         expected_number_of_replacements=1
     )
+
+    if feconf.OPPIA_IS_DOCKERIZED:
+        return
 
     branch_name_variable = (
         '"BRANCH_NAME": "%s"'
