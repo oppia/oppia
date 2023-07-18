@@ -422,7 +422,7 @@ class DocstringParameterChecker(checkers.BaseChecker):  # type: ignore[misc]
     priority = -2
 
     constructor_names = {'__init__', '__new__'}
-    not_needed_param_in_docstring = {'self', 'cls'}
+    not_needed_param_in_docstring = {'self', 'cls', 'mcs'}
     docstring_sections = {'Raises:', 'Returns:', 'Yields:'}
 
     # Docstring section headers split up into arguments, returns, yields
@@ -470,7 +470,7 @@ class DocstringParameterChecker(checkers.BaseChecker):  # type: ignore[misc]
             node: astroid.scoped_nodes.FunctionDef. Node for a function or
                 method definition in the AST.
         """
-        node_doc = docstrings_checker.docstringify(node.doc)
+        node_doc = docstrings_checker.docstringify(node.doc_node)
         self.check_functiondef_params(node, node_doc)
         self.check_functiondef_returns(node, node_doc)
         self.check_functiondef_yields(node, node_doc)
@@ -598,7 +598,7 @@ class DocstringParameterChecker(checkers.BaseChecker):  # type: ignore[misc]
         if node.name in self.constructor_names:
             class_node = checker_utils.node_frame_class(node)
             if class_node is not None:
-                class_doc = docstrings_checker.docstringify(class_node.doc)
+                class_doc = docstrings_checker.docstringify(class_node.doc_node)
                 self.check_single_constructor_params(
                     class_doc, node_doc, class_node)
 
@@ -990,8 +990,8 @@ class DocstringParameterChecker(checkers.BaseChecker):  # type: ignore[misc]
             if setters_property:
                 func_node = setters_property
 
-        doc = docstrings_checker.docstringify(func_node.doc)
-        if not doc.is_valid():
+        doc = docstrings_checker.docstringify(func_node.doc_node)
+        if doc.matching_sections() == 0:
             if doc.doc:
                 self._handle_no_raise_doc(expected_excs, func_node)
             return
@@ -1015,8 +1015,8 @@ class DocstringParameterChecker(checkers.BaseChecker):  # type: ignore[misc]
 
         func_node = node.frame()
 
-        doc = docstrings_checker.docstringify(func_node.doc)
-        if not doc.is_valid() and self.config.accept_no_return_doc:
+        doc = docstrings_checker.docstringify(func_node.doc_node)
+        if doc.matching_sections() == 0 and self.config.accept_no_return_doc:
             return
 
         is_property = checker_utils.decorated_with_property(func_node)
@@ -1047,8 +1047,8 @@ class DocstringParameterChecker(checkers.BaseChecker):  # type: ignore[misc]
         """
         func_node = node.frame()
 
-        doc = docstrings_checker.docstringify(func_node.doc)
-        if not doc.is_valid() and self.config.accept_no_yields_doc:
+        doc = docstrings_checker.docstringify(func_node.doc_node)
+        if doc.matching_sections() == 0 and self.config.accept_no_yields_doc:
             return
 
         doc_has_yields = doc.has_yields()
@@ -2866,21 +2866,21 @@ class DisallowHandlerWithoutSchema(checkers.BaseChecker):  # type: ignore[misc]
 
         if 'URL_PATH_ARGS_SCHEMAS' not in node.locals:
             self.add_message(
-                'no-schema-for-url-path-elements', node=node, args=(node.name))
+                'no-schema-for-url-path-elements', node=node, args=node.name)
         elif not self.check_given_variable_is_a_dict(
                 node, 'URL_PATH_ARGS_SCHEMAS'):
             self.add_message(
                 'url-path-args-schemas-must-be-dict',
-                node=node, args=(node.name))
+                node=node, args=node.name)
 
         if 'HANDLER_ARGS_SCHEMAS' not in node.locals:
             self.add_message(
-                'no-schema-for-handler-args', node=node, args=(node.name))
+                'no-schema-for-handler-args', node=node, args=node.name)
         elif not self.check_given_variable_is_a_dict(
                 node, 'HANDLER_ARGS_SCHEMAS'):
             self.add_message(
                 'handler-args-schemas-must-be-dict',
-                node=node, args=(node.name))
+                node=node, args=node.name)
 
 
 # TODO(#16567): Here we use MyPy ignore because of the incomplete typing of

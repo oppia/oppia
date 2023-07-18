@@ -76,7 +76,7 @@ class JobMetaclass(type):
     _JOB_REGISTRY: Dict[str, Type[JobBase]] = {}
 
     def __new__(
-            cls: Type[JobMetaclass],
+            mcs: Type[JobMetaclass],
             name: str,
             bases: Tuple[type, ...],
             namespace: Dict[str, str]
@@ -108,12 +108,12 @@ class JobMetaclass(type):
             TypeError. The given name must end with "Job".
             TypeError. The class with the given name must inherit from JobBase.
         """
-        if name in cls._JOB_REGISTRY:
-            collision = cls._JOB_REGISTRY[name]
+        if name in mcs._JOB_REGISTRY:
+            collision = mcs._JOB_REGISTRY[name]
             raise TypeError('%s name is already used by %s.%s' % (
                 name, collision.__module__, name))
 
-        job_cls = super(JobMetaclass, cls).__new__(cls, name, bases, namespace)
+        job_cls = super(JobMetaclass, mcs).__new__(mcs, name, bases, namespace)
 
         # Here we use cast because the return value of '__new__' method
         # is 'type' but we want to return a more narrower type 'JobMetaclass'.
@@ -127,7 +127,7 @@ class JobMetaclass(type):
                 if not name.endswith('Job'):
                     raise TypeError('Job name "%s" must end with "Job"' % name)
 
-                cls._JOB_REGISTRY[name] = job_cls
+                mcs._JOB_REGISTRY[name] = job_cls
 
             else:
                 raise TypeError('%s must inherit from JobBase' % name)
@@ -139,26 +139,26 @@ class JobMetaclass(type):
         return cast(JobMetaclass, job_cls)
 
     @classmethod
-    def get_all_jobs(cls) -> List[Type[JobBase]]:
+    def get_all_jobs(mcs) -> List[Type[JobBase]]:
         """Returns all jobs that have inherited from the JobBase class.
 
         Returns:
             list(class). The classes that have inherited from JobBase.
         """
-        return list(cls._JOB_REGISTRY.values())
+        return list(mcs._JOB_REGISTRY.values())
 
     @classmethod
-    def get_all_job_names(cls) -> List[str]:
+    def get_all_job_names(mcs) -> List[str]:
         """Returns the names of all jobs that have inherited from the JobBase
         class.
 
         Returns:
             list(str). The names of all classes that hae inherited from JobBase.
         """
-        return list(cls._JOB_REGISTRY.keys())
+        return list(mcs._JOB_REGISTRY.keys())
 
     @classmethod
-    def get_job_class_by_name(cls, job_name: str) -> Type[JobBase]:
+    def get_job_class_by_name(mcs, job_name: str) -> Type[JobBase]:
         """Returns the class associated with the given job name.
 
         Args:
@@ -170,9 +170,9 @@ class JobMetaclass(type):
         Raises:
             ValueError. Given job name is not registered as a job.
         """
-        if job_name not in cls._JOB_REGISTRY:
+        if job_name not in mcs._JOB_REGISTRY:
             raise ValueError('%s is not registered as a job' % job_name)
-        return cls._JOB_REGISTRY[job_name]
+        return mcs._JOB_REGISTRY[job_name]
 
 
 class JobBase(metaclass=JobMetaclass):

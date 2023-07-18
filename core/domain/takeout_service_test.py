@@ -2173,13 +2173,13 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
                 'user_settings_profile_picture.webp')
         ]
         self.assertEqual(len(expected_images), len(observed_images))
-        for i, _ in enumerate(expected_images):
+        for i, expected_image in enumerate(expected_images):
             self.assertEqual(
-                expected_images[i].b64_image_data,
+                expected_image.b64_image_data,
                 observed_images[i].b64_image_data
             )
             self.assertEqual(
-                expected_images[i].image_export_path,
+                expected_image.image_export_path,
                 observed_images[i].image_export_path
             )
 

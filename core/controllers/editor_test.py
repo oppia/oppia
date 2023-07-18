@@ -3579,7 +3579,7 @@ class ImageUploadHandlerTests(BaseEditorControllerTests):
             upload_files=[('image', 'unused_filename', b'')]
         )
 
-        error_msg = ('No image supplied')
+        error_msg = 'No image supplied'
         self.assertEqual(response['error'], error_msg)
 
         # Check that the file is not uploaded.

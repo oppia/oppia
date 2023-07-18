@@ -29,7 +29,8 @@ from core.domain import param_domain
 from core.platform import models
 from core.tests import test_utils
 
-from typing import Callable, Final, OrderedDict
+import elasticsearch
+from typing import Callable, Final, List, OrderedDict, Tuple
 import webapp2
 
 email_services = models.Registry.import_email_services()
@@ -201,6 +202,12 @@ class AuthServicesStubTests(test_utils.GenericTestBase):
     def test_get_association_that_is_missing(self) -> None:
         self.assertIsNone(self.stub.get_user_id_from_auth_id('does_not_exist'))
         self.assertIsNone(self.stub.get_auth_id_from_user_id('does_not_exist'))
+
+    def test_fail_to_get_deleted_association(self) -> None:
+        self.stub.associate_auth_id_with_user_id(auth_domain.AuthIdUserIdPair(
+            'aid', 'uid'))
+        self.stub.mark_user_for_deletion('uid')
+        self.assertIsNone(self.stub.get_user_id_from_auth_id('aid'))
 
     def test_get_multi_associations_with_all_present(self) -> None:
         self.stub.associate_auth_id_with_user_id(auth_domain.AuthIdUserIdPair(
@@ -652,6 +659,20 @@ class TestUtilsTests(test_utils.GenericTestBase):
         ):
             test_utils.mock_load_template('invalid_path')
 
+    def test_raises_error_if_multiple_file_paths_found(self) -> None:
+        def mock_walk(_: str) -> List[Tuple[str, List[str], List[str]]]:
+            return [
+                ('page-dir-1', [], ['duplicate_file.ts']),
+                ('page-dir-2', [], ['duplicate_file.ts']),
+            ]
+        walk_swap = self.swap_with_checks(
+            os, 'walk', mock_walk, expected_args=[('core/templates/pages',)])
+        with self.assertRaisesRegex(
+            Exception, 'Multiple files found with name: duplicate_file.ts'
+        ):
+            with walk_swap:
+                test_utils.mock_load_template('duplicate_file.ts')
+
     def test_raises_error_if_no_user_name_exists_with_strict_true(self) -> None:
         with self.assertRaisesRegex(
             Exception, 'No user_id found for the given email address'
@@ -659,6 +680,73 @@ class TestUtilsTests(test_utils.GenericTestBase):
             self.get_user_id_from_email(
                 'invalidemail@gmail.com'
             )
+
+    def test_assert_matches_regexps_error_diff_num_expressions(self) -> None:
+        with self.assertRaisesRegex(
+            AssertionError, 'missing item expected to match: \'1\''
+        ):
+            self.assert_matches_regexps([], ['1'])
+
+        with self.assertRaisesRegex(
+            AssertionError, 'extra item \'1\''
+        ):
+            self.assert_matches_regexps(['1'], [])
+
+
+class CheckImagePngOrWebpTests(test_utils.GenericTestBase):
+
+    def test_png_image_yields_true(self) -> None:
+        self.assertTrue(test_utils.check_image_png_or_webp('data:image/png'))
+
+    def test_webp_image_yields_true(self) -> None:
+        self.assertTrue(test_utils.check_image_png_or_webp('data:image/webp'))
+
+    def test_jpeg_image_yields_false(self) -> None:
+        self.assertFalse(test_utils.check_image_png_or_webp('data:image/jpeg'))
+
+
+class ElasticSearchStubTests(test_utils.GenericTestBase):
+
+    def test_duplicate_index_yields_error(self) -> None:
+        stub = test_utils.ElasticSearchStub()
+        stub.mock_create_index('index1')
+        stub.mock_create_index('index2')
+        with self.assertRaisesRegex(
+            elasticsearch.RequestError,
+            r'RequestError\(400, \'resource_already_exists_exception\'\)',
+        ):
+            stub.mock_create_index('index1')
+
+    def test_delete_from_missing_index_yields_error(self) -> None:
+        stub = test_utils.ElasticSearchStub()
+        with self.assertRaisesRegex(
+            elasticsearch.NotFoundError,
+            (
+                r'NotFoundError\(404, \'index_not_found_exception\', '
+                r'\'no such index \[index1\]\', index1, index_or_alias\)'
+            ),
+        ):
+            stub.mock_delete('index1', 'some_id')
+
+    def test_delete_missing_doc_yields_error(self) -> None:
+        stub = test_utils.ElasticSearchStub()
+        stub.mock_create_index('index1')
+        with self.assertRaisesRegex(
+            elasticsearch.NotFoundError,
+            r'NotFoundError\(404,',
+        ):
+            stub.mock_delete('index1', 'doc_id')
+
+    def test_delete_by_query_with_missing_index_yields_error(self) -> None:
+        stub = test_utils.ElasticSearchStub()
+        with self.assertRaisesRegex(
+            elasticsearch.NotFoundError,
+            (
+                r'NotFoundError\(404, \'index_not_found_exception\', '
+                r'\'no such index \[index1\]\', index1, index_or_alias\)'
+            ),
+        ):
+            stub.mock_delete_by_query('index1', {'query': {'match_all': {}}})
 
 
 class EmailMockTests(test_utils.EmailTestBase):

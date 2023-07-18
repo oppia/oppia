@@ -2661,7 +2661,7 @@ class UpdateBlogPostHandlerTest(test_utils.GenericTestBase):
             csrf_token=csrf_token,
             expected_status_int=400)
 
-        error_msg = ('Invalid username: someusername')
+        error_msg = 'Invalid username: someusername'
         self.assertEqual(response['error'], error_msg)
 
     def test_update_blog_post_with_wrong_blog_post_id_raises_error(
@@ -2696,7 +2696,7 @@ class UpdateBlogPostHandlerTest(test_utils.GenericTestBase):
             csrf_token=csrf_token,
             expected_status_int=400)
 
-        error_msg = ('User does not have enough rights to be blog post author.')
+        error_msg = 'User does not have enough rights to be blog post author.'
         self.assertEqual(response['error'], error_msg)
 
     def test_update_blog_post_with_invalid_date_format(self) -> None:

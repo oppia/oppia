@@ -211,7 +211,6 @@ def run_webpack_compilation(source_maps: bool = False) -> None:
         except subprocess.CalledProcessError as error:
             print(error.output)
             sys.exit(error.returncode)
-            return
         if os.path.isdir(webpack_bundles_dir_name):
             break
     else:
@@ -1415,6 +1414,7 @@ def generate_python_package() -> None:
         subprocess.check_call('python setup.py -q sdist -d build', shell=True)
         print('Oppia package build completed.')
     finally:
+        install_python_dev_dependencies.install_installation_tools()
         install_third_party_libs.main()
         print('Dev dependencies reinstalled')
 

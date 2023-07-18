@@ -6,7 +6,7 @@
 init-hook='import sys; sys.path.append(".")'
 
 # Checks for correct docstring style
-load-plugins=pylint.extensions.docstyle, pylint_quotes, scripts.linters.pylint_extensions
+load-plugins=pylint.extensions.docstyle, pylint_quotes, scripts.linters.pylint_extensions, pylint.extensions.bad_builtin
 
 string-quote=single
 triple-quote=double
@@ -45,13 +45,18 @@ module-rgx=[A-Za-z_][A-Za-z0-9_]*$
 # not require a docstring.
 no-docstring-rgx=test_[a-z_]*|[A-Za-z]*Tests|Mock[A-Za-z]*|mock_[a-z_]*|setUp|tearDown|__.*__
 
+# We allow more flexible type names than pylint normally allows. We allow
+# CamelCased types, with an optional underscore prefix. Pylint normally
+# prohibits type names from ending in 'Type'.
+typevar-rgx=_?([A-Z][a-z0-9]+)+
+
 [DESIGN]
 
 # Minimum number of public methods for a class (see R0903).
 min-public-methods=0
 
 # List of builtin function names that should not be used, separated by a comma
-bad-functions=apply,input
+bad-functions=apply
 
 [FORMAT]
 
@@ -121,15 +126,11 @@ disable=abstract-method,
         fixme,
         inconsistent-return-statements,
         len-as-condition,
-        locally-disabled,
-        locally-enabled,
         logging-not-lazy,
         multiple-constructor-doc,
         no-else-return,
         no-member,
-        no-self-use,
         not-context-manager,
-        redefined-variable-type,
         redundant-returns-doc,
 # TODO(#12912): Python interpreter migration to 3.8.15 causing failing lint check. Fix it later.
         redundant-u-string-prefix,
@@ -144,11 +145,9 @@ disable=abstract-method,
         too-many-statements,
         wrong-import-order,
 # TODO(#12912): Remove these after the Python 3 migration.
-        arg-name-for-non-keyword-arg,
         arguments-renamed,
         consider-using-with,
         import-outside-toplevel,
-        non-explicit-keyword-args,
         not-an-iterable,
         unnecessary-pass,
         consider-using-f-string,
@@ -158,6 +157,8 @@ disable=abstract-method,
         # broken by putting imports inside functions so they aren't
         # executed upon module import.
         cyclic-import,
+        broad-exception-raised,
+        unnecessary-lambda-assignment,
 
 [REPORTS]
 

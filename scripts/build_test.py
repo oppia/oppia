@@ -1262,7 +1262,22 @@ class E2EAndAcceptanceBuildTests(test_utils.GenericTestBase):
             build, 'main', lambda *_, **__: None,
             expected_kwargs=[{'args': []}]))
         self.exit_stack.enter_context(self.swap_with_checks(
-            sys, 'exit', lambda _: None, expected_args=[(return_code,)]))
+            sys, 'exit', lambda _: None,
+            expected_args=[
+                # When the code under test runs, the first sys.exit call halts
+                # execution. However, when this test runs, sys.exit is mocked
+                # and so does not interrupt the execution flow. Therefore we
+                # call sys.exit with the error code from the webpack compilation
+                # process (2) 5 times (the maximum number of attempts allowed to
+                # compile webpack) and then exit with code 1 after giving up
+                # trying to compile webpack.
+                (return_code,),
+                (return_code,),
+                (return_code,),
+                (return_code,),
+                (return_code,),
+                (1,),
+            ]))
 
         build.build_js_files(True)
 

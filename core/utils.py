@@ -1438,8 +1438,6 @@ def url_open(
     Returns:
         urlopen. The 'urlopen' object.
     """
-    # TODO(#12912): Remove pylint disable after the arg-name-for-non-keyword-arg
-    # check is refactored.
     context = ssl.create_default_context(cafile=certifi.where())
     return urllib.request.urlopen(source_url, context=context)
 

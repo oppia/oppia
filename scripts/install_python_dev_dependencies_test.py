@@ -53,7 +53,10 @@ class InstallPythonDevDependenciesTests(test_utils.GenericTestBase):
             yield
         finally:
             if had_attribute:
-                setattr(sys, 'real_prefix', original)
+                # Pylint doesn't recognize that if we reach this part of the
+                # code, then had_attribute is True, which means that we did set
+                # `original` above.
+                setattr(sys, 'real_prefix', original)  # pylint: disable=used-before-assignment
             else:
                 delattr(sys, 'real_prefix')
 
@@ -111,9 +114,9 @@ class InstallPythonDevDependenciesTests(test_utils.GenericTestBase):
 
     def test_install_installation_tools(self) -> None:
         expected_tools = {
-            'pip': '22.1.1',
-            'pip-tools': '6.6.2',
-            'setuptools': '58.5.3',
+            'pip': '23.1.2',
+            'pip-tools': '6.13.0',
+            'setuptools': '67.7.1',
         }
         installed_tools: Dict[str, str] = {}
 

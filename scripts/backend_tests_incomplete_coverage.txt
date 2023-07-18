@@ -85,6 +85,7 @@ core.storage.collection.gae_models_test
 core.storage.exploration.gae_models_test
 core.storage.question.gae_models_test
 core.storage.topic.gae_models_test
+core.tests.test_utils_test
 core.utils_test
 main_test
 scripts.build_test

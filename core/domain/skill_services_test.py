@@ -273,7 +273,15 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
                         '1': {}, '2': {}, '3': {}
                     }
                 })
-            )
+            ),
+            rubrics=[
+                skill_domain.Rubric(
+                    constants.SKILL_DIFFICULTIES[0], ['Explanation 1']),
+                skill_domain.Rubric(
+                    constants.SKILL_DIFFICULTIES[1], ['Explanation 2']),
+                skill_domain.Rubric(
+                    constants.SKILL_DIFFICULTIES[2], ['Explanation 3']),
+            ],
         )
         self.save_new_skill(
             'skill_id_2', self.user_id_admin, description='Description 2',
