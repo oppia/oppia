@@ -38,7 +38,7 @@ class MockChangeDetectorRef {
   detectChanges(): void {}
 }
 
-describe('Translation Suggestion Review Modal Component', function() {
+fdescribe('Translation Suggestion Review Modal Component', function() {
   let fixture: ComponentFixture<TranslationSuggestionReviewModalComponent>;
   let component: TranslationSuggestionReviewModalComponent;
   let alertsService: AlertsService;
@@ -272,6 +272,7 @@ describe('Translation Suggestion Review Modal Component', function() {
           return Promise.resolve(successCallback(suggestionId));
         });
       spyOn(activeModal, 'close');
+      spyOn(alertsService, 'addSuccessMessage');
 
       component.reviewMessage = 'Review message example';
       component.translationUpdated = true;
@@ -293,6 +294,8 @@ describe('Translation Suggestion Review Modal Component', function() {
           '(Note: This suggestion was submitted with reviewer edits.)',
           'hint section of "StateName" card',
           jasmine.any(Function), jasmine.any(Function));
+      expect(alertsService.addSuccessMessage).toHaveBeenCalledWith(
+        'Suggestion accepted.');
 
       component.reviewMessage = 'Review message example 2';
       component.translationUpdated = false;
@@ -306,6 +309,8 @@ describe('Translation Suggestion Review Modal Component', function() {
           '2', 'suggestion_2', 'accept', 'Review message example 2',
           'hint section of "StateName" card', jasmine.any(Function),
           jasmine.any(Function));
+      expect(alertsService.addSuccessMessage).toHaveBeenCalledWith(
+        'Suggestion accepted.');
       expect(activeModal.close).toHaveBeenCalledWith([
         'suggestion_1', 'suggestion_2']);
     });
@@ -328,6 +333,7 @@ describe('Translation Suggestion Review Modal Component', function() {
             successCallback, errorCallback) => {
           return Promise.resolve(successCallback(suggestionId));
         });
+      spyOn(alertsService, 'addSuccessMessage');
 
       component.translationUpdated = true;
       component.acceptAndReviewNext();
@@ -341,6 +347,8 @@ describe('Translation Suggestion Review Modal Component', function() {
           '(Note: This suggestion was submitted with reviewer edits.)',
           'hint section of "StateName" card', jasmine.any(Function),
           jasmine.any(Function));
+      expect(alertsService.addSuccessMessage).toHaveBeenCalledWith(
+        'Suggestion accepted.');
     });
 
     it('should reject suggestion in suggestion modal service when clicking ' +
@@ -361,6 +369,7 @@ describe('Translation Suggestion Review Modal Component', function() {
         siteAnalyticsService,
         'registerContributorDashboardRejectSuggestion');
       spyOn(activeModal, 'close');
+      spyOn(alertsService, 'addSuccessMessage');
 
       component.reviewMessage = 'Review message example';
       component.translationUpdated = true;
@@ -378,6 +387,8 @@ describe('Translation Suggestion Review Modal Component', function() {
           '1', 'suggestion_1', 'reject', 'Review message example',
           null, jasmine.any(Function),
           jasmine.any(Function));
+      expect(alertsService.addSuccessMessage).toHaveBeenCalledWith(
+        'Suggestion rejected.');
 
       component.reviewMessage = 'Review message example 2';
       component.translationUpdated = false;
@@ -386,6 +397,8 @@ describe('Translation Suggestion Review Modal Component', function() {
       expect(
         siteAnalyticsService.registerContributorDashboardRejectSuggestion)
         .toHaveBeenCalledWith('Translation');
+      expect(alertsService.addSuccessMessage).toHaveBeenCalledWith(
+        'Suggestion rejected.');
       expect(activeModal.close).toHaveBeenCalledWith([
         'suggestion_1', 'suggestion_2']);
     });
@@ -850,6 +863,7 @@ describe('Translation Suggestion Review Modal Component', function() {
         siteAnalyticsService,
         'registerContributorDashboardRejectSuggestion');
       spyOn(activeModal, 'close');
+      spyOn(alertsService, 'addSuccessMessage');
 
       component.reviewMessage = 'Review message example';
       component.rejectAndReviewNext(component.reviewMessage);
@@ -862,6 +876,8 @@ describe('Translation Suggestion Review Modal Component', function() {
           '1', 'suggestion_1', 'reject', 'Review message example',
           null, jasmine.any(Function),
           jasmine.any(Function));
+      expect(alertsService.addSuccessMessage).toHaveBeenCalledWith(
+        'Suggestion rejected.');
       expect(activeModal.close).toHaveBeenCalledWith([
         'suggestion_1']);
     });

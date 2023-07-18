@@ -433,7 +433,10 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
       this.activeSuggestion.target_id, this.activeSuggestionId,
       AppConstants.ACTION_ACCEPT_SUGGESTION,
       reviewMessageForSubmitter, this.finalCommitMessage,
-      this.resolveSuggestionAndUpdateModal.bind(this),
+      () => {
+        this.alertsService.addSuccessMessage('Suggestion accepted.');
+        this.resolveSuggestionAndUpdateModal();
+      },
       (errorMessage) => {
         this.rejectAndReviewNext(`Invalid Suggestion: ${errorMessage}`);
         this.alertsService.clearWarnings();
@@ -455,7 +458,10 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
         this.activeSuggestion.target_id, this.activeSuggestionId,
         AppConstants.ACTION_REJECT_SUGGESTION,
         reviewMessage || this.reviewMessage, null,
-        this.resolveSuggestionAndUpdateModal.bind(this),
+        () => {
+          this.alertsService.addSuccessMessage('Suggestion rejected.');
+          this.resolveSuggestionAndUpdateModal();
+        },
         (error) => {
           this.alertsService.clearWarnings();
           this.alertsService.addWarning(
