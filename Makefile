@@ -1,8 +1,8 @@
 SHELL_PREFIX=docker-compose exec -e
-ALL_SERVICES = datastore dev-server firebase elasticsearch webpack-compiler angular-build
+ALL_SERVICES = datastore dev-server firebase elasticsearch webpack-compiler angular-build redis
 
 FLAGS = save_datastore disable_host_checking no_auto_restart prod_env maintenance_mode source_maps
-$(foreach flag, $(FLAGS), $(eval $(flag) = true))
+$(foreach flag, $(FLAGS), $(eval $(flag) = false))
 
 # Parameters ##################################################################
 #
