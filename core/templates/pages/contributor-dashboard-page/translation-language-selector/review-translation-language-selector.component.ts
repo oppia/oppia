@@ -50,7 +50,7 @@ export class ReviewTranslationLanguageSelectorComponent implements OnInit {
   options!: Options[];
   filteredOptions: Options[] = [];
   optionsFilter: string = '';
-  languageSelection!: string;
+  languageSelection: string = 'Language';
   languageIdToDescription: {[id: string]: string} = {};
 
   dropdownShown = false;
@@ -69,11 +69,13 @@ export class ReviewTranslationLanguageSelectorComponent implements OnInit {
         this.languageSelection = this.languageIdToDescription[
           this.translationLanguageService.getActiveLanguageCode()];
       });
+
     this.userService.getUserContributionRightsDataAsync()
       .then(userContributionRights => {
         if (!userContributionRights) {
           throw new Error('User contribution rights not found.');
         }
+
         this.filteredOptions = this.options = userContributionRights
           .can_review_translation_for_language_codes.map(languageCode => {
             const description = this.languageUtilService
@@ -81,14 +83,12 @@ export class ReviewTranslationLanguageSelectorComponent implements OnInit {
             this.languageIdToDescription[languageCode] = description;
             return { id: languageCode, description };
           });
-      });
 
-    this.languageSelection = (
-      Object.keys(this.languageIdToDescription).length > 0 && (
-        this.activeLanguageCode) ?
-      this.languageIdToDescription[this.activeLanguageCode] :
-      'Language'
-    );
+        if (this.activeLanguageCode) {
+          this.languageSelection = this.languageIdToDescription[
+            this.activeLanguageCode];
+        }
+      });
 
     this.contributionOpportunitiesBackendApiService
       .getPreferredTranslationLanguageAsync()

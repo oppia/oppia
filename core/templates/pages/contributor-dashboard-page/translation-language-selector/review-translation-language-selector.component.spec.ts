@@ -123,20 +123,28 @@ describe('Review Translation language selector', () => {
       fixture.detectChanges();
     }));
 
-    it('should correctly initialize languageIdToDescription map', () => {
-      expect(component.languageIdToDescription.en).toBe('English');
-      expect(component.languageIdToDescription.fr).toBe('français (French)');
+    it('should initialize languageIdToDescription map to user\'s reviewable ' +
+      'languages', () => {
+      const reviewableLanguageDescriptions = {
+        en: 'English',
+        es: 'español (Spanish)',
+        fr: 'français (French)'
+      };
+
+      expect(component.languageIdToDescription).toEqual(
+        reviewableLanguageDescriptions);
     });
 
-    it('should correctly initialize dropdown activeLanguageCode', () => {
-      const dropdown = (
-        fixture.nativeElement.querySelector(
-          '.oppia-review-translation-language-selector-inner-container'));
+    it('should initialize selected language to activeLanguageCode input',
+      () => {
+        const dropdown = (
+          fixture.nativeElement.querySelector(
+            '.oppia-review-translation-language-selector-inner-container'));
 
-      expect(dropdown.firstChild.textContent.trim()).toBe('English');
-    });
+        expect(dropdown.firstChild.textContent.trim()).toBe('English');
+      });
 
-    it('should only show language options that the user can review' +
+    it('should only show language options for which the user can review' +
       ' translations', () => {
       expect(component.options.map(opt => opt.id)).toEqual(
         translationReviewerLanguageCodes);
@@ -158,19 +166,25 @@ describe('Review Translation language selector', () => {
       clickDropdown();
       expect(component.dropdownShown).toBe(true);
       expect(getDropdownOptionsContainer()).toBeTruthy();
+    }));
 
-      let fakeClickAwayEvent = new MouseEvent('click');
+    it('should be hide the dropdown when open and the user clicks outside' +
+      'the dropdown', () => {
+      const fakeClickAwayEvent = new MouseEvent('click');
       Object.defineProperty(
         fakeClickAwayEvent,
         'target',
         {value: document.createElement('div')});
+      component.dropdownShown = true;
+
       component.onDocumentClick(fakeClickAwayEvent);
       fixture.detectChanges();
+
       expect(component.dropdownShown).toBe(false);
       expect(getDropdownOptionsContainer()).toBeFalsy();
-    }));
+    });
 
-    it('should correctly select and indicate selection of an option', () => {
+    it('should set active language code to selected option', () => {
       spyOn(component.setActiveLanguageCode, 'emit');
 
       component.selectOption('fr');
@@ -217,7 +231,7 @@ describe('Review Translation language selector', () => {
       ' language is not defined', fakeAsync(() => {
       preferredLanguageCode = '';
       component.activeLanguageCode = null;
-      component.languageSelection = '';
+      component.languageSelection = 'Language';
 
       component.ngOnInit();
 
