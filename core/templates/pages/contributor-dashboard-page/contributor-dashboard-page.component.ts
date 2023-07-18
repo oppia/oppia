@@ -29,7 +29,6 @@ import { LocalStorageService } from 'services/local-storage.service';
 import { TranslationLanguageService } from 'pages/exploration-editor-page/translation-tab/services/translation-language.service';
 import { TranslationTopicService } from 'pages/exploration-editor-page/translation-tab/services/translation-topic.service';
 import { UserService } from 'services/user.service';
-import { WindowRef } from 'services/contextual/window-ref.service';
 
 @Component({
   selector: 'contributor-dashboard-page',
@@ -68,7 +67,6 @@ export class ContributorDashboardPageComponent
     private translationTopicService: TranslationTopicService,
     private urlInterpolationService: UrlInterpolationService,
     private userService: UserService,
-    private windowRef: WindowRef,
   ) {}
 
   onTabClick(activeTabName: string): void {
@@ -122,14 +120,6 @@ export class ContributorDashboardPageComponent
       );
   }
 
-  scrollFunction(): void {
-    if (this.windowRef.nativeWindow.pageYOffset >= 80) {
-      this.defaultHeaderVisible = false;
-    } else {
-      this.defaultHeaderVisible = true;
-    }
-  }
-
   getLanguageDescriptions(languageCodes: string[]): string[] {
     const languageDescriptions: string[] = [];
     languageCodes.forEach((languageCode) => {
@@ -152,10 +142,6 @@ export class ContributorDashboardPageComponent
 
     const prevSelectedTopicName = (
       this.localStorageService.getLastSelectedTranslationTopicName());
-
-    this.windowRef.nativeWindow.addEventListener('scroll', () => {
-      this.scrollFunction();
-    });
 
     this.userService.getUserContributionRightsDataAsync().then(
       (userContributionRights) => {
