@@ -69,6 +69,9 @@ CONTRIBUTOR_USERNAME: Final = 'b'
 CLASSROOM_NAME: Final = 'math'
 CLASSROOM_URL_FRAGMENT: Final = 'math'
 
+# Timeout for requests in seconds.
+TIMEOUT_SECS = 60
+
 
 class SampleDataInitializer:
     """Contains functions that populate sample data by sending requests to the
@@ -148,7 +151,8 @@ class SampleDataInitializer:
             json={
                 'email': email,
                 'password': password
-            }
+            },
+            timeout=TIMEOUT_SECS,
         ).json()['idToken']
 
         return str(token_id)
@@ -169,7 +173,8 @@ class SampleDataInitializer:
             json={
                 'email': email,
                 'password': password
-            }
+            },
+            timeout=TIMEOUT_SECS,
         ).json()['idToken']
 
         return str(token_id)
