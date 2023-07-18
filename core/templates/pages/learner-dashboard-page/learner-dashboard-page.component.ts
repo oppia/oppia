@@ -37,6 +37,7 @@ import { AlertsService } from 'services/alerts.service';
 import { DateTimeFormatService } from 'services/date-time-format.service';
 import { LoaderService } from 'services/loader.service';
 import { UserService } from 'services/user.service';
+import { PlatformFeatureService } from 'services/platform-feature.service';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
 import { StorySummary } from 'domain/story/story-summary.model';
 import { LearnerTopicSummary } from 'domain/topic/learner-topic-summary.model';
@@ -137,6 +138,7 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
   progressImageUrl: string = '';
   windowIsNarrow: boolean = false;
   directiveSubscriptions = new Subscription();
+  SHOW_REDESIGNED_LEARNER_DASHBOARD: boolean = false;
   LEARNER_GROUP_FEATURE_IS_ENABLED: boolean = false;
 
   constructor(
@@ -150,6 +152,7 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
     private loaderService: LoaderService,
     private suggestionModalForLearnerDashboardService:
       SuggestionModalForLearnerDashboardService,
+    private platformFeatureService: PlatformFeatureService,
     private threadStatusDisplayService: ThreadStatusDisplayService,
     private urlInterpolationService: UrlInterpolationService,
     private userService: UserService,
@@ -260,6 +263,12 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.directiveSubscriptions.unsubscribe();
+  }
+
+  isShowRedesignedLearnerDashboardFeatureFlagEnable(): boolean {
+    return (
+      this.platformFeatureService.status.
+        ShowRedesignedLearnerDashboard.isEnabled);
   }
 
   getauthorPicturePngDataUrl(username: string): string {

@@ -1,4 +1,28 @@
-<mat-card class="oppia-topic-dashboard-card">
+<mat-card class="oppia-topic-dashboard-card" *ngIf="!displayAreaIsLearnerDashboard">
+  <a [href]="getTopicLink()"
+     target="{{ openInNewWindow ? '_blank' : '_self' }}"
+     class="oppia-topic-link">
+    <div class="oppia-title-section" [ngStyle]="{'background-color': thumbnailBgColor}">
+      <!-- We add an empty alt text so that the screen reader does not read the thumbnail image filename and ignores it as the thumbnail does not convey any significant information. -->
+      <img alt="" class="oppia-thumbnail-image" [src]="thumbnailUrl">
+    </div>
+    <div class="oppia-summary-section">
+      <span class="oppia-topic-title e2e-test-learner-topic-summary-tile-title">
+        {{topicTitle}}
+      </span>
+      <div class="oppia-topic-lessons">
+        {{totalPublishedNodeCount}}
+        <div *ngIf="totalPublishedNodeCount === 1" class="lesson-title">
+          <span translate="I18N_TOPIC_VIEWER_LESSON"></span>
+        </div>
+        <div *ngIf="totalPublishedNodeCount !== 1" class="lesson-title">
+          <span translate="I18N_TOPIC_VIEWER_LESSONS"></span>
+        </div>
+      </div>
+    </div>
+  </a>
+</mat-card>
+<mat-card class="new-oppia-topic-dashboard-card" *ngIf="displayAreaIsLearnerDashboard">
   <a [href]="getTopicLink()"
      target="{{ openInNewWindow ? '_blank' : '_self' }}"
      class="oppia-topic-link">
@@ -28,13 +52,14 @@
   }
   .oppia-topic-dashboard-card .oppia-topic-lessons {
     font-size: 14px;
+    font-style: italic;
     left: -1px;
     position: relative;
-    top: 0px;
+    top: 53px;
   }
   .oppia-topic-dashboard-card .oppia-summary-section {
     color: #fff;
-    padding: 15px 15px 0px 15px;
+    padding: 8px;
     position: absolute;
   }
   .oppia-topic-dashboard-card .lesson-title {
@@ -42,8 +67,8 @@
   }
   .oppia-topic-dashboard-card .oppia-topic-title {
     display: block;
-    font-size: 16px;
-    font-weight: 700;
+    font-size: 14px;
+    font-weight: 500;
     height: 16px;
     letter-spacing: 0.25px;
     text-align: left;
@@ -53,19 +78,67 @@
     background-color: #205d86;
     border-radius: 4px;
     display: inline-block;
+    height: 210px;
+    margin: 0 2px 30px 0;
+    padding: 0;
+    position: relative;
+    width: 148px;
+    z-index: 5;
+  }
+  .oppia-topic-dashboard-card .oppia-title-section {
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
+    height: 108px;
+    width: 148px;
+  }
+  .oppia-topic-dashboard-card .oppia-thumbnail-image {
+    height: 108px;
+    width: 160px;
+  }
+  /* redesigned learner topic summary tile css */
+  .new-oppia-topic-dashboard-card .oppia-topic-link {
+    text-decoration: none;
+  }
+  .new-oppia-topic-dashboard-card .oppia-topic-lessons {
+    font-size: 14px;
+    left: -1px;
+    position: relative;
+    top: 0px;
+  }
+  .new-oppia-topic-dashboard-card .oppia-summary-section {
+    color: #fff;
+    padding: 15px 15px 0px 15px;
+    position: absolute;
+  }
+  .new-oppia-topic-dashboard-card .lesson-title {
+    display: inline-block;
+  }
+  .new-oppia-topic-dashboard-card .oppia-topic-title {
+    display: block;
+    font-size: 16px;
+    font-weight: 700;
+    height: 16px;
+    letter-spacing: 0.25px;
+    text-align: left;
+    text-transform: capitalize;
+  }
+  .new-oppia-topic-dashboard-card {
+    background-color: #205d86;
+    border-radius: 4px;
+    display: inline-block;
     height: 220px;
     padding: 0;
     position: relative;
     width: 210px;
     z-index: 5;
   }
-  .oppia-topic-dashboard-card .oppia-title-section {
+  .new-oppia-topic-dashboard-card .oppia-title-section {
     border-top-left-radius: 4px;
     border-top-right-radius: 4px;
     height: 120px;
     width: 210px;
   }
-  .oppia-topic-dashboard-card .oppia-thumbnail-image {
+  .new-oppia-topic-dashboard-card .oppia-thumbnail-image {
     height: 120px;
     width: 210px;
   }

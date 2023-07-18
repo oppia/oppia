@@ -39,6 +39,7 @@ export class LearnerStorySummaryTileComponent implements OnInit {
   @Input() topicName!: string;
   @Input() markTileAsGoal!: boolean;
   @Input() learnerGroupTitle!: string;
+  @Input() displayAreaIsLearnerDashboard: boolean = false;
   nodeCount!: number;
   completedNodeCount!: number;
   storyProgress!: number;
@@ -50,6 +51,7 @@ export class LearnerStorySummaryTileComponent implements OnInit {
   starImageUrl!: string;
   storyCompleted: boolean = false;
   buttonIsHovered: boolean = false;
+  cardIsHovered: boolean = false;
   todolistImageUrl: string = '';
   learnerGroupImageUrl: string = '';
   openInNewWindow = false;
@@ -146,6 +148,12 @@ export class LearnerStorySummaryTileComponent implements OnInit {
 
   isButtonHovered(): string {
     if (this.displayArea === 'homeTab' && this.buttonIsHovered) {
+      return 'box-shadow: 0 5px 5px -5px #333;';
+    }
+  }
+
+  isCardHovered(): string {
+    if (this.displayArea === 'homeTab' && this.cardIsHovered) {
       return 'box-shadow: 0 5px 5px -5px #333;';
     }
   }

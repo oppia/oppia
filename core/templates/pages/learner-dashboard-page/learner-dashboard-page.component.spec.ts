@@ -45,6 +45,7 @@ import { UrlInterpolationService } from 'domain/utilities/url-interpolation.serv
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { StorySummary } from 'domain/story/story-summary.model';
 import { LearnerTopicSummary } from 'domain/topic/learner-topic-summary.model';
+import { PlatformFeatureService } from 'services/platform-feature.service';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { NonExistentTopicsAndStories } from 'domain/learner_dashboard/non-existent-topics-and-stories.model';
 import { NonExistentCollections } from 'domain/learner_dashboard/non-existent-collections.model';
@@ -84,6 +85,13 @@ class MockTranslateService {
   }
 }
 
+class MockPlatformFeatureService {
+  status = {
+    ShowRedesignedLearnerDashboard: {
+      isEnabled: false
+    }
+  };
+}
 @Component({selector: 'background-banner', template: ''})
 class BackgroundBannerComponentStub {
 }
@@ -119,6 +127,8 @@ describe('Learner dashboard page', () => {
   let pageTitleService: PageTitleService = null;
   let learnerGroupBackendApiService: LearnerGroupBackendApiService;
   let urlService: UrlService;
+  let mockPlatformFeatureService = new MockPlatformFeatureService();
+
 
   let explorationDict: ExplorationBackendDict = {
     init_state_name: 'Introduction',
@@ -305,6 +315,10 @@ describe('Learner dashboard page', () => {
               isWindowNarrow: () => true,
               getResizeEvent: () => mockResizeEmitter,
             }
+          },
+          {
+            provide: PlatformFeatureService,
+            useValue: mockPlatformFeatureService
           },
           SuggestionModalForLearnerDashboardService,
           UrlInterpolationService,
@@ -622,6 +636,22 @@ describe('Learner dashboard page', () => {
         expect(component.getLocaleAbbreviatedDatetimeString(NOW_MILLIS))
           .toBe('4/2/2021');
       });
+
+    it('should return correct value for show redesigned' +
+      'learner dashboard feature flag', () => {
+      expect(
+        component.
+          isShowRedesignedLearnerDashboardFeatureFlagEnable())
+        .toBeFalse();
+
+      mockPlatformFeatureService.status.
+        ShowRedesignedLearnerDashboard.isEnabled = true;
+
+      expect(
+        component.
+          isShowRedesignedLearnerDashboardFeatureFlagEnable())
+        .toBeTrue();
+    });
 
     it('should sanitize given png base64 data and generate url', () => {
       let result = component.decodePngURIData('%D1%88%D0%B5%D0%BB%D0%BB%D1%8B');
