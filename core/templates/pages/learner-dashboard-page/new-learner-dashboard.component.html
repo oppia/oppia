@@ -4,8 +4,8 @@
   <div class="oppia-learner-dashboard-content-container oppia-row"
        [ngStyle]="TabletView ? {'display': 'block'} : {'display': 'flex'}"
        [ngClass]="{'oppia-learner-dashboard-mobile-mode': TabletView}">
-    <div class="oppia-learner-dashboard-side-content"
-         *ngIf="!TabletView">
+       <div class="oppia-learner-dashboard-side-content" *ngIf="!TabletView"></div>
+    <div class="oppia-learner-dashboard-fixed-side-content" *ngIf="!TabletView" [ngStyle]="!TabletView ? {'width': '13%'} : {'width': '16%'}">
       <mat-card class="oppia-learner-dashboard-main-menu">
         <picture *ngIf="profilePicturePngDataUrl">
             <source type="image/webp" [srcset]="profilePictureWebpDataUrl">

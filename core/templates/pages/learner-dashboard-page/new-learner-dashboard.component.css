@@ -140,6 +140,14 @@
     background-color: #fff;
   }
   
+  .new-learner-dashboard .oppia-learner-dashboard-fixed-side-content {
+    margin-top: -47px;
+    min-width: 241px;
+    padding-left: 11px;
+    position: fixed;
+    width: 16%;
+  }
+
   .new-learner-dashboard .oppia-learner-dashboard-side-content {
     margin-top: -47px;
     min-width: 241px;
