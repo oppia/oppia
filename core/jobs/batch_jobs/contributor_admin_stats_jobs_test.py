@@ -101,7 +101,7 @@ class ContributorDashboardTest(job_test_utils.JobTestBase):
             rejected_translations_count=self.REJECTED_TRANSLATIONS_COUNT,
             rejected_translation_word_count=(
                 self.REJECTED_TRANSLATION_WORD_COUNT),
-            contribution_dates=self.CONTRIBUTION_DATES
+            contribution_dates=[datetime.date(2022, 5, 2)]
         )
 
         self.translation_contribution_model_2 = self.create_model(

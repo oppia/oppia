@@ -373,7 +373,7 @@ class GenerateContributorAdminStatsJob(base_jobs.JobBase):
         first_contribution_date = min(
             [v.contribution_dates[0] for v in translation_contribution_stats])
         last_contribution_date = max(
-            [v.contribution_dates[1] for v in translation_contribution_stats])
+            [v.contribution_dates[-1] for v in translation_contribution_stats])
 
         # Weights of overall_accuracy as documented in
         # https://docs.google.com/document/d/19lCEYQUgV7_DwIK_0rz3zslRHX2qKOHn-t9Twpi0qu0/edit.
