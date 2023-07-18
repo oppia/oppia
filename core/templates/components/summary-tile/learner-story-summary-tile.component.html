@@ -39,7 +39,7 @@
     <mat-card class="oppia-story-dashboard-card" [attr.style]="isButtonHovered()">
         <div class="oppia-title-section" [ngStyle]="{'background-color': thumbnailBgColor}">
           <div class="oppia-story-tags">
-            <span *ngIf="true" class="oppia-learnergroup-title-tag">
+            <span *ngIf="learnerGroupTitle.length !== 0" class="oppia-learnergroup-title-tag">
               <img [src]="learnerGroupImageUrl" alt="learnergroup image">
               <span>
                 {{ learnerGroupTitle }}
