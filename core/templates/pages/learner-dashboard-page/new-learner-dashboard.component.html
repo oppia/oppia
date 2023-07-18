@@ -70,7 +70,7 @@
 
     <div class="oppia-learner-dashboard-main-content"
          [ngClass]="{'oppia-learner-dashboard-mobile-mode': TabletView}">
-        <div *ngIf="activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.HOME">
+        <!-- <div *ngIf="activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.HOME">
           <oppia-home-tab [currentGoals]="topicsToLearn"
                           [goalTopics]="allTopics"
                           [partiallyLearntTopicsList]="partiallyLearntTopicsList"
@@ -84,6 +84,21 @@
                           [storyIdToLearnerGroupsTitleMap]="storyIdToLearnerGroupsTitleMap"
                           (setActiveSection)="setActiveSection($event)">
           </oppia-home-tab>
+        </div> -->
+        <div *ngIf="activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.HOME">
+        <oppia-new-home-tab [currentGoals]="topicsToLearn"
+                            [goalTopics]="allTopics"
+                            [partiallyLearntTopicsList]="partiallyLearntTopicsList"
+                            [incompleteExplorationsList]="incompleteExplorationsList"
+                            [completedExplorationsList]="completedExplorationsList"
+                            [learnerGroupFeatureIsEnable]="LEARNER_GROUP_FEATURE_IS_ENABLED"
+                            [untrackedTopics]="untrackedTopics"
+                            [username]="username"
+                            [explorationPlaylist]="explorationPlaylist"
+                            [collectionPlaylist]="collectionPlaylist"
+                            [storyIdToLearnerGroupsTitleMap]="storyIdToLearnerGroupsTitleMap"
+                            (setActiveSection)="setActiveSection($event)" >
+        </oppia-new-home-tab>
         </div>
         <div *ngIf="activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.GOALS">
           <oppia-goals-tab [currentGoals]="topicsToLearn"
