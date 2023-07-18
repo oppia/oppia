@@ -17,9 +17,15 @@
  */
 
 window.CodeMirror = require('codemirror');
+// We need to add the following properties to window since they are used by
+// as global properties by ui-codemirror.
+window.diff_match_patch = require('diff-match-patch');
+window.DIFF_DELETE = require('diff-match-patch');
+window.DIFF_EQUAL = require('diff-match-patch');
+window.DIFF_INSERT = require('diff-match-patch');
 
 import 'codemirror/mode/javascript/javascript';
 import 'codemirror/mode/python/python';
 import 'codemirror/mode/yaml/yaml';
-require('static/diff-match-patch-1.0.0/diff_match_patch.js');
+import 'diff-match-patch';
 import 'codemirror/addon/merge/merge';
