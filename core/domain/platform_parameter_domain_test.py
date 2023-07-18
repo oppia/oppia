@@ -19,15 +19,21 @@
 from __future__ import annotations
 
 import collections
+import enum
 
 from core import feconf
 from core import utils
+from core.domain import platform_feature_services
 from core.domain import platform_parameter_domain as parameter_domain
 from core.tests import test_utils
 
 from typing import Dict, Final, List, Optional, Union
 
 ServerMode = parameter_domain.ServerMode
+
+
+class DummyParamNames(enum.Enum):
+    PARAMETER_A = 'parameter_a'
 
 
 class PlatformParameterChangeTests(test_utils.GenericTestBase):
@@ -2206,3 +2212,34 @@ class PlatformParameterTests(test_utils.GenericTestBase):
             parameter.to_dict(),
             parameter_domain.PlatformParameter.deserialize(
                 parameter.serialize()).to_dict())
+
+    def test_validate_platform_param_with_feature_stage_raises_error(
+        self) -> None:
+        parameter = parameter_domain.PlatformParameter.from_dict({
+            'name': 'parameter_a',
+            'description': '',
+            'data_type': 'bool',
+            'rules': [
+                {
+                    'filters': [
+                        {'type': 'server_mode', 'conditions': [['=', 'prod']]}],
+                    'value_when_matched': True
+                }
+            ],
+            'rule_schema_version': (
+                feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION),
+            'default_value': False,
+            'is_feature': False,
+            'feature_stage': 'dev',
+        })
+        swap_platform_params_list = self.swap(
+            platform_feature_services,
+            'ALL_PLATFORM_PARAMS_EXCEPT_FEATURE_FLAGS',
+            [DummyParamNames.PARAMETER_A]
+        )
+        with swap_platform_params_list, self.assertRaisesRegex(
+            utils.ValidationError, (
+                'The feature stage of the platform parameter parameter_a should'
+                ' be None.')
+        ):
+            parameter.validate()

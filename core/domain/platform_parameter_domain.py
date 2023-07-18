@@ -26,6 +26,7 @@ from core import feconf
 from core import utils
 from core.constants import constants
 from core.domain import change_domain
+from core.domain import platform_feature_services
 
 from typing import (
     Callable, Dict, Final, List, Optional, Pattern, TypedDict, Union)
@@ -842,6 +843,20 @@ class PlatformParameter:
         if self._data_type not in self.DATA_TYPE_PREDICATES_DICT:
             raise utils.ValidationError(
                 'Unsupported data type \'%s\'.' % self._data_type)
+
+        all_platform_params_names = [
+            param.value
+            for param in platform_feature_services.
+            ALL_PLATFORM_PARAMS_EXCEPT_FEATURE_FLAGS
+        ]
+        if (
+            self._feature_stage is not None and
+            self._name in all_platform_params_names
+        ):
+            raise utils.ValidationError(
+                'The feature stage of the platform parameter %s should '
+                'be None.' % self._name
+            )
 
         predicate = self.DATA_TYPE_PREDICATES_DICT[self.data_type]
         if not predicate(self._default_value):

@@ -75,7 +75,8 @@ class Registry:
                 for the platform parameter.
             is_feature: bool. True if the platform parameter is a feature flag.
             feature_stage: Enum(FeatureStages)|None. The stage of the feature,
-                required if 'is_feature' is True.
+                required if 'is_feature' is True. The value for the platform
+                parameters should be None.
 
         Returns:
             PlatformParameter. The created platform parameter.
