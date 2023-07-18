@@ -136,7 +136,7 @@ export class NewHomeTabComponent {
           markTileAsGoal: currentGoalsIds.includes(topicSummaryTile.id),
           learnerGroupTitle: ''
         };
-        if (this.storyIdToLearnerGroupsTitleMap.size !== 0) {
+        if (this.storyIdToLearnerGroupsTitleMap.has(storySummary.getId())) {
           let learnerGroupsTitle =
           this.storyIdToLearnerGroupsTitleMap.get(storySummary.getId());
           storyData.learnerGroupTitle = learnerGroupsTitle[0];
