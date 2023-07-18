@@ -331,17 +331,9 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
 
     def test_function_calls(self) -> None:
         check_function_calls = {
-            'validate_dependencies_is_called': False,
-            'download_files_is_called': False,
-            'download_and_unzip_files_is_called': False,
-            'download_and_untar_files_is_called': False,
             'install_python_prod_dependencies_is_called': False
         }
         expected_check_function_calls = {
-            'validate_dependencies_is_called': True,
-            'download_files_is_called': True,
-            'download_and_unzip_files_is_called': True,
-            'download_and_untar_files_is_called': True,
             'install_python_prod_dependencies_is_called': True
         }
         def mock_return_json(

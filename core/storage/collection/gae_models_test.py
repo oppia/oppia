@@ -429,7 +429,7 @@ class CollectionRightsModelRevertUnitTest(test_utils.GenericTestBase):
         )
 
     def test_revert_to_version_with_invalid_status_is_successful(self) -> None:
-        broken_dict = dict(**self.original_dict)
+        broken_dict = {**self.original_dict}
         broken_dict['status'] = 'publicized'
 
         snapshot_model = (
@@ -456,7 +456,7 @@ class CollectionRightsModelRevertUnitTest(test_utils.GenericTestBase):
     def test_revert_to_version_with_translator_ids_field_is_successful(
         self
     ) -> None:
-        broken_dict = dict(**self.original_dict)
+        broken_dict = {**self.original_dict}
         del broken_dict['voice_artist_ids']
         broken_dict['translator_ids'] = [self.USER_ID_2]
 
