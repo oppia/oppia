@@ -11,6 +11,7 @@ services:
       - node_modules:/app/oppia/node_modules
       - third_party:/app/oppia/third_party
       - frontend_proto_files:/app/oppia/extensions/classifiers/proto
+      - yarn_cache:/root/.yarn-cache
     environment:
       - NODE_OPTIONS=--max_old_space_size=4096
       - prod_env=${prod_env}
@@ -44,6 +45,7 @@ services:
       - proto_files:/app/oppia/proto_files
       - frontend_proto_files:/app/oppia/extensions/classifiers/proto
       - third_party:/app/oppia/third_party
+      - pip_cache:/root/.cache/pip
     environment:
       - CLOUDSDK_CORE_DISABLE_PROMPTS=1
       - PIP_NO_DEPS=True
@@ -150,3 +152,5 @@ volumes:
   redis_dump:
   firebase_emulator_cache:
   cloud_datastore_emulator_cache:
+  pip_cache:
+  yarn_cache:
