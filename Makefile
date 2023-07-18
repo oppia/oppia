@@ -12,7 +12,6 @@ ifeq ($(firstword $(MAKECMDGOALS)),$(filter $(firstword $(MAKECMDGOALS)), run-ba
   $(eval $(RUN_ARGS):;@:)
 endif
 
-# TODO add all the targets here.
 .PHONY: help run-devserver setup-devserver clean terminal stop-devserver \
 	$(addsuffix stop., $(ALL_SERVICES)) $(addsuffix logs., $(ALL_SERVICES)) \
 	$(addsuffix restart., $(ALL_SERVICES))
@@ -36,7 +35,7 @@ build: ## Builds the all docker services.
 	docker compose build
 
 run-devserver: # Runs the devserver
-	docker compose up -d dev-server
+	docker compose up dev-server
 
 init: build run-devserver ## Initializes the build and runs devserver.
 
