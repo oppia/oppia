@@ -168,7 +168,6 @@
     "dayjs": "^1.8.35",
     "default-passive-events": "^2.0.0",
     "dequeue": "^1.0.5",
-    "diff-match-patch": "1.0.0",
     "fabric": "^4.1.0",
     "firebase": "^8.10.0",
     "gif-frames": "^1.0.1",
