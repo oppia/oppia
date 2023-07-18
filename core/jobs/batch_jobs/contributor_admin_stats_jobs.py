@@ -350,30 +350,30 @@ class GenerateContributorAdminStatsJob(base_jobs.JobBase):
         topic_ids = (
             [v.topic_id for v in translation_contribution_stats])
         submitted_translations_count = sum(
-            [v.submitted_translations_count
-                for v in translation_contribution_stats])
+            v.submitted_translations_count
+                for v in translation_contribution_stats)
         submitted_translation_word_count = sum(
-            [v.submitted_translation_word_count
-                for v in translation_contribution_stats])
+            v.submitted_translation_word_count
+                for v in translation_contribution_stats)
         accepted_translations_count = sum(
-            [v.accepted_translations_count
-                for v in translation_contribution_stats])
+            v.accepted_translations_count
+                for v in translation_contribution_stats)
         accepted_translations_without_reviewer_edits_count = sum(
-            [v.accepted_translations_without_reviewer_edits_count
-                for v in translation_contribution_stats])
+            v.accepted_translations_without_reviewer_edits_count
+                for v in translation_contribution_stats)
         accepted_translation_word_count = sum(
-            [v.accepted_translation_word_count
-                for v in translation_contribution_stats])
+            v.accepted_translation_word_count
+                for v in translation_contribution_stats)
         rejected_translations_count = sum(
-            [v.rejected_translations_count
-                for v in translation_contribution_stats])
+            v.rejected_translations_count
+                for v in translation_contribution_stats)
         rejected_translation_word_count = sum(
-            [v.rejected_translation_word_count
-                for v in translation_contribution_stats])
+            v.rejected_translation_word_count
+                for v in translation_contribution_stats)
         first_contribution_date = min(
-            [v.contribution_dates[0] for v in translation_contribution_stats])
+            v.contribution_dates[0] for v in translation_contribution_stats)
         last_contribution_date = max(
-            [v.contribution_dates[-1] for v in translation_contribution_stats])
+            v.contribution_dates[-1] for v in translation_contribution_stats)
 
         # Weights of overall_accuracy as documented in
         # https://docs.google.com/document/d/19lCEYQUgV7_DwIK_0rz3zslRHX2qKOHn-t9Twpi0qu0/edit.
@@ -444,24 +444,24 @@ class GenerateContributorAdminStatsJob(base_jobs.JobBase):
         topic_ids = (
             [v.topic_id for v in translation_reviewer_stats])
         reviewed_translations_count = sum(
-            [v.reviewed_translations_count
-                for v in translation_reviewer_stats])
+            v.reviewed_translations_count
+                for v in translation_reviewer_stats)
         accepted_translations_count = sum(
-            [v.accepted_translations_count
-                for v in translation_reviewer_stats])
+            v.accepted_translations_count
+                for v in translation_reviewer_stats)
         accepted_translations_with_reviewer_edits_count = sum(
-            [v.accepted_translations_with_reviewer_edits_count
-                for v in translation_reviewer_stats])
+            v.accepted_translations_with_reviewer_edits_count
+                for v in translation_reviewer_stats)
         accepted_translation_word_count = sum(
-            [v.accepted_translation_word_count
-                for v in translation_reviewer_stats])
+            v.accepted_translation_word_count
+                for v in translation_reviewer_stats)
         rejected_translations_count = (
             reviewed_translations_count - accepted_translations_count
         )
         first_contribution_date = min(
-            [v.first_contribution_date for v in translation_reviewer_stats])
+            v.first_contribution_date for v in translation_reviewer_stats)
         last_contribution_date = max(
-            [v.last_contribution_date for v in translation_reviewer_stats])
+            v.last_contribution_date for v in translation_reviewer_stats)
 
         with datastore_services.get_ndb_context():
             translation_review_stats_models = (
@@ -556,21 +556,21 @@ class GenerateContributorAdminStatsJob(base_jobs.JobBase):
         topic_ids = (
             [v.topic_id for v in question_contribution_stats])
         submitted_questions_count = sum(
-            [v.submitted_questions_count
-                for v in question_contribution_stats])
+            v.submitted_questions_count
+                for v in question_contribution_stats)
         accepted_questions_count = sum(
-            [v.accepted_questions_count
-                for v in question_contribution_stats])
+            v.accepted_questions_count
+                for v in question_contribution_stats)
         accepted_questions_without_reviewer_edits_count = sum(
-            [v.accepted_questions_without_reviewer_edits_count
-                for v in question_contribution_stats])
+            v.accepted_questions_without_reviewer_edits_count
+                for v in question_contribution_stats)
         rejected_questions_count = (
             submitted_questions_count - accepted_questions_count
         )
         first_contribution_date = min(
-            [v.first_contribution_date for v in question_contribution_stats])
+            v.first_contribution_date for v in question_contribution_stats)
         last_contribution_date = max(
-            [v.last_contribution_date for v in question_contribution_stats])
+            v.last_contribution_date for v in question_contribution_stats)
 
         # Weights of overall_accuracy as documented in
         # https://docs.google.com/document/d/19lCEYQUgV7_DwIK_0rz3zslRHX2qKOHn-t9Twpi0qu0/edit.
@@ -627,21 +627,21 @@ class GenerateContributorAdminStatsJob(base_jobs.JobBase):
         topic_ids = (
             [v.topic_id for v in question_reviewer_stats])
         reviewed_questions_count = sum(
-            [v.reviewed_questions_count
-                for v in question_reviewer_stats])
+            v.reviewed_questions_count
+                for v in question_reviewer_stats)
         accepted_questions_count = sum(
-            [v.accepted_questions_count
-                for v in question_reviewer_stats])
+            v.accepted_questions_count
+                for v in question_reviewer_stats)
         accepted_questions_with_reviewer_edits_count = sum(
-            [v.accepted_questions_with_reviewer_edits_count
-                for v in question_reviewer_stats])
+            v.accepted_questions_with_reviewer_edits_count
+                for v in question_reviewer_stats)
         rejected_questions_count = (
             reviewed_questions_count - accepted_questions_count
         )
         first_contribution_date = min(
-            [v.first_contribution_date for v in question_reviewer_stats])
+            v.first_contribution_date for v in question_reviewer_stats)
         last_contribution_date = max(
-            [v.last_contribution_date for v in question_reviewer_stats])
+            v.last_contribution_date for v in question_reviewer_stats)
 
         with datastore_services.get_ndb_context():
             question_review_stats_models = (
