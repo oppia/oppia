@@ -287,11 +287,13 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
             self.cmd_token_list,
             [
                 [
-                    'pip-compile', '--no-emit-index-url', 'requirements.in',
+                    'pip-compile', '--no-emit-index-url',
+                    '--generate-hashes', 'requirements.in',
                     '--output-file', 'requirements.txt',
                 ],
                 [
-                    'python', '-m', 'pip', 'install', '--target',
+                    'python', '-m', 'pip', 'install', '--require-hashes',
+                    '--no-deps', '--target',
                     common.THIRD_PARTY_PYTHON_LIBS_DIR,
                     '--no-dependencies',
                     '-r', common.COMPILED_REQUIREMENTS_FILE_PATH,
@@ -336,7 +338,8 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
             self.cmd_token_list,
             [
                 [
-                    'pip-compile', '--no-emit-index-url', 'requirements.in',
+                    'pip-compile', '--no-emit-index-url',
+                    '--generate-hashes', 'requirements.in',
                     '--output-file', 'requirements.txt',
                 ],
                 [
@@ -416,11 +419,13 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
             self.cmd_token_list,
             [
                 [
-                    'pip-compile', '--no-emit-index-url', 'requirements.in',
+                    'pip-compile', '--no-emit-index-url',
+                    '--generate-hashes', 'requirements.in',
                     '--output-file', 'requirements.txt',
                 ],
                 [
-                    'python', '-m', 'pip', 'install', '--target',
+                    'python', '-m', 'pip', 'install', '--require-hashes',
+                    '--no-deps', '--target',
                     common.THIRD_PARTY_PYTHON_LIBS_DIR,
                     '--no-dependencies', '-r',
                     common.COMPILED_REQUIREMENTS_FILE_PATH,
@@ -462,7 +467,8 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
 
         self.assertEqual(self.cmd_token_list, [
             [
-                'pip-compile', '--no-emit-index-url', 'requirements.in',
+                'pip-compile', '--no-emit-index-url',
+                '--generate-hashes', 'requirements.in',
                 '--output-file', 'requirements.txt',
             ],
         ])
@@ -495,7 +501,8 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
 
         self.assertEqual(self.cmd_token_list, [
             [
-                'pip-compile', '--no-emit-index-url', 'requirements.in',
+                'pip-compile', '--no-emit-index-url',
+                '--generate-hashes', 'requirements.in',
                 '--output-file', 'requirements.txt',
             ],
         ])
@@ -563,7 +570,8 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
             self.cmd_token_list,
             [
                 [
-                    'pip-compile', '--no-emit-index-url', 'requirements.in',
+                    'pip-compile', '--no-emit-index-url',
+                    '--generate-hashes', 'requirements.in',
                     '--output-file', 'requirements.txt',
                 ],
                 [
@@ -692,7 +700,9 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
         # regular letters, digits, periods, underscores, or hyphens and ending
         # with an optional suffix of the pattern [str] with no brackets inside
         # the outside brackets.
-        library_name_pattern = re.compile(r'^[a-zA-Z0-9_.-]+(\[[^\[^\]]+\])*$')
+        library_name_pattern = re.compile(
+            r'^[a-zA-Z0-9_.-]+(\[[^\[^\]]+\])*$|^\s*--hash=sha256:.*$|\\$'
+        )
         with utils.open_file(
             common.COMPILED_REQUIREMENTS_FILE_PATH, 'r') as f:
             lines = f.readlines()
