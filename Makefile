@@ -1,10 +1,10 @@
-SHELL_PREFIX=docker-compose exec -e
+SHELL_PREFIX=docker-compose exec
 ALL_SERVICES = datastore dev-server firebase elasticsearch webpack-compiler angular-build redis
 
 FLAGS = save_datastore disable_host_checking no_auto_restart prod_env maintenance_mode source_maps
 $(foreach flag, $(FLAGS), $(eval $(flag) = false))
 
-# Parameters ##################################################################
+# Parameters #################################################################################
 #
 # For backend tests, use the rest as test path/module and turn them into do-nothing targets.
 ifeq ($(firstword $(MAKECMDGOALS)),$(filter $(firstword $(MAKECMDGOALS)), run-backend-tests))
@@ -35,6 +35,10 @@ build: ## Builds the all docker services.
 	docker compose build
 
 run-devserver: # Runs the devserver
+# Add some build steps here.
+	docker compose up dev-server
+
+run-offline: # Runs the devserver in offline mode
 	docker compose up dev-server
 
 init: build run-devserver ## Initializes the build and runs devserver.
@@ -51,9 +55,10 @@ stop:
 
 update.requirements: ## Installs the python requirements for the project
 	${SHELL_PREFIX} dev-server pip install -r requirements.txt
+	${SHELL_PREFIX} dev-server pip install -r requirements_dev.txt
 
 update.package: ## Installs the npm requirements for the project
-	${SHELL_PREFIX} angular-build npm install
+	${SHELL_PREFIX} angular-build yarn install
 
 stop.%: ## Stops the given docker service. Example: make stop.datastore
 	docker compose stop $*
