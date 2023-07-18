@@ -2,6 +2,17 @@ table {
     width: 100%;
   }
   
+tr.mat-header-row {
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+}
+
+.mat-header-cell {
+    color: rgb(0, 0, 0);
+}
+
 tr.example-detail-row {
     display: contents;
 }

@@ -17,7 +17,7 @@
  * @fileoverview Component for the feedback Updates page.
  */
 
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { LoaderService } from 'services/loader.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
@@ -54,7 +54,8 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
   constructor(
     private loaderService: LoaderService,
     private windowDimensionsService: WindowDimensionsService,
-    private windowRef: WindowRef
+    private windowRef: WindowRef,
+    private changeDetectorRef: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
@@ -70,6 +71,7 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
 
   setActiveTab(tabName: string): void {
     this.activeTab = tabName;
+    this.changeDetectorRef.detectChanges();
   }
 
   checkMobileView(): boolean {

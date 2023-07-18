@@ -2,7 +2,7 @@
        [dataSource]="dataSource" multiTemplateDataRows
        class="mat-elevation-z8">
   <ng-container matColumnDef="{{column}}" *ngFor="let column of columnsToDisplay">
-    <th mat-header-cell *matHeaderCellDef> {{column}} </th>
+    <b><th mat-header-cell *matHeaderCellDef> {{column}} </th></b>
     <td mat-cell *matCellDef="let element"> {{element[column]}} </td>
   </ng-container>
 

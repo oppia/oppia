@@ -17,7 +17,7 @@
  * @fileoverview Component for the feedback Updates page.
  */
 
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnInit, SimpleChanges } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { LoaderService } from 'services/loader.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
@@ -52,6 +52,8 @@ export class TanslationSubmitterTable implements OnInit {
     'Role'
   ];
 
+  dataSource = ELEMENT_DATA;
+
   expandedElement: PeriodicElement | null | [];
 
   TAB_NAME_TRANSLATION_SUBMITTER: string = 'translation_submitter';
@@ -69,7 +71,16 @@ export class TanslationSubmitterTable implements OnInit {
 
   ngOnInit(): void {
     this.loaderService.showLoadingScreen('Loading');
+    this.updateColumnsToDisplay();
+  }
 
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes.activeTab) {
+      this.updateColumnsToDisplay();
+    }
+  }
+
+  updateColumnsToDisplay(): void {
     if (this.activeTab === this.TAB_NAME_TRANSLATION_SUBMITTER) {
       this.columnsToDisplay = [
         'User',
@@ -83,11 +94,8 @@ export class TanslationSubmitterTable implements OnInit {
     } else if (this.activeTab === this.TAB_NAME_TRANSLATION_REVIEWER) {
       this.columnsToDisplay = [
         'User',
-        'Rank',
-        'Performace',
-        'Accuracy',
-        'Translated Cards',
-        'Last Translated(in days)',
+        'Reviewed Cards',
+        'Last Reviewed(in days)',
         'Role'
       ];
     } else if (this.activeTab === this.TAB_NAME_QUESTION_SUBMITTER) {
@@ -96,25 +104,18 @@ export class TanslationSubmitterTable implements OnInit {
         'Rank',
         'Performace',
         'Accuracy',
-        'Translated Cards',
-        'Last Translated(in days)',
+        'Questions Submitted',
+        'Last Submitted(in days)',
         'Role'
       ];
     } else if (this.activeTab === this.TAB_NAME_QUESTION_REVIEWER) {
       this.columnsToDisplay = [
         'User',
-        'Rank',
-        'Performace',
-        'Accuracy',
-        'Translated Cards',
-        'Last Translated(in days)',
+        'Questions Reviewed',
+        'Last Reviewed(in days)',
         'Role'
       ];
     }
-  }
-
-  setActiveTab(tabName: string): void {
-    this.activeTab = tabName;
   }
 }
 
