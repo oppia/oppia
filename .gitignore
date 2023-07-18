@@ -51,6 +51,7 @@ yarn-error.log
 .pytest_cache/v/cache/*
 .lighthouseci
 .direnv/*
+.docker.env
 .envrc
 portserver.socket
 temp-tsconfig-strict.json
