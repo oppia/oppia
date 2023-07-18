@@ -53,6 +53,7 @@ services:
       - third_party:/app/oppia/third_party
     environment:
       - CLOUDSDK_CORE_DISABLE_PROMPTS=1
+      - PIP_NO_DEPS=True
     depends_on:
       - angular-build
       - webpack-compiler
