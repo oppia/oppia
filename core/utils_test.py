@@ -892,7 +892,8 @@ class UtilsTests(test_utils.GenericTestBase):
     def test_require_valid_name_with_incorrect_input(self) -> None:
         with self.assertRaisesRegex(
             utils.ValidationError,
-            'The length of the exploration title should be between 1 and 50 ' 'characters; received '):   # pylint: disable=line-too-long
+            'The length of the exploration title should be between 1 and 50 '
+            'characters; received '):
             utils.require_valid_name('', 'the exploration title')
         with self.assertRaisesRegex(
             utils.ValidationError,
