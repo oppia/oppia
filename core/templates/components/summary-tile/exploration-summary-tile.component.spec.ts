@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for for ExplorationSummaryTileComponent.
  */
 
-import { async, ComponentFixture, fakeAsync, TestBed, tick } from
+import { async, ComponentFixture, fakeAsync, flush, TestBed, tick } from
   '@angular/core/testing';
 import { Component, NO_ERRORS_SCHEMA, Pipe } from '@angular/core';
 import { MaterialModule } from 'modules/material.module';
@@ -251,6 +251,7 @@ describe('Exploration Summary Tile Component', () => {
     expect(userServiceSpy).toHaveBeenCalled();
     expect(windowResizeSpy).toHaveBeenCalled();
     expect(windowWidthSpy).toHaveBeenCalled();
+    flush();
   }));
 
   it('should check whether hacky translations are displayed or not'
@@ -280,6 +281,7 @@ describe('Exploration Summary Tile Component', () => {
       hackyTranslationIsDisplayed =
         component.isHackyExpObjectiveTranslationDisplayed();
       expect(hackyTranslationIsDisplayed).toBe(true);
+      flush();
     }));
 
   it('should intialize the component and set mobileCutoffPx to 0' +
@@ -301,6 +303,7 @@ describe('Exploration Summary Tile Component', () => {
     expect(userServiceSpy).toHaveBeenCalled();
     expect(windowResizeSpy).toHaveBeenCalled();
     expect(windowWidthSpy).toHaveBeenCalled();
+    flush();
   }));
 
   it('should remove all subscriptions when calling ngOnDestroy',
@@ -533,4 +536,21 @@ describe('Exploration Summary Tile Component', () => {
     expect(urlPathSpy).toHaveBeenCalled();
     expect(addFieldSpy).toHaveBeenCalled();
   }));
+  it('should return box-shadow style when button is hovered', () => {
+    component.buttonIsHovered = true;
+
+    fixture.detectChanges();
+    const result = component.isButtonHovered();
+
+    expect(result).toBe('box-shadow: 0 5px 5px -5px #333;');
+  });
+
+  it('should return undefined when button is not hovered', () => {
+    component.buttonIsHovered = false;
+
+    fixture.detectChanges();
+    const result = component.isButtonHovered();
+
+    expect(result).toBeUndefined();
+  });
 });
