@@ -297,7 +297,10 @@ def get_csrf_secret_value() -> str:
         str. Returns the csrf secret value.
     """
     memcached_items = caching_services.get_multi(
-        caching_services.CACHE_NAMESPACE_CSRF, None, [CSRF_SECRET_INSTANCE_ID])
+        caching_services.CACHE_NAMESPACE_DEFAULT,
+        None,
+        [CSRF_SECRET_INSTANCE_ID]
+    )
     if CSRF_SECRET_INSTANCE_ID in memcached_items:
         return memcached_items[CSRF_SECRET_INSTANCE_ID]
 
@@ -311,7 +314,7 @@ def get_csrf_secret_value() -> str:
             oppia_csrf_secret=csrf_secret_value
         ).put()
         caching_services.set_multi(
-            caching_services.CACHE_NAMESPACE_CSRF,
+            caching_services.CACHE_NAMESPACE_DEFAULT,
             None,
             {
                 CSRF_SECRET_INSTANCE_ID: csrf_secret_value
