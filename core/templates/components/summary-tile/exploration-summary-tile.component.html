@@ -14,7 +14,7 @@
        target="{{ openInNewWindow ? '_blank' : '_self' }}">
       <div class="title-section" [ngStyle]="{'background-color': thumbnailBgColor}">
         <img class="thumbnail-image" [src]="thumbnailIcon" alt="{{ category }}">
-        <h3 class="activity-title e2e-test-exp-summary-tile-title">
+        <span class="activity-title e2e-test-exp-summary-tile-title">
           <span *ngIf="isWindowLarge">
             <span *ngIf="!isHackyExpTitleTranslationDisplayed()">{{ explorationTitle | truncate:40 }}</span>
             <span *ngIf="isHackyExpTitleTranslationDisplayed()">{{ expTitleTranslationKey | translate | truncate:40 }}</span>
@@ -23,7 +23,7 @@
             <span *ngIf="!isHackyExpTitleTranslationDisplayed()">{{ explorationTitle | truncate:40 }}</span>
             <span *ngIf="isHackyExpTitleTranslationDisplayed()">{{ expTitleTranslationKey | translate | truncate:40 }}</span>
           </span>
-        </h3>
+        </span>
       </div>
       <div *ngIf="!isPlaylistTile" class="title-section-mask"></div>
       <div class="summary-section"

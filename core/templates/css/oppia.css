@@ -2867,6 +2867,7 @@ md-card.preview-conversation-skin-supplemental-card {
 .oppia-lost-changes > li > .state-edit-desc > .sub-edit {
   margin-left: 20px;
 }
+.oppia-activity-summary-tile .metrics li,
 .oppia-activity-summary-tile .metrics .row-three,
 .oppia-activity-summary-tile-mobile .metrics .row-three {
   font-size: 0.75em;
@@ -3169,7 +3170,7 @@ oppia-noninteractive-link {
 
 .oppia-activity-summary-tile .rating-disabled,
 .oppia-activity-summary-tile-mobile .rating-disabled {
-  opacity: 0.5;
+  opacity: 0.8;
 }
 
 .oppia-activity-summary-tile [section="right-section"],
