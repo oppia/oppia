@@ -105,7 +105,7 @@ CACHE_NAMESPACE_CONFIG: Final = 'config'
 CACHE_NAMESPACE_DEFAULT: Final = 'default'
 # This namespace is regarding the csrf secret value we store. The value for the
 # key in the namespace should be a serialized representation of csrf secret.
-CACHE_NAMESPACE_CSRF: Final = 'csrf_secret'
+CACHE_NAMESPACE_CSRF: Final = 'csrf'
 
 
 class DeserializationFunctionsDict(TypedDict):
@@ -119,7 +119,7 @@ class DeserializationFunctionsDict(TypedDict):
     platform: Callable[[str], platform_parameter_domain.PlatformParameter]
     config: Callable[[str], config_domain.AllowedDefaultValueTypes]
     default: Callable[[str], str]
-    csrf_secret: Callable[[str], str]
+    csrf: Callable[[str], str]
 
 
 class SerializationFunctionsDict(TypedDict):
@@ -133,7 +133,7 @@ class SerializationFunctionsDict(TypedDict):
     platform: Callable[[platform_parameter_domain.PlatformParameter], str]
     config: Callable[[config_domain.AllowedDefaultValueTypes], str]
     default: Callable[[str], str]
-    csrf_secret: Callable[[str], str]
+    csrf: Callable[[str], str]
 
 
 # Type defined for arguments which can accept only keys of Dict
@@ -147,7 +147,7 @@ NamespaceType = Literal[
     'platform',
     'config',
     'default',
-    'csrf_secret'
+    'csrf'
 ]
 
 

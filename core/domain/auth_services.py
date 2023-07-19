@@ -304,34 +304,27 @@ def get_csrf_secret_value() -> str:
     csrf_secret_model = auth_models.CsrfSecretModel.get(
         CSRF_SECRET_INSTANCE_ID, strict=False)
 
-    # Any non-default value is fine.
-    if csrf_secret_model is not None:
-        # Rulling out the possibility of csrf_secret_model being None in
-        # order to avoid mypy error.
-        assert csrf_secret_model is not None
-        csrf_secret_value = csrf_secret_model.oppia_csrf_secret
-        # Rulling out the possibility for csrf_secret_value of being type other
-        # than str in order to avoid mypy error.
-        assert isinstance(csrf_secret_value, str)
-        return csrf_secret_value
-
-    # Initialize to random value.
-    csrf_secret_value = base64.urlsafe_b64encode(os.urandom(20)).decode()
-    auth_models.CsrfSecretModel(
-        id=CSRF_SECRET_INSTANCE_ID,
-        oppia_csrf_secret=csrf_secret_value
-    ).put()
-    caching_services.set_multi(
-        CSRF_SECRET_INSTANCE_ID,
-        None,
-        {
-            CSRF_SECRET_INSTANCE_ID: csrf_secret_value
-        }
-    )
+    if csrf_secret_model is None:
+        csrf_secret_value = base64.urlsafe_b64encode(os.urandom(20)).decode()
+        auth_models.CsrfSecretModel(
+            id=CSRF_SECRET_INSTANCE_ID,
+            oppia_csrf_secret=csrf_secret_value
+        ).put()
+        caching_services.set_multi(
+            caching_services.CACHE_NAMESPACE_CSRF,
+            None,
+            {
+                CSRF_SECRET_INSTANCE_ID: csrf_secret_value
+            }
+        )
 
     csrf_secret_model = auth_models.CsrfSecretModel.get(
         CSRF_SECRET_INSTANCE_ID, strict=False)
+    # Rulling out the possibility of csrf_secret_model being None in
+    # order to avoid mypy error.
     assert csrf_secret_model is not None
     csrf_secret_value = csrf_secret_model.oppia_csrf_secret
+    # Rulling out the possibility for csrf_secret_value of being type other
+    # than str in order to avoid mypy error.
     assert isinstance(csrf_secret_value, str)
     return csrf_secret_value

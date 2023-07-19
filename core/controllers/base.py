@@ -899,13 +899,11 @@ class CsrfTokenManager:
         if user_id is None:
             user_id = cls._USER_ID_DEFAULT
 
-        csrf_secret = auth_services.get_csrf_secret_value()
-
         # Round time to seconds.
         issued_on_str = str(int(issued_on))
 
         digester = hmac.new(
-            key=csrf_secret.encode('utf-8'),
+            key=auth_services.get_csrf_secret_value().encode('utf-8'),
             digestmod='md5'
         )
         digester.update(user_id.encode('utf-8'))
