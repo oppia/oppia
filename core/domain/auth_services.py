@@ -302,7 +302,11 @@ def get_csrf_secret_value() -> str:
         [CSRF_SECRET_INSTANCE_ID]
     )
     if CSRF_SECRET_INSTANCE_ID in memcached_items:
-        return memcached_items[CSRF_SECRET_INSTANCE_ID]
+        csrf_value = memcached_items[CSRF_SECRET_INSTANCE_ID]
+        # Rulling out the possibility for csrf_value of being type other
+        # than str in order to avoid mypy error.
+        assert isinstance(csrf_value, str)
+        return csrf_value
 
     csrf_secret_model = auth_models.CsrfSecretModel.get(
         CSRF_SECRET_INSTANCE_ID, strict=False)
