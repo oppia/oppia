@@ -54,8 +54,8 @@
     <th *ngFor="let key of STORY_TABLE_COLUMN_HEADINGS"
         class="story-dashboard-table-headings">
       <p *ngIf="key === 'title'" class="text-center">Title</p>
-      <p *ngIf="key === 'publication_status'" class="text-center">Story State</p>
-      <p *ngIf="key === 'node_count'" class="text-center">Chapters (Published /Added)</p>
+      <p *ngIf="key === 'publication_status'" class="text-center">Story Status</p>
+      <p *ngIf="key === 'node_count'" class="text-center">Chapters</p>
       <p *ngIf="key === 'notifications'" class="text-center">Chapter Publication Notifications  </p>
     </th>
   </tr>
@@ -84,13 +84,18 @@
       </td>
       <td>
         <a (click)="topicRights.canEditTopic() && openStoryEditor(summary.getId())" class="story-list-summary text-center">
-          <span> ({{ summary.getPublishedChaptersCount() }}/{{ summary.getTotalChaptersCount() }}) </span>
+          <span> {{ summary.getPublishedChaptersCount() }} Published</span>
+          <span> {{ summary.getTotalChaptersCount() }} Total</span>
         </a>
       </td>
       <td>
         <a (click)="topicRights.canEditTopic() && openStoryEditor(summary.getId())" class="story-list-summary text-left">
-          <span *ngIf="summary.getUpcomingChaptersCount()"> {{ summary.getUpcomingChaptersCount() }} upcoming launches (next 14d)</span>
-          <span *ngIf="summary.getOverdueChaptersCount()"> {{ summary.getOverdueChaptersCount() }} launches behind schedule</span>
+          <span *ngIf="summary.getUpcomingChaptersCount()"> {{ summary.getUpcomingChaptersCount() }} upcoming launch
+            <span *ngIf="summary.getUpcomingChaptersCount()>1">es</span> (next 14 days)
+          </span>
+          <span *ngIf="summary.getOverdueChaptersCount()"> {{ summary.getOverdueChaptersCount() }} launch
+            <span *ngIf="summary.getOverdueChaptersCount()>1">es</span> behind schedule
+          </span>
           <span *ngIf="!summary.getUpcomingChaptersCount() && !summary.getOverdueChaptersCount()">-</span>
         </a>
       </td>
@@ -144,7 +149,6 @@
   }
 
   .story-dashboard-table .delete-story-icon {
-    background-color: white !important;
     border: none;
   }
 
@@ -175,7 +179,7 @@
     background-color: #ededed;
   }
 
-  .list-summary span, .story-list-summary span {
+  .list-summary span, .story-list-summary > span {
     display: inline-block;
     line-height: normal;
     vertical-align: middle;

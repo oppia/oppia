@@ -150,25 +150,34 @@ class TopicEditorStoryHandler(
         additional_story_summary_dicts = [
             summary.to_dict() for summary in additional_story_summaries]
 
+        canonical_stories_ids = [summary['id'] for
+            summary in canonical_story_summary_dicts]
+        canonical_stories = story_fetchers.get_stories_by_ids(
+            canonical_stories_ids)
         updated_canonical_story_summary_dicts = []
-        for summary in canonical_story_summary_dicts:
-            story = story_fetchers.get_story_by_id(summary['id'])
+        for story in canonical_stories:
+            summary = {}
+            for story_summary in canonical_story_summary_dicts:
+                if story_summary['id'] == story.id:
+                    summary = story_summary
             nodes = story.story_contents.nodes
             total_chapters_count = len(nodes)
-            published_chapters_count = len(
-                [node for node in nodes if
-                node.status == 'Published'])
-            upcoming_chapters_count = len(
-                [node for node in nodes if
-                node.planned_publication_date is not None and (
-                node.planned_publication_date - datetime.datetime.today()).
-                days < 14 and node.planned_publication_date >
-                datetime.datetime.today() and node.status != 'Published'])
-            overdue_chapters_count = len(
-                [node for node in nodes if
-                node.planned_publication_date is not None and
-                node.planned_publication_date < datetime.datetime.today() and
-                node.status != 'Published'])
+            published_chapters_count = 0
+            upcoming_chapters_count = 0
+            overdue_chapters_count = 0
+            for node in nodes:              
+                if node.status == constants.STORYNODE_STATUS_PUBLISHED:
+                    published_chapters_count += 1
+                if (node.planned_publication_date is not None and (node.
+                    planned_publication_date - datetime.datetime.today()).
+                    days < 14 and node.planned_publication_date >
+                    datetime.datetime.today() and
+                    node.status != constants.STORYNODE_STATUS_PUBLISHED):
+                    upcoming_chapters_count += 1
+                if (node.planned_publication_date is not None and
+                    node.planned_publication_date < datetime.datetime.today()
+                    and node.status != constants.STORYNODE_STATUS_PUBLISHED):
+                    overdue_chapters_count += 1
             updated_canonical_story_summary_dict = {
                 'id': summary['id'],
                 'title': summary['title'],
