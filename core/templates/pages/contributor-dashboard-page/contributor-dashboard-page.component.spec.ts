@@ -16,7 +16,6 @@
  * @fileoverview Unit tests for contributor dashboard page component.
  */
 
-import { WindowRef } from 'services/contextual/window-ref.service';
 import { ComponentFixture, fakeAsync, flush, TestBed, tick, waitForAsync } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
@@ -46,7 +45,6 @@ describe('Contributor dashboard page', () => {
     can_suggest_questions: true,
   };
   let focusManagerService: FocusManagerService;
-  let windowRef: WindowRef;
   let getTranslatableTopicNamesAsyncSpy: jasmine.Spy;
   let getUserInfoAsyncSpy: jasmine.Spy;
   let urlInterpolationService: UrlInterpolationService;
@@ -62,8 +60,7 @@ describe('Contributor dashboard page', () => {
         UserService,
         TranslationLanguageService,
         TranslationTopicService,
-        ContributionOpportunitiesService,
-        WindowRef
+        ContributionOpportunitiesService
       ],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
@@ -76,7 +73,6 @@ describe('Contributor dashboard page', () => {
     contributionOpportunitiesService =
       TestBed.inject(ContributionOpportunitiesService);
     localStorageService = TestBed.inject(LocalStorageService);
-    windowRef = TestBed.inject(WindowRef);
     translationLanguageService = TestBed.inject(TranslationLanguageService);
     translationTopicService = TestBed.inject(TranslationTopicService);
     userService = TestBed.inject(UserService);
@@ -130,19 +126,6 @@ describe('Contributor dashboard page', () => {
       flush();
     }).toThrowError();
   }));
-
-  it('should scroll properly', () => {
-    spyOn(userService, 'getUserContributionRightsDataAsync')
-      .and.returnValue(Promise.resolve(userContributionRights));
-    const nativeWindowSpy = spyOnProperty(windowRef, 'nativeWindow');
-    nativeWindowSpy.and.returnValue({
-      pageYOffset: 11
-    } as Window);
-
-    component.scrollFunction();
-
-    expect(component.defaultHeaderVisible).toBeTrue();
-  });
 
   it('should set default profile pictures when username is null',
     fakeAsync(() => {
@@ -310,45 +293,5 @@ describe('Contributor dashboard page', () => {
       expect(component.activeTabName).toBe(changedTab);
       expect(component.showTopicSelector()).toBe(true);
     });
-
-    it('should call scrollFunction on scroll', () => {
-      spyOn(userService, 'getUserContributionRightsDataAsync')
-        .and.returnValue(Promise.resolve(userContributionRights));
-      let dummyScrollEvent = new Event('scroll');
-      let scrollSpy = spyOn(component, 'scrollFunction');
-
-      windowRef.nativeWindow.dispatchEvent(dummyScrollEvent);
-
-      expect(scrollSpy).toHaveBeenCalled();
-    });
-
-    it('should show default header if window pageYOffset is ' +
-      'less than 80', function() {
-      spyOn(userService, 'getUserContributionRightsDataAsync')
-        .and.returnValue(Promise.resolve(userContributionRights));
-      const nativeWindowSpy = spyOnProperty(windowRef, 'nativeWindow');
-      nativeWindowSpy.and.returnValue({
-        pageYOffset: 79
-      } as Window);
-
-      component.scrollFunction();
-
-      expect(component.defaultHeaderVisible).toBe(true);
-    });
-
-    it('should show collapsed header if window pageYOffset is' +
-      ' scrolled greater than 80', fakeAsync(() => {
-      spyOn(userService, 'getUserContributionRightsDataAsync')
-        .and.returnValue(Promise.resolve(userContributionRights));
-      const nativeWindowSpy = spyOnProperty(windowRef, 'nativeWindow');
-      nativeWindowSpy.and.returnValue({
-        pageYOffset: 81
-      } as Window);
-
-      component.scrollFunction();
-      tick();
-
-      expect(component.defaultHeaderVisible).toBe(false);
-    }));
   });
 });
