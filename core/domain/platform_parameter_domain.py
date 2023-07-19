@@ -67,9 +67,6 @@ ALLOWED_FEATURE_STAGES: Final = [
 ALLOWED_PLATFORM_TYPES: List[str] = (
     constants.PLATFORM_PARAMETER_ALLOWED_PLATFORM_TYPES
 )
-ALLOWED_BROWSER_TYPES: List[str] = (
-    constants.PLATFORM_PARAMETER_ALLOWED_BROWSER_TYPES
-)
 ALLOWED_APP_VERSION_FLAVORS: List[str] = (
     constants.PLATFORM_PARAMETER_ALLOWED_APP_VERSION_FLAVORS
 )
@@ -112,7 +109,6 @@ class ClientSideContextDict(TypedDict):
     """Dictionary representing the client's side Context object."""
 
     platform_type: Optional[str]
-    browser_type: Optional[str]
     app_version: Optional[str]
 
 
@@ -128,12 +124,10 @@ class EvaluationContext:
     def __init__(
         self,
         platform_type: Optional[str],
-        browser_type: Optional[str],
         app_version: Optional[str],
         server_mode: ServerMode
     ) -> None:
         self._platform_type = platform_type
-        self._browser_type = browser_type
         self._app_version = app_version
         self._server_mode = server_mode
 
@@ -145,16 +139,6 @@ class EvaluationContext:
             str|None. The platform type, e.g. 'Web', 'Android', 'Backend'.
         """
         return self._platform_type
-
-    @property
-    def browser_type(self) -> Optional[str]:
-        """Returns client browser type.
-
-        Returns:
-            str|None. The client browser type, e.g. 'Chrome', 'FireFox',
-            'Edge'. None if the platform type is not Web.
-        """
-        return self._browser_type
 
     @property
     def app_version(self) -> Optional[str]:
@@ -199,13 +183,6 @@ class EvaluationContext:
         """Validates the EvaluationContext domain object, raising an exception
         if the object is in an irrecoverable error state.
         """
-        if (
-                self._browser_type is not None and
-                self._browser_type not in ALLOWED_BROWSER_TYPES):
-            raise utils.ValidationError(
-                'Invalid browser type \'%s\', must be one of %s.' % (
-                    self._browser_type, ALLOWED_BROWSER_TYPES))
-
         if self._app_version is not None:
             match = APP_VERSION_WITH_HASH_REGEXP.match(self._app_version)
             if match is None:
@@ -249,7 +226,6 @@ class EvaluationContext:
         # to fetch dictionary keys.
         return cls(
             client_context_dict['platform_type'],
-            client_context_dict.get('browser_type'),
             client_context_dict.get('app_version'),
             server_context_dict['server_mode'],
         )
@@ -266,12 +242,11 @@ class PlatformParameterFilter:
     """Domain object for filters in platform parameters."""
 
     SUPPORTED_FILTER_TYPES: Final = [
-        'platform_type', 'browser_type', 'app_version', 'app_version_flavor',
+        'server_mode', 'platform_type', 'app_version', 'app_version_flavor',
     ]
 
     SUPPORTED_OP_FOR_FILTERS: Final = {
         'platform_type': ['='],
-        'browser_type': ['='],
         'app_version_flavor': ['=', '<', '<=', '>', '>='],
         'app_version': ['=', '<', '<=', '>', '>='],
     }
@@ -339,7 +314,7 @@ class PlatformParameterFilter:
         Raises:
             Exception. Given operator is not supported.
         """
-        if self._type in ('platform_type', 'browser_type') and op != '=':
+        if self._type is 'platform_type' and op != '=':
             raise Exception(
                 'Unsupported comparison operator \'%s\' for %s filter, '
                 'expected one of %s.' % (
@@ -348,8 +323,6 @@ class PlatformParameterFilter:
         matched = False
         if self._type == 'platform_type' and op == '=':
             matched = context.platform_type == value
-        elif self._type == 'browser_type' and op == '=':
-            matched = context.browser_type == value
         elif self._type == 'app_version_flavor':
             # Ruling out the possibility of None for mypy type checking.
             assert context.app_version is not None

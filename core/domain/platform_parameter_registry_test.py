@@ -442,8 +442,7 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
     def test_evaluate_all_parameters(self) -> None:
         context = parameter_domain.EvaluationContext.from_dict(
             {
-                'platform_type': 'Backend',
-                'browser_type': None,
+                'platform_type': 'Web',
                 'app_version': '1.2.3',
             },
             {

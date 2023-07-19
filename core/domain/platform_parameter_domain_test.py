@@ -107,7 +107,6 @@ class EvaluationContextTests(test_utils.GenericTestBase):
         context = parameter_domain.EvaluationContext.from_dict(
             {
                 'platform_type': 'Android',
-                'browser_type': None,
                 'app_version': '1.0.0',
             },
             {
@@ -115,7 +114,6 @@ class EvaluationContextTests(test_utils.GenericTestBase):
             },
         )
         self.assertEqual(context.platform_type, 'Android')
-        self.assertEqual(context.browser_type, None)
         self.assertEqual(context.app_version, '1.0.0')
         self.assertEqual(context.server_mode, ServerMode.DEV)
 
@@ -123,7 +121,6 @@ class EvaluationContextTests(test_utils.GenericTestBase):
         context = parameter_domain.EvaluationContext.from_dict(
             {
                 'platform_type': 'invalid',
-                'browser_type': None,
                 'app_version': '1.0.0',
             },
             {
@@ -136,7 +133,6 @@ class EvaluationContextTests(test_utils.GenericTestBase):
         context = parameter_domain.EvaluationContext.from_dict(
             {
                 'platform_type': 'Android',
-                'browser_type': None,
                 'app_version': '1.0.0',
             },
             {
@@ -149,7 +145,6 @@ class EvaluationContextTests(test_utils.GenericTestBase):
         context = parameter_domain.EvaluationContext.from_dict(
             {
                 'platform_type': 'Web',
-                'browser_type': 'Chrome',
                 'app_version': None,
             },
             {
@@ -162,7 +157,6 @@ class EvaluationContextTests(test_utils.GenericTestBase):
         context = parameter_domain.EvaluationContext.from_dict(
             {
                 'platform_type': 'Backend',
-                'browser_type': None,
                 'app_version': '3.0.0',
             },
             {
@@ -175,7 +169,6 @@ class EvaluationContextTests(test_utils.GenericTestBase):
         context = parameter_domain.EvaluationContext.from_dict(
             {
                 'platform_type': 'Android',
-                'browser_type': None,
                 'app_version': '1.0.0',
             },
             {
@@ -190,7 +183,6 @@ class EvaluationContextTests(test_utils.GenericTestBase):
         context = parameter_domain.EvaluationContext.from_dict(
             {
                 'platform_type': 'invalid',
-                'browser_type': None,
                 'app_version': '1.0.0',
             },
             {
@@ -201,26 +193,10 @@ class EvaluationContextTests(test_utils.GenericTestBase):
         # ignored.
         context.validate()
 
-    def test_validate_with_invalid_browser_type_raises_exception(self) -> None:
-        context = parameter_domain.EvaluationContext.from_dict(
-            {
-                'platform_type': 'Web',
-                'browser_type': 'Invalid',
-                'app_version': '1.0.0',
-            },
-            {
-                'server_mode': ServerMode.DEV,
-            },
-        )
-        with self.assertRaisesRegex(
-            utils.ValidationError, 'Invalid browser type \'Invalid\''):
-            context.validate()
-
     def test_validate_with_invalid_app_version_raises_exception(self) -> None:
         context = parameter_domain.EvaluationContext.from_dict(
             {
                 'platform_type': 'Android',
-                'browser_type': None,
                 'app_version': 'a.a.a',
             },
             {
@@ -237,7 +213,6 @@ class EvaluationContextTests(test_utils.GenericTestBase):
         context = parameter_domain.EvaluationContext.from_dict(
             {
                 'platform_type': 'Android',
-                'browser_type': None,
                 'app_version': '1.0.0.0',
             },
             {
@@ -254,7 +229,6 @@ class EvaluationContextTests(test_utils.GenericTestBase):
         context = parameter_domain.EvaluationContext.from_dict(
             {
                 'platform_type': 'Android',
-                'browser_type': None,
                 'app_version': '1.0.0-abcedef-invalid',
             },
             {
@@ -271,7 +245,6 @@ class EvaluationContextTests(test_utils.GenericTestBase):
         context = parameter_domain.EvaluationContext.from_dict(
             {
                 'platform_type': 'Android',
-                'browser_type': None,
                 'app_version': '1.0.0',
             },
             {
@@ -295,7 +268,6 @@ class PlatformParameterFilterTests(test_utils.GenericTestBase):
     def _create_example_context(
         self,
         platform_type: str = 'Android',
-        browser_type: Optional[str] = None,
         app_version: Optional[str] = '1.2.3',
         mode: str = 'DEV'
     ) -> parameter_domain.EvaluationContext:
@@ -305,7 +277,6 @@ class PlatformParameterFilterTests(test_utils.GenericTestBase):
         return parameter_domain.EvaluationContext.from_dict(
             {
                 'platform_type': platform_type,
-                'browser_type': browser_type,
                 'app_version': app_version,
             },
             {
@@ -415,34 +386,6 @@ class PlatformParameterFilterTests(test_utils.GenericTestBase):
 
         native_context = self._create_example_context(platform_type='Android')
         self.assertFalse(filter_domain.evaluate(native_context))
-
-    def test_evaluate_chrome_browser_filter_with_chrome_returns_true(
-        self
-    ) -> None:
-        filter_dict: parameter_domain.PlatformParameterFilterDict = {
-            'type': 'browser_type',
-            'conditions': [['=', 'Chrome']]
-        }
-        filter_domain = (
-            parameter_domain
-            .PlatformParameterFilter.from_dict(filter_dict))
-
-        chrome_context = self._create_example_context(browser_type='Chrome')
-        self.assertTrue(filter_domain.evaluate(chrome_context))
-
-    def test_evaluate_chrome_browser_filter_with_firefox_returns_false(
-        self
-    ) -> None:
-        filter_dict: parameter_domain.PlatformParameterFilterDict = {
-            'type': 'browser_type',
-            'conditions': [['=', 'Chrome']]
-        }
-        filter_domain = (
-            parameter_domain
-            .PlatformParameterFilter.from_dict(filter_dict))
-
-        firefox_context = self._create_example_context(browser_type='Firefox')
-        self.assertFalse(filter_domain.evaluate(firefox_context))
 
     def test_evaluate_eq_version_filter_with_same_version_returns_true(
         self
@@ -1458,7 +1401,6 @@ class PlatformParameterRuleTests(test_utils.GenericTestBase):
         context = parameter_domain.EvaluationContext.from_dict(
             {
                 'platform_type': 'Android',
-                'browser_type': None,
                 'app_version': '1.2.3',
             },
             {
@@ -1480,7 +1422,6 @@ class PlatformParameterRuleTests(test_utils.GenericTestBase):
         context = parameter_domain.EvaluationContext.from_dict(
             {
                 'platform_type': 'Android',
-                'browser_type': None,
                 'app_version': '1.2.3',
             },
             {
@@ -1865,7 +1806,6 @@ class PlatformParameterTests(test_utils.GenericTestBase):
         dev_context = parameter_domain.EvaluationContext.from_dict(
             {
                 'platform_type': 'Android',
-                'browser_type': 'Chrome',
                 'app_version': '1.2.3',
             },
             {
@@ -1900,7 +1840,6 @@ class PlatformParameterTests(test_utils.GenericTestBase):
         prod_context = parameter_domain.EvaluationContext.from_dict(
             {
                 'platform_type': 'Android',
-                'browser_type': None,
                 'app_version': '1.2.3',
             },
             {
@@ -1937,7 +1876,6 @@ class PlatformParameterTests(test_utils.GenericTestBase):
         dev_context = parameter_domain.EvaluationContext.from_dict(
             {
                 'platform_type': 'invalid',
-                'browser_type': None,
                 'app_version': '1.2.3',
             },
             {
@@ -1974,7 +1912,6 @@ class PlatformParameterTests(test_utils.GenericTestBase):
         dev_context = parameter_domain.EvaluationContext.from_dict(
             {
                 'platform_type': '',
-                'browser_type': None,
                 'app_version': '1.2.3',
             },
             {
@@ -2047,7 +1984,12 @@ class PlatformParameterTests(test_utils.GenericTestBase):
             'data_type': 'bool',
             'rules': [
                 {
-                    'filters': [],
+                    'filters': [
+                        {
+                            'type': 'platform_type',
+                            'conditions': [['=', 'Web']]
+                        }
+                    ],
                     'value_when_matched': True
                 }
             ],
