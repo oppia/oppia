@@ -32,14 +32,18 @@ docstrings in this file.
 
 from __future__ import annotations
 
+import json
+import os
+
 from core import feconf
 from core import platform_feature_list
+from core import utils
 from core.constants import constants
 from core.domain import platform_parameter_domain
 from core.domain import platform_parameter_list
 from core.domain import platform_parameter_registry as registry
 
-from typing import Dict, List, Set
+from typing import Dict, Final, List, Set
 
 ALL_FEATURE_FLAGS: List[platform_feature_list.ParamNames] = (
     platform_feature_list.DEV_FEATURES_LIST +
@@ -74,6 +78,8 @@ ALL_PLATFORM_PARAMS_EXCEPT_FEATURE_FLAGS: List[
         platform_parameter_list.ParamNames.PROMO_BAR_ENABLED,
         platform_parameter_list.ParamNames.PROMO_BAR_MESSAGE,
     ]
+
+PACKAGE_JSON_FILE_PATH: Final = os.path.join(os.getcwd(), 'package.json')
 
 
 class FeatureFlagNotFoundException(Exception):
@@ -226,17 +232,29 @@ def _create_evaluation_context_for_server() -> (
     Returns:
         EvaluationContext. The context for evaluation.
     """
-    # TODO(#11208): Here we use MyPy ignore because due to the missing
-    # `browser_type` key MyPy throwing missing key error. Also, `app_version`
-    # key is set as none which forces us to use `.get()` method while fetching
-    # the values from dictionaries. So, to remove 'type ignore' from here and
-    # '.get()' method from '.from_dict' method, properly set app version and
-    # browser type key below using GAE app version as part of the server &
-    # client context.
+    current_app_version = json.load(utils.open_file(
+        PACKAGE_JSON_FILE_PATH, 'r'))['version']
+    # We want to make sure that the branch is the release branch.
+    if not constants.BRANCH_NAME == '' and 'release' in constants.BRANCH_NAME:
+        # We only need current app version so we can drop the 'release' part.
+        current_app_version = constants.BRANCH_NAME.split('release-')[1]
+        # We want to replace the '-' with the '.' for the version name.
+        # If the branch is the hotfix branch then we would require to further
+        # split it up and do the replacement for the version name. In the end,
+        # '3-3-1-hotfix-5' will be '3.3.1-hotfix-5' and '3-3-1' will be '3.3.1'.
+        if 'hotfix' in current_app_version:
+            split_via_hotfix = current_app_version.split('-hotfix')
+            current_app_version = (
+                split_via_hotfix[0].replace('-', '.') +
+                '-hotfix' + split_via_hotfix[1]
+            )
+        else:
+            current_app_version = current_app_version.replace('-', '.')
+
     return platform_parameter_domain.EvaluationContext.from_dict(
-        {  # type: ignore[typeddict-item]
-            'platform_type': 'Backend',
-            'app_version': None,
+        {
+            'platform_type': 'Web',
+            'app_version': current_app_version,
         },
         {
             'server_mode': get_server_mode()
