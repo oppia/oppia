@@ -53,7 +53,7 @@ RUN chmod -R 744 $BUF_DIR \
 # Installing python dependencies from the requirements_dev.txt file
 COPY requirements_dev.txt .
 
-RUN pip install -r requirements_dev.txt
+RUN pip install --require-hashes --no-deps -r requirements_dev.txt
 
 # Installing buf and proto for Linux -- this docker container is based on Linux
 COPY buf.gen.yaml .

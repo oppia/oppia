@@ -925,6 +925,8 @@ CONTRIBUTOR_STATS_SUMMARIES_URL = '/contributorstatssummaries'
 CONTRIBUTOR_ALL_STATS_SUMMARIES_URL = '/contributorallstatssummaries'
 CONTRIBUTOR_CERTIFICATE_URL = '/contributorcertificate'
 CONTRIBUTOR_DASHBOARD_ADMIN_URL = '/contributor-dashboard-admin'
+CONTRIBUTOR_DASHBOARD_ADMIN_STATS_URL_PREFIX = (
+    '/contributor-dashboard-admin-stats')
 CONTRIBUTOR_OPPORTUNITIES_DATA_URL = '/opportunitiessummaryhandler'
 CREATOR_DASHBOARD_DATA_URL = '/creatordashboardhandler/data'
 CREATOR_DASHBOARD_URL = '/creator-dashboard'
