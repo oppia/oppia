@@ -14,7 +14,7 @@
           <div *ngIf="storyExplorationProgressList.length !== 0" class="oppia-story-exploration-in-progress inprogress">
             <oppia-carousel-bar [carouselClassname]="'.inprogress '" [carouselHeading]="'I18N_LEARNER_DASHBOARD_LESSONS_IN_PROGRESS'">
               <div *ngFor="let summaryTile of storyExplorationProgressList">
-                <div *ngIf="getstoryExplorationTileType(summaryTile) === 'story'">
+                <div *ngIf="getTileType(summaryTile) === 'story'">
                   <oppia-learner-story-summary-tile
                   [storySummary]="summaryTile.storySummary"
                   [displayArea]="'homeTab'"
@@ -24,7 +24,7 @@
                   [learnerGroupTitle]="summaryTile.learnerGroupTitle">
                   </oppia-learner-story-summary-tile>
                 </div>
-                <div *ngIf="getstoryExplorationTileType(summaryTile) === 'exploration'">
+                <div *ngIf="getTileType(summaryTile) === 'exploration'">
                   <oppia-exploration-summary-tile
                   [explorationId]="summaryTile.id"
                   [explorationTitle]="summaryTile.title"

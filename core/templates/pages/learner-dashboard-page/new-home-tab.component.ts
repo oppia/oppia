@@ -16,8 +16,7 @@
  * @fileoverview Component for new-home tab in the Learner Dashboard page.
  */
 
-import { AppConstants } from 'app.constants';
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { LearnerTopicSummary } from 'domain/topic/learner-topic-summary.model';
 import { LearnerDashboardPageConstants } from 'pages/learner-dashboard-page/learner-dashboard-page.constants';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
@@ -45,7 +44,6 @@ interface storySummaryTile {
    styleUrls: ['./new-home-tab.component.css']
  })
 export class NewHomeTabComponent {
-  @Output() setActiveSection: EventEmitter<string> = new EventEmitter();
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
@@ -65,7 +63,6 @@ export class NewHomeTabComponent {
   currentGoalsLength!: number;
   classroomUrlFragment!: string;
   goalTopicsLength!: number;
-  width!: number;
   noPlaylistActivity: boolean = false;
   showMoreInPlaylistSection: boolean = false;
   CLASSROOM_LINK_URL_TEMPLATE: string = '/learn/<classroom_url_fragment>';
@@ -99,7 +96,6 @@ export class NewHomeTabComponent {
   ) {}
 
   ngOnInit(): void {
-    this.width = this.widthConst * (this.currentGoals.length);
     var allGoals = [...this.currentGoals, ...this.partiallyLearntTopicsList];
     this.currentGoalsLength = this.currentGoals.length;
     this.goalTopicsLength = this.goalTopics.length;
@@ -193,11 +189,15 @@ export class NewHomeTabComponent {
       }));
   }
 
-  getTileType(tile: LearnerExplorationSummary | CollectionSummary): string {
+  getTileType(
+      tile: LearnerExplorationSummary | CollectionSummary |
+    storySummaryTile): string {
     if (tile instanceof LearnerExplorationSummary) {
       return 'exploration';
+    } else if (tile instanceof CollectionSummary) {
+      return 'collection';
     }
-    return 'collection';
+    return 'story';
   }
 
   calculateExplorationProgress(
@@ -214,25 +214,6 @@ export class NewHomeTabComponent {
     return progress;
   }
 
-  getstoryExplorationTileType(
-      tile: LearnerExplorationSummary | storySummaryTile): string {
-    if (tile instanceof LearnerExplorationSummary) {
-      return 'exploration';
-    }
-    return 'story';
-  }
-
-  getTimeOfDay(): string {
-    let time = new Date().getHours();
-
-    if (time <= 12) {
-      return 'I18N_LEARNER_DASHBOARD_MORNING_GREETING';
-    } else if (time <= 18) {
-      return 'I18N_LEARNER_DASHBOARD_AFTERNOON_GREETING';
-    }
-    return 'I18N_LEARNER_DASHBOARD_EVENING_GREETING';
-  }
-
   isNonemptyObject(object: Object): boolean {
     return Object.keys(object).length !== 0;
   }
@@ -244,32 +225,6 @@ export class NewHomeTabComponent {
         classroom_url_fragment: this.classroomUrlFragment
       }
     );
-  }
-
-  isGoalLimitReached(): boolean {
-    if (this.goalTopicsLength === 0) {
-      return false;
-    } else if (this.currentGoalsLength === this.goalTopicsLength) {
-      return true;
-    }
-    return this.currentGoalsLength === AppConstants.MAX_CURRENT_GOALS_COUNT;
-  }
-
-  getWidth(length: number): number {
-    /**
-     * If there are 3 or more topics for each untrackedTopic, the total
-     * width of the section will be 662px in mobile view to enable scrolling.
-    */
-    if (length >= 3) {
-      return 662;
-    }
-    /**
-     * If there less than 3 topics for each untrackedTopic, the total
-     * width of the section will be calculated by multiplying the addition of
-     * number of topics and one classroom card with 164px in mobile view to
-     * enable scrolling.
-    */
-    return (length + 1) * 164;
   }
 
   openRemoveActivityModal(
@@ -303,10 +258,5 @@ export class NewHomeTabComponent {
         this.noPlaylistActivity = (
           (this.totalLessonsInPlaylist.length === 0));
       });
-  }
-
-  changeActiveSection(): void {
-    this.setActiveSection.emit(
-      LearnerDashboardPageConstants.LEARNER_DASHBOARD_SECTION_I18N_IDS.GOALS);
   }
 }
