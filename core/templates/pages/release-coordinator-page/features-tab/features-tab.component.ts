@@ -90,11 +90,6 @@ export class FeaturesTabComponent implements OnInit {
         options: AdminFeaturesTabConstants.ALLOWED_PLATFORM_TYPES,
         operators: ['=']
       },
-      [PlatformParameterFilterType.BrowserType]: {
-        displayName: 'Browser Type',
-        options: AdminFeaturesTabConstants.ALLOWED_BROWSER_TYPES,
-        operators: ['=']
-      },
       [PlatformParameterFilterType.AppVersion]: {
         displayName: 'App Version',
         operators: ['=', '<', '>', '<=', '>='],
