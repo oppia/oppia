@@ -21,6 +21,7 @@ from __future__ import annotations
 from core.constants import constants
 from core.domain import auth_domain
 from core.domain import auth_services
+from core.domain import caching_services
 from core.domain import user_domain
 from core.domain import user_services
 from core.platform import models
@@ -295,6 +296,11 @@ class AuthServicesTests(test_utils.GenericTestBase):
             auth_services.CSRF_SECRET_INSTANCE_ID, strict=False)
         if csrf_secret_model is not None:
             auth_models.CsrfSecretModel.delete(csrf_secret_model)
+            caching_services.delete_multi(
+                caching_services.CACHE_NAMESPACE_DEFAULT,
+                None,
+                [auth_services.CSRF_SECRET_INSTANCE_ID]
+            )
         self.assertIsNone(auth_models.CsrfSecretModel.get(
             auth_services.CSRF_SECRET_INSTANCE_ID, strict=False))
 
