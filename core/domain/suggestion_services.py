@@ -2301,20 +2301,9 @@ def _update_translation_contribution_stats_models(
     Args:
         translation_contribution_stats: list(TranslationContributionStats).
             A list of TranslationContributionStats domain objects.
-
-    Raises:
-        Exception. Language is None.
-        Exception. Contributor user ID is None.
-        Exception. Topic ID is None.
     """
     stats_dict = {}
     for stat in translation_contribution_stats:
-        if stat.language_code is None:
-            raise Exception('Language code should not be None.')
-        if stat.contributor_user_id is None:
-            raise Exception('Contributor user ID should not be None.')
-        if stat.topic_id is None:
-            raise Exception('Topic ID should not be None.')
         stat_id = (
             suggestion_models.TranslationContributionStatsModel.construct_id(
                 stat.language_code,
