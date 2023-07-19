@@ -12,7 +12,7 @@ ifeq ($(firstword $(MAKECMDGOALS)),$(filter $(firstword $(MAKECMDGOALS)), run-ba
   $(eval $(RUN_ARGS):;@:)
 endif
 
-.PHONY: help run-devserver setup-devserver clean terminal stop-devserver \
+.PHONY: help run-devserver build clean terminal stop-devserver \
 	$(addsuffix stop., $(ALL_SERVICES)) $(addsuffix logs., $(ALL_SERVICES)) \
 	$(addsuffix restart., $(ALL_SERVICES))
 
@@ -62,6 +62,9 @@ shell.%: ## Opens a shell in the given docker service. Example: make shell.datas
 stop:
 	docker compose down
 
+stop.%: ## Stops the given docker service. Example: make stop.datastore
+	docker compose stop $*
+
 update.requirements: ## Installs the python requirements for the project
 	${SHELL_PREFIX} dev-server pip install -r requirements.txt
 	${SHELL_PREFIX} dev-server pip install -r requirements_dev.txt
@@ -74,9 +77,6 @@ update.package: ## Installs the npm requirements for the project
 # Reverting the .yarnrc file to the original state, so that it works in python setup also.
 	@echo 'yarn-path "../oppia_tools/yarn-1.22.15/bin/yarn"' > .yarnrc
 	@echo 'cache-folder "../yarn_cache"' >> .yarnrc
-
-stop.%: ## Stops the given docker service. Example: make stop.datastore
-	docker compose stop $*
 
 logs.%: ## Shows the logs of the given docker service. Example: make logs.datastore
 	docker compose logs -f $*
