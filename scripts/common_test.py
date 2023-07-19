@@ -46,16 +46,12 @@ from typing import Generator, List, Literal, NoReturn
 
 from . import common
 
-# Here we use MyPy ignore because the pool_size argument is required by
-# Requester.__init__(), but it is missing from the typing definition in
-# Requester.pyi. We therefore disable type checking here. A PR was opened
-# to PyGithub to fix this, but it was closed due to inactivity (the project
-# does not seem very active). Here is the PR:
-# https://github.com/PyGithub/PyGithub/pull/2151.
-_MOCK_REQUESTER = github.Requester.Requester(  # type: ignore[call-arg]
+
+_MOCK_REQUESTER = github.Requester.Requester(
     login_or_token=None,
     password=None,
     jwt=None,
+    app_auth=None,
     base_url='https://github.com',
     timeout=0,
     user_agent='user',
