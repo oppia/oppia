@@ -619,15 +619,9 @@ class SignupEmailTests(test_utils.EmailTestBase):
                 platform_parameter_domain.PlatformParameterRule.from_dict({
                     'filters': [
                         {
-                            'type': 'server_mode',
+                            'type': 'platform_type',
                             'conditions': [
-                                [
-                                    '=',
-                                    (
-                                        platform_parameter_domain.
-                                        ServerMode.DEV.value
-                                    )
-                                ]
+                                ['=', 'Web']
                             ],
                         }
                     ],
@@ -644,15 +638,9 @@ class SignupEmailTests(test_utils.EmailTestBase):
                 platform_parameter_domain.PlatformParameterRule.from_dict({
                     'filters': [
                         {
-                            'type': 'server_mode',
+                            'type': 'platform_type',
                             'conditions': [
-                                [
-                                    '=',
-                                    (
-                                        platform_parameter_domain.
-                                        ServerMode.DEV.value
-                                    )
-                                ]
+                                ['=', 'Web']
                             ],
                         }
                     ],
@@ -787,15 +775,9 @@ class SignupEmailTests(test_utils.EmailTestBase):
                 platform_parameter_domain.PlatformParameterRule.from_dict({
                     'filters': [
                         {
-                            'type': 'server_mode',
+                            'type': 'platform_type',
                             'conditions': [
-                                [
-                                    '=',
-                                    (
-                                        platform_parameter_domain.
-                                        ServerMode.DEV.value
-                                    )
-                                ]
+                                ['=', 'Web']
                             ],
                         }
                     ],
@@ -897,15 +879,9 @@ class SignupEmailTests(test_utils.EmailTestBase):
                     platform_parameter_domain.PlatformParameterRule.from_dict({
                         'filters': [
                             {
-                                'type': 'server_mode',
+                                'type': 'platform_type',
                                 'conditions': [
-                                    [
-                                        '=',
-                                        (
-                                            platform_parameter_domain.
-                                            ServerMode.DEV.value
-                                        )
-                                    ]
+                                    ['=', 'Web']
                                 ],
                             }
                         ],
@@ -922,15 +898,9 @@ class SignupEmailTests(test_utils.EmailTestBase):
                     platform_parameter_domain.PlatformParameterRule.from_dict({
                         'filters': [
                             {
-                                'type': 'server_mode',
+                                'type': 'platform_type',
                                 'conditions': [
-                                    [
-                                        '=',
-                                        (
-                                            platform_parameter_domain.
-                                            ServerMode.DEV.value
-                                        )
-                                    ]
+                                    ['=', 'Web']
                                 ],
                             }
                         ],
@@ -1094,15 +1064,9 @@ class SignupEmailTests(test_utils.EmailTestBase):
                     platform_parameter_domain.PlatformParameterRule.from_dict({
                         'filters': [
                             {
-                                'type': 'server_mode',
+                                'type': 'platform_type',
                                 'conditions': [
-                                    [
-                                        '=',
-                                        (
-                                            platform_parameter_domain.
-                                            ServerMode.DEV.value
-                                        )
-                                    ]
+                                    ['=', 'Web']
                                 ],
                             }
                         ],
@@ -1119,15 +1083,9 @@ class SignupEmailTests(test_utils.EmailTestBase):
                     platform_parameter_domain.PlatformParameterRule.from_dict({
                         'filters': [
                             {
-                                'type': 'server_mode',
+                                'type': 'platform_type',
                                 'conditions': [
-                                    [
-                                        '=',
-                                        (
-                                            platform_parameter_domain.
-                                            ServerMode.DEV.value
-                                        )
-                                    ]
+                                    ['=', 'Web']
                                 ],
                             }
                         ],
