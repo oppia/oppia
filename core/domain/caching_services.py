@@ -103,6 +103,9 @@ CACHE_NAMESPACE_CONFIG: Final = 'config'
 # handles default datatypes allowed by Redis including Strings, Lists, Sets,
 # and Hashes. More details can be found at: https://redis.io/topics/data-types.
 CACHE_NAMESPACE_DEFAULT: Final = 'default'
+# This namespace is regarding the csrf secret value we store. The value for the
+# key in the namespace should be a serialized representation of csrf secret.
+CACHE_NAMESPACE_CSRF: Final = 'csrf_secret'
 
 
 class DeserializationFunctionsDict(TypedDict):
@@ -116,6 +119,7 @@ class DeserializationFunctionsDict(TypedDict):
     platform: Callable[[str], platform_parameter_domain.PlatformParameter]
     config: Callable[[str], config_domain.AllowedDefaultValueTypes]
     default: Callable[[str], str]
+    csrf_secret: Callable[[str], str]
 
 
 class SerializationFunctionsDict(TypedDict):
@@ -129,6 +133,7 @@ class SerializationFunctionsDict(TypedDict):
     platform: Callable[[platform_parameter_domain.PlatformParameter], str]
     config: Callable[[config_domain.AllowedDefaultValueTypes], str]
     default: Callable[[str], str]
+    csrf_secret: Callable[[str], str]
 
 
 # Type defined for arguments which can accept only keys of Dict
@@ -141,7 +146,8 @@ NamespaceType = Literal[
     'topic',
     'platform',
     'config',
-    'default'
+    'default',
+    'csrf_secret'
 ]
 
 
@@ -154,7 +160,8 @@ DESERIALIZATION_FUNCTIONS: DeserializationFunctionsDict = {
     CACHE_NAMESPACE_PLATFORM_PARAMETER: (
         platform_parameter_domain.PlatformParameter.deserialize),
     CACHE_NAMESPACE_CONFIG: json.loads,
-    CACHE_NAMESPACE_DEFAULT: json.loads
+    CACHE_NAMESPACE_DEFAULT: json.loads,
+    CACHE_NAMESPACE_CSRF: json.loads
 }
 
 
@@ -166,7 +173,8 @@ SERIALIZATION_FUNCTIONS: SerializationFunctionsDict = {
     CACHE_NAMESPACE_TOPIC: lambda x: x.serialize(),
     CACHE_NAMESPACE_PLATFORM_PARAMETER: lambda x: x.serialize(),
     CACHE_NAMESPACE_CONFIG: json.dumps,
-    CACHE_NAMESPACE_DEFAULT: json.dumps
+    CACHE_NAMESPACE_DEFAULT: json.dumps,
+    CACHE_NAMESPACE_CSRF: json.dumps
 }
 
 

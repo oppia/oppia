@@ -22,6 +22,7 @@ import base64
 import os
 
 from core.domain import auth_domain
+from core.domain import caching_services
 from core.platform import models
 from core.platform.auth import firebase_auth_services
 
@@ -295,6 +296,11 @@ def get_csrf_secret_value() -> str:
     Returns:
         str. Returns the csrf secret value.
     """
+    memcached_items = caching_services.get_multi(
+        caching_services.CACHE_NAMESPACE_CSRF, None, [CSRF_SECRET_INSTANCE_ID])
+    if CSRF_SECRET_INSTANCE_ID in memcached_items:
+        return memcached_items[CSRF_SECRET_INSTANCE_ID]
+
     csrf_secret_model = auth_models.CsrfSecretModel.get(
         CSRF_SECRET_INSTANCE_ID, strict=False)
 
@@ -310,10 +316,18 @@ def get_csrf_secret_value() -> str:
         return csrf_secret_value
 
     # Initialize to random value.
+    csrf_secret_value = base64.urlsafe_b64encode(os.urandom(20)).decode()
     auth_models.CsrfSecretModel(
         id=CSRF_SECRET_INSTANCE_ID,
-        oppia_csrf_secret=base64.urlsafe_b64encode(os.urandom(20)).decode()
+        oppia_csrf_secret=csrf_secret_value
     ).put()
+    caching_services.set_multi(
+        CSRF_SECRET_INSTANCE_ID,
+        None,
+        {
+            CSRF_SECRET_INSTANCE_ID: csrf_secret_value
+        }
+    )
 
     csrf_secret_model = auth_models.CsrfSecretModel.get(
         CSRF_SECRET_INSTANCE_ID, strict=False)
