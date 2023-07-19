@@ -145,12 +145,8 @@ class BlogAdminHandler(
                 platform_parameter_domain.PlatformParameterRule.from_dict({
                     'filters': [
                         {
-                            'type': 'server_mode',
-                            'conditions': [[
-                                '=',
-                                platform_feature_services.
-                                get_server_mode().value
-                            ]]
+                            'type': 'platform_type',
+                            'conditions': [['=', 'Web']]
                         }
                     ],
                     'value_when_matched': value

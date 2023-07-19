@@ -2116,7 +2116,11 @@ class PlatformParameterTests(test_utils.GenericTestBase):
             'rules': [
                 {
                     'filters': [
-                        {'type': 'server_mode', 'conditions': [['=', 'prod']]}],
+                        {
+                            'type': 'platform_type',
+                            'conditions': [['=', 'Web']]
+                        }
+                    ],
                     'value_when_matched': True
                 }
             ],
