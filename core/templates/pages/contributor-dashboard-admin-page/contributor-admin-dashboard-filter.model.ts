@@ -13,20 +13,16 @@
 // limitations under the License.
 
 /**
- * @fileoverview Model class for creating filters of frontend topics
- * and skill dashboard.
+ * @fileoverview Model class for creating filters of frontend contributor
+ * admin Dashboard.
  */
+export class ContributorAdminDashboardFilter {
+  languageCode?: string;
+  topicIds?: string[];
+  sort?: string;
+  lastActivity?: number;
 
-import { ContributorDashboardAdminPageConstants } from './contributor-dashboard-admin-page.constants';
-import { AppConstants } from 'app.constants';
-
-export class TopicsAndSkillsDashboardFilter {
-  languageCode!: string;
-  topicIds!: string[];
-  sort!: string;
-  lastActivity!: number;
-
-/**
+  /**
  * @param {String} languageCode - Language Code to filter for.
  * @param {String[]} topicIds - keywords to filter for.
  * @param {string} sort - One of the values in ETopicSortOptions.
@@ -34,33 +30,26 @@ export class TopicsAndSkillsDashboardFilter {
  *   in ETopicPublishedOptions.
  */
   constructor(
-    languageCode: string, topicIds: string[],
-    sort: string, lastActivity: number) {
+      languageCode?: string, topicIds?: string[],
+      sort?: string, lastActivity?: number) {
     this.languageCode = languageCode;
     this.topicIds = topicIds;
     this.sort = sort;
-    this.status = status;
+    this.lastActivity = lastActivity;
   }
 
-/**
+  /**
  * Resets the filter object values
  */
-reset(): void {
-    this.classroom =
-        TopicsAndSkillsDashboardPageConstants.TOPIC_FILTER_CLASSROOM_ALL;
-    this.keywords = [];
-    this.sort = ETopicSortOptions.IncreasingCreatedOn;
-    this.status = ETopicPublishedOptions.All;
-}
+  reset(): void {
+    ContributorAdminDashboardFilter.createDefault();
+  }
 
-/**
+  /**
  * @returns {TopicsAndSkillsDashboardFilter} - A new
  *   TopicsAndSkillsDashboardFilter instance.
  */
-static createDefault(): TopicsAndSkillsDashboardFilter {
-    return new TopicsAndSkillsDashboardFilter(
-    TopicsAndSkillsDashboardPageConstants.TOPIC_FILTER_CLASSROOM_ALL,
-    [], ETopicSortOptions.IncreasingCreatedOn, ETopicPublishedOptions.All);
+  static createDefault(): ContributorAdminDashboardFilter {
+    return new ContributorAdminDashboardFilter('en', []);
+  }
 }
-}
-  

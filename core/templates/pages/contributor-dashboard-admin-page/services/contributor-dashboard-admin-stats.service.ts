@@ -19,105 +19,116 @@
 
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
-import { AppConstants } from 'app.constants';
+import { HttpClient } from '@angular/common/http';
+import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
+import { ContributorAdminDashboardFilter } from '../contributor-admin-dashboard-filter.model'
+import { ContributorAdminStats } from '../contributor-dashboard-admin-summary.model'
 
 export interface TranslationSubmitterBackendDict {
-   'language_code': string;
-   'topic_name': string;
-   'submitted_translations_count': number;
-   'submitted_translation_word_count': number;
-   'accepted_translations_count': number;
-   'accepted_translations_without_reviewer_edits_count': number;
-   'accepted_translation_word_count': number;
-   'rejected_translations_count': number;
-   'rejected_translation_word_count': number;
-   'first_contribution_date': string;
-   'last_contribution_date': string;
+    'language_code': string;
+    'contributor_name': string;
+    'topic_names': string[];
+    'recent_performance': number;
+    'overall_accuracy': number;
+    'submitted_translations_count': number;
+    'submitted_translation_word_count': number;
+    'accepted_translations_count': number;
+    'accepted_translations_without_reviewer_edits_count': number;
+    'accepted_translation_word_count': number;
+    'rejected_translations_count': number;
+    'rejected_translation_word_count': number;
+    'first_contribution_date': string;
+    'last_contributed_in_days': number;
 }
 
 export interface TranslationReviewerBackendDict {
-   'language_code': string;
-   'topic_name': string;
-   'reviewed_translations_count': number;
-   'reviewed_translation_word_count': number;
-   'accepted_translations_count': number;
-   'accepted_translations_with_reviewer_edits_count': number;
-   'accepted_translation_word_count': number;
-   'first_contribution_date': string;
-   'last_contribution_date': string;
+    'language_code': string;
+    'contributor_name': string;
+    'topic_names': string[];
+    'reviewed_translations_count': number;
+    'accepted_translations_count': number;
+    'accepted_translations_with_reviewer_edits_count': number;
+    'accepted_translation_word_count': number;
+    'first_contribution_date': string;
+    'last_contributed_in_days': number;
 }
 
 export interface QuestionSubmitterBackendDict {
-   'topic_name': string;
-   'submitted_questions_count': number;
-   'accepted_questions_count': number;
-   'accepted_questions_without_reviewer_edits_count': number;
-   'first_contribution_date': string;
-   'last_contribution_date': string;
+    'contributor_name': string;
+    'topic_names': string[];
+    'recent_performance': number;
+    'overall_accuracy': number;
+    'submitted_questions_count': number;
+    'accepted_questions_count': number;
+    'accepted_questions_without_reviewer_edits_count': number;
+    'rejected_questions_count': number;
+    'first_contribution_date': string;
+    'last_contributed_in_days': number;
 }
 
 export interface QuestionReviewerBackendDict {
-   'topic_name': string;
-   'reviewed_questions_count': number;
-   'accepted_questions_count': number;
-   'accepted_questions_with_reviewer_edits_count': number;
-   'first_contribution_date': string;
-   'last_contribution_date': string;
+    'contributor_name': string;
+    'topic_names': string[];
+    'reviewed_questions_count': number;
+    'accepted_questions_count': number;
+    'accepted_questions_with_reviewer_edits_count': number;
+    'rejected_questions_count': number;
+    'first_contribution_date': string;
+    'last_contributed_in_days': number;
+}
+
+export interface ContributorAdminStatsData {
+  stats: ContributorAdminStats;
+  nextOffset: number;
+  more: boolean;
 }
 
 @Injectable({
   providedIn: 'root',
 })
-export class ContributorDashboardAdminStats {
+export class ContributorDashboardAdminStatsService {
   constructor(
+    private http: HttpClient,
+    private urlInterpolationService: UrlInterpolationService
   ) {}
 
-  async fetchTranslationSubmitterStats(
-      username: string
-  ): Promise<TranslationSubmitterBackendDict> {
-    return (
-      this.contributionAndReviewStatsBackendApiService
-        .fetchContributionAndReviewStatsAsync(
-          AppConstants.CONTRIBUTION_STATS_TYPE_TRANSLATION,
-          AppConstants.CONTRIBUTION_STATS_SUBTYPE_SUBMISSION, username));
-  }
+  private CONTRIBUTOR_ADMIN_STATS_SUMMARIES_URL = (
+    '/contributor-dashboard-admin-stats/<contribution_type>/' +
+    '<contribution_subtype>');
 
-  async fetchTranslationReviewerStats():
-    Promise<TranslationReviewerBackendDict> {
-    return (
-      this.contributionAndReviewStatsBackendApiService
-        .fetchContributionAndReviewStatsAsync(
-          AppConstants.CONTRIBUTION_STATS_TYPE_TRANSLATION,
-          AppConstants.CONTRIBUTION_STATS_SUBTYPE_REVIEW));
-
+  async fetchContributorAdminStats(
+    filter: ContributorAdminDashboardFilter,
+    pageSize: number,
+    nextOffset: string | null,
+    contributionType: string,
+    contributionSubtype: string
+  ):
+    Promise<ContributorAdminStatsData> {
     const url = this.urlInterpolationService.interpolateUrl(
-    this.CONTRIBUTOR_ALL_STATS_SUMMARIES_URL, {
-        username: username
-    }
+      this.CONTRIBUTOR_ADMIN_STATS_SUMMARIES_URL, {
+        contribution_type: contributionType,
+        contribution_subtype: contributionSubtype
+      }
     );
-    return this.http.get<ContributorStatsSummaryBackendDict>(url).toPromise();
-  }
-
-  async fetchQuestionSubmitterStats(
-      username: string
-  ): Promise<QuestionSubmitterBackendDict> {
-    return (
-      this.contributionAndReviewStatsBackendApiService
-        .fetchContributionAndReviewStatsAsync(
-          AppConstants.CONTRIBUTION_STATS_TYPE_QUESTION,
-          AppConstants.CONTRIBUTION_STATS_SUBTYPE_SUBMISSION, username));
-  }
-
-  async fetchQuestionReviewerStats(
-      username: string
-  ): Promise<QuestionReviewerBackendDict> {
-    return (
-      this.contributionAndReviewStatsBackendApiService
-        .fetchContributionAndReviewStatsAsync(
-          AppConstants.CONTRIBUTION_STATS_TYPE_QUESTION,
-          AppConstants.CONTRIBUTION_STATS_SUBTYPE_REVIEW, username));
+    return this.http.get<ContributorAdminStatsData>(
+      url, {
+          page_size: pageSize
+          offset: nextOffset
+          language_code: filter.languageCode
+          sort_by: filter.sort
+          topic_ids: filter.topicIds
+          max_days_since_last_activity: filter.lastActivity
+        }).toPromise().then(response => {
+        return {
+          stats: response.stats,
+          nextOffset: response.next_cursor,
+          more: response.more
+        };
+      }, errorResponse => {
+        throw new Error(errorResponse.error.error);
+      });
   }
 }
 
-angular.module('oppia').factory('ContributionAndReviewStatsService',
-  downgradeInjectable(ContributionAndReviewStatsService));
+angular.module('oppia').factory('ContributorDashboardAdminStatsService',
+  downgradeInjectable(ContributorDashboardAdminStatsService));
