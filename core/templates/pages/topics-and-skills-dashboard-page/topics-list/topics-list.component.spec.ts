@@ -166,6 +166,28 @@ describe('Topics List Component', () => {
       toEqual(true);
   });
 
+  it('should get correct headings list based on feature flag', () => {
+    mockPlatformFeatureService.
+      status.SerialChapterLaunchCurriculumAdminView.isEnabled = true;
+    componentInstance.ngOnInit();
+
+    expect(componentInstance.TOPIC_HEADINGS.length).toBe(8);
+    expect(componentInstance.TOPIC_HEADINGS).toEqual([
+      'index', 'name', 'added_stories_count', 'published_stories_count',
+      'notifications', 'subtopic_count', 'skill_count', 'topic_status'
+    ]);
+
+    mockPlatformFeatureService.
+      status.SerialChapterLaunchCurriculumAdminView.isEnabled = false;
+    componentInstance.ngOnInit();
+
+    expect(componentInstance.TOPIC_HEADINGS.length).toBe(6);
+    expect(componentInstance.TOPIC_HEADINGS).toEqual([
+      'index', 'name', 'canonical_story_count', 'subtopic_count',
+      'skill_count', 'topic_status'
+    ]);
+  });
+
   it('should create', () => {
     expect(componentInstance).toBeDefined();
   });
