@@ -90,12 +90,10 @@
       </td>
       <td>
         <a (click)="topicRights.canEditTopic() && openStoryEditor(summary.getId())" class="story-list-summary text-left">
-          <span *ngIf="summary.getUpcomingChaptersCount()"> {{ summary.getUpcomingChaptersCount() }} upcoming launch
-            <span *ngIf="summary.getUpcomingChaptersCount()>1">es</span> (next 14 days)
-          </span>
-          <span *ngIf="summary.getOverdueChaptersCount()"> {{ summary.getOverdueChaptersCount() }} launch
-            <span *ngIf="summary.getOverdueChaptersCount()>1">es</span> behind schedule
-          </span>
+          <span *ngIf="summary.getUpcomingChaptersCount()==1"> {{ summary.getUpcomingChaptersCount() }} upcoming launch (next 14 days)</span>
+          <span *ngIf="summary.getUpcomingChaptersCount()>1"> {{ summary.getUpcomingChaptersCount() }} upcoming launches (next 14 days)</span>
+          <span *ngIf="summary.getOverdueChaptersCount()==1"> {{ summary.getOverdueChaptersCount() }} launch behind schedule</span>
+          <span *ngIf="summary.getOverdueChaptersCount()>1"> {{ summary.getOverdueChaptersCount() }} launches behind schedule</span>
           <span *ngIf="!summary.getUpcomingChaptersCount() && !summary.getOverdueChaptersCount()">-</span>
         </a>
       </td>
