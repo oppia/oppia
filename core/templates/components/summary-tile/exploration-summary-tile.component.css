@@ -103,13 +103,9 @@ oppia-exploration-summary-tile .oppia-exploration-objective-title {
   line-height: 1.26;
   max-height: 4.71em;
   overflow: hidden;
-  /* padding: 12px; */
   text-overflow: ellipsis;
   word-break: break-word;
   color: #333;
-  /* display: flex;
-  font-size: 11px;
-  height: 40px; */
   letter-spacing: 0;
   margin: 0px 8px 0 8px;
   opacity: 1;
@@ -128,8 +124,6 @@ oppia-exploration-summary-tile .continue-button {
   background: white 0% 0% no-repeat padding-box;
   border: 1px solid #00645C;
   border-radius: 4px;
-  /* box-shadow: 0 2px 2px #0000003d; */
-  /* display: none; */
   height: 36px;
   left: 86px;
   position: absolute;
@@ -144,7 +138,6 @@ oppia-exploration-summary-tile .continue-button-text {
   letter-spacing: 0;
   position: relative;
   text-align: center;
-  /* text-transform: uppercase; */
   top: 10px;
 }
 oppia-exploration-summary-tile .oppia-story-completion {
@@ -172,9 +165,6 @@ oppia-exploration-summary-tile .oppia-svg-star-image {
 oppia-exploration-summary-tile .oppia-exploration-link {
   text-decoration: none;
 }
-/* oppia-exploration-summary-tile .exploration-card {
-  height: 100%;
-} */
 oppia-exploration-summary-tile .oppia-summary-section {
   position: absolute;
   width: 100%;
@@ -239,8 +229,6 @@ oppia-exploration-summary-tile .oppia-thumbnail-image {
 
 }
 oppia-exploration-summary-tile .oppia-exploration-learner-dashboard-card .continue-button:hover {
-  /* display: block;
-  float: left; */
   background-color: #35ada3;
 }
 oppia-exploration-summary-tile .oppia-exploration-summary-container {
