@@ -298,7 +298,7 @@ class CronTranslationContributionStatsHandler(
         beam_job_services.run_beam_job(
             job_class=(
                 suggestion_stats_computation_jobs
-                .GenerateTranslationContributionStatsJob))
+                .GenerateContributionStatsJob))
 
 
 class CronMailChapterPublicationsNotificationsHandler(
