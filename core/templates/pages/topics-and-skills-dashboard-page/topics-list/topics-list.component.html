@@ -112,7 +112,7 @@
     </tr>
     <tr *ngFor="let topic of topicSummaries; index as idx" class="list-item">
       <td>
-        {{getSerialNumberForTopic(idx)}}.
+        {{ getSerialNumberForTopic(idx) }}.
       </td>
       <td>
         <div class="topic-primary-information-container">
@@ -120,16 +120,16 @@
             <div>
               <a class="topic-name e2e-test-topic-name"
                  [href]="getTopicEditorUrl(topic.id)">
-                {{topic.name}}
+                {{ topic.name }}
               </a>
             </div>
             <div>
               <span class="topic-classroom e2e-test-topic-classroom">
-                <span *ngIf="topic.classroom">{{topic.classroom}}</span>
+                <span *ngIf="topic.classroom">{{ topic.classroom }}</span>
                 <span ngbTooltip="Assign this topic to a classroom from the admin page" placement="bottom" *ngIf="!topic.classroom">No classroom assigned.</span>
               </span>
             </div>
-            <div><span class="topic-description e2e-test-topic-description">{{topic.description}}</span></div>
+            <div><span class="topic-description e2e-test-topic-description">{{ topic.description }}</span></div>
           </div>
         </div>
       </td>
@@ -139,7 +139,7 @@
         </p>
       </td>
       <td>
-        <p class="list-summary" [ngClass]="partiallyPublishedStoriesCounts[idx] || fullyPublishedStoriesCounts[idx]? 'text-left': 'text-center'">
+        <p class="list-summary" [ngClass]="partiallyPublishedStoriesCounts[idx] || fullyPublishedStoriesCounts[idx] ? 'text-left': 'text-center'">
           <span *ngIf="partiallyPublishedStoriesCounts[idx]">
             {{ partiallyPublishedStoriesCounts[idx] }} Partial ({{ publishedChaptersInPartiallyPublishedStories[idx] }}/{{ totalChaptersInPartiallyPublishedStories[idx] }} chapters)
           </span>
@@ -153,23 +153,25 @@
         </p>
       </td>
       <td>
-        <p class="list-summary" [ngClass]="topic.getTotalUpcomingChapters() || topic.getTotalOverdueChapters()? 'text-left': 'text-center'">
-          <span *ngIf="topic.getTotalUpcomingChapters()"> {{ topic.getTotalUpcomingChapters() }} upcoming launches in the next 14 days</span>
-          <span *ngIf="topic.getTotalOverdueChapters()"> {{ topic.getTotalOverdueChapters() }} launches behind schedule</span>
-          <span *ngIf="!topic.getTotalUpcomingChapters() && !topic.getTotalOverdueChapters()">--</span>
+        <p class="list-summary" [ngClass]="topic.getTotalUpcomingChaptersCount() || topic.getTotalOverdueChaptersCount() ? 'text-left': 'text-center'">
+          <span *ngIf="topic.getTotalUpcomingChaptersCount()==1"> {{ topic.getTotalUpcomingChaptersCount() }} upcoming launch in the next 14 days</span>
+          <span *ngIf="topic.getTotalUpcomingChaptersCount()>1"> {{ topic.getTotalUpcomingChaptersCount() }} upcoming launches in the next 14 days</span>
+          <span *ngIf="topic.getTotalOverdueChaptersCount()==1"> {{ topic.getTotalOverdueChaptersCount() }} launch behind schedule</span>
+          <span *ngIf="topic.getTotalOverdueChaptersCount()>1"> {{ topic.getTotalOverdueChaptersCount() }} launches behind schedule</span>
+          <span *ngIf="!topic.getTotalUpcomingChaptersCount() && !topic.getTotalOverdueChaptersCount()">--</span>
         </p>
       </td>
       <td>
         <p class="text-center list-summary">
-          <span> {{topic.subtopicCount}} </span>
+          <span> {{ topic.subtopicCount }} </span>
         </p>
       </td>
       <td>
         <p class="list-summary text-center">
-          <span> {{topic.totalSkillCount}} </span>
+          <span> {{ topic.totalSkillCount }} </span>
           <span [hidden]="!topic.uncategorized_skill_count"
                 class="oppia-editor-warnings-indicator oppia-editor-warnings-error-color tooltip"
-                ngbTooltip="This topic has {{ topic.uncategorizedSkillCount }} uncategorized skill{{topic.uncategorizedSkillCount > 1 ? 's' : ''}}."
+                ngbTooltip="This topic has {{ topic.uncategorizedSkillCount }} uncategorized skill{{ topic.uncategorizedSkillCount > 1 ? 's' : '' }}."
                 placement="bottom">
             <span class="oppia-editor-warnings-count">
               &nbsp;!
@@ -177,16 +179,18 @@
           </span>
         </p>
       </td>
-      <td class="text-center topic-list-status">
-        <span class="topic-list-status-text" *ngIf="topic.isPublished && topic.getTotalChaptersCounts().length == fullyPublishedStoriesCounts[idx]">
+      <td class="text-center topic-list-status topic-status">
+        <span class="topic-list-status-text" *ngIf="topic.isPublished && topic.getTotalChaptersCounts().length && topic.getTotalChaptersCounts().length == fullyPublishedStoriesCounts[idx]">
           Fully Published
         </span>
-        <span class="topic-list-status-text" *ngIf="topic.isPublished && topic.getTotalChaptersCounts().length !== fullyPublishedStoriesCounts[idx]">
+        <span class="topic-list-status-text" *ngIf="topic.isPublished && (topic.getTotalChaptersCounts().length==0 || topic.getTotalChaptersCounts().length !== fullyPublishedStoriesCounts[idx])">
           Partially Published
         </span>
         <span class="topic-list-status-text" *ngIf="!topic.isPublished">
           Not Published
         </span>
+      </td>
+      <td>
         <button class="fas fa-ellipsis-v  topic-edit-box-icon e2e-test-topic-edit-box" role="button" (click)="changeEditOptions(topic.id)" aria-label="Topic edit"></button>
         <div *ngIf="showEditOptions(topic.id)" class="topic-edit-options">
           <a class="topic-edit-options-edit e2e-test-edit-topic-button" [href]="getTopicEditorUrl(topic.id)">
@@ -280,16 +284,16 @@
           <div class="topic-item-name-box">
             <div class="topic-item-name e2e-test-mobile-topic-name">
               <span>
-                {{getSerialNumberForTopic(idx)}}.
+                {{ getSerialNumberForTopic(idx) }}.
               </span>
               <a [href]="getTopicEditorUrl(topic.id)">
-                {{topic.name}}
+                {{ topic.name }}
               </a>
               <span>({{ topic.getTotalChaptersCounts().length }} stories, {{ topic.subtopicCount }} subtopics, {{ topic.totalSkillCount }} skills)</span>
             </div>
             <div class="topic-item-classroom">
               <span class="topic-item-classroom-header">Classroom: </span>
-              <span *ngIf="topic.classroom">{{topic.classroom}}</span>
+              <span *ngIf="topic.classroom">{{ topic.classroom }}</span>
               <span *ngIf="!topic.classroom">Unassigned</span>
             </div>
           </div>
@@ -309,10 +313,10 @@
         </div>
         <div class="topic-item-topic-status">
           <span class="topic-item-topic-status-header">Status</span>
-          <span *ngIf="topic.isPublished && topic.getTotalChaptersCounts().length == fullyPublishedStoriesCounts[idx]">
+          <span *ngIf="topic.isPublished && topic.getTotalChaptersCounts().length && topic.getTotalChaptersCounts().length == fullyPublishedStoriesCounts[idx]">
             Fully Published
           </span>
-          <span *ngIf="topic.isPublished && topic.getTotalChaptersCounts().length !== fullyPublishedStoriesCounts[idx]">
+          <span *ngIf="topic.isPublished && (topic.getTotalChaptersCounts().length==0 || topic.getTotalChaptersCounts().length !== fullyPublishedStoriesCounts[idx])">
             Partially Published
           </span>
           <span *ngIf="!topic.isPublished">
@@ -321,7 +325,7 @@
         </div>
         <div class="topic-item-topic-description">
           <span class="topic-item-description-header">Description: </span>
-          <span>{{topic.description}}</span>
+          <span>{{ topic.description }}</span>
         </div>
         <div class="topic-item-entities">
           <div class="topic-item-topic-entity published-stories-entity">
@@ -329,7 +333,11 @@
               Published Stories
             </div>
             <span *ngIf="partiallyPublishedStoriesCounts[idx]">
-              {{ partiallyPublishedStoriesCounts[idx] }} Partial ({{ publishedChaptersInPartiallyPublishedStories[idx] }}/{{ totalChaptersInPartiallyPublishedStories[idx] }} chapters)
+              {{ partiallyPublishedStoriesCounts[idx] }} Partial
+              <br>
+              (<span>{{ publishedChaptersInPartiallyPublishedStories[idx] }} published</span>
+              <br>
+              <span>{{ totalChaptersInPartiallyPublishedStories[idx] }} total</span>)
             </span>
             <span *ngIf="fullyPublishedStoriesCounts[idx]">
               {{ fullyPublishedStoriesCounts[idx] }} Full
@@ -343,9 +351,11 @@
             <div class="topic-item-topic-entity-header">
               Chapter Publication Notifications
             </div>
-            <span *ngIf="topic.getTotalUpcomingChapters()"> {{ topic.getTotalUpcomingChapters() }} upcoming launches in the next 14 days</span>
-            <span *ngIf="topic.getTotalOverdueChapters()"> {{ topic.getTotalOverdueChapters() }} launches behind schedule</span>
-            <span *ngIf="!topic.getTotalUpcomingChapters() && !topic.getTotalOverdueChapters()">--</span>
+            <span *ngIf="topic.getTotalUpcomingChaptersCount()==1"> {{ topic.getTotalUpcomingChaptersCount() }} upcoming launch in the next 14 days</span>
+            <span *ngIf="topic.getTotalUpcomingChaptersCount()>1"> {{ topic.getTotalUpcomingChaptersCount() }} upcoming launches in the next 14 days</span>
+            <span *ngIf="topic.getTotalOverdueChaptersCount()==1"> {{ topic.getTotalOverdueChaptersCount() }} launch behind schedule</span>
+            <span *ngIf="topic.getTotalOverdueChaptersCount()>1"> {{ topic.getTotalOverdueChaptersCount() }} launches behind schedule</span>
+            <span *ngIf="!topic.getTotalUpcomingChaptersCount() && !topic.getTotalOverdueChaptersCount()">--</span>
           </div>
         </div>
       </div>
@@ -401,6 +411,9 @@
     display: flex;
     justify-content: space-between;
     position: relative;
+  }
+  .topic-status {
+    margin-right: 15px;
   }
   .topic-edit-box-icon {
     cursor: pointer;
@@ -511,7 +524,6 @@
   }
 
   .list-summary span {
-    display: inline-block;
     line-height: normal;
     vertical-align: middle;
     word-break: break-word;

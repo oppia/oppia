@@ -65,8 +65,8 @@ export class CreatorTopicSummary {
       public thumbnailFilename: string,
       public thumbnailBgColor: string,
       public urlFragment: string,
-      public totalUpcomingChapters: number,
-      public totalOverdueChapters: number,
+      public totalUpcomingChaptersCount: number,
+      public totalOverdueChaptersCount: number,
       public totalChaptersCounts: number[],
       public publishedChaptersCounts: number[]) { }
 
@@ -171,12 +171,12 @@ export class CreatorTopicSummary {
     return this.isPublished;
   }
 
-  getTotalUpcomingChapters(): number {
-    return this.totalUpcomingChapters;
+  getTotalUpcomingChaptersCount(): number {
+    return this.totalUpcomingChaptersCount;
   }
 
-  getTotalOverdueChapters(): number {
-    return this.totalOverdueChapters;
+  getTotalOverdueChaptersCount(): number {
+    return this.totalOverdueChaptersCount;
   }
 
   getTotalChaptersCounts(): number[] {

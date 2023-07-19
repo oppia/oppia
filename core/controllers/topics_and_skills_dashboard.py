@@ -120,37 +120,46 @@ class TopicsAndSkillsDashboardPageDataHandler(
             for topic_id in classroom['topic_ids']:
                 topic_classroom_dict[topic_id] = classroom['name']
 
-        for topic_summary_dict in topic_summary_dicts:
+        topic_ids = [summary['id'] for summary in topic_summary_dicts]
+        topics = topic_fetchers.get_topics_by_ids(topic_ids)
+        for topic in topics:
+            if topic is None:
+                continue
+            topic_summary_dict = next(
+                topic_summary for topic_summary in topic_summary_dicts
+                if topic_summary['id'] == topic.id)
             topic_summary_dict['classroom'] = topic_classroom_dict.get(
                 topic_summary_dict['id'], None)
-            topic = topic_fetchers.get_topic_by_id(topic_summary_dict['id'])
             upcoming_chapters_count = 0
             overdue_chapters_count = 0
             total_chapters_counts = []
             published_chapters_counts = []
-            for story_reference in topic.canonical_story_references:
-                story = story_fetchers.get_story_by_id(
-                    story_reference.story_id)
+            story_ids = [story_reference.story_id for story_reference in
+                topic.canonical_story_references]
+            stories = story_fetchers.get_stories_by_ids(story_ids)
+            for story in stories:
+                if story is None:
+                    continue
                 nodes = story.story_contents.nodes
-
                 total_chapters_count = len(nodes)
-                published_chapters_count = len(
-                    [node for node in nodes if
-                    node.status == 'Published'])
-                upcoming_chapters_count += len(
-                    [node for node in nodes if
-                    node.planned_publication_date is not None and (
-                    node.planned_publication_date - datetime.datetime.today()).
-                    days < 14 and node.planned_publication_date >
-                    datetime.datetime.today() and node.status != 'Published'])
-                overdue_chapters_count += len(
-                    [node for node in nodes if
-                    node.planned_publication_date is not None and
-                    node.planned_publication_date < datetime.datetime.today()
-                    and node.status != 'Published'])
+                published_chapters_count = 0
+                for node in nodes:
+                    if node.status == constants.STORYNODE_STATUS_PUBLISHED:
+                        published_chapters_count += 1
+                    if (node.status != constants.STORYNODE_STATUS_PUBLISHED and
+                        node.planned_publication_date is not None):
+                        if ((node.planned_publication_date - datetime.datetime.
+                            today()).days < 14 and node.
+                            planned_publication_date >
+                            datetime.datetime.today()):
+                            upcoming_chapters_count += 1
+                        if (node.planned_publication_date <
+                            datetime.datetime.today()):
+                            overdue_chapters_count += 1
 
                 total_chapters_counts.append(total_chapters_count)
                 published_chapters_counts.append(published_chapters_count)
+
             topic_summary_dict.update({
                 'upcoming_chapters_count': upcoming_chapters_count,
                 'overdue_chapters_count': overdue_chapters_count,

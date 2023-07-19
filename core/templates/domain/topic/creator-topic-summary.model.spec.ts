@@ -73,8 +73,10 @@ describe('Creator topic summary model', () => {
       'image.svg');
     expect(_sampleCreatorTopicSummary.getThumbnailBgColor()).toEqual('#C6DCDA');
     expect(_sampleCreatorTopicSummary.isTopicPublished()).toBeFalse();
-    expect(_sampleCreatorTopicSummary.getTotalUpcomingChapters()).toEqual(1);
-    expect(_sampleCreatorTopicSummary.getTotalOverdueChapters()).toEqual(1);
+    expect(_sampleCreatorTopicSummary.getTotalUpcomingChaptersCount()).toEqual(
+      1);
+    expect(_sampleCreatorTopicSummary.getTotalOverdueChaptersCount()).toEqual(
+      1);
     expect(_sampleCreatorTopicSummary.getTotalChaptersCounts()).toEqual([2]);
     expect(_sampleCreatorTopicSummary.getPublishedChaptersCounts()).
       toEqual([1]);
