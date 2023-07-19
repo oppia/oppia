@@ -29,8 +29,6 @@ export const AdminFeaturesTabConstants = {
   ALLOWED_PLATFORM_TYPES: (
     AppConstants.PLATFORM_PARAMETER_ALLOWED_PLATFORM_TYPES),
 
-  ALLOWED_BROWSER_TYPES: AppConstants.PLATFORM_PARAMETER_ALLOWED_BROWSER_TYPES,
-
   // Matches app version with the numeric part only, hash and flavor are not
   // needed since hash is redundant and there is already app_version_flavor
   // filter.
