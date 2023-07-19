@@ -448,7 +448,6 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
         context = parameter_domain.EvaluationContext.from_dict(
             {
                 'platform_type': 'Android',
-                'browser_type': None,
                 'app_version': '1.2.3',
             },
             {
