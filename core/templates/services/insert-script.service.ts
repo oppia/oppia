@@ -28,7 +28,7 @@ export enum KNOWN_SCRIPTS {
   providedIn: 'root'
 })
 export class InsertScriptService {
-  private loaded_scripts: Set<string> = new Set<string>();
+  private loadedScripts: Set<string> = new Set<string>();
   private renderer: Renderer2;
 
   constructor(rendererFactory: RendererFactory2) {
@@ -36,7 +36,7 @@ export class InsertScriptService {
   }
 
   loadScript(script: KNOWN_SCRIPTS): boolean {
-    if (this.loaded_scripts.has(script)) {
+    if (this.loadedScripts.has(script)) {
       return false;
     }
     const scriptElement = document.createElement('script');
@@ -45,14 +45,18 @@ export class InsertScriptService {
         scriptElement.src = 'https://donorbox.org/widget.js';
         scriptElement.setAttribute('paypalExpress', 'false');
         scriptElement.async = true;
-        this.renderer.appendChild(document.body, scriptElement);
-        this.loaded_scripts.add(script);
+        this.appendChild(script, scriptElement);
         break;
       default: {
         return false;
       }
     }
     return true;
+  }
+
+  private appendChild(script: KNOWN_SCRIPTS, scriptElement: HTMLElement): void {
+    this.renderer.appendChild(document.body, scriptElement);
+    this.loadedScripts.add(script);
   }
 }
 
