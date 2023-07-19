@@ -86,10 +86,6 @@ describe('PlatformParameterRuleModel', () => {
       const instance = PlatformParameterRule.createFromBackendDict({
         filters: [
           {
-            type: PlatformParameterFilterType.BrowserType,
-            conditions: [['=', 'Chrome']]
-          },
-          {
             type: PlatformParameterFilterType.AppVersion,
             conditions: [['>', '1.0.0']]
           }
