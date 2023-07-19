@@ -168,8 +168,8 @@ describe('Review Translation language selector', () => {
       expect(getDropdownOptionsContainer()).toBeTruthy();
     }));
 
-    it('should be hide the dropdown when open and the user clicks outside' +
-      'the dropdown', () => {
+    it('should hide the dropdown when open and the user clicks outside' +
+      ' the dropdown', () => {
       const fakeClickAwayEvent = new MouseEvent('click');
       Object.defineProperty(
         fakeClickAwayEvent,
