@@ -108,6 +108,7 @@ DATA_TYPE_TO_SCHEMA_TYPE: Dict[str, str] = {
 
 PACKAGE_JSON_FILE_PATH: Final = os.path.join(os.getcwd(), 'package.json')
 
+
 class FeatureFlagNotFoundException(Exception):
     """Exception thrown when an unknown feature flag is requested."""
 
