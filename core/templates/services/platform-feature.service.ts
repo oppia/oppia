@@ -178,9 +178,8 @@ export class PlatformFeatureService {
    */
   private generateClientContext(): ClientContext {
     const platformType = 'Web';
-    const browserType = this.browserCheckerService.detectBrowserType();
 
-    return ClientContext.create(platformType, browserType);
+    return ClientContext.create(platformType);
   }
 }
 
