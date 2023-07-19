@@ -458,7 +458,7 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
                     'filters': [
                         {
                             'type': 'platform_type',
-                            'conditions': [['=', 'Backend']]
+                            'conditions': [['=', 'Web']]
                         }
                     ],
                     'value_when_matched': '222'

@@ -267,7 +267,7 @@ class PlatformParameterFilterTests(test_utils.GenericTestBase):
 
     def _create_example_context(
         self,
-        platform_type: str = 'Android',
+        platform_type: str = 'Web',
         app_version: Optional[str] = '1.2.3',
         mode: str = 'DEV'
     ) -> parameter_domain.EvaluationContext:
@@ -1205,23 +1205,22 @@ class PlatformParameterFilterTests(test_utils.GenericTestBase):
         self
     ) -> None:
         filter_dict: parameter_domain.PlatformParameterFilterDict = {
-            'type': 'browser_type',
-            'conditions': [['=', 'Chrome']]
+            'type': 'platform_type',
+            'conditions': [['=', 'Web']]
         }
         filter_domain = (
             parameter_domain
             .PlatformParameterFilter.from_dict(filter_dict))
 
-        browser_type_context = self._create_example_context(
-            browser_type='Chrome')
-        self.assertTrue(filter_domain.evaluate(browser_type_context))
+        platform_type_context = self._create_example_context()
+        self.assertTrue(filter_domain.evaluate(platform_type_context))
 
     def test_evaluate_multi_value_filter_with_none_matched_returns_true(
         self
     ) -> None:
         filter_dict: parameter_domain.PlatformParameterFilterDict = {
-            'type': 'browser_type',
-            'conditions': [['=', 'Chrome'], ['=', 'Safari']]
+            'type': 'platform_type',
+            'conditions': [['=', 'Backend'], ['=', 'Android']]
         }
         filter_domain = (
             parameter_domain
@@ -1249,7 +1248,7 @@ class PlatformParameterFilterTests(test_utils.GenericTestBase):
         filter_domain = (
             parameter_domain
             .PlatformParameterFilter.from_dict(
-                {'type': 'browser_type', 'conditions': [['!=', 'Chrome']]}
+                {'type': 'platform_type', 'conditions': [['!=', 'Web']]}
             ))
         with self.assertRaisesRegex(
             Exception, 'Unsupported comparison operator \'!=\''):
@@ -1280,8 +1279,8 @@ class PlatformParameterFilterTests(test_utils.GenericTestBase):
 
     def test_validate_filter_passes_without_exception(self) -> None:
         filter_dict: parameter_domain.PlatformParameterFilterDict = {
-            'type': 'browser_type',
-            'conditions': [['=', 'Chrome']]
+            'type': 'platform_type',
+            'conditions': [['=', 'Web']]
         }
         filter_domain = (
             parameter_domain
@@ -1304,7 +1303,7 @@ class PlatformParameterFilterTests(test_utils.GenericTestBase):
         filter_domain = (
             parameter_domain
             .PlatformParameterFilter.from_dict(
-                {'type': 'browser_type', 'conditions': [['!=', 'Chrome']]}
+                {'type': 'platform_type', 'conditions': [['!=', 'Web']]}
             ))
         with self.assertRaisesRegex(
             utils.ValidationError, 'Unsupported comparison operator \'!=\''):
@@ -1458,8 +1457,8 @@ class PlatformParameterTests(test_utils.GenericTestBase):
                 {
                     'filters': [
                         {
-                            'type': 'browser_type',
-                            'conditions': [['=', 'Chrome']]
+                            'type': 'platform_type',
+                            'conditions': [['=', 'Web']]
                         }
                     ],
                     'value_when_matched': '222'
@@ -1493,8 +1492,8 @@ class PlatformParameterTests(test_utils.GenericTestBase):
                 {
                     'filters': [
                         {
-                            'type': 'browser_type',
-                            'conditions': [['=', 'Chrome']]
+                            'type': 'platform_type',
+                            'conditions': [['=', 'Web']]
                         }
                     ],
                     'value_when_matched': '222'
@@ -1519,8 +1518,8 @@ class PlatformParameterTests(test_utils.GenericTestBase):
                 {
                     'filters': [
                         {
-                            'type': 'browser_type',
-                            'conditions': [['=', 'Chrome']]
+                            'type': 'platform_type',
+                            'conditions': [['=', 'Web']]
                         }
                     ],
                     'value_when_matched': '222'
@@ -1547,8 +1546,8 @@ class PlatformParameterTests(test_utils.GenericTestBase):
                 {
                     'filters': [
                         {
-                            'type': 'browser_type',
-                            'conditions': [['=', 'Chrome']]
+                            'type': 'platform_type',
+                            'conditions': [['=', 'Web']]
                         }
                     ],
                     'value_when_matched': '222'
@@ -1574,8 +1573,8 @@ class PlatformParameterTests(test_utils.GenericTestBase):
                 {
                     'filters': [
                         {
-                            'type': 'browser_type',
-                            'conditions': [['=', 'Chrome']]
+                            'type': 'platform_type',
+                            'conditions': [['=', 'Web']]
                         }
                     ],
                     'value_when_matched': '222'
@@ -1602,8 +1601,8 @@ class PlatformParameterTests(test_utils.GenericTestBase):
                 {
                     'filters': [
                         {
-                            'type': 'browser_type',
-                            'conditions': [['=', 'Chrome']]
+                            'type': 'platform_type',
+                            'conditions': [['=', 'Web']]
                         }
                     ],
                     'value_when_matched': '222'
@@ -1672,8 +1671,8 @@ class PlatformParameterTests(test_utils.GenericTestBase):
                         {
                             'filters': [
                                 {
-                                    'type': 'browser_type',
-                                    'conditions': [['=', 'Chrome']]
+                                    'type': 'platform_type',
+                                    'conditions': [['=', 'Web']]
                                 }
                             ],
                             'value_when_matched': '222'
@@ -1694,8 +1693,8 @@ class PlatformParameterTests(test_utils.GenericTestBase):
                 {
                     'filters': [
                         {
-                            'type': 'browser_type',
-                            'conditions': [['=', 'Chrome']]
+                            'type': 'platform_type',
+                            'conditions': [['=', 'Web']]
                         }
                     ],
                     'value_when_matched': '222'
@@ -1719,8 +1718,8 @@ class PlatformParameterTests(test_utils.GenericTestBase):
                 {
                     'filters': [
                         {
-                            'type': 'browser_type',
-                            'conditions': [['=', 'Chrome']]
+                            'type': 'platform_type',
+                            'conditions': [['=', 'Web']]
                         }
                     ],
                     'value_when_matched': '222'
@@ -1728,8 +1727,8 @@ class PlatformParameterTests(test_utils.GenericTestBase):
                 {
                     'filters': [
                         {
-                            'type': 'browser_type',
-                            'conditions': [['=', 'Chrome']]
+                            'type': 'platform_type',
+                            'conditions': [['=', 'Web']]
                         }
                     ],
                     'value_when_matched': '555'
@@ -1743,7 +1742,7 @@ class PlatformParameterTests(test_utils.GenericTestBase):
         })
         new_rule_dict: parameter_domain.PlatformParameterRuleDict = {
             'filters': [
-                {'type': 'browser_type', 'conditions': [['=', 'Chrome']]}
+                {'type': 'platform_type', 'conditions': [['=', 'Web']]}
             ],
             'value_when_matched': 'new rule value',
         }
@@ -1763,8 +1762,8 @@ class PlatformParameterTests(test_utils.GenericTestBase):
                 {
                     'filters': [
                         {
-                            'type': 'browser_type',
-                            'conditions': [['=', 'Chrome']]
+                            'type': 'platform_type',
+                            'conditions': [['=', 'Web']]
                         }
                     ],
                     'value_when_matched': '222'
@@ -1789,8 +1788,8 @@ class PlatformParameterTests(test_utils.GenericTestBase):
                 {
                     'filters': [
                         {
-                            'type': 'browser_type',
-                            'conditions': [['=', 'Chrome']]
+                            'type': 'platform_type',
+                            'conditions': [['=', 'Web']]
                         }
                     ],
                     'value_when_matched': '222'
@@ -1805,7 +1804,7 @@ class PlatformParameterTests(test_utils.GenericTestBase):
 
         dev_context = parameter_domain.EvaluationContext.from_dict(
             {
-                'platform_type': 'Android',
+                'platform_type': 'Web',
                 'app_version': '1.2.3',
             },
             {
@@ -1823,8 +1822,8 @@ class PlatformParameterTests(test_utils.GenericTestBase):
                 {
                     'filters': [
                         {
-                            'type': 'browser_type',
-                            'conditions': [['=', 'Chrome']]
+                            'type': 'platform_type',
+                            'conditions': [['=', 'Web']]
                         }
                     ],
                     'value_when_matched': '222'
@@ -1859,8 +1858,8 @@ class PlatformParameterTests(test_utils.GenericTestBase):
                 {
                     'filters': [
                         {
-                            'type': 'browser_type',
-                            'conditions': [['=', 'Chrome']]
+                            'type': 'platform_type',
+                            'conditions': [['=', 'Web']]
                         }
                     ],
                     'value_when_matched': '222'
@@ -1895,8 +1894,8 @@ class PlatformParameterTests(test_utils.GenericTestBase):
                 {
                     'filters': [
                         {
-                            'type': 'browser_type',
-                            'conditions': [['=', 'Chrome']]
+                            'type': 'platform_type',
+                            'conditions': [['=', 'Web']]
                         }
                     ],
                     'value_when_matched': '222'
@@ -1929,8 +1928,8 @@ class PlatformParameterTests(test_utils.GenericTestBase):
                 {
                     'filters': [
                         {
-                            'type': 'browser_type',
-                            'conditions': [['=', 'Chrome']]
+                            'type': 'platform_type',
+                            'conditions': [['=', 'Web']]
                         }
                     ],
                     'value_when_matched': False
@@ -2076,8 +2075,8 @@ class PlatformParameterTests(test_utils.GenericTestBase):
                 {
                     'filters': [
                         {
-                            'type': 'browser_type',
-                            'conditions': [['=', 'Chrome']]
+                            'type': 'platform_type',
+                            'conditions': [['=', 'Web']]
                         }
                     ],
                     'value_when_matched': True
