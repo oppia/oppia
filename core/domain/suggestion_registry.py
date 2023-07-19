@@ -24,7 +24,7 @@ import datetime
 from core import feconf
 from core import utils
 from core.constants import constants
-from core.domain import change_domain
+from core.domain import change_domain, topic_fetchers
 from core.domain import config_domain
 from core.domain import exp_domain
 from core.domain import exp_fetchers
@@ -1983,9 +1983,8 @@ class TranslationSubmitterTotalContributionStatsFrontendDict(TypedDict):
     """
 
     language_code: str
-    contributor_id: str
+    contributor_name: str
     topic_ids_with_translation_submissions: List[str]
-    recent_review_outcomes: List[str]
     recent_performance: int
     overall_accuracy: float
     submitted_translations_count: int
@@ -2047,12 +2046,20 @@ class TranslationSubmitterTotalContributionStats:
         Returns:
             dict. The dict representation.
         """
+        topic_summaries = topic_fetchers.get_multi_topic_summaries(
+            self.topic_ids_with_translation_submissions)
+        topic_name_by_topic_id = []
+        {
+            topic_name_by_topic_id.append(topic_summary.name)
+            for topic_summary in topic_summaries if topic_summary is not None
+        }
+        contributor_name = user_services.get_username(self.contributor_id)
+
         return {
             'language_code': self.language_code,
-            'contributor_id': self.contributor_id,
-            'topic_ids_with_translation_submissions': (
-                self.topic_ids_with_translation_submissions),
-            'recent_review_outcomes': self.recent_review_outcomes,
+            'contributor_name': contributor_name,
+            'topic_names_with_translation_submissions': (
+                topic_name_by_topic_id),
             'recent_performance': self.recent_performance,
             'overall_accuracy': self.overall_accuracy,
             'submitted_translations_count': self.submitted_translations_count,
@@ -2079,7 +2086,7 @@ class TranslationReviewerTotalContributionStatsFrontendDict(TypedDict):
     """
 
     language_code: str
-    contributor_id: str
+    contributor_name: str
     topic_ids_with_translation_reviews: List[str]
     reviewed_translations_count: int
     accepted_translations_count: int
@@ -2128,11 +2135,20 @@ class TranslationReviewerTotalContributionStats:
         Returns:
             dict. The dict representation.
         """
+        topic_summaries = topic_fetchers.get_multi_topic_summaries(
+            self.topic_ids_with_translation_reviews)
+        topic_name_by_topic_id = []
+        {
+            topic_name_by_topic_id.append(topic_summary.name)
+            for topic_summary in topic_summaries if topic_summary is not None
+        }
+        contributor_name = user_services.get_username(self.contributor_id)
+
         return {
             'language_code': self.language_code,
-            'contributor_id': self.contributor_id,
+            'contributor_name': contributor_name,
             'topic_ids_with_translation_reviews': (
-                self.topic_ids_with_translation_reviews),
+                topic_name_by_topic_id),
             'reviewed_translations_count': self.reviewed_translations_count,
             'accepted_translations_count': self.accepted_translations_count,
             'accepted_translations_with_reviewer_edits_count': (
@@ -2152,9 +2168,8 @@ class QuestionSubmitterTotalContributionStatsFrontendDict(TypedDict):
     object for frontend.
     """
 
-    contributor_id: str
+    contributor_name: str
     topic_ids_with_question_submissions: List[str]
-    recent_review_outcomes: List[str]
     recent_performance: int
     overall_accuracy: float
     submitted_questions_count: int
@@ -2205,11 +2220,19 @@ class QuestionSubmitterTotalContributionStats:
         Returns:
             dict. The dict representation.
         """
+        topic_summaries = topic_fetchers.get_multi_topic_summaries(
+            self.topic_ids_with_question_submissions)
+        topic_name_by_topic_id = []
+        {
+            topic_name_by_topic_id.append(topic_summary.name)
+            for topic_summary in topic_summaries if topic_summary is not None
+        }
+        contributor_name = user_services.get_username(self.contributor_id)
+
         return {
-            'contributor_id': self.contributor_id,
+            'contributor_name': contributor_name,
             'topic_ids_with_question_submissions': (
-                self.topic_ids_with_question_submissions),
-            'recent_review_outcomes': self.recent_review_outcomes,
+                topic_name_by_topic_id),
             'recent_performance': self.recent_performance,
             'overall_accuracy': self.overall_accuracy,
             'submitted_questions_count': self.submitted_questions_count,
@@ -2229,7 +2252,7 @@ class QuestionReviewerTotalContributionStatsFrontendDict(TypedDict):
     object for frontend.
     """
 
-    contributor_id: str
+    contributor_name: str
     topic_ids_with_question_reviews: List[str]
     reviewed_questions_count: int
     accepted_questions_count: int
@@ -2273,10 +2296,19 @@ class QuestionReviewerTotalContributionStats:
         Returns:
             dict. The dict representation.
         """
+        topic_summaries = topic_fetchers.get_multi_topic_summaries(
+            self.topic_ids_with_question_reviews)
+        topic_name_by_topic_id = []
+        {
+            topic_name_by_topic_id.append(topic_summary.name)
+            for topic_summary in topic_summaries if topic_summary is not None
+        }
+        contributor_name = user_services.get_username(self.contributor_id)
+
         return {
-            'contributor_id': self.contributor_id,
+            'contributor_name': contributor_name,
             'topic_ids_with_question_reviews': (
-                self.topic_ids_with_question_reviews),
+                topic_name_by_topic_id),
             'reviewed_questions_count': self.reviewed_questions_count,
             'accepted_questions_count': self.accepted_questions_count,
             'accepted_questions_with_reviewer_edits_count': (

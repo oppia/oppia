@@ -21,8 +21,10 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
-import { ContributorAdminDashboardFilter } from '../contributor-admin-dashboard-filter.model'
-import { ContributorAdminStats } from '../contributor-dashboard-admin-summary.model'
+import { ContributorAdminDashboardFilter } from '../contributor-admin-dashboard-filter.model';
+import { TranslationSubmitterStats, TranslationReviewerStats,
+  QuestionSubmitterStats, QuestionReviewerStats } from '../contributor-dashboard-admin-summary.model';
+import { AppConstants } from 'app.constants';
 
 export interface TranslationSubmitterBackendDict {
     'language_code': string;
@@ -48,7 +50,7 @@ export interface TranslationReviewerBackendDict {
     'reviewed_translations_count': number;
     'accepted_translations_count': number;
     'accepted_translations_with_reviewer_edits_count': number;
-    'accepted_translation_word_count': number;
+    'rejected_translations_count': number;
     'first_contribution_date': string;
     'last_contributed_in_days': number;
 }
@@ -78,7 +80,15 @@ export interface QuestionReviewerBackendDict {
 }
 
 export interface ContributorAdminStatsData {
-  stats: ContributorAdminStats;
+  stats: TranslationSubmitterStats | TranslationReviewerStats
+    | QuestionSubmitterStats | QuestionReviewerStats;
+  nextOffset: number;
+  more: boolean;
+}
+
+export interface ContributorAdminStatsBackendDict {
+  stats: TranslationSubmitterBackendDict | TranslationReviewerBackendDict
+    | QuestionSubmitterBackendDict | QuestionReviewerBackendDict;
   nextOffset: number;
   more: boolean;
 }
@@ -97,11 +107,11 @@ export class ContributorDashboardAdminStatsService {
     '<contribution_subtype>');
 
   async fetchContributorAdminStats(
-    filter: ContributorAdminDashboardFilter,
-    pageSize: number,
-    nextOffset: string | null,
-    contributionType: string,
-    contributionSubtype: string
+      filter: ContributorAdminDashboardFilter,
+      pageSize: number,
+      nextOffset: string | null,
+      contributionType: string,
+      contributionSubtype: string
   ):
     Promise<ContributorAdminStatsData> {
     const url = this.urlInterpolationService.interpolateUrl(
@@ -110,23 +120,32 @@ export class ContributorDashboardAdminStatsService {
         contribution_subtype: contributionSubtype
       }
     );
-    return this.http.get<ContributorAdminStatsData>(
-      url, {
-          page_size: pageSize
-          offset: nextOffset
-          language_code: filter.languageCode
-          sort_by: filter.sort
-          topic_ids: filter.topicIds
-          max_days_since_last_activity: filter.lastActivity
-        }).toPromise().then(response => {
-        return {
-          stats: response.stats,
-          nextOffset: response.next_cursor,
-          more: response.more
-        };
-      }, errorResponse => {
-        throw new Error(errorResponse.error.error);
-      });
+    if (contributionType === AppConstants.CONTRIBUTION_STATS_TYPE_TRANSLATION) {
+      if (
+        contributionSubtype === (
+          AppConstants.CONTRIBUTION_STATS_SUBTYPE_SUBMISSION)
+      ) {
+        return this.http.get<ContributorAdminStatsBackendDict>(
+          url, {
+            page_size: pageSize,
+            offset: nextOffset,
+            language_code: filter.languageCode,
+            sort_by: filter.sort,
+            topic_ids: filter.topicIds,
+            max_days_since_last_activity: filter.lastActivity
+          } as Object).toPromise().then(response => {
+          return {
+            stats: response.stats.map(
+              backendDict => TranslationSubmitterStats
+                .createFromBackendDict(backendDict)),
+            nextOffset: response.nextOffset,
+            more: response.more
+          };
+        }, errorResponse => {
+          throw new Error(errorResponse.error.error);
+        });
+      }
+    }
   }
 }
 
