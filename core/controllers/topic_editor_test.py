@@ -143,7 +143,7 @@ class TopicEditorStoryHandlerTests(BaseTopicEditorControllerTests):
             canonical_story_id, 'title', 'description', topic_id,
             'url-fragment')
         story.meta_tag_content = 'story meta content'
-        node_1 = {
+        node_1: story_domain.StoryNodeDict = {
             'outline': 'outline',
             'exploration_id': 'exp-1',
             'destination_node_ids': [],
@@ -163,7 +163,7 @@ class TopicEditorStoryHandlerTests(BaseTopicEditorControllerTests):
             'last_modified_msecs': 1672684200000,
             'unpublishing_reason': None
         }
-        node_2 = {
+        node_2: story_domain.StoryNodeDict = {
             'outline': 'outline',
             'exploration_id': 'exp-2',
             'destination_node_ids': [],
@@ -183,7 +183,7 @@ class TopicEditorStoryHandlerTests(BaseTopicEditorControllerTests):
             'last_modified_msecs': 1672684200000,
             'unpublishing_reason': None
         }
-        node_3 = {
+        node_3: story_domain.StoryNodeDict = {
             'outline': 'outline',
             'exploration_id': 'exp-3',
             'destination_node_ids': [],
