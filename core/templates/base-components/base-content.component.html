@@ -24,7 +24,10 @@
     </div>
   </div>
   <div *ngIf="!iframed">
-    <a role="button" tabindex="0" (click)="skipToMainContent()"
+    <a role="button"
+       tabindex="0"
+       (click)="skipToMainContent()"
+       (keydown.enter)="skipToMainContent()"
        class="oppia-skip-to-content e2e-test-skip-link">
       Skip to Main Content
     </a>
