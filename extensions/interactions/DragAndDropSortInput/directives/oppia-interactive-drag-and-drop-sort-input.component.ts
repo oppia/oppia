@@ -16,7 +16,7 @@
  * @fileoverview Component for the DragAndDropSortInput interaction.
  */
 
-import { Component, Input, OnInit, ElementRef } from '@angular/core';
+import { Component, Input, OnInit, ElementRef, QueryList, ViewChildren } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { CdkDragDrop, CdkDragExit, moveItemInArray } from '@angular/cdk/drag-drop';
 import { DragAndDropSortInputCustomizationArgs } from 'interactions/customization-args-defs';
@@ -28,6 +28,9 @@ import { InteractionAttributesExtractorService } from 'interactions/interaction-
 import { InteractionAnswer } from 'interactions/answer-defs';
 import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 import { DragAndDropAnswer } from 'interactions/answer-defs';
+
+import { Subscription } from 'rxjs';
+
 
 @Component({
   selector: 'oppia-interactive-drag-and-drop-sort-input',
@@ -52,6 +55,9 @@ export class InteractiveDragAndDropSortInputComponent implements OnInit {
   highlightedGroup: number = -1;
   noShow: number = -1;
   rootHeight: number = 40;
+  activeItem!: number;
+  listSubscription!: Subscription;
+  @ViewChildren('listItem') listItems!: QueryList<ElementRef<HTMLDivElement>>;
 
   constructor(
     private currentInteractionService: CurrentInteractionService,
@@ -59,6 +65,24 @@ export class InteractiveDragAndDropSortInputComponent implements OnInit {
     private el: ElementRef,
     private interactionAttributesExtractorService:
       InteractionAttributesExtractorService) {}
+
+  ngAfterViewInit(): void {
+    this.listSubscription = this.listItems.changes.subscribe((_) => {
+      this.setFocus();
+    });
+  }
+
+  ngOnDestroy(): void {
+    this.listSubscription.unsubscribe();
+  }
+
+  setFocus(): void {
+    if (!this.listItems) {
+      return;
+    }
+    this.listItems.toArray()[this.activeItem].nativeElement.focus();
+  }
+
 
   resetArray(): void {
     // Resets the array into the correct format.
@@ -104,7 +128,8 @@ export class InteractiveDragAndDropSortInputComponent implements OnInit {
     // drag is cancelled.
     moveItemInArray(
       this.multipleItemsInSamePositionArray,
-      event.previousIndex, event.currentIndex);
+      event.previousIndex,
+      event.currentIndex);
     this.resetArray();
   }
 
@@ -146,6 +171,48 @@ export class InteractiveDragAndDropSortInputComponent implements OnInit {
     moveItemInArray(
       this.singleItemInSamePositionArray,
       event.previousIndex, event.currentIndex);
+    this.activeItem = event.currentIndex;
+    this.setFocus();
+  }
+
+  handleKeyDown(event: KeyboardEvent, currentIndex: number): void {
+    let newIndex = currentIndex;
+    if (event.key === 'ArrowDown') {
+      event.preventDefault();
+      if (this.activeItem !== this.listItems.length - 1) {
+        newIndex += 1;
+        moveItemInArray(
+          this.singleItemInSamePositionArray,
+          currentIndex,
+          newIndex);
+      }
+    }
+    if (event.key === 'ArrowUp') {
+      event.preventDefault();
+      if (this.activeItem !== 0) {
+        newIndex -= 1;
+        moveItemInArray(
+          this.singleItemInSamePositionArray,
+          currentIndex,
+          newIndex);
+      }
+    }
+
+    if (event.key === 'Tab') {
+      if (event.shiftKey) {
+        if (this.activeItem > 0) {
+          event.preventDefault();
+          newIndex -= 1;
+        }
+      } else {
+        if (this.activeItem < this.listItems.length - 1) {
+          event.preventDefault();
+          newIndex += 1;
+        }
+      }
+    }
+    this.activeItem = newIndex;
+    this.setFocus();
   }
 
   hideElement(event: CdkDragExit<string[]>): void {

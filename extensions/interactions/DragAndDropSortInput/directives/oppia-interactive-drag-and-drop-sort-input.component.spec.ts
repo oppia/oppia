@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for the DragAndDropSortInput interaction.
  */
 
-import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { NO_ERRORS_SCHEMA, ElementRef, QueryList } from '@angular/core';
 import { async, ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { InteractiveDragAndDropSortInputComponent } from './oppia-interactive-drag-and-drop-sort-input.component';
 import { CurrentInteractionService } from 'pages/exploration-player-page/services/current-interaction.service';
@@ -472,6 +472,39 @@ describe('Drag and drop sort input interactive component', () => {
       expect(component.dragStarted).toBeTrue();
     });
 
+    it('should set focus on list items change', () => {
+      spyOn(component, 'setFocus');
+      component.listItems = new QueryList<ElementRef<HTMLDivElement>>();
+      component.listItems.reset([
+        new ElementRef(document.createElement('div')),
+        new ElementRef(document.createElement('div')),
+        new ElementRef(document.createElement('div'))
+      ]);
+
+      component.ngAfterViewInit();
+
+      component.listItems.notifyOnChanges();
+
+      expect(component.setFocus).toHaveBeenCalled();
+    });
+
+    it('should focus on the active item', () => {
+      component.activeItem = 0;
+
+      component.listItems = new QueryList<ElementRef<HTMLDivElement>>();
+      component.listItems.reset([
+        new ElementRef(document.createElement('div')),
+        new ElementRef(document.createElement('div')),
+        new ElementRef(document.createElement('div'))
+      ]);
+      const listItemElements = component.listItems.toArray();
+      spyOn(listItemElements[0].nativeElement, 'focus');
+
+      component.setFocus();
+
+      expect(listItemElements[0].nativeElement.focus).toHaveBeenCalled();
+    });
+
     it('should not hide item when drag is started', () => {
       component.dragStarted = true;
 
@@ -498,6 +531,81 @@ describe('Drag and drop sort input interactive component', () => {
 
       expect(component.isChildElementHaveZeroHeight(1)).toBeTrue();
     });
+  });
+
+  it('should move the item down when ArrowDown key is pressed', () => {
+    const event = new KeyboardEvent('keydown', { key: 'ArrowDown' });
+    const currentIndex = 0;
+    component.activeItem = 0;
+    component.listItems = new QueryList<ElementRef<HTMLDivElement>>();
+    component.listItems.reset([
+      new ElementRef(document.createElement('div')),
+      new ElementRef(document.createElement('div')),
+      new ElementRef(document.createElement('div'))
+    ]);
+    component.singleItemInSamePositionArray = [
+      '<p>choice 1</p>',
+      '<p>choice 2</p>',
+      '<p>choice 3</p>'
+    ];
+    spyOn(component, 'setFocus');
+
+    component.handleKeyDown(event, currentIndex);
+
+    expect(component.setFocus).toHaveBeenCalled();
+    expect(component.activeItem).toBe(currentIndex + 1);
+  });
+
+  it('should move item up when ArrowUp key is pressed', () => {
+    const event = new KeyboardEvent('keydown', { key: 'ArrowUp' });
+    const currentIndex = 1;
+    component.activeItem = 1;
+    component.listItems = new QueryList<ElementRef<HTMLDivElement>>();
+    component.listItems.reset([
+      new ElementRef(document.createElement('div')),
+      new ElementRef(document.createElement('div')),
+      new ElementRef(document.createElement('div'))
+    ]);
+    component.singleItemInSamePositionArray = [
+      '<p>choice 1</p>',
+      '<p>choice 2</p>',
+      '<p>choice 3</p>'
+    ];
+    spyOn(component, 'setFocus');
+
+    component.handleKeyDown(event, currentIndex);
+
+    expect(component.setFocus).toHaveBeenCalled();
+    expect(component.activeItem).toBe(currentIndex - 1);
+  });
+
+  it('should decrement newIndex when Shift + Tab keys are pressed', () => {
+    const event = new KeyboardEvent('keydown', { key: 'Tab', shiftKey: true });
+    const currentIndex = 1;
+    component.activeItem = 1;
+    spyOn(component, 'setFocus');
+
+    component.handleKeyDown(event, currentIndex);
+
+    expect(component.setFocus).toHaveBeenCalled();
+    expect(component.activeItem).toBe(currentIndex - 1);
+  });
+
+  it('should increment newIndex when Tab key is pressed', () => {
+    const event = new KeyboardEvent('keydown', { key: 'Tab', shiftKey: false });
+    const currentIndex = 1;
+    component.activeItem = 1;
+    component.listItems = new QueryList<ElementRef<HTMLDivElement>>();
+    component.listItems.reset([
+      new ElementRef(document.createElement('div')),
+      new ElementRef(document.createElement('div')),
+      new ElementRef(document.createElement('div'))
+    ]);
+
+    spyOn(component, 'setFocus');
+    component.handleKeyDown(event, currentIndex);
+    expect(component.setFocus).toHaveBeenCalled();
+    expect(component.activeItem).toBe(currentIndex + 1);
   });
 
   describe('when multiple items in the same position are not allowed', () => {
