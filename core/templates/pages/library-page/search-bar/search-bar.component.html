@@ -8,9 +8,6 @@
             <i class="fas fa-sync oppia-animate-spin"></i>
           </span>
         </div>
-        <span *ngIf="isMobileViewActive()" class="search-icon-in-mobileview">
-          <i class="fas fal fa-search ram"></i>
-        </span>
         <input type="text"
                class="form-control oppia-search-bar-input oppia-search-bar-text-input e2e-test-search-input"
                [placeholder]="searchBarPlaceholder"
@@ -151,20 +148,3 @@
     </div>
   </div>
 </div>
-
-<style>
-  .search-icon-in-mobileview {
-    position: relative;
-    right: 20px;
-    border: 1px solid #205D86;
-    border-right: none;
-    border-top-left-radius: 4px;
-    border-bottom-left-radius: 4px;
-  }
-  .ram {
-    padding: 7px 0px 7px 7px;
-    font-size: 24px;
-    color: #205D86;
-  }
-
-</style>

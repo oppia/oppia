@@ -70,10 +70,10 @@ oppia-search-bar .oppia-navbar-button-container {
 .input-group-addon.oppia-search-bar-icon {
   border-radius: 4px 0 0 4px;
   color: #00609C;
-  font-size: 20px;
+  font-size: 21px;
   font-weight: normal;
   line-height: 1;
-  padding: 7px 12px;
+  padding: 6px 10px;
   text-align: center;
 }
 .oppia-search-bar-input.btn:hover,
@@ -289,8 +289,11 @@ oppia-search-bar .oppia-input-group {
   oppia-search-bar .oppia-translate-icon-down {
     transform: translate(0,6px);
   }
-  .oppia-search-bar-icon {
-    display: none;
+  .input-group-addon.oppia-search-bar-icon {
+    font-size: 24px;
+    padding: 1px 12px;
+    position: relative;
+    right: 17px;
   }
   .search-button-icon {
     font-size: 24px;

@@ -90,7 +90,7 @@ export class SearchBarComponent implements OnInit, OnDestroy {
   }
 
   isMobileViewActive(): boolean {
-    return this.windowDimensionsService.getWidth() <= 639;
+    return this.windowDimensionsService.getWidth() <= 766;
   }
 
   isSearchButtonActive(): boolean {
