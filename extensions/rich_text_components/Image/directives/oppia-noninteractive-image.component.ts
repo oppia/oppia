@@ -169,7 +169,7 @@ export class NoninteractiveImage implements OnInit, OnChanges {
           }
         }
         throw e;
-      }
+     }
     }
      // We set the alt text and caption for the image, regardless of when
     // user is in the exploration player or not in the exploration player.
