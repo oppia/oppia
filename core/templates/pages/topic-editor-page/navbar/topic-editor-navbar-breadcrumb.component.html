@@ -3,12 +3,18 @@
     <a href="/topics-and-skills-dashboard"
        ngbTooltip="Back to Topics and Skills Dashboard"
        *ngIf="!canNavigateToTopicEditorPage()"
+       aria-label="Back to topic and skills dashboard"
+       tabindex="0"
        class="back-to-dashboard">
       <i class="fa fa-arrow-left"></i>
     </a>
     <i class="fa fa-arrow-left e2e-test-edit-topic-tab"
        ngbTooltip="Back to Topic"
        *ngIf="canNavigateToTopicEditorPage()"
+       tabindex="0"
+       aria-label="Back to topic"
+       role="button"
+       (keydown.enter)="navigateToMainTab()"
        (click)="navigateToMainTab()">
     </i>
     {{ topic.getName() }} (v{{ topic.getVersion() }})
