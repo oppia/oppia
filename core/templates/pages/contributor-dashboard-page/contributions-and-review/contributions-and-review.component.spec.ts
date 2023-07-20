@@ -1184,6 +1184,44 @@ describe('Contributions and review component', () => {
             }
           }
         };
+        const reviewableTranslation = Promise.resolve({
+          suggestionIdToDetails: suggestion1,
+          more: false
+        });
+        getReviewableTranslationSuggestionsAsyncSpy.and.returnValue(
+          reviewableTranslation);
+
+        component.switchToTab(
+          component.TAB_TYPE_REVIEWS, 'translate_content');
+
+        // Set up contributions with a translation.
+        component.loadContributions(null).then(({opportunitiesDicts, more}) => {
+          expect(Object.keys(component.contributions)).toContain(
+            'suggestion_1');
+          expect(opportunitiesDicts).toEqual([{
+            id: 'suggestion_1',
+            heading: 'Tradução',
+            subheading: 'topic_name / story_title / chapter_title',
+            labelText: 'Obsolete',
+            labelColor: '#e76c8c',
+            actionButtonTitle: 'Review',
+            translationWordCount: undefined
+          }]);
+          expect(more).toEqual(false);
+
+          // When opening the review modal for translations,
+          // only translations should be shown.
+          spyOn(component, '_showTranslationSuggestionModal');
+          component.onClickViewSuggestion('suggestion_1');
+          expect(component._showTranslationSuggestionModal).
+            toHaveBeenCalledWith(
+              suggestion1,
+              'suggestion_1',
+              true
+            );
+        });
+        // Wait for the first test to complete.
+        tick();
 
         const suggestion2 = {
           target_type: 'state',
@@ -1268,46 +1306,6 @@ describe('Contributions and review component', () => {
           status: 'accepted'
         };
 
-        const reviewableTranslation = Promise.resolve({
-          suggestionIdToDetails: suggestion1,
-          more: false
-        });
-        getReviewableTranslationSuggestionsAsyncSpy.and.returnValue(
-          reviewableTranslation);
-
-        component.switchToTab(
-          component.TAB_TYPE_REVIEWS, 'translate_content');
-
-        // Set up contributions with a translation.
-        component.loadContributions(null).then(({opportunitiesDicts, more}) => {
-          expect(Object.keys(component.contributions)).toContain(
-            'suggestion_1');
-          expect(opportunitiesDicts).toEqual([{
-            id: 'suggestion_1',
-            heading: 'Tradução',
-            subheading: 'topic_name / story_title / chapter_title',
-            labelText: 'Obsolete',
-            labelColor: '#e76c8c',
-            actionButtonTitle: 'Review',
-            translationWordCount: undefined
-          }]);
-
-          expect(more).toEqual(false);
-
-          // When opening the review modal for translations,
-          // only translations should be shown.
-          spyOn(component, '_showTranslationSuggestionModal');
-          component.onClickViewSuggestion('suggestion_1');
-          expect(component._showTranslationSuggestionModal).
-            toHaveBeenCalledWith(
-              suggestion1,
-              'suggestion_1',
-              true
-            );
-        });
-        // Wait for the first test to complete.
-        tick();
-
         // Now load a question contribution.
         getUserCreatedQuestionSuggestionsAsyncSpy.and.returnValue(
           Promise.resolve({
@@ -1331,7 +1329,6 @@ describe('Contributions and review component', () => {
         component.loadContributions(null).then(({opportunitiesDicts, more}) => {
           expect(Object.keys(component.contributions)).toContain(
             'suggestion_2');
-
           expect(opportunitiesDicts).toEqual([
             {
               id: 'suggestion_2',
@@ -1341,8 +1338,8 @@ describe('Contributions and review component', () => {
               labelColor: '#8ed274',
               actionButtonTitle: 'View'
             }]);
-
           expect(more).toEqual(false);
+
           // When opening the contribution modal for questions,
           // only contribution questions should be shown.
           spyOn(component, 'openQuestionSuggestionModal');
