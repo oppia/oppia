@@ -38,6 +38,8 @@ auth_models, = models.Registry.import_models([models.Names.AUTH])
 
 platform_auth_services = models.Registry.import_auth_services()
 
+# NOTE TO DEVELOPERS: Don't modify this constant since it is used to
+# identify a specific datastore entity in production.
 CSRF_SECRET_INSTANCE_ID: Final = 'csrf_secret'
 
 
@@ -291,7 +293,8 @@ def revoke_super_admin_privileges(user_id: str) -> None:
 
 
 def get_csrf_secret_value() -> str:
-    """Returns the csrf secret value if it exists otherwise initializes it.
+    """Returns the CSRF secret value. If this value does not exist,
+    creates a new secret value and returns it.
 
     Returns:
         str. Returns the csrf secret value.
@@ -303,7 +306,7 @@ def get_csrf_secret_value() -> str:
     )
     if CSRF_SECRET_INSTANCE_ID in memcached_items:
         csrf_value = memcached_items[CSRF_SECRET_INSTANCE_ID]
-        # Rulling out the possibility for csrf_value of being type other
+        # Ruling out the possibility for csrf_value of being type other
         # than str in order to avoid mypy error.
         assert isinstance(csrf_value, str)
         return csrf_value
@@ -327,11 +330,11 @@ def get_csrf_secret_value() -> str:
 
     csrf_secret_model = auth_models.CsrfSecretModel.get(
         CSRF_SECRET_INSTANCE_ID, strict=False)
-    # Rulling out the possibility of csrf_secret_model being None in
+    # Ruling out the possibility of csrf_secret_model being None in
     # order to avoid mypy error.
     assert csrf_secret_model is not None
     csrf_secret_value = csrf_secret_model.oppia_csrf_secret
-    # Rulling out the possibility for csrf_secret_value of being type other
+    # Ruling out the possibility for csrf_secret_value of being type other
     # than str in order to avoid mypy error.
     assert isinstance(csrf_secret_value, str)
     return csrf_secret_value
