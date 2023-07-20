@@ -17,12 +17,17 @@
     <h3>Embed this exploration</h3>
   </div>
 
-  <div class="modal-body">
+  <div class="modal-body" tabindex="0">
     <p>
       To embed this exploration in another webpage, copy the following HTML into the source code of the webpage:
     </p>
 
-    <div class="oppia-embed-modal-code" (click)="selectText($event)">&lt;iframe src="{{serverName}}/embed/exploration/{{explorationId}}" width="700" height="1000"&gt;</div>
+    <div class="oppia-embed-modal-code"
+         tabindex="0"
+         (keydown.enter)="selectText($event)"
+         (click)="selectText($event)">
+      &lt;iframe src="{{serverName}}/embed/exploration/{{explorationId}}" width="700" height="1000"&gt;
+    </div>
 
     <p>
       For more details, as well as instructions on how to embed a particular version of an exploration, please see the <a href="https://oppia.github.io/#/EmbeddingAnExploration" target="_blank" rel="noopener">documentation</a>.

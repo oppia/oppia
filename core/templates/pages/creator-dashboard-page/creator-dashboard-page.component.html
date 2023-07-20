@@ -11,14 +11,15 @@
        [ngClass]="{'oppia-creator-dashboard-mobile-mode': checkMobileView()}">
     <mat-card layout="row" class="oppia-mat-card">
       <div class="average-ratings stats-card"
-           [attr.aria-label]="'Average ratings ' + (dashboardStats.averageRatings || 'N/A')"
            tabindex="0" >
         <p class="stat-description" [innerHTML]="'I18N_DASHBOARD_STATS_AVERAGE_RATING' | translate"></p>
         <h2 class="stat-value-with-rating e2e-test-oppia-average-rating"
+            [attr.aria-hidden]="!dashboardStats.numRatings || relativeChangeInTotalPlays"
             [hidden]="!dashboardStats.numRatings || relativeChangeInTotalPlays">
             {{ dashboardStats.averageRatings || 'N/A' }}
         </h2>
         <h2 class="stat-value-without-rating"
+            [attr.aria-hidden]="dashboardStats.numRatings || relativeChangeInTotalPlays"
             [hidden]="dashboardStats.numRatings || relativeChangeInTotalPlays">
             {{ dashboardStats.averageRatings || 'N/A' }}
         </h2>
@@ -31,35 +32,44 @@
           </p>
         </div>
       </div>
-      <div class="total-plays stats-card"  [attr.aria-label]="'Total plays ' + (dashboardStats.totalPlays)" tabindex="0">
+      <div class="total-plays stats-card" tabindex="0">
         <p class="stat-description" [innerHTML]="'I18N_DASHBOARD_STATS_TOTAL_PLAYS' | translate"></p>
         <h2 class="stat-value-with-rating e2e-test-oppia-total-plays"
+            [attr.aria-hidden]="!dashboardStats.numRatings || relativeChangeInTotalPlays"
             [hidden]="!dashboardStats.numRatings || relativeChangeInTotalPlays">
             {{ dashboardStats.totalPlays }}
         </h2>
         <h2 class="stat-value-without-rating"
+            [attr.aria-hidden]="dashboardStats.numRatings || relativeChangeInTotalPlays"
             [hidden]="dashboardStats.numRatings || relativeChangeInTotalPlays">
             {{ dashboardStats.totalPlays }}
         </h2>
-        <p [hidden]="!relativeChangeInTotalPlays">
+        <p [hidden]="!relativeChangeInTotalPlays" [attr.aria-hidden]="!relativeChangeInTotalPlays">
           (+{{ relativeChangeInTotalPlays }} from last week)
         </p>
       </div>
-      <div class="total-open-feedback stats-card" [attr.aria-label]="'Total feedbacks ' + (dashboardStats.totalOpenFeedback)" tabindex="0">
+      <div class="total-open-feedback stats-card" tabindex="0">
         <p class="stat-description" [innerHTML]="'I18N_DASHBOARD_STATS_OPEN_FEEDBACK' | translate"></p>
         <h2 class="stat-value-with-rating e2e-test-oppia-open-feedback"
+            [attr.aria-hidden]="!dashboardStats.numRatings || relativeChangeInTotalPlays"
             [hidden]="!dashboardStats.numRatings || relativeChangeInTotalPlays">
             {{ dashboardStats.totalOpenFeedback }}
         </h2>
-        <h2 class="stat-value-without-rating" [hidden]="dashboardStats.numRatings || relativeChangeInTotalPlays">{{ dashboardStats.totalOpenFeedback }}</h2>
+        <h2 class="stat-value-without-rating"
+            [attr.aria-hidden]="dashboardStats.numRatings || relativeChangeInTotalPlays"
+            [hidden]="dashboardStats.numRatings || relativeChangeInTotalPlays">
+          {{ dashboardStats.totalOpenFeedback }}
+        </h2>
       </div>
-      <div class="total-open-feedback stats-card" [attr.aria-label]="'Total subscribers ' + (subscribersList?.length)" tabindex="0">
+      <div class="total-open-feedback stats-card" tabindex="0">
         <p class="stat-description" [innerHTML]="'I18N_DASHBOARD_STATS_TOTAL_SUBSCRIBERS' | translate"></p>
         <h2 class="stat-value-with-rating e2e-test-oppia-total-subscribers"
+            [attr.aria-hidden]="!dashboardStats.numRatings || relativeChangeInTotalPlays"
             [hidden]="!dashboardStats.numRatings || relativeChangeInTotalPlays">
             {{ subscribersList?.length }}
         </h2>
         <h2 class="stat-value-without-rating"
+            [attr.aria-hidden]="dashboardStats.numRatings || relativeChangeInTotalPlays"
             [hidden]="dashboardStats.numRatings || relativeChangeInTotalPlays">
             {{ subscribersList?.length }}
         </h2>
@@ -72,6 +82,8 @@
       <li *ngIf="explorationsList?.length > 0"
           [ngClass]="{'oppia-dashboard-tabs-active': activeTab === 'myExplorations'}">
         <a class="oppia-dashboard-tabs-text"
+           tabindex="0"
+           (keydown.enter)="setActiveTab('myExplorations')"
            (click)="setActiveTab('myExplorations')"
            [innerHTML]="'I18N_DASHBOARD_EXPLORATIONS' | translate">
         </a>
@@ -79,6 +91,8 @@
       <li *ngIf="canCreateCollections && collectionsList?.length > 0"
           [ngClass]="{'oppia-dashboard-tabs-active': activeTab === 'myCollections'}">
         <a class="oppia-dashboard-tabs-text e2e-test-collections-tab"
+           tabindex="0"
+           (keydown.enter)="setActiveTab('myCollections')"
            (click)="setActiveTab('myCollections')"
            [innerHTML]="'I18N_DASHBOARD_COLLECTIONS' | translate">
         </a>
@@ -87,6 +101,8 @@
           class="e2e-test-subscription-tab"
           [ngClass]="{'oppia-dashboard-tabs-active': activeTab === 'mySubscribers'}">
         <a class="oppia-dashboard-tabs-text"
+           tabindex="0"
+           (keydown.enter)="setActiveTab('mySubscribers')"
            (click)="setActiveTab('mySubscribers')"
            [innerHTML]="'I18N_DASHBOARD_SUBSCRIBERS' | translate">
         </a>
@@ -139,9 +155,11 @@
         </select>
         <span class="sort-order fas"
               (click)="setExplorationsSortingOptions(currentSortType)"
+              tabindex="0"
+              (keydown.enter)="setExplorationsSortingOptions(currentSortType)"
               [ngClass]="isCurrentSortDescending ? 'fa-long-arrow-alt-up': 'fa-long-arrow-alt-down'"
               role="button"
-              aria-label="Change Sort Order">
+              [attr.aria-label]="'Sort by ' + (isCurrentSortDescending ? 'descending' : 'ascending') + ' order'">
         </span>
       </span>
     </div>
@@ -161,6 +179,16 @@
           <tr>
             <th *ngFor="let item of EXPLORATIONS_SORT_BY_KEYS | keyvalue: returnZero"
                 class="oppia-dashboard-table-headings"
+                tabindex="0"
+                scope="col"
+                [attr.aria-label]="(item.key === 'TITLE' ? 'Exploration.' :
+                (item.key === 'RATING' ? 'Rating.' :
+                 (item.key === 'NUM_VIEWS' ? 'Plays.' :
+                  (item.key === 'OPEN_FEEDBACK' ? 'Open Threads.' :
+                   (item.key === 'LAST_UPDATED' ? 'Last Updated.' :
+                    ''))))) +
+               ' Sort by ' + (isCurrentSortDescending ? 'descending' : 'ascending') + ' order button'"
+                (keydown.enter)="setExplorationsSortingOptions(item.value)"
                 (click)="setExplorationsSortingOptions(item.value)">
               <p *ngIf="item.key === 'TITLE'" [innerHTML]="'I18N_DASHBOARD_TABLE_HEADING_EXPLORATION' | translate"></p>
               <p *ngIf="item.key === 'RATING'" [innerHTML]="'I18N_DASHBOARD_TABLE_HEADING_RATING' | translate"></p>
@@ -177,7 +205,9 @@
           <tr *ngFor="let exploration of explorationsList | sortBy: isCurrentSortDescending: sortByFunction(exploration?.ratings)"
               class="exploration-list-item">
             <td>
-              <a [href]="getExplorationUrl(exploration.id)" class="oppia-dashboard-list-summary e2e-test-exp-summary-row-title">
+              <a [href]="getExplorationUrl(exploration.id)"
+                 [attr.aria-label]="'Exploration: ' + (exploration.title || DEFAULT_EMPTY_TITLE)"
+                 class="oppia-dashboard-list-summary e2e-test-exp-summary-row-title">
                 {{ exploration.title || DEFAULT_EMPTY_TITLE }}
               </a>
             </td>
@@ -189,23 +219,30 @@
               </a>
             </td>
             <td *ngIf="exploration.status !== 'private'">
-              <a [href]="getExplorationUrl(exploration.id)" class="oppia-dashboard-list-summary e2e-test-exp-summary-row-rating">
+              <a [href]="getExplorationUrl(exploration.id)"
+                 [attr.aria-label]="'Rating: ' + ((getAverageRating(exploration.ratings) | number:'1.1-1') || 'N/A')"
+                 class="oppia-dashboard-list-summary e2e-test-exp-summary-row-rating">
                 {{ (getAverageRating(exploration.ratings) | number:'1.1-1') || 'N/A' }}
               </a>
             </td>
             <td *ngIf="exploration.status !== 'private'">
-              <a [href]="getExplorationUrl(exploration.id)" class="oppia-dashboard-list-summary e2e-test-exp-summary-row-num-views">
+              <a [href]="getExplorationUrl(exploration.id)"
+                 [attr.aria-label]="'Plays: ' + exploration.numViews"
+                 class="oppia-dashboard-list-summary e2e-test-exp-summary-row-num-views">
                 {{ exploration.numViews }}
               </a>
             </td>
             <td *ngIf="exploration.status !== 'private'">
               <a [href]="'/create/' + exploration.id +'#/feedback'"
+                 [attr.aria-label]="'Open Threads' + exploration.numOpenThreads"
                  class="oppia-dashboard-list-summary e2e-test-exp-summary-row-open-feedback">
                 {{ exploration.numOpenThreads }}
               </a>
             </td>
             <td>
-              <a [href]="getExplorationUrl(exploration.id)" class="oppia-dashboard-list-summary e2e-test-exp-summary-row-last-updated">
+              <a [href]="getExplorationUrl(exploration.id)"
+                 [attr.aria-label]="'Last updated: ' + getLocaleAbbreviatedDatetimeString(exploration.lastUpdatedMsec)"
+                 class="oppia-dashboard-list-summary e2e-test-exp-summary-row-last-updated">
                 {{ getLocaleAbbreviatedDatetimeString(exploration.lastUpdatedMsec) }}
               </a>
             </td>
