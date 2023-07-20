@@ -17,6 +17,7 @@
 from __future__ import annotations
 
 import datetime
+import json
 
 from core import feconf
 from core.constants import constants
@@ -700,3 +701,830 @@ class TranslationContributionStatsHandlerTest(test_utils.GenericTestBase):
             ]
         }
         self.assertEqual(response, expected_response)
+
+
+class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
+    """Tests for ContributorDashboardAdminStatsHandler.
+    """
+
+    CONTRIBUTOR_EMAIL: Final = 'contributor@example.com'
+    CONTRIBUTOR_USERNAME: Final = 'contributor'
+    SUGGESTION_LANGUAGE_CODE: Final = 'es'
+    USER_ID_1: Final = 'uid_01234567890123456789012345678912'
+    TOPIC_IDS_WITH_TRANSLATION_SUBMISSIONS: Final = ['topic1', 'topic2']
+    RECENT_REVIEW_OUTCOMES: Final = ['accepted', 'rejected']
+    RECENT_PERFORMANCE: Final = 2
+    OVERALL_ACCURACY: Final = 2.0
+    SUBMITTED_TRANSLATIONS_COUNT: Final = 2
+    SUBMITTED_TRANSLATION_WORD_COUNT: Final = 100
+    TOPIC_IDS_WITH_TRANSLATION_REVIEWS = ['18', '19', '20']
+    REVIEWED_TRANSLATIONS_COUNT = 2
+    ACCEPTED_TRANSLATIONS_COUNT: Final = 1
+    ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT: Final = 0
+    ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT: Final = 0
+    ACCEPTED_TRANSLATION_WORD_COUNT: Final = 50
+    REJECTED_TRANSLATIONS_COUNT: Final = 0
+    REJECTED_TRANSLATION_WORD_COUNT: Final = 0
+    REVIEWED_QUESTIONS_COUNT = 2
+    ACCEPTED_QUESTIONS_COUNT = 1
+    ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT = 0
+    ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT = 0
+    REJECTED_QUESTIONS_COUNT: Final = 20
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.signup(self.CONTRIBUTOR_EMAIL, self.CONTRIBUTOR_USERNAME)
+        self.contributor_id = self.get_user_id_from_email(
+            self.CONTRIBUTOR_EMAIL)
+        user_services.add_user_role(
+            self.contributor_id, feconf.ROLE_ID_TRANSLATION_ADMIN)
+
+        suggestion_models.TranslationSubmitterTotalContributionStatsModel(
+            id='model_1',
+            language_code=self.SUGGESTION_LANGUAGE_CODE,
+            contributor_id='user1',
+            topic_ids_with_translation_submissions=[
+                'topic1'
+            ],
+            recent_review_outcomes=self.RECENT_REVIEW_OUTCOMES,
+            recent_performance=1,
+            overall_accuracy=4,
+            submitted_translations_count=20,
+            submitted_translation_word_count=(
+                self.SUBMITTED_TRANSLATION_WORD_COUNT),
+            accepted_translations_count=self.ACCEPTED_TRANSLATIONS_COUNT,
+            accepted_translations_without_reviewer_edits_count=(
+                self.ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT),
+            accepted_translation_word_count=(
+                self.ACCEPTED_TRANSLATION_WORD_COUNT),
+            rejected_translations_count=self.REJECTED_TRANSLATIONS_COUNT,
+            rejected_translation_word_count=(
+                self.REJECTED_TRANSLATION_WORD_COUNT),
+            first_contribution_date=datetime.datetime.utcnow(),
+            last_contribution_date=(
+                datetime.date.today() - datetime.timedelta(35))
+        ).put()
+        suggestion_models.TranslationSubmitterTotalContributionStatsModel(
+            id='model_2',
+            language_code=self.SUGGESTION_LANGUAGE_CODE,
+            contributor_id='user2',
+            topic_ids_with_translation_submissions=[
+                'topic3'
+            ],
+            recent_review_outcomes=self.RECENT_REVIEW_OUTCOMES,
+            recent_performance=2,
+            overall_accuracy=3,
+            submitted_translations_count=10,
+            submitted_translation_word_count=(
+                self.SUBMITTED_TRANSLATION_WORD_COUNT),
+            accepted_translations_count=self.ACCEPTED_TRANSLATIONS_COUNT,
+            accepted_translations_without_reviewer_edits_count=(
+                self.ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT),
+            accepted_translation_word_count=(
+                self.ACCEPTED_TRANSLATION_WORD_COUNT),
+            rejected_translations_count=self.REJECTED_TRANSLATIONS_COUNT,
+            rejected_translation_word_count=(
+                self.REJECTED_TRANSLATION_WORD_COUNT),
+            first_contribution_date=datetime.datetime.utcnow(),
+            last_contribution_date=(
+                datetime.date.today() - datetime.timedelta(65))
+        ).put()
+        suggestion_models.TranslationSubmitterTotalContributionStatsModel(
+            id='model_3',
+            language_code=self.SUGGESTION_LANGUAGE_CODE,
+            contributor_id='user3',
+            topic_ids_with_translation_submissions=[
+                'topic1', 'topic2'
+            ],
+            recent_review_outcomes=self.RECENT_REVIEW_OUTCOMES,
+            recent_performance=3,
+            overall_accuracy=2,
+            submitted_translations_count=50,
+            submitted_translation_word_count=(
+                self.SUBMITTED_TRANSLATION_WORD_COUNT),
+            accepted_translations_count=self.ACCEPTED_TRANSLATIONS_COUNT,
+            accepted_translations_without_reviewer_edits_count=(
+                self.ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT),
+            accepted_translation_word_count=(
+                self.ACCEPTED_TRANSLATION_WORD_COUNT),
+            rejected_translations_count=self.REJECTED_TRANSLATIONS_COUNT,
+            rejected_translation_word_count=(
+                self.REJECTED_TRANSLATION_WORD_COUNT),
+            first_contribution_date=datetime.datetime.utcnow(),
+            last_contribution_date=(
+                datetime.date.today() - datetime.timedelta(95))
+        ).put()
+        suggestion_models.TranslationSubmitterTotalContributionStatsModel(
+            id='model_4',
+            language_code=self.SUGGESTION_LANGUAGE_CODE,
+            contributor_id='user4',
+            topic_ids_with_translation_submissions=(
+                self.TOPIC_IDS_WITH_TRANSLATION_SUBMISSIONS),
+            recent_review_outcomes=self.RECENT_REVIEW_OUTCOMES,
+            recent_performance=4,
+            overall_accuracy=1,
+            submitted_translations_count=4,
+            submitted_translation_word_count=(
+                self.SUBMITTED_TRANSLATION_WORD_COUNT),
+            accepted_translations_count=self.ACCEPTED_TRANSLATIONS_COUNT,
+            accepted_translations_without_reviewer_edits_count=(
+                self.ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT),
+            accepted_translation_word_count=(
+                self.ACCEPTED_TRANSLATION_WORD_COUNT),
+            rejected_translations_count=self.REJECTED_TRANSLATIONS_COUNT,
+            rejected_translation_word_count=(
+                self.REJECTED_TRANSLATION_WORD_COUNT),
+            first_contribution_date=datetime.datetime.utcnow(),
+            last_contribution_date=(
+                datetime.date.today() - datetime.timedelta(125))
+        ).put()
+
+        suggestion_models.TranslationReviewerTotalContributionStatsModel(
+            id='model_1',
+            language_code=self.SUGGESTION_LANGUAGE_CODE,
+            contributor_id='user1',
+            topic_ids_with_translation_reviews=(
+                self.TOPIC_IDS_WITH_TRANSLATION_REVIEWS),
+            reviewed_translations_count=10,
+            accepted_translations_count=self.ACCEPTED_TRANSLATIONS_COUNT,
+            accepted_translations_with_reviewer_edits_count=(
+                self.ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT),
+            accepted_translation_word_count=(
+                self.ACCEPTED_TRANSLATION_WORD_COUNT),
+            rejected_translations_count=(
+                self.REJECTED_TRANSLATIONS_COUNT),
+            first_contribution_date=datetime.datetime.utcnow(),
+            last_contribution_date=(
+                datetime.date.today() - datetime.timedelta(35))
+        ).put()
+        suggestion_models.TranslationReviewerTotalContributionStatsModel(
+            id='model_2',
+            language_code=self.SUGGESTION_LANGUAGE_CODE,
+            contributor_id='user2',
+            topic_ids_with_translation_reviews=(
+                self.TOPIC_IDS_WITH_TRANSLATION_REVIEWS),
+            reviewed_translations_count=20,
+            accepted_translations_count=self.ACCEPTED_TRANSLATIONS_COUNT,
+            accepted_translations_with_reviewer_edits_count=(
+                self.ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT),
+            accepted_translation_word_count=(
+                self.ACCEPTED_TRANSLATION_WORD_COUNT),
+            rejected_translations_count=(
+                self.REJECTED_TRANSLATIONS_COUNT),
+            first_contribution_date=datetime.datetime.utcnow(),
+            last_contribution_date=(
+                datetime.date.today() - datetime.timedelta(65))
+        ).put()
+        suggestion_models.TranslationReviewerTotalContributionStatsModel(
+            id='model_3',
+            language_code=self.SUGGESTION_LANGUAGE_CODE,
+            contributor_id='user3',
+            topic_ids_with_translation_reviews=(
+                self.TOPIC_IDS_WITH_TRANSLATION_REVIEWS),
+            reviewed_translations_count=30,
+            accepted_translations_count=self.ACCEPTED_TRANSLATIONS_COUNT,
+            accepted_translations_with_reviewer_edits_count=(
+                self.ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT),
+            accepted_translation_word_count=(
+                self.ACCEPTED_TRANSLATION_WORD_COUNT),
+            rejected_translations_count=(
+                self.REJECTED_TRANSLATIONS_COUNT),
+            first_contribution_date=datetime.datetime.utcnow(),
+            last_contribution_date=(
+                datetime.date.today() - datetime.timedelta(95))
+        ).put()
+        suggestion_models.TranslationReviewerTotalContributionStatsModel(
+            id='model_4',
+            language_code=self.SUGGESTION_LANGUAGE_CODE,
+            contributor_id='user4',
+            topic_ids_with_translation_reviews=(
+                self.TOPIC_IDS_WITH_TRANSLATION_REVIEWS),
+            reviewed_translations_count=40,
+            accepted_translations_count=self.ACCEPTED_TRANSLATIONS_COUNT,
+            accepted_translations_with_reviewer_edits_count=(
+                self.ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT),
+            accepted_translation_word_count=(
+                self.ACCEPTED_TRANSLATION_WORD_COUNT),
+            rejected_translations_count=(
+                self.REJECTED_TRANSLATIONS_COUNT),
+            first_contribution_date=datetime.datetime.utcnow(),
+            last_contribution_date=(
+                datetime.date.today() - datetime.timedelta(125))
+        ).put()
+
+        suggestion_models.QuestionSubmitterTotalContributionStatsModel(
+            id='model_1',
+            contributor_id='user1',
+            topic_ids_with_question_submissions=[
+                'topic1'
+            ],
+            recent_review_outcomes=self.RECENT_REVIEW_OUTCOMES,
+            recent_performance=10,
+            overall_accuracy=30.0,
+            submitted_questions_count=10,
+            accepted_questions_count=self.ACCEPTED_QUESTIONS_COUNT,
+            accepted_questions_without_reviewer_edits_count=(
+                self.ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT),
+            rejected_questions_count=self.REJECTED_QUESTIONS_COUNT,
+            first_contribution_date=datetime.date.today(),
+            last_contribution_date=(
+                datetime.date.today() - datetime.timedelta(35))
+        ).put()
+        suggestion_models.QuestionSubmitterTotalContributionStatsModel(
+            id='model_2',
+            contributor_id='user2',
+            topic_ids_with_question_submissions=[
+                'topic3'
+            ],
+            recent_review_outcomes=self.RECENT_REVIEW_OUTCOMES,
+            recent_performance=20,
+            overall_accuracy=20.0,
+            submitted_questions_count=20,
+            accepted_questions_count=self.ACCEPTED_QUESTIONS_COUNT,
+            accepted_questions_without_reviewer_edits_count=(
+                self.ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT),
+            rejected_questions_count=self.REJECTED_QUESTIONS_COUNT,
+            first_contribution_date=datetime.date.today(),
+            last_contribution_date=(
+                datetime.date.today() - datetime.timedelta(65))
+        ).put()
+        suggestion_models.QuestionSubmitterTotalContributionStatsModel(
+            id='model_3',
+            contributor_id='user3',
+            topic_ids_with_question_submissions=[
+                'topic1'
+            ],
+            recent_review_outcomes=self.RECENT_REVIEW_OUTCOMES,
+            recent_performance=30,
+            overall_accuracy=10.0,
+            submitted_questions_count=30,
+            accepted_questions_count=self.ACCEPTED_QUESTIONS_COUNT,
+            accepted_questions_without_reviewer_edits_count=(
+                self.ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT),
+            rejected_questions_count=self.REJECTED_QUESTIONS_COUNT,
+            first_contribution_date=datetime.date.today(),
+            last_contribution_date=(
+                datetime.date.today() - datetime.timedelta(95))
+        ).put()
+        suggestion_models.QuestionSubmitterTotalContributionStatsModel(
+            id='model_4',
+            contributor_id='user4',
+            topic_ids_with_question_submissions=[
+                'topic1', 'topic2'
+            ],
+            recent_review_outcomes=self.RECENT_REVIEW_OUTCOMES,
+            recent_performance=40,
+            overall_accuracy=5.0,
+            submitted_questions_count=40,
+            accepted_questions_count=self.ACCEPTED_QUESTIONS_COUNT,
+            accepted_questions_without_reviewer_edits_count=(
+                self.ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT),
+            rejected_questions_count=self.REJECTED_QUESTIONS_COUNT,
+            first_contribution_date=datetime.date.today(),
+            last_contribution_date=(
+                datetime.date.today() - datetime.timedelta(125))
+        ).put()
+
+        suggestion_models.QuestionReviewerTotalContributionStatsModel(
+            id='model_1',
+            contributor_id='user1',
+            topic_ids_with_question_reviews=[
+                'topic1'
+            ],
+            reviewed_questions_count=10,
+            accepted_questions_count=self.ACCEPTED_QUESTIONS_COUNT,
+            accepted_questions_with_reviewer_edits_count=(
+                self.ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT),
+            rejected_questions_count=self.REJECTED_QUESTIONS_COUNT,
+            first_contribution_date=datetime.date.today(),
+            last_contribution_date=(
+                datetime.date.today() - datetime.timedelta(35))
+        ).put()
+        suggestion_models.QuestionReviewerTotalContributionStatsModel(
+            id='model_2',
+            contributor_id='user2',
+            topic_ids_with_question_reviews=[
+                'topic1', 'topic2'
+            ],
+            reviewed_questions_count=20,
+            accepted_questions_count=self.ACCEPTED_QUESTIONS_COUNT,
+            accepted_questions_with_reviewer_edits_count=(
+                self.ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT),
+            rejected_questions_count=self.REJECTED_QUESTIONS_COUNT,
+            first_contribution_date=datetime.date.today(),
+            last_contribution_date=(
+                datetime.date.today() - datetime.timedelta(65))
+        ).put()
+        suggestion_models.QuestionReviewerTotalContributionStatsModel(
+            id='model_3',
+            contributor_id='user3',
+            topic_ids_with_question_reviews=[
+                'topic3'
+            ],
+            reviewed_questions_count=30,
+            accepted_questions_count=self.ACCEPTED_QUESTIONS_COUNT,
+            accepted_questions_with_reviewer_edits_count=(
+                self.ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT),
+            rejected_questions_count=self.REJECTED_QUESTIONS_COUNT,
+            first_contribution_date=datetime.date.today(),
+            last_contribution_date=(
+                datetime.date.today() - datetime.timedelta(95))
+        ).put()
+        suggestion_models.QuestionReviewerTotalContributionStatsModel(
+            id='model_4',
+            contributor_id='user4',
+            topic_ids_with_question_reviews=[
+                'topic3'
+            ],
+            reviewed_questions_count=40,
+            accepted_questions_count=self.ACCEPTED_QUESTIONS_COUNT,
+            accepted_questions_with_reviewer_edits_count=(
+                self.ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT),
+            rejected_questions_count=self.REJECTED_QUESTIONS_COUNT,
+            first_contribution_date=datetime.date.today(),
+            last_contribution_date=(
+                datetime.date.today() - datetime.timedelta(125))
+        ).put()
+
+    def test_get_stats_with_invalid_contribution_type_raises_error(
+        self
+    ) -> None:
+        self.login(self.CONTRIBUTOR_EMAIL)
+
+        self.get_json(
+            '/contributor-dashboard-admin-stats/invalid/submission', {
+                'page_size': 2,
+                'offset': 1,
+                'language_code': self.SUGGESTION_LANGUAGE_CODE,
+                'sort_by': None,
+                'topic_ids': []
+            }, expected_status_int=400)
+        self.logout()
+
+    def test_get_stats_with_invalid_sub_contribution_type_raises_error(
+        self
+    ) -> None:
+        self.login(self.CONTRIBUTOR_EMAIL)
+
+        self.get_json(
+            '/contributor-dashboard-admin-stats/translation/invalid', {
+                'page_size': 2,
+                'offset': 1,
+                'language_code': self.SUGGESTION_LANGUAGE_CODE,
+                'sort_by': None,
+                'topic_ids': []
+            }, expected_status_int=400)
+        self.logout()
+
+    def test_get_translation_submitter_stats_for_pagination(self) -> None:
+        self.login(self.CONTRIBUTOR_EMAIL)
+
+        # Test with language filter and pagination.
+        response = self.get_json(
+            '/contributor-dashboard-admin-stats/translation/submission', {
+                'page_size': 2,
+                'offset': 1,
+                'language_code': self.SUGGESTION_LANGUAGE_CODE,
+                'topic_ids': []
+            })
+
+        self.assertEqual(
+            len(response['stats']),
+            2
+        )
+        self.assertEqual(
+            response['stats'][0]['contributor_id'],
+            'user3'
+        )
+        self.assertEqual(
+            response['next_offset'],
+            3
+        )
+        self.assertEqual(
+            response['more'],
+            True
+        )
+        self.logout()
+
+    def test_get_translation_submitter_stats_for_sorting(self) -> None:
+        self.login(self.CONTRIBUTOR_EMAIL)
+
+        # Test with sorting and pagination.
+        response = self.get_json(
+            '/contributor-dashboard-admin-stats/translation/submission', {
+                'page_size': 2,
+                'offset': 1,
+                'language_code': self.SUGGESTION_LANGUAGE_CODE,
+                'sort_by': 'IncreasingLastActivity',
+                'topic_ids': []
+            })
+
+        self.assertEqual(
+            len(response['stats']),
+            2
+        )
+        self.assertEqual(
+            response['stats'][0]['contributor_id'],
+            'user2'
+        )
+        self.assertEqual(
+            response['next_offset'],
+            3
+        )
+        self.assertEqual(
+            response['more'],
+            True
+        )
+        self.logout()
+
+    def test_get_translation_submitter_stats_for_topic_filter(self) -> None:
+        self.login(self.CONTRIBUTOR_EMAIL)
+
+        # Test with topic filter and pagination.
+        response = self.get_json(
+            '/contributor-dashboard-admin-stats/translation/submission', {
+                'page_size': 2,
+                'offset': 1,
+                'language_code': self.SUGGESTION_LANGUAGE_CODE,
+                'topic_ids': json.dumps(['topic1', 'topic2'])
+            })
+
+        self.assertEqual(
+            len(response['stats']),
+            2
+        )
+        self.assertEqual(
+            response['stats'][0]['contributor_id'],
+            'user3'
+        )
+        self.assertEqual(
+            response['stats'][0]['last_contributed_in_days'],
+            95
+        )
+        self.assertEqual(
+            response['next_offset'],
+            3
+        )
+        self.assertEqual(
+            response['more'],
+            False
+        )
+        self.logout()
+
+    def test_get_translation_submitter_stats_for_last_activity_filter(
+        self
+    ) -> None:
+        self.login(self.CONTRIBUTOR_EMAIL)
+
+        # Test with max_days_since_last_activity filter and pagination.
+        response = self.get_json(
+            '/contributor-dashboard-admin-stats/translation/submission', {
+                'page_size': 4,
+                'offset': 1,
+                'language_code': self.SUGGESTION_LANGUAGE_CODE,
+                'max_days_since_last_activity': 120,
+                'topic_ids': []
+            })
+
+        self.assertEqual(
+            len(response['stats']),
+            3
+        )
+        self.assertEqual(
+            response['stats'][0]['contributor_id'],
+            'user3'
+        )
+        self.assertEqual(
+            response['stats'][1]['contributor_id'],
+            'user2'
+        )
+        self.assertEqual(
+            response['next_offset'],
+            4
+        )
+        self.assertEqual(
+            response['more'],
+            False
+        )
+        self.logout()
+
+    def test_get_translation_reviewer_stats_for_pagination(self) -> None:
+        self.login(self.CONTRIBUTOR_EMAIL)
+
+        # Test with language filter and pagination.
+        response = self.get_json(
+            '/contributor-dashboard-admin-stats/translation/review', {
+                'page_size': 2,
+                'offset': 1,
+                'language_code': self.SUGGESTION_LANGUAGE_CODE,
+                'topic_ids': []
+            })
+
+        self.assertEqual(
+            len(response['stats']),
+            2
+        )
+        self.assertEqual(
+            response['stats'][0]['contributor_id'],
+            'user3'
+        )
+        self.assertEqual(
+            response['next_offset'],
+            3
+        )
+        self.assertEqual(
+            response['more'],
+            True
+        )
+        self.logout()
+
+    def test_get_translation_reviewer_stats_for_sorting(self) -> None:
+        self.login(self.CONTRIBUTOR_EMAIL)
+
+        # Test with sorting and pagination.
+        response = self.get_json(
+            '/contributor-dashboard-admin-stats/translation/review', {
+                'page_size': 2,
+                'offset': 1,
+                'language_code': self.SUGGESTION_LANGUAGE_CODE,
+                'sort_by': 'IncreasingLastActivity',
+                'topic_ids': []
+            })
+
+        self.assertEqual(
+            len(response['stats']),
+            2
+        )
+        self.assertEqual(
+            response['stats'][0]['contributor_id'],
+            'user2'
+        )
+        self.assertEqual(
+            response['next_offset'],
+            3
+        )
+        self.assertEqual(
+            response['more'],
+            True
+        )
+        self.logout()
+
+    def test_get_translation_reviewer_stats_for_last_activity_filter(
+        self
+    ) -> None:
+        self.login(self.CONTRIBUTOR_EMAIL)
+
+        # Test with max_days_since_last_activity filter and pagination.
+        response = self.get_json(
+            '/contributor-dashboard-admin-stats/translation/review', {
+                'page_size': 4,
+                'offset': 1,
+                'language_code': self.SUGGESTION_LANGUAGE_CODE,
+                'max_days_since_last_activity': 120,
+                'topic_ids': []
+            })
+
+        self.assertEqual(
+            len(response['stats']),
+            3
+        )
+        self.assertEqual(
+            response['stats'][0]['contributor_id'],
+            'user3'
+        )
+        self.assertEqual(
+            response['stats'][1]['contributor_id'],
+            'user2'
+        )
+        self.assertEqual(
+            response['next_offset'],
+            4
+        )
+        self.assertEqual(
+            response['more'],
+            False
+        )
+        self.logout()
+
+    def test_get_question_submitter_stats_for_pagination(self) -> None:
+        self.login(self.CONTRIBUTOR_EMAIL)
+
+        # Test pagination.
+        response = self.get_json(
+            '/contributor-dashboard-admin-stats/question/submission', {
+                'page_size': 2,
+                'offset': 1,
+                'topic_ids': []
+            })
+
+        self.assertEqual(
+            len(response['stats']),
+            2
+        )
+        self.assertEqual(
+            response['stats'][0]['contributor_id'],
+            'user3'
+        )
+        self.assertEqual(
+            response['next_offset'],
+            3
+        )
+        self.assertEqual(
+            response['more'],
+            True
+        )
+        self.logout()
+
+    def test_get_question_submitter_stats_for_sorting(self) -> None:
+        self.login(self.CONTRIBUTOR_EMAIL)
+
+        # Test with sorting and pagination.
+        response = self.get_json(
+            '/contributor-dashboard-admin-stats/question/submission', {
+                'page_size': 2,
+                'offset': 1,
+                'sort_by': 'IncreasingLastActivity',
+                'topic_ids': []
+            })
+
+        self.assertEqual(
+            len(response['stats']),
+            2
+        )
+        self.assertEqual(
+            response['stats'][0]['contributor_id'],
+            'user2'
+        )
+        self.assertEqual(
+            response['next_offset'],
+            3
+        )
+        self.assertEqual(
+            response['more'],
+            True
+        )
+        self.logout()
+
+    def test_get_question_submitter_stats_for_topic_filter(self) -> None:
+        self.login(self.CONTRIBUTOR_EMAIL)
+
+        # Test with topic filter and pagination.
+        response = self.get_json(
+            '/contributor-dashboard-admin-stats/question/submission', {
+                'page_size': 2,
+                'offset': 1,
+                'topic_ids': json.dumps(['topic1', 'topic2'])
+            })
+
+        self.assertEqual(
+            len(response['stats']),
+            2
+        )
+        self.assertEqual(
+            response['stats'][0]['contributor_id'],
+            'user3'
+        )
+        self.assertEqual(
+            response['stats'][0]['last_contributed_in_days'],
+            95
+        )
+        self.assertEqual(
+            response['next_offset'],
+            3
+        )
+        self.assertEqual(
+            response['more'],
+            False
+        )
+        self.logout()
+
+    def test_get_question_submitter_stats_for_last_activity_filter(
+        self
+    ) -> None:
+        self.login(self.CONTRIBUTOR_EMAIL)
+
+        # Test with max_days_since_last_activity filter and pagination.
+        response = self.get_json(
+            '/contributor-dashboard-admin-stats/question/submission', {
+                'page_size': 4,
+                'offset': 1,
+                'max_days_since_last_activity': 120,
+                'topic_ids': []
+            })
+
+        self.assertEqual(
+            len(response['stats']),
+            3
+        )
+        self.assertEqual(
+            response['stats'][0]['contributor_id'],
+            'user3'
+        )
+        self.assertEqual(
+            response['stats'][1]['contributor_id'],
+            'user2'
+        )
+        self.assertEqual(
+            response['next_offset'],
+            4
+        )
+        self.assertEqual(
+            response['more'],
+            False
+        )
+        self.logout()
+
+    def test_get_question_reviewer_stats_for_pagination(self) -> None:
+        self.login(self.CONTRIBUTOR_EMAIL)
+
+        # Test pagination.
+        response = self.get_json(
+            '/contributor-dashboard-admin-stats/question/review', {
+                'page_size': 2,
+                'offset': 1,
+                'topic_ids': []
+            })
+
+        self.assertEqual(
+            len(response['stats']),
+            2
+        )
+        self.assertEqual(
+            response['stats'][0]['contributor_id'],
+            'user3'
+        )
+        self.assertEqual(
+            response['next_offset'],
+            3
+        )
+        self.assertEqual(
+            response['more'],
+            True
+        )
+        self.logout()
+
+    def test_get_question_reviewer_stats_for_sorting(self) -> None:
+        self.login(self.CONTRIBUTOR_EMAIL)
+
+        # Test with sorting and pagination.
+        response = self.get_json(
+            '/contributor-dashboard-admin-stats/question/review', {
+                'page_size': 2,
+                'offset': 1,
+                'sort_by': 'IncreasingLastActivity',
+                'topic_ids': []
+            })
+
+        self.assertEqual(
+            len(response['stats']),
+            2
+        )
+        self.assertEqual(
+            response['stats'][0]['contributor_id'],
+            'user2'
+        )
+        self.assertEqual(
+            response['next_offset'],
+            3
+        )
+        self.assertEqual(
+            response['more'],
+            True
+        )
+        self.logout()
+
+    def test_get_question_reviewer_stats_for_last_activity_filter(
+        self
+    ) -> None:
+        self.login(self.CONTRIBUTOR_EMAIL)
+
+        # Test with max_days_since_last_activity filter and pagination.
+        response = self.get_json(
+            '/contributor-dashboard-admin-stats/question/review', {
+                'page_size': 4,
+                'offset': 1,
+                'max_days_since_last_activity': 120,
+                'topic_ids': []
+            })
+
+        self.assertEqual(
+            len(response['stats']),
+            3
+        )
+        self.assertEqual(
+            response['stats'][0]['contributor_id'],
+            'user3'
+        )
+        self.assertEqual(
+            response['stats'][1]['contributor_id'],
+            'user2'
+        )
+        self.assertEqual(
+            response['next_offset'],
+            4
+        )
+        self.assertEqual(
+            response['more'],
+            False
+        )
+        self.logout()

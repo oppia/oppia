@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Functions to get stats displayed in contributor Admin Dashboard.
+"""Service methods for operating on contributor admin dashboard user stats.
 """
 
 from __future__ import annotations
@@ -233,9 +233,9 @@ def get_translation_submitter_total_stats(
     page_size: int,
     offset: int,
     language_code: str,
-    sort_by: Optional[suggestion_models.SortChoices],
+    sort_by: Optional[str],
     topic_ids: Optional[List[str]],
-    num_days_since_last_activity: Optional[int]
+    max_days_since_last_activity: Optional[int]
 ) -> Tuple[
         List[suggestion_registry.TranslationSubmitterTotalContributionStats],
         int,
@@ -251,15 +251,15 @@ def get_translation_submitter_total_stats(
             result.
         topic_ids: List[str]|None. List of topic ID(s) to fetch
             contributor stats for.
-        num_days_since_last_activity: int. To get number of users
-            who are active in num_days_since_last_activity.
+        max_days_since_last_activity: int. To get number of users
+            who are active in max_days_since_last_activity.
 
     Returns:
         3-tuple(sorted_results, next_offset, more). where:
                 sorted_results:
                     list(TranslationSubmitterTotalContributionStats).
                     The list of domain objects which match the supplied
-                    language_code, topic_ids and num_days_since_last_activity
+                    language_code, topic_ids and max_days_since_last_activity
                     filters, returned in the order specified by sort_by.
                 next_offset: int. Number of results to skip in next batch.
                 more: bool. If True, there are (probably) more results after
@@ -274,7 +274,7 @@ def get_translation_submitter_total_stats(
             language_code=language_code,
             sort_by=sort_by,
             topic_ids=topic_ids,
-            num_days_since_last_activity=num_days_since_last_activity
+            max_days_since_last_activity=max_days_since_last_activity
         )
     )
 
@@ -293,8 +293,8 @@ def get_translation_reviewer_total_stats(
         page_size: int,
         offset: int,
         language_code: str,
-        sort_by: Optional[suggestion_models.SortChoices],
-        num_days_since_last_activity: Optional[int]
+        sort_by: Optional[str],
+        max_days_since_last_activity: Optional[int]
 ) -> Tuple[
         List[suggestion_registry.TranslationReviewerTotalContributionStats],
         int,
@@ -309,15 +309,15 @@ def get_translation_reviewer_total_stats(
         language_code: str. The language code to get results for.
         sort_by: SortChoices|None. A string indicating how to sort the
             result.
-        num_days_since_last_activity: int|None. To get number of users
-            who are active in num_days_since_last_activity.
+        max_days_since_last_activity: int|None. To get number of users
+            who are active in max_days_since_last_activity.
 
     Returns:
         3-tuple(sorted_results, next_offset, more). where:
             sorted_results:
                 list(TranslationReviewerTotalContributionStats).
                 The list of domain objects which match the supplied
-                language_code, and num_days_since_last_activity filters,
+                language_code, and max_days_since_last_activity filters,
                 returned in the order specified by sort_by.
             next_offset: int. Number of results to skip in next batch.
             more: bool. If True, there are (probably) more results after
@@ -331,7 +331,7 @@ def get_translation_reviewer_total_stats(
             offset=offset,
             language_code=language_code,
             sort_by=sort_by,
-            num_days_since_last_activity=num_days_since_last_activity
+            max_days_since_last_activity=max_days_since_last_activity
         )
     )
 
@@ -350,9 +350,9 @@ def get_translation_reviewer_total_stats(
 def get_question_submitter_total_stats(
     page_size: int,
     offset: int,
-    sort_by: Optional[suggestion_models.SortChoices],
+    sort_by: Optional[str],
     topic_ids: Optional[List[str]],
-    num_days_since_last_activity: Optional[int]
+    max_days_since_last_activity: Optional[int]
 ) -> Tuple[
         List[suggestion_registry.QuestionSubmitterTotalContributionStats],
         int,
@@ -368,15 +368,15 @@ def get_question_submitter_total_stats(
             result.
         topic_ids: List[str]|None. List of topic ID(s) to fetch
             contributor stats for.
-        num_days_since_last_activity: int. To get results of users
-            who are active in num_days_since_last_activity.
+        max_days_since_last_activity: int. To get results of users
+            who are active in max_days_since_last_activity.
 
     Returns:
         3-tuple(sorted_results, next_offset, more). where:
             sorted_results:
                 list(QuestionSubmitterTotalContributionStats).
                 The list of domain objects which match the supplied topic_ids
-                and num_days_since_last_activity filters,
+                and max_days_since_last_activity filters,
                 returned in the order specified by sort_by.
             next_offset: int. Number of results to skip in next batch.
             more: bool. If True, there are (probably) more results after
@@ -390,7 +390,7 @@ def get_question_submitter_total_stats(
             offset=offset,
             sort_by=sort_by,
             topic_ids=topic_ids,
-            num_days_since_last_activity=num_days_since_last_activity
+            max_days_since_last_activity=max_days_since_last_activity
         )
     )
 
@@ -409,8 +409,8 @@ def get_question_submitter_total_stats(
 def get_question_reviewer_total_stats(
         page_size: int,
         offset: int,
-        sort_by: Optional[suggestion_models.SortChoices],
-        num_days_since_last_activity: Optional[int]
+        sort_by: Optional[str],
+        max_days_since_last_activity: Optional[int]
 ) -> Tuple[
         List[suggestion_registry.QuestionReviewerTotalContributionStats],
         int,
@@ -424,15 +424,15 @@ def get_question_reviewer_total_stats(
             results matching the query.
         sort_by: SortChoices|None. A string indicating how to sort the
             result.
-        num_days_since_last_activity: int|None. To get result of users
-            who are active in num_days_since_last_activity.
+        max_days_since_last_activity: int|None. To get result of users
+            who are active in max_days_since_last_activity.
 
     Returns:
         3-tuple(sorted_results, next_offset, more). where:
             sorted_results:
                 list(QuestionReviewerTotalContributionStats).
                 The list of domain objects which match the supplied
-                num_days_since_last_activity filter,
+                max_days_since_last_activity filter,
                 returned in the order specified by sort_by.
             next_offset: int. Number of results to skip in next batch.
             more: bool. If True, there are (probably) more results after
@@ -445,7 +445,7 @@ def get_question_reviewer_total_stats(
             page_size=page_size,
             offset=offset,
             sort_by=sort_by,
-            num_days_since_last_activity=num_days_since_last_activity
+            max_days_since_last_activity=max_days_since_last_activity
         )
     )
 
