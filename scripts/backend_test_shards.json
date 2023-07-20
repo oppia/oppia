@@ -282,6 +282,7 @@
         "core.domain.translation_services_test",
         "core.storage.recommendations.gae_models_test",
         "scripts.linters.other_files_linter_test",
+        "scripts.install_dependencies_json_packages_test",
         "scripts.install_third_party_test",
         "scripts.check_frontend_test_coverage_test",
         "core.platform.models_test",
@@ -300,9 +301,11 @@
         "scripts.docstrings_checker_test",
         "extensions.domain_test",
         "core.controllers.learner_dashboard_test",
+        "core.controllers.feedback_updates_test",
         "core.platform.storage.cloud_storage_emulator_test",
         "core.platform.storage.dev_mode_storage_services_test",
-        "core.platform.storage.cloud_storage_services_test"
+        "core.platform.storage.cloud_storage_services_test",
+        "core.domain.contribution_stats_services_test"
     ],
     "5": [
         "core.controllers.classifier_test",
