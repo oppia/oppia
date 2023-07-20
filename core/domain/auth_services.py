@@ -327,9 +327,9 @@ def get_csrf_secret_value() -> str:
                 CSRF_SECRET_INSTANCE_ID: csrf_secret_value
             }
         )
+        csrf_secret_model = auth_models.CsrfSecretModel.get(
+            CSRF_SECRET_INSTANCE_ID, strict=False)
 
-    csrf_secret_model = auth_models.CsrfSecretModel.get(
-        CSRF_SECRET_INSTANCE_ID, strict=False)
     # Ruling out the possibility of csrf_secret_model being None in
     # order to avoid mypy error.
     assert csrf_secret_model is not None
