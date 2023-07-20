@@ -70,7 +70,7 @@
                     <div class="col-10 oppia-filter-container">
                       <div class="row">
                         <div class="col-2"><b>Type:</b></div>
-                        <div class="col-10">
+                        <div class="col-4">
                           <select [(ngModel)]="filter.type"
                                   (change)="clearFilterConditions(filter)">
                             <option *ngFor="let filterType of availableFilterTypes"
@@ -79,9 +79,12 @@
                             </option>
                           </select>
                         </div>
-                      </div>
-                      <div class="row oppia-parameter-top-margin">
-                        <div class="col-2"><b>Conditions:</b></div>
+                        <div class="col-2">
+                          <div><b>Conditions:</b></div>
+                        </div>
+                        <div *ngIf="filter.conditions.length === 0" class="col-4">
+                          No condition specified.
+                        </div>
                       </div>
                       <!-- Conditions -->
                       <ng-container *ngFor="let condition of filter.conditions; index as conditionIndex">
@@ -94,8 +97,8 @@
                           </div>
                         </div>
                         <div class="row">
-                          <div class="col-4"></div>
-                          <div class="col-4 oppia-condition-container">
+                          <div class="col-7"></div>
+                          <div class="col-3 oppia-condition-container">
                             <select [(ngModel)]="filter.conditions[conditionIndex][0]">
                               <option *ngFor="let op of filterTypeToContext[filter.type].operators"
                                       [value]="op">
@@ -127,15 +130,12 @@
                               </ng-container>
                             </ng-container>
                           </div>
-                          <div class="col-4">
+                          <div class="col-1">
                             <button class="btn btn-secondary" (click)="removeCondition(filter, conditionIndex)">x</button>
                           </div>
                         </div>
                       </ng-container>
-                      <div *ngIf="filter.conditions.length === 0" class="oppia-flex-center">
-                        No condition specified.
-                      </div>
-                      <div class="oppia-flex-center oppia-parameter-top-margin">
+                      <div class="oppia-flex-right oppia-parameter-top-margin">
                         <button class="btn btn-secondary oppia-parameter-top-margin e2e-test-add-condition-button" (click)="addNewCondition(filter)">
                           Add New Condition To Bottom
                         </button>
@@ -217,6 +217,12 @@
     align-items: center;
     display: flex;
     justify-content: center;
+  }
+
+  .oppia-flex-right {
+    align-items: end;
+    display: flex;
+    justify-content: end;
   }
 
   .oppia-admin-parameters .oppia-flex-horizon-center {
