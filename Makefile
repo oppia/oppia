@@ -4,14 +4,6 @@ ALL_SERVICES = datastore dev-server firebase elasticsearch webpack-compiler angu
 FLAGS = save_datastore disable_host_checking no_auto_restart prod_env maintenance_mode source_maps
 $(foreach flag, $(FLAGS), $(eval $(flag) = false))
 
-# Parameters #################################################################################
-#
-# For backend tests, use the rest as test path/module and turn them into do-nothing targets.
-ifeq ($(firstword $(MAKECMDGOALS)),$(filter $(firstword $(MAKECMDGOALS)), run-backend-tests))
-  RUN_ARGS := $(wordlist 2,$(words $(MAKECMDGOALS)),$(MAKECMDGOALS))
-  $(eval $(RUN_ARGS):;@:)
-endif
-
 .PHONY: help run-devserver build clean terminal stop-devserver \
 	$(addsuffix stop., $(ALL_SERVICES)) $(addsuffix logs., $(ALL_SERVICES)) \
 	$(addsuffix restart., $(ALL_SERVICES))
@@ -34,13 +26,13 @@ build.%: ## Builds the given docker service. Example: make build.datastore
 build: ## Builds the all docker services.
 	docker compose build
 
-run-devserver: # Runs the devserver
+run-devserver: # Runs the dev-server
 	docker compose up dev-server -d
 	$(MAKE) update.requirements
 	$(MAKE) update.package
 	$(MAKE) run-offline
 
-run-offline: # Runs the devserver in offline mode
+run-offline: # Runs the dev-server in offline mode
 	docker compose up dev-server -d
 	@echo "\n\nStarting development server at port 8181.....\n\n"
 	@while ! curl -s http://localhost:8181 > /dev/null; do \
@@ -48,19 +40,18 @@ run-offline: # Runs the devserver in offline mode
 	done
 	@echo "Development server started at port 8181."
 	@echo "Please visit -- http://localhost:8181 to access the development server."
-	@echo 'Check devserver logs using "make logs.dev-server"'
+	@echo 'Check dev-server logs using "make logs.dev-server"'
 
-init: build run-devserver ## Initializes the build and runs devserver.
+init: build run-devserver ## Initializes the build and runs dev-server.
 
-clean: stop ## Cleans the docker containers and volumes.
-	docker rmi oppia-dev-server oppia-angular-build oppia-webpack-compiler oppia-datastore redis:6.2.4 elasticsearch:7.17.0 node:16.13.0-alpine
-	docker volume rm oppia_cloud_datastore_emulator_cache oppia_firebase_emulator_cache oppia_proto_files oppia_frontend_proto_files oppia_node_modules oppia_redis_dump oppia_third_party
+clean: ## Cleans the docker containers and volumes.
+	docker compose down --rmi all --volumes
 
 shell.%: ## Opens a shell in the given docker service. Example: make shell.datastore
 	docker exec -it $* /bin/sh
 
-stop:
-	docker compose down
+stop: ## Stops all the services.
+	docker compose stop
 
 stop.%: ## Stops the given docker service. Example: make stop.datastore
 	docker compose stop $*
