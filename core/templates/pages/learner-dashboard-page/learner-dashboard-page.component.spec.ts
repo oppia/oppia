@@ -663,6 +663,7 @@ describe('Learner dashboard page', () => {
   });
 
   describe('when fetching dashboard data fails', () => {
+    let mockPlatformFeatureService = new MockPlatformFeatureService();
     beforeEach(async(() => {
       TestBed.configureTestingModule({
         imports: [
@@ -691,7 +692,11 @@ describe('Learner dashboard page', () => {
           {
             provide: TranslateService,
             useClass: MockTranslateService
-          }
+          },
+          {
+            provide: PlatformFeatureService,
+            useValue: mockPlatformFeatureService
+          },
         ],
         schemas: [NO_ERRORS_SCHEMA]
       }).compileComponents();
