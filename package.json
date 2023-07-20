@@ -159,6 +159,7 @@
     "browserify-zlib": "^0.2.0",
     "chai": "^4.2.0",
     "codemirror": "^5.61.0",
+    "codemirror-v5.17.0": "npm:codemirror@5.17.0",
     "cropperjs": "^1.5.6",
     "d3": "^5.9.2",
     "d3-array": "^2.4.0",

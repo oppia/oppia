@@ -5253,6 +5253,11 @@ code-point-at@^1.0.0:
   resolved "https://registry.yarnpkg.com/code-point-at/-/code-point-at-1.1.0.tgz#0d070b4d043a5bea33a2f1a40e2edb3d9a4ccf77"
   integrity sha512-RpAVKQA5T63xEj6/giIbUEtZwJ4UFIc3ZtvEkiaUERylqe8xb5IvqcgOurZLahv93CLKfxcw5YI+DZcUBRyLXA==
 
+"codemirror-v5.17.0@npm:codemirror@5.17.0":
+  version "5.17.0"
+  resolved "https://registry.yarnpkg.com/codemirror/-/codemirror-5.17.0.tgz#a9431353373f152fe2851f29502a3aa12c1d6247"
+  integrity sha512-5PtAlqXqe+Cu+LAKeXXSE8kprcua6JG6JLNr+wxgKDMZ0ah0agWLZ9t4me3cloPfGUSmvGS/ww8tkItsx7wqbg==
+
 codemirror@^5.61.0:
   version "5.65.10"
   resolved "https://registry.yarnpkg.com/codemirror/-/codemirror-5.65.10.tgz#4276a93b8534ce91f14b733ba9a1ac949666eac9"
