@@ -34,7 +34,6 @@ class PlatformFeaturesEvaluationHandlerNormalizedRequestDict(TypedDict):
     """
 
     platform_type: Optional[str]
-    browser_type: Optional[str]
     app_version: Optional[str]
 
 
@@ -53,14 +52,6 @@ class PlatformFeaturesEvaluationHandler(
             'platform_type': {
                 'schema': {
                     'type': 'basestring'
-                },
-                'default_value': None
-            },
-            'browser_type': {
-                'schema': {
-                    'type': 'basestring',
-                    'choices': (
-                        constants.PLATFORM_PARAMETER_ALLOWED_BROWSER_TYPES)
                 },
                 'default_value': None
             },
@@ -88,7 +79,6 @@ class PlatformFeaturesEvaluationHandler(
         assert self.normalized_request is not None
         context_dict: platform_parameter_domain.ClientSideContextDict = {
             'platform_type': self.normalized_request.get('platform_type'),
-            'browser_type': self.normalized_request.get('browser_type'),
             'app_version': self.normalized_request.get('app_version'),
         }
         context = (
