@@ -45,10 +45,8 @@ export class PreferredLanguagesComponent implements AfterViewInit {
   searchQuery: string = '';
 
   onInputBoxClick(): void {
-    setTimeout(() => {
       this.searchQuery = '';
       this.filteredChoices = this.choices;
-    });
   }
 
   ngAfterViewInit(): void {
@@ -106,6 +104,7 @@ export class PreferredLanguagesComponent implements AfterViewInit {
   }
 
   onSearchInputChange(): void {
+    this.searchQuery = this.formCtrl.value;
     this.filteredChoices = this.choices.filter(choice => {
       let lowerSearchQuery = this.searchQuery.toLowerCase();
       return (
