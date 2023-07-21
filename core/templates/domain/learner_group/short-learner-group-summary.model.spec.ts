@@ -25,7 +25,8 @@ describe('Short Learner Group Summary', () => {
       title: 'sampleTitle',
       description: 'sampleDescription',
       facilitator_usernames: ['username1'],
-      learners_count: 5
+      learners_count: 5,
+      story_ids: ['story1']
     };
 
     let sampleShortLearnerGroupSummary = (
