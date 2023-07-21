@@ -56,7 +56,7 @@ export class LearnerStorySummaryTileComponent implements OnInit {
   learnerGroupImageUrl: string = '';
   openInNewWindow = false;
   circumference = (18 * 2 * Math.PI);
-  getStrokeDashOffSet: number;
+  getStrokeDashOffSet!: number;
 
 
   constructor(
@@ -147,15 +147,18 @@ export class LearnerStorySummaryTileComponent implements OnInit {
   }
 
   isButtonHovered(): string {
-    if (this.displayArea === 'homeTab' && this.buttonIsHovered) {
+    if (this.buttonIsHovered) {
       return 'box-shadow: 0 5px 5px -5px #333;';
     }
+    return '';
   }
+
 
   isCardHovered(): string {
     if (this.displayArea === 'homeTab' && this.cardIsHovered) {
       return 'box-shadow: 0 5px 5px -5px #333;';
     }
+    return '';
   }
 
   getStrokeDashOffSetValue(storyProgress: number): number {

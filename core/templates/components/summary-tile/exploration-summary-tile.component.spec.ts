@@ -551,6 +551,6 @@ describe('Exploration Summary Tile Component', () => {
     fixture.detectChanges();
     const result = component.isButtonHovered();
 
-    expect(result).toBeUndefined();
+    expect(result).toBe('');
   });
 });

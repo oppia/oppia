@@ -32,15 +32,15 @@ import { AppConstants } from 'app.constants';
   styleUrls: ['./carousel-bar.component.css']
 })
 export class CarouselBarComponent implements AfterViewInit, OnInit {
-  CarouselScrollWidthPx: number;
-  CarouselClientWidthPx: number;
+  CarouselScrollWidthPx!: number;
+  CarouselClientWidthPx!: number;
   untrackedTopicTiles: boolean = true;
   carouselScrollPositionPx: number = 0;
   disableLeftButton: boolean = true;
   disableRightButton: boolean = false;
   isScrollable: boolean = false;
- @Input() carouselClassname: string;
- @Input() carouselHeading: string;
+ @Input() carouselClassname!: string;
+ @Input() carouselHeading!: string;
  @Input() scrollUntrackedTopics: boolean = false;
 
  // These properties are initialized using Angular lifecycle hooks

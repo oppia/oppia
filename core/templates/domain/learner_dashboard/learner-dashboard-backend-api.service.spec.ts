@@ -778,14 +778,16 @@ describe('Learner Dashboard Backend API Service', () => {
         title: 'sampleTitle',
         description: 'sampleDescription',
         facilitator_usernames: ['username1'],
-        learners_count: 5
+        learners_count: 5,
+        story_ids: ['story1']
       };
       const sampleShortLearnerGroupSummaryDict2 = {
         id: 'sampleId2',
         title: 'sampleTitle 2',
         description: 'sampleDescription 2',
         facilitator_usernames: ['username1'],
-        learners_count: 7
+        learners_count: 7,
+        story_ids: ['story1']
       };
       const sampleShortLearnerGroupSummary1 = (
         ShortLearnerGroupSummary.createFromBackendDict(

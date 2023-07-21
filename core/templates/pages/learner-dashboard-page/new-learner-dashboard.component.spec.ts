@@ -103,19 +103,19 @@ class LoadingDotsComponentStub {
 describe('New Learner dashboard page', () => {
   let component: NewLearnerDashboardComponent;
   let fixture: ComponentFixture<NewLearnerDashboardComponent>;
-  let alertsService: AlertsService = null;
-  let csrfTokenService: CsrfTokenService = null;
-  let dateTimeFormatService: DateTimeFormatService = null;
-  let explorationObjectFactory: ExplorationObjectFactory = null;
+  let alertsService: AlertsService;
+  let csrfTokenService: CsrfTokenService;
+  let dateTimeFormatService: DateTimeFormatService;
+  let explorationObjectFactory: ExplorationObjectFactory;
   let learnerDashboardBackendApiService:
-    LearnerDashboardBackendApiService = null;
+    LearnerDashboardBackendApiService;
   let suggestionModalForLearnerDashboardService:
-    SuggestionModalForLearnerDashboardService = null;
+    SuggestionModalForLearnerDashboardService;
   let windowDimensionsService: WindowDimensionsService;
   let mockResizeEmitter: EventEmitter<void>;
-  let userService: UserService = null;
-  let translateService: TranslateService = null;
-  let pageTitleService: PageTitleService = null;
+  let userService: UserService;
+  let translateService: TranslateService;
+  let pageTitleService: PageTitleService;
   let learnerGroupBackendApiService: LearnerGroupBackendApiService;
   let urlService: UrlService;
 

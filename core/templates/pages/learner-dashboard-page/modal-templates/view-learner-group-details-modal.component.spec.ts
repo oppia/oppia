@@ -41,7 +41,8 @@ describe('View Learner Group Details Modal Component', function() {
   let fixture: ComponentFixture<ViewLearnerGroupDetailsModalComponent>;
 
   const shortLearnerGroup = new ShortLearnerGroupSummary(
-    'sampleId2', 'sampleTitle 2', 'sampleDescription 2', ['username1'], 7
+    'sampleId2', 'sampleTitle 2', 'sampleDescription 2', ['username1'], 7,
+    ['story1']
   );
 
   beforeEach(waitForAsync(() => {

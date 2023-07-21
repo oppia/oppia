@@ -391,7 +391,7 @@ describe('New-Home tab Component', () => {
     let explorationSummary = LearnerExplorationSummary.createFromBackendDict(
       exploration);
 
-    const storySummary = [StorySummary.createFromBackendDict({
+    const storySummary = StorySummary.createFromBackendDict({
       id: 'storyId',
       title: 'Story Title',
       node_titles: ['node1', 'node2', 'node3'],
@@ -401,8 +401,11 @@ describe('New-Home tab Component', () => {
       story_is_published: true,
       completed_node_titles: ['node1'],
       url_fragment: 'story1',
-      all_node_dicts: []
-    })];
+      all_node_dicts: [],
+      topic_name: 'topic',
+      topic_url_fragment: 'topic',
+      classroom_url_fragment: 'math',
+    });
 
     const storyData: storySummaryTile = {
       topicName: 'Addition',

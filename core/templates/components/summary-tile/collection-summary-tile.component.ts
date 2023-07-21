@@ -139,7 +139,9 @@ export class CollectionSummaryTileComponent implements OnInit, OnDestroy {
     if (this.buttonIsHovered) {
       return 'box-shadow: 0 5px 5px -5px #333;';
     }
+    return '';
   }
+
 
   getCompleteThumbnailIconUrl(): string {
     return this.urlInterpolationService.getStaticImageUrl(

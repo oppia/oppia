@@ -42,7 +42,8 @@ describe('View Learner Group Invitation Modal Component', function() {
   let ngbActiveModal: NgbActiveModal;
 
   const shortLearnerGroup = new ShortLearnerGroupSummary(
-    'sampleId2', 'sampleTitle 2', 'sampleDescription 2', ['username1'], 7
+    'sampleId2', 'sampleTitle 2', 'sampleDescription 2', ['username1'], 7,
+    ['story1']
   );
 
   beforeEach(waitForAsync(() => {

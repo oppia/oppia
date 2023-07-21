@@ -95,7 +95,7 @@ export class ExplorationSummaryTileComponent implements OnInit, OnDestroy {
   expObjectiveTranslationKey!: string;
   buttonIsHovered: boolean = false;
   circumference = (18 * 2 * Math.PI);
-  getStrokeDashOffSet: number;
+  getStrokeDashOffSet!: number;
 
 
   constructor(
@@ -126,10 +126,10 @@ export class ExplorationSummaryTileComponent implements OnInit, OnDestroy {
         return commitsOfContributor2 - commitsOfContributor1;
       }
     );
-    setTimeout(() => {
-      this.getStrokeDashOffSet =
+
+    this.getStrokeDashOffSet =
     this.getStrokeDashOffSetValue(this.explorationProgress);
-    }, 2000);
+
     this.isRefresherExploration = false;
     if (this.parentExplorationIds) {
       this.isRefresherExploration = (
@@ -263,6 +263,7 @@ export class ExplorationSummaryTileComponent implements OnInit, OnDestroy {
     if (this.buttonIsHovered) {
       return 'box-shadow: 0 5px 5px -5px #333;';
     }
+    return '';
   }
 
   getCompleteThumbnailIconUrl(): string {
