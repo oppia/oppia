@@ -6,7 +6,7 @@
     <span>Back to Topic</span>
   </p>
   <div class="subtopic-header-text">
-    <span class="topic-name" (click)="navigateToTopicEditor()">{{ topic?.getName() }} / </span>
+    <span class="topic-name" (click)="navigateToTopicEditor()" tabindex="0" role="button" [attr.aria-label]="'Navigate back to ' + topic?.getName()" (keydown.enter)="navigateToTopicEditor()">{{ topic?.getName() }} / </span>
     <span class="subtopic-name">{{ editableTitle }}</span>
   </div>
   <div class="subtopic-content-box">
@@ -26,7 +26,7 @@
         </div>
         <div class="oppia-subtopics-list-card oppia-mobile-collapsible-card-content"
              *ngIf="subtopicEditorCardIsShown">
-          <div class="subtopic-title">
+          <div class="subtopic-title" tabindex="0">
             <p>
               <strong>Title*</strong>
             </p>
@@ -35,6 +35,7 @@
                      type="text"
                      (blur)="updateSubtopicTitle(editableTitle)"
                      [(ngModel)]="editableTitle"
+                     aria-label="Input field to add Subtopic title"
                      [ngModelOptions]="{standalone: true}"
                      maxlength="MAX_CHARS_IN_SUBTOPIC_TITLE"
                      (change)="resetErrorMsg()">
@@ -51,7 +52,7 @@
               <em>The maximum length of subtopic title is 80 characters.</em>
             </span>
           </div>
-          <div class="subtopic-url-fragment">
+          <div class="subtopic-url-fragment" tabindex="0">
             <p>
               <strong>Url Fragment*</strong>
             </p>
@@ -61,6 +62,7 @@
                      type="text"
                      (blur)="updateSubtopicUrlFragment(editableUrlFragment)"
                      [(ngModel)]="editableUrlFragment"
+                     aria-label="Input field to add Subtopic URL"
                      [ngModelOptions]="{standalone: true}"
                      maxlength="MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT">
               <span class="oppia-input-box-subtitle">
@@ -72,12 +74,17 @@
               </span>
             </form>
             <div class="oppia-input-box-subtitle text-danger"
-                 *ngIf="editableUrlFragment && subtopicUrlFragmentExists">
+                 *ngIf="editableUrlFragment && subtopicUrlFragmentExists" aria-live="polite">
               <em>The subtopic url fragment is not unique.</em>
             </div>
           </div>
-          <div class="subtopic-html">
-            <div  (click)="showSchemaEditor()" class="e2e-test-edit-html-content">
+          <div class="subtopic-html" tabindex="0">
+            <div (click)="showSchemaEditor()"
+                 class="e2e-test-edit-html-content"
+                 role="button"
+                 aria-label="Edit explanation of the subtopic"
+                 tabindex="0"
+                 (keydown.enter)="showSchemaEditor()">
               <p>
                 <strong>Explanation of the subtopic*</strong>
                 <i class="fa fa-pen edit-icon" *ngIf="!schemaEditorIsShown"></i>
@@ -131,6 +138,8 @@
         <div *ngIf="editableThumbnailFilename && subtopicEditorCardIsShown">
           <div *ngIf="!subtopicPreviewCardIsShown">
             <button class="btn btn-default show-subtopic-preview-button"
+                    tabindex="0"
+                    (keydown.enter)="toggleSubtopicPreview()"
                     (click)="toggleSubtopicPreview()">
               Expand Preview
               <i class="fa fa-angle-down"></i>
@@ -138,6 +147,8 @@
           </div>
           <div *ngIf="subtopicPreviewCardIsShown">
             <button class="btn btn-default show-subtopic-preview-button"
+                    tabindex="0"
+                    (keydown.enter)="toggleSubtopicPreview()"
                     (click)="toggleSubtopicPreview()">
               Collapse Preview
               <i class="fa fa-angle-up"></i>
@@ -153,7 +164,7 @@
           </div>
         </div>
       </mat-card>
-      <mat-card class="oppia-subtopics-list-card subtopic-skill-card subtopic-item-container oppia-mobile-collapsible-card">
+      <mat-card class="oppia-subtopics-list-card subtopic-skill-card subtopic-item-container oppia-mobile-collapsible-card" tabindex="0">
         <div class="skill-card-header oppia-mobile-collapsible-card-header"
              (click)="togglePreviewSkillCard()">
           <h3>Skills</h3>
@@ -181,23 +192,37 @@
                    cdkDrag>
                 <span class="fas fa-grip-vertical draggable-icon-indicator"></span>
                 <a *ngIf="!isSkillDeleted(skillSummary)"
+                   tabindex="0"
                    [href]="getSkillEditorUrl(skillSummary.getId())" target="_blank" rel="noopener">
                   {{ skillSummary.getDescription() }}
                 </a>
                 <div class="skill-options-box">
-                  <span>{{ skillQuestionCountDict[skillSummary.getId()]  }}</span>
-                  <i class="fa fa-ellipsis-v" (click)="showSkillEditOptions(idx)"></i>
+                  <span tabindex="0" [attr.aria-label]="'Number of questions: ' + skillQuestionCountDict[skillSummary.getId()]">{{ skillQuestionCountDict[skillSummary.getId()]  }}</span>
+                  <i class="fa fa-ellipsis-v"
+                     tabindex="0"
+                     (click)="showSkillEditOptions(idx)"
+                     role="button"
+                     aria-label="More options"
+                     (keydown.enter)="showSkillEditOptions(idx)">
+                  </i>
                 </div>
                 <div class="skill-option-box"
                      *ngIf="selectedSkillEditOptionsIndex === idx"
                      (mouseleave)="showSkillEditOptions(null)"
                      (click)="showSkillEditOptions(null)">
                   <div class="skill-edit-option"
+                       tabindex="0"
+                       role="button"
+                       (keydown.enter)="removeSkillFromSubtopic(skillSummary)"
                        (click)="removeSkillFromSubtopic(skillSummary)">
                     <i class="fa fa-trash"></i>
                     <span>Remove from subtopic</span>
                   </div>
                   <div class="skill-edit-option remove-from-topic-option"
+                       tabindex="0"
+                       role="button"
+                       (keydown.enter)="removeSkillFromTopic(skillSummary)"
+                       (blur)="showSkillEditOptions(null)"
                        (click)="removeSkillFromTopic(skillSummary)">
                     <i class="fa fa-trash"></i>
                     <span>Remove from topic</span>
@@ -210,7 +235,7 @@
       </mat-card>
     </div>
     <div class="subtopic-right-box">
-      <div class="entity-count">
+      <div class="entity-count" tabindex="0">
         <div class="skill-count">
           <span class="skill-count-value">{{ skillIds?.length }}</span>
           <span class="skill-count-text">Skills</span>
@@ -338,7 +363,7 @@
     margin-left: 4%;
   }
   .topic-name {
-    color: #707070;
+    color: #000;
     cursor: pointer;
   }
   .entity-count {
