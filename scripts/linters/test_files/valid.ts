@@ -27,4 +27,4 @@ require('codemirror-v5.17.0/mode/javascript/javascript.js');
 require('codemirror-v5.17.0/mode/python/python.js');
 require('codemirror-v5.17.0/mode/yaml/yaml.js');
 require('static/ui-codemirror-5d04fa/src/ui-codemirror.js');
-require('static/diff-match-patch-1.0.0/diff_match_patch.js');
+import 'diff_match_patch';
