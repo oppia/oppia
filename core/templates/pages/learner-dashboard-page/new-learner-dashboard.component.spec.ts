@@ -23,7 +23,7 @@ import { LearnerExplorationSummary } from 'domain/summary/learner-exploration-su
 
 import { CollectionSummary } from 'domain/collection/collection-summary.model';
 import { ProfileSummary } from 'domain/user/profile-summary.model';
-import { LearnerDashboardPageComponent } from './learner-dashboard-page.component';
+import { NewLearnerDashboardComponent } from './new-learner-dashboard.component';
 import { async, ComponentFixture, fakeAsync, flush, TestBed, tick } from '@angular/core/testing';
 import { MaterialModule } from 'modules/material.module';
 import { FormsModule } from '@angular/forms';
@@ -32,8 +32,8 @@ import { Component, EventEmitter, NO_ERRORS_SCHEMA, Pipe } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
 
 import { AlertsService } from 'services/alerts.service';
+import { ShortLearnerGroupSummary } from 'domain/learner_group/short-learner-group-summary.model';
 import { CsrfTokenService } from 'services/csrf-token.service';
-import { FocusManagerService } from 'services/stateful/focus-manager.service';
 import { DateTimeFormatService } from 'services/date-time-format.service';
 import { ExplorationBackendDict, ExplorationObjectFactory } from 'domain/exploration/ExplorationObjectFactory';
 import { LearnerDashboardBackendApiService } from 'domain/learner_dashboard/learner-dashboard-backend-api.service';
@@ -100,14 +100,13 @@ class CollectionSummaryTileComponentStub {
 class LoadingDotsComponentStub {
 }
 
-describe('Learner dashboard page', () => {
-  let component: LearnerDashboardPageComponent;
-  let fixture: ComponentFixture<LearnerDashboardPageComponent>;
+describe('New Learner dashboard page', () => {
+  let component: NewLearnerDashboardComponent;
+  let fixture: ComponentFixture<NewLearnerDashboardComponent>;
   let alertsService: AlertsService = null;
   let csrfTokenService: CsrfTokenService = null;
   let dateTimeFormatService: DateTimeFormatService = null;
   let explorationObjectFactory: ExplorationObjectFactory = null;
-  let focusManagerService: FocusManagerService;
   let learnerDashboardBackendApiService:
     LearnerDashboardBackendApiService = null;
   let suggestionModalForLearnerDashboardService:
@@ -279,7 +278,7 @@ describe('Learner dashboard page', () => {
           HttpClientTestingModule
         ],
         declarations: [
-          LearnerDashboardPageComponent,
+          NewLearnerDashboardComponent,
           MockTranslatePipe,
           SortByPipe,
           MockSlicePipe,
@@ -293,7 +292,6 @@ describe('Learner dashboard page', () => {
           AlertsService,
           DateTimeFormatService,
           ExplorationObjectFactory,
-          FocusManagerService,
           LearnerDashboardBackendApiService,
           {
             provide: LearnerDashboardActivityBackendApiService,
@@ -303,6 +301,7 @@ describe('Learner dashboard page', () => {
             provide: WindowDimensionsService,
             useValue: {
               isWindowNarrow: () => true,
+              isTabletView: () => true,
               getResizeEvent: () => mockResizeEmitter,
             }
           },
@@ -320,14 +319,13 @@ describe('Learner dashboard page', () => {
     }));
 
     beforeEach(fakeAsync(() => {
-      fixture = TestBed.createComponent(LearnerDashboardPageComponent);
+      fixture = TestBed.createComponent(NewLearnerDashboardComponent);
       component = fixture.componentInstance;
 
       alertsService = TestBed.inject(AlertsService);
       csrfTokenService = TestBed.inject(CsrfTokenService);
       dateTimeFormatService = TestBed.inject(DateTimeFormatService);
       explorationObjectFactory = TestBed.inject(ExplorationObjectFactory);
-      focusManagerService = TestBed.inject(FocusManagerService);
       windowDimensionsService = TestBed.inject(WindowDimensionsService);
       learnerDashboardBackendApiService =
         TestBed.inject(LearnerDashboardBackendApiService);
@@ -496,25 +494,42 @@ describe('Learner dashboard page', () => {
 
     it('should check whether window is narrow on resizing the screen', () => {
       spyOn(windowDimensionsService, 'isWindowNarrow').and.returnValue(false);
+      spyOn(windowDimensionsService, 'isTabletView').and.returnValue(false);
 
       expect(component.windowIsNarrow).toBeTrue();
+      expect(component.tabletView).toBeTrue();
+
 
       mockResizeEmitter.emit();
 
       expect(component.windowIsNarrow).toBeFalse();
+      expect(component.tabletView).toBeFalse();
     });
 
-    it('should set focus without scroll on browse lesson btn', fakeAsync(() => {
-      const focusSpy = spyOn(focusManagerService, 'setFocusWithoutScroll');
-      spyOn(userService, 'getUserInfoAsync').and
-        .callFake(async() => {
-          return Promise.resolve(userInfo);
-        });
+    it('should update map data', fakeAsync(() => {
+      const sampleShortLearnerGroupSummary = new ShortLearnerGroupSummary(
+        'sampleId', 'sampleTitle', 'sampleDescription', ['username1'], 2,
+        ['storyId1', 'storyId2']
+      );
+      component.storyIdToLearnerGroupsTitleMap =
+      new Map([['storyId1', ['sampleTitle1']]]);
+      spyOn(
+        learnerDashboardBackendApiService,
+        'fetchLearnerDashboardLearnerGroupsAsync'
+      ).and.returnValue(
+        Promise.resolve({
+          learnerGroupsJoined: [sampleShortLearnerGroupSummary],
+          invitedToLearnerGroups: []
+        })
+      );
 
       component.ngOnInit();
-      flush();
-
-      expect(focusSpy).toHaveBeenCalledWith('ourLessonsBtn');
+      tick();
+      expect(component.storyIdToLearnerGroupsTitleMap.size).toBe(2);
+      expect(component.storyIdToLearnerGroupsTitleMap.get('storyId1')).
+        toEqual(['sampleTitle1', 'sampleTitle']);
+      expect(component.storyIdToLearnerGroupsTitleMap.get('storyId2')).
+        toEqual(['sampleTitle']);
     }));
 
     it('should subscribe to onLangChange upon initialisation and set page ' +
@@ -563,18 +578,6 @@ describe('Learner dashboard page', () => {
         'profile-image-url-webp');
     });
 
-    it('should toggle active subsection type when changing subsection type',
-      () => {
-        // Active subsection is set as I18N_DASHBOARD_SKILL_PROFICIENCY when
-        // component is initialized.
-        expect(component.activeSubsection).toBe(
-          'I18N_DASHBOARD_SKILL_PROFICIENCY');
-
-        let newActiveSubsection2 = 'I18N_DASHBOARD_SKILL_PROFICIENCY';
-        component.setActiveSubsection(newActiveSubsection2);
-
-        expect(component.activeSubsection).toBe(newActiveSubsection2);
-      });
 
     it('should show username popover based on its length', () => {
       expect(component.showUsernamePopover('abcdefghijk')).toBe('mouseenter');
@@ -642,7 +645,7 @@ describe('Learner dashboard page', () => {
           HttpClientTestingModule
         ],
         declarations: [
-          LearnerDashboardPageComponent,
+          NewLearnerDashboardComponent,
           MockTranslatePipe,
           SortByPipe,
           MockSlicePipe,
@@ -668,7 +671,7 @@ describe('Learner dashboard page', () => {
     }));
 
     beforeEach(fakeAsync(() => {
-      fixture = TestBed.createComponent(LearnerDashboardPageComponent);
+      fixture = TestBed.createComponent(NewLearnerDashboardComponent);
       component = fixture.componentInstance;
       alertsService = TestBed.inject(AlertsService);
       csrfTokenService = TestBed.inject(CsrfTokenService);
@@ -706,112 +709,6 @@ describe('Learner dashboard page', () => {
       expect(fetchDataSpy).toHaveBeenCalled();
     }));
 
-    it('should show an alert warning when fails to get collections data' +
-      'in mobile view',
-    fakeAsync(() => {
-      const fetchDataSpy = spyOn(
-        learnerDashboardBackendApiService,
-        'fetchLearnerDashboardCollectionsDataAsync')
-        .and.rejectWith(404);
-      const alertsSpy = spyOn(alertsService, 'addWarning').and.callThrough();
-
-      let newActiveSectionName = 'I18N_DASHBOARD_LESSONS';
-      component.setActiveSubsection(newActiveSectionName);
-
-      tick();
-      fixture.detectChanges();
-
-      expect(alertsSpy).toHaveBeenCalledWith(
-        'Failed to get learner dashboard collections data');
-      expect(fetchDataSpy).toHaveBeenCalled();
-    }));
-
-    it('should show an alert warning when fails to get explorations data in' +
-    'mobile view',
-    fakeAsync(() => {
-      const fetchDataSpy = spyOn(
-        learnerDashboardBackendApiService,
-        'fetchLearnerDashboardExplorationsDataAsync')
-        .and.rejectWith(404);
-      const alertsSpy = spyOn(alertsService, 'addWarning').and.callThrough();
-
-      let newActiveSectionName = 'I18N_DASHBOARD_LESSONS';
-      component.setActiveSubsection(newActiveSectionName);
-
-      tick();
-      fixture.detectChanges();
-
-      expect(alertsSpy).toHaveBeenCalledWith(
-        'Failed to get learner dashboard explorations data');
-      expect(fetchDataSpy).toHaveBeenCalled();
-    }));
-
-    it('should get explorations and collections data when user clicks ' +
-    'communtiy lessons tab in mobile view',
-    fakeAsync(() => {
-      const fetchCollectionsDataSpy = spyOn(
-        learnerDashboardBackendApiService,
-        'fetchLearnerDashboardCollectionsDataAsync')
-        .and.returnValue(Promise.resolve({
-          completedCollectionsList: (
-            learnerDashboardCollectionsData.completed_collections_list.map(
-              collectionSummary => CollectionSummary
-                .createFromBackendDict(collectionSummary))),
-          incompleteCollectionsList: (
-            learnerDashboardCollectionsData.incomplete_collections_list.map(
-              collectionSummary => CollectionSummary
-                .createFromBackendDict(collectionSummary))),
-          collectionPlaylist: (
-            learnerDashboardCollectionsData.collection_playlist.map(
-              collectionSummary => CollectionSummary
-                .createFromBackendDict(collectionSummary))),
-          completedToIncompleteCollections: (
-            learnerDashboardCollectionsData
-              .completed_to_incomplete_collections),
-          numberOfNonexistentCollections: (
-            NonExistentCollections.createFromBackendDict(
-              learnerDashboardCollectionsData
-                .number_of_nonexistent_collections)),
-        }));
-
-      const fetchExplorationsDataSpy = spyOn(
-        learnerDashboardBackendApiService,
-        'fetchLearnerDashboardExplorationsDataAsync')
-        .and.returnValue(Promise.resolve({
-          completedExplorationsList: (
-            learnerDashboardExplorationsData.completed_explorations_list.map(
-              expSummary => LearnerExplorationSummary.createFromBackendDict(
-                expSummary))),
-          incompleteExplorationsList: (
-            learnerDashboardExplorationsData.incomplete_explorations_list.map(
-              expSummary => LearnerExplorationSummary.createFromBackendDict(
-                expSummary))),
-          explorationPlaylist: (
-            learnerDashboardExplorationsData.exploration_playlist.map(
-              expSummary => LearnerExplorationSummary.createFromBackendDict(
-                expSummary))),
-          numberOfNonexistentExplorations: (
-            NonExistentExplorations.createFromBackendDict(
-              learnerDashboardExplorationsData
-                .number_of_nonexistent_explorations)),
-          subscriptionList: (
-            learnerDashboardExplorationsData.subscription_list.map(
-              profileSummary => ProfileSummary
-                .createFromCreatorBackendDict(profileSummary)))
-        }));
-
-      let newActiveSectionName = 'I18N_DASHBOARD_LESSONS';
-      component.setActiveSubsection(newActiveSectionName);
-
-      tick();
-      fixture.detectChanges();
-
-      expect(fetchCollectionsDataSpy).toHaveBeenCalled();
-      flush();
-      expect(fetchExplorationsDataSpy).toHaveBeenCalled();
-      expect(component.communtiyLessonsDataLoaded).toEqual(true);
-    }));
-
     it('should show an alert warning when fails to get collections data ' +
       'in web view',
     fakeAsync(() => {
@@ -821,10 +718,7 @@ describe('Learner dashboard page', () => {
         .and.rejectWith(404);
       const alertsSpy = spyOn(alertsService, 'addWarning').and.callThrough();
 
-      let newActiveSectionName = (
-        'I18N_LEARNER_DASHBOARD_COMMUNITY_LESSONS_SECTION');
-      component.setActiveSection(newActiveSectionName);
-
+      component.ngOnInit();
       tick();
       fixture.detectChanges();
 
@@ -842,9 +736,7 @@ describe('Learner dashboard page', () => {
         .and.rejectWith(404);
       const alertsSpy = spyOn(alertsService, 'addWarning').and.callThrough();
 
-      let newActiveSectionName = (
-        'I18N_LEARNER_DASHBOARD_COMMUNITY_LESSONS_SECTION');
-      component.setActiveSection(newActiveSectionName);
+      component.ngOnInit();
 
       tick();
       fixture.detectChanges();
@@ -908,9 +800,7 @@ describe('Learner dashboard page', () => {
                 .createFromCreatorBackendDict(profileSummary)))
         }));
 
-      let newActiveSectionName = (
-        'I18N_LEARNER_DASHBOARD_COMMUNITY_LESSONS_SECTION');
-      component.setActiveSection(newActiveSectionName);
+      component.ngOnInit();
 
       tick();
       fixture.detectChanges();
@@ -918,7 +808,6 @@ describe('Learner dashboard page', () => {
       expect(fetchCollectionsDataSpy).toHaveBeenCalled();
       flush();
       expect(fetchExplorationsDataSpy).toHaveBeenCalled();
-      expect(component.communtiyLessonsDataLoaded).toEqual(true);
     }));
 
     it('should unsubscribe upon component destruction', () => {

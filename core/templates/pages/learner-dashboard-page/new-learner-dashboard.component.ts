@@ -36,7 +36,6 @@ import { AlertsService } from 'services/alerts.service';
 import { DateTimeFormatService } from 'services/date-time-format.service';
 import { LoaderService } from 'services/loader.service';
 import { UserService } from 'services/user.service';
-import { FocusManagerService } from 'services/stateful/focus-manager.service';
 import { StorySummary } from 'domain/story/story-summary.model';
 import { LearnerTopicSummary } from 'domain/topic/learner-topic-summary.model';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
@@ -138,13 +137,12 @@ export class NewLearnerDashboardComponent implements OnInit {
   windowIsNarrow: boolean = false;
   directiveSubscriptions = new Subscription();
   LEARNER_GROUP_FEATURE_IS_ENABLED: boolean = false;
-  TabletView: boolean = false;
+  tabletView: boolean = false;
 
   constructor(
     private alertsService: AlertsService,
     private windowDimensionService: WindowDimensionsService,
     private dateTimeFormatService: DateTimeFormatService,
-    private focusManagerService: FocusManagerService,
     private i18nLanguageCodeService: I18nLanguageCodeService,
     private learnerDashboardBackendApiService:
       LearnerDashboardBackendApiService,
@@ -303,8 +301,6 @@ export class NewLearnerDashboardComponent implements OnInit {
         this.activeSection = (
           LearnerDashboardPageConstants
             .LEARNER_DASHBOARD_SECTION_I18N_IDS.HOME);
-        // So that focus is applied after the loading screen has dissapeared.
-        this.focusManagerService.setFocusWithoutScroll('ourLessonsBtn');
       }, 0);
     }).catch(errorResponse => {
       // This is placed here in order to satisfy Unit tests.
@@ -312,11 +308,11 @@ export class NewLearnerDashboardComponent implements OnInit {
 
 
     this.windowIsNarrow = this.windowDimensionService.isWindowNarrow();
-    this.TabletView = this.windowDimensionService.isTabletView();
+    this.tabletView = this.windowDimensionService.isTabletView();
     this.directiveSubscriptions.add(
       this.windowDimensionService.getResizeEvent().subscribe(() => {
         this.windowIsNarrow = this.windowDimensionService.isWindowNarrow();
-        this.TabletView = this.windowDimensionService.isTabletView();
+        this.tabletView = this.windowDimensionService.isTabletView();
       }));
     this.directiveSubscriptions.add(
       this.translateService.onLangChange.subscribe(() => {
@@ -350,134 +346,6 @@ export class NewLearnerDashboardComponent implements OnInit {
 
   getStaticImageUrl(imagePath: string): string {
     return this.urlInterpolationService.getStaticImageUrl(imagePath);
-  }
-
-  setActiveSection(newActiveSectionName: string): void {
-    this.activeSection = newActiveSectionName;
-    if (this.activeSection ===
-      LearnerDashboardPageConstants
-        .LEARNER_DASHBOARD_SECTION_I18N_IDS.COMMUNITY_LESSONS) {
-      this.loaderService.showLoadingScreen('Loading');
-      let dashboardCollectionsDataPromise = (
-        this.learnerDashboardBackendApiService
-          .fetchLearnerDashboardCollectionsDataAsync());
-      dashboardCollectionsDataPromise.then(
-        responseData => {
-          this.completedCollectionsList = (
-            responseData.completedCollectionsList);
-          this.incompleteCollectionsList = (
-            responseData.incompleteCollectionsList);
-          this.completedToIncompleteCollections = (
-            responseData.completedToIncompleteCollections);
-          this.collectionPlaylist = responseData.collectionPlaylist;
-        }, errorResponseStatus => {
-          if (
-            AppConstants.FATAL_ERROR_CODES.indexOf(errorResponseStatus
-            ) !== -1) {
-            this.alertsService.addWarning(
-              'Failed to get learner dashboard collections data');
-          }
-        }
-      );
-
-      let dashboardExplorationsDataPromise = (
-        this.learnerDashboardBackendApiService
-          .fetchLearnerDashboardExplorationsDataAsync());
-      dashboardExplorationsDataPromise.then(
-        responseData => {
-          this.completedExplorationsList = (
-            responseData.completedExplorationsList);
-          this.incompleteExplorationsList = (
-            responseData.incompleteExplorationsList);
-          this.subscriptionsList = responseData.subscriptionList;
-          this.explorationPlaylist = responseData.explorationPlaylist;
-        }, errorResponseStatus => {
-          if (
-            AppConstants.FATAL_ERROR_CODES.indexOf(errorResponseStatus
-            ) !== -1) {
-            this.alertsService.addWarning(
-              'Failed to get learner dashboard explorations data');
-          }
-        }
-      );
-      Promise.all([
-        dashboardCollectionsDataPromise,
-        dashboardExplorationsDataPromise,
-      ]).then(() => {
-        setTimeout(() => {
-          this.loaderService.hideLoadingScreen();
-          this.communtiyLessonsDataLoaded = true;
-          // So that focus is applied after the loading screen has dissapeared.
-          this.focusManagerService.setFocusWithoutScroll('ourLessonsBtn');
-        }, 0);
-      }).catch(errorResponse => {
-        // This is placed here in order to satisfy Unit tests.
-      });
-    }
-  }
-
-  setActiveSubsection(newActiveSubsectionName: string): void {
-    this.activeSubsection = newActiveSubsectionName;
-    if (this.activeSubsection ===
-      LearnerDashboardPageConstants
-        .LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.LESSONS) {
-      this.loaderService.showLoadingScreen('Loading');
-      let dashboardCollectionsDataPromise = (
-        this.learnerDashboardBackendApiService
-          .fetchLearnerDashboardCollectionsDataAsync());
-      dashboardCollectionsDataPromise.then(
-        responseData => {
-          this.completedCollectionsList = (
-            responseData.completedCollectionsList);
-          this.incompleteCollectionsList = (
-            responseData.incompleteCollectionsList);
-          this.completedToIncompleteCollections = (
-            responseData.completedToIncompleteCollections);
-          this.collectionPlaylist = responseData.collectionPlaylist;
-        }, errorResponseStatus => {
-          if (
-            AppConstants.FATAL_ERROR_CODES.indexOf(errorResponseStatus
-            ) !== -1) {
-            this.alertsService.addWarning(
-              'Failed to get learner dashboard collections data');
-          }
-        }
-      );
-
-      let dashboardExplorationsDataPromise = (
-        this.learnerDashboardBackendApiService
-          .fetchLearnerDashboardExplorationsDataAsync());
-      dashboardExplorationsDataPromise.then(
-        responseData => {
-          this.completedExplorationsList = (
-            responseData.completedExplorationsList);
-          this.incompleteExplorationsList = (
-            responseData.incompleteExplorationsList);
-          this.subscriptionsList = responseData.subscriptionList;
-          this.explorationPlaylist = responseData.explorationPlaylist;
-        }, errorResponseStatus => {
-          if (
-            AppConstants.FATAL_ERROR_CODES.indexOf(errorResponseStatus
-            ) !== -1) {
-            this.alertsService.addWarning(
-              'Failed to get learner dashboard explorations data');
-          }
-        }
-      );
-      Promise.all([
-        dashboardCollectionsDataPromise,
-        dashboardExplorationsDataPromise,
-      ]).then(() => {
-        setTimeout(() => {
-          this.loaderService.hideLoadingScreen();
-          this.communtiyLessonsDataLoaded = true;
-          // So that focus is applied after the loading screen has dissapeared.
-          this.focusManagerService.setFocusWithoutScroll('ourLessonsBtn');
-        }, 0);
-      }).catch(errorResponse => {
-        // This is placed here in order to satisfy Unit tests.
-      });
-    }
   }
 
   showUsernamePopover(subscriberUsername: string): string {
