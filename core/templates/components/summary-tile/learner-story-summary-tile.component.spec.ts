@@ -205,6 +205,16 @@ describe('Learner Story Summary Tile Component', () => {
     expect(urlSpy).not.toHaveBeenCalled();
   });
 
+  it('should return box-shadow style when button is hovered', () => {
+    component.displayArea = 'homeTab';
+    component.buttonIsHovered = true;
+
+    fixture.detectChanges();
+    const result = component.isButtonHovered();
+
+    expect(result).toBe('box-shadow: 0 5px 5px -5px #333;');
+  });
+
   it('should get static image url', () => {
     const urlSpy = spyOn(
       urlInterpolationService, 'getStaticImageUrl')
