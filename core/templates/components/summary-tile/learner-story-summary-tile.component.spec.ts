@@ -131,7 +131,7 @@ describe('Learner Story Summary Tile Component', () => {
     component.cardIsHovered = true;
     component.displayArea = 'homeTab';
     expect(component.isCardHovered()).toBe(
-      '-webkit-filter: blur(2px); filter: blur(2px);');
+      'box-shadow: 0 5px 5px -5px #333;');
   });
 
   it('should get story link url for exploration page on homeTab', () => {

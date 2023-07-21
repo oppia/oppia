@@ -44,7 +44,8 @@ describe('Learner groups tab Component', () => {
   let mockResizeEmitter: EventEmitter<void>;
 
   const sampleShortLearnerGroupSummary = new ShortLearnerGroupSummary(
-    'sampleId', 'sampleTitle', 'sampleDescription', ['username1'], 2
+    'sampleId', 'sampleTitle', 'sampleDescription', ['username1'], 2,
+    ['story1', 'story2']
   );
   const sampleLearnerGroupSummary = new LearnerGroupData(
     'sampleId', 'sampleTitle', 'sampleDescription', ['username1'],
