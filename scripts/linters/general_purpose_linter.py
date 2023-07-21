@@ -116,7 +116,9 @@ BAD_STRINGS_CONSTANTS: Dict[str, BadStringsConstantsDict] = {
 BAD_PATTERNS: Dict[str, BadPatternsDict] = {
     '\t': {
         'message': 'Please use spaces instead of tabs.',
-        'excluded_files': (),
+        'excluded_files': (
+            'Makefile',
+        ),
         'excluded_dirs': (
             'assets/i18n/', 'core/tests/build_sources/assets/')},
     '\r': {

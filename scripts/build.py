@@ -337,11 +337,11 @@ def _minify_and_create_sourcemap(
         common.NODE_BIN_PATH, UGLIFY_FILE, source_path,
         source_map_properties, target_file_path)
     if feconf.OPPIA_IS_DOCKERIZED:
-        cmd = ''.join([
+        cmd = ' '.join([
             'bash', '-c',
             'node /app/oppia/node_modules/uglify-js/bin/uglifyjs'
             ' /app/oppia/third_party/generated/js/third_party.js'
-            ' -c -m --source-map %s -o /app/op0pia/third_party/'
+            ' -c -m --source-map %s -o /app/oppia/third_party/'
             'generated/js/third_party.min.js' % (
                 source_map_properties
             )

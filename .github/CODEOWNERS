@@ -188,8 +188,8 @@
 /.yarnrc @oppia/dev-workflow-reviewers
 /app_dev_docker.yaml @oppia/dev-workflow-reviewers
 /docker-compose.yml @oppia/dev-workflow-reviewers
-/docker/Dockerfile.frontend @oppia/dev-workflow-reviewers
-/docker/Dockerfile.backend @oppia/dev-workflow-reviewers
+/docker/ @oppia/dev-workflow-reviewers
+/Makefile @oppia/dev-workflow-reviewers
 /tox.ini @oppia/dev-workflow-reviewers
 /scripts/*.py @oppia/dev-workflow-reviewers
 /scripts/check_e2e_tests_are_captured_in_ci*.py @oppia/automated-qa-reviewers
