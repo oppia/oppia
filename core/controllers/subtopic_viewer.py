@@ -50,8 +50,12 @@ class SubtopicViewerPage(
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.can_access_subtopic_viewer_page
-    def get(self) -> None:
-        """Handles GET requests."""
+    def get(self, *args: str) -> None:
+        """Handles GET requests.
+
+        Args:
+            *args: list(*). Variable-length argument list, not accessed.
+        """
 
         self.render_template('subtopic-viewer-page.mainpage.html')
 
