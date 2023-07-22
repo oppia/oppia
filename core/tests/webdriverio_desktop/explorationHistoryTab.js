@@ -131,7 +131,7 @@ describe('Exploration history', function() {
       },
       10: {
         text: '  default_outcome:',
-        highlighted: false
+        highlighted: true
       },
       // Note that highlighting *underneath* a line is still considered a
       // highlight.
@@ -328,7 +328,7 @@ describe('Exploration history', function() {
       },
       28: {
         text: '  default_outcome:',
-        highlighted: false
+        highlighted: true
       },
       29: {
         text: '    dest: first',
