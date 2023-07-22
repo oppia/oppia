@@ -206,10 +206,6 @@ export class NewLearnerDashboardComponent implements OnInit {
           LearnerDashboardPageConstants
             .LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.SKILL_PROFICIENCY
         );
-        if (this.urlService.getUrlParams().active_tab === 'learner-groups') {
-          this.activeSection = LearnerDashboardPageConstants
-            .LEARNER_DASHBOARD_SECTION_I18N_IDS.LEARNER_GROUPS;
-        }
       }, errorResponseStatus => {
         if (
           AppConstants.FATAL_ERROR_CODES.indexOf(errorResponseStatus) !== -1) {

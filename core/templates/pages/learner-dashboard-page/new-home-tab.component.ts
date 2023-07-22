@@ -125,17 +125,18 @@ export class NewHomeTabComponent {
 
         let storyProgress = Math.floor(
           (storyCompletedNodeCount / stotyNodeCount) * 100);
-
+        let topicId = topicSummaryTile.id;
         var storyData: storySummaryTile = {
           topicName: topicSummaryTile.name,
           storySummary: storySummary,
-          markTileAsGoal: currentGoalsIds.includes(topicSummaryTile.id),
+          markTileAsGoal: currentGoalsIds?.includes(topicId) ? true : false,
           learnerGroupTitle: ''
         };
         if (this.storyIdToLearnerGroupsTitleMap.has(storySummary.getId())) {
           let learnerGroupsTitle =
           this.storyIdToLearnerGroupsTitleMap.get(storySummary.getId());
-          storyData.learnerGroupTitle = learnerGroupsTitle[0];
+          storyData.learnerGroupTitle = learnerGroupsTitle ?
+          learnerGroupsTitle[0] : '';
         }
         if (storyProgress !== 0) {
           this.storyInProgress.push(storyData);
@@ -160,7 +161,7 @@ export class NewHomeTabComponent {
       this.completedExpIds.push(exp.id);
     }
     if (this.totalExploration.length !== 0) {
-      let expIds = [];
+      let expIds: string[] = [];
       for (var exp of this.totalExploration) {
         expIds.push(exp.id);
       }

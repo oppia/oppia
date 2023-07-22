@@ -215,6 +215,16 @@ describe('Learner Story Summary Tile Component', () => {
     expect(result).toBe('box-shadow: 0 5px 5px -5px #333;');
   });
 
+  it('should check when button is not hovered', () => {
+    component.displayArea = 'homeTab';
+    component.buttonIsHovered = false;
+
+    fixture.detectChanges();
+    const result = component.isButtonHovered();
+
+    expect(result).toBe('');
+  });
+
   it('should get static image url', () => {
     const urlSpy = spyOn(
       urlInterpolationService, 'getStaticImageUrl')
