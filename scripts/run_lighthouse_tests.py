@@ -264,7 +264,7 @@ def main(args: Optional[List[str]] = None) -> None:
         print('Starting ffmpeg for screen recording.')
         vid_popen = subprocess.Popen([
             'ffmpeg', '-framerate', '25', '-f',
-            'x11grab', '-i', ':0', vid_path])
+            'x11grab', '-i', ':99', vid_path])
 
     with contextlib.ExitStack() as stack:
         stack.enter_context(servers.managed_redis_server())
