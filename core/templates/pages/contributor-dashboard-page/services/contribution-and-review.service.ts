@@ -182,7 +182,7 @@ export class ContributionAndReviewService {
     );
   }
 
-  private async fetchTranslationSuggestionsAsync(
+  async fetchTranslationSuggestionsAsync(
       fetcher: SuggestionFetcher,
       shouldResetOffset: boolean,
       explorationId: string
