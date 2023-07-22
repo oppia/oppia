@@ -60,7 +60,6 @@ export class LibraryPageComponent {
   // - .oppia-library-carousel: max-width.
   MAX_NUM_TILES_PER_ROW: number = 4;
   isAnyCarouselCurrentlyScrolling: boolean = false;
-  CLASSROOM_PROMOS_ARE_ENABLED: boolean = false;
   tileDisplayCount: number = 0;
   leftmostCardIndices: number[] = [];
   LIBRARY_PAGE_MODES = LibraryPageConstants.LIBRARY_PAGE_MODES;
@@ -282,11 +281,6 @@ export class LibraryPageComponent {
       Math.floor(Math.random() * this.possibleBannerFilenames.length)];
     this.bannerImageFileUrl = this.urlInterpolationService.getStaticImageUrl(
       '/library/' + this.bannerImageFilename);
-
-    this.classroomBackendApiService.fetchClassroomPromosAreEnabledStatusAsync()
-      .then((classroomPromosAreEnabled) => {
-        this.CLASSROOM_PROMOS_ARE_ENABLED = classroomPromosAreEnabled;
-      });
 
     let currentPath = this.windowRef.nativeWindow.location.pathname;
 
