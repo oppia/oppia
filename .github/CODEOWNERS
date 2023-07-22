@@ -327,7 +327,7 @@
 /core/templates/services/internet-connectivity.service*.ts @oppia/frontend-infrastructure-reviewers
 /core/templates/services/server-connection-backend-api.service*.ts @oppia/frontend-infrastructure-reviewers
 /core/templates/services/number-conversion.service*.ts @oppia/frontend-infrastructure-reviewers
-
+/core/templates/services/insert-script.service.ts @oppia/frontend-infrastructure-reviewers @oppia/core-reviewers
 
 # Global stylesheet.
 /core/templates/css/oppia.css @oppia/frontend-infrastructure-reviewers

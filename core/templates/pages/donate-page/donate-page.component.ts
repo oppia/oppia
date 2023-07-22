@@ -35,7 +35,7 @@ import { AlertsService } from 'services/alerts.service';
 import { MailingListBackendApiService } from 'domain/mailing-list/mailing-list-backend-api.service';
 import { ThanksForDonatingModalComponent } from './thanks-for-donating-modal.component';
 import { ThanksForSubscribingModalComponent } from './thanks-for-subscribing-modal.component';
-
+import { InsertScriptService, KNOWN_SCRIPTS } from 'services/insert-script.service';
 @Component({
   selector: 'donate-page',
   templateUrl: './donate-page.component.html',
@@ -59,10 +59,12 @@ export class DonatePageComponent implements OnInit, OnDestroy {
     private translateService: TranslateService,
     private alertsService: AlertsService,
     private mailingListBackendApiService: MailingListBackendApiService,
-    private ngbModal: NgbModal
+    private ngbModal: NgbModal,
+    private insertScriptService: InsertScriptService,
   ) {}
 
   ngOnInit(): void {
+    this.insertScriptService.loadScript(KNOWN_SCRIPTS.DONORBOX);
     this.windowIsNarrow = this.windowDimensionService.isWindowNarrow();
     this.donateImgUrl = this.getStaticImageUrl('/general/opp_donate_text.svg');
     this.directiveSubscriptions.add(
