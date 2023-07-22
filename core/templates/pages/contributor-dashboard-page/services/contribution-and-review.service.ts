@@ -267,7 +267,7 @@ export class ContributionAndReviewService {
     }
 
     const stateNamesInOrder = this.computeGraphService.
-      computeBfsTraversalOfStates(q
+      computeBfsTraversalOfStates(
         initStateName,
         states,
         initStateName
