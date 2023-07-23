@@ -26,7 +26,7 @@
         </div>
         <div *ngIf="mainTopicCardIsShown">
           <div class="oppia-mobile-collapsible-card-content">
-            <div class="topic-name">
+            <div class="topic-name" tabindex="0">
               <label for="topicName"
                      class="form-heading e2e-test-topic-name-heading">
                 Name
@@ -51,7 +51,7 @@
                 </em>
               </div>
             </div>
-            <div class="topic-url-fragment">
+            <div class="topic-url-fragment" tabindex="0">
               <label for="topicUrlFragment"
                      class="form-heading e2e-test-topic-url-fragment-heading">
                 Topic URL Fragment
@@ -78,7 +78,7 @@
                 </em>
               </div>
             </div>
-            <div class="topic-description" [ngClass]="{'has-error': editableDescriptionIsEmpty && topicDescriptionChanged}">
+            <div class="topic-description" [ngClass]="{'has-error': editableDescriptionIsEmpty && topicDescriptionChanged}" tabindex="0">
               <label for="topicDescription"
                      class="form-heading e2e-test-topic-description-heading">
                 Description
@@ -103,6 +103,7 @@
               </span>
             </div>
             <div class="topic-page-title"
+                 tabindex="0"
                  [ngClass]="{'has-error': editablePageTitleFragmentForWeb.length === 0}">
               <label for="topicPageTitleFragmentForWeb"
                      class="form-heading e2e-test-topic-page-title-fragment-label">
@@ -125,6 +126,7 @@
               </span>
             </div>
             <div class="topic-meta-tag-content"
+                 tabindex="0"
                  [ngClass]="{'has-error': editableMetaTagContent.length === 0}">
               <label for="topicMetaTagContent"
                      class="form-heading e2e-test-topic-meta-tag-content-label">Meta Tag Content
@@ -212,7 +214,11 @@
           <label>
             <input class="practice-tab-checkbox e2e-test-toggle-practice-tab"
                    type="checkbox"
+                   tabindex="0"
                    [(ngModel)]="editablePracticeIsDisplayed"
+                   aria-label="Show Practice Tab to learners"
+                   role="checkbox"
+                   aria-labelled="Show practice tab to learners"
                    (change)="updatePracticeTabIsDisplayed(editablePracticeIsDisplayed)"
                    [disabled]="!topicRights.canEditTopic() || (!editablePracticeIsDisplayed && !doesTopicHaveMinimumPracticeQuestions())">
             <span class="practice-tab-text"> Show Practice Tab to learners.</span>
@@ -231,13 +237,13 @@
                 (click)="createSkill()">
           + ADD SKILL
         </button>
-        <div *ngIf="(subtopics.length || uncategorizedSkillSummaries.length) && subtopicsListIsShown">
+        <div *ngIf="(subtopics.length || uncategorizedSkillSummaries.length) && subtopicsListIsShown" tabindex="0">
           <div class="list-header">
             <span>Name</span>
             <span class="number-skills-header"># of Questions</span>
           </div>
           <div class="subtopic-name-header skills-invalid"
-               *ngIf="uncategorizedSkillSummaries.length">
+               *ngIf="uncategorizedSkillSummaries.length" tabindex="0">
             <span>Uncategorized Skills</span>
           </div>
           <div *ngFor="let skillSummary of uncategorizedSkillSummaries; index as $index"
@@ -250,6 +256,10 @@
             <div class="edit-options-container">
               <i class="fa fa-ellipsis-v e2e-test-skill-item-edit-btn"
                  (click)="toggleUncategorizedSkillOptions($index)"
+                 tabindex="0"
+                 role="button"
+                 aria-label="More options"
+                 (keydown.enter)="toggleUncategorizedSkillOptions($index)"
                  *ngIf="topicRights.canEditTopic()">
               </i>
             </div>
@@ -257,11 +267,16 @@
                  *ngIf="uncategorizedEditOptionsIndex === $index"
                  (mouseleave)="toggleUncategorizedSkillOptions(null)"
                  (click)="toggleUncategorizedSkillOptions(null)">
-              <div class="uncategorized-skill-edit-option" (click)="deleteUncategorizedSkillFromTopic(skillSummary)">
+              <div class="uncategorized-skill-edit-option" tabindex="0" role="button" (keydown.enter)="deleteUncategorizedSkillFromTopic(skillSummary)" (click)="deleteUncategorizedSkillFromTopic(skillSummary)">
                 <i class="fa fa-trash" *ngIf="topicRights.canEditTopic()"></i>
                 <span>Remove from topic</span>
               </div>
-              <div class="uncategorized-skill-edit-option edit-option-assign e2e-test-assign-subtopic" (click)="changeSubtopicAssignment(null, skillSummary)">
+              <div class="uncategorized-skill-edit-option edit-option-assign e2e-test-assign-subtopic"
+                   tabindex="0"
+                   role="button"
+                   (keydown.enter)="changeSubtopicAssignment(null, skillSummary)"
+                   (click)="changeSubtopicAssignment(null, skillSummary)"
+                   (blur)="toggleUncategorizedSkillOptions(null)">
                 <i class="fa fa-plus" *ngIf="topicRights.canEditTopic()"></i>
                 <span>Assign to Subtopic</span>
               </div>
@@ -272,20 +287,27 @@
             <div *ngFor="let subtopic of subtopics;index as subtopicIndex"
                 cdkDrag>
               <div class="subtopics-list-item">
-                <div class="subtopic-name-header subtopic-name-card-header" (click)="toggleSubtopicCard(subtopicIndex)">
+                <div class="subtopic-name-header subtopic-name-card-header" tabindex="0" (click)="toggleSubtopicCard(subtopicIndex)" (focus)="toggleSubtopicCard(subtopicIndex)">
                   <span class="clickable-item" (click)="navigateToSubtopic(subtopic.getId(), subtopic.getTitle())">
                     <span class="fas fa-grip-vertical draggable-icon-indicator"></span>
                     <span class="e2e-test-subtopic">{{ subtopic.getTitle() }}</span>
                   </span>
-                  <div class="subtopic-edit-options-container edit-options-container">
+                  <div class="subtopic-edit-options-container edit-options-container" [attr.aria-label]="'Number of questions: ' + subtopicQuestionCountDict[subtopic.getId()]">
                     <span>{{ subtopicQuestionCountDict[subtopic.getId()] }}</span>
                     <i class="fa fa-ellipsis-v e2e-test-show-subtopic-options"
                        (click)="showSubtopicEditOptions(subtopicIndex);$event.stopPropagation()"
+                       tabindex="0"
+                       aria-label="More options"
+                       role="button"
+                       (keydown.enter)="showSubtopicEditOptions(subtopicIndex);$event.stopPropagation()"
                        *ngIf="topicRights.canEditTopic()">
                     </i>
                     <div *ngIf="subtopicEditOptionsAreShown === subtopicIndex"
                          class="subtopic-edit-options"
                          (click)="deleteSubtopic(subtopic.getId())"
+                         tabindex="0"
+                         (blur)="showSubtopicEditOptions(null)"
+                         (keydown.enter)="deleteSubtopic(subtopic.getId())"
                          (mouseleave)="showSubtopicEditOptions(null)">
                       <i class="fa fa-trash e2e-test-delete-subtopic-button"></i>
                       <span>Delete</span>
@@ -301,9 +323,12 @@
                          rel="noopener">
                         <span class="clickable-item">{{ skillSummary.getDescription() }}</span>
                       </a>
-                      <div class="edit-options-container">
+                      <div class="edit-options-container" tabindex="0" [attr.aria-label]="'Number of questions: ' + skillQuestionCountDict[skillSummary.getId()]">
                         <span>{{ skillQuestionCountDict[skillSummary.getId()]  }}</span>
                         <i class="fa fa-ellipsis-v"
+                           tabindex="0"
+                           aria-label="More options"
+                           (keydown.enter)="showSkillEditOptions(subtopicIndex, idx); $event.stopPropagation()"
                            (click)="showSkillEditOptions(subtopicIndex, idx); $event.stopPropagation()"
                            *ngIf="topicRights.canEditTopic()">
                         </i>
@@ -313,17 +338,24 @@
                            (mouseleave)="showSkillEditOptions()"
                            (click)="showSkillEditOptions()">
                         <div class="skill-edit-option"
+                             tabindex="0"
+                             (keydown.enter)="removeSkillFromSubtopic(subtopic.getId(), skillSummary)"
                              (click)="removeSkillFromSubtopic(subtopic.getId(), skillSummary)">
                           <i class="fa fa-trash"></i>
                           <span>Remove from subtopic</span>
                         </div>
                         <div class="skill-edit-option"
+                             tabindex="0"
+                             (keydown.enter)="changeSubtopicAssignment(subtopic.getId(), skillSummary)"
                              (click)="changeSubtopicAssignment(subtopic.getId(), skillSummary)">
                           <i class="fa fa-plus"></i>
                           <span>Change Subtopic</span>
                         </div>
                         <div class="skill-edit-option remove-from-topic-option"
-                             (click)="removeSkillFromTopic(subtopic.getId(), skillSummary)">
+                             tabindex="0"
+                             (keydown.enter)="removeSkillFromTopic(subtopic.getId(), skillSummary)"
+                             (click)="removeSkillFromTopic(subtopic.getId(), skillSummary)"
+                             (blur)="showSkillEditOptions()">
                           <i class="fa fa-trash"></i>
                           <span>Remove from topic</span>
                         </div>
@@ -340,7 +372,7 @@
         </div>
       </div>
     </mat-card>
-    <mat-card class="item-list-card diagnostic-test-card-container oppia-mobile-collapsible-card">
+    <mat-card class="item-list-card diagnostic-test-card-container oppia-mobile-collapsible-card" tabindex="0">
       <div class="item-list-card-header oppia-mobile-collapsible-card-header"
            (click)="togglePreviewListCards()">
         <h3>Diagnostic test</h3>
@@ -424,7 +456,7 @@
     <mat-card class="item-list-card topic-item-card topic-bottom-card oppia-mobile-collapsible-card">
       <div class="item-list-card-header oppia-mobile-collapsible-card-header"
            (click)="togglePreviewListCards(STORY_LIST)">
-        <h3>Canonical Stories</h3>
+        <h3 tabindex="0">Canonical Stories</h3>
         <i class="fa fa-caret-down e2e-test-story-dropdown"
            *ngIf="!storiesListIsShown"
            aria-hidden="true">
@@ -449,7 +481,7 @@
         </div>
       </div>
     </mat-card>
-    <mat-card class="entity-count">
+    <mat-card class="entity-count" tabindex="0">
       <div class="subtopic-count">
         <span class="subtopic-count-value" *ngIf="!topicDataHasLoaded"><loading-dots></loading-dots></span>
         <span class="subtopic-count-value" *ngIf="topicDataHasLoaded">{{ topic.getSubtopics().length }}</span>
@@ -637,6 +669,7 @@
   }
 
   .topic-editor .add-skill-btn {
+    margin-left: 3%;
     width: 108px;
   }
 
