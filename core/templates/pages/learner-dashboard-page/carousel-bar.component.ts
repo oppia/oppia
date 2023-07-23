@@ -64,6 +64,7 @@ export class CarouselBarComponent implements AfterViewInit, OnInit {
  directiveSubscriptions = new Subscription();
 
  ngOnInit(): void {
+   console.error(this.carouselHeading, 'ch..');
    this.directiveSubscriptions.add(
      this.windowDimensionService.getResizeEvent().subscribe(() => {
        this.isScrollable = this.initCarousel();

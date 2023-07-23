@@ -2,7 +2,7 @@
   <div class="learner-of-learner-groups-section">
     <p class="learner-groups-section-heading">
       <span [innerHTML]="'I18N_LEARNER_DASHBOARD_LEARNER_GROUPS_SECTION' | translate"></span>
-    </p>    
+    </p>
     <div class="invited-groups-info-summary">
       <div class="learner-groups-heading">
         <span [innerHTML]="'I18N_LEARNER_DASHBOARD_LEARNER_GROUPS_SECTION_INVITATIONS' | translate"></span>
@@ -11,10 +11,8 @@
     </div>
 
     <div class="invited-to-learner-groups-section">
-      <div class="oppia-learner-group-summary-cards-container"
-            *ngIf="invitedToLearnerGroups.length > 0">
-        <div class="oppia-learner-group-summary-card"
-              *ngFor="let learnerGroupSummary of invitedToLearnerGroups">
+      <div class="oppia-learner-group-summary-cards-container" *ngIf="invitedToLearnerGroups.length > 0">
+        <div class="oppia-learner-group-summary-card" *ngFor="let learnerGroupSummary of invitedToLearnerGroups">
           <div class="oppia-learner-group-summary-card-info">
             <div class="oppia-learner-group-summary-card-title">
               {{ learnerGroupSummary.title }}
@@ -25,43 +23,40 @@
               <span [innerHTML]="'I18N_LEARNER_GROUP_MORE_INFO' | translate"></span>
             </div>
             <div class="oppia-learner-groups-buttons">
-              <div class="learner-group-accept-invite-button" (click)="acceptLearnerGroupInvitation(learnerGroupSummary)" >
-                <span [innerHTML]="'I18N_LEARNER_GROUP_ACCEPT_INVITAITON' | translate"></span>
+              <div class="learner-group-accept-invite-button" (click)="acceptLearnerGroupInvitation(learnerGroupSummary)">
+                <span [innerHTML]="'I18N_LEARNER_GROUP_ACCEPT_INVITATION' | translate"></span>
               </div>
               <div class="learner-group-decline-invite-button" (click)="declineLearnerGroupInvitation(learnerGroupSummary)">
-                <span [innerHTML]="'I18N_LEARNER_GROUP_DECLINE_INVITAITON' | translate"></span>
+                <span [innerHTML]="'I18N_LEARNER_GROUP_DECLINE_INVITATION' | translate"></span>
               </div>
             </div>
           </div>
         </div>
       </div>
-      </div>
-      <div class="oppia-learner-groups-feature-info"
-           *ngIf="invitedToLearnerGroups.length == 0">
+      <div class="oppia-learner-groups-feature-info" *ngIf="invitedToLearnerGroups.length == 0">
         <span class="oppia-learner-group-no-invitations" translate="I18N_LEARNER_GROUP_NO_INVITATIONS"></span>
       </div>
-  <div class="learner-of-learner-my-groups-section">
-    <div class="learner-groups-heading">
-      <span [innerHTML]="'I18N_LEARNER_DASHBOARD_LEARNER_GROUPS_SECTION_GROUPS' | translate"></span>
     </div>
-    <div class="oppia-learner-group-summary-cards-container"
-         *ngIf="learnerGroupsJoined.length > 0">
-      <div class="oppia-learner-group-summary-card"
-            *ngFor="let learnerGroupSummary of learnerGroupsJoined; let idx = index;">
-        <a [href]="getLearnerGroupPageUrl(learnerGroupSummary.id)" class="oppia-learner-group-summary-card-info">
-          <div class="oppia-learner-group-summary-card-title">
-            {{ learnerGroupSummary.title }}
+
+    <div class="learner-of-learner-my-groups-section">
+      <div class="learner-groups-heading">
+        <span [innerHTML]="'I18N_LEARNER_DASHBOARD_LEARNER_GROUPS_SECTION_GROUPS' | translate"></span>
+      </div>
+      <div class="oppia-learner-group-summary-cards-container" *ngIf="learnerGroupsJoined.length > 0">
+        <div class="oppia-learner-group-summary-card" *ngFor="let learnerGroupSummary of learnerGroupsJoined; let idx = index;">
+          <a [href]="getLearnerGroupPageUrl(learnerGroupSummary.id)" class="oppia-learner-group-summary-card-info">
+            <div class="oppia-learner-group-summary-card-title">
+              {{ learnerGroupSummary.title }}
+            </div>
+          </a>
+          <div class="learner-group-view-details-button" (click)="viewLearnerGroupDetails(learnerGroupSummary)">
+            <span [innerHTML]="'I18N_LEARNER_GROUP_MORE_INFO' | translate"></span>
           </div>
-        </a>
-        <div class="learner-group-view-details-button" (click)="viewLearnerGroupDetails(learnerGroupSummary)">
-          <!-- <span [innerHTML]="'I18N_LEARNER_GROUP_VIEW_DETAILS' | translate"></span> -->
-          More Info
         </div>
       </div>
+      <div class="oppia-learner-groups-feature-info" *ngIf="learnerGroupsJoined.length == 0">
+        <span class="oppia-no-learner-groups" translate="I18N_LEARNER_DASHBOARD_LEARNER_GROUPS_SECTION_NO_GROUPS"></span>
+      </div>
     </div>
-    <div class="oppia-learner-groups-feature-info" *ngIf="learnerGroupsJoined.length == 0">
-      <span class="oppia-no-learner-groups" translate="I18N_LEARNER_DASHBOARD_LEARNER_GROUPS_SECTION_NO_GROUPS"></span>
-    </div>
-  </div>
   </div>
 </div>

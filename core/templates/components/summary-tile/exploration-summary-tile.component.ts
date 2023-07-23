@@ -16,7 +16,7 @@
  * @fileoverview Component for an exploration summary tile.
  */
 
-import { Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { Component, Input, OnChanges, OnDestroy, OnInit, SimpleChanges } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 
 import { AppConstants } from 'app.constants';
@@ -39,7 +39,8 @@ import './exploration-summary-tile.component.css';
   templateUrl: './exploration-summary-tile.component.html',
   styleUrls: ['./exploration-summary-tile.component.css']
 })
-export class ExplorationSummaryTileComponent implements OnInit, OnDestroy {
+export class ExplorationSummaryTileComponent implements OnInit,
+OnChanges, OnDestroy {
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
@@ -109,6 +110,11 @@ export class ExplorationSummaryTileComponent implements OnInit, OnDestroy {
     private i18nLanguageCodeService: I18nLanguageCodeService
   ) {}
 
+  ngOnChanges(changes: SimpleChanges): void {
+    this.getStrokeDashOffSet =
+    this.getStrokeDashOffSetValue(this.explorationProgress);
+  }
+
   ngOnInit(): void {
     this.userService.getUserInfoAsync().then(userInfo => {
       this.userIsLoggedIn = userInfo.isLoggedIn();
@@ -126,9 +132,6 @@ export class ExplorationSummaryTileComponent implements OnInit, OnDestroy {
         return commitsOfContributor2 - commitsOfContributor1;
       }
     );
-
-    this.getStrokeDashOffSet =
-    this.getStrokeDashOffSetValue(this.explorationProgress);
 
     this.isRefresherExploration = false;
     if (this.parentExplorationIds) {

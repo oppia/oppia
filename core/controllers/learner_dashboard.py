@@ -17,31 +17,16 @@
 from __future__ import annotations
 
 from core import feconf
-from core import utils
-from core.constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
-from core.domain import exp_fetchers
-from core.domain import feedback_services
 from core.domain import learner_progress_services
+from core.domain import exp_fetchers
 from core.domain import story_fetchers
 from core.domain import subscription_services
-from core.domain import suggestion_registry
-from core.domain import suggestion_services
 from core.domain import summary_services
 from core.domain import user_services
 
-from typing import Dict, List, Optional, TypedDict, Union
-
-
-class MessageSummaryDict(TypedDict):
-    """Dict representation of author's messages summary."""
-
-    message_id: int
-    text: str
-    updated_status: str
-    author_username: Optional[str]
-    created_on_msecs: float
+from typing import Dict, List, Optional, TypedDict
 
 
 class SuggestionSummaryDict(TypedDict):
@@ -292,74 +277,6 @@ class LearnerDashboardExplorationsProgressHandler(
         self.render_json(self.values)
 
 
-class LearnerDashboardFeedbackUpdatesHandlerNormalizedPayloadDict(TypedDict):
-    """Dict representation of LearnerDashboardFeedbackUpdatesHandler's
-    normalized_payload dictionary.
-    """
-
-    paginated_threads_list: List[List[str]]
-
-
-class LearnerDashboardFeedbackUpdatesHandler(
-    base.BaseHandler[
-        LearnerDashboardFeedbackUpdatesHandlerNormalizedPayloadDict,
-        Dict[str, str]
-    ]
-):
-    """Provides data for the user's learner dashboard page."""
-
-    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
-    HANDLER_ARGS_SCHEMAS = {
-            'POST': {
-                'paginated_threads_list': {
-                    'schema': {
-                        'type': 'list',
-                        'items': {
-                            'type': 'list',
-                            'items': {
-                                'type': 'basestring'
-                            },
-                        },
-                    },
-                    'default_value': []
-                }
-            }
-        }
-
-    @acl_decorators.can_access_learner_dashboard
-    def post(self) -> None:
-        """Handles POST requests."""
-        assert self.user_id is not None
-        assert self.normalized_payload is not None
-        if len(self.normalized_payload['paginated_threads_list']) == 0:
-            full_thread_ids = (
-                subscription_services.get_all_threads_subscribed_to(
-                    self.user_id))
-            paginated_threads_list = [
-                full_thread_ids[index: index + 100]
-                for index in range(0, len(full_thread_ids), 100)]
-        else:
-            paginated_threads_list = self.normalized_payload[
-                'paginated_threads_list']
-        if (
-            len(paginated_threads_list) > 0 and
-            len(paginated_threads_list[0]) > 0
-        ):
-            thread_summaries, number_of_unread_threads = (
-                feedback_services.get_exp_thread_summaries(
-                    self.user_id, paginated_threads_list[0]))
-        else:
-            thread_summaries, number_of_unread_threads = [], 0
-
-        self.values.update({
-            'thread_summaries': [s.to_dict() for s in thread_summaries],
-            'number_of_unread_threads': number_of_unread_threads,
-            'paginated_threads_list': paginated_threads_list[1:]
-        })
-        self.render_json(self.values)
-
-
 class LearnerDashboardIdsHandler(
     base.BaseHandler[Dict[str, str], Dict[str, str]]
 ):
@@ -388,7 +305,6 @@ class LearnerDashboardIdsHandler(
         })
         self.render_json(self.values)
 
-
 class LearnerExplorationProgressHandlerNormalizedRequestDict(TypedDict):
     """Dict representation of LearnerExplorationProgressHandler's
     normalized_request dictionary.
@@ -399,14 +315,14 @@ class LearnerExplorationProgressHandlerNormalizedRequestDict(TypedDict):
 
 class LearnerExplorationProgressHandler(
     base.BaseHandler[
-        List[str],
+        Dict[str, str],
         LearnerExplorationProgressHandlerNormalizedRequestDict
     ]
 ):
     """Handles fetching progress of a user in all exploration"""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-    URL_PATH_ARGS_SCHEMAS: List[str] = {}
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
 
     HANDLER_ARGS_SCHEMAS = {
         'GET': {
@@ -430,11 +346,6 @@ class LearnerExplorationProgressHandler(
         assert self.normalized_request is not None
         exp_ids = self.normalized_request['exp_ids']
         user_id = self.user_id
-        if user_id is None:
-            raise Exception(
-                'No learner user_id found for the given learner username: %s' %
-                self.username
-            )
 
         exploration_progress = (
             exp_fetchers.get_user_progress_in_exploration(

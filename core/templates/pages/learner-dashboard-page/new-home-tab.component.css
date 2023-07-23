@@ -4,372 +4,393 @@
   https://rtlcss.com/learn/usage-guide/control-directives .
 */
 .new-home-tab .greeting {
-    color: #00645c;
-    font-family: 'Capriola', 'Roboto', Arial, sans-serif;
-    font-size: 32px;
+  color: #00645c;
+  font-family: 'Capriola', 'Roboto', Arial, sans-serif;
+  font-size: 32px;
+}
+
+.new-home-tab .continue-where-you-left-off {
+  background-color: #fff;
+  border-radius: 4px;
+  box-shadow: 0 0 4px #0000001a;
+  min-height: 179px;
+  padding: 32px 0 30px 40px;
+}
+
+.new-home-tab .continue-where-you-left-off-container {
+  margin-top: 24px;
+}
+
+.new-home-tab .continue-where-you-left-off-section {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24px;
+}
+
+.new-home-tab .suggested-for-you .classroom-name {
+  color: #333;
+  font-size: 19px;
+  font-weight: 500;
+  padding: 24px 0 8px 0;
+  text-transform: capitalize;
+}
+
+.new-home-tab .topic-suggested-for-you .oppia-classroom-link {
+  text-decoration: none;
+}
+
+.new-home-tab .suggested-for-you .topic-summary-tile {
+  display: inline-block;
+  padding-right: 20px;
+}
+
+.new-home-tab .topic-suggested-for-you .untracked-topics {
+  margin-bottom: 24px;
+}
+
+.new-home-tab .continue-where-you-left-off .continue-where-you-left-off-heading,
+.new-home-tab .suggested-for-you .suggested-for-you-heading,
+.new-home-tab .topic-suggested-for-you .suggested-for-you-heading {
+  color: #205d86;
+  font-family: 'Capriola', 'Roboto', Arial, sans-serif;
+  font-size: 24px;
+  margin: 0;
+}
+
+.new-home-tab .continue-where-you-left-off .empty-continue-where-you-left-off-section {
+  color: #333;
+  font-size: 18px;
+  padding-top: 32px;
+}
+
+.new-home-tab .topic-suggested-for-you .classroom-button {
+  align-items: center;
+  border: 1px solid #205d86;
+  border-radius: 4px;
+  display: flex;
+  gap: 4px;
+  height: 44px;
+  justify-content: center;
+  margin-top: 20px;
+  padding: 10px 0;
+  width: 344px;
+}
+
+.new-home-tab .topic-suggested-for-you .classroom-text {
+  color: #205d86;
+  font-size: 16px;
+  font-weight: bold;
+  letter-spacing: 0.25px;
+  text-align: center;
+  text-transform: capitalize;
+}
+
+.new-home-tab .continue-where-you-left-off .empty-continue-where-you-left-off-section-text {
+  display: inline-block;
+}
+
+#setting-a-goal-link {
+  color: #00645c;
+  font-weight: bold;
+}
+
+.new-home-tab .empty-suggested-for-you-section {
+  color: #333;
+  font-size: 18px;
+  padding: 30px 0;
+}
+
+.new-home-tab .topic-suggested-for-you.learn-something-new-section {
+  padding: 32px 23px 0 32px;
+}
+
+.new-home-tab .suggested-for-you,
+.new-home-tab .topic-suggested-for-you,
+.new-home-tab .continue-where-you-left-off {
+  background-color: #fff;
+  border-radius: 4px;
+  box-shadow: 0 0 4px #0000001a;
+  margin: 18px 0 25px;
+  min-height: 206px;
+  padding: 16px;
+}
+
+.new-home-tab .suggested-for-you .suggested-for-you-section {
+  display: inline-block;
+  padding: 8px 16px 0 0;
+}
+
+.new-home-tab .continue-where-you-left-off .topic-summary {
+  display: inline-block;
+  padding-right: 30px;
+  width: 228px;
+}
+
+.new-home-tab .community-lessons-playlist-section {
+  background-color: #fff;
+  border-radius: 4px;
+  min-height: 215px;
+  opacity: 1;
+  width: auto;
+}
+
+.new-home-tab .community-lessons-playlist-section .summary-container {
+  margin: auto;
+  width: auto;
+}
+
+.new-home-tab .community-lessons-playlist-section .oppia-summary-tile-container {
+  display: inline-block;
+}
+
+.new-home-tab .community-lessons-playlist-section .remove-icon {
+  color: white;
+  float: right;
+  font-size: 20px;
+  left: -7px;
+  margin-left: -26px;
+  margin-top: 10px;
+  position: relative;
+  width: 18px;
+  z-index: 20;
+}
+
+.new-home-tab .oppia-learner-dashboard-search-container {
+  margin: 23px 0 45px 0;
+}
+
+.new-home-tab .topic-suggested-for-you .oppia-learner-dashboard-search-bar-container {
+  display: flex;
+  justify-content: center;
+}
+
+.new-home-tab .oppia-learner-dashboard-search-section {
+  align-items: center;
+  display: flex;
+  justify-content: center;
+}
+
+@media screen and (max-width: 1200px) {
+  .new-home-tab .greeting {
+    margin-left: 12px;
   }
-  .new-home-tab .continue-where-you-left-off {
-    background-color: #fff;
-    border-radius: 4px;
-    box-shadow: 0 0 4px #0000001a;
-    min-height: 179px;
-    padding: 32px 0 30px 40px;
+  .new-home-tab .continue-where-you-left-off, .new-home-tab .suggested-for-you,
+  .new-home-tab .topic-suggested-for-you {
+    margin-left: 12px;
   }
-  .new-home-tab .continue-where-you-left-off-container {
-    margin-top: 24px;
+  .new-home-tab .continue-where-you-left-off .continue-where-you-left-off-scroll {
+    overflow: scroll;
   }
-  .new-home-tab .continue-where-you-left-off-section {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 24px;
+  .new-home-tab .continue-where-you-left-off .continue-where-you-left-off-scroll::-webkit-scrollbar,
+  .new-home-tab .suggested-for-you .topic-summary-tile-scroll::-webkit-scrollbar {
+    -webkit-appearance: none;
   }
-  .new-home-tab .suggested-for-you .classroom-name {
-    color: #333;
-    font-size: 19px;
-    font-weight: 500;
-    padding: 24px 0 8px 0;
-    text-transform: capitalize;
+  .new-home-tab .continue-where-you-left-off .continue-where-you-left-off-scroll::-webkit-scrollbar-thumb,
+  .new-home-tab .suggested-for-you .topic-summary-tile-scroll::-webkit-scrollbar-thumb {
+    background-color: #eee;
+    border: 1px solid #fff;
+    border-radius: 8px;
   }
-  .new-home-tab .topic-suggested-for-you .oppia-classroom-link {
-    text-decoration: none;
-  }
-  .new-home-tab .suggested-for-you .topic-summary-tile {
-    display: inline-block;
-    padding-right: 20px;
+  .new-home-tab .continue-where-you-left-off .continue-where-you-left-off-scroll::-webkit-scrollbar:horizontal,
+  .new-home-tab .suggested-for-you .topic-summary-tile-scroll::-webkit-scrollbar:horizontal {
+    height: 5px;
   }
   .new-home-tab .topic-suggested-for-you .untracked-topics {
     margin-bottom: 24px;
   }
-  .new-home-tab .continue-where-you-left-off .continue-where-you-left-off-heading,
-  .new-home-tab .suggested-for-you .suggested-for-you-heading,
-  .new-home-tab .topic-suggested-for-you .suggested-for-you-heading {
-    color: #205D86;
-    font-family: 'Capriola', 'Roboto', Arial, sans-serif;
-    font-size: 24px;
-    margin: 0;
+}
+
+@media screen and (min-width: 1001px) and (max-width: 1281px) {
+  .new-home-tab .oppia-story-exploration-in-progress {
+    margin-right: 30px;
   }
-  .new-home-tab .continue-where-you-left-off .empty-continue-where-you-left-off-section {
-    color: #333;
-    font-size: 18px;
-    padding-top: 32px;
+}
+
+@media (max-width: 1050px) {
+  .new-home-tab .oppia-learner-dashboard-search-container {
+    margin: 32px 0 32px 0;
   }
   .new-home-tab .topic-suggested-for-you .classroom-button {
-    border: 1px solid #205D86;
-    border-radius: 4px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 4px;
-    height: 44px;
-    margin-top: 20px;
-    padding: 10px 0px;
-    width: 344px;
+    background-color: #cadbda;
+    width: 367px;
   }
-  .new-home-tab .topic-suggested-for-you .classroom-text {
-    color: #205D86;
-    font-size: 16px;
-    font-weight: bold;
-    letter-spacing: 0.25px;
-    text-align: center;
-    text-transform: capitalize;
+}
+
+@media screen and (max-width: 767px) {
+  .new-home-tab .greeting {
+    font-size: 23px;
+    margin: 24px 0 0 20px;
+  }
+  .new-home-tab .continue-where-you-left-off, .new-home-tab .suggested-for-you,
+  .new-home-tab .topic-suggested-for-you {
+    margin-left: 12px;
+  }
+  .new-home-tab .continue-where-you-left-off .continue-where-you-left-off-heading,
+  .new-home-tab .suggested-for-you .suggested-for-you-heading {
+    font-size: 18px;
+  }
+  .new-home-tab .continue-where-you-left-off .continue-where-you-left-off-scroll {
+    overflow: scroll;
+  }
+  .new-home-tab .suggested-for-you .topic-summary-tile-section {
+    width: 656px;
   }
   .new-home-tab .continue-where-you-left-off .empty-continue-where-you-left-off-section-text {
-    display: inline-block;
+    margin-bottom: 0;
   }
-  #setting-a-goal-link {
-    color: #00645c;
-    font-weight: bold;
+  .new-home-tab .continue-where-you-left-off .empty-continue-where-you-left-off-section {
+    font-size: 15px;
   }
   .new-home-tab .empty-suggested-for-you-section {
-    color: #333;
-    font-size: 18px;
-    padding: 30px 0;
+    padding: 32px 32px 32px 0;
   }
-  
-  .new-home-tab .topic-suggested-for-you.learn-something-new-section {
-    padding: 32px 23px 0 32px;
+  .new-home-tab .suggested-for-you .topic-summary-tile-scroll {
+    overflow: scroll;
+    width: 305px;
   }
-  
-  .new-home-tab .suggested-for-you,
-  .new-home-tab .topic-suggested-for-you,
-  .new-home-tab .continue-where-you-left-off {
-    background-color: #fff;
-    border-radius: 4px;
-    box-shadow: 0 0 4px #0000001a;
-    margin: 18px 0 25px;
-    min-height: 206px;
-    padding: 16px;
-  }
-  .new-home-tab .suggested-for-you .suggested-for-you-section {
-    display: inline-block;
-    padding: 8px 16px 0 0;
-  }
-  .new-home-tab .continue-where-you-left-off .topic-summary {
-    display: inline-block;
-    padding-right: 30px;
-    width: 228px;
-  }
-  .new-home-tab .community-lessons-playlist-section {
-    background-color: #fff;
-    border-radius: 4px;
-    min-height: 215px;
-    opacity: 1;
-    width: auto;
-  }
-  .new-home-tab .community-lessons-playlist-section .summary-container {
-    margin: auto;
-    width: auto;
-  }
-  .new-home-tab .community-lessons-playlist-section .oppia-summary-tile-container {
-    display: inline-block;
-  }
-  .new-home-tab .community-lessons-playlist-section .remove-icon {
-    color: white;
-    float: right;
-    font-size: 20px;
-    left: -7px;
-    margin-left: -26px;
-    margin-top: 10px;
-    position: relative;
-    width: 18px;
-    z-index: 20;
+  .new-home-tab .untracked-topics {
+    margin-bottom: 32px;
   }
   .new-home-tab .oppia-learner-dashboard-search-container {
-    margin: 23px 0 45px 0;
+    margin: 12px 0 45px 0;
   }
-  .new-home-tab .topic-suggested-for-you .oppia-learner-dashboard-search-bar-container {
-    display: flex;
-    justify-content: center;
+}
+
+@media screen and (min-width: 768px) and (max-width: 1000px) {
+  .new-home-tab .greeting {
+    font-size: 25px;
+    margin-left: 12px;
   }
-  .new-home-tab .oppia-learner-dashboard-search-section {
-    display: flex;
-    justify-content: center;
-    align-items: center;
+  .new-home-tab .continue-where-you-left-off,
+  .new-home-tab .suggested-for-you,
+  .new-home-tab .topic-suggested-for-you {
+    margin: 18px 0 25px 12px;
+    padding: 16px;
   }
-  
-  @media screen and (max-width: 1200px) {
-    .new-home-tab .greeting {
-      margin-left: 12px;
-    }
-    .new-home-tab .continue-where-you-left-off, .new-home-tab .suggested-for-you,
-    .new-home-tab .topic-suggested-for-you {
-      margin-left: 12px;
-    }
-    .new-home-tab .continue-where-you-left-off .continue-where-you-left-off-scroll {
-      overflow: scroll;
-    }
-    .new-home-tab .continue-where-you-left-off .continue-where-you-left-off-scroll::-webkit-scrollbar,
-    .new-home-tab .suggested-for-you .topic-summary-tile-scroll::-webkit-scrollbar {
-      -webkit-appearance: none;
-    }
-    .new-home-tab .continue-where-you-left-off .continue-where-you-left-off-scroll::-webkit-scrollbar-thumb,
-    .new-home-tab .suggested-for-you .topic-summary-tile-scroll::-webkit-scrollbar-thumb {
-      background-color: #eee;
-      border: 1px solid #fff;
-      border-radius: 8px;
-    }
-    .new-home-tab .continue-where-you-left-off .continue-where-you-left-off-scroll::-webkit-scrollbar:horizontal,
-    .new-home-tab .suggested-for-you .topic-summary-tile-scroll::-webkit-scrollbar:horizontal {
-      height: 5px;
-    }
-    .new-home-tab .topic-suggested-for-you .untracked-topics {
-      margin-bottom: 24px;
-    }
+  .new-home-tab .continue-where-you-left-off .continue-where-you-left-off-heading,
+  .new-home-tab .suggested-for-you .suggested-for-you-heading {
+    font-size: 24px;
   }
-  
-  @media screen and (min-width: 1001px) and (max-width: 1281px) {
-    .new-home-tab .oppia-story-exploration-in-progress {
-      margin-right: 30px;
-    }
+  .new-home-tab .suggested-for-you .topic-summary-tile-scroll {
+    overflow: scroll;
+    width: 440px;
   }
-  
-  @media (max-width: 1050px) {
-    .new-home-tab .oppia-learner-dashboard-search-container {
-      margin: 32px 0px 32px 0px;
-    }
-    .new-home-tab .topic-suggested-for-you .classroom-button {
-      width: 367px;
-      background-color: #CADBDA;
-    }
+  .new-home-tab .continue-where-you-left-off .continue-where-you-left-off-scroll {
+    overflow: scroll;
   }
-  @media screen and (max-width: 767px) {
-    .new-home-tab .greeting {
-      font-size: 23px;
-      margin: 24px 0 0 20px;
-    }
-    .new-home-tab .continue-where-you-left-off, .new-home-tab .suggested-for-you,
-    .new-home-tab .topic-suggested-for-you {
-      margin-left: 12px;
-    }
-    .new-home-tab .continue-where-you-left-off .continue-where-you-left-off-heading,
-    .new-home-tab .suggested-for-you .suggested-for-you-heading {
-      font-size: 18px;
-    }
-    .new-home-tab .continue-where-you-left-off .continue-where-you-left-off-scroll {
-      overflow: scroll;
-    }
-    .new-home-tab .suggested-for-you .topic-summary-tile-section {
-      width: 656px;
-    }
-    .new-home-tab .continue-where-you-left-off .empty-continue-where-you-left-off-section-text {
-      margin-bottom: 0;
-    }
-    .new-home-tab .continue-where-you-left-off .empty-continue-where-you-left-off-section {
-      font-size: 15px;
-    }
-    .new-home-tab .empty-suggested-for-you-section {
-      padding: 32px 32px 32px 0;
-    }
-    .new-home-tab .suggested-for-you .topic-summary-tile-scroll {
-      overflow: scroll;
-      width: 305px;
-    }
-    .new-home-tab .oppia-learner-dashboard-search-container {
-      margin-bottom: 45px;
-    }
-    .new-home-tab .untracked-topics {
-      margin-bottom: 32px;
-    }
-    .new-home-tab .oppia-learner-dashboard-search-container {
-      margin: 12px 0px 32px 0px;
-    }
+  .new-home-tab .empty-suggested-for-you-section {
+    padding: 17px 32px 17px 0;
   }
-  @media screen and (min-width: 768px) and (max-width: 1000px) {
-    .new-home-tab .greeting {
-      font-size: 25px;
-      margin-left: 12px;
-    }
-    .new-home-tab .continue-where-you-left-off,
-    .new-home-tab .suggested-for-you,
-    .new-home-tab .topic-suggested-for-you {
-      margin: 18px 0 25px 12px;
-      padding: 16px;
-    }
-    .new-home-tab .continue-where-you-left-off .continue-where-you-left-off-heading,
-    .new-home-tab .suggested-for-you .suggested-for-you-heading {
-      font-size: 24px;
-    }
-    .new-home-tab .suggested-for-you .topic-summary-tile-scroll {
-      overflow: scroll;
-      width: 440px;
-    }
-    .new-home-tab .continue-where-you-left-off .continue-where-you-left-off-scroll {
-      overflow: scroll;
-    }
-    .new-home-tab .empty-suggested-for-you-section {
-      padding: 17px 32px 17px 0;
-    }
+}
+
+@media (max-width: 639px) {
+  .new-home-tab .continue-where-you-left-off, .new-home-tab .suggested-for-you,
+  .new-home-tab .topic-suggested-for-you {
+    margin-left: 12px;
+    padding: 8px;
   }
-  
-  @media(max-width: 639px) {
-    .new-home-tab .continue-where-you-left-off, .new-home-tab .suggested-for-you,
-    .new-home-tab .topic-suggested-for-you, .new-home-tab .continue-where-you-left-off {
-      margin-left: 12px;
-      padding: 8px;
-    }
-  
-    .new-home-tab .suggested-for-you .topic-summary-tile-scroll {
-      width: 265px;
-    }
-  
-    .new-home-tab .topic-suggested-for-you .classroom-button {
-      width: 291px;
-    }
-  
-    .new-home-tab .greeting {
-      margin-left: 12px;
-    }
+
+  .new-home-tab .suggested-for-you .topic-summary-tile-scroll {
+    width: 265px;
   }
-  
-  .new-home-tab .oppia-classroom-search-container {
-    background-color: #d7d7d7;
-    bottom: 0;
-    margin-left: -12.5vw;
-    margin-right: -12.5vw;
-    padding-bottom: 10px;
-    position: absolute;
-    width: 100vw;
+
+  .new-home-tab .topic-suggested-for-you .classroom-button {
+    width: 291px;
   }
-  
+
+  .new-home-tab .greeting {
+    margin-left: 12px;
+  }
+}
+
+.new-home-tab .oppia-classroom-search-container {
+  background-color: #d7d7d7;
+  bottom: 0;
+  margin-left: -12.5vw;
+  margin-right: -12.5vw;
+  padding-bottom: 10px;
+  position: absolute;
+  width: 100vw;
+}
+
+.new-home-tab .oppia-classroom-search-container .initial-help-text {
+  font-weight: 500;
+  padding-top: 2.5vh;
+}
+
+.new-home-tab .oppia-classroom-search-section .classroom-page-search-bar {
+  margin-left: -18px;
+}
+
+.new-home-tab .oppia-classroom-viewer-container,
+.oppia-classroom-search-section {
+  display: grid;
+  justify-content: center;
+  margin-left: auto;
+  margin-right: auto;
+  width: 75vw;
+}
+
+@media (max-width: 880px) {
+  .new-home-tab .oppia-classroom-viewer-container .classroom-header {
+    margin-top: -3vh;
+  }
   .new-home-tab .oppia-classroom-search-container .initial-help-text {
-    font-weight: 500;
-    padding-top: 2.5vh;
+    padding-top: 0.5vh;
   }
-  
-  .new-home-tab .oppia-classroom-search-section .classroom-page-search-bar {
-    margin-left: -18px;
+  .new-home-tab .oppia-classroom-search-container {
+    padding-bottom: 12vw;
   }
-  
-  .new-home-tab .oppia-classroom-viewer-container,
-  .oppia-classroom-search-section {
-    display: grid;
-    justify-content: center;
-    margin-left: auto;
-    margin-right: auto;
-    width: 75vw;
+
+  .new-home-tab .oppia-classroom-search-section {
+    text-align: center;
+    width: 95vw;
   }
-  @media (max-width: 880px) {
-    .new-home-tab .oppia-classroom-viewer-container .classroom-header {
-      margin-top: -3vh;
-    }
-    .new-home-tab .oppia-classroom-search-container .initial-help-text {
-      padding-top: 0.5vh;
-    }
-    .new-home-tab  .oppia-classroom-search-container {
-      padding-bottom: 12vw;
-    }
-  
-    .new-home-tab .oppia-classroom-search-section {
-      text-align: center;
-      width: 95vw;
-    }
-    .new-home-tab .oppia-learner-dashboard-search-container {
-      margin: 12px 0px 32px 0px;
-    }
-    .new-home-tab .continue-where-you-left-off-container {
-      margin-top: 24px;
-    }
+  .new-home-tab .oppia-learner-dashboard-search-container {
+    margin: 12px 0 32px 0;
   }
-  
-  @media (max-width: 750px) {
-    .new-home-tab .continue-where-you-left-off-container {
-      margin-top: 12px;
-    }
-    .new-home-tab .topic-suggested-for-you .classroom-text {
-      font-size: 13px;
-    }
-    .new-home-tab .topic-suggested-for-you .untracked-topics {
-      margin-bottom: 20px;
-    }
+  .new-home-tab .continue-where-you-left-off-container {
+    margin-top: 24px;
   }
-  
-  @media(max-width: 600px) {
-    .new-home-tab .oppia-classroom-viewer-container {
-      width: 85vw;
-    }
-  
-    .new-home-tab .oppia-classroom-search-container {
-      margin-left: -7.5vw;
-    }
-    .new-home-tab .oppia-classroom-search-section {
-      width: 95vw;
-    }
-    .new-home-tab .oppia-learner-dashboard-search-container {
-      margin: 12px 0px 40px 0px;
-    }
-    .new-home-tab .continue-where-you-left-off-container {
-      margin-top: 24px;
-    }
+}
+
+@media (max-width: 750px) {
+  .new-home-tab .continue-where-you-left-off-container {
+    margin-top: 12px;
   }
-  
-  
-  @media(max-width: 1150px) {
-    .new-home-tab .oppia-topic-summary-tiles {
-      margin-bottom: 20vw;
-    }
-  
-    .new-home-tab .oppia-classroom-viewer-container .oppia-topic-summary-tiles {
-      grid-template-columns: 180px 180px 180px;
-    }
+  .new-home-tab .topic-suggested-for-you .classroom-text {
+    font-size: 13px;
   }
-  
+  .new-home-tab .topic-suggested-for-you .untracked-topics {
+    margin-bottom: 20px;
+  }
+}
+
+@media (max-width: 600px) {
+  .new-home-tab .oppia-classroom-viewer-container {
+    width: 85vw;
+  }
+
+  .new-home-tab .oppia-classroom-search-container {
+    margin-left: -7.5vw;
+  }
+  .new-home-tab .oppia-classroom-search-section {
+    width: 95vw;
+  }
+  .new-home-tab .oppia-learner-dashboard-search-container {
+    margin: 12px 0 40px 0;
+  }
+  .new-home-tab .continue-where-you-left-off-container {
+    margin-top: 24px;
+  }
+}
+
+@media (max-width: 1150px) {
+  .new-home-tab .oppia-topic-summary-tiles {
+    margin-bottom: 20vw;
+  }
+
+  .new-home-tab .oppia-classroom-viewer-container .oppia-topic-summary-tiles {
+    grid-template-columns: 180px 180px 180px;
+  }
+}

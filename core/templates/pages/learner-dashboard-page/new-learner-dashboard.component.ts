@@ -231,7 +231,7 @@ export class NewLearnerDashboardComponent implements OnInit {
               for (var storyId of storyIds) {
                 if (this.storyIdToLearnerGroupsTitleMap.has(storyId)) {
                   this.storyIdToLearnerGroupsTitleMap.
-                    get(storyId).push(title);
+                    get(storyId)?.push(title);
                 } else {
                   this.storyIdToLearnerGroupsTitleMap.set(storyId, [title]);
                 }
@@ -321,6 +321,10 @@ export class NewLearnerDashboardComponent implements OnInit {
     this.directiveSubscriptions.unsubscribe();
   }
 
+  setActiveSection(newActiveSectionName: string): void {
+    this.activeSection = newActiveSectionName;
+  }
+
   getauthorPicturePngDataUrl(username: string): string {
     let [pngImageUrl, _] = this.userService.getProfileImageDataUrl(
       username);
@@ -384,4 +388,3 @@ export class NewLearnerDashboardComponent implements OnInit {
     return decodeURIComponent(base64ImageData);
   }
 }
-

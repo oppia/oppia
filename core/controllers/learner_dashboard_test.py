@@ -16,12 +16,12 @@
 
 from __future__ import annotations
 
-
 import json
 
 from core import feconf
 from core.constants import constants
-from core.domain import config_domain, exp_fetchers
+from core.domain import config_domain
+from core.domain import exp_fetchers
 from core.domain import learner_progress_services
 from core.domain import story_domain
 from core.domain import story_services
@@ -845,4 +845,3 @@ class LearnerExplorationProgressHandlerTests(test_utils.GenericTestBase):
         self.assertEqual(response[0]['total_checkpoints_count'], 1)
 
         self.logout()
-

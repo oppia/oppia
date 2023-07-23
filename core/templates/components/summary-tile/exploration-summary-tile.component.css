@@ -95,24 +95,24 @@ oppia-exploration-summary-tile .exploration-progress {
 }
 oppia-exploration-summary-tile .oppia-exploration-objective-title {
   -webkit-box-orient: vertical;
+  color: #333;
   display: -webkit-box;
   font-family: "Roboto", Arial, sans-serif;
   font-size: 0.85em;
   height: 30px;
+  letter-spacing: 0;
   -webkit-line-clamp: 2;
   line-height: 1.26;
+  margin: 0 8px 0 8px;
   max-height: 4.71em;
+  opacity: 1;
   overflow: hidden;
+  text-align: left;
   text-overflow: ellipsis;
   word-break: break-word;
-  color: #333;
-  letter-spacing: 0;
-  margin: 0px 8px 0 8px;
-  opacity: 1;
-  text-align: left;
 }
 oppia-exploration-summary-tile .oppia-learner-dashboard-exploration-title {
-  color: #00645C;
+  color: #00645c;
   font-family: Capriola,Roboto,Arial,sans-serif;
   font-size: 15px;
   font-weight: 400;
@@ -122,7 +122,7 @@ oppia-exploration-summary-tile .oppia-learner-dashboard-exploration-title {
 }
 oppia-exploration-summary-tile .continue-button {
   background: white 0% 0% no-repeat padding-box;
-  border: 1px solid #00645C;
+  border: 1px solid #00645c;
   border-radius: 4px;
   height: 36px;
   left: 86px;
@@ -131,7 +131,7 @@ oppia-exploration-summary-tile .continue-button {
   width: 122px;
 }
 oppia-exploration-summary-tile .continue-button-text {
-  color: #00645C;
+  color: #00645c;
   font-size: 14px;
   font-weight: 500;
   left: 1px;
@@ -166,19 +166,19 @@ oppia-exploration-summary-tile .oppia-exploration-link {
   text-decoration: none;
 }
 oppia-exploration-summary-tile .oppia-summary-section {
+  margin-top: 8px;
   position: absolute;
   width: 100%;
-  margin-top: 8px;
 }
 oppia-exploration-summary-tile .oppia-library-title {
   color: #333;
   display: block;
-  font-family: 'Roboto';
+  font-family: 'Roboto',sans-serif;
   font-size: 12px;
   font-weight: 600;
   height: 16px;
   letter-spacing: 0.05px;
-  margin: 4px 8px 0px 8px;
+  margin: 4px 8px 0 8px;
   padding-bottom: 12px;
   text-align: left;
   width: 188px;
@@ -213,8 +213,8 @@ oppia-exploration-summary-tile .oppia-exploration-learner-dashboard-card {
   z-index: 5;
 }
 oppia-exploration-summary-tile .oppia-exploration-card-footer {
-  position: relative;
   display: flex;
+  position: relative;
 }
 oppia-exploration-summary-tile .oppia-title-section {
   border-top-left-radius: 4px;
@@ -232,6 +232,6 @@ oppia-exploration-summary-tile .oppia-exploration-learner-dashboard-card .contin
   background-color: #35ada3;
 }
 oppia-exploration-summary-tile .oppia-exploration-summary-container {
-  position: relative;
   bottom: 150px;
+  position: relative;
 }

@@ -5,357 +5,367 @@
 */
 
 .new-learner-dashboard .oppia-learner-dashboard-container {
-    margin: 0 auto 30px auto;
-    text-align: left;
-    max-width: 1480px;
-  }
+  margin: 0 auto 30px auto;
+  max-width: 1480px;
+  text-align: left;
+}
 
 .new-learner-dashboard .oppia-learner-dashboard-content-container {
-    display: flex;
-    flex-wrap: nowrap;
-    gap: 16px;
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 16px;
 }
-  .new-learner-dashboard .oppia-learner-dashboard-side-content-container {
-    flex-wrap: nowrap;
-    margin-right: -15px;
-    margin-left: -75px;
-  }
 
-  .new-learner-dashboard .oppia-learner-dashboard-button-menu {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    padding: 10px 8px 0px 8px;
-    background-color: #A5D3EC;
-  }
-  .new-learner-dashboard  .home-button,
-  .new-learner-dashboard  .goals-button,
-  .new-learner-dashboard  .progress-button {
-    color: #fff;
-  }
-  .new-learner-dashboard .oppia-learner-dashboard-title {
-    color: #01645c;
-    font-family: 'Capriola', 'Roboto', Arial, sans-serif;
-    font-size: 3em;
-    margin-bottom: 33px;
-    margin-top: 0;
-    padding-top: 65.5px;
-    text-align: center;
-  }
-  
-  .new-learner-dashboard .oppia-learner-dashboard-section-not-active-button {
-    filter: invert(1%) sepia(3%) saturate(11%) hue-rotate(341deg) brightness(101%) contrast(90%);
-  }
-  
-  .new-learner-dashboard .oppia-learner-dashboard-section-active-button-window-narrow {
-    filter: invert(26%) sepia(109%) saturate(4263%) hue-rotate(41deg) brightness(65%) contrast(277%);
-  }
-  
-  .new-learner-dashboard .oppia-learner-dashboard-progress-button-menu {
-    background: #e8e7e3;
-    border-bottom: 2px solid #d4d4d4;
-    border-radius: 0;
-    box-shadow: none;
-    padding: 0.1px;
-  }
-  
-  .new-learner-dashboard .oppia-learner-dashboard-buttons {
-    background: #fff 0% 0% no-repeat padding-box;
-    bottom: 0;
-    box-shadow: 0 -3px 5px #3333331a;
-    height: 2.5rem;
-    margin-bottom: 60px;
-    position: relative;
-    width: 100%;
-    z-index: 20;
-  }
-  
-  .new-learner-dashboard .oppia-learner-dashboard-progress-button-menu-options {
-    color: #00645c;
-    cursor: pointer;
-    display: inline-block;
-    font-size: 19px;
-    font-weight: 500;
-    margin: 0 16px;
-    padding: 23px 5px;
-    text-align: center;
-  }
-  
-  
-  .new-learner-dashboard  .oppia-buttons {
-    cursor: pointer;
-    display: grid;
-    justify-items: center;
-  }
-  
-  .new-learner-dashboard .oppia-active-tab {
-    border-bottom: 2px solid #00645C;
-  }
-  .new-learner-dashboard  .oppia-svg-image {
-    height: 24px;
-    margin: 0;
-    width: 24px;
-  }
+.new-learner-dashboard .oppia-learner-dashboard-side-content-container {
+  flex-wrap: nowrap;
+  margin-left: -75px;
+  margin-right: -15px;
+}
 
-  .new-learner-dashboard .oppia-learner-dashboard-menu {
-    border: 2px solid white;
-    border-radius: 4px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    font-family: "Roboto", Arial, sans-serif;
+.new-learner-dashboard .oppia-learner-dashboard-button-menu {
+  background-color: #a5d3ec;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  padding: 10px 8px 0 8px;
+}
+
+.new-learner-dashboard .home-button,
+.new-learner-dashboard .goals-button,
+.new-learner-dashboard .progress-button {
+  color: #fff;
+}
+
+.new-learner-dashboard .oppia-learner-dashboard-title {
+  color: #01645c;
+  font-family: 'Capriola', 'Roboto', Arial, sans-serif;
+  font-size: 3em;
+  margin-bottom: 33px;
+  margin-top: 0;
+  padding-top: 65.5px;
+  text-align: center;
+}
+
+.new-learner-dashboard .oppia-learner-dashboard-section-not-active-button {
+  filter: invert(1%) sepia(3%) saturate(11%) hue-rotate(341deg) brightness(101%) contrast(90%);
+}
+
+.new-learner-dashboard .oppia-learner-dashboard-section-active-button-window-narrow {
+  filter: invert(26%) sepia(109%) saturate(4263%) hue-rotate(41deg) brightness(65%) contrast(277%);
+}
+
+.new-learner-dashboard .oppia-learner-dashboard-progress-button-menu {
+  background: #e8e7e3;
+  border-bottom: 2px solid #d4d4d4;
+  border-radius: 0;
+  box-shadow: none;
+  padding: 0.1px;
+}
+
+.new-learner-dashboard .oppia-learner-dashboard-buttons {
+  background: #fff 0% 0% no-repeat padding-box;
+  bottom: 0;
+  box-shadow: 0 -3px 5px #3333331a;
+  height: 2.5rem;
+  margin-bottom: 60px;
+  position: relative;
+  width: 100%;
+  z-index: 20;
+}
+
+.new-learner-dashboard .oppia-learner-dashboard-progress-button-menu-options {
+  color: #00645c;
+  cursor: pointer;
+  display: inline-block;
+  font-size: 19px;
+  font-weight: 500;
+  margin: 0 16px;
+  padding: 23px 5px;
+  text-align: center;
+}
+
+.new-learner-dashboard .oppia-buttons {
+  cursor: pointer;
+  display: grid;
+  justify-items: center;
+}
+
+.new-learner-dashboard .oppia-active-tab {
+  border-bottom: 2px solid #00645c;
+}
+
+.new-learner-dashboard .oppia-svg-image {
+  height: 24px;
+  margin: 0;
+  width: 24px;
+}
+
+.new-learner-dashboard .oppia-learner-dashboard-menu {
+  align-items: center;
+  border: 2px solid white;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  font-family: "Roboto", Arial, sans-serif;
+  font-size: 16px;
+  gap: 12px;
+  line-height: 0.9;
+  margin: 10px 0;
+  padding: 8px 12px;
+}
+
+.new-learner-dashboard .oppia-learner-dashboard-menu:focus {
+  background-color: #fff;
+}
+
+.new-learner-dashboard .oppia-learner-dashboard-menu-active {
+  align-items: center;
+  background-color: #fff;
+  border-radius: 4px;
+  box-shadow: 0 4px 4px 0 rgba(0, 0, 0, 0.25);
+  color: #205d86;
+  display: flex;
+  gap: 12px;
+  padding: 8px 12px;
+}
+
+.new-learner-dashboard .oppia-learner-dashboard-active-button-icon {
+  filter: invert(39%) sepia(109%) saturate(4263%) hue-rotate(200deg) brightness(53%) contrast(127%);
+}
+
+.new-learner-dashboard .oppia-learner-dashborad-tab-menu-hover:hover {
+  background-color: #004d45;
+  border-radius: 4px;
+}
+
+.new-learner-dashboard .oppia-learner-dashboard-menu-active:hover {
+  background-color: #fff;
+}
+
+.new-learner-dashboard .oppia-learner-dashboard-fixed-side-content {
+  margin-top: -47px;
+  min-width: 241px;
+  padding-left: 11px;
+  position: fixed;
+  width: 16%;
+}
+
+.new-learner-dashboard .oppia-learner-dashboard-side-content {
+  margin-top: -47px;
+  min-width: 241px;
+  padding-left: 11px;
+  width: 16%;
+}
+
+.new-learner-dashboard .oppia-learner-dashboard-main-content {
+  padding-right: 11px;
+  width: 83%;
+}
+
+.new-learner-dashboard .oppia-learner-dashboard-main-content .remove-icon {
+  color: white;
+  float: right;
+  font-size: 20px;
+  margin-left: -26px;
+  margin-top: 10px;
+  position: relative;
+  width: 18px;
+  z-index: 20;
+}
+
+.new-learner-dashboard .oppia-learner-dashboard-main-menu {
+  background-color: #00645c;
+  color: white;
+  height: 89vh;
+  margin: 64px 0 0 0;
+  padding: 11px;
+}
+
+.new-learner-dashboard .oppia-learner-dashboard-menu-profile-picture {
+  height: 65px;
+  margin: 3rem 0 3rem 1rem;
+  width: 65px;
+}
+
+.new-learner-dashboard .oppia-learner-dashboard-menu-footer-hover:hover {
+  color: white;
+  text-decoration: none;
+}
+
+.new-learner-dashboard .oppia-learner-dashboard-menu-footer-link {
+  color: white;
+  display: block;
+  font-size: 18px;
+  margin: 2rem 0;
+  padding: 0;
+}
+
+.new-learner-dashboard .oppia-learner-dashboard-menu-footer {
+  margin: 21rem 0 0 2rem;
+}
+
+.new-learner-dashboard .oppia-learner-dashboard-mobile-mode {
+  margin: auto;
+  width: 100%;
+}
+
+.new-learner-dashboard .oppia-learner-dashboard-main-content-title {
+  color: #076962;
+  display: inline-block;
+  font-family: 'Capriola', 'Roboto', Arial, sans-serif;
+  font-size: 24px;
+  padding-bottom: 8px;
+}
+
+.new-learner-dashboard .oppia-learner-dashboard-sort {
+  float: right;
+  padding-right: 7.5px;
+  padding-top: 8px;
+}
+
+.new-learner-dashboard .oppia-learner-dashboard-main-content-container .oppia-learner-dashboard-no-activity-card {
+  background: rgb(255, 255, 255);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+  font-family: "Capriola", "Roboto", Arial, sans-serif;
+  margin: 0 17px 0 4px;
+  padding: 30px 55px 30px 30px;
+}
+
+.new-learner-dashboard .oppia-learner-dashboard-sort-mobile {
+  float: none;
+  padding: 0 7.5px;
+}
+
+.new-learner-dashboard .oppia-row {
+  display: flex;
+}
+
+.new-learner-dashboard .oppia-sort-options {
+  width: auto;
+}
+
+.new-learner-dashboard .oppia-learner-dashboard-intro-button-link {
+  margin-top: 13px;
+  width: 230px;
+}
+
+.new-learner-dashboard .oppia-btn-secondary {
+  padding: 0 3px;
+}
+
+.new-learner-dashboard .oppia-exploration-title {
+  font-size: 105%;
+  margin-left: 7px;
+}
+
+.new-learner-dashboard .oppia-message-summaries {
+  padding: 13px 8px 7px 8px;
+}
+
+.new-learner-dashboard .oppia-profile-picture {
+  margin-top: 4px;
+  min-width: 32px;
+}
+
+.new-learner-dashboard .oppia-updated-status {
+  float: right;
+  margin-right: 15px;
+}
+
+.new-learner-dashboard .oppia-feedback-message-spacing {
+  width: 8%;
+}
+
+.new-learner-dashboard .learner-groups-icon {
+  font-size: 44px;
+}
+
+@media (max-width: 768px) {
+  .new-learner-dashboard .oppia-learner-dashboard-container {
+    margin-bottom: 0;
+  }
+}
+
+@media screen and (min-width: 768px) and (max-width: 1000px) {
+  .oppia-learner-dashboard-buttons {
+    height: 0.1rem;
+  }
+  .new-learner-dashboard .oppia-buttons {
+    margin-left: 0;
+  }
+  .oppia-learner-dashboard-progress-button-menu-options {
+    margin: 0 70px;
+  }
+}
+
+@media (max-width: 450px) {
+  .oppia-learner-dashboard-progress-button-menu-options {
     font-size: 16px;
-    gap: 12px;
-    line-height: 0.9;
-    margin: 10px 0;
-    padding: 8px 12px;
+  }
+}
+
+@media screen and (min-width: 1001px) and (max-width: 1200px) {
+  .new-learner-dashboard .oppia-buttons {
+    margin-left: 0;
+  }
+  .oppia-learner-dashboard-progress-button-menu-options {
+    margin: 0 110px;
+  }
+}
+
+@media (max-width: 810px) {
+  .oppia-learner-dashboard-main-content-container {
+    margin-bottom: 10vh;
+  }
+}
+
+@media (max-width: 500px) {
+  .oppia-learner-dashboard-main-content-container {
+    padding: 7px;
   }
 
-  .new-learner-dashboard .oppia-learner-dashboard-menu:focus {
-    background-color: #fff;
+  .oppia-learner-dashboard-main-content-container .oppia-learner-dashboard-no-activity-card {
+    margin: 0 2px 0 4px;
   }
 
-  .new-learner-dashboard .oppia-learner-dashboard-menu-active {
-    background-color: #fff;
-    color: #205D86;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 8px 12px;
-    border-radius: 4px;
-    box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
-  }
-  .new-learner-dashboard .oppia-learner-dashboard-active-button-icon {
-    filter: invert(39%) sepia(109%) saturate(4263%) hue-rotate(200deg) brightness(53%) contrast(127%);
-  }
-  .new-learner-dashboard .oppia-learner-dashborad-tab-menu-hover:hover {
-    border-radius: 4px;
-    background-color: #004D45;
+  .new-learner-dashboard .oppia-svg-image {
+    height: 35px;
+    width: 44px;
   }
 
-  .new-learner-dashboard .oppia-learner-dashboard-menu-active:hover {
-    background-color: #fff;
-  }
-  
-  .new-learner-dashboard .oppia-learner-dashboard-fixed-side-content {
-    margin-top: -47px;
-    min-width: 241px;
-    padding-left: 11px;
-    position: fixed;
-    width: 16%;
+  .new-learner-dashboard .home-button,
+  .new-learner-dashboard .goals-button,
+  .new-learner-dashboard .progress-button,
+  .new-learner-dashboard .learner-groups-button {
+    font-size: 14px;
   }
 
-  .new-learner-dashboard .oppia-learner-dashboard-side-content {
-    margin-top: -47px;
-    min-width: 241px;
-    padding-left: 11px;
-    width: 16%;
+  .new-learner-dashboard .learner-groups-icon {
+    font-size: 36px;
   }
+}
 
-  .new-learner-dashboard .oppia-learner-dashboard-main-content {
-    padding-right: 11px;
-    width: 83%;
-  }
-  
-  .new-learner-dashboard .oppia-learner-dashboard-main-content .remove-icon {
-    color: white;
-    float: right;
-    font-size: 20px;
-    margin-left: -26px;
-    margin-top: 10px;
-    position: relative;
-    width: 18px;
-    z-index: 20;
-  }
-  
-  .new-learner-dashboard .oppia-learner-dashboard-main-menu {
-    background-color: #00645c;
-    color: white;
-    height: 89vh;
-    margin: 64px 0 0 0;
-    padding: 11px;
-  }
-
-  .new-learner-dashboard .oppia-learner-dashboard-menu-profile-picture {
-    height: 65px;
-    width: 65px;
-    margin: 3rem 0 3rem 1rem;
-  }
-  
-  .new-learner-dashboard .oppia-learner-dashboard-menu-footer-hover:hover {
-    text-decoration: none;
-    color: white;
-  }
-  
-  .new-learner-dashboard .oppia-learner-dashboard-menu-footer-link {
-    color: white;
-    display: block;
-    font-size: 18px;
-    margin: 2rem 0;
-    padding: 0;
-  }
-  
-  .new-learner-dashboard .oppia-learner-dashboard-menu-footer {
-    margin: 21rem 0 0 2rem;
-  }
-
-  .new-learner-dashboard .oppia-learner-dashboard-mobile-mode {
-    margin: auto;
+@media screen and (max-width: 470px) {
+  .oppia-learner-dashboard-main-content,
+  .oppia-learner-dashboard-side-content {
     width: 100%;
   }
-  
-  .new-learner-dashboard .oppia-learner-dashboard-main-content-title {
-    color: #076962;
-    display: inline-block;
-    font-family: 'Capriola', 'Roboto', Arial, sans-serif;
-    font-size: 24px;
-    padding-bottom: 8px;
-  }
-  
-  .new-learner-dashboard .oppia-learner-dashboard-sort {
-    float: right;
-    padding-right: 7.5px;
-    padding-top: 8px;
-  }
-  
-  .new-learner-dashboard .oppia-learner-dashboard-main-content-container .oppia-learner-dashboard-no-activity-card {
-    background: rgb(255,255,255);
-    box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
-    font-family: "Capriola", "Roboto", Arial, sans-serif;
-    margin: 0 17px 0 4px;
-    padding: 30px 55px 30px 30px;
-  }
-  
-  .new-learner-dashboard .oppia-learner-dashboard-sort-mobile {
-    float: none;
-    padding: 0 7.5px;
-  }
+}
 
-  .new-learner-dashboard .oppia-row {
-    display: flex;
-  }
-  .new-learner-dashboard .oppia-sort-options {
-    width: auto;
-  }
-  .new-learner-dashboard .oppia-learner-dashboard-intro-button-link {
-    margin-top: 13px;
-    width: 230px;
-  }
-  .new-learner-dashboard .oppia-btn-secondary {
-    padding: 0 3px;
-  }
-  .new-learner-dashboard .oppia-exploration-title {
-    font-size: 105%;
-    margin-left: 7px;
-  }
-  .new-learner-dashboard .oppia-message-summaries {
-    padding: 13px 8px 7px 8px;
-  }
-  .new-learner-dashboard .oppia-profile-picture {
-    margin-top: 4px;
-    min-width: 32px;
-  }
-  .new-learner-dashboard  .oppia-updated-status {
-    float: right;
-    margin-right: 15px;
-  }
-  .new-learner-dashboard  .oppia-feedback-message-spacing {
-    width: 8%;
-  }
-  .new-learner-dashboard  .learner-groups-icon {
-    font-size: 44px;
-  }
-  
-  @media (max-width: 768px) {
-    .new-learner-dashboard .oppia-learner-dashboard-container {
-      margin-bottom: 0;
-    }
-  }
-  
-  @media screen and (min-width: 768px) and (max-width: 1000px) {
-    .oppia-learner-dashboard-buttons {
-      height: 0.1rem;
-    }
-    .new-learner-dashboard .oppia-buttons {
-      margin-left: 0;
-    }
-    .oppia-learner-dashboard-progress-button-menu-options {
-      margin: 0 70px;
-    }
-  }
-  
-  @media(max-width:450px) {
-    .oppia-learner-dashboard-progress-button-menu-options {
-      font-size: 16px;
-    }
-  }
-  
-  @media screen and (min-width: 1001px) and (max-width: 1200px) {
-    .new-learner-dashboard .oppia-buttons {
-      margin-left: 0;
-    }
-    .oppia-learner-dashboard-progress-button-menu-options {
-      margin: 0 110px;
-    }
-  }
+.oppia-dashboard-tooltip:hover + .oppia-dashboard-tooltip-text {
+  visibility: visible;
+}
 
-  @media (max-width: 810px) {
-    .oppia-learner-dashboard-main-content-container {
-      margin-bottom: 10vh;
-    }
-  }
-  
-  @media (max-width: 500px) {
-    .oppia-learner-dashboard-main-content-container {
-      padding: 7px;
-    }
-  
-    .oppia-learner-dashboard-main-content-container .oppia-learner-dashboard-no-activity-card {
-      margin: 0 2px 0 4px;
-    }
-  
-    .new-learner-dashboard  .oppia-svg-image {
-      height: 35px;
-      width: 44px;
-    }
-  
-    .new-learner-dashboard  .home-button,
-    .new-learner-dashboard  .goals-button,
-    .new-learner-dashboard  .progress-button,
-    .new-learner-dashboard  .learner-groups-button {
-      font-size: 14px;
-    }
-  
-    .new-learner-dashboard  .learner-groups-icon {
-      font-size: 36px;
-    }
-  }
-  
-  @media screen and (max-width: 470px) {
-    .oppia-learner-dashboard-main-content,
-    .oppia-learner-dashboard-side-content {
-      width: 100%;
-    }
-  }
-  
-  .oppia-dashboard-tooltip:hover + .oppia-dashboard-tooltip-text {
-    visibility: visible;
-  }
-  
-  .oppia-learner-dashboard-page-portfolio {
-    font-weight: bold;
-    margin-right: 14px;
-    margin-top: 8px;
-    text-align: right;
-  }
+.oppia-learner-dashboard-page-portfolio {
+  font-weight: bold;
+  margin-right: 14px;
+  margin-top: 8px;
+  text-align: right;
+}
 
-  @media (max-width: 1024px) {
-    .new-learner-dashboard  .home-button,
-    .new-learner-dashboard  .goals-button,
-    .new-learner-dashboard  .progress-button {
-      color: #00645c;
-    }
-  } 
-
-
-
-  
+@media (max-width: 1024px) {
+  .new-learner-dashboard .home-button,
+  .new-learner-dashboard .goals-button,
+  .new-learner-dashboard .progress-button {
+    color: #00645c;
+  }
+}

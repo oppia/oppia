@@ -1,55 +1,55 @@
 oppia-collection-summary-tile .oppia-activity-summary-tile {
-    position: relative;
-    z-index: 5;
-  }
+  position: relative;
+  z-index: 5;
+}
 
-oppia-collection-summary-tile  .oppia-activity-summary-tile .thumbnail {
-    text-decoration: none;
-  }
+oppia-collection-summary-tile .oppia-activity-summary-tile .thumbnail {
+  text-decoration: none;
+}
 
-oppia-collection-summary-tile  .oppia-activity-summary-tile .thumbnail-image {
-    top: 15.5%;
-  }
+oppia-collection-summary-tile .oppia-activity-summary-tile .thumbnail-image {
+  top: 15.5%;
+}
 
-oppia-collection-summary-tile  .oppia-activity-summary-tile .collection-corner-image {
-    position: absolute;
-    width: 36px;
-  }
+oppia-collection-summary-tile .oppia-activity-summary-tile .collection-corner-image {
+  position: absolute;
+  width: 36px;
+}
 
-oppia-collection-summary-tile  .mobile-activity-summary-card {
-    box-shadow: slategrey 2px 4px 4px 0;
-    padding: 0 0 0 0;
-  }
+oppia-collection-summary-tile .mobile-activity-summary-card {
+  box-shadow: slategrey 2px 4px 4px 0;
+  padding: 0 0 0 0;
+}
 
-oppia-collection-summary-tile  .mobile-collection-card-cascading-images-container {
-    align-self: center;
-    height: 63px;
-    position: relative;
-    width: 63px;
-  }
+oppia-collection-summary-tile .mobile-collection-card-cascading-images-container {
+  align-self: center;
+  height: 63px;
+  position: relative;
+  width: 63px;
+}
 
-oppia-collection-summary-tile  .mobile-collection-card-image-container {
-    box-shadow: slategrey -1px 3px 4px 0;
-    position: absolute;
-    width: 55px;
-  }
+oppia-collection-summary-tile .mobile-collection-card-image-container {
+  box-shadow: slategrey -1px 3px 4px 0;
+  position: absolute;
+  width: 55px;
+}
 
-oppia-collection-summary-tile  .rear-image {
-    opacity: 40%;
-    right: 0;
-    top: 0;
-  }
+oppia-collection-summary-tile .rear-image {
+  opacity: 40%;
+  right: 0;
+  top: 0;
+}
 
-oppia-collection-summary-tile  .middle-image {
-    left: 4px;
-    opacity: 70%;
-    top: 4px;
-  }
+oppia-collection-summary-tile .middle-image {
+  left: 4px;
+  opacity: 70%;
+  top: 4px;
+}
 
-oppia-collection-summary-tile  .front-image {
-    bottom: 0;
-    left: 0;
-  }
+oppia-collection-summary-tile .front-image {
+  bottom: 0;
+  left: 0;
+}
 
 oppia-collection-summary-tile .collection-progress-svg {
   transform: rotate(-90deg);
@@ -72,36 +72,39 @@ oppia-collection-summary-tile .collection-progress {
   position: relative;
   top: 98px;
 }
+
 oppia-collection-summary-tile .oppia-collection-objective-title {
   -webkit-box-orient: vertical;
+  color: #333;
   display: -webkit-box;
   font-family: "Roboto", Arial, sans-serif;
   font-size: 0.85em;
   height: 30px;
+  letter-spacing: 0;
   -webkit-line-clamp: 2;
   line-height: 1.26;
+  margin: 0 8px 0 8px;
   max-height: 4.71em;
+  opacity: 1;
   overflow: hidden;
+  text-align: left;
   text-overflow: ellipsis;
   word-break: break-word;
-  color: #333;
-  letter-spacing: 0;
-  margin: 0px 8px 0 8px;
-  opacity: 1;
-  text-align: left;
 }
+
 oppia-collection-summary-tile .oppia-learner-dashboard-collection-title {
-  color: #00645C;
+  color: #00645c;
   display: flex;
-  font-family: Capriola,Roboto,Arial,sans-serif;
+  font-family: Capriola, Roboto, Arial, sans-serif;
   font-size: 15px;
   font-weight: 400;
   padding-left: 8px;
   text-align: left;
 }
+
 oppia-collection-summary-tile .continue-button {
   background: white 0% 0% no-repeat padding-box;
-  border: 1px solid #00645C;
+  border: 1px solid #00645c;
   border-radius: 4px;
   height: 36px;
   left: 86px;
@@ -109,8 +112,9 @@ oppia-collection-summary-tile .continue-button {
   top: 108px;
   width: 122px;
 }
+
 oppia-collection-summary-tile .continue-button-text {
-  color: #00645C;
+  color: #00645c;
   font-size: 14px;
   font-weight: 500;
   left: 1px;
@@ -119,6 +123,7 @@ oppia-collection-summary-tile .continue-button-text {
   text-align: center;
   top: 10px;
 }
+
 oppia-collection-summary-tile .oppia-story-completion {
   background: #000c 0% 0% no-repeat padding-box;
   border-radius: 2px;
@@ -131,9 +136,11 @@ oppia-collection-summary-tile .oppia-story-completion {
   text-align: left;
   width: 90px;
 }
+
 oppia-collection-summary-tile .story-completion {
   bottom: 52px;
 }
+
 oppia-collection-summary-tile .oppia-svg-star-image {
   bottom: 3px;
   filter: invert(95%) sepia(49%) saturate(2374%) hue-rotate(320deg) brightness(91%) contrast(89%);
@@ -141,27 +148,31 @@ oppia-collection-summary-tile .oppia-svg-star-image {
   position: relative;
   width: 11px;
 }
+
 oppia-collection-summary-tile .oppia-collection-link {
   text-decoration: none;
 }
+
 oppia-collection-summary-tile .oppia-summary-section {
+  margin-top: 8px;
   position: absolute;
   width: 100%;
-  margin-top: 8px;
 }
+
 oppia-collection-summary-tile .oppia-library-title {
   color: #333;
   display: block;
-  font-family: 'Roboto';
+  font-family: 'Roboto', sans-serif;
   font-size: 12px;
   font-weight: 600;
   height: 16px;
   letter-spacing: 0.05px;
-  margin: 4px 8px 0px 8px;
+  margin: 4px 8px 0 8px;
   padding-bottom: 12px;
   text-align: left;
   width: 188px;
 }
+
 oppia-collection-summary-tile .oppia-story-completed-percent {
   color: #fff;
   font-size: 10px;
@@ -171,6 +182,7 @@ oppia-collection-summary-tile .oppia-story-completed-percent {
   position: absolute;
   width: 100%;
 }
+
 oppia-collection-summary-tile .oppia-percent-story-completed {
   color: #fff;
   font-size: 10px;
@@ -180,6 +192,7 @@ oppia-collection-summary-tile .oppia-percent-story-completed {
   position: absolute;
   width: 100%;
 }
+
 oppia-collection-summary-tile .oppia-collection-learner-dashboard-card {
   border-radius: 4px;
   box-shadow: 0 3px 6px #00000029;
@@ -191,26 +204,30 @@ oppia-collection-summary-tile .oppia-collection-learner-dashboard-card {
   width: 216px;
   z-index: 5;
 }
+
 oppia-collection-summary-tile .oppia-collection-card-footer {
-  position: relative;
   display: flex;
+  position: relative;
 }
+
 oppia-collection-summary-tile .oppia-title-section {
   border-top-left-radius: 4px;
   border-top-right-radius: 4px;
   height: 136px;
   width: 216px;
 }
+
 oppia-collection-summary-tile .oppia-thumbnail-image {
   height: 108px;
   margin: 19px 43px 9px 44px;
   width: 129px;
-
 }
+
 oppia-collection-summary-tile .oppia-collection-learner-dashboard-card .continue-button:hover {
   background-color: #35ada3;
 }
+
 oppia-collection-summary-tile .oppia-collection-summary-container {
-  position: relative;
   bottom: 150px;
+  position: relative;
 }

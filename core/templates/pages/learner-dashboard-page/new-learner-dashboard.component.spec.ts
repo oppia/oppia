@@ -635,7 +635,13 @@ describe('New Learner dashboard page', () => {
         'profile-image-url-webp');
     });
 
+    it('should set activeSection', () => {
+      const newActiveSectionName = 'I18N_LEARNER_DASHBOARD_HOME_SECTION';
 
+      component.setActiveSection(newActiveSectionName);
+
+      expect(component.activeSection).toEqual(newActiveSectionName);
+    });
     it('should show username popover based on its length', () => {
       expect(component.showUsernamePopover('abcdefghijk')).toBe('mouseenter');
       expect(component.showUsernamePopover('abc')).toBe('none');

@@ -18,7 +18,7 @@
 
 import { async, ComponentFixture, fakeAsync, flush, TestBed, tick } from
   '@angular/core/testing';
-import { Component, NO_ERRORS_SCHEMA, Pipe } from '@angular/core';
+import { Component, NO_ERRORS_SCHEMA, Pipe, SimpleChanges } from '@angular/core';
 import { MaterialModule } from 'modules/material.module';
 import { FormsModule } from '@angular/forms';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
@@ -553,4 +553,22 @@ describe('Exploration Summary Tile Component', () => {
 
     expect(result).toBe('');
   });
+  it('should set the getStrokeDashOffSet', fakeAsync(() => {
+    const explorationProgress = 75;
+    const expectedOffsetValue =
+    (
+      component.circumference -
+      (explorationProgress / 100) * component.circumference);
+    component.explorationProgress = explorationProgress;
+    const changes: SimpleChanges = {
+      value: {
+        currentValue: explorationProgress,
+        previousValue: undefined,
+        firstChange: false,
+        isFirstChange: () => false
+      }
+    };
+    component.ngOnChanges(changes);
+    expect(component.getStrokeDashOffSet).toEqual(expectedOffsetValue);
+  }));
 });

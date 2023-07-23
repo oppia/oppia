@@ -1,144 +1,122 @@
 <div *ngIf="!displayAreaIsLearnerDashboard">
-<div *ngIf="!mobileCardToBeShown">
-  <oppia-learner-dashboard-icons *ngIf="showLearnerDashboardIconsIfPossible && userIsLoggedIn"
-                                [activityType]="activityTypeCollection"
-                                [activityId]="getCollectionId"
-                                [activityTitle]="getCollectionTitle"
-                                [isContainerNarrow]="isContainerNarrow"
-                                [isAddToPlaylistIconShown]="!isOwnedByCurrentUser">
-  </oppia-learner-dashboard-icons>
-  <mat-card class="oppia-activity-summary-tile e2e-test-collection-card"
-          [ngClass]="{'oppia-activity-playlist-tile': isPlaylistTile}" [style.padding]="0">
-    <a [href]="getCollectionLink()" class="thumbnail">
-      <div class="title-section" [ngStyle]="{'background-color': getThumbnailBgColor}">
-        <img class="collection-corner-image" [src]="getStaticImageUrl('/general/collection_corner.svg')" alt="">
-        <img class="thumbnail-image" [src]="getCompleteThumbnailIconUrl()" alt="{{ getCategory }}">
-        <h3 class="activity-title e2e-test-collection-summary-tile-title">
-          {{ getCollectionTitle || defaultEmptyTitle }}
-        </h3>
-      </div>
+  <div *ngIf="!mobileCardToBeShown">
+    <oppia-learner-dashboard-icons *ngIf="showLearnerDashboardIconsIfPossible && userIsLoggedIn"
+      [activityType]="activityTypeCollection"
+      [activityId]="getCollectionId"
+      [activityTitle]="getCollectionTitle"
+      [isContainerNarrow]="isContainerNarrow"
+      [isAddToPlaylistIconShown]="!isOwnedByCurrentUser">
+    </oppia-learner-dashboard-icons>
 
-      <div [ngStyle]="isPlaylistTile && {'float': 'right', 'width': '67%', 'margin-top': '3%'}">
-        <div class="objective">
-          {{ getObjective | truncateAndCapitalize: 95 }}
-          <span *ngIf="!getObjective">No objective specified.</span>
+    <mat-card class="oppia-activity-summary-tile e2e-test-collection-card" [ngClass]="{'oppia-activity-playlist-tile': isPlaylistTile}" [style.padding]="0">
+      <a [href]="getCollectionLink()" class="thumbnail">
+        <div class="title-section" [ngStyle]="{'background-color': getThumbnailBgColor}">
+          <img class="collection-corner-image" [src]="getStaticImageUrl('/general/collection_corner.svg')" alt="">
+          <img class="thumbnail-image" [src]="getCompleteThumbnailIconUrl()" alt="{{ getCategory }}">
+          <h3 class="activity-title e2e-test-collection-summary-tile-title">
+            {{ getCollectionTitle || defaultEmptyTitle }}
+          </h3>
         </div>
-        <ul class="metrics layout-align-space-between-center layout-row">
-          <li>
-            <span>
-              {{ 'I18N_COMMUNITY_LIBRARY_PAGE_COLLECTION' | translate }} ({{ getNodeCount }})
-            </span>
-          </li>
-          <li>
-            <span>
-              <span class="oppia-icon-accessibility-label">Last Updated</span>
-              {{ getLastUpdatedDatetime() }}
-            </span>
-          </li>
-        </ul>
-      </div>
-      <div *ngIf="!isPlaylistTile" class="title-section-mask"
-           (mouseenter)="setHoverState(true)" (mouseleave)="setHoverState(false)">
-      </div>
-    </a>
-  </mat-card>
-</div>
 
-<div *ngIf="mobileCardToBeShown">
-  <mat-card class="mobile-activity-summary-card">
-    <a [href]="getCollectionLink()" class="thumbnail">
-
-      <div class="mobile-collection-card-cascading-images-container">
-        <div class="mobile-collection-card-image-container rear-image" [ngStyle]="{'background-color': getThumbnailBgColor}">
-          <img class="mobile-collection-card-image" [src]="getCompleteThumbnailIconUrl()" alt="{{ getCategory }}">
-        </div>
-        <div class="mobile-collection-card-image-container middle-image" [ngStyle]="{'background-color': getThumbnailBgColor}">
-          <img class="mobile-collection-card-image" [src]="getCompleteThumbnailIconUrl()" alt="{{ getCategory }}">
-        </div>
-        <div class="mobile-collection-card-image-container front-image" [ngStyle]="{'background-color': getThumbnailBgColor}">
-          <img class="mobile-collection-card-image" [src]="getCompleteThumbnailIconUrl()" alt="{{ getCategory }}">
-        </div>
-      </div>
-
-      <div class="mobile-activity-card-details">
-        <h3 class="mobile-collection-title e2e-test-collection-summary-tile-title">{{ getCollectionTitle || defaultEmptyTitle }}</h3>
-        <div class="mobile-activity-card-summary-section">
-          <ul class="mobile-activity-card-summary-elements">
+        <div [ngStyle]="isPlaylistTile && {'float': 'right', 'width': '67%', 'margin-top': '3%'}">
+          <div class="objective">
+            {{ getObjective | truncateAndCapitalize: 95 }}
+            <span *ngIf="!getObjective">No objective specified.</span>
+          </div>
+          <ul class="metrics layout-align-space-between-center layout-row">
             <li>
               <span>
-                {{ getNodeCount }} explorations
-              </span>
-            </li>
-            <li>
-              <span>
-                <i class="fas fa-circle bullet-separator"></i>
+                {{ 'I18N_COMMUNITY_LIBRARY_PAGE_COLLECTION' | translate }} ({{ getNodeCount }})
               </span>
             </li>
             <li>
               <span>
                 <span class="oppia-icon-accessibility-label">Last Updated</span>
-                {{ relativeLastUpdatedDateTime }}
+                {{ getLastUpdatedDatetime() }}
               </span>
             </li>
           </ul>
         </div>
-      </div>
-    </a>
-  </mat-card>
-</div>
-</div>
-<div *ngIf="displayAreaIsLearnerDashboard">
-  <mat-card class="oppia-collection-learner-dashboard-card" [attr.style]="isButtonHovered()">
-      <div class="collection-card">
-        <div class="oppia-title-section" [ngStyle]="{'background-color': getThumbnailBgColor}">
-          <img class="oppia-thumbnail-image" [src]="getCompleteThumbnailIconUrl()">
-        </div>
-      </div>
-        <div class="oppia-summary-section">
-          <span class="oppia-learner-dashboard-collection-title">
-            {{getCollectionTitle}}
-          </span>
-          <span class="oppia-library-title e2e-test-topic-name-in-learner-story-summary-tile">
-            Community Lesson
-          </span>
-          <div class="oppia-collection-objective-title e2e-test-story-name-in-learner-story-summary-tile">
-            {{getObjective | truncateAndCapitalize: 95}}
+
+        <div *ngIf="!isPlaylistTile" class="title-section-mask" (mouseenter)="setHoverState(true)" (mouseleave)="setHoverState(false)"></div>
+      </a>
+    </mat-card>
+  </div>
+
+  <div *ngIf="mobileCardToBeShown">
+    <mat-card class="mobile-activity-summary-card">
+      <a [href]="getCollectionLink()" class="thumbnail">
+        <div class="mobile-collection-card-cascading-images-container">
+          <div class="mobile-collection-card-image-container rear-image" [ngStyle]="{'background-color': getThumbnailBgColor}">
+            <img class="mobile-collection-card-image" [src]="getCompleteThumbnailIconUrl()" alt="{{ getCategory }}">
+          </div>
+          <div class="mobile-collection-card-image-container middle-image" [ngStyle]="{'background-color': getThumbnailBgColor}">
+            <img class="mobile-collection-card-image" [src]="getCompleteThumbnailIconUrl()" alt="{{ getCategory }}">
+          </div>
+          <div class="mobile-collection-card-image-container front-image" [ngStyle]="{'background-color': getThumbnailBgColor}">
+            <img class="mobile-collection-card-image" [src]="getCompleteThumbnailIconUrl()" alt="{{ getCategory }}">
           </div>
         </div>
-      <div class="oppia-collection-card-footer">
-        <span class="collection-progress">
-          <svg class="collection-progress-svg" width="50" height="50">
-            <circle class="collection-progress-circle total-circle"
-                    cx="25"
-                    cy="25"
-                    r="18"/>
-            <circle class="collection-progress-circle completed-circle"
-                    cx="25"
-                    cy="25"
-                    r="18"
-                    [ngStyle]="{'stroke-dashoffset': getStrokeDashOffSet,'stroke-dasharray': circumference}"/>
-            <text x="25"
-                  y="-20"
-                  text-anchor="middle"
-                  stroke="#00645c"
-                  stroke-width="0.5"
-                  font-size="0.9em"
-                  transform="rotate(90)">
-              {{ collectionProgress }}%
-            </text>
-          </svg>
-        </span>
 
-        <span class="continue-button" (mouseenter)="buttonIsHovered=true" (mouseleave)="buttonIsHovered=false">
-          <a [href]="getCollectionLink()" target="{{ openInNewWindow ? '_blank' : '_self' }}" class="oppia-collection-link">
-          <p *ngIf="collectionProgress !== 0" class="continue-button-text">
-            Resume
-          </p>
-          <p *ngIf="collectionProgress === 0" class="continue-button-text">
-            Start
-          </p>
-          </a>
-        </span>
+        <div class="mobile-activity-card-details">
+          <h3 class="mobile-collection-title e2e-test-collection-summary-tile-title">{{ getCollectionTitle || defaultEmptyTitle }}</h3>
+          <div class="mobile-activity-card-summary-section">
+            <ul class="mobile-activity-card-summary-elements">
+              <li>
+                <span>
+                  {{ getNodeCount }} explorations
+                </span>
+              </li>
+              <li>
+                <span>
+                  <i class="fas fa-circle bullet-separator"></i>
+                </span>
+              </li>
+              <li>
+                <span>
+                  <span class="oppia-icon-accessibility-label">Last Updated</span>
+                  {{ relativeLastUpdatedDateTime }}
+                </span>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </a>
+    </mat-card>
+  </div>
+</div>
+
+<div *ngIf="displayAreaIsLearnerDashboard">
+  <mat-card class="oppia-collection-learner-dashboard-card" [attr.style]="isButtonHovered()">
+    <div class="collection-card">
+      <div class="oppia-title-section" [ngStyle]="{'background-color': getThumbnailBgColor}">
+        <img class="oppia-thumbnail-image" [src]="getCompleteThumbnailIconUrl()">
       </div>
+    </div>
+    <div class="oppia-summary-section">
+      <span class="oppia-learner-dashboard-collection-title">{{getCollectionTitle}}</span>
+      <span class="oppia-library-title e2e-test-topic-name-in-learner-story-summary-tile">Community Lesson</span>
+      <div class="oppia-collection-objective-title e2e-test-story-name-in-learner-story-summary-tile">
+        {{getObjective | truncateAndCapitalize: 95}}
+      </div>
+    </div>
+    <div class="oppia-collection-card-footer">
+      <span class="collection-progress">
+        <svg class="collection-progress-svg" width="50" height="50">
+          <circle class="collection-progress-circle total-circle" cx="25" cy="25" r="18" />
+          <circle class="collection-progress-circle completed-circle" cx="25" cy="25" r="18"
+            [ngStyle]="{'stroke-dashoffset': getStrokeDashOffSet,'stroke-dasharray': circumference}" />
+          <text x="25" y="-20" text-anchor="middle" stroke="#00645c" stroke-width="0.5" font-size="0.9em" transform="rotate(90)">
+            {{ collectionProgress }}%
+          </text>
+        </svg>
+      </span>
+      <span class="continue-button" (mouseenter)="buttonIsHovered=true" (mouseleave)="buttonIsHovered=false">
+        <a [href]="getCollectionLink()" target="{{ openInNewWindow ? '_blank' : '_self' }}" class="oppia-collection-link">
+          <p *ngIf="collectionProgress !== 0" class="continue-button-text">Resume</p>
+          <p *ngIf="collectionProgress === 0" class="continue-button-text">Start</p>
+        </a>
+      </span>
+    </div>
   </mat-card>
 </div>
