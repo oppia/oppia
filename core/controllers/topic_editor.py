@@ -167,6 +167,7 @@ class TopicEditorStoryHandler(
             published_chapters_count = 0
             upcoming_chapters_count = 0
             overdue_chapters_count = 0
+            upcoming_chapters_expected_days = []
             for node in nodes:
                 if node.status == constants.STORYNODE_STATUS_PUBLISHED:
                     published_chapters_count += 1
@@ -176,6 +177,9 @@ class TopicEditorStoryHandler(
                         today()).days < 14 and node.planned_publication_date >
                         datetime.datetime.today()):
                         upcoming_chapters_count += 1
+                        upcoming_chapters_expected_days.append((
+                            node.planned_publication_date - datetime.datetime.
+                            today()).days)
                     if (node.planned_publication_date <
                         datetime.datetime.today()):
                         overdue_chapters_count += 1
@@ -199,6 +203,8 @@ class TopicEditorStoryHandler(
                 'total_chapters_count': total_chapters_count,
                 'published_chapters_count': published_chapters_count,
                 'upcoming_chapters_count': upcoming_chapters_count,
+                'upcoming_chapters_expected_days': (
+                    upcoming_chapters_expected_days),
                 'overdue_chapters_count': overdue_chapters_count
             }
             updated_canonical_story_summary_dicts.append(

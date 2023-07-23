@@ -59,6 +59,7 @@ describe('Story summary model', () => {
       published_chapters_count: 2,
       total_chapters_count: 5,
       upcoming_chapters_count: 1,
+      upcoming_chapters_expected_days: [3],
       overdue_chapters_count: 1,
       visited_chapter_titles: ['Chapter 2']
     };
@@ -106,6 +107,7 @@ describe('Story summary model', () => {
     expect(_sampleStorySummary.getPublishedChaptersCount()).toEqual(2);
     expect(_sampleStorySummary.getTotalChaptersCount()).toEqual(5);
     expect(_sampleStorySummary.getUpcomingChaptersCount()).toEqual(1);
+    expect(_sampleStorySummary.getUpcomingChaptersExpectedDays()).toEqual([3]);
     expect(_sampleStorySummary.getOverdueChaptersCount()).toEqual(1);
     expect(_sampleStorySummary.getVisitedChapterTitles()).toEqual(
       ['Chapter 2']);

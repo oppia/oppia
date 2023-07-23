@@ -83,15 +83,24 @@
         </a>
       </td>
       <td>
-        <a (click)="topicRights.canEditTopic() && openStoryEditor(summary.getId())" class="story-list-summary text-center">
+        <a (click)="topicRights.canEditTopic() && openStoryEditor(summary.getId())" class="story-list-summary chapter-count text-center">
           <span> {{ summary.getPublishedChaptersCount() }} Published</span>
-          <span> {{ summary.getTotalChaptersCount() }} Total</span>
+          <span *ngIf="summary.getTotalChaptersCount()!=summary.getPublishedChaptersCount()"> {{ summary.getTotalChaptersCount() - summary.getPublishedChaptersCount() }} Awaiting Publication</span>
         </a>
       </td>
       <td>
         <a (click)="topicRights.canEditTopic() && openStoryEditor(summary.getId())" class="story-list-summary text-left">
-          <span *ngIf="summary.getUpcomingChaptersCount()==1"> {{ summary.getUpcomingChaptersCount() }} upcoming launch (next 14 days)</span>
-          <span *ngIf="summary.getUpcomingChaptersCount()>1"> {{ summary.getUpcomingChaptersCount() }} upcoming launches (next 14 days)</span>
+          <span *ngIf="summary.getUpcomingChaptersCount()==1">
+            {{ summary.getUpcomingChaptersCount() }} upcoming launch (next {{ summary.getUpcomingChaptersExpectedDays()[0] }} day)
+          </span>
+          <span *ngIf="summary.getUpcomingChaptersCount()>1">
+            {{ summary.getUpcomingChaptersCount() }} upcoming launches (next
+            <span *ngFor="let day of summary.getUpcomingChaptersExpectedDays(); index as id">
+              {{ day }}
+              <span *ngIf="id!=summary.getUpcomingChaptersExpectedDays().length-1">,</span>
+            </span>
+            days)
+          </span>
           <span *ngIf="summary.getOverdueChaptersCount()==1"> {{ summary.getOverdueChaptersCount() }} launch behind schedule</span>
           <span *ngIf="summary.getOverdueChaptersCount()>1"> {{ summary.getOverdueChaptersCount() }} launches behind schedule</span>
           <span *ngIf="!summary.getUpcomingChaptersCount() && !summary.getOverdueChaptersCount()">-</span>
@@ -182,6 +191,10 @@
     line-height: normal;
     vertical-align: middle;
     word-break: break-word;
+  }
+
+  .chapter-count span:last-child {
+    margin-top: 10px;
   }
 
   .oppia-colgroup-col-1 {

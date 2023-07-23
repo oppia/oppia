@@ -36,6 +36,7 @@ export interface StorySummaryBackendDict {
   'total_chapters_count'?: number;
   'upcoming_chapters_count'?: number;
   'overdue_chapters_count'?: number;
+  'upcoming_chapters_expected_days'?: number[];
   'visited_chapter_titles'?: string[];
   // This property is optional because it is only present in the
   // story summary dict of learner dashboard page.
@@ -62,6 +63,7 @@ export class StorySummary {
     private _publishedChaptersCount: number | undefined,
     private _totalChaptersCount: number | undefined,
     private _upcomingChaptersCount: number | undefined,
+    private _upcomingChaptersExpectedDays: number[] | undefined,
     private _overdueChaptersCount: number | undefined,
     private _visitedChapterTitles: string[] | undefined
   ) {}
@@ -142,6 +144,10 @@ export class StorySummary {
     return this._visitedChapterTitles;
   }
 
+  getUpcomingChaptersExpectedDays(): number[] | undefined {
+    return this._upcomingChaptersExpectedDays;
+  }
+
   static createFromBackendDict(
       storySummaryBackendDict: StorySummaryBackendDict): StorySummary {
     let allNodes = (
@@ -166,6 +172,7 @@ export class StorySummary {
       storySummaryBackendDict.published_chapters_count,
       storySummaryBackendDict.total_chapters_count,
       storySummaryBackendDict.upcoming_chapters_count,
+      storySummaryBackendDict.upcoming_chapters_expected_days,
       storySummaryBackendDict.overdue_chapters_count,
       storySummaryBackendDict.visited_chapter_titles
     );
