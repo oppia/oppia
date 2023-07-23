@@ -23,8 +23,10 @@ import { HttpClient } from '@angular/common/http';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { ContributorAdminDashboardFilter } from '../contributor-admin-dashboard-filter.model';
 import { TranslationSubmitterStats, TranslationReviewerStats,
-  QuestionSubmitterStats, QuestionReviewerStats } from '../contributor-dashboard-admin-summary.model';
+  QuestionSubmitterStats, QuestionReviewerStats
+} from '../contributor-dashboard-admin-summary.model';
 import { AppConstants } from 'app.constants';
+import { ContributorDashboardAdminPageConstants as PageConstants } from '../contributor-dashboard-admin-page.constants';
 
 export interface TranslationSubmitterBackendDict {
     'language_code': string;
@@ -50,6 +52,7 @@ export interface TranslationReviewerBackendDict {
     'reviewed_translations_count': number;
     'accepted_translations_count': number;
     'accepted_translations_with_reviewer_edits_count': number;
+    'accepted_translation_word_count': number;
     'rejected_translations_count': number;
     'first_contribution_date': string;
     'last_contributed_in_days': number;
@@ -79,43 +82,108 @@ export interface QuestionReviewerBackendDict {
     'last_contributed_in_days': number;
 }
 
-export interface ContributorAdminStatsData {
-  stats: TranslationSubmitterStats | TranslationReviewerStats
-    | QuestionSubmitterStats | QuestionReviewerStats;
+export interface CommunityContributionStatsBackendDict {
+  'translation_reviewers_count': translation_reviewers_count;
+  'question_reviewers_count': number;
+}
+
+export interface translation_reviewers_count {
+  [key: string]: number;
+}
+
+export interface CommunityContributionStatsDict {
+  'translation_reviewers_count': number;
+  'question_reviewers_count': number;
+}
+
+export interface TranslationSubmitterStatsData {
+  stats: TranslationSubmitterStats[];
   nextOffset: number;
   more: boolean;
 }
 
-export interface ContributorAdminStatsBackendDict {
-  stats: TranslationSubmitterBackendDict | TranslationReviewerBackendDict
-    | QuestionSubmitterBackendDict | QuestionReviewerBackendDict;
+export interface TranslationSubmitterStatsBackendDict {
+  stats: TranslationSubmitterBackendDict[];
+  next_offset: number;
+  more: boolean;
+}
+
+export interface TranslationReviewerStatsData {
+  stats: TranslationReviewerStats[];
   nextOffset: number;
+  more: boolean;
+}
+
+export interface TranslationReviewerStatsBackendDict {
+  stats: TranslationReviewerBackendDict[];
+  next_offset: number;
+  more: boolean;
+}
+
+export interface QuestionSubmitterStatsData {
+  stats: QuestionSubmitterStats[];
+  nextOffset: number;
+  more: boolean;
+}
+
+export interface QuestionSubmitterStatsBackendDict {
+  stats: QuestionSubmitterBackendDict[];
+  next_offset: number;
+  more: boolean;
+}
+
+export interface QuestionReviewerStatsData {
+  stats: QuestionReviewerStats[];
+  nextOffset: number;
+  more: boolean;
+}
+
+export interface QuestionReviewerStatsBackendDict {
+  stats: QuestionReviewerBackendDict[];
+  next_offset: number;
   more: boolean;
 }
 
 @Injectable({
   providedIn: 'root',
 })
-export class ContributorDashboardAdminStatsService {
+export class ContributorDashboardAdminStatsBackendApiService {
   constructor(
     private http: HttpClient,
     private urlInterpolationService: UrlInterpolationService
   ) {}
 
-  private CONTRIBUTOR_ADMIN_STATS_SUMMARIES_URL = (
-    '/contributor-dashboard-admin-stats/<contribution_type>/' +
-    '<contribution_subtype>');
+  async fetchCommunityStats():
+    Promise<CommunityContributionStatsDict> {
+    return new Promise((resolve, reject) => {
+      this.http.get<CommunityContributionStatsBackendDict>(
+        PageConstants.COMMUNITY_CONTRIBUTION_STATS_URL
+      ).toPromise().then(response => {
+        resolve({
+          translation_reviewers_count: (
+            response.translation_reviewers_count.en),
+          question_reviewers_count: response.question_reviewers_count
+        })
+        console.log(response);
+      }, errorResponse => {
+        reject(errorResponse.error.error);
+      });
+    });
+  }
 
   async fetchContributorAdminStats(
       filter: ContributorAdminDashboardFilter,
       pageSize: number,
-      nextOffset: string | null,
+      nextOffset: number | null,
       contributionType: string,
       contributionSubtype: string
   ):
-    Promise<ContributorAdminStatsData> {
+    Promise<TranslationSubmitterStatsData |
+      TranslationReviewerStatsData |
+      QuestionSubmitterStatsData |
+      QuestionReviewerStatsData> {
     const url = this.urlInterpolationService.interpolateUrl(
-      this.CONTRIBUTOR_ADMIN_STATS_SUMMARIES_URL, {
+      PageConstants.CONTRIBUTOR_ADMIN_STATS_SUMMARIES_URL, {
         contribution_type: contributionType,
         contribution_subtype: contributionSubtype
       }
@@ -123,31 +191,118 @@ export class ContributorDashboardAdminStatsService {
     if (contributionType === AppConstants.CONTRIBUTION_STATS_TYPE_TRANSLATION) {
       if (
         contributionSubtype === (
-          AppConstants.CONTRIBUTION_STATS_SUBTYPE_SUBMISSION)
+          AppConstants.CONTRIBUTION_STATS_SUBTYPE_SUBMISSION)) {
+        return new Promise((resolve, reject) => {
+          this.http.get<TranslationSubmitterStatsBackendDict>(
+            url, {
+              params: {
+                page_size: 20,
+                offset: 0,
+                language_code: 'es',
+                topic_ids: []
+              }
+            } as Object
+          ).toPromise().then(response => {
+            console.log(response);
+            resolve({
+              stats: response.stats.map(
+                backendDict => TranslationSubmitterStats
+                  .createFromBackendDict(backendDict)),
+              nextOffset: response.next_offset,
+              more: response.more
+            });
+          }, errorResponse => {
+            reject(errorResponse.error.error);
+          });
+        });
+      } else if (
+        contributionSubtype === (
+          AppConstants.CONTRIBUTION_STATS_SUBTYPE_REVIEW)
       ) {
-        return this.http.get<ContributorAdminStatsBackendDict>(
-          url, {
-            page_size: pageSize,
-            offset: nextOffset,
-            language_code: filter.languageCode,
-            sort_by: filter.sort,
-            topic_ids: filter.topicIds,
-            max_days_since_last_activity: filter.lastActivity
-          } as Object).toPromise().then(response => {
-          return {
-            stats: response.stats.map(
-              backendDict => TranslationSubmitterStats
-                .createFromBackendDict(backendDict)),
-            nextOffset: response.nextOffset,
-            more: response.more
-          };
-        }, errorResponse => {
-          throw new Error(errorResponse.error.error);
+        return new Promise((resolve, reject) => {
+          this.http.get<TranslationReviewerStatsBackendDict>(
+            url, {
+              params: {
+                page_size: 20,
+                offset: 0,
+                language_code: 'es',
+                topic_ids: []
+              }
+            } as Object
+          ).toPromise().then(response => {
+            console.log(response);
+            resolve({
+              stats: response.stats.map(
+                backendDict => TranslationReviewerStats
+                  .createFromBackendDict(backendDict)),
+              nextOffset: response.next_offset,
+              more: response.more
+            });
+          }, errorResponse => {
+            reject(errorResponse.error.error);
+          });
+        });
+      }
+    } else if (
+      contributionType === AppConstants.CONTRIBUTION_STATS_TYPE_QUESTION) {
+      if (
+        contributionSubtype === (
+          AppConstants.CONTRIBUTION_STATS_SUBTYPE_SUBMISSION)) {
+        return new Promise((resolve, reject) => {
+          this.http.get<QuestionSubmitterStatsBackendDict>(
+            url, {
+              params: {
+                page_size: 20,
+                offset: 0,
+                language_code: 'en',
+                topic_ids: []
+              }
+            } as Object
+          ).toPromise().then(response => {
+            console.log(response);
+            resolve({
+              stats: response.stats.map(
+                backendDict => QuestionSubmitterStats
+                  .createFromBackendDict(backendDict)),
+              nextOffset: response.next_offset,
+              more: response.more
+            });
+          }, errorResponse => {
+            reject(errorResponse.error.error);
+          });
+        });
+      } else if (
+        contributionSubtype === (
+          AppConstants.CONTRIBUTION_STATS_SUBTYPE_REVIEW)
+      ) {
+        return new Promise((resolve, reject) => {
+          this.http.get<QuestionReviewerStatsBackendDict>(
+            url, {
+              params: {
+                page_size: 20,
+                offset: 0,
+                language_code: 'en',
+                topic_ids: []
+              }
+            } as Object
+          ).toPromise().then(response => {
+            console.log(response);
+            resolve({
+              stats: response.stats.map(
+                backendDict => QuestionReviewerStats
+                  .createFromBackendDict(backendDict)),
+              nextOffset: response.next_offset,
+              more: response.more
+            });
+          }, errorResponse => {
+            reject(errorResponse.error.error);
+          });
         });
       }
     }
   }
 }
 
-angular.module('oppia').factory('ContributorDashboardAdminStatsService',
-  downgradeInjectable(ContributorDashboardAdminStatsService));
+angular.module('oppia').factory(
+  'ContributorDashboardAdminStatsBackendApiService',
+  downgradeInjectable(ContributorDashboardAdminStatsBackendApiService));

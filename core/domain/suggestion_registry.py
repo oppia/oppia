@@ -2049,17 +2049,16 @@ class TranslationSubmitterTotalContributionStats:
         topic_summaries = topic_fetchers.get_multi_topic_summaries(
             self.topic_ids_with_translation_submissions)
         topic_name_by_topic_id = []
-        {
-            topic_name_by_topic_id.append(topic_summary.name)
-            for topic_summary in topic_summaries if topic_summary is not None
-        }
-        contributor_name = user_services.get_username(self.contributor_id)
+        for topic_summary in topic_summaries:
+            if topic_summary is not None:
+                topic_name_by_topic_id.append(topic_summary.name)
+        # contributor_name = user_services.get_username(self.contributor_id)
 
         return {
             'language_code': self.language_code,
-            'contributor_name': contributor_name,
-            'topic_names_with_translation_submissions': (
-                topic_name_by_topic_id),
+            'contributor_name': self.contributor_id,
+            'topic_names': (
+                self.topic_ids_with_translation_submissions),
             'recent_performance': self.recent_performance,
             'overall_accuracy': self.overall_accuracy,
             'submitted_translations_count': self.submitted_translations_count,
@@ -2138,17 +2137,16 @@ class TranslationReviewerTotalContributionStats:
         topic_summaries = topic_fetchers.get_multi_topic_summaries(
             self.topic_ids_with_translation_reviews)
         topic_name_by_topic_id = []
-        {
-            topic_name_by_topic_id.append(topic_summary.name)
-            for topic_summary in topic_summaries if topic_summary is not None
-        }
-        contributor_name = user_services.get_username(self.contributor_id)
+        for topic_summary in topic_summaries:
+            if topic_summary is not None:
+                topic_name_by_topic_id.append(topic_summary.name)
+        # contributor_name = user_services.get_username(self.contributor_id)
 
         return {
             'language_code': self.language_code,
-            'contributor_name': contributor_name,
-            'topic_ids_with_translation_reviews': (
-                topic_name_by_topic_id),
+            'contributor_name': self.contributor_id,
+            'topic_names': (
+                self.topic_ids_with_translation_reviews),
             'reviewed_translations_count': self.reviewed_translations_count,
             'accepted_translations_count': self.accepted_translations_count,
             'accepted_translations_with_reviewer_edits_count': (
@@ -2223,16 +2221,15 @@ class QuestionSubmitterTotalContributionStats:
         topic_summaries = topic_fetchers.get_multi_topic_summaries(
             self.topic_ids_with_question_submissions)
         topic_name_by_topic_id = []
-        {
-            topic_name_by_topic_id.append(topic_summary.name)
-            for topic_summary in topic_summaries if topic_summary is not None
-        }
-        contributor_name = user_services.get_username(self.contributor_id)
+        for topic_summary in topic_summaries:
+            if topic_summary is not None:
+                topic_name_by_topic_id.append(topic_summary.name)
+        # contributor_name = user_services.get_username(self.contributor_id)
 
         return {
-            'contributor_name': contributor_name,
-            'topic_ids_with_question_submissions': (
-                topic_name_by_topic_id),
+            'contributor_name': self.contributor_id,
+            'topic_names': (
+                self.topic_ids_with_question_submissions),
             'recent_performance': self.recent_performance,
             'overall_accuracy': self.overall_accuracy,
             'submitted_questions_count': self.submitted_questions_count,
@@ -2299,16 +2296,15 @@ class QuestionReviewerTotalContributionStats:
         topic_summaries = topic_fetchers.get_multi_topic_summaries(
             self.topic_ids_with_question_reviews)
         topic_name_by_topic_id = []
-        {
-            topic_name_by_topic_id.append(topic_summary.name)
-            for topic_summary in topic_summaries if topic_summary is not None
-        }
-        contributor_name = user_services.get_username(self.contributor_id)
+        for topic_summary in topic_summaries:
+            if topic_summary is not None:
+                topic_name_by_topic_id.append(topic_summary.name)
+        # contributor_name = user_services.get_username(self.contributor_id)
 
         return {
-            'contributor_name': contributor_name,
-            'topic_ids_with_question_reviews': (
-                topic_name_by_topic_id),
+            'contributor_name': self.contributor_id,
+            'topic_names': (
+                self.topic_ids_with_question_reviews),
             'reviewed_questions_count': self.reviewed_questions_count,
             'accepted_questions_count': self.accepted_questions_count,
             'accepted_questions_with_reviewer_edits_count': (

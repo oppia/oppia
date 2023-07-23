@@ -60,12 +60,13 @@ export class TranslationSubmitterStats {
 
 export class TranslationReviewerStats {
   constructor(
-        public languageCode: string,
         public contributorName: string,
+        public languageCode: string,
         public topicsWithTranslationReviews: string[],
         public reviewedTranslationsCount: number,
         public acceptedTranslationsCount: number,
         public acceptedTranslationsWithReviewerEditsCount: number,
+        public acceptedTranslationWordCount: number,
         public rejectedTranslationsCount: number,
         public firstContributionDate: string,
         public lastContributedInDays: number) { }
@@ -79,6 +80,7 @@ export class TranslationReviewerStats {
       summaryDict.reviewed_translations_count,
       summaryDict.accepted_translations_count,
       summaryDict.accepted_translations_with_reviewer_edits_count,
+      summaryDict.accepted_translation_word_count,
       summaryDict.rejected_translations_count,
       summaryDict.first_contribution_date,
       summaryDict.last_contributed_in_days

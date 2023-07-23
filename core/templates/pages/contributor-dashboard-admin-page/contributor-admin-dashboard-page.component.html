@@ -8,26 +8,26 @@
   [ngClass]="{'oppia-contributor-dashboard-mobile-mode': checkMobileView()}">
     <mat-card layout="row" class="oppia-mat-card">
     <div class="translation-reviewer stats-card"  [attr.aria-label]="'Translation Reviewer ' + 24"
-          tabindex="0" >
-      <p class="stat-description">Translation<br>Reviewer</p>
+          tabindex="0">
+      <p class="stat-description">Translation<br>Reviewers</p>
       <h2 class="stat-value-with-rating e2e-test-oppia-average-rating">
-          24
+          {{translationReviewersCount}}
       </h2>
     </div>
     <div class="question-reviewer stats-card"  [attr.aria-label]="'Question Reviewer ' + 24" tabindex="0">
-      <p class="stat-description">Questions<br>Reviewer</p>
+      <p class="stat-description">Question<br>Reviewers</p>
       <h2 class="stat-value-with-rating e2e-test-oppia-total-plays">
-          24
+          {{questionReviewersCount}}
       </h2>
     </div>
-    <div class="language-coordinator stats-card" [attr.aria-label]="'Language Coordinators' + 24" tabindex="0">
-      <p class="stat-description">Language<br>Coordinator</p>
+    <div class="translation-coordinator stats-card" [attr.aria-label]="'Translation Coordinators' + 24" tabindex="0">
+      <p class="stat-description">Translation<br>Coordinators</p>
       <h2 class="stat-value-with-rating e2e-test-oppia-open-feedback">
           24
       </h2>
     </div>
     <div class="question-coordinator stats-card" [attr.aria-label]="'Question Coordinator ' + 24" tabindex="0">
-      <p class="stat-description">Question<br>Coordinator</p>
+      <p class="stat-description">Question<br>Coordinators</p>
       <h2 class="stat-value-with-rating e2e-test-oppia-total-subscribers">
           24
       </h2>
@@ -42,41 +42,51 @@
         <li [ngClass]="{'dashboard-tabs-active': activeTab === TAB_NAME_TRANSLATION_SUBMITTER}">
           <a class="dashboard-tabs-text e2e-test-topics-tab"
              (click)="setActiveTab(TAB_NAME_TRANSLATION_SUBMITTER)">
-            Translation<br>Submitter 
+            Translation<br>Submitters 
           </a>
         </li>
         <li [ngClass]="{'dashboard-tabs-active': activeTab === TAB_NAME_TRANSLATION_REVIEWER}">
           <a class="dashboard-tabs-text e2e-test-skills-tab"
              (click)="setActiveTab(TAB_NAME_TRANSLATION_REVIEWER)">
-            Translation<br>Reviewer
+            Translation<br>Reviewers
           </a>
         </li>
         <li [ngClass]="{'dashboard-tabs-active': activeTab === TAB_NAME_QUESTION_SUBMITTER}">
           <a class="dashboard-tabs-text e2e-test-skills-tab"
              (click)="setActiveTab(TAB_NAME_QUESTION_SUBMITTER)">
-            Question<br>Submitter
+            Question<br>Submitters
           </a>
         </li>
         <li [ngClass]="{'dashboard-tabs-active': activeTab === TAB_NAME_QUESTION_REVIEWER}">
           <a class="dashboard-tabs-text e2e-test-skills-tab"
              (click)="setActiveTab(TAB_NAME_QUESTION_REVIEWER)">
-            Question<br>Reviewer
+            Question<br>Reviewers
           </a>
         </li>
         <li [ngClass]="{'dashboard-tabs-active': activeTab === TAB_NAME_LANGUAGE_COORDINATOR}">
           <a class="dashboard-tabs-text e2e-test-skills-tab"
              (click)="setActiveTab(TAB_NAME_LANGUAGE_COORDINATOR)">
-            Language<br>Coordinator
+            Language<br>Coordinators
           </a>
         </li>
         <li [ngClass]="{'dashboard-tabs-active': activeTab === TAB_NAME_QUESTION_COORDINATOR}">
           <a class="dashboard-tabs-text e2e-test-skills-tab"
              (click)="setActiveTab(TAB_NAME_QUESTION_COORDINATOR)">
-            Question<br>Coordinator
+            Question<br>Coordinators
           </a>
         </li>
       </ul>
     </div>
-    <translation-submitter-table [activeTab]="activeTab"></translation-submitter-table>
+    <contributor-admin-stats-table [activeTab]="activeTab"></contributor-admin-stats-table>
+  </div>
+  <div class="dashboard-content-mobile">
+    <div class="dropdown">
+      <oppia-filtered-choices-field [choices]="CONTRIBUTION_TYPES"
+                                    placeholder="Contribution Type"
+                                    [isSearchable]="false"
+                                    [(selection)]="activeTab">
+      </oppia-filtered-choices-field>
+    </div>
+    <contributor-admin-stats-table [activeTab]="activeTab"></contributor-admin-stats-table>
   </div>
 </div>
