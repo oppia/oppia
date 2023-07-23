@@ -21,5 +21,7 @@ window.CodeMirror = require('codemirror');
 import 'codemirror/mode/javascript/javascript';
 import 'codemirror/mode/python/python';
 import 'codemirror/mode/yaml/yaml';
-require('static/diff-match-patch-1.0.0/diff_match_patch.js');
+import 'diff_match_patch';
 import 'codemirror/addon/merge/merge';
+import 'codemirror-v5.17.0/addon/merge/merge.css';
+import 'codemirror-v5.17.0/lib/codemirror.css';
