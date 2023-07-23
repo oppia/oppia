@@ -346,7 +346,7 @@ class LearnerExplorationProgressHandler(
         assert self.normalized_request is not None
         exp_ids = self.normalized_request['exp_ids']
         user_id = self.user_id
-
+        assert user_id is not None
         exploration_progress = (
             exp_fetchers.get_user_progress_in_exploration(
                 user_id, exp_ids))

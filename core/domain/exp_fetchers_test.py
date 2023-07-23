@@ -1015,22 +1015,22 @@ title: Old Title
         exploration.validate()
 
 
-def test_get_user_progress_in_exploration(self) -> None:
-    auth_id: str = 'test_id'
-    username: str = 'testname'
-    user_email: str = 'test@email.com'
-    user_id = user_services.create_new_user(auth_id, user_email).user_id
-    user_services.set_username(user_id, username)
-    self.exp_id = exp_fetchers.get_new_exploration_id()
-    self.save_new_valid_exploration(self.exp_id, user_id)
+    def test_get_user_progress_in_exploration(self) -> None:
+        auth_id: str = 'test_id'
+        username: str = 'testname'
+        user_email: str = 'test@email.com'
+        user_id = user_services.create_new_user(auth_id, user_email).user_id
+        user_services.set_username(user_id, username)
+        self.exp_id = exp_fetchers.get_new_exploration_id()
+        self.save_new_valid_exploration(self.exp_id, user_id)
 
-    user_services.update_learner_checkpoint_progress(
-        user_id, self.exp_id, 'Introduction', 1)
+        user_services.update_learner_checkpoint_progress(
+            user_id, self.exp_id, 'Introduction', 1)
 
-    user_progress = exp_fetchers.get_user_progress_in_exploration(
-        user_id, [self.exp_id])
+        user_progress = exp_fetchers.get_user_progress_in_exploration(
+            user_id, [self.exp_id])
 
-    self.assertEqual(len(user_progress), 1)
-    self.assertEqual(user_progress[0]['exploration_id'], self.exp_id)
-    self.assertEqual(user_progress[0]['visited_checkpoints_count'], 1)
-    self.assertEqual(user_progress[0]['total_checkpoints_count'], 1)
+        self.assertEqual(len(user_progress), 1)
+        self.assertEqual(user_progress[0]['exploration_id'], self.exp_id)
+        self.assertEqual(user_progress[0]['visited_checkpoints_count'], 1)
+        self.assertEqual(user_progress[0]['total_checkpoints_count'], 1)
