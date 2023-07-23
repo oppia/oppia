@@ -441,7 +441,7 @@ import { DiagnosticTestPlayerEngineService } from 'pages/exploration-player-page
 import { DiagnosticTestPlayerStatusService } from 'pages/diagnostic-test-player-page/diagnostic-test-player-status.service';
 import { RteHelperService } from 'services/rte-helper.service';
 import { HtmlLengthService } from 'services/html-length.service';
-
+import { InsertScriptService } from './insert-script.service';
 export const angularServices: [string, Type<{}>][] = [
   ['AccessValidationBackendApiService', AccessValidationBackendApiService],
   ['AdminBackendApiService', AdminBackendApiService],
@@ -917,5 +917,6 @@ export const angularServices: [string, Type<{}>][] = [
   ['VersionHistoryService', VersionHistoryService],
   ['VoiceoverRecordingService', VoiceoverRecordingService],
   ['RteHelperService', RteHelperService],
-  ['HtmlLengthService', HtmlLengthService]
+  ['HtmlLengthService', HtmlLengthService],
+  ['InsertScriptService', InsertScriptService],
 ];
