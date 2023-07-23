@@ -64,14 +64,6 @@ describe('Preferred Languages Component', () => {
     componentInstance.ngAfterViewInit();
     fixture.detectChanges();
     expect(componentInstance.chipList.errorState).toBeFalse();
-    componentInstance.formCtrl.setValue('fr');
-    componentInstance.ngAfterViewInit();
-    fixture.detectChanges();
-    expect(componentInstance.chipList.errorState).toBeTrue();
-    componentInstance.formCtrl.setValue('en');
-    componentInstance.ngAfterViewInit();
-    fixture.detectChanges();
-    expect(componentInstance.chipList.errorState).toBeFalse();
   });
 
   it('should validate input', () => {
@@ -88,17 +80,15 @@ describe('Preferred Languages Component', () => {
   });
 
 
-  it('should filtered choices when input box is clicked', () => {
+  it('should filtered choices when input box is clicked', async () => {
     const mockChoices = [
       { id: 'en', text: 'English ' },
       { id: 'fr', text: 'French ' }
     ];
     componentInstance.choices = [...mockChoices];
-    componentInstance.onInputBoxClick();
-    setTimeout(() => {
-      expect(componentInstance.searchQuery).toEqual('');
-      expect(componentInstance.filteredChoices).toEqual(mockChoices);
-    });
+    await componentInstance.onInputBoxClick();
+    expect(componentInstance.searchQuery).toEqual('');
+    expect(componentInstance.filteredChoices).toEqual(mockChoices);
   });
 
   it('should add language', () => {

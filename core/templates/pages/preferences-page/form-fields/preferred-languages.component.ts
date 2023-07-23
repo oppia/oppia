@@ -44,7 +44,8 @@ export class PreferredLanguagesComponent implements AfterViewInit {
   filteredChoices: LanguageIdAndText[] = [];
   searchQuery: string = '';
 
-  onInputBoxClick(): void {
+  async onInputBoxClick(): Promise<void> {
+    await Promise.resolve();
     this.searchQuery = '';
     this.filteredChoices = this.choices;
   }
