@@ -171,7 +171,7 @@ export class CkEditor4RteComponent implements AfterViewInit, OnChanges,
     const ckConfig: RteConfig = {
       extraPlugins: 'pre,sharedspace,' + pluginNames,
       startupFocus: true,
-      removePlugins: 'indentblock',
+      removePlugins: 'contextmenu,tabletools,tableselection,indentblock',
       title: false,
       floatSpaceDockedOffsetY: 15,
       extraAllowedContent: extraAllowedContentRules,
