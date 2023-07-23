@@ -80,7 +80,7 @@ describe('Preferred Languages Component', () => {
   });
 
 
-  it('should filtered choices when input box is clicked', async () => {
+  it('should filtered choices when input box is clicked', async() => {
     const mockChoices = [
       { id: 'en', text: 'English ' },
       { id: 'fr', text: 'French ' }
