@@ -78,6 +78,13 @@ const routes: Route[] = [
       .then(m => m.PreferencesPageModule)
   },
   {
+    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.FEEDBACK_UPDATES.ROUTE,
+    pathMatch: 'full',
+    loadChildren: () => import(
+      'pages/feedback-updates-page/feedback-updates-page.module')
+      .then(m => m.FeedbackUpdatesPageModule)
+  },
+  {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.PROFILE.ROUTE,
     loadChildren: () => import('pages/profile-page/profile-page.module')
       .then(m => m.ProfilePageModule)
