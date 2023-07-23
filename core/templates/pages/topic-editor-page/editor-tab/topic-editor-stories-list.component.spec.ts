@@ -86,7 +86,11 @@ describe('topicEditorStoriesList', () => {
       story_is_published: true,
       completed_node_titles: ['node1'],
       url_fragment: 'story1',
-      all_node_dicts: []
+      all_node_dicts: [],
+      total_chapters_count: 3,
+      published_chapters_count: 2,
+      overdue_chapters_count: 0,
+      upcoming_chapters_count: 0
     }), StorySummary.createFromBackendDict({
       id: 'storyId2',
       title: 'Story Title2',
@@ -97,7 +101,11 @@ describe('topicEditorStoriesList', () => {
       story_is_published: true,
       completed_node_titles: ['node1'],
       url_fragment: 'story1',
-      all_node_dicts: []
+      all_node_dicts: [],
+      total_chapters_count: 3,
+      published_chapters_count: 3,
+      overdue_chapters_count: 3,
+      upcoming_chapters_count: 0
     })];
   });
 
@@ -206,5 +214,19 @@ describe('topicEditorStoriesList', () => {
     component.openStoryEditor('storyId');
 
     expect(modalSpy).toHaveBeenCalled();
+  });
+
+  it('should return if some chapters are not published', () => {
+    expect(component.areChaptersAwaitingPublication(storySummaries[0])).toBe(
+      true);
+    expect(component.areChaptersAwaitingPublication(storySummaries[1])).toBe(
+      false);
+  });
+
+  it('should return if chapter notifications are empty', () => {
+    expect(component.isChapterNotificationsEmpty(storySummaries[0])).toBe(
+      true);
+    expect(component.isChapterNotificationsEmpty(storySummaries[1])).toBe(
+      false);
   });
 });

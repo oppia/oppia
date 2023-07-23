@@ -74,10 +74,10 @@
           <span *ngIf="summary.getPublishedChaptersCount()!=0 && summary.getPublishedChaptersCount()!=summary.getTotalChaptersCount()">
             Partially Published
           </span>
-          <span *ngIf="summary.getPublishedChaptersCount()==0">
+          <span *ngIf="summary.getPublishedChaptersCount() == 0">
             Not Published
           </span>
-          <span *ngIf="summary.getPublishedChaptersCount()!=0 && summary.getPublishedChaptersCount()==summary.getTotalChaptersCount()">
+          <span *ngIf="summary.getPublishedChaptersCount() != 0 && summary.getPublishedChaptersCount() == summary.getTotalChaptersCount()">
             Fully Published
           </span>
         </a>
@@ -85,25 +85,28 @@
       <td>
         <a (click)="topicRights.canEditTopic() && openStoryEditor(summary.getId())" class="story-list-summary chapter-count text-center">
           <span> {{ summary.getPublishedChaptersCount() }} Published</span>
-          <span *ngIf="summary.getTotalChaptersCount()!=summary.getPublishedChaptersCount()"> {{ summary.getTotalChaptersCount() - summary.getPublishedChaptersCount() }} Awaiting Publication</span>
+          <span *ngIf="areChaptersAwaitingPublication(summary)"> {{ summary.getTotalChaptersCount() - summary.getPublishedChaptersCount() }} Awaiting Publication</span>
         </a>
       </td>
       <td>
         <a (click)="topicRights.canEditTopic() && openStoryEditor(summary.getId())" class="story-list-summary text-left">
-          <span *ngIf="summary.getUpcomingChaptersCount()==1">
-            {{ summary.getUpcomingChaptersCount() }} upcoming launch (next {{ summary.getUpcomingChaptersExpectedDays()[0] }} day)
+          <span *ngIf="summary.getUpcomingChaptersCount() == 1">
+            {{ summary.getUpcomingChaptersCount() }} upcoming launch (next
+            <span *ngIf="summary.getUpcomingChaptersExpectedDays()[0] > 1">{{ summary.getUpcomingChaptersExpectedDays()[0] }} days</span>
+            <span *ngIf="summary.getUpcomingChaptersExpectedDays()[0] == 1">{{ summary.getUpcomingChaptersExpectedDays()[0] }} day</span>
+            )
           </span>
-          <span *ngIf="summary.getUpcomingChaptersCount()>1">
+          <span *ngIf="summary.getUpcomingChaptersCount() > 1">
             {{ summary.getUpcomingChaptersCount() }} upcoming launches (next
             <span *ngFor="let day of summary.getUpcomingChaptersExpectedDays(); index as id">
               {{ day }}
-              <span *ngIf="id!=summary.getUpcomingChaptersExpectedDays().length-1">,</span>
+              <span *ngIf="id != summary.getUpcomingChaptersExpectedDays().length-1">,</span>
             </span>
             days)
           </span>
-          <span *ngIf="summary.getOverdueChaptersCount()==1"> {{ summary.getOverdueChaptersCount() }} launch behind schedule</span>
-          <span *ngIf="summary.getOverdueChaptersCount()>1"> {{ summary.getOverdueChaptersCount() }} launches behind schedule</span>
-          <span *ngIf="!summary.getUpcomingChaptersCount() && !summary.getOverdueChaptersCount()">-</span>
+          <span *ngIf="summary.getOverdueChaptersCount() == 1"> {{ summary.getOverdueChaptersCount() }} launch behind schedule</span>
+          <span *ngIf="summary.getOverdueChaptersCount() > 1"> {{ summary.getOverdueChaptersCount() }} launches behind schedule</span>
+          <span *ngIf="isChapterNotificationsEmpty(summary)">-</span>
         </a>
       </td>
       <td class="delete-story-icon">

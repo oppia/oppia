@@ -184,6 +184,7 @@ class TopicEditorStoryHandler(
                         datetime.datetime.today()):
                         overdue_chapters_count += 1
 
+            upcoming_chapters_expected_days.sort()
             updated_canonical_story_summary_dict = {
                 'id': summary['id'],
                 'title': summary['title'],

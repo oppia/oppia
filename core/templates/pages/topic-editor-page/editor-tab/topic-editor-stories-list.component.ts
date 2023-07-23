@@ -112,6 +112,17 @@ export class TopicEditorStoriesListComponent implements OnInit {
       SerialChapterLaunchCurriculumAdminView.isEnabled;
   }
 
+  areChaptersAwaitingPublication(summary: StorySummary): boolean {
+    return (
+      summary.getTotalChaptersCount() !== summary.getPublishedChaptersCount());
+  }
+
+  isChapterNotificationsEmpty(summary: StorySummary): boolean {
+    return (
+      summary.getUpcomingChaptersCount() === 0 &&
+      summary.getOverdueChaptersCount() === 0);
+  }
+
   ngOnInit(): void {
     if (this.isSerialChapterLaunchFeatureEnabled()) {
       this.STORY_TABLE_COLUMN_HEADINGS = [
