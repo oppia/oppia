@@ -2248,6 +2248,18 @@ class TopicSummaryDict(TypedDict):
     topic_model_last_updated: float
 
 
+class FrontendTopicSummaryDict(TopicSummaryDict):
+    """Dictionary that represents TopicSummary domain object for frontend."""
+
+    is_published: bool
+    can_edit_topic: bool
+    classroom: Optional[str]
+    total_upcoming_chapters_count: int
+    total_overdue_chapters_count: int
+    total_chapters_counts: List[int]
+    published_chapters_counts: List[int]
+
+
 class TopicSummary:
     """Domain object for Topic Summary."""
 

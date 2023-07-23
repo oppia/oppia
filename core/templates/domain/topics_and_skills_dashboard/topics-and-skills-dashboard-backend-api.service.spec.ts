@@ -105,8 +105,8 @@ describe('Topics and Skills Dashboard backend API service', () => {
           additional_story_count: 0,
           topic_model_last_updated: 1623851496406.582,
           thumbnail_filename: 'thumbnail_filename',
-          upcoming_chapters_count: 1,
-          overdue_chapters_count: 1,
+          total_upcoming_chapters_count: 1,
+          total_overdue_chapters_count: 1,
           total_chapters_counts: [5, 4],
           published_chapters_counts: [3, 4]
         },
@@ -130,8 +130,8 @@ describe('Topics and Skills Dashboard backend API service', () => {
           additional_story_count: 0,
           topic_model_last_updated: 1623851737518.369,
           thumbnail_filename: 'thumbnail_filename',
-          upcoming_chapters_count: 1,
-          overdue_chapters_count: 1,
+          total_upcoming_chapters_count: 1,
+          total_overdue_chapters_count: 1,
           total_chapters_counts: [5, 4],
           published_chapters_counts: [3, 4]
         }

@@ -56,8 +56,8 @@ describe('Topic and Skill dashboard page service', () => {
       url_fragment: 'alpha',
       thumbnail_filename: 'image.svg',
       thumbnail_bg_color: '#C6DCDA',
-      upcoming_chapters_count: 1,
-      overdue_chapters_count: 1,
+      total_upcoming_chapters_count: 1,
+      total_overdue_chapters_count: 1,
       total_chapters_counts: [5, 4],
       published_chapters_counts: [3, 4]
     });
@@ -81,8 +81,8 @@ describe('Topic and Skill dashboard page service', () => {
       url_fragment: 'beta',
       thumbnail_filename: 'image.svg',
       thumbnail_bg_color: '#C6DCDA',
-      upcoming_chapters_count: 1,
-      overdue_chapters_count: 1,
+      total_upcoming_chapters_count: 1,
+      total_overdue_chapters_count: 1,
       total_chapters_counts: [5, 4],
       published_chapters_counts: [3, 4]
     });
@@ -106,8 +106,8 @@ describe('Topic and Skill dashboard page service', () => {
       url_fragment: 'gamma',
       thumbnail_filename: 'image.svg',
       thumbnail_bg_color: '#C6DCDA',
-      upcoming_chapters_count: 1,
-      overdue_chapters_count: 1,
+      total_upcoming_chapters_count: 1,
+      total_overdue_chapters_count: 1,
       total_chapters_counts: [5, 4],
       published_chapters_counts: [3, 4]
     });

@@ -57,8 +57,8 @@ describe('Admin backend api service', () => {
         can_edit_topic: true,
         is_published: false,
         url_fragment: '',
-        upcoming_chapters_count: 1,
-        overdue_chapters_count: 1,
+        total_upcoming_chapters_count: 1,
+        total_overdue_chapters_count: 1,
         total_chapters_counts: [5, 4],
         published_chapters_counts: [3, 4]
       }

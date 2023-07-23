@@ -34,8 +34,8 @@ export interface CreatorTopicSummaryBackendDict {
   'topic_model_last_updated': number;
   'can_edit_topic': boolean;
   'is_published': boolean;
-  'upcoming_chapters_count': number;
-  'overdue_chapters_count': number;
+  'total_upcoming_chapters_count': number;
+  'total_overdue_chapters_count': number;
   'total_chapters_counts': number[];
   'published_chapters_counts': number[];
   'url_fragment': string;
@@ -93,8 +93,8 @@ export class CreatorTopicSummary {
       topicSummaryBackendDict.thumbnail_filename,
       topicSummaryBackendDict.thumbnail_bg_color,
       topicSummaryBackendDict.url_fragment,
-      topicSummaryBackendDict.upcoming_chapters_count,
-      topicSummaryBackendDict.overdue_chapters_count,
+      topicSummaryBackendDict.total_upcoming_chapters_count,
+      topicSummaryBackendDict.total_overdue_chapters_count,
       topicSummaryBackendDict.total_chapters_counts,
       topicSummaryBackendDict.published_chapters_counts);
   }

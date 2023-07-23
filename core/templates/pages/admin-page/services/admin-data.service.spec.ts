@@ -58,8 +58,8 @@ describe('Admin Data Service', () => {
         url_fragment: 'topicurlfrag',
         can_edit_topic: false,
         is_published: false,
-        upcoming_chapters_count: 1,
-        overdue_chapters_count: 1,
+        total_upcoming_chapters_count: 1,
+        total_overdue_chapters_count: 1,
         total_chapters_counts: [5, 4],
         published_chapters_counts: [3, 4]
       }

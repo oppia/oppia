@@ -19,7 +19,6 @@ are created.
 from __future__ import annotations
 
 import base64
-import datetime
 
 from core import android_validation_constants
 from core import feconf
@@ -37,24 +36,11 @@ from core.domain import skill_domain
 from core.domain import skill_fetchers
 from core.domain import skill_services
 from core.domain import state_domain
-from core.domain import story_fetchers
 from core.domain import topic_domain
 from core.domain import topic_fetchers
 from core.domain import topic_services
 
 from typing import Dict, List, Optional, TypedDict, Union
-
-
-class FrontendTopicSummaryDict(topic_domain.TopicSummaryDict):
-    """Dictionary that represents TopicSummary domain object for frontend."""
-
-    is_published: bool
-    can_edit_topic: bool
-    classroom: Optional[str]
-    upcoming_chapters_count: int
-    overdue_chapters_count: int
-    total_chapters_counts: List[int]
-    published_chapters_counts: List[int]
 
 
 class TopicsAndSkillsDashboardPage(
@@ -88,7 +74,7 @@ class TopicsAndSkillsDashboardPageDataHandler(
         # the type from the list of 'TopicSummaryDict' to the list of
         # 'FrontendTopicSummaryDict', and this is done because below we
         # are adding new keys that are not defined on the 'TopicSummaryDict'.
-        topic_summary_dicts: List[FrontendTopicSummaryDict] = [
+        topic_summary_dicts: List[topic_domain.FrontendTopicSummaryDict] = [
             summary.to_dict() for summary in topic_summaries]  # type: ignore[misc]
 
         skill_summaries = skill_services.get_all_skill_summaries()
@@ -120,52 +106,13 @@ class TopicsAndSkillsDashboardPageDataHandler(
             for topic_id in classroom['topic_ids']:
                 topic_classroom_dict[topic_id] = classroom['name']
 
-        topic_ids = [summary['id'] for summary in topic_summary_dicts]
-        topics = topic_fetchers.get_topics_by_ids(topic_ids)
-        for topic in topics:
-            if topic is None:
-                continue
-            topic_summary_dict = next(
-                topic_summary for topic_summary in topic_summary_dicts
-                if topic_summary['id'] == topic.id)
+        for topic_summary_dict in topic_summary_dicts:
             topic_summary_dict['classroom'] = topic_classroom_dict.get(
                 topic_summary_dict['id'], None)
-            upcoming_chapters_count = 0
-            overdue_chapters_count = 0
-            total_chapters_counts = []
-            published_chapters_counts = []
-            story_ids = [story_reference.story_id for story_reference in
-                topic.canonical_story_references]
-            stories = story_fetchers.get_stories_by_ids(story_ids)
-            for story in stories:
-                if story is None:
-                    continue
-                nodes = story.story_contents.nodes
-                total_chapters_count = len(nodes)
-                published_chapters_count = 0
-                for node in nodes:
-                    if node.status == constants.STORYNODE_STATUS_PUBLISHED:
-                        published_chapters_count += 1
-                    if (node.status != constants.STORYNODE_STATUS_PUBLISHED and
-                        node.planned_publication_date is not None):
-                        if ((node.planned_publication_date - datetime.datetime.
-                            today()).days < 14 and node.
-                            planned_publication_date >
-                            datetime.datetime.today()):
-                            upcoming_chapters_count += 1
-                        if (node.planned_publication_date <
-                            datetime.datetime.today()):
-                            overdue_chapters_count += 1
 
-                total_chapters_counts.append(total_chapters_count)
-                published_chapters_counts.append(published_chapters_count)
-
-            topic_summary_dict.update({
-                'upcoming_chapters_count': upcoming_chapters_count,
-                'overdue_chapters_count': overdue_chapters_count,
-                'total_chapters_counts': total_chapters_counts,
-                'published_chapters_counts': published_chapters_counts
-            })
+        updated_topic_summary_dicts = (
+            topic_services.update_chapters_counts_in_topic_summaries(
+                topic_summary_dicts))
 
         mergeable_skill_summary_dicts = []
 
@@ -201,7 +148,7 @@ class TopicsAndSkillsDashboardPageDataHandler(
                 for skill_summary in untriaged_skill_summaries
             ],
             'mergeable_skill_summary_dicts': mergeable_skill_summary_dicts,
-            'topic_summary_dicts': topic_summary_dicts,
+            'topic_summary_dicts': updated_topic_summary_dicts,
             'total_skill_count': len(skill_summary_dicts),
             'all_classroom_names': all_classroom_names,
             'can_delete_topic': can_delete_topic,

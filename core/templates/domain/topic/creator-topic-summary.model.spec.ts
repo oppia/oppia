@@ -42,8 +42,8 @@ describe('Creator topic summary model', () => {
       thumbnail_bg_color: '#C6DCDA',
       is_published: false,
       can_edit_topic: false,
-      upcoming_chapters_count: 1,
-      overdue_chapters_count: 1,
+      total_upcoming_chapters_count: 1,
+      total_overdue_chapters_count: 1,
       total_chapters_counts: [2],
       published_chapters_counts: [1]
     };

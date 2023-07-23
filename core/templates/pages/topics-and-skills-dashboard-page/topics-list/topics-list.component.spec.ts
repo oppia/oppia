@@ -265,8 +265,9 @@ describe('Topics List Component', () => {
     expect(alertsService.addWarning).toHaveBeenCalledWith('error_message');
   });
 
-  it('should update the displayed topics on applying filters', () => {
-    let topic1 = CreatorTopicSummary.createFromBackendDict({
+  it('should update the chapter counts upon changing the input topic ' +
+    'summaries', () => {
+    let topic = CreatorTopicSummary.createFromBackendDict({
       topic_model_created_on: 1581839432987.596,
       uncategorized_skill_count: 0,
       canonical_story_count: 1,
@@ -286,12 +287,12 @@ describe('Topics List Component', () => {
       url_fragment: 'alpha',
       thumbnail_filename: 'image.svg',
       thumbnail_bg_color: '#C6DCDA',
-      upcoming_chapters_count: 1,
-      overdue_chapters_count: 1,
+      total_upcoming_chapters_count: 1,
+      total_overdue_chapters_count: 1,
       total_chapters_counts: [5, 4],
       published_chapters_counts: [3, 4]
     });
-    componentInstance.topicSummaries = [topic1];
+    componentInstance.topicSummaries = [topic];
 
     componentInstance.ngOnChanges();
 

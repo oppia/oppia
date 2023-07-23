@@ -19,6 +19,7 @@
 from __future__ import annotations
 
 import collections
+import datetime
 import logging
 
 from core import feconf
@@ -1686,3 +1687,70 @@ def get_topic_id_to_topic_name_dict(topic_ids: List[str]) -> Dict[str, str]:
         )
         raise Exception(error_msg)
     return topic_id_to_topic_name
+
+
+def update_chapters_counts_in_topic_summaries(
+    topic_summary_dicts: List[topic_domain.FrontendTopicSummaryDict]
+) -> List[topic_domain.FrontendTopicSummaryDict]:
+    """Returns topic summary dicts after updating chapter counts in them.
+
+    Args:
+        topic_summary_dicts: List[FrontendTopicSummaryDict]. A list of
+            topic summary dicts to be updated with chapter counts.
+
+    Returns:
+        List[FrontendTopicSummaryDict]. List of updated topic summary dicts.
+    """
+    topic_ids = [summary['id'] for summary in topic_summary_dicts]
+    topics = topic_fetchers.get_topics_by_ids(topic_ids)
+    total_story_ids: List[str] = []
+    for topic in topics:
+        if topic:
+            story_ids = [story_reference.story_id for
+                story_reference in topic.canonical_story_references]
+            total_story_ids = total_story_ids + story_ids
+    total_stories = story_fetchers.get_stories_by_ids(total_story_ids)
+    for topic in topics:
+        if topic is None:
+            continue
+        topic_summary_dict = next(
+            topic_summary for topic_summary in topic_summary_dicts
+            if topic_summary['id'] == topic.id)
+        upcoming_chapters_count = 0
+        overdue_chapters_count = 0
+        total_chapters_counts = []
+        published_chapters_counts = []
+        stories = [story for story in total_stories if story and
+            story.corresponding_topic_id == topic.id]
+        for story in stories:
+            nodes = story.story_contents.nodes
+            total_chapters_count = len(nodes)
+            published_chapters_count = 0
+            for node in nodes:
+                if node.status == constants.STORY_NODE_STATUS_PUBLISHED:
+                    published_chapters_count += 1
+                elif node.planned_publication_date is not None:
+                    chapter_is_upcoming = (
+                        node.planned_publication_date - datetime.datetime.
+                        today()).days < 14 and (
+                        node.planned_publication_date > datetime.datetime.
+                        today())
+                    chapter_is_behind_schedule = (
+                        node.planned_publication_date < datetime.datetime.
+                        today())
+                    if chapter_is_upcoming:
+                        upcoming_chapters_count += 1
+                    if chapter_is_behind_schedule:
+                        overdue_chapters_count += 1
+
+            total_chapters_counts.append(total_chapters_count)
+            published_chapters_counts.append(published_chapters_count)
+
+        topic_summary_dict.update({
+            'total_upcoming_chapters_count': upcoming_chapters_count,
+            'total_overdue_chapters_count': overdue_chapters_count,
+            'total_chapters_counts': total_chapters_counts,
+            'published_chapters_counts': published_chapters_counts
+        })
+
+    return topic_summary_dicts
