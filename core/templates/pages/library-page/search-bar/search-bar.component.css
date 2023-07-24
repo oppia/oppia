@@ -50,6 +50,28 @@ oppia-search-bar .oppia-navbar-button-container {
   padding: 4px 21px 8px 21px;
 }
 
+.oppia-same-row-container .dropdown-toggle::after {
+  border: solid #205d86;
+  border-width: 0 3px 3px 0;
+  display: inline-block;
+  padding: 3px;
+  position: relative;
+  top: 2px;
+  transform: rotate(45deg);
+  -webkit-transform: rotate(45deg);
+}
+
+.oppia-same-row-container .dropup .dropdown-toggle::after {
+  border: solid #205d86;
+  border-width: 0 3px 3px 0;
+  display: inline-block;
+  padding: 3px;
+  position: relative;
+  top: 5px;
+  transform: rotate(-135deg);
+  -webkit-transform: rotate(-135deg);
+}
+
 .oppia-search-button:hover {
   cursor: pointer;
 }
@@ -91,20 +113,7 @@ oppia-search-bar .oppia-navbar-button-container {
   outline: auto 5px -webkit-focus-ring-color;
 }
 
-/* .oppia-search-bar-input::-webkit-input-placeholder {
-  color: #333;
-}
-.oppia-search-bar-input::-moz-placeholder {
-  color: #333;
-}
-.oppia-search-bar-input:-moz-placeholder {
-  color: #333;
-}
-.oppia-search-bar-input:-ms-input-placeholder {
-  color: #333;
-} */
 oppia-search-bar .oppia-input-group {
-  /* max-width: 375px; */
   width: 52.5em;
 }
 
@@ -132,10 +141,6 @@ oppia-search-bar .oppia-input-group {
   margin-left: 8px;
 }
 
-/* @media (max-width: 1125px) { */
-/* .btn-text {
-    color: #205d86;
-  } */
 .oppia-search-bar-input {
   color: #333;
 }
@@ -173,13 +178,9 @@ oppia-search-bar .oppia-input-group {
   color: #333;
 }
 
-/* } */
 
 @media (max-width: 639px) {
 
-  /* .btn-text {
-    color: #333;
-  } */
   .oppia-search-bar-input {
     color: #333;
     padding-top: 17px;
@@ -189,6 +190,16 @@ oppia-search-bar .oppia-input-group {
   .oppia-search-bar-input {
     border-radius: 0;
     height: 40px;
+  }
+
+  .oppia-same-row-container .dropdown-toggle::after {
+   position: relative;
+   top: -2px;
+  }
+  
+  .oppia-same-row-container .dropup .dropdown-toggle::after {
+    position: relative;
+    top:1px;
   }
 
   .oppia-search-button {
@@ -202,11 +213,6 @@ oppia-search-bar .oppia-input-group {
   }
 
   .oppia-search-bar-form .input-group .oppia-search-bar-text-input {
-    /* border: 1px solid #205d86;
-    border-bottom-left-radius: 4px;
-    border-bottom-right-radius: 0;
-    border-top-left-radius: 4px;
-    border-top-right-radius: 0; */
     height: 40px;
     padding-top: 8px;
   }
@@ -215,24 +221,10 @@ oppia-search-bar .oppia-input-group {
     margin-left: -4.5vw;
   }
 
-  /* .oppia-search-bar-input::-webkit-input-placeholder {
-    color: #999;
-  }
-  .oppia-search-bar-input::-moz-placeholder {
-    color: #999;
-  }
-  .oppia-search-bar-input:-moz-placeholder {
-    color: #999;
-  }
-  .oppia-search-bar-input:-ms-input-placeholder {
-    color: #999;
-  } */
   .oppia-search-bar-input.btn {
-    /* background-color: #205d86; */
     border: 1px solid #205d86;
-    /* border-radius: 10px; */
-    /* color: #fff; */
     height: 40px;
+    justify-content: space-around;
     margin-top: -60px;
     max-width: none;
     padding: 8px 7px 0 6px;
@@ -242,7 +234,6 @@ oppia-search-bar .oppia-input-group {
 
   .oppia-search-bar-input.btn:hover,
   .oppia-search-bar-input.btn:focus {
-    /* color: #fff; */
     color: #333;
   }
 
@@ -292,7 +283,6 @@ oppia-search-bar .oppia-input-group {
 
   .oppia-search-bar-dropdown-toggle-button {
     display: flex;
-    /* justify-content: space-between; */
   }
 
   .oppia-search-bar-dropdown-toggle-button::after {
@@ -316,7 +306,6 @@ oppia-search-bar .oppia-input-group {
     color: #205d86;
     font-size: 24px;
     left: 123px;
-    /* margin-top: 2px; */
     position: relative;
   }
 
@@ -373,11 +362,6 @@ oppia-search-bar .oppia-input-group {
   }
 }
 
-/* @media (max-width: 1023px) {
-  oppia-search-bar .oppia-input-group {
-    width: em;
-  }
-} */
 @media (max-width: 629px) {
   .oppia-search-bar-category-selector {
     position: relative;

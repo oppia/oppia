@@ -30,7 +30,6 @@
             type="button"
             class="btn e2e-test-search-bar-dropdown-toggle oppia-search-bar-dropdown-toggle oppia-search-bar-input oppia-search-bar-category-input dropdown-toggle"
             title="{{ selectionDetails.categories.description | translate }}">
-      <i *ngIf="isMobileViewActive()" class="fas far fa-angle-down category-selector-icon"></i>
       <span class="btn-text">
         {{ categoryButtonText | truncate:14 }}
       </span>
@@ -90,7 +89,6 @@
             type="button"
             class="btn e2e-test-search-bar-dropdown-toggle oppia-search-bar-input oppia-search-bar-language-input dropdown-toggle language-dropdown-toggle oppia-search-bar-dropdown-toggle-button"
             title="{{selectionDetails.languageCodes.description | translate}}">
-      <i *ngIf="isMobileViewActive()" class="fas far fa-angle-down language-selector-icon"></i>
       <span class="btn-text">
         {{ languageButtonText | truncate:14 }}
       </span>
