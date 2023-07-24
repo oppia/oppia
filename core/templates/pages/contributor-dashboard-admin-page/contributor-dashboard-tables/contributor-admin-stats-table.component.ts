@@ -30,7 +30,7 @@ import { QuestionReviewerStats, QuestionSubmitterStats, TranslationReviewerStats
 
 @Component({
   selector: 'contributor-admin-stats-table',
-  templateUrl: './contributor-admin-stats-table.html',
+  templateUrl: './contributor-admin-stats-table.component.html',
   animations: [
     trigger('detailExpand', [
       state('collapsed', style({height: '0px', minHeight: '0'})),
@@ -46,8 +46,8 @@ import { QuestionReviewerStats, QuestionSubmitterStats, TranslationReviewerStats
       transition('collapsed => expanded', animate('200ms ease-in')),
     ]),
     trigger('mobileChevronExpand', [
-      state('expanded', style({ transform: 'rotate(90deg)' })),
-      state('collapsed', style({ transform: 'rotate(-90deg)' })),
+      state('expanded', style({ transform: 'rotate(-90deg)' })),
+      state('collapsed', style({ transform: 'rotate(90deg)' })),
       transition('expanded => collapsed', animate('200ms ease-out')),
       transition('collapsed => expanded', animate('200ms ease-in')),
     ]),

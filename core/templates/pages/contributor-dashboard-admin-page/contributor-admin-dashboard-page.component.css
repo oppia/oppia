@@ -66,6 +66,10 @@
     display: flex;
     justify-content: space-around;
     align-items: baseline;
+    width: 960px;
+  }
+  .oppia-dashboard-container {
+    max-width: 960px;
   }
   
   @media(max-width: 815px) {
@@ -194,7 +198,14 @@
     text-align: center;
   }
 
-  @media only screen and (max-width: 830px) {
+  @media only screen and (max-width: 800px) {
+
+    .oppia-dashboard-container {
+      max-width: 400px;
+    }
+    .mat-card.oppia-mat-card {
+      width: 380px;
+    }
      .dashboard-tabs {
       box-shadow: 0 0 5px #333;
       display: flex;
