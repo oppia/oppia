@@ -7092,6 +7092,6 @@ export default {
   ],
   "CONTRIBUTOR_CERTIFICATE_WIDTH": 1493,
   "CONTRIBUTOR_CERTIFICATE_HEIGHT": 1313,
-  "BRANCH_NAME": "newsletter-ftr-redesign-18648",
-  "SHORT_COMMIT_HASH": "1e3cea52c2"
+  "BRANCH_NAME": "",
+  "SHORT_COMMIT_HASH": ""
 } as const;

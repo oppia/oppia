@@ -137,4 +137,22 @@ describe('OppiaFooterComponent', () => {
         'Sorry, an unexpected error occurred. Please email admin@oppia.org ' +
         'to be added to the mailing list.', 10000);
     }));
+
+  it('should reject request to the mailing list correctly',
+    fakeAsync(() => {
+      spyOn(alertsService, 'addInfoMessage');
+      tick();
+      component.emailAddress = 'validEmail@example.com';
+      component.name = 'validName';
+      spyOn(mailingListBackendApiService, 'subscribeUserToMailingList')
+        .and.returnValue(Promise.reject(false));
+
+      component.subscribeToMailingList();
+
+      flushMicrotasks();
+
+      expect(alertsService.addInfoMessage).toHaveBeenCalledWith(
+        'Sorry, an unexpected error occurred. Please email admin@oppia.org ' +
+        'to be added to the mailing list.', 10000);
+    }));
 });
