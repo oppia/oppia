@@ -292,7 +292,7 @@ export class GraphVizComponent implements OnInit, AfterViewInit {
       this.vizContainer[0].getScreenCTM().inverse());
     this.state.mouseX = svgp.x;
     this.state.mouseY = svgp.y;
-    // The condition: currentMode === 2 signifies that
+    // The condition `currentMode === 2` signifies that
     // the "add node" option in the graph is active.
     if (this.state.currentMode === 2) {
       const dot = document.querySelector(
