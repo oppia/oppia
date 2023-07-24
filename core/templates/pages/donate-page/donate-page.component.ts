@@ -31,7 +31,7 @@ import { WindowRef } from 'services/contextual/window-ref.service';
 import 'popper.js';
 import 'bootstrap';
 import { ThanksForDonatingModalComponent } from './thanks-for-donating-modal.component';
-
+import { InsertScriptService, KNOWN_SCRIPTS } from 'services/insert-script.service';
 @Component({
   selector: 'donate-page',
   templateUrl: './donate-page.component.html',
@@ -51,10 +51,12 @@ export class DonatePageComponent implements OnInit, OnDestroy {
     private windowDimensionService: WindowDimensionsService,
     private windowRef: WindowRef,
     private translateService: TranslateService,
-    private ngbModal: NgbModal
+    private ngbModal: NgbModal,
+    private insertScriptService: InsertScriptService,
   ) {}
 
   ngOnInit(): void {
+    this.insertScriptService.loadScript(KNOWN_SCRIPTS.DONORBOX);
     this.windowIsNarrow = this.windowDimensionService.isWindowNarrow();
     this.donateImgUrl = this.getStaticImageUrl('/general/opp_donate_text.svg');
     this.directiveSubscriptions.add(
