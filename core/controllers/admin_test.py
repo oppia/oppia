@@ -33,7 +33,6 @@ from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import fs_services
 from core.domain import opportunity_services
-from core.domain import platform_feature_services
 from core.domain import platform_parameter_domain
 from core.domain import platform_parameter_registry
 from core.domain import question_fetchers

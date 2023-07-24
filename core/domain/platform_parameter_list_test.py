@@ -87,7 +87,10 @@ class ExistingPlatformParameterValidityTests(test_utils.GenericTestBase):
         EXPECTED_PARAM_NAMES list as well.
         """
         self.assertEqual(
-            len(platform_parameter_registry.Registry.get_all_platform_parameter_names()),
+            len(
+                platform_parameter_registry.Registry.
+                get_all_platform_parameter_names()
+            ),
             len(self.EXPECTED_PARAM_NAMES))
 
     def test_all_expected_parameters_are_present_in_registry(self) -> None:

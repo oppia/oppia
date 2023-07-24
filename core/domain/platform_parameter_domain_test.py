@@ -24,7 +24,6 @@ import enum
 from core import feconf
 from core import platform_feature_list
 from core import utils
-from core.domain import platform_feature_services
 from core.domain import platform_parameter_domain as parameter_domain
 from core.tests import test_utils
 
