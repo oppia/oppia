@@ -29,6 +29,7 @@
             </div>
             <div *ngFor="let item of items"
                  class="child-dnd-item-box"
+                 tabindex="0"
                  [ngClass]="{'highlight-group': idx === highlightedGroup}"
                  cdkDrag>
               <div class="child-dnd-placeholder" *cdkDragPlaceholder></div>
@@ -43,7 +44,13 @@
          class="child-dnd-single-item"
          (cdkDropListDropped)="dropItemInSameList($event)"
          cdkDropList>
-      <div class="child-dnd-item-box" *ngFor="let item of singleItemInSamePositionArray" cdkDrag>
+      <div tabindex="0"
+           class="child-dnd-item-box"
+           *ngFor="let item of singleItemInSamePositionArray; let i = index"
+           cdkDrag
+           role="listitem"
+           #listItem
+           (keydown)="handleKeyDown($event, i)">
         <div class="child-dnd-single-item-placeholder" *cdkDragPlaceholder></div>
         <oppia-rte-output-display [rteString]="item"></oppia-rte-output-display>
       </div>
@@ -75,6 +82,10 @@
 
   .drag-and-drop-sort-container {
     border: 1px solid #000;
+  }
+
+  .drag-and-drop-sort-container:focus {
+    outline: 1px solid #000;
   }
 
   .cdk-drag-placeholder {
@@ -119,6 +130,10 @@
 
   .child-dnd.cdk-drop-list-dragging .child-dnd-item-box:not(.cdk-drag-placeholder) {
     transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+  }
+
+  .child-dnd-item-box:hover {
+    outline: 1px solid #000;
   }
 
   .child-dnd-border {
