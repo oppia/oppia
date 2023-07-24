@@ -92,6 +92,7 @@ import { ReadOnlyExplorationBackendApiService } from 'domain/exploration/read-on
 import { StateInteractionStatsBackendApiService } from 'domain/exploration/state-interaction-stats-backend-api.service';
 import { StatsReportingBackendApiService } from 'domain/exploration/stats-reporting-backend-api.service';
 import { FeedbackThreadObjectFactory } from 'domain/feedback_thread/FeedbackThreadObjectFactory';
+import { FeedbackUpdatesBackendApiService } from 'domain/feedback_updates/feedback-updates-backend-api.service';
 import { LearnerDashboardActivityBackendApiService} from 'domain/learner_dashboard/learner-dashboard-activity-backend-api.service';
 import { LearnerDashboardBackendApiService } from 'domain/learner_dashboard/learner-dashboard-backend-api.service';
 import { LearnerDashboardIdsBackendApiService } from 'domain/learner_dashboard/learner-dashboard-ids-backend-api.service';
@@ -440,7 +441,7 @@ import { DiagnosticTestPlayerEngineService } from 'pages/exploration-player-page
 import { DiagnosticTestPlayerStatusService } from 'pages/diagnostic-test-player-page/diagnostic-test-player-status.service';
 import { RteHelperService } from 'services/rte-helper.service';
 import { HtmlLengthService } from 'services/html-length.service';
-
+import { InsertScriptService } from './insert-script.service';
 export const angularServices: [string, Type<{}>][] = [
   ['AccessValidationBackendApiService', AccessValidationBackendApiService],
   ['AdminBackendApiService', AdminBackendApiService],
@@ -611,6 +612,7 @@ export const angularServices: [string, Type<{}>][] = [
     FatigueDetectionService],
   ['FeedbackPopupBackendApiService', FeedbackPopupBackendApiService],
   ['FeedbackThreadObjectFactory', FeedbackThreadObjectFactory],
+  ['FeedbackUpdatesBackendApiService', FeedbackUpdatesBackendApiService],
   ['FilterForMatchingSubstringPipe', FilterForMatchingSubstringPipe],
   ['FocusManagerService', FocusManagerService],
   ['FormatTimePipe', FormatTimePipe],
@@ -915,5 +917,6 @@ export const angularServices: [string, Type<{}>][] = [
   ['VersionHistoryService', VersionHistoryService],
   ['VoiceoverRecordingService', VoiceoverRecordingService],
   ['RteHelperService', RteHelperService],
-  ['HtmlLengthService', HtmlLengthService]
+  ['HtmlLengthService', HtmlLengthService],
+  ['InsertScriptService', InsertScriptService],
 ];

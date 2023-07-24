@@ -2367,7 +2367,7 @@ def compute_exploration_contributors_summary(
     while True:
         snapshot_metadata = snapshots_metadata[current_version - 1]
         committer_id = snapshot_metadata['committer_id']
-        is_revert = (snapshot_metadata['commit_type'] == 'revert')
+        is_revert = snapshot_metadata['commit_type'] == 'revert'
         if not is_revert and committer_id not in constants.SYSTEM_USER_IDS:
             contributors_summary[committer_id] += 1
         if current_version == 1:
