@@ -24,7 +24,7 @@ from typing import List
 
 ParamNames = params.ParamNames
 
-# Names of feature objects defined in domain/platform_parameter_list.py
+# Names of feature objects defined in domain/params.py
 # should be added to one of the following lists:
 #   - DEV_FEATURES_LIST
 #   - TEST_FEATURES_LIST
@@ -72,4 +72,25 @@ PROD_FEATURES_LIST: List[ParamNames] = [
 # completed and no longer gated because their functionality is permanently
 # built into the codebase.
 DEPRECATED_FEATURE_NAMES: List[ParamNames] = [
+]
+
+ALL_PLATFORM_PARAMS_EXCEPT_FEATURE_FLAGS: List[ParamNames] = [
+    params.ParamNames.ALWAYS_ASK_LEARNERS_FOR_ANSWER_DETAILS,
+    params.ParamNames.CONTRIBUTOR_DASHBOARD_REVIEWER_EMAILS_IS_ENABLED,
+    params.ParamNames.DUMMY_PARAMETER,
+    params.ParamNames.ENABLE_ADMIN_NOTIFICATIONS_FOR_REVIEWER_SHORTAGE,
+    params.ParamNames.ENABLE_ADMIN_NOTIFICATIONS_FOR_SUGGESTIONS_NEEDING_REVIEW,
+    (
+        params.ParamNames.
+        HIGH_BOUNCE_RATE_TASK_STATE_BOUNCE_RATE_CREATION_THRESHOLD
+    ),
+    (
+        params.ParamNames.
+        HIGH_BOUNCE_RATE_TASK_STATE_BOUNCE_RATE_OBSOLETION_THRESHOLD
+    ),
+    params.ParamNames.HIGH_BOUNCE_RATE_TASK_MINIMUM_EXPLORATION_STARTS,
+    params.ParamNames.MAX_NUMBER_OF_TAGS_ASSIGNED_TO_BLOG_POST,
+    params.ParamNames.MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER,
+    params.ParamNames.PROMO_BAR_ENABLED,
+    params.ParamNames.PROMO_BAR_MESSAGE,
 ]

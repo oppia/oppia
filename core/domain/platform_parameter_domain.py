@@ -23,6 +23,7 @@ import json
 import re
 
 from core import feconf
+from core import platform_feature_list
 from core import utils
 from core.constants import constants
 from core.domain import change_domain
@@ -806,15 +807,9 @@ class PlatformParameter:
             raise utils.ValidationError(
                 'Unsupported data type \'%s\'.' % self._data_type)
 
-        # We need to add the import here as adding at the top results in
-        # circular-import-error. We have to add the pylint-disable here as
-        # we cannot import services files to the domain layer but for the
-        # validation purpose we require the complete list of platform params
-        # and that is present in the platform_feature_services file.
-        from core.domain import platform_feature_services # pylint: disable=invalid-import-from # isort:skip
         all_platform_params_names = [
             param.value
-            for param in platform_feature_services.
+            for param in platform_feature_list.
             ALL_PLATFORM_PARAMS_EXCEPT_FEATURE_FLAGS
         ]
         if (

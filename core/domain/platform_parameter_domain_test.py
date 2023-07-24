@@ -22,6 +22,7 @@ import collections
 import enum
 
 from core import feconf
+from core import platform_feature_list
 from core import utils
 from core.domain import platform_feature_services
 from core.domain import platform_parameter_domain as parameter_domain
@@ -2131,7 +2132,7 @@ class PlatformParameterTests(test_utils.GenericTestBase):
             'feature_stage': 'dev',
         })
         swap_platform_params_list = self.swap(
-            platform_feature_services,
+            platform_feature_list,
             'ALL_PLATFORM_PARAMS_EXCEPT_FEATURE_FLAGS',
             [DummyParamNames.PARAMETER_A]
         )

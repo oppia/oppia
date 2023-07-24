@@ -21,6 +21,7 @@ import enum
 import logging
 
 from core import feconf
+from core import platform_feature_list
 from core import utils
 from core.constants import constants
 from core.domain import blog_services
@@ -868,7 +869,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
                 platform_parameter_domain.DataTypes.BOOL)
         )
         with self.swap(
-            platform_feature_services,
+            platform_feature_list,
             'ALL_PLATFORM_PARAMS_EXCEPT_FEATURE_FLAGS',
             [ParamNames.TEST_PARAMETER_1]
         ):
@@ -903,7 +904,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         ]
 
         with self.swap(
-            platform_feature_services,
+            platform_feature_list,
             'ALL_PLATFORM_PARAMS_EXCEPT_FEATURE_FLAGS',
             [ParamNames.TEST_PARAMETER_1]
         ):
@@ -951,7 +952,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         ]
 
         with self.swap(
-            platform_feature_services,
+            platform_feature_list,
             'ALL_PLATFORM_PARAMS_EXCEPT_FEATURE_FLAGS',
             [ParamNames.TEST_PARAMETER_1]
         ):
@@ -995,7 +996,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         ]
 
         with self.swap(
-            platform_feature_services,
+            platform_feature_list,
             'ALL_PLATFORM_PARAMS_EXCEPT_FEATURE_FLAGS',
             [ParamNames.TEST_PARAMETER_1]
         ):

@@ -41,7 +41,6 @@ from core import platform_feature_list
 from core import utils
 from core.constants import constants
 from core.domain import platform_parameter_domain
-from core.domain import platform_parameter_list
 from core.domain import platform_parameter_registry as registry
 
 from typing import Dict, Final, List, Set
@@ -55,50 +54,6 @@ ALL_FEATURE_FLAGS: List[platform_feature_list.ParamNames] = (
 ALL_FEATURES_NAMES_SET: Set[str] = set(
     feature.value for feature in ALL_FEATURE_FLAGS
 )
-
-ALL_PLATFORM_PARAMS_EXCEPT_FEATURE_FLAGS: List[
-    platform_parameter_list.ParamNames
-] = [
-        (
-            platform_parameter_list.ParamNames.
-            ALWAYS_ASK_LEARNERS_FOR_ANSWER_DETAILS
-        ),
-        (
-            platform_parameter_list.ParamNames.
-            CONTRIBUTOR_DASHBOARD_REVIEWER_EMAILS_IS_ENABLED
-        ),
-        platform_parameter_list.ParamNames.DUMMY_PARAMETER,
-        (
-            platform_parameter_list.ParamNames.
-            ENABLE_ADMIN_NOTIFICATIONS_FOR_REVIEWER_SHORTAGE
-        ),
-        (
-            platform_parameter_list.ParamNames.
-            ENABLE_ADMIN_NOTIFICATIONS_FOR_SUGGESTIONS_NEEDING_REVIEW
-        ),
-        (
-            platform_parameter_list.ParamNames.
-            HIGH_BOUNCE_RATE_TASK_STATE_BOUNCE_RATE_CREATION_THRESHOLD
-        ),
-        (
-            platform_parameter_list.ParamNames.
-            HIGH_BOUNCE_RATE_TASK_STATE_BOUNCE_RATE_OBSOLETION_THRESHOLD
-        ),
-        (
-            platform_parameter_list.ParamNames.
-            HIGH_BOUNCE_RATE_TASK_MINIMUM_EXPLORATION_STARTS
-        ),
-        (
-            platform_parameter_list.ParamNames.
-            MAX_NUMBER_OF_TAGS_ASSIGNED_TO_BLOG_POST
-        ),
-        (
-            platform_parameter_list.ParamNames.
-            MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER
-        ),
-        platform_parameter_list.ParamNames.PROMO_BAR_ENABLED,
-        platform_parameter_list.ParamNames.PROMO_BAR_MESSAGE,
-    ]
 
 DATA_TYPE_TO_SCHEMA_TYPE: Dict[str, str] = {
     'number': 'float',
@@ -170,7 +125,8 @@ def get_all_platform_parameters_except_feature_flag_dicts() -> List[
     """
     return [
         registry.Registry.get_platform_parameter(_plat_param.value).to_dict()
-        for _plat_param in ALL_PLATFORM_PARAMS_EXCEPT_FEATURE_FLAGS
+        for _plat_param in platform_feature_list.
+        ALL_PLATFORM_PARAMS_EXCEPT_FEATURE_FLAGS
     ]
 
 

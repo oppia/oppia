@@ -21,6 +21,7 @@ from __future__ import annotations
 import enum
 
 from core import feconf
+from core import platform_feature_list
 from core.constants import constants
 from core.domain import caching_services
 from core.domain import platform_feature_services as feature_services
@@ -154,7 +155,7 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
             feature_services.ALL_FEATURES_NAMES_SET
         )
         self.original_parameter_list = (
-            feature_services.ALL_PLATFORM_PARAMS_EXCEPT_FEATURE_FLAGS)
+            platform_feature_list.ALL_PLATFORM_PARAMS_EXCEPT_FEATURE_FLAGS)
         # Here we use MyPy ignore because the expected type of ALL_FEATURE_FLAGS
         # is a list of 'PARAM_NAMES' Enum, but here for testing purposes we are
         # providing a list of 'ParamNames' enums, which causes MyPy to throw an
@@ -167,7 +168,7 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
         # Enum, but here for testing purposes we are providing a list of
         # 'ParamNames' enums, which causes MyPy to throw an 'Incompatible types
         # in assignment' error. Thus to avoid the error, we used ignore here.
-        feature_services.ALL_PLATFORM_PARAMS_EXCEPT_FEATURE_FLAGS = (
+        platform_feature_list.ALL_PLATFORM_PARAMS_EXCEPT_FEATURE_FLAGS = (
             param_name_enums) # type: ignore[assignment]
 
     def tearDown(self) -> None:
@@ -175,7 +176,7 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
         feature_services.ALL_FEATURE_FLAGS = self.original_feature_list
         feature_services.ALL_FEATURES_NAMES_SET = (
             self.original_feature_name_set)
-        feature_services.ALL_PLATFORM_PARAMS_EXCEPT_FEATURE_FLAGS = (
+        platform_feature_list.ALL_PLATFORM_PARAMS_EXCEPT_FEATURE_FLAGS = (
             self.original_parameter_list)
         registry.Registry.parameter_registry = self.original_parameter_registry
 
@@ -448,7 +449,7 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
         feature_services.ALL_FEATURE_FLAGS = self.original_feature_list
         feature_services.ALL_FEATURES_NAMES_SET = (
             self.original_feature_name_set)
-        feature_services.ALL_PLATFORM_PARAMS_EXCEPT_FEATURE_FLAGS = (
+        platform_feature_list.ALL_PLATFORM_PARAMS_EXCEPT_FEATURE_FLAGS = (
             self.original_parameter_list)
         registry.Registry.parameter_registry = self.original_parameter_registry
         all_params_name = registry.Registry.get_all_platform_parameter_names()
@@ -456,7 +457,9 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
             feature.value for feature in feature_services.ALL_FEATURE_FLAGS]
         all_params_except_features_names_list = [
             params.value
-            for params in feature_services.ALL_PLATFORM_PARAMS_EXCEPT_FEATURE_FLAGS]
+            for params in platform_feature_list.
+            ALL_PLATFORM_PARAMS_EXCEPT_FEATURE_FLAGS
+        ]
         self.assertEqual(
             len(all_params_name),
             (
