@@ -1,8 +1,8 @@
 .oppia-carousel-bar .oppia-carousel-heading {
-color: #333;
-font-family: Roboto;
-font-style: normal;
-font-weight: 500;
+  color: #333;
+  font-family: Roboto,sans-serif;
+  font-style: normal;
+  font-weight: 500;
 }
 
 .oppia-carousel-bar .oppia-carousel-content {
@@ -36,23 +36,23 @@ font-weight: 500;
 }
 
 .oppia-carousel-bar .oppia-carousel-scroller {
+  align-items: center;
   border-radius: 4px;
   color: white;
   cursor: pointer;
   display: flex;
-  justify-content: center;
-  align-items: center;
   float: left;
   height: 24px;
+  justify-content: center;
   outline: none !important;
-  width: 24px;
   padding: 0;
   position: relative;
+  width: 24px;
 }
 
 .oppia-carousel-bar .oppia-horizontal-line {
-  border: 1px solid #00645C;
-  margin: 2px 0px 12px;
+  border: 1px solid #00645c;
+  margin: 2px 0 12px;
   width: 100%;
 }
 

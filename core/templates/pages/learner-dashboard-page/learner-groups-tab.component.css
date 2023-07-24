@@ -12,10 +12,10 @@
 }
 
 .learner-groups-tab .oppia-learner-groups-buttons {
-  display: flex;
-  justify-content: flex-end;
   align-items: center;
+  display: flex;
   gap: 11px;
+  justify-content: flex-end;
 }
 
 .learner-groups-tab .invited-to-learner-groups-section {
@@ -34,9 +34,9 @@
 }
 
 .learner-groups-tab .learner-groups-section-heading {
-  color: #205D86;
-  font-size: 24px;
+  color: #205d86;
   font-family: Capriola,Roboto,Arial,sans-serif;
+  font-size: 24px;
   margin: 0 0 24px 0;
 }
 
@@ -52,7 +52,7 @@
 
 .learner-groups-tab .oppia-learner-group-summary-card {
   align-items: center;
-  background: #F2F4F7;
+  background: #f2f4f7;
   border: 1px solid #e6e6e6;
   border-radius: 4px;
   box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.1);
@@ -89,31 +89,31 @@
 }
 
 .learner-groups-tab .learner-group-accept-invite-button {
-  border-radius: 4px;
+  align-items: center;
   background: #00645c;
+  border-radius: 4px;
   color: white;
   cursor: pointer;
   display: flex;
-  padding: 10px 8px;
-  justify-content: center;
-  align-items: center;
   font-size: 14px;
   font-weight: 500;
+  justify-content: center;
+  padding: 10px 8px;
   width: 96px;
 }
 
 .learner-groups-tab .learner-group-decline-invite-button {
-  border-radius: 4px;
+  align-items: center;
   border: 1px solid #00645c;
-  color: #00645C;
+  border-radius: 4px;
+  color: #00645c;
   cursor: pointer;
   display: flex;
-  height: 36px;
-  padding: 10px 8px;
-  justify-content: center;
-  align-items: center;
   font-size: 14px;
   font-weight: 500;
+  height: 36px;
+  justify-content: center;
+  padding: 10px 8px;
   width: 96px;
 }
 
@@ -160,13 +160,13 @@
 }
 
 .learner-groups-tab .learner-group-view-details-button {
-  color: #00645C;
+  align-items: flex-start;
+  color: #00645c;
   cursor: pointer;
   display: flex;
-  padding: 4px 8px;
-  align-items: flex-start;
   font-size: 14px;
   font-weight: 500;
+  padding: 4px 8px;
 }
 
 .learner-groups-tab .learner-group-view-preferences-button {
@@ -281,7 +281,7 @@
 }
 @media (max-width: 767px) {
   .learner-groups-tab .learner-groups-section-heading {
-    font-size: 18px;
     font-family: Capriola,Roboto,Arial,sans-serif;
+    font-size: 18px;
   }
 }

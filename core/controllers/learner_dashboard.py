@@ -19,8 +19,8 @@ from __future__ import annotations
 from core import feconf
 from core.controllers import acl_decorators
 from core.controllers import base
-from core.domain import learner_progress_services
 from core.domain import exp_fetchers
+from core.domain import learner_progress_services
 from core.domain import story_fetchers
 from core.domain import subscription_services
 from core.domain import summary_services
@@ -304,6 +304,7 @@ class LearnerDashboardIdsHandler(
                 learner_dashboard_activities.to_dict())
         })
         self.render_json(self.values)
+
 
 class LearnerExplorationProgressHandlerNormalizedRequestDict(TypedDict):
     """Dict representation of LearnerExplorationProgressHandler's

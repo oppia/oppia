@@ -246,7 +246,6 @@ export class NewLearnerDashboardComponent implements OnInit {
         .fetchLearnerDashboardCollectionsDataAsync());
     dashboardCollectionsDataPromise.then(
       responseData => {
-        console.error(responseData, 'res of collec...');
         this.completedCollectionsList = (
           responseData.completedCollectionsList);
         this.incompleteCollectionsList = (
@@ -269,7 +268,6 @@ export class NewLearnerDashboardComponent implements OnInit {
         .fetchLearnerDashboardExplorationsDataAsync());
     dashboardExplorationsDataPromise.then(
       responseData => {
-        console.error(responseData, 'res of explora...');
         this.completedExplorationsList = (
           responseData.completedExplorationsList);
         this.incompleteExplorationsList = (

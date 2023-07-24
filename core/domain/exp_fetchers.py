@@ -33,8 +33,8 @@ from core.domain import caching_services
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import subscription_services
-from core.domain import user_services
 from core.domain import user_domain
+from core.domain import user_services
 from core.platform import models
 
 from typing import Dict, List, Literal, Optional, Sequence, overload
@@ -682,9 +682,11 @@ def get_user_progress_in_exploration(
     user_id: str, exp_ids: List[str]
 ) -> List[exp_domain.ExplorationProgressSummaryDict]:
     """Returns the progress of multiple users in multiple exploration.
+
     Args:
         user_id: str. The user id of the user.
         exp_ids: list(str). The ids of the exploration.
+
     Returns:
         list(ExplorationProgressSummaryDict). The list of the progress
         summaries of the user corresponding to all exploration.
