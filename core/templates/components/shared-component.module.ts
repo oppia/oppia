@@ -180,7 +180,7 @@ import { ComponentOverviewComponent } from './copy-url/copy-url.component';
 import { MatMenuModule} from '@angular/material/menu';
 import { DynamicComponentModule } from 'value_generators/templates/dynamic-component.module';
 import { ThanksForDonatingModalComponent } from 'pages/donate-page/thanks-for-donating-modal.component';
-import { ThanksForSubscribingModalComponent } from 'pages/donate-page/thanks-for-subscribing-modal.component';
+import { ThanksForSubscribingModalComponent } from 'base-components/thanks-for-subscribing-modal.component';
 import { RteHelperModalComponent } from 'services/rte-helper-modal.controller';
 import { DirectivesModule } from 'directives/directives.module';
 

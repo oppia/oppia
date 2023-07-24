@@ -30,11 +30,7 @@ import { WindowDimensionsService } from
 import { WindowRef } from 'services/contextual/window-ref.service';
 import 'popper.js';
 import 'bootstrap';
-import { AppConstants } from 'app.constants';
-import { AlertsService } from 'services/alerts.service';
-import { MailingListBackendApiService } from 'domain/mailing-list/mailing-list-backend-api.service';
 import { ThanksForDonatingModalComponent } from './thanks-for-donating-modal.component';
-import { ThanksForSubscribingModalComponent } from './thanks-for-subscribing-modal.component';
 
 @Component({
   selector: 'donate-page',
@@ -45,8 +41,6 @@ export class DonatePageComponent implements OnInit, OnDestroy {
   directiveSubscriptions = new Subscription();
   windowIsNarrow: boolean = false;
   donateImgUrl: string = '';
-  emailAddress: string | null = null;
-  name: string | null = null;
   OPPIA_AVATAR_IMAGE_URL = (
     this.getStaticImageUrl('/avatar/oppia_avatar_large_100px.svg')
   );
@@ -57,8 +51,6 @@ export class DonatePageComponent implements OnInit, OnDestroy {
     private windowDimensionService: WindowDimensionsService,
     private windowRef: WindowRef,
     private translateService: TranslateService,
-    private alertsService: AlertsService,
-    private mailingListBackendApiService: MailingListBackendApiService,
     private ngbModal: NgbModal
   ) {}
 
@@ -101,38 +93,6 @@ export class DonatePageComponent implements OnInit, OnDestroy {
       this.getStaticImageUrl(imageName + '15x.' + imageExt) + ' 1.5x, ' +
       this.getStaticImageUrl(imageName + '2x.' + imageExt) + ' 2x'
     );
-  }
-
-  validateEmailAddress(): boolean {
-    let regex = new RegExp(AppConstants.EMAIL_REGEX);
-    return regex.test(String(this.emailAddress));
-  }
-
-  subscribeToMailingList(): void {
-    this.mailingListBackendApiService.subscribeUserToMailingList(
-      String(this.emailAddress),
-      String(this.name),
-      AppConstants.MAILING_LIST_WEB_TAG
-    ).then((status) => {
-      if (status) {
-        this.alertsService.addInfoMessage('Done!', 1000);
-        this.ngbModal.open(
-          ThanksForSubscribingModalComponent,
-          {
-            backdrop: 'static',
-            size: 'xl'
-          }
-        );
-      } else {
-        this.alertsService.addInfoMessage(
-          'Sorry, an unexpected error occurred. Please email admin@oppia.org ' +
-          'to be added to the mailing list.', 10000);
-      }
-    }).catch(errorResponse => {
-      this.alertsService.addInfoMessage(
-        'Sorry, an unexpected error occurred. Please email admin@oppia.org ' +
-        'to be added to the mailing list.', 10000);
-    });
   }
 
   ngOnDestroy(): void {

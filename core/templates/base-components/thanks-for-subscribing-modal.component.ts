@@ -13,12 +13,12 @@
 // limitations under the License.
 
 /**
- * @fileoverview Controller for the donation page thanks for subscribing modal.
+ * @fileoverview Controller for the thanks for subscribing modal.
  */
 
 import { Component } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-
+import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 
 @Component({
   selector: 'thanks-for-subscribing-modal',
@@ -26,7 +26,8 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 })
 export class ThanksForSubscribingModalComponent {
   constructor(
-    private activeModal: NgbActiveModal
+    private activeModal: NgbActiveModal,
+    private i18nLanguageCodeService: I18nLanguageCodeService,
   ) {}
 
   dismiss(): void {

@@ -40,25 +40,30 @@
 
 .oppia-footer-social .oppia-footer-social-icons .oppia-youtube-follow {
   background: #cd201f;
+  border-radius: 5px;
   margin-right: 6px;
   padding: 5px 9px;
 }
 .oppia-footer-social .oppia-footer-social-icons .oppia-facebook-follow {
   background: #3b5998;
+  border-radius: 5px;
   margin-right: 6px;
   padding: 5px 10px;
 }
 .oppia-footer-social .oppia-footer-social-icons .oppia-twitter-follow {
   background: #1da1f2;
+  border-radius: 5px;
   margin-right: 6px;
   padding: 5px 6px;
 }
 .oppia-footer-social .oppia-facebook-follow  i.oppia-follow-icons.fab.fa-facebook {
+  border-radius: 5px;
   bottom: -7px;
   position: relative;
   right: -5px;
 }
 .oppia-footer-social .oppia-youtube-follow  i.oppia-follow-icons.fab.fa-youtube-play {
+  border-radius: 5px;
   font-size: 18px;
   left: -0.35px;
   position: relative;

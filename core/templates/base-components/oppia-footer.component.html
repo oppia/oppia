@@ -1,6 +1,37 @@
 <footer class="oppia-footer" role="contentinfo">
+  <div class="oppia-footer-newsletter-container">
+    <div class="oppia-footer-newsletter">
+      <div class="oppia-newsletter-content">
+        <h3 [innerHTML]="'I18N_FOOTER_NEWSLETTER_HEADING' | translate"></h3>
+        <p [innerHTML]="'I18N_FOOTER_NEWSLETTER_TEXT' | translate"></p>
+      </div>
+      <div class="oppia-footer-newsletter-input">
+        <label id="email"
+               [innerHTML]="'I18N_FOOTER_NEWSLETTER_EMAIL' | translate"
+        >
+        </label>
+        <div class="oppia-newsletter-input">
+          <input type="email"
+                 [(ngModel)]="emailAddress"
+                 [ngModelOptions]="{standalone: true}"
+                 required="true"
+                 aria-labelledby="email">
+          <button class="oppia-footer-newsletter-button"
+                  [disabled]="!validateEmailAddress()"
+                  (click)="subscribeToMailingList()">
+            <span [innerHTML]="'I18N_FOOTER_NEWSLETTER_SUBSCRIBE' | translate"></span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
   <div class="oppia-footer-container">
     <div class="row row-cols-2">
+      <div class="oppia-mission-volunteer col-5">
+        <p class="oppia-mission" [innerHTML]="'I18N_FOOTER_OPPIA_MISSION' | translate"></p>
+        <p class="oppia-donate-volunteer" [innerHTML]="'I18N_FOOTER_OPPIA_MISSION_DONATE_VOLUNTEER' | translate"></p>
+      </div>
+      <hr class="oppia-footer-separator">
       <div class="col">
         <p [innerHTML]="'I18N_FOOTER_ABOUT_ALL_CAPS' | translate"></p>
         <ul>
@@ -64,45 +95,7 @@
           </li>
         </ul>
       </div>
-      <div class="col">
-        <p [innerHTML]="'I18N_FOOTER_CONTRIBUTE_ALL_CAPS' | translate"></p>
-        <ul>
-          <li>
-            <a href="/volunteer"
-               [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.VOLUNTEER.ROUTE"
-               [innerHTML]="'I18N_HEADING_VOLUNTEER' | translate">
-            </a>
-          </li>
-          <li *ngIf="siteFeedbackFormUrl">
-            <a [href]="siteFeedbackFormUrl"
-               target="_blank"
-               rel="noopener"
-               [innerHTML]="'I18N_SPLASH_SITE_FEEDBACK' | translate " >
-            </a>
-          </li>
-          <li>
-            <a href="/donate"
-               [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.DONATE.ROUTE"
-               class="e2e-test-donate-link"
-               [innerHTML]="'I18N_FOOTER_DONATE' | translate">
-            </a>
-          </li>
-          <li>
-            <a href="/terms"
-               [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.TERMS.ROUTE"
-               class="e2e-test-terms-link"
-               [innerHTML]="'I18N_FOOTER_TERMS_OF_SERVICE' | translate">
-            </a>
-          </li>
-          <li>
-            <a href="/privacy-policy"
-               [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.PRIVACY.ROUTE"
-               class="e2e-test-privacy-policy-link"
-               [innerHTML]="'I18N_FOOTER_PRIVACY_POLICY' | translate">
-            </a>
-          </li>
-        </ul>
-      </div>
+      <div class="oppia-flex-break"></div>
       <div class="col">
         <oppia-social-buttons></oppia-social-buttons>
       </div>
@@ -111,5 +104,22 @@
          *ngIf="versionInformationIsShown">
       Version: {{ BRANCH_NAME + ' (' + SHORT_COMMIT_HASH + ')' }}
     </div>
+  </div>
+  <div class="oppia-footer-terms-privacy">
+    <small [innerHTML]="'I18N_FOOTER_COPYRIGHT' | translate"></small>
+    <small>
+      <a href="/terms"
+         [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.TERMS.ROUTE"
+         class="e2e-test-terms-link"
+         [innerHTML]="'I18N_FOOTER_TERMS_OF_SERVICE' | translate">
+      </a>
+    </small>
+    <small>
+      <a href="/privacy-policy"
+         [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.PRIVACY.ROUTE"
+         class="e2e-test-privacy-policy-link"
+         [innerHTML]="'I18N_FOOTER_PRIVACY_POLICY' | translate">
+      </a>
+    </small>
   </div>
 </footer>

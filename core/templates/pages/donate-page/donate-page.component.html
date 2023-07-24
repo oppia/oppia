@@ -445,52 +445,6 @@
   <div class="oppia-page-card mt-0 mb-0 bg-white">
     <div class="container">
       <div class="row">
-        <div class="col-md-7">
-          <div class="donate-page-section-heading oppia-donate-page-text-color mb-5">
-            {{ 'I18N_DONATE_PAGE_SUBSCRIBE_SECTION_TEXT_1' | translate }}
-          </div>
-          <div class="mb-5">
-            <div class="donate-page-subscribe-text">
-              {{ 'I18N_DONATE_PAGE_SUBSCRIBE_SECTION_TEXT_2' | translate }}
-            </div>
-          </div>
-        </div>
-        <div class="col-md-5">
-          <div class="p-5">
-            <div class="m-4">
-              <label id="name">
-                {{ 'I18N_DONATE_PAGE_SUBSCRIBE_SECTION_NAME_LABEL_TEXT' | translate }}
-              </label>
-              <input class="w-100"
-                     type="text"
-                     [(ngModel)]="name"
-                     [ngModelOptions]="{standalone: true}"
-                     required="true"
-                     aria-labelledby="name">
-            </div>
-            <div class="m-4">
-              <label id="email">
-                {{ 'I18N_DONATE_PAGE_SUBSCRIBE_SECTION_EMAIL_LABEL_TEXT' | translate }}
-                <span class="oppia-donate-asterisk-color">*</span>
-              </label>
-              <input class="w-100"
-                     type="email"
-                     [(ngModel)]="emailAddress"
-                     [ngModelOptions]="{standalone: true}"
-                     required="true"
-                     aria-labelledby="email">
-            </div>
-            <div class="text-center m-4">
-              <button [disabled]="!validateEmailAddress()"
-                      (click)="subscribeToMailingList()"
-                      class="btn oppia-donate-subscribe-button">
-                {{ 'I18N_DONATE_PAGE_SUBSCRIBE_SECTION_SUBSCRIBE_LABEL_TEXT' | translate }}
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="row">
         <div class="col-md-8">
           <img class="oppia-donate-page-avatar-img" [src]="OPPIA_AVATAR_IMAGE_URL" alt="">
         </div>
