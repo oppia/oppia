@@ -31,12 +31,12 @@ from typing import Any, Dict
 TIMEOUT_SECS = 60
 
 
-class FirebaseProxyHandler(
+class FirebaseProxyPage(
     base.BaseHandler[Any, Any]
 ):
     """Handler to proxy auth requests to the firebase domain."""
 
-    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_HTML
     URL_PATH_ARGS_SCHEMAS = {
         'firebase_path': {
             'schema': {
@@ -62,16 +62,16 @@ class FirebaseProxyHandler(
         self.response.status = response.status_code
         self.response.body = response.content
 
-    # Here we use type Any because the method signature has to match
-    # the parent class.
+    # Here we use type Any because we accept any number/type of args
+    # to accomodate all firebase requests.
     @acl_decorators.open_access
     def get(self, *args: Any, **kwargs: Any) -> None:  # pylint: disable=unused-argument
         """Proxies GET requests to the firebase app."""
         self._firebase_proxy()
 
-    # Here we use type Any because the method signature has to match
-    # the parent class.
+    # Here we use type Any because we accept any number/type of args
+    # to accomodate all firebase requests.
     @acl_decorators.open_access
-    def post(self, *args: Any) -> None:  # pylint: disable=unused-argument
+    def post(self, *args: Any, **kwargs: Any) -> None:  # pylint: disable=unused-argument
         """Proxies POST requests to the firebase app."""
         self._firebase_proxy()

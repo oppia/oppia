@@ -27,8 +27,8 @@ from core.tests import test_utils
 import requests
 
 
-class FirebaseProxyHandlerTest(test_utils.GenericTestBase):
-    """Tests for FirebaseProxyHandler."""
+class FirebaseProxyPageTest(test_utils.GenericTestBase):
+    """Tests for FirebaseProxyPage."""
 
     MockResponse = collections.namedtuple(
         'MockResponse',
