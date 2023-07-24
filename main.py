@@ -1190,7 +1190,7 @@ URLS.extend((
         r'/cron/suggestions/translation_contribution_stats',
         cron.CronTranslationContributionStatsHandler),
     get_redirect_route(
-        r'/cron/mail/curriculum_admins/chapter_publication_notfications/',
+        r'/cron/mail/curriculum_admins/chapter_publication_notfications',
         cron.CronMailChapterPublicationsNotificationsHandler),
 ))
 

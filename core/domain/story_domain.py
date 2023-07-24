@@ -2347,3 +2347,25 @@ class StoryChapterProgressSummaryDict(TypedDict):
     exploration_id: str
     visited_checkpoints_count: int
     total_checkpoints_count: int
+
+
+class OverdueStoryDict(TypedDict):
+    """Dictionary representation of a Story object having behind-schedule
+    chapters.
+    """
+
+    story_name: str
+    topic_name: str
+    story_id: str
+    overdue_chapters: List[str]
+
+
+class UpcomingStoryDict(TypedDict):
+    """Dictionary representation of a Story object having upcoming
+    chapters within next UPCOMING_CHAPTERS_DAY_LIMIT days.
+    """
+
+    story_name: str
+    topic_name: str
+    story_id: str
+    upcoming_chapters: List[str]

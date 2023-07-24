@@ -41,7 +41,7 @@ from core.domain import suggestion_services
 from core.domain import topic_fetchers
 from core.platform import models
 
-from typing import Dict, List, Sequence, Tuple, cast
+from typing import List, Sequence, Tuple, cast
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -970,19 +970,26 @@ def record_completed_node_in_story_context(
         progress_model.put()
 
 
-def get_chapter_notification_dicts() -> Dict[str, List[Dict[
-    str, Sequence[str]]]]:
-    """Returns a dict of behind schedule and upcoming chapters."""
+def get_chapter_notification_dicts() -> Tuple[
+    List[story_domain.OverdueStoryDict],
+    List[story_domain.UpcomingStoryDict]]:
+    """Returns a dict of behind-schedule and upcoming chapters."""
     topic_models = topic_fetchers.get_all_topics()
-    overdue_stories_dicts = []
-    upcoming_stories_dicts = []
+    overdue_stories_dicts: List[story_domain.OverdueStoryDict] = []
+    upcoming_stories_dicts: List[story_domain.UpcomingStoryDict] = []
+    total_canonical_story_ids = []
+    for topic_model in topic_models:
+        canonical_story_ids = [story_reference.story_id
+            for story_reference in topic_model.canonical_story_references]
+        total_canonical_story_ids += canonical_story_ids
+    total_canonical_story_models = story_models.StoryModel.get_multi(
+        total_canonical_story_ids)
     for topic_model in topic_models:
         topic_rights = topic_fetchers.get_topic_rights(topic_model.id)
         if topic_rights.topic_is_published:
-            canonical_story_ids = [story.story_id
-                for story in topic_model.canonical_story_references]
-            canonical_story_models = story_models.StoryModel.get_multi(
-                canonical_story_ids)
+            canonical_story_models = [story for story in
+                total_canonical_story_models if story and
+                story.corresponding_topic_id == topic_model.id]
 
             for story_model in canonical_story_models:
                 story = (
@@ -993,42 +1000,37 @@ def get_chapter_notification_dicts() -> Dict[str, List[Dict[
                 overdue_chapters = []
                 upcoming_chapters = []
                 for node in story.story_contents.nodes:
-                    if node.planned_publication_date is not None and ((
-                        node.planned_publication_date -
-                        datetime.datetime.today()).days < 14 and
-                        node.planned_publication_date >
-                        datetime.datetime.today() and
-                        node.status != 'Published'):
-                        upcoming_chapters.append(node.title)
-
                     if node.planned_publication_date is not None and (
-                        node.planned_publication_date <
-                        datetime.datetime.today()
-                        and node.status != 'Published'):
-                        overdue_chapters.append(node.title)
+                        node.status != constants.STORY_NODE_STATUS_PUBLISHED):
+                        chapter_is_upcoming = (
+                            node.planned_publication_date - datetime.datetime.
+                            today()).days < (
+                            constants.UPCOMING_CHAPTERS_DAY_LIMIT) and (
+                            node.planned_publication_date > datetime.datetime.
+                            today())
+                        chapter_is_behind_schedule = (
+                            node.planned_publication_date < datetime.datetime.
+                            today())
+
+                        if chapter_is_upcoming:
+                            upcoming_chapters.append(node.title)
+                        if chapter_is_behind_schedule:
+                            overdue_chapters.append(node.title)
 
                 if len(overdue_chapters):
-                    story_link = (
-                        'https://www.oppia.org/story_editor/%s' % story.id)
                     overdue_stories_dicts.append({
                         'story_name': story.title,
                         'topic_name': topic_model.name,
-                        'story_link': story_link,
+                        'story_id': story.id,
                         'overdue_chapters': overdue_chapters
                     })
 
                 if len(upcoming_chapters):
-                    story_link = (
-                        'https://www.oppia.org/story_editor/%s' % story.id)
                     upcoming_stories_dicts.append({
                         'story_name': story.title,
                         'topic_name': topic_model.name,
-                        'story_link': story_link,
+                        'story_id': story.id,
                         'upcoming_chapters': upcoming_chapters
                     })
 
-    chapter_notifications = {
-        'overdue_stories_dicts': overdue_stories_dicts,
-        'upcoming_stories_dicts': upcoming_stories_dicts
-    }
-    return chapter_notifications
+    return (overdue_stories_dicts, upcoming_stories_dicts)

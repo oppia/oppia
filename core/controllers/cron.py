@@ -315,15 +315,15 @@ class CronMailChapterPublicationsNotificationsHandler(
     @acl_decorators.can_perform_cron_tasks
     def get(self) -> None:
         """Sends each curriculum admin mail to notify them about behind schedule
-        and upcoming (within 14 days) chapter launches.
+        and upcoming (within UPCOMING_CHAPTERS_DAY_LIMIT days) chapter launches.
         """
         if not feconf.CAN_SEND_EMAILS:
             return self.render_json({})
 
         admin_ids = user_services.get_user_ids_by_role(
             feconf.ROLE_ID_CURRICULUM_ADMIN)
-        chapter_notifications = story_services.get_chapter_notification_dicts()
+        overdue_stories_dicts, upcoming_stories_dicts = (
+            story_services.get_chapter_notification_dicts())
         email_manager.send_reminder_mail_to_notify_curriculum_admins(
-            admin_ids, chapter_notifications['overdue_stories_dicts'],
-            chapter_notifications['upcoming_stories_dicts'])
+            admin_ids, overdue_stories_dicts, upcoming_stories_dicts)
         return self.render_json({})

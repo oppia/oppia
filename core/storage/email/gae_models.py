@@ -76,7 +76,6 @@ class SentEmailModel(base_models.BaseModel):
             feconf.EMAIL_INTENT_ADDRESS_CONTRIBUTOR_DASHBOARD_SUGGESTIONS,
             feconf.EMAIL_INTENT_REVIEW_CREATOR_DASHBOARD_SUGGESTIONS,
             feconf.EMAIL_INTENT_REVIEW_CONTRIBUTOR_DASHBOARD_SUGGESTIONS,
-            feconf.EMAIL_INTENT_NOTIFY_CURRICULUM_ADMINS_CHAPTERS,
             feconf.EMAIL_INTENT_ADD_CONTRIBUTOR_DASHBOARD_REVIEWERS,
             feconf.EMAIL_INTENT_ACCOUNT_DELETED,
             feconf.BULK_EMAIL_INTENT_TEST,
@@ -358,6 +357,7 @@ class BulkEmailModel(base_models.BaseModel):
             feconf.BULK_EMAIL_INTENT_CREATE_EXPLORATION,
             feconf.BULK_EMAIL_INTENT_CREATOR_REENGAGEMENT,
             feconf.BULK_EMAIL_INTENT_LEARNER_REENGAGEMENT,
+            feconf.EMAIL_INTENT_NOTIFY_CURRICULUM_ADMINS_CHAPTERS,
             feconf.BULK_EMAIL_INTENT_ML_JOB_FAILURE
         ])
     # The subject line of the email.
