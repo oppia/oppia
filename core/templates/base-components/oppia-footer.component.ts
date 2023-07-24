@@ -72,7 +72,9 @@ export class OppiaFooterComponent {
   subscribeToMailingList(): void {
     this.mailingListBackendApiService.subscribeUserToMailingList(
       String(this.emailAddress),
-      'validName',
+      // Most of the times, since the name is not provided
+      // so it is null and the placeholder name is set to UserX.
+      String(this.name) ?? 'UserX',
       AppConstants.MAILING_LIST_WEB_TAG
     ).then((status) => {
       if (status) {
