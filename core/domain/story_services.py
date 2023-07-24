@@ -973,7 +973,13 @@ def record_completed_node_in_story_context(
 def get_chapter_notification_dicts() -> Tuple[
     List[story_domain.OverdueStoryDict],
     List[story_domain.UpcomingStoryDict]]:
-    """Returns a dict of behind-schedule and upcoming chapters."""
+    """Returns a dict of behind-schedule and upcoming chapters.
+
+    Returns:
+        tuple(list(OverdueStoryDict), list(UpcomingStoryDict)). A 2-tuple
+        whose first element is a list of story dicts having overdue chapters
+        and second element is a list of story dicts having upcoming chapters.
+    """
     topic_models = topic_fetchers.get_all_topics()
     overdue_stories_dicts: List[story_domain.OverdueStoryDict] = []
     upcoming_stories_dicts: List[story_domain.UpcomingStoryDict] = []

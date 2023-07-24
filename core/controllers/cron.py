@@ -305,7 +305,8 @@ class CronMailChapterPublicationsNotificationsHandler(
     base.BaseHandler[Dict[str, str], Dict[str, str]]
 ):
     """Handler for mailing curriculum admins to remind them about behind
-    schedule and upcoming (within 14 days) chapter launches.
+    schedule and upcoming (within UPCOMING_CHAPTERS_DAY_LIMIT days) chapter
+    launches.
     """
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON

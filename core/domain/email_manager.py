@@ -2055,10 +2055,12 @@ def send_reminder_mail_to_notify_curriculum_admins(
 
     Args:
         curriculum_admin_ids: list(str). The user ids of the admins to notify.
-        overdue_stories_dicts: list(dict). A list of dictionaries containing
-            the information about the behind-schedule chapters to be notified.
-        upcoming_stories_dicts: list(dict). A list of dictionaries containing
-            the information about the upcoming chapters to be notified.
+        overdue_stories_dicts: list(story_domain.OverdueStoryDict). A list of
+            dictionaries containing the information about the behind-schedule
+            chapters to be notified.
+        upcoming_stories_dicts: list(story_domain.UpcomingStoryDict). A list of
+            dictionaries containing the information about the upcoming chapters
+            to be notified.
     """
     if not feconf.CAN_SEND_EMAILS:
         logging.error('This app cannot send emails to users.')
