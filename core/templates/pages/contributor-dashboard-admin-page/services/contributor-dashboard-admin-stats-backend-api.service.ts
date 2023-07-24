@@ -163,10 +163,7 @@ export class ContributorDashboardAdminStatsBackendApiService {
           translation_reviewers_count: (
             response.translation_reviewers_count.en),
           question_reviewers_count: response.question_reviewers_count
-        })
-        console.log(response);
-      }, errorResponse => {
-        reject(errorResponse.error.error);
+        });
       });
     });
   }
@@ -196,14 +193,13 @@ export class ContributorDashboardAdminStatsBackendApiService {
           this.http.get<TranslationSubmitterStatsBackendDict>(
             url, {
               params: {
-                page_size: 20,
-                offset: 0,
-                language_code: 'es',
+                page_size: pageSize,
+                offset: nextOffset,
+                language_code: filter.languageCode,
                 topic_ids: []
               }
             } as Object
           ).toPromise().then(response => {
-            console.log(response);
             resolve({
               stats: response.stats.map(
                 backendDict => TranslationSubmitterStats
@@ -223,14 +219,13 @@ export class ContributorDashboardAdminStatsBackendApiService {
           this.http.get<TranslationReviewerStatsBackendDict>(
             url, {
               params: {
-                page_size: 20,
-                offset: 0,
-                language_code: 'es',
+                page_size: pageSize,
+                offset: nextOffset,
+                language_code: filter.languageCode,
                 topic_ids: []
               }
             } as Object
           ).toPromise().then(response => {
-            console.log(response);
             resolve({
               stats: response.stats.map(
                 backendDict => TranslationReviewerStats
@@ -252,14 +247,13 @@ export class ContributorDashboardAdminStatsBackendApiService {
           this.http.get<QuestionSubmitterStatsBackendDict>(
             url, {
               params: {
-                page_size: 20,
-                offset: 0,
-                language_code: 'en',
+                page_size: pageSize,
+                offset: nextOffset,
+                language_code: filter.languageCode,
                 topic_ids: []
               }
             } as Object
           ).toPromise().then(response => {
-            console.log(response);
             resolve({
               stats: response.stats.map(
                 backendDict => QuestionSubmitterStats
@@ -279,14 +273,13 @@ export class ContributorDashboardAdminStatsBackendApiService {
           this.http.get<QuestionReviewerStatsBackendDict>(
             url, {
               params: {
-                page_size: 20,
-                offset: 0,
-                language_code: 'en',
+                page_size: pageSize,
+                offset: nextOffset,
+                language_code: filter.languageCode,
                 topic_ids: []
               }
             } as Object
           ).toPromise().then(response => {
-            console.log(response);
             resolve({
               stats: response.stats.map(
                 backendDict => QuestionReviewerStats

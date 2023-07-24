@@ -1,4 +1,4 @@
-// Copyright 2020 The Oppia Authors. All Rights Reserved.
+// Copyright 2023 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -21,13 +21,13 @@ export class ContributorAdminDashboardFilter {
   topicIds?: string[];
   sort?: string;
   lastActivity?: number;
+  filter: ContributorAdminDashboardFilter;
 
   /**
  * @param {String} languageCode - Language Code to filter for.
  * @param {String[]} topicIds - keywords to filter for.
- * @param {string} sort - One of the values in ETopicSortOptions.
- * @param {number} lastActivity - One of the values
- *   in ETopicPublishedOptions.
+ * @param {string} sort - sort options.
+ * @param {number} lastActivity - number of days since last activity.
  */
   constructor(
       languageCode?: string, topicIds?: string[],
@@ -39,17 +39,21 @@ export class ContributorAdminDashboardFilter {
   }
 
   /**
- * Resets the filter object values
+ * Resets the filter object values to default.
  */
   reset(): void {
-    ContributorAdminDashboardFilter.createDefault();
+    this.filter = ContributorAdminDashboardFilter.createDefault();
+    this.languageCode = this.filter.languageCode;
+    this.topicIds = this.filter.topicIds;
+    this.sort = this.filter.sort;
+    this.lastActivity = this.filter.lastActivity;
   }
 
   /**
- * @returns {TopicsAndSkillsDashboardFilter} - A new
- *   TopicsAndSkillsDashboardFilter instance.
+ * @returns {ContributorAdminDashboardFilter} - A new
+ *   ContributorAdminDashboardFilter instance.
  */
   static createDefault(): ContributorAdminDashboardFilter {
-    return new ContributorAdminDashboardFilter('en', []);
+    return new ContributorAdminDashboardFilter('es', []);
   }
 }

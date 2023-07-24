@@ -35,7 +35,7 @@ import { SharedComponentsModule } from 'components/shared-component.module';
 import { OppiaAngularRootComponent } from 'components/oppia-angular-root.component';
 import { ContributorDashboardAdminNavbarComponent } from './navbar/contributor-dashboard-admin-navbar.component';
 import { ContributorAdminDashboardPageComponent } from './contributor-admin-dashboard-page.component';
-import { TanslationSubmitterTable } from './contributor-dashboard-tables/contributor-admin-stats-table.component';
+import { ContributorAdminStatsTable } from './contributor-dashboard-tables/contributor-admin-stats-table.component';
 import { platformFeatureInitFactory, PlatformFeatureService } from 'services/platform-feature.service';
 import { SmartRouterModule } from 'hybrid-router-module-provider';
 import { ToastrModule } from 'ngx-toastr';
@@ -62,12 +62,12 @@ import { AppErrorHandlerProvider } from 'pages/oppia-root/app-error-handler';
   declarations: [
     ContributorDashboardAdminNavbarComponent,
     ContributorAdminDashboardPageComponent,
-    TanslationSubmitterTable
+    ContributorAdminStatsTable
   ],
   entryComponents: [
     ContributorDashboardAdminNavbarComponent,
     ContributorAdminDashboardPageComponent,
-    TanslationSubmitterTable
+    ContributorAdminStatsTable
   ],
   providers: [
     {

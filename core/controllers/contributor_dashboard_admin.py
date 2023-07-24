@@ -734,7 +734,7 @@ class CommunityContributionStatsHandler(
         Dict[str, str]
     ]
 ):
-    """Handler to show the contribution rights of a user."""
+    """Handler to get Community Stats for contributor admin dashboard."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
@@ -749,12 +749,9 @@ class CommunityContributionStatsHandler(
         """
         community_stats = suggestion_services.get_community_contribution_stats()
 
-        translation_reviewers_count = (
-            community_stats.translation_reviewer_counts_by_lang_code)
-        question_reviewers_count = community_stats.question_reviewer_count
-
         response = {
-            'translation_reviewers_count': translation_reviewers_count,
-            'question_reviewers_count': question_reviewers_count
+            'translation_reviewers_count': (
+                community_stats.translation_reviewer_counts_by_lang_code),
+            'question_reviewers_count': community_stats.question_reviewer_count
         }
         self.render_json(response)

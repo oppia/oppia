@@ -1093,7 +1093,7 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
             2
         )
         self.assertEqual(
-            response['stats'][0]['contributor_id'],
+            response['stats'][0]['contributor_name'],
             'user3'
         )
         self.assertEqual(
@@ -1124,7 +1124,7 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
             2
         )
         self.assertEqual(
-            response['stats'][0]['contributor_id'],
+            response['stats'][0]['contributor_name'],
             'user2'
         )
         self.assertEqual(
@@ -1154,7 +1154,7 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
             2
         )
         self.assertEqual(
-            response['stats'][0]['contributor_id'],
+            response['stats'][0]['contributor_name'],
             'user3'
         )
         self.assertEqual(
@@ -1191,11 +1191,11 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
             3
         )
         self.assertEqual(
-            response['stats'][0]['contributor_id'],
+            response['stats'][0]['contributor_name'],
             'user3'
         )
         self.assertEqual(
-            response['stats'][1]['contributor_id'],
+            response['stats'][1]['contributor_name'],
             'user2'
         )
         self.assertEqual(
@@ -1225,7 +1225,7 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
             2
         )
         self.assertEqual(
-            response['stats'][0]['contributor_id'],
+            response['stats'][0]['contributor_name'],
             'user3'
         )
         self.assertEqual(
@@ -1256,7 +1256,7 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
             2
         )
         self.assertEqual(
-            response['stats'][0]['contributor_id'],
+            response['stats'][0]['contributor_name'],
             'user2'
         )
         self.assertEqual(
@@ -1289,11 +1289,11 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
             3
         )
         self.assertEqual(
-            response['stats'][0]['contributor_id'],
+            response['stats'][0]['contributor_name'],
             'user3'
         )
         self.assertEqual(
-            response['stats'][1]['contributor_id'],
+            response['stats'][1]['contributor_name'],
             'user2'
         )
         self.assertEqual(
@@ -1322,7 +1322,7 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
             2
         )
         self.assertEqual(
-            response['stats'][0]['contributor_id'],
+            response['stats'][0]['contributor_name'],
             'user3'
         )
         self.assertEqual(
@@ -1352,7 +1352,7 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
             2
         )
         self.assertEqual(
-            response['stats'][0]['contributor_id'],
+            response['stats'][0]['contributor_name'],
             'user2'
         )
         self.assertEqual(
@@ -1381,7 +1381,7 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
             2
         )
         self.assertEqual(
-            response['stats'][0]['contributor_id'],
+            response['stats'][0]['contributor_name'],
             'user3'
         )
         self.assertEqual(
@@ -1417,11 +1417,11 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
             3
         )
         self.assertEqual(
-            response['stats'][0]['contributor_id'],
+            response['stats'][0]['contributor_name'],
             'user3'
         )
         self.assertEqual(
-            response['stats'][1]['contributor_id'],
+            response['stats'][1]['contributor_name'],
             'user2'
         )
         self.assertEqual(
@@ -1450,7 +1450,7 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
             2
         )
         self.assertEqual(
-            response['stats'][0]['contributor_id'],
+            response['stats'][0]['contributor_name'],
             'user3'
         )
         self.assertEqual(
@@ -1480,7 +1480,7 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
             2
         )
         self.assertEqual(
-            response['stats'][0]['contributor_id'],
+            response['stats'][0]['contributor_name'],
             'user2'
         )
         self.assertEqual(
@@ -1512,11 +1512,11 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
             3
         )
         self.assertEqual(
-            response['stats'][0]['contributor_id'],
+            response['stats'][0]['contributor_name'],
             'user3'
         )
         self.assertEqual(
-            response['stats'][1]['contributor_id'],
+            response['stats'][1]['contributor_name'],
             'user2'
         )
         self.assertEqual(
@@ -1528,3 +1528,25 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
             False
         )
         self.logout()
+
+
+class CommunityStatsHandlerTest(test_utils.GenericTestBase):
+    """Tests for getting community stats for contributor admin dashboard
+    """
+
+    def test_get_community_stats(self) -> None:
+        self.signup('reviewer@org.com', 'reviewer')
+        user_id = self.get_user_id_from_email('reviewer@org.com')
+        user_services.add_user_role(
+            user_id, feconf.ROLE_ID_TRANSLATION_ADMIN)
+        self.login('reviewer@org.com')
+        user_services.allow_user_to_review_translation_in_language(
+            user_id, 'en')
+        user_services.allow_user_to_review_translation_in_language(
+            user_id, 'fr')
+
+        stats = self.get_json(feconf.COMMUNITY_CONTRIBUTION_STATS_URL)
+
+        self.assertEqual(stats['question_reviewers_count'], 0)
+        self.assertDictEqual(
+            stats['translation_reviewers_count'], {'en': 1, 'fr': 1})

@@ -6846,11 +6846,6 @@ export default {
         }
       ]
     },
-    "CONTRIBUTOR_ADMIN_DASHBOARD": {
-      "ROUTE": "contributor-admin-dashboard",
-      "TITLE": "Contributor Admin Dashboard",
-      "META": []
-    },
     "PROFILE": {
       "ROUTE": "profile/:username_fragment",
       "TITLE": "I18N_PROFILE_PAGE_TITLE",
@@ -7097,6 +7092,6 @@ export default {
   ],
   "CONTRIBUTOR_CERTIFICATE_WIDTH": 1493,
   "CONTRIBUTOR_CERTIFICATE_HEIGHT": 1313,
-  "BRANCH_NAME": "",
-  "SHORT_COMMIT_HASH": ""
+  "BRANCH_NAME": "gsoc_M1.7",
+  "SHORT_COMMIT_HASH": "04e8e9f957"
 } as const;

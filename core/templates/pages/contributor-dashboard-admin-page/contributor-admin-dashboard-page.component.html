@@ -1,7 +1,7 @@
 <background-banner></background-banner>
 <div class="oppia-dashboard-container position-relative">
   <div class="oppia-dashboard-title"
-    [ngClass]="{'oppia-dashboard-title-mobile': checkTabletView(), 'oppia-dashboard-title-desktop': !checkTabletView()}">
+    [ngClass]="{'oppia-dashboard-title-mobile': checkMobileView(), 'oppia-dashboard-title-desktop': !checkMobileView()}">
     <h1 tabindex="0">Contributor Admin Dashboard</h1>
   </div>
   <div class="m-auto oppia-dashboard-aggregated-stats oppia-contributor-dashboard-main-content pt-1"

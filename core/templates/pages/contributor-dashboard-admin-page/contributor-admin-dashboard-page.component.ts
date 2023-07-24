@@ -19,9 +19,7 @@
 
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
-import { LoaderService } from 'services/loader.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
-import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 import './contributor-admin-dashboard-page.component.css';
 import { animate, state, style, transition, trigger } from '@angular/animations';
 import { ContributorDashboardAdminStatsBackendApiService } from './services/contributor-dashboard-admin-stats-backend-api.service'
@@ -56,8 +54,6 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
     this.TAB_NAME_QUESTION_REVIEWER];
 
   constructor(
-    private loaderService: LoaderService,
-    private windowDimensionsService: WindowDimensionsService,
     private windowRef: WindowRef,
     private changeDetectorRef: ChangeDetectorRef,
     private contributorDashboardAdminStatsBackendApiService:
@@ -65,15 +61,13 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.loaderService.showLoadingScreen('Loading');
-
     this.activeTab = this.TAB_NAME_TRANSLATION_SUBMITTER;
-
-    this.getCommunityStats();
-  }
-
-  checkTabletView(): boolean {
-    return (this.windowDimensionsService.getWidth() < 768);
+    this.contributorDashboardAdminStatsBackendApiService
+      .fetchCommunityStats().then(
+        (response) => {
+          this.translationReviewersCount = response.translation_reviewers_count;
+          this.questionReviewersCount = response.question_reviewers_count;
+        });
   }
 
   setActiveTab(tabName: string): void {
@@ -82,17 +76,7 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
   }
 
   checkMobileView(): boolean {
-    return (this.windowRef.nativeWindow.innerWidth < 500);
-  }
-
-  getCommunityStats(): void {
-    this.contributorDashboardAdminStatsBackendApiService
-      .fetchCommunityStats().then(
-        (response) => {
-          this.translationReviewersCount = response.translation_reviewers_count;
-          this.questionReviewersCount = response.question_reviewers_count;
-          console.log(response);
-        });
+    return (this.windowRef.nativeWindow.innerWidth < 800);
   }
 }
 

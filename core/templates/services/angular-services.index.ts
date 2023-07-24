@@ -921,6 +921,6 @@ export const angularServices: [string, Type<{}>][] = [
   ['RteHelperService', RteHelperService],
   ['HtmlLengthService', HtmlLengthService],
   ['ContributorDashboardAdminStatsBackendApiService',
-    ContributorDashboardAdminStatsBackendApiService]
-  ['InsertScriptService', InsertScriptService],
+    ContributorDashboardAdminStatsBackendApiService],
+  ['InsertScriptService', InsertScriptService]
 ];

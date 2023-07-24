@@ -3871,10 +3871,9 @@ class TranslationSubmitterTotalContributionStatsUnitTests(
     def test_to_frontend_dict(self) -> None:
         expected_frontend_dict = {
             'language_code': self.SUGGESTION_LANGUAGE_CODE,
-            'contributor_id': self.USER_ID_1,
-            'topic_ids_with_translation_submissions': (
+            'contributor_name': self.USER_ID_1,
+            'topic_names': (
                 self.TOPIC_IDS_WITH_TRANSLATION_SUBMISSIONS),
-            'recent_review_outcomes': self.RECENT_REVIEW_OUTCOMES,
             'recent_performance': self.RECENT_PERFORMANCE,
             'overall_accuracy': self.OVERALL_ACCURACY,
             'submitted_translations_count': (
@@ -3936,8 +3935,8 @@ class TranslationReviewerTotalContributionStatsUnitTests(
     def test_to_frontend_dict(self) -> None:
         expected_stats_dict = {
             'language_code': self.SUGGESTION_LANGUAGE_CODE,
-            'contributor_id': self.USER_ID_1,
-            'topic_ids_with_translation_reviews': (
+            'contributor_name': self.USER_ID_1,
+            'topic_names': (
                 self.TOPIC_IDS_WITH_TRANSLATION_REVIEWS),
             'reviewed_translations_count': (
                 self.REVIEWED_TRANSLATIONS_COUNT),
@@ -3993,10 +3992,9 @@ class QuestionSubmitterTotalContributionStatsUnitTests(
 
     def test_to_frontend_dict(self) -> None:
         expected_stats_dict = {
-            'contributor_id': self.USER_ID_1,
-            'topic_ids_with_question_submissions': (
+            'contributor_name': self.USER_ID_1,
+            'topic_names': (
                 self.TOPIC_IDS_WITH_QUESTION_SUBMISSIONS),
-            'recent_review_outcomes': self.RECENT_REVIEW_OUTCOMES,
             'recent_performance': self.RECENT_PERFORMANCE,
             'overall_accuracy': self.OVERALL_ACCURACY,
             'submitted_questions_count': (
@@ -4046,8 +4044,8 @@ class QuestionReviewerTotalContributionStatsUnitTests(
 
     def test_to_frontend_dict(self) -> None:
         expected_stats_dict = {
-            'contributor_id': self.USER_ID_1,
-            'topic_ids_with_question_reviews': (
+            'contributor_name': self.USER_ID_1,
+            'topic_names': (
                 self.TOPIC_IDS_WITH_QUESTION_REVIEWS),
             'reviewed_questions_count': (
                 self.REVIEWED_QUESTIONS_COUNT),

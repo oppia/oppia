@@ -53,7 +53,7 @@ import { QuestionReviewerStats, QuestionSubmitterStats, TranslationReviewerStats
     ]),
   ],
 })
-export class TanslationSubmitterTable implements OnInit {
+export class ContributorAdminStatsTable implements OnInit {
   @Input() activeTab: string;
 
   columnsToDisplay = [
@@ -133,7 +133,7 @@ export class TanslationSubmitterTable implements OnInit {
       }
       this.ContributorDashboardAdminStatsBackendApiService
         .fetchContributorAdminStats(
-          new ContributorAdminDashboardFilter(),
+          ContributorAdminDashboardFilter.createDefault(),
           20,
           0,
           AppConstants.CONTRIBUTION_STATS_TYPE_TRANSLATION,
@@ -142,7 +142,6 @@ export class TanslationSubmitterTable implements OnInit {
             this.dataSource = response.stats;
             this.nextOffset = response.nextOffset;
             this.more = response.more;
-            console.log(response);
           });
     } else if (this.activeTab === this.TAB_NAME_TRANSLATION_REVIEWER) {
       this.columnsToDisplay = [
@@ -163,7 +162,7 @@ export class TanslationSubmitterTable implements OnInit {
       }
       this.ContributorDashboardAdminStatsBackendApiService
         .fetchContributorAdminStats(
-          new ContributorAdminDashboardFilter(),
+          ContributorAdminDashboardFilter.createDefault(),
           20,
           0,
           AppConstants.CONTRIBUTION_STATS_TYPE_TRANSLATION,
@@ -172,7 +171,6 @@ export class TanslationSubmitterTable implements OnInit {
             this.dataSource = response.stats;
             this.nextOffset = response.nextOffset;
             this.more = response.more;
-            console.log(response);
           });
     } else if (this.activeTab === this.TAB_NAME_QUESTION_SUBMITTER) {
       this.columnsToDisplay = [
@@ -206,7 +204,6 @@ export class TanslationSubmitterTable implements OnInit {
             this.dataSource = response.stats;
             this.nextOffset = response.nextOffset;
             this.more = response.more;
-            console.log(response);
           });
     } else if (this.activeTab === this.TAB_NAME_QUESTION_REVIEWER) {
       this.columnsToDisplay = [
@@ -236,7 +233,6 @@ export class TanslationSubmitterTable implements OnInit {
             this.dataSource = response.stats;
             this.nextOffset = response.nextOffset;
             this.more = response.more;
-            console.log(response);
           });
     }
   }
@@ -245,5 +241,5 @@ export class TanslationSubmitterTable implements OnInit {
 
 angular.module('oppia').directive('contributorAdminDashboardPage',
   downgradeComponent({
-    component: TanslationSubmitterTable
+    component: ContributorAdminStatsTable
   }) as angular.IDirectiveFactory);
