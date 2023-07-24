@@ -2047,19 +2047,19 @@ def send_mail_to_notify_contributor_ranking_achievement(
 
 def send_reminder_mail_to_notify_curriculum_admins(
     curriculum_admin_ids: List[str],
-    overdue_stories_dicts: List[story_domain.OverdueStoryDict],
-    upcoming_stories_dicts: List[story_domain.UpcomingStoryDict]) -> None:
+    overdue_stories: List[story_domain.OverdueChaptersStory],
+    upcoming_stories: List[story_domain.UpcomingChaptersStory]) -> None:
 
     """Sends an email to curriculum admins to notify them about the
     behind-schedule and upcoming chapters in all the topics.
 
     Args:
         curriculum_admin_ids: list(str). The user ids of the admins to notify.
-        overdue_stories_dicts: list(story_domain.OverdueStoryDict). A list of
-            dictionaries containing the information about the behind-schedule
+        overdue_stories: list(OverdueChaptersStory). A list of
+            stories containing the information about the behind-schedule
             chapters to be notified.
-        upcoming_stories_dicts: list(story_domain.UpcomingStoryDict). A list of
-            dictionaries containing the information about the upcoming chapters
+        upcoming_stories: list(UpcomingChaptersStory). A list of
+            stories containing the information about the upcoming chapters
             to be notified.
     """
     if not feconf.CAN_SEND_EMAILS:
@@ -2075,17 +2075,17 @@ def send_reminder_mail_to_notify_curriculum_admins(
 
     email_body = 'Dear Curriculum Admin, <br><br>'
 
-    if len(overdue_stories_dicts):
+    if len(overdue_stories):
         overdue_stories_html = ''
-        for story_dict in overdue_stories_dicts:
+        for overdue_story in overdue_stories:
             story_link = (
                 str(feconf.OPPIA_SITE_URL) +
                 str(feconf.STORY_EDITOR_URL_PREFIX) +
-                '/' + str(story_dict['story_id']))
+                '/' + overdue_story.id)
             story_html = '<li>%s (%s) - <a href="%s">Link</a><ul>' % (
-                story_dict['story_name'], story_dict['topic_name'],
+                overdue_story.story_name, overdue_story.topic_name,
                 story_link)
-            for chapter in story_dict['overdue_chapters']:
+            for chapter in overdue_story.overdue_chapters:
                 chapter_html = '<li>%s</li>' % chapter
                 story_html += chapter_html
             story_html += '</ul></li>'
@@ -2093,17 +2093,17 @@ def send_reminder_mail_to_notify_curriculum_admins(
         email_body += email_body_template['overdue_chapters_template'] % (
             overdue_stories_html)
 
-    if len(upcoming_stories_dicts):
+    if len(upcoming_stories):
         upcoming_stories_html = ''
-        for story in upcoming_stories_dicts:
+        for upcoming_story in upcoming_stories:
             story_link = (
                 str(feconf.OPPIA_SITE_URL) +
                 str(feconf.STORY_EDITOR_URL_PREFIX) +
-                '/' + str(story['story_id']))
+                '/' + upcoming_story.id)
             story_html = '<li>%s (%s) - <a href="%s">Link</a><ul>' % (
-                story['story_name'], story['topic_name'],
+                upcoming_story.story_name, upcoming_story.topic_name,
                 story_link)
-            for chapter in story['upcoming_chapters']:
+            for chapter in upcoming_story.upcoming_chapters:
                 chapter_html = '<li>%s</li>' % chapter
                 story_html += chapter_html
             story_html += '</ul></li>'
@@ -2113,7 +2113,7 @@ def send_reminder_mail_to_notify_curriculum_admins(
 
     email_body += 'Regards,<br> Oppia Foundation'
 
-    if len(overdue_stories_dicts) or len(upcoming_stories_dicts):
+    if len(overdue_stories) or len(upcoming_stories):
         bulk_email_model_id = email_models.BulkEmailModel.get_new_id('')
         _send_bulk_mail(
             curriculum_admin_ids, feconf.SYSTEM_COMMITTER_ID,

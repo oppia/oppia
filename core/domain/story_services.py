@@ -971,30 +971,31 @@ def record_completed_node_in_story_context(
 
 
 def get_chapter_notification_dicts() -> Tuple[
-    List[story_domain.OverdueStoryDict],
-    List[story_domain.UpcomingStoryDict]]:
+    List[story_domain.OverdueChaptersStory],
+    List[story_domain.UpcomingChaptersStory]]:
     """Returns a dict of behind-schedule and upcoming chapters.
 
     Returns:
-        tuple(list(OverdueStoryDict), list(UpcomingStoryDict)). A 2-tuple
-        whose first element is a list of story dicts having overdue chapters
-        and second element is a list of story dicts having upcoming chapters.
+        tuple(list(OverdueChaptersStory), list(UpcomingChaptersStory)). A
+        2-tuple whose first element is a list of story dicts having overdue
+        chapters and second element is a list of story dicts having upcoming
+        chapters.
     """
     topic_models = topic_fetchers.get_all_topics()
-    overdue_stories_dicts: List[story_domain.OverdueStoryDict] = []
-    upcoming_stories_dicts: List[story_domain.UpcomingStoryDict] = []
-    total_canonical_story_ids = []
+    overdue_stories: List[story_domain.OverdueChaptersStory] = []
+    upcoming_stories: List[story_domain.UpcomingChaptersStory] = []
+    all_canonical_story_ids = []
     for topic_model in topic_models:
         canonical_story_ids = [story_reference.story_id
             for story_reference in topic_model.canonical_story_references]
-        total_canonical_story_ids += canonical_story_ids
-    total_canonical_story_models = story_models.StoryModel.get_multi(
-        total_canonical_story_ids)
+        all_canonical_story_ids += canonical_story_ids
+    all_canonical_story_models = story_models.StoryModel.get_multi(
+        all_canonical_story_ids)
     for topic_model in topic_models:
         topic_rights = topic_fetchers.get_topic_rights(topic_model.id)
         if topic_rights.topic_is_published:
             canonical_story_models = [story for story in
-                total_canonical_story_models if story and
+                all_canonical_story_models if story and
                 story.corresponding_topic_id == topic_model.id]
 
             for story_model in canonical_story_models:
@@ -1009,11 +1010,10 @@ def get_chapter_notification_dicts() -> Tuple[
                     if node.planned_publication_date is not None and (
                         node.status != constants.STORY_NODE_STATUS_PUBLISHED):
                         chapter_is_upcoming = (
-                            node.planned_publication_date - datetime.datetime.
-                            today()).days < (
-                            constants.UPCOMING_CHAPTERS_DAY_LIMIT) and (
-                            node.planned_publication_date > datetime.datetime.
-                            today())
+                            datetime.datetime.today() <
+                            node.planned_publication_date <
+                            (datetime.datetime.today() + datetime.timedelta(
+                            constants.UPCOMING_CHAPTERS_DAY_LIMIT)))
                         chapter_is_behind_schedule = (
                             node.planned_publication_date < datetime.datetime.
                             today())
@@ -1024,19 +1024,15 @@ def get_chapter_notification_dicts() -> Tuple[
                             overdue_chapters.append(node.title)
 
                 if len(overdue_chapters):
-                    overdue_stories_dicts.append({
-                        'story_name': story.title,
-                        'topic_name': topic_model.name,
-                        'story_id': story.id,
-                        'overdue_chapters': overdue_chapters
-                    })
+                    overdue_story = story_domain.OverdueChaptersStory(
+                        story.id, story.title, topic_model.name,
+                        overdue_chapters)
+                    overdue_stories.append(overdue_story)
 
                 if len(upcoming_chapters):
-                    upcoming_stories_dicts.append({
-                        'story_name': story.title,
-                        'topic_name': topic_model.name,
-                        'story_id': story.id,
-                        'upcoming_chapters': upcoming_chapters
-                    })
+                    upcoming_story = story_domain.UpcomingChaptersStory(
+                        story.id, story.title, topic_model.name,
+                        upcoming_chapters)
+                    upcoming_stories.append(upcoming_story)
 
-    return (overdue_stories_dicts, upcoming_stories_dicts)
+    return (overdue_stories, upcoming_stories)
