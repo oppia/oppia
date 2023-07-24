@@ -6191,6 +6191,8 @@ export default {
   //
   // NOTE TO RELEASE COORDINATORS: Please change these to the production values,
   // and change useEmulator to be false, before deploying to production.
+
+  "FIREBASE_DOMAIN": "https://oppiaserver.firebaseapp.com",
   "FIREBASE_CONFIG_API_KEY": "fake-api-key",
   "FIREBASE_CONFIG_AUTH_DOMAIN": "",
   "FIREBASE_CONFIG_PROJECT_ID": "dev-project-id",

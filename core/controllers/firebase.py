@@ -18,6 +18,7 @@ from __future__ import annotations
 
 import json
 
+from core.constants import constants
 from core.controllers import base
 
 import requests
@@ -25,7 +26,7 @@ from typing import Any, Dict
 
 
 # Timeout in seconds for requests.
-_TIMEOUT_SECS = 60
+TIMEOUT_SECS = 60
 
 
 class FirebaseProxyHandler(
@@ -41,11 +42,11 @@ class FirebaseProxyHandler(
         data = json.loads(self.request.body) if self.request.body else None
         response = requests.request(
             self.request.method,
-            f'https://oppiaserver.firebaseapp.com{self.request.path}',
+            f'{constants.FIREBASE_DOMAIN}{self.request.path}',
             params=dict(self.request.params),
             data=data,
             headers=dict(self.request.headers.items()),
-            timeout=_TIMEOUT_SECS
+            timeout=TIMEOUT_SECS
         )
         for header_key, header_value in response.headers.items():
             self.response.headers[header_key] = header_value
