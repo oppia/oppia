@@ -18,7 +18,9 @@ from __future__ import annotations
 
 import json
 
+from core import feconf
 from core.constants import constants
+from core.controllers import acl_decorators
 from core.controllers import base
 
 import requests
@@ -34,7 +36,14 @@ class FirebaseProxyHandler(
 ):
     """Handler to proxy auth requests to the firebase domain."""
 
-    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {
+        'firebase_path': {
+            'schema': {
+                'type': 'basestring'
+            }
+        }
+    }
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}, 'POST': {}}
 
     def _firebase_proxy(self) -> None:
@@ -55,12 +64,14 @@ class FirebaseProxyHandler(
 
     # Here we use type Any because the method signature has to match
     # the parent class.
+    @acl_decorators.open_access
     def get(self, *args: Any, **kwargs: Any) -> None:  # pylint: disable=unused-argument
         """Proxies GET requests to the firebase app."""
         self._firebase_proxy()
 
     # Here we use type Any because the method signature has to match
     # the parent class.
+    @acl_decorators.open_access
     def post(self, *args: Any) -> None:  # pylint: disable=unused-argument
         """Proxies POST requests to the firebase app."""
         self._firebase_proxy()

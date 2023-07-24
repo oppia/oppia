@@ -214,7 +214,10 @@ def get_redirect_route(
 
 # Register the URLs with the classes responsible for handling them.
 URLS = [
-    get_redirect_route('/<:__/auth(?:/.*)?>', firebase.FirebaseProxyHandler),
+    get_redirect_route(
+        '/<firebase_path:__/auth(?:/.*)?>',
+        firebase.FirebaseProxyHandler
+    ),
     get_redirect_route(r'/_ah/warmup', WarmupPage),
     get_redirect_route(r'/splash', SplashRedirectPage),
     get_redirect_route(
