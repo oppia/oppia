@@ -18,7 +18,6 @@
 
 import { Component } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 
 @Component({
   selector: 'thanks-for-subscribing-modal',
@@ -27,7 +26,6 @@ import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 export class ThanksForSubscribingModalComponent {
   constructor(
     private activeModal: NgbActiveModal,
-    private i18nLanguageCodeService: I18nLanguageCodeService,
   ) {}
 
   dismiss(): void {
