@@ -314,7 +314,6 @@
         "core.jobs.batch_jobs.topic_migration_jobs_test",
         "core.jobs.batch_jobs.blog_post_search_indexing_jobs_test",
         "core.jobs.batch_jobs.rejecting_suggestion_for_invalid_content_ids_jobs_test",
-        "core.jobs.batch_jobs.user_settings_profile_picture_jobs_test",
         "core.jobs.io.cache_io_test",
         "scripts.populate_sample_contributor_data_test",
         "core.platform.secrets.cloud_secrets_services_test",
@@ -381,8 +380,8 @@
         "core.platform.bulk_email.mailchimp_bulk_email_services_test",
         "core.platform.bulk_email.dev_mode_bulk_email_services_test",
         "core.jobs.io.job_io_test",
+        "core.jobs.batch_jobs.remove_profile_picture_data_url_field_jobs_test",
         "core.jobs.io.gcs_io_test",
-        "core.domain.android_services_test",
-        "core.jobs.batch_jobs.store_profile_images_to_gcs_jobs_test"
+        "core.domain.android_services_test"
     ]
 }
