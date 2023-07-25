@@ -107,20 +107,9 @@ class BuildTests(test_utils.GenericTestBase):
 
     def test_minify_and_create_sourcemap_under_docker_environment(self) -> None:
         """Tests _minify_and_create_sourcemap with an invalid filepath."""
-        with self.assertRaisesRegex(
-            subprocess.CalledProcessError,
-            'returned non-zero exit status 1') as called_process:
-            with self.swap(feconf, 'OPPIA_IS_DOCKERIZED', True):
-                build._minify_and_create_sourcemap(  # pylint: disable=protected-access
-                    INVALID_INPUT_FILEPATH, INVALID_OUTPUT_FILEPATH)
-        # Here we use MyPy ignore because the stubs of 'assertRaisesRegex' do
-        # not contain any returncode attribute, so because of this MyPy throws
-        # an '"Exception" has no attribute "returncode"' error. Thus to avoid
-        # the error, we used ignore here.
-        # `returncode` is the exit status of the child process.
-        # Exit Code will be 127 (refers to a non-existent file or directory) as
-        # the file path will be available only in the docker container.
-        self.assertEqual(called_process.exception.returncode, 127)  # type: ignore[attr-defined]
+        with self.swap(feconf, 'OPPIA_IS_DOCKERIZED', True):
+            build._minify_and_create_sourcemap(  # pylint: disable=protected-access
+                INVALID_INPUT_FILEPATH, INVALID_OUTPUT_FILEPATH)
 
     def test_join_files(self) -> None:
         """Determine third_party.js contains the content of the first 10 JS
@@ -1262,7 +1251,22 @@ class E2EAndAcceptanceBuildTests(test_utils.GenericTestBase):
             build, 'main', lambda *_, **__: None,
             expected_kwargs=[{'args': []}]))
         self.exit_stack.enter_context(self.swap_with_checks(
-            sys, 'exit', lambda _: None, expected_args=[(return_code,)]))
+            sys, 'exit', lambda _: None,
+            expected_args=[
+                # When the code under test runs, the first sys.exit call halts
+                # execution. However, when this test runs, sys.exit is mocked
+                # and so does not interrupt the execution flow. Therefore we
+                # call sys.exit with the error code from the webpack compilation
+                # process (2) 5 times (the maximum number of attempts allowed to
+                # compile webpack) and then exit with code 1 after giving up
+                # trying to compile webpack.
+                (return_code,),
+                (return_code,),
+                (return_code,),
+                (return_code,),
+                (return_code,),
+                (1,),
+            ]))
 
         build.build_js_files(True)
 
