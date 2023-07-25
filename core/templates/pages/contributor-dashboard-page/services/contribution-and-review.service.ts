@@ -226,11 +226,12 @@ export class ContributionAndReviewService {
 
     const exploration: Exploration = this.explorationObjectFactory.
       createFromBackendDict(explorationBackendDict);
-
+    const states = this.getStatesForExploration(exploration);
     const sortedTranslationCards = this.sortTranslationSuggestionsByState(
       responseBody.suggestions,
-      exploration.getStates(),
-      exploration.getInitialState().name
+      // exploration.getStates(),
+      states,
+      explorationBackendDict.init_state_name
     );
 
     responseBody.suggestions = sortedTranslationCards;
@@ -250,6 +251,10 @@ export class ContributionAndReviewService {
       suggestionIdToDetails: responseSuggestionIdToDetails,
       more: Object.keys(fetcher.suggestionIdToDetails).length > 0
     };
+  }
+
+  private getStatesForExploration(exploration: Exploration) {
+    return exploration.getStates();
   }
 
   // Function to sort translation cards by state.
