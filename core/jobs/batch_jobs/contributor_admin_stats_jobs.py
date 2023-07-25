@@ -375,8 +375,7 @@ class GenerateContributorAdminStatsJob(base_jobs.JobBase):
         # https://docs.google.com/document/d/19lCEYQUgV7_DwIK_0rz3zslRHX2qKOHn-t9Twpi0qu0/edit.
         overall_accuracy = (
             round(
-                accepted_translations_count / submitted_translations_count * 100
-                ,2
+                accepted_translations_count / submitted_translations_count * 100, 2
             )
         )
 
