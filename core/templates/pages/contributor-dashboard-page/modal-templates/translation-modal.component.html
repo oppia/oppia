@@ -37,7 +37,7 @@
   <div *ngIf="textToTranslate">
     <div class="oppia-translatable-text-section">
       <strong>Please translate the given {{ activeContentType }} in {{ languageDescription }}:</strong>
-      <a class="oppia-skip-button" *ngIf="moreAvailable" (click)="skipActiveTranslation()">skip</a>
+      <a class="oppia-skip-button" *ngIf="moreAvailable" (click)="skipActiveTranslation()">Skip</a>
     </div>
     <div *ngIf="!loadingData && !uploadingTranslation"
          class="oppia-text-to-translate-container"
@@ -138,7 +138,7 @@
   <button class="btn btn-success oppia-go-back-button"
           [disabled]="!hasPreviousTranslations()"
           (click)="returnToPreviousTranslation()">
-    Go Back
+    Go back
   </button>
   <button class="btn btn-success oppia-upload-translated-text-button"
           [disabled]="loadingData || uploadingTranslation || activeWrittenTranslation === '' || isSubmitted()"
