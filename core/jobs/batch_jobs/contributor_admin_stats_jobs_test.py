@@ -777,7 +777,6 @@ class GenerateContributorAdminStatsJobTests(ContributorDashboardTest):
                 language_code=None,
                 edited_by_reviewer=False).put()
 
-
         for i in range(1, 130):
             if i < 40:
                 suggestion_models.GeneralSuggestionModel(
