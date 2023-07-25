@@ -558,7 +558,8 @@ describe('Exploration Summary Tile Component', () => {
     const expectedOffsetValue =
     (
       component.circumference -
-      (explorationProgress / 100) * component.circumference);
+      (explorationProgress / 100) * component.circumference
+    );
     component.explorationProgress = explorationProgress;
     const changes: SimpleChanges = {
       value: {
