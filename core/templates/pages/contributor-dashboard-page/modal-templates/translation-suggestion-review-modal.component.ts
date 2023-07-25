@@ -434,18 +434,19 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
       AppConstants.ACTION_ACCEPT_SUGGESTION,
       reviewMessageForSubmitter, this.finalCommitMessage,
       () => {
+        this.alertsService.clearMessages();
         this.alertsService.addSuccessMessage('Suggestion accepted.');
         this.resolveSuggestionAndUpdateModal();
       },
       (errorMessage) => {
-        this.rejectAndReviewNext(`Invalid Suggestion: ${errorMessage}`);
+        const message = `Invalid Suggestion: ${errorMessage}`;
         this.alertsService.clearWarnings();
-        this.alertsService.addWarning(
-          `Invalid Suggestion: ${errorMessage}`);
+        this.alertsService.addWarning(message);
+        this._reject(message);
       });
   }
 
-  rejectAndReviewNext(reviewMessage: string): void {
+  _reject(reviewMessage: string, onSuccess: () => void = () => {}): void {
     if (this.validatorsService.isValidReviewMessage(reviewMessage,
       /* ShowWarnings= */ true)) {
       this.resolvingSuggestion = true;
@@ -458,17 +459,21 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
         this.activeSuggestion.target_id, this.activeSuggestionId,
         AppConstants.ACTION_REJECT_SUGGESTION,
         reviewMessage || this.reviewMessage, null,
-        () => {
-          this.alertsService.addSuccessMessage('Suggestion rejected.');
-          this.resolveSuggestionAndUpdateModal();
-        },
-        (error) => {
+        onSuccess, (error) => {
           this.alertsService.clearWarnings();
           this.alertsService.addWarning(
             'There was an error rejecting this suggestion');
         }
       );
     }
+  }
+
+  rejectAndReviewNext(reviewMessage: string): void {
+    this._reject(reviewMessage, () => {
+      this.alertsService.clearMessages();
+      this.alertsService.addSuccessMessage('Suggestion rejected.');
+      this.resolveSuggestionAndUpdateModal();
+    });
   }
 
   // Returns whether the active suggestion's exploration_content_html

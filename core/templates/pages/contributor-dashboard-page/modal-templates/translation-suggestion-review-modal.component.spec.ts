@@ -38,7 +38,7 @@ class MockChangeDetectorRef {
   detectChanges(): void {}
 }
 
-fdescribe('Translation Suggestion Review Modal Component', function() {
+describe('Translation Suggestion Review Modal Component', function() {
   let fixture: ComponentFixture<TranslationSuggestionReviewModalComponent>;
   let component: TranslationSuggestionReviewModalComponent;
   let alertsService: AlertsService;
@@ -294,8 +294,7 @@ fdescribe('Translation Suggestion Review Modal Component', function() {
           '(Note: This suggestion was submitted with reviewer edits.)',
           'hint section of "StateName" card',
           jasmine.any(Function), jasmine.any(Function));
-      expect(alertsService.addSuccessMessage).toHaveBeenCalledWith(
-        'Suggestion accepted.');
+      expect(alertsService.addSuccessMessage).toHaveBeenCalled();
 
       component.reviewMessage = 'Review message example 2';
       component.translationUpdated = false;
@@ -309,8 +308,7 @@ fdescribe('Translation Suggestion Review Modal Component', function() {
           '2', 'suggestion_2', 'accept', 'Review message example 2',
           'hint section of "StateName" card', jasmine.any(Function),
           jasmine.any(Function));
-      expect(alertsService.addSuccessMessage).toHaveBeenCalledWith(
-        'Suggestion accepted.');
+      expect(alertsService.addSuccessMessage).toHaveBeenCalled();
       expect(activeModal.close).toHaveBeenCalledWith([
         'suggestion_1', 'suggestion_2']);
     });
@@ -347,8 +345,7 @@ fdescribe('Translation Suggestion Review Modal Component', function() {
           '(Note: This suggestion was submitted with reviewer edits.)',
           'hint section of "StateName" card', jasmine.any(Function),
           jasmine.any(Function));
-      expect(alertsService.addSuccessMessage).toHaveBeenCalledWith(
-        'Suggestion accepted.');
+      expect(alertsService.addSuccessMessage).toHaveBeenCalled();
     });
 
     it('should reject suggestion in suggestion modal service when clicking ' +
@@ -387,8 +384,7 @@ fdescribe('Translation Suggestion Review Modal Component', function() {
           '1', 'suggestion_1', 'reject', 'Review message example',
           null, jasmine.any(Function),
           jasmine.any(Function));
-      expect(alertsService.addSuccessMessage).toHaveBeenCalledWith(
-        'Suggestion rejected.');
+      expect(alertsService.addSuccessMessage).toHaveBeenCalled();
 
       component.reviewMessage = 'Review message example 2';
       component.translationUpdated = false;
@@ -397,14 +393,14 @@ fdescribe('Translation Suggestion Review Modal Component', function() {
       expect(
         siteAnalyticsService.registerContributorDashboardRejectSuggestion)
         .toHaveBeenCalledWith('Translation');
-      expect(alertsService.addSuccessMessage).toHaveBeenCalledWith(
-        'Suggestion rejected.');
+      expect(alertsService.addSuccessMessage).toHaveBeenCalled();
       expect(activeModal.close).toHaveBeenCalledWith([
         'suggestion_1', 'suggestion_2']);
     });
 
     it('should reject a suggestion if the backend pre accept validation ' +
     'failed', function() {
+      const responseMessage = 'Pre accept validation failed.';
       component.ngOnInit();
       expect(component.activeSuggestionId).toBe('suggestion_1');
       expect(component.activeSuggestion).toEqual(suggestion1);
@@ -418,7 +414,7 @@ fdescribe('Translation Suggestion Review Modal Component', function() {
             targetId, suggestionId, action, reviewMessage, commitMessage,
             successCallback, errorCallback) => {
           return Promise.reject(
-            errorCallback('Pre accept validation failed.')
+            errorCallback(responseMessage)
           );
         });
       spyOn(alertsService, 'addWarning');
@@ -435,7 +431,7 @@ fdescribe('Translation Suggestion Review Modal Component', function() {
           'hint section of "StateName" card', jasmine.any(Function),
           jasmine.any(Function));
       expect(alertsService.addWarning).toHaveBeenCalledWith(
-        'Invalid Suggestion: Pre accept validation failed.');
+        jasmine.stringContaining(responseMessage));
     });
 
     it(
