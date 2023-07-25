@@ -373,10 +373,8 @@ class GenerateContributorAdminStatsJob(base_jobs.JobBase):
 
         # Weights of overall_accuracy as documented in
         # https://docs.google.com/document/d/19lCEYQUgV7_DwIK_0rz3zslRHX2qKOHn-t9Twpi0qu0/edit.
-        overall_accuracy = (
-            round(
-                accepted_translations_count / submitted_translations_count * 100, 2
-            )
+        overall_accuracy = round(
+            accepted_translations_count / submitted_translations_count * 100, 2
         )
 
         with datastore_services.get_ndb_context():
