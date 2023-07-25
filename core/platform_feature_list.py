@@ -24,7 +24,7 @@ from typing import List
 
 ParamNames = params.ParamNames
 
-# Names of feature objects defined in domain/params.py
+# Names of feature objects defined in domain/platform_parameter_list.py
 # should be added to one of the following lists:
 #   - DEV_FEATURES_LIST
 #   - TEST_FEATURES_LIST
