@@ -68,11 +68,7 @@ class GenerateContributorAdminStatsJob(base_jobs.JobBase):
              | 'Filter reviewed translate suggestions' >> beam.Filter(
                 lambda m: (
                     m.suggestion_type ==
-                    feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT and
-                    m.status in [
-                        suggestion_models.STATUS_ACCEPTED,
-                        suggestion_models.STATUS_REJECTED
-                    ]
+                    feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT
                 ))
             | 'Group by language and user' >> beam.Map(
                 lambda stats: ((stats.language_code, stats.author_id), stats)
@@ -84,11 +80,7 @@ class GenerateContributorAdminStatsJob(base_jobs.JobBase):
              | 'Filter reviewed questions suggestions' >> beam.Filter(
                 lambda m: (
                     m.suggestion_type ==
-                    feconf.SUGGESTION_TYPE_ADD_QUESTION and
-                    m.status in [
-                        suggestion_models.STATUS_ACCEPTED,
-                        suggestion_models.STATUS_REJECTED
-                    ]
+                    feconf.SUGGESTION_TYPE_ADD_QUESTION
                 ))
             | 'Group by user' >> beam.Map(
                 lambda stats: (stats.author_id, stats)
@@ -321,11 +313,15 @@ class GenerateContributorAdminStatsJob(base_jobs.JobBase):
         }
 
         for v in general_suggestion_stats:
-            if (v.status == 'accepted' and v.edited_by_reviewer is False):
+            if (
+                v.status == suggestion_models.STATUS_ACCEPTED and
+                v.edited_by_reviewer is False):
                 recent_review_outcomes.append('accepted')
-            elif (v.status == 'accepted' and v.edited_by_reviewer is True):
+            elif (
+                v.status == suggestion_models.STATUS_ACCEPTED and
+                v.edited_by_reviewer is True):
                 recent_review_outcomes.append('accepted_with_edits')
-            else:
+            elif v.status == suggestion_models.STATUS_REJECTED:
                 recent_review_outcomes.append('rejected')
 
         if len(recent_review_outcomes) > 100:
@@ -379,8 +375,9 @@ class GenerateContributorAdminStatsJob(base_jobs.JobBase):
         # https://docs.google.com/document/d/19lCEYQUgV7_DwIK_0rz3zslRHX2qKOHn-t9Twpi0qu0/edit.
         overall_accuracy = (
             round(
-                accepted_translations_count / submitted_translations_count, 2
-            ) * 100
+                accepted_translations_count / submitted_translations_count * 100
+                , 2
+            )
         )
 
         with datastore_services.get_ndb_context():
@@ -530,11 +527,14 @@ class GenerateContributorAdminStatsJob(base_jobs.JobBase):
         }
 
         for v in general_suggestion_stats:
-            if (v.status == 'accepted' and v.edited_by_reviewer is False):
+            if (
+                v.status == suggestion_models.STATUS_ACCEPTED and
+                v.edited_by_reviewer is False):
                 recent_review_outcomes.append('accepted')
-            elif (v.status == 'accepted' and v.edited_by_reviewer is True):
+            elif (v.status == suggestion_models.STATUS_ACCEPTED and
+                  v.edited_by_reviewer is True):
                 recent_review_outcomes.append('accepted_with_edits')
-            else:
+            elif v.status == suggestion_models.STATUS_REJECTED:
                 recent_review_outcomes.append('rejected')
 
         if len(recent_review_outcomes) > 100:
@@ -575,8 +575,9 @@ class GenerateContributorAdminStatsJob(base_jobs.JobBase):
         # Weights of overall_accuracy as documented in
         # https://docs.google.com/document/d/19lCEYQUgV7_DwIK_0rz3zslRHX2qKOHn-t9Twpi0qu0/edit.
         overall_accuracy = (
-            round(accepted_questions_count / submitted_questions_count, 2)
-            * 100
+            round(
+            accepted_questions_count / submitted_questions_count
+            * 100, 2)
         )
 
         with datastore_services.get_ndb_context():

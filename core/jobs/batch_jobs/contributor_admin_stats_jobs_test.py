@@ -719,35 +719,122 @@ class GenerateContributorAdminStatsJobTests(ContributorDashboardTest):
         )
 
     def test_job_for_recent_review_outcomes_limit(self) -> None:
-        for i in range(1, 120):
-            suggestion_models.GeneralSuggestionModel(
-            id=i,
-            suggestion_type=feconf.SUGGESTION_TYPE_ADD_QUESTION,
-            target_type=feconf.ENTITY_TYPE_EXPLORATION,
-            target_id=self.target_id,
-            target_version_at_submission=self.target_version_at_submission,
-            status=suggestion_models.STATUS_ACCEPTED,
-            author_id='user1',
-            final_reviewer_id='reviewer_2',
-            change_cmd=self.change_cmd,
-            score_category=self.score_category,
-            language_code=None,
-            edited_by_reviewer=True).put()
+        for i in range(1, 130):
+            if i < 40:
+                suggestion_models.GeneralSuggestionModel(
+                id=i,
+                suggestion_type=feconf.SUGGESTION_TYPE_ADD_QUESTION,
+                target_type=feconf.ENTITY_TYPE_EXPLORATION,
+                target_id=self.target_id,
+                target_version_at_submission=self.target_version_at_submission,
+                status=suggestion_models.STATUS_ACCEPTED,
+                author_id='user1',
+                final_reviewer_id='reviewer_2',
+                change_cmd=self.change_cmd,
+                score_category=self.score_category,
+                language_code=None,
+                edited_by_reviewer=True).put()
+            elif 40 < i < 80:
+                suggestion_models.GeneralSuggestionModel(
+                id=i,
+                suggestion_type=feconf.SUGGESTION_TYPE_ADD_QUESTION,
+                target_type=feconf.ENTITY_TYPE_EXPLORATION,
+                target_id=self.target_id,
+                target_version_at_submission=self.target_version_at_submission,
+                status=suggestion_models.STATUS_REJECTED,
+                author_id='user1',
+                final_reviewer_id='reviewer_2',
+                change_cmd=self.change_cmd,
+                score_category=self.score_category,
+                language_code=None,
+                edited_by_reviewer=True).put()
+            elif 80 < i < 120:
+                suggestion_models.GeneralSuggestionModel(
+                id=i,
+                suggestion_type=feconf.SUGGESTION_TYPE_ADD_QUESTION,
+                target_type=feconf.ENTITY_TYPE_EXPLORATION,
+                target_id=self.target_id,
+                target_version_at_submission=self.target_version_at_submission,
+                status=suggestion_models.STATUS_ACCEPTED,
+                author_id='user1',
+                final_reviewer_id='reviewer_2',
+                change_cmd=self.change_cmd,
+                score_category=self.score_category,
+                language_code=None,
+                edited_by_reviewer=False).put()
+            else:
+                suggestion_models.GeneralSuggestionModel(
+                id=i,
+                suggestion_type=feconf.SUGGESTION_TYPE_ADD_QUESTION,
+                target_type=feconf.ENTITY_TYPE_EXPLORATION,
+                target_id=self.target_id,
+                target_version_at_submission=self.target_version_at_submission,
+                status=suggestion_models.STATUS_IN_REVIEW,
+                author_id='user1',
+                final_reviewer_id='reviewer_2',
+                change_cmd=self.change_cmd,
+                score_category=self.score_category,
+                language_code=None,
+                edited_by_reviewer=False).put()
 
-        for i in range(1, 120):
-            suggestion_models.GeneralSuggestionModel(
-            id=i + 120,
-            suggestion_type=feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
-            target_type=feconf.ENTITY_TYPE_EXPLORATION,
-            target_id=self.target_id,
-            target_version_at_submission=self.target_version_at_submission,
-            status=suggestion_models.STATUS_ACCEPTED,
-            author_id='user1',
-            final_reviewer_id='reviewer_2',
-            change_cmd=self.change_cmd,
-            score_category=self.score_category,
-            language_code='hi',
-            edited_by_reviewer=True).put()
+
+        for i in range(1, 130):
+            if i < 40:
+                suggestion_models.GeneralSuggestionModel(
+                id=i + 130,
+                suggestion_type=feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+                target_type=feconf.ENTITY_TYPE_EXPLORATION,
+                target_id=self.target_id,
+                target_version_at_submission=self.target_version_at_submission,
+                status=suggestion_models.STATUS_ACCEPTED,
+                author_id='user1',
+                final_reviewer_id='reviewer_2',
+                change_cmd=self.change_cmd,
+                score_category=self.score_category,
+                language_code='hi',
+                edited_by_reviewer=True).put()
+            elif 40 < i < 80:
+                suggestion_models.GeneralSuggestionModel(
+                id=i + 130,
+                suggestion_type=feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+                target_type=feconf.ENTITY_TYPE_EXPLORATION,
+                target_id=self.target_id,
+                target_version_at_submission=self.target_version_at_submission,
+                status=suggestion_models.STATUS_REJECTED,
+                author_id='user1',
+                final_reviewer_id='reviewer_2',
+                change_cmd=self.change_cmd,
+                score_category=self.score_category,
+                language_code='hi',
+                edited_by_reviewer=True).put()
+            elif 80 < i < 120:
+                suggestion_models.GeneralSuggestionModel(
+                id=i + 130,
+                suggestion_type=feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+                target_type=feconf.ENTITY_TYPE_EXPLORATION,
+                target_id=self.target_id,
+                target_version_at_submission=self.target_version_at_submission,
+                status=suggestion_models.STATUS_ACCEPTED,
+                author_id='user1',
+                final_reviewer_id='reviewer_2',
+                change_cmd=self.change_cmd,
+                score_category=self.score_category,
+                language_code='hi',
+                edited_by_reviewer=False).put()
+            else:
+                suggestion_models.GeneralSuggestionModel(
+                id=i + 130,
+                suggestion_type=feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+                target_type=feconf.ENTITY_TYPE_EXPLORATION,
+                target_id=self.target_id,
+                target_version_at_submission=self.target_version_at_submission,
+                status=suggestion_models.STATUS_IN_REVIEW,
+                author_id='user1',
+                final_reviewer_id='reviewer_2',
+                change_cmd=self.change_cmd,
+                score_category=self.score_category,
+                language_code='hi',
+                edited_by_reviewer=False).put()
 
         self.translation_contribution_model_1.update_timestamps()
         self.translation_contribution_model_1.put()
