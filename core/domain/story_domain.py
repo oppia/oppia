@@ -2349,34 +2349,9 @@ class StoryChapterProgressSummaryDict(TypedDict):
     total_checkpoints_count: int
 
 
-class OverdueChaptersStory:
-    """Domain object for story with overdue chapters."""
-
-    def __init__(
-        self,
-        story_id: str,
-        story_name: str,
-        topic_name: str,
-        overdue_chapters: List[str]
-    ) -> None:
-        """Constructs an OverdueChaptersStory domain object.
-
-        Args:
-            story_id: str. The unique id of the story.
-            story_name: str. The title of the story.
-            topic_name: str. The title of the topic.
-            overdue_chapters: list(str). The list of behind schedule chapter
-                names.
-        """
-        self.id = story_id
-        self.story_name = story_name
-        self.topic_name = topic_name
-        self.overdue_chapters = overdue_chapters
-
-
-class UpcomingChaptersStory:
-    """Domain object for story with chapters upcoming
-    within UPCOMING_CHAPTERS_DAY_LIMIT.
+class StoryPublicationTimeliness:
+    """Domain object for stories with behind-schedule chapters
+    or chapters upcoming within UPCOMING_CHAPTERS_DAY_LIMIT.
     """
 
     def __init__(
@@ -2384,18 +2359,22 @@ class UpcomingChaptersStory:
         story_id: str,
         story_name: str,
         topic_name: str,
+        overdue_chapters: List[str],
         upcoming_chapters: List[str]
     ) -> None:
-        """Constructs an UpcomingChaptersStory domain object.
+        """Constructs a StoryPublicationTimeliness domain object.
 
         Args:
             story_id: str. The unique id of the story.
             story_name: str. The title of the story.
             topic_name: str. The title of the topic.
+            overdue_chapters: list(str). The list of behind schedule chapter
+                names.
             upcoming_chapters: list(str). The list of chapter names
                 upcoming within UPCOMING_CHAPTERS_DAY_LIMIT.
         """
         self.id = story_id
         self.story_name = story_name
         self.topic_name = topic_name
+        self.overdue_chapters = overdue_chapters
         self.upcoming_chapters = upcoming_chapters

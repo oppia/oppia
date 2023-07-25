@@ -2047,20 +2047,16 @@ def send_mail_to_notify_contributor_ranking_achievement(
 
 def send_reminder_mail_to_notify_curriculum_admins(
     curriculum_admin_ids: List[str],
-    overdue_stories: List[story_domain.OverdueChaptersStory],
-    upcoming_stories: List[story_domain.UpcomingChaptersStory]) -> None:
-
+    chapter_notifications_list: List[
+        story_domain.StoryPublicationTimeliness]) -> None:
     """Sends an email to curriculum admins to notify them about the
     behind-schedule and upcoming chapters in all the topics.
 
     Args:
         curriculum_admin_ids: list(str). The user ids of the admins to notify.
-        overdue_stories: list(OverdueChaptersStory). A list of
-            stories containing the information about the behind-schedule
-            chapters to be notified.
-        upcoming_stories: list(UpcomingChaptersStory). A list of
-            stories containing the information about the upcoming chapters
-            to be notified.
+        chapter_notifications_list: list(StoryPublicationTimeliness). The list
+            of stories having behind-schedule or upcoming chapters to be
+            notified.
     """
     if not feconf.CAN_SEND_EMAILS:
         logging.error('This app cannot send emails to users.')
@@ -2075,9 +2071,19 @@ def send_reminder_mail_to_notify_curriculum_admins(
 
     email_body = 'Dear Curriculum Admin, <br><br>'
 
-    if len(overdue_stories):
+    chapters_are_overdue = False
+    chapters_are_upcoming = False
+    for story in chapter_notifications_list:
+        if len(story.overdue_chapters):
+            chapters_are_overdue = chapters_are_overdue or True
+        if len(story.upcoming_chapters):
+            chapters_are_upcoming = chapters_are_upcoming or True
+
+    if chapters_are_overdue:
         overdue_stories_html = ''
-        for overdue_story in overdue_stories:
+        for overdue_story in chapter_notifications_list:
+            if len(overdue_story.overdue_chapters) == 0:
+                continue
             story_link = (
                 str(feconf.OPPIA_SITE_URL) +
                 str(feconf.STORY_EDITOR_URL_PREFIX) +
@@ -2093,9 +2099,11 @@ def send_reminder_mail_to_notify_curriculum_admins(
         email_body += email_body_template['overdue_chapters_template'] % (
             overdue_stories_html)
 
-    if len(upcoming_stories):
+    if chapters_are_upcoming:
         upcoming_stories_html = ''
-        for upcoming_story in upcoming_stories:
+        for upcoming_story in chapter_notifications_list:
+            if len(upcoming_story.upcoming_chapters) == 0:
+                continue
             story_link = (
                 str(feconf.OPPIA_SITE_URL) +
                 str(feconf.STORY_EDITOR_URL_PREFIX) +
@@ -2113,7 +2121,7 @@ def send_reminder_mail_to_notify_curriculum_admins(
 
     email_body += 'Regards,<br> Oppia Foundation'
 
-    if len(overdue_stories) or len(upcoming_stories):
+    if chapters_are_overdue or chapters_are_upcoming:
         bulk_email_model_id = email_models.BulkEmailModel.get_new_id('')
         _send_bulk_mail(
             curriculum_admin_ids, feconf.SYSTEM_COMMITTER_ID,

@@ -970,20 +970,18 @@ def record_completed_node_in_story_context(
         progress_model.put()
 
 
-def get_chapter_notification_dicts() -> Tuple[
-    List[story_domain.OverdueChaptersStory],
-    List[story_domain.UpcomingChaptersStory]]:
-    """Returns a dict of behind-schedule and upcoming chapters.
+def get_chapter_notifications_stories_list() -> List[
+    story_domain.StoryPublicationTimeliness]:
+    """Returns a list of stories with behind-schedule or upcoming chapters.
 
     Returns:
-        tuple(list(OverdueChaptersStory), list(UpcomingChaptersStory)). A
-        2-tuple whose first element is a list of story dicts having overdue
-        chapters and second element is a list of story dicts having upcoming
-        chapters.
+        list(StoryPublicationTimeliness). A list of stories with having
+        behind-schedule chapters or chapters upcoming within
+        UPCOMING_CHAPTERS_DAY_LIMIT.
     """
     topic_models = topic_fetchers.get_all_topics()
-    overdue_stories: List[story_domain.OverdueChaptersStory] = []
-    upcoming_stories: List[story_domain.UpcomingChaptersStory] = []
+    chapter_notifications_stories_list: List[
+        story_domain.StoryPublicationTimeliness] = []
     all_canonical_story_ids = []
     for topic_model in topic_models:
         canonical_story_ids = [story_reference.story_id
@@ -1013,7 +1011,7 @@ def get_chapter_notification_dicts() -> Tuple[
                             datetime.datetime.today() <
                             node.planned_publication_date <
                             (datetime.datetime.today() + datetime.timedelta(
-                            constants.UPCOMING_CHAPTERS_DAY_LIMIT)))
+                            days=constants.UPCOMING_CHAPTERS_DAY_LIMIT)))
                         chapter_is_behind_schedule = (
                             node.planned_publication_date < datetime.datetime.
                             today())
@@ -1023,16 +1021,10 @@ def get_chapter_notification_dicts() -> Tuple[
                         if chapter_is_behind_schedule:
                             overdue_chapters.append(node.title)
 
-                if len(overdue_chapters):
-                    overdue_story = story_domain.OverdueChaptersStory(
+                if len(upcoming_chapters) or len(overdue_chapters):
+                    story_timeliness = story_domain.StoryPublicationTimeliness(
                         story.id, story.title, topic_model.name,
-                        overdue_chapters)
-                    overdue_stories.append(overdue_story)
+                        overdue_chapters, upcoming_chapters)
+                    chapter_notifications_stories_list.append(story_timeliness)
 
-                if len(upcoming_chapters):
-                    upcoming_story = story_domain.UpcomingChaptersStory(
-                        story.id, story.title, topic_model.name,
-                        upcoming_chapters)
-                    upcoming_stories.append(upcoming_story)
-
-    return (overdue_stories, upcoming_stories)
+    return chapter_notifications_stories_list

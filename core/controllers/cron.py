@@ -323,8 +323,8 @@ class CronMailChapterPublicationsNotificationsHandler(
 
         admin_ids = user_services.get_user_ids_by_role(
             feconf.ROLE_ID_CURRICULUM_ADMIN)
-        overdue_stories_dicts, upcoming_stories_dicts = (
-            story_services.get_chapter_notification_dicts())
+        chapter_notifications_stories_list = (
+            story_services.get_chapter_notifications_stories_list())
         email_manager.send_reminder_mail_to_notify_curriculum_admins(
-            admin_ids, overdue_stories_dicts, upcoming_stories_dicts)
+            admin_ids, chapter_notifications_stories_list)
         return self.render_json({})
