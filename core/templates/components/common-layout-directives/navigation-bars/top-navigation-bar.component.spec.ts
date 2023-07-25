@@ -19,6 +19,7 @@
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, fakeAsync, flush, TestBed, tick, waitForAsync } from '@angular/core/testing';
+import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { DeviceInfoService } from 'services/contextual/device-info.service';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
@@ -157,7 +158,8 @@ describe('TopNavigationBarComponent', () => {
     mockWindowRef = new MockWindowRef();
     TestBed.configureTestingModule({
       imports: [
-        HttpClientTestingModule
+        HttpClientTestingModule,
+        NgbModule,
       ],
       declarations: [
         TopNavigationBarComponent,
