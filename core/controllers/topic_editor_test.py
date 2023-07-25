@@ -16,6 +16,7 @@
 
 from __future__ import annotations
 
+import datetime
 import os
 
 from core import feconf
@@ -133,6 +134,7 @@ class TopicEditorStoryHandlerTests(BaseTopicEditorControllerTests):
         topic_id = topic_fetchers.get_new_topic_id()
         canonical_story_id = story_services.get_new_story_id()
         canonical_story_id_2 = story_services.get_new_story_id()
+        canonical_story_id_3 = story_services.get_new_story_id()
         additional_story_id = story_services.get_new_story_id()
 
         # 'self.topic_id' does not contain any canonical_story_summary_dicts
@@ -218,7 +220,8 @@ class TopicEditorStoryHandlerTests(BaseTopicEditorControllerTests):
             topic_id, self.admin_id, name='New name',
             abbreviated_name='topic-two', url_fragment='topic-two',
             description='New description',
-            canonical_story_ids=[canonical_story_id, canonical_story_id_2],
+            canonical_story_ids=[canonical_story_id, canonical_story_id_2,
+                canonical_story_id_3],
             additional_story_ids=[additional_story_id],
             uncategorized_skill_ids=[self.skill_id],
             subtopics=[], next_subtopic_id=1)
@@ -240,6 +243,22 @@ class TopicEditorStoryHandlerTests(BaseTopicEditorControllerTests):
             description='another description',
             notes='another note'
         )
+
+        story_summary = story_domain.StorySummary(
+            story_id=canonical_story_id_3,
+            title='title 3',
+            description='description 3',
+            language_code='en',
+            version=1,
+            node_titles=[],
+            thumbnail_bg_color=constants.ALLOWED_THUMBNAIL_BG_COLORS[
+                'story'][0],
+            thumbnail_filename='img.svg',
+            url_fragment='url',
+            story_model_created_on=datetime.datetime.today(),
+            story_model_last_updated=datetime.datetime.today()
+        )
+        story_services.save_story_summary(story_summary)
 
         topic_services.publish_story(
             topic_id, canonical_story_id, self.admin_id)
