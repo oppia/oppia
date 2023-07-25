@@ -9,12 +9,16 @@
           <i class="fa fa-caret-down"
              *ngIf="!responseCardIsShown"
              tabindex="0"
-             aria-hidden="true">
+             role="button"
+             aria-label="Expand answers and responses"
+             [attr.aria-hidden]="responseCardIsShown ? 'true' : 'false'">
           </i>
           <i class="fa fa-caret-up"
              *ngIf="responseCardIsShown"
              tabindex="0"
-             aria-hidden="true">
+             role="button"
+             aria-label="collapse answers and responses"
+             [attr.aria-hidden]="responseCardIsShown ? 'false' : 'true'">>
           </i>
         </div>
       </div>
