@@ -188,8 +188,8 @@
 /.yarnrc @oppia/dev-workflow-reviewers
 /app_dev_docker.yaml @oppia/dev-workflow-reviewers
 /docker-compose.yml @oppia/dev-workflow-reviewers
-/docker/Dockerfile.frontend @oppia/dev-workflow-reviewers
-/docker/Dockerfile.backend @oppia/dev-workflow-reviewers
+/docker/ @oppia/dev-workflow-reviewers
+/Makefile @oppia/dev-workflow-reviewers
 /tox.ini @oppia/dev-workflow-reviewers
 /scripts/*.py @oppia/dev-workflow-reviewers
 /scripts/check_e2e_tests_are_captured_in_ci*.py @oppia/automated-qa-reviewers
@@ -327,7 +327,7 @@
 /core/templates/services/internet-connectivity.service*.ts @oppia/frontend-infrastructure-reviewers
 /core/templates/services/server-connection-backend-api.service*.ts @oppia/frontend-infrastructure-reviewers
 /core/templates/services/number-conversion.service*.ts @oppia/frontend-infrastructure-reviewers
-
+/core/templates/services/insert-script.service.ts @oppia/frontend-infrastructure-reviewers @oppia/core-reviewers
 
 # Global stylesheet.
 /core/templates/css/oppia.css @oppia/frontend-infrastructure-reviewers
