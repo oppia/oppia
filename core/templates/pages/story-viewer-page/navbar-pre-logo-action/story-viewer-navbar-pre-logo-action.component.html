@@ -1,4 +1,8 @@
-<a *ngIf="topicName" [href]="getTopicUrl()" class="oppia-story-viewer-back-button">
+<a *ngIf="topicName" [href]="getTopicUrl()"
+   class="oppia-story-viewer-back-button"
+   tabindex="0"
+   aria-label="Back button"
+   role="button">
   <span class="material-icons oppia-navbar-back-button">
     arrow_back
   </span>
