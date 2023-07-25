@@ -89,10 +89,7 @@ module.exports = {
           'assertions': {
             // TODO(18675): Change this back to 1 once the pencilcode.net TLS
             // cert error is fixed.
-            'errors-in-console': ['error', {
-              'minScore': 1,
-              'ignoredPatterns': ['Failed to load resource: net::ERR_CERT_DATE_INVALID'],
-            }],
+            'errors-in-console': ['error', {'minScore': 0}],
             // TODO(#13465): Change this maxLength to 0 once images are migrated.
             'modern-image-formats': [
               'error', {'maxLength': 3, 'strategy': 'pessimistic'}
