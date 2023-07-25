@@ -71,6 +71,7 @@
         <div class="oppia-editor-container"
              [ngClass]="isTranslationExpanded ? 'oppia-container-expanded' : 'oppia-container-contracted'"
              #translationContainer>
+          <p class="oppia-keybaord-accessibility-text" tabindex="0">Alt+0 for keyboard accessibility</p>
           <schema-based-editor *ngIf="editorIsShown && activeDataFormat === 'html'"
                                [schema]="HTML_SCHEMA"
                                [localValue]="activeWrittenTranslation"
@@ -155,6 +156,13 @@
 <style>
   .oppia-collapse-content {
     display: none;
+  }
+  .oppia-keybaord-accessibility-text {
+    color:#757575;
+    font-size: 12px;
+    font-style: normal;
+    font-weight: 400;
+    margin-bottom: 0;
   }
   .oppia-translate-modal-footer {
     display: flex;
