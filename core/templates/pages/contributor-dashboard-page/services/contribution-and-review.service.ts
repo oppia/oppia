@@ -259,8 +259,7 @@ export class ContributionAndReviewService {
       translationSuggestionsByState.set(stateName, suggestionsForState);
     }
 
-    // Sort translation cards within each state based on the specified criteria
-    // in the order object.
+    // Sort translation cards within each state based on the content type and index.
     for (const stateName of stateNamesInOrder) {
       const cardsForState = translationSuggestionsByState.get(stateName) || [];
 
