@@ -170,17 +170,18 @@ export class NoninteractiveImage implements OnInit, OnChanges {
         }
         throw e;
       }
-
-      this.imageCaption = '';
-      if (this.captionWithValue) {
-        this.imageCaption = this.htmlEscaperService.escapedJsonToObj(
-          this.captionWithValue) as string;
-      }
-      this.imageAltText = '';
-      if (this.altWithValue) {
-        this.imageAltText = this.htmlEscaperService.escapedJsonToObj(
-          this.altWithValue) as string;
-      }
+    }
+    // We set the alt text and caption for the image, regardless of when
+    // user is in the exploration player or not in the exploration player.
+    this.imageAltText = '';
+    if (this.altWithValue) {
+      this.imageAltText = this.htmlEscaperService.escapedJsonToObj(
+        this.altWithValue) as string;
+    }
+    this.imageCaption = '';
+    if (this.captionWithValue) {
+      this.imageCaption = this.htmlEscaperService.escapedJsonToObj(
+        this.captionWithValue) as string;
     }
   }
 
