@@ -20,18 +20,6 @@
           {{questionReviewersCount}}
       </h2>
     </div>
-    <div class="translation-coordinator stats-card" [attr.aria-label]="'Translation Coordinators' + 24" tabindex="0">
-      <p class="stat-description">Translation<br>Coordinators</p>
-      <h2 class="stat-value-with-rating e2e-test-oppia-open-feedback">
-          24
-      </h2>
-    </div>
-    <div class="question-coordinator stats-card" [attr.aria-label]="'Question Coordinator ' + 24" tabindex="0">
-      <p class="stat-description">Question<br>Coordinators</p>
-      <h2 class="stat-value-with-rating e2e-test-oppia-total-subscribers">
-          24
-      </h2>
-    </div>
     </mat-card>
   </div>
 </div>
@@ -61,18 +49,6 @@
           <a class="dashboard-tabs-text e2e-test-skills-tab"
              (click)="setActiveTab(TAB_NAME_QUESTION_REVIEWER)">
             Question<br>Reviewers
-          </a>
-        </li>
-        <li [ngClass]="{'dashboard-tabs-active': activeTab === TAB_NAME_LANGUAGE_COORDINATOR}">
-          <a class="dashboard-tabs-text e2e-test-skills-tab"
-             (click)="setActiveTab(TAB_NAME_LANGUAGE_COORDINATOR)">
-            Language<br>Coordinators
-          </a>
-        </li>
-        <li [ngClass]="{'dashboard-tabs-active': activeTab === TAB_NAME_QUESTION_COORDINATOR}">
-          <a class="dashboard-tabs-text e2e-test-skills-tab"
-             (click)="setActiveTab(TAB_NAME_QUESTION_COORDINATOR)">
-            Question<br>Coordinators
           </a>
         </li>
       </ul>

@@ -27,7 +27,7 @@ import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { RouterModule } from '@angular/router';
 import { APP_BASE_HREF } from '@angular/common';
 import { MatTableModule } from '@angular/material/table';
-import { MatCardModule } from '@angular/material/card';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 import { RequestInterceptor } from 'services/request-interceptor.service';
@@ -50,7 +50,7 @@ import { AppErrorHandlerProvider } from 'pages/oppia-root/app-error-handler';
     FormsModule,
     HttpClientModule,
     MatTableModule,
-    MatCardModule,
+    MatTooltipModule,
     // TODO(#13443): Remove smart router module provider once all pages are
     // migrated to angular router.
     SmartRouterModule,

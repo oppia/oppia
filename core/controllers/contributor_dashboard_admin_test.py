@@ -739,10 +739,23 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
         user_services.add_user_role(
             self.contributor_id, feconf.ROLE_ID_TRANSLATION_ADMIN)
 
+        user_settings_1 = user_services.create_new_user(
+            'auth_id_1', 'user1@example.com')
+        user_services.set_username(user_settings_1.user_id, 'user1')
+        user_settings_2 = user_services.create_new_user(
+            'auth_id_2', 'user2@example.com')
+        user_services.set_username(user_settings_2.user_id, 'user2')
+        user_settings_3 = user_services.create_new_user(
+            'auth_id_3', 'user3@example.com')
+        user_services.set_username(user_settings_3.user_id, 'user3')
+        user_settings_4 = user_services.create_new_user(
+            'auth_id_4', 'user4@example.com')
+        user_services.set_username(user_settings_4.user_id, 'user4')
+
         suggestion_models.TranslationSubmitterTotalContributionStatsModel(
             id='model_1',
             language_code=self.SUGGESTION_LANGUAGE_CODE,
-            contributor_id='user1',
+            contributor_id=user_settings_1.user_id,
             topic_ids_with_translation_submissions=[
                 'topic1'
             ],
@@ -767,7 +780,7 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
         suggestion_models.TranslationSubmitterTotalContributionStatsModel(
             id='model_2',
             language_code=self.SUGGESTION_LANGUAGE_CODE,
-            contributor_id='user2',
+            contributor_id=user_settings_2.user_id,
             topic_ids_with_translation_submissions=[
                 'topic3'
             ],
@@ -792,7 +805,7 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
         suggestion_models.TranslationSubmitterTotalContributionStatsModel(
             id='model_3',
             language_code=self.SUGGESTION_LANGUAGE_CODE,
-            contributor_id='user3',
+            contributor_id=user_settings_3.user_id,
             topic_ids_with_translation_submissions=[
                 'topic1', 'topic2'
             ],
@@ -817,7 +830,7 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
         suggestion_models.TranslationSubmitterTotalContributionStatsModel(
             id='model_4',
             language_code=self.SUGGESTION_LANGUAGE_CODE,
-            contributor_id='user4',
+            contributor_id=user_settings_4.user_id,
             topic_ids_with_translation_submissions=(
                 self.TOPIC_IDS_WITH_TRANSLATION_SUBMISSIONS),
             recent_review_outcomes=self.RECENT_REVIEW_OUTCOMES,
@@ -842,7 +855,7 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
         suggestion_models.TranslationReviewerTotalContributionStatsModel(
             id='model_1',
             language_code=self.SUGGESTION_LANGUAGE_CODE,
-            contributor_id='user1',
+            contributor_id=user_settings_1.user_id,
             topic_ids_with_translation_reviews=(
                 self.TOPIC_IDS_WITH_TRANSLATION_REVIEWS),
             reviewed_translations_count=10,
@@ -860,7 +873,7 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
         suggestion_models.TranslationReviewerTotalContributionStatsModel(
             id='model_2',
             language_code=self.SUGGESTION_LANGUAGE_CODE,
-            contributor_id='user2',
+            contributor_id=user_settings_2.user_id,
             topic_ids_with_translation_reviews=(
                 self.TOPIC_IDS_WITH_TRANSLATION_REVIEWS),
             reviewed_translations_count=20,
@@ -878,7 +891,7 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
         suggestion_models.TranslationReviewerTotalContributionStatsModel(
             id='model_3',
             language_code=self.SUGGESTION_LANGUAGE_CODE,
-            contributor_id='user3',
+            contributor_id=user_settings_3.user_id,
             topic_ids_with_translation_reviews=(
                 self.TOPIC_IDS_WITH_TRANSLATION_REVIEWS),
             reviewed_translations_count=30,
@@ -896,7 +909,7 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
         suggestion_models.TranslationReviewerTotalContributionStatsModel(
             id='model_4',
             language_code=self.SUGGESTION_LANGUAGE_CODE,
-            contributor_id='user4',
+            contributor_id=user_settings_4.user_id,
             topic_ids_with_translation_reviews=(
                 self.TOPIC_IDS_WITH_TRANSLATION_REVIEWS),
             reviewed_translations_count=40,
@@ -914,7 +927,7 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
 
         suggestion_models.QuestionSubmitterTotalContributionStatsModel(
             id='model_1',
-            contributor_id='user1',
+            contributor_id=user_settings_1.user_id,
             topic_ids_with_question_submissions=[
                 'topic1'
             ],
@@ -932,7 +945,7 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
         ).put()
         suggestion_models.QuestionSubmitterTotalContributionStatsModel(
             id='model_2',
-            contributor_id='user2',
+            contributor_id=user_settings_2.user_id,
             topic_ids_with_question_submissions=[
                 'topic3'
             ],
@@ -950,7 +963,7 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
         ).put()
         suggestion_models.QuestionSubmitterTotalContributionStatsModel(
             id='model_3',
-            contributor_id='user3',
+            contributor_id=user_settings_3.user_id,
             topic_ids_with_question_submissions=[
                 'topic1'
             ],
@@ -968,7 +981,7 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
         ).put()
         suggestion_models.QuestionSubmitterTotalContributionStatsModel(
             id='model_4',
-            contributor_id='user4',
+            contributor_id=user_settings_4.user_id,
             topic_ids_with_question_submissions=[
                 'topic1', 'topic2'
             ],
@@ -987,7 +1000,7 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
 
         suggestion_models.QuestionReviewerTotalContributionStatsModel(
             id='model_1',
-            contributor_id='user1',
+            contributor_id=user_settings_1.user_id,
             topic_ids_with_question_reviews=[
                 'topic1'
             ],
@@ -1002,7 +1015,7 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
         ).put()
         suggestion_models.QuestionReviewerTotalContributionStatsModel(
             id='model_2',
-            contributor_id='user2',
+            contributor_id=user_settings_2.user_id,
             topic_ids_with_question_reviews=[
                 'topic1', 'topic2'
             ],
@@ -1017,7 +1030,7 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
         ).put()
         suggestion_models.QuestionReviewerTotalContributionStatsModel(
             id='model_3',
-            contributor_id='user3',
+            contributor_id=user_settings_3.user_id,
             topic_ids_with_question_reviews=[
                 'topic3'
             ],
@@ -1032,7 +1045,7 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
         ).put()
         suggestion_models.QuestionReviewerTotalContributionStatsModel(
             id='model_4',
-            contributor_id='user4',
+            contributor_id=user_settings_4.user_id,
             topic_ids_with_question_reviews=[
                 'topic3'
             ],

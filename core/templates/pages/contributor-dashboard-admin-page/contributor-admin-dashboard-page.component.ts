@@ -44,8 +44,6 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
   TAB_NAME_TRANSLATION_REVIEWER: string = 'Translation Reviewer';
   TAB_NAME_QUESTION_SUBMITTER: string = 'Question Submitter';
   TAB_NAME_QUESTION_REVIEWER: string = 'Question Reviewer';
-  TAB_NAME_LANGUAGE_COORDINATOR: string = 'Language Coordinator';
-  TAB_NAME_QUESTION_COORDINATOR: string = 'Question Coordinator';
   translationReviewersCount: number = 24;
   questionReviewersCount: number = 24;
   CONTRIBUTION_TYPES: string[] = [this.TAB_NAME_TRANSLATION_SUBMITTER,

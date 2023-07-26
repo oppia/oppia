@@ -270,11 +270,11 @@ angular.module('oppia').directive('contributorDashboardAdminPage', [
         };
 
         ctrl.$onInit = function() {
+          ctrl.isNewUiEnabled = (
+            PlatformFeatureService.status.CD_NEW_UI.isEnabled);
           UserService.getUserInfoAsync().then((userInfo) => {
             let translationCategories = {};
             let questionCategories = {};
-            ctrl.isNewUiEnabled = (
-              PlatformFeatureService.status.CD_NEW_UI.isEnabled);
             if (userInfo.isTranslationAdmin()) {
               ctrl.UserIsTranslationAdmin = true;
               translationCategories = {

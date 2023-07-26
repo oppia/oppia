@@ -23,7 +23,7 @@ import { ContributorAdminDashboardFilter } from '../contributor-admin-dashboard-
 import { AppConstants } from 'app.constants';
 import { CsrfTokenService } from 'services/csrf-token.service';
 
-fdescribe('Contribution Admin dasboard stats service', () => {
+describe('Contribution Admin dasboard stats service', () => {
   let cdasbas: ContributorDashboardAdminStatsBackendApiService;
   let http: HttpTestingController;
   let csrfService: CsrfTokenService;

@@ -26,12 +26,12 @@ describe('Contributor Admin Dashboard Filter Model', () => {
   });
 
   it('should create a new dashboard filter object', () => {
-    expect(filter.languageCode).toEqual('en');
+    expect(filter.languageCode).toEqual('es');
     expect(filter.topicIds).toEqual([]);
   });
 
   it('should reset values of the filter', () => {
-    expect(filter.languageCode).toEqual('en');
+    expect(filter.languageCode).toEqual('es');
     expect(filter.topicIds).toEqual([]);
 
     const languageCode = 'hi';
@@ -50,7 +50,7 @@ describe('Contributor Admin Dashboard Filter Model', () => {
     expect(filter.lastActivity).toEqual(lastActivity);
 
     filter.reset();
-    expect(filter.languageCode).toEqual('en');
+    expect(filter.languageCode).toEqual('es');
     expect(filter.topicIds).toEqual([]);
   });
 });

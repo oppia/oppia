@@ -116,13 +116,6 @@
     font-size: 32px;
     font-weight: 500;
   }
-  @media(max-width: 464px) {
-    .oppia-contributor-dashboard-main-content .stats-card .stat-value-with-rating {
-      position: absolute;
-      top: 1.75em;
-      padding-top: 0;
-    }
-  }
    .dashboard-content {
       display: flex;
       flex-wrap: wrap;
@@ -199,6 +192,15 @@
   }
 
   @media only screen and (max-width: 800px) {
+
+    .oppia-contributor-dashboard-main-content .stats-card .stat-value-with-rating {
+      position: absolute;
+      top: 1.25em;
+      padding-top: 0;
+    }
+    .oppia-contributor-dashboard-main-content .stats-card .stat-description {
+      line-height: 1.8;
+    }
 
     .oppia-dashboard-container {
       max-width: 400px;

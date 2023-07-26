@@ -1,9 +1,16 @@
 <div class="example-container">
+  <div *ngIf="loadingMessage">
+    <div class="oppia-align-center">
+      <span>{{ loadingMessage }}</span>
+      <loading-dots></loading-dots>
+    </div>
+  </div>
   <table mat-table
     [dataSource]="dataSource"
     multiTemplateDataRows
     [class.isMobile]="true"
-    class="mat-elevation-z8">
+    class="mat-elevation-z8"
+    *ngIf="!loadingMessage">
 
     <ng-container matColumnDef="contributorName">
       <th mat-header-cell *matHeaderCellDef class="user-header"><b> User </b></th>
@@ -17,12 +24,12 @@
       <th mat-header-cell *matHeaderCellDef>
         <b>
           Performance
-          <i class="fas fa-info-circle" matTooltip="Performance is based on number of contributions accepted/rejected in last 100 contributions"></i>
+          <i class="fas fa-info-circle" matTooltip="Performance is calculated based on the review results of the last 100 accepted/rejected contributions."></i>
         </b>
       </th>
       <td mat-cell *matCellDef="let element">
         <span class="mobile-label">Performance
-          <i class="fas fa-info-circle" matTooltip="Performance is based on number of contributions accepted/rejected in last 100 contributions" #performanceTooltip="matTooltip" (click)="performanceTooltip.toggle()">
+          <i class="fas fa-info-circle" matTooltip="Performance is calculated based on the review results of the last 100 accepted/rejected contributions." #performanceTooltip="matTooltip" (click)="performanceTooltip.toggle()">
           </i>:</span>
         {{ element.recentPerformance }}
       </td>
@@ -33,13 +40,13 @@
         <b>
           Accuracy
           <i class="fas fa-info-circle"
-            matTooltip="Accuracy is based on total number of accepted translation in comparison to submitted translation"></i>
+            matTooltip="Accuracy is based on the ratio of accepted to submitted translations."></i>
         </b>
       </th>
       <td mat-cell *matCellDef="let element">
         <span class="mobile-label">Accuracy
           <i class="fas fa-info-circle"
-            matTooltip="Accuracy is based on total number of accepted translation in comparison to submitted translation" #accuracyTooltip="matTooltip" (click)="accuracyTooltip.toggle()">
+            matTooltip="Accuracy is based on the ratio of accepted to submitted translations." #accuracyTooltip="matTooltip" (click)="accuracyTooltip.toggle()">
           </i>:</span>
         {{ element.overallAccuracy }}%
       </td>
@@ -104,8 +111,7 @@
     <ng-container matColumnDef="role">
       <th mat-header-cell *matHeaderCellDef><b> Role </b></th>
       <td mat-cell *matCellDef="let element">
-        <span class="mobile-label">Role:</span>
-        EDIT</td>
+        <button mat-raised-button disabled>EDIT</button>
     </ng-container>
 
     <ng-container matColumnDef="chevron" *ngIf="!checkMobileView()">
@@ -129,6 +135,13 @@
             [@mobileChevronExpand]="element == expandedElement ? 'expanded' : 'collapsed'">
           </i>
         </div>
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="mobile-role" *ngIf="checkMobileView()">
+      <th mat-header-cell *matHeaderCellDef><b> </b></th>
+      <td mat-cell *matCellDef="let element">
+        <button mat-raised-button disabled>EDIT ROLE</button>
       </td>
     </ng-container>
 
@@ -156,33 +169,32 @@
               </div>
               <div class="attribute-container">
                 <div class="attribute-sub-container">
-                  <div class="attribute-key">Accepted Translations</div>
-                  <div class="attribute-value">
-                    {{ element.acceptedTranslationsCount }} card{{
-                      element.acceptedTranslationsCount !== 1 ? "s" : ""
-                    }}, {{ element.acceptedTranslationWordCount }} word{{
-                      element.acceptedTranslationWordCount !== 1 ? "s" : ""
-                    }}
-                    ({{
-                      element.acceptedTranslationsWithoutReviewerEditsCount
-                    }}
-                    word{{
-                      element.acceptedTranslationsWithoutReviewerEditsCount !==
-                      1
-                        ? "s"
-                        : ""
-                    }} without edits)
-                  </div>
-                </div>
-              </div>
-              <div class="attribute-container">
-                <div class="attribute-sub-container">
                   <div class="attribute-key">Submitted Translations</div>
                   <div class="attribute-value">
                     {{ element.submittedTranslationsCount }} card{{
                       element.submittedTranslationsCount !== 1 ? "s" : ""
                     }}, {{ element.submittedTranslationWordCount }} word{{
                       element.submittedTranslationWordCount !== 1 ? "s" : ""
+                    }}
+                  </div>
+                </div>
+              </div>
+              <div class="attribute-container">
+                <div class="attribute-sub-container">
+                  <div class="attribute-key">Accepted Translations</div>
+                  <div class="attribute-value">
+                    {{ element.acceptedTranslationsCount }} card{{
+                      element.acceptedTranslationsCount !== 1 ? "s" : ""
+                    }} ({{
+                      element.acceptedTranslationsWithoutReviewerEditsCount
+                    }}
+                    card{{
+                      element.acceptedTranslationsWithoutReviewerEditsCount !==
+                      1
+                        ? "s"
+                        : ""
+                    }} without edits), {{ element.acceptedTranslationWordCount }} word{{
+                      element.acceptedTranslationWordCount !== 1 ? "s" : ""
                     }}
                   </div>
                 </div>
@@ -203,7 +215,7 @@
                 <div class="attribute-sub-container">
                   <div class="attribute-key">Active Topics</div>
                   <div class="attribute-value">
-                    {{ element.topicsWithTranslationSubmissions.join(', ') }}
+                    {{ element.topicsWithTranslationSubmissions ? element.topicsWithTranslationSubmissions.join(', ') : 'No topics available' }}
                   </div>
                 </div>
               </div>
@@ -226,19 +238,16 @@
                 <div class="attribute-sub-container">
                   <div class="attribute-key">Accepted Translations</div>
                   <div class="attribute-value">
-                    {{ element.acceptedTranslationsCount }} card
-                    {{
+                    {{ element.acceptedTranslationsCount }} card{{
                       element.acceptedTranslationsCount !== 1 ? "s" : ""
-                    }}, {{ element.acceptedTranslationWordCount }} word{{
-                      element.acceptedTranslationWordCount !== 1 ? "s" : ""
-                    }}
-                    ({{element.acceptedTranslationsWithReviewerEditsCount}}
-                    card
-                    {{
+                    }} ({{element.acceptedTranslationsWithReviewerEditsCount}}
+                    card{{
                       element.acceptedTranslationsWithReviewerEditsCount !== 1
                         ? "s"
                         : ""
-                    }} with edits)
+                    }} with edits), {{ element.acceptedTranslationWordCount }} word{{
+                      element.acceptedTranslationWordCount !== 1 ? "s" : ""
+                    }}
                   </div>
                 </div>
               </div>
@@ -248,8 +257,6 @@
                   <div class="attribute-value">
                     {{ element.rejectedTranslationsCount }} card{{
                       element.rejectedTranslationsCount !== 1 ? "s" : ""
-                    }}, {{ element.rejectedTranslationWordCount }} word{{
-                      element.rejectedTranslationWordCount !== 1 ? "s" : ""
                     }}
                   </div>
                 </div>
@@ -258,7 +265,7 @@
                 <div class="attribute-sub-container">
                   <div class="attribute-key">Active Topics</div>
                   <div class="attribute-value">
-                    {{ element.topicsWithTranslationReviews.join(', ') }}
+                    {{ element.topicsWithTranslationReviews ? element.topicsWithTranslationReviews.join(', ') : 'No topics available' }}
                   </div>
                 </div>
               </div>
@@ -289,7 +296,7 @@
                 <div class="attribute-sub-container">
                   <div class="attribute-key">Accepted Questions</div>
                   <div class="attribute-value">
-                    {{ element.acceptedQuestionsCount }} ({{ element.acceptedQuestionsWithoutReviewerEditsCount }} without Edits)
+                    {{ element.acceptedQuestionsCount }} ({{ element.acceptedQuestionsWithoutReviewerEditsCount }} without edits)
                   </div>
                 </div>
               </div>
@@ -305,7 +312,7 @@
                 <div class="attribute-sub-container">
                   <div class="attribute-key">Active Topics</div>
                   <div class="attribute-value">
-                    {{ element.topicsWithQuestionSubmissions.join(', ') }}
+                    {{ element.topicsWithQuestionSubmissions ? element.topicsWithQuestionSubmissions.join(', ') : 'No topics available' }}
                   </div>
                 </div>
               </div>
@@ -354,7 +361,7 @@
                 <div class="attribute-sub-container">
                   <div class="attribute-key">Active Topics</div>
                   <div class="attribute-value">
-                    {{ element.topicsWithQuestionReviews.join(', ') }}
+                    {{ element.topicsWithQuestionReviews ? element.topicsWithQuestionReviews.join(', ') : 'No topics available' }}
                   </div>
                 </div>
               </div>
@@ -370,6 +377,9 @@
         class="example-element-row"
         [class.example-expanded-row]="expandedElement === element"
         (click)="expandedElement = expandedElement === element ? null : element"></tr>
+      <div *ngIf="checkMobileView()">
+        <tr mat-row *matRowDef="let element; columns: ['mobile-role']" class="mobile-edit-role"></tr>
+      </div>
       <tr mat-row
         *matRowDef="let row; columns: ['expandedDetail']"
         class="example-detail-row"></tr>
@@ -377,6 +387,11 @@
 </div>
 
 <style>
+  .oppia-align-center {
+    width: 960px;
+    font-size: 2em;
+  }
+
   table {
     max-width: 960px;
     margin: 10px;
@@ -512,6 +527,9 @@
   }
 
 @media only screen and (max-width: 800px) {
+  .mobile-edit-role {
+    align-items: center;
+  }
   .chevron {
     padding-left: 50%;
   }
@@ -529,7 +547,7 @@
   }
   .attribute-sub-container {
     width: 300px;
-    height: 50px;
+    height: 30px;
   }
   .example-element-detail {
     width: 100%;

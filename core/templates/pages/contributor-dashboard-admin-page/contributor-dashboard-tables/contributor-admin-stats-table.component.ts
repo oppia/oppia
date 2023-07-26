@@ -14,14 +14,13 @@
 
 
 /**
- * @fileoverview Component for the feedback Updates page.
+ * @fileoverview Component for the Contributor Admin Dashboard table.
  */
 
 import { Component, Input, OnInit, SimpleChanges } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
-import { LoaderService } from 'services/loader.service';
+
 import { WindowRef } from 'services/contextual/window-ref.service';
-import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 import { animate, state, style, transition, trigger } from '@angular/animations';
 import { ContributorDashboardAdminStatsBackendApiService } from '../services/contributor-dashboard-admin-stats-backend-api.service';
 import { ContributorAdminDashboardFilter } from '../contributor-admin-dashboard-filter.model';
@@ -85,17 +84,16 @@ export class ContributorAdminStatsTable implements OnInit {
   TAB_NAME_QUESTION_REVIEWER: string = 'Question Reviewer';
   TAB_NAME_LANGUAGE_COORDINATOR: string = 'Language Coordinator';
   TAB_NAME_QUESTION_COORDINATOR: string = 'Question Coordinator';
+  loadingMessage!: string;
 
   constructor(
-    private loaderService: LoaderService,
-    private windowDimensionsService: WindowDimensionsService,
     private windowRef: WindowRef,
     private ContributorDashboardAdminStatsBackendApiService:
       ContributorDashboardAdminStatsBackendApiService
   ) {}
 
   ngOnInit(): void {
-    this.loaderService.showLoadingScreen('Loading');
+    this.loadingMessage = 'Loading';
     this.updateColumnsToDisplay();
   }
 
@@ -105,6 +103,7 @@ export class ContributorAdminStatsTable implements OnInit {
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes.activeTab) {
+      this.loadingMessage = 'Loading';
       this.updateColumnsToDisplay();
     }
   }
@@ -127,7 +126,6 @@ export class ContributorAdminStatsTable implements OnInit {
           'overallAccuracy',
           'submittedTranslationsCount',
           'lastContributedInDays',
-          'role',
           'chevron'
         ];
       }
@@ -142,6 +140,7 @@ export class ContributorAdminStatsTable implements OnInit {
             this.dataSource = response.stats;
             this.nextOffset = response.nextOffset;
             this.more = response.more;
+            this.loadingMessage = '';
           });
     } else if (this.activeTab === this.TAB_NAME_TRANSLATION_REVIEWER) {
       this.columnsToDisplay = [
@@ -156,7 +155,6 @@ export class ContributorAdminStatsTable implements OnInit {
           'contributorName',
           'reviewedTranslationsCount',
           'lastContributedInDays',
-          'role',
           'chevron'
         ];
       }
@@ -171,6 +169,7 @@ export class ContributorAdminStatsTable implements OnInit {
             this.dataSource = response.stats;
             this.nextOffset = response.nextOffset;
             this.more = response.more;
+            this.loadingMessage = '';
           });
     } else if (this.activeTab === this.TAB_NAME_QUESTION_SUBMITTER) {
       this.columnsToDisplay = [
@@ -189,13 +188,12 @@ export class ContributorAdminStatsTable implements OnInit {
           'overallAccuracy',
           'submittedQuestionsCount',
           'lastContributedInDays',
-          'role',
           'chevron'
         ];
       }
       this.ContributorDashboardAdminStatsBackendApiService
         .fetchContributorAdminStats(
-          new ContributorAdminDashboardFilter(),
+          ContributorAdminDashboardFilter.createDefault(),
           20,
           0,
           AppConstants.CONTRIBUTION_STATS_TYPE_QUESTION,
@@ -204,6 +202,7 @@ export class ContributorAdminStatsTable implements OnInit {
             this.dataSource = response.stats;
             this.nextOffset = response.nextOffset;
             this.more = response.more;
+            this.loadingMessage = '';
           });
     } else if (this.activeTab === this.TAB_NAME_QUESTION_REVIEWER) {
       this.columnsToDisplay = [
@@ -218,13 +217,12 @@ export class ContributorAdminStatsTable implements OnInit {
           'contributorName',
           'reviewedQuestionsCount',
           'lastContributedInDays',
-          'role',
           'chevron'
         ];
       }
       this.ContributorDashboardAdminStatsBackendApiService
         .fetchContributorAdminStats(
-          new ContributorAdminDashboardFilter(),
+          ContributorAdminDashboardFilter.createDefault(),
           20,
           0,
           AppConstants.CONTRIBUTION_STATS_TYPE_QUESTION,
@@ -233,6 +231,7 @@ export class ContributorAdminStatsTable implements OnInit {
             this.dataSource = response.stats;
             this.nextOffset = response.nextOffset;
             this.more = response.more;
+            this.loadingMessage = '';
           });
     }
   }
