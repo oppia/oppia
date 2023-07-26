@@ -54,8 +54,7 @@ class ExistingPlatformParameterValidityTests(test_utils.GenericTestBase):
                             'show_translation_size',
                             'cd_new_ui',
                             'show_feedback_updates_in_profile_pic_dropdown',
-                            'show_redesigned_learner_dashboard',
-                            'show_translation_size']
+                            'show_redesigned_learner_dashboard']
 
     def test_all_defined_parameters_are_valid(self) -> None:
         all_names = params.Registry.get_all_platform_parameter_names()
