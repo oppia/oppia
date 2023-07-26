@@ -154,6 +154,9 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
   @ViewChild('translationContainer')
     translationContainer!: ElementRef;
 
+  @ViewChild('contentPanelWithAltText')
+    contentPanelWithAltText!: RteOutputDisplayComponent;
+
   HTML_SCHEMA: HTMLSchema = { type: 'html' };
   MAX_REVIEW_MESSAGE_LENGTH = AppConstants.MAX_REVIEW_MESSAGE_LENGTH;
   SET_OF_STRINGS_SCHEMA: ListSchema = {
