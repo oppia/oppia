@@ -203,7 +203,7 @@ export class ContributionAndReviewService {
 
           const exploration: Exploration = this.explorationObjectFactory.
             createFromBackendDict(explorationBackendDict);
-          const sortedTranslationCards = this.sortTranslationSuggestionsByState(
+          const sortedTranslationSuggestions = this.sortTranslationSuggestionsByState(
             fetchSuggestionsResponse.suggestions,
             exploration.getStates(),
             explorationBackendDict.init_state_name
