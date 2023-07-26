@@ -17,7 +17,7 @@
  */
 
 import { ENTER } from '@angular/cdk/keycodes';
-import { AfterViewInit, Component, ElementRef, EventEmitter, Input, Output, ViewChild } from '@angular/core';
+import { Component, ElementRef, EventEmitter, Input, Output, ViewChild } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { MatChipList } from '@angular/material/chips';
 import { LanguageIdAndText } from 'domain/utilities/language-util.service';
@@ -26,7 +26,7 @@ import { LanguageIdAndText } from 'domain/utilities/language-util.service';
   selector: 'oppia-preferred-languages',
   templateUrl: './preferred-languages.component.html'
 })
-export class PreferredLanguagesComponent implements AfterViewInit {
+export class PreferredLanguagesComponent {
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
@@ -44,13 +44,12 @@ export class PreferredLanguagesComponent implements AfterViewInit {
   filteredChoices: LanguageIdAndText[] = [];
   searchQuery: string = '';
 
-  async onInputBoxClick(): Promise<void> {
-    await Promise.resolve();
-    this.searchQuery = '';
-    this.filteredChoices = this.choices;
+  onInputBoxClick(): void {
+      this.searchQuery = '';
+      this.filteredChoices = this.choices;
   }
 
-  ngAfterViewInit(): void {
+  ngOnInit(): void {
     this.formCtrl.valueChanges.subscribe((value: string) => {
       if (!this.validInput(value)) {
         this.chipList.errorState = true;

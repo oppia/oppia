@@ -61,7 +61,16 @@ describe('Preferred Languages Component', () => {
       text: 'English'
     }];
     componentInstance.formCtrl = new FormControl(value);
-    componentInstance.ngAfterViewInit();
+    componentInstance.ngOnInit();
+    expect(componentInstance.chipList.errorState).toBeFalse();
+    const invalidValue = 'fr';
+    componentInstance.formCtrl.setValue(invalidValue);
+    componentInstance.ngOnInit();
+    fixture.detectChanges();
+    expect(componentInstance.chipList.errorState).toBeTrue();
+    const validValue = 'en';
+    componentInstance.formCtrl.setValue(validValue);
+    componentInstance.ngOnInit();
     fixture.detectChanges();
     expect(componentInstance.chipList.errorState).toBeFalse();
   });
@@ -80,13 +89,13 @@ describe('Preferred Languages Component', () => {
   });
 
 
-  it('should filtered choices when input box is clicked', async() => {
+  it('should filtered choices when input box is clicked', () => {
     const mockChoices = [
       { id: 'en', text: 'English ' },
       { id: 'fr', text: 'French ' }
     ];
     componentInstance.choices = [...mockChoices];
-    await componentInstance.onInputBoxClick();
+    componentInstance.onInputBoxClick();
     expect(componentInstance.searchQuery).toEqual('');
     expect(componentInstance.filteredChoices).toEqual(mockChoices);
   });
