@@ -208,8 +208,8 @@ export class ContributionAndReviewService {
             exploration.getStates(),
             explorationBackendDict.init_state_name
           );
-
-          const responseSuggestionIdToDetails = {};
+          // eslint-disable-next-line
+          const responseSuggestionIdToDetails: {[key: string]: any} = {};
           const targetIdToDetails = fetchSuggestionsResponse.target_id_to_opportunity_dict;
           sortedTranslationCards.forEach((suggestion) => {
           const suggestionDetails = {
@@ -225,7 +225,7 @@ export class ContributionAndReviewService {
         })
     );
   }
-q
+
   // Function to sort translation cards by state.
   sortTranslationSuggestionsByState(
       // eslint-disable-next-line

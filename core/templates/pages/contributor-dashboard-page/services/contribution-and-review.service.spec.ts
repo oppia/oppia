@@ -19,7 +19,7 @@
 import { TestBed, fakeAsync, flushMicrotasks, tick } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { AppConstants } from 'app.constants';
-import { ContributionAndReviewService } from './contribution-and-review.service';
+import { ContributionAndReviewService, FetchSuggestionsResponse } from './contribution-and-review.service';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { ContributionAndReviewBackendApiService }
   from './contribution-and-review-backend-api.service';
@@ -30,6 +30,7 @@ import { ExplorationObjectFactory, ExplorationBackendDict}
   from 'domain/exploration/ExplorationObjectFactory';
 import { StateObjectsBackendDict } from 'domain/exploration/StatesObjectFactory';
 import { StatesObjectFactory } from 'domain/exploration/StatesObjectFactory';
+import { FetchExplorationBackendResponse } from '../../../domain/exploration/read-only-exploration-backend-api.service';
 
 describe('Contribution and review service', () => {
   let cars: ContributionAndReviewService;
@@ -328,14 +329,14 @@ describe('Contribution and review service', () => {
   describe('getReviewableTranslationSuggestionsAsync', () => {
     const mockSuggestionsDetailsDict = {
       target_1: {
-        suggestions: suggestion1,
+        suggestion: suggestion1,
         details: opportunityDict1
       }
     };
     const mockFetchSuggestionsResponse = {
       suggestionIdToDetails: mockSuggestionsDetailsDict,
       more: false
-    };
+    } as FetchSuggestionsResponse;
     let explorationObjectFactory: ExplorationObjectFactory;
     let explorationObjectFactorySpy: jasmine.Spy;
     let fetchExplorationSpy: jasmine.Spy;
@@ -459,7 +460,7 @@ describe('Contribution and review service', () => {
           card_is_checkpoint: false
         }
       };
-      const mockReadOnlyExplorationData = {
+      const mockReadOnlyExplorationData: FetchExplorationBackendResponse = {
         can_edit: true,
         exploration: {
           init_state_name: 'Introduction',
@@ -469,7 +470,7 @@ describe('Contribution and review service', () => {
           title: 'Dummy Title',
           language_code: 'en',
           objective: 'Dummy Objective',
-          next_content_id_index: '4',
+          next_content_id_index: 4,
           correctness_feedback_enabled: true
         },
         exploration_metadata: {
