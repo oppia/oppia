@@ -187,12 +187,6 @@
                       element.acceptedTranslationsCount !== 1 ? "s" : ""
                     }} ({{
                       element.acceptedTranslationsWithoutReviewerEditsCount
-                    }}
-                    card{{
-                      element.acceptedTranslationsWithoutReviewerEditsCount !==
-                      1
-                        ? "s"
-                        : ""
                     }} without edits), {{ element.acceptedTranslationWordCount }} word{{
                       element.acceptedTranslationWordCount !== 1 ? "s" : ""
                     }}
@@ -240,12 +234,8 @@
                   <div class="attribute-value">
                     {{ element.acceptedTranslationsCount }} card{{
                       element.acceptedTranslationsCount !== 1 ? "s" : ""
-                    }} ({{element.acceptedTranslationsWithReviewerEditsCount}}
-                    card{{
-                      element.acceptedTranslationsWithReviewerEditsCount !== 1
-                        ? "s"
-                        : ""
-                    }} with edits), {{ element.acceptedTranslationWordCount }} word{{
+                    }} ({{element.acceptedTranslationsWithReviewerEditsCount}} with edits), {{
+                      element.acceptedTranslationWordCount }} word{{
                       element.acceptedTranslationWordCount !== 1 ? "s" : ""
                     }}
                   </div>

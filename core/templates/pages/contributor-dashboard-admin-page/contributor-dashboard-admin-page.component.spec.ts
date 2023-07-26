@@ -38,7 +38,7 @@ class MockPlatformFeatureService {
   };
 }
 
-fdescribe('Contributor dashboard admin page ', function() {
+describe('Contributor dashboard admin page ', function() {
   let $scope = null;
   let ctrl = null;
   let $rootScope = null;
