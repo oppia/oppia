@@ -23,7 +23,7 @@ import { ContributorAdminDashboardFilter } from '../contributor-admin-dashboard-
 import { AppConstants } from 'app.constants';
 import { CsrfTokenService } from 'services/csrf-token.service';
 
-fdescribe('Contribution Admin dasboard stats service', () => {
+describe('Contribution Admin dasboard stats service', () => {
   let cdasbas: ContributorDashboardAdminStatsBackendApiService;
   let http: HttpTestingController;
   let csrfService: CsrfTokenService;
@@ -399,7 +399,13 @@ fdescribe('Contribution Admin dasboard stats service', () => {
         0,
         'invalid',
         'invalid_subtype'
-      );
+      ).then(result => {
+        expect(result).toEqual({
+          stats: [],
+          nextOffset: 0,
+          more: false
+        });
+      });
 
       expect(cdasbas.fetchContributorAdminStats).toHaveBeenCalled();
     }));
