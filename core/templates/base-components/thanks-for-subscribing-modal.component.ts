@@ -25,7 +25,7 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 })
 export class ThanksForSubscribingModalComponent {
   constructor(
-    private activeModal: NgbActiveModal,
+    private activeModal: NgbActiveModal
   ) {}
 
   dismiss(): void {
