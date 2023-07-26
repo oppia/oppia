@@ -212,11 +212,11 @@ export class ContributionAndReviewService {
           const responseSuggestionIdToDetails: {[key: string]: any} = {};
           const targetIdToDetails = fetchSuggestionsResponse.target_id_to_opportunity_dict;
           sortedTranslationCards.forEach((suggestion) => {
-          const suggestionDetails = {
-            suggestion: suggestion,
-            details: targetIdToDetails[suggestion.target_id]
-          };
-          responseSuggestionIdToDetails[suggestion.suggestion_id] = suggestionDetails;
+            const suggestionDetails = {
+              suggestion: suggestion,
+              details: targetIdToDetails[suggestion.target_id]
+            };
+            responseSuggestionIdToDetails[suggestion.suggestion_id] = suggestionDetails;
           });
           return {
             suggestionIdToDetails: responseSuggestionIdToDetails,
