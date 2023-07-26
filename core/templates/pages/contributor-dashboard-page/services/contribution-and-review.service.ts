@@ -28,7 +28,7 @@ import { ReadOnlyExplorationBackendApiService }
   from 'domain/exploration/read-only-exploration-backend-api.service';
 import { ComputeGraphService } from 'services/compute-graph.service';
 import { States } from 'domain/exploration/StatesObjectFactory';
-import { ExplorationObjectFactory, Exploration, ExplorationBackendDict }
+import { ExplorationObjectFactory, Exploration}
   from 'domain/exploration/ExplorationObjectFactory';
 
 export interface OpportunityDict {
@@ -183,80 +183,49 @@ export class ContributionAndReviewService {
   }
 
   async fetchTranslationSuggestionsAsync(
-      fetcher: SuggestionFetcher,
-      shouldResetOffset: boolean,
       explorationId: string
   ): Promise<FetchSuggestionsResponse> {
-    if (shouldResetOffset) {
-      fetcher.offset = 0;
-      fetcher.suggestionIdToDetails = {};
-    }
-
     const explorationBackendResponse = await this.
       readOnlyExplorationBackendApiService.fetchExplorationAsync(
         explorationId, null);
+    return(
+      this.contributionAndReviewBackendApiService.
+        fetchSuggestionsAsync(
+          'REVIEWABLE_TRANSLATION_SUGGESTIONS',
+          null,
+          0,
+          AppConstants.SUGGESTIONS_SORT_KEY_DATE,
+          explorationId
+        ).then((fetchSuggestionsResponse) => {
+          const explorationBackendDict = this.explorationObjectFactory.
+          createBackendDictFromExplorationBackendResponse(
+            explorationBackendResponse);
 
-    const responseBody = await this.
-      contributionAndReviewBackendApiService.
-      fetchSuggestionsAsync(
-        fetcher.type,
-        null,
-        fetcher.offset,
-        fetcher.sortKey,
-        explorationId
-      );
+          const exploration: Exploration = this.explorationObjectFactory.
+            createFromBackendDict(explorationBackendDict);
+          const sortedTranslationCards = this.sortTranslationSuggestionsByState(
+            fetchSuggestionsResponse.suggestions,
+            exploration.getStates(),
+            explorationBackendDict.init_state_name
+          );
 
-    const explorationBackendDict: ExplorationBackendDict = {
-      auto_tts_enabled: explorationBackendResponse.auto_tts_enabled,
-      correctness_feedback_enabled: explorationBackendResponse.
-        correctness_feedback_enabled,
-      draft_changes: [],
-      init_state_name: explorationBackendResponse.exploration.init_state_name,
-      states: explorationBackendResponse.exploration.states,
-      param_changes: explorationBackendResponse.exploration.param_changes,
-      param_specs: explorationBackendResponse.exploration.param_specs,
-      title: explorationBackendResponse.exploration.title,
-      language_code: explorationBackendResponse.exploration.language_code,
-      next_content_id_index: explorationBackendResponse.
-        exploration.next_content_id_index,
-      exploration_metadata: explorationBackendResponse.exploration_metadata,
-      is_version_of_draft_valid: false,
-      draft_change_list_id: explorationBackendResponse.draft_change_list_id
-    };
-
-    const exploration: Exploration = this.explorationObjectFactory.
-      createFromBackendDict(explorationBackendDict);
-    const states = this.getStatesForExploration(exploration);
-    const sortedTranslationCards = this.sortTranslationSuggestionsByState(
-      responseBody.suggestions,
-      // exploration.getStates(),
-      states,
-      explorationBackendDict.init_state_name
+          const responseSuggestionIdToDetails = {};
+          const targetIdToDetails = fetchSuggestionsResponse.target_id_to_opportunity_dict;
+          sortedTranslationCards.forEach((suggestion) => {
+          const suggestionDetails = {
+            suggestion: suggestion,
+            details: targetIdToDetails[suggestion.target_id]
+          };
+          responseSuggestionIdToDetails[suggestion.suggestion_id] = suggestionDetails;
+          });
+          return {
+            suggestionIdToDetails: responseSuggestionIdToDetails,
+            more: false
+          };
+        })
     );
-
-    responseBody.suggestions = sortedTranslationCards;
-    const responseSuggestionIdToDetails = fetcher.suggestionIdToDetails;
-    fetcher.suggestionIdToDetails = {};
-    const targetIdToDetails = responseBody.target_id_to_opportunity_dict;
-    responseBody.suggestions.forEach((suggestion) => {
-      const suggestionDetails = {
-        suggestion: suggestion,
-        details: targetIdToDetails[suggestion.target_id]
-      };
-
-      responseSuggestionIdToDetails[suggestion.suggestion_id] = (
-        suggestionDetails);
-    });
-    return {
-      suggestionIdToDetails: responseSuggestionIdToDetails,
-      more: Object.keys(fetcher.suggestionIdToDetails).length > 0
-    };
   }
-
-  private getStatesForExploration(exploration: Exploration) {
-    return exploration.getStates();
-  }
-
+q
   // Function to sort translation cards by state.
   sortTranslationSuggestionsByState(
       // eslint-disable-next-line
@@ -266,7 +235,6 @@ export class ContributionAndReviewService {
       // eslint-disable-next-line
   ): any[] {
     // Obtain the state names in the order of content flow in the lesson.
-
     if (!initStateName) {
       return translationSuggestions;
     }
@@ -297,43 +265,7 @@ export class ContributionAndReviewService {
       const cardsForState = translationSuggestionsByState.get(stateName) || [];
 
       cardsForState.sort((cardA, cardB) => {
-        const getTypeOrder = (contentId: string): number => {
-          const type = (
-            // Get the type prefix (e.g., feedback, hints).
-            contentId.split('_')[0]);
-          const order: { [key: string]: number } = {
-            content: 0,
-            interaction: 1,
-            feedback: 2,
-            'default': 3, // Default is a keyword so '' is used in key.
-            hints: 4,
-            solution: 5
-          };
-          return order.hasOwnProperty(type) ?
-      order[type] : Number.MAX_SAFE_INTEGER;
-        };
-
-        const cardATypeOrder = getTypeOrder(cardA.change.content_id);
-        const cardBTypeOrder = getTypeOrder(cardB.change.content_id);
-        if (cardATypeOrder !== cardBTypeOrder) {
-          return cardATypeOrder - cardBTypeOrder;
-        } else {
-          const getIndex = (contentId: string) => {
-            const index = parseInt(contentId.split('_')[1]);
-            return isNaN(index) ? Number.MAX_SAFE_INTEGER : index;
-          };
-
-          const cardAIndex = getIndex(cardA.change.content_id);
-          const cardBIndex = getIndex(cardB.change.content_id);
-
-          if (cardAIndex !== cardBIndex) {
-            return cardAIndex - cardBIndex;
-          } else {
-            // If the indices are the same, sort by content_id.
-            return cardA.change.content_id.
-              localeCompare(cardB.change.content_id);
-          }
-        }
+        return this.compareTranslationSuggestions(cardA, cardB);
       });
       translationSuggestionsByState.set(stateName, cardsForState);
     }
@@ -345,6 +277,46 @@ export class ContributionAndReviewService {
       sortedTranslationCards.push(...cardsForState);
     }
     return sortedTranslationCards;
+  }
+
+  // eslint-disable-next-line
+  private compareTranslationSuggestions(cardA: any, cardB: any): number {
+    const getTypeOrder = (contentId: string): number => {
+      const type = contentId.split('_')[0];
+      const order: { [key: string]: number } = {
+        'content': 0,
+        'interaction': 1,
+        'feedback': 2,
+        'default': 3,
+        'hints': 4,
+        'solution': 5
+      };
+      return order.hasOwnProperty(type) ?
+      order[type] : Number.MAX_SAFE_INTEGER;
+    };
+
+    const cardATypeOrder = getTypeOrder(cardA.change.content_id);
+    const cardBTypeOrder = getTypeOrder(cardB.change.content_id);
+
+    if (cardATypeOrder !== cardBTypeOrder) {
+      return cardATypeOrder - cardBTypeOrder;
+    } else {
+      const getIndex = (contentId: string): number => {
+        const index = parseInt(contentId.split('_')[1]);
+        return isNaN(index) ? Number.MAX_SAFE_INTEGER : index;
+      };
+
+      const cardAIndex = getIndex(cardA.change.content_id);
+      const cardBIndex = getIndex(cardB.change.content_id);
+
+      if (cardAIndex !== cardBIndex) {
+        return cardAIndex - cardBIndex;
+      } else {
+        // If the indices are the same, sort by content_id.
+        return cardA.change.content_id.localeCompare(
+          cardB.change.content_id);
+      }
+    }
   }
 
   async getUserCreatedQuestionSuggestionsAsync(
@@ -385,8 +357,6 @@ export class ContributionAndReviewService {
     this.reviewableTranslationFetcher.sortKey = sortKey;
     if (explorationId) {
       return this.fetchTranslationSuggestionsAsync(
-        this.reviewableTranslationFetcher,
-        shouldResetOffset,
         explorationId);
     }
     return this.fetchSuggestionsAsync(

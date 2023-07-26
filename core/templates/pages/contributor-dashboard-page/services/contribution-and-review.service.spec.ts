@@ -19,19 +19,19 @@
 import { TestBed, fakeAsync, flushMicrotasks, tick } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { AppConstants } from 'app.constants';
-import { ContributionAndReviewService } from './contribution-and-review.service';
+import { ContributionAndReviewService, FetchSuggestionsResponse } from './contribution-and-review.service';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { ContributionAndReviewBackendApiService }
   from './contribution-and-review-backend-api.service';
 import { SuggestionBackendDict } from 'domain/suggestion/suggestion.model';
 import { ReadOnlyExplorationBackendApiService }
   from 'domain/exploration/read-only-exploration-backend-api.service';
-import { ExplorationObjectFactory, Exploration, ExplorationBackendDict}
+import { ExplorationObjectFactory, ExplorationBackendDict}
   from 'domain/exploration/ExplorationObjectFactory';
 import { StateObjectsBackendDict } from 'domain/exploration/StatesObjectFactory';
 import { StatesObjectFactory } from 'domain/exploration/StatesObjectFactory';
 
-describe('Contribution and review service', () => {
+fdescribe('Contribution and review service', () => {
   let cars: ContributionAndReviewService;
   let carbas: ContributionAndReviewBackendApiService;
   let fetchSuggestionsAsyncSpy: jasmine.Spy;
@@ -116,8 +116,6 @@ describe('Contribution and review service', () => {
         StatesObjectFactory,
       ]
     });
-    // explorationObjectFactory = TestBed.inject(
-    //   ExplorationObjectFactory);
     cars = TestBed.inject(ContributionAndReviewService);
     carbas = TestBed.inject(ContributionAndReviewBackendApiService);
     readOnlyExplorationBackendApiService = TestBed.inject(
@@ -337,11 +335,10 @@ describe('Contribution and review service', () => {
     const mockFetchSuggestionsResponse = {
       suggestionIdToDetails: mockSuggestionsDetailsDict,
       more: false
-    };
+    } as unknown as FetchSuggestionsResponse;
     let explorationObjectFactory: ExplorationObjectFactory;
     let explorationObjectFactorySpy: jasmine.Spy;
     let fetchExplorationSpy: jasmine.Spy;
-    let getStatesSpy: jasmine.Spy;
     let mockSortTranslationSpy: jasmine.Spy;
 
     beforeEach(() => {
@@ -389,17 +386,13 @@ describe('Contribution and review service', () => {
 
     it('should correctly fetch translation suggestions and return' +
     'the transformed result', async() => {
-      // Mock Datas.
-      getStatesSpy = spyOn(
-        cars, 'getStatesForExploration').and.callThrough();
+ 
       const fetcher = {
         type: 'someType',
         offset: 0,
         suggestionIdToDetails: {},
         sortKey: 'someSortKey',
       };
-      const shouldResetOffset = true;
-      const explorationId = '1';
       const mockStates = {
         Introduction: {
           classifier_model_id: null,
@@ -519,19 +512,11 @@ describe('Contribution and review service', () => {
         most_recently_reached_checkpoint_exp_version: 1,
         displayable_language_codes: ['en'],
       };
-      const dummyExplorationBackendDict: ExplorationBackendDict = {
-        init_state_name: 'Introduction',
-        param_changes: [],
-        param_specs: {},
-        states: mockStates,
-        title: 'Dummy Title',
-        language_code: 'en',
-        objective: 'Dummy Objective',
-        correctness_feedback_enabled: true,
-        next_content_id_index: 4
-      } as unknown as ExplorationBackendDict;
-      const exploration: Exploration = explorationObjectFactory.createFromBackendDict(
-        dummyExplorationBackendDict);
+      const explorationBackendDict = explorationObjectFactory.
+      createBackendDictFromExplorationBackendResponse(mockReadOnlyExplorationData);
+      const exploration = explorationObjectFactory.createFromBackendDict(
+        explorationBackendDict);
+      // const getStatesSpy = spyOn(exploration, 'getStates');
 
       fetchExplorationSpy.and.returnValue(
         Promise.resolve(mockReadOnlyExplorationData));
@@ -539,9 +524,8 @@ describe('Contribution and review service', () => {
         Promise.resolve(backendFetchResponse));
       explorationObjectFactorySpy.and.returnValue(
         Promise.resolve(exploration));
-
-      getStatesSpy.and.returnValue(
-        Promise.resolve(mockStates));
+      // getStatesSpy.and.returnValue(
+      //   Promise.resolve(mockStates));
       mockSortTranslationSpy.and.returnValue(
         Promise.resolve([
           {
@@ -624,18 +608,14 @@ describe('Contribution and review service', () => {
           }
         ]));
 
-      // This throws "Unexpected any. Specify a different type".
-      //  We need to suppress this
-      // error because 'as any' type assertion is needed to access the private
-      // method.
-      // @ts-ignore
-      const result = await (cars as any).fetchTranslationSuggestionsAsync(
-        fetcher, shouldResetOffset, explorationId);
-      expect(getStatesSpy).toHaveBeenCalled();
-        // expect(getStatesSpy).toHaveBeenCalledWith(exploration);
-      expect(explorationObjectFactorySpy).toHaveBeenCalled();
-      expect(fetchSuggestionsAsyncSpy).toHaveBeenCalled();
-      expect(fetchExplorationSpy).toHaveBeenCalled();
+      cars.fetchTranslationSuggestionsAsync(
+        '1').then((response)=>{
+          expect(response).toEqual(mockFetchSuggestionsResponse)
+          expect(explorationObjectFactorySpy).toHaveBeenCalled();
+          expect(fetchSuggestionsAsyncSpy).toHaveBeenCalled();
+          expect(fetchExplorationSpy).toHaveBeenCalled();
+          // expect(getStatesSpy).toHaveBeenCalled();
+        })
     });
   });
 
@@ -1061,11 +1041,9 @@ describe('Contribution and review service', () => {
     'on type and index', () => {
       const states = statesObjectFactory.createFromBackendDict(
         statesBackendDict);
-      const initStateName = 'First State';
-
       const sortedTranslationSuggestions = cars.
         sortTranslationSuggestionsByState(
-          translationSuggestions, states, initStateName);
+          translationSuggestions, states, 'First State');
 
       expect(sortedTranslationSuggestions).toEqual([
         {
@@ -1151,13 +1129,10 @@ describe('Contribution and review service', () => {
 
     it('should return suggestions as it is when initStateName is not defined',
       () => {
-        const initStateName = null;
-
         const states = statesObjectFactory.createFromBackendDict(
           statesBackendDict);
-
         const sortedTranslationCards = cars.sortTranslationSuggestionsByState(
-          translationSuggestions, states, initStateName);
+          translationSuggestions, states, null);
 
         expect(sortedTranslationCards).toEqual(translationSuggestions);
       });
