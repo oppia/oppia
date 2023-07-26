@@ -303,3 +303,17 @@ class BlogAuthorProfilePageAccessValidationHandler(
             raise self.PageNotFoundException(
                 'User with given username is not a blog post author.'
             )
+
+class AdminPageAccessValidator(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
+    """Validates access to admin page."""
+
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
+
+    @acl_decorators.can_access_admin_page
+    def get(self) -> None:
+        """Validates access to admin page."""
+        pass
+

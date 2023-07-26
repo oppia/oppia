@@ -1,4 +1,4 @@
-<a *ngIf="isUsernameLinkable(username)" [href]="profileUrl" [smartRouterLink]="profileUrl">
+<a *ngIf="isUsernameLinkable(username)" [href]="profileUrl" [routerLink]="profileUrl">
   <picture>
     <source type="image/webp" [srcset]="profilePictureWebpDataUrl">
     <source type="image/png" [srcset]="profilePicturePngDataUrl">

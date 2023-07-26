@@ -245,7 +245,245 @@ const routes: Route[] = [
     loadChildren: () => import(
       'pages/blog-post-page/blog-post-page.module')
       .then(m => m.BlogPostPageModule)
-  }
+  },
+  {
+    path: (
+      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ADMIN.ROUTE
+    ),
+    pathMatch: 'full',
+    loadChildren: () => import(
+      'pages/admin-page/admin-page.module')
+      .then(m => m.AdminPageModule)
+  },
+  {
+    path: (
+      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.BLOG_ADMIN.ROUTE
+    ),
+    pathMatch: 'full',
+    loadChildren: () => import(
+      'pages/blog-admin-page/blog-admin-page.module')
+      .then(m => m.BlogAdminPageModule)
+  },
+  // {
+  //   path: (
+  //     AppConstants.PAGES_REGISTERED_WITH_FRONTEND.CLASSROOM_ADMIN.ROUTE
+  //   ),
+  //   pathMatch: 'full',
+  //   loadChildren: () => import(
+  //     'pages/classroom-admin-page/classroom-admin-page.module')
+  //     .then(m => m.ClassroomAdminPageModule)
+  // },
+  // {
+  //   path: (
+  //     AppConstants.PAGES_REGISTERED_WITH_FRONTEND.DIAGNOSTIC_TEST_PLAYER.ROUTE
+  //   ),
+  //   pathMatch: 'full',
+  //   loadChildren: () => import(
+  //     'pages/diagnostic-test-player-page/diagnostic-test-player-page.module')
+  //     .then(m => m.DiagnosticTestPlayerPageModule)
+  // },
+  {
+    path: (
+      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.BLOG_DASHBOARD.ROUTE
+    ),
+    pathMatch: 'full',
+    loadChildren: () => import(
+      'pages/blog-dashboard-page/blog-dashboard-page.module')
+      .then(m => m.BlogDashboardPageModule)
+  },
+  // {
+  //   path: (
+  //     AppConstants.PAGES_REGISTERED_WITH_FRONTEND.COLLECTION_EDITOR.ROUTE
+  //   ),
+  //   pathMatch: 'full',
+  //   loadChildren: () => import(
+  //     'pages/collection-editor-page/collection-editor-page.module')
+  //     .then(m => m.CollectionEditorPageModule)
+  // },
+  // {
+  //   path: (
+  //     AppConstants.PAGES_REGISTERED_WITH_FRONTEND.COLLECTION_PLAYER.ROUTE
+  //   ),
+  //   pathMatch: 'full',
+  //   loadChildren: () => import(
+  //     'pages/collection-player-page/collection-player-page.module')
+  //     .then(m => m.CollectionPlayerPageModule)
+  // },
+  // {
+  //   path: (
+  //     AppConstants.PAGES_REGISTERED_WITH_FRONTEND.CREATOR_DASHBOARD.ROUTE
+  //   ),
+  //   pathMatch: 'full',
+  //   loadChildren: () => import(
+  //     'pages/creator-dashboard-page/creator-dashboard-page.module')
+  //     .then(m => m.CreatorDashboardPageModule)
+  // },
+  // {
+  //   path: (
+  //     // eslint-disable-next-line max-len
+  //     AppConstants.PAGES_REGISTERED_WITH_FRONTEND.CONTRIBUTOR_DASHBOARD_ADMIN.ROUTE
+  //   ),
+  //   pathMatch: 'full',
+  //   loadChildren: () => import(
+  //     // eslint-disable-next-line max-len
+  //     'pages/contributor-dashboard-admin-page/contributor-dashboard-admin-page.module')
+  //     .then(m => m.ContributorDashboardAdminPageModule)
+  // },
+  // {
+  //   path: (
+  //     AppConstants.PAGES_REGISTERED_WITH_FRONTEND.CONTRIBUTOR_DASHBOARD.ROUTE
+  //   ),
+  //   pathMatch: 'full',
+  //   loadChildren: () => import(
+  //     'pages/contributor-dashboard-page/contributor-dashboard-page.module')
+  //     .then(m => m.ContributorDashboardPageModule)
+  // },
+  // {
+  //   path: (
+  //     AppConstants.PAGES_REGISTERED_WITH_FRONTEND.EMAIL_DASHBOARD.ROUTE
+  //   ),
+  //   pathMatch: 'full',
+  //   loadChildren: () => import(
+  //     'pages/email-dashboard-page/email-dashboard-page.module')
+  //     .then(m => m.EmailDashboardPageModule)
+  // },
+  // {
+  //   path: (
+  //     AppConstants.PAGES_REGISTERED_WITH_FRONTEND.EXPLORATION_EDITOR.ROUTE
+  //   ),
+  //   pathMatch: 'full',
+  //   loadChildren: () => import(
+  //     'pages/exploration-editor-page/exploration-editor-page.module')
+  //     .then(m => m.ExplorationEditorPageModule)
+  // },
+  // {
+  //   path: (
+  //     AppConstants.PAGES_REGISTERED_WITH_FRONTEND.LEARNER_DASHBOARD.ROUTE
+  //   ),
+  //   pathMatch: 'full',
+  //   loadChildren: () => import(
+  //     'pages/learner-dashboard-page/learner-dashboard-page.module')
+  //     .then(m => m.LearnerDashboardPageModule)
+  // },
+  // {
+  //   path: (
+  //     AppConstants.PAGES_REGISTERED_WITH_FRONTEND.MAINTENANCE.ROUTE
+  //   ),
+  //   pathMatch: 'full',
+  //   loadChildren: () => import(
+  //     'pages/maintenance-page/maintenance-page.module')
+  //     .then(m => m.MaintenancePageModule)
+  // },
+  // {
+  //   path: (
+  //     AppConstants.PAGES_REGISTERED_WITH_FRONTEND.MODERATOR.ROUTE
+  //   ),
+  //   pathMatch: 'full',
+  //   loadChildren: () => import(
+  //     'pages/moderator-page/moderator-page.module')
+  //     .then(m => m.ModeratorPageModule)
+  // },
+  // {
+  //   path: (
+  //     AppConstants.PAGES_REGISTERED_WITH_FRONTEND.PRACTICE_SESSION.ROUTE
+  //   ),
+  //   pathMatch: 'full',
+  //   loadChildren: () => import(
+  //     'pages/practice-session-page/practice-session-page.module')
+  //     .then(m => m.PracticeSessionPageModule)
+  // },
+  // {
+  //   path: (
+  //     AppConstants.PAGES_REGISTERED_WITH_FRONTEND.REVIEW_TEST.ROUTE
+  //   ),
+  //   pathMatch: 'full',
+  //   loadChildren: () => import(
+  //     'pages/review-test-page/review-test-page.module')
+  //     .then(m => m.ReviewTestPageModule)
+  // },
+  // {
+  //   path: (
+  //     AppConstants.PAGES_REGISTERED_WITH_FRONTEND.SKILL_EDITOR.ROUTE
+  //   ),
+  //   pathMatch: 'full',
+  //   loadChildren: () => import(
+  //     'pages/skill-editor-page/skill-editor-page.module')
+  //     .then(m => m.SkillEditorPageModule)
+  // },
+  // {
+  //   path: (
+  //     AppConstants.PAGES_REGISTERED_WITH_FRONTEND.STORY_EDITOR.ROUTE
+  //   ),
+  //   pathMatch: 'full',
+  //   loadChildren: () => import(
+  //     'pages/story-editor-page/story-editor-page.module')
+  //     .then(m => m.StoryEditorPageModule)
+  // },
+  // {
+  //   path: (
+  //     AppConstants.PAGES_REGISTERED_WITH_FRONTEND.SUBTOPIC_VIEWER.ROUTE
+  //   ),
+  //   pathMatch: 'full',
+  //   loadChildren: () => import(
+  //     'pages/subtopic-viewer-page/subtopic-viewer-page.module')
+  //     .then(m => m.SubtopicViewerPageModule)
+  // },
+  // {
+  //   path: (
+  //     AppConstants.PAGES_REGISTERED_WITH_FRONTEND.TOPIC_EDITOR.ROUTE
+  //   ),
+  //   pathMatch: 'full',
+  //   loadChildren: () => import(
+  //     'pages/topic-editor-page/topic-editor-page.module')
+  //     .then(m => m.TopicEditorPageModule)
+  // },
+  // {
+  //   path: (
+  //     // eslint-disable-next-line max-len
+  //     AppConstants.PAGES_REGISTERED_WITH_FRONTEND.TOPICS_AND_SKILLS_DASHBOARD.ROUTE
+  //   ),
+  //   pathMatch: 'full',
+  //   loadChildren: () => import(
+  //     // eslint-disable-next-line max-len
+  //     'pages/topics-and-skills-dashboard-page/topics-and-skills-dashboard-page.module')
+  //     .then(m => m.TopicsAndSkillsDashboardPageModule)
+  // },
+  // {
+  //   path: (
+  //     AppConstants.PAGES_REGISTERED_WITH_FRONTEND.TOPIC_VIEWER.ROUTE
+  //   ),
+  //   pathMatch: 'full',
+  //   loadChildren: () => import(
+  //     'pages/topic-viewer-page/topic-viewer-page.module')
+  //     .then(m => m.TopicViewerPageModule)
+  // },
+  // {
+  //   path: (
+  //     AppConstants.PAGES_REGISTERED_WITH_FRONTEND.FACILITATOR_DASHBOARD.ROUTE
+  //   ),
+  //   pathMatch: 'full',
+  //   loadChildren: () => import(
+  //     'pages/facilitator-dashboard-page/facilitator-dashboard-page.module')
+  //     .then(m => m.FacilitatorDashboardPageModule)
+  // },
+  // {
+  //   path: (
+  //     AppConstants.PAGES_REGISTERED_WITH_FRONTEND.CREATE_LEARNER_GROUP.ROUTE
+  //   ),
+  //   pathMatch: 'full',
+  //   loadChildren: () => import(
+  //     'pages/create-learner-group-page/create-learner-group-page.module')
+  //     .then(m => m.CreateLearnerGroupPageModule)
+  // },
+  // {
+  //   path: (
+  //     AppConstants.PAGES_REGISTERED_WITH_FRONTEND.EDIT_LEARNER_GROUP.ROUTE
+  //   ),
+  //   pathMatch: 'full',
+  //   loadChildren: () => import(
+  //     'pages/edit-learner-group-page/edit-learner-group-page.module')
+  //     .then(m => m.EditLearnerGroupPageModule)
+  // },
 ];
 
 // Register stewards landing pages.

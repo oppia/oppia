@@ -266,7 +266,6 @@ URLS = [
         feconf.ACCESS_VALIDATION_HANDLER_PREFIX,
         access_validators.ViewLearnerGroupPageAccessValidationHandler),
 
-    get_redirect_route(r'%s' % feconf.ADMIN_URL, admin.AdminPage),
     get_redirect_route(r'/adminhandler', admin.AdminHandler),
     get_redirect_route(r'/adminrolehandler', admin.AdminRoleHandler),
     get_redirect_route(r'/bannedusershandler', admin.BannedUsersHandler),
@@ -973,8 +972,6 @@ URLS = [
         improvements.ExplorationImprovementsConfigHandler),
 
     get_redirect_route(
-        r'%s' % feconf.BLOG_ADMIN_PAGE_URL, blog_admin.BlogAdminPage),
-    get_redirect_route(
         r'%s' % feconf.BLOG_ADMIN_ROLE_HANDLER_URL,
         blog_admin.BlogAdminRolesHandler),
     get_redirect_route(
@@ -994,8 +991,6 @@ URLS = [
     get_redirect_route(
         r'%s' % feconf.BLOG_DASHBOARD_DATA_URL,
         blog_dashboard.BlogDashboardDataHandler),
-    get_redirect_route(
-        r'%s' % feconf.BLOG_DASHBOARD_URL, blog_dashboard.BlogDashboardPage),
 
     get_redirect_route(
         r'/issuesdatahandler/<exploration_id>', editor.FetchIssuesHandler),
@@ -1155,7 +1150,7 @@ URLS.extend((
     get_redirect_route(
         r'%s/<author_username>' % feconf.BLOG_AUTHOR_PROFILE_PAGE_URL_PREFIX,
         oppia_root.OppiaRootPage
-    )
+    ),
 ))
 
 # Add cron urls. Note that cron URLs MUST start with /cron for them to work
