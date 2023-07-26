@@ -1,11 +1,11 @@
 <div class="parent-container">
-  <div class="oppia-story-viewer-title">
+  <div class="oppia-story-viewer-title" tabindex="0">
     {{ story.getTitle() }}
   </div>
-  <div dir="auto" class="oppia-story-viewer-description">
+  <div dir="auto" class="oppia-story-viewer-description" tabindex="0">
     {{ story.getDescription() }}
   </div>
-  <div class="oppia-story-header-text">
+  <div class="oppia-story-header-text" tabindex="0">
     <strong>
   <!-- Angular here attempts to resolve nodes.length before it is resolved from our component file.
   This gives errors in console like "cannot read property length of undefined"
@@ -18,7 +18,7 @@
          target="_blank" rel="noopener">
       <div class="oppia-story-viewer-desktop">
         <div [ngStyle]="(i > 0 && {'opacity': '0.5', 'display': 'flex'}) || { 'display': 'flex' }">
-          <a class="oppia-story-viewer-card" [href]="getExplorationUrl(node)">
+          <a class="oppia-story-viewer-card" [href]="getExplorationUrl(node)" tabindex="0">
             <span class="oppia-chapter-title" aria-live="assertive">
               <span [innerHTML]="'I18N_TOPIC_VIEWER_CHAPTER' | translate"></span> {{i + 1}}: {{ node.getTitle() }}
             </span>
@@ -92,8 +92,8 @@
             </rect>
           </svg>
         </div>
-        <div class="story-text">
-          <span dir="ltr" class="oppia-chapter-title" aria-live="assertive">
+        <div class="story-text" aria-hidden="true">
+          <span dir="ltr" class="oppia-chapter-title">
             <span [innerHTML]="'I18N_TOPIC_VIEWER_CHAPTER' | translate"></span> {{i + 1}}:
             <span dir="auto">{{node.getTitle()}}</span>
           </span>
