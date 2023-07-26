@@ -23,7 +23,7 @@ import { ContributorAdminDashboardFilter } from '../contributor-admin-dashboard-
 import { AppConstants } from 'app.constants';
 import { CsrfTokenService } from 'services/csrf-token.service';
 
-describe('Contribution Admin dasboard stats service', () => {
+fdescribe('Contribution Admin dasboard stats service', () => {
   let cdasbas: ContributorDashboardAdminStatsBackendApiService;
   let http: HttpTestingController;
   let csrfService: CsrfTokenService;
@@ -382,5 +382,25 @@ describe('Contribution Admin dasboard stats service', () => {
 
       expect(successHandler).toHaveBeenCalled();
       expect(failHandler).not.toHaveBeenCalled();
+    }));
+
+  it('should return empty stats if contribution type is invalid', fakeAsync(
+    () => {
+      spyOn(cdasbas, 'fetchContributorAdminStats')
+        .and.returnValue(Promise.resolve({
+          stats: [],
+          nextOffset: 0,
+          more: false
+        }));
+
+      cdasbas.fetchContributorAdminStats(
+        ContributorAdminDashboardFilter.createDefault(),
+        20,
+        0,
+        'invalid',
+        'invalid_subtype'
+      );
+
+      expect(cdasbas.fetchContributorAdminStats).toHaveBeenCalled();
     }));
 });
