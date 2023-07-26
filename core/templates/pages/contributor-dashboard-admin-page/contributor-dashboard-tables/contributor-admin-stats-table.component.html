@@ -128,7 +128,7 @@
 
     <ng-container matColumnDef="chevron" *ngIf="checkMobileView()">
       <th mat-header-cell *matHeaderCellDef><b> </b></th>
-      <td mat-cell *matCellDef="let element" style="padding-left: 50%;">
+      <td mat-cell *matCellDef="let element" class="mobile-chevron">
         <div class="chevron">
           <i
             class="fas fa-chevron-right"
@@ -388,7 +388,7 @@
   }
 
   tr.example-detail-row {
-    height: 0;
+    height: 0px;
   }
 
   tr.example-element-row:not(.example-expanded-row):hover {
@@ -400,7 +400,7 @@
   }
 
   .example-element-row td {
-    border-bottom-width: 0;
+    border-bottom-width: 0px;
   }
 
   .example-element-detail {
@@ -477,9 +477,9 @@
     font-weight: 500;
     word-wrap: break-word;
     text-align: end;
-  } 
+  }
 
-   td.mat-cell:first-of-type {
+  td.mat-cell:first-of-type {
     padding-left: 20px;
     text-align: start;
   }
@@ -496,7 +496,8 @@
     border-bottom: 2px rgba(0, 0, 0, 0.54) solid;
   }
 
-  .user-header, td.user-value {
+  .user-header,
+  td.user-value {
     text-align: left;
   }
 
@@ -516,95 +517,91 @@
     width: 50px;
   }
 
-@media only screen and (max-width: 800px) {
-  .mobile-edit-role {
-    align-items: center;
-  }
-  .chevron {
-    padding-left: 50%;
-  }
-  .attribute-value {
-    left: 153px;
-  }
-  .details-container {
-    padding-left: 20px;
-  }
-  .attribute-container {
-    height: fit-content;
-  }
-  tr.example-detail-row {
-    height: auto;
-  }
-  .attribute-sub-container {
-    width: 300px;
-    height: 30px;
-  }
-  .example-element-detail {
-    width: 100%;
-    overflow: hidden;
-    display: flex;
-    justify-content: space-around;
-    align-items: baseline;
-  }
-  .mobile-label {
-    width: 80px;
-    display: inline-block;
-    font-weight: bold;
-  }
-  .mat-header-row {
-    display: none;
-  }
+  @media only screen and (max-width: 800px) {
+    .mobile-chevron {
+      padding-left: 50%;
+    }
+    .mobile-edit-role {
+      align-items: center;
+    }
+    .chevron {
+      padding-left: 50%;
+    }
+    .attribute-value {
+      left: 153px;
+    }
+    .details-container {
+      padding-left: 20px;
+    }
+    .attribute-container {
+      height: fit-content;
+    }
+    tr.example-detail-row {
+      height: auto;
+    }
+    .attribute-sub-container {
+      width: 300px;
+      height: 30px;
+    }
+    .example-element-detail {
+      width: 100%;
+      overflow: hidden;
+      display: flex;
+      justify-content: space-around;
+      align-items: baseline;
+    }
+    .mat-header-row {
+      display: none;
+    }
 
-  .example-container {
-    display: flex;
-    justify-content: space-around;
-    align-items: baseline;
-  }
-  
-  .mat-row { 
-    display: flex;
-    flex-direction: column;
-    align-items: start;
-    padding: 8px 24px;
-    height: auto;
-  }
-  td.mat-cell:first-of-type {
-    padding-left: 0px;
-    text-align: start;
-  }
+    .example-container {
+      display: flex;
+      justify-content: space-around;
+      align-items: baseline;
+    }
 
-  td.mat-cell {
-    text-align: start;
-    margin-bottom: 2px;
-  }
+    .mat-row {
+      display: flex;
+      flex-direction: column;
+      align-items: start;
+      padding: 8px 24px;
+      height: auto;
+    }
+    td.mat-cell:first-of-type {
+      padding-left: 0px;
+      text-align: start;
+    }
 
-  td.mat-cell:last-of-type {
-    padding-right: 0px;
-  }
-  .mobile-label {
-    width: 150px;
-    display: inline-block;
-    font-weight: bold;
-  }
+    td.mat-cell {
+      text-align: start;
+      margin-bottom: 2px;
+    }
 
-  th.mat-header-row {
-    display: none;
+    td.mat-cell:last-of-type {
+      padding-right: 0px;
+    }
+    .mobile-label {
+      width: 150px;
+      display: inline-block;
+      font-weight: bold;
+    }
+
+    th.mat-header-row {
+      display: none;
+    }
+
+    th.mat-row {
+      display: flex;
+      flex-direction: column;
+      align-items: start;
+      padding: 8px 24px;
+    }
+
+    table {
+      display: flex;
+      justify-content: space-around;
+      align-items: baseline;
+    }
   }
-
-  th.mat-row { 
-    display: flex;
-    flex-direction: column;
-    align-items: start;
-    padding: 8px 24px;
-  }
-
-  table {
-    display: flex;
-    justify-content: space-around;
-    align-items: baseline;
-  }
-}
-
-
 </style>
 
