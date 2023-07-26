@@ -31,7 +31,7 @@ import { ExplorationObjectFactory, ExplorationBackendDict}
 import { StateObjectsBackendDict } from 'domain/exploration/StatesObjectFactory';
 import { StatesObjectFactory } from 'domain/exploration/StatesObjectFactory';
 
-fdescribe('Contribution and review service', () => {
+describe('Contribution and review service', () => {
   let cars: ContributionAndReviewService;
   let carbas: ContributionAndReviewBackendApiService;
   let fetchSuggestionsAsyncSpy: jasmine.Spy;
