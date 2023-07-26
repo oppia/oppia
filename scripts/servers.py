@@ -580,6 +580,10 @@ def get_chrome_version() -> str:
     installed_version_parts = b''.join(re.findall(rb'[0-9.]', output))
     installed_version = '.'.join(
         installed_version_parts.decode('utf-8').split('.')[:-1])
+    print()
+    print()
+    print()
+    print(installed_version)
     response = utils.url_open(
         'https://chromedriver.storage.googleapis.com/LATEST_RELEASE_%s' % (
             installed_version))
