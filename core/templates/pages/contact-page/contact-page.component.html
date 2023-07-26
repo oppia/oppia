@@ -2,62 +2,98 @@
   <h1 tabindex="0" [innerHTML]="'I18N_CONTACT_PAGE_HEADING' | translate"></h1>
 </div>
 <background-banner></background-banner>
-<div class="oppia-page-card oppia-static-content oppia-static-content-below-banner">
-  <div class="oppia-static-card-content oppia-static-card-content-narrow e2e-test-contact-page">
-    <p tabindex="0" [innerHTML]="'I18N_CONTACT_PAGE_PARAGRAPH_1' | translate"></p>
-
-    <h2 tabindex="0" class="oppia-contact-h2"
-        [innerHTML]="'I18N_CONTACT_PAGE_PARAGRAPH_2_HEADING' | translate">
-    </h2>
-    <p tabindex="0" [innerHTML]="'I18N_CONTACT_PAGE_PARAGRAPH_2' | translate"></p>
-
-    <h2 class="oppia-contact-h2" tabindex="0"
-        [innerHTML]="'I18N_CONTACT_PAGE_PARAGRAPH_3_HEADING' | translate">
-    </h2>
-    <p tabindex="0" [innerHTML]="'I18N_CONTACT_PAGE_PARAGRAPH_3' | translate"></p>
-
-    <h2 tabindex="0" [innerHTML]="'I18N_CONTACT_PAGE_PARAGRAPH_4_HEADING' | translate"></h2>
-    <p tabindex="0" [innerHTML]="'I18N_CONTACT_PAGE_PARAGRAPH_4' | translate"></p>
-
-    <a name="testing"></a>
-    <h3 tabindex="0" [innerHTML]="'I18N_CONTACT_PAGE_PARAGRAPH_5_HEADING' | translate"></h3>
-    <p tabindex="0" [innerHTML]="'I18N_CONTACT_PAGE_PARAGRAPH_5' | translate"></p>
-
-    <p tabindex="0" [innerHTML]="'I18N_CONTACT_PAGE_PARAGRAPH_6' | translate"></p>
-
-    <h3 tabindex="0" [innerHTML]="'I18N_CONTACT_PAGE_PARAGRAPH_7_HEADING' | translate"></h3>
-    <p tabindex="0" [innerHTML]="'I18N_CONTACT_PAGE_PARAGRAPH_7' | translate"></p>
-
-    <p tabindex="0" [innerHTML]="'I18N_CONTACT_PAGE_PARAGRAPH_8' | translate"></p>
-
-    <a name="suggest"></a>
-    <h3 tabindex="0" [innerHTML]="'I18N_CONTACT_PAGE_PARAGRAPH_9_HEADING' | translate"></h3>
-    <p tabindex="0" [innerHTML]="'I18N_CONTACT_PAGE_PARAGRAPH_9' | translate"></p>
-
-    <h3 tabindex="0" [innerHTML]="'I18N_CONTACT_PAGE_PARAGRAPH_10_HEADING' | translate"></h3>
-    <p tabindex="0" [innerHTML]="'I18N_CONTACT_PAGE_PARAGRAPH_10' | translate"></p>
-
-    <h3 tabindex="0" [innerHTML]="'I18N_CONTACT_PAGE_PARAGRAPH_11_HEADING' | translate"></h3>
-    <p tabindex="0" [innerHTML]="'I18N_CONTACT_PAGE_PARAGRAPH_11' | translate"></p>
-
-    <p tabindex="0" [innerHTML]="'I18N_CONTACT_PAGE_PARAGRAPH_12' | translate"></p>
-
-    <h3 tabindex="0" [innerHTML]="'I18N_CONTACT_PAGE_PARAGRAPH_13_HEADING' | translate"></h3>
-    <p tabindex="0" [innerHTML]="'I18N_CONTACT_PAGE_PARAGRAPH_13' | translate"></p>
-
-    <h3 tabindex="0" [innerHTML]="'I18N_CONTACT_PAGE_PARAGRAPH_14_HEADING' | translate"></h3>
-    <p tabindex="0" [innerHTML]="'I18N_CONTACT_PAGE_PARAGRAPH_14' | translate"></p>
-
-    <h3 tabindex="0" [innerHTML]="'I18N_CONTACT_PAGE_PARAGRAPH_15_HEADING' | translate"></h3>
-    <p tabindex="0" [innerHTML]="'I18N_CONTACT_PAGE_PARAGRAPH_15' | translate"></p>
+<div class="oppia-page-card oppia-static-full-content oppia-static-content-contact-page-below-banner">
+  <div class="oppia-static-card-full-content oppia-static-card-content-full-wide e2e-test-contact-page">
+    <h2>We would love to hear from you!</h2>
+    
+    <div class="oppia-contact-page flex">
+  <div class="oppia-contact-page-content">
+    <img id="Donate" src="assets/images/contact_page/Donate img.svg" alt="Donate">
+    <h2>Donate</h2>
+    <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Expedita </p>
+  </div>
+  <div class="oppia-contact-page-content">
+    <img src="assets/images/contact_page/Partner img.svg" alt="Partner">
+    <h2>Partner</h2>
+    <p>Lorem ipsum dolor sit, amet consectetur adipisicing elit. </p>
+  </div>
+  <div class="oppia-contact-page-content">
+    <img id="Volunteer" src="assets/images/contact_page/Volunteer img.svg" alt="Volunteer">
+    <h2>Volunteer</h2>
+    <p>Lorem ipsum dolor, sit amet consectetur adipisicing elit.!</p>
+  </div>
+  <div class="oppia-contact-page-content">
+    <img id="Other_inquiries" src="assets/images/contact_page/Other inquiries img.svg" alt="Other inquiries">
+    <h2>Other inquiries</h2>
+    <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. </p>
+  </div>
+</div>
 
   </div>
 </div>
-<div class="oppia-footer-padding-below-banner"></div>
+<div class="oppia-footer-padding-contact-page-below-banner"></div>
 <style>
+  oppia-contact-page-content img {
+   height:100px;
+   width: 100px;
+  }
+
   h2.oppia-contact-h2 {
     font-size: 1.17em;
     font-weight: bold;
     text-align: left;
   }
+
+  h2 {
+    text-align: center;
+  }
+
+  .oppia-contact-page-content {
+    margin-top: 100px;
+  }
+
+  .oppia-contact-page {
+    justify-content: space-evenly;
+  }
+
+  .flex {
+    display: flex;
+    flex-direction: row;
+  }
+ 
+   .oppia-footer-padding-contact-page-below-banner {
+    top: 209px;
+   }
+   
+   .oppia-static-content-contact-page-below-banner {
+    position: relative; 
+    top: 209px;
+   }
+
+   .oppia-static-card-content-full-wide {
+     width: 100%;
+   }
+
+   .oppia-text-center {
+    text-align: center;
+   }
+
+   .oppia-contact-page-content p {
+     text-align: center;
+   }
+   
+
+   @media (max-width: 768px){
+
+    .flex {
+      display: flex ; 
+      flex-direction: column;
+      text-align: center;
+    }
+ 
+    .oppia-contact-page {
+      margin-bottom: 200px;
+    }
+   }
+
 </style>
