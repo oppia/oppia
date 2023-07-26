@@ -171,7 +171,7 @@ class VerifyVersionHistoryModelsJob(base_jobs.JobBase):
                     exp_model.version <= exp_model_vlatest.version
                 ): # pragma: no cover
                     all_explorations[exp_model.version - 1] = exp_model
-            model_group_is_valid = (all_explorations.count(None) == 0)
+            model_group_is_valid = all_explorations.count(None) == 0
 
             if model_group_is_valid:
                 all_snapshot_metadata_models: List[Optional[
@@ -536,7 +536,7 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
                     exp_model.version <= exp_model_vlatest.version
                 ):
                     all_explorations[exp_model.version - 1] = exp_model
-            model_group_is_valid = (all_explorations.count(None) == 0)
+            model_group_is_valid = all_explorations.count(None) == 0
 
             if model_group_is_valid:
                 all_snapshot_metadata_models: List[Optional[

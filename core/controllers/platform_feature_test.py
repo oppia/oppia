@@ -79,7 +79,8 @@ class PlatformFeaturesEvaluationHandlerTest(test_utils.GenericTestBase):
                     ],
                     'value_when_matched': True
                 })
-            ]
+            ],
+            False
         )
 
         # Here we use MyPy ignore because the expected type of ALL_FEATURE_FLAGS
@@ -158,25 +159,6 @@ class PlatformFeaturesEvaluationHandlerTest(test_utils.GenericTestBase):
                 '[\'test\', \'alpha\', \'beta\', \'release\'] if specified.'
             )
 
-    def test_get_features_invalid_browser_type_raises_400(
-        self
-    ) -> None:
-        with self.swap(constants, 'DEV_MODE', True):
-            result = self.get_json(
-                '/platform_features_evaluation_handler',
-                params={
-                    'browser_type': 'invalid_browser',
-                },
-                expected_status_int=400
-            )
-
-            error_msg = (
-                'Schema validation for \'browser_type\' failed: Received '
-                'invalid_browser which is not in the allowed range of choices: '
-                '[\'Chrome\', \'Edge\', \'Safari\', \'Firefox\', \'Others\']'
-            )
-            self.assertEqual(result['error'], error_msg)
-
     def test_get_features_invalid_app_version_raises_400(self) -> None:
         with self.swap(constants, 'DEV_MODE', True):
             result = self.get_json(
@@ -208,10 +190,10 @@ class PlatformFeatureDummyHandlerTest(test_utils.GenericTestBase):
         self.user_id = self.get_user_id_from_email(self.OWNER_EMAIL)
 
     def tearDown(self) -> None:
-        feature_services.update_feature_flag_rules(
+        feature_services.update_feature_flag(
             param_list.ParamNames.DUMMY_FEATURE_FLAG_FOR_E2E_TESTS.value,
             self.user_id,
-            'clear rule', []
+            'clear rule', [], False
         )
 
         super().tearDown()
@@ -220,7 +202,7 @@ class PlatformFeatureDummyHandlerTest(test_utils.GenericTestBase):
         self, is_enabled: bool, mode: param_domain.ServerMode
     ) -> None:
         """Enables the dummy_feature for the dev environment."""
-        feature_services.update_feature_flag_rules(
+        feature_services.update_feature_flag(
             param_list.ParamNames.DUMMY_FEATURE_FLAG_FOR_E2E_TESTS.value,
             self.user_id,
             'update rule for testing purpose',
@@ -230,7 +212,8 @@ class PlatformFeatureDummyHandlerTest(test_utils.GenericTestBase):
                     'type': 'server_mode',
                     'conditions': [['=', mode.value]]
                 }]
-            })]
+            })],
+            False
         )
 
     def _mock_dummy_feature_stage(
