@@ -365,7 +365,7 @@ fdescribe('Contribution and review service', () => {
         expect(fetchSuggestionsAsyncSpy).toHaveBeenCalled();
       });
 
-    it('should return translation suggestions for given exp', async() => {
+    it('should return translation suggestions for given exploration', async() => {
       fetchSuggestionsAsyncSpy.and.returnValue(
         Promise.resolve(backendFetchResponse));
       const fetchTranslationSuggestionsAsyncSpy = spyOn(
