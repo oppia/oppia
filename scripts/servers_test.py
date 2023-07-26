@@ -28,6 +28,7 @@ import subprocess
 import sys
 import threading
 import time
+from unittest import mock
 
 from core.tests import test_utils
 from scripts import common
@@ -35,7 +36,6 @@ from scripts import scripts_test_utils
 from scripts import servers
 
 import psutil
-
 from typing import Callable, Iterator, List, Optional, Sequence, Tuple
 
 
@@ -48,6 +48,7 @@ class ManagedProcessTests(test_utils.TestBase):
     def setUp(self) -> None:
         super().setUp()
         self.exit_stack = contextlib.ExitStack()
+        self.chrome_version = '104.0.5112.79'.encode('UTF-8')
 
     def tearDown(self) -> None:
         try:
@@ -1011,11 +1012,26 @@ class ManagedProcessTests(test_utils.TestBase):
         self.assertIn('--suite full', program_args)
         self.assertIn('--params.devMode=True', program_args)
 
-    def test_managed_webdriverio_mobile(self) -> None:
+    @mock.patch('urllib.request.urlopen')
+    def test_managed_webdriverio_mobile(
+        self, mock_urlopen: mock.MagicMock
+    ) -> None:
+        mock_response = mock.MagicMock()
+        mock_response.getcode.return_value = 200
+        mock_response.read.return_value = self.chrome_version
+        mock_urlopen.return_value = mock_response
         with servers.managed_webdriverio_server(mobile=True):
             self.assertEqual(os.getenv('MOBILE'), 'true')
 
-    def test_managed_webdriverio_with_explicit_args(self) -> None:
+    @mock.patch('urllib.request.urlopen')
+    def test_managed_webdriverio_with_explicit_args(
+        self, mock_urlopen: mock.MagicMock
+    ) -> None:
+        mock_response = mock.MagicMock()
+        mock_response.getcode.return_value = 200
+        mock_response.read.return_value = self.chrome_version
+        mock_urlopen.return_value = mock_response
+
         popen_calls = self.exit_stack.enter_context(self.swap_popen())
 
         self.exit_stack.enter_context(servers.managed_webdriverio_server(
