@@ -21,7 +21,8 @@ export class ContributorAdminDashboardFilter {
   topicIds?: string[];
   sort?: string;
   lastActivity?: number;
-  filter: ContributorAdminDashboardFilter;
+  filter: ContributorAdminDashboardFilter = (
+    ContributorAdminDashboardFilter.createDefault());
 
   /**
  * @param {String} languageCode - Language Code to filter for.

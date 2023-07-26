@@ -178,7 +178,7 @@ export class ContributorDashboardAdminStatsBackendApiService {
     Promise<TranslationSubmitterStatsData |
       TranslationReviewerStatsData |
       QuestionSubmitterStatsData |
-      QuestionReviewerStatsData> {
+      QuestionReviewerStatsData | null> {
     const url = this.urlInterpolationService.interpolateUrl(
       PageConstants.CONTRIBUTOR_ADMIN_STATS_SUMMARIES_URL, {
         contribution_type: contributionType,

@@ -53,7 +53,7 @@ import { QuestionReviewerStats, QuestionSubmitterStats, TranslationReviewerStats
   ],
 })
 export class ContributorAdminStatsTable implements OnInit {
-  @Input() activeTab: string;
+  @Input() activeTab: string = null;
 
   columnsToDisplay = [
     'chevron',
@@ -68,15 +68,15 @@ export class ContributorAdminStatsTable implements OnInit {
   dataSource: TranslationSubmitterStats[] |
     TranslationReviewerStats[] |
     QuestionSubmitterStats[] |
-    QuestionReviewerStats[];
+    QuestionReviewerStats[] = null;
 
-  nextOffset: number;
-  more: boolean;
+  nextOffset: number = null;
+  more: boolean = null;
 
   expandedElement: TranslationSubmitterStats[] |
     TranslationReviewerStats[] |
     QuestionSubmitterStats[] |
-    QuestionReviewerStats[] | null | [];
+    QuestionReviewerStats[] | null | [] = null;
 
   TAB_NAME_TRANSLATION_SUBMITTER: string = 'Translation Submitter';
   TAB_NAME_TRANSLATION_REVIEWER: string = 'Translation Reviewer';
