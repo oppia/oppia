@@ -45,8 +45,8 @@ export class PreferredLanguagesComponent {
   searchQuery: string = '';
 
   onInputBoxClick(): void {
-      this.searchQuery = '';
-      this.filteredChoices = this.choices;
+    this.searchQuery = '';
+    this.filteredChoices = this.choices;
   }
 
   ngOnInit(): void {
