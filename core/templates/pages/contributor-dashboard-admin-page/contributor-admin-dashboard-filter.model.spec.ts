@@ -18,7 +18,7 @@
 
 import { ContributorAdminDashboardFilter } from './contributor-admin-dashboard-filter.model';
 
-fdescribe('Contributor Admin Dashboard Filter Model', () => {
+describe('Contributor Admin Dashboard Filter Model', () => {
   let filter: ContributorAdminDashboardFilter;
 
   beforeEach(() => {
