@@ -178,7 +178,7 @@ export class ContributorDashboardAdminStatsBackendApiService {
     Promise<TranslationSubmitterStatsData |
       TranslationReviewerStatsData |
       QuestionSubmitterStatsData |
-      QuestionReviewerStatsData | undefined> {
+      QuestionReviewerStatsData> {
     const url = this.urlInterpolationService.interpolateUrl(
       PageConstants.CONTRIBUTOR_ADMIN_STATS_SUMMARIES_URL, {
         contribution_type: contributionType,
@@ -293,6 +293,11 @@ export class ContributorDashboardAdminStatsBackendApiService {
         });
       }
     }
+    return Promise.resolve({
+      stats: [],
+      nextOffset: 0,
+      more: false
+    });
   }
 }
 
