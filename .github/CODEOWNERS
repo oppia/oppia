@@ -186,6 +186,10 @@
 /.pylintrc @oppia/dev-workflow-reviewers
 /.stylelintrc @oppia/dev-workflow-reviewers
 /.yarnrc @oppia/dev-workflow-reviewers
+/app_dev_docker.yaml @oppia/dev-workflow-reviewers
+/docker-compose.yml @oppia/dev-workflow-reviewers
+/docker/ @oppia/dev-workflow-reviewers
+/Makefile @oppia/dev-workflow-reviewers
 /tox.ini @oppia/dev-workflow-reviewers
 /scripts/*.py @oppia/dev-workflow-reviewers
 /scripts/check_e2e_tests_are_captured_in_ci*.py @oppia/automated-qa-reviewers
@@ -323,7 +327,7 @@
 /core/templates/services/internet-connectivity.service*.ts @oppia/frontend-infrastructure-reviewers
 /core/templates/services/server-connection-backend-api.service*.ts @oppia/frontend-infrastructure-reviewers
 /core/templates/services/number-conversion.service*.ts @oppia/frontend-infrastructure-reviewers
-
+/core/templates/services/insert-script.service.ts @oppia/frontend-infrastructure-reviewers @oppia/core-reviewers
 
 # Global stylesheet.
 /core/templates/css/oppia.css @oppia/frontend-infrastructure-reviewers
@@ -523,6 +527,7 @@
 /core/templates/services/interaction-specs.service*.ts @oppia/lace-frontend-reviewers
 /core/templates/services/translation-file-hash-loader-backend-api.service.ts @oppia/angular-migration-reviewers
 /redis.conf @oppia/data-and-stability-reviewers
+/redis_docker.conf @oppia/data-and-stability-reviewers
 /.firebase.json @oppia/data-and-stability-reviewers
 
 
@@ -606,6 +611,7 @@
 /core/templates/domain/suggestion/ @oppia/contributor-experience-team
 /core/templates/services/suggestion-modal.service*.ts @oppia/contributor-experience-team
 /core/templates/services/suggestions.service*.ts @oppia/contributor-experience-team
+/core/domain/contribution_stats_services*.py @oppia/contributor-experience-team
 
 
 # Feedback project.

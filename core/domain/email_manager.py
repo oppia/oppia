@@ -1011,7 +1011,7 @@ def send_emails_to_subscribers(
     """
 
     creator_name = user_services.get_username(creator_id)
-    email_subject = ('%s has published a new exploration!' % creator_name)
+    email_subject = '%s has published a new exploration!' % creator_name
     email_body_template = (
         'Hi %s,<br>'
         '<br>'
