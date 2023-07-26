@@ -386,13 +386,6 @@ describe('Contribution Admin dasboard stats service', () => {
 
   it('should return empty stats if contribution type is invalid', fakeAsync(
     () => {
-      spyOn(cdasbas, 'fetchContributorAdminStats')
-        .and.returnValue(Promise.resolve({
-          stats: [],
-          nextOffset: 0,
-          more: false
-        }));
-
       cdasbas.fetchContributorAdminStats(
         ContributorAdminDashboardFilter.createDefault(),
         20,
@@ -406,7 +399,5 @@ describe('Contribution Admin dasboard stats service', () => {
           more: false
         });
       });
-
-      expect(cdasbas.fetchContributorAdminStats).toHaveBeenCalled();
     }));
 });
