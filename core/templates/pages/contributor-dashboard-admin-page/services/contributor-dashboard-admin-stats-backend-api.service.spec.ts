@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for contribution and review service
+ * @fileoverview Unit tests for contributor admin dashboard backend service
  */
 
 import { fakeAsync, flushMicrotasks, TestBed } from '@angular/core/testing';

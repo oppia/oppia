@@ -21,8 +21,6 @@ export class ContributorAdminDashboardFilter {
   topicIds?: string[];
   sort?: string;
   lastActivity?: number;
-  filter: ContributorAdminDashboardFilter = (
-    ContributorAdminDashboardFilter.createDefault());
 
   /**
  * @param {String} languageCode - Language Code to filter for.
@@ -39,16 +37,6 @@ export class ContributorAdminDashboardFilter {
     this.lastActivity = lastActivity;
   }
 
-  /**
- * Resets the filter object values to default.
- */
-  reset(): void {
-    this.filter = ContributorAdminDashboardFilter.createDefault();
-    this.languageCode = this.filter.languageCode;
-    this.topicIds = this.filter.topicIds;
-    this.sort = this.filter.sort;
-    this.lastActivity = this.filter.lastActivity;
-  }
 
   /**
  * @returns {ContributorAdminDashboardFilter} - A new
