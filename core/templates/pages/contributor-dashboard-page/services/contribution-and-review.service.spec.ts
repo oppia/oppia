@@ -384,7 +384,7 @@ fdescribe('Contribution and review service', () => {
         });
     });
 
-    it('should correctly fetch translation suggestions and return' +
+    it('should correctly fetch translation suggestions and return ' +
     'the transformed result', async() => {
  
       const fetcher = {
