@@ -22,7 +22,7 @@ import { downgradeComponent } from '@angular/upgrade/static';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import './contributor-admin-dashboard-page.component.css';
 import { animate, state, style, transition, trigger } from '@angular/animations';
-import { ContributorDashboardAdminStatsBackendApiService } from './services/contributor-dashboard-admin-stats-backend-api.service'
+import { ContributorDashboardAdminStatsBackendApiService } from './services/contributor-dashboard-admin-stats-backend-api.service';
 
 @Component({
   selector: 'contributor-admin-dashboard-page',

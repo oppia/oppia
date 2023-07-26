@@ -378,17 +378,17 @@
 
 <style>
   .oppia-align-center {
-    width: 960px;
     font-size: 2em;
+    width: 960px;
   }
 
   table {
-    max-width: 960px;
     margin: 10px;
+    max-width: 960px;
   }
 
   tr.example-detail-row {
-    height: 0px;
+    height: 0;
   }
 
   tr.example-element-row:not(.example-expanded-row):hover {
@@ -400,26 +400,26 @@
   }
 
   .example-element-row td {
-    border-bottom-width: 0px;
+    border-bottom-width: 0;
   }
 
   .example-element-detail {
+    display: flex;
     overflow: hidden;
     width: 919px;
-    display: flex;
   }
 
   .details-container {
-    width: 100%;
-    height: fit-content;
-    padding-top: 20px;
-    padding-bottom: 20px;
     background: rgb(242, 244, 247);
     border-radius: 6px;
+    display: inline-flex;
+    height: fit-content;
     flex-direction: column;
     justify-content: flex-start;
-    display: inline-flex;
+    padding-bottom: 20px;
+    padding-top: 20px;
     padding-left: 40px;
+    width: 100%;
   }
 
   .details-sub-container {
@@ -604,4 +604,3 @@
     }
   }
 </style>
-

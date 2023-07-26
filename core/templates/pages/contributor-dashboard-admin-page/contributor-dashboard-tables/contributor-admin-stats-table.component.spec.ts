@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for ContributorAdminStatsTable.
  */
 
-import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
+import { ComponentFixture, fakeAsync, TestBed, waitForAsync } from '@angular/core/testing';
 import { NO_ERRORS_SCHEMA, SimpleChanges } from '@angular/core';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ContributorAdminStatsTable } from './contributor-admin-stats-table.component';

@@ -22,7 +22,7 @@ import os
 from core import feconf
 from core import utils
 from core.constants import constants
-from core.domain import change_domain, topic_fetchers, user_services
+from core.domain import change_domain
 from core.domain import config_services
 from core.domain import exp_domain
 from core.domain import exp_services
@@ -34,8 +34,10 @@ from core.domain import skill_services
 from core.domain import state_domain
 from core.domain import suggestion_registry
 from core.domain import suggestion_services
+from core.domain import topic_fetchers
 from core.domain import translation_domain
 from core.domain import translation_fetchers
+from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
 from extensions import domain
