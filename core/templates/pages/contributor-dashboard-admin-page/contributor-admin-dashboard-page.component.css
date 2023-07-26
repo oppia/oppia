@@ -225,14 +225,17 @@
   .dashboard-tabs li {
     width: 50%;
   }
-  .dashboard-tabs .dashboard-tabs-text,
-  .dashboard-tabs .dashboard-tabs-text:hover {
+  .dashboard-tabs .dashboard-tabs-text {
     border-radius: 0;
     color: rgb(255, 255, 255);
   }
   .dashboard-tabs-active .dashboard-tabs-text,
   .dashboard-tabs-active .dashboard-tabs-text:hover {
     border-bottom: 2px solid rgb(255, 255, 255);
+    border-radius: 0;
+    color: rgb(255, 255, 255);
+  }
+  .dashboard-tabs .dashboard-tabs-text:hover {
     border-radius: 0;
     color: rgb(255, 255, 255);
   }
