@@ -19,7 +19,7 @@
 import { TestBed, fakeAsync, flushMicrotasks, tick } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { AppConstants } from 'app.constants';
-import { ContributionAndReviewService, FetchSuggestionsResponse } from './contribution-and-review.service';
+import { ContributionAndReviewService } from './contribution-and-review.service';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { ContributionAndReviewBackendApiService }
   from './contribution-and-review-backend-api.service';
@@ -335,7 +335,7 @@ describe('Contribution and review service', () => {
     const mockFetchSuggestionsResponse = {
       suggestionIdToDetails: mockSuggestionsDetailsDict,
       more: false
-    } as unknown as FetchSuggestionsResponse;
+    };
     let explorationObjectFactory: ExplorationObjectFactory;
     let explorationObjectFactorySpy: jasmine.Spy;
     let fetchExplorationSpy: jasmine.Spy;
@@ -386,13 +386,6 @@ describe('Contribution and review service', () => {
 
     it('should correctly fetch translation suggestions and return ' +
     'the transformed result', async() => {
- 
-      const fetcher = {
-        type: 'someType',
-        offset: 0,
-        suggestionIdToDetails: {},
-        sortKey: 'someSortKey',
-      };
       const mockStates = {
         Introduction: {
           classifier_model_id: null,
