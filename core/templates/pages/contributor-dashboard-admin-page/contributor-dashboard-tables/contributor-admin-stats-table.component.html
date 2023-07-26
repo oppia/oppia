@@ -6,11 +6,11 @@
     </div>
   </div>
   <table mat-table
-    [dataSource]="dataSource"
-    multiTemplateDataRows
-    [class.isMobile]="true"
-    class="mat-elevation-z8"
-    *ngIf="!loadingMessage">
+         [dataSource]="dataSource"
+         multiTemplateDataRows
+         [class.isMobile]="true"
+         class="mat-elevation-z8"
+         *ngIf="!loadingMessage">
 
     <ng-container matColumnDef="contributorName">
       <th mat-header-cell *matHeaderCellDef class="user-header"><b> User </b></th>
@@ -30,7 +30,8 @@
       <td mat-cell *matCellDef="let element">
         <span class="mobile-label">Performance
           <i class="fas fa-info-circle" matTooltip="Performance is calculated based on the review results of the last 100 accepted/rejected contributions." #performanceTooltip="matTooltip" (click)="performanceTooltip.toggle()">
-          </i>:</span>
+          </i>:
+        </span>
         {{ element.recentPerformance }}
       </td>
     </ng-container>
@@ -40,14 +41,16 @@
         <b>
           Accuracy
           <i class="fas fa-info-circle"
-            matTooltip="Accuracy is based on the ratio of accepted to submitted translations."></i>
+            matTooltip="Accuracy is based on the ratio of accepted to submitted translations.">
+          </i>
         </b>
       </th>
       <td mat-cell *matCellDef="let element">
         <span class="mobile-label">Accuracy
           <i class="fas fa-info-circle"
             matTooltip="Accuracy is based on the ratio of accepted to submitted translations." #accuracyTooltip="matTooltip" (click)="accuracyTooltip.toggle()">
-          </i>:</span>
+          </i>:
+        </span>
         {{ element.overallAccuracy }}%
       </td>
     </ng-container>
@@ -62,9 +65,9 @@
 
     <ng-container matColumnDef="lastContributedInDays">
       <div *ngIf="activeTab === TAB_NAME_TRANSLATION_SUBMITTER">
-          <th mat-header-cell *matHeaderCellDef><b>
-            Last Translated
-          </b></th>
+        <th mat-header-cell *matHeaderCellDef>
+          <b>Last Translated</b>
+        </th>
       </div>
       <div
         *ngIf="activeTab === TAB_NAME_TRANSLATION_REVIEWER ||
@@ -119,9 +122,8 @@
       <th mat-header-cell *matHeaderCellDef><b> </b></th>
       <td mat-cell *matCellDef="let element">
         <div class="chevron">
-          <i
-            class="fas fa-chevron-right"
-            [@chevronExpand]="element == expandedElement ? 'expanded' : 'collapsed'">
+          <i class="fas fa-chevron-right"
+             [@chevronExpand]="element == expandedElement ? 'expanded' : 'collapsed'">
           </i>
         </div>
       </td>
@@ -131,9 +133,8 @@
       <th mat-header-cell *matHeaderCellDef><b> </b></th>
       <td mat-cell *matCellDef="let element" class="mobile-chevron">
         <div class="chevron">
-          <i
-            class="fas fa-chevron-right"
-            [@mobileChevronExpand]="element == expandedElement ? 'expanded' : 'collapsed'">
+          <i class="fas fa-chevron-right"
+             [@mobileChevronExpand]="element == expandedElement ? 'expanded' : 'collapsed'">
           </i>
         </div>
       </td>
@@ -148,17 +149,13 @@
 
     <!-- Expanded Content Column - The detail row is made up of this one column that spans across all columns -->
     <ng-container matColumnDef="expandedDetail">
-      <td
-        mat-cell
-        *matCellDef="let element"
-        [attr.colspan]="columnsToDisplay.length"
-      >
-        <div
-          class="example-element-detail"
-          [@detailExpand]="element == expandedElement ? 'expanded' : 'collapsed'">
-          <div
-            class="details-container"
-            *ngIf="activeTab === TAB_NAME_TRANSLATION_SUBMITTER">
+      <td mat-cell
+          *matCellDef="let element"
+          [attr.colspan]="columnsToDisplay.length">
+        <div class="example-element-detail"
+             [@detailExpand]="element == expandedElement ? 'expanded' : 'collapsed'">
+          <div class="details-container"
+               *ngIf="activeTab === TAB_NAME_TRANSLATION_SUBMITTER">
             <div class="details-sub-container">
               <div class="attribute-container">
                 <div class="attribute-sub-container">
@@ -216,10 +213,8 @@
               </div>
             </div>
           </div>
-          <div
-            class="details-container"
-            *ngIf="activeTab === TAB_NAME_TRANSLATION_REVIEWER"
-          >
+          <div class="details-container"
+               *ngIf="activeTab === TAB_NAME_TRANSLATION_REVIEWER">
             <div class="details-sub-container">
               <div class="attribute-container">
                 <div class="attribute-sub-container">
@@ -262,10 +257,8 @@
               </div>
             </div>
           </div>
-          <div
-            class="details-container"
-            *ngIf="activeTab === TAB_NAME_QUESTION_SUBMITTER"
-          >
+          <div class="details-container"
+               *ngIf="activeTab === TAB_NAME_QUESTION_SUBMITTER">
             <div class="details-sub-container">
               <div class="attribute-container">
                 <div class="attribute-sub-container">
@@ -309,9 +302,8 @@
               </div>
             </div>
           </div>
-          <div
-            class="details-container"
-            *ngIf="activeTab === TAB_NAME_QUESTION_REVIEWER">
+          <div class="details-container"
+               *ngIf="activeTab === TAB_NAME_QUESTION_REVIEWER">
             <div class="details-sub-container">
               <div class="attribute-container">
                 <div class="attribute-sub-container">
@@ -362,18 +354,20 @@
       </td>
     </ng-container>
 
-      <b><tr mat-header-row *matHeaderRowDef="columnsToDisplay"></tr></b>
-      <tr mat-row
+    <b><tr mat-header-row *matHeaderRowDef="columnsToDisplay"></tr></b>
+    <tr mat-row
         *matRowDef="let element; columns: columnsToDisplay"
         class="example-element-row"
         [class.example-expanded-row]="expandedElement === element"
-        (click)="expandedElement = expandedElement === element ? null : element"></tr>
-      <div *ngIf="checkMobileView()">
-        <tr mat-row *matRowDef="let element; columns: ['mobile-role']" class="mobile-edit-role"></tr>
-      </div>
-      <tr mat-row
+        (click)="expandedElement = expandedElement === element ? null : element">
+    </tr>
+    <div *ngIf="checkMobileView()">
+      <tr mat-row *matRowDef="let element; columns: ['mobile-role']" class="mobile-edit-role"></tr>
+    </div>
+    <tr mat-row
         *matRowDef="let row; columns: ['expandedDetail']"
-        class="example-detail-row"></tr>
+        class="example-detail-row">
+    </tr>
   </table>
 </div>
 
