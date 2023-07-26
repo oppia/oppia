@@ -1984,7 +1984,7 @@ class TranslationSubmitterTotalContributionStatsFrontendDict(TypedDict):
 
     language_code: str
     contributor_name: str
-    topic_ids_with_translation_submissions: List[str]
+    topic_names: List[str]
     recent_performance: int
     overall_accuracy: float
     submitted_translations_count: int
@@ -2085,7 +2085,7 @@ class TranslationReviewerTotalContributionStatsFrontendDict(TypedDict):
 
     language_code: str
     contributor_name: str
-    topic_ids_with_translation_reviews: List[str]
+    topic_names: List[str]
     reviewed_translations_count: int
     accepted_translations_count: int
     accepted_translations_with_reviewer_edits_count: int
@@ -2165,7 +2165,7 @@ class QuestionSubmitterTotalContributionStatsFrontendDict(TypedDict):
     """
 
     contributor_name: str
-    topic_ids_with_question_submissions: List[str]
+    topic_names: List[str]
     recent_performance: int
     overall_accuracy: float
     submitted_questions_count: int
@@ -2247,7 +2247,7 @@ class QuestionReviewerTotalContributionStatsFrontendDict(TypedDict):
     """
 
     contributor_name: str
-    topic_ids_with_question_reviews: List[str]
+    topic_names: List[str]
     reviewed_questions_count: int
     accepted_questions_count: int
     accepted_questions_with_reviewer_edits_count: int
