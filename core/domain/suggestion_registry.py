@@ -25,7 +25,6 @@ from core import feconf
 from core import utils
 from core.constants import constants
 from core.domain import change_domain
-from core.domain import topic_fetchers
 from core.domain import config_domain
 from core.domain import exp_domain
 from core.domain import exp_fetchers
@@ -38,14 +37,16 @@ from core.domain import question_services
 from core.domain import skill_domain
 from core.domain import skill_fetchers
 from core.domain import state_domain
+from core.domain import topic_fetchers
 from core.domain import translation_domain
 from core.domain import translation_services
 from core.domain import user_services
 from core.platform import models
 from extensions import domain
 
-from typing import (Any, Callable, Dict, List, Mapping, Optional, Set, Type,
-                    TypedDict, Union, cast)
+from typing import (
+    Any, Callable, Dict, List, Mapping, Optional, Set, Type, TypedDict, Union,
+    cast)
 
 MYPY = False
 if MYPY:  # pragma: no cover

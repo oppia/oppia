@@ -1,37 +1,37 @@
 .oppia-community-stats-value {
-  left: 0;
   color: rgb(51, 51, 51);
-  position: absolute;
-  top: 31px;
   font-family: Roboto, sans-serif;
   font-size: 32px;
   font-weight: 500;
+  left: 0;
+  position: absolute;
   text-transform: capitalize;
+  top: 31px;
   word-wrap: break-word;
 }
 .oppia-community-stats-header {
-  left: 0;
   color: rgb(102, 112, 133);
-  position: absolute;
-  top: 0;
   font-family: Roboto, sans-serif;
   font-size: 16px;
   font-weight: 400;
+  left: 0;
+  position: absolute;
   text-transform: capitalize;
+  top: 0;
   word-wrap: break-word;
 }
 .oppia-vertical-ruler {
-  height: 0;
-  width: 66.03px;
   border: 0.5px rgb(51, 51, 51) solid;
+  height: 0;
   opacity: 0.1;
   transform: rotate(-90deg);
   transform-origin: 0 0;
+  width: 66.03px;
 }
 .oppia-header-stats-container {
-  width: 81px;
   height: 69px;
   position: relative;
+  width: 81px;
 }
 .oppia-dashboard-title {
   margin-bottom: 50px;
@@ -53,8 +53,8 @@
 }
 .stats-header {
   color: #667085;
-  font-size: 16px;
   font-family: Roboto, sans-serif;
+  font-size: 16px;
   font-weight: 400;
   text-transform: capitalize;
   word-wrap: break-word;
@@ -63,8 +63,8 @@
   padding: 1em;
 }
 .mat-card.oppia-mat-card {
-  display: flex;
   align-items: baseline;
+  display: flex;
   justify-content: space-around;
   width: 960px;
 }
@@ -108,8 +108,8 @@
 }
 .oppia-contributor-dashboard-main-content .stats-card .stat-value-with-rating {
   margin-top: 0;
-  position: absolute;
   padding-top: 1em;
+  position: absolute;
   top: 0.75em;
 }
 .stats-card h2 {
@@ -119,21 +119,21 @@
 .dashboard-content {
   display: flex;
   flex-wrap: wrap;
-  margin: 0 auto;
   justify-content: space-around;
+  margin: 0 auto;
   padding-top: 50px;
 }
 .dashboard-content-primary {
   display: inline-block;
-  margin-bottom: 50px;
   justify-content: space-around;
+  margin-bottom: 50px;
   overflow: auto;
 }
 
 .dashboard-content-mobile {
   border: 0;
-  display: none;
   border-radius: 0;
+  display: none;
   max-width: 1000px;
 }
 
@@ -162,9 +162,9 @@
 .dashboard-tabs .dashboard-tabs-text:hover,
 .dashboard-tabs .dashboard-tabs-text:focus {
   color: rgb(51, 51, 51);
-  text-decoration: none;
   font-size: 16px;
   padding: 10px;
+  text-decoration: none;
   text-transform: uppercase;
   width: 100%;
 }
@@ -194,8 +194,8 @@
   .oppia-contributor-dashboard-main-content
   .stats-card
   .stat-value-with-rating {
-    position: absolute;
     padding-top: 0;
+    position: absolute;
     top: 1.25em;
   }
   .oppia-contributor-dashboard-main-content .stats-card .stat-description {
@@ -225,14 +225,14 @@
   .dashboard-tabs li {
     width: 50%;
   }
-  .dashboard-tabs-active .dashboard-tabs-text,
-  .dashboard-tabs-active .dashboard-tabs-text:hover {
-    border-bottom: 2px solid rgb(255, 255, 255);
+  .dashboard-tabs .dashboard-tabs-text,
+  .dashboard-tabs .dashboard-tabs-text:hover {
     border-radius: 0;
     color: rgb(255, 255, 255);
   }
-  .dashboard-tabs .dashboard-tabs-text,
-  .dashboard-tabs .dashboard-tabs-text:hover {
+  .dashboard-tabs-active .dashboard-tabs-text,
+  .dashboard-tabs-active .dashboard-tabs-text:hover {
+    border-bottom: 2px solid rgb(255, 255, 255);
     border-radius: 0;
     color: rgb(255, 255, 255);
   }
@@ -242,8 +242,8 @@
   }
   .dashboard-content-primary {
     border: 0;
-    display: none;
     border-radius: 0;
+    display: none;
     max-width: 1000px;
   }
   .dashboard-content-mobile {
