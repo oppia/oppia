@@ -56,7 +56,6 @@ interface Dimension {
   styleUrls: []
 })
 export class NoninteractiveImage implements OnInit, OnChanges {
-  @Input() altTextIsDisplayed: boolean = false;
   @Input() altWithValue: string = '';
   @Input() captionWithValue: string = '';
   // These properties are initialized using Angular lifecycle hooks
