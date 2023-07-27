@@ -372,7 +372,6 @@ class GenerateContributorAdminStatsJob(base_jobs.JobBase):
 
         return (key, recent_review_outcomes)
 
-
     @staticmethod
     def transform_translation_contribution_stats(
         keys: Tuple[str, str],
