@@ -25,6 +25,7 @@ import { PlatformFeatureService } from 'services/platform-feature.service';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { MailingListBackendApiService } from 'domain/mailing-list/mailing-list-backend-api.service';
 import { AlertsService } from 'services/alerts.service';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { OppiaFooterComponent } from './oppia-footer.component';
 
 class MockPlatformFeatureService {
@@ -48,6 +49,7 @@ describe('OppiaFooterComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
       declarations: [
         OppiaFooterComponent,
         MockTranslatePipe
@@ -67,6 +69,7 @@ describe('OppiaFooterComponent', () => {
 
   beforeEach(() => {
     fixture = TestBed.createComponent(OppiaFooterComponent);
+    alertsService = TestBed.inject(AlertsService);
     component = fixture.componentInstance;
   });
 
