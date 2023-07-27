@@ -214,12 +214,13 @@ export class ContributionAndReviewService {
               this.compareTranslationSuggestions.bind(this)));
           // eslint-disable-next-line
           const responseSuggestionIdToDetails: {[key: string]: any} = {};
-          const targetIdToDetails = (
-            fetchSuggestionsResponse.target_id_to_opportunity_dict);
           sortedTranslationSuggestions.forEach((suggestion) => {
             const suggestionDetails = {
               suggestion: suggestion,
-              details: targetIdToDetails[suggestion.target_id]
+              details: (
+                fetchSuggestionsResponse.
+                target_id_to_opportunity_dict
+                [suggestion.target_id])
             };
             responseSuggestionIdToDetails[
               suggestion.suggestion_id] = suggestionDetails;
@@ -314,9 +315,6 @@ export class ContributionAndReviewService {
 
       if (cardAIndex !== cardBIndex) {
         return cardAIndex - cardBIndex;
-      } else {
-        // If the indices are the same, sort by content_id.
-        return cardA.change.content_id.localeCompare(cardB.change.content_id);
       }
     }
   }

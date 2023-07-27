@@ -809,7 +809,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
     @classmethod
     def get_in_review_question_suggestions_by_offset(
         cls,
-        limit: int,
+        limit: Optional[int],
         offset: int,
         user_id: str,
         sort_key: Optional[str]
