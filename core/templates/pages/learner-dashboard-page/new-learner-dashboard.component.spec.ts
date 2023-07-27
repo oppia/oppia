@@ -27,7 +27,6 @@ import { FormsModule } from '@angular/forms';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { Component, EventEmitter, NO_ERRORS_SCHEMA, Pipe } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
-
 import { AlertsService } from 'services/alerts.service';
 import { ShortLearnerGroupSummary } from 'domain/learner_group/short-learner-group-summary.model';
 import { CsrfTokenService } from 'services/csrf-token.service';
