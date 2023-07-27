@@ -18,7 +18,6 @@
 import { Collection, CollectionBackendDict } from 'domain/collection/collection.model';
 import { LearnerExplorationSummary } from 'domain/summary/learner-exploration-summary.model';
 
-
 import { CollectionSummary } from 'domain/collection/collection-summary.model';
 import { ProfileSummary } from 'domain/user/profile-summary.model';
 import { NewLearnerDashboardComponent } from './new-learner-dashboard.component';
