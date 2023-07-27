@@ -15,11 +15,8 @@
 /**
  * @fileoverview Unit tests for learner dashboard parge.
  */
-
-
 import { Collection, CollectionBackendDict } from 'domain/collection/collection.model';
 import { LearnerExplorationSummary } from 'domain/summary/learner-exploration-summary.model';
-
 
 import { CollectionSummary } from 'domain/collection/collection-summary.model';
 import { ProfileSummary } from 'domain/user/profile-summary.model';
@@ -30,7 +27,6 @@ import { FormsModule } from '@angular/forms';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { Component, EventEmitter, NO_ERRORS_SCHEMA, Pipe } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
-
 import { AlertsService } from 'services/alerts.service';
 import { ShortLearnerGroupSummary } from 'domain/learner_group/short-learner-group-summary.model';
 import { CsrfTokenService } from 'services/csrf-token.service';
@@ -193,8 +189,6 @@ describe('New Learner dashboard page', () => {
       completed_exploration_ids: ['expId2']
     }
   };
-
-
   let learnerDashboardTopicAndStoriesData = {
     completed_stories_list: [],
     learnt_topic_list: [],
@@ -224,8 +218,6 @@ describe('New Learner dashboard page', () => {
     },
     collection_playlist: []
   };
-
-
   let learnerDashboardExplorationsData = {
     completed_explorations_list: [],
     incomplete_explorations_list: [],
@@ -555,8 +547,6 @@ describe('New Learner dashboard page', () => {
 
       expect(component.windowIsNarrow).toBeTrue();
       expect(component.tabletView).toBeTrue();
-
-
       mockResizeEmitter.emit();
 
       expect(component.windowIsNarrow).toBeFalse();

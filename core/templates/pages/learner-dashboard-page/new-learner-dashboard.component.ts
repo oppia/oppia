@@ -111,7 +111,6 @@ export class NewLearnerDashboardComponent implements OnInit {
   allTopics!: LearnerTopicSummary[];
   untrackedTopics!: Record<string, LearnerTopicSummary[]>;
   subscriptionsList!: ProfileSummary[];
-
   completedToIncompleteCollections!: string[];
   learntToPartiallyLearntTopics!: string[];
   numberOfUnreadThreads!: number;
@@ -120,7 +119,6 @@ export class NewLearnerDashboardComponent implements OnInit {
   storyIdToLearnerGroupsTitleMap: Map<string, string[]> = new Map();
   activeSection!: string;
   activeSubsection!: string;
-
   profilePicturePngDataUrl!: string;
   profilePictureWebpDataUrl!: string;
 
@@ -128,7 +126,6 @@ export class NewLearnerDashboardComponent implements OnInit {
   explorationId!: string;
   communityLibraryUrl = (
     '/' + AppConstants.PAGES_REGISTERED_WITH_FRONTEND.LIBRARY_INDEX.ROUTE);
-
   communtiyLessonsDataLoaded: boolean = false;
   loadingIndicatorIsShown: boolean = false;
   homeImageUrl: string = '';
@@ -225,7 +222,7 @@ export class NewLearnerDashboardComponent implements OnInit {
           (learnerDashboardLearnerGroups) => {
             let learnerGroupsJoined = (
               learnerDashboardLearnerGroups.learnerGroupsJoined);
-            for (var learnerGroup of learnerGroupsJoined) {
+            for (let learnerGroup of learnerGroupsJoined) {
               let title = learnerGroup.title;
               let storyIds = learnerGroup.storyIds;
               for (var storyId of storyIds) {
@@ -340,8 +337,6 @@ export class NewLearnerDashboardComponent implements OnInit {
       'I18N_LEARNER_DASHBOARD_PAGE_TITLE');
     this.pageTitleService.setDocumentTitle(translatedTitle);
   }
-
-
   getStaticImageUrl(imagePath: string): string {
     return this.urlInterpolationService.getStaticImageUrl(imagePath);
   }
