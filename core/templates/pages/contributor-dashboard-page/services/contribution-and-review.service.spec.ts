@@ -908,7 +908,7 @@ describe('Contribution and review service', () => {
     }));
   });
 
-  describe('sort translation suggestions', () => {
+  describe('sortTranslationSuggestionsByState', () => {
     const translationSuggestions = [
       {
         suggestion_type: 'suggestion',
