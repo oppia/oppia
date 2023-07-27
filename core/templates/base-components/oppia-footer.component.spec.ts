@@ -70,6 +70,8 @@ describe('OppiaFooterComponent', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(OppiaFooterComponent);
     alertsService = TestBed.inject(AlertsService);
+    mailingListBackendApiService = TestBed.inject(
+      MailingListBackendApiService);
     component = fixture.componentInstance;
   });
 
