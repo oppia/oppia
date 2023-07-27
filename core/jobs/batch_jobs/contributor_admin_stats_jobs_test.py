@@ -161,6 +161,25 @@ class ContributorDashboardTest(job_test_utils.JobTestBase):
             contribution_dates=self.CONTRIBUTION_DATES
         )
 
+        self.translation_contribution_model_5 = self.create_model(
+            suggestion_models.TranslationContributionStatsModel,
+            language_code='hi',
+            contributor_user_id='user3',
+            topic_id='topic3',
+            submitted_translations_count=self.SUBMITTED_TRANSLATIONS_COUNT,
+            submitted_translation_word_count=(
+                self.SUBMITTED_TRANSLATION_WORD_COUNT),
+            accepted_translations_count=self.ACCEPTED_TRANSLATIONS_COUNT,
+            accepted_translations_without_reviewer_edits_count=(
+                self.ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT),
+            accepted_translation_word_count=(
+                self.ACCEPTED_TRANSLATION_WORD_COUNT),
+            rejected_translations_count=self.REJECTED_TRANSLATIONS_COUNT,
+            rejected_translation_word_count=(
+                self.REJECTED_TRANSLATION_WORD_COUNT),
+            contribution_dates=self.CONTRIBUTION_DATES
+        )
+
         self.translation_review_model_1 = self.create_model(
             suggestion_models.TranslationReviewStatsModel,
             language_code=self.LANGUAGE_CODE,
@@ -445,6 +464,7 @@ class GenerateContributorAdminStatsJobTests(ContributorDashboardTest):
         self.translation_contribution_model_2.update_timestamps()
         self.translation_contribution_model_3.update_timestamps()
         self.translation_contribution_model_4.update_timestamps()
+        self.translation_contribution_model_5.update_timestamps()
         self.translation_review_model_1.update_timestamps()
         self.translation_review_model_2.update_timestamps()
         self.translation_review_model_3.update_timestamps()
@@ -470,6 +490,7 @@ class GenerateContributorAdminStatsJobTests(ContributorDashboardTest):
             self.translation_contribution_model_2,
             self.translation_contribution_model_3,
             self.translation_contribution_model_4,
+            self.translation_contribution_model_5,
             self.translation_review_model_1,
             self.translation_review_model_2,
             self.translation_review_model_3,
@@ -495,7 +516,7 @@ class GenerateContributorAdminStatsJobTests(ContributorDashboardTest):
             job_run_result.JobRunResult(
                 stdout='Translation Reviewer Models SUCCESS: 3'),
             job_run_result.JobRunResult(
-                stdout='Translation Submitter Models SUCCESS: 2'),
+                stdout='Translation Submitter Models SUCCESS: 3'),
             job_run_result.JobRunResult(
                 stdout='Question Submitter Models SUCCESS: 3'),
             job_run_result.JobRunResult(
@@ -507,7 +528,7 @@ class GenerateContributorAdminStatsJobTests(ContributorDashboardTest):
             suggestion_models.TranslationSubmitterTotalContributionStatsModel
             .get_all()
         )
-        self.assertEqual(2, translation_submitter_all_models.count())
+        self.assertEqual(3, translation_submitter_all_models.count())
 
         translation_submitter_total_stats = (
             suggestion_models.TranslationSubmitterTotalContributionStatsModel
@@ -881,6 +902,7 @@ class AuditGenerateContributorAdminStatsJobTests(ContributorDashboardTest):
         self.translation_contribution_model_2.update_timestamps()
         self.translation_contribution_model_3.update_timestamps()
         self.translation_contribution_model_4.update_timestamps()
+        self.translation_contribution_model_5.update_timestamps()
         self.translation_review_model_1.update_timestamps()
         self.translation_review_model_2.update_timestamps()
         self.translation_review_model_3.update_timestamps()
@@ -906,6 +928,7 @@ class AuditGenerateContributorAdminStatsJobTests(ContributorDashboardTest):
             self.translation_contribution_model_2,
             self.translation_contribution_model_3,
             self.translation_contribution_model_4,
+            self.translation_contribution_model_5,
             self.translation_review_model_1,
             self.translation_review_model_2,
             self.translation_review_model_3,
@@ -931,7 +954,7 @@ class AuditGenerateContributorAdminStatsJobTests(ContributorDashboardTest):
             job_run_result.JobRunResult(
                 stdout='Translation Reviewer Models SUCCESS: 3'),
             job_run_result.JobRunResult(
-                stdout='Translation Submitter Models SUCCESS: 2'),
+                stdout='Translation Submitter Models SUCCESS: 3'),
             job_run_result.JobRunResult(
                 stdout='Question Submitter Models SUCCESS: 3'),
             job_run_result.JobRunResult(
