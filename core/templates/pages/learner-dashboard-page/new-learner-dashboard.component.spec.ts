@@ -553,8 +553,6 @@ describe('New Learner dashboard page', () => {
 
       expect(component.windowIsNarrow).toBeTrue();
       expect(component.tabletView).toBeTrue();
-
-
       mockResizeEmitter.emit();
 
       expect(component.windowIsNarrow).toBeFalse();
