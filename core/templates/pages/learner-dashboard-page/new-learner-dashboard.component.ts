@@ -223,7 +223,7 @@ export class NewLearnerDashboardComponent implements OnInit {
           (learnerDashboardLearnerGroups) => {
             let learnerGroupsJoined = (
               learnerDashboardLearnerGroups.learnerGroupsJoined);
-            for (var learnerGroup of learnerGroupsJoined) {
+            for (let learnerGroup of learnerGroupsJoined) {
               let title = learnerGroup.title;
               let storyIds = learnerGroup.storyIds;
               for (var storyId of storyIds) {
