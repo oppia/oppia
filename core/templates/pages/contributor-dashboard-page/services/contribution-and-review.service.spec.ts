@@ -364,14 +364,15 @@ describe('Contribution and review service', () => {
         expect(fetchSuggestionsAsyncSpy).toHaveBeenCalled();
       });
 
-    it('should return translation suggestions for given exploration', async() => {
+    it('should return translation suggestions for given ' +
+    'exploration', async() => {
       fetchSuggestionsAsyncSpy.and.returnValue(
         Promise.resolve(backendFetchResponse));
       const fetchTranslationSuggestionsAsyncSpy = spyOn(
         cars, 'fetchTranslationSuggestionsAsync').and.returnValue(
         Promise.resolve({
           suggestionIdToDetails: {
-            'skill_id_1': {
+            skill_id_1: {
               suggestions: suggestion1,
               details: opportunityDict1
             }
@@ -512,8 +513,6 @@ describe('Contribution and review service', () => {
         most_recently_reached_checkpoint_exp_version: 1,
         displayable_language_codes: ['en'],
       };
-      const explorationBackendDict = explorationObjectFactory.
-      createBackendDictFromExplorationBackendResponse(mockReadOnlyExplorationData);
       const exploration: Exploration = new Exploration(
         mockReadOnlyExplorationData.exploration.init_state_name,
         [],
@@ -524,7 +523,7 @@ describe('Contribution and review service', () => {
         mockReadOnlyExplorationData.exploration.language_code,
         loggerService,
         urlInterpolationService
-      )
+      );
       const getStatesSpy = spyOn(exploration, 'getStates');
 
       fetchExplorationSpy.and.returnValue(
@@ -534,115 +533,115 @@ describe('Contribution and review service', () => {
       explorationObjectFactorySpy.and.returnValue(
         exploration);
       mockSortTranslationSpy.and.returnValue([
-          {
-            suggestion_type: 'suggestion',
-            suggestion_id: 'id',
-            target_type: 'exploration',
-            target_id: '1',
-            status: 'review',
-            author_name: 'author',
-            change: {
-              state_name: 'First State',
-              content_id: 'content_1'
-            },
-            last_updated_msecs: 0,
+        {
+          suggestion_type: 'suggestion',
+          suggestion_id: 'id',
+          target_type: 'exploration',
+          target_id: '1',
+          status: 'review',
+          author_name: 'author',
+          change: {
+            state_name: 'First State',
+            content_id: 'content_1'
           },
-          {
-            suggestion_type: 'suggestion',
-            suggestion_id: 'id',
-            target_type: 'exploration',
-            target_id: '1',
-            status: 'review',
-            author_name: 'author',
-            change: {
-              state_name: 'First State',
-              content_id: 'content_3'
-            },
-            last_updated_msecs: 0,
+          last_updated_msecs: 0,
+        },
+        {
+          suggestion_type: 'suggestion',
+          suggestion_id: 'id',
+          target_type: 'exploration',
+          target_id: '1',
+          status: 'review',
+          author_name: 'author',
+          change: {
+            state_name: 'First State',
+            content_id: 'content_3'
           },
-          {
-            suggestion_type: 'suggestion',
-            suggestion_id: 'id',
-            target_type: 'exploration',
-            target_id: '1',
-            status: 'review',
-            author_name: 'author',
-            change: {
-              state_name: 'First State',
-              content_id: 'feedback_2'
-            },
-            last_updated_msecs: 0,
+          last_updated_msecs: 0,
+        },
+        {
+          suggestion_type: 'suggestion',
+          suggestion_id: 'id',
+          target_type: 'exploration',
+          target_id: '1',
+          status: 'review',
+          author_name: 'author',
+          change: {
+            state_name: 'First State',
+            content_id: 'feedback_2'
           },
-          {
-            suggestion_type: 'suggestion',
-            suggestion_id: 'id',
-            target_type: 'exploration',
-            target_id: '1',
-            status: 'review',
-            author_name: 'author',
-            change: {
-              state_name: 'End State',
-              content_id: 'content_2'
-            },
-            last_updated_msecs: 0,
+          last_updated_msecs: 0,
+        },
+        {
+          suggestion_type: 'suggestion',
+          suggestion_id: 'id',
+          target_type: 'exploration',
+          target_id: '1',
+          status: 'review',
+          author_name: 'author',
+          change: {
+            state_name: 'End State',
+            content_id: 'content_2'
           },
-          {
-            suggestion_type: 'suggestion',
-            suggestion_id: 'id',
-            target_type: 'exploration',
-            target_id: '1',
-            status: 'review',
-            author_name: 'author',
-            change: {
-              state_name: 'End State',
-              content_id: 'interaction_1'
-            },
-            last_updated_msecs: 0,
+          last_updated_msecs: 0,
+        },
+        {
+          suggestion_type: 'suggestion',
+          suggestion_id: 'id',
+          target_type: 'exploration',
+          target_id: '1',
+          status: 'review',
+          author_name: 'author',
+          change: {
+            state_name: 'End State',
+            content_id: 'interaction_1'
           },
-          {
-            suggestion_type: 'suggestion',
-            suggestion_id: 'id',
-            target_type: 'exploration',
-            target_id: '1',
-            status: 'review',
-            author_name: 'author',
-            change: {
-              state_name: 'End State',
-              content_id: 'hints_1'
-            },
-            last_updated_msecs: 0,
-          }
-        ]);
+          last_updated_msecs: 0,
+        },
+        {
+          suggestion_type: 'suggestion',
+          suggestion_id: 'id',
+          target_type: 'exploration',
+          target_id: '1',
+          status: 'review',
+          author_name: 'author',
+          change: {
+            state_name: 'End State',
+            content_id: 'hints_1'
+          },
+          last_updated_msecs: 0,
+        }
+      ]);
       getStatesSpy.and.returnValue(mockStates);
 
       await cars.fetchTranslationSuggestionsAsync(
         '1').then((response)=>{
-          expect(response).toEqual({
-            suggestionIdToDetails: {
-              id: {
-                suggestion: {
-                  suggestion_type: 'suggestion',
-                  suggestion_id: 'id',
-                  target_type: 'exploration',
-                  target_id: '1',
-                  status: 'review',
-                  author_name: 'author',
-                  change: {
-                    state_name: 'End State',
-                    content_id: 'hints_1',
-                  },
-                  last_updated_msecs: 0
+        expect(response).toEqual({
+          suggestionIdToDetails: {
+            id: {
+              suggestion: {
+                suggestion_type: 'suggestion',
+                suggestion_id: 'id',
+                target_type: 'exploration',
+                target_id: '1',
+                status: 'review',
+                author_name: 'author',
+                change: {
+                  state_name: 'End State',
+                  content_id: 'hints_1',
                 },
-                details: undefined,
+                last_updated_msecs: 0
               },
+              details: undefined,
             },
-            more: false
-          });
-          expect(explorationObjectFactorySpy).toHaveBeenCalled();
-          expect(getStatesSpy).toHaveBeenCalled();
-          expect(fetchSuggestionsAsyncSpy).toHaveBeenCalled();
-          expect(fetchExplorationSpy).toHaveBeenCalled();
-        })
+          },
+          more: false
+        });
+        expect(explorationObjectFactorySpy).toHaveBeenCalled();
+        expect(getStatesSpy).toHaveBeenCalled();
+        expect(fetchSuggestionsAsyncSpy).toHaveBeenCalled();
+        expect(fetchExplorationSpy).toHaveBeenCalled();
+      });
     });
   });
 

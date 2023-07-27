@@ -30,7 +30,7 @@ import { LoggerService } from 'services/contextual/logger.service';
 import { SubtitledUnicode } from
   'domain/exploration/SubtitledUnicodeObjectFactory';
 import { SubtitledHtmlBackendDict } from 'domain/exploration/subtitled-html.model';
-import {FetchExplorationBackendResponse, ReadOnlyExplorationBackendApiService} from './read-only-exploration-backend-api.service'
+import {FetchExplorationBackendResponse } from './read-only-exploration-backend-api.service'
 
 describe('Exploration object factory', () => {
   let eof: ExplorationObjectFactory;
@@ -189,7 +189,7 @@ describe('Exploration object factory', () => {
       }
     };
 
-    const mockReadOnlyExplorationData: 
+    const mockReadOnlyExplorationData:
     FetchExplorationBackendResponse = {
       can_edit: true,
       exploration: {
@@ -243,8 +243,8 @@ describe('Exploration object factory', () => {
     exploration = eof.createFromBackendDict(explorationDict);
     exploration.setInitialStateName('first state');
     explorationBackendDict = eof.
-    createBackendDictFromExplorationBackendResponse(
-      mockReadOnlyExplorationData);
+      createBackendDictFromExplorationBackendResponse(
+        mockReadOnlyExplorationData);
     loggerErrorSpy = spyOn(ls, 'error').and.callThrough();
   });
 
@@ -418,5 +418,5 @@ describe('Exploration object factory', () => {
       draft_change_list_id: 1
     };
     expect(explorationBackendDict).toEqual(expectedBackendDict);
-   });
+  });
 });
