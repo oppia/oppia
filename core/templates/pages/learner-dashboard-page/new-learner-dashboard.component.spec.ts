@@ -189,8 +189,6 @@ describe('New Learner dashboard page', () => {
       completed_exploration_ids: ['expId2']
     }
   };
-
-
   let learnerDashboardTopicAndStoriesData = {
     completed_stories_list: [],
     learnt_topic_list: [],
