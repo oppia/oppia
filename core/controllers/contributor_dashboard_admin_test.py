@@ -739,10 +739,23 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
         user_services.add_user_role(
             self.contributor_id, feconf.ROLE_ID_TRANSLATION_ADMIN)
 
+        user_1_settings = user_services.create_new_user(
+            'auth_id_1', 'user1@example.com')
+        user_services.set_username(user_1_settings.user_id, 'user1')
+        user_2_settings = user_services.create_new_user(
+            'auth_id_2', 'user2@example.com')
+        user_services.set_username(user_2_settings.user_id, 'user2')
+        user_3_settings = user_services.create_new_user(
+            'auth_id_3', 'user3@example.com')
+        user_services.set_username(user_3_settings.user_id, 'user3')
+        user_4_settings = user_services.create_new_user(
+            'auth_id_4', 'user4@example.com')
+        user_services.set_username(user_4_settings.user_id, 'user4')
+
         suggestion_models.TranslationSubmitterTotalContributionStatsModel(
             id='model_1',
             language_code=self.SUGGESTION_LANGUAGE_CODE,
-            contributor_id='user1',
+            contributor_id=user_1_settings.user_id,
             topic_ids_with_translation_submissions=[
                 'topic1'
             ],
@@ -767,7 +780,7 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
         suggestion_models.TranslationSubmitterTotalContributionStatsModel(
             id='model_2',
             language_code=self.SUGGESTION_LANGUAGE_CODE,
-            contributor_id='user2',
+            contributor_id=user_2_settings.user_id,
             topic_ids_with_translation_submissions=[
                 'topic3'
             ],
@@ -792,7 +805,7 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
         suggestion_models.TranslationSubmitterTotalContributionStatsModel(
             id='model_3',
             language_code=self.SUGGESTION_LANGUAGE_CODE,
-            contributor_id='user3',
+            contributor_id=user_3_settings.user_id,
             topic_ids_with_translation_submissions=[
                 'topic1', 'topic2'
             ],
@@ -817,7 +830,7 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
         suggestion_models.TranslationSubmitterTotalContributionStatsModel(
             id='model_4',
             language_code=self.SUGGESTION_LANGUAGE_CODE,
-            contributor_id='user4',
+            contributor_id=user_4_settings.user_id,
             topic_ids_with_translation_submissions=(
                 self.TOPIC_IDS_WITH_TRANSLATION_SUBMISSIONS),
             recent_review_outcomes=self.RECENT_REVIEW_OUTCOMES,
@@ -842,7 +855,7 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
         suggestion_models.TranslationReviewerTotalContributionStatsModel(
             id='model_1',
             language_code=self.SUGGESTION_LANGUAGE_CODE,
-            contributor_id='user1',
+            contributor_id=user_1_settings.user_id,
             topic_ids_with_translation_reviews=(
                 self.TOPIC_IDS_WITH_TRANSLATION_REVIEWS),
             reviewed_translations_count=10,
@@ -860,7 +873,7 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
         suggestion_models.TranslationReviewerTotalContributionStatsModel(
             id='model_2',
             language_code=self.SUGGESTION_LANGUAGE_CODE,
-            contributor_id='user2',
+            contributor_id=user_2_settings.user_id,
             topic_ids_with_translation_reviews=(
                 self.TOPIC_IDS_WITH_TRANSLATION_REVIEWS),
             reviewed_translations_count=20,
@@ -878,7 +891,7 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
         suggestion_models.TranslationReviewerTotalContributionStatsModel(
             id='model_3',
             language_code=self.SUGGESTION_LANGUAGE_CODE,
-            contributor_id='user3',
+            contributor_id=user_3_settings.user_id,
             topic_ids_with_translation_reviews=(
                 self.TOPIC_IDS_WITH_TRANSLATION_REVIEWS),
             reviewed_translations_count=30,
@@ -896,7 +909,7 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
         suggestion_models.TranslationReviewerTotalContributionStatsModel(
             id='model_4',
             language_code=self.SUGGESTION_LANGUAGE_CODE,
-            contributor_id='user4',
+            contributor_id=user_4_settings.user_id,
             topic_ids_with_translation_reviews=(
                 self.TOPIC_IDS_WITH_TRANSLATION_REVIEWS),
             reviewed_translations_count=40,
@@ -914,7 +927,7 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
 
         suggestion_models.QuestionSubmitterTotalContributionStatsModel(
             id='model_1',
-            contributor_id='user1',
+            contributor_id=user_1_settings.user_id,
             topic_ids_with_question_submissions=[
                 'topic1'
             ],
@@ -932,7 +945,7 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
         ).put()
         suggestion_models.QuestionSubmitterTotalContributionStatsModel(
             id='model_2',
-            contributor_id='user2',
+            contributor_id=user_2_settings.user_id,
             topic_ids_with_question_submissions=[
                 'topic3'
             ],
@@ -950,7 +963,7 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
         ).put()
         suggestion_models.QuestionSubmitterTotalContributionStatsModel(
             id='model_3',
-            contributor_id='user3',
+            contributor_id=user_3_settings.user_id,
             topic_ids_with_question_submissions=[
                 'topic1'
             ],
@@ -968,7 +981,7 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
         ).put()
         suggestion_models.QuestionSubmitterTotalContributionStatsModel(
             id='model_4',
-            contributor_id='user4',
+            contributor_id=user_4_settings.user_id,
             topic_ids_with_question_submissions=[
                 'topic1', 'topic2'
             ],
@@ -987,7 +1000,7 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
 
         suggestion_models.QuestionReviewerTotalContributionStatsModel(
             id='model_1',
-            contributor_id='user1',
+            contributor_id=user_1_settings.user_id,
             topic_ids_with_question_reviews=[
                 'topic1'
             ],
@@ -1002,7 +1015,7 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
         ).put()
         suggestion_models.QuestionReviewerTotalContributionStatsModel(
             id='model_2',
-            contributor_id='user2',
+            contributor_id=user_2_settings.user_id,
             topic_ids_with_question_reviews=[
                 'topic1', 'topic2'
             ],
@@ -1017,7 +1030,7 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
         ).put()
         suggestion_models.QuestionReviewerTotalContributionStatsModel(
             id='model_3',
-            contributor_id='user3',
+            contributor_id=user_3_settings.user_id,
             topic_ids_with_question_reviews=[
                 'topic3'
             ],
@@ -1032,7 +1045,7 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
         ).put()
         suggestion_models.QuestionReviewerTotalContributionStatsModel(
             id='model_4',
-            contributor_id='user4',
+            contributor_id=user_4_settings.user_id,
             topic_ids_with_question_reviews=[
                 'topic3'
             ],
@@ -1093,7 +1106,7 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
             2
         )
         self.assertEqual(
-            response['stats'][0]['contributor_id'],
+            response['stats'][0]['contributor_name'],
             'user3'
         )
         self.assertEqual(
@@ -1124,7 +1137,7 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
             2
         )
         self.assertEqual(
-            response['stats'][0]['contributor_id'],
+            response['stats'][0]['contributor_name'],
             'user2'
         )
         self.assertEqual(
@@ -1154,7 +1167,7 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
             2
         )
         self.assertEqual(
-            response['stats'][0]['contributor_id'],
+            response['stats'][0]['contributor_name'],
             'user3'
         )
         self.assertEqual(
@@ -1191,11 +1204,11 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
             3
         )
         self.assertEqual(
-            response['stats'][0]['contributor_id'],
+            response['stats'][0]['contributor_name'],
             'user3'
         )
         self.assertEqual(
-            response['stats'][1]['contributor_id'],
+            response['stats'][1]['contributor_name'],
             'user2'
         )
         self.assertEqual(
@@ -1225,7 +1238,7 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
             2
         )
         self.assertEqual(
-            response['stats'][0]['contributor_id'],
+            response['stats'][0]['contributor_name'],
             'user3'
         )
         self.assertEqual(
@@ -1256,7 +1269,7 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
             2
         )
         self.assertEqual(
-            response['stats'][0]['contributor_id'],
+            response['stats'][0]['contributor_name'],
             'user2'
         )
         self.assertEqual(
@@ -1289,11 +1302,11 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
             3
         )
         self.assertEqual(
-            response['stats'][0]['contributor_id'],
+            response['stats'][0]['contributor_name'],
             'user3'
         )
         self.assertEqual(
-            response['stats'][1]['contributor_id'],
+            response['stats'][1]['contributor_name'],
             'user2'
         )
         self.assertEqual(
@@ -1322,7 +1335,7 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
             2
         )
         self.assertEqual(
-            response['stats'][0]['contributor_id'],
+            response['stats'][0]['contributor_name'],
             'user3'
         )
         self.assertEqual(
@@ -1352,7 +1365,7 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
             2
         )
         self.assertEqual(
-            response['stats'][0]['contributor_id'],
+            response['stats'][0]['contributor_name'],
             'user2'
         )
         self.assertEqual(
@@ -1381,7 +1394,7 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
             2
         )
         self.assertEqual(
-            response['stats'][0]['contributor_id'],
+            response['stats'][0]['contributor_name'],
             'user3'
         )
         self.assertEqual(
@@ -1417,11 +1430,11 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
             3
         )
         self.assertEqual(
-            response['stats'][0]['contributor_id'],
+            response['stats'][0]['contributor_name'],
             'user3'
         )
         self.assertEqual(
-            response['stats'][1]['contributor_id'],
+            response['stats'][1]['contributor_name'],
             'user2'
         )
         self.assertEqual(
@@ -1450,7 +1463,7 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
             2
         )
         self.assertEqual(
-            response['stats'][0]['contributor_id'],
+            response['stats'][0]['contributor_name'],
             'user3'
         )
         self.assertEqual(
@@ -1480,7 +1493,7 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
             2
         )
         self.assertEqual(
-            response['stats'][0]['contributor_id'],
+            response['stats'][0]['contributor_name'],
             'user2'
         )
         self.assertEqual(
@@ -1512,11 +1525,11 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
             3
         )
         self.assertEqual(
-            response['stats'][0]['contributor_id'],
+            response['stats'][0]['contributor_name'],
             'user3'
         )
         self.assertEqual(
-            response['stats'][1]['contributor_id'],
+            response['stats'][1]['contributor_name'],
             'user2'
         )
         self.assertEqual(
@@ -1528,3 +1541,25 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
             False
         )
         self.logout()
+
+
+class CommunityStatsHandlerTest(test_utils.GenericTestBase):
+    """Tests for getting community stats for contributor admin dashboard
+    """
+
+    def test_get_community_stats(self) -> None:
+        self.signup('reviewer@org.com', 'reviewer')
+        user_id = self.get_user_id_from_email('reviewer@org.com')
+        user_services.add_user_role(
+            user_id, feconf.ROLE_ID_TRANSLATION_ADMIN)
+        self.login('reviewer@org.com')
+        user_services.allow_user_to_review_translation_in_language(
+            user_id, 'en')
+        user_services.allow_user_to_review_translation_in_language(
+            user_id, 'fr')
+
+        stats = self.get_json(feconf.COMMUNITY_CONTRIBUTION_STATS_URL)
+
+        self.assertEqual(stats['question_reviewers_count'], 0)
+        self.assertDictEqual(
+            stats['translation_reviewers_count'], {'en': 1, 'fr': 1})

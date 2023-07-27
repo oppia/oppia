@@ -27,9 +27,12 @@ require(
   'pages/contributor-dashboard-admin-page/navbar/' +
   'contributor-dashboard-admin-navbar.component.ts');
 
+require('services/platform-feature.service.ts');
+
 angular.module('oppia').directive('contributorDashboardAdminPage', [
   '$rootScope', 'ContributorDashboardAdminBackendApiService',
   'LanguageUtilService', 'UrlInterpolationService', 'UserService',
+  'PlatformFeatureService',
   'CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION',
   'CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION',
   'CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER',
@@ -38,6 +41,7 @@ angular.module('oppia').directive('contributorDashboardAdminPage', [
   function(
       $rootScope, ContributorDashboardAdminBackendApiService,
       LanguageUtilService, UrlInterpolationService, UserService,
+      PlatformFeatureService,
       CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION,
       CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION,
       CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER,
@@ -56,6 +60,8 @@ angular.module('oppia').directive('contributorDashboardAdminPage', [
         ctrl.taskRunningInBackground = false;
         ctrl.statusMessage = '';
         ctrl.UserIsTranslationAdmin = false;
+
+        ctrl.isNewUiEnabled = false;
 
         var handleErrorResponse = function(errorResponse) {
           ctrl.statusMessage = 'Server error: ' + errorResponse;
@@ -264,6 +270,8 @@ angular.module('oppia').directive('contributorDashboardAdminPage', [
         };
 
         ctrl.$onInit = function() {
+          ctrl.isNewUiEnabled = (
+            PlatformFeatureService.status.CdAdminDashboardNewUi.isEnabled);
           UserService.getUserInfoAsync().then((userInfo) => {
             let translationCategories = {};
             let questionCategories = {};

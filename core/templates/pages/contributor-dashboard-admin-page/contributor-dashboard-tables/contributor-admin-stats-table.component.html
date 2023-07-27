@@ -1,0 +1,601 @@
+<div class="example-container">
+  <div *ngIf="loadingMessage">
+    <div class="oppia-align-center">
+      <span>{{ loadingMessage }}</span>
+      <loading-dots></loading-dots>
+    </div>
+  </div>
+  <table mat-table
+         [dataSource]="dataSource"
+         multiTemplateDataRows
+         [class.isMobile]="true"
+         class="mat-elevation-z8"
+         *ngIf="!loadingMessage">
+
+    <ng-container matColumnDef="contributorName">
+      <th mat-header-cell *matHeaderCellDef class="user-header"><b> User </b></th>
+      <td mat-cell *matCellDef="let element" class="user-value">
+        <span class="mobile-label">User:</span>
+        <b> {{ element.contributorName }} </b>
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="recentPerformance">
+      <th mat-header-cell *matHeaderCellDef>
+        <b>
+          Performance
+          <i class="fas fa-info-circle" matTooltip="Performance is calculated based on the review results of the last 100 accepted/rejected contributions."></i>
+        </b>
+      </th>
+      <td mat-cell *matCellDef="let element">
+        <span class="mobile-label">Performance
+          <i class="fas fa-info-circle" matTooltip="Performance is calculated based on the review results of the last 100 accepted/rejected contributions." #performanceTooltip="matTooltip" (click)="performanceTooltip.toggle()">
+          </i>:
+        </span>
+        {{ element.recentPerformance }}
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="overallAccuracy">
+      <th mat-header-cell *matHeaderCellDef>
+        <b>
+          Accuracy
+          <i class="fas fa-info-circle"
+            matTooltip="Accuracy is based on the ratio of accepted to submitted translations.">
+          </i>
+        </b>
+      </th>
+      <td mat-cell *matCellDef="let element">
+        <span class="mobile-label">Accuracy
+          <i class="fas fa-info-circle"
+            matTooltip="Accuracy is based on the ratio of accepted to submitted translations." #accuracyTooltip="matTooltip" (click)="accuracyTooltip.toggle()">
+          </i>:
+        </span>
+        {{ element.overallAccuracy }}%
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="submittedTranslationsCount">
+      <th mat-header-cell *matHeaderCellDef><b> Translated Cards </b></th>
+      <td mat-cell *matCellDef="let element">
+        <span class="mobile-label">Translated Cards:</span>
+        {{ element.submittedTranslationsCount }}
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="lastContributedInDays">
+      <div *ngIf="activeTab === TAB_NAME_TRANSLATION_SUBMITTER">
+        <th mat-header-cell *matHeaderCellDef>
+          <b>Last Translated</b>
+        </th>
+      </div>
+      <div
+        *ngIf="activeTab === TAB_NAME_TRANSLATION_REVIEWER ||
+          TAB_NAME_QUESTION_REVIEWER">
+        <th mat-header-cell *matHeaderCellDef><b> Last Reviewed </b></th>
+      </div>
+      <div *ngIf="activeTab === TAB_NAME_QUESTION_SUBMITTER">
+        <th mat-header-cell *matHeaderCellDef><b> Last Submitted </b></th>
+      </div>
+      <td mat-cell *matCellDef="let element">
+        <span class="mobile-label" *ngIf="activeTab === TAB_NAME_TRANSLATION_SUBMITTER">Last Translated:</span>
+        <span class="mobile-label" *ngIf="(activeTab === TAB_NAME_TRANSLATION_REVIEWER) || (activeTab === TAB_NAME_QUESTION_REVIEWER)">Last Reviewed:</span>
+        <span class="mobile-label" *ngIf="activeTab === TAB_NAME_QUESTION_SUBMITTER">Last Submitted:</span>
+        {{element.lastContributedInDays === 0 ? "Today" : element.lastContributedInDays + " " +
+              (element.lastContributedInDays === 1 ? "day" : "days") + " ago"
+        }}
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="reviewedTranslationsCount">
+      <th mat-header-cell *matHeaderCellDef><b> Reviewed Cards </b></th>
+      <td mat-cell *matCellDef="let element">
+        <span class="mobile-label">Reviewed Cards:</span>
+        {{ element.reviewedTranslationsCount }}
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="submittedQuestionsCount">
+      <th mat-header-cell *matHeaderCellDef><b> Questions Submitted </b></th>
+      <td mat-cell *matCellDef="let element">
+        <span class="mobile-label">Questions Submitted:</span>
+        {{ element.submittedQuestionsCount }}
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="reviewedQuestionsCount">
+      <th mat-header-cell *matHeaderCellDef><b> Questions Reviewed </b></th>
+      <td mat-cell *matCellDef="let element">
+        <span class="mobile-label">Questions Reviewed:</span>
+        {{ element.reviewedQuestionsCount }}
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="role">
+      <th mat-header-cell *matHeaderCellDef><b> Role </b></th>
+      <td mat-cell *matCellDef="let element">
+        <button mat-raised-button disabled>EDIT</button>
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="chevron" *ngIf="!checkMobileView()">
+      <th mat-header-cell *matHeaderCellDef><b> </b></th>
+      <td mat-cell *matCellDef="let element">
+        <div class="chevron">
+          <i class="fas fa-chevron-right"
+             [@chevronExpand]="element == expandedElement ? 'expanded' : 'collapsed'">
+          </i>
+        </div>
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="chevron" *ngIf="checkMobileView()">
+      <th mat-header-cell *matHeaderCellDef><b> </b></th>
+      <td mat-cell *matCellDef="let element" class="mobile-chevron">
+        <div class="chevron">
+          <i class="fas fa-chevron-right"
+             [@mobileChevronExpand]="element == expandedElement ? 'expanded' : 'collapsed'">
+          </i>
+        </div>
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="mobile-role" *ngIf="checkMobileView()">
+      <th mat-header-cell *matHeaderCellDef><b> </b></th>
+      <td mat-cell *matCellDef="let element">
+        <button mat-raised-button disabled>EDIT ROLE</button>
+      </td>
+    </ng-container>
+
+    <!-- Expanded Content Column - The detail row is made up of this one column that spans across all columns -->
+    <ng-container matColumnDef="expandedDetail">
+      <td mat-cell
+          *matCellDef="let element"
+          [attr.colspan]="columnsToDisplay.length">
+        <div class="example-element-detail"
+             [@detailExpand]="element == expandedElement ? 'expanded' : 'collapsed'">
+          <div class="details-container"
+               *ngIf="activeTab === TAB_NAME_TRANSLATION_SUBMITTER">
+            <div class="details-sub-container">
+              <div class="attribute-container">
+                <div class="attribute-sub-container">
+                  <div class="attribute-key">Date Joined</div>
+                  <div class="attribute-value">
+                    {{ element.firstContributionDate }}
+                  </div>
+                </div>
+              </div>
+              <div class="attribute-container">
+                <div class="attribute-sub-container">
+                  <div class="attribute-key">Submitted Translations</div>
+                  <div class="attribute-value">
+                    {{ element.submittedTranslationsCount }} card{{
+                      element.submittedTranslationsCount !== 1 ? "s" : ""
+                    }}, {{ element.submittedTranslationWordCount }} word{{
+                      element.submittedTranslationWordCount !== 1 ? "s" : ""
+                    }}
+                  </div>
+                </div>
+              </div>
+              <div class="attribute-container">
+                <div class="attribute-sub-container">
+                  <div class="attribute-key">Accepted Translations</div>
+                  <div class="attribute-value">
+                    {{ element.acceptedTranslationsCount }} card{{
+                      element.acceptedTranslationsCount !== 1 ? "s" : ""
+                    }} ({{
+                      element.acceptedTranslationsWithoutReviewerEditsCount
+                    }} without edits), {{ element.acceptedTranslationWordCount }} word{{
+                      element.acceptedTranslationWordCount !== 1 ? "s" : ""
+                    }}
+                  </div>
+                </div>
+              </div>
+              <div class="attribute-container">
+                <div class="attribute-sub-container">
+                  <div class="attribute-key">Rejected Translations</div>
+                  <div class="attribute-value">
+                    {{ element.rejectedTranslationsCount }} card{{
+                      element.rejectedTranslationsCount !== 1 ? "s" : ""
+                    }}, {{ element.rejectedTranslationWordCount }} word{{
+                      element.rejectedTranslationWordCount !== 1 ? "s" : ""
+                    }}
+                  </div>
+                </div>
+              </div>
+              <div class="attribute-container">
+                <div class="attribute-sub-container">
+                  <div class="attribute-key">Active Topics</div>
+                  <div class="attribute-value">
+                    {{ element.topicsWithTranslationSubmissions ? element.topicsWithTranslationSubmissions.join(', ') : 'No topics available' }}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="details-container"
+               *ngIf="activeTab === TAB_NAME_TRANSLATION_REVIEWER">
+            <div class="details-sub-container">
+              <div class="attribute-container">
+                <div class="attribute-sub-container">
+                  <div class="attribute-key">Date Joined</div>
+                  <div class="attribute-value">
+                    {{ element.firstContributionDate }}
+                  </div>
+                </div>
+              </div>
+              <div class="attribute-container">
+                <div class="attribute-sub-container">
+                  <div class="attribute-key">Accepted Translations</div>
+                  <div class="attribute-value">
+                    {{ element.acceptedTranslationsCount }} card{{
+                      element.acceptedTranslationsCount !== 1 ? "s" : ""
+                    }} ({{element.acceptedTranslationsWithReviewerEditsCount}} edited), {{
+                      element.acceptedTranslationWordCount }} word{{
+                      element.acceptedTranslationWordCount !== 1 ? "s" : ""
+                    }}
+                  </div>
+                </div>
+              </div>
+              <div class="attribute-container">
+                <div class="attribute-sub-container">
+                  <div class="attribute-key">Rejected Translations</div>
+                  <div class="attribute-value">
+                    {{ element.rejectedTranslationsCount }} card{{
+                      element.rejectedTranslationsCount !== 1 ? "s" : ""
+                    }}
+                  </div>
+                </div>
+              </div>
+              <div class="attribute-container">
+                <div class="attribute-sub-container">
+                  <div class="attribute-key">Active Topics</div>
+                  <div class="attribute-value">
+                    {{ element.topicsWithTranslationReviews ? element.topicsWithTranslationReviews.join(', ') : 'No topics available' }}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="details-container"
+               *ngIf="activeTab === TAB_NAME_QUESTION_SUBMITTER">
+            <div class="details-sub-container">
+              <div class="attribute-container">
+                <div class="attribute-sub-container">
+                  <div class="attribute-key">Date Joined</div>
+                  <div class="attribute-value">
+                    {{ element.firstContributionDate }}
+                  </div>
+                </div>
+              </div>
+              <div class="attribute-container">
+                <div class="attribute-sub-container">
+                  <div class="attribute-key">Submitted Questions</div>
+                  <div class="attribute-value">
+                    {{ element.submittedQuestionsCount }}
+                  </div>
+                </div>
+              </div>
+              <div class="attribute-container">
+                <div class="attribute-sub-container">
+                  <div class="attribute-key">Accepted Questions</div>
+                  <div class="attribute-value">
+                    {{ element.acceptedQuestionsCount }} ({{ element.acceptedQuestionsWithoutReviewerEditsCount }} without edits)
+                  </div>
+                </div>
+              </div>
+              <div class="attribute-container">
+                <div class="attribute-sub-container">
+                  <div class="attribute-key">Rejected Questions</div>
+                  <div class="attribute-value">
+                    {{ element.rejectedQuestionsCount }}
+                  </div>
+                </div>
+              </div>
+              <div class="attribute-container">
+                <div class="attribute-sub-container">
+                  <div class="attribute-key">Active Topics</div>
+                  <div class="attribute-value">
+                    {{ element.topicsWithQuestionSubmissions ? element.topicsWithQuestionSubmissions.join(', ') : 'No topics available' }}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="details-container"
+               *ngIf="activeTab === TAB_NAME_QUESTION_REVIEWER">
+            <div class="details-sub-container">
+              <div class="attribute-container">
+                <div class="attribute-sub-container">
+                  <div class="attribute-key">Date Joined</div>
+                  <div class="attribute-value">
+                    {{ element.firstContributionDate }}
+                  </div>
+                </div>
+              </div>
+              <div class="attribute-container">
+                <div class="attribute-sub-container">
+                  <div class="attribute-key">Reviewed Questions</div>
+                  <div class="attribute-value">
+                    {{ element.reviewedQuestionsCount }}
+                  </div>
+                </div>
+              </div>
+              <div class="attribute-container">
+                <div class="attribute-sub-container">
+                  <div class="attribute-key">Accepted Questions</div>
+                  <div class="attribute-value">
+                    {{ element.acceptedQuestionsCount }} ({{
+                      element.acceptedQuestionsWithReviewerEditsCount
+                    }}
+                    edited)
+                  </div>
+                </div>
+              </div>
+              <div class="attribute-container">
+                <div class="attribute-sub-container">
+                  <div class="attribute-key">Rejected Questions</div>
+                  <div class="attribute-value">
+                    {{ element.rejectedQuestionsCount }}
+                  </div>
+                </div>
+              </div>
+              <div class="attribute-container">
+                <div class="attribute-sub-container">
+                  <div class="attribute-key">Active Topics</div>
+                  <div class="attribute-value">
+                    {{ element.topicsWithQuestionReviews ? element.topicsWithQuestionReviews.join(', ') : 'No topics available' }}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </td>
+    </ng-container>
+
+    <b><tr mat-header-row *matHeaderRowDef="columnsToDisplay"></tr></b>
+    <tr mat-row
+        *matRowDef="let element; columns: columnsToDisplay"
+        class="example-element-row"
+        [class.example-expanded-row]="expandedElement === element"
+        (click)="expandedElement = expandedElement === element ? null : element">
+    </tr>
+    <div *ngIf="checkMobileView()">
+      <tr mat-row *matRowDef="let element; columns: ['mobile-role']" class="mobile-edit-role"></tr>
+    </div>
+    <tr mat-row
+        *matRowDef="let row; columns: ['expandedDetail']"
+        class="example-detail-row">
+    </tr>
+  </table>
+</div>
+
+<style>
+  .oppia-align-center {
+    font-size: 2em;
+    width: 960px;
+  }
+
+  table {
+    margin: 10px;
+    max-width: 960px;
+  }
+
+  tr.example-detail-row {
+    height: 0;
+  }
+
+  tr.example-element-row:not(.example-expanded-row):hover {
+    background: rgb(245, 245, 245);
+  }
+
+  tr.example-element-row:not(.example-expanded-row):active {
+    background: rgb(239, 239, 239);
+  }
+
+  .example-element-row td {
+    border-bottom-width: 0;
+  }
+
+  .example-element-detail {
+    display: flex;
+    overflow: hidden;
+    width: 919px;
+  }
+
+  .details-container {
+    background: rgb(242, 244, 247);
+    border-radius: 6px;
+    display: inline-flex;
+    flex-direction: column;
+    height: fit-content;
+    justify-content: flex-start;
+    padding-bottom: 20px;
+    padding-left: 40px;
+    padding-top: 20px;
+    width: 100%;
+  }
+
+  .details-sub-container {
+    align-items: flex-start;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    height: fit-content;
+    justify-content: flex-start;
+  }
+
+  .attribute-container {
+    align-items: flex-start;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    height: 16px;
+    justify-content: flex-start;
+  }
+
+  .attribute-sub-container {
+    height: 16px;
+    position: relative;
+    width: 598px;
+  }
+
+  .attribute-key {
+    color: rgb(51, 51, 51);
+    font-family: Roboto, sans-serif;
+    font-size: 14px;
+    font-weight: 400;
+    left: 0;
+    opacity: 0.75;
+    position: absolute;
+    top: 0;
+    word-wrap: break-word;
+  }
+
+  .attribute-value {
+    color: rgb(51, 51, 51);
+    font-family: Roboto, sans-serif;
+    font-size: 14px;
+    font-weight: 400;
+    left: 223px;
+    position: absolute;
+    top: 0;
+    word-wrap: break-word;
+  }
+
+  .b,
+  .mat-header-cell {
+    color: rgb(51, 51, 51);
+    font-family: Roboto, sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    text-align: end;
+    word-wrap: break-word;
+  }
+
+  td.mat-cell:first-of-type {
+    padding-left: 20px;
+    text-align: start;
+  }
+
+  td.mat-cell {
+    text-align: end;
+  }
+
+  td.mat-cell:last-of-type {
+    padding-right: 20px;
+  }
+
+  tr.mat-header-row {
+    border-bottom: 2px rgba(0, 0, 0, 0.54) solid;
+  }
+
+  .user-header,
+  td.user-value {
+    text-align: left;
+  }
+
+  .mat-header-cell:first-child {
+    border-top-left-radius: 5px;
+  }
+  .mat-header-cell:last-child {
+    border-top-right-radius: 5px;
+  }
+
+  .mobile-label {
+    display: none;
+  }
+
+  th.mat-header-cell:first-of-type {
+    border-top-left-radius: 5px;
+    width: 50px;
+  }
+
+  @media only screen and (max-width: 800px) {
+    .mobile-chevron {
+      padding-left: 50%;
+    }
+    .mobile-edit-role {
+      align-items: center;
+    }
+    .chevron {
+      padding-left: 50%;
+    }
+    .attribute-value {
+      left: 153px;
+    }
+    .details-container {
+      padding-left: 20px;
+    }
+    .attribute-container {
+      height: fit-content;
+    }
+    tr.example-detail-row {
+      height: auto;
+    }
+    .attribute-sub-container {
+      height: 30px;
+      width: 300px;
+    }
+    .example-element-detail {
+      align-items: baseline;
+      display: flex;
+      justify-content: space-around;
+      overflow: hidden;
+      width: 100%;
+    }
+    .mat-header-row {
+      display: none;
+    }
+
+    .example-container {
+      align-items: baseline;
+      display: flex;
+      justify-content: space-around;
+    }
+
+    .mat-row {
+      align-items: start;
+      display: flex;
+      flex-direction: column;
+      height: auto;
+      padding: 8px 24px;
+    }
+    td.mat-cell:first-of-type {
+      padding-left: 0;
+      text-align: start;
+    }
+
+    td.mat-cell {
+      margin-bottom: 2px;
+      text-align: start;
+    }
+
+    td.mat-cell:last-of-type {
+      padding-right: 0;
+    }
+    .mobile-label {
+      display: inline-block;
+      font-weight: bold;
+      width: 150px;
+    }
+
+    th.mat-header-row {
+      display: none;
+    }
+
+    th.mat-row {
+      align-items: start;
+      display: flex;
+      flex-direction: column;
+      padding: 8px 24px;
+    }
+
+    table {
+      align-items: baseline;
+      display: flex;
+      justify-content: space-around;
+    }
+  }
+</style>

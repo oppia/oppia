@@ -772,6 +772,7 @@ def get_usernames_by_role(role: str) -> List[str]:
     Returns:
         list(str). List of usernames of users with given role ID.
     """
+
     user_settings = user_models.UserSettingsModel.get_by_role(role)
     return [user.username for user in user_settings]
 

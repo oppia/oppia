@@ -27,6 +27,16 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { UserService } from 'services/user.service';
 import { UserInfo } from 'domain/user/user-info.model';
 import { ContributorDashboardAdminBackendApiService } from './services/contributor-dashboard-admin-backend-api.service';
+import { PlatformFeatureService } from 'services/platform-feature.service';
+
+
+class MockPlatformFeatureService {
+  status = {
+    CdAdminDashboardNewUi: {
+      isEnabled: false
+    }
+  };
+}
 
 describe('Contributor dashboard admin page ', function() {
   let $scope = null;
@@ -39,12 +49,20 @@ describe('Contributor dashboard admin page ', function() {
 
   let userInfo: UserInfo = null;
 
+  let mockPlatformFeatureService = new MockPlatformFeatureService();
+
   beforeEach(angular.mock.module('oppia'));
   importAllAngularServices();
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule]
+      imports: [HttpClientTestingModule],
+      providers: [
+        {
+          provide: PlatformFeatureService,
+          useValue: mockPlatformFeatureService
+        }
+      ]
     });
   });
 
@@ -96,6 +114,16 @@ describe('Contributor dashboard admin page ', function() {
     tick();
 
     expect(userInfoSpy).toHaveBeenCalled();
+  }));
+
+  it('should account for feature flag when initialized', fakeAsync(function() {
+    mockPlatformFeatureService.status.CdAdminDashboardNewUi.isEnabled = (
+      true);
+
+    ctrl.$onInit();
+    tick();
+
+    expect(ctrl.isNewUiEnabled).toBeTrue();
   }));
 
   describe('on clicking add rights button ', () => {
