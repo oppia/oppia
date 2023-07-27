@@ -338,8 +338,6 @@ export class NewLearnerDashboardComponent implements OnInit {
       'I18N_LEARNER_DASHBOARD_PAGE_TITLE');
     this.pageTitleService.setDocumentTitle(translatedTitle);
   }
-
-
   getStaticImageUrl(imagePath: string): string {
     return this.urlInterpolationService.getStaticImageUrl(imagePath);
   }
