@@ -19,7 +19,7 @@
 import { TestBed, fakeAsync, flushMicrotasks, tick } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { AppConstants } from 'app.constants';
-import { ContributionAndReviewService } from './contribution-and-review.service';
+import { ContributionAndReviewService, FetchSuggestionsResponse } from './contribution-and-review.service';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { ContributionAndReviewBackendApiService }
   from './contribution-and-review-backend-api.service';
@@ -32,6 +32,7 @@ import { StateObjectsBackendDict } from 'domain/exploration/StatesObjectFactory'
 import { StatesObjectFactory } from 'domain/exploration/StatesObjectFactory';
 import { FetchExplorationBackendResponse } from '../../../domain/exploration/read-only-exploration-backend-api.service';
 import { LoggerService } from 'services/contextual/logger.service';
+import { States } from 'domain/exploration/StatesObjectFactory';
 
 describe('Contribution and review service', () => {
   let cars: ContributionAndReviewService;
@@ -376,7 +377,7 @@ describe('Contribution and review service', () => {
             }
           },
           more: false
-        }));
+        } as unknown as FetchSuggestionsResponse));
 
       cars.getReviewableTranslationSuggestionsAsync(
         true, 'skill_id_1', '1')
@@ -464,7 +465,7 @@ describe('Contribution and review service', () => {
           solicit_answer_details: false,
           card_is_checkpoint: false
         }
-      };
+      } as unknown as States;
       const mockReadOnlyExplorationData: FetchExplorationBackendResponse = {
         can_edit: true,
         exploration: {
@@ -515,7 +516,7 @@ describe('Contribution and review service', () => {
       createBackendDictFromExplorationBackendResponse(mockReadOnlyExplorationData);
       const exploration: Exploration = new Exploration(
         mockReadOnlyExplorationData.exploration.init_state_name,
-        mockReadOnlyExplorationData.exploration.param_changes,
+        [],
         mockReadOnlyExplorationData.exploration.param_specs,
         mockReadOnlyExplorationData.exploration.states,
         mockReadOnlyExplorationData.exploration.title,
