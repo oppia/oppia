@@ -58,7 +58,7 @@ class ParamNames(enum.Enum):
         'high_bounce_rate_task_state_bounce_rate_obsoletion_threshold')
     HIGH_BOUNCE_RATE_TASK_MINIMUM_EXPLORATION_STARTS = (
         'high_bounce_rate_task_minimum_exploration_starts')
-    CD_ADMIN_DASHBOARD_NEW_UI = 'cd_new_ui'
+    CD_ADMIN_DASHBOARD_NEW_UI = 'cd_admin_dashboard_new_ui'
 
 
 # Platform parameters should all be defined below.
