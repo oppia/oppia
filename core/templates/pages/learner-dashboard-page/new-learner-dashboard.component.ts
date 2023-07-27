@@ -111,7 +111,6 @@ export class NewLearnerDashboardComponent implements OnInit {
   allTopics!: LearnerTopicSummary[];
   untrackedTopics!: Record<string, LearnerTopicSummary[]>;
   subscriptionsList!: ProfileSummary[];
-
   completedToIncompleteCollections!: string[];
   learntToPartiallyLearntTopics!: string[];
   numberOfUnreadThreads!: number;
