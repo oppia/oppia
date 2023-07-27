@@ -7092,6 +7092,6 @@ export default {
   ],
   "CONTRIBUTOR_CERTIFICATE_WIDTH": 1493,
   "CONTRIBUTOR_CERTIFICATE_HEIGHT": 1313,
-  "BRANCH_NAME": "",
-  "SHORT_COMMIT_HASH": ""
+  "BRANCH_NAME": "remove_request",
+  "SHORT_COMMIT_HASH": "0002a2a964"
 } as const;

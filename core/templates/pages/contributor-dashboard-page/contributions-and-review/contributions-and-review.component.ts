@@ -29,6 +29,7 @@ import { Question, QuestionBackendDict, QuestionObjectFactory } from 'domain/que
 import { ActiveContributionDict, TranslationSuggestionReviewModalComponent } from '../modal-templates/translation-suggestion-review-modal.component';
 import { ContributorDashboardConstants } from 'pages/contributor-dashboard-page/contributor-dashboard-page.constants';
 import { QuestionSuggestionReviewModalComponent } from '../modal-templates/question-suggestion-review-modal.component';
+import { TranslationLanguageService } from 'pages/exploration-editor-page/translation-tab/services/translation-language.service';
 import { TranslationTopicService } from 'pages/exploration-editor-page/translation-tab/services/translation-topic.service';
 import { FormatRtePreviewPipe } from 'filters/format-rte-preview.pipe';
 import { UserService } from 'services/user.service';
@@ -174,6 +175,7 @@ export class ContributionsAndReview
     private ngbModal: NgbModal,
     private questionObjectFactory: QuestionObjectFactory,
     private skillBackendApiService: SkillBackendApiService,
+    private translationLanguageService: TranslationLanguageService,
     private translationTopicService: TranslationTopicService,
     private userService: UserService,
     private featureService: PlatformFeatureService,
@@ -563,6 +565,8 @@ export class ContributionsAndReview
     this.contributions = {};
     this.userDetailsLoading = true;
     this.userIsLoggedIn = false;
+    this.languageCode = (
+      this.translationLanguageService.getActiveLanguageCode());
     this.activeTabType = '';
     this.activeTabSubtype = '';
     this.dropdownShown = false;
