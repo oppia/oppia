@@ -19,18 +19,19 @@
 import { TestBed, fakeAsync, flushMicrotasks, tick } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { AppConstants } from 'app.constants';
-import { ContributionAndReviewService, FetchSuggestionsResponse } from './contribution-and-review.service';
+import { ContributionAndReviewService } from './contribution-and-review.service';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { ContributionAndReviewBackendApiService }
   from './contribution-and-review-backend-api.service';
 import { SuggestionBackendDict } from 'domain/suggestion/suggestion.model';
 import { ReadOnlyExplorationBackendApiService }
   from 'domain/exploration/read-only-exploration-backend-api.service';
-import { ExplorationObjectFactory, ExplorationBackendDict}
+import { ExplorationObjectFactory, Exploration}
   from 'domain/exploration/ExplorationObjectFactory';
 import { StateObjectsBackendDict } from 'domain/exploration/StatesObjectFactory';
 import { StatesObjectFactory } from 'domain/exploration/StatesObjectFactory';
 import { FetchExplorationBackendResponse } from '../../../domain/exploration/read-only-exploration-backend-api.service';
+import { LoggerService } from 'services/contextual/logger.service';
 
 describe('Contribution and review service', () => {
   let cars: ContributionAndReviewService;
@@ -40,6 +41,8 @@ describe('Contribution and review service', () => {
   let statesObjectFactory: StatesObjectFactory;
   let readOnlyExplorationBackendApiService:
     ReadOnlyExplorationBackendApiService;
+  let urlInterpolationService: UrlInterpolationService;
+  let loggerService: LoggerService;
 
   const suggestion1 = {
     suggestion_id: 'suggestion_id_1',
@@ -115,12 +118,16 @@ describe('Contribution and review service', () => {
         ReadOnlyExplorationBackendApiService,
         ExplorationObjectFactory,
         StatesObjectFactory,
+        LoggerService
       ]
     });
     cars = TestBed.inject(ContributionAndReviewService);
     carbas = TestBed.inject(ContributionAndReviewBackendApiService);
     readOnlyExplorationBackendApiService = TestBed.inject(
       ReadOnlyExplorationBackendApiService);
+    loggerService = TestBed.inject(LoggerService);
+    urlInterpolationService = TestBed.inject(
+      UrlInterpolationService);
     statesObjectFactory = TestBed.inject(StatesObjectFactory);
     fetchSuggestionsAsyncSpy = spyOn(carbas, 'fetchSuggestionsAsync');
     downloadContributorCertificateAsyncSpy = spyOn(
@@ -327,16 +334,6 @@ describe('Contribution and review service', () => {
   });
 
   describe('getReviewableTranslationSuggestionsAsync', () => {
-    const mockSuggestionsDetailsDict = {
-      target_1: {
-        suggestion: suggestion1,
-        details: opportunityDict1
-      }
-    };
-    const mockFetchSuggestionsResponse = {
-      suggestionIdToDetails: mockSuggestionsDetailsDict,
-      more: false
-    } as FetchSuggestionsResponse;
     let explorationObjectFactory: ExplorationObjectFactory;
     let explorationObjectFactorySpy: jasmine.Spy;
     let fetchExplorationSpy: jasmine.Spy;
@@ -371,12 +368,20 @@ describe('Contribution and review service', () => {
         Promise.resolve(backendFetchResponse));
       const fetchTranslationSuggestionsAsyncSpy = spyOn(
         cars, 'fetchTranslationSuggestionsAsync').and.returnValue(
-        Promise.resolve(mockFetchSuggestionsResponse));
+        Promise.resolve({
+          suggestionIdToDetails: {
+            'skill_id_1': {
+              suggestions: suggestion1,
+              details: opportunityDict1
+            }
+          },
+          more: false
+        }));
 
       cars.getReviewableTranslationSuggestionsAsync(
         true, 'skill_id_1', '1')
         .then((response) => {
-          expect(response.suggestionIdToDetails.target_1)
+          expect(response.suggestionIdToDetails.skill_id_1)
             .toEqual({
               suggestions: suggestion1,
               details: opportunityDict1
@@ -508,20 +513,26 @@ describe('Contribution and review service', () => {
       };
       const explorationBackendDict = explorationObjectFactory.
       createBackendDictFromExplorationBackendResponse(mockReadOnlyExplorationData);
-      const exploration = explorationObjectFactory.createFromBackendDict(
-        explorationBackendDict);
-      // const getStatesSpy = spyOn(exploration, 'getStates');
+      const exploration: Exploration = new Exploration(
+        mockReadOnlyExplorationData.exploration.init_state_name,
+        mockReadOnlyExplorationData.exploration.param_changes,
+        mockReadOnlyExplorationData.exploration.param_specs,
+        mockReadOnlyExplorationData.exploration.states,
+        mockReadOnlyExplorationData.exploration.title,
+        mockReadOnlyExplorationData.exploration.next_content_id_index,
+        mockReadOnlyExplorationData.exploration.language_code,
+        loggerService,
+        urlInterpolationService
+      )
+      const getStatesSpy = spyOn(exploration, 'getStates');
 
       fetchExplorationSpy.and.returnValue(
         Promise.resolve(mockReadOnlyExplorationData));
       fetchSuggestionsAsyncSpy.and.returnValue(
         Promise.resolve(backendFetchResponse));
       explorationObjectFactorySpy.and.returnValue(
-        Promise.resolve(exploration));
-      // getStatesSpy.and.returnValue(
-      //   Promise.resolve(mockStates));
-      mockSortTranslationSpy.and.returnValue(
-        Promise.resolve([
+        exploration);
+      mockSortTranslationSpy.and.returnValue([
           {
             suggestion_type: 'suggestion',
             suggestion_id: 'id',
@@ -600,15 +611,36 @@ describe('Contribution and review service', () => {
             },
             last_updated_msecs: 0,
           }
-        ]));
+        ]);
+      getStatesSpy.and.returnValue(mockStates);
 
-      cars.fetchTranslationSuggestionsAsync(
+      await cars.fetchTranslationSuggestionsAsync(
         '1').then((response)=>{
-          expect(response).toEqual(mockFetchSuggestionsResponse)
+          expect(response).toEqual({
+            suggestionIdToDetails: {
+              id: {
+                suggestion: {
+                  suggestion_type: 'suggestion',
+                  suggestion_id: 'id',
+                  target_type: 'exploration',
+                  target_id: '1',
+                  status: 'review',
+                  author_name: 'author',
+                  change: {
+                    state_name: 'End State',
+                    content_id: 'hints_1',
+                  },
+                  last_updated_msecs: 0
+                },
+                details: undefined,
+              },
+            },
+            more: false
+          });
           expect(explorationObjectFactorySpy).toHaveBeenCalled();
+          expect(getStatesSpy).toHaveBeenCalled();
           expect(fetchSuggestionsAsyncSpy).toHaveBeenCalled();
           expect(fetchExplorationSpy).toHaveBeenCalled();
-          // expect(getStatesSpy).toHaveBeenCalled();
         })
     });
   });
@@ -1031,13 +1063,15 @@ describe('Contribution and review service', () => {
       }
     };
 
-    it('should sort translation cards within each state based' +
+    it('should sort translation cards within each state based ' +
     'on type and index', () => {
       const states = statesObjectFactory.createFromBackendDict(
         statesBackendDict);
+      const compareFn = cars.compareTranslationSuggestions.bind(cars);
       const sortedTranslationSuggestions = cars.
         sortTranslationSuggestionsByState(
-          translationSuggestions, states, 'First State');
+          translationSuggestions, states, 'First State',
+          compareFn);
 
       expect(sortedTranslationSuggestions).toEqual([
         {
@@ -1125,8 +1159,10 @@ describe('Contribution and review service', () => {
       () => {
         const states = statesObjectFactory.createFromBackendDict(
           statesBackendDict);
+        const compareFn = cars.compareTranslationSuggestions.bind(cars);
         const sortedTranslationCards = cars.sortTranslationSuggestionsByState(
-          translationSuggestions, states, null);
+          translationSuggestions, states, null,
+          compareFn);
 
         expect(sortedTranslationCards).toEqual(translationSuggestions);
       });
