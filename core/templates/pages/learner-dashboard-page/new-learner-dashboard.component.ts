@@ -120,7 +120,6 @@ export class NewLearnerDashboardComponent implements OnInit {
   storyIdToLearnerGroupsTitleMap: Map<string, string[]> = new Map();
   activeSection!: string;
   activeSubsection!: string;
-
   profilePicturePngDataUrl!: string;
   profilePictureWebpDataUrl!: string;
 
