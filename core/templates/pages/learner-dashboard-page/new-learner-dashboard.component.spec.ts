@@ -224,8 +224,6 @@ describe('New Learner dashboard page', () => {
     },
     collection_playlist: []
   };
-
-
   let learnerDashboardExplorationsData = {
     completed_explorations_list: [],
     incomplete_explorations_list: [],
