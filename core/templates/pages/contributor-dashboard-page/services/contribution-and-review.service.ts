@@ -63,6 +63,7 @@ interface SuggestionDetailsDict {
   };
 }
 
+// eslint-disable-next-line
 export type CompareFunction = (a: any, b: any) => number;
 
 // Represents a client-facing response to a fetch suggestion query.
@@ -190,7 +191,7 @@ export class ContributionAndReviewService {
     const explorationBackendResponse = await this.
       readOnlyExplorationBackendApiService.fetchExplorationAsync(
         explorationId, null);
-    return(
+    return (
       this.contributionAndReviewBackendApiService.
         fetchSuggestionsAsync(
           'REVIEWABLE_TRANSLATION_SUGGESTIONS',
@@ -200,26 +201,28 @@ export class ContributionAndReviewService {
           explorationId
         ).then((fetchSuggestionsResponse) => {
           const explorationBackendDict = this.explorationObjectFactory.
-          createBackendDictFromExplorationBackendResponse(
-            explorationBackendResponse);
+            createBackendDictFromExplorationBackendResponse(
+              explorationBackendResponse);
 
           const exploration: Exploration = this.explorationObjectFactory.
             createFromBackendDict(explorationBackendDict);
-          const sortedTranslationSuggestions = this.sortTranslationSuggestionsByState(
-            fetchSuggestionsResponse.suggestions,
-            exploration.getStates(),
-            explorationBackendDict.init_state_name,
-            this.compareTranslationSuggestions.bind(this)
-          );
+          const sortedTranslationSuggestions = (
+            this.sortTranslationSuggestionsByState(
+              fetchSuggestionsResponse.suggestions,
+              exploration.getStates(),
+              explorationBackendDict.init_state_name,
+              this.compareTranslationSuggestions.bind(this)));
           // eslint-disable-next-line
           const responseSuggestionIdToDetails: {[key: string]: any} = {};
-          const targetIdToDetails = fetchSuggestionsResponse.target_id_to_opportunity_dict;
+          const targetIdToDetails = (
+            fetchSuggestionsResponse.target_id_to_opportunity_dict);
           sortedTranslationSuggestions.forEach((suggestion) => {
             const suggestionDetails = {
               suggestion: suggestion,
               details: targetIdToDetails[suggestion.target_id]
             };
-            responseSuggestionIdToDetails[suggestion.suggestion_id] = suggestionDetails;
+            responseSuggestionIdToDetails[
+              suggestion.suggestion_id] = suggestionDetails;
           });
           return {
             suggestionIdToDetails: responseSuggestionIdToDetails,
@@ -249,11 +252,13 @@ export class ContributionAndReviewService {
         states,
         initStateName
       );
-    const translationSuggestionsByState = this.groupTranslationSuggestionsByState(translationSuggestions);
+    const translationSuggestionsByState = (
+      this.groupTranslationSuggestionsByState(translationSuggestions));
     const sortedTranslationCards: SuggestionBackendDict[] = [];
 
     for (const stateName of stateNamesInOrder) {
-      const cardsForState = translationSuggestionsByState.get(stateName) || [];
+      const cardsForState = (
+        translationSuggestionsByState.get(stateName) || []);
       cardsForState.sort(compareFn);
       translationSuggestionsByState.set(stateName, cardsForState);
       sortedTranslationCards.push(...cardsForState);
@@ -261,7 +266,9 @@ export class ContributionAndReviewService {
     return sortedTranslationCards;
   }
 
-  private groupTranslationSuggestionsByState(translationSuggestions: any[]): Map<string, any[]> {
+  // eslint-disable-next-line
+  private groupTranslationSuggestionsByState(
+    translationSuggestions: any[]): Map<string, any[]> {
     const translationSuggestionsByState = new Map<string, any[]>();
 
     for (const translationSuggestion of translationSuggestions) {
@@ -277,12 +284,12 @@ export class ContributionAndReviewService {
   private getTypeOrder(contentId: string): number {
     const type = contentId.split('_')[0];
     const order: { [key: string]: number } = {
-      'content': 0,
-      'interaction': 1,
-      'feedback': 2,
-      'default': 3,
-      'hints': 4,
-      'solution': 5
+      'content': 0, // eslint-disable-line quote-props
+      'interaction': 1, // eslint-disable-line quote-props
+      'feedback': 2, // eslint-disable-line quote-props
+      'default': 3, 
+      'hints': 4, // eslint-disable-line quote-props
+      'solution': 5 // eslint-disable-line quote-props
     };
     return order.hasOwnProperty(type) ? order[type] : Number.MAX_SAFE_INTEGER;
   }
@@ -293,7 +300,8 @@ export class ContributionAndReviewService {
     return isNaN(index) ? Number.MAX_SAFE_INTEGER : index;
   }
 
- // Compare translation suggestions based on type and index.
+  // Compare translation suggestions based on type and index.
+  // eslint-disable-next-line
   compareTranslationSuggestions(cardA: any, cardB: any): number {
     const cardATypeOrder = this.getTypeOrder(cardA.change.content_id);
     const cardBTypeOrder = this.getTypeOrder(cardB.change.content_id);
