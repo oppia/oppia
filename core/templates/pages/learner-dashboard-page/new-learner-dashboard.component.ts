@@ -127,7 +127,6 @@ export class NewLearnerDashboardComponent implements OnInit {
   explorationId!: string;
   communityLibraryUrl = (
     '/' + AppConstants.PAGES_REGISTERED_WITH_FRONTEND.LIBRARY_INDEX.ROUTE);
-
   communtiyLessonsDataLoaded: boolean = false;
   loadingIndicatorIsShown: boolean = false;
   homeImageUrl: string = '';
