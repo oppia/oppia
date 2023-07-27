@@ -171,7 +171,7 @@ describe('Contribution Admin dasboard stats service', () => {
 
       cdasbas.fetchContributorAdminStats(
         new ContributorAdminDashboardFilter(
-          'invalid', []),
+          [], 'invalid'),
         20,
         0,
         AppConstants.CONTRIBUTION_STATS_TYPE_TRANSLATION,
@@ -230,7 +230,7 @@ describe('Contribution Admin dasboard stats service', () => {
 
       cdasbas.fetchContributorAdminStats(
         new ContributorAdminDashboardFilter(
-          'invalid', []),
+          [], 'invalid'),
         20,
         0,
         AppConstants.CONTRIBUTION_STATS_TYPE_TRANSLATION,
@@ -289,7 +289,7 @@ describe('Contribution Admin dasboard stats service', () => {
 
       cdasbas.fetchContributorAdminStats(
         new ContributorAdminDashboardFilter(
-          'invalid', []),
+          [], 'invalid'),
         20,
         0,
         AppConstants.CONTRIBUTION_STATS_TYPE_QUESTION,
@@ -348,7 +348,7 @@ describe('Contribution Admin dasboard stats service', () => {
 
       cdasbas.fetchContributorAdminStats(
         new ContributorAdminDashboardFilter(
-          'invalid', []),
+          [], 'invalid'),
         20,
         0,
         AppConstants.CONTRIBUTION_STATS_TYPE_QUESTION,

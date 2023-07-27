@@ -32,7 +32,7 @@ import { PlatformFeatureService } from 'services/platform-feature.service';
 
 class MockPlatformFeatureService {
   status = {
-    CD_NEW_UI: {
+    CdAdminDashboardNewUi: {
       isEnabled: false
     }
   };
@@ -117,7 +117,8 @@ describe('Contributor dashboard admin page ', function() {
   }));
 
   it('should account for feature flag when initialized', fakeAsync(function() {
-    mockPlatformFeatureService.status.CD_NEW_UI.isEnabled = true;
+    mockPlatformFeatureService.status.CdAdminDashboardNewUi.isEnabled = (
+      true);
 
     ctrl.$onInit();
     tick();

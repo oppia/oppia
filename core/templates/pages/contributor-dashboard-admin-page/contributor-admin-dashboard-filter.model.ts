@@ -17,8 +17,8 @@
  * admin Dashboard.
  */
 export class ContributorAdminDashboardFilter {
+  topicIds: string[];
   languageCode?: string;
-  topicIds?: string[];
   sort?: string;
   lastActivity?: number;
 
@@ -29,7 +29,7 @@ export class ContributorAdminDashboardFilter {
  * @param {number} lastActivity - number of days since last activity.
  */
   constructor(
-      languageCode?: string, topicIds?: string[],
+      topicIds: string[], languageCode?: string,
       sort?: string, lastActivity?: number) {
     this.languageCode = languageCode;
     this.topicIds = topicIds;
@@ -43,6 +43,6 @@ export class ContributorAdminDashboardFilter {
  *   ContributorAdminDashboardFilter instance.
  */
   static createDefault(): ContributorAdminDashboardFilter {
-    return new ContributorAdminDashboardFilter('es', []);
+    return new ContributorAdminDashboardFilter([], 'es');
   }
 }

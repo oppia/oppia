@@ -1,4 +1,4 @@
-// Copyright 2020 The Oppia Authors. All Rights Reserved.
+// Copyright 2023 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for contributor dashboard page component.
+ * @fileoverview Unit tests for contributor admin dashboard page component.
  */
 
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
