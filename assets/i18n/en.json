@@ -858,7 +858,7 @@
     "I18N_LEARNER_GROUP_LEARNERS_PROGRESS_TAB": "Learners' Progress",
     "I18N_LEARNER_GROUP_LEARNERS_SECTION": "{learnersCount, plural, =1{Learner} other{Learners}}",
     "I18N_LEARNER_GROUP_MINIMUM_SYLLABUS_ITEMS_INFO": "You need to add at least one syllabus item(Skill/Story) in order to make a group.",
-    "I18N_LEARNER_GROUP_MORE_INFO": "View Details",
+    "I18N_LEARNER_GROUP_MORE_INFO": "More Info",
     "I18N_LEARNER_GROUP_NO_INVITATIONS": "You do not have any pending invitations.",
     "I18N_LEARNER_GROUP_NO_ITEMS_ADDED": "You have not added any new story or skill. Start by adding one!",
     "I18N_LEARNER_GROUP_NO_LEARNERS_HAVE_JOINED": "There is no one in this group. How about inviting a learner?",

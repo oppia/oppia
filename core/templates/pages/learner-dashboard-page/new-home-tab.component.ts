@@ -113,12 +113,12 @@ export class NewHomeTabComponent {
     }
     if (this.currentGoals.length !== 0) {
       var currentGoalsIds = [];
-      for (var goal of this.currentGoals) {
+      for (let goal of this.currentGoals) {
         currentGoalsIds.push(goal.id);
       }
     }
-    for (var topicSummaryTile of this.continueWhereYouLeftOffList) {
-      for (var storySummary of topicSummaryTile.canonicalStorySummaryDicts) {
+    for (let topicSummaryTile of this.continueWhereYouLeftOffList) {
+      for (let storySummary of topicSummaryTile.canonicalStorySummaryDicts) {
         let stotyNodeCount = storySummary.getNodeTitles().length;
         let storyCompletedNodeCount =
         storySummary.getCompletedNodeTitles().length;
@@ -126,7 +126,7 @@ export class NewHomeTabComponent {
         let storyProgress = Math.floor(
           (storyCompletedNodeCount / stotyNodeCount) * 100);
         let topicId = topicSummaryTile.id;
-        var storyData: storySummaryTile = {
+        let storyData: storySummaryTile = {
           topicName: topicSummaryTile.name,
           storySummary: storySummary,
           markTileAsGoal: currentGoalsIds?.includes(topicId) ? true : false,
