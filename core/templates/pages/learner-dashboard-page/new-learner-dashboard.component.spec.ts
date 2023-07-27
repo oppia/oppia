@@ -15,8 +15,6 @@
 /**
  * @fileoverview Unit tests for learner dashboard parge.
  */
-
-
 import { Collection, CollectionBackendDict } from 'domain/collection/collection.model';
 import { LearnerExplorationSummary } from 'domain/summary/learner-exploration-summary.model';
 
