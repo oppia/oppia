@@ -63,3 +63,4 @@ class ParamNames(enum.Enum):
         'enable_admin_notifications_for_reviewer_shortage')
     MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER = (
         'max_number_of_suggestions_per_reviewer')
+    CD_ADMIN_DASHBOARD_NEW_UI = 'cd_admin_dashboard_new_ui'
