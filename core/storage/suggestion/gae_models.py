@@ -809,7 +809,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
     @classmethod
     def get_in_review_question_suggestions_by_offset(
         cls,
-        limit: Optional[int],
+        limit: int,
         offset: int,
         user_id: str,
         sort_key: Optional[str]
@@ -846,29 +846,20 @@ class GeneralSuggestionModel(base_models.BaseModel):
             )).order(-cls.created_on)
 
             sorted_results: List[GeneralSuggestionModel] = []
+            num_suggestions_per_fetch = 1000
 
-            if limit is None:
+            while len(sorted_results) < limit:
                 suggestion_models: Sequence[GeneralSuggestionModel] = (
-                    suggestion_query.fetch(offset=offset))
+                    suggestion_query.fetch(
+                        num_suggestions_per_fetch, offset=offset))
+                if not suggestion_models:
+                    break
                 for suggestion_model in suggestion_models:
                     offset += 1
                     if suggestion_model.author_id != user_id:
                         sorted_results.append(suggestion_model)
-            else:
-                num_suggestions_per_fetch = 1000
-
-                while len(sorted_results) < limit:
-                    suggestion_models: Sequence[GeneralSuggestionModel] = (
-                        suggestion_query.fetch(
-                            num_suggestions_per_fetch, offset=offset))
-                    if not suggestion_models:
-                        break
-                    for suggestion_model in suggestion_models:
-                        offset += 1
-                        if suggestion_model.author_id != user_id:
-                            sorted_results.append(suggestion_model)
-                            if len(sorted_results) == limit:
-                                break
+                        if len(sorted_results) == limit:
+                            break
 
             return (
                 sorted_results,
@@ -883,8 +874,6 @@ class GeneralSuggestionModel(base_models.BaseModel):
 
         results: Sequence[GeneralSuggestionModel] = (
             suggestion_query.fetch(limit, offset=offset)
-            if limit is not None
-            else suggestion_query.fetch(offset=offset)
         )
         next_offset = offset + len(results)
 

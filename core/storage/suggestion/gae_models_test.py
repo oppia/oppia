@@ -937,20 +937,6 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(sorted_results[1].id, suggestion_1_id)
         self.assertEqual(offset_6, 3)
 
-        sorted_results, offset_7 = (
-            suggestion_models.GeneralSuggestionModel
-            .get_in_review_question_suggestions_by_offset(
-                limit=None,
-                offset=0,
-                user_id=user_id,
-                sort_key=constants.SUGGESTIONS_SORT_KEY_DATE))
-        # Ruling out the possibility of None for mypy type checking.
-        assert sorted_results is not None
-        self.assertEqual(len(sorted_results), 2)
-        self.assertEqual(sorted_results[0].id, suggestion_2_id)
-        self.assertEqual(sorted_results[1].id, suggestion_1_id)
-        self.assertEqual(offset_6, 3)
-
     def test_user_created_suggestions_by_offset(self) -> None:
         authored_translation_suggestion_id = 'exploration.exp1.thread_6'
         non_authored_translation_suggestion_id = 'exploration.exp1.thread_7'
