@@ -198,17 +198,14 @@ export class ContributionAndReviewService {
           AppConstants.SUGGESTIONS_SORT_KEY_DATE,
           explorationId
         ).then((fetchSuggestionsResponse) => {
-          const explorationBackendDict = this.explorationObjectFactory.
-            createBackendDictFromExplorationBackendResponse(
-              explorationBackendResponse);
-
           const exploration: Exploration = this.explorationObjectFactory.
-            createFromBackendDict(explorationBackendDict);
+            createFromExplorationBackendResponse(
+              explorationBackendResponse);
           const sortedTranslationSuggestions = (
             this.sortTranslationSuggestionsByState(
               fetchSuggestionsResponse.suggestions,
               exploration.getStates(),
-              explorationBackendDict.init_state_name));
+              exploration.initStateName));
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           const responseSuggestionIdToDetails: {[key: string]: any} = {};
           sortedTranslationSuggestions.forEach((suggestion) => {

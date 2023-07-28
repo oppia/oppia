@@ -231,9 +231,9 @@ export class ExplorationObjectFactory {
       this.logger, this.urlInterpolationService);
   }
 
-  createBackendDictFromExplorationBackendResponse(
+  createFromExplorationBackendResponse(
       explorationBackendResponse: FetchExplorationBackendResponse):
-        ExplorationBackendDict {
+        Exploration {
     const explorationBackendDict: ExplorationBackendDict = {
       auto_tts_enabled: explorationBackendResponse.auto_tts_enabled,
       correctness_feedback_enabled: explorationBackendResponse.
@@ -257,7 +257,7 @@ export class ExplorationObjectFactory {
       draft_change_list_id: explorationBackendResponse.
         draft_change_list_id
     };
-    return explorationBackendDict;
+    return this.createFromBackendDict(explorationBackendDict);
   }
 }
 

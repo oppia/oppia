@@ -41,7 +41,7 @@ describe('Exploration object factory', () => {
   let loggerErrorSpy: jasmine.Spy<(msg: string) => void>;
   let firstState: StateBackendDict;
   let secondState: StateBackendDict;
-  let explorationBackendDict: ExplorationBackendDict;
+  let mockReadOnlyExplorationData: FetchExplorationBackendResponse; 
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -154,43 +154,7 @@ describe('Exploration object factory', () => {
       linked_skill_id: null,
     };
 
-    const explorationDict: ExplorationBackendDict = {
-      title: 'My Title',
-      init_state_name: 'Introduction',
-      language_code: 'en',
-      auto_tts_enabled: false,
-      states: {
-        'first state': firstState,
-        'second state': secondState
-      },
-      param_specs: {},
-      param_changes: [],
-      draft_changes: [],
-      is_version_of_draft_valid: true,
-      version: 1,
-      draft_change_list_id: 0,
-      correctness_feedback_enabled: false,
-      next_content_id_index: 4,
-      exploration_metadata: {
-        title: 'Exploration',
-        category: 'Algebra',
-        objective: 'To learn',
-        language_code: 'en',
-        tags: [],
-        blurb: '',
-        author_notes: '',
-        states_schema_version: 50,
-        init_state_name: 'Introduction',
-        param_specs: {},
-        param_changes: [],
-        auto_tts_enabled: false,
-        correctness_feedback_enabled: true,
-        edits_allowed: true
-      }
-    };
-
-    const mockReadOnlyExplorationData:
-    FetchExplorationBackendResponse = {
+    mockReadOnlyExplorationData = {
       can_edit: true,
       exploration: {
         init_state_name: 'Introduction',
@@ -240,11 +204,43 @@ describe('Exploration object factory', () => {
       displayable_language_codes: ['en'],
     };
 
+    const explorationDict: ExplorationBackendDict = {
+      title: 'My Title',
+      init_state_name: 'Introduction',
+      language_code: 'en',
+      auto_tts_enabled: false,
+      states: {
+        'first state': firstState,
+        'second state': secondState
+      },
+      param_specs: {},
+      param_changes: [],
+      draft_changes: [],
+      is_version_of_draft_valid: true,
+      version: 1,
+      draft_change_list_id: 0,
+      correctness_feedback_enabled: false,
+      next_content_id_index: 4,
+      exploration_metadata: {
+        title: 'Exploration',
+        category: 'Algebra',
+        objective: 'To learn',
+        language_code: 'en',
+        tags: [],
+        blurb: '',
+        author_notes: '',
+        states_schema_version: 50,
+        init_state_name: 'Introduction',
+        param_specs: {},
+        param_changes: [],
+        auto_tts_enabled: false,
+        correctness_feedback_enabled: true,
+        edits_allowed: true
+      }
+    };
+
     exploration = eof.createFromBackendDict(explorationDict);
     exploration.setInitialStateName('first state');
-    explorationBackendDict = eof.
-      createBackendDictFromExplorationBackendResponse(
-        mockReadOnlyExplorationData);
     loggerErrorSpy = spyOn(ls, 'error').and.callThrough();
   });
 
@@ -382,41 +378,18 @@ describe('Exploration object factory', () => {
     expect(exploration.getTranslatableObjects().length).toEqual(2);
   });
 
-  it('should create a exploration dict for given exploration' +
+  it('should create a exploration for given exploration' +
    'backend response', () => {
-    const expectedBackendDict = {
-      auto_tts_enabled: true,
-      correctness_feedback_enabled: true,
-      draft_changes: [],
-      init_state_name: 'Introduction',
-      states: {
-        'first state': firstState,
-        'second state': secondState
-      },
-      param_changes: [],
-      param_specs: {},
-      title: 'Dummy Title',
-      language_code: 'en',
-      next_content_id_index: 4,
-      exploration_metadata: {
-        title: 'Dummy Title',
-        category: 'Dummy Category',
-        objective: 'Dummy Objective',
-        language_code: 'en',
-        tags: [],
-        blurb: 'Dummy Blurb',
-        author_notes: 'Dummy Notes',
-        states_schema_version: 0,
-        init_state_name: 'Introduction',
-        param_specs: {},
-        param_changes: [],
-        auto_tts_enabled: true,
-        correctness_feedback_enabled: true,
-        edits_allowed: true,
-      },
-      is_version_of_draft_valid: false,
-      draft_change_list_id: 1
-    };
-    expect(explorationBackendDict).toEqual(expectedBackendDict);
+    const responseExploration = eof.
+    createFromExplorationBackendResponse(mockReadOnlyExplorationData);
+
+    expect(responseExploration.getLanguageCode()).toBe('en');
+    expect(responseExploration.getInteraction('first state')).toEqual(
+      iof.createFromBackendDict(firstState.interaction)
+    );
+    expect(responseExploration.getInteraction('second state')).toEqual(
+      iof.createFromBackendDict(secondState.interaction)
+    );
+    expect(responseExploration.getInteraction('invalid state')).toBeNull();
   });
 });
