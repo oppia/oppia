@@ -1603,13 +1603,16 @@ describe('Conversation skin component', () => {
       .toHaveBeenCalled();
   });
 
-  it('should submit answer from progress nav', () => {
+  it('should submit answer from progress nav and toggle submit clicked', () => {
+    componentInstance.displayedCard = displayedCard;
+    spyOn(displayedCard, 'toggleSubmitClicked');
     spyOn(explorationEngineService, 'getLanguageCode').and.returnValue('en');
     spyOn(currentInteractionService, 'submitAnswer');
 
     componentInstance.submitAnswerFromProgressNav();
 
     expect(currentInteractionService.submitAnswer).toHaveBeenCalled();
+    expect(displayedCard.toggleSubmitClicked).toHaveBeenCalledOnceWith(true);
   });
 
   it('should show learn again button', () => {
@@ -1956,12 +1959,15 @@ describe('Conversation skin component', () => {
     componentInstance.showUpcomingCard();
   });
 
-  it('should submit answer', fakeAsync(() => {
+  it('should submit answer and reset current answer state', fakeAsync(() => {
+    spyOn(displayedCard, 'updateCurrentAnswer');
+    componentInstance.displayedCard = displayedCard;
     componentInstance.answerIsBeingProcessed = true;
+
     componentInstance.submitAnswer('', null);
 
+    expect(displayedCard.updateCurrentAnswer).toHaveBeenCalledOnceWith(null);
     componentInstance.answerIsBeingProcessed = false;
-    componentInstance.displayedCard = displayedCard;
     spyOn(explorationEngineService, 'getLanguageCode').and.returnValue('en');
     spyOn(componentInstance, 'isCurrentCardAtEndOfTranscript').and.returnValue(
       true);

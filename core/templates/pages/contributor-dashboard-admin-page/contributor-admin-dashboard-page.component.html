@@ -1,0 +1,61 @@
+<background-banner></background-banner>
+<div class="oppia-dashboard-container position-relative">
+  <div class="oppia-dashboard-title"
+    [ngClass]="{'oppia-dashboard-title-mobile': checkMobileView(), 'oppia-dashboard-title-desktop': !checkMobileView()}">
+    <h1 tabindex="0">Contributor Admin Dashboard</h1>
+  </div>
+  <div class="m-auto oppia-dashboard-aggregated-stats oppia-contributor-dashboard-main-content pt-1"
+    [ngClass]="{'oppia-contributor-dashboard-mobile-mode': checkMobileView()}">
+    <mat-card layout="row" class="oppia-mat-card">
+      <div class="translation-reviewer stats-card" [attr.aria-label]="'Translation Reviewer ' + 24" tabindex="0">
+        <p class="stat-description">Translation<br>Reviewers</p>
+        <h2 class="stat-value-with-rating e2e-test-oppia-average-rating">
+          {{translationReviewersCount}}
+        </h2>
+      </div>
+      <div class="question-reviewer stats-card" [attr.aria-label]="'Question Reviewer ' + 24" tabindex="0">
+        <p class="stat-description">Question<br>Reviewers</p>
+        <h2 class="stat-value-with-rating e2e-test-oppia-total-plays">
+          {{questionReviewersCount}}
+        </h2>
+      </div>
+    </mat-card>
+  </div>
+</div>
+<div class="dashboard-content">
+  <div class="dashboard-content-primary">
+    <div>
+      <ul class="dashboard-tabs e2e-test-topics-tab">
+        <li [ngClass]="{'dashboard-tabs-active': activeTab === TAB_NAME_TRANSLATION_SUBMITTER}">
+          <a class="dashboard-tabs-text e2e-test-topics-tab" (click)="setActiveTab(TAB_NAME_TRANSLATION_SUBMITTER)">
+            Translation<br>Submitters
+          </a>
+        </li>
+        <li [ngClass]="{'dashboard-tabs-active': activeTab === TAB_NAME_TRANSLATION_REVIEWER}">
+          <a class="dashboard-tabs-text e2e-test-skills-tab" (click)="setActiveTab(TAB_NAME_TRANSLATION_REVIEWER)">
+            Translation<br>Reviewers
+          </a>
+        </li>
+        <li [ngClass]="{'dashboard-tabs-active': activeTab === TAB_NAME_QUESTION_SUBMITTER}">
+          <a class="dashboard-tabs-text e2e-test-skills-tab" (click)="setActiveTab(TAB_NAME_QUESTION_SUBMITTER)">
+            Question<br>Submitters
+          </a>
+        </li>
+        <li [ngClass]="{'dashboard-tabs-active': activeTab === TAB_NAME_QUESTION_REVIEWER}">
+          <a class="dashboard-tabs-text e2e-test-skills-tab" (click)="setActiveTab(TAB_NAME_QUESTION_REVIEWER)">
+            Question<br>Reviewers
+          </a>
+        </li>
+      </ul>
+    </div>
+    <contributor-admin-stats-table [activeTab]="activeTab"></contributor-admin-stats-table>
+  </div>
+  <div class="dashboard-content-mobile">
+    <div class="dropdown">
+      <oppia-filtered-choices-field [choices]="CONTRIBUTION_TYPES" placeholder="Contribution Type"
+        [isSearchable]="false" [(selection)]="activeTab">
+      </oppia-filtered-choices-field>
+    </div>
+    <contributor-admin-stats-table [activeTab]="activeTab"></contributor-admin-stats-table>
+  </div>
+</div>
