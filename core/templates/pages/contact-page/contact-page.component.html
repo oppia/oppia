@@ -5,47 +5,47 @@
 <div class="oppia-page-card oppia-static-full-content oppia-static-content-contact-page-below-banner">
   <div class="oppia-static-card-full-content oppia-static-card-content-full-wide e2e-test-contact-page">
     <h2 [innerHTML]="'I18N_CONTACT_PAGE_GREETING_HEADING' | translate"></h2>
-    
+
     <div class="oppia-contact-page flex">
-  <div class="oppia-contact-page-content">
-    <img id="donate" src="assets/images/contact_page/Donate img.svg" alt="Donate">
-    <h2 [innerHTML]="'I18N_CONTACT_PAGE_DONATE_HEADING' | translate"></h2>
-    <p [innerHTML]="'I18N_CONTACT_PAGE_DONATE_PARAGRAPH' | translate"></p>
-    <a href="https://www.oppia.org/donate">
-    <button [innerHTML]="'I18N_CONTACT_PAGE_DONATE_TODAY_BUTTON' | translate"></button>
-    </a>
-  </div>
-  <div class="oppia-contact-page-content">
-    <img  id="Partner" src="assets/images/contact_page/Partner img.svg" alt="Partner">
-    <h2 [innerHTML]="'I18N_CONTACT_PAGE_PARTNER_HEADING' | translate"></h2>
-    <p [innerHTML]="'I18N_CONTACT_PAGE_PARTNER_PARAGRAPH' | translate"></p>
-    <a href="https://www.oppia.org/partnership">
-    <button [innerHTML]="'I18N_CONTACT_PAGE_BECOME_A_PARTNER_BUTTON' | translate"></button>
-    </a>
-  </div>
-  <div class="oppia-contact-page-content">
-    <img id="volunteer" src="assets/images/contact_page/Volunteer img.svg" alt="Volunteer">
-    <h2 [innerHTML]="'I18N_CONTACT_PAGE_VOLUNTEER_HEADING' | translate"></h2>
-    <p [innerHTML]="'I18N_CONTACT_PAGE_VOLUNTEER_PARAGRAPH' | translate"></p>
-    <a href="https://www.oppia.org/volunteer">
-    <button [innerHTML]="'I18N_CONTACT_PAGE_BECOME_A_VOLUNTEER_BUTTON' | translate"></button>
-    </a>
-  </div>
-  <div class="oppia-contact-page-content">
-    <img id="other_inquiries" src="assets/images/contact_page/Other inquiries img.svg" alt="Other inquiries">
-    <h2 [innerHTML]="'I18N_CONTACT_PAGE_OTHER_INQUIRIES_HEADING' | translate"></h2>
-    <p [innerHTML]="'I18N_CONTACT_PAGE_OTHER_INQUIRIES_PARAGRAPH_1' | translate"></p>
-    <p [innerHTML]="'I18N_CONTACT_PAGE_OTHER_INQUIRIES_PARAGRAPH_2' | translate"></p>
-  </div>
-</div>
+      <div class="oppia-contact-page-content">
+        <img id="donate" src="assets/images/contact_page/Donate img.svg" alt="Donate">
+        <h2 [innerHTML]="'I18N_CONTACT_PAGE_DONATE_HEADING' | translate"></h2>
+        <p [innerHTML]="'I18N_CONTACT_PAGE_DONATE_PARAGRAPH' | translate"></p>
+        <a href="https://www.oppia.org/donate">
+          <button class="hover-button" [innerHTML]="'I18N_CONTACT_PAGE_DONATE_TODAY_BUTTON' | translate"></button>
+        </a>
+      </div>
+      <div class="oppia-contact-page-content">
+        <img id="Partner" src="assets/images/contact_page/Partner img.svg" alt="Partner">
+        <h2 [innerHTML]="'I18N_CONTACT_PAGE_PARTNER_HEADING' | translate"></h2>
+        <p [innerHTML]="'I18N_CONTACT_PAGE_PARTNER_PARAGRAPH' | translate"></p>
+        <a href="https://www.oppia.org/partnership">
+          <button class="hover-button" [innerHTML]="'I18N_CONTACT_PAGE_BECOME_A_PARTNER_BUTTON' | translate"></button>
+        </a>
+      </div>
+      <div class="oppia-contact-page-content">
+        <img id="volunteer" src="assets/images/contact_page/Volunteer img.svg" alt="Volunteer">
+        <h2 [innerHTML]="'I18N_CONTACT_PAGE_VOLUNTEER_HEADING' | translate"></h2>
+        <p [innerHTML]="'I18N_CONTACT_PAGE_VOLUNTEER_PARAGRAPH' | translate"></p>
+        <a href="https://www.oppia.org/volunteer">
+          <button class="hover-button" [innerHTML]="'I18N_CONTACT_PAGE_BECOME_A_VOLUNTEER_BUTTON' | translate"></button>
+        </a>
+      </div>
+      <div class="oppia-contact-page-content">
+        <img id="other_inquiries" src="assets/images/contact_page/Other inquiries img.svg" alt="Other inquiries">
+        <h2 [innerHTML]="'I18N_CONTACT_PAGE_OTHER_INQUIRIES_HEADING' | translate"></h2>
+        <p [innerHTML]="'I18N_CONTACT_PAGE_OTHER_INQUIRIES_PARAGRAPH_1' | translate"></p>
+        <p [innerHTML]="'I18N_CONTACT_PAGE_OTHER_INQUIRIES_PARAGRAPH_2' | translate"></p>
+      </div>
+    </div>
 
   </div>
 </div>
 <div class="oppia-footer-padding-contact-page-below-banner"></div>
 <style>
   oppia-contact-page-content img {
-   height:100px;
-   width: 100px;
+    height: 100px;
+    width: 100px;
   }
 
   h2.oppia-contact-h2 {
@@ -70,61 +70,83 @@
     display: flex;
     flex-direction: row;
   }
- 
-   .oppia-footer-padding-contact-page-below-banner {
+
+  .oppia-footer-padding-contact-page-below-banner {
     top: 209px;
-   }
-   
-   .oppia-static-content-contact-page-below-banner {
-    position: relative; 
+  }
+
+  .oppia-static-content-contact-page-below-banner {
+    position: relative;
     top: 209px;
-   }
+  }
 
-   .oppia-static-card-content-full-wide {
-     width: 100%;
-   }
+  .oppia-static-card-content-full-wide {
+    width: 100%;
+  }
 
-   .oppia-text-center {
+  .oppia-text-center {
     text-align: center;
-   }
+  }
 
-   .oppia-contact-page-content p {
-    margin: 20px 30px 50px 30px; 
+  .oppia-contact-page-content p {
+    margin: 20px 30px 50px 30px;
     text-align: center;
-     
-   }
 
-   .oppia-contact-page-content button {
+  }
+
+  .oppia-contact-page-content button {
     background-color: #00645c;
     border-radius: 5px;
     color: white;
     font-weight: bold;
     height: 40px;
     width: 250px;
-   }
+  }
 
-   .oppia-contact-page-content {
+  .oppia-contact-page-content {
     text-align: center;
-   }
+  }
 
-   #donate {
+  #donate {
     margin-bottom: 17px;
-   }
+  }
 
-   #other_inquiries {
+  #other_inquiries {
     margin-bottom: 7px;
-   }
+  }
 
-   #volunteer {
+  #volunteer {
     margin-bottom: 15px;
-   }
+  }
 
-   @media (max-width: 1154px) {
+  .hover-button {
+    background-color: #00645c;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    position: relative;
+    z-index: 1;
+    overflow: hidden;
+    transition: background-color 0.3s ease;
+  }
+  
+  .hover-button:hover::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(128, 128, 128, 0.3);
+    z-index: -1;
+  }
+
+  @media (max-width: 1154px) {
     .oppia-contact-page-content p {
       margin: 20px 0 50px 0;
       text-align: center;
-   }
-   }
+    }
+  }
 
   @media (max-width: 950px) and (min-width: 843px) {
     .oppia-contact-page-content button {
@@ -134,32 +156,35 @@
     }
   }
 
-  @media (max-width: 375px) {
+  @media (max-width: 475px) {
+    
     .oppia-contact-page-content p {
-      margin: 20px 20px 50px 20px;
+      margin: 20px 20px 30px 20px;
     }
+  }
 
-    .oppia-contact-page-content button{
+  @media (max-width: 375px) {
+    
+    .oppia-contact-page-content button {
       width: 225px;
     }
 
   }
 
-   @media (max-width: 842px) {
+  @media (max-width: 842px) {
 
     .flex {
-      display: flex ; 
+      display: flex;
       flex-direction: column;
       text-align: center;
     }
 
     .oppia-contact-page-content {
-    margin-top: 50px;
+      margin-top: 50px;
     }
 
     .oppia-contact-page {
       margin-bottom: 200px;
     }
-   }
-
+  }
 </style>
