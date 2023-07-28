@@ -50,7 +50,7 @@ export class InteractiveNumericInput implements OnInit {
   // the case when the user has not yet clicked the submit button.
   answer!: number | string;
   NUMERIC_INPUT_FORM_SCHEMA!: NumericInputFormSchema;
-  errorString: string = '';
+  errorMessageI18nKey: string = '';
   requireNonnegativeInput: boolean = false;
   constructor(
     private currentInteractionService: CurrentInteractionService,
@@ -74,6 +74,12 @@ export class InteractiveNumericInput implements OnInit {
   }
 
   submitAnswer(answer: number | string): void {
+    if (typeof answer !== 'number' &&
+      this.currentInteractionService.showNoResponseError()) {
+      this.errorMessageI18nKey = 'I18N_INTERACTIONS_NUMERIC_INPUT_NO_RESPONSE';
+      return;
+    }
+
     if (this.isAnswerValid()) {
       this.currentInteractionService.onSubmit(
         answer, this.numericInputRulesService);
@@ -92,6 +98,8 @@ export class InteractiveNumericInput implements OnInit {
       return;
     }
     this.answer = answer;
+    this.errorMessageI18nKey = '';
+    this.currentInteractionService.updateCurrentAnswer(this.answer);
     this.changeDetectorRef.detectChanges();
   }
 
