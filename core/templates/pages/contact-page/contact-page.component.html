@@ -4,38 +4,38 @@
 <background-banner></background-banner>
 <div class="oppia-page-card oppia-static-full-content oppia-static-content-contact-page-below-banner">
   <div class="oppia-static-card-full-content oppia-static-card-content-full-wide e2e-test-contact-page">
-    <h2>We would love to hear from you!</h2>
+    <h2 [innerHTML]="'I18N_CONTACT_PAGE_GREETING_HEADING' | translate"></h2>
     
     <div class="oppia-contact-page flex">
   <div class="oppia-contact-page-content">
     <img id="donate" src="assets/images/contact_page/Donate img.svg" alt="Donate">
-    <h2>Donate</h2>
-    <p>Your donations will go towards initiatives that support learners across the world.</p>
+    <h2 [innerHTML]="'I18N_CONTACT_PAGE_DONATE_HEADING' | translate"></h2>
+    <p [innerHTML]="'I18N_CONTACT_PAGE_DONATE_PARAGRAPH' | translate"></p>
     <a href="https://www.oppia.org/donate">
-    <button>Donate Today</button>
+    <button [innerHTML]="'I18N_CONTACT_PAGE_DONATE_TODAY_BUTTON' | translate"></button>
     </a>
   </div>
   <div class="oppia-contact-page-content">
     <img  id="Partner" src="assets/images/contact_page/Partner img.svg" alt="Partner">
-    <h2>Partner</h2>
-    <p>Partner with us to receive educational support for your organization or community.</p>
+    <h2 [innerHTML]="'I18N_CONTACT_PAGE_PARTNER_HEADING' | translate"></h2>
+    <p [innerHTML]="'I18N_CONTACT_PAGE_PARTNER_PARAGRAPH' | translate"></p>
     <a href="https://www.oppia.org/partnership">
-    <button>Become a Partner</button>
+    <button [innerHTML]="'I18N_CONTACT_PAGE_BECOME_A_PARTNER_BUTTON' | translate"></button>
     </a>
   </div>
   <div class="oppia-contact-page-content">
     <img id="volunteer" src="assets/images/contact_page/Volunteer img.svg" alt="Volunteer">
-    <h2>Volunteer</h2>
-    <p>We welcome lesson creators, designers, developers, product managers, and artists.</p>
+    <h2 [innerHTML]="'I18N_CONTACT_PAGE_VOLUNTEER_HEADING' | translate"></h2>
+    <p [innerHTML]="'I18N_CONTACT_PAGE_VOLUNTEER_PARAGRAPH' | translate"></p>
     <a href="https://www.oppia.org/volunteer">
-    <button>Become a Volunteer</button>
+    <button [innerHTML]="'I18N_CONTACT_PAGE_BECOME_A_VOLUNTEER_BUTTON' | translate"></button>
     </a>
   </div>
   <div class="oppia-contact-page-content">
     <img id="other_inquiries" src="assets/images/contact_page/Other inquiries img.svg" alt="Other inquiries">
-    <h2>Other Inquiries</h2>
-    <p>For general questions, please reach out to <a href="mailto:admin@oppia.org">admin@oppia.org.</a></p>
-    <p>If you have a media inquiry, please send it to press@oppia.org.</p>
+    <h2 [innerHTML]="'I18N_CONTACT_PAGE_OTHER_INQUIRIES_HEADING' | translate"></h2>
+    <p [innerHTML]="'I18N_CONTACT_PAGE_OTHER_INQUIRIES_PARAGRAPH_1' | translate"></p>
+    <p [innerHTML]="'I18N_CONTACT_PAGE_OTHER_INQUIRIES_PARAGRAPH_2' | translate"></p>
   </div>
 </div>
 
