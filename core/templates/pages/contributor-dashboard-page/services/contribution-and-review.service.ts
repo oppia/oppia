@@ -257,7 +257,6 @@ export class ContributionAndReviewService {
         translationSuggestionsByState.get(stateName) || []);
       cardsForState.sort(ContributionAndReviewService
         .compareTranslationSuggestions.bind(this));
-      translationSuggestionsByState.set(stateName, cardsForState);
       sortedTranslationCards.push(...cardsForState);
     }
     return sortedTranslationCards;
