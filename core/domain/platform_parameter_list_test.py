@@ -31,6 +31,7 @@ class ExistingPlatformParameterValidityTests(test_utils.GenericTestBase):
     EXPECTED_PARAM_NAMES = ['always_ask_learners_for_answer_details',
                             'android_beta_landing_page',
                             'blog_pages',
+                            'cd_admin_dashboard_new_ui',
                             'checkpoint_celebration',
                             'contributor_dashboard_accomplishments',
                             'contributor_dashboard_reviewer_emails_is_enabled',
@@ -61,8 +62,7 @@ class ExistingPlatformParameterValidityTests(test_utils.GenericTestBase):
                             'serial_chapter_launch_curriculum_admin_view',
                             'show_feedback_updates_in_profile_pic_dropdown',
                             'show_redesigned_learner_dashboard',
-                            'show_translation_size',
-                            'cd_admin_dashboard_new_ui',]
+                            'show_translation_size',]
 
     def test_all_defined_parameters_are_valid(self) -> None:
         all_names = (

@@ -458,6 +458,11 @@ Registry.create_feature_flag(
     'Enable learner groups feature',
     platform_parameter_domain.FeatureStages.PROD)
 
+Registry.create_feature_flag(
+    ParamNames.CD_ADMIN_DASHBOARD_NEW_UI,
+    'This flag is to show new contributor admin dashboard.',
+    platform_parameter_domain.FeatureStages.DEV)
+
 Registry.create_platform_parameter(
     ParamNames.PROMO_BAR_ENABLED,
     'Whether the promo bar should be enabled for all users',
