@@ -1100,7 +1100,7 @@ def get_reviewable_translation_suggestions_by_offset(
 
 def get_reviewable_question_suggestions_by_offset(
     user_id: str,
-    limit: Optional[int],
+    limit: int,
     offset: int,
     sort_key: Optional[str]
 ) -> Tuple[List[suggestion_registry.SuggestionAddQuestion], int]:
