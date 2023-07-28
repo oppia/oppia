@@ -8,6 +8,7 @@ WORKDIR /
 # Installing the pre-requisites libs and dependencies
 RUN apt-get update -y && apt-get upgrade -y \
     curl \
+    git \
     npm \
     openjdk-11-jre \
     python2 \
