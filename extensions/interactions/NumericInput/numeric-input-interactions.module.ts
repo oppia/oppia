@@ -26,13 +26,15 @@ import { SharedFormsModule } from 'components/forms/shared-forms.module';
 import { InteractiveNumericInput } from './directives/oppia-interactive-numeric-input.component';
 import { ResponseNumericInput } from './directives/oppia-response-numeric-input.component';
 import { ShortResponseNumericInput } from './directives/oppia-short-response-numeric-input.component';
+import { TranslateModule } from '@ngx-translate/core';
 
 
 @NgModule({
   imports: [
     CommonModule,
     MaterialModule,
-    SharedFormsModule
+    SharedFormsModule,
+    TranslateModule
   ],
   declarations: [
     InteractiveNumericInput,
