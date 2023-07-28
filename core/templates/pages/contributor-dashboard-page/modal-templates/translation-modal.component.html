@@ -14,7 +14,10 @@
         {{ heading | wrapTextWithEllipsis : 25 }}
       </div>
     </div>
-    <button type="button" class="close oppia-close-button-position" (click)="activeModal.close()" attr.aria-label="Close">
+    <button type="button"
+            class="close oppia-close-button-position"
+            (click)="activeModal.close()"
+            aria-label="Close">
       <span aria-hidden="true">&times;</span>
     </button>
   </div>
@@ -34,7 +37,7 @@
   <div *ngIf="textToTranslate">
     <div class="oppia-translatable-text-section">
       <strong>Please translate the given {{ activeContentType }} in {{ languageDescription }}:</strong>
-      <a class="oppia-skip-button" *ngIf="moreAvailable" (click)="skipActiveTranslation()">skip</a>
+      <a class="oppia-skip-button" *ngIf="moreAvailable" (click)="skipActiveTranslation()">Skip</a>
     </div>
     <div *ngIf="!loadingData && !uploadingTranslation"
          class="oppia-text-to-translate-container"
@@ -68,6 +71,7 @@
         <div class="oppia-editor-container"
              [ngClass]="isTranslationExpanded ? 'oppia-container-expanded' : 'oppia-container-contracted'"
              #translationContainer>
+          <p class="oppia-keybaord-accessibility-text" tabindex="0">Alt+0 for keyboard accessibility</p>
           <schema-based-editor *ngIf="editorIsShown && activeDataFormat === 'html'"
                                [schema]="HTML_SCHEMA"
                                [localValue]="activeWrittenTranslation"
@@ -135,7 +139,7 @@
   <button class="btn btn-success oppia-go-back-button"
           [disabled]="!hasPreviousTranslations()"
           (click)="returnToPreviousTranslation()">
-    Go Back
+    Go back
   </button>
   <button class="btn btn-success oppia-upload-translated-text-button"
           [disabled]="loadingData || uploadingTranslation || activeWrittenTranslation === '' || isSubmitted()"
@@ -153,6 +157,13 @@
   .oppia-collapse-content {
     display: none;
   }
+  .oppia-keybaord-accessibility-text {
+    color: #757575;
+    font-size: 12px;
+    font-style: normal;
+    font-weight: 400;
+    margin-bottom: 0;
+  }
   .oppia-translate-modal-footer {
     display: flex;
     flex-direction: row;
@@ -165,7 +176,7 @@
       display: none;
     }
   .oppia-translate-text-header-container .oppia-opportunities-subheading {
-    color: #009688;
+    color: #00645d;
     display: block;
     font-size: 14px;
     height: 40%;

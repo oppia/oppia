@@ -1,5 +1,8 @@
 <div #dropdown class="oppia-translation-topic-selector-container e2e-test-topic-selector">
-  <div class="oppia-translation-topic-selector-inner-container e2e-test-topic-selector-selected" (click)="toggleDropdown()" (keydown.enter)="toggleDropdown()" tabindex="0">
+  <div class="oppia-translation-topic-selector-inner-container e2e-test-topic-selector-selected"
+       tabindex="0"
+       (keydown.enter)="toggleDropdown()"
+       (click)="toggleDropdown()">
     {{activeTopicName}}
     <span class="fas fa-caret-down oppia-translation-topic-selector-inner-container-arrow" [ngStyle]="{ 'transform': dropdownShown ? 'scaleY(-1)' : 'scaleY(1)' }">
     </span>

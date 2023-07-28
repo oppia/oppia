@@ -2,16 +2,24 @@
   <div>
     <mat-card class="oppia-editor-card-with-avatar oppia-mobile-collapsible-card">
       <div class="oppia-editor-card-body">
-        <div class="state-solution-header-container" (click)="toggleSolutionCard()">
+        <div class="state-solution-header-container"
+             (click)="toggleSolutionCard()"
+             (keydown.enter)="toggleSolutionCard()">
           <div class="state-solution-header oppia-mobile-collapsible-card-header">
             <h3 class="oppia-exp-solution-card-header">Solution</h3>
             <i class="fa fa-caret-down"
                *ngIf="!solutionCardIsShown"
-               [attr.aria-hidden]="true">
+               tabindex="0"
+               role="button"
+               aria-label="Expand answers and responses"
+               [attr.aria-hidden]="solutionCardIsShown ? 'true' : 'false'">
             </i>
             <i class="fa fa-caret-up"
                *ngIf="solutionCardIsShown"
-               [attr.aria-hidden]="true">
+               tabindex="0"
+               role="button"
+               aria-label="collapse answers and responses"
+               [attr.aria-hidden]="solutionCardIsShown ? 'false' : 'true'">
             </i>
           </div>
         </div>
