@@ -398,9 +398,10 @@ describe('Translation Suggestion Review Modal Component', function() {
         'suggestion_1', 'suggestion_2']);
     });
 
-    it('should reject a suggestion if the backend pre accept validation ' +
-    'failed', function() {
+    it('should allow the reviewer to fix the suggestion if the backend pre' +
+      ' accept/reject validation failed', function() {
       const responseMessage = 'Pre accept validation failed.';
+
       component.ngOnInit();
       expect(component.activeSuggestionId).toBe('suggestion_1');
       expect(component.activeSuggestion).toEqual(suggestion1);
@@ -409,6 +410,9 @@ describe('Translation Suggestion Review Modal Component', function() {
       spyOn(
         siteAnalyticsService,
         'registerContributorDashboardAcceptSuggestion');
+      spyOn(
+        siteAnalyticsService,
+        'registerContributorDashboardRejectSuggestion');
       spyOn(contributionAndReviewService, 'reviewExplorationSuggestion')
         .and.callFake((
             targetId, suggestionId, action, reviewMessage, commitMessage,
@@ -422,6 +426,10 @@ describe('Translation Suggestion Review Modal Component', function() {
       component.reviewMessage = 'Review message example';
       component.acceptAndReviewNext();
 
+      expect(component.activeSuggestionId).toBe('suggestion_1');
+      expect(component.activeSuggestion).toEqual(suggestion1);
+      expect(component.reviewable).toBe(reviewable);
+      expect(component.reviewMessage).toBe('Review message example');
       expect(
         siteAnalyticsService.registerContributorDashboardAcceptSuggestion)
         .toHaveBeenCalledWith('Translation');
@@ -430,6 +438,23 @@ describe('Translation Suggestion Review Modal Component', function() {
           '1', 'suggestion_1', 'accept', 'Review message example',
           'hint section of "StateName" card', jasmine.any(Function),
           jasmine.any(Function));
+      expect(alertsService.addWarning).toHaveBeenCalledWith(
+        jasmine.stringContaining(responseMessage));
+
+      component.reviewMessage = 'Edited review message example';
+      component.rejectAndReviewNext(component.reviewMessage);
+
+      expect(component.activeSuggestionId).toBe('suggestion_1');
+      expect(component.activeSuggestion).toEqual(suggestion1);
+      expect(component.reviewable).toBe(reviewable);
+      expect(component.reviewMessage).toBe('Edited review message example');
+      expect(
+        siteAnalyticsService.registerContributorDashboardRejectSuggestion)
+        .toHaveBeenCalledWith('Translation');
+      expect(contributionAndReviewService.reviewExplorationSuggestion)
+        .toHaveBeenCalledWith(
+          '1', 'suggestion_1', 'reject', 'Edited review message example', null,
+          jasmine.any(Function), jasmine.any(Function));
       expect(alertsService.addWarning).toHaveBeenCalledWith(
         jasmine.stringContaining(responseMessage));
     });

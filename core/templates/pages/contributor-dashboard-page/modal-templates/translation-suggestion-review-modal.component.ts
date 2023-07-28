@@ -437,16 +437,13 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
         this.alertsService.clearMessages();
         this.alertsService.addSuccessMessage('Suggestion accepted.');
         this.resolveSuggestionAndUpdateModal();
-      },
-      (errorMessage) => {
-        const message = `Invalid Suggestion: ${errorMessage}`;
+      }, (errorMessage) => {
         this.alertsService.clearWarnings();
-        this.alertsService.addWarning(message);
-        this._reject(message);
+        this.alertsService.addWarning(`Invalid Suggestion: ${errorMessage}`);
       });
   }
 
-  _reject(reviewMessage: string, onSuccess: () => void = () => {}): void {
+  rejectAndReviewNext(reviewMessage: string): void {
     if (this.validatorsService.isValidReviewMessage(reviewMessage,
       /* ShowWarnings= */ true)) {
       this.resolvingSuggestion = true;
@@ -459,21 +456,15 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
         this.activeSuggestion.target_id, this.activeSuggestionId,
         AppConstants.ACTION_REJECT_SUGGESTION,
         reviewMessage || this.reviewMessage, null,
-        onSuccess, (error) => {
+        () => {
+          this.alertsService.clearMessages();
+          this.alertsService.addSuccessMessage('Suggestion rejected.');
+          this.resolveSuggestionAndUpdateModal();
+        }, (errorMessage) => {
           this.alertsService.clearWarnings();
-          this.alertsService.addWarning(
-            'There was an error rejecting this suggestion');
-        }
-      );
+          this.alertsService.addWarning(`Invalid Suggestion: ${errorMessage}`);
+        });
     }
-  }
-
-  rejectAndReviewNext(reviewMessage: string): void {
-    this._reject(reviewMessage, () => {
-      this.alertsService.clearMessages();
-      this.alertsService.addSuccessMessage('Suggestion rejected.');
-      this.resolveSuggestionAndUpdateModal();
-    });
   }
 
   // Returns whether the active suggestion's exploration_content_html
