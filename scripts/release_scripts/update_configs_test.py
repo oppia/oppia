@@ -284,8 +284,8 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
         with utils.open_file(MOCK_LOCAL_FECONF_PATH, 'r') as f:
             original_text = f.read()
         expected_text = original_text.replace(
-            'INCOMING_EMAILS_DOMAIN_NAME = \'\'',
-            'INCOMING_EMAILS_DOMAIN_NAME = \'oppia.org\'')
+            'ADMIN_EMAIL_ADDRESS = \'\'',
+            'ADMIN_EMAIL_ADDRESS = \'adm@example.com\'')
         try:
             update_configs.apply_changes_based_on_config(
                 MOCK_LOCAL_FECONF_PATH,
