@@ -90,15 +90,14 @@ class ContributorDashboardTest(job_test_utils.JobTestBase):
             language_code='hi',
             contributor_user_id='user1',
             topic_id='topic2',
-            submitted_translations_count=self.SUBMITTED_TRANSLATIONS_COUNT,
+            submitted_translations_count=1,
             submitted_translation_word_count=(
                 self.SUBMITTED_TRANSLATION_WORD_COUNT),
-            accepted_translations_count=self.ACCEPTED_TRANSLATIONS_COUNT,
-            accepted_translations_without_reviewer_edits_count=(
-                self.ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT),
+            accepted_translations_count=1,
+            accepted_translations_without_reviewer_edits_count=0,
             accepted_translation_word_count=(
                 self.ACCEPTED_TRANSLATION_WORD_COUNT),
-            rejected_translations_count=self.REJECTED_TRANSLATIONS_COUNT,
+            rejected_translations_count=0,
             rejected_translation_word_count=(
                 self.REJECTED_TRANSLATION_WORD_COUNT),
             contribution_dates=[datetime.date(2022, 5, 2)]
@@ -109,15 +108,14 @@ class ContributorDashboardTest(job_test_utils.JobTestBase):
             language_code='hi',
             contributor_user_id='user1',
             topic_id='topic1',
-            submitted_translations_count=self.SUBMITTED_TRANSLATIONS_COUNT,
+            submitted_translations_count=1,
             submitted_translation_word_count=(
                 self.SUBMITTED_TRANSLATION_WORD_COUNT),
-            accepted_translations_count=self.ACCEPTED_TRANSLATIONS_COUNT,
-            accepted_translations_without_reviewer_edits_count=(
-                self.ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT),
+            accepted_translations_count=1,
+            accepted_translations_without_reviewer_edits_count=1,
             accepted_translation_word_count=(
                 self.ACCEPTED_TRANSLATION_WORD_COUNT),
-            rejected_translations_count=self.REJECTED_TRANSLATIONS_COUNT,
+            rejected_translations_count=0,
             rejected_translation_word_count=(
                 self.REJECTED_TRANSLATION_WORD_COUNT),
             contribution_dates=self.CONTRIBUTION_DATES
@@ -147,15 +145,14 @@ class ContributorDashboardTest(job_test_utils.JobTestBase):
             language_code='hi',
             contributor_user_id='user1',
             topic_id='topic3',
-            submitted_translations_count=self.SUBMITTED_TRANSLATIONS_COUNT,
+            submitted_translations_count=1,
             submitted_translation_word_count=(
                 self.SUBMITTED_TRANSLATION_WORD_COUNT),
-            accepted_translations_count=self.ACCEPTED_TRANSLATIONS_COUNT,
-            accepted_translations_without_reviewer_edits_count=(
-                self.ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT),
+            accepted_translations_count=0,
+            accepted_translations_without_reviewer_edits_count=0,
             accepted_translation_word_count=(
                 self.ACCEPTED_TRANSLATION_WORD_COUNT),
-            rejected_translations_count=self.REJECTED_TRANSLATIONS_COUNT,
+            rejected_translations_count=1,
             rejected_translation_word_count=(
                 self.REJECTED_TRANSLATION_WORD_COUNT),
             contribution_dates=self.CONTRIBUTION_DATES
@@ -447,6 +444,21 @@ class ContributorDashboardTest(job_test_utils.JobTestBase):
             language_code='hi',
             edited_by_reviewer=False,
             created_on=datetime.datetime(2023, 2, 2))
+        
+        self.translation_suggestion_in_review_model = self.create_model(
+            suggestion_models.GeneralSuggestionModel,
+            suggestion_type=feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            target_type=feconf.ENTITY_TYPE_EXPLORATION,
+            target_id=self.target_id,
+            target_version_at_submission=self.target_version_at_submission,
+            status=suggestion_models.STATUS_IN_REVIEW,
+            author_id='user1',
+            final_reviewer_id='reviewer_2',
+            change_cmd=self.change_cmd,
+            score_category=self.score_category,
+            language_code='hi',
+            edited_by_reviewer=False,
+            created_on=datetime.datetime(2023, 2, 2))
 
 
 class GenerateContributorAdminStatsJobTests(ContributorDashboardTest):
@@ -484,6 +496,7 @@ class GenerateContributorAdminStatsJobTests(ContributorDashboardTest):
         self.translation_suggestion_rejected_model_user2.update_timestamps()
         self.translation_suggestion_accepted_with_edits_model.update_timestamps() # pylint: disable=line-too-long
         self.translation_suggestion_accepted_model.update_timestamps()
+        self.translation_suggestion_in_review_model.update_timestamps()
 
         self.put_multi([
             self.translation_contribution_model_1,
@@ -509,7 +522,8 @@ class GenerateContributorAdminStatsJobTests(ContributorDashboardTest):
             self.translation_suggestion_rejected_model_user1,
             self.translation_suggestion_rejected_model_user2,
             self.translation_suggestion_accepted_with_edits_model,
-            self.translation_suggestion_accepted_model
+            self.translation_suggestion_accepted_model,
+            self.translation_suggestion_in_review_model
         ])
 
         self.assert_job_output_is([
@@ -550,11 +564,11 @@ class GenerateContributorAdminStatsJobTests(ContributorDashboardTest):
             translation_submitter_total_stats.recent_performance
         )
         self.assertEqual(
-            75,
+            66.67,
             translation_submitter_total_stats.overall_accuracy
         )
         self.assertEqual(
-            60,
+            3,
             translation_submitter_total_stats.submitted_translations_count
         )
         self.assertEqual(
@@ -562,11 +576,11 @@ class GenerateContributorAdminStatsJobTests(ContributorDashboardTest):
             translation_submitter_total_stats.submitted_translation_word_count
         )
         self.assertEqual(
-            45,
+            2,
             translation_submitter_total_stats.accepted_translations_count
         )
         self.assertEqual(
-            15,
+            1,
             translation_submitter_total_stats
             .accepted_translations_without_reviewer_edits_count
         )
@@ -575,7 +589,7 @@ class GenerateContributorAdminStatsJobTests(ContributorDashboardTest):
             translation_submitter_total_stats.accepted_translation_word_count
         )
         self.assertEqual(
-            15,
+            1,
             translation_submitter_total_stats.rejected_translations_count
         )
         self.assertEqual(
@@ -683,7 +697,7 @@ class GenerateContributorAdminStatsJobTests(ContributorDashboardTest):
             .accepted_questions_without_reviewer_edits_count
         )
         self.assertEqual(
-            10,
+            1,
             question_submitter_total_stats.rejected_questions_count
         )
         self.assertEqual(

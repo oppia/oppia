@@ -63,36 +63,28 @@ class GenerateContributorAdminStatsJob(base_jobs.JobBase):
                     include_deleted=False))
         )
 
-        translation_recent_review_outcomes = (
+        translation_general_suggestions_stats = (
             general_suggestions_models
              | 'Filter reviewed translate suggestions' >> beam.Filter(
                 lambda m: (
                     m.suggestion_type ==
                     feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT
                 ))
-            | 'Map by language and user' >> beam.Map(
+            | 'Group by language and user' >> beam.Map(
                 lambda stats: ((stats.language_code, stats.author_id), stats)
             )
-            | 'Group by language and user' >> beam.GroupByKey()
-            | 'Extract translatio recent review outcomes' >> beam.MapTuple(
-                        self.extract_translation_recent_review_outcomes
-                )
         )
 
-        question_recent_review_outcomes = (
+        question_general_suggestions_stats = (
             general_suggestions_models
              | 'Filter reviewed questions suggestions' >> beam.Filter(
                 lambda m: (
                     m.suggestion_type ==
                     feconf.SUGGESTION_TYPE_ADD_QUESTION
                 ))
-            | 'Map by user' >> beam.Map(
+            | 'Group by user' >> beam.Map(
                 lambda stats: (stats.author_id, stats)
             )
-            | 'Group by user' >> beam.GroupByKey()
-            | 'Extract question recent review outcomes' >> beam.MapTuple(
-                        self.extract_question_recent_review_outcomes
-                )
         )
 
         translation_contribution_stats = (
@@ -155,8 +147,8 @@ class GenerateContributorAdminStatsJob(base_jobs.JobBase):
             {
                 'translation_contribution_stats':
                     translation_contribution_stats,
-                'translation_recent_review_outcomes':
-                    translation_recent_review_outcomes
+                'translation_general_suggestions_stats':
+                    translation_general_suggestions_stats
             }
             | 'Merge Translation models' >> beam.CoGroupByKey()
             | 'Transform translation contribution stats' >>
@@ -165,7 +157,7 @@ class GenerateContributorAdminStatsJob(base_jobs.JobBase):
                         self.transform_translation_contribution_stats(
                             key,
                             value['translation_contribution_stats'],
-                            value['translation_recent_review_outcomes']
+                            value['translation_general_suggestions_stats']
                         )
                 )
         )
@@ -182,8 +174,8 @@ class GenerateContributorAdminStatsJob(base_jobs.JobBase):
             {
                 'question_contribution_stats':
                     question_contribution_stats,
-                'question_recent_review_outcomes':
-                    question_recent_review_outcomes
+                'question_general_suggestions_stats':
+                    question_general_suggestions_stats
             }
             | 'Merge Question models' >> beam.CoGroupByKey()
             | 'Transform question contribution stats' >>
@@ -192,7 +184,7 @@ class GenerateContributorAdminStatsJob(base_jobs.JobBase):
                         self.transform_question_contribution_stats(
                             key,
                             value['question_contribution_stats'],
-                            value['question_recent_review_outcomes']
+                            value['question_general_suggestions_stats']
                         )
                 )
         )
@@ -273,24 +265,32 @@ class GenerateContributorAdminStatsJob(base_jobs.JobBase):
         )
 
     @staticmethod
-    def extract_translation_recent_review_outcomes(
-        key: Tuple[str, str],
+    def transform_translation_contribution_stats(
+        keys: Tuple[str, str],
+        translation_contribution_stats:
+            Iterable[suggestion_models.TranslationContributionStatsModel],
         translation_general_suggestions_stats:
             Iterable[suggestion_models.GeneralSuggestionModel]) -> (
-        Tuple[Tuple[str, str], list[str]]):
-        """Transforms GeneralSuggestionModel to recent_review_outcomes.
+        suggestion_models.TranslationSubmitterTotalContributionStatsModel):
+        """Transforms TranslationContributionStatsModel and
+        GeneralSuggestionModel to
+        TranslationSubmitterTotalContributionStatsModel.
 
         Args:
-            key: Tuple[str, str].
+            keys: Tuple[str, str].
                 Tuple of (language_code, contributor_user_id).
-            translation_general_suggestions_stats:
-                Iterable[suggestion_models.GeneralSuggestionModel]).
-                GeneralSuggestionModel grouped by
+            translation_contribution_stats:
+                Iterable[suggestion_models.TranslationContributionStatsModel].
+                TranslationReviewStatsModel grouped by
                 (language_code, contributor_user_id).
+            translation_general_suggestions_stats:
+                Iterable[suggestion_models.GeneralSuggestionModel].
+                TranslationReviewStatsModel grouped by
+                (language_code, author_id).
 
         Returns:
-            Tuple[Tuple[str, str], list[str]]. List of recent_review_outcomes
-            grouped by (language_code, author_id).
+            suggestion_models.TranslationSubmitterTotalContributionStatsModel.
+            New TranslationReviewerTotalContributionStatsModel model.
         """
         # The key for sorting is defined separately because of a mypy bug.
         # A [no-any-return] is thrown if key is defined in the sort() method
@@ -301,105 +301,10 @@ class GenerateContributorAdminStatsJob(base_jobs.JobBase):
             key=by_created_on
         )
 
+        translation_contribution_stats = list(translation_contribution_stats)
         general_suggestion_stats = list(
             translation_general_suggestions_sorted_stats)
         recent_review_outcomes = []
-
-        for v in general_suggestion_stats:
-            if (
-                v.status == suggestion_models.STATUS_ACCEPTED and
-                v.edited_by_reviewer is False):
-                recent_review_outcomes.append('accepted')
-            elif (
-                v.status == suggestion_models.STATUS_ACCEPTED and
-                v.edited_by_reviewer is True):
-                recent_review_outcomes.append('accepted_with_edits')
-            elif v.status == suggestion_models.STATUS_REJECTED:
-                recent_review_outcomes.append('rejected')
-
-        if len(recent_review_outcomes) > 100:
-            recent_review_outcomes = recent_review_outcomes[-100:]
-
-        return (key, recent_review_outcomes)
-
-    @staticmethod
-    def extract_question_recent_review_outcomes(
-        key: str,
-        question_general_suggestions_stats:
-            Iterable[suggestion_models.GeneralSuggestionModel]) -> (
-        Tuple[str, list[str]]):
-        """Transforms GeneralSuggestionModel to recent_review_outcomes.
-
-        Args:
-            key: str.
-                The author_id.
-            question_general_suggestions_stats:
-                Iterable[suggestion_models.GeneralSuggestionModel]).
-                GeneralSuggestionModel grouped by
-                (language_code, contributor_user_id).
-
-        Returns:
-            Tuple[Tuple[str, str], list[str]]. List of recent_review_outcomes
-            grouped by (author_id).
-        """
-        # The key for sorting is defined separately because of a mypy bug.
-        # A [no-any-return] is thrown if key is defined in the sort() method
-        # instead. Reference: https://github.com/python/mypy/issues/9590.
-        by_created_on = lambda m: m.created_on
-        question_general_suggestions_sorted_stats = sorted(
-            question_general_suggestions_stats,
-            key=by_created_on
-        )
-
-        general_suggestion_stats = list(
-            question_general_suggestions_sorted_stats)
-        recent_review_outcomes = []
-
-        for v in general_suggestion_stats:
-            if (
-                v.status == suggestion_models.STATUS_ACCEPTED and
-                v.edited_by_reviewer is False):
-                recent_review_outcomes.append('accepted')
-            elif (
-                v.status == suggestion_models.STATUS_ACCEPTED and
-                v.edited_by_reviewer is True):
-                recent_review_outcomes.append('accepted_with_edits')
-            elif v.status == suggestion_models.STATUS_REJECTED:
-                recent_review_outcomes.append('rejected')
-
-        if len(recent_review_outcomes) > 100:
-            recent_review_outcomes = recent_review_outcomes[-100:]
-
-        return (key, recent_review_outcomes)
-
-    @staticmethod
-    def transform_translation_contribution_stats(
-        keys: Tuple[str, str],
-        translation_contribution_stats:
-            Iterable[suggestion_models.TranslationContributionStatsModel],
-        recent_review_outcomes: list[str]) -> (
-        suggestion_models.TranslationSubmitterTotalContributionStatsModel):
-        """Transforms TranslationContributionStatsModel and
-        recent_review_outcomes to
-        TranslationSubmitterTotalContributionStatsModel.
-
-        Args:
-            keys: Tuple[str, str].
-                Tuple of (language_code, contributor_user_id).
-            translation_contribution_stats:
-                Iterable[suggestion_models.TranslationContributionStatsModel].
-                TranslationReviewStatsModel grouped by
-                (language_code, contributor_user_id).
-            recent_review_outcomes: list[str].
-                List of recent_review_outcomes grouped by
-                (language_code, author_id).
-
-        Returns:
-            suggestion_models. TranslationSubmitterTotalContributionStatsModel.
-            New TranslationReviewerTotalContributionStatsModel model.
-        """
-        recent_review_outcomes_list = (
-            recent_review_outcomes[0] if recent_review_outcomes else [])
 
         counts = {
             'accepted': 0,
@@ -407,10 +312,20 @@ class GenerateContributorAdminStatsJob(base_jobs.JobBase):
             'rejected': 0
         }
 
+        for v in general_suggestion_stats:
+            if (v.status == 'accepted' and v.edited_by_reviewer is False):
+                recent_review_outcomes.append('accepted')
+            elif (v.status == 'accepted' and v.edited_by_reviewer is True):
+                recent_review_outcomes.append('accepted_with_edits')
+            elif v.status == 'rejected':
+                recent_review_outcomes.append('rejected')
+
+        if len(recent_review_outcomes) > 100:
+            recent_review_outcomes = recent_review_outcomes[-100:]
+
         # Iterate over the list and count occurrences.
-        if recent_review_outcomes:
-            for outcome in recent_review_outcomes_list:
-                counts[outcome] += 1
+        for outcome in recent_review_outcomes:
+            counts[outcome] += 1
 
         # Weights of recent_performance as documented in
         # https://docs.google.com/document/d/19lCEYQUgV7_DwIK_0rz3zslRHX2qKOHn-t9Twpi0qu0/edit.
@@ -465,7 +380,7 @@ class GenerateContributorAdminStatsJob(base_jobs.JobBase):
                 language_code=language_code,
                 contributor_id=contributor_user_id,
                 topic_ids_with_translation_submissions=topic_ids,
-                recent_review_outcomes=recent_review_outcomes_list,
+                recent_review_outcomes=recent_review_outcomes,
                 recent_performance=recent_performance,
                 overall_accuracy=overall_accuracy,
                 submitted_translations_count=submitted_translations_count,
@@ -564,7 +479,8 @@ class GenerateContributorAdminStatsJob(base_jobs.JobBase):
         contributor_user_id: str,
         question_contribution_stats:
             Iterable[suggestion_models.QuestionContributionStatsModel],
-        recent_review_outcomes: list[str]) -> (
+        question_general_suggestions_stats:
+            Iterable[suggestion_models.GeneralSuggestionModel]) -> (
         suggestion_models.QuestionSubmitterTotalContributionStatsModel):
         """Transforms QuestionContributionStatsModel and GeneralSuggestionModel
         to QuestionSubmitterTotalContributionStatsModel.
@@ -575,7 +491,7 @@ class GenerateContributorAdminStatsJob(base_jobs.JobBase):
                 Iterable[suggestion_models.QuestionContributionStatsModel].
                 QuestionContributionStatsModel grouped by
                 contributor_user_id.
-            recent_review_outcomes:
+            question_general_suggestions_stats:
                 Iterable[suggestion_models.GeneralSuggestionModel].
                 GeneralSuggestionModel grouped by author_id.
 
@@ -583,19 +499,42 @@ class GenerateContributorAdminStatsJob(base_jobs.JobBase):
             suggestion_models.QuestionSubmitterTotalContributionStatsModel.
             New QuestionSubmitterTotalContributionStatsModel model.
         """
+        # The key for sorting is defined separately because of a mypy bug.
+        # A [no-any-return] is thrown if key is defined in the sort() method
+        # instead. Reference: https://github.com/python/mypy/issues/9590.
+        by_created_on = lambda m: m.created_on
+        question_general_suggestions_sorted_stats = sorted(
+            question_general_suggestions_stats,
+            key=by_created_on
+        )
+
+        question_contribution_stats = list(question_contribution_stats)
+        general_suggestion_stats = list(
+            question_general_suggestions_sorted_stats)
+        recent_review_outcomes = []
+        rejected_questions_count = 0
+
         counts = {
             'accepted': 0,
             'accepted_with_edits': 0,
             'rejected': 0
         }
 
-        recent_review_outcomes_list = (
-            recent_review_outcomes[0] if recent_review_outcomes else [])
+        for v in general_suggestion_stats:
+            if (v.status == 'accepted' and v.edited_by_reviewer is False):
+                recent_review_outcomes.append('accepted')
+            elif (v.status == 'accepted' and v.edited_by_reviewer is True):
+                recent_review_outcomes.append('accepted_with_edits')
+            elif v.status == 'rejected':
+                recent_review_outcomes.append('rejected')
+                rejected_questions_count += 1
+
+        if len(recent_review_outcomes) > 100:
+            recent_review_outcomes = recent_review_outcomes[-100:]
 
         # Iterate over the list and count occurrences.
-        if recent_review_outcomes:
-            for outcome in recent_review_outcomes_list:
-                counts[outcome] += 1
+        for outcome in recent_review_outcomes:
+            counts[outcome] += 1
 
         # Weights of recent_performance as documented in
         # https://docs.google.com/document/d/19lCEYQUgV7_DwIK_0rz3zslRHX2qKOHn-t9Twpi0qu0/edit.
@@ -617,9 +556,6 @@ class GenerateContributorAdminStatsJob(base_jobs.JobBase):
         accepted_questions_without_reviewer_edits_count = sum(
             v.accepted_questions_without_reviewer_edits_count
                 for v in question_contribution_stats)
-        rejected_questions_count = (
-            submitted_questions_count - accepted_questions_count
-        )
         first_contribution_date = min(
             v.first_contribution_date for v in question_contribution_stats)
         last_contribution_date = max(
@@ -639,7 +575,7 @@ class GenerateContributorAdminStatsJob(base_jobs.JobBase):
                 id=entity_id,
                 contributor_id=contributor_user_id,
                 topic_ids_with_question_submissions=topic_ids,
-                recent_review_outcomes=recent_review_outcomes_list,
+                recent_review_outcomes=recent_review_outcomes,
                 recent_performance=recent_performance,
                 overall_accuracy=overall_accuracy,
                 submitted_questions_count=submitted_questions_count,
