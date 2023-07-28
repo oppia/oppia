@@ -63,8 +63,6 @@ interface SuggestionDetailsDict {
   };
 }
 
-// eslint-disable-next-line
-export type CompareFunction = (a: any, b: any) => number;
 
 // Represents a client-facing response to a fetch suggestion query.
 export interface FetchSuggestionsResponse {
@@ -210,9 +208,8 @@ export class ContributionAndReviewService {
             this.sortTranslationSuggestionsByState(
               fetchSuggestionsResponse.suggestions,
               exploration.getStates(),
-              explorationBackendDict.init_state_name,
-              this.compareTranslationSuggestions.bind(this)));
-          // eslint-disable-next-line
+              explorationBackendDict.init_state_name));
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           const responseSuggestionIdToDetails: {[key: string]: any} = {};
           sortedTranslationSuggestions.forEach((suggestion) => {
             const suggestionDetails = {
@@ -235,13 +232,10 @@ export class ContributionAndReviewService {
 
   // Function to sort translation cards by state.
   sortTranslationSuggestionsByState(
-      // eslint-disable-next-line
-      translationSuggestions: any[],
+      translationSuggestions: SuggestionBackendDict[],
       states: States,
-      initStateName: string | null,
-      compareFn: CompareFunction
-      // eslint-disable-next-line
-  ): any[] {
+      initStateName: string | null
+  ): SuggestionBackendDict[] {
     // Obtain the state names in the order of content flow in the lesson.
     if (!initStateName) {
       return translationSuggestions;
@@ -254,23 +248,26 @@ export class ContributionAndReviewService {
         initStateName
       );
     const translationSuggestionsByState = (
-      this.groupTranslationSuggestionsByState(translationSuggestions));
+      ContributionAndReviewService
+      .groupTranslationSuggestionsByState(translationSuggestions));
     const sortedTranslationCards: SuggestionBackendDict[] = [];
 
     for (const stateName of stateNamesInOrder) {
       const cardsForState = (
         translationSuggestionsByState.get(stateName) || []);
-      cardsForState.sort(compareFn);
+      cardsForState.sort(ContributionAndReviewService
+        .compareTranslationSuggestions.bind(this));
       translationSuggestionsByState.set(stateName, cardsForState);
       sortedTranslationCards.push(...cardsForState);
     }
     return sortedTranslationCards;
   }
 
-  // eslint-disable-next-line
-  private groupTranslationSuggestionsByState(
-    translationSuggestions: any[]): Map<string, any[]> {
-    const translationSuggestionsByState = new Map<string, any[]>();
+  static groupTranslationSuggestionsByState(
+    translationSuggestions: SuggestionBackendDict[])
+    : Map<string, SuggestionBackendDict[]> {
+    const translationSuggestionsByState = new Map<
+    string, SuggestionBackendDict[]>();
 
     for (const translationSuggestion of translationSuggestions) {
       const stateName = translationSuggestion.change.state_name;
@@ -281,8 +278,8 @@ export class ContributionAndReviewService {
     return translationSuggestionsByState;
   }
 
-  // Helper function to get the type order for a given content ID.
-  private getTypeOrder(contentId: string): number {
+  // Returns the type order for a given content ID.
+  static getTypeOrder(contentId: string): number {
     const type = contentId.split('_')[0];
     const order: { [key: string]: number } = {
       'content': 0, // eslint-disable-line quote-props
@@ -295,27 +292,29 @@ export class ContributionAndReviewService {
     return order.hasOwnProperty(type) ? order[type] : Number.MAX_SAFE_INTEGER;
   }
 
-  // Helper function to get the index for a given content ID.
-  private getIndex(contentId: string): number {
+  // Returns index for a given content ID.
+  static getIndex(contentId: string): number {
     const index = parseInt(contentId.split('_')[1]);
     return isNaN(index) ? Number.MAX_SAFE_INTEGER : index;
   }
 
-  // Compare translation suggestions based on type and index.
-  // eslint-disable-next-line
-  compareTranslationSuggestions(cardA: any, cardB: any): number {
-    const cardATypeOrder = this.getTypeOrder(cardA.change.content_id);
-    const cardBTypeOrder = this.getTypeOrder(cardB.change.content_id);
+  // Compares translation suggestions based on type and index.
+  static compareTranslationSuggestions(cardA: SuggestionBackendDict,
+    cardB: SuggestionBackendDict): number {
+    const cardATypeOrder = ContributionAndReviewService.
+    getTypeOrder(cardA.change.content_id);
+    const cardBTypeOrder = ContributionAndReviewService
+    .getTypeOrder(cardB.change.content_id);
 
     if (cardATypeOrder !== cardBTypeOrder) {
       return cardATypeOrder - cardBTypeOrder;
     } else {
-      const cardAIndex = this.getIndex(cardA.change.content_id);
-      const cardBIndex = this.getIndex(cardB.change.content_id);
+      const cardAIndex = ContributionAndReviewService
+      .getIndex(cardA.change.content_id);
+      const cardBIndex = ContributionAndReviewService
+      .getIndex(cardB.change.content_id);
 
-      if (cardAIndex !== cardBIndex) {
-        return cardAIndex - cardBIndex;
-      }
+      return cardAIndex - cardBIndex;
     }
   }
 

@@ -846,20 +846,29 @@ class GeneralSuggestionModel(base_models.BaseModel):
             )).order(-cls.created_on)
 
             sorted_results: List[GeneralSuggestionModel] = []
-            num_suggestions_per_fetch = 1000
 
-            while len(sorted_results) < limit:
+            if limit is None:
                 suggestion_models: Sequence[GeneralSuggestionModel] = (
-                    suggestion_query.fetch(
-                        num_suggestions_per_fetch, offset=offset))
-                if not suggestion_models:
-                    break
+                    suggestion_query.fetch(offset=offset))
                 for suggestion_model in suggestion_models:
                     offset += 1
                     if suggestion_model.author_id != user_id:
                         sorted_results.append(suggestion_model)
-                        if len(sorted_results) == limit:
-                            break
+            else:
+                num_suggestions_per_fetch = 1000
+
+                while len(sorted_results) < limit:
+                    suggestion_models: Sequence[GeneralSuggestionModel] = (
+                        suggestion_query.fetch(
+                            num_suggestions_per_fetch, offset=offset))
+                    if not suggestion_models:
+                        break
+                    for suggestion_model in suggestion_models:
+                        offset += 1
+                        if suggestion_model.author_id != user_id:
+                            sorted_results.append(suggestion_model)
+                            if len(sorted_results) == limit:
+                                break
 
             return (
                 sorted_results,
@@ -874,6 +883,8 @@ class GeneralSuggestionModel(base_models.BaseModel):
 
         results: Sequence[GeneralSuggestionModel] = (
             suggestion_query.fetch(limit, offset=offset)
+            if limit is not None
+            else suggestion_query.fetch(offset=offset)
         )
         next_offset = offset + len(results)
 

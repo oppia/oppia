@@ -32,7 +32,6 @@ import { StateObjectsBackendDict } from 'domain/exploration/StatesObjectFactory'
 import { StatesObjectFactory } from 'domain/exploration/StatesObjectFactory';
 import { FetchExplorationBackendResponse } from '../../../domain/exploration/read-only-exploration-backend-api.service';
 import { LoggerService } from 'services/contextual/logger.service';
-import { States } from 'domain/exploration/StatesObjectFactory';
 
 describe('Contribution and review service', () => {
   let cars: ContributionAndReviewService;
@@ -466,7 +465,7 @@ describe('Contribution and review service', () => {
           solicit_answer_details: false,
           card_is_checkpoint: false
         }
-      } as unknown as States;
+      } as StateObjectsBackendDict;
       const mockReadOnlyExplorationData: FetchExplorationBackendResponse = {
         can_edit: true,
         exploration: {
@@ -516,7 +515,7 @@ describe('Contribution and review service', () => {
       const exploration: Exploration = new Exploration(
         mockReadOnlyExplorationData.exploration.init_state_name,
         [],
-        mockReadOnlyExplorationData.exploration.param_specs,
+        {},
         mockReadOnlyExplorationData.exploration.states,
         mockReadOnlyExplorationData.exploration.title,
         mockReadOnlyExplorationData.exploration.next_content_id_index,
@@ -1067,11 +1066,9 @@ describe('Contribution and review service', () => {
     'on type and index', () => {
       const states = statesObjectFactory.createFromBackendDict(
         statesBackendDict);
-      const compareFn = cars.compareTranslationSuggestions.bind(cars);
       const sortedTranslationSuggestions = cars.
         sortTranslationSuggestionsByState(
-          translationSuggestions, states, 'First State',
-          compareFn);
+          translationSuggestions, states, 'First State');
 
       expect(sortedTranslationSuggestions).toEqual([
         {
@@ -1159,10 +1156,8 @@ describe('Contribution and review service', () => {
       () => {
         const states = statesObjectFactory.createFromBackendDict(
           statesBackendDict);
-        const compareFn = cars.compareTranslationSuggestions.bind(cars);
         const sortedTranslationCards = cars.sortTranslationSuggestionsByState(
-          translationSuggestions, states, null,
-          compareFn);
+          translationSuggestions, states, null);
 
         expect(sortedTranslationCards).toEqual(translationSuggestions);
       });
