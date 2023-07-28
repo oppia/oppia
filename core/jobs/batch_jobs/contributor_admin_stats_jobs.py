@@ -93,6 +93,8 @@ class GenerateContributorAdminStatsJob(base_jobs.JobBase):
                 ndb_io.GetModels(
                 suggestion_models.TranslationContributionStatsModel.get_all(
                     include_deleted=False))
+            | 'Filter translation contribution with no topic' >> beam.Filter(
+                lambda m: m.topic_id != '')
             | 'Group TranslationContributionStatsModel by language and contributor' # pylint: disable=line-too-long
                 >> beam.Map(
                 lambda stats: (

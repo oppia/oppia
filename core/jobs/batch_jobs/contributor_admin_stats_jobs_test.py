@@ -158,6 +158,24 @@ class ContributorDashboardTest(job_test_utils.JobTestBase):
             contribution_dates=self.CONTRIBUTION_DATES
         )
 
+        self.translation_contribution_model_with_no_topic = self.create_model(
+            suggestion_models.TranslationContributionStatsModel,
+            language_code='hi',
+            contributor_user_id='user1',
+            topic_id='',
+            submitted_translations_count=20,
+            submitted_translation_word_count=(
+                self.SUBMITTED_TRANSLATION_WORD_COUNT),
+            accepted_translations_count=0,
+            accepted_translations_without_reviewer_edits_count=0,
+            accepted_translation_word_count=(
+                self.ACCEPTED_TRANSLATION_WORD_COUNT),
+            rejected_translations_count=1,
+            rejected_translation_word_count=(
+                self.REJECTED_TRANSLATION_WORD_COUNT),
+            contribution_dates=self.CONTRIBUTION_DATES
+        )
+
         self.translation_contribution_model_5 = self.create_model(
             suggestion_models.TranslationContributionStatsModel,
             language_code='hi',
@@ -444,7 +462,7 @@ class ContributorDashboardTest(job_test_utils.JobTestBase):
             language_code='hi',
             edited_by_reviewer=False,
             created_on=datetime.datetime(2023, 2, 2))
-        
+
         self.translation_suggestion_in_review_model = self.create_model(
             suggestion_models.GeneralSuggestionModel,
             suggestion_type=feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
@@ -476,6 +494,7 @@ class GenerateContributorAdminStatsJobTests(ContributorDashboardTest):
         self.translation_contribution_model_2.update_timestamps()
         self.translation_contribution_model_3.update_timestamps()
         self.translation_contribution_model_4.update_timestamps()
+        self.translation_contribution_model_with_no_topic.update_timestamps()
         self.translation_contribution_model_5.update_timestamps()
         self.translation_review_model_1.update_timestamps()
         self.translation_review_model_2.update_timestamps()
@@ -503,6 +522,7 @@ class GenerateContributorAdminStatsJobTests(ContributorDashboardTest):
             self.translation_contribution_model_2,
             self.translation_contribution_model_3,
             self.translation_contribution_model_4,
+            self.translation_contribution_model_with_no_topic,
             self.translation_contribution_model_5,
             self.translation_review_model_1,
             self.translation_review_model_2,
