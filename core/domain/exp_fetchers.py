@@ -681,7 +681,7 @@ def get_exploration_version_history(
 def get_user_progress_in_exploration(
     user_id: str, exp_ids: List[str]
 ) -> List[exp_domain.ExplorationProgressSummaryDict]:
-    """Returns the progress of multiple users in multiple exploration.
+    """Returns the progress of user in multiple exploration.
 
     Args:
         user_id: str. The user id of the user.

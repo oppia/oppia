@@ -142,7 +142,6 @@ export class CollectionSummaryTileComponent implements OnInit, OnDestroy {
     return '';
   }
 
-
   getCompleteThumbnailIconUrl(): string {
     return this.urlInterpolationService.getStaticImageUrl(
       this.getThumbnailIconUrl);

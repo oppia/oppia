@@ -126,6 +126,7 @@ export class NewLearnerDashboardComponent implements OnInit {
   explorationId!: string;
   communityLibraryUrl = (
     '/' + AppConstants.PAGES_REGISTERED_WITH_FRONTEND.LIBRARY_INDEX.ROUTE);
+
   communtiyLessonsDataLoaded: boolean = false;
   loadingIndicatorIsShown: boolean = false;
   homeImageUrl: string = '';
@@ -337,6 +338,7 @@ export class NewLearnerDashboardComponent implements OnInit {
       'I18N_LEARNER_DASHBOARD_PAGE_TITLE');
     this.pageTitleService.setDocumentTitle(translatedTitle);
   }
+
   getStaticImageUrl(imagePath: string): string {
     return this.urlInterpolationService.getStaticImageUrl(imagePath);
   }

@@ -54,6 +54,7 @@
   color: #205d86;
   font-family: 'Capriola', 'Roboto', Arial, sans-serif;
   font-size: 24px;
+  font-weight: 400;
   margin: 0;
 }
 
@@ -363,6 +364,9 @@
   }
   .new-home-tab .topic-suggested-for-you .untracked-topics {
     margin-bottom: 20px;
+  }
+  .new-home-tab .topic-suggested-for-you .suggested-for-you-heading {
+    font-size: 18px;
   }
 }
 

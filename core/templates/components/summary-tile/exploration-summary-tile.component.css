@@ -48,6 +48,7 @@ oppia-exploration-summary-tile .oppia-learner-confirm-button {
 
 oppia-exploration-summary-tile .mobile-activity-summary-card {
   box-shadow: slategrey 2px 4px 4px 0;
+  margin: 5px;
   padding: 0 0 0 0;
   width: 340px;
 }
@@ -96,7 +97,6 @@ oppia-exploration-summary-tile .exploration-progress {
 oppia-exploration-summary-tile .oppia-exploration-objective-title {
   -webkit-box-orient: vertical;
   color: #333;
-  display: -webkit-box;
   font-family: "Roboto", Arial, sans-serif;
   font-size: 0.85em;
   height: 30px;
@@ -113,7 +113,7 @@ oppia-exploration-summary-tile .oppia-exploration-objective-title {
 }
 oppia-exploration-summary-tile .oppia-learner-dashboard-exploration-title {
   color: #00645c;
-  font-family: Capriola,Roboto,Arial,sans-serif;
+  font-family: Capriola, Roboto, Arial, sans-serif;
   font-size: 15px;
   font-weight: 400;
   padding-left: 8px;
@@ -121,7 +121,7 @@ oppia-exploration-summary-tile .oppia-learner-dashboard-exploration-title {
   word-wrap: break-word;
 }
 oppia-exploration-summary-tile .continue-button {
-  background: white 0% 0% no-repeat padding-box;
+  background: #FFFFFF 0% 0% no-repeat padding-box;
   border: 1px solid #00645c;
   border-radius: 4px;
   height: 36px;
@@ -173,7 +173,7 @@ oppia-exploration-summary-tile .oppia-summary-section {
 oppia-exploration-summary-tile .oppia-library-title {
   color: #333;
   display: block;
-  font-family: 'Roboto',sans-serif;
+  font-family: 'Roboto', sans-serif;
   font-size: 12px;
   font-weight: 600;
   height: 16px;
