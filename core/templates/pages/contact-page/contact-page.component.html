@@ -99,9 +99,8 @@
     border-radius: 5px;
     color: white;
     font-weight: bold;
-    padding: 5px 30px;
-    
-    
+    height: 40px;
+    width: 250px;
    }
 
    .oppia-contact-page-content {
@@ -126,6 +125,25 @@
       text-align: center;
    }
    }
+
+  @media (max-width: 950px) and (min-width: 843px) {
+    .oppia-contact-page-content button {
+      padding: 5px 30px;
+      height: auto;
+      width: auto;
+    }
+  }
+
+  @media (max-width: 375px) {
+    .oppia-contact-page-content p {
+      margin: 20px 20px 50px 20px;
+    }
+
+    .oppia-contact-page-content button{
+      width: 225px;
+    }
+
+  }
 
    @media (max-width: 842px) {
 
