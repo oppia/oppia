@@ -138,6 +138,7 @@ export class InteractiveRatioExpressionInputComponent
 
   answerValueChanged(): void {
     this.answerChanged.next(this.answer);
+    this.currentInteractionService.updateCurrentAnswer(this.answer);
   }
 
   ngOnDestroy(): void {

@@ -9,16 +9,12 @@
          [oppiaFocusOn]="labelForFocusTarget"
          placeholder="{{customPlaceholder !== '' ? customPlaceholder : getPlaceholderText() | translate}}">
 
-  <div class="oppia-form-error oppia-fraction-input-error">
+  <div *ngIf="errorMessageI18nKey" class="oppia-form-error-container">
     {{errorMessageI18nKey | translate}}
   </div>
 </form>
 
 <style>
-  .oppia-fraction-input-error {
-    margin-top: 10px;
-  }
-
   .ng-invalid {
     border-color: red;
     outline-color: red;

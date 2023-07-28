@@ -40,6 +40,7 @@ import { GraphInputRulesService } from 'interactions/GraphInput/directives/graph
 import { SetInputRulesService } from 'interactions/SetInput/directives/set-input-rules.service';
 import { TextInputRulesService } from 'interactions/TextInput/directives/text-input-rules.service';
 import { InteractionAnswer } from 'interactions/answer-defs';
+import { StateCard } from 'domain/state_card/state-card.model';
 
 type SubmitAnswerFn = () => void;
 
@@ -146,6 +147,19 @@ export class CurrentInteractionService {
       CurrentInteractionService.presubmitHooks[i]();
     }
     CurrentInteractionService.onSubmitFn(answer, interactionRulesService);
+  }
+
+  getDisplayedCard(): StateCard {
+    const index = this.playerPositionService.getDisplayedCardIndex();
+    return this.playerTranscriptService.getCard(index);
+  }
+
+  updateCurrentAnswer(answer: InteractionAnswer | null): void {
+    this.getDisplayedCard().updateCurrentAnswer(answer);
+  }
+
+  showNoResponseError(): boolean {
+    return this.getDisplayedCard().showNoResponseError();
   }
 
   submitAnswer(): void {

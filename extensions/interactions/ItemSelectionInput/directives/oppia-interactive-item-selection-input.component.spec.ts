@@ -28,7 +28,7 @@ import { Interaction } from 'domain/exploration/InteractionObjectFactory';
 import { RecordedVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
 import { AudioTranslationLanguageService } from 'pages/exploration-player-page/services/audio-translation-language.service';
 import { StateCard } from 'domain/state_card/state-card.model';
-import { ItemSelectionAnswer } from 'interactions/answer-defs';
+import { InteractionAnswer, ItemSelectionAnswer } from 'interactions/answer-defs';
 import { InteractionSpecsKey } from 'pages/interaction-specs.constants';
 import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 
@@ -61,6 +61,8 @@ describe('oppiaInteractiveItemSelectionInput', function() {
   class MockCurrentInteractionService {
     onSubmit(
         answer: ItemSelectionAnswer, rulesService: CurrentInteractionService) {}
+
+    updateCurrentAnswer(answer: InteractionAnswer | null): void {}
 
     registerCurrentInteraction(
         submitAnswerFn: Function, validateExpressionFn: Function) {
@@ -162,6 +164,7 @@ describe('oppiaInteractiveItemSelectionInput', function() {
     ' checked by the user', () => {
       spyOn(playerTranscriptService, 'getCard').and.returnValue(displayedCard);
       let dummyMouseEvent = new MouseEvent('Mouse');
+      spyOn(currentInteractionService, 'updateCurrentAnswer');
       spyOn(browserCheckerService, 'isMobileDevice').and.returnValue(false);
       spyOn(document, 'querySelector')
         .withArgs('button.multiple-choice-option.selected').and.returnValue({
@@ -213,6 +216,9 @@ describe('oppiaInteractiveItemSelectionInput', function() {
       });
       expect(component.submitAnswer).toHaveBeenCalledTimes(1);
       expect(currentInteractionService.onSubmit).toHaveBeenCalledTimes(1);
+      expect(
+        currentInteractionService.updateCurrentAnswer).toHaveBeenCalledOnceWith(
+        ['ca_choices_1']);
     });
 
     it('should be able to call onsubmit event while submitting answer', () => {
@@ -236,6 +242,7 @@ describe('oppiaInteractiveItemSelectionInput', function() {
       spyOn(playerTranscriptService, 'getCard').and.returnValue(displayedCard);
       let dummyMouseEvent = new MouseEvent('Mouse');
       spyOn(browserCheckerService, 'isMobileDevice').and.returnValue(true);
+      spyOn(currentInteractionService, 'updateCurrentAnswer');
       spyOn(document, 'querySelector')
         .withArgs('button.multiple-choice-option.selected').and.returnValue({
           // This throws "Type '{ add: () => void; remove: () => void; }'
@@ -286,6 +293,9 @@ describe('oppiaInteractiveItemSelectionInput', function() {
       });
       expect(component.submitAnswer).toHaveBeenCalledTimes(1);
       expect(currentInteractionService.onSubmit).toHaveBeenCalledTimes(1);
+      expect(
+        currentInteractionService.updateCurrentAnswer).toHaveBeenCalledOnceWith(
+        ['ca_choices_1']);
     });
   });
 
@@ -329,6 +339,7 @@ describe('oppiaInteractiveItemSelectionInput', function() {
 
     it('should toggle checkbox when user clicks checkbox', () => {
       spyOn(playerTranscriptService, 'getCard').and.returnValue(displayedCard);
+      spyOn(currentInteractionService, 'updateCurrentAnswer');
       component.ngOnInit();
       component.userSelections = {
         'choice 1': true,
@@ -350,11 +361,15 @@ describe('oppiaInteractiveItemSelectionInput', function() {
       // not been reached.
       expect(component.preventAdditionalSelections).toBeFalse();
       expect(component.notEnoughSelections).toBeFalse();
+      expect(
+        currentInteractionService.updateCurrentAnswer).toHaveBeenCalledOnceWith(
+        ['ca_choices_1']);
     });
 
     it('should prevent users from selecting more options when' +
     ' \'maxAllowableSelectionCount\' has been reached', () => {
       spyOn(playerTranscriptService, 'getCard').and.returnValue(displayedCard);
+      spyOn(currentInteractionService, 'updateCurrentAnswer');
       component.ngOnInit();
       component.userSelections = {
         'choice 1': true,
@@ -370,6 +385,9 @@ describe('oppiaInteractiveItemSelectionInput', function() {
       expect(component.selectionCount).toBe(2);
       expect(component.preventAdditionalSelections).toBeTrue();
       expect(component.notEnoughSelections).toBeFalse();
+      expect(
+        currentInteractionService.updateCurrentAnswer).toHaveBeenCalledOnceWith(
+        ['ca_choices_1', 'ca_choices_2']);
     });
   });
 });

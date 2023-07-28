@@ -87,11 +87,25 @@ export class AlgebraicExpressionInputInteractionComponent
   }
 
   submitAnswer(): void {
+    this.hasBeenTouched = true;
     if (!this.isCurrentAnswerValid(false)) {
       return;
     }
     this.currentInteractionService.onSubmit(
       this.value, this.algebraicExpressionInputRulesService);
+  }
+
+  onAnswerChange(focusObj: FocusObj): void {
+    const activeGuppyObject = (
+      this.guppyInitializationService.findActiveGuppyObject());
+    if (activeGuppyObject !== undefined) {
+      this.hasBeenTouched = true;
+      this.value = activeGuppyObject.guppyInstance.asciimath();
+      this.currentInteractionService.updateCurrentAnswer(this.value);
+    }
+    if (!focusObj.focused) {
+      this.isCurrentAnswerValid();
+    }
   }
 
   ngOnInit(): void {
@@ -112,21 +126,9 @@ export class AlgebraicExpressionInputInteractionComponent
       this.savedSolution !== undefined ? this.savedSolution as string : ''
     );
 
-    Guppy.event('change', (focusObj: FocusObj) => {
-      let activeGuppyObject = (
-        this.guppyInitializationService.findActiveGuppyObject());
-      if (activeGuppyObject !== undefined) {
-        this.hasBeenTouched = true;
-        this.value = activeGuppyObject.guppyInstance.asciimath();
-      }
-      if (!focusObj.focused) {
-        this.isCurrentAnswerValid();
-      }
-    });
+    Guppy.event('change', this.onAnswerChange.bind(this));
 
-    Guppy.event('done', () => {
-      this.submitAnswer();
-    });
+    Guppy.event('done', this.submitAnswer.bind(this));
 
     Guppy.event('focus', (focusObj: FocusObj) => {
       if (!focusObj.focused) {
@@ -134,15 +136,8 @@ export class AlgebraicExpressionInputInteractionComponent
       }
     });
 
-    const isCurrentAnswerValid = (): boolean => {
-      return this.isCurrentAnswerValid();
-    };
-
-    const submitAnswer = () => {
-      return this.submitAnswer();
-    };
     this.currentInteractionService.registerCurrentInteraction(
-      submitAnswer, isCurrentAnswerValid);
+      this.submitAnswer.bind(this), this.isCurrentAnswerValid.bind(this));
   }
 
   ngOnDestroy(): void {

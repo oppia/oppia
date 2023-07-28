@@ -108,6 +108,11 @@ export class InteractiveNumberWithUnitsComponent
 
   submitAnswer(): void {
     try {
+      if (this.answer.trim() === '' &&
+          this.currentInteractionService.showNoResponseError()) {
+        this.errorMessageI18nKey = 'I18N_INTERACTIONS_INPUT_NO_RESPONSE';
+        return;
+      }
       const numberWithUnits = (
         this.numberWithUnitsObjectFactory.fromRawInputString(this.answer));
       this.currentInteractionService.onSubmit(
@@ -140,6 +145,7 @@ export class InteractiveNumberWithUnitsComponent
 
   answerValueChanged(): void {
     this.answerChanged.next(this.answer);
+    this.currentInteractionService.updateCurrentAnswer(this.answer);
   }
 
   ngOnDestroy(): void {

@@ -27,6 +27,8 @@ import { Interaction } from 'domain/exploration/InteractionObjectFactory';
 import { RecordedVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
 import { AudioTranslationLanguageService } from 'pages/exploration-player-page/services/audio-translation-language.service';
 import { StateCard } from 'domain/state_card/state-card.model';
+import { TranslateModule } from '@ngx-translate/core';
+import { InteractionAnswer } from 'interactions/answer-defs';
 
 describe('InteractiveMultipleChoiceInputComponent', () => {
   let component: InteractiveMultipleChoiceInputComponent;
@@ -54,6 +56,12 @@ describe('InteractiveMultipleChoiceInputComponent', () => {
       expect(answer).toBe(1);
     }
 
+    showNoResponseError(): boolean {
+      return false;
+    }
+
+    updateCurrentAnswer(answer: InteractionAnswer): void {}
+
     registerCurrentInteraction(submitAnswerFn, validateExpressionFn) {
       submitAnswerFn();
       validateExpressionFn();
@@ -63,6 +71,14 @@ describe('InteractiveMultipleChoiceInputComponent', () => {
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       declarations: [InteractiveMultipleChoiceInputComponent],
+      imports: [
+        TranslateModule.forRoot({
+          useDefaultLang: true,
+          isolate: false,
+          extend: false,
+          defaultLanguage: 'en'
+        })
+      ],
       providers: [
         {
           provide: InteractionAttributesExtractorService,
@@ -146,7 +162,7 @@ describe('InteractiveMultipleChoiceInputComponent', () => {
       .toHaveBeenCalled();
   });
 
-  it('should initalise component when user selects multiple choice ' +
+  it('should initialise component when user selects multiple choice ' +
   'interaction', () => {
     spyOn(currentInteractionService, 'registerCurrentInteraction')
       .and.callThrough();
@@ -164,7 +180,9 @@ describe('InteractiveMultipleChoiceInputComponent', () => {
 
   it('should update selected answer when user selects an option', () => {
     let dummyMouseEvent = new MouseEvent('Mouse');
+    component.errorMessageI18nKey = 'Some error';
     spyOn(browserCheckerService, 'isMobileDevice').and.returnValue(false);
+    spyOn(currentInteractionService, 'updateCurrentAnswer');
     spyOn(document, 'querySelector')
       .withArgs('button.multiple-choice-option.selected').and.returnValue({
         // This throws "Type '{ add: () => void; remove: () => void; }'
@@ -199,6 +217,10 @@ describe('InteractiveMultipleChoiceInputComponent', () => {
     component.selectAnswer(dummyMouseEvent, '1');
 
     expect(component.answer).toBe(1);
+    expect(
+      currentInteractionService.updateCurrentAnswer).toHaveBeenCalledOnceWith(
+      1);
+    expect(component.errorMessageI18nKey).toEqual('');
   });
 
   it('should not update the answer if the user does not select any', () => {
@@ -213,7 +235,9 @@ describe('InteractiveMultipleChoiceInputComponent', () => {
   it('should not submit answer when user selects option if user is on' +
   ' a mobile', () => {
     let dummyMouseEvent = new MouseEvent('Mouse');
+    component.errorMessageI18nKey = 'Some error';
     spyOn(browserCheckerService, 'isMobileDevice').and.returnValue(true);
+    spyOn(currentInteractionService, 'updateCurrentAnswer');
     spyOn(document, 'querySelectorAll')
       .withArgs('button.multiple-choice-option.selected').and.returnValue([{
         // This throws "Type '{ add: () => void; remove: () => void; }'
@@ -250,15 +274,22 @@ describe('InteractiveMultipleChoiceInputComponent', () => {
     component.selectAnswer(dummyMouseEvent, '1');
 
     expect(component.submitAnswer).not.toHaveBeenCalled();
+    expect(
+      currentInteractionService.updateCurrentAnswer).toHaveBeenCalledOnceWith(
+      1);
+    expect(component.errorMessageI18nKey).toEqual('');
   });
 
   it('should submit answer when user submits answer', () => {
     component.answer = 1;
     spyOn(currentInteractionService, 'onSubmit').and.callThrough();
+    spyOn(currentInteractionService, 'showNoResponseError');
 
     component.submitAnswer();
 
     expect(currentInteractionService.onSubmit).toHaveBeenCalled();
+    expect(
+      currentInteractionService.showNoResponseError).not.toHaveBeenCalled();
   });
 
   it('should not submit answer when no answer is selected', () => {
@@ -268,5 +299,19 @@ describe('InteractiveMultipleChoiceInputComponent', () => {
     component.submitAnswer();
 
     expect(currentInteractionService.onSubmit).not.toHaveBeenCalled();
+    expect(component.errorMessageI18nKey).toEqual('');
+  });
+
+  it('should show "no response error" if no answer is selected', () => {
+    component.answer = null;
+    spyOn(currentInteractionService, 'onSubmit').and.callThrough();
+    spyOn(
+      currentInteractionService, 'showNoResponseError').and.returnValue(true);
+
+    component.submitAnswer();
+
+    expect(currentInteractionService.onSubmit).not.toHaveBeenCalled();
+    expect(component.errorMessageI18nKey).toEqual(
+      'I18N_INTERACTIONS_ITEM_SELECTION_NO_RESPONSE');
   });
 });

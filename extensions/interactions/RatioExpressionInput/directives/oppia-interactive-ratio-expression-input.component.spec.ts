@@ -52,6 +52,7 @@ describe('InteractiveRatioExpressionInput', () => {
     onSubmit: (
         answer: RatioInputAnswer, rulesService: CurrentInteractionService
     ) => {},
+    updateCurrentAnswer: (): boolean => false,
     registerCurrentInteraction: (
         submitAnswerFn: Function, validateExpressionFn: Function) => {
       submitAnswerFn();
@@ -152,6 +153,8 @@ describe('InteractiveRatioExpressionInput', () => {
 
     it('should not display error message before user' +
     ' submit answer', fakeAsync(() => {
+      const updateCurrentAnswerSpy = spyOn(
+        currentInteractionService, 'updateCurrentAnswer');
       component.answer = '1';
       component.answerValueChanged();
       component.answer = '1:2:3';
@@ -163,6 +166,8 @@ describe('InteractiveRatioExpressionInput', () => {
 
       expect(component.errorMessageI18nKey).toBe('');
       expect(component.isValid).toBe(true);
+      expect(
+        updateCurrentAnswerSpy.calls.allArgs()).toEqual([['1'], ['1:2:3']]);
     }));
 
     it('should unsubscribe when component is destroyed', function() {
