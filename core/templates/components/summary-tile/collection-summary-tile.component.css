@@ -18,7 +18,7 @@ oppia-collection-summary-tile .oppia-activity-summary-tile .collection-corner-im
 
 oppia-collection-summary-tile .mobile-activity-summary-card {
   box-shadow: #708090 2px 4px 4px 0;
-  padding: 0 0 0 0;
+  padding: 0;
 }
 
 oppia-collection-summary-tile .mobile-collection-card-cascading-images-container {
