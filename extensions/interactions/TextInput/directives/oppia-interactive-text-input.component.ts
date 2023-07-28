@@ -51,6 +51,7 @@ export class InteractiveTextInputComponent implements OnInit {
   @Input() savedSolution!: TextInputAnswer;
   @Input() labelForFocusTarget!: string;
   answer!: TextInputAnswer;
+  errorMessageI18nKey: string = '';
   placeholder!: string;
   schema!: TextInputSchema;
   rows!: number;
@@ -123,6 +124,9 @@ export class InteractiveTextInputComponent implements OnInit {
 
   submitAnswer(answer: string): void {
     if (!answer) {
+      if (this.currentInteractionService.showNoResponseError()) {
+        this.errorMessageI18nKey = 'I18N_INTERACTIONS_INPUT_NO_RESPONSE';
+      }
       return;
     }
     this.currentInteractionService.onSubmit(
@@ -134,6 +138,8 @@ export class InteractiveTextInputComponent implements OnInit {
       return;
     }
     this.answer = answer;
+    this.currentInteractionService.updateCurrentAnswer(this.answer);
+    this.errorMessageI18nKey = '';
     this.changeDetectorRef.detectChanges();
   }
 }
