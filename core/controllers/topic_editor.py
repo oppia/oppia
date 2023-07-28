@@ -18,6 +18,7 @@ are created.
 
 from __future__ import annotations
 
+import datetime
 import logging
 
 from core import feconf
@@ -149,8 +150,43 @@ class TopicEditorStoryHandler(
         additional_story_summary_dicts = [
             summary.to_dict() for summary in additional_story_summaries]
 
+        canonical_stories_ids = [summary['id'] for
+            summary in canonical_story_summary_dicts]
+        canonical_stories = story_fetchers.get_stories_by_ids(
+            canonical_stories_ids)
+        non_empty_canonical_stories = [story for story in
+            canonical_stories if story is not None]
         updated_canonical_story_summary_dicts = []
         for summary in canonical_story_summary_dicts:
+            story = None
+            for canonical_story in non_empty_canonical_stories:
+                if canonical_story.id == summary['id']:
+                    story = canonical_story
+            if story is None:
+                continue
+            nodes = story.story_contents.nodes
+            total_chapters_count = len(nodes)
+            published_chapters_count = 0
+            upcoming_chapters_count = 0
+            overdue_chapters_count = 0
+            upcoming_chapters_expected_days = []
+            for node in nodes:
+                if node.status == constants.STORYNODE_STATUS_PUBLISHED:
+                    published_chapters_count += 1
+                if (node.status != constants.STORYNODE_STATUS_PUBLISHED and
+                    node.planned_publication_date is not None):
+                    if ((node.planned_publication_date - datetime.datetime.
+                        today()).days < 14 and node.planned_publication_date >
+                        datetime.datetime.today()):
+                        upcoming_chapters_count += 1
+                        upcoming_chapters_expected_days.append((
+                            node.planned_publication_date - datetime.datetime.
+                            today()).days)
+                    if (node.planned_publication_date <
+                        datetime.datetime.today()):
+                        overdue_chapters_count += 1
+
+            upcoming_chapters_expected_days.sort()
             updated_canonical_story_summary_dict = {
                 'id': summary['id'],
                 'title': summary['title'],
@@ -166,7 +202,13 @@ class TopicEditorStoryHandler(
                 'story_is_published': (
                     story_id_to_publication_status_map[summary['id']]),
                 'completed_node_titles': [],
-                'all_node_dicts': []
+                'all_node_dicts': [],
+                'total_chapters_count': total_chapters_count,
+                'published_chapters_count': published_chapters_count,
+                'upcoming_chapters_count': upcoming_chapters_count,
+                'upcoming_chapters_expected_days': (
+                    upcoming_chapters_expected_days),
+                'overdue_chapters_count': overdue_chapters_count
             }
             updated_canonical_story_summary_dicts.append(
                 updated_canonical_story_summary_dict

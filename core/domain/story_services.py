@@ -289,6 +289,77 @@ def apply_change_list(
                         update_node_exploration_id_cmd.node_id,
                         update_node_exploration_id_cmd.new_value
                     )
+                elif (change.property_name ==
+                        story_domain.STORY_NODE_PROPERTY_STATUS):
+                    # Here we use cast because this 'elif'
+                    # condition forces change to have type
+                    # UpdateStoryNodePropertyStatusCmd.
+                    update_node_status_cmd = cast(
+                        story_domain.UpdateStoryNodePropertyStatusCmd,
+                        change
+                    )
+                    story.update_node_status(
+                        update_node_status_cmd.node_id,
+                        update_node_status_cmd.new_value
+                    )
+
+                elif (change.property_name ==
+                        story_domain.
+                        STORY_NODE_PROPERTY_PLANNED_PUBLICATION_DATE):
+                    # Here we use cast because this 'elif'
+                    # condition forces change to have type
+                    # UpdateStoryNodePropertyPlannedPublicationDateCmd.
+                    update_node_planned_publication_date_cmd = cast(
+                        story_domain.
+                        UpdateStoryNodePropertyPlannedPublicationDateCmd,
+                        change
+                    )
+                    story.update_node_planned_publication_date(
+                        update_node_planned_publication_date_cmd.node_id,
+                        update_node_planned_publication_date_cmd.new_value
+                    )
+                elif (change.property_name ==
+                        story_domain.STORY_NODE_PROPERTY_LAST_MODIFIED):
+                    # Here we use cast because this 'elif'
+                    # condition forces change to have type
+                    # UpdateStoryNodePropertyLastModifiedCmd.
+                    update_node_last_modified_cmd = cast(
+                        story_domain.UpdateStoryNodePropertyLastModifiedCmd,
+                        change
+                    )
+                    story.update_node_last_modified(
+                        update_node_last_modified_cmd.node_id,
+                        update_node_last_modified_cmd.new_value
+                    )
+                elif (change.property_name ==
+                        story_domain.
+                        STORY_NODE_PROPERTY_FIRST_PUBLICATION_DATE):
+                    # Here we use cast because this 'elif'
+                    # condition forces change to have type
+                    # UpdateStoryNodePropertyFirstPublicationDateCmd.
+                    update_node_first_publication_date_cmd = cast(
+                        story_domain.
+                        UpdateStoryNodePropertyFirstPublicationDateCmd,
+                        change
+                    )
+                    story.update_node_first_publication_date(
+                        update_node_first_publication_date_cmd.node_id,
+                        update_node_first_publication_date_cmd.new_value
+                    )
+                elif (change.property_name ==
+                        story_domain.STORY_NODE_PROPERTY_UNPUBLISHING_REASON):
+                    # Here we use cast because this 'elif'
+                    # condition forces change to have type
+                    # UpdateStoryNodePropertyUnpublishingReasonCmd.
+                    update_node_unpublishing_reason_cmd = cast(
+                        story_domain.
+                        UpdateStoryNodePropertyUnpublishingReasonCmd,
+                        change
+                    )
+                    story.update_node_unpublishing_reason(
+                        update_node_unpublishing_reason_cmd.node_id,
+                        update_node_unpublishing_reason_cmd.new_value
+                    )
             elif change.cmd == story_domain.CMD_UPDATE_STORY_PROPERTY:
                 # Here we use cast because we are narrowing down the type from
                 # StoryChange to a specific change command.
