@@ -60,6 +60,7 @@
 
   .oppia-contact-page-content {
     margin-top: 100px;
+    text-align: center;
   }
 
   .oppia-contact-page {
@@ -103,10 +104,6 @@
     width: 250px;
   }
 
-  .oppia-contact-page-content {
-    text-align: center;
-  }
-
   #donate {
     margin-bottom: 17px;
   }
@@ -121,23 +118,21 @@
 
   .hover-button {
     background-color: #00645c;
-    color: #fff;
     border: none;
+    color: #fff;
     cursor: pointer;
-    position: relative;
-    z-index: 1;
     overflow: hidden;
+    position: relative;
     transition: background-color 0.3s ease;
+    z-index: 1;
   }
-  
   .hover-button:hover::before {
-    content: "";
+    background-color: rgba(128, 128, 128, 0.3);
+    height: 100%;
+    left: 0;
     position: absolute;
     top: 0;
-    left: 0;
     width: 100%;
-    height: 100%;
-    background-color: rgba(128, 128, 128, 0.3);
     z-index: -1;
   }
 
@@ -150,29 +145,25 @@
 
   @media (max-width: 950px) and (min-width: 843px) {
     .oppia-contact-page-content button {
-      padding: 5px 30px;
       height: auto;
+      padding: 5px 30px;
       width: auto;
     }
   }
 
   @media (max-width: 475px) {
-    
     .oppia-contact-page-content p {
       margin: 20px 20px 30px 20px;
     }
   }
 
   @media (max-width: 375px) {
-    
     .oppia-contact-page-content button {
       width: 225px;
     }
-
   }
 
   @media (max-width: 842px) {
-
     .flex {
       display: flex;
       flex-direction: column;
@@ -187,4 +178,5 @@
       margin-bottom: 200px;
     }
   }
+
 </style>
