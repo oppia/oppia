@@ -75,7 +75,7 @@
       </svg>
 
       <g *ngFor="let button of buttons; let idx = index" #optionButtons>
-        <rect attr.class="e2e-test-{{(button.description | translate).replace(' ','-')}}-button"
+        <rect attr.class="graph-button e2e-test-{{(button.description | translate).replace(' ','-')}}-button"
               tabindex="0"
               width="140"
               (keydown)="handleKeyDown($event)"

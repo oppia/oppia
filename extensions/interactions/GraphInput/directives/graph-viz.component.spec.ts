@@ -809,8 +809,8 @@ describe('GraphVizComponent', () => {
       document.createElement('button')
     ];
 
-    buttonElements[0].classList.add('e2e-test-one-button');
-    buttonElements[1].classList.add('e2e-test-two-button');
+    buttonElements[0].classList.add('graph-button');
+    buttonElements[1].classList.add('graph-button');
 
     spyOn(document, 'querySelector').and.returnValue(dotElement);
     spyOn(document, 'querySelectorAll').and.returnValue(buttonElements);
@@ -856,8 +856,8 @@ describe('GraphVizComponent', () => {
       document.createElement('button')
     ];
 
-    buttonElements[0].classList.add('e2e-test-one-button');
-    buttonElements[1].classList.add('e2e-test-two-button');
+    buttonElements[0].classList.add('graph-button');
+    buttonElements[1].classList.add('graph-button');
 
     spyOn(document, 'querySelector').and.returnValue(dotElement);
     spyOn(document, 'querySelectorAll').and.returnValue(buttonElements);

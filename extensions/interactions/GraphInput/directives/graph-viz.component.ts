@@ -327,7 +327,7 @@ export class GraphVizComponent implements OnInit, AfterViewInit {
     const dotElement = document.querySelector(
       '.oppia-add-node-cursor') as HTMLDivElement;
     const buttonElements = document.querySelectorAll(
-      '[class^="e2e-test-"][class$="-button"]');
+      'graph-button');
 
     if (!dotElement || !buttonElements || buttonElements.length === 0) {
       return false;
