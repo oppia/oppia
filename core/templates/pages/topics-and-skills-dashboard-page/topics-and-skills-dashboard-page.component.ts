@@ -65,7 +65,6 @@ export class TopicsAndSkillsDashboardPageComponent {
 
   activeTab!: string;
   filterBoxIsShown: boolean = false;
-  filterBoxNumber: number = 0;
   filterObject!: TopicsAndSkillsDashboardFilter;
   fetchSkillsDebounced!: () => void;
   lastPage!: number;
@@ -88,6 +87,7 @@ export class TopicsAndSkillsDashboardPageComponent {
   displayedTopicSummaries: CreatorTopicSummary[] = [];
   displayedSkillSummaries: SkillSummary[] = [];
   skillStatusOptions: string[] = [];
+  prevWidth: number = window.innerWidth;
 
   constructor(
     private focusManagerService: FocusManagerService,
@@ -103,9 +103,6 @@ export class TopicsAndSkillsDashboardPageComponent {
   ngOnInit(): void {
     this.activeTab = this.TAB_NAME_TOPICS;
     this.filterBoxIsShown = !this.windowDimensionsService.isWindowNarrow();
-    this.filterBoxNumber = (
-      this.windowDimensionsService
-        .isWindowNarrow()) ? 0 : 1;
     this.filterObject = TopicsAndSkillsDashboardFilter.createDefault();
 
     for (let key in TopicsAndSkillsDashboardPageConstants.TOPIC_SORT_OPTIONS) {
@@ -301,16 +298,14 @@ export class TopicsAndSkillsDashboardPageComponent {
 
   toggleFilterBox(): void {
     this.filterBoxIsShown = !this.filterBoxIsShown;
-    if (this.filterBoxNumber === 0) {
-      this.filterBoxNumber = 1;
-    } else if (this.filterBoxNumber === 1) {
-      this.filterBoxNumber = 0;
-    }
   }
 
   @HostListener('window:resize')
   filterBoxOnResize(): void {
-    this.filterBoxIsShown = !this.windowDimensionsService.isWindowNarrow();
+    if (window.innerWidth !== this.prevWidth) {
+      this.prevWidth = window.innerWidth;
+      this.filterBoxIsShown = !this.windowDimensionsService.isWindowNarrow();
+    }
   }
 
   getUpperLimitValueForPagination(): number {
