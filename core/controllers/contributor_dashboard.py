@@ -70,6 +70,7 @@ class ContributorDashboardPage(
 
     @acl_decorators.open_access
     def get(self) -> None:
+        """Handles GET requests and renders the contributor dashboard page."""
         self.render_template('contributor-dashboard-page.mainpage.html')
 
 
@@ -126,7 +127,15 @@ class ContributionOpportunitiesHandler(
 
     @acl_decorators.open_access
     def get(self, opportunity_type: str) -> None:
-        """Handles GET requests."""
+        """Handles GET requests and retrieves data based on the opportunity type
+
+        Args:
+            opportunity_type: str. The opportunity type.
+
+        Raises:
+            PageNotFoundException. The opportunity type is invalid.
+            InvalidInputException. If language code is None.
+        """
         assert self.normalized_request is not None
         search_cursor = self.normalized_request.get('cursor')
         language_code = self.normalized_request.get('language_code')
@@ -442,7 +451,11 @@ class TranslatableTextHandler(
 
     @acl_decorators.open_access
     def get(self) -> None:
-        """Handles GET requests."""
+        """Handles GET requests for rendering translation-related data.
+
+        Raises:
+            InvalidInputException. If the exploration ID is invalid.
+        """
         assert self.normalized_request is not None
         language_code = self.normalized_request['language_code']
         exp_id = self.normalized_request['exp_id']
@@ -729,7 +742,7 @@ class UserContributionRightsDataHandler(
 
     @acl_decorators.open_access
     def get(self) -> None:
-        """Handles GET requests."""
+        """Handles GET requests for retrieving user contribution rights."""
         contribution_rights = None
         if self.username:
             # Here we are sure that 'user_id' is not None because
@@ -766,7 +779,7 @@ class FeaturedTranslationLanguagesHandler(
 
     @acl_decorators.open_access
     def get(self) -> None:
-        """Handles GET requests."""
+        """Handles GET requests for retrieving translation languages."""
         self.render_json({
             'featured_translation_languages':
                 constants.FEATURED_TRANSLATION_LANGUAGES
@@ -831,7 +844,9 @@ class TranslationPreferenceHandler(
 
     @acl_decorators.can_manage_own_account
     def get(self) -> None:
-        """Handles GET requests."""
+        """Handles GET requests.
+        Retrieves the preferred translation language code.
+        """
         assert self.user_id is not None
         user_settings = user_services.get_user_settings(self.user_id)
         return self.render_json({
@@ -841,7 +856,9 @@ class TranslationPreferenceHandler(
 
     @acl_decorators.can_manage_own_account
     def post(self) -> None:
-        """Handles POST requests."""
+        """Handles POST requests for updating the
+        user preferred translation language.
+        """
         assert self.user_id is not None
         assert self.normalized_payload is not None
         language_code = self.normalized_payload['language_code']
@@ -882,7 +899,17 @@ class ContributorStatsSummariesHandler(
         contribution_subtype: str,
         username: str
     ) -> None:
-        """Handles GET requests."""
+        """Handles GET requests.
+
+        Args:
+            contribution_type: str. The contribution type.
+            contribution_subtype: str. The contribution subtype.
+            username: str. The username.
+
+        Raises:
+            InvalidInputException. The contribution type or the contribution
+                subtype is invalid.
+        """
         if contribution_type not in [
             feconf.CONTRIBUTION_TYPE_TRANSLATION,
             feconf.CONTRIBUTION_TYPE_QUESTION
