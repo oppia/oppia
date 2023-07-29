@@ -17,6 +17,7 @@
 """Unit tests for core.domain.exp_fetchers."""
 
 from __future__ import annotations
+import datetime
 
 from core import feconf
 from core.domain import caching_services
@@ -36,8 +37,10 @@ from typing import Final
 MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import exp_models
+    from mypy_imports import user_models
 
-(exp_models,) = models.Registry.import_models([models.Names.EXPLORATION])
+(exp_models, user_models, stats_models) = models.Registry.import_models(
+    [models.Names.EXPLORATION, models.Names.USER, models.Names.STATISTICS])
 
 
 class ExplorationRetrievalTests(test_utils.GenericTestBase):
@@ -1021,15 +1024,54 @@ title: Old Title
         user_id = user_services.create_new_user(auth_id, user_email).user_id
         user_services.set_username(user_id, username)
         exp_id = exp_fetchers.get_new_exploration_id()
+        exp_id_1 = exp_fetchers.get_new_exploration_id()
+
         self.save_new_valid_exploration(exp_id, user_id)
+        self.save_new_valid_exploration(exp_id_1, user_id)
 
         user_services.update_learner_checkpoint_progress(
-            user_id, exp_id, 'Introduction', 1)
+            user_id, exp_id_1, 'Introduction', 1)
+
+        user_progress = exp_fetchers.get_user_progress_in_exploration(
+            user_id, [exp_id, exp_id_1])
+
+        self.assertEqual(len(user_progress), 2)
+        self.assertEqual(user_progress[0]['exploration_id'], exp_id)
+        self.assertEqual(user_progress[0]['visited_checkpoints_count'], 0)
+        self.assertEqual(user_progress[0]['total_checkpoints_count'], 1)
+
+    def test_get_user_progress_in_exploration_model_is_not_none(self) -> None:
+        auth_id: str = 'test_id'
+        username: str = 'testname'
+        user_email: str = 'test@email.com'
+        user_id = user_services.create_new_user(auth_id, user_email).user_id
+        user_services.set_username(user_id, username)
+        exp_id = exp_fetchers.get_new_exploration_id()
+        self.save_new_valid_exploration(exp_id, user_id)
+
+        datetime_object: Final = datetime.datetime.strptime(
+        '2016-02-16', '%Y-%m-%d'
+        )
+        user_models.ExplorationUserDataModel(
+            id='%s.%s' % (user_id, exp_id),
+            user_id=user_id,
+            exploration_id=exp_id,
+            rating=2,
+            rated_on=datetime_object,
+            draft_change_list={'new_content': {}},
+            draft_change_list_last_updated=datetime_object,
+            draft_change_list_exp_version=3,
+            draft_change_list_id=1,
+            furthest_reached_checkpoint_exp_version=1,
+            furthest_reached_checkpoint_state_name='checkpoint1',
+            most_recently_reached_checkpoint_exp_version=1,
+            most_recently_reached_checkpoint_state_name=None
+        ).put()
 
         user_progress = exp_fetchers.get_user_progress_in_exploration(
             user_id, [exp_id])
 
         self.assertEqual(len(user_progress), 1)
         self.assertEqual(user_progress[0]['exploration_id'], exp_id)
-        self.assertEqual(user_progress[0]['visited_checkpoints_count'], 1)
+        self.assertEqual(user_progress[0]['visited_checkpoints_count'], 0)
         self.assertEqual(user_progress[0]['total_checkpoints_count'], 1)
