@@ -3419,19 +3419,6 @@ oppia-noninteractive-link {
   z-index: 1;
 }
 
-.oppia-static-full-content {
-  margin-bottom: 0;
-  margin-top: 0;
-  padding: 0;
-  position: relative;
-  top: 0;
-  width: 100%;
-}
-
-.oppia-static-card-full-content {
-  padding: 1% 0 20% 0;
-}
-
 .oppia-static-content {
   margin-bottom: 0;
   margin-top: 0;
