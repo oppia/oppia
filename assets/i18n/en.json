@@ -822,7 +822,7 @@
     "I18N_LEARNER_DASHBOARD_SUGGESTION_SUGGESTED_STATE_CONTENT_HEADER": "Suggested:",
     "I18N_LEARNER_DASHBOARD_SUGGESTION_TEXT": "Suggestion",
     "I18N_LEARNER_DASHBOARD_TOOLTIP": "Collections are multiple related explorations that are intended to be completed in a sequence.",
-    "118N_LEARNER_DASHBOARD_TOPICS_AVAILABLE_IN_OPPIA_CLASSROOM": "Topics available in Oppia's Classroom",
+    "I18N_LEARNER_DASHBOARD_TOPICS_AVAILABLE_IN_OPPIA_CLASSROOM": "Topics available in Oppia's Classroom",
     "I18N_LEARNER_DASHBOARD_VIEW": "View",
     "I18N_LEARNER_DASHBOARD_WELCOME": "Welcome",
     "I18N_LEARNER_GROUPS_SECTION_TITLE": "Your Learner Groups",

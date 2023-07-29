@@ -121,7 +121,7 @@ oppia-exploration-summary-tile .oppia-learner-dashboard-exploration-title {
   word-wrap: break-word;
 }
 oppia-exploration-summary-tile .continue-button {
-  background: #FFFFFF 0% 0% no-repeat padding-box;
+  background: #fff 0% 0% no-repeat padding-box;
   border: 1px solid #00645c;
   border-radius: 4px;
   height: 36px;

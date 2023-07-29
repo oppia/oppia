@@ -70,7 +70,7 @@
     </div>
     <div *ngFor="let item of untrackedTopics | keyvalue" class="untracked-topics">
       <oppia-carousel-bar [scrollUntrackedTopics]="true" [carouselClassname]="'.untracked '"
-        [carouselHeading]="'118N_LEARNER_DASHBOARD_TOPICS_AVAILABLE_IN_OPPIA_CLASSROOM'">
+        [carouselHeading]="'I18N_LEARNER_DASHBOARD_TOPICS_AVAILABLE_IN_OPPIA_CLASSROOM'">
         <div *ngFor="let topicSummaryTile of item.value" class="topic-summary-tile">
           <oppia-learner-topic-summary-tile
                                             [topicSummary]="topicSummaryTile"
