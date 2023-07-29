@@ -255,6 +255,8 @@
 }
 
 .splash-page .oppia-splash-section-six-right {
+  display: flex;
+  flex-direction: column;
   margin-bottom: auto;
   margin-left: auto;
   margin-top: auto;
