@@ -63,7 +63,6 @@ interface SuggestionDetailsDict {
   };
 }
 
-
 // Represents a client-facing response to a fetch suggestion query.
 export interface FetchSuggestionsResponse {
   // A dict mapping suggestion ID to suggestion metadata.
@@ -207,14 +206,13 @@ export class ContributionAndReviewService {
               exploration.getStates(),
               exploration.initStateName));
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          const responseSuggestionIdToDetails: {[key: string]: any} = {};
+          const responseSuggestionIdToDetails: SuggestionDetailsDict = {};
           sortedTranslationSuggestions.forEach((suggestion) => {
             const suggestionDetails = {
               suggestion: suggestion,
               details: (
-                fetchSuggestionsResponse.
-                target_id_to_opportunity_dict
-                [suggestion.target_id])
+                fetchSuggestionsResponse.target_id_to_opportunity_dict[
+                  suggestion.target_id])
             };
             responseSuggestionIdToDetails[
               suggestion.suggestion_id] = suggestionDetails;
@@ -227,13 +225,11 @@ export class ContributionAndReviewService {
     );
   }
 
-  // Function to sort translation cards by state.
   sortTranslationSuggestionsByState(
       translationSuggestions: SuggestionBackendDict[],
       states: States,
       initStateName: string | null
   ): SuggestionBackendDict[] {
-    // Obtain the state names in the order of content flow in the lesson.
     if (!initStateName) {
       return translationSuggestions;
     }
@@ -253,7 +249,7 @@ export class ContributionAndReviewService {
       const cardsForState = (
         translationSuggestionsByState.get(stateName) || []);
       cardsForState.sort(ContributionAndReviewService
-        .compareTranslationSuggestions.bind(this));
+        .compareTranslationSuggestions);
       sortedTranslationCards.push(...cardsForState);
     }
     return sortedTranslationCards;
@@ -272,26 +268,6 @@ export class ContributionAndReviewService {
       translationSuggestionsByState.set(stateName, suggestionsForState);
     }
     return translationSuggestionsByState;
-  }
-
-  // Returns the type order for a given content ID.
-  static getTypeOrder(contentId: string): number {
-    const type = contentId.split('_')[0];
-    const order: { [key: string]: number } = {
-      'content': 0, // eslint-disable-line quote-props
-      'interaction': 1, // eslint-disable-line quote-props
-      'feedback': 2, // eslint-disable-line quote-props
-      'default': 3, 
-      'hints': 4, // eslint-disable-line quote-props
-      'solution': 5 // eslint-disable-line quote-props
-    };
-    return order.hasOwnProperty(type) ? order[type] : Number.MAX_SAFE_INTEGER;
-  }
-
-  // Returns index for a given content ID.
-  static getIndex(contentId: string): number {
-    const index = parseInt(contentId.split('_')[1]);
-    return isNaN(index) ? Number.MAX_SAFE_INTEGER : index;
   }
 
   // Compares translation suggestions based on type and index.
@@ -314,6 +290,27 @@ export class ContributionAndReviewService {
 
       return cardAIndex - cardBIndex;
     }
+  }
+
+  // Returns the type order for a given content ID.
+  static getTypeOrder(contentId: string): number {
+    const type = contentId.split('_')[0];
+    return this.orderMap.get(type) ?? Number.MAX_SAFE_INTEGER;
+  }
+
+  private static readonly orderMap: Map<string, number> = new Map([
+    ['content', 0],
+    ['interaction', 1],
+    ['feedback', 2],
+    ['default', 3],
+    ['hints', 4],
+    ['solution', 5]
+  ]);
+
+  // Returns index for a given content ID.
+  static getIndex(contentId: string): number {
+    const index = parseInt(contentId.split('_')[1]);
+    return isNaN(index) ? Number.MAX_SAFE_INTEGER : index;
   }
 
   async getUserCreatedQuestionSuggestionsAsync(

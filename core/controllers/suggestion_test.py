@@ -3179,6 +3179,16 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
             expected_status_int=404
         )
 
+    def test_skill_handler_with_no_limit_raise_error(self) -> None:
+        self.get_json(
+            '/getreviewablesuggestions/exploration/invalid_suggestion_type', {
+                'limit': constants.OPPORTUNITIES_PAGE_SIZE,
+                'offset': 0,
+                'sort_key': constants.SUGGESTIONS_SORT_KEY_DATE
+            },
+            expected_status_int=404
+        )
+
     def test_handler_with_invalid_target_type_raise_error(self) -> None:
         self.get_json(
             '/getreviewablesuggestions/invalid_target_type/translate_content', {

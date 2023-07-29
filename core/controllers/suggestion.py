@@ -771,11 +771,13 @@ class ReviewableSuggestionsHandler(
                 .get_suggestions_with_editable_explorations(
                     reviewable_suggestions))
         elif suggestion_type == feconf.SUGGESTION_TYPE_ADD_QUESTION:
-            if limit:
-                suggestions, next_offset = (
-                    suggestion_services
-                    .get_reviewable_question_suggestions_by_offset(
-                        self.user_id, limit, offset, sort_key))
+            if limit is None:
+                raise ValueError("Limit must be provided for question suggestions.")
+
+            suggestions, next_offset = (
+                suggestion_services
+                .get_reviewable_question_suggestions_by_offset(
+                    self.user_id, limit, offset, sort_key))
         self._render_suggestions(target_type, suggestions, next_offset)
 
 
