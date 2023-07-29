@@ -285,7 +285,8 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
     this.directiveSubscriptions.add(
       this.windowDimensionsService.getResizeEvent().subscribe(evt => {
         this.windowIsNarrow = this.windowDimensionsService.isWindowNarrow();
-      this.windowRef.nativeWindow.document.body.style.overflowY = this.windowIsNarrow ? 'auto' : '';
+        this.windowRef.nativeWindow.document.body.style.overflowY =
+          this.windowIsNarrow ? 'auto' : '';
         // If window is resized larger, try displaying the hidden
         // elements.
         if (
