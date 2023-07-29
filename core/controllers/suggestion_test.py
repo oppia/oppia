@@ -3181,8 +3181,8 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
 
     def test_skill_handler_with_no_limit_raise_error(self) -> None:
         self.get_json(
-            '/getreviewablesuggestions/exploration/invalid_suggestion_type', {
-                'limit': constants.OPPORTUNITIES_PAGE_SIZE,
+            '/getreviewablesuggestions/skill/add_question', {
+                'limit': None,
                 'offset': 0,
                 'sort_key': constants.SUGGESTIONS_SORT_KEY_DATE
             },
