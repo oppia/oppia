@@ -57,6 +57,13 @@ STORY_NODE_PROPERTY_DESCRIPTION: Final = 'description'
 STORY_NODE_PROPERTY_THUMBNAIL_BG_COLOR: Final = 'thumbnail_bg_color'
 STORY_NODE_PROPERTY_THUMBNAIL_FILENAME: Final = 'thumbnail_filename'
 STORY_NODE_PROPERTY_EXPLORATION_ID: Final = 'exploration_id'
+STORY_NODE_PROPERTY_STATUS: Final = 'status'
+STORY_NODE_PROPERTY_PLANNED_PUBLICATION_DATE: Final = (
+    'planned_publication_date_msecs')
+STORY_NODE_PROPERTY_LAST_MODIFIED: Final = 'last_modified_msecs'
+STORY_NODE_PROPERTY_FIRST_PUBLICATION_DATE: Final = (
+    'first_publication_date_msecs')
+STORY_NODE_PROPERTY_UNPUBLISHING_REASON: Final = 'unpublishing_reason'
 
 
 INITIAL_NODE_ID: Final = 'initial_node_id'
@@ -129,7 +136,12 @@ class StoryChange(change_domain.BaseChange):
         STORY_NODE_PROPERTY_TITLE,
         STORY_NODE_PROPERTY_DESCRIPTION,
         STORY_NODE_PROPERTY_THUMBNAIL_BG_COLOR,
-        STORY_NODE_PROPERTY_THUMBNAIL_FILENAME
+        STORY_NODE_PROPERTY_THUMBNAIL_FILENAME,
+        STORY_NODE_PROPERTY_STATUS,
+        STORY_NODE_PROPERTY_PLANNED_PUBLICATION_DATE,
+        STORY_NODE_PROPERTY_LAST_MODIFIED,
+        STORY_NODE_PROPERTY_FIRST_PUBLICATION_DATE,
+        STORY_NODE_PROPERTY_UNPUBLISHING_REASON
     ]
 
     # The allowed list of story content properties which can be used in
@@ -376,6 +388,71 @@ class UpdateStoryNodePropertyThumbnailFilenameCmd(StoryChange):
     old_value: str
 
 
+class UpdateStoryNodePropertyStatusCmd(StoryChange):
+    """Class representing the StoryChange's
+    CMD_UPDATE_STORY_NODE_PROPERTY command with
+    STORY_NODE_PROPERTY_STATUS as
+    allowed value.
+    """
+
+    node_id: str
+    property_name: Literal['status']
+    new_value: str
+    old_value: str
+
+
+class UpdateStoryNodePropertyLastModifiedCmd(StoryChange):
+    """Class representing the StoryChange's
+    CMD_UPDATE_STORY_NODE_PROPERTY command with
+    STORY_NODE_PROPERTY_LAST_MODIFIED as
+    allowed value.
+    """
+
+    node_id: str
+    property_name: Literal['last_modified_msecs']
+    new_value: float
+    old_value: float
+
+
+class UpdateStoryNodePropertyPlannedPublicationDateCmd(StoryChange):
+    """Class representing the StoryChange's
+    CMD_UPDATE_STORY_NODE_PROPERTY command with
+    STORY_NODE_PROPERTY_PLANNED_PUBLICATION_DATE as
+    allowed value.
+    """
+
+    node_id: str
+    property_name: Literal['planned_publication_date_msecs']
+    new_value: float
+    old_value: float
+
+
+class UpdateStoryNodePropertyFirstPublicationDateCmd(StoryChange):
+    """Class representing the StoryChange's
+    CMD_UPDATE_STORY_NODE_PROPERTY command with
+    STORY_NODE_PROPERTY_FIRST_PUBLICATION_DATE as
+    allowed value.
+    """
+
+    node_id: str
+    property_name: Literal['first_publication_date_msecs']
+    new_value: float
+    old_value: float
+
+
+class UpdateStoryNodePropertyUnpublishingReasonCmd(StoryChange):
+    """Class representing the StoryChange's
+    CMD_UPDATE_STORY_NODE_PROPERTY command with
+    STORY_NODE_PROPERTY_UNPUBLISHING_REASON as
+    allowed value.
+    """
+
+    node_id: str
+    property_name: Literal['unpublishing_reason']
+    new_value: str
+    old_value: str
+
+
 class UpdateStoryPropertyCmd(StoryChange):
     """Class representing the StoryChange's
     CMD_UPDATE_STORY_PROPERTY command.
@@ -401,6 +478,11 @@ class StoryNodeDict(TypedDict):
     outline: str
     outline_is_finalized: bool
     exploration_id: Optional[str]
+    status: Optional[str]
+    planned_publication_date_msecs: Optional[float]
+    last_modified_msecs: Optional[float]
+    first_publication_date_msecs: Optional[float]
+    unpublishing_reason: Optional[str]
 
 
 class StoryNode:
@@ -421,7 +503,12 @@ class StoryNode:
         prerequisite_skill_ids: List[str],
         outline: str,
         outline_is_finalized: bool,
-        exploration_id: Optional[str]
+        exploration_id: Optional[str],
+        status: Optional[str],
+        planned_publication_date: Optional[datetime.datetime],
+        last_modified: Optional[datetime.datetime],
+        first_publication_date: Optional[datetime.datetime],
+        unpublishing_reason: Optional[str]
     ) -> None:
         """Initializes a StoryNode domain object.
 
@@ -450,6 +537,15 @@ class StoryNode:
                 story node. It can be None initially, when the story creator
                 has just created a story with the basic storyline (by providing
                 outlines) without linking an exploration to any node.
+            status: str. It is the publication status of the node.
+            planned_publication_date: datetime.datetime | None. It is the
+                expected publication date for a node.
+            last_modified: datetime.datetime | None. The date time when a node
+                was last modified.
+            first_publication_date: datetime.datetime | None. The date when
+                the node was first published.
+            unpublishing_reason: str or None. The reason for unpublishing this
+                node. It is None when the node is published.
         """
         self.id = node_id
         self.title = title
@@ -463,6 +559,11 @@ class StoryNode:
         self.outline = html_cleaner.clean(outline)
         self.outline_is_finalized = outline_is_finalized
         self.exploration_id = exploration_id
+        self.status = status
+        self.planned_publication_date = planned_publication_date
+        self.last_modified = last_modified
+        self.first_publication_date = first_publication_date
+        self.unpublishing_reason = unpublishing_reason
 
     @classmethod
     def get_number_from_node_id(cls, node_id: str) -> int:
@@ -531,6 +632,32 @@ class StoryNode:
         return thumbnail_bg_color in constants.ALLOWED_THUMBNAIL_BG_COLORS[
             'chapter']
 
+    @classmethod
+    def require_valid_status(cls, status: str) -> bool:
+        """Checks whether the status of the story node is valid.
+
+        Args:
+            status: str. The status to validate.
+
+        Returns:
+            bool. Whether the status is valid or not.
+        """
+        return status in constants.ALLOWED_STORYNODE_STATUS
+
+    @classmethod
+    def require_valid_unpublishing_reason(
+        cls, unpublishing_reason: str) -> bool:
+        """Checks whether the unpublishing reason of the story node is valid.
+
+        Args:
+            unpublishing_reason: str. The unpublishing reason to validate.
+
+        Returns:
+            bool. Whether the unpublishing reason is valid or not.
+        """
+        return unpublishing_reason in (
+            constants.ALLOWED_STORYNODE_UNPUBLISHING_REASONS)
+
     def to_dict(self) -> StoryNodeDict:
         """Returns a dict representing this StoryNode domain object.
 
@@ -549,7 +676,17 @@ class StoryNode:
             'prerequisite_skill_ids': self.prerequisite_skill_ids,
             'outline': self.outline,
             'outline_is_finalized': self.outline_is_finalized,
-            'exploration_id': self.exploration_id
+            'exploration_id': self.exploration_id,
+            'status': self.status,
+            'planned_publication_date_msecs': utils.get_time_in_millisecs(
+                self.planned_publication_date) if self.planned_publication_date
+                else None,
+            'last_modified_msecs': utils.get_time_in_millisecs(
+                self.last_modified) if self.last_modified else None,
+            'first_publication_date_msecs': utils.get_time_in_millisecs(
+                self.first_publication_date) if self.first_publication_date
+                else None,
+            'unpublishing_reason': self.unpublishing_reason
         }
 
     @classmethod
@@ -562,6 +699,18 @@ class StoryNode:
         Returns:
             StoryNode. The corresponding StoryNode domain object.
         """
+        planned_publication_date_msecs = (
+            node_dict['planned_publication_date_msecs'] if
+            'planned_publication_date_msecs' in node_dict and
+            node_dict['planned_publication_date_msecs'] else None)
+        last_modified_msecs = (
+                node_dict['last_modified_msecs'] if
+                'last_modified_msecs' in node_dict and
+                node_dict['last_modified_msecs'] else None)
+        first_publication_date_msecs = (
+                node_dict['first_publication_date_msecs'] if
+                'first_publication_date_msecs' in node_dict and
+                node_dict['first_publication_date_msecs'] else None)
         node = cls(
             node_dict['id'],
             node_dict['title'],
@@ -574,9 +723,20 @@ class StoryNode:
             node_dict['prerequisite_skill_ids'],
             node_dict['outline'],
             node_dict['outline_is_finalized'],
-            node_dict['exploration_id']
+            node_dict['exploration_id'],
+            node_dict['status'] if 'status' in node_dict else None,
+            utils.convert_millisecs_time_to_datetime_object(
+                planned_publication_date_msecs) if
+                planned_publication_date_msecs else None,
+            utils.convert_millisecs_time_to_datetime_object(
+                last_modified_msecs) if
+                last_modified_msecs else None,
+            utils.convert_millisecs_time_to_datetime_object(
+                first_publication_date_msecs) if
+                first_publication_date_msecs else None,
+            node_dict['unpublishing_reason'] if
+            'unpublishing_reason' in node_dict else None
         )
-
         return node
 
     @classmethod
@@ -593,7 +753,8 @@ class StoryNode:
         """
         return cls(
             node_id, title, '', None, None, None,
-            [], [], [], '', False, None)
+            [], [], [], '', False, None, 'Draft', None,
+            None, None, None)
 
     def validate(self) -> None:
         """Validates various properties of the story node.
@@ -712,6 +873,44 @@ class StoryNode:
             if node_id == self.id:
                 raise utils.ValidationError(
                     'The story node with ID %s points to itself.' % node_id)
+
+        if self.status:
+            if not isinstance(self.status, str):
+                raise utils.ValidationError(
+                    'Expected status to be a string, received %s' %
+                    self.status)
+            if not self.require_valid_status(self.status):
+                raise utils.ValidationError(
+                    'Chapter status cannot be %s ' % self.status)
+
+        if self.planned_publication_date and (
+            not isinstance(self.planned_publication_date, datetime.datetime)):
+            raise utils.ValidationError(
+                'Expected planned publication date to be a datetime, '
+                'received %s' % self.planned_publication_date)
+
+        if self.last_modified and (
+            not isinstance(self.last_modified, datetime.datetime)):
+            raise utils.ValidationError(
+                'Expected last modified to be a datetime, '
+                'received %s' % self.last_modified)
+
+        if self.first_publication_date and (
+            not isinstance(self.first_publication_date, datetime.datetime)):
+            raise utils.ValidationError(
+                'Expected first publication date to be a datetime, '
+                'received %s' % self.first_publication_date)
+
+        if self.unpublishing_reason:
+            if not isinstance(self.unpublishing_reason, str):
+                raise utils.ValidationError(
+                    'Expected unpublishing reason to be string, received %s' %
+                    self.unpublishing_reason)
+            if not self.require_valid_unpublishing_reason(
+                self.unpublishing_reason):
+                raise utils.ValidationError(
+                    'Chapter unpublishing reason cannot be %s ' %
+                    self.unpublishing_reason)
 
 
 class StoryContentsDict(TypedDict):
@@ -1804,6 +2003,72 @@ class Story:
         node_index = self.story_contents.get_node_index(node_id)
         self.story_contents.nodes[node_index].prerequisite_skill_ids = (
             new_prerequisite_skill_ids)
+
+    def update_node_status(self, node_id: str, new_status: str) -> None:
+        """Updates the status of a given node
+
+        Args:
+            node_id: str. The Id of the node.
+            new_status: str. The new publication status of the node.
+        """
+        node_index = self.story_contents.get_node_index(node_id)
+        self.story_contents.nodes[node_index].status = new_status
+
+    def update_node_planned_publication_date(
+            self, node_id: str,
+            new_planned_publication_date_msecs: float) -> None:
+        """Updates the planned publication date of a given node
+
+        Args:
+            node_id: str. The Id of the node.
+            new_planned_publication_date_msecs: float. The planned publication
+                date of the node in miliseconds.
+        """
+        node_index = self.story_contents.get_node_index(node_id)
+        self.story_contents.nodes[node_index].planned_publication_date = (
+            utils.convert_millisecs_time_to_datetime_object(
+                new_planned_publication_date_msecs))
+
+    def update_node_last_modified(
+            self, node_id: str, new_last_modified_msecs: float) -> None:
+        """Updates the last modified of a given node
+
+        Args:
+            node_id: str. The Id of the node.
+            new_last_modified_msecs: float. The last modified date time
+                of the node in miliseconds.
+        """
+        node_index = self.story_contents.get_node_index(node_id)
+        self.story_contents.nodes[node_index].last_modified = (
+            utils.convert_millisecs_time_to_datetime_object(
+            new_last_modified_msecs))
+
+    def update_node_first_publication_date(
+            self, node_id: str, new_publication_date_msecs: float) -> None:
+        """Updates the first publication date of a given node.
+
+        Args:
+            node_id: str. The Id of the node.
+            new_publication_date_msecs: float. The first publication date
+                of the node in miliseconds.
+        """
+        node_index = self.story_contents.get_node_index(node_id)
+        self.story_contents.nodes[node_index].first_publication_date = (
+            utils.convert_millisecs_time_to_datetime_object(
+                new_publication_date_msecs))
+
+    def update_node_unpublishing_reason(
+            self, node_id: str, new_unpublishing_reason: str) -> None:
+        """Updates the unpublishing reason of a given node.
+
+        Args:
+            node_id: str. The Id of the node.
+            new_unpublishing_reason: str. The reason behind unpublishing
+                this node.
+        """
+        node_index = self.story_contents.get_node_index(node_id)
+        self.story_contents.nodes[node_index].unpublishing_reason = (
+            new_unpublishing_reason)
 
     def update_node_destination_node_ids(
         self,
