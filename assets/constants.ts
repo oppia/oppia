@@ -414,6 +414,9 @@ export default {
   "ALLOWED_STORYNODE_STATUS": ["Draft", "Ready To Publish", "Published"],
   "ALLOWED_STORYNODE_UNPUBLISHING_REASONS": ["BAD_CONTENT",
     "CHAPTER_NEEDS_SPLITTING"],
+  "STORYNODE_STATUS_PUBLISHED": "Published",
+  "STORYNODE_STATUS_READY_TO_PUBLISH": "Ready To Publish",
+  "STORYNODE_STATUS_DRAFT": "Draft",
 
   "ALLOWED_IMAGE_FORMATS": ["svg", "png", "jpeg", "jpg", "gif"],
   "MAX_ALLOWED_IMAGE_SIZE_IN_KB_FOR_BLOG": 1024,
@@ -6383,8 +6386,6 @@ export default {
   // Maximum allowed length of unique progress url ID.
   "MAX_PROGRESS_URL_ID_LENGTH": 6,
 
-  "PLATFORM_PARAMETER_ALLOWED_BROWSER_TYPES": [
-    "Chrome", "Edge", "Safari", "Firefox", "Others"],
   "PLATFORM_PARAMETER_ALLOWED_PLATFORM_TYPES": ["Web", "Android", "Backend"],
   // The ordering of in ALLOWED_APP_VERSION_FLAVORS implies the ordering
   // of corresponding flavors, which is used in app_version_flavor filter for
