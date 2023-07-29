@@ -3186,7 +3186,7 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
                 'offset': 0,
                 'sort_key': constants.SUGGESTIONS_SORT_KEY_DATE
             },
-            expected_status_int=404
+            expected_status_int=400
         )
 
     def test_handler_with_invalid_target_type_raise_error(self) -> None:
