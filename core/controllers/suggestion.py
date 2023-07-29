@@ -748,6 +748,9 @@ class ReviewableSuggestionsHandler(
         Args:
             target_type: str. The type of the suggestion target.
             suggestion_type: str. The type of the suggestion.
+
+        Raises:
+            ValueError. If limit is None for question suggestions.
         """
         assert self.user_id is not None
         assert self.normalized_request is not None
@@ -772,7 +775,8 @@ class ReviewableSuggestionsHandler(
                     reviewable_suggestions))
         elif suggestion_type == feconf.SUGGESTION_TYPE_ADD_QUESTION:
             if limit is None:
-                raise ValueError("Limit must be provided for question suggestions.")
+                raise ValueError(
+                    'Limit must be provided for question suggestions.')
 
             suggestions, next_offset = (
                 suggestion_services

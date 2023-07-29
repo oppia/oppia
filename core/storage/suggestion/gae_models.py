@@ -681,8 +681,8 @@ class GeneralSuggestionModel(base_models.BaseModel):
 
         Args:
             limit: int|None. Maximum number of entities to be returned. If None,
-                returns all matching entities. This parameter is made optional due
-                to the sorting implementation required for sorting results
+                returns all matching entities. This parameter is made optional
+                due to the sorting implementation required for sorting results
                 client-side.
             offset: int. Number of results to skip from the beginning of all
                 results matching the query.

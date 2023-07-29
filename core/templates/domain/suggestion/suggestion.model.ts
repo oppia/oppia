@@ -25,7 +25,7 @@ interface SuggestionChangeBackendDict {
   'new_value': SuggestionChangeValue;
   'old_value': SuggestionChangeValue;
   'skill_id': string;
-  'content_id': string
+  'content_id': string;
 }
 
 export interface SuggestionBackendDict {

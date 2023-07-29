@@ -242,28 +242,29 @@ export class ContributionAndReviewService {
       );
     const translationSuggestionsByState = (
       ContributionAndReviewService
-      .groupTranslationSuggestionsByState(translationSuggestions));
+        .groupTranslationSuggestionsByState(translationSuggestions));
     const sortedTranslationCards: SuggestionBackendDict[] = [];
 
     for (const stateName of stateNamesInOrder) {
       const cardsForState = (
         translationSuggestionsByState.get(stateName) || []);
-      cardsForState.sort(ContributionAndReviewService
-        .compareTranslationSuggestions);
+      cardsForState.sort(
+        ContributionAndReviewService.compareTranslationSuggestions);
       sortedTranslationCards.push(...cardsForState);
     }
     return sortedTranslationCards;
   }
 
   static groupTranslationSuggestionsByState(
-    translationSuggestions: SuggestionBackendDict[]
-  ): Map<string, SuggestionBackendDict[]> {
+      translationSuggestions: SuggestionBackendDict[])
+    : Map<string, SuggestionBackendDict[]> {
     const translationSuggestionsByState = new Map<
     string, SuggestionBackendDict[]>();
 
     for (const translationSuggestion of translationSuggestions) {
       const stateName = translationSuggestion.change.state_name;
-      const suggestionsForState = translationSuggestionsByState.get(stateName) || [];
+      const suggestionsForState = translationSuggestionsByState.get(
+        stateName) || [];
       suggestionsForState.push(translationSuggestion);
       translationSuggestionsByState.set(stateName, suggestionsForState);
     }
@@ -272,21 +273,21 @@ export class ContributionAndReviewService {
 
   // Compares translation suggestions based on type and index.
   static compareTranslationSuggestions(
-    cardA: SuggestionBackendDict,
-    cardB: SuggestionBackendDict
+      cardA: SuggestionBackendDict,
+      cardB: SuggestionBackendDict
   ): number {
     const cardATypeOrder = ContributionAndReviewService.
-    getTypeOrder(cardA.change.content_id);
+      getTypeOrder(cardA.change.content_id);
     const cardBTypeOrder = ContributionAndReviewService
-    .getTypeOrder(cardB.change.content_id);
+      .getTypeOrder(cardB.change.content_id);
 
     if (cardATypeOrder !== cardBTypeOrder) {
       return cardATypeOrder - cardBTypeOrder;
     } else {
       const cardAIndex = ContributionAndReviewService
-      .getIndex(cardA.change.content_id);
+        .getIndex(cardA.change.content_id);
       const cardBIndex = ContributionAndReviewService
-      .getIndex(cardB.change.content_id);
+        .getIndex(cardB.change.content_id);
 
       return cardAIndex - cardBIndex;
     }

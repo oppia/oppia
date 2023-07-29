@@ -30,7 +30,7 @@ import { LoggerService } from 'services/contextual/logger.service';
 import { SubtitledUnicode } from
   'domain/exploration/SubtitledUnicodeObjectFactory';
 import { SubtitledHtmlBackendDict } from 'domain/exploration/subtitled-html.model';
-import {FetchExplorationBackendResponse } from './read-only-exploration-backend-api.service'
+import {FetchExplorationBackendResponse } from './read-only-exploration-backend-api.service';
 
 describe('Exploration object factory', () => {
   let eof: ExplorationObjectFactory;
@@ -41,7 +41,7 @@ describe('Exploration object factory', () => {
   let loggerErrorSpy: jasmine.Spy<(msg: string) => void>;
   let firstState: StateBackendDict;
   let secondState: StateBackendDict;
-  let mockReadOnlyExplorationData: FetchExplorationBackendResponse; 
+  let mockReadOnlyExplorationData: FetchExplorationBackendResponse;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -381,7 +381,8 @@ describe('Exploration object factory', () => {
   it('should create a exploration for given exploration' +
    'backend response', () => {
     const responseExploration = eof.
-    createFromExplorationBackendResponse(mockReadOnlyExplorationData);
+      createFromExplorationBackendResponse(
+        mockReadOnlyExplorationData);
 
     expect(responseExploration.getLanguageCode()).toBe('en');
     expect(responseExploration.getInteraction('first state')).toEqual(
