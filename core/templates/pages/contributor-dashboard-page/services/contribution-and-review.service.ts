@@ -295,8 +295,10 @@ export class ContributionAndReviewService {
   }
 
   // Compares translation suggestions based on type and index.
-  static compareTranslationSuggestions(cardA: SuggestionBackendDict,
-    cardB: SuggestionBackendDict): number {
+  static compareTranslationSuggestions(
+    cardA: SuggestionBackendDict,
+    cardB: SuggestionBackendDict
+  ): number {
     const cardATypeOrder = ContributionAndReviewService.
     getTypeOrder(cardA.change.content_id);
     const cardBTypeOrder = ContributionAndReviewService
