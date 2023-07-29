@@ -350,7 +350,7 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
                         {
                             'type': 'app_version',
                             'conditions': [
-                                ['=', '3.3.1']
+                                ['>=', '3.3.1']
                             ],
                         }
                     ],
