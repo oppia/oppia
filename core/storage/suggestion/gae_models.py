@@ -682,8 +682,8 @@ class GeneralSuggestionModel(base_models.BaseModel):
         Args:
             limit: int|None. Maximum number of entities to be returned. If None,
                 returns all matching entities. This parameter is made optional
-                due to the sorting implementation required for sorting results
-                client-side.
+                to allow fetching of all translation suggestions for client-side
+                sorting based on lesson flow.
             offset: int. Number of results to skip from the beginning of all
                 results matching the query.
             user_id: str. The id of the user trying to make this query.
@@ -702,6 +702,17 @@ class GeneralSuggestionModel(base_models.BaseModel):
                     given exploration IDs.
                 next_offset: int. The input offset + the number of results
                     returned by the current query.
+
+        Note:
+            The `limit` parameter is made optional to support fetching all
+            translation suggestions for client-side sorting based on specific
+            criteria related to their presentation. Since the datastore does not
+            efficiently support sorting based on complex client-side criteria, we
+            fetch all matching entities from the datastore and allow the frontend
+            to perform the sorting as needed.
+
+            Please exercise caution when using `limit = None`, as it may result in
+            fetching a large number of entities, potentially impacting performance.
         """
         if sort_key == constants.SUGGESTIONS_SORT_KEY_DATE:
             # The first sort property must be the same as the property to which
