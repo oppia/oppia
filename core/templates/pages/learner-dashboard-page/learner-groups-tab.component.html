@@ -34,7 +34,8 @@
         </div>
       </div>
       <div class="oppia-learner-groups-feature-info" *ngIf="invitedToLearnerGroups.length == 0">
-        <span class="oppia-learner-group-no-invitations" translate="I18N_LEARNER_GROUP_NO_INVITATIONS"></span>
+        <span class="oppia-learner-group-no-invitations" [innerHTML]="'I18N_LEARNER_GROUP_NO_INVITATIONS' | translate">
+        </span>
       </div>
     </div>
 
@@ -55,7 +56,8 @@
         </div>
       </div>
       <div class="oppia-learner-groups-feature-info" *ngIf="learnerGroupsJoined.length == 0">
-        <span class="oppia-no-learner-groups" translate="I18N_LEARNER_DASHBOARD_LEARNER_GROUPS_SECTION_NO_GROUPS"></span>
+        <span class="oppia-no-learner-groups" [innerHTML]="'I18N_LEARNER_DASHBOARD_LEARNER_GROUPS_SECTION_NO_GROUPS' | translate">
+        </span>
       </div>
     </div>
   </div>
