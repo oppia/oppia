@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Controller for the thanks for subscribing modal.
+ * @fileoverview Controller for the thanks-for-subscribing-modal.
  */
 
 import { Component } from '@angular/core';
