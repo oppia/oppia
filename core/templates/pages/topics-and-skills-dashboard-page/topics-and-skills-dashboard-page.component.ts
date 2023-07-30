@@ -64,7 +64,7 @@ export class TopicsAndSkillsDashboardPageComponent {
   userCanDeleteSkill!: boolean;
 
   activeTab!: string;
-  filterBoxIsShown: boolean = false;
+  filterBoxIsShown!: boolean;
   filterObject!: TopicsAndSkillsDashboardFilter;
   fetchSkillsDebounced!: () => void;
   lastPage!: number;
@@ -87,7 +87,6 @@ export class TopicsAndSkillsDashboardPageComponent {
   displayedTopicSummaries: CreatorTopicSummary[] = [];
   displayedSkillSummaries: SkillSummary[] = [];
   skillStatusOptions: string[] = [];
-  prevWidth: number = window.innerWidth;
 
   constructor(
     private focusManagerService: FocusManagerService,
@@ -302,10 +301,7 @@ export class TopicsAndSkillsDashboardPageComponent {
 
   @HostListener('window:resize')
   filterBoxOnResize(): void {
-    if (window.innerWidth !== this.prevWidth) {
-      this.prevWidth = window.innerWidth;
-      this.filterBoxIsShown = !this.windowDimensionsService.isWindowNarrow();
-    }
+    this.filterBoxIsShown = !this.windowDimensionsService.isWindowNarrow();
   }
 
   getUpperLimitValueForPagination(): number {
