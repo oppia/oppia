@@ -145,6 +145,10 @@ var suites = {
     './core/tests/webdriverio_desktop/navigation.js'
   ],
 
+  newLearnerDashboard: [
+    './core/tests/webdriverio_desktop/newLearnerDashboard.js'
+  ],
+
   playVoiceovers: [
     './core/tests/webdriverio_desktop/playVoiceovers.js'
   ],

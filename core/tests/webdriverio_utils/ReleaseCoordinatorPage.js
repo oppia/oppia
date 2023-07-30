@@ -122,6 +122,22 @@ var ReleaseCoordinatorPage = function() {
     return null;
   };
 
+  // Remove this method after the show_redesigned_learner_dashboard feature flag
+  // is deprecated.
+  this.getRedesignedLearnerDashboardFeatureElement = async function() {
+    var featureFlagElements = await featureFlagElementsSelector();
+    var count = featureFlagElements.length;
+    for (let i = 0; i < count; i++) {
+      var elem = featureFlagElements[i];
+      if ((await elem.$(featureNameLocator).getText()) ===
+          'show_redesigned_learner_dashboard') {
+        return elem;
+      }
+    }
+
+    return null;
+  };
+
   // This function is meant to be used to enable a feature gated behind
   // a feature flag in test mode, which is the server environment the E2E
   // tests are run in.

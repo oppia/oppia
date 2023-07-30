@@ -89,6 +89,7 @@
         "fileUploadExtensions.js",
         "learnerDashboard.js",
         "navigation.js",
+        "newLearnerDashboard.js",
         "playVoiceovers.js",
         "preferences.js",
         "profileFeatures.js",
