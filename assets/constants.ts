@@ -417,6 +417,7 @@ export default {
   "STORY_NODE_STATUS_PUBLISHED": "Published",
   "STORY_NODE_STATUS_READY_TO_PUBLISH": "Ready To Publish",
   "STORY_NODE_STATUS_DRAFT": "Draft",
+  "UPCOMING_CHAPTERS_DAY_LIMIT": 14,
 
   "ALLOWED_IMAGE_FORMATS": ["svg", "png", "jpeg", "jpg", "gif"],
   "MAX_ALLOWED_IMAGE_SIZE_IN_KB_FOR_BLOG": 1024,

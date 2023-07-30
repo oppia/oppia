@@ -144,6 +144,57 @@ export class TopicsListComponent {
       SerialChapterLaunchCurriculumAdminView.isEnabled;
   }
 
+  /**
+   * @param {CreatorTopicSummary} topic - Topic object whose upcoming chapters
+   * notifications text is needed.
+   * @returns {String} The text for upcoming chapters notifications in the
+   * HTML template.
+   */
+  getUpcomingChapterNotificationsText(topic: CreatorTopicSummary): string {
+    let upcomingChapterNotificationsText = (
+      topic.getTotalUpcomingChaptersCount() + ' upcoming launch');
+    if (topic.getTotalUpcomingChaptersCount() > 1) {
+      upcomingChapterNotificationsText += 'es';
+    }
+    upcomingChapterNotificationsText += ' in the next 14 days';
+    return upcomingChapterNotificationsText;
+  }
+
+  /**
+   * @param {CreatorTopicSummary} topic - Topic object whose overdue chapters
+   * notifications text is needed.
+   * @returns {String} The text for overdue chapters notifications in the
+   * HTML template.
+   */
+  getOverdueChapterNotificationsText(topic: CreatorTopicSummary): string {
+    let overdueChapterNotificationsText = (
+      topic.getTotalOverdueChaptersCount() + ' launch');
+    if (topic.getTotalOverdueChaptersCount() > 1) {
+      overdueChapterNotificationsText += 'es';
+    }
+    overdueChapterNotificationsText += ' behind schedule';
+    return overdueChapterNotificationsText;
+  }
+
+  /**
+   * @param {CreatorTopicSummary} topic - Topic object which is checked if all
+   * of its chapters are published.
+   * @param {Number} idx - The index of the topic in the topicSummaries.
+   * @returns {boolean} Checks whether all the chapters in the topic are
+   * published.
+   */
+  areTopicChaptersFullyPublished(
+      topic: CreatorTopicSummary, idx: number): boolean {
+    if (
+      topic.getTotalChaptersCounts().length &&
+      topic.getTotalChaptersCounts().length ===
+      this.fullyPublishedStoriesCounts[idx]) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
   ngOnInit(): void {
     if (this.isSerialChapterLaunchFeatureEnabled()) {
       this.TOPIC_HEADINGS = [

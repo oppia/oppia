@@ -912,6 +912,36 @@ class StoryNode:
                     'Chapter unpublishing reason cannot be %s ' %
                     self.unpublishing_reason)
 
+    def is_node_upcoming(self) -> bool:
+        """Return whether the StoryNode domain object is expected to be
+        published within next UPCOMING_CHAPTERS_DAY_LIMIT days.
+
+        Returns:
+            bool. True if the chapter is upcoming else false.
+        """
+        if (
+            self.status != constants.STORY_NODE_STATUS_PUBLISHED and
+            self.planned_publication_date is not None and
+            datetime.datetime.today() < self.planned_publication_date <
+            (datetime.datetime.today() + datetime.timedelta(
+            days=constants.UPCOMING_CHAPTERS_DAY_LIMIT))):
+            return True
+        return False
+
+    def is_node_behind_schedule(self) -> bool:
+        """Return whether StoryNode domain object is behind-schedule
+        from the planned publication date.
+
+        Returns:
+            bool. True if the chapter is behind-schedule else false.
+        """
+        if (
+            self.status != constants.STORY_NODE_STATUS_PUBLISHED and
+            self.planned_publication_date is not None and
+            datetime.datetime.today() > self.planned_publication_date):
+            return True
+        return False
+
 
 class StoryContentsDict(TypedDict):
     """Dictionary representing the StoryContents object."""

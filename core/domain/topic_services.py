@@ -19,7 +19,6 @@
 from __future__ import annotations
 
 import collections
-import datetime
 import logging
 
 from core import feconf
@@ -1703,13 +1702,13 @@ def update_chapters_counts_in_topic_summaries(
     """
     topic_ids = [summary['id'] for summary in topic_summary_dicts]
     topics = topic_fetchers.get_topics_by_ids(topic_ids)
-    total_story_ids: List[str] = []
+    all_story_ids: List[str] = []
     for topic in topics:
         if topic:
             story_ids = [story_reference.story_id for
                 story_reference in topic.canonical_story_references]
-            total_story_ids = total_story_ids + story_ids
-    total_stories = story_fetchers.get_stories_by_ids(total_story_ids)
+            all_story_ids = all_story_ids + story_ids
+    total_stories = story_fetchers.get_stories_by_ids(all_story_ids)
     for topic in topics:
         if topic is None:
             continue
@@ -1729,18 +1728,10 @@ def update_chapters_counts_in_topic_summaries(
             for node in nodes:
                 if node.status == constants.STORY_NODE_STATUS_PUBLISHED:
                     published_chapters_count += 1
-                elif node.planned_publication_date is not None:
-                    chapter_is_upcoming = (
-                        node.planned_publication_date - datetime.datetime.
-                        today()).days < 14 and (
-                        node.planned_publication_date > datetime.datetime.
-                        today())
-                    chapter_is_behind_schedule = (
-                        node.planned_publication_date < datetime.datetime.
-                        today())
-                    if chapter_is_upcoming:
+                else:
+                    if node.is_node_upcoming():
                         upcoming_chapters_count += 1
-                    if chapter_is_behind_schedule:
+                    if node.is_node_behind_schedule():
                         overdue_chapters_count += 1
 
             total_chapters_counts.append(total_chapters_count)

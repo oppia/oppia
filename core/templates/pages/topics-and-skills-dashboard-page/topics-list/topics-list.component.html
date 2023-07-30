@@ -139,25 +139,23 @@
         </p>
       </td>
       <td>
-        <p class="list-summary" [ngClass]="partiallyPublishedStoriesCounts[idx] || fullyPublishedStoriesCounts[idx] ? 'text-left': 'text-center'">
-          <span *ngIf="partiallyPublishedStoriesCounts[idx]">
+        <div class="list-summary" [ngClass]="partiallyPublishedStoriesCounts[idx] || fullyPublishedStoriesCounts[idx] ? 'text-left': 'text-center'">
+          <div *ngIf="partiallyPublishedStoriesCounts[idx]">
             {{ partiallyPublishedStoriesCounts[idx] }} Partial ({{ publishedChaptersInPartiallyPublishedStories[idx] }}/{{ totalChaptersInPartiallyPublishedStories[idx] }} chapters)
-          </span>
-          <span *ngIf="fullyPublishedStoriesCounts[idx]">
+          </div>
+          <div *ngIf="fullyPublishedStoriesCounts[idx]">
             {{ fullyPublishedStoriesCounts[idx] }} Full
-          </span>
-          <span *ngIf="!partiallyPublishedStoriesCounts[idx] && !fullyPublishedStoriesCounts[idx]"
-                class="text-center">
+          </div>
+          <div *ngIf="!partiallyPublishedStoriesCounts[idx] && !fullyPublishedStoriesCounts[idx]"
+               class="text-center">
             --
-          </span>
-        </p>
+          </div>
+        </div>
       </td>
       <td>
         <p class="list-summary" [ngClass]="topic.getTotalUpcomingChaptersCount() || topic.getTotalOverdueChaptersCount() ? 'text-left': 'text-center'">
-          <span *ngIf="topic.getTotalUpcomingChaptersCount()==1"> {{ topic.getTotalUpcomingChaptersCount() }} upcoming launch in the next 14 days</span>
-          <span *ngIf="topic.getTotalUpcomingChaptersCount()>1"> {{ topic.getTotalUpcomingChaptersCount() }} upcoming launches in the next 14 days</span>
-          <span *ngIf="topic.getTotalOverdueChaptersCount()==1"> {{ topic.getTotalOverdueChaptersCount() }} launch behind schedule</span>
-          <span *ngIf="topic.getTotalOverdueChaptersCount()>1"> {{ topic.getTotalOverdueChaptersCount() }} launches behind schedule</span>
+          <span *ngIf="topic.getTotalUpcomingChaptersCount()"> {{ getUpcomingChapterNotificationsText(topic) }}</span>
+          <span *ngIf="topic.getTotalOverdueChaptersCount()"> {{ getOverdueChapterNotificationsText(topic) }}</span>
           <span *ngIf="!topic.getTotalUpcomingChaptersCount() && !topic.getTotalOverdueChaptersCount()">--</span>
         </p>
       </td>
@@ -180,10 +178,10 @@
         </p>
       </td>
       <td class="text-center topic-list-status topic-status">
-        <span class="topic-list-status-text" *ngIf="topic.isPublished && topic.getTotalChaptersCounts().length && topic.getTotalChaptersCounts().length == fullyPublishedStoriesCounts[idx]">
+        <span class="topic-list-status-text" *ngIf="topic.isPublished && areTopicChaptersFullyPublished(topic)">
           Fully Published
         </span>
-        <span class="topic-list-status-text" *ngIf="topic.isPublished && (topic.getTotalChaptersCounts().length==0 || topic.getTotalChaptersCounts().length !== fullyPublishedStoriesCounts[idx])">
+        <span class="topic-list-status-text" *ngIf="topic.isPublished && !areTopicChaptersFullyPublished(topic)">
           Partially Published
         </span>
         <span class="topic-list-status-text" *ngIf="!topic.isPublished">
@@ -313,10 +311,10 @@
         </div>
         <div class="topic-item-topic-status">
           <span class="topic-item-topic-status-header">Status</span>
-          <span *ngIf="topic.isPublished && topic.getTotalChaptersCounts().length && topic.getTotalChaptersCounts().length == fullyPublishedStoriesCounts[idx]">
+          <span *ngIf="topic.isPublished && areTopicChaptersFullyPublished(topic)">
             Fully Published
           </span>
-          <span *ngIf="topic.isPublished && (topic.getTotalChaptersCounts().length==0 || topic.getTotalChaptersCounts().length !== fullyPublishedStoriesCounts[idx])">
+          <span *ngIf="topic.isPublished && !areTopicChaptersFullyPublished(topic)">
             Partially Published
           </span>
           <span *ngIf="!topic.isPublished">
@@ -334,10 +332,8 @@
             </div>
             <span *ngIf="partiallyPublishedStoriesCounts[idx]">
               {{ partiallyPublishedStoriesCounts[idx] }} Partial
-              <br>
-              (<span>{{ publishedChaptersInPartiallyPublishedStories[idx] }} published</span>
-              <br>
-              <span>{{ totalChaptersInPartiallyPublishedStories[idx] }} total</span>)
+              <div>({{ publishedChaptersInPartiallyPublishedStories[idx] }} published</div>
+              <div>{{ totalChaptersInPartiallyPublishedStories[idx] }} total)</div>
             </span>
             <span *ngIf="fullyPublishedStoriesCounts[idx]">
               {{ fullyPublishedStoriesCounts[idx] }} Full
@@ -351,10 +347,8 @@
             <div class="topic-item-topic-entity-header">
               Chapter Publication Notifications
             </div>
-            <span *ngIf="topic.getTotalUpcomingChaptersCount()==1"> {{ topic.getTotalUpcomingChaptersCount() }} upcoming launch in the next 14 days</span>
-            <span *ngIf="topic.getTotalUpcomingChaptersCount()>1"> {{ topic.getTotalUpcomingChaptersCount() }} upcoming launches in the next 14 days</span>
-            <span *ngIf="topic.getTotalOverdueChaptersCount()==1"> {{ topic.getTotalOverdueChaptersCount() }} launch behind schedule</span>
-            <span *ngIf="topic.getTotalOverdueChaptersCount()>1"> {{ topic.getTotalOverdueChaptersCount() }} launches behind schedule</span>
+            <span *ngIf="topic.getTotalUpcomingChaptersCount()"> {{ getUpcomingChapterNotificationsText(topic) }}</span>
+            <span *ngIf="topic.getTotalOverdueChaptersCount()"> {{ getOverdueChapterNotificationsText(topic) }}</span>
             <span *ngIf="!topic.getTotalUpcomingChaptersCount() && !topic.getTotalOverdueChaptersCount()">--</span>
           </div>
         </div>
