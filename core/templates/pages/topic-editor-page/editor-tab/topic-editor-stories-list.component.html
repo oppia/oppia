@@ -1,5 +1,4 @@
-<table *ngIf="!isSerialChapterLaunchFeatureEnabled()"
-       class="dashboard-table e2e-test-story-list-table">
+<table class="dashboard-table e2e-test-story-list-table">
   <colgroup>
     <col class="oppia-colgroup-col-1">
     <col class="oppia-colgroup-col-2">
@@ -42,82 +41,6 @@
   </tbody>
 </table>
 
-<table *ngIf="isSerialChapterLaunchFeatureEnabled()"
-       class="dashboard-table story-dashboard-table e2e-test-story-list-table">
-  <colgroup>
-    <col class="oppia-colgroup-column-1">
-    <col class="oppia-colgroup-column-2">
-    <col class="oppia-colgroup-column-3">
-    <col class="oppia-colgroup-column-4">
-  </colgroup>
-  <tr>
-    <th *ngFor="let key of STORY_TABLE_COLUMN_HEADINGS"
-        class="story-dashboard-table-headings">
-      <p *ngIf="key === 'title'" class="text-center">Title</p>
-      <p *ngIf="key === 'publication_status'" class="text-center">Status</p>
-      <p *ngIf="key === 'node_count'" class="text-center">Chapters</p>
-      <p *ngIf="key === 'notifications'" class="text-center">Chapter Publication Notifications  </p>
-    </th>
-  </tr>
-  <tbody cdkDropList
-         (cdkDropListDropped)="drop($event)">
-    <tr *ngFor="let summary of storySummaries; index as idx"
-        class="story-list-item e2e-test-list-view-item-item e2e-test-story-list-item"
-        cdkDrag>
-      <td>
-        <a (click)="topicRights.canEditTopic() && openStoryEditor(summary.getId())" class="story-list-summary text-left">
-          <span> {{ summary.getTitle() }} </span>
-        </a>
-      </td>
-      <td>
-        <a (click)="topicRights.canEditTopic() && openStoryEditor(summary.getId())" class="story-list-summary text-center">
-          <span *ngIf="summary.getPublishedChaptersCount() != 0 && areChaptersAwaitingPublication(summary)">
-            Partially Published
-          </span>
-          <span *ngIf="summary.getPublishedChaptersCount() == 0">
-            Not Published
-          </span>
-          <span *ngIf="summary.getPublishedChaptersCount() != 0 && !areChaptersAwaitingPublication(summary)">
-            Fully Published
-          </span>
-        </a>
-      </td>
-      <td>
-        <a (click)="topicRights.canEditTopic() && openStoryEditor(summary.getId())" class="story-list-summary chapter-count text-center">
-          <span> {{ summary.getPublishedChaptersCount() }} Published</span>
-          <span *ngIf="areChaptersAwaitingPublication(summary)"> {{ summary.getTotalChaptersCount() - summary.getPublishedChaptersCount() }} Awaiting Publication</span>
-        </a>
-      </td>
-      <td>
-        <a (click)="topicRights.canEditTopic() && openStoryEditor(summary.getId())" class="story-list-summary text-left">
-          <span *ngIf="summary.getUpcomingChaptersCount() == 1">
-            {{ summary.getUpcomingChaptersCount() }} upcoming launch (next {{ summary.getUpcomingChaptersExpectedDays()[0] }}
-            <span *ngIf="summary.getUpcomingChaptersExpectedDays()[0] > 1"> days</span>
-            <span *ngIf="summary.getUpcomingChaptersExpectedDays()[0] == 1"> day</span>
-            )
-          </span>
-          <span *ngIf="summary.getUpcomingChaptersCount() > 1">
-            {{ summary.getUpcomingChaptersCount() }} upcoming launches (next
-            <span *ngFor="let day of summary.getUpcomingChaptersExpectedDays(); index as id">
-              {{ day }}
-              <span *ngIf="id != summary.getUpcomingChaptersExpectedDays().length - 1">,</span>
-            </span>
-            days)
-          </span>
-          <span *ngIf="summary.getOverdueChaptersCount() == 1"> {{ summary.getOverdueChaptersCount() }} launch behind schedule</span>
-          <span *ngIf="summary.getOverdueChaptersCount() > 1"> {{ summary.getOverdueChaptersCount() }} launches behind schedule</span>
-          <span *ngIf="isChapterNotificationsEmpty(summary)">-</span>
-        </a>
-      </td>
-      <td class="delete-story-icon">
-        <a (click)="deleteCanonicalStory(summary.getId())" class="story-list-summary text-center">
-          <span class="fas fa-trash-alt" *ngIf="topicRights.canEditTopic()"></span>
-        </a>
-      </td>
-    </tr>
-  </tbody>
-</table>
-
 <style>
   .list-item {
     background: #fff;
@@ -126,40 +49,20 @@
     width: 75%;
   }
 
-  .story-list-item {
-    background: #fff;
-    font-size: 14px;
-    margin: 20px 7.5px 0 12.5%;
-    padding: 10px 20px;
-    width: 75%;
-  }
-
-  .story-list-item td {
-    padding: 2%;
-  }
-
   .dashboard-table {
     font-size: 15px;
     margin-top: 2vh;
     width: 100%;
   }
 
-  .dashboard-table .dashboard-table-headings, .story-dashboard-table-headings {
+  .dashboard-table .dashboard-table-headings {
     border-bottom: 2px solid #000;
     margin: 25px 0;
   }
 
-  .story-dashboard-table-headings p {
-    font-size: 13px;
-    word-spacing: 100vw;
-  }
-
-  .story-dashboard-table td {
-    border: 0.5px solid #dbdbdb;
-  }
-
-  .story-dashboard-table .delete-story-icon {
-    border: none;
+  .dashboard-table .dashboard-table-headings tr {
+    font-size: 16px;
+    font-weight: bold;
   }
 
   .list-summary,
@@ -172,32 +75,18 @@
     text-decoration: none;
   }
 
-  .story-list-summary,
-  .story-list-summary:active,
-  .story-list-summary:visited {
-    color: inherit;
-    display: block;
-    margin: 5px 0;
-    text-decoration: none;
-  }
-
   .list-item:not(:last-child) {
     border-bottom: 1px solid #bbb;
   }
 
-  .list-item:hover, .story-list-item:hover {
+  .list-item:hover {
     background-color: #ededed;
   }
 
-  .list-summary span, .story-list-summary > span {
+  .list-summary span {
     display: inline-block;
     line-height: normal;
     vertical-align: middle;
-    word-break: break-word;
-  }
-
-  .chapter-count span:last-child {
-    margin-top: 10px;
   }
 
   .oppia-colgroup-col-1 {
@@ -207,16 +96,6 @@
   .oppia-colgroup-col-2
   .oppia-colgroup-col-3 {
     width: 30%;
-  }
-
-  .oppia-colgroup-column-4 {
-    width: 40%;
-  }
-
-  .oppia-colgroup-column-1,
-  .oppia-colgroup-column-2,
-  .oppia-colgroup-column-3 {
-    width: 20%;
   }
 
   .cdk-drag-preview {
