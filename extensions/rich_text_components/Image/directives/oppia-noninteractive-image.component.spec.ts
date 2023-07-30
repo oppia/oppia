@@ -327,7 +327,8 @@ describe('NoninteractiveImage', () => {
   it('should show alt text images when altTextIsDisplayed property is true',
     () => {
       spyOn(contextService, 'getEntityType').and.returnValue('exploration');
-      spyOn(imagePreloaderService, 'getImageUrlAsync').and.resolveTo(dataUrlSvg);
+      spyOn(imagePreloaderService, 'getImageUrlAsync').and.resolveTo(
+        dataUrlSvg);
       spyOn(contextService, 'getExplorationId').and.returnValue('exp_id');
       spyOn(contextService, 'getEntityId').and.returnValue('expId');
 
