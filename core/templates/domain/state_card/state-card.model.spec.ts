@@ -33,6 +33,7 @@ import { Voiceover } from 'domain/exploration/voiceover.model';
 import { InteractionCustomizationArgs } from 'interactions/customization-args-defs';
 import { Hint } from 'domain/exploration/hint-object.model';
 import { SolutionObjectFactory } from 'domain/exploration/SolutionObjectFactory';
+import { InteractionAnswer } from 'interactions/answer-defs';
 
 
 describe('State card object factory', () => {
@@ -354,5 +355,55 @@ describe('State card object factory', () => {
     expect(_sampleCard1.getStateName()).toEqual('State 2');
     expect(_sampleCard1.getInteractionHtml()).toEqual('');
     expect(_sampleCard1.getInteractionId()).toBeNull();
+  });
+
+  it('should not show a "no response error" by default', () => {
+    expect(_sampleCard1.getInteraction().currentAnswer).toBeNull();
+    expect(_sampleCard1.getInteraction().submitClicked).toBeFalse();
+    expect(_sampleCard1.showNoResponseError()).toBeFalse();
+  });
+
+  it('should update current answer and toggle submit clicked to false', () => {
+    _sampleCard1.getInteraction().submitClicked = true;
+    _sampleCard1.updateCurrentAnswer('answer');
+
+    expect(_sampleCard1.getInteraction().currentAnswer).toEqual('answer');
+    expect(_sampleCard1.getInteraction().submitClicked).toBeFalse();
+  });
+
+  it('should not toggle submit clicked for "Continue" interaction', () => {
+    _sampleCard1.getInteraction().id = 'Continue';
+
+    _sampleCard1.toggleSubmitClicked(true);
+
+    expect(_sampleCard1.getInteraction().submitClicked).toBeFalse();
+  });
+
+  it('should enable no response correctly', () => {
+    const simulateInteraction = (currentAnswer: InteractionAnswer | null) => {
+      _sampleCard1.updateCurrentAnswer(currentAnswer);
+      _sampleCard1.toggleSubmitClicked(true);
+    };
+
+    simulateInteraction(null);
+    expect(_sampleCard1.showNoResponseError()).toBeTrue();
+
+    simulateInteraction([]);
+    expect(_sampleCard1.showNoResponseError()).toBeTrue();
+
+    simulateInteraction(['']);
+    expect(_sampleCard1.showNoResponseError()).toBeFalse();
+
+    simulateInteraction('');
+    expect(_sampleCard1.showNoResponseError()).toBeTrue();
+
+    simulateInteraction('ans');
+    expect(_sampleCard1.showNoResponseError()).toBeFalse();
+
+    simulateInteraction(0);
+    expect(_sampleCard1.showNoResponseError()).toBeFalse();
+
+    simulateInteraction(-1);
+    expect(_sampleCard1.showNoResponseError()).toBeFalse();
   });
 });

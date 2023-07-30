@@ -145,6 +145,14 @@ export class InteractiveItemSelectionInputComponent implements OnInit {
     }
   }
 
+  getAnswers(): string[] {
+    const htmlAnswers = Object.keys(this.userSelections).filter(
+      (obj) => this.userSelections[obj]);
+    return htmlAnswers.map(
+      html => (
+        this.choicesValue[this.choices.indexOf(html)].contentId as string));
+  }
+
   onToggleCheckbox(): void {
     this.newQuestion = false;
     this.selectionCount = Object.keys(this.userSelections).filter(
@@ -153,6 +161,7 @@ export class InteractiveItemSelectionInputComponent implements OnInit {
       this.selectionCount >= this.maxAllowableSelectionCount);
     this.notEnoughSelections = (
       this.selectionCount < this.minAllowableSelectionCount);
+    this.currentInteractionService.updateCurrentAnswer(this.getAnswers());
   }
 
   submitMultipleChoiceAnswer(event: MouseEvent, index: number): void {
@@ -171,16 +180,13 @@ export class InteractiveItemSelectionInputComponent implements OnInit {
     this.userSelections = {};
     this.userSelections[this.choices[index]] = true;
     this.notEnoughSelections = false;
+    this.currentInteractionService.updateCurrentAnswer(this.getAnswers());
   }
 
   submitAnswer(): void {
-    const htmlAnswers = Object.keys(this.userSelections).filter(
-      (obj) => this.userSelections[obj]);
-    const answers = htmlAnswers.map(
-      html => this.choicesValue[this.choices.indexOf(html)].contentId);
-
+    const answers = this.getAnswers();
     this.currentInteractionService.onSubmit(
-      answers as string | string[],
+      answers,
       this.itemSelectionInputRulesService as
       ItemSelectionInputRulesService);
   }
