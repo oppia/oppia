@@ -616,7 +616,7 @@
     "I18N_FOOTER_BROWSE_LIBRARY": "Browse the Library",
     "I18N_FOOTER_CONTACT_US": "Contact Us",
     "I18N_FOOTER_CONTRIBUTE_ALL_CAPS": "CONTRIBUTE",
-    "I18N_FOOTER_COPYRIGHT": "© 2023 The Oppia Foundation",
+    "I18N_FOOTER_COPYRIGHT": "© <[currentYear]> The Oppia Foundation",
     "I18N_FOOTER_CREDITS": "Credits",
     "I18N_FOOTER_DONATE": "Donate",
     "I18N_FOOTER_FOLLOW_US": "Follow Us",

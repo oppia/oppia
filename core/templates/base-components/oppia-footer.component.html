@@ -106,7 +106,7 @@
     </div>
   </div>
   <div class="oppia-footer-terms-privacy">
-    <small [innerHTML]="'I18N_FOOTER_COPYRIGHT' | translate"></small>
+    <small [innerHTML]="'I18N_FOOTER_COPYRIGHT' | translate:{currentYear: currentYear}"></small>
     <small>
       <a href="/terms"
          [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.TERMS.ROUTE"
