@@ -1,4 +1,4 @@
-SHELL_PREFIX=docker-compose exec
+SHELL_PREFIX=docker compose exec
 ALL_SERVICES = datastore dev-server firebase elasticsearch webpack-compiler angular-build redis
 
 FLAGS = save_datastore disable_host_checking no_auto_restart prod_env maintenance_mode source_maps
@@ -34,11 +34,10 @@ run-devserver: # Runs the dev-server
 
 run-offline: # Runs the dev-server in offline mode
 	docker compose up dev-server -d
-	@echo "\n\nStarting development server at port 8181.....\n\n"
 	@while ! curl -s http://localhost:8181 > /dev/null; do \
 		sleep 5; \
 	done
-	@echo "Development server started at port 8181."
+	@echo "\n\nDevelopment server started at port 8181."
 	@echo "Please visit -- http://localhost:8181 to access the development server."
 	@echo 'Check dev-server logs using "make logs.dev-server"'
 
@@ -52,6 +51,7 @@ shell.%: ## Opens a shell in the given docker service. Example: make shell.datas
 
 stop: ## Stops all the services.
 	docker compose stop
+	@echo "Development server shut down successfully."
 
 stop.%: ## Stops the given docker service. Example: make stop.datastore
 	docker compose stop $*

@@ -149,13 +149,6 @@
           "js": ["angular-material.js"]
         }
       },
-      "diff-match-patch": {
-        "version": "1.0.0",
-        "downloadFormat": "files",
-        "url": "https://cdnjs.cloudflare.com/ajax/libs/diff_match_patch/20121119",
-        "targetDirPrefix": "diff-match-patch-",
-        "files": ["diff_match_patch.js"]
-      },
       "fontAwesome": {
         "version": "5.9.0",
         "downloadFormat": "zip",
