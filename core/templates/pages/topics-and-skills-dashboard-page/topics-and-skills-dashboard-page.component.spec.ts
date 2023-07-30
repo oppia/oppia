@@ -264,14 +264,17 @@ describe('Topics and skills dashboard page component', () => {
 
   it('should display filter box on maximizing the window', () => {
     componentInstance.filterBoxIsShown = false;
+
     spyOn(windowDimensionsService, 'isWindowNarrow').and.returnValue(false);
 
     componentInstance.filterBoxOnResize();
+
     expect(componentInstance.filterBoxIsShown).toBeTrue();
   });
 
   it('should hide filter box on minimizing the window', () => {
     componentInstance.filterBoxIsShown = true;
+
     spyOn(windowDimensionsService, 'isWindowNarrow').and.returnValue(true);
 
     componentInstance.filterBoxOnResize();
