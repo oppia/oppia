@@ -61,6 +61,7 @@ class TopicsAndSkillsDashboardPage(
 
     @acl_decorators.can_access_topics_and_skills_dashboard
     def get(self) -> None:
+        """Handles GET requests."""
         self.render_template(
             'topics-and-skills-dashboard-page.mainpage.html')
 
@@ -176,7 +177,7 @@ class CategorizedAndUntriagedSkillsDataHandler(
 
     @acl_decorators.open_access
     def get(self) -> None:
-        """Handles GET requests."""
+        """Handles GET requests for retrieving skill-related data."""
         skill_summaries = skill_services.get_all_skill_summaries()
         skill_ids_assigned_to_some_topic = (
             topic_fetchers.get_all_skill_ids_assigned_to_some_topic())
@@ -430,7 +431,12 @@ class NewTopicHandler(
 
     @acl_decorators.can_create_topic
     def post(self) -> None:
-        """Creates a new topic."""
+        """Creates a new topic.
+
+        Raise:
+            InvalidInputException. If there are validation errors
+                during image validation.
+        """
         assert self.user_id is not None
         assert self.normalized_payload is not None
         assert self.normalized_request is not None
@@ -555,7 +561,11 @@ class NewSkillHandler(
 
     @acl_decorators.can_create_skill
     def post(self) -> None:
-        """Creates a new skill."""
+        """Creates a new skill.
+
+        Raises:
+            InvalidInputException. Topic is None or duplicate skill description.
+        """
         assert self.user_id is not None
         assert self.normalized_payload is not None
         description = self.normalized_payload['description']
