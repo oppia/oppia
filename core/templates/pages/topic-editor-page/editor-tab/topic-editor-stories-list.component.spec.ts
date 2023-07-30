@@ -25,7 +25,6 @@ import { StorySummary } from 'domain/story/story-summary.model';
 import { TopicUpdateService } from 'domain/topic/topic-update.service';
 import { TopicEditorStoriesListComponent } from './topic-editor-stories-list.component';
 import { WindowRef } from 'services/contextual/window-ref.service';
-import { PlatformFeatureService } from '../../../services/platform-feature.service';
 
 class MockNgbModalRef {
   componentInstance: {
@@ -33,19 +32,10 @@ class MockNgbModalRef {
   };
 }
 
-class MockPlatformFeatureService {
-  status = {
-    SerialChapterLaunchCurriculumAdminView: {
-      isEnabled: false
-    }
-  };
-}
-
 describe('topicEditorStoriesList', () => {
   let component: TopicEditorStoriesListComponent;
   let fixture: ComponentFixture<TopicEditorStoriesListComponent>;
   let storySummaries;
-  let mockPlatformFeatureService = new MockPlatformFeatureService();
   let topicUpdateService: TopicUpdateService;
   let undoRedoService: UndoRedoService;
   let ngbModal: NgbModal;
@@ -58,12 +48,6 @@ describe('topicEditorStoriesList', () => {
       ],
       imports: [
         HttpClientTestingModule,
-      ],
-      providers: [
-        {
-          provide: PlatformFeatureService,
-          useValue: mockPlatformFeatureService
-        },
       ]
     });
   }));
@@ -86,11 +70,7 @@ describe('topicEditorStoriesList', () => {
       story_is_published: true,
       completed_node_titles: ['node1'],
       url_fragment: 'story1',
-      all_node_dicts: [],
-      total_chapters_count: 3,
-      published_chapters_count: 2,
-      overdue_chapters_count: 0,
-      upcoming_chapters_count: 0
+      all_node_dicts: []
     }), StorySummary.createFromBackendDict({
       id: 'storyId2',
       title: 'Story Title2',
@@ -101,22 +81,8 @@ describe('topicEditorStoriesList', () => {
       story_is_published: true,
       completed_node_titles: ['node1'],
       url_fragment: 'story1',
-      all_node_dicts: [],
-      total_chapters_count: 3,
-      published_chapters_count: 3,
-      overdue_chapters_count: 3,
-      upcoming_chapters_count: 0
+      all_node_dicts: []
     })];
-  });
-
-  it('should get status of Serial Chapter Launch Feature flag', () => {
-    mockPlatformFeatureService.
-      status.SerialChapterLaunchCurriculumAdminView.isEnabled = false;
-    expect(component.isSerialChapterLaunchFeatureEnabled()).toEqual(false);
-
-    mockPlatformFeatureService.
-      status.SerialChapterLaunchCurriculumAdminView.isEnabled = true;
-    expect(component.isSerialChapterLaunchFeatureEnabled()).toEqual(true);
   });
 
   it('should change list order properly', () => {
@@ -133,17 +99,10 @@ describe('topicEditorStoriesList', () => {
   });
 
   it('should initialise component when list of stories is displayed', () => {
-    mockPlatformFeatureService.
-      status.SerialChapterLaunchCurriculumAdminView.isEnabled = false;
     component.ngOnInit();
+
     expect(component.STORY_TABLE_COLUMN_HEADINGS).toEqual([
       'title', 'node_count', 'publication_status']);
-
-    mockPlatformFeatureService.
-      status.SerialChapterLaunchCurriculumAdminView.isEnabled = true;
-    component.ngOnInit();
-    expect(component.STORY_TABLE_COLUMN_HEADINGS).toEqual([
-      'title', 'publication_status', 'node_count', 'notifications']);
   });
 
   it('should delete story when user deletes story', fakeAsync(() => {
@@ -214,19 +173,5 @@ describe('topicEditorStoriesList', () => {
     component.openStoryEditor('storyId');
 
     expect(modalSpy).toHaveBeenCalled();
-  });
-
-  it('should return if some chapters are not published', () => {
-    expect(component.areChaptersAwaitingPublication(storySummaries[0])).toBe(
-      true);
-    expect(component.areChaptersAwaitingPublication(storySummaries[1])).toBe(
-      false);
-  });
-
-  it('should return if chapter notifications are empty', () => {
-    expect(component.isChapterNotificationsEmpty(storySummaries[0])).toBe(
-      true);
-    expect(component.isChapterNotificationsEmpty(storySummaries[1])).toBe(
-      false);
   });
 });
