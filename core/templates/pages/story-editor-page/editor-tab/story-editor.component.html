@@ -260,7 +260,7 @@
           <div>
             <div class="chapter-control-bar" *ngIf="linearNodesList.length">
               <div class="publish-upto-chapter-menu">
-                <span class="publish-upto-chapter-label">Publish up to Chapter ...</span>
+                <span class="publish-upto-chapter-label">Publish upto Chapter ...</span>
                 <select [(ngModel)]="selectedChapterIndexInPublishUptoDropdown"
                         (ngModelChange)="updatePublishUptoChapterSelection(selectedChapterIndexInPublishUptoDropdown)"
                         class="publish-upto-chapter-dropdown">
@@ -434,6 +434,7 @@
 
   .published-node {
     background-color: rgb(217, 248, 231);
+    opacity: 0.725;
   }
 
   .ready-to-publish-node {
@@ -442,6 +443,7 @@
 
   .draft-node {
     background-color: rgb(239, 239, 239);
+    opacity: 0.7;
   }
 
   .story-editor-node {
