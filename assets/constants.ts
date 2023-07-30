@@ -414,9 +414,6 @@ export default {
   "ALLOWED_STORYNODE_STATUS": ["Draft", "Ready To Publish", "Published"],
   "ALLOWED_STORYNODE_UNPUBLISHING_REASONS": ["BAD_CONTENT",
     "CHAPTER_NEEDS_SPLITTING"],
-  "STORYNODE_STATUS_PUBLISHED": "Published",
-  "STORYNODE_STATUS_READY_TO_PUBLISH": "Ready To Publish",
-  "STORYNODE_STATUS_DRAFT": "Draft",
 
   "ALLOWED_IMAGE_FORMATS": ["svg", "png", "jpeg", "jpg", "gif"],
   "MAX_ALLOWED_IMAGE_SIZE_IN_KB_FOR_BLOG": 1024,
