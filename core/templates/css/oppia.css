@@ -1033,6 +1033,15 @@ textarea {
   }
   ul.nav.navbar-nav.oppia-navbar-nav.float-right {
     display: flex;
+    flex-direction: row;
+    float: right;
+    margin: 0;
+  }
+}
+@media (min-width: 767px) and (max-width: 992px) {
+  ul.nav.navbar-nav.oppia-navbar-nav.float-right {
+    display: flex;
+    flex-direction: row;
     float: right;
     margin: 0;
   }
