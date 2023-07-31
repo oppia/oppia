@@ -642,7 +642,7 @@ class StoryNode:
         Returns:
             bool. Whether the status is valid or not.
         """
-        return status in constants.ALLOWED_STORYNODE_STATUS
+        return status in constants.ALLOWED_STORY_NODE_STATUS
 
     @classmethod
     def require_valid_unpublishing_reason(
@@ -656,7 +656,7 @@ class StoryNode:
             bool. Whether the unpublishing reason is valid or not.
         """
         return unpublishing_reason in (
-            constants.ALLOWED_STORYNODE_UNPUBLISHING_REASONS)
+            constants.ALLOWED_STORY_NODE_UNPUBLISHING_REASONS)
 
     def to_dict(self) -> StoryNodeDict:
         """Returns a dict representing this StoryNode domain object.
