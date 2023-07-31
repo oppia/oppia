@@ -24,9 +24,10 @@ import { WindowRef } from 'services/contextual/window-ref.service';
 import { CurrentInteractionService } from 'pages/exploration-player-page/services/current-interaction.service';
 import { InteractiveNumericExpressionInput } from './oppia-interactive-numeric-expression-input.component';
 import { InteractionAttributesExtractorService } from 'interactions/interaction-attributes-extractor.service';
-import { NumericExpressionAnswer } from 'interactions/answer-defs';
+import { InteractionAnswer, NumericExpressionAnswer } from 'interactions/answer-defs';
 
 describe('NumericExpressionInputInteractive', () => {
+  const asciiDummyValue: string = 'Dummy value';
   let component: InteractiveNumericExpressionInput;
   let fixture: ComponentFixture<InteractiveNumericExpressionInput>;
   let windowRef: WindowRef;
@@ -37,7 +38,7 @@ describe('NumericExpressionInputInteractive', () => {
     divId: '1',
     guppyInstance: {
       asciimath: function() {
-        return 'Dummy value';
+        return asciiDummyValue;
       }
     }
   };
@@ -46,7 +47,7 @@ describe('NumericExpressionInputInteractive', () => {
     constructor(id: string, config: Object) {}
 
     asciimath() {
-      return 'Dummy value';
+      return asciiDummyValue;
     }
 
     configure(name: string, val: Object): void {}
@@ -63,6 +64,8 @@ describe('NumericExpressionInputInteractive', () => {
     onSubmit(
         answer: NumericExpressionAnswer, rulesService: CurrentInteractionService
     ) {}
+
+    updateCurrentAnswer(answer: InteractionAnswer): void {}
 
     registerCurrentInteraction(
         submitAnswerFn: Function, validateExpressionFn: Function) {
@@ -123,29 +126,36 @@ describe('NumericExpressionInputInteractive', () => {
   });
 
   it('should not submit the answer if invalid', function() {
-    component.hasBeenTouched = true;
+    component.hasBeenTouched = false;
     // Invalid answer.
     component.value = '1/';
     fixture.detectChanges();
     spyOn(mockCurrentInteractionService, 'onSubmit');
+
     component.submitAnswer();
+
     expect(mockCurrentInteractionService.onSubmit).not.toHaveBeenCalled();
     expect(component.warningText).toBe(
       'Your answer seems to be missing a variable/number after the "/".');
+    expect(component.hasBeenTouched).toBeTrue();
   });
 
   it('should submit the answer if valid', function() {
-    component.hasBeenTouched = true;
+    component.hasBeenTouched = false;
     component.value = '1+1';
     spyOn(mockCurrentInteractionService, 'onSubmit');
+
     component.submitAnswer();
+
     expect(mockCurrentInteractionService.onSubmit).toHaveBeenCalled();
     expect(component.warningText).toBe('');
+    expect(component.hasBeenTouched).toBeTrue();
   });
 
   it('should correctly validate current answer', function() {
     // This should be validated as true if the editor hasn't been touched.
     component.value = '';
+    component.hasBeenTouched = false;
     fixture.detectChanges();
     expect(component.isCurrentAnswerValid()).toBeTrue();
     expect(component.warningText).toBe('');
@@ -174,5 +184,22 @@ describe('NumericExpressionInputInteractive', () => {
     MockGuppy.focused = false;
     component.ngOnInit();
     expect(component.value).not.toBeNull();
+  });
+
+  it('should update current answer on change', () => {
+    spyOn(guppyInitializationService, 'findActiveGuppyObject').and.returnValue(
+      mockGuppyObject as GuppyObject);
+    component.ngOnInit();
+    spyOn(mockCurrentInteractionService, 'updateCurrentAnswer');
+    spyOn(component, 'isCurrentAnswerValid');
+
+    component.onAnswerChange({focused: false});
+
+    expect(component.value).toEqual(asciiDummyValue);
+    expect(component.hasBeenTouched).toBeTrue();
+    expect(
+      mockCurrentInteractionService.updateCurrentAnswer
+    ).toHaveBeenCalledOnceWith(asciiDummyValue);
+    expect(component.isCurrentAnswerValid).toHaveBeenCalledTimes(1);
   });
 });
