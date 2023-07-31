@@ -50,7 +50,10 @@ describe('Classroom page functionality', function() {
       'English',
       true);
 
+    await browser.url('/classroom-admin/');
+    await waitFor.pageToFullyLoad();
     await diagnosticTestPage.createNewClassroomConfig('Math', 'math');
+
     await classroomPage.get('math');
     await libraryPage.findExploration('Title');
     await libraryPage.expectExplorationToBeVisible('Exploration Title');
