@@ -94,7 +94,7 @@ export class RouterService {
         this.stateEditorService.setActiveStateName(stateName);
       }
       if (contentId) {
-        this.stateEditorService.setActiveContentId(contentId);
+        this.stateEditorService.setInitActiveContentId(contentId);
       }
       this.windowRef.nativeWindow.location.hash = this.TABS.TRANSLATION.path + '/' + stateName
       this.refreshTranslationTabEventEmitter.emit();

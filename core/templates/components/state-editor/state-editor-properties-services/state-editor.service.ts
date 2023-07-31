@@ -99,7 +99,7 @@ export class StateEditorService {
   stateEditorDirectiveInitialised: boolean = false;
   currentRuleInputIsValid: boolean = false;
   inapplicableSkillMisconceptionIds: string[] = [];
-  activeContentId: string | null = null;
+  initActiveContentId: string | null = null;
 
   updateStateContentEditorInitialised(): void {
     this.stateContentEditorInitialised = true;
@@ -320,15 +320,12 @@ export class StateEditorService {
     this.solutionValidityService.deleteSolutionValidity(this.activeStateName);
   }
 
-  setActiveContentId(newActiveContentId: string | null): void {
-    // if(newActiveContentId === '' || newActiveContentId === null) {
-    //   return;
-    // }
-    this.activeContentId = newActiveContentId;
+  setInitActiveContentId(newActiveContentId: string | null): void {
+    this.initActiveContentId = newActiveContentId;
   }
 
-  getActiveContentId(): string | null {
-    return this.activeContentId;
+  getInitActiveContentId(): string | null {
+    return this.initActiveContentId;
   }
 
   get onStateEditorInitialized(): EventEmitter<State> {

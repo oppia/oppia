@@ -63,11 +63,6 @@ export class ExplorationGraphComponent {
   }
 
   onClickStateInMinimap(stateName: string): void {
-    if (this.routerService.getActiveTabName() === 'translation') {
-      console.log("HAHAHAHA");
-      this.routerService.navigateToTranslationTab(stateName);
-      return;
-    }
     this.routerService.navigateToMainTab(stateName);
   }
 

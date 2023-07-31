@@ -85,8 +85,8 @@ export class StateTranslationComponent
   answerChoices: AnswerChoice[];
   activeTranslatedContent: TranslatedContent;
   activeTab: string;
-  activeContentId: string | null;
-  activeIndex: number;
+  initActiveContentId: string | null;
+  initActiveIndex: number;
   interactionRuleTranslatableContents: {
     rule: Rule; inputName: string; contentId: string;
   }[];
@@ -193,7 +193,7 @@ export class StateTranslationComponent
     if (tabId === this.TAB_ID_CONTENT) {
       activeContentId = this.stateContent.contentId;
     } else if (tabId === this.TAB_ID_FEEDBACK) {
-      this.activeAnswerGroupIndex = this.activeIndex;
+      this.activeAnswerGroupIndex = this.initActiveIndex;
       if (this.stateAnswerGroups.length > 0) {
         activeContentId = (
           this.stateAnswerGroups[0].outcome.feedback.contentId);
@@ -202,13 +202,13 @@ export class StateTranslationComponent
           this.stateDefaultOutcome.feedback.contentId);
       }
     } else if (tabId === this.TAB_ID_HINTS) {
-      this.activeHintIndex = this.activeIndex;
+      this.activeHintIndex = this.initActiveIndex;
       activeContentId = (
         this.stateHints[0].hintContent.contentId);
     } else if (tabId === this.TAB_ID_SOLUTION) {
       activeContentId = (this.stateSolution as Solution).explanation.contentId;
     } else if (tabId === this.TAB_ID_CUSTOMIZATION_ARGS) {
-      this.activeCustomizationArgContentIndex = this.activeIndex;
+      this.activeCustomizationArgContentIndex = this.initActiveIndex;
       const activeContent = (
         this.interactionCustomizationArgTranslatableContent[0].content
       );
@@ -578,28 +578,36 @@ export class StateTranslationComponent
   }
 
   getActiveTab(): string {
-    this.activeContentId = this.stateEditorService.getActiveContentId();
-    if(!this.activeContentId) {
+    this.initActiveContentId = this.stateEditorService.
+      getInitActiveContentId();
+    if(!this.initActiveContentId) {
       return null;
     }
-    const tabName = this.stateEditorService.getActiveContentId().split('_')[0];
-    return tabName;
+    const tabName = this.stateEditorService.getInitActiveContentId().
+      split('_')[0];
+    return tabName === 'default'? this.TAB_ID_FEEDBACK: tabName;
   }
 
   getIndexOfActiveCard(): number {
-    if (!this.stateEditorService.getActiveContentId()) {
+    if (!this.stateEditorService.getInitActiveContentId()) {
       return 0;
     }
 
     const tabName = this.activeTab;
-
     switch (tabName) {
       case this.TAB_ID_FEEDBACK:
-        return this.stateAnswerGroups.findIndex(card => card.outcome.feedback.contentId === this.activeContentId);
+        return this.stateAnswerGroups.findIndex (
+          card => card.outcome.feedback.contentId === this.
+            initActiveContentId);
       case this.TAB_ID_HINTS:
-        return this.stateHints.findIndex(card => card.hintContent.contentId === this.activeContentId);
+        return this.stateHints.findIndex(
+          card => card.hintContent.contentId === this.
+            initActiveContentId);
       case this.TAB_ID_CUSTOMIZATION_ARGS:
-        return this.interactionCustomizationArgTranslatableContent.findIndex(card => card.content.contentId === this.activeContentId);
+        return (
+          this.interactionCustomizationArgTranslatableContent
+            .findIndex(card => card.content.contentId === (
+              this.initActiveContentId)));
       default:
         return 0;
     }
@@ -690,8 +698,8 @@ export class StateTranslationComponent
     );
 
     this.initStateTranslation();
-    this.activeIndex = this.getIndexOfActiveCard();
-    this.stateEditorService.setActiveContentId(null);
+    this.initActiveIndex = this.getIndexOfActiveCard();
+    this.stateEditorService.setInitActiveContentId(null);
   }
 
   ngOnDestroy(): void {
