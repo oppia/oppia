@@ -84,6 +84,9 @@ export class StateTranslationComponent
   stateDefaultOutcome: Outcome;
   answerChoices: AnswerChoice[];
   activeTranslatedContent: TranslatedContent;
+  activeTab: string;
+  activeContentId: string | null;
+  activeIndex: number;
   interactionRuleTranslatableContents: {
     rule: Rule; inputName: string; contentId: string;
   }[];
@@ -190,7 +193,7 @@ export class StateTranslationComponent
     if (tabId === this.TAB_ID_CONTENT) {
       activeContentId = this.stateContent.contentId;
     } else if (tabId === this.TAB_ID_FEEDBACK) {
-      this.activeAnswerGroupIndex = 0;
+      this.activeAnswerGroupIndex = this.activeIndex;
       if (this.stateAnswerGroups.length > 0) {
         activeContentId = (
           this.stateAnswerGroups[0].outcome.feedback.contentId);
@@ -199,13 +202,13 @@ export class StateTranslationComponent
           this.stateDefaultOutcome.feedback.contentId);
       }
     } else if (tabId === this.TAB_ID_HINTS) {
-      this.activeHintIndex = 0;
+      this.activeHintIndex = this.activeIndex;
       activeContentId = (
         this.stateHints[0].hintContent.contentId);
     } else if (tabId === this.TAB_ID_SOLUTION) {
       activeContentId = (this.stateSolution as Solution).explanation.contentId;
     } else if (tabId === this.TAB_ID_CUSTOMIZATION_ARGS) {
-      this.activeCustomizationArgContentIndex = 0;
+      this.activeCustomizationArgContentIndex = this.activeIndex;
       const activeContent = (
         this.interactionCustomizationArgTranslatableContent[0].content
       );
@@ -574,6 +577,35 @@ export class StateTranslationComponent
     return translatableContents;
   }
 
+  getActiveTab(): string {
+    this.activeContentId = this.stateEditorService.getActiveContentId();
+    if(!this.activeContentId) {
+      return null;
+    }
+    const tabName = this.stateEditorService.getActiveContentId().split('_')[0];
+    return tabName;
+  }
+
+  getIndexOfActiveCard(): number {
+    if (!this.stateEditorService.getActiveContentId()) {
+      return 0;
+    }
+
+    const tabName = this.activeTab;
+
+    switch (tabName) {
+      case this.TAB_ID_FEEDBACK:
+        return this.stateAnswerGroups.findIndex(card => card.outcome.feedback.contentId === this.activeContentId);
+      case this.TAB_ID_HINTS:
+        return this.stateHints.findIndex(card => card.hintContent.contentId === this.activeContentId);
+      case this.TAB_ID_CUSTOMIZATION_ARGS:
+        return this.interactionCustomizationArgTranslatableContent.findIndex(card => card.content.contentId === this.activeContentId);
+      default:
+        return 0;
+    }
+  }
+
+
   initStateTranslation(): void {
     this.stateName = this.stateEditorService.getActiveStateName();
     this.stateContent = this.explorationStatesService
@@ -616,7 +648,13 @@ export class StateTranslationComponent
       this.needsUpdateTooltipMessage = 'Translation needs update ' +
         'to match text. Please re-translate the content.';
     }
-    this.onTabClick(this.TAB_ID_CONTENT);
+    if (this.isDisabled(this.activeTab) || !this.activeTab) {
+      this.onTabClick(this.TAB_ID_CONTENT);
+    }
+    else {
+      this.onTabClick(this.activeTab);
+    }
+
     this.updateTranslatedContent();
   }
 
@@ -644,12 +682,16 @@ export class StateTranslationComponent
     this.stateHints = [];
     this.stateAnswerGroups = [];
 
+    this.activeTab = this.getActiveTab();
+
     this.directiveSubscriptions.add(
       this.stateEditorService.onRefreshStateTranslation.subscribe(
         () => this.initStateTranslation())
     );
 
     this.initStateTranslation();
+    this.activeIndex = this.getIndexOfActiveCard();
+    this.stateEditorService.setActiveContentId(null);
   }
 
   ngOnDestroy(): void {

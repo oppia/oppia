@@ -220,6 +220,7 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
       this.contentHtml);
     this.suggestionImagesString = this.getImageInfoForSuggestion(
       this.translationHtml);
+    console.log("Here is the content id", this.activeSuggestion.change.content_id);
   }
 
   refreshActiveContributionState(): void {
@@ -579,5 +580,9 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
     }
 
     return htmlString;
+  }
+
+  navigateToExplorationEditor(stateName: string, contentId: string) {
+    // let tabType = 
   }
 }
