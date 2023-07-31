@@ -6,12 +6,12 @@
 apache-beam[gcp]==2.38.0
 beautifulsoup4==4.10.0
 bleach==4.1.0
-certifi==2021.5.30
+certifi==2022.12.7
 deepdiff==5.8.1
 defusedxml==0.7.1
 elasticsearch==7.17.0
 firebase-admin==5.2.0
-future==0.18.2
+future==0.18.3
 googledatastore==7.0.2
 google-cloud-storage==2.1.0
 google-auth==1.35.0
@@ -25,7 +25,7 @@ gunicorn==20.1.0
 html5lib==1.1
 mailchimp3==3.0.15
 mutagen==1.45.1
-pillow==9.0.1
+Pillow==9.5.0
 pylatexenc==2.10
 pytest==6.2.5
 PyYAML==6.0
@@ -38,7 +38,7 @@ rsa==4.7.2
 simplejson==3.17.5
 six==1.16.0
 soupsieve==2.3.1
-typing-extensions==3.10.0.2
+typing-extensions==4.5.0
 urllib3==1.26.7
 webapp2==3.0.0b1
 webencodings==0.5.1

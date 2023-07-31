@@ -3,8 +3,8 @@
 // only class exported by the library.
 
 interface SetupCode {
-  code: string,
-  type: string
+  code: string;
+  type: string;
 }
 
 declare class PencilCodeEmbed {
