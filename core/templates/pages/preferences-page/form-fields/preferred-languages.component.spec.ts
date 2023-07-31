@@ -62,6 +62,7 @@ describe('Preferred Languages Component', () => {
     }];
     componentInstance.formCtrl = new FormControl(value);
     componentInstance.ngOnInit();
+    fixture.detectChanges();
     expect(componentInstance.chipList.errorState).toBeFalse();
     const invalidValue = 'fr';
     componentInstance.formCtrl.setValue(invalidValue);
