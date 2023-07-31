@@ -20,6 +20,7 @@ from __future__ import annotations
 
 import datetime
 import logging
+import time
 
 from core import feconf
 from core import utils
@@ -175,15 +176,17 @@ class TopicEditorStoryHandler(
                     published_chapters_count += 1
                 if (node.status != constants.STORYNODE_STATUS_PUBLISHED and
                     node.planned_publication_date is not None):
-                    if ((node.planned_publication_date - datetime.datetime.
-                        today()).days < 14 and node.planned_publication_date >
-                        datetime.datetime.today()):
+                    current_time = (
+                        utils.convert_millisecs_time_to_datetime_object(
+                        utils.get_current_time_in_millisecs() -
+                        1000.0 * time.timezone))
+                    if (current_time < node.planned_publication_date
+                        < current_time + datetime.timedelta(
+                        constants.UPCOMING_CHAPTERS_DAY_LIMIT)):
                         upcoming_chapters_count += 1
                         upcoming_chapters_expected_days.append((
-                            node.planned_publication_date - datetime.datetime.
-                            today()).days)
-                    if (node.planned_publication_date <
-                        datetime.datetime.today()):
+                            node.planned_publication_date - current_time).days)
+                    if node.planned_publication_date < current_time:
                         overdue_chapters_count += 1
 
             upcoming_chapters_expected_days.sort()

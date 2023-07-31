@@ -265,38 +265,44 @@ class TopicEditorStoryHandlerTests(BaseTopicEditorControllerTests):
         topic_services.publish_story(
             topic_id, canonical_story_id_2, self.admin_id)
 
-        response = self.get_json(
-            '%s/%s' % (feconf.TOPIC_EDITOR_STORY_URL, topic_id))
-        canonical_story_summary_dict = response[
-            'canonical_story_summary_dicts'][0]
-        additional_story_summary_dict = response[
-            'additional_story_summary_dicts'][0]
+        def mock_get_current_time_in_millisecs() -> int:
+            return 1690555400000
 
-        self.assertEqual(
-            canonical_story_summary_dict['description'], 'description')
-        self.assertEqual(canonical_story_summary_dict['title'], 'title')
-        self.assertEqual(
-            canonical_story_summary_dict['id'], canonical_story_id)
-        self.assertEqual(
-            canonical_story_summary_dict['story_is_published'], True)
-        self.assertEqual(
-            canonical_story_summary_dict['total_chapters_count'], 3)
-        self.assertEqual(
-            canonical_story_summary_dict['published_chapters_count'], 1)
-        self.assertEqual(
-            canonical_story_summary_dict['upcoming_chapters_count'], 1)
-        self.assertEqual(
-            canonical_story_summary_dict['overdue_chapters_count'], 1)
+        with self.swap(
+            utils, 'get_current_time_in_millisecs',
+            mock_get_current_time_in_millisecs):
+            response = self.get_json(
+                '%s/%s' % (feconf.TOPIC_EDITOR_STORY_URL, topic_id))
+            canonical_story_summary_dict = response[
+                'canonical_story_summary_dicts'][0]
+            additional_story_summary_dict = response[
+                'additional_story_summary_dicts'][0]
 
-        self.assertEqual(
-            additional_story_summary_dict['description'],
-            'another description')
-        self.assertEqual(
-            additional_story_summary_dict['title'], 'another title')
-        self.assertEqual(
-            additional_story_summary_dict['id'], additional_story_id)
-        self.assertEqual(
-            additional_story_summary_dict['story_is_published'], False)
+            self.assertEqual(
+                canonical_story_summary_dict['description'], 'description')
+            self.assertEqual(canonical_story_summary_dict['title'], 'title')
+            self.assertEqual(
+                canonical_story_summary_dict['id'], canonical_story_id)
+            self.assertEqual(
+                canonical_story_summary_dict['story_is_published'], True)
+            self.assertEqual(
+                canonical_story_summary_dict['total_chapters_count'], 3)
+            self.assertEqual(
+                canonical_story_summary_dict['published_chapters_count'], 1)
+            self.assertEqual(
+                canonical_story_summary_dict['upcoming_chapters_count'], 1)
+            self.assertEqual(
+                canonical_story_summary_dict['overdue_chapters_count'], 1)
+
+            self.assertEqual(
+                additional_story_summary_dict['description'],
+                'another description')
+            self.assertEqual(
+                additional_story_summary_dict['title'], 'another title')
+            self.assertEqual(
+                additional_story_summary_dict['id'], additional_story_id)
+            self.assertEqual(
+                additional_story_summary_dict['story_is_published'], False)
 
         self.logout()
 
