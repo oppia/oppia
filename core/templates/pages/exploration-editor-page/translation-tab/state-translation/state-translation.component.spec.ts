@@ -1609,7 +1609,7 @@ describe('State translation component', () => {
       component.activeTab = 'feedback';
       component.initActiveContentId = 'feedback_29';
 
-      spyOn(stateEditorService, 'getInitActiveContentId()').and.
+      spyOn(stateEditorService, 'getInitActiveContentId').and.
         returnValue('feedback_29');
 
       const index = component.getIndexOfActiveCard();
@@ -1621,7 +1621,7 @@ describe('State translation component', () => {
       component.activeTab = 'hint';
       component.initActiveContentId = 'hint_2';
 
-      spyOn(stateEditorService, 'getInitActiveContentId()').and.
+      spyOn(stateEditorService, 'getInitActiveContentId').and.
       returnValue('hint_2');
 
       const index = component.getIndexOfActiveCard();
@@ -1634,7 +1634,7 @@ describe('State translation component', () => {
       component.activeTab = 'ca';
       component.initActiveContentId = 'ca_1';
 
-      spyOn(stateEditorService, 'getInitActiveContentId()').and.
+      spyOn(stateEditorService, 'getInitActiveContentId').and.
       returnValue('ca_1');
 
       const index = component.getIndexOfActiveCard();
@@ -1642,14 +1642,14 @@ describe('State translation component', () => {
     });
 
     it('should return correct active tab name', () => {
-      spyOn(stateEditorService, 'getInitActiveContentId()').and.
+      spyOn(stateEditorService, 'getInitActiveContentId').and.
         returnValue('content_29');
 
         expect(component.getActiveTab().toBe('content'));
     });
 
     it('should return active tab name as null when contentId is null', () => {
-      spyOn(stateEditorService, 'getInitActiveContentId()').and.
+      spyOn(stateEditorService, 'getInitActiveContentId').and.
         returnValue(null);
 
         expect(component.getActiveTab().toBe(null));
