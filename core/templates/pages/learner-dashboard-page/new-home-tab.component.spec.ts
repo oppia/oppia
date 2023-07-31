@@ -252,7 +252,7 @@ describe('New Home tab Component', () => {
     component.ngOnInit();
     expect(component.completedExpIds).toEqual(completedExpIds);
   });
-  it('should check total explortion Ids', () => {
+  it('should check total explortion IDs', () => {
     const exp1 = {
       last_updated_msec: 1591296737470.528,
       community_owned: false,
