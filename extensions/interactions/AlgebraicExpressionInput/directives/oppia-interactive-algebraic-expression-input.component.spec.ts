@@ -24,7 +24,7 @@ import { CurrentInteractionService } from 'pages/exploration-player-page/service
 import { GuppyInitializationService, GuppyObject } from 'services/guppy-initialization.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { TranslateService } from '@ngx-translate/core';
-import { AlgebraicExpressionAnswer } from 'interactions/answer-defs';
+import { AlgebraicExpressionAnswer, InteractionAnswer } from 'interactions/answer-defs';
 
 class MockTranslateService {
   instant(key: string): string {
@@ -33,7 +33,9 @@ class MockTranslateService {
 }
 
 describe('AlgebraicExpressionInputInteractive', () => {
+  const asciiDummyValue: string = 'Dummy value';
   let component: AlgebraicExpressionInputInteractionComponent;
+  let currentInteractionService: CurrentInteractionService;
   let fixture: ComponentFixture<AlgebraicExpressionInputInteractionComponent>;
   let windowRef: WindowRef;
   let guppyInitializationService: GuppyInitializationService;
@@ -42,7 +44,7 @@ describe('AlgebraicExpressionInputInteractive', () => {
     divId: '1',
     guppyInstance: {
       asciimath: function() {
-        return 'Dummy value';
+        return asciiDummyValue;
       }
     }
   };
@@ -51,7 +53,7 @@ describe('AlgebraicExpressionInputInteractive', () => {
     constructor(id: string, config: Object) {}
 
     asciimath() {
-      return 'Dummy value';
+      return asciiDummyValue;
     }
 
     configure(name: string, val: Object): void {}
@@ -69,6 +71,7 @@ describe('AlgebraicExpressionInputInteractive', () => {
         answer: AlgebraicExpressionAnswer,
         rulesService: CurrentInteractionService
     ) => {},
+    updateCurrentAnswer: (answer: InteractionAnswer) => {},
     registerCurrentInteraction: (
         submitAnswerFn: Function, validateExpressionFn: Function) => {
       submitAnswerFn();
@@ -95,6 +98,7 @@ describe('AlgebraicExpressionInputInteractive', () => {
 
   beforeEach(() => {
     windowRef = TestBed.inject(WindowRef);
+    currentInteractionService = TestBed.inject(CurrentInteractionService);
     windowRef.nativeWindow.Guppy = MockGuppy as unknown as Guppy;
     guppyInitializationService = TestBed.inject(GuppyInitializationService);
     deviceInfoService = TestBed.inject(DeviceInfoService);
@@ -121,20 +125,22 @@ describe('AlgebraicExpressionInputInteractive', () => {
   });
 
   it('should not submit the answer if invalid', () => {
-    component.hasBeenTouched = true;
+    component.hasBeenTouched = false;
     // Invalid answer.
     component.value = 'x/';
 
-    spyOn(mockCurrentInteractionService, 'onSubmit');
+    spyOn(currentInteractionService, 'onSubmit');
     component.submitAnswer();
-    expect(mockCurrentInteractionService.onSubmit).not.toHaveBeenCalled();
+    expect(currentInteractionService.onSubmit).not.toHaveBeenCalled();
     expect(component.warningText).toBe(
       'Your answer seems to be missing a variable/number after the "/".');
+    expect(component.hasBeenTouched).toBeTrue();
   });
 
   it('should correctly validate current answer', () => {
     // This should be validated as true if the editor hasn't been touched.
     component.value = '';
+    component.hasBeenTouched = false;
     expect(component.isCurrentAnswerValid()).toBeTrue();
     expect(component.warningText).toBe('');
 
@@ -161,5 +167,22 @@ describe('AlgebraicExpressionInputInteractive', () => {
     MockGuppy.focused = false;
     component.ngOnInit();
     expect(component.value).not.toBeNull();
+  });
+
+  it('should update current answer on change', () => {
+    spyOn(guppyInitializationService, 'findActiveGuppyObject').and.returnValue(
+      mockGuppyObject as GuppyObject);
+    component.ngOnInit();
+    spyOn(currentInteractionService, 'updateCurrentAnswer');
+    spyOn(component, 'isCurrentAnswerValid');
+
+    component.onAnswerChange({focused: false});
+
+    expect(component.value).toEqual(asciiDummyValue);
+    expect(component.hasBeenTouched).toBeTrue();
+    expect(
+      currentInteractionService.updateCurrentAnswer
+    ).toHaveBeenCalledOnceWith(asciiDummyValue);
+    expect(component.isCurrentAnswerValid).toHaveBeenCalledTimes(1);
   });
 });

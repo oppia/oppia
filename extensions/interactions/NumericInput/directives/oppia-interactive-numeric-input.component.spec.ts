@@ -21,11 +21,12 @@ import { ChangeDetectorRef } from '@angular/core';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { CurrentInteractionService } from 'pages/exploration-player-page/services/current-interaction.service';
+import { TranslateModule } from '@ngx-translate/core';
 import { InteractionAttributesExtractorService } from 'interactions/interaction-attributes-extractor.service';
 import { InteractiveNumericInput } from './oppia-interactive-numeric-input.component';
 import { TranslateService } from '@ngx-translate/core';
 import { InteractionSpecsKey } from 'pages/interaction-specs.constants';
-import { NumericInputAnswer } from 'interactions/answer-defs';
+import { InteractionAnswer, NumericInputAnswer } from 'interactions/answer-defs';
 
 class MockTranslateService {
   instant(key: string): string | undefined {
@@ -66,6 +67,8 @@ describe('InteractiveNumericInput', () => {
     onSubmit: (
         answer: NumericInputAnswer, rulesService: CurrentInteractionService
     ) => {},
+    updateCurrentAnswer: (answer: InteractionAnswer) => {},
+    showNoResponseError: (): boolean => false,
     registerCurrentInteraction: (
         submitAnswerFn: Function, validateExpressionFn: Function) => {
       submitAnswerFn();
@@ -77,6 +80,14 @@ describe('InteractiveNumericInput', () => {
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       declarations: [InteractiveNumericInput],
+      imports: [
+        TranslateModule.forRoot({
+          useDefaultLang: true,
+          isolate: false,
+          extend: false,
+          defaultLanguage: 'en'
+        })
+      ],
       providers: [
         {
           provide: InteractionAttributesExtractorService,
@@ -118,6 +129,7 @@ describe('InteractiveNumericInput', () => {
         checkRequireNonnegativeInput: false
       }
     });
+    expect(component.errorMessageI18nKey).toBe('');
     expect(currentInteractionService.registerCurrentInteraction)
       .toHaveBeenCalled();
   });
@@ -168,12 +180,15 @@ describe('InteractiveNumericInput', () => {
       fixture.debugElement.injector.get(ChangeDetectorRef);
     const detectChangesSpy =
       spyOn(changeDetectorRef.constructor.prototype, 'detectChanges');
+    const updateCurrentAnswerSpy = spyOn(
+      currentInteractionService, 'updateCurrentAnswer');
     component.answer = 20;
 
     component.onAnswerChange(25);
 
     expect(component.answer).toBe(25);
     expect(detectChangesSpy).toHaveBeenCalled();
+    expect(updateCurrentAnswerSpy).toHaveBeenCalledOnceWith(25);
   });
 
   it('should not update answer when user does not update the answer', () => {
@@ -187,5 +202,19 @@ describe('InteractiveNumericInput', () => {
 
     expect(component.answer).toBe(20);
     expect(detectChangesSpy).not.toHaveBeenCalled();
+  });
+
+  it('should set an error when user submits with no response', () => {
+    spyOn(
+      currentInteractionService, 'showNoResponseError').and.returnValue(true);
+    const onSubmitSpy = spyOn(currentInteractionService, 'onSubmit');
+
+    component.ngOnInit();
+    component.requireNonnegativeInput = false;
+    component.submitAnswer('');
+
+    expect(component.errorMessageI18nKey).toBe(
+      'I18N_INTERACTIONS_NUMERIC_INPUT_NO_RESPONSE');
+    expect(onSubmitSpy).not.toHaveBeenCalled();
   });
 });
