@@ -45,7 +45,7 @@ class MockRemoveActivityNgbModalRef {
   };
 }
 
-describe('New-Home tab Component', () => {
+describe('New Home tab Component', () => {
   let component: NewHomeTabComponent;
   let fixture: ComponentFixture<NewHomeTabComponent>;
   let urlInterpolationService: UrlInterpolationService;
