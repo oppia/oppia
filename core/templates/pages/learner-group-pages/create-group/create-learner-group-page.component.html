@@ -28,7 +28,7 @@
                                    (updateLearnerGroupTitle)="updateLearnerGroupTitle($event)"
                                    (updateLearnerGroupDesc)="updateLearnerGroupDesc($event)">
       </oppia-learner-group-details>
-      <div class="oppia-next-section-container oppia-next-section-button"
+      <div class="oppia-next-section-container oppia-next-section-button e2e-test-add-group-detail-next-button"
            [ngClass]="{'active': !isGroupDetailsNextButtonDisabled()}"
            (click)="setActiveSection(LEARNER_GROUP_CREATION_SECTION_I18N_IDS.ADD_SYLLABUS_ITEMS, 2)">
         <span translate="I18N_LEARNER_GROUP_CREATION_NEXT_BUTTON_TEXT"></span>
@@ -51,7 +51,7 @@
         <span translate="I18N_LEARNER_GROUP_CREATION_PREV_BUTTON_TEXT"></span>
       </div>
       <div class="oppia-next-section-container">
-        <div class="oppia-next-section-button"
+        <div class="oppia-next-section-button e2e-test-add-to-syllabus-items-next-button"
              [ngClass]="{'active': !isAddSyllabusNextButtonDisabled()}"
              (click)="setActiveSection(LEARNER_GROUP_CREATION_SECTION_I18N_IDS.INVITE_LEARNERS, 3)">
           <span translate="I18N_LEARNER_GROUP_CREATION_NEXT_BUTTON_TEXT"></span>
@@ -73,7 +73,7 @@
         <span>&lt; </span>
         <span translate="I18N_LEARNER_GROUP_CREATION_PREV_BUTTON_TEXT"></span>
       </div>
-      <div class="oppia-next-section-container oppia-next-section-button active"
+      <div class="oppia-next-section-container oppia-next-section-button active e2e-test-confirm-create-group-button"
            (click)="createLearnerGroup()">
         <span translate="I18N_CREATE_LEARNER_GROUP"></span>
       </div>

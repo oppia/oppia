@@ -23,8 +23,31 @@ var action = require('./action.js');
 
 var NewLearnerDashboardPage = function() {
   var NEW_LEARNER_DASHBOARD_URL = '/learner-dashboard';
+  var FACILITATOR_DASHBOARD_URL = '/facilitator-dashboard';
+  var createLearnerGroupButton = $(
+    '.e2e-test-create-learner-group-button');
   var addToLearnerGoalsButton = $(
     '.e2e-test-add-topic-to-current-goals-button');
+  var learnerGroupTitleInput = $(
+    '.e2e-test-learner-group-title-input');
+  var learnerGroupDescription = $(
+    '.e2e-test-learner-group-description');
+  var addGroupDetailsNextButton = $(
+    '.e2e-test-add-group-detail-next-button');
+  var learnerGroupSearchBarInput = $(
+    '.e2e-test-learner-group-search-bar-input');
+  var learnerGroupAddToSyllabusButton = $(
+    '.e2e-test-add-to-syllabus-button');
+  var learnerGroupAddSyllabusItemsNextButton = $(
+    '.e2e-test-add-to-syllabus-items-next-button');
+  var inviteLearnerGroupLearnerSearchInput = $(
+    '.e2e-test-invite-learner-search-bar-input');
+  var inviteLearnerButton = $('.e2e-test-invite-learner-button');
+  var confirmCreateLearnerGroupButton = $(
+    '.e2e-test-confirm-create-group-button');
+  var acceptLearnerGroupInvitationButton = $('.e2e-test-accept-invitation');
+  var joinLearnerGroupButton = $('.e2e-test-join-learner-group');
+  var learnerGroupTitle = $('.e2e-test-learner-group-title');
   var communityLessonsSection = $('.e2e-test-community-lessons-section');
   var completeCommunityLessonsSection = $(
     '.e2e-test-completed-community-lessons-section');
@@ -58,10 +81,74 @@ var NewLearnerDashboardPage = function() {
   var subscriptionNameSelector = function() {
     return $$('.e2e-test-subscription-name');
   };
+  var _submitSyllabusQuery = async function(searchQuery) {
+    await waitFor.visibilityOf(
+      learnerGroupSearchBarInput,
+      'Learner Group search input takes too long to appear');
+    await action.setValue(
+      'Learner Group SearchBar Input', learnerGroupSearchBarInput, searchQuery);
+  };
 
   this.get = async function() {
     await browser.url(NEW_LEARNER_DASHBOARD_URL);
     await waitFor.pageToFullyLoad();
+  };
+
+  this.getFacilitatorDashboard = async function() {
+    await browser.url(FACILITATOR_DASHBOARD_URL);
+    await waitFor.pageToFullyLoad();
+  };
+
+  this.addLearnerGroupDetails = async function(groupTitle, groupDesc) {
+    await waitFor.visibilityOf(
+      createLearnerGroupButton,
+      'Create Learner Group button takes too long to apper');
+    await action.click('Create Learner Group Button', createLearnerGroupButton);
+    await waitFor.visibilityOf(
+      learnerGroupTitleInput,
+      'Create Learner Group page takes too long to appear.');
+    await action.setValue(
+      'Learner Group Title', learnerGroupTitleInput, groupTitle);
+    await action.setValue(
+      'Learner Group Description', learnerGroupDescription, groupDesc);
+    await action.click(
+      'Add Group Details Next Button', addGroupDetailsNextButton);
+  };
+
+  this.addLearnerGroupSyllabus = async function(topicName) {
+    await _submitSyllabusQuery(topicName);
+    await waitFor.visibilityOf(
+      learnerGroupAddToSyllabusButton,
+      'Add to syllabus button takes too long to appear');
+    await action.click(
+      'Add to syllabus', learnerGroupAddToSyllabusButton);
+    await action.click(
+      'Add to syllabus', learnerGroupAddToSyllabusButton);
+    await action.click(
+      'learnerGroupAddSyllabusItemsNextButton',
+      learnerGroupAddSyllabusItemsNextButton);
+  };
+
+  this.inviteLearnerGroupLearner = async function(learnerName) {
+    await waitFor.visibilityOf(
+      inviteLearnerGroupLearnerSearchInput,
+      'Invite Learner Group Learner Search Input');
+    await action.setValue(
+      'Invite Learner Group Learner SearchInput',
+      inviteLearnerGroupLearnerSearchInput, learnerName);
+    await action.click('Invite Learner Button', inviteLearnerButton);
+    await action.click(
+      'Confirm Create Learner Group Button', confirmCreateLearnerGroupButton);
+  };
+
+  this.acceptLearnerGroupInvitaion = async function(groupTitle) {
+    await action.click(
+      'Accept Group Invitaion', acceptLearnerGroupInvitationButton);
+    await waitFor.visibilityOf(
+      joinLearnerGroupButton,
+      'Join Learner Group modal takes too long to appear');
+    await action.click(
+      'Join LearnerGroup Button', joinLearnerGroupButton);
   };
 
   this.navigateToHomeSection = async function() {
@@ -82,6 +169,12 @@ var NewLearnerDashboardPage = function() {
       'Commmunity lesson section takes too long to appear'
     );
     await action.click('Community Lessons Section', communityLessonsSection);
+  };
+
+  this.expectlearnerGroupTitleToMatch = async function(groupTitle) {
+    var titleofLearnerGroup = await action.getText(
+      'Learner Group Title', learnerGroupTitle);
+    expect(titleofLearnerGroup).toMatch(groupTitle);
   };
 
   this.expectTitleOfCollectionSummaryTileToMatch = async function(title) {

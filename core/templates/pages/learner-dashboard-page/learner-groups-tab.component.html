@@ -23,7 +23,7 @@
               <span [innerHTML]="'I18N_LEARNER_GROUP_MORE_INFO' | translate"></span>
             </div>
             <div class="oppia-learner-groups-buttons">
-              <div class="learner-group-accept-invite-button" (click)="acceptLearnerGroupInvitation(learnerGroupSummary)">
+              <div class="learner-group-accept-invite-button e2e-test-accept-invitation" (click)="acceptLearnerGroupInvitation(learnerGroupSummary)">
                 <span [innerHTML]="'I18N_LEARNER_GROUP_ACCEPT_INVITATION' | translate"></span>
               </div>
               <div class="learner-group-decline-invite-button" (click)="declineLearnerGroupInvitation(learnerGroupSummary)">
@@ -46,7 +46,7 @@
       <div class="oppia-learner-group-summary-cards-container" *ngIf="learnerGroupsJoined.length > 0">
         <div class="oppia-learner-group-summary-card" *ngFor="let learnerGroupSummary of learnerGroupsJoined; let idx = index;">
           <a [href]="getLearnerGroupPageUrl(learnerGroupSummary.id)" class="oppia-learner-group-summary-card-info">
-            <div class="oppia-learner-group-summary-card-title">
+            <div class="oppia-learner-group-summary-card-title e2e-test-learner-group-title">
               {{ learnerGroupSummary.title }}
             </div>
           </a>

@@ -1,4 +1,4 @@
-// Copyright 2022 The Oppia Authors. All Rights Reserved.
+// Copyright 2023 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -36,46 +36,20 @@ var SubscriptionDashboardPage =
   require('../webdriverio_utils/SubscriptionDashboardPage.js');
 var TopicAndStoryViewerPage = require(
   '../webdriverio_utils/TopicAndStoryViewerPage.js');
-var forms = require('../webdriverio_utils/forms.js');
 var ExplorationEditorPage =
   require('../webdriverio_utils/ExplorationEditorPage.js');
-var Constants = require('../webdriverio_utils/WebdriverioConstants.js');
 var SkillEditorPage = require('../webdriverio_utils/SkillEditorPage.js');
 
 describe('New Learner dashboard functionality', function() {
-  var explorationPlayerPage = null;
   var topicsAndSkillsDashboardPage = null;
   var adminPage = null;
   var releaseCoordinatorPage = null;
   var libraryPage = null;
   var topicEditorPage = null;
   var storyEditorPage = null;
-  var topicAndStoryViewerPage = null;
-  var explorationEditorMainTab = null;
   var newLearnerDashboardPage = null;
   //   Var subscriptionDashboardPage = null;
   var skillEditorPage = null;
-  var dummyExplorationIds = [];
-
-  var createDummyExplorations = async function() {
-    var EXPLORATION = {
-      category: 'Biology',
-      objective: 'The goal is to check story viewer functionality.',
-      language: 'English'
-    };
-
-    for (var i = 1; i <= 3; i++) {
-      await workflow.createAndPublishTwoCardExploration(
-        `Learner Dashboard Exploration ${i}`,
-        EXPLORATION.category,
-        EXPLORATION.objective,
-        EXPLORATION.language,
-        i === 1,
-        true
-      );
-      dummyExplorationIds.push(await general.getExplorationIdFromEditor());
-    }
-  };
 
   beforeAll(async function() {
     libraryPage = new LibraryPage.LibraryPage();
@@ -99,12 +73,12 @@ describe('New Learner dashboard functionality', function() {
     subscriptionDashboardPage =
       new SubscriptionDashboardPage.SubscriptionDashboardPage();
     await users.createAndLoginCurriculumAdminUser(
-      'creator@storyViewer.com', 'creatorStoryViewer');
-    // The below lines enable the checkpoint_celebration flag in prod mode.
-    // They should be removed after the checkpoint_celebration flag is
-    // deprecated.
+      'creator1@learnerDashboard.com', 'creator1LearnerDashboard');
+    // The below lines enable the show_redesigned_learner_dashboard flag
+    // in dev mode. They should be removed after the
+    // show_redesigned_learner_dashboard flag is deprecated.
     await adminPage.get();
-    await adminPage.addRole('creatorStoryViewer', 'release coordinator');
+    await adminPage.addRole('creator1LearnerDashboard', 'release coordinator');
     await releaseCoordinatorPage.getFeaturesTab();
     var redesignedLearnerDashboardFlag = (
       await releaseCoordinatorPage.
@@ -114,7 +88,7 @@ describe('New Learner dashboard functionality', function() {
     await users.logout();
   });
 
-  it('should add exploration to play later list', async function() {
+  it('should add exploration to lesson you saved for later', async function() {
     var EXPLORATION_FRACTION = 'fraction';
     var EXPLORATION_SINGING = 'singing';
     var CATEGORY_MATHEMATICS = 'Mathematics';
@@ -149,14 +123,12 @@ describe('New Learner dashboard functionality', function() {
     await libraryPage.findExploration(EXPLORATION_FRACTION);
     await libraryPage.addSelectedExplorationToPlaylist();
     await newLearnerDashboardPage.get();
-    // Await newLearnerDashboardPage.navigateToCommunityLessonsSection();
     await newLearnerDashboardPage.expectTitleOfExplorationSummaryTileToMatch(
       EXPLORATION_FRACTION);
     await libraryPage.get();
     await libraryPage.findExploration(EXPLORATION_SINGING);
     await libraryPage.addSelectedExplorationToPlaylist();
     await newLearnerDashboardPage.get();
-    // Await newLearnerDashboardPage.navigateToCommunityLessonsSection();
     await newLearnerDashboardPage.expectTitleOfExplorationSummaryTileToMatch(
       EXPLORATION_SINGING);
     await users.logout();
@@ -268,6 +240,42 @@ describe('New Learner dashboard functionality', function() {
     await newLearnerDashboardPage.navigateToHomeSection();
     await newLearnerDashboardPage.
       expectNumberOfTopicsInContinueWhereYouLeftOff(1);
+    await users.logout();
+  });
+
+  it('should create a leaner group', async function() {
+    var GROUP_TITLE = 'Group Title';
+    var GROUP_DESC = 'Group Desc.';
+    var STORY_TITLE = 'Story Title';
+    var LEARNER_NAME = 'learner1LearnerDashboard';
+    await users.createUser(
+      'learner1@learnerDashboard.com', 'learner1LearnerDashboard');
+    await users.login('learner1@learnerDashboard.com');
+    await users.logout();
+
+    await users.login('creator@learnerDashboard1.com');
+    // The below lines enable the learner_groups_are_enabled flag in prod mode.
+    // They should be removed after the learner_groups_are_enabled flag is
+    // deprecated.
+    await adminPage.get();
+    await adminPage.addRole('learnerDashboard1', 'release coordinator');
+    await releaseCoordinatorPage.getFeaturesTab();
+    var learnerGroupFlag = (
+      await releaseCoordinatorPage.
+        getLearnerGroupFeatureElement());
+    await releaseCoordinatorPage.enableFeatureForTest(
+      learnerGroupFlag);
+    await newLearnerDashboardPage.get();
+    await newLearnerDashboardPage.getFacilitatorDashboard();
+    await newLearnerDashboardPage.addLearnerGroupDetails(
+      GROUP_TITLE, GROUP_DESC);
+    await newLearnerDashboardPage.addLearnerGroupSyllabus(STORY_TITLE);
+    await newLearnerDashboardPage.inviteLearnerGroupLearner(LEARNER_NAME);
+    await newLearnerDashboardPage.get();
+    await users.logout();
+    await users.login('learner1@learnerDashboard.com');
+    await newLearnerDashboardPage.acceptLearnerGroupInvitaion();
+    await newLearnerDashboardPage.expectlearnerGroupTitleToMatch(GROUP_TITLE);
     await users.logout();
   });
 

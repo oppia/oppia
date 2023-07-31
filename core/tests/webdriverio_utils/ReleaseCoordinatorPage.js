@@ -138,6 +138,22 @@ var ReleaseCoordinatorPage = function() {
     return null;
   };
 
+  // Remove this method after the learner_groups_are_enabled feature flag
+  // is deprecated.
+  this.getLearnerGroupFeatureElement = async function() {
+    var featureFlagElements = await featureFlagElementsSelector();
+    var count = featureFlagElements.length;
+    for (let i = 0; i < count; i++) {
+      var elem = featureFlagElements[i];
+      if ((await elem.$(featureNameLocator).getText()) ===
+          'learner_groups_are_enabled') {
+        return elem;
+      }
+    }
+
+    return null;
+  };
+
   // This function is meant to be used to enable a feature gated behind
   // a feature flag in test mode, which is the server environment the E2E
   // tests are run in.

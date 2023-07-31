@@ -1,7 +1,7 @@
 <div class="oppia-learner-group-details">
   <div class="form-group">
     <b>{{ 'I18N_LEARNER_GROUP_DETAILS_GROUP_TITLE' | translate }}<span class="required-field">*</span></b>
-    <input class="form-control"
+    <input class="form-control e2e-test-learner-group-title-input"
            type="text"
            [(ngModel)]="learnerGroupTitle"
            (ngModelChange)="updateGroupTitle($event)"
@@ -17,7 +17,7 @@
               [maxlength]="250"
               [(ngModel)]="learnerGroupDescription"
               (ngModelChange)="updateGroupDescription($event)"
-              class="form-control"
+              class="form-control e2e-test-learner-group-description"
               autofocus
               required="true"
               [readonly]="isReadOnlyModeActive()">
