@@ -193,9 +193,6 @@ def run_lighthouse_checks(lighthouse_mode: str, shard: str) -> None:
     stdout, stderr = process.communicate()
     if process.returncode == 0:
         print('Lighthouse checks completed successfully.')
-        # If vid_path:.
-        # Os.remove(vid_path).
-        # Print('Corresponding video has been deleted.').
     else:
         print('Return code: %s' % process.returncode)
         print('OUTPUT:')
