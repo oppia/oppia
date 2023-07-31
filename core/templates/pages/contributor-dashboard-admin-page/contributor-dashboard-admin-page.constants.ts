@@ -23,5 +23,10 @@ export const ContributorDashboardAdminPageConstants = {
   GET_CONTRIBUTOR_USERS_HANDLER_URL: '/getcontributorusershandler/<category>',
   TRANSLATION_CONTRIBUTION_STATS_HANDLER_URL: (
     '/translationcontributionstatshandler'
-  )
+  ),
+  CONTRIBUTOR_ADMIN_STATS_SUMMARIES_URL: (
+    '/contributor-dashboard-admin-stats/<contribution_type>' +
+    '/<contribution_subtype>'
+  ),
+  COMMUNITY_CONTRIBUTION_STATS_URL: '/community-contribution-stats'
 } as const;
