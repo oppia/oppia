@@ -1061,8 +1061,6 @@ typing-extensions==4.5.0 \
     #   -r requirements.in
     #   apache-beam
     #   libcst
-    #   pyee
-    #   python-ffmpeg
     #   typing-inspect
 typing-inspect==0.7.1 \
     --hash=sha256:047d4097d9b17f46531bf6f014356111a1b6fb821a24fe7ac909853ca2a782aa \

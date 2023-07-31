@@ -278,6 +278,34 @@ const main = async function() {
     width: 1920,
     height: 1080
   });
+
+  var recorder = null;
+  let record = process.argv[2] && process.argv[2] === '-record';
+  let videoPath = process.argv[3];
+  if (record && videoPath) { // Start recording via puppeteer-screen-recorder.
+    const { PuppeteerScreenRecorder } = require('puppeteer-screen-recorder');
+    const Config = {
+      followNewTab: true,
+      fps: 25,
+      ffmpeg_Path: null,
+      videoFrame: {
+        width: 1920,
+        height: 1080,
+      },
+      videoCrf: 18,
+      videoCodec: 'libx264',
+      videoPreset: 'ultrafast',
+      videoBitrate: 1000,
+      autopad: {
+        color: 'black' | '#35A5FF',
+      },
+      aspectRatio: '16:9',
+    };
+    recorder = new PuppeteerScreenRecorder(page, Config);
+    // Create directory for video in opensource.
+    await recorder.start(videoPath);
+  }
+
   await login(browser, page);
   await getExplorationEditorUrl(browser, page);
 
@@ -295,6 +323,9 @@ const main = async function() {
       skillEditorUrl,
     ].join('\n')
   );
+  if (record) {
+    await recorder.stop();
+  }
   await page.close();
   process.exit(0);
 };

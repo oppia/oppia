@@ -75,23 +75,32 @@ _PARSER.add_argument(
     action='store_true')
 
 _PARSER.add_argument(
-    '--record_screen', help='Sets whether lighthouse screen-records tests',
+    '--record_screen', help='Sets whether LHCI Puppeteer script is recorded',
     action='store_true')
 
 
-def run_lighthouse_puppeteer_script(
-        vid_popen: Optional[subprocess.Popen[bytes]]=None) -> None: # pylint: disable=unsubscriptable-object
+def run_lighthouse_puppeteer_script(record: bool=False) -> None:
 
     """Runs puppeteer script to collect dynamic urls.
 
     Args:
-        vid_popen: subprocess.Popen. If not None, holds subprocess for ffmpeg
-            screen recording.
+        record: bool. Set to True to record the LHCI puppeteer script
+            via puppeteer-screen-recorder and False to not. Note that
+            puppeteer-screen-recorder must be separately installed to record.
     """
-
     puppeteer_path = (
         os.path.join('core', 'tests', 'puppeteer', 'lighthouse_setup.js'))
     bash_command = [common.NODE_BIN_PATH, puppeteer_path]
+    if record:
+        # Add arguments to lighthouse_setup that enable video recording.
+        bash_command.append('-record')
+        dir_path = os.path.join(os.getcwd(), '..', 'lhci-puppeteer-video')
+        if not os.path.exists(dir_path):
+            os.mkdir(dir_path)
+        video_path = os.path.join(dir_path, 'video.mp4')
+        bash_command.append(video_path)
+        print('Starting LHCI Puppeteer script with recording.')
+        print('Video Path:', video_path)
 
     process = subprocess.Popen(
         bash_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -114,11 +123,11 @@ def run_lighthouse_puppeteer_script(
         # print it.
         print(stderr.decode('utf-8'))
         print('Puppeteer script failed. More details can be found above.')
-        if vid_popen:
-            vid_popen.terminate()
-            process.communicate()
-            print('Saved video of failed script.')
-
+        if record:
+            if os.path.isfile(video_path):
+                print('Resulting puppeteer video saved at', video_path)
+            else:
+                print('No video found at', video_path)
         sys.exit(1)
 
 
@@ -161,10 +170,7 @@ def export_url(line: str) -> None:
         os.environ['skill_id'] = url_parts[4]
 
 
-def run_lighthouse_checks(
-        lighthouse_mode: str, shard: str,
-        vid_popen: Optional[subprocess.Popen[bytes]]=None, # pylint: disable=unsubscriptable-object
-        vid_path: Optional[str]=None) -> None:
+def run_lighthouse_checks(lighthouse_mode: str, shard: str) -> None:
 
     """Runs the Lighthouse checks through the Lighthouse config.
 
@@ -172,9 +178,6 @@ def run_lighthouse_checks(
         lighthouse_mode: str. Represents whether the lighthouse checks are in
             accessibility mode or performance mode.
         shard: str. Specifies which shard of the tests should be run.
-        vid_popen: subprocess.Popen. If not None, holds subprocess for ffmpeg
-            screen recording.
-        vid_path: str. If not None, represents vid_popen output video path.
     """
     lhci_path = os.path.join('node_modules', '@lhci', 'cli', 'src', 'cli.js')
     # The max-old-space-size is a quick fix for node running out of heap memory
@@ -190,13 +193,6 @@ def run_lighthouse_checks(
     stdout, stderr = process.communicate()
     if process.returncode == 0:
         print('Lighthouse checks completed successfully.')
-        if vid_popen:
-            vid_popen.terminate()
-            vid_popen.communicate()
-            if vid_path is not None and os.path.isfile(vid_path):
-                print('Lighthouse video saved at', vid_path)
-            else:
-                print('Resulting path', vid_path, 'does not have file.')
         # If vid_path:.
         # Os.remove(vid_path).
         # Print('Corresponding video has been deleted.').
@@ -211,10 +207,6 @@ def run_lighthouse_checks(
         # print it.
         print(stderr.decode('utf-8'))
         print('Lighthouse checks failed. More details can be found above.')
-        if vid_popen:
-            vid_popen.terminate()
-            vid_popen.communicate()
-            print('Lighthouse video saved at', vid_path)
         sys.exit(1)
 
 
@@ -248,16 +240,6 @@ def main(args: Optional[List[str]] = None) -> None:
         common.run_ng_compilation()
         run_webpack_compilation()
 
-    if parsed_args.record_screen:
-        dir_path = os.path.join(os.getcwd(), 'ffmpeg-video')
-        os.mkdir(dir_path)
-        vid_path = os.path.join(dir_path, 'lhci.mp4')
-        print('Starting ffmpeg for screen recording.')
-        vid_popen = subprocess.Popen([
-            'ffmpeg', '-framerate', '25', '-f',
-            'x11grab', '-i', ':0', vid_path],
-            stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-
     with contextlib.ExitStack() as stack:
         stack.enter_context(servers.managed_redis_server())
         stack.enter_context(servers.managed_elasticsearch_dev_server())
@@ -276,14 +258,10 @@ def main(args: Optional[List[str]] = None) -> None:
             env=env))
 
         if parsed_args.record_screen:
-            print('Starting puppeteer scrupt with screen recording.')
-            run_lighthouse_puppeteer_script(vid_popen)
-            print('Starting LHCI checks with screen recording.')
-            run_lighthouse_checks(
-                lighthouse_mode, parsed_args.shard, vid_popen, vid_path)
+            run_lighthouse_puppeteer_script(True)
         else:
             run_lighthouse_puppeteer_script()
-            run_lighthouse_checks(lighthouse_mode, parsed_args.shard)
+        run_lighthouse_checks(lighthouse_mode, parsed_args.shard)
 
 
 if __name__ == '__main__': # pragma: no cover
