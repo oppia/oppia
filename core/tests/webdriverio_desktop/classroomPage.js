@@ -18,6 +18,7 @@
 
 var general = require('../webdriverio_utils/general.js');
 var users = require('../webdriverio_utils/users.js');
+var waitFor = require('../webdriverio_utils/waitFor.js');
 var workflow = require('../webdriverio_utils/workflow.js');
 
 var ClassroomPage = require('../webdriverio_utils/ClassroomPage.js');
