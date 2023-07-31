@@ -5,7 +5,7 @@
 
 <ul class="nav navbar-nav oppia-navbar-nav float-right">
   <!-- Start of html for large screens. -->
-  <li class="nav-item d-none d-sm-block" *ngIf="explorationCanBePublished">
+  <li class="nav-item d-sm-block" *ngIf="explorationCanBePublished">
     <div class="btn-group oppia-publish-button-container"
          ngbTooltip="{{ getPublishExplorationButtonTooltip() }}"
          placement="bottom"
@@ -34,7 +34,7 @@
     </div>
   </li>
 
-  <li class="nav-item d-none d-sm-block" *ngIf="isEditableOutsideTutorialMode()">
+  <li class="nav-item d-sm-block" *ngIf="isEditableOutsideTutorialMode()">
     <div class="btn-group oppia-publish-button-container"
          title="{{ getSaveButtonTooltip() }}" [ngClass]="{'disable-save-button': !connectedToInternet || !isExplorationSaveable() || isLockedByAdmin()}">
       <button id="tutorialSaveButton"
