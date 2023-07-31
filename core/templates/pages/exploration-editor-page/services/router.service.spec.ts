@@ -328,13 +328,13 @@ describe('Router Service', () => {
       .toHaveBeenCalled();
   });
 
-  it('should set contentId and tabName which will be loaded in' +
+  it('should set contentId and tabName which will be loaded in ' +
   'translation tab', fakeAsync(() => {
     routerService._changeTab('/create/25#/translation/END/content');
 
-    expect(stateEditorService.getInitActiveContentId()).toEqual(
+    expect(stateEditorService.getInitActiveContentId()).toBe(
     'content');
-    expect(stateEditorService. getActiveStateName()).toEqual(
+    expect(stateEditorService. getActiveStateName()).toBe(
       'END');
   }));
 });

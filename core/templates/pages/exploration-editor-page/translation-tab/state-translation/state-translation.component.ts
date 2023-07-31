@@ -236,6 +236,7 @@ export class StateTranslationComponent
       activeContentId, activeDataFormat);
     this.activatedTabId = tabId;
     this.updateTranslatedContent();
+    console.log(this.stateHints);
   }
 
   updateTranslatedContent(): void {
