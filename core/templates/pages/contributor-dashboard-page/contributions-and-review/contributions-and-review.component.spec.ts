@@ -1191,10 +1191,13 @@ describe('Contributions and review component', () => {
         getReviewableTranslationSuggestionsAsyncSpy.and.returnValue(
           reviewableTranslation);
 
+        // Go to the review translations tab, to ensure that
+        // getReviewableTranslationSuggestionsAsyncSpy is
+        // called by loadContributions.
         component.switchToTab(
           component.TAB_TYPE_REVIEWS, 'translate_content');
 
-        // Set up contributions with a translation.
+        // Set up contributions with a translation to be reviewed.
         component.loadContributions(null).then(({opportunitiesDicts, more}) => {
           expect(Object.keys(component.contributions)).toContain(
             'suggestion_1');
@@ -1305,8 +1308,6 @@ describe('Contributions and review component', () => {
           },
           status: 'accepted'
         };
-
-        // Now load a question contribution.
         getUserCreatedQuestionSuggestionsAsyncSpy.and.returnValue(
           Promise.resolve({
             suggestionIdToDetails: {
@@ -1321,11 +1322,15 @@ describe('Contributions and review component', () => {
             more: false
           }));
 
+        // Go to the add questions tab, to ensure that
+        // getUserCreatedQuestionSuggestionsAsyncSpy is
+        // called by loadContributions.
         component.switchToTab(
           component.TAB_TYPE_CONTRIBUTIONS, 'add_question');
 
         // Load contributions object with a question. This should also remove
-        // any existing data from the contributions object.
+        // any data created in the previous call to loadContributions
+        // from the component.contributions object.
         component.loadContributions(null).then(({opportunitiesDicts, more}) => {
           expect(Object.keys(component.contributions)).toContain(
             'suggestion_2');
