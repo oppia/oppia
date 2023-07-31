@@ -22,6 +22,7 @@ var workflow = require('../webdriverio_utils/workflow.js');
 
 var ClassroomPage = require('../webdriverio_utils/ClassroomPage.js');
 var LibraryPage = require('../webdriverio_utils/LibraryPage.js');
+var DiagnosticTestPage = require('../webdriverio_utils/DiagnosticTestPage.js');
 
 describe('Classroom page functionality', function() {
   var classroomPage = null;
@@ -30,6 +31,7 @@ describe('Classroom page functionality', function() {
   beforeAll(async function() {
     classroomPage = new ClassroomPage.ClassroomPage();
     libraryPage = new LibraryPage.LibraryPage();
+    diagnosticTestPage = new DiagnosticTestPage.DiagnosticTestPage();
 
     await users.createAndLoginCurriculumAdminUser(
       'creator@classroomPage.com', 'creatorClassroomPage');
@@ -47,6 +49,8 @@ describe('Classroom page functionality', function() {
       'This is the objective.',
       'English',
       true);
+
+    await diagnosticTestPage.createNewClassroomConfig('Math', 'math');
     await classroomPage.get('math');
     await libraryPage.findExploration('Title');
     await libraryPage.expectExplorationToBeVisible('Exploration Title');
