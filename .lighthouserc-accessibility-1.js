@@ -62,13 +62,13 @@ module.exports = {
         {
           'matchingUrlPattern': '^http://127.0.0.1:8181/contributor-dashboard$',
           'assertions': {
-            'categories:accessibility': ['error', {'minScore': 0.98}]
+            'categories:accessibility': ['error', {'minScore': 1}]
           }
         },
         {
           'matchingUrlPattern': '^http://127.0.0.1:8181/creator-dashboard$',
           'assertions': {
-            'categories:accessibility': ['error', {'minScore': 0.98}]
+            'categories:accessibility': ['error', {'minScore': 1}]
           }
         },
         {
@@ -96,7 +96,7 @@ module.exports = {
         {
           'matchingUrlPattern': '^http://127.0.0.1:8181/learner-dashboard$',
           'assertions': {
-            'categories:accessibility': ['error', {'minScore': 0.98}]
+            'categories:accessibility': ['error', {'minScore': 1}]
           }
         },
         {
