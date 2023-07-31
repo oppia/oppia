@@ -29,7 +29,6 @@ import { WindowDimensionsService } from
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { PageTitleService } from 'services/page-title.service';
-import { AlertsService } from 'services/alerts.service';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 
@@ -68,8 +67,6 @@ describe('Donate page', () => {
   let translateService: TranslateService;
   let pageTitleService: PageTitleService;
   let windowRef: MockWindowRef;
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  let alertsService: AlertsService;
   let ngbModal: NgbModal;
 
   beforeEach(async() => {
@@ -110,7 +107,6 @@ describe('Donate page', () => {
     component = donatePageComponent.componentInstance;
     translateService = TestBed.inject(TranslateService);
     pageTitleService = TestBed.inject(PageTitleService);
-    alertsService = TestBed.inject(AlertsService);
     ngbModal = TestBed.inject(NgbModal);
     spyOn(ngbModal, 'open');
   });
