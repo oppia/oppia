@@ -211,7 +211,6 @@ def run_webpack_compilation(source_maps: bool = False) -> None:
         except subprocess.CalledProcessError as error:
             print(error.output)
             sys.exit(error.returncode)
-            return
         if os.path.isdir(webpack_bundles_dir_name):
             break
     else:
@@ -338,11 +337,11 @@ def _minify_and_create_sourcemap(
         common.NODE_BIN_PATH, UGLIFY_FILE, source_path,
         source_map_properties, target_file_path)
     if feconf.OPPIA_IS_DOCKERIZED:
-        cmd = ''.join([
+        cmd = ' '.join([
             'bash', '-c',
             'node /app/oppia/node_modules/uglify-js/bin/uglifyjs'
             ' /app/oppia/third_party/generated/js/third_party.js'
-            ' -c -m --source-map %s -o /app/op0pia/third_party/'
+            ' -c -m --source-map %s -o /app/oppia/third_party/'
             'generated/js/third_party.min.js' % (
                 source_map_properties
             )
@@ -1415,6 +1414,7 @@ def generate_python_package() -> None:
         subprocess.check_call('python setup.py -q sdist -d build', shell=True)
         print('Oppia package build completed.')
     finally:
+        install_python_dev_dependencies.install_installation_tools()
         install_third_party_libs.main()
         print('Dev dependencies reinstalled')
 

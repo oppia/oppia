@@ -24,10 +24,12 @@ import os
 import re
 import shutil
 import signal
+import ssl
 import subprocess
 import sys
 import threading
 import time
+from urllib import request as urlrequest
 
 from core.tests import test_utils
 from scripts import common
@@ -35,7 +37,6 @@ from scripts import scripts_test_utils
 from scripts import servers
 
 import psutil
-
 from typing import Callable, Iterator, List, Optional, Sequence, Tuple
 
 
@@ -1011,17 +1012,54 @@ class ManagedProcessTests(test_utils.TestBase):
         self.assertIn('--suite full', program_args)
         self.assertIn('--params.devMode=True', program_args)
 
-    def test_managed_webdriverio_mobile(self) -> None:
-        with servers.managed_webdriverio_server(mobile=True):
-            self.assertEqual(os.getenv('MOBILE'), 'true')
+    def test_managed_webdriverio_mobile(
+        self
+    ) -> None:
+        attempts = []
 
-    def test_managed_webdriverio_with_explicit_args(self) -> None:
+        def mock_urlopen(
+            url: str, context: ssl.SSLContext
+        ) -> io.BufferedIOBase:
+            attempts.append(url)
+            self.assertLessEqual(len(attempts), 1)
+            self.assertTrue(
+                url.startswith(
+                    'https://chromedriver.storage.googleapis.com/LATEST_RELEASE'
+                    ))
+            self.assertIsNotNone(context)
+            return io.BytesIO(b'content')
+
+        urlopen_swap = self.swap(urlrequest, 'urlopen', mock_urlopen)
+        with urlopen_swap:
+            with servers.managed_webdriverio_server(mobile=True):
+                self.assertEqual(os.getenv('MOBILE'), 'true')
+
+    def test_managed_webdriverio_with_explicit_args(
+        self
+    ) -> None:
+        attempts = []
+
+        def mock_urlopen(
+            url: str, context: ssl.SSLContext
+        ) -> io.BufferedIOBase:
+            attempts.append(url)
+            self.assertLessEqual(len(attempts), 1)
+            self.assertTrue(
+                url.startswith(
+                    'https://chromedriver.storage.googleapis.com/LATEST_RELEASE'
+                    ))
+            self.assertIsNotNone(context)
+            return io.BytesIO(b'content')
+
+        urlopen_swap = self.swap(urlrequest, 'urlopen', mock_urlopen)
+
         popen_calls = self.exit_stack.enter_context(self.swap_popen())
 
-        self.exit_stack.enter_context(servers.managed_webdriverio_server(
-            suite_name='abc', sharding_instances=3, debug_mode=True,
-            dev_mode=False, stdout=subprocess.PIPE))
-        self.exit_stack.close()
+        with urlopen_swap:
+            self.exit_stack.enter_context(servers.managed_webdriverio_server(
+                suite_name='abc', sharding_instances=3, debug_mode=True,
+                dev_mode=False, stdout=subprocess.PIPE))
+            self.exit_stack.close()
 
         self.assertEqual(len(popen_calls), 1)
         self.assertEqual(
