@@ -2,18 +2,25 @@
           id="tutorialStateInteraction">
   <div>
     <div class="oppia-exp-interaction-card-header-container oppia-mobile-collapsible-card-header"
-         (click)="toggleInteractionEditor()">
+         (click)="toggleInteractionEditor()"
+         (keydown.enter)="toggleInteractionEditor()">
       <h3 class="oppia-exp-interaction-card-header">
         Interaction <span *ngIf="getCurrentInteractionName()">( {{getCurrentInteractionName()}} )</span>
       </h3>
       <div *ngIf="getCurrentInteractionName().length>0">
         <i class="fa fa-caret-down"
            *ngIf="!interactionEditorIsShown"
-           aria-hidden="true">
+           tabindex="0"
+           role="button"
+           aria-label="Expand interaction"
+           [attr.aria-hidden]="interactionEditorIsShown ? 'true' : 'false'">
         </i>
         <i class="fa fa-caret-up"
            *ngIf="interactionEditorIsShown"
-           aria-hidden="true">
+           tabindex="0"
+           role="button"
+           aria-label="collapse answers and responses"
+           [attr.aria-hidden]="interactionEditorIsShown ? 'false' : 'true'">
         </i>
       </div>
     </div>
