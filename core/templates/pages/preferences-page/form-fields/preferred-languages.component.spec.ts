@@ -61,17 +61,15 @@ describe('Preferred Languages Component', () => {
       text: 'English'
     }];
     componentInstance.formCtrl = new FormControl(value);
-    componentInstance.ngOnInit();
+    componentInstance.ngAfterViewInit();
     fixture.detectChanges();
     expect(componentInstance.chipList.errorState).toBeFalse();
-    const invalidValue = 'fr';
-    componentInstance.formCtrl.setValue(invalidValue);
-    componentInstance.ngOnInit();
+    componentInstance.formCtrl.setValue('fr');
+    componentInstance.ngAfterViewInit();
     fixture.detectChanges();
     expect(componentInstance.chipList.errorState).toBeTrue();
-    const validValue = 'en';
-    componentInstance.formCtrl.setValue(validValue);
-    componentInstance.ngOnInit();
+    componentInstance.formCtrl.setValue('en');
+    componentInstance.ngAfterViewInit();
     fixture.detectChanges();
     expect(componentInstance.chipList.errorState).toBeFalse();
   });
