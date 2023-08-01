@@ -24,6 +24,7 @@ from core import utils
 from core.jobs import base_jobs
 from core.jobs.io import ndb_io
 from core.jobs.transforms import job_result_transforms
+from core.jobs.transforms import results_transforms
 from core.jobs.types import job_run_result
 from core.platform import models
 
@@ -185,22 +186,27 @@ class PopulateStoryNodeJob(base_jobs.JobBase):
             | 'Update story node fields' >> beam.Map(self._update_story_node)
         )
 
+        updated_story_models_job_results = (
+            updated_story_models_results
+            | job_result_transforms.ResultsToJobRunResults(
+                    'TOPIC MODELS WHOSE STORIES ARE UPDATED')
+        )
+
+        filtered_migrated_stories = (
+            updated_story_models_results
+            | 'Filter migration results' >> (
+                results_transforms.DrainResultsOnError())
+        )
+
         if self.DATASTORE_UPDATES_ALLOWED:
             unused_put_results = (
-                updated_story_models_results
-                | 'Filter results with oks' >> beam.Filter(
-                    lambda result_item: result_item.is_ok())
+                filtered_migrated_stories
                 | 'Unwrap story models lists' >> beam.Map(
                     lambda result_item: result_item.unwrap())
                 | 'Flatten story models lists' >> beam.FlatMap(lambda x: x)
                 | 'Put models into datastore' >> ndb_io.PutModels()
             )
 
-        updated_story_models_job_results = (
-            updated_story_models_results
-            | job_result_transforms.ResultsToJobRunResults(
-                    'TOPIC MODELS WHSOSE STORIES ARE UPDATED')
-        )
         return updated_story_models_job_results
 
 

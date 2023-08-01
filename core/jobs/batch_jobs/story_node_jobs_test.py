@@ -232,7 +232,7 @@ class PopulateStoryNodeJobTests(job_test_utils.JobTestBase):
 
         self.assert_job_output_is([
             job_run_result.JobRunResult(
-                stdout='TOPIC MODELS WHSOSE STORIES ARE UPDATED SUCCESS: 1'
+                stdout='TOPIC MODELS WHOSE STORIES ARE UPDATED SUCCESS: 1'
             )
         ])
         updated_story_model_1 = story_models.StoryModel.get(
@@ -319,7 +319,7 @@ class PopulateStoryNodeJobTests(job_test_utils.JobTestBase):
         self.assert_job_output_is([
             job_run_result.JobRunResult(
                 stderr=(
-                    'TOPIC MODELS WHSOSE STORIES ARE UPDATED ERROR: '
+                    'TOPIC MODELS WHOSE STORIES ARE UPDATED ERROR: '
                     '\"(\'story_1_id\', StopIteration())\": 1'
                 )
             )
@@ -387,7 +387,7 @@ class PopulateStoryNodeJobTests(job_test_utils.JobTestBase):
         self.assert_job_output_is([
             job_run_result.JobRunResult(
                 stderr=(
-                    'TOPIC MODELS WHSOSE STORIES ARE UPDATED ERROR: \"('
+                    'TOPIC MODELS WHOSE STORIES ARE UPDATED ERROR: \"('
                     '\'story_1_id\', Exception(\'Node was not created.\''
                     '))\": 1'
                 )
@@ -588,7 +588,7 @@ class AuditPopulateStoryNodeJobTests(job_test_utils.JobTestBase):
 
         self.assert_job_output_is([
             job_run_result.JobRunResult(
-                stdout='TOPIC MODELS WHSOSE STORIES ARE UPDATED SUCCESS: 1'
+                stdout='TOPIC MODELS WHOSE STORIES ARE UPDATED SUCCESS: 1'
             )
         ])
 
@@ -639,7 +639,7 @@ class AuditPopulateStoryNodeJobTests(job_test_utils.JobTestBase):
         self.assert_job_output_is([
             job_run_result.JobRunResult(
                 stderr=(
-                    'TOPIC MODELS WHSOSE STORIES ARE UPDATED ERROR: \"(\''
+                    'TOPIC MODELS WHOSE STORIES ARE UPDATED ERROR: \"(\''
                     'story_1_id\', StopIteration())\": 1'
                 )
             )
@@ -707,7 +707,7 @@ class AuditPopulateStoryNodeJobTests(job_test_utils.JobTestBase):
         self.assert_job_output_is([
             job_run_result.JobRunResult(
                 stderr=(
-                    'TOPIC MODELS WHSOSE STORIES ARE UPDATED ERROR: \"(\''
+                    'TOPIC MODELS WHOSE STORIES ARE UPDATED ERROR: \"(\''
                     'story_1_id\', Exception(\'Node was not created.\'))\": 1'
                 )
             )
