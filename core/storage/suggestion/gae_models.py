@@ -684,6 +684,14 @@ class GeneralSuggestionModel(base_models.BaseModel):
                 returns all matching entities. This parameter is made optional
                 to allow fetching of all translation suggestions for client-side
                 sorting based on lesson flow.
+                Maximum number of entities to be returned: Note that the None
+                case is needed because we sometimes need to fetch all
+                translation suggestions so that they can be sorted client-side
+                based on specific criteria, and the datastore does not
+                efficiently support sorting based on complex client-side
+                criteria. So, we need to fetch all matching entities from the
+                datastore and allow the frontend to perform the sorting as
+                needed.
             offset: int. Number of results to skip from the beginning of all
                 results matching the query.
             user_id: str. The id of the user trying to make this query.
@@ -693,15 +701,6 @@ class GeneralSuggestionModel(base_models.BaseModel):
             language_codes: list(str). The list of language codes.
             exp_ids: list(str). Exploration IDs matching the target ID of the
                 translation suggestions.
-            Maximum number of entities to be returned: Note that the None case
-                is needed because we sometimes need to fetch all translation
-                suggestions so that they can be sorted client-side based on
-                specific criteria, and the datastore does not efficiently
-                support sorting based on complex client-side criteria. So, we
-                need to fetch all matching entities from the datastore and
-                allow the frontend to perform the sorting as needed.
-                Even in this case, though, the maximum number of entities
-                that can be returned by this query is 500.
 
         Returns:
             Tuple of (results, next_offset). Where:
