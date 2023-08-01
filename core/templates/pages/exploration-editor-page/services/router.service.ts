@@ -46,7 +46,7 @@ export class RouterService {
   private centerGraphEventEmitter = new EventEmitter();
   private SLUG_GUI = 'gui';
   private SLUG_PREVIEW = 'preview';
-  private SLUG_TRANSLATION = 'translation'
+  private SLUG_TRANSLATION = 'translation';
   private PREVIEW_TAB_WAIT_TIME_MSEC = 200;
   private _activeTabName = this.TABS.MAIN.name;
   private refreshSettingsTabEventEmitter = new EventEmitter();
@@ -89,14 +89,16 @@ export class RouterService {
 
     if (newPath.indexOf(this.TABS.TRANSLATION.path) === 0) {
       this._activeTabName = this.TABS.TRANSLATION.name;
-      const [stateName, contentId] = newPath.substring(this.TABS.TRANSLATION.path.length + 1).split('/');
-      if (stateName){
+      const [stateName, contentId] = newPath.substring(
+        this.TABS.TRANSLATION.path.length + 1).split('/');
+      if (stateName) {
         this.stateEditorService.setActiveStateName(stateName);
       }
       if (contentId) {
         this.stateEditorService.setInitActiveContentId(contentId);
       }
-      this.windowRef.nativeWindow.location.hash = this.TABS.TRANSLATION.path + '/' + stateName
+      this.windowRef.nativeWindow.location.hash = (
+        this.TABS.TRANSLATION.path + '/' + stateName);
       this.refreshTranslationTabEventEmitter.emit();
       this.ngZone.runOutsideAngular(() => {
         let waitForStatesToLoad = setInterval(() => {

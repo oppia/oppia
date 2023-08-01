@@ -334,8 +334,8 @@ describe('Router Service', () => {
 
     tick();
     expect(stateEditorService.getInitActiveContentId()).toBe(
-    'content');
-    expect(stateEditorService. getActiveStateName()).toBe(
+      'content');
+    expect(stateEditorService.getActiveStateName()).toBe(
       'END');
   }));
 });

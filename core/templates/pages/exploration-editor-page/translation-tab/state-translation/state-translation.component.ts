@@ -236,7 +236,6 @@ export class StateTranslationComponent
       activeContentId, activeDataFormat);
     this.activatedTabId = tabId;
     this.updateTranslatedContent();
-    console.log(this.stateHints);
   }
 
   updateTranslatedContent(): void {
@@ -581,12 +580,12 @@ export class StateTranslationComponent
   getActiveTab(): string {
     this.initActiveContentId = this.stateEditorService.
       getInitActiveContentId();
-    if(!this.initActiveContentId) {
+    if (!this.initActiveContentId) {
       return null;
     }
     const tabName = this.stateEditorService.getInitActiveContentId().
       split('_')[0];
-    return tabName === 'default'? this.TAB_ID_FEEDBACK: tabName;
+    return tabName === 'default' ? this.TAB_ID_FEEDBACK : tabName;
   }
 
   getIndexOfActiveCard(): number {
@@ -659,8 +658,7 @@ export class StateTranslationComponent
     }
     if (this.isDisabled(this.activeTab) || !this.activeTab) {
       this.onTabClick(this.TAB_ID_CONTENT);
-    }
-    else {
+    } else {
       this.onTabClick(this.activeTab);
     }
 

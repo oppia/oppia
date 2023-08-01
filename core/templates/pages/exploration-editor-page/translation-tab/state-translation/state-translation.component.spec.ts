@@ -1509,13 +1509,13 @@ describe('State translation component', () => {
     const mockStateAnswerGroups = [
       {
         outcome: {
-          dest: "dest 1",
+          dest: 'dest 1',
           destIfReallyStuck: null,
           feedback: {
-            _contentId: "feedback_27",
-            _html: "html",
-            contentId: "feedback_27",
-            html: "html"
+            _contentId: 'feedback_27',
+            _html: 'html',
+            contentId: 'feedback_27',
+            html: 'html'
           },
           labelledAsCorrect: false,
           missingPrerequisiteSkillId: null,
@@ -1528,13 +1528,13 @@ describe('State translation component', () => {
       },
       {
         outcome: {
-          dest: "dest 2",
+          dest: 'dest 2',
           destIfReallyStuck: null,
           feedback: {
-            _contentId: "feedback_28",
-            _html: "html",
-            contentId: "feedback_28",
-            html: "html"
+            _contentId: 'feedback_28',
+            _html: 'html',
+            contentId: 'feedback_28',
+            html: 'html'
           },
           labelledAsCorrect: false,
           missingPrerequisiteSkillId: null,
@@ -1547,13 +1547,13 @@ describe('State translation component', () => {
       },
       {
         outcome: {
-          dest: "dest 3",
+          dest: 'dest 3',
           destIfReallyStuck: null,
           feedback: {
-            _contentId: "feedback_29",
-            _html: "html",
-            contentId: "feedback_29",
-            html: "html"
+            _contentId: 'feedback_29',
+            _html: 'html',
+            contentId: 'feedback_29',
+            html: 'html'
           },
           labelledAsCorrect: false,
           missingPrerequisiteSkillId: null,
@@ -1564,7 +1564,7 @@ describe('State translation component', () => {
         taggedSkillMisconceptionId: null,
         trainingData: []
       }
-    ]
+    ];
 
     const mockStateHints = [
       {
@@ -1582,7 +1582,7 @@ describe('State translation component', () => {
           contentId: 'hint_3'
         }
       }
-    ]
+    ];
 
     const mockinteractionCustomizationArgTranslatableContent = [
       {
@@ -1603,10 +1603,10 @@ describe('State translation component', () => {
           contentId: 'ca_3'
         }
       }
-    ]
+    ];
 
     it('should return correct index for card of type feedback', () => {
-      component.stateAnswerGroups = mockStateAnswerGroups as unknown as 
+      component.stateAnswerGroups = mockStateAnswerGroups as unknown as
       AnswerGroup[];
       component.activeTab = 'feedback';
       component.initActiveContentId = 'feedback_29';
@@ -1632,12 +1632,12 @@ describe('State translation component', () => {
 
     it('should return correct index for card of type custom args', () => {
       component.interactionCustomizationArgTranslatableContent = (
-        mockinteractionCustomizationArgTranslatableContent)
+        mockinteractionCustomizationArgTranslatableContent);
       component.activeTab = 'ca';
       component.initActiveContentId = 'ca_1';
 
       spyOn(stateEditorService, 'getInitActiveContentId').and.
-      returnValue('ca_1');
+        returnValue('ca_1');
 
       const index = component.getIndexOfActiveCard();
       expect(index).toEqual(0);
@@ -1647,14 +1647,14 @@ describe('State translation component', () => {
       spyOn(stateEditorService, 'getInitActiveContentId').and.
         returnValue('content_29');
 
-        expect(component.getActiveTab()).toBe('content');
+      expect(component.getActiveTab()).toBe('content');
     });
 
     it('should return active tab name as null when contentId is null', () => {
       spyOn(stateEditorService, 'getInitActiveContentId').and.
         returnValue(null);
 
-        expect(component.getActiveTab()).toBe(null);
+      expect(component.getActiveTab()).toBe(null);
     });
   });
 });
