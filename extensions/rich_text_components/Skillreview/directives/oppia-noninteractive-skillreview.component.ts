@@ -99,6 +99,9 @@ export class NoninteractiveSkillreview implements OnInit, OnChanges {
     if (this._shouldOpenRTEModal(event)) {
       return;
     }
+    const entityId = this.contextService.getEntityId();
+    const entityType = this.contextService.getEntityType();
+
     this.contextService.setCustomEntityContext(
       AppConstants.ENTITY_TYPE.SKILL, this.skillId);
     // The catch at the end was needed according to this thread:
@@ -112,7 +115,7 @@ export class NoninteractiveSkillreview implements OnInit, OnChanges {
     );
     modalRef.componentInstance.skillId = this.skillId;
     modalRef.result.then(() => {}, (res) => {
-      this.contextService.removeCustomEntityContext();
+      this.contextService.setCustomEntityContext(entityType, entityId);
       const allowedDismissActions = (
         ['cancel', 'escape key press', 'backdrop click']);
       if (!allowedDismissActions.includes(res)) {
