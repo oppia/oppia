@@ -27,6 +27,7 @@ import { ContributionOpportunitiesBackendApiService } from
   'pages/contributor-dashboard-page/services/contribution-opportunities-backend-api.service';
 import { LanguageUtilService } from 'domain/utilities/language-util.service';
 import { TranslationLanguageService } from 'pages/exploration-editor-page/translation-tab/services/translation-language.service';
+import { UserService } from 'services/user.service';
 
 interface Options {
   id: string;
@@ -49,7 +50,7 @@ export class ReviewTranslationLanguageSelectorComponent implements OnInit {
   options!: Options[];
   filteredOptions: Options[] = [];
   optionsFilter: string = '';
-  languageSelection!: string;
+  languageSelection: string = 'Language';
   languageIdToDescription: {[id: string]: string} = {};
 
   dropdownShown = false;
@@ -59,6 +60,7 @@ export class ReviewTranslationLanguageSelectorComponent implements OnInit {
       ContributionOpportunitiesBackendApiService,
     private languageUtilService: LanguageUtilService,
     private readonly translationLanguageService: TranslationLanguageService,
+    private userService: UserService,
   ) {}
 
   ngOnInit(): void {
@@ -67,19 +69,26 @@ export class ReviewTranslationLanguageSelectorComponent implements OnInit {
         this.languageSelection = this.languageIdToDescription[
           this.translationLanguageService.getActiveLanguageCode()];
       });
-    this.filteredOptions = this.options = this.languageUtilService
-      .getAllVoiceoverLanguageCodes().map(languageCode => {
-        const description = this.languageUtilService
-          .getAudioLanguageDescription(languageCode);
-        this.languageIdToDescription[languageCode] = description;
-        return { id: languageCode, description };
-      });
 
-    this.languageSelection = (
-      this.activeLanguageCode ?
-      this.languageIdToDescription[this.activeLanguageCode] :
-      'Language'
-    );
+    this.userService.getUserContributionRightsDataAsync()
+      .then(userContributionRights => {
+        if (!userContributionRights) {
+          throw new Error('User contribution rights not found.');
+        }
+
+        this.filteredOptions = this.options = userContributionRights
+          .can_review_translation_for_language_codes.map(languageCode => {
+            const description = this.languageUtilService
+              .getAudioLanguageDescription(languageCode);
+            this.languageIdToDescription[languageCode] = description;
+            return { id: languageCode, description };
+          });
+
+        if (this.activeLanguageCode) {
+          this.languageSelection = this.languageIdToDescription[
+            this.activeLanguageCode];
+        }
+      });
 
     this.contributionOpportunitiesBackendApiService
       .getPreferredTranslationLanguageAsync()
