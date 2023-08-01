@@ -255,7 +255,7 @@ export class ContributionAndReviewService {
     return sortedTranslationCards;
   }
 
-  static groupTranslationSuggestionsByState(
+  private static groupTranslationSuggestionsByState(
       translationSuggestions: SuggestionBackendDict[])
     : Map<string, SuggestionBackendDict[]> {
     const translationSuggestionsByState = new Map<
@@ -272,44 +272,43 @@ export class ContributionAndReviewService {
   }
 
   // Compares translation suggestions based on type and index.
-  static compareTranslationSuggestions(
+  private static compareTranslationSuggestions(
       cardA: SuggestionBackendDict,
       cardB: SuggestionBackendDict
   ): number {
     const cardATypeOrder = ContributionAndReviewService.
-      getTypeOrder(cardA.change.content_id);
+      getTranslationContentTypeOrder(cardA.change.content_id);
     const cardBTypeOrder = ContributionAndReviewService
-      .getTypeOrder(cardB.change.content_id);
+      .getTranslationContentTypeOrder(cardB.change.content_id);
 
     if (cardATypeOrder !== cardBTypeOrder) {
       return cardATypeOrder - cardBTypeOrder;
     } else {
       const cardAIndex = ContributionAndReviewService
-        .getIndex(cardA.change.content_id);
+        .getTranslationContentIndex(cardA.change.content_id);
       const cardBIndex = ContributionAndReviewService
-        .getIndex(cardB.change.content_id);
+        .getTranslationContentIndex(cardB.change.content_id);
 
       return cardAIndex - cardBIndex;
     }
   }
 
   // Returns the type order for a given content ID.
-  static getTypeOrder(contentId: string): number {
+  private static getTranslationContentTypeOrder(contentId: string): number {
+    const contentOrders: Map<string, number> = new Map([
+      ['content', 0],
+      ['interaction', 1],
+      ['feedback', 2],
+      ['default', 3],
+      ['hints', 4],
+      ['solution', 5]
+    ]);
     const type = contentId.split('_')[0];
-    return this.orderMap.get(type) ?? Number.MAX_SAFE_INTEGER;
+    return contentOrders.get(type) ?? Number.MAX_SAFE_INTEGER;
   }
 
-  private static readonly orderMap: Map<string, number> = new Map([
-    ['content', 0],
-    ['interaction', 1],
-    ['feedback', 2],
-    ['default', 3],
-    ['hints', 4],
-    ['solution', 5]
-  ]);
-
   // Returns index for a given content ID.
-  static getIndex(contentId: string): number {
+  private static getTranslationContentIndex(contentId: string): number {
     const index = parseInt(contentId.split('_')[1]);
     return isNaN(index) ? Number.MAX_SAFE_INTEGER : index;
   }
