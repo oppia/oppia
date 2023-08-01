@@ -7092,6 +7092,6 @@ export default {
   ],
   "CONTRIBUTOR_CERTIFICATE_WIDTH": 1493,
   "CONTRIBUTOR_CERTIFICATE_HEIGHT": 1313,
-  "BRANCH_NAME": "contact_us-page",
-  "SHORT_COMMIT_HASH": "5819c854ef"
+  "BRANCH_NAME": "",
+  "SHORT_COMMIT_HASH": ""
 } as const;
