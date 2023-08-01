@@ -127,10 +127,13 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
             expected_args=((self.puppeteer_bash_command,),))
 
         with self.print_swap, swap_popen:
-            run_lighthouse_tests.run_lighthouse_puppeteer_script()
+            run_lighthouse_tests.run_lighthouse_puppeteer_script(record=True)
 
         self.assertIn(
             'Puppeteer script completed successfully.', self.print_arr)
+        self.assertIn(
+            'Starting LHCI Puppeteer script with recording.', self.print_arr)
+        self.assertIn('Resulting puppeteer video saved at', self.print_arr)
 
     def test_run_lighthouse_puppeteer_script_failed(self) -> None:
         class MockTask:
@@ -150,13 +153,16 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
             expected_args=((self.puppeteer_bash_command,),))
 
         with self.print_swap, self.swap_sys_exit, swap_popen:
-            run_lighthouse_tests.run_lighthouse_puppeteer_script()
+            run_lighthouse_tests.run_lighthouse_puppeteer_script(record=True)
 
         self.assertIn('Return code: 1', self.print_arr)
         self.assertIn('ABC error.', self.print_arr)
         self.assertIn(
             'Puppeteer script failed. More details can be found above.',
             self.print_arr)
+        self.assertIn(
+            'Starting LHCI Puppeteer script with recording.', self.print_arr)
+        self.assertIn('Resulting puppeteer video saved at', self.print_arr)
 
     def test_run_webpack_compilation_successfully(self) -> None:
         swap_isdir = self.swap_with_checks(

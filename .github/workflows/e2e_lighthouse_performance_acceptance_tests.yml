@@ -274,12 +274,10 @@ jobs:
       - name: Install chrome
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
         run: python -m scripts.install_chrome_for_ci
-      - name: Install puppeteer-screen-recorder
-        run: npm install puppeteer-screen-recorder
       - name: Run Lighthouse performance checks shard
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
         run: python -m scripts.run_lighthouse_tests --mode performance --shard ${{ matrix.shard }} --skip_build --record_screen
-      - name: Uploading ffmpeg video as Artifacts
+      - name: Uploading puppeteer video as Artifacts
         # if: ${{ failure() }}
         uses: actions/upload-artifact@v3
         with: 

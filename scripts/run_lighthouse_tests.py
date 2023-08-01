@@ -112,6 +112,11 @@ def run_lighthouse_puppeteer_script(record: bool=False) -> None:
             # print it.
             export_url(line.decode('utf-8'))
         print('Puppeteer script completed successfully.')
+        if record:
+            if os.path.isfile(video_path):
+                print('Resulting puppeteer video saved at', video_path)
+            else:
+                print('No video found at', video_path)
     else:
         print('Return code: %s' % process.returncode)
         print('OUTPUT:')
