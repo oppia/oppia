@@ -23,7 +23,7 @@ import { NumberWithUnitsObjectFactory } from 'domain/objects/NumberWithUnitsObje
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { TranslateModule } from '@ngx-translate/core';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { NumberWithUnitsAnswer } from 'interactions/answer-defs';
+import { InteractionAnswer, NumberWithUnitsAnswer } from 'interactions/answer-defs';
 
 describe('Number with units interaction component', () => {
   let component: InteractiveNumberWithUnitsComponent;
@@ -37,6 +37,8 @@ describe('Number with units interaction component', () => {
     onSubmit: (
         answer: NumberWithUnitsAnswer, rulesService: CurrentInteractionService
     ) => {},
+    showNoResponseError: (): boolean => false,
+    updateCurrentAnswer: (answer: InteractionAnswer) => {},
     registerCurrentInteraction: (
         submitAnswerFn: Function, validateExpressionFn: Function) => {
       submitAnswerFn();
@@ -89,6 +91,7 @@ describe('Number with units interaction component', () => {
 
   it('should not display warning when the answer format is correct',
     fakeAsync(() => {
+      spyOn(currentInteractionService, 'updateCurrentAnswer');
       component.errorMessageI18nKey = 'Unit "xyz" not found';
       component.isValid = false;
 
@@ -106,10 +109,15 @@ describe('Number with units interaction component', () => {
       // Therefore we verify that the value of errorMessage is ''.
       expect(component.errorMessageI18nKey).toBe('');
       expect(component.isValid).toBeTrue();
+      expect(
+        currentInteractionService.updateCurrentAnswer).toHaveBeenCalledOnceWith(
+        '24 km');
     }));
 
   it('should display warning when the answer format is incorrect',
     fakeAsync(() => {
+      spyOn(currentInteractionService, 'updateCurrentAnswer');
+
       // PreChecks.
       expect(component.errorMessageI18nKey).toBe('');
       expect(component.isValid).toBeTrue();
@@ -123,6 +131,9 @@ describe('Number with units interaction component', () => {
       // PostChecks: Error message as the Unit is incorrect.
       expect(component.errorMessageI18nKey).toBe('Unit "k" not found.');
       expect(component.isValid).toBeFalse();
+      expect(
+        currentInteractionService.updateCurrentAnswer).toHaveBeenCalledOnceWith(
+        '24 k');
     }));
 
   it('should close help modal when user clicks the \'close\' button', () =>{
@@ -182,12 +193,44 @@ describe('Number with units interaction component', () => {
 
   it('should show error when user submits answer in incorrect format', () => {
     component.answer = '24 k';
+    spyOn(currentInteractionService, 'showNoResponseError');
 
     expect(component.errorMessageI18nKey).toBe('');
 
     component.submitAnswer();
 
     expect(component.errorMessageI18nKey).toBe('Unit "k" not found.');
+    expect(
+      currentInteractionService.showNoResponseError).not.toHaveBeenCalled();
+  });
+
+  it('should show no response error when answer is empty', () => {
+    component.answer = '';
+    spyOn(
+      currentInteractionService, 'showNoResponseError').and.returnValue(true);
+    expect(component.errorMessageI18nKey).toBe('');
+
+    component.submitAnswer();
+
+    expect(component.errorMessageI18nKey).toBe(
+      'I18N_INTERACTIONS_INPUT_NO_RESPONSE');
+    expect(
+      currentInteractionService.showNoResponseError).toHaveBeenCalledTimes(1);
+  });
+
+  it('should submit answer if answer is correct', () => {
+    component.answer = '24 km';
+    spyOn(currentInteractionService, 'showNoResponseError');
+    spyOn(numberWithUnitsObjectFactory, 'fromRawInputString');
+    spyOn(currentInteractionService, 'onSubmit');
+
+    component.submitAnswer();
+
+    expect(component.errorMessageI18nKey).toBe('');
+    expect(
+      currentInteractionService.showNoResponseError).not.toHaveBeenCalled();
+    expect(numberWithUnitsObjectFactory.fromRawInputString).toHaveBeenCalled();
+    expect(currentInteractionService.onSubmit).toHaveBeenCalled();
   });
 
   it('should throw uncaught errors that are not Error type',

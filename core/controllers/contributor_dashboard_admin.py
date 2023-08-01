@@ -726,3 +726,32 @@ class ContributorDashboardAdminStatsHandler(
                 }
 
         self.render_json(response)
+
+
+class CommunityContributionStatsHandler(
+    base.BaseHandler[
+        Dict[str, str],
+        Dict[str, str]
+    ]
+):
+    """Handler to get Community Stats for contributor admin dashboard."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
+
+    @acl_decorators.can_access_contributor_dashboard_admin_page
+    def get(self) -> None:
+        """Fetches community contribution stats data.
+
+        Raises:
+            InvalidInputException. Invalid username.
+        """
+        community_stats = suggestion_services.get_community_contribution_stats()
+
+        response = {
+            'translation_reviewers_count': (
+                community_stats.translation_reviewer_counts_by_lang_code),
+            'question_reviewers_count': community_stats.question_reviewer_count
+        }
+        self.render_json(response)
