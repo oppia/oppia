@@ -182,44 +182,55 @@ describe('Story editor navbar component', () => {
   });
 
   it('should get status of Serial Chapter Launch Feature flag', () => {
-    expect(component.isSerialChapterFeatureFlagEnabled()).toEqual(false);
+    expect(component.isSerialChapterFeatureFlagEnabled()).toBeFalse();
 
     mockPlatformFeatureService.
       status.SerialChapterLaunchCurriculumAdminView.isEnabled = true;
-    expect(component.isSerialChapterFeatureFlagEnabled()).toEqual(true);
+    expect(component.isSerialChapterFeatureFlagEnabled()).toBeTrue();
   });
 
   it('should get if chapter is publishable', () => {
     spyOn(
       storyEditorStateService, 'isCurrentNodePublishable').
       and.returnValue(true);
-    expect(component.isChapterPublishable()).toBe(true);
+    expect(component.isChapterPublishable()).toBeTrue();
 
     storyEditorStateService.isCurrentNodePublishable = jasmine.
       createSpy().and.returnValue(false);
-    expect(component.isChapterPublishable()).toBe(false);
+    expect(component.isChapterPublishable()).toBeFalse();
   });
 
   it('should get if publish button is disabled', () => {
     spyOn(
       storyEditorStateService, 'getNewChapterPublicationIsDisabled').
       and.returnValue(true);
-    expect(component.isPublishButtonDisabled()).toBe(true);
+    expect(component.isPublishButtonDisabled()).toBeTrue();
 
     storyEditorStateService.getNewChapterPublicationIsDisabled = jasmine.
       createSpy().and.returnValue(false);
-    expect(component.isPublishButtonDisabled()).toBe(false);
+    expect(component.isPublishButtonDisabled()).toBeFalse();
   });
 
   it('should get if chapters are being published', () => {
     spyOn(
       storyEditorStateService, 'areChaptersBeingPublished').
       and.returnValue(true);
-    expect(component.areChaptersBeingPublished()).toBe(true);
+    expect(component.areChaptersBeingPublished()).toBeTrue();
 
     storyEditorStateService.areChaptersBeingPublished = jasmine.
       createSpy().and.returnValue(false);
-    expect(component.areChaptersBeingPublished()).toBe(false);
+    expect(component.areChaptersBeingPublished()).toBeFalse();
+  });
+
+  it('should get if chapter status is being changed', () => {
+    spyOn(
+      storyEditorStateService, 'isChangingChapterStatus').
+      and.returnValue(true);
+    expect(component.isChapterStatusBeingChanged()).toBeTrue();
+
+    storyEditorStateService.isChangingChapterStatus = jasmine.
+      createSpy().and.returnValue(false);
+    expect(component.isChapterStatusBeingChanged()).toBeFalse();
   });
 
   describe('on initialization ', () => {
@@ -421,19 +432,19 @@ describe('Story editor navbar component', () => {
     fixture.detectChanges();
     // This check will make sure that story is
     // loaded correctly before publishing it.
-    expect(storyEditorStateService.hasLoadedStory()).toBe(true);
+    expect(storyEditorStateService.hasLoadedStory()).toBeTrue();
 
     // Publishing story will acts as pre-check here.
     component.publishStory();
     tick(1000);
     fixture.detectChanges();
-    expect(component.storyIsPublished).toBe(true);
+    expect(component.storyIsPublished).toBeTrue();
 
     component.unpublishStory();
     tick(1000);
     fixture.detectChanges();
     expect(modalSpy).toHaveBeenCalled();
-    expect(component.storyIsPublished).toBe(false);
+    expect(component.storyIsPublished).toBeFalse();
   }));
 
   it('should toggle warning text', () => {
@@ -442,7 +453,7 @@ describe('Story editor navbar component', () => {
     component.toggleWarningText();
     fixture.detectChanges();
 
-    expect(component.warningsAreShown).toBe(false);
+    expect(component.warningsAreShown).toBeFalse();
   });
 
   it('should toggle navigation options', () => {
@@ -451,7 +462,7 @@ describe('Story editor navbar component', () => {
     component.toggleNavigationOptions();
     fixture.detectChanges();
 
-    expect(component.showNavigationOptions).toBe(false);
+    expect(component.showNavigationOptions).toBeFalse();
   });
 
   it('should toggle edit options', () => {
@@ -460,7 +471,7 @@ describe('Story editor navbar component', () => {
     component.toggleStoryEditOptions();
     fixture.detectChanges();
 
-    expect(component.showStoryEditOptions).toBe(false);
+    expect(component.showStoryEditOptions).toBeFalse();
   });
 
   it('should navigate to main tab in story editor page', () => {
@@ -564,7 +575,7 @@ describe('Story editor navbar component', () => {
 
       expect(modalSpy).toHaveBeenCalled();
       expect(saveChangesSpy).toHaveBeenCalled();
-      expect(component.chapterIsPublishedOrUnpublished).toBe(false);
+      expect(component.chapterIsPublishedOrUnpublished).toBeFalse();
     }));
 
     it('should show error message if the story was not saved' +
@@ -655,7 +666,7 @@ describe('Story editor navbar component', () => {
       expect(modalSpy).toHaveBeenCalled();
       expect(saveChangesSpy).not.toHaveBeenCalled();
       expect(discardChangesSpy).toHaveBeenCalled();
-      expect(component.chapterIsPublishedOrUnpublished).toBe(false);
+      expect(component.chapterIsPublishedOrUnpublished).toBeFalse();
     }));
   });
 

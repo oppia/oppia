@@ -89,10 +89,10 @@
                 aria-label="List that shows issues preventing to save story as draft"
                 class="w-100">
             <button class="btn btn-light dropdown oppia-save-changes-button float-left e2e-test-save-story-button"
-                    [ngClass]="{'btn-success': isStorySaveable()}"
+                    [ngClass]="{'btn-success': isStorySaveable() && !isChapterStatusBeingChanged()}"
                     (click)="saveChanges()"
-                    [disabled]="!isStorySaveable()">
-              <span *ngIf="!isSaveInProgress()">
+                    [disabled]="!isStorySaveable() || isChapterStatusBeingChanged()">
+              <span *ngIf="!isSaveInProgress() || isChapterStatusBeingChanged()">
                 <i *ngIf="isWarningTooltipDisabled()"
                    class="fas fa-save md-18 md-dark oppia-save-publish-button-icon story-editor-save-draft-icon"
                    alt="Save Story">
@@ -104,12 +104,12 @@
                   Save Changes
                 </span>
                 <span class="d-none d-md-block float-left oppia-changes-count"
-                      *ngIf="getChangeListLength() > 0">
+                      *ngIf="getChangeListLength() > 0 && !isChapterStatusBeingChanged()">
                   ({{ getChangeListLength() }})
                 </span>
               </span>
 
-              <span *ngIf="isSaveInProgress()">
+              <span *ngIf="isSaveInProgress() && !isChapterStatusBeingChanged()">
                 <span class="oppia-save-publish-button-label">
                   Saving
                 </span>
@@ -119,7 +119,7 @@
           </span>
           <button type="button"
                   class="btn btn-light dropdown-toggle oppia-dropdown-toggle e2e-test-show-discard-option"
-                  [disabled]="!getChangeListLength()"
+                  [disabled]="!getChangeListLength() || isChapterStatusBeingChanged()"
                   aria-label="Dropdown toggle"
                   ngbDropdownToggle>
           </button>
@@ -142,9 +142,6 @@
                 (click)="changeChapterStatus('Published')"
                 [ngClass]="{'btn-success': !isPublishButtonDisabled() && !getChangeListLength()}"
                 [disabled]="isPublishButtonDisabled() || getChangeListLength() > 0">
-          <i class="fas fa-save md-18 md-dark oppia-save-publish-button-icon"
-             alt="Publish selected chapters in the story">
-          </i>
           <span class="oppia-save-publish-button-label"
                 *ngIf="areChaptersBeingPublished()">
             Publish Chapters
@@ -163,23 +160,20 @@
         <div ngbDropdown>
           <span class="w-100">
             <button class="btn btn-light dropdown oppia-save-changes-button float-left e2e-test-save-story-button"
-                    [ngClass]="{'btn-success': getChangeListLength()}"
+                    [ngClass]="{'btn-success': getChangeListLength() && !isChapterStatusBeingChanged()}"
                     (click)="saveChanges()"
-                    [disabled]="!getChangeListLength()">
-              <span *ngIf="!isSaveInProgress()">
-                <i class="fas fa-save md-18 md-dark oppia-save-publish-button-icon story-editor-save-draft-icon"
-                   alt="Save Draft">
-                </i>
+                    [disabled]="!getChangeListLength() || isChapterStatusBeingChanged()">
+              <span *ngIf="!isSaveInProgress() || isChapterStatusBeingChanged()">
                 <span class="oppia-save-publish-button-label float-left">
                   Save Draft
                 </span>
                 <span class="d-none d-md-block float-left oppia-changes-count"
-                      *ngIf="getChangeListLength() > 0">
+                      *ngIf="getChangeListLength() > 0 && !isChapterStatusBeingChanged()">
                   ({{ getChangeListLength() }})
                 </span>
               </span>
 
-              <span *ngIf="isSaveInProgress()">
+              <span *ngIf="isSaveInProgress() && !isChapterStatusBeingChanged()">
                 <span class="oppia-save-publish-button-label">
                   Saving
                 </span>
@@ -189,7 +183,7 @@
           </span>
           <button type="button"
                   class="btn btn-light dropdown-toggle oppia-dropdown-toggle e2e-test-show-discard-option"
-                  [disabled]="!getChangeListLength()"
+                  [disabled]="!getChangeListLength() || isChapterStatusBeingChanged()"
                   aria-label="Dropdown toggle"
                   ngbDropdownToggle>
           </button>
@@ -215,15 +209,11 @@
                 (click)="changeChapterStatus('Ready To Publish')"
                 [ngClass]="{'btn-success': isChapterPublishable() && getChangeListLength() === 0}"
                 [disabled]="!isChapterPublishable() || getChangeListLength() > 0">
-          <i *ngIf="isChapterPublishable()"
-             class="fas fa-save md-18 md-dark oppia-save-publish-button-icon"
-             alt="Save Chapter as Ready To Publish">
-          </i>
           <i class="fas fa-exclamation-triangle oppia-save-draft-warning"
              *ngIf="!isChapterPublishable()">
           </i>
           <span class="oppia-save-publish-button-label">
-            Save as Ready To Publish
+            Mark as Ready To Publish
           </span>
         </button>
       </li>
@@ -235,23 +225,20 @@
         <div ngbDropdown>
           <span class="w-100">
             <button class="btn btn-light dropdown oppia-save-changes-button float-left e2e-test-save-story-button"
-                    [ngClass]="{'btn-success': getChangeListLength()}"
+                    [ngClass]="{'btn-success': getChangeListLength() && !isChapterStatusBeingChanged()}"
                     (click)="saveChangesInReadyToPublishChapter()"
-                    [disabled]="!getChangeListLength()">
-              <span *ngIf="!isSaveInProgress()">
-                <i class="fas fa-save md-18 md-dark oppia-save-publish-button-icon story-editor-save-draft-icon"
-                   alt="Save Changes">
-                </i>
+                    [disabled]="!getChangeListLength() || isChapterStatusBeingChanged()">
+              <span *ngIf="!isSaveInProgress() || isChapterStatusBeingChanged()">
                 <span class="oppia-save-publish-button-label float-left">
                   Save Changes
                 </span>
                 <span class="d-none d-md-block float-left oppia-changes-count"
-                      *ngIf="getChangeListLength() > 0">
+                      *ngIf="getChangeListLength() > 0 && !isChapterStatusBeingChanged()">
                   ({{ getChangeListLength() }})
                 </span>
               </span>
 
-              <span *ngIf="isSaveInProgress()">
+              <span *ngIf="isSaveInProgress() && !isChapterStatusBeingChanged()">
                 <span class="oppia-save-publish-button-label">
                   Saving
                 </span>
@@ -261,7 +248,7 @@
           </span>
           <button type="button"
                   class="btn btn-light dropdown-toggle oppia-dropdown-toggle e2e-test-show-discard-option"
-                  [disabled]="!getChangeListLength()"
+                  [disabled]="!getChangeListLength() || isChapterStatusBeingChanged()"
                   aria-label="Dropdown toggle"
                   ngbDropdownToggle>
           </button>
@@ -283,11 +270,8 @@
                 class="btn btn-secondary oppia-editor-publish-button"
                 (click)="changeChapterStatus('Draft')"
                 [disabled]="getChangeListLength() > 0">
-          <i class="fas fa-save md-18 md-dark oppia-save-publish-button-icon"
-             alt="Change Chapter to Draft">
-          </i>
           <span class="oppia-save-publish-button-label">
-            Change To Draft
+            Mark as Draft
           </span>
         </button>
       </li>
@@ -475,15 +459,15 @@
       </div>
       <div class="story-nav-dropdown-content right-container">
         <button class="story-nav-dropdown-text e2e-test-mobile-save-changes"
-                [disabled]="!isStorySaveable()"
+                [disabled]="!isStorySaveable() || isChapterStatusBeingChanged()"
                 (click)="saveChanges()">
-          <span *ngIf="isSaveInProgress()">
+          <span *ngIf="isSaveInProgress() && !isChapterStatusBeingChanged()">
             <span>Saving</span>
           </span>
-          <span *ngIf="!isSaveInProgress()">
+          <span *ngIf="!isSaveInProgress() || isChapterStatusBeingChanged()">
             Save Changes
           </span>
-          <span *ngIf="getChangeListLength() > 0">
+          <span *ngIf="getChangeListLength() > 0 && !isChapterStatusBeingChanged()">
             ({{ getChangeListLength() }})
           </span>
         </button>
@@ -506,21 +490,21 @@
              [class.disabled]="!isChapterPublishable() || getChangeListLength() > 0">
           <div (click)="changeChapterStatus('Ready To Publish')" class="ready-to-publish-mobile-option">
             <i class="fas fa-pen navbar-tab-icon"></i>
-            <span>Save as Ready To Publish</span>
+            <span>Mark as Ready To Publish</span>
           </div>
         </div>
       </div>
       <div class="story-nav-dropdown-content right-container">
         <button class="story-nav-dropdown-text e2e-test-mobile-save-changes"
-                [disabled]="!getChangeListLength()"
+                [disabled]="!getChangeListLength() || isChapterStatusBeingChanged()"
                 (click)="saveChanges()">
-          <span *ngIf="isSaveInProgress()">
+          <span *ngIf="isSaveInProgress() && !isChapterStatusBeingChanged()">
             <span>Saving</span>
           </span>
-          <span *ngIf="!isSaveInProgress()">
+          <span *ngIf="!isSaveInProgress() || isChapterStatusBeingChanged()">
             Save Draft
           </span>
-          <span *ngIf="getChangeListLength() > 0">
+          <span *ngIf="getChangeListLength() > 0 && !isChapterStatusBeingChanged()">
             ({{ getChangeListLength() }})
           </span>
         </button>
@@ -543,21 +527,21 @@
              [class.disabled]="getChangeListLength() > 0">
           <div (click)="changeChapterStatus('Draft')">
             <i class="fas fa-pen navbar-tab-icon"></i>
-            <span>Change To Draft</span>
+            <span>Mark as Draft</span>
           </div>
         </div>
       </div>
       <div class="story-nav-dropdown-content right-container">
         <button class="story-nav-dropdown-text"
-                [disabled]="!getChangeListLength()"
+                [disabled]="!getChangeListLength() || isChapterStatusBeingChanged()"
                 (click)="saveChangesInReadyToPublishChapter()">
-          <span *ngIf="isSaveInProgress()">
+          <span *ngIf="isSaveInProgress() && !isChapterStatusBeingChanged()">
             <span>Saving</span>
           </span>
-          <span *ngIf="!isSaveInProgress()">
+          <span *ngIf="!isSaveInProgress() || isChapterStatusBeingChanged()">
             Save Changes
           </span>
-          <span *ngIf="getChangeListLength() > 0">
+          <span *ngIf="getChangeListLength() > 0 && !isChapterStatusBeingChanged()">
             ({{ getChangeListLength() }})
           </span>
         </button>

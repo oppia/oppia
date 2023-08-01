@@ -87,6 +87,10 @@ export class StoryEditorNavbarComponent implements OnInit {
     return this.storyEditorStateService.isSavingStory();
   }
 
+  isChapterStatusBeingChanged(): boolean {
+    return this.storyEditorStateService.isChangingChapterStatus();
+  }
+
   getChangeListLength(): number {
     return this.undoRedoService.getChangeCount();
   }

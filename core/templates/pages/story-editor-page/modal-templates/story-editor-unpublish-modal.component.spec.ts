@@ -79,7 +79,7 @@ describe('Story Editor Unpublish Modal Component', () => {
       status.SerialChapterLaunchCurriculumAdminView.isEnabled = false;
     const confirmSpy = spyOn(ngbActiveModal, 'close').and.callThrough();
     component.confirm();
-    expect(confirmSpy).toHaveBeenCalledWith();
+    expect(confirmSpy).toHaveBeenCalled();
 
     mockPlatformFeatureService.
       status.SerialChapterLaunchCurriculumAdminView.isEnabled = true;

@@ -318,15 +318,16 @@ describe('Story editor state service', () => {
     expect(successCallback).toHaveBeenCalled();
   }));
 
-  it('should be able to save the chapter', () => {
+  it('should be able to save the chapter', fakeAsync(() => {
     let successCallback = jasmine.createSpy('successCallback');
     let errorCallback = jasmine.createSpy('errorCallback');
     let saveStorySpy = spyOn(storyEditorStateService, 'saveStory');
 
     storyEditorStateService.saveChapter(successCallback, errorCallback);
+    expect(storyEditorStateService.isChangingChapterStatus()).toBeTrue();
     expect(saveStorySpy).toHaveBeenCalledWith(
       'Changed Chapter Status', successCallback, errorCallback);
-  });
+  }));
 
   it('should be able to publish the story', fakeAsync(() => {
     spyOn(
@@ -427,6 +428,7 @@ describe('Story editor state service', () => {
 
     tick(1000);
     expect(storyEditorStateService.isSavingStory()).toBe(false);
+    expect(storyEditorStateService.isChangingChapterStatus()).toBeFalse();
   }));
 
   it('should warn user when story fails to save', fakeAsync(() => {
@@ -469,6 +471,7 @@ describe('Story editor state service', () => {
 
       tick(1000);
       expect(storyEditorStateService.isSavingStory()).toBe(false);
+      expect(storyEditorStateService.isChangingChapterStatus()).toBeFalse();
     }));
 
   it('should update stories URL when user updates the storie\'s URL',

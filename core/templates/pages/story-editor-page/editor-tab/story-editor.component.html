@@ -260,7 +260,7 @@
           <div>
             <div class="chapter-control-bar" *ngIf="linearNodesList.length">
               <div class="publish-upto-chapter-menu">
-                <span class="publish-upto-chapter-label">Publish upto Chapter ...</span>
+                <span class="publish-upto-chapter-label">Publish up to Chapter ...</span>
                 <select [(ngModel)]="selectedChapterIndexInPublishUptoDropdown"
                         (ngModelChange)="updatePublishUptoChapterSelection(selectedChapterIndexInPublishUptoDropdown)"
                         class="publish-upto-chapter-dropdown">
@@ -471,7 +471,7 @@
 
   .draggable-icon-indicator {
     position: absolute;
-    top: 15%;
+    top: 1.5vh;
   }
 
   .story-node .chapter-index {
@@ -764,6 +764,10 @@
 
     .chapter-list-container {
       margin-top: 40px;
+    }
+
+    .draggable-icon-indicator {
+       top: 2.5vh;
     }
 
     .story-notes {

@@ -51,6 +51,7 @@ export class StoryEditorStateService {
   _selectedChapterIndexInPublishUptoDropdown: number = 0;
   _chaptersAreBeingPublished: boolean = true;
   _newChapterPublicationIsDisabled: boolean = true;
+  _chapterStatusIsBeingChanged: boolean = false;
 
   _storyInitializedEventEmitter = new EventEmitter();
   _storyReinitializedEventEmitter = new EventEmitter();
@@ -232,6 +233,7 @@ export class StoryEditorStateService {
         this._updateStory(storyBackendObject);
         this.undoRedoService.clearChanges();
         this._storyIsBeingSaved = false;
+        this._chapterStatusIsBeingChanged = false;
         if (successCallback) {
           successCallback();
         }
@@ -239,6 +241,7 @@ export class StoryEditorStateService {
         let errorMessage = error || 'There was an error when saving the story.';
         this.alertsService.addWarning(errorMessage);
         this._storyIsBeingSaved = false;
+        this._chapterStatusIsBeingChanged = false;
         if (errorCallback) {
           errorCallback(errorMessage);
         }
@@ -248,6 +251,7 @@ export class StoryEditorStateService {
 
   saveChapter(
       successCallback: () => void, errorCallback: () => void): void {
+    this._chapterStatusIsBeingChanged = true;
     this.saveStory(
       'Changed Chapter Status', successCallback, errorCallback);
   }
@@ -290,6 +294,10 @@ export class StoryEditorStateService {
    */
   isSavingStory(): boolean {
     return this._storyIsBeingSaved;
+  }
+
+  isChangingChapterStatus(): boolean {
+    return this._chapterStatusIsBeingChanged;
   }
 
   setCurrentNodeAsPublishable(currentNodeIsPublishable: boolean): void {
