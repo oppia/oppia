@@ -232,7 +232,7 @@ describe('Opportunities List Item Component', () => {
         '.oppia-translation-length-label');
 
       expect(translationLengthLabel).toBeTruthy();
-      expect(translationLengthLabel?.textContent).toContain('short');
+      expect(translationLengthLabel?.textContent).toContain('Short Translation');
     });
 
     it('should not show length label for translation suggestions with word' +
