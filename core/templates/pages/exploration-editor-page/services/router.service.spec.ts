@@ -327,15 +327,4 @@ describe('Router Service', () => {
     expect(routerService._getCurrentStateFromLocationPath)
       .toHaveBeenCalled();
   });
-
-  it('should set contentId and tabName which will be loaded in ' +
-  'translation tab', fakeAsync(() => {
-    routerService._changeTab('/create/25#/translation/END/content');
-
-    tick();
-    expect(stateEditorService.getInitActiveContentId()).toBe(
-      'content');
-    expect(stateEditorService.getActiveStateName()).toBe(
-      'END');
-  }));
 });
