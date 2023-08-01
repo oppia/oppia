@@ -3963,7 +3963,7 @@ div.oppia-issues-learner-action {
  of fixed height given which exceeds after word-break and breaks the view.
 */
 .oppia-mat-radio-button-label {
-  text-wrap : wrap;
+  text-wrap: wrap;
 }
 
 label .mat-radio-label {
