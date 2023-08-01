@@ -332,6 +332,7 @@ describe('Router Service', () => {
   'translation tab', fakeAsync(() => {
     routerService._changeTab('/create/25#/translation/END/content');
 
+    tick();
     expect(stateEditorService.getInitActiveContentId()).toBe(
     'content');
     expect(stateEditorService. getActiveStateName()).toBe(

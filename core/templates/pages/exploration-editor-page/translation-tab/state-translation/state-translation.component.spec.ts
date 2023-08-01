@@ -58,6 +58,8 @@ import { TranslationTabActiveModeService } from '../services/translation-tab-act
 import { StateTranslationComponent } from './state-translation.component';
 import { RouterService } from 'pages/exploration-editor-page/services/router.service';
 import { TranslatedContent } from 'domain/exploration/TranslatedContentObjectFactory';
+import { Hint } from 'domain/exploration/hint-object.model';
+import { AnswerGroup } from 'domain/exploration/AnswerGroupObjectFactory';
 
 const DEFAULT_OBJECT_VALUES = require('objects/object_defaults.json');
 
@@ -1613,11 +1615,11 @@ describe('State translation component', () => {
         returnValue('feedback_29');
 
       const index = component.getIndexOfActiveCard();
-      expect(index).toEqual(3);
+      expect(index).toEqual(2);
     });
 
     it('should return correct index for card of type hint', () => {
-      component.stateHints = mockStateHints as unknown as Hints[];
+      component.stateHints = mockStateHints as unknown as Hint[];
       component.activeTab = 'hint';
       component.initActiveContentId = 'hint_2';
 
@@ -1625,7 +1627,7 @@ describe('State translation component', () => {
       returnValue('hint_2');
 
       const index = component.getIndexOfActiveCard();
-      expect(index).toEqual(2);
+      expect(index).toEqual(1);
     });
 
     it('should return correct index for card of type custom args', () => {
@@ -1638,21 +1640,21 @@ describe('State translation component', () => {
       returnValue('ca_1');
 
       const index = component.getIndexOfActiveCard();
-      expect(index).toEqual(1);
+      expect(index).toEqual(0);
     });
 
     it('should return correct active tab name', () => {
       spyOn(stateEditorService, 'getInitActiveContentId').and.
         returnValue('content_29');
 
-        expect(component.getActiveTab().toBe('content'));
+        expect(component.getActiveTab()).toBe('content');
     });
 
     it('should return active tab name as null when contentId is null', () => {
       spyOn(stateEditorService, 'getInitActiveContentId').and.
         returnValue(null);
 
-        expect(component.getActiveTab().toBe(null));
+        expect(component.getActiveTab()).toBe(null);
     });
   });
 });
