@@ -681,15 +681,15 @@ def get_exploration_version_history(
 def get_user_progress_in_exploration(
     user_id: str, exp_ids: List[str]
 ) -> List[exp_domain.ExplorationProgressSummaryDict]:
-    """Returns the progress of user in multiple exploration.
+    """Returns the progress of the user in multiple explorations.
 
     Args:
         user_id: str. The user id of the user.
-        exp_ids: list(str). The ids of the exploration.
+        exp_ids: list(str). The ids of the explorations.
 
     Returns:
         list(ExplorationProgressSummaryDict). The list of the progress
-        summaries of the user corresponding to all exploration.
+        summaries of the user corresponding to all explorations.
     """
     exp_id_to_exp_map = exp_fetchers.get_multiple_explorations_by_id(exp_ids)
     user_id_exp_id_combinations = list(itertools.product([user_id], exp_ids))
@@ -700,7 +700,7 @@ def get_user_progress_in_exploration(
     all_exploration_progress: List[
         exp_domain.ExplorationProgressSummaryDict] = []
     for i, user_id_exp_id_pair in enumerate(user_id_exp_id_combinations):
-        exp_id = user_id_exp_id_pair[1]
+        _, exp_id = user_id_exp_id_pair
         exploration = exp_id_to_exp_map[exp_id]
         all_checkpoints = user_services.get_checkpoints_in_order(
             exploration.init_state_name,
@@ -709,10 +709,12 @@ def get_user_progress_in_exploration(
         visited_checkpoints = 0
         if model is not None:
             most_recently_visited_checkpoint = (
-                model.most_recently_reached_checkpoint_state_name)
+                model.most_recently_reached_checkpoint_state_name
+                )
             if most_recently_visited_checkpoint is not None:
                 visited_checkpoints = all_checkpoints.index(
-                    most_recently_visited_checkpoint) + 1
+                    most_recently_visited_checkpoint
+                    ) + 1
         all_exploration_progress.append({
             'exploration_id': exp_id,
             'visited_checkpoints_count': visited_checkpoints,

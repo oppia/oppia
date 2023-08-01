@@ -71,6 +71,12 @@ export class CarouselBarComponent implements AfterViewInit, OnInit {
  }
 
  ngAfterViewInit(): void {
+   /* SetTimeout is a need to handle asynchronous work
+    when selecting the element using querySelector based
+     on its class name, this help to  ensures that the
+     carousel setup occurs only after the relevant DOM
+     elements have been properly loaded and updated.
+  */
    setTimeout(() => {
      this.isScrollable = this.initCarousel();
    });

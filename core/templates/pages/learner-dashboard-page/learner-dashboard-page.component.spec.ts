@@ -129,7 +129,6 @@ describe('Learner dashboard page', () => {
   let urlService: UrlService;
   let mockPlatformFeatureService = new MockPlatformFeatureService();
 
-
   let explorationDict: ExplorationBackendDict = {
     init_state_name: 'Introduction',
     language_code: 'en',

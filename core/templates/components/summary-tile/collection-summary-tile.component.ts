@@ -55,7 +55,6 @@ export class CollectionSummaryTileComponent implements OnInit, OnDestroy {
   @Input() mobileCutoffPx!: number;
   @Input() displayAreaIsLearnerDashboard: boolean = false;
 
-
   userIsLoggedIn: boolean = false;
   collectionIsCurrentlyHoveredOver: boolean = false;
   defaultEmptyTitle!: string;

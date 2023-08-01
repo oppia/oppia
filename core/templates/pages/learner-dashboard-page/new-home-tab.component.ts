@@ -96,18 +96,18 @@ export class NewHomeTabComponent {
   ) {}
 
   ngOnInit(): void {
-    var allGoals = [...this.currentGoals, ...this.partiallyLearntTopicsList];
+    let allGoals = [...this.currentGoals, ...this.partiallyLearntTopicsList];
     this.currentGoalsLength = this.currentGoals.length;
     this.goalTopicsLength = this.goalTopics.length;
 
     if (allGoals.length !== 0) {
-      var allGoalIds = [];
-      for (var goal of allGoals) {
+      let allGoalIds = [];
+      for (let goal of allGoals) {
         allGoalIds.push(goal.id);
       }
-      var uniqueGoalIds = Array.from(new Set(allGoalIds));
-      for (var uniqueGoalId of uniqueGoalIds) {
-        var index = allGoalIds.indexOf(uniqueGoalId);
+      let uniqueGoalIds = Array.from(new Set(allGoalIds));
+      for (let uniqueGoalId of uniqueGoalIds) {
+        let index = allGoalIds.indexOf(uniqueGoalId);
         this.continueWhereYouLeftOffList.push(allGoals[index]);
       }
     }
@@ -157,12 +157,12 @@ export class NewHomeTabComponent {
     this.storyExplorationProgressList.push(
       ...this.storyInProgress, ...this.incompleteExplorationsList);
 
-    for (var exp of this.completedExplorationsList) {
+    for (let exp of this.completedExplorationsList) {
       this.completedExpIds.push(exp.id);
     }
     if (this.totalExploration.length !== 0) {
       let expIds: string[] = [];
-      for (var exp of this.totalExploration) {
+      for (let exp of this.totalExploration) {
         expIds.push(exp.id);
       }
 

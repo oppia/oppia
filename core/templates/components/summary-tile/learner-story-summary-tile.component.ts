@@ -58,7 +58,6 @@ export class LearnerStorySummaryTileComponent implements OnInit {
   circumference = (18 * 2 * Math.PI);
   getStrokeDashOffSet!: number;
 
-
   constructor(
     private urlInterpolationService: UrlInterpolationService,
     private assetsBackendApiService: AssetsBackendApiService,
@@ -152,7 +151,6 @@ export class LearnerStorySummaryTileComponent implements OnInit {
     }
     return '';
   }
-
 
   isCardHovered(): string {
     if (this.displayArea === 'homeTab' && this.cardIsHovered) {
