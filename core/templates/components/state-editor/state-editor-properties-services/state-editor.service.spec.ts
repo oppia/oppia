@@ -566,6 +566,6 @@ describe('Editor state service', () => {
     ecs.setInitActiveContentId('content_id');
     const initActiveContentId = ecs.getInitActiveContentId();
 
-    expect(initActiveContentId).toBe('content_id'));
+    expect(initActiveContentId).toBe('content_id');
   });
 });
