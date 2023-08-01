@@ -1643,6 +1643,17 @@ describe('State translation component', () => {
       expect(index).toEqual(0);
     });
 
+    it('should return 0 as index for unknown tabs', () => {
+      component.activeTab = 'unknown';
+      component.initActiveContentId = 'unknown_1';
+
+      spyOn(stateEditorService, 'getInitActiveContentId').and.
+        returnValue('ca_1');
+
+      const index = component.getIndexOfActiveCard();
+      expect(index).toEqual(0);
+    });
+
     it('should return correct active tab name', () => {
       spyOn(stateEditorService, 'getInitActiveContentId').and.
         returnValue('content_29');

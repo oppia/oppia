@@ -656,11 +656,9 @@ export class StateTranslationComponent
       this.needsUpdateTooltipMessage = 'Translation needs update ' +
         'to match text. Please re-translate the content.';
     }
-    if (this.isDisabled(this.activeTab) || !this.activeTab) {
-      this.onTabClick(this.TAB_ID_CONTENT);
-    } else {
-      this.onTabClick(this.activeTab);
-    }
+    this.isDisabled(this.activeTab) || !this.activeTab?
+    this.onTabClick(this.TAB_ID_CONTENT):this.onTabClick(this.activeTab);
+
 
     this.updateTranslatedContent();
   }
