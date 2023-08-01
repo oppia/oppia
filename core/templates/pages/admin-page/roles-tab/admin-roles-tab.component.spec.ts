@@ -60,8 +60,8 @@ describe('Admin roles tab component ', function() {
     can_edit_topic: true,
     total_upcoming_chapters_count: 1,
     total_overdue_chapters_count: 1,
-    total_chapters_counts: [5, 4],
-    published_chapters_counts: [3, 4]
+    total_chapter_counts_for_each_story: [5, 4],
+    published_chapter_counts_for_each_story: [3, 4]
   };
 
   const sampleTopicSummary: CreatorTopicSummary = (

@@ -36,8 +36,8 @@ export interface CreatorTopicSummaryBackendDict {
   'is_published': boolean;
   'total_upcoming_chapters_count': number;
   'total_overdue_chapters_count': number;
-  'total_chapters_counts': number[];
-  'published_chapters_counts': number[];
+  'total_chapter_counts_for_each_story': number[];
+  'published_chapter_counts_for_each_story': number[];
   'url_fragment': string;
   // This property is optional because it is only present in the
   // topic summary dict of topic dashboard page.
@@ -95,8 +95,8 @@ export class CreatorTopicSummary {
       topicSummaryBackendDict.url_fragment,
       topicSummaryBackendDict.total_upcoming_chapters_count,
       topicSummaryBackendDict.total_overdue_chapters_count,
-      topicSummaryBackendDict.total_chapters_counts,
-      topicSummaryBackendDict.published_chapters_counts);
+      topicSummaryBackendDict.total_chapter_counts_for_each_story,
+      topicSummaryBackendDict.published_chapter_counts_for_each_story);
   }
 
   getId(): string {

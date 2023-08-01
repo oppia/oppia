@@ -110,9 +110,23 @@ class TopicsAndSkillsDashboardPageDataHandler(
             topic_summary_dict['classroom'] = topic_classroom_dict.get(
                 topic_summary_dict['id'], None)
 
-        updated_topic_summary_dicts = (
-            topic_services.update_chapters_counts_in_topic_summaries(
+        topic_chapter_count_dicts = (
+            topic_services.get_chapters_counts_in_topic_summaries(
                 topic_summary_dicts))
+
+        for topic_summary_dict in topic_summary_dicts:
+            topic_chapter_count = topic_chapter_count_dicts[
+                topic_summary_dict['id']]
+            topic_summary_dict.update({
+                'total_upcoming_chapters_count': (
+                    topic_chapter_count.total_upcoming_chapters_count),
+                'total_overdue_chapters_count': (
+                    topic_chapter_count.total_overdue_chapters_count),
+                'total_chapter_counts_for_each_story': (
+                    topic_chapter_count.total_chapter_counts_for_each_story),
+                'published_chapter_counts_for_each_story': (
+                    topic_chapter_count.published_chapter_counts_for_each_story)
+            })
 
         mergeable_skill_summary_dicts = []
 
@@ -148,7 +162,7 @@ class TopicsAndSkillsDashboardPageDataHandler(
                 for skill_summary in untriaged_skill_summaries
             ],
             'mergeable_skill_summary_dicts': mergeable_skill_summary_dicts,
-            'topic_summary_dicts': updated_topic_summary_dicts,
+            'topic_summary_dicts': topic_summary_dicts,
             'total_skill_count': len(skill_summary_dicts),
             'all_classroom_names': all_classroom_names,
             'can_delete_topic': can_delete_topic,

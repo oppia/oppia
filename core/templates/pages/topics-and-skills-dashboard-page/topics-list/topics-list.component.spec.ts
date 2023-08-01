@@ -31,6 +31,7 @@ import { PlatformFeatureService } from
   '../../../services/platform-feature.service';
 import { CreatorTopicSummary } from
   'domain/topic/creator-topic-summary.model';
+import constants from 'assets/constants';
 
 class MockPlatformFeatureService {
   status = {
@@ -289,8 +290,8 @@ describe('Topics List Component', () => {
       thumbnail_bg_color: '#C6DCDA',
       total_upcoming_chapters_count: 1,
       total_overdue_chapters_count: 1,
-      total_chapters_counts: [5, 4],
-      published_chapters_counts: [3, 4]
+      total_chapter_counts_for_each_story: [5, 4],
+      published_chapter_counts_for_each_story: [3, 4]
     });
     componentInstance.topicSummaries = [topic];
 
@@ -339,15 +340,17 @@ describe('Topics List Component', () => {
       thumbnail_bg_color: '#C6DCDA',
       total_upcoming_chapters_count: 1,
       total_overdue_chapters_count: 1,
-      total_chapters_counts: [5, 4],
-      published_chapters_counts: [3, 4]
+      total_chapter_counts_for_each_story: [5, 4],
+      published_chapter_counts_for_each_story: [3, 4]
     });
     expect(componentInstance.getUpcomingChapterNotificationsText(topic)).toBe(
-      '1 upcoming launch in the next 14 days');
+      '1 upcoming launch in the next ' +
+      constants.UPCOMING_CHAPTERS_DAY_LIMIT + ' days');
 
     topic.totalUpcomingChaptersCount = 2;
     expect(componentInstance.getUpcomingChapterNotificationsText(topic)).toBe(
-      '2 upcoming launches in the next 14 days');
+      '2 upcoming launches in the next ' + constants.
+        UPCOMING_CHAPTERS_DAY_LIMIT + ' days');
   });
 
   it('should get text for upcoming chapter notifications', () => {
@@ -373,8 +376,8 @@ describe('Topics List Component', () => {
       thumbnail_bg_color: '#C6DCDA',
       total_upcoming_chapters_count: 1,
       total_overdue_chapters_count: 1,
-      total_chapters_counts: [5, 4],
-      published_chapters_counts: [3, 4]
+      total_chapter_counts_for_each_story: [5, 4],
+      published_chapter_counts_for_each_story: [3, 4]
     });
     expect(componentInstance.getOverdueChapterNotificationsText(topic)).toBe(
       '1 launch behind schedule');
@@ -407,8 +410,8 @@ describe('Topics List Component', () => {
       thumbnail_bg_color: '#C6DCDA',
       total_upcoming_chapters_count: 1,
       total_overdue_chapters_count: 1,
-      total_chapters_counts: [5, 4],
-      published_chapters_counts: [5, 4]
+      total_chapter_counts_for_each_story: [5, 4],
+      published_chapter_counts_for_each_story: [5, 4]
     });
     componentInstance.topicSummaries = [topic];
     componentInstance.ngOnChanges();

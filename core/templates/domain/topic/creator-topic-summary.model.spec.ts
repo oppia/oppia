@@ -44,8 +44,8 @@ describe('Creator topic summary model', () => {
       can_edit_topic: false,
       total_upcoming_chapters_count: 1,
       total_overdue_chapters_count: 1,
-      total_chapters_counts: [2],
-      published_chapters_counts: [1]
+      total_chapter_counts_for_each_story: [2],
+      published_chapter_counts_for_each_story: [1]
     };
     _sampleCreatorTopicSummary = CreatorTopicSummary.createFromBackendDict(
       sampleCreatorTopicSummaryBackendDict);

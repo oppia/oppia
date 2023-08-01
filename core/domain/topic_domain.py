@@ -2256,8 +2256,8 @@ class FrontendTopicSummaryDict(TopicSummaryDict):
     classroom: Optional[str]
     total_upcoming_chapters_count: int
     total_overdue_chapters_count: int
-    total_chapters_counts: List[int]
-    published_chapters_counts: List[int]
+    total_chapter_counts_for_each_story: List[int]
+    published_chapter_counts_for_each_story: List[int]
 
 
 class TopicSummary:
@@ -2474,3 +2474,33 @@ class TopicRights:
             bool. Whether user is a topic manager of this topic.
         """
         return bool(user_id in self.manager_ids)
+
+
+class TopicChapterCounts:
+    """Domain object for chapter counts in a topic."""
+
+    def __init__(
+            self,
+            total_upcoming_chapters_count: int,
+            total_overdue_chapters_count: int,
+            total_chapter_counts_for_each_story: List[int],
+            published_chapter_counts_for_each_story: List[int]
+    ) -> None:
+        """Constructs a TopicChapterCounts domain object.
+
+        Args:
+            total_upcoming_chapters_count: int. Total number of upcoming
+                chapters in all the stories of the topic.
+            total_overdue_chapters_count: int. Total number of behind-schedule
+                chapters in all the stories of the topic.
+            total_chapter_counts_for_each_story: list(int). List of total
+                chapters in each story of the topic.
+            published_chapter_counts_for_each_story: list(int). List of
+                number of published chapters in each story of the topic.
+        """
+        self.total_upcoming_chapters_count = total_upcoming_chapters_count
+        self.total_overdue_chapters_count = total_overdue_chapters_count
+        self.total_chapter_counts_for_each_story = (
+            total_chapter_counts_for_each_story)
+        self.published_chapter_counts_for_each_story = (
+            published_chapter_counts_for_each_story)

@@ -58,8 +58,8 @@ describe('Topic and Skill dashboard page service', () => {
       thumbnail_bg_color: '#C6DCDA',
       total_upcoming_chapters_count: 1,
       total_overdue_chapters_count: 1,
-      total_chapters_counts: [5, 4],
-      published_chapters_counts: [3, 4]
+      total_chapter_counts_for_each_story: [5, 4],
+      published_chapter_counts_for_each_story: [3, 4]
     });
     const topic2 = CreatorTopicSummary.createFromBackendDict({
       topic_model_created_on: 1681839432987.596,
@@ -83,8 +83,8 @@ describe('Topic and Skill dashboard page service', () => {
       thumbnail_bg_color: '#C6DCDA',
       total_upcoming_chapters_count: 1,
       total_overdue_chapters_count: 1,
-      total_chapters_counts: [5, 4],
-      published_chapters_counts: [3, 4]
+      total_chapter_counts_for_each_story: [5, 4],
+      published_chapter_counts_for_each_story: [3, 4]
     });
     const topic3 = CreatorTopicSummary.createFromBackendDict({
       topic_model_created_on: 1781839432987.596,
@@ -108,8 +108,8 @@ describe('Topic and Skill dashboard page service', () => {
       thumbnail_bg_color: '#C6DCDA',
       total_upcoming_chapters_count: 1,
       total_overdue_chapters_count: 1,
-      total_chapters_counts: [5, 4],
-      published_chapters_counts: [3, 4]
+      total_chapter_counts_for_each_story: [5, 4],
+      published_chapter_counts_for_each_story: [3, 4]
     });
     let topicsArray = [topic1, topic2, topic3];
     let filterOptions = TopicsAndSkillsDashboardFilter.createDefault();

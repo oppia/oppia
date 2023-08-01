@@ -27,6 +27,7 @@ import { Subscription } from 'rxjs';
 import { AlertsService } from 'services/alerts.service';
 import { DeleteTopicModalComponent } from '../modals/delete-topic-modal.component';
 import { PlatformFeatureService } from 'services/platform-feature.service';
+import constants from 'assets/constants';
 
 @Component({
   selector: 'oppia-topics-list',
@@ -156,7 +157,8 @@ export class TopicsListComponent {
     if (topic.getTotalUpcomingChaptersCount() > 1) {
       upcomingChapterNotificationsText += 'es';
     }
-    upcomingChapterNotificationsText += ' in the next 14 days';
+    upcomingChapterNotificationsText += ' in the next ' +
+    constants.UPCOMING_CHAPTERS_DAY_LIMIT + ' days';
     return upcomingChapterNotificationsText;
   }
 
