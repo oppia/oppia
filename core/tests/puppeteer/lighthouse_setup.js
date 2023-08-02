@@ -274,26 +274,10 @@ const generateDataForTopicAndStoryPlayer = async function(browser, page) {
   try {
     await page.goto('http://127.0.0.1:8181/admin#/activities', { waitUntil: networkIdle });
 
-    await page.waitForSelector('oppia-admin-dev-mode-activities-tab');
-    await page.evaluate(async () => {
-      const adminPageComponent = document.querySelector('oppia-admin-dev-mode-activities-tab');
+    await page.waitForSelector(generateTopicButton);
+    await page.click(generateTopicButton);
 
-      // Check if the component is found
-      if (!adminPageComponent) {
-        throw new Error('Admin page not found');
-      }
-
-      await adminPageComponent.loadNewStructuresData();
-
-      // Wait for the status message to indicate success
-      await new Promise((resolve) => {
-        adminPageComponent.setStatusMessage.subscribe((message) => {
-          if (message === 'Dummy new structures data generated successfully.') {
-            resolve();
-          }
-        });
-      });
-    });
+    await page.waitForTimeout(15000);
   } catch (e) {
     // eslint-disable-next-line no-console
     console.log(e);
