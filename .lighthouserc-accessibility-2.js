@@ -42,7 +42,7 @@ module.exports = {
         {
           'matchingUrlPattern': '^http://127.0.0.1:8181/profile/username1$',
           'assertions': {
-            'categories:accessibility': ['error', {'minScore': 0.98}]
+            'categories:accessibility': ['error', {'minScore': 1}]
           }
         },
         {
@@ -84,7 +84,7 @@ module.exports = {
         {
           'matchingUrlPattern': '^http://127.0.0.1:8181/topic_editor/.*$',
           'assertions': {
-            'categories:accessibility': ['error', {'minScore': 0.84}]
+            'categories:accessibility': ['error', {'minScore': 1}]
           }
         },
         {
