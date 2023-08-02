@@ -139,8 +139,7 @@ describe('OppiaFooterComponent', () => {
       flushMicrotasks();
 
       expect(alertsService.addInfoMessage).toHaveBeenCalledWith(
-        'Sorry, an unexpected error occurred. Please email admin@oppia.org ' +
-        'to be added to the mailing list.', 10000);
+        AppConstants.MAILING_LIST_UNEXPECTED_ERROR_MESSAGE, 10000);
     }));
 
   it('should reject request to the mailing list correctly',
@@ -157,7 +156,6 @@ describe('OppiaFooterComponent', () => {
       flushMicrotasks();
 
       expect(alertsService.addInfoMessage).toHaveBeenCalledWith(
-        'Sorry, an unexpected error occurred. Please email admin@oppia.org ' +
-        'to be added to the mailing list.', 10000);
+        AppConstants.MAILING_LIST_UNEXPECTED_ERROR_MESSAGE, 10000);
     }));
 });

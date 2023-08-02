@@ -88,13 +88,11 @@ export class OppiaFooterComponent {
         );
       } else {
         this.alertsService.addInfoMessage(
-          'Sorry, an unexpected error occurred. Please email admin@oppia.org ' +
-          'to be added to the mailing list.', 10000);
+          AppConstants.MAILING_LIST_UNEXPECTED_ERROR_MESSAGE, 10000);
       }
     }).catch(errorResponse => {
       this.alertsService.addInfoMessage(
-        'Sorry, an unexpected error occurred. Please email admin@oppia.org ' +
-        'to be added to the mailing list.', 10000);
+        AppConstants.MAILING_LIST_UNEXPECTED_ERROR_MESSAGE, 10000);
     });
   }
 }
