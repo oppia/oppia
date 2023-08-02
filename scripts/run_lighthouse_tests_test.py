@@ -124,7 +124,7 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
             return MockTask()
         swap_popen = self.swap_with_checks(
             subprocess, 'Popen', mock_popen,
-            expected_args=((self.puppeteer_bash_command, '-record'),))
+            expected_args=((self.puppeteer_bash_command + ['-record'],),))
 
         with self.print_swap, swap_popen:
             run_lighthouse_tests.run_lighthouse_puppeteer_script(record=True)
@@ -150,7 +150,7 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
             return MockTask()
         swap_popen = self.swap_with_checks(
             subprocess, 'Popen', mock_popen,
-            expected_args=((self.puppeteer_bash_command, '-record'),))
+            expected_args=((self.puppeteer_bash_command + ['-record'],),))
 
         with self.print_swap, self.swap_sys_exit, swap_popen:
             run_lighthouse_tests.run_lighthouse_puppeteer_script(record=True)
