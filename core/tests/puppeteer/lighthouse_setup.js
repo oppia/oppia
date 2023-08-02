@@ -271,13 +271,12 @@ const getSkillEditorUrl = async function(browser, page) {
 
 const generateDataForTopicPlayer = async function(browser, page) {
   try {
-
+    // eslint-disable-next-line dot-notation
     await page.goto('http://127.0.0.1:8181/admin#/activities', { waitUntil: networkIdle });
 
     await page.waitForSelector(generateTopicButton);
     await page.click(generateTopicButton);
 
-    // Wait for some time to allow the data to be generated
     await page.waitForTimeout(15000);
   } catch (e) {
     // eslint-disable-next-line no-console
