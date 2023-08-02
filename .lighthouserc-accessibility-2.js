@@ -88,6 +88,12 @@ module.exports = {
           }
         },
         {
+          'matchingUrlPattern': '^http://127.0.0.1:8181/learn/math',
+          'assertions': {
+            'categories:accessibility': ['error', {'minScore': 1}]
+          }
+        },
+        {
           'matchingUrlPattern': '^http://127.0.0.1:8181/create/.*$',
           'assertions': {
             'categories:accessibility': ['error', {'minScore': 0.91}]

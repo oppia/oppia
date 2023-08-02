@@ -81,6 +81,7 @@ var roleEditorContainer = '.e2e-test-roles-editor-card-container';
 var addNewRoleButton = '.e2e-test-add-new-role-button';
 var roleSelect = '.e2e-test-new-role-selector';
 var generateTopicButton = '.load-dummy-new-structures-data-button';
+var generateClassroomButton = '.load-dummy-math-classroom';
 var cookieBannerAcceptButton = (
   '.e2e-test-oppia-cookie-banner-accept-button');
 
@@ -271,13 +272,27 @@ const getSkillEditorUrl = async function(browser, page) {
 
 const generateDataForTopicAndStoryPlayer = async function(browser, page) {
   try {
-    // eslint-disable-next-line dot-notation
     await page.goto('http://127.0.0.1:8181/admin#/activities', { waitUntil: networkIdle });
 
     await page.waitForSelector(generateTopicButton);
     await page.click(generateTopicButton);
 
-    await page.waitForTimeout(20000);
+    await page.waitForTimeout(15000);
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.log(e);
+    process.exit(1);
+  }
+};
+
+const generateDataForClassroom = async function(browser, page) {
+  try {
+    await page.goto('http://127.0.0.1:8181/admin#/activities', { waitUntil: networkIdle });
+
+    await page.waitForSelector(generateClassroomButton);
+    await page.click(generateClassroomButton);
+
+    await page.waitForTimeout(15000);
   } catch (e) {
     // eslint-disable-next-line no-console
     console.log(e);
@@ -305,6 +320,7 @@ const main = async function() {
   await getStoryEditorUrl(browser, page);
   await getSkillEditorUrl(browser, page);
   await generateDataForTopicAndStoryPlayer(browser, page);
+  await generateDataForClassroom(browser, page);
   await process.stdout.write(
     [
       explorationEditorUrl,
