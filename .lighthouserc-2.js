@@ -81,11 +81,11 @@ module.exports = {
           'assertions': baseConfig['basePerformanceAssertions']
         },
         {
-          'matchingUrlPattern': '^http://[^/]+/learn/staging/dummy-topic-one/story$',
+          'matchingUrlPattern': '^http://[^/]+/learn/staging/dummy-topic-one/story',
           'assertions': baseConfig['basePerformanceAssertions']
         },
         {
-          'matchingUrlPattern': '^http://[^/]+/learn/staging/dummy-topic-one/story/help-jamie-win-arcade$',
+          'matchingUrlPattern': '^http://[^/]+/learn/staging/dummy-topic-one/story/help-jamie-win-arcade',
           'assertions': baseConfig['basePerformanceAssertions']
         },
         {
