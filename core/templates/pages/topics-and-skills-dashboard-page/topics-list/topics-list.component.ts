@@ -158,7 +158,7 @@ export class TopicsListComponent {
       upcomingChapterNotificationsText += 'es';
     }
     upcomingChapterNotificationsText += ' in the next ' +
-    constants.UPCOMING_CHAPTERS_DAY_LIMIT + ' days';
+    constants.CHAPTER_PUBLICATION_NOTICE_PERIOD_IN_DAYS + ' days';
     return upcomingChapterNotificationsText;
   }
 

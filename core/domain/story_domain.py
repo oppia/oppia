@@ -914,7 +914,8 @@ class StoryNode:
 
     def is_node_upcoming(self) -> bool:
         """Return whether the StoryNode domain object is expected to be
-        published within the next UPCOMING_CHAPTERS_DAY_LIMIT days.
+        published within the next CHAPTER_PUBLICATION_NOTICE_PERIOD_IN_DAYS
+        days.
 
         Returns:
             bool. True if the chapter is upcoming else false.
@@ -924,7 +925,7 @@ class StoryNode:
             self.planned_publication_date is not None and
             datetime.datetime.today() < self.planned_publication_date <
             (datetime.datetime.today() + datetime.timedelta(
-            days=constants.UPCOMING_CHAPTERS_DAY_LIMIT))):
+            days=constants.CHAPTER_PUBLICATION_NOTICE_PERIOD_IN_DAYS))):
             return True
         return False
 

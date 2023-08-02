@@ -345,12 +345,12 @@ describe('Topics List Component', () => {
     });
     expect(componentInstance.getUpcomingChapterNotificationsText(topic)).toBe(
       '1 upcoming launch in the next ' +
-      constants.UPCOMING_CHAPTERS_DAY_LIMIT + ' days');
+      constants.CHAPTER_PUBLICATION_NOTICE_PERIOD_IN_DAYS + ' days');
 
     topic.totalUpcomingChaptersCount = 2;
     expect(componentInstance.getUpcomingChapterNotificationsText(topic)).toBe(
       '2 upcoming launches in the next ' + constants.
-        UPCOMING_CHAPTERS_DAY_LIMIT + ' days');
+        CHAPTER_PUBLICATION_NOTICE_PERIOD_IN_DAYS + ' days');
   });
 
   it('should get text for upcoming chapter notifications', () => {
