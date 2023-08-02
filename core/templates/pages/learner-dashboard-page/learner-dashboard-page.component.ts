@@ -138,7 +138,6 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
   progressImageUrl: string = '';
   windowIsNarrow: boolean = false;
   directiveSubscriptions = new Subscription();
-  SHOW_REDESIGNED_LEARNER_DASHBOARD: boolean = false;
   LEARNER_GROUP_FEATURE_IS_ENABLED: boolean = false;
 
   constructor(
@@ -265,7 +264,7 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
     this.directiveSubscriptions.unsubscribe();
   }
 
-  isShowRedesignedLearnerDashboardFeatureFlagEnable(): boolean {
+  isRedesignedLearnerDashboardEnabled(): boolean {
     return (
       this.platformFeatureService.status.
         ShowRedesignedLearnerDashboard.isEnabled);

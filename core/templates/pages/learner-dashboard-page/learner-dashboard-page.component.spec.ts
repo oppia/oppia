@@ -640,7 +640,7 @@ describe('Learner dashboard page', () => {
       'learner dashboard feature flag', () => {
       expect(
         component.
-          isShowRedesignedLearnerDashboardFeatureFlagEnable())
+          isRedesignedLearnerDashboardEnabled())
         .toBeFalse();
 
       mockPlatformFeatureService.status.
@@ -648,7 +648,7 @@ describe('Learner dashboard page', () => {
 
       expect(
         component.
-          isShowRedesignedLearnerDashboardFeatureFlagEnable())
+          isRedesignedLearnerDashboardEnabled())
         .toBeTrue();
     });
 

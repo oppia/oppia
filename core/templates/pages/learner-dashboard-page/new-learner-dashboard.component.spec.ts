@@ -30,7 +30,6 @@ import { TranslateService } from '@ngx-translate/core';
 import { AlertsService } from 'services/alerts.service';
 import { ShortLearnerGroupSummary } from 'domain/learner_group/short-learner-group-summary.model';
 import { CsrfTokenService } from 'services/csrf-token.service';
-import { DateTimeFormatService } from 'services/date-time-format.service';
 import { ExplorationBackendDict, ExplorationObjectFactory } from 'domain/exploration/ExplorationObjectFactory';
 import { LearnerDashboardBackendApiService } from 'domain/learner_dashboard/learner-dashboard-backend-api.service';
 import { LearnerDashboardActivityBackendApiService } from 'domain/learner_dashboard/learner-dashboard-activity-backend-api.service';
@@ -100,7 +99,6 @@ describe('New Learner dashboard page', () => {
   let fixture: ComponentFixture<NewLearnerDashboardComponent>;
   let alertsService: AlertsService;
   let csrfTokenService: CsrfTokenService;
-  let dateTimeFormatService: DateTimeFormatService;
   let explorationObjectFactory: ExplorationObjectFactory;
   let learnerDashboardBackendApiService:
     LearnerDashboardBackendApiService;
@@ -280,7 +278,6 @@ describe('New Learner dashboard page', () => {
         ],
         providers: [
           AlertsService,
-          DateTimeFormatService,
           ExplorationObjectFactory,
           LearnerDashboardBackendApiService,
           {
@@ -314,7 +311,6 @@ describe('New Learner dashboard page', () => {
 
       alertsService = TestBed.inject(AlertsService);
       csrfTokenService = TestBed.inject(CsrfTokenService);
-      dateTimeFormatService = TestBed.inject(DateTimeFormatService);
       explorationObjectFactory = TestBed.inject(ExplorationObjectFactory);
       windowDimensionsService = TestBed.inject(WindowDimensionsService);
       learnerDashboardBackendApiService =
@@ -659,32 +655,6 @@ describe('New Learner dashboard page', () => {
       expect(component.getLabelClass('open')).toBe('badge badge-info');
       expect(component.getLabelClass('compliment')).toBe('badge badge-success');
       expect(component.getLabelClass('another')).toBe('badge badge-secondary');
-    });
-
-    it('should get human readable status from provided status', () => {
-      expect(component.getHumanReadableStatus('open')).toBe('Open');
-      expect(component.getHumanReadableStatus('compliment')).toBe('Compliment');
-      expect(component.getHumanReadableStatus('not_actionable')).toBe(
-        'Not Actionable');
-    });
-
-    it('should get formatted date string from the timestamp in milliseconds',
-      () => {
-        // This corresponds to Fri, 2 Apr 2021 09:45:00 GMT.
-        let NOW_MILLIS = 1617393321345;
-        spyOn(dateTimeFormatService, 'getLocaleAbbreviatedDatetimeString')
-          .withArgs(NOW_MILLIS).and.returnValue('4/2/2021');
-
-        expect(component.getLocaleAbbreviatedDatetimeString(NOW_MILLIS))
-          .toBe('4/2/2021');
-      });
-
-    it('should sanitize given png base64 data and generate url', () => {
-      let result = component.decodePngURIData('%D1%88%D0%B5%D0%BB%D0%BB%D1%8B');
-
-      fixture.detectChanges();
-
-      expect(result).toBe('шеллы');
     });
   });
 

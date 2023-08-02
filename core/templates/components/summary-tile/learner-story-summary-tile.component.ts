@@ -55,8 +55,8 @@ export class LearnerStorySummaryTileComponent implements OnInit {
   todolistImageUrl: string = '';
   learnerGroupImageUrl: string = '';
   openInNewWindow = false;
-  circumference = (18 * 2 * Math.PI);
-  getStrokeDashOffSet!: number;
+  circumference!: number;
+  strokeDashOffSet!: number;
 
   constructor(
     private urlInterpolationService: UrlInterpolationService,
@@ -102,6 +102,7 @@ export class LearnerStorySummaryTileComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.circumference = AppConstants.PROGRESS_CIRCLE_CIRCUMFERENCE;
     this.nodeCount = this.storySummary.getNodeTitles().length;
     this.completedNodeCount = this.storySummary.getCompletedNodeTitles().length;
     this.storyProgress = Math.floor(
@@ -113,7 +114,7 @@ export class LearnerStorySummaryTileComponent implements OnInit {
       '/learner_dashboard/todolist.svg');
     this.learnerGroupImageUrl = this.getStaticImageUrl(
       '/learner_dashboard/learner-group-icon.svg');
-    this.getStrokeDashOffSet =
+    this.strokeDashOffSet =
     this.getStrokeDashOffSetValue(this.storyProgress);
 
     if (this.storySummary.getThumbnailFilename()) {
@@ -143,13 +144,6 @@ export class LearnerStorySummaryTileComponent implements OnInit {
 
   getStaticImageUrl(imagePath: string): string {
     return this.urlInterpolationService.getStaticImageUrl(imagePath);
-  }
-
-  isButtonHovered(): string {
-    if (this.buttonIsHovered) {
-      return 'box-shadow: 0 5px 5px -5px #333;';
-    }
-    return '';
   }
 
   isCardHovered(): string {

@@ -301,22 +301,4 @@ describe('Collection Summary Tile Component', () => {
 
     expect(component.collectionIsCurrentlyHoveredOver).toBe(false);
   });
-
-  it('should return box-shadow style when button is hovered', () => {
-    component.buttonIsHovered = true;
-
-    fixture.detectChanges();
-    const result = component.isButtonHovered();
-
-    expect(result).toBe('box-shadow: 0 5px 5px -5px #333;');
-  });
-
-  it('should check when button is not hovered', () => {
-    component.buttonIsHovered = false;
-
-    fixture.detectChanges();
-    const result = component.isButtonHovered();
-
-    expect(result).toBe('');
-  });
 });

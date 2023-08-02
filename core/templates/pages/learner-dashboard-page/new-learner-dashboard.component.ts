@@ -369,17 +369,4 @@ export class NewLearnerDashboardComponent implements OnInit {
   getLabelClass(status: string): string {
     return this.threadStatusDisplayService.getLabelClass(status);
   }
-
-  getHumanReadableStatus(status: string): string {
-    return this.threadStatusDisplayService.getHumanReadableStatus(status);
-  }
-
-  getLocaleAbbreviatedDatetimeString(millisSinceEpoch: number): string {
-    return this.dateTimeFormatService.getLocaleAbbreviatedDatetimeString(
-      millisSinceEpoch);
-  }
-
-  decodePngURIData(base64ImageData: string): string {
-    return decodeURIComponent(base64ImageData);
-  }
 }

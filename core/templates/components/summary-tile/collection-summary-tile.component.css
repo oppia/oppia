@@ -103,7 +103,7 @@ oppia-collection-summary-tile .oppia-learner-dashboard-collection-title {
 }
 
 oppia-collection-summary-tile .continue-button {
-  background: white 0% 0% no-repeat padding-box;
+  background: #fff 0% 0% no-repeat padding-box;
   border: 1px solid #00645c;
   border-radius: 4px;
   height: 36px;
@@ -230,4 +230,7 @@ oppia-collection-summary-tile .oppia-collection-learner-dashboard-card .continue
 oppia-collection-summary-tile .oppia-collection-summary-container {
   bottom: 150px;
   position: relative;
+}
+oppia-collection-summary-tile .oppia-collection-summary-button-hover {
+  box-shadow: 0 5px 5px -5px #333;
 }

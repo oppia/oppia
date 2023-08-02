@@ -234,3 +234,6 @@ oppia-exploration-summary-tile .oppia-exploration-summary-container {
   bottom: 150px;
   position: relative;
 }
+oppia-exploration-summary-tile .oppia-exploration-button-hover {
+  box-shadow: 0 5px 5px -5px #333;
+}

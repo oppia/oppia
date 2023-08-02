@@ -95,8 +95,8 @@ OnChanges, OnDestroy {
   expTitleTranslationKey!: string;
   expObjectiveTranslationKey!: string;
   buttonIsHovered: boolean = false;
-  circumference = (18 * 2 * Math.PI);
-  getStrokeDashOffSet!: number;
+  circumference!: number;
+  strokeDashOffSet!: number;
 
 
   constructor(
@@ -111,7 +111,7 @@ OnChanges, OnDestroy {
   ) {}
 
   ngOnChanges(changes: SimpleChanges): void {
-    this.getStrokeDashOffSet =
+    this.strokeDashOffSet =
     this.getStrokeDashOffSetValue(this.explorationProgress);
   }
 
@@ -164,6 +164,7 @@ OnChanges, OnDestroy {
       this.i18nLanguageCodeService.getExplorationTranslationKey(
         this.explorationId, TranslationKeyType.DESCRIPTION)
     );
+    this.circumference = AppConstants.PROGRESS_CIRCLE_CIRCUMFERENCE;
   }
 
   ngOnDestroy(): void {
@@ -260,13 +261,6 @@ OnChanges, OnDestroy {
       }
       return result;
     }
-  }
-
-  isButtonHovered(): string {
-    if (this.buttonIsHovered) {
-      return 'box-shadow: 0 5px 5px -5px #333;';
-    }
-    return '';
   }
 
   getCompleteThumbnailIconUrl(): string {

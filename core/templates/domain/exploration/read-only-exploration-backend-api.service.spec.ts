@@ -455,7 +455,7 @@ describe('Read only exploration backend API service', () => {
     expect(roebas.isCached('0')).toBe(false);
   }));
 
-  it('should successfully fetch learners progress in stories chapters',
+  it('should successfully fetch learners progress in chapters',
     fakeAsync(() => {
       var successHandler = jasmine.createSpy('success');
       var failHandler = jasmine.createSpy('fail');
@@ -479,7 +479,7 @@ describe('Read only exploration backend API service', () => {
       ];
 
       roebas.
-        fetchProgressInExplorationsOrChapters(['exp_id_1', 'exp_id_2'])
+        fetchChapterProgressSummaries(['exp_id_1', 'exp_id_2'])
         .then(successHandler, failHandler);
 
       var req = httpTestingController.expectOne(

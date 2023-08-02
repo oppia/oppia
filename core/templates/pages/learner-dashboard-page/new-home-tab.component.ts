@@ -167,7 +167,7 @@ export class NewHomeTabComponent {
       }
 
       this.readOnlyExplorationBackendApiService.
-        fetchProgressInExplorationsOrChapters(
+        fetchChapterProgressSummaries(
           expIds
         ).then(explorationsProgressSummary => {
           let explorationsProgress = explorationsProgressSummary;

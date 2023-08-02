@@ -35,7 +35,7 @@
 
 .learner-groups-tab .learner-groups-section-heading {
   color: #205d86;
-  font-family: Capriola,Roboto,Arial,sans-serif;
+  font-family: Capriola, Roboto, Arial, sans-serif;
   font-size: 24px;
   font-weight: 400;
   margin: 0 0 24px 0;
@@ -93,7 +93,7 @@
   align-items: center;
   background: #00645c;
   border-radius: 4px;
-  color: white;
+  color: #fff;
   cursor: pointer;
   display: flex;
   font-size: 14px;
@@ -282,7 +282,7 @@
 }
 @media (max-width: 767px) {
   .learner-groups-tab .learner-groups-section-heading {
-    font-family: Capriola,Roboto,Arial,sans-serif;
+    font-family: Capriola, Roboto, Arial, sans-serif;
     font-size: 18px;
   }
 }

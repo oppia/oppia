@@ -242,13 +242,10 @@ export class ReadOnlyExplorationBackendApiService {
   }
 
   /**
-   * Retrives the Progress of exploratin
-   * chapters are nothing but exploration.
-   * The exploration used in story are called chapters.
-   * To reduce the code redundacy, ChapterProgressSummay Model is used.
+   * Retrives the Progress in a chapters
    */
 
-  async fetchProgressInExplorationsOrChapters(
+  async fetchChapterProgressSummaries(
       expIds: string[]
   ): Promise<ChapterProgressSummary[]> {
     return new Promise((resolve, reject) => {

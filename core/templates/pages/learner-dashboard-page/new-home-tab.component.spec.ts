@@ -220,8 +220,8 @@ describe('New Home tab Component', () => {
     expect(component.storyInProgress.length).toBe(1);
   });
 
-  it('should check the completed ExpIds', () => {
-    const completed = {
+  it('should check the number of completed exploration list', () => {
+    const completedLearnerExplorationSummaryDict = {
       last_updated_msec: 1591296737470.528,
       community_owned: false,
       objective: 'Test Objective',
@@ -246,45 +246,46 @@ describe('New Home tab Component', () => {
       title: 'Test Title'
     };
     let completedSummary = LearnerExplorationSummary.createFromBackendDict(
-      completed);
+      completedLearnerExplorationSummaryDict);
     component.completedExplorationsList = [completedSummary];
     const completedExpIds = ['44LKoKLlIbGe'];
     component.ngOnInit();
     expect(component.completedExpIds).toEqual(completedExpIds);
   });
-  it('should check total explortion IDs', () => {
-    const exp1 = {
-      last_updated_msec: 1591296737470.528,
-      community_owned: false,
-      objective: 'Test Objective',
-      id: '44LKoKLlIbGe',
-      num_views: 0,
-      thumbnail_icon_url: '/subjects/Algebra.svg',
-      human_readable_contributors_summary: {},
-      language_code: 'en',
-      thumbnail_bg_color: '#cc4b00',
-      created_on_msec: 1591296635736.666,
-      ratings: {
-        1: 0,
-        2: 0,
-        3: 0,
-        4: 0,
-        5: 0
-      },
-      status: 'public',
-      tags: [],
-      activity_type: 'exploration',
-      category: 'Algebra',
-      title: 'Test Title'
-    };
-    let expSummary = LearnerExplorationSummary.createFromBackendDict(
-      exp1);
-    component.explorationPlaylist = [expSummary];
-    component.ngOnInit();
-    expect(component.totalExploration).toEqual([expSummary]);
-  });
+  it('should populate exploration ID count in learner exploration summary',
+    () => {
+      const exploration1 = {
+        last_updated_msec: 1591296737470.528,
+        community_owned: false,
+        objective: 'Test Objective',
+        id: '44LKoKLlIbGe',
+        num_views: 0,
+        thumbnail_icon_url: '/subjects/Algebra.svg',
+        human_readable_contributors_summary: {},
+        language_code: 'en',
+        thumbnail_bg_color: '#cc4b00',
+        created_on_msec: 1591296635736.666,
+        ratings: {
+          1: 0,
+          2: 0,
+          3: 0,
+          4: 0,
+          5: 0
+        },
+        status: 'public',
+        tags: [],
+        activity_type: 'exploration',
+        category: 'Algebra',
+        title: 'Test Title'
+      };
+      let expSummary = LearnerExplorationSummary.createFromBackendDict(
+        exploration1);
+      component.explorationPlaylist = [expSummary];
+      component.ngOnInit();
+      expect(component.totalExploration).toEqual([expSummary]);
+    });
   it('should intialize', fakeAsync(() => {
-    const exp1 = {
+    const exploration1 = {
       last_updated_msec: 1591296737470.528,
       community_owned: false,
       objective: 'Test Objective',
@@ -309,7 +310,7 @@ describe('New Home tab Component', () => {
       title: 'Test Title'
     };
     let expSummary = LearnerExplorationSummary.createFromBackendDict(
-      exp1);
+      exploration1);
     component.totalExploration = [expSummary];
     const explorationProgressSummaryDict = {
       total_checkpoints_count: 6,
@@ -322,14 +323,14 @@ describe('New Home tab Component', () => {
     spyOn(component, 'calculateExplorationProgress');
     spyOn(
       readOnlyExplorationBackendApiService,
-      'fetchProgressInExplorationsOrChapters')
+      'fetchChapterProgressSummaries')
       .and.returnValue(Promise.resolve([explorationProgress]));
 
     component.ngOnInit();
     tick(100);
     expect(
       readOnlyExplorationBackendApiService.
-        fetchProgressInExplorationsOrChapters).toHaveBeenCalled();
+        fetchChapterProgressSummaries).toHaveBeenCalled();
     expect(component.calculateExplorationProgress).toHaveBeenCalledWith(
       explorationOrChapterProgress[0], expIds[0]
     );
@@ -443,7 +444,7 @@ describe('New Home tab Component', () => {
     [explorationProgress1, explorationProgress2];
     spyOn(
       readOnlyExplorationBackendApiService,
-      'fetchProgressInExplorationsOrChapters')
+      'fetchChapterProgressSummaries')
       .and.returnValue(Promise.resolve(explorationOrChaptersProgress));
     component.ngOnInit();
     tick();
@@ -490,7 +491,7 @@ describe('New Home tab Component', () => {
             result: Promise.resolve('success')
           }) as NgbModalRef;
       });
-      const exp1 = {
+      const exploration1 = {
         last_updated_msec: 1591296737470.528,
         community_owned: false,
         objective: 'Test Objective',
@@ -515,7 +516,7 @@ describe('New Home tab Component', () => {
         title: 'Test Title'
       };
       let summary1 = LearnerExplorationSummary.createFromBackendDict(
-        exp1);
+        exploration1);
       component.explorationPlaylist = [summary1];
       component.totalLessonsInPlaylist = [summary1];
       let sectionNameI18nId = 'I18N_LEARNER_DASHBOARD_PLAYLIST_SECTION';

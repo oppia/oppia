@@ -1,6 +1,6 @@
 /*
   NOTE to developers: We generate RTL CSS from this file in the webpack
-  compilation, here are sme additional rules that can be added to the CSS files:
+  compilation, here are some additional rules that can be added to the CSS files:
   https://rtlcss.com/learn/usage-guide/control-directives .
 */
 
@@ -101,7 +101,7 @@
 
 .new-learner-dashboard .oppia-learner-dashboard-menu {
   align-items: center;
-  border: 2px solid white;
+  border: 2px solid #fff;
   border-radius: 4px;
   cursor: pointer;
   display: flex;
@@ -162,7 +162,7 @@
 }
 
 .new-learner-dashboard .oppia-learner-dashboard-main-content .remove-icon {
-  color: white;
+  color: #fff;
   float: right;
   font-size: 20px;
   margin-left: -26px;
@@ -174,7 +174,7 @@
 
 .new-learner-dashboard .oppia-learner-dashboard-main-menu {
   background-color: #00645c;
-  color: white;
+  color: #fff;
   height: 89vh;
   margin: 64px 0 0 0;
   padding: 11px;
@@ -187,12 +187,12 @@
 }
 
 .new-learner-dashboard .oppia-learner-dashboard-menu-footer-hover:hover {
-  color: white;
+  color: #fff;
   text-decoration: none;
 }
 
 .new-learner-dashboard .oppia-learner-dashboard-menu-footer-link {
-  color: white;
+  color: #fff;
   display: block;
   font-size: 18px;
   margin: 2rem 0;

@@ -1,4 +1,4 @@
-<div *ngIf="!isShowRedesignedLearnerDashboardFeatureFlagEnable()">
+<div *ngIf="!isRedesignedLearnerDashboardEnabled()">
   <background-banner *ngIf="!windowIsNarrow || (windowIsNarrow && activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.HOME)"></background-banner>
   <div [ngStyle]="{'min-height': windowIsNarrow ? '85.5vh': 'auto'}"
        class="oppia-learner-dashboard-container position-relative">
@@ -140,7 +140,7 @@
     </div>
   </div>
 </div>
-<div *ngIf="isShowRedesignedLearnerDashboardFeatureFlagEnable()">
+<div *ngIf="isRedesignedLearnerDashboardEnabled()">
   <oppia-new-learner-dashboard></oppia-new-learner-dashboard>
 </div>
 

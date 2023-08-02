@@ -206,7 +206,7 @@ describe('CarouselBarComponent', () => {
   });
 
   it('should disable left button' +
-   ' when carouselScrollPositionPx is less than or equal to 0', () => {
+   ' when carouselScrollPosition is at left most position', () => {
     const carouselSelector = document.createElement('div');
     spyOn(document, 'querySelector').and.returnValue(carouselSelector);
 

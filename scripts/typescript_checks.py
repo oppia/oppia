@@ -26,6 +26,10 @@ import sys
 from typing import List, Optional, Sequence
 
 # TODO(#15567): This can be removed after Literal in utils.py is loaded
+# TODO(#18731): File new-learner-dashboard.component.spec.ts' will be
+# removed from the TS_STRICT_EXCLUDE_PATHS once the learner Dashboard
+# completely redesign and the code of this file will be shifted to
+# learner-dashboard-page.component.spec.ts.
 # from typing instead of typing_extensions, this will be possible after
 # we migrate to Python 3.8.
 from scripts import common  # isort:skip pylint: disable=wrong-import-position, unused-import

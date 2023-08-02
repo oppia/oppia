@@ -33,7 +33,7 @@
   </mat-card>
 </div>
 <div *ngIf="displayAreaIsLearnerDashboard" class="new-learner-story-summary-tile">
-  <mat-card class="oppia-story-dashboard-card" [attr.style]="isButtonHovered()">
+  <mat-card class="oppia-story-dashboard-card" [ngClass]="{'oppia-story-button-hover': buttonIsHovered}">
     <div class="oppia-title-section" [ngStyle]="{'background-color': thumbnailBgColor}">
       <div class="oppia-story-tags">
         <span *ngIf="learnerGroupTitle.length !== 0" class="oppia-learnergroup-title-tag">
@@ -47,7 +47,7 @@
           <span>Goals</span>
         </span>
       </div>
-      <img class="oppia-thumbnail-image" alt="" [src]="thumbnailUrl" [attr.style]="isButtonHovered()">
+      <img class="oppia-thumbnail-image" alt="" [src]="thumbnailUrl" [ngClass]="{'oppia-story-button-hover': buttonIsHovered}">
     </div>
     <div class="oppia-summary-section">
       <div class="next-incomplete-chapter" *ngIf="isDisplayAreaHome()">
@@ -65,7 +65,7 @@
         <svg class="story-progress-svg" width="50" height="50">
           <circle class="story-progress-circle total-circle" cx="25" cy="25" r="18"/>
           <circle class="story-progress-circle completed-circle" cx="25" cy="25" r="18"
-                  [ngStyle]="{'stroke-dashoffset': getStrokeDashOffSet,'stroke-dasharray': circumference}"/>
+                  [ngStyle]="{'stroke-dashoffset': strokeDashOffSet,'stroke-dasharray': circumference}"/>
           <text x="25" y="-20" text-anchor="middle" stroke="#00645c" stroke-width="0.5" font-size="0.9em"
                 transform="rotate(90)">
             {{ storyProgress }}%
@@ -219,7 +219,8 @@
     float: left;
   }
 
-/* redesigned learner story summary tile css*/
+/*TODO(#18731): Remove the current Learner Dashboard code and
+ keep the code of Redesigned Learner Dashboard*/
 
   .new-learner-story-summary-tile .story-progress-svg {
     transform: rotate(-90deg);
@@ -395,5 +396,8 @@
   }
   .new-learner-story-summary-tile .oppia-goal-svg-image {
     filter: invert(27%) sepia(108%) saturate(4263%) hue-rotate(500deg) brightness(60%) contrast(131%);
+  }
+  .new-learner-story-summary-tile .oppia-story-button-hover {
+    box-shadow: 0 5px 5px -5px #333;
   }
 </style>
