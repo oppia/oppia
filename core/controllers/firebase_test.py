@@ -37,7 +37,8 @@ class FirebaseProxyPageTest(test_utils.GenericTestBase):
     MOCK_FIREBASE_RESPONSE = MockResponse(
         {
             'Content-Type': 'application/json',
-            'Res-Header': 'value'
+            'Res-Header': 'value',
+            'Connection': 'connection_value'
         },
         200,
         b')]}\'\n{"key": "val"}'
@@ -83,8 +84,15 @@ class FirebaseProxyPageTest(test_utils.GenericTestBase):
                 payload,
                 headers
             )
+
             for header, value in self.MOCK_FIREBASE_RESPONSE.headers.items():
-                self.assertEqual(response.headers[header], value)
+                if (
+                    header.lower() in
+                    firebase.FirebaseProxyPage.RESPONSE_EXCLUDED_HEADERS
+                ):
+                    self.assertNotIn(header, response.headers)
+                else:
+                    self.assertEqual(response.headers[header], value)
             self.assertEqual(
                 response.status_int,
                 self.MOCK_FIREBASE_RESPONSE.status_code
