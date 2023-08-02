@@ -173,14 +173,6 @@
         "targetDirPrefix": "angular-ui-leaflet-",
         "files": ["ui-leaflet.min.no-header.js"]
       },
-      "leaflet": {
-        "version": "1.4.0",
-        "downloadFormat": "files",
-        "url": "https://unpkg.com/leaflet@1.4.0/dist",
-        "rootDirPrefix": "leaflet-",
-        "targetDirPrefix": "leaflet-",
-        "files": ["leaflet.js", "leaflet.css"]
-      },
       "angular-simple-logger": {
         "version": "0.1.7",
         "downloadFormat": "files",
