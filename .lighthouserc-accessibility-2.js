@@ -76,13 +76,13 @@ module.exports = {
           }
         },
         {
-          'matchingUrlPattern': '^http://127.0.0.1:8181/learn/staging/dummy-topic-one/story$',
+          'matchingUrlPattern': '^http://127.0.0.1:8181/learn/staging/dummy-topic-one/story',
           'assertions': {
             'categories:accessibility': ['error', {'minScore': 1}]
           }
         },
         {
-          'matchingUrlPattern': '^http://127.0.0.1:8181/learn/staging/dummy-topic-one/story/help-jamie-win-arcade$',
+          'matchingUrlPattern': '^http://127.0.0.1:8181/learn/staging/dummy-topic-one/story/help-jamie-win-arcade',
           'assertions': {
             'categories:accessibility': ['error', {'minScore': 1}]
           }
