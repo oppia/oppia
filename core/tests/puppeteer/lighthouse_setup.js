@@ -80,6 +80,7 @@ var editUserRoleButton = '.e2e-test-role-edit-button';
 var roleEditorContainer = '.e2e-test-roles-editor-card-container';
 var addNewRoleButton = '.e2e-test-add-new-role-button';
 var roleSelect = '.e2e-test-new-role-selector';
+var generateTopicButton = '.load-dummy-new-structures-data-button';
 var cookieBannerAcceptButton = (
   '.e2e-test-oppia-cookie-banner-accept-button');
 
@@ -261,6 +262,27 @@ const getSkillEditorUrl = async function(browser, page) {
     if (await skillEditorUrl.includes('topic_editor')) {
       skillEditorUrl = await pages[3].url();
     }
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.log(e);
+    process.exit(1);
+  }
+};
+
+const generateDataForTopicPlayer = async function(browser, page) {
+  try {
+    await login(browser, page);
+
+    await setRole(browser, page, 'CURRICULUM_ADMIN');
+
+    // eslint-disable-next-line dot-notation
+    await page.goto('http://127.0.0.1:8181/admin/activities', { waitUntil: networkIdle });
+
+    await page.waitForSelector(generateTopicButton);
+    await page.click(generateTopicButton);
+
+    // Wait for some time to allow the data to be generated
+    await page.waitForTimeout(15000);
   } catch (e) {
     // eslint-disable-next-line no-console
     console.log(e);
