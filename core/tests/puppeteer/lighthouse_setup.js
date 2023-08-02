@@ -287,7 +287,6 @@ const generateDataForTopicAndStoryPlayer = async function(browser, page) {
 
 const generateDataForClassroom = async function(browser, page) {
   try {
-    
     await page.goto('http://127.0.0.1:8181/admin#/activities', { waitUntil: networkIdle });
 
     await page.waitForSelector(generateClassroomButton);
