@@ -45,6 +45,13 @@ class FirebaseProxyPage(
         }
     }
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}, 'POST': {}}
+    RESPONSE_EXCLUDED_HEADERS = frozenset([
+        'content-encoding',
+        'content-length',
+        'transfer-encoding',
+        'connection'
+    ])
+    """Headers to exclude from the packaged response."""
 
     def _firebase_proxy(self) -> None:
         """Proxies all requests to the firebase app."""
@@ -58,6 +65,8 @@ class FirebaseProxyPage(
             timeout=TIMEOUT_SECS
         )
         for header_key, header_value in response.headers.items():
+            if header_key.lower() in self.RESPONSE_EXCLUDED_HEADERS:
+                continue
             self.response.headers[header_key] = header_value
         self.response.status = response.status_code
         self.response.body = response.content
