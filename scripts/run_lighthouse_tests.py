@@ -100,7 +100,7 @@ def run_lighthouse_puppeteer_script(record: bool=False) -> None:
         video_path = os.path.join(dir_path, 'video.mp4')
         bash_command.append(video_path)
         print('Starting LHCI Puppeteer script with recording.')
-        print('Video Path:', video_path)
+        print('Video Path:' + video_path)
 
     process = subprocess.Popen(
         bash_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -114,9 +114,9 @@ def run_lighthouse_puppeteer_script(record: bool=False) -> None:
         print('Puppeteer script completed successfully.')
         if record:
             if os.path.isfile(video_path):
-                print('Resulting puppeteer video saved at', video_path)
+                print('Resulting puppeteer video saved at %s' % video_path)
             else:
-                print('No video found at', video_path)
+                print('No video found at %s' % video_path)
     else:
         print('Return code: %s' % process.returncode)
         print('OUTPUT:')
@@ -130,9 +130,9 @@ def run_lighthouse_puppeteer_script(record: bool=False) -> None:
         print('Puppeteer script failed. More details can be found above.')
         if record:
             if os.path.isfile(video_path):
-                print('Resulting puppeteer video saved at', video_path)
+                print('Resulting puppeteer video saved at %s' % video_path)
             else:
-                print('No video found at', video_path)
+                print('No video found at %s' % video_path)
         sys.exit(1)
 
 
