@@ -269,7 +269,7 @@ const getSkillEditorUrl = async function(browser, page) {
   }
 };
 
-const generateDataForTopicPlayer = async function(browser, page) {
+const generateDataForTopicAndStoryPlayer = async function(browser, page) {
   try {
     // eslint-disable-next-line dot-notation
     await page.goto('http://127.0.0.1:8181/admin#/activities', { waitUntil: networkIdle });
@@ -304,7 +304,7 @@ const main = async function() {
   await getTopicEditorUrl(browser, page);
   await getStoryEditorUrl(browser, page);
   await getSkillEditorUrl(browser, page);
-  await generateDataForTopicPlayer(browser, page);
+  await generateDataForTopicAndStoryPlayer(browser, page);
   await process.stdout.write(
     [
       explorationEditorUrl,
