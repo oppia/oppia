@@ -41,7 +41,7 @@ from core.platform import models
 import requests
 
 from typing import (
-    Dict, Final, List, Literal, Optional, Sequence, TypedDict, overload)
+    Dict, Final, List, Literal, Optional, Sequence, TypedDict, overload, Union)
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -1744,7 +1744,7 @@ def record_user_created_an_exploration(user_id: str) -> None:
         save_user_settings(user_settings)
 
 
-def add_user_to_mailing_list(email: str, tag: str, name=None) -> bool:
+def add_user_to_mailing_list(email: str, tag: str, name: Union[str, None]=None) -> bool:
     """Adds user to the bulk email provider with the relevant tag and required
     merge fields.
 
