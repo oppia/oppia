@@ -91,8 +91,8 @@ describe('CarouselBarComponent', () => {
     expect(component.isScrollable).toBe(true);
   });
 
-  it('should scroll untraked topics to right, when' +
-     'card is at left end', () => {
+  it('should scroll untracked topics to right, when' +
+     'card is at the left end', () => {
     const carouselSelector = document.createElement('div');
     spyOn(document, 'querySelector').and.returnValue(carouselSelector);
 
