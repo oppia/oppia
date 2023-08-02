@@ -277,7 +277,7 @@ const generateDataForTopicAndStoryPlayer = async function(browser, page) {
     await page.waitForSelector(generateTopicButton);
     await page.click(generateTopicButton);
 
-    await page.waitForTimeout(15000);
+    await page.waitForTimeout(20000);
   } catch (e) {
     // eslint-disable-next-line no-console
     console.log(e);
