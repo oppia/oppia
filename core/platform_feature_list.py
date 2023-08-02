@@ -45,7 +45,6 @@ ParamNames = params.ParamNames
 DEV_FEATURES_LIST = [
     params.ParamNames.SERIAL_CHAPTER_LAUNCH_CURRICULUM_ADMIN_VIEW,
     params.ParamNames.SHOW_FEEDBACK_UPDATES_IN_PROFILE_PIC_DROPDOWN,
-    params.ParamNames.SHOW_REDESIGNED_LEARNER_DASHBOARD,
     params.ParamNames.SHOW_TRANSLATION_SIZE,
     params.ParamNames.CD_ADMIN_DASHBOARD_NEW_UI,
 ]
@@ -66,7 +65,9 @@ PROD_FEATURES_LIST: List[ParamNames] = [
     params.ParamNames.CONTRIBUTOR_DASHBOARD_ACCOMPLISHMENTS,
     params.ParamNames.DIAGNOSTIC_TEST,
     params.ParamNames.IS_IMPROVEMENTS_TAB_ENABLED,
-    params.ParamNames.LEARNER_GROUPS_ARE_ENABLED
+    params.ParamNames.LEARNER_GROUPS_ARE_ENABLED,
+    params.ParamNames.SHOW_REDESIGNED_LEARNER_DASHBOARD,
+
 ]
 
 # Names of features that should not be used anymore, e.g. features that are
