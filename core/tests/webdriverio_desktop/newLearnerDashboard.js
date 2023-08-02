@@ -83,7 +83,7 @@ describe('New Learner dashboard functionality', function() {
     var redesignedLearnerDashboardFlag = (
       await releaseCoordinatorPage.
         getRedesignedLearnerDashboardFeatureElement());
-    await releaseCoordinatorPage.enableFeatureForTest(
+    await releaseCoordinatorPage.enableFeatureForDev(
       redesignedLearnerDashboardFlag);
     await users.logout();
   });
