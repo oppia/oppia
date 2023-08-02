@@ -271,12 +271,8 @@ const getSkillEditorUrl = async function(browser, page) {
 
 const generateDataForTopicPlayer = async function(browser, page) {
   try {
-    await login(browser, page);
 
-    await setRole(browser, page, 'CURRICULUM_ADMIN');
-
-    // eslint-disable-next-line dot-notation
-    await page.goto('http://127.0.0.1:8181/admin/activities', { waitUntil: networkIdle });
+    await page.goto('http://127.0.0.1:8181/admin#/activities', { waitUntil: networkIdle });
 
     await page.waitForSelector(generateTopicButton);
     await page.click(generateTopicButton);
@@ -309,6 +305,7 @@ const main = async function() {
   await getTopicEditorUrl(browser, page);
   await getStoryEditorUrl(browser, page);
   await getSkillEditorUrl(browser, page);
+  await generateDataForTopicPlayer(browser, page);
   await process.stdout.write(
     [
       explorationEditorUrl,
