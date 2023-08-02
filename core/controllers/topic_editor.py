@@ -153,18 +153,16 @@ class TopicEditorStoryHandler(
 
         canonical_stories_ids = [summary['id'] for
             summary in canonical_story_summary_dicts]
-        canonical_stories = story_fetchers.get_stories_by_ids(
-            canonical_stories_ids)
-        non_empty_canonical_stories = [story for story in
-            canonical_stories if story is not None]
+        canonical_stories = list(filter(
+            None, story_fetchers.get_stories_by_ids(canonical_stories_ids)))
+        canonical_stories_dict: Dict[str, story_domain.Story] = {}
+        for canonical_story in canonical_stories:
+            canonical_stories_dict.update({
+                canonical_story.id: canonical_story})
         updated_canonical_story_summary_dicts = []
+
         for summary in canonical_story_summary_dicts:
-            story = None
-            for canonical_story in non_empty_canonical_stories:
-                if canonical_story.id == summary['id']:
-                    story = canonical_story
-            if story is None:
-                continue
+            story = canonical_stories_dict[summary['id']]
             nodes = story.story_contents.nodes
             total_chapters_count = len(nodes)
             published_chapters_count = 0
