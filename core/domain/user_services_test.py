@@ -690,7 +690,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         with fn_swap:
             self.assertTrue(
                 user_services.add_user_to_mailing_list(
-                    'email@example.com', 'Name', 'Android'))
+                    'email@example.com', 'Android', name='Name'))
 
     def test_set_and_get_user_email_preferences(self) -> None:
         auth_id = 'someUser'

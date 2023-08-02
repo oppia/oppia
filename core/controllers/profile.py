@@ -253,7 +253,7 @@ class MailingListSubscriptionHandler(
         email = self.normalized_payload['email']
         name = self.normalized_payload['name']
         tag = self.normalized_payload['tag']
-        status = user_services.add_user_to_mailing_list(email, name, tag)
+        status = user_services.add_user_to_mailing_list(email, tag, name)
         self.render_json({'status': status})
 
 

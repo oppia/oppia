@@ -26,7 +26,7 @@ export interface MailingListReturnStatusData {
 
 export interface MailingListPayload {
   email: string;
-  name: string;
+  name: string | null;
 }
 
 @Injectable({
@@ -50,12 +50,12 @@ export class MailingListBackendApiService {
   }
 
   async subscribeUserToMailingList(
-      email: string, name: string, tag: string
+      email: string, name: string | null, tag: string
   ): Promise<boolean> {
     let payload = {
       email: email,
-      name: name,
-      tag: tag
+      tag: tag,
+      name: name
     };
     return this._putRequestAsync(
       '/mailinglistsubscriptionhandler', payload);

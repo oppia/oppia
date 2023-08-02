@@ -1744,21 +1744,19 @@ def record_user_created_an_exploration(user_id: str) -> None:
         save_user_settings(user_settings)
 
 
-def add_user_to_mailing_list(email: str, name: str, tag: str) -> bool:
+def add_user_to_mailing_list(email: str, tag: str, name=None) -> bool:
     """Adds user to the bulk email provider with the relevant tag and required
     merge fields.
 
     Args:
         email: str. Email of the user.
-        name: str. Name of the user.
         tag: str. Tag for the mailing list.
+        name: None or str. Name of the user.
 
     Returns:
         bool. Whether the operation was successful or not.
     """
-    merge_fields = {
-        'NAME': name
-    }
+    merge_fields = {'NAME': name} if name is not None else {}
     return bulk_email_services.add_or_update_user_status(
         email, merge_fields, tag, can_receive_email_updates=True)
 
