@@ -277,8 +277,6 @@ const generateDataForTopicAndStoryPlayer = async function(browser, page) {
     await page.waitForNavigation({ waitUntil: networkIdle });
     await page.waitForSelector(generateTopicButton);
     await page.click(generateTopicButton);
-
-
     await page.waitForXPath("//div[contains(text(), 'Dummy new structures data generated successfully.')]");
 
   } catch (e) {
