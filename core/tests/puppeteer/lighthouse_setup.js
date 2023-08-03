@@ -276,8 +276,16 @@ const generateDataForTopicAndStoryPlayer = async function(browser, page) {
 
     await page.waitForSelector(generateTopicButton);
     await page.click(generateTopicButton);
-    await page.waitForXPath("//div[contains(text(), 'Dummy new structures data generated successfully.')]");
-
+    
+    const successMessage = 'Dummy new structures data generated successfully.';
+    let statusMessage;
+    do {
+      await page.waitForTimeout(1000); // Wait for 1 second before checking again
+      statusMessage = await page.evaluate(() => {
+        const statusMessageElement = document.querySelector('.oppia-status-message-container');
+        return statusMessageElement ? statusMessageElement.textContent.trim() : '';
+      });
+    } while (statusMessage !== successMessage);
   } catch (e) {
     // eslint-disable-next-line no-console
     console.error(e);
