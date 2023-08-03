@@ -275,15 +275,6 @@ const generateDataForTopicAndStoryPlayer = async function(browser, page) {
     await page.goto('http://127.0.0.1:8181/admin#/activities', { waitUntil: networkIdle });
 
     await page.waitForNavigation({ waitUntil: networkIdle });
-    await page.waitForLoadState();
-
-    await page.waitForSelector(generateTopicButton);
-
-    await page.click(generateTopicButton);
-
-    await page.waitForSelector('.oppia-status-message-container');
-
-    await page.waitForNavigation({ waitUntil: networkIdle });
     await page.waitForSelector(generateTopicButton);
     await page.click(generateTopicButton);
 
