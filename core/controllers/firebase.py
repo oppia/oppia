@@ -32,8 +32,8 @@ TIMEOUT_SECS = 60
 FIREBASE_DOMAINS = {
     'oppiaserver-backup-migration.appspot.com':
         'https://oppiaserver-backup-migration.firebaseapp.com',
-    'oppiatestserver.org': 'https://oppiatestserver.firebaseapp.com',
-    'oppia.org': 'https://oppiaserver.firebaseapp.com'
+    'www.oppiatestserver.org': 'https://oppiatestserver.firebaseapp.com',
+    'www.oppia.org': 'https://oppiaserver.firebaseapp.com'
 }
 """A mapping of oppia domain to firebase domains used for authentication."""
 
