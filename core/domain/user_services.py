@@ -1756,7 +1756,7 @@ def add_user_to_mailing_list(
     Args:
         email: str. Email of the user.
         tag: str. Tag for the mailing list.
-        name: None or str. Name of the user.
+        name: str or None. Name of the user, or None if no name was supplied.
 
     Returns:
         bool. Whether the operation was successful or not.
