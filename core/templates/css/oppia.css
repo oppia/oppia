@@ -501,6 +501,11 @@ input.ng-dirty.ng-invalid, textarea.ng-dirty.ng-invalid, md-input-group.md-defau
   color: red;
 }
 
+.oppia-form-error-container {
+  color: #f00;
+  margin-top: 5px;
+}
+
 .oppia-serious-warning-text {
   color: red;
 }
@@ -921,21 +926,19 @@ textarea {
 
 }
 .oppia-navbar-breadcrumb {
-  -webkit-box-orient: vertical;
   color: #fff;
   cursor: default;
-  display: -webkit-box;
   font-family: "Capriola", "Roboto", Arial, sans-serif;
   font-size: 20px;
-  -webkit-line-clamp: 1;
-  margin: 0;
-  margin-bottom: -3px;
-  margin-left: -6px;
-  overflow: hidden;
   padding-top: 13px;
+}
+
+.oppia-navbar-breadcrumb li {
+  display: inline-block;
+  overflow: hidden;
   text-overflow: ellipsis;
-  white-space: break-spaces;
-  width: -webkit-fill-available;
+  white-space: nowrap;
+  width: calc(100vw - 930px);
 }
 
 .oppia-navbar-breadcrumb-separator {
@@ -1028,6 +1031,15 @@ textarea {
   }
   ul.nav.navbar-nav.oppia-navbar-nav.float-right {
     display: flex;
+    flex-direction: row;
+    float: right;
+    margin: 0;
+  }
+}
+@media (min-width: 767px) and (max-width: 992px) {
+  ul.nav.navbar-nav.oppia-navbar-nav.float-right {
+    display: flex;
+    flex-direction: row;
     float: right;
     margin: 0;
   }
