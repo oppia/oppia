@@ -32,6 +32,7 @@ import { StateObjectsBackendDict } from 'domain/exploration/StatesObjectFactory'
 import { StatesObjectFactory } from 'domain/exploration/StatesObjectFactory';
 import { FetchExplorationBackendResponse } from '../../../domain/exploration/read-only-exploration-backend-api.service';
 import { LoggerService } from 'services/contextual/logger.service';
+import { ParamSpecs } from '../../../domain/exploration/ParamSpecsObjectFactory';
 
 describe('Contribution and review service', () => {
   let cars: ContributionAndReviewService;
@@ -466,6 +467,8 @@ describe('Contribution and review service', () => {
           card_is_checkpoint: false
         }
       } as StateObjectsBackendDict;
+      const states = statesObjectFactory.createFromBackendDict(
+        mockStates);
       const mockReadOnlyExplorationData: FetchExplorationBackendResponse = {
         can_edit: true,
         exploration: {
@@ -515,7 +518,7 @@ describe('Contribution and review service', () => {
       const exploration: Exploration = new Exploration(
         mockReadOnlyExplorationData.exploration.init_state_name,
         [],
-        {},
+        {} as unknown as ParamSpecs,
         mockReadOnlyExplorationData.exploration.states,
         mockReadOnlyExplorationData.exploration.title,
         mockReadOnlyExplorationData.exploration.next_content_id_index,
@@ -611,7 +614,7 @@ describe('Contribution and review service', () => {
           last_updated_msecs: 0,
         }
       ]);
-      getStatesSpy.and.returnValue(mockStates);
+      getStatesSpy.and.returnValue(states);
 
       await cars.fetchTranslationSuggestionsAsync(
         '1').then((response)=>{
@@ -918,7 +921,10 @@ describe('Contribution and review service', () => {
         author_name: 'author',
         change: {
           state_name: 'First State',
-          content_id: 'feedback_2'
+          content_id: 'feedback_2',
+          new_value: 'new_val',
+          old_value: 'old_val',
+          skill_id: 'skill_id_1'
         },
         last_updated_msecs: 0,
       },
@@ -931,7 +937,10 @@ describe('Contribution and review service', () => {
         author_name: 'author',
         change: {
           state_name: 'End State',
-          content_id: 'hints_1'
+          content_id: 'hints_1',
+          new_value: 'new_val',
+          old_value: 'old_val',
+          skill_id: 'skill_id_1'
         },
         last_updated_msecs: 0,
       },
@@ -944,7 +953,10 @@ describe('Contribution and review service', () => {
         author_name: 'author',
         change: {
           state_name: 'First State',
-          content_id: 'content_3'
+          content_id: 'content_3',
+          new_value: 'new_val',
+          old_value: 'old_val',
+          skill_id: 'skill_id_1'
         },
         last_updated_msecs: 0,
       },
@@ -957,7 +969,10 @@ describe('Contribution and review service', () => {
         author_name: 'author',
         change: {
           state_name: 'End State',
-          content_id: 'interaction_1'
+          content_id: 'interaction_1',
+          new_value: 'new_val',
+          old_value: 'old_val',
+          skill_id: 'skill_id_1'
         },
         last_updated_msecs: 0,
       },
@@ -970,7 +985,10 @@ describe('Contribution and review service', () => {
         author_name: 'author',
         change: {
           state_name: 'First State',
-          content_id: 'content_1'
+          content_id: 'content_1',
+          new_value: 'new_val',
+          old_value: 'old_val',
+          skill_id: 'skill_id_1'
         },
         last_updated_msecs: 0,
       },
@@ -983,7 +1001,10 @@ describe('Contribution and review service', () => {
         author_name: 'author',
         change: {
           state_name: 'End State',
-          content_id: 'content_2'
+          content_id: 'content_2',
+          new_value: 'new_val',
+          old_value: 'old_val',
+          skill_id: 'skill_id_1'
         },
         last_updated_msecs: 0,
       }
