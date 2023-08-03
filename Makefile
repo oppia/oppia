@@ -1,3 +1,5 @@
+SHELL := /bin/bash
+
 SHELL_PREFIX=docker compose exec
 ALL_SERVICES = datastore dev-server firebase elasticsearch webpack-compiler angular-build redis
 
@@ -34,7 +36,7 @@ run-devserver: # Runs the dev-server
 
 run-offline: # Runs the dev-server in offline mode
 	docker compose up dev-server -d
-	@while ! curl -s http://localhost:8181 > /dev/null; do \
+	@while [[ $$(curl -s -o /tmp/status_code.txt -w '%{http_code}' http://localhost:8181/community-library) != "200" ]]; do \
 		sleep 5; \
 	done
 	@echo "\n\nDevelopment server started at port 8181."
