@@ -1075,15 +1075,27 @@ def get_reviewable_translation_suggestions_by_offset(
                 sort_key,
                 language_codes))
     elif len(opportunity_summary_exp_ids) > 0:
-        in_review_translation_suggestions, next_offset = (
-            suggestion_models.GeneralSuggestionModel
-            .get_in_review_translation_suggestions_with_exp_ids_by_offset(
-                limit,
-                offset,
-                user_id,
-                sort_key,
-                language_codes,
-                opportunity_summary_exp_ids))
+        in_review_translation_suggestions = []
+        next_offset = 0
+        if (limit is None and len(opportunity_summary_exp_ids) == 1):
+            in_review_translation_suggestions, next_offset = (
+                suggestion_models.GeneralSuggestionModel
+                .get_reviewable_translation_suggestions_for_single_exploration(
+                    offset,
+                    user_id,
+                    sort_key,
+                    language_codes,
+                    opportunity_summary_exp_ids[0]))
+        else:
+            in_review_translation_suggestions, next_offset = (
+                suggestion_models.GeneralSuggestionModel
+                .get_in_review_translation_suggestions_with_exp_ids_by_offset(
+                    limit,
+                    offset,
+                    user_id,
+                    sort_key,
+                    language_codes,
+                    opportunity_summary_exp_ids))
 
     translation_suggestions = []
     for suggestion_model in in_review_translation_suggestions:

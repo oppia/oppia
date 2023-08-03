@@ -29,7 +29,7 @@ import { ReadOnlyExplorationBackendApiService }
 import { ExplorationObjectFactory, Exploration}
   from 'domain/exploration/ExplorationObjectFactory';
 import { StateObjectsBackendDict } from 'domain/exploration/StatesObjectFactory';
-import { StatesObjectFactory } from 'domain/exploration/StatesObjectFactory';
+import { StatesObjectFactory, States } from 'domain/exploration/StatesObjectFactory';
 import { FetchExplorationBackendResponse } from '../../../domain/exploration/read-only-exploration-backend-api.service';
 import { LoggerService } from 'services/contextual/logger.service';
 import { ParamSpecs } from '../../../domain/exploration/ParamSpecsObjectFactory';
@@ -519,7 +519,7 @@ describe('Contribution and review service', () => {
         mockReadOnlyExplorationData.exploration.init_state_name,
         [],
         {} as unknown as ParamSpecs,
-        mockReadOnlyExplorationData.exploration.states,
+        mockReadOnlyExplorationData.exploration.states as unknown as States,
         mockReadOnlyExplorationData.exploration.title,
         mockReadOnlyExplorationData.exploration.next_content_id_index,
         mockReadOnlyExplorationData.exploration.language_code,
@@ -1008,7 +1008,7 @@ describe('Contribution and review service', () => {
         },
         last_updated_msecs: 0,
       }
-    ];
+    ] as unknown as SuggestionBackendDict[];
     const statesBackendDict: StateObjectsBackendDict = {
       'First State': {
         classifier_model_id: null,
