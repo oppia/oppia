@@ -274,16 +274,27 @@ const generateDataForTopicAndStoryPlayer = async function(browser, page) {
   try {
     await page.goto('http://127.0.0.1:8181/admin#/activities', { waitUntil: networkIdle });
 
+    await page.waitForNavigation({ waitUntil: networkIdle });
+    await page.waitForLoadState();
+
     await page.waitForSelector(generateTopicButton);
+
     await page.click(generateTopicButton);
 
-    await page.waitForTimeout(15000);
+    await page.waitForSelector('.oppia-status-message-container');
+
+    await page.waitForFunction(() => {
+      const statusElement = document.querySelector('.oppia-status-message-container');
+      return statusElement.textContent.includes('Dummy new structures data generated successfully.');
+    });
+
   } catch (e) {
     // eslint-disable-next-line no-console
-    console.log(e);
+    console.error(e);
     process.exit(1);
   }
 };
+
 
 const generateDataForClassroom = async function(browser, page) {
   try {
