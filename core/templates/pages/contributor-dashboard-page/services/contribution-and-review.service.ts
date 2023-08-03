@@ -205,7 +205,6 @@ export class ContributionAndReviewService {
               fetchSuggestionsResponse.suggestions,
               exploration.getStates(),
               exploration.initStateName));
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           const responseSuggestionIdToDetails: SuggestionDetailsDict = {};
           sortedTranslationSuggestions.forEach((suggestion) => {
             const suggestionDetails = {
@@ -288,7 +287,6 @@ export class ContributionAndReviewService {
         .getTranslationContentIndex(cardA.change.content_id);
       const cardBIndex = ContributionAndReviewService
         .getTranslationContentIndex(cardB.change.content_id);
-
       return cardAIndex - cardBIndex;
     }
   }
