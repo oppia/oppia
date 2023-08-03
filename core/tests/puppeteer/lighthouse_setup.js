@@ -272,18 +272,21 @@ const getSkillEditorUrl = async function(browser, page) {
 
 const generateDataForTopicAndStoryPlayer = async function(browser, page) {
   try {
+    // eslint-disable-next-line dot-notation
     await page.goto('http://127.0.0.1:8181/admin#/activities', { waitUntil: networkIdle });
 
     await page.waitForSelector(generateTopicButton);
     await page.click(generateTopicButton);
-    
+
     const successMessage = 'Dummy new structures data generated successfully.';
     let statusMessage;
     do {
-      await page.waitForTimeout(1000); // Wait for 1 second before checking again
+      await page.waitForTimeout(1000);
       statusMessage = await page.evaluate(() => {
-        const statusMessageElement = document.querySelector('.oppia-status-message-container');
-        return statusMessageElement ? statusMessageElement.textContent.trim() : '';
+        const statusMessageElement = document
+          .querySelector('.oppia-status-message-container');
+        return statusMessageElement ? statusMessageElement
+          .textContent.trim() : '';
       });
     } while (statusMessage !== successMessage);
   } catch (e) {
@@ -295,12 +298,23 @@ const generateDataForTopicAndStoryPlayer = async function(browser, page) {
 
 const generateDataForClassroom = async function(browser, page) {
   try {
+    // eslint-disable-next-line dot-notation
     await page.goto('http://127.0.0.1:8181/admin#/activities', { waitUntil: networkIdle });
 
     await page.waitForSelector(generateClassroomButton);
     await page.click(generateClassroomButton);
 
-    await page.waitForTimeout(15000);
+    const successMessage = 'Dummy new classroom generated successfully.';
+    let statusMessage;
+    do {
+      await page.waitForTimeout(1000);
+      statusMessage = await page.evaluate(() => {
+        const statusMessageElement = document
+          .querySelector('.oppia-status-message-container');
+        return statusMessageElement ? statusMessageElement
+          .textContent.trim() : '';
+      });
+    } while (statusMessage !== successMessage);
   } catch (e) {
     // eslint-disable-next-line no-console
     console.log(e);
