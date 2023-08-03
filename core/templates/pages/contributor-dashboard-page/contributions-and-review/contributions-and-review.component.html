@@ -114,17 +114,12 @@
       </oppia-opportunities-list>
       <div *ngIf="activeExplorationId !== null || !isReviewTranslationsTab() && !isAccomplishmentsTabActive()">
         <div *ngIf="isReviewTranslationsTab()" class="oppia-contributions-back-to-lessons-container">
-          <div class="oppia-back-to-lessons-button-wrapper">
-            <button aria-label="Back to reviewable lessons"
-                    (click)="onClickBackToReviewableLessons()"
-                    class="oppia-contributions-back-button mat-raised-button">
-              <i class="fa fa-arrow-left oppia-vcenter arrow-left" aria-hidden="true"></i>
-            </button>
-            <div class="oppia-contributions-back-button-label">Back to lessons</div>
-          </div>
-          <div class="oppia-awaiting-review-header">
-            Awaiting Review
-          </div>
+          <button aria-label="Back to reviewable lessons"
+                  (click)="onClickBackToReviewableLessons()"
+                  class="oppia-contributions-back-button mat-raised-button">
+            <i class="fa fa-arrow-left oppia-vcenter arrow-left" aria-hidden="true"></i>
+          </button>
+          <div class="oppia-contributions-back-button-label">Back to lessons</div>
         </div>
         <oppia-opportunities-list [loadOpportunities]="loadOpportunities.bind(this)"
                                   [loadMoreOpportunities]="loadMoreOpportunities.bind(this)"
@@ -147,19 +142,6 @@
 </div>
 
 <style>
-  .oppia-back-to-lessons-button-wrapper {
-    align-items: center;
-    display: flex;
-  }
-
-  .oppia-awaiting-review-header {
-    background-color: #00645d;
-    color: #fff;
-    font-weight: bold;
-    padding: 4px;
-    text-align: center;
-  }
-
   .oppia-contributions-show-review {
     display: flex;
     justify-content: center;
@@ -276,7 +258,6 @@
   .oppia-contributions-back-to-lessons-container {
     align-items: center;
     display: flex;
-    justify-content: space-between;
     padding-top: 12px;
   }
 
