@@ -1089,7 +1089,8 @@ describe('Contribution and review service', () => {
         statesBackendDict);
       const sortedTranslationSuggestions = cars.
         sortTranslationSuggestionsByState(
-          translationSuggestions, states, 'First State');
+          translationSuggestions, states,
+          'First State') as unknown as SuggestionBackendDict[];
 
       expect(sortedTranslationSuggestions).toEqual([
         {
