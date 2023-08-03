@@ -47,11 +47,15 @@ module.exports = {
         },
         {
           'matchingUrlPattern': '^http://127.0.0.1:8181/signup?return_url=%2F$',
-          'assertions': baseConfig['baseAccessibilityAssertions']
+          'assertions': {
+            'categories:accessibility': ['error', {'minScore': 1}]
+          }
         },
         {
           'matchingUrlPattern': '^http://127.0.0.1:8181/teach$',
-          'assertions': baseConfig['baseAccessibilityAssertions']
+          'assertions': {
+            'categories:accessibility': ['error', {'minScore': 1}]
+          }
         },
         {
           'matchingUrlPattern': '^http://127.0.0.1:8181/topics-and-skills-dashboard$',
@@ -67,7 +71,9 @@ module.exports = {
         },
         {
           'matchingUrlPattern': '^http://127.0.0.1:8181/thanks$',
-          'assertions': baseConfig['baseAccessibilityAssertions']
+          'assertions': {
+            'categories:accessibility': ['error', {'minScore': 1}]
+          }
         },
         {
           'matchingUrlPattern': '^http://127.0.0.1:8181/volunteer$',
