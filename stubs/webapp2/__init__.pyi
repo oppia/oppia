@@ -15,6 +15,7 @@ class Request:
     GET: Dict[str, Any]
     method: str
     params: Dict[str, str]
+    domain: str
 
     def arguments(self) -> List[str]: ...
     def get(self, value: str) -> Any: ...

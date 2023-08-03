@@ -20,7 +20,6 @@ from __future__ import annotations
 
 import collections
 
-from core.constants import constants
 from core.controllers import firebase
 from core.tests import test_utils
 
@@ -43,15 +42,29 @@ class FirebaseProxyPageTest(test_utils.GenericTestBase):
         200,
         b')]}\'\n{"key": "val"}'
     )
+    MOCK_FIREBASE_DOMAIN = 'https://mock.firebaseapp.com'
+
+    def test_no_firebase_domain_error_raised(self) -> None:
+        response = self.post_task(
+            '/__/auth/', {'a': 'a'},
+            {'b': 'b'}, expected_status_int=500
+        )
+        self.assertIn(
+            b'No firebase domain found for localhost',
+            response.body
+        )
 
     def test_get_request_forwarded_to_firebase_proxy(self) -> None:
         url = '/__/auth'
         params = {'param_1': 'value_1', 'param_2': 'value_2'}
-        with self.swap_with_checks(
+        with self.swap(
+            firebase, 'FIREBASE_DOMAINS',
+            {'localhost': self.MOCK_FIREBASE_DOMAIN}
+        ), self.swap_with_checks(
             requests,
             'request',
             lambda *args, **kwargs: self.MOCK_FIREBASE_RESPONSE,
-            [('GET', f'{constants.FIREBASE_DOMAIN}{url}')],
+            [('GET', f'{self.MOCK_FIREBASE_DOMAIN}{url}')],
             [{
             'params': params, 'timeout': firebase.TIMEOUT_SECS,
             'data': None, 'headers': {'Host': 'localhost:80'}
@@ -69,11 +82,14 @@ class FirebaseProxyPageTest(test_utils.GenericTestBase):
             'Content-Length': '20'
         }
         payload = {'payload': 'value'}
-        with self.swap_with_checks(
+        with self.swap(
+            firebase, 'FIREBASE_DOMAINS',
+            {'localhost': self.MOCK_FIREBASE_DOMAIN}
+        ), self.swap_with_checks(
             requests,
             'request',
             lambda *args, **kwargs: self.MOCK_FIREBASE_RESPONSE,
-            [('POST', f'{constants.FIREBASE_DOMAIN}{url}')],
+            [('POST', f'{self.MOCK_FIREBASE_DOMAIN}{url}')],
             [{
             'data': payload, 'params': {},
             'headers': headers, 'timeout': firebase.TIMEOUT_SECS

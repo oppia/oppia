@@ -19,7 +19,6 @@ from __future__ import annotations
 import json
 
 from core import feconf
-from core.constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
 
@@ -27,8 +26,16 @@ import requests
 from typing import Any, Dict
 
 
-# Timeout in seconds for requests.
 TIMEOUT_SECS = 60
+"""Timeout in seconds for firebase requests."""
+
+FIREBASE_DOMAINS = {
+    'oppiaserver-backup-migration.appspot.com':
+        'https://oppiaserver-backup-migration.firebaseapp.com',
+    'oppiatestserver.org': 'https://oppiatestserver.firebaseapp.com',
+    'oppia.org': 'https://oppiaserver.firebaseapp.com'
+}
+"""A mapping of oppia domain to firebase domains used for authentication."""
 
 
 class FirebaseProxyPage(
@@ -55,15 +62,22 @@ class FirebaseProxyPage(
 
     def _firebase_proxy(self) -> None:
         """Proxies all requests to the firebase app."""
+        firebase_domain = FIREBASE_DOMAINS.get(self.request.domain)
+        if firebase_domain is None:
+            raise KeyError(
+                f'No firebase domain found for {self.request.domain}.'
+            )
+
         data = json.loads(self.request.body) if self.request.body else None
         response = requests.request(
             self.request.method,
-            f'{constants.FIREBASE_DOMAIN}{self.request.path}',
+            f'{firebase_domain}{self.request.path}',
             params=dict(self.request.params),
             data=data,
             headers=dict(self.request.headers.items()),
             timeout=TIMEOUT_SECS
         )
+
         for header_key, header_value in response.headers.items():
             if header_key.lower() in self.RESPONSE_EXCLUDED_HEADERS:
                 continue
