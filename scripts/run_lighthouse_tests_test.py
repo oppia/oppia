@@ -137,6 +137,8 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
             'Puppeteer script completed successfully.', self.print_arr)
         self.assertIn(
             'Starting LHCI Puppeteer script with recording.', self.print_arr)
+        # Since the Popen isn't actually run, we shouldn't expect a file.
+        self.assertIn('No video found at ' + extra_args[1], self.print_arr)
 
     def test_run_lighthouse_puppeteer_script_failed(self) -> None:
         class MockTask:
@@ -170,6 +172,8 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
             self.print_arr)
         self.assertIn(
             'Starting LHCI Puppeteer script with recording.', self.print_arr)
+        # Since the Popen isn't actually run, we shouldn't expect a file.
+        self.assertIn('No video found at ' + extra_args[1], self.print_arr)
 
     def test_run_webpack_compilation_successfully(self) -> None:
         swap_isdir = self.swap_with_checks(
