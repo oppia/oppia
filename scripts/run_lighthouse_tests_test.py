@@ -124,7 +124,7 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
             return MockTask()
         # Test with screen-recording.
         extra_args = [
-            'record',
+            '-record',
             '/home/runner/work/oppia/oppia/../lhci-puppeteer-video/video.mp4']
         swap_popen = self.swap_with_checks(
             subprocess, 'Popen', mock_popen,
@@ -154,7 +154,7 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
             return MockTask()
         # Test with screen-recording.
         extra_args = [
-            'record',
+            '-record',
             '/home/runner/work/oppia/oppia/../lhci-puppeteer-video/video.mp4']
         swap_popen = self.swap_with_checks(
             subprocess, 'Popen', mock_popen,
