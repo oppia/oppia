@@ -680,28 +680,30 @@ class GeneralSuggestionModel(base_models.BaseModel):
             offset: int. Number of results to skip from the beginning of all
                 matching results.
 
-            user_id: str. The id of the user trying to make this query. Suggestions
-                authored by this user will be excluded from the results.
+            user_id: str. The id of the user trying to make this query.
+                Suggestions authored by this user will be excluded from
+                the results.
 
-            sort_key: str|None. The key to sort the suggestions by. If set to None,
-                the suggestions will be returned in their default order. When a
-                `sort_key` is provided, the suggestions will be sorted on the
-                client-side based on specific criteria related to their presentation.
+            sort_key: str|None. The key to sort the suggestions by. If set to
+                None, the suggestions will be returned in their default order.
+                When a `sort_key` is provided, the suggestions will be sorted
+                on the client-side based on specific criteria related to their
+                presentation.
 
             language_codes: list(str). The list of language codes.
 
-            exp_id: str. Exploration ID matching the target ID of the translation
-                suggestions.
+            exp_id: str. Exploration ID matching the target ID of the
+                translation suggestions.
 
         Returns:
             Tuple of (results, next_offset). Where:
-                results: list(SuggestionModel). A list of all suggestions that are
-                    in-review, not authored by the supplied user, match one of the
-                    supplied language codes, and correspond to the given exploration
-                    ID.
+                results: list(SuggestionModel). A list of all suggestions that
+                    are in-review, not authored by the supplied user, match
+                    one of the supplied language codes, and correspond to the
+                    given exploration ID.
 
-                next_offset: int. The input offset + the number of results returned
-                    by the current query.
+                next_offset: int. The input offset + the number of results
+                    returned by the current query.
         """
         if sort_key == constants.SUGGESTIONS_SORT_KEY_DATE:
             # The first sort property must be the same as the property to which
@@ -785,14 +787,6 @@ class GeneralSuggestionModel(base_models.BaseModel):
                     in-review, not authored by the supplied user, match
                     one of the supplied language codes and correspond to the
                     given exploration IDs.
-                    Maximum number of entities to be returned: Note that the None
-                    case for limit is needed because we sometimes need to fetch all
-                    translation suggestions so that they can be sorted client-side
-                    based on specific criteria, and the datastore does not
-                    efficiently support sorting based on complex client-side
-                    criteria. So, we need to fetch all matching entities from the
-                    datastore and allow the frontend to perform the sorting as
-                    needed.
                 next_offset: int. The input offset + the number of results
                     returned by the current query.
         """
