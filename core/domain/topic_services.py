@@ -1701,6 +1701,13 @@ def get_chapter_counts_in_topic_summaries(
         Dict[str, TopicChapterCounts]. Dict of topic id and topic chapter
         counts domain object.
     """
+
+    topic_summary_id_mapping: Dict[
+        str, topic_domain.FrontendTopicSummaryDict] = {}
+    for topic_summary in topic_summary_dicts:
+        topic_summary_id_mapping.update({
+            topic_summary['id']: topic_summary})
+
     topic_ids = [summary['id'] for summary in topic_summary_dicts]
     all_topics = topic_fetchers.get_topics_by_ids(topic_ids)
     all_valid_topics = [topic for topic in all_topics if topic is not None]
@@ -1718,9 +1725,7 @@ def get_chapter_counts_in_topic_summaries(
         story_id_mapping.update({story.id: story})
 
     for topic in all_valid_topics:
-        topic_summary_dict = next(
-            topic_summary for topic_summary in topic_summary_dicts
-            if topic_summary['id'] == topic.id)
+        topic_summary_dict = topic_summary_id_mapping[topic.id]
         upcoming_chapters_count = 0
         overdue_chapters_count = 0
         total_chapter_counts = []

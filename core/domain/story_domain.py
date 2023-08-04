@@ -21,6 +21,7 @@ import datetime
 import functools
 import json
 import re
+import time
 
 from core import android_validation_constants
 from core import feconf
@@ -920,11 +921,15 @@ class StoryNode:
         Returns:
             bool. True if the chapter is upcoming else false.
         """
+        current_time = (
+            utils.convert_millisecs_time_to_datetime_object(
+            utils.get_current_time_in_millisecs() -
+            1000.0 * time.timezone))
         if (
             self.status != constants.STORY_NODE_STATUS_PUBLISHED and
             self.planned_publication_date is not None and
-            datetime.datetime.today() < self.planned_publication_date <
-            (datetime.datetime.today() + datetime.timedelta(
+            current_time < self.planned_publication_date <
+            (current_time + datetime.timedelta(
             days=constants.CHAPTER_PUBLICATION_NOTICE_PERIOD_IN_DAYS))):
             return True
         return False
@@ -936,10 +941,14 @@ class StoryNode:
         Returns:
             bool. True if the chapter is behind-schedule else false.
         """
+        current_time = (
+            utils.convert_millisecs_time_to_datetime_object(
+            utils.get_current_time_in_millisecs() -
+            1000.0 * time.timezone))
         if (
             self.status != constants.STORY_NODE_STATUS_PUBLISHED and
             self.planned_publication_date is not None and
-            datetime.datetime.today() > self.planned_publication_date):
+            current_time > self.planned_publication_date):
             return True
         return False
 
