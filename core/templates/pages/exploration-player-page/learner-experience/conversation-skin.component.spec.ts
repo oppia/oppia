@@ -579,11 +579,6 @@ describe('Conversation skin component', () => {
       LearnerDashboardBackendApiService);
     audioTranslationLanguageService = TestBed.inject(
       AudioTranslationLanguageService);
-
-    spyOn(
-      readOnlyExplorationBackendApiService,
-      'fetchCheckpointsFeatureIsEnabledStatus'
-    ).and.returnValue(Promise.resolve(true));
   }));
 
   it('should create && adjust page height on resize of window',
@@ -1288,7 +1283,6 @@ describe('Conversation skin component', () => {
     componentInstance.isLoggedIn = true;
     componentInstance.isIframed = false;
     componentInstance.alertMessageTimeout = 5;
-    componentInstance.CHECKPOINTS_FEATURE_IS_ENABLED = true;
 
     componentInstance.initializePage();
     tick(100);
@@ -1297,6 +1291,24 @@ describe('Conversation skin component', () => {
       ['Start']);
     expect(componentInstance.mostRecentlyReachedCheckpoint).toBe('Mid');
   }));
+
+  it('should display the exploration after the the progress reminder modal' +
+   'has loaded', () => {
+    spyOn(contextService, 'isInExplorationEditorPage').and.returnValue(false);
+    spyOn(contextService, 'isInExplorationPlayerPage').and.returnValue(true);
+    spyOn(urlService, 'getCollectionIdFromExplorationUrl').and.returnValue(
+      null);
+    spyOn(urlService, 'getPidFromUrl').and.returnValue(null);
+    spyOn(explorationEngineService, 'getExplorationId').and.returnValue(
+      'expl_1');
+    spyOn(explorationEngineService, 'isInPreviewMode').and.returnValue(false);
+    spyOn(urlService, 'isIframed').and.returnValue(false);
+
+    componentInstance.ngOnInit();
+    expect(componentInstance.hasFullyLoaded).toBe(false);
+    explorationPlayerStateService.onShowProgressModal.emit();
+    expect(componentInstance.hasFullyLoaded).toBe(true);
+  });
 
   it('should determine if chapter was completed for the first time',
     fakeAsync(() => {
@@ -1591,13 +1603,16 @@ describe('Conversation skin component', () => {
       .toHaveBeenCalled();
   });
 
-  it('should submit answer from progress nav', () => {
+  it('should submit answer from progress nav and toggle submit clicked', () => {
+    componentInstance.displayedCard = displayedCard;
+    spyOn(displayedCard, 'toggleSubmitClicked');
     spyOn(explorationEngineService, 'getLanguageCode').and.returnValue('en');
     spyOn(currentInteractionService, 'submitAnswer');
 
     componentInstance.submitAnswerFromProgressNav();
 
     expect(currentInteractionService.submitAnswer).toHaveBeenCalled();
+    expect(displayedCard.toggleSubmitClicked).toHaveBeenCalledOnceWith(true);
   });
 
   it('should show learn again button', () => {
@@ -1944,12 +1959,15 @@ describe('Conversation skin component', () => {
     componentInstance.showUpcomingCard();
   });
 
-  it('should submit answer', fakeAsync(() => {
+  it('should submit answer and reset current answer state', fakeAsync(() => {
+    spyOn(displayedCard, 'updateCurrentAnswer');
+    componentInstance.displayedCard = displayedCard;
     componentInstance.answerIsBeingProcessed = true;
+
     componentInstance.submitAnswer('', null);
 
+    expect(displayedCard.updateCurrentAnswer).toHaveBeenCalledOnceWith(null);
     componentInstance.answerIsBeingProcessed = false;
-    componentInstance.displayedCard = displayedCard;
     spyOn(explorationEngineService, 'getLanguageCode').and.returnValue('en');
     spyOn(componentInstance, 'isCurrentCardAtEndOfTranscript').and.returnValue(
       true);
@@ -1989,7 +2007,6 @@ describe('Conversation skin component', () => {
       .and.returnValues(false, false, false, true);
     spyOn(componentInstance, 'initLearnerAnswerInfoService');
     spyOn(explorationEngineService, 'getState');
-    spyOn(componentInstance, 'alwaysAskLearnerForAnswerDetails');
     spyOn(numberAttemptsService, 'submitAttempt');
     spyOn(playerTranscriptService, 'addNewInput');
     spyOn(componentInstance, 'getCanAskLearnerForAnswerInfo').and.returnValues(

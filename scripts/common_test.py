@@ -35,6 +35,7 @@ import time
 from urllib import request as urlrequest
 
 from core import constants
+from core import feconf
 from core import utils
 from core.tests import test_utils
 from scripts import install_python_dev_dependencies
@@ -46,16 +47,11 @@ from typing import Generator, List, Literal, NoReturn
 from . import common
 
 
-# Here we use MyPy ignore because the pool_size argument is required by
-# Requester.__init__(), but it is missing from the typing definition in
-# Requester.pyi. We therefore disable type checking here. A PR was opened
-# to PyGithub to fix this, but it was closed due to inactivity (the project
-# does not seem very active). Here is the PR:
-# https://github.com/PyGithub/PyGithub/pull/2151.
-_MOCK_REQUESTER = github.Requester.Requester(  # type: ignore[call-arg]
+_MOCK_REQUESTER = github.Requester.Requester(
     login_or_token=None,
     password=None,
     jwt=None,
+    app_auth=None,
     base_url='https://github.com',
     timeout=0,
     user_agent='user',
@@ -1282,12 +1278,86 @@ class CommonTests(test_utils.GenericTestBase):
             common.setup_chrome_bin_env_variable()
         self.assertIn('Chrome is not found, stopping...', print_arr)
 
+    def test_modify_constants_under_docker_env(self) -> None:
+        mock_constants_path = 'mock_app_dev.yaml'
+        mock_feconf_path = 'mock_app.yaml'
+        constants_path_swap = self.swap(
+            common, 'CONSTANTS_FILE_PATH', mock_constants_path)
+        feconf_path_swap = self.swap(common, 'FECONF_PATH', mock_feconf_path)
+
+        with self.swap(feconf, 'OPPIA_IS_DOCKERIZED', True):
+            def mock_check_output(
+                unused_cmd_tokens: List[str], encoding: str = 'utf-8'  # pylint: disable=unused-argument
+            ) -> str:
+                return 'test'
+            check_output_swap = self.swap(
+                subprocess, 'check_output', mock_check_output
+            )
+
+            constants_temp_file = tempfile.NamedTemporaryFile()
+            # Here MyPy assumes that the 'name' attribute is
+            # read-only. In order to silence the MyPy complaints
+            # `setattr` is used to set the attribute.
+            setattr(
+                constants_temp_file, 'name', mock_constants_path)
+            with utils.open_file(mock_constants_path, 'w') as tmp:
+                tmp.write('export = {\n')
+                tmp.write('  "DEV_MODE": true,\n')
+                tmp.write('  "EMULATOR_MODE": false,\n')
+                tmp.write('};')
+
+            feconf_temp_file = tempfile.NamedTemporaryFile()
+            # Here MyPy assumes that the 'name' attribute is
+            # read-only. In order to silence the MyPy complaints
+            # `setattr` is used to set the attribute.
+            setattr(feconf_temp_file, 'name', mock_feconf_path)
+            with utils.open_file(mock_feconf_path, 'w') as tmp:
+                tmp.write(u'ENABLE_MAINTENANCE_MODE = False')
+
+            with constants_path_swap, feconf_path_swap, check_output_swap:
+                common.modify_constants(prod_env=True, maintenance_mode=False)
+                with utils.open_file(
+                    mock_constants_path, 'r') as constants_file:
+                    self.assertEqual(
+                        constants_file.read(),
+                        'export = {\n'
+                        '  "DEV_MODE": false,\n'
+                        '  "EMULATOR_MODE": true,\n'
+                        '};')
+                with utils.open_file(mock_feconf_path, 'r') as feconf_file:
+                    self.assertEqual(
+                        feconf_file.read(), 'ENABLE_MAINTENANCE_MODE = False')
+
+                common.modify_constants(prod_env=False, maintenance_mode=True)
+                with utils.open_file(
+                    mock_constants_path, 'r') as constants_file:
+                    self.assertEqual(
+                        constants_file.read(),
+                        'export = {\n'
+                        '  "DEV_MODE": true,\n'
+                        '  "EMULATOR_MODE": true,\n'
+                        '};')
+                with utils.open_file(mock_feconf_path, 'r') as feconf_file:
+                    self.assertEqual(
+                        feconf_file.read(), 'ENABLE_MAINTENANCE_MODE = True')
+
+            constants_temp_file.close()
+            feconf_temp_file.close()
+
     def test_modify_constants(self) -> None:
         mock_constants_path = 'mock_app_dev.yaml'
         mock_feconf_path = 'mock_app.yaml'
         constants_path_swap = self.swap(
             common, 'CONSTANTS_FILE_PATH', mock_constants_path)
         feconf_path_swap = self.swap(common, 'FECONF_PATH', mock_feconf_path)
+
+        def mock_check_output(
+            unused_cmd_tokens: List[str], encoding: str = 'utf-8'  # pylint: disable=unused-argument
+        ) -> str:
+            return 'test'
+        check_output_swap = self.swap(
+            subprocess, 'check_output', mock_check_output
+        )
 
         constants_temp_file = tempfile.NamedTemporaryFile()
         # Here MyPy assumes that the 'name' attribute is read-only. In order to
@@ -1298,6 +1368,8 @@ class CommonTests(test_utils.GenericTestBase):
             tmp.write('export = {\n')
             tmp.write('  "DEV_MODE": true,\n')
             tmp.write('  "EMULATOR_MODE": false,\n')
+            tmp.write('  "BRANCH_NAME": "",\n')
+            tmp.write('  "SHORT_COMMIT_HASH": ""\n')
             tmp.write('};')
 
         feconf_temp_file = tempfile.NamedTemporaryFile()
@@ -1307,7 +1379,7 @@ class CommonTests(test_utils.GenericTestBase):
         with utils.open_file(mock_feconf_path, 'w') as tmp:
             tmp.write(u'ENABLE_MAINTENANCE_MODE = False')
 
-        with constants_path_swap, feconf_path_swap:
+        with constants_path_swap, feconf_path_swap, check_output_swap:
             common.modify_constants(prod_env=True, maintenance_mode=False)
             with utils.open_file(
                 mock_constants_path, 'r') as constants_file:
@@ -1316,6 +1388,8 @@ class CommonTests(test_utils.GenericTestBase):
                     'export = {\n'
                     '  "DEV_MODE": false,\n'
                     '  "EMULATOR_MODE": true,\n'
+                    '  "BRANCH_NAME": "test",\n'
+                    '  "SHORT_COMMIT_HASH": "test"\n'
                     '};')
             with utils.open_file(mock_feconf_path, 'r') as feconf_file:
                 self.assertEqual(
@@ -1329,6 +1403,8 @@ class CommonTests(test_utils.GenericTestBase):
                     'export = {\n'
                     '  "DEV_MODE": true,\n'
                     '  "EMULATOR_MODE": true,\n'
+                    '  "BRANCH_NAME": "test",\n'
+                    '  "SHORT_COMMIT_HASH": "test"\n'
                     '};')
             with utils.open_file(mock_feconf_path, 'r') as feconf_file:
                 self.assertEqual(
@@ -1353,6 +1429,8 @@ class CommonTests(test_utils.GenericTestBase):
             tmp.write('export = {\n')
             tmp.write('  "DEV_MODE": false,\n')
             tmp.write('  "EMULATOR_MODE": false,\n')
+            tmp.write('  "BRANCH_NAME": "test",\n')
+            tmp.write('  "SHORT_COMMIT_HASH": "test"\n')
             tmp.write('};')
 
         feconf_temp_file = tempfile.NamedTemporaryFile()
@@ -1371,6 +1449,8 @@ class CommonTests(test_utils.GenericTestBase):
                     'export = {\n'
                     '  "DEV_MODE": true,\n'
                     '  "EMULATOR_MODE": true,\n'
+                    '  "BRANCH_NAME": "",\n'
+                    '  "SHORT_COMMIT_HASH": ""\n'
                     '};')
             with utils.open_file(mock_feconf_path, 'r') as feconf_file:
                 self.assertEqual(

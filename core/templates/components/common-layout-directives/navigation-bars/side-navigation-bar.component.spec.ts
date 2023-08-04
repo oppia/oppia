@@ -156,26 +156,36 @@ describe('Side Navigation Bar Component', () => {
     expect(sidebarStatusService.closeSidebar).toHaveBeenCalled();
   });
 
-  it('should navigate to learner dashboard when learner clicks on ' +
-  'HOME, when not on the learner dashboard', () => {
+  it('should navigate to default dashboard when user clicks on ' +
+  'HOME, when not on the default dashboard', fakeAsync(() => {
     expect(mockWindowRef.nativeWindow.location.href).toBe('');
 
+    spyOn(userService, 'getUserPreferredDashboardAsync').and.returnValue(
+      Promise.resolve('contributor'));
     spyOn(sidebarStatusService, 'closeSidebar');
-    componentInstance.navigateToLearnerDashboard();
+
+    componentInstance.currentUrl = '/learner-dashboard';
+    componentInstance.navigateToDefaultDashboard();
+    tick();
 
     expect(sidebarStatusService.closeSidebar).not.toHaveBeenCalled();
-    expect(mockWindowRef.nativeWindow.location.href).toBe('/learner-dashboard');
-  });
+    expect(mockWindowRef.nativeWindow.location.href).toBe('/');
+  }));
 
-  it('should not navigate to learner dashboard when learner clicks on ' +
-  'HOME, when on the learner dashboard', () => {
-    componentInstance.currentUrl = '/learner-dashboard';
-
+  it('should not navigate to default dashboard when user clicks on ' +
+  'HOME, when on the default dashboard', fakeAsync(() => {
+    expect(mockWindowRef.nativeWindow.location.href).toBe('');
+    spyOn(userService, 'getUserPreferredDashboardAsync').and.returnValue(
+      Promise.resolve('creator'));
     spyOn(sidebarStatusService, 'closeSidebar');
-    componentInstance.navigateToLearnerDashboard();
+
+    componentInstance.currentUrl = '/creator-dashboard';
+    componentInstance.navigateToDefaultDashboard();
+    tick();
 
     expect(sidebarStatusService.closeSidebar).toHaveBeenCalled();
-  });
+    expect(mockWindowRef.nativeWindow.location.href).toBe('');
+  }));
 
   it('should navigate to classroom page when user clicks on' +
   '\'Basic Mathematics\'', fakeAsync(() => {
@@ -203,50 +213,41 @@ describe('Side Navigation Bar Component', () => {
         ['USER_ROLE'], true, false, false, false, true,
         'en', 'username1', 'tester@example.com', true
       );
-      spyOn(
-        classroomBackendApiService, 'fetchClassroomPromosAreEnabledStatusAsync')
-        .and.resolveTo(true);
       spyOn(userService, 'getUserInfoAsync').and.resolveTo(userInfo);
       componentInstance.ngOnInit();
       tick();
       expect(componentInstance.userIsLoggedIn).toBeTrue();
-      expect(componentInstance.CLASSROOM_PROMOS_ARE_ENABLED).toBe(true);
     }));
 
-  it('should fetch classroom data when classroomPromos are enabled',
-    fakeAsync(() => {
-      spyOn(
-        classroomBackendApiService,
-        'fetchClassroomPromosAreEnabledStatusAsync').
-        and.resolveTo(true);
-      spyOn(accessValidationBackendApiService, 'validateAccessToClassroomPage')
-        .and.returnValue(Promise.resolve());
+  it('should fetch classroom data', fakeAsync(() => {
+    spyOn(accessValidationBackendApiService, 'validateAccessToClassroomPage')
+      .and.returnValue(Promise.resolve());
 
-      let cData1: CreatorTopicSummary = new CreatorTopicSummary(
-        'dummy', 'addition', 3, 3, 3, 3, 1,
-        'en', 'dummy', 1, 1, 1, 1, true,
-        true, 'math', 'public/img.webp', 'red', 'add');
-      let cData2: CreatorTopicSummary = new CreatorTopicSummary(
-        'dummy2', 'division', 2, 2, 3, 3, 0,
-        'es', 'dummy2', 1, 1, 1, 1, true,
-        true, 'math', 'public/img1.png', 'green', 'div');
+    let cData1: CreatorTopicSummary = new CreatorTopicSummary(
+      'dummy', 'addition', 3, 3, 3, 3, 1,
+      'en', 'dummy', 1, 1, 1, 1, true,
+      true, 'math', 'public/img.webp', 'red', 'add');
+    let cData2: CreatorTopicSummary = new CreatorTopicSummary(
+      'dummy2', 'division', 2, 2, 3, 3, 0,
+      'es', 'dummy2', 1, 1, 1, 1, true,
+      true, 'math', 'public/img1.png', 'green', 'div');
 
-      let array: CreatorTopicSummary[] = [cData1, cData2];
-      let classroomData = new ClassroomData('test', array, 'dummy', 'dummy');
-      let topicTitlesTranslationKeys: string[] =
-        ['I18N_TOPIC_dummy_TITLE', 'I18N_TOPIC_dummy2_TITLE'];
-      spyOn(
-        classroomBackendApiService, 'fetchClassroomDataAsync')
-        .and.resolveTo(classroomData);
+    let array: CreatorTopicSummary[] = [cData1, cData2];
+    let classroomData = new ClassroomData('test', array, 'dummy', 'dummy');
+    let topicTitlesTranslationKeys: string[] =
+      ['I18N_TOPIC_dummy_TITLE', 'I18N_TOPIC_dummy2_TITLE'];
+    spyOn(
+      classroomBackendApiService, 'fetchClassroomDataAsync')
+      .and.resolveTo(classroomData);
 
-      componentInstance.ngOnInit();
+    componentInstance.ngOnInit();
 
-      tick();
+    tick();
 
-      expect(componentInstance.classroomData).toEqual(array);
-      expect(componentInstance.topicTitlesTranslationKeys).toEqual(
-        topicTitlesTranslationKeys);
-    }));
+    expect(componentInstance.classroomData).toEqual(array);
+    expect(componentInstance.topicTitlesTranslationKeys).toEqual(
+      topicTitlesTranslationKeys);
+  }));
 
   it('should check whether hacky translations are displayed or not', () => {
     spyOn(i18nLanguageCodeService, 'isHackyTranslationAvailable')

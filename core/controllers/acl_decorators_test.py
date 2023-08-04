@@ -51,7 +51,7 @@ from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
 
-from typing import Dict, Final, List, TypedDict, Union
+from typing import Dict, Final, List, Optional, TypedDict, Union
 import webapp2
 import webtest
 
@@ -4334,6 +4334,55 @@ class AccessLearnerDashboardDecoratorTests(test_utils.GenericTestBase):
         self.assertEqual(response['error'], error_msg)
 
 
+class AccessFeedbackUpdatesDecoratorTests(test_utils.GenericTestBase):
+    """Tests the decorator can_access_learner_dashboard."""
+
+    user = 'user'
+    user_email = 'user@example.com'
+    banned_user = 'banneduser'
+    banned_user_email = 'banned@example.com'
+
+    class MockHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
+        GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+        HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
+
+        @acl_decorators.can_access_feedback_updates
+        def get(self) -> None:
+            self.render_json({'success': True})
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.signup(self.user_email, self.user)
+        self.signup(self.banned_user_email, self.banned_user)
+        self.mark_user_banned(self.banned_user)
+        self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
+            [webapp2.Route('/mock/', self.MockHandler)],
+            debug=feconf.DEBUG,
+        ))
+
+    def test_banned_user_cannot_access_feedback_updates(self) -> None:
+        self.login(self.banned_user_email)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json('/mock/', expected_status_int=401)
+        error_msg = 'You do not have the credentials to access this page.'
+        self.assertEqual(response['error'], error_msg)
+        self.logout()
+
+    def test_exploration_editor_can_access_feedback_updates(self) -> None:
+        self.login(self.user_email)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json('/mock/')
+        self.assertTrue(response['success'])
+        self.logout()
+
+    def test_guest_user_cannot_access_feedback_updates(self) -> None:
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json('/mock/', expected_status_int=401)
+        error_msg = 'You must be logged in to access this resource.'
+        self.assertEqual(response['error'], error_msg)
+
+
 class AccessLearnerGroupsDecoratorTests(test_utils.GenericTestBase):
     """Tests the decorator can_access_learner_groups."""
 
@@ -6885,6 +6934,39 @@ class EditEntityDecoratorTests(test_utils.GenericTestBase):
                 ' images to questions.')
         self.logout()
 
+    def test_can_submit_images_to_explorations(self) -> None:
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json('/mock_edit_entity/%s/%s' % (
+                feconf.IMAGE_CONTEXT_EXPLORATION_SUGGESTIONS,
+                self.published_exp_id))
+            self.assertEqual(response['entity_id'], self.published_exp_id)
+            self.assertEqual(response['entity_type'], 'exploration_suggestions')
+        self.logout()
+
+    def test_unauthenticated_users_cannot_submit_images_to_explorations(
+        self
+    ) -> None:
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json('/mock_edit_entity/%s/%s' % (
+                feconf.IMAGE_CONTEXT_EXPLORATION_SUGGESTIONS,
+                self.published_exp_id),
+                expected_status_int=401)
+
+    def test_cannot_submit_images_to_explorations_without_having_permissions(
+        self
+    ) -> None:
+        self.login(self.user_email)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json('/mock_edit_entity/%s/%s' % (
+                feconf.IMAGE_CONTEXT_EXPLORATION_SUGGESTIONS,
+                self.published_exp_id),
+                expected_status_int=401)
+            self.assertEqual(
+                response['error'], 'You do not have credentials to submit'
+                ' images to explorations.')
+        self.logout()
+
     def test_can_edit_blog_post(self) -> None:
         self.login(self.BLOG_ADMIN_EMAIL)
         blog_admin_id = (
@@ -7113,6 +7195,21 @@ class OppiaMLAccessDecoratorTest(test_utils.GenericTestBase):
         def post(self) -> None:
             self.render_json({'job_id': 'new_job'})
 
+    def _mock_get_secret(self, name: str) -> Optional[str]:
+        """Mock for the get_secret function.
+
+        Args:
+            name: str. The name of the secret to retrieve the value.
+
+        Returns:
+            Optional[str]. The value of the secret.
+        """
+        if name == 'VM_ID':
+            return 'vm_default'
+        elif name == 'SHARED_SECRET_KEY':
+            return '1a2b3c4e'
+        return None
+
     def setUp(self) -> None:
         super().setUp()
         self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
@@ -7129,8 +7226,14 @@ class OppiaMLAccessDecoratorTest(test_utils.GenericTestBase):
             secret.encode('utf-8'),
             payload['message'].encode('utf-8'),
             payload['vm_id'])
+        swap_secret = self.swap_with_checks(
+            secrets_services,
+            'get_secret',
+            self._mock_get_secret,
+            expected_args=[('VM_ID',), ('SHARED_SECRET_KEY',)],
+        )
 
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with self.swap(self, 'testapp', self.mock_testapp), swap_secret:
             self.post_json(
                 '/ml/nextjobhandler', payload,
                 expected_status_int=401)
@@ -7156,8 +7259,14 @@ class OppiaMLAccessDecoratorTest(test_utils.GenericTestBase):
         payload['message'] = json.dumps('malicious message')
         payload['signature'] = classifier_services.generate_signature(
             secret.encode('utf-8'), 'message'.encode('utf-8'), payload['vm_id'])
+        swap_secret = self.swap_with_checks(
+            secrets_services,
+            'get_secret',
+            self._mock_get_secret,
+            expected_args=[('VM_ID',), ('SHARED_SECRET_KEY',)],
+        )
 
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with self.swap(self, 'testapp', self.mock_testapp), swap_secret:
             self.post_json(
                 '/ml/nextjobhandler', payload, expected_status_int=401)
 
@@ -7170,8 +7279,14 @@ class OppiaMLAccessDecoratorTest(test_utils.GenericTestBase):
             secret.encode('utf-8'),
             payload['message'].encode('utf-8'),
             payload['vm_id'])
+        swap_secret = self.swap_with_checks(
+            secrets_services,
+            'get_secret',
+            self._mock_get_secret,
+            expected_args=[('VM_ID',), ('SHARED_SECRET_KEY',)],
+        )
 
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with self.swap(self, 'testapp', self.mock_testapp), swap_secret:
             json_response = self.post_json('/ml/nextjobhandler', payload)
 
         self.assertEqual(json_response['job_id'], 'new_job')

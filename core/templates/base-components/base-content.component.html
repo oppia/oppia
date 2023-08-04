@@ -12,8 +12,7 @@
 
 <main>
   <div *ngIf="iframed">
-    <div tabindex="0"
-         aria-label="Oppia Main Content"
+    <div aria-label="Oppia Main Content"
          id="oppia-main-content"
          class="e2e-test-main-content">
       <oppia-loading-message [message]="loadingMessage"></oppia-loading-message>
@@ -25,9 +24,13 @@
     </div>
   </div>
   <div *ngIf="!iframed">
-    <div role="button" tabindex="0" (click)="skipToMainContent()"
-         class="oppia-skip-to-content e2e-test-skip-link">Skip to Main Content
-    </div>
+    <a role="button"
+       tabindex="0"
+       (click)="skipToMainContent()"
+       (keydown.enter)="skipToMainContent()"
+       class="oppia-skip-to-content e2e-test-skip-link">
+      Skip to Main Content
+    </a>
     <oppia-promo-bar>
     </oppia-promo-bar>
     <div *ngIf="isBackgroundMaskActive()" class="ng-cloak oppia-background-mask">
@@ -48,7 +51,7 @@
                 <oppia-top-navigation-bar [headerText]="getHeaderText()"
                                           [subheaderText]="getSubheaderText()">
                 </oppia-top-navigation-bar>
-                <div class="collapse d-lg-inline-flex navbar-collapse oppia-navbar-collapse ng-cloak">
+                <div class="collapse d-lg-inline-flex navbar-collapse oppia-navbar-collapse ng-cloak flex-display">
                   <div [ngClass]="{'mr-auto': !isLanguageRTL(), 'ml-auto': isLanguageRTL()}">
                     <ng-content select="navbar-breadcrumb"></ng-content>
                   </div>
@@ -61,6 +64,7 @@
             <div class="navbar-mobile-container" *ngIf="isBottomNavbarShown()">
               <i class="fa fa-book show-mobile-navbar-icon e2e-test-mobile-options-base"
                  (click)="toggleMobileNavOptions()"
+                 role="button"
                  aria-label="Mobile navbar options">
               </i>
               <div class="navbar-mobile-options" *ngIf="mobileNavOptionsAreShown">
@@ -69,7 +73,7 @@
                 </div>
               </div>
             </div>
-            <div tabindex="0" aria-label="Oppia Main Content" id="oppia-main-content"
+            <div aria-label="Oppia Main Content" id="oppia-main-content"
                  class="e2e-test-main-content">
               <oppia-loading-message [message]="loadingMessage"></oppia-loading-message>
               <oppia-warnings-and-alerts></oppia-warnings-and-alerts>
@@ -101,3 +105,10 @@
     Dev Mode
   </div>
 </main>
+<style>
+  @media screen and (min-width: 600px) {
+    div.flex-display {
+      display: flex;
+    }
+  }
+</style>

@@ -120,6 +120,7 @@ class PlatformParameterModelUnitTests(test_utils.GenericTestBase):
             rule_dicts=[{'filters': [], 'value_when_matched': False}],
             rule_schema_version=(
                 feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION),
+            default_value=False
         )
         self.assertEqual(param_model.id, 'parameter_name')
         self.assertEqual(
@@ -128,6 +129,7 @@ class PlatformParameterModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             param_model.rules,
             [{'filters': [], 'value_when_matched': False}])
+        self.assertEqual(param_model.default_value, False)
 
     def test_commit(self) -> None:
         parameter_name = 'parameter_name'
@@ -140,6 +142,7 @@ class PlatformParameterModelUnitTests(test_utils.GenericTestBase):
             rule_dicts=rule_dicts,
             rule_schema_version=(
                 feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION),
+            default_value=False
         )
 
         param_model.commit(feconf.SYSTEM_COMMITTER_ID, 'commit message', [])
@@ -182,6 +185,7 @@ class PlatformParameterModelUnitTests(test_utils.GenericTestBase):
             rule_dicts=rule_dicts,
             rule_schema_version=(
                 feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION),
+            default_value=False
         )
 
         param_model.commit(feconf.SYSTEM_COMMITTER_ID, 'commit message', [])
@@ -203,6 +207,7 @@ class PlatformParameterModelUnitTests(test_utils.GenericTestBase):
             rule_dicts=rule_dicts,
             rule_schema_version=(
                 feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION),
+            default_value=False
         )
         param_model.commit(feconf.SYSTEM_COMMITTER_ID, 'commit message', [])
 
@@ -238,7 +243,8 @@ class PlatformParameterModelUnitTests(test_utils.GenericTestBase):
             'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'rules': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'rule_schema_version': base_models.EXPORT_POLICY.NOT_APPLICABLE
+            'rule_schema_version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'default_value': base_models.EXPORT_POLICY.NOT_APPLICABLE
         }
         self.assertEqual(
             config_models.PlatformParameterModel.get_export_policy(),
