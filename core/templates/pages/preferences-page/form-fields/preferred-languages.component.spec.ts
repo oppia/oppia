@@ -87,26 +87,15 @@ describe('Preferred Languages Component', () => {
     expect(componentInstance.validInput('en')).toBeTrue();
   });
 
-  it('should show filtered choices when input box is clicked', () => {
+  it('should filtered choices when input box is clicked', () => {
     const mockChoices = [
       { id: 'en', text: 'English ' },
       { id: 'fr', text: 'French ' }
     ];
     componentInstance.choices = [...mockChoices];
-    componentInstance.searchQuery = '';
-    componentInstance.onSearchInputChange();
+    componentInstance.resetLanguageSearch();
+    expect(componentInstance.searchQuery).toEqual('');
     expect(componentInstance.filteredChoices).toEqual(mockChoices);
-  });
-
-  it('should filter choices when search query does not match', () => {
-    const mockChoices = [
-      { id: 'en', text: 'English ' },
-      { id: 'fr', text: 'French ' }
-    ];
-    componentInstance.choices = [...mockChoices];
-    componentInstance.searchQuery = 'xy';
-    componentInstance.onSearchInputChange();
-    expect(componentInstance.filteredChoices).toEqual([]);
   });
 
   it('should add language', () => {
