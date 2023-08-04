@@ -109,6 +109,7 @@ export class AdminPlatformParametersTabComponent implements OnInit {
   platformParametersAreFetched: boolean = false;
   loadingMessage: string = '';
   directiveSubscriptions = new Subscription();
+  platformParameterNameToRulesReadonlyData: Map<string, string[]> = new Map();
 
   constructor(
     private windowRef: WindowRef,
@@ -124,6 +125,9 @@ export class AdminPlatformParametersTabComponent implements OnInit {
     this.platformParameters = data.platformParameters;
     this.platformParameterNameToBackupMap = new Map(
       this.platformParameters.map(param => [param.name, cloneDeep(param)]));
+    for (let platformParameter of this.platformParameters) {
+      this.updateFilterValuesForDisplay(platformParameter);
+    }
     this.loaderService.hideLoadingScreen();
   }
 
@@ -143,8 +147,30 @@ export class AdminPlatformParametersTabComponent implements OnInit {
     return {type: dataType};
   }
 
-  addNewRuleToTop(param: PlatformParameter): void {
-    param.rules.unshift(cloneDeep(this.getdefaultNewRule(param)));
+  getReadonlyFilterValues(rule: PlatformParameterRule): string {
+    let resultantString: string = '';
+    for (let filter of rule.filters) {
+      let filterName: string = this.filterTypeToContext[filter.type].displayName;
+      if (filter.conditions.length === 0) {
+        resultantString += filterName + ' = ' + '[ ]' + '; ';
+      } else {
+        let conditions: string[] = [];
+        for (let condition of filter.conditions) {
+          conditions.push(condition[1]);
+        }
+        resultantString += filterName + ' = ' + '[' + conditions.toString() + ']' + '; ';
+      }
+    }
+    return resultantString;
+  }
+
+  updateFilterValuesForDisplay(platformParameter: PlatformParameter): void {
+    let ruleReadOnlyValue: string[] = [];
+    for (let parameterRule of platformParameter.rules) {
+      ruleReadOnlyValue.push(this.getReadonlyFilterValues(parameterRule));
+    }
+    this.platformParameterNameToRulesReadonlyData.set(
+      platformParameter.name, ruleReadOnlyValue);
   }
 
   addNewRuleToBottom(param: PlatformParameter): void {
@@ -180,12 +206,14 @@ export class AdminPlatformParametersTabComponent implements OnInit {
     const rule = param.rules[ruleIndex];
     this.removeRule(param, ruleIndex);
     param.rules.splice(ruleIndex - 1, 0, rule);
+    this.updateFilterValuesForDisplay(param);
   }
 
   moveRuleDown(param: PlatformParameter, ruleIndex: number): void {
     const rule = param.rules[ruleIndex];
     this.removeRule(param, ruleIndex);
     param.rules.splice(ruleIndex + 1, 0, rule);
+    this.updateFilterValuesForDisplay(param);
   }
 
   async saveDefaultValueToStorage(): Promise<void> {
@@ -208,6 +236,7 @@ export class AdminPlatformParametersTabComponent implements OnInit {
         param.name, commitMessage, param.rules, param.defaultValue);
 
       this.platformParameterNameToBackupMap.set(param.name, cloneDeep(param));
+      this.updateFilterValuesForDisplay(param);
 
       this.setStatusMessage.emit('Saved successfully.');
     // We use unknown type because we are unsure of the type of error

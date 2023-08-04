@@ -131,6 +131,7 @@ export class FeaturesTabComponent implements OnInit {
   isDummyApiEnabled: boolean = false;
   loadingMessage: string = '';
   directiveSubscriptions = new Subscription();
+  featureFlagNameToRulesReadonlyData: Map<string, string[]> = new Map();
 
   constructor(
     private windowRef: WindowRef,
@@ -147,11 +148,10 @@ export class FeaturesTabComponent implements OnInit {
     this.featureFlags = data.featureFlags;
     this.featureFlagNameToBackupMap = new Map(
       this.featureFlags.map(feature => [feature.name, cloneDeep(feature)]));
+    for (let featureFlag of this.featureFlags) {
+      this.updateFilterValuesForDisplay(featureFlag);
+    }
     this.loaderService.hideLoadingScreen();
-  }
-
-  addNewRuleToTop(feature: PlatformParameter): void {
-    feature.rules.unshift(cloneDeep(this.defaultNewRule));
   }
 
   addNewRuleToBottom(feature: PlatformParameter): void {
@@ -168,6 +168,34 @@ export class FeaturesTabComponent implements OnInit {
       context.operators[0],
       context.options ? context.options[0] : ''
     ]);
+  }
+
+  getReadonlyFilterValues(rule: PlatformParameterRule): string {
+    let resultantString: string = '';
+    for (let filter of rule.filters) {
+      let filterName: string = this.filterTypeToContext[
+        filter.type].displayName;
+      if (filter.conditions.length === 0) {
+        resultantString += filterName + ' = ' + '[ ]' + '; ';
+      } else {
+        let conditions: string[] = [];
+        for (let condition of filter.conditions) {
+          conditions.push(condition[1]);
+        }
+        resultantString += (
+          filterName + ' = ' + '[' + conditions.toString() + ']' + '; ');
+      }
+    }
+    return resultantString;
+  }
+
+  updateFilterValuesForDisplay(feature: PlatformParameter): void {
+    let ruleReadOnlyValue: string[] = [];
+    for (let parameterRule of feature.rules) {
+      ruleReadOnlyValue.push(this.getReadonlyFilterValues(parameterRule));
+    }
+    this.featureFlagNameToRulesReadonlyData.set(
+      feature.name, ruleReadOnlyValue);
   }
 
   removeRule(feature: PlatformParameter, ruleIndex: number): void {
@@ -187,12 +215,14 @@ export class FeaturesTabComponent implements OnInit {
     const rule = feature.rules[ruleIndex];
     this.removeRule(feature, ruleIndex);
     feature.rules.splice(ruleIndex - 1, 0, rule);
+    this.updateFilterValuesForDisplay(feature);
   }
 
   moveRuleDown(feature: PlatformParameter, ruleIndex: number): void {
     const rule = feature.rules[ruleIndex];
     this.removeRule(feature, ruleIndex);
     feature.rules.splice(ruleIndex + 1, 0, rule);
+    this.updateFilterValuesForDisplay(feature);
   }
 
   getFeatureValidOnCurrentServer(feature: PlatformParameter): boolean {
@@ -227,6 +257,7 @@ export class FeaturesTabComponent implements OnInit {
         feature.name, commitMessage, feature.rules, feature.defaultValue);
 
       this.featureFlagNameToBackupMap.set(feature.name, cloneDeep(feature));
+      this.updateFilterValuesForDisplay(feature);
 
       this.setStatusMessage.emit('Saved successfully.');
     // We use unknown type because we are unsure of the type of error

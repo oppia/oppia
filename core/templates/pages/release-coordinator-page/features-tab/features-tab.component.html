@@ -35,155 +35,169 @@
     <div class="row oppia-feature-top-margin oppia-feature-bottom-margin">
       <div class="admin-note">Note: The first rule that matches client criteria will be chosen.</div>
     </div>
-    <div class="oppia-flex-center oppia-feature-bottom-margin">
-      <button class="btn btn-secondary"
-              (click)="addNewRuleToTop(featureFlag)">
-        Add Rule To Top
-      </button>
-    </div>
     <div class="row oppia-feature-top-margin">
       <div class="col-12">
         <div *ngIf="featureFlag.rules.length === 0" class="oppia-flex-center oppia-feature-bottom-margin e2e-test-no-rule-indicator">
           No rule.
         </div>
         <!-- Rules -->
-        <div *ngFor="let rule of featureFlag.rules; index as ruleIndex" class="container oppia-feature-bottom-margin">
-          <div class="row">
-            <div class="col-1"></div>
-            <div class="col-10 oppia-rule-container">
-              <div class="row">
-                <div class="col-2"><b>If Matched:</b></div>
-                <div class="col-10">
-                  <select [(ngModel)]="rule.valueWhenMatched" class="e2e-test-value-selector">
-                    <option [ngValue]="true">Enabled</option>
-                    <option [ngValue]="false">Disabled</option>
-                  </select>
+        <div id="accordion" class="container">
+          <div class="card oppia-feature-bottom-margin" *ngFor="let rule of featureFlag.rules; index as ruleIndex">
+            <div class="row">
+              <div class="col-1"></div>
+  
+              <div class="col-10">
+                <div class="row card-header" [attr.id]="'heading'+ruleIndex" data-toggle="collapse" 
+                     [attr.data-target]="'#collapse'+ruleIndex" aria-expanded="true" aria-controls="collapseOne">
+                  <div class="col-10" >
+                    {{featureFlagNameToRulesReadonlyData.get(featureFlag.name)[ruleIndex]}}
+                  </div>
+                  <div class="col-2">
+                    <select [(ngModel)]="rule.valueWhenMatched" class="e2e-test-value-selector">
+                      <option [ngValue]="true">Enabled</option>
+                      <option [ngValue]="false">Disabled</option>
+                    </select>
+                  </div>
                 </div>
-              </div>
-              <div class="row oppia-feature-top-margin">
-                <div class="col-12"><b>Filters:</b></div>
-              </div>
-              <div class="row oppia-feature-top-margin">
-                <div class="col-12">
-                  <div *ngIf="rule.filters.length === 0" class="oppia-flex-center">No filter.</div>
-                  <!-- Filters -->
-                  <div *ngFor="let filter of rule.filters; index as filterIndex" class="container">
-                    <div *ngIf="filterIndex > 0" class="row">
-                      <div class="col-12 oppia-conjunction-indicator">
-                        <div class="horizontal-line"></div>
-                        AND
-                        <div class="horizontal-line"></div>
-                      </div>
+                <div [attr.id]="'collapse'+ruleIndex" class="collapse" aria-labelledby="'heading'+ruleIndex" data-parent="#accordion">
+                  <div class="card-body oppia-rule-container">
+                    <div class="row oppia-feature-top-margin">
+                      <div class="col-12"><b>Filters:</b></div>
                     </div>
-                    <div class="row">
-                      <div class="col-1"></div>
-                      <div class="col-10 oppia-filter-container">
-                        <div class="row">
-                          <div class="col-2"><b>Type:</b></div>
-                          <div class="col-4">
-                            <select [(ngModel)]="filter.type"
-                                    (change)="clearFilterConditions(filter)">
-                              <option *ngFor="let filterType of availableFilterTypes"
-                                      [value]="filterType.toString()">
-                                {{filterTypeToContext[filterType].displayName}}
-                              </option>
-                            </select>
-                          </div>
-                          <div class="col-2">
-                            <div><b>Conditions:</b></div>
-                          </div>
-                          <div *ngIf="filter.conditions.length === 0" class="col-4">
-                            No condition specified.
-                          </div>
-                        </div>
-                        <!-- Conditions -->
-                        <ng-container *ngFor="let condition of filter.conditions; index as conditionIndex">
-                          <div class="row" *ngIf="conditionIndex > 0">
-                            <div class="col-6"></div>
-                            <div class="col-6 oppia-conjunction-indicator">
+                    <div class="row oppia-feature-top-margin">
+                      <div class="col-12">
+                        <div *ngIf="rule.filters.length === 0" class="oppia-flex-center">No filter.</div>
+                        <!-- Filters -->
+                        <div *ngFor="let filter of rule.filters; index as filterIndex" class="container">
+                          <div *ngIf="filterIndex > 0" class="row">
+                            <div class="col-12 oppia-conjunction-indicator">
                               <div class="horizontal-line"></div>
-                              OR
+                              AND
                               <div class="horizontal-line"></div>
                             </div>
                           </div>
                           <div class="row">
-                            <div class="col-7"></div>
-                            <div class="col-3 oppia-condition-container">
-                              <select [(ngModel)]="filter.conditions[conditionIndex][0]">
-                                <option *ngFor="let op of filterTypeToContext[filter.type].operators"
-                                        [value]="op">
-                                  {{op}}
-                                </option>
-                              </select>
-                              <ng-container *ngIf="!!filterTypeToContext[filter.type].options">
-                                <select [(ngModel)]="filter.conditions[conditionIndex][1]" class="e2e-test-server-mode-selector">
-                                  <ng-container *ngFor="let option of filterTypeToContext[filter.type].options">
-                                    <option *ngIf="!filterTypeToContext[filter.type].optionFilter || filterTypeToContext[filter.type].optionFilter(featureFlag, option)"
-                                            [value]="option">
-                                      {{option}}
+                            <div class="col-1"></div>
+                            <div class="col-10 oppia-filter-container">
+                              <div class="row">
+                                <div class="col-1"><b>If:</b></div>
+                                <div class="col-4">
+                                  <select [(ngModel)]="filter.type"
+                                          (change)="clearFilterConditions(filter)">
+                                    <option *ngFor="let filterType of availableFilterTypes"
+                                            [value]="filterType.toString()">
+                                      {{filterTypeToContext[filterType].displayName}}
                                     </option>
-                                  </ng-container>
-                                </select>
+                                  </select>
+                                </div>
+                                <div class="col-3">
+                                  <div><b>Conditions:</b></div>
+                                </div>
+                                <div *ngIf="filter.conditions.length === 0" class="col-4">
+                                  No condition specified.
+                                </div>
+                              </div>
+                              <!-- Conditions -->
+                              <ng-container *ngFor="let condition of filter.conditions; index as conditionIndex">
+                                <div class="row" *ngIf="conditionIndex > 0">
+                                  <div class="col-6"></div>
+                                  <div class="col-6 oppia-conjunction-indicator">
+                                    <div class="horizontal-line"></div>
+                                    OR
+                                    <div class="horizontal-line"></div>
+                                  </div>
+                                </div>
+                                <div class="row">
+                                  <div class="col-7"></div>
+                                  <div class="col-3 oppia-condition-container">
+                                    <select [(ngModel)]="filter.conditions[conditionIndex][0]">
+                                      <option *ngFor="let op of filterTypeToContext[filter.type].operators"
+                                              [value]="op">
+                                        {{op}}
+                                      </option>
+                                    </select>
+                                    <ng-container *ngIf="!!filterTypeToContext[filter.type].options">
+                                      <select [(ngModel)]="filter.conditions[conditionIndex][1]" class="e2e-test-server-mode-selector">
+                                        <ng-container *ngFor="let option of filterTypeToContext[filter.type].options">
+                                          <option *ngIf="!filterTypeToContext[filter.type].optionFilter || filterTypeToContext[filter.type].optionFilter(featureFlag, option)"
+                                                  [value]="option">
+                                            {{option}}
+                                          </option>
+                                        </ng-container>
+                                      </select>
+                                    </ng-container>
+                                    <ng-container *ngIf="!filterTypeToContext[filter.type].options">
+                                      <input [(ngModel)]="filter.conditions[conditionIndex][1]"
+                                             [placeholder]="filterTypeToContext[filter.type].placeholder"
+                                             class="oppia-condition-input">
+                                      <ng-container *ngIf="filterTypeToContext[filter.type].inputRegex">
+                                        <span class="oppia-input-error"
+                                              *ngIf="!filterTypeToContext[filter.type].inputRegex.test(filter.conditions[conditionIndex][1])">
+                                          <div class="input-error-symbol">!</div>
+                                          <div class="tooltip">
+                                            Expected to match {{filterTypeToContext[filter.type].inputRegex}}
+                                          </div>
+                                        </span>
+                                      </ng-container>
+                                    </ng-container>
+                                  </div>
+                                  <div class="col-1">
+                                    <button class="btn btn-secondary" (click)="removeCondition(filter, conditionIndex)">x</button>
+                                  </div>
+                                </div>
                               </ng-container>
-                              <ng-container *ngIf="!filterTypeToContext[filter.type].options">
-                                <input [(ngModel)]="filter.conditions[conditionIndex][1]"
-                                       [placeholder]="filterTypeToContext[filter.type].placeholder"
-                                       class="oppia-condition-input">
-                                <ng-container *ngIf="filterTypeToContext[filter.type].inputRegex">
-                                  <span class="oppia-input-error"
-                                        *ngIf="!filterTypeToContext[filter.type].inputRegex.test(filter.conditions[conditionIndex][1])">
-                                    <div class="input-error-symbol">!</div>
-                                    <div class="tooltip">
-                                      Expected to match {{filterTypeToContext[filter.type].inputRegex}}
-                                    </div>
-                                  </span>
-                                </ng-container>
-                              </ng-container>
+                              <div class="oppia-flex-right oppia-feature-top-margin">
+                                <button class="btn btn-secondary oppia-feature-top-margin e2e-test-add-condition-button" (click)="addNewCondition(filter)">
+                                  Add New Condition To Bottom
+                                </button>
+                              </div>
                             </div>
-                            <div class="col-1">
-                              <button class="btn btn-secondary" (click)="removeCondition(filter, conditionIndex)">x</button>
+                            <div class="col-1 oppia-flex-center">
+                              <button class="btn btn-secondary" (click)="removeFilter(rule, filterIndex)">x</button>
                             </div>
                           </div>
-                        </ng-container>
-                        <div class="oppia-flex-right oppia-feature-top-margin">
-                          <button class="btn btn-secondary oppia-feature-top-margin e2e-test-add-condition-button" (click)="addNewCondition(filter)">
-                            Add New Condition To Bottom
-                          </button>
+                        </div>
+                        <div class="oppia-flex-center oppia-feature-top-margin">
+                          <button class="btn btn-secondary" (click)="addNewFilter(rule)">Add New Filter To Bottom</button>
                         </div>
                       </div>
-                      <div class="col-1 oppia-flex-center">
-                        <button class="btn btn-secondary" (click)="removeFilter(rule, filterIndex)">x</button>
+                    </div>
+                    <div class="row">
+                      <div class="col-2"><b>If Matched:</b></div>
+                      <div class="col-10">
+                        <select [(ngModel)]="rule.valueWhenMatched" class="e2e-test-value-selector">
+                          <option [ngValue]="true">Enabled</option>
+                          <option [ngValue]="false">Disabled</option>
+                        </select>
                       </div>
                     </div>
                   </div>
-                  <div class="oppia-flex-center oppia-feature-top-margin">
-                    <button class="btn btn-secondary" (click)="addNewFilter(rule)">Add New Filter To Bottom</button>
-                  </div>
                 </div>
               </div>
-            </div>
-
-            <div class="col-1 oppia-flex-center">
-              <div class="row">
-                <div class="col-6 oppia-rule-moving-buttons-container">
-                  <button class="btn btn-secondary"
-                          *ngIf="ruleIndex > 0"
-                          (click)="moveRuleUp(featureFlag, ruleIndex)">
-                    ↑
-                  </button>
-                  <button class="btn btn-secondary"
-                          *ngIf="ruleIndex + 1 < featureFlag.rules.length"
-                          (click)="moveRuleDown(featureFlag, ruleIndex)">
-                    ↓
-                  </button>
-                </div>
-                <div class="col-6 oppia-flex-vertical-center">
-                  <button class="btn btn-secondary e2e-test-remove-rule-button" (click)="removeRule(featureFlag, ruleIndex)">x</button>
+  
+              <div class="col-1 oppia-flex-center">
+                <div class="row">
+                  <div class="col-6 oppia-rule-moving-buttons-container">
+                    <button class="btn btn-secondary"
+                            *ngIf="ruleIndex > 0"
+                            (click)="moveRuleUp(featureFlag, ruleIndex)">
+                      ↑
+                    </button>
+                    <button class="btn btn-secondary"
+                            *ngIf="ruleIndex + 1 < featureFlag.rules.length"
+                            (click)="moveRuleDown(featureFlag, ruleIndex)">
+                      ↓
+                    </button>
+                  </div>
+                  <div class="col-6 oppia-flex-vertical-center">
+                    <button class="btn btn-secondary e2e-test-remove-rule-button" (click)="removeRule(featureFlag, ruleIndex)">x</button>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
+
       </div>
     </div>
     <div class="oppia-flex-center oppia-feature-bottom-margin">
@@ -195,16 +209,16 @@
     <div class="row oppia-control-buttons-container oppia-feature-top-margin">
       <!-- Control Buttons -->
       <button
-              class="btn btn-primary e2e-test-save-button"
-              (click)="updateFeatureRulesAsync(featureFlag)"
-              [disabled]="!isFeatureFlagChanged(featureFlag)">
-        Save
-      </button>
-      <button
               class="btn btn-secondary"
               (click)="clearChanges(featureFlag)"
               [disabled]="!isFeatureFlagChanged(featureFlag)">
         Clear Changes
+      </button>
+      <button
+              class="btn btn-primary e2e-test-save-button"
+              (click)="updateFeatureRulesAsync(featureFlag)"
+              [disabled]="!isFeatureFlagChanged(featureFlag)">
+        Save
       </button>
     </div>
   </div>
