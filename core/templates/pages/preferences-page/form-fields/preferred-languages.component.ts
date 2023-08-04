@@ -44,7 +44,7 @@ export class PreferredLanguagesComponent implements AfterViewInit {
   filteredChoices: LanguageIdAndText[] = [];
   searchQuery: string = '';
 
-  onInputBoxClick(): void {
+  resetLanguageSearch(): void {
     this.searchQuery = '';
     this.filteredChoices = this.choices;
   }
@@ -82,8 +82,7 @@ export class PreferredLanguagesComponent implements AfterViewInit {
       this.preferredLanguagesChange.emit(this.preferredLanguages);
       this.languageInput.nativeElement.value = '';
     }
-    this.searchQuery = '';
-    this.filteredChoices = this.choices;
+    this.resetLanguageSearch();
   }
 
   remove(fruit: string): void {
