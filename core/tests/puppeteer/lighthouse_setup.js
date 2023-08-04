@@ -281,7 +281,7 @@ const generateDataForTopicAndStoryPlayer = async function(browser, page) {
     const successMessage = 'Dummy new structures data generated successfully.';
     let statusMessage;
     do {
-      await page.waitForTimeout(1000);
+      await new Promise(r => setTimeout(r, 1000));
       statusMessage = await page.evaluate(() => {
         const statusMessageElement = document
           .querySelector('.oppia-status-message-container');
@@ -307,7 +307,7 @@ const generateDataForClassroom = async function(browser, page) {
     const successMessage = 'Dummy new classroom generated successfully.';
     let statusMessage;
     do {
-      await page.waitForTimeout(1000);
+      await new Promise(r => setTimeout(r, 1000));
       statusMessage = await page.evaluate(() => {
         const statusMessageElement = document
           .querySelector('.oppia-status-message-container');
