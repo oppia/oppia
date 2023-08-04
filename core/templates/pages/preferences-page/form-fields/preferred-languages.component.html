@@ -21,7 +21,7 @@
            [matChipInputFor]="chipList"
            [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
            (matChipInputTokenEnd)="add($event)"
-           [(ngModel)]="searchQuery" (ngModelChange)="onSearchInputChange()" (click)="onInputBoxClick()">
+           [(ngModel)]="searchQuery" (ngModelChange)="onSearchInputChange()" (click)="resetLanguageSearch()">
   </mat-chip-list>
   <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selected($event)">
     <mat-option *ngFor="let choice of filteredChoices" [value]="choice.id">
