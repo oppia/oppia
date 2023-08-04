@@ -922,8 +922,12 @@ describe('Contribution and review service', () => {
         change: {
           state_name: 'First State',
           content_id: 'feedback_2',
-          new_value: 'new_val',
-          old_value: 'old_val',
+          new_value: {
+            html: 'new_val'
+          },
+          old_value: {
+            html: 'old_val'
+          },
           skill_id: 'skill_id_1'
         },
         last_updated_msecs: 0,
@@ -938,8 +942,12 @@ describe('Contribution and review service', () => {
         change: {
           state_name: 'End State',
           content_id: 'hints_1',
-          new_value: 'new_val',
-          old_value: 'old_val',
+          new_value: {
+            html: 'new_val'
+          },
+          old_value: {
+            html: 'old_val'
+          },
           skill_id: 'skill_id_1'
         },
         last_updated_msecs: 0,
@@ -954,8 +962,12 @@ describe('Contribution and review service', () => {
         change: {
           state_name: 'First State',
           content_id: 'content_3',
-          new_value: 'new_val',
-          old_value: 'old_val',
+          new_value: {
+            html: 'new_val'
+          },
+          old_value: {
+            html: 'old_val'
+          },
           skill_id: 'skill_id_1'
         },
         last_updated_msecs: 0,
@@ -970,8 +982,12 @@ describe('Contribution and review service', () => {
         change: {
           state_name: 'End State',
           content_id: 'interaction_1',
-          new_value: 'new_val',
-          old_value: 'old_val',
+          new_value: {
+            html: 'new_val'
+          },
+          old_value: {
+            html: 'old_val'
+          },
           skill_id: 'skill_id_1'
         },
         last_updated_msecs: 0,
@@ -986,8 +1002,12 @@ describe('Contribution and review service', () => {
         change: {
           state_name: 'First State',
           content_id: 'content_1',
-          new_value: 'new_val',
-          old_value: 'old_val',
+          new_value: {
+            html: 'new_val'
+          },
+          old_value: {
+            html: 'old_val'
+          },
           skill_id: 'skill_id_1'
         },
         last_updated_msecs: 0,
@@ -1002,8 +1022,12 @@ describe('Contribution and review service', () => {
         change: {
           state_name: 'End State',
           content_id: 'content_2',
-          new_value: 'new_val',
-          old_value: 'old_val',
+          new_value: {
+            html: 'new_val'
+          },
+          old_value: {
+            html: 'old_val'
+          },
           skill_id: 'skill_id_1'
         },
         last_updated_msecs: 0,
@@ -1103,8 +1127,12 @@ describe('Contribution and review service', () => {
           change: {
             state_name: 'First State',
             content_id: 'content_1',
-            new_value: 'new_val',
-            old_value: 'old_val',
+            new_value: {
+              html: 'new_val'
+            },
+            old_value: {
+              html: 'old_val'
+            },
             skill_id: 'skill_id_1'
           },
           last_updated_msecs: 0,
@@ -1119,8 +1147,12 @@ describe('Contribution and review service', () => {
           change: {
             state_name: 'First State',
             content_id: 'content_3',
-            new_value: 'new_val',
-            old_value: 'old_val',
+            new_value: {
+              html: 'new_val'
+            },
+            old_value: {
+              html: 'old_val'
+            },
             skill_id: 'skill_id_1'
           },
           last_updated_msecs: 0,
@@ -1135,8 +1167,12 @@ describe('Contribution and review service', () => {
           change: {
             state_name: 'First State',
             content_id: 'feedback_2',
-            new_value: 'new_val',
-            old_value: 'old_val',
+            new_value: {
+              html: 'new_val'
+            },
+            old_value: {
+              html: 'old_val'
+            },
             skill_id: 'skill_id_1'
           },
           last_updated_msecs: 0,
@@ -1151,8 +1187,12 @@ describe('Contribution and review service', () => {
           change: {
             state_name: 'End State',
             content_id: 'content_2',
-            new_value: 'new_val',
-            old_value: 'old_val',
+            new_value: {
+              html: 'new_val'
+            },
+            old_value: {
+              html: 'old_val'
+            },
             skill_id: 'skill_id_1'
           },
           last_updated_msecs: 0,
@@ -1167,8 +1207,12 @@ describe('Contribution and review service', () => {
           change: {
             state_name: 'End State',
             content_id: 'interaction_1',
-            new_value: 'new_val',
-            old_value: 'old_val',
+            new_value: {
+              html: 'new_val'
+            },
+            old_value: {
+              html: 'old_val'
+            },
             skill_id: 'skill_id_1'
           },
           last_updated_msecs: 0,
@@ -1183,8 +1227,12 @@ describe('Contribution and review service', () => {
           change: {
             state_name: 'End State',
             content_id: 'hints_1',
-            new_value: 'new_val',
-            old_value: 'old_val',
+            new_value: {
+              html: 'new_val'
+            },
+            old_value: {
+              html: 'old_val'
+            },
             skill_id: 'skill_id_1'
           },
           last_updated_msecs: 0,
