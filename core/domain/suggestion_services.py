@@ -1075,27 +1075,73 @@ def get_reviewable_translation_suggestions_by_offset(
                 sort_key,
                 language_codes))
     elif len(opportunity_summary_exp_ids) > 0:
-        in_review_translation_suggestions = []
-        next_offset = 0
-        if (limit is None and len(opportunity_summary_exp_ids) == 1):
-            in_review_translation_suggestions, next_offset = (
+        in_review_translation_suggestions, next_offset = (
+            suggestion_models.GeneralSuggestionModel
+            .get_in_review_translation_suggestions_with_exp_ids_by_offset(
+                limit,
+                offset,
+                user_id,
+                sort_key,
+                language_codes,
+                opportunity_summary_exp_ids))
+
+    translation_suggestions = []
+    for suggestion_model in in_review_translation_suggestions:
+        suggestion = get_suggestion_from_model(suggestion_model)
+        # Here, we are narrowing down the type from BaseSuggestion to
+        # SuggestionTranslateContent.
+        assert isinstance(
+            suggestion, suggestion_registry.SuggestionTranslateContent
+        )
+        translation_suggestions.append(suggestion)
+
+    return translation_suggestions, next_offset
+
+def get_reviewable_translation_suggestions_for_single_exp(
+    user_id: str,
+    opportunity_summary_exp_id: str,
+    sort_key: Optional[str],
+    language: Optional[str] = None
+) -> Tuple[List[suggestion_registry.SuggestionTranslateContent], int]:
+    """Returns a list of translation suggestions matching the
+     passed opportunity ID which the user can review.
+
+    Args:
+        user_id: str. The ID of the user.
+        opportunity_summary_exp_id: str.
+            The exploration ID for which suggestions
+            are fetched. If exp id is empty, no suggestions are
+            fetched.
+        sort_key: str|None. The key to sort the suggestions by.
+        language: str. ISO 639-1 language code for which to filter. If it is
+            None, all available languages will be returned.
+
+    Returns:
+        Tuple of (results, next_offset). Where:
+            results: list(Suggestion). A list of translation suggestions
+            which the supplied user is permitted to review.
+            next_offset: int. The input offset + the number of results returned
+                by the current query.
+    """
+    contribution_rights = user_services.get_user_contribution_rights(
+        user_id)
+    language_codes = (
+        contribution_rights.can_review_translation_for_language_codes)
+
+    if language is not None:
+        language_codes = [language] if language in language_codes else []
+
+    # The user cannot review any translations, so return early.
+    if len(language_codes) == 0:
+        return [], 0
+
+    in_review_translation_suggestions, next_offset = (
                 suggestion_models.GeneralSuggestionModel
                 .get_reviewable_translation_suggestions_for_single_exploration(
-                    offset,
                     user_id,
                     sort_key,
                     language_codes,
-                    opportunity_summary_exp_ids[0]))
-        else:
-            in_review_translation_suggestions, next_offset = (
-                suggestion_models.GeneralSuggestionModel
-                .get_in_review_translation_suggestions_with_exp_ids_by_offset(
-                    limit,
-                    offset,
-                    user_id,
-                    sort_key,
-                    language_codes,
-                    opportunity_summary_exp_ids))
+                    opportunity_summary_exp_id))
 
     translation_suggestions = []
     for suggestion_model in in_review_translation_suggestions:

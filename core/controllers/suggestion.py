@@ -765,10 +765,17 @@ class ReviewableSuggestionsHandler(
         suggestions: Sequence[suggestion_registry.BaseSuggestion] = []
         next_offset = 0
         if suggestion_type == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT:
-            reviewable_suggestions, next_offset = (
-                suggestion_services
-                .get_reviewable_translation_suggestions_by_offset(
-                    self.user_id, exp_ids, limit, offset, sort_key))
+            reviewable_suggestions = []
+            if (exp_ids and len(exp_ids) > 1 and limit is None):
+                reviewable_suggestions, next_offset = (
+                    suggestion_services
+                    .get_reviewable_translation_suggestions_for_single_exp(
+                        self.user_id, exp_ids[0], sort_key))
+            else:
+                reviewable_suggestions, next_offset = (
+                    suggestion_services
+                    .get_reviewable_translation_suggestions_by_offset(
+                        self.user_id, exp_ids, limit, offset, sort_key))
             suggestions = (
                 suggestion_services
                 .get_suggestions_with_editable_explorations(

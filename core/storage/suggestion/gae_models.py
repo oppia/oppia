@@ -668,7 +668,6 @@ class GeneralSuggestionModel(base_models.BaseModel):
     @classmethod
     def get_reviewable_translation_suggestions_for_single_exploration(
         cls,
-        offset: int,
         user_id: str,
         sort_key: Optional[str],
         language_codes: List[str],
@@ -677,9 +676,6 @@ class GeneralSuggestionModel(base_models.BaseModel):
         """Fetches reviewable translation suggestions for a single exploration.
 
         Args:
-            offset: int. Number of results to skip from the beginning of all
-                matching results.
-
             user_id: str. The id of the user trying to make this query.
                 Suggestions authored by this user will be excluded from
                 the results.
@@ -718,7 +714,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
 
             sorted_results: List[GeneralSuggestionModel] = []
             suggestion_models: Sequence[GeneralSuggestionModel] = (
-                suggestion_query.fetch(offset=offset))
+                suggestion_query.fetch())
             for suggestion_model in suggestion_models:
                 offset += 1
                 if suggestion_model.author_id != user_id:
@@ -738,9 +734,9 @@ class GeneralSuggestionModel(base_models.BaseModel):
         ))
 
         results: Sequence[GeneralSuggestionModel] = (
-            suggestion_query.fetch(offset=offset)
+            suggestion_query.fetch()
         )
-        next_offset = offset + len(results)
+        next_offset = len(results)
 
         return (
             results,

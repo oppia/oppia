@@ -558,7 +558,6 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
         sorted_results, _ = (
             suggestion_models.GeneralSuggestionModel
             .get_reviewable_translation_suggestions_for_single_exploration(
-                offset=0,
                 user_id=user_id,
                 sort_key=None,
                 language_codes=[self.translation_language_code],
