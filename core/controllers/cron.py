@@ -24,6 +24,7 @@ from core.domain import beam_job_services
 from core.domain import config_domain
 from core.domain import cron_services
 from core.domain import email_manager
+from core.domain import story_services
 from core.domain import suggestion_services
 from core.domain import taskqueue_services
 from core.domain import user_services
@@ -298,3 +299,32 @@ class CronTranslationContributionStatsHandler(
             job_class=(
                 suggestion_stats_computation_jobs
                 .GenerateContributionStatsJob))
+
+
+class CronMailChapterPublicationsNotificationsHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
+    """Handler for mailing curriculum admins to remind them about behind
+    schedule and upcoming (within UPCOMING_CHAPTERS_DAY_LIMIT days) chapter
+    launches.
+    """
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
+
+    @acl_decorators.can_perform_cron_tasks
+    def get(self) -> None:
+        """Sends each curriculum admin mail to notify them about behind schedule
+        and upcoming (within UPCOMING_CHAPTERS_DAY_LIMIT days) chapter launches.
+        """
+        if not feconf.CAN_SEND_EMAILS:
+            return self.render_json({})
+
+        admin_ids = user_services.get_user_ids_by_role(
+            feconf.ROLE_ID_CURRICULUM_ADMIN)
+        chapter_notifications_stories_list = (
+            story_services.get_chapter_notifications_stories_list())
+        email_manager.send_reminder_mail_to_notify_curriculum_admins(
+            admin_ids, chapter_notifications_stories_list)
+        return self.render_json({})
