@@ -526,7 +526,6 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
         assert sorted_results is not None
         self.assertEqual(len(sorted_results), 2)
 
-
     def test_get_reviewable_translation_suggestions_for_single_exploration_unsorted( # pylint: disable=line-too-long
         self
     ) -> None:
