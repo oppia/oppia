@@ -2061,7 +2061,7 @@ def send_reminder_mail_to_notify_curriculum_admins(
     if not feconf.CAN_SEND_EMAILS:
         logging.error('This app cannot send emails to users.')
         return
-    if not curriculum_admin_ids:
+    if len(curriculum_admin_ids) == 0:
         logging.error('There were no curriculum admins to notify.')
         return
 
@@ -2073,49 +2073,46 @@ def send_reminder_mail_to_notify_curriculum_admins(
 
     chapters_are_overdue = False
     chapters_are_upcoming = False
-    for story in chapter_notifications_list:
-        if len(story.overdue_chapters):
-            chapters_are_overdue = chapters_are_overdue or True
-        if len(story.upcoming_chapters):
-            chapters_are_upcoming = chapters_are_upcoming or True
 
+    overdue_stories_html = ''
+    for overdue_story in chapter_notifications_list:
+        if len(overdue_story.overdue_chapters) == 0:
+            continue
+        chapters_are_overdue = True
+        story_link = (
+            str(feconf.OPPIA_SITE_URL) +
+            str(feconf.STORY_EDITOR_URL_PREFIX) +
+            '/' + overdue_story.id)
+        story_html = '<li>%s (%s) - <a href="%s">Link</a><ul>' % (
+            overdue_story.story_name, overdue_story.topic_name,
+            story_link)
+        for chapter in overdue_story.overdue_chapters:
+            chapter_html = '<li>%s</li>' % chapter
+            story_html += chapter_html
+        story_html += '</ul></li>'
+        overdue_stories_html += story_html
     if chapters_are_overdue:
-        overdue_stories_html = ''
-        for overdue_story in chapter_notifications_list:
-            if len(overdue_story.overdue_chapters) == 0:
-                continue
-            story_link = (
-                str(feconf.OPPIA_SITE_URL) +
-                str(feconf.STORY_EDITOR_URL_PREFIX) +
-                '/' + overdue_story.id)
-            story_html = '<li>%s (%s) - <a href="%s">Link</a><ul>' % (
-                overdue_story.story_name, overdue_story.topic_name,
-                story_link)
-            for chapter in overdue_story.overdue_chapters:
-                chapter_html = '<li>%s</li>' % chapter
-                story_html += chapter_html
-            story_html += '</ul></li>'
-            overdue_stories_html += story_html
         email_body += email_body_template['overdue_chapters_template'] % (
             overdue_stories_html)
 
+    upcoming_stories_html = ''
+    for upcoming_story in chapter_notifications_list:
+        if len(upcoming_story.upcoming_chapters) == 0:
+            continue
+        chapters_are_upcoming = True
+        story_link = (
+            str(feconf.OPPIA_SITE_URL) +
+            str(feconf.STORY_EDITOR_URL_PREFIX) +
+            '/' + upcoming_story.id)
+        story_html = '<li>%s (%s) - <a href="%s">Link</a><ul>' % (
+            upcoming_story.story_name, upcoming_story.topic_name,
+            story_link)
+        for chapter in upcoming_story.upcoming_chapters:
+            chapter_html = '<li>%s</li>' % chapter
+            story_html += chapter_html
+        story_html += '</ul></li>'
+        upcoming_stories_html += story_html
     if chapters_are_upcoming:
-        upcoming_stories_html = ''
-        for upcoming_story in chapter_notifications_list:
-            if len(upcoming_story.upcoming_chapters) == 0:
-                continue
-            story_link = (
-                str(feconf.OPPIA_SITE_URL) +
-                str(feconf.STORY_EDITOR_URL_PREFIX) +
-                '/' + upcoming_story.id)
-            story_html = '<li>%s (%s) - <a href="%s">Link</a><ul>' % (
-                upcoming_story.story_name, upcoming_story.topic_name,
-                story_link)
-            for chapter in upcoming_story.upcoming_chapters:
-                chapter_html = '<li>%s</li>' % chapter
-                story_html += chapter_html
-            story_html += '</ul></li>'
-            upcoming_stories_html += story_html
         email_body += email_body_template['upcoming_chapters_template'] % (
             upcoming_stories_html)
 
