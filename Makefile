@@ -36,7 +36,7 @@ run-devserver: # Runs the dev-server
 
 run-offline: # Runs the dev-server in offline mode
 	docker compose up dev-server -d
-	@printf 'Please wait until the development server is up and running...\n\n'
+	@printf 'Please wait while the development server starts...\n\n'
 	@while [[ $$(curl -s -o /tmp/status_code.txt -w '%{http_code}' http://localhost:8181/community-library) != "200" ]]; do \
 		sleep 5; \
 	done
