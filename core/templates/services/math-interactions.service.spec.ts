@@ -181,20 +181,17 @@ describe('MathInteractionsService', () => {
     expect(mathInteractionsService.validateAlgebraicExpression(
       'x-y=0', ['x', 'y'])).toBeFalse();
     expect(mathInteractionsService.getWarningText()).toBe(
-      'It looks like you have entered an equation/inequality.' +
-      ' Please enter an expression instead.');
+      'It looks like you have entered an equals sign which turns your answer into an equation. Please remove the equals sign to make your answer an expression.');
 
     expect(mathInteractionsService.validateAlgebraicExpression(
       'x^2 < 2.5', ['x'])).toBeFalse();
     expect(mathInteractionsService.getWarningText()).toBe(
-      'It looks like you have entered an equation/inequality.' +
-      ' Please enter an expression instead.');
+      'It looks like you have entered an equals sign which turns your answer into an equation. Please remove the equals sign to make your answer an expression.');
 
     expect(mathInteractionsService.validateAlgebraicExpression(
       '5 >= 2*alpha', ['α'])).toBeFalse();
     expect(mathInteractionsService.getWarningText()).toBe(
-      'It looks like you have entered an equation/inequality.' +
-      ' Please enter an expression instead.');
+      'It looks like you have entered an equals sign which turns your answer into an equation. Please remove the equals sign to make your answer an expression.');
 
     expect(mathInteractionsService.validateAlgebraicExpression(
       '(x+y)/0', ['x', 'y'])).toBeFalse();
