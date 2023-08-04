@@ -157,8 +157,9 @@ export class TopicsListComponent {
     if (topic.getTotalUpcomingChaptersCount() > 1) {
       upcomingChapterNotificationsText += 'es';
     }
-    upcomingChapterNotificationsText += ' in the next ' +
-    constants.CHAPTER_PUBLICATION_NOTICE_PERIOD_IN_DAYS + ' days';
+    upcomingChapterNotificationsText += (
+      ' in the next ' +
+      constants.CHAPTER_PUBLICATION_NOTICE_PERIOD_IN_DAYS + ' days');
     return upcomingChapterNotificationsText;
   }
 

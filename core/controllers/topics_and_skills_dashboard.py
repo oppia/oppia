@@ -110,12 +110,12 @@ class TopicsAndSkillsDashboardPageDataHandler(
             topic_summary_dict['classroom'] = topic_classroom_dict.get(
                 topic_summary_dict['id'], None)
 
-        topic_chapter_count_dicts = (
-            topic_services.get_chapters_counts_in_topic_summaries(
+        chapter_counts_by_topic_id = (
+            topic_services.get_chapter_counts_in_topic_summaries(
                 topic_summary_dicts))
 
         for topic_summary_dict in topic_summary_dicts:
-            topic_chapter_count = topic_chapter_count_dicts[
+            topic_chapter_count = chapter_counts_by_topic_id[
                 topic_summary_dict['id']]
             topic_summary_dict.update({
                 'total_upcoming_chapters_count': (
