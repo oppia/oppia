@@ -107,7 +107,7 @@ describe('Preferred Languages Component', () => {
     componentInstance.onSearchInputChange();
     expect(componentInstance.filteredChoices).toEqual([]);
   });
-  
+
   it('should add language', () => {
     spyOn(componentInstance.preferredLanguagesChange, 'emit');
     spyOn(componentInstance, 'validInput').and.returnValue(true);
