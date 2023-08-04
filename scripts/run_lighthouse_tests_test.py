@@ -83,9 +83,8 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
             '--max-old-space-size=4096'
         ]
         # Arguments to record in lighthouse_setup.js.
-        self.extra_args = [
-            '-record',
-            os.path.join('..', 'lhci-puppeteer-video', 'video.mp4')]
+        self.extra_args = ['-record', os.path.join(
+                os.getcwd(), '..', 'lhci-puppeteer-video', 'video.mp4')]
 
         def mock_context_manager() -> MockCompilerContextManager:
             return MockCompilerContextManager()
@@ -166,7 +165,7 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
             'No video found at %s' % self.extra_args[1], self.print_arr)
 
         # Create empty output recording file and re-test.
-        dir_path = os.path.join('..', 'lhci-puppeteer-video')
+        dir_path = os.path.join(os.getcwd(), '..', 'lhci-puppeteer-video')
         if not os.path.exists(dir_path):
             os.mkdir(dir_path)
         with open(self.extra_args[1], 'w', encoding='utf-8') as _:
@@ -208,7 +207,7 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
             'No video found at %s' % self.extra_args[1], self.print_arr)
 
         # Create empty output recording file and re-test.
-        dir_path = os.path.join('..', 'lhci-puppeteer-video')
+        dir_path = os.path.join(os.getcwd(), '..', 'lhci-puppeteer-video')
         if not os.path.exists(dir_path):
             os.mkdir(dir_path)
         with open(self.extra_args[1], 'w', encoding='utf-8') as _:
