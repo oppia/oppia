@@ -167,9 +167,15 @@ describe('Audio Bar Component', () => {
   it('should return true if the selected language is RTL', () => {
     spyOn(i18nLanguageCodeService, 'isCurrentLanguageRTL').and.returnValue(
       true);
-    let result = component.isLanguageRTL();
-    component.isLanguageRTL();
-    expect(result).toBe(true);
+
+    expect(component.isLanguageRTL()).toBe(true);
+  });
+
+  it('should return false if the selected language is not RTL', () => {
+    spyOn(i18nLanguageCodeService, 'isCurrentLanguageRTL').and.returnValue(
+      false);
+
+    expect(component.isLanguageRTL()).toBe(false);
   });
 
   it('should forward audio with time interval of five seconds ' +
