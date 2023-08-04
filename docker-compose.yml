@@ -96,7 +96,7 @@ services:
       - "9099:9099"
       - "4000:4000"
     volumes:
-      - ./.firebase.json:/app/oppia/.firebase.json
+      - ./.firebase_docker.json:/app/oppia/.firebase_docker.json
       - node_modules:/app/oppia/node_modules
       - firebase_emulator_cache:/app/firebase_emulator_cache
       - ./docker/firebase.entrypoint.sh:/app/oppia/docker/firebase.entrypoint.sh
