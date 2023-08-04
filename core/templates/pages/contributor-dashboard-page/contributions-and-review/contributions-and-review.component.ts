@@ -39,6 +39,7 @@ import { ContributionOpportunitiesService } from '../services/contribution-oppor
 import { OpportunitiesListComponent } from '../opportunities-list/opportunities-list.component';
 import { PlatformFeatureService } from 'services/platform-feature.service';
 import { HtmlLengthService } from 'services/html-length.service';
+import { HtmlEscaperService } from 'services/html-escaper.service';
 
 export interface Suggestion {
   change: {
@@ -177,7 +178,8 @@ export class ContributionsAndReview
     private translationTopicService: TranslationTopicService,
     private userService: UserService,
     private featureService: PlatformFeatureService,
-    private htmlLengthService: HtmlLengthService
+    private htmlLengthService: HtmlLengthService,
+    private htmlEscaperService: HtmlEscaperService
   ) {}
 
   getQuestionContributionsSummary(
@@ -257,10 +259,11 @@ export class ContributionsAndReview
   getTranslationSuggestionHeading(suggestion: Suggestion): string {
     const changeTranslation = suggestion.change.translation_html;
 
-    if (Array.isArray(changeTranslation)) {
-      return this.formatRtePreviewPipe.transform(', ');
-    }
-    return this.formatRtePreviewPipe.transform(changeTranslation);
+    return this.htmlEscaperService.escapedStrToUnescapedStr(
+      this.formatRtePreviewPipe.transform(
+        Array.isArray(changeTranslation) ? ', ' : changeTranslation
+      )
+    );
   }
 
   resolveSuggestionSuccess(suggestionId: string): void {
