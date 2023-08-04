@@ -2077,3 +2077,18 @@ class StorySummaryTests(test_utils.GenericTestBase):
         with self.assertRaisesRegex(
             utils.ValidationError, 'Invalid language code: invalid'):
             self.story_summary.validate()
+
+
+class StoryPublicationTimelinessTest(test_utils.GenericTestBase):
+    """Test the story publication timeliness domain object."""
+
+    def test_story_publication_timeliness_gets_created(self) -> None:
+        story_publication_timeliness = story_domain.StoryPublicationTimeliness(
+            'story_id', 'Story', 'Topic', ['Chapter 1'], ['Chapter 2'])
+        self.assertEqual(story_publication_timeliness.id, 'story_id')
+        self.assertEqual(story_publication_timeliness.story_name, 'Story')
+        self.assertEqual(story_publication_timeliness.topic_name, 'Topic')
+        self.assertEqual(
+            story_publication_timeliness.overdue_chapters, ['Chapter 1'])
+        self.assertEqual(
+            story_publication_timeliness.upcoming_chapters, ['Chapter 2'])

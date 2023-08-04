@@ -30,14 +30,15 @@ from core.domain import config_domain
 from core.domain import email_services
 from core.domain import html_cleaner
 from core.domain import rights_domain
+from core.domain import story_domain
 from core.domain import subscription_services
 from core.domain import suggestion_registry
 from core.domain import user_services
 from core.platform import models
 
 from typing import (
-    Callable, Dict, Final, List, Mapping, Optional, Sequence, Set, Tuple,
-    TypedDict, Union)
+    Callable, Dict, Final, List, Mapping, Optional, Sequence,
+    Set, Tuple, TypedDict, Union)
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -264,6 +265,24 @@ CONTRIBUTOR_DASHBOARD_REVIEWER_NOTIFICATION_EMAIL_DATA: Dict[str, str] = {
         '<br><br>%s'
     ),
     'email_subject': 'Contributor Dashboard Reviewer Opportunities'
+}
+
+CURRICULUM_ADMIN_CHAPTER_NOTIFICATION_EMAIL_DATA: Dict[str, str] = {
+    'overdue_chapters_template': (
+        'The following stories have unpublished chapters which are behind '
+        'schedule. Please publish them or adjust the planned publication date.'
+        '<br><br>'
+        '<ol>%s</ol>'
+    ),
+    'upcoming_chapters_template': (
+        'The following stories have unpublished chapters which are due for '
+        'publication in the next ' + str(constants.UPCOMING_CHAPTERS_DAY_LIMIT)
+        + ' days. Please ensure they are published '
+        'on or before the planned date or adjust the planned publication date.'
+        '<br><br>'
+        '<ol>%s</ol>'
+    ),
+    'email_subject': 'Chapter Publication Notifications'
 }
 
 HTML_FOR_SUGGESTION_DESCRIPTION: Dict[
@@ -494,6 +513,8 @@ SENDER_VALIDATORS: Dict[str, Union[bool, Callable[[str], bool]]] = {
     feconf.EMAIL_INTENT_REMOVE_REVIEWER: (
         lambda x: x == feconf.SYSTEM_COMMITTER_ID),
     feconf.EMAIL_INTENT_REVIEW_CREATOR_DASHBOARD_SUGGESTIONS: (
+        lambda x: x == feconf.SYSTEM_COMMITTER_ID),
+    feconf.EMAIL_INTENT_NOTIFY_CURRICULUM_ADMINS_CHAPTERS: (
         lambda x: x == feconf.SYSTEM_COMMITTER_ID),
     feconf.EMAIL_INTENT_ADDRESS_CONTRIBUTOR_DASHBOARD_SUGGESTIONS: (
         lambda x: x == feconf.SYSTEM_COMMITTER_ID),
@@ -2022,6 +2043,88 @@ def send_mail_to_notify_contributor_ranking_achievement(
             feconf.EMAIL_INTENT_NOTIFY_CONTRIBUTOR_DASHBOARD_ACHIEVEMENTS,
             email_template['email_subject'], email_body,
             feconf.NOREPLY_EMAIL_ADDRESS)
+
+
+def send_reminder_mail_to_notify_curriculum_admins(
+    curriculum_admin_ids: List[str],
+    chapter_notifications_list: List[
+        story_domain.StoryPublicationTimeliness]) -> None:
+    """Sends an email to curriculum admins to notify them about the
+    behind-schedule and upcoming chapters in all the topics.
+
+    Args:
+        curriculum_admin_ids: list(str). The user ids of the admins to notify.
+        chapter_notifications_list: list(StoryPublicationTimeliness). The list
+            of stories having behind-schedule or upcoming chapters to be
+            notified.
+    """
+    if not feconf.CAN_SEND_EMAILS:
+        logging.error('This app cannot send emails to users.')
+        return
+    if len(curriculum_admin_ids) == 0:
+        logging.error('There were no curriculum admins to notify.')
+        return
+
+    email_body_template = CURRICULUM_ADMIN_CHAPTER_NOTIFICATION_EMAIL_DATA
+    email_subject = CURRICULUM_ADMIN_CHAPTER_NOTIFICATION_EMAIL_DATA[
+        'email_subject']
+
+    email_body = 'Dear Curriculum Admin, <br><br>'
+
+    chapters_are_overdue = False
+    chapters_are_upcoming = False
+
+    overdue_stories_html = ''
+    for overdue_story in chapter_notifications_list:
+        if len(overdue_story.overdue_chapters) == 0:
+            continue
+        chapters_are_overdue = True
+        story_link = (
+            str(feconf.OPPIA_SITE_URL) +
+            str(feconf.STORY_EDITOR_URL_PREFIX) +
+            '/' + overdue_story.id)
+        story_html = '<li>%s (%s) - <a href="%s">Link</a><ul>' % (
+            overdue_story.story_name, overdue_story.topic_name,
+            story_link)
+        for chapter in overdue_story.overdue_chapters:
+            chapter_html = '<li>%s</li>' % chapter
+            story_html += chapter_html
+        story_html += '</ul></li>'
+        overdue_stories_html += story_html
+    if chapters_are_overdue:
+        email_body += email_body_template['overdue_chapters_template'] % (
+            overdue_stories_html)
+
+    upcoming_stories_html = ''
+    for upcoming_story in chapter_notifications_list:
+        if len(upcoming_story.upcoming_chapters) == 0:
+            continue
+        chapters_are_upcoming = True
+        story_link = (
+            str(feconf.OPPIA_SITE_URL) +
+            str(feconf.STORY_EDITOR_URL_PREFIX) +
+            '/' + upcoming_story.id)
+        story_html = '<li>%s (%s) - <a href="%s">Link</a><ul>' % (
+            upcoming_story.story_name, upcoming_story.topic_name,
+            story_link)
+        for chapter in upcoming_story.upcoming_chapters:
+            chapter_html = '<li>%s</li>' % chapter
+            story_html += chapter_html
+        story_html += '</ul></li>'
+        upcoming_stories_html += story_html
+    if chapters_are_upcoming:
+        email_body += email_body_template['upcoming_chapters_template'] % (
+            upcoming_stories_html)
+
+    email_body += 'Regards,<br> Oppia Foundation'
+
+    if chapters_are_overdue or chapters_are_upcoming:
+        bulk_email_model_id = email_models.BulkEmailModel.get_new_id('')
+        _send_bulk_mail(
+            curriculum_admin_ids, feconf.SYSTEM_COMMITTER_ID,
+            feconf.EMAIL_INTENT_NOTIFY_CURRICULUM_ADMINS_CHAPTERS,
+            email_subject, email_body, feconf.NOREPLY_EMAIL_ADDRESS,
+            feconf.SYSTEM_EMAIL_NAME, bulk_email_model_id)
 
 
 def send_account_deleted_email(user_id: str, user_email: str) -> None:

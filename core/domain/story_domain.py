@@ -642,7 +642,7 @@ class StoryNode:
         Returns:
             bool. Whether the status is valid or not.
         """
-        return status in constants.ALLOWED_STORYNODE_STATUS
+        return status in constants.ALLOWED_STORY_NODE_STATUS
 
     @classmethod
     def require_valid_unpublishing_reason(
@@ -656,7 +656,7 @@ class StoryNode:
             bool. Whether the unpublishing reason is valid or not.
         """
         return unpublishing_reason in (
-            constants.ALLOWED_STORYNODE_UNPUBLISHING_REASONS)
+            constants.ALLOWED_STORY_NODE_UNPUBLISHING_REASONS)
 
     def to_dict(self) -> StoryNodeDict:
         """Returns a dict representing this StoryNode domain object.
@@ -2347,3 +2347,34 @@ class StoryChapterProgressSummaryDict(TypedDict):
     exploration_id: str
     visited_checkpoints_count: int
     total_checkpoints_count: int
+
+
+class StoryPublicationTimeliness:
+    """Domain object for stories with behind-schedule chapters
+    or chapters upcoming within UPCOMING_CHAPTERS_DAY_LIMIT.
+    """
+
+    def __init__(
+        self,
+        story_id: str,
+        story_name: str,
+        topic_name: str,
+        overdue_chapters: List[str],
+        upcoming_chapters: List[str]
+    ) -> None:
+        """Constructs a StoryPublicationTimeliness domain object.
+
+        Args:
+            story_id: str. The unique id of the story.
+            story_name: str. The title of the story.
+            topic_name: str. The title of the topic.
+            overdue_chapters: list(str). The list of behind schedule chapter
+                names.
+            upcoming_chapters: list(str). The list of chapter names
+                upcoming within UPCOMING_CHAPTERS_DAY_LIMIT.
+        """
+        self.id = story_id
+        self.story_name = story_name
+        self.topic_name = topic_name
+        self.overdue_chapters = overdue_chapters
+        self.upcoming_chapters = upcoming_chapters

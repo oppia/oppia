@@ -23,7 +23,9 @@ storage model to be changed without affecting this module and others above it.
 from __future__ import annotations
 
 import copy
+import datetime
 import logging
+import time
 
 from core import feconf
 from core import utils
@@ -967,3 +969,61 @@ def record_completed_node_in_story_context(
         progress_model.completed_node_ids.append(node_id)
         progress_model.update_timestamps()
         progress_model.put()
+
+
+def get_chapter_notifications_stories_list() -> List[
+    story_domain.StoryPublicationTimeliness]:
+    """Returns a list of stories with behind-schedule or upcoming chapters.
+
+    Returns:
+        list(StoryPublicationTimeliness). A list of stories with having
+        behind-schedule chapters or chapters upcoming within
+        UPCOMING_CHAPTERS_DAY_LIMIT.
+    """
+    topic_models = topic_fetchers.get_all_topics()
+    chapter_notifications_stories_list: List[
+        story_domain.StoryPublicationTimeliness] = []
+    all_canonical_story_ids = []
+    for topic_model in topic_models:
+        canonical_story_ids = [story_reference.story_id
+            for story_reference in topic_model.canonical_story_references]
+        all_canonical_story_ids += canonical_story_ids
+    all_canonical_stories = list(
+        filter(
+            None, story_fetchers.get_stories_by_ids(all_canonical_story_ids)))
+    for topic_model in topic_models:
+        topic_rights = topic_fetchers.get_topic_rights(topic_model.id)
+        if topic_rights.topic_is_published:
+            canonical_stories = [story for story in
+                all_canonical_stories if
+                story.corresponding_topic_id == topic_model.id]
+            for story in canonical_stories:
+                overdue_chapters = []
+                upcoming_chapters = []
+                for node in story.story_contents.nodes:
+                    if node.planned_publication_date is not None and (
+                        node.status != constants.STORY_NODE_STATUS_PUBLISHED):
+                        current_time = (
+                            utils.convert_millisecs_time_to_datetime_object(
+                            utils.get_current_time_in_millisecs() -
+                            1000.0 * time.timezone))
+                        chapter_is_upcoming = (
+                            current_time <
+                            node.planned_publication_date <
+                            (current_time + datetime.timedelta(
+                            days=constants.UPCOMING_CHAPTERS_DAY_LIMIT)))
+                        chapter_is_behind_schedule = (
+                            node.planned_publication_date < current_time)
+
+                        if chapter_is_upcoming:
+                            upcoming_chapters.append(node.title)
+                        if chapter_is_behind_schedule:
+                            overdue_chapters.append(node.title)
+
+                if len(upcoming_chapters) or len(overdue_chapters):
+                    story_timeliness = story_domain.StoryPublicationTimeliness(
+                        story.id, story.title, topic_model.name,
+                        overdue_chapters, upcoming_chapters)
+                    chapter_notifications_stories_list.append(story_timeliness)
+
+    return chapter_notifications_stories_list
