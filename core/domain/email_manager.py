@@ -276,7 +276,8 @@ CURRICULUM_ADMIN_CHAPTER_NOTIFICATION_EMAIL_DATA: Dict[str, str] = {
     ),
     'upcoming_chapters_template': (
         'The following stories have unpublished chapters which are due for '
-        'publication in the next ' + str(constants.UPCOMING_CHAPTERS_DAY_LIMIT)
+        'publication in the next ' +
+        str(constants.CHAPTER_PUBLICATION_NOTICE_PERIOD_IN_DAYS)
         + ' days. Please ensure they are published '
         'on or before the planned date or adjust the planned publication date.'
         '<br><br>'

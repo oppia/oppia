@@ -929,6 +929,48 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
             'Expected first publication date to be a datetime, received 1')
         self.story.story_contents.nodes[0].first_publication_date = None
 
+    def test_node_is_upcoming(self) -> None:
+        self.story.story_contents.nodes[0].status = (
+            constants.STORY_NODE_STATUS_DRAFT)
+        self.story.story_contents.nodes[0].planned_publication_date = (
+            datetime.datetime(2023, 1, 1))
+        self.story.story_contents.nodes[1].status = (
+            constants.STORY_NODE_STATUS_READY_TO_PUBLISH)
+        self.story.story_contents.nodes[1].planned_publication_date = (
+            datetime.datetime(2022, 12, 29))
+        def _mock_get_current_time_in_millisecs() -> int:
+            return 1672483686000
+
+        with self.swap(
+            utils, 'get_current_time_in_millisecs',
+            _mock_get_current_time_in_millisecs):
+            self.assertEqual(
+                self.story.story_contents.nodes[0].is_node_upcoming(), True)
+            self.assertEqual(
+                self.story.story_contents.nodes[1].is_node_upcoming(), False)
+
+    def test_node_is_behind_schedule(self) -> None:
+        self.story.story_contents.nodes[0].status = (
+            constants.STORY_NODE_STATUS_DRAFT)
+        self.story.story_contents.nodes[0].planned_publication_date = (
+            datetime.datetime(2023, 1, 1))
+        self.story.story_contents.nodes[1].status = (
+            constants.STORY_NODE_STATUS_READY_TO_PUBLISH)
+        self.story.story_contents.nodes[1].planned_publication_date = (
+            datetime.datetime(2022, 12, 29))
+        def _mock_get_current_time_in_millisecs() -> int:
+            return 1672483686000
+
+        with self.swap(
+            utils, 'get_current_time_in_millisecs',
+            _mock_get_current_time_in_millisecs):
+            self.assertEqual(
+                self.story.story_contents.nodes[0].is_node_behind_schedule(),
+                False)
+            self.assertEqual(
+                self.story.story_contents.nodes[1].is_node_behind_schedule(),
+                True)
+
     def test_valididate_non_string_unpublishing_reason(self) -> None:
         # TODO(#13059): Here we use MyPy ignore because after we fully type the
         # codebase we plan to get rid of the tests that intentionally test wrong

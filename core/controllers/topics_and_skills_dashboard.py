@@ -43,14 +43,6 @@ from core.domain import topic_services
 from typing import Dict, List, Optional, TypedDict, Union
 
 
-class FrontendTopicSummaryDict(topic_domain.TopicSummaryDict):
-    """Dictionary that represents TopicSummary domain object for frontend."""
-
-    is_published: bool
-    can_edit_topic: bool
-    classroom: Optional[str]
-
-
 class TopicsAndSkillsDashboardPage(
     base.BaseHandler[Dict[str, str], Dict[str, str]]
 ):
@@ -82,7 +74,7 @@ class TopicsAndSkillsDashboardPageDataHandler(
         # the type from the list of 'TopicSummaryDict' to the list of
         # 'FrontendTopicSummaryDict', and this is done because below we
         # are adding new keys that are not defined on the 'TopicSummaryDict'.
-        topic_summary_dicts: List[FrontendTopicSummaryDict] = [
+        topic_summary_dicts: List[topic_domain.FrontendTopicSummaryDict] = [
             summary.to_dict() for summary in topic_summaries]  # type: ignore[misc]
 
         skill_summaries = skill_services.get_all_skill_summaries()
@@ -117,6 +109,24 @@ class TopicsAndSkillsDashboardPageDataHandler(
         for topic_summary_dict in topic_summary_dicts:
             topic_summary_dict['classroom'] = topic_classroom_dict.get(
                 topic_summary_dict['id'], None)
+
+        chapter_counts_by_topic_id = (
+            topic_services.get_chapter_counts_in_topic_summaries(
+                topic_summary_dicts))
+
+        for topic_summary_dict in topic_summary_dicts:
+            topic_chapter_count = chapter_counts_by_topic_id[
+                topic_summary_dict['id']]
+            topic_summary_dict.update({
+                'total_upcoming_chapters_count': (
+                    topic_chapter_count.total_upcoming_chapters_count),
+                'total_overdue_chapters_count': (
+                    topic_chapter_count.total_overdue_chapters_count),
+                'total_chapter_counts_for_each_story': (
+                    topic_chapter_count.total_chapter_counts_for_each_story),
+                'published_chapter_counts_for_each_story': (
+                    topic_chapter_count.published_chapter_counts_for_each_story)
+            })
 
         mergeable_skill_summary_dicts = []
 

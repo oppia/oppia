@@ -6712,7 +6712,8 @@ class CurriculumAdminsChapterNotificationsReminderMailTests(
             'Dear Curriculum Admin, <br><br>'
             'The following stories have unpublished chapters which are due for'
             ' publication in the next ' +
-            str(constants.UPCOMING_CHAPTERS_DAY_LIMIT) + ' days. Please ensure'
+            str(constants.CHAPTER_PUBLICATION_NOTICE_PERIOD_IN_DAYS) + ' days.'
+            ' Please ensure'
             ' they are published on or before the planned date or adjust the '
             'planned publication date.'
             '<br><br>'
