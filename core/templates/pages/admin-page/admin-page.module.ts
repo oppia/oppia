@@ -45,6 +45,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ToastrModule } from 'ngx-toastr';
 import { MyHammerConfig, toastrConfig } from 'pages/oppia-root/app.module';
 import { SmartRouterModule } from 'hybrid-router-module-provider';
+import { CdkAccordionModule } from '@angular/cdk/accordion';
 
 @NgModule({
   imports: [
@@ -59,7 +60,8 @@ import { SmartRouterModule } from 'hybrid-router-module-provider';
     SharedComponentsModule,
     SharedFormsModule,
     AdminBlogAdminCommonModule,
-    ToastrModule.forRoot(toastrConfig)
+    ToastrModule.forRoot(toastrConfig),
+    CdkAccordionModule
   ],
   declarations: [
     OppiaAdminProdModeActivitiesTabComponent,

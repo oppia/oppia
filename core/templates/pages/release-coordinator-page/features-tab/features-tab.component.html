@@ -41,14 +41,18 @@
           No rule.
         </div>
         <!-- Rules -->
-        <div id="accordion" class="container">
-          <div class="card oppia-feature-bottom-margin" *ngFor="let rule of featureFlag.rules; index as ruleIndex">
+        <div class="container oppia-accordion">
+          <cdk-accordion-item *ngFor="let rule of featureFlag.rules; index as ruleIndex" #accordionItem="cdkAccordionItem"
+                              class="oppia-feature-bottom-margin oppia-accordion-item"
+                              role="button"
+                              tabindex="0"
+                              [attr.id]="'accordion-header-' + index"
+                              [attr.aria-expanded]="accordionItem.expanded"
+                              [attr.aria-controls]="'accordion-body-' + index">
             <div class="row">
               <div class="col-1"></div>
-  
               <div class="col-10">
-                <div class="row card-header" [attr.id]="'heading'+ruleIndex" data-toggle="collapse" 
-                     [attr.data-target]="'#collapse'+ruleIndex" aria-expanded="true" aria-controls="collapseOne">
+                <div class="row oppia-accordion-item-header" (click)="accordionItem.toggle()">
                   <div class="col-10" >
                     {{featureFlagNameToRulesReadonlyData.get(featureFlag.name)[ruleIndex]}}
                   </div>
@@ -59,8 +63,9 @@
                     </select>
                   </div>
                 </div>
-                <div [attr.id]="'collapse'+ruleIndex" class="collapse" aria-labelledby="'heading'+ruleIndex" data-parent="#accordion">
-                  <div class="card-body oppia-rule-container">
+                <div class="oppia-accordion-item-body" role="region" [style.display]="accordionItem.expanded ? '' : 'none'"
+                     [attr.id]="'accordion-body-' + index" [attr.aria-labelledby]="'accordion-header-' + index">
+                  <div class="oppia-rule-container">
                     <div class="row oppia-feature-top-margin">
                       <div class="col-12"><b>Filters:</b></div>
                     </div>
@@ -128,8 +133,8 @@
                                     </ng-container>
                                     <ng-container *ngIf="!filterTypeToContext[filter.type].options">
                                       <input [(ngModel)]="filter.conditions[conditionIndex][1]"
-                                             [placeholder]="filterTypeToContext[filter.type].placeholder"
-                                             class="oppia-condition-input">
+                                            [placeholder]="filterTypeToContext[filter.type].placeholder"
+                                            class="oppia-condition-input">
                                       <ng-container *ngIf="filterTypeToContext[filter.type].inputRegex">
                                         <span class="oppia-input-error"
                                               *ngIf="!filterTypeToContext[filter.type].inputRegex.test(filter.conditions[conditionIndex][1])">
@@ -174,7 +179,6 @@
                   </div>
                 </div>
               </div>
-  
               <div class="col-1 oppia-flex-center">
                 <div class="row">
                   <div class="col-6 oppia-rule-moving-buttons-container">
@@ -195,9 +199,8 @@
                 </div>
               </div>
             </div>
-          </div>
+          </cdk-accordion-item>
         </div>
-
       </div>
     </div>
     <div class="oppia-flex-center oppia-feature-bottom-margin">
@@ -253,6 +256,31 @@
 
 
 <style>
+  .oppia-accordion {
+    display: block;
+  }
+
+  .oppia-accordion-item {
+    display: block;
+    border: solid 1px #ccc;
+  }
+
+  .oppia-accordion-item-header {
+    display: flex;
+    align-content: center;
+    justify-content: space-between;
+  }
+
+  .oppia-accordion-item-header,
+  .oppia-accordion-item-body {
+    padding: 16px;
+  }
+
+  .oppia-accordion-item-header:hover {
+    cursor: pointer;
+    background-color: #eee;
+  }
+
   .save-default-values-button {
     align-items: center;
     display: flex;
@@ -385,6 +413,7 @@
     border: 1px solid #a8a8a8;
     padding-bottom: 10px;
     padding-top: 10px;
+    padding-left: 10px;
   }
 
   .oppia-admin-features.oppia-empty-indicator {

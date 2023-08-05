@@ -175,6 +175,7 @@ export class AdminPlatformParametersTabComponent implements OnInit {
 
   addNewRuleToBottom(param: PlatformParameter): void {
     param.rules.push(cloneDeep(this.getdefaultNewRule(param)));
+    this.updateFilterValuesForDisplay(param);
   }
 
   addNewFilter(rule: PlatformParameterRule): void {
