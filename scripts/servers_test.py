@@ -31,6 +31,7 @@ import threading
 import time
 from urllib import request as urlrequest
 
+from core import utils
 from core.tests import test_utils
 from scripts import common
 from scripts import scripts_test_utils
@@ -1098,3 +1099,42 @@ class ManagedProcessTests(test_utils.TestBase):
                 servers.managed_acceptance_tests_server(
                     suite_name=suite_name,
                     stdout=subprocess.PIPE))
+
+
+class GetChromedriverVersionTests(test_utils.TestBase):
+
+    def test_chrome_before_115_queries_api(self) -> None:
+        def mock_check_output(_: List[str]) -> bytes:
+            return b'Google Chrome 72.0.3626.123\n'
+        def mock_url_open(_: str) -> io.BytesIO:
+            return io.BytesIO(b'72.0.3626.69')
+        expected_url = (
+            'https://chromedriver.storage.googleapis.com/'
+            'LATEST_RELEASE_72.0.3626')
+
+        check_output_swap = self.swap(
+            subprocess, 'check_output', mock_check_output)
+        url_open_swap = self.swap_with_checks(
+            utils, 'url_open', mock_url_open, expected_args=[(expected_url,)])
+
+        with check_output_swap, url_open_swap:
+            self.assertEqual(
+                servers.get_chromedriver_version(),
+                '72.0.3626.69',
+            )
+
+    def test_chrome_115_and_later_returns_chrome_version(self) -> None:
+        def mock_check_output(_: List[str]) -> bytes:
+            return b'Google Chrome 115.0.3626.123\n'
+        def mock_url_open(_: str) -> None:
+            raise AssertionError('url_open should not be called.')
+
+        check_output_swap = self.swap(
+            subprocess, 'check_output', mock_check_output)
+        url_open_swap = self.swap(utils, 'url_open', mock_url_open)
+
+        with check_output_swap, url_open_swap:
+            self.assertEqual(
+                servers.get_chromedriver_version(),
+                '115.0.3626.123',
+            )

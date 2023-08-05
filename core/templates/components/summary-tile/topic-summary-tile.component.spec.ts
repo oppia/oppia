@@ -69,7 +69,11 @@ describe('TopicSummaryTileCompoennt', () => {
       language_code: 'en',
       url_fragment: 'alpha',
       thumbnail_filename: 'image.svg',
-      thumbnail_bg_color: '#C6DCDA'
+      thumbnail_bg_color: '#C6DCDA',
+      total_upcoming_chapters_count: 1,
+      total_overdue_chapters_count: 1,
+      total_chapter_counts_for_each_story: [5, 4],
+      published_chapter_counts_for_each_story: [3, 4]
     });
   });
 
