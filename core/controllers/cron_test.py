@@ -26,6 +26,8 @@ from core.domain import email_manager
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import question_domain
+from core.domain import story_domain
+from core.domain import story_services
 from core.domain import suggestion_registry
 from core.domain import suggestion_services
 from core.domain import taskqueue_services
@@ -793,3 +795,99 @@ class CronMailAdminContributorDashboardBottlenecksHandlerTests(
         with swap_with_checks, self.testapp_swap:
             self.get_html_response(
                 '/cron/suggestions/translation_contribution_stats')
+
+
+class CronMailChapterPublicationsNotificationsHandlerTests(
+    test_utils.GenericTestBase):
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
+
+        self.story_publication_timeliness_1 = (
+            story_domain.StoryPublicationTimeliness(
+            'story_1', 'Story', 'Topic', ['Chapter 1'], ['Chapter 2']))
+        self.story_publication_timeliness_2 = (
+            story_domain.StoryPublicationTimeliness(
+            'story_2', 'Story 2', 'Topic', ['Chapter 3'], ['Chapter 4']))
+
+        self.can_send_emails = self.swap(feconf, 'CAN_SEND_EMAILS', True)
+        self.cannot_send_emails = self.swap(feconf, 'CAN_SEND_EMAILS', False)
+        self.testapp_swap = self.swap(
+            self, 'testapp', webtest.TestApp(main.app_without_context))
+
+        self.curriculum_admin_ids: List[str] = []
+        self.chapter_notifications_list: List[
+            story_domain.StoryPublicationTimeliness] = []
+
+    def _mock_send_reminder_mail_to_notify_curriculum_admins(
+        self,
+        curriculum_admin_ids: List[str],
+        chapter_notifications_list: List[
+            story_domain.StoryPublicationTimeliness]) -> None:
+        """Mocks
+        email_manager.send_reminder_mail_to_notify_curriculum_admins as
+        it's not possible to send mail with self.testapp_swap, i.e with the URLs
+        defined in main.
+        """
+        self.curriculum_admin_ids = curriculum_admin_ids
+        self.chapter_notifications_list = chapter_notifications_list
+
+    def _mock_get_chapter_notifications_stories_list(self) -> List[
+        story_domain.StoryPublicationTimeliness]:
+        """Mocks
+        story_services.get_chapter_notifications_stories_list.
+        """
+
+        chapter_notifications_stories_list: List[
+            story_domain.StoryPublicationTimeliness] = [
+                self.story_publication_timeliness_1,
+                self.story_publication_timeliness_2]
+        return chapter_notifications_stories_list
+
+    def test_email_not_sent_if_sending_emails_is_not_enabled(self) -> None:
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+
+        with self.cannot_send_emails, self.testapp_swap:
+            with self.swap(
+                email_manager,
+                'send_reminder_mail_to_notify_curriculum_admins',
+                self._mock_send_reminder_mail_to_notify_curriculum_admins):
+                self.get_json(
+                    '/cron/mail/curriculum_admins/'
+                    'chapter_publication_notfications')
+
+        self.assertEqual(len(self.curriculum_admin_ids), 0)
+        self.assertEqual(len(self.chapter_notifications_list), 0)
+
+        self.logout()
+
+    def test_email_sent_if_sending_emails_is_enabled(self) -> None:
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+
+        with self.can_send_emails, self.testapp_swap:
+            with self.swap(
+                email_manager,
+                'send_reminder_mail_to_notify_curriculum_admins',
+                self._mock_send_reminder_mail_to_notify_curriculum_admins):
+                with self.swap(
+                    story_services, 'get_chapter_notifications_stories_list',
+                    self._mock_get_chapter_notifications_stories_list):
+                    self.get_json(
+                        '/cron/mail/curriculum_admins/'
+                        'chapter_publication_notfications')
+
+        self.assertEqual(len(self.curriculum_admin_ids), 1)
+        self.assertEqual(self.curriculum_admin_ids[0], self.admin_id)
+
+        self.assertEqual(len(self.chapter_notifications_list), 2)
+        self.assertEqual(
+            self.chapter_notifications_list[0],
+            self.story_publication_timeliness_1)
+        self.assertEqual(
+            self.chapter_notifications_list[1],
+            self.story_publication_timeliness_2)
+
+        self.logout()
