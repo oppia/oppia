@@ -2951,12 +2951,12 @@ class NoBlankLineAfterFunctionDefChecker(checkers.BaseChecker):
             ):
                 return
             if (
-                len(node.doc.split("\n")) + node.lineno
+                len(node.doc.split('\n')) + node.lineno
                 < node.tolineno
             ):
                 if node.args:
                     line = linecache.getline(node.root().file, node.lineno)
-                    if line.endswith(":\n"):
+                    if line.endswith(':\n'):
                         line_number = (
                             len(node.doc.split("\n"))
                             + node.lineno
@@ -2970,12 +2970,12 @@ class NoBlankLineAfterFunctionDefChecker(checkers.BaseChecker):
                             )
                     else:
                         line_number = node.lineno
-                        while not line.endswith(":\n"):
+                        while not line.endswith(':\n'):
                             line_number = line_number + 1
                             line = linecache.getline(node.root().file,
                             line_number)
                         line_number = (
-                            len(node.doc.split("\n")) + line_number
+                            len(node.doc.split('\n')) + line_number
                         )
                         line = linecache.getline(node.root().file, line_number)
                         if not line.strip():
