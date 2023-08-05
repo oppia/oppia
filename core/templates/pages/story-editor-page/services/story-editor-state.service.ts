@@ -233,7 +233,7 @@ export class StoryEditorStateService {
         this._updateStory(storyBackendObject);
         this.undoRedoService.clearChanges();
         this._storyIsBeingSaved = false;
-        this._chapterStatusIsBeingChanged = false;
+        this.setChapterStatusIsChanging(false);
         if (successCallback) {
           successCallback();
         }
@@ -241,7 +241,7 @@ export class StoryEditorStateService {
         let errorMessage = error || 'There was an error when saving the story.';
         this.alertsService.addWarning(errorMessage);
         this._storyIsBeingSaved = false;
-        this._chapterStatusIsBeingChanged = false;
+        this.setChapterStatusIsChanging(false);
         if (errorCallback) {
           errorCallback(errorMessage);
         }
@@ -251,7 +251,6 @@ export class StoryEditorStateService {
 
   saveChapter(
       successCallback: () => void, errorCallback: () => void): void {
-    this._chapterStatusIsBeingChanged = true;
     this.saveStory(
       'Changed Chapter Status', successCallback, errorCallback);
   }
@@ -298,6 +297,10 @@ export class StoryEditorStateService {
 
   isChangingChapterStatus(): boolean {
     return this._chapterStatusIsBeingChanged;
+  }
+
+  setChapterStatusIsChanging(chapterStatusIsChanging: boolean): void {
+    this._chapterStatusIsBeingChanged = chapterStatusIsChanging;
   }
 
   setCurrentNodeAsPublishable(currentNodeIsPublishable: boolean): void {

@@ -575,7 +575,6 @@ describe('Story editor navbar component', () => {
 
       expect(modalSpy).toHaveBeenCalled();
       expect(saveChangesSpy).toHaveBeenCalled();
-      expect(component.chapterIsPublishedOrUnpublished).toBeFalse();
     }));
 
     it('should show error message if the story was not saved' +
@@ -628,7 +627,6 @@ describe('Story editor navbar component', () => {
     it('should not save story on clicking cancel button', fakeAsync(() => {
       story = Story.createFromBackendDict(storyBackendDict);
       let mockStoryInitializedEventEmitter = new EventEmitter();
-      let discardChangesSpy = spyOn(component, 'discardChanges');
 
       spyOn(storyEditorStateService, 'getStory').and.returnValue(story);
       spyOnProperty(storyEditorStateService, 'onStoryInitialized')
@@ -649,7 +647,6 @@ describe('Story editor navbar component', () => {
             result: Promise.reject()
           } as NgbModalRef);
       });
-      component.chapterIsPublishedOrUnpublished = true;
 
       component.ngOnInit();
       mockStoryInitializedEventEmitter.emit();
@@ -665,8 +662,6 @@ describe('Story editor navbar component', () => {
 
       expect(modalSpy).toHaveBeenCalled();
       expect(saveChangesSpy).not.toHaveBeenCalled();
-      expect(discardChangesSpy).toHaveBeenCalled();
-      expect(component.chapterIsPublishedOrUnpublished).toBeFalse();
     }));
   });
 
@@ -679,9 +674,12 @@ describe('Story editor navbar component', () => {
     let saveChapterSpy = spyOn(
       storyEditorStateService, 'saveChapter').and.callThrough();
     let storyNodeStatusSpy = spyOn(storyUpdateService, 'setStoryNodeStatus');
+    let chapterStatusChangingSpy = spyOn(
+      storyEditorStateService, 'setChapterStatusIsChanging');
     const saveChangesSpy = spyOn(
       storyEditorStateService, 'saveStory')
       .and.callFake((commitMessage, successCallback, errorCallback) => {
+        storyEditorStateService.setChapterStatusIsChanging(false);
         errorCallback(commitMessage);
         return true;
       });
@@ -689,6 +687,7 @@ describe('Story editor navbar component', () => {
     component.changeChapterStatus('Draft');
     expect(saveChapterSpy).toHaveBeenCalled();
     expect(saveChangesSpy).toHaveBeenCalled();
+    expect(chapterStatusChangingSpy).toHaveBeenCalledTimes(2);
     expect(storyNodeStatusSpy).toHaveBeenCalledTimes(2);
   });
 
@@ -719,55 +718,89 @@ describe('Story editor navbar component', () => {
   }));
 
   it('should publish chapters', () => {
-    component.story = Story.createFromBackendDict(storyBackendDict);
+    story = Story.createFromBackendDict(storyBackendDict);
+    spyOn(storyEditorStateService, 'getStory').and.returnValue(story);
+    component.story = story;
     spyOn(
       storyEditorStateService,
       'getSelectedChapterIndexInPublishUptoDropdown').and.returnValue(1);
     let storyNodeFirstPublicationDateSpy = spyOn(
       storyUpdateService, 'setStoryNodeFirstPublicationDateMsecs');
+    let chapterStatusChangingSpy = spyOn(
+      storyEditorStateService, 'setChapterStatusIsChanging');
     let storyNodeStatusSpy = spyOn(storyUpdateService, 'setStoryNodeStatus');
     let storyNodeUnpublishingReasonSpy = spyOn(
       storyUpdateService, 'setStoryNodeUnpublishingReason');
     let publishStorySpy = spyOn(component, 'publishStory');
-    let saveChangesSpy = spyOn(component, 'saveChanges');
+    let loadStorySpy = spyOn(
+      storyEditorStateService, 'loadStory').and.returnValue();
+    let alertServiceSpy = spyOn(
+      alertsService, 'addInfoMessage').and.callThrough();
+    let check: number = 0;
+    let saveStorySpy = spyOn(storyEditorStateService, 'saveStory')
+      .and.callFake((commitMessage, successCallback, errorCallback) => {
+        if (check) {
+          successCallback();
+        } else {
+          errorCallback('Error');
+        }
+        storyEditorStateService.setChapterStatusIsChanging(false);
+        return true;
+      });
 
     component.changeChapterStatus('Published');
     expect(storyNodeStatusSpy).toHaveBeenCalledTimes(1);
     expect(storyNodeUnpublishingReasonSpy).toHaveBeenCalledTimes(1);
-    expect(saveChangesSpy).toHaveBeenCalled();
+    expect(chapterStatusChangingSpy).toHaveBeenCalledTimes(2);
+    expect(alertServiceSpy).toHaveBeenCalled();
+    expect(saveStorySpy).toHaveBeenCalled();
 
 
     component.story.getStoryContents().getNodes()[0].
       setStatus('Ready To Publish');
     component.story.getStoryContents().getNodes()[0].
       setFirstPublicationDateMsecs(null);
+    check = 1;
 
     component.changeChapterStatus('Published');
     expect(storyNodeStatusSpy).toHaveBeenCalledTimes(3);
     expect(storyNodeUnpublishingReasonSpy).toHaveBeenCalledTimes(3);
     expect(storyNodeFirstPublicationDateSpy).toHaveBeenCalledTimes(1);
-    expect(saveChangesSpy).toHaveBeenCalled();
+    expect(chapterStatusChangingSpy).toHaveBeenCalledTimes(4);
+    expect(saveStorySpy).toHaveBeenCalled();
     expect(publishStorySpy).toHaveBeenCalled();
+    expect(loadStorySpy).toHaveBeenCalled();
   });
 
   it('should unpublish chapters', fakeAsync(() => {
-    component.story = Story.createFromBackendDict(storyBackendDict);
+    story = Story.createFromBackendDict(storyBackendDict);
+    spyOn(storyEditorStateService, 'getStory').and.returnValue(story);
+    component.story = story;
     spyOn(
       storyEditorStateService,
       'getSelectedChapterIndexInPublishUptoDropdown').and.returnValue(0);
     let storyNodePlannedPublicationDateSpy = spyOn(
       storyUpdateService, 'setStoryNodePlannedPublicationDateMsecs');
+    let chapterStatusChangingSpy = spyOn(
+      storyEditorStateService, 'setChapterStatusIsChanging');
     let storyNodeStatusSpy = spyOn(storyUpdateService, 'setStoryNodeStatus');
     let storyNodeUnpublishingReasonSpy = spyOn(
       storyUpdateService, 'setStoryNodeUnpublishingReason');
-    const saveChangesSpy = spyOn(
+    let unpublishStorySpy = spyOn(component, 'unpublishStory');
+    let loadStorySpy = spyOn(
+      storyEditorStateService, 'loadStory').and.returnValue();
+    let alertServiceSpy = spyOn(
+      alertsService, 'addInfoMessage').and.callThrough();
+    let check: number = 0;
+    const saveStorySpy = spyOn(
       storyEditorStateService, 'saveStory')
       .and.callFake((commitMessage, successCallback, errorCallback) => {
-        if (commitMessage !== null) {
+        if (check) {
           successCallback();
         } else {
-          errorCallback('Expected a commit message but received none.');
+          errorCallback('Error');
         }
+        storyEditorStateService.setChapterStatusIsChanging(false);
         return true;
       });
     const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
@@ -786,11 +819,14 @@ describe('Story editor navbar component', () => {
     expect(storyNodeStatusSpy).toHaveBeenCalledTimes(1);
     expect(storyNodeUnpublishingReasonSpy).toHaveBeenCalledTimes(1);
     expect(storyNodePlannedPublicationDateSpy).toHaveBeenCalledTimes(1);
-    expect(saveChangesSpy).toHaveBeenCalled();
+    expect(chapterStatusChangingSpy).toHaveBeenCalledTimes(2);
+    expect(saveStorySpy).toHaveBeenCalled();
+    expect(alertServiceSpy).toHaveBeenCalled();
 
     component.story.getStoryContents().getNodes()[1].setStatus('Published');
     component.story.getStoryContents().getNodes()[1].
       setPlannedPublicationDateMsecs(null);
+    check = 1;
 
     component.changeChapterStatus('Published');
     tick();
@@ -799,7 +835,25 @@ describe('Story editor navbar component', () => {
     expect(storyNodeStatusSpy).toHaveBeenCalledTimes(2);
     expect(storyNodeUnpublishingReasonSpy).toHaveBeenCalledTimes(2);
     expect(storyNodePlannedPublicationDateSpy).toHaveBeenCalledTimes(1);
-    expect(saveChangesSpy).toHaveBeenCalled();
+    expect(chapterStatusChangingSpy).toHaveBeenCalledTimes(4);
+    expect(saveStorySpy).toHaveBeenCalled();
+    expect(loadStorySpy).toHaveBeenCalled();
+
+    storyEditorStateService.getSelectedChapterIndexInPublishUptoDropdown = (
+      jasmine.createSpy().and.returnValue(-1)
+    );
+    component.story.getStoryContents().getNodes()[1].setStatus('Published');
+
+    component.changeChapterStatus('Published');
+    tick();
+
+    expect(modalSpy).toHaveBeenCalled();
+    expect(storyNodeStatusSpy).toHaveBeenCalledTimes(4);
+    expect(storyNodeUnpublishingReasonSpy).toHaveBeenCalledTimes(4);
+    expect(unpublishStorySpy).toHaveBeenCalled();
+    expect(storyNodePlannedPublicationDateSpy).toHaveBeenCalledTimes(2);
+    expect(chapterStatusChangingSpy).toHaveBeenCalledTimes(6);
+    expect(saveStorySpy).toHaveBeenCalled();
   }));
 
   it('should return change list length', () => {

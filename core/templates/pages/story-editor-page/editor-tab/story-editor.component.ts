@@ -395,6 +395,18 @@ export class StoryEditorComponent implements OnInit, OnDestroy {
     this.storyEditorStateService.setSelectedChapterIndexInPublishUptoDropdown(
       chapterIndex
     );
+    if (Number(chapterIndex) === -1) {
+      if (this.linearNodesList.length &&
+      this.linearNodesList[0].getStatus() === 'Published') {
+        this.storyEditorStateService.setChaptersAreBeingPublished(false);
+        this.storyEditorStateService.setNewChapterPublicationIsDisabled(false);
+      } else {
+        this.storyEditorStateService.setChaptersAreBeingPublished(true);
+        this.storyEditorStateService.setNewChapterPublicationIsDisabled(true);
+      }
+      return;
+    }
+
     let nextChapterIndex = Number(chapterIndex) + 1;
 
     if (this.linearNodesList[chapterIndex].getStatus() === 'Published' &&
@@ -440,7 +452,7 @@ export class StoryEditorComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.storyPreviewCardIsShown = false;
     this.mainStoryCardIsShown = true;
-    this.selectedChapterIndexInPublishUptoDropdown = 0;
+    this.selectedChapterIndexInPublishUptoDropdown = -1;
     this.chaptersListIsShown = (
       !this.windowDimensionsService.isWindowNarrow());
     this.directiveSubscriptions.add(

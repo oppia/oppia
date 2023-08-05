@@ -324,7 +324,6 @@ describe('Story editor state service', () => {
     let saveStorySpy = spyOn(storyEditorStateService, 'saveStory');
 
     storyEditorStateService.saveChapter(successCallback, errorCallback);
-    expect(storyEditorStateService.isChangingChapterStatus()).toBeTrue();
     expect(saveStorySpy).toHaveBeenCalledWith(
       'Changed Chapter Status', successCallback, errorCallback);
   }));

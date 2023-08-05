@@ -690,5 +690,16 @@ describe('Story Editor Component having three story nodes', () => {
 
     component.updatePublishUptoChapterSelection(1);
     expect(chaptersAreBeingPublishedSpy).toHaveBeenCalledWith(false);
+
+    component.updatePublishUptoChapterSelection(-1);
+    expect(selectChapterSpy).toHaveBeenCalled();
+    expect(chaptersAreBeingPublishedSpy).toHaveBeenCalledWith(false);
+    expect(newChapterPublicationIsDisabledSpy).toHaveBeenCalledWith(false);
+
+    component.linearNodesList = [];
+    component.updatePublishUptoChapterSelection(-1);
+    expect(selectChapterSpy).toHaveBeenCalled();
+    expect(chaptersAreBeingPublishedSpy).toHaveBeenCalledWith(true);
+    expect(newChapterPublicationIsDisabledSpy).toHaveBeenCalledWith(true);
   });
 });

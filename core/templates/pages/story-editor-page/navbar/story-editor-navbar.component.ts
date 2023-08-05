@@ -54,7 +54,6 @@ export class StoryEditorNavbarComponent implements OnInit {
   showNavigationOptions: boolean = false;
   showStoryEditOptions: boolean = false;
   currentTab!: string;
-  chapterIsPublishedOrUnpublished: boolean = false;
 
   constructor(
     private storyEditorStateService: StoryEditorStateService,
@@ -223,12 +222,10 @@ export class StoryEditorNavbarComponent implements OnInit {
           this.alertsService.addInfoMessage(errorMessage, 5000);
         }
       );
-      this.chapterIsPublishedOrUnpublished = false;
     }, () => {
-      if (this.chapterIsPublishedOrUnpublished) {
-        this.discardChanges();
-      }
-      this.chapterIsPublishedOrUnpublished = false;
+      // Note to developers:
+      // This callback is triggered when the Cancel button is clicked.
+      // No further action is needed.
     });
   }
 
@@ -279,6 +276,7 @@ export class StoryEditorNavbarComponent implements OnInit {
   }
 
   changeChapterStatus(newStatus: string): void {
+    this.storyEditorStateService.setChapterStatusIsChanging(true);
     if (newStatus === 'Published') {
       let selectedChapterIndexInPublishUptoDropdown = this.
         storyEditorStateService.getSelectedChapterIndexInPublishUptoDropdown();
@@ -290,17 +288,16 @@ export class StoryEditorNavbarComponent implements OnInit {
         }
       }
 
-      this.chapterIsPublishedOrUnpublished = true;
       if (selectedChapterIndexInPublishUptoDropdown <
           lastPublishedChapterIndex) {
-        const  modalRef = this.ngbModal.open(
+        const modalRef = this.ngbModal.open(
           StoryEditorUnpublishModalComponent,
           { backdrop: 'static' }
         );
         let unpublishedChapters = [];
         for (let i = Number(selectedChapterIndexInPublishUptoDropdown) + 1;
           i <= lastPublishedChapterIndex; i++) {
-            unpublishedChapters.push(Number(i)+1);
+          unpublishedChapters.push(Number(i) + 1);
         }
         modalRef.componentInstance.unpublishedChapters = unpublishedChapters;
         modalRef.result.then((unpublishingReason) => {
@@ -315,7 +312,17 @@ export class StoryEditorNavbarComponent implements OnInit {
                 this.story, nodes[i].getId(), null);
             }
           }
-          this.saveChanges();
+          if (selectedChapterIndexInPublishUptoDropdown === -1) {
+            this.unpublishStory();
+          }
+          this.storyEditorStateService.saveStory(
+            'Published chapters', () => {
+              this.storyEditorStateService.loadStory(this.story.getId());
+              this._validateStory();
+            }, (errorMessage: string) => {
+              this.alertsService.addInfoMessage(errorMessage, 5000);
+            }
+          );
         }, () => {
           // Note to developers:
           // This callback is triggered when the Cancel button is clicked.
@@ -334,10 +341,17 @@ export class StoryEditorNavbarComponent implements OnInit {
               this.story, nodes[i].getId(), currentDate.getTime());
           }
         }
-        this.saveChanges();
         if (lastPublishedChapterIndex === -1) {
           this.publishStory();
         }
+        this.storyEditorStateService.saveStory(
+          'Unpublished chapters', () => {
+            this.storyEditorStateService.loadStory(this.story.getId());
+            this._validateStory();
+          }, (errorMessage: string) => {
+            this.alertsService.addInfoMessage(errorMessage, 5000);
+          }
+        );
       }
       return;
     }

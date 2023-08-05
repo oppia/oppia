@@ -29,7 +29,9 @@ export class StoryEditorUnpublishModalComponent {
      private platformFeatureService: PlatformFeatureService,
      private activeModal: NgbActiveModal
   ) {}
+
   unpublishedChapters: number[] = [];
+
   badContentReasonText: string = 'Bad content (no new explorations ' +
     'will be added)';
 
