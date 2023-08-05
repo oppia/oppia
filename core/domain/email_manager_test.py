@@ -29,6 +29,7 @@ from core.domain import exp_domain
 from core.domain import html_cleaner
 from core.domain import question_domain
 from core.domain import rights_domain
+from core.domain import story_domain
 from core.domain import subscription_services
 from core.domain import suggestion_registry
 from core.domain import suggestion_services
@@ -6594,3 +6595,164 @@ class MailchimpSecretTest(test_utils.GenericTestBase):
                 email_manager.verify_mailchimp_secret('secret'))
             self.assertFalse(
                 email_manager.verify_mailchimp_secret('not-secret'))
+
+
+class CurriculumAdminsChapterNotificationsReminderMailTests(
+    test_utils.EmailTestBase):
+    CURRICULUM_ADMIN_1_USERNAME: Final = 'user1'
+    CURRICULUM_ADMIN_1_EMAIL: Final = 'user1@community.org'
+    CURRICULUM_ADMIN_2_USERNAME: Final = 'user2'
+    CURRICULUM_ADMIN_2_EMAIL: Final = 'user2@community.org'
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.signup(
+            self.CURRICULUM_ADMIN_1_EMAIL, self.CURRICULUM_ADMIN_1_USERNAME)
+        self.admin_1_id = self.get_user_id_from_email(
+            self.CURRICULUM_ADMIN_1_EMAIL)
+        self.signup(
+            self.CURRICULUM_ADMIN_2_EMAIL, self.CURRICULUM_ADMIN_2_USERNAME)
+        self.admin_2_id = self.get_user_id_from_email(
+            self.CURRICULUM_ADMIN_2_EMAIL)
+        self.can_send_emails_ctx = self.swap(feconf, 'CAN_SEND_EMAILS', True)
+        self.can_not_send_emails_ctx = self.swap(
+            feconf, 'CAN_SEND_EMAILS', False)
+        self.log_new_error_counter = test_utils.CallCounter(
+            logging.error)
+
+    def test_that_email_not_sent_if_can_send_emails_is_false(self) -> None:
+        with self.can_not_send_emails_ctx:
+            email_manager.send_reminder_mail_to_notify_curriculum_admins(
+                [self.CURRICULUM_ADMIN_1_EMAIL, self.CURRICULUM_ADMIN_2_EMAIL],
+                [])
+
+            messages = self._get_sent_email_messages(
+                self.CURRICULUM_ADMIN_1_EMAIL)
+            self.assertEqual(len(messages), 0)
+            messages = self._get_sent_email_messages(
+                self.CURRICULUM_ADMIN_2_EMAIL)
+            self.assertEqual(len(messages), 0)
+
+    def test_email_not_sent_if_no_admins_to_notify(self) -> None:
+        with self.capture_logging(min_level=logging.ERROR) as logs:
+            with self.can_send_emails_ctx:
+                email_manager.send_reminder_mail_to_notify_curriculum_admins(
+                    [], [])
+
+                messages = self._get_all_sent_email_messages()
+                self.assertEqual(len(messages), 0)
+                self.assertEqual(
+                    logs[0], 'There were no curriculum admins to notify.')
+
+    def test_email_not_sent_if_no_overdue_or_upcoming_chapters(self) -> None:
+        story_publication_timeliness = story_domain.StoryPublicationTimeliness(
+            'story_1', 'Story', 'Topic', [], [])
+        with self.can_send_emails_ctx:
+            email_manager.send_reminder_mail_to_notify_curriculum_admins(
+                [self.admin_1_id], [story_publication_timeliness])
+
+            messages = self._get_all_sent_email_messages()
+            self.assertEqual(len(messages), 0)
+
+    def test_email_sent_if_chapters_are_overdue(self) -> None:
+        story_publication_timeliness = story_domain.StoryPublicationTimeliness(
+            'story_1', 'Story', 'Topic', ['Chapter 1', 'Chapter 2'], []
+        )
+        expected_email_html_body = (
+            'Dear Curriculum Admin, <br><br>'
+            'The following stories have unpublished chapters which are behind '
+            'schedule. Please publish them or adjust the planned publication '
+            'date.<br><br>'
+            '<ol>'
+            '<li>Story (Topic) - <a href="%s">Link</a><ul>'
+            '<li>Chapter 1</li>'
+            '<li>Chapter 2</li>'
+            '</ul></li>'
+            '</ol>'
+            'Regards,<br> Oppia Foundation'
+        ) % (
+            str(feconf.OPPIA_SITE_URL) + str(feconf.STORY_EDITOR_URL_PREFIX) +
+            '/story_1')
+        expected_email_subject = 'Chapter Publication Notifications'
+
+        with self.can_send_emails_ctx:
+            email_manager.send_reminder_mail_to_notify_curriculum_admins(
+                [self.admin_1_id], [story_publication_timeliness]
+            )
+
+            # Make sure correct email is sent.
+            messages = self._get_sent_email_messages(
+                self.CURRICULUM_ADMIN_1_EMAIL)
+            self.assertEqual(len(messages), 1)
+            self.assertEqual(messages[0].html, expected_email_html_body)
+
+            # Make sure correct email model is stored.
+            all_models: Sequence[
+                email_models.BulkEmailModel
+            ] = email_models.BulkEmailModel.get_all().fetch()
+            sent_email_model = all_models[0]
+            self.assertEqual(
+                sent_email_model.subject, expected_email_subject)
+            self.assertEqual(
+                sent_email_model.sender_id, feconf.SYSTEM_COMMITTER_ID)
+            self.assertEqual(
+                sent_email_model.sender_email,
+                '. <%s>' % feconf.NOREPLY_EMAIL_ADDRESS)
+            self.assertEqual(
+                sent_email_model.intent,
+                feconf.EMAIL_INTENT_NOTIFY_CURRICULUM_ADMINS_CHAPTERS)
+            self.assertEqual(
+                sent_email_model.html_body, expected_email_html_body)
+
+    def test_email_sent_if_chapters_are_upcoming(self) -> None:
+        story_publication_timeliness = story_domain.StoryPublicationTimeliness(
+            'story_1', 'Story', 'Topic', [], ['Chapter 1', 'Chapter 2']
+        )
+        expected_email_html_body = (
+            'Dear Curriculum Admin, <br><br>'
+            'The following stories have unpublished chapters which are due for'
+            ' publication in the next ' +
+            str(constants.UPCOMING_CHAPTERS_DAY_LIMIT) + ' days. Please ensure'
+            ' they are published on or before the planned date or adjust the '
+            'planned publication date.'
+            '<br><br>'
+            '<ol>'
+            '<li>Story (Topic) - <a href="%s">Link</a><ul>'
+            '<li>Chapter 1</li>'
+            '<li>Chapter 2</li>'
+            '</ul></li>'
+            '</ol>'
+            'Regards,<br> Oppia Foundation'
+        ) % (
+            str(feconf.OPPIA_SITE_URL) + str(feconf.STORY_EDITOR_URL_PREFIX) +
+            '/story_1')
+        expected_email_subject = 'Chapter Publication Notifications'
+
+        with self.can_send_emails_ctx:
+            email_manager.send_reminder_mail_to_notify_curriculum_admins(
+                [self.admin_1_id], [story_publication_timeliness]
+            )
+
+            # Make sure correct email is sent.
+            messages = self._get_sent_email_messages(
+                self.CURRICULUM_ADMIN_1_EMAIL)
+            self.assertEqual(len(messages), 1)
+            self.assertEqual(messages[0].html, expected_email_html_body)
+
+            # Make sure correct email model is stored.
+            all_models: Sequence[
+                email_models.BulkEmailModel
+            ] = email_models.BulkEmailModel.get_all().fetch()
+            sent_email_model = all_models[0]
+            self.assertEqual(
+                sent_email_model.subject, expected_email_subject)
+            self.assertEqual(
+                sent_email_model.sender_id, feconf.SYSTEM_COMMITTER_ID)
+            self.assertEqual(
+                sent_email_model.sender_email,
+                '. <%s>' % feconf.NOREPLY_EMAIL_ADDRESS)
+            self.assertEqual(
+                sent_email_model.intent,
+                feconf.EMAIL_INTENT_NOTIFY_CURRICULUM_ADMINS_CHAPTERS)
+            self.assertEqual(
+                sent_email_model.html_body, expected_email_html_body)
