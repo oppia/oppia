@@ -87,7 +87,7 @@ describe('Preferred Languages Component', () => {
     expect(componentInstance.validInput('en')).toBeTrue();
   });
 
-  it('should filtered choices when input box is clicked', () => {
+  it('should show filtered choices when input box is clicked', () => {
     const mockChoices = [
       { id: 'en', text: 'English ' },
       { id: 'fr', text: 'French ' }
