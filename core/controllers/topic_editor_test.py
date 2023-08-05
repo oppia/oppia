@@ -159,7 +159,7 @@ class TopicEditorStoryHandlerTests(BaseTopicEditorControllerTests):
             'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
                 'chapter'][0],
             'thumbnail_size_in_bytes': 21131,
-            'status': constants.STORYNODE_STATUS_PUBLISHED,
+            'status': constants.STORY_NODE_STATUS_PUBLISHED,
             'planned_publication_date_msecs': 1672770600000,
             'first_publication_date_msecs': 1672684200000,
             'last_modified_msecs': 1672684200000,
@@ -179,7 +179,7 @@ class TopicEditorStoryHandlerTests(BaseTopicEditorControllerTests):
             'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
                 'chapter'][0],
             'thumbnail_size_in_bytes': 21131,
-            'status': constants.STORYNODE_STATUS_DRAFT,
+            'status': constants.STORY_NODE_STATUS_DRAFT,
             'planned_publication_date_msecs': 1672770600000,
             'first_publication_date_msecs': None,
             'last_modified_msecs': 1672684200000,
@@ -199,7 +199,7 @@ class TopicEditorStoryHandlerTests(BaseTopicEditorControllerTests):
             'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
                 'chapter'][0],
             'thumbnail_size_in_bytes': 21131,
-            'status': constants.STORYNODE_STATUS_READY_TO_PUBLISH,
+            'status': constants.STORY_NODE_STATUS_READY_TO_PUBLISH,
             'planned_publication_date_msecs': 1690655400000,
             'first_publication_date_msecs': None,
             'last_modified_msecs': 1672684200000,

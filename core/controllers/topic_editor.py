@@ -171,9 +171,9 @@ class TopicEditorStoryHandler(
             overdue_chapters_count = 0
             upcoming_chapters_expected_days = []
             for node in nodes:
-                if node.status == constants.STORYNODE_STATUS_PUBLISHED:
+                if node.status == constants.STORY_NODE_STATUS_PUBLISHED:
                     published_chapters_count += 1
-                if (node.status != constants.STORYNODE_STATUS_PUBLISHED and
+                if (node.status != constants.STORY_NODE_STATUS_PUBLISHED and
                     node.planned_publication_date is not None):
                     current_time = (
                         utils.convert_millisecs_time_to_datetime_object(
@@ -181,7 +181,7 @@ class TopicEditorStoryHandler(
                         1000.0 * time.timezone))
                     if (current_time < node.planned_publication_date
                         < current_time + datetime.timedelta(
-                        constants.UPCOMING_CHAPTERS_DAY_LIMIT)):
+                        constants.CHAPTER_PUBLICATION_NOTICE_PERIOD_IN_DAYS)):
                         upcoming_chapters_count += 1
                         upcoming_chapters_expected_days.append((
                             node.planned_publication_date - current_time).days)

@@ -292,7 +292,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
                 'property_name': (
                     story_domain.STORY_NODE_PROPERTY_STATUS),
                 'old_value': None,
-                'new_value': constants.STORYNODE_STATUS_PUBLISHED
+                'new_value': constants.STORY_NODE_STATUS_PUBLISHED
             }),
             story_domain.StoryChange({
                 'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
@@ -354,7 +354,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(story.version, 3)
         self.assertEqual(
             story.story_contents.nodes[1].status,
-            constants.STORYNODE_STATUS_PUBLISHED)
+            constants.STORY_NODE_STATUS_PUBLISHED)
         self.assertEqual(
             story.story_contents.nodes[1].
             planned_publication_date, datetime.datetime(2023, 1, 2, 0, 0))
