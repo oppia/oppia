@@ -978,7 +978,7 @@ def get_chapter_notifications_stories_list() -> List[
     Returns:
         list(StoryPublicationTimeliness). A list of stories with having
         behind-schedule chapters or chapters upcoming within
-        UPCOMING_CHAPTERS_DAY_LIMIT.
+        CHAPTER_PUBLICATION_NOTICE_PERIOD_IN_DAYS.
     """
     topic_models = topic_fetchers.get_all_topics()
     chapter_notifications_stories_list: List[
@@ -1011,7 +1011,8 @@ def get_chapter_notifications_stories_list() -> List[
                             current_time <
                             node.planned_publication_date <
                             (current_time + datetime.timedelta(
-                            days=constants.UPCOMING_CHAPTERS_DAY_LIMIT)))
+                            days=constants.
+                                CHAPTER_PUBLICATION_NOTICE_PERIOD_IN_DAYS)))
                         chapter_is_behind_schedule = (
                             node.planned_publication_date < current_time)
 

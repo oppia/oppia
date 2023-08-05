@@ -2223,6 +2223,159 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             topic_summary.url_fragment
         )
 
+    def test_get_chapter_counts_in_topic_summaries(self) -> None:
+        canonical_story_id_1 = story_services.get_new_story_id()
+        story = story_domain.Story.create_default_story(
+            canonical_story_id_1, 'title', 'description', self.TOPIC_ID,
+            'url-fragment')
+        story.meta_tag_content = 'story meta content'
+        node_1: story_domain.StoryNodeDict = {
+            'outline': 'outline',
+            'exploration_id': 'exp-1',
+            'destination_node_ids': [],
+            'outline_is_finalized': False,
+            'acquired_skill_ids': [],
+            'id': 'node_1',
+            'title': 'Chapter 1',
+            'description': '',
+            'prerequisite_skill_ids': [],
+            'thumbnail_filename': 'image.svg',
+            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
+                'chapter'][0],
+            'thumbnail_size_in_bytes': 21131,
+            'status': constants.STORY_NODE_STATUS_PUBLISHED,
+            'planned_publication_date_msecs': 1690800486000,
+            'first_publication_date_msecs': 1672684200000,
+            'last_modified_msecs': 1672684200000,
+            'unpublishing_reason': None
+        }
+        node_2: story_domain.StoryNodeDict = {
+            'outline': 'outline',
+            'exploration_id': 'exp-2',
+            'destination_node_ids': [],
+            'outline_is_finalized': False,
+            'acquired_skill_ids': [],
+            'id': 'node_2',
+            'title': 'Chapter 2',
+            'description': '',
+            'prerequisite_skill_ids': [],
+            'thumbnail_filename': 'image.svg',
+            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
+                'chapter'][0],
+            'thumbnail_size_in_bytes': 21131,
+            'status': constants.STORY_NODE_STATUS_DRAFT,
+            'planned_publication_date_msecs': 1659264486000,
+            'first_publication_date_msecs': None,
+            'last_modified_msecs': 1672684200000,
+            'unpublishing_reason': None
+        }
+        node_3: story_domain.StoryNodeDict = {
+            'outline': 'outline',
+            'exploration_id': 'exp-3',
+            'destination_node_ids': [],
+            'outline_is_finalized': False,
+            'acquired_skill_ids': [],
+            'id': 'node_3',
+            'title': 'Chapter 3',
+            'description': '',
+            'prerequisite_skill_ids': [],
+            'thumbnail_filename': 'image.svg',
+            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
+                'chapter'][0],
+            'thumbnail_size_in_bytes': 21131,
+            'status': constants.STORY_NODE_STATUS_READY_TO_PUBLISH,
+            'planned_publication_date_msecs': 1690800486000,
+            'first_publication_date_msecs': None,
+            'last_modified_msecs': 1672684200000,
+            'unpublishing_reason': None
+        }
+        node_4: story_domain.StoryNodeDict = {
+            'outline': 'outline',
+            'exploration_id': 'exp-4',
+            'destination_node_ids': [],
+            'outline_is_finalized': False,
+            'acquired_skill_ids': [],
+            'id': 'node_4',
+            'title': 'Chapter 4',
+            'description': '',
+            'prerequisite_skill_ids': [],
+            'thumbnail_filename': 'image.svg',
+            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
+                'chapter'][0],
+            'thumbnail_size_in_bytes': 21131,
+            'status': constants.STORY_NODE_STATUS_READY_TO_PUBLISH,
+            'planned_publication_date_msecs': 1693478886000,
+            'first_publication_date_msecs': None,
+            'last_modified_msecs': 1672684200000,
+            'unpublishing_reason': None
+        }
+        story.story_contents.nodes = [
+            story_domain.StoryNode.from_dict(node_1),
+            story_domain.StoryNode.from_dict(node_2),
+            story_domain.StoryNode.from_dict(node_3),
+            story_domain.StoryNode.from_dict(node_4)
+        ]
+        story.story_contents.initial_node_id = 'node_1'
+        story.story_contents.next_node_id = 'node_5'
+
+        story_services.save_new_story(self.user_id, story)
+        topic_services.add_canonical_story(
+            self.user_id, self.TOPIC_ID, canonical_story_id_1)
+
+        def mock_get_current_time_in_millisecs() -> int:
+            return 1690555400000
+
+        with self.swap(
+            utils, 'get_current_time_in_millisecs',
+            mock_get_current_time_in_millisecs):
+            topic_summary = (
+                topic_fetchers.get_topic_summary_by_id(
+                self.TOPIC_ID).to_dict())
+            frontend_topic_summary: topic_domain.FrontendTopicSummaryDict = {
+                'id': topic_summary['id'],
+                'name': topic_summary['name'],
+                'url_fragment': topic_summary['url_fragment'],
+                'language_code': topic_summary['language_code'],
+                'description': topic_summary['description'],
+                'version': topic_summary['version'],
+                'canonical_story_count': topic_summary[
+                    'canonical_story_count'],
+                'additional_story_count': topic_summary[
+                    'canonical_story_count'],
+                'uncategorized_skill_count': topic_summary[
+                    'additional_story_count'],
+                'subtopic_count': topic_summary['subtopic_count'],
+                'total_skill_count': topic_summary['total_skill_count'],
+                'total_published_node_count': topic_summary[
+                    'total_published_node_count'],
+                'thumbnail_filename': topic_summary['thumbnail_filename'],
+                'thumbnail_bg_color': topic_summary['thumbnail_bg_color'],
+                'topic_model_created_on': topic_summary[
+                    'topic_model_created_on'],
+                'topic_model_last_updated': topic_summary[
+                    'topic_model_last_updated'],
+                'is_published': True,
+                'can_edit_topic': True,
+                'classroom': None,
+                'total_upcoming_chapters_count': 0,
+                'total_overdue_chapters_count': 0,
+                'total_chapter_counts_for_each_story': [],
+                'published_chapter_counts_for_each_story': []
+            }
+            chapter_counts = (
+                topic_services.get_chapter_counts_in_topic_summaries(
+                    [frontend_topic_summary]))
+            self.assertEqual(
+                chapter_counts[self.TOPIC_ID].total_upcoming_chapters_count, 1)
+            self.assertEqual(
+                chapter_counts[self.TOPIC_ID].total_overdue_chapters_count, 1)
+            self.assertEqual(
+                chapter_counts[self.TOPIC_ID].
+                    total_chapter_counts_for_each_story, [0, 0, 4])
+            self.assertEqual(
+                chapter_counts[self.TOPIC_ID].
+                    published_chapter_counts_for_each_story, [0, 0, 1])
+
 
 # TODO(#7009): Remove this mock class and the SubtopicMigrationTests class
 # once the actual functions for subtopic migrations are implemented.
