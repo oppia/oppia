@@ -21,6 +21,7 @@ import datetime
 import functools
 import json
 import re
+import time
 
 from core import android_validation_constants
 from core import feconf
@@ -911,6 +912,45 @@ class StoryNode:
                 raise utils.ValidationError(
                     'Chapter unpublishing reason cannot be %s ' %
                     self.unpublishing_reason)
+
+    def is_node_upcoming(self) -> bool:
+        """Return whether the StoryNode domain object is expected to be
+        published within the next CHAPTER_PUBLICATION_NOTICE_PERIOD_IN_DAYS
+        days.
+
+        Returns:
+            bool. True if the chapter is upcoming else false.
+        """
+        current_time = (
+            utils.convert_millisecs_time_to_datetime_object(
+            utils.get_current_time_in_millisecs() -
+            1000.0 * time.timezone))
+        if (
+            self.status != constants.STORY_NODE_STATUS_PUBLISHED and
+            self.planned_publication_date is not None and
+            current_time < self.planned_publication_date <
+            (current_time + datetime.timedelta(
+            days=constants.CHAPTER_PUBLICATION_NOTICE_PERIOD_IN_DAYS))):
+            return True
+        return False
+
+    def is_node_behind_schedule(self) -> bool:
+        """Return whether StoryNode domain object is behind-schedule
+        from the planned publication date.
+
+        Returns:
+            bool. True if the chapter is behind-schedule else false.
+        """
+        current_time = (
+            utils.convert_millisecs_time_to_datetime_object(
+            utils.get_current_time_in_millisecs() -
+            1000.0 * time.timezone))
+        if (
+            self.status != constants.STORY_NODE_STATUS_PUBLISHED and
+            self.planned_publication_date is not None and
+            current_time > self.planned_publication_date):
+            return True
+        return False
 
 
 class StoryContentsDict(TypedDict):
@@ -2351,7 +2391,7 @@ class StoryChapterProgressSummaryDict(TypedDict):
 
 class StoryPublicationTimeliness:
     """Domain object for stories with behind-schedule chapters
-or chapters upcoming within CHAPTER_PUBLICATION_NOTICE_PERIOD_IN_DAYS.
+    or chapters upcoming within CHAPTER_PUBLICATION_NOTICE_PERIOD_IN_DAYS.
     """
 
     def __init__(
