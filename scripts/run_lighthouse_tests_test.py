@@ -177,6 +177,7 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
         self.assertIn(
             'Resulting puppeteer video saved at %s' % self.extra_args[1],
             self.print_arr)
+        os.remove(self.extra_args[1])
 
     def test_puppeteer_script_failed_with_recording(self) -> None:
         class MockTask:
@@ -219,6 +220,7 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
         self.assertIn(
             'Resulting puppeteer video saved at %s' % self.extra_args[1],
             self.print_arr)
+        os.remove(self.extra_args[1])
 
     def test_run_lighthouse_puppeteer_script_failed(self) -> None:
         class MockTask:
