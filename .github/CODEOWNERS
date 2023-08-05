@@ -529,6 +529,7 @@
 /redis.conf @oppia/data-and-stability-reviewers
 /redis_docker.conf @oppia/data-and-stability-reviewers
 /.firebase.json @oppia/data-and-stability-reviewers
+/.firebase_docker.json @oppia/data-and-stability-reviewers
 
 
 # Miscellaneous.
