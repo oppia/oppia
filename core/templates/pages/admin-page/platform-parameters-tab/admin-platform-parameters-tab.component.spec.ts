@@ -37,6 +37,7 @@ import { PlatformParameterFilterType, ServerMode } from
   'domain/platform_feature/platform-parameter-filter.model';
 import { FeatureStage, PlatformParameter } from 'domain/platform_feature/platform-parameter.model';
 import { HttpErrorResponse } from '@angular/common/http';
+import { CdkAccordionModule } from '@angular/cdk/accordion';
 
 class MockWindowRef {
   nativeWindow = {
@@ -66,7 +67,7 @@ describe('Admin page platform parameters tab', () => {
   beforeEach(async(() => {
     mockWindowRef = new MockWindowRef();
     TestBed.configureTestingModule({
-      imports: [FormsModule, HttpClientTestingModule],
+      imports: [CdkAccordionModule, FormsModule, HttpClientTestingModule],
       declarations: [AdminPlatformParametersTabComponent],
       providers: [
         AdminTaskManagerService,
@@ -136,18 +137,6 @@ describe('Admin page platform parameters tab', () => {
     it('should return the schema according to the data type', () => {
       const schema = component.getPlatformParamSchema('bool');
       expect(schema).toEqual({type: 'bool'});
-    });
-  });
-
-  describe('.addNewRuleToTop', () => {
-    it('should add new rule to top of rule list', () => {
-      const platformParameter = component.platformParameters[0];
-
-      expect(platformParameter.rules.length).toBe(1);
-
-      component.addNewRuleToTop(platformParameter);
-      expect(platformParameter.rules.length).toBe(2);
-      expect(platformParameter.rules[1].valueWhenMatched).toEqual('original');
     });
   });
 
@@ -300,7 +289,7 @@ describe('Admin page platform parameters tab', () => {
       const platformParameter = component.platformParameters[0];
       const originalRules = cloneDeep(platformParameter.rules);
 
-      component.addNewRuleToTop(platformParameter);
+      component.addNewRuleToBottom(platformParameter);
       component.clearChanges(platformParameter);
 
       expect(platformParameter.rules.length).toBe(1);
@@ -313,7 +302,7 @@ describe('Admin page platform parameters tab', () => {
 
       expect(platformParameter.rules.length).toBe(1);
 
-      component.addNewRuleToTop(platformParameter);
+      component.addNewRuleToBottom(platformParameter);
       component.clearChanges(platformParameter);
 
       expect(platformParameter.rules.length).toBe(2);
@@ -357,7 +346,7 @@ describe('Admin page platform parameters tab', () => {
 
       const platformParameter = component.platformParameters[0];
 
-      component.addNewRuleToTop(platformParameter);
+      component.addNewRuleToBottom(platformParameter);
       component.updateParameterRulesAsync(platformParameter);
 
       flushMicrotasks();
@@ -373,7 +362,7 @@ describe('Admin page platform parameters tab', () => {
 
         const platformParameter = component.platformParameters[0];
 
-        component.addNewRuleToTop(platformParameter);
+        component.addNewRuleToBottom(platformParameter);
         component.updateParameterRulesAsync(platformParameter);
 
         flushMicrotasks();
@@ -395,7 +384,7 @@ describe('Admin page platform parameters tab', () => {
         const platformParameter = component.platformParameters[0];
         const originalFeatureFlag = cloneDeep(platformParameter);
 
-        component.addNewRuleToTop(platformParameter);
+        component.addNewRuleToBottom(platformParameter);
         component.updateParameterRulesAsync(platformParameter);
 
         flushMicrotasks();
@@ -411,7 +400,7 @@ describe('Admin page platform parameters tab', () => {
 
       const platformParameter = component.platformParameters[0];
 
-      component.addNewRuleToTop(platformParameter);
+      component.addNewRuleToBottom(platformParameter);
       component.updateParameterRulesAsync(platformParameter);
 
       flushMicrotasks();
@@ -432,7 +421,7 @@ describe('Admin page platform parameters tab', () => {
 
         const platformParameter = component.platformParameters[0];
 
-        component.addNewRuleToTop(platformParameter);
+        component.addNewRuleToBottom(platformParameter);
         component.updateParameterRulesAsync(platformParameter);
 
         flushMicrotasks();
@@ -448,8 +437,8 @@ describe('Admin page platform parameters tab', () => {
       const platformParameter = component.platformParameters[0];
 
       // Two identical rules.
-      component.addNewRuleToTop(platformParameter);
-      component.addNewRuleToTop(platformParameter);
+      component.addNewRuleToBottom(platformParameter);
+      component.addNewRuleToBottom(platformParameter);
       component.updateParameterRulesAsync(platformParameter);
 
       flushMicrotasks();
@@ -469,7 +458,7 @@ describe('Admin page platform parameters tab', () => {
       updateApiSpy.and.rejectWith(errorResponse);
       const platformParameter = component.platformParameters[0];
 
-      component.addNewRuleToTop(platformParameter);
+      component.addNewRuleToBottom(platformParameter);
       component.updateParameterRulesAsync(platformParameter);
 
       flushMicrotasks();
@@ -491,7 +480,7 @@ describe('Admin page platform parameters tab', () => {
       updateApiSpy.and.rejectWith(errorResponse);
       const platformParameter = component.platformParameters[0];
 
-      component.addNewRuleToTop(platformParameter);
+      component.addNewRuleToBottom(platformParameter);
       component.updateParameterRulesAsync(platformParameter);
 
       flushMicrotasks();
@@ -529,7 +518,7 @@ describe('Admin page platform parameters tab', () => {
       () => {
         const platformParameter = component.platformParameters[0];
 
-        component.addNewRuleToTop(platformParameter);
+        component.addNewRuleToBottom(platformParameter);
 
         expect(component.isPlatformParamChanged(platformParameter))
           .toBeTrue();

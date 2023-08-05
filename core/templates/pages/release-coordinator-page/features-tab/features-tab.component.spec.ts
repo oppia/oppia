@@ -38,6 +38,7 @@ import { PlatformParameterFilterType, ServerMode } from
 import { FeatureStage, PlatformParameter } from 'domain/platform_feature/platform-parameter.model';
 import { PlatformFeatureService } from 'services/platform-feature.service';
 import { HttpErrorResponse } from '@angular/common/http';
+import { CdkAccordionModule } from '@angular/cdk/accordion';
 
 
 let dummyFeatureStatus = false;
@@ -71,7 +72,7 @@ describe('Release coordinator page feature tab', function() {
   beforeEach(async(() => {
     TestBed
       .configureTestingModule({
-        imports: [FormsModule, HttpClientTestingModule],
+        imports: [CdkAccordionModule, FormsModule, HttpClientTestingModule],
         declarations: [FeaturesTabComponent],
         providers: [
           {
@@ -135,18 +136,6 @@ describe('Release coordinator page feature tab', function() {
     expect(component.featureFlags.length).toBe(1);
     expect(component.featureFlags[0].name).toEqual(
       'dummy_feature_flag_for_e2e_tests');
-  });
-
-  describe('.addNewRuleToTop', () => {
-    it('should add new rule to top of rule list', () => {
-      const featureFlag = component.featureFlags[0];
-
-      expect(featureFlag.rules.length).toBe(1);
-
-      component.addNewRuleToTop(featureFlag);
-      expect(featureFlag.rules.length).toBe(2);
-      expect(featureFlag.rules[1].valueWhenMatched).toEqual('original');
-    });
   });
 
   describe('.addNewRuleToBottom', () => {
@@ -297,7 +286,7 @@ describe('Release coordinator page feature tab', function() {
       const featureFlag = component.featureFlags[0];
       const originalRules = cloneDeep(featureFlag.rules);
 
-      component.addNewRuleToTop(featureFlag);
+      component.addNewRuleToBottom(featureFlag);
       component.clearChanges(featureFlag);
 
       expect(featureFlag.rules.length).toBe(1);
@@ -310,7 +299,7 @@ describe('Release coordinator page feature tab', function() {
 
       expect(featureFlag.rules.length).toBe(1);
 
-      component.addNewRuleToTop(featureFlag);
+      component.addNewRuleToBottom(featureFlag);
       component.clearChanges(featureFlag);
 
       expect(featureFlag.rules.length).toBe(2);
@@ -438,7 +427,7 @@ describe('Release coordinator page feature tab', function() {
 
       const featureFlag = component.featureFlags[0];
 
-      component.addNewRuleToTop(featureFlag);
+      component.addNewRuleToBottom(featureFlag);
       component.updateFeatureRulesAsync(featureFlag);
 
       flushMicrotasks();
@@ -454,7 +443,7 @@ describe('Release coordinator page feature tab', function() {
 
       const featureFlag = component.featureFlags[0];
 
-      component.addNewRuleToTop(featureFlag);
+      component.addNewRuleToBottom(featureFlag);
       component.updateFeatureRulesAsync(featureFlag);
 
       flushMicrotasks();
@@ -475,7 +464,7 @@ describe('Release coordinator page feature tab', function() {
       const featureFlag = component.featureFlags[0];
       const originalFeatureFlag = cloneDeep(featureFlag);
 
-      component.addNewRuleToTop(featureFlag);
+      component.addNewRuleToBottom(featureFlag);
       component.updateFeatureRulesAsync(featureFlag);
 
       flushMicrotasks();
@@ -490,7 +479,7 @@ describe('Release coordinator page feature tab', function() {
 
         const featureFlag = component.featureFlags[0];
 
-        component.addNewRuleToTop(featureFlag);
+        component.addNewRuleToBottom(featureFlag);
         component.updateFeatureRulesAsync(featureFlag);
 
         flushMicrotasks();
@@ -506,8 +495,8 @@ describe('Release coordinator page feature tab', function() {
       const featureFlag = component.featureFlags[0];
 
       // Two identical rules.
-      component.addNewRuleToTop(featureFlag);
-      component.addNewRuleToTop(featureFlag);
+      component.addNewRuleToBottom(featureFlag);
+      component.addNewRuleToBottom(featureFlag);
       component.updateFeatureRulesAsync(featureFlag);
 
       flushMicrotasks();
@@ -527,7 +516,7 @@ describe('Release coordinator page feature tab', function() {
       updateApiSpy.and.rejectWith(errorResponse);
       const featureFlag = component.featureFlags[0];
 
-      component.addNewRuleToTop(featureFlag);
+      component.addNewRuleToBottom(featureFlag);
       component.updateFeatureRulesAsync(featureFlag);
 
       flushMicrotasks();
@@ -549,7 +538,7 @@ describe('Release coordinator page feature tab', function() {
       updateApiSpy.and.rejectWith(errorResponse);
       const featureFlag = component.featureFlags[0];
 
-      component.addNewRuleToTop(featureFlag);
+      component.addNewRuleToBottom(featureFlag);
       component.updateFeatureRulesAsync(featureFlag);
 
       flushMicrotasks();
@@ -641,7 +630,7 @@ describe('Release coordinator page feature tab', function() {
       () => {
         const featureFlag = component.featureFlags[0];
 
-        component.addNewRuleToTop(featureFlag);
+        component.addNewRuleToBottom(featureFlag);
 
         expect(component.isFeatureFlagChanged(featureFlag))
           .toBeTrue();

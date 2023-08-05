@@ -150,7 +150,8 @@ export class AdminPlatformParametersTabComponent implements OnInit {
   getReadonlyFilterValues(rule: PlatformParameterRule): string {
     let resultantString: string = '';
     for (let filter of rule.filters) {
-      let filterName: string = this.filterTypeToContext[filter.type].displayName;
+      let filterName: string = (
+        this.filterTypeToContext[filter.type].displayName);
       if (filter.conditions.length === 0) {
         resultantString += filterName + ' = ' + '[ ]' + '; ';
       } else {
@@ -158,7 +159,8 @@ export class AdminPlatformParametersTabComponent implements OnInit {
         for (let condition of filter.conditions) {
           conditions.push(condition[1]);
         }
-        resultantString += filterName + ' = ' + '[' + conditions.toString() + ']' + '; ';
+        resultantString += (
+          filterName + ' = ' + '[' + conditions.toString() + ']' + '; ');
       }
     }
     return resultantString;
