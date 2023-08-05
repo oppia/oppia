@@ -2919,7 +2919,13 @@ class DisallowedImportsChecker(checkers.BaseChecker):  # type: ignore[misc]
                 self.add_message('disallowed-text-import', node=node)
 
 
-class NoBlankLineAfterFunctionDefChecker(checkers.BaseChecker):
+# TODO(#16567): Here we use MyPy ignore because of the incomplete typing of
+# pylint library and absences of stubs in pylint, forces MyPy to
+# assume that BaseChecker class has attributes of type Any.
+# Thus to avoid MyPy's error
+# (Class cannot subclass 'BaseChecker' (has type 'Any')),
+# we added an ignore here.
+class NoBlankLineAfterFunctionDefChecker(checkers.BaseChecker):  # type: ignore[misc]
     """Ensures that there is no blank line after function definition"""
 
     __implements__ = (interfaces.IAstroidChecker,)
