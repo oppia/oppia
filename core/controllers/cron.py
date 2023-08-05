@@ -305,8 +305,8 @@ class CronMailChapterPublicationsNotificationsHandler(
     base.BaseHandler[Dict[str, str], Dict[str, str]]
 ):
     """Handler for mailing curriculum admins to remind them about behind
-    schedule and upcoming (within UPCOMING_CHAPTERS_DAY_LIMIT days) chapter
-    launches.
+    schedule and upcoming (within CHAPTER_PUBLICATION_NOTICE_PERIOD_IN_DAYS
+    days) chapter launches.
     """
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -316,7 +316,8 @@ class CronMailChapterPublicationsNotificationsHandler(
     @acl_decorators.can_perform_cron_tasks
     def get(self) -> None:
         """Sends each curriculum admin mail to notify them about behind schedule
-        and upcoming (within UPCOMING_CHAPTERS_DAY_LIMIT days) chapter launches.
+        and upcoming (within CHAPTER_PUBLICATION_NOTICE_PERIOD_IN_DAYS days)
+        chapter launches.
         """
         if not feconf.CAN_SEND_EMAILS:
             return self.render_json({})
