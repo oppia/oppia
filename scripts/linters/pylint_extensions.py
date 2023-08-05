@@ -2918,6 +2918,7 @@ class DisallowedImportsChecker(checkers.BaseChecker):  # type: ignore[misc]
             if name == 'Text':
                 self.add_message('disallowed-text-import', node=node)
 
+
 # TODO(#16567): Here we use MyPy ignore because of the incomplete typing of
 # pylint library and absences of stubs in pylint, forces MyPy to
 # assume that BaseChecker class has attributes of type Any.
@@ -2958,7 +2959,7 @@ class NoBlankLineAfterFunctionDefChecker(checkers.BaseChecker):
                     line = linecache.getline(node.root().file, node.lineno)
                     if line.endswith(':\n'):
                         line_number = (
-                            len(node.doc.split("\n"))
+                            len(node.doc.split('\n'))
                             + node.lineno
                         )
                         line = linecache.getline(node.root().file, line_number)
@@ -2972,8 +2973,10 @@ class NoBlankLineAfterFunctionDefChecker(checkers.BaseChecker):
                         line_number = node.lineno
                         while not line.endswith(':\n'):
                             line_number = line_number + 1
-                            line = linecache.getline(node.root().file,
-                            line_number)
+                            line = linecache.getline(
+                                node.root().file,
+                            line_number
+                            )
                         line_number = (
                             len(node.doc.split('\n')) + line_number
                         )
