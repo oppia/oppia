@@ -2929,18 +2929,16 @@ class NoBlankLineAfterFunctionDefChecker(checkers.BaseChecker):
 
     __implements__ = (interfaces.IAstroidChecker,)
 
-    name = "awesome-checker"
-
+    name = 'no-blank-line'
     msgs = {
-        "C0041": (
-            "Blank line after function definition",
-            "Blank-line-after-function-definition",
-            "Please remove blank line after function definition",
+        'C0041': (
+            'Blank line after function definition',
+            'Blank-line-after-function-definition',
+            'Please remove blank line after function definition',
         )
     }
 
     def visit_functiondef(self, node: astroid.nodes.FunctionDef) -> None:
-        print(dir(node))
         """Called for function and method definitions (def).
 
         Args:
@@ -2966,7 +2964,7 @@ class NoBlankLineAfterFunctionDefChecker(checkers.BaseChecker):
                         line = linecache.getline(node.root().file, line_number)
                         if not line.strip():
                             self.add_message(
-                                "Blank-line-after-function-definition",
+                                'Blank-line-after-function-definition',
                                 line=line_number,
                                 node=node,
                             )
@@ -2974,14 +2972,15 @@ class NoBlankLineAfterFunctionDefChecker(checkers.BaseChecker):
                         line_number = node.lineno
                         while not line.endswith(":\n"):
                             line_number = line_number + 1
-                            line = linecache.getline(node.root().file, line_number)
+                            line = linecache.getline(node.root().file,
+                            line_number)
                         line_number = (
                             len(node.doc.split("\n")) + line_number
                         )
                         line = linecache.getline(node.root().file, line_number)
                         if not line.strip():
                             self.add_message(
-                                "Blank-line-after-function-definition",
+                                'Blank-line-after-function-definition',
                                 line=line_number,
                                 node=node,
                             )
@@ -2990,7 +2989,7 @@ class NoBlankLineAfterFunctionDefChecker(checkers.BaseChecker):
             line = linecache.getline(node.root().file, line_number)
             if not line.strip():
                 self.add_message(
-                    "Blank-line-after-function-definition",
+                    'Blank-line-after-function-definition',
                     line=line_number,
                     node=node,
                 )
