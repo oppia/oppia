@@ -1100,8 +1100,6 @@ def get_reviewable_translation_suggestions_by_offset(
 def get_reviewable_translation_suggestions_for_single_exp(
     user_id: str,
     opportunity_summary_exp_id: str,
-    sort_key: Optional[str],
-    language: Optional[str] = None
 ) -> Tuple[List[suggestion_registry.SuggestionTranslateContent], int]:
     """Returns a list of translation suggestions matching the
      passed opportunity ID which the user can review.
@@ -1112,7 +1110,6 @@ def get_reviewable_translation_suggestions_for_single_exp(
             The exploration ID for which suggestions
             are fetched. If exp id is empty, no suggestions are
             fetched.
-        sort_key: str|None. The key to sort the suggestions by.
         language: str. ISO 639-1 language code for which to filter. If it is
             None, all available languages will be returned.
 
@@ -1125,22 +1122,21 @@ def get_reviewable_translation_suggestions_for_single_exp(
     """
     contribution_rights = user_services.get_user_contribution_rights(
         user_id)
-    language_codes = (
+    user_settings = user_services.get_user_settings(user_id)
+    prefered_language_code = user_settings.preferred_translation_language_code
+    language_code = (
         contribution_rights.can_review_translation_for_language_codes)
 
-    if language is not None:
-        language_codes = [language] if language in language_codes else []
-
-    # The user cannot review any translations, so return early.
-    if len(language_codes) == 0:
+    # The user cannot review any translations or in preferred lang,
+    # so return early.
+    if language_code is None or prefered_language_code not in language_code:
         return [], 0
 
     in_review_translation_suggestions, next_offset = (
                 suggestion_models.GeneralSuggestionModel
                 .get_reviewable_translation_suggestions_for_single_exploration(
                     user_id,
-                    sort_key,
-                    language_codes,
+                    prefered_language_code,
                     opportunity_summary_exp_id))
 
     translation_suggestions = []

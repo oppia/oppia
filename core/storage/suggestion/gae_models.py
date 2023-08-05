@@ -669,8 +669,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
     def get_reviewable_translation_suggestions_for_single_exploration(
         cls,
         user_id: str,
-        sort_key: Optional[str],
-        language_codes: List[str],
+        language_code: str,
         exp_id: str
     ) -> Tuple[Sequence[GeneralSuggestionModel], int]:
         """Fetches reviewable translation suggestions for a single exploration.
@@ -679,57 +678,24 @@ class GeneralSuggestionModel(base_models.BaseModel):
             user_id: str. The id of the user trying to make this query.
                 Suggestions authored by this user will be excluded from
                 the results.
-
-            sort_key: str|None. The key to sort the suggestions by. If set to
-                None, the suggestions will be returned in their default order.
-                When a `sort_key` is provided, the suggestions will be sorted
-                on the client-side based on specific criteria related to their
-                presentation.
-
-            language_codes: list(str). The list of language codes.
-
+            language_code: str. The language code to get results for.
             exp_id: str. Exploration ID matching the target ID of the
                 translation suggestions.
 
         Returns:
             Tuple of (results, next_offset). Where:
                 results: list(SuggestionModel). A list of all suggestions that
-                    are in-review, not authored by the supplied user, match
-                    one of the supplied language codes, and correspond to the
+                    are in-review, not authored by the supplied user, matching
+                    the supplied language code, and correspond to the
                     given exploration ID.
-
-                next_offset: int. The input offset + the number of results
+                next_offset: int. The number of results
                     returned by the current query.
         """
-        if sort_key == constants.SUGGESTIONS_SORT_KEY_DATE:
-            # The first sort property must be the same as the property to which
-            # an inequality filter is applied. Thus, the inequality filter on
-            # author_id can not be used here.
-            suggestion_query = cls.get_all().filter(datastore_services.all_of(
-                cls.status == STATUS_IN_REVIEW,
-                cls.suggestion_type == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
-                cls.language_code.IN(language_codes),
-                cls.target_id == exp_id
-            )).order(-cls.created_on)
-
-            sorted_results: List[GeneralSuggestionModel] = []
-            suggestion_models: Sequence[GeneralSuggestionModel] = (
-                suggestion_query.fetch())
-            for suggestion_model in suggestion_models:
-                offset += 1
-                if suggestion_model.author_id != user_id:
-                    sorted_results.append(suggestion_model)
-
-            return (
-                sorted_results,
-                offset
-            )
-
         suggestion_query = cls.get_all().filter(datastore_services.all_of(
             cls.status == STATUS_IN_REVIEW,
             cls.suggestion_type == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
             cls.author_id != user_id,
-            cls.language_code.IN(language_codes),
+            cls.language_code == (language_code),
             cls.target_id == exp_id
         ))
 
@@ -747,7 +713,6 @@ class GeneralSuggestionModel(base_models.BaseModel):
     # get_reviewable_translation_suggestions_for_single_exploration instead
     # for the case of a single exploration without a limit. Deprecate the
     # no-limit behavior of this method to avoid future issues.
-
     @classmethod
     def get_in_review_translation_suggestions_with_exp_ids_by_offset(
         cls,
@@ -764,9 +729,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
 
         Args:
             limit: int|None. Maximum number of entities to be returned. If None,
-                returns all matching entities. This parameter is made optional
-                to allow fetching of all translation suggestions for client-side
-                sorting based on lesson flow.
+                returns all matching entities.
             offset: int. Number of results to skip from the beginning of all
                 results matching the query.
             user_id: str. The id of the user trying to make this query.
