@@ -18,3 +18,4 @@
 
 (window as Window).Guppy = require('guppy-dev/build/guppy.min.js');
 import 'guppy-dev/build/guppy-default.min.css';
+import 'guppy-dev/build/icons/help.png';

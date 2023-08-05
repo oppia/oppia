@@ -619,6 +619,20 @@ module.exports = {
       ]
     },
     {
+      test: /\.(jpe?g|png|gif|svg)$/i,
+      include: [
+        path.resolve(__dirname, 'assets'),
+        path.resolve(__dirname, 'core/templates'),
+        path.resolve(__dirname, 'extensions'),
+        path.resolve(__dirname, 'typings'),
+        path.resolve(__dirname, 'node_modules'),
+      ],
+      loader: 'file-loader',
+      options: {
+        name: '/guppy-dev/build/icons/help.png'
+      }
+    },
+    {
       test: {
         include: /.html$/,
         exclude: /(directive|component)\.html$/

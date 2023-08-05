@@ -30,6 +30,11 @@
                 "glob": "**/*",
                 "input": "./node_modules/midi/examples/soundfont/",
                 "output": "./midi/examples/soundfont/"
+              },
+              {
+                "glob": "**/*",
+                "input": "./node_modules/guppy-dev/build/icons/",
+                "output": "./icons/"
               }
             ],
             "styles": [
