@@ -209,12 +209,12 @@
                 (click)="changeChapterStatus('Ready To Publish')"
                 [ngClass]="{'btn-success': isChapterPublishable() && getChangeListLength() === 0}"
                 [disabled]="!isChapterPublishable() || getChangeListLength() > 0">
-          <i class="fas fa-exclamation-triangle oppia-save-draft-warning"
-             *ngIf="!isChapterPublishable()">
-          </i>
           <span class="oppia-save-publish-button-label">
             Mark as Ready To Publish
           </span>
+          <i class="fas fa-exclamation-triangle oppia-save-draft-warning"
+             *ngIf="!isChapterPublishable()">
+          </i>
         </button>
       </li>
     </ul>
@@ -615,7 +615,7 @@
   }
   .save-changes-non-published-chapter {
     position: absolute;
-    right: 350px;
+    right: 24vw;
   }
   .oppia-changes-count {
     margin-left: 2px;
@@ -634,11 +634,11 @@
   }
   .mark-as-ready-to-publish-btn {
     position: absolute;
-    right: 140px;
+    left: 80vw;
   }
   .mark-as-draft-btn {
     position: absolute;
-    right: 215px;
+    left: 80vw;
   }
   .story-editor-save-draft-icon {
     padding-left: 4px;

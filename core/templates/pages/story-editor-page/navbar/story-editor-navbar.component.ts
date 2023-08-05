@@ -293,10 +293,17 @@ export class StoryEditorNavbarComponent implements OnInit {
       this.chapterIsPublishedOrUnpublished = true;
       if (selectedChapterIndexInPublishUptoDropdown <
           lastPublishedChapterIndex) {
-        this.ngbModal.open(
+        const  modalRef = this.ngbModal.open(
           StoryEditorUnpublishModalComponent,
           { backdrop: 'static' }
-        ).result.then((unpublishingReason) => {
+        );
+        let unpublishedChapters = [];
+        for (let i = Number(selectedChapterIndexInPublishUptoDropdown) + 1;
+          i <= lastPublishedChapterIndex; i++) {
+            unpublishedChapters.push(Number(i)+1);
+        }
+        modalRef.componentInstance.unpublishedChapters = unpublishedChapters;
+        modalRef.result.then((unpublishingReason) => {
           for (let i = Number(selectedChapterIndexInPublishUptoDropdown) + 1;
             i <= lastPublishedChapterIndex; i++) {
             this.storyUpdateService.setStoryNodeStatus(
