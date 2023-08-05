@@ -133,8 +133,8 @@
                                     </ng-container>
                                     <ng-container *ngIf="!filterTypeToContext[filter.type].options">
                                       <input [(ngModel)]="filter.conditions[conditionIndex][1]"
-                                            [placeholder]="filterTypeToContext[filter.type].placeholder"
-                                            class="oppia-condition-input">
+                                             [placeholder]="filterTypeToContext[filter.type].placeholder"
+                                             class="oppia-condition-input">
                                       <ng-container *ngIf="filterTypeToContext[filter.type].inputRegex">
                                         <span class="oppia-input-error"
                                               *ngIf="!filterTypeToContext[filter.type].inputRegex.test(filter.conditions[conditionIndex][1])">
@@ -261,13 +261,13 @@
   }
 
   .oppia-accordion-item {
-    display: block;
     border: solid 1px #ccc;
+    display: block;
   }
 
   .oppia-accordion-item-header {
-    display: flex;
     align-content: center;
+    display: flex;
     justify-content: space-between;
   }
 
@@ -277,8 +277,8 @@
   }
 
   .oppia-accordion-item-header:hover {
-    cursor: pointer;
     background-color: #eee;
+    cursor: pointer;
   }
 
   .save-default-values-button {
@@ -412,8 +412,8 @@
   .oppia-admin-features .oppia-rule-container {
     border: 1px solid #a8a8a8;
     padding-bottom: 10px;
-    padding-top: 10px;
     padding-left: 10px;
+    padding-top: 10px;
   }
 
   .oppia-admin-features.oppia-empty-indicator {
