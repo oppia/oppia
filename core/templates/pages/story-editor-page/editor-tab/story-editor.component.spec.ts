@@ -203,6 +203,11 @@ describe('Story Editor Component having three story nodes', () => {
     expect(component.chapterIsPublishable[2]).toEqual(false);
   });
 
+  it('should get medium dateStyle locale date string', () => {
+    expect(component.getMediumStyleLocaleDateString(1692144000000)).toBe(
+      '16 Aug 2023');
+  });
+
   it('should disable drag and drop', () => {
     let node = StoryNode.createFromBackendDict({
       id: 'node_1',

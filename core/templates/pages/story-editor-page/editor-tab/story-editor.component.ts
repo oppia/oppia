@@ -142,9 +142,17 @@ export class StoryEditorComponent implements OnInit, OnDestroy {
     this._initEditor();
   }
 
+  getMediumStyleLocaleDateString(millisSinceEpoch: number): string {
+    const options = {
+      dateStyle: 'medium'
+    } as Intl.DateTimeFormatOptions;
+    let date = new Date(millisSinceEpoch);
+    return date.toLocaleDateString(undefined, options);
+  }
+
   isDragAndDropDisabled(node: StoryNode): boolean {
     return (
-      node.getStatus() === constants.STORYNODE_STATUS_PUBLISHED ||
+      node.getStatus() === constants.STORY_NODE_STATUS_PUBLISHED ||
       window.innerWidth <= 425);
   }
 

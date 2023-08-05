@@ -304,7 +304,7 @@
                             *ngIf="node.getStatus()!=='Published'">
                       </span>
                     </td>
-                    <td class="chapter-index"> {{ idx+1 }}. </td>
+                    <td class="chapter-index"> {{ idx+1 }} </td>
                     <td class="e2e-test-chapter-title chapter-title">{{ node.getTitle() }}</td>
                     <td class="chapter-status">
                       {{ node.getStatus() }}
@@ -316,7 +316,7 @@
                       <div *ngIf="node.getStatus()=='Draft'">(draft added)</div>
                     </td>
                     <td class="chapter-planned-publication-date">{{ node.getPlannedPublicationDateMsecs() != null ?
-                      dateTimeFormatService.getLocaleDateString(node.getPlannedPublicationDateMsecs()): '-' }}
+                      getMediumStyleLocaleDateString(node.getPlannedPublicationDateMsecs()): '-' }}
                     </td>
                     <td class="edit-options-container">
                       <i class="fa fa-ellipsis-v chapter-edit-toggle-button e2e-test-edit-options"
