@@ -696,6 +696,7 @@ class ContributorDashboardAdminStatsHandler(
                 }
 
             else:
+                assert sort_by is not None
                 translation_coordinator_dicts = (
                     contribution_stats_services
                     .get_all_translation_coordinator_stats(sort_by))
@@ -815,18 +816,23 @@ def get_translation_coordinator_frontend_dict(
 
     for stats_dict in stats_dicts:
         coordinator_activity_list = []
-        stats_dict['translators_count'] = (
+        # Here we use MyPy ignore because MyPy doesn't allow key addition
+        # to TypedDict.
+        stats_dict['translators_count'] = ( # type: ignore[misc]
             contribution_stats_services.get_translator_counts(
                 stats_dict['language_id']))
 
         community_stats = suggestion_services.get_community_contribution_stats()
 
-        stats_dict['reviewers_count'] = (
+        # Here we use MyPy ignore because MyPy doesn't allow key addition
+        # to TypedDict.
+        stats_dict['reviewers_count'] = ( # type: ignore[misc]
             community_stats.translation_reviewer_counts_by_lang_code[
                 stats_dict['language_id']])
 
         for coordinator_id in stats_dict['coordinator_ids']:
             user_setting = user_services.get_user_settings(coordinator_id)
+            assert user_setting is not None
             last_activity = user_setting.last_logged_in
             last_activity_days = int(
                 (datetime.datetime.today() - last_activity).days)
@@ -836,7 +842,9 @@ def get_translation_coordinator_frontend_dict(
                 'last_activity_days': last_activity_days
             })
 
-        stats_dict['coordinator_activity_list'] = coordinator_activity_list
+        # Here we use MyPy ignore because MyPy doesn't allow key addition
+        # to TypedDict.
+        stats_dict['coordinator_activity_list'] = coordinator_activity_list # type: ignore[misc]
 
         # Here we use MyPy ignore because MyPy doesn't allow key deletion
         # from TypedDict.
@@ -863,6 +871,7 @@ def get_question_coordinator_frontend_dict(
     stats: List[Dict[str, str]] = []
     for coordinator in question_coordinators:
         user_setting = user_services.get_user_settings(coordinator)
+        assert user_setting is not None
 
         last_activity = user_setting.last_logged_in
         last_activity_days = int(
