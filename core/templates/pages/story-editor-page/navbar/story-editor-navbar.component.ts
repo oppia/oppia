@@ -316,7 +316,7 @@ export class StoryEditorNavbarComponent implements OnInit {
             this.unpublishStory();
           }
           this.storyEditorStateService.saveStory(
-            'Published chapters', () => {
+            'Unpublished chapters', () => {
               this.storyEditorStateService.loadStory(this.story.getId());
               this._validateStory();
             }, (errorMessage: string) => {
@@ -345,7 +345,7 @@ export class StoryEditorNavbarComponent implements OnInit {
           this.publishStory();
         }
         this.storyEditorStateService.saveStory(
-          'Unpublished chapters', () => {
+          'Published chapters', () => {
             this.storyEditorStateService.loadStory(this.story.getId());
             this._validateStory();
           }, (errorMessage: string) => {
@@ -366,8 +366,6 @@ export class StoryEditorNavbarComponent implements OnInit {
           this.story, this.storyNode.getId(), oldStatus);
       }
     );
-    this.storyEditorStateService.loadStory(this.story.getId());
-    this._validateStory();
   }
 
   toggleWarningText(): void {
