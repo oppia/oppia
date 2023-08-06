@@ -291,6 +291,9 @@ oppia-search-bar .oppia-input-group {
   .oppia-search-bar-category-selector {
     position: relative;
   }
+  /* :lang(ar) .oppia-search-bar-category-selector{
+    position: absolute;
+  } */
 }
 
 /* This rule targets only Firefox browsers. */
