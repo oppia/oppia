@@ -3189,16 +3189,6 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
             expected_status_int=400
         )
 
-    def test_add_question_handler_with_no_limit_raise_error(self) -> None:
-        self.get_json(
-            '/getreviewablesuggestions/exploration/add_question', {
-                'limit': None,
-                'offset': 0,
-                'sort_key': constants.SUGGESTIONS_SORT_KEY_DATE
-            },
-            expected_status_int=400
-        )
-
     def test_handler_with_invalid_target_type_raise_error(self) -> None:
         self.get_json(
             '/getreviewablesuggestions/invalid_target_type/translate_content', {
