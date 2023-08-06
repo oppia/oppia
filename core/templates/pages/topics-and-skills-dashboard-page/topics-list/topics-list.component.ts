@@ -26,6 +26,8 @@ import { UrlInterpolationService } from 'domain/utilities/url-interpolation.serv
 import { Subscription } from 'rxjs';
 import { AlertsService } from 'services/alerts.service';
 import { DeleteTopicModalComponent } from '../modals/delete-topic-modal.component';
+import { PlatformFeatureService } from 'services/platform-feature.service';
+import constants from 'assets/constants';
 
 @Component({
   selector: 'oppia-topics-list',
@@ -48,6 +50,10 @@ export class TopicsListComponent {
   // This is to ensure that the edit options are not shown for the topic that
   // is being deleted.
   selectedIndex: string | null = null;
+  partiallyPublishedStoriesCounts: number[] = [];
+  fullyPublishedStoriesCounts: number[] = [];
+  publishedChaptersInPartiallyPublishedStories: number[] = [];
+  totalChaptersInPartiallyPublishedStories: number[] = [];
   TOPIC_HEADINGS: string[] = [
     'index', 'name', 'canonical_story_count', 'subtopic_count',
     'skill_count', 'topic_status'
@@ -59,7 +65,8 @@ export class TopicsListComponent {
     private editableTopicBackendApiService: EditableTopicBackendApiService,
     private topicsAndSkillsDashboardBackendApiService:
     TopicsAndSkillsDashboardBackendApiService,
-    private urlInterpolationService: UrlInterpolationService
+    private urlInterpolationService: UrlInterpolationService,
+    private platformFeatureService: PlatformFeatureService
   ) {}
 
   /**
@@ -127,6 +134,110 @@ export class TopicsListComponent {
         }
       );
     }, () => {});
+  }
+
+  /**
+   * @returns {boolean} Checks whether the SerialChapterLaunch feature
+   * flag is enabled.
+   */
+  isSerialChapterLaunchFeatureEnabled(): boolean {
+    return this.platformFeatureService.status.
+      SerialChapterLaunchCurriculumAdminView.isEnabled;
+  }
+
+  /**
+   * @param {CreatorTopicSummary} topic - Topic object whose upcoming chapters
+   * notifications text is needed.
+   * @returns {String} The text for upcoming chapters notifications in the
+   * HTML template.
+   */
+  getUpcomingChapterNotificationsText(topic: CreatorTopicSummary): string {
+    let upcomingChapterNotificationsText = (
+      topic.getTotalUpcomingChaptersCount() + ' upcoming launch');
+    if (topic.getTotalUpcomingChaptersCount() > 1) {
+      upcomingChapterNotificationsText += 'es';
+    }
+    upcomingChapterNotificationsText += (
+      ' in the next ' +
+      constants.CHAPTER_PUBLICATION_NOTICE_PERIOD_IN_DAYS + ' days');
+    return upcomingChapterNotificationsText;
+  }
+
+  /**
+   * @param {CreatorTopicSummary} topic - Topic object whose overdue chapters
+   * notifications text is needed.
+   * @returns {String} The text for overdue chapters notifications in the
+   * HTML template.
+   */
+  getOverdueChapterNotificationsText(topic: CreatorTopicSummary): string {
+    let overdueChapterNotificationsText = (
+      topic.getTotalOverdueChaptersCount() + ' launch');
+    if (topic.getTotalOverdueChaptersCount() > 1) {
+      overdueChapterNotificationsText += 'es';
+    }
+    overdueChapterNotificationsText += ' behind schedule';
+    return overdueChapterNotificationsText;
+  }
+
+  /**
+   * @param {CreatorTopicSummary} topic - Topic object which is checked if all
+   * of its chapters are published.
+   * @param {Number} idx - The index of the topic in the topicSummaries.
+   * @returns {boolean} Checks whether all the chapters in the topic are
+   * published.
+   */
+  areTopicChaptersFullyPublished(
+      topic: CreatorTopicSummary, idx: number): boolean {
+    if (
+      topic.getTotalChaptersCounts().length &&
+      topic.getTotalChaptersCounts().length ===
+      this.fullyPublishedStoriesCounts[idx]) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  ngOnInit(): void {
+    if (this.isSerialChapterLaunchFeatureEnabled()) {
+      this.TOPIC_HEADINGS = [
+        'index', 'name', 'added_stories_count', 'published_stories_count',
+        'notifications', 'subtopic_count', 'skill_count', 'topic_status'];
+    } else {
+      this.TOPIC_HEADINGS = [
+        'index', 'name', 'canonical_story_count', 'subtopic_count',
+        'skill_count', 'topic_status'
+      ];
+    }
+  }
+
+  ngOnChanges(): void {
+    this.fullyPublishedStoriesCounts = [];
+    this.partiallyPublishedStoriesCounts = [];
+    this.totalChaptersInPartiallyPublishedStories = [];
+    this.publishedChaptersInPartiallyPublishedStories = [];
+
+    for (let i = 0; i < this.topicSummaries.length; i++) {
+      this.fullyPublishedStoriesCounts.push(0);
+      this.partiallyPublishedStoriesCounts.push(0);
+      this.totalChaptersInPartiallyPublishedStories.push(0);
+      this.publishedChaptersInPartiallyPublishedStories.push(0);
+
+      let totalStories = this.topicSummaries[i].getTotalChaptersCounts().length;
+
+      for (let j = 0; this.topicSummaries[i] && j < totalStories; j++) {
+        if (this.topicSummaries[i].getTotalChaptersCounts()[j] ===
+          this.topicSummaries[i].getPublishedChaptersCounts()[j]) {
+          this.fullyPublishedStoriesCounts[i]++;
+        } else {
+          this.partiallyPublishedStoriesCounts[i]++;
+          this.totalChaptersInPartiallyPublishedStories[i] +=
+              this.topicSummaries[i].getTotalChaptersCounts()[j];
+          this.publishedChaptersInPartiallyPublishedStories[i] +=
+              this.topicSummaries[i].getPublishedChaptersCounts()[j];
+        }
+      }
+    }
   }
 
   ngOnDestroy(): void {
