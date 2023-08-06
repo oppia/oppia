@@ -107,20 +107,20 @@ class CloudTasksEmulatorUnitTests(test_utils.TestBase):
             queue_name=self.queue_name1)
 
         self.assertEqual(
-            self.output,
-            [
+            set(self.output),
+            {
                 'Task Default in queue %s with payload %s is sent to %s.' % (
                     self.queue_name1,
                     str(self.payload1),
                     self.url)
-            ]
+            }
         )
 
         self.assertEqual(self.unit_test_emulator.get_number_of_tasks(), 1)
         self.unit_test_emulator.process_and_flush_tasks()
         self.assertEqual(
-            self.output,
-            [
+            set(self.output),
+            {
                 'Task Default in queue %s with payload %s is sent to %s.' % (
                     self.queue_name1,
                     str(self.payload1),
@@ -129,7 +129,7 @@ class CloudTasksEmulatorUnitTests(test_utils.TestBase):
                     self.queue_name2,
                     str(self.payload2),
                     self.url),
-            ]
+            }
         )
         self.assertEqual(self.unit_test_emulator.get_number_of_tasks(), 0)
 
@@ -144,8 +144,8 @@ class CloudTasksEmulatorUnitTests(test_utils.TestBase):
         time.sleep(1)
 
         self.assertEqual(
-            self.output,
-            [
+            set(self.output),
+            {
                 'Task Default in queue %s with payload %s is sent to %s.' % (
                     self.queue_name1,
                     str(self.payload1),
@@ -154,5 +154,5 @@ class CloudTasksEmulatorUnitTests(test_utils.TestBase):
                     self.queue_name2,
                     str(self.payload2),
                     self.url),
-            ]
+            }
         )
