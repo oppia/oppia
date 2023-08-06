@@ -156,7 +156,7 @@
   </div>
   <div *ngIf="currentTab === 'chapter_editor' && storyNode && storyNode.getStatus() === 'Draft'">
     <ul class="nav navbar-nav oppia-navbar-nav navbar-desktop float-right">
-      <li class="oppia-dropdown-menu-container save-changes-non-published-chapter">
+      <li class="oppia-dropdown-menu-container">
         <div ngbDropdown>
           <span class="w-100">
             <button class="btn btn-light dropdown oppia-save-changes-button float-left e2e-test-save-story-button"
@@ -200,7 +200,7 @@
           </ul>
         </div>
       </li>
-      <li class="oppia-editor-publish-button-container mark-as-ready-to-publish-btn"
+      <li class="oppia-editor-publish-button-container"
           [matTooltip]="'Chapter Publication Checklist should be fulfilled'"
           matTooltipClass="oppia-mat-tooltip-list"
           [matTooltipDisabled]="isChapterPublishable()">
@@ -221,7 +221,7 @@
   </div>
   <div *ngIf="currentTab === 'chapter_editor' && storyNode && storyNode.getStatus() === 'Ready To Publish'">
     <ul class="nav navbar-nav oppia-navbar-nav navbar-desktop float-right">
-      <li class="oppia-dropdown-menu-container save-changes-non-published-chapter">
+      <li class="oppia-dropdown-menu-container">
         <div ngbDropdown>
           <span class="w-100">
             <button class="btn btn-light dropdown oppia-save-changes-button float-left e2e-test-save-story-button"
@@ -265,7 +265,7 @@
           </ul>
         </div>
       </li>
-      <li class="oppia-editor-publish-button-container mark-as-draft-btn">
+      <li class="oppia-editor-publish-button-container">
         <button type="button"
                 class="btn btn-secondary oppia-editor-publish-button"
                 (click)="changeChapterStatus('Draft')"
@@ -613,10 +613,6 @@
     margin-right: 5px;
     margin-top: 8px;
   }
-  .save-changes-non-published-chapter {
-    position: absolute;
-    right: 24vw;
-  }
   .oppia-changes-count {
     margin-left: 2px;
     opacity: 0.5;
@@ -631,14 +627,6 @@
   .oppia-editor-publish-button-container {
     margin-right: 20px;
     margin-top: 8px;
-  }
-  .mark-as-ready-to-publish-btn {
-    left: 80vw;
-    position: absolute;
-  }
-  .mark-as-draft-btn {
-    left: 80vw;
-    position: absolute;
   }
   .story-editor-save-draft-icon {
     padding-left: 4px;
