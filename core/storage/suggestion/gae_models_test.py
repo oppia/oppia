@@ -6068,7 +6068,8 @@ class TranslationCoordinatorsModelUnitTests(test_utils.GenericTestBase):
 
     def test_get_deletion_policy(self) -> None:
         self.assertEqual(
-            suggestion_models.TranslationCoordinatorsModel.get_deletion_policy(),
+            suggestion_models.TranslationCoordinatorsModel
+            .get_deletion_policy(),
             base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE)
 
     def test_has_reference_to_user_id(self) -> None:

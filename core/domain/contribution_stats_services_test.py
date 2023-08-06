@@ -15,11 +15,13 @@
 """Tests the functions to get stats displayed in contributor Admin Dashboard."""
 
 from __future__ import annotations
+
 import datetime
 
-from core.domain import contribution_stats_services, user_services
+from core.domain import contribution_stats_services
 from core.platform import models
 from core.tests import test_utils
+
 from typing import Final
 
 MYPY = False
@@ -444,7 +446,7 @@ class ContributorAdminDashboardServicesUnitTest(test_utils.GenericTestBase):
             ))
 
         self.assertEqual(2, len(stats))
-        self.assertEqual('en',stats[0].language_id)
+        self.assertEqual('en', stats[0].language_id)
 
         stats = (
             contribution_stats_services.get_all_translation_coordinator_stats(
@@ -453,7 +455,7 @@ class ContributorAdminDashboardServicesUnitTest(test_utils.GenericTestBase):
             ))
 
         self.assertEqual(2, len(stats))
-        self.assertEqual('hi',stats[0].language_id)
+        self.assertEqual('hi', stats[0].language_id)
 
     def test_get_translator_counts(self) -> None:
         stats = contribution_stats_services.get_translator_counts('es')

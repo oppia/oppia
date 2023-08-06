@@ -48,6 +48,7 @@ class TranslationContributionStatsDict(TypedDict):
     contribution_months: List[str]
     language: str
 
+
 class TranslationCoordinatorStatsFrontendDict(TypedDict):
     """Dictionary representation of Translation Coordinator Stats
     frontend Dict.
@@ -792,6 +793,7 @@ class CommunityContributionStatsHandler(
         }
         self.render_json(response)
 
+
 def get_translation_coordinator_frontend_dict(
     backend_stats: List[suggestion_registry.TranslationCoordinatorStats]
 ) -> List[TranslationCoordinatorStatsFrontendDict]:
@@ -840,8 +842,8 @@ def get_translation_coordinator_frontend_dict(
         # from TypedDict.
         del stats_dict['coordinator_ids']  # type: ignore[misc]
 
-    print(stats_dicts)
     return stats_dicts
+
 
 def get_question_coordinator_frontend_dict(
     question_coordinators: List[str]
@@ -858,7 +860,7 @@ def get_question_coordinator_frontend_dict(
         question_coordinator: str.
         last_activity: int.
     """
-    stats:List[Dict[str, str]] = []
+    stats: List[Dict[str, str]] = []
     for coordinator in question_coordinators:
         user_setting = user_services.get_user_settings(coordinator)
 

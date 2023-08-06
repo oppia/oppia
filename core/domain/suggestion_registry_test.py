@@ -4196,7 +4196,6 @@ class QuestionReviewerTotalContributionStatsUnitTests(
             actual_stats.to_frontend_dict(), expected_stats_dict)
 
 
-
 class TranslationCoordinatorStatsUnitTests(
     test_utils.GenericTestBase):
     """Tests for the TranslationCoordinatorStats class."""

@@ -2320,6 +2320,7 @@ class TranslationCoordinatorStatsDict(TypedDict):
     coordinator_ids: List[str]
     coordinators_count: int
 
+
 class TranslationCoordinatorStats:
     """Domain object for the TranslationCoordinatorStatsModel."""
 

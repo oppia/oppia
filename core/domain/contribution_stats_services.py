@@ -476,7 +476,7 @@ def get_all_translation_coordinator_stats(
     """
     model_class = suggestion_models.TranslationCoordinatorsModel
     translation_coordinator_models: Sequence[
-        suggestion_models.TranslationCoordinatorsModel]= []
+        suggestion_models.TranslationCoordinatorsModel] = []
     if sort == (
         suggestion_models.SortChoices.SORT_KEY_INCREASING_COORDINATOR_COUNTS
         .value):
