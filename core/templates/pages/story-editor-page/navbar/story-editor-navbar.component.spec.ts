@@ -736,10 +736,10 @@ describe('Story editor navbar component', () => {
       storyEditorStateService, 'loadStory').and.returnValue();
     let alertServiceSpy = spyOn(
       alertsService, 'addInfoMessage').and.callThrough();
-    let check: number = 0;
+    let success: boolean = false;
     let saveStorySpy = spyOn(storyEditorStateService, 'saveStory')
       .and.callFake((commitMessage, successCallback, errorCallback) => {
-        if (check) {
+        if (success) {
           successCallback();
         } else {
           errorCallback('Error');
@@ -760,7 +760,7 @@ describe('Story editor navbar component', () => {
       setStatus('Ready To Publish');
     component.story.getStoryContents().getNodes()[0].
       setFirstPublicationDateMsecs(null);
-    check = 1;
+    success = true;
 
     component.changeChapterStatus('Published');
     expect(storyNodeStatusSpy).toHaveBeenCalledTimes(3);
@@ -791,11 +791,11 @@ describe('Story editor navbar component', () => {
       storyEditorStateService, 'loadStory').and.returnValue();
     let alertServiceSpy = spyOn(
       alertsService, 'addInfoMessage').and.callThrough();
-    let check: number = 0;
+    let success: boolean = false;
     const saveStorySpy = spyOn(
       storyEditorStateService, 'saveStory')
       .and.callFake((commitMessage, successCallback, errorCallback) => {
-        if (check) {
+        if (success) {
           successCallback();
         } else {
           errorCallback('Error');
@@ -826,7 +826,7 @@ describe('Story editor navbar component', () => {
     component.story.getStoryContents().getNodes()[1].setStatus('Published');
     component.story.getStoryContents().getNodes()[1].
       setPlannedPublicationDateMsecs(null);
-    check = 1;
+    success = true;
 
     component.changeChapterStatus('Published');
     tick();
