@@ -49,18 +49,6 @@ class TranslationContributionStatsDict(TypedDict):
     language: str
 
 
-class TranslationCoordinatorStatsFrontendDict(TypedDict):
-    """Dictionary representation of Translation Coordinator Stats
-    frontend Dict.
-    """
-
-    language_id: str
-    coordinator_activity_list: List[Dict[str, str]]
-    coordinators_count: int
-    reviewers_count: int
-    translators_count: int
-
-
 class ContributorDashboardAdminPage(
     base.BaseHandler[Dict[str, str], Dict[str, str]]
 ):
@@ -797,7 +785,7 @@ class CommunityContributionStatsHandler(
 
 def get_translation_coordinator_frontend_dict(
     backend_stats: List[suggestion_registry.TranslationCoordinatorStats]
-) -> List[TranslationCoordinatorStatsFrontendDict]:
+) -> List[suggestion_registry.TranslationCoordinatorStatsDict]:
     """Returns corresponding stats dicts with all the necessary
     information for the frontend.
 
@@ -832,7 +820,7 @@ def get_translation_coordinator_frontend_dict(
 
         for coordinator_id in stats_dict['coordinator_ids']:
             user_setting = user_services.get_user_settings(coordinator_id)
-            assert user_setting is not None
+            assert user_setting.last_logged_in is not None
             last_activity = user_setting.last_logged_in
             last_activity_days = int(
                 (datetime.datetime.today() - last_activity).days)
@@ -855,7 +843,7 @@ def get_translation_coordinator_frontend_dict(
 
 def get_question_coordinator_frontend_dict(
     question_coordinators: List[str]
-) -> List[Dict[str, str]]:
+) -> List[Dict[str, Union[str, int]]]:
     """Returns corresponding stats dicts with all the necessary
     information for the frontend.
 
@@ -868,10 +856,11 @@ def get_question_coordinator_frontend_dict(
         question_coordinator: str.
         last_activity: int.
     """
-    stats: List[Dict[str, str]] = []
+    stats: List[Dict[str, Union[str, int]]] = []
     for coordinator in question_coordinators:
         user_setting = user_services.get_user_settings(coordinator)
-        assert user_setting is not None
+        assert user_setting.last_logged_in is not None
+        assert user_setting.username is not None
 
         last_activity = user_setting.last_logged_in
         last_activity_days = int(
