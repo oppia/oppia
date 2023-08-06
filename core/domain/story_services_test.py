@@ -401,7 +401,8 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
                 'property_name': (
                     story_domain.STORY_NODE_PROPERTY_UNPUBLISHING_REASON),
                 'old_value': None,
-                'new_value': constants.ALLOWED_STORYNODE_UNPUBLISHING_REASONS[0]
+                'new_value': (
+                    constants.ALLOWED_STORY_NODE_UNPUBLISHING_REASONS[0])
             })
         ]
         story_services.update_story(
@@ -419,7 +420,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             story.story_contents.nodes[0].outline_is_finalized, False)
         self.assertEqual(
             story.story_contents.nodes[0].unpublishing_reason,
-            constants.ALLOWED_STORYNODE_UNPUBLISHING_REASONS[0])
+            constants.ALLOWED_STORY_NODE_UNPUBLISHING_REASONS[0])
 
     def test_prerequisite_skills_validation(self) -> None:
         self.story.story_contents.next_node_id = 'node_4'
