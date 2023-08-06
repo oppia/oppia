@@ -1110,8 +1110,6 @@ def get_reviewable_translation_suggestions_for_single_exp(
             The exploration ID for which suggestions
             are fetched. If exp id is empty, no suggestions are
             fetched.
-        language: str. ISO 639-1 language code for which to filter. If it is
-            None, all available languages will be returned.
 
     Returns:
         Tuple of (results, next_offset). Where:
@@ -1124,12 +1122,12 @@ def get_reviewable_translation_suggestions_for_single_exp(
         user_id)
     user_settings = user_services.get_user_settings(user_id)
     prefered_language_code = user_settings.preferred_translation_language_code
-    language_code = (
+    language_codes = (
         contribution_rights.can_review_translation_for_language_codes)
 
     # The user cannot review any translations or in preferred lang,
     # so return early.
-    if language_code is None or prefered_language_code not in language_code:
+    if language_codes is None or prefered_language_code not in language_codes:
         return [], 0
 
     in_review_translation_suggestions, next_offset = (
