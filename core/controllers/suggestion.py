@@ -765,7 +765,8 @@ class ReviewableSuggestionsHandler(
         suggestions: Sequence[suggestion_registry.BaseSuggestion] = []
         next_offset = 0
         if suggestion_type == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT:
-            reviewable_suggestions = []
+            reviewable_suggestions: List[
+                suggestion_registry.SuggestionTranslateContent] = []
             if (exp_ids and len(exp_ids) == 1 and limit is None):
                 reviewable_suggestions, next_offset = (
                     suggestion_services
