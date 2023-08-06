@@ -709,7 +709,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
             next_offset
         )
 
-    # TODO(sll): Transition the callsite to use the new method
+    # TODO(#18745): Transition the callsite to use the new method
     # get_reviewable_translation_suggestions_for_single_exploration instead
     # for the case of a single exploration without a limit. Deprecate the
     # no-limit behavior of this method to avoid future issues.
