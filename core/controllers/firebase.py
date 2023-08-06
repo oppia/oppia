@@ -39,7 +39,7 @@ FIREBASE_DOMAINS = {
 
 
 class FirebaseProxyPage(
-    base.BaseHandler[Any, Any]
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
 ):
     """Handler to proxy auth requests to the firebase domain."""
 
