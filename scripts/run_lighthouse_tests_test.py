@@ -175,14 +175,13 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
 
         def mock_popen(*unused_args: str, **unused_kwargs: str) -> MockTask:  # pylint: disable=unused-argument
             return MockTask()
-        
-        if os.path.exists(self.extra_args[1]):
-            os.remove(self.extra_args[1])
+
+        swap_isfile = self.swap(os.path, 'isfile', lambda _: False)
         swap_popen = self.swap_with_checks(
             subprocess, 'Popen', mock_popen,
             expected_args=((self.puppeteer_bash_command + self.extra_args,),))
 
-        with self.print_swap, swap_popen:
+        with self.print_swap, swap_popen, swap_isfile:
             run_lighthouse_tests.run_lighthouse_puppeteer_script(record=True)
 
         self.assertIn(
@@ -206,17 +205,12 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
         def mock_popen(*unused_args: str, **unused_kwargs: str) -> MockTask:  # pylint: disable=unused-argument
             return MockTask()
 
-        dir_path = os.path.join(os.getcwd(), '..', 'lhci-puppeteer-video')
-        if not os.path.exists(dir_path):
-            os.mkdir(dir_path)
-        with open(self.extra_args[1], 'w', encoding='utf-8') as _:
-            pass
-
+        swap_isfile = self.swap(os.path, 'isfile', lambda _: True)
         swap_popen = self.swap_with_checks(
             subprocess, 'Popen', mock_popen,
             expected_args=((self.puppeteer_bash_command + self.extra_args,),))
 
-        with self.print_swap, swap_popen:
+        with self.print_swap, swap_popen, swap_isfile:
             run_lighthouse_tests.run_lighthouse_puppeteer_script(record=True)
 
         self.assertIn(
@@ -241,13 +235,12 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
         def mock_popen(*unused_args: str, **unused_kwargs: str) -> MockTask:  # pylint: disable=unused-argument
             return MockTask()
 
-        if os.path.exists(self.extra_args[1]):
-            os.remove(self.extra_args[1])
+        swap_isfile = self.swap(os.path, 'isfile', lambda _: False)
         swap_popen = self.swap_with_checks(
             subprocess, 'Popen', mock_popen,
             expected_args=((self.puppeteer_bash_command + self.extra_args,),))
 
-        with self.print_swap, self.swap_sys_exit, swap_popen:
+        with self.print_swap, self.swap_sys_exit, swap_popen, swap_isfile:
             run_lighthouse_tests.run_lighthouse_puppeteer_script(record=True)
 
         self.assertIn('Return code: 1', self.print_arr)
@@ -272,16 +265,12 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
         def mock_popen(*unused_args: str, **unused_kwargs: str) -> MockTask:  # pylint: disable=unused-argument
             return MockTask()
 
-        dir_path = os.path.join(os.getcwd(), '..', 'lhci-puppeteer-video')
-        if not os.path.exists(dir_path):
-            os.mkdir(dir_path)
-        with open(self.extra_args[1], 'w', encoding='utf-8') as _:
-            pass
+        swap_isfile = self.swap(os.path, 'isfile', lambda _: True)
         swap_popen = self.swap_with_checks(
             subprocess, 'Popen', mock_popen,
             expected_args=((self.puppeteer_bash_command + self.extra_args,),))
 
-        with self.print_swap, self.swap_sys_exit, swap_popen:
+        with self.print_swap, self.swap_sys_exit, swap_popen, swap_isfile:
             run_lighthouse_tests.run_lighthouse_puppeteer_script(record=True)
 
         self.assertIn('Return code: 1', self.print_arr)
