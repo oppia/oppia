@@ -18,7 +18,7 @@
           <button class="oppia-footer-newsletter-button"
                   [disabled]="!validateEmailAddress()"
                   (click)="subscribeToMailingList()">
-            <span>{{ 'I18N_FOOTER_NEWSLETTER_SUBSCRIBE' | translate }}</span>
+            <span>{{ 'I18N_SUBSCRIBE_BUTTON_TEXT' | translate }}</span>
           </button>
         </div>
       </div>
@@ -26,7 +26,7 @@
   </div>
   <div class="oppia-footer-container">
     <div class="row row-cols-2">
-      <div class="oppia-mission-volunteer col-5">
+      <div class="oppia-mission-volunteer col-7">
         <p class="oppia-mission">{{ 'I18N_FOOTER_OPPIA_MISSION' | translate }}</p>
         <p class="oppia-donate-volunteer"
            [innerHTML]="'I18N_FOOTER_OPPIA_MISSION_DONATE_VOLUNTEER' | translate">

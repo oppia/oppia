@@ -6,8 +6,8 @@
 .oppia-footer-container {
   margin-left: auto;
   margin-right: auto;
-  max-width: 1150px;
-  padding: 30px 80px;
+  max-width: 97%;
+  padding: 30px 50px;
   text-align: left;
 }
 
@@ -72,7 +72,7 @@
 .oppia-footer-container hr {
   border: 1px solid white;
   display: none;
-  width: 95%;
+  width: 96%;
 }
 
 .oppia-flex-break {
@@ -83,13 +83,13 @@
 
 .oppia-footer-newsletter-container {
   background-color: #00645c;
-  padding: 10px 6%;
+  padding: 10px 3%;
 }
 
 .oppia-footer-newsletter {
   display: flex;
   flex: 1;
-  gap: 20px;
+  gap: 55px;
   padding: 20px;
   position: relative;
 }
@@ -137,16 +137,24 @@
 }
 
 .oppia-newsletter-input > button {
-  background-color: #c55f45;
-  border: 1px solid transparent;
+  background-color: white;
+  border: 1px solid #00645c;
   border-radius: 4px;
-  color: white;
+  color: #00645c;
   font-size: 14px;
   font-weight: 600;
   height: 44px;
   outline-color: transparent;
   padding: 10px;
   width: 96px;
+}
+
+.oppia-newsletter-input > button:hover {
+  border: 2px;
+}
+
+.oppia-newsletter-input > button:active {
+  background-color: #f5f5f5;
 }
 
 .oppia-footer-terms-privacy {
@@ -182,20 +190,13 @@
   .oppia-footer-newsletter {
     display: flex;
     flex-direction: column;
+    gap: 20px;
   }
 }
 
 @media (max-width: 768px) {
-  .oppia-footer-newsletter-container {
-    padding: 10px 2%;
-  }
-
   .oppia-footer-container {
     padding: 30px;
-  }
-
-  .oppia-newsletter-input > input {
-    width: 100%;
   }
 
   .oppia-footer-terms-privacy {
@@ -214,6 +215,11 @@
     line-height: 16.5px;
   }
 
+  .oppia-newsletter-input,
+  .oppia-newsletter-input > input {
+    width: 100%;
+  }
+
   .oppia-footer-newsletter-input .oppia-newsletter-input {
     flex-direction: column;
   }
@@ -226,6 +232,7 @@
 
   .oppia-newsletter-input > button {
     margin-left: auto;
+    padding: 7px;
   }
 
   .oppia-newsletter-content > h3 {

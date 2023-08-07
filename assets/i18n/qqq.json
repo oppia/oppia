@@ -625,7 +625,6 @@
 	"I18N_FOOTER_GET_STARTED": "Text shown in the footer. - Link to the get started page. See I18N_GET_STARTED_PAGE_TITLE\n{{Identical|Get started}}",
 	"I18N_FOOTER_NEWSLETTER_EMAIL": "Text label that appears on the email input field in the newsletter subscription form.",
 	"I18N_FOOTER_NEWSLETTER_HEADING": "Text that appears on the heading of the newsletter subscription form.",
-	"I18N_FOOTER_NEWSLETTER_SUBSCRIBE": "Text that appears on the subscribe button in the newsletter subscription form.",
 	"I18N_FOOTER_NEWSLETTER_TEXT": "Be a part of the Oppia community! Our bi-weekly newsletter keeps you informed on new features, lessons and how Oppia is making a worldwide impact.",
 	"I18N_FOOTER_OPPIA_FOUNDATION": "Text shown in the footer. - Link to the Oppia Foundation website. See I18N_ABOUT_PAGE_TITLE.",
 	"I18N_FOOTER_OPPIA_MISSION": "Text that appears on the footer of the page that describes the mission of Oppia.",
