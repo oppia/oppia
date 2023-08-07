@@ -841,6 +841,12 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             last_contribution_date=self.LAST_CONTRIBUTION_DATE
         )
 
+        suggestion_models.TranslationCoordinatorsModel(
+            id=self.USER_ID_1,
+            coordinator_ids=['user1', 'user2'],
+            coordinators_count=2
+        ).put()
+
         user_models.UserContributionRightsModel(
             id=self.USER_ID_1,
             can_review_translation_for_language_codes=['hi', 'en'],
@@ -1188,6 +1194,9 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         expected_question_reviewer_total_contribution_stats: Dict[
             str, Dict[str, Dict[str, str]]
         ] = {}
+        expected_translation_coordinator_stats: Dict[
+            str, Dict[str, Dict[str, str]]
+        ] = {}
         expected_story_sm: Dict[str, Dict[str, Dict[str, str]]] = {}
         expected_question_sm: Dict[str, Dict[str, Dict[str, str]]] = {}
         expected_config_property_sm: Dict[str, Dict[str, Dict[str, str]]] = {}
@@ -1270,6 +1279,8 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
                 expected_question_submitter_total_contribution_stats,
             'question_reviewer_total_contribution_stats':
                 expected_question_reviewer_total_contribution_stats,
+            'translation_coordinator_stats':
+                expected_translation_coordinator_stats,
             'story_snapshot_metadata': expected_story_sm,
             'question_snapshot_metadata': expected_question_sm,
             'config_property_snapshot_metadata':
@@ -2064,6 +2075,13 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
                         self.LAST_CONTRIBUTION_DATE.isoformat())
                 }
         }
+        expected_translation_coordinator_stats_data = {
+            '%s' % (
+                self.USER_ID_1): {
+                    'coordinator_ids': ['user1', 'user2'],
+                    'coordinators_count': 2
+                }
+        }
         expected_user_data = {
             'user_stats': expected_stats_data,
             'user_settings': expected_user_settings_data,
@@ -2121,6 +2139,8 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
                 expected_question_submitter_total_contribution_stats_data,
             'question_reviewer_total_contribution_stats':
                 expected_question_reviewer_total_contribution_stats_data,
+            'translation_coordinator_stats':
+                expected_translation_coordinator_stats_data,
             'story_snapshot_metadata': expected_story_sm,
             'question_snapshot_metadata': expected_question_sm,
             'config_property_snapshot_metadata':

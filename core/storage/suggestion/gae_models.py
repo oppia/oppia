@@ -3443,7 +3443,7 @@ class TranslationCoordinatorsModel(base_models.BaseModel):
         indexed=True, repeated=True)
 
     # The number of coordinators of this language, added this property for
-    # enabling sorting.
+    # enabling sorting. It is lenght of coordinator_ids.
     coordinators_count = datastore_services.IntegerProperty(
         indexed=True, required=True)
 
@@ -3507,7 +3507,7 @@ class TranslationCoordinatorsModel(base_models.BaseModel):
         Returns:
             dict. The user-relevant properties of TranslationCoordinatorsModel
             in a dict format. In this case, we are returning all the ids of the
-            topics this user manages.
+            languages user coordinates.
         """
         coordinated_languages = cls.get_all().filter(
             cls.coordinator_ids == user_id)
