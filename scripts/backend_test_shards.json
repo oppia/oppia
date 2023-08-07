@@ -5,6 +5,7 @@
         "core.controllers.base_test",
         "core.controllers.collection_editor_test",
         "core.controllers.editor_test",
+        "core.controllers.firebase_test",
         "core.controllers.learner_playlist_test",
         "core.controllers.review_tests_test",
         "core.controllers.resources_test",
