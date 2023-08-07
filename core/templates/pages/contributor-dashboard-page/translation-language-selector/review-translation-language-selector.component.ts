@@ -89,15 +89,6 @@ export class ReviewTranslationLanguageSelectorComponent implements OnInit {
             this.activeLanguageCode];
         }
       });
-
-    this.contributionOpportunitiesBackendApiService
-      .getPreferredTranslationLanguageAsync()
-      .then((preferredLanguageCode: string|null) => {
-        if (preferredLanguageCode) {
-          this.populateLanguageSelection(
-            preferredLanguageCode);
-        }
-      });
   }
 
   toggleDropdown(): void {
