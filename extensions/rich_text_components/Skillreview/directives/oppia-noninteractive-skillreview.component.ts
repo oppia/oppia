@@ -54,6 +54,9 @@ export class NoninteractiveSkillreview implements OnInit, OnChanges {
   @Input() textWithValue!: string;
   skillId!: string;
   linkText!: string;
+  entityId!: string;
+  entityType?: string;
+
 
   constructor(
     private ckEditorCopyContentService: CkEditorCopyContentService,
@@ -99,8 +102,8 @@ export class NoninteractiveSkillreview implements OnInit, OnChanges {
     if (this._shouldOpenRTEModal(event)) {
       return;
     }
-    const entityId = this.contextService.getEntityId();
-    const entityType = this.contextService.getEntityType();
+    this.entityId = this.contextService.getEntityId();
+    this.entityType = this.contextService.getEntityType();
 
     this.contextService.setCustomEntityContext(
       AppConstants.ENTITY_TYPE.SKILL, this.skillId);
@@ -115,7 +118,14 @@ export class NoninteractiveSkillreview implements OnInit, OnChanges {
     );
     modalRef.componentInstance.skillId = this.skillId;
     modalRef.result.then(() => {}, (res) => {
-      this.contextService.setCustomEntityContext(entityType, entityId);
+      this.contextService.removeCustomEntityContext();
+      // Restore the entity context to that of the state before the concept card
+      // editor was initialized. This prevents change of context issues in
+      // calling components once the editor is closed.
+      if (this.entityId && this.entityType) {
+        this.contextService.setCustomEntityContext(
+          this.entityType, this.entityId);
+      }
       const allowedDismissActions = (
         ['cancel', 'escape key press', 'backdrop click']);
       if (!allowedDismissActions.includes(res)) {
