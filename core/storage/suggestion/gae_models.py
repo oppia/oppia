@@ -695,7 +695,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
             cls.status == STATUS_IN_REVIEW,
             cls.suggestion_type == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
             cls.author_id != user_id,
-            cls.language_code == (language_code),
+            cls.language_code == language_code,
             cls.target_id == exp_id
         ))
 
@@ -709,7 +709,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
             next_offset
         )
 
-    # TODO(#18745): Transition the callsite to use the new method
+    # TODO(#18745): Transition all callsites to use the new method
     # get_reviewable_translation_suggestions_for_single_exploration instead
     # for the case of a single exploration without a limit. Deprecate the
     # no-limit behavior of this method to avoid future issues.
