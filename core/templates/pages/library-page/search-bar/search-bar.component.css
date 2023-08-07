@@ -8,7 +8,7 @@ oppia-search-bar .navbar-fixed-bottom .dropdown .dropdown-menu {
   bottom: auto;
 }
 .oppia-search-bar-input {
-  width: 220px;
+  width: 220px !important;
 }
 .oppia-search-bar-input,
 .oppia-search-button {
@@ -151,6 +151,12 @@ oppia-search-bar .oppia-input-group {
   }
   .oppia-search-bar-input:focus {
     color: #257d76;
+  }
+}
+
+@media (max-width: 982px) {
+  .oppia-classroom-search-bar-container {
+    width: 590px;
   }
 }
 
