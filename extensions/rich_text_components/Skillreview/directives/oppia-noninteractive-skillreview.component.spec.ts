@@ -121,6 +121,7 @@ describe('NoninteractiveSkillreview', () => {
 
   it('should close concept card when user clicks the link', fakeAsync(() => {
     spyOn(contextService, 'setCustomEntityContext');
+    spyOn(contextService, 'removeCustomEntityContext');
     let e = {
       currentTarget: {
         offsetParent: {
@@ -143,6 +144,7 @@ describe('NoninteractiveSkillreview', () => {
     tick();
 
     expect(modalSpy).toHaveBeenCalled();
+    expect(contextService.removeCustomEntityContext).toHaveBeenCalled();
     expect(contextService.setCustomEntityContext).toHaveBeenCalled();
   }));
 
