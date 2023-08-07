@@ -34,6 +34,10 @@ export interface CreatorTopicSummaryBackendDict {
   'topic_model_last_updated': number;
   'can_edit_topic': boolean;
   'is_published': boolean;
+  'total_upcoming_chapters_count': number;
+  'total_overdue_chapters_count': number;
+  'total_chapter_counts_for_each_story': number[];
+  'published_chapter_counts_for_each_story': number[];
   'url_fragment': string;
   // This property is optional because it is only present in the
   // topic summary dict of topic dashboard page.
@@ -60,7 +64,11 @@ export class CreatorTopicSummary {
       public classroom: string | undefined,
       public thumbnailFilename: string,
       public thumbnailBgColor: string,
-      public urlFragment: string) { }
+      public urlFragment: string,
+      public totalUpcomingChaptersCount: number,
+      public totalOverdueChaptersCount: number,
+      public totalChaptersCounts: number[],
+      public publishedChaptersCounts: number[]) { }
 
   static createFromBackendDict(
       topicSummaryBackendDict: CreatorTopicSummaryBackendDict
@@ -84,7 +92,11 @@ export class CreatorTopicSummary {
       topicSummaryBackendDict.classroom,
       topicSummaryBackendDict.thumbnail_filename,
       topicSummaryBackendDict.thumbnail_bg_color,
-      topicSummaryBackendDict.url_fragment);
+      topicSummaryBackendDict.url_fragment,
+      topicSummaryBackendDict.total_upcoming_chapters_count,
+      topicSummaryBackendDict.total_overdue_chapters_count,
+      topicSummaryBackendDict.total_chapter_counts_for_each_story,
+      topicSummaryBackendDict.published_chapter_counts_for_each_story);
   }
 
   getId(): string {
@@ -157,5 +169,21 @@ export class CreatorTopicSummary {
 
   isTopicPublished(): boolean {
     return this.isPublished;
+  }
+
+  getTotalUpcomingChaptersCount(): number {
+    return this.totalUpcomingChaptersCount;
+  }
+
+  getTotalOverdueChaptersCount(): number {
+    return this.totalOverdueChaptersCount;
+  }
+
+  getTotalChaptersCounts(): number[] {
+    return this.totalChaptersCounts;
+  }
+
+  getPublishedChaptersCounts(): number[] {
+    return this.publishedChaptersCounts;
   }
 }

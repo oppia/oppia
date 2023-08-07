@@ -529,6 +529,7 @@
 /redis.conf @oppia/data-and-stability-reviewers
 /redis_docker.conf @oppia/data-and-stability-reviewers
 /.firebase.json @oppia/data-and-stability-reviewers
+/.firebase_docker.json @oppia/data-and-stability-reviewers
 
 
 # Miscellaneous.
@@ -763,6 +764,7 @@
 /core/controllers/access_validators*.py @oppia/core-reviewers
 /core/controllers/acl_decorators*.py @oppia/core-reviewers
 /core/controllers/base*.py @oppia/core-reviewers
+/core/controllers/firebase*.py @oppia/core-reviewers
 /core/domain/html*.py @oppia/core-reviewers
 /core/domain/rights_manager*.py @oppia/core-reviewers
 /core/domain/role_services*.py @oppia/core-reviewers
