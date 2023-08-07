@@ -780,8 +780,9 @@ class UtilsTests(test_utils.GenericTestBase):
             dt, datetime.datetime.fromtimestamp(msecs / 1000.0))
 
     def test_convert_millisecs_time_to_datetime_object(self) -> None:
-        msecs = 1690741800000
-        dt = utils.convert_millisecs_time_to_datetime_object(msecs)
+        msecs = 1690761600000
+        dt = utils.convert_millisecs_time_to_datetime_object(
+            msecs + 1000.0 * time.timezone)
         dt2 = datetime.datetime(2023, 7, 31)
         self.assertEqual(dt, dt2)
 
