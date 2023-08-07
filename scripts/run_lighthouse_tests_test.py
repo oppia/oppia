@@ -391,6 +391,21 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
                     b'No error.')
         def mock_popen(*unused_args: str, **unused_kwargs: str) -> MockTask:  # pylint: disable=unused-argument
             return MockTask()
+
+        # Mimic Chrome Verification in run_lighthoue_tests.
+        common.setup_chrome_bin_env_variable()
+        env = os.environ.copy()
+        env['PIP_NO_DEPS'] = 'True'
+        swap_dev_appserver = self.swap_with_checks(
+            servers, 'managed_dev_appserver',
+            lambda *unused_args, **unused_kwargs: MockCompilerContextManager(),
+            expected_kwargs=[{
+                'port': GOOGLE_APP_ENGINE_PORT,
+                'log_level': 'critical',
+                'skip_sdk_update_check': True,
+                'env': env
+            }])
+
         swap_popen = self.swap(
             subprocess, 'Popen', mock_popen)
         swap_run_lighthouse_tests = self.swap_with_checks(
@@ -404,7 +419,7 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
         swap_emulator_mode = self.swap(constants, 'EMULATOR_MODE', False)
 
         with swap_popen, self.swap_webpack_compiler, swap_isdir, swap_build:
-            with self.swap_elasticsearch_dev_server, self.swap_dev_appserver:
+            with self.swap_elasticsearch_dev_server, swap_dev_appserver:
                 with self.swap_ng_build, swap_emulator_mode, self.print_swap:
                     with self.swap_redis_server, swap_run_lighthouse_tests:
                         run_lighthouse_tests.main(
