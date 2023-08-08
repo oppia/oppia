@@ -3053,7 +3053,7 @@ version: 1
         self,
         url: str,
         payload: Dict[str, str],
-        headers: Dict[str, bytes],
+        headers: Dict[str, bytes] | Dict[str, str],
         csrf_token: Optional[str] = None,
         expect_errors: bool = False,
         expected_status_int: int = 200
