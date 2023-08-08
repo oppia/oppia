@@ -1188,7 +1188,7 @@ def _construct_exploration_suggestions(
         exploration's current content.
 
     Raises:
-        ValueError. Exlporation content is unavailable.
+        ValueError. Exploration content is unavailable.
     """
     suggestion_dicts: List[FrontendBaseSuggestionDict] = []
     exp_ids = {suggestion.target_id for suggestion in suggestions}
