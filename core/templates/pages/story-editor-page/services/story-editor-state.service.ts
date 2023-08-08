@@ -48,6 +48,10 @@ export class StoryEditorStateService {
   _expIdsChanged: boolean = false;
   _storyWithUrlFragmentExists: boolean = false;
   _currentNodeIsPublishable: boolean = false;
+  _selectedChapterIndexInPublishUptoDropdown: number = 0;
+  _chaptersAreBeingPublished: boolean = true;
+  _newChapterPublicationIsDisabled: boolean = true;
+  _chapterStatusIsBeingChanged: boolean = false;
 
   _storyInitializedEventEmitter = new EventEmitter();
   _storyReinitializedEventEmitter = new EventEmitter();
@@ -229,6 +233,7 @@ export class StoryEditorStateService {
         this._updateStory(storyBackendObject);
         this.undoRedoService.clearChanges();
         this._storyIsBeingSaved = false;
+        this.setChapterStatusIsChanging(false);
         if (successCallback) {
           successCallback();
         }
@@ -236,11 +241,18 @@ export class StoryEditorStateService {
         let errorMessage = error || 'There was an error when saving the story.';
         this.alertsService.addWarning(errorMessage);
         this._storyIsBeingSaved = false;
+        this.setChapterStatusIsChanging(false);
         if (errorCallback) {
           errorCallback(errorMessage);
         }
       });
     return true;
+  }
+
+  saveChapter(
+      successCallback: () => void, errorCallback: () => void): void {
+    this.saveStory(
+      'Changed Chapter Status', successCallback, errorCallback);
   }
 
   getTopicUrlFragment(): string {
@@ -283,12 +295,45 @@ export class StoryEditorStateService {
     return this._storyIsBeingSaved;
   }
 
+  isChangingChapterStatus(): boolean {
+    return this._chapterStatusIsBeingChanged;
+  }
+
+  setChapterStatusIsChanging(chapterStatusIsChanging: boolean): void {
+    this._chapterStatusIsBeingChanged = chapterStatusIsChanging;
+  }
+
   setCurrentNodeAsPublishable(currentNodeIsPublishable: boolean): void {
     this._currentNodeIsPublishable = currentNodeIsPublishable;
   }
 
   isCurrentNodePublishable(): boolean {
     return this._currentNodeIsPublishable;
+  }
+
+  setSelectedChapterIndexInPublishUptoDropdown(chapterIndex: number): void {
+    this._selectedChapterIndexInPublishUptoDropdown = chapterIndex;
+  }
+
+  getSelectedChapterIndexInPublishUptoDropdown(): number {
+    return this._selectedChapterIndexInPublishUptoDropdown;
+  }
+
+  setChaptersAreBeingPublished(chaptersAreBeingPublished: boolean): void {
+    this._chaptersAreBeingPublished = chaptersAreBeingPublished;
+  }
+
+  areChaptersBeingPublished(): boolean {
+    return this._chaptersAreBeingPublished;
+  }
+
+  setNewChapterPublicationIsDisabled(
+      chapterPublicationIsDisabled: boolean): void {
+    this._newChapterPublicationIsDisabled = chapterPublicationIsDisabled;
+  }
+
+  getNewChapterPublicationIsDisabled(): boolean {
+    return this._newChapterPublicationIsDisabled;
   }
 
   get onStoryInitialized(): EventEmitter<string> {

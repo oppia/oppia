@@ -170,7 +170,7 @@ describe('Topics and skills dashboard page component', () => {
       componentInstance.topicSummaries.push(
         new CreatorTopicSummary(
           '', '', 2, 2, 2, 2, 2, '', '', 2, 2, 2, 2, true, true, '', '',
-          '', ''));
+          '', '', 1, 1, [5, 4], [3, 4]));
     }
     componentInstance.pageNumber = 1;
     componentInstance.itemsPerPage = 4;
@@ -318,7 +318,7 @@ describe('Topics and skills dashboard page component', () => {
         totalSkillCount: 5,
         topicSummaries: [new CreatorTopicSummary(
           '', '', 2, 2, 2, 2, 2, '', '', 1, 1, 2, 3, true, true, '', '', '',
-          '')],
+          '', 1, 1, [5, 4], [3, 4])],
         categorizedSkillsDict: {}
       }),
       Promise.resolve({
