@@ -71,7 +71,8 @@
           <div class="story-node-planned-publication-date" *ngIf="isSerialChapterFeatureFlagEnabled()">
             <label for="storyNodePlannedPublicationDate" class="form-heading">Planned Publication Date*</label>
             <input id="storyNodePlannedPublicationDate" type="date" class="form-control"
-                   [(ngModel)]="editablePlannedPublicationDate"
+                   [ngModel]="editablePlannedPublicationDate | date:'yyyy-MM-dd'"
+                   (ngModelChange)="editablePlannedPublicationDate = $event"
                    (blur)="updatePlannedPublicationDate(editablePlannedPublicationDate)">
           </div>
           <div class="e2e-test-story-node-thumbnail">

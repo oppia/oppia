@@ -75,12 +75,21 @@ describe('Story Editor Unpublish Modal Component', () => {
   });
 
   it('should close by proceeding with unpublishing', () => {
+    mockPlatformFeatureService.
+      status.SerialChapterLaunchCurriculumAdminView.isEnabled = false;
     const confirmSpy = spyOn(ngbActiveModal, 'close').and.callThrough();
     component.confirm();
     expect(confirmSpy).toHaveBeenCalled();
+
+    mockPlatformFeatureService.
+      status.SerialChapterLaunchCurriculumAdminView.isEnabled = true;
+    component.confirm();
+    expect(confirmSpy).toHaveBeenCalledWith(component.unpublishingReason);
   });
 
   it('should get status of Serial Chapter Launch Feature flag', () => {
+    mockPlatformFeatureService.
+      status.SerialChapterLaunchCurriculumAdminView.isEnabled = false;
     expect(component.isSerialChapterFeatureFlagEnabled()).toEqual(false);
 
     mockPlatformFeatureService.

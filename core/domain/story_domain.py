@@ -2067,7 +2067,8 @@ class Story:
         node_index = self.story_contents.get_node_index(node_id)
         self.story_contents.nodes[node_index].planned_publication_date = (
             utils.convert_millisecs_time_to_datetime_object(
-                new_planned_publication_date_msecs))
+                new_planned_publication_date_msecs) if
+                new_planned_publication_date_msecs else None)
 
     def update_node_last_modified(
             self, node_id: str, new_last_modified_msecs: float) -> None:
@@ -2081,7 +2082,7 @@ class Story:
         node_index = self.story_contents.get_node_index(node_id)
         self.story_contents.nodes[node_index].last_modified = (
             utils.convert_millisecs_time_to_datetime_object(
-            new_last_modified_msecs))
+            new_last_modified_msecs)) if new_last_modified_msecs else None
 
     def update_node_first_publication_date(
             self, node_id: str, new_publication_date_msecs: float) -> None:
@@ -2095,7 +2096,8 @@ class Story:
         node_index = self.story_contents.get_node_index(node_id)
         self.story_contents.nodes[node_index].first_publication_date = (
             utils.convert_millisecs_time_to_datetime_object(
-                new_publication_date_msecs))
+                new_publication_date_msecs) if
+                new_publication_date_msecs else None)
 
     def update_node_unpublishing_reason(
             self, node_id: str, new_unpublishing_reason: str) -> None:
