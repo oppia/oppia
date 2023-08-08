@@ -386,6 +386,7 @@
         "core.jobs.io.job_io_test",
         "core.jobs.batch_jobs.remove_profile_picture_data_url_field_jobs_test",
         "core.jobs.io.gcs_io_test",
-        "core.domain.android_services_test"
+        "core.domain.android_services_test",
+        "core.jobs.batch_jobs.story_node_jobs_test"
     ]
 }
