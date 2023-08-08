@@ -22,9 +22,10 @@ jobs:
         with:
           python-version: '3.8.15'
           architecture: 'x64'
-      - uses: DubeySandeep/pending-review-notification@v1
+      - uses: oppia/stale-review-request-notifier@develop
         with:
-          team-slug: oppia-codeowners
+          category-name: Reviewer_notifications
+          discussion-title: Pending_Reviews
           repo-token: ${{ secrets.DISCUSSION_NOTIFICATION_TOKEN }}
           review-turnaround-hours: 48
       - name: Report if failed
