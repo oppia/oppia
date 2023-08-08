@@ -564,7 +564,8 @@ class NewSkillHandler(
         """Creates a new skill.
 
         Raises:
-            InvalidInputException. Topic is None or duplicate skill description.
+            InvalidInputException. The topic is None or there is a duplicate
+                skill description.
         """
         assert self.user_id is not None
         assert self.normalized_payload is not None
