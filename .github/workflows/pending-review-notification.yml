@@ -24,8 +24,8 @@ jobs:
           architecture: 'x64'
       - uses: oppia/stale-review-request-notifier@develop
         with:
-          category-name: Reviewer_notifications
-          discussion-title: Pending_Reviews
+          category-name: Notify\ Reviewers
+          discussion-title: Pending\ Reviews
           repo-token: ${{ secrets.DISCUSSION_NOTIFICATION_TOKEN }}
           review-turnaround-hours: 48
       - name: Report if failed
