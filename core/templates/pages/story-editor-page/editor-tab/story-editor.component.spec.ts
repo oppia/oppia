@@ -204,8 +204,11 @@ describe('Story Editor Component having three story nodes', () => {
   });
 
   it('should get medium dateStyle locale date string', () => {
-    expect(component.getMediumStyleLocaleDateString(1692144000000)).toBe(
-      '16 Aug 2023');
+    const options = {
+      dateStyle: 'medium'
+    } as Intl.DateTimeFormatOptions;
+    expect(component.getMediumStyleLocaleDateString(1692144000000)).toEqual(
+      (new Date(1692144000000)).toLocaleDateString(undefined, options));
   });
 
   it('should disable drag and drop', () => {
