@@ -1,10 +1,14 @@
 <div *ngIf="isSerialChapterFeatureFlagEnabled()">
   <div class="modal-header">
-    Unpublishing Confirmation
+    <span *ngIf="unpublishedChapters.length === 1">Unpublish Chapter</span>
+    <span *ngIf="unpublishedChapters.length > 1">Unpublish Chapters</span>
   </div>
   <div class="modal-body">
     <p>
-      You're attempting to unpublish chapters, please specify a reason and note the warning
+      You're attempting to unpublish
+      <span *ngIf="unpublishedChapters.length === 1">chapter {{ unpublishedChapters[0] }}</span>
+      <span *ngIf="unpublishedChapters.length > 1">chapters {{ unpublishedChapters[0] }}-{{ unpublishedChapters[unpublishedChapters.length - 1] }}</span>
+      of this story. Please specify a reason and note the warning
       message before proceeding.
     </p>
     <div class="modal-body-actions">
@@ -46,13 +50,13 @@
                *ngIf="unpublishingReason=='BAD_CONTENT'"
                tabindex="0"
                role="alert">
-            “Please edit the existing explorations instead of adding/deleting new ones, to avoid inadvertently impacting learners' progress”
+            Please edit the existing explorations instead of adding/deleting new ones, to avoid inadvertently impacting learners' progress.
           </div>
           <div class="split-chapters-warning oppia-warning-text"
                *ngIf="unpublishingReason=='CHAPTER_NEEDS_SPLITTING'"
                tabindex="0"
                role="alert">
-            “Please note that learners' overall progress score will decrease if some of the content they've played gets moved to a new exploration.”
+            Please note that learners' overall progress score will decrease if some of the content they've played gets moved to a new exploration.
           </div>
         </div>
         <div class="oppia-modal-buttons">
