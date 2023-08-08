@@ -91,6 +91,7 @@ jobs:
           - explorationTranslationTab
           - extensions
           - featureGating
+          - feedbackUpdates
           - fileUploadExtensions
           - fileUploadFeatures
           - learner
