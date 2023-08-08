@@ -665,6 +665,7 @@ img, video, canvas {
 }
 
 textarea {
+  padding: 5px 6px;
   width: 90%;
 }
 
