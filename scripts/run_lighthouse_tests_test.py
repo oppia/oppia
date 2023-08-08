@@ -503,7 +503,7 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
         swap_run_puppeteer_script = self.swap_with_checks(
             run_lighthouse_tests, 'run_lighthouse_puppeteer_script',
             lambda record: None,
-            expected_args=((True),))
+            expected_args=((True,),))
         swap_run_lighthouse_tests = self.swap_with_checks(
             run_lighthouse_tests, 'run_lighthouse_checks',
             lambda *unused_args: None,
