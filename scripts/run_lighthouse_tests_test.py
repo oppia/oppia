@@ -498,3 +498,17 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
             self.print_arr)
         self.assertIn(
             'Puppeteer script completed successfully.', self.print_arr)
+
+    def test_main_function_calls_puppeteer_record(self) -> None:
+        swap_run_puppeteer_script = self.swap_with_checks(
+            run_lighthouse_tests, 'run_lighthouse_puppeteer_script',
+            lambda record: None,
+            expected_args=((True),))
+        swap_run_lighthouse_tests = self.swap_with_checks(
+            run_lighthouse_tests, 'run_lighthouse_checks',
+            lambda *unused_args: None,
+            expected_args=(('performance', '1'),))
+        with swap_run_puppeteer_script, swap_run_lighthouse_tests:
+            run_lighthouse_tests.main(
+            args=['--mode', 'performance',
+                '--shard', '1', '--record_screen'])
