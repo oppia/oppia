@@ -38,6 +38,7 @@ from core.domain import state_domain
 from core.domain import suggestion_registry
 from core.domain import suggestion_services
 from core.domain import translation_domain
+from core.domain import user_services
 
 from typing import (
     Dict, List, Mapping, Optional, Sequence, TypedDict, TypeVar, Union, cast
@@ -761,7 +762,9 @@ class ReviewableSuggestionsHandler(
         sort_key = self.normalized_request['sort_key']
         exploration_id = self.normalized_request.get('exploration_id')
         exp_ids = [exploration_id] if exploration_id else []
-
+        user_settings = user_services.get_user_settings(self.user_id)
+        language_code_to_filter_by = (
+            user_settings.preferred_translation_language_code)
         suggestions: Sequence[suggestion_registry.BaseSuggestion] = []
         next_offset = 0
         if suggestion_type == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT:
@@ -771,7 +774,8 @@ class ReviewableSuggestionsHandler(
                 reviewable_suggestions, next_offset = (
                     suggestion_services
                     .get_reviewable_translation_suggestions_for_single_exp(
-                        self.user_id, exp_ids[0]))
+                        self.user_id, exp_ids[0],
+                        language_code_to_filter_by))
             else:
                 reviewable_suggestions, next_offset = (
                     suggestion_services
