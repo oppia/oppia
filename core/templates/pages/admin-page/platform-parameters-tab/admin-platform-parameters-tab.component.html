@@ -53,7 +53,7 @@
                   </div>
                 </div>
                 <div class="oppia-accordion-item-body" role="region" [style.display]="accordionItem.expanded ? '' : 'none'"
-                    [attr.id]="'accordion-body-' + index" [attr.aria-labelledby]="'accordion-header-' + index">
+                     [attr.id]="'accordion-body-' + index" [attr.aria-labelledby]="'accordion-header-' + index">
                   <div class="oppia-rule-container">
                     <div class="row oppia-parameter-top-margin">
                       <div class="col-12"><b>If:</b></div>
@@ -121,8 +121,8 @@
                                     </ng-container>
                                     <ng-container *ngIf="!filterTypeToContext[filter.type].options">
                                       <input [(ngModel)]="filter.conditions[conditionIndex][1]"
-                                            [placeholder]="filterTypeToContext[filter.type].placeholder"
-                                            class="oppia-condition-input">
+                                             [placeholder]="filterTypeToContext[filter.type].placeholder"
+                                             class="oppia-condition-input">
                                       <ng-container *ngIf="filterTypeToContext[filter.type].inputRegex">
                                         <span class="oppia-input-error"
                                               *ngIf="!filterTypeToContext[filter.type].inputRegex.test(filter.conditions[conditionIndex][1])">
@@ -301,7 +301,7 @@
     border-top: 1px solid #dee2e6;
     display: flex;
     justify-content: flex-end;
-    margin-right:5px;
+    margin-right: 5px;
     padding-top: 10px;
   }
 
@@ -412,5 +412,5 @@
   .e2e-test-angular-dummy-parameter-indicator {
     bottom: 10px;
   }
-  
+
 </style>

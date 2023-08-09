@@ -156,11 +156,8 @@ export class AdminPlatformParametersTabComponent implements OnInit {
         resultantString += filterName + ' in ' + '[ ]' + '; ';
       } else {
         let conditions: string = '';
-        // for (let condition of filter.conditions) {
-        //   conditions += condition[1] + ', ';
-        // }
         for (let idx = 0; idx < filter.conditions.length; idx++) {
-          if (idx === filter.conditions.length-1) {
+          if (idx === filter.conditions.length - 1) {
             conditions += filter.conditions[idx][1];
           } else {
             conditions += filter.conditions[idx][1] + ', ';
