@@ -78,6 +78,7 @@ describe('Topics and skills dashboard page component', () => {
     createNewSkillModalService = TestBed.inject(CreateNewSkillModalService);
     topicsAndSkillsDashboardPageService = TestBed.inject(
       TopicsAndSkillsDashboardPageService);
+    fixture.detectChanges();
   });
 
   it('should create', () => {
@@ -260,23 +261,24 @@ describe('Topics and skills dashboard page component', () => {
     componentInstance.filterBoxIsShown = false;
     componentInstance.toggleFilterBox();
     expect(componentInstance.filterBoxIsShown).toBeTrue();
+    componentInstance.toggleFilterBox();
+    expect(componentInstance.filterBoxIsShown).toBeFalse();
   });
 
   it('should display filter box on maximizing the window', () => {
     componentInstance.filterBoxIsShown = false;
-
     spyOn(windowDimensionsService, 'isWindowNarrow').and.returnValue(false);
 
+    Object.defineProperty(window, 'innerWidth', { value: 1024 });
     componentInstance.filterBoxOnResize();
-
     expect(componentInstance.filterBoxIsShown).toBeTrue();
   });
 
   it('should hide filter box on minimizing the window', () => {
     componentInstance.filterBoxIsShown = true;
-
     spyOn(windowDimensionsService, 'isWindowNarrow').and.returnValue(true);
 
+    Object.defineProperty(window, 'innerWidth', { value: 768 });
     componentInstance.filterBoxOnResize();
 
     expect(componentInstance.filterBoxIsShown).toBeFalse();
