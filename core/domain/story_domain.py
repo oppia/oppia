@@ -21,6 +21,7 @@ import datetime
 import functools
 import json
 import re
+import time
 
 from core import android_validation_constants
 from core import feconf
@@ -642,7 +643,7 @@ class StoryNode:
         Returns:
             bool. Whether the status is valid or not.
         """
-        return status in constants.ALLOWED_STORYNODE_STATUS
+        return status in constants.ALLOWED_STORY_NODE_STATUS
 
     @classmethod
     def require_valid_unpublishing_reason(
@@ -656,7 +657,7 @@ class StoryNode:
             bool. Whether the unpublishing reason is valid or not.
         """
         return unpublishing_reason in (
-            constants.ALLOWED_STORYNODE_UNPUBLISHING_REASONS)
+            constants.ALLOWED_STORY_NODE_UNPUBLISHING_REASONS)
 
     def to_dict(self) -> StoryNodeDict:
         """Returns a dict representing this StoryNode domain object.
@@ -911,6 +912,45 @@ class StoryNode:
                 raise utils.ValidationError(
                     'Chapter unpublishing reason cannot be %s ' %
                     self.unpublishing_reason)
+
+    def is_node_upcoming(self) -> bool:
+        """Return whether the StoryNode domain object is expected to be
+        published within the next CHAPTER_PUBLICATION_NOTICE_PERIOD_IN_DAYS
+        days.
+
+        Returns:
+            bool. True if the chapter is upcoming else false.
+        """
+        current_time = (
+            utils.convert_millisecs_time_to_datetime_object(
+            utils.get_current_time_in_millisecs() -
+            1000.0 * time.timezone))
+        if (
+            self.status != constants.STORY_NODE_STATUS_PUBLISHED and
+            self.planned_publication_date is not None and
+            current_time < self.planned_publication_date <
+            (current_time + datetime.timedelta(
+            days=constants.CHAPTER_PUBLICATION_NOTICE_PERIOD_IN_DAYS))):
+            return True
+        return False
+
+    def is_node_behind_schedule(self) -> bool:
+        """Return whether StoryNode domain object is behind-schedule
+        from the planned publication date.
+
+        Returns:
+            bool. True if the chapter is behind-schedule else false.
+        """
+        current_time = (
+            utils.convert_millisecs_time_to_datetime_object(
+            utils.get_current_time_in_millisecs() -
+            1000.0 * time.timezone))
+        if (
+            self.status != constants.STORY_NODE_STATUS_PUBLISHED and
+            self.planned_publication_date is not None and
+            current_time > self.planned_publication_date):
+            return True
+        return False
 
 
 class StoryContentsDict(TypedDict):
@@ -2027,7 +2067,8 @@ class Story:
         node_index = self.story_contents.get_node_index(node_id)
         self.story_contents.nodes[node_index].planned_publication_date = (
             utils.convert_millisecs_time_to_datetime_object(
-                new_planned_publication_date_msecs))
+                new_planned_publication_date_msecs) if
+                new_planned_publication_date_msecs else None)
 
     def update_node_last_modified(
             self, node_id: str, new_last_modified_msecs: float) -> None:
@@ -2041,7 +2082,7 @@ class Story:
         node_index = self.story_contents.get_node_index(node_id)
         self.story_contents.nodes[node_index].last_modified = (
             utils.convert_millisecs_time_to_datetime_object(
-            new_last_modified_msecs))
+            new_last_modified_msecs)) if new_last_modified_msecs else None
 
     def update_node_first_publication_date(
             self, node_id: str, new_publication_date_msecs: float) -> None:
@@ -2055,7 +2096,8 @@ class Story:
         node_index = self.story_contents.get_node_index(node_id)
         self.story_contents.nodes[node_index].first_publication_date = (
             utils.convert_millisecs_time_to_datetime_object(
-                new_publication_date_msecs))
+                new_publication_date_msecs) if
+                new_publication_date_msecs else None)
 
     def update_node_unpublishing_reason(
             self, node_id: str, new_unpublishing_reason: str) -> None:
@@ -2347,3 +2389,34 @@ class StoryChapterProgressSummaryDict(TypedDict):
     exploration_id: str
     visited_checkpoints_count: int
     total_checkpoints_count: int
+
+
+class StoryPublicationTimeliness:
+    """Domain object for stories with behind-schedule chapters
+    or chapters upcoming within CHAPTER_PUBLICATION_NOTICE_PERIOD_IN_DAYS.
+    """
+
+    def __init__(
+        self,
+        story_id: str,
+        story_name: str,
+        topic_name: str,
+        overdue_chapters: List[str],
+        upcoming_chapters: List[str]
+    ) -> None:
+        """Constructs a StoryPublicationTimeliness domain object.
+
+        Args:
+            story_id: str. The unique id of the story.
+            story_name: str. The title of the story.
+            topic_name: str. The title of the topic.
+            overdue_chapters: list(str). The list of behind schedule chapter
+                names.
+            upcoming_chapters: list(str). The list of chapter names
+                upcoming within CHAPTER_PUBLICATION_NOTICE_PERIOD_IN_DAYS.
+        """
+        self.id = story_id
+        self.story_name = story_name
+        self.topic_name = topic_name
+        self.overdue_chapters = overdue_chapters
+        self.upcoming_chapters = upcoming_chapters
