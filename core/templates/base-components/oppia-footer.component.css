@@ -137,10 +137,10 @@
 }
 
 .oppia-newsletter-input > button {
-  background-color: white;
-  border: 1px solid #00645c;
+  background-color: #004d45;
+  border: 2px solid white;
   border-radius: 4px;
-  color: #00645c;
+  color: white;
   font-size: 14px;
   font-weight: 600;
   height: 44px;
@@ -149,12 +149,9 @@
   width: 96px;
 }
 
-.oppia-newsletter-input > button:hover {
-  border: 2px;
-}
-
 .oppia-newsletter-input > button:active {
   background-color: #f5f5f5;
+  color: #009688;
 }
 
 .oppia-footer-terms-privacy {
