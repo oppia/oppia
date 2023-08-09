@@ -1634,12 +1634,8 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
             2
         )
         self.assertEqual(
-            response['stats'][0]['language_id'],
-            'hi'
-        )
-        self.assertEqual(
-            response['stats'][1]['language_id'],
-            'es'
+            [stat['language_id'] for stat in response['stats']],
+            ['hi', 'es']
         )
         self.logout()
 

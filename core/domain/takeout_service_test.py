@@ -842,8 +842,14 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         )
 
         suggestion_models.TranslationCoordinatorsModel(
-            id=self.USER_ID_1,
-            coordinator_ids=['user1', 'user2'],
+            id='es',
+            coordinator_ids=[self.USER_ID_1],
+            coordinators_count=2
+        ).put()
+
+        suggestion_models.TranslationCoordinatorsModel(
+            id='hi',
+            coordinator_ids=[self.USER_ID_1],
             coordinators_count=2
         ).put()
 
@@ -1194,9 +1200,9 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         expected_question_reviewer_total_contribution_stats: Dict[
             str, Dict[str, Dict[str, str]]
         ] = {}
-        expected_translation_coordinator_stats: Dict[
-            str, Dict[str, Dict[str, str]]
-        ] = {}
+        expected_translation_coordinator_stats: Dict[str, List[str]] = {
+            'coordinated_language_ids': []
+        }
         expected_story_sm: Dict[str, Dict[str, Dict[str, str]]] = {}
         expected_question_sm: Dict[str, Dict[str, Dict[str, str]]] = {}
         expected_config_property_sm: Dict[str, Dict[str, Dict[str, str]]] = {}
@@ -1279,7 +1285,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
                 expected_question_submitter_total_contribution_stats,
             'question_reviewer_total_contribution_stats':
                 expected_question_reviewer_total_contribution_stats,
-            'translation_coordinator_stats':
+            'translation_coordinators':
                 expected_translation_coordinator_stats,
             'story_snapshot_metadata': expected_story_sm,
             'question_snapshot_metadata': expected_question_sm,
@@ -2076,11 +2082,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
                 }
         }
         expected_translation_coordinator_stats_data = {
-            '%s' % (
-                self.USER_ID_1): {
-                    'coordinator_ids': ['user1', 'user2'],
-                    'coordinators_count': 2
-                }
+            'coordinated_language_ids': ['es', 'hi']
         }
         expected_user_data = {
             'user_stats': expected_stats_data,
@@ -2139,7 +2141,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
                 expected_question_submitter_total_contribution_stats_data,
             'question_reviewer_total_contribution_stats':
                 expected_question_reviewer_total_contribution_stats_data,
-            'translation_coordinator_stats':
+            'translation_coordinators':
                 expected_translation_coordinator_stats_data,
             'story_snapshot_metadata': expected_story_sm,
             'question_snapshot_metadata': expected_question_sm,
