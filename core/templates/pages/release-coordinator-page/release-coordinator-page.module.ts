@@ -45,7 +45,6 @@ import { ReleaseCoordinatorPageRootComponent } from './release-coordinator-page-
 import { ReleaseCoordinatorPageRoutingModule } from './release-coordinator-page-routing.module';
 import { Error404PageModule } from 'pages/error-pages/error-404/error-404-page.module';
 import { SmartRouterModule } from 'hybrid-router-module-provider';
-import { CdkAccordionModule } from '@angular/cdk/accordion';
 
 @NgModule({
   imports: [
@@ -70,8 +69,7 @@ import { CdkAccordionModule } from '@angular/cdk/accordion';
     // migrated to angular router.
     SmartRouterModule,
     ReleaseCoordinatorPageRoutingModule,
-    Error404PageModule,
-    CdkAccordionModule
+    Error404PageModule
   ],
   declarations: [
     BeamJobsTabComponent,
