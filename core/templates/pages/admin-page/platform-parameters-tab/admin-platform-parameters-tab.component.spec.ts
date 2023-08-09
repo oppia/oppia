@@ -329,7 +329,7 @@ describe('Admin page platform parameters tab', () => {
     }));
   });
 
-  describe('.updateParameterRulesAsync', () => {
+  describe('.updateParameterRuleAsync', () => {
     let setStatusSpy: jasmine.Spy;
     let promptSpy: jasmine.Spy;
 
@@ -347,7 +347,7 @@ describe('Admin page platform parameters tab', () => {
       const platformParameter = component.platformParameters[0];
 
       component.addNewRuleToBottom(platformParameter);
-      component.updateParameterRulesAsync(platformParameter);
+      component.updateParameterRuleAsync(platformParameter);
 
       flushMicrotasks();
 
@@ -363,7 +363,7 @@ describe('Admin page platform parameters tab', () => {
         const platformParameter = component.platformParameters[0];
 
         component.addNewRuleToBottom(platformParameter);
-        component.updateParameterRulesAsync(platformParameter);
+        component.updateParameterRuleAsync(platformParameter);
 
         flushMicrotasks();
 
@@ -385,7 +385,7 @@ describe('Admin page platform parameters tab', () => {
         const originalFeatureFlag = cloneDeep(platformParameter);
 
         component.addNewRuleToBottom(platformParameter);
-        component.updateParameterRulesAsync(platformParameter);
+        component.updateParameterRuleAsync(platformParameter);
 
         flushMicrotasks();
 
@@ -401,7 +401,7 @@ describe('Admin page platform parameters tab', () => {
       const platformParameter = component.platformParameters[0];
 
       component.addNewRuleToBottom(platformParameter);
-      component.updateParameterRulesAsync(platformParameter);
+      component.updateParameterRuleAsync(platformParameter);
 
       flushMicrotasks();
 
@@ -422,7 +422,7 @@ describe('Admin page platform parameters tab', () => {
         const platformParameter = component.platformParameters[0];
 
         component.addNewRuleToBottom(platformParameter);
-        component.updateParameterRulesAsync(platformParameter);
+        component.updateParameterRuleAsync(platformParameter);
 
         flushMicrotasks();
 
@@ -439,7 +439,7 @@ describe('Admin page platform parameters tab', () => {
       // Two identical rules.
       component.addNewRuleToBottom(platformParameter);
       component.addNewRuleToBottom(platformParameter);
-      component.updateParameterRulesAsync(platformParameter);
+      component.updateParameterRuleAsync(platformParameter);
 
       flushMicrotasks();
 
@@ -459,7 +459,7 @@ describe('Admin page platform parameters tab', () => {
       const platformParameter = component.platformParameters[0];
 
       component.addNewRuleToBottom(platformParameter);
-      component.updateParameterRulesAsync(platformParameter);
+      component.updateParameterRuleAsync(platformParameter);
 
       flushMicrotasks();
 
@@ -481,7 +481,7 @@ describe('Admin page platform parameters tab', () => {
       const platformParameter = component.platformParameters[0];
 
       component.addNewRuleToBottom(platformParameter);
-      component.updateParameterRulesAsync(platformParameter);
+      component.updateParameterRuleAsync(platformParameter);
 
       flushMicrotasks();
 
@@ -497,7 +497,7 @@ describe('Admin page platform parameters tab', () => {
       const platformParameter = component.platformParameters[0];
 
       expect(() => {
-        component.updateParameterRulesAsync(platformParameter);
+        component.updateParameterRuleAsync(platformParameter);
         tick();
       }).toThrowError();
     }));
