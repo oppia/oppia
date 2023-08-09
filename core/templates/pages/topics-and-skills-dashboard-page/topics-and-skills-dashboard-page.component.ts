@@ -87,7 +87,7 @@ export class TopicsAndSkillsDashboardPageComponent {
   displayedTopicSummaries: CreatorTopicSummary[] = [];
   displayedSkillSummaries: SkillSummary[] = [];
   skillStatusOptions: string[] = [];
-  prevWidth: number = window.innerWidth;
+  windowWidth: number = window.innerWidth;
 
   constructor(
     private focusManagerService: FocusManagerService,
@@ -302,8 +302,8 @@ export class TopicsAndSkillsDashboardPageComponent {
 
   @HostListener('window:resize')
   filterBoxOnResize(): void {
-    if (window.innerWidth !== this.prevWidth) {
-      this.prevWidth = window.innerWidth;
+    if (window.innerWidth !== this.windowWidth) {
+      this.windowWidth = window.innerWidth;
       this.filterBoxIsShown = !this.windowDimensionsService.isWindowNarrow();
     }
   }
