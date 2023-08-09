@@ -303,6 +303,12 @@ export class AdminPlatformParametersTabComponent implements OnInit {
   }
 
   clearChanges(param: PlatformParameter): void {
+    if (this.isPlatformParamChanged(param)) {
+      if (!this.windowRef.nativeWindow.confirm(
+        'This will revert all changes you made. Are you sure?')) {
+        return;
+      }
+    }
     const backup = this.platformParameterNameToBackupMap.get(
       param.name
     );

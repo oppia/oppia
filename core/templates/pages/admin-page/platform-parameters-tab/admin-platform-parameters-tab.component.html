@@ -175,7 +175,7 @@
                       </button>
                       <button
                               class="btn btn-primary"
-                              (click)="updateParameterRuleAsync(platformParameter)"
+                              (click)="updateParameterRuleAsync(platformParameter); accordionItem.toggle();"
                               [disabled]="!isPlatformParamChanged(platformParameter)">
                         Save
                       </button>
@@ -213,7 +213,7 @@
   </div>
   <div class="oppia-flex-center oppia-parameter-bottom-margin">
     <button class="btn btn-secondary e2e-test-parameter-add-rule-button"
-            (click)="addNewRuleToBottom(platformParameter); autoupdateParameterRulesAsync(platformParameter);">
+            (click)="addNewRuleToBottom(platformParameter)">
       Add Rule
     </button>
   </div>
