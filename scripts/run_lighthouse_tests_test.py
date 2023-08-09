@@ -500,15 +500,52 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
             'Puppeteer script completed successfully.', self.print_arr)
 
     def test_main_function_calls_puppeteer_record(self) -> None:
+        class MockTask:
+            returncode = 0
+            def communicate(self) -> tuple[bytes, bytes]:   # pylint: disable=missing-docstring
+                return (
+                    b'Task output',
+                    b'No error.')
+        # Mimic Chrome Verification in run_lighthoue_tests.
+        common.setup_chrome_bin_env_variable()
+        env = os.environ.copy()
+        env['PIP_NO_DEPS'] = 'True'
+        swap_dev_appserver = self.swap_with_checks(
+            servers, 'managed_dev_appserver',
+            lambda *unused_args, **unused_kwargs: MockCompilerContextManager(),
+            expected_kwargs=[{
+                'port': GOOGLE_APP_ENGINE_PORT,
+                'log_level': 'critical',
+                'skip_sdk_update_check': True,
+                'env': env
+            }])
+
         swap_run_puppeteer_script = self.swap_with_checks(
             run_lighthouse_tests, 'run_lighthouse_puppeteer_script',
             lambda record: None,
             expected_args=((True,),))
         swap_run_lighthouse_tests = self.swap_with_checks(
             run_lighthouse_tests, 'run_lighthouse_checks',
-            lambda *unused_args: None,
-            expected_args=(('performance', '1'),))
-        with swap_run_puppeteer_script, swap_run_lighthouse_tests:
-            run_lighthouse_tests.main(
-            args=['--mode', 'performance',
-                '--shard', '1', '--record_screen'])
+            lambda *unused_args: None, expected_args=(('performance', '1'),))
+        def mock_popen(*unused_args: str, **unused_kwargs: str) -> MockTask:  # pylint: disable=unused-argument
+            return MockTask()
+        swap_popen = self.swap(
+            subprocess, 'Popen', mock_popen)
+        swap_isdir = self.swap(
+            os.path, 'isdir', lambda _: True)
+        swap_build = self.swap_with_checks(
+            build, 'main', lambda args: None,
+            expected_kwargs=[{'args': ['--prod_env']}])
+
+        with self.print_swap, self.swap_webpack_compiler, swap_isdir:
+            with self.swap_elasticsearch_dev_server, swap_dev_appserver:
+                with self.swap_redis_server, self.swap_cloud_datastore_emulator:
+                    with self.swap_firebase_auth_emulator, swap_build:
+                        with swap_popen, swap_run_lighthouse_tests:
+                            with swap_run_puppeteer_script:
+                                run_lighthouse_tests.main(
+                                    args=[
+                                        '--mode', 'performance',
+                                        '--shard', '1', '--record_screen'])
+
+        self.assertIn('Building files in production mode.', self.print_arr)
