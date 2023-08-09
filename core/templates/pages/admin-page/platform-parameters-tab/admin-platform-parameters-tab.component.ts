@@ -153,14 +153,21 @@ export class AdminPlatformParametersTabComponent implements OnInit {
       let filterName: string = (
         this.filterTypeToContext[filter.type].displayName);
       if (filter.conditions.length === 0) {
-        resultantString += filterName + ' = ' + '[ ]' + '; ';
+        resultantString += filterName + ' in ' + '[ ]' + '; ';
       } else {
-        let conditions: string[] = [];
-        for (let condition of filter.conditions) {
-          conditions.push(condition[1]);
+        let conditions: string = '';
+        // for (let condition of filter.conditions) {
+        //   conditions += condition[1] + ', ';
+        // }
+        for (let idx = 0; idx < filter.conditions.length; idx++) {
+          if (idx === filter.conditions.length-1) {
+            conditions += filter.conditions[idx][1];
+          } else {
+            conditions += filter.conditions[idx][1] + ', ';
+          }
         }
         resultantString += (
-          filterName + ' = ' + '[' + conditions.toString() + ']' + '; ');
+          filterName + ' in ' + '[' + conditions + ']' + '; ');
       }
     }
     return resultantString;
@@ -261,7 +268,7 @@ export class AdminPlatformParametersTabComponent implements OnInit {
     }
   }
 
-  async updateParameterRulesAsync(param: PlatformParameter): Promise<void> {
+  async updateParameterRuleAsync(param: PlatformParameter): Promise<void> {
     const issues = (
       AdminPlatformParametersTabComponent.validatePlatformParam(param));
     if (issues.length > 0) {
@@ -283,11 +290,22 @@ export class AdminPlatformParametersTabComponent implements OnInit {
     await this.updatePlatformParameter(param, commitMessage);
   }
 
-  clearChanges(param: PlatformParameter): void {
-    if (!this.windowRef.nativeWindow.confirm(
-      'This will revert all changes you made. Are you sure?')) {
+  async autoupdateParameterRulesAsync(param: PlatformParameter): Promise<void> {
+    const issues = (
+      AdminPlatformParametersTabComponent.validatePlatformParam(param));
+    if (issues.length > 0) {
+      this.windowRef.nativeWindow.alert(issues.join('\n'));
       return;
     }
+    if (this.adminTaskManager.isTaskRunning()) {
+      return;
+    }
+    const commitMessage = 'Platform parameter rules are updated.';
+
+    await this.updatePlatformParameter(param, commitMessage);
+  }
+
+  clearChanges(param: PlatformParameter): void {
     const backup = this.platformParameterNameToBackupMap.get(
       param.name
     );
