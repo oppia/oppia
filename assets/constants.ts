@@ -115,6 +115,14 @@ export default {
     "IncreasingUpdatedOn": "Most Recently Updated",
     "DecreasingUpdatedOn": "Least Recently Updated"
   },
+  "TOPIC_SKILL_DASHBOARD_SORTING_OPTIONS": {
+    "IncreasingCreatedOn": "Newly Created",
+    "DecreasingCreatedOn": "Oldest Created",
+    "IncreasingUpdatedOn": "Most Recently Updated",
+    "DecreasingUpdatedOn": "Least Recently Updated",
+    "DecreasingUpcomingLaunches": "Most Upcoming Launches",
+    "DecreasingOverdueLaunches": "Most Launches Behind Schedule"
+  },
 
   // Sorting categories for contributor admin dashboard.
   "CD_ADMIN_STATS_SORT_OPTIONS": {
@@ -6387,6 +6395,8 @@ export default {
   // Maximum allowed length of unique progress url ID.
   "MAX_PROGRESS_URL_ID_LENGTH": 6,
 
+  "PLATFORM_PARAMETER_ALLOWED_BROWSER_TYPES": [
+    "Chrome", "Edge", "Safari", "Firefox", "Others"],
   "PLATFORM_PARAMETER_ALLOWED_PLATFORM_TYPES": ["Web", "Android", "Backend"],
   // The ordering of in ALLOWED_APP_VERSION_FLAVORS implies the ordering
   // of corresponding flavors, which is used in app_version_flavor filter for
