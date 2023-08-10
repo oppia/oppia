@@ -18,6 +18,7 @@ from __future__ import annotations
 
 import datetime
 import os
+from unittest import mock
 
 from core import feconf
 from core import utils
@@ -265,12 +266,9 @@ class TopicEditorStoryHandlerTests(BaseTopicEditorControllerTests):
         topic_services.publish_story(
             topic_id, canonical_story_id_2, self.admin_id)
 
-        def mock_get_current_time_in_millisecs() -> int:
-            return 1690555400000
-
-        with self.swap(
-            utils, 'get_current_time_in_millisecs',
-            mock_get_current_time_in_millisecs):
+        dt = mock.Mock(wraps=datetime.datetime)
+        with self.swap(datetime, 'datetime', dt):
+            dt.now.return_value = datetime.datetime.fromtimestamp(1690555400)
             response = self.get_json(
                 '%s/%s' % (feconf.TOPIC_EDITOR_STORY_URL, topic_id))
             canonical_story_summary_dict = response[

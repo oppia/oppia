@@ -20,7 +20,6 @@ from __future__ import annotations
 
 import datetime
 import logging
-import time
 
 from core import feconf
 from core import utils
@@ -175,10 +174,7 @@ class TopicEditorStoryHandler(
                     published_chapters_count += 1
                 if (node.status != constants.STORY_NODE_STATUS_PUBLISHED and
                     node.planned_publication_date is not None):
-                    current_time = (
-                        utils.convert_millisecs_time_to_datetime_object(
-                        utils.get_current_time_in_millisecs() -
-                        1000.0 * time.timezone))
+                    current_time = datetime.datetime.now()
                     if (current_time < node.planned_publication_date
                         < current_time + datetime.timedelta(
                         constants.CHAPTER_PUBLICATION_NOTICE_PERIOD_IN_DAYS)):

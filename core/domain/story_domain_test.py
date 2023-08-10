@@ -18,6 +18,7 @@ from __future__ import annotations
 
 import datetime
 import os
+from unittest import mock
 
 from core import feconf
 from core import utils
@@ -938,12 +939,10 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
             constants.STORY_NODE_STATUS_READY_TO_PUBLISH)
         self.story.story_contents.nodes[1].planned_publication_date = (
             datetime.datetime(2022, 12, 29))
-        def _mock_get_current_time_in_millisecs() -> int:
-            return 1672483686000
 
-        with self.swap(
-            utils, 'get_current_time_in_millisecs',
-            _mock_get_current_time_in_millisecs):
+        dt = mock.Mock(wraps=datetime.datetime)
+        with self.swap(datetime, 'datetime', dt):
+            dt.now.return_value = datetime.datetime.fromtimestamp(1672483686)
             self.assertEqual(
                 self.story.story_contents.nodes[0].is_node_upcoming(), True)
             self.assertEqual(
@@ -958,12 +957,10 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
             constants.STORY_NODE_STATUS_READY_TO_PUBLISH)
         self.story.story_contents.nodes[1].planned_publication_date = (
             datetime.datetime(2022, 12, 29))
-        def _mock_get_current_time_in_millisecs() -> int:
-            return 1672483686000
 
-        with self.swap(
-            utils, 'get_current_time_in_millisecs',
-            _mock_get_current_time_in_millisecs):
+        dt = mock.Mock(wraps=datetime.datetime)
+        with self.swap(datetime, 'datetime', dt):
+            dt.now.return_value = datetime.datetime.fromtimestamp(1672483686)
             self.assertEqual(
                 self.story.story_contents.nodes[0].is_node_behind_schedule(),
                 False)

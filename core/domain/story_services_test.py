@@ -19,6 +19,7 @@ from __future__ import annotations
 import datetime
 import logging
 import os
+from unittest import mock
 
 from core import feconf
 from core import utils
@@ -2187,12 +2188,9 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         topic_services.save_topic_rights(
             topic_rights, self.USER_ID, 'Published the topic', commit_cmds)
 
-        def mock_get_current_time_in_millisecs() -> int:
-            return 1690555400000
-
-        with self.swap(
-            utils, 'get_current_time_in_millisecs',
-            mock_get_current_time_in_millisecs):
+        dt = mock.Mock(wraps=datetime.datetime)
+        with self.swap(datetime, 'datetime', dt):
+            dt.now.return_value = datetime.datetime.fromtimestamp(1690555400)
             chapter_notifications = (
                 story_services.get_chapter_notifications_stories_list())
             self.assertEqual(len(chapter_notifications), 1)
