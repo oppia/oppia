@@ -7,13 +7,17 @@ WORKDIR /
 
 # Installing the pre-requisites libs and dependencies
 RUN apt-get update -y && apt-get upgrade -y \
+    chromium \
     curl \
+    git \
     npm \
     openjdk-11-jre \
     python2 \
     python3-matplotlib \
     unzip \
     wget
+RUN curl -sL https://deb.nodesource.com/setup_16.x | bash -
+RUN apt-get install -y nodejs
 
 RUN pip install --upgrade pip==21.2.3
 RUN pip install pip-tools==6.6.2 setuptools==58.5.3 cmake

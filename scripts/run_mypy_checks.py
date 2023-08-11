@@ -23,9 +23,11 @@ import os
 import site
 import subprocess
 import sys
+from core import feconf
 
 from scripts import common
-from scripts import install_third_party_libs
+if not feconf.OPPIA_IS_DOCKERIZED:
+    from scripts import install_third_party_libs
 
 from typing import Final, List, Optional, Tuple
 
@@ -139,12 +141,24 @@ def install_mypy_prerequisites(install_globally: bool) -> Tuple[int, str]:
             PYTHON3_CMD, '-m', 'pip', 'install', '-r',
             MYPY_REQUIREMENTS_FILE_PATH
         ]
+        if feconf.OPPIA_IS_DOCKERIZED:
+            cmd = [
+                'pip', 'install', '-r',
+                MYPY_REQUIREMENTS_FILE_PATH
+            ]
     else:
         cmd = [
             PYTHON3_CMD, '-m', 'pip', 'install', '-r',
             MYPY_REQUIREMENTS_FILE_PATH, '--target', MYPY_TOOLS_DIR,
             '--upgrade'
         ]
+        # this fixes the error pip not found, but it was earlier working on my mac.
+        if feconf.OPPIA_IS_DOCKERIZED:
+            cmd = [
+                'pip', 'install', '-r',
+                MYPY_REQUIREMENTS_FILE_PATH, '--target', MYPY_TOOLS_DIR,
+                '--upgrade'
+            ]
     process = subprocess.Popen(
         cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     output = process.communicate()
@@ -177,7 +191,8 @@ def main(args: Optional[List[str]] = None) -> int:
         # https://stackoverflow.com/q/10095037 for more details.
         sys.path.insert(1, directory)
 
-    install_third_party_libraries(parsed_args.skip_install)
+    if not feconf.OPPIA_IS_DOCKERIZED:
+        install_third_party_libraries(parsed_args.skip_install)
 
     print('Installing Mypy and stubs for third party libraries.')
     return_code, mypy_exec_path = install_mypy_prerequisites(

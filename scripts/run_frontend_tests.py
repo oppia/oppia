@@ -20,6 +20,7 @@ import argparse
 import os
 import subprocess
 import sys
+from core import feconf
 
 # TODO(#15567): This can be removed after Literal in utils.py is loaded
 # from typing instead of typing_extensions, this will be possible after
@@ -30,7 +31,8 @@ from typing import Optional, Sequence  # isort:skip
 
 from . import build  # isort:skip
 from . import check_frontend_test_coverage  # isort:skip
-from . import install_third_party_libs  # isort:skip
+if not feconf.OPPIA_IS_DOCKERIZED:
+    from . import install_third_party_libs  # isort:skip
 
 # These is a relative path from the oppia/ folder. They are relative because the
 # dtslint command prepends the current working directory to the path, even if
@@ -116,7 +118,7 @@ def main(args: Optional[Sequence[str]] = None) -> None:
     if parsed_args.dtslint_only:
         return
 
-    if not parsed_args.skip_install:
+    if not parsed_args.skip_install and not feconf.OPPIA_IS_DOCKERIZED:
         install_third_party_libs.main()
 
     common.setup_chrome_bin_env_variable()
