@@ -3180,13 +3180,15 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
         )
 
     def test_exploration_handler_returns_data_with_no_limit(self) -> None:
+        user_services.update_preferred_translation_language_code(
+            self.reviewer_id, 'hi')
         response = self.get_json(
             '/getreviewablesuggestions/exploration/translate_content', params={
                 'exploration_id': self.EXP_ID,
                 'offset': 0,
                 'sort_key': constants.SUGGESTIONS_SORT_KEY_DATE
             })
-        self.assertEqual(len(response['suggestions']), 0)
+        self.assertEqual(len(response['suggestions']), 1)
 
     def test_skill_handler_with_no_limit_raise_error(self) -> None:
         self.get_json(
