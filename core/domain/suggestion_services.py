@@ -1134,7 +1134,7 @@ def get_reviewable_translation_suggestions_for_single_exp(
 
     in_review_translation_suggestions, next_offset = (
         suggestion_models.GeneralSuggestionModel
-        .get_reviewable_translation_suggestions_for_single_exploration(
+        .get_reviewable_translation_suggestions(
             user_id,
             language_code,
             opportunity_summary_exp_id))
