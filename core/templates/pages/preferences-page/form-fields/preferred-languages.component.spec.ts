@@ -94,7 +94,6 @@ describe('Preferred Languages Component', () => {
     ];
     componentInstance.choices = [...mockChoices];
     componentInstance.searchQuery = 'en';
-    componentInstance.filteredChoices();
     const expectedFilteredChoice = [{ id: 'en', text: 'English' }];
     expect(componentInstance.filteredChoices).toEqual(expectedFilteredChoice);
   });
@@ -106,7 +105,6 @@ describe('Preferred Languages Component', () => {
     ];
     componentInstance.choices = [...mockChoices];
     componentInstance.searchQuery = 'de';
-    componentInstance.filteredChoices();
     expect(componentInstance.filteredChoices).toEqual([]);
   });
 
