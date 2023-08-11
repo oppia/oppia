@@ -763,6 +763,8 @@ class ReviewableSuggestionsHandler(
         exploration_id = self.normalized_request.get('exploration_id')
         exp_ids = [exploration_id] if exploration_id else []
         user_settings = user_services.get_user_settings(self.user_id)
+        # User_settings.preferred_translation_language_code is the language
+        # selected by used in language_filter of contributor dashboard.
         language_code_to_filter_by = (
             user_settings.preferred_translation_language_code)
         suggestions: Sequence[suggestion_registry.BaseSuggestion] = []

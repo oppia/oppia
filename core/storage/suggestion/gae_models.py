@@ -666,7 +666,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
         )
 
     @classmethod
-    def get_reviewable_translation_suggestions_for_single_exploration(
+    def get_reviewable_translation_suggestions(
         cls,
         user_id: str,
         language_code: str,

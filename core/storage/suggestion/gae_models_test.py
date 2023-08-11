@@ -485,7 +485,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             suggestions[1].status,
             suggestion_models.STATUS_IN_REVIEW)
 
-    def test_get_reviewable_translation_suggestions_for_single_exploration( # pylint: disable=line-too-long
+    def test_get_reviewable_translation_suggestions(
         self
     ) -> None:
         suggestion_1_id = 'exploration.exp1.thread_6'
@@ -516,7 +516,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
 
         results, _ = (
             suggestion_models.GeneralSuggestionModel
-            .get_reviewable_translation_suggestions_for_single_exploration(
+            .get_reviewable_translation_suggestions(
                 user_id=user_id,
                 language_code=self.translation_language_code,
                 exp_id='exp1'))
