@@ -34,6 +34,7 @@ import { StoryEditorNavbarComponent } from './navbar/story-editor-navbar.compone
 import { StoryEditorNavbarBreadcrumbComponent } from './navbar/story-editor-navbar-breadcrumb.component';
 import { StoryEditorSaveModalComponent } from './modal-templates/story-editor-save-modal.component';
 import { StoryEditorUnpublishModalComponent } from './modal-templates/story-editor-unpublish-modal.component';
+import { DraftChapterConfirmationModalComponent } from './modal-templates/draft-chapter-confirmation-modal.component';
 import { StoryPreviewTabComponent } from './story-preview-tab/story-preview-tab.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MyHammerConfig, toastrConfig } from 'pages/oppia-root/app.module';
@@ -62,6 +63,7 @@ import { NewChapterTitleModalComponent } from './modal-templates/new-chapter-tit
     StoryEditorNavbarBreadcrumbComponent,
     StoryEditorSaveModalComponent,
     StoryEditorUnpublishModalComponent,
+    DraftChapterConfirmationModalComponent,
     StoryEditorNavbarComponent,
     StoryNodeEditorComponent,
     StoryPreviewTabComponent,
@@ -75,6 +77,7 @@ import { NewChapterTitleModalComponent } from './modal-templates/new-chapter-tit
     StoryEditorNavbarBreadcrumbComponent,
     StoryEditorSaveModalComponent,
     StoryEditorUnpublishModalComponent,
+    DraftChapterConfirmationModalComponent,
     StoryEditorNavbarComponent,
     StoryNodeEditorComponent,
     StoryPreviewTabComponent,
