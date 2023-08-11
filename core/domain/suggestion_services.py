@@ -1112,6 +1112,7 @@ def get_reviewable_translation_suggestions_for_single_exp(
             The exploration ID for which suggestions
             are fetched. If exp id is empty, no suggestions are
             fetched.
+        language_code: str. The language code to get results for.
 
     Returns:
         Tuple of (results, next_offset). where:

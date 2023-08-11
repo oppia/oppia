@@ -770,13 +770,17 @@ class ReviewableSuggestionsHandler(
         if suggestion_type == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT:
             reviewable_suggestions: List[
                 suggestion_registry.SuggestionTranslateContent] = []
-            if (exp_ids and len(exp_ids) == 1 and limit is None):
+            if (exp_ids and len(exp_ids) == 1 and language_code_to_filter_by):
                 reviewable_suggestions, next_offset = (
                     suggestion_services
                     .get_reviewable_translation_suggestions_for_single_exp(
                         self.user_id, exp_ids[0],
                         language_code_to_filter_by))
             else:
+                # TODO(#18745): Deprecate the
+                # get_reviewable_translation_suggestions_by_offset method
+                # as it's limit is unbounded and it can be given an
+                # unlimited number of exp_ids.
                 reviewable_suggestions, next_offset = (
                     suggestion_services
                     .get_reviewable_translation_suggestions_by_offset(

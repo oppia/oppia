@@ -685,9 +685,11 @@ class GeneralSuggestionModel(base_models.BaseModel):
         Returns:
             Tuple of (results, next_offset). Where:
                 results: list(SuggestionModel). A list of all suggestions
-                    ordered by descending creation date that are in-review,
-                    not authored by the supplied user, matching the supplied
-                    language code, and correspond to the given exploration ID.
+                    that are in-review, not authored by the supplied user,
+                    matching the supplied language code, and correspond
+                    to the given exploration ID.
+                    The suggestions are ordered by descending creation
+                    date.
                 next_offset: int. The number of results
                     returned by the current query.
         """

@@ -255,8 +255,8 @@ export class ContributionAndReviewService {
   }
 
   private static groupTranslationSuggestionsByState(
-      translationSuggestions: SuggestionBackendDict[])
-  : Map<string, SuggestionBackendDict[]> {
+      translationSuggestions: SuggestionBackendDict[]):
+      Map<string, SuggestionBackendDict[]> {
     const translationSuggestionsByState = new Map<
     string, SuggestionBackendDict[]>();
 

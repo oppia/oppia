@@ -1701,7 +1701,7 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
        # Get all reviewable translation suggestions.
         opportunity_summary_id = self.opportunity_summary_ids[0]
         suggestions, _ = suggestion_services.get_reviewable_translation_suggestions_for_single_exp( # pylint: disable=line-too-long
-            self.reviewer_id_1, opportunity_summary_id)
+            self.reviewer_id_1, opportunity_summary_id, 'hi')
         self.assertEqual(len(suggestions), 2)
 
     def test_get_reviewable_translation_suggestions_for_single_exploration__with_no_reviewable_languages( # pylint: disable=line-too-long
@@ -1719,7 +1719,7 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
         suggestions, _ = (
             suggestion_services.
             get_reviewable_translation_suggestions_for_single_exp(
-                self.reviewer_id_1, opportunity_summary_id))
+                self.reviewer_id_1, opportunity_summary_id, 'hi'))
 
         # The user does not have rights to review any languages, so expect an
         # empty result.
