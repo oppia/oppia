@@ -22,9 +22,11 @@ jobs:
         with:
           python-version: '3.8.15'
           architecture: 'x64'
-      - uses: DubeySandeep/pending-review-notification@v1
+        # SHA1 hash of the develop commit.
+      - uses: oppia/stale-review-request-notifier@5c3267f3f43cdb99827425fc67ceba52442a54b7
         with:
-          team-slug: oppia-codeowners
+          category-name: Notify\ Reviewers
+          discussion-title: Pending\ Reviews
           repo-token: ${{ secrets.DISCUSSION_NOTIFICATION_TOKEN }}
           review-turnaround-hours: 48
       - name: Report if failed
