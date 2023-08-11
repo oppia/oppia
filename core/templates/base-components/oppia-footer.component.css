@@ -6,9 +6,9 @@
 .oppia-footer-container {
   margin-left: auto;
   margin-right: auto;
-  max-width: 97%;
-  padding: 30px 50px;
+  padding: 30px;
   text-align: left;
+  width: 85%;
 }
 
 .oppia-footer-container a {
@@ -18,7 +18,8 @@
   line-height: 18.75px;
 }
 
-.oppia-footer-terms-privacy a, .oppia-footer-terms-privacy > small {
+.oppia-footer-terms-privacy a,
+.oppia-footer-terms-privacy > small {
   color: white;
   font-size: 12px;
   font-weight: 600;
@@ -33,7 +34,7 @@
   color: #fff;
   font-size: 1em;
   font-weight: bold;
-  margin: 1.33em 0;
+  margin: 2rem 0;
   text-transform: uppercase;
 }
 
@@ -42,7 +43,6 @@
   font-weight: 400;
   line-height: 28px;
   margin-bottom: 20px;
-  margin-right: 55px;
   text-transform: none;
 }
 
@@ -72,7 +72,7 @@
 .oppia-footer-container hr {
   border: 1px solid white;
   display: none;
-  width: 96%;
+  width: 100%;
 }
 
 .oppia-flex-break {
@@ -83,15 +83,19 @@
 
 .oppia-footer-newsletter-container {
   background-color: #00645c;
-  padding: 10px 3%;
+  padding: 30px;
 }
 
 .oppia-footer-newsletter {
   display: flex;
-  flex: 1;
-  gap: 55px;
-  padding: 20px;
+  gap: 4rem;
+  margin: 0 auto;
   position: relative;
+  width: 85%;
+}
+
+.oppia-newsletter-content {
+  flex: 1;
 }
 
 .oppia-newsletter-content > h3 {
@@ -111,6 +115,7 @@
 
 .oppia-footer-newsletter-input {
   display: flex;
+  flex: 1;
   flex-direction: column;
 }
 
@@ -133,7 +138,7 @@
   height: 44px;
   outline-color: transparent;
   padding: 0 3px;
-  width: 496px;
+  width: 474px;
 }
 
 .oppia-newsletter-input > button {
@@ -154,17 +159,34 @@
   color: #009688;
 }
 
+.oppia-mission-volunteer {
+  max-width: 51.3%;
+  padding-left: 0;
+  padding-right: 3rem;
+}
+
 .oppia-footer-terms-privacy {
   display: flex;
   flex-direction: row;
   flex-shrink: 1;
-  gap: 4%;
+  gap: 6%;
   justify-content: center;
+  margin: 0 auto;
   padding-bottom: 15px;
-  width: 94%;
+  width: 85%;
+}
+
+.col.max-width {
+  max-width: 225px;
 }
 
 @media (max-width: 1350px) {
+  .oppia-footer-container,
+  .oppia-footer-newsletter,
+  .oppia-footer-terms-privacy {
+    width: 93%
+  }
+
   .oppia-footer-container .oppia-mission-volunteer {
     flex: 0 0 100%;
     max-width: 100%;
@@ -181,9 +203,13 @@
   .oppia-newsletter-input > input {
     width: 350px;
   }
+
+  .col.max-width {
+    max-width: 100%;
+  }
 }
 
-@media (max-width: 1000px) {
+@media (max-width: 1150px) {
   .oppia-footer-newsletter {
     display: flex;
     flex-direction: column;
@@ -192,11 +218,17 @@
 }
 
 @media (max-width: 768px) {
+  .oppia-footer-container,
+  .oppia-footer-newsletter {
+    width: 97%
+  }
+
   .oppia-footer-container {
     padding: 30px;
   }
 
   .oppia-footer-terms-privacy {
+    gap: 4%;
     width: 100%;
   }
 
