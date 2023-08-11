@@ -170,13 +170,13 @@
                       <!-- Control Buttons -->
                       <button
                               class="btn btn-secondary"
-                              (click)="clearChanges(platformParameter); accordionItem.toggle();">
+                              (click)="clearChanges(platformParameter, ruleIndex); accordionItem.toggle();">
                         Cancel
                       </button>
                       <button
                               class="btn btn-primary"
                               (click)="updateParameterRuleAsync(platformParameter); accordionItem.toggle();"
-                              [disabled]="!isPlatformParamChanged(platformParameter)">
+                              [disabled]="!isPlatformParamRuleChanged(platformParameter, ruleIndex)">
                         Save
                       </button>
                     </div>
@@ -187,19 +187,19 @@
                 <div class="row">
                   <div *ngIf="ruleIndex > 0" class="col-4 oppia-rule-moving-buttons-container">
                     <button class="btn btn-secondary"
-                            (click)="moveRuleUp(platformParameter, ruleIndex); autoupdateParameterRulesAsync(platformParameter);">
+                            (click)="moveRuleUp(platformParameter, ruleIndex); autoupdateParameterAsync(platformParameter);">
                       ↑
                     </button>
                   </div>
                   <div *ngIf="ruleIndex + 1 < platformParameter.rules.length" class="col-4 oppia-rule-moving-buttons-container">
                     <button class="btn btn-secondary"
-                            (click)="moveRuleDown(platformParameter, ruleIndex); autoupdateParameterRulesAsync(platformParameter);">
+                            (click)="moveRuleDown(platformParameter, ruleIndex); autoupdateParameterAsync(platformParameter);">
                       ↓
                     </button>
                   </div>
                   <div class="col-4 oppia-flex-vertical-center">
                     <button class="btn btn-secondary e2e-test-remove-rule-button"
-                            (click)="removeRule(platformParameter, ruleIndex); autoupdateParameterRulesAsync(platformParameter);">
+                            (click)="removeRule(platformParameter, ruleIndex); autoupdateParameterAsync(platformParameter);">
                       <i class="fas fa-times"></i>
                     </button>
                   </div>
@@ -219,9 +219,16 @@
   </div>
   <div class="row oppia-parameter-top-margin">
     <div class="col-2"><b>Default:</b></div>
-    <div *ngIf="platformParameter.rules.length === 0" class="col-10">
+    <div *ngIf="platformParameter.rules.length === 0" class="col-9">
       <schema-based-editor [schema]="getPlatformParamSchema(platformParameter.dataType)" [(ngModel)]="platformParameter.defaultValue">
       </schema-based-editor>
+    </div>
+    <div *ngIf="platformParameter.rules.length === 0" class="col-1">
+      <button
+              class="btn btn-primary"
+              (click)="autoupdateParameterAsync(platformParameter)">
+        Save
+      </button>
     </div>
     <div *ngIf="platformParameter.rules.length !== 0" class="col-10">{{platformParameter.defaultValue}}</div>
   </div>
