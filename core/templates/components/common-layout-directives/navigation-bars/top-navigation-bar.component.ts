@@ -313,8 +313,6 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
     this.directiveSubscriptions.add(
       this.windowDimensionsService.getResizeEvent().subscribe(evt => {
         this.windowIsNarrow = this.windowDimensionsService.isWindowNarrow();
-        this.windowRef.nativeWindow.document.body.style.overflowY =
-          this.windowIsNarrow ? 'auto' : '';
         // If window is resized larger, try displaying the hidden
         // elements.
         if (
@@ -333,6 +331,7 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
         this.sidebarStatusService.closeSidebar();
         this.sidebarIsShown = this.sidebarStatusService.isSidebarShown();
         this.currentWindowWidth = this.windowDimensionsService.getWidth();
+        this.windowRef.nativeWindow.document.body.style.overflowY = 'auto';
         this.debouncerService.debounce(this.truncateNavbar, 500);
       })
     );
