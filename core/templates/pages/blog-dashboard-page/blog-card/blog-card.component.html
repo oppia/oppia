@@ -6,9 +6,13 @@
   <div mat-card-image class="blog-card-thumbnail-container">
     <picture>
       <img mat-card-image
+           *ngIf="thumbnailUrl || !blogCardPreviewModeIsActive"
            class="blog-card-thumbnail"
            [src]="thumbnailUrl"
            alt="Thumbnail image of the blog card">
+      <p *ngIf="!thumbnailUrl && blogCardPreviewModeIsActive" class="px-4 py-2">
+        {{ 'I18N_BLOG_POST_EDITOR_NO_THUMBNAIL_UPLOADED_WARNING' | translate }}
+      </p>
     </picture>
   </div>
   <div class="blog-card-content" [ngClass]="{'mx-1 my-1': shownOnblogPostPage}">

@@ -74,6 +74,9 @@ DEFAULT_IDENTICON_DATA_URL: Final = (
 LABEL_FOR_USER_BEING_DELETED: Final = '[User being deleted]'
 USERNAME_FOR_USER_BEING_DELETED: Final = 'UserBeingDeleted'
 
+# Timeout in seconds for requests.
+TIMEOUT_SECS = 60
+
 
 class DashboardStatsDict(TypedDict):
     """Dictionary representing the dashborad stats dictionary."""
@@ -391,7 +394,7 @@ def fetch_gravatar(email: str) -> str:
     try:
         response = requests.get(
             gravatar_url, headers={b'Content-Type': b'image/png'},
-            allow_redirects=False)
+            allow_redirects=False, timeout=TIMEOUT_SECS)
     except Exception:
         logging.exception('Failed to fetch Gravatar from %s' % gravatar_url)
     else:
@@ -769,6 +772,7 @@ def get_usernames_by_role(role: str) -> List[str]:
     Returns:
         list(str). List of usernames of users with given role ID.
     """
+
     user_settings = user_models.UserSettingsModel.get_by_role(role)
     return [user.username for user in user_settings]
 
@@ -1580,6 +1584,8 @@ def add_user_role(user_id: str, role: str) -> None:
         raise Exception('The role of a Mobile Learner cannot be changed.')
     if role in feconf.ALLOWED_DEFAULT_USER_ROLES_ON_REGISTRATION:
         raise Exception('Adding a %s role is not allowed.' % role)
+    if role in user_settings.roles:
+        raise Exception('The user already has this role.')
     user_settings.roles.append(role)
     role_services.log_role_query(
         user_id, feconf.ROLE_ACTION_ADD, role=role,

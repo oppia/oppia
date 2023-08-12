@@ -479,7 +479,7 @@ describe('Exploration Player State Service', () => {
       } as ExplorationBackendDict));
     spyOn(explorationFeaturesBackendApiService, 'fetchExplorationFeaturesAsync')
       .and.returnValue(Promise.resolve({
-        isExplorationWhitelisted: true,
+        explorationIsCurated: true,
         alwaysAskLearnersForAnswerDetails: false
       }));
     spyOn(explorationFeaturesService, 'init');
@@ -522,7 +522,7 @@ describe('Exploration Player State Service', () => {
 
   it('should init exploration player', fakeAsync(() => {
     let explorationFeatures: ExplorationFeatures = {
-      isExplorationWhitelisted: true,
+      explorationIsCurated: true,
       alwaysAskLearnersForAnswerDetails: false
     };
     spyOn(explorationFeaturesBackendApiService, 'fetchExplorationFeaturesAsync')
@@ -547,7 +547,7 @@ describe('Exploration Player State Service', () => {
 
   it('should init exploration player without pretests', fakeAsync(() => {
     let explorationFeatures: ExplorationFeatures = {
-      isExplorationWhitelisted: true,
+      explorationIsCurated: true,
       alwaysAskLearnersForAnswerDetails: false
     };
     spyOn(explorationFeaturesBackendApiService, 'fetchExplorationFeaturesAsync')
@@ -568,7 +568,7 @@ describe('Exploration Player State Service', () => {
 
   it('should init exploration player with story chapter mode', fakeAsync(() => {
     let explorationFeatures: ExplorationFeatures = {
-      isExplorationWhitelisted: true,
+      explorationIsCurated: true,
       alwaysAskLearnersForAnswerDetails: false
     };
     spyOn(urlService, 'getUrlParams').and.returnValue({

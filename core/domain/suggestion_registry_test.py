@@ -34,8 +34,10 @@ from core.domain import skill_services
 from core.domain import state_domain
 from core.domain import suggestion_registry
 from core.domain import suggestion_services
+from core.domain import topic_fetchers
 from core.domain import translation_domain
 from core.domain import translation_fetchers
+from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
 from extensions import domain
@@ -1566,7 +1568,7 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
                 exp.id, exp.version))
         self.assertEqual(len(translations), 1)
         self.assertEqual(translations[0].language_code, 'hi')
-        self.assertEqual(translations[0].get_translation_count(), 1)
+        self.assertEqual(len(translations[0].translations), 1)
 
     def test_accept_suggestion_with_set_of_string_adds_translation(
         self
@@ -1605,7 +1607,7 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
         )
         self.assertEqual(len(translations), 1)
         self.assertEqual(translations[0].language_code, 'hi')
-        self.assertEqual(translations[0].get_translation_count(), 1)
+        self.assertEqual(len(translations[0].translations), 1)
 
     def test_accept_suggestion_with_psedonymous_author_adds_translation(
         self
@@ -1637,7 +1639,7 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
         )
         self.assertEqual(len(translations), 1)
         self.assertEqual(translations[0].language_code, 'hi')
-        self.assertEqual(translations[0].get_translation_count(), 1)
+        self.assertEqual(len(translations[0].translations), 1)
 
     def test_get_all_html_content_strings(self) -> None:
         suggestion = suggestion_registry.SuggestionTranslateContent(
@@ -3845,3 +3847,350 @@ class ContributorStatsSummaryUnitTests(test_utils.GenericTestBase):
         self.assertDictEqual(
             contribution_summary.to_dict(), expected_contribution_summary
         )
+
+
+class TranslationSubmitterTotalContributionStatsUnitTests(
+    test_utils.GenericTestBase):
+    """Tests for the TranslationSubmitterTotalContributionStats class."""
+
+    SUGGESTION_LANGUAGE_CODE: Final = 'es'
+    TOPIC_IDS_WITH_TRANSLATION_SUBMISSIONS: Final = ['topic1', 'topic2']
+    RECENT_REVIEW_OUTCOMES: Final = ['accepted', 'rejected']
+    RECENT_PERFORMANCE: Final = 2
+    OVERALL_ACCURACY: Final = 2.0
+    SUBMITTED_TRANSLATIONS_COUNT: Final = 2
+    SUBMITTED_TRANSLATION_WORD_COUNT: Final = 100
+    ACCEPTED_TRANSLATIONS_COUNT: Final = 1
+    ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT: Final = 0
+    ACCEPTED_TRANSLATION_WORD_COUNT: Final = 50
+    REJECTED_TRANSLATIONS_COUNT: Final = 0
+    REJECTED_TRANSLATION_WORD_COUNT: Final = 0
+    FIRST_CONTRIBUTION_DATE = datetime.date.today()
+    LAST_CONTRIBUTION_DATE = (
+        datetime.date.today() - datetime.timedelta(25))
+    user_id: str = 'user_id'
+    story_id_1: str = 'story_1'
+    story_id_2: str = 'story_2'
+    story_id_3: str = 'story_3'
+    subtopic_id: int = 1
+    skill_id_1: str = 'skill_1'
+    skill_id_2: str = 'skill_2'
+
+    def test_to_frontend_dict(self) -> None:
+        auth_id = 'someUser'
+        username = 'username'
+        user_settings = user_services.create_new_user(
+            auth_id, 'user@example.com')
+        user_services.set_username(user_settings.user_id, username)
+        topic_id_1 = topic_fetchers.get_new_topic_id()
+        topic_id_2 = topic_fetchers.get_new_topic_id()
+        self.save_new_topic(
+            topic_id_1, self.user_id, name='topic1',
+            abbreviated_name='name1', url_fragment='name-one',
+            description='Description',
+            canonical_story_ids=[self.story_id_1, self.story_id_2],
+            additional_story_ids=[self.story_id_3],
+            uncategorized_skill_ids=[self.skill_id_1, self.skill_id_2],
+            subtopics=[], next_subtopic_id=1)
+        self.save_new_topic(
+            topic_id_2, self.user_id, name='topic2',
+            abbreviated_name='name2', url_fragment='name-two',
+            description='Description',
+            canonical_story_ids=[self.story_id_1, self.story_id_2],
+            additional_story_ids=[self.story_id_3],
+            uncategorized_skill_ids=[self.skill_id_1, self.skill_id_2],
+            subtopics=[], next_subtopic_id=1)
+        expected_frontend_dict = {
+            'language_code': self.SUGGESTION_LANGUAGE_CODE,
+            'contributor_name': username,
+            'topic_names': (
+                self.TOPIC_IDS_WITH_TRANSLATION_SUBMISSIONS),
+            'recent_performance': self.RECENT_PERFORMANCE,
+            'overall_accuracy': self.OVERALL_ACCURACY,
+            'submitted_translations_count': (
+                self.SUBMITTED_TRANSLATIONS_COUNT),
+            'submitted_translation_word_count': (
+                self.SUBMITTED_TRANSLATION_WORD_COUNT),
+            'accepted_translations_count': (
+                self.ACCEPTED_TRANSLATIONS_COUNT),
+            'accepted_translations_without_reviewer_edits_count': (
+                self
+                .ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT),
+            'accepted_translation_word_count': (
+                self.ACCEPTED_TRANSLATION_WORD_COUNT),
+            'rejected_translations_count': (
+                self.REJECTED_TRANSLATIONS_COUNT),
+            'rejected_translation_word_count': (
+                self.REJECTED_TRANSLATION_WORD_COUNT),
+            'first_contribution_date': (
+                self.FIRST_CONTRIBUTION_DATE.strftime('%b %d, %Y')),
+            'last_contributed_in_days': int(
+                (datetime.date.today() - self.LAST_CONTRIBUTION_DATE).days)
+        }
+
+        actual_stats = suggestion_registry.TranslationSubmitterTotalContributionStats( # pylint: disable=line-too-long
+            self.SUGGESTION_LANGUAGE_CODE,
+            user_settings.user_id,
+            [topic_id_1, topic_id_2],
+            self.RECENT_REVIEW_OUTCOMES, self.RECENT_PERFORMANCE,
+            self.OVERALL_ACCURACY,
+            self.SUBMITTED_TRANSLATIONS_COUNT,
+            self.SUBMITTED_TRANSLATION_WORD_COUNT,
+            self.ACCEPTED_TRANSLATIONS_COUNT,
+            self.ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT,
+            self.ACCEPTED_TRANSLATION_WORD_COUNT,
+            self.REJECTED_TRANSLATIONS_COUNT,
+            self.REJECTED_TRANSLATION_WORD_COUNT,
+            self.FIRST_CONTRIBUTION_DATE, self.LAST_CONTRIBUTION_DATE
+        )
+
+        self.assertDictEqual(
+            actual_stats.to_frontend_dict(), expected_frontend_dict)
+
+
+class TranslationReviewerTotalContributionStatsUnitTests(
+    test_utils.GenericTestBase):
+    """Tests for the TranslationReviewerTotalContributionStats class."""
+
+    SUGGESTION_LANGUAGE_CODE: Final = 'es'
+    TOPIC_IDS_WITH_TRANSLATION_REVIEWS: Final = ['topic1', 'topic2']
+    REVIEWED_TRANSLATIONS_COUNT: Final = 2
+    ACCEPTED_TRANSLATIONS_COUNT: Final = 1
+    ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT: Final = 0
+    ACCEPTED_TRANSLATION_WORD_COUNT: Final = 1
+    REJECTED_TRANSLATIONS_COUNT: Final = 0
+    FIRST_CONTRIBUTION_DATE = datetime.date.today()
+    LAST_CONTRIBUTION_DATE = (
+        datetime.date.today() - datetime.timedelta(25))
+    user_id: str = 'user_id'
+    story_id_1: str = 'story_1'
+    story_id_2: str = 'story_2'
+    story_id_3: str = 'story_3'
+    subtopic_id: int = 1
+    skill_id_1: str = 'skill_1'
+    skill_id_2: str = 'skill_2'
+
+    def test_to_frontend_dict(self) -> None:
+        auth_id = 'someUser'
+        username = 'username'
+        user_settings = user_services.create_new_user(
+            auth_id, 'user@example.com')
+        user_services.set_username(user_settings.user_id, username)
+        topic_id_1 = topic_fetchers.get_new_topic_id()
+        topic_id_2 = topic_fetchers.get_new_topic_id()
+        self.save_new_topic(
+            topic_id_1, self.user_id, name='topic1',
+            abbreviated_name='name1', url_fragment='name-one',
+            description='Description',
+            canonical_story_ids=[self.story_id_1, self.story_id_2],
+            additional_story_ids=[self.story_id_3],
+            uncategorized_skill_ids=[self.skill_id_1, self.skill_id_2],
+            subtopics=[], next_subtopic_id=1)
+        self.save_new_topic(
+            topic_id_2, self.user_id, name='topic2',
+            abbreviated_name='name2', url_fragment='name-two',
+            description='Description',
+            canonical_story_ids=[self.story_id_1, self.story_id_2],
+            additional_story_ids=[self.story_id_3],
+            uncategorized_skill_ids=[self.skill_id_1, self.skill_id_2],
+            subtopics=[], next_subtopic_id=1)
+        expected_stats_dict = {
+            'language_code': self.SUGGESTION_LANGUAGE_CODE,
+            'contributor_name': username,
+            'topic_names': (
+                self.TOPIC_IDS_WITH_TRANSLATION_REVIEWS),
+            'reviewed_translations_count': (
+                self.REVIEWED_TRANSLATIONS_COUNT),
+            'accepted_translations_count': (
+                self.ACCEPTED_TRANSLATIONS_COUNT),
+            'accepted_translations_with_reviewer_edits_count': (
+                self
+                .ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT),
+            'accepted_translation_word_count': (
+                self.ACCEPTED_TRANSLATION_WORD_COUNT),
+            'rejected_translations_count': (
+                self.REJECTED_TRANSLATIONS_COUNT),
+            'first_contribution_date': (
+                self.FIRST_CONTRIBUTION_DATE.strftime('%b %d, %Y')),
+            'last_contributed_in_days': int(
+                (datetime.date.today() - self.LAST_CONTRIBUTION_DATE).days)
+        }
+
+        actual_stats = suggestion_registry.TranslationReviewerTotalContributionStats( # pylint: disable=line-too-long
+            self.SUGGESTION_LANGUAGE_CODE,
+            user_settings.user_id,
+            [topic_id_1, topic_id_2],
+            self.REVIEWED_TRANSLATIONS_COUNT,
+            self.ACCEPTED_TRANSLATIONS_COUNT,
+            self.ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT,
+            self.ACCEPTED_TRANSLATION_WORD_COUNT,
+            self.REJECTED_TRANSLATIONS_COUNT,
+            self.FIRST_CONTRIBUTION_DATE, self.LAST_CONTRIBUTION_DATE
+        )
+
+        self.assertDictEqual(
+            actual_stats.to_frontend_dict(), expected_stats_dict)
+
+
+class QuestionSubmitterTotalContributionStatsUnitTests(
+    test_utils.GenericTestBase):
+    """Tests for the QuestionSubmitterTotalContributionStats class."""
+
+    TOPIC_IDS_WITH_QUESTION_SUBMISSIONS: Final = ['topic1', 'topic2']
+    RECENT_REVIEW_OUTCOMES: Final = ['accepted', 'rejected']
+    RECENT_PERFORMANCE: Final = 2
+    OVERALL_ACCURACY: Final = 2.0
+    SUBMITTED_QUESTIONS_COUNT: Final = 2
+    SUBMITTED_QUESTION_WORD_COUNT: Final = 100
+    ACCEPTED_QUESTIONS_COUNT: Final = 1
+    ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT: Final = 0
+    ACCEPTED_QUESTION_WORD_COUNT: Final = 50
+    REJECTED_QUESTIONS_COUNT: Final = 0
+    REJECTED_QUESTION_WORD_COUNT: Final = 0
+    FIRST_CONTRIBUTION_DATE = datetime.date.today()
+    LAST_CONTRIBUTION_DATE = (
+        datetime.date.today() - datetime.timedelta(25))
+    user_id: str = 'user_id'
+    story_id_1: str = 'story_1'
+    story_id_2: str = 'story_2'
+    story_id_3: str = 'story_3'
+    subtopic_id: int = 1
+    skill_id_1: str = 'skill_1'
+    skill_id_2: str = 'skill_2'
+
+    def test_to_frontend_dict(self) -> None:
+        auth_id = 'someUser'
+        username = 'username'
+        user_settings = user_services.create_new_user(
+            auth_id, 'user@example.com')
+        user_services.set_username(user_settings.user_id, username)
+        topic_id_1 = topic_fetchers.get_new_topic_id()
+        topic_id_2 = topic_fetchers.get_new_topic_id()
+        self.save_new_topic(
+            topic_id_1, self.user_id, name='topic1',
+            abbreviated_name='name1', url_fragment='name-one',
+            description='Description',
+            canonical_story_ids=[self.story_id_1, self.story_id_2],
+            additional_story_ids=[self.story_id_3],
+            uncategorized_skill_ids=[self.skill_id_1, self.skill_id_2],
+            subtopics=[], next_subtopic_id=1)
+        self.save_new_topic(
+            topic_id_2, self.user_id, name='topic2',
+            abbreviated_name='name2', url_fragment='name-two',
+            description='Description',
+            canonical_story_ids=[self.story_id_1, self.story_id_2],
+            additional_story_ids=[self.story_id_3],
+            uncategorized_skill_ids=[self.skill_id_1, self.skill_id_2],
+            subtopics=[], next_subtopic_id=1)
+        expected_stats_dict = {
+            'contributor_name': username,
+            'topic_names': (
+                self.TOPIC_IDS_WITH_QUESTION_SUBMISSIONS),
+            'recent_performance': self.RECENT_PERFORMANCE,
+            'overall_accuracy': self.OVERALL_ACCURACY,
+            'submitted_questions_count': (
+                self.SUBMITTED_QUESTIONS_COUNT),
+            'accepted_questions_count': (
+                self.ACCEPTED_QUESTIONS_COUNT),
+            'accepted_questions_without_reviewer_edits_count': (
+                self
+                .ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT),
+            'rejected_questions_count': (
+                self.REJECTED_QUESTIONS_COUNT),
+            'first_contribution_date': (
+                self.FIRST_CONTRIBUTION_DATE.strftime('%b %d, %Y')),
+            'last_contributed_in_days': int(
+                (datetime.date.today() - self.LAST_CONTRIBUTION_DATE).days)
+        }
+
+        actual_stats = suggestion_registry.QuestionSubmitterTotalContributionStats( # pylint: disable=line-too-long
+            user_settings.user_id,
+            [topic_id_1, topic_id_2],
+            self.RECENT_REVIEW_OUTCOMES, self.RECENT_PERFORMANCE,
+            self.OVERALL_ACCURACY,
+            self.SUBMITTED_QUESTIONS_COUNT,
+            self.ACCEPTED_QUESTIONS_COUNT,
+            self.ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT,
+            self.REJECTED_QUESTIONS_COUNT,
+            self.FIRST_CONTRIBUTION_DATE, self.LAST_CONTRIBUTION_DATE
+        )
+
+        self.assertDictEqual(
+            actual_stats.to_frontend_dict(), expected_stats_dict)
+
+
+class QuestionReviewerTotalContributionStatsUnitTests(
+    test_utils.GenericTestBase):
+    """Tests for the QuestionReviewerTotalContributionStats class."""
+
+    TOPIC_IDS_WITH_QUESTION_REVIEWS: Final = ['topic1', 'topic2']
+    REVIEWED_QUESTIONS_COUNT: Final = 2
+    ACCEPTED_QUESTIONS_COUNT: Final = 1
+    ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT: Final = 0
+    REJECTED_QUESTIONS_COUNT: Final = 0
+    FIRST_CONTRIBUTION_DATE = datetime.date.today()
+    LAST_CONTRIBUTION_DATE = (
+        datetime.date.today() - datetime.timedelta(25))
+    user_id: str = 'user_id'
+    story_id_1: str = 'story_1'
+    story_id_2: str = 'story_2'
+    story_id_3: str = 'story_3'
+    subtopic_id: int = 1
+    skill_id_1: str = 'skill_1'
+    skill_id_2: str = 'skill_2'
+
+    def test_to_frontend_dict(self) -> None:
+        auth_id = 'someUser'
+        username = 'username'
+        user_settings = user_services.create_new_user(
+            auth_id, 'user@example.com')
+        user_services.set_username(user_settings.user_id, username)
+        topic_id_1 = topic_fetchers.get_new_topic_id()
+        topic_id_2 = topic_fetchers.get_new_topic_id()
+        self.save_new_topic(
+            topic_id_1, self.user_id, name='topic1',
+            abbreviated_name='name1', url_fragment='name-one',
+            description='Description',
+            canonical_story_ids=[self.story_id_1, self.story_id_2],
+            additional_story_ids=[self.story_id_3],
+            uncategorized_skill_ids=[self.skill_id_1, self.skill_id_2],
+            subtopics=[], next_subtopic_id=1)
+        self.save_new_topic(
+            topic_id_2, self.user_id, name='topic2',
+            abbreviated_name='name2', url_fragment='name-two',
+            description='Description',
+            canonical_story_ids=[self.story_id_1, self.story_id_2],
+            additional_story_ids=[self.story_id_3],
+            uncategorized_skill_ids=[self.skill_id_1, self.skill_id_2],
+            subtopics=[], next_subtopic_id=1)
+        expected_stats_dict = {
+            'contributor_name': username,
+            'topic_names': (
+                self.TOPIC_IDS_WITH_QUESTION_REVIEWS),
+            'reviewed_questions_count': (
+                self.REVIEWED_QUESTIONS_COUNT),
+            'accepted_questions_count': (
+                self.ACCEPTED_QUESTIONS_COUNT),
+            'accepted_questions_with_reviewer_edits_count': (
+                self
+                .ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT),
+            'rejected_questions_count': (
+                self.REJECTED_QUESTIONS_COUNT),
+            'first_contribution_date': (
+                self.FIRST_CONTRIBUTION_DATE.strftime('%b %d, %Y')),
+            'last_contributed_in_days': int(
+                (datetime.date.today() - self.LAST_CONTRIBUTION_DATE).days)
+        }
+
+        actual_stats = suggestion_registry.QuestionReviewerTotalContributionStats( # pylint: disable=line-too-long
+            user_settings.user_id,
+            [topic_id_1, topic_id_2],
+            self.REVIEWED_QUESTIONS_COUNT,
+            self.ACCEPTED_QUESTIONS_COUNT,
+            self.ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT,
+            self.REJECTED_QUESTIONS_COUNT,
+            self.FIRST_CONTRIBUTION_DATE, self.LAST_CONTRIBUTION_DATE
+        )
+
+        self.assertDictEqual(
+            actual_stats.to_frontend_dict(), expected_stats_dict)

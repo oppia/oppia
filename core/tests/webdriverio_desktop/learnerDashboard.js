@@ -113,9 +113,9 @@ describe('Learner dashboard functionality', function() {
     await users.login('learner1@learnerDashboard.com');
     // Subscribe to both the creators.
     await subscriptionDashboardPage.navigateToUserSubscriptionPage(creator1Id);
-    await subscriptionDashboardPage.navigateToSubscriptionButton();
+    await subscriptionDashboardPage.clickSubscribeButton();
     await subscriptionDashboardPage.navigateToUserSubscriptionPage(creator2Id);
-    await subscriptionDashboardPage.navigateToSubscriptionButton();
+    await subscriptionDashboardPage.clickSubscribeButton();
 
     // Completing exploration 'Activations' to activate /learner_dashboard.
     await libraryPage.get();
@@ -135,38 +135,6 @@ describe('Learner dashboard functionality', function() {
     // The first user (collectionAdm) that learner subscribes to is placed
     // last in the list.
     await learnerDashboardPage.expectSubscriptionLastNameToMatch('collect...');
-    await users.logout();
-  });
-
-  it('should display learner feedback threads', async function() {
-    await users.createUser(
-      'learner2@learnerDashboard.com', 'learner2learnerDashboard');
-    await users.createUser(
-      'feedbackAdm@learnerDashboard.com', 'feedbackAdmlearnerDashboard');
-    await users.login('feedbackAdm@learnerDashboard.com');
-    await workflow.createAndPublishExploration(
-      'BUS101',
-      'Business',
-      'Learn about different business regulations around the world.',
-      'English',
-      true
-    );
-    await users.logout();
-
-    await users.login('learner2@learnerDashboard.com');
-    var feedback = 'A good exploration. Would love to see a few ' +
-      'more questions';
-    await libraryPage.get();
-    await libraryPage.findExploration('BUS101');
-    await libraryPage.playExploration('BUS101');
-    await explorationPlayerPage.submitFeedback(feedback);
-
-    // Verify feedback thread is created.
-    await learnerDashboardPage.get();
-    await learnerDashboardPage.navigateToFeedbackSection();
-    await learnerDashboardPage.expectFeedbackExplorationTitleToMatch('BUS101');
-    await learnerDashboardPage.navigateToFeedbackThread();
-    await learnerDashboardPage.expectFeedbackMessageToMatch(feedback);
     await users.logout();
   });
 

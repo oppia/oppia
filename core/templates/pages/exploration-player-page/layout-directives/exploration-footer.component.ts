@@ -34,6 +34,7 @@ import { WindowDimensionsService } from 'services/contextual/window-dimensions.s
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { UserService } from 'services/user.service';
 import { ExplorationEngineService } from '../services/exploration-engine.service';
+import { ExplorationPlayerStateService } from '../services/exploration-player-state.service';
 import { LearnerViewInfoBackendApiService } from '../services/learner-view-info-backend-api.service';
 import { PlayerPositionService } from '../services/player-position.service';
 import { PlayerTranscriptService } from '../services/player-transcript.service';
@@ -79,7 +80,6 @@ export class ExplorationFooterComponent {
   learnerHasViewedLessonInfoTooltip: boolean = false;
   userIsLoggedIn: boolean = false;
   footerIsInQuestionPlayerMode: boolean = false;
-  CHECKPOINTS_FEATURE_IS_ENABLED = false;
 
   conceptCardForStateExists: boolean = true;
   linkedSkillId: string | null = null;
@@ -100,6 +100,7 @@ export class ExplorationFooterComponent {
     private playerTranscriptService: PlayerTranscriptService,
     private playerPositionService: PlayerPositionService,
     private explorationEngineService: ExplorationEngineService,
+    private explorationPlayerStateService: ExplorationPlayerStateService,
     private userService: UserService,
     private editableExplorationBackendApiService:
       EditableExplorationBackendApiService,
@@ -161,28 +162,18 @@ export class ExplorationFooterComponent {
         });
       this.footerIsInQuestionPlayerMode = true;
     } else if (this.explorationId) {
-      this.readOnlyExplorationBackendApiService
-        .fetchCheckpointsFeatureIsEnabledStatus().then(
-          (checkpointsFeatureIsEnabled) => {
-            this.CHECKPOINTS_FEATURE_IS_ENABLED = checkpointsFeatureIsEnabled;
-            if (this.CHECKPOINTS_FEATURE_IS_ENABLED) {
-              // Fetching the number of checkpoints.
-              this.getCheckpointCount();
-              this.setLearnerHasViewedLessonInfoTooltip();
-            }
-          }
-        );
+      // Fetching the number of checkpoints.
+      this.getCheckpointCount();
+      this.setLearnerHasViewedLessonInfoTooltip();
     }
     this.directiveSubscriptions.add(
       this.playerPositionService.onLoadedMostRecentCheckpoint.subscribe(() => {
-        if (this.CHECKPOINTS_FEATURE_IS_ENABLED) {
-          if (this.checkpointCount) {
+        if (this.checkpointCount) {
+          this.showProgressReminderModal();
+        } else {
+          this.getCheckpointCount().then(() => {
             this.showProgressReminderModal();
-          } else {
-            this.getCheckpointCount().then(() => {
-              this.showProgressReminderModal();
-            });
-          }
+          });
         }
       })
     );
@@ -213,6 +204,7 @@ export class ExplorationFooterComponent {
     this.completedCheckpointsCount = mostRecentlyReachedCheckpointIndex - 1;
 
     if (this.completedCheckpointsCount === 0) {
+      this.explorationPlayerStateService.onShowProgressModal.emit();
       return;
     }
 
@@ -245,6 +237,7 @@ export class ExplorationFooterComponent {
     let modalRef = this.ngbModal.open(ProgressReminderModalComponent, {
       windowClass: 'oppia-progress-reminder-modal'
     });
+    this.explorationPlayerStateService.onShowProgressModal.emit();
 
     let displayedCardIndex = (
       this.playerPositionService.getDisplayedCardIndex()

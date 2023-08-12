@@ -78,6 +78,7 @@ describe('Topics and skills dashboard page component', () => {
     createNewSkillModalService = TestBed.inject(CreateNewSkillModalService);
     topicsAndSkillsDashboardPageService = TestBed.inject(
       TopicsAndSkillsDashboardPageService);
+    fixture.detectChanges();
   });
 
   it('should create', () => {
@@ -170,7 +171,7 @@ describe('Topics and skills dashboard page component', () => {
       componentInstance.topicSummaries.push(
         new CreatorTopicSummary(
           '', '', 2, 2, 2, 2, 2, '', '', 2, 2, 2, 2, true, true, '', '',
-          '', ''));
+          '', '', 1, 1, [5, 4], [3, 4]));
     }
     componentInstance.pageNumber = 1;
     componentInstance.itemsPerPage = 4;
@@ -260,23 +261,24 @@ describe('Topics and skills dashboard page component', () => {
     componentInstance.filterBoxIsShown = false;
     componentInstance.toggleFilterBox();
     expect(componentInstance.filterBoxIsShown).toBeTrue();
+    componentInstance.toggleFilterBox();
+    expect(componentInstance.filterBoxIsShown).toBeFalse();
   });
 
   it('should display filter box on maximizing the window', () => {
     componentInstance.filterBoxIsShown = false;
-
     spyOn(windowDimensionsService, 'isWindowNarrow').and.returnValue(false);
 
+    Object.defineProperty(window, 'innerWidth', { value: 1024 });
     componentInstance.filterBoxOnResize();
-
     expect(componentInstance.filterBoxIsShown).toBeTrue();
   });
 
   it('should hide filter box on minimizing the window', () => {
     componentInstance.filterBoxIsShown = true;
-
     spyOn(windowDimensionsService, 'isWindowNarrow').and.returnValue(true);
 
+    Object.defineProperty(window, 'innerWidth', { value: 768 });
     componentInstance.filterBoxOnResize();
 
     expect(componentInstance.filterBoxIsShown).toBeFalse();
@@ -318,7 +320,7 @@ describe('Topics and skills dashboard page component', () => {
         totalSkillCount: 5,
         topicSummaries: [new CreatorTopicSummary(
           '', '', 2, 2, 2, 2, 2, '', '', 1, 1, 2, 3, true, true, '', '', '',
-          '')],
+          '', 1, 1, [5, 4], [3, 4])],
         categorizedSkillsDict: {}
       }),
       Promise.resolve({

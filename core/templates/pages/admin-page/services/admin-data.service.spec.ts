@@ -20,12 +20,14 @@ import { HttpClientTestingModule, HttpTestingController } from
   '@angular/common/http/testing';
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
+import { PlatformParameterFilterType } from
+  'domain/platform_feature/platform-parameter-filter.model';
+import { PlatformParameter } from
+  'domain/platform_feature/platform-parameter.model';
 import { AdminDataService } from
   'pages/admin-page/services/admin-data.service';
 import { AdminPageData, AdminPageDataBackendDict } from
   'domain/admin/admin-backend-api.service';
-import { PlatformParameterFilterType } from 'domain/platform_feature/platform-parameter-filter.model';
-import { FeatureStage, PlatformParameter } from 'domain/platform_feature/platform-parameter.model';
 import { CreatorTopicSummary } from 'domain/topic/creator-topic-summary.model';
 
 
@@ -55,7 +57,11 @@ describe('Admin Data Service', () => {
         total_published_node_count: 10,
         url_fragment: 'topicurlfrag',
         can_edit_topic: false,
-        is_published: false
+        is_published: false,
+        total_upcoming_chapters_count: 1,
+        total_overdue_chapters_count: 1,
+        total_chapter_counts_for_each_story: [5, 4],
+        published_chapter_counts_for_each_story: [3, 4]
       }
     ],
     updatable_roles: ['TOPIC_MANAGER'],
@@ -82,22 +88,22 @@ describe('Admin Data Service', () => {
       FULL_USER: 'full user',
       TOPIC_MANAGER: 'topic manager'
     },
-    feature_flags: [{
-      name: 'dummy_feature',
-      description: 'this is a dummy feature',
-      data_type: 'bool',
+    platform_params_dicts: [{
+      name: 'dummy_parameter',
+      description: 'This is a dummy platform parameter.',
+      data_type: 'string',
       rules: [{
         filters: [{
           type: PlatformParameterFilterType.ServerMode,
           conditions: [['=', 'dev'] as [string, string]]
         }],
-        value_when_matched: true
+        value_when_matched: ''
       }],
       rule_schema_version: 1,
-      default_value: false,
-      is_feature: true,
-      feature_stage: FeatureStage.DEV
-    }]
+      default_value: '',
+      is_feature: false,
+      feature_stage: null
+    }],
   };
   let adminDataResponse: AdminPageData;
 
@@ -119,7 +125,7 @@ describe('Admin Data Service', () => {
       humanReadableRoles: sampleAdminData.human_readable_roles,
       topicSummaries: sampleAdminData.topic_summaries.map(
         CreatorTopicSummary.createFromBackendDict),
-      featureFlags: sampleAdminData.feature_flags.map(
+      platformParameters: sampleAdminData.platform_params_dicts.map(
         dict => PlatformParameter.createFromBackendDict(dict))
     };
   });

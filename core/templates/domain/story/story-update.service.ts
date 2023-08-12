@@ -20,7 +20,7 @@
  */
 
 import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
+import { Injectable, EventEmitter } from '@angular/core';
 
 import { AlertsService } from 'services/alerts.service';
 import { BackendChangeObject, Change, DomainObject } from 'domain/editor/undo_redo/change.model';
@@ -35,6 +35,7 @@ import { StoryNode } from './story-node.model';
 import { EntityEditorBrowserTabsInfo } from 'domain/entity_editor_browser_tabs_info/entity-editor-browser-tabs-info.model';
 import { LocalStorageService } from 'services/local-storage.service';
 import { EntityEditorBrowserTabsInfoDomainConstants } from 'domain/entity_editor_browser_tabs_info/entity-editor-browser-tabs-info-domain.constants';
+import { PlatformFeatureService } from 'services/platform-feature.service';
 
 type StoryUpdateApply = (storyChange: StoryChange, story: Story) => void;
 type StoryUpdateReverse = (storyChange: StoryChange, story: Story) => void;
@@ -49,7 +50,7 @@ interface Params {
   // For properties like initialNodeId, thumbnailBackdroundColor
   // old value can be null.
   'old_value'?: string | string[] | boolean | number | null;
-  'new_value'?: string | string[] | boolean | number;
+  'new_value'?: string | string[] | boolean | number | null;
   'property_name'?: string;
   'cmd'?: string;
 }
@@ -60,12 +61,19 @@ type Command = BackendChangeObject['cmd'];
   providedIn: 'root'
 })
 export class StoryUpdateService {
+  private _storyChapterUpdateEventEmitter = new EventEmitter<void>();
+
   constructor(
     private _undoRedoService: UndoRedoService,
     private _alertsService: AlertsService,
     private _storyEditorStateService: StoryEditorStateService,
-    private _localStorageService: LocalStorageService
+    private _localStorageService: LocalStorageService,
+    private _platformFeatureService: PlatformFeatureService
   ) {}
+
+  get onStoryChapterUpdateEventEmitter(): EventEmitter<void> {
+    return this._storyChapterUpdateEventEmitter;
+  }
 
   // Creates a change using an apply function, reverse function, a change
   // command and related parameters. The change is applied to a given
@@ -155,8 +163,8 @@ export class StoryUpdateService {
 
   _applyStoryNodePropertyChange(
       story: Story, propertyName: string,
-      nodeId: string, oldValue: string | string[] | null,
-      newValue: string | string[],
+      nodeId: string, oldValue: number | string | string[] | null,
+      newValue: number | string | string[] | null,
       apply: StoryUpdateApply, reverse: StoryUpdateReverse): void {
     this._applyChange(
       story, StoryDomainConstants.CMD_UPDATE_STORY_NODE_PROPERTY, {
@@ -390,6 +398,7 @@ export class StoryUpdateService {
    */
   finalizeStoryNodeOutline(story: Story, nodeId: string): void {
     let storyNode = this._getStoryNode(story.getStoryContents(), nodeId);
+    this.setStoryNodeLastModifiedMsecs(story, nodeId, Date.now());
     if (storyNode.getOutlineStatus()) {
       throw new Error('Node outline is already finalized.');
     }
@@ -401,9 +410,11 @@ export class StoryUpdateService {
       }, (changeDict, story) => {
         // ---- Apply ----
         story.getStoryContents().markNodeOutlineAsFinalized(nodeId);
+        this._storyChapterUpdateEventEmitter.emit();
       }, (changeDict, story) => {
         // ---- Undo ----
         story.getStoryContents().markNodeOutlineAsNotFinalized(nodeId);
+        this._storyChapterUpdateEventEmitter.emit();
       });
   }
 
@@ -416,6 +427,7 @@ export class StoryUpdateService {
     if (!storyNode.getOutlineStatus()) {
       throw new Error('Node outline is already not finalized.');
     }
+    this.setStoryNodeLastModifiedMsecs(story, nodeId, Date.now());
     this._applyChange(
       story, StoryDomainConstants.CMD_UPDATE_STORY_NODE_OUTLINE_STATUS, {
         node_id: nodeId,
@@ -424,9 +436,11 @@ export class StoryUpdateService {
       }, (changeDict, story) => {
         // ---- Apply ----
         story.getStoryContents().markNodeOutlineAsNotFinalized(nodeId);
+        this._storyChapterUpdateEventEmitter.emit();
       }, (changeDict, story) => {
         // ---- Undo ----
         story.getStoryContents().markNodeOutlineAsFinalized(nodeId);
+        this._storyChapterUpdateEventEmitter.emit();
       });
   }
 
@@ -437,6 +451,7 @@ export class StoryUpdateService {
   setStoryNodeOutline(story: Story, nodeId: string, newOutline: string): void {
     let storyNode = this._getStoryNode(story.getStoryContents(), nodeId);
     let oldOutline = storyNode.getOutline();
+    this.setStoryNodeLastModifiedMsecs(story, nodeId, Date.now());
 
     this._applyStoryNodePropertyChange(
       story, StoryDomainConstants.STORY_NODE_PROPERTY_OUTLINE, nodeId,
@@ -458,6 +473,7 @@ export class StoryUpdateService {
   setStoryNodeTitle(story: Story, nodeId: string, newTitle: string): void {
     let storyNode = this._getStoryNode(story.getStoryContents(), nodeId);
     let oldTitle = storyNode.getTitle();
+    this.setStoryNodeLastModifiedMsecs(story, nodeId, Date.now());
 
     this._applyStoryNodePropertyChange(
       story, StoryDomainConstants.STORY_NODE_PROPERTY_TITLE, nodeId,
@@ -479,6 +495,7 @@ export class StoryUpdateService {
       story: Story, nodeId: string, newDescription: string): void {
     let storyNode = this._getStoryNode(story.getStoryContents(), nodeId);
     let oldDescription = storyNode.getDescription();
+    this.setStoryNodeLastModifiedMsecs(story, nodeId, Date.now());
 
     this._applyStoryNodePropertyChange(
       story, StoryDomainConstants.STORY_NODE_PROPERTY_DESCRIPTION, nodeId,
@@ -500,6 +517,7 @@ export class StoryUpdateService {
       story: Story, nodeId: string, newThumbnailFilename: string): void {
     let storyNode = this._getStoryNode(story.getStoryContents(), nodeId);
     let oldThumbnailFilename = storyNode.getThumbnailFilename();
+    this.setStoryNodeLastModifiedMsecs(story, nodeId, Date.now());
 
     this._applyStoryNodePropertyChange(
       story, StoryDomainConstants.STORY_NODE_PROPERTY_THUMBNAIL_FILENAME,
@@ -521,6 +539,7 @@ export class StoryUpdateService {
       story: Story, nodeId: string, newThumbnailBgColor: string): void {
     let storyNode = this._getStoryNode(story.getStoryContents(), nodeId);
     let oldThumbnailBgColor = storyNode.getThumbnailBgColor();
+    this.setStoryNodeLastModifiedMsecs(story, nodeId, Date.now());
 
     this._applyStoryNodePropertyChange(
       story, StoryDomainConstants.STORY_NODE_PROPERTY_THUMBNAIL_BG_COLOR,
@@ -542,6 +561,7 @@ export class StoryUpdateService {
       story: Story, nodeId: string, newExplorationId: string): void {
     let storyNode = this._getStoryNode(story.getStoryContents(), nodeId);
     let oldExplorationId = storyNode.getExplorationId();
+    this.setStoryNodeLastModifiedMsecs(story, nodeId, Date.now());
 
     this._applyStoryNodePropertyChange(
       story, StoryDomainConstants.STORY_NODE_PROPERTY_EXPLORATION_ID,
@@ -556,6 +576,137 @@ export class StoryUpdateService {
         story.getStoryContents().setNodeExplorationId(
           nodeId, oldExplorationId);
         this._storyEditorStateService.setExpIdsChanged();
+      });
+  }
+
+  /**
+   * Sets the publication status of a node in the story and records the change
+   * in the undo/redo service.
+   */
+  setStoryNodeStatus(
+      story: Story, nodeId: string, newStatus: string
+  ): void {
+    let storyNode = this._getStoryNode(story.getStoryContents(), nodeId);
+    let oldStatus = storyNode.getStatus();
+    this.setStoryNodeLastModifiedMsecs(story, nodeId, Date.now());
+
+    this._applyStoryNodePropertyChange(
+      story, StoryDomainConstants.STORY_NODE_PROPERTY_STATUS, nodeId,
+      oldStatus, newStatus,
+      (changeDict, story) => {
+        // ---- Apply ----
+        story.getStoryContents().setNodeStatus(nodeId, newStatus);
+      }, (changeDict, story) => {
+        // ---- Undo ----
+        story.getStoryContents().setNodeStatus(nodeId, oldStatus);
+      });
+  }
+
+  /**
+   * Sets the planned publication date (in msecs) of a node in the story and
+   * records the change in the undo/redo service.
+   */
+  setStoryNodePlannedPublicationDateMsecs(
+      story: Story, nodeId: string,
+      newPlannedPublicationDateMsecs: number | null
+  ): void {
+    let storyNode = this._getStoryNode(story.getStoryContents(), nodeId);
+    let oldPlannedPublicationDateMsecs =
+        storyNode.getPlannedPublicationDateMsecs();
+    this.setStoryNodeLastModifiedMsecs(story, nodeId, Date.now());
+
+    this._applyStoryNodePropertyChange(
+      story,
+      StoryDomainConstants.STORY_NODE_PROPERTY_PLANNED_PUBLICATION_DATE_MSECS,
+      nodeId,
+      oldPlannedPublicationDateMsecs, newPlannedPublicationDateMsecs,
+      (changeDict, story) => {
+        // ---- Apply ----
+        story.getStoryContents().setNodePlannedPublicationDateMsecs(
+          nodeId, newPlannedPublicationDateMsecs);
+      }, (changeDict, story) => {
+        // ---- Undo ----
+        story.getStoryContents().setNodePlannedPublicationDateMsecs(
+          nodeId, oldPlannedPublicationDateMsecs);
+      });
+  }
+
+  /**
+ * Sets the last modified date and time (in msecs) of a node in the story and
+ * records the change in the undo/redo service.
+ */
+  setStoryNodeLastModifiedMsecs(
+      story: Story, nodeId: string, newLastModifiedMsecs: number
+  ): void {
+    let storyNode = this._getStoryNode(story.getStoryContents(), nodeId);
+    let oldLastModifiedMsecs = storyNode.getLastModifiedMsecs();
+
+    if (this._platformFeatureService.status.
+      SerialChapterLaunchCurriculumAdminView.isEnabled) {
+      this._applyStoryNodePropertyChange(
+        story, StoryDomainConstants.STORY_NODE_PROPERTY_LAST_MODIFIED_MSECS,
+        nodeId, oldLastModifiedMsecs, newLastModifiedMsecs,
+        (changeDict, story) => {
+          // ---- Apply ----
+          story.getStoryContents().setNodeLastModifiedMsecs(
+            nodeId, newLastModifiedMsecs);
+        }, (changeDict, story) => {
+          // ---- Undo ----
+          story.getStoryContents().setNodeLastModifiedMsecs(
+            nodeId, oldLastModifiedMsecs);
+        });
+    }
+  }
+
+  /**
+ * Sets the first publication date (in msecs) of a node in the story and
+ * records the change in the undo/redo service.
+ */
+  setStoryNodeFirstPublicationDateMsecs(
+      story: Story, nodeId: string, newFirstPublicationDateMsecs: number | null
+  ): void {
+    let storyNode = this._getStoryNode(story.getStoryContents(), nodeId);
+    let oldFirstPublicationDateMsecs =
+      storyNode.getFirstPublicationDateMsecs();
+    this.setStoryNodeLastModifiedMsecs(story, nodeId, Date.now());
+
+    this._applyStoryNodePropertyChange(
+      story,
+      StoryDomainConstants.STORY_NODE_PROPERTY_FIRST_PUBLICATION_DATE_MSECS,
+      nodeId, oldFirstPublicationDateMsecs, newFirstPublicationDateMsecs,
+      (changeDict, story) => {
+        // ---- Apply ----
+        story.getStoryContents().setNodeFirstPublicationDateMsecs(
+          nodeId, newFirstPublicationDateMsecs);
+      }, (changeDict, story) => {
+        // ---- Undo ----
+        story.getStoryContents().setNodeFirstPublicationDateMsecs(
+          nodeId, oldFirstPublicationDateMsecs);
+      });
+  }
+
+  /**
+   * Sets the unpublishing reason of a node in the story and
+   * records the change in the undo/redo service.
+   */
+  setStoryNodeUnpublishingReason(
+      story: Story, nodeId: string, newUnpublishingReason: string | null
+  ): void {
+    let storyNode = this._getStoryNode(story.getStoryContents(), nodeId);
+    let oldUnpublishingReason = storyNode.getUnpublishingReason();
+    this.setStoryNodeLastModifiedMsecs(story, nodeId, Date.now());
+
+    this._applyStoryNodePropertyChange(
+      story, StoryDomainConstants.STORY_NODE_PROPERTY_UNPUBLISHING_REASON,
+      nodeId, oldUnpublishingReason, newUnpublishingReason,
+      (changeDict, story) => {
+        // ---- Apply ----
+        story.getStoryContents().setNodeUnpublishingReason(
+          nodeId, newUnpublishingReason);
+      }, (changeDict, story) => {
+        // ---- Undo ----
+        story.getStoryContents().setNodeUnpublishingReason(
+          nodeId, oldUnpublishingReason);
       });
   }
 
@@ -600,6 +751,7 @@ export class StoryUpdateService {
       throw new Error('The given destination node is not part of the node');
     }
     newDestinationNodeIds.splice(index, 1);
+    this.setStoryNodeLastModifiedMsecs(story, nodeId, Date.now());
 
     this._applyStoryNodePropertyChange(
       story, StoryDomainConstants.STORY_NODE_PROPERTY_DESTINATION_NODE_IDS,
@@ -644,6 +796,7 @@ export class StoryUpdateService {
       storyNode.getPrerequisiteSkillIds());
     let newPrerequisiteSkillIds = cloneDeep(oldPrerequisiteSkillIds);
     newPrerequisiteSkillIds.push(skillId);
+    this.setStoryNodeLastModifiedMsecs(story, nodeId, Date.now());
     this._applyStoryNodePropertyChange(
       story, StoryDomainConstants.STORY_NODE_PROPERTY_PREREQUISITE_SKILL_IDS,
       nodeId, oldPrerequisiteSkillIds, newPrerequisiteSkillIds,
@@ -651,10 +804,12 @@ export class StoryUpdateService {
         // ---- Apply ----
         story.getStoryContents().addPrerequisiteSkillIdToNode(
           nodeId, skillId);
+        this._storyChapterUpdateEventEmitter.emit();
       }, (changeDict, story) => {
         // ---- Undo ----
         story.getStoryContents().removePrerequisiteSkillIdFromNode(
           nodeId, skillId);
+        this._storyChapterUpdateEventEmitter.emit();
       });
   }
 
@@ -674,6 +829,7 @@ export class StoryUpdateService {
         'The given prerequisite skill is not part of the node');
     }
     newPrerequisiteSkillIds.splice(index, 1);
+    this.setStoryNodeLastModifiedMsecs(story, nodeId, Date.now());
 
     this._applyStoryNodePropertyChange(
       story, StoryDomainConstants.STORY_NODE_PROPERTY_PREREQUISITE_SKILL_IDS,
@@ -682,10 +838,12 @@ export class StoryUpdateService {
         // ---- Apply ----
         story.getStoryContents().removePrerequisiteSkillIdFromNode(
           nodeId, skillId);
+        this._storyChapterUpdateEventEmitter.emit();
       }, (changeDict, story) => {
         // ---- Undo ----
         story.getStoryContents().addPrerequisiteSkillIdToNode(
           nodeId, skillId);
+        this._storyChapterUpdateEventEmitter.emit();
       });
   }
 
@@ -700,6 +858,7 @@ export class StoryUpdateService {
       storyNode.getAcquiredSkillIds());
     let newAcquiredSkillIds = cloneDeep(oldAcquiredSkillIds);
     newAcquiredSkillIds.push(skillId);
+    this.setStoryNodeLastModifiedMsecs(story, nodeId, Date.now());
 
     this._applyStoryNodePropertyChange(
       story, StoryDomainConstants.STORY_NODE_PROPERTY_ACQUIRED_SKILL_IDS,
@@ -708,10 +867,12 @@ export class StoryUpdateService {
         // ---- Apply ----
         story.getStoryContents().addAcquiredSkillIdToNode(
           nodeId, skillId);
+        this._storyChapterUpdateEventEmitter.emit();
       }, (changeDict, story) => {
         // ---- Undo ----
         story.getStoryContents().removeAcquiredSkillIdFromNode(
           nodeId, skillId);
+        this._storyChapterUpdateEventEmitter.emit();
       });
   }
 
@@ -726,6 +887,7 @@ export class StoryUpdateService {
       storyNode.getAcquiredSkillIds());
     let newAcquiredSkillIds = cloneDeep(oldAcquiredSkillIds);
     let index = newAcquiredSkillIds.indexOf(skillId);
+    this.setStoryNodeLastModifiedMsecs(story, nodeId, Date.now());
     if (index === -1) {
       throw new Error(
         'The given acquired skill id is not part of the node');
@@ -739,11 +901,17 @@ export class StoryUpdateService {
         // ---- Apply ----
         story.getStoryContents().removeAcquiredSkillIdFromNode(
           nodeId, skillId);
+        this._storyChapterUpdateEventEmitter.emit();
       }, (changeDict, story) => {
         // ---- Undo ----
         story.getStoryContents().addAcquiredSkillIdToNode(
           nodeId, skillId);
+        this._storyChapterUpdateEventEmitter.emit();
       });
+  }
+
+  get storyChapterUpdateEventEmitter(): EventEmitter<void> {
+    return this._storyChapterUpdateEventEmitter;
   }
 }
 

@@ -323,4 +323,36 @@ describe('NoninteractiveImage', () => {
       // This is tested to make sure the function did no continue to execute.
       expect(imagePreloaderService.getDimensionsOfImage).not.toHaveBeenCalled();
     });
+
+  it('should show alt text images when altTextIsDisplayed property is true',
+    () => {
+      spyOn(contextService, 'getEntityType').and.returnValue('exploration');
+      spyOn(imagePreloaderService, 'getImageUrlAsync').and.resolveTo(
+        dataUrlSvg);
+      spyOn(contextService, 'getExplorationId').and.returnValue('exp_id');
+      spyOn(contextService, 'getEntityId').and.returnValue('expId');
+
+      component.altTextIsDisplayed = true;
+      component.imageAltText = 'This is alt text';
+      fixture.detectChanges();
+
+      const altTextcomponent = document.querySelector('figcaption.alt-text');
+      expect(altTextcomponent?.textContent).toEqual(
+        'Description: ' + component.imageAltText);
+    });
+
+  it('should not show alt text images when altTextIsDisplayed property is' +
+    'false', () => {
+    spyOn(contextService, 'getEntityType').and.returnValue('exploration');
+    spyOn(imagePreloaderService, 'getImageUrlAsync').and.resolveTo(dataUrlSvg);
+    spyOn(contextService, 'getExplorationId').and.returnValue('exp_id');
+    spyOn(contextService, 'getEntityId').and.returnValue('expId');
+
+    component.altTextIsDisplayed = false;
+    component.imageAltText = 'This is alt text';
+    fixture.detectChanges();
+
+    const altTextComponent = document.querySelector('figcaption.alt-text');
+    expect(altTextComponent).toBeNull();
+  });
 });

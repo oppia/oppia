@@ -20,7 +20,6 @@ from core import feconf
 from core.constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
-from core.domain import config_domain
 from core.domain import learner_group_fetchers
 from core.domain import learner_group_services
 from core.domain import story_fetchers
@@ -657,7 +656,7 @@ class FacilitatorDashboardPage(
     @acl_decorators.can_access_learner_groups
     def get(self) -> None:
         """Handles GET requests."""
-        if not config_domain.LEARNER_GROUPS_ARE_ENABLED.value:
+        if not learner_group_services.is_learner_group_feature_enabled():
             raise self.PageNotFoundException
 
         self.render_template('facilitator-dashboard-page.mainpage.html')
@@ -674,7 +673,7 @@ class CreateLearnerGroupPage(
     @acl_decorators.can_access_learner_groups
     def get(self) -> None:
         """Handles GET requests."""
-        if not config_domain.LEARNER_GROUPS_ARE_ENABLED.value:
+        if not learner_group_services.is_learner_group_feature_enabled():
             raise self.PageNotFoundException
 
         self.render_template('create-learner-group-page.mainpage.html')
@@ -782,7 +781,7 @@ class EditLearnerGroupPage(
     def get(self, group_id: str) -> None:
         """Handles GET requests."""
         assert self.user_id is not None
-        if not config_domain.LEARNER_GROUPS_ARE_ENABLED.value:
+        if not learner_group_services.is_learner_group_feature_enabled():
             raise self.PageNotFoundException
 
         is_valid_request = learner_group_services.is_user_facilitator(
@@ -1239,5 +1238,5 @@ class LearnerGroupsFeatureStatusHandler(
         """Handles GET requests."""
         self.render_json({
             'feature_is_enabled': (
-                config_domain.LEARNER_GROUPS_ARE_ENABLED.value)
+                learner_group_services.is_learner_group_feature_enabled())
         })

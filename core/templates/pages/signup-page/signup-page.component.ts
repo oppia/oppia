@@ -175,6 +175,8 @@ export class SignupPageComponent {
 
     if (returnUrl.indexOf('creator-dashboard') !== -1) {
       defaultDashboard = AppConstants.DASHBOARD_TYPE_CREATOR;
+    } else if (returnUrl.indexOf('contributor-dashboard') !== -1) {
+      defaultDashboard = AppConstants.DASHBOARD_TYPE_CONTRIBUTOR;
     } else {
       defaultDashboard = AppConstants.DASHBOARD_TYPE_LEARNER;
     }

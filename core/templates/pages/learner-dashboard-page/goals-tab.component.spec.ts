@@ -108,7 +108,12 @@ describe('Goals tab Component', () => {
       outline: 'Outline',
       exploration_id: null,
       outline_is_finalized: false,
-      thumbnail_bg_color: '#a33f40'
+      thumbnail_bg_color: '#a33f40',
+      status: 'Published',
+      planned_publication_date_msecs: 100,
+      last_modified_msecs: 100,
+      first_publication_date_msecs: 200,
+      unpublishing_reason: null
     };
     const learnerTopicSummaryBackendDict1 = {
       id: 'sample_topic_id',
@@ -306,6 +311,20 @@ describe('Goals tab Component', () => {
     fixture.detectChanges();
 
     expect(learnerGoalsSpy).toHaveBeenCalled();
+  });
+  it('should remove topic from learner goals if already present', () => {
+    component.topicIdsInCurrentGoals = ['1', '2', '3'];
+
+    const learnerGoalsSpy = spyOn(
+      learnerDashboardActivityBackendApiService, 'addToLearnerGoals')
+      .and.returnValue(Promise.resolve(true));
+    const removeTopicSpy = spyOn(component, 'removeFromLearnerGoals');
+
+    component.addToLearnerGoals(component.editGoals[0], '2', 1);
+    fixture.detectChanges();
+
+    expect(removeTopicSpy).toHaveBeenCalled();
+    expect(learnerGoalsSpy).not.toHaveBeenCalled();
   });
 
   it('should remove topic from the learner goals', () => {
