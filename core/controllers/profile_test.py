@@ -986,7 +986,8 @@ class MailingListSubscriptionHandlerTests(test_utils.GenericTestBase):
 
     def test_put_function(self) -> None:
         swap_add_fn = self.swap(
-            user_services, 'add_user_to_mailing_list', lambda *args: True)
+            user_services, 'add_user_to_mailing_list', lambda *args,
+            **kwargs: True)
 
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
         self.login(self.VIEWER_EMAIL)
