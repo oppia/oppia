@@ -342,9 +342,10 @@ class GenerateContributorAdminStatsJob(base_jobs.JobBase):
             '%s.%s' % (language_code, contributor_user_id)
         )
 
-        for v in translation_contribution_stats:
-            if GenerateContributorAdminStatsJob.not_validate_topic(v.topic_id):
-                translation_contribution_stats.remove(v)
+        for stat in translation_contribution_stats:
+            if GenerateContributorAdminStatsJob.not_validate_topic(
+                stat.topic_id):
+                translation_contribution_stats.remove(stat)
 
         topic_ids = (
             [v.topic_id for v in translation_contribution_stats])
@@ -438,9 +439,10 @@ class GenerateContributorAdminStatsJob(base_jobs.JobBase):
             '%s.%s' % (language_code, reviewer_user_id)
         )
 
-        for v in translation_reviewer_stats:
-            if GenerateContributorAdminStatsJob.not_validate_topic(v.topic_id):
-                translation_reviewer_stats.remove(v)
+        for stat in translation_reviewer_stats:
+            if GenerateContributorAdminStatsJob.not_validate_topic(
+                stat.topic_id):
+                translation_reviewer_stats.remove(stat)
 
         topic_ids = (
             [v.topic_id for v in translation_reviewer_stats])
@@ -556,9 +558,9 @@ class GenerateContributorAdminStatsJob(base_jobs.JobBase):
 
         entity_id = contributor_user_id
 
-        for v in question_contribution_stats:
-            if GenerateContributorAdminStatsJob.not_validate_topic(v.topic_id):
-                question_contribution_stats.remove(v)
+        for stat in question_contribution_stats:
+            if GenerateContributorAdminStatsJob.not_validate_topic(stat.topic_id):
+                question_contribution_stats.remove(stat)
 
         topic_ids = (
             [v.topic_id for v in question_contribution_stats])
@@ -629,9 +631,10 @@ class GenerateContributorAdminStatsJob(base_jobs.JobBase):
         question_reviewer_stats = list(question_reviewer_stats)
         entity_id = reviewer_user_id
 
-        for v in question_reviewer_stats:
-            if GenerateContributorAdminStatsJob.not_validate_topic(v.topic_id):
-                question_reviewer_stats.remove(v)
+        for stat in question_reviewer_stats:
+            if GenerateContributorAdminStatsJob.not_validate_topic(
+                stat.topic_id):
+                question_reviewer_stats.remove(stat)
 
         topic_ids = (
             [v.topic_id for v in question_reviewer_stats])
