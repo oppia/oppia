@@ -21,7 +21,7 @@ from __future__ import annotations
 import datetime
 
 from core import feconf
-from core.domain import change_domain
+from core.domain import change_domain, topic_domain, topic_services
 from core.jobs import job_test_utils
 from core.jobs.batch_jobs import contributor_admin_stats_jobs
 from core.jobs.types import job_run_result
@@ -176,6 +176,24 @@ class ContributorDashboardTest(job_test_utils.JobTestBase):
             contribution_dates=self.CONTRIBUTION_DATES
         )
 
+        self.translation_contribution_model_with_invalid_topic = self.create_model(
+            suggestion_models.TranslationContributionStatsModel,
+            language_code='hi',
+            contributor_user_id='user1',
+            topic_id='invalid_topic',
+            submitted_translations_count=20,
+            submitted_translation_word_count=(
+                self.SUBMITTED_TRANSLATION_WORD_COUNT),
+            accepted_translations_count=0,
+            accepted_translations_without_reviewer_edits_count=0,
+            accepted_translation_word_count=(
+                self.ACCEPTED_TRANSLATION_WORD_COUNT),
+            rejected_translations_count=1,
+            rejected_translation_word_count=(
+                self.REJECTED_TRANSLATION_WORD_COUNT),
+            contribution_dates=self.CONTRIBUTION_DATES
+        )
+
         self.translation_contribution_model_5 = self.create_model(
             suggestion_models.TranslationContributionStatsModel,
             language_code='hi',
@@ -263,6 +281,23 @@ class ContributorDashboardTest(job_test_utils.JobTestBase):
             last_contribution_date=self.LAST_CONTRIBUTION_DATE
         )
 
+        self.translation_review_model_with_invalid_topic = self.create_model(
+            suggestion_models.TranslationReviewStatsModel,
+            language_code=self.LANGUAGE_CODE,
+            reviewer_user_id='user3',
+            topic_id='invalid_topic',
+            reviewed_translations_count=self.REVIEWED_TRANSLATIONS_COUNT,
+            reviewed_translation_word_count=(
+                self.REVIEWED_TRANSLATION_WORD_COUNT),
+            accepted_translations_count=self.ACCEPTED_TRANSLATIONS_COUNT,
+            accepted_translations_with_reviewer_edits_count=(
+                self.ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT),
+            accepted_translation_word_count=(
+                self.ACCEPTED_TRANSLATION_WORD_COUNT),
+            first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
+            last_contribution_date=self.LAST_CONTRIBUTION_DATE
+        )
+
         self.question_contribution_model_1 = self.create_model(
             suggestion_models.QuestionContributionStatsModel,
             contributor_user_id='user1',
@@ -311,6 +346,19 @@ class ContributorDashboardTest(job_test_utils.JobTestBase):
             last_contribution_date=self.LAST_CONTRIBUTION_DATE
         )
 
+        self.question_contribution_model_with_invalid_topic = (
+            self.create_model(
+                suggestion_models.QuestionContributionStatsModel,
+                contributor_user_id='user3',
+                topic_id='invalid_topic',
+                submitted_questions_count=self.SUBMITTED_QUESTION_COUNT,
+                accepted_questions_count=self.ACCEPTED_QUESTIONS_COUNT,
+                accepted_questions_without_reviewer_edits_count=(
+                    self.ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT),
+                first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
+                last_contribution_date=self.LAST_CONTRIBUTION_DATE
+        ))
+
         self.question_review_model_1 = self.create_model(
             suggestion_models.QuestionReviewStatsModel,
             reviewer_user_id='user1',
@@ -351,6 +399,18 @@ class ContributorDashboardTest(job_test_utils.JobTestBase):
             suggestion_models.QuestionReviewStatsModel,
             reviewer_user_id='user3',
             topic_id='topic1',
+            reviewed_questions_count=self.REVIEWED_QUESTIONS_COUNT,
+            accepted_questions_count=self.ACCEPTED_QUESTIONS_COUNT,
+            accepted_questions_with_reviewer_edits_count=(
+                self.ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT),
+            first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
+            last_contribution_date=self.LAST_CONTRIBUTION_DATE
+        )
+
+        self.question_review_model_with_invalid_topic = self.create_model(
+            suggestion_models.QuestionReviewStatsModel,
+            reviewer_user_id='user3',
+            topic_id='invalid_topic',
             reviewed_questions_count=self.REVIEWED_QUESTIONS_COUNT,
             accepted_questions_count=self.ACCEPTED_QUESTIONS_COUNT,
             accepted_questions_with_reviewer_edits_count=(
@@ -478,6 +538,22 @@ class ContributorDashboardTest(job_test_utils.JobTestBase):
             edited_by_reviewer=False,
             created_on=datetime.datetime(2023, 2, 2))
 
+        topic = topic_domain.Topic.create_default_topic(
+            'topic1', 'name1', 'name-a', 'description', 'fragm')
+        topic_services.save_new_topic(feconf.SYSTEM_COMMITTER_ID, topic)
+
+        topic = topic_domain.Topic.create_default_topic(
+            'topic2', 'name2', 'name-b', 'description', 'fragmm')
+        topic_services.save_new_topic(feconf.SYSTEM_COMMITTER_ID, topic)
+
+        topic = topic_domain.Topic.create_default_topic(
+            'topic3', 'name3', 'name-c', 'description', 'fragmmm')
+        topic_services.save_new_topic(feconf.SYSTEM_COMMITTER_ID, topic)
+
+        topic = topic_domain.Topic.create_default_topic(
+            'topic4', 'name4', 'name-d', 'description', 'fragmmmmm')
+        topic_services.save_new_topic(feconf.SYSTEM_COMMITTER_ID, topic)
+
 
 class GenerateContributorAdminStatsJobTests(ContributorDashboardTest):
 
@@ -495,19 +571,23 @@ class GenerateContributorAdminStatsJobTests(ContributorDashboardTest):
         self.translation_contribution_model_3.update_timestamps()
         self.translation_contribution_model_4.update_timestamps()
         self.translation_contribution_model_with_no_topic.update_timestamps()
+        self.translation_contribution_model_with_invalid_topic.update_timestamps()
         self.translation_contribution_model_5.update_timestamps()
         self.translation_review_model_1.update_timestamps()
         self.translation_review_model_2.update_timestamps()
         self.translation_review_model_3.update_timestamps()
         self.translation_review_model_4.update_timestamps()
+        self.translation_review_model_with_invalid_topic.update_timestamps()
         self.question_contribution_model_1.update_timestamps()
         self.question_contribution_model_2.update_timestamps()
         self.question_contribution_model_3.update_timestamps()
         self.question_contribution_model_4.update_timestamps()
+        self.question_contribution_model_with_invalid_topic.update_timestamps()
         self.question_review_model_1.update_timestamps()
         self.question_review_model_2.update_timestamps()
         self.question_review_model_3.update_timestamps()
         self.question_review_model_4.update_timestamps()
+        self.question_review_model_with_invalid_topic.update_timestamps()
         self.question_suggestion_rejected_model.update_timestamps()
         self.question_suggestion_accepted_with_edits_model.update_timestamps()
         self.question_suggestion_accepted_model.update_timestamps()
@@ -523,19 +603,23 @@ class GenerateContributorAdminStatsJobTests(ContributorDashboardTest):
             self.translation_contribution_model_3,
             self.translation_contribution_model_4,
             self.translation_contribution_model_with_no_topic,
+            self.translation_contribution_model_with_invalid_topic,
             self.translation_contribution_model_5,
             self.translation_review_model_1,
             self.translation_review_model_2,
             self.translation_review_model_3,
             self.translation_review_model_4,
+            self.translation_review_model_with_invalid_topic,
             self.question_contribution_model_1,
             self.question_contribution_model_2,
             self.question_contribution_model_3,
             self.question_contribution_model_4,
+            self.question_contribution_model_with_invalid_topic,
             self.question_review_model_1,
             self.question_review_model_2,
             self.question_review_model_3,
             self.question_review_model_4,
+            self.question_review_model_with_invalid_topic,
             self.question_suggestion_rejected_model,
             self.question_suggestion_accepted_with_edits_model,
             self.question_suggestion_accepted_model,

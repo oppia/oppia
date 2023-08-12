@@ -19,6 +19,7 @@
 from __future__ import annotations
 
 from core import feconf
+from core.domain import topic_fetchers
 from core.jobs import base_jobs
 from core.jobs.io import ndb_io
 from core.jobs.transforms import job_result_transforms
@@ -341,6 +342,10 @@ class GenerateContributorAdminStatsJob(base_jobs.JobBase):
             '%s.%s' % (language_code, contributor_user_id)
         )
 
+        for v in translation_contribution_stats:
+            if GenerateContributorAdminStatsJob.not_validate_topic(v.topic_id):
+                translation_contribution_stats.remove(v)
+
         topic_ids = (
             [v.topic_id for v in translation_contribution_stats])
         submitted_translations_count = sum(
@@ -432,6 +437,10 @@ class GenerateContributorAdminStatsJob(base_jobs.JobBase):
         entity_id = (
             '%s.%s' % (language_code, reviewer_user_id)
         )
+
+        for v in translation_reviewer_stats:
+            if GenerateContributorAdminStatsJob.not_validate_topic(v.topic_id):
+                translation_reviewer_stats.remove(v)
 
         topic_ids = (
             [v.topic_id for v in translation_reviewer_stats])
@@ -547,6 +556,10 @@ class GenerateContributorAdminStatsJob(base_jobs.JobBase):
 
         entity_id = contributor_user_id
 
+        for v in question_contribution_stats:
+            if GenerateContributorAdminStatsJob.not_validate_topic(v.topic_id):
+                question_contribution_stats.remove(v)
+
         topic_ids = (
             [v.topic_id for v in question_contribution_stats])
         submitted_questions_count = sum(
@@ -616,6 +629,10 @@ class GenerateContributorAdminStatsJob(base_jobs.JobBase):
         question_reviewer_stats = list(question_reviewer_stats)
         entity_id = reviewer_user_id
 
+        for v in question_reviewer_stats:
+            if GenerateContributorAdminStatsJob.not_validate_topic(v.topic_id):
+                question_reviewer_stats.remove(v)
+
         topic_ids = (
             [v.topic_id for v in question_reviewer_stats])
         reviewed_questions_count = sum(
@@ -652,6 +669,23 @@ class GenerateContributorAdminStatsJob(base_jobs.JobBase):
             )
             question_review_stats_models.update_timestamps()
             return question_review_stats_models
+
+    @staticmethod
+    def not_validate_topic(topic_id: str) -> bool:
+        """Validates if there exist a topic with a given topic ID.
+
+        Args:
+            topic_id: str. The id of the topic that needs to be validated.
+
+        Returns:
+            bool. True if topic doesn't exist and False if topic exists.
+        """
+        topic = topic_fetchers.get_topic_by_id(topic_id, strict=False)
+
+        if topic is None:
+            return True
+
+        return False
 
 
 class AuditGenerateContributorAdminStatsJob(
