@@ -98,13 +98,14 @@
 </ng-template>
 
 <ng-template #TranslationLengthLabel>
-  <div class="oppia-translation-label-container oppia-animate-fadein"
-       *ngIf="opportunity?.translationWordCount < 20">
-    <div class="oppia-translation-length-label"
-         ngbTooltip="Translation word count: {{opportunity.translationWordCount}}">
-      <ng-container>
-          short
-      </ng-container>
+  <div>
+    <div class="oppia-animate-fadein"
+       *ngIf="opportunity?.translationWordCount < 20"
+       [ngStyle]="labelStyle">
+      <div class="oppia-translation-length-label"
+        ngbTooltip="Translation word count: {{opportunity.translationWordCount}}">
+        <ng-container>Short Translation</ng-container>
+      </div>
     </div>
   </div>
 </ng-template>
@@ -293,26 +294,19 @@
     min-height: 90px;
     padding: 0% 3%;
   }
-  .oppia-translation-label-container {
-    align-items: center;
-    background-color: #fff;
-    display: flex;
-    justify-content: center;
-    margin: 1% 0;
-    width: 20%;
-  }
   .oppia-translation-length-label {
     align-items: center;
-    background-color: #4e89b1;
-    color: #fff;
+    background-color: #eee;
+    border-radius: 10px;
+    color: #1b1b1b;
     display: flex;
-    font-size: 12px;
-    height: 26px;
+    font-size: 16px;
+    height: 60px;
     justify-content: center;
     margin: 18px;
     padding: 3px;
     text-align: center;
-    width: 60px;
+    width: 95px;
   }
   .oppia-animate-fadein {
     -webkit-animation: fadein 0.5s linear 1 normal forwards; /* Safari, Chrome and Opera > 12.1 */

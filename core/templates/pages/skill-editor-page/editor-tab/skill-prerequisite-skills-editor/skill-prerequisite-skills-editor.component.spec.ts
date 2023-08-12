@@ -193,6 +193,10 @@ describe('Skill editor main tab Component', () => {
           additionalStoryCount: 0,
           topicModelLastUpdated: 1623851496406.582,
           thumbnailFilename: 'thumbnail_filename',
+          totalUpcomingChaptersCount: 1,
+          totalOverdueChaptersCount: 1,
+          totalChaptersCounts: [5, 4],
+          publishedChaptersCounts: [3, 4],
           getId(): string {
             return this.id;
           },
@@ -246,6 +250,18 @@ describe('Skill editor main tab Component', () => {
           },
           isTopicPublished(): boolean {
             return this.isPublished;
+          },
+          getTotalUpcomingChaptersCount(): number {
+            return this.totalUpcomingChaptersCount;
+          },
+          getTotalOverdueChaptersCount(): number {
+            return this.totalOverdueChaptersCount;
+          },
+          getTotalChaptersCounts(): number[] {
+            return this.totalChaptersCounts;
+          },
+          getPublishedChaptersCounts(): number[] {
+            return this.publishedChaptersCounts;
           }
         }
       ],

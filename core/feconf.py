@@ -668,6 +668,9 @@ EMAIL_INTENT_ACCOUNT_DELETED = 'account_deleted'
 EMAIL_INTENT_NOTIFY_CONTRIBUTOR_DASHBOARD_ACHIEVEMENTS = (
     'notify_contributor_dashboard_achievements'
 )
+EMAIL_INTENT_NOTIFY_CURRICULUM_ADMINS_CHAPTERS = (
+    'notify_curriculum_admins_chapters'
+)
 # Possible intents for email sent in bulk.
 BULK_EMAIL_INTENT_MARKETING = 'bulk_email_marketing'
 BULK_EMAIL_INTENT_IMPROVE_EXPLORATION = 'bulk_email_improve_exploration'
