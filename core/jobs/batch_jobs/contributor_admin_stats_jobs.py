@@ -559,7 +559,8 @@ class GenerateContributorAdminStatsJob(base_jobs.JobBase):
         entity_id = contributor_user_id
 
         for stat in question_contribution_stats:
-            if GenerateContributorAdminStatsJob.not_validate_topic(stat.topic_id):
+            if GenerateContributorAdminStatsJob.not_validate_topic(
+                stat.topic_id):
                 question_contribution_stats.remove(stat)
 
         topic_ids = (
