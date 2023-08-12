@@ -180,6 +180,12 @@ export class AdminPlatformParametersTabComponent implements OnInit {
   }
 
   addNewRuleToBottom(param: PlatformParameter): void {
+    const backup = this.platformParameterNameToBackupMap.get(param.name);
+    if (!isEqual(param, backup)) {
+      this.windowRef.nativeWindow.alert(
+        `Please save existing rules before adding new one.`);
+      return;
+    }
     param.rules.push(cloneDeep(this.getdefaultNewRule(param)));
     this.updateFilterValuesForDisplay(param);
   }
@@ -287,7 +293,17 @@ export class AdminPlatformParametersTabComponent implements OnInit {
     await this.updatePlatformParameter(param, commitMessage);
   }
 
-  async autoupdateParameterRulesAsync(param: PlatformParameter): Promise<void> {
+  isParameterRuleAllowedToEdit(param: PlatformParameter): boolean {
+    const backup = this.platformParameterNameToBackupMap.get(param.name);
+    if (!isEqual(param, backup)) {
+      this.windowRef.nativeWindow.alert(
+        `Please save your edits before editing another rule.`);
+      return false;
+    }
+    return true;
+  }
+
+  async autoupdateParameterAsync(param: PlatformParameter): Promise<void> {
     const issues = (
       AdminPlatformParametersTabComponent.validatePlatformParam(param));
     if (issues.length > 0) {
@@ -302,19 +318,29 @@ export class AdminPlatformParametersTabComponent implements OnInit {
     await this.updatePlatformParameter(param, commitMessage);
   }
 
-  clearChanges(param: PlatformParameter): void {
-    if (this.isPlatformParamChanged(param)) {
-      if (!this.windowRef.nativeWindow.confirm(
-        'This will revert all changes you made. Are you sure?')) {
+  clearChanges(param: PlatformParameter, ruleIndex: number): void {
+    const backup = this.platformParameterNameToBackupMap.get(param.name);
+    if (!isEqual(param.rules[ruleIndex], backup.rules[ruleIndex])) {
+      if (ruleIndex === backup.rules.length && !backup.rules[ruleIndex]) {
+        if (
+          !isEqual(param.rules[ruleIndex], this.getdefaultNewRule(param)) &&
+          !this.windowRef.nativeWindow.confirm(
+            'This will revert all changes you made. Are you sure?')
+        ) {
+          return;
+        }
+        param.rules[ruleIndex] = cloneDeep(this.getdefaultNewRule(param));
         return;
+      } else {
+        if (!this.windowRef.nativeWindow.confirm(
+          'This will revert all changes you made. Are you sure?')) {
+          return;
+        }
       }
     }
-    const backup = this.platformParameterNameToBackupMap.get(
-      param.name
-    );
 
     if (backup) {
-      param.rules = cloneDeep(backup.rules);
+      param.rules[ruleIndex] = cloneDeep(backup.rules[ruleIndex]);
       param.defaultValue = backup.defaultValue;
     }
   }
@@ -323,17 +349,16 @@ export class AdminPlatformParametersTabComponent implements OnInit {
     filter.conditions.splice(0);
   }
 
-  isPlatformParamChanged(param: PlatformParameter): boolean {
+  isPlatformParamRuleChanged(
+    param: PlatformParameter, ruleIndex: number
+  ): boolean {
     const original = this.platformParameterNameToBackupMap.get(
       param.name
     );
     if (original === undefined) {
       throw new Error('Backup not found for platform params: ' + param.name);
     }
-    return (
-      !isEqual(original.rules, param.rules) ||
-      !isEqual(original.defaultValue, param.defaultValue)
-    );
+    return !isEqual(param.rules[ruleIndex], original.rules[ruleIndex])
   }
 
   /**
