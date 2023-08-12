@@ -4542,7 +4542,6 @@ class DisallowHandlerWithoutSchemaTests(unittest.TestCase):
         self.checker_test_object.setup_method()
 
     def test_schema_handlers_without_request_args_raise_error(self) -> None:
-
         schemaless_class_node = astroid.extract_node(
             """
             class BaseHandler():
@@ -4564,7 +4563,6 @@ class DisallowHandlerWithoutSchemaTests(unittest.TestCase):
                 schemaless_class_node)
 
     def test_schema_handlers_without_url_path_args_raise_error(self) -> None:
-
         schemaless_class_node = astroid.extract_node(
             """
             class BaseHandler():
@@ -4587,7 +4585,6 @@ class DisallowHandlerWithoutSchemaTests(unittest.TestCase):
                 schemaless_class_node)
 
     def test_handlers_with_valid_schema_do_not_raise_error(self) -> None:
-
         schemaless_class_node = astroid.extract_node(
             """
             class BaseHandler():
