@@ -21,7 +21,9 @@ from __future__ import annotations
 import datetime
 
 from core import feconf
-from core.domain import change_domain, topic_domain, topic_services
+from core.domain import change_domain
+from core.domain import topic_domain
+from core.domain import topic_services
 from core.jobs import job_test_utils
 from core.jobs.batch_jobs import contributor_admin_stats_jobs
 from core.jobs.types import job_run_result
@@ -176,23 +178,24 @@ class ContributorDashboardTest(job_test_utils.JobTestBase):
             contribution_dates=self.CONTRIBUTION_DATES
         )
 
-        self.translation_contribution_model_with_invalid_topic = self.create_model(
-            suggestion_models.TranslationContributionStatsModel,
-            language_code='hi',
-            contributor_user_id='user1',
-            topic_id='invalid_topic',
-            submitted_translations_count=20,
-            submitted_translation_word_count=(
-                self.SUBMITTED_TRANSLATION_WORD_COUNT),
-            accepted_translations_count=0,
-            accepted_translations_without_reviewer_edits_count=0,
-            accepted_translation_word_count=(
-                self.ACCEPTED_TRANSLATION_WORD_COUNT),
-            rejected_translations_count=1,
-            rejected_translation_word_count=(
-                self.REJECTED_TRANSLATION_WORD_COUNT),
-            contribution_dates=self.CONTRIBUTION_DATES
-        )
+        self.translation_contribution_model_with_invalid_topic = (
+            self.create_model(
+                suggestion_models.TranslationContributionStatsModel,
+                language_code='hi',
+                contributor_user_id='user1',
+                topic_id='invalid_topic',
+                submitted_translations_count=20,
+                submitted_translation_word_count=(
+                    self.SUBMITTED_TRANSLATION_WORD_COUNT),
+                accepted_translations_count=0,
+                accepted_translations_without_reviewer_edits_count=0,
+                accepted_translation_word_count=(
+                    self.ACCEPTED_TRANSLATION_WORD_COUNT),
+                rejected_translations_count=1,
+                rejected_translation_word_count=(
+                    self.REJECTED_TRANSLATION_WORD_COUNT),
+                contribution_dates=self.CONTRIBUTION_DATES
+        ))
 
         self.translation_contribution_model_5 = self.create_model(
             suggestion_models.TranslationContributionStatsModel,
@@ -571,7 +574,7 @@ class GenerateContributorAdminStatsJobTests(ContributorDashboardTest):
         self.translation_contribution_model_3.update_timestamps()
         self.translation_contribution_model_4.update_timestamps()
         self.translation_contribution_model_with_no_topic.update_timestamps()
-        self.translation_contribution_model_with_invalid_topic.update_timestamps()
+        self.translation_contribution_model_with_invalid_topic.update_timestamps() # pylint: disable=line-too-long
         self.translation_contribution_model_5.update_timestamps()
         self.translation_review_model_1.update_timestamps()
         self.translation_review_model_2.update_timestamps()
