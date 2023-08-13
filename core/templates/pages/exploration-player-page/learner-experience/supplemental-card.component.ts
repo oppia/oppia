@@ -55,7 +55,7 @@ export class SupplementalCardComponent implements OnInit, OnDestroy {
   OPPIA_AVATAR_IMAGE_URL!: string;
   directiveSubscriptions = new Subscription();
   // Last answer is null if their is no answer.
-  lastAnswer: string | null = null;
+  lastAnswer: { answerDetails: string } | string | null = null;
   maxHelpCardHeightSeen: number = 0;
   helpCardHasContinueButton: boolean = false;
   CONTINUE_BUTTON_FOCUS_LABEL: string = (

@@ -19,7 +19,7 @@
 import { Subscription } from 'rxjs';
 import { TopicEditorSendMailComponent } from '../modal-templates/topic-editor-send-mail-modal.component';
 import { TopicEditorSaveModalComponent } from '../modal-templates/topic-editor-save-modal.component';
-import { Component } from '@angular/core';
+import { AfterContentChecked, Component, OnDestroy, OnInit } from '@angular/core';
 import { TopicEditorStateService } from '../services/topic-editor-state.service';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { TopicRightsBackendApiService } from 'domain/topic/topic-rights-backend-api.service';
@@ -38,7 +38,8 @@ import { downgradeComponent } from '@angular/upgrade/static';
   selector: 'oppia-topic-editor-navbar',
   templateUrl: './topic-editor-navbar.component.html'
 })
-export class TopicEditorNavbarComponent {
+export class TopicEditorNavbarComponent implements OnInit,
+  OnDestroy, AfterContentChecked {
   validationIssues: string[];
   topic: Topic;
   prepublishValidationIssues: string[];
@@ -52,6 +53,9 @@ export class TopicEditorNavbarComponent {
   warningsAreShown: boolean;
   navigationChoices: string[];
   activeTab: string;
+  changeListLength: number;
+  topicIsSaveable: boolean;
+  totalWarningsCount: number;
 
   constructor(
     private topicEditorStateService: TopicEditorStateService,
@@ -294,6 +298,12 @@ export class TopicEditorNavbarComponent {
         }
       )
     );
+  }
+
+  ngAfterContentChecked(): void {
+    this.changeListLength = this.getChangeListLength();
+    this.topicIsSaveable = this.isTopicSaveable();
+    this.totalWarningsCount = this.getTotalWarningsCount();
   }
 
   ngOnDestroy(): void {

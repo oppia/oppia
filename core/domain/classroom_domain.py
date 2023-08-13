@@ -18,7 +18,21 @@
 
 from __future__ import annotations
 
-from typing import List
+from typing import List, TypedDict
+
+
+class ClassroomDict(TypedDict):
+    """Dictionary representing the Classroom object."""
+
+    name: str
+    url_fragment: str
+    topic_ids: List[str]
+    course_details: str
+    topic_list_intro: str
+
+# TODO(#17246): Currently, the classroom data is stored in the config model and
+# we are planning to migrate the storage into a new Classroom model. After the
+# successful migration, this file should be deleted.
 
 
 class Classroom:
@@ -46,3 +60,19 @@ class Classroom:
         self.topic_ids = topic_ids
         self.course_details = course_details
         self.topic_list_intro = topic_list_intro
+
+    def to_dict(self) -> ClassroomDict:
+        """Converts this Classroom domain instance into a dictionary form with
+        its keys as the attributes of this class.
+
+        Returns:
+            dict. A dictionary containing the Classroom class information in a
+            dictionary form.
+        """
+        return {
+            'name': self.name,
+            'url_fragment': self.url_fragment,
+            'topic_ids': self.topic_ids,
+            'course_details': self.course_details,
+            'topic_list_intro': self.topic_list_intro
+        }

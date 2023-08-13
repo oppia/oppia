@@ -24,7 +24,7 @@ import { HtmlEscaperService } from 'services/html-escaper.service';
 export interface RteComponentSpecs {
   backendId: string;
   customizationArgSpecs: {
-    name: string; value: unknown; 'default_value': unknown;
+    name: string; value: string; 'default_value': string;
   }[];
   id: string;
   iconDataUrl: string;
@@ -35,7 +35,7 @@ export interface RteComponentSpecs {
 }
 
 export interface RteHelperService {
-  createCustomizationArgDictFromAttrs: (attrs) => Record<string, unknown>;
+  createCustomizationArgDictFromAttrs: (attrs) => Record<string, string>;
   getRichTextComponents: () => RteComponentSpecs[];
   isInlineComponent: (string) => boolean;
   openCustomizationModal: (

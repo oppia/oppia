@@ -24,7 +24,7 @@ import { WindowRef } from 'services/contextual/window-ref.service';
 import { CurrentInteractionService } from 'pages/exploration-player-page/services/current-interaction.service';
 import { InteractiveMathEquationInput } from './oppia-interactive-math-equation-input.component';
 import { TranslateService } from '@ngx-translate/core';
-import { MathEquationAnswer } from 'interactions/answer-defs';
+import { InteractionAnswer, MathEquationAnswer } from 'interactions/answer-defs';
 
 class MockTranslateService {
   instant(key: string): string {
@@ -33,6 +33,7 @@ class MockTranslateService {
 }
 
 describe('MathEquationInputInteractive', () => {
+  const asciiDummyValue: string = 'Dummy value';
   let component: InteractiveMathEquationInput;
   let fixture: ComponentFixture<InteractiveMathEquationInput>;
   let windowRef: WindowRef;
@@ -43,7 +44,7 @@ describe('MathEquationInputInteractive', () => {
     divId: '1',
     guppyInstance: {
       asciimath: function() {
-        return 'Dummy value';
+        return asciiDummyValue;
       }
     }
   };
@@ -52,7 +53,7 @@ describe('MathEquationInputInteractive', () => {
     constructor(id: string, config: Object) {}
 
     asciimath() {
-      return 'Dummy value';
+      return asciiDummyValue;
     }
 
     configure(name: string, val: Object): void {}
@@ -68,6 +69,8 @@ describe('MathEquationInputInteractive', () => {
   class MockCurrentInteractionService {
     onSubmit(
         answer: MathEquationAnswer, rulesService: CurrentInteractionService) {}
+
+    updateCurrentAnswer(answer: InteractionAnswer): void {}
 
     registerCurrentInteraction(
         submitAnswerFn: Function, validateExpressionFn: Function) {
@@ -95,15 +98,6 @@ describe('MathEquationInputInteractive', () => {
 
   beforeEach(() => {
     windowRef = TestBed.inject(WindowRef);
-    // TODO(#16734): Introduce the "as unknown as X" convention for testing
-    // and remove comments that explain it.
-    // We need to mock guppy for the test. The mock guppy only has partial
-    // functionality when compared to the Guppy. This is because we only use
-    // certain methods or data from the Guppy in the test we are testing.
-    // Mocking the full object is a waste of time and effort. However,
-    // the typescript strict checks will complain about this assignment. In
-    // order to get around this, we typecast the Mock to unknown and then
-    // to the type which we are mocking.
     windowRef.nativeWindow.Guppy = MockGuppy as unknown as Guppy;
     guppyInitializationService = TestBed.inject(GuppyInitializationService);
     mockCurrentInteractionService = TestBed.inject(CurrentInteractionService);
@@ -122,7 +116,7 @@ describe('MathEquationInputInteractive', () => {
   });
 
   it('should not submit the answer if invalid', function() {
-    component.hasBeenTouched = true;
+    component.hasBeenTouched = false;
     // Invalid answer.
     component.value = '(x + y)) = 3';
 
@@ -131,10 +125,11 @@ describe('MathEquationInputInteractive', () => {
     expect(mockCurrentInteractionService.onSubmit).not.toHaveBeenCalled();
     expect(component.warningText).toBe(
       'It looks like your answer has an invalid bracket pairing.');
+    expect(component.hasBeenTouched).toBeTrue();
   });
 
   it('should submit the answer if valid', function() {
-    component.hasBeenTouched = true;
+    component.hasBeenTouched = false;
     // Invalid answer.
     component.value = 'x + y = 3';
 
@@ -143,11 +138,13 @@ describe('MathEquationInputInteractive', () => {
     spyOn(mockCurrentInteractionService, 'onSubmit');
     component.submitAnswer();
     expect(mockCurrentInteractionService.onSubmit).toHaveBeenCalled();
+    expect(component.hasBeenTouched).toBeTrue();
   });
 
   it('should correctly validate current answer', function() {
     // This should be validated as true if the editor hasn't been touched.
     component.value = '';
+    component.hasBeenTouched = false;
     expect(component.isCurrentAnswerValid()).toBeTrue();
     expect(component.warningText).toBe('');
 
@@ -175,5 +172,22 @@ describe('MathEquationInputInteractive', () => {
     MockGuppy.focused = false;
     component.ngOnInit();
     expect(component.value).not.toBeNull();
+  });
+
+  it('should update current answer on change', () => {
+    spyOn(guppyInitializationService, 'findActiveGuppyObject').and.returnValue(
+      mockGuppyObject as GuppyObject);
+    component.ngOnInit();
+    spyOn(mockCurrentInteractionService, 'updateCurrentAnswer');
+    spyOn(component, 'isCurrentAnswerValid');
+
+    component.onAnswerChange({focused: false});
+
+    expect(component.value).toEqual(asciiDummyValue);
+    expect(component.hasBeenTouched).toBeTrue();
+    expect(
+      mockCurrentInteractionService.updateCurrentAnswer
+    ).toHaveBeenCalledOnceWith(asciiDummyValue);
+    expect(component.isCurrentAnswerValid).toHaveBeenCalledTimes(1);
   });
 });

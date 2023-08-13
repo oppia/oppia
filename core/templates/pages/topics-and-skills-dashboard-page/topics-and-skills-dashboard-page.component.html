@@ -143,8 +143,9 @@
             <span class="skill-count-text">Skills</span>
           </div>
           <div class="create-topic-skill">
-            <div *ngIf="activeTab === TAB_NAME_TOPICS && userCanCreateTopic"
+            <div tabindex="0" *ngIf="activeTab === TAB_NAME_TOPICS && userCanCreateTopic"
                  (click)="createTopic()"
+                 (keydown.enter)="createTopic()"
                  class="e2e-test-create-topic-button create-topic-button oppia-autofocus"
                  oppiaFocusOn="createTopicBtn">
               <i class="fa fa-plus-circle"></i>
@@ -597,6 +598,12 @@
     .oppia-topics-and-skills-dashboard .dashboard-tabs li {
       background-color: #00645c;
       width: 50%;
+    }
+    .oppia-topics-and-skills-dashboard .dashboard-tabs .dashboard-tabs-text,
+    .oppia-topics-and-skills-dashboard .dashboard-tabs .dashboard-tabs-text:hover {
+      background-color: #00645c;
+      border-radius: 0;
+      color: #fff;
     }
     .oppia-topics-and-skills-dashboard .dashboard-tabs-active .dashboard-tabs-text,
     .oppia-topics-and-skills-dashboard .dashboard-tabs-active .dashboard-tabs-text:hover {

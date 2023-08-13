@@ -26,6 +26,7 @@ import { LoaderService } from 'services/loader.service';
 import { UrlService } from 'services/contextual/url.service';
 import { AlertsService } from 'services/alerts.service';
 import { AppConstants } from 'app.constants';
+import { UserService } from 'services/user.service';
 
 import './blog-author-profile-page.component.css';
 
@@ -41,8 +42,8 @@ export class BlogAuthorProfilePageComponent implements OnInit {
   authorName!: string;
   authorUsername!: string;
   authorBio!: string;
-  authorProfilePicUrl!: string;
-  DEFAULT_PROFILE_PICTURE_URL!: string;
+  authorProfilePicPngUrl!: string;
+  authorProfilePicWebpUrl!: string;
   lastPostOnPageNum!: number;
   noResultsFound!: boolean;
   blogPostSummaries: BlogPostSummary[] = [];
@@ -57,7 +58,8 @@ export class BlogAuthorProfilePageComponent implements OnInit {
     private loaderService: LoaderService,
     private blogHomePageBackendApiService: BlogHomePageBackendApiService,
     private urlService: UrlService,
-    private alertsService: AlertsService
+    private alertsService: AlertsService,
+    private userService: UserService
   ) {}
 
   ngOnInit(): void {
@@ -81,8 +83,9 @@ export class BlogAuthorProfilePageComponent implements OnInit {
         this.noResultsFound = false;
         this.blogPostSummaries = data.blogPostSummaries;
         this.blogPostSummariesToShow = this.blogPostSummaries;
-        this.decodeAuthorProfilePicUrl(data.profilePictureDataUrl);
         this.calculateLastPostOnPageNum();
+        [this.authorProfilePicPngUrl, this.authorProfilePicWebpUrl] = (
+          this.userService.getProfileImageDataUrl(this.authorUsername));
       } else {
         this.noResultsFound = true;
       }
@@ -143,13 +146,6 @@ export class BlogAuthorProfilePageComponent implements OnInit {
   getStaticCopyrightedImageUrl(imagePath: string): string {
     return this.urlInterpolationService.getStaticCopyrightedImageUrl(
       imagePath);
-  }
-
-  decodeAuthorProfilePicUrl(url: string): void {
-    this.DEFAULT_PROFILE_PICTURE_URL = this.urlInterpolationService
-      .getStaticImageUrl('/general/no_profile_picture.png');
-    this.authorProfilePicUrl = decodeURIComponent((
-      url || this.DEFAULT_PROFILE_PICTURE_URL));
   }
 
   isSmallScreenViewActive(): boolean {

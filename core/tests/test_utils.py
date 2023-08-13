@@ -47,7 +47,6 @@ from core.domain import caching_domain
 from core.domain import classifier_domain
 from core.domain import collection_domain
 from core.domain import collection_services
-from core.domain import config_domain
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
@@ -74,6 +73,7 @@ from core.platform.search import elastic_search_services
 from core.platform.taskqueue import cloud_tasks_emulator
 import main
 from proto_files import text_classifier_pb2
+from scripts import common
 
 import elasticsearch
 import requests_mock
@@ -97,20 +97,15 @@ if MYPY:  # pragma: no cover
     from mypy_imports import platform_auth_services
     from mypy_imports import platform_taskqueue_services
     from mypy_imports import question_models
-    from mypy_imports import skill_models
     from mypy_imports import storage_services
-    from mypy_imports import story_models
     from mypy_imports import suggestion_models
-    from mypy_imports import topic_models
 
 (
-    auth_models, base_models, exp_models,
-    feedback_models, question_models, skill_models,
-    story_models, suggestion_models, topic_models
+    auth_models, base_models, exp_models, feedback_models, question_models,
+    suggestion_models,
 ) = models.Registry.import_models([
     models.Names.AUTH, models.Names.BASE_MODEL, models.Names.EXPLORATION,
-    models.Names.FEEDBACK, models.Names.QUESTION, models.Names.SKILL,
-    models.Names.STORY, models.Names.SUGGESTION, models.Names.TOPIC
+    models.Names.FEEDBACK, models.Names.QUESTION, models.Names.SUGGESTION,
 ])
 
 datastore_services = models.Registry.import_datastore_services()
@@ -285,7 +280,11 @@ def check_image_png_or_webp(image_string: str) -> bool:
 
 
 def get_storage_model_module_names() -> Iterator[models.Names]:
-    """Get all module names in storage."""
+    """Get all model names in storage.
+
+    Yields:
+        Names. The model with all model names in storage.
+    """
     # As models.Names is an enum, it cannot be iterated over. So we use the
     # __dict__ property which can be iterated over.
     for name in models.Names:
@@ -293,7 +292,11 @@ def get_storage_model_module_names() -> Iterator[models.Names]:
 
 
 def get_storage_model_classes() -> Iterator[Type[base_models.BaseModel]]:
-    """Get all model classes in storage."""
+    """Get all model classes in storage.
+
+    Yields:
+        BaseModel. The model with all model classes in storage.
+    """
     for module_name in get_storage_model_module_names():
         (module,) = models.Registry.import_models([module_name])
         for member_name, member_obj in inspect.getmembers(module):
@@ -1208,6 +1211,9 @@ class TestBase(unittest.TestCase):
     def log_line(self, line: str) -> None:
         """Print the line with a prefix that can be identified by the script
         that calls the test.
+
+        Args:
+            line: str. The log line.
         """
         # We are using the b' prefix as all the stdouts are in bytes.
         print(b'%s%s' % (LOG_LINE_PREFIX, line.encode()))
@@ -1228,6 +1234,17 @@ class TestBase(unittest.TestCase):
         Note that the list of parameter changes is ordered. Parameter changes
         later in the list may depend on parameter changes that have been set
         earlier in the same list.
+
+        Args:
+            param_dict: dict. The old param dict.
+            param_changes: list. The param changes to use for the update.
+            exp_param_specs: dict. The expected param specifications.
+
+        Returns:
+            dict. The updated param dict.
+
+        Raises:
+            Exception. Parameter not found.
         """
         new_param_dict = copy.deepcopy(param_dict)
         for param_change in param_changes:
@@ -1250,6 +1267,12 @@ class TestBase(unittest.TestCase):
     def get_static_asset_url(self, asset_suffix: str) -> str:
         """Returns the relative path for the asset, appending it to the
         corresponding cache slug. asset_suffix should have a leading slash.
+
+        Args:
+            asset_suffix: str. The asset suffix to append to the cache slug.
+
+        Returns:
+            str. The relative path for the asset.
         """
         return '/assets%s%s' % (utils.get_asset_dir_prefix(), asset_suffix)
 
@@ -1291,60 +1314,62 @@ class TestBase(unittest.TestCase):
             # below but due to the absence of some methods MyPy throws an error
             # that 'Cannot instantiate abstract class 'ListStream' with abstract
             # attributes'. So, to suppress the error, we defined all the methods
-            # that was present in super class.
+            # that was present in super class. Since these are just added for
+            # type checking, we don't need to test them and so have excluded
+            # them from the coverage checks.
             @property
             def mode(self) -> str:
-                pass
+                pass  # pragma: no cover
 
             @property
             def name(self) -> str:
-                pass
+                pass  # pragma: no cover
 
             def close(self) -> None:
-                pass
+                pass  # pragma: no cover
 
             @property
             def closed(self) -> bool:
-                pass
+                pass  # pragma: no cover
 
             def fileno(self) -> int:
-                pass
+                pass  # pragma: no cover
 
             def isatty(self) -> bool:
-                pass
+                pass  # pragma: no cover
 
             def read(self, n: int = -1) -> str:
-                pass
+                pass  # pragma: no cover
 
             def readable(self) -> bool:
-                pass
+                pass  # pragma: no cover
 
             def readline(self, limit: int = -1) -> str:
-                pass
+                pass  # pragma: no cover
 
             def readlines(self, hint: int = -1) -> List[str]:
-                pass
+                pass  # pragma: no cover
 
             def seek(self, offset: int, whence: int = 0) -> int:
-                pass
+                pass  # pragma: no cover
 
             def seekable(self) -> bool:
-                pass
+                pass  # pragma: no cover
 
             def tell(self) -> int:
-                pass
+                pass  # pragma: no cover
 
             def truncate(self, size: Optional[int] = None) -> int:
-                pass
+                pass  # pragma: no cover
 
             def writable(self) -> bool:
-                pass
+                pass  # pragma: no cover
 
             def writelines(self, lines: Iterable[str]) -> None:
-                pass
+                pass  # pragma: no cover
 
             def __enter__(self) -> IO[str]:
-                pass
+                pass  # pragma: no cover
 
             def __exit__(
                 self,
@@ -1352,13 +1377,13 @@ class TestBase(unittest.TestCase):
                 value: Optional[BaseException],
                 traceback: Optional[TracebackType]
             ) -> None:
-                pass
+                pass  # pragma: no cover
 
             def __iter__(self) -> Iterator[str]:
-                pass
+                pass  # pragma: no cover
 
             def __next__(self) -> str:
-                pass
+                pass  # pragma: no cover
 
         list_stream_handler = logging.StreamHandler(ListStream())
 
@@ -1454,7 +1479,6 @@ class TestBase(unittest.TestCase):
         attr: str,
         raises: Optional[Exception] = None,
         returns: Any = None,
-        call_through: bool = False
     ) -> Iterator[CallCounter]:
         """Swap obj.attr with a CallCounter instance.
 
@@ -1464,26 +1488,20 @@ class TestBase(unittest.TestCase):
             raises: Exception|None. The exception raised by the swapped
                 function. If None, then no exception is raised.
             returns: *. The return value of the swapped function.
-            call_through: bool. Whether to call through to the real function,
-                rather than use a stub implementation. If True, the `raises` and
-                `returns` arguments will be ignored.
 
         Yields:
             CallCounter. A CallCounter instance that's installed as obj.attr's
             implementation while within the context manager returned.
         """
-        if call_through:
-            impl = obj.attr
-        else:
-            # Here we use type Any because this method returns the return value
-            # of the swapped function, and that value can be of any type.
-            def impl(*_: str, **__: str) -> Any:
-                """Behaves according to the given values."""
-                if raises is not None:
-                    # Pylint thinks we're trying to raise `None` even though
-                    # we've explicitly checked for it above.
-                    raise raises # pylint: disable=raising-bad-type
-                return returns
+        # Here we use type Any because this method returns the return value
+        # of the swapped function, and that value can be of any type.
+        def impl(*_: str, **__: str) -> Any:
+            """Behaves according to the given values."""
+            if raises is not None:
+                # Pylint thinks we're trying to raise `None` even though
+                # we've explicitly checked for it above.
+                raise raises # pylint: disable=raising-bad-type
+            return returns
         call_counter = CallCounter(impl)
         with self.swap(obj, attr, call_counter):
             yield call_counter
@@ -1842,11 +1860,20 @@ class AppEngineTestBase(TestBase):
         storage_services.CLIENT.namespace = self.id()
         # Set up apps for testing.
         self.testapp = webtest.TestApp(main.app_without_context)
+        # Mock set_constans_to_default method to throw an exception.
+        # Don't directly change constants file in the test.
+        # Mock this method again in your test.
+        self.contextManager = self.swap(
+            common, 'set_constants_to_default',
+            self.mock_set_constants_to_default)
+        self.contextManager.__enter__()
 
     def tearDown(self) -> None:
         datastore_services.delete_multi(
             list(datastore_services.query_everything().iter(keys_only=True)))
         storage_services.CLIENT.reset()
+        if hasattr(self, 'contextManager'):
+            self.contextManager.__exit__(None, None, None)
         super().tearDown()
 
     def run(self, result: Optional[unittest.TestResult] = None) -> None:
@@ -1916,6 +1943,13 @@ class AppEngineTestBase(TestBase):
         return self._platform_taskqueue_services_stub.get_pending_tasks(
             queue_name=queue_name)
 
+    def mock_set_constants_to_default(self) -> None:
+        """Change constants file in the test could lead to other
+        tests fail. Mock set_constants_to_default method in your test
+        will suppress this exception.
+        """
+        raise Exception('Please mock this method in the test.')
+
 
 class GenericTestBase(AppEngineTestBase):
     """Base test class with common/generic helper methods.
@@ -1945,6 +1979,8 @@ class GenericTestBase(AppEngineTestBase):
     BLOG_ADMIN_USERNAME: Final = 'blogadm'
     BLOG_EDITOR_EMAIL: Final = 'blogeditor@example.com'
     BLOG_EDITOR_USERNAME: Final = 'blogeditor'
+    CLASSROOM_ADMIN_EMAIL: Final = 'classroomadmin@example.com'
+    CLASSROOM_ADMIN_USERNAME: Final = 'classroomadm'
     MODERATOR_EMAIL: Final = 'moderator@example.com'
     MODERATOR_USERNAME: Final = 'moderator'
     RELEASE_COORDINATOR_EMAIL: Final = 'releasecoordinator@example.com'
@@ -2156,6 +2192,11 @@ class GenericTestBase(AppEngineTestBase):
             'thumbnail_filename': None,
             'thumbnail_bg_color': None,
             'thumbnail_size_in_bytes': None,
+            'status': None,
+            'planned_publication_date_msecs': None,
+            'last_modified_msecs': None,
+            'first_publication_date_msecs': None,
+            'unpublishing_reason': None
         }],
         'initial_node_id': 'node_1',
         'next_node_id': 'node_2',
@@ -2253,6 +2294,7 @@ states:
 states_schema_version: %d
 tags: []
 title: Title
+version: 1
 """) % (
     feconf.DEFAULT_INIT_STATE_NAME,
     exp_domain.Exploration.CURRENT_EXP_SCHEMA_VERSION,
@@ -2371,7 +2413,7 @@ title: Title
             """Overrides isinstance() behavior."""
 
             @classmethod
-            def __instancecheck__(cls, instance: datetime.datetime) -> bool:
+            def __instancecheck__(mcs, instance: datetime.datetime) -> bool:
                 return isinstance(instance, old_datetime)
 
         class MockDatetime(datetime.datetime, metaclass=MockDatetimeType):
@@ -2471,22 +2513,6 @@ title: Title
     def signup_superadmin_user(self) -> None:
         """Signs up a superadmin user. Must be called at the end of setUp()."""
         self.signup(self.SUPER_ADMIN_EMAIL, self.SUPER_ADMIN_USERNAME)
-
-    def set_config_property(
-        self,
-        config_obj: config_domain.ConfigProperty,
-        new_config_value: Union[str, List[str], bool, float]
-    ) -> None:
-        """Sets a given configuration object's value to the new value specified
-        using a POST request.
-        """
-        with self.super_admin_context():
-            self.post_json('/adminhandler', {
-                'action': 'save_config_properties',
-                'new_config_property_values': {
-                    config_obj.name: new_config_value,
-                },
-            }, csrf_token=self.get_new_csrf_token())
 
     def add_user_role(self, username: str, user_role: str) -> None:
         """Adds the given role to the user account with the given username.
@@ -2792,7 +2818,15 @@ title: Title
     def _parse_json_response(
         self, json_response: webtest.TestResponse, expect_errors: bool
     ) -> Any:
-        """Convert a JSON server response to an object (such as a dict)."""
+        """Convert a JSON server response to an object (such as a dict).
+
+        Args:
+            json_response: webtest.TestResponse. The test reponse.
+            expect_errors: bool. Whether errors are expected.
+
+        Returns:
+            dict. A json response from the server except the XSSI_PREFIX.
+        """
         if expect_errors:
             self.assertTrue(json_response.status_int >= 400)
         else:
@@ -2816,7 +2850,17 @@ title: Title
         expected_status_int: int = 200,
         headers: Optional[Dict[str, str]] = None
     ) -> Any:
-        """Get a JSON response, transformed to a Python object."""
+        """Get a JSON response, transformed to a Python object.
+
+        Args:
+            url: str. The url to make a request for.
+            params: Dict[str, Any]. The arguments to be sent over.
+            expected_status_int: int. The expetected response status.
+            headers: Dict[str, str]. The headers used in the request.
+
+        Returns:
+            dict. A json response from the server.
+        """
         if params is not None:
             self.assertIsInstance(params, dict)
 
@@ -3009,13 +3053,24 @@ title: Title
         self,
         url: str,
         payload: Dict[str, str],
-        headers: Dict[str, bytes],
+        headers: Dict[str, bytes] | Dict[str, str],
         csrf_token: Optional[str] = None,
         expect_errors: bool = False,
         expected_status_int: int = 200
     ) -> webtest.TestApp:
         """Posts an object to the server by JSON with the specific headers
         specified; return the received object.
+
+        Args:
+            url: str. The url to post an object to.
+            payload: dict. The dictionary which needs to be sent.
+            headers: dict. The headers set in the request.
+            csrf_token: str. The csrf token to identify the user.
+            expect_errors: bool. Whether errors are expected.
+            expected_status_int: int. The expected status code.
+
+        Returns:
+            webtest.TestApp. The respose of the post task request.
         """
         if csrf_token:
             payload['csrf_token'] = csrf_token
@@ -3037,7 +3092,18 @@ title: Title
         csrf_token: Optional[str] = None,
         expected_status_int: int = 200
     ) -> Dict[str, Any]:
-        """PUT an object to the server with JSON and return the response."""
+        """PUT an object to the server with JSON and return the response.
+
+        Args:
+            url: str. The url of where to put the object.
+            payload: dict. The dictionary to be sent over to the handler.
+            csrf_token: str. The csrf token to use.
+            expected_status_int: int. The integer status code to expect. Will be
+                200 if not specified.
+
+        Returns:
+            dict. A json dict response from the server.
+        """
         params = {'payload': json.dumps(payload)}
         if csrf_token:
             params['csrf_token'] = csrf_token
@@ -3121,6 +3187,9 @@ title: Title
                 schema: dict. The current traversed schema.
                 ca_name: str. The arg name which will be used for generating
                     content_id.
+
+            Raises:
+                NotImplementedError. The schema includes an unsupported type.
             """
             is_subtitled_html_spec = (
                 schema['type'] == schema_utils.SCHEMA_TYPE_CUSTOM and
@@ -3139,12 +3208,24 @@ title: Title
                 for x in value:
                     traverse_schema_and_assign_content_ids(
                         x, schema['items'], ca_name)
-            elif schema['type'] == schema_utils.SCHEMA_TYPE_DICT:
-                for schema_property in schema['properties']:
-                    traverse_schema_and_assign_content_ids(
-                        schema['properties'][schema_property.name],
-                        schema_property['schema'],
-                        '%s_%s' % (ca_name, schema_property.name))
+            elif schema['type'] in (
+                schema_utils.SCHEMA_TYPE_CUSTOM,
+                schema_utils.SCHEMA_TYPE_BOOL,
+                schema_utils.SCHEMA_TYPE_INT,
+                schema_utils.SCHEMA_TYPE_FLOAT,
+                schema_utils.SCHEMA_TYPE_UNICODE,
+            ):
+                # These types need no recursion.
+                pass
+            # We exclude this else block from coverage because this block is
+            # only meant to ensure that if a new type is added to interaction
+            # schemas in the future, this utility function will fail noisily.
+            else:
+                raise NotImplementedError((  # pragma: no cover
+                    'GenericTestBase.set_interaction_for_state() received '
+                    'an interaction schema with an unsupported type: %s. If '
+                    'you need to test such an interaction, please update '
+                    'GenericTestBase to add support.') % schema['type'])
 
         interaction = (
             interaction_registry.Registry.get_interaction_by_id(interaction_id))
@@ -3516,151 +3597,6 @@ title: Title
         story_services.save_new_story(owner_id, story)
         return story
 
-    def save_new_story_with_story_contents_schema_v1(
-        self,
-        story_id: str,
-        thumbnail_filename: Optional[str],
-        thumbnail_bg_color: Optional[str],
-        thumbnail_size_in_bytes: Optional[int],
-        owner_id: str,
-        title: str,
-        description: str,
-        notes: str,
-        corresponding_topic_id: str,
-        language_code: str = constants.DEFAULT_LANGUAGE_CODE,
-        url_fragment: str = 'story-frag',
-        meta_tag_content: str = 'story meta tag content'
-    ) -> None:
-        """Saves a new story with a default version 1 story contents data dict.
-
-        This function should only be used for creating stories in tests
-        involving migration of datastore stories that use an old story contents
-        schema version.
-
-        Note that it makes an explicit commit to the datastore instead of using
-        the usual functions for updating and creating stories. This is because
-        the latter approach would result in a story with the *current* story
-        contents schema version.
-
-        Args:
-            story_id: str. ID for the story to be created.
-            thumbnail_filename: str|None. Thumbnail filename for the story.
-            thumbnail_bg_color: str|None. Thumbnail background color for the
-                story.
-            thumbnail_size_in_bytes: int|None. The thumbnail size in bytes of
-                the story.
-            owner_id: str. The user_id of the creator of the story.
-            title: str. The title of the story.
-            description: str. The high level description of the story.
-            notes: str. A set of notes, that describe the characters, main
-                storyline, and setting.
-            corresponding_topic_id: str. The id of the topic to which the story
-                belongs.
-            language_code: str. The ISO 639-1 code for the language this story
-                is written in.
-            url_fragment: str. The URL fragment for the story.
-            meta_tag_content: str. The meta tag content of the story.
-        """
-        story_model = story_models.StoryModel(
-            id=story_id, thumbnail_filename=thumbnail_filename,
-            thumbnail_bg_color=thumbnail_bg_color,
-            thumbnail_size_in_bytes=thumbnail_size_in_bytes,
-            description=description, title=title,
-            language_code=language_code,
-            story_contents_schema_version=1, notes=notes,
-            corresponding_topic_id=corresponding_topic_id,
-            story_contents=self.VERSION_1_STORY_CONTENTS_DICT,
-            url_fragment=url_fragment, meta_tag_content=meta_tag_content)
-        commit_message = 'New story created with title \'%s\'.' % title
-        story_model.commit(
-            owner_id, commit_message,
-            [{'cmd': story_domain.CMD_CREATE_NEW, 'title': title}])
-
-    def save_new_story_with_story_contents_schema_v5(
-        self,
-        story_id: str,
-        thumbnail_filename: Optional[str],
-        thumbnail_bg_color: Optional[str],
-        thumbnail_size_in_bytes: Optional[int],
-        owner_id: str,
-        title: str,
-        description: str,
-        notes: str,
-        corresponding_topic_id: str,
-        language_code: str = constants.DEFAULT_LANGUAGE_CODE,
-        url_fragment: str = 'story-frag',
-        meta_tag_content: str = 'story meta tag content'
-    ) -> None:
-        """Saves a new story with a default version 1 story contents data dict.
-
-        This function should only be used for creating stories in tests
-        involving migration of datastore stories that use an old story contents
-        schema version.
-
-        Note that it makes an explicit commit to the datastore instead of using
-        the usual functions for updating and creating stories. This is because
-        the latter approach would result in a story with the *current* story
-        contents schema version.
-
-        Args:
-            story_id: str. ID for the story to be created.
-            thumbnail_filename: str|None. Thumbnail filename for the story.
-            thumbnail_bg_color: str|None. Thumbnail background color for the
-                story.
-            thumbnail_size_in_bytes: int|None. The thumbnail size in bytes of
-                the story.
-            owner_id: str. The user_id of the creator of the story.
-            title: str. The title of the story.
-            description: str. The high level description of the story.
-            notes: str. A set of notes, that describe the characters, main
-                storyline, and setting.
-            corresponding_topic_id: str. The id of the topic to which the story
-                belongs.
-            language_code: str. The ISO 639-1 code for the language this story
-                is written in.
-            url_fragment: str. The URL fragment for the story.
-            meta_tag_content: str. The meta tag content of the story.
-        """
-        story_content_v5 = {
-            'nodes': [{
-                'outline': (
-                    '<p>Value</p>'
-                    '<oppia-noninteractive-math math_content-with-value="{'
-                    '&amp;quot;raw_latex&amp;quot;: &amp;quot;+,-,-,+&amp;quot;, ' # pylint: disable=line-too-long
-                    '&amp;quot;svg_filename&amp;quot;: &amp;quot;&amp;quot;'
-                    '}">'
-                    '</oppia-noninteractive-math>'),
-                'exploration_id': None,
-                'destination_node_ids': [],
-                'outline_is_finalized': False,
-                'acquired_skill_ids': [],
-                'id': 'node_1',
-                'title': 'Chapter 1',
-                'description': '',
-                'prerequisite_skill_ids': [],
-                'thumbnail_filename': 'image.svg',
-                'thumbnail_bg_color': None,
-                'thumbnail_size_in_bytes': 21131,
-            }],
-            'initial_node_id': 'node_1',
-            'next_node_id': 'node_2',
-        }
-        story_model = story_models.StoryModel(
-            id=story_id, thumbnail_filename=thumbnail_filename,
-            thumbnail_bg_color=thumbnail_bg_color,
-            thumbnail_size_in_bytes=thumbnail_size_in_bytes,
-            description=description, title=title,
-            language_code=language_code,
-            story_contents_schema_version=5, notes=notes,
-            corresponding_topic_id=corresponding_topic_id,
-            story_contents=story_content_v5,
-            url_fragment=url_fragment, meta_tag_content=meta_tag_content)
-        commit_message = 'New story created with title \'%s\'.' % title
-        story_model.commit(
-            owner_id, commit_message,
-            [{'cmd': story_domain.CMD_CREATE_NEW, 'title': title}])
-        story_services.create_story_summary(story_id)
-
     def save_new_subtopic(
         self, subtopic_id: int, owner_id: str, topic_id: str
     ) -> subtopic_page_domain.SubtopicPage:
@@ -3769,92 +3705,6 @@ title: Title
             page_title_fragment_for_web, skill_ids_for_diagnostic_test)
         topic_services.save_new_topic(owner_id, topic)
         return topic
-
-    def save_new_topic_with_subtopic_schema_v1(
-        self,
-        topic_id: str,
-        owner_id: str,
-        name: str,
-        abbreviated_name: str,
-        url_fragment: str,
-        canonical_name: str,
-        description: str,
-        thumbnail_filename: str,
-        thumbnail_bg_color: str,
-        canonical_story_references: List[topic_domain.StoryReference],
-        additional_story_references: List[topic_domain.StoryReference],
-        uncategorized_skill_ids: List[str],
-        next_subtopic_id: int,
-        language_code: str = constants.DEFAULT_LANGUAGE_CODE,
-        meta_tag_content: str = 'topic meta tag content',
-        practice_tab_is_displayed: bool = False,
-        page_title_fragment_for_web: str = 'topic page title'
-    ) -> None:
-        """Saves a new topic with a default version 1 subtopic data dict.
-
-        This function should only be used for creating topics in tests involving
-        migration of datastore topics that use an old subtopic schema version.
-
-        Note that it makes an explicit commit to the datastore instead of using
-        the usual functions for updating and creating topics. This is because
-        the latter approach would result in a topic with the *current* subtopic
-        schema version.
-
-        Args:
-            topic_id: str. ID for the topic to be created.
-            owner_id: str. The user_id of the creator of the topic.
-            name: str. The name of the topic.
-            abbreviated_name: str. The abbreviated name of the topic.
-            url_fragment: str. The url fragment of the topic.
-            canonical_name: str. The canonical name (lowercase) of the topic.
-            description: str. The description of the topic.
-            thumbnail_filename: str. The thumbnail file name of the topic.
-            thumbnail_bg_color: str. The thumbnail background color of the
-                topic.
-            canonical_story_references: list(StoryReference). A set of story
-                reference objects representing the canonical stories that are
-                part of this topic.
-            additional_story_references: list(StoryReference). A set of story
-                reference object representing the additional stories that are
-                part of this topic.
-            uncategorized_skill_ids: list(str). The list of ids of skills that
-                are not part of any subtopic.
-            next_subtopic_id: int. The id for the next subtopic.
-            language_code: str. The ISO 639-1 code for the language this topic
-                is written in.
-            meta_tag_content: str. The meta tag content for the topic.
-            practice_tab_is_displayed: bool. Whether the practice tab should be
-                displayed.
-            page_title_fragment_for_web: str. The page title fragment for the
-                topic.
-        """
-        topic_rights_model = topic_models.TopicRightsModel(
-            id=topic_id, manager_ids=[], topic_is_published=True)
-        topic_model = topic_models.TopicModel(
-            id=topic_id, name=name, abbreviated_name=abbreviated_name,
-            url_fragment=url_fragment, thumbnail_filename=thumbnail_filename,
-            thumbnail_bg_color=thumbnail_bg_color,
-            canonical_name=canonical_name, description=description,
-            language_code=language_code,
-            canonical_story_references=canonical_story_references,
-            additional_story_references=additional_story_references,
-            uncategorized_skill_ids=uncategorized_skill_ids,
-            subtopic_schema_version=1,
-            story_reference_schema_version=(
-                feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION),
-            next_subtopic_id=next_subtopic_id,
-            subtopics=[self.VERSION_1_SUBTOPIC_DICT],
-            meta_tag_content=meta_tag_content,
-            practice_tab_is_displayed=practice_tab_is_displayed,
-            page_title_fragment_for_web=page_title_fragment_for_web)
-        commit_message = 'New topic created with name \'%s\'.' % name
-        topic_rights_model.commit(
-            committer_id=owner_id,
-            commit_message='Created new topic rights',
-            commit_cmds=[{'cmd': topic_domain.CMD_CREATE_NEW}])
-        topic_model.commit(
-            owner_id, commit_message,
-            [{'cmd': topic_domain.CMD_CREATE_NEW, 'name': name}])
 
     def save_new_question(
         self,
@@ -4043,65 +3893,6 @@ title: Title
         skill.version = 0
         skill_services.save_new_skill(owner_id, skill)
         return skill
-
-    def save_new_skill_with_defined_schema_versions(
-        self,
-        skill_id: str,
-        owner_id: str,
-        description: str,
-        next_misconception_id: int,
-        misconceptions: Optional[List[skill_domain.Misconception]] = None,
-        rubrics: Optional[List[skill_domain.Rubric]] = None,
-        skill_contents: Optional[skill_domain.SkillContents] = None,
-        misconceptions_schema_version: int = 1,
-        rubric_schema_version: int = 1,
-        skill_contents_schema_version: int = 1,
-        language_code: str = constants.DEFAULT_LANGUAGE_CODE
-    ) -> None:
-        """Saves a new default skill with the given versions for misconceptions
-        and skill contents.
-
-        This function should only be used for creating skills in tests involving
-        migration of datastore skills that use an old schema version.
-
-        Note that it makes an explicit commit to the datastore instead of using
-        the usual functions for updating and creating skills. This is because
-        the latter approach would result in a skill with the *current* schema
-        version.
-
-        Args:
-            skill_id: str. ID for the skill to be created.
-            owner_id: str. The user_id of the creator of the skill.
-            description: str. The description of the skill.
-            next_misconception_id: int. The misconception id to be used by the
-                next misconception added.
-            misconceptions: list(Misconception.to_dict()). The list of
-                misconception dicts associated with the skill.
-            rubrics: list(Rubric.to_dict()). The list of rubric dicts associated
-                with the skill.
-            skill_contents: SkillContents.to_dict(). A SkillContents dict
-                containing the explanation and examples of the skill.
-            misconceptions_schema_version: int. The schema version for the
-                misconceptions object.
-            rubric_schema_version: int. The schema version for the rubric
-                object.
-            skill_contents_schema_version: int. The schema version for the
-                skill_contents object.
-            language_code: str. The ISO 639-1 code for the language this skill
-                is written in.
-        """
-        skill_model = skill_models.SkillModel(
-            id=skill_id, description=description, language_code=language_code,
-            misconceptions=misconceptions, rubrics=rubrics,
-            skill_contents=skill_contents,
-            next_misconception_id=next_misconception_id,
-            misconceptions_schema_version=misconceptions_schema_version,
-            rubric_schema_version=rubric_schema_version,
-            skill_contents_schema_version=skill_contents_schema_version,
-            superseding_skill_id=None, all_questions_merged=False)
-        skill_model.commit(
-            owner_id, 'New skill created.',
-            [{'cmd': skill_domain.CMD_CREATE_NEW}])
 
     def _create_valid_question_data(
         self,

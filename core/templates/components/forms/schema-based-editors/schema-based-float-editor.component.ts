@@ -21,6 +21,7 @@ import { AbstractControl, ControlValueAccessor, NgForm, NG_VALIDATORS, NG_VALUE_
 import { downgradeComponent } from '@angular/upgrade/static';
 import { NumericInputValidationService } from 'interactions/NumericInput/directives/numeric-input-validation.service';
 import { NumberConversionService } from 'services/number-conversion.service';
+import { SchemaDefaultValue } from 'services/schema-default-value.service';
 import { SchemaFormSubmittedService } from 'services/schema-form-submitted.service';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
 
@@ -90,7 +91,7 @@ implements ControlValueAccessor, OnInit, Validator {
   }
 
   // Implemented as a part of ControlValueAccessor interface.
-  registerOnTouched(fn: unknown): void {
+  registerOnTouched(fn: SchemaDefaultValue): void {
   }
 
   // Implemented as a part of Validator interface.
@@ -104,7 +105,8 @@ implements ControlValueAccessor, OnInit, Validator {
 
   private _validate(
       localValue: number | string,
-      customizationArg: {checkRequireNonnegativeInput: unknown}): boolean {
+      customizationArg: {checkRequireNonnegativeInput: SchemaDefaultValue}
+  ): boolean {
     let { checkRequireNonnegativeInput } = customizationArg || {};
 
     // TODO(#15462): Move the type base checks (like the ones done below) to

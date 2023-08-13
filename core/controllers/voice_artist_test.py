@@ -440,3 +440,20 @@ class VoiceArtistManagementTests(test_utils.GenericTestBase):
             response['error']
         )
         self.logout()
+
+    def test_cannot_assign_voice_artist_to_invalid_user(self) -> None:
+        self.login(self.VOICEOVER_ADMIN_EMAIL)
+        params = {
+            'username': 'invalid'
+        }
+        csrf_token = self.get_new_csrf_token()
+        response = self.post_json(
+            '/voice_artist_management_handler/exploration/%s'
+            % self.published_exp_id_1, params, csrf_token=csrf_token,
+            expected_status_int=400)
+        self.assertEqual(
+            response['error'],
+            'Sorry, we could not find the specified user.'
+        )
+
+        self.logout()

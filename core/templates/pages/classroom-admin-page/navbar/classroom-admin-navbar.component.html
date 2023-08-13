@@ -29,17 +29,14 @@
                    data-toggle="dropdown"
                    (mouseenter)="activateProfileDropdown()"
                    (mouseleave)="deactivateProfileDropdown()">
-                  <span *ngIf="profilePictureDataUrl">
-                      <!--
-                        Lighthouse flags <img> elements that don't have alt attributes:
-                        If the image acts as decoration and does not provide any useful content, give it an empty alt=""
-                        https://web.dev/image-alt/?utm_source=lighthouse&utm_medium=devtools#how-to-add-alternative-text-to-images
-                      -->
-                    <img [src]="profilePictureDataUrl"
+                  <picture *ngIf="profilePicturePngDataUrl">
+                    <source type="image/webp" [srcset]="profilePictureWebpDataUrl">
+                    <source type="image/png" [srcset]="profilePicturePngDataUrl">
+                    <img [src]="profilePicturePngDataUrl"
                          class="oppia-navbar-profile-picture rounded-circle"
-                         alt="">
-                  </span>
-                  <div *ngIf="!profilePictureDataUrl" class="dropdown-toggle">
+                         alt="User profile picture">
+                  </picture>
+                  <div *ngIf="!profilePicturePngDataUrl" class="dropdown-toggle">
                     <i class="material-icons md-40 oppia-dropdown-toggle-icon">&#xE853;</i>
                   </div>
                 </a>

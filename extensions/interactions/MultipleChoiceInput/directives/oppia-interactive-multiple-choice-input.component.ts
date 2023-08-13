@@ -46,6 +46,7 @@ export class InteractiveMultipleChoiceInputComponent implements OnInit {
   choices;
   answer;
   displayedCard!: StateCard;
+  errorMessageI18nKey: string = '';
   recordedVoiceovers!: RecordedVoiceovers;
 
   constructor(
@@ -115,9 +116,10 @@ export class InteractiveMultipleChoiceInputComponent implements OnInit {
 
       // Combine labels for voiceover.
       let combinedChoiceLabels = '';
-      for (const choice of choices.value) {
+      for (let i = 0; i < choices.value.length; i++) {
+        const index = this.choices[i].originalIndex;
         combinedChoiceLabels += this.audioTranslationManagerService
-          .cleanUpHTMLforVoiceover(choice.html);
+          .cleanUpHTMLforVoiceover(choices.value[index].html);
       }
       // Say the choices aloud if autoplay is enabled.
       this.audioTranslationManagerService.setSequentialAudioTranslations(
@@ -137,6 +139,7 @@ export class InteractiveMultipleChoiceInputComponent implements OnInit {
     if (answer === null) {
       return;
     }
+    this.errorMessageI18nKey = '';
     // Deselect previously selected option.
     var selectedElement = (
       document.querySelector(
@@ -147,13 +150,15 @@ export class InteractiveMultipleChoiceInputComponent implements OnInit {
     // Selected current option.
     (event.currentTarget as HTMLDivElement).classList.add('selected');
     this.answer = parseInt(answer, 10);
-    if (!this.browserCheckerService.isMobileDevice()) {
-      this.submitAnswer();
-    }
+    this.currentInteractionService.updateCurrentAnswer(this.answer);
   }
 
   submitAnswer(): void {
     if (this.answer === null) {
+      if (this.currentInteractionService.showNoResponseError()) {
+        this.errorMessageI18nKey =
+        'I18N_INTERACTIONS_ITEM_SELECTION_NO_RESPONSE';
+      }
       return;
     }
     this.currentInteractionService.onSubmit(

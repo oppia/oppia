@@ -49,13 +49,13 @@ export class InputResponsePairComponent {
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() data!: InputResponsePair;
   @Input() oppiaAvatarImageUrl!: string;
-  @Input() profilePicture!: string;
+  @Input() profilePicturePngDataUrl!: string;
+  @Input() profilePictureWebpDataUrl!: string;
   @Input() inputResponsePairId!: string;
   @Input() bottomSection!: boolean;
   @Input() isLastPair!: boolean;
   @Input() feedbackIsEnabled!: boolean;
   @Output() dataChange: EventEmitter<InputResponsePair> = new EventEmitter();
-  decodedProfilePicture: string | undefined;
   @ViewChild('popover') popover!: NgbPopover;
 
   constructor(
@@ -68,10 +68,6 @@ export class InputResponsePairComponent {
     private playerTranscriptService: PlayerTranscriptService,
     private numberConversionService: NumberConversionService,
   ) {}
-
-  ngOnInit(): void {
-    this.decodedProfilePicture = decodeURIComponent(this.profilePicture);
-  }
 
   isVideoRteElementPresentInResponse(): boolean {
     if (this.data.oppiaResponse) {
@@ -107,7 +103,8 @@ export class InputResponsePairComponent {
       this.playerPositionService.getDisplayedCardIndex());
     let interaction = displayedCard.getInteraction();
     return this.explorationHtmlFormatterService.getAnswerHtml(
-      this.convertAnswerToLocalFormat(this.data.learnerInput), interaction.id,
+      this.convertAnswerToLocalFormat(this.data.learnerInput as string),
+      interaction.id,
       interaction.customizationArgs);
   }
 
@@ -120,8 +117,8 @@ export class InputResponsePairComponent {
     let shortAnswerHtml = '';
     if (this.data.learnerInput.hasOwnProperty('answerDetails')) {
       shortAnswerHtml = (
-           this.data.learnerInput as unknown as { answerDetails: string })
-        .answerDetails;
+        this.data.learnerInput as { answerDetails: string }
+      ).answerDetails;
     } else if (
       this.data && interaction.id &&
       InteractionSpecsConstants.INTERACTION_SPECS[
@@ -131,7 +128,7 @@ export class InputResponsePairComponent {
       shortAnswerHtml = (
         this.explorationHtmlFormatterService.getShortAnswerHtml(
           this.convertAnswerToLocalFormat(
-            this.data.learnerInput), interaction.id,
+            this.data.learnerInput as string), interaction.id,
           interaction.customizationArgs));
     }
     return shortAnswerHtml;

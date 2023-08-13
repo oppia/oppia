@@ -7,6 +7,8 @@
            class="progress">
         <div class="progress-bar bg-success"
              role="progressbar"
+             [attr.aria-label]="progressBarLabel"
+             title="progressBar"
              [ngStyle]="progressBarStyle">
         </div>
       </div>
@@ -15,6 +17,7 @@
            class="progress">
         <div class="progress-bar bg-success"
              role="progressbar"
+             aria-hidden="true"
              [ngStyle]="translatedProgressStyle"
              ngbTooltip="{{opportunity.translationsCount}}/{{opportunity.totalCount}} cards accepted"
              container="body"
@@ -22,6 +25,7 @@
         </div>
         <div class="progress-bar bg-light-green"
              role="progressbar"
+             aria-hidden="true"
              [ngStyle]="inReviewProgressStyle"
              ngbTooltip="{{opportunity.inReviewCount}}/{{opportunity.totalCount}} cards awaiting review"
              container="body"
@@ -29,6 +33,7 @@
         </div>
         <div class="progress-bar bg-light"
              role="progressbar"
+             aria-label="Progress Bar"
              [ngStyle]="untranslatedProgressStyle"
              ngbTooltip="{{cardsAvailable}}/{{opportunity.totalCount}} cards available for translation"
              container="body"
@@ -92,6 +97,19 @@
   </div>
 </ng-template>
 
+<ng-template #TranslationLengthLabel>
+  <div>
+    <div class="oppia-animate-fadein"
+       *ngIf="opportunity?.translationWordCount < 20"
+       [ngStyle]="labelStyle">
+      <div class="oppia-translation-length-label"
+        ngbTooltip="Translation word count: {{opportunity.translationWordCount}}">
+        <ng-container>Short Translation</ng-container>
+      </div>
+    </div>
+  </div>
+</ng-template>
+
 <ng-template #OpportunitiesButton>
   <div class="oppia-opportunities-button-container oppia-animate-fadein">
     <div class="oppia-opportunities-button-wrapper"
@@ -116,10 +134,11 @@
 
 <!-- Desktop -->
 <div *ngIf="!onMobile && !opportunityDataIsLoading"
-     class="oppia-opportunities-list-item oppia-desktop-list-item e2e-test-opportunity-list-item">
+     class="oppia-opportunities-list-item oppia-desktop-list-item e2e-test-opportunity-list-item" tabindex="0">
   <ng-template [ngTemplateOutlet]="OpportunitiesDetails"></ng-template>
   <ng-template [ngTemplateOutlet]="ProgressBar"></ng-template>
   <ng-template [ngTemplateOutlet]="OpportunitiesLabel"></ng-template>
+  <ng-template [ngTemplateOutlet]="TranslationLengthLabel"></ng-template>
   <ng-template [ngTemplateOutlet]="OpportunitiesButton"></ng-template>
 </div>
 
@@ -129,6 +148,7 @@
   <ng-template [ngTemplateOutlet]="ProgressBar"></ng-template>
   <ng-template [ngTemplateOutlet]="OpportunitiesDetails"></ng-template>
   <ng-template [ngTemplateOutlet]="OpportunitiesLabel"></ng-template>
+  <ng-template [ngTemplateOutlet]="TranslationLengthLabel"></ng-template>
   <ng-template [ngTemplateOutlet]="OpportunitiesButton"></ng-template>
 </div>
 
@@ -139,6 +159,7 @@
         (click)="clickActionButton.emit(opportunity.id)">
   <ng-template [ngTemplateOutlet]="ProgressBar"></ng-template>
   <ng-template [ngTemplateOutlet]="OpportunitiesDetails"></ng-template>
+  <ng-template [ngTemplateOutlet]="TranslationLengthLabel"></ng-template>
   <ng-template [ngTemplateOutlet]="OpportunitiesLabel"></ng-template>
 </button>
 
@@ -164,9 +185,9 @@
   }
   .oppia-opportunities-button {
     background-color: #fff;
-    border: 2px solid #009688;
+    border: 2px solid #00645c;
     border-radius: 5px;
-    color: #009688;
+    color: #00645c;
     font-size: 18px;
     font-weight: bold;
     min-width: 64%;
@@ -185,7 +206,7 @@
     min-width: 64%;
     text-align: center;
   }
-  .oppia-opportunities-button:hover {
+  .oppia-opportunities-button:hover, .oppia-opportunities-button:focus {
     background-color: #6f817f;
     color: #fff;
     -webkit-transition: background-color 200ms ease-out;
@@ -206,7 +227,7 @@
     margin-top: -6px;
   }
   .oppia-opportunities-subheading {
-    color: #009688;
+    color: #00645c;
     font-size: 14px;
     height: 40%;
   }
@@ -272,6 +293,20 @@
     margin-top: 24px;
     min-height: 90px;
     padding: 0% 3%;
+  }
+  .oppia-translation-length-label {
+    align-items: center;
+    background-color: #eee;
+    border-radius: 10px;
+    color: #1b1b1b;
+    display: flex;
+    font-size: 16px;
+    height: 60px;
+    justify-content: center;
+    margin: 18px;
+    padding: 3px;
+    text-align: center;
+    width: 95px;
   }
   .oppia-animate-fadein {
     -webkit-animation: fadein 0.5s linear 1 normal forwards; /* Safari, Chrome and Opera > 12.1 */

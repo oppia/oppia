@@ -24,8 +24,22 @@ import { AdminPageConstants } from
   'pages/admin-page/admin-page.constants';
 import { PlatformFeatureDomainConstants } from
   'domain/platform_feature/platform-feature-domain.constants';
-import { PlatformParameterRule } from
+import { PlatformParameterRule, PlatformParameterValue } from
   'domain/platform_feature/platform-parameter-rule.model';
+import {
+  PlatformParameter,
+  PlatformParameterBackendDict
+} from 'domain/platform_feature/platform-parameter.model';
+
+export interface FeatureFlagsDicts {
+  'feature_flags': PlatformParameterBackendDict[];
+  'server_stage': string;
+}
+
+export interface FeatureFlagsResponse {
+  featureFlags: PlatformParameter[];
+  serverStage: string;
+}
 
 @Injectable({
   providedIn: 'root'
@@ -35,16 +49,60 @@ export class PlatformFeatureAdminBackendApiService {
     private http: HttpClient,
   ) {}
 
+  async getFeatureFlags(): Promise<FeatureFlagsResponse> {
+    return new Promise((resolve, reject) => {
+      this.http.get<FeatureFlagsDicts>(
+        PlatformFeatureDomainConstants.FEATURE_FLAGS_URL
+      ).toPromise().then(response => {
+        resolve({
+          featureFlags: response.feature_flags.map(
+            dict => PlatformParameter.createFromBackendDict(
+              dict)),
+          serverStage: response.server_stage
+        });
+      }, errorResponse => {
+        reject(errorResponse.error.error);
+      });
+    });
+  }
+
   async updateFeatureFlag(
-      name: string, message: string, newRules: PlatformParameterRule[]):
+      name: string, message: string, newRules: PlatformParameterRule[],
+      defaultValue: PlatformParameterValue
+  ):
+      Promise<void> {
+    await this.http.post(
+      PlatformFeatureDomainConstants.FEATURE_FLAGS_URL,
+      {
+        action: PlatformFeatureDomainConstants.UPDATE_FEATURE_FLAG_ACTION,
+        feature_name: name,
+        commit_message: message,
+        new_rules: newRules.map(rule => rule.toBackendDict()),
+        default_value: defaultValue
+      }
+    ).toPromise();
+  }
+
+  async updatePlatformParameter(
+      name: string, message: string, newRules: PlatformParameterRule[],
+      defaultValue: PlatformParameterValue
+  ):
       Promise<void> {
     await this.http.post(
       AdminPageConstants.ADMIN_HANDLER_URL,
       {
-        action: PlatformFeatureDomainConstants.UPDATE_FEATURE_FLAG_RULES_ACTION,
-        feature_name: name,
+        action: (
+          PlatformFeatureDomainConstants.
+            UPDATE_PLATFORM_PARAMETER_RULES_ACTION),
+        platform_param_name: name,
         commit_message: message,
-        new_rules: newRules.map(rule => rule.toBackendDict())
+        new_rules: newRules.map(rule => rule.toBackendDict()),
+        // The default_value is being sent as a map in order to handle the
+        // schema in the backend. The default value can be of type number,
+        // string and boolean and to handle this part we are passing a map
+        // so we can declare the schema for the incoming value as a map and
+        // then further validate the actual value.
+        default_value: {value: defaultValue}
       }
     ).toPromise();
   }

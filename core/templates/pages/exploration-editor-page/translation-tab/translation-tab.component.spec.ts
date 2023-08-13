@@ -39,7 +39,8 @@ import {
   JoyrideStepService
   // This throws "Object is possibly undefined." The type undefined
   // comes here from ngx joyride dependency. We need to suppress this
-  // error because of strict type checking.
+  // error because of strict type checking. This error is thrown because
+  // the type of the variable is undefined.
   // @ts-ignore
 } from 'ngx-joyride';
 
@@ -71,7 +72,7 @@ describe('Translation tab component', () => {
   let stateTutorialFirstTimeService: StateTutorialFirstTimeService;
   let userExplorationPermissionsService: UserExplorationPermissionsService;
   let refreshTranslationTabEmitter = new EventEmitter<void>();
-  let enterTranslationForTheFirstTimeEmitter = new EventEmitter<void>();
+  let enterTranslationForTheFirstTimeEmitter = new EventEmitter<string>();
 
   class MockJoyrideService {
     startTour() {
@@ -436,7 +437,8 @@ describe('Translation tab component', () => {
     component.tutorialInProgress = false;
     // This throws "Type 'null' is not assignable to parameter of
     // type '{ canVoiceover: boolean; }'." We need to suppress this
-    // error because of the need to test validations.
+    // error because of the need to test validations. This throws an
+    // error because the permissions are not initialized in the test.
     // @ts-ignore
     component.permissions = null;
     component.startTutorial();

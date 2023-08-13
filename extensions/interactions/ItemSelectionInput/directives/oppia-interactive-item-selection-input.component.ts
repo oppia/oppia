@@ -26,7 +26,6 @@ import { ItemSelectionInputCustomizationArgs } from 'interactions/customization-
 import { BrowserCheckerService } from 'domain/utilities/browser-checker.service';
 import { CurrentInteractionService } from 'pages/exploration-player-page/services/current-interaction.service';
 import { InteractionAttributesExtractorService } from 'interactions/interaction-attributes-extractor.service';
-import { InteractionRulesService } from 'pages/exploration-player-page/services/answer-classification.service';
 import { ItemSelectionInputRulesService } from 'interactions/ItemSelectionInput/directives/item-selection-input-rules.service';
 import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 import { AudioTranslationManagerService } from 'pages/exploration-player-page/services/audio-translation-manager.service';
@@ -146,6 +145,14 @@ export class InteractiveItemSelectionInputComponent implements OnInit {
     }
   }
 
+  getAnswers(): string[] {
+    const htmlAnswers = Object.keys(this.userSelections).filter(
+      (obj) => this.userSelections[obj]);
+    return htmlAnswers.map(
+      html => (
+        this.choicesValue[this.choices.indexOf(html)].contentId as string));
+  }
+
   onToggleCheckbox(): void {
     this.newQuestion = false;
     this.selectionCount = Object.keys(this.userSelections).filter(
@@ -154,35 +161,34 @@ export class InteractiveItemSelectionInputComponent implements OnInit {
       this.selectionCount >= this.maxAllowableSelectionCount);
     this.notEnoughSelections = (
       this.selectionCount < this.minAllowableSelectionCount);
+    this.currentInteractionService.updateCurrentAnswer(this.getAnswers());
   }
 
   submitMultipleChoiceAnswer(event: MouseEvent, index: number): void {
     event.preventDefault();
     // Deselect previously selected option.
-    if ((event.currentTarget as HTMLDivElement).classList.contains(
-      'selected')) {
-      (event.currentTarget as HTMLDivElement).classList.remove('selected');
+    var selectedElement = (
+      document.querySelector(
+        'button.multiple-choice-option.selected'
+      )
+    );
+    if (selectedElement) {
+      selectedElement.classList.remove('selected');
     }
     // Selected current option.
     (event.currentTarget as HTMLDivElement).classList.add('selected');
     this.userSelections = {};
     this.userSelections[this.choices[index]] = true;
     this.notEnoughSelections = false;
-    if (!this.browserCheckerService.isMobileDevice()) {
-      this.submitAnswer();
-    }
+    this.currentInteractionService.updateCurrentAnswer(this.getAnswers());
   }
 
   submitAnswer(): void {
-    const htmlAnswers = Object.keys(this.userSelections).filter(
-      (obj) => this.userSelections[obj]);
-    const answers = htmlAnswers.map(
-      html => this.choicesValue[this.choices.indexOf(html)].contentId);
-
+    const answers = this.getAnswers();
     this.currentInteractionService.onSubmit(
-      answers as unknown as string,
-      this.itemSelectionInputRulesService as unknown as
-      InteractionRulesService);
+      answers,
+      this.itemSelectionInputRulesService as
+      ItemSelectionInputRulesService);
   }
 
   validityCheckFn(): boolean {

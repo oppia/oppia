@@ -17,6 +17,8 @@
 from __future__ import annotations
 
 import datetime
+import random
+import string
 
 from core import feconf
 from core import utils
@@ -1573,6 +1575,34 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
             question_suggestions[1].status,
             suggestion_models.STATUS_IN_REVIEW)
 
+    def test_get_translation_suggestions_in_review(self) -> None:
+        self._create_translation_suggestion_with_language_code('hi')
+        self._create_translation_suggestion_with_language_code('hi')
+
+        suggestions = (
+            suggestion_services
+            .get_translation_suggestions_in_review(self.target_id_1))
+
+        # Ruling out the possibility of None for mypy type checking.
+        assert suggestions[0] is not None
+        self.assertEqual(len(suggestions), 2)
+        self.assertEqual(suggestions[0].target_id, self.target_id_1)
+        self.assertEqual(
+            suggestions[0].suggestion_type,
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT)
+        self.assertEqual(
+            suggestions[0].status,
+            suggestion_models.STATUS_IN_REVIEW)
+        # Ruling out the possibility of None for mypy type checking.
+        assert suggestions[1] is not None
+        self.assertEqual(suggestions[1].target_id, self.target_id_1)
+        self.assertEqual(
+            suggestions[1].suggestion_type,
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT)
+        self.assertEqual(
+            suggestions[1].status,
+            suggestion_models.STATUS_IN_REVIEW)
+
     def test_get_translation_suggestions_in_review_by_exploration(self) -> None:
         self._create_translation_suggestion_with_language_code('hi')
         self._create_translation_suggestion_with_language_code('hi')
@@ -2348,7 +2378,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             category=constants.ALL_CATEGORIES[i],
             end_state_name='End State',
             correctness_feedback_enabled=True
-        ) for i in range(2)]
+        ) for i in range(3)]
 
         for exp in explorations:
             self.publish_exploration(self.owner_id, exp.id)
@@ -2385,6 +2415,118 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             'data_format': 'html'
         }
 
+    def _set_up_topics_and_100_stories_for_translations(self) -> Mapping[
+        str, change_domain.AcceptableChangeDictTypes]:
+        """Sets up required topics and stories for translations. It does the
+        following.
+        1. Create 2 explorations and publish them.
+        2. Create a default topic.
+        3. Publish the topic with two story IDs.
+        4. Create 100 stories for translation opportunities.
+
+        Returns:
+            Mapping[str, change_domain.AcceptableChangeDictTypes]. A dictionary
+            of the change object for the translations.
+        """
+        explorations = [self.save_new_valid_exploration(
+            '%s' % i,
+            self.owner_id,
+            title='title %d' % i,
+            category='Algebra',
+            end_state_name='End State',
+            correctness_feedback_enabled=True
+        ) for i in range(103)]
+
+        for exp in explorations:
+            self.publish_exploration(self.owner_id, exp.id)
+            exp_services.update_exploration(
+                self.owner_id, exp.id, [exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+                    'state_name': 'Introduction',
+                    'new_value': {
+                        'content_id': 'content_0',
+                        'html': '<p>A content to translate.</p>'
+                    }
+                })], 'Changes content.')
+
+        topic_id = '0'
+        topic = topic_domain.Topic.create_default_topic(
+            topic_id, 'topic_name', 'abbrev', 'description', 'fragm')
+        skill_id_0 = 'skill_id_0'
+        skill_id_1 = 'skill_id_1'
+        self._publish_valid_topic(topic, [skill_id_0, skill_id_1])
+
+        for i in range(103):
+            self.create_story_for_translation_opportunity(
+                self.owner_id, self.admin_id, ('story_id_%s' % (i)), topic_id,
+                '%s' % i)
+
+        return {
+            'cmd': 'add_written_translation',
+            'content_id': 'content_0',
+            'language_code': 'hi',
+            'content_html': '<p>A content to translate.</p>',
+            'state_name': 'Introduction',
+            'translation_html': '<p>Translation for content.</p>',
+            'data_format': 'html'
+        }
+
+    def _set_up_a_topic_and_stories_for_translations(self) -> Mapping[
+        str, change_domain.AcceptableChangeDictTypes]:
+        """Sets up required topics and stories for translations. It does the
+        following.
+        1. Create 2 explorations and publish them.
+        2. Create a topic with topic_id A.
+        3. Publish the topic with one story ID.
+        4. Create 1 story for translation opportunities.
+
+        Returns:
+            Mapping[str, change_domain.AcceptableChangeDictTypes]. A dictionary
+            of the change object for the translations.
+        """
+        explorations = [self.save_new_valid_exploration(
+            '%s' % i,
+            self.owner_id,
+            title='title %d' % i,
+            category=constants.ALL_CATEGORIES[i],
+            end_state_name='End State',
+            correctness_feedback_enabled=True
+        ) for i in range(2, 4)]
+
+        for exp in explorations:
+            self.publish_exploration(self.owner_id, exp.id)
+            exp_services.update_exploration(
+                self.owner_id, exp.id, [exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+                    'state_name': 'Introduction',
+                    'new_value': {
+                        'content_id': 'content_0',
+                        'html': '<p>A content to translate.</p>'
+                    }
+                })], 'Changes content.')
+
+        topic_id = 'A'
+        topic = topic_domain.Topic.create_default_topic(
+            topic_id, 'topic_name_a', 'abbrev-a', 'description', 'fragm-a')
+        skill_id_2 = 'skill_id_2'
+        skill_id_3 = 'skill_id_3'
+        self._publish_valid_topic(topic, [skill_id_2, skill_id_3])
+
+        self.create_story_for_translation_opportunity(
+            self.owner_id, self.admin_id, 'story_id_03', topic_id, '2')
+
+        return {
+            'cmd': 'add_written_translation',
+            'content_id': 'content_0',
+            'language_code': 'hi',
+            'content_html': '<p>A content to translate.</p>',
+            'state_name': 'Introduction',
+            'translation_html': '<p>Translation for content.</p>',
+            'data_format': 'html'
+        }
+
     def _get_change_with_normalized_string(self) -> Mapping[
         str, change_domain.AcceptableChangeDictTypes]:
         """Provides change dictionary with normalized translation html.
@@ -2402,51 +2544,6 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             'translation_html': ['translated text1', 'translated text2'],
             'data_format': 'set_of_normalized_string'
         }
-
-    def test_update_translation_contribution_stats_without_language_codes(
-        self
-    ) -> None:
-        translation_contribution_stats = (
-            suggestion_registry.TranslationContributionStats(
-                None, 'user1', 'topic1', 1, 1, 1, 0, 1, 0, 0,
-                {datetime.date.fromtimestamp(1616173836)}
-            )
-        )
-        with self.assertRaisesRegex(
-            Exception,
-            'Language code should not be None.'):
-            suggestion_services._update_translation_contribution_stats_models(  # pylint: disable=protected-access
-                [translation_contribution_stats])
-
-    def test_update_translation_contribution_stats_without_contributor_id(
-        self
-    ) -> None:
-        translation_contribution_stats = (
-            suggestion_registry.TranslationContributionStats(
-                'hi', None, 'topic1', 1, 1, 1, 0, 1, 0, 0,
-                {datetime.date.fromtimestamp(1616173836)}
-            )
-        )
-        with self.assertRaisesRegex(
-            Exception,
-            'Contributor user ID should not be None.'):
-            suggestion_services._update_translation_contribution_stats_models(  # pylint: disable=protected-access
-                [translation_contribution_stats])
-
-    def test_update_translation_contribution_stats_without_topic_id(
-        self
-    ) -> None:
-        translation_contribution_stats = (
-            suggestion_registry.TranslationContributionStats(
-                'hi', 'user1', None, 1, 1, 1, 0, 1, 0, 0,
-                {datetime.date.fromtimestamp(1616173836)}
-            )
-        )
-        with self.assertRaisesRegex(
-            Exception,
-            'Topic ID should not be None.'):
-            suggestion_services._update_translation_contribution_stats_models(  # pylint: disable=protected-access
-                [translation_contribution_stats])
 
     def test_get_translation_contribution_stats_for_invalid_id_with_strict_true(
         self
@@ -2542,6 +2639,13 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             feconf.ENTITY_TYPE_EXPLORATION,
             '1', 1, self.author_id, new_change_dict, 'description')
 
+        change_dict_for_a_topic = (
+            self._set_up_a_topic_and_stories_for_translations())
+        topic_suggestion = suggestion_services.create_suggestion(
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION,
+            '2', 1, self.author_id, change_dict_for_a_topic, 'description')
+
         suggestion_services.update_translation_contribution_stats_at_submission(
             initial_suggestion
         )
@@ -2576,6 +2680,60 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             0
         )
 
+        translation_submitter_total_stats_model = (
+            suggestion_models.TranslationSubmitterTotalContributionStatsModel
+            .get(
+                'hi', self.author_id
+            )
+        )
+        assert translation_submitter_total_stats_model is not None
+        self.assertEqual(
+            (
+                translation_submitter_total_stats_model
+                .submitted_translations_count
+            ),
+            2
+        )
+        self.assertEqual(
+            (
+                translation_submitter_total_stats_model
+                .submitted_translation_word_count
+            ),
+            7
+        )
+        self.assertEqual(
+            (
+                translation_submitter_total_stats_model
+                .accepted_translations_count
+            ),
+            0
+        )
+        self.assertEqual(
+            (
+                translation_submitter_total_stats_model
+                .topic_ids_with_translation_submissions
+            ),
+            ['0']
+        )
+
+        suggestion_services.update_translation_contribution_stats_at_submission(
+            topic_suggestion
+        )
+        updated_translation_submitter_total_stats_model = (
+            suggestion_models.TranslationSubmitterTotalContributionStatsModel
+            .get(
+                'hi', self.author_id
+            )
+        )
+        assert updated_translation_submitter_total_stats_model is not None
+        self.assertItemsEqual(
+            (
+                updated_translation_submitter_total_stats_model
+                .topic_ids_with_translation_submissions
+            ),
+            ['0', 'A']
+        )
+
     def test_update_translation_review_stats_when_suggestion_is_accepted(
         self) -> None:
         # This test case will check stats of the reviewer and the submitter
@@ -2595,6 +2753,22 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
             feconf.ENTITY_TYPE_EXPLORATION,
             '1', 1, self.author_id, new_change_dict, 'description')
+        change_dict_for_a_topic = (
+            self._set_up_a_topic_and_stories_for_translations())
+        topic_suggestion = suggestion_services.create_suggestion(
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION,
+            '2', 1, self.author_id, change_dict_for_a_topic, 'description')
+
+        suggestion_services.update_translation_contribution_stats_at_submission(
+            suggestion_services.get_suggestion_by_id(
+                initial_suggestion.suggestion_id)
+        )
+        suggestion_services.update_translation_contribution_stats_at_submission(
+            suggestion_services.get_suggestion_by_id(
+                latest_suggestion.suggestion_id)
+        )
+
         suggestion_services.accept_suggestion(
             initial_suggestion.suggestion_id, self.reviewer_id, 'Accepted',
             'Accepted')
@@ -2649,6 +2823,102 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
         self.assertEqual(
             translation_contribution_stats_model.accepted_translations_count,
             2
+        )
+
+        translation_reviewer_total_stats_model = (
+            suggestion_models.TranslationReviewerTotalContributionStatsModel
+            .get(
+                'hi', self.reviewer_id
+            )
+        )
+        translation_submitter_total_stats_model = (
+            suggestion_models.TranslationSubmitterTotalContributionStatsModel
+            .get(
+                'hi', self.author_id
+            )
+        )
+        # Assert translation review stats after the review.
+        # At this point we can confirm that there should be an associated
+        # translation review stat object for the given IDs since we have
+        # called update_translation_review_stats function to create/update
+        # translation review stats.
+        assert translation_reviewer_total_stats_model is not None
+        self.assertEqual(
+            translation_reviewer_total_stats_model.accepted_translations_count,
+            2
+        )
+        self.assertEqual(
+            (
+                translation_reviewer_total_stats_model
+                .reviewed_translations_count
+            ),
+            2
+        )
+        assert translation_submitter_total_stats_model is not None
+        self.assertEqual(
+            (
+                translation_submitter_total_stats_model
+                .accepted_translation_word_count
+            ),
+            7
+        )
+        self.assertEqual(
+            translation_submitter_total_stats_model.accepted_translations_count,
+            2
+        )
+        self.assertEqual(
+            (
+                translation_submitter_total_stats_model
+                .recent_review_outcomes
+            ),
+            ['accepted', 'accepted']
+        )
+        self.assertEqual(
+            (
+                translation_submitter_total_stats_model
+                .recent_performance
+            ),
+            2
+        )
+        self.assertEqual(
+            (
+                translation_submitter_total_stats_model
+                .overall_accuracy
+            ),
+            100.0
+        )
+
+        suggestion_services.accept_suggestion(
+            topic_suggestion.suggestion_id, self.reviewer_id, 'Accepted',
+            'Accepted')
+        suggestion_services.update_translation_review_stats(
+            suggestion_services.get_suggestion_by_id(
+                topic_suggestion.suggestion_id)
+        )
+        translation_reviewer_total_stats_model_for_a_topic = (
+            suggestion_models.TranslationReviewerTotalContributionStatsModel
+            .get(
+                'hi', self.reviewer_id
+            )
+        )
+        translation_submitter_total_stats_model_for_a_topic = (
+            suggestion_models.TranslationSubmitterTotalContributionStatsModel
+            .get(
+                'hi', self.author_id
+            )
+        )
+        assert translation_reviewer_total_stats_model_for_a_topic is not None
+        assert translation_submitter_total_stats_model_for_a_topic is not None
+        self.assertItemsEqual(
+            translation_reviewer_total_stats_model_for_a_topic.
+            topic_ids_with_translation_reviews,
+            ['0', 'A']
+        )
+
+        self.assertItemsEqual(
+            translation_submitter_total_stats_model_for_a_topic.
+            topic_ids_with_translation_submissions,
+            ['0', 'A']
         )
 
     def test_update_translation_review_stats_when_suggestion_is_rejected(
@@ -2733,6 +3003,81 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
         self.assertEqual(
             translation_contribution_stats_model.accepted_translations_count,
             0
+        )
+
+        translation_reviewer_total_stats_model = (
+            suggestion_models.TranslationReviewerTotalContributionStatsModel
+            .get(
+                'hi', self.reviewer_id
+            )
+        )
+        translation_submitter_total_stats_model = (
+            suggestion_models.TranslationSubmitterTotalContributionStatsModel
+            .get(
+                'hi', self.author_id
+            )
+        )
+
+        # Assert translation review stats after the review.
+        # At this point we can confirm that there should be an associated
+        # translation review stat object for the given IDs since we have
+        # called update_translation_review_stats function to create/update
+        # translation review stats.
+        assert translation_reviewer_total_stats_model is not None
+        self.assertEqual(
+            translation_reviewer_total_stats_model.reviewed_translations_count,
+            2
+        )
+        self.assertEqual(
+            translation_reviewer_total_stats_model.accepted_translations_count,
+            0
+        )
+        self.assertEqual(
+            (
+                translation_reviewer_total_stats_model
+                .accepted_translation_word_count
+            ),
+            0
+        )
+        assert translation_submitter_total_stats_model is not None
+        self.assertEqual(
+            translation_submitter_total_stats_model.rejected_translations_count,
+            2
+        )
+        self.assertEqual(
+            (
+                translation_submitter_total_stats_model
+                .rejected_translations_count
+            ),
+            2
+        )
+        self.assertEqual(
+            (
+                translation_submitter_total_stats_model
+                .accepted_translations_count
+            ),
+            0
+        )
+        self.assertEqual(
+            (
+                translation_submitter_total_stats_model
+                .recent_review_outcomes
+            ),
+            ['rejected', 'rejected']
+        )
+        self.assertEqual(
+            (
+                translation_submitter_total_stats_model
+                .recent_performance
+            ),
+            -4
+        )
+        self.assertEqual(
+            (
+                translation_submitter_total_stats_model
+                .overall_accuracy
+            ),
+            0.0
         )
 
     def test_update_translation_review_stats_without_a_reviewer_id(
@@ -2872,6 +3217,240 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             0
         )
 
+        translation_reviewer_total_stats_model = (
+            suggestion_models.TranslationReviewerTotalContributionStatsModel
+            .get(
+                'hi', self.reviewer_id
+            )
+        )
+        translation_submitter_total_stats_model = (
+            suggestion_models.TranslationSubmitterTotalContributionStatsModel
+            .get(
+                'hi', self.author_id
+            )
+        )
+        # Assert translation review stats after the review.
+        # At this point we can confirm that there should be an associated
+        # translation review stat object for the given IDs since we have
+        # called update_translation_review_stats function to create/update
+        # translation review stats.
+        assert translation_reviewer_total_stats_model is not None
+        self.assertEqual(
+            translation_reviewer_total_stats_model.accepted_translations_count,
+            2
+        )
+        self.assertEqual(
+            (
+                translation_reviewer_total_stats_model
+                .accepted_translation_word_count
+            ),
+            2
+        )
+        self.assertEqual(
+            translation_reviewer_total_stats_model
+            .accepted_translations_with_reviewer_edits_count,
+            2
+        )
+        assert translation_submitter_total_stats_model is not None
+        self.assertEqual(
+            (
+                translation_submitter_total_stats_model
+                .submitted_translations_count
+            ),
+            2
+        )
+        self.assertEqual(
+            (
+                translation_submitter_total_stats_model
+                .submitted_translation_word_count
+            ),
+            6
+        )
+        self.assertEqual(
+            translation_submitter_total_stats_model.recent_performance,
+            2
+        )
+        self.assertEqual(
+            translation_submitter_total_stats_model.overall_accuracy,
+            100.0
+        )
+        self.assertEqual(
+            translation_submitter_total_stats_model.accepted_translations_count,
+            2
+        )
+        self.assertEqual(
+            (
+                translation_submitter_total_stats_model
+                .accepted_translations_without_reviewer_edits_count
+            ),
+            0
+        )
+
+    def test_increment_translation_stats_for_than_100_suggestions_accepted(
+        self) -> None:
+
+        change_dict = self._set_up_topics_and_100_stories_for_translations()
+        initial_suggestion = suggestion_services.create_suggestion(
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION,
+            '0', 0, self.author_id, change_dict, 'description')
+        suggestion_services.update_translation_contribution_stats_at_submission(
+            suggestion_services.get_suggestion_by_id(
+                initial_suggestion.suggestion_id)
+        )
+        for i in range(1, 102):
+            common_change_dict = self._get_change_with_normalized_string()
+            suggestion = suggestion_services.create_suggestion(
+                feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+                feconf.ENTITY_TYPE_EXPLORATION,
+                ('%s' % (i)), i, self.author_id, common_change_dict,
+                'description')
+            suggestion_services.update_translation_contribution_stats_at_submission( # pylint: disable=line-too-long
+                suggestion_services.get_suggestion_by_id(
+                    suggestion.suggestion_id))
+            suggestion_services.accept_suggestion(
+                suggestion.suggestion_id, self.reviewer_id, 'Accepted',
+                'Accepted')
+            suggestion_services.update_translation_review_stats(
+                suggestion_services.get_suggestion_by_id(
+                    suggestion.suggestion_id)
+            )
+
+        updated_translation_submitter_total_stats_model = (
+            suggestion_models.TranslationSubmitterTotalContributionStatsModel
+            .get(
+                'hi', self.author_id
+            )
+        )
+        assert updated_translation_submitter_total_stats_model is not None
+        self.assertEqual(
+            len(
+                updated_translation_submitter_total_stats_model
+                .recent_review_outcomes),
+            100
+        )
+
+        new_change_dict = self._get_change_with_normalized_string()
+        latest_suggestion = suggestion_services.create_suggestion(
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION,
+            '102', 102, self.author_id, new_change_dict, 'description')
+        suggestion_services.update_translation_contribution_stats_at_submission(
+            suggestion_services.get_suggestion_by_id(
+                latest_suggestion.suggestion_id)
+        )
+        suggestion_services.reject_suggestion(
+            latest_suggestion.suggestion_id, self.reviewer_id, 'Rejected'
+        )
+
+        suggestion_services.update_translation_review_stats(
+            suggestion_services.get_suggestion_by_id(
+                latest_suggestion.suggestion_id)
+        )
+
+        rejected_translation_submitter_total_stats_model = (
+            suggestion_models.TranslationSubmitterTotalContributionStatsModel
+            .get(
+                'hi', self.author_id
+            )
+        )
+        assert rejected_translation_submitter_total_stats_model is not None
+
+        self.assertEqual(
+            len(
+                rejected_translation_submitter_total_stats_model
+                .recent_review_outcomes),
+            100
+        )
+
+        self.assertEqual(
+            rejected_translation_submitter_total_stats_model
+            .recent_review_outcomes[99],
+            suggestion_models.REVIEW_OUTCOME_REJECTED
+        )
+
+    def test_increment_translation_stats_for_than_100_suggestions_rejected(
+        self) -> None:
+
+        change_dict = self._set_up_topics_and_100_stories_for_translations()
+        initial_suggestion = suggestion_services.create_suggestion(
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION,
+            '0', 0, self.author_id, change_dict, 'description')
+        suggestion_services.update_translation_contribution_stats_at_submission(
+            suggestion_services.get_suggestion_by_id(
+                initial_suggestion.suggestion_id)
+        )
+        for i in range(1, 102):
+            common_change_dict = self._get_change_with_normalized_string()
+            suggestion = suggestion_services.create_suggestion(
+                feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+                feconf.ENTITY_TYPE_EXPLORATION,
+                ('%s' % (i)), i, self.author_id, common_change_dict,
+                'description')
+            suggestion_services.update_translation_contribution_stats_at_submission( # pylint: disable=line-too-long
+                suggestion_services.get_suggestion_by_id(
+                    suggestion.suggestion_id))
+            suggestion_services.reject_suggestion(
+                suggestion.suggestion_id, self.reviewer_id, 'Rejected')
+            suggestion_services.update_translation_review_stats(
+                suggestion_services.get_suggestion_by_id(
+                    suggestion.suggestion_id)
+            )
+
+        updated_translation_submitter_total_stats_model = (
+            suggestion_models.TranslationSubmitterTotalContributionStatsModel
+            .get(
+                'hi', self.author_id
+            )
+        )
+        assert updated_translation_submitter_total_stats_model is not None
+        self.assertEqual(
+            len(
+                updated_translation_submitter_total_stats_model
+                .recent_review_outcomes),
+            100
+        )
+
+        new_change_dict = self._get_change_with_normalized_string()
+        latest_suggestion = suggestion_services.create_suggestion(
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION,
+            '102', 102, self.author_id, new_change_dict, 'description')
+        suggestion_services.update_translation_contribution_stats_at_submission(
+            suggestion_services.get_suggestion_by_id(
+                latest_suggestion.suggestion_id)
+        )
+        suggestion_services.accept_suggestion(
+            latest_suggestion.suggestion_id, self.reviewer_id, 'Accepted',
+            'Accepted'
+        )
+
+        suggestion_services.update_translation_review_stats(
+            suggestion_services.get_suggestion_by_id(
+                latest_suggestion.suggestion_id)
+        )
+
+        accepted_translation_submitter_total_stats_model = (
+            suggestion_models.TranslationSubmitterTotalContributionStatsModel
+            .get(
+                'hi', self.author_id
+            )
+        )
+        assert accepted_translation_submitter_total_stats_model is not None
+        self.assertEqual(
+            len(
+                accepted_translation_submitter_total_stats_model
+                .recent_review_outcomes),
+            100
+        )
+
+        self.assertEqual(
+            accepted_translation_submitter_total_stats_model
+            .recent_review_outcomes[99],
+            suggestion_models.REVIEW_OUTCOME_ACCEPTED
+        )
+
     def _create_question_suggestion(
         self,
         skill_id: str
@@ -2951,9 +3530,21 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
         # 3. Create a question suggestion.
         skill_id_1 = self._create_skill()
         skill_id_2 = self._create_skill()
+        skill_id_3 = self._create_skill()
+        skill_id_4 = self._create_skill()
         topic_id = self._create_topic(skill_id_1, skill_id_2)
+        topic_id_2 = topic_fetchers.get_new_topic_id()
+        self.save_new_topic(
+            topic_id_2, 'topic_admin', name='Topic2',
+            abbreviated_name='topic-three-1', url_fragment='topic-three-a',
+            description='Description',
+            canonical_story_ids=[],
+            additional_story_ids=[],
+            uncategorized_skill_ids=[skill_id_3, skill_id_4],
+            subtopics=[], next_subtopic_id=1)
         initial_suggestion = self._create_question_suggestion(skill_id_1)
         latest_suggestion = self._create_question_suggestion(skill_id_2)
+        topic_id_2_suggestion = self._create_question_suggestion(skill_id_3)
 
         # Action to update question contribution stats.
         suggestion_services.update_question_contribution_stats_at_submission(
@@ -2983,6 +3574,57 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             0
         )
 
+        question_submitter_total_stats_model = (
+            suggestion_models.QuestionSubmitterTotalContributionStatsModel
+            .get_by_id(
+                self.author_id
+            )
+        )
+        # Assert question contribution stats before the review.
+        # At this point we can confirm that there should be an associated
+        # question contribution stat object for the given IDs since we have
+        # called update_question_contribution_stats_at_submission function to
+        # create/update question contribution stats.
+        assert question_submitter_total_stats_model is not None
+        self.assertEqual(
+            question_submitter_total_stats_model.submitted_questions_count,
+            2
+        )
+        self.assertEqual(
+            question_submitter_total_stats_model.accepted_questions_count,
+            0
+        )
+        self.assertEqual(
+            question_submitter_total_stats_model.recent_review_outcomes,
+            []
+        )
+        self.assertEqual(
+            question_submitter_total_stats_model.recent_performance,
+            0
+        )
+        self.assertEqual(
+            question_submitter_total_stats_model.overall_accuracy,
+            0.0
+        )
+
+        suggestion_services.update_question_contribution_stats_at_submission(
+            topic_id_2_suggestion
+        )
+        question_submitter_total_stats_model_with_topic_id_2 = (
+            suggestion_models.QuestionSubmitterTotalContributionStatsModel
+            .get_by_id(
+                self.author_id
+            )
+        )
+
+        self.assertItemsEqual(
+            (
+                question_submitter_total_stats_model_with_topic_id_2.
+                topic_ids_with_question_submissions
+            ),
+            [topic_id, topic_id_2]
+        )
+
     def test_update_question_stats_when_suggestion_is_accepted(
         self) -> None:
         # This test case will check stats of the reviewer and the submitter
@@ -2993,9 +3635,32 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
         # 3. Create a question suggestion.
         skill_id_1 = self._create_skill()
         skill_id_2 = self._create_skill()
+        skill_id_3 = self._create_skill()
+        skill_id_4 = self._create_skill()
         topic_id = self._create_topic(skill_id_1, skill_id_2)
+        topic_id_2 = topic_fetchers.get_new_topic_id()
+        self.save_new_topic(
+            topic_id_2, 'topic_admin', name='Topic2',
+            abbreviated_name='topic-three-1', url_fragment='topic-three-a',
+            description='Description',
+            canonical_story_ids=[],
+            additional_story_ids=[],
+            uncategorized_skill_ids=[skill_id_3, skill_id_4],
+            subtopics=[], next_subtopic_id=1)
         initial_suggestion = self._create_question_suggestion(skill_id_1)
         latest_suggestion = self._create_question_suggestion(skill_id_2)
+
+        suggestion_services.update_question_contribution_stats_at_submission(
+            suggestion_services.get_suggestion_by_id(
+                initial_suggestion.suggestion_id
+            )
+        )
+        suggestion_services.update_question_contribution_stats_at_submission(
+            suggestion_services.get_suggestion_by_id(
+                latest_suggestion.suggestion_id
+            )
+        )
+
         suggestion_services.accept_suggestion(
             initial_suggestion.suggestion_id, self.reviewer_id, 'Accepted',
             'Accepted')
@@ -3051,6 +3716,90 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
                 .accepted_questions_without_reviewer_edits_count
             ),
             2
+        )
+
+        question_reviewer_total_stats_model = (
+            suggestion_models.QuestionReviewerTotalContributionStatsModel
+            .get_by_id(
+                self.reviewer_id
+            )
+        )
+        question_submitter_total_stats_model = (
+            suggestion_models.QuestionSubmitterTotalContributionStatsModel
+            .get_by_id(
+                self.author_id
+            )
+        )
+        # Assert question review stats after the review.
+        # At this point we can confirm that there should be an associated
+        # question review stat object for the given IDs since we have
+        # called update_question_review_stats function to create/update question
+        # review stats.
+        assert question_reviewer_total_stats_model is not None
+        self.assertEqual(
+            question_reviewer_total_stats_model.accepted_questions_count,
+            2
+        )
+        self.assertEqual(
+            (
+                question_reviewer_total_stats_model
+                .reviewed_questions_count
+            ),
+            2
+        )
+        assert question_submitter_total_stats_model is not None
+        self.assertEqual(
+            question_submitter_total_stats_model.submitted_questions_count,
+            2
+        )
+        self.assertEqual(
+            question_submitter_total_stats_model.accepted_questions_count,
+            2
+        )
+        self.assertEqual(
+            (
+                question_submitter_total_stats_model
+                .accepted_questions_without_reviewer_edits_count
+            ),
+            2
+        )
+        self.assertEqual(
+            (
+                question_submitter_total_stats_model
+                .recent_review_outcomes
+            ),
+            ['accepted', 'accepted']
+        )
+        self.assertEqual(
+            question_submitter_total_stats_model.recent_performance,
+            2
+        )
+        self.assertEqual(
+            question_submitter_total_stats_model.overall_accuracy,
+            100.0
+        )
+
+        topic_id_2_suggestion = self._create_question_suggestion(skill_id_3)
+        suggestion_services.accept_suggestion(
+            topic_id_2_suggestion.suggestion_id, self.reviewer_id, 'Accepted',
+            'Accepted')
+        suggestion_services.update_question_review_stats(
+            suggestion_services.get_suggestion_by_id(
+                topic_id_2_suggestion.suggestion_id)
+        )
+        question_reviewer_total_stats_model_with_topic_id_2 = (
+            suggestion_models.QuestionReviewerTotalContributionStatsModel
+            .get_by_id(
+                self.reviewer_id
+            )
+        )
+
+        self.assertItemsEqual(
+            (
+                question_reviewer_total_stats_model_with_topic_id_2
+                .topic_ids_with_question_reviews
+            ),
+            [topic_id, topic_id_2]
         )
 
     def test_update_question_stats_when_suggestion_is_rejected(
@@ -3125,6 +3874,68 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             0
         )
 
+        question_reviewer_total_stats_model = (
+            suggestion_models.QuestionReviewerTotalContributionStatsModel
+            .get_by_id(
+                self.reviewer_id
+            )
+        )
+        question_submitter_total_stats_model = (
+            suggestion_models.QuestionSubmitterTotalContributionStatsModel
+            .get_by_id(
+                self.author_id
+            )
+        )
+        # Assert question review stats after the review.
+        # At this point we can confirm that there should be an associated
+        # question review stat object for the given IDs since we have
+        # called update_question_review_stats function to create/update question
+        # review stats.
+        assert question_reviewer_total_stats_model is not None
+        self.assertEqual(
+            question_reviewer_total_stats_model.reviewed_questions_count,
+            2
+        )
+        self.assertEqual(
+            question_reviewer_total_stats_model.accepted_questions_count,
+            0
+        )
+        self.assertEqual(
+            question_reviewer_total_stats_model.rejected_questions_count,
+            2
+        )
+        self.assertEqual(
+            (
+                question_reviewer_total_stats_model
+                .reviewed_questions_count
+            ),
+            2
+        )
+        assert question_submitter_total_stats_model is not None
+        self.assertEqual(
+            question_submitter_total_stats_model.accepted_questions_count,
+            0
+        )
+        self.assertEqual(
+            question_submitter_total_stats_model.rejected_questions_count,
+            2
+        )
+        self.assertEqual(
+            (
+                question_submitter_total_stats_model
+                .accepted_questions_without_reviewer_edits_count
+            ),
+            0
+        )
+        self.assertEqual(
+            question_submitter_total_stats_model.recent_performance,
+            -4
+        )
+        self.assertEqual(
+            question_submitter_total_stats_model.overall_accuracy,
+            0.0
+        )
+
     def test_update_question_stats_when_suggestion_is_edited(
         self
     ) -> None:
@@ -3142,6 +3953,14 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
         content_id_generator = translation_domain.ContentIdGenerator()
         question_state_data = self._create_valid_question_data(
             'default_state', content_id_generator).to_dict()
+        suggestion_services.update_question_contribution_stats_at_submission(
+            suggestion_services.get_suggestion_by_id(
+                initial_suggestion.suggestion_id)
+        )
+        suggestion_services.update_question_contribution_stats_at_submission(
+            suggestion_services.get_suggestion_by_id(
+                latest_suggestion.suggestion_id)
+        )
         suggestion_services.accept_suggestion(
             initial_suggestion.suggestion_id, self.reviewer_id, 'Accepted',
             'Accepted')
@@ -3209,6 +4028,250 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             0
         )
 
+        question_reviewer_total_stats_model = (
+            suggestion_models.QuestionReviewerTotalContributionStatsModel
+            .get_by_id(
+                self.reviewer_id
+            )
+        )
+        question_submitter_total_stats_model = (
+            suggestion_models.QuestionSubmitterTotalContributionStatsModel
+            .get_by_id(
+                self.author_id
+            )
+        )
+        # Assert question review stats.
+        # At this point we can confirm that there should be an associated
+        # question review stat object for the given IDs since we have
+        # called update_question_review_stats function to create/update question
+        # review stats.
+        assert question_reviewer_total_stats_model is not None
+        self.assertEqual(
+            question_reviewer_total_stats_model.reviewed_questions_count,
+            2
+        )
+        self.assertEqual(
+            question_reviewer_total_stats_model.accepted_questions_count,
+            2
+        )
+        self.assertEqual(
+            (
+                question_reviewer_total_stats_model
+                .accepted_questions_with_reviewer_edits_count
+            ),
+            2
+        )
+        assert question_submitter_total_stats_model is not None
+        self.assertEqual(
+            question_submitter_total_stats_model.submitted_questions_count,
+            2
+        )
+        self.assertEqual(
+            question_submitter_total_stats_model.accepted_questions_count,
+            2
+        )
+        self.assertEqual(
+            (
+                question_submitter_total_stats_model
+                .accepted_questions_without_reviewer_edits_count
+            ),
+            0
+        )
+        self.assertEqual(
+            (
+                question_submitter_total_stats_model
+                .recent_review_outcomes
+            ),
+            ['accepted_with_edits', 'accepted_with_edits']
+        )
+        self.assertEqual(
+            question_submitter_total_stats_model.recent_performance,
+            2
+        )
+        self.assertEqual(
+            question_submitter_total_stats_model.overall_accuracy,
+            100.0
+        )
+
+    def generate_random_string(self, length: int) -> str:
+        """Generate a random string of given length.
+
+        Args:
+            length: int. Length of the string to be generated.
+
+        Returns:
+            str. Generated string.
+        """
+        letters = string.ascii_letters
+        return (''.join(random.choice(letters) for _ in range(length))).lower()
+
+    def test_increment_question_stats_for_than_100_suggestions_accepted(
+        self) -> None:
+
+        for i in range(102):
+            skill_id = self._create_skill()
+            topic_id = topic_fetchers.get_new_topic_id()
+            self.save_new_topic(
+                topic_id, 'topic_admin', name='Topic %s' % (i),
+                abbreviated_name='topic-three-1',
+                url_fragment=self.generate_random_string(20),
+                description='Description',
+                canonical_story_ids=[],
+                additional_story_ids=[],
+                uncategorized_skill_ids=[skill_id],
+                subtopics=[], next_subtopic_id=i)
+            suggestion = self._create_question_suggestion(skill_id)
+            suggestion_services.update_question_contribution_stats_at_submission( # pylint: disable=line-too-long
+                suggestion_services.get_suggestion_by_id(
+                    suggestion.suggestion_id
+                )
+            )
+            suggestion_services.accept_suggestion(
+                suggestion.suggestion_id, self.reviewer_id, 'Accepted',
+                'Accepted')
+            suggestion_services.update_question_review_stats(
+                suggestion_services.get_suggestion_by_id(
+                    suggestion.suggestion_id)
+            )
+
+        updated_question_submitter_total_stats_model = (
+            suggestion_models.QuestionSubmitterTotalContributionStatsModel
+            .get_by_id(self.author_id)
+        )
+
+        self.assertEqual(
+            len(
+                updated_question_submitter_total_stats_model
+                .recent_review_outcomes),
+            100
+        )
+
+        new_skill_id = self._create_skill()
+        new_topic_id = topic_fetchers.get_new_topic_id()
+        self.save_new_topic(
+            new_topic_id, 'topic_admin', name='New Topic Rejected',
+            abbreviated_name='topic-three-1',
+            url_fragment=self.generate_random_string(20),
+            description='Description',
+            canonical_story_ids=[],
+            additional_story_ids=[],
+            uncategorized_skill_ids=[new_skill_id],
+            subtopics=[], next_subtopic_id=102)
+        latest_suggestion = self._create_question_suggestion(new_skill_id)
+        suggestion_services.update_question_contribution_stats_at_submission(
+            suggestion_services.get_suggestion_by_id(
+                latest_suggestion.suggestion_id
+            )
+        )
+        suggestion_services.reject_suggestion(
+            latest_suggestion.suggestion_id, self.reviewer_id, 'Rejected')
+
+        suggestion_services.update_question_review_stats(
+            suggestion_services.get_suggestion_by_id(
+                latest_suggestion.suggestion_id)
+        )
+
+        rejected_question_submitter_total_stats_model = (
+            suggestion_models.QuestionSubmitterTotalContributionStatsModel
+            .get_by_id(self.author_id)
+        )
+
+        self.assertEqual(
+            len(
+                rejected_question_submitter_total_stats_model
+                .recent_review_outcomes),
+            100
+        )
+
+        self.assertEqual(
+            rejected_question_submitter_total_stats_model
+            .recent_review_outcomes[99],
+            suggestion_models.REVIEW_OUTCOME_REJECTED
+        )
+
+    def test_increment_question_stats_for_than_100_suggestions_rejected(
+        self) -> None:
+
+        for i in range(102):
+            skill_id = self._create_skill()
+            topic_id = topic_fetchers.get_new_topic_id()
+            self.save_new_topic(
+                topic_id, 'topic_admin', name='Topic %s' % (i),
+                abbreviated_name='topic-three-1',
+                url_fragment=self.generate_random_string(20),
+                description='Description',
+                canonical_story_ids=[],
+                additional_story_ids=[],
+                uncategorized_skill_ids=[skill_id],
+                subtopics=[], next_subtopic_id=i)
+            suggestion = self._create_question_suggestion(skill_id)
+            suggestion_services.update_question_contribution_stats_at_submission( # pylint: disable=line-too-long
+                suggestion_services.get_suggestion_by_id(
+                    suggestion.suggestion_id
+                )
+            )
+            suggestion_services.reject_suggestion(
+                suggestion.suggestion_id, self.reviewer_id, 'Rejected')
+            suggestion_services.update_question_review_stats(
+                suggestion_services.get_suggestion_by_id(
+                    suggestion.suggestion_id)
+            )
+
+        updated_question_submitter_total_stats_model = (
+            suggestion_models.QuestionSubmitterTotalContributionStatsModel
+            .get_by_id(self.author_id)
+        )
+
+        self.assertEqual(
+            len(
+                updated_question_submitter_total_stats_model
+                .recent_review_outcomes),
+            100
+        )
+
+        new_skill_id = self._create_skill()
+        new_topic_id = topic_fetchers.get_new_topic_id()
+        self.save_new_topic(
+            new_topic_id, 'topic_admin', name='New Topic Rejected',
+            abbreviated_name='topic-three-1',
+            url_fragment=self.generate_random_string(20),
+            description='Description',
+            canonical_story_ids=[],
+            additional_story_ids=[],
+            uncategorized_skill_ids=[new_skill_id],
+            subtopics=[], next_subtopic_id=102)
+        latest_suggestion = self._create_question_suggestion(new_skill_id)
+        suggestion_services.update_question_contribution_stats_at_submission(
+            suggestion_services.get_suggestion_by_id(
+                latest_suggestion.suggestion_id
+            )
+        )
+        suggestion_services.accept_suggestion(
+            latest_suggestion.suggestion_id, self.reviewer_id, 'Accepted',
+            'Accepted')
+        suggestion_services.update_question_review_stats(
+            suggestion_services.get_suggestion_by_id(
+                latest_suggestion.suggestion_id)
+        )
+
+        accepted_question_submitter_total_stats_model = (
+            suggestion_models.QuestionSubmitterTotalContributionStatsModel
+            .get_by_id(self.author_id)
+        )
+
+        self.assertEqual(
+            len(
+                accepted_question_submitter_total_stats_model
+                .recent_review_outcomes),
+            100
+        )
+
+        self.assertEqual(
+            accepted_question_submitter_total_stats_model
+            .recent_review_outcomes[99],
+            suggestion_models.REVIEW_OUTCOME_ACCEPTED
+        )
+
     def test_create_and_reject_suggestion(self) -> None:
         with self.swap(
             feedback_models.GeneralFeedbackThreadModel,
@@ -3264,6 +4327,27 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
 
         suggestion = suggestion_services.get_suggestion_by_id(suggestion_id)
         self.assertEqual(suggestion.status, suggestion_models.STATUS_ACCEPTED)
+
+    def test_auto_reject_translation_suggestions_for_content_ids(self) -> None:
+        with self.swap(
+            feedback_models.GeneralFeedbackThreadModel,
+            'generate_new_thread_id', self.mock_generate_new_thread_id):
+            self.create_translation_suggestion_associated_with_exp(
+                self.EXP_ID, self.author_id)
+        suggestion_id = self.THREAD_ID
+
+        suggestion_services.auto_reject_translation_suggestions_for_content_ids(
+            self.EXP_ID, {'content_0'})
+
+        thread_messages = feedback_services.get_messages(self.THREAD_ID)
+        last_message = thread_messages[len(thread_messages) - 1]
+        self.assertEqual(
+            last_message.text,
+            constants.OBSOLETE_TRANSLATION_SUGGESTION_REVIEW_MSG)
+        suggestion = suggestion_services.get_suggestion_by_id(suggestion_id)
+        self.assertEqual(
+            suggestion.final_reviewer_id, feconf.SUGGESTION_BOT_USER_ID)
+        self.assertEqual(suggestion.status, suggestion_models.STATUS_REJECTED)
 
     def test_delete_skill_rejects_question_suggestion(self) -> None:
         skill_id = skill_services.get_new_skill_id()
@@ -3389,39 +4473,18 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
 
         # Should return the created translation suggestion.
         filtered_translatable_suggestions = (
-            suggestion_services.get_suggestions_with_translatable_explorations(
+            suggestion_services.get_suggestions_with_editable_explorations(
                 translatable_suggestions
             )
         )
         self.assertEqual(len(filtered_translatable_suggestions), 1)
 
-        # Delete the exploration state corresponding to the translation
-        # suggestion.
-        init_state = exploration.states[exploration.init_state_name]
-        outcome_object = init_state.interaction.default_outcome
-        # Ruling out the possibility of None for mypy type checking.
-        assert outcome_object is not None
-        default_outcome_dict = outcome_object.to_dict()
-        default_outcome_dict['dest'] = 'End State'
-        exp_services.update_exploration(
-            self.owner_id, self.EXP_ID, [
-                exp_domain.ExplorationChange({
-                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                    'property_name': (
-                        exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME),
-                    'state_name': exploration.init_state_name,
-                    'new_value': default_outcome_dict
-                }),
-                exp_domain.ExplorationChange({
-                    'cmd': exp_domain.CMD_DELETE_STATE,
-                    'state_name': state_name,
-                }),
-            ], 'delete state')
+        # Disable exploration editing.
+        exp_services.set_exploration_edits_allowed(self.EXP_ID, False)
 
-        # The suggestion no longer corresponds to an existing exploration state,
-        # so it should not be returned.
+        # Should not return the created translation suggestion.
         filtered_translatable_suggestions = (
-            suggestion_services.get_suggestions_with_translatable_explorations(
+            suggestion_services.get_suggestions_with_editable_explorations(
                 translatable_suggestions
             )
         )

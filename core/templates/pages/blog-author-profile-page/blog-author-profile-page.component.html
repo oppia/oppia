@@ -2,10 +2,14 @@
   <mat-card class="oppia-blog-author-page-card oppia-page-card py-5 mb-5">
     <mat-card-header class="blog-author-page-header mr-0"
                      [ngClass]="{'d-flex flex-column align-items-center': isSmallScreenViewActive()}">
-      <img mat-card-avatar
-           [src]="authorProfilePicUrl"
-           alt="Profile image of the author"
-           class="authorProfilePic e2e-test-author-profile-photo">
+      <picture>
+        <source type="image/webp" [srcset]="authorProfilePicWebpUrl">
+        <source type="image/png" [srcset]="authorProfilePicPngUrl">
+        <img mat-card-avatar
+             [src]="authorProfilePicPngUrl"
+             class="authorProfilePic e2e-test-author-profile-photo"
+             alt="Profile image of the author">
+      </picture>
       <mat-card-title class="w-100 d-flex flex-column"
                       [ngClass]="{'align-items-center mt-2': isSmallScreenViewActive()}">
         <span class="blog-author-name e2e-test-author-name">
@@ -53,7 +57,6 @@
            class="blog-post-card e2e-test-blog-post-list">
         <oppia-blog-card class="d-flex justify-content-center e2e-test-blog-post-tile-item"
                          [blogPostSummary]="blogPostSummary"
-                         [authorProfilePicDataUrl]="blogPostSummary.authorProfilePicUrl"
                          [shownOnblogPostPage]="false">
         </oppia-blog-card>
       </div>

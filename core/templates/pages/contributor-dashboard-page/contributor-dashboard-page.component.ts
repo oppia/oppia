@@ -16,8 +16,8 @@
  * @fileoverview Component for the contributor dashboard page.
  */
 
+import { AppConstants } from 'app.constants';
 import { Component, OnInit } from '@angular/core';
-import { SafeUrl } from '@angular/platform-browser';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { LanguageUtilService } from 'domain/utilities/language-util.service';
@@ -29,7 +29,6 @@ import { LocalStorageService } from 'services/local-storage.service';
 import { TranslationLanguageService } from 'pages/exploration-editor-page/translation-tab/services/translation-language.service';
 import { TranslationTopicService } from 'pages/exploration-editor-page/translation-tab/services/translation-topic.service';
 import { UserService } from 'services/user.service';
-import { WindowRef } from 'services/contextual/window-ref.service';
 
 @Component({
   selector: 'contributor-dashboard-page',
@@ -41,7 +40,8 @@ export class ContributorDashboardPageComponent
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   defaultHeaderVisible!: boolean;
-  profilePictureDataUrl!: SafeUrl | string;
+  profilePicturePngDataUrl!: string;
+  profilePictureWebpDataUrl!: string;
   userInfoIsLoading!: boolean;
   userIsLoggedIn!: boolean;
   userIsReviewer!: boolean;
@@ -67,7 +67,6 @@ export class ContributorDashboardPageComponent
     private translationTopicService: TranslationTopicService,
     private urlInterpolationService: UrlInterpolationService,
     private userService: UserService,
-    private windowRef: WindowRef,
   ) {}
 
   onTabClick(activeTabName: string): void {
@@ -121,14 +120,6 @@ export class ContributorDashboardPageComponent
       );
   }
 
-  scrollFunction(): void {
-    if (this.windowRef.nativeWindow.pageYOffset >= 80) {
-      this.defaultHeaderVisible = false;
-    } else {
-      this.defaultHeaderVisible = true;
-    }
-  }
-
   getLanguageDescriptions(languageCodes: string[]): string[] {
     const languageDescriptions: string[] = [];
     languageCodes.forEach((languageCode) => {
@@ -151,10 +142,6 @@ export class ContributorDashboardPageComponent
 
     const prevSelectedTopicName = (
       this.localStorageService.getLastSelectedTranslationTopicName());
-
-    this.windowRef.nativeWindow.addEventListener('scroll', () => {
-      this.scrollFunction();
-    });
 
     this.userService.getUserContributionRightsDataAsync().then(
       (userContributionRights) => {
@@ -187,19 +174,24 @@ export class ContributorDashboardPageComponent
 
     this.userService.getUserInfoAsync().then((userInfo) => {
       this.userInfoIsLoading = false;
+      this.profilePictureWebpDataUrl = (
+        this.urlInterpolationService.getStaticImageUrl(
+          AppConstants.DEFAULT_PROFILE_IMAGE_WEBP_PATH));
+      this.profilePicturePngDataUrl = (
+        this.urlInterpolationService.getStaticImageUrl(
+          AppConstants.DEFAULT_PROFILE_IMAGE_PNG_PATH));
       if (userInfo.isLoggedIn()) {
         this.userIsLoggedIn = true;
         this.username = userInfo.getUsername();
+        if (this.username !== null) {
+          [this.profilePicturePngDataUrl, this.profilePictureWebpDataUrl] = (
+            this.userService.getProfileImageDataUrl(this.username));
+        }
       } else {
         this.userIsLoggedIn = false;
         this.username = '';
       }
     });
-
-    this.userService.getProfileImageDataUrlAsync().then(
-      (dataUrl) => {
-        this.profilePictureDataUrl = decodeURIComponent(dataUrl);
-      });
 
     this.contributionOpportunitiesService.getTranslatableTopicNamesAsync()
       .then((topicNames) => {
@@ -219,9 +211,9 @@ export class ContributorDashboardPageComponent
 
     this.activeTabName = 'myContributionTab';
 
-    // TODO(#13015): Remove use of unknown as a type.
     this.tabsDetails = {
       ...ContributorDashboardConstants.CONTRIBUTOR_DASHBOARD_TABS_DETAILS
+    // TODO(#13015): Remove use of unknown as a type.
     } as unknown as ContributorDashboardTabsDetails;
     this.OPPIA_AVATAR_IMAGE_URL = (
       this.urlInterpolationService.getStaticCopyrightedImageUrl(

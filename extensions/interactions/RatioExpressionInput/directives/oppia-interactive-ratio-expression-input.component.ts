@@ -121,7 +121,6 @@ export class InteractiveRatioExpressionInputComponent
       }
       this.errorMessageI18nKey = '';
       this.isValid = true;
-      // TODO(#13015): Remove use of unknown as a type.
       this.currentInteractionService.onSubmit(
         ratioExpression.getComponents(),
         this.ratioExpressionInputRulesService);
@@ -139,6 +138,7 @@ export class InteractiveRatioExpressionInputComponent
 
   answerValueChanged(): void {
     this.answerChanged.next(this.answer);
+    this.currentInteractionService.updateCurrentAnswer(this.answer);
   }
 
   ngOnDestroy(): void {

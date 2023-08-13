@@ -107,16 +107,17 @@ export class MultipleChoiceInputValidationService {
           } else {
             warningsList.push({
               type: AppConstants.WARNING_TYPES.CRITICAL,
-              message: 'Please ensure rule ' + String(j + 1) +
-                ' in group ' + String(i + 1) + ' is not equaling the ' +
-                'same multiple choice option as another rule.'
+              message: 'Please ensure learner answer ' + String(j + 1) +
+              ' in Oppia response ' + String(i + 1) + ' is not equaling ' +
+              'the same multiple choice option as another learner answer.'
             });
           }
           if (rules[j].inputs.x >= numChoices) {
             warningsList.push({
               type: AppConstants.WARNING_TYPES.CRITICAL,
-              message: 'Please ensure rule ' + String(j + 1) +
-                ' in group ' + String(i + 1) + ' refers to a valid choice.'
+              message: 'Please ensure learner answer ' + String(j + 1) +
+              ' in Oppia response ' + String(i + 1) +
+              ' refers to a valid choice.'
             });
           }
         }

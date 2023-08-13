@@ -587,7 +587,8 @@ title: Old Title
 """) % (
     exp_domain.Exploration.CURRENT_EXP_SCHEMA_VERSION,
     feconf.DEFAULT_INIT_STATE_NAME,
-    feconf.CURRENT_STATE_SCHEMA_VERSION)
+    feconf.CURRENT_STATE_SCHEMA_VERSION
+)
 
     STATES_AT_V41 = {
         'Introduction': {
@@ -755,7 +756,8 @@ title: Old Title
         self.assertEqual(
             exploration.states_schema_version,
             feconf.CURRENT_STATE_SCHEMA_VERSION)
-        self.assertEqual(exploration.to_yaml(), self.UPGRADED_EXP_YAML)
+        self.assertEqual(
+            exploration.to_yaml(), '%sversion: 1\n' % self.UPGRADED_EXP_YAML)
 
     def test_does_not_convert_up_to_date_exploration(self) -> None:
         exploration = exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
@@ -952,7 +954,8 @@ title: Old Title
         # The reversion after migration should still be an up-to-date
         # exploration. exp_fetchers.get_exploration_by_id will automatically
         # keep it up-to-date.
-        self.assertEqual(exploration.to_yaml(), self.UPGRADED_EXP_YAML)
+        self.assertEqual(
+            exploration.to_yaml(), '%sversion: 5\n' % self.UPGRADED_EXP_YAML)
 
         # The exploration should be valid after reversion.
         exploration.validate(strict=True)
@@ -1007,5 +1010,6 @@ title: Old Title
             exploration_model, run_conversion=False)
 
         # This exploration should be both up-to-date and valid.
-        self.assertEqual(exploration.to_yaml(), self.UPGRADED_EXP_YAML)
+        self.assertEqual(
+            exploration.to_yaml(), '%sversion: 6\n' % self.UPGRADED_EXP_YAML)
         exploration.validate()

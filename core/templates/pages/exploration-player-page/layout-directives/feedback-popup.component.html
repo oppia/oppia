@@ -32,7 +32,7 @@
     </div>
   </div>
 
-  <div *ngIf="feedbackSubmitted">
+  <div aria-live="polite" *ngIf="feedbackSubmitted">
     {{ 'I18N_PLAYER_THANK_FEEDBACK' | translate }}
   </div>
 </div>
@@ -71,5 +71,12 @@
   .oppia-checkbox {
     font-size: 0.9em;
     margin: 12px 0 4px 0;
+  }
+  .btn:disabled {
+   color: white;
+  }
+  .btn:enabled {
+  background-color: #218838;
+  color: white;
   }
 </style>

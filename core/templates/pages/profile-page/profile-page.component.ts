@@ -22,7 +22,6 @@ import { AppConstants } from 'app.constants';
 import { RatingComputationService } from 'components/ratings/rating-computation/rating-computation.service';
 import { LearnerExplorationSummary } from 'domain/summary/learner-exploration-summary.model';
 import { UserProfile } from 'domain/user/user-profile.model';
-import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { LoggerService } from 'services/contextual/logger.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { DateTimeFormatService } from 'services/date-time-format.service';
@@ -51,7 +50,6 @@ interface UserDisplayedStatistic {
   styleUrls: ['./profile-page.component.css']
 })
 export class ProfilePageComponent {
-  DEFAULT_PROFILE_PICTURE_URL: string = '';
   username: ViewedProfileUsername = {
     title: '',
     value: '',
@@ -83,7 +81,8 @@ export class ProfilePageComponent {
   profileIsOfCurrentUser: boolean = false;
   explorationsOnPage: LearnerExplorationSummary[] = [];
   subjectInterests: string[] = [];
-  profilePictureDataUrl: string = '';
+  profilePicturePngDataUrl!: string;
+  profilePictureWebpDataUrl!: string;
   preferencesUrl = (
     '/' + AppConstants.PAGES_REGISTERED_WITH_FRONTEND.PREFERENCES.ROUTE);
 
@@ -93,14 +92,11 @@ export class ProfilePageComponent {
     private loggerService: LoggerService,
     private profilePageBackendApiService: ProfilePageBackendApiService,
     private ratingComputationService: RatingComputationService,
-    private urlInterpolationService: UrlInterpolationService,
     private userService: UserService,
     private windowRef: WindowRef,
   ) { }
 
   ngOnInit(): void {
-    this.DEFAULT_PROFILE_PICTURE_URL = this.urlInterpolationService
-      .getStaticImageUrl('/general/no_profile_picture.png');
     this.loaderService.showLoadingScreen('Loading');
     this.profilePageBackendApiService.fetchProfileDataAsync()
       .then((data) => {
@@ -172,8 +168,9 @@ export class ProfilePageComponent {
         this.numUserPortfolioExplorations = data.editedExpSummaries.length;
         this.subjectInterests = data.subjectInterests;
         this.firstContributionMsec = data.firstContributionMsec;
-        this.profilePictureDataUrl = decodeURIComponent((
-          data.profilePictureDataUrl || this.DEFAULT_PROFILE_PICTURE_URL));
+
+        [this.profilePicturePngDataUrl, this.profilePictureWebpDataUrl] = (
+          this.userService.getProfileImageDataUrl(this.username.value));
         this.loaderService.hideLoadingScreen();
       });
   }

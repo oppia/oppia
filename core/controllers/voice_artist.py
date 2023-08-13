@@ -90,7 +90,11 @@ class AudioUploadHandler(
 
     @acl_decorators.can_voiceover_exploration
     def post(self, exploration_id: str) -> None:
-        """Saves an audio file uploaded by a content creator."""
+        """Saves an audio file uploaded by a content creator.
+
+        Args:
+            exploration_id: str. The exploration ID.
+        """
         assert self.normalized_payload is not None
         assert self.normalized_request is not None
 
@@ -145,7 +149,10 @@ class StartedTranslationTutorialEventHandler(
 
     @acl_decorators.can_play_exploration_as_logged_in_user
     def post(self, unused_exploration_id: str) -> None:
-        """Handles POST requests."""
+        """Records that the user has started the state translation tutorial.
+
+        unused_exploration_id: str. The unused exploration ID.
+        """
         assert self.user_id is not None
         user_services.record_user_started_state_translation_tutorial(
             self.user_id)
@@ -221,12 +228,19 @@ class VoiceArtistManagementHandler(
 
     @acl_decorators.can_add_voice_artist
     def post(self, unused_entity_type: str, entity_id: str) -> None:
-        """Handles Post requests."""
+        """Assigns a voice artist role.
+
+        Args:
+            unused_entity_type: str. The unused entity type.
+            entity_id: str. The entity ID.
+        """
         assert self.normalized_payload is not None
         voice_artist = self.normalized_payload['username']
         voice_artist_id = user_services.get_user_id_from_username(
             voice_artist)
-        assert voice_artist_id is not None
+        if voice_artist_id is None:
+            raise self.InvalidInputException(
+                'Sorry, we could not find the specified user.')
         rights_manager.assign_role_for_exploration(
             self.user, entity_id, voice_artist_id,
             rights_domain.ROLE_VOICE_ARTIST)
@@ -235,7 +249,12 @@ class VoiceArtistManagementHandler(
 
     @acl_decorators.can_remove_voice_artist
     def delete(self, unused_entity_type: str, entity_id: str) -> None:
-        """Handles Delete requests."""
+        """Removes the voice artist role from a user.
+
+        Args:
+            unused_entity_type: str. The unused entity type.
+            entity_id: str. The entity ID.
+        """
         assert self.normalized_request is not None
         voice_artist = self.normalized_request['voice_artist']
         voice_artist_id = user_services.get_user_id_from_username(

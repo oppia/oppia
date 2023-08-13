@@ -15,41 +15,41 @@
               </div>
             </div>
           </a>
-          <img *ngIf="profileIsOfCurrentUser"
-               [src]="profilePictureDataUrl"
-               class="oppia-profile-picture-fullsize e2e-test-profile-current-user-photo"
-               alt="">
-          <img *ngIf="!profileIsOfCurrentUser"
-               [src]="profilePictureDataUrl"
-               class="oppia-profile-picture-fullsize e2e-test-profile-other-user-photo"
-               alt="">
+          <picture>
+            <source type="image/webp" [srcset]="profilePictureWebpDataUrl">
+            <source type="image/png" [srcset]="profilePicturePngDataUrl">
+            <img [src]="profilePicturePngDataUrl"
+                 class="oppia-profile-picture-fullsize e2e-test-profile-user-photo"
+                 alt="User profile picture">
+          </picture>
         </div>
       </div>
 
       <div class="oppia-profile-text">
-        <h2 class="oppia-profile-username-large-screen">
+        <h1 class="oppia-profile-username-large-screen">
           <span placement="right"
                 [ngbPopover]="usernameIsLong ? username.helpText : undefined"
                 triggers="mouseenter:mouseleave">
             <strong>{{ username.value | truncate:16 }}</strong>
           </span>
-        </h2>
-        <h2 class="oppia-profile-username-small-screen">
+        </h1>
+        <h1 class="oppia-profile-username-small-screen">
           <span placement="right"
                 [ngbPopover]="username.helpText"
                 triggers="mouseenter:mouseleave">
             <strong>{{ username.value | truncate:11 }}</strong>
           </span>
-        </h2>
+        </h1>
 
         <p class="oppia-profile-first-contributed"
+           tabindex="0"
            *ngIf="firstContributionMsec">
           Contributing since: {{ getLocaleDateString(firstContributionMsec) }}
         </p>
       </div>
     </div>
 
-    <div class="oppia-profile-user-stat-container-large-screen">
+    <div class="oppia-profile-user-stat-container-large-screen" tabindex="0">
       <div *ngFor="let stat of userDisplayedStatistics" class="oppia-profile-user-stat">
         <div placement="right"
              [ngbPopover]="stat.helpText"
@@ -62,14 +62,14 @@
       </div>
     </div>
 
-    <p class="oppia-profile-user-bio e2e-test-profile-bio">
+    <p class="oppia-profile-user-bio e2e-test-profile-bio" tabindex="0">
       <span *ngIf="userBio" class="oppia-user-bio-text">{{ userBio }}</span>
       <span *ngIf="!userBio">
         <em>This user has not supplied a bio yet.</em>
       </span>
     </p>
 
-    <p class="oppia-profile-subject-interest-container">
+    <p class="oppia-profile-subject-interest-container" tabindex="0">
       Interests:
       <span class="oppia-profile-subject-interest-blocks" *ngIf="subjectInterests.length > 0">
         <span *ngFor="let interest of subjectInterests; index as index">
@@ -85,7 +85,7 @@
     </p>
 
     <hr class="oppia-profile-stat-container-line-small-screen">
-    <div class="oppia-profile-user-stat-container-small-screen">
+    <div class="oppia-profile-user-stat-container-small-screen" tabindex="0">
       <div *ngFor="let stat of userDisplayedStatistics" class="oppia-profile-user-stat">
         <div placement="right"
              [ngbPopover]="stat.helpText"

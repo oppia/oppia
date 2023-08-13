@@ -6,7 +6,13 @@
   <[ $ctrl.statusMessage ]>
 </div>
 <br>
-<div class="oppia-contributor-dashboard-admin-page-tabs-container">
+
+<div ng-if="$ctrl.isNewUiEnabled">
+  <contributor-admin-dashboard-page></contributor-admin-dashboard-page>
+</div>
+
+<div class="oppia-contributor-dashboard-admin-page-tabs-container"
+     ng-if="!$ctrl.isNewUiEnabled">
   <md-card class="oppia-page-card oppia-long-text e2e-test-view-contribution-rights-form">
     <form class="form-horizontal" ng-submit="$ctrl.submitViewContributorUsersForm($ctrl.formData.viewContributionReviewers)">
       <legend class="text-center">View Contributor Dashboard Users</legend>
@@ -180,7 +186,7 @@
     </form>
   </md-card>
 
-  <md-card class="oppia-page-card oppia-long-text">
+  <md-card class="oppia-page-card oppia-long-text" ng-if="$ctrl.UserIsTranslationAdmin">
     <form class="form-horizontal"
           ng-submit="$ctrl.submitViewTranslationContributionStatsForm($ctrl.formData.viewTranslationContributionStats)">
       <legend class="text-center">View Translation Contribution Stats</legend>

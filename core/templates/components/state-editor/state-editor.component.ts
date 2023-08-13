@@ -38,7 +38,7 @@ import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 import { Solution } from 'domain/exploration/SolutionObjectFactory';
 import { Outcome } from 'domain/exploration/OutcomeObjectFactory';
 import { InteractionCustomizationArgs } from 'interactions/customization-args-defs';
-import { Hint } from 'domain/exploration/HintObjectFactory';
+import { Hint } from 'domain/exploration/hint-object.model';
 import { InteractionSpecsKey } from 'pages/interaction-specs.constants';
 import { AnswerGroup } from 'domain/exploration/AnswerGroupObjectFactory';
 

@@ -96,8 +96,7 @@ describe('Skill unassignment modal', () => {
     fixture = TestBed.createComponent(UnassignSkillFromTopicsModalComponent);
     componentInstance = fixture.componentInstance;
     ngbActiveModal = TestBed.inject(NgbActiveModal);
-    ngbActiveModal = (ngbActiveModal as unknown) as
-      jasmine.SpyObj<NgbActiveModal>;
+    ngbActiveModal = ngbActiveModal as jasmine.SpyObj<NgbActiveModal>;
     urlInterpolationService = TestBed.inject(UrlInterpolationService);
   });
 

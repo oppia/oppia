@@ -43,7 +43,8 @@ ALLOWED_ENTITY_NAMES: List[str] = [
     feconf.ENTITY_TYPE_TOPIC,
     feconf.ENTITY_TYPE_SKILL,
     feconf.ENTITY_TYPE_STORY,
-    feconf.ENTITY_TYPE_QUESTION
+    feconf.ENTITY_TYPE_QUESTION,
+    feconf.ENTITY_TYPE_USER
 ]
 ALLOWED_SUGGESTION_IMAGE_CONTEXTS: List[str] = [
     feconf.IMAGE_CONTEXT_QUESTION_SUGGESTIONS,
@@ -233,7 +234,7 @@ class GcsFileSystem(GeneralFileSystem):
             filepath: str. The path to the relevant file within the entity's
                 assets folder.
         """
-        source_file_url = ('%s/%s' % (source_assets_path, filepath))
+        source_file_url = '%s/%s' % (source_assets_path, filepath)
         storage_services.copy(
             self._bucket_name, source_file_url, self._get_gcs_file_url(filepath)
         )

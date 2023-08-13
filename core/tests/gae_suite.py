@@ -56,7 +56,19 @@ _PARSER.add_argument(
 def create_test_suites(
     test_target: Optional[str] = None
 ) -> List[unittest.TestSuite]:
-    """Creates test suites. If test_dir is None, runs all tests."""
+    """Creates test suites. If test_target is None, runs all tests.
+
+    Args:
+        test_target: str. The name of the test script.
+            Default to None if not specified.
+
+    Returns:
+        list. A list of tests within the test script.
+
+    Raises:
+        Exception. The delimeter in the test_target should be a dot (.)
+    """
+
     if test_target and '/' in test_target:
         raise Exception('The delimiter in test_target should be a dot (.)')
 
@@ -70,14 +82,20 @@ def create_test_suites(
             top_level_dir=CURR_DIR
         )
     )
-
     return [master_test_suite]
 
 
 def main(args: Optional[List[str]] = None) -> None:
-    """Runs the tests."""
-    parsed_args = _PARSER.parse_args(args=args)
+    """Runs the tests.
 
+    Args:
+        args: list. A list of arguments to parse.
+
+    Raises:
+        Exception. Directory invalid_path does not exist.
+    """
+
+    parsed_args = _PARSER.parse_args(args=args)
     for directory in common.DIRS_TO_ADD_TO_SYS_PATH:
         if not os.path.exists(os.path.dirname(directory)):
             raise Exception('Directory %s does not exist.' % directory)
@@ -99,23 +117,21 @@ def main(args: Optional[List[str]] = None) -> None:
     import dev_appserver
     dev_appserver.fix_sys_path()
 
-    # In the process of migrating Oppia from Python 2 to Python 3, we are using
-    # both google app engine apis that are contained in the Google Cloud SDK
-    # folder, and also google cloud apis that are installed in our
+    # We are using both google app engine apis that are contained in the Google
+    # Cloud SDK folder, and also google cloud apis that are installed in our
     # 'third_party/python_libs' directory. Therefore, there is a confusion of
     # where the google module is located and which google module to import from.
     # The following code ensures that the google module that python looks at
     # imports from the 'third_party/python_libs' folder so that the imports are
     # correct.
-    if 'google' in sys.modules:
-        google_path = os.path.join(THIRD_PARTY_PYTHON_LIBS_DIR, 'google')
-        google_module = sys.modules['google']
-        # TODO(#15913): Here we use MyPy ignore because MyPy considering
-        # '__path__' attribute is not defined on Module type and this is
-        # because internally Module type was pointed wrongly, but this can
-        # be fixed once we upgraded our library.
-        google_module.__path__ = [google_path, THIRD_PARTY_PYTHON_LIBS_DIR]  # type: ignore[attr-defined]
-        google_module.__file__ = os.path.join(google_path, '__init__.py')
+    google_path = os.path.join(THIRD_PARTY_PYTHON_LIBS_DIR, 'google')
+    google_module = sys.modules['google']
+    # TODO(#15913): Here we use MyPy ignore because MyPy considering
+    # '__path__' attribute is not defined on Module type and this is
+    # because internally Module type was pointed wrongly, but this can
+    # be fixed once we upgraded our library.
+    google_module.__path__ = [google_path, THIRD_PARTY_PYTHON_LIBS_DIR]  # type: ignore[attr-defined]
+    google_module.__file__ = os.path.join(google_path, '__init__.py')
 
     suites = create_test_suites(
         test_target=parsed_args.test_target,

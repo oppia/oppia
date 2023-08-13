@@ -233,7 +233,7 @@ export class TranslationModalComponent {
     this.computePanelOverflowState();
   }
 
-  ngAfterViewChecked(): void {
+  ngAfterContentChecked(): void {
     this.computeTranslationEditorOverflowState();
   }
 
@@ -269,6 +269,9 @@ export class TranslationModalComponent {
 
   close(): void {
     this.activeModal.close();
+
+    // Reset copyMode to the default value and avoid console errors.
+    this.ckEditorCopyContentService.copyModeActive = false;
   }
 
   getHtmlSchema(): HTMLSchema {
@@ -383,10 +386,15 @@ export class TranslationModalComponent {
 
   getFormattedContentType(
       contentType: string, interactionId: string | undefined): string {
-    if (contentType === 'interaction') {
-      return interactionId + ' interaction';
-    } else if (contentType === 'rule') {
-      return 'input rule';
+    switch (contentType) {
+      case 'interaction':
+        return interactionId + ' interaction';
+      case 'ca':
+        // Customization_arg. This is typically a button label, input
+        // placeholder text, or a multiple choice option.
+        return 'label';
+      case 'rule':
+        return 'input rule';
     }
     return contentType;
   }

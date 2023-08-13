@@ -20,7 +20,6 @@
 // question-update.service.ts is upgraded to Angular 8.
 import { AnswerGroupObjectFactory } from
   'domain/exploration/AnswerGroupObjectFactory';
-import { HintObjectFactory } from 'domain/exploration/HintObjectFactory';
 import { OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory';
 import { ParamChangeObjectFactory } from
@@ -65,8 +64,6 @@ describe('Question update service', function() {
     $provide.value(
       'AnswerGroupObjectFactory', new AnswerGroupObjectFactory(
         new OutcomeObjectFactory()));
-    $provide.value(
-      'HintObjectFactory', new HintObjectFactory());
     $provide.value(
       'OutcomeObjectFactory', new OutcomeObjectFactory());
     $provide.value('ParamChangeObjectFactory', new ParamChangeObjectFactory());
@@ -257,7 +254,7 @@ describe('Question update service', function() {
       .toBe(undefined);
 
     QuestionUpdateService.setQuestionInapplicableSkillMisconceptionIds(
-      sampleQuestion, 'id1');
+      sampleQuestion, ['id1']);
 
     expect(sampleQuestion.getInapplicableSkillMisconceptionIds())
       .toEqual(['id1']);

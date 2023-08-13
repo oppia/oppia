@@ -24,6 +24,10 @@ from core.domain import config_domain
 
 from typing import Optional
 
+# TODO(#17246): Currently, the classroom data is stored in the config model and
+# we are planning to migrate the storage into a new Classroom model. After the
+# successful migration, this file should be deleted.
+
 
 def get_classroom_url_fragment_for_topic_id(topic_id: str) -> str:
     """Returns the classroom url fragment for the provided topic id.

@@ -152,7 +152,7 @@ def get_entity_translation(
         language_code: str. The language code for the entity.
 
     Returns:
-        EntityTranslation. An instance of Entitytranslations.
+        EntityTranslation. An instance of entity translations.
     """
     entity_translation_model = (
         translation_models.EntityTranslationsModel.get_model(

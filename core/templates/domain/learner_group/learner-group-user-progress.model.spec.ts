@@ -41,7 +41,12 @@ describe('Learner Group User Progress', () => {
       outline: 'Outline',
       exploration_id: null,
       outline_is_finalized: false,
-      thumbnail_bg_color: '#a33f40'
+      thumbnail_bg_color: '#a33f40',
+      status: 'Published',
+      planned_publication_date_msecs: 100,
+      last_modified_msecs: 100,
+      first_publication_date_msecs: 200,
+      unpublishing_reason: null
     };
 
     const sampleStorySummaryBackendDict = {
@@ -63,7 +68,6 @@ describe('Learner Group User Progress', () => {
     let sampleLearnerGroupUserProgDict = {
       username: 'user1',
       progress_sharing_is_turned_on: true,
-      profile_picture_data_url: 'picture',
       stories_progress: [sampleStorySummaryBackendDict],
       subtopic_pages_progress: [sampleLearnerGroupSubtopicSummaryDict]
     };
@@ -75,7 +79,6 @@ describe('Learner Group User Progress', () => {
 
     expect(sampleLearnerGroupUserProg.username).toEqual('user1');
     expect(sampleLearnerGroupUserProg.isProgressSharingTurnedOn).toEqual(true);
-    expect(sampleLearnerGroupUserProg.profilePictureDataUrl).toEqual('picture');
     expect(sampleLearnerGroupUserProg.storiesProgress.length).toEqual(1);
     expect(sampleLearnerGroupUserProg.subtopicsProgress.length).toEqual(1);
 

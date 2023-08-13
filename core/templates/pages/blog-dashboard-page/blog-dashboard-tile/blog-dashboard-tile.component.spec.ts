@@ -124,7 +124,8 @@ describe('Blog Dashboard Tile Component', () => {
       url_fragment: 'title',
       // This throws "Value 'undefined' is not assignable to parameter of type
       // 'String'." We need to suppress this error because of the need to
-      // test validations.
+      // test validations. This throws an error because last_updated is
+      // undefined.
       // @ts-ignore
       last_updated: undefined,
       published_on: '11/21/2014',

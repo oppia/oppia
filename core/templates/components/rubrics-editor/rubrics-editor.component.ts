@@ -54,7 +54,7 @@ interface SkillDescriptionStatusValuesInterface {
   templateUrl: './rubrics-editor.component.html'
 })
 export class RubricsEditorComponent {
-  @Output() saveRubric: EventEmitter<unknown> = (
+  @Output() saveRubric: EventEmitter<RubricData> = (
     new EventEmitter());
 
   // These properties below are initialized using Angular lifecycle hooks

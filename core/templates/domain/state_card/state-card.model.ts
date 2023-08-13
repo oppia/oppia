@@ -27,15 +27,16 @@ import { BindableVoiceovers, RecordedVoiceovers } from
   'domain/exploration/recorded-voiceovers.model';
 import { InteractionCustomizationArgs } from
   'interactions/customization-args-defs';
-import { Hint } from 'domain/exploration/HintObjectFactory';
+import { Hint } from 'domain/exploration/hint-object.model';
 import { Solution } from 'domain/exploration/SolutionObjectFactory';
 
 import { InteractionSpecsConstants, InteractionSpecsKey } from 'pages/interaction-specs.constants';
 import { EntityTranslation } from 'domain/translation/EntityTranslationObjectFactory';
 import { TranslatedContent } from 'domain/exploration/TranslatedContentObjectFactory';
+import { InteractionAnswer } from 'interactions/answer-defs';
 
 export interface InputResponsePair {
-  learnerInput: string;
+  learnerInput: string | { answerDetails: string };
   // 'oppiaResponse' is null when the response for the input has
   // not been received yet.
   oppiaResponse: string | null;
@@ -68,6 +69,27 @@ export class StateCard {
     this._contentId = contentId;
     this._completed = false;
     this.audioTranslationLanguageService = audioTranslationLanguageService;
+  }
+
+  toggleSubmitClicked(value: boolean): void {
+    if (this.getInteraction().id === 'Continue') {
+      return;
+    }
+    this.getInteraction().submitClicked = value;
+  }
+
+  updateCurrentAnswer(value: InteractionAnswer | null): void {
+    this.getInteraction().currentAnswer = value;
+    this.toggleSubmitClicked(false);
+  }
+
+  showNoResponseError(): boolean {
+    const currentAnswer = this.getInteraction().currentAnswer;
+    const notNumber = !(typeof currentAnswer === 'number');
+    const isEmptyArray = (
+      Array.isArray(currentAnswer) && currentAnswer.length === 0);
+    const noResponse = notNumber && (isEmptyArray || !currentAnswer);
+    return noResponse && this.getInteraction().submitClicked;
   }
 
   // Restore everything immutably so that Angular can detect changes.
@@ -215,14 +237,13 @@ export class StateCard {
   }
 
   // This will return null when there is no input response pair.
-  getLastAnswer(): string | null {
+  getLastAnswer(): string | null | { answerDetails: string } {
     const lastInputResponsePair = this.getLastInputResponsePair();
     if (lastInputResponsePair === null) {
       return null;
     }
     return lastInputResponsePair.learnerInput;
   }
-
 
   // This will return null when no previous response exists.
   getLastOppiaResponse(): string | null {
@@ -281,7 +302,7 @@ export class StateCard {
   swapContentsWithTranslation(entityTranslation: EntityTranslation): void {
     let writtenTranslation = entityTranslation.getWrittenTranslation(
       this._contentId) as TranslatedContent;
-    if (writtenTranslation && !writtenTranslation.needsUpdate) {
+    if (writtenTranslation) {
       this.contentHtml = writtenTranslation.translation as string;
     }
     this._interaction.swapContentsWithTranslation(entityTranslation);

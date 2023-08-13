@@ -57,6 +57,10 @@ var elementToBeClickable = async function(element, errorMessage) {
     timeout: DEFAULT_WAIT_TIME_MSECS,
     timeoutMsg: errorMessage + '\n' + new Error().stack + '\n'
   });
+  var enabled = await element.isEnabled();
+  if (!enabled) {
+    throw new Error('Element ' + element + ' is not enabled.');
+  }
 };
 
 /**
@@ -74,14 +78,20 @@ var invisibilityOf = async function(element, errorMessage) {
 
 /**
  * Consider adding this method after each browser.url() call.
+ * However, note that it does not guarantee that the page is fully loaded. It
+ * is advised to add additional page-specific checks to each page's get()
+ * method that verify the visibility of elements that are guaranteed to be
+ * on that page.
  */
 var pageToFullyLoad = async function() {
   var loadingMessage = await $('.e2e-test-loading-fullpage');
+  // Wait for the message to disappear.
   await loadingMessage.waitForDisplayed({
     timeout: 15000,
     reverse: true,
-    timeoutMsg: 'Pages takes more than 15 sec to load\n' +
-    new Error().stack + '\n'
+    timeoutMsg: (
+      'Loading message takes more than 15 sec to disappear\n' +
+      new Error().stack + '\n')
   });
 };
 

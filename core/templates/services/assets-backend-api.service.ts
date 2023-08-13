@@ -42,6 +42,8 @@ interface SaveImageResponse {
   providedIn: 'root'
 })
 export class AssetsBackendApiService {
+  public readonly profileImagePngUrlTemplate: string;
+  public readonly profileImageWebpUrlTemplate: string;
   private readonly downloadUrlTemplate: string;
 
   /** List of audio files that have been requested but have not returned. */
@@ -64,6 +66,10 @@ export class AssetsBackendApiService {
     }
     this.downloadUrlTemplate = (
       urlPrefix + '/<entity_type>/<entity_id>/assets/<asset_type>/<filename>');
+    this.profileImagePngUrlTemplate = (
+      urlPrefix + '/user/<username>/assets/profile_picture.png');
+    this.profileImageWebpUrlTemplate = (
+      urlPrefix + '/user/<username>/assets/profile_picture.webp');
   }
 
   static get EMULATOR_MODE(): boolean {
@@ -105,6 +111,10 @@ export class AssetsBackendApiService {
     try {
       return await this.http.post<SaveAudioResponse>(
         this.getAudioUploadUrl(explorationId), form).toPromise();
+    // We use unknown type because we are unsure of the type of error
+    // that was thrown. Since the catch block cannot identify the
+    // specific type of error, we are unable to further optimise the
+    // code by introducing more types of errors.
     } catch (error: unknown) {
       if (error instanceof HttpErrorResponse) {
         return Promise.reject(error.error);
@@ -113,7 +123,7 @@ export class AssetsBackendApiService {
     }
   }
 
-  async saveMathExpresionImage(
+  async saveMathExpressionImage(
       resampledFile: Blob, filename: string, entityType: string,
       entityId: string): Promise<SaveImageResponse> {
     const form = new FormData();
@@ -124,6 +134,10 @@ export class AssetsBackendApiService {
     try {
       return await this.http.post<SaveImageResponse>(
         this.getImageUploadUrl(entityType, entityId), form).toPromise();
+    // We use unknown type because we are unsure of the type of error
+    // that was thrown. Since the catch block cannot identify the
+    // specific type of error, we are unable to further optimise the
+    // code by introducing more types of errors.
     } catch (error: unknown) {
       if (error instanceof HttpErrorResponse) {
         return Promise.reject(error.error);

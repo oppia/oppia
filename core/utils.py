@@ -22,6 +22,7 @@ import collections
 import datetime
 import hashlib
 import imghdr
+import io
 import itertools
 import json
 import os
@@ -38,6 +39,7 @@ import zlib
 from core import feconf
 from core.constants import constants
 
+from PIL import Image
 import certifi
 import yaml
 
@@ -394,28 +396,47 @@ def get_url_scheme(url: str) -> str:
     return urllib.parse.urlparse(url).scheme
 
 
-def convert_png_data_url_to_binary(image_data_url: str) -> bytes:
-    """Converts a PNG base64 data URL to a PNG binary data.
+def convert_png_binary_to_webp_binary(png_binary: bytes) -> bytes:
+    """Convert png binary to webp binary.
+
+    Args:
+        png_binary: bytes. The binary content of png.
+
+    Returns:
+        bytes. The binary content of webp.
+    """
+    with io.BytesIO() as output:
+        image = Image.open(io.BytesIO(png_binary)).convert('RGB')
+        image.save(output, 'webp')
+        return output.getvalue()
+
+
+def convert_data_url_to_binary(
+    image_data_url: str, file_type: str
+) -> bytes:
+    """Converts a PNG or WEBP base64 data URL to a PNG binary data.
 
     Args:
         image_data_url: str. A string that is to be interpreted as a PNG
-            data URL.
+            or WEBP data URL.
+        file_type: str. Type of the data url, webp or png.
 
     Returns:
-        bytes. Binary content of the PNG created from the data URL.
+        bytes. Binary content of the PNG or WEBP created from the data URL.
 
     Raises:
         Exception. The given string does not represent a PNG data URL.
     """
-    if image_data_url.startswith(PNG_DATA_URL_PREFIX):
+    if image_data_url.startswith(DATA_URL_FORMAT_PREFIX % file_type):
         return base64.b64decode(
             urllib.parse.unquote(
-                image_data_url[len(PNG_DATA_URL_PREFIX):]))
+                image_data_url[len(DATA_URL_FORMAT_PREFIX % file_type):]))
     else:
-        raise Exception('The given string does not represent a PNG data URL.')
+        raise Exception(
+            'The given string does not represent a %s data URL.' % file_type)
 
 
-def convert_png_or_webp_binary_to_data_url(
+def convert_image_binary_to_data_url(
     content: bytes, file_type: str
 ) -> str:
     """Converts a PNG or WEBP image string (represented by 'content')
@@ -468,7 +489,7 @@ def convert_png_to_data_url(filepath: str) -> str:
         str. Data url created from the filepath of the PNG.
     """
     file_contents = get_file_contents(filepath, raw_bytes=True, mode='rb')
-    return convert_png_or_webp_binary_to_data_url(file_contents, 'png')
+    return convert_image_binary_to_data_url(file_contents, 'png')
 
 
 def camelcase_to_hyphenated(camelcase_str: str) -> str:
@@ -600,6 +621,20 @@ def get_time_in_millisecs(datetime_obj: datetime.datetime) -> float:
     """
     msecs = time.mktime(datetime_obj.timetuple()) * 1000.0
     return msecs + (datetime_obj.microsecond / 1000.0)
+
+
+def convert_millisecs_time_to_datetime_object(
+        date_time_msecs: float) -> datetime.datetime:
+    """Returns the datetime object from the given date time in milliseconds.
+
+    Args:
+        date_time_msecs: float. Date time represented in milliseconds.
+
+    Returns:
+        datetime. An object of type datetime.datetime corresponding to
+        the given milliseconds.
+    """
+    return datetime.datetime.fromtimestamp(date_time_msecs / 1000.0)
 
 
 def convert_naive_datetime_to_string(datetime_obj: datetime.datetime) -> str:
@@ -1403,8 +1438,6 @@ def url_open(
     Returns:
         urlopen. The 'urlopen' object.
     """
-    # TODO(#12912): Remove pylint disable after the arg-name-for-non-keyword-arg
-    # check is refactored.
     context = ssl.create_default_context(cafile=certifi.where())
     return urllib.request.urlopen(source_url, context=context)
 

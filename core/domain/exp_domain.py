@@ -1234,6 +1234,7 @@ class ExplorationDict(TypedDict):
     correctness_feedback_enabled: bool
     edits_allowed: bool
     next_content_id_index: int
+    version: int
 
 
 class VersionedExplorationDict(ExplorationDict):
@@ -1266,7 +1267,6 @@ class VersionedExplorationStatesDict(TypedDict):
 class SerializableExplorationDict(ExplorationDict):
     """Dictionary representing the serializable Exploration object."""
 
-    version: int
     created_on: str
     last_updated: str
 
@@ -5699,7 +5699,8 @@ class Exploration(translation_domain.BaseTranslatableObject):
             'next_content_id_index': self.next_content_id_index,
             'edits_allowed': self.edits_allowed,
             'states': {state_name: state.to_dict()
-                       for (state_name, state) in self.states.items()}
+                       for (state_name, state) in self.states.items()},
+            'version': self.version
         })
         exploration_dict_deepcopy = copy.deepcopy(exploration_dict)
         return exploration_dict_deepcopy
@@ -6468,10 +6469,8 @@ class ExplorationChangeMergeVerifier:
                         change_is_mergeable = True
             elif change.cmd == CMD_EDIT_EXPLORATION_PROPERTY:
                 change_is_mergeable = (
-                    exp_at_change_list_version.__getattribute__(
-                        change.property_name) ==
-                    current_exploration.__getattribute__(
-                        change.property_name))
+                    getattr(exp_at_change_list_version, change.property_name)
+                    == getattr(current_exploration, change.property_name))
 
             if change_is_mergeable:
                 changes_are_mergeable = True

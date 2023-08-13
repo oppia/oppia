@@ -752,7 +752,7 @@ describe('SvgEditor', () => {
         return '<path></path>';
       };
       var customToSVG = component.createCustomToSVG(
-      mocktoSVG as unknown as () => string, 'path', 'group1', component);
+        mocktoSVG as () => string, 'path', 'group1', component);
       expect(customToSVG()).toBe('<path id="group1"/>');
       expect(component.diagramStatus).toBe('editing');
     })));
@@ -773,7 +773,7 @@ describe('SvgEditor', () => {
         return '<path></path>';
       };
       var customToSVG = component.createCustomToSVG(
-      mocktoSVG as unknown as () => string, 'path', 'group1', component);
+        mocktoSVG as () => string, 'path', 'group1', component);
       expect(customToSVG()).toBe('<path id="group1"/>');
       expect(component.diagramStatus).toBe('editing');
     })));

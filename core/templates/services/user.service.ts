@@ -19,17 +19,21 @@
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { AppConstants } from 'app.constants';
+import { ImageLocalStorageService } from 'services/image-local-storage.service';
 import { UserInfo } from 'domain/user/user-info.model';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { UrlService } from 'services/contextual/url.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { UpdatePreferencesResponse, UserBackendApiService, UserContributionRightsDataBackendDict } from 'services/user-backend-api.service';
+import { AssetsBackendApiService } from 'services/assets-backend-api.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class UserService {
   constructor(
+    private assetsBackendApiService: AssetsBackendApiService,
+    private imageLocalStorageService: ImageLocalStorageService,
     private urlInterpolationService: UrlInterpolationService,
     private urlService: UrlService,
     private windowRef: WindowRef,
@@ -56,21 +60,37 @@ export class UserService {
     return this.userInfo;
   }
 
-  async getProfileImageDataUrlAsync(): Promise<string> {
-    let defaultUrl = (
-      this.urlInterpolationService.getStaticImageUrl(
-        AppConstants.DEFAULT_PROFILE_IMAGE_PATH));
-    return this.getUserInfoAsync().then(
-      async(userInfo) => {
-        if (userInfo.isLoggedIn()) {
-          return this.userBackendApiService.getProfileImageDataUrlAsync(
-            defaultUrl);
-        } else {
-          return new Promise((resolve, reject) => {
-            resolve(defaultUrl);
-          });
-        }
-      });
+  getProfileImageDataUrl(username: string): [string, string] {
+    // TODO(#17663): Remove use of performance.now with a long term fix
+    // in order to avoid cache problems.
+    // Here we are using prformanceTime in order to avoid cache problems.
+    // For details have a look at - https://stackoverflow.com/a/126831
+    let prformanceTime = '?' + performance.now().toString();
+    if (AssetsBackendApiService.EMULATOR_MODE) {
+      let localStoredImage = this.imageLocalStorageService.getRawImageData(
+        username + '_profile_picture.png');
+      let defaultUrlWebp = this.urlInterpolationService.getStaticImageUrl(
+        AppConstants.DEFAULT_PROFILE_IMAGE_WEBP_PATH);
+      let defaultUrlPng = this.urlInterpolationService.getStaticImageUrl(
+        AppConstants.DEFAULT_PROFILE_IMAGE_PNG_PATH);
+      if (localStoredImage === null) {
+        return [
+          defaultUrlPng + prformanceTime, defaultUrlWebp + prformanceTime];
+      }
+      // Normally, we return a tuple of PNG image URL and WebP image URL.
+      // In emulator mode we use local storage and we only store the PNG image.
+      // To handle this we return a tuple of the same PNG images in
+      // emulator mode.
+      return [localStoredImage, localStoredImage];
+    } else {
+      let pngImageUrl = this.urlInterpolationService.interpolateUrl(
+        this.assetsBackendApiService.profileImagePngUrlTemplate,
+        {username: username});
+      let WebpImageUrl = this.urlInterpolationService.interpolateUrl(
+        this.assetsBackendApiService.profileImageWebpUrlTemplate,
+        {username: username});
+      return [pngImageUrl + prformanceTime, WebpImageUrl + prformanceTime];
+    }
   }
 
   async setProfileImageDataUrlAsync(

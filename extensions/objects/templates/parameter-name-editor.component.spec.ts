@@ -53,6 +53,10 @@ describe('StateHintsEditorComponent', () => {
     explorationParamSpecsService = TestBed.inject(ExplorationParamSpecsService);
 
     explorationParamSpecsService.init(
+      // This throws "Type object is not assignable to type
+      // 'string'." We need to suppress this error
+      // because of the need to test validations.
+      // @ts-ignore
       paramSpecsObjectFactory.createFromBackendDict({
         y: {
           obj_type: 'UnicodeString'
@@ -60,7 +64,7 @@ describe('StateHintsEditorComponent', () => {
         a: {
           obj_type: 'UnicodeString'
         }
-      }) as unknown as string);
+      }) as string);
     fixture.detectChanges();
   });
 

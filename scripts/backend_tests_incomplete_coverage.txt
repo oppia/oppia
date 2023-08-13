@@ -3,7 +3,6 @@ core.controllers.base_test
 core.controllers.blog_homepage_test
 core.controllers.contributor_dashboard_test
 core.controllers.creator_dashboard_test
-core.controllers.domain_objects_validator_test
 core.controllers.editor_test
 core.controllers.feedback_test
 core.controllers.learner_playlist_test
@@ -38,11 +37,9 @@ core.domain.exp_domain_test
 core.domain.exp_services_test
 core.domain.feedback_domain_test
 core.domain.feedback_services_test
-core.domain.fs_services_test
 core.domain.html_cleaner_test
 core.domain.html_validation_service_test
 core.domain.interaction_registry_test
-core.domain.learner_goals_services_test
 core.domain.learner_group_fetchers_test
 core.domain.learner_group_services_test
 core.domain.learner_playlist_services_test
@@ -74,7 +71,6 @@ core.domain.user_domain_test
 core.domain.user_query_domain_test
 core.domain.user_query_services_test
 core.domain.user_services_test
-core.domain.wipeout_domain_test
 core.domain.wipeout_service_test
 core.jobs.transforms.validation.base_validation_test
 core.jobs.types.base_validation_errors_test
@@ -89,11 +85,13 @@ core.storage.collection.gae_models_test
 core.storage.exploration.gae_models_test
 core.storage.question.gae_models_test
 core.storage.topic.gae_models_test
+core.tests.test_utils_test
 core.utils_test
 main_test
 scripts.build_test
 scripts.common_test
 scripts.concurrent_task_utils_test
+scripts.install_dependencies_json_packages_test
 scripts.install_python_prod_dependencies_test
 scripts.install_third_party_test
 scripts.linters.html_linter_test

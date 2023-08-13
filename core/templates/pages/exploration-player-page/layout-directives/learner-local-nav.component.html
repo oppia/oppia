@@ -28,6 +28,7 @@
   </li>
   <li class="nav-item">
     <a *ngIf="username" (click)="showFlagExplorationModal()" href="#"
+       (keydown.enter)="showFlagExplorationModal()"
        ngbTooltip="{{ 'I18N_PLAYER_REPORT_TOOLTIP' | translate }}" placement="bottom"
        tabindex="0" class="nav-link e2e-test-report-exploration-button">
       <i class="fas fa-flag exploration-player-navbar-icons"></i>

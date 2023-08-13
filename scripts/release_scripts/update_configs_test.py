@@ -44,15 +44,11 @@ MOCK_LOCAL_FECONF_PATH: Final = os.path.join(
     os.getcwd(), 'core', 'tests', 'release_sources',
     'feconf.txt')
 
-# Here we use MyPy ignore because the pool_size argument is required by
-# Requester.__init__(), but it is missing from the typing definition in
-# Requester.pyi. We therefore disable type checking here. Here is the
-# type definition:
-# https://github.com/PyGithub/PyGithub/blob/001970d4a828017f704f6744a5775b4207a6523c/github/Requester.pyi#L97
-MOCK_REQUESTER = github.Requester.Requester(  # type: ignore[call-arg]
+MOCK_REQUESTER = github.Requester.Requester(
     login_or_token=None,
     password=None,
     jwt=None,
+    app_auth=None,
     base_url='https://github.com',
     timeout=0,
     user_agent='user',
@@ -288,8 +284,8 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
         with utils.open_file(MOCK_LOCAL_FECONF_PATH, 'r') as f:
             original_text = f.read()
         expected_text = original_text.replace(
-            'INCOMING_EMAILS_DOMAIN_NAME = \'\'',
-            'INCOMING_EMAILS_DOMAIN_NAME = \'oppia.org\'')
+            'ADMIN_EMAIL_ADDRESS = \'\'',
+            'ADMIN_EMAIL_ADDRESS = \'adm@example.com\'')
         try:
             update_configs.apply_changes_based_on_config(
                 MOCK_LOCAL_FECONF_PATH,
@@ -373,20 +369,17 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
             tempfile.NamedTemporaryFile().name
         )
         constants_text = (
-            '  "UA_ANALYTICS_ID": "456"\n'
             '  "GA_ANALYTICS_ID": "123"\n'
             '  "SITE_NAME_FOR_ANALYTICS": "site-name"\n'
             '  "CAN_SEND_ANALYTICS_EVENTS": true\n'
         )
         analytics_constants_config_text = (
             '  "GA_ANALYTICS_ID": ""\n'
-            '  "UA_ANALYTICS_ID": ""\n'
             '  "SITE_NAME_FOR_ANALYTICS": ""\n'
             '  "CAN_SEND_ANALYTICS_EVENTS": false\n'
         )
         expected_analytics_constants_config_text = (
             '  "GA_ANALYTICS_ID": "123"\n'
-            '  "UA_ANALYTICS_ID": "456"\n'
             '  "SITE_NAME_FOR_ANALYTICS": "site-name"\n'
             '  "CAN_SEND_ANALYTICS_EVENTS": true\n'
         )
@@ -409,33 +402,14 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
         )
         analytics_constants_config_text = (
             '  "GA_ANALYTICS_ID": ""\n'
-            '  "UA_ANALYTICS_ID": ""\n'
             '  "SITE_NAME_FOR_ANALYTICS": ""\n'
             '  "CAN_SEND_ANALYTICS_EVENTS": false\n'
         )
         with utils.open_file(temp_analytics_constants_config_path, 'w') as f:
             f.write(analytics_constants_config_text)
 
-        # Testing invalid UA_ANALYTICS_ID key.
-        constants_text = (
-            '  "UA_analytics_ID": "456"\n'
-            '  "GA_ANALYTICS_ID": "123"\n'
-            '  "SITE_NAME_FOR_ANALYTICS": "site-name"\n'
-            '  "CAN_SEND_ANALYTICS_EVENTS": true\n'
-        )
-        with utils.open_file(temp_constants_path, 'w') as f:
-            f.write(constants_text)
-        with self.assertRaisesRegex(
-            Exception, 'Error: No UA_ANALYTICS_ID key found.'
-        ):
-            update_configs.update_analytics_constants_based_on_config(
-                temp_analytics_constants_config_path,
-                temp_constants_path
-            )
-
         # Testing invalid GA_ANALYTICS_ID key.
         constants_text = (
-            '  "UA_ANALYTICS_ID": "456"\n'
             '  "GA_analytics_ID": "123"\n'
             '  "SITE_NAME_FOR_ANALYTICS": "site-name"\n'
             '  "CAN_SEND_ANALYTICS_EVENTS": true\n'
@@ -452,7 +426,6 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
 
         # Testing invalid SITE_NAME_FOR_ANALYTICS key.
         constants_text = (
-            '  "UA_ANALYTICS_ID": "456"\n'
             '  "GA_ANALYTICS_ID": "123"\n'
             '  "SITE_name_for_ANALYTICS": "site-name"\n'
             '  "CAN_SEND_ANALYTICS_EVENTS": true\n'
@@ -469,7 +442,6 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
 
         # Testing invalid CAN_SEND_ANALYTICS_EVENTS key.
         constants_text = (
-            '  "UA_ANALYTICS_ID": "456"\n'
             '  "GA_ANALYTICS_ID": "123"\n'
             '  "SITE_NAME_FOR_ANALYTICS": "site-name"\n'
             '  "can_SEND_analytics_EVENTS": true\n'

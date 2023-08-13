@@ -75,7 +75,6 @@
         </div>
         <div *ngFor="let blogPostSummary of blogPostSummariesToShow" class="blog-post-card e2e-test-blog-post-list">
           <oppia-blog-card [blogPostSummary]="blogPostSummary"
-                           [authorProfilePicDataUrl]="blogPostSummary.authorProfilePicUrl"
                            [shownOnblogPostPage]="false"
                            class="e2e-test-blog-post-tile-item">
           </oppia-blog-card>
@@ -91,7 +90,9 @@
                   [srcset]="getStaticCopyrightedImageUrl('/general/no_explorations_found.png')">
           <img [src]="getStaticCopyrightedImageUrl('/general/no_explorations_found.png')">
         </picture>
-        {{ 'I18N_BLOG_HOME_PAGE_NO_RESULTS_FOUND' | translate }}
+        <p class="text-center">
+          {{ 'I18N_BLOG_HOME_PAGE_NO_RESULTS_FOUND' | translate }}
+        </p>
       </div>
       <div *ngIf="showBlogPostCardsLoadingScreen" class="col-8 my-auto">
         <mat-spinner class="mx-auto"></mat-spinner>

@@ -16,7 +16,8 @@
       <br>
       <div>
         <oppia-interaction-display classStr="e2e-test-interaction-html"
-                                   [htmlData]="correctAnswerEditorHtml">
+                                   [htmlData]="correctAnswerEditorHtml"
+                                   [parentScope]="this">
         </oppia-interaction-display>
       </div>
       <br>
@@ -50,3 +51,9 @@
     Check and Save Solution
   </button>
 </div>
+
+<style>
+  .oppia-learner-submit-answer-button:focus {
+    border: 2px solid #000;
+  }
+</style>

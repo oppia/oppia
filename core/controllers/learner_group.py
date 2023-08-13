@@ -20,7 +20,6 @@ from core import feconf
 from core.constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
-from core.domain import config_domain
 from core.domain import learner_group_fetchers
 from core.domain import learner_group_services
 from core.domain import story_fetchers
@@ -343,16 +342,12 @@ class LearnerGroupLearnerProgressHandler(
             )
         )
 
-        all_users_settings = user_services.get_users_settings(
-            learner_user_ids, strict=True)
         all_learners_progress = []
         for i, user_id in enumerate(learner_user_ids):
             learner_progress = {
                 'username': learner_usernames[i],
                 'progress_sharing_is_turned_on':
                     progress_sharing_permissions[i],
-                'profile_picture_data_url':
-                    all_users_settings[i].profile_picture_data_url,
                 'stories_progress': [],
                 'subtopic_pages_progress': []
             }
@@ -424,13 +419,10 @@ class LearnerGroupLearnerSpecificProgressHandler(
             )
         )[learner_user_id]
 
-        users_settings = user_services.get_user_settings(learner_user_id)
         learner_progress = {
             'username': self.username,
             'progress_sharing_is_turned_on':
                 progress_sharing_permission,
-            'profile_picture_data_url':
-                users_settings.profile_picture_data_url,
             'stories_progress': stories_progress,
             'subtopic_pages_progress': subtopic_pages_progress
         }
@@ -664,7 +656,7 @@ class FacilitatorDashboardPage(
     @acl_decorators.can_access_learner_groups
     def get(self) -> None:
         """Handles GET requests."""
-        if not config_domain.LEARNER_GROUPS_ARE_ENABLED.value:
+        if not learner_group_services.is_learner_group_feature_enabled():
             raise self.PageNotFoundException
 
         self.render_template('facilitator-dashboard-page.mainpage.html')
@@ -681,7 +673,7 @@ class CreateLearnerGroupPage(
     @acl_decorators.can_access_learner_groups
     def get(self) -> None:
         """Handles GET requests."""
-        if not config_domain.LEARNER_GROUPS_ARE_ENABLED.value:
+        if not learner_group_services.is_learner_group_feature_enabled():
             raise self.PageNotFoundException
 
         self.render_template('create-learner-group-page.mainpage.html')
@@ -736,7 +728,6 @@ class LearnerGroupSearchLearnerHandler(
         if user_settings is None:
             self.render_json({
                 'username': username,
-                'profile_picture_data_url': '',
                 'error': ('User with username %s does not exist.' % username)
             })
             return
@@ -744,7 +735,6 @@ class LearnerGroupSearchLearnerHandler(
         if self.username.lower() == username.lower():
             self.render_json({
                 'username': user_settings.username,
-                'profile_picture_data_url': '',
                 'error': 'You cannot invite yourself to the group'
             })
             return
@@ -757,14 +747,12 @@ class LearnerGroupSearchLearnerHandler(
         if not valid_invitation:
             self.render_json({
                 'username': user_settings.username,
-                'profile_picture_data_url': '',
                 'error': error
             })
             return
 
         self.render_json({
             'username': user_settings.username,
-            'profile_picture_data_url': user_settings.profile_picture_data_url,
             'error': ''
         })
 
@@ -793,7 +781,7 @@ class EditLearnerGroupPage(
     def get(self, group_id: str) -> None:
         """Handles GET requests."""
         assert self.user_id is not None
-        if not config_domain.LEARNER_GROUPS_ARE_ENABLED.value:
+        if not learner_group_services.is_learner_group_feature_enabled():
             raise self.PageNotFoundException
 
         is_valid_request = learner_group_services.is_user_facilitator(
@@ -850,17 +838,13 @@ class LearnerGroupLearnersInfoHandler(
         self.render_json({
             'learners_info': [
                 {
-                    'username': user_settings.username,
-                    'profile_picture_data_url':
-                        user_settings.profile_picture_data_url
+                    'username': user_settings.username
                 }
                 for user_settings in learners_user_settings
             ],
             'invited_learners_info': [
                 {
-                    'username': user_settings.username,
-                    'profile_picture_data_url':
-                        user_settings.profile_picture_data_url
+                    'username': user_settings.username
                 }
                 for user_settings in invited_user_settings
             ]
@@ -1254,5 +1238,5 @@ class LearnerGroupsFeatureStatusHandler(
         """Handles GET requests."""
         self.render_json({
             'feature_is_enabled': (
-                config_domain.LEARNER_GROUPS_ARE_ENABLED.value)
+                learner_group_services.is_learner_group_feature_enabled())
         })

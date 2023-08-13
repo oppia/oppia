@@ -35,12 +35,6 @@ from scripts import install_third_party_libs  # isort:skip
 from scripts import servers  # isort:skip
 
 MAX_RETRY_COUNT: Final = 3
-GOOGLE_APP_ENGINE_PORT: Final = 9001
-ELASTICSEARCH_SERVER_PORT: Final = 9200
-PORTS_USED_BY_OPPIA_PROCESSES: Final = [
-    GOOGLE_APP_ENGINE_PORT,
-    ELASTICSEARCH_SERVER_PORT,
-]
 
 _PARSER: Final = argparse.ArgumentParser(
     description="""
@@ -109,50 +103,6 @@ MOBILE_SUITES = [
 ]
 
 
-def is_oppia_server_already_running() -> bool:
-    """Check if the ports are taken by any other processes. If any one of
-    them is taken, it may indicate there is already one Oppia instance running.
-
-    Returns:
-        bool. Whether there is a running Oppia instance.
-    """
-    for port in PORTS_USED_BY_OPPIA_PROCESSES:
-        if common.is_port_in_use(port):
-            print(
-                'There is already a server running on localhost:%s. '
-                'Please terminate it before running the end-to-end tests. '
-                'Exiting.' % port)
-            return True
-    return False
-
-
-def run_webpack_compilation(source_maps: bool = False) -> None:
-    """Runs webpack compilation.
-
-    Args:
-        source_maps: bool. Whether to compile with source maps.
-    """
-    max_tries = 5
-    webpack_bundles_dir_name = 'webpack_bundles'
-
-    for _ in range(max_tries):
-        try:
-            managed_webpack_compiler = (
-                servers.managed_webpack_compiler(use_source_maps=source_maps))
-            with managed_webpack_compiler as proc:
-                proc.wait()
-        except subprocess.CalledProcessError as error:
-            print(error.output)
-            sys.exit(error.returncode)
-            return
-        if os.path.isdir(webpack_bundles_dir_name):
-            break
-    else:
-        # We didn't break out of the loop, meaning all attempts have failed.
-        print('Failed to complete webpack compilation, exiting...')
-        sys.exit(1)
-
-
 def install_third_party_libraries(skip_install: bool) -> None:
     """Run the installation script.
 
@@ -163,32 +113,9 @@ def install_third_party_libraries(skip_install: bool) -> None:
         install_third_party_libs.main()
 
 
-def build_js_files(dev_mode: bool, source_maps: bool = False) -> None:
-    """Build the javascript files.
-
-    Args:
-        dev_mode: bool. Represents whether to run the related commands in dev
-            mode.
-        source_maps: bool. Represents whether to use source maps while
-            building webpack.
-    """
-    if not dev_mode:
-        print('Generating files for production mode...')
-
-        build_args = ['--prod_env']
-        if source_maps:
-            build_args.append('--source_maps')
-        build.main(args=build_args)
-
-    else:
-        build.main(args=[])
-        common.run_ng_compilation()
-        run_webpack_compilation(source_maps=source_maps)
-
-
 def run_tests(args: argparse.Namespace) -> Tuple[List[bytes], int]:
     """Run the scripts to start end-to-end tests."""
-    if is_oppia_server_already_running():
+    if common.is_oppia_server_already_running():
         sys.exit(1)
 
     install_third_party_libraries(args.skip_install)
@@ -197,10 +124,10 @@ def run_tests(args: argparse.Namespace) -> Tuple[List[bytes], int]:
         dev_mode = not args.prod_env
 
         if args.skip_build:
-            build.modify_constants(prod_env=args.prod_env)
+            common.modify_constants(prod_env=args.prod_env)
         else:
-            build_js_files(dev_mode, source_maps=args.source_maps)
-        stack.callback(build.set_constants_to_default)
+            build.build_js_files(dev_mode, source_maps=args.source_maps)
+        stack.callback(common.set_constants_to_default)
 
         stack.enter_context(servers.managed_redis_server())
         stack.enter_context(servers.managed_elasticsearch_dev_server())
@@ -212,7 +139,7 @@ def run_tests(args: argparse.Namespace) -> Tuple[List[bytes], int]:
         app_yaml_path = 'app.yaml' if args.prod_env else 'app_dev.yaml'
         stack.enter_context(servers.managed_dev_appserver(
             app_yaml_path,
-            port=GOOGLE_APP_ENGINE_PORT,
+            port=common.GAE_PORT_FOR_E2E_TESTING,
             log_level=args.server_log_level,
             # Automatic restart can be disabled since we don't expect code
             # changes to happen while the e2e tests are running.
@@ -221,6 +148,7 @@ def run_tests(args: argparse.Namespace) -> Tuple[List[bytes], int]:
             env={
                 **os.environ,
                 'PORTSERVER_ADDRESS': common.PORTSERVER_SOCKET_FILEPATH,
+                'PIP_NO_DEPS': 'True'
             }))
 
         if (args.mobile) and (args.suite not in MOBILE_SUITES):

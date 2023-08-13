@@ -996,7 +996,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             'ACCEPT_ANY_SUGGESTION', 'PUBLISH_OWNED_ACTIVITY',
             'PLAY_ANY_PUBLIC_ACTIVITY',
             'EDIT_ANY_SUBTOPIC_PAGE', 'VISIT_ANY_QUESTION_EDITOR_PAGE',
-            'ACCESS_LEARNER_DASHBOARD',
+            'ACCESS_LEARNER_DASHBOARD', 'ACCESS_FEEDBACK_UPDATES',
             'EDIT_ANY_ACTIVITY', 'VISIT_ANY_TOPIC_EDITOR_PAGE',
             'SUGGEST_CHANGES', 'DELETE_OWNED_PRIVATE_ACTIVITY',
             'EDIT_OWNED_ACTIVITY', 'EDIT_SKILL_DESCRIPTION',
@@ -1006,7 +1006,8 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             'ACCESS_TOPICS_AND_SKILLS_DASHBOARD', 'EDIT_SKILL',
             'DELETE_ANY_QUESTION', 'EDIT_ANY_STORY', 'PUBLISH_ANY_ACTIVITY',
             'EDIT_ANY_QUESTION', 'CREATE_NEW_SKILL', 'CHANGE_STORY_STATUS',
-            'CAN_MANAGE_VOICE_ARTIST', 'ACCESS_LEARNER_GROUPS'])
+            'CAN_MANAGE_VOICE_ARTIST', 'ACCESS_LEARNER_GROUPS',
+            'ACCESS_CLASSROOM_ADMIN_PAGE'])
         expected_roles = set(
             ['EXPLORATION_EDITOR', 'ADMIN', 'MODERATOR',
             'VOICEOVER_ADMIN'])
@@ -1300,6 +1301,26 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         with self.assertRaisesRegex(Exception, error_msg):
             user_services.add_user_role(
                 profile_user_id, feconf.ROLE_ID_FULL_USER)
+
+    def test_add_duplicate_user_role_raises_exception(self) -> None:
+        auth_id = 'test_id'
+        user_email = 'test@gmail.com'
+
+        user_id = user_services.create_new_user(auth_id, user_email).user_id
+        self.assertEqual(
+            user_services.get_user_roles_from_id(user_id),
+            [feconf.ROLE_ID_FULL_USER])
+
+        user_services.add_user_role(
+            user_id, feconf.ROLE_ID_BLOG_POST_EDITOR)
+        self.assertEqual(
+            user_services.get_user_roles_from_id(user_id), [
+                feconf.ROLE_ID_FULL_USER, feconf.ROLE_ID_BLOG_POST_EDITOR])
+
+        expected_error_msg = 'The user already has this role.'
+        with self.assertRaisesRegex(Exception, expected_error_msg):
+            user_services.add_user_role(
+                user_id, feconf.ROLE_ID_BLOG_POST_EDITOR)
 
     def test_add_full_user_role_to_learner_raises_exception(self) -> None:
         auth_id = 'test_id'

@@ -19,9 +19,7 @@
   <div *ngIf="isContentEditable()"
        class="e2e-test-edit-content oppia-editable-section e2e-test-edit-content-pencil-button"
        (click)="openStateContentEditor()">
-    <i class="fas fa-pen oppia-editor-edit-icon oppia-editor-edit-icon-position e2e-test-edit-content-pencil-button"
-       title="Edit Card Content">
-    </i>
+    <button class="fas fa-pen oppia-editor-edit-icon oppia-editor-edit-icon-position e2e-test-edit-content-pencil-button" title="Edit Card Content"></button>
     <div class="oppia-prevent-selection oppia-state-content-display oppia-transition-200"
          title="Card Content">
       <span [hidden]="!stateContentService.savedMemento.isEmpty()" class="oppia-placeholder">
@@ -112,6 +110,9 @@
     top: -30000px;
   }
   .oppia-editor-edit-icon-position {
+    border: 0;
+    padding: 4px 4px;
+    position: absolute;
     top: 9px;
   }
   .oppia-editor-edit-icon {

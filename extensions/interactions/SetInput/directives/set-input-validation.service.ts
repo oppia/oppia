@@ -127,10 +127,10 @@ export class SetInputValidationService {
           if (this.areSameRule(prevRule.rule, rule)) {
             warningsList.push({
               type: AppConstants.WARNING_TYPES.ERROR,
-              message: `Rule ${ruleIndex + 1} from answer group ` +
-                `${answerGroupIndex + 1} is the same as ` +
-                `rule ${prevRule.ruleIndex + 1} from ` +
-                `answer group ${prevRule.answerGroupIndex + 1}`
+              message: `Learner answer ${ruleIndex + 1} from Oppia response ` +
+              `${answerGroupIndex + 1} is the same as ` +
+              `answer ${prevRule.ruleIndex + 1} from ` +
+              `Oppia response ${prevRule.answerGroupIndex + 1}`
             });
           } else if (prevRule.rule.type === rule.type) {
             /*
@@ -173,10 +173,11 @@ export class SetInputValidationService {
             if (isRuleCoveredByAnyPrevRule) {
               warningsList.push({
                 type: AppConstants.WARNING_TYPES.ERROR,
-                message: `Rule ${ruleIndex + 1} from answer group ` +
-                  `${answerGroupIndex + 1} will never be matched because it ` +
-                  `is made redundant by rule ${prevRule.ruleIndex + 1}` +
-                  ` from answer group ${prevRule.answerGroupIndex + 1}.`
+                message:
+                `Learner answer ${ruleIndex + 1} from Oppia response ` +
+                `${answerGroupIndex + 1} will never be matched because it ` +
+                `is made redundant by answer ${prevRule.ruleIndex + 1} ` +
+                `from Oppia response ${prevRule.answerGroupIndex + 1}.`
               });
             }
           }

@@ -60,7 +60,7 @@ export class EmailDashboardBackendApiService {
       this.http.get<EmailDashboardQueryResultsBackendDict>(
         this.QUERY_DATA_URL, {
           params: params
-        }).toPromise().then(data => {
+        } as Object).toPromise().then(data => {
         let emailDashboardQueryResultsObject = (
           EmailDashboardQueryResults.createFromBackendDict(data));
         resolve(emailDashboardQueryResultsObject);

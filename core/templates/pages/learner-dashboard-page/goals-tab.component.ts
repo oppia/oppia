@@ -62,6 +62,7 @@ export class GoalsTabComponent implements OnInit {
   learnerDashboardActivityIds!: LearnerDashboardActivityIds;
   MAX_CURRENT_GOALS_LENGTH!: number;
   currentGoalsStoryIsShown!: boolean[];
+  showThreeDotsDropdown!: boolean[];
   pawImageUrl: string = '';
   bookImageUrl: string = '';
   starImageUrl: string = '';
@@ -76,18 +77,19 @@ export class GoalsTabComponent implements OnInit {
     NEITHER: 2
   };
 
+  indexOfSelectedTopic: number = -1;
   activityType: string = AppConstants.ACTIVITY_TYPE_LEARN_TOPIC;
   editGoalsTopicPageUrl: string[] = [];
   completedGoalsTopicPageUrl: string[] = [];
   editGoalsTopicClassification: number[] = [];
   editGoalsTopicBelongToLearntToPartiallyLearntTopic: boolean[] = [];
   windowIsNarrow: boolean = false;
-  showThreeDotsDropdown: boolean = false;
   directiveSubscriptions = new Subscription();
 
   ngOnInit(): void {
     this.MAX_CURRENT_GOALS_LENGTH = AppConstants.MAX_CURRENT_GOALS_COUNT;
     this.currentGoalsStoryIsShown = [];
+    this.showThreeDotsDropdown = [];
     this.currentGoalsStoryIsShown[0] = true;
     this.pawImageUrl = this.getStaticImageUrl('/learner_dashboard/paw.svg');
     this.bookImageUrl = this.getStaticImageUrl(
@@ -185,11 +187,20 @@ export class GoalsTabComponent implements OnInit {
           }
         }
       }
+    } else {
+      const goalIndex = this.topicIdsInCurrentGoals.indexOf(activityId);
+      this.removeFromLearnerGoals(topic, topicId, topic.name, goalIndex);
     }
   }
 
-  toggleThreeDotsDropdown(): void {
-    this.showThreeDotsDropdown = !this.showThreeDotsDropdown;
+  toggleThreeDotsDropdown(index: number): void {
+    this.showThreeDotsDropdown[index] = !this.showThreeDotsDropdown[index];
+    if (this.indexOfSelectedTopic !== index) {
+      this.indexOfSelectedTopic = index;
+    } else {
+      this.indexOfSelectedTopic = -1;
+    }
+    return;
   }
 
   /**
@@ -199,14 +210,11 @@ export class GoalsTabComponent implements OnInit {
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: MouseEvent): void {
     const targetElement = event.target as HTMLElement;
-    if (!this.dropdownRef) {
-      return;
-    }
-    if (
-      targetElement &&
-      !this.dropdownRef.nativeElement.contains(targetElement)
-    ) {
-      this.showThreeDotsDropdown = false;
+    for (let i = 0; i < this.currentGoals.length; i++) {
+      if (targetElement &&
+          this.showThreeDotsDropdown[i]) {
+        this.showThreeDotsDropdown[i] = false;
+      }
     }
   }
 

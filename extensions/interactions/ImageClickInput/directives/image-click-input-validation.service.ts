@@ -133,8 +133,8 @@ export class ImageClickInputValidationService {
             warningsList.push({
               type: AppConstants.WARNING_TYPES.CRITICAL,
               message: (
-                'The region label \'' + label + '\' in rule ' +
-                String(j + 1) + ' in group ' + String(i + 1) +
+                'The region label \'' + label + '\' in learner answer ' +
+                String(j + 1) + ' in Oppia response ' + String(i + 1) +
                 ' is invalid.')
             });
           }
@@ -146,8 +146,8 @@ export class ImageClickInputValidationService {
       warningsList.push({
         type: AppConstants.WARNING_TYPES.ERROR,
         message: (
-          'Please add a rule to cover what should happen if none of the ' +
-          'given regions are clicked.')
+          'Please add a learner answer to cover what should ' +
+          'happen if none of the given regions are clicked.')
       });
     }
 

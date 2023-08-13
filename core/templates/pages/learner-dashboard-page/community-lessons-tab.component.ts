@@ -27,6 +27,7 @@ import { AppConstants } from 'app.constants';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 import { Subscription } from 'rxjs';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
+import { UserService } from 'services/user.service';
 
 import './community-lessons-tab.component.css';
 
@@ -45,7 +46,8 @@ export class CommunityLessonsTabComponent {
     private learnerDashboardActivityBackendApiService:
       LearnerDashboardActivityBackendApiService,
     private i18nLanguageCodeService: I18nLanguageCodeService,
-    private windowDimensionService: WindowDimensionsService) {
+    private windowDimensionService: WindowDimensionsService,
+    private userService: UserService) {
   }
 
   // These properties are initialized using Angular lifecycle hooks
@@ -153,6 +155,18 @@ export class CommunityLessonsTabComponent {
     this.displayInCommunityLessons = this.allCommunityLessons;
     this.selectedSection = this.all;
     this.dropdownEnabled = false;
+  }
+
+  getProfileImagePngDataUrl(username: string): string {
+    let [pngImageUrl, _] = this.userService.getProfileImageDataUrl(
+      username);
+    return pngImageUrl;
+  }
+
+  getProfileImageWebpDataUrl(username: string): string {
+    let [_, webpImageUrl] = this.userService.getProfileImageDataUrl(
+      username);
+    return webpImageUrl;
   }
 
   setDisplayLessonsInPlaylist(): void {

@@ -191,8 +191,8 @@ describe('ImageClickInputValidationService', () => {
       goodDefaultOutcome);
     expect(warnings).toEqual([{
       type: WARNING_TYPES.CRITICAL,
-      message: 'The region label \'FakeLabel\' in rule 1 in group 1 is ' +
-        'invalid.'
+      message: 'The region label \'FakeLabel\' in learner answer 1 in ' +
+        'Oppia response 1 is invalid.'
     }]);
   });
 
@@ -202,15 +202,15 @@ describe('ImageClickInputValidationService', () => {
         currentState, customizationArguments, goodAnswerGroups, null);
       expect(warnings).toEqual([{
         type: WARNING_TYPES.ERROR,
-        message: 'Please add a rule to cover what should happen if none of ' +
-          'the given regions are clicked.'
+        message: 'Please add a learner answer to cover what should happen ' +
+          'if none of the given regions are clicked.'
       }]);
       warnings = validatorService.getAllWarnings(
         currentState, customizationArguments, goodAnswerGroups, badOutcome);
       expect(warnings).toEqual([{
         type: WARNING_TYPES.ERROR,
-        message: 'Please add a rule to cover what should happen if none of ' +
-          'the given regions are clicked.'
+        message: 'Please add a learner answer to cover what should happen ' +
+        'if none of the given regions are clicked.'
       }]);
     });
 });

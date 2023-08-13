@@ -392,8 +392,12 @@ class _Gae(Platform):
         Returns:
             module. The cloud_secrets_services module.
         """
-        from core.platform.secrets import cloud_secrets_services
-        return cloud_secrets_services
+        if constants.DEV_MODE:
+            from core.platform.secrets import dev_mode_secrets_services
+            return dev_mode_secrets_services
+        else:
+            from core.platform.secrets import cloud_secrets_services
+            return cloud_secrets_services
 
     NAME = 'gae'
 

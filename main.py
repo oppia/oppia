@@ -24,7 +24,7 @@ from core.constants import constants
 from core.controllers import access_validators
 from core.controllers import acl_decorators
 from core.controllers import admin
-from core.controllers import android_e2e_config
+from core.controllers import android
 from core.controllers import base
 from core.controllers import beam_jobs
 from core.controllers import blog_admin
@@ -45,6 +45,8 @@ from core.controllers import editor
 from core.controllers import email_dashboard
 from core.controllers import features
 from core.controllers import feedback
+from core.controllers import feedback_updates
+from core.controllers import firebase
 from core.controllers import improvements
 from core.controllers import incoming_app_feedback_report
 from core.controllers import learner_dashboard
@@ -212,6 +214,10 @@ def get_redirect_route(
 
 # Register the URLs with the classes responsible for handling them.
 URLS = [
+    get_redirect_route(
+        '/<firebase_path:__/auth(?:/.*)?>',
+        firebase.FirebaseProxyPage
+    ),
     get_redirect_route(r'/_ah/warmup', WarmupPage),
     get_redirect_route(r'/splash', SplashRedirectPage),
     get_redirect_route(
@@ -291,6 +297,13 @@ URLS = [
         r'%s' % feconf.CONTRIBUTOR_DASHBOARD_ADMIN_URL,
         contributor_dashboard_admin.ContributorDashboardAdminPage),
     get_redirect_route(
+        r'%s/<contribution_type>/<contribution_subtype>' % (
+            feconf.CONTRIBUTOR_DASHBOARD_ADMIN_STATS_URL_PREFIX),
+        contributor_dashboard_admin.ContributorDashboardAdminStatsHandler),
+    get_redirect_route(
+        r'%s' % (feconf.COMMUNITY_CONTRIBUTION_STATS_URL),
+        contributor_dashboard_admin.CommunityContributionStatsHandler),
+    get_redirect_route(
         r'/translationcontributionstatshandler',
         contributor_dashboard_admin.TranslationContributionStatsHandler),
     get_redirect_route(
@@ -349,7 +362,7 @@ URLS = [
         r'/usercontributionrightsdatahandler',
         contributor_dashboard.UserContributionRightsDataHandler),
     get_redirect_route(
-        r'/retrivefeaturedtranslationlanguages',
+        r'/retrievefeaturedtranslationlanguages',
         contributor_dashboard.FeaturedTranslationLanguagesHandler),
     get_redirect_route(
         r'/gettranslatabletopicnames',
@@ -490,15 +503,15 @@ URLS = [
         r'%s' % feconf.LEARNER_DASHBOARD_EXPLORATION_DATA_URL,
         learner_dashboard.LearnerDashboardExplorationsProgressHandler),
     get_redirect_route(
-        r'%s' % feconf.LEARNER_DASHBOARD_FEEDBACK_UPDATES_DATA_URL,
-        learner_dashboard.LearnerDashboardFeedbackUpdatesHandler),
+        r'%s' % feconf.FEEDBACK_UPDATES_DATA_URL,
+        feedback_updates.FeedbackUpdatesHandler),
     get_redirect_route(
         r'%s' % feconf.LEARNER_DASHBOARD_IDS_DATA_URL,
         learner_dashboard.LearnerDashboardIdsHandler),
     get_redirect_route(
         r'%s/<thread_id>' %
-        feconf.LEARNER_DASHBOARD_FEEDBACK_THREAD_DATA_URL,
-        learner_dashboard.LearnerDashboardFeedbackThreadHandler),
+        feconf.FEEDBACK_UPDATES_THREAD_DATA_URL,
+        feedback_updates.FeedbackThreadHandler),
     get_redirect_route(
         r'%s' % feconf.TOPICS_AND_SKILLS_DASHBOARD_URL,
         topics_and_skills_dashboard.TopicsAndSkillsDashboardPage),
@@ -579,11 +592,6 @@ URLS = [
         profile.BulkEmailWebhookEndpoint),
     get_redirect_route(
         feconf.PREFERENCES_DATA_URL, profile.PreferencesHandler),
-    get_redirect_route(
-        r'/preferenceshandler/profile_picture', profile.ProfilePictureHandler),
-    get_redirect_route(
-        r'/preferenceshandler/profile_picture_by_username/<username>',
-        profile.ProfilePictureHandlerByUsernameHandler),
     get_redirect_route(r'%s' % feconf.SIGNUP_URL, profile.SignupPage),
     get_redirect_route(r'%s' % feconf.SIGNUP_DATA_URL, profile.SignupHandler),
     get_redirect_route(
@@ -605,10 +613,10 @@ URLS = [
 
     get_redirect_route(
         r'/memorycachehandler', release_coordinator.MemoryCacheHandler),
-
     get_redirect_route(
-        '/checkpoints_feature_status_handler',
-        reader.CheckpointsFeatureStatusHandler),
+        r'%s' % feconf.FEATURE_FLAGS_URL,
+        release_coordinator.FeatureFlagsHandler),
+
     get_redirect_route(
         r'%s/<exploration_id>' % feconf.EXPLORATION_URL_PREFIX,
         reader.ExplorationPage),
@@ -921,10 +929,6 @@ URLS = [
         feconf.VALIDATE_STORY_EXPLORATIONS_URL_PREFIX,
         story_editor.ValidateExplorationsHandler),
 
-    get_redirect_route(
-        '/classroom_promos_status_handler',
-        classroom.ClassroomPromosStatusHandler),
-
     get_redirect_route(r'/emaildashboard', email_dashboard.EmailDashboardPage),
     get_redirect_route(
         r'/emaildashboarddatahandler',
@@ -1103,7 +1107,8 @@ URLS = [
         learner_group.LearnerStoriesChaptersProgressHandler),
     get_redirect_route(
         '/learner_groups_feature_status_handler',
-        learner_group.LearnerGroupsFeatureStatusHandler)
+        learner_group.LearnerGroupsFeatureStatusHandler),
+    get_redirect_route('/android_data', android.AndroidActivityHandler)
 ]
 
 # Adding redirects for topic landing pages.
@@ -1118,7 +1123,7 @@ if constants.DEV_MODE:
     URLS.append(
         get_redirect_route(
             r'/initialize_android_test_data',
-            android_e2e_config.InitializeAndroidTestDataHandler))
+            android.InitializeAndroidTestDataHandler))
 
 # Adding redirects for all stewards landing pages.
 for stewards_route in constants.STEWARDS_LANDING_PAGE['ROUTES']:
@@ -1192,6 +1197,9 @@ URLS.extend((
     get_redirect_route(
         r'/cron/suggestions/translation_contribution_stats',
         cron.CronTranslationContributionStatsHandler),
+    get_redirect_route(
+        r'/cron/mail/curriculum_admins/chapter_publication_notfications',
+        cron.CronMailChapterPublicationsNotificationsHandler),
 ))
 
 # Add tasks urls.

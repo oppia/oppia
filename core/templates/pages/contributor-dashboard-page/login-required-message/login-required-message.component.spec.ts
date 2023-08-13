@@ -49,7 +49,7 @@ describe('Login required message component', () => {
         href: 'starting-url'
       },
       gtag: () => {}
-    });
+    } as unknown as Window);
     component.ngOnInit();
   });
 

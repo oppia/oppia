@@ -85,10 +85,6 @@ var suites = {
     './core/tests/webdriverio_desktop/creatorDashboard.js'
   ],
 
-  diagnosticTestPage: [
-    './core/tests/webdriverio_desktop/diagnosticTestPage.js'
-  ],
-
   embedding: [
     './core/tests/webdriverio_desktop/embedding.js'
   ],
@@ -119,6 +115,10 @@ var suites = {
 
   featureGating: [
     './core/tests/webdriverio/featureGatingFlow.js'
+  ],
+
+  feedbackUpdates: [
+    './core/tests/webdriverio_desktop/feedbackUpdates.js'
   ],
 
   fileUploadExtensions: [

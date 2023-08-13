@@ -2,18 +2,27 @@
           id="tutorialStateInteraction">
   <div>
     <div class="oppia-exp-interaction-card-header-container oppia-mobile-collapsible-card-header"
-         (click)="toggleInteractionEditor()">
+         (click)="toggleInteractionEditor()"
+         (keydown.enter)="toggleInteractionEditor()">
       <h3 class="oppia-exp-interaction-card-header">
         Interaction <span *ngIf="getCurrentInteractionName()">( {{getCurrentInteractionName()}} )</span>
       </h3>
-      <i class="fa fa-caret-down"
-         *ngIf="!interactionEditorIsShown"
-         aria-hidden="true">
-      </i>
-      <i class="fa fa-caret-up"
-         *ngIf="interactionEditorIsShown"
-         aria-hidden="true">
-      </i>
+      <div *ngIf="getCurrentInteractionName().length>0">
+        <i class="fa fa-caret-down"
+           *ngIf="!interactionEditorIsShown"
+           tabindex="0"
+           role="button"
+           aria-label="Expand interaction"
+           [attr.aria-hidden]="interactionEditorIsShown ? 'true' : 'false'">
+        </i>
+        <i class="fa fa-caret-up"
+           *ngIf="interactionEditorIsShown"
+           tabindex="0"
+           role="button"
+           aria-label="collapse answers and responses"
+           [attr.aria-hidden]="interactionEditorIsShown ? 'false' : 'true'">
+        </i>
+      </div>
     </div>
     <div class="oppia-add-interaction-button-container"
          *ngIf="!interactionId">
@@ -48,6 +57,7 @@
               <div class="oppia-interaction-preview oppia-transition-200"
                    (click)="openInteractionCustomizerModal()"
                    *ngIf="editabilityService.isEditable()"
+                   role="button"
                    aria-label="edit interaction">
               </div>
               <div>
@@ -60,7 +70,7 @@
                     class="e2e-test-delete-interaction oppia-delete-interaction-button oppia-transition-200"
                     (click)="deleteInteraction()"
                     *ngIf="editabilityService.isEditable()">
-              <i class="fas fa-times oppia-delete-interaction-icon"></i>
+              <i class="fas fa-times oppia-delete-interaction-icon" title="Delete interaction"></i>
             </button>
           </div>
         </div>

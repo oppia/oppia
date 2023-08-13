@@ -166,83 +166,6 @@ describe('Topic editor functionality', function() {
         await forms.toRichText('Story notes'));
     });
 
-  it('should assign a skill to, and from subtopics',
-    async function() {
-      await topicsAndSkillsDashboardPage.get();
-      await (
-        topicsAndSkillsDashboardPage.createSkillWithDescriptionAndExplanation(
-          'Skill 2', 'Concept card explanation', false));
-      await skillEditorPage.addRubricExplanationForDifficulty(
-        'Easy', 'Second explanation for easy difficulty.');
-      await skillEditorPage.saveOrPublishSkill('Edited rubrics');
-      // A minimum of three questions are required for skill to get assigned in
-      // a topic’s diagnostic test.
-      await workflow.createQuestion();
-      await workflow.createQuestion();
-      await workflow.createQuestion();
-
-      await topicsAndSkillsDashboardPage.get();
-      await (
-        topicsAndSkillsDashboardPage.createSkillWithDescriptionAndExplanation(
-          'Skill 3', 'Concept card explanation', true));
-
-      var TOPIC_NAME = 'TASE2';
-      var TOPIC_URL_FRAGMENT_NAME = 'tase-two';
-      var TOPIC_DESCRIPTION = 'TASE2 description';
-      await topicsAndSkillsDashboardPage.get();
-      await topicsAndSkillsDashboardPage.createTopic(
-        TOPIC_NAME, TOPIC_URL_FRAGMENT_NAME, TOPIC_DESCRIPTION, false);
-      await topicsAndSkillsDashboardPage.get();
-      await topicsAndSkillsDashboardPage.navigateToSkillsTab();
-      await topicsAndSkillsDashboardPage.filterSkillsByStatus(
-        Constants.SKILL_STATUS_UNASSIGNED);
-      await topicsAndSkillsDashboardPage.assignSkillToTopic(
-        'Skill 3', TOPIC_NAME);
-
-      await topicsAndSkillsDashboardPage.get();
-      await topicsAndSkillsDashboardPage.navigateToSkillsTab();
-      await topicsAndSkillsDashboardPage.filterSkillsByStatus(
-        Constants.SKILL_STATUS_UNASSIGNED);
-      await topicsAndSkillsDashboardPage.assignSkillToTopic(
-        'Skill 2', TOPIC_NAME);
-
-      await topicsAndSkillsDashboardPage.get();
-      await topicsAndSkillsDashboardPage.editTopic(TOPIC_NAME);
-
-      await topicEditorPage.addDiagnosticTestSkill('Skill 2');
-
-      await topicEditorPage.addSubtopic(
-        'Subtopic 1', 'subtopic-two', '../data/test2_svg.svg',
-        'Subtopic1 Content');
-      await topicEditorPage.saveTopic('Added subtopic.');
-
-      await topicEditorPage.navigateToTopicEditorTab();
-      await topicEditorPage.addSubtopic(
-        'Subtopic 2', 'subtopic-three', '../data/test2_svg.svg',
-        'Subtopic2 Content');
-      await topicEditorPage.saveTopic('Added subtopics.');
-
-      await topicEditorPage.navigateToTopicEditorTab();
-      await topicEditorPage.navigateToReassignModal();
-      await topicEditorPage.expectUncategorizedSkillsToBe(
-        ['Skill 3', 'Skill 2']);
-      await topicEditorPage.expectSubtopicWithIndexToHaveSkills(0, []);
-      await topicEditorPage.expectSubtopicWithIndexToHaveSkills(1, []);
-
-      await topicEditorPage.dragSkillToSubtopic('Skill 2', 0);
-      await topicEditorPage.expectSubtopicWithIndexToHaveSkills(0, ['Skill 2']);
-      await topicEditorPage.dragSkillToSubtopic('Skill 3', 1);
-      await topicEditorPage.expectSubtopicWithIndexToHaveSkills(1, ['Skill 3']);
-      await topicEditorPage.dragSkillFromSubtopicToSubtopic(1, 0, 'Skill 3');
-      await topicEditorPage.expectSubtopicWithIndexToHaveSkills(
-        0, ['Skill 2', 'Skill 3']);
-      await topicEditorPage.dragSkillFromSubtopicToUncategorized(0, 'Skill 2');
-      await topicEditorPage.expectUncategorizedSkillsToBe(
-        ['Skill 2']);
-      await topicEditorPage.saveRearrangedSkills();
-      await topicEditorPage.saveTopic('Rearranged skills');
-    });
-
   afterEach(async function() {
     await general.checkForConsoleErrors([]);
     await users.logout();
@@ -398,16 +321,7 @@ describe('Chapter editor functionality', function() {
       await storyEditorPage.expectChaptersListToBe(
         ['Chapter 1', 'Chapter 2', 'Chapter 3']);
 
-      await storyEditorPage.dragChapterToAnotherChapter(
-        'Chapter 3', 'Chapter 1');
-      await storyEditorPage.expectChaptersListToBe(
-        ['Chapter 3', 'Chapter 1', 'Chapter 2']);
-
-      await storyEditorPage.dragChapterToAnotherChapter(
-        'Chapter 2', 'Chapter 1');
       await storyEditorPage.saveStory('Saving chapters');
-      await storyEditorPage.expectChaptersListToBe(
-        ['Chapter 3', 'Chapter 2', 'Chapter 1']);
     }
   );
 
@@ -418,7 +332,15 @@ describe('Chapter editor functionality', function() {
       await storyEditorPage.expectPrerequisiteSkillDescriptionCardCount(0);
       await storyEditorPage.addAcquiredSkill(dummySkills[0]);
       await storyEditorPage.expectAcquiredSkillDescriptionCardCount(1);
-      await storyEditorPage.addPrerequisiteSkill(dummySkills[1]);
+      await storyEditorPage.saveStory('Save');
+      await storyEditorPage.navigateToStoryEditorTab();
+
+      await storyEditorPage.navigateToChapterWithName('Chapter 2');
+      await storyEditorPage.expectAcquiredSkillDescriptionCardCount(0);
+      await storyEditorPage.expectPrerequisiteSkillDescriptionCardCount(0);
+      await storyEditorPage.addAcquiredSkill(dummySkills[1]);
+      await storyEditorPage.expectAcquiredSkillDescriptionCardCount(1);
+      await storyEditorPage.addPrerequisiteSkill(dummySkills[0]);
       await storyEditorPage.expectPrerequisiteSkillDescriptionCardCount(1);
       await storyEditorPage.saveStory('Save');
     });
@@ -426,7 +348,7 @@ describe('Chapter editor functionality', function() {
   it('should fail to add one prerequisite skill which is already added as' +
     ' acquired skill', async function() {
     await storyEditorPage.navigateToChapterWithName('Chapter 1');
-    await storyEditorPage.addAcquiredSkill(dummySkills[1]);
+    await storyEditorPage.addPrerequisiteSkill(dummySkills[0]);
     await storyEditorPage.expectSaveStoryDisabled();
     var warningRegex = new RegExp(
       'The skill with id [a-zA-Z0-9]+ is common to both the acquired and ' +
@@ -437,7 +359,7 @@ describe('Chapter editor functionality', function() {
   });
 
   it('should delete prerequisite skill and acquired skill', async function() {
-    await storyEditorPage.navigateToChapterWithName('Chapter 1');
+    await storyEditorPage.navigateToChapterWithName('Chapter 2');
     await storyEditorPage.deleteAcquiredSkillByIndex(0);
     await storyEditorPage.expectAcquiredSkillDescriptionCardCount(0);
     await storyEditorPage.deletePrerequisiteSkillByIndex(0);

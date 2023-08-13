@@ -18,11 +18,8 @@
 
 import { Component, OnInit, Input } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
-import { UrlInterpolationService } from
-  'domain/utilities/url-interpolation.service';
-import { ProfileLinkImageBackendApiService } from
-  'components/profile-link-directives/profile-link-image-backend-api.service';
 import { AppConstants } from 'app.constants';
+import { UserService } from 'services/user.service';
 
 @Component({
   selector: 'profile-link-image',
@@ -34,8 +31,8 @@ export class ProfileLinkImageComponent implements OnInit {
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() username!: string;
-  profileImageUrl!: string;
-  profilePicture!: string;
+  profilePicturePngDataUrl!: string;
+  profilePictureWebpDataUrl!: string;
   profileUrl = (
     '/' + AppConstants.PAGES_REGISTERED_WITH_FRONTEND.PROFILE.ROUTE.replace(
       ':username_fragment', this.username
@@ -43,9 +40,7 @@ export class ProfileLinkImageComponent implements OnInit {
   );
 
   constructor(
-    private profileLinkImageBackendApiService:
-      ProfileLinkImageBackendApiService,
-    private urlInterpolationService: UrlInterpolationService,
+    private userService: UserService
   ) {}
 
   isUsernameLinkable(username: string): boolean {
@@ -53,28 +48,13 @@ export class ProfileLinkImageComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.profileImageUrl = (
-      '/preferenceshandler/profile_picture_by_username/' +
-      this.username);
-    var DEFAULT_PROFILE_IMAGE_PATH = (
-      this.urlInterpolationService.getStaticImageUrl(
-        '/avatar/user_blue_72px.webp'));
-    this.profilePicture = DEFAULT_PROFILE_IMAGE_PATH;
     this.profileUrl = (
       '/' + AppConstants.PAGES_REGISTERED_WITH_FRONTEND.PROFILE.ROUTE.replace(
         ':username_fragment', this.username
       )
     );
-
-    // Returns a promise for the user profile picture, or the default
-    // image if user is not logged in or has not uploaded a profile
-    // picture, or the player is in preview mode.
-    this.profileLinkImageBackendApiService.fetchProfilePictureDataAsync(
-      this.profileImageUrl
-    ).then((base64ProfilePicture: string | null) => {
-      this.profilePicture = (
-        base64ProfilePicture || DEFAULT_PROFILE_IMAGE_PATH);
-    });
+    [this.profilePicturePngDataUrl, this.profilePictureWebpDataUrl] = (
+      this.userService.getProfileImageDataUrl(this.username));
   }
 }
 

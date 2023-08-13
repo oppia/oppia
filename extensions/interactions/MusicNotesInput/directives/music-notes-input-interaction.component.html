@@ -6,7 +6,10 @@
       <span><i class="fas fa-play music-notes-play"></i></span>
       <span [innerHTML]="'I18N_INTERACTIONS_MUSIC_PLAY' | translate"></span>
     </button>
-    <div class="oppia-music-input-note-choices"></div>
+    <music-phrase-editor>
+    </music-phrase-editor>
+    <div class="oppia-music-input-note-choices">
+    </div>
     <div class="oppia-music-input-staff"></div>
   </div>
 
@@ -31,10 +34,31 @@
     background: #fff;
     padding: 8px;
   }
-  @media screen and (max-width: 959px) {
+  @media screen and (max-width: 1024px) {
     .music-notes-input-container {
       max-width: 100vw;
-      width: 560px;
+      width: 235px;
+    }
+  }
+
+  @media screen and (max-width: 768px) {
+    .music-notes-input-container {
+      max-width: 100vw;
+      width: 526px;
+    }
+  }
+
+  @media screen and (max-width: 425px) {
+    .music-notes-input-container {
+      max-width: 100vw;
+      width: 289px;
+    }
+  }
+
+  @media screen and (max-width: 375px) {
+    .music-notes-input-container {
+      max-width: 100vw;
+      width: 248px;
     }
   }
   .music-notes-play {

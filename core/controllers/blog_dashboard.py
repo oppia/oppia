@@ -27,7 +27,6 @@ from core.domain import blog_services
 from core.domain import config_domain
 from core.domain import fs_services
 from core.domain import image_validation_services
-from core.domain import user_services
 
 from typing import Dict, List, Optional, TypedDict
 
@@ -83,8 +82,7 @@ class BlogDashboardPage(
 
     @acl_decorators.can_access_blog_dashboard
     def get(self) -> None:
-        """Handles GET requests."""
-
+        """Renders the blog dashboard page."""
         self.render_template('blog-dashboard-page.mainpage.html')
 
 
@@ -126,9 +124,8 @@ class BlogDashboardDataHandler(
 
     @acl_decorators.can_access_blog_dashboard
     def get(self) -> None:
-        """Handles GET requests."""
+        """Retrieves data for the blog dashboard."""
         assert self.user_id is not None
-        user_settings = user_services.get_user_settings(self.user_id)
         author_details = (
             blog_services.get_blog_author_details(self.user_id).to_dict())
         no_of_published_blog_posts = 0
@@ -154,7 +151,6 @@ class BlogDashboardDataHandler(
                     draft_blog_post_summaries))
         self.values.update({
             'author_details': author_details,
-            'profile_picture_data_url': user_settings.profile_picture_data_url,
             'no_of_published_blog_posts': no_of_published_blog_posts,
             'no_of_draft_blog_posts': no_of_draft_blog_posts,
             'published_blog_post_summary_dicts': published_post_summary_dicts,
@@ -165,7 +161,7 @@ class BlogDashboardDataHandler(
 
     @acl_decorators.can_access_blog_dashboard
     def post(self) -> None:
-        """Handles POST requests to create a new blog post draft."""
+        """Creates a new blog post draft."""
         assert self.user_id is not None
         new_blog_post = blog_services.create_new_blog_post(self.user_id)
         self.render_json({'blog_post_id': new_blog_post.id})
@@ -268,26 +264,26 @@ class BlogPostHandler(
 
     @acl_decorators.can_access_blog_dashboard
     def get(self, blog_post_id: str) -> None:
-        """Populates the data on the blog dashboard editor page."""
+        """Populates the data on the blog dashboard editor page.
+
+        Args:
+            blog_post_id: str. The ID of the blog post.
+
+        Raises:
+            PageNotFoundException. The blog post with the given id
+                or url doesn't exist.
+        """
         blog_post = (
             blog_services.get_blog_post_by_id(blog_post_id, strict=False))
         if blog_post is None:
             raise self.PageNotFoundException(
                 'The blog post with the given id or url doesn\'t exist.')
 
-        user_settings = user_services.get_user_settings(
-            blog_post.author_id, strict=False)
-        if user_settings:
-            profile_picture_data_url = user_settings.profile_picture_data_url
-        else:
-            profile_picture_data_url = None
-
         author_details = blog_services.get_blog_author_details(
             blog_post.author_id)
         max_no_of_tags = config_domain.Registry.get_config_property(
             'max_number_of_tags_assigned_to_blog_post', strict=True).value
-        list_of_default_tags = config_domain.Registry.get_config_property(
-            'list_of_default_tags_for_blog_post', strict=True).value
+        list_of_default_tags = constants.LIST_OF_DEFAULT_TAGS_FOR_BLOG_POST
 
         blog_post_dict = blog_post.to_dict()
         blog_post_dict_for_dashboard = {
@@ -304,7 +300,6 @@ class BlogPostHandler(
         self.values.update({
             'blog_post_dict': blog_post_dict_for_dashboard,
             'displayed_author_name': author_details.displayed_author_name,
-            'profile_picture_data_url': profile_picture_data_url,
             'max_no_of_tags': max_no_of_tags,
             'list_of_default_tags': list_of_default_tags
         })
@@ -313,7 +308,11 @@ class BlogPostHandler(
 
     @acl_decorators.can_edit_blog_post
     def put(self, blog_post_id: str) -> None:
-        """Updates properties of the given blog post."""
+        """Updates properties of the given blog post.
+
+        Args:
+            blog_post_id: str. The ID of the blog post.
+        """
         assert self.normalized_payload is not None
         blog_post_rights = (
             blog_services.get_blog_post_rights(blog_post_id, strict=True))
@@ -336,7 +335,14 @@ class BlogPostHandler(
 
     @acl_decorators.can_edit_blog_post
     def post(self, blog_post_id: str) -> None:
-        """Stores thumbnail of the blog post in the datastore."""
+        """Stores thumbnail of the blog post in the datastore.
+
+        Args:
+            blog_post_id: str. The ID of the blog post.
+
+        Raises:
+            InvalidInputException. The input provided is not valid.
+        """
         assert self.normalized_request is not None
         assert self.normalized_payload is not None
         raw_image = self.normalized_request['image']
@@ -360,7 +366,11 @@ class BlogPostHandler(
 
     @acl_decorators.can_delete_blog_post
     def delete(self, blog_post_id: str) -> None:
-        """Handles Delete requests."""
+        """Deletes a blog post.
+
+        Args:
+            blog_post_id: str. The ID of the blog post.
+        """
         blog_services.delete_blog_post(blog_post_id)
         self.render_json(self.values)
 
@@ -419,6 +429,9 @@ class BlogPostTitleHandler(
     def get(self, blog_post_id: str) -> None:
         """Handler that receives a blog post title and checks whether
         a blog post with the same title exists.
+
+        Args:
+            blog_post_id: str. The ID of the blog post.
         """
         assert self.normalized_request is not None
         title = self.normalized_request['title']

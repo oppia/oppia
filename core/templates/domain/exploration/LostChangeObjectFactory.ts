@@ -240,7 +240,7 @@ export class LostChangeObjectFactory {
    */
   createNew(
       lostChangeDict: ExplorationChange | LostChangeBackendDict): LostChange {
-    lostChangeDict = lostChangeDict as unknown as LostChangeBackendDict;
+    lostChangeDict = lostChangeDict as LostChangeBackendDict;
     return new LostChange(
       this.utilsService,
       lostChangeDict.cmd,

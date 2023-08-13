@@ -25,6 +25,7 @@ import {
   Output } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { AlertsService } from 'services/alerts.service';
+import { SchemaDefaultValue } from 'services/schema-default-value.service';
 
 interface MusicPhraseSchema {
   type: string;
@@ -43,7 +44,7 @@ interface MusicPhraseSchema {
 })
 export class MusicPhraseEditorComponent implements OnInit {
   @Input() modalId!: symbol;
-  @Input() value!: unknown;
+  @Input() value!: SchemaDefaultValue;
 
   @Output() valueChanged = new EventEmitter();
 

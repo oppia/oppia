@@ -201,7 +201,7 @@ def managed_dev_appserver(
             dev_appserver_args,
             human_readable_name='GAE Development Server',
             shell=True,
-            env=env
+            env=env,
         ))
         common.wait_for_port_to_be_in_use(port)
         yield proc
@@ -550,9 +550,10 @@ def managed_webpack_compiler(
         yield proc
 
 
-def get_chrome_version() -> str:
-    """Returns the version of Chrome installed on the system."""
-
+def get_chromedriver_version() -> str:
+    """Returns the version of Chromedriver compatible with the installed version
+    of Chrome.
+    """
     # Although there are spaces between Google and Chrome in the path, we
     # don't need to escape them for Popen (as opposed to on the terminal, in
     # which case we would need to escape them for the command to run).
@@ -577,15 +578,23 @@ def get_chrome_version() -> str:
             'https://chromedriver.chromium.org/downloads/version-selection'
             % chrome_command.replace(' ', r'\ ')) from e
 
-    installed_version_parts = b''.join(re.findall(rb'[0-9.]', output))
-    installed_version = '.'.join(
-        installed_version_parts.decode('utf-8').split('.')[:-1])
-    response = utils.url_open(
-        'https://chromedriver.storage.googleapis.com/LATEST_RELEASE_%s' % (
-            installed_version))
-    chrome_version: str = response.read().decode('utf-8')
+    installed_version_bytes = b''.join(re.findall(rb'[0-9.]', output))
+    installed_version_parts = installed_version_bytes.decode('utf-8').split('.')
+    # For Chrome versions 115 and above, compatible Chromedriver and Chrome
+    # versions have the same version numbers. For earlier versions, we use a
+    # Google API to find the compatible Chromedriver version. See
+    # https://chromedriver.chromium.org/downloads/version-selection for details.
+    if int(installed_version_parts[0]) >= 115:
+        chromedriver_version: str = '.'.join(installed_version_parts)
+    else:
+        response = utils.url_open(
+            'https://chromedriver.storage.googleapis.com/LATEST_RELEASE_%s' % (
+                '.'.join(installed_version_parts[:-1])
+            )
+        )
+        chromedriver_version = response.read().decode('utf-8')
 
-    return chrome_version
+    return chromedriver_version
 
 
 @contextlib.contextmanager
@@ -683,7 +692,7 @@ def managed_webdriverio_server(
         raise ValueError('Sharding instance should be larger than 0')
 
     if chrome_version is None:
-        chrome_version = get_chrome_version()
+        chrome_version = get_chromedriver_version()
 
     if mobile:
         os.environ['MOBILE'] = 'true'
@@ -722,3 +731,57 @@ def managed_webdriverio_server(
             yield proc
     finally:
         del os.environ['MOBILE']
+
+
+@contextlib.contextmanager
+def managed_acceptance_tests_server(
+    suite_name: str,
+    stdout: int = subprocess.PIPE,
+) -> Iterator[psutil.Process]:
+    """Returns context manager to start/stop the acceptance tests
+    server gracefully. If the suite_name is not in the list of the
+    acceptance tests suite names, then raises an exception.
+
+    Args:
+        suite_name: str. The suite name whose tests should be run.
+        stdout: int. This parameter specifies the executed program's standard
+            output file handle.
+
+    Yields:
+        psutil.Process. The jasmine testing process.
+
+    Raises:
+        Exception. The suite_name is not in the list of the acceptance tests
+            suite names.
+    """
+    nodemodules_jasmine_bin_path = os.path.join(
+        common.NODE_MODULES_PATH, '.bin', 'jasmine')
+    puppeteer_acceptance_tests_dir_path = os.path.join(
+        common.CURR_DIR, 'core', 'tests', 'puppeteer-acceptance-tests')
+    spec_dir_path = os.path.join(
+        puppeteer_acceptance_tests_dir_path, 'spec')
+    jasmine_config_file_path = os.path.join(
+        puppeteer_acceptance_tests_dir_path, 'jasmine.json')
+
+    acceptance_tests_args = [
+        nodemodules_jasmine_bin_path,
+        '--config="%s"' % jasmine_config_file_path,
+        '%s' % os.path.join(spec_dir_path, suite_name)
+    ]
+
+    if suite_name not in common.ACCEPTANCE_TESTS_SUITE_NAMES:
+        raise Exception('Invalid suite name: %s' % suite_name)
+
+    # OK to use shell=True here because we are passing string literals,
+    # and verifying that the passed suite-name are within the list of
+    # the suites we have, so there is no risk of a shell-injection attack.
+    managed_acceptance_tests_proc = managed_process(
+        acceptance_tests_args,
+        human_readable_name='Acceptance Tests Server',
+        shell=True,
+        raise_on_nonzero_exit=False,
+        stdout=stdout,
+    )
+
+    with managed_acceptance_tests_proc as proc:
+        yield proc

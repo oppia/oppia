@@ -129,8 +129,11 @@ export class AuthService {
   }
 
   static get firebaseEmulatorConfig(): readonly [string, number] | undefined {
+    let firebaseHost = (
+      process.env.OPPIA_IS_DOCKERIZED ? '0.0.0.0' : 'localhost');
+    // TODO(#18260): Change this when we permanently move to the Docker Setup.
     return AuthService.firebaseEmulatorIsEnabled ?
-      ['localhost', 9099] : undefined;
+      [firebaseHost, 9099] : undefined;
   }
 
   async handleRedirectResultAsync(): Promise<boolean> {
@@ -164,6 +167,10 @@ export class AuthService {
         this.creds = await this.angularFireAuth.signInWithEmailAndPassword(
           email, password);
       }
+    // We use unknown type because we are unsure of the type of error
+    // that was thrown. Since the catch block cannot identify the
+    // specific type of error, we are unable to further optimise the
+    // code by introducing more types of errors.
     } catch (err: unknown) {
       if ((err as firebase.auth.Error).code === 'auth/user-not-found') {
         if (this.angularFireAuth !== null) {

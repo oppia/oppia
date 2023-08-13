@@ -108,7 +108,12 @@ describe('Goals tab Component', () => {
       outline: 'Outline',
       exploration_id: null,
       outline_is_finalized: false,
-      thumbnail_bg_color: '#a33f40'
+      thumbnail_bg_color: '#a33f40',
+      status: 'Published',
+      planned_publication_date_msecs: 100,
+      last_modified_msecs: 100,
+      first_publication_date_msecs: 200,
+      unpublishing_reason: null
     };
     const learnerTopicSummaryBackendDict1 = {
       id: 'sample_topic_id',
@@ -307,6 +312,20 @@ describe('Goals tab Component', () => {
 
     expect(learnerGoalsSpy).toHaveBeenCalled();
   });
+  it('should remove topic from learner goals if already present', () => {
+    component.topicIdsInCurrentGoals = ['1', '2', '3'];
+
+    const learnerGoalsSpy = spyOn(
+      learnerDashboardActivityBackendApiService, 'addToLearnerGoals')
+      .and.returnValue(Promise.resolve(true));
+    const removeTopicSpy = spyOn(component, 'removeFromLearnerGoals');
+
+    component.addToLearnerGoals(component.editGoals[0], '2', 1);
+    fixture.detectChanges();
+
+    expect(removeTopicSpy).toHaveBeenCalled();
+    expect(learnerGoalsSpy).not.toHaveBeenCalled();
+  });
 
   it('should remove topic from the learner goals', () => {
     expect(learnerDashboardActivityBackendApiService.removeActivityModalStatus)
@@ -340,30 +359,29 @@ describe('Goals tab Component', () => {
   });
 
   it('should correctly show and hide the dropdown', () => {
-    expect(component.showThreeDotsDropdown).toBe(false);
+    for (let i = 0; i < component.currentGoals.length; i++) {
+      component.toggleThreeDotsDropdown(i);
+      expect(component.showThreeDotsDropdown[i]).toBe(true);
 
-    component.toggleThreeDotsDropdown();
-    expect(component.showThreeDotsDropdown).toBe(true);
+      component.toggleThreeDotsDropdown(i);
+      expect(component.showThreeDotsDropdown[i]).toBe(false);
 
-    component.toggleThreeDotsDropdown();
-    expect(component.showThreeDotsDropdown).toBe(false);
+      component.toggleThreeDotsDropdown(i);
+      expect(component.showThreeDotsDropdown[i]).toBe(true);
 
-    component.toggleThreeDotsDropdown();
-    expect(component.showThreeDotsDropdown).toBe(true);
+      let fakeClickAwayEvent = new MouseEvent('click');
+      Object.defineProperty(
+        fakeClickAwayEvent,
+        'target',
+        {value: document.createElement('div')});
+      component.onDocumentClick(fakeClickAwayEvent);
+      fixture.detectChanges();
+      expect(component.showThreeDotsDropdown[i]).toBe(false);
 
-    let fakeClickAwayEvent = new MouseEvent('click');
-    Object.defineProperty(
-      fakeClickAwayEvent,
-      'target',
-      {value: document.createElement('div')});
-    component.onDocumentClick(fakeClickAwayEvent);
-    fixture.detectChanges();
-    expect(component.showThreeDotsDropdown).toBe(false);
-
-    // Three dots are not shown when no goals are present.
-    component.dropdownRef = undefined;
-    component.onDocumentClick(fakeClickAwayEvent);
-    fixture.detectChanges();
-    expect(component.showThreeDotsDropdown).toBe(false);
+      // Three dots are not shown when no goals are present.
+      component.onDocumentClick(fakeClickAwayEvent);
+      fixture.detectChanges();
+      expect(component.showThreeDotsDropdown[i]).toBe(false);
+    }
   });
 });

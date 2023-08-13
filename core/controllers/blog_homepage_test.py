@@ -18,8 +18,8 @@ from __future__ import annotations
 import logging
 
 from core import feconf
+from core.constants import constants
 from core.domain import blog_services
-from core.domain import config_domain
 from core.platform import models
 from core.tests import test_utils
 
@@ -62,9 +62,7 @@ class BlogHomepageDataHandlerTest(test_utils.GenericTestBase):
         json_response = self.get_json(
             '%s?offset=0' % (feconf.BLOG_HOMEPAGE_DATA_URL),
             )
-        default_tags = config_domain.Registry.get_config_property(
-            'list_of_default_tags_for_blog_post', strict=True
-        ).value
+        default_tags = constants.LIST_OF_DEFAULT_TAGS_FOR_BLOG_POST
         self.assertEqual(default_tags, json_response['list_of_default_tags'])
         self.assertEqual(
             self.BLOG_ADMIN_USERNAME,
@@ -193,7 +191,6 @@ class BlogPostDataHandlerTest(test_utils.GenericTestBase):
             '<p>Hello Bloggers</p>',
             json_response['blog_post_dict']['content'])
         self.assertEqual(len(json_response['summary_dicts']), 0)
-        self.assertIsNotNone(json_response['profile_picture_data_url'])
 
         blog_post_two_id = (
             blog_services.create_new_blog_post(self.blog_admin_id).id)
@@ -220,7 +217,6 @@ class BlogPostDataHandlerTest(test_utils.GenericTestBase):
             '<p>Hello Blog</p>',
             json_response['blog_post_dict']['content'])
         self.assertEqual(len(json_response['summary_dicts']), 1)
-        self.assertIsNotNone(json_response['profile_picture_data_url'])
 
         # Deleting blog admin's user setting model.
         blog_admin_model = (
@@ -242,7 +238,6 @@ class BlogPostDataHandlerTest(test_utils.GenericTestBase):
             '<p>Hello Blog</p>',
             json_response['blog_post_dict']['content'])
         self.assertEqual(len(json_response['summary_dicts']), 1)
-        self.assertIsNone(json_response['profile_picture_data_url'])
 
     def test_should_get_correct_recommendations_for_post_page(self) -> None:
         self.signup(
@@ -407,7 +402,6 @@ class AuthorsPageHandlerTest(test_utils.GenericTestBase):
         )
         self.assertEqual(
             len(json_response['summary_dicts']), 1)
-        self.assertIsNotNone(json_response['profile_picture_data_url'])
 
         blog_services.unpublish_blog_post(self.blog_post.id)
         json_response = self.get_json(
@@ -556,9 +550,7 @@ class BlogPostSearchHandlerTest(test_utils.GenericTestBase):
                 'tags': '("Science")'
             })
 
-        default_tags = config_domain.Registry.get_config_property(
-            'list_of_default_tags_for_blog_post', strict=True
-        ).value
+        default_tags = constants.LIST_OF_DEFAULT_TAGS_FOR_BLOG_POST
         self.assertEqual(default_tags, response_dict['list_of_default_tags'])
         self.assertEqual(len(response_dict['blog_post_summaries_list']), 1)
         self.assertEqual(

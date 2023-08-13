@@ -182,7 +182,8 @@ describe('MultipleChoiceInputValidationService', () => {
         goodDefaultOutcome);
       expect(warnings).toEqual([{
         type: WARNING_TYPES.CRITICAL,
-        message: 'Please ensure rule 1 in group 1 refers to a valid choice.'
+        message: 'Please ensure learner answer 1 in Oppia response 1 refers ' +
+        'to a valid choice.'
       }]);
 
       goodAnswerGroups[0].rules[0].inputs.x = 1;
@@ -194,8 +195,9 @@ describe('MultipleChoiceInputValidationService', () => {
       expect(warnings).toEqual([{
         type: WARNING_TYPES.CRITICAL,
         message: (
-          'Please ensure rule 2 in group 1 is not equaling the same ' +
-          'multiple choice option as another rule.')
+          'Please ensure learner answer 2 in Oppia response 1 is not ' +
+          'equaling the same multiple choice option as another ' +
+          'learner answer.')
       }]);
     });
 

@@ -121,7 +121,8 @@ describe('Compare versions service', () => {
       };
       // This throws "Argument of type 'null' is not assignable to parameter of
       // type 'AnswerGroup[]'." We need to suppress this error
-      // because of the need to test validations.
+      // because of the need to test validations. This throws an
+      // error only in the frontend tests and not in the linter.
       // @ts-ignore
       newStateData.interaction.answer_groups =
           stateDetail.ruleDests.map(function(ruleDestName) {

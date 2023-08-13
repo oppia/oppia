@@ -97,11 +97,25 @@ export class InteractiveNumericExpressionInput implements OnInit {
   }
 
   submitAnswer(): void {
+    this.hasBeenTouched = true;
     if (!this.isCurrentAnswerValid(false)) {
       return;
     }
     this.currentInteractionService.onSubmit(
       this.value, this.numericExpressionInputRulesService);
+  }
+
+  onAnswerChange(focusObj: FocusObj): void {
+    const activeGuppyObject = (
+      this.guppyInitializationService.findActiveGuppyObject());
+    if (activeGuppyObject !== undefined) {
+      this.hasBeenTouched = true;
+      this.value = activeGuppyObject.guppyInstance.asciimath();
+      this.currentInteractionService.updateCurrentAnswer(this.value);
+    }
+    if (!focusObj.focused) {
+      this.isCurrentAnswerValid();
+    }
   }
 
   showOSK(): void {
@@ -129,29 +143,16 @@ export class InteractiveNumericExpressionInput implements OnInit {
         break;
       }
     }
-    this.guppyConfigurationService.changeDivSymbol(
-      (useFractionForDivision as unknown as { value: boolean }).value);
+    this.guppyConfigurationService.changeDivSymbol(useFractionForDivision);
     this.guppyInitializationService.init(
       'guppy-div-learner',
       placeholder.value.unicode,
       this.savedSolution !== undefined ?
       this.savedSolution as string : ''
     );
-    Guppy.event('change', (focusObj: FocusObj) => {
-      let activeGuppyObject = (
-        this.guppyInitializationService.findActiveGuppyObject());
-      if (activeGuppyObject !== undefined) {
-        this.hasBeenTouched = true;
-        this.value = activeGuppyObject.guppyInstance.asciimath();
-      }
-      if (!focusObj.focused) {
-        this.isCurrentAnswerValid();
-      }
-    });
+    Guppy.event('change', this.onAnswerChange.bind(this));
 
-    Guppy.event('done', () => {
-      this.submitAnswer();
-    });
+    Guppy.event('done', this.submitAnswer.bind(this));
 
     Guppy.event('focus', (focusObj: FocusObj) => {
       if (!focusObj.focused) {
@@ -159,18 +160,10 @@ export class InteractiveNumericExpressionInput implements OnInit {
       }
     });
 
-    const isCurrentAnswerValid = (): boolean => {
-      return this.isCurrentAnswerValid();
-    };
-
-    const submitAnswer = () => {
-      return this.submitAnswer();
-    };
     this.currentInteractionService.registerCurrentInteraction(
-      submitAnswer, isCurrentAnswerValid);
+      this.submitAnswer.bind(this), this.isCurrentAnswerValid.bind(this));
   }
 }
-
 
 angular.module('oppia').directive(
   'oppiaInteractiveNumericExpressionInput', downgradeComponent(

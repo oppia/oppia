@@ -16,7 +16,6 @@
  * @fileoverview Unit tests for contributor dashboard page component.
  */
 
-import { WindowRef } from 'services/contextual/window-ref.service';
 import { ComponentFixture, fakeAsync, flush, TestBed, tick, waitForAsync } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
@@ -28,6 +27,8 @@ import { UserService } from 'services/user.service';
 import { LocalStorageService } from 'services/local-storage.service';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { UserInfo } from 'domain/user/user-info.model';
+import { AppConstants } from 'app.constants';
+import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 
 describe('Contributor dashboard page', () => {
   let component: ContributorDashboardPageComponent;
@@ -37,7 +38,6 @@ describe('Contributor dashboard page', () => {
   let translationLanguageService: TranslationLanguageService;
   let translationTopicService: TranslationTopicService;
   let contributionOpportunitiesService: ContributionOpportunitiesService;
-  let userProfileImage = 'profile-data-url';
   let userContributionRights = {
     can_review_translation_for_language_codes: ['en', 'pt', 'hi'],
     can_review_voiceover_for_language_codes: ['en', 'pt', 'hi'],
@@ -45,9 +45,9 @@ describe('Contributor dashboard page', () => {
     can_suggest_questions: true,
   };
   let focusManagerService: FocusManagerService;
-  let windowRef: WindowRef;
   let getTranslatableTopicNamesAsyncSpy: jasmine.Spy;
   let getUserInfoAsyncSpy: jasmine.Spy;
+  let urlInterpolationService: UrlInterpolationService;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -60,8 +60,7 @@ describe('Contributor dashboard page', () => {
         UserService,
         TranslationLanguageService,
         TranslationTopicService,
-        ContributionOpportunitiesService,
-        WindowRef
+        ContributionOpportunitiesService
       ],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
@@ -74,11 +73,11 @@ describe('Contributor dashboard page', () => {
     contributionOpportunitiesService =
       TestBed.inject(ContributionOpportunitiesService);
     localStorageService = TestBed.inject(LocalStorageService);
-    windowRef = TestBed.inject(WindowRef);
     translationLanguageService = TestBed.inject(TranslationLanguageService);
     translationTopicService = TestBed.inject(TranslationTopicService);
     userService = TestBed.inject(UserService);
     focusManagerService = TestBed.inject(FocusManagerService);
+    urlInterpolationService = TestBed.inject(UrlInterpolationService);
 
     getTranslatableTopicNamesAsyncSpy = spyOn(
       contributionOpportunitiesService, 'getTranslatableTopicNamesAsync');
@@ -97,11 +96,11 @@ describe('Contributor dashboard page', () => {
       getUsername: () => 'username1'
     };
 
-    spyOn(userService, 'getProfileImageDataUrlAsync')
-      .and.returnValue(Promise.resolve(userProfileImage));
     getUserInfoAsyncSpy = spyOn(userService, 'getUserInfoAsync');
     getUserInfoAsyncSpy.and.returnValue(
       Promise.resolve(userInfo as UserInfo));
+    spyOn(userService, 'getProfileImageDataUrl').and.returnValue(
+      ['default-image-url-png', 'default-image-url-webp']);
 
     component.ngOnInit();
   });
@@ -128,18 +127,28 @@ describe('Contributor dashboard page', () => {
     }).toThrowError();
   }));
 
-  it('should scroll properly', () => {
-    spyOn(userService, 'getUserContributionRightsDataAsync')
-      .and.returnValue(Promise.resolve(userContributionRights));
-    const nativeWindowSpy = spyOnProperty(windowRef, 'nativeWindow');
-    nativeWindowSpy.and.returnValue({
-      pageYOffset: 11
-    });
+  it('should set default profile pictures when username is null',
+    fakeAsync(() => {
+      spyOn(userService, 'getUserContributionRightsDataAsync')
+        .and.returnValue(Promise.resolve(userContributionRights));
+      let userInfo = {
+        isLoggedIn: () => true,
+        getUsername: () => null
+      };
 
-    component.scrollFunction();
+      getUserInfoAsyncSpy.and.returnValue(
+        Promise.resolve(userInfo as UserInfo));
 
-    expect(component.defaultHeaderVisible).toBeTrue();
-  });
+      component.ngOnInit();
+      tick();
+
+      expect(component.profilePicturePngDataUrl).toBe(
+        urlInterpolationService.getStaticImageUrl(
+          AppConstants.DEFAULT_PROFILE_IMAGE_PNG_PATH));
+      expect(component.profilePictureWebpDataUrl).toBe(
+        urlInterpolationService.getStaticImageUrl(
+          AppConstants.DEFAULT_PROFILE_IMAGE_WEBP_PATH));
+    }));
 
   it('should username equal to "" when user is not loggedIn', fakeAsync(() => {
     spyOn(userService, 'getUserContributionRightsDataAsync')
@@ -157,6 +166,12 @@ describe('Contributor dashboard page', () => {
 
     expect(component.username).toEqual('');
     expect(component.userIsLoggedIn).toBeFalse();
+    expect(component.profilePicturePngDataUrl).toBe(
+      urlInterpolationService.getStaticImageUrl(
+        AppConstants.DEFAULT_PROFILE_IMAGE_PNG_PATH));
+    expect(component.profilePictureWebpDataUrl).toBe(
+      urlInterpolationService.getStaticImageUrl(
+        AppConstants.DEFAULT_PROFILE_IMAGE_WEBP_PATH));
   }));
 
   describe('when user is logged in', () => {
@@ -173,6 +188,10 @@ describe('Contributor dashboard page', () => {
         expect(component.activeTabName).toBe('myContributionTab');
         expect(component.OPPIA_AVATAR_IMAGE_URL).toBe(
           '/assets/copyrighted-images/avatar/oppia_avatar_100px.svg');
+        expect(component.profilePicturePngDataUrl).toEqual(
+          'default-image-url-png');
+        expect(component.profilePictureWebpDataUrl).toEqual(
+          'default-image-url-webp');
       }));
 
     it('should not set active topic name when no topics are returned',
@@ -207,7 +226,6 @@ describe('Contributor dashboard page', () => {
       expect(component.username).toBe('');
       expect(component.userCanReviewQuestions).toBe(false);
       expect(component.userIsReviewer).toBe(false);
-      expect(component.profilePictureDataUrl).toBeUndefined();
     });
 
     it('should change active tab name when clicking on translate text tab',
@@ -275,45 +293,5 @@ describe('Contributor dashboard page', () => {
       expect(component.activeTabName).toBe(changedTab);
       expect(component.showTopicSelector()).toBe(true);
     });
-
-    it('should call scrollFunction on scroll', () => {
-      spyOn(userService, 'getUserContributionRightsDataAsync')
-        .and.returnValue(Promise.resolve(userContributionRights));
-      let dummyScrollEvent = new Event('scroll');
-      let scrollSpy = spyOn(component, 'scrollFunction');
-
-      windowRef.nativeWindow.dispatchEvent(dummyScrollEvent);
-
-      expect(scrollSpy).toHaveBeenCalled();
-    });
-
-    it('should show default header if window pageYOffset is ' +
-      'less than 80', function() {
-      spyOn(userService, 'getUserContributionRightsDataAsync')
-        .and.returnValue(Promise.resolve(userContributionRights));
-      const nativeWindowSpy = spyOnProperty(windowRef, 'nativeWindow');
-      nativeWindowSpy.and.returnValue({
-        pageYOffset: 79
-      });
-
-      component.scrollFunction();
-
-      expect(component.defaultHeaderVisible).toBe(true);
-    });
-
-    it('should show collapsed header if window pageYOffset is' +
-      ' scrolled greater than 80', fakeAsync(() => {
-      spyOn(userService, 'getUserContributionRightsDataAsync')
-        .and.returnValue(Promise.resolve(userContributionRights));
-      const nativeWindowSpy = spyOnProperty(windowRef, 'nativeWindow');
-      nativeWindowSpy.and.returnValue({
-        pageYOffset: 81
-      });
-
-      component.scrollFunction();
-      tick();
-
-      expect(component.defaultHeaderVisible).toBe(false);
-    }));
   });
 });

@@ -18,7 +18,7 @@
            *ngIf="avatarImageIsShown">
       <div class="oppia-rte-viewer oppia-learner-view-card-top-content"
            [ngClass]="getContentAudioHighlightClass()">
-        <div tabindex="1">
+        <div tabindex="0">
           <oppia-rte-output-display [rteString]="displayedCard.getContentHtml()"
                                     class="e2e-test-conversation-content">
           </oppia-rte-output-display>
@@ -48,7 +48,8 @@
       <div *ngFor="let responsePair of displayedCard.getInputResponsePairs(); index as index">
         <div *ngIf="index !== (displayedCard.getInputResponsePairs().length - 1) || !isInteractionInline()">
           <oppia-input-response-pair [data]="responsePair"
-                                     [profilePicture]="profilePicture"
+                                     [profilePicturePngDataUrl]="profilePicturePngDataUrl"
+                                     [profilePictureWebpDataUrl]="profilePictureWebpDataUrl"
                                      [oppiaAvatarImageUrl]="OPPIA_AVATAR_IMAGE_URL"
                                      [inputResponsePairId]="getInputResponsePairId($index)"
                                      [isLastPair]="false"
@@ -62,7 +63,8 @@
     <div class="conversation-skin-tutor-card-bottom-section" *ngIf="isInteractionInline() && displayedCard.getInputResponsePairs().length > 0">
       <oppia-input-response-pair [data]="displayedCard.getInputResponsePairs()[displayedCard.getInputResponsePairs().length - 1]"
                                  [bottomSection]="true"
-                                 [profilePicture]="profilePicture"
+                                 [profilePicturePngDataUrl]="profilePicturePngDataUrl"
+                                 [profilePictureWebpDataUrl]="profilePictureWebpDataUrl"
                                  [oppiaAvatarImageUrl]="OPPIA_AVATAR_IMAGE_URL"
                                  [inputResponsePairId]="getInputResponsePairId(displayedCard.getInputResponsePairs().length - 1)"
                                  [isLastPair]="true"
@@ -91,16 +93,6 @@
           </oppia-interaction-display>
         </div>
       </div>
-    </div>
-
-    <div *ngIf="displayedCard.getInteractionId() === 'MultipleChoiceInput'"
-         class="oppia-mcq-question-description-text">
-      <span>
-        <i>
-          Note: When you select an option, the quiz will automatically
-          move to the next question.
-        </i>
-      </span>
     </div>
 
     <div *ngIf="!isInteractionInline() && !conceptCardIsBeingShown"

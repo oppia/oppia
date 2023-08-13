@@ -63,6 +63,7 @@ export class LessonInformationCardModalComponent extends ConfirmOrCancelModal {
   explorationId!: string;
   expTitle!: string;
   expDesc!: string;
+  expCategory!: string;
   contributorNames!: string[];
   checkpointCount!: number;
   expInfo!: LearnerExplorationSummaryBackendDict;
@@ -115,6 +116,7 @@ export class LessonInformationCardModalComponent extends ConfirmOrCancelModal {
     this.explorationTags = this.getExplorationTagsSummary(this.expInfo.tags);
     this.explorationId = this.expInfo.id;
     this.expTitle = this.expInfo.title;
+    this.expCategory = this.expInfo.category;
     this.expDesc = this.expInfo.objective;
     this.infoCardBackgroundCss = {
       'background-color': this.expInfo.thumbnail_bg_color
@@ -175,6 +177,19 @@ export class LessonInformationCardModalComponent extends ConfirmOrCancelModal {
     return (
       ((this.completedCheckpointsCount - 1) * spaceBetweenEachNode) +
       (spaceBetweenEachNode / 2));
+  }
+
+  getProgressPercentage(): string {
+    if (this.completedCheckpointsCount === this.checkpointCount) {
+      return '100';
+    }
+    if (this.completedCheckpointsCount === 0) {
+      return '0';
+    }
+    const progressPercentage = Math.floor(
+      (this.completedCheckpointsCount / this.checkpointCount) * 100
+    );
+    return progressPercentage.toString();
   }
 
   getExplorationTagsSummary(arrayOfTags: string[]): ExplorationTagSummary {

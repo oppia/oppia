@@ -1,0 +1,274 @@
+.oppia-community-stats-value {
+  color: rgb(51, 51, 51);
+  font-family: Roboto, sans-serif;
+  font-size: 32px;
+  font-weight: 500;
+  left: 0;
+  position: absolute;
+  text-transform: capitalize;
+  top: 31px;
+  word-wrap: break-word;
+}
+.oppia-community-stats-header {
+  color: rgb(102, 112, 133);
+  font-family: Roboto, sans-serif;
+  font-size: 16px;
+  font-weight: 400;
+  left: 0;
+  position: absolute;
+  text-transform: capitalize;
+  top: 0;
+  word-wrap: break-word;
+}
+.oppia-vertical-ruler {
+  border: 0.5px rgb(51, 51, 51) solid;
+  height: 0;
+  opacity: 0.1;
+  transform: rotate(-90deg);
+  transform-origin: 0 0;
+  width: 66.03px;
+}
+.oppia-header-stats-container {
+  height: 69px;
+  position: relative;
+  width: 81px;
+}
+.oppia-dashboard-title {
+  margin-bottom: 50px;
+  margin-top: 0;
+}
+.oppia-dashboard-title h1 {
+  color: #01645c;
+  display: inline;
+  font-family: "Capriola", "Roboto", Arial, sans-serif;
+  font-size: 3em;
+  margin-bottom: 25px;
+}
+.oppia-dashboard-title-desktop {
+  padding-top: 78.5px;
+}
+.oppia-dashboard-title-mobile {
+  padding-top: 25px;
+  text-align: center;
+}
+.stats-header {
+  color: #667085;
+  font-family: Roboto, sans-serif;
+  font-size: 16px;
+  font-weight: 400;
+  text-transform: capitalize;
+  word-wrap: break-word;
+}
+.mat-card-content.stats-container {
+  padding: 1em;
+}
+.mat-card.oppia-mat-card {
+  align-items: baseline;
+  display: flex;
+  justify-content: space-around;
+  width: 960px;
+}
+.oppia-dashboard-container {
+  max-width: 960px;
+}
+
+@media (max-width: 815px) {
+  .oppia-dashboard-container {
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+  .stats-card h2 {
+    font-size: 24px;
+    font-weight: 500;
+  }
+}
+@media (max-width: 316px) {
+  body {
+    width: fit-content;
+  }
+  .mat-card {
+    width: fit-content;
+  }
+}
+.oppia-contributor-dashboard-main-content {
+  width: 100%;
+}
+.oppia-contributor-dashboard-mobile-mode {
+  margin: auto;
+  width: 100%;
+}
+.oppia-contributor-dashboard-main-content .stats-card {
+  min-height: 63px;
+  position: relative;
+}
+.oppia-contributor-dashboard-main-content .stats-card .stat-description {
+  line-height: 1.646;
+  margin-bottom: 3em;
+  padding-right: 10px;
+}
+.oppia-contributor-dashboard-main-content .stats-card .stat-value-with-rating {
+  margin-top: 0;
+  padding-top: 1em;
+  position: absolute;
+  top: 0.75em;
+}
+.stats-card h2 {
+  font-size: 32px;
+  font-weight: 500;
+}
+.dashboard-content {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-around;
+  margin: 0 auto;
+  padding-top: 50px;
+}
+.dashboard-content-primary {
+  display: inline-block;
+  justify-content: space-around;
+  margin-bottom: 50px;
+  overflow: auto;
+}
+
+.dashboard-content-mobile {
+  border: 0;
+  border-radius: 0;
+  display: none;
+  max-width: 1000px;
+}
+
+.dashboard-tabs .dashboard-tabs-text {
+  border-bottom: 2px solid rgb(255, 255, 255);
+  font-size: 16px;
+  padding: 10px;
+  text-decoration: none;
+  text-transform: uppercase;
+  width: 100%;
+}
+
+.dashboard-tabs a.dashboard-tabs-text {
+  color: #667085;
+}
+
+.dashboard-tabs-active .dashboard-tabs-text,
+.dashboard-tabs-active .dashboard-tabs-text:hover {
+  border-bottom: 4px solid rgb(0, 99, 93);
+  border-radius: 0;
+}
+.dashboard-tabs-active a.dashboard-tabs-text {
+  color: #00645c;
+}
+
+.dashboard-tabs .dashboard-tabs-text:hover,
+.dashboard-tabs .dashboard-tabs-text:focus {
+  color: rgb(51, 51, 51);
+  font-size: 16px;
+  padding: 10px;
+  text-decoration: none;
+  text-transform: uppercase;
+  width: 100%;
+}
+.dashboard-tabs {
+  display: flex;
+  flex-wrap: nowrap;
+  padding: 5px;
+  text-align: center;
+}
+.dashboard-tabs li {
+  display: flex;
+  display: -webkit-flex;
+  margin-bottom: 0;
+  width: 50%;
+}
+.dashboard-title {
+  color: #01645c;
+  font-family: Capriola, Roboto, Arial, sans-serif;
+  font-size: 3em;
+  margin-bottom: 25px;
+  margin-top: 0;
+  padding-top: 78.5px;
+  text-align: center;
+}
+
+@media only screen and (max-width: 800px) {
+  .oppia-contributor-dashboard-main-content
+  .stats-card
+  .stat-value-with-rating {
+    padding-top: 0;
+    position: absolute;
+    top: 1.25em;
+  }
+  .oppia-contributor-dashboard-main-content .stats-card .stat-description {
+    line-height: 1.8;
+  }
+
+  .oppia-dashboard-container {
+    max-width: 400px;
+  }
+  .mat-card.oppia-mat-card {
+    width: 380px;
+  }
+  .dashboard-tabs {
+    box-shadow: 0 0 5px #333;
+    display: flex;
+    flex-wrap: nowrap;
+    text-align: center;
+    width: 100%;
+  }
+  .oppia-filtered-choices-field {
+    box-shadow: 0 0 5px #333;
+    display: flex;
+    flex-wrap: nowrap;
+    text-align: center;
+    width: 100%;
+  }
+  .dashboard-tabs li {
+    width: 50%;
+  }
+  .dashboard-tabs .dashboard-tabs-text {
+    border-radius: 0;
+    color: rgb(255, 255, 255);
+  }
+  .dashboard-tabs-active .dashboard-tabs-text,
+  .dashboard-tabs-active .dashboard-tabs-text:hover {
+    border-bottom: 2px solid rgb(255, 255, 255);
+    border-radius: 0;
+    color: rgb(255, 255, 255);
+  }
+  .dashboard-tabs .dashboard-tabs-text:hover {
+    border-radius: 0;
+    color: rgb(255, 255, 255);
+  }
+  .dashboard-content {
+    max-width: 1000px;
+    padding-top: 0;
+  }
+  .dashboard-content-primary {
+    border: 0;
+    border-radius: 0;
+    display: none;
+    max-width: 1000px;
+  }
+  .dashboard-content-mobile {
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+  }
+  .dashboard-content-mobile .dropdown {
+    background: white;
+    border-radius: 5px;
+    display: flex;
+    height: 90px;
+    padding: 20px;
+    width: 220px;
+  }
+}
+@media screen and (max-width: 1200px) {
+  .dashboard-content {
+    max-width: 1000px;
+  }
+  .dashboard-content-secondary {
+    display: inline-block;
+    width: 29%;
+  }
+}

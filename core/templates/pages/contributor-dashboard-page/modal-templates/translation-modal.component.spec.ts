@@ -123,7 +123,8 @@ describe('Translation Modal Component', () => {
     component.contentPanel = new RteOutputDisplayComponent(
       // This throws "Argument of type 'null' is not assignable to parameter of
       // type 'ViewContainerRef'." We need to suppress this error because of
-      // the need to test validations.
+      // the need to test validations. This is because the component is not
+      // strictly typed yet.
       // @ts-ignore
       null, null, new ElementRef({offsetHeight: 200}), null);
     getUserContributionRightsDataAsyncSpy = spyOn(
@@ -320,7 +321,7 @@ describe('Translation Modal Component', () => {
         AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE);
     }));
 
-    it('should compute panel overlfow after the view has initialized', () => {
+    it('should compute panel overflow after the view has initialized', () => {
       spyOn(component, 'computePanelOverflowState');
 
       component.ngAfterViewInit();
@@ -328,10 +329,10 @@ describe('Translation Modal Component', () => {
       expect(component.computePanelOverflowState).toHaveBeenCalled();
     });
 
-    it('should compute editor overlfow after the view has changed', () => {
+    it('should compute editor overflow after the view has changed', () => {
       spyOn(component, 'computeTranslationEditorOverflowState');
 
-      component.ngAfterViewChecked();
+      component.ngAfterContentChecked();
 
       expect(component.computeTranslationEditorOverflowState)
         .toHaveBeenCalled();
@@ -520,12 +521,19 @@ describe('Translation Modal Component', () => {
         stateName2: {
           contentId2: {
             content_format: 'unicode',
-            content_value: 'Continue',
+            content_value: 'input',
             content_type: 'interaction',
-            interaction_id: null,
+            interaction_id: 'TextInput',
             rule_type: null
           },
           contentId3: {
+            content_format: 'unicode',
+            content_value: 'Continue',
+            content_type: 'ca',
+            interaction_id: 'Continue',
+            rule_type: null
+          },
+          contentId4: {
             content_format: 'set_of_normalized_string',
             content_value: ['answer1', 'answer2', 'answer3'],
             content_type: 'rule',
@@ -675,6 +683,17 @@ describe('Translation Modal Component', () => {
       });
     });
 
+    describe('when skipping translations', () => {
+      it('should update activeContentType', () => {
+        component.skipActiveTranslation();
+        expect(component.activeContentType).toBe('TextInput interaction');
+        component.skipActiveTranslation();
+        expect(component.activeContentType).toBe('label');
+        component.skipActiveTranslation();
+        expect(component.activeContentType).toBe('input rule');
+      });
+    });
+
     describe('when suggesting the last available text', () => {
       beforeEach(() => {
         expectedPayload = {
@@ -685,7 +704,7 @@ describe('Translation Modal Component', () => {
           target_version_at_submission: 1,
           change: {
             cmd: 'add_written_translation',
-            content_id: 'contentId3',
+            content_id: 'contentId4',
             state_name: 'stateName2',
             language_code: 'es',
             content_html: ['answer1', 'answer2', 'answer3'],
@@ -694,6 +713,7 @@ describe('Translation Modal Component', () => {
           },
           files: {}
         };
+        component.skipActiveTranslation();
         component.skipActiveTranslation();
         component.skipActiveTranslation();
         component.activeWrittenTranslation = [

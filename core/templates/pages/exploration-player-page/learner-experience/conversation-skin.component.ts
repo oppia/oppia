@@ -163,7 +163,6 @@ export class ConversationSkinComponent {
   // Until the response is received, it remains undefined.
   completedChaptersCount: number | undefined;
   chapterIsCompletedForTheFirstTime: boolean = false;
-  CHECKPOINTS_FEATURE_IS_ENABLED: boolean = false;
   pidInUrl: string;
   submitButtonIsDisabled = true;
   solutionForState: Solution | null = null;
@@ -253,13 +252,6 @@ export class ConversationSkinComponent {
     this.collectionId = this.urlService.getCollectionIdFromExplorationUrl();
     this.pidInUrl = this.urlService.getPidFromUrl();
 
-    this.readOnlyExplorationBackendApiService
-      .fetchCheckpointsFeatureIsEnabledStatus().then(
-        (checkpointsFeatureIsEnabled) => {
-          this.CHECKPOINTS_FEATURE_IS_ENABLED = checkpointsFeatureIsEnabled;
-        }
-      );
-
     if (this.collectionId) {
       this.readOnlyCollectionBackendApiService.loadCollectionAsync(
         this.collectionId).then((collection) => {
@@ -310,6 +302,14 @@ export class ConversationSkinComponent {
           })
       );
     }
+
+    this.directiveSubscriptions.add(
+      this.explorationPlayerStateService.onShowProgressModal.subscribe(
+        () => {
+          this.hasFullyLoaded = true;
+        }
+      )
+    );
 
     this.directiveSubscriptions.add(
       this.playerPositionService.onNewCardOpened.subscribe(
@@ -417,8 +417,7 @@ export class ConversationSkinComponent {
           let isLoggedOutProgressTracked = (
             this.explorationPlayerStateService
               .isLoggedOutLearnerProgressTracked());
-          if (this.CHECKPOINTS_FEATURE_IS_ENABLED && !this.isLoggedIn &&
-            !isLoggedOutProgressTracked) {
+          if (!this.isLoggedIn && !isLoggedOutProgressTracked) {
             let confirmationMessage = (
               'Please save your progress before navigating away from the' +
               ' page; else, you will lose your exploration progress.');
@@ -465,8 +464,7 @@ export class ConversationSkinComponent {
       this.fetchCompletedChaptersCount();
 
       // We do not save checkpoints progress for iframes.
-      if (this.CHECKPOINTS_FEATURE_IS_ENABLED &&
-        !this.isIframed && !this._editorPreviewMode &&
+      if (!this.isIframed && !this._editorPreviewMode &&
         !this.explorationPlayerStateService.isInQuestionPlayerMode()) {
         // For the first state which is always a checkpoint.
         let firstStateName: string;
@@ -499,16 +497,16 @@ export class ConversationSkinComponent {
     });
   }
 
-  doesCollectionAllowsGuestProgress(collectionId: string): boolean {
+  doesCollectionAllowsGuestProgress(collectionId: string | never): boolean {
     let whiteListedCollectionIds = (
       AppConstants.
         WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS
     );
     return (
       (
-        whiteListedCollectionIds as unknown as string[]
+        whiteListedCollectionIds as readonly[]
       ).
-        indexOf(collectionId) !== -1);
+        indexOf(collectionId as never) !== -1);
   }
 
   isSubmitButtonDisabled(): boolean {
@@ -830,8 +828,7 @@ export class ConversationSkinComponent {
     let index = this.playerPositionService.getDisplayedCardIndex();
     this.displayedCard = this.playerTranscriptService.getCard(index);
 
-    if (this.CHECKPOINTS_FEATURE_IS_ENABLED && index > 0 &&
-      !this.isIframed && !this._editorPreviewMode &&
+    if (index > 0 && !this.isIframed && !this._editorPreviewMode &&
       !this.explorationPlayerStateService.isInQuestionPlayerMode()) {
       let currentState = this.explorationEngineService.getState();
       let currentStateName = currentState.name;
@@ -1134,20 +1131,18 @@ export class ConversationSkinComponent {
         this.nextCard.getStateName());
     }
 
-    if (this.CHECKPOINTS_FEATURE_IS_ENABLED) {
-      // We do not store checkpoints progress for iframes hence we do not
-      // need to consider redirecting the user to the most recently
-      // reached checkpoint on exploration initial load in that case.
-      if (!this.isIframed && !this._editorPreviewMode &&
-          !this.explorationPlayerStateService.isInQuestionPlayerMode()) {
-        // Navigate the learner to the most recently reached checkpoint state.
-        this._navigateToMostRecentlyReachedCheckpoint();
-      }
+    // We do not store checkpoints progress for iframes hence we do not
+    // need to consider redirecting the user to the most recently
+    // reached checkpoint on exploration initial load in that case.
+    if (!this.isIframed && !this._editorPreviewMode &&
+        !this.explorationPlayerStateService.isInQuestionPlayerMode()) {
+      // Navigate the learner to the most recently reached checkpoint state.
+      this._navigateToMostRecentlyReachedCheckpoint();
     }
+    this.hasFullyLoaded = true;
 
     this.focusManagerService.setFocusIfOnDesktop(focusLabel);
     this.loaderService.hideLoadingScreen();
-    this.hasFullyLoaded = true;
 
     // If the exploration is embedded, use the url language code
     // as site language. If the url language code is not supported
@@ -1206,6 +1201,8 @@ export class ConversationSkinComponent {
 
   submitAnswer(
       answer: string, interactionRulesService: InteractionRulesService): void {
+    this.displayedCard.updateCurrentAnswer(null);
+
     // Safety check to prevent double submissions from occurring.
     if (this.answerIsBeingProcessed ||
       !this.isCurrentCardAtEndOfTranscript() ||
@@ -1615,6 +1612,7 @@ export class ConversationSkinComponent {
   }
 
   submitAnswerFromProgressNav(): void {
+    this.displayedCard.toggleSubmitClicked(true);
     this.currentInteractionService.submitAnswer();
   }
 

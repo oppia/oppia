@@ -155,8 +155,8 @@ describe('NumberWithUnitsValidationService', () => {
       currentState, {}, answerGroups, goodDefaultOutcome);
     expect(warnings).toEqual([{
       type: WARNING_TYPES.ERROR,
-      message: 'Rule 2 from answer group 1 will never be matched ' +
-        'because it is made redundant by rule 1 from answer group 1.'
+      message: 'Learner answer 2 from Oppia response 1 will never be matched' +
+        ' because it is made redundant by answer 1 from response 1.'
     }]);
   });
 
@@ -188,8 +188,8 @@ describe('NumberWithUnitsValidationService', () => {
         currentState, {}, answerGroups, goodDefaultOutcome);
       expect(warnings).toEqual([{
         type: WARNING_TYPES.ERROR,
-        message: 'Rule 2 from answer group 1 will never be matched ' +
-          'because it is made redundant by rule 1 from answer group 1.'
+        message: 'Learner answer 2 from Oppia response 1 will never be ' +
+        'matched because it is made redundant by answer 1 from response 1.'
       }]);
     });
 
@@ -209,8 +209,8 @@ describe('NumberWithUnitsValidationService', () => {
         currentState, {}, answerGroups, goodDefaultOutcome);
       expect(warnings).toEqual([{
         type: WARNING_TYPES.ERROR,
-        message: 'Rule 2 from answer group 1 will never be matched ' +
-          'because it is made redundant by rule 1 from answer group 1.'
+        message: 'Learner answer 2 from Oppia response 1 will never be ' +
+        'matched because it is made redundant by answer 1 from response 1.'
       }]);
     });
 
@@ -237,8 +237,13 @@ describe('NumberWithUnitsValidationService', () => {
           return 0.0;
         }
       },
+      // This throws "Type null is not assignable to type
+      // 'string'." We need to suppress this error
+      // because of the need to test validations. This
+      // function is not used in the validations.
+      // @ts-ignore
       toMathjsCompatibleString: () => {
-        return null as unknown as string;
+        return null;
       },
       toDict: () => {
         let uof = new UnitsObjectFactory();

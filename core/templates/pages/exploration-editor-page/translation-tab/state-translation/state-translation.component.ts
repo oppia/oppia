@@ -43,7 +43,7 @@ import { WrapTextWithEllipsisPipe } from 'filters/string-utility-filters/wrap-te
 import { ParameterizeRuleDescriptionPipe } from 'filters/parameterize-rule-description.pipe';
 import { AnswerGroup } from 'domain/exploration/AnswerGroupObjectFactory';
 import { BaseTranslatableObject } from 'interactions/rule-input-defs';
-import { Hint } from 'domain/exploration/HintObjectFactory';
+import { Hint } from 'domain/exploration/hint-object.model';
 import { Solution } from 'domain/exploration/SolutionObjectFactory';
 import { EntityTranslationsService } from 'services/entity-translations.services';
 import { TranslatedContent } from 'domain/exploration/TranslatedContentObjectFactory';

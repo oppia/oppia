@@ -17,20 +17,18 @@
  */
 
 import { TestBed } from '@angular/core/testing';
-import { HintObjectFactory } from 'domain/exploration/HintObjectFactory';
+import { Hint } from 'domain/exploration/hint-object.model';
 import { StateHintsService } from 'components/state-editor/state-editor-properties-services/state-hints.service';
 
 describe('State hints service', () => {
   let shs: StateHintsService;
-  let hof: HintObjectFactory;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [StateHintsService, HintObjectFactory]
+      providers: [StateHintsService]
     });
 
     shs = TestBed.get(StateHintsService);
-    hof = TestBed.get(HintObjectFactory);
   });
 
   it('should called the constructor', () =>{
@@ -46,7 +44,7 @@ describe('State hints service', () => {
         html: '<p>math</p>',
         content_id: 'hint_1'
       }
-    }].map(item => hof.createFromBackendDict(item));
+    }].map(item => Hint.createFromBackendDict(item));
     shs.init(StateName, value);
     expect(shs.setActiveHintIndex).toHaveBeenCalled();
   });

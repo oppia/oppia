@@ -80,7 +80,7 @@ class FrontendBaseSuggestionDict(TypedDict):
     language_code: str
     last_updated: float
     edited_by_reviewer: bool
-    exploration_content_html: Union[str, List[str]]
+    exploration_content_html: Optional[Union[str, List[str]]]
 
 
 SuggestionsProviderHandlerUrlPathArgsSchemaDictType = Dict[
@@ -765,12 +765,9 @@ class ReviewableSuggestionsHandler(
                 suggestion_services
                 .get_reviewable_translation_suggestions_by_offset(
                     self.user_id, exp_ids, limit, offset, sort_key))
-            # Filter out obsolete translation suggestions, i.e. suggestions with
-            # translations that no longer match the current exploration content
-            # text. See issue #16536 for more details.
             suggestions = (
                 suggestion_services
-                .get_suggestions_with_translatable_explorations(
+                .get_suggestions_with_editable_explorations(
                     reviewable_suggestions))
         elif suggestion_type == feconf.SUGGESTION_TYPE_ADD_QUESTION:
             suggestions, next_offset = (
@@ -876,7 +873,7 @@ class UserSubmittedSuggestionsHandler(
             )
             suggestions_with_translatable_exps = (
                 suggestion_services
-                .get_suggestions_with_translatable_explorations(
+                .get_suggestions_with_editable_explorations(
                     translatable_suggestions))
             while (
                 len(translatable_suggestions) > 0 and
@@ -896,7 +893,7 @@ class UserSubmittedSuggestionsHandler(
                 )
                 suggestions_with_translatable_exps = (
                     suggestion_services
-                    .get_suggestions_with_translatable_explorations(
+                    .get_suggestions_with_editable_explorations(
                         translatable_suggestions
                     )
                 )
@@ -1168,10 +1165,10 @@ def _get_target_id_to_skill_opportunity_dict(
 def _construct_exploration_suggestions(
     suggestions: Sequence[suggestion_registry.BaseSuggestion]
 ) -> List[FrontendBaseSuggestionDict]:
-    """Returns exploration suggestions with current exploration content. This
-    method assumes that the supplied suggestions represent changes that are
-    still valid, e.g. the suggestions refer to content that still exist in the
-    linked exploration.
+    """Returns exploration suggestions with current exploration content. If the
+    exploration content is no longer available, e.g. the exploration state or
+    content was deleted, the suggestion's change content is used for the
+    exploration content instead.
 
     Args:
         suggestions: list(BaseSuggestion). A list of suggestions.
@@ -1186,8 +1183,13 @@ def _construct_exploration_suggestions(
     exp_id_to_exp = exp_fetchers.get_multiple_explorations_by_id(list(exp_ids))
     for suggestion in suggestions:
         exploration = exp_id_to_exp[suggestion.target_id]
-        content_html = exploration.get_content_html(
-            suggestion.change.state_name, suggestion.change.content_id)
+        content_html: Optional[Union[str, List[str]]] = None
+        try:
+            content_html = exploration.get_content_html(
+                suggestion.change.state_name, suggestion.change.content_id)
+        except ValueError:
+            # Exploration content is no longer available.
+            pass
         suggestion_dict = suggestion.to_dict()
         updated_suggestion_dict: FrontendBaseSuggestionDict = {
             'suggestion_id': suggestion_dict['suggestion_id'],

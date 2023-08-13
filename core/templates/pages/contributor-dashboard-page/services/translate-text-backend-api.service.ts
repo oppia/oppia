@@ -29,7 +29,7 @@ interface Data {
   'target_id': string;
   'target_version_at_submission': string;
   change: object;
-  files?: Record<string, unknown>;
+  files?: Record<string, string>;
 }
 @Injectable({
   providedIn: 'root'
@@ -57,7 +57,8 @@ export class TranslateTextBackendApiService {
       expId: string, expVersion: string, contentId: string, stateName: string,
       languageCode: string, contentHtml: string | string[],
       translationHtml: string | string[], imagesData: ImagesData[],
-      dataFormat: string): Promise<unknown> {
+      dataFormat: string
+  ): Promise<void> {
     const postData: Data = {
       suggestion_type: 'translate_content',
       target_type: 'exploration',
@@ -79,7 +80,7 @@ export class TranslateTextBackendApiService {
     };
     const body = new FormData();
     body.append('payload', JSON.stringify(postData));
-    return this.http.post(
+    return this.http.post<void>(
       '/suggestionhandler/', body).toPromise();
   }
 }

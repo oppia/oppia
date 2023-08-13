@@ -175,7 +175,10 @@ export class ContributionAndReviewBackendApiService {
     if (explorationId !== undefined) {
       params.exploration_id = explorationId;
     }
-    return this.http.get<FetchSuggestionsResponse>(url, { params }).toPromise();
+    return this.http.get<FetchSuggestionsResponse>(
+      url,
+      { params } as Object
+    ).toPromise();
   }
 
   async reviewExplorationSuggestionAsync(
@@ -253,7 +256,7 @@ export class ContributionAndReviewBackendApiService {
       params.language = language;
     }
     return this.http.get<ContributorCertificateResponse>(
-      url, { params }
+      url, { params } as Object
     ).toPromise();
   }
 }

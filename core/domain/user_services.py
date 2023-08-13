@@ -32,6 +32,7 @@ from core.constants import constants
 from core.domain import auth_domain
 from core.domain import auth_services
 from core.domain import exp_fetchers
+from core.domain import fs_services
 from core.domain import role_services
 from core.domain import state_domain
 from core.domain import user_domain
@@ -72,6 +73,9 @@ DEFAULT_IDENTICON_DATA_URL: Final = (
 
 LABEL_FOR_USER_BEING_DELETED: Final = '[User being deleted]'
 USERNAME_FOR_USER_BEING_DELETED: Final = 'UserBeingDeleted'
+
+# Timeout in seconds for requests.
+TIMEOUT_SECS = 60
 
 
 class DashboardStatsDict(TypedDict):
@@ -390,13 +394,13 @@ def fetch_gravatar(email: str) -> str:
     try:
         response = requests.get(
             gravatar_url, headers={b'Content-Type': b'image/png'},
-            allow_redirects=False)
+            allow_redirects=False, timeout=TIMEOUT_SECS)
     except Exception:
         logging.exception('Failed to fetch Gravatar from %s' % gravatar_url)
     else:
         if response.ok:
             if imghdr.what(None, h=response.content) == 'png':
-                return utils.convert_png_or_webp_binary_to_data_url(
+                return utils.convert_image_binary_to_data_url(
                     response.content, 'png')
         else:
             logging.error(
@@ -768,6 +772,7 @@ def get_usernames_by_role(role: str) -> List[str]:
     Returns:
         list(str). List of usernames of users with given role ID.
     """
+
     user_settings = user_models.UserSettingsModel.get_by_role(role)
     return [user.username for user in user_settings]
 
@@ -882,8 +887,6 @@ def _get_user_settings_from_model(
             user_settings_model.last_edited_an_exploration),
         last_created_an_exploration=(
             user_settings_model.last_created_an_exploration),
-        profile_picture_data_url=(
-            user_settings_model.profile_picture_data_url),
         default_dashboard=user_settings_model.default_dashboard,
         creator_dashboard_display_pref=(
             user_settings_model.creator_dashboard_display_pref),
@@ -1413,8 +1416,18 @@ def update_profile_picture_data_url(
         profile_picture_data_url: str. New profile picture url to be set.
     """
     user_settings = get_user_settings(user_id, strict=True)
-    user_settings.profile_picture_data_url = profile_picture_data_url
-    save_user_settings(user_settings)
+    username = user_settings.username
+    # Ruling out the possibility of different types for mypy type checking.
+    assert isinstance(username, str)
+    fs = fs_services.GcsFileSystem(feconf.ENTITY_TYPE_USER, username)
+    filename_png = 'profile_picture.png'
+    png_binary = utils.convert_data_url_to_binary(
+        profile_picture_data_url, 'png')
+    fs.commit(filename_png, png_binary, mimetype='image/png')
+
+    webp_binary = utils.convert_png_binary_to_webp_binary(png_binary)
+    filename_webp = 'profile_picture.webp'
+    fs.commit(filename_webp, webp_binary, mimetype='image/webp')
 
 
 def update_user_bio(user_id: str, user_bio: str) -> None:
@@ -1571,6 +1584,8 @@ def add_user_role(user_id: str, role: str) -> None:
         raise Exception('The role of a Mobile Learner cannot be changed.')
     if role in feconf.ALLOWED_DEFAULT_USER_ROLES_ON_REGISTRATION:
         raise Exception('Adding a %s role is not allowed.' % role)
+    if role in user_settings.roles:
+        raise Exception('The user already has this role.')
     user_settings.roles.append(role)
     role_services.log_role_query(
         user_id, feconf.ROLE_ACTION_ADD, role=role,

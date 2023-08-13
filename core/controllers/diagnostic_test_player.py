@@ -19,9 +19,11 @@ from __future__ import annotations
 import collections
 
 from core import feconf
+from core import platform_feature_list
 from core.constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
+from core.domain import platform_feature_services
 from core.domain import question_domain
 from core.domain import question_services
 from core.domain import topic_fetchers
@@ -40,7 +42,11 @@ class DiagnosticTestPlayerPage(
     @acl_decorators.open_access
     def get(self) -> None:
         """Handles GET requests."""
-        self.render_template('diagnostic-test-player-page.mainpage.html')
+        if platform_feature_services.is_feature_enabled(
+            platform_feature_list.ParamNames.DIAGNOSTIC_TEST.value):
+            self.render_template('diagnostic-test-player-page.mainpage.html')
+        else:
+            raise self.PageNotFoundException
 
 
 def normalize_comma_separated_ids(comma_separated_ids: str) -> List[str]:
@@ -102,6 +108,11 @@ class DiagnosticTestQuestionsHandler(
 
     @acl_decorators.open_access
     def get(self, topic_id: str) -> None:
+        """Retrieves diagnostic test questions for a specific topic.
+
+        Args:
+            topic_id: str. The ID of the topic.
+        """
         # Here we use cast because we are narrowing down the type of
         # 'normalized_request' from Union of request TypedDicts to a
         # particular TypedDict that was defined according to the schemas.

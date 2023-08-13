@@ -18,7 +18,6 @@
 from __future__ import annotations
 
 import contextlib
-import os
 import subprocess
 import sys
 import time
@@ -56,26 +55,16 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         super().setUp()
         self.exit_stack = contextlib.ExitStack()
 
+        def mock_constants() -> None:
+            print('mock_set_constants_to_default')
+        self.swap_mock_set_constants_to_default = self.swap(
+            common, 'set_constants_to_default', mock_constants)
+
     def tearDown(self) -> None:
         try:
             self.exit_stack.close()
         finally:
             super().tearDown()
-
-    def test_is_oppia_server_already_running_when_ports_closed(self) -> None:
-        self.exit_stack.enter_context(self.swap_to_always_return(
-            common, 'is_port_in_use', value=False))
-
-        self.assertFalse(run_e2e_tests.is_oppia_server_already_running())
-
-    def test_is_oppia_server_already_running_when_a_port_is_open(
-        self
-    ) -> None:
-        self.exit_stack.enter_context(self.swap_with_checks(
-            common, 'is_port_in_use',
-            lambda port: port == run_e2e_tests.GOOGLE_APP_ENGINE_PORT))
-
-        self.assertTrue(run_e2e_tests.is_oppia_server_already_running())
 
     def test_wait_for_port_to_be_in_use_when_port_successfully_opened(
         self
@@ -110,41 +99,6 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         self.assertEqual(
             mock_sleep.times_called, common.MAX_WAIT_TIME_FOR_PORT_TO_OPEN_SECS)
 
-    def test_run_webpack_compilation_success(self) -> None:
-        old_os_path_isdir = os.path.isdir
-        def mock_os_path_isdir(path: str) -> bool:
-            if path == 'webpack_bundles':
-                return True
-            return old_os_path_isdir(path)
-
-        # The webpack compilation processes will be called 4 times as mock_isdir
-        # will return true after 4 calls.
-        self.exit_stack.enter_context(self.swap_with_checks(
-            servers, 'managed_webpack_compiler', mock_managed_process))
-        self.exit_stack.enter_context(self.swap_with_checks(
-            sys, 'exit', lambda _: None, called=False))
-        self.exit_stack.enter_context(self.swap_with_checks(
-            os.path, 'isdir', mock_os_path_isdir))
-
-        run_e2e_tests.run_webpack_compilation()
-
-    def test_run_webpack_compilation_failed(self) -> None:
-        old_os_path_isdir = os.path.isdir
-        def mock_os_path_isdir(path: str) -> bool:
-            if path == 'webpack_bundles':
-                return False
-            return old_os_path_isdir(path)
-
-        # The webpack compilation processes will be called five times.
-        self.exit_stack.enter_context(self.swap_with_checks(
-            servers, 'managed_webpack_compiler', mock_managed_process))
-        self.exit_stack.enter_context(self.swap_with_checks(
-            os.path, 'isdir', mock_os_path_isdir))
-        self.exit_stack.enter_context(self.swap_with_checks(
-            sys, 'exit', lambda _: None, expected_args=[(1,)]))
-
-        run_e2e_tests.run_webpack_compilation()
-
     def test_install_third_party_libraries_without_skip(self) -> None:
         self.exit_stack.enter_context(self.swap_with_checks(
             install_third_party_libs, 'main', lambda *_, **__: None))
@@ -158,71 +112,9 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
 
         run_e2e_tests.install_third_party_libraries(True)
 
-    def test_build_js_files_in_dev_mode_with_hash_file_exists(self) -> None:
-        old_os_path_isdir = os.path.isdir
-        def mock_os_path_isdir(path: str) -> bool:
-            if path == 'webpack_bundles':
-                return True
-            return old_os_path_isdir(path)
-
-        self.exit_stack.enter_context(self.swap_with_checks(
-            servers, 'managed_webpack_compiler', mock_managed_process))
-        self.exit_stack.enter_context(self.swap_with_checks(
-            build, 'main', lambda *_, **__: None,
-            expected_kwargs=[{'args': []}]))
-        self.exit_stack.enter_context(self.swap_with_checks(
-            os.path, 'isdir', mock_os_path_isdir))
-        self.exit_stack.enter_context(self.swap_with_checks(
-            sys, 'exit', lambda _: None, called=False))
-
-        run_e2e_tests.build_js_files(True)
-
-    def test_build_js_files_in_dev_mode_with_exception_raised(self) -> None:
-        return_code = 2
-        self.exit_stack.enter_context(self.swap_to_always_raise(
-            servers, 'managed_webpack_compiler',
-            error=subprocess.CalledProcessError(return_code, [])))
-        self.exit_stack.enter_context(self.swap_with_checks(
-            build, 'main', lambda *_, **__: None,
-            expected_kwargs=[{'args': []}]))
-        self.exit_stack.enter_context(self.swap_with_checks(
-            sys, 'exit', lambda _: None, expected_args=[(return_code,)]))
-
-        run_e2e_tests.build_js_files(True)
-
-    def test_build_js_files_in_prod_mode(self) -> None:
-        self.exit_stack.enter_context(self.swap_with_checks(
-            common, 'run_cmd', lambda *_: None, called=False))
-        self.exit_stack.enter_context(self.swap_with_checks(
-            build, 'main', lambda *_, **__: None,
-            expected_kwargs=[{'args': ['--prod_env']}]))
-
-        run_e2e_tests.build_js_files(False)
-
-    def test_build_js_files_in_prod_mode_with_source_maps(self) -> None:
-        self.exit_stack.enter_context(self.swap_with_checks(
-            common, 'run_cmd', lambda *_: None, called=False))
-        self.exit_stack.enter_context(self.swap_with_checks(
-            build, 'main', lambda *_, **__: None,
-            expected_kwargs=[{'args': ['--prod_env', '--source_maps']}]))
-
-        run_e2e_tests.build_js_files(False, source_maps=True)
-
-    def test_webpack_compilation_in_dev_mode_with_source_maps(self) -> None:
-        self.exit_stack.enter_context(self.swap_with_checks(
-            common, 'run_cmd', lambda *_: None, called=False))
-        self.exit_stack.enter_context(self.swap_with_checks(
-            build, 'main', lambda *_, **__: None,
-            expected_kwargs=[{'args': []}]))
-        self.exit_stack.enter_context(self.swap_with_checks(
-            run_e2e_tests, 'run_webpack_compilation', lambda **_: None,
-            expected_kwargs=[{'source_maps': True}]))
-
-        run_e2e_tests.build_js_files(True, source_maps=True)
-
     def test_start_tests_when_other_instances_not_stopped(self) -> None:
         self.exit_stack.enter_context(self.swap_with_checks(
-            run_e2e_tests, 'is_oppia_server_already_running', lambda *_: True))
+            common, 'is_oppia_server_already_running', lambda *_: True))
         self.exit_stack.enter_context(self.swap_with_checks(
             servers, 'managed_portserver', mock_managed_process))
 
@@ -231,12 +123,12 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
 
     def test_start_tests_when_no_other_instance_running(self) -> None:
         self.exit_stack.enter_context(self.swap_with_checks(
-            run_e2e_tests, 'is_oppia_server_already_running', lambda *_: False))
+            common, 'is_oppia_server_already_running', lambda *_: False))
         self.exit_stack.enter_context(self.swap_with_checks(
             run_e2e_tests, 'install_third_party_libraries', lambda _: None,
             expected_args=[(False,)]))
         self.exit_stack.enter_context(self.swap_with_checks(
-            run_e2e_tests, 'build_js_files', lambda *_, **__: None,
+            build, 'build_js_files', lambda *_, **__: None,
             expected_args=[(True,)]))
         self.exit_stack.enter_context(self.swap_with_checks(
             servers, 'managed_elasticsearch_dev_server', mock_managed_process))
@@ -265,8 +157,8 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             ]))
         self.exit_stack.enter_context(self.swap_with_checks(
             sys, 'exit', lambda _: None, expected_args=[(0,)]))
-
-        run_e2e_tests.main(args=[])
+        with self.swap_mock_set_constants_to_default:
+            run_e2e_tests.main(args=[])
 
     def test_work_with_non_ascii_chars(self) -> None:
         def mock_managed_webdriverio_server(
@@ -278,12 +170,12 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                     alive=False))
 
         self.exit_stack.enter_context(self.swap_with_checks(
-            run_e2e_tests, 'is_oppia_server_already_running', lambda *_: False))
+            common, 'is_oppia_server_already_running', lambda *_: False))
         self.exit_stack.enter_context(self.swap_with_checks(
             run_e2e_tests, 'install_third_party_libraries', lambda _: None,
             expected_args=[(False,)]))
         self.exit_stack.enter_context(self.swap_with_checks(
-            run_e2e_tests, 'build_js_files', lambda *_, **__: None,
+            build, 'build_js_files', lambda *_, **__: None,
             expected_args=[(True,)]))
         self.exit_stack.enter_context(self.swap_with_checks(
             servers, 'managed_elasticsearch_dev_server', mock_managed_process))
@@ -311,7 +203,8 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             ]))
         args = run_e2e_tests._PARSER.parse_args(args=[])  # pylint: disable=protected-access
 
-        lines, _ = run_e2e_tests.run_tests(args)
+        with self.swap_mock_set_constants_to_default:
+            lines, _ = run_e2e_tests.run_tests(args)
 
         self.assertEqual(
             [line.decode('utf-8') for line in lines],
@@ -385,15 +278,15 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
 
     def test_start_tests_skip_build(self) -> None:
         self.exit_stack.enter_context(self.swap_with_checks(
-            run_e2e_tests, 'is_oppia_server_already_running', lambda *_: False))
+            common, 'is_oppia_server_already_running', lambda *_: False))
         self.exit_stack.enter_context(self.swap_with_checks(
             run_e2e_tests, 'install_third_party_libraries', lambda _: None,
             expected_args=[(True,)]))
         self.exit_stack.enter_context(self.swap_with_checks(
-            build, 'modify_constants', lambda *_, **__: None,
+            common, 'modify_constants', lambda *_, **__: None,
             expected_kwargs=[{'prod_env': False}]))
         self.exit_stack.enter_context(self.swap_with_checks(
-            build, 'set_constants_to_default', lambda: None))
+            common, 'set_constants_to_default', lambda: None))
         self.exit_stack.enter_context(self.swap_with_checks(
             servers, 'managed_elasticsearch_dev_server', mock_managed_process))
         self.exit_stack.enter_context(self.swap_with_checks(
@@ -429,12 +322,12 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
 
     def test_start_tests_in_debug_mode(self) -> None:
         self.exit_stack.enter_context(self.swap_with_checks(
-            run_e2e_tests, 'is_oppia_server_already_running', lambda *_: False))
+            common, 'is_oppia_server_already_running', lambda *_: False))
         self.exit_stack.enter_context(self.swap_with_checks(
             run_e2e_tests, 'install_third_party_libraries', lambda _: None,
             expected_args=[(False,)]))
         self.exit_stack.enter_context(self.swap_with_checks(
-            run_e2e_tests, 'build_js_files', lambda *_, **__: None,
+            build, 'build_js_files', lambda *_, **__: None,
             expected_args=[(True,)]))
         self.exit_stack.enter_context(self.swap_with_checks(
             servers, 'managed_elasticsearch_dev_server', mock_managed_process))
@@ -464,16 +357,17 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         self.exit_stack.enter_context(self.swap_with_checks(
             sys, 'exit', lambda _: None, expected_args=[(0,)]))
 
-        run_e2e_tests.main(args=['--debug_mode'])
+        with self.swap_mock_set_constants_to_default:
+            run_e2e_tests.main(args=['--debug_mode'])
 
     def test_start_tests_in_with_chromedriver_flag(self) -> None:
         self.exit_stack.enter_context(self.swap_with_checks(
-            run_e2e_tests, 'is_oppia_server_already_running', lambda *_: False))
+            common, 'is_oppia_server_already_running', lambda *_: False))
         self.exit_stack.enter_context(self.swap_with_checks(
             run_e2e_tests, 'install_third_party_libraries', lambda _: None,
             expected_args=[(False,)]))
         self.exit_stack.enter_context(self.swap_with_checks(
-            run_e2e_tests, 'build_js_files', lambda *_, **__: None,
+            build, 'build_js_files', lambda *_, **__: None,
             expected_args=[(True,)]))
         self.exit_stack.enter_context(self.swap_with_checks(
             servers, 'managed_elasticsearch_dev_server', mock_managed_process))
@@ -503,17 +397,18 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         self.exit_stack.enter_context(self.swap_with_checks(
             sys, 'exit', lambda _: None, expected_args=[(0,)]))
 
-        run_e2e_tests.main(
-            args=['--chrome_driver_version', CHROME_DRIVER_VERSION])
+        with self.swap_mock_set_constants_to_default:
+            run_e2e_tests.main(
+                args=['--chrome_driver_version', CHROME_DRIVER_VERSION])
 
     def test_start_tests_in_webdriverio(self) -> None:
         self.exit_stack.enter_context(self.swap_with_checks(
-            run_e2e_tests, 'is_oppia_server_already_running', lambda *_: False))
+            common, 'is_oppia_server_already_running', lambda *_: False))
         self.exit_stack.enter_context(self.swap_with_checks(
             run_e2e_tests, 'install_third_party_libraries', lambda _: None,
             expected_args=[(False,)]))
         self.exit_stack.enter_context(self.swap_with_checks(
-            run_e2e_tests, 'build_js_files', lambda *_, **__: None,
+            build, 'build_js_files', lambda *_, **__: None,
             expected_args=[(True,)]))
         self.exit_stack.enter_context(self.swap_with_checks(
             servers, 'managed_elasticsearch_dev_server', mock_managed_process))
@@ -543,17 +438,18 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         self.exit_stack.enter_context(self.swap_with_checks(
             sys, 'exit', lambda _: None, expected_args=[(0,)]))
 
-        run_e2e_tests.main(
-            args=['--suite', 'collections'])
+        with self.swap_mock_set_constants_to_default:
+            run_e2e_tests.main(
+                args=['--suite', 'collections'])
 
     def test_do_not_run_with_test_non_mobile_suite_in_mobile_mode(self) -> None:
         self.exit_stack.enter_context(self.swap_with_checks(
-            run_e2e_tests, 'is_oppia_server_already_running', lambda *_: False))
+            common, 'is_oppia_server_already_running', lambda *_: False))
         self.exit_stack.enter_context(self.swap_with_checks(
             run_e2e_tests, 'install_third_party_libraries', lambda _: None,
             expected_args=[(False,)]))
         self.exit_stack.enter_context(self.swap_with_checks(
-            run_e2e_tests, 'build_js_files', lambda *_, **__: None,
+            build, 'build_js_files', lambda *_, **__: None,
             expected_args=[(True,)]))
         self.exit_stack.enter_context(self.swap_with_checks(
             servers, 'managed_elasticsearch_dev_server', mock_managed_process))
@@ -569,4 +465,5 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             servers, 'managed_cloud_datastore_emulator', mock_managed_process))
 
         with self.assertRaisesRegex(SystemExit, '^1$'):
-            run_e2e_tests.main(args=['--mobile', '--suite', 'collections'])
+            with self.swap_mock_set_constants_to_default:
+                run_e2e_tests.main(args=['--mobile', '--suite', 'collections'])

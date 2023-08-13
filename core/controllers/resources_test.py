@@ -289,7 +289,7 @@ class AssetDevHandlerImageTests(test_utils.GenericTestBase):
         csrf_token = self.get_new_csrf_token()
 
         filename_without_extension = 'test'
-        supplied_filename = ('%s.jpg' % filename_without_extension)
+        supplied_filename = '%s.jpg' % filename_without_extension
         filename_with_correct_extension = (
             '%s.png' % filename_without_extension)
 
@@ -877,7 +877,6 @@ class PromoBarHandlerTest(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
         super().setUp()
-        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(
             self.RELEASE_COORDINATOR_EMAIL, self.RELEASE_COORDINATOR_USERNAME)
 

@@ -1611,7 +1611,7 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
             }, csrf_token=csrf_token, expected_status_int=400)
         self.assertEqual(
             response['error'],
-            'Users are not allowed to assign other roles to themselves')
+            'Users are not allowed to assign other roles to themselves.')
         self.logout()
 
     def test_for_deassign_viewer_role_from_exploration(self) -> None:
@@ -3579,7 +3579,7 @@ class ImageUploadHandlerTests(BaseEditorControllerTests):
             upload_files=[('image', 'unused_filename', b'')]
         )
 
-        error_msg = ('No image supplied')
+        error_msg = 'No image supplied'
         self.assertEqual(response['error'], error_msg)
 
         # Check that the file is not uploaded.

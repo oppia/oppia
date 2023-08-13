@@ -21,6 +21,7 @@ from __future__ import annotations
 
 import argparse
 import contextlib
+import os
 import time
 from typing import Iterator, Optional, Sequence
 
@@ -37,7 +38,6 @@ from . import extend_index_yaml # isort:skip  pylint: disable=wrong-import-posit
 from . import servers # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 
 from core.constants import constants # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
-from scripts import contributor_dashboard_debug # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 
 _PARSER = argparse.ArgumentParser(
     description="""
@@ -77,11 +77,6 @@ _PARSER.add_argument(
 _PARSER.add_argument(
     '--source_maps',
     help='optional; if specified, build webpack with source maps.',
-    action='store_true')
-_PARSER.add_argument(
-    '--contributor_dashboard_debug',
-    help='optional; if specified, populate sample data that can be used to help'
-         'develop for the contributor dashboard.',
     action='store_true')
 
 PORT_NUMBER_FOR_GAE_SERVER = 8181
@@ -159,7 +154,7 @@ def main(args: Optional[Sequence[str]] = None) -> None:
         if parsed_args.source_maps:
             build_args.append('--source_maps')
         build.main(args=build_args)
-        stack.callback(build.set_constants_to_default)
+        stack.callback(common.set_constants_to_default)
 
         stack.enter_context(servers.managed_redis_server())
         stack.enter_context(servers.managed_elasticsearch_dev_server())
@@ -180,21 +175,16 @@ def main(args: Optional[Sequence[str]] = None) -> None:
                 use_prod_env=False, use_source_maps=parsed_args.source_maps,
                 watch_mode=True))
 
+        env = os.environ.copy()
+        env['PIP_NO_DEPS'] = 'True'
         app_yaml_path = 'app.yaml' if parsed_args.prod_env else 'app_dev.yaml'
         dev_appserver = stack.enter_context(servers.managed_dev_appserver(
             app_yaml_path,
             enable_host_checking=not parsed_args.disable_host_checking,
             automatic_restart=not parsed_args.no_auto_restart,
             skip_sdk_update_check=True,
-            port=PORT_NUMBER_FOR_GAE_SERVER))
-
-        if parsed_args.contributor_dashboard_debug:
-            initializer = (
-                contributor_dashboard_debug
-                .ContributorDashboardDebugInitializer(
-                    base_url='http://localhost:%s' % PORT_NUMBER_FOR_GAE_SERVER)
-            )
-            initializer.populate_debug_data()
+            port=PORT_NUMBER_FOR_GAE_SERVER,
+            env=env))
 
         if parsed_args.no_browser:
             common.print_each_string_after_two_new_lines([

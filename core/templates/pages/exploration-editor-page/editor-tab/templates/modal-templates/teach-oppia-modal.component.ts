@@ -41,7 +41,7 @@ import { InteractionAnswer } from 'interactions/answer-defs';
 import { TeachOppiaModalBackendApiService } from './teach-oppia-modal-backend-api.service';
 import { AnswerClassificationResult } from 'domain/classifier/answer-classification-result.model';
 
-interface UnresolvedAnswer {
+export interface UnresolvedAnswer {
   answer: InteractionAnswer;
   answerTemplate: string;
   classificationResult: AnswerClassificationResult;

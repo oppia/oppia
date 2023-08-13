@@ -107,7 +107,7 @@ describe('Pie Chart component', () => {
           callback();
         }
       }
-    });
+    } as unknown as typeof google);
     component.redrawChart();
     tick();
     component.ngAfterViewInit();
@@ -130,13 +130,14 @@ describe('Pie Chart component', () => {
           callback();
         }
       }
-    });
+    } as unknown as typeof google);
     component.pieChart = {
       nativeElement: null
     };
     // This throws "Type 'null' is not assignable to
     // parameter of type 'Piechart'." We need to suppress this error
-    // because of the need to test validations.
+    // because of the need to test validations. This error is thrown
+    // because the chart is not initialized.
     // @ts-ignore
     component.chart = null;
     component.ngAfterViewInit();
@@ -158,7 +159,7 @@ describe('Pie Chart component', () => {
           callback();
         }
       }
-    });
+    } as unknown as typeof google);
     spyOn(component, 'redrawChart').and.stub();
     component.chart = mockedChart;
 
@@ -181,7 +182,7 @@ describe('Pie Chart component', () => {
           callback();
         }
       }
-    });
+    } as unknown as typeof google);
     spyOn(component, 'redrawChart').and.stub();
 
     component.ngOnInit();

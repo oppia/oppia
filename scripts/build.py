@@ -25,17 +25,22 @@ import os
 import re
 import shutil
 import subprocess
+import sys
 import threading
 
+from core import feconf
 from core import utils
 from scripts import common
-from scripts import install_python_dev_dependencies
-from scripts import install_third_party_libs
-from scripts import servers
 
 import rcssmin
 from typing import (
-    Deque, Dict, List, Optional, Sequence, TextIO, Tuple, TypedDict)
+    Deque, Dict, List, Optional, Sequence, TextIO, Tuple, TypedDict
+)
+
+if not feconf.OPPIA_IS_DOCKERIZED:
+    from scripts import install_python_dev_dependencies
+    from scripts import install_third_party_libs
+    from scripts import servers
 
 ASSETS_DEV_DIR = os.path.join('assets', '')
 ASSETS_OUT_DIR = os.path.join('build', 'assets', '')
@@ -140,7 +145,10 @@ FILEPATHS_PROVIDED_TO_FRONTEND = (
 
 HASH_BLOCK_SIZE = 2**20
 
-APP_DEV_YAML_FILEPATH = 'app_dev.yaml'
+APP_DEV_YAML_FILEPATH = (
+    'app_dev_docker.yaml' if feconf.OPPIA_IS_DOCKERIZED else 'app_dev.yaml'
+)
+
 APP_YAML_FILEPATH = 'app.yaml'
 
 MAX_OLD_SPACE_SIZE_FOR_WEBPACK_BUILD = 8192
@@ -185,6 +193,56 @@ class DependencyBundleDict(TypedDict):
     fontsPath: str
 
 
+def run_webpack_compilation(source_maps: bool = False) -> None:
+    """Runs webpack compilation.
+
+    Args:
+        source_maps: bool. Whether to compile with source maps.
+    """
+    max_tries = 5
+    webpack_bundles_dir_name = 'webpack_bundles'
+
+    for _ in range(max_tries):
+        try:
+            managed_webpack_compiler = (
+                servers.managed_webpack_compiler(use_source_maps=source_maps))
+            with managed_webpack_compiler as proc:
+                proc.wait()
+        except subprocess.CalledProcessError as error:
+            print(error.output)
+            sys.exit(error.returncode)
+        if os.path.isdir(webpack_bundles_dir_name):
+            break
+    else:
+        # We didn't break out of the loop, meaning all attempts have failed.
+        print('Failed to complete webpack compilation, exiting...')
+        sys.exit(1)
+
+
+def build_js_files(dev_mode: bool, source_maps: bool = False) -> None:
+    """Build the javascript files.
+
+    Args:
+        dev_mode: bool. Represents whether to run the related commands in dev
+            mode.
+        source_maps: bool. Represents whether to use source maps while
+            building webpack.
+    """
+    if not dev_mode:
+        print('Generating files for production mode...')
+
+        build_args = ['--prod_env']
+        if source_maps:
+            build_args.append('--source_maps')
+        main(args=build_args)
+
+    else:
+        main(args=[])
+        common.run_ng_compilation()
+        if not feconf.OPPIA_IS_DOCKERIZED:
+            run_webpack_compilation(source_maps=source_maps)
+
+
 def generate_app_yaml(deploy_mode: bool = False) -> None:
     """Generate app.yaml from app_dev.yaml.
 
@@ -218,51 +276,6 @@ def generate_app_yaml(deploy_mode: bool = False) -> None:
         os.remove(APP_YAML_FILEPATH)
     with utils.open_file(APP_YAML_FILEPATH, 'w+') as prod_yaml_file:
         prod_yaml_file.write(content)
-
-
-def modify_constants(
-    prod_env: bool = False,
-    emulator_mode: bool = True,
-    maintenance_mode: bool = False
-) -> None:
-    """Modify constants.ts and feconf.py.
-
-    Args:
-        prod_env: bool. Whether the server is started in prod mode.
-        emulator_mode: bool. Whether the server is started in emulator mode.
-        maintenance_mode: bool. Whether the site should be put into
-            the maintenance mode.
-    """
-    dev_mode_variable = (
-        '"DEV_MODE": false' if prod_env else '"DEV_MODE": true')
-    common.inplace_replace_file(
-        common.CONSTANTS_FILE_PATH,
-        r'"DEV_MODE": (true|false)',
-        dev_mode_variable,
-        expected_number_of_replacements=1
-    )
-    emulator_mode_variable = (
-        '"EMULATOR_MODE": true' if emulator_mode else '"EMULATOR_MODE": false')
-    common.inplace_replace_file(
-        common.CONSTANTS_FILE_PATH,
-        r'"EMULATOR_MODE": (true|false)',
-        emulator_mode_variable,
-        expected_number_of_replacements=1
-    )
-
-    enable_maintenance_mode_variable = (
-        'ENABLE_MAINTENANCE_MODE = %s' % str(maintenance_mode))
-    common.inplace_replace_file(
-        common.FECONF_PATH,
-        r'ENABLE_MAINTENANCE_MODE = (True|False)',
-        enable_maintenance_mode_variable,
-        expected_number_of_replacements=1
-    )
-
-
-def set_constants_to_default() -> None:
-    """Set variables in constants.ts and feconf.py to default values."""
-    modify_constants(prod_env=False, emulator_mode=True, maintenance_mode=False)
 
 
 def _minify_css(source_path: str, target_path: str) -> None:
@@ -318,9 +331,22 @@ def _minify_and_create_sourcemap(
     """
     print('Minifying and creating sourcemap for %s' % source_path)
     source_map_properties = 'includeSources,url=\'third_party.min.js.map\''
+    # TODO(#18260): Change this when we permanently move to
+    # the Dockerized Setup.
     cmd = '%s %s %s -c -m --source-map %s -o %s ' % (
         common.NODE_BIN_PATH, UGLIFY_FILE, source_path,
         source_map_properties, target_file_path)
+    if feconf.OPPIA_IS_DOCKERIZED:
+        cmd = ' '.join([
+            'bash', '-c',
+            'node /app/oppia/node_modules/uglify-js/bin/uglifyjs'
+            ' /app/oppia/third_party/generated/js/third_party.js'
+            ' -c -m --source-map %s -o /app/oppia/third_party/'
+            'generated/js/third_party.min.js' % (
+                source_map_properties
+            )
+        ])
+
     subprocess.check_call(cmd, shell=True)
 
 
@@ -1388,6 +1414,7 @@ def generate_python_package() -> None:
         subprocess.check_call('python setup.py -q sdist -d build', shell=True)
         print('Oppia package build completed.')
     finally:
+        install_python_dev_dependencies.install_installation_tools()
         install_third_party_libs.main()
         print('Dev dependencies reinstalled')
 
@@ -1412,7 +1439,8 @@ def main(args: Optional[Sequence[str]] = None) -> None:
 
     # Regenerate /third_party/generated from scratch.
     safe_delete_directory_tree(THIRD_PARTY_GENERATED_DEV_DIR)
-    build_third_party_libs(THIRD_PARTY_GENERATED_DEV_DIR)
+    build_third_party_libs(
+        THIRD_PARTY_GENERATED_DEV_DIR)
 
     # If minify_third_party_libs_only is set to True, skips the rest of the
     # build process once third party libs are minified.
@@ -1425,19 +1453,20 @@ def main(args: Optional[Sequence[str]] = None) -> None:
                 'minify_third_party_libs_only should not be '
                 'set in non-prod env.')
 
-    modify_constants(
+    common.modify_constants(
         prod_env=options.prod_env,
         emulator_mode=not options.deploy_mode,
         maintenance_mode=options.maintenance_mode)
     if options.prod_env:
         minify_third_party_libs(THIRD_PARTY_GENERATED_DEV_DIR)
         hashes = generate_hashes()
-        generate_python_package()
-        if options.source_maps:
-            build_using_webpack(WEBPACK_PROD_SOURCE_MAPS_CONFIG)
-        else:
-            build_using_webpack(WEBPACK_PROD_CONFIG)
-        build_using_ng()
+        if not feconf.OPPIA_IS_DOCKERIZED:
+            generate_python_package()
+            if options.source_maps:
+                build_using_webpack(WEBPACK_PROD_SOURCE_MAPS_CONFIG)
+            else:
+                build_using_webpack(WEBPACK_PROD_CONFIG)
+            build_using_ng()
         generate_app_yaml(
             deploy_mode=options.deploy_mode)
         generate_build_directory(hashes)

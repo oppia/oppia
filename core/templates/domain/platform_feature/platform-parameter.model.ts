@@ -51,10 +51,10 @@ export class PlatformParameter {
   readonly description: string;
   readonly dataType: string;
   readonly ruleSchemaVersion: number;
-  readonly defaultValue: PlatformParameterValue;
   readonly isFeature: boolean;
   readonly featureStage: FeatureStage | null;
   rules: PlatformParameterRule[];
+  defaultValue: PlatformParameterValue;
 
   constructor(
       name: string, description: string, dataType: string,

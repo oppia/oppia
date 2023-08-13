@@ -17,7 +17,7 @@
  */
 
 import { EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { async, ComponentFixture, fakeAsync, flush, TestBed, tick } from '@angular/core/testing';
 import { MathExpressionContentEditorComponent } from './math-expression-content-editor.component';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import 'mathjaxConfig.ts';
@@ -131,7 +131,7 @@ describe('MathExpressionContentEditorComponent', () => {
         'AyMSAyODdaIi8+PC9nPjwvZz48L2c+PC9zdmc+',
       mathExpressionSvgIsBeingProcessed: false
     };
-    window.MathJax = mockMathJs as unknown as typeof MathJax;
+    window.MathJax = mockMathJs as typeof MathJax;
     svgElement = {
       setAttribute: (txt: string, temp: string) => {
         return;
@@ -302,15 +302,16 @@ describe('MathExpressionContentEditorComponent', () => {
   });
 
   it('should update local value when user types in the expression editor',
-    () => {
+    fakeAsync(() => {
       spyOn(component.valueChanged, 'emit');
       component.value.raw_latex = '';
-
-      component.updateLocalValue('\\frac{x}{y}');
-
+      component.ngOnInit();
+      flush();
+      component.debouncedUpdate$.next('\\frac{x}{y}');
+      tick(1000);
       expect(component.value.raw_latex).toBe('\\frac{x}{y}');
       expect(component.valueChanged.emit).toHaveBeenCalledWith(component.value);
-    });
+    }));
 
 
   it('should set active true when user open editor', () => {

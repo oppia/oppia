@@ -19,7 +19,6 @@
 
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
-import { SafeResourceUrl } from '@angular/platform-browser';
 import { trigger, state, style, transition,
   animate, group } from '@angular/animations';
 import { TranslateService } from '@ngx-translate/core';
@@ -28,9 +27,7 @@ import { Subscription } from 'rxjs';
 import { AppConstants } from 'app.constants';
 import { LearnerExplorationSummary } from 'domain/summary/learner-exploration-summary.model';
 import { CollectionSummary } from 'domain/collection/collection-summary.model';
-import { FeedbackThreadSummary, FeedbackThreadSummaryBackendDict } from 'domain/feedback_thread/feedback-thread-summary.model';
 import { ProfileSummary } from 'domain/user/profile-summary.model';
-import { FeedbackMessageSummary } from 'domain/feedback_message/feedback-message-summary.model';
 import { LearnerDashboardBackendApiService } from 'domain/learner_dashboard/learner-dashboard-backend-api.service';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { ThreadStatusDisplayService } from 'pages/exploration-editor-page/feedback-tab/services/thread-status-display.service';
@@ -91,9 +88,6 @@ import './learner-dashboard-page.component.css';
   ]
 })
 export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
-  FEEDBACK_THREADS_SORT_BY_KEYS_AND_I18N_IDS = (
-    LearnerDashboardPageConstants.FEEDBACK_THREADS_SORT_BY_KEYS_AND_I18N_IDS);
-
   LEARNER_DASHBOARD_SECTION_I18N_IDS = (
     LearnerDashboardPageConstants.LEARNER_DASHBOARD_SECTION_I18N_IDS);
 
@@ -107,9 +101,6 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
   // These properties below are initialized using Angular lifecycle hooks
   // where we need to do non-null assertion. For more information see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
-  threadIndex!: number;
-  isCurrentFeedbackSortDescending!: boolean;
-  currentFeedbackThreadsSortType!: string;
 
   completedExplorationsList!: LearnerExplorationSummary[];
   completedCollectionsList!: CollectionSummary[];
@@ -125,28 +116,17 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
 
   completedToIncompleteCollections!: string[];
   learntToPartiallyLearntTopics!: string[];
-  threadSummaries: FeedbackThreadSummary[] = [];
   numberOfUnreadThreads!: number;
   explorationPlaylist!: LearnerExplorationSummary[];
   collectionPlaylist!: CollectionSummary[];
   activeSection!: string;
   activeSubsection!: string;
-  feedbackThreadActive!: boolean;
-  paginatedThreadsList: FeedbackThreadSummaryBackendDict[][] = [];
 
-  messageSendingInProgress!: boolean;
-  profilePictureDataUrl!: SafeResourceUrl;
-  newMessage!: {
-    'text': string | null;
-  };
+  profilePicturePngDataUrl!: string;
+  profilePictureWebpDataUrl!: string;
 
-  loadingFeedbacks!: boolean;
   explorationTitle!: string;
-  threadStatus!: string;
   explorationId!: string;
-  threadId!: string;
-  messageSummaries!: FeedbackMessageSummary[];
-  threadSummary!: FeedbackThreadSummary;
   communityLibraryUrl = (
     '/' + AppConstants.PAGES_REGISTERED_WITH_FRONTEND.LIBRARY_INDEX.ROUTE);
 
@@ -180,14 +160,6 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    let userProfileImagePromise =
-      this.userService.getProfileImageDataUrlAsync();
-    userProfileImagePromise.then(
-      dataUrl => {
-        this.profilePictureDataUrl =
-          decodeURIComponent(dataUrl);
-      });
-
     this.loaderService.showLoadingScreen('Loading');
 
     let userInfoPromise = this.userService.getUserInfoAsync();
@@ -195,6 +167,15 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
       const username = userInfo.getUsername();
       if (username) {
         this.username = username;
+        [this.profilePicturePngDataUrl, this.profilePictureWebpDataUrl] = (
+          this.userService.getProfileImageDataUrl(username));
+      } else {
+        this.profilePictureWebpDataUrl = (
+          this.urlInterpolationService.getStaticImageUrl(
+            AppConstants.DEFAULT_PROFILE_IMAGE_WEBP_PATH));
+        this.profilePicturePngDataUrl = (
+          this.urlInterpolationService.getStaticImageUrl(
+            AppConstants.DEFAULT_PROFILE_IMAGE_PNG_PATH));
       }
     });
     this.homeImageUrl = this.getStaticImageUrl('/learner_dashboard/home.svg');
@@ -249,7 +230,6 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
       this.LEARNER_GROUP_FEATURE_IS_ENABLED = featureIsEnabled;
     });
 
-    this.fetchFeedbackUpdates();
 
     Promise.all([
       userInfoPromise,
@@ -265,11 +245,6 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
       // This is placed here in order to satisfy Unit tests.
     });
 
-    this.loadingFeedbacks = false;
-
-    this.newMessage = {
-      text: ''
-    };
 
     this.windowIsNarrow = this.windowDimensionService.isWindowNarrow();
     this.directiveSubscriptions.add(
@@ -287,42 +262,24 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
     this.directiveSubscriptions.unsubscribe();
   }
 
+  getauthorPicturePngDataUrl(username: string): string {
+    let [pngImageUrl, _] = this.userService.getProfileImageDataUrl(
+      username);
+    return pngImageUrl;
+  }
+
+  getauthorPictureWebpDataUrl(username: string): string {
+    let [_, webpImageUrl] = this.userService.getProfileImageDataUrl(
+      username);
+    return webpImageUrl;
+  }
+
   setPageTitle(): void {
     let translatedTitle = this.translateService.instant(
       'I18N_LEARNER_DASHBOARD_PAGE_TITLE');
     this.pageTitleService.setDocumentTitle(translatedTitle);
   }
 
-  fetchFeedbackUpdates(): void {
-    this.loadingIndicatorIsShown = true;
-    let dashboardFeedbackUpdatesDataPromise = (
-      this.learnerDashboardBackendApiService
-        .fetchLearnerDashboardFeedbackUpdatesDataAsync(
-          this.paginatedThreadsList));
-    dashboardFeedbackUpdatesDataPromise.then(
-      responseData => {
-        this.isCurrentFeedbackSortDescending = true;
-        this.currentFeedbackThreadsSortType = (
-          LearnerDashboardPageConstants
-            .FEEDBACK_THREADS_SORT_BY_KEYS_AND_I18N_IDS.LAST_UPDATED.key);
-        this.threadSummaries = [
-          ... this.threadSummaries,
-          ... responseData.threadSummaries];
-        this.paginatedThreadsList = responseData.paginatedThreadsList;
-        this.numberOfUnreadThreads =
-          responseData.numberOfUnreadThreads;
-        this.feedbackThreadActive = false;
-        this.loadingIndicatorIsShown = false;
-      }, errorResponseStatus => {
-        this.loadingIndicatorIsShown = false;
-        if (
-          AppConstants.FATAL_ERROR_CODES.indexOf(errorResponseStatus) !== -1) {
-          this.alertsService.addWarning(
-            'Failed to get learner dashboard feedback updates data');
-        }
-      }
-    );
-  }
 
   getStaticImageUrl(imagePath: string): string {
     return this.urlInterpolationService.getStaticImageUrl(imagePath);
@@ -389,12 +346,6 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
       }).catch(errorResponse => {
         // This is placed here in order to satisfy Unit tests.
       });
-    }
-    if (this.activeSection ===
-      LearnerDashboardPageConstants
-        .LEARNER_DASHBOARD_SECTION_I18N_IDS.FEEDBACK &&
-      this.feedbackThreadActive === true) {
-      this.feedbackThreadActive = false;
     }
   }
 
@@ -471,90 +422,6 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
     } else {
       return 'none';
     }
-  }
-
-  setFeedbackSortingOptions(sortType: string): void {
-    if (sortType === this.currentFeedbackThreadsSortType) {
-      this.isCurrentFeedbackSortDescending = (
-        !this.isCurrentFeedbackSortDescending);
-    } else {
-      this.currentFeedbackThreadsSortType = sortType;
-    }
-  }
-
-  getValueOfFeedbackThreadSortKey(): string {
-    // 'Last Updated' is the default sorting operation
-    // so we will return 'lastUpdatedMsecs' to SortByPipe when Last Updated
-    // option is selected in the drop down menu.
-    return this.currentFeedbackThreadsSortType;
-  }
-
-  onClickThread(
-      threadStatus: string, explorationId: string,
-      threadId: string, explorationTitle: string): void {
-    this.loadingFeedbacks = true;
-    let threadDataUrl = this.urlInterpolationService.interpolateUrl(
-      '/learnerdashboardthreadhandler/<threadId>', {
-        threadId: threadId
-      });
-    this.explorationTitle = explorationTitle;
-    this.feedbackThreadActive = true;
-    this.threadStatus = threadStatus;
-    this.explorationId = explorationId;
-    this.threadId = threadId;
-
-    for (let index = 0; index < this.threadSummaries.length; index++) {
-      if (this.threadSummaries[index].threadId === threadId) {
-        this.threadIndex = index;
-        let threadSummary = this.threadSummaries[index];
-        if (!threadSummary.lastMessageIsRead) {
-          this.numberOfUnreadThreads -= 1;
-        }
-        threadSummary.markTheLastTwoMessagesAsRead();
-      }
-    }
-
-    this.learnerDashboardBackendApiService.onClickThreadAsync(threadDataUrl)
-      .then((messageSummaryList) => {
-        let messageSummaryDicts = messageSummaryList;
-        this.messageSummaries = [];
-        for (let index = 0; index < messageSummaryDicts.length; index++) {
-          this.messageSummaries.push(
-            FeedbackMessageSummary.createFromBackendDict(
-              messageSummaryDicts[index]));
-        }
-        this.loadingFeedbacks = false;
-      });
-  }
-
-  showAllThreads(): void {
-    this.feedbackThreadActive = false;
-  }
-
-  addNewMessage(threadId: string, newMessage: string): void {
-    let url = this.urlInterpolationService.interpolateUrl(
-      '/threadhandler/<threadId>', {
-        threadId: threadId
-      });
-    let payload = {
-      updated_status: false,
-      updated_subject: null,
-      text: newMessage
-    };
-    this.messageSendingInProgress = true;
-    this.learnerDashboardBackendApiService
-      .addNewMessageAsync(url, payload).then(() => {
-        this.threadSummary = this.threadSummaries[this.threadIndex];
-        this.threadSummary.appendNewMessage(
-          newMessage, this.username);
-        this.messageSendingInProgress = false;
-        this.newMessage.text = null;
-        let newMessageSummary = (
-          FeedbackMessageSummary.createNewMessage(
-            this.threadSummary.totalMessageCount, newMessage,
-            this.username, String(this.profilePictureDataUrl)));
-        this.messageSummaries.push(newMessageSummary);
-      });
   }
 
   showSuggestionModal(

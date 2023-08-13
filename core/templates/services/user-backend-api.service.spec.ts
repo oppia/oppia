@@ -21,14 +21,11 @@ import { HttpClientTestingModule, HttpTestingController } from
 import { fakeAsync, flushMicrotasks, TestBed } from '@angular/core/testing';
 
 import { UserInfo } from 'domain/user/user-info.model';
-import { UrlInterpolationService } from
-  'domain/utilities/url-interpolation.service';
 import { CsrfTokenService } from 'services/csrf-token.service';
 import { PreferencesBackendDict, UserBackendApiService } from 'services/user-backend-api.service';
 
 describe('User Backend Api Service', () => {
   let userBackendApiService: UserBackendApiService;
-  let urlInterpolationService: UrlInterpolationService;
   let httpTestingController: HttpTestingController;
   let csrfService: CsrfTokenService;
 
@@ -38,7 +35,6 @@ describe('User Backend Api Service', () => {
     });
     httpTestingController = TestBed.inject(HttpTestingController);
     userBackendApiService = TestBed.inject(UserBackendApiService);
-    urlInterpolationService = TestBed.inject(UrlInterpolationService);
     csrfService = TestBed.inject(CsrfTokenService);
 
 
@@ -120,23 +116,6 @@ describe('User Backend Api Service', () => {
     flushMicrotasks();
   }));
 
-  it('should return image data', fakeAsync(() => {
-    var requestUrl = '/preferenceshandler/profile_picture';
-    var defaultUrl = urlInterpolationService.getStaticImageUrl(
-      '/avatar/user_blue_72px.webp');
-
-    userBackendApiService.getProfileImageDataUrlAsync(defaultUrl).then(
-      (dataUrl) => {
-        expect(dataUrl).toBe('image data');
-      });
-
-    const req2 = httpTestingController.expectOne(requestUrl);
-    expect(req2.request.method).toEqual('GET');
-    req2.flush({profile_picture_data_url: 'image data'});
-
-    flushMicrotasks();
-  }));
-
   it('should return the login url', fakeAsync(() => {
     const loginUrl = '/login';
     const currentUrl = 'dummy';
@@ -189,7 +168,6 @@ describe('User Backend Api Service', () => {
       preferred_language_codes: ['en', 'hi'],
       preferred_site_language_code: 'en',
       preferred_audio_language_code: 'en',
-      profile_picture_data_url: '',
       default_dashboard: 'learner',
       user_bio: '',
       subject_interests: '',
