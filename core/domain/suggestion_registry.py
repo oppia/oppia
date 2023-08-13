@@ -657,6 +657,13 @@ class SuggestionTranslateContent(BaseSuggestion):
         # So, once this suggestion_services.create_suggestion() method is
         # fixed, we can remove both todo and MyPy ignore from here.
         self.last_updated = last_updated  # type: ignore[assignment]
+        # TODO(#16048): Here we use MyPy ignore because in BaseSuggestion,
+        # created_on is defined with only datetime type but here
+        # created_on is of Optional[datetime] type because while creating
+        # 'SuggestionTranslateContent' through create_suggestion() method, we
+        # are not providing 'created_on' and just using None default value.
+        # So, once this suggestion_services.create_suggestion() method is
+        # fixed, we can remove both todo and MyPy ignore from here.
         self.created_on = created_on  # type: ignore[assignment]
         self.edited_by_reviewer = edited_by_reviewer
         self.image_context = feconf.IMAGE_CONTEXT_EXPLORATION_SUGGESTIONS
@@ -895,6 +902,13 @@ class SuggestionAddQuestion(BaseSuggestion):
         # So, once this suggestion_services.create_suggestion() method is
         # fixed, we can remove both todo and MyPy ignore from here.
         self.last_updated = last_updated  # type: ignore[assignment]
+        # TODO(#16048): Here we use MyPy ignore because in BaseSuggestion,
+        # created_on is defined with only datetime type but here
+        # created_on is of Optional[datetime] type because while creating
+        # 'SuggestionAddQuestion' through create_suggestion() method, we
+        # are not providing 'created_on' and just using None default value.
+        # So, once this suggestion_services.create_suggestion() method is
+        # fixed, we can remove both todo and MyPy ignore from here.
         self.created_on = created_on  # type: ignore[assignment]
         self.image_context = feconf.IMAGE_CONTEXT_QUESTION_SUGGESTIONS
         self._update_change_to_latest_state_schema_version()
