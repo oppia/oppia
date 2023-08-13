@@ -260,7 +260,7 @@ def add_or_update_user_status(
             'merge_fields': {}
         }
 
-        if merge_fields['NAME'] is not None:
+        if 'NAME' in merge_fields and merge_fields['NAME'] is not None:
             new_user_mailchimp_data['merge_fields']['NAME'] = (
                 merge_fields['NAME'])
             subscribed_mailchimp_data['merge_fields']['NAME'] = (
