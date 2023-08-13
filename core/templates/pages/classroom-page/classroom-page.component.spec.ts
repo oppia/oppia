@@ -168,7 +168,11 @@ describe('Classroom Page Component', () => {
       can_edit_topic: true,
       is_published: true,
       url_fragment: 'some-url-fragment',
-      classroom: 'math'
+      classroom: 'math',
+      total_upcoming_chapters_count: 1,
+      total_overdue_chapters_count: 1,
+      total_chapter_counts_for_each_story: [5, 4],
+      published_chapter_counts_for_each_story: [3, 4]
     }];
 
     let classroomData = ClassroomData.createFromBackendData(
