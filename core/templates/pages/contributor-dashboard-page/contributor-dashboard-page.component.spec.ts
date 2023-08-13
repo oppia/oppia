@@ -172,7 +172,7 @@ describe('Contributor dashboard page', () => {
           .toHaveBeenCalled();
         expect(component.activeTabName).toBe('myContributionTab');
         expect(component.OPPIA_AVATAR_IMAGE_URL).toBe(
-          '/assets/images/avatar/oppia_avatar_100px.svg');
+          '/assets/copyrighted-images/avatar/oppia_avatar_100px.svg');
       }));
 
     it('should not set active topic name when no topics are returned',

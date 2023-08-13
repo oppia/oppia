@@ -20,6 +20,7 @@ from __future__ import annotations
 
 from core import feconf
 from core import utils
+from core.constants import constants
 from core.domain import image_services
 from core.platform import models
 
@@ -402,3 +403,18 @@ def copy_images(
             ('image/%s' % compressed_image_filename))
         destination_fs.copy(
             source_fs.assets_path, ('image/%s' % micro_image_filename))
+
+
+def get_static_asset_url(filepath: str) -> str:
+    """Returns the url for the static assets.
+
+    Returns:
+        str. The url for the static assets.
+    """
+    if constants.EMULATOR_MODE:
+        return 'http://localhost:8181/assetsstatic/copyrighted-images/%s' % (
+            filepath
+        )
+    return 'https://storage.googleapis.com/%s-static/%s' % (
+        feconf.OPPIA_PROJECT_ID, filepath
+    )

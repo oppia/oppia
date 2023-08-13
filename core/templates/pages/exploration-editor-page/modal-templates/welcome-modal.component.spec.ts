@@ -85,7 +85,7 @@ describe('Welcome Modal Component', () => {
   it ('should evaluate exploration id when component is initialized', () => {
     expect(component.explorationId).toBe(explorationId);
     expect(component.editorWelcomeImgUrl).toBe(
-      '/assets/images/general/editor_welcome.svg');
+      '/assets/copyrighted-images/general/editor_welcome.svg');
     expect(siteAnalyticsServiceSpy)
       .toHaveBeenCalled();
   });

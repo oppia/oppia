@@ -140,6 +140,10 @@ export class BlogAuthorProfilePageComponent implements OnInit {
     this.loadPage();
   }
 
+  getStaticCopyrightedImageUrl(imagePath: string): string {
+    return this.urlInterpolationService.getStaticCopyrightedImageUrl(
+      imagePath);
+  }
 
   decodeAuthorProfilePicUrl(url: string): void {
     this.DEFAULT_PROFILE_PICTURE_URL = this.urlInterpolationService

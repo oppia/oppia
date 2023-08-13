@@ -169,7 +169,7 @@ export class TutorCardComponent {
       this.learnerAnswerInfoService.getCanAskLearnerForAnswerInfo);
     this.OPPIA_AVATAR_IMAGE_URL = (
       this.urlInterpolationService
-        .getStaticImageUrl('/avatar/oppia_avatar_100px.svg'));
+        .getStaticCopyrightedImageUrl('/avatar/oppia_avatar_100px.svg'));
 
     this.profilePicture = this.urlInterpolationService
       .getStaticImageUrl('/avatar/user_blue_72px.png');

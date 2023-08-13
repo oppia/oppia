@@ -47,8 +47,9 @@ export class WelcomeModalComponent
     this.explorationId = this.contextService.getExplorationId();
     this.siteAnalyticsService.registerTutorialModalOpenEvent(
       this.explorationId);
-    this.editorWelcomeImgUrl = this.urlInterpolationService.getStaticImageUrl(
-      '/general/editor_welcome.svg');
+    this.editorWelcomeImgUrl = (
+      this.urlInterpolationService.getStaticCopyrightedImageUrl(
+        '/general/editor_welcome.svg'));
   }
 
   cancel(): void {

@@ -215,8 +215,10 @@ export class QuestionEditorComponent implements OnInit, OnDestroy {
     this.stateEditorService.setActiveStateName('question');
     this.stateEditorService.setMisconceptionsBySkill(
       this.misconceptionsBySkill);
-    this.oppiaBlackImgUrl = this.urlInterpolationService.getStaticImageUrl(
-      '/avatar/oppia_avatar_100px.svg');
+    this.oppiaBlackImgUrl = (
+      this.urlInterpolationService.getStaticCopyrightedImageUrl(
+        '/avatar/oppia_avatar_100px.svg')
+    );
 
     this.interactionIsShown = false;
     this.stateEditorIsInitialized = false;

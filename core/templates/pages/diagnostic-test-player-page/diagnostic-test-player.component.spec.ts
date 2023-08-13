@@ -122,7 +122,7 @@ describe('Diagnostic test player component', () => {
       expect(component.OPPIA_AVATAR_IMAGE_URL).toEqual('');
 
       const avatarImageLocation = (
-        '/assets/images/avatar/oppia_avatar_100px.svg');
+        '/assets/copyrighted-images/avatar/oppia_avatar_100px.svg');
 
       component.ngOnInit();
 

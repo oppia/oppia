@@ -60,7 +60,7 @@ describe('Login required message component', () => {
   it('should initialize controller properties after its initialization',
     () => {
       expect(component.OPPIA_AVATAR_IMAGE_URL).toBe(
-        '/assets/images/avatar/oppia_avatar_100px.svg');
+        '/assets/copyrighted-images/avatar/oppia_avatar_100px.svg');
     });
 
   it('should go to login url when login button is clicked', fakeAsync(() => {

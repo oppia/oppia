@@ -192,7 +192,7 @@ describe('Question Editor Component', () => {
     component.ngOnInit();
 
     expect(component.oppiaBlackImgUrl)
-      .toBe('/assets/images/avatar/oppia_avatar_100px.svg');
+      .toBe('/assets/copyrighted-images/avatar/oppia_avatar_100px.svg');
     expect(component.interactionIsShown).toBe(true);
     expect(component.stateEditorIsInitialized).toBe(true);
   });

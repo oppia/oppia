@@ -95,7 +95,7 @@ export class CheckpointCelebrationModalComponent implements OnInit, OnDestroy {
     this.explorationId = this.contextService.getExplorationId();
     this.oppiaAvatarImageUrl = (
       this.urlInterpolationService
-        .getStaticImageUrl('/avatar/oppia_avatar_100px.svg'));
+        .getStaticCopyrightedImageUrl('/avatar/oppia_avatar_100px.svg'));
     this.readOnlyExplorationBackendApiService.fetchExplorationAsync(
       this.explorationId, null).then((response) => {
       this.exploration = response.exploration;

@@ -50,6 +50,6 @@ export class WelcomeTranslationModalComponent
     this.siteAnalyticsService.registerTutorialModalOpenEvent(
       this.explorationId);
     this.translationWelcomeImgUrl = this.urlInterpolationService
-      .getStaticImageUrl('/general/editor_welcome.svg');
+      .getStaticCopyrightedImageUrl('/general/editor_welcome.svg');
   }
 }

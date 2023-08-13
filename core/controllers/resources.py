@@ -212,3 +212,63 @@ class PromoBarHandler(
             self.user_id, 'promo_bar_message', promo_bar_message_value)
 
         self.render_json({})
+
+
+class FaviconHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
+
+    @acl_decorators.open_access
+    def get(self) -> None:
+        """Returns an asset file.
+
+        Args:
+
+        """
+        self.redirect(fs_services.get_static_asset_url('favicon.ico'))
+
+
+class RobotsTxtHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
+
+    @acl_decorators.open_access
+    def get(self) -> None:
+        """Returns an asset file.
+
+        Args:
+
+        """
+        self.redirect(fs_services.get_static_asset_url('robots.txt'))
+
+
+class StaticImagesHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {
+        'folder': {
+            'schema': {
+                'type': 'basestring'
+            }
+        },
+        'filename': {
+            'schema': {
+                'type': 'basestring'
+            }
+        },
+    }
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
+
+    @acl_decorators.open_access
+    def get(self, folder: str, filename: str) -> None:
+        """Returns an asset file.
+
+        Args:
+
+        """
+        self.redirect(
+            fs_services.get_static_asset_url('%s/%s' % (folder, filename)))

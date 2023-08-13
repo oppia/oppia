@@ -192,13 +192,9 @@ export class UrlInterpolationService {
     return this._getCompleteUrl('/assets', '/images' + imagePath);
   }
 
-  /**
-   * @param {string} videoPath - A video path relative to /assets/videos folder.
-   * @return {string} The complete url path to that image.
-   */
-  getStaticVideoUrl(videoPath: string): string {
-    this.validateResourcePath(videoPath);
-    return this._getCompleteUrl('/assets', '/videos' + videoPath);
+  getStaticCopyrightedImageUrl(imagePath: string): string {
+    this.validateResourcePath(imagePath);
+    return this._getCompleteUrl('/assets', '/copyrighted-images' + imagePath);
   }
 
   /**
@@ -262,5 +258,4 @@ export class UrlInterpolationService {
 }
 
 angular.module('oppia').factory(
-  'UrlInterpolationService',
-  downgradeInjectable(UrlInterpolationService));
+  'UrlInterpolationService', downgradeInjectable(UrlInterpolationService));

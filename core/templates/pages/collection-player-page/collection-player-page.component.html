@@ -62,7 +62,7 @@
         </text>
       </svg>
 
-      <img [src]="getStaticImageUrl('/general/collection_mascot.svg')"
+      <img [src]="getStaticCopyrightedImageUrl('/general/collection_mascot.svg')"
            class="collection-mascot">
       <a *ngFor="let node of collection.getCollectionNodes();let index = index"
          [href]="getExplorationUrl(node?.getExplorationId())"

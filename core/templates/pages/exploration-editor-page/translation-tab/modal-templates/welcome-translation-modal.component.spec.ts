@@ -81,6 +81,6 @@ describe('Welcome Translation Modal Component', function() {
       expect(siteAnalyticsService.registerTutorialModalOpenEvent)
         .toHaveBeenCalledWith(explorationId);
       expect(component.translationWelcomeImgUrl).toBe(
-        '/assets/images/general/editor_welcome.svg');
+        '/assets/copyrighted-images/general/editor_welcome.svg');
     });
 });
