@@ -322,6 +322,33 @@ const generateDataForClassroom = async function(browser, page) {
   }
 };
 
+const addThumbnailToTopic = async function(page, topicName) {
+  try {
+    await page.goto(TOPIC_AND_SKILLS_DASHBOARD_URL, { waitUntil: networkIdle });
+
+    const topicLinkSelector = `.e2e-test-topic-name:contains("${topicName}")`;
+    await page.waitForSelector(topicLinkSelector);
+    await page.click(topicLinkSelector);
+    await page.waitForTimeout(5000);
+
+    await page.waitForSelector(topicThumbnailButton);
+    await page.click(topicThumbnailButton);
+    
+    await page.waitForSelector(topicUploadButton, { visible: true });
+
+    const elementHandle = await page.$(topicUploadButton);
+    await elementHandle.uploadFile('core/tests/data/test_svg.svg');
+
+    await page.waitForSelector(thumbnailContainer, { visible: true });
+    await page.click(topicPhotoSubmit);
+    await page.waitForTimeout(5000);
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.log(e);
+    process.exit(1);
+  }
+};
+
 const main = async function() {
   process.env.FIREBASE_AUTH_EMULATOR_HOST = 'localhost:9099';
   FirebaseAdmin.initializeApp({projectId: 'dev-project-id'});
@@ -343,6 +370,11 @@ const main = async function() {
   await getSkillEditorUrl(browser, page);
   await generateDataForTopicAndStoryPlayer(browser, page);
   await generateDataForClassroom(browser, page);
+  await addThumbnailToTopic(page, 'Fraction');
+  await addThumbnailToTopic(page, 'Addition');
+  await addThumbnailToTopic(page, 'Subtraction');
+  await addThumbnailToTopic(page, 'Multiplication');
+  await addThumbnailToTopic(page, 'Division');
   await process.stdout.write(
     [
       explorationEditorUrl,

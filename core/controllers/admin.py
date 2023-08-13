@@ -953,7 +953,7 @@ class AdminHandler(
             topic_1 = topic_domain.Topic.create_default_topic(
                 topic_id_1, 'Addition', 'add', 'description', 'fragm')
             topic_1.skill_ids_for_diagnostic_test = [skill_id_1]
-            topic_1.thumbnail_filename = '../../assets/images/avatar/oppia_avatar_100px.svg'
+            topic_1.thumbnail_filename = 'thumbnail.svg'
             topic_1.thumbnail_bg_color = '#C6DCDA'
             topic_1.subtopics = [
                 topic_domain.Subtopic(
@@ -967,7 +967,7 @@ class AdminHandler(
                 'description', 'fragm'
             )
             topic_2.skill_ids_for_diagnostic_test = [skill_id_2]
-            topic_2.thumbnail_filename = '../../assets/images/avatar/oppia_avatar_100px.svg'
+            topic_2.thumbnail_filename = 'thumbnail.svg'
             topic_2.thumbnail_bg_color = '#C6DCDA'
             topic_2.subtopics = [
                 topic_domain.Subtopic(
@@ -981,7 +981,7 @@ class AdminHandler(
                 'description', 'fragm'
             )
             topic_3.skill_ids_for_diagnostic_test = [skill_id_3]
-            topic_3.thumbnail_filename = '../../assets/images/avatar/oppia_avatar_100px.svg'
+            topic_3.thumbnail_filename = 'thumbnail.svg'
             topic_3.thumbnail_bg_color = '#C6DCDA'
             topic_3.subtopics = [
                 topic_domain.Subtopic(
@@ -993,7 +993,7 @@ class AdminHandler(
             topic_4 = topic_domain.Topic.create_default_topic(
                 topic_id_4, 'Division', 'division', 'description', 'fragm')
             topic_4.skill_ids_for_diagnostic_test = [skill_id_4]
-            topic_4.thumbnail_filename = '../../assets/images/avatar/oppia_avatar_100px.svg'
+            topic_4.thumbnail_filename = 'thumbnail.svg'
             topic_4.thumbnail_bg_color = '#C6DCDA'
             topic_4.subtopics = [
                 topic_domain.Subtopic(
@@ -1005,7 +1005,7 @@ class AdminHandler(
             topic_5 = topic_domain.Topic.create_default_topic(
                 topic_id_5, 'Fraction', 'fraction', 'description', 'fragm')
             topic_5.skill_ids_for_diagnostic_test = [skill_id_5]
-            topic_5.thumbnail_filename = '../../assets/images/avatar/oppia_avatar_100px.svg'
+            topic_5.thumbnail_filename = 'thumbnail.svg'
             topic_5.thumbnail_bg_color = '#C6DCDA'
             topic_5.subtopics = [
                 topic_domain.Subtopic(
