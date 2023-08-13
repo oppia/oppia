@@ -326,7 +326,15 @@ const addThumbnailToTopic = async function(page, topicName) {
   try {
     await page.goto(TOPIC_AND_SKILLS_DASHBOARD_URL, { waitUntil: networkIdle });
 
-    const topicLinkSelector = `.e2e-test-topic-name:contains("${topicName}")`;
+    const topicLinkSelector = await page.evaluate(topicName => {
+      const topicLinks = document.querySelectorAll('.e2e-test-topic-name');
+      for (const link of topicLinks) {
+        if (link.textContent.trim() === topicName) {
+          return link;
+        }
+      }
+      return null;
+    }, topicName);
     await page.waitForSelector(topicLinkSelector);
     await page.click(topicLinkSelector);
     await page.waitForTimeout(5000);
