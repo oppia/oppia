@@ -32,7 +32,7 @@ and link to the job request doc here.
 Otherwise, please delete this section.
 -->
 - [ ] A testing doc has been written: ... (ADD LINK) ...
-- [ ] _(To be filled in by the server admin)_ All jobs in this PR have been verified on a live server, and the PR is safe to merge.
+- [ ] _(To be confirmed by the server admin)_ All jobs in this PR have been verified on a live server, and the PR is safe to merge.
 
 
 ## Proof that changes are correct
