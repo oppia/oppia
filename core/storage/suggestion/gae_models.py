@@ -3434,8 +3434,8 @@ class QuestionReviewerTotalContributionStatsModel(base_models.BaseModel):
 class TranslationCoordinatorsModel(base_models.BaseModel):
     """Storage model for rights related to translation coordinator.
 
-    The id of each instance is the id of the corresponding language(
-        The ISO 639-1 language code)
+    The id of each instance is the id of the corresponding language (the
+    ISO 639-1 language code).
     """
 
     # The user_ids of the coordinators of this language.
@@ -3445,8 +3445,8 @@ class TranslationCoordinatorsModel(base_models.BaseModel):
     # The number of coordinators of this language. This property is added to
     # enable the sorting of datastore query results. It is equal to the
     # length of the coordinator_ids field.
-    # TODO(#18762): Add a validate method in domain layer to match the
-    # coordinators_count with length of coordinator_ids.
+    # TODO(#18762): Add a validate method in domain layer to verify that the
+    # coordinators_count equals the length of coordinator_ids.
     coordinators_count = datastore_services.IntegerProperty(
         indexed=True, required=True)
 
