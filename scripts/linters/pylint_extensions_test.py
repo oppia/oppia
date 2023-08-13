@@ -4832,7 +4832,7 @@ class NoBlankLineAfterFunctionDefCheckerTests(unittest.TestCase):
         )
 
         with self.checker_test_object.assertAddsMessages(
-            testutils.Message(
+            testutils.MessageTest(
                 msg_id='Blank-line-after-function-definition',
                 node=node_with_no_error_message,
                 line=1
