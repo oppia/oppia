@@ -1186,9 +1186,6 @@ URLS.extend((
         r'/cron/blog_posts/search_rank', cron.CronBlogPostSearchRankHandler),
     get_redirect_route(
         r'/cron/users/dashboard_stats', cron.CronDashboardStatsHandler),
-    get_redirect_route(
-        r'/cron/suggestions/translation_contribution_stats',
-        cron.CronTranslationContributionStatsHandler),
 ))
 
 # Add tasks urls.
