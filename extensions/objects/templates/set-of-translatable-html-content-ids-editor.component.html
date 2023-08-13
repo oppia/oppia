@@ -7,8 +7,14 @@
     white-space: normal;
     word-break: break-word;
   }
+
+  @media screen and (max-width: 700px) {
+  .checkbox-text {
+    margin-top: 10px;
+  }
+  }
 </style>
-<div class="set-of-translatable-html-content-ids-editor">
+<div class="set-of-translatable-html-content-ids-editor checkbox-text">
   <div class="container-fluid">
     <div *ngFor="let choice of choices; let idx = index">
       <mat-checkbox (click)="toggleSelection(idx)"

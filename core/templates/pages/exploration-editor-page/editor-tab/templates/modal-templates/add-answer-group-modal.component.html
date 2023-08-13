@@ -22,7 +22,7 @@
          title="Edit feedback" class="oppia-edit-feedback">
       <div class="oppia-rule-details-header oppia-editable-section">
         <div class="oppia-rule-preview oppia-transition-200">
-          <div class="oppia-click-to-start-editing" (click)="openFeedbackEditor()">
+          <div class="oppia-click-to-start-editing editing-click-tell-learner" (click)="openFeedbackEditor()">
             <i class="fa fa-pen oppia-editor-edit-icon e2e-test-open-feedback-editor" (keydown.enter)="openFeedbackEditor()" aria-label="edit button" tabindex="0" title="Edit Feedback">&#xE254;</i>
           </div>
           <strong>Oppia tells the learner...</strong>
@@ -63,7 +63,7 @@
            class="e2e-test-editor-correctness-toggle mr-2"
            type="checkbox"
            [(ngModel)]="tmpOutcome.labelledAsCorrect">
-    <strong><label class="ans-correct-checkbox" for="labelledAsCorrect">The answers in this group are correct</label></strong>
+    <strong><label for="labelledAsCorrect" class = "answer-text-lable">The answers in this group are correct</label></strong>
   </div>
 
   <oppia-question-misconception-editor *ngIf="questionModeEnabled"
@@ -107,15 +107,7 @@
   .add-answer-group-modal .oppia-nothing-text {
     color: #888;
   }
-  @media screen and (max-width: 321px) {
-    .ans-correct-checkbox {
-      font-size: 13px;
-    }
-  }
   @media screen and (max-width: 768px) {
-    .ans-correct-checkbox {
-      font-size: 1.4rem;
-    }
     .oppia-click-to-start-editing {
       margin-top: 20px;
       position: relative;
@@ -148,6 +140,17 @@
     }
     .oppia-correctness-label-editor {
       margin-top: 0;
+    }
+    .answer-text-lable {
+      font-size: 1.5rem;
+    }
+    .editing-click-tell-learner {
+      margin-top: 32px;
+    }
+  }
+  @media screen and (max-width: 321px) {
+    .answer-text-lable {
+      font-size: 1.2rem;
     }
   }
 </style>

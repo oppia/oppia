@@ -1,25 +1,5 @@
-<style>
-  .col-sm-1 {
-    margin-right: 10px;
-  }
-
-  .col-sm-10 {
-    border: 1px solid #000;
-    border-radius: 10px;
-    margin-bottom: 5px;
-    margin-left: 10px;
-  }
-
-  p {
-    margin-bottom: 10px;
-  }
-  .oppia-drag-and-drop-error {
-    position: absolute;
-  }
-</style>
-
 <div>
-  <p>NOTE: Two or more items may occupy the same slot.</p>
+  <p class = "txt-two-or-more-items">NOTE: Two or more items may occupy the same slot.</p>
   <div *ngFor="let choice of choices; let idx = index">
     <div class="row">
       <div class="col-sm-1">
@@ -43,3 +23,34 @@
 <div class="oppia-form-error oppia-drag-and-drop-error">
   {{ errorMessage }}
 </div>
+<style>
+  @media screen and (max-width: 700px) {
+  .txt-two-or-more-items {
+    margin-top: 10px;
+    }
+  }
+
+  .col-sm-1 {
+    margin-right: 10px;
+    width: 1rem;
+  }
+
+  .col-sm-10 {
+    border: 1px solid #000;
+    border-radius: 10px;
+    margin-bottom: 5px;
+    margin-left: 10px;
+  }
+
+  p {
+    margin-bottom: 10px;
+  }
+  .oppia-drag-and-drop-error {
+    position: absolute;
+  }
+  @media screen and (max-width: 475px) {
+    .col-sm-10 {
+      width: 80%;
+    }
+  }
+</style>
