@@ -82,6 +82,7 @@ var addNewRoleButton = '.e2e-test-add-new-role-button';
 var roleSelect = '.e2e-test-new-role-selector';
 var generateTopicButton = '.load-dummy-new-structures-data-button';
 var generateClassroomButton = '.load-dummy-math-classroom';
+var topicThumbnailResetButton = '.e2e-test-thumbnail-reset-button';
 var cookieBannerAcceptButton = (
   '.e2e-test-oppia-cookie-banner-accept-button');
 
@@ -334,6 +335,9 @@ const addThumbnailToTopic = async function(page, topicName) {
 
     await page.waitForSelector(topicThumbnailButton);
     await page.click(topicThumbnailButton);
+
+    await page.waitForSelector(topicThumbnailResetButton);
+    await page.click(topicThumbnailResetButton);
     
     await page.waitForSelector(topicUploadButton, { visible: true });
 
