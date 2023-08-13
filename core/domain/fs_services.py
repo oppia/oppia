@@ -412,7 +412,7 @@ def get_static_asset_url(filepath: str) -> str:
         str. The url for the static assets.
     """
     if constants.EMULATOR_MODE:
-        return 'http://localhost:8181/assetsstatic/copyrighted-images/%s' % (
+        return 'http://localhost:8181/assetsstatic/%s' % (
             filepath
         )
     return 'https://storage.googleapis.com/%s-static/%s' % (
