@@ -83,6 +83,10 @@ var roleSelect = '.e2e-test-new-role-selector';
 var generateTopicButton = '.load-dummy-new-structures-data-button';
 var generateClassroomButton = '.load-dummy-math-classroom';
 var topicThumbnailResetButton = '.e2e-test-thumbnail-reset-button';
+var topicMetaTagInput = '.e2e-test-topic-meta-tag-content-field';
+var saveTopicButton = '.e2e-test-save-topic-button';
+var topicCommitMessageInput = 'e2e-test-commit-message-input';
+var publishChangesButton = '.e2e-test-close-save-modal-button';
 var cookieBannerAcceptButton = (
   '.e2e-test-oppia-cookie-banner-accept-button');
 
@@ -352,7 +356,23 @@ const addThumbnailToTopic = async function(page, topicName) {
 
     await page.waitForSelector(thumbnailContainer, { visible: true });
     await page.click(topicPhotoSubmit);
-    await page.waitForTimeout(5000);
+    await page.waitForTimeout(3000);
+
+    await page.waitForSelector(topicMetaTagInput);
+    await page.focus(topicMetaTagInput);
+    await page.type(topicMetaTagInput, 'meta');
+
+    await page.waitForSelector(saveTopicButtonSelector);
+    await page.click(saveTopicButtonSelector);
+
+    await page.waitForSelector(topicCommitMessageInput);
+    await page.focus(topicCommitMessageInput);
+    await page.type(topicCommitMessageInput, 'Updated thumbnail');
+
+    await page.waitForSelector(publishChangesButton);
+    await page.click(publishChangesButton);
+    await page.waitForTimeout(10000);
+
   } catch (e) {
     // eslint-disable-next-line no-console
     console.log(e);
