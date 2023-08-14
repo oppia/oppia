@@ -290,7 +290,7 @@ describe('Admin page platform parameters tab', () => {
 
       expect(platformParameter.rules.length).toBe(1);
 
-      component.clearChanges(platformParameter, 0);
+      component.clearChanges(platformParameter);
 
       expect(platformParameter.rules.length).toBe(1);
     });
@@ -324,13 +324,13 @@ describe('Admin page platform parameters tab', () => {
     it('should shift to edit mode', () => {
       const platformParameter = component.platformParameters[0];
       expect(
-        component.platformParametersInEditMode[platformParameter.name]
+        component.platformParametersInEditMode.get(platformParameter.name)
       ).toBeFalse;
 
       component.shiftToEditMode(platformParameter);
 
       expect(
-        component.platformParametersInEditMode[platformParameter.name]
+        component.platformParametersInEditMode.get(platformParameter.name)
       ).toBeTrue;
     });
   });
@@ -340,13 +340,13 @@ describe('Admin page platform parameters tab', () => {
       const platformParameter = component.platformParameters[0];
       component.shiftToEditMode(platformParameter);
       expect(
-        component.platformParametersInEditMode[platformParameter.name]
+        component.platformParametersInEditMode.get(platformParameter.name)
       ).toBeTrue;
 
       component.shiftToReadMode(platformParameter);
 
       expect(
-        component.platformParametersInEditMode[platformParameter.name]
+        component.platformParametersInEditMode.get(platformParameter.name)
       ).toBeFalse;
     });
   });

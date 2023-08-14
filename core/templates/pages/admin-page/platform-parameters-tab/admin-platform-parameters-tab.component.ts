@@ -233,11 +233,11 @@ export class AdminPlatformParametersTabComponent implements OnInit {
   }
 
   shiftToEditMode(param: PlatformParameter): void {
-    this.platformParametersInEditMode[param.name] = true;
+    this.platformParametersInEditMode.set(param.name, true);
   }
 
   shiftToReadMode(param: PlatformParameter): void {
-    this.platformParametersInEditMode[param.name] = false;
+    this.platformParametersInEditMode.set(param.name, false);
   }
 
   async saveDefaultValueToStorage(): Promise<void> {
