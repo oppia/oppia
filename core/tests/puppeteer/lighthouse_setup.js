@@ -362,8 +362,8 @@ const addThumbnailToTopic = async function(page, topicName) {
     await page.focus(topicMetaTagInput);
     await page.type(topicMetaTagInput, 'meta');
 
-    await page.waitForSelector(saveTopicButtonSelector);
-    await page.click(saveTopicButtonSelector);
+    await page.waitForSelector(saveTopicButton);
+    await page.click(saveTopicButton);
 
     await page.waitForSelector(topicCommitMessageInput);
     await page.focus(topicCommitMessageInput);
