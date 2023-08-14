@@ -103,13 +103,16 @@ export class PreferredLanguagesComponent implements AfterViewInit {
   }
 
   onSearchInputChange(): void {
-    this.searchQuery = this.formCtrl.value;
-    const lowerSearchQuery = this.searchQuery.toLowerCase();
-    this.filteredChoices = this.choices.filter(choice => {
-      return (
-        choice.text.toLowerCase().includes(lowerSearchQuery) ||
-        choice.id.toLowerCase().includes(lowerSearchQuery)
-      );
-    });
+    if (this.searchQuery) {
+      this.searchQuery = this.formCtrl.value;
+      const lowerSearchQuery = this.searchQuery.toLowerCase();
+      this.filteredChoices = this.choices.filter(choice => {
+        return (
+          choice.text.toLowerCase().includes(lowerSearchQuery) ||
+          choice.id.toLowerCase().includes(lowerSearchQuery)
+        );
+      });
+    } else {
+      this.filteredChoices = this.choices;
+    }
   }
-}
