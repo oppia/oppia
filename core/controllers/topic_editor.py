@@ -174,7 +174,7 @@ class TopicEditorStoryHandler(
                     published_chapters_count += 1
                 if (node.status != constants.STORY_NODE_STATUS_PUBLISHED and
                     node.planned_publication_date is not None):
-                    current_time = datetime.datetime.now()
+                    current_time = datetime.datetime.utcnow()
                     if (current_time < node.planned_publication_date
                         < current_time + datetime.timedelta(
                         constants.CHAPTER_PUBLICATION_NOTICE_PERIOD_IN_DAYS)):

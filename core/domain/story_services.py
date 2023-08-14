@@ -1073,7 +1073,7 @@ def get_chapter_notifications_stories_list() -> List[
                 for node in story.story_contents.nodes:
                     if node.planned_publication_date is not None and (
                         node.status != constants.STORY_NODE_STATUS_PUBLISHED):
-                        current_time = datetime.datetime.now()
+                        current_time = datetime.datetime.utcnow()
                         chapter_is_upcoming = (
                             current_time <
                             node.planned_publication_date <

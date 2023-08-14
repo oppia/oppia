@@ -920,7 +920,7 @@ class StoryNode:
         Returns:
             bool. True if the chapter is upcoming else false.
         """
-        current_time = datetime.datetime.now()
+        current_time = datetime.datetime.utcnow()
         if (
             self.status != constants.STORY_NODE_STATUS_PUBLISHED and
             self.planned_publication_date is not None and
@@ -937,7 +937,7 @@ class StoryNode:
         Returns:
             bool. True if the chapter is behind-schedule else false.
         """
-        current_time = datetime.datetime.now()
+        current_time = datetime.datetime.utcnow()
         if (
             self.status != constants.STORY_NODE_STATUS_PUBLISHED and
             self.planned_publication_date is not None and

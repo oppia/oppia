@@ -23,6 +23,7 @@ from unittest import mock
 from core import feconf
 from core import utils
 from core.constants import constants
+from core.controllers import topic_editor
 from core.domain import config_domain
 from core.domain import skill_services
 from core.domain import story_domain
@@ -267,8 +268,9 @@ class TopicEditorStoryHandlerTests(BaseTopicEditorControllerTests):
             topic_id, canonical_story_id_2, self.admin_id)
 
         dt = mock.Mock(wraps=datetime.datetime)
-        with self.swap(datetime, 'datetime', dt):
-            dt.now.return_value = datetime.datetime.fromtimestamp(1690555400)
+        with self.swap(topic_editor.datetime, 'datetime', dt):
+            dt.utcnow.return_value = datetime.datetime.utcfromtimestamp(
+                1690555400)
             response = self.get_json(
                 '%s/%s' % (feconf.TOPIC_EDITOR_STORY_URL, topic_id))
             canonical_story_summary_dict = response[

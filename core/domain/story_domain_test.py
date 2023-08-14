@@ -941,8 +941,9 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
             datetime.datetime(2022, 12, 29))
 
         dt = mock.Mock(wraps=datetime.datetime)
-        with self.swap(datetime, 'datetime', dt):
-            dt.now.return_value = datetime.datetime.fromtimestamp(1672483686)
+        with self.swap(story_domain.datetime, 'datetime', dt):
+            dt.utcnow.return_value = datetime.datetime.utcfromtimestamp(
+                1672483686)
             self.assertEqual(
                 self.story.story_contents.nodes[0].is_node_upcoming(), True)
             self.assertEqual(
@@ -959,8 +960,9 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
             datetime.datetime(2022, 12, 29))
 
         dt = mock.Mock(wraps=datetime.datetime)
-        with self.swap(datetime, 'datetime', dt):
-            dt.now.return_value = datetime.datetime.fromtimestamp(1672483686)
+        with self.swap(story_domain.datetime, 'datetime', dt):
+            dt.utcnow.return_value = datetime.datetime.utcfromtimestamp(
+                1672483686)
             self.assertEqual(
                 self.story.story_contents.nodes[0].is_node_behind_schedule(),
                 False)
