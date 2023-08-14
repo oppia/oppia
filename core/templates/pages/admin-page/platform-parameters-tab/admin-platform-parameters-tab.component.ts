@@ -329,7 +329,7 @@ export class AdminPlatformParametersTabComponent implements OnInit {
     if (original === undefined) {
       throw new Error('Backup not found for platform params: ' + param.name);
     }
-    return !isEqual(param, original)
+    return !isEqual(param, original);
   }
 
   /**
