@@ -316,6 +316,12 @@ const generateDataForClassroom = async function(browser, page) {
           .textContent.trim() : '';
       });
     } while (statusMessage !== successMessage);
+
+    await addThumbnailToTopic(page, 'Fraction');
+    await addThumbnailToTopic(page, 'Addition');
+    await addThumbnailToTopic(page, 'Subtraction');
+    await addThumbnailToTopic(page, 'Multiplication');
+    await addThumbnailToTopic(page, 'Division');
   } catch (e) {
     // eslint-disable-next-line no-console
     console.log(e);
@@ -342,7 +348,7 @@ const addThumbnailToTopic = async function(page, topicName) {
     await page.waitForSelector(topicUploadButton, { visible: true });
 
     const elementHandle = await page.$(topicUploadButton);
-    await elementHandle.uploadFile('core/tests/data/test_svg.svg');
+    await elementHandle.uploadFile('core/tests/data/test2_svg.svg');
 
     await page.waitForSelector(thumbnailContainer, { visible: true });
     await page.click(topicPhotoSubmit);
@@ -375,11 +381,6 @@ const main = async function() {
   await getSkillEditorUrl(browser, page);
   await generateDataForTopicAndStoryPlayer(browser, page);
   await generateDataForClassroom(browser, page);
-  await addThumbnailToTopic(page, 'Fraction');
-  await addThumbnailToTopic(page, 'Addition');
-  await addThumbnailToTopic(page, 'Subtraction');
-  await addThumbnailToTopic(page, 'Multiplication');
-  await addThumbnailToTopic(page, 'Division');
   await process.stdout.write(
     [
       explorationEditorUrl,
