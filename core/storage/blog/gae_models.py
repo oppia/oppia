@@ -57,6 +57,8 @@ class BlogPostModel(base_models.BaseModel):
     """Model to store blog post data. Functionality to allow authors to revert
     back to earlier versions is not being built in as we do not want to maintain
     commit history for blog post models. All models are therefore not versioned.
+    Note that blog post authors can always make edits directly to their post,
+    and re-publish it.
 
     The id of instances of this class is in the form of random hash of 12 chars.
     """
@@ -256,7 +258,7 @@ class BlogPostSummaryModel(base_models.BaseModel):
     thumbnail_filename = datastore_services.StringProperty(indexed=True)
     # Time when the blog post model was last published. Value will be None
     # if the blog post is currently not published.
-    published_on = (datastore_services.DateTimeProperty(indexed=True))
+    published_on = datastore_services.DateTimeProperty(indexed=True)
 
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:

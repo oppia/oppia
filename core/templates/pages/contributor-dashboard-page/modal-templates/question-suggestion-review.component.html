@@ -1,8 +1,8 @@
 <div class="modal-header e2e-test-question-suggestion-review-modal-header">
   <div>
-    <h3 class="oppia-question-header">
+    <h1 class="oppia-question-header" tabindex="0">
       {{questionHeader}}
-    </h3>
+    </h1>
     <h3 class="oppia-mobile-question-header" title="{{questionHeader}}">
       {{questionHeader.substring(0, 25)}}{{questionHeader.length > 25 ? "...": ""}}
     </h3>
@@ -20,7 +20,7 @@
 </div>
 
 <div class="modal-body">
-  <div class="oppia-question-details">
+  <div class="oppia-question-details" tabindex="0">
     <strong class="oppia-difficulty-title">
       Selected Difficulty: {{skillDifficultyLabel}}
     </strong>
@@ -42,7 +42,8 @@
                            [questionStateData]="questionStateData"
                            [question]="question"
                            [userCanEditQuestion]="canEditQuestion"
-                           (questionChange)="questionChanged()">
+                           (questionChange)="questionChanged()"
+                           tabindex="0">
     </oppia-question-editor>
   </div>
   <section [hidden]="!reviewable"
@@ -126,6 +127,9 @@
   }
   .oppia-question-header {
     display: block;
+    font-size: 1.17em;
+    margin-bottom: 18.7px;
+    margin-top: 18.7px;
   }
   .oppia-review-button {
     margin: auto 5px;
