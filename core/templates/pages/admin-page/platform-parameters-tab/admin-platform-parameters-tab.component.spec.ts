@@ -284,6 +284,17 @@ describe('Admin page platform parameters tab', () => {
   });
 
   describe('.clearChanges', () => {
+    it('should not do anything when no changes are done to platform ' +
+    'param', () => {
+      const platformParameter = component.platformParameters[0];
+
+      expect(platformParameter.rules.length).toBe(1);
+
+      component.clearChanges(platformParameter, 0);
+
+      expect(platformParameter.rules.length).toBe(1);
+    });
+
     it('should clear changes', () => {
       spyOn(mockWindowRef.nativeWindow, 'confirm').and.returnValue(true);
       const platformParameter = component.platformParameters[0];
@@ -309,6 +320,77 @@ describe('Admin page platform parameters tab', () => {
     });
   });
 
+  describe('.shiftToEditMode', () => {
+    it('should shift to edit mode', () => {
+      const platformParameter = component.platformParameters[0];
+      expect(
+        component.platformParametersInEditMode[platformParameter.name]
+      ).toBeFalse;
+
+      component.shiftToEditMode(platformParameter);
+
+      expect(
+        component.platformParametersInEditMode[platformParameter.name]
+      ).toBeTrue;
+    });
+  });
+
+  describe('.shiftToReadMode', () => {
+    it('should shift to read mode', () => {
+      const platformParameter = component.platformParameters[0];
+      component.shiftToEditMode(platformParameter);
+      expect(
+        component.platformParametersInEditMode[platformParameter.name]
+      ).toBeTrue;
+
+      component.shiftToReadMode(platformParameter);
+
+      expect(
+        component.platformParametersInEditMode[platformParameter.name]
+      ).toBeFalse;
+    });
+  });
+
+  describe('.getReadonlyFilterValues', () => {
+    it('should get read only value of the rule with one filter and one ' +
+    'condition', () => {
+      const platformParameter = component.platformParameters[0];
+
+      expect(
+        component.getReadonlyFilterValues(platformParameter.rules[0])
+      ).toBe('Server Mode in [dev]');
+    });
+
+    it('should get read only value of the rule with one filter and multiple ' +
+    'condition', () => {
+      const platformParameter = component.platformParameters[0];
+      component.addNewCondition(platformParameter.rules[0].filters[0]);
+
+      expect(
+        component.getReadonlyFilterValues(platformParameter.rules[0])
+      ).toBe('Server Mode in [dev, dev]');
+    });
+
+    it('should get read only value of the rule with multiple filter', () => {
+      const platformParameter = component.platformParameters[0];
+      component.addNewFilter(platformParameter.rules[0]);
+      component.addNewCondition(platformParameter.rules[0].filters[1]);
+
+      expect(
+        component.getReadonlyFilterValues(platformParameter.rules[0])
+      ).toBe('Server Mode in [dev]; Server Mode in [dev]');
+    });
+
+    it('should get read only value of the rule with no condition', () => {
+      const platformParameter = component.platformParameters[0];
+      component.addNewRuleToBottom(platformParameter);
+
+      expect(
+        component.getReadonlyFilterValues(platformParameter.rules[1])
+      ).toBe('Server Mode in [ ]');
+    });
+  });
+
   describe('.saveDefaultValueToStorage', () => {
     it('should save the changes', fakeAsync(() => {
       spyOn(mockWindowRef.nativeWindow, 'confirm').and.returnValue(true);
@@ -329,7 +411,7 @@ describe('Admin page platform parameters tab', () => {
     }));
   });
 
-  describe('.updateParameterRuleAsync', () => {
+  describe('.updateParameterRulesAsync', () => {
     let setStatusSpy: jasmine.Spy;
     let promptSpy: jasmine.Spy;
 
@@ -347,7 +429,7 @@ describe('Admin page platform parameters tab', () => {
       const platformParameter = component.platformParameters[0];
 
       component.addNewRuleToBottom(platformParameter);
-      component.updateParameterRuleAsync(platformParameter);
+      component.updateParameterRulesAsync(platformParameter);
 
       flushMicrotasks();
 
@@ -363,7 +445,7 @@ describe('Admin page platform parameters tab', () => {
         const platformParameter = component.platformParameters[0];
 
         component.addNewRuleToBottom(platformParameter);
-        component.updateParameterRuleAsync(platformParameter);
+        component.updateParameterRulesAsync(platformParameter);
 
         flushMicrotasks();
 
@@ -385,7 +467,7 @@ describe('Admin page platform parameters tab', () => {
         const originalFeatureFlag = cloneDeep(platformParameter);
 
         component.addNewRuleToBottom(platformParameter);
-        component.updateParameterRuleAsync(platformParameter);
+        component.updateParameterRulesAsync(platformParameter);
 
         flushMicrotasks();
 
@@ -401,7 +483,7 @@ describe('Admin page platform parameters tab', () => {
       const platformParameter = component.platformParameters[0];
 
       component.addNewRuleToBottom(platformParameter);
-      component.updateParameterRuleAsync(platformParameter);
+      component.updateParameterRulesAsync(platformParameter);
 
       flushMicrotasks();
 
@@ -422,7 +504,7 @@ describe('Admin page platform parameters tab', () => {
         const platformParameter = component.platformParameters[0];
 
         component.addNewRuleToBottom(platformParameter);
-        component.updateParameterRuleAsync(platformParameter);
+        component.updateParameterRulesAsync(platformParameter);
 
         flushMicrotasks();
 
@@ -439,7 +521,7 @@ describe('Admin page platform parameters tab', () => {
       // Two identical rules.
       component.addNewRuleToBottom(platformParameter);
       component.addNewRuleToBottom(platformParameter);
-      component.updateParameterRuleAsync(platformParameter);
+      component.updateParameterRulesAsync(platformParameter);
 
       flushMicrotasks();
 
@@ -459,7 +541,7 @@ describe('Admin page platform parameters tab', () => {
       const platformParameter = component.platformParameters[0];
 
       component.addNewRuleToBottom(platformParameter);
-      component.updateParameterRuleAsync(platformParameter);
+      component.updateParameterRulesAsync(platformParameter);
 
       flushMicrotasks();
 
@@ -481,7 +563,7 @@ describe('Admin page platform parameters tab', () => {
       const platformParameter = component.platformParameters[0];
 
       component.addNewRuleToBottom(platformParameter);
-      component.updateParameterRuleAsync(platformParameter);
+      component.updateParameterRulesAsync(platformParameter);
 
       flushMicrotasks();
 
@@ -497,7 +579,7 @@ describe('Admin page platform parameters tab', () => {
       const platformParameter = component.platformParameters[0];
 
       expect(() => {
-        component.updateParameterRuleAsync(platformParameter);
+        component.updateParameterRulesAsync(platformParameter);
         tick();
       }).toThrowError();
     }));

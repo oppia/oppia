@@ -110,6 +110,7 @@ export class AdminPlatformParametersTabComponent implements OnInit {
   loadingMessage: string = '';
   directiveSubscriptions = new Subscription();
   platformParameterNameToRulesReadonlyData: Map<string, string[]> = new Map();
+  platformParametersInEditMode!: Map<string, boolean>;
 
   constructor(
     private windowRef: WindowRef,
@@ -125,6 +126,8 @@ export class AdminPlatformParametersTabComponent implements OnInit {
     this.platformParameters = data.platformParameters;
     this.platformParameterNameToBackupMap = new Map(
       this.platformParameters.map(param => [param.name, cloneDeep(param)]));
+    this.platformParametersInEditMode = new Map(
+      this.platformParameters.map(param => [param.name, false]));
     for (let platformParameter of this.platformParameters) {
       this.updateFilterValuesForDisplay(platformParameter);
     }
@@ -149,22 +152,28 @@ export class AdminPlatformParametersTabComponent implements OnInit {
 
   getReadonlyFilterValues(rule: PlatformParameterRule): string {
     let resultantString: string = '';
-    for (let filter of rule.filters) {
+    let filters: PlatformParameterFilter[] = rule.filters;
+    for (let filterIdx = 0; filterIdx < filters.length; filterIdx++) {
       let filterName: string = (
-        this.filterTypeToContext[filter.type].displayName);
-      if (filter.conditions.length === 0) {
-        resultantString += filterName + ' in ' + '[ ]' + '; ';
+        this.filterTypeToContext[filters[filterIdx].type].displayName);
+      if (filters[filterIdx].conditions.length === 0) {
+        resultantString += filterName + ' in ' + '[ ]';
       } else {
         let conditions: string = '';
-        for (let idx = 0; idx < filter.conditions.length; idx++) {
-          if (idx === filter.conditions.length - 1) {
-            conditions += filter.conditions[idx][1];
+        for (let idx = 0; idx < filters[filterIdx].conditions.length; idx++) {
+          if (idx === filters[filterIdx].conditions.length - 1) {
+            conditions += filters[filterIdx].conditions[idx][1];
           } else {
-            conditions += filter.conditions[idx][1] + ', ';
+            conditions += filters[filterIdx].conditions[idx][1] + ', ';
           }
         }
-        resultantString += (
-          filterName + ' in ' + '[' + conditions + ']' + '; ');
+        if (filterIdx === filters.length - 1) {
+          resultantString += (
+            filterName + ' in ' + '[' + conditions + ']');
+        } else {
+          resultantString += (
+            filterName + ' in ' + '[' + conditions + ']' + '; ');
+        }
       }
     }
     return resultantString;
@@ -180,12 +189,6 @@ export class AdminPlatformParametersTabComponent implements OnInit {
   }
 
   addNewRuleToBottom(param: PlatformParameter): void {
-    const backup = this.platformParameterNameToBackupMap.get(param.name);
-    if (!isEqual(param, backup)) {
-      this.windowRef.nativeWindow.alert(
-        `Please save existing rules before adding new one.`);
-      return;
-    }
     param.rules.push(cloneDeep(this.getdefaultNewRule(param)));
     this.updateFilterValuesForDisplay(param);
   }
@@ -227,6 +230,14 @@ export class AdminPlatformParametersTabComponent implements OnInit {
     this.removeRule(param, ruleIndex);
     param.rules.splice(ruleIndex + 1, 0, rule);
     this.updateFilterValuesForDisplay(param);
+  }
+
+  shiftToEditMode(param: PlatformParameter): void {
+    this.platformParametersInEditMode[param.name] = true;
+  }
+
+  shiftToReadMode(param: PlatformParameter): void {
+    this.platformParametersInEditMode[param.name] = false;
   }
 
   async saveDefaultValueToStorage(): Promise<void> {
@@ -271,7 +282,7 @@ export class AdminPlatformParametersTabComponent implements OnInit {
     }
   }
 
-  async updateParameterRuleAsync(param: PlatformParameter): Promise<void> {
+  async updateParameterRulesAsync(param: PlatformParameter): Promise<void> {
     const issues = (
       AdminPlatformParametersTabComponent.validatePlatformParam(param));
     if (issues.length > 0) {
@@ -293,55 +304,17 @@ export class AdminPlatformParametersTabComponent implements OnInit {
     await this.updatePlatformParameter(param, commitMessage);
   }
 
-  isParameterRuleAllowedToEdit(param: PlatformParameter): boolean {
-    const backup = this.platformParameterNameToBackupMap.get(param.name);
-    if (!isEqual(param, backup)) {
-      this.windowRef.nativeWindow.alert(
-        `Please save your edits before editing another rule.`);
-      return false;
-    }
-    return true;
-  }
-
-  async autoupdateParameterAsync(param: PlatformParameter): Promise<void> {
-    const issues = (
-      AdminPlatformParametersTabComponent.validatePlatformParam(param));
-    if (issues.length > 0) {
-      this.windowRef.nativeWindow.alert(issues.join('\n'));
-      return;
-    }
-    if (this.adminTaskManager.isTaskRunning()) {
-      return;
-    }
-    const commitMessage = 'Platform parameter rules are updated.';
-
-    await this.updatePlatformParameter(param, commitMessage);
-  }
-
-  clearChanges(param: PlatformParameter, ruleIndex: number): void {
-    const backup = this.platformParameterNameToBackupMap.get(param.name);
-    if (!isEqual(param.rules[ruleIndex], backup.rules[ruleIndex])) {
-      if (ruleIndex === backup.rules.length && !backup.rules[ruleIndex]) {
-        if (
-          !isEqual(param.rules[ruleIndex], this.getdefaultNewRule(param)) &&
-          !this.windowRef.nativeWindow.confirm(
-            'This will revert all changes you made. Are you sure?')
-        ) {
-          return;
-        }
-        param.rules[ruleIndex] = cloneDeep(this.getdefaultNewRule(param));
+  clearChanges(param: PlatformParameter): void {
+    if (this.isPlatformParamChanged(param)) {
+      if (!this.windowRef.nativeWindow.confirm(
+        'This will revert all changes you made. Are you sure?')) {
         return;
-      } else {
-        if (!this.windowRef.nativeWindow.confirm(
-          'This will revert all changes you made. Are you sure?')) {
-          return;
-        }
       }
-    }
-
-    if (backup) {
-      param.rules[ruleIndex] = cloneDeep(backup.rules[ruleIndex]);
-      param.defaultValue = backup.defaultValue;
+      const backup = this.platformParameterNameToBackupMap.get(param.name);
+      if (backup) {
+        param.rules = cloneDeep(backup.rules);
+        param.defaultValue = backup.defaultValue;
+      }
     }
   }
 
@@ -349,16 +322,14 @@ export class AdminPlatformParametersTabComponent implements OnInit {
     filter.conditions.splice(0);
   }
 
-  isPlatformParamRuleChanged(
-    param: PlatformParameter, ruleIndex: number
-  ): boolean {
+  isPlatformParamChanged(param: PlatformParameter): boolean {
     const original = this.platformParameterNameToBackupMap.get(
       param.name
     );
     if (original === undefined) {
       throw new Error('Backup not found for platform params: ' + param.name);
     }
-    return !isEqual(param.rules[ruleIndex], original.rules[ruleIndex])
+    return !isEqual(param, original)
   }
 
   /**

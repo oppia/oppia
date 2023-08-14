@@ -7,7 +7,16 @@
   </button>
 </div>
 <div *ngFor="let platformParameter of platformParameters;" class="container oppia-page-card oppia-long-text oppia-admin-parameters e2e-test-platform-param">
-  <h2 class="oppia-parameter-name e2e-test-parameter-name">{{platformParameter.name}}</h2>
+  <div class="row oppia-parameter-name">
+    <div class="col-10">
+      <h2 class="e2e-test-parameter-name">{{platformParameter.name}}</h2>
+    </div>
+    <div class="col-2">
+      <div *ngIf="!platformParametersInEditMode[platformParameter.name]" (click)="shiftToEditMode(platformParameter)">
+        <button>Click to edit</button>
+      </div>
+    </div>
+  </div>
   <div class="row oppia-parameter-top-margin">
     <div class="col-2"><b>Description:</b></div>
     <div class="col-10 oppia-description-content">{{platformParameter.description}}</div>
@@ -28,32 +37,21 @@
     <div class="col-11">
       <!-- Rules -->
       <div class="container oppia-accordion">
-        <cdk-accordion>
-          <cdk-accordion-item *ngFor="let rule of platformParameter.rules; index as ruleIndex"
-                              #accordionItem="cdkAccordionItem"
-                              class="oppia-parameter-bottom-margin oppia-accordion-item"
-                              role="button"
-                              tabindex="0"
-                              [attr.id]="'accordion-header-' + ruleIndex"
-                              [attr.aria-expanded]="accordionItem.expanded"
-                              [attr.aria-controls]="'accordion-body-' + ruleIndex">
-            <div class="row">
-              <div class="col-10">
-                <div *ngIf="accordionItem.expanded === false">
-                  <div class="row oppia-accordion-item-header">
-                    <div class="col-6" >
-                      {{platformParameterNameToRulesReadonlyData.get(platformParameter.name)[ruleIndex]}}
-                    </div>
-                    <div class="col-3">
-                      {{ rule.valueWhenMatched }}
-                    </div>
-                    <div class="col-3" (click)="isParameterRuleAllowedToEdit(platformParameter) && accordionItem.toggle()">
-                      <button>Click to edit</button>
-                    </div>
-                  </div>
+        <div *ngFor="let rule of platformParameter.rules; index as ruleIndex" class="oppia-parameter-bottom-margin oppia-accordion-item">
+          <div class="row">
+            <div class="col-12" *ngIf="!platformParametersInEditMode[platformParameter.name]">
+              <div class="row oppia-accordion-item-header">
+                <div class="col-6" >
+                  {{platformParameterNameToRulesReadonlyData.get(platformParameter.name)[ruleIndex]}}
                 </div>
-                <div class="oppia-accordion-item-body" role="region" [style.display]="accordionItem.expanded ? '' : 'none'"
-                     [attr.id]="'accordion-body-' + ruleIndex" [attr.aria-labelledby]="'accordion-header-' + ruleIndex">
+                <div class="col-3">
+                  {{ rule.valueWhenMatched }}
+                </div>
+              </div>
+            </div>
+            <div class="col-12" *ngIf="platformParametersInEditMode[platformParameter.name]">
+              <div class="row">
+                <div class="col-10">
                   <div class="oppia-rule-container">
                     <div class="row oppia-parameter-top-margin">
                       <div class="col-12"><b>If:</b></div>
@@ -166,72 +164,65 @@
                         </schema-based-editor>
                       </div>
                     </div>
-                    <div class="row oppia-control-buttons-container oppia-parameter-top-margin">
-                      <!-- Control Buttons -->
-                      <button
-                              class="btn btn-secondary"
-                              (click)="clearChanges(platformParameter, ruleIndex); accordionItem.toggle();">
-                        Cancel
+                  </div>
+                </div>
+                <div class="col-2">
+                  <div class="row">
+                    <div *ngIf="ruleIndex === 0 || ruleIndex === platformParameter.rules.length - 1" class="col-4"></div>
+                    <div *ngIf="ruleIndex > 0" class="col-4 oppia-rule-moving-buttons-container">
+                      <button class="btn btn-secondary"
+                              (click)="moveRuleUp(platformParameter, ruleIndex)">
+                        ↑
                       </button>
-                      <button
-                              class="btn btn-primary"
-                              (click)="updateParameterRuleAsync(platformParameter); accordionItem.toggle();"
-                              [disabled]="!isPlatformParamRuleChanged(platformParameter, ruleIndex)">
-                        Save
+                    </div>
+                    <div *ngIf="ruleIndex + 1 < platformParameter.rules.length" class="col-4 oppia-rule-moving-buttons-container">
+                      <button class="btn btn-secondary"
+                              (click)="moveRuleDown(platformParameter, ruleIndex)">
+                        ↓
+                      </button>
+                    </div>
+                    <div class="col-4 oppia-flex-vertical-center">
+                      <button class="btn btn-secondary e2e-test-remove-rule-button"
+                              (click)="removeRule(platformParameter, ruleIndex)">
+                        <i class="fas fa-times"></i>
                       </button>
                     </div>
                   </div>
                 </div>
               </div>
-              <div class="col-2">
-                <div class="row">
-                  <div *ngIf="ruleIndex === 0 || ruleIndex === platformParameter.rules.length - 1" class="col-4"></div>
-                  <div *ngIf="ruleIndex > 0" class="col-4 oppia-rule-moving-buttons-container">
-                    <button class="btn btn-secondary"
-                            (click)="moveRuleUp(platformParameter, ruleIndex); autoupdateParameterAsync(platformParameter);">
-                      ↑
-                    </button>
-                  </div>
-                  <div *ngIf="ruleIndex + 1 < platformParameter.rules.length" class="col-4 oppia-rule-moving-buttons-container">
-                    <button class="btn btn-secondary"
-                            (click)="moveRuleDown(platformParameter, ruleIndex); autoupdateParameterAsync(platformParameter);">
-                      ↓
-                    </button>
-                  </div>
-                  <div class="col-4 oppia-flex-vertical-center">
-                    <button class="btn btn-secondary e2e-test-remove-rule-button"
-                            (click)="removeRule(platformParameter, ruleIndex); autoupdateParameterAsync(platformParameter);">
-                      <i class="fas fa-times"></i>
-                    </button>
-                  </div>
-                </div>
-              </div>
             </div>
-          </cdk-accordion-item>
-        </cdk-accordion>
+          </div>
+        </div>
       </div>
     </div>
   </div>
-  <div class="oppia-flex-center oppia-parameter-bottom-margin">
+  <div *ngIf="platformParametersInEditMode[platformParameter.name]" class="oppia-flex-center oppia-parameter-bottom-margin">
     <button class="btn btn-secondary e2e-test-parameter-add-rule-button"
             (click)="addNewRuleToBottom(platformParameter)">
       Add Rule
     </button>
   </div>
   <div class="row oppia-parameter-top-margin">
-    <div class="col-2"><b>Default:</b></div>
-    <div *ngIf="platformParameter.rules.length === 0" class="col-9">
+    <div class="col-2"><b>Default value:</b></div>
+    <div *ngIf="platformParametersInEditMode[platformParameter.name]" class="col-9">
       <schema-based-editor [schema]="getPlatformParamSchema(platformParameter.dataType)" [(ngModel)]="platformParameter.defaultValue">
       </schema-based-editor>
     </div>
-    <div *ngIf="platformParameter.rules.length === 0" class="col-1">
-      <button
-              class="btn btn-primary"
-              (click)="autoupdateParameterAsync(platformParameter)">
-        Save
-      </button>
-    </div>
-    <div *ngIf="platformParameter.rules.length !== 0" class="col-10">{{platformParameter.defaultValue}}</div>
+    <div *ngIf="!platformParametersInEditMode[platformParameter.name]" class="col-10">{{platformParameter.defaultValue}}</div>
+  </div>
+  <div class="row oppia-control-buttons-container oppia-parameter-top-margin">
+    <!-- Control Buttons -->
+    <button
+            class="btn btn-secondary"
+            (click)="clearChanges(platformParameter); shiftToReadMode(platformParameter)">
+      Cancel
+    </button>
+    <button
+            class="btn btn-primary"
+            (click)="updateParameterRulesAsync(platformParameter); shiftToReadMode(platformParameter);"
+            [disabled]="!isPlatformParameterChanged(platformParameter)">
+      Save
+    </button>
   </div>
 </div>
 
