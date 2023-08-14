@@ -372,7 +372,6 @@ const addThumbnailToTopic = async function(page, topicName) {
     await page.waitForSelector(publishChangesButton);
     await page.click(publishChangesButton);
     await page.waitForTimeout(10000);
-
   } catch (e) {
     // eslint-disable-next-line no-console
     console.log(e);
