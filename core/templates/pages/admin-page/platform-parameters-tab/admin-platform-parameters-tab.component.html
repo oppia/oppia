@@ -11,8 +11,8 @@
     <div class="col-10">
       <h2 class="e2e-test-parameter-name">{{platformParameter.name}}</h2>
     </div>
-    <div class="col-2">
-      <div *ngIf="!platformParametersInEditMode[platformParameter.name]" (click)="shiftToEditMode(platformParameter)">
+    <div class="col-2 oppia-edit-param-button">
+      <div *ngIf="!platformParametersInEditMode.get(platformParameter.name)" (click)="shiftToEditMode(platformParameter)">
         <button>Click to edit</button>
       </div>
     </div>
@@ -36,11 +36,11 @@
     <div class="col-1"></div>
     <div class="col-11">
       <!-- Rules -->
-      <div class="container oppia-accordion">
-        <div *ngFor="let rule of platformParameter.rules; index as ruleIndex" class="oppia-parameter-bottom-margin oppia-accordion-item">
+      <div class="container oppia-rules-section">
+        <div *ngFor="let rule of platformParameter.rules; index as ruleIndex" class="oppia-parameter-bottom-margin oppia-rule-item">
           <div class="row">
-            <div class="col-12" *ngIf="!platformParametersInEditMode[platformParameter.name]">
-              <div class="row oppia-accordion-item-header">
+            <div class="col-12" *ngIf="!platformParametersInEditMode.get(platformParameter.name)">
+              <div class="row oppia-rule-item-header">
                 <div class="col-6" >
                   {{platformParameterNameToRulesReadonlyData.get(platformParameter.name)[ruleIndex]}}
                 </div>
@@ -49,7 +49,7 @@
                 </div>
               </div>
             </div>
-            <div class="col-12" *ngIf="platformParametersInEditMode[platformParameter.name]">
+            <div class="col-12" *ngIf="platformParametersInEditMode.get(platformParameter.name)">
               <div class="row">
                 <div class="col-10">
                   <div class="oppia-rule-container">
@@ -196,7 +196,7 @@
       </div>
     </div>
   </div>
-  <div *ngIf="platformParametersInEditMode[platformParameter.name]" class="oppia-flex-center oppia-parameter-bottom-margin">
+  <div *ngIf="platformParametersInEditMode.get(platformParameter.name)" class="oppia-flex-center oppia-parameter-bottom-margin">
     <button class="btn btn-secondary e2e-test-parameter-add-rule-button"
             (click)="addNewRuleToBottom(platformParameter)">
       Add Rule
@@ -204,11 +204,11 @@
   </div>
   <div class="row oppia-parameter-top-margin">
     <div class="col-2"><b>Default value:</b></div>
-    <div *ngIf="platformParametersInEditMode[platformParameter.name]" class="col-9">
+    <div *ngIf="platformParametersInEditMode.get(platformParameter.name)" class="col-9">
       <schema-based-editor [schema]="getPlatformParamSchema(platformParameter.dataType)" [(ngModel)]="platformParameter.defaultValue">
       </schema-based-editor>
     </div>
-    <div *ngIf="!platformParametersInEditMode[platformParameter.name]" class="col-10">{{platformParameter.defaultValue}}</div>
+    <div *ngIf="!platformParametersInEditMode.get(platformParameter.name)" class="col-10">{{platformParameter.defaultValue}}</div>
   </div>
   <div class="row oppia-control-buttons-container oppia-parameter-top-margin">
     <!-- Control Buttons -->
@@ -220,7 +220,7 @@
     <button
             class="btn btn-primary"
             (click)="updateParameterRulesAsync(platformParameter); shiftToReadMode(platformParameter);"
-            [disabled]="!isPlatformParameterChanged(platformParameter)">
+            [disabled]="!isPlatformParamChanged(platformParameter)">
       Save
     </button>
   </div>
@@ -232,23 +232,24 @@
 
 
 <style>
-  .oppia-accordion {
+  .oppia-edit-param-button {
+    padding: 15px;
+    text-align: center;
+  }
+
+  .oppia-rules-section {
     display: block;
   }
 
-  .oppia-accordion-item {
+  .oppia-rule-item {
     border: solid 1px #ccc;
     display: block;
   }
 
-  .oppia-accordion-item-header {
+  .oppia-rule-item-header {
     align-content: center;
     display: flex;
     justify-content: space-between;
-  }
-
-  .oppia-accordion-item-header,
-  .oppia-accordion-item-body {
     padding: 16px;
   }
 

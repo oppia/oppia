@@ -37,7 +37,6 @@ import { PlatformParameterFilterType, ServerMode } from
   'domain/platform_feature/platform-parameter-filter.model';
 import { FeatureStage, PlatformParameter } from 'domain/platform_feature/platform-parameter.model';
 import { HttpErrorResponse } from '@angular/common/http';
-import { CdkAccordionModule } from '@angular/cdk/accordion';
 
 class MockWindowRef {
   nativeWindow = {
@@ -67,7 +66,7 @@ describe('Admin page platform parameters tab', () => {
   beforeEach(async(() => {
     mockWindowRef = new MockWindowRef();
     TestBed.configureTestingModule({
-      imports: [CdkAccordionModule, FormsModule, HttpClientTestingModule],
+      imports: [FormsModule, HttpClientTestingModule],
       declarations: [AdminPlatformParametersTabComponent],
       providers: [
         AdminTaskManagerService,
