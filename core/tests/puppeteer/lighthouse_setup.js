@@ -338,7 +338,7 @@ const addThumbnailToTopic = async function(page, topicName) {
 
     await page.waitForSelector(topicThumbnailResetButton);
     await page.click(topicThumbnailResetButton);
-    
+
     await page.waitForSelector(topicUploadButton, { visible: true });
 
     const elementHandle = await page.$(topicUploadButton);
