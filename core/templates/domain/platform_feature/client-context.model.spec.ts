@@ -21,18 +21,16 @@ import { ClientContext } from
 
 describe('Client Context Model', () => {
   it('should create an instance.', () => {
-    const context = ClientContext.create('Web', 'Chrome');
+    const context = ClientContext.create('Web');
 
     expect(context.platformType).toEqual('Web');
-    expect(context.browserType).toEqual('Chrome');
   });
 
   it('should convert an instance to a dict.', () => {
-    const context = ClientContext.create('Web', 'Chrome');
+    const context = ClientContext.create('Web');
 
     expect(context.toBackendDict()).toEqual({
       platform_type: 'Web',
-      browser_type: 'Chrome',
     });
   });
 });

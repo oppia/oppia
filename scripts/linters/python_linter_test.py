@@ -29,6 +29,7 @@ from . import python_linter
 
 LINTER_TESTS_DIR = os.path.join(os.getcwd(), 'scripts', 'linters', 'test_files')
 VALID_PY_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'valid.py')
+VALID_PY_JOBS_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'valid_job_imports.py')
 INVALID_IMPORT_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'invalid_import_order.py')
 INVALID_PYCODESTYLE_FILEPATH = os.path.join(
@@ -69,7 +70,8 @@ class PythonLintChecksManagerTests(test_utils.LinterTestBase):
             os.path.join(os.getcwd(), 'core', 'jobs', 'batch_jobs')
         )
         lint_task_report = (
-            python_linter.check_jobs_imports(batch_jobs_dir, VALID_PY_FILEPATH)
+            python_linter.check_jobs_imports(
+                batch_jobs_dir, VALID_PY_JOBS_FILEPATH)
         )
         self.assertEqual(
             'SUCCESS  Check jobs imports in jobs registry check passed',
