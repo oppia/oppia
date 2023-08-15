@@ -33,7 +33,6 @@ import { TopicsAndSkillsDashboardPageService } from './topics-and-skills-dashboa
 import { PlatformFeatureService } from '../../services/platform-feature.service';
 import { ETopicPublishedOptions, ETopicStatusOptions, TopicsAndSkillsDashboardPageConstants } from './topics-and-skills-dashboard-page.constants';
 
-
 /**
  * @fileoverview Unit tests for the topics and skills dashboard component.
  */

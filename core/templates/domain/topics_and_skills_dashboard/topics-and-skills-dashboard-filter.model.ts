@@ -21,7 +21,7 @@ import {
   ETopicPublishedOptions,
   ETopicStatusOptions,
   ETopicSortOptions,
-  ETopicSortingOptions,
+  ETopicNewSortingOptions,
   TopicsAndSkillsDashboardPageConstants } from
   // eslint-disable-next-line max-len
   'pages/topics-and-skills-dashboard-page/topics-and-skills-dashboard-page.constants';
@@ -29,7 +29,7 @@ import {
 export class TopicsAndSkillsDashboardFilter {
   classroom: string;
   keywords: string[];
-  sort: ETopicSortOptions | ETopicSortingOptions;
+  sort: ETopicSortOptions | ETopicNewSortingOptions;
   status: ETopicPublishedOptions | ETopicStatusOptions;
 
   /**
@@ -41,7 +41,7 @@ export class TopicsAndSkillsDashboardFilter {
    */
   constructor(
       classroom: string, keywords: string[],
-      sort: ETopicSortOptions | ETopicSortingOptions,
+      sort: ETopicSortOptions | ETopicNewSortingOptions,
       status: ETopicPublishedOptions | ETopicStatusOptions) {
     this.classroom = classroom;
     this.keywords = keywords;

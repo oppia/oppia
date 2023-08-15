@@ -17,7 +17,7 @@
  */
 
 import { ETopicPublishedOptions, ETopicSortOptions,
-  ETopicSortingOptions, ETopicStatusOptions } from
+  ETopicNewSortingOptions, ETopicStatusOptions } from
   // eslint-disable-next-line max-len
   'pages/topics-and-skills-dashboard-page/topics-and-skills-dashboard-page.constants';
 import { TopicsAndSkillsDashboardFilter } from
@@ -184,11 +184,11 @@ describe('Topic and Skill dashboard page service', () => {
     filteredArray = tsds.getFilteredTopics(topicsArray, filterOptions);
     expect(filteredArray).toEqual([topic1, topic2, topic3]);
 
-    filterOptions.sort = ETopicSortingOptions.DecreasingUpcomingLaunches;
+    filterOptions.sort = ETopicNewSortingOptions.DecreasingUpcomingLaunches;
     filteredArray = tsds.getFilteredTopics(topicsArray, filterOptions);
     expect(filteredArray).toEqual([topic2, topic1, topic3]);
 
-    filterOptions.sort = ETopicSortingOptions.DecreasingOverdueLaunches;
+    filterOptions.sort = ETopicNewSortingOptions.DecreasingOverdueLaunches;
     filteredArray = tsds.getFilteredTopics(topicsArray, filterOptions);
     expect(filteredArray).toEqual([topic1, topic2, topic3]);
 

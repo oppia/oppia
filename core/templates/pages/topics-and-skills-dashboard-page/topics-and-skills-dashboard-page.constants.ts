@@ -24,7 +24,7 @@ export enum ETopicSortOptions {
   DecreasingUpdatedOn = 'Least Recently Updated',
 }
 
-export enum ETopicSortingOptions {
+export enum ETopicNewSortingOptions {
   IncreasingCreatedOn = 'Newly Created',
   DecreasingCreatedOn = 'Oldest Created',
   IncreasingUpdatedOn = 'Most Recently Updated',
