@@ -480,7 +480,7 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
             os.path, 'isdir', lambda _: True)
         swap_build = self.swap_with_checks(
             build, 'main', lambda args: None,
-            expected_kwargs=[{'args': ['--prod_env']}])
+            expected_kwargs=[{'args': []}])
         swap_emulator_mode = self.swap(constants, 'EMULATOR_MODE', False)
         swap_popen = self.swap(
             subprocess, 'Popen', mock_popen)
