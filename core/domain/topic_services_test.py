@@ -2325,7 +2325,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             self.user_id, self.TOPIC_ID, canonical_story_id_1)
 
         dt = mock.Mock(wraps=datetime.datetime)
-        with self.swap(story_domain.datetime, 'datetime', dt):
+        with self.swap(datetime, 'datetime', dt):
             dt.utcnow.return_value = datetime.datetime.utcfromtimestamp(
                 1690555400)
             topic_summary = (

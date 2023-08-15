@@ -1073,15 +1073,21 @@ def get_chapter_notifications_stories_list() -> List[
                 for node in story.story_contents.nodes:
                     if node.planned_publication_date is not None and (
                         node.status != constants.STORY_NODE_STATUS_PUBLISHED):
-                        current_time = datetime.datetime.utcnow()
+                        current_time_msecs = (
+                            datetime.datetime.utcnow().timestamp() * 1000)
+                        planned_publication_date_msecs = (
+                            utils.get_time_in_millisecs(
+                            node.planned_publication_date))
                         chapter_is_upcoming = (
-                            current_time <
-                            node.planned_publication_date <
-                            (current_time + datetime.timedelta(
-                            days=constants.
-                                CHAPTER_PUBLICATION_NOTICE_PERIOD_IN_DAYS)))
+                            current_time_msecs <
+                            planned_publication_date_msecs <
+                            (current_time_msecs + (
+                                constants.
+                                CHAPTER_PUBLICATION_NOTICE_PERIOD_IN_DAYS) *
+                                3600 * 24 * 1000))
                         chapter_is_behind_schedule = (
-                            node.planned_publication_date < current_time)
+                            planned_publication_date_msecs <
+                            current_time_msecs)
 
                         if chapter_is_upcoming:
                             upcoming_chapters.append(node.title)

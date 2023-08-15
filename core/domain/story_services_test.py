@@ -2189,7 +2189,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             topic_rights, self.USER_ID, 'Published the topic', commit_cmds)
 
         dt = mock.Mock(wraps=datetime.datetime)
-        with self.swap(story_services.datetime, 'datetime', dt):
+        with self.swap(datetime, 'datetime', dt):
             dt.utcnow.return_value = datetime.datetime.utcfromtimestamp(
                 1690555400)
             chapter_notifications = (

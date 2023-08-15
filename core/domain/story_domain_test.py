@@ -941,7 +941,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
             datetime.datetime(2022, 12, 29))
 
         dt = mock.Mock(wraps=datetime.datetime)
-        with self.swap(story_domain.datetime, 'datetime', dt):
+        with self.swap(datetime, 'datetime', dt):
             dt.utcnow.return_value = datetime.datetime.utcfromtimestamp(
                 1672483686)
             self.assertEqual(
@@ -960,7 +960,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
             datetime.datetime(2022, 12, 29))
 
         dt = mock.Mock(wraps=datetime.datetime)
-        with self.swap(story_domain.datetime, 'datetime', dt):
+        with self.swap(datetime, 'datetime', dt):
             dt.utcnow.return_value = datetime.datetime.utcfromtimestamp(
                 1672483686)
             self.assertEqual(

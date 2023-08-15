@@ -920,13 +920,18 @@ class StoryNode:
         Returns:
             bool. True if the chapter is upcoming else false.
         """
-        current_time = datetime.datetime.utcnow()
+        current_time_msecs = datetime.datetime.utcnow().timestamp() * 1000
+        planned_publication_date_msecs = (
+            utils.get_time_in_millisecs(self.planned_publication_date) if
+            self.planned_publication_date else None)
         if (
             self.status != constants.STORY_NODE_STATUS_PUBLISHED and
-            self.planned_publication_date is not None and
-            current_time < self.planned_publication_date <
-            (current_time + datetime.timedelta(
-            days=constants.CHAPTER_PUBLICATION_NOTICE_PERIOD_IN_DAYS))):
+            planned_publication_date_msecs is not None and
+            current_time_msecs <
+            planned_publication_date_msecs <
+            (current_time_msecs + (
+                constants.CHAPTER_PUBLICATION_NOTICE_PERIOD_IN_DAYS) * 24 *
+                3600 * 1000)):
             return True
         return False
 
@@ -937,11 +942,14 @@ class StoryNode:
         Returns:
             bool. True if the chapter is behind-schedule else false.
         """
-        current_time = datetime.datetime.utcnow()
+        current_time_msecs = datetime.datetime.utcnow().timestamp() * 1000
+        planned_publication_date_msecs = (
+            utils.get_time_in_millisecs(self.planned_publication_date) if
+            self.planned_publication_date else None)
         if (
             self.status != constants.STORY_NODE_STATUS_PUBLISHED and
-            self.planned_publication_date is not None and
-            current_time > self.planned_publication_date):
+            planned_publication_date_msecs is not None and
+            current_time_msecs > planned_publication_date_msecs):
             return True
         return False
 
