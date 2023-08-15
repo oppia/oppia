@@ -18,9 +18,7 @@
 
 from __future__ import annotations
 
-import datetime
 import os
-from unittest import mock
 
 from core import feconf
 from core import utils
@@ -2324,10 +2322,12 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         topic_services.add_canonical_story(
             self.user_id, self.TOPIC_ID, canonical_story_id_1)
 
-        dt = mock.Mock(wraps=datetime.datetime)
-        with self.swap(datetime, 'datetime', dt):
-            dt.utcnow.return_value = datetime.datetime.utcfromtimestamp(
-                1690555400)
+        def mock_get_current_time_in_millisecs() -> int:
+            return 1690555400000
+
+        with self.swap(
+            utils, 'get_current_time_in_millisecs',
+            mock_get_current_time_in_millisecs):
             topic_summary = (
                 topic_fetchers.get_topic_summary_by_id(
                 self.TOPIC_ID).to_dict())

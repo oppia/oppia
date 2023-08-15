@@ -18,7 +18,6 @@ from __future__ import annotations
 
 import datetime
 import os
-from unittest import mock
 
 from core import feconf
 from core import utils
@@ -161,7 +160,7 @@ class TopicEditorStoryHandlerTests(BaseTopicEditorControllerTests):
                 'chapter'][0],
             'thumbnail_size_in_bytes': 21131,
             'status': constants.STORY_NODE_STATUS_PUBLISHED,
-            'planned_publication_date_msecs': 1672770600000,
+            'planned_publication_date_msecs': None,
             'first_publication_date_msecs': 1672684200000,
             'last_modified_msecs': 1672684200000,
             'unpublishing_reason': None
@@ -266,10 +265,12 @@ class TopicEditorStoryHandlerTests(BaseTopicEditorControllerTests):
         topic_services.publish_story(
             topic_id, canonical_story_id_2, self.admin_id)
 
-        dt = mock.Mock(wraps=datetime.datetime)
-        with self.swap(datetime, 'datetime', dt):
-            dt.utcnow.return_value = datetime.datetime.utcfromtimestamp(
-                1690555400)
+        def mock_get_current_time_in_millisecs() -> int:
+            return 1690555400000
+
+        with self.swap(
+            utils, 'get_current_time_in_millisecs',
+            mock_get_current_time_in_millisecs):
             response = self.get_json(
                 '%s/%s' % (feconf.TOPIC_EDITOR_STORY_URL, topic_id))
             canonical_story_summary_dict = response[

@@ -18,7 +18,6 @@ are created.
 
 from __future__ import annotations
 
-import datetime
 import logging
 
 from core import feconf
@@ -172,24 +171,17 @@ class TopicEditorStoryHandler(
             for node in nodes:
                 if node.status == constants.STORY_NODE_STATUS_PUBLISHED:
                     published_chapters_count += 1
-                if (node.status != constants.STORY_NODE_STATUS_PUBLISHED and
-                    node.planned_publication_date is not None):
-                    current_time_msecs = (
-                        datetime.datetime.utcnow().timestamp() * 1000)
-                    current_time = datetime.datetime.utcnow()
+                if node.planned_publication_date is not None:
+                    current_time_msecs = utils.get_current_time_in_millisecs()
                     planned_publication_date_msecs = (
                         utils.get_time_in_millisecs(
                             node.planned_publication_date))
-                    if (current_time_msecs <
-                        planned_publication_date_msecs <
-                        current_time_msecs + (
-                            constants.
-                            CHAPTER_PUBLICATION_NOTICE_PERIOD_IN_DAYS) *
-                            24 * 3600 * 1000):
+                    if node.is_node_upcoming():
                         upcoming_chapters_count += 1
                         upcoming_chapters_expected_days.append((
-                            node.planned_publication_date - current_time).days)
-                    if planned_publication_date_msecs < current_time_msecs:
+                            planned_publication_date_msecs -
+                            current_time_msecs) / (1000.0 * 3600 * 24))
+                    if node.is_node_behind_schedule():
                         overdue_chapters_count += 1
 
             upcoming_chapters_expected_days.sort()
