@@ -21,18 +21,14 @@ import { UndoRedoService } from 'domain/editor/undo_redo/undo-redo.service';
 import { EditableStoryBackendApiService } from 'domain/story/editable-story-backend-api.service';
 import { StoryValidationService } from 'domain/story/story-validation.service';
 import { Story } from 'domain/story/story.model';
-import { StoryNode } from 'domain/story/story-node.model';
 import { Subscription } from 'rxjs';
 import { AlertsService } from 'services/alerts.service';
 import { StoryEditorStateService } from '../services/story-editor-state.service';
-import { StoryUpdateService } from 'domain/story/story-update.service';
 import { StoryEditorSaveModalComponent } from '../modal-templates/story-editor-save-modal.component';
 import { StoryEditorUnpublishModalComponent } from '../modal-templates/story-editor-unpublish-modal.component';
 import { Component, Input, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { StoryEditorNavigationService } from '../services/story-editor-navigation.service';
-import { PlatformFeatureService } from 'services/platform-feature.service';
-import { DraftChapterConfirmationModalComponent } from '../modal-templates/draft-chapter-confirmation-modal.component';
 
 @Component({
   selector: 'oppia-story-editor-navbar',
@@ -46,15 +42,12 @@ export class StoryEditorNavbarComponent implements OnInit {
   validationIssues!: string[];
   prepublishValidationIssues!: string | string[];
   story!: Story;
-  storyNode!: StoryNode;
   activeTab!: string;
   forceValidateExplorations: boolean = false;
   storyIsPublished: boolean = false;
   warningsAreShown: boolean = false;
   showNavigationOptions: boolean = false;
   showStoryEditOptions: boolean = false;
-  currentTab!: string;
-
   constructor(
     private storyEditorStateService: StoryEditorStateService,
     private undoRedoService: UndoRedoService,
@@ -62,9 +55,7 @@ export class StoryEditorNavbarComponent implements OnInit {
     private editableStoryBackendApiService: EditableStoryBackendApiService,
     private ngbModal: NgbModal,
     private alertsService: AlertsService,
-    private storyEditorNavigationService: StoryEditorNavigationService,
-    private platformFeatureService: PlatformFeatureService,
-    private storyUpdateService: StoryUpdateService
+    private storyEditorNavigationService: StoryEditorNavigationService
   ) {}
 
   EDITOR = 'Editor';
@@ -72,22 +63,12 @@ export class StoryEditorNavbarComponent implements OnInit {
   directiveSubscriptions = new Subscription();
   explorationValidationIssues: string[] = [];
 
-  isSerialChapterFeatureFlagEnabled(): boolean {
-    return (
-      this.platformFeatureService.
-        status.SerialChapterLaunchCurriculumAdminView.isEnabled);
-  }
-
   isStoryPublished(): boolean {
     return this.storyEditorStateService.isStoryPublished();
   }
 
   isSaveInProgress(): boolean {
     return this.storyEditorStateService.isSavingStory();
-  }
-
-  isChapterStatusBeingChanged(): boolean {
-    return this.storyEditorStateService.isChangingChapterStatus();
   }
 
   getChangeListLength(): number {
@@ -116,18 +97,6 @@ export class StoryEditorNavbarComponent implements OnInit {
       this.getWarningsCount() === 0);
   }
 
-  isChapterPublishable(): boolean {
-    return this.storyEditorStateService.isCurrentNodePublishable();
-  }
-
-  isPublishButtonDisabled(): boolean {
-    return this.storyEditorStateService.getNewChapterPublicationIsDisabled();
-  }
-
-  areChaptersBeingPublished(): boolean {
-    return this.storyEditorStateService.areChaptersBeingPublished();
-  }
-
   isWarningTooltipDisabled(): boolean {
     return this.isStorySaveable() || this.getTotalWarningsCount() === 0;
   }
@@ -149,9 +118,6 @@ export class StoryEditorNavbarComponent implements OnInit {
     this.story = this.storyEditorStateService.getStory();
     this.validationIssues = this.story.validate();
     let nodes = this.story.getStoryContents().getNodes();
-    if (this.currentTab === 'chapter_editor') {
-      this.getStoryNodeData();
-    }
     let skillIdsInTopic = (
       this.storyEditorStateService.getSkillSummaries().map(
         skill => skill.id));
@@ -229,25 +195,6 @@ export class StoryEditorNavbarComponent implements OnInit {
     });
   }
 
-  saveChangesInReadyToPublishChapter(): void {
-    if (!this.isChapterPublishable()) {
-      const modalRef = this.ngbModal.open(
-        DraftChapterConfirmationModalComponent,
-        { backdrop: 'static' });
-      modalRef.result.then(() => {
-        this.storyUpdateService.setStoryNodeStatus(
-          this.story, this.storyNode.getId(), 'Draft');
-        this.saveChanges();
-      }, () => {
-        // Note to developers:
-        // This callback is triggered when the Cancel button is clicked.
-        // No further action is needed.
-      });
-    } else {
-      this.saveChanges();
-    }
-  }
-
   publishStory(): void {
     this.storyEditorStateService.changeStoryPublicationStatus(
       true, () => {
@@ -275,99 +222,6 @@ export class StoryEditorNavbarComponent implements OnInit {
     });
   }
 
-  changeChapterStatus(newStatus: string): void {
-    this.storyEditorStateService.setChapterStatusIsChanging(true);
-    if (newStatus === 'Published') {
-      let selectedChapterIndexInPublishUptoDropdown = this.
-        storyEditorStateService.getSelectedChapterIndexInPublishUptoDropdown();
-      let nodes = this.story.getStoryContents().getLinearNodesList();
-      let lastPublishedChapterIndex = -1;
-      for (let i = 0; i < nodes.length; i++) {
-        if (nodes[i].getStatus() === 'Published') {
-          lastPublishedChapterIndex = i;
-        }
-      }
-
-      if (selectedChapterIndexInPublishUptoDropdown <
-          lastPublishedChapterIndex) {
-        const modalRef = this.ngbModal.open(
-          StoryEditorUnpublishModalComponent,
-          { backdrop: 'static' }
-        );
-        let unpublishedChapters = [];
-        for (let i = Number(selectedChapterIndexInPublishUptoDropdown) + 1;
-          i <= lastPublishedChapterIndex; i++) {
-          unpublishedChapters.push(Number(i) + 1);
-        }
-        modalRef.componentInstance.unpublishedChapters = unpublishedChapters;
-        modalRef.result.then((unpublishingReason) => {
-          for (let i = Number(selectedChapterIndexInPublishUptoDropdown) + 1;
-            i <= lastPublishedChapterIndex; i++) {
-            this.storyUpdateService.setStoryNodeStatus(
-              this.story, nodes[i].getId(), 'Draft');
-            this.storyUpdateService.setStoryNodeUnpublishingReason(
-              this.story, nodes[i].getId(), unpublishingReason);
-            if (nodes[i].getPlannedPublicationDateMsecs()) {
-              this.storyUpdateService.setStoryNodePlannedPublicationDateMsecs(
-                this.story, nodes[i].getId(), null);
-            }
-          }
-          if (selectedChapterIndexInPublishUptoDropdown === -1) {
-            this.unpublishStory();
-          }
-          this.storyEditorStateService.saveStory(
-            'Unpublished chapters', () => {
-              this.storyEditorStateService.loadStory(this.story.getId());
-              this._validateStory();
-            }, (errorMessage: string) => {
-              this.alertsService.addInfoMessage(errorMessage, 5000);
-            }
-          );
-        }, () => {
-          // Note to developers:
-          // This callback is triggered when the Cancel button is clicked.
-          // No further action is needed.
-        });
-      } else {
-        for (let i = Number(lastPublishedChapterIndex) + 1;
-          i <= selectedChapterIndexInPublishUptoDropdown; i++) {
-          this.storyUpdateService.setStoryNodeStatus(
-            this.story, nodes[i].getId(), 'Published');
-          this.storyUpdateService.setStoryNodeUnpublishingReason(
-            this.story, nodes[i].getId(), null);
-          if (nodes[i].getFirstPublicationDateMsecs() === null) {
-            let currentDate = new Date();
-            this.storyUpdateService.setStoryNodeFirstPublicationDateMsecs(
-              this.story, nodes[i].getId(), currentDate.getTime());
-          }
-        }
-        if (lastPublishedChapterIndex === -1) {
-          this.publishStory();
-        }
-        this.storyEditorStateService.saveStory(
-          'Published chapters', () => {
-            this.storyEditorStateService.loadStory(this.story.getId());
-            this._validateStory();
-          }, (errorMessage: string) => {
-            this.alertsService.addInfoMessage(errorMessage, 5000);
-          }
-        );
-      }
-      return;
-    }
-
-    let oldStatus = this.storyNode.getStatus();
-    this.storyUpdateService.setStoryNodeStatus(
-      this.story, this.storyNode.getId(), newStatus);
-    this.storyEditorStateService.saveChapter(
-      () => {
-      }, () => {
-        this.storyUpdateService.setStoryNodeStatus(
-          this.story, this.storyNode.getId(), oldStatus);
-      }
-    );
-  }
-
   toggleWarningText(): void {
     this.warningsAreShown = !this.warningsAreShown;
   }
@@ -392,13 +246,6 @@ export class StoryEditorNavbarComponent implements OnInit {
     this.showNavigationOptions = false;
   }
 
-  getStoryNodeData(): void {
-    let nodeId = this.storyEditorNavigationService.getChapterId();
-    let nodeIndex = this.story.getStoryContents().getNodeIndex(nodeId);
-    this.storyNode = this.story.getStoryContents().
-      getLinearNodesList()[nodeIndex];
-  }
-
   ngOnInit(): void {
     this.directiveSubscriptions.add(
       this.storyEditorStateService.onStoryInitialized.subscribe(
@@ -408,19 +255,9 @@ export class StoryEditorNavbarComponent implements OnInit {
       this.storyEditorStateService.onStoryReinitialized.subscribe(
         () => this._validateStory()
       ));
-    this.directiveSubscriptions.add(
-      this.storyEditorNavigationService.onChangeActiveTab.subscribe(
-        (tab) => {
-          this.currentTab = tab;
-          if (tab === 'chapter_editor') {
-            this.getStoryNodeData();
-          }
-        }
-      ));
     this.forceValidateExplorations = true;
     this.warningsAreShown = false;
     this.activeTab = this.EDITOR;
-    this.currentTab = this.storyEditorNavigationService.getActiveTab();
     this.showNavigationOptions = false;
     this.showStoryEditOptions = false;
     this.story = this.storyEditorStateService.getStory();

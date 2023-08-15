@@ -30,8 +30,6 @@ export class StoryEditorUnpublishModalComponent {
      private activeModal: NgbActiveModal
   ) {}
 
-  unpublishedChapters: number[] = [];
-
   badContentReasonText: string = 'Bad content (no new explorations ' +
     'will be added)';
 
@@ -46,11 +44,7 @@ export class StoryEditorUnpublishModalComponent {
   }
 
   confirm(): void {
-    if (this.isSerialChapterFeatureFlagEnabled()) {
-      this.activeModal.close(this.unpublishingReason);
-    } else {
-      this.activeModal.close();
-    }
+    this.activeModal.close();
   }
 
   isSerialChapterFeatureFlagEnabled(): boolean {

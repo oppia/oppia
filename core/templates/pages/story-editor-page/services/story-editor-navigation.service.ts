@@ -17,7 +17,7 @@
  */
 
 import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable, EventEmitter } from '@angular/core';
+import { Injectable } from '@angular/core';
 
 import { WindowRef } from 'services/contextual/window-ref.service';
 
@@ -33,9 +33,6 @@ export class StoryEditorNavigationService {
   chapterId!: string;
   // 'chapterIndex' is null when we are navigating to a chapter with its ID.
   chapterIndex: number | null = null;
-
-  private _activeTabIsSwitchedEventEmitter: EventEmitter<string> = (
-    new EventEmitter<string>());
 
   constructor(private windowRef: WindowRef) {}
 
@@ -58,7 +55,6 @@ export class StoryEditorNavigationService {
   navigateToChapterEditorWithId(id: string, index: number | null): void {
     this.activeTab = CHAPTER_EDITOR;
     this.setChapterId(id);
-    this._activeTabIsSwitchedEventEmitter.emit(CHAPTER_EDITOR);
     this.chapterIndex = index;
     this.windowRef.nativeWindow.location.hash = '/chapter_editor/' + id;
   }
@@ -84,17 +80,12 @@ export class StoryEditorNavigationService {
 
   navigateToStoryEditor(): void {
     this.activeTab = STORY_EDITOR;
-    this._activeTabIsSwitchedEventEmitter.emit(STORY_EDITOR);
     this.windowRef.nativeWindow.location.hash = '';
   }
 
   navigateToStoryPreviewTab(): void {
     this.windowRef.nativeWindow.location.hash = '/story_preview/';
     this.activeTab = STORY_PREVIEW;
-  }
-
-  get onChangeActiveTab(): EventEmitter<string> {
-    return this._activeTabIsSwitchedEventEmitter;
   }
 }
 

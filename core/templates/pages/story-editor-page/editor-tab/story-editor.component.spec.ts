@@ -203,40 +203,6 @@ describe('Story Editor Component having three story nodes', () => {
     expect(component.chapterIsPublishable[2]).toEqual(false);
   });
 
-  it('should get medium dateStyle locale date string', () => {
-    const options = {
-      dateStyle: 'medium'
-    } as Intl.DateTimeFormatOptions;
-    expect(component.getMediumStyleLocaleDateString(1692144000000)).toEqual(
-      (new Date(1692144000000)).toLocaleDateString(undefined, options));
-  });
-
-  it('should disable drag and drop', () => {
-    let node = StoryNode.createFromBackendDict({
-      id: 'node_1',
-      thumbnail_filename: 'image.png',
-      title: 'Title 1',
-      description: 'Description 1',
-      prerequisite_skill_ids: ['skill_1'],
-      acquired_skill_ids: ['skill_2'],
-      destination_node_ids: ['node_2'],
-      outline: 'Outline',
-      exploration_id: null,
-      outline_is_finalized: false,
-      thumbnail_bg_color: '#a33f40',
-      status: 'Published',
-      planned_publication_date_msecs: 100,
-      last_modified_msecs: 100,
-      first_publication_date_msecs: 200,
-      unpublishing_reason: null
-    });
-    expect(component.isDragAndDropDisabled(node)).toBeTrue();
-
-    node.setStatus('Draft');
-    spyOnProperty(window, 'innerWidth').and.returnValue(1200);
-    expect(component.isDragAndDropDisabled(node)).toBeFalse();
-  });
-
   it('should change list order', fakeAsync(() => {
     spyOn(storyUpdateService, 'rearrangeNodeInStory').and.stub();
     component.linearNodesList = [StoryNode.createFromBackendDict({
@@ -670,14 +636,11 @@ describe('Story Editor Component having three story nodes', () => {
     let mockEventEmitter = new EventEmitter();
     spyOnProperty(storyEditorStateService, 'onStoryInitialized')
       .and.returnValue(mockEventEmitter);
-    let updatePublishUptoChapterSelectionSpy = spyOn(
-      component, 'updatePublishUptoChapterSelection');
 
     component.ngOnInit();
     mockEventEmitter.emit();
 
     expect(fetchSpy).toHaveBeenCalled();
-    expect(updatePublishUptoChapterSelectionSpy).toHaveBeenCalled();
   });
 
   it('should fetch story when story is reinitialized', () => {
@@ -700,40 +663,5 @@ describe('Story Editor Component having three story nodes', () => {
     mockEventEmitter.emit();
 
     expect(fetchSpy).toHaveBeenCalled();
-  });
-
-  it('should update publish upto dropdown chapter selection', () => {
-    let selectChapterSpy = spyOn(
-      storyEditorStateService, 'setSelectedChapterIndexInPublishUptoDropdown');
-    let chaptersAreBeingPublishedSpy = spyOn(
-      storyEditorStateService, 'setChaptersAreBeingPublished');
-    let newChapterPublicationIsDisabledSpy = spyOn(
-      storyEditorStateService, 'setNewChapterPublicationIsDisabled');
-
-    component.updatePublishUptoChapterSelection(1);
-    expect(selectChapterSpy).toHaveBeenCalledWith(1);
-    expect(chaptersAreBeingPublishedSpy).toHaveBeenCalledWith(true);
-    expect(newChapterPublicationIsDisabledSpy).toHaveBeenCalledWith(false);
-
-    component.story.getStoryContents().getNodes()[1].setStatus('Published');
-    component.story.getStoryContents().getNodes()[2].setStatus('Published');
-
-    component.updatePublishUptoChapterSelection(2);
-    expect(selectChapterSpy).toHaveBeenCalledWith(2);
-    expect(newChapterPublicationIsDisabledSpy).toHaveBeenCalledWith(true);
-
-    component.updatePublishUptoChapterSelection(1);
-    expect(chaptersAreBeingPublishedSpy).toHaveBeenCalledWith(false);
-
-    component.updatePublishUptoChapterSelection(-1);
-    expect(selectChapterSpy).toHaveBeenCalled();
-    expect(chaptersAreBeingPublishedSpy).toHaveBeenCalledWith(false);
-    expect(newChapterPublicationIsDisabledSpy).toHaveBeenCalledWith(false);
-
-    component.linearNodesList = [];
-    component.updatePublishUptoChapterSelection(-1);
-    expect(selectChapterSpy).toHaveBeenCalled();
-    expect(chaptersAreBeingPublishedSpy).toHaveBeenCalledWith(true);
-    expect(newChapterPublicationIsDisabledSpy).toHaveBeenCalledWith(true);
   });
 });

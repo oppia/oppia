@@ -318,16 +318,6 @@ describe('Story editor state service', () => {
     expect(successCallback).toHaveBeenCalled();
   }));
 
-  it('should be able to save the chapter', fakeAsync(() => {
-    let successCallback = jasmine.createSpy('successCallback');
-    let errorCallback = jasmine.createSpy('errorCallback');
-    let saveStorySpy = spyOn(storyEditorStateService, 'saveStory');
-
-    storyEditorStateService.saveChapter(successCallback, errorCallback);
-    expect(saveStorySpy).toHaveBeenCalledWith(
-      'Changed Chapter Status', successCallback, errorCallback);
-  }));
-
   it('should be able to publish the story', fakeAsync(() => {
     spyOn(
       fakeEditableStoryBackendApiService,
@@ -427,7 +417,6 @@ describe('Story editor state service', () => {
 
     tick(1000);
     expect(storyEditorStateService.isSavingStory()).toBe(false);
-    expect(storyEditorStateService.isChangingChapterStatus()).toBeFalse();
   }));
 
   it('should warn user when story fails to save', fakeAsync(() => {
@@ -470,7 +459,6 @@ describe('Story editor state service', () => {
 
       tick(1000);
       expect(storyEditorStateService.isSavingStory()).toBe(false);
-      expect(storyEditorStateService.isChangingChapterStatus()).toBeFalse();
     }));
 
   it('should update stories URL when user updates the storie\'s URL',
@@ -567,66 +555,6 @@ describe('Story editor state service', () => {
     expect(storyEditorStateService.isCurrentNodePublishable()).toBe(false);
     storyEditorStateService._currentNodeIsPublishable = true;
     expect(storyEditorStateService.isCurrentNodePublishable()).toBe(true);
-  });
-
-  it('should set the selected chapter index in the publish upto chapter ' +
-    'dropdown', () => {
-    storyEditorStateService.setSelectedChapterIndexInPublishUptoDropdown(1);
-    expect(
-      storyEditorStateService._selectedChapterIndexInPublishUptoDropdown).
-      toBe(1);
-  });
-
-  it('should get the selected chapter index in the publish upto chapter ' +
-    'dropdown', () => {
-    storyEditorStateService._selectedChapterIndexInPublishUptoDropdown = 2;
-    expect(
-      storyEditorStateService.
-        getSelectedChapterIndexInPublishUptoDropdown()).toBe(2);
-  });
-
-  it('should set if the chapters are being published', () => {
-    storyEditorStateService.setChaptersAreBeingPublished(true);
-    expect(
-      storyEditorStateService._chaptersAreBeingPublished).
-      toBe(true);
-    storyEditorStateService.setChaptersAreBeingPublished(false);
-    expect(
-      storyEditorStateService._chaptersAreBeingPublished).
-      toBe(false);
-  });
-
-  it('should get if the chapters are being published', () => {
-    storyEditorStateService._chaptersAreBeingPublished = true;
-    expect(
-      storyEditorStateService.areChaptersBeingPublished()).
-      toBe(true);
-    storyEditorStateService._chaptersAreBeingPublished = false;
-    expect(
-      storyEditorStateService.areChaptersBeingPublished()).
-      toBe(false);
-  });
-
-  it('should set if new chapter publication is disabled', () => {
-    storyEditorStateService.setNewChapterPublicationIsDisabled(true);
-    expect(
-      storyEditorStateService._newChapterPublicationIsDisabled).
-      toBe(true);
-    storyEditorStateService.setNewChapterPublicationIsDisabled(false);
-    expect(
-      storyEditorStateService._newChapterPublicationIsDisabled).
-      toBe(false);
-  });
-
-  it('should get if new chapter publication is disabled', () => {
-    storyEditorStateService._newChapterPublicationIsDisabled = true;
-    expect(
-      storyEditorStateService.getNewChapterPublicationIsDisabled()).
-      toBe(true);
-    storyEditorStateService._newChapterPublicationIsDisabled = false;
-    expect(
-      storyEditorStateService.getNewChapterPublicationIsDisabled()).
-      toBe(false);
   });
 
   it('should return skill summaries when called', fakeAsync(() => {

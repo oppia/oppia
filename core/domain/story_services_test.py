@@ -16,7 +16,6 @@
 
 from __future__ import annotations
 
-import datetime
 import logging
 import os
 
@@ -285,38 +284,6 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
                 'old_value': None,
                 'new_value': constants.ALLOWED_THUMBNAIL_BG_COLORS[
                     'chapter'][0]
-            }),
-            story_domain.StoryChange({
-                'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
-                'node_id': self.NODE_ID_2,
-                'property_name': (
-                    story_domain.STORY_NODE_PROPERTY_STATUS),
-                'old_value': None,
-                'new_value': constants.STORY_NODE_STATUS_PUBLISHED
-            }),
-            story_domain.StoryChange({
-                'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
-                'node_id': self.NODE_ID_2,
-                'property_name': (
-                    story_domain.STORY_NODE_PROPERTY_PLANNED_PUBLICATION_DATE),
-                'old_value': None,
-                'new_value': 1672617600000
-            }),
-            story_domain.StoryChange({
-                'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
-                'node_id': self.NODE_ID_2,
-                'property_name': (
-                    story_domain.STORY_NODE_PROPERTY_LAST_MODIFIED),
-                'old_value': None,
-                'new_value': 1672531200000
-            }),
-            story_domain.StoryChange({
-                'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
-                'node_id': self.NODE_ID_2,
-                'property_name': (
-                    story_domain.STORY_NODE_PROPERTY_FIRST_PUBLICATION_DATE),
-                'old_value': None,
-                'new_value': 1672531200000
             })
         ]
 
@@ -352,18 +319,6 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(story.story_contents.initial_node_id, self.NODE_ID_2)
         self.assertEqual(story.story_contents.next_node_id, 'node_3')
         self.assertEqual(story.version, 3)
-        self.assertEqual(
-            story.story_contents.nodes[1].status,
-            constants.STORY_NODE_STATUS_PUBLISHED)
-        self.assertEqual(
-            story.story_contents.nodes[1].
-            planned_publication_date, datetime.datetime(2023, 1, 2, 0, 0))
-        self.assertEqual(
-            story.story_contents.nodes[1].
-            first_publication_date, datetime.datetime(2023, 1, 1, 0, 0))
-        self.assertEqual(
-            story.story_contents.nodes[1].
-            last_modified, datetime.datetime(2023, 1, 1, 0, 0))
 
         story_summary = story_fetchers.get_story_summary_by_id(self.STORY_ID)
         self.assertEqual(story_summary.node_titles, ['Title 1', 'Title 2'])
@@ -395,15 +350,6 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
                 'old_value': 'Description 2',
                 'new_value': 'Modified description 2'
             }),
-            story_domain.StoryChange({
-                'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
-                'node_id': self.NODE_ID_2,
-                'property_name': (
-                    story_domain.STORY_NODE_PROPERTY_UNPUBLISHING_REASON),
-                'old_value': None,
-                'new_value': (
-                    constants.ALLOWED_STORY_NODE_UNPUBLISHING_REASONS[0])
-            })
         ]
         story_services.update_story(
             self.USER_ID, self.STORY_ID, changelist,
@@ -418,9 +364,6 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(story.story_contents.nodes[0].destination_node_ids, [])
         self.assertEqual(
             story.story_contents.nodes[0].outline_is_finalized, False)
-        self.assertEqual(
-            story.story_contents.nodes[0].unpublishing_reason,
-            constants.ALLOWED_STORY_NODE_UNPUBLISHING_REASONS[0])
 
     def test_prerequisite_skills_validation(self) -> None:
         self.story.story_contents.next_node_id = 'node_4'

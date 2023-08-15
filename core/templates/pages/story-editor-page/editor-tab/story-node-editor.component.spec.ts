@@ -397,7 +397,7 @@ describe('Story node editor component', () => {
   });
 
   it('should call StoryUpdate service to update planned publication date',
-    () => {
+    fakeAsync(() => {
       let storySpy = spyOn(
         storyUpdateService, 'setStoryNodePlannedPublicationDateMsecs');
       let currentNodeIsPublishableSpy = spyOn(
@@ -416,6 +416,8 @@ describe('Story node editor component', () => {
         toHaveBeenCalledTimes(0);
       expect(component.plannedPublicationDate).toBe(null);
       expect(component.plannedPublicationDateIsInPast).toBeTrue();
+      tick(5000);
+      expect(component.plannedPublicationDateIsInPast).toBeFalse();
 
       let futureDateString = '2037-04-20';
       component.updatePlannedPublicationDate(futureDateString);
@@ -423,18 +425,17 @@ describe('Story node editor component', () => {
       expect(storySpy).toHaveBeenCalledWith(
         component.story, component.nodeId, futureDate.getTime());
       expect(currentNodeIsPublishableSpy).toHaveBeenCalled();
-      expect(component.plannedPublicationDateIsInPast).toBeFalse();
 
       component.updatePlannedPublicationDate('');
       expect(storySpy).toHaveBeenCalled();
       expect(currentNodeIsPublishableSpy).toHaveBeenCalled();
       expect(component.plannedPublicationDate).toBe(null);
-      expect(component.plannedPublicationDateIsInPast).toBeFalse();
 
       component.plannedPublicationDate = new Date();
       component.updatePlannedPublicationDate(oldDateString);
       expect(storySpy).toHaveBeenCalled();
-    });
+      flush();
+    }));
 
   it('should update check if current node can be changed to' +
   'Ready To Publish', () => {

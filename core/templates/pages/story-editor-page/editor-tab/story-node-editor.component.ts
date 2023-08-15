@@ -227,6 +227,7 @@ export class StoryNodeEditorComponent implements OnInit, OnDestroy {
 
   updatePlannedPublicationDate(dateString: string | null): void {
     let newPlannedPublicationDate = dateString ? new Date(dateString) : null;
+    const TOAST_MESSAGE_DISPLAY_TIME_MSEC = 5000;
 
     if (newPlannedPublicationDate !== this.plannedPublicationDate) {
       if (newPlannedPublicationDate) {
@@ -239,6 +240,9 @@ export class StoryNodeEditorComponent implements OnInit, OnDestroy {
           }
           this.plannedPublicationDate = null;
           this.editablePlannedPublicationDate = null;
+          setTimeout(() => {
+            this.plannedPublicationDateIsInPast = false;
+          }, TOAST_MESSAGE_DISPLAY_TIME_MSEC);
           return;
         } else if (this.plannedPublicationDate === null ||
           this.plannedPublicationDate.getTime() !==
@@ -246,13 +250,11 @@ export class StoryNodeEditorComponent implements OnInit, OnDestroy {
           this.storyUpdateService.setStoryNodePlannedPublicationDateMsecs(
             this.story, this.nodeId, newPlannedPublicationDate.getTime());
           this.plannedPublicationDate = newPlannedPublicationDate;
-          this.plannedPublicationDateIsInPast = false;
         }
       } else {
         this.storyUpdateService.setStoryNodePlannedPublicationDateMsecs(
           this.story, this.nodeId, null);
         this.plannedPublicationDate = null;
-        this.plannedPublicationDateIsInPast = false;
       }
     }
 

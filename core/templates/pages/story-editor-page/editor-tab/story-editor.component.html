@@ -260,11 +260,10 @@
           <div>
             <div class="chapter-control-bar" *ngIf="linearNodesList.length">
               <div class="publish-upto-chapter-menu">
-                <span class="publish-upto-chapter-label">Publish up to Chapter ...</span>
+                <span class="publish-upto-chapter-label">Publish upto Chapter ...</span>
                 <select [(ngModel)]="selectedChapterIndexInPublishUptoDropdown"
                         (ngModelChange)="updatePublishUptoChapterSelection(selectedChapterIndexInPublishUptoDropdown)"
                         class="publish-upto-chapter-dropdown">
-                  <option [value]="-1">None</option>
                   <option *ngFor="let node of linearNodesList;index as idx"
                           [disabled]="!chapterIsPublishable[idx]"
                           [value]="idx">
@@ -298,26 +297,26 @@
                                  'draft-node': (node.getStatus() === 'Draft')}"
                       (click)="navigateToChapterWithId(node.getId(), idx)"
                       cdkDrag
-                      [cdkDragDisabled]="isDragAndDropDisabled(node)"
+                      [cdkDragDisabled]="node.getStatus()=='Published'"
                       [cdkDragData]="node">
                     <td class="drag-handler" (click)="$event.stopPropagation()">
                       <span class="fas fa-grip-vertical draggable-icon-indicator"
                             *ngIf="node.getStatus()!=='Published'">
                       </span>
                     </td>
-                    <td class="chapter-index"> {{ idx+1 }} </td>
+                    <td class="chapter-index"> {{ idx+1 }}. </td>
                     <td class="e2e-test-chapter-title chapter-title">{{ node.getTitle() }}</td>
                     <td class="chapter-status">
                       {{ node.getStatus() }}
                     </td>
                     <td class="chapter-last-modified">
-                        {{ dateTimeFormatService.getLocaleDateTimeHourString(node.getLastModifiedMsecs()) }}
+                        {{ dateTimeFormatService.getLocaleAbbreviatedDatetimeString(node.getLastModifiedMsecs()) }}
                       <div *ngIf="node.getStatus()=='Published'">(published)</div>
                       <div *ngIf="node.getStatus()=='Ready To Publish'">(draft modified)</div>
                       <div *ngIf="node.getStatus()=='Draft'">(draft added)</div>
                     </td>
                     <td class="chapter-planned-publication-date">{{ node.getPlannedPublicationDateMsecs() != null ?
-                      getMediumStyleLocaleDateString(node.getPlannedPublicationDateMsecs()): '-' }}
+                      dateTimeFormatService.getLocaleAbbreviatedDatetimeString(node.getPlannedPublicationDateMsecs()): '-' }}
                     </td>
                     <td class="edit-options-container">
                       <i class="fa fa-ellipsis-v chapter-edit-toggle-button e2e-test-edit-options"
@@ -406,8 +405,7 @@
 
   .publish-upto-chapter-dropdown {
     background-color: rgb(184 231 247);
-    font-size: 14px;
-    width: 60px;
+    width: 40px;
   }
 
   .publish-upto-chapter-dropdown option {
@@ -436,6 +434,7 @@
 
   .published-node {
     background-color: rgb(217, 248, 231);
+    opacity: 0.725;
   }
 
   .ready-to-publish-node {
@@ -444,6 +443,7 @@
 
   .draft-node {
     background-color: rgb(239, 239, 239);
+    opacity: 0.7;
   }
 
   .story-editor-node {
@@ -473,7 +473,7 @@
 
   .draggable-icon-indicator {
     position: absolute;
-    top: 1.5vh;
+    top: 15%;
   }
 
   .story-node .chapter-index {
@@ -768,10 +768,6 @@
       margin-top: 40px;
     }
 
-    .draggable-icon-indicator {
-       top: 2.5vh;
-    }
-
     .story-notes {
       width: 95%;
     }
@@ -803,15 +799,11 @@
       padding-top: 15px;
     }
   }
-  @media screen and (max-width: 425px) {
+  @media screen and (max-width: 375px) {
+
     .drag-handler,.drag-handler-header {
       display: none;
     }
-    .chapter-control-panel {
-      padding: 20px 0 15px;
-    }
-  }
-  @media screen and (max-width: 375px) {
     .chapter-control-bar {
       flex-direction: column;
       padding-left: 5px;
@@ -824,6 +816,9 @@
     }
     .story-nodes-container table {
       font-size: 12px;
+    }
+    .chapter-control-panel {
+      padding: 20px 0 15px;
     }
     .chapter-edit-option span {
       font-size: 12px;

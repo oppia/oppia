@@ -1,3 +1,7 @@
+<div *ngIf="plannedPublicationDateIsInPast"
+     class="oppia-error-message-container">
+     Planned Publication Date cannot be in the past.
+</div>
 <div class="story-node">
   <div class="story-node-content-container">
     <div class="story-node-content">
@@ -67,13 +71,8 @@
           <div class="story-node-planned-publication-date" *ngIf="isSerialChapterFeatureFlagEnabled()">
             <label for="storyNodePlannedPublicationDate" class="form-heading">Planned Publication Date*</label>
             <input id="storyNodePlannedPublicationDate" type="date" class="form-control"
-                   [ngModel]="editablePlannedPublicationDate | date:'yyyy-MM-dd'"
-                   (ngModelChange)="editablePlannedPublicationDate = $event"
+                   [(ngModel)]="editablePlannedPublicationDate"
                    (blur)="updatePlannedPublicationDate(editablePlannedPublicationDate)">
-            <div *ngIf="plannedPublicationDateIsInPast"
-                 class="oppia-error-message-container">
-                  The planned publication date cannot be in the past.
-            </div>
           </div>
           <div class="e2e-test-story-node-thumbnail">
             <label class="form-heading">Thumbnail Image*</label>
@@ -489,9 +488,15 @@
     display: none;
   }
   .oppia-error-message-container {
-    color: red;
-    font-size: 14px;
-    margin-top: 10px;
+    background-color: #fff;
+    border: 1px solid #00376d;
+    bottom: 30px;
+    max-width: 30%;
+    padding: 5px;
+    position: fixed;
+    right: 30px;
+    text-align: center;
+    z-index: 3000;
   }
   @media screen and (max-width: 768px) {
     .story-node-content-container {
