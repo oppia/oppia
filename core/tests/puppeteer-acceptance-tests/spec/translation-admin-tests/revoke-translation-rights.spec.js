@@ -34,8 +34,10 @@ describe('Translation Admin', function() {
 
   it('should be able to revoke translation rights from user.',
     async function() {
-      await userFactory.createNewGuestUser(
+      let translatorSpanish = await userFactory.createNewGuestUser(
         'translatorSpanish', 'translatorSpanish@example.com');
+      await userFactory.closeBrowserForUser(translatorSpanish);
+        
       await translationAdmin.navigateToContributorDashboardAdminPage();
       await translationAdmin.assignTranslationRightsToUserWithLanguageCode(
         'translatorSpanish', 'es');
