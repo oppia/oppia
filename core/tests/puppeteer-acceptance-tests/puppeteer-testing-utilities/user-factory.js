@@ -21,8 +21,6 @@ let e2eBlogAdmin = e2eBlogPostEditor = e2eGuestUser = require(
   '../user-utilities/blog-post-admin-utils.js');
 let e2eTranslationAdmin = require(
   '../user-utilities/translation-admin-utils.js');
-const baseUser = require(
-  '../puppeteer-testing-utilities/puppeteer-utils.js');
 
 /**
  * Global user instances that are created and can be reused again.
