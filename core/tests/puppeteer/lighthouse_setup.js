@@ -19,6 +19,8 @@
 var FirebaseAdmin = require('firebase-admin');
 const process = require('process');
 const puppeteer = require('puppeteer');
+const PuppeteerScreenRecorder = require('puppeteer-screen-recorder');
+
 
 const ADMIN_URL = 'http://127.0.0.1:8181/admin';
 const CREATOR_DASHBOARD_URL = 'http://127.0.0.1:8181/creator-dashboard';
@@ -283,7 +285,6 @@ const main = async function() {
   let record = process.argv[2] && process.argv[2] === '-record';
   let videoPath = process.argv[3];
   if (record && videoPath) { // Start recording via puppeteer-screen-recorder.
-    const { PuppeteerScreenRecorder } = require('puppeteer-screen-recorder');
     const Config = {
       followNewTab: true,
       fps: 25,

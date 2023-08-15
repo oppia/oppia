@@ -79,7 +79,7 @@ _PARSER.add_argument(
     action='store_true')
 
 
-def run_lighthouse_puppeteer_script(record: bool=False) -> None:
+def run_lighthouse_puppeteer_script(record: bool = False) -> None:
 
     """Runs puppeteer script to collect dynamic urls.
 
@@ -113,10 +113,7 @@ def run_lighthouse_puppeteer_script(record: bool=False) -> None:
             export_url(line.decode('utf-8'))
         print('Puppeteer script completed successfully.')
         if record:
-            if os.path.isfile(video_path):
-                print('Resulting puppeteer video saved at %s' % video_path)
-            else:
-                print('No video found at %s' % video_path)
+            print('Resulting puppeteer video saved at %s' % video_path)
     else:
         print('Return code: %s' % process.returncode)
         print('OUTPUT:')
@@ -129,10 +126,7 @@ def run_lighthouse_puppeteer_script(record: bool=False) -> None:
         print(stderr.decode('utf-8'))
         print('Puppeteer script failed. More details can be found above.')
         if record:
-            if os.path.isfile(video_path):
-                print('Resulting puppeteer video saved at %s' % video_path)
-            else:
-                print('No video found at %s' % video_path)
+            print('Resulting puppeteer video saved at %s' % video_path)
         sys.exit(1)
 
 
@@ -176,7 +170,6 @@ def export_url(line: str) -> None:
 
 
 def run_lighthouse_checks(lighthouse_mode: str, shard: str) -> None:
-
     """Runs the Lighthouse checks through the Lighthouse config.
 
     Args:
@@ -259,10 +252,7 @@ def main(args: Optional[List[str]] = None) -> None:
             skip_sdk_update_check=True,
             env=env))
 
-        if parsed_args.record_screen:
-            run_lighthouse_puppeteer_script(True)
-        else:
-            run_lighthouse_puppeteer_script()
+        run_lighthouse_puppeteer_script(parsed_args.record_screen)
         run_lighthouse_checks(lighthouse_mode, parsed_args.shard)
 
 

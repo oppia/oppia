@@ -83,8 +83,10 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
             '--max-old-space-size=4096'
         ]
         # Arguments to record in lighthouse_setup.js.
-        self.extra_args = ['-record', os.path.join(
-                os.getcwd(), '..', 'lhci-puppeteer-video', 'video.mp4')]
+        self.extra_args = [
+            '-record',
+            os.path.join(os.getcwd(), '..', 'lhci-puppeteer-video', 'video.mp4')
+        ]
 
         def mock_context_manager() -> MockCompilerContextManager:
             return MockCompilerContextManager()
@@ -162,35 +164,6 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
             'Puppeteer script failed. More details can be found above.',
             self.print_arr)
 
-    def test_puppeteer_script_successfully_recording_failed(self) -> None:
-        class MockTask:
-            returncode = 0
-            def communicate(self) -> tuple[bytes, bytes]:   # pylint: disable=missing-docstring
-                return (
-                    b'https://oppia.org/create/4\n' +
-                    b'https://oppia.org/topic_editor/4\n' +
-                    b'https://oppia.org/story_editor/4\n' +
-                    b'https://oppia.org/skill_editor/4\n',
-                    b'Task output.')
-
-        def mock_popen(*unused_args: str, **unused_kwargs: str) -> MockTask:  # pylint: disable=unused-argument
-            return MockTask()
-
-        swap_isfile = self.swap(os.path, 'isfile', lambda _: False)
-        swap_popen = self.swap_with_checks(
-            subprocess, 'Popen', mock_popen,
-            expected_args=((self.puppeteer_bash_command + self.extra_args,),))
-
-        with self.print_swap, swap_popen, swap_isfile:
-            run_lighthouse_tests.run_lighthouse_puppeteer_script(record=True)
-
-        self.assertIn(
-            'Puppeteer script completed successfully.', self.print_arr)
-        self.assertIn(
-            'Starting LHCI Puppeteer script with recording.', self.print_arr)
-        self.assertIn(
-            'No video found at %s' % self.extra_args[1], self.print_arr)
-
     def test_puppeteer_script_successfully_with_recording(self) -> None:
         class MockTask:
             returncode = 0
@@ -220,36 +193,6 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
         self.assertIn(
             'Resulting puppeteer video saved at %s' % self.extra_args[1],
             self.print_arr)
-
-    def test_puppeteer_script_failed_recording_failed(self) -> None:
-        class MockTask:
-            returncode = 1
-            def communicate(self) -> tuple[bytes, bytes]:   # pylint: disable=missing-docstring
-                return (
-                    b'https://oppia.org/create/4\n' +
-                    b'https://oppia.org/topic_editor/4\n' +
-                    b'https://oppia.org/story_editor/4\n' +
-                    b'https://oppia.org/skill_editor/4\n',
-                    b'ABC error.')
-
-        def mock_popen(*unused_args: str, **unused_kwargs: str) -> MockTask:  # pylint: disable=unused-argument
-            return MockTask()
-
-        swap_isfile = self.swap(os.path, 'isfile', lambda _: False)
-        swap_popen = self.swap_with_checks(
-            subprocess, 'Popen', mock_popen,
-            expected_args=((self.puppeteer_bash_command + self.extra_args,),))
-
-        with self.print_swap, self.swap_sys_exit, swap_popen, swap_isfile:
-            run_lighthouse_tests.run_lighthouse_puppeteer_script(record=True)
-
-        self.assertIn('Return code: 1', self.print_arr)
-        self.assertIn('ABC error.', self.print_arr)
-        self.assertIn(
-            'Puppeteer script failed. More details can be found above.',
-            self.print_arr)
-        self.assertIn(
-            'No video found at %s' % self.extra_args[1], self.print_arr)
 
     def test_puppeteer_script_failed_with_recording(self) -> None:
         class MockTask:
