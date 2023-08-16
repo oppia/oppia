@@ -16,7 +16,7 @@
  * @fileoverview Service for Computing length of HTML strings.
  */
 
-import { Injectable, SecurityContext } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { LoggerService } from './contextual/logger.service';
 import { DomSanitizer} from '@angular/platform-browser';
 
@@ -26,7 +26,6 @@ import { DomSanitizer} from '@angular/platform-browser';
 export class HtmlLengthService {
   constructor(
     private loggerService: LoggerService,
-    private _sanitizer: DomSanitizer
   ) {}
 
   /**
