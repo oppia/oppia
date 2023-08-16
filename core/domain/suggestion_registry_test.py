@@ -177,6 +177,7 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
             'score_category': 'content.Algebra',
             'language_code': None,
             'last_updated': utils.get_time_in_millisecs(self.fake_date),
+            'created_on': utils.get_time_in_millisecs(self.fake_date),
             'edited_by_reviewer': False
         }
 
