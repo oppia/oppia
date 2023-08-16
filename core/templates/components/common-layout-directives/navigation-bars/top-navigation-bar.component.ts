@@ -331,6 +331,7 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
         this.sidebarStatusService.closeSidebar();
         this.sidebarIsShown = this.sidebarStatusService.isSidebarShown();
         this.currentWindowWidth = this.windowDimensionsService.getWidth();
+        this.windowRef.nativeWindow.document.body.style.overflowY = 'auto';
         this.debouncerService.debounce(this.truncateNavbar, 500);
       })
     );
