@@ -80,6 +80,13 @@ var editUserRoleButton = '.e2e-test-role-edit-button';
 var roleEditorContainer = '.e2e-test-roles-editor-card-container';
 var addNewRoleButton = '.e2e-test-add-new-role-button';
 var roleSelect = '.e2e-test-new-role-selector';
+var generateTopicButton = '.load-dummy-new-structures-data-button';
+var generateClassroomButton = '.load-dummy-math-classroom';
+var topicThumbnailResetButton = '.e2e-test-thumbnail-reset-button';
+var topicMetaTagInput = '.e2e-test-topic-meta-tag-content-field';
+var saveTopicButton = '.e2e-test-save-topic-button';
+var topicCommitMessageInput = '.e2e-test-commit-message-input';
+var publishChangesButton = '.e2e-test-close-save-modal-button';
 var cookieBannerAcceptButton = (
   '.e2e-test-oppia-cookie-banner-accept-button');
 
@@ -268,6 +275,110 @@ const getSkillEditorUrl = async function(browser, page) {
   }
 };
 
+const generateDataForTopicAndStoryPlayer = async function(browser, page) {
+  try {
+    // eslint-disable-next-line dot-notation
+    await page.goto('http://127.0.0.1:8181/admin#/activities', { waitUntil: networkIdle });
+
+    await page.waitForSelector(generateTopicButton);
+    await page.click(generateTopicButton);
+
+    const successMessage = 'Dummy new structures data generated successfully.';
+    let statusMessage;
+    do {
+      await new Promise(r => setTimeout(r, 1000));
+      statusMessage = await page.evaluate(() => {
+        const statusMessageElement = document
+          .querySelector('.oppia-status-message-container');
+        return statusMessageElement ? statusMessageElement
+          .textContent.trim() : '';
+      });
+    } while (statusMessage !== successMessage);
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.error(e);
+    process.exit(1);
+  }
+};
+
+const generateDataForClassroom = async function(browser, page) {
+  try {
+    // eslint-disable-next-line dot-notation
+    await page.goto('http://127.0.0.1:8181/admin#/activities', { waitUntil: networkIdle });
+
+    await page.waitForSelector(generateClassroomButton);
+    await page.click(generateClassroomButton);
+
+    const successMessage = 'Dummy new classroom generated successfully.';
+    let statusMessage;
+    do {
+      await new Promise(r => setTimeout(r, 1000));
+      statusMessage = await page.evaluate(() => {
+        const statusMessageElement = document
+          .querySelector('.oppia-status-message-container');
+        return statusMessageElement ? statusMessageElement
+          .textContent.trim() : '';
+      });
+    } while (statusMessage !== successMessage);
+
+    await addThumbnailToTopic(page, 'Fraction');
+    await addThumbnailToTopic(page, 'Addition');
+    await addThumbnailToTopic(page, 'Subtraction');
+    await addThumbnailToTopic(page, 'Multiplication');
+    await addThumbnailToTopic(page, 'Division');
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.log(e);
+    process.exit(1);
+  }
+};
+
+const addThumbnailToTopic = async function(page, topicName) {
+  try {
+    await page.goto(TOPIC_AND_SKILLS_DASHBOARD_URL, { waitUntil: networkIdle });
+
+    const topicLinkXPath = `//a[contains(text(), "${topicName}")]`;
+    await page.waitForXPath(topicLinkXPath);
+    const [topicLinkElement] = await page.$x(topicLinkXPath);
+    await topicLinkElement.click();
+    await page.waitForTimeout(5000);
+
+    await page.waitForSelector(topicThumbnailButton);
+    await page.click(topicThumbnailButton);
+
+    await page.waitForSelector(topicThumbnailResetButton);
+    await page.click(topicThumbnailResetButton);
+
+    await page.waitForSelector(topicUploadButton, { visible: true });
+
+    const elementHandle = await page.$(topicUploadButton);
+    await elementHandle.uploadFile('core/tests/data/test2_svg.svg');
+
+    await page.waitForSelector(thumbnailContainer, { visible: true });
+    await page.click(topicPhotoSubmit);
+    await page.waitForTimeout(3000);
+
+    await page.waitForSelector(topicMetaTagInput);
+    await page.focus(topicMetaTagInput);
+    await page.type(topicMetaTagInput, 'meta');
+
+    await page.waitForSelector(saveTopicButton);
+    await page.click(saveTopicButton);
+
+    await page.waitForSelector(topicCommitMessageInput);
+    await page.focus(topicCommitMessageInput);
+    await page.type(topicCommitMessageInput, 'Updated thumbnail');
+
+    await page.waitForSelector(publishChangesButton);
+    await page.click(publishChangesButton);
+    await page.waitForTimeout(10000);
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.log(e);
+    process.exit(1);
+  }
+};
+
 const main = async function() {
   process.env.FIREBASE_AUTH_EMULATOR_HOST = 'localhost:9099';
   FirebaseAdmin.initializeApp({projectId: 'dev-project-id'});
@@ -287,6 +398,8 @@ const main = async function() {
   await getTopicEditorUrl(browser, page);
   await getStoryEditorUrl(browser, page);
   await getSkillEditorUrl(browser, page);
+  await generateDataForTopicAndStoryPlayer(browser, page);
+  await generateDataForClassroom(browser, page);
   await process.stdout.write(
     [
       explorationEditorUrl,
