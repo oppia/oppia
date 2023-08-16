@@ -1101,7 +1101,6 @@ class ManagedProcessTests(test_utils.TestBase):
                     stdout=subprocess.PIPE))
 
 
-
 class GetChromedriverVersionTests(test_utils.TestBase):
 
     def test_chrome_before_115_queries_api(self) -> None:

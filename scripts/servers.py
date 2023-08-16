@@ -554,7 +554,6 @@ def get_chromedriver_version() -> str:
     """Returns the version of Chromedriver compatible with the installed version
     of Chrome.
     """
-
     # Although there are spaces between Google and Chrome in the path, we
     # don't need to escape them for Popen (as opposed to on the terminal, in
     # which case we would need to escape them for the command to run).
