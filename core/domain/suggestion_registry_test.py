@@ -139,6 +139,7 @@ class SuggestionEditStateContentDict(TypedDict):
     score_category: str
     language_code: Optional[str]
     last_updated: float
+    created_on: float
     edited_by_reviewer: bool
 
 
@@ -926,6 +927,7 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
             'score_category': 'translation.Algebra',
             'language_code': 'hi',
             'last_updated': utils.get_time_in_millisecs(self.fake_date),
+            'created_on': utils.get_time_in_millisecs(self.fake_date),
             'edited_by_reviewer': False
         }
 
@@ -1783,6 +1785,7 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             'score_category': 'question.topic_1',
             'language_code': 'en',
             'last_updated': utils.get_time_in_millisecs(self.fake_date),
+            'created_on': utils.get_time_in_millisecs(self.fake_date),
             'edited_by_reviewer': False
         }
 
@@ -2603,6 +2606,7 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             'score_category': 'question.skill1',
             'language_code': 'en',
             'last_updated': utils.get_time_in_millisecs(self.fake_date),
+            'created_on': utils.get_time_in_millisecs(self.fake_date),
             'edited_by_reviewer': False
         }
         suggestion = suggestion_registry.SuggestionAddQuestion(
@@ -2669,6 +2673,7 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             'score_category': 'question.skill1',
             'language_code': 'en',
             'last_updated': utils.get_time_in_millisecs(self.fake_date),
+            'created_on': utils.get_time_in_millisecs(self.fake_date),
             'edited_by_reviewer': False
         }
         suggestion = suggestion_registry.SuggestionAddQuestion(
@@ -2815,6 +2820,7 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             'score_category': 'question.skill1',
             'language_code': 'en',
             'last_updated': utils.get_time_in_millisecs(self.fake_date),
+            'created_on': utils.get_time_in_millisecs(self.fake_date),
             'edited_by_reviewer': False
         }
         self.save_new_skill(

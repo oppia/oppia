@@ -70,6 +70,7 @@ class BaseSuggestionDict(TypedDict):
     score_category: str
     language_code: str
     last_updated: float
+    created_on: float
     edited_by_reviewer: bool
 
 
