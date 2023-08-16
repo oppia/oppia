@@ -82,3 +82,15 @@ restart.%: ## Restarts the given docker service. Example: make restart.datastore
 run-backend-tests: ## [Not ready for use] Runs the backend tests
 	@echo "Run the backend test on the following module: $(RUN_ARGS)"
 	@echo "Not in use, under construction!"
+
+run_tests.frontend: ## Runs the frontend unit tests
+	docker compose run --no-deps --entrypoint "python -m scripts.run_frontend_tests $(flags)" dev-server
+
+run_tests.typescript: ## Runs the typescript checks
+	docker compose run --no-deps --entrypoint "python -m scripts.typescript_checks" dev-server
+
+run_tests.custom_eslint: ## Runs the custome eslint tests
+	docker compose run --no-deps --entrypoint "python -m scripts.run_custom_eslint_tests" dev-server
+
+run_tests.mypy: ## Runs mypy checks
+	docker compose run --no-deps --entrypoint "python -m scripts.run_mypy_checks" dev-server
