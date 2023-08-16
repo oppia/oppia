@@ -111,7 +111,7 @@ describe('retrieving threads service', () => {
         suggestion_type: 'edit_exploration_state_content',
         target_id: 'exp1',
         target_type: 'exploration',
-      }
+      } as unknown as SuggestionBackendDict
     ];
     mockMessages = [
       {
