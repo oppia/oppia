@@ -18,7 +18,6 @@
 
 import { Injectable } from '@angular/core';
 import { LoggerService } from './contextual/logger.service';
-import { DomSanitizer} from '@angular/platform-browser';
 
 @Injectable({
   providedIn: 'root'
