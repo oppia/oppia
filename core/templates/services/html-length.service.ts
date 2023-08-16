@@ -48,11 +48,8 @@ export class HtmlLengthService {
       this.loggerService.error('Empty string was passed to compute length');
       return 0;
     }
-    const sanitizedHtml = this._sanitizer.sanitize(
-      SecurityContext.HTML, htmlString) as string;
     let domparser = new DOMParser();
-    let dom = domparser.parseFromString(sanitizedHtml, 'text/html');
-
+    let dom = domparser.parseFromString(htmlString, 'text/html');
     const tagList = Array.from(dom.body.querySelectorAll(
       'p,ul,ol,oppia-noninteractive-image,oppia-noninteractive-math'));
     let totalWeight = 0;
