@@ -666,6 +666,62 @@ class GeneralSuggestionModel(base_models.BaseModel):
         )
 
     @classmethod
+    def get_reviewable_translation_suggestions(
+        cls,
+        user_id: str,
+        language_code: str,
+        exp_id: str
+    ) -> Tuple[Sequence[GeneralSuggestionModel], int]:
+        """Fetches reviewable translation suggestions for a single exploration.
+
+        Args:
+            user_id: str. The id of the user trying to make this query.
+                Suggestions authored by this user will be excluded from
+                the results.
+            language_code: str. The language code to get results for.
+            exp_id: str. Exploration ID matching the target ID of the
+                translation suggestions.
+
+        Returns:
+            Tuple of (results, next_offset). Where:
+                results: list(SuggestionModel). A list of all suggestions
+                    that are in-review, not authored by the supplied user,
+                    matching the supplied language code, and correspond
+                    to the given exploration ID.
+                    The suggestions are ordered by descending creation
+                    date.
+                next_offset: int. The number of results
+                    returned by the current query.
+        """
+        # The first sort property must be the same as the property to which
+        # an inequality filter is applied. Thus, the inequality filter on
+        # author_id can not be used here.
+        suggestion_query = cls.get_all().filter(datastore_services.all_of(
+            cls.status == STATUS_IN_REVIEW,
+            cls.suggestion_type == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            cls.language_code == language_code,
+            cls.target_id == exp_id
+        )).order(-cls.created_on)
+
+        sorted_results: List[GeneralSuggestionModel] = []
+        offset = 0
+        suggestion_models: Sequence[GeneralSuggestionModel] = (
+            suggestion_query.fetch(offset=offset))
+        for suggestion_model in suggestion_models:
+            offset += 1
+            if suggestion_model.author_id != user_id:
+                sorted_results.append(suggestion_model)
+
+        return (
+            sorted_results,
+            offset
+        )
+
+    # TODO(#18745): Transition all callsites to use the new method
+    # get_reviewable_translation_suggestions_for_single_exploration instead
+    # for the case of a single exploration without a limit. Deprecate the
+    # no-limit behavior of this method to avoid future issues.
+    @classmethod
     def get_in_review_translation_suggestions_with_exp_ids_by_offset(
         cls,
         limit: Optional[int],

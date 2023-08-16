@@ -33,6 +33,7 @@ describe('Suggestion data model', () => {
         cmd: 'edit_state_property',
         property_name: 'content',
         state_name: 'state_1',
+        content_id: 'interaction_0',
         new_value: {
           html: 'new suggestion content'
         },

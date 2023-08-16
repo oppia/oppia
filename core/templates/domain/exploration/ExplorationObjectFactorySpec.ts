@@ -30,6 +30,7 @@ import { LoggerService } from 'services/contextual/logger.service';
 import { SubtitledUnicode } from
   'domain/exploration/SubtitledUnicodeObjectFactory';
 import { SubtitledHtmlBackendDict } from 'domain/exploration/subtitled-html.model';
+import {FetchExplorationBackendResponse } from './read-only-exploration-backend-api.service';
 
 describe('Exploration object factory', () => {
   let eof: ExplorationObjectFactory;
@@ -40,6 +41,7 @@ describe('Exploration object factory', () => {
   let loggerErrorSpy: jasmine.Spy<(msg: string) => void>;
   let firstState: StateBackendDict;
   let secondState: StateBackendDict;
+  let mockReadOnlyExplorationData: FetchExplorationBackendResponse;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -152,6 +154,56 @@ describe('Exploration object factory', () => {
       linked_skill_id: null,
     };
 
+    mockReadOnlyExplorationData = {
+      can_edit: true,
+      exploration: {
+        init_state_name: 'Introduction',
+        param_changes: [],
+        param_specs: {},
+        states: {
+          'first state': firstState,
+          'second state': secondState
+        },
+        title: 'Dummy Title',
+        language_code: 'en',
+        objective: 'Dummy Objective',
+        next_content_id_index: 4,
+        correctness_feedback_enabled: true
+      },
+      exploration_metadata: {
+        title: 'Dummy Title',
+        category: 'Dummy Category',
+        objective: 'Dummy Objective',
+        language_code: 'en',
+        tags: [],
+        blurb: 'Dummy Blurb',
+        author_notes: 'Dummy Notes',
+        states_schema_version: 0,
+        init_state_name: 'Introduction',
+        param_specs: {},
+        param_changes: [],
+        auto_tts_enabled: true,
+        correctness_feedback_enabled: true,
+        edits_allowed: true,
+      },
+      exploration_id: '1',
+      is_logged_in: true,
+      session_id: '0',
+      version: 0,
+      preferred_audio_language_code: 'en',
+      preferred_language_codes: [],
+      auto_tts_enabled: true,
+      correctness_feedback_enabled: true,
+      record_playthrough_probability: 1,
+      draft_change_list_id: 1,
+      has_viewed_lesson_info_modal_once: false,
+      furthest_reached_checkpoint_exp_version: 0,
+      furthest_reached_checkpoint_state_name: '',
+      most_recently_reached_checkpoint_state_name: '',
+      most_recently_reached_checkpoint_exp_version: 1,
+      displayable_language_codes: ['en'],
+    };
+
     const explorationDict: ExplorationBackendDict = {
       title: 'My Title',
       init_state_name: 'Introduction',
@@ -189,7 +241,6 @@ describe('Exploration object factory', () => {
 
     exploration = eof.createFromBackendDict(explorationDict);
     exploration.setInitialStateName('first state');
-
     loggerErrorSpy = spyOn(ls, 'error').and.callThrough();
   });
 
@@ -325,5 +376,21 @@ describe('Exploration object factory', () => {
 
   it('should return correct list of translatable objects', () => {
     expect(exploration.getTranslatableObjects().length).toEqual(2);
+  });
+
+  it('should create a exploration for given exploration' +
+   'backend response', () => {
+    const responseExploration = eof.
+      createFromExplorationBackendResponse(
+        mockReadOnlyExplorationData);
+
+    expect(responseExploration.getLanguageCode()).toBe('en');
+    expect(responseExploration.getInteraction('first state')).toEqual(
+      iof.createFromBackendDict(firstState.interaction)
+    );
+    expect(responseExploration.getInteraction('second state')).toEqual(
+      iof.createFromBackendDict(secondState.interaction)
+    );
+    expect(responseExploration.getInteraction('invalid state')).toBeNull();
   });
 });

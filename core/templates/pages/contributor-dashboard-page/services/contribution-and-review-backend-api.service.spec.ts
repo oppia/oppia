@@ -121,7 +121,7 @@ describe('Contribution and review backend API service', () => {
     it('should fetch reviewable question suggestions', fakeAsync(() => {
       spyOn(carbas, 'fetchReviewableSuggestionsAsync').and.callThrough();
       const url = '/getreviewablesuggestions/skill/add_question' +
-      '?limit=10&offset=0&sort_key=Date';
+      '?offset=0&sort_key=Date&limit=10';
 
       carbas.fetchSuggestionsAsync(
         'REVIEWABLE_QUESTION_SUGGESTIONS',
@@ -149,11 +149,11 @@ describe('Contribution and review backend API service', () => {
     it('should fetch reviewable suggestions from exp1', fakeAsync(() => {
       spyOn(carbas, 'fetchReviewableSuggestionsAsync').and.callThrough();
       const url = '/getreviewablesuggestions/exploration/translate_content' +
-      '?limit=10&offset=0&sort_key=Date&exploration_id=exp1';
+      '?offset=0&sort_key=Date&exploration_id=exp1';
 
       carbas.fetchSuggestionsAsync(
         'REVIEWABLE_TRANSLATION_SUGGESTIONS',
-        AppConstants.OPPORTUNITIES_PAGE_SIZE,
+        null,
         0,
         AppConstants.SUGGESTIONS_SORT_KEY_DATE,
         explorationId
@@ -167,7 +167,7 @@ describe('Contribution and review backend API service', () => {
         .toHaveBeenCalledWith(
           'exploration',
           'translate_content',
-          AppConstants.OPPORTUNITIES_PAGE_SIZE,
+          null,
           0,
           'Date',
           explorationId

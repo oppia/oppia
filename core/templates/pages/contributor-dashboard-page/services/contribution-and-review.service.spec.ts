@@ -19,17 +19,31 @@
 import { TestBed, fakeAsync, flushMicrotasks, tick } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { AppConstants } from 'app.constants';
-import { ContributionAndReviewService } from './contribution-and-review.service';
+import { ContributionAndReviewService, FetchSuggestionsResponse } from './contribution-and-review.service';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { ContributionAndReviewBackendApiService }
   from './contribution-and-review-backend-api.service';
 import { SuggestionBackendDict } from 'domain/suggestion/suggestion.model';
+import { ReadOnlyExplorationBackendApiService }
+  from 'domain/exploration/read-only-exploration-backend-api.service';
+import { ExplorationObjectFactory, Exploration}
+  from 'domain/exploration/ExplorationObjectFactory';
+import { StateObjectsBackendDict } from 'domain/exploration/StatesObjectFactory';
+import { StatesObjectFactory, States } from 'domain/exploration/StatesObjectFactory';
+import { FetchExplorationBackendResponse } from '../../../domain/exploration/read-only-exploration-backend-api.service';
+import { LoggerService } from 'services/contextual/logger.service';
+import { ParamSpecs } from '../../../domain/exploration/ParamSpecsObjectFactory';
 
 describe('Contribution and review service', () => {
   let cars: ContributionAndReviewService;
   let carbas: ContributionAndReviewBackendApiService;
   let fetchSuggestionsAsyncSpy: jasmine.Spy;
   let downloadContributorCertificateAsyncSpy: jasmine.Spy;
+  let statesObjectFactory: StatesObjectFactory;
+  let readOnlyExplorationBackendApiService:
+    ReadOnlyExplorationBackendApiService;
+  let urlInterpolationService: UrlInterpolationService;
+  let loggerService: LoggerService;
 
   const suggestion1 = {
     suggestion_id: 'suggestion_id_1',
@@ -101,11 +115,21 @@ describe('Contribution and review service', () => {
       imports: [HttpClientTestingModule],
       providers: [
         UrlInterpolationService,
-        ContributionAndReviewBackendApiService
+        ContributionAndReviewBackendApiService,
+        ReadOnlyExplorationBackendApiService,
+        ExplorationObjectFactory,
+        StatesObjectFactory,
+        LoggerService
       ]
     });
     cars = TestBed.inject(ContributionAndReviewService);
     carbas = TestBed.inject(ContributionAndReviewBackendApiService);
+    readOnlyExplorationBackendApiService = TestBed.inject(
+      ReadOnlyExplorationBackendApiService);
+    loggerService = TestBed.inject(LoggerService);
+    urlInterpolationService = TestBed.inject(
+      UrlInterpolationService);
+    statesObjectFactory = TestBed.inject(StatesObjectFactory);
     fetchSuggestionsAsyncSpy = spyOn(carbas, 'fetchSuggestionsAsync');
     downloadContributorCertificateAsyncSpy = spyOn(
       carbas, 'downloadContributorCertificateAsync');
@@ -311,6 +335,20 @@ describe('Contribution and review service', () => {
   });
 
   describe('getReviewableTranslationSuggestionsAsync', () => {
+    let explorationObjectFactory: ExplorationObjectFactory;
+    let explorationObjectFactorySpy: jasmine.Spy;
+    let fetchExplorationSpy: jasmine.Spy;
+    let mockSortTranslationSpy: jasmine.Spy;
+
+    beforeEach(() => {
+      explorationObjectFactory = TestBed.inject(ExplorationObjectFactory);
+      explorationObjectFactorySpy = spyOn(
+        explorationObjectFactory, 'createFromBackendDict');
+      fetchExplorationSpy = spyOn(
+        readOnlyExplorationBackendApiService, 'fetchExplorationAsync');
+      mockSortTranslationSpy = spyOn(
+        cars, 'sortTranslationSuggestionsByState');
+    });
     it('should return translation suggestions and opportunity details',
       () => {
         fetchSuggestionsAsyncSpy.and.returnValue(
@@ -325,6 +363,288 @@ describe('Contribution and review service', () => {
 
         expect(fetchSuggestionsAsyncSpy).toHaveBeenCalled();
       });
+
+    it('should return translation suggestions for given ' +
+    'exploration', async() => {
+      fetchSuggestionsAsyncSpy.and.returnValue(
+        Promise.resolve(backendFetchResponse));
+      const fetchTranslationSuggestionsAsyncSpy = spyOn(
+        cars, 'fetchTranslationSuggestionsAsync').and.returnValue(
+        Promise.resolve({
+          suggestionIdToDetails: {
+            skill_id_1: {
+              suggestions: suggestion1,
+              details: opportunityDict1
+            }
+          },
+          more: false
+        } as unknown as FetchSuggestionsResponse));
+
+      cars.getReviewableTranslationSuggestionsAsync(
+        true, 'skill_id_1', '1')
+        .then((response) => {
+          expect(response.suggestionIdToDetails.skill_id_1)
+            .toEqual({
+              suggestions: suggestion1,
+              details: opportunityDict1
+            });
+          expect(fetchTranslationSuggestionsAsyncSpy).toHaveBeenCalled();
+        });
+    });
+
+    it('should correctly fetch translation suggestions and return ' +
+    'the transformed result', async() => {
+      const mockStates = {
+        Introduction: {
+          classifier_model_id: null,
+          content: {
+            content_id: 'content',
+            html: ''
+          },
+          recorded_voiceovers: {
+            voiceovers_mapping: {
+              content: {},
+              default_outcome: {}
+            }
+          },
+          interaction: {
+            answer_groups: [],
+            confirmed_unclassified_answers: [],
+            customization_args: {
+              buttonText: {
+                value: 'Continue'
+              }
+            },
+            default_outcome: {
+              dest: 'End State',
+              dest_if_really_stuck: null,
+              feedback: {
+                content_id: 'default_outcome',
+                html: ''
+              },
+              param_changes: [],
+              labelled_as_correct: true,
+              refresher_exploration_id: null,
+              missing_prerequisite_skill_id: null
+            },
+            hints: [],
+            solution: null,
+            id: 'Continue'
+          },
+          linked_skill_id: null,
+          param_changes: [],
+          solicit_answer_details: false,
+          card_is_checkpoint: true
+        },
+        'End State': {
+          classifier_model_id: null,
+          content: {
+            content_id: 'content',
+            html: ''
+          },
+          recorded_voiceovers: {
+            voiceovers_mapping: {
+              content: {},
+              default_outcome: {}
+            }
+          },
+          interaction: {
+            answer_groups: [],
+            confirmed_unclassified_answers: [],
+            customization_args: {
+              recommendedExplorationIds: {
+                value: []
+              }
+            },
+            default_outcome: null,
+            hints: [],
+            solution: null,
+            id: 'EndExploration'
+          },
+          linked_skill_id: null,
+          param_changes: [],
+          solicit_answer_details: false,
+          card_is_checkpoint: false
+        }
+      } as StateObjectsBackendDict;
+      const states = statesObjectFactory.createFromBackendDict(
+        mockStates);
+      const mockReadOnlyExplorationData: FetchExplorationBackendResponse = {
+        can_edit: true,
+        exploration: {
+          init_state_name: 'Introduction',
+          param_changes: [],
+          param_specs: {},
+          states: mockStates,
+          title: 'Dummy Title',
+          language_code: 'en',
+          objective: 'Dummy Objective',
+          next_content_id_index: 4,
+          correctness_feedback_enabled: true
+        },
+        exploration_metadata: {
+          title: 'Dummy Title',
+          category: 'Dummy Category',
+          objective: 'Dummy Objective',
+          language_code: 'en',
+          tags: [],
+          blurb: 'Dummy Blurb',
+          author_notes: 'Dummy Notes',
+          states_schema_version: 0,
+          init_state_name: 'Introduction',
+          param_specs: {},
+          param_changes: [],
+          auto_tts_enabled: true,
+          correctness_feedback_enabled: true,
+          edits_allowed: true,
+        },
+        exploration_id: '1',
+        is_logged_in: true,
+        session_id: '0',
+        version: 0,
+        preferred_audio_language_code: 'en',
+        preferred_language_codes: [],
+        auto_tts_enabled: true,
+        correctness_feedback_enabled: true,
+        record_playthrough_probability: 1,
+        draft_change_list_id: 1,
+        has_viewed_lesson_info_modal_once: false,
+        furthest_reached_checkpoint_exp_version: 0,
+        furthest_reached_checkpoint_state_name: '',
+        most_recently_reached_checkpoint_state_name: '',
+        most_recently_reached_checkpoint_exp_version: 1,
+        displayable_language_codes: ['en'],
+      };
+      const exploration: Exploration = new Exploration(
+        mockReadOnlyExplorationData.exploration.init_state_name,
+        [],
+        {} as unknown as ParamSpecs,
+        mockReadOnlyExplorationData.exploration.states as unknown as States,
+        mockReadOnlyExplorationData.exploration.title,
+        mockReadOnlyExplorationData.exploration.next_content_id_index,
+        mockReadOnlyExplorationData.exploration.language_code,
+        loggerService,
+        urlInterpolationService
+      );
+      const getStatesSpy = spyOn(exploration, 'getStates');
+
+      fetchExplorationSpy.and.returnValue(
+        Promise.resolve(mockReadOnlyExplorationData));
+      fetchSuggestionsAsyncSpy.and.returnValue(
+        Promise.resolve(backendFetchResponse));
+      explorationObjectFactorySpy.and.returnValue(
+        exploration);
+      mockSortTranslationSpy.and.returnValue([
+        {
+          suggestion_type: 'suggestion',
+          suggestion_id: 'id',
+          target_type: 'exploration',
+          target_id: '1',
+          status: 'review',
+          author_name: 'author',
+          change: {
+            state_name: 'First State',
+            content_id: 'content_1'
+          },
+          last_updated_msecs: 0,
+        },
+        {
+          suggestion_type: 'suggestion',
+          suggestion_id: 'id',
+          target_type: 'exploration',
+          target_id: '1',
+          status: 'review',
+          author_name: 'author',
+          change: {
+            state_name: 'First State',
+            content_id: 'content_3'
+          },
+          last_updated_msecs: 0,
+        },
+        {
+          suggestion_type: 'suggestion',
+          suggestion_id: 'id',
+          target_type: 'exploration',
+          target_id: '1',
+          status: 'review',
+          author_name: 'author',
+          change: {
+            state_name: 'First State',
+            content_id: 'feedback_2'
+          },
+          last_updated_msecs: 0,
+        },
+        {
+          suggestion_type: 'suggestion',
+          suggestion_id: 'id',
+          target_type: 'exploration',
+          target_id: '1',
+          status: 'review',
+          author_name: 'author',
+          change: {
+            state_name: 'End State',
+            content_id: 'content_2'
+          },
+          last_updated_msecs: 0,
+        },
+        {
+          suggestion_type: 'suggestion',
+          suggestion_id: 'id',
+          target_type: 'exploration',
+          target_id: '1',
+          status: 'review',
+          author_name: 'author',
+          change: {
+            state_name: 'End State',
+            content_id: 'interaction_1'
+          },
+          last_updated_msecs: 0,
+        },
+        {
+          suggestion_type: 'suggestion',
+          suggestion_id: 'id',
+          target_type: 'exploration',
+          target_id: '1',
+          status: 'review',
+          author_name: 'author',
+          change: {
+            state_name: 'End State',
+            content_id: 'hints_1'
+          },
+          last_updated_msecs: 0,
+        }
+      ]);
+      getStatesSpy.and.returnValue(states);
+
+      await cars.fetchTranslationSuggestionsAsync(
+        '1').then((response)=>{
+        expect(response).toEqual({
+          suggestionIdToDetails: {
+            id: {
+              suggestion: {
+                suggestion_type: 'suggestion',
+                suggestion_id: 'id',
+                target_type: 'exploration',
+                target_id: '1',
+                status: 'review',
+                author_name: 'author',
+                change: {
+                  state_name: 'End State',
+                  content_id: 'hints_1',
+                },
+                last_updated_msecs: 0
+              },
+              details: undefined,
+            },
+          },
+          more: false
+        });
+        expect(explorationObjectFactorySpy).toHaveBeenCalled();
+        expect(getStatesSpy).toHaveBeenCalled();
+        expect(fetchSuggestionsAsyncSpy).toHaveBeenCalled();
+        expect(fetchExplorationSpy).toHaveBeenCalled();
+      });
+    });
   });
 
   describe('reviewExplorationSuggestion', () => {
@@ -588,5 +908,346 @@ describe('Contribution and review service', () => {
       expect(onSuccess).not.toHaveBeenCalled();
       expect(onFailure).toHaveBeenCalledWith('pqr');
     }));
+  });
+
+  describe('sortTranslationSuggestionsByState', () => {
+    const translationSuggestions = [
+      {
+        suggestion_type: 'suggestion',
+        suggestion_id: 'id',
+        target_type: 'exploration',
+        target_id: '1',
+        status: 'review',
+        author_name: 'author',
+        change: {
+          state_name: 'First State',
+          content_id: 'feedback_2',
+          new_value: {
+            html: 'new_val'
+          },
+          old_value: {
+            html: 'old_val'
+          },
+          skill_id: 'skill_id_1'
+        },
+        last_updated_msecs: 0,
+      },
+      {
+        suggestion_type: 'suggestion',
+        suggestion_id: 'id',
+        target_type: 'exploration',
+        target_id: '1',
+        status: 'review',
+        author_name: 'author',
+        change: {
+          state_name: 'End State',
+          content_id: 'hints_1',
+          new_value: {
+            html: 'new_val'
+          },
+          old_value: {
+            html: 'old_val'
+          },
+          skill_id: 'skill_id_1'
+        },
+        last_updated_msecs: 0,
+      },
+      {
+        suggestion_type: 'suggestion',
+        suggestion_id: 'id',
+        target_type: 'exploration',
+        target_id: '1',
+        status: 'review',
+        author_name: 'author',
+        change: {
+          state_name: 'First State',
+          content_id: 'content_3',
+          new_value: {
+            html: 'new_val'
+          },
+          old_value: {
+            html: 'old_val'
+          },
+          skill_id: 'skill_id_1'
+        },
+        last_updated_msecs: 0,
+      },
+      {
+        suggestion_type: 'suggestion',
+        suggestion_id: 'id',
+        target_type: 'exploration',
+        target_id: '1',
+        status: 'review',
+        author_name: 'author',
+        change: {
+          state_name: 'End State',
+          content_id: 'interaction_1',
+          new_value: {
+            html: 'new_val'
+          },
+          old_value: {
+            html: 'old_val'
+          },
+          skill_id: 'skill_id_1'
+        },
+        last_updated_msecs: 0,
+      },
+      {
+        suggestion_type: 'suggestion',
+        suggestion_id: 'id',
+        target_type: 'exploration',
+        target_id: '1',
+        status: 'review',
+        author_name: 'author',
+        change: {
+          state_name: 'First State',
+          content_id: 'content_1',
+          new_value: {
+            html: 'new_val'
+          },
+          old_value: {
+            html: 'old_val'
+          },
+          skill_id: 'skill_id_1'
+        },
+        last_updated_msecs: 0,
+      },
+      {
+        suggestion_type: 'suggestion',
+        suggestion_id: 'id',
+        target_type: 'exploration',
+        target_id: '1',
+        status: 'review',
+        author_name: 'author',
+        change: {
+          state_name: 'End State',
+          content_id: 'content_2',
+          new_value: {
+            html: 'new_val'
+          },
+          old_value: {
+            html: 'old_val'
+          },
+          skill_id: 'skill_id_1'
+        },
+        last_updated_msecs: 0,
+      }
+    ] as unknown as SuggestionBackendDict[];
+    const statesBackendDict: StateObjectsBackendDict = {
+      'First State': {
+        classifier_model_id: null,
+        content: {
+          content_id: 'content',
+          html: ''
+        },
+        recorded_voiceovers: {
+          voiceovers_mapping: {
+            content: {},
+            default_outcome: {}
+          }
+        },
+        interaction: {
+          answer_groups: [],
+          confirmed_unclassified_answers: [],
+          customization_args: {
+            buttonText: {
+              value: 'Continue'
+            }
+          },
+          default_outcome: {
+            dest: 'End State',
+            dest_if_really_stuck: null,
+            feedback: {
+              content_id: 'default_outcome',
+              html: ''
+            },
+            param_changes: [],
+            labelled_as_correct: true,
+            refresher_exploration_id: null,
+            missing_prerequisite_skill_id: null
+          },
+          hints: [],
+          solution: null,
+          id: 'Continue'
+        },
+        linked_skill_id: null,
+        param_changes: [],
+        solicit_answer_details: false,
+        card_is_checkpoint: true
+      },
+      'End State': {
+        classifier_model_id: null,
+        content: {
+          content_id: 'content',
+          html: ''
+        },
+        recorded_voiceovers: {
+          voiceovers_mapping: {
+            content: {},
+            default_outcome: {}
+          }
+        },
+        interaction: {
+          answer_groups: [],
+          confirmed_unclassified_answers: [],
+          customization_args: {
+            recommendedExplorationIds: {
+              value: []
+            }
+          },
+          default_outcome: null,
+          hints: [],
+          solution: null,
+          id: 'EndExploration'
+        },
+        linked_skill_id: null,
+        param_changes: [],
+        solicit_answer_details: false,
+        card_is_checkpoint: false
+      }
+    };
+
+    it('should sort translation cards within each state based ' +
+    'on type and index', () => {
+      const states = statesObjectFactory.createFromBackendDict(
+        statesBackendDict);
+      const sortedTranslationSuggestions = cars.
+        sortTranslationSuggestionsByState(
+          translationSuggestions, states,
+          'First State') as unknown as SuggestionBackendDict[];
+
+      expect(sortedTranslationSuggestions).toEqual([
+        {
+          suggestion_type: 'suggestion',
+          suggestion_id: 'id',
+          target_type: 'exploration',
+          target_id: '1',
+          status: 'review',
+          author_name: 'author',
+          change: {
+            state_name: 'First State',
+            content_id: 'content_1',
+            new_value: {
+              html: 'new_val'
+            },
+            old_value: {
+              html: 'old_val'
+            },
+            skill_id: 'skill_id_1'
+          },
+          last_updated_msecs: 0,
+        },
+        {
+          suggestion_type: 'suggestion',
+          suggestion_id: 'id',
+          target_type: 'exploration',
+          target_id: '1',
+          status: 'review',
+          author_name: 'author',
+          change: {
+            state_name: 'First State',
+            content_id: 'content_3',
+            new_value: {
+              html: 'new_val'
+            },
+            old_value: {
+              html: 'old_val'
+            },
+            skill_id: 'skill_id_1'
+          },
+          last_updated_msecs: 0,
+        },
+        {
+          suggestion_type: 'suggestion',
+          suggestion_id: 'id',
+          target_type: 'exploration',
+          target_id: '1',
+          status: 'review',
+          author_name: 'author',
+          change: {
+            state_name: 'First State',
+            content_id: 'feedback_2',
+            new_value: {
+              html: 'new_val'
+            },
+            old_value: {
+              html: 'old_val'
+            },
+            skill_id: 'skill_id_1'
+          },
+          last_updated_msecs: 0,
+        },
+        {
+          suggestion_type: 'suggestion',
+          suggestion_id: 'id',
+          target_type: 'exploration',
+          target_id: '1',
+          status: 'review',
+          author_name: 'author',
+          change: {
+            state_name: 'End State',
+            content_id: 'content_2',
+            new_value: {
+              html: 'new_val'
+            },
+            old_value: {
+              html: 'old_val'
+            },
+            skill_id: 'skill_id_1'
+          },
+          last_updated_msecs: 0,
+        },
+        {
+          suggestion_type: 'suggestion',
+          suggestion_id: 'id',
+          target_type: 'exploration',
+          target_id: '1',
+          status: 'review',
+          author_name: 'author',
+          change: {
+            state_name: 'End State',
+            content_id: 'interaction_1',
+            new_value: {
+              html: 'new_val'
+            },
+            old_value: {
+              html: 'old_val'
+            },
+            skill_id: 'skill_id_1'
+          },
+          last_updated_msecs: 0,
+        },
+        {
+          suggestion_type: 'suggestion',
+          suggestion_id: 'id',
+          target_type: 'exploration',
+          target_id: '1',
+          status: 'review',
+          author_name: 'author',
+          change: {
+            state_name: 'End State',
+            content_id: 'hints_1',
+            new_value: {
+              html: 'new_val'
+            },
+            old_value: {
+              html: 'old_val'
+            },
+            skill_id: 'skill_id_1'
+          },
+          last_updated_msecs: 0,
+        }
+      ]);
+    });
+
+    it('should return suggestions as it is when initStateName is not defined',
+      () => {
+        const states = statesObjectFactory.createFromBackendDict(
+          statesBackendDict);
+        const sortedTranslationCards = cars.sortTranslationSuggestionsByState(
+          translationSuggestions, states, null);
+
+        expect(sortedTranslationCards).toEqual(translationSuggestions);
+      });
   });
 });
