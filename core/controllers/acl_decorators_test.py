@@ -4334,6 +4334,55 @@ class AccessLearnerDashboardDecoratorTests(test_utils.GenericTestBase):
         self.assertEqual(response['error'], error_msg)
 
 
+class AccessFeedbackUpdatesDecoratorTests(test_utils.GenericTestBase):
+    """Tests the decorator can_access_learner_dashboard."""
+
+    user = 'user'
+    user_email = 'user@example.com'
+    banned_user = 'banneduser'
+    banned_user_email = 'banned@example.com'
+
+    class MockHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
+        GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+        HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
+
+        @acl_decorators.can_access_feedback_updates
+        def get(self) -> None:
+            self.render_json({'success': True})
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.signup(self.user_email, self.user)
+        self.signup(self.banned_user_email, self.banned_user)
+        self.mark_user_banned(self.banned_user)
+        self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
+            [webapp2.Route('/mock/', self.MockHandler)],
+            debug=feconf.DEBUG,
+        ))
+
+    def test_banned_user_cannot_access_feedback_updates(self) -> None:
+        self.login(self.banned_user_email)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json('/mock/', expected_status_int=401)
+        error_msg = 'You do not have the credentials to access this page.'
+        self.assertEqual(response['error'], error_msg)
+        self.logout()
+
+    def test_exploration_editor_can_access_feedback_updates(self) -> None:
+        self.login(self.user_email)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json('/mock/')
+        self.assertTrue(response['success'])
+        self.logout()
+
+    def test_guest_user_cannot_access_feedback_updates(self) -> None:
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json('/mock/', expected_status_int=401)
+        error_msg = 'You must be logged in to access this resource.'
+        self.assertEqual(response['error'], error_msg)
+
+
 class AccessLearnerGroupsDecoratorTests(test_utils.GenericTestBase):
     """Tests the decorator can_access_learner_groups."""
 
@@ -6883,6 +6932,39 @@ class EditEntityDecoratorTests(test_utils.GenericTestBase):
             self.assertEqual(
                 response['error'], 'You do not have credentials to submit'
                 ' images to questions.')
+        self.logout()
+
+    def test_can_submit_images_to_explorations(self) -> None:
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json('/mock_edit_entity/%s/%s' % (
+                feconf.IMAGE_CONTEXT_EXPLORATION_SUGGESTIONS,
+                self.published_exp_id))
+            self.assertEqual(response['entity_id'], self.published_exp_id)
+            self.assertEqual(response['entity_type'], 'exploration_suggestions')
+        self.logout()
+
+    def test_unauthenticated_users_cannot_submit_images_to_explorations(
+        self
+    ) -> None:
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json('/mock_edit_entity/%s/%s' % (
+                feconf.IMAGE_CONTEXT_EXPLORATION_SUGGESTIONS,
+                self.published_exp_id),
+                expected_status_int=401)
+
+    def test_cannot_submit_images_to_explorations_without_having_permissions(
+        self
+    ) -> None:
+        self.login(self.user_email)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json('/mock_edit_entity/%s/%s' % (
+                feconf.IMAGE_CONTEXT_EXPLORATION_SUGGESTIONS,
+                self.published_exp_id),
+                expected_status_int=401)
+            self.assertEqual(
+                response['error'], 'You do not have credentials to submit'
+                ' images to explorations.')
         self.logout()
 
     def test_can_edit_blog_post(self) -> None:

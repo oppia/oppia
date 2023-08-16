@@ -411,6 +411,14 @@ export default {
     "story": ["#F8BF74", "#D68F78", "#8EBBB6", "#B3D8F1"]
   },
 
+  "ALLOWED_STORY_NODE_STATUS": ["Draft", "Ready To Publish", "Published"],
+  "ALLOWED_STORY_NODE_UNPUBLISHING_REASONS": ["BAD_CONTENT",
+    "CHAPTER_NEEDS_SPLITTING"],
+  "STORY_NODE_STATUS_PUBLISHED": "Published",
+  "STORY_NODE_STATUS_READY_TO_PUBLISH": "Ready To Publish",
+  "STORY_NODE_STATUS_DRAFT": "Draft",
+  "CHAPTER_PUBLICATION_NOTICE_PERIOD_IN_DAYS": 14,
+
   "ALLOWED_IMAGE_FORMATS": ["svg", "png", "jpeg", "jpg", "gif"],
   "MAX_ALLOWED_IMAGE_SIZE_IN_KB_FOR_BLOG": 1024,
 
@@ -5037,29 +5045,29 @@ export default {
   // color associated with it. Each category also has a thumbnail icon whose
   // filename is '{{CategoryName}}.svg'.
   "CATEGORIES_TO_COLORS": {
-    "Mathematics": "#cd672b",
-    "Algebra": "#cd672b",
-    "Arithmetic": "#d68453",
-    "Calculus": "#b86330",
-    "Logic": "#d68453",
-    "Combinatorics": "#cf5935",
-    "Graph Theory": "#cf5935",
-    "Probability": "#cf5935",
-    "Statistics": "#cd672b",
-    "Geometry": "#d46949",
-    "Trigonometry": "#d46949",
+    "Mathematics": "#cc4b00",
+    "Algebra": "#cc4b00",
+    "Arithmetic": "#ae511b",
+    "Calculus": "#ae5f2d",
+    "Logic": "#ae511b",
+    "Combinatorics": "#c54f2b",
+    "Graph Theory": "#c54f2b",
+    "Probability": "#c54f2b",
+    "Statistics": "#cc4b00",
+    "Geometry": "#be5637",
+    "Trigonometry": "#be5637",
 
-    "Algorithms": "#d0982a",
-    "Computing": "#bb8b2f",
-    "Programming": "#d9aa53",
+    "Algorithms": "#9d6901",
+    "Computing": "#927117",
+    "Programming": "#886628",
 
-    "Astronomy": "#879d6c",
-    "Biology": "#97a766",
-    "Chemistry": "#aab883",
-    "Engineering": "#8b9862",
-    "Environment": "#aba86d",
-    "Medicine": "#97a766",
-    "Physics": "#879d6c",
+    "Astronomy": "#58613a",
+    "Biology": "#657030",
+    "Chemistry": "#6c7c36",
+    "Engineering": "#6f7a48",
+    "Environment": "#747142",
+    "Medicine": "#657030",
+    "Physics": "#58613a",
 
     "Architecture": "#6e3466",
     "Art": "#895a83",
@@ -5075,11 +5083,11 @@ export default {
     "Gaulish": "#1b4174",
 
     "Business": "#387163",
-    "Economics": "#5d8b7f",
+    "Economics": "#2f836d",
     "Geography": "#3c6d62",
-    "Government": "#538270",
+    "Government": "#507c6b",
     "History": "#3d6b52",
-    "Law": "#538270",
+    "Law": "#507c6b",
 
     "Education": "#942e20",
     "Puzzles": "#a8554a",
@@ -5389,87 +5397,104 @@ export default {
     "id": "en",
     "text": "English",
     "direction": "ltr",
-    "decimal_separator": "."
+    "decimal_separator": ".",
+    "ariaLabelInEnglish": "English"
   }, {
     "id": "pt-br",
     "text": "Português (Brasil)",
     "direction": "ltr",
-    "decimal_separator": ","
+    "decimal_separator": ",",
+    "ariaLabelInEnglish": "Portuguese"
   }, {
     "id": "ar",
     "text": "العربية",
     "direction": "rtl",
-    "decimal_separator": ","
+    "decimal_separator": ",",
+    "ariaLabelInEnglish": "Arabic"
   }, {
     "id": "hi",
     "text": "हिन्दी",
     "direction": "ltr",
-    "decimal_separator": "."
+    "decimal_separator": ".",
+    "ariaLabelInEnglish": "Hindi"
   }, {
     "id": "es",
     "text": "Español",
     "direction": "ltr",
-    "decimal_separator": ","
+    "decimal_separator": ",",
+    "ariaLabelInEnglish": "Spanish"
   }, {
     "id": "bn",
     "text": "বাংলা",
     "direction": "ltr",
-    "decimal_separator": "."
+    "decimal_separator": ".",
+    "ariaLabelInEnglish": "Bangla"
   }, {
     "id": "fr",
     "text": "français",
     "direction": "ltr",
-    "decimal_separator": ","
+    "decimal_separator": ",",
+    "ariaLabelInEnglish": "French"
   }, {
     "id": "id",
     "text": "Bahasa Indonesia",
     "direction": "ltr",
-    "decimal_separator": ","
+    "decimal_separator": ",",
+    "ariaLabelInEnglish": "Indonesian"
   }, {
     "id": "pcm",
     "text": "Naijá (Nigerian Pidgin)",
     "direction": "ltr",
-    "decimal_separator": ","
+    "decimal_separator": ",",
+    "ariaLabelInEnglish": "Nigerian"
   }, {
     "id": "uk",
     "text": "украї́нська мо́ва",
     "direction": "ltr",
-    "decimal_separator": ","
+    "decimal_separator": ",",
+    "ariaLabelInEnglish": "Ukrainian"
   }, {
     "id": "sk",
     "text": "slovenčina",
     "direction": "ltr",
-    "decimal_separator": ","
+    "decimal_separator": ",",
+    "ariaLabelInEnglish": "Slovak"
   }, {
     "id": "nl",
     "text": "Nederlands",
     "direction": "ltr",
-    "decimal_separator": ","
+    "decimal_separator": ",",
+    "ariaLabelInEnglish": "Nederlands"
   }, {
     "id": "kab",
     "text": "Taqbaylit (Kabyle)",
     "direction": "ltr",
-    "decimal_separator": ","
+    "decimal_separator": ",",
+    "ariaLabelInEnglish": "Berber"
   }, {
     "id": "vi",
     "text": "Tiếng Việt",
     "direction": "ltr",
-    "decimal_separator": ","
+    "decimal_separator": ",",
+    "ariaLabelInEnglish": "Vietnamese"
   }, {
     "id": "tr",
     "text": "Türkçe",
     "direction": "ltr",
-    "decimal_separator": ","
+    "decimal_separator": ",",
+    "ariaLabelInEnglish": "Turkish"
   }, {
     "id": "zh-hans",
     "text": "中文(简体)",
     "direction": "ltr",
-    "decimal_separator": "."
+    "decimal_separator": ".",
+    "ariaLabelInEnglish": "Simplified Chinese"
   }, {
     "id": "zh-hant",
     "text": "中文(繁體)",
     "direction": "ltr",
-    "decimal_separator": "."
+    "decimal_separator": ".",
+    "ariaLabelInEnglish": "Traditional Chinese"
   }],
 
   // List of supported audio languages in which we have audio and translations
@@ -6362,8 +6387,6 @@ export default {
   // Maximum allowed length of unique progress url ID.
   "MAX_PROGRESS_URL_ID_LENGTH": 6,
 
-  "PLATFORM_PARAMETER_ALLOWED_BROWSER_TYPES": [
-    "Chrome", "Edge", "Safari", "Firefox", "Others"],
   "PLATFORM_PARAMETER_ALLOWED_PLATFORM_TYPES": ["Web", "Android", "Backend"],
   // The ordering of in ALLOWED_APP_VERSION_FLAVORS implies the ordering
   // of corresponding flavors, which is used in app_version_flavor filter for
@@ -6808,6 +6831,22 @@ export default {
           "PROPERTY_TYPE": "itemprop",
           "PROPERTY_VALUE": "og:description",
           "CONTENT": "Change your Oppia profile settings and preferences"
+        }
+      ]
+    },
+    "FEEDBACK_UPDATES": {
+      "ROUTE": "feedback-updates",
+      "TITLE": "Feedback Updates",
+      "META": [
+        {
+          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_VALUE": "description",
+          "CONTENT": "With Oppia,learn and give feedback to improve the lessons"
+        },
+        {
+          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_VALUE": "og:description",
+          "CONTENT": "With Oppia,learn and give feedback to improve the lessons"
         }
       ]
     },

@@ -1686,3 +1686,74 @@ def get_topic_id_to_topic_name_dict(topic_ids: List[str]) -> Dict[str, str]:
         )
         raise Exception(error_msg)
     return topic_id_to_topic_name
+
+
+def get_chapter_counts_in_topic_summaries(
+    topic_summary_dicts: List[topic_domain.FrontendTopicSummaryDict]
+) -> Dict[str, topic_domain.TopicChapterCounts]:
+    """Returns topic chapter counts for each topic summary dict.
+
+    Args:
+        topic_summary_dicts: List[FrontendTopicSummaryDict]. A list of
+            topic summary dicts.
+
+    Returns:
+        Dict[str, TopicChapterCounts]. Dict of topic id and topic chapter
+        counts domain object.
+    """
+
+    topic_summary_id_mapping: Dict[
+        str, topic_domain.FrontendTopicSummaryDict] = {}
+    for topic_summary in topic_summary_dicts:
+        topic_summary_id_mapping.update({
+            topic_summary['id']: topic_summary})
+
+    topic_ids = [summary['id'] for summary in topic_summary_dicts]
+    all_topics = topic_fetchers.get_topics_by_ids(topic_ids)
+    all_valid_topics = [topic for topic in all_topics if topic is not None]
+    all_story_ids: List[str] = []
+    topic_chapter_counts_dict: Dict[str, topic_domain.TopicChapterCounts] = {}
+    for topic in all_valid_topics:
+        story_ids = [story_reference.story_id for
+            story_reference in topic.canonical_story_references]
+        all_story_ids = all_story_ids + story_ids
+
+    all_stories = story_fetchers.get_stories_by_ids(all_story_ids)
+    all_valid_stories = [story for story in all_stories if story is not None]
+    story_id_mapping: Dict[str, story_domain.Story] = {}
+    for story in all_valid_stories:
+        story_id_mapping.update({story.id: story})
+
+    for topic in all_valid_topics:
+        topic_summary_dict = topic_summary_id_mapping[topic.id]
+        upcoming_chapters_count = 0
+        overdue_chapters_count = 0
+        total_chapter_counts = []
+        published_chapter_counts = []
+        stories = [story_id_mapping[story_reference.story_id] for
+            story_reference in topic.canonical_story_references]
+        for story in stories:
+            nodes = story.story_contents.nodes
+            total_chapters_count = len(nodes)
+            published_chapters_count = 0
+            for node in nodes:
+                if node.status == constants.STORY_NODE_STATUS_PUBLISHED:
+                    published_chapters_count += 1
+                else:
+                    if node.is_node_upcoming():
+                        upcoming_chapters_count += 1
+                    elif node.is_node_behind_schedule():
+                        overdue_chapters_count += 1
+
+            total_chapter_counts.append(total_chapters_count)
+            published_chapter_counts.append(published_chapters_count)
+
+        topic_chapter_counts = topic_domain.TopicChapterCounts(
+            upcoming_chapters_count, overdue_chapters_count,
+            total_chapter_counts, published_chapter_counts)
+
+        topic_chapter_counts_dict.update({
+            topic_summary_dict['id']: topic_chapter_counts
+        })
+
+    return topic_chapter_counts_dict

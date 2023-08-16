@@ -167,6 +167,14 @@ why they need to be overriden.  */
   transform: translate3d(0,-1px,0);
 }
 
+.oppia-focus-indicator-blue:focus {
+  outline: 2px solid rgb(23, 23, 255);
+}
+
+.oppia-focus-indicator-white:focus {
+  outline: 2px solid rgb(255, 255, 255);
+}
+
 .oppia-learner-confirm-button.oppia-learner-submit-answer-button.md-button[disabled],
 .oppia-learner-confirm-button.oppia-learner-submit-answer-button.mat-button[disabled] {
   background-color: transparent;
@@ -493,6 +501,11 @@ input.ng-dirty.ng-invalid, textarea.ng-dirty.ng-invalid, md-input-group.md-defau
   color: red;
 }
 
+.oppia-form-error-container {
+  color: #f00;
+  margin-top: 5px;
+}
+
 .oppia-serious-warning-text {
   color: red;
 }
@@ -652,6 +665,7 @@ img, video, canvas {
 }
 
 textarea {
+  padding: 5px 6px;
   width: 90%;
 }
 
@@ -920,6 +934,14 @@ textarea {
   padding-top: 13px;
 }
 
+.oppia-navbar-breadcrumb li {
+  display: inline-block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  width: calc(100vw - 930px);
+}
+
 .oppia-navbar-breadcrumb-separator {
   margin-right: 8px;
 }
@@ -1010,6 +1032,15 @@ textarea {
   }
   ul.nav.navbar-nav.oppia-navbar-nav.float-right {
     display: flex;
+    flex-direction: row;
+    float: right;
+    margin: 0;
+  }
+}
+@media (min-width: 767px) and (max-width: 992px) {
+  ul.nav.navbar-nav.oppia-navbar-nav.float-right {
+    display: flex;
+    flex-direction: row;
     float: right;
     margin: 0;
   }
@@ -1255,7 +1286,6 @@ span.sort-explorations-select .sort-order {
   width: 200px;
 }
 .oppia-dashboard-intro-button:hover,
-.oppia-dashboard-intro-button:focus,
 .oppia-dashboard-intro-button:active {
   background-color: rgba(5, 190, 178, 1);
   color: #fff;
@@ -1276,7 +1306,7 @@ span.sort-explorations-select .sort-order {
 
 .oppia-toast-container {
   position: fixed;
-  z-index: 1000;
+  z-index: 1020;
 }
 
 .oppia-toast-container * {
@@ -2416,7 +2446,7 @@ div#ng-curtain {
   /* This is larger than the editor tutorial's z-index, but smaller than
      the z-index for Bootstrap modals.
   */
-  z-index: 1005;
+  z-index: 1015;
 }
 
 .oppia-top-of-page-padding {
@@ -2472,7 +2502,6 @@ div#ng-curtain {
   font-weight: 500;
   letter-spacing: 0.7px;
   padding: 17px 12px 10px;
-  padding-left: 3rem;
   text-transform: uppercase;
 }
 .oppia-option-list {
@@ -2850,6 +2879,7 @@ md-card.preview-conversation-skin-supplemental-card {
 .oppia-lost-changes > li > .state-edit-desc > .sub-edit {
   margin-left: 20px;
 }
+.oppia-activity-summary-tile .metrics li,
 .oppia-activity-summary-tile .metrics .row-three,
 .oppia-activity-summary-tile-mobile .metrics .row-three {
   font-size: 0.75em;
@@ -3152,7 +3182,7 @@ oppia-noninteractive-link {
 
 .oppia-activity-summary-tile .rating-disabled,
 .oppia-activity-summary-tile-mobile .rating-disabled {
-  opacity: 0.5;
+  opacity: 0.8;
 }
 
 .oppia-activity-summary-tile [section="right-section"],

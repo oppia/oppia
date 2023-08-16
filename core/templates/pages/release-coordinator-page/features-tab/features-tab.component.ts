@@ -90,11 +90,6 @@ export class FeaturesTabComponent implements OnInit {
         options: AdminFeaturesTabConstants.ALLOWED_PLATFORM_TYPES,
         operators: ['=']
       },
-      [PlatformParameterFilterType.BrowserType]: {
-        displayName: 'Browser Type',
-        options: AdminFeaturesTabConstants.ALLOWED_BROWSER_TYPES,
-        operators: ['=']
-      },
       [PlatformParameterFilterType.AppVersion]: {
         displayName: 'App Version',
         operators: ['=', '<', '>', '<=', '>='],
@@ -122,6 +117,11 @@ export class FeaturesTabComponent implements OnInit {
     })
   );
 
+  DEV_SERVER_STAGE = 'dev';
+  TEST_SERVER_STAGE = 'test';
+  PROD_SERVER_STAGE = 'prod';
+  serverStage: string = '';
+
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
@@ -142,6 +142,7 @@ export class FeaturesTabComponent implements OnInit {
 
   async reloadFeatureFlagsAsync(): Promise<void> {
     const data = await this.apiService.getFeatureFlags();
+    this.serverStage = data.serverStage;
     this.featureFlagsAreFetched = true;
     this.featureFlags = data.featureFlags;
     this.featureFlagNameToBackupMap = new Map(
@@ -194,24 +195,36 @@ export class FeaturesTabComponent implements OnInit {
     feature.rules.splice(ruleIndex + 1, 0, rule);
   }
 
-  async updateFeatureRulesAsync(feature: PlatformParameter): Promise<void> {
-    const issues = this.validateFeatureFlag(feature);
-    if (issues.length > 0) {
-      this.windowRef.nativeWindow.alert(issues.join('\n'));
-      return;
+  getFeatureValidOnCurrentServer(feature: PlatformParameter): boolean {
+    if (this.serverStage === this.DEV_SERVER_STAGE) {
+      return true;
+    } else if (this.serverStage === this.TEST_SERVER_STAGE) {
+      return (
+        feature.featureStage === this.TEST_SERVER_STAGE ||
+        feature.featureStage === this.PROD_SERVER_STAGE
+      ) ? true : false;
+    } else if (this.serverStage === this.PROD_SERVER_STAGE) {
+      return feature.featureStage === this.PROD_SERVER_STAGE ? true : false;
     }
-    const commitMessage = this.windowRef.nativeWindow.prompt(
-      'This action is irreversible. If you insist to proceed, please enter ' +
-      'the commit message for the update',
-      `Update feature '${feature.name}'.`
-    );
-    if (commitMessage === null) {
-      return;
-    }
+    return false;
+  }
 
+  async saveDefaultValueToStorage(): Promise<void> {
+    if (!this.windowRef.nativeWindow.confirm(
+      'This action is irreversible.')) {
+      return;
+    }
+    for (let feature of this.featureFlags) {
+      let commitMessage = `Update default value for '${feature.name}'.`;
+      await this.updateFeatureFlag(feature, commitMessage);
+    }
+  }
+
+  async updateFeatureFlag(
+      feature: PlatformParameter, commitMessage: string): Promise<void> {
     try {
       await this.apiService.updateFeatureFlag(
-        feature.name, commitMessage, feature.rules);
+        feature.name, commitMessage, feature.rules, feature.defaultValue);
 
       this.featureFlagNameToBackupMap.set(feature.name, cloneDeep(feature));
 
@@ -233,6 +246,24 @@ export class FeaturesTabComponent implements OnInit {
     }
   }
 
+  async updateFeatureRulesAsync(feature: PlatformParameter): Promise<void> {
+    const issues = this.validateFeatureFlag(feature);
+    if (issues.length > 0) {
+      this.windowRef.nativeWindow.alert(issues.join('\n'));
+      return;
+    }
+    const commitMessage = this.windowRef.nativeWindow.prompt(
+      'This action is irreversible. If you insist to proceed, please enter ' +
+      'the commit message for the update',
+      `Update feature '${feature.name}'.`
+    );
+    if (commitMessage === null) {
+      return;
+    }
+
+    await this.updateFeatureFlag(feature, commitMessage);
+  }
+
   clearChanges(featureFlag: PlatformParameter): void {
     if (!this.windowRef.nativeWindow.confirm(
       'This will revert all changes you made. Are you sure?')) {
@@ -244,6 +275,7 @@ export class FeaturesTabComponent implements OnInit {
 
     if (backup) {
       featureFlag.rules = cloneDeep(backup.rules);
+      featureFlag.defaultValue = backup.defaultValue;
     }
   }
 
@@ -251,14 +283,17 @@ export class FeaturesTabComponent implements OnInit {
     filter.conditions.splice(0);
   }
 
-  isFeatureFlagRulesChanged(feature: PlatformParameter): boolean {
+  isFeatureFlagChanged(feature: PlatformParameter): boolean {
     const original = this.featureFlagNameToBackupMap.get(
       feature.name
     );
     if (original === undefined) {
       throw new Error('Backup not found for feature flag: ' + feature.name);
     }
-    return !isEqual(original.rules, feature.rules);
+    return (
+      !isEqual(original.rules, feature.rules) ||
+      !isEqual(original.defaultValue, feature.defaultValue)
+    );
   }
 
   /**
@@ -316,12 +351,12 @@ export class FeaturesTabComponent implements OnInit {
     return issues;
   }
 
-  get isDummyFeatureEnabled(): boolean {
-    return this.featureService.status.DummyFeature.isEnabled;
+  get dummyFeatureFlagForE2eTestsIsEnabled(): boolean {
+    return this.featureService.status.DummyFeatureFlagForE2ETests.isEnabled;
   }
 
   async reloadDummyHandlerStatusAsync(): Promise<void> {
-    if (this.isDummyFeatureEnabled) {
+    if (this.dummyFeatureFlagForE2eTestsIsEnabled) {
       this.isDummyApiEnabled = await this.dummyApiService.isHandlerEnabled();
     }
   }

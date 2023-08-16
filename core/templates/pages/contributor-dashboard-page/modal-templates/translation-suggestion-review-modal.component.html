@@ -1,9 +1,9 @@
 <div class="modal-header">
-  <div class="oppia-modal-info">
-    <h3 title="{{ heading }}"
+  <div class="oppia-modal-info" tabindex="0">
+    <h1 title="{{ heading }}"
         class="oppia-modal-info-header">
       {{ heading }}
-    </h3>
+    </h1>
     <span title="{{ subheading }}"
           class="oppia-translation-modal-subheading e2e-translation-suggestion-review-subheading"
           aria-hidden="false">
@@ -133,6 +133,24 @@
       </oppia-rte-output-display>
     </div>
   </section>
+  <section [hidden]="!reviewable"
+           class="oppia-image-review-panel"
+           *ngIf="explorationImagesString">
+    <div class="oppia-exploration-image-container float-left">
+      <oppia-rte-output-display *ngIf="!contentTypeIsSetOfStrings"
+                                  [rteString]="explorationImagesString"
+                                  [altTextIsDisplayed]="altTextIsDisplayed"
+                                  #contentPanelWithAltText>
+      </oppia-rte-output-display>
+    </div>
+    <div class="oppia-suggestion-image-container float-right">
+      <oppia-rte-output-display *ngIf="!contentTypeIsSetOfStrings"
+                                  [rteString]="suggestionImagesString"
+                                  [altTextIsDisplayed]="altTextIsDisplayed"
+                                  #contentPanelWithAltText>
+      </oppia-rte-output-display>
+    </div>
+  </section>
   <div [hidden]="!reviewable"
        class="oppia-suggestion-review-message">
     <label for="reviewMessage">Review message (required if rejecting):</label>
@@ -208,6 +226,25 @@
 </div>
 
 <style>
+  .oppia-image-review-panel {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    overflow-x: auto;
+    padding: 10px;
+  }
+  .oppia-exploration-image-container,
+  .oppia-suggestion-image-container {
+    border: 1px solid #ccc;
+    max-height: 250px;
+    overflow-y: auto;
+    padding: 8px;
+    width: 49%;
+  }
+  oppia-rte-output-display oppia-noninteractive-image {
+    max-height: 50px;
+    max-width: 50px;
+  }
   .oppia-reviewable-message {
     border: 1px solid #ccc;
   }
@@ -386,10 +423,14 @@
       height: fit-content;
       padding: 0;
     }
+    .oppia-image-review-panel {
+      padding: 0;
+    }
     .oppia-modal-info-header {
       font-size: 16px;
       font-weight: normal;
-      margin: 0;
+      margin-bottom: 18.7px;
+      margin-top: 18.7px;
     }
     .oppia-translation-modal-subheading {
       display: none;

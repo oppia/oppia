@@ -49,6 +49,9 @@ module.exports = {
       'http://127.0.0.1:8181/terms',
       'http://127.0.0.1:8181/thanks',
       'http://127.0.0.1:8181/volunteer',
+      'http://127.0.0.1:8181/learn/staging/dummy-topic-one/story',
+      'http://127.0.0.1:8181/learn/staging/dummy-topic-one/story/help-jamie-win-arcade',
+      'http://127.0.0.1:8181/learn/math',
       `http://127.0.0.1:8181/create/${process.env.exploration_id}`,
       `http://127.0.0.1:8181/topic_editor/${process.env.topic_id}`,
       `http://127.0.0.1:8181/skill_editor/${process.env.skill_id}`,
@@ -70,7 +73,6 @@ module.exports = {
       'offscreen-images': ['error', {'minScore': 0.45}],
       'time-to-first-byte': ['off', {}],
       // Best practices category.
-      'errors-in-console': ['error', {'minScore': 1}],
       'no-document-write': ['error', {'minScore': 1}],
       'geolocation-on-start': ['error', {'minScore': 1}],
       'doctype': ['error', {'minScore': 1}],
@@ -83,6 +85,7 @@ module.exports = {
     }
   },
   basePerformanceAssertions: {
+    'errors-in-console': ['error', {'minScore': 1}],
     'modern-image-formats': [
       'error', {'maxLength': 0, 'strategy': 'pessimistic'}
     ],

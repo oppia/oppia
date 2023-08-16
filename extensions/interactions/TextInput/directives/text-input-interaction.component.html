@@ -8,4 +8,7 @@
                          [labelForFocusTarget]="getLabelForFocusTarget()">
     </schema-based-editor>
   </form>
+  <div *ngIf="errorMessageI18nKey" class="oppia-form-error-container">
+    {{errorMessageI18nKey | translate}}
+  </div>
 </div>
