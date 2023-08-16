@@ -124,7 +124,7 @@
         <oppia-opportunities-list [loadOpportunities]="loadOpportunities.bind(this)"
                                   [loadMoreOpportunities]="loadMoreOpportunities.bind(this)"
                                   (clickActionButton)="onClickViewSuggestion($event)"
-                                  [labelRequired]="!activeReviewTab"
+                                  [labelRequired]="!isReviewTranslationsTab()"
                                   [opportunityHeadingTruncationLength]="30"
                                   [showOpportunityButton]="false">
         </oppia-opportunities-list>
@@ -275,7 +275,7 @@
   }
 
   .oppia-contributions-back-button-label {
-    color: #009688;
+    color: #00645d;
     font-weight: bold;
     margin-left: 6px;
   }

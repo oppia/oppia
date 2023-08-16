@@ -29,6 +29,7 @@ from core.domain import param_domain
 from core.domain import story_domain
 from core.domain import story_fetchers
 from core.domain import story_services
+from core.domain import topic_domain
 from core.domain import topic_fetchers
 from core.domain import topic_services
 from core.domain import user_services
@@ -2028,6 +2029,135 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         story = story_fetchers.get_story_by_id(self.STORY_ID)
 
         self.assertIsNone(story.story_contents.initial_node_id)
+
+    def test_get_chapter_notifications_list(self) -> None:
+        canonical_story_id_1 = story_services.get_new_story_id()
+        story = story_domain.Story.create_default_story(
+            canonical_story_id_1, 'title', 'description', self.TOPIC_ID,
+            'url-fragment')
+        story.meta_tag_content = 'story meta content'
+        node_1: story_domain.StoryNodeDict = {
+            'outline': 'outline',
+            'exploration_id': 'exp-1',
+            'destination_node_ids': [],
+            'outline_is_finalized': False,
+            'acquired_skill_ids': [],
+            'id': 'node_1',
+            'title': 'Chapter 1',
+            'description': '',
+            'prerequisite_skill_ids': [],
+            'thumbnail_filename': 'image.svg',
+            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
+                'chapter'][0],
+            'thumbnail_size_in_bytes': 21131,
+            'status': constants.STORY_NODE_STATUS_PUBLISHED,
+            'planned_publication_date_msecs': 1672770600000,
+            'first_publication_date_msecs': 1672684200000,
+            'last_modified_msecs': 1672684200000,
+            'unpublishing_reason': None
+        }
+        node_2: story_domain.StoryNodeDict = {
+            'outline': 'outline',
+            'exploration_id': 'exp-2',
+            'destination_node_ids': [],
+            'outline_is_finalized': False,
+            'acquired_skill_ids': [],
+            'id': 'node_2',
+            'title': 'Chapter 2',
+            'description': '',
+            'prerequisite_skill_ids': [],
+            'thumbnail_filename': 'image.svg',
+            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
+                'chapter'][0],
+            'thumbnail_size_in_bytes': 21131,
+            'status': constants.STORY_NODE_STATUS_DRAFT,
+            'planned_publication_date_msecs': 1672770600000,
+            'first_publication_date_msecs': None,
+            'last_modified_msecs': 1672684200000,
+            'unpublishing_reason': None
+        }
+        node_3: story_domain.StoryNodeDict = {
+            'outline': 'outline',
+            'exploration_id': 'exp-3',
+            'destination_node_ids': [],
+            'outline_is_finalized': False,
+            'acquired_skill_ids': [],
+            'id': 'node_3',
+            'title': 'Chapter 3',
+            'description': '',
+            'prerequisite_skill_ids': [],
+            'thumbnail_filename': 'image.svg',
+            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
+                'chapter'][0],
+            'thumbnail_size_in_bytes': 21131,
+            'status': constants.STORY_NODE_STATUS_READY_TO_PUBLISH,
+            'planned_publication_date_msecs': 1690655400000,
+            'first_publication_date_msecs': None,
+            'last_modified_msecs': 1672684200000,
+            'unpublishing_reason': None
+        }
+        story.story_contents.nodes = [
+            story_domain.StoryNode.from_dict(node_1),
+            story_domain.StoryNode.from_dict(node_2),
+            story_domain.StoryNode.from_dict(node_3)
+        ]
+        story.story_contents.initial_node_id = 'node_1'
+        story.story_contents.next_node_id = 'node_4'
+
+        story_services.save_new_story(self.USER_ID, story)
+        topic_services.add_canonical_story(
+            self.USER_ID, self.TOPIC_ID, canonical_story_id_1)
+
+        topic_id = topic_fetchers.get_new_topic_id()
+        self.save_new_topic(
+            topic_id, self.user_id_admin, name='New name',
+            abbreviated_name='topic-two', url_fragment='topic-two',
+            description='New description',
+            canonical_story_ids=[],
+            additional_story_ids=[],
+            uncategorized_skill_ids=[],
+            subtopics=[], next_subtopic_id=1)
+        topic_services.create_new_topic_rights(topic_id, self.USER_ID)
+
+        topic_services.create_new_topic_rights(self.TOPIC_ID, self.USER_ID)
+        topic_rights = topic_fetchers.get_topic_rights(
+            self.TOPIC_ID, strict=False)
+        assert topic_rights is not None
+        topic_rights.topic_is_published = True
+        commit_cmds = [topic_domain.TopicRightsChange({
+            'cmd': topic_domain.CMD_PUBLISH_TOPIC
+        })]
+        topic_services.save_topic_rights(
+            topic_rights, self.USER_ID, 'Published the topic', commit_cmds)
+
+        def mock_get_current_time_in_millisecs() -> int:
+            return 1690555400000
+
+        with self.swap(
+            utils, 'get_current_time_in_millisecs',
+            mock_get_current_time_in_millisecs):
+            chapter_notifications = (
+                story_services.get_chapter_notifications_stories_list())
+            self.assertEqual(len(chapter_notifications), 1)
+
+            story_publcation_timeliness = (
+                story_domain.StoryPublicationTimeliness(
+                    canonical_story_id_1, 'title', 'Topic', ['Chapter 2'],
+                    ['Chapter 3']))
+            self.assertEqual(
+                chapter_notifications[0].id, story_publcation_timeliness.id)
+            self.assertEqual(
+                chapter_notifications[0].story_name,
+                story_publcation_timeliness.story_name)
+            self.assertEqual(
+                chapter_notifications[0].topic_name,
+                story_publcation_timeliness.topic_name)
+            self.assertEqual(
+                chapter_notifications[0].overdue_chapters,
+                story_publcation_timeliness.overdue_chapters)
+            self.assertEqual(
+                chapter_notifications[0].upcoming_chapters,
+                story_publcation_timeliness.upcoming_chapters)
 
 
 class StoryProgressUnitTests(test_utils.GenericTestBase):

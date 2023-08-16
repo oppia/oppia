@@ -46,6 +46,7 @@ from core.controllers import email_dashboard
 from core.controllers import features
 from core.controllers import feedback
 from core.controllers import feedback_updates
+from core.controllers import firebase
 from core.controllers import improvements
 from core.controllers import incoming_app_feedback_report
 from core.controllers import learner_dashboard
@@ -213,6 +214,10 @@ def get_redirect_route(
 
 # Register the URLs with the classes responsible for handling them.
 URLS = [
+    get_redirect_route(
+        '/<firebase_path:__/auth(?:/.*)?>',
+        firebase.FirebaseProxyPage
+    ),
     get_redirect_route(r'/_ah/warmup', WarmupPage),
     get_redirect_route(r'/splash', SplashRedirectPage),
     get_redirect_route(
@@ -295,6 +300,9 @@ URLS = [
         r'%s/<contribution_type>/<contribution_subtype>' % (
             feconf.CONTRIBUTOR_DASHBOARD_ADMIN_STATS_URL_PREFIX),
         contributor_dashboard_admin.ContributorDashboardAdminStatsHandler),
+    get_redirect_route(
+        r'%s' % (feconf.COMMUNITY_CONTRIBUTION_STATS_URL),
+        contributor_dashboard_admin.CommunityContributionStatsHandler),
     get_redirect_route(
         r'/translationcontributionstatshandler',
         contributor_dashboard_admin.TranslationContributionStatsHandler),
@@ -1186,6 +1194,15 @@ URLS.extend((
         r'/cron/blog_posts/search_rank', cron.CronBlogPostSearchRankHandler),
     get_redirect_route(
         r'/cron/users/dashboard_stats', cron.CronDashboardStatsHandler),
+<<<<<<< HEAD
+=======
+    get_redirect_route(
+        r'/cron/suggestions/translation_contribution_stats',
+        cron.CronTranslationContributionStatsHandler),
+    get_redirect_route(
+        r'/cron/mail/curriculum_admins/chapter_publication_notfications',
+        cron.CronMailChapterPublicationsNotificationsHandler),
+>>>>>>> b63b17d41e4641e990c67599fd97c9c3c547a410
 ))
 
 # Add tasks urls.

@@ -1,6 +1,6 @@
 {
   "name": "oppia",
-  "version": "3.3.1",
+  "version": "3.3.2",
   "description": "Oppia enables the creation of interactive online lessons.",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -149,6 +149,7 @@
     "@ngx-translate/http-loader": "^6.0.0",
     "@popperjs/core": "^2.11.6",
     "@types/angular-translate": "^2.16.2",
+    "@types/diff-match-patch": "^1.0.32",
     "@types/howler": "^2.2.2",
     "@webcomponents/custom-elements": "^1.5.1",
     "angular": "^1.8.2",
@@ -159,6 +160,7 @@
     "browserify-zlib": "^0.2.0",
     "chai": "^4.2.0",
     "codemirror": "^5.61.0",
+    "codemirror-v5.17.0": "npm:codemirror@5.17.0",
     "cropperjs": "^1.5.6",
     "d3": "^5.9.2",
     "d3-array": "^2.4.0",
@@ -168,6 +170,7 @@
     "dayjs": "^1.8.35",
     "default-passive-events": "^2.0.0",
     "dequeue": "^1.0.5",
+    "diff_match_patch": "^0.1.1",
     "fabric": "^4.1.0",
     "firebase": "^8.10.0",
     "gif-frames": "^1.0.1",
