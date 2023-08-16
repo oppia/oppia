@@ -272,7 +272,7 @@ const main = async function() {
   process.env.FIREBASE_AUTH_EMULATOR_HOST = 'localhost:9099';
   FirebaseAdmin.initializeApp({projectId: 'dev-project-id'});
   // Change headless to false to see the puppeteer actions.
-  const browser = await puppeteer.launch({headless: true});
+  const browser = await puppeteer.launch({headless: true, args: ['--no-sandbox']});
   const page = await browser.newPage();
   await page.setViewport({
     width: 1920,
