@@ -104,8 +104,8 @@ export class NoninteractiveImage implements OnInit, OnChanges {
       width: this.dimensions.width + 'px'
     };
     this.miniatureImageContainerStyle = {
-      height: '25px',
-      width: '25px'
+      height: '50px',
+      width: '50px'
     };
     // If viewing a concept card in the exploration player, don't use the
     // preloader service. Since, in that service, the image file names are

@@ -232,7 +232,7 @@
     border: 1px solid #ccc;
     display: flex;
     flex-direction: row;
-    gap: 10px;
+    gap: 1px;
     overflow-x: auto;
     width: 100%;
   }
@@ -378,6 +378,11 @@
   }
 
   @media only screen and (max-width: 700px) {
+    .oppia-exploration-image-container,
+    .oppia-suggestion-image-container {
+      padding: 1px;
+      width: 50%;
+    }
     .oppia-translation-panel {
       margin-top: 12px;
     }

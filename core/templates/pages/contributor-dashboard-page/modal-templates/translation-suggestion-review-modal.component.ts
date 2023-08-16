@@ -216,10 +216,6 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
     this.editedContent = {
       html: this.translationHtml
     };
-    this.explorationImagesString = this.getImageInfoForSuggestion(
-      this.contentHtml);
-    this.suggestionImagesString = this.getImageInfoForSuggestion(
-      this.translationHtml);
   }
 
   refreshActiveContributionState(): void {
@@ -234,7 +230,7 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
     }
     this.activeSuggestion = this.activeContribution.suggestion;
     this.contextService.setCustomEntityContext(
-      AppConstants.IMAGE_CONTEXT.EXPLORATION_SUGGESTIONS,
+      AppConstants.ENTITY_TYPE.EXPLORATION,
       this.activeSuggestion.target_id);
     this.subheading = (
       `${this.activeContribution.details.topic_name} / ` +
@@ -308,6 +304,10 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
         }
       });
     }
+    this.explorationImagesString = this.getImageInfoForSuggestion(
+      this.contentHtml);
+    this.suggestionImagesString = this.getImageInfoForSuggestion(
+      this.translationHtml);
     setTimeout(() => {
       this.computePanelOverflowState();
     }, 0);
