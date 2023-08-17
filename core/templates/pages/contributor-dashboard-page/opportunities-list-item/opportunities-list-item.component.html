@@ -103,7 +103,7 @@
        *ngIf="opportunity?.translationWordCount < 20"
        [ngStyle]="labelStyle">
       <div class="oppia-translation-length-label"
-        ngbTooltip="Translation word count: {{opportunity.translationWordCount}}">
+      ngbTooltip="Translation word count: {{opportunity.translationWordCount === 0 ? 1 : opportunity.translationWordCount}}">
         <ng-container>Short Translation</ng-container>
       </div>
     </div>

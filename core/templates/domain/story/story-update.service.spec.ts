@@ -204,11 +204,15 @@ describe('Story update service', () => {
 
   it('should add/remove a destination node id to/from a node in the story',
     () => {
+      let storyNodeLastModifiedSpy = spyOn(
+        storyUpdateService, 'setStoryNodeLastModifiedMsecs');
       expect(
         _sampleStory.getStoryContents().getNodes()[0].getDestinationNodeIds()
       ).toEqual([]);
       storyUpdateService.addDestinationNodeIdToNode(
         _sampleStory, 'node_1', 'node_2');
+      expect(storyNodeLastModifiedSpy)
+        .toHaveBeenCalled();
 
       // Adding an invalid destination node id should throw an error.
       expect(() => {
@@ -230,6 +234,8 @@ describe('Story update service', () => {
   it('should create a proper backend change dict for adding a destination ' +
     'node id to a node',
   () => {
+    let storyNodeLastModifiedSpy = spyOn(
+      storyUpdateService, 'setStoryNodeLastModifiedMsecs');
     storyUpdateService.addDestinationNodeIdToNode(
       _sampleStory, 'node_1', 'node_2');
     expect(undoRedoService.getCommittableChangeList()).toEqual([{
@@ -239,6 +245,8 @@ describe('Story update service', () => {
       old_value: [],
       node_id: 'node_1'
     }]);
+    expect(storyNodeLastModifiedSpy)
+      .toHaveBeenCalled();
   });
 
   it('should remove/add a prerequisite skill id from/to a node in the story',
