@@ -23,9 +23,7 @@ storage model to be changed without affecting this module and others above it.
 from __future__ import annotations
 
 import copy
-import datetime
 import logging
-import time
 
 from core import feconf
 from core import utils
@@ -1001,25 +999,10 @@ def get_chapter_notifications_stories_list() -> List[
                 overdue_chapters = []
                 upcoming_chapters = []
                 for node in story.story_contents.nodes:
-                    if node.planned_publication_date is not None and (
-                        node.status != constants.STORY_NODE_STATUS_PUBLISHED):
-                        current_time = (
-                            utils.convert_millisecs_time_to_datetime_object(
-                            utils.get_current_time_in_millisecs() -
-                            1000.0 * time.timezone))
-                        chapter_is_upcoming = (
-                            current_time <
-                            node.planned_publication_date <
-                            (current_time + datetime.timedelta(
-                            days=constants.
-                                CHAPTER_PUBLICATION_NOTICE_PERIOD_IN_DAYS)))
-                        chapter_is_behind_schedule = (
-                            node.planned_publication_date < current_time)
-
-                        if chapter_is_upcoming:
-                            upcoming_chapters.append(node.title)
-                        if chapter_is_behind_schedule:
-                            overdue_chapters.append(node.title)
+                    if node.is_node_upcoming():
+                        upcoming_chapters.append(node.title)
+                    if node.is_node_behind_schedule():
+                        overdue_chapters.append(node.title)
 
                 if len(upcoming_chapters) or len(overdue_chapters):
                     story_timeliness = story_domain.StoryPublicationTimeliness(
