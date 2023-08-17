@@ -290,13 +290,14 @@ describe('Blog home page component', () => {
       .not.toHaveBeenCalled();
   });
 
-  describe(' when loading search results page', () => {
+  describe('when loading search results page', () => {
     beforeEach(() => {
       spyOn(urlService, 'getUrlParams').and.returnValue(
         {q: 'search_query'}
       );
-      spyOn(urlInterpolationService, 'getStaticImageUrl').and.returnValue(
-        'image_url');
+      spyOn(
+        urlInterpolationService, 'getStaticCopyrightedImageUrl'
+      ).and.returnValue('image_url');
       spyOnProperty(searchService, 'onInitialSearchResultsLoaded')
         .and.returnValue(mockOnInitialSearchResultsLoaded);
       spyOn(component, 'onSearchQueryChangeExec');
@@ -512,8 +513,9 @@ describe('Blog home page component', () => {
     it('should initialize', () => {
       spyOn(component, 'loadInitialBlogHomePageData');
       spyOn(searchService.onSearchBarLoaded, 'emit');
-      spyOn(urlInterpolationService, 'getStaticImageUrl').and.returnValue(
-        'image_url');
+      spyOn(
+        urlInterpolationService, 'getStaticCopyrightedImageUrl'
+      ).and.returnValue('image_url');
       spyOn(searchService, 'onInitialSearchResultsLoaded')
         .and.returnValue(mockOnInitialSearchResultsLoaded);
       spyOn(searchService.onInitialSearchResultsLoaded, 'subscribe');
@@ -734,9 +736,9 @@ describe('Blog home page component', () => {
   });
 
   it('should get static asset image url', () => {
-    spyOn(urlInterpolationService, 'getStaticAssetUrl')
+    spyOn(urlInterpolationService, 'getStaticCopyrightedImageUrl')
       .and.returnValue('image_url');
 
-    expect(component.getStaticImageUrl('url')).toBe('image_url');
+    expect(component.getStaticCopyrightedImageUrl('url')).toBe('image_url');
   });
 });

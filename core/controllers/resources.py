@@ -278,38 +278,33 @@ class PromoBarHandler(
 
 
 class FaviconHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
+    """Handles favicon image redirection·"""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-    URL_PATH_ARGS_SCHEMAS = {}
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.open_access
     def get(self) -> None:
-        """Returns an asset file.
-
-        Args:
-
-        """
+        """Redirects to correct favicon for particular deployment."""
         self.redirect(fs_services.get_static_asset_url('favicon.ico'))
 
 
 class RobotsTxtHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
+    """Handles robots.txt redirection·"""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-    URL_PATH_ARGS_SCHEMAS = {}
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str]  = {}
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.open_access
     def get(self) -> None:
-        """Returns an asset file.
-
-        Args:
-
-        """
+        """Redirects to correct robots.txt for particular deployment."""
         self.redirect(fs_services.get_static_asset_url('robots.txt'))
 
 
-class StaticImagesHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
+class CopyrightImagesHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
+    """Handles copyrighted images redirection·"""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS = {
@@ -328,10 +323,11 @@ class StaticImagesHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
 
     @acl_decorators.open_access
     def get(self, folder: str, filename: str) -> None:
-        """Returns an asset file.
+        """Redirects to correct copyrighted image for particular deployment.
 
         Args:
-
+            folder: str. The folder in which the image is.
+            filename: str. The filename of the image.
         """
         self.redirect(
             fs_services.get_static_asset_url('/copyrighted-images/%s/%s' % (folder, filename)))

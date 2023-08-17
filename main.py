@@ -1231,7 +1231,7 @@ URLS.extend((
     get_redirect_route('/robots.txt', resources.RobotsTxtHandler),
     get_redirect_route(
         '/assets/copyrighted-images/<folder>/<filename>',
-        resources.StaticImagesHandler
+        resources.CopyrightImagesHandler
     ),
 ))
 

@@ -407,12 +407,21 @@ def copy_images(
 
 
 def get_static_asset_url(filepath: str) -> str:
-    """Returns the url for the static assets.
+    """Returns the URL for the static assets that differ between
+    deployment.
+
+    Args:
+        filepath: str. The filepath to the file for which the URL
+            should be returned.
 
     Returns:
-        str. The url for the static assets.
+        str. The URL of the file.
     """
     if constants.EMULATOR_MODE:
+        # By using assetsstatic the app returns the requested
+        # files in assets folder by that it bypasses
+        # the handlers that call this method, thus preventing
+        # loop.
         return 'http://localhost:8181/assetsstatic/%s' % (
             filepath
         )

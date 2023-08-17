@@ -91,7 +91,7 @@ describe('Post Publish Modal Controller', function() {
     contextService = TestBed.inject(ContextService);
     urlInterpolationService = TestBed.inject(UrlInterpolationService);
     spyOn(contextService, 'getExplorationId').and.returnValue(explorationId);
-    spyOn(urlInterpolationService, 'getStaticImageUrl')
+    spyOn(urlInterpolationService, 'getStaticCopyrightedImageUrl')
       .and.returnValue(address);
     fixture.detectChanges();
   });

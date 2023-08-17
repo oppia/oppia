@@ -120,8 +120,10 @@ describe('Search Results component', () => {
 
   it('should get static image url', () => {
     let staticUrl = 'test_url';
-    spyOn(urlInterpolationService, 'getStaticAssetUrl')
+    spyOn(urlInterpolationService, 'getStaticCopyrightedImageUrl')
       .and.returnValue(staticUrl);
-    expect(componentInstance.getStaticImageUrl('path')).toEqual(staticUrl);
+    expect(
+      componentInstance.getStaticCopyrightedImageUrl('path')
+    ).toEqual(staticUrl);
   });
 });
