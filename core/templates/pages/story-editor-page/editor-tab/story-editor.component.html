@@ -297,26 +297,26 @@
                                  'draft-node': (node.getStatus() === 'Draft')}"
                       (click)="navigateToChapterWithId(node.getId(), idx)"
                       cdkDrag
-                      [cdkDragDisabled]="node.getStatus()=='Published'"
+                      [cdkDragDisabled]="isDragAndDropDisabled(node)"
                       [cdkDragData]="node">
                     <td class="drag-handler" (click)="$event.stopPropagation()">
                       <span class="fas fa-grip-vertical draggable-icon-indicator"
                             *ngIf="node.getStatus()!=='Published'">
                       </span>
                     </td>
-                    <td class="chapter-index"> {{ idx+1 }}. </td>
+                    <td class="chapter-index"> {{ idx+1 }} </td>
                     <td class="e2e-test-chapter-title chapter-title">{{ node.getTitle() }}</td>
                     <td class="chapter-status">
                       {{ node.getStatus() }}
                     </td>
                     <td class="chapter-last-modified">
-                        {{ dateTimeFormatService.getLocaleAbbreviatedDatetimeString(node.getLastModifiedMsecs()) }}
+                        {{ dateTimeFormatService.getLocaleDateTimeHourString(node.getLastModifiedMsecs()) }}
                       <div *ngIf="node.getStatus()=='Published'">(published)</div>
                       <div *ngIf="node.getStatus()=='Ready To Publish'">(draft modified)</div>
                       <div *ngIf="node.getStatus()=='Draft'">(draft added)</div>
                     </td>
                     <td class="chapter-planned-publication-date">{{ node.getPlannedPublicationDateMsecs() != null ?
-                      dateTimeFormatService.getLocaleAbbreviatedDatetimeString(node.getPlannedPublicationDateMsecs()): '-' }}
+                      getMediumStyleLocaleDateString(node.getPlannedPublicationDateMsecs()): '-' }}
                     </td>
                     <td class="edit-options-container">
                       <i class="fa fa-ellipsis-v chapter-edit-toggle-button e2e-test-edit-options"
@@ -799,11 +799,15 @@
       padding-top: 15px;
     }
   }
-  @media screen and (max-width: 375px) {
-
+  @media screen and (max-width: 425px) {
     .drag-handler,.drag-handler-header {
       display: none;
     }
+    .chapter-control-panel {
+      padding: 20px 0 15px;
+    }
+  }
+  @media screen and (max-width: 375px) {
     .chapter-control-bar {
       flex-direction: column;
       padding-left: 5px;
@@ -816,9 +820,6 @@
     }
     .story-nodes-container table {
       font-size: 12px;
-    }
-    .chapter-control-panel {
-      padding: 20px 0 15px;
     }
     .chapter-edit-option span {
       font-size: 12px;
