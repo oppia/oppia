@@ -16,6 +16,7 @@
 
 from __future__ import annotations
 
+import datetime
 import os
 
 from core import feconf
@@ -23,6 +24,7 @@ from core import utils
 from core.constants import constants
 from core.domain import config_domain
 from core.domain import skill_services
+from core.domain import story_domain
 from core.domain import story_fetchers
 from core.domain import story_services
 from core.domain import topic_domain
@@ -116,15 +118,100 @@ class TopicEditorStoryHandlerTests(BaseTopicEditorControllerTests):
 
     def test_handler_updates_story_summary_dicts(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL)
+        self.save_new_valid_exploration(
+            'exp-1', self.admin_id, title='Title 1', end_state_name='End',
+            correctness_feedback_enabled=True)
+        self.publish_exploration(self.admin_id, 'exp-1')
+        self.save_new_valid_exploration(
+            'exp-2', self.admin_id, title='Title 2', end_state_name='End',
+            correctness_feedback_enabled=True)
+        self.publish_exploration(self.admin_id, 'exp-2')
+        self.save_new_valid_exploration(
+            'exp-3', self.admin_id, title='Title 3', end_state_name='End',
+            correctness_feedback_enabled=True)
+        self.publish_exploration(self.admin_id, 'exp-3')
 
         topic_id = topic_fetchers.get_new_topic_id()
-        canonical_story_id = story_services.get_new_story_id()
+        canonical_story_id_1 = story_services.get_new_story_id()
+        canonical_story_id_2 = story_services.get_new_story_id()
+        canonical_story_id_3 = story_services.get_new_story_id()
         additional_story_id = story_services.get_new_story_id()
 
         # 'self.topic_id' does not contain any canonical_story_summary_dicts
         # or additional_story_summary_dicts.
         response = self.get_json(
             '%s/%s' % (feconf.TOPIC_EDITOR_STORY_URL, self.topic_id))
+        story = story_domain.Story.create_default_story(
+            canonical_story_id_1, 'title', 'description', topic_id,
+            'url-fragment')
+        story.meta_tag_content = 'story meta content'
+        node_1: story_domain.StoryNodeDict = {
+            'outline': 'outline',
+            'exploration_id': 'exp-1',
+            'destination_node_ids': [],
+            'outline_is_finalized': False,
+            'acquired_skill_ids': [],
+            'id': 'node_1',
+            'title': 'Chapter 1',
+            'description': '',
+            'prerequisite_skill_ids': [],
+            'thumbnail_filename': 'image.svg',
+            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
+                'chapter'][0],
+            'thumbnail_size_in_bytes': 21131,
+            'status': constants.STORY_NODE_STATUS_PUBLISHED,
+            'planned_publication_date_msecs': None,
+            'first_publication_date_msecs': 1672684200000,
+            'last_modified_msecs': 1672684200000,
+            'unpublishing_reason': None
+        }
+        node_2: story_domain.StoryNodeDict = {
+            'outline': 'outline',
+            'exploration_id': 'exp-2',
+            'destination_node_ids': [],
+            'outline_is_finalized': False,
+            'acquired_skill_ids': [],
+            'id': 'node_2',
+            'title': 'Chapter 2',
+            'description': '',
+            'prerequisite_skill_ids': [],
+            'thumbnail_filename': 'image.svg',
+            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
+                'chapter'][0],
+            'thumbnail_size_in_bytes': 21131,
+            'status': constants.STORY_NODE_STATUS_DRAFT,
+            'planned_publication_date_msecs': 1672770600000,
+            'first_publication_date_msecs': None,
+            'last_modified_msecs': 1672684200000,
+            'unpublishing_reason': None
+        }
+        node_3: story_domain.StoryNodeDict = {
+            'outline': 'outline',
+            'exploration_id': 'exp-3',
+            'destination_node_ids': [],
+            'outline_is_finalized': False,
+            'acquired_skill_ids': [],
+            'id': 'node_3',
+            'title': 'Chapter 3',
+            'description': '',
+            'prerequisite_skill_ids': [],
+            'thumbnail_filename': 'image.svg',
+            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
+                'chapter'][0],
+            'thumbnail_size_in_bytes': 21131,
+            'status': constants.STORY_NODE_STATUS_READY_TO_PUBLISH,
+            'planned_publication_date_msecs': 1690655400000,
+            'first_publication_date_msecs': None,
+            'last_modified_msecs': 1672684200000,
+            'unpublishing_reason': None
+        }
+        story.story_contents.nodes = [
+            story_domain.StoryNode.from_dict(node_1),
+            story_domain.StoryNode.from_dict(node_2),
+            story_domain.StoryNode.from_dict(node_3)
+        ]
+        story.story_contents.initial_node_id = 'node_1'
+        story.story_contents.next_node_id = 'node_4'
 
         self.assertEqual(response['canonical_story_summary_dicts'], [])
         self.assertEqual(response['additional_story_summary_dicts'], [])
@@ -133,18 +220,20 @@ class TopicEditorStoryHandlerTests(BaseTopicEditorControllerTests):
             topic_id, self.admin_id, name='New name',
             abbreviated_name='topic-two', url_fragment='topic-two',
             description='New description',
-            canonical_story_ids=[canonical_story_id],
+            canonical_story_ids=[canonical_story_id_1, canonical_story_id_2,
+                canonical_story_id_3],
             additional_story_ids=[additional_story_id],
             uncategorized_skill_ids=[self.skill_id],
             subtopics=[], next_subtopic_id=1)
 
+        story_services.save_new_story(self.admin_id, story)
         self.save_new_story(
-            canonical_story_id,
+            canonical_story_id_2,
             self.admin_id,
             topic_id,
-            title='title',
-            description='description',
-            notes='note'
+            title='title 2',
+            description='description 2',
+            notes='note 2'
         )
         self.save_new_story(
             additional_story_id,
@@ -155,33 +244,65 @@ class TopicEditorStoryHandlerTests(BaseTopicEditorControllerTests):
             notes='another note'
         )
 
+        story_summary = story_domain.StorySummary(
+            story_id=canonical_story_id_3,
+            title='title 3',
+            description='description 3',
+            language_code='en',
+            version=1,
+            node_titles=[],
+            thumbnail_bg_color=constants.ALLOWED_THUMBNAIL_BG_COLORS[
+                'story'][0],
+            thumbnail_filename='img.svg',
+            url_fragment='url',
+            story_model_created_on=datetime.datetime.today(),
+            story_model_last_updated=datetime.datetime.today()
+        )
+        story_services.save_story_summary(story_summary)
+
         topic_services.publish_story(
-            topic_id, canonical_story_id, self.admin_id)
+            topic_id, canonical_story_id_1, self.admin_id)
+        topic_services.publish_story(
+            topic_id, canonical_story_id_2, self.admin_id)
 
-        response = self.get_json(
-            '%s/%s' % (feconf.TOPIC_EDITOR_STORY_URL, topic_id))
-        canonical_story_summary_dict = response[
-            'canonical_story_summary_dicts'][0]
-        additional_story_summary_dict = response[
-            'additional_story_summary_dicts'][0]
+        def mock_get_current_time_in_millisecs() -> int:
+            return 1690555400000
 
-        self.assertEqual(
-            canonical_story_summary_dict['description'], 'description')
-        self.assertEqual(canonical_story_summary_dict['title'], 'title')
-        self.assertEqual(
-            canonical_story_summary_dict['id'], canonical_story_id)
-        self.assertEqual(
-            canonical_story_summary_dict['story_is_published'], True)
+        with self.swap(
+            utils, 'get_current_time_in_millisecs',
+            mock_get_current_time_in_millisecs):
+            response = self.get_json(
+                '%s/%s' % (feconf.TOPIC_EDITOR_STORY_URL, topic_id))
+            canonical_story_summary_dict = response[
+                'canonical_story_summary_dicts'][0]
+            additional_story_summary_dict = response[
+                'additional_story_summary_dicts'][0]
 
-        self.assertEqual(
-            additional_story_summary_dict['description'],
-            'another description')
-        self.assertEqual(
-            additional_story_summary_dict['title'], 'another title')
-        self.assertEqual(
-            additional_story_summary_dict['id'], additional_story_id)
-        self.assertEqual(
-            additional_story_summary_dict['story_is_published'], False)
+            self.assertEqual(
+                canonical_story_summary_dict['description'], 'description')
+            self.assertEqual(canonical_story_summary_dict['title'], 'title')
+            self.assertEqual(
+                canonical_story_summary_dict['id'], canonical_story_id_1)
+            self.assertEqual(
+                canonical_story_summary_dict['story_is_published'], True)
+            self.assertEqual(
+                canonical_story_summary_dict['total_chapters_count'], 3)
+            self.assertEqual(
+                canonical_story_summary_dict['published_chapters_count'], 1)
+            self.assertEqual(
+                canonical_story_summary_dict['upcoming_chapters_count'], 1)
+            self.assertEqual(
+                canonical_story_summary_dict['overdue_chapters_count'], 1)
+
+            self.assertEqual(
+                additional_story_summary_dict['description'],
+                'another description')
+            self.assertEqual(
+                additional_story_summary_dict['title'], 'another title')
+            self.assertEqual(
+                additional_story_summary_dict['id'], additional_story_id)
+            self.assertEqual(
+                additional_story_summary_dict['story_is_published'], False)
 
         self.logout()
 

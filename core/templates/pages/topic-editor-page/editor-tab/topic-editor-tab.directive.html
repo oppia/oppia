@@ -466,7 +466,7 @@
            aria-hidden="true">
         </i>
       </div>
-      <div *ngIf="storiesListIsShown" class="oppia-mobile-collapsible-card-content">
+      <div *ngIf="storiesListIsShown" class="oppia-mobile-collapsible-card-content stories-list-container">
         <button class="btn add-story-btn e2e-test-create-story-button oppia-autofocus"
                 (click)="createCanonicalStory()"
                 [oppiaFocusOn]="addStoryBtn"
@@ -516,7 +516,7 @@
     flex-wrap: wrap;
     justify-content: center;
     margin: 0 auto;
-    width: 85%;
+    width: 95%;
   }
 
   .topic-editor .topic-content-container {
@@ -679,7 +679,7 @@
 
   .topic-editor .item-list-card {
     font-family: Roboto, Arial, sans-serif;
-    padding: 30px 55px 30px 45px;
+    padding: 20px 20px 20px 25px;
   }
 
   .topic-editor .list-header {
@@ -1004,6 +1004,12 @@
 
     .topic-editor .uncategorized-skill-option-box {
       right: 43px;
+    }
+  }
+
+  @media screen and (max-width: 375px) {
+    .stories-list-container {
+      padding: 20px 15px 15px;
     }
   }
 </style>

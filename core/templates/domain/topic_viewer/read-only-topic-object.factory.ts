@@ -166,7 +166,11 @@ export class ReadOnlyTopicObjectFactory {
             storyDict.id, storyDict.title, storyDict.node_titles,
             storyDict.thumbnail_filename, storyDict.thumbnail_bg_color,
             storyDict.description, true, storyDict.completed_node_titles,
-            storyDict.url_fragment, allNodes, undefined, undefined, undefined);
+            storyDict.url_fragment, allNodes, undefined, undefined, undefined,
+            storyDict.published_chapters_count, storyDict.total_chapters_count,
+            storyDict.upcoming_chapters_count,
+            storyDict.upcoming_chapters_expected_days,
+            storyDict.overdue_chapters_count, storyDict.completed_node_titles);
         });
     let additionalStories =
         topicDataDict.additional_story_dicts.map(storyDict => {
@@ -179,7 +183,11 @@ export class ReadOnlyTopicObjectFactory {
             storyDict.id, storyDict.title, storyDict.node_titles,
             storyDict.thumbnail_filename, storyDict.thumbnail_bg_color,
             storyDict.description, true, storyDict.completed_node_titles,
-            storyDict.url_fragment, allNodes, undefined, undefined, undefined);
+            storyDict.url_fragment, allNodes, undefined, undefined, undefined,
+            storyDict.published_chapters_count, storyDict.total_chapters_count,
+            storyDict.upcoming_chapters_count,
+            storyDict.upcoming_chapters_expected_days,
+            storyDict.overdue_chapters_count, storyDict.completed_node_titles);
         });
     return new ReadOnlyTopic(
       topicDataDict.topic_name, topicDataDict.topic_id,

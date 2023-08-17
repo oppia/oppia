@@ -30,6 +30,7 @@ import { WindowRef } from 'services/contextual/window-ref.service';
 import { DeleteStoryModalComponent } from '../modal-templates/delete-story-modal.component';
 import { TopicRights } from 'domain/topic/topic-rights.model';
 import { TopicEditorStateService } from '../services/topic-editor-state.service';
+import { PlatformFeatureService } from 'services/platform-feature.service';
 
 @Component({
   selector: 'oppia-topic-editor-stories-list',
@@ -48,7 +49,8 @@ export class TopicEditorStoriesListComponent implements OnInit {
     private undoRedoService: UndoRedoService,
     private urlInterpolationService: UrlInterpolationService,
     private windowRef: WindowRef,
-    private topicEditorStateService: TopicEditorStateService
+    private topicEditorStateService: TopicEditorStateService,
+    private platformFeatureService: PlatformFeatureService
   ) {}
 
   STORY_EDITOR_URL_TEMPLATE = '/story_editor/<story_id>';
@@ -105,9 +107,30 @@ export class TopicEditorStoriesListComponent implements OnInit {
     });
   }
 
+  isSerialChapterLaunchFeatureEnabled(): boolean {
+    return this.platformFeatureService.status.
+      SerialChapterLaunchCurriculumAdminView.isEnabled;
+  }
+
+  areChaptersAwaitingPublication(summary: StorySummary): boolean {
+    return (
+      summary.getTotalChaptersCount() !== summary.getPublishedChaptersCount());
+  }
+
+  isChapterNotificationsEmpty(summary: StorySummary): boolean {
+    return (
+      summary.getUpcomingChaptersCount() === 0 &&
+      summary.getOverdueChaptersCount() === 0);
+  }
+
   ngOnInit(): void {
-    this.STORY_TABLE_COLUMN_HEADINGS = [
-      'title', 'node_count', 'publication_status'];
+    if (this.isSerialChapterLaunchFeatureEnabled()) {
+      this.STORY_TABLE_COLUMN_HEADINGS = [
+        'title', 'publication_status', 'node_count', 'notifications'];
+    } else {
+      this.STORY_TABLE_COLUMN_HEADINGS = [
+        'title', 'node_count', 'publication_status'];
+    }
     this.topicRights = this.topicEditorStateService.getTopicRights();
   }
 }

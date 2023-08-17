@@ -72,8 +72,8 @@ describe('NoninteractiveVideo', () => {
   it('should initialize component when video is added to the RTE', () => {
     spyOn(htmlEscaperService, 'escapedJsonToObj').and.callThrough();
     spyOn(contextService, 'isInExplorationEditorMode').and.returnValue(true);
-    spyOnProperty(window, 'innerHeight').and.returnValue(1054);
-    spyOnProperty(window, 'innerWidth').and.returnValue(1098);
+    spyOnProperty(window, 'innerHeight', 'get').and.returnValue(1054);
+    spyOnProperty(window, 'innerWidth', 'get').and.returnValue(1098);
     spyOn(Element.prototype, 'getBoundingClientRect').and.callFake(
       jasmine.createSpy('getBoundingClientRect').and
         .returnValue(boundingClientRect));
@@ -90,8 +90,8 @@ describe('NoninteractiveVideo', () => {
   it('should enable video when not in exploration editor', () => {
     spyOn(htmlEscaperService, 'escapedJsonToObj').and.callThrough();
     spyOn(contextService, 'isInExplorationEditorMode').and.returnValue(false);
-    spyOnProperty(window, 'innerHeight').and.returnValue(1054);
-    spyOnProperty(window, 'innerWidth').and.returnValue(1098);
+    spyOnProperty(window, 'innerHeight', 'get').and.returnValue(1054);
+    spyOnProperty(window, 'innerWidth', 'get').and.returnValue(1098);
     spyOn(Element.prototype, 'getBoundingClientRect').and.callFake(
       jasmine.createSpy('getBoundingClientRect').and
         .returnValue(boundingClientRect));
@@ -107,8 +107,8 @@ describe('NoninteractiveVideo', () => {
 
   it('should autoplay video if user is in learner view and creator has' +
     ' specified to autoplay given video.', () => {
-    spyOnProperty(window, 'innerHeight').and.returnValue(1054);
-    spyOnProperty(window, 'innerWidth').and.returnValue(1098);
+    spyOnProperty(window, 'innerHeight', 'get').and.returnValue(1054);
+    spyOnProperty(window, 'innerWidth', 'get').and.returnValue(1098);
     spyOn(Element.prototype, 'getBoundingClientRect').and.callFake(
       jasmine.createSpy('getBoundingClientRect').and
         .returnValue(boundingClientRect));
@@ -131,8 +131,8 @@ describe('NoninteractiveVideo', () => {
 
   it('should not autoplay video if user is in learner view and creator has' +
     ' not specified to autoplay given video.', () => {
-    spyOnProperty(window, 'innerHeight').and.returnValue(1054);
-    spyOnProperty(window, 'innerWidth').and.returnValue(1098);
+    spyOnProperty(window, 'innerHeight', 'get').and.returnValue(1054);
+    spyOnProperty(window, 'innerWidth', 'get').and.returnValue(1098);
     spyOn(Element.prototype, 'getBoundingClientRect').and.callFake(
       jasmine.createSpy('getBoundingClientRect').and
         .returnValue(boundingClientRect));
@@ -153,8 +153,8 @@ describe('NoninteractiveVideo', () => {
   });
 
   it('should update video view if user changes video parameters', () => {
-    spyOnProperty(window, 'innerHeight').and.returnValue(1054);
-    spyOnProperty(window, 'innerWidth').and.returnValue(1098);
+    spyOnProperty(window, 'innerHeight', 'get').and.returnValue(1054);
+    spyOnProperty(window, 'innerWidth', 'get').and.returnValue(1098);
     spyOn(Element.prototype, 'getBoundingClientRect').and.callFake(
       jasmine.createSpy('getBoundingClientRect').and
         .returnValue(boundingClientRect));
