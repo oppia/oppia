@@ -16,9 +16,8 @@
  * @fileoverview Service for Computing length of HTML strings.
  */
 
-import { Injectable, SecurityContext } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { LoggerService } from './contextual/logger.service';
-import { DomSanitizer} from '@angular/platform-browser';
 
 @Injectable({
   providedIn: 'root'
@@ -26,7 +25,6 @@ import { DomSanitizer} from '@angular/platform-browser';
 export class HtmlLengthService {
   constructor(
     private loggerService: LoggerService,
-    private _sanitizer: DomSanitizer
   ) {}
 
   /**
@@ -48,11 +46,8 @@ export class HtmlLengthService {
       this.loggerService.error('Empty string was passed to compute length');
       return 0;
     }
-    const sanitizedHtml = this._sanitizer.sanitize(
-      SecurityContext.HTML, htmlString) as string;
     let domparser = new DOMParser();
-    let dom = domparser.parseFromString(sanitizedHtml, 'text/html');
-
+    let dom = domparser.parseFromString(htmlString, 'text/html');
     const tagList = Array.from(dom.body.querySelectorAll(
       'p,ul,ol,oppia-noninteractive-image,oppia-noninteractive-math'));
     let totalWeight = 0;
