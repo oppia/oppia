@@ -24,6 +24,12 @@ import { ContributionAndReviewBackendApiService, ContributorCertificateResponse 
 import { SuggestionBackendDict } from 'domain/suggestion/suggestion.model';
 import { StateBackendDict } from 'domain/state/StateObjectFactory';
 import { ImagesData } from 'services/image-local-storage.service';
+import { ReadOnlyExplorationBackendApiService }
+  from 'domain/exploration/read-only-exploration-backend-api.service';
+import { ComputeGraphService } from 'services/compute-graph.service';
+import { States } from 'domain/exploration/StatesObjectFactory';
+import { ExplorationObjectFactory, Exploration}
+  from 'domain/exploration/ExplorationObjectFactory';
 
 export interface OpportunityDict {
   'skill_id': string;
@@ -77,7 +83,13 @@ export class ContributionAndReviewService {
 
   constructor(
     private contributionAndReviewBackendApiService:
-      ContributionAndReviewBackendApiService
+      ContributionAndReviewBackendApiService,
+      private readOnlyExplorationBackendApiService:
+      ReadOnlyExplorationBackendApiService,
+    private computeGraphService:
+      ComputeGraphService,
+    private explorationObjectFactory:
+      ExplorationObjectFactory
   ) {}
 
   getActiveTabType(): string {
@@ -170,6 +182,135 @@ export class ContributionAndReviewService {
     );
   }
 
+  async fetchTranslationSuggestionsAsync(
+      explorationId: string
+  ): Promise<FetchSuggestionsResponse> {
+    const explorationBackendResponse = await this.
+      readOnlyExplorationBackendApiService.fetchExplorationAsync(
+        explorationId, null);
+    return (
+      this.contributionAndReviewBackendApiService.
+        fetchSuggestionsAsync(
+          'REVIEWABLE_TRANSLATION_SUGGESTIONS',
+          null,
+          0,
+          AppConstants.SUGGESTIONS_SORT_KEY_DATE,
+          explorationId
+        ).then((fetchSuggestionsResponse) => {
+          const exploration: Exploration = this.explorationObjectFactory.
+            createFromExplorationBackendResponse(
+              explorationBackendResponse);
+          const sortedTranslationSuggestions = (
+            this.sortTranslationSuggestionsByState(
+              fetchSuggestionsResponse.suggestions,
+              exploration.getStates(),
+              exploration.initStateName));
+          const responseSuggestionIdToDetails: SuggestionDetailsDict = {};
+          sortedTranslationSuggestions.forEach((suggestion) => {
+            const suggestionDetails = {
+              suggestion: suggestion,
+              details: (
+                fetchSuggestionsResponse.target_id_to_opportunity_dict[
+                  suggestion.target_id])
+            };
+            responseSuggestionIdToDetails[
+              suggestion.suggestion_id] = suggestionDetails;
+          });
+          return {
+            suggestionIdToDetails: responseSuggestionIdToDetails,
+            more: false
+          };
+        })
+    );
+  }
+
+  sortTranslationSuggestionsByState(
+      translationSuggestions: SuggestionBackendDict[],
+      states: States,
+      initStateName: string | null
+  ): SuggestionBackendDict[] {
+    if (!initStateName) {
+      return translationSuggestions;
+    }
+
+    const stateNamesInOrder = this.computeGraphService.
+      computeBfsTraversalOfStates(
+        initStateName,
+        states,
+        initStateName
+      );
+    const translationSuggestionsByState = (
+      ContributionAndReviewService
+        .groupTranslationSuggestionsByState(translationSuggestions));
+    const sortedTranslationCards: SuggestionBackendDict[] = [];
+
+    for (const stateName of stateNamesInOrder) {
+      const cardsForState = (
+        translationSuggestionsByState.get(stateName) || []);
+      cardsForState.sort(
+        ContributionAndReviewService.compareTranslationSuggestions);
+      sortedTranslationCards.push(...cardsForState);
+    }
+    return sortedTranslationCards;
+  }
+
+  private static groupTranslationSuggestionsByState(
+      translationSuggestions: SuggestionBackendDict[]):
+      Map<string, SuggestionBackendDict[]> {
+    const translationSuggestionsByState = new Map<
+    string, SuggestionBackendDict[]>();
+
+    for (const translationSuggestion of translationSuggestions) {
+      const stateName = translationSuggestion.change.state_name;
+      const suggestionsForState = translationSuggestionsByState.get(
+        stateName) || [];
+      suggestionsForState.push(translationSuggestion);
+      translationSuggestionsByState.set(stateName, suggestionsForState);
+    }
+    return translationSuggestionsByState;
+  }
+
+  // Compares translation suggestions based on type and index.
+  private static compareTranslationSuggestions(
+      cardA: SuggestionBackendDict,
+      cardB: SuggestionBackendDict
+  ): number {
+    const cardATypeOrder = ContributionAndReviewService.
+      getTranslationContentTypeOrder(cardA.change.content_id);
+    const cardBTypeOrder = ContributionAndReviewService
+      .getTranslationContentTypeOrder(cardB.change.content_id);
+
+    if (cardATypeOrder !== cardBTypeOrder) {
+      return cardATypeOrder - cardBTypeOrder;
+    } else {
+      const cardAIndex = ContributionAndReviewService
+        .getTranslationContentIndex(cardA.change.content_id);
+      const cardBIndex = ContributionAndReviewService
+        .getTranslationContentIndex(cardB.change.content_id);
+      return cardAIndex - cardBIndex;
+    }
+  }
+
+  // Returns the type order for a given content ID.
+  private static getTranslationContentTypeOrder(contentId: string): number {
+    const contentOrders: Map<string, number> = new Map([
+      ['content', 0],
+      ['interaction', 1],
+      ['feedback', 2],
+      ['default', 3],
+      ['hints', 4],
+      ['solution', 5]
+    ]);
+    const type = contentId.split('_')[0];
+    return contentOrders.get(type) ?? Number.MAX_SAFE_INTEGER;
+  }
+
+  // Returns index for a given content ID.
+  private static getTranslationContentIndex(contentId: string): number {
+    const index = parseInt(contentId.split('_')[1]);
+    return isNaN(index) ? Number.MAX_SAFE_INTEGER : index;
+  }
+
   async getUserCreatedQuestionSuggestionsAsync(
       shouldResetOffset: boolean = true,
       sortKey: string
@@ -206,10 +347,13 @@ export class ContributionAndReviewService {
       explorationId?: string
   ): Promise<FetchSuggestionsResponse> {
     this.reviewableTranslationFetcher.sortKey = sortKey;
+    if (explorationId) {
+      return this.fetchTranslationSuggestionsAsync(
+        explorationId);
+    }
     return this.fetchSuggestionsAsync(
       this.reviewableTranslationFetcher,
-      shouldResetOffset,
-      explorationId);
+      shouldResetOffset);
   }
 
   reviewExplorationSuggestion(
