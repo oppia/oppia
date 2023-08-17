@@ -142,7 +142,8 @@ describe('Translator Overview component', () => {
       entityTranslationsService.languageCodeToEntityTranslations = {
         hi: entityTranslation
       };
-      windowRef.nativeWindow.localStorage.getItem = () => 'hi';
+      spyOn(
+        windowRef.nativeWindow.localStorage, 'getItem').and.returnValue('hi');
       entityTranslationsService.getEntityTranslationsAsync = (
         jasmine.createSpy().and.returnValue(Promise.resolve(entityTranslation))
       );
