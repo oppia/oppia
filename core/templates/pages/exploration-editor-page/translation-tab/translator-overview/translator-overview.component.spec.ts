@@ -65,12 +65,8 @@ describe('Translator Overview component', () => {
   let userExplorationPermissionsService: UserExplorationPermissionsService;
   let changeListService: ChangeListService;
   let windowRef: WindowRef;
-  let entityTranslation: EntityTranslation = new EntityTranslation(
-    'entityId', 'entityType', 1, 'hi', {
-      content1: new TranslatedContent(
-        'translated content', 'html', false)
-    }
-  );
+  let entityTranslation: EntityTranslation;
+
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
@@ -137,6 +133,12 @@ describe('Translator Overview component', () => {
 
   describe('when change list contains changes', () => {
     beforeEach(() => {
+      entityTranslation = new EntityTranslation(
+        'entityId', 'entityType', 1, 'hi', {
+          content1: new TranslatedContent(
+            'translated content', 'html', false)
+        }
+      );
       entityTranslationsService.languageCodeToEntityTranslations = {
         hi: entityTranslation
       };
