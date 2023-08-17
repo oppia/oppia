@@ -967,3 +967,47 @@ def record_completed_node_in_story_context(
         progress_model.completed_node_ids.append(node_id)
         progress_model.update_timestamps()
         progress_model.put()
+
+
+def get_chapter_notifications_stories_list() -> List[
+    story_domain.StoryPublicationTimeliness]:
+    """Returns a list of stories with behind-schedule or upcoming chapters.
+
+    Returns:
+        list(StoryPublicationTimeliness). A list of stories with having
+        behind-schedule chapters or chapters upcoming within
+        CHAPTER_PUBLICATION_NOTICE_PERIOD_IN_DAYS.
+    """
+    topic_models = topic_fetchers.get_all_topics()
+    chapter_notifications_stories_list: List[
+        story_domain.StoryPublicationTimeliness] = []
+    all_canonical_story_ids = []
+    for topic_model in topic_models:
+        canonical_story_ids = [story_reference.story_id
+            for story_reference in topic_model.canonical_story_references]
+        all_canonical_story_ids += canonical_story_ids
+    all_canonical_stories = list(
+        filter(
+            None, story_fetchers.get_stories_by_ids(all_canonical_story_ids)))
+    for topic_model in topic_models:
+        topic_rights = topic_fetchers.get_topic_rights(topic_model.id)
+        if topic_rights.topic_is_published:
+            canonical_stories = [story for story in
+                all_canonical_stories if
+                story.corresponding_topic_id == topic_model.id]
+            for story in canonical_stories:
+                overdue_chapters = []
+                upcoming_chapters = []
+                for node in story.story_contents.nodes:
+                    if node.is_node_upcoming():
+                        upcoming_chapters.append(node.title)
+                    if node.is_node_behind_schedule():
+                        overdue_chapters.append(node.title)
+
+                if len(upcoming_chapters) or len(overdue_chapters):
+                    story_timeliness = story_domain.StoryPublicationTimeliness(
+                        story.id, story.title, topic_model.name,
+                        overdue_chapters, upcoming_chapters)
+                    chapter_notifications_stories_list.append(story_timeliness)
+
+    return chapter_notifications_stories_list

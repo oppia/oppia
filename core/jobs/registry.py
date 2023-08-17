@@ -68,6 +68,8 @@ from core.jobs.batch_jobs import (                                   # pylint: d
     rejecting_suggestion_for_invalid_content_ids_jobs)
 from core.jobs.batch_jobs import (                                   # pylint: disable=unused-import  # isort: skip
     remove_profile_picture_data_url_field_jobs)
+from core.jobs.batch_jobs import (                                   # pylint: disable=unused-import  # isort: skip
+    story_node_jobs)
 
 
 def get_all_jobs() -> List[Type[base_jobs.JobBase]]:
