@@ -39,6 +39,7 @@ import { StoryContents } from 'domain/story/story-contents-object.model';
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { PlatformFeatureService } from 'services/platform-feature.service';
 import { DateTimeFormatService } from 'services/date-time-format.service';
+import constants from 'assets/constants';
 
 @Component({
   selector: 'oppia-story-editor',
@@ -139,6 +140,20 @@ export class StoryEditorComponent implements OnInit, OnDestroy {
     this.storyUpdateService.rearrangeNodeInStory(
       this.story, fromIndex, toIndex);
     this._initEditor();
+  }
+
+  getMediumStyleLocaleDateString(millisSinceEpoch: number): string {
+    const options = {
+      dateStyle: 'medium'
+    } as Intl.DateTimeFormatOptions;
+    let date = new Date(millisSinceEpoch);
+    return date.toLocaleDateString(undefined, options);
+  }
+
+  isDragAndDropDisabled(node: StoryNode): boolean {
+    return (
+      node.getStatus() === constants.STORY_NODE_STATUS_PUBLISHED ||
+      window.innerWidth <= 425);
   }
 
   drop(event: CdkDragDrop<string[]>): void {
