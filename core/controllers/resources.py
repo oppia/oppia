@@ -294,7 +294,7 @@ class RobotsTxtHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     """Handles robots.txt redirection·"""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-    URL_PATH_ARGS_SCHEMAS: Dict[str, str]  = {}
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.open_access
@@ -330,4 +330,5 @@ class CopyrightImagesHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
             filename: str. The filename of the image.
         """
         self.redirect(
-            fs_services.get_static_asset_url('/copyrighted-images/%s/%s' % (folder, filename)))
+            fs_services.get_static_asset_url(
+                '/copyrighted-images/%s/%s' % (folder, filename)))
