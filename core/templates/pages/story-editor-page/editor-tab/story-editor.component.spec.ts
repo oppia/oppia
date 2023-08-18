@@ -237,7 +237,6 @@ describe('Story Editor Component having three story nodes', () => {
     expect(component.isDragAndDropDisabled(node)).toBeFalse();
   });
 
-
   it('should change list order', fakeAsync(() => {
     spyOn(storyUpdateService, 'rearrangeNodeInStory').and.stub();
     component.linearNodesList = [StoryNode.createFromBackendDict({
