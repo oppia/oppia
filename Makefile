@@ -94,3 +94,6 @@ run_tests.custom_eslint: ## Runs the custome eslint tests
 
 run_tests.mypy: ## Runs mypy checks
 	docker compose run --no-deps --entrypoint "python -m scripts.run_mypy_checks" dev-server
+
+run_tests.backend_associate: ## Runs the backend associate tests
+	docker compose run --no-deps --entrypoint "python -m scripts.check_backend_associated_test_file" dev-server
