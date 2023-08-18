@@ -128,7 +128,7 @@ class ContributionOpportunitiesHandler(
     @acl_decorators.open_access
     def get(self, opportunity_type: str) -> None:
         """Handles GET requests and retrieves data based on the
-           opportunity type.
+        opportunity type.
 
         Args:
             opportunity_type: str. The opportunity type.
@@ -784,7 +784,7 @@ class FeaturedTranslationLanguagesHandler(
     @acl_decorators.open_access
     def get(self) -> None:
         """Handles GET requests for retrieving featured translation
-           languages.
+        languages.
         """
         self.render_json({
             'featured_translation_languages':
@@ -851,7 +851,7 @@ class TranslationPreferenceHandler(
     @acl_decorators.can_manage_own_account
     def get(self) -> None:
         """Handles GET requests. Retrieves the preferred translation language
-           code.
+        code.
         """
         assert self.user_id is not None
         user_settings = user_services.get_user_settings(self.user_id)
@@ -862,8 +862,8 @@ class TranslationPreferenceHandler(
 
     @acl_decorators.can_manage_own_account
     def post(self) -> None:
-        """Handles POST requests for updating the user preferred translation
-           language.
+        """Handles POST requests for updating the user's preferred translation
+        language.
         """
         assert self.user_id is not None
         assert self.normalized_payload is not None
