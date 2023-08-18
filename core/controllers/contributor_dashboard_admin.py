@@ -15,6 +15,7 @@
 """Controllers for the contributor dashboard page."""
 
 from __future__ import annotations
+import datetime
 
 from core import feconf
 from core import utils
@@ -555,7 +556,8 @@ class ContributorDashboardAdminStatsHandler(
             },
             'choices': [
                 feconf.CONTRIBUTION_SUBTYPE_SUBMISSION,
-                feconf.CONTRIBUTION_SUBTYPE_REVIEW
+                feconf.CONTRIBUTION_SUBTYPE_REVIEW,
+                feconf.CONTRIBUTION_SUBTYPE_COORDINATE,
             ]
         }
     }
@@ -658,7 +660,7 @@ class ContributorDashboardAdminStatsHandler(
                     'more': more
                 }
 
-            else:
+            elif contribution_subtype == feconf.CONTRIBUTION_SUBTYPE_REVIEW:
                 # Asserting here because even though we are validating through
                 # schema mypy is assuming is can be None.
                 assert page_size is not None
@@ -679,6 +681,18 @@ class ContributorDashboardAdminStatsHandler(
                     'stats': translation_reviewer_frontend_dicts,
                     'next_offset': next_offset,
                     'more': more
+                }
+
+            else:
+                assert sort_by is not None
+                translation_coordinator_dicts = (
+                    contribution_stats_services
+                    .get_all_translation_coordinator_stats(sort_by))
+                translation_coordinator_frontend_dicts = (
+                    get_translation_coordinator_frontend_dict(
+                    translation_coordinator_dicts))
+                response = {
+                    'stats': translation_coordinator_frontend_dicts
                 }
 
         else:
@@ -704,7 +718,7 @@ class ContributorDashboardAdminStatsHandler(
                     'more': more
                 }
 
-            else:
+            elif contribution_subtype == feconf.CONTRIBUTION_SUBTYPE_REVIEW:
                 # Asserting here because even though we are validating through
                 # schema mypy is assuming is can be None.
                 assert page_size is not None
@@ -723,6 +737,18 @@ class ContributorDashboardAdminStatsHandler(
                     'stats': question_reviewer_frontend_dicts,
                     'next_offset': next_offset,
                     'more': more
+                }
+
+            else:
+                question_coordinators = (
+                    user_services
+                    .get_user_ids_by_role(feconf.ROLE_ID_QUESTION_COORDINATOR))
+                question_coordinators.sort()
+                question_coordinator_frontend_dicts = (
+                    get_question_coordinator_frontend_dict(
+                    question_coordinators))
+                response = {
+                    'stats': question_coordinator_frontend_dicts
                 }
 
         self.render_json(response)
@@ -755,3 +781,95 @@ class CommunityContributionStatsHandler(
             'question_reviewers_count': community_stats.question_reviewer_count
         }
         self.render_json(response)
+
+
+def get_translation_coordinator_frontend_dict(
+    backend_stats: List[suggestion_registry.TranslationCoordinatorStats]
+) -> List[suggestion_registry.TranslationCoordinatorStatsDict]:
+    """Returns corresponding stats dicts with all the necessary
+    information for the frontend.
+
+    Args:
+        backend_stats: list. TranslationCoordinatorStats domain object.
+
+    Returns:
+        list. Dict representations of TranslationCoordinatorStats
+        domain objects with additional keys:
+            translators_count: int.
+            reviewers_count: int.
+    """
+    stats_dicts = [
+        stats.to_dict() for stats in backend_stats
+    ]
+
+    for stats_dict in stats_dicts:
+        coordinator_activity_list = []
+        # Here we use MyPy ignore because MyPy doesn't allow key addition
+        # to TypedDict.
+        stats_dict['translators_count'] = ( # type: ignore[misc]
+            contribution_stats_services.get_translator_counts(
+                stats_dict['language_id']))
+
+        community_stats = suggestion_services.get_community_contribution_stats()
+
+        # Here we use MyPy ignore because MyPy doesn't allow key addition
+        # to TypedDict.
+        stats_dict['reviewers_count'] = ( # type: ignore[misc]
+            community_stats.translation_reviewer_counts_by_lang_code[
+                stats_dict['language_id']])
+
+        for coordinator_id in stats_dict['coordinator_ids']:
+            user_setting = user_services.get_user_settings(coordinator_id)
+            assert user_setting.last_logged_in is not None
+            last_activity = user_setting.last_logged_in
+            last_activity_days = int(
+                (datetime.datetime.today() - last_activity).days
+            )
+
+            coordinator_activity_list.append({
+                'translation_coordinator': user_setting.username,
+                'last_activity_days': last_activity_days
+            })
+
+        # Here we use MyPy ignore because MyPy doesn't allow key addition
+        # to TypedDict.
+        stats_dict['coordinator_activity_list'] = coordinator_activity_list # type: ignore[misc]
+
+        # Here we use MyPy ignore because MyPy doesn't allow key deletion
+        # from TypedDict.
+        del stats_dict['coordinator_ids']  # type: ignore[misc]
+
+    return stats_dicts
+
+
+def get_question_coordinator_frontend_dict(
+    question_coordinators: List[str]
+) -> List[Dict[str, Union[str, int]]]:
+    """Returns corresponding stats dicts with all the necessary
+    information for the frontend.
+
+    Args:
+        question_coordinators: list[str]. List of question coordinators.
+
+    Returns:
+        list[Dict[str, str]]. List of dict representing question coordinator
+        stats:
+        question_coordinator: str.
+        last_activity: int.
+    """
+    stats: List[Dict[str, Union[str, int]]] = []
+    for coordinator in question_coordinators:
+        user_setting = user_services.get_user_settings(coordinator)
+        assert user_setting.last_logged_in is not None
+        assert user_setting.username is not None
+
+        last_activity = user_setting.last_logged_in
+        last_activity_days = int(
+            (datetime.datetime.today() - last_activity).days)
+
+        stats.append({
+            'question_coordinator': user_setting.username,
+            'last_activity': last_activity_days
+        })
+
+    return stats

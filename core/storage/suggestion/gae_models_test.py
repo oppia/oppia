@@ -25,7 +25,7 @@ from core.constants import constants
 from core.platform import models
 from core.tests import test_utils
 
-from typing import Dict, Final, Mapping
+from typing import Dict, Final, List, Mapping
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -6079,3 +6079,93 @@ class SortChoicesUnitTest(test_utils.GenericTestBase):
         dict_values.sort()
 
         self.assertEqual(enum_values, dict_values)
+
+
+class TranslationCoordinatorsModelUnitTests(test_utils.GenericTestBase):
+    """Tests the TranslationCoordinatorsModel class."""
+
+    LANGUAGE_1_ID: Final = 'language_1_id'
+    LANGUAGE_2_ID: Final = 'language_2_id'
+    LANGUAGE_3_ID: Final = 'language_3_id'
+    LANGUAGE_4_ID: Final = 'language_4_id'
+    LANGUAGE_5_ID: Final = 'language_5_id'
+    USER_ID_1: Final = 'user_id_1'
+    USER_ID_2: Final = 'user_id_2'
+
+    def setUp(self) -> None:
+        super().setUp()
+        suggestion_models.TranslationCoordinatorsModel(
+            id=self.LANGUAGE_4_ID,
+            coordinator_ids=[self.USER_ID_2],
+            coordinators_count=1
+        ).put()
+        suggestion_models.TranslationCoordinatorsModel(
+            id=self.LANGUAGE_5_ID,
+            coordinator_ids=[self.USER_ID_2],
+            coordinators_count=1
+        ).put()
+
+    def test_get_deletion_policy(self) -> None:
+        self.assertEqual(
+            suggestion_models.TranslationCoordinatorsModel
+            .get_deletion_policy(),
+            base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE)
+
+    def test_has_reference_to_user_id(self) -> None:
+        language_coordinator_model = (
+            suggestion_models.TranslationCoordinatorsModel(
+            id=self.LANGUAGE_1_ID, coordinator_ids=['coordinator_id'],
+            coordinators_count=1))
+        language_coordinator_model.put()
+        self.assertTrue(
+            suggestion_models.TranslationCoordinatorsModel
+            .has_reference_to_user_id('coordinator_id'))
+        self.assertFalse(
+            suggestion_models.TranslationCoordinatorsModel
+            .has_reference_to_user_id('x_id'))
+
+    def test_export_data_nontrivial(self) -> None:
+        """Tests nontrivial export data on user with some coordinated
+        languages.
+        """
+        user_data = suggestion_models.TranslationCoordinatorsModel.export_data(
+            self.USER_ID_2)
+        expected_data = {
+            'coordinated_language_ids': [self.LANGUAGE_4_ID, self.LANGUAGE_5_ID]
+        }
+        self.assertEqual(user_data, expected_data)
+
+    def test_export_data_trivial(self) -> None:
+        """Tests trivial export data on user with no coordinated languages."""
+        user_data = suggestion_models.TranslationCoordinatorsModel.export_data(
+            self.USER_ID_1)
+        expected_data: Dict[str, List[str]] = {
+            'coordinated_language_ids': []
+        }
+        self.assertEqual(user_data, expected_data)
+
+    def test_get_model_association_to_user(self) -> None:
+        model = suggestion_models.TranslationCoordinatorsModel
+        self.assertEqual(
+            model.get_model_association_to_user(),
+            base_models.MODEL_ASSOCIATION_TO_USER
+            .ONE_INSTANCE_SHARED_ACROSS_USERS)
+
+    def test_get_export_policy(self) -> None:
+        expected_dict = {
+            'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'coordinator_ids': base_models.EXPORT_POLICY.EXPORTED,
+            'coordinators_count': base_models.EXPORT_POLICY.NOT_APPLICABLE
+        }
+        model = suggestion_models.TranslationCoordinatorsModel
+        self.assertEqual(model.get_export_policy(), expected_dict)
+
+    def test_get_field_name_mapping_to_takeout_keys(self) -> None:
+        self.assertEqual(
+            suggestion_models.TranslationCoordinatorsModel.
+            get_field_name_mapping_to_takeout_keys(),
+            {
+                'coordinator_ids': 'coordinated_language_ids'
+            })

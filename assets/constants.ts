@@ -137,7 +137,9 @@ export default {
     "IncreasingReviewedTranslations": "Lowest to Highest Reviewed Translations",
     "DecreasingReviewedTranslations": "Highest to Lowest Reviewed Translations",
     "IncreasingReviewedQuestions": "Lowest to Highest Reviewed Questions",
-    "DecreasingReviewedQuestions": "Highest to Lowest Reviewed Questions"
+    "DecreasingReviewedQuestions": "Highest to Lowest Reviewed Questions",
+    "DecreasingCoordinatorCounts": "Highest to Lowest Coordinators Count",
+    "IncreasingCoordinatorCounts": "Lowest to Highest Coordinators Count"
   },
   // These categories are shown in the library navbar. The categories should
   // be in sorted order.

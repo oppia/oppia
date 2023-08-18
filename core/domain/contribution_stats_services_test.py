@@ -15,11 +15,13 @@
 """Tests the functions to get stats displayed in contributor Admin Dashboard."""
 
 from __future__ import annotations
+
 import datetime
 
 from core.domain import contribution_stats_services
 from core.platform import models
 from core.tests import test_utils
+
 from typing import Final
 
 MYPY = False
@@ -357,6 +359,17 @@ class ContributorAdminDashboardServicesUnitTest(test_utils.GenericTestBase):
                 datetime.date.today() - datetime.timedelta(5))
         ).put()
 
+        suggestion_models.TranslationCoordinatorsModel(
+            id='en',
+            coordinator_ids=['user1', 'user2'],
+            coordinators_count=2
+        ).put()
+        suggestion_models.TranslationCoordinatorsModel(
+            id='hi',
+            coordinator_ids=['user1', 'user2', 'user3'],
+            coordinators_count=3
+        ).put()
+
     def test_get_translation_submitter_admin_stats(self) -> None:
         stats, next_offset, more = (
             contribution_stats_services.get_translation_submitter_total_stats( # pylint: disable=line-too-long
@@ -424,3 +437,27 @@ class ContributorAdminDashboardServicesUnitTest(test_utils.GenericTestBase):
         self.assertEqual(3, next_offset)
         self.assertEqual('user2', stats[0].contributor_id)
         self.assertEqual('user1', stats[1].contributor_id)
+
+    def test_get_translation_coordinator_stats(self) -> None:
+        stats = (
+            contribution_stats_services.get_all_translation_coordinator_stats(
+                suggestion_models.SortChoices
+                .SORT_KEY_INCREASING_COORDINATOR_COUNTS.value
+            ))
+
+        self.assertEqual(2, len(stats))
+        self.assertEqual('en', stats[0].language_id)
+
+        stats = (
+            contribution_stats_services.get_all_translation_coordinator_stats(
+                suggestion_models.SortChoices
+                .SORT_KEY_DECREASING_COORDINATOR_COUNTS.value
+            ))
+
+        self.assertEqual(2, len(stats))
+        self.assertEqual('hi', stats[0].language_id)
+
+    def test_get_translator_counts(self) -> None:
+        stats = contribution_stats_services.get_translator_counts('es')
+
+        self.assertEqual(4, stats)

@@ -155,6 +155,8 @@ class SortChoices(enum.Enum):
     SORT_KEY_DECREASING_REVIEWED_TRANSLATIONS = 'DecreasingReviewedTranslations'
     SORT_KEY_INCREASING_REVIEWED_QUESTIONS = 'IncreasingReviewedQuestions'
     SORT_KEY_DECREASING_REVIEWED_QUESTIONS = 'DecreasingReviewedQuestions'
+    SORT_KEY_INCREASING_COORDINATOR_COUNTS = 'IncreasingCoordinatorCounts'
+    SORT_KEY_DECREASING_COORDINATOR_COUNTS = 'DecreasingCoordinatorCounts'
 
 
 class GeneralSuggestionExportDataDict(TypedDict):
@@ -3483,3 +3485,94 @@ class QuestionReviewerTotalContributionStatsModel(base_models.BaseModel):
                     model.last_contribution_date.isoformat())
             }
         return user_data
+
+
+class TranslationCoordinatorsModel(base_models.BaseModel):
+    """Storage model for rights related to translation coordinator.
+
+    The id of each instance is the id of the corresponding language (the
+    ISO 639-1 language code).
+    """
+
+    # The user_ids of the coordinators of this language.
+    coordinator_ids = datastore_services.StringProperty(
+        indexed=True, repeated=True)
+
+    # The number of coordinators of this language. This property is added to
+    # enable the sorting of datastore query results. It is equal to the
+    # length of the coordinator_ids field.
+    # TODO(#18762): Add a validate method in domain layer to verify that the
+    # coordinators_count equals the length of coordinator_ids.
+    coordinators_count = datastore_services.IntegerProperty(
+        indexed=True, required=True)
+
+    @staticmethod
+    def get_deletion_policy() -> base_models.DELETION_POLICY:
+        """Model contains data to pseudonymize or delete corresponding
+        to a user: coordinator_ids field.
+        """
+        return base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE
+
+    @classmethod
+    def has_reference_to_user_id(cls, user_id: str) -> bool:
+        """Check whether TranslationCoordinatorsModel references user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be checked.
+
+        Returns:
+            bool. Whether any models refer to the given user ID.
+        """
+        return cls.query(
+            cls.coordinator_ids == user_id
+        ).get(keys_only=True) is not None
+
+    @staticmethod
+    def get_model_association_to_user(
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+        """Model is exported as one instance shared across users since multiple
+        users can coordinate a single language.
+        """
+        return (
+            base_models
+            .MODEL_ASSOCIATION_TO_USER
+            .ONE_INSTANCE_SHARED_ACROSS_USERS)
+
+    @classmethod
+    def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
+        """Model contains data to export corresponding to a user."""
+        return dict(super(cls, cls).get_export_policy(), **{
+            'coordinator_ids': base_models.EXPORT_POLICY.EXPORTED,
+            'coordinators_count': base_models.EXPORT_POLICY.NOT_APPLICABLE
+        })
+
+    @classmethod
+    def get_field_name_mapping_to_takeout_keys(cls) -> Dict[str, str]:
+        """Defines the mapping of field names to takeout keys since this model
+        is exported as one instance shared across users.
+        """
+        return {
+            'coordinator_ids': 'coordinated_language_ids'
+        }
+
+    @classmethod
+    def export_data(cls, user_id: str) -> Dict[str, List[str]]:
+        """(Takeout) Export user-relevant properties of
+        TranslationCoordinatorsModel.
+
+        Args:
+            user_id: str. The user_id denotes which user's data to extract.
+
+        Returns:
+            dict. The user-relevant properties of TranslationCoordinatorsModel
+            in a dict format. In this case, we are returning all the ids of the
+            languages this user coordinates.
+        """
+        coordinated_languages = cls.get_all().filter(
+            cls.coordinator_ids == user_id)
+        coordinated_language_ids = [
+            language.id for language in coordinated_languages]
+
+        return {
+            'coordinated_language_ids': coordinated_language_ids
+        }
