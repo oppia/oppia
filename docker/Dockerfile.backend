@@ -54,8 +54,10 @@ RUN chmod -R 744 $BUF_DIR \
 COPY requirements.txt .
 COPY requirements_dev.txt .
 
-RUN pip install --require-hashes --no-deps -r requirements.txt
+RUN pip install --require-hashes --no-deps -r requirements.txt -t /app/oppia/third_party/python_libs
 RUN pip install --require-hashes --no-deps -r requirements_dev.txt
+RUN pip download --no-deps -r requirements.txt -d /root/.cache
+RUN pip download --no-deps -r requirements_dev.txt -d /root/.cache
 
 # Installing buf and proto for Linux -- this docker container is based on Linux
 COPY buf.gen.yaml .
