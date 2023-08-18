@@ -202,12 +202,15 @@ export class StoryEditorComponent implements OnInit, OnDestroy {
             this.chapterIsPublishable.push(true);
             this.selectedChapterIndexInPublishUptoDropdown = index;
           } else if (node.getStatus() === 'Ready To Publish' &&
-            index !== 0 && this.chapterIsPublishable[index - 1]) {
+            ((index !== 0 && this.chapterIsPublishable[index - 1]) ||
+            index === 0)) {
             this.chapterIsPublishable.push(true);
           } else {
             this.chapterIsPublishable.push(false);
           }
         });
+        this.updatePublishUptoChapterSelection(
+          this.selectedChapterIndexInPublishUptoDropdown);
       }
       this.notesEditorIsShown = false;
       this.storyTitleEditorIsShown = false;
@@ -403,6 +406,43 @@ export class StoryEditorComponent implements OnInit, OnDestroy {
     }
   }
 
+  updatePublishUptoChapterSelection(chapterIndex: number): void {
+    this.storyEditorStateService.setSelectedChapterIndexInPublishUptoDropdown(
+      chapterIndex
+    );
+    if (Number(chapterIndex) === -1) {
+      if (this.linearNodesList.length &&
+      this.linearNodesList[0].getStatus() === 'Published') {
+        this.storyEditorStateService.setChaptersAreBeingPublished(false);
+        this.storyEditorStateService.setNewChapterPublicationIsDisabled(false);
+      } else {
+        this.storyEditorStateService.setChaptersAreBeingPublished(true);
+        this.storyEditorStateService.setNewChapterPublicationIsDisabled(true);
+      }
+      return;
+    }
+
+    let nextChapterIndex = Number(chapterIndex) + 1;
+
+    if (this.linearNodesList[chapterIndex].getStatus() === 'Published' &&
+    nextChapterIndex < this.linearNodesList.length &&
+    this.linearNodesList[nextChapterIndex].getStatus() === 'Published') {
+      this.storyEditorStateService.setChaptersAreBeingPublished(false);
+    } else {
+      this.storyEditorStateService.setChaptersAreBeingPublished(true);
+    }
+
+    if (this.linearNodesList.length === 0 || (
+      chapterIndex === 0 && !this.chapterIsPublishable[0]) || (
+      this.linearNodesList[chapterIndex].getStatus() === 'Published' && (
+        nextChapterIndex === this.linearNodesList.length ||
+        this.linearNodesList[nextChapterIndex].getStatus() !== 'Published'))) {
+      this.storyEditorStateService.setNewChapterPublicationIsDisabled(true);
+    } else {
+      this.storyEditorStateService.setNewChapterPublicationIsDisabled(false);
+    }
+  }
+
   togglePreview(): void {
     this.storyPreviewCardIsShown = !(this.storyPreviewCardIsShown);
   }
@@ -427,7 +467,7 @@ export class StoryEditorComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.storyPreviewCardIsShown = false;
     this.mainStoryCardIsShown = true;
-    this.selectedChapterIndexInPublishUptoDropdown = 0;
+    this.selectedChapterIndexInPublishUptoDropdown = -1;
     this.chaptersListIsShown = (
       !this.windowDimensionsService.isWindowNarrow());
     this.directiveSubscriptions.add(
