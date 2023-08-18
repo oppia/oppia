@@ -155,8 +155,8 @@ class StoryProgressHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
                 next_exp_ids: List[str]. The next_exp_ids list contains
                     the exploration IDs of the next node(s) to be explored
                 next_node_id: str. The ID of the next node to be explored.
-                completed_node_ids: List[str]. An updated of IDS that represents
-                    all the nodes the user has completed.
+                completed_node_ids: List[str]. An updated list of IDS that
+                    represents all the nodes the user has completed.
 
         Raises:
             PageNotFoundException. The new structure viewer updates are
