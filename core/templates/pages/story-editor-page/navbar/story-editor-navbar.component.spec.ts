@@ -474,6 +474,18 @@ describe('Story editor navbar component', () => {
     expect(component.showStoryEditOptions).toBeFalse();
   });
 
+  it('should return whether story is published', () => {
+    storyEditorStateService._storyIsPublished = true;
+    expect(component.isStoryPublished()).toBeTrue();
+    storyEditorStateService._storyIsPublished = false;
+    expect(component.isStoryPublished()).toBeFalse();
+  });
+
+  it('should get count of warnings', () => {
+    component.validationIssues = ['issue 1', 'issue 2'];
+    expect(component.getWarningsCount()).toBe(2);
+  });
+
   it('should navigate to main tab in story editor page', () => {
     expect(component.activeTab).toBeUndefined();
 
