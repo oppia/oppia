@@ -14,7 +14,7 @@ services:
       - yarn_cache:/root/.yarn-cache
     environment:
       - NODE_OPTIONS=--max_old_space_size=4096
-      - prod_env=${prod_env}
+      - prod_env=${prod_env:-false}
     entrypoint: bash /app/oppia/docker/angular-build.entrypoint.sh
 
   webpack-compiler:
@@ -28,8 +28,8 @@ services:
       - third_party:/app/oppia/third_party
       - frontend_proto_files:/app/oppia/extensions/classifiers/proto
     environment:
-      - prod_env=${prod_env}
-      - source_maps=${source_maps}
+      - prod_env=${prod_env:-false}
+      - source_maps=${source_maps:-false}
     entrypoint: bash /app/oppia/docker/webpack-compiler.entrypoint.sh
 
   dev-server:
@@ -45,15 +45,17 @@ services:
       - proto_files:/app/oppia/proto_files
       - frontend_proto_files:/app/oppia/extensions/classifiers/proto
       - third_party:/app/oppia/third_party
-      - pip_cache:/root/.cache/pip
+      - pip_cache:/root/.cache
     environment:
       - CLOUDSDK_CORE_DISABLE_PROMPTS=1
       - PIP_NO_DEPS=True
-      - prod_env=${prod_env}
-      - maintenance_mode=${maintenance_mode}
-      - source_maps=${source_maps}
-      - disable_host_checking=${disable_host_checking}
-      - no_auto_restart=${no_auto_restart}
+      - PIP_NO_INDEX=True
+      - PIP_FIND_LINKS=/root/.cache
+      - prod_env=${prod_env:-false}
+      - maintenance_mode=${maintenance_mode:-false}
+      - source_maps=${source_maps:-false}
+      - disable_host_checking=${disable_host_checking:-false}
+      - no_auto_restart=${no_auto_restart:-false}
     depends_on:
       - angular-build
       - webpack-compiler
@@ -77,7 +79,7 @@ services:
     environment:
       - CLOUDSDK_CORE_DISABLE_PROMPTS=1
       - DATASTORE_HOST=datastore
-      - save_datastore=${save_datastore}
+      - save_datastore=${save_datastore:-false}
     volumes:
       - cloud_datastore_emulator_cache:/app/cloud_datastore_emulator_cache
       - ./docker/datastore.entrypoint.sh:/app/oppia/docker/datastore.entrypoint.sh
@@ -111,7 +113,7 @@ services:
       interval: 20s
       retries: 5
     environment:
-      - save_datastore=${save_datastore}
+      - save_datastore=${save_datastore:-false}
     entrypoint: sh /app/oppia/docker/firebase.entrypoint.sh
 
   redis:
