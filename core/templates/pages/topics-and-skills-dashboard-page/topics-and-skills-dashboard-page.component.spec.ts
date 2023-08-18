@@ -140,6 +140,7 @@ describe('Topics and skills dashboard page component', () => {
           key as TopicPublishedOptionsKeys]);
     }
 
+    componentInstance.ngOnInit();
     expect(componentInstance.sortOptions).toEqual(topicSortOptions);
     expect(componentInstance.statusOptions).toEqual(topicStatusOptions);
 
