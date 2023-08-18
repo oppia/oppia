@@ -22,6 +22,8 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { MaterialModule } from 'modules/material.module';
 import { FormsModule } from '@angular/forms';
+
+import { AlertsService } from 'services/alerts.service';
 import { BlogAuthorProfilePageComponent } from 'pages/blog-author-profile-page/blog-author-profile-page.component';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 import { LoaderService } from 'services/loader.service';
@@ -31,7 +33,7 @@ import { UrlService } from 'services/contextual/url.service';
 import { BlogCardComponent } from 'pages/blog-dashboard-page/blog-card/blog-card.component';
 import { BlogAuthorProfilePageConstants } from './blog-author-profile-page.constants';
 import { BlogPostSummary, BlogPostSummaryBackendDict } from 'domain/blog/blog-post-summary.model';
-import { AlertsService } from 'services/alerts.service';
+import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { UserService } from 'services/user.service';
 // This throws "TS2307". We need to
 // suppress this error because rte-text-components are not strictly typed yet.
@@ -55,6 +57,7 @@ describe('Blog home page component', () => {
   let alertsService: AlertsService;
   let windowDimensionsService: WindowDimensionsService;
   let urlService: UrlService;
+  let urlInterpolationService: UrlInterpolationService;
   let loaderService: LoaderService;
   let blogHomePageBackendApiService: BlogHomePageBackendApiService;
   let blogAuthorProfilePageDataObject: BlogAuthorProfilePageData;
@@ -109,6 +112,7 @@ describe('Blog home page component', () => {
     blogHomePageBackendApiService = TestBed.inject(
       BlogHomePageBackendApiService);
     urlService = TestBed.inject(UrlService);
+    urlInterpolationService = TestBed.inject(UrlInterpolationService);
     loaderService = TestBed.inject(LoaderService);
     userService = TestBed.inject(UserService);
     blogPostSummaryObject = BlogPostSummary.createFromBackendDict(
@@ -336,5 +340,12 @@ describe('Blog home page component', () => {
     expect(component.isSmallScreenViewActive()).toBe(true);
     windowWidthSpy.and.returnValue(1028);
     expect(component.isSmallScreenViewActive()).toBe(false);
+  });
+
+  it('should get static asset image url', () => {
+    spyOn(urlInterpolationService, 'getStaticCopyrightedImageUrl')
+      .and.returnValue('image_url');
+
+    expect(component.getStaticCopyrightedImageUrl('url')).toBe('image_url');
   });
 });

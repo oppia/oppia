@@ -273,8 +273,4 @@ export class OppiaAngularRootComponent implements AfterViewInit {
     // This emit triggers ajs to start its app.
     this.initialized.emit();
   }
-
-  getAssetUrl(path: string): string {
-    return this.urlInterpolationService.getFullStaticAssetUrl(path);
-  }
 }

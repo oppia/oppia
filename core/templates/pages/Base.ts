@@ -28,17 +28,15 @@ require('app.constants.ajs.ts');
  */
 
 angular.module('oppia').controller('Base', [
-  '$rootScope', '$scope',
-  'CsrfTokenService', 'DocumentAttributeCustomizationService', 'LoaderService',
-  'UrlInterpolationService', 'SUPPORTED_SITE_LANGUAGES',
+  '$rootScope', '$scope', 'CsrfTokenService',
+  'DocumentAttributeCustomizationService', 'LoaderService',
+  'SUPPORTED_SITE_LANGUAGES',
   function(
-      $rootScope, $scope,
-      CsrfTokenService, DocumentAttributeCustomizationService, LoaderService,
-      UrlInterpolationService, SUPPORTED_SITE_LANGUAGES) {
+      $rootScope, $scope, CsrfTokenService,
+      DocumentAttributeCustomizationService, LoaderService,
+      SUPPORTED_SITE_LANGUAGES
+  ) {
     var ctrl = this;
-    $scope.getAssetUrl = function(path) {
-      return UrlInterpolationService.getFullStaticAssetUrl(path);
-    };
 
     ctrl.$onInit = function() {
       $scope.currentLang = 'en';

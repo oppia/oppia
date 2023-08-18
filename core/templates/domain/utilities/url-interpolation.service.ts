@@ -216,20 +216,6 @@ export class UrlInterpolationService {
   }
 
   /**
-   * @param {string} path - A complete url path to an asset.
-   * @return {string} The url including the current url origin and the complete
-   * url path.
-   */
-  getFullStaticAssetUrl(path: string): string {
-    this.validateResourcePath(path);
-    if (this.DEV_MODE) {
-      return this.urlService.getOrigin() + path;
-    } else {
-      return this.urlService.getOrigin() + '/build' + path;
-    }
-  }
-
-  /**
    * @param {string} interactionId - An interaction id.
    * @return {string} The complete url path to the thumbnail image for the
    * interaction.

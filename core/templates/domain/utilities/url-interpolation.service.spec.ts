@@ -323,16 +323,6 @@ describe('URL Interpolation Service', () => {
       '/build/assets/assets_test/hash_test.' +
         hashes['/assets_test/hash_test.json'] + '.json');
 
-    expect(uis.getFullStaticAssetUrl(
-      '/assets/msapplication-large.png')).toBe(
-      'http://sample.com/build/assets/msapplication-large.png');
-    expect(uis.getFullStaticAssetUrl(
-      '/assets/images/msapplication-large.png')).toBe(
-      'http://sample.com/build/assets/images/msapplication-large.png');
-    expect(uis.getFullStaticAssetUrl(
-      '/assets/images/path/msapplication-large.png')).toBe(
-      'http://sample.com/build/assets/images/path/msapplication-large.png');
-
     expect(uis.getExtensionResourceUrl('/test.html')).toBe(
       '/build/extensions/test.html');
     expect(uis.getExtensionResourceUrl('/test_url/test.html')).toBe(
