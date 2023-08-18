@@ -331,4 +331,4 @@ class CopyrightImagesHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         """
         self.redirect(
             fs_services.get_static_asset_url(
-                '/copyrighted-images/%s/%s' % (folder, filename)))
+                'copyrighted-images/%s/%s' % (folder, filename)))

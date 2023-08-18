@@ -527,7 +527,7 @@ describe('Collection player page component', () => {
     expect(result).toEqual(4);
   }));
 
-  it('should close the exploration card and scroll into the' +
+  it('should close the exploration card and scroll into the ' +
       'exploration icon location on clicking outside of the exploration card',
   fakeAsync(() => {
     spyOn(readOnlyCollectionBackendApiService, 'loadCollectionAsync')
