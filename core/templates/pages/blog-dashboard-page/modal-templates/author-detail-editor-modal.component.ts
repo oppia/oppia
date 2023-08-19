@@ -48,10 +48,16 @@ export class BlogAuthorDetailsEditorComponent extends ConfirmOrCancelModal {
   }
 
   validateAuthorDetails(): string[] {
-    let issues = [];
+    let issues: string[] = [];
     if (this.authorName === '') {
       issues.push(
         'Author Name should not be empty.');
+    } else if (
+      this.authorName.length < AppConstants.MIN_AUTHOR_NAME_LENGTH) {
+      issues.push(
+        'Author Name should not be less than ' +
+        `${AppConstants.MIN_AUTHOR_NAME_LENGTH} characters.`
+      );
     } else if (
       this.authorName.length > AppConstants.MAX_AUTHOR_NAME_LENGTH) {
       issues.push(
@@ -62,6 +68,11 @@ export class BlogAuthorDetailsEditorComponent extends ConfirmOrCancelModal {
     if (this.authorBio === '') {
       issues.push(
         'Author Bio should not be empty.');
+    } else if (this.authorBio.length < AppConstants.MIN_CHARS_IN_AUTHOR_BIO) {
+      issues.push(
+        'Author Bio should not be less than ' +
+        `${AppConstants.MIN_CHARS_IN_AUTHOR_BIO} characters.`
+      );
     } else if (this.authorBio.length > AppConstants.MAX_CHARS_IN_AUTHOR_BIO) {
       issues.push(
         'Author Bio should not be more than ' +
