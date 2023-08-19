@@ -80,7 +80,6 @@ _PARSER.add_argument(
 
 
 def run_lighthouse_puppeteer_script(record: bool = False) -> None:
-
     """Runs puppeteer script to collect dynamic urls.
 
     Args:

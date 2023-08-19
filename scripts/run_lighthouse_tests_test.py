@@ -41,22 +41,6 @@ LIGHTHOUSE_CONFIG_FILENAMES = {
         '2': '.lighthouserc-accessibility-2.js'
     }
 }
-CHROME_PATHS = [
-    # Unix.
-    '/usr/bin/google-chrome',
-    '/usr/bin/chromium-browser',
-    # Arch Linux.
-    '/usr/bin/brave',
-    '/usr/bin/chromium',
-    # Windows.
-    '/c/Program Files (x86)/Google/Chrome/Application/chrome.exe',
-    'c:\\Program Files (x86)\\Google\\Chrome\\Application\\Chrome.exe',
-    # WSL.
-    '/mnt/c/Program Files (x86)/Google/Chrome/Application/chrome.exe',
-    # Mac OS.
-    '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
-]
-
 
 class MockCompiler:
     def wait(self) -> None: # pylint: disable=missing-docstring
@@ -178,7 +162,7 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
             'Puppeteer script failed. More details can be found above.',
             self.print_arr)
 
-    def test_puppeteer_script_successfully_with_recording(self) -> None:
+    def test_puppeteer_script_succeeds_when_recording_succeeds(self) -> None:
         class MockTask:
             returncode = 0
             def communicate(self) -> tuple[bytes, bytes]:   # pylint: disable=missing-docstring
@@ -208,7 +192,7 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
             'Resulting puppeteer video saved at %s' % self.extra_args[1],
             self.print_arr)
 
-    def test_puppeteer_script_failed_with_recording(self) -> None:
+    def test_puppeteer_script_fails_when_recording_succeeds(self) -> None:
         class MockTask:
             returncode = 1
             def communicate(self) -> tuple[bytes, bytes]:   # pylint: disable=missing-docstring
@@ -452,7 +436,7 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
         env = os.environ.copy()
         env['PIP_NO_DEPS'] = 'True'
         # Set up pseudo-chrome path env variable.
-        for path in CHROME_PATHS:
+        for path in common.CHROME_PATHS:
             if os.path.isfile(path):
                 env['CHROME_BIN'] = path
                 break
