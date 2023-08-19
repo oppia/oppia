@@ -233,7 +233,7 @@ describe('Story Editor Component having three story nodes', () => {
     expect(component.isDragAndDropDisabled(node)).toBeTrue();
 
     node.setStatus('Draft');
-    spyOnProperty(window, 'innerWidth').and.returnValue(1200);
+    spyOnProperty(window, 'innerWidth', 'get').and.returnValue(1200);
     expect(component.isDragAndDropDisabled(node)).toBeFalse();
   });
 
