@@ -72,11 +72,12 @@ export class DonatePageComponent implements OnInit, OnDestroy {
         this.setPageTitle();
       })
     );
-    this.showThanksForDonatingModal();
-  }
 
-  showThanksForDonatingModal(): void {
-    if (this.windowRef.nativeWindow.location.hash === '#thank-you') {
+    const searchParams = new URLSearchParams(
+      this.windowRef.nativeWindow.location.search);
+    const params = Object.fromEntries(searchParams.entries());
+    if (params.hasOwnProperty('thanks')) {
+      // Show the "thanks for donating" modal.
       this.ngbModal.open(
         ThanksForDonatingModalComponent,
         {
