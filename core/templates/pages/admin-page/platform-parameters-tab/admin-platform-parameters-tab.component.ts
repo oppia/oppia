@@ -353,8 +353,7 @@ export class AdminPlatformParametersTabComponent implements OnInit {
         seenRule => isEqual(seenRule, rule));
       if (sameRuleIndex !== -1) {
         issues.push(
-          `The ${sameRuleIndex + 1}-th & ${ruleIndex + 1}-th rules are` +
-          ' identical.');
+          `Rules ${sameRuleIndex + 1} & ${ruleIndex + 1} are identical.`);
         continue;
       }
       seenRules.push(rule);
@@ -365,15 +364,15 @@ export class AdminPlatformParametersTabComponent implements OnInit {
           seenFilter => isEqual(seenFilter, filter));
         if (sameFilterIndex !== -1) {
           issues.push(
-            `In the ${ruleIndex + 1}-th rule: the ${sameFilterIndex + 1}-th` +
-            ` & ${filterIndex + 1}-th filters are identical.`);
+            `In rule ${ruleIndex + 1}, filters ${sameFilterIndex + 1}` +
+            ` & ${filterIndex + 1} are identical.`);
           continue;
         }
         seenFilters.push(filter);
 
         if (filter.conditions.length === 0) {
           issues.push(
-            `In the ${ruleIndex + 1}-th rule, ${filterIndex + 1}-th filter ` +
+            `In rule ${ruleIndex + 1}, filter ${filterIndex + 1} ` +
             'there should be at least one condition.');
           continue;
         }
@@ -385,9 +384,9 @@ export class AdminPlatformParametersTabComponent implements OnInit {
             seenCond => isEqual(seenCond, condition));
           if (sameCondIndex !== -1) {
             issues.push(
-              `In the ${ruleIndex + 1}-th rule, ${filterIndex + 1}-th` +
-              ` filter: the ${sameCondIndex + 1}-th & ` +
-              `${conditionIndex + 1}-th conditions are identical.`);
+              `In rule ${ruleIndex + 1}, filter ${filterIndex + 1},` +
+              ` conditions ${sameCondIndex + 1} & ` +
+              `${conditionIndex + 1} are identical.`);
             continue;
           }
 
@@ -397,7 +396,7 @@ export class AdminPlatformParametersTabComponent implements OnInit {
 
       if (rule.filters.length === 0) {
         issues.push(
-          `In the ${ruleIndex + 1}-th rule, there should be at least ` +
+          `In rule ${ruleIndex + 1}, there should be at least ` +
           'one filter.');
         continue;
       }

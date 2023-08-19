@@ -399,7 +399,7 @@ describe('Admin page platform parameters tab', () => {
 
       expect(warnings.length).toEqual(1);
       expect(warnings[0]).toEqual(
-        'In the 1-th rule, there should be at least one filter.');
+        'In rule 1, there should be at least one filter.');
     });
   });
 
@@ -759,7 +759,7 @@ describe('Admin page platform parameters tab', () => {
         })
       );
 
-      expect(issues).toEqual(['The 1-th & 2-th rules are identical.']);
+      expect(issues).toEqual(['Rules 1 & 2 are identical.']);
     });
 
     it('should return issues if there are identical filters', () => {
@@ -791,7 +791,7 @@ describe('Admin page platform parameters tab', () => {
       );
 
       expect(issues).toEqual([
-        'In the 1-th rule: the 1-th & 2-th filters are identical.']);
+        'In rule 1, filters 1 & 2 are identical.']);
     });
 
     it('should return issues if there are identical conditions', () => {
@@ -819,8 +819,7 @@ describe('Admin page platform parameters tab', () => {
       );
 
       expect(issues).toEqual([
-        'In the 1-th rule, 1-th filter: the 1-th & 2-th conditions' +
-        ' are identical.']);
+        'In rule 1, filter 1, conditions 1 & 2 are identical.']);
     });
 
     it('should return issues if filter has no condition', () => {
@@ -848,8 +847,7 @@ describe('Admin page platform parameters tab', () => {
       );
 
       expect(issues).toEqual(
-        ['In the 1-th rule, 1-th filter there should be at least ' +
-        'one condition.']);
+        ['In rule 1, filter 1 there should be at least one condition.']);
     });
 
     it('should return issues if there is no filter in the rule', () => {
@@ -872,7 +870,7 @@ describe('Admin page platform parameters tab', () => {
       );
 
       expect(issues).toEqual(
-        ['In the 1-th rule, there should be at least one filter.']);
+        ['In rule 1, there should be at least one filter.']);
     });
   });
 });
