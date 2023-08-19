@@ -111,6 +111,7 @@ export class AdminPlatformParametersTabComponent implements OnInit {
   directiveSubscriptions = new Subscription();
   platformParameterNameToRulesReadonlyData: Map<string, string[]> = new Map();
   platformParametersInEditMode!: Map<string, boolean>;
+  warningsAreShown: boolean;
 
   constructor(
     private windowRef: WindowRef,
@@ -367,6 +368,12 @@ export class AdminPlatformParametersTabComponent implements OnInit {
         }
         seenFilters.push(filter);
 
+        if (filter.conditions.length === 0) {
+          issues.push(
+            `In the ${ruleIndex + 1}-th rule, ${filterIndex + 1}-th filter ` +
+            `there should be at least one condition.`);
+        }
+
         const seenConditions: [string, string][] = [];
         for (const [conditionIndex, condition] of filter.conditions
           .entries()) {
@@ -383,8 +390,22 @@ export class AdminPlatformParametersTabComponent implements OnInit {
           seenConditions.push(condition);
         }
       }
+
+      if (rule.filters.length === 0) {
+        issues.push(
+          `In the ${ruleIndex + 1}-th rule, there should be at least ` +
+          `one filter.`);
+      }
     }
     return issues;
+  }
+
+  getWarnings(param: PlatformParameter): string[] {
+    return AdminPlatformParametersTabComponent.validatePlatformParam(param);
+  }
+
+  setWarningsAreShown(value: boolean): void {
+    this.warningsAreShown = value;
   }
 
   ngOnInit(): void {
@@ -397,5 +418,6 @@ export class AdminPlatformParametersTabComponent implements OnInit {
     this.platformParametersAreFetched = true;
     this.loaderService.showLoadingScreen('Loading');
     this.reloadPlatformParametersAsync();
+    this.warningsAreShown = false;
   }
 }

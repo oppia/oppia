@@ -390,6 +390,29 @@ describe('Admin page platform parameters tab', () => {
     });
   });
 
+  describe('.getWarnings', () => {
+    it('should show all the warnings present in the platform-parameter', () => {
+      const platformParameter = component.platformParameters[0];
+      component.removeFilter(platformParameter.rules[0], 0);
+
+      let warnings = component.getWarnings(platformParameter);
+
+      expect(warnings.length).toEqual(1);
+      expect(warnings[0]).toEqual(
+        'In the 1-th rule, there should be at least one filter.');
+    });
+  });
+
+  describe('.setWarningsAreShown', () => {
+    it('should set the warningsAreShown to boolean', () => {
+      expect(component.warningsAreShown).toBeFalse;
+
+      component.setWarningsAreShown(true);
+
+      expect(component.warningsAreShown).toBeTrue;
+    });
+  });
+
   describe('.saveDefaultValueToStorage', () => {
     it('should save the changes', fakeAsync(() => {
       spyOn(mockWindowRef.nativeWindow, 'confirm').and.returnValue(true);
@@ -428,6 +451,9 @@ describe('Admin page platform parameters tab', () => {
       const platformParameter = component.platformParameters[0];
 
       component.addNewRuleToBottom(platformParameter);
+      platformParameter.rules[1].filters[0].conditions = [
+        ['=', ServerMode.Prod]
+      ];
       component.updateParameterRulesAsync(platformParameter);
 
       flushMicrotasks();
@@ -444,6 +470,9 @@ describe('Admin page platform parameters tab', () => {
         const platformParameter = component.platformParameters[0];
 
         component.addNewRuleToBottom(platformParameter);
+        platformParameter.rules[1].filters[0].conditions = [
+          ['=', ServerMode.Prod]
+        ];
         component.updateParameterRulesAsync(platformParameter);
 
         flushMicrotasks();
@@ -540,6 +569,9 @@ describe('Admin page platform parameters tab', () => {
       const platformParameter = component.platformParameters[0];
 
       component.addNewRuleToBottom(platformParameter);
+      platformParameter.rules[1].filters[0].conditions = [
+        ['=', ServerMode.Prod]
+      ];
       component.updateParameterRulesAsync(platformParameter);
 
       flushMicrotasks();
@@ -562,6 +594,9 @@ describe('Admin page platform parameters tab', () => {
       const platformParameter = component.platformParameters[0];
 
       component.addNewRuleToBottom(platformParameter);
+      platformParameter.rules[1].filters[0].conditions = [
+        ['=', ServerMode.Prod]
+      ];
       component.updateParameterRulesAsync(platformParameter);
 
       flushMicrotasks();
@@ -668,7 +703,12 @@ describe('Admin page platform parameters tab', () => {
               value_when_matched: true,
             },
             {
-              filters: [],
+              filters: [
+                {
+                  type: PlatformParameterFilterType.ServerMode,
+                  conditions: [['=', ServerMode.Prod]]
+                }
+              ],
               value_when_matched: true
             }
           ],
@@ -690,11 +730,21 @@ describe('Admin page platform parameters tab', () => {
           rule_schema_version: 1,
           rules: [
             {
-              filters: [],
+              filters: [
+                {
+                  type: PlatformParameterFilterType.ServerMode,
+                  conditions: [['=', ServerMode.Prod]]
+                }
+              ],
               value_when_matched: true
             },
             {
-              filters: [],
+              filters: [
+                {
+                  type: PlatformParameterFilterType.ServerMode,
+                  conditions: [['=', ServerMode.Prod]]
+                }
+              ],
               value_when_matched: true
             },
           ],
@@ -763,6 +813,35 @@ describe('Admin page platform parameters tab', () => {
       expect(issues).toEqual([
         'In the 1-th rule, 1-th filter: the 1-th & 2-th conditions' +
         ' are identical.']);
+    });
+
+    it('should return issues if filter has no condition', () => {
+      const issues = AdminPlatformParametersTabComponent.validatePlatformParam(
+        PlatformParameter.createFromBackendDict({
+          data_type: 'bool',
+          default_value: false,
+          description: 'This is a dummy platform param.',
+          feature_stage: FeatureStage.DEV,
+          is_feature: true,
+          name: 'dummy_platform_parameter',
+          rule_schema_version: 1,
+          rules: [
+            {
+              filters: [
+                {
+                  type: PlatformParameterFilterType.ServerMode,
+                  conditions: []
+                },
+              ],
+              value_when_matched: true
+            },
+          ],
+        })
+      );
+
+      expect(issues).toEqual(
+        ['In the 1-th rule, 1-th filter there should be at least ' +
+        'one condition.']);
     });
   });
 });

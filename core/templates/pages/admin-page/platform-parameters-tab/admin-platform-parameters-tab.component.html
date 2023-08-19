@@ -21,6 +21,23 @@
     <div class="col-2"><b>Description:</b></div>
     <div class="col-10 oppia-description-content">{{platformParameter.description}}</div>
   </div>
+  <!-- <div class="row oppia-parameter-top-margin">
+    <div class="col-2"><b>Feature Group:</b></div>
+    <div class="col-10">
+      <div class="d-flex flex-column">
+        <div class="mb-2">
+          <select [(ngModel)]="selectedOption">
+            <option *ngFor="let option of dropdownOptions" [ngValue]="option.value">
+              {{ option.label }}
+            </option>
+          </select>            
+        </div>
+        <div>
+          Setting the feature-group will enable the platform parameter for the users present in that group only.
+        </div>
+      </div>
+    </div>
+  </div> -->
   <div class="row oppia-parameter-top-margin">
     <div class="col-2">
       <b>Rules:</b>
@@ -144,7 +161,7 @@
                                 </div>
                               </div>
                             </div>
-                            <div class="col-1 oppia-flex-center">
+                            <div *ngIf="rule.filters.length > 1" class="col-1 oppia-flex-center">
                               <button class="btn btn-secondary" (click)="removeFilter(rule, filterIndex)"><i class="fas fa-times"></i></button>
                             </div>
                           </div>
@@ -217,12 +234,25 @@
             (click)="clearChanges(platformParameter); shiftToReadMode(platformParameter)">
       Cancel
     </button>
-    <button
-            class="btn btn-primary"
-            (click)="updateParameterRulesAsync(platformParameter); shiftToReadMode(platformParameter);"
-            [disabled]="!isPlatformParamChanged(platformParameter)">
-      Save
-    </button>
+    <div class="save-button-container" (mouseover)="setWarningsAreShown(true)" (mouseleave)="setWarningsAreShown(false)">
+      <button
+        class="btn btn-primary"
+        (click)="updateParameterRulesAsync(platformParameter) && shiftToReadMode(platformParameter)"
+        [disabled]="!isPlatformParamChanged(platformParameter) || getWarnings(platformParameter).length > 0">
+        Save
+      </button>
+      <li class="uib-dropdown nav-item icon nav-list-item">
+        <ul class="uib-dropdown-menu oppia-editor-warnings-box dropdown-menu warning-box" *ngIf="warningsAreShown && getWarnings(platformParameter).length > 0">
+          <span class="oppia-editor-warnings-header">Fix below errors before saving</span>
+          <li class="oppia-editor-warnings-text" *ngFor="let warning of getWarnings(platformParameter); index as index">
+            <hr class="oppia-editor-warnings-separator">
+            <span *ngIf="warning">
+              {{ warning }}
+            </span>
+          </li>
+        </ul>
+      </li>
+    </div>
   </div>
 </div>
 
@@ -232,6 +262,36 @@
 
 
 <style>
+  .save-button-container {
+    position: relative;
+    display: inline-block;
+  }
+
+  .save-button-container .uib-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    visibility: hidden;
+    opacity: 0;
+    transition: opacity 0.3s, visibility 0.3s;
+    z-index: 1;
+  }
+
+  .save-button-container:hover .uib-dropdown {
+    visibility: visible;
+    opacity: 1;
+  }
+
+  .warning-box {
+    display: block;
+  }
+
+  .oppia-editor-warnings-box {
+    background: #fcf8e3;
+    cursor: default;
+    max-width: none;
+  }
+
   .oppia-edit-param-button {
     padding: 15px;
     text-align: center;
