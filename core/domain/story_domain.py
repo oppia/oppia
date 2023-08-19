@@ -21,7 +21,6 @@ import datetime
 import functools
 import json
 import re
-import time
 
 from core import android_validation_constants
 from core import feconf
@@ -921,16 +920,18 @@ class StoryNode:
         Returns:
             bool. True if the chapter is upcoming else false.
         """
-        current_time = (
-            utils.convert_millisecs_time_to_datetime_object(
-            utils.get_current_time_in_millisecs() -
-            1000.0 * time.timezone))
+        current_time_msecs = utils.get_current_time_in_millisecs()
+        planned_publication_date_msecs = (
+            utils.get_time_in_millisecs(self.planned_publication_date) if
+            self.planned_publication_date else None)
         if (
             self.status != constants.STORY_NODE_STATUS_PUBLISHED and
-            self.planned_publication_date is not None and
-            current_time < self.planned_publication_date <
-            (current_time + datetime.timedelta(
-            days=constants.CHAPTER_PUBLICATION_NOTICE_PERIOD_IN_DAYS))):
+            planned_publication_date_msecs is not None and
+            current_time_msecs < planned_publication_date_msecs <
+            current_time_msecs + (
+                constants.
+                    CHAPTER_PUBLICATION_NOTICE_PERIOD_IN_DAYS) *
+                    24 * 3600 * 1000):
             return True
         return False
 
@@ -941,14 +942,14 @@ class StoryNode:
         Returns:
             bool. True if the chapter is behind-schedule else false.
         """
-        current_time = (
-            utils.convert_millisecs_time_to_datetime_object(
-            utils.get_current_time_in_millisecs() -
-            1000.0 * time.timezone))
+        current_time_msecs = utils.get_current_time_in_millisecs()
+        planned_publication_date_msecs = (
+            utils.get_time_in_millisecs(self.planned_publication_date) if
+            self.planned_publication_date else None)
         if (
             self.status != constants.STORY_NODE_STATUS_PUBLISHED and
-            self.planned_publication_date is not None and
-            current_time > self.planned_publication_date):
+            planned_publication_date_msecs is not None and
+            current_time_msecs > planned_publication_date_msecs):
             return True
         return False
 
@@ -2067,7 +2068,8 @@ class Story:
         node_index = self.story_contents.get_node_index(node_id)
         self.story_contents.nodes[node_index].planned_publication_date = (
             utils.convert_millisecs_time_to_datetime_object(
-                new_planned_publication_date_msecs))
+                new_planned_publication_date_msecs) if
+                new_planned_publication_date_msecs else None)
 
     def update_node_last_modified(
             self, node_id: str, new_last_modified_msecs: float) -> None:
@@ -2081,7 +2083,7 @@ class Story:
         node_index = self.story_contents.get_node_index(node_id)
         self.story_contents.nodes[node_index].last_modified = (
             utils.convert_millisecs_time_to_datetime_object(
-            new_last_modified_msecs))
+            new_last_modified_msecs)) if new_last_modified_msecs else None
 
     def update_node_first_publication_date(
             self, node_id: str, new_publication_date_msecs: float) -> None:
@@ -2095,7 +2097,8 @@ class Story:
         node_index = self.story_contents.get_node_index(node_id)
         self.story_contents.nodes[node_index].first_publication_date = (
             utils.convert_millisecs_time_to_datetime_object(
-                new_publication_date_msecs))
+                new_publication_date_msecs) if
+                new_publication_date_msecs else None)
 
     def update_node_unpublishing_reason(
             self, node_id: str, new_unpublishing_reason: str) -> None:

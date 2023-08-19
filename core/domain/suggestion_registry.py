@@ -2311,3 +2311,37 @@ class QuestionReviewerTotalContributionStats:
             'last_contributed_in_days': int(
                 (datetime.date.today() - self.last_contribution_date).days)
         }
+
+
+class TranslationCoordinatorStatsDict(TypedDict):
+    """Dict representation of TranslationCoordinatorStats domain object"""
+
+    language_id: str
+    coordinator_ids: List[str]
+    coordinators_count: int
+
+
+class TranslationCoordinatorStats:
+    """Domain object for the TranslationCoordinatorStatsModel."""
+
+    def __init__(
+        self,
+        language_id: str,
+        coordinator_ids: List[str],
+        coordinators_count: int
+    ) -> None:
+        self.language_id = language_id
+        self.coordinator_ids = coordinator_ids
+        self.coordinators_count = coordinators_count
+
+    def to_dict(self) -> TranslationCoordinatorStatsDict:
+        """Returns a dict representaion of TranslationCoordinatorStats.
+
+        Returns: dict. The dict representation.
+        """
+
+        return {
+            'language_id': self.language_id,
+            'coordinator_ids': self.coordinator_ids,
+            'coordinators_count': self.coordinators_count
+        }

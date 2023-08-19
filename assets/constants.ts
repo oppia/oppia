@@ -115,6 +115,14 @@ export default {
     "IncreasingUpdatedOn": "Most Recently Updated",
     "DecreasingUpdatedOn": "Least Recently Updated"
   },
+  "TOPIC_SKILL_DASHBOARD_SORTING_OPTIONS": {
+    "IncreasingCreatedOn": "Newly Created",
+    "DecreasingCreatedOn": "Oldest Created",
+    "IncreasingUpdatedOn": "Most Recently Updated",
+    "DecreasingUpdatedOn": "Least Recently Updated",
+    "DecreasingUpcomingLaunches": "Most Upcoming Launches",
+    "DecreasingOverdueLaunches": "Most Launches Behind Schedule"
+  },
 
   // Sorting categories for contributor admin dashboard.
   "CD_ADMIN_STATS_SORT_OPTIONS": {
@@ -129,7 +137,9 @@ export default {
     "IncreasingReviewedTranslations": "Lowest to Highest Reviewed Translations",
     "DecreasingReviewedTranslations": "Highest to Lowest Reviewed Translations",
     "IncreasingReviewedQuestions": "Lowest to Highest Reviewed Questions",
-    "DecreasingReviewedQuestions": "Highest to Lowest Reviewed Questions"
+    "DecreasingReviewedQuestions": "Highest to Lowest Reviewed Questions",
+    "DecreasingCoordinatorCounts": "Highest to Lowest Coordinators Count",
+    "IncreasingCoordinatorCounts": "Lowest to Highest Coordinators Count"
   },
   // These categories are shown in the library navbar. The categories should
   // be in sorted order.
