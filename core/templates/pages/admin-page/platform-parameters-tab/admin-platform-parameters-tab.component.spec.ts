@@ -641,6 +641,14 @@ describe('Admin page platform parameters tab', () => {
       }
     );
 
+    it('should return true when default value is changed', () => {
+      const platformParameter = component.platformParameters[0];
+      platformParameter.defaultValue = 'new value';
+
+      expect(component.isPlatformParamChanged(platformParameter))
+          .toBeTrue();
+    });
+
     it('should throw error if the platform param username is not found', () => {
       const platformParameter = PlatformParameter.createFromBackendDict({
         data_type: 'bool',
@@ -842,6 +850,29 @@ describe('Admin page platform parameters tab', () => {
       expect(issues).toEqual(
         ['In the 1-th rule, 1-th filter there should be at least ' +
         'one condition.']);
+    });
+
+    it('should return issues if there is no filter in the rule', () => {
+      const issues = AdminPlatformParametersTabComponent.validatePlatformParam(
+        PlatformParameter.createFromBackendDict({
+          data_type: 'bool',
+          default_value: false,
+          description: 'This is a dummy platform param.',
+          feature_stage: FeatureStage.DEV,
+          is_feature: true,
+          name: 'dummy_platform_parameter',
+          rule_schema_version: 1,
+          rules: [
+            {
+              filters: [],
+              value_when_matched: true
+            },
+          ],
+        })
+      );
+
+      expect(issues).toEqual(
+        ['In the 1-th rule, there should be at least one filter.']);
     });
   });
 });

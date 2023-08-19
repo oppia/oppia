@@ -330,7 +330,10 @@ export class AdminPlatformParametersTabComponent implements OnInit {
     if (original === undefined) {
       throw new Error('Backup not found for platform params: ' + param.name);
     }
-    return !isEqual(param, original);
+    return (
+      !isEqual(original.rules, param.rules) ||
+      !isEqual(original.defaultValue, param.defaultValue)
+    );
   }
 
   /**
@@ -420,6 +423,5 @@ export class AdminPlatformParametersTabComponent implements OnInit {
     this.platformParametersAreFetched = true;
     this.loaderService.showLoadingScreen('Loading');
     this.reloadPlatformParametersAsync();
-    this.warningsAreShown = false;
   }
 }
