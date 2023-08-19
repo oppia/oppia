@@ -371,7 +371,8 @@ export class AdminPlatformParametersTabComponent implements OnInit {
         if (filter.conditions.length === 0) {
           issues.push(
             `In the ${ruleIndex + 1}-th rule, ${filterIndex + 1}-th filter ` +
-            `there should be at least one condition.`);
+            'there should be at least one condition.');
+          continue;
         }
 
         const seenConditions: [string, string][] = [];
@@ -394,7 +395,8 @@ export class AdminPlatformParametersTabComponent implements OnInit {
       if (rule.filters.length === 0) {
         issues.push(
           `In the ${ruleIndex + 1}-th rule, there should be at least ` +
-          `one filter.`);
+          'one filter.');
+        continue;
       }
     }
     return issues;

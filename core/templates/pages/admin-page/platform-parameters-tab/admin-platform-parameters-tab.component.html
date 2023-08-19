@@ -21,23 +21,6 @@
     <div class="col-2"><b>Description:</b></div>
     <div class="col-10 oppia-description-content">{{platformParameter.description}}</div>
   </div>
-  <!-- <div class="row oppia-parameter-top-margin">
-    <div class="col-2"><b>Feature Group:</b></div>
-    <div class="col-10">
-      <div class="d-flex flex-column">
-        <div class="mb-2">
-          <select [(ngModel)]="selectedOption">
-            <option *ngFor="let option of dropdownOptions" [ngValue]="option.value">
-              {{ option.label }}
-            </option>
-          </select>            
-        </div>
-        <div>
-          Setting the feature-group will enable the platform parameter for the users present in that group only.
-        </div>
-      </div>
-    </div>
-  </div> -->
   <div class="row oppia-parameter-top-margin">
     <div class="col-2">
       <b>Rules:</b>
@@ -235,10 +218,9 @@
       Cancel
     </button>
     <div class="save-button-container" (mouseover)="setWarningsAreShown(true)" (mouseleave)="setWarningsAreShown(false)">
-      <button
-        class="btn btn-primary"
-        (click)="updateParameterRulesAsync(platformParameter) && shiftToReadMode(platformParameter)"
-        [disabled]="!isPlatformParamChanged(platformParameter) || getWarnings(platformParameter).length > 0">
+      <button class="btn btn-primary"
+              (click)="updateParameterRulesAsync(platformParameter) && shiftToReadMode(platformParameter)"
+              [disabled]="!isPlatformParamChanged(platformParameter) || getWarnings(platformParameter).length > 0">
         Save
       </button>
       <li class="uib-dropdown nav-item icon nav-list-item">
@@ -263,23 +245,23 @@
 
 <style>
   .save-button-container {
-    position: relative;
     display: inline-block;
+    position: relative;
   }
 
   .save-button-container .uib-dropdown {
     position: absolute;
-    top: 100%;
     left: 0;
-    visibility: hidden;
+    top: 100%;
     opacity: 0;
+    visibility: hidden;
     transition: opacity 0.3s, visibility 0.3s;
     z-index: 1;
   }
 
   .save-button-container:hover .uib-dropdown {
-    visibility: visible;
     opacity: 1;
+    visibility: visible;
   }
 
   .warning-box {
