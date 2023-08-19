@@ -1624,7 +1624,7 @@ describe('State translation component', () => {
       component.initActiveContentId = 'hint_2';
 
       spyOn(stateEditorService, 'getInitActiveContentId').and.
-        returnValue('hint_2');
+          returnValue('hint_2');
 
       const index = component.getIndexOfActiveCard();
       expect(index).toEqual(1);
