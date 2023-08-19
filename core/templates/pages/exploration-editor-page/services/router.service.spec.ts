@@ -182,7 +182,7 @@ describe('Router Service', () => {
 
     tick(300);
 
-    expect(stateEditorService.getInitActiveContentId()).toBe('ca_buttonText_6')
+    expect(stateEditorService.getInitActiveContentId()).toBe('ca_buttonText_6');
   }));
 
   it('should navigate to preview tab', fakeAsync(() => {
