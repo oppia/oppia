@@ -141,6 +141,7 @@ class SuggestionEditStateContentDict(TypedDict):
     score_category: str
     language_code: Optional[str]
     last_updated: float
+    created_on: float
     edited_by_reviewer: bool
 
 
@@ -179,6 +180,7 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
             'score_category': 'content.Algebra',
             'language_code': None,
             'last_updated': utils.get_time_in_millisecs(self.fake_date),
+            'created_on': utils.get_time_in_millisecs(self.fake_date),
             'edited_by_reviewer': False
         }
 
@@ -192,7 +194,9 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
             expected_suggestion_dict['status'], self.author_id,
             self.reviewer_id, expected_suggestion_dict['change'],
             expected_suggestion_dict['score_category'],
-            expected_suggestion_dict['language_code'], False, self.fake_date)
+            expected_suggestion_dict['language_code'], False, self.fake_date,
+            self.fake_date
+        )
 
         self.assertDictEqual(
             observed_suggestion.to_dict(), expected_suggestion_dict)
@@ -927,6 +931,7 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
             'score_category': 'translation.Algebra',
             'language_code': 'hi',
             'last_updated': utils.get_time_in_millisecs(self.fake_date),
+            'created_on': utils.get_time_in_millisecs(self.fake_date),
             'edited_by_reviewer': False
         }
 
@@ -1059,7 +1064,9 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
             expected_suggestion_dict['status'], self.author_id,
             self.reviewer_id, expected_suggestion_dict['change'],
             expected_suggestion_dict['score_category'],
-            expected_suggestion_dict['language_code'], False, self.fake_date)
+            expected_suggestion_dict['language_code'], False, self.fake_date,
+            self.fake_date
+        )
 
         self.assertDictEqual(
             observed_suggestion.to_dict(), expected_suggestion_dict)
@@ -1784,6 +1791,7 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             'score_category': 'question.topic_1',
             'language_code': 'en',
             'last_updated': utils.get_time_in_millisecs(self.fake_date),
+            'created_on': utils.get_time_in_millisecs(self.fake_date),
             'edited_by_reviewer': False
         }
 
@@ -1797,7 +1805,9 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             expected_suggestion_dict['status'], self.author_id,
             self.reviewer_id, expected_suggestion_dict['change'],
             expected_suggestion_dict['score_category'],
-            expected_suggestion_dict['language_code'], False, self.fake_date)
+            expected_suggestion_dict['language_code'], False, self.fake_date,
+            self.fake_date
+        )
 
         self.assertDictEqual(
             observed_suggestion.to_dict(), expected_suggestion_dict)
@@ -2604,6 +2614,7 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             'score_category': 'question.skill1',
             'language_code': 'en',
             'last_updated': utils.get_time_in_millisecs(self.fake_date),
+            'created_on': utils.get_time_in_millisecs(self.fake_date),
             'edited_by_reviewer': False
         }
         suggestion = suggestion_registry.SuggestionAddQuestion(
@@ -2670,6 +2681,7 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             'score_category': 'question.skill1',
             'language_code': 'en',
             'last_updated': utils.get_time_in_millisecs(self.fake_date),
+            'created_on': utils.get_time_in_millisecs(self.fake_date),
             'edited_by_reviewer': False
         }
         suggestion = suggestion_registry.SuggestionAddQuestion(
@@ -2816,6 +2828,7 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             'score_category': 'question.skill1',
             'language_code': 'en',
             'last_updated': utils.get_time_in_millisecs(self.fake_date),
+            'created_on': utils.get_time_in_millisecs(self.fake_date),
             'edited_by_reviewer': False
         }
         self.save_new_skill(

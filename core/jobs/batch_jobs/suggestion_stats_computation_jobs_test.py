@@ -146,7 +146,7 @@ class GenerateContributionStatsJobTests(job_test_utils.JobTestBase):
             translation_stats_model.rejected_translation_word_count, 0)
         self.assertItemsEqual(
             translation_stats_model.contribution_dates,
-            [datetime.datetime.utcnow().date()]
+            [suggestion_model.created_on.date()]
         )
 
     def test_reports_failure_on_broken_model(self) -> None:
@@ -266,7 +266,7 @@ class GenerateContributionStatsJobTests(job_test_utils.JobTestBase):
             translation_stats_model.rejected_translation_word_count, 0)
         self.assertItemsEqual(
             translation_stats_model.contribution_dates,
-            [datetime.datetime.utcnow().date()]
+            [suggestion_model.created_on.date()]
         )
 
     def test_creates_stats_model_from_one_suggestion_in_set_format(
@@ -341,7 +341,7 @@ class GenerateContributionStatsJobTests(job_test_utils.JobTestBase):
             translation_stats_model.rejected_translation_word_count, 0)
         self.assertItemsEqual(
             translation_stats_model.contribution_dates,
-            [datetime.datetime.utcnow().date()]
+            [suggestion_model.created_on.date()]
         )
 
     def test_creates_stats_model_from_one_in_review_suggestion_with_opportunity(
@@ -416,7 +416,7 @@ class GenerateContributionStatsJobTests(job_test_utils.JobTestBase):
             translation_stats_model.rejected_translation_word_count, 0)
         self.assertItemsEqual(
             translation_stats_model.contribution_dates,
-            [datetime.datetime.utcnow().date()]
+            [suggestion_model.created_on.date()]
         )
 
     def test_creates_translation_stats_models_from_one_accepted_suggestion(
@@ -501,7 +501,7 @@ class GenerateContributionStatsJobTests(job_test_utils.JobTestBase):
             translation_stats_model.rejected_translation_word_count, 0)
         self.assertItemsEqual(
             translation_stats_model.contribution_dates,
-            [datetime.datetime.utcnow().date()]
+            [suggestion_model.created_on.date()]
         )
 
         self.assertEqual(
@@ -677,7 +677,7 @@ class GenerateContributionStatsJobTests(job_test_utils.JobTestBase):
             translation_stats_model.rejected_translation_word_count, 0)
         self.assertItemsEqual(
             translation_stats_model.contribution_dates,
-            [datetime.datetime.utcnow().date()]
+            [first_suggestion_model.created_on.date()]
         )
 
         self.assertEqual(
@@ -825,7 +825,7 @@ class GenerateContributionStatsJobTests(job_test_utils.JobTestBase):
             first_translation_stats_model.rejected_translation_word_count, 0)
         self.assertItemsEqual(
             first_translation_stats_model.contribution_dates,
-            [datetime.datetime.utcnow().date()]
+            [first_suggestion_model.created_on.date()]
         )
 
         self.assertEqual(
@@ -855,7 +855,7 @@ class GenerateContributionStatsJobTests(job_test_utils.JobTestBase):
             second_translation_stats_model.rejected_translation_word_count, 0)
         self.assertItemsEqual(
             second_translation_stats_model.contribution_dates,
-            [datetime.datetime.utcnow().date()]
+            [second_suggestion_model.created_on.date()]
         )
 
         self.assertEqual(
@@ -1228,8 +1228,7 @@ class GenerateContributionStatsJobTests(job_test_utils.JobTestBase):
         self.assertItemsEqual(
             translation_stats_model.contribution_dates,
             [
-                datetime.datetime.utcnow().date(),
-                datetime.datetime.utcnow().date() - datetime.timedelta(days=1)
+                suggestion_1_model.created_on.date()
             ]
         )
 

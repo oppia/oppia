@@ -36,7 +36,6 @@ from core.domain import user_services
 from core.jobs.batch_jobs import blog_post_search_indexing_jobs
 from core.jobs.batch_jobs import exp_recommendation_computation_jobs
 from core.jobs.batch_jobs import exp_search_indexing_jobs
-from core.jobs.batch_jobs import suggestion_stats_computation_jobs
 from core.jobs.batch_jobs import user_stats_computation_jobs
 from core.platform import models
 from core.tests import test_utils
@@ -781,20 +780,6 @@ class CronMailAdminContributorDashboardBottlenecksHandlerTests(
         )
         with swap_with_checks, self.testapp_swap:
             self.get_html_response('/cron/users/dashboard_stats')
-
-    def test_cron_translation_contribution_stats_handler(self) -> None:
-        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
-        swap_with_checks = self.swap_with_checks(
-            beam_job_services, 'run_beam_job', lambda **_: None,
-            expected_kwargs=[{
-                'job_class': (
-                    suggestion_stats_computation_jobs
-                    .GenerateContributionStatsJob),
-            }]
-        )
-        with swap_with_checks, self.testapp_swap:
-            self.get_html_response(
-                '/cron/suggestions/translation_contribution_stats')
 
 
 class CronMailChapterPublicationsNotificationsHandlerTests(

@@ -63,6 +63,7 @@ class ContributionStatsDict(TypedDict):
     edited_by_reviewer: bool
     word_count: int
     last_updated_date: datetime.date
+    created_on_date: datetime.date
 
 
 class GenerateContributionStatsJob(base_jobs.JobBase):
@@ -486,7 +487,9 @@ class GenerateContributionStatsJob(base_jobs.JobBase):
                         'edited_by_reviewer': suggestion.edited_by_reviewer,
                         'word_count': word_count,
                         'last_updated_date': (
-                            suggestion.last_updated.date())
+                            suggestion.last_updated.date()),
+                        'created_on_date': (
+                            suggestion.created_on.date())
                     }
                     yield (key, result.Ok(translation_contribution_stats_dict))
                 except Exception as e:
@@ -549,7 +552,9 @@ class GenerateContributionStatsJob(base_jobs.JobBase):
                         'edited_by_reviewer': suggestion.edited_by_reviewer,
                         'word_count': 0,
                         'last_updated_date': (
-                            suggestion.last_updated.date())
+                            suggestion.last_updated.date()),
+                        'created_on_date': (
+                            suggestion.created_on.date())
                     }
                     yield (key, result.Ok(question_stats_dict))
 
@@ -582,7 +587,7 @@ class GenerateContributionStatsJob(base_jobs.JobBase):
         )
         word_count = stat['word_count']
         suggestion_date = datetime.datetime.strptime(
-            str(stat['last_updated_date']), '%Y-%m-%d').date()
+            str(stat['created_on_date']), '%Y-%m-%d').date()
         transformed_data = suggestion_registry.TranslationContributionStats(
             language_code=language_code,
             contributor_user_id=contributor_user_id,
@@ -757,8 +762,8 @@ class GenerateContributionStatsJob(base_jobs.JobBase):
             accepted_questions_count=int(is_accepted),
             accepted_questions_without_reviewer_edits_count=int(
                 is_accepted_and_not_edited),
-            first_contribution_date=stat['last_updated_date'],
-            last_contribution_date=stat['last_updated_date']
+            first_contribution_date=stat['created_on_date'],
+            last_contribution_date=stat['created_on_date']
         )
 
         return (entity_id, transformed_data)
