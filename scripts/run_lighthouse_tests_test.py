@@ -42,6 +42,7 @@ LIGHTHOUSE_CONFIG_FILENAMES = {
     }
 }
 
+
 class MockCompiler:
     def wait(self) -> None: # pylint: disable=missing-docstring
         pass
