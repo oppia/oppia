@@ -111,7 +111,7 @@ export class AdminPlatformParametersTabComponent implements OnInit {
   directiveSubscriptions = new Subscription();
   platformParameterNameToRulesReadonlyData: Map<string, string[]> = new Map();
   platformParametersInEditMode!: Map<string, boolean>;
-  warningsAreShown: boolean;
+  warningsAreShown: boolean = false;
 
   constructor(
     private windowRef: WindowRef,
