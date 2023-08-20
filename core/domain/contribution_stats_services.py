@@ -20,7 +20,7 @@ from __future__ import annotations
 from core.domain import suggestion_registry
 from core.platform import models
 
-from typing import List, Optional, Tuple
+from typing import List, Optional, Sequence, Tuple
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -458,4 +458,60 @@ def get_question_reviewer_total_stats(
         question_reviewer_stats,
         next_offset,
         more
+    )
+
+
+def get_all_translation_coordinator_stats(
+    sort: str
+) -> List[suggestion_registry.TranslationCoordinatorStats]:
+    """Gets all TranslationCoordinatorStats corresponding to the supplied
+    user and converts them to their corresponding domain objects.
+
+    Args:
+        sort: str. The sort order for coordinator counts.
+
+    Returns:
+        list(TranslationCoordinatorStats). TranslationCoordinatorStats domain
+        objects corresponding to the supplied user.
+    """
+    model_class = suggestion_models.TranslationCoordinatorsModel
+    translation_coordinator_models: Sequence[
+        suggestion_models.TranslationCoordinatorsModel] = []
+    if sort == (
+        suggestion_models.SortChoices.SORT_KEY_INCREASING_COORDINATOR_COUNTS
+        .value):
+        translation_coordinator_models = (
+            model_class.query().order(
+                model_class.coordinators_count).fetch()
+        )
+    else:
+        translation_coordinator_models = (
+            suggestion_models.TranslationCoordinatorsModel.query().order(
+                -model_class.coordinators_count).fetch()
+        )
+    return [
+        suggestion_registry.TranslationCoordinatorStats(
+            model.id,
+            model.coordinator_ids,
+            model.coordinators_count
+        )
+        for model in translation_coordinator_models
+    ]
+
+
+def get_translator_counts(language_code: str) -> int:
+    """Gets the count of translators corresponding to the given language code.
+
+    Args:
+        language_code: str. The language code of which translators count in
+            required.
+
+    Returns:
+        int. Number of translator counts.
+    """
+    model_class = (
+        suggestion_models.TranslationSubmitterTotalContributionStatsModel)
+    return len(
+        suggestion_models.TranslationSubmitterTotalContributionStatsModel
+        .query(model_class.language_code == language_code).fetch()
     )
