@@ -1836,12 +1836,13 @@ pre.oppia-pre-wrapped-text {
 }
 
 .oppia-interaction-preview {
-  height: 100%;
+  height: 99.7%;
   opacity: 0.5;
   outline: none;
   padding: 4px;
   position: absolute;
-  width: 100%;
+  width: 92%;
+  left: 29px;
 }
 
 .oppia-editable-section:hover .oppia-interaction-preview {
