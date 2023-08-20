@@ -97,15 +97,15 @@
         role="menu">
       <ng-container *ngFor="let item of selectionDetails.languageCodes.masterList">
         <li ngbDropdownItem *ngIf="selectionDetails.languageCodes.selections[item.id]">
-          <a tabindex="0" (keydown.enter)="toggleSelection('languageCodes', item.id)" (click)="toggleSelection('languageCodes', item.id)" *ngIf="!first && !last" class="dropdown-item">
+          <a tabindex="0" [attr.aria-label]="item.text + 'selected'" (keydown.enter)="toggleSelection('languageCodes', item.id)" (click)="toggleSelection('languageCodes', item.id)" *ngIf="!first && !last" class="dropdown-item">
             <span class="e2e-test-selected">{{ item.text | translate }}</span>
             <i *ngIf="selectionDetails.languageCodes.selections[item.id]" class="fas fa-check float-right oppia-search-bar-category-selection-symbol"></i>
           </a>
-          <a tabindex="0" (keydown.enter)="toggleSelection('languageCodes', item.id)" (click)="toggleSelection('languageCodes', item.id)" *ngIf="first" (keydown)="onMenuKeypress($event, 'language', {shiftTab: ACTION_CLOSE})" class="dropdown-item">
+          <a tabindex="0" [attr.aria-label]="item.text + 'selected'" (keydown.enter)="toggleSelection('languageCodes', item.id)" (click)="toggleSelection('languageCodes', item.id)" *ngIf="first" (keydown)="onMenuKeypress($event, 'language', {shiftTab: ACTION_CLOSE})" class="dropdown-item">
             <span class="e2e-test-selected">{{ item.text | translate }}</span>
             <i *ngIf="selectionDetails.languageCodes.selections[item.id]" class="fas fa-check float-right oppia-search-bar-category-selection-symbol"></i>
           </a>
-          <a tabindex="0" (keydown.enter)="toggleSelection('languageCodes', item.id)" (click)="toggleSelection('languageCodes', item.id)" *ngIf="last" (keydown)="onMenuKeypress($event, 'language', {tab: ACTION_CLOSE})"
+          <a tabindex="0" [attr.aria-label]="item.text + 'selected'" (keydown.enter)="toggleSelection('languageCodes', item.id)" (click)="toggleSelection('languageCodes', item.id)" *ngIf="last" (keydown)="onMenuKeypress($event, 'language', {tab: ACTION_CLOSE})"
              class="dropdown-item">
             <span class="e2e-test-selected">{{ item.text | translate }}</span>
             <i *ngIf="selectionDetails.languageCodes.selections[item.id]" class="fas fa-check float-right oppia-search-bar-category-selection-symbol"></i>
