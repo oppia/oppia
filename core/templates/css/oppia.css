@@ -1837,11 +1837,11 @@ pre.oppia-pre-wrapped-text {
 
 .oppia-interaction-preview {
   height: 99.7%;
+  left: 29px;
   opacity: 0.5;
   outline: none;
   padding: 4px;
   position: absolute;
-  left: 29px;
   width: 92%;
   
 }
