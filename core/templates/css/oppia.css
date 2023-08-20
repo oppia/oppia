@@ -1841,8 +1841,9 @@ pre.oppia-pre-wrapped-text {
   outline: none;
   padding: 4px;
   position: absolute;
-  width: 92%;
   left: 29px;
+  width: 92%;
+  
 }
 
 .oppia-editable-section:hover .oppia-interaction-preview {
