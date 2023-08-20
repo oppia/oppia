@@ -612,7 +612,8 @@ export class UpgradedServices {
       new ThreadStatusDisplayService();
     upgradedServices['Title'] = new Title({});
     upgradedServices['TopicsAndSkillsDashboardPageService'] =
-        new TopicsAndSkillsDashboardPageService();
+        new TopicsAndSkillsDashboardPageService(
+          upgradedServices['PlatformFeatureService']);
     upgradedServices['UnitsObjectFactory'] = new UnitsObjectFactory();
     upgradedServices['UtilsService'] = new UtilsService();
     upgradedServices['VersionTreeService'] = new VersionTreeService();
