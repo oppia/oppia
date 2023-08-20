@@ -37,8 +37,8 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 class MockWindowRef {
   _window = {
     location: {
-      hash: '#thank-you',
       _href: '',
+      search: '',
       get href() {
         return this._href;
       },
@@ -236,27 +236,17 @@ describe('Donate page', () => {
     expect(component.getStaticImageUrl).toHaveBeenCalled();
   });
 
-  it('should show thank you modal on hash change', () => {
-    windowRef.nativeWindow.location.hash = '#nothing';
+  it('should show thank you modal on query parameters change', () => {
+    windowRef.nativeWindow.location.search = '';
     component.ngOnInit();
-
     expect(ngbModal.open).not.toHaveBeenCalled();
 
-    windowRef.nativeWindow.location.hash = '#thank-you';
-    component.showThanksForDonatingModal();
-
-    expect(ngbModal.open).toHaveBeenCalled();
-  });
-
-  it('should show thank you modal on init', () => {
-    windowRef.nativeWindow.location.hash = '#nothing';
+    windowRef.nativeWindow.location.search = '?random';
     component.ngOnInit();
-
     expect(ngbModal.open).not.toHaveBeenCalled();
 
-    windowRef.nativeWindow.location.hash = '#thank-you';
+    windowRef.nativeWindow.location.search = '?thanks';
     component.ngOnInit();
-
     expect(ngbModal.open).toHaveBeenCalled();
   });
 });
