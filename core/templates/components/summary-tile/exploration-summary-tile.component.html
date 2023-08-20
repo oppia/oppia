@@ -13,15 +13,15 @@
        [href]="getExplorationLink()"
        target="{{ openInNewWindow ? '_blank' : '_self' }}">
       <div class="title-section" [ngStyle]="{'background-color': thumbnailBgColor}">
-        <img class="thumbnail-image" [src]="thumbnailIcon" alt="{{ category }}">
+        <img class="thumbnail-image" [src]="thumbnailIcon" [alt]="'category: ' + category + '.'">
         <span class="activity-title e2e-test-exp-summary-tile-title">
           <span *ngIf="isWindowLarge">
-            <span *ngIf="!isHackyExpTitleTranslationDisplayed()">{{ explorationTitle | truncate:40 }}</span>
-            <span *ngIf="isHackyExpTitleTranslationDisplayed()">{{ expTitleTranslationKey | translate | truncate:40 }}</span>
+            <span *ngIf="!isHackyExpTitleTranslationDisplayed()" [attr.aria-label]="'exploration title:' + explorationTitle + '.'">{{ explorationTitle | truncate:40 }}</span>
+            <span *ngIf="isHackyExpTitleTranslationDisplayed()" [attr.aria-label]="'exploration title:' + expTitleTranslationKey + '.'">{{ expTitleTranslationKey | translate | truncate:40 }}</span>
           </span>
           <span *ngIf="!isWindowLarge">
-            <span *ngIf="!isHackyExpTitleTranslationDisplayed()">{{ explorationTitle | truncate:40 }}</span>
-            <span *ngIf="isHackyExpTitleTranslationDisplayed()">{{ expTitleTranslationKey | translate | truncate:40 }}</span>
+            <span *ngIf="!isHackyExpTitleTranslationDisplayed()" [attr.aria-label]="'exploration title:' + explorationTitle + '.'">{{ explorationTitle | truncate:40 }}</span>
+            <span *ngIf="isHackyExpTitleTranslationDisplayed()" [attr.aria-label]="'exploration title:' + expTitleTranslationKey + '.'">{{ expTitleTranslationKey | translate | truncate:40 }}</span>
           </span>
         </span>
       </div>
@@ -29,8 +29,8 @@
       <div class="summary-section"
            section="{isWindowLarge?undefined:'right-section'}">
         <div *ngIf="isWindowLarge" class="objective e2e-test-exp-summary-tile-objective">
-          <span *ngIf="!isHackyExpObjectiveTranslationDisplayed()">{{ objective | truncateAndCapitalize:95 }}</span>
-          <span *ngIf="isHackyExpObjectiveTranslationDisplayed()">{{ expObjectiveTranslationKey | translate | truncateAndCapitalize:95 }}</span>
+          <span *ngIf="!isHackyExpObjectiveTranslationDisplayed()" [attr.aria-label]="'objective:' + objective + '.'">{{ objective | truncateAndCapitalize:95 }}</span>
+          <span *ngIf="isHackyExpObjectiveTranslationDisplayed()" [attr.aria-label]="'objective:' + expObjectiveTranslationKey + '.'">{{ expObjectiveTranslationKey | translate | truncateAndCapitalize:95 }}</span>
         </div>
         <div *ngIf="!objective" class="objective">
           <span [innerHTML]="'I18N_LIBRARY_NO_OBJECTIVE' | translate">

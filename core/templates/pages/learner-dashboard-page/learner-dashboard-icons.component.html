@@ -2,6 +2,7 @@
    *ngIf="isAddToPlaylistIconShown"
    [hidden]="!(canActivityBeAddedToLearnerPlaylist(activityId) && !isContainerNarrow)"
    (click)="addToLearnerPlaylist(activityId, activityType)"
+   (keydown.enter)="addToLearnerPlaylist(activityId, activityType)"
    tabindex="0"
    ngbTooltip="{{ 'I18N_LIBRARY_ADD_TO_LEARNER_PLAYLIST' | translate }}"
    container="body"
