@@ -148,10 +148,10 @@ let closeAllBrowsers = async function() {
 
 /**
  * Function to close the browser opened by the specified user
- * @param {baseUser} username - the username of the user who's browser
+ * @param {baseUser} user - the user object of the user who's browser
  * should be closed.
  */
-let closeBrowserForUser = async function(username) {
+let closeBrowserForUser = async function(user) {
   const index = activeUsers.indexOf(user);
   activeUsers.splice(index, 1);
   await user.closeBrowser();
