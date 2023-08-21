@@ -918,7 +918,7 @@ class LearnerGroupLearnerInvitationHandler(
         assert self.normalized_payload is not None
         learner_username = self.normalized_payload['learner_username']
         is_invitation_accepted = (
-            self.normalized_payload['is_invitation_accepted'] == True)
+            self.normalized_payload['is_invitation_accepted'] is True)
         progress_sharing_permission = (
             self.normalized_payload['progress_sharing_permission'] == 'true')
 
