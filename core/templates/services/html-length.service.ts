@@ -48,7 +48,8 @@ export class HtmlLengthService {
       this.loggerService.error('Empty string was passed to compute length');
       return 0;
     }
-    const sanitizedHtml = this.sanitizer.sanitize(SecurityContext.HTML, htmlString);
+    const sanitizedHtml = this.sanitizer.sanitize(
+      SecurityContext.HTML, htmlString) as string;
     let totalWeight = this.calculateBaselineLength(sanitizedHtml);
 
     // Identify custom tags using regex on the original HTML string.
@@ -89,11 +90,11 @@ export class HtmlLengthService {
       return 1;
     }
     const altTextMatch = nonTextNode.match(/alt-with-value=["']([^"']*)["']/);
-      let words = []
-      if (altTextMatch && altTextMatch[1]) {
-        const altText = altTextMatch[1];
-        words = altText.trim().split(' ');
-      }
-      return words.length + 2; // +2 as a bonus for images with text
+    let words = [];
+    if (altTextMatch && altTextMatch[1]) {
+      const altText = altTextMatch[1];
+      words = altText.trim().split(' ');
+    }
+    return words.length + 2; // +2 as a bonus for images with text
   }
 }
