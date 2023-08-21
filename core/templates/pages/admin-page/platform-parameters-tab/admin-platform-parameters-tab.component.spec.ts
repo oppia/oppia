@@ -645,8 +645,7 @@ describe('Admin page platform parameters tab', () => {
       const platformParameter = component.platformParameters[0];
       platformParameter.defaultValue = 'new value';
 
-      expect(component.isPlatformParamChanged(platformParameter))
-          .toBeTrue();
+      expect(component.isPlatformParamChanged(platformParameter)).toBeTrue();
     });
 
     it('should throw error if the platform param username is not found', () => {
@@ -847,7 +846,7 @@ describe('Admin page platform parameters tab', () => {
       );
 
       expect(issues).toEqual(
-        ['In rule 1, filter 1 there should be at least one condition.']);
+        ['In rule 1, filter 1 should have at least one condition.']);
     });
 
     it('should return issues if there is no filter in the rule', () => {

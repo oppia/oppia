@@ -373,7 +373,7 @@ export class AdminPlatformParametersTabComponent implements OnInit {
         if (filter.conditions.length === 0) {
           issues.push(
             `In rule ${ruleIndex + 1}, filter ${filterIndex + 1} ` +
-            'there should be at least one condition.');
+            'should have at least one condition.');
           continue;
         }
 
