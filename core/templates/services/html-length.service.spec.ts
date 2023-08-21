@@ -78,7 +78,7 @@ describe('Html Length Service', () => {
     const testCases = [
       {
         input: '<p><em>This is a brief exploration about conjugations' +
-          'in Spanish.</em></p>',
+          ' in Spanish.</em></p>',
         expected: 9
       },
       {

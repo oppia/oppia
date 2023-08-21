@@ -95,6 +95,6 @@ export class HtmlLengthService {
       const altText = altTextMatch[1];
       words = altText.trim().split(' ');
     }
-    return words.length + 2; // +2 as a bonus for images with text
+    return words.length + 2; // +2 as a bonus for images with text.
   }
 }
