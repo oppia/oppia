@@ -320,7 +320,7 @@ export class ChangeListService {
     return angular.copy(this.explorationChangeList.filter((change) => {
       return [
         'edit_translation',
-        'remove_translation',
+        'remove_translations',
         'mark_translations_needs_update'
       ].includes(change.cmd);
     }));
