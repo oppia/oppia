@@ -31,7 +31,6 @@ from core.domain import user_services
 from core.jobs.batch_jobs import blog_post_search_indexing_jobs
 from core.jobs.batch_jobs import exp_recommendation_computation_jobs
 from core.jobs.batch_jobs import exp_search_indexing_jobs
-from core.jobs.batch_jobs import suggestion_stats_computation_jobs
 from core.jobs.batch_jobs import user_stats_computation_jobs
 
 from typing import Dict
@@ -281,24 +280,6 @@ class CronBlogPostSearchRankHandler(
         beam_job_services.run_beam_job(
             job_class=blog_post_search_indexing_jobs.IndexBlogPostsInSearchJob
         )
-
-
-class CronTranslationContributionStatsHandler(
-    base.BaseHandler[Dict[str, str], Dict[str, str]]
-):
-    """Handler for running the translation contribution stats populate job."""
-
-    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
-    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
-
-    @acl_decorators.can_perform_cron_tasks
-    def get(self) -> None:
-        """Handles GET requests."""
-        beam_job_services.run_beam_job(
-            job_class=(
-                suggestion_stats_computation_jobs
-                .GenerateContributionStatsJob))
 
 
 class CronMailChapterPublicationsNotificationsHandler(
