@@ -7,10 +7,11 @@
                                 [isAddToPlaylistIconShown]="!isOwnedByCurrentUser">
   </oppia-learner-dashboard-icons>
 
-  <mat-card [ngClass]="{'oppia-activity-summary-tile-mobile': isCollectionPreviewTile, 'oppia-activity-summary-tile': !isCollectionPreviewTile, 'small-width': !isWindowLarge, 'oppia-activity-playlist-tile': isPlaylistTile}"
-          *ngIf="!isRefresherExploration" [style.padding]="0" class="oppia-exploration-dashboard-card e2e-test-exploration-dashboard-card" (mouseenter)="setHoverState(true)" (mouseleave)="setHoverState(false)" [ngStyle]="{'margin': '5px'}">
-    <a class="oppia-focus-indicator-blue"
+  <mat-card (keydown.enter)="$event.stopPropagation(); explorationAnchor.click()" [ngClass]="{'oppia-activity-summary-tile-mobile': isCollectionPreviewTile, 'oppia-activity-summary-tile': !isCollectionPreviewTile, 'small-width': !isWindowLarge, 'oppia-activity-playlist-tile': isPlaylistTile}"
+          *ngIf="!isRefresherExploration" tabindex="0" (keydown.enter)="this.querySelector('.oppia-focus-indicator-blue').click()" [style.padding]="0" class="oppia-exploration-dashboard-card e2e-test-exploration-dashboard-card oppia-focus-indicator-blue" (mouseenter)="setHoverState(true)" (mouseleave)="setHoverState(false)" [ngStyle]="{'margin': '5px'}">
+    <a #explorationAnchor
        [href]="getExplorationLink()"
+       tabindex="-1"
        target="{{ openInNewWindow ? '_blank' : '_self' }}">
       <div class="title-section" [ngStyle]="{'background-color': thumbnailBgColor}">
         <img class="thumbnail-image" [src]="thumbnailIcon" [alt]="'category: ' + category + '.'">
