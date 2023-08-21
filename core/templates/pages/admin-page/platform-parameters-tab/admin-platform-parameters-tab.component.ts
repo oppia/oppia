@@ -153,12 +153,12 @@ export class AdminPlatformParametersTabComponent implements OnInit {
 
   getReadonlyFilterValues(rule: PlatformParameterRule): string {
     let resultantString: string = '';
-    let filters: PlatformParameterFilter[] = rule.filters;
+    const filters: PlatformParameterFilter[] = rule.filters;
     for (let filterIdx = 0; filterIdx < filters.length; filterIdx++) {
       let filterName: string = (
         this.filterTypeToContext[filters[filterIdx].type].displayName);
       if (filters[filterIdx].conditions.length === 0) {
-        resultantString += filterName + ' in ' + '[ ]';
+        resultantString += `${filterName} in [ ]`;
       } else {
         let conditions: string = '';
         for (let idx = 0; idx < filters[filterIdx].conditions.length; idx++) {
@@ -169,11 +169,9 @@ export class AdminPlatformParametersTabComponent implements OnInit {
           }
         }
         if (filterIdx === filters.length - 1) {
-          resultantString += (
-            filterName + ' in ' + '[' + conditions + ']');
+          resultantString += `${filterName} in [${conditions}]`;
         } else {
-          resultantString += (
-            filterName + ' in ' + '[' + conditions + ']' + '; ');
+          resultantString += `${filterName} in [${conditions}]; `;
         }
       }
     }
