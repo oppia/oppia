@@ -28,7 +28,6 @@ import { TranslationLanguageService } from '../services/translation-language.ser
 import { TranslationTabActiveContentIdService } from '../services/translation-tab-active-content-id.service';
 import { StateTranslationEditorComponent } from './state-translation-editor.component';
 import { MarkAudioAsNeedingUpdateModalComponent } from 'components/forms/forms-templates/mark-audio-as-needing-update-modal.component';
-import { Voiceover } from 'domain/exploration/voiceover.model';
 import { RecordedVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
 import { ChangeListService } from 'pages/exploration-editor-page/services/change-list.service';
 import { TranslatedContent } from 'domain/exploration/TranslatedContentObjectFactory';
