@@ -495,6 +495,9 @@ describe('Admin page platform parameters tab', () => {
         const originalFeatureFlag = cloneDeep(platformParameter);
 
         component.addNewRuleToBottom(platformParameter);
+        platformParameter.rules[1].filters[0].conditions = [
+          ['=', ServerMode.Prod]
+        ];
         component.updateParameterRulesAsync(platformParameter);
 
         flushMicrotasks();
@@ -511,6 +514,9 @@ describe('Admin page platform parameters tab', () => {
       const platformParameter = component.platformParameters[0];
 
       component.addNewRuleToBottom(platformParameter);
+      platformParameter.rules[1].filters[0].conditions = [
+        ['=', ServerMode.Prod]
+      ];
       component.updateParameterRulesAsync(platformParameter);
 
       flushMicrotasks();
@@ -532,6 +538,9 @@ describe('Admin page platform parameters tab', () => {
         const platformParameter = component.platformParameters[0];
 
         component.addNewRuleToBottom(platformParameter);
+        platformParameter.rules[1].filters[0].conditions = [
+          ['=', ServerMode.Prod]
+        ];
         component.updateParameterRulesAsync(platformParameter);
 
         flushMicrotasks();

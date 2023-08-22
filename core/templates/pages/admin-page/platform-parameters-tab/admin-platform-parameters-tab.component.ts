@@ -129,7 +129,7 @@ export class AdminPlatformParametersTabComponent implements OnInit {
       this.platformParameters.map(param => [param.name, cloneDeep(param)]));
     this.platformParametersInEditMode = new Map(
       this.platformParameters.map(param => [param.name, false]));
-    for (let platformParameter of this.platformParameters) {
+    for (const platformParameter of this.platformParameters) {
       this.updateFilterValuesForDisplay(platformParameter);
     }
     this.loaderService.hideLoadingScreen();
@@ -155,7 +155,7 @@ export class AdminPlatformParametersTabComponent implements OnInit {
     let resultantString: string = '';
     const filters: PlatformParameterFilter[] = rule.filters;
     for (let filterIdx = 0; filterIdx < filters.length; filterIdx++) {
-      let filterName: string = (
+      const filterName: string = (
         this.filterTypeToContext[filters[filterIdx].type].displayName);
       if (filters[filterIdx].conditions.length === 0) {
         resultantString += `${filterName} in [ ]`;
@@ -179,8 +179,8 @@ export class AdminPlatformParametersTabComponent implements OnInit {
   }
 
   updateFilterValuesForDisplay(platformParameter: PlatformParameter): void {
-    let ruleReadOnlyValue: string[] = [];
-    for (let parameterRule of platformParameter.rules) {
+    const ruleReadOnlyValue: string[] = [];
+    for (const parameterRule of platformParameter.rules) {
       ruleReadOnlyValue.push(this.getReadonlyFilterValues(parameterRule));
     }
     this.platformParameterNameToRulesReadonlyData.set(
@@ -244,8 +244,8 @@ export class AdminPlatformParametersTabComponent implements OnInit {
       'This action is irreversible.')) {
       return;
     }
-    for (let param of this.platformParameters) {
-      let commitMessage = `Update default value for '${param.name}'.`;
+    for (const param of this.platformParameters) {
+      const commitMessage = `Update default value for '${param.name}'.`;
       await this.updatePlatformParameter(param, commitMessage);
     }
   }
