@@ -46,7 +46,6 @@ class MockNgbModal {
   }
 }
 
-
 describe('State Translation Editor Component', () => {
   let component: StateTranslationEditorComponent;
   let fixture: ComponentFixture<StateTranslationEditorComponent>;
