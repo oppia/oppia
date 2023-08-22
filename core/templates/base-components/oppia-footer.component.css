@@ -197,6 +197,7 @@
   .oppia-footer-container .oppia-mission-volunteer {
     flex: 0 0 100%;
     max-width: 100%;
+    padding-right: 0;
   }
 
   .col.mr-30 {
