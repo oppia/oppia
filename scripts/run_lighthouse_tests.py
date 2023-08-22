@@ -24,7 +24,6 @@ import subprocess
 import sys
 
 from typing import Final, List, Optional
-from core import feconf
 
 # TODO(#15567): This can be removed after Literal in utils.py is loaded
 # from typing instead of typing_extensions, this will be possible after
@@ -202,21 +201,13 @@ def main(args: Optional[List[str]] = None) -> None:
             # Skip webpack build if skip_build flag is passed.
             print('Building files in production mode skipping webpack build.')
             build.main(args=[])
-            if not feconf.OPPIA_IS_DOCKERIZED:
-                common.run_ng_compilation()
-                run_webpack_compilation()
+            common.run_ng_compilation()
+            run_webpack_compilation()
     else:
         # Accessibility mode skip webpack build.
         build.main(args=[])
-        if not feconf.OPPIA_IS_DOCKERIZED:
-            common.run_ng_compilation()
-            run_webpack_compilation()
-
-    if feconf.OPPIA_IS_DOCKERIZED:
-        run_lighthouse_puppeteer_script()
-        run_lighthouse_checks(lighthouse_mode, parsed_args.shard)
-
-        return
+        common.run_ng_compilation()
+        run_webpack_compilation()
 
     with contextlib.ExitStack() as stack:
         stack.enter_context(servers.managed_redis_server())

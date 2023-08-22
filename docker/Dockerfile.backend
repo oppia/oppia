@@ -26,17 +26,6 @@ RUN rm google-chrome-stable_current_amd64.deb
 RUN pip install --upgrade pip==21.2.3
 RUN pip install pip-tools==6.6.2 setuptools==58.5.3 cmake
 
-# Installing python2.7.18
-# RUN wget https://www.python.org/ftp/python/2.7.18/Python-2.7.18.tar.xz && \
-#     tar -xf Python-2.7.18.tar.xz
-# WORKDIR Python-2.7.18
-# RUN ./configure --prefix=/usr/local
-# RUN make && make install
-
-# WORKDIR /
-
-# RUN rm Python-2.7.18.tar.xz
-
 # Installing google cloud sdk
 RUN wget -O gcloud-sdk.tar.gz https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-sdk-364.0.0-linux-x86_64.tar.gz && \
     tar -xzf gcloud-sdk.tar.gz && \

@@ -50,8 +50,7 @@ module.exports = class baseUser {
         headless: false,
         args: [
         '--start-fullscreen',
-        '--use-fake-ui-for-media-stream',
-        '--no-sandbox',
+        '--use-fake-ui-for-media-stream'
         ]
       })
       .then(async(browser) => {

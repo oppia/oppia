@@ -28,6 +28,29 @@ build.%: ## Builds the given docker service. Example: make build.datastore
 build: ## Builds the all docker services.
 	docker compose build
 
+# # Define the directory to install oppia_tools
+# INSTALL_DIR := ../oppia_tools
+
+# # Define the Node.js version you want to install
+# NODE_VERSION := 16.13.0
+
+# # Determine the operating system
+# UNAME_S := $(shell uname -s)
+
+# # Define the URLs for downloading Node.js based on the operating system and version
+# ifeq ($(UNAME_S),Linux)
+#   NODE_URL := https://nodejs.org/dist/v$(NODE_VERSION)/node-v$(NODE_VERSION)-linux-x64.tar.gz
+# endif
+# ifeq ($(UNAME_S),Darwin)
+#   NODE_URL := https://nodejs.org/dist/v$(NODE_VERSION)/node-v$(NODE_VERSION)-darwin-x64.tar.gz
+# endif
+
+# .PHONY: install_node
+
+# install_node:
+# 	mkdir -p $(INSTALL_DIR)
+# 	curl -L $(NODE_URL) | tar -xzf -C $(INSTALL_DIR) --strip-components=1
+
 run-devserver: # Runs the dev-server
 	docker compose up dev-server -d --no-deps
 	$(MAKE) update.requirements
@@ -98,3 +121,47 @@ run_tests.mypy: ## Runs mypy checks
 
 run_tests.backend_associate: ## Runs the backend associate tests
 	docker compose run --no-deps --entrypoint "python -m scripts.check_backend_associated_test_file" dev-server
+
+OS_NAME := $(shell uname)
+
+.PHONY: install_node
+
+install_node:
+	@echo "Installing Node.js..."
+	@if [ "$(OS_NAME)" = "Windows" ]; then \
+		if [ "$(shell python -c 'import sys; print(sys.maxsize > 2**32)')" = "True" ]; then \
+			architecture=x64; \
+		else \
+			architecture=x86; \
+		fi; \
+		extension=.zip; \
+		node_file_name=node-v16.13.0-win-$$architecture; \
+		url_to_retrieve=https://nodejs.org/dist/v16.13.0/$$node_file_name$$extension; \
+		curl -o node-download $$url_to_retrieve; \
+		powershell.exe -c "Expand-Archive -Path node-download -DestinationPath ../oppia_tools"; \
+	else \
+		extension=.tar.gz; \
+		if [ "$(shell python -c 'import sys; print(sys.maxsize > 2**32)')" = "True" ]; then \
+			if [ "$(OS_NAME)" = "Darwin" ]; then \
+				node_file_name=node-v16.13.0-darwin-x64; \
+			elif [ "$(OS_NAME)" = "Linux" ]; then \
+				node_file_name=node-v16.13.0-linux-x64; \
+			else \
+				echo "System's Operating System is not compatible."; \
+				exit 1; \
+			fi; \
+		else \
+			node_file_name=node-v16.13.0; \
+		fi; \
+		curl -o node-download https://nodejs.org/dist/v16.13.0/$$node_file_name$$extension; \
+		mkdir -p ../oppia_tools; \
+		tar -xvf node-download -C ../oppia_tools; \
+		rm node-download; \
+	fi
+# mv ../oppia_tools/$$node_file_name ../oppia_tools/node-16.13.0
+	@if [ "$$node_file_name" = "node-v16.13.0" ]; then \
+		cd ../oppia_tools/node-16.13.0; \
+		./configure; \
+		make; \
+	fi
+	@echo "Node.js installation completed."
