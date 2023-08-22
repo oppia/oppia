@@ -18,7 +18,7 @@
 
 import { EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { State, StateObjectFactory } from 'domain/state/StateObjectFactory';
 import { ExplorationStatesService } from 'pages/exploration-editor-page/services/exploration-states.service';
@@ -36,11 +36,14 @@ import { EntityTranslationsService } from 'services/entity-translations.services
 import { EntityTranslation } from 'domain/translation/EntityTranslationObjectFactory';
 import { TranslationStatusService } from '../services/translation-status.service';
 
+
+export class MockNgbModalRef {
+  result: Promise<void> = Promise.resolve();
+}
+
 class MockNgbModal {
   open() {
-    return {
-      result: Promise.resolve()
-    };
+    return new MockNgbModalRef();
   }
 }
 
@@ -166,9 +169,35 @@ describe('State Translation Editor Component', () => {
           }
         }
       });
-
       spyOn(ngbModal, 'open').and.callThrough();
+
       component.onSaveTranslationButtonClicked();
+
+      expect(ngbModal.open).toHaveBeenCalledWith(
+        MarkAudioAsNeedingUpdateModalComponent, {
+          backdrop: 'static'
+        });
+    });
+
+    it('should open accept NO on voiceover needs update modal', () => {
+      state.recordedVoiceovers = RecordedVoiceovers.createFromBackendDict({
+        voiceovers_mapping: {
+          content1: {
+            hi: Voiceover.createFromBackendDict({
+              filename: 'filename1.mp3',
+              file_size_bytes: 100,
+              needs_update: false,
+              duration_secs: 10
+            })
+          }
+        }
+      });
+      const mockNgbModalRef = new MockNgbModalRef();
+      mockNgbModalRef.result = Promise.reject();
+      spyOn(ngbModal, 'open').and.returnValue(mockNgbModalRef as NgbModalRef);
+
+      component.onSaveTranslationButtonClicked();
+
       expect(ngbModal.open).toHaveBeenCalledWith(
         MarkAudioAsNeedingUpdateModalComponent, {
           backdrop: 'static'
