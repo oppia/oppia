@@ -47,6 +47,7 @@ class MockNgbModal {
   }
 }
 
+
 describe('State Translation Editor Component', () => {
   let component: StateTranslationEditorComponent;
   let fixture: ComponentFixture<StateTranslationEditorComponent>;
@@ -155,17 +156,17 @@ describe('State Translation Editor Component', () => {
     fixture.destroy();
   });
 
-  describe('on cliking save button', () => {
+  describe('on clicking save button', () => {
     it('should open model asking whether voiceover needs update', () => {
       state.recordedVoiceovers = RecordedVoiceovers.createFromBackendDict({
         voiceovers_mapping: {
           content1: {
-            hi: Voiceover.createFromBackendDict({
+            hi: {
               filename: 'filename1.mp3',
               file_size_bytes: 100,
               needs_update: false,
               duration_secs: 10
-            })
+            }
           }
         }
       });
@@ -179,16 +180,36 @@ describe('State Translation Editor Component', () => {
         });
     });
 
-    it('should open accept NO on voiceover needs update modal', () => {
+    it('should not open the modal if voiceover already needs update', () => {
       state.recordedVoiceovers = RecordedVoiceovers.createFromBackendDict({
         voiceovers_mapping: {
           content1: {
-            hi: Voiceover.createFromBackendDict({
+            hi: {
+              filename: 'filename1.mp3',
+              file_size_bytes: 100,
+              needs_update: true,
+              duration_secs: 10
+            }
+          }
+        }
+      });
+      spyOn(ngbModal, 'open');
+
+      component.onSaveTranslationButtonClicked();
+
+      expect(ngbModal.open).not.toHaveBeenCalled();
+    });
+
+    it('should accept NO on voiceover needs update modal', () => {
+      state.recordedVoiceovers = RecordedVoiceovers.createFromBackendDict({
+        voiceovers_mapping: {
+          content1: {
+            hi: {
               filename: 'filename1.mp3',
               file_size_bytes: 100,
               needs_update: false,
               duration_secs: 10
-            })
+            }
           }
         }
       });
@@ -199,9 +220,7 @@ describe('State Translation Editor Component', () => {
       component.onSaveTranslationButtonClicked();
 
       expect(ngbModal.open).toHaveBeenCalledWith(
-        MarkAudioAsNeedingUpdateModalComponent, {
-          backdrop: 'static'
-        });
+        MarkAudioAsNeedingUpdateModalComponent, {backdrop: 'static'});
     });
 
     it('should add editTranslation changes to draft change list', () => {
