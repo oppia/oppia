@@ -62,6 +62,7 @@ describe('State Translation Editor Component', () => {
   let state: State;
 
   let mockActiveLanguageChangedEventEmitter = new EventEmitter<void>();
+  let mockActiveLanguageIdChangedEventEmitter = new EventEmitter<string>();
   let mockExternalSaveEventEmitter = new EventEmitter<void>();
 
   beforeEach(waitForAsync(() => {
@@ -118,7 +119,7 @@ describe('State Translation Editor Component', () => {
       .and.returnValue('hi');
     spyOnProperty(
       translationTabActiveContentIdService, 'onActiveContentIdChanged'
-    ).and.returnValue(mockActiveLanguageChangedEventEmitter);
+    ).and.returnValue(mockActiveLanguageIdChangedEventEmitter);
     entityTranslationsService.languageCodeToEntityTranslations = {
       hi: EntityTranslation.createFromBackendDict({
         entity_id: 'id',
@@ -251,7 +252,7 @@ describe('State Translation Editor Component', () => {
       });
 
       it('should intialize active translation if it does not exist', () => {
-        component.activeWrittenTranslation = null;
+        component.activeWrittenTranslation = undefined;
         component.dataFormat = 'html';
         component.openTranslationEditor();
         expect(component.activeWrittenTranslation).toEqual(

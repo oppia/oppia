@@ -34,7 +34,7 @@ export class TranslationTabActiveContentIdService {
   // has not been set.
   activeContentId: string | null = null;
   activeDataFormat: string | null = null;
-  _activeContentIdChangedEventEmitter = new EventEmitter();
+  _activeContentIdChangedEventEmitter = new EventEmitter<string>();
 
   getActiveContentId(): string | null {
     return this.activeContentId;
