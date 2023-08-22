@@ -37,7 +37,7 @@ import { EntityTranslation } from 'domain/translation/EntityTranslationObjectFac
 import { TranslationStatusService } from '../services/translation-status.service';
 
 
-export class MockNgbModalRef {
+class MockNgbModalRef {
   result: Promise<void> = Promise.resolve();
 }
 
