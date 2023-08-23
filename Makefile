@@ -1,3 +1,5 @@
+SHELL := /bin/bash
+
 SHELL_PREFIX=docker compose exec
 ALL_SERVICES = datastore dev-server firebase elasticsearch webpack-compiler angular-build redis
 
@@ -27,19 +29,22 @@ build: ## Builds the all docker services.
 	docker compose build
 
 run-devserver: # Runs the dev-server
-	docker compose up dev-server -d
+	docker compose up dev-server -d --no-deps
 	$(MAKE) update.requirements
+	docker compose up angular-build -d
 	$(MAKE) update.package
 	$(MAKE) run-offline
 
 run-offline: # Runs the dev-server in offline mode
 	docker compose up dev-server -d
-	@while ! curl -s http://localhost:8181 > /dev/null; do \
+	@printf 'Please wait while the development server starts...\n\n'
+	@while [[ $$(curl -s -o /tmp/status_code.txt -w '%{http_code}' http://localhost:8181) != "200" ]] || [[ $$(curl -s -o /tmp/status_code.txt -w '%{http_code}' http://localhost:8181/community-library) != "200" ]]; do \
 		sleep 5; \
 	done
-	@echo "\n\nDevelopment server started at port 8181."
-	@echo "Please visit -- http://localhost:8181 to access the development server."
+	@echo 'Development server started at port 8181.'
+	@echo 'Please visit http://localhost:8181 to access the development server.'
 	@echo 'Check dev-server logs using "make logs.dev-server"'
+	@echo 'Stop the development server using "make stop"'
 
 init: build run-devserver ## Initializes the build and runs dev-server.
 

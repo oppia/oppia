@@ -440,7 +440,11 @@ describe('Skills List Component', () => {
       'sad',
       'asdf',
       'asdf',
-      'sdf'
+      'sdf',
+      1,
+      1,
+      [5, 4],
+      [3, 4]
     )];
     spyOn(
       topicsAndSkillsDashboardBackendApiService

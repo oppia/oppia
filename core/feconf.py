@@ -668,6 +668,9 @@ EMAIL_INTENT_ACCOUNT_DELETED = 'account_deleted'
 EMAIL_INTENT_NOTIFY_CONTRIBUTOR_DASHBOARD_ACHIEVEMENTS = (
     'notify_contributor_dashboard_achievements'
 )
+EMAIL_INTENT_NOTIFY_CURRICULUM_ADMINS_CHAPTERS = (
+    'notify_curriculum_admins_chapters'
+)
 # Possible intents for email sent in bulk.
 BULK_EMAIL_INTENT_MARKETING = 'bulk_email_marketing'
 BULK_EMAIL_INTENT_IMPROVE_EXPLORATION = 'bulk_email_improve_exploration'
@@ -1603,6 +1606,7 @@ CONTRIBUTION_TYPE_TRANSLATION: Final = 'translation'
 CONTRIBUTION_TYPE_QUESTION: Final = 'question'
 CONTRIBUTION_SUBTYPE_ACCEPTANCE: Final = 'acceptance'
 CONTRIBUTION_SUBTYPE_REVIEW: Final = 'review'
+CONTRIBUTION_SUBTYPE_COORDINATE: Final = 'coordinate'
 CONTRIBUTION_SUBTYPE_EDIT: Final = 'edit'
 CONTRIBUTION_SUBTYPE_SUBMISSION: Final = 'submission'
 
