@@ -59,7 +59,7 @@ export class StateTranslationEditorComponent
   languageCode: string;
   activeWrittenTranslation: TranslatedContent;
   translationEditorIsOpen: boolean = false;
-  dataFormat: DataFormatToDefaultValuesKey | string | null;
+  dataFormat: DataFormatToDefaultValuesKey | string;
   UNICODE_SCHEMA: { type: string };
   SET_OF_STRINGS_SCHEMA: ListSchema;
   HTML_SCHEMA: HTMLSchema;
