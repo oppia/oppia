@@ -64,7 +64,6 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
         super().setUp()
-
         self.print_arr: list[str] = []
         def mock_print(msg: str) -> None:
             self.print_arr.append(msg)
@@ -81,6 +80,11 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
             '--config=%s' % (
                 LIGHTHOUSE_CONFIG_FILENAMES[LIGHTHOUSE_MODE_PERFORMANCE]['1']),
             '--max-old-space-size=4096'
+        ]
+        # Arguments to record in lighthouse_setup.js.
+        self.extra_args = [
+            '-record',
+            os.path.join(os.getcwd(), '..', 'lhci-puppeteer-video', 'video.mp4')
         ]
 
         def mock_context_manager() -> MockCompilerContextManager:
@@ -122,6 +126,7 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
 
         def mock_popen(*unused_args: str, **unused_kwargs: str) -> MockTask:  # pylint: disable=unused-argument
             return MockTask()
+
         swap_popen = self.swap_with_checks(
             subprocess, 'Popen', mock_popen,
             expected_args=((self.puppeteer_bash_command,),))
@@ -156,6 +161,67 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
         self.assertIn('ABC error.', self.print_arr)
         self.assertIn(
             'Puppeteer script failed. More details can be found above.',
+            self.print_arr)
+
+    def test_puppeteer_script_succeeds_when_recording_succeeds(self) -> None:
+        class MockTask:
+            returncode = 0
+            def communicate(self) -> tuple[bytes, bytes]:   # pylint: disable=missing-docstring
+                return (
+                    b'https://oppia.org/create/4\n' +
+                    b'https://oppia.org/topic_editor/4\n' +
+                    b'https://oppia.org/story_editor/4\n' +
+                    b'https://oppia.org/skill_editor/4\n',
+                    b'Task output.')
+
+        def mock_popen(*unused_args: str, **unused_kwargs: str) -> MockTask:  # pylint: disable=unused-argument
+            return MockTask()
+
+        swap_isfile = self.swap(os.path, 'isfile', lambda _: True)
+        swap_popen = self.swap_with_checks(
+            subprocess, 'Popen', mock_popen,
+            expected_args=((self.puppeteer_bash_command + self.extra_args,),))
+
+        with self.print_swap, swap_popen, swap_isfile:
+            run_lighthouse_tests.run_lighthouse_puppeteer_script(record=True)
+
+        self.assertIn(
+            'Puppeteer script completed successfully.', self.print_arr)
+        self.assertIn(
+            'Starting LHCI Puppeteer script with recording.', self.print_arr)
+        self.assertIn(
+            'Resulting puppeteer video saved at %s' % self.extra_args[1],
+            self.print_arr)
+
+    def test_puppeteer_script_fails_when_recording_succeeds(self) -> None:
+        class MockTask:
+            returncode = 1
+            def communicate(self) -> tuple[bytes, bytes]:   # pylint: disable=missing-docstring
+                return (
+                    b'https://oppia.org/create/4\n' +
+                    b'https://oppia.org/topic_editor/4\n' +
+                    b'https://oppia.org/story_editor/4\n' +
+                    b'https://oppia.org/skill_editor/4\n',
+                    b'ABC error.')
+
+        def mock_popen(*unused_args: str, **unused_kwargs: str) -> MockTask:  # pylint: disable=unused-argument
+            return MockTask()
+
+        swap_isfile = self.swap(os.path, 'isfile', lambda _: True)
+        swap_popen = self.swap_with_checks(
+            subprocess, 'Popen', mock_popen,
+            expected_args=((self.puppeteer_bash_command + self.extra_args,),))
+
+        with self.print_swap, self.swap_sys_exit, swap_popen, swap_isfile:
+            run_lighthouse_tests.run_lighthouse_puppeteer_script(record=True)
+
+        self.assertIn('Return code: 1', self.print_arr)
+        self.assertIn('ABC error.', self.print_arr)
+        self.assertIn(
+            'Puppeteer script failed. More details can be found above.',
+            self.print_arr)
+        self.assertIn(
+            'Resulting puppeteer video saved at %s' % self.extra_args[1],
             self.print_arr)
 
     def test_run_webpack_compilation_successfully(self) -> None:
@@ -267,6 +333,7 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
                     b'No error.')
         def mock_popen(*unused_args: str, **unused_kwargs: str) -> MockTask:  # pylint: disable=unused-argument
             return MockTask()
+
         swap_popen = self.swap(
             subprocess, 'Popen', mock_popen)
         swap_run_lighthouse_tests = self.swap_with_checks(
@@ -359,3 +426,58 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
             self.print_arr)
         self.assertIn(
             'Puppeteer script completed successfully.', self.print_arr)
+
+    def test_main_function_calls_puppeteer_record(self) -> None:
+        class MockTask:
+            returncode = 0
+            def communicate(self) -> tuple[bytes, bytes]:   # pylint: disable=missing-docstring
+                return (
+                    b'Task output',
+                    b'No error.')
+        env = os.environ.copy()
+        env['PIP_NO_DEPS'] = 'True'
+        # Set up pseudo-chrome path env variable.
+        for path in common.CHROME_PATHS:
+            if os.path.isfile(path):
+                env['CHROME_BIN'] = path
+                break
+        swap_dev_appserver = self.swap_with_checks(
+            servers, 'managed_dev_appserver',
+            lambda *unused_args, **unused_kwargs: MockCompilerContextManager(),
+            expected_kwargs=[{
+                'port': GOOGLE_APP_ENGINE_PORT,
+                'log_level': 'critical',
+                'skip_sdk_update_check': True,
+                'env': env
+            }])
+        swap_run_puppeteer_script = self.swap_with_checks(
+            run_lighthouse_tests, 'run_lighthouse_puppeteer_script',
+            lambda _: None,
+            expected_args=((True,),))
+        swap_run_lighthouse_tests = self.swap_with_checks(
+            run_lighthouse_tests, 'run_lighthouse_checks',
+            lambda *unused_args: None, expected_args=(('performance', '1'),))
+        def mock_popen(*unused_args: str, **unused_kwargs: str) -> MockTask:  # pylint: disable=unused-argument
+            return MockTask()
+        swap_popen = self.swap(
+            subprocess, 'Popen', mock_popen)
+        swap_isdir = self.swap(
+            os.path, 'isdir', lambda _: True)
+        swap_build = self.swap_with_checks(
+            build, 'main', lambda args: None,
+            expected_kwargs=[{'args': []}])
+        swap_emulator_mode = self.swap(constants, 'EMULATOR_MODE', False)
+        swap_popen = self.swap(
+            subprocess, 'Popen', mock_popen)
+        swap_isdir = self.swap(
+            os.path, 'isdir', lambda _: True)
+
+        with swap_popen, self.swap_webpack_compiler, swap_isdir, swap_build:
+            with self.swap_elasticsearch_dev_server, swap_dev_appserver:
+                with self.swap_ng_build, swap_emulator_mode, self.print_swap:
+                    with self.swap_redis_server, swap_run_lighthouse_tests:
+                        with swap_run_puppeteer_script:
+                            run_lighthouse_tests.main(
+                                args=[
+                                    '--mode', 'performance', '--skip_build',
+                                    '--shard', '1', '--record_screen'])
