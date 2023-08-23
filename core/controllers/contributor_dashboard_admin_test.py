@@ -32,8 +32,10 @@ from typing import Final
 MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import suggestion_models
+    from mypy_imports import user_models
 
-(suggestion_models,) = models.Registry.import_models([models.Names.SUGGESTION])
+(suggestion_models, user_models) = models.Registry.import_models(
+    [models.Names.SUGGESTION, models.Names.USER])
 
 
 class ContributorDashboardAdminPageTest(test_utils.GenericTestBase):
@@ -752,6 +754,68 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
             'auth_id_4', 'user4@example.com')
         user_services.set_username(user_4_settings.user_id, 'user4')
 
+        self.signup('reviewer@org.com', 'reviewer')
+        user_id = self.get_user_id_from_email('reviewer@org.com')
+        user_services.add_user_role(
+            user_id, feconf.ROLE_ID_TRANSLATION_ADMIN)
+        self.login('reviewer@org.com')
+        user_services.allow_user_to_review_translation_in_language(
+            user_id, 'es')
+        user_services.allow_user_to_review_translation_in_language(
+            user_id, 'hi')
+
+        auth_ids = ['test1', 'test2', 'test3', 'test4']
+        usernames = ['name1', 'name2', 'name3', 'name4']
+        user_emails = [
+            'test1@email.com', 'test2@email.com',
+            'test3@email.com', 'test4@email.com']
+
+        user_ids = []
+        for auth_id, email, name in zip(auth_ids, user_emails, usernames):
+            user_settings = user_services.create_new_user(auth_id, email)
+            user_models.UserSettingsModel(
+                id=user_settings.user_id,
+                email=user_settings.email,
+                roles=user_settings.roles,
+                username=user_settings.username,
+                normalized_username=user_settings.normalized_username,
+                last_agreed_to_terms=user_settings.last_agreed_to_terms,
+                last_started_state_editor_tutorial=(
+                    user_settings.last_started_state_editor_tutorial),
+                last_started_state_translation_tutorial=(
+                    user_settings.last_started_state_translation_tutorial),
+                last_logged_in=datetime.datetime.today(),
+                last_edited_an_exploration=(
+                    user_settings.last_edited_an_exploration),
+                last_created_an_exploration=(
+                    user_settings.last_created_an_exploration),
+                default_dashboard=user_settings.default_dashboard,
+                creator_dashboard_display_pref=(
+                    user_settings.creator_dashboard_display_pref),
+                user_bio=user_settings.user_bio,
+                subject_interests=user_settings.subject_interests,
+                first_contribution_msec=user_settings.first_contribution_msec,
+                preferred_language_codes=(
+                    user_settings.preferred_language_codes),
+                preferred_site_language_code=(
+                    user_settings.preferred_site_language_code),
+                preferred_audio_language_code=(
+                    user_settings.preferred_audio_language_code),
+                deleted=user_settings.deleted
+            ).put()
+
+            user_ids.append(user_settings.user_id)
+            user_services.set_username(user_settings.user_id, name)
+
+        user_services.add_user_role(
+            user_ids[0], feconf.ROLE_ID_QUESTION_COORDINATOR)
+        user_services.add_user_role(
+            user_ids[1], feconf.ROLE_ID_QUESTION_COORDINATOR)
+        user_services.add_user_role(
+            user_ids[2], feconf.ROLE_ID_QUESTION_COORDINATOR)
+        user_services.add_user_role(
+            user_ids[3], feconf.ROLE_ID_QUESTION_COORDINATOR)
+
         suggestion_models.TranslationSubmitterTotalContributionStatsModel(
             id='model_1',
             language_code=self.SUGGESTION_LANGUAGE_CODE,
@@ -1057,6 +1121,17 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
             first_contribution_date=datetime.date.today(),
             last_contribution_date=(
                 datetime.date.today() - datetime.timedelta(125))
+        ).put()
+
+        suggestion_models.TranslationCoordinatorsModel(
+            id='es',
+            coordinator_ids=[user_ids[0], user_ids[1]],
+            coordinators_count=2
+        ).put()
+        suggestion_models.TranslationCoordinatorsModel(
+            id='hi',
+            coordinator_ids=[user_ids[0], user_ids[1], user_ids[2]],
+            coordinators_count=3
         ).put()
 
     def test_get_stats_with_invalid_contribution_type_raises_error(
@@ -1539,6 +1614,71 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
         self.assertEqual(
             response['more'],
             False
+        )
+        self.logout()
+
+    def test_get_translation_coordinator_stats(self) -> None:
+        self.login(self.CONTRIBUTOR_EMAIL)
+
+        response = self.get_json(
+            '/contributor-dashboard-admin-stats/translation/coordinate', {
+                'page_size': 0,
+                'offset': 0,
+                'max_days_since_last_activity': 0,
+                'topic_ids': [],
+                'sort_by': 'DecreasingCoordinatorCounts'
+            })
+
+        self.assertEqual(
+            len(response['stats']),
+            2
+        )
+        self.assertEqual(
+            [stat['language_id'] for stat in response['stats']],
+            ['hi', 'es']
+        )
+        self.logout()
+
+    def test_get_translation_coordinator_stats_with_sort(self) -> None:
+        self.login(self.CONTRIBUTOR_EMAIL)
+
+        response = self.get_json(
+            '/contributor-dashboard-admin-stats/translation/coordinate', {
+                'page_size': 0,
+                'offset': 0,
+                'max_days_since_last_activity': 0,
+                'topic_ids': [],
+                'sort_by': 'IncreasingCoordinatorCounts'
+            })
+
+        self.assertEqual(
+            len(response['stats']),
+            2
+        )
+        self.assertEqual(
+            response['stats'][0]['language_id'],
+            'es'
+        )
+        self.assertEqual(
+            response['stats'][1]['language_id'],
+            'hi'
+        )
+        self.logout()
+
+    def test_get_question_coordinator_stats(self) -> None:
+        self.login(self.CONTRIBUTOR_EMAIL)
+
+        response = self.get_json(
+            '/contributor-dashboard-admin-stats/question/coordinate', {
+                'page_size': 0,
+                'offset': 0,
+                'max_days_since_last_activity': 0,
+                'topic_ids': []
+            })
+
+        self.assertEqual(
+            len(response['stats']),
+            4
         )
         self.logout()
 
