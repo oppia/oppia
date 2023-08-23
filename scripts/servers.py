@@ -550,9 +550,10 @@ def managed_webpack_compiler(
         yield proc
 
 
-def get_chrome_version() -> str:
-    """Returns the version of Chrome installed on the system."""
-
+def get_chromedriver_version() -> str:
+    """Returns the version of Chromedriver compatible with the installed version
+    of Chrome.
+    """
     # Although there are spaces between Google and Chrome in the path, we
     # don't need to escape them for Popen (as opposed to on the terminal, in
     # which case we would need to escape them for the command to run).
@@ -577,15 +578,23 @@ def get_chrome_version() -> str:
             'https://chromedriver.chromium.org/downloads/version-selection'
             % chrome_command.replace(' ', r'\ ')) from e
 
-    installed_version_parts = b''.join(re.findall(rb'[0-9.]', output))
-    installed_version = '.'.join(
-        installed_version_parts.decode('utf-8').split('.')[:-1])
-    response = utils.url_open(
-        'https://chromedriver.storage.googleapis.com/LATEST_RELEASE_%s' % (
-            installed_version))
-    chrome_version: str = response.read().decode('utf-8')
+    installed_version_bytes = b''.join(re.findall(rb'[0-9.]', output))
+    installed_version_parts = installed_version_bytes.decode('utf-8').split('.')
+    # For Chrome versions 115 and above, compatible Chromedriver and Chrome
+    # versions have the same version numbers. For earlier versions, we use a
+    # Google API to find the compatible Chromedriver version. See
+    # https://chromedriver.chromium.org/downloads/version-selection for details.
+    if int(installed_version_parts[0]) >= 115:
+        chromedriver_version: str = '.'.join(installed_version_parts)
+    else:
+        response = utils.url_open(
+            'https://chromedriver.storage.googleapis.com/LATEST_RELEASE_%s' % (
+                '.'.join(installed_version_parts[:-1])
+            )
+        )
+        chromedriver_version = response.read().decode('utf-8')
 
-    return chrome_version
+    return chromedriver_version
 
 
 @contextlib.contextmanager
@@ -683,7 +692,7 @@ def managed_webdriverio_server(
         raise ValueError('Sharding instance should be larger than 0')
 
     if chrome_version is None:
-        chrome_version = get_chrome_version()
+        chrome_version = get_chromedriver_version()
 
     if mobile:
         os.environ['MOBILE'] = 'true'

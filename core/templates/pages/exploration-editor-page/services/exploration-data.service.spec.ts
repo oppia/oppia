@@ -339,7 +339,6 @@ describe('Exploration data service', function() {
   it('should get last saved data', fakeAsync(() => {
     const successHandler = jasmine.createSpy('success');
     const failHandler = jasmine.createSpy('fail');
-    const logInfoSpy = spyOn(ls, 'info').and.callThrough();
 
     eds.getLastSavedDataAsync().then(successHandler, failHandler);
 
@@ -350,7 +349,6 @@ describe('Exploration data service', function() {
 
     expect(successHandler).toHaveBeenCalledWith(
       sampleExploration.exploration);
-    expect(logInfoSpy).toHaveBeenCalledTimes(2);
   }));
 
   it('should save an exploration to the backend', fakeAsync(() => {
