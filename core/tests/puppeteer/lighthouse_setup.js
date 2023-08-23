@@ -20,9 +20,9 @@ var FirebaseAdmin = require('firebase-admin');
 const process = require('process');
 const puppeteer = require('puppeteer');
 
-const ADMIN_URL = 'http://127.0.0.1:8181/admin';
-const CREATOR_DASHBOARD_URL = 'http://127.0.0.1:8181/creator-dashboard';
-const TOPIC_AND_SKILLS_DASHBOARD_URL = 'http://127.0.0.1:8181/topics-and-skills-dashboard';
+const ADMIN_URL = 'http://localhost:8181/admin';
+const CREATOR_DASHBOARD_URL = 'http://localhost:8181/creator-dashboard';
+const TOPIC_AND_SKILLS_DASHBOARD_URL = 'http://localhost:8181/topics-and-skills-dashboard';
 // Read more about networkidle0
 // https://github.com/puppeteer/puppeteer/blob/main/docs/api.md#pagegotourl-options
 const networkIdle = 'networkidle0';
@@ -127,7 +127,7 @@ const setRole = async function(browser, page, role) {
   try {
     // eslint-disable-next-line dot-notation
     await page.goto(
-      'http://127.0.0.1:8181/admin#/roles', { waitUntil: networkIdle });
+      'http://localhost:8181/admin#/roles', { waitUntil: networkIdle });
     await page.waitForSelector(usernameInputFieldForRolesEditing);
     await page.type(usernameInputFieldForRolesEditing, 'username1');
     await page.waitForSelector(editUserRoleButton);
@@ -278,7 +278,7 @@ const getSkillEditorUrl = async function(browser, page) {
 const generateDataForTopicAndStoryPlayer = async function(browser, page) {
   try {
     // eslint-disable-next-line dot-notation
-    await page.goto('http://127.0.0.1:8181/admin#/activities', { waitUntil: networkIdle });
+    await page.goto('http://localhost:8181/admin#/activities', { waitUntil: networkIdle });
 
     await page.waitForSelector(generateTopicButton);
     await page.click(generateTopicButton);
@@ -304,7 +304,7 @@ const generateDataForTopicAndStoryPlayer = async function(browser, page) {
 const generateDataForClassroom = async function(browser, page) {
   try {
     // eslint-disable-next-line dot-notation
-    await page.goto('http://127.0.0.1:8181/admin#/activities', { waitUntil: networkIdle });
+    await page.goto('http://localhost:8181/admin#/activities', { waitUntil: networkIdle });
 
     await page.waitForSelector(generateClassroomButton);
     await page.click(generateClassroomButton);

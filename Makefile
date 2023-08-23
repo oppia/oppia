@@ -25,31 +25,9 @@ help: ## Display this help message.
 build.%: ## Builds the given docker service. Example: make build.datastore
 	docker compose build $*
 
-build: ## Builds the all docker services.
+build: ## Builds the all docker setup.
 	docker compose build
-
-# # Define the directory to install oppia_tools
-# INSTALL_DIR := ../oppia_tools
-
-# # Define the Node.js version you want to install
-# NODE_VERSION := 16.13.0
-
-# # Determine the operating system
-# UNAME_S := $(shell uname -s)
-
-# # Define the URLs for downloading Node.js based on the operating system and version
-# ifeq ($(UNAME_S),Linux)
-#   NODE_URL := https://nodejs.org/dist/v$(NODE_VERSION)/node-v$(NODE_VERSION)-linux-x64.tar.gz
-# endif
-# ifeq ($(UNAME_S),Darwin)
-#   NODE_URL := https://nodejs.org/dist/v$(NODE_VERSION)/node-v$(NODE_VERSION)-darwin-x64.tar.gz
-# endif
-
-# .PHONY: install_node
-
-# install_node:
-# 	mkdir -p $(INSTALL_DIR)
-# 	curl -L $(NODE_URL) | tar -xzf -C $(INSTALL_DIR) --strip-components=1
+	$(MAKE) install_node
 
 run-devserver: # Runs the dev-server
 	docker compose up dev-server -d --no-deps

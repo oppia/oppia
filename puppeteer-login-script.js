@@ -18,8 +18,8 @@
  * @param {puppeteer.Browser} browser
  * @param {{url: string, options: LHCI.CollectCommand.Options}} context
  */
-const LOGIN_URL = 'http://127.0.0.1:8181/login';
-const CREATOR_DASHBOARD_URL = 'http://127.0.0.1:8181/creator-dashboard';
+const LOGIN_URL = 'http://localhost:8181/login';
+const CREATOR_DASHBOARD_URL = 'http://localhost:8181/creator-dashboard';
 const networkIdle = 'networkidle0';
 
 var emailInput = '.e2e-test-sign-in-email-input';
@@ -88,7 +88,7 @@ const setRole = async function(page, role) {
   try {
     // eslint-disable-next-line dot-notation
     await page.goto(
-      'http://127.0.0.1:8181/admin#/roles', { waitUntil: networkIdle });
+      'http://localhost:8181/admin#/roles', { waitUntil: networkIdle });
     await page.waitForSelector(usernameInputFieldForRolesEditing);
     await page.type(usernameInputFieldForRolesEditing, 'username1');
     await page.waitForSelector(editUserRoleButton);
@@ -117,7 +117,7 @@ const createCollections = async function(context, page) {
     await setRole(page, 'COLLECTION_EDITOR');
     // Load in Collection
     // eslint-disable-next-line dot-notation
-    await page.goto('http://127.0.0.1:8181/admin');
+    await page.goto('http://localhost:8181/admin');
     await page.waitForTimeout(2000);
     await page.evaluate('window.confirm = () => true');
     await page.click('#reload-collection-button-id');
@@ -135,7 +135,7 @@ const createExplorations = async function(context, page) {
     console.log('Creating Exploration...');
     // Load in Exploration
     // eslint-disable-next-line dot-notation
-    await page.goto('http://127.0.0.1:8181/admin', { waitUntil: 'networkidle0' });
+    await page.goto('http://localhost:8181/admin', { waitUntil: 'networkidle0' });
     await page.waitForTimeout(2000);
     await page.evaluate('window.confirm = () => true');
     await page.click(
