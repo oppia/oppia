@@ -127,8 +127,7 @@ class ContributionOpportunitiesHandler(
 
     @acl_decorators.open_access
     def get(self, opportunity_type: str) -> None:
-        """Handles GET requests and retrieves data based on the
-        opportunity type.
+        """Handles GET requests.
 
         Args:
             opportunity_type: str. The opportunity type.
@@ -455,7 +454,7 @@ class TranslatableTextHandler(
 
     @acl_decorators.open_access
     def get(self) -> None:
-        """Handles GET requests for rendering translation-related data.
+        """Handles GET requests.
 
         Raises:
             InvalidInputException. The exploration ID is invalid.
@@ -746,7 +745,7 @@ class UserContributionRightsDataHandler(
 
     @acl_decorators.open_access
     def get(self) -> None:
-        """Handles GET requests for retrieving user contribution rights."""
+        """Handles GET requests."""
         contribution_rights = None
         if self.username:
             # Here we are sure that 'user_id' is not None because
@@ -783,9 +782,7 @@ class FeaturedTranslationLanguagesHandler(
 
     @acl_decorators.open_access
     def get(self) -> None:
-        """Handles GET requests for retrieving featured translation
-        languages.
-        """
+        """Handles GET requests."""
         self.render_json({
             'featured_translation_languages':
                 constants.FEATURED_TRANSLATION_LANGUAGES
@@ -850,9 +847,7 @@ class TranslationPreferenceHandler(
 
     @acl_decorators.can_manage_own_account
     def get(self) -> None:
-        """Handles GET requests. Retrieves the preferred translation language
-        code.
-        """
+        """Handles GET requests."""
         assert self.user_id is not None
         user_settings = user_services.get_user_settings(self.user_id)
         return self.render_json({
@@ -862,9 +857,7 @@ class TranslationPreferenceHandler(
 
     @acl_decorators.can_manage_own_account
     def post(self) -> None:
-        """Handles POST requests for updating the user's preferred translation
-        language.
-        """
+        """Handles POST requests."""
         assert self.user_id is not None
         assert self.normalized_payload is not None
         language_code = self.normalized_payload['language_code']
@@ -905,7 +898,7 @@ class ContributorStatsSummariesHandler(
         contribution_subtype: str,
         username: str
     ) -> None:
-        """Handles GET requests for fetching contributor dashboard statistics.
+        """Handles GET requests.
 
         Args:
             contribution_type: str. The type of contribution to retrieve
