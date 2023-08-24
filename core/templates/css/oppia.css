@@ -458,6 +458,10 @@ h3 {
   margin: 18px 0 18px 0;
 }
 
+.oppia-contact-mail {
+  color: #052b6c;
+}
+
 a {
   color: #0844aa;
   cursor: pointer;
