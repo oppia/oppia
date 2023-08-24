@@ -230,7 +230,7 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
     }
     this.activeSuggestion = this.activeContribution.suggestion;
     this.contextService.setCustomEntityContext(
-      AppConstants.ENTITY_TYPE.EXPLORATION,
+      AppConstants.IMAGE_CONTEXT.EXPLORATION_SUGGESTIONS,
       this.activeSuggestion.target_id);
     this.subheading = (
       `${this.activeContribution.details.topic_name} / ` +
@@ -351,6 +351,8 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
           reloadOpportunitiesEventEmitter.emit();
       },
       this.showTranslationSuggestionUpdateError);
+      this.suggestionImagesString = this.getImageInfoForSuggestion(
+        this.translationHtml)
   }
 
   // The length of the commit message should not exceed 375 characters,
