@@ -177,7 +177,7 @@ class CategorizedAndUntriagedSkillsDataHandler(
 
     @acl_decorators.open_access
     def get(self) -> None:
-        """Handles GET requests for retrieving skill-related data."""
+        """Handles GET requests."""
         skill_summaries = skill_services.get_all_skill_summaries()
         skill_ids_assigned_to_some_topic = (
             topic_fetchers.get_all_skill_ids_assigned_to_some_topic())
