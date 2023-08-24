@@ -28,6 +28,7 @@ build.%: ## Builds the given docker service. Example: make build.datastore
 build: ## Builds the all docker setup.
 	docker compose build
 	$(MAKE) install_node
+	docker cp oppia-angular-build:/app/oppia/node_modules .
 
 run-devserver: # Runs the dev-server
 	docker compose up dev-server -d --no-deps
@@ -94,7 +95,9 @@ run-backend-tests: ## [Not ready for use] Runs the backend tests
 	@echo "Not in use, under construction!"
 
 run_tests.frontend: ## Runs the frontend unit tests
-	docker compose run --no-deps --entrypoint "python -m scripts.run_frontend_tests $(flags)" dev-server
+	docker compose run --no-deps --name FE_TESTS --entrypoint "python -m scripts.run_frontend_tests $(flags)" dev-server
+	docker cp FE_TESTS:/app/karma_coverage_reports ../
+	docker container rm FE_TESTS
 
 run_tests.typescript: ## Runs the typescript checks
 	docker compose run --no-deps --entrypoint "python -m scripts.typescript_checks" dev-server
@@ -108,13 +111,21 @@ run_tests.mypy: ## Runs mypy checks
 run_tests.backend_associate: ## Runs the backend associate tests
 	docker compose run --no-deps --entrypoint "python -m scripts.check_backend_associated_test_file" dev-server
 
+run_tests.acceptance: ## Runs the acceptance tests for the parsed suite
+	@echo 'Shutting down any previously started server.'
+	$(MAKE) stop 
+	$(MAKE) start-devserver-for-tests
+	@echo 'Starting acceptance test for the suite: $(suite)'
+	./node_modules/.bin/jasmine --config="./core/tests/puppeteer-acceptance-tests/jasmine.json" ./core/tests/puppeteer-acceptance-tests/spec/$(suite)
+	$(MAKE) stop
+
 CHROME_VERSION := $(shell google-chrome --version | awk '{print $$3}')
 
 run_tests.e2e: ## Runs the e2e tests for the parsed suite
 	@echo 'Shutting down any previously started server.'
 	$(MAKE) stop 
 	$(MAKE) start-devserver-for-tests
-	@echo 'Starting e2e tests for the suite: $(suite)'
+	@echo 'Starting e2e test for the suite: $(suite)'
 	../oppia_tools/node-v16.13.0-linux-x64/bin/npx wdio ./core/tests/wdio.conf.js --suite $(suite) $(CHROME_VERSION) --params.devMode=True --capabilities[0].maxInstances=3
 	$(MAKE) stop
 

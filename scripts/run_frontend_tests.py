@@ -80,11 +80,6 @@ _PARSER.add_argument(
     action='store_true'
 )
 
-# need to copy node_modules folder in local, must have webpack bundles and angular-build.
-# docker cp oppia-angular-build:/app/oppia/node_modules .
-# or check if not needed
-# then run docker cp command to copy karma reports
-# docker cp oppia-dev-server:/app/karma_coverage_reports ../
 def run_dtslint_type_tests() -> None:
     """Runs the dtslint type tests in typings/tests."""
     print('Running dtslint type tests.')
