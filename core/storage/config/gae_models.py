@@ -180,3 +180,63 @@ class PlatformParameterModel(base_models.VersionedModel):
             rules=rule_dicts,
             rule_schema_version=rule_schema_version,
             default_value=default_value)
+
+
+class FeatureFlagModel(base_models.BaseModel):
+    """A class that represents named dynamic feature-flag.
+    This model only stores fields that can be updated in run time.
+
+    The id is the name of the feature-flag.
+    """
+
+    rollout_percentage = datastore_services.IntegerProperty(default=0)
+    force_enable_for_all_users = datastore_services.BooleanProperty(
+        default=False)
+    user_group_ids = datastore_services.JsonProperty(default=[])
+
+    @staticmethod
+    def get_deletion_policy() -> base_models.DELETION_POLICY:
+        """FeatureFlagModel is not related to users."""
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
+
+    @staticmethod
+    def get_model_association_to_user(
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+        """Model does not contain user data."""
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
+
+    @classmethod
+    def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
+        """Model doesn't contain any data directly corresponding to a user."""
+        return dict(super(cls, cls).get_export_policy(), **{
+            'rollout_percentage': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'force_enable_for_all_users': (
+                base_models.EXPORT_POLICY.NOT_APPLICABLE),
+            'user_group_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE
+        })
+
+    @classmethod
+    def create(
+        cls,
+        feature_name: str,
+        rollout_percentage: int,
+        force_enable_for_all_users: bool,
+        user_group_ids: List[str]
+    ) -> FeatureFlagModel:
+        """Creates FeatureFlagModel instance.
+
+        Args:
+            feature_name: str. The name of the feature-flag.
+            rollout_percentage: int. The defined percentage of logged-in
+                users for which the feature should be enabled.
+            force_enable_for_all_users: bool. Force enable the feature-flag for
+                all the users.
+
+        Returns:
+            FeatureFlagModel. The created FeatureFlagModel instance.
+        """
+        return cls(
+            id=feature_name,
+            rollout_percentage=rollout_percentage,
+            force_enable_for_all_users=force_enable_for_all_users,
+            user_group_ids=user_group_ids)

@@ -250,3 +250,46 @@ class PlatformParameterModelUnitTests(test_utils.GenericTestBase):
             config_models.PlatformParameterModel.get_export_policy(),
             expected_export_policy_dict
         )
+
+
+class FeatureFlagModelUnitTests(test_utils.GenericTestBase):
+    """Test FeatureFlagModel class."""
+
+    def test_get_deletion_policy_is_not_applicable(self) -> None:
+        self.assertEqual(
+            config_models.PlatformParameterModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.NOT_APPLICABLE)
+
+    def test_create_model(self) -> None:
+        feature_model = config_models.FeatureFlagModel.create(
+            feature_name='feature_name',
+            rollout_percentage=50,
+            force_enable_for_all_users=False,
+            user_group_ids=['User Group 1', 'User Group 2']
+        )
+        self.assertEqual(feature_model.id, 'feature_name')
+        self.assertEqual(feature_model.rollout_percentage, 50)
+        self.assertEqual(
+            feature_model.user_group_ids,
+            ['User Group 1', 'User Group 2'])
+        self.assertEqual(feature_model.force_enable_for_all_users, False)
+
+    def test_get_model_association_to_user(self) -> None:
+        self.assertEqual(
+            config_models.PlatformParameterModel.get_model_association_to_user(), # pylint: disable=line-too-long
+            base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
+        )
+
+    def test_get_export_policy(self) -> None:
+        expected_export_policy_dict = {
+            'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'feature_name': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'rollout_percentage': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'user_group_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE
+        }
+        self.assertEqual(
+            config_models.FeatureFlagModel.get_export_policy(),
+            expected_export_policy_dict
+        )
