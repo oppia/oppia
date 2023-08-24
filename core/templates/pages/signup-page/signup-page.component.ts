@@ -131,7 +131,6 @@ export class SignupPageComponent {
   // Returns the warning text corresponding to the validation error for
   // the given username, or an empty string if the username is valid.
   updateWarningText(username: string): void {
-    console.log("change called!");
     let alphanumericRegex = /^[A-Za-z0-9]+$/;
     let adminRegex = /admin/i;
     let oppiaRegex = /oppia/i;
