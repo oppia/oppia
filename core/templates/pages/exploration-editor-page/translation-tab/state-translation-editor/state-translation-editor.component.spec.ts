@@ -56,6 +56,7 @@ describe('State Translation Editor Component', () => {
   let explorationStatesService: ExplorationStatesService;
   let stateObjectFactory: StateObjectFactory;
   let translationLanguageService: TranslationLanguageService;
+  let externalSaveService: ExternalSaveService;
   let translationTabActiveContentIdService:
     TranslationTabActiveContentIdService;
   let translationStatusService: TranslationStatusService;
@@ -63,7 +64,6 @@ describe('State Translation Editor Component', () => {
 
   let mockActiveLanguageChangedEventEmitter = new EventEmitter<void>();
   let mockActiveLanguageIdChangedEventEmitter = new EventEmitter<string>();
-  let mockExternalSaveEventEmitter = new EventEmitter<void>();
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -76,12 +76,6 @@ describe('State Translation Editor Component', () => {
         {
           provide: NgbModal,
           useClass: MockNgbModal
-        },
-        {
-          provide: ExternalSaveService,
-          useValue: {
-            onExternalSave: mockExternalSaveEventEmitter
-          }
         }
       ],
       schemas: [NO_ERRORS_SCHEMA]
@@ -96,6 +90,7 @@ describe('State Translation Editor Component', () => {
     changeListService = TestBed.inject(ChangeListService);
     entityTranslationsService = TestBed.inject(EntityTranslationsService);
     translationLanguageService = TestBed.inject(TranslationLanguageService);
+    externalSaveService = TestBed.inject(ExternalSaveService);
     translationTabActiveContentIdService = TestBed.inject(
       TranslationTabActiveContentIdService);
     editabilityService = TestBed.inject(EditabilityService);
@@ -300,5 +295,47 @@ describe('State Translation Editor Component', () => {
       component.markAsNeedingUpdate();
       expect(translationStatusService.refresh).toHaveBeenCalled();
     });
+  });
+
+  it('should init editor on language change', () => {
+    spyOn(component, 'initEditor');
+
+    translationLanguageService.onActiveLanguageChanged.emit();
+    fixture.detectChanges();
+
+    expect(component.initEditor).toHaveBeenCalled();
+  });
+
+  it('should init editor and update data ' +
+     'format on active content id change', () => {
+    component.dataFormat = 'html';
+    spyOn(component, 'initEditor');
+
+    translationTabActiveContentIdService
+      .onActiveContentIdChanged.emit('unicode');
+    fixture.detectChanges();
+
+    expect(component.dataFormat).toEqual('unicode');
+    expect(component.initEditor).toHaveBeenCalled();
+  });
+
+  it('should save translation if translation editor is open', () => {
+    component.translationEditorIsOpen = true;
+    spyOn(component, 'saveTranslation');
+
+    externalSaveService.onExternalSave.emit();
+    fixture.detectChanges();
+
+    expect(component.saveTranslation).toHaveBeenCalled();
+  });
+
+  it('should not save translation if translation editor is open', () => {
+    component.translationEditorIsOpen = false;
+    spyOn(component, 'saveTranslation');
+
+    externalSaveService.onExternalSave.emit();
+    fixture.detectChanges();
+
+    expect(component.saveTranslation).not.toHaveBeenCalled();
   });
 });
