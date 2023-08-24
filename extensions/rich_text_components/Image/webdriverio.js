@@ -178,7 +178,7 @@ var expectComponentDetailsToMatch = async function(
       'SVG Diagram input element takes too long to load.');
     var src = await svgDiagramInputElement.getAttribute('src');
     var alt = await svgDiagramInputElement.getAttribute('alt');
-    var pre = 'http://localhost:9001';
+    var pre = 'http://localhost:8181';
     var link = pre + src;
     expect(alt).toEqual(altText);
     await request(link, function(error, response, body) {

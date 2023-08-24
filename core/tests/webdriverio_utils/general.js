@@ -93,7 +93,7 @@ var isInDevMode = async function() {
   return await browser.config.params.devMode === 'true';
 };
 
-var SERVER_URL_PREFIX = 'http://localhost:9001';
+var SERVER_URL_PREFIX = 'http://localhost:8181';
 var EDITOR_URL_SLICE = '/create/';
 var PLAYER_URL_SLICE = '/explore/';
 var USER_PREFERENCES_URL = '/preferences';

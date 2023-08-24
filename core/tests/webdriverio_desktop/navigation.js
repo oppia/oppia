@@ -82,7 +82,7 @@ describe('Meta Tags', function() {
     expect(await getStartedPage.getMetaTagContent('description', 'og')).toEqual(
       EXPECTED_META_DESCRIPTION);
     expect(await getStartedPage.getMetaTagContent('url', 'og')).toEqual(
-      'http://localhost:9001/get-started');
+      'http://localhost:8181/get-started');
   });
 
   it('should set the correct application name', async function() {
@@ -149,7 +149,7 @@ describe('Static Pages Tour', function() {
       (url) => {
         // Wait for second redirection (splash page to preferred dashboard
         // page).
-        return url !== 'http://localhost:9001/';
+        return url !== 'http://localhost:8181/';
       },
       async() => {
         await waitFor.presenceOf(

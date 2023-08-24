@@ -149,17 +149,17 @@ describe('Preferences', function() {
       await preferencesPage.get();
       await preferencesPage.selectCreatorDashboard();
       await general.goToHomePage();
-      await waitFor.urlToBe('http://localhost:9001/creator-dashboard');
+      await waitFor.urlToBe('http://localhost:8181/creator-dashboard');
 
       await preferencesPage.get();
       await preferencesPage.selectContributorDashboard();
       await general.goToHomePage();
-      await waitFor.urlToBe('http://localhost:9001/contributor-dashboard');
+      await waitFor.urlToBe('http://localhost:8181/contributor-dashboard');
 
       await preferencesPage.get();
       await preferencesPage.selectLearnerDashboard();
       await general.goToHomePage();
-      await waitFor.urlToBe('http://localhost:9001/learner-dashboard');
+      await waitFor.urlToBe('http://localhost:8181/learner-dashboard');
     });
 
   it('should navigate to account deletion page',
@@ -168,7 +168,7 @@ describe('Preferences', function() {
       await users.login('delete@page.com');
       await preferencesPage.get();
       await preferencesPage.clickDeleteAccountButton();
-      await waitFor.urlToBe('http://localhost:9001/delete-account');
+      await waitFor.urlToBe('http://localhost:8181/delete-account');
     });
 
   it('should export account data',

@@ -37,14 +37,14 @@ var EXPLORATION = {
 describe('screenreader and keyboard user accessibility features', function() {
   var ERROR_MESSAGE = 'Content container taking too long to load';
   var libraryPage = null;
-  var GET_STARTED_URL = 'http://localhost:9001/get-started';
-  var COMMUNITY_LIBRARY_URL = 'http://localhost:9001/community-library';
-  var LEARNER_DASHBOARD_URL = 'http://localhost:9001/learner-dashboard';
-  var CREATOR_DASHBOARD_URL = 'http://localhost:9001/creator-dashboard';
-  var ABOUT_URL = 'http://localhost:9001/about';
-  var PREFERENCES_URL = 'http://localhost:9001/preferences';
-  var PRIVACY_POLICY_URL = 'http://localhost:9001/privacy-policy';
-  var DONATE_URL = 'http://localhost:9001/donate';
+  var GET_STARTED_URL = 'http://localhost:8181/get-started';
+  var COMMUNITY_LIBRARY_URL = 'http://localhost:8181/community-library';
+  var LEARNER_DASHBOARD_URL = 'http://localhost:8181/learner-dashboard';
+  var CREATOR_DASHBOARD_URL = 'http://localhost:8181/creator-dashboard';
+  var ABOUT_URL = 'http://localhost:8181/about';
+  var PREFERENCES_URL = 'http://localhost:8181/preferences';
+  var PRIVACY_POLICY_URL = 'http://localhost:8181/privacy-policy';
+  var DONATE_URL = 'http://localhost:8181/donate';
 
   var holdCtrlAndPressKey = async function(key) {
     await browser.keys(['Control', key]);
@@ -545,8 +545,8 @@ describe('Cache Slugs', function() {
     async function() {
       await browser.url('/console_errors');
       var expectedErrors = [
-        'http://localhost:9001/build/fail/logo/288x128_logo_white.png',
-        'http://localhost:9001/build/fail/logo/288x128_logo_white.webp'
+        'http://localhost:8181/build/fail/logo/288x128_logo_white.png',
+        'http://localhost:8181/build/fail/logo/288x128_logo_white.webp'
       ];
       await general.checkForConsoleErrors(expectedErrors);
     });

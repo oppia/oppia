@@ -47,6 +47,14 @@ run-offline: # Runs the dev-server in offline mode
 	@echo 'Check dev-server logs using "make logs.dev-server"'
 	@echo 'Stop the development server using "make stop"'
 
+start-devserver-for-tests: ## Starts the development server for the tests
+	docker compose up dev-server -d
+	@printf 'Please wait while the development server starts...\n\n'
+	@while [[ $$(curl -s -o /tmp/status_code.txt -w '%{http_code}' http://localhost:8181) != "200" ]] || [[ $$(curl -s -o /tmp/status_code.txt -w '%{http_code}' http://localhost:8181/community-library) != "200" ]]; do \
+		sleep 5; \
+	done
+	@echo 'Development server started at port 8181.'
+
 init: build run-devserver ## Initializes the build and runs dev-server.
 
 clean: ## Cleans the docker containers and volumes.
@@ -99,6 +107,16 @@ run_tests.mypy: ## Runs mypy checks
 
 run_tests.backend_associate: ## Runs the backend associate tests
 	docker compose run --no-deps --entrypoint "python -m scripts.check_backend_associated_test_file" dev-server
+
+CHROME_VERSION := $(shell google-chrome --version | awk '{print $$3}')
+
+run_tests.e2e: ## Runs the e2e tests for the parsed suite
+	@echo 'Shutting down any previously started server.'
+	$(MAKE) stop 
+	$(MAKE) start-devserver-for-tests
+	@echo 'Starting e2e tests for the suite: $(suite)'
+	../oppia_tools/node-v16.13.0-linux-x64/bin/npx wdio ./core/tests/wdio.conf.js --suite $(suite) $(CHROME_VERSION) --params.devMode=True --capabilities[0].maxInstances=3
+	$(MAKE) stop
 
 OS_NAME := $(shell uname)
 

@@ -105,7 +105,7 @@ describe('rich-text components', function() {
       // in both regexes and strings: https://stackoverflow.com/a/5514380
       'The target origin provided \\\(\'https://www\.youtube\.com\'\\\) does ' +
       'not match the recipient window\'s ' +
-      'origin \\\(\'http://localhost:9001\'\\\).',
+      'origin \\\(\'http://localhost:8181\'\\\).',
     ]);
   });
 });

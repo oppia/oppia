@@ -39,7 +39,7 @@ var DeleteAccountPage = function() {
     await waitFor.clientSideRedirection(async() => {
       await action.click('Confirm deletion button', confirmDeletionButton);
     }, (url) => {
-      return url === 'http://localhost:9001/pending-account-deletion';
+      return url === 'http://localhost:8181/pending-account-deletion';
     }, async() => {
       var pendingAccountDeletionHeading = $(
         '.e2e-test-pending-account-deletion');
