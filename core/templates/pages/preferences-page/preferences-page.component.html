@@ -134,7 +134,10 @@
     </div>
 
     <div class="form-group row">
-      <label for="label-target-interests-dropdown" class="col-lg-4 col-md-4 col-sm-4" tabindex="0" [attr.aria-label]="('I18N_PREFERENCES_SUBJECT_INTERESTS' | translate) + ('I18N_PREFERENCES_SUBJECT_INTERESTS_HELP_BLOCK' | translate)">
+      <label for="label-target-interests-dropdown" 
+             class="col-lg-4 col-md-4 col-sm-4"
+             tabindex="0"
+             [attr.aria-label]="('I18N_PREFERENCES_SUBJECT_INTERESTS' | translate) + ('I18N_PREFERENCES_SUBJECT_INTERESTS_HELP_BLOCK' | translate)">
         {{ 'I18N_PREFERENCES_SUBJECT_INTERESTS' | translate }}
       </label>
       <div class="col-lg-8 col-md-8 col-sm-8">
@@ -200,7 +203,9 @@
     </div>
 
     <div class="form-group row">
-      <label class="col-lg-4 col-md-4 col-sm-4" tabindex="0" [attr.aria-label]="('I18N_PREFERENCES_PREFERRED_EXPLORATION_LANGUAGE' | translate) + ('I18N_PREFERENCES_PREFERRED_EXPLORATION_LANGUAGE_EXPLAIN' | translate)">
+      <label class="col-lg-4 col-md-4 col-sm-4"
+             tabindex="0"
+             [attr.aria-label]="('I18N_PREFERENCES_PREFERRED_EXPLORATION_LANGUAGE' | translate) + ('I18N_PREFERENCES_PREFERRED_EXPLORATION_LANGUAGE_EXPLAIN' | translate)">
         {{ 'I18N_PREFERENCES_PREFERRED_EXPLORATION_LANGUAGE' | translate }}
       </label>
       <div class="col-lg-8 col-md-8 col-sm-8">
@@ -221,7 +226,9 @@
     </div>
 
     <div class="form-group row">
-      <label class="col-lg-4 col-md-4 col-sm-4" tabindex="0" [attr.aria-label]="('I18N_PREFERENCES_PREFERRED_SITE_LANGUAGE' | translate) + ('I18N_PREFERENCES_PREFERRED_SITE_LANGUAGE_EXPLAIN' | translate)">
+      <label class="col-lg-4 col-md-4 col-sm-4"
+             tabindex="0"
+             [attr.aria-label]="('I18N_PREFERENCES_PREFERRED_SITE_LANGUAGE' | translate) + ('I18N_PREFERENCES_PREFERRED_SITE_LANGUAGE_EXPLAIN' | translate)">
         {{ 'I18N_PREFERENCES_PREFERRED_SITE_LANGUAGE' | translate }}
       </label>
       <div class="col-lg-8 col-md-8 col-sm-8">
@@ -243,7 +250,9 @@
     </div>
 
     <div class="form-group row">
-      <label class="col-lg-4 col-md-4 col-sm-4" tabindex="0" [attr.aria-label]="('I18N_PREFERENCES_PREFERRED_AUDIO_LANGUAGE' | translate) + ('I18N_PREFERENCES_PREFERRED_AUDIO_LANGUAGE_EXPLAIN' | translate)">
+      <label class="col-lg-4 col-md-4 col-sm-4"
+             tabindex="0"
+             [attr.aria-label]="('I18N_PREFERENCES_PREFERRED_AUDIO_LANGUAGE' | translate) + ('I18N_PREFERENCES_PREFERRED_AUDIO_LANGUAGE_EXPLAIN' | translate)">
         {{ "I18N_PREFERENCES_PREFERRED_AUDIO_LANGUAGE" | translate }}
       </label>
       <div class="col-lg-8 col-md-8 col-sm-8">
@@ -342,7 +351,10 @@
         {{ 'I18N_DELETE_ACCOUNT_PAGE_HEADING' | translate }}
       </label>
       <div class="col-lg-8 col-md-8 col-sm-8">
-        <a href="/delete-account" [attr.aria-label]="('I18N_DELETE_ACCOUNT_PAGE_HEADING' | translate) + ('I18N_DELETE_ACCOUNT_PAGE_REDIRECT_INFO' | translate)" class="preferences-page-tab-focus" [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.DELETE_ACCOUNT.ROUTE">
+        <a href="/delete-account"
+           [attr.aria-label]="('I18N_DELETE_ACCOUNT_PAGE_HEADING' | translate) + ('I18N_DELETE_ACCOUNT_PAGE_REDIRECT_INFO' | translate)"
+           class="preferences-page-tab-focus"
+           [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.DELETE_ACCOUNT.ROUTE">
           <button tabindex="-1" type="button" class="btn btn-danger e2e-test-delete-account-button">
             {{ 'I18N_DELETE_ACCOUNT_PAGE_HEADING' | translate }}
           </button>
@@ -360,7 +372,10 @@
         {{ 'I18N_PREFERENCES_EXPORT_ACCOUNT' | translate }}
       </label>
       <div class="col-lg-8 col-md-8 col-sm-8" *ngIf="!exportingData">
-        <a href="/export-account-handler" tabindex="0" [attr.aria-label]="('I18N_PREFERENCES_EXPORT_ACCOUNT' | translate) + ('I18N_PREFERENCES_EXPORT_ACCOUNT_INFO_TEXT' | translate)" class="preferences-page-tab-focus">
+        <a href="/export-account-handler"
+           tabindex="0"
+           [attr.aria-label]="('I18N_PREFERENCES_EXPORT_ACCOUNT' | translate) + ('I18N_PREFERENCES_EXPORT_ACCOUNT_INFO_TEXT' | translate)"
+           class="preferences-page-tab-focus">
           <button type="button"
                   class="btn btn-primary e2e-test-export-account-button"
                   title="Export account"
