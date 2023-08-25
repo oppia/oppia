@@ -1195,9 +1195,6 @@ URLS.extend((
     get_redirect_route(
         r'/cron/users/dashboard_stats', cron.CronDashboardStatsHandler),
     get_redirect_route(
-        r'/cron/suggestions/translation_contribution_stats',
-        cron.CronTranslationContributionStatsHandler),
-    get_redirect_route(
         r'/cron/mail/curriculum_admins/chapter_publication_notfications',
         cron.CronMailChapterPublicationsNotificationsHandler),
 ))
