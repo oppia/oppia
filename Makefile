@@ -95,9 +95,7 @@ run-backend-tests: ## [Not ready for use] Runs the backend tests
 	@echo "Not in use, under construction!"
 
 run_tests.frontend: ## Runs the frontend unit tests
-	docker compose run --no-deps --name FE_TESTS --entrypoint "python -m scripts.run_frontend_tests $(flags)" dev-server
-	docker cp FE_TESTS:/app/karma_coverage_reports ../
-	docker container rm FE_TESTS
+	docker compose run --no-deps --entrypoint "python -m scripts.run_frontend_tests $(flags)" dev-server
 
 run_tests.typescript: ## Runs the typescript checks
 	docker compose run --no-deps --entrypoint "python -m scripts.typescript_checks" dev-server
@@ -165,7 +163,7 @@ install_node:
 		tar -xvf node-download -C ../oppia_tools; \
 		rm node-download; \
 	fi
-# mv ../oppia_tools/$$node_file_name ../oppia_tools/node-16.13.0
+
 	@if [ "$$node_file_name" = "node-v16.13.0" ]; then \
 		cd ../oppia_tools/node-16.13.0; \
 		./configure; \

@@ -46,6 +46,7 @@ services:
       - frontend_proto_files:/app/oppia/extensions/classifiers/proto
       - third_party:/app/oppia/third_party
       - pip_cache:/root/.cache
+      - ../karma_coverage_reports:/app/karma_coverage_reports
     environment:
       - CLOUDSDK_CORE_DISABLE_PROMPTS=1
       - PIP_NO_DEPS=True
