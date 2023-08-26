@@ -24,7 +24,7 @@ import { Fraction } from 'domain/objects/fraction.model';
 import { ObjectsDomainConstants } from
   'domain/objects/objects-domain.constants';
 import { Units, UnitsObjectFactory } from
-  'domain/objects/UnitsObjectFactory';
+  'domain/objects/units-object.model';
 import { Unit, NumberWithUnitsAnswer } from
   'interactions/answer-defs';
 

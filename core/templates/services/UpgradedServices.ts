@@ -456,7 +456,7 @@ import { TopicsAndSkillsDashboardPageService } from
   'pages/topics-and-skills-dashboard-page/topics-and-skills-dashboard-page.service';
 import { TopicViewerBackendApiService } from
   'domain/topic_viewer/topic-viewer-backend-api.service';
-import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory';
+import { UnitsObjectFactory } from 'domain/objects/units-object.model';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 import { UrlService } from 'services/contextual/url.service';
