@@ -4847,7 +4847,6 @@ class NoBlankLineAfterFunctionDefCheckerTests(unittest.TestCase):
         with self.checker_test_object.assertNoMessages():
             temp_file.close()
 
-
     def test_function_with_no_blank_line_after_function_definition_and_docs(
         self
     ) -> None:
@@ -4870,7 +4869,7 @@ class NoBlankLineAfterFunctionDefCheckerTests(unittest.TestCase):
         node.path = filename
 
         self.checker_test_object.checker.visit_functiondef(
-            node_with_no_error_message
+            node
         )
 
         with self.checker_test_object.assertNoMessages():
