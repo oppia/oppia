@@ -4778,10 +4778,80 @@ class NoBlankLineAfterFunctionDefCheckerTests(unittest.TestCase):
             pylint_extensions.NoBlankLineAfterFunctionDefChecker)
         self.checker_test_object.setup_method()
 
-    def test_function_with_no_blank_line_after_function_definition(
+    def test_function_with_blank_line_after_function_definition(
         self
     ) -> None:
-        node_with_no_error_message = astroid.scoped_nodes.Module(
+        node = astroid.extract_node(
+            """def add(first: int, second: int) -> int:
+
+                   return first+second
+            """)
+        with self.checker_test_object.assertAddsMessages(
+            testutils.MessageTest(
+                msg_id='Blank-line-after-function-definition',
+                node=node,
+                line=2,
+                col_offset=0,
+                end_line=1,
+                end_col_offset=8
+            )
+        ):
+            self.checker_test_object.checker.visit_functiondef(
+                node)
+
+    def test_function_with_blank_line_after_function_definition_with_docs(
+        self
+    ) -> None:
+        node = astroid.extract_node(
+            """def add2(first: int, second: int) -> int:
+
+                   \'\'\' This a docstring.\'\'\'
+                   return first+second
+            """)
+        with self.checker_test_object.assertAddsMessages(
+            testutils.MessageTest(
+                msg_id='Blank-line-after-function-definition',
+                node=node,
+                line=2,
+                col_offset=0,
+                end_line=1,
+                end_col_offset=8
+            )
+        ):
+            self.checker_test_object.checker.visit_functiondef(
+                node)
+
+    def test_function_with_no_blank_line_after_function_definition_and_no_docs(
+        self
+    ) -> None:
+        node = astroid.scoped_nodes.Module(
+            name='test',
+            doc=None
+        )
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+
+        with utils.open_file(filename, 'w') as tmp:
+            tmp.write(
+                u"""def add3(first: int, second: int) -> int:
+                        return first+second
+                """
+            )
+        node.file = filename
+        node.path = filename
+
+        self.checker_test_object.checker.visit_functiondef(
+            node
+        )
+
+        with self.checker_test_object.assertNoMessages():
+            temp_file.close()
+
+
+    def test_function_with_no_blank_line_after_function_definition_and_docs(
+        self
+    ) -> None:
+        node = astroid.scoped_nodes.Module(
             name='test',
             doc='Custom test'
         )
@@ -4791,51 +4861,17 @@ class NoBlankLineAfterFunctionDefCheckerTests(unittest.TestCase):
         with utils.open_file(filename, 'w') as tmp:
             tmp.write(
                 u"""
-                    def add(first: int, second: int) -> int:
+                    def add4(first: int, second: int) -> int:
                         \"\"\" This a docstring.\"\"\"
                         return first+second
                 """
             )
-        node_with_no_error_message.file = filename
-        node_with_no_error_message.path = filename
+        node.file = filename
+        node.path = filename
 
         self.checker_test_object.checker.visit_functiondef(
             node_with_no_error_message
         )
 
         with self.checker_test_object.assertNoMessages():
-            temp_file.close()
-
-    def test_function_with_blank_line_after_function_definition(
-        self
-    ) -> None:
-        node_with_no_error_message = astroid.scoped_nodes.Module(
-            name='test2',
-            doc=None
-        )
-        temp_file = tempfile.NamedTemporaryFile()
-        filename = temp_file.name
-
-        with utils.open_file(filename, 'w') as tmp:
-            tmp.write(
-                u"""
-                    def add(first: int, second: int) -> int:
-
-                        return first+second
-                """
-            )
-        node_with_no_error_message.file = filename
-        node_with_no_error_message.path = filename
-
-        self.checker_test_object.checker.visit_functiondef(
-            node_with_no_error_message
-        )
-
-        with self.checker_test_object.assertAddsMessages(
-            testutils.MessageTest(
-                msg_id='Blank-line-after-function-definition',
-                node=node_with_no_error_message,
-                line=1
-            )
-        ):
             temp_file.close()
