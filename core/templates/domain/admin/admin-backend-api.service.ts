@@ -99,7 +99,7 @@ export interface ConfigPropertyValues {
   'email_footer': string;
   'email_sender_name': string;
   'notification_user_ids_for_failed_tasks': string[];
-  'oppia_csrf_secret': string;
+  'notify_admins_suggestions_waiting_too_long_is_enabled': boolean;
   'record_playthrough_probability': number;
   'signup_email_content': SignupEmailContent;
   'unpublish_exploration_email_html_body': string;
