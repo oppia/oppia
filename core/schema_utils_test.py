@@ -1163,6 +1163,14 @@ class SchemaNormalizationUnitTests(test_utils.GenericTestBase):
         normalize_obj_2 = schema_utils.normalize_against_schema(obj_2, schema_2)
         self.assertEqual(u'http://www.oppia.org/splash/', normalize_obj_2)
 
+    def test_normalize_against_schema_for_bytes_unicode_works_fine(
+        self) -> None:
+        schema = {'type': schema_utils.SCHEMA_TYPE_UNICODE}
+        obj = bytes('random string', 'utf-8')
+        normalized_obj = schema_utils.normalize_against_schema(obj, schema)
+
+        self.assertEqual('random string', normalized_obj)
+
     def test_list_schema(self) -> None:
         schema = {
             'type': schema_utils.SCHEMA_TYPE_LIST,

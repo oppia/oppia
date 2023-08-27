@@ -69,12 +69,12 @@ describe('Admin backend api service', () => {
     },
     demo_collections: [],
     config_properties: {
-      oppia_csrf_secret: {
+      record_playthrough_probability: {
         schema: {
-          type: 'unicode'
+          type: 'float'
         } as Schema,
-        value: '3WHOWnD3sy0r1wukJ2lX4vBS_YA=',
-        description: 'Text used to encrypt CSRF tokens.'
+        value: 0.2,
+        description: 'The record_playthrough_probability.'
       }
     },
     demo_exploration_ids: ['19'],
@@ -118,7 +118,6 @@ describe('Admin backend api service', () => {
     max_number_of_suggestions_per_reviewer: 5,
     notification_user_ids_for_failed_tasks: [],
     notify_admins_suggestions_waiting_too_long_is_enabled: false,
-    oppia_csrf_secret: 'H62T5aIngXb1PB6arDkFrAnxakpQ=',
     record_playthrough_probability: 0.2,
     signup_email_content: {
       subject: 'THIS IS A PLACEHOLDER.',

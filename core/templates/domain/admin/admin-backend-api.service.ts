@@ -103,7 +103,6 @@ export interface ConfigPropertyValues {
   'max_number_of_suggestions_per_reviewer': number;
   'notification_user_ids_for_failed_tasks': string[];
   'notify_admins_suggestions_waiting_too_long_is_enabled': boolean;
-  'oppia_csrf_secret': string;
   'record_playthrough_probability': number;
   'signup_email_content': SignupEmailContent;
   'unpublish_exploration_email_html_body': string;
