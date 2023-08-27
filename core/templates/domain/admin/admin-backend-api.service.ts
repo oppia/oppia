@@ -95,7 +95,6 @@ export interface ConfigPropertyValues {
   'enable_admin_notifications_for_reviewer_shortage': boolean;
   'max_number_of_suggestions_per_reviewer': number;
   'notify_admins_suggestions_waiting_too_long_is_enabled': boolean;
-  'oppia_csrf_secret': string;
   'record_playthrough_probability': number;
 }
 
