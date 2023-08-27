@@ -79,7 +79,7 @@
       <ng-container *ngFor="let item of selectionDetails.categories.masterList">
         <li ngbDropdownItem
             *ngIf="!selectionDetails.categories.selections[item.id]">
-          <a tabindex="0" 
+          <a tabindex="0"
              (keydown.enter)="toggleSelection('categories', item.id)"
              (click)="toggleSelection('categories', item.id)"
              *ngIf="!first && !last"
@@ -160,7 +160,7 @@
       </li>
       <hr *ngIf="selectionDetails.languageCodes.numSelections > 0" class="oppia-search-bar-hr">
       <ng-container *ngFor="let item of selectionDetails.languageCodes.masterList">
-        <li ngbDropdownItem 
+        <li ngbDropdownItem
             *ngIf="!selectionDetails.languageCodes.selections[item.id]">
           <a (click)="toggleSelection('languageCodes', item.id)"
              (keydown.enter)="toggleSelection('languageCodes', item.id)"
