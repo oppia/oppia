@@ -18,7 +18,7 @@
 
 import {TestBed} from '@angular/core/testing';
 import { Units, UnitsObjectFactory } from
-  'domain/objects/UnitsObjectFactory';
+  'domain/objects/units-object.model';
 
 describe('UnitsObjectFactory', () => {
   let units: UnitsObjectFactory;
