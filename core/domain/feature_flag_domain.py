@@ -25,6 +25,7 @@ import re
 from core import feconf
 from core import utils
 from core.constants import constants
+from core.domain import change_domain
 
 from typing import Final, List, TypedDict
 
@@ -110,21 +111,40 @@ class FeatureFlag:
 
     @property
     def force_enable_for_all_users(self) -> bool:
-        """Returns the force_enable_for_all_users of the feature flag.
+        """Returns the force_enable_for_all_users field of the feature flag.
 
         Returns:
-            str. The force_enable_for_all_users of the feature flag.
+            str. The force_enable_for_all_users field of the feature flag.
         """
         return self._force_enable_for_all_users
 
+    def set_force_enable_for_all_users(
+        self, force_enable_for_all_users: bool
+    ) -> None:
+        """Sets the force_enable_for_all_users of FeatureFlag.
+
+        Args:
+            force_enable_for_all_users: bool. The new value of
+                force_enable_for_all_users.
+        """
+        self._force_enable_for_all_users = force_enable_for_all_users
+
     @property
     def rollout_percentage(self) -> int:
-        """Returns the rollout_percentage of the feature flag.
+        """Returns the rollout_percentage field of the feature flag.
 
         Returns:
-            str. The rollout_percentage of the feature flag.
+            str. The rollout_percentage field of the feature flag.
         """
         return self._rollout_percentage
+
+    def set_rollout_percentage(self, rollout_percentage: int) -> None:
+        """Sets the rollout_percentage of FeatureFlag.
+
+        Args:
+            rollout_percentage: int. The new value of rollout_percentage.
+        """
+        self._rollout_percentage = rollout_percentage
 
     @property
     def user_group_ids(self) -> List[str]:
@@ -135,6 +155,14 @@ class FeatureFlag:
         """
         return self._user_group_ids
 
+    def set_user_group_ids(self, user_group_ids: List[str]) -> None:
+        """Sets the user_group_ids of FeatureFlag.
+
+        Args:
+            user_group_ids: List[str]. The new value of user_group_ids.
+        """
+        self._user_group_ids = user_group_ids
+
     @property
     def last_updated(self) -> str:
         """Returns the last_updated of the feature flag.
@@ -143,6 +171,14 @@ class FeatureFlag:
             str. The last_updated of the feature flag.
         """
         return self._last_updated
+
+    def set_last_updated(self, last_updated: str) -> None:
+        """Sets the last_updated of FeatureFlag.
+
+        Args:
+            last_updated: str. The new value of last_updated.
+        """
+        self._last_updated = last_updated
 
     def _get_server_mode(self) -> ServerMode:
         """Returns the current server mode.

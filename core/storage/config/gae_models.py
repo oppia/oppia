@@ -189,9 +189,9 @@ class FeatureFlagModel(base_models.BaseModel):
     The id is the name of the feature-flag.
     """
 
-    rollout_percentage = datastore_services.IntegerProperty(default=0)
     force_enable_for_all_users = datastore_services.BooleanProperty(
         default=False)
+    rollout_percentage = datastore_services.IntegerProperty(default=0)
     user_group_ids = datastore_services.JsonProperty(default=[])
 
     @staticmethod
@@ -209,9 +209,9 @@ class FeatureFlagModel(base_models.BaseModel):
     def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
         """Model doesn't contain any data directly corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
-            'rollout_percentage': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'force_enable_for_all_users': (
                 base_models.EXPORT_POLICY.NOT_APPLICABLE),
+            'rollout_percentage': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'user_group_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
 
@@ -219,24 +219,28 @@ class FeatureFlagModel(base_models.BaseModel):
     def create(
         cls,
         feature_name: str,
-        rollout_percentage: int,
         force_enable_for_all_users: bool,
+        rollout_percentage: int,
         user_group_ids: List[str]
     ) -> FeatureFlagModel:
         """Creates FeatureFlagModel instance.
 
         Args:
             feature_name: str. The name of the feature-flag.
-            rollout_percentage: int. The defined percentage of logged-in
-                users for which the feature should be enabled.
             force_enable_for_all_users: bool. Force enable the feature-flag for
                 all the users.
+            rollout_percentage: int. The defined percentage of logged-in
+                users for which the feature should be enabled.
+            user_group_ids: List[str]. The list of ids of UserGroup objects.
 
         Returns:
             FeatureFlagModel. The created FeatureFlagModel instance.
         """
-        return cls(
+        feature_entity = cls(
             id=feature_name,
-            rollout_percentage=rollout_percentage,
             force_enable_for_all_users=force_enable_for_all_users,
+            rollout_percentage=rollout_percentage,
             user_group_ids=user_group_ids)
+        feature_entity.update_timestamps()
+        feature_entity.put()
+        return feature_entity

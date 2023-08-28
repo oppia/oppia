@@ -257,14 +257,14 @@ class FeatureFlagModelUnitTests(test_utils.GenericTestBase):
 
     def test_get_deletion_policy_is_not_applicable(self) -> None:
         self.assertEqual(
-            config_models.PlatformParameterModel.get_deletion_policy(),
+            config_models.FeatureFlagModel.get_deletion_policy(),
             base_models.DELETION_POLICY.NOT_APPLICABLE)
 
     def test_create_model(self) -> None:
         feature_model = config_models.FeatureFlagModel.create(
             feature_name='feature_name',
-            rollout_percentage=50,
             force_enable_for_all_users=False,
+            rollout_percentage=50,
             user_group_ids=['User Group 1', 'User Group 2']
         )
         self.assertEqual(feature_model.id, 'feature_name')
@@ -276,7 +276,7 @@ class FeatureFlagModelUnitTests(test_utils.GenericTestBase):
 
     def test_get_model_association_to_user(self) -> None:
         self.assertEqual(
-            config_models.PlatformParameterModel.get_model_association_to_user(), # pylint: disable=line-too-long
+            config_models.FeatureFlagModel.get_model_association_to_user(), # pylint: disable=line-too-long
             base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
         )
 
@@ -285,7 +285,8 @@ class FeatureFlagModelUnitTests(test_utils.GenericTestBase):
             'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'feature_name': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'force_enable_for_all_users': (
+                base_models.EXPORT_POLICY.NOT_APPLICABLE),
             'rollout_percentage': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'user_group_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE
         }

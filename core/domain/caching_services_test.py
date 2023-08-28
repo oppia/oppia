@@ -26,6 +26,7 @@ from core.domain import caching_domain
 from core.domain import caching_services
 from core.domain import collection_domain
 from core.domain import exp_domain
+from core.domain import feature_flag_domain
 from core.domain import platform_parameter_domain as parameter_domain
 from core.domain import skill_domain
 from core.domain import story_domain
@@ -964,3 +965,45 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             default_parameter.to_dict(),
             platform_parameters[platform_parameter_id].to_dict())
+
+    def test_feature_flags_with_unicode_are_set_and_get_correctly(
+        self
+    ) -> None:
+        """Test to make sure that a feature flag initialized with unicode
+        characters is set to the cache without errors and retrieved from
+        the cache without any alterations (in an identical state to when it was
+        set to the cache).
+        """
+        feature_flag_id = 'id'
+
+        self.assertEqual(
+            caching_services.get_multi(
+                caching_services.CACHE_NAMESPACE_FEATURE_FLAG,
+                '0',
+                [feature_flag_id]),
+            {})
+
+        feature = feature_flag_domain.FeatureFlag.from_dict({
+            'name': 'feature_a',
+            'description': 'for test',
+            'feature_stage': 'dev',
+            'force_enable_for_all_users': False,
+            'rollout_percentage': 0,
+            'user_group_ids': [],
+            'last_updated': 'August 25, 2023'
+        })
+
+        caching_services.set_multi(
+            caching_services.CACHE_NAMESPACE_FEATURE_FLAG,
+            '0',
+            {
+                feature_flag_id: feature
+            })
+
+        feature_flags = caching_services.get_multi(
+            caching_services.CACHE_NAMESPACE_FEATURE_FLAG,
+            '0', [feature_flag_id])
+
+        self.assertEqual(
+            feature.to_dict(),
+            feature_flags[feature_flag_id].to_dict())
