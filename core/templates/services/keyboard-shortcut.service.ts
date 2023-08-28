@@ -73,6 +73,22 @@ export class KeyboardShortcutService {
     Mousetrap.bind('?', () => {
       this.openQuickReference();
     });
+
+    Mousetrap.bind('left', () => {
+      var previousButton = document.querySelector(
+        '.oppia-back-button') as HTMLElement;
+      if (previousButton !== null) {
+        previousButton.click();
+      }
+    });
+
+    Mousetrap.bind('right', () => {
+      var nextButton = document.querySelector(
+        '.oppia-next-button') as HTMLElement;
+      if (nextButton !== null) {
+        nextButton.click();
+      }
+    });
   }
 
   bindLibraryPageShortcuts(): void {
