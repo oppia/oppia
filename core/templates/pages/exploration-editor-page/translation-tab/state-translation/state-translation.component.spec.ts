@@ -58,6 +58,8 @@ import { TranslationTabActiveModeService } from '../services/translation-tab-act
 import { StateTranslationComponent } from './state-translation.component';
 import { RouterService } from 'pages/exploration-editor-page/services/router.service';
 import { TranslatedContent } from 'domain/exploration/TranslatedContentObjectFactory';
+import { Hint } from 'domain/exploration/hint-object.model';
+import { AnswerGroup } from 'domain/exploration/AnswerGroupObjectFactory';
 
 const DEFAULT_OBJECT_VALUES = require('objects/object_defaults.json');
 
@@ -1500,6 +1502,170 @@ describe('State translation component', () => {
       expect(component.isDisabled('feedback')).toBe(false);
       expect(translationTabActiveContentIdService.setActiveContent)
         .toHaveBeenCalledWith('default_outcome', 'html');
+    });
+  });
+
+  describe('when initContentId and initTabName are provided', () => {
+    const mockStateAnswerGroups = [
+      {
+        outcome: {
+          dest: 'dest 1',
+          destIfReallyStuck: null,
+          feedback: {
+            _contentId: 'feedback_27',
+            _html: 'html',
+            contentId: 'feedback_27',
+            html: 'html'
+          },
+          labelledAsCorrect: false,
+          missingPrerequisiteSkillId: null,
+          paramChanges: [],
+          refresherExplorationId: null
+        },
+        rules: [],
+        taggedSkillMisconceptionId: null,
+        trainingData: []
+      },
+      {
+        outcome: {
+          dest: 'dest 2',
+          destIfReallyStuck: null,
+          feedback: {
+            _contentId: 'feedback_28',
+            _html: 'html',
+            contentId: 'feedback_28',
+            html: 'html'
+          },
+          labelledAsCorrect: false,
+          missingPrerequisiteSkillId: null,
+          paramChanges: [],
+          refresherExplorationId: null
+        },
+        rules: [],
+        taggedSkillMisconceptionId: null,
+        trainingData: []
+      },
+      {
+        outcome: {
+          dest: 'dest 3',
+          destIfReallyStuck: null,
+          feedback: {
+            _contentId: 'feedback_29',
+            _html: 'html',
+            contentId: 'feedback_29',
+            html: 'html'
+          },
+          labelledAsCorrect: false,
+          missingPrerequisiteSkillId: null,
+          paramChanges: [],
+          refresherExplorationId: null
+        },
+        rules: [],
+        taggedSkillMisconceptionId: null,
+        trainingData: []
+      }
+    ];
+
+    const mockStateHints = [
+      {
+        hintContent: {
+          contentId: 'hint_1'
+        }
+      },
+      {
+        hintContent: {
+          contentId: 'hint_2'
+        }
+      },
+      {
+        hintContent: {
+          contentId: 'hint_3'
+        }
+      }
+    ];
+
+    const mockinteractionCustomizationArgTranslatableContent = [
+      {
+        name: 'demo',
+        content: {
+          contentId: 'ca_1'
+        }
+      },
+      {
+        name: 'demo',
+        content: {
+          contentId: 'ca_2'
+        }
+      },
+      {
+        name: 'demo',
+        content: {
+          contentId: 'ca_3'
+        }
+      }
+    ];
+
+    it('should return correct index for card of type feedback', () => {
+      component.stateAnswerGroups = mockStateAnswerGroups as unknown as
+      AnswerGroup[];
+      component.activeTab = 'feedback';
+      component.initActiveContentId = 'feedback_29';
+
+      spyOn(stateEditorService, 'getInitActiveContentId').and.
+        returnValue('feedback_29');
+
+      const index = component.getIndexOfActiveCard();
+      expect(index).toEqual(2);
+    });
+
+    it('should return correct index for card of type hint', () => {
+      component.stateHints = mockStateHints as unknown as Hint[];
+      component.activeTab = 'hint';
+      component.initActiveContentId = 'hint_2';
+
+      spyOn(stateEditorService, 'getInitActiveContentId').and.
+        returnValue('hint_2');
+
+      const index = component.getIndexOfActiveCard();
+      expect(index).toEqual(1);
+    });
+
+    it('should return correct index for card of type custom args', () => {
+      component.interactionCustomizationArgTranslatableContent = (
+        mockinteractionCustomizationArgTranslatableContent);
+      component.activeTab = 'ca';
+      component.initActiveContentId = 'ca_1';
+
+      spyOn(stateEditorService, 'getInitActiveContentId').and.
+        returnValue('ca_1');
+
+      const index = component.getIndexOfActiveCard();
+      expect(index).toEqual(0);
+    });
+
+    it('should return 0 as index for unknown tabs', () => {
+      component.activeTab = 'unknown';
+      component.initActiveContentId = 'unknown_1';
+
+      spyOn(stateEditorService, 'getInitActiveContentId').and.
+        returnValue('ca_1');
+
+      const index = component.getIndexOfActiveCard();
+      expect(index).toEqual(0);
+    });
+
+    it('should return correct active tab name', () => {
+      spyOn(stateEditorService, 'getInitActiveContentId').and.
+        returnValue('content_29');
+
+      expect(component.getActiveTab()).toBe('content');
+    });
+
+    it('should return active tab name as null when contentId is null', () => {
+      spyOn(stateEditorService, 'getInitActiveContentId').and.
+        returnValue(null);
+
+      expect(component.getActiveTab()).toBe(null);
     });
   });
 });

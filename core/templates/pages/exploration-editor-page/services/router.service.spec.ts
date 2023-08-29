@@ -176,6 +176,15 @@ describe('Router Service', () => {
     discardPeriodicTasks();
   }));
 
+  it('should navigate to translation tab', fakeAsync(()=>{
+    window.location.hash = '/translation/Start/ca_buttonText_6';
+    routerService._changeTab('/translation/Start/ca_buttonText_6');
+
+    tick(300);
+
+    expect(stateEditorService.getInitActiveContentId()).toBe('ca_buttonText_6');
+  }));
+
   it('should navigate to preview tab', fakeAsync(() => {
     expect(routerService.getActiveTabName()).toBe('main');
     routerService.navigateToPreviewTab();
