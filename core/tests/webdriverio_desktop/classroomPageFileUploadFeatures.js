@@ -84,6 +84,7 @@ describe('Classroom page functionality', function() {
       await browser.url('/classroom-admin/');
       await waitFor.pageToFullyLoad();
       await diagnosticTestPage.createNewClassroomConfig('Math', 'math');
+      await diagnosticTestPage.addTopicIdToClassroomConfig(topicId, 0);
       await classroomPage.get('math');
       // Even if the topic is unpublished, an unclickable tile is shown
       // currently.
