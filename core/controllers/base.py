@@ -36,8 +36,6 @@ from core.controllers import payload_validator
 from core.domain import auth_domain
 from core.domain import auth_services
 from core.domain import classifier_domain
-from core.domain import config_domain
-from core.domain import config_services
 from core.domain import user_services
 
 from typing import (
@@ -53,10 +51,6 @@ _NormalizedRequestDictType = TypeVar('_NormalizedRequestDictType')
 _NormalizedPayloadDictType = TypeVar('_NormalizedPayloadDictType')
 
 ONE_DAY_AGO_IN_SECS: Final = -24 * 60 * 60
-DEFAULT_CSRF_SECRET: Final = 'oppia csrf secret'
-CSRF_SECRET: Final = config_domain.ConfigProperty(
-    'oppia_csrf_secret', {'type': 'unicode'},
-    'Text used to encrypt CSRF tokens.', DEFAULT_CSRF_SECRET)
 
 # NOTE: These handlers manage user sessions and serve auth pages. Thus, we
 # should never reject or replace them when running in maintenance mode;
@@ -889,19 +883,6 @@ class CsrfTokenManager:
     _USER_ID_DEFAULT: Final = 'non_logged_in_user'
 
     @classmethod
-    def init_csrf_secret(cls) -> None:
-        """Verify that non-default CSRF secret exists; creates one if not."""
-
-        # Any non-default value is fine.
-        if CSRF_SECRET.value and CSRF_SECRET.value != DEFAULT_CSRF_SECRET:
-            return
-
-        # Initialize to random value.
-        config_services.set_property(
-            feconf.SYSTEM_COMMITTER_ID, CSRF_SECRET.name,
-            base64.urlsafe_b64encode(os.urandom(20)))
-
-    @classmethod
     def _create_token(
             cls, user_id: Optional[str], issued_on: float,
             nonce: Optional[str] = None) -> str:
@@ -918,8 +899,6 @@ class CsrfTokenManager:
         Returns:
             str. The generated CSRF token.
         """
-        cls.init_csrf_secret()
-
         # The token has 4 parts: hash of the actor user id, hash of the page
         # name, hash of the time issued and plain text of the time issued.
 
@@ -939,7 +918,7 @@ class CsrfTokenManager:
             nonce = base64.urlsafe_b64encode(os.urandom(20)).decode('utf-8')
 
         digester = hmac.new(
-            key=CSRF_SECRET.value.encode('utf-8'),
+            key=auth_services.get_csrf_secret_value().encode('utf-8'),
             digestmod='sha256'
         )
         digester.update(user_id.encode('utf-8'))
