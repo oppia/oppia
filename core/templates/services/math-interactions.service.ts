@@ -164,8 +164,8 @@ export class MathInteractionsService {
       return false;
     } else if (expressionString.indexOf('=') !== -1 || expressionString.indexOf(
       '<') !== -1 || expressionString.indexOf('>') !== -1) {
-      this.warningText = 'It looks like you have entered an ' +
-        'equation/inequality. Please enter an expression instead.';
+      this.warningText = 'Please remove the equal sign to make ' +
+      'your answer an expression.';
       return false;
     } else if (expressionString.indexOf('_') !== -1) {
       this.warningText = 'Your answer contains an invalid character: "_".';
