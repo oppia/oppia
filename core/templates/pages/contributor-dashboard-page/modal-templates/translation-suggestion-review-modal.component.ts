@@ -443,12 +443,13 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
       this.activeSuggestion.target_id, this.activeSuggestionId,
       AppConstants.ACTION_ACCEPT_SUGGESTION,
       reviewMessageForSubmitter, this.finalCommitMessage,
-      this.resolveSuggestionAndUpdateModal.bind(this),
-      (errorMessage) => {
-        this.rejectAndReviewNext(`Invalid Suggestion: ${errorMessage}`);
+      () => {
+        this.alertsService.clearMessages();
+        this.alertsService.addSuccessMessage('Suggestion accepted.');
+        this.resolveSuggestionAndUpdateModal();
+      }, (errorMessage) => {
         this.alertsService.clearWarnings();
-        this.alertsService.addWarning(
-          `Invalid Suggestion: ${errorMessage}`);
+        this.alertsService.addWarning(`Invalid Suggestion: ${errorMessage}`);
       });
   }
 
@@ -465,13 +466,14 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
         this.activeSuggestion.target_id, this.activeSuggestionId,
         AppConstants.ACTION_REJECT_SUGGESTION,
         reviewMessage || this.reviewMessage, null,
-        this.resolveSuggestionAndUpdateModal.bind(this),
-        (error) => {
+        () => {
+          this.alertsService.clearMessages();
+          this.alertsService.addSuccessMessage('Suggestion rejected.');
+          this.resolveSuggestionAndUpdateModal();
+        }, (errorMessage) => {
           this.alertsService.clearWarnings();
-          this.alertsService.addWarning(
-            'There was an error rejecting this suggestion');
-        }
-      );
+          this.alertsService.addWarning(`Invalid Suggestion: ${errorMessage}`);
+        });
     }
   }
 

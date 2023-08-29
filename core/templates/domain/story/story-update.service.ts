@@ -50,7 +50,7 @@ interface Params {
   // For properties like initialNodeId, thumbnailBackdroundColor
   // old value can be null.
   'old_value'?: string | string[] | boolean | number | null;
-  'new_value'?: string | string[] | boolean | number;
+  'new_value'?: string | string[] | boolean | number | null;
   'property_name'?: string;
   'cmd'?: string;
 }
@@ -164,7 +164,7 @@ export class StoryUpdateService {
   _applyStoryNodePropertyChange(
       story: Story, propertyName: string,
       nodeId: string, oldValue: number | string | string[] | null,
-      newValue: number | string | string[],
+      newValue: number | string | string[] | null,
       apply: StoryUpdateApply, reverse: StoryUpdateReverse): void {
     this._applyChange(
       story, StoryDomainConstants.CMD_UPDATE_STORY_NODE_PROPERTY, {
@@ -607,7 +607,8 @@ export class StoryUpdateService {
    * records the change in the undo/redo service.
    */
   setStoryNodePlannedPublicationDateMsecs(
-      story: Story, nodeId: string, newPlannedPublicationDateMsecs: number
+      story: Story, nodeId: string,
+      newPlannedPublicationDateMsecs: number | null
   ): void {
     let storyNode = this._getStoryNode(story.getStoryContents(), nodeId);
     let oldPlannedPublicationDateMsecs =
@@ -662,7 +663,7 @@ export class StoryUpdateService {
  * records the change in the undo/redo service.
  */
   setStoryNodeFirstPublicationDateMsecs(
-      story: Story, nodeId: string, newFirstPublicationDateMsecs: number
+      story: Story, nodeId: string, newFirstPublicationDateMsecs: number | null
   ): void {
     let storyNode = this._getStoryNode(story.getStoryContents(), nodeId);
     let oldFirstPublicationDateMsecs =
@@ -689,7 +690,7 @@ export class StoryUpdateService {
    * records the change in the undo/redo service.
    */
   setStoryNodeUnpublishingReason(
-      story: Story, nodeId: string, newUnpublishingReason: string
+      story: Story, nodeId: string, newUnpublishingReason: string | null
   ): void {
     let storyNode = this._getStoryNode(story.getStoryContents(), nodeId);
     let oldUnpublishingReason = storyNode.getUnpublishingReason();
@@ -720,7 +721,6 @@ export class StoryUpdateService {
       storyNode.getDestinationNodeIds());
     let newDestinationNodeIds = cloneDeep(oldDestinationNodeIds);
     newDestinationNodeIds.push(destinationNodeId);
-    this.setStoryNodeLastModifiedMsecs(story, nodeId, Date.now());
 
     this._applyStoryNodePropertyChange(
       story, StoryDomainConstants.STORY_NODE_PROPERTY_DESTINATION_NODE_IDS,
