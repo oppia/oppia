@@ -93,7 +93,9 @@ export class ReviewTranslationLanguageSelectorComponent implements OnInit {
     this.contributionOpportunitiesBackendApiService
       .getPreferredTranslationLanguageAsync()
       .then((preferredLanguageCode: string|null) => {
-        if (preferredLanguageCode) {
+        if (
+          preferredLanguageCode && this.languageSelection === 'Language'
+        ) {
           this.populateLanguageSelection(
             preferredLanguageCode);
         }
@@ -113,12 +115,12 @@ export class ReviewTranslationLanguageSelectorComponent implements OnInit {
   }
 
   populateLanguageSelection(languageCode: string): void {
+    this.setActiveLanguageCode.emit(languageCode);
     this.languageSelection = (
       this.languageIdToDescription[languageCode]);
   }
 
   selectOption(activeLanguageCode: string): void {
-    this.setActiveLanguageCode.emit(activeLanguageCode);
     this.populateLanguageSelection(activeLanguageCode);
     this.dropdownShown = false;
     this.contributionOpportunitiesBackendApiService
