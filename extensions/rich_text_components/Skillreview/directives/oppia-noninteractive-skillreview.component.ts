@@ -115,7 +115,7 @@ export class NoninteractiveSkillreview implements OnInit, OnChanges {
       this.contextService.removeCustomEntityContext();
       const allowedDismissActions = (
         ['cancel', 'escape key press', 'backdrop click']);
-      if (!allowedDismissActions.includes(res)) {
+      if (res && !allowedDismissActions.includes(res)) {
         throw new Error(res);
       }
     });
