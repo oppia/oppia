@@ -200,8 +200,9 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
       this.heading = 'Review Translation Contributions';
     }
     delete this.suggestionIdToContribution[this.initialSuggestionId];
-    this.remainingContributionIds = Object.keys(
-      this.suggestionIdToContribution);
+    this.remainingContributionIds = Object.keys(this.suggestionIdToContribution)
+      .filter(contributionId => !this.skippedContributionIds.includes(
+        contributionId));
     this.remainingContributionIds.reverse();
     this.isLastItem = this.remainingContributionIds.length === 0;
     this.allContributions = this.suggestionIdToContribution;

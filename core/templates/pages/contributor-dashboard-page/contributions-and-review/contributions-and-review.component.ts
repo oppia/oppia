@@ -315,7 +315,8 @@ export class ContributionsAndReview
 
   _showTranslationSuggestionModal(
       suggestionIdToContribution: Record<string, ActiveContributionDict>,
-      initialSuggestionId: string, reviewable: boolean): void {
+      initialSuggestionId: string, reviewable: boolean,
+      skippedContributionIds: string[]): void {
     const details = (
        this.contributions[initialSuggestionId].details as ContributionDetails);
     const subheading = (
@@ -334,6 +335,7 @@ export class ContributionsAndReview
     modalRef.componentInstance.initialSuggestionId = initialSuggestionId;
     modalRef.componentInstance.reviewable = reviewable;
     modalRef.componentInstance.subheading = subheading;
+    modalRef.componentInstance.skippedContributionIds = skippedContributionIds;
 
     modalRef.result.then((resolvedSuggestionIds) => {
       this.contributionOpportunitiesService.
@@ -408,8 +410,15 @@ export class ContributionsAndReview
       this.contextService.setCustomEntityContext(
         AppConstants.IMAGE_CONTEXT.EXPLORATION_SUGGESTIONS,
         suggestion.target_id);
+      const suggestionIdsList = Object.keys(this.contributions);
+      const clickedIndex = suggestionIdsList.indexOf(suggestionId);
+      const skippedContributionIds = [];
+      for (let i = 0; i < clickedIndex; i++) {
+        skippedContributionIds.push(suggestionIdsList[i]);
+      }
       this._showTranslationSuggestionModal(
-        suggestionIdToContribution, suggestionId, reviewable);
+        suggestionIdToContribution, suggestionId, reviewable,
+        skippedContributionIds);
     }
   }
 
