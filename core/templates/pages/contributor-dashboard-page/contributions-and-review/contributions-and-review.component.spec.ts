@@ -1220,7 +1220,8 @@ describe('Contributions and review component', () => {
             toHaveBeenCalledWith(
               suggestion1,
               'suggestion_1',
-              true
+              true,
+              []
             );
         });
         // Wait for the first test to complete.
