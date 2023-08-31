@@ -52,6 +52,8 @@ import { ContributionsAndReview } from './contributions-and-review/contributions
 import { QuestionOpportunitiesComponent } from './question-opportunities/question-opportunities.component';
 import { ContributorDashboardPageComponent } from './contributor-dashboard-page.component';
 import { AppErrorHandlerProvider } from 'pages/oppia-root/app-error-handler';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { UndoSnackbarComponent } from './custom-snackbar/undo-snackbar.component';
 
 @NgModule({
   imports: [
@@ -67,7 +69,8 @@ import { AppErrorHandlerProvider } from 'pages/oppia-root/app-error-handler';
     NgbModalModule,
     SharedFormsModule,
     OppiaCkEditorCopyToolBarModule,
-    ToastrModule.forRoot(toastrConfig)
+    ToastrModule.forRoot(toastrConfig),
+    MatSnackBarModule,
   ],
   declarations: [
     CertificateDownloadModalComponent,
@@ -87,7 +90,8 @@ import { AppErrorHandlerProvider } from 'pages/oppia-root/app-error-handler';
     ContributionsAndReview,
     QuestionOpportunitiesComponent,
     ContributorDashboardPageComponent,
-    ContributorBadgesComponent
+    ContributorBadgesComponent,
+    UndoSnackbarComponent
   ],
   entryComponents: [
     CertificateDownloadModalComponent,
@@ -106,7 +110,8 @@ import { AppErrorHandlerProvider } from 'pages/oppia-root/app-error-handler';
     TranslationModalComponent,
     ContributionsAndReview,
     QuestionOpportunitiesComponent,
-    ContributorDashboardPageComponent
+    ContributorDashboardPageComponent,
+    UndoSnackbarComponent
   ],
   providers: [
     {
