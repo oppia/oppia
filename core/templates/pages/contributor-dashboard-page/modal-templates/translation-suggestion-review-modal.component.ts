@@ -351,8 +351,8 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
           reloadOpportunitiesEventEmitter.emit();
       },
       this.showTranslationSuggestionUpdateError);
-      this.suggestionImagesString = this.getImageInfoForSuggestion(
-        this.translationHtml)
+    this.suggestionImagesString = this.getImageInfoForSuggestion(
+      this.translationHtml);
   }
 
   // The length of the commit message should not exceed 375 characters,
