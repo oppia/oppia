@@ -25,7 +25,7 @@ from core.constants import constants
 from core.platform import models
 from core.tests import test_utils
 
-from typing import Dict, Final, Mapping
+from typing import Dict, Final, List, Mapping
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -484,6 +484,45 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             suggestions[1].status,
             suggestion_models.STATUS_IN_REVIEW)
+
+    def test_get_reviewable_translation_suggestions(
+        self
+    ) -> None:
+        suggestion_1_id = 'exploration.exp1.thread_6'
+        suggestion_2_id = 'exploration.exp1.thread_7'
+        suggestion_3_id = 'exploration.exp1.thread_8'
+        user_id = 'author1'
+        suggestion_models.GeneralSuggestionModel.create(
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION,
+            'exp1', self.target_version_at_submission,
+            suggestion_models.STATUS_IN_REVIEW, 'author_3',
+            'reviewer_2', self.change_cmd, self.score_category,
+            suggestion_1_id, self.translation_language_code)
+        suggestion_models.GeneralSuggestionModel.create(
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION,
+            'exp1', self.target_version_at_submission,
+            suggestion_models.STATUS_IN_REVIEW, 'author_4',
+            'reviewer_2', self.change_cmd, self.score_category,
+            suggestion_2_id, self.translation_language_code)
+        suggestion_models.GeneralSuggestionModel.create(
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION,
+            'exp1', self.target_version_at_submission,
+            suggestion_models.STATUS_IN_REVIEW, user_id,
+            'reviewer_2', self.change_cmd, self.score_category,
+            suggestion_3_id, self.translation_language_code)
+
+        results, _ = (
+            suggestion_models.GeneralSuggestionModel
+            .get_reviewable_translation_suggestions(
+                user_id=user_id,
+                language_code=self.translation_language_code,
+                exp_id='exp1'))
+        # Ruling out the possibility of None for mypy type checking.
+        assert results is not None
+        self.assertEqual(len(results), 2)
 
     def test_get_translation_suggestions_in_review_with_valid_exp(self) -> None:
         suggestion_models.GeneralSuggestionModel.create(
@@ -3163,7 +3202,7 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
                 offset=0,
                 sort_by=None,
                 topic_ids=None,
-                num_days_since_last_activity=None,
+                max_days_since_last_activity=None,
                 language_code='es'
             ))
         self.assertEqual(len(sorted_results), 3)
@@ -3179,9 +3218,9 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
                 page_size=4,
                 offset=0,
                 sort_by=suggestion_models.
-                    SortChoices.SORT_KEY_INCREASING_PERFORMANCE,
+                    SortChoices.SORT_KEY_INCREASING_PERFORMANCE.value,
                 topic_ids=None,
-                num_days_since_last_activity=None,
+                max_days_since_last_activity=None,
                 language_code='es'
             ))
         self.assertEqual(len(sorted_results), 4)
@@ -3197,9 +3236,9 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
                 page_size=4,
                 offset=0,
                 sort_by=suggestion_models.
-                    SortChoices.SORT_KEY_DECREASING_ACCURACY,
+                    SortChoices.SORT_KEY_DECREASING_ACCURACY.value,
                 topic_ids=None,
-                num_days_since_last_activity=None,
+                max_days_since_last_activity=None,
                 language_code='es'
             ))
         self.assertEqual(len(sorted_results), 4)
@@ -3215,9 +3254,9 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
                 page_size=2,
                 offset=0,
                 sort_by=suggestion_models.
-                    SortChoices.SORT_KEY_INCREASING_ACCURACY,
+                    SortChoices.SORT_KEY_INCREASING_ACCURACY.value,
                 topic_ids=None,
-                num_days_since_last_activity=None,
+                max_days_since_last_activity=None,
                 language_code='es'
             ))
         self.assertEqual(len(sorted_results), 2)
@@ -3233,9 +3272,9 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
                 page_size=2,
                 offset=0,
                 sort_by=suggestion_models.
-                    SortChoices.SORT_KEY_DECREASING_SUBMISSIONS,
+                    SortChoices.SORT_KEY_DECREASING_SUBMISSIONS.value,
                 topic_ids=None,
-                num_days_since_last_activity=None,
+                max_days_since_last_activity=None,
                 language_code='es'
             ))
         self.assertEqual(len(sorted_results), 2)
@@ -3251,9 +3290,9 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
                 page_size=2,
                 offset=0,
                 sort_by=suggestion_models.
-                    SortChoices.SORT_KEY_INCREASING_SUBMISSIONS,
+                    SortChoices.SORT_KEY_INCREASING_SUBMISSIONS.value,
                 topic_ids=None,
-                num_days_since_last_activity=None,
+                max_days_since_last_activity=None,
                 language_code='es'
             ))
         self.assertEqual(sorted_results[0].id, 'model_4')
@@ -3268,9 +3307,9 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
                 page_size=2,
                 offset=0,
                 sort_by=suggestion_models.
-                    SortChoices.SORT_KEY_DECREASING_LAST_ACTIVITY,
+                    SortChoices.SORT_KEY_DECREASING_LAST_ACTIVITY.value,
                 topic_ids=None,
-                num_days_since_last_activity=None,
+                max_days_since_last_activity=None,
                 language_code='es'
             ))
         self.assertEqual(len(sorted_results), 2)
@@ -3286,9 +3325,9 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
                 page_size=2,
                 offset=0,
                 sort_by=suggestion_models.
-                    SortChoices.SORT_KEY_INCREASING_LAST_ACTIVITY,
+                    SortChoices.SORT_KEY_INCREASING_LAST_ACTIVITY.value,
                 topic_ids=None,
-                num_days_since_last_activity=None,
+                max_days_since_last_activity=None,
                 language_code='es'
             ))
         self.assertEqual(len(sorted_results), 2)
@@ -3406,7 +3445,7 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
                 offset=0,
                 sort_by=None,
                 topic_ids=None,
-                num_days_since_last_activity=None,
+                max_days_since_last_activity=None,
                 language_code='es'
             ))
         self.assertEqual(len(sorted_results), 3)
@@ -3423,7 +3462,7 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
                 offset=0,
                 sort_by=None,
                 topic_ids=None,
-                num_days_since_last_activity=None,
+                max_days_since_last_activity=None,
                 language_code='hi'
             ))
         self.assertEqual(len(sorted_results), 1)
@@ -3439,7 +3478,7 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
                 offset=0,
                 sort_by=None,
                 topic_ids=['topic1', 'topic2'],
-                num_days_since_last_activity=None,
+                max_days_since_last_activity=None,
                 language_code='es'
             ))
         self.assertEqual(len(sorted_results), 2)
@@ -3456,7 +3495,7 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
                 offset=0,
                 sort_by=None,
                 topic_ids=None,
-                num_days_since_last_activity=7,
+                max_days_since_last_activity=7,
                 language_code='es'
             ))
         self.assertEqual(len(sorted_results), 1)
@@ -3472,7 +3511,7 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
                 offset=0,
                 sort_by=None,
                 topic_ids=None,
-                num_days_since_last_activity=90,
+                max_days_since_last_activity=90,
                 language_code='es'
             ))
         self.assertEqual(len(sorted_results), 2)
@@ -3489,7 +3528,7 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
                 offset=0,
                 sort_by=None,
                 topic_ids=None,
-                num_days_since_last_activity=7,
+                max_days_since_last_activity=7,
                 language_code='hi'
             ))
         self.assertEqual(len(sorted_results), 0)
@@ -3602,9 +3641,9 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
                 page_size=2,
                 offset=0,
                 sort_by=suggestion_models.
-                    SortChoices.SORT_KEY_INCREASING_PERFORMANCE,
+                    SortChoices.SORT_KEY_INCREASING_PERFORMANCE.value,
                 topic_ids=['topic1', 'topic2'],
-                num_days_since_last_activity=None,
+                max_days_since_last_activity=None,
                 language_code='es'
             ))
         self.assertEqual(len(sorted_results), 2)
@@ -3620,9 +3659,9 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
                 page_size=2,
                 offset=0,
                 sort_by=suggestion_models.
-                    SortChoices.SORT_KEY_DECREASING_LAST_ACTIVITY,
+                    SortChoices.SORT_KEY_DECREASING_LAST_ACTIVITY.value,
                 topic_ids=['topic1', 'topic2'],
-                num_days_since_last_activity=None,
+                max_days_since_last_activity=None,
                 language_code='es'
             ))
         self.assertEqual(len(sorted_results), 2)
@@ -3740,7 +3779,7 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
                 offset=2,
                 sort_by=None,
                 topic_ids=None,
-                num_days_since_last_activity=None,
+                max_days_since_last_activity=None,
                 language_code='es'
             ))
         self.assertEqual(len(sorted_results), 2)
@@ -3756,9 +3795,9 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
                 page_size=2,
                 offset=4,
                 sort_by=suggestion_models.
-                    SortChoices.SORT_KEY_INCREASING_PERFORMANCE,
+                    SortChoices.SORT_KEY_INCREASING_PERFORMANCE.value,
                 topic_ids=None,
-                num_days_since_last_activity=None,
+                max_days_since_last_activity=None,
                 language_code='es'
             ))
         self.assertEqual(len(sorted_results), 0)
@@ -4147,7 +4186,7 @@ class TranslationReviewerTotalContributionStatsModelUnitTests(
                 page_size=4,
                 offset=0,
                 sort_by=None,
-                num_days_since_last_activity=None,
+                max_days_since_last_activity=None,
                 language_code='es'
             ))
         self.assertEqual(len(sorted_results), 4)
@@ -4163,8 +4202,8 @@ class TranslationReviewerTotalContributionStatsModelUnitTests(
                 page_size=4,
                 offset=0,
                 sort_by=suggestion_models.
-                    SortChoices.SORT_KEY_INCREASING_REVIEWED_TRANSLATIONS,
-                num_days_since_last_activity=None,
+                    SortChoices.SORT_KEY_INCREASING_REVIEWED_TRANSLATIONS.value,
+                max_days_since_last_activity=None,
                 language_code='es'
             ))
         self.assertEqual(len(sorted_results), 4)
@@ -4180,8 +4219,8 @@ class TranslationReviewerTotalContributionStatsModelUnitTests(
                 page_size=2,
                 offset=0,
                 sort_by=suggestion_models.
-                    SortChoices.SORT_KEY_DECREASING_LAST_ACTIVITY,
-                num_days_since_last_activity=None,
+                    SortChoices.SORT_KEY_DECREASING_LAST_ACTIVITY.value,
+                max_days_since_last_activity=None,
                 language_code='es'
             ))
         self.assertEqual(len(sorted_results), 2)
@@ -4197,8 +4236,8 @@ class TranslationReviewerTotalContributionStatsModelUnitTests(
                 page_size=3,
                 offset=0,
                 sort_by=suggestion_models.
-                    SortChoices.SORT_KEY_INCREASING_LAST_ACTIVITY,
-                num_days_since_last_activity=None,
+                    SortChoices.SORT_KEY_INCREASING_LAST_ACTIVITY.value,
+                max_days_since_last_activity=None,
                 language_code='es'
             ))
         self.assertEqual(len(sorted_results), 3)
@@ -4287,7 +4326,7 @@ class TranslationReviewerTotalContributionStatsModelUnitTests(
                 page_size=4,
                 offset=0,
                 sort_by=None,
-                num_days_since_last_activity=None,
+                max_days_since_last_activity=None,
                 language_code='es'
             ))
         self.assertEqual(len(sorted_results), 3)
@@ -4303,7 +4342,7 @@ class TranslationReviewerTotalContributionStatsModelUnitTests(
                 page_size=3,
                 offset=0,
                 sort_by=None,
-                num_days_since_last_activity=None,
+                max_days_since_last_activity=None,
                 language_code='hi'
             ))
         self.assertEqual(len(sorted_results), 1)
@@ -4311,14 +4350,14 @@ class TranslationReviewerTotalContributionStatsModelUnitTests(
         self.assertFalse(more)
         self.assertEqual(next_offset, 1)
 
-        # Check for num_days_since_last_activity filter within 7 days.
+        # Check for max_days_since_last_activity filter within 7 days.
         sorted_results, next_offset, more = (
             suggestion_models.TranslationReviewerTotalContributionStatsModel
             .fetch_page(
                 page_size=4,
                 offset=0,
                 sort_by=None,
-                num_days_since_last_activity=7,
+                max_days_since_last_activity=7,
                 language_code='es'
             ))
         self.assertEqual(len(sorted_results), 1)
@@ -4326,14 +4365,14 @@ class TranslationReviewerTotalContributionStatsModelUnitTests(
         self.assertFalse(more)
         self.assertEqual(next_offset, 3)
 
-        # Check for num_days_since_last_activity filter within 90 days.
+        # Check for max_days_since_last_activity filter within 90 days.
         sorted_results, next_offset, more = (
             suggestion_models.TranslationReviewerTotalContributionStatsModel
             .fetch_page(
                 page_size=4,
                 offset=0,
                 sort_by=None,
-                num_days_since_last_activity=90,
+                max_days_since_last_activity=90,
                 language_code='es'
             ))
         self.assertEqual(len(sorted_results), 2)
@@ -4349,7 +4388,7 @@ class TranslationReviewerTotalContributionStatsModelUnitTests(
                 page_size=1,
                 offset=0,
                 sort_by=None,
-                num_days_since_last_activity=7,
+                max_days_since_last_activity=7,
                 language_code='hi'
             ))
         self.assertEqual(len(sorted_results), 0)
@@ -4436,8 +4475,8 @@ class TranslationReviewerTotalContributionStatsModelUnitTests(
                 page_size=1,
                 offset=0,
                 sort_by=suggestion_models.
-                    SortChoices.SORT_KEY_INCREASING_LAST_ACTIVITY,
-                num_days_since_last_activity=None,
+                    SortChoices.SORT_KEY_INCREASING_LAST_ACTIVITY.value,
+                max_days_since_last_activity=None,
                 language_code='hi'
             ))
         self.assertEqual(len(sorted_results), 1)
@@ -4445,7 +4484,7 @@ class TranslationReviewerTotalContributionStatsModelUnitTests(
         self.assertFalse(more)
         self.assertEqual(next_offset, 1)
 
-        # Check for num_days_since_last_activity filter within 7 days
+        # Check for max_days_since_last_activity filter within 7 days
         # and IncreasingReviewedTranslations sort.
         sorted_results, next_offset, more = (
             suggestion_models.TranslationReviewerTotalContributionStatsModel
@@ -4453,8 +4492,8 @@ class TranslationReviewerTotalContributionStatsModelUnitTests(
                 page_size=2,
                 offset=0,
                 sort_by=suggestion_models.
-                    SortChoices.SORT_KEY_INCREASING_REVIEWED_TRANSLATIONS,
-                num_days_since_last_activity=7,
+                    SortChoices.SORT_KEY_INCREASING_REVIEWED_TRANSLATIONS.value,
+                max_days_since_last_activity=7,
                 language_code='es'
             ))
         self.assertEqual(len(sorted_results), 1)
@@ -4541,7 +4580,7 @@ class TranslationReviewerTotalContributionStatsModelUnitTests(
                 page_size=2,
                 offset=2,
                 sort_by=None,
-                num_days_since_last_activity=None,
+                max_days_since_last_activity=None,
                 language_code='es'
             ))
         self.assertEqual(len(sorted_results), 2)
@@ -4629,8 +4668,8 @@ class TranslationReviewerTotalContributionStatsModelUnitTests(
             page_size=2,
             offset=0,
             sort_by=suggestion_models.
-                    SortChoices.SORT_KEY_INCREASING_REVIEWED_TRANSLATIONS,
-            num_days_since_last_activity=7,
+                    SortChoices.SORT_KEY_INCREASING_REVIEWED_TRANSLATIONS.value,
+            max_days_since_last_activity=7,
             language_code='es'
             ))
         self.assertEqual(sorted_results[0].id, 'model_2')
@@ -4644,8 +4683,8 @@ class TranslationReviewerTotalContributionStatsModelUnitTests(
             page_size=1,
             offset=0,
             sort_by=suggestion_models.
-                    SortChoices.SORT_KEY_INCREASING_REVIEWED_TRANSLATIONS,
-            num_days_since_last_activity=90,
+                    SortChoices.SORT_KEY_INCREASING_REVIEWED_TRANSLATIONS.value,
+            max_days_since_last_activity=90,
             language_code='es'
             ))
         self.assertEqual(sorted_results[0].id, 'model_1')
@@ -4659,7 +4698,7 @@ class TranslationReviewerTotalContributionStatsModelUnitTests(
             page_size=1,
             offset=0,
             sort_by=None,
-            num_days_since_last_activity=7,
+            max_days_since_last_activity=7,
             language_code='hi'
             ))
         self.assertEqual(len(sorted_results), 0)
@@ -4927,7 +4966,7 @@ class QuestionSubmitterTotalContributionStatsModelUnitTests(
                 offset=0,
                 sort_by=None,
                 topic_ids=None,
-                num_days_since_last_activity=None
+                max_days_since_last_activity=None
             ))
         self.assertEqual(len(sorted_results), 4)
         self.assertEqual(sorted_results[0].id, 'model_4')
@@ -4942,9 +4981,9 @@ class QuestionSubmitterTotalContributionStatsModelUnitTests(
                 page_size=4,
                 offset=0,
                 sort_by=suggestion_models.
-                    SortChoices.SORT_KEY_INCREASING_PERFORMANCE,
+                    SortChoices.SORT_KEY_INCREASING_PERFORMANCE.value,
                 topic_ids=None,
-                num_days_since_last_activity=None
+                max_days_since_last_activity=None
             ))
         self.assertEqual(len(sorted_results), 4)
         self.assertEqual(sorted_results[0].id, 'model_1')
@@ -4959,9 +4998,9 @@ class QuestionSubmitterTotalContributionStatsModelUnitTests(
                 page_size=3,
                 offset=0,
                 sort_by=suggestion_models.
-                    SortChoices.SORT_KEY_DECREASING_ACCURACY,
+                    SortChoices.SORT_KEY_DECREASING_ACCURACY.value,
                 topic_ids=None,
-                num_days_since_last_activity=None
+                max_days_since_last_activity=None
             ))
         self.assertEqual(len(sorted_results), 3)
         self.assertEqual(sorted_results[0].id, 'model_1')
@@ -4976,9 +5015,9 @@ class QuestionSubmitterTotalContributionStatsModelUnitTests(
                 page_size=4,
                 offset=0,
                 sort_by=suggestion_models.
-                    SortChoices.SORT_KEY_INCREASING_ACCURACY,
+                    SortChoices.SORT_KEY_INCREASING_ACCURACY.value,
                 topic_ids=None,
-                num_days_since_last_activity=None
+                max_days_since_last_activity=None
             ))
         self.assertEqual(len(sorted_results), 4)
         self.assertEqual(sorted_results[0].id, 'model_4')
@@ -4993,9 +5032,9 @@ class QuestionSubmitterTotalContributionStatsModelUnitTests(
                 page_size=3,
                 offset=0,
                 sort_by=suggestion_models.
-                    SortChoices.SORT_KEY_DECREASING_SUBMISSIONS,
+                    SortChoices.SORT_KEY_DECREASING_SUBMISSIONS.value,
                 topic_ids=None,
-                num_days_since_last_activity=None
+                max_days_since_last_activity=None
             ))
         self.assertEqual(len(sorted_results), 3)
         self.assertEqual(sorted_results[0].id, 'model_4')
@@ -5010,9 +5049,9 @@ class QuestionSubmitterTotalContributionStatsModelUnitTests(
                 page_size=3,
                 offset=0,
                 sort_by=suggestion_models.
-                    SortChoices.SORT_KEY_INCREASING_SUBMISSIONS,
+                    SortChoices.SORT_KEY_INCREASING_SUBMISSIONS.value,
                 topic_ids=None,
-                num_days_since_last_activity=None
+                max_days_since_last_activity=None
             ))
         self.assertEqual(len(sorted_results), 3)
         self.assertEqual(sorted_results[0].id, 'model_1')
@@ -5027,9 +5066,9 @@ class QuestionSubmitterTotalContributionStatsModelUnitTests(
                 page_size=2,
                 offset=0,
                 sort_by=suggestion_models.
-                    SortChoices.SORT_KEY_DECREASING_LAST_ACTIVITY,
+                    SortChoices.SORT_KEY_DECREASING_LAST_ACTIVITY.value,
                 topic_ids=None,
-                num_days_since_last_activity=None
+                max_days_since_last_activity=None
             ))
         self.assertEqual(len(sorted_results), 2)
         self.assertEqual(sorted_results[0].id, 'model_1')
@@ -5044,9 +5083,9 @@ class QuestionSubmitterTotalContributionStatsModelUnitTests(
                 page_size=2,
                 offset=0,
                 sort_by=suggestion_models.
-                    SortChoices.SORT_KEY_INCREASING_LAST_ACTIVITY,
+                    SortChoices.SORT_KEY_INCREASING_LAST_ACTIVITY.value,
                 topic_ids=None,
-                num_days_since_last_activity=None
+                max_days_since_last_activity=None
             ))
         self.assertEqual(len(sorted_results), 2)
         self.assertEqual(sorted_results[0].id, 'model_4')
@@ -5136,7 +5175,7 @@ class QuestionSubmitterTotalContributionStatsModelUnitTests(
                 offset=0,
                 sort_by=None,
                 topic_ids=['topic1', 'topic2'],
-                num_days_since_last_activity=None
+                max_days_since_last_activity=None
             ))
         self.assertEqual(len(sorted_results), 2)
         self.assertEqual(sorted_results[0].id, 'model_2')
@@ -5144,7 +5183,7 @@ class QuestionSubmitterTotalContributionStatsModelUnitTests(
         self.assertFalse(more)
         self.assertEqual(next_offset, 2)
 
-        # Check for num_days_since_last_activity under 7 days.
+        # Check for max_days_since_last_activity under 7 days.
         sorted_results, next_offset, more = (
             suggestion_models.QuestionSubmitterTotalContributionStatsModel
             .fetch_page(
@@ -5152,14 +5191,14 @@ class QuestionSubmitterTotalContributionStatsModelUnitTests(
                 offset=0,
                 sort_by=None,
                 topic_ids=None,
-                num_days_since_last_activity=7
+                max_days_since_last_activity=7
             ))
         self.assertEqual(len(sorted_results), 1)
         self.assertEqual(sorted_results[0].id, 'model_4')
         self.assertFalse(more)
         self.assertEqual(next_offset, 4)
 
-        # Check for num_days_since_last_activity under 90 days.
+        # Check for max_days_since_last_activity under 90 days.
         sorted_results, next_offset, more = (
             suggestion_models.QuestionSubmitterTotalContributionStatsModel
             .fetch_page(
@@ -5167,7 +5206,7 @@ class QuestionSubmitterTotalContributionStatsModelUnitTests(
                 offset=0,
                 sort_by=None,
                 topic_ids=None,
-                num_days_since_last_activity=90
+                max_days_since_last_activity=90
             ))
         self.assertEqual(len(sorted_results), 2)
         self.assertEqual(sorted_results[0].id, 'model_4')
@@ -5185,7 +5224,7 @@ class QuestionSubmitterTotalContributionStatsModelUnitTests(
                 topic_ids=[
                     'non_existent_topic'
                 ],
-                num_days_since_last_activity=7
+                max_days_since_last_activity=7
             ))
         self.assertEqual(len(sorted_results), 0)
         self.assertFalse(more)
@@ -5272,15 +5311,15 @@ class QuestionSubmitterTotalContributionStatsModelUnitTests(
                 page_size=1,
                 offset=1,
                 sort_by=suggestion_models.
-                    SortChoices.SORT_KEY_INCREASING_PERFORMANCE,
+                    SortChoices.SORT_KEY_INCREASING_PERFORMANCE.value,
                 topic_ids=['topic1', 'topic2'],
-                num_days_since_last_activity=None
+                max_days_since_last_activity=None
             ))
         self.assertEqual(sorted_results[0].id, 'model_2')
         self.assertFalse(more)
         self.assertEqual(next_offset, 2)
 
-        # Check for num_days_since_last_activity in 90 days
+        # Check for max_days_since_last_activity in 90 days
         # and DecreasingLastActivity order.
         sorted_results, next_offset, more = (
             suggestion_models.QuestionSubmitterTotalContributionStatsModel
@@ -5288,9 +5327,9 @@ class QuestionSubmitterTotalContributionStatsModelUnitTests(
                 page_size=2,
                 offset=0,
                 sort_by=suggestion_models.
-                    SortChoices.SORT_KEY_DECREASING_LAST_ACTIVITY,
+                    SortChoices.SORT_KEY_DECREASING_LAST_ACTIVITY.value,
                 topic_ids=None,
-                num_days_since_last_activity=90
+                max_days_since_last_activity=90
             ))
         self.assertEqual(len(sorted_results), 2)
         self.assertEqual(sorted_results[0].id, 'model_3')
@@ -5380,7 +5419,7 @@ class QuestionSubmitterTotalContributionStatsModelUnitTests(
                 offset=2,
                 sort_by=None,
                 topic_ids=None,
-                num_days_since_last_activity=None
+                max_days_since_last_activity=None
             ))
         self.assertEqual(len(sorted_results), 2)
         self.assertEqual(sorted_results[0].id, 'model_2')
@@ -5396,7 +5435,7 @@ class QuestionSubmitterTotalContributionStatsModelUnitTests(
                 offset=4,
                 sort_by=None,
                 topic_ids=None,
-                num_days_since_last_activity=None
+                max_days_since_last_activity=None
             ))
         self.assertEqual(len(sorted_results), 0)
         self.assertFalse(more)
@@ -5597,7 +5636,7 @@ class QuestionReviewerTotalContributionStatsModelUnitTests(
                 page_size=3,
                 offset=0,
                 sort_by=None,
-                num_days_since_last_activity=None
+                max_days_since_last_activity=None
             ))
         self.assertEqual(len(sorted_results), 3)
         self.assertEqual(sorted_results[0].id, 'model_3')
@@ -5612,8 +5651,8 @@ class QuestionReviewerTotalContributionStatsModelUnitTests(
                 page_size=3,
                 offset=0,
                 sort_by=suggestion_models.
-                    SortChoices.SORT_KEY_INCREASING_REVIEWED_QUESTIONS,
-                num_days_since_last_activity=None
+                    SortChoices.SORT_KEY_INCREASING_REVIEWED_QUESTIONS.value,
+                max_days_since_last_activity=None
             ))
         self.assertEqual(len(sorted_results), 3)
         self.assertEqual(sorted_results[0].id, 'model_1')
@@ -5628,8 +5667,8 @@ class QuestionReviewerTotalContributionStatsModelUnitTests(
                 page_size=2,
                 offset=0,
                 sort_by=suggestion_models.
-                    SortChoices.SORT_KEY_DECREASING_LAST_ACTIVITY,
-                num_days_since_last_activity=None
+                    SortChoices.SORT_KEY_DECREASING_LAST_ACTIVITY.value,
+                max_days_since_last_activity=None
             ))
         self.assertEqual(len(sorted_results), 2)
         self.assertEqual(sorted_results[0].id, 'model_1')
@@ -5644,8 +5683,8 @@ class QuestionReviewerTotalContributionStatsModelUnitTests(
                 page_size=2,
                 offset=0,
                 sort_by=suggestion_models.
-                    SortChoices.SORT_KEY_INCREASING_LAST_ACTIVITY,
-                num_days_since_last_activity=None
+                    SortChoices.SORT_KEY_INCREASING_LAST_ACTIVITY.value,
+                max_days_since_last_activity=None
             ))
         self.assertEqual(len(sorted_results), 2)
         self.assertEqual(sorted_results[0].id, 'model_3')
@@ -5700,28 +5739,28 @@ class QuestionReviewerTotalContributionStatsModelUnitTests(
                 datetime.date.today() - datetime.timedelta(5))
         ).put()
 
-        # Check for num_days_since_last_activity filter within 7 days.
+        # Check for max_days_since_last_activity filter within 7 days.
         sorted_results, next_offset, more = (
             suggestion_models.QuestionReviewerTotalContributionStatsModel
             .fetch_page(
                 page_size=2,
                 offset=0,
                 sort_by=None,
-                num_days_since_last_activity=7
+                max_days_since_last_activity=7
             ))
         self.assertEqual(len(sorted_results), 1)
         self.assertEqual(sorted_results[0].id, 'model_3')
         self.assertFalse(more)
         self.assertEqual(next_offset, 3)
 
-        # Check for num_days_since_last_activity filter within 90 days.
+        # Check for max_days_since_last_activity filter within 90 days.
         sorted_results, next_offset, more = (
             suggestion_models.QuestionReviewerTotalContributionStatsModel
             .fetch_page(
                 page_size=2,
                 offset=0,
                 sort_by=None,
-                num_days_since_last_activity=90
+                max_days_since_last_activity=90
             ))
         self.assertEqual(len(sorted_results), 2)
         self.assertEqual(sorted_results[0].id, 'model_3')
@@ -5736,7 +5775,7 @@ class QuestionReviewerTotalContributionStatsModelUnitTests(
                 page_size=1,
                 offset=0,
                 sort_by=None,
-                num_days_since_last_activity=1
+                max_days_since_last_activity=1
             ))
         self.assertEqual(len(sorted_results), 0)
         self.assertFalse(more)
@@ -5789,7 +5828,7 @@ class QuestionReviewerTotalContributionStatsModelUnitTests(
                 datetime.date.today() - datetime.timedelta(5))
         ).put()
 
-        # Check for num_days_since_last_activity filter within 90 days
+        # Check for max_days_since_last_activity filter within 90 days
         # and IncreasingReviewedQuestions sort.
         sorted_results, next_offset, more = (
             suggestion_models.QuestionReviewerTotalContributionStatsModel
@@ -5797,8 +5836,8 @@ class QuestionReviewerTotalContributionStatsModelUnitTests(
                 page_size=2,
                 offset=0,
                 sort_by=suggestion_models.
-                    SortChoices.SORT_KEY_INCREASING_REVIEWED_QUESTIONS,
-                num_days_since_last_activity=90
+                    SortChoices.SORT_KEY_INCREASING_REVIEWED_QUESTIONS.value,
+                max_days_since_last_activity=90
             ))
         self.assertEqual(len(sorted_results), 2)
         self.assertEqual(sorted_results[0].id, 'model_2')
@@ -5806,7 +5845,7 @@ class QuestionReviewerTotalContributionStatsModelUnitTests(
         self.assertFalse(more)
         self.assertEqual(next_offset, 3)
 
-        # Check for num_days_since_last_activity filter within 7 days
+        # Check for max_days_since_last_activity filter within 7 days
         # and IncreasingReviewedQuestions sort.
         sorted_results, next_offset, more = (
             suggestion_models.QuestionReviewerTotalContributionStatsModel
@@ -5814,15 +5853,15 @@ class QuestionReviewerTotalContributionStatsModelUnitTests(
                 page_size=2,
                 offset=0,
                 sort_by=suggestion_models.
-                    SortChoices.SORT_KEY_INCREASING_REVIEWED_QUESTIONS,
-                num_days_since_last_activity=7
+                    SortChoices.SORT_KEY_INCREASING_REVIEWED_QUESTIONS.value,
+                max_days_since_last_activity=7
             ))
         self.assertEqual(len(sorted_results), 1)
         self.assertEqual(sorted_results[0].id, 'model_3')
         self.assertFalse(more)
         self.assertEqual(next_offset, 3)
 
-        # Check for num_days_since_last_activity filter within 90 days
+        # Check for max_days_since_last_activity filter within 90 days
         # and IncreasingLastActivity sort.
         sorted_results, next_offset, more = (
             suggestion_models.QuestionReviewerTotalContributionStatsModel
@@ -5830,8 +5869,8 @@ class QuestionReviewerTotalContributionStatsModelUnitTests(
                 page_size=2,
                 offset=0,
                 sort_by=suggestion_models.
-                    SortChoices.SORT_KEY_INCREASING_LAST_ACTIVITY,
-                num_days_since_last_activity=90
+                    SortChoices.SORT_KEY_INCREASING_LAST_ACTIVITY.value,
+                max_days_since_last_activity=90
             ))
         self.assertEqual(len(sorted_results), 2)
         self.assertEqual(sorted_results[0].id, 'model_3')
@@ -5893,7 +5932,7 @@ class QuestionReviewerTotalContributionStatsModelUnitTests(
                 page_size=2,
                 offset=1,
                 sort_by=None,
-                num_days_since_last_activity=None
+                max_days_since_last_activity=None
             ))
         self.assertEqual(len(sorted_results), 2)
         self.assertEqual(sorted_results[0].id, 'model_2')
@@ -5908,7 +5947,7 @@ class QuestionReviewerTotalContributionStatsModelUnitTests(
                 page_size=2,
                 offset=3,
                 sort_by=None,
-                num_days_since_last_activity=None
+                max_days_since_last_activity=None
             ))
         self.assertEqual(len(sorted_results), 0)
         self.assertFalse(more)
@@ -6040,3 +6079,93 @@ class SortChoicesUnitTest(test_utils.GenericTestBase):
         dict_values.sort()
 
         self.assertEqual(enum_values, dict_values)
+
+
+class TranslationCoordinatorsModelUnitTests(test_utils.GenericTestBase):
+    """Tests the TranslationCoordinatorsModel class."""
+
+    LANGUAGE_1_ID: Final = 'language_1_id'
+    LANGUAGE_2_ID: Final = 'language_2_id'
+    LANGUAGE_3_ID: Final = 'language_3_id'
+    LANGUAGE_4_ID: Final = 'language_4_id'
+    LANGUAGE_5_ID: Final = 'language_5_id'
+    USER_ID_1: Final = 'user_id_1'
+    USER_ID_2: Final = 'user_id_2'
+
+    def setUp(self) -> None:
+        super().setUp()
+        suggestion_models.TranslationCoordinatorsModel(
+            id=self.LANGUAGE_4_ID,
+            coordinator_ids=[self.USER_ID_2],
+            coordinators_count=1
+        ).put()
+        suggestion_models.TranslationCoordinatorsModel(
+            id=self.LANGUAGE_5_ID,
+            coordinator_ids=[self.USER_ID_2],
+            coordinators_count=1
+        ).put()
+
+    def test_get_deletion_policy(self) -> None:
+        self.assertEqual(
+            suggestion_models.TranslationCoordinatorsModel
+            .get_deletion_policy(),
+            base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE)
+
+    def test_has_reference_to_user_id(self) -> None:
+        language_coordinator_model = (
+            suggestion_models.TranslationCoordinatorsModel(
+            id=self.LANGUAGE_1_ID, coordinator_ids=['coordinator_id'],
+            coordinators_count=1))
+        language_coordinator_model.put()
+        self.assertTrue(
+            suggestion_models.TranslationCoordinatorsModel
+            .has_reference_to_user_id('coordinator_id'))
+        self.assertFalse(
+            suggestion_models.TranslationCoordinatorsModel
+            .has_reference_to_user_id('x_id'))
+
+    def test_export_data_nontrivial(self) -> None:
+        """Tests nontrivial export data on user with some coordinated
+        languages.
+        """
+        user_data = suggestion_models.TranslationCoordinatorsModel.export_data(
+            self.USER_ID_2)
+        expected_data = {
+            'coordinated_language_ids': [self.LANGUAGE_4_ID, self.LANGUAGE_5_ID]
+        }
+        self.assertEqual(user_data, expected_data)
+
+    def test_export_data_trivial(self) -> None:
+        """Tests trivial export data on user with no coordinated languages."""
+        user_data = suggestion_models.TranslationCoordinatorsModel.export_data(
+            self.USER_ID_1)
+        expected_data: Dict[str, List[str]] = {
+            'coordinated_language_ids': []
+        }
+        self.assertEqual(user_data, expected_data)
+
+    def test_get_model_association_to_user(self) -> None:
+        model = suggestion_models.TranslationCoordinatorsModel
+        self.assertEqual(
+            model.get_model_association_to_user(),
+            base_models.MODEL_ASSOCIATION_TO_USER
+            .ONE_INSTANCE_SHARED_ACROSS_USERS)
+
+    def test_get_export_policy(self) -> None:
+        expected_dict = {
+            'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'coordinator_ids': base_models.EXPORT_POLICY.EXPORTED,
+            'coordinators_count': base_models.EXPORT_POLICY.NOT_APPLICABLE
+        }
+        model = suggestion_models.TranslationCoordinatorsModel
+        self.assertEqual(model.get_export_policy(), expected_dict)
+
+    def test_get_field_name_mapping_to_takeout_keys(self) -> None:
+        self.assertEqual(
+            suggestion_models.TranslationCoordinatorsModel.
+            get_field_name_mapping_to_takeout_keys(),
+            {
+                'coordinator_ids': 'coordinated_language_ids'
+            })

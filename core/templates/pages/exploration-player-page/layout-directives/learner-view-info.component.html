@@ -4,13 +4,11 @@
     <div class="lesson-info-section">
       <h1 class="oppia-exploration-h1">
         <span class="e2e-test-exploration-header oppia-exploration-header"
-              itemprop="description"
-              title="{{ explorationTitle }}">
+              itemprop="description">
           <span *ngIf="!isHackyExpTitleTranslationDisplayed()">
             {{ explorationTitle }}
           </span>
-          <span *ngIf="isHackyExpTitleTranslationDisplayed()"
-                title="{{ explorationTitleTranslationKey | translate }}">
+          <span *ngIf="isHackyExpTitleTranslationDisplayed()">
             {{ explorationTitleTranslationKey | translate }}
           </span>
         </span>

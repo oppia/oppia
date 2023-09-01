@@ -57,19 +57,23 @@ describe('Admin Data Service', () => {
         total_published_node_count: 10,
         url_fragment: 'topicurlfrag',
         can_edit_topic: false,
-        is_published: false
+        is_published: false,
+        total_upcoming_chapters_count: 1,
+        total_overdue_chapters_count: 1,
+        total_chapter_counts_for_each_story: [5, 4],
+        published_chapter_counts_for_each_story: [3, 4]
       }
     ],
     updatable_roles: ['TOPIC_MANAGER'],
     human_readable_current_time: 'June 03 15:31:20',
     demo_collections: [],
     config_properties: {
-      oppia_csrf_secret: {
+      record_playthrough_probability: {
         schema: {
-          type: 'unicode'
+          type: 'float'
         },
-        value: '3WHOWnD3sy0r1wukJ2lX4vBS_YA=',
-        description: 'Text used to encrypt CSRF tokens.'
+        value: 0.2,
+        description: 'The record_playthrough_probability.'
       }
     },
     demo_exploration_ids: ['19'],

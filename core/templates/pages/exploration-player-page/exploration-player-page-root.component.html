@@ -18,7 +18,6 @@
   </oppia-base-content>
 </oppia-angular-root>
 
-<link rel="stylesheet" href="/third_party/static/guppy-f509e1/build/guppy-default.min.css">
 <script>
   // Use the normal default browser eventlistener without passive set to false.
   // TODO(#8833): Use passive listeners when guppy supports it.
@@ -26,7 +25,7 @@
     EventTarget.prototype.addEventListener._original);
 </script>
 <script src="https://pencilcode.net/lib/pencilcodeembed.js"></script>
-<link rel="stylesheet" href="/third_party/static/leaflet-1.4.0/leaflet.css">
+<link rel="stylesheet" type="text/html" href="/node_modules/leaflet/dist/leaflet.css">
 
 <!--Preload the interactions thumbnails.-->
 <!--TODO(#13465): Migrate the PNG images to the webp images.-->

@@ -17,7 +17,7 @@
  * @fileoverview Component for translation suggestion review modal.
  */
 
-import { Component, OnInit, ChangeDetectorRef, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, ViewChild, ElementRef, Input } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { AlertsService } from 'services/alerts.service';
 import { ContextService } from 'services/context.service';
@@ -138,6 +138,9 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
   isContentOverflowing: boolean = false;
   isTranslationExpanded: boolean = false;
   isTranslationOverflowing: boolean = false;
+  explorationImagesString: string = '';
+  suggestionImagesString: string = '';
+  @Input() altTextIsDisplayed: boolean = false;
 
   @ViewChild('contentPanel')
     contentPanel!: RteOutputDisplayComponent;
@@ -150,6 +153,9 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
 
   @ViewChild('translationContainer')
     translationContainer!: ElementRef;
+
+  @ViewChild('contentPanelWithAltText')
+    contentPanelWithAltText!: RteOutputDisplayComponent;
 
   HTML_SCHEMA: HTMLSchema = { type: 'html' };
   MAX_REVIEW_MESSAGE_LENGTH = AppConstants.MAX_REVIEW_MESSAGE_LENGTH;
@@ -298,6 +304,10 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
         }
       });
     }
+    this.explorationImagesString = this.getImageInfoForSuggestion(
+      this.contentHtml);
+    this.suggestionImagesString = this.getImageInfoForSuggestion(
+      this.translationHtml);
     setTimeout(() => {
       this.computePanelOverflowState();
     }, 0);
@@ -341,6 +351,8 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
           reloadOpportunitiesEventEmitter.emit();
       },
       this.showTranslationSuggestionUpdateError);
+    this.suggestionImagesString = this.getImageInfoForSuggestion(
+      this.translationHtml);
   }
 
   // The length of the commit message should not exceed 375 characters,
@@ -433,12 +445,13 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
       this.activeSuggestion.target_id, this.activeSuggestionId,
       AppConstants.ACTION_ACCEPT_SUGGESTION,
       reviewMessageForSubmitter, this.finalCommitMessage,
-      this.resolveSuggestionAndUpdateModal.bind(this),
-      (errorMessage) => {
-        this.rejectAndReviewNext(`Invalid Suggestion: ${errorMessage}`);
+      () => {
+        this.alertsService.clearMessages();
+        this.alertsService.addSuccessMessage('Suggestion accepted.');
+        this.resolveSuggestionAndUpdateModal();
+      }, (errorMessage) => {
         this.alertsService.clearWarnings();
-        this.alertsService.addWarning(
-          `Invalid Suggestion: ${errorMessage}`);
+        this.alertsService.addWarning(`Invalid Suggestion: ${errorMessage}`);
       });
   }
 
@@ -455,13 +468,14 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
         this.activeSuggestion.target_id, this.activeSuggestionId,
         AppConstants.ACTION_REJECT_SUGGESTION,
         reviewMessage || this.reviewMessage, null,
-        this.resolveSuggestionAndUpdateModal.bind(this),
-        (error) => {
+        () => {
+          this.alertsService.clearMessages();
+          this.alertsService.addSuccessMessage('Suggestion rejected.');
+          this.resolveSuggestionAndUpdateModal();
+        }, (errorMessage) => {
           this.alertsService.clearWarnings();
-          this.alertsService.addWarning(
-            'There was an error rejecting this suggestion');
-        }
-      );
+          this.alertsService.addWarning(`Invalid Suggestion: ${errorMessage}`);
+        });
     }
   }
 
@@ -544,5 +558,30 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
       this.editedContent.html = value;
       this.changeDetectorRef.detectChanges();
     }
+  }
+
+  /**
+   * Retrieves image information from the given content and
+   * returns it as a string.
+   * If the content is in the form of a string (not an array),
+   * it parses the content using a DOMParser and extracts the HTML
+   * for all 'oppia-noninteractive-image' elements. The extracted HTML
+   * is returned as a string.
+   * @param content The content containing image information (
+   * either a string or an array of strings).
+   * @returns A string representation of the extracted image information.
+   */
+  getImageInfoForSuggestion(content: string | string[]): string {
+    let htmlString = '';
+
+    // Images are present in form of strings not as Array of strings.
+    if (!Array.isArray(content)) {
+      this.altTextIsDisplayed = true;
+      const doc = new DOMParser().parseFromString(content, 'text/html');
+      const imgElements = doc.querySelectorAll('oppia-noninteractive-image');
+      htmlString = Array.from(imgElements).map((img) => img.outerHTML).join('');
+    }
+
+    return htmlString;
   }
 }

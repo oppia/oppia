@@ -15,12 +15,14 @@
 """Controllers for the contributor dashboard page."""
 
 from __future__ import annotations
+import datetime
 
 from core import feconf
 from core import utils
 from core.constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
+from core.domain import contribution_stats_services
 from core.domain import email_manager
 from core.domain import suggestion_registry
 from core.domain import suggestion_services
@@ -452,23 +454,12 @@ class TranslationContributionStatsHandler(
                     months of format: "%b %Y", e.g. "Jan 2021".
             Unnecessary keys language_code, topic_id, contribution_dates,
             contributor_user_id are consequently deleted.
-
-        Raises:
-            Exception. There is no topic_id associated with the given
-                TranslationContributionStatsDict.
-            Exception. No language_code found for the given
-                TranslationContributionStatsDict.
         """
         translation_contribution_stats_dicts = [
             stats.to_dict() for stats in translation_contribution_stats
         ]
         topic_ids: List[str] = []
         for stats_dict in translation_contribution_stats_dicts:
-            if stats_dict['topic_id'] is None:
-                raise Exception(
-                    'There is no topic_id associated with the given '
-                    'TranslationContributionStatsDict.'
-                )
             topic_ids.append(stats_dict['topic_id'])
         topic_summaries = topic_fetchers.get_multi_topic_summaries(topic_ids)
         topic_name_by_topic_id = {}
@@ -485,11 +476,6 @@ class TranslationContributionStatsHandler(
             # be None because above we are already handling the case of None
             # 'topic_id' by raising an exception.
             assert stats_dict['topic_id'] is not None
-            if stats_dict['language_code'] is None:
-                raise Exception(
-                    'No language_code found for the given '
-                    'TranslationContributionStatsDict.'
-                )
 
             response_translation_contribution_stats_dicts.append({
                 'submitted_translations_count': (
@@ -529,3 +515,361 @@ class TranslationContributionStatsHandler(
             })
 
         return response_translation_contribution_stats_dicts
+
+
+class ContributorDashboardAdminStatsHandlerNormalizedPayloadDict(TypedDict):
+    """Dict representation of ContributorDashboardAdminStatsHandler's
+    normalized_request dictionary.
+    """
+
+    page_size: int
+    offset: int
+    language_code: Optional[str]
+    sort_by: Optional[str]
+    topic_ids: Optional[List[str]]
+    max_days_since_last_activity: Optional[int]
+
+
+class ContributorDashboardAdminStatsHandler(
+    base.BaseHandler[
+        Dict[str, str],
+        ContributorDashboardAdminStatsHandlerNormalizedPayloadDict
+    ]
+):
+    """Return Contributor Admin Dashboard Stats for supplied parameters.
+    """
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {
+        'contribution_type': {
+            'schema': {
+                'type': 'basestring'
+            },
+            'choices': [
+                feconf.CONTRIBUTION_TYPE_TRANSLATION,
+                feconf.CONTRIBUTION_TYPE_QUESTION
+            ]
+        },
+        'contribution_subtype': {
+            'schema': {
+                'type': 'basestring'
+            },
+            'choices': [
+                feconf.CONTRIBUTION_SUBTYPE_SUBMISSION,
+                feconf.CONTRIBUTION_SUBTYPE_REVIEW,
+                feconf.CONTRIBUTION_SUBTYPE_COORDINATE,
+            ]
+        }
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {
+            'page_size': {
+                'schema': {
+                    'type': 'int',
+                    'validators': [{
+                        'id': 'is_at_least',
+                        'min_value': 0
+                    }],
+                },
+                'default_value': 20
+            },
+            'offset': {
+                'schema': {
+                    'type': 'int',
+                    'validators': [{
+                        'id': 'is_at_least',
+                        'min_value': 0
+                    }]
+                }
+            },
+            'language_code': {
+                'schema': {
+                    'type': 'basestring',
+                    'validators': [{
+                        'id': 'is_supported_audio_language_code'
+                    }]
+                },
+                'default_value': None
+            },
+            'sort_by': {
+                'schema': {
+                    'type': 'basestring',
+                    'choices': constants.CD_ADMIN_STATS_SORT_OPTIONS
+                },
+                'default_value': None
+            },
+            'topic_ids': {
+                'schema': {
+                    'type': 'custom',
+                    'obj_type': 'JsonEncodedInString'
+                },
+                'default_value': None
+            },
+            'max_days_since_last_activity': {
+                'schema': {
+                    'type': 'int',
+                    'validators': [{
+                        'id': 'is_at_least',
+                        'min_value': 0
+                    }]
+                },
+                'default_value': None
+            }
+        }
+    }
+
+    @acl_decorators.can_access_contributor_dashboard_admin_page
+    def get(
+        self,
+        contribution_type: str,
+        contribution_subtype: str
+    ) -> None:
+        """Handles GET requests."""
+
+        assert self.normalized_request is not None
+        page_size = self.normalized_request.get('page_size')
+        offset = self.normalized_request.get('offset')
+        language_code = self.normalized_request.get('language_code')
+        sort_by = self.normalized_request.get('sort_by')
+        topic_ids = self.normalized_request.get('topic_ids')
+        max_days_since_last_activity = self.normalized_request.get(
+            'max_days_since_last_activity')
+
+        if contribution_type == feconf.CONTRIBUTION_TYPE_TRANSLATION:
+            if contribution_subtype == feconf.CONTRIBUTION_SUBTYPE_SUBMISSION:
+                # Asserting here because even though we are validating through
+                # schema mypy is assuming is can be None.
+                assert page_size is not None
+                assert offset is not None
+                assert language_code is not None
+                translation_submitter_stats, next_offset, more = (
+                    contribution_stats_services
+                    .get_translation_submitter_total_stats(
+                        page_size,
+                        offset,
+                        language_code,
+                        sort_by,
+                        topic_ids,
+                        max_days_since_last_activity
+                    ))
+                translation_submitter_frontend_dicts = [stat.to_frontend_dict()
+                    for stat in translation_submitter_stats]
+                response = {
+                    'stats': translation_submitter_frontend_dicts,
+                    'next_offset': next_offset,
+                    'more': more
+                }
+
+            elif contribution_subtype == feconf.CONTRIBUTION_SUBTYPE_REVIEW:
+                # Asserting here because even though we are validating through
+                # schema mypy is assuming is can be None.
+                assert page_size is not None
+                assert offset is not None
+                assert language_code is not None
+                translation_reviewer_stats, next_offset, more = (
+                    contribution_stats_services
+                    .get_translation_reviewer_total_stats(
+                        page_size,
+                        offset,
+                        language_code,
+                        sort_by,
+                        max_days_since_last_activity
+                    ))
+                translation_reviewer_frontend_dicts = [stat.to_frontend_dict()
+                    for stat in translation_reviewer_stats]
+                response = {
+                    'stats': translation_reviewer_frontend_dicts,
+                    'next_offset': next_offset,
+                    'more': more
+                }
+
+            else:
+                assert sort_by is not None
+                translation_coordinator_dicts = (
+                    contribution_stats_services
+                    .get_all_translation_coordinator_stats(sort_by))
+                translation_coordinator_frontend_dicts = (
+                    get_translation_coordinator_frontend_dict(
+                    translation_coordinator_dicts))
+                response = {
+                    'stats': translation_coordinator_frontend_dicts
+                }
+
+        else:
+            if contribution_subtype == feconf.CONTRIBUTION_SUBTYPE_SUBMISSION:
+                # Asserting here because even though we are validating through
+                # schema mypy is assuming is can be None.
+                assert page_size is not None
+                assert offset is not None
+                question_submitter_stats, next_offset, more = (
+                    contribution_stats_services
+                    .get_question_submitter_total_stats(
+                        page_size,
+                        offset,
+                        sort_by,
+                        topic_ids,
+                        max_days_since_last_activity
+                    ))
+                question_submitter_frontend_dicts = [stat.to_frontend_dict()
+                    for stat in question_submitter_stats]
+                response = {
+                    'stats': question_submitter_frontend_dicts,
+                    'next_offset': next_offset,
+                    'more': more
+                }
+
+            elif contribution_subtype == feconf.CONTRIBUTION_SUBTYPE_REVIEW:
+                # Asserting here because even though we are validating through
+                # schema mypy is assuming is can be None.
+                assert page_size is not None
+                assert offset is not None
+                question_reviewer_stats, next_offset, more = (
+                    contribution_stats_services
+                    .get_question_reviewer_total_stats(
+                        page_size,
+                        offset,
+                        sort_by,
+                        max_days_since_last_activity
+                    ))
+                question_reviewer_frontend_dicts = [stat.to_frontend_dict()
+                    for stat in question_reviewer_stats]
+                response = {
+                    'stats': question_reviewer_frontend_dicts,
+                    'next_offset': next_offset,
+                    'more': more
+                }
+
+            else:
+                question_coordinators = (
+                    user_services
+                    .get_user_ids_by_role(feconf.ROLE_ID_QUESTION_COORDINATOR))
+                question_coordinators.sort()
+                question_coordinator_frontend_dicts = (
+                    get_question_coordinator_frontend_dict(
+                    question_coordinators))
+                response = {
+                    'stats': question_coordinator_frontend_dicts
+                }
+
+        self.render_json(response)
+
+
+class CommunityContributionStatsHandler(
+    base.BaseHandler[
+        Dict[str, str],
+        Dict[str, str]
+    ]
+):
+    """Handler to get Community Stats for contributor admin dashboard."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
+
+    @acl_decorators.can_access_contributor_dashboard_admin_page
+    def get(self) -> None:
+        """Fetches community contribution stats data.
+
+        Raises:
+            InvalidInputException. Invalid username.
+        """
+        community_stats = suggestion_services.get_community_contribution_stats()
+
+        response = {
+            'translation_reviewers_count': (
+                community_stats.translation_reviewer_counts_by_lang_code),
+            'question_reviewers_count': community_stats.question_reviewer_count
+        }
+        self.render_json(response)
+
+
+def get_translation_coordinator_frontend_dict(
+    backend_stats: List[suggestion_registry.TranslationCoordinatorStats]
+) -> List[suggestion_registry.TranslationCoordinatorStatsDict]:
+    """Returns corresponding stats dicts with all the necessary
+    information for the frontend.
+
+    Args:
+        backend_stats: list. TranslationCoordinatorStats domain object.
+
+    Returns:
+        list. Dict representations of TranslationCoordinatorStats
+        domain objects with additional keys:
+            translators_count: int.
+            reviewers_count: int.
+    """
+    stats_dicts = [
+        stats.to_dict() for stats in backend_stats
+    ]
+
+    for stats_dict in stats_dicts:
+        coordinator_activity_list = []
+        # Here we use MyPy ignore because MyPy doesn't allow key addition
+        # to TypedDict.
+        stats_dict['translators_count'] = ( # type: ignore[misc]
+            contribution_stats_services.get_translator_counts(
+                stats_dict['language_id']))
+
+        community_stats = suggestion_services.get_community_contribution_stats()
+
+        # Here we use MyPy ignore because MyPy doesn't allow key addition
+        # to TypedDict.
+        stats_dict['reviewers_count'] = ( # type: ignore[misc]
+            community_stats.translation_reviewer_counts_by_lang_code[
+                stats_dict['language_id']])
+
+        for coordinator_id in stats_dict['coordinator_ids']:
+            user_setting = user_services.get_user_settings(coordinator_id)
+            assert user_setting.last_logged_in is not None
+            last_activity = user_setting.last_logged_in
+            last_activity_days = int(
+                (datetime.datetime.today() - last_activity).days
+            )
+
+            coordinator_activity_list.append({
+                'translation_coordinator': user_setting.username,
+                'last_activity_days': last_activity_days
+            })
+
+        # Here we use MyPy ignore because MyPy doesn't allow key addition
+        # to TypedDict.
+        stats_dict['coordinator_activity_list'] = coordinator_activity_list # type: ignore[misc]
+
+        # Here we use MyPy ignore because MyPy doesn't allow key deletion
+        # from TypedDict.
+        del stats_dict['coordinator_ids']  # type: ignore[misc]
+
+    return stats_dicts
+
+
+def get_question_coordinator_frontend_dict(
+    question_coordinators: List[str]
+) -> List[Dict[str, Union[str, int]]]:
+    """Returns corresponding stats dicts with all the necessary
+    information for the frontend.
+
+    Args:
+        question_coordinators: list[str]. List of question coordinators.
+
+    Returns:
+        list[Dict[str, str]]. List of dict representing question coordinator
+        stats:
+        question_coordinator: str.
+        last_activity: int.
+    """
+    stats: List[Dict[str, Union[str, int]]] = []
+    for coordinator in question_coordinators:
+        user_setting = user_services.get_user_settings(coordinator)
+        assert user_setting.last_logged_in is not None
+        assert user_setting.username is not None
+
+        last_activity = user_setting.last_logged_in
+        last_activity_days = int(
+            (datetime.datetime.today() - last_activity).days)
+
+        stats.append({
+            'question_coordinator': user_setting.username,
+            'last_activity': last_activity_days
+        })
+
+    return stats

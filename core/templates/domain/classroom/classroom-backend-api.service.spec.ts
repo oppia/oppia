@@ -46,7 +46,11 @@ describe('Classroom backend API service', function() {
     topic_model_last_updated: 3454354354,
     url_fragment: 'topic-name-one',
     can_edit_topic: false,
-    is_published: false
+    is_published: false,
+    total_upcoming_chapters_count: 1,
+    total_overdue_chapters_count: 1,
+    total_chapter_counts_for_each_story: [5, 4],
+    published_chapter_counts_for_each_story: [3, 4]
   };
   let secondTopicSummaryDict: CreatorTopicSummaryBackendDict = {
     id: 'topic2',
@@ -66,7 +70,11 @@ describe('Classroom backend API service', function() {
     topic_model_last_updated: 3454354354,
     url_fragment: 'topic-name-two',
     can_edit_topic: false,
-    is_published: false
+    is_published: false,
+    total_upcoming_chapters_count: 1,
+    total_overdue_chapters_count: 1,
+    total_chapter_counts_for_each_story: [5, 4],
+    published_chapter_counts_for_each_story: [3, 4]
   };
 
   let responseDictionaries = {
@@ -157,51 +165,6 @@ describe('Classroom backend API service', function() {
 
       expect(successHandler).toHaveBeenCalledWith(sampleClassroomDataObject);
       expect(failHandler).not.toHaveBeenCalled();
-    })
-  );
-
-  it('should handle successCallback for fetch classroom page is shown status',
-    fakeAsync(() => {
-      let successHandler = jasmine.createSpy('success');
-      let failHandler = jasmine.createSpy('fail');
-
-      let service = classroomBackendApiService;
-      service.fetchClassroomPromosAreEnabledStatusAsync().then(
-        successHandler, failHandler);
-
-      let req = httpTestingController.expectOne(
-        '/classroom_promos_status_handler');
-      expect(req.request.method).toEqual('GET');
-      req.flush({classroom_promos_are_enabled: false});
-
-      flushMicrotasks();
-
-      expect(successHandler).toHaveBeenCalledWith(false);
-      expect(failHandler).not.toHaveBeenCalled();
-    })
-  );
-
-  it('should handle errorCallback for fetch classroom page is shown status',
-    fakeAsync(() => {
-      let successHandler = jasmine.createSpy('success');
-      let failHandler = jasmine.createSpy('fail');
-
-      let service = classroomBackendApiService;
-      service.fetchClassroomPromosAreEnabledStatusAsync().then(
-        successHandler, failHandler);
-
-      let req = httpTestingController.expectOne(
-        '/classroom_promos_status_handler');
-      expect(req.request.method).toEqual('GET');
-      req.flush('Invalid request', {
-        status: 400,
-        statusText: 'Invalid request'
-      });
-
-      flushMicrotasks();
-
-      expect(successHandler).not.toHaveBeenCalled();
-      expect(failHandler).toHaveBeenCalled();
     })
   );
 

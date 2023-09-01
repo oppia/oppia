@@ -501,6 +501,11 @@ input.ng-dirty.ng-invalid, textarea.ng-dirty.ng-invalid, md-input-group.md-defau
   color: red;
 }
 
+.oppia-form-error-container {
+  color: #f00;
+  margin-top: 5px;
+}
+
 .oppia-serious-warning-text {
   color: red;
 }
@@ -660,6 +665,7 @@ img, video, canvas {
 }
 
 textarea {
+  padding: 5px 6px;
   width: 90%;
 }
 
@@ -921,21 +927,19 @@ textarea {
 
 }
 .oppia-navbar-breadcrumb {
-  -webkit-box-orient: vertical;
   color: #fff;
   cursor: default;
-  display: -webkit-box;
   font-family: "Capriola", "Roboto", Arial, sans-serif;
   font-size: 20px;
-  -webkit-line-clamp: 1;
-  margin: 0;
-  margin-bottom: -3px;
-  margin-left: -6px;
-  overflow: hidden;
   padding-top: 13px;
+}
+
+.oppia-navbar-breadcrumb li {
+  display: inline-block;
+  overflow: hidden;
   text-overflow: ellipsis;
-  white-space: break-spaces;
-  width: -webkit-fill-available;
+  white-space: nowrap;
+  width: calc(100vw - 930px);
 }
 
 .oppia-navbar-breadcrumb-separator {
@@ -1028,6 +1032,15 @@ textarea {
   }
   ul.nav.navbar-nav.oppia-navbar-nav.float-right {
     display: flex;
+    flex-direction: row;
+    float: right;
+    margin: 0;
+  }
+}
+@media (min-width: 767px) and (max-width: 992px) {
+  ul.nav.navbar-nav.oppia-navbar-nav.float-right {
+    display: flex;
+    flex-direction: row;
     float: right;
     margin: 0;
   }
@@ -1293,7 +1306,7 @@ span.sort-explorations-select .sort-order {
 
 .oppia-toast-container {
   position: fixed;
-  z-index: 1000;
+  z-index: 1020;
 }
 
 .oppia-toast-container * {
@@ -1824,11 +1837,12 @@ pre.oppia-pre-wrapped-text {
 
 .oppia-interaction-preview {
   height: 100%;
+  left: 23px;
   opacity: 0.5;
   outline: none;
   padding: 4px;
   position: absolute;
-  width: 100%;
+  width: 90%;
 }
 
 .oppia-editable-section:hover .oppia-interaction-preview {
@@ -2433,7 +2447,7 @@ div#ng-curtain {
   /* This is larger than the editor tutorial's z-index, but smaller than
      the z-index for Bootstrap modals.
   */
-  z-index: 1005;
+  z-index: 1015;
 }
 
 .oppia-top-of-page-padding {
@@ -2489,7 +2503,6 @@ div#ng-curtain {
   font-weight: 500;
   letter-spacing: 0.7px;
   padding: 17px 12px 10px;
-  padding-left: 3rem;
   text-transform: uppercase;
 }
 .oppia-option-list {
@@ -2867,6 +2880,7 @@ md-card.preview-conversation-skin-supplemental-card {
 .oppia-lost-changes > li > .state-edit-desc > .sub-edit {
   margin-left: 20px;
 }
+.oppia-activity-summary-tile .metrics li,
 .oppia-activity-summary-tile .metrics .row-three,
 .oppia-activity-summary-tile-mobile .metrics .row-three {
   font-size: 0.75em;
@@ -3169,7 +3183,7 @@ oppia-noninteractive-link {
 
 .oppia-activity-summary-tile .rating-disabled,
 .oppia-activity-summary-tile-mobile .rating-disabled {
-  opacity: 0.5;
+  opacity: 0.8;
 }
 
 .oppia-activity-summary-tile [section="right-section"],

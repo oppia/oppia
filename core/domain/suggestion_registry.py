@@ -37,6 +37,7 @@ from core.domain import question_services
 from core.domain import skill_domain
 from core.domain import skill_fetchers
 from core.domain import state_domain
+from core.domain import topic_fetchers
 from core.domain import translation_domain
 from core.domain import translation_services
 from core.domain import user_services
@@ -45,8 +46,7 @@ from extensions import domain
 
 from typing import (
     Any, Callable, Dict, List, Mapping, Optional, Set, Type, TypedDict, Union,
-    cast
-)
+    cast)
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -70,6 +70,7 @@ class BaseSuggestionDict(TypedDict):
     score_category: str
     language_code: str
     last_updated: float
+    created_on: float
     edited_by_reviewer: bool
 
 
@@ -116,6 +117,7 @@ class BaseSuggestion:
     change: change_domain.BaseChange
     score_category: str
     last_updated: datetime.datetime
+    created_on: datetime.datetime
     language_code: str
     edited_by_reviewer: bool
     image_context: str
@@ -144,6 +146,7 @@ class BaseSuggestion:
             'score_category': self.score_category,
             'language_code': self.language_code,
             'last_updated': utils.get_time_in_millisecs(self.last_updated),
+            'created_on': utils.get_time_in_millisecs(self.created_on),
             'edited_by_reviewer': self.edited_by_reviewer
         }
 
@@ -403,7 +406,8 @@ class SuggestionEditStateContent(BaseSuggestion):
         score_category: str,
         language_code: Optional[str],
         edited_by_reviewer: bool,
-        last_updated: Optional[datetime.datetime] = None
+        last_updated: Optional[datetime.datetime] = None,
+        created_on: Optional[datetime.datetime] = None
     ) -> None:
         """Initializes an object of type SuggestionEditStateContent
         corresponding to the SUGGESTION_TYPE_EDIT_STATE_CONTENT choice.
@@ -435,6 +439,14 @@ class SuggestionEditStateContent(BaseSuggestion):
         # So, once this suggestion_services.create_suggestion() method is
         # fixed, we can remove both todo and MyPy ignore from here.
         self.last_updated = last_updated  # type: ignore[assignment]
+        # TODO(#16048): Here we use MyPy ignore because in BaseSuggestion,
+        # created_on is defined with only datetime type but here
+        # created_on is of Optional[datetime] type because while creating
+        # 'SuggestionEditStateContent' through create_suggestion() method, we
+        # are not providing 'created_on' and just using None default value.
+        # So, once this suggestion_services.create_suggestion() method is
+        # fixed, we can remove both todo and MyPy ignore from here.
+        self.created_on = created_on  # type: ignore[assignment]
         self.edited_by_reviewer = edited_by_reviewer
         # Here we use MyPy ignore because in BaseSuggestion, image_context
         # is defined as string type attribute but currently, we don't
@@ -629,7 +641,8 @@ class SuggestionTranslateContent(BaseSuggestion):
         score_category: str,
         language_code: str,
         edited_by_reviewer: bool,
-        last_updated: Optional[datetime.datetime] = None
+        last_updated: Optional[datetime.datetime] = None,
+        created_on: Optional[datetime.datetime] = None
     ) -> None:
         """Initializes an object of type SuggestionTranslateContent
         corresponding to the SUGGESTION_TYPE_TRANSLATE_CONTENT choice.
@@ -656,6 +669,14 @@ class SuggestionTranslateContent(BaseSuggestion):
         # So, once this suggestion_services.create_suggestion() method is
         # fixed, we can remove both todo and MyPy ignore from here.
         self.last_updated = last_updated  # type: ignore[assignment]
+        # TODO(#16048): Here we use MyPy ignore because in BaseSuggestion,
+        # created_on is defined with only datetime type but here
+        # created_on is of Optional[datetime] type because while creating
+        # 'SuggestionTranslateContent' through create_suggestion() method, we
+        # are not providing 'created_on' and just using None default value.
+        # So, once this suggestion_services.create_suggestion() method is
+        # fixed, we can remove both todo and MyPy ignore from here.
+        self.created_on = created_on  # type: ignore[assignment]
         self.edited_by_reviewer = edited_by_reviewer
         self.image_context = feconf.IMAGE_CONTEXT_EXPLORATION_SUGGESTIONS
 
@@ -867,7 +888,8 @@ class SuggestionAddQuestion(BaseSuggestion):
         score_category: str,
         language_code: str,
         edited_by_reviewer: bool,
-        last_updated: Optional[datetime.datetime] = None
+        last_updated: Optional[datetime.datetime] = None,
+        created_on: Optional[datetime.datetime] = None
     ) -> None:
         """Initializes an object of type SuggestionAddQuestion
         corresponding to the SUGGESTION_TYPE_ADD_QUESTION choice.
@@ -892,6 +914,14 @@ class SuggestionAddQuestion(BaseSuggestion):
         # So, once this suggestion_services.create_suggestion() method is
         # fixed, we can remove both todo and MyPy ignore from here.
         self.last_updated = last_updated  # type: ignore[assignment]
+        # TODO(#16048): Here we use MyPy ignore because in BaseSuggestion,
+        # created_on is defined with only datetime type but here
+        # created_on is of Optional[datetime] type because while creating
+        # 'SuggestionAddQuestion' through create_suggestion() method, we
+        # are not providing 'created_on' and just using None default value.
+        # So, once this suggestion_services.create_suggestion() method is
+        # fixed, we can remove both todo and MyPy ignore from here.
+        self.created_on = created_on  # type: ignore[assignment]
         self.image_context = feconf.IMAGE_CONTEXT_QUESTION_SUGGESTIONS
         self._update_change_to_latest_state_schema_version()
         self.edited_by_reviewer = edited_by_reviewer
@@ -1400,9 +1430,9 @@ class CommunityContributionStats:
 class TranslationContributionStatsDict(TypedDict):
     """Dictionary representing the TranslationContributionStats object."""
 
-    language_code: Optional[str]
-    contributor_user_id: Optional[str]
-    topic_id: Optional[str]
+    language_code: str
+    contributor_user_id: str
+    topic_id: str
     submitted_translations_count: int
     submitted_translation_word_count: int
     accepted_translations_count: int
@@ -1418,8 +1448,8 @@ class TranslationContributionStatsFrontendDict(TypedDict):
     object for frontend.
     """
 
-    language_code: Optional[str]
-    topic_id: Optional[str]
+    language_code: str
+    topic_id: str
     submitted_translations_count: int
     submitted_translation_word_count: int
     accepted_translations_count: int
@@ -1436,9 +1466,9 @@ class TranslationContributionStats:
 
     def __init__(
         self,
-        language_code: Optional[str],
-        contributor_user_id: Optional[str],
-        topic_id: Optional[str],
+        language_code: str,
+        contributor_user_id: str,
+        topic_id: str,
         submitted_translations_count: int,
         submitted_translation_word_count: int,
         accepted_translations_count: int,
@@ -1461,32 +1491,6 @@ class TranslationContributionStats:
         self.rejected_translations_count = rejected_translations_count
         self.rejected_translation_word_count = rejected_translation_word_count
         self.contribution_dates = contribution_dates
-
-    @classmethod
-    def create_default(
-        cls,
-        language_code: Optional[str] = None,
-        contributor_user_id: Optional[str] = None,
-        topic_id: Optional[str] = None
-    ) -> TranslationContributionStats:
-        """Create default translation contribution stats.
-
-        Args:
-            language_code: str. The language code for which are these stats
-                generated.
-            contributor_user_id: str. User ID of the contributor to which
-                these stats belong.
-            topic_id: str. ID of the topic for which were
-                the translations created.
-
-        Returns:
-            TranslationContributionStats. Default translation contribution
-            stats.
-        """
-        return cls(
-            language_code, contributor_user_id, topic_id,
-            0, 0, 0, 0, 0, 0, 0, set()
-        )
 
     def to_dict(self) -> TranslationContributionStatsDict:
         """Returns a dict representation of a TranslationContributionStats
@@ -2003,37 +2007,14 @@ class ReviewableSuggestionEmailInfo:
         self.submission_datetime = submission_datetime
 
 
-class TranslationSubmitterTotalContributionStatsDict(TypedDict):
-    """Dictionary representing the TranslationSubmitterTotalContributionStats
-    object.
-    """
-
-    language_code: str
-    contributor_id: str
-    topic_ids_with_translation_submissions: List[str]
-    recent_review_outcomes: List[str]
-    recent_performance: int
-    overall_accuracy: float
-    submitted_translations_count: int
-    submitted_translation_word_count: int
-    accepted_translations_count: int
-    accepted_translations_without_reviewer_edits_count: int
-    accepted_translation_word_count: int
-    rejected_translations_count: int
-    rejected_translation_word_count: int
-    first_contribution_date: datetime.date
-    last_contribution_date: datetime.date
-
-
 class TranslationSubmitterTotalContributionStatsFrontendDict(TypedDict):
     """Dictionary representing the TranslationSubmitterTotalContributionStats
     object for frontend.
     """
 
     language_code: str
-    contributor_id: str
-    topic_ids_with_translation_submissions: List[str]
-    recent_review_outcomes: List[str]
+    contributor_name: str
+    topic_names: List[str]
     recent_performance: int
     overall_accuracy: float
     submitted_translations_count: int
@@ -2095,12 +2076,18 @@ class TranslationSubmitterTotalContributionStats:
         Returns:
             dict. The dict representation.
         """
+        topic_summaries = topic_fetchers.get_multi_topic_summaries(
+            self.topic_ids_with_translation_submissions)
+        topic_name_by_topic_id = []
+        for topic_summary in topic_summaries:
+            if topic_summary is not None:
+                topic_name_by_topic_id.append(topic_summary.name)
+        contributor_name = user_services.get_username(self.contributor_id)
+
         return {
             'language_code': self.language_code,
-            'contributor_id': self.contributor_id,
-            'topic_ids_with_translation_submissions': (
-                self.topic_ids_with_translation_submissions),
-            'recent_review_outcomes': self.recent_review_outcomes,
+            'contributor_name': contributor_name,
+            'topic_names': topic_name_by_topic_id,
             'recent_performance': self.recent_performance,
             'overall_accuracy': self.overall_accuracy,
             'submitted_translations_count': self.submitted_translations_count,
@@ -2121,31 +2108,14 @@ class TranslationSubmitterTotalContributionStats:
         }
 
 
-class TranslationReviewerTotalContributionStatsDict(TypedDict):
-    """Dictionary representing the TranslationReviewerTotalContributionStats
-    object.
-    """
-
-    language_code: str
-    contributor_id: str
-    topic_ids_with_translation_reviews: List[str]
-    reviewed_translations_count: int
-    accepted_translations_count: int
-    accepted_translations_with_reviewer_edits_count: int
-    accepted_translation_word_count: int
-    rejected_translations_count: int
-    first_contribution_date: datetime.date
-    last_contribution_date: datetime.date
-
-
 class TranslationReviewerTotalContributionStatsFrontendDict(TypedDict):
     """Dictionary representing the TranslationReviewerTotalContributionStats
     object for frontend.
     """
 
     language_code: str
-    contributor_id: str
-    topic_ids_with_translation_reviews: List[str]
+    contributor_name: str
+    topic_names: List[str]
     reviewed_translations_count: int
     accepted_translations_count: int
     accepted_translations_with_reviewer_edits_count: int
@@ -2193,11 +2163,18 @@ class TranslationReviewerTotalContributionStats:
         Returns:
             dict. The dict representation.
         """
+        topic_summaries = topic_fetchers.get_multi_topic_summaries(
+            self.topic_ids_with_translation_reviews)
+        topic_name_by_topic_id = []
+        for topic_summary in topic_summaries:
+            if topic_summary is not None:
+                topic_name_by_topic_id.append(topic_summary.name)
+        contributor_name = user_services.get_username(self.contributor_id)
+
         return {
             'language_code': self.language_code,
-            'contributor_id': self.contributor_id,
-            'topic_ids_with_translation_reviews': (
-                self.topic_ids_with_translation_reviews),
+            'contributor_name': contributor_name,
+            'topic_names': topic_name_by_topic_id,
             'reviewed_translations_count': self.reviewed_translations_count,
             'accepted_translations_count': self.accepted_translations_count,
             'accepted_translations_with_reviewer_edits_count': (
@@ -2212,32 +2189,13 @@ class TranslationReviewerTotalContributionStats:
         }
 
 
-class QuestionSubmitterTotalContributionStatsDict(TypedDict):
-    """Dictionary representing the QuestionSubmitterTotalContributionStats
-    object.
-    """
-
-    contributor_id: str
-    topic_ids_with_question_submissions: List[str]
-    recent_review_outcomes: List[str]
-    recent_performance: int
-    overall_accuracy: float
-    submitted_questions_count: int
-    accepted_questions_count: int
-    accepted_questions_without_reviewer_edits_count: int
-    rejected_questions_count: int
-    first_contribution_date: datetime.date
-    last_contribution_date: datetime.date
-
-
 class QuestionSubmitterTotalContributionStatsFrontendDict(TypedDict):
     """Dictionary representing the QuestionSubmitterTotalContributionStats
     object for frontend.
     """
 
-    contributor_id: str
-    topic_ids_with_question_submissions: List[str]
-    recent_review_outcomes: List[str]
+    contributor_name: str
+    topic_names: List[str]
     recent_performance: int
     overall_accuracy: float
     submitted_questions_count: int
@@ -2288,11 +2246,17 @@ class QuestionSubmitterTotalContributionStats:
         Returns:
             dict. The dict representation.
         """
+        topic_summaries = topic_fetchers.get_multi_topic_summaries(
+            self.topic_ids_with_question_submissions)
+        topic_name_by_topic_id = []
+        for topic_summary in topic_summaries:
+            if topic_summary is not None:
+                topic_name_by_topic_id.append(topic_summary.name)
+        contributor_name = user_services.get_username(self.contributor_id)
+
         return {
-            'contributor_id': self.contributor_id,
-            'topic_ids_with_question_submissions': (
-                self.topic_ids_with_question_submissions),
-            'recent_review_outcomes': self.recent_review_outcomes,
+            'contributor_name': contributor_name,
+            'topic_names': topic_name_by_topic_id,
             'recent_performance': self.recent_performance,
             'overall_accuracy': self.overall_accuracy,
             'submitted_questions_count': self.submitted_questions_count,
@@ -2307,28 +2271,13 @@ class QuestionSubmitterTotalContributionStats:
         }
 
 
-class QuestionReviewerTotalContributionStatsDict(TypedDict):
-    """Dictionary representing the QuestionReviewerTotalContributionStats
-    object.
-    """
-
-    contributor_id: str
-    topic_ids_with_question_reviews: List[str]
-    reviewed_questions_count: int
-    accepted_questions_count: int
-    accepted_questions_with_reviewer_edits_count: int
-    rejected_questions_count: int
-    first_contribution_date: datetime.date
-    last_contribution_date: datetime.date
-
-
 class QuestionReviewerTotalContributionStatsFrontendDict(TypedDict):
     """Dictionary representing the QuestionReviewerTotalContributionStats
     object for frontend.
     """
 
-    contributor_id: str
-    topic_ids_with_question_reviews: List[str]
+    contributor_name: str
+    topic_names: List[str]
     reviewed_questions_count: int
     accepted_questions_count: int
     accepted_questions_with_reviewer_edits_count: int
@@ -2371,10 +2320,17 @@ class QuestionReviewerTotalContributionStats:
         Returns:
             dict. The dict representation.
         """
+        topic_summaries = topic_fetchers.get_multi_topic_summaries(
+            self.topic_ids_with_question_reviews)
+        topic_name_by_topic_id = []
+        for topic_summary in topic_summaries:
+            if topic_summary is not None:
+                topic_name_by_topic_id.append(topic_summary.name)
+        contributor_name = user_services.get_username(self.contributor_id)
+
         return {
-            'contributor_id': self.contributor_id,
-            'topic_ids_with_question_reviews': (
-                self.topic_ids_with_question_reviews),
+            'contributor_name': contributor_name,
+            'topic_names': topic_name_by_topic_id,
             'reviewed_questions_count': self.reviewed_questions_count,
             'accepted_questions_count': self.accepted_questions_count,
             'accepted_questions_with_reviewer_edits_count': (
@@ -2384,4 +2340,38 @@ class QuestionReviewerTotalContributionStats:
                 self.first_contribution_date.strftime('%b %d, %Y')),
             'last_contributed_in_days': int(
                 (datetime.date.today() - self.last_contribution_date).days)
+        }
+
+
+class TranslationCoordinatorStatsDict(TypedDict):
+    """Dict representation of TranslationCoordinatorStats domain object"""
+
+    language_id: str
+    coordinator_ids: List[str]
+    coordinators_count: int
+
+
+class TranslationCoordinatorStats:
+    """Domain object for the TranslationCoordinatorStatsModel."""
+
+    def __init__(
+        self,
+        language_id: str,
+        coordinator_ids: List[str],
+        coordinators_count: int
+    ) -> None:
+        self.language_id = language_id
+        self.coordinator_ids = coordinator_ids
+        self.coordinators_count = coordinators_count
+
+    def to_dict(self) -> TranslationCoordinatorStatsDict:
+        """Returns a dict representaion of TranslationCoordinatorStats.
+
+        Returns: dict. The dict representation.
+        """
+
+        return {
+            'language_id': self.language_id,
+            'coordinator_ids': self.coordinator_ids,
+            'coordinators_count': self.coordinators_count
         }
