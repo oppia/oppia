@@ -45,7 +45,7 @@ class MockNgbModalRef {
     initialSuggestionId: null;
     reviewable: null;
     subheading: null;
-    skippedContributionIds: []
+    skippedContributionIds: [];
   };
 }
 
