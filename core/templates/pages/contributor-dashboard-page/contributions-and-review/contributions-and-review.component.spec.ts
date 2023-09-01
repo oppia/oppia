@@ -45,6 +45,7 @@ class MockNgbModalRef {
     initialSuggestionId: null;
     reviewable: null;
     subheading: null;
+    skippedContributionIds: []
   };
 }
 
@@ -1182,6 +1183,30 @@ describe('Contributions and review component', () => {
               story_title: 'story_title',
               chapter_title: 'chapter_title'
             }
+          },
+          suggestion_2: {
+            suggestion: {
+              target_type: 'state',
+              author_name: 'rod newt',
+              last_updated_msecs: '66778',
+              suggestion_id: 'suggestion_2',
+              target_id: '1',
+              suggestion_type: 'translate_content',
+              change: {
+                state_name: 'state',
+                new_value: 'new',
+                old_value: 'old',
+                content_html: 'Translation',
+                translation_html: 'Tradução'
+              },
+              status: 'rejected',
+              exploration_content_html: null
+            },
+            details: {
+              topic_name: 'topic_name',
+              story_title: 'story_title',
+              chapter_title: 'chapter_title'
+            }
           }
         };
         const reviewableTranslation = Promise.resolve({
@@ -1209,19 +1234,28 @@ describe('Contributions and review component', () => {
             labelColor: '#e76c8c',
             actionButtonTitle: 'Review',
             translationWordCount: undefined
+          },
+          {
+            id: 'suggestion_2',
+            heading: 'Tradução',
+            subheading: 'topic_name / story_title / chapter_title',
+            labelText: 'Obsolete',
+            labelColor: '#e76c8c',
+            actionButtonTitle: 'Review',
+            translationWordCount: undefined
           }]);
           expect(more).toEqual(false);
 
           // When opening the review modal for translations,
           // only translations should be shown.
           spyOn(component, '_showTranslationSuggestionModal');
-          component.onClickViewSuggestion('suggestion_1');
+          component.onClickViewSuggestion('suggestion_2');
           expect(component._showTranslationSuggestionModal).
             toHaveBeenCalledWith(
               suggestion1,
-              'suggestion_1',
+              'suggestion_2',
               true,
-              []
+              ['suggestion_1']
             );
         });
         // Wait for the first test to complete.
