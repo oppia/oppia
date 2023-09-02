@@ -28,13 +28,6 @@ jobs:
           echo ---Building Docker Images---
           docker compose build
           make run-devserver
-          if curl -s http://localhost:8181/; then
-            echo ---Dev-server (dev) is up---
-            exit 0
-          else
-            echo ---Retrying in 1 min---
-            sleep 60
-          fi
           make stop
 
       - name: Start Containers
