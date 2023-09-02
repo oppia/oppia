@@ -561,4 +561,11 @@ describe('Editor state service', () => {
     }).toThrowError('Active State for this solution is not set');
     expect(ecs.isCurrentSolutionValid()).toBeFalse();
   });
+
+  it('should correctly set and get initActiveContentId', () => {
+    ecs.setInitActiveContentId('content_id');
+    const initActiveContentId = ecs.getInitActiveContentId();
+
+    expect(initActiveContentId).toBe('content_id');
+  });
 });
