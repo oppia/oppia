@@ -247,7 +247,7 @@ describe('State Translation Editor Component', () => {
       });
 
       it('should intialize active translation if it does not exist', () => {
-        component.activeWrittenTranslation = undefined;
+        component.activeWrittenTranslation = null;
         component.dataFormat = 'html';
         component.openTranslationEditor();
         expect(component.activeWrittenTranslation).toEqual(

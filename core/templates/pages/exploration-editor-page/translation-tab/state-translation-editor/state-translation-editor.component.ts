@@ -55,14 +55,26 @@ export class StateTranslationEditorComponent
   implements OnInit, OnDestroy {
   directiveSubscriptions = new Subscription();
 
-  contentId: string;
-  languageCode: string;
-  activeWrittenTranslation: TranslatedContent;
+  contentId: string = '';
+  languageCode: string = '';
+  activeWrittenTranslation: TranslatedContent | null = null;
   translationEditorIsOpen: boolean = false;
-  dataFormat: DataFormatToDefaultValuesKey | string;
-  UNICODE_SCHEMA: { type: string };
-  SET_OF_STRINGS_SCHEMA: ListSchema;
-  HTML_SCHEMA: HTMLSchema;
+  dataFormat: DataFormatToDefaultValuesKey | string = '';
+  UNICODE_SCHEMA: { type: string } = {
+    type: 'unicode'
+  };
+
+  SET_OF_STRINGS_SCHEMA: ListSchema = {
+    type: 'list',
+    items: {
+      type: 'unicode'
+    },
+    validators: [{
+      id: 'is_uniquified'
+    }]
+  };
+
+  HTML_SCHEMA: HTMLSchema | null = null;
 
   constructor(
     private editabilityService: EditabilityService,
@@ -81,7 +93,7 @@ export class StateTranslationEditorComponent
 
   showMarkAudioAsNeedingUpdateModalIfRequired(
       contentId: string, languageCode: string): void {
-    let stateName = this.stateEditorService.getActiveStateName();
+    let stateName = this.stateEditorService.getActiveStateName() as string;
     let state = this.explorationStatesService.getState(stateName);
     let recordedVoiceovers = state.recordedVoiceovers;
     let availableAudioLanguages = (
@@ -115,7 +127,7 @@ export class StateTranslationEditorComponent
   initEditor(): void {
     this.translationEditorIsOpen = false;
     this.contentId = (
-      this.translationTabActiveContentIdService.getActiveContentId());
+      this.translationTabActiveContentIdService.getActiveContentId() as string);
     this.languageCode = this.translationLanguageService.getActiveLanguageCode();
 
     this.HTML_SCHEMA = {
@@ -133,17 +145,20 @@ export class StateTranslationEditorComponent
     );
     if (entityTranslations) {
       this.activeWrittenTranslation = entityTranslations.getWrittenTranslation(
-        this.translationTabActiveContentIdService.getActiveContentId());
+        this.translationTabActiveContentIdService.getActiveContentId() as string
+      );
     }
   }
 
   saveTranslation(): void {
     this.contentId = (
-      this.translationTabActiveContentIdService.getActiveContentId());
+      this.translationTabActiveContentIdService.getActiveContentId() as string);
     this.languageCode = this.translationLanguageService.getActiveLanguageCode();
 
     this.showMarkAudioAsNeedingUpdateModalIfRequired(
       this.contentId, this.languageCode);
+    this.activeWrittenTranslation = (
+      this.activeWrittenTranslation as TranslatedContent);
     this.changeListService.editTranslation(
       this.contentId, this.languageCode, this.activeWrittenTranslation);
     this.entityTranslationsService.languageCodeToEntityTranslations[
@@ -169,6 +184,8 @@ export class StateTranslationEditorComponent
   }
 
   onSaveTranslationButtonClicked(): void {
+    this.activeWrittenTranslation = (
+      this.activeWrittenTranslation as TranslatedContent);
     this.activeWrittenTranslation.needsUpdate = false;
     this.saveTranslation();
   }
@@ -179,8 +196,10 @@ export class StateTranslationEditorComponent
 
   markAsNeedingUpdate(): void {
     let contentId = (
-      this.translationTabActiveContentIdService.getActiveContentId());
+      this.translationTabActiveContentIdService.getActiveContentId() as string);
     let languageCode = this.translationLanguageService.getActiveLanguageCode();
+    this.activeWrittenTranslation = (
+      this.activeWrittenTranslation as TranslatedContent);
     this.activeWrittenTranslation.markAsNeedingUpdate();
     this.changeListService.editTranslation(
       contentId, languageCode, this.activeWrittenTranslation);
@@ -189,21 +208,8 @@ export class StateTranslationEditorComponent
 
   ngOnInit(): void {
     this.dataFormat = (
-      this.translationTabActiveContentIdService.getActiveDataFormat());
-
-    this.UNICODE_SCHEMA = {
-      type: 'unicode'
-    };
-
-    this.SET_OF_STRINGS_SCHEMA = {
-      type: 'list',
-      items: {
-        type: 'unicode'
-      },
-      validators: [{
-        id: 'is_uniquified'
-      }]
-    };
+      this.translationTabActiveContentIdService.getActiveDataFormat() as string
+    );
 
     this.directiveSubscriptions.add(
       this.translationTabActiveContentIdService.onActiveContentIdChanged.

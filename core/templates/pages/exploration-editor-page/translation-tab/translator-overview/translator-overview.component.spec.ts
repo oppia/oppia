@@ -175,9 +175,9 @@ describe('Translator Overview component', () => {
 
     it('should handle mark needs update translation changes',
       fakeAsync(() => {
-        expect(
-          entityTranslation.getWrittenTranslation('content1').needsUpdate
-        ).toBeFalse();
+        let translatedContent = entityTranslation.getWrittenTranslation(
+          'content1') as TranslatedContent;
+        expect(translatedContent.needsUpdate).toBeFalse();
 
         spyOn(changeListService, 'getTranslationChangeList').and.returnValue([{
           cmd: 'mark_translations_needs_update',
@@ -187,9 +187,9 @@ describe('Translator Overview component', () => {
         component.ngOnInit();
         tick();
 
-        expect(
-          entityTranslation.getWrittenTranslation('content1').needsUpdate
-        ).toBeTrue();
+        translatedContent = entityTranslation.getWrittenTranslation(
+          'content1') as TranslatedContent;
+        expect(translatedContent.needsUpdate).toBeTrue();
       }));
 
     it('should update entity translations with remove translation changes',
