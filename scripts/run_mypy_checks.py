@@ -158,7 +158,6 @@ def install_mypy_prerequisites(install_globally: bool) -> Tuple[int, str]:
             MYPY_REQUIREMENTS_FILE_PATH, '--target', MYPY_TOOLS_DIR,
             '--upgrade'
         ]
-        # this fixes the error pip not found, but it was earlier working on my mac.
         if feconf.OPPIA_IS_DOCKERIZED:
             cmd = [
                 'pip', 'install', '-r',
