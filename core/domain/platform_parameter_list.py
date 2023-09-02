@@ -36,6 +36,8 @@ class ParamNames(enum.Enum):
     DIAGNOSTIC_TEST = 'diagnostic_test'
     SERIAL_CHAPTER_LAUNCH_CURRICULUM_ADMIN_VIEW = (
         'serial_chapter_launch_curriculum_admin_view')
+    SERIAL_CHAPTER_LAUNCH_LEARNER_VIEW = (
+        'serial_chapter_launch_learner_view')
     SHOW_REDESIGNED_LEARNER_DASHBOARD = (
         'show_redesigned_learner_dashboard')
     SHOW_TRANSLATION_SIZE = 'show_translation_size'

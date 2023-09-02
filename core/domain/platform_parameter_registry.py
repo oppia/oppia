@@ -432,6 +432,12 @@ Registry.create_feature_flag(
     platform_parameter_domain.FeatureStages.DEV)
 
 Registry.create_feature_flag(
+    ParamNames.SERIAL_CHAPTER_LAUNCH_LEARNER_VIEW,
+    'This flag is for serial chapter launch feature and making changes only' +
+    'in the learner view.',
+    platform_parameter_domain.FeatureStages.DEV)
+
+Registry.create_feature_flag(
     ParamNames.SHOW_REDESIGNED_LEARNER_DASHBOARD,
     'This flag is to show redesigned learner dashboard.',
     platform_parameter_domain.FeatureStages.DEV)
@@ -449,6 +455,11 @@ Registry.create_feature_flag(
      platform_parameter_domain.FeatureStages.DEV)
 
 Registry.create_feature_flag(
+    ParamNames.CD_ADMIN_DASHBOARD_NEW_UI,
+    'This flag is to show new contributor admin dashboard.',
+    platform_parameter_domain.FeatureStages.DEV)
+
+Registry.create_feature_flag(
     ParamNames.IS_IMPROVEMENTS_TAB_ENABLED,
     'Exposes the Improvements Tab for creators in the exploration editor.',
     platform_parameter_domain.FeatureStages.PROD)
@@ -457,11 +468,6 @@ Registry.create_feature_flag(
     ParamNames.LEARNER_GROUPS_ARE_ENABLED,
     'Enable learner groups feature',
     platform_parameter_domain.FeatureStages.PROD)
-
-Registry.create_feature_flag(
-    ParamNames.CD_ADMIN_DASHBOARD_NEW_UI,
-    'This flag is to show new contributor admin dashboard.',
-    platform_parameter_domain.FeatureStages.DEV)
 
 Registry.create_platform_parameter(
     ParamNames.PROMO_BAR_ENABLED,
@@ -476,17 +482,17 @@ Registry.create_platform_parameter(
 )
 
 Registry.create_platform_parameter(
+    ParamNames.ALWAYS_ASK_LEARNERS_FOR_ANSWER_DETAILS,
+    'Always ask learners for answer details. For testing -- do not use',
+    platform_parameter_domain.DataTypes.BOOL
+)
+
+Registry.create_platform_parameter(
     ParamNames.MAX_NUMBER_OF_TAGS_ASSIGNED_TO_BLOG_POST,
     'The maximum number of tags that can be selected to categorize the blog '
     'post',
     platform_parameter_domain.DataTypes.NUMBER,
     default=10
-)
-
-Registry.create_platform_parameter(
-    ParamNames.ALWAYS_ASK_LEARNERS_FOR_ANSWER_DETAILS,
-    'Always ask learners for answer details. For testing -- do not use',
-    platform_parameter_domain.DataTypes.BOOL
 )
 
 Registry.create_platform_parameter(
