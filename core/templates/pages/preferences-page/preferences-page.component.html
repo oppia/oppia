@@ -1,11 +1,11 @@
 <background-banner></background-banner>
 <div class="oppia-dashboard-container ng-scope">
-  <h1 class="oppia-preferences-page-heading e2e-test-preferences-title">
+  <h1 class="oppia-preferences-page-heading e2e-test-preferences-title" tabindex="0">
       {{ 'I18N_PREFERENCES_HEADING' | translate }}
   </h1>
   <em>
     <div>
-      <h2 class="oppia-preferences-page-heading-subtext">
+      <h2 class="oppia-preferences-page-heading-subtext" tabindex="0">
         {{ 'I18N_PREFERENCES_HEADING_SUBTEXT' | translate }}
       </h2>
     </div>
@@ -13,11 +13,12 @@
   <mat-card class="oppia-page-card">
     <div class="container">
       <div class="form-group row">
-        <label class="col-lg-4 col-md-4 col-sm-4">
+        <label class="col-lg-4 col-md-4 col-sm-4" for="label-target-username">
           {{ 'I18N_PREFERENCES_USERNAME' | translate }}
         </label>
         <div class="col-lg-8 col-md-8 col-sm-8">
           <a *ngIf="username"
+             id="label-target-username"
              href="/profile/{{ username }}"
              [smartRouterLink]="'/profile/' + username"
              class="preferences-page-tab-focus">
@@ -37,13 +38,13 @@
           <div class="oppia-editable-section oppia-editor-profile-picture-container"
                title="{{ 'I18N_PREFERENCES_CHANGE_PICTURE' | translate }}">
             <div class="oppia-click-to-start-editing e2e-test-photo-clickable"
-                 (click)="showEditProfilePictureModal()"
-                 aria-label="Edit profile picture button">
+                 (click)="showEditProfilePictureModal()">
             </div>
             <div class="oppia-editor-edit-btn oppia-editor-edit-btn-pos">
               <i class="fas fa-pen oppia-editor-profile-edit-icon"
                  tabindex="0"
                  aria-label="Edit profile picture"
+                 role="button"
                  (keydown.enter)="showEditProfilePictureModal()">
               </i>
             </div>
@@ -66,11 +67,11 @@
       </div>
 
       <div class="form-group row">
-        <label for="label-target-user-bio" class="col-lg-4 col-md-4 col-sm-4">
+        <label class="col-lg-4 col-md-4 col-sm-4">
           {{ 'I18N_PREFERENCES_BIO' | translate }}
         </label>
         <div class="col-lg-8 col-md-8 col-sm-8">
-          <textarea id="label-target-user-bio"
+          <textarea [attr.aria-label]="'Bio. ' + ('I18N_PREFERENCES_BIO_EXPLAIN_TEXT' | translate)"
                     class="oppia-bio-border e2e-test-user-bio oppia-autofocus"
                     [(ngModel)]="userBio"
                     [attr.value]="userBio"
@@ -87,41 +88,43 @@
     </div>
 
     <div class="form-group row">
-      <label class="col-lg-4 col-md-4 col-sm-4">
+      <label class="col-lg-4 col-md-4 col-sm-4"
+             tabindex="0"
+             [attr.aria-label]="('I18N_PREFERENCES_PREFERRED_DASHBOARD' | translate) + ('I18N_PREFERENCES_PREFERRED_DASHBOARD_EXPLAIN' | translate)">
         {{ 'I18N_PREFERENCES_PREFERRED_DASHBOARD' | translate }}
       </label>
       <div class="col-lg-8 col-md-8 col-sm-8">
         <div class="checkbox oppia-checkbox">
-          <label>
+          <label tabindex="0">
             <input type="radio" [(ngModel)]="defaultDashboard" value="{{ DASHBOARD_TYPE_CREATOR }}" (change)="saveDefaultDashboard(defaultDashboard)" class="e2e-test-creator-dashboard-radio"
                    attr.aria-label="{{ 'I18N_PREFERENCES_PREFERRED_DASHBOARD' | translate }}, {{ 'I18N_TOPNAV_CREATOR_DASHBOARD' | translate }}">
-            <span>
+            <span aria-hidden="true">
               {{ 'I18N_TOPNAV_CREATOR_DASHBOARD' | translate }}
             </span>
           </label>
         </div>
         <div class="checkbox oppia-checkbox">
-          <label>
+          <label tabindex="0">
             <input type="radio"
                    [(ngModel)]="defaultDashboard"
                    value="{{ DASHBOARD_TYPE_LEARNER }}"
                    (change)="saveDefaultDashboard(defaultDashboard)"
                    class="e2e-test-learner-dashboard-radio"
                    attr.aria-label="{{ 'I18N_PREFERENCES_PREFERRED_DASHBOARD' | translate }}, {{ 'I18N_TOPNAV_LEARNER_DASHBOARD' | translate }}">
-            <span>
+            <span aria-hidden="true">
               {{ 'I18N_TOPNAV_LEARNER_DASHBOARD' | translate }}
             </span>
           </label>
         </div>
         <div class="checkbox oppia-checkbox">
-          <label>
+          <label tabindex="0">
             <input type="radio"
                    [(ngModel)]="defaultDashboard"
                    value="{{ DASHBOARD_TYPE_CONTRIBUTOR }}"
                    (change)="saveDefaultDashboard(defaultDashboard)"
                    class="e2e-test-contributor-dashboard-radio"
                    attr.aria-label="{{ 'I18N_PREFERENCES_PREFERRED_DASHBOARD' | translate }}, {{ 'I18N_TOPNAV_CONTRIBUTOR_DASHBOARD' | translate }}">
-            <span>
+            <span aria-hidden="true">
               {{ 'I18N_TOPNAV_CONTRIBUTOR_DASHBOARD' | translate }}
             </span>
           </label>
@@ -133,7 +136,10 @@
     </div>
 
     <div class="form-group row">
-      <label for="label-target-interests-dropdown" class="col-lg-4 col-md-4 col-sm-4">
+      <label for="label-target-interests-dropdown"
+             class="col-lg-4 col-md-4 col-sm-4"
+             tabindex="0"
+             [attr.aria-label]="('I18N_PREFERENCES_SUBJECT_INTERESTS' | translate) + ('I18N_PREFERENCES_SUBJECT_INTERESTS_HELP_BLOCK' | translate)">
         {{ 'I18N_PREFERENCES_SUBJECT_INTERESTS' | translate }}
       </label>
       <div class="col-lg-8 col-md-8 col-sm-8">
@@ -149,11 +155,11 @@
     </div>
 
     <div class="form-group row">
-      <label class="col-lg-4 col-md-4 col-sm-4">
+      <label class="col-lg-4 col-md-4 col-sm-4" tabindex="0">
         {{ 'I18N_PREFERENCES_SUBSCRIBED_CREATORS' | translate }}
       </label>
       <div class="col-lg-8 col-md-8 col-sm-8">
-        <span *ngIf="subscriptionList?.length === 0" class="form-text oppia-form-text">
+        <span *ngIf="subscriptionList?.length === 0" class="form-text oppia-form-text" tabindex="0">
           {{ 'I18N_PREFERENCES_NO_SUBSCRIPTIONS' | translate }}
         </span>
         <mat-grid-list *ngIf="subscriptionList?.length > 0" cols="2" rowHeight="100px">
@@ -162,6 +168,7 @@
               <a class="oppia-subscription-profile-link"
                  href="/profile/{{ subscription.creator_username }}"
                  [smartRouterLink]="'/profile/' + subscription.creator_username"
+                 tabindex="0"
                  rel="noopener"
                  target="_blank">
                 <picture>
@@ -198,7 +205,9 @@
     </div>
 
     <div class="form-group row">
-      <label class="col-lg-4 col-md-4 col-sm-4">
+      <label class="col-lg-4 col-md-4 col-sm-4"
+             tabindex="0"
+             [attr.aria-label]="('I18N_PREFERENCES_PREFERRED_EXPLORATION_LANGUAGE' | translate) + ('I18N_PREFERENCES_PREFERRED_EXPLORATION_LANGUAGE_EXPLAIN' | translate)">
         {{ 'I18N_PREFERENCES_PREFERRED_EXPLORATION_LANGUAGE' | translate }}
       </label>
       <div class="col-lg-8 col-md-8 col-sm-8">
@@ -219,7 +228,9 @@
     </div>
 
     <div class="form-group row">
-      <label class="col-lg-4 col-md-4 col-sm-4">
+      <label class="col-lg-4 col-md-4 col-sm-4"
+             tabindex="0"
+             [attr.aria-label]="('I18N_PREFERENCES_PREFERRED_SITE_LANGUAGE' | translate) + ('I18N_PREFERENCES_PREFERRED_SITE_LANGUAGE_EXPLAIN' | translate)">
         {{ 'I18N_PREFERENCES_PREFERRED_SITE_LANGUAGE' | translate }}
       </label>
       <div class="col-lg-8 col-md-8 col-sm-8">
@@ -241,7 +252,9 @@
     </div>
 
     <div class="form-group row">
-      <label class="col-lg-4 col-md-4 col-sm-4">
+      <label class="col-lg-4 col-md-4 col-sm-4"
+             tabindex="0"
+             [attr.aria-label]="('I18N_PREFERENCES_PREFERRED_AUDIO_LANGUAGE' | translate) + ('I18N_PREFERENCES_PREFERRED_AUDIO_LANGUAGE_EXPLAIN' | translate)">
         {{ "I18N_PREFERENCES_PREFERRED_AUDIO_LANGUAGE" | translate }}
       </label>
       <div class="col-lg-8 col-md-8 col-sm-8">
@@ -263,15 +276,14 @@
     </div>
     <hr>
     <div role="form" class="form-group row">
-      <label class="col-lg-4 col-md-4 col-sm-4">
+      <label class="col-lg-4 col-md-4 col-sm-4" tabindex="0">
         {{ 'I18N_PREFERENCES_EMAIL' | translate }}
       </label>
       <div class="col-lg-8 col-md-8 col-sm-8">
-        {{ email }}
-        <span class="help-block oppia-form-text">
-          {{ 'I18N_PREFERENCES_EMAIL_EXPLAIN' | translate }}
+        <span class="help-block oppia-form-text" tabindex="0">
+          {{ email }} {{ 'I18N_PREFERENCES_EMAIL_EXPLAIN' | translate }}
         </span>
-        <div>
+        <div tabindex="0">
           <i>
             <span class="help-block oppia-form-text">
               {{ 'I18N_PREFERENCES_EMAIL_CLARIFICATION' | translate }}
@@ -341,7 +353,10 @@
         {{ 'I18N_DELETE_ACCOUNT_PAGE_HEADING' | translate }}
       </label>
       <div class="col-lg-8 col-md-8 col-sm-8">
-        <a href="/delete-account" class="preferences-page-tab-focus" [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.DELETE_ACCOUNT.ROUTE">
+        <a href="/delete-account"
+           [attr.aria-label]="('I18N_DELETE_ACCOUNT_PAGE_HEADING' | translate) + ('I18N_DELETE_ACCOUNT_PAGE_REDIRECT_INFO' | translate)"
+           class="preferences-page-tab-focus"
+           [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.DELETE_ACCOUNT.ROUTE">
           <button tabindex="-1" type="button" class="btn btn-danger e2e-test-delete-account-button">
             {{ 'I18N_DELETE_ACCOUNT_PAGE_HEADING' | translate }}
           </button>
@@ -359,7 +374,10 @@
         {{ 'I18N_PREFERENCES_EXPORT_ACCOUNT' | translate }}
       </label>
       <div class="col-lg-8 col-md-8 col-sm-8" *ngIf="!exportingData">
-        <a href="/export-account-handler" tabindex="0" class="preferences-page-tab-focus">
+        <a href="/export-account-handler"
+           tabindex="0"
+           [attr.aria-label]="('I18N_PREFERENCES_EXPORT_ACCOUNT' | translate) + ('I18N_PREFERENCES_EXPORT_ACCOUNT_INFO_TEXT' | translate)"
+           class="preferences-page-tab-focus">
           <button type="button"
                   class="btn btn-primary e2e-test-export-account-button"
                   title="Export account"
