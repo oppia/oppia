@@ -30,7 +30,7 @@ describe('TranslatedContent', () => {
   });
 
   it('should create a translated content object from backend dict', () => {
-    let translatedContent = TranslatedContent.createFromBackendDict(
+    const translatedContent = TranslatedContent.createFromBackendDict(
       translatedContentBackendDict
     );
 
@@ -38,7 +38,7 @@ describe('TranslatedContent', () => {
   });
 
   it('should mark translated content needs update', () => {
-    let translatedContent = TranslatedContent.createFromBackendDict(
+    const translatedContent = TranslatedContent.createFromBackendDict(
       translatedContentBackendDict);
     expect(translatedContent.needsUpdate).toBeFalse();
 
@@ -52,7 +52,7 @@ describe('TranslatedContent', () => {
       translatedContentBackendDict);
     expect(translatedContent.isHtml()).toBeTrue();
 
-    let newTranslatedContentBackendDict = {
+    const newTranslatedContentBackendDict = {
       content_value: ['<p>Translated html</p>'],
       content_format: 'set_of_normalized_string',
       needs_update: false,
@@ -67,7 +67,7 @@ describe('TranslatedContent', () => {
       translatedContentBackendDict);
     expect(translatedContent.isUnicode()).toBeFalse();
 
-    let newTranslatedContentBackendDict = {
+    const newTranslatedContentBackendDict = {
       content_value: 'Translated unicode',
       content_format: 'unicode',
       needs_update: false,
@@ -82,7 +82,7 @@ describe('TranslatedContent', () => {
       translatedContentBackendDict);
     expect(translatedContent.isSetOfStrings()).toBeFalse();
 
-    let newTranslatedContentBackendDict = {
+    const newTranslatedContentBackendDict = {
       content_value: ['<p>Translated html</p>'],
       content_format: 'set_of_normalized_string',
       needs_update: false,
@@ -90,5 +90,11 @@ describe('TranslatedContent', () => {
     translatedContent = TranslatedContent.createFromBackendDict(
       newTranslatedContentBackendDict);
     expect(translatedContent.isSetOfStrings()).toBeTrue();
+  });
+
+  it('should throw an error if dataFormat is not present' +
+  ' in DATA_FORMAT_TO_DEFAULT_VALUES', () => {
+    expect(() => TranslatedContent.createNew(
+      'unicodex')).toThrowError('Invalid translation data format: unicodex');
   });
 });

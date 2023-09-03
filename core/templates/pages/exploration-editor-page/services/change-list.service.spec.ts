@@ -26,6 +26,7 @@ import { ExplorationDataService } from './exploration-data.service';
 import { AutosaveInfoModalsService } from './autosave-info-modals.service';
 import { AlertsService } from 'services/alerts.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
+import { TranslatedContent } from 'domain/exploration/TranslatedContentObjectFactory';
 
 class MockWindowRef {
   _window = {
@@ -255,6 +256,51 @@ describe('Change List Service when changes are mergable', () => {
     changeListService.removeTranslations('content_id_1');
     flush();
     expect(saveSpy).toHaveBeenCalled();
+  }));
+
+  it('should add change for edit translations', fakeAsync(() => {
+    changeListService.changeListAddedTimeoutId = setTimeout(() => { }, 10);
+    changeListService.explorationChangeList.length = 0;
+    changeListService.loadingMessage = '';
+    let saveSpy = spyOn(
+      changeListService.autosaveInProgressEventEmitter, 'emit')
+      .and.callThrough();
+
+    changeListService.editTranslation(
+      'content_id_1', 'en', new TranslatedContent(
+        'Translated content', 'unicode', false));
+    flush();
+    expect(saveSpy).toHaveBeenCalled();
+    expect(changeListService.explorationChangeList.length).toEqual(1);
+  }));
+
+  it('should get all translation changelist', fakeAsync(() => {
+    changeListService.changeListAddedTimeoutId = setTimeout(() => { }, 10);
+    changeListService.explorationChangeList.length = 0;
+    changeListService.loadingMessage = '';
+    spyOn(
+      changeListService.autosaveInProgressEventEmitter, 'emit')
+      .and.callThrough();
+
+    changeListService.editTranslation(
+      'content_id_1', 'en', new TranslatedContent(
+        'Translated content', 'unicode', false));
+    changeListService.addState(
+      'state_2', 'content_id_2', 'content_id_default');
+    changeListService.removeTranslations('content_id_3');
+    changeListService.markTranslationsAsNeedingUpdate('content_id_4');
+    flush();
+
+    expect(changeListService.explorationChangeList.length).toEqual(4);
+    const translationChangeList = changeListService.getTranslationChangeList();
+    expect(translationChangeList.length).toEqual(3);
+    expect(
+      translationChangeList.map(change => change.cmd)).toEqual(
+      jasmine.arrayWithExactContents([
+        'remove_translations',
+        'edit_translation',
+        'mark_translations_needs_update'
+      ]));
   }));
 
   it('should save changes after renaming a state ' +

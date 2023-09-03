@@ -18,7 +18,7 @@
 
 import { EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { ComponentFixture, discardPeriodicTasks, fakeAsync, flush, TestBed, waitForAsync } from '@angular/core/testing';
+import { ComponentFixture, discardPeriodicTasks, fakeAsync, flush, TestBed, tick, waitForAsync } from '@angular/core/testing';
 import { LanguageUtilService } from 'domain/utilities/language-util.service';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
 import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
@@ -34,6 +34,10 @@ import { WindowRef } from 'services/contextual/window-ref.service';
 import { ContextService } from 'services/context.service';
 import { EntityTranslationsService } from 'services/entity-translations.services';
 import { UserExplorationPermissionsService } from '../../services/user-exploration-permissions.service';
+import { ChangeListService } from '../../services/change-list.service';
+import { EntityTranslation } from 'domain/translation/EntityTranslationObjectFactory';
+import { TranslatedContent } from 'domain/exploration/TranslatedContentObjectFactory';
+
 
 class MockNgbModal {
   open() {
@@ -59,6 +63,9 @@ describe('Translator Overview component', () => {
   let routerService: RouterService;
   let entityTranslationsService: EntityTranslationsService;
   let userExplorationPermissionsService: UserExplorationPermissionsService;
+  let changeListService: ChangeListService;
+  let windowRef: WindowRef;
+  let entityTranslation: EntityTranslation;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -98,6 +105,8 @@ describe('Translator Overview component', () => {
     entityTranslationsService = TestBed.inject(EntityTranslationsService);
     userExplorationPermissionsService = TestBed.inject(
       UserExplorationPermissionsService);
+    changeListService = TestBed.inject(ChangeListService);
+    windowRef = TestBed.inject(WindowRef);
 
     spyOn(translationTabActiveModeService, 'isTranslationModeActive').and
       .returnValue(true);
@@ -111,18 +120,93 @@ describe('Translator Overview component', () => {
 
     component.ngOnInit();
     fixture.detectChanges();
+    tick();
 
     flush();
     discardPeriodicTasks();
-    expect(
-      entityTranslationsService.getEntityTranslationsAsync
-    ).toHaveBeenCalled();
   }));
 
   afterEach(fakeAsync(() => {
     flush();
     discardPeriodicTasks();
   }));
+
+  describe('when change list contains changes', () => {
+    beforeEach(() => {
+      entityTranslation = new EntityTranslation(
+        'entityId', 'entityType', 1, 'hi', {
+          content1: new TranslatedContent(
+            'translated content', 'html', false)
+        }
+      );
+      entityTranslationsService.languageCodeToEntityTranslations = {
+        hi: entityTranslation
+      };
+      spyOn(
+        windowRef.nativeWindow.localStorage, 'getItem').and.returnValue('hi');
+      entityTranslationsService.getEntityTranslationsAsync = (
+        jasmine.createSpy().and.returnValue(Promise.resolve(entityTranslation))
+      );
+    });
+    it('should update entity translations with edit translation changes',
+      fakeAsync(() => {
+        expect(
+          entityTranslationsService.getHtmlTranslations('hi', ['content1'])
+        ).toEqual(['translated content']);
+
+        spyOn(changeListService, 'getTranslationChangeList').and.returnValue([{
+          cmd: 'edit_translation',
+          content_id: 'content1',
+          language_code: 'hi',
+          translation: {
+            content_value: 'new translation',
+            content_format: 'html',
+            needs_update: false
+          }
+        }]);
+
+        component.ngOnInit();
+        tick();
+
+        expect(
+          entityTranslationsService.getHtmlTranslations('hi', ['content1'])
+        ).toEqual(['new translation']);
+      }));
+
+    it('should handle mark needs update translation changes',
+      fakeAsync(() => {
+        let translatedContent = entityTranslation.getWrittenTranslation(
+          'content1') as TranslatedContent;
+        expect(translatedContent.needsUpdate).toBeFalse();
+
+        spyOn(changeListService, 'getTranslationChangeList').and.returnValue([{
+          cmd: 'mark_translations_needs_update',
+          content_id: 'content1',
+        }]);
+
+        component.ngOnInit();
+        tick();
+
+        translatedContent = entityTranslation.getWrittenTranslation(
+          'content1') as TranslatedContent;
+        expect(translatedContent.needsUpdate).toBeTrue();
+      }));
+
+    it('should update entity translations with remove translation changes',
+      fakeAsync(() => {
+        expect(entityTranslation.hasWrittenTranslation('content1')).toBeTrue();
+
+        spyOn(changeListService, 'getTranslationChangeList').and.returnValue([{
+          cmd: 'remove_translations',
+          content_id: 'content1',
+        }]);
+
+        component.ngOnInit();
+        tick();
+
+        expect(entityTranslation.hasWrittenTranslation('content1')).toBeFalse();
+      }));
+  });
 
   it('should initialize component properties after controller is initialized',
     () => {

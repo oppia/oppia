@@ -348,34 +348,7 @@
     <oppia-audio-translation-bar [isTranslationTabBusy]="isTranslationTabBusy"></oppia-audio-translation-bar>
   </div>
   <div *ngIf="!isVoiceoverModeActive()">
-    <div class="oppia-state-content-header">Translated content</div>
-    <div class="translated-state-contents">
-      <div class="translation-state-content oppia-transition-200"
-           [ngClass]="oppia-prevent-selection"
-           title="Translated Content">
-        <span class="oppia-placeholder" *ngIf="!activeTranslatedContent || activeTranslatedContent.translation === ''">
-          This section has not been translated yet.
-        </span>
-        <span *ngIf="activeTranslatedContent">
-          <oppia-rte-output-display *ngIf="activeTranslatedContent.isHtml()"
-                                    [rteString]="activeTranslatedContent.translation"
-                                    class="oppia-rte-editor e2e-test-translation-display">
-          </oppia-rte-output-display>
-          <p *ngIf="activeTranslatedContent.isUnicode()">
-            {{activeTranslatedContent.translation}}
-          </p>
-          <ul *ngIf="activeTranslatedContent.isSetOfStrings()">
-            <li *ngFor="let item of activeTranslatedContent.translation; index as index">
-              {{item}}
-            </li>
-          </ul>
-          <p
-            *ngIf="!activeTranslatedContent.isUnicode() && !activeTranslatedContent.isHtml() && !activeTranslatedContent.isSetOfStrings()">
-            <strong>ERROR:</strong> Unsupported translation data format.
-          </p>
-        </span>
-      </div>
-    </div>
+    <oppia-state-translation-editor></oppia-state-translation-editor>
   </div>
 </div>
 

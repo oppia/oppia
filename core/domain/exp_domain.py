@@ -122,6 +122,7 @@ DEPRECATED_CMD_MARK_WRITTEN_TRANSLATION_AS_NEEDING_UPDATE: Final = (
 DEPRECATED_CMD_MARK_WRITTEN_TRANSLATIONS_AS_NEEDING_UPDATE: Final = (
     'mark_written_translations_as_needing_update')
 CMD_MARK_TRANSLATIONS_NEEDS_UPDATE: Final = 'mark_translations_needs_update'
+CMD_EDIT_TRANSLATION: Final = 'edit_translation'
 # This takes additional 'content_id' parameters.
 CMD_REMOVE_TRANSLATIONS: Final = 'remove_translations'
 # This takes additional 'property_name' and 'new_value' parameters.
@@ -394,6 +395,14 @@ class ExplorationChange(change_domain.BaseChange):
     }, {
         'name': CMD_MARK_TRANSLATIONS_NEEDS_UPDATE,
         'required_attribute_names': ['content_id'],
+        'optional_attribute_names': [],
+        'user_id_attribute_names': [],
+        'allowed_values': {},
+        'deprecated_values': {}
+    }, {
+        'name': CMD_EDIT_TRANSLATION,
+        'required_attribute_names': [
+            'content_id', 'language_code', 'translation'],
         'optional_attribute_names': [],
         'user_id_attribute_names': [],
         'allowed_values': {},
@@ -887,6 +896,16 @@ class TransientCheckpointUrlDict(TypedDict):
     furthest_reached_checkpoint_exp_version: int
     most_recently_reached_checkpoint_state_name: str
     most_recently_reached_checkpoint_exp_version: int
+
+
+class EditTranslationsChangesCmd(ExplorationChange):
+    """Class representing the ExplorationChange's
+    CMD_EDIT_TRANSLATION command.
+    """
+
+    language_code: str
+    content_id: str
+    translation: feconf.TranslatedContentDict
 
 
 class TransientCheckpointUrl:
