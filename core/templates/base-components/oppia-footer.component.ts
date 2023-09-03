@@ -40,6 +40,7 @@ export class OppiaFooterComponent {
   name: string | null = null;
   siteFeedbackFormUrl: string = AppConstants.SITE_FEEDBACK_FORM_URL;
   currentYear: number = new Date().getFullYear();
+  donateVolunteerSplitMessage: string[] = ['or ', ' today!'];
   PAGES_REGISTERED_WITH_FRONTEND = (
     AppConstants.PAGES_REGISTERED_WITH_FRONTEND);
 

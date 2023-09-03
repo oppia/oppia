@@ -25,6 +25,12 @@
   font-weight: 600;
 }
 
+.oppia-donate-volunteer a {
+  color: #c55f45;
+  font-size: 24px;
+  text-decoration: underline;
+}
+
 .oppia-footer-container a:focus {
   outline: 2px solid #fff;
   text-decoration: underline;
@@ -51,12 +57,6 @@
   font-weight: 400;
   line-height: 28px;
   text-transform: none;
-}
-
-.oppia-footer-container .oppia-donate-volunteer > a {
-  color: #c55f45;
-  font-size: 24px;
-  text-decoration: underline;
 }
 
 .oppia-footer-container ul {
