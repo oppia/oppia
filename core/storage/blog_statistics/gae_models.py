@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Models for storing statsistics data related to blog posts."""
+"""Models for storing statistics data related to blog posts."""
 
 from __future__ import annotations
 
