@@ -301,12 +301,15 @@ class BlogPostViewsAggregatedStatsModel(base_models.BaseModel):
     @classmethod
     def create(cls, blog_post_id: str) -> BlogPostViewsAggregatedStatsModel:
         """Creates a new BlogPostViewsAggregatedStatsModel entry.
+
         Args:
             blog_post_id: str. Blog Post ID of the newly-published blog post for
                 which the stats model has to be created.
+
         Returns:
             BlogPostViewsAggregatedStatsModel. The newly created
             BlogPostViewsAggregatedStatsModel instance.
+
         Raises:
             Exception. A views stats model with the given blog post ID exists
                 already.
@@ -378,12 +381,15 @@ class BlogPostReadsAggregatedStatsModel(base_models.BaseModel):
     @classmethod
     def create(cls, blog_post_id: str) -> BlogPostReadsAggregatedStatsModel:
         """Creates a new BlogPostReadsAggregatedStatsModel entry.
+
         Args:
             blog_post_id: str. Blog Post ID of the newly-published blog post for
                 which the stats model has to be created.
+
         Returns:
             BlogPostReadsAggregatedStatsModel. The newly created
             BlogPostReadsAggregatedStatsModel instance.
+
         Raises:
             Exception. A reads stats model with the given blog post ID exists
                 already.
@@ -480,12 +486,15 @@ class BlogPostReadingTimeModel(base_models.BaseModel):
     @classmethod
     def create(cls, blog_post_id: str) -> BlogPostReadingTimeModel:
         """Creates a new BlogPostReadingTimeModel entry.
+
         Args:
             blog_post_id: str. Blog Post ID of the newly-published blog post for
                 which the stats model has to be created.
+
         Returns:
             BlogPostReadingTimeModel. The newly created BlogPostReadingTimeModel
             instance.
+
         Raises:
             Exception. A reading time model with the given blog post ID exists
                 already.
@@ -568,11 +577,16 @@ class AuthorBlogPostViewsAggregatedStatsModel(base_models.BaseModel):
     @classmethod
     def create(cls, author_id: str) -> AuthorBlogPostViewsAggregatedStatsModel:
         """Creates a new AuthorBlogPostViewsAggregatedStatsModel entry.
+
         Args:
             author_id: str. User ID of the author.
+
         Returns:
             AuthorBlogPostViewsAggregatedStatsModel. The newly created
             AuthorBlogPostViewsAggregatedStatsModel instance.
+        Raises:  AuthorBlogPostViewsAggregatedStatsModel. The newly created
+            AuthorBlogPostViewsAggregatedStatsModel instance.
+
         Raises:
             Exception. A views stats model with the given author ID exists
                 already.
@@ -596,8 +610,10 @@ class AuthorBlogPostViewsAggregatedStatsModel(base_models.BaseModel):
     @classmethod
     def has_reference_to_user_id(cls, user_id: str) -> bool:
         """Check whether author blog post views stats model references user.
+
         Args:
             user_id: str. The ID of the user whose data should be checked.
+
         Returns:
             bool. Whether any models refer to the given user ID.
         """
@@ -682,8 +698,10 @@ class AuthorBlogPostAggregatedReadingTimeModel(base_models.BaseModel):
     @classmethod
     def has_reference_to_user_id(cls, user_id: str) -> bool:
         """Check whether author blog post reads stats model references user.
+
         Args:
             user_id: str. The ID of the user whose data should be checked.
+
         Returns:
             bool. Whether any models refer to the given user ID.
         """
@@ -694,11 +712,14 @@ class AuthorBlogPostAggregatedReadingTimeModel(base_models.BaseModel):
         cls, author_id: str
     ) -> AuthorBlogPostAggregatedReadingTimeModel:
         """Creates a new AuthorBlogPostAggregatedReadingTimeModel entry.
+
         Args:
             author_id: str. User ID of the author.
+
         Returns:
             AuthorBlogPostAggregatedReadingTimeModel. The newly created
             AuthorBlogPostAggregatedReadingTimeModel instance.
+
         Raises:
             Exception. A reading time model with the given author ID exists
                 already.
@@ -782,11 +803,14 @@ class AuthorBlogPostReadsAggregatedStatsModel(base_models.BaseModel):
     @classmethod
     def create(cls, author_id: str) -> AuthorBlogPostReadsAggregatedStatsModel:
         """Creates a new AuthorBlogPostReadsAggregatedStatsModel entry.
+
         Args:
             author_id: str. User ID of author.
+
         Returns:
             AuthorBlogPostReadsAggregatedStatsModel. The newly created
             AuthorBlogPostReadsAggregatedStatsModel instance.
+
         Raises:
             Exception. A reads stats model with the given author ID exists
                 already.
@@ -810,8 +834,10 @@ class AuthorBlogPostReadsAggregatedStatsModel(base_models.BaseModel):
     @classmethod
     def has_reference_to_user_id(cls, user_id: str) -> bool:
         """Check whether author blog post reads stats model references user.
+
         Args:
             user_id: str. The ID of the user whose data should be checked.
+
         Returns:
             bool. Whether any models refer to the given user ID.
         """

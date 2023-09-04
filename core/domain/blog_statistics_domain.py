@@ -23,7 +23,8 @@ import datetime
 from core import utils
 from core.constants import constants
 
-from typing import Dict, TypedDict, Union
+from typing import Dict
+
 
 class BlogPostViewsAggregatedStats:
     """Domain object representing blog post views aggregated stats model."""
@@ -37,6 +38,7 @@ class BlogPostViewsAggregatedStats:
         created_on: datetime.datetime
     ) -> None:
         """Constructs an BlogPostViewsAggregatedStats domain object.
+
         Args:
             blog_post_id: str. ID of the blog post.
             views_by_hour: Dict. It will consist of a dict of dictionaries where
@@ -60,6 +62,7 @@ class BlogPostViewsAggregatedStats:
 
     def validate(self) -> None:
         """Checks whether the blog post id is a valid one.
+
         Raises:
             ValidationError. No blog_post_id specified.
             ValidationError. The blog_post_id is not a string.
@@ -89,6 +92,7 @@ class BlogPostReadsAggregatedStats:
         created_on: datetime.datetime
     ) -> None:
         """Constructs an BlogPostReadsAggregatedStats domain object.
+
         Args:
             blog_post_id: str. ID of the blog post.
             reads_by_hour: Dict. It will consist of a dict of dictionaries where
@@ -112,6 +116,7 @@ class BlogPostReadsAggregatedStats:
 
     def validate(self) -> None:
         """Checks whether the blog post id is a valid one.
+
         Raises:
             ValidationError. No blog_post_id specified.
             ValidationError. The blog_post_id is not a string.
@@ -148,6 +153,7 @@ class BlogPostReadingTime:
         more_than_ten_min: int,
     ) -> None:
         """Constructs an BlogPostReadingTime domain object.
+
         Args:
             blog_post_id: str. ID of the blog post.
             zero_to_one_min: int. Number of user taking less than a minute to
@@ -188,6 +194,7 @@ class BlogPostReadingTime:
 
     def validate(self) -> None:
         """Checks whether the blog post id is a valid one.
+
         Raises:
             ValidationError. No blog_post_id specified.
             ValidationError. The blog_post_id is not a string.
@@ -219,6 +226,7 @@ class AuthorBlogPostViewsAggregatedStats:
         created_on: datetime.datetime
     ) -> None:
         """Constructs an AuthorBlogPostViewsAggregatedStats domain object.
+
         Args:
             author_id: str. User ID of the author.
             views_by_hour: Dict. It will consist of a dict of dictionaries where
@@ -243,6 +251,7 @@ class AuthorBlogPostViewsAggregatedStats:
 
     def validate(self) -> None:
         """Checks whether the blog post id is a valid one.
+
         Raises:
             ValidationError. No author_id specified.
             ValidationError. The author_id is not a string.
@@ -274,6 +283,7 @@ class AuthorBlogPostReadsAggregatedStats:
         created_on: datetime.datetime
     ) -> None:
         """Constructs an AuthorBlogPostReadsAggregatedStats domain object.
+
         Args:
             author_id: str. ID of the author.
             reads_by_hour: Dict. It will consist of a dict of dictionaries where
@@ -298,6 +308,7 @@ class AuthorBlogPostReadsAggregatedStats:
 
     def validate(self) -> None:
         """Checks whether the blog post id is a valid one.
+
         Raises:
             ValidationError. No author_id specified.
             ValidationError. The author_id is not a string.
@@ -334,6 +345,7 @@ class AuthorBlogPostsReadingTime:
         more_than_ten_min: int,
     ) -> None:
         """Constructs an BlogPostReadingTime domain object.
+
         Args:
             author_id: str. User ID of the author.
             zero_to_one_min: int. Number of user taking less than a minute to
@@ -374,6 +386,7 @@ class AuthorBlogPostsReadingTime:
 
     def validate(self) -> None:
         """Checks whether the author id is a valid one.
+
         Raises:
             ValidationError. No author_id specified.
             ValidationError. The author_id is not a string.

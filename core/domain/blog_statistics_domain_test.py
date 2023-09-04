@@ -25,16 +25,18 @@ from core.domain import blog_statistics_domain
 from core.platform import models
 from core.tests import test_utils
 
-
 from typing import Final
 
 MYPY = False
 if MYPY: # pragma: no cover
+    from mypy_imports import blog_models
     from mypy_imports import blog_stats_models
 
-(blog_stats_models) = models.Registry.import_models(
-    [models.Names.BLOG_STATISTICS]
-)
+
+(blog_stats_models, blog_models) = models.Registry.import_models([
+    models.Names.BLOG_STATISTICS, models.Names.BLOG
+])
+
 
 class AuthorBlogPostsReadingTimeDomainUnitTests(test_utils.GenericTestBase):
     """Tests for author blog post reading time domain objects."""
@@ -90,6 +92,7 @@ class AuthorBlogPostsReadingTimeDomainUnitTests(test_utils.GenericTestBase):
         self._assert_valid_reading_time_stats_domain_obj(
             'Author ID must be a string, but got 1234'
         )
+
 
 class BlogPostsReadingTimeDomainUnitTests(test_utils.GenericTestBase):
     """Tests for blog post reading time domain objects."""
@@ -150,6 +153,7 @@ class BlogPostsReadingTimeDomainUnitTests(test_utils.GenericTestBase):
 class AuthorBlogPostsReadsStatsDomainUnitTests(test_utils.GenericTestBase):
     """Tests for author blog post reads stats domain object."""
 
+    MOCK_DATE: Final = datetime.datetime(2021, 9, 20).replace(hour=6)
 
     def setUp(self) -> None:
         """Set up for testing blog post reading domain object."""
@@ -207,6 +211,8 @@ class AuthorBlogPostsReadsStatsDomainUnitTests(test_utils.GenericTestBase):
 
 class AuthorBlogPostsViewsStatsDomainUnitTests(test_utils.GenericTestBase):
     """Tests for author blog post views stats domain object."""
+
+    MOCK_DATE: Final = datetime.datetime(2021, 9, 20)
 
     def setUp(self) -> None:
         """Set up for testing blog post reading domain object."""
@@ -267,6 +273,8 @@ class AuthorBlogPostsViewsStatsDomainUnitTests(test_utils.GenericTestBase):
 class BlogPostsReadsStatsDomainUnitTests(test_utils.GenericTestBase):
     """Tests for blog post reads stats domain object."""
 
+    MOCK_DATE: Final = datetime.datetime(2021, 9, 20)
+
     def setUp(self) -> None:
         """Set up for testing blog post reads stats domain object."""
         super().setUp()
@@ -320,8 +328,11 @@ class BlogPostsReadsStatsDomainUnitTests(test_utils.GenericTestBase):
             'Blog Post ID must be a string, but got 1234'
         )
 
+
 class BlogPostsViewsStatsDomainUnitTests(test_utils.GenericTestBase):
     """Tests for blog post views stats domain object."""
+
+    MOCK_DATE: Final = datetime.datetime(2021, 9, 20)
 
     def setUp(self) -> None:
         """Set up for testing blog post views stats domain object."""
