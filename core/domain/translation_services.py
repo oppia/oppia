@@ -26,7 +26,7 @@ from core.domain import translation_domain
 from core.domain import translation_fetchers
 from core.platform import models
 
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Optional, Tuple, cast
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -125,41 +125,98 @@ def add_new_translation(
     model.put()
 
 
+def _apply_changes(
+    entity_translation: translation_domain.EntityTranslation,
+    translation_changes: List[exp_domain.ExplorationChange]
+) -> None:
+    """Applies the changes to the entity_translation object.
+
+    Args:
+        entity_translation: EntityTranslation. The entity translation object.
+        translation_changes: list(ExplorationChange). The list of changes to be
+            applied.
+
+    Raises:
+        Exception. Invalid translation change cmd.
+    """
+    for change in translation_changes:
+        if change.cmd == exp_domain.CMD_EDIT_TRANSLATION:
+            # Here we use cast because we are narrowing down the type of
+            # 'change' from exp_domain.ExplorationChange to specific type of
+            # change EditTranslationsChangesCmd.
+            change = cast(
+                exp_domain.EditTranslationsChangesCmd,
+                change
+            )
+
+            if entity_translation.language_code != change.language_code:
+                continue
+            entity_translation.translations[change.content_id] = (
+                translation_domain.TranslatedContent.from_dict(
+                    change.translation
+                )
+            )
+        elif change.cmd == exp_domain.CMD_REMOVE_TRANSLATIONS:
+            entity_translation.remove_translations([change.content_id])
+        elif change.cmd == exp_domain.CMD_MARK_TRANSLATIONS_NEEDS_UPDATE:
+            entity_translation.mark_translations_needs_update(
+                [change.content_id])
+        else:
+            raise Exception(
+                'Invalid translation change cmd: %s' % change.cmd)
+
+    entity_translation.validate()
+
+
 def compute_translation_related_change(
     updated_exploration: exp_domain.Exploration,
-    content_ids_corresponding_translations_to_remove: List[str],
-    content_ids_corresponding_translations_to_mark_needs_update: List[str],
+    translation_changes: List[exp_domain.ExplorationChange]
 ) -> Tuple[List[translation_models.EntityTranslationsModel], Dict[str, int]]:
     """Cretase new EntityTranslation models corresponding to translation related
     changes.
 
     Args:
         updated_exploration: Exploration. The updated exploration object.
-        content_ids_corresponding_translations_to_remove: List[str]. The list of
-            content Ids for translation removal.
-        content_ids_corresponding_translations_to_mark_needs_update: List[str].
-            The list of content Ids to mark translation needs update.
+        translation_changes: list(ExplorationChange). The list of changes to be
+            applied.
 
     Returns:
         Tuple(list(EntityTranslationsModel), dict(str, int)). A tuple containing
         list of new EntityTranslationsModel and a dict with count of translated
         contents as value and the languages as key.
     """
-    old_translations = (
-        translation_fetchers.get_all_entity_translations_for_entity(
-            feconf.TranslatableEntityType.EXPLORATION,
-            updated_exploration.id,
-            updated_exploration.version - 1
-        ))
+    language_code_to_entity_translation = {
+        entity_translation.language_code: entity_translation
+        for entity_translation in (
+            translation_fetchers.get_all_entity_translations_for_entity(
+                feconf.TranslatableEntityType.EXPLORATION,
+                updated_exploration.id,
+                updated_exploration.version - 1
+            )
+        )
+    }
 
-    # Create new_translation_models with updated id and entity version.
+    # Create EntityTranslation object for new languages.
+    for change in translation_changes:
+        if change.cmd != exp_domain.CMD_EDIT_TRANSLATION:
+            continue
+        if change.language_code in language_code_to_entity_translation:
+            continue
+
+        language_code_to_entity_translation[change.language_code] = (
+            translation_domain.EntityTranslation.create_empty(
+                feconf.TranslatableEntityType.EXPLORATION,
+                updated_exploration.id,
+                change.language_code,
+                updated_exploration.version - 1
+            )
+        )
+
+    # Create entity_translation models for all languages.
     new_translation_models = []
     translation_counts = {}
-    for entity_translation in old_translations:
-        entity_translation.remove_translations(
-            content_ids_corresponding_translations_to_remove)
-        entity_translation.mark_translations_needs_update(
-            content_ids_corresponding_translations_to_mark_needs_update)
+    for entity_translation in language_code_to_entity_translation.values():
+        _apply_changes(entity_translation, translation_changes)
 
         translation_counts[entity_translation.language_code] = (
             updated_exploration.get_translation_count(entity_translation))
@@ -173,7 +230,6 @@ def compute_translation_related_change(
                 entity_translation.to_dict()['translations']
             )
         )
-
     return new_translation_models, translation_counts
 
 

@@ -39,6 +39,7 @@ import { Outcome, OutcomeBackendDict } from 'domain/exploration/OutcomeObjectFac
 import { RecordedVoiceOverBackendDict, RecordedVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
 import { LostChange } from 'domain/exploration/LostChangeObjectFactory';
 import { BaseTranslatableObject } from 'domain/objects/BaseTranslatableObject.model';
+import { TranslatedContent } from 'domain/exploration/TranslatedContentObjectFactory';
 
 export type StatePropertyValues = (
   AnswerGroup[] |
@@ -315,6 +316,16 @@ export class ChangeListService {
     return angular.copy(this.explorationChangeList);
   }
 
+  getTranslationChangeList(): ExplorationChange[] {
+    return angular.copy(this.explorationChangeList.filter((change) => {
+      return [
+        'edit_translation',
+        'remove_translations',
+        'mark_translations_needs_update'
+      ].includes(change.cmd);
+    }));
+  }
+
   isExplorationLockedForEditing(): boolean {
     return this.explorationChangeList.length > 0;
   }
@@ -378,6 +389,22 @@ export class ChangeListService {
     this.addChange({
       cmd: 'mark_translations_needs_update',
       content_id: contentId
+    });
+  }
+
+  /**
+   * Saves a change dict that represents editing translations.
+   */
+  editTranslation(
+      contentId: string,
+      languageCode: string,
+      translatedContent: TranslatedContent,
+  ): void {
+    this.addChange({
+      cmd: 'edit_translation',
+      language_code: languageCode,
+      content_id: contentId,
+      translation: translatedContent.toBackendDict()
     });
   }
 
