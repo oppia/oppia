@@ -144,6 +144,7 @@ class ValidModelNames(enum.Enum):
     BASE_MODEL = 'base_model'
     BEAM_JOB = 'beam_job'
     BLOG = 'blog'
+    BLOG_STATISTICS = 'blog_statistics'
     CLASSIFIER = 'classifier'
     CLASSROOM = 'classroom'
     COLLECTION = 'collection'
