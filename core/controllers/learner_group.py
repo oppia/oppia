@@ -899,7 +899,7 @@ class LearnerGroupLearnerInvitationHandler(
             },
             'is_invitation_accepted': {
                 'schema': {
-                    'type': 'basestring'
+                    'type': 'bool'
                 },
                 'default_value': 'false'
             },
@@ -918,7 +918,7 @@ class LearnerGroupLearnerInvitationHandler(
         assert self.normalized_payload is not None
         learner_username = self.normalized_payload['learner_username']
         is_invitation_accepted = (
-            self.normalized_payload['is_invitation_accepted'] == 'true')
+            self.normalized_payload['is_invitation_accepted'] is True)
         progress_sharing_permission = (
             self.normalized_payload['progress_sharing_permission'] == 'true')
 
