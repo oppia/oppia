@@ -55,7 +55,21 @@ export class EntityTranslation {
   }
 
   markTranslationAsNeedingUpdate(contentId: string): void {
+    if (!this.translationMapping.hasOwnProperty(contentId)) {
+      return;
+    }
+
     this.translationMapping[contentId].markAsNeedingUpdate();
+  }
+
+  updateTranslation(
+      contentId: string, translatedContent: TranslatedContent
+  ): void {
+    this.translationMapping[contentId] = translatedContent;
+  }
+
+  removeTranslation(contentId: string): void {
+    delete this.translationMapping[contentId];
   }
 
   hasWrittenTranslation(contentId: string): boolean {
