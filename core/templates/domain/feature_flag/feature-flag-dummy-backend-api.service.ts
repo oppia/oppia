@@ -20,8 +20,8 @@ import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
-import { PlatformFeatureDomainConstants } from
-  'domain/platform_feature/platform-feature-domain.constants';
+import { FeatureFlagDomainConstants } from
+  'domain/feature_flag/feature-flag-domain.constants';
 
 /**
  * Api service for the backend dummy handler that is gated by the
@@ -31,7 +31,7 @@ import { PlatformFeatureDomainConstants } from
 @Injectable({
   providedIn: 'root'
 })
-export class PlatformFeatureDummyBackendApiService {
+export class FeatureFlagDummyBackendApiService {
   constructor(
     private http: HttpClient,
   ) {}
@@ -45,7 +45,7 @@ export class PlatformFeatureDummyBackendApiService {
    */
   async isHandlerEnabled(): Promise<boolean> {
     try {
-      await this.http.get(PlatformFeatureDomainConstants.DUMMY_HANDLER_URL)
+      await this.http.get(FeatureFlagDomainConstants.DUMMY_HANDLER_URL)
         .toPromise();
       return true;
     // We use unknown type because we are unsure of the type of error
@@ -63,5 +63,5 @@ export class PlatformFeatureDummyBackendApiService {
 }
 
 angular.module('oppia').factory(
-  'PlatformFeatureDummyBackendApiService',
-  downgradeInjectable(PlatformFeatureDummyBackendApiService));
+  'FeatureFlagDummyBackendApiService',
+  downgradeInjectable(FeatureFlagDummyBackendApiService));

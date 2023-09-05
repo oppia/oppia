@@ -13,28 +13,28 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for PlatformFeatureDummyBackendApiService.
+ * @fileoverview Unit tests for FeatureFlagDummyBackendApiService.
  */
 
 import { HttpClientTestingModule, HttpTestingController } from
   '@angular/common/http/testing';
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
-import { PlatformFeatureDomainConstants } from
-  'domain/platform_feature/platform-feature-domain.constants';
-import { PlatformFeatureDummyBackendApiService } from
-  'domain/platform_feature/platform-feature-dummy-backend-api.service';
+import { FeatureFlagDomainConstants } from
+  'domain/feature_flag/feature-flag-domain.constants';
+import { FeatureFlagDummyBackendApiService } from
+  'domain/feature_flag/feature-flag-dummy-backend-api.service';
 
-describe('PlatformFeatureDummyBackendApiService', () => {
+describe('FeatureFlagDummyBackendApiService', () => {
   let httpTestingController: HttpTestingController;
-  let apiService: PlatformFeatureDummyBackendApiService;
+  let apiService: FeatureFlagDummyBackendApiService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule]
     });
 
-    apiService = TestBed.get(PlatformFeatureDummyBackendApiService);
+    apiService = TestBed.get(FeatureFlagDummyBackendApiService);
     httpTestingController = TestBed.get(HttpTestingController);
   });
 
@@ -51,7 +51,7 @@ describe('PlatformFeatureDummyBackendApiService', () => {
         .then(successHandler, failHandler);
 
       httpTestingController
-        .expectOne(PlatformFeatureDomainConstants.DUMMY_HANDLER_URL)
+        .expectOne(FeatureFlagDomainConstants.DUMMY_HANDLER_URL)
         .flush({ msg: 'ok' });
 
       flushMicrotasks();
@@ -68,7 +68,7 @@ describe('PlatformFeatureDummyBackendApiService', () => {
         .then(successHandler, failHandler);
 
       httpTestingController
-        .expectOne(PlatformFeatureDomainConstants.DUMMY_HANDLER_URL)
+        .expectOne(FeatureFlagDomainConstants.DUMMY_HANDLER_URL)
         .flush('Mock 404 Error', {
           status: 404,
           statusText: 'Not Found'
@@ -88,7 +88,7 @@ describe('PlatformFeatureDummyBackendApiService', () => {
         .then(successHandler, failHandler);
 
       httpTestingController
-        .expectOne(PlatformFeatureDomainConstants.DUMMY_HANDLER_URL)
+        .expectOne(FeatureFlagDomainConstants.DUMMY_HANDLER_URL)
         .flush('Mock 500 Error', {
           status: 500,
           statusText: 'Some internal server error.'

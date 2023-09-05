@@ -12,86 +12,36 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Controllers for the platform feature handlers."""
+"""Controllers for the feature flags handlers."""
 
 from __future__ import annotations
 
 from core import feconf
 from core import platform_feature_list
-from core import utils
-from core.constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
-from core.domain import platform_feature_services
-from core.domain import platform_parameter_domain
+from core.domain import feature_flag_services
 
-from typing import Dict, Optional, TypedDict
-
-
-class PlatformFeaturesEvaluationHandlerNormalizedRequestDict(TypedDict):
-    """Dict representation of PlatformFeaturesEvaluationHandler's
-    normalized_request dictionary.
-    """
-
-    platform_type: Optional[str]
-    app_version: Optional[str]
+from typing import Dict
 
 
 class PlatformFeaturesEvaluationHandler(
-    base.BaseHandler[
-        Dict[str, str],
-        PlatformFeaturesEvaluationHandlerNormalizedRequestDict
-    ]
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
 ):
     """The handler for retrieving feature flag values."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
-    HANDLER_ARGS_SCHEMAS = {
-        'GET': {
-            'platform_type': {
-                'schema': {
-                    'type': 'basestring'
-                },
-                'default_value': None
-            },
-            'app_version': {
-                'schema': {
-                    'type': 'basestring',
-                    'validators': [{
-                        'id': 'is_regex_matched',
-                        'regex_pattern': (
-                            constants.
-                            PLATFORM_PARAMETER_APP_VERSION_WITH_HASH_REGEXP
-                        )
-                    }]
-                },
-                'default_value': None
-            }
-        }
-    }
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.open_access
     def get(self) -> None:
-        """Handles GET requests. Evaluates and returns all feature flags using
-        the given client information.
+        """Handles GET requests. Evaluates and returns all feature flags.
         """
-        assert self.normalized_request is not None
-        context_dict: platform_parameter_domain.ClientSideContextDict = {
-            'platform_type': self.normalized_request.get('platform_type'),
-            'app_version': self.normalized_request.get('app_version'),
-        }
-        context = (
-            platform_feature_services.create_evaluation_context_for_client(
-                context_dict))
-        try:
-            context.validate()
-        except utils.ValidationError as e:
-            raise self.InvalidInputException(e)
-
         result_dict = (
-            platform_feature_services
-            .evaluate_all_feature_flag_values_for_client(context))
+            feature_flag_services.evaluate_all_feature_flag_values(
+                self.user_id)
+        )
 
         self.render_json(result_dict)
 
@@ -110,8 +60,8 @@ class PlatformFeatureDummyHandler(
         # This handler is gated by the dummy_feature_flag_for_e2e_tests flag,
         # i.e. it's only visible when the dummy_feature_flag_for_e2e_tests
         # is enabled.
-        if not platform_feature_services.is_feature_enabled(
-            platform_feature_list.ParamNames.
+        if not feature_flag_services.is_feature_flag_enabled(
+            self.user_id, platform_feature_list.ParamNames.
             DUMMY_FEATURE_FLAG_FOR_E2E_TESTS.value
         ):
             raise self.PageNotFoundException()

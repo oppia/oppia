@@ -84,11 +84,13 @@ def get_all_feature_flag_dicts() -> List[feature_flag_domain.FeatureFlag]:
     ]
 
 
-def is_feature_flag_enabled(user_id: str) -> bool:
+def is_feature_flag_enabled(user_id: str, feature_name: str) -> bool:
     """Returns True if feature is enabled for the given user else False.
 
     Args:
         user_id: str. The id of the user.
+        feature_name: str. The name of the feature flag that needs to
+            be evaluated.
 
     Returns:
         bool. True if the feature is enabled for the given user else False.

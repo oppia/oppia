@@ -30,7 +30,7 @@ import { FeaturesTabComponent } from
   'pages/release-coordinator-page/features-tab/features-tab.component';
 import { PlatformFeatureAdminBackendApiService } from
   'domain/platform_feature/platform-feature-admin-backend-api.service';
-import { PlatformFeatureDummyBackendApiService } from
+import { FeatureFlagDummyBackendApiService } from
   'domain/platform_feature/platform-feature-dummy-backend-api.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { PlatformParameterFilterType, ServerMode } from
@@ -830,12 +830,12 @@ describe('Release coordinator page feature tab', function() {
   });
 
   describe('.reloadDummyHandlerStatusAsync', () => {
-    let dummyApiService: PlatformFeatureDummyBackendApiService;
+    let dummyApiService: FeatureFlagDummyBackendApiService;
 
     let dummyApiSpy: jasmine.Spy;
 
     beforeEach(() => {
-      dummyApiService = TestBed.get(PlatformFeatureDummyBackendApiService);
+      dummyApiService = TestBed.get(FeatureFlagDummyBackendApiService);
 
       dummyApiSpy = spyOn(dummyApiService, 'isHandlerEnabled')
         .and.resolveTo();

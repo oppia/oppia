@@ -13,31 +13,30 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for PlatformFeatureBackendApiService.
+ * @fileoverview Unit tests for FeatureFlagBackendApiService.
  */
 
 import { HttpClientTestingModule, HttpTestingController } from
   '@angular/common/http/testing';
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
-import { PlatformFeatureBackendApiService } from
-  'domain/platform_feature/platform-feature-backend-api.service';
-import { PlatformFeatureDomainConstants } from
-  'domain/platform_feature/platform-feature-domain.constants';
-import { ClientContext } from 'domain/platform_feature/client-context.model';
-import { FeatureStatusSummary } from 'domain/platform_feature/feature-status-summary.model';
+import { FeatureFlagBackendApiService } from
+  'domain/feature_flag/feature-flag-backend-api.service';
+import { FeatureFlagDomainConstants } from
+  'domain/feature_flag/feature-flag-domain.constants';
+import { FeatureStatusSummary } from 'domain/feature_flag/feature-status-summary.model';
 
-describe('PlatformFeatureBackendApiService', () => {
+describe('FeatureFlagBackendApiService', () => {
   let httpTestingController: HttpTestingController;
-  let platformFeatureBackendApiService: PlatformFeatureBackendApiService;
+  let featureFlagBackendApiService: FeatureFlagBackendApiService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule]
     });
 
-    platformFeatureBackendApiService = TestBed.get(
-      PlatformFeatureBackendApiService);
+    featureFlagBackendApiService = TestBed.get(
+      FeatureFlagBackendApiService);
     httpTestingController = TestBed.get(HttpTestingController);
   });
 
@@ -51,23 +50,19 @@ describe('PlatformFeatureBackendApiService', () => {
         const successHandler = jasmine.createSpy('success');
         const failHandler = jasmine.createSpy('fail');
 
-        const context = ClientContext.create('Web');
-        const contextDict = context.toBackendDict();
         const responseDict = {
           feature_a: true,
           feature_b: false,
         };
 
-        platformFeatureBackendApiService.fetchFeatureFlags(context)
+        featureFlagBackendApiService.fetchFeatureFlags()
           .then(successHandler, failHandler);
 
         flushMicrotasks();
 
-        const url = PlatformFeatureDomainConstants
+        const url = FeatureFlagDomainConstants
           .PLATFORM_FEATURES_EVALUATION_HANDLER_URL;
-        const urlWithParams = url + '?' +
-          Object.entries(contextDict).map(([k, v]) => `${k}=${v}`).join('&');
-        httpTestingController.expectOne(urlWithParams).flush(responseDict);
+        httpTestingController.expectOne(url).flush(responseDict);
 
         flushMicrotasks();
         expect(successHandler).toHaveBeenCalledWith(
@@ -81,20 +76,15 @@ describe('PlatformFeatureBackendApiService', () => {
       const successHandler = jasmine.createSpy('success');
       const failHandler = jasmine.createSpy('fail');
 
-      const context = ClientContext.create('Web');
-      const contextDict = context.toBackendDict();
-
-      platformFeatureBackendApiService.fetchFeatureFlags(context)
+      featureFlagBackendApiService.fetchFeatureFlags()
         .then(successHandler, failHandler);
 
       flushMicrotasks();
 
-      const url = PlatformFeatureDomainConstants
+      const url = FeatureFlagDomainConstants
         .PLATFORM_FEATURES_EVALUATION_HANDLER_URL;
-      const urlWithParams = url + '?' +
-        Object.entries(contextDict).map(([k, v]) => `${k}=${v}`).join('&');
       httpTestingController
-        .expectOne(urlWithParams)
+        .expectOne(url)
         .error(new ErrorEvent('Error'));
 
       flushMicrotasks();

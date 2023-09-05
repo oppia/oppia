@@ -13,24 +13,11 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for ClientContext.
+ * @fileoverview Constants for platform parameter domain.
  */
 
-import { ClientContext } from
-  'domain/platform_feature/client-context.model';
-
-describe('Client Context Model', () => {
-  it('should create an instance.', () => {
-    const context = ClientContext.create('Web');
-
-    expect(context.platformType).toEqual('Web');
-  });
-
-  it('should convert an instance to a dict.', () => {
-    const context = ClientContext.create('Web');
-
-    expect(context.toBackendDict()).toEqual({
-      platform_type: 'Web',
-    });
-  });
-});
+export const PlatformParameterDomainConstants = {
+  // Action name for request to the release-coordinator handler that updates
+  // the rules of feature flags.
+  UPDATE_PLATFORM_PARAMETER_RULES_ACTION: 'update_platform_parameter_rules'
+} as const;

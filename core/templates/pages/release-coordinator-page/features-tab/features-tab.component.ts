@@ -29,8 +29,8 @@ import { LoaderService } from 'services/loader.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { PlatformFeatureAdminBackendApiService } from
   'domain/platform_feature/platform-feature-admin-backend-api.service';
-import { PlatformFeatureDummyBackendApiService } from
-  'domain/platform_feature/platform-feature-dummy-backend-api.service';
+import { FeatureFlagDummyBackendApiService } from
+  'domain/feature_flag/feature-flag-dummy-backend-api.service';
 import { PlatformFeatureService } from 'services/platform-feature.service';
 import {
   PlatformParameterFilterType,
@@ -136,7 +136,7 @@ export class FeaturesTabComponent implements OnInit {
     private windowRef: WindowRef,
     private apiService: PlatformFeatureAdminBackendApiService,
     private featureService: PlatformFeatureService,
-    private dummyApiService: PlatformFeatureDummyBackendApiService,
+    private dummyApiService: FeatureFlagDummyBackendApiService,
     private loaderService: LoaderService,
   ) {}
 

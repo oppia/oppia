@@ -22,8 +22,10 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 
 import { AdminPageConstants } from
   'pages/admin-page/admin-page.constants';
-import { PlatformFeatureDomainConstants } from
-  'domain/platform_feature/platform-feature-domain.constants';
+import { FeatureFlagDomainConstants } from
+  'domain/feature_flag/feature-flag-domain.constants';
+import { PlatformParameterDomainConstants } from
+  'domain/platform_feature/platform-parameter-domain.constants';
 import { PlatformParameterRule, PlatformParameterValue } from
   'domain/platform_feature/platform-parameter-rule.model';
 import {
@@ -52,7 +54,7 @@ export class PlatformFeatureAdminBackendApiService {
   async getFeatureFlags(): Promise<FeatureFlagsResponse> {
     return new Promise((resolve, reject) => {
       this.http.get<FeatureFlagsDicts>(
-        PlatformFeatureDomainConstants.FEATURE_FLAGS_URL
+        FeatureFlagDomainConstants.FEATURE_FLAGS_URL
       ).toPromise().then(response => {
         resolve({
           featureFlags: response.feature_flags.map(
@@ -72,9 +74,9 @@ export class PlatformFeatureAdminBackendApiService {
   ):
       Promise<void> {
     await this.http.post(
-      PlatformFeatureDomainConstants.FEATURE_FLAGS_URL,
+      FeatureFlagDomainConstants.FEATURE_FLAGS_URL,
       {
-        action: PlatformFeatureDomainConstants.UPDATE_FEATURE_FLAG_ACTION,
+        action: FeatureFlagDomainConstants.UPDATE_FEATURE_FLAG_ACTION,
         feature_name: name,
         commit_message: message,
         new_rules: newRules.map(rule => rule.toBackendDict()),
@@ -92,7 +94,7 @@ export class PlatformFeatureAdminBackendApiService {
       AdminPageConstants.ADMIN_HANDLER_URL,
       {
         action: (
-          PlatformFeatureDomainConstants.
+          PlatformParameterDomainConstants.
             UPDATE_PLATFORM_PARAMETER_RULES_ACTION),
         platform_param_name: name,
         commit_message: message,
