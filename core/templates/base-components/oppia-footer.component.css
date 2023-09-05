@@ -25,7 +25,7 @@
   font-weight: 600;
 }
 
-.oppia-donate-volunteer a {
+.oppia-donate-volunteer > a {
   color: #c55f45;
   font-size: 24px;
   text-decoration: underline;
@@ -327,6 +327,7 @@
     line-height: 12px;
   }
 
+  .oppia-footer-container .oppia-mission,
   .oppia-footer-container .oppia-donate-volunteer,
   .oppia-footer-container .oppia-donate-volunteer > a {
     font-size: 20px;

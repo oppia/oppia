@@ -28,19 +28,8 @@
     <div class="row row-cols-2 p-0 m-0">
       <div class="oppia-mission-volunteer col-7">
         <p class="oppia-mission">{{ 'I18N_FOOTER_OPPIA_MISSION' | translate }}</p>
-        <p class="oppia-donate-volunteer">
-          <a href="/donate"
-             class="oppia-donate-volunteer-link"
-             [innerHTML]="'I18N_FOOTER_DONATE' | translate"
-             [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.DONATE.ROUTE">
-          </a>
-          {{ donateVolunteerSplitMessage[0] }}
-          <a href="/volunteer"
-             class="oppia-donate-volunteer-link"
-             [innerHTML]="'I18N_FOOTER_VOLUNTEER' | translate"
-             [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.VOLUNTEER.ROUTE">
-          </a>
-          {{ donateVolunteerSplitMessage[1] }}
+        <p class="oppia-donate-volunteer"
+           [innerHTML]="'I18N_FOOTER_OPPIA_MISSION_DONATE_VOLUNTEER' | translate">
         </p>
       </div>
       <hr class="oppia-footer-separator">

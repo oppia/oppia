@@ -16,7 +16,7 @@
  * @fileoverview Component for the footer.
  */
 
-import { Component } from '@angular/core';
+import { Component, ViewEncapsulation } from '@angular/core';
 import { Router } from '@angular/router';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { PlatformFeatureService } from 'services/platform-feature.service';
@@ -33,14 +33,14 @@ import './oppia-footer.component.css';
 @Component({
   selector: 'oppia-footer',
   templateUrl: './oppia-footer.component.html',
-  styleUrls: ['./oppia-footer.component.css']
+  styleUrls: ['./oppia-footer.component.css'],
+  encapsulation: ViewEncapsulation.None,
 })
 export class OppiaFooterComponent {
   emailAddress: string | null = null;
   name: string | null = null;
   siteFeedbackFormUrl: string = AppConstants.SITE_FEEDBACK_FORM_URL;
   currentYear: number = new Date().getFullYear();
-  donateVolunteerSplitMessage: string[] = ['or ', ' today!'];
   PAGES_REGISTERED_WITH_FRONTEND = (
     AppConstants.PAGES_REGISTERED_WITH_FRONTEND);
 
