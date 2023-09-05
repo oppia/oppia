@@ -621,7 +621,6 @@
 	"I18N_FOOTER_TEACH_LEARN_ALL_CAPS": "Text shown in the footer. - Title of the teach/learn section. Must be in all capital letters for languages that use Latin, Cyrillic, and/or Greek scripts. This section has links to pages with content for teachers and students.",
 	"I18N_FOOTER_TEACH_PAGE": "Text shown in the footer. - Link to a page that contains Oppia's Teach page containg information for parents and teachers.",
 	"I18N_FOOTER_TERMS_OF_SERVICE": "Text shown in the footer. - Link to a page that contains Oppia's terms of service.\n{{Identical|Terms of service}}",
-	"I18N_FOOTER_VOLUNTEER": "Text shown in the footer. - Link to the volunteer page.\n{{Identical|Volunteer}}",
 	"I18N_FORMS_TYPE_NUMBER": "Text displayed in a number interaction. - The interaction is a input box when the user has a to enter a number. This text is shown inside the box when the user has not introduced anything yet.",
 	"I18N_FORMS_TYPE_NUMBER_AT_LEAST": "Text displayed in a number interaction. - This text is shown in red when the user introduces a number that is less than <[minValue]>.",
 	"I18N_FORMS_TYPE_NUMBER_AT_MOST": "Text displayed in a number interaction. - This text is shown in red when the user introduces a number that is greater than <[maxValue]>.",
