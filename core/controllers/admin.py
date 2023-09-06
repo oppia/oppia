@@ -312,12 +312,12 @@ class AdminHandler(
                 regenerate_topic_related_opportunities.
             Exception. The exp_id' must be provided when the action is
                 rollback_exploration_to_safe_state.
-            Exception. The feature_name must be provided when the action
-                is update_feature_flag_rules.
+            Exception. The platform_param_name must be provided when the action
+                is update_platform_parameter_rules.
             Exception. The new_rules must be provided when the action is
-                update_feature_flag_rules.
+                update_platform_parameter_rules.
             Exception. The commit_message must be provided when the action
-                is update_feature_flag_rules.
+                is update_platform_parameter_rules.
             InvalidInputException. The input provided is not valid.
         """
         assert self.user_id is not None
