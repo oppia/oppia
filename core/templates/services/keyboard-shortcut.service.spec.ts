@@ -169,5 +169,11 @@ describe('Keyboard Shortcuts', () => {
 
     Mousetrap.trigger('?');
     expect(openQuickReferenceSpy).toHaveBeenCalled();
+
+    Mousetrap.trigger('left');
+    expect(backButton.isEqualNode(document.activeElement));
+
+    Mousetrap.trigger('right');
+    expect(nextButton.isEqualNode(document.activeElement));
   });
 });
