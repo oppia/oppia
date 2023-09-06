@@ -27,6 +27,8 @@ import { AdminPageData } from 'domain/admin/admin-backend-api.service';
 import { AdminDataService } from 'pages/admin-page/services/admin-data.service';
 import { AdminTaskManagerService } from
   'pages/admin-page/services/admin-task-manager.service';
+import { AdminFeaturesTabConstants } from
+  'pages/release-coordinator-page/features-tab/features-tab.constants';
 import { PlatformFeatureAdminBackendApiService } from
   'domain/platform_feature/platform-feature-admin-backend-api.service';
 import { AdminPlatformParametersTabComponent } from
@@ -357,7 +359,7 @@ describe('Admin page platform parameters tab', () => {
 
       expect(
         component.getReadonlyFilterValues(platformParameter.rules[0])
-      ).toBe('Server Mode in [dev]');
+      ).toBe('Platform Type in [Web]');
     });
 
     it('should get read only value of the rule with one filter and multiple ' +
@@ -367,7 +369,7 @@ describe('Admin page platform parameters tab', () => {
 
       expect(
         component.getReadonlyFilterValues(platformParameter.rules[0])
-      ).toBe('Server Mode in [dev, dev]');
+      ).toBe('Platform Type in [Web, Web]');
     });
 
     it('should get read only value of the rule with multiple filter', () => {
@@ -377,7 +379,7 @@ describe('Admin page platform parameters tab', () => {
 
       expect(
         component.getReadonlyFilterValues(platformParameter.rules[0])
-      ).toBe('Server Mode in [dev]; Server Mode in [dev]');
+      ).toBe('Platform Type in [Web]; Platform Type in [Web]');
     });
 
     it('should get read only value of the rule with no condition', () => {
@@ -386,7 +388,7 @@ describe('Admin page platform parameters tab', () => {
 
       expect(
         component.getReadonlyFilterValues(platformParameter.rules[1])
-      ).toBe('Server Mode in [ ]');
+      ).toBe('Platform Type in [ ]');
     });
   });
 
@@ -452,7 +454,7 @@ describe('Admin page platform parameters tab', () => {
 
       component.addNewRuleToBottom(platformParameter);
       platformParameter.rules[1].filters[0].conditions = [
-        ['=', ServerMode.Prod]
+        ['=', AdminFeaturesTabConstants.ALLOWED_PLATFORM_TYPES[1]]
       ];
       component.updateParameterRulesAsync(platformParameter);
 
@@ -471,7 +473,7 @@ describe('Admin page platform parameters tab', () => {
 
         component.addNewRuleToBottom(platformParameter);
         platformParameter.rules[1].filters[0].conditions = [
-          ['=', ServerMode.Prod]
+          ['=', AdminFeaturesTabConstants.ALLOWED_PLATFORM_TYPES[1]]
         ];
         component.updateParameterRulesAsync(platformParameter);
 
@@ -496,7 +498,7 @@ describe('Admin page platform parameters tab', () => {
 
         component.addNewRuleToBottom(platformParameter);
         platformParameter.rules[1].filters[0].conditions = [
-          ['=', ServerMode.Prod]
+          ['=', AdminFeaturesTabConstants.ALLOWED_PLATFORM_TYPES[1]]
         ];
         component.updateParameterRulesAsync(platformParameter);
 
@@ -515,7 +517,7 @@ describe('Admin page platform parameters tab', () => {
 
       component.addNewRuleToBottom(platformParameter);
       platformParameter.rules[1].filters[0].conditions = [
-        ['=', ServerMode.Prod]
+        ['=', AdminFeaturesTabConstants.ALLOWED_PLATFORM_TYPES[1]]
       ];
       component.updateParameterRulesAsync(platformParameter);
 
@@ -539,7 +541,7 @@ describe('Admin page platform parameters tab', () => {
 
         component.addNewRuleToBottom(platformParameter);
         platformParameter.rules[1].filters[0].conditions = [
-          ['=', ServerMode.Prod]
+          ['=', AdminFeaturesTabConstants.ALLOWED_PLATFORM_TYPES[1]]
         ];
         component.updateParameterRulesAsync(platformParameter);
 
@@ -579,7 +581,7 @@ describe('Admin page platform parameters tab', () => {
 
       component.addNewRuleToBottom(platformParameter);
       platformParameter.rules[1].filters[0].conditions = [
-        ['=', ServerMode.Prod]
+        ['=', AdminFeaturesTabConstants.ALLOWED_PLATFORM_TYPES[1]]
       ];
       component.updateParameterRulesAsync(platformParameter);
 
@@ -604,7 +606,7 @@ describe('Admin page platform parameters tab', () => {
 
       component.addNewRuleToBottom(platformParameter);
       platformParameter.rules[1].filters[0].conditions = [
-        ['=', ServerMode.Prod]
+        ['=', AdminFeaturesTabConstants.ALLOWED_PLATFORM_TYPES[1]]
       ];
       component.updateParameterRulesAsync(platformParameter);
 
@@ -705,7 +707,9 @@ describe('Admin page platform parameters tab', () => {
               filters: [
                 {
                   type: PlatformParameterFilterType.PlatformType,
-                  conditions: [['=', 'Web']]
+                  conditions: [
+                    ['=', AdminFeaturesTabConstants.ALLOWED_PLATFORM_TYPES[0]]
+                  ]
                 }
               ],
               value_when_matched: true,
@@ -713,8 +717,10 @@ describe('Admin page platform parameters tab', () => {
             {
               filters: [
                 {
-                  type: PlatformParameterFilterType.ServerMode,
-                  conditions: [['=', ServerMode.Prod]]
+                  type: PlatformParameterFilterType.PlatformType,
+                  conditions: [
+                    ['=', AdminFeaturesTabConstants.ALLOWED_PLATFORM_TYPES[1]]
+                  ]
                 }
               ],
               value_when_matched: true
@@ -740,8 +746,10 @@ describe('Admin page platform parameters tab', () => {
             {
               filters: [
                 {
-                  type: PlatformParameterFilterType.ServerMode,
-                  conditions: [['=', ServerMode.Prod]]
+                  type: PlatformParameterFilterType.PlatformType,
+                  conditions: [
+                    ['=', AdminFeaturesTabConstants.ALLOWED_PLATFORM_TYPES[1]]
+                  ]
                 }
               ],
               value_when_matched: true
@@ -749,8 +757,10 @@ describe('Admin page platform parameters tab', () => {
             {
               filters: [
                 {
-                  type: PlatformParameterFilterType.ServerMode,
-                  conditions: [['=', ServerMode.Prod]]
+                  type: PlatformParameterFilterType.PlatformType,
+                  conditions: [
+                    ['=', AdminFeaturesTabConstants.ALLOWED_PLATFORM_TYPES[1]]
+                  ]
                 }
               ],
               value_when_matched: true
@@ -836,7 +846,7 @@ describe('Admin page platform parameters tab', () => {
             {
               filters: [
                 {
-                  type: PlatformParameterFilterType.ServerMode,
+                  type: PlatformParameterFilterType.PlatformType,
                   conditions: []
                 },
               ],
