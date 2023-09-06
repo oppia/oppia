@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Tests for Blog Post models."""
+"""Tests for Blog Post Statistics Models."""
 
 from __future__ import annotations
 

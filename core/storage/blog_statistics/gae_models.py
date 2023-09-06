@@ -47,10 +47,8 @@ class BlogPostViewedEventLogEntryModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:
-        """Model does contains data corresponding to a user (author_id) and
-        should be deleted.
-        """
-        return base_models.DELETION_POLICY.DELETE
+        """Model doesn't contain any data directly corresponding to a user."""
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @classmethod
     def get_new_event_entity_id(cls, blog_post_id: str) -> str:
@@ -118,8 +116,8 @@ class BlogPostReadEventLogEntryModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:
-        """Model contains data corresponding to a user and should be deleted."""
-        return base_models.DELETION_POLICY.DELETE
+        """Model doesn't contain any data directly corresponding to a user."""
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @classmethod
     def get_new_event_entity_id(cls, blog_post_id: str) -> str:
@@ -192,8 +190,8 @@ class BlogPostExitedEventLogEntryModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:
-        """Model contains data corresponding to a user and should be deleted."""
-        return base_models.DELETION_POLICY.DELETE
+        """Model doesn't contain any data directly corresponding to a user."""
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @classmethod
     def get_new_event_entity_id(cls, blog_post_id: str) -> str:
