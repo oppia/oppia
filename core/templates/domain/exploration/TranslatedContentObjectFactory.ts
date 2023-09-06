@@ -17,6 +17,7 @@
  * TranslatedContent domain objects.
  */
 
+import cloneDeep from 'lodash/cloneDeep';
 
 export const TRANSLATION_DATA_FORMAT_HTML = 'html';
 export const TRANSLATION_DATA_FORMAT_UNICODE = 'unicode';
@@ -66,11 +67,39 @@ export class TranslatedContent {
     this.needsUpdate = true;
   }
 
+  getTranslation(): string | string[] {
+    return this.translation;
+  }
+
+  toBackendDict(): TranslatedContentBackendDict {
+    return {
+      content_value: this.translation,
+      content_format: this.dataFormat,
+      needs_update: this.needsUpdate
+    };
+  }
+
   static createFromBackendDict(
       translationBackendDict: TranslatedContentBackendDict): TranslatedContent {
     return new TranslatedContent(
       translationBackendDict.content_value,
       translationBackendDict.content_format as DataFormatToDefaultValuesKey,
       translationBackendDict.needs_update);
+  }
+
+  static createNew(dataFormat: string): TranslatedContent {
+    if (!DATA_FORMAT_TO_DEFAULT_VALUES.hasOwnProperty(dataFormat)) {
+      throw new Error('Invalid translation data format: ' + dataFormat);
+    }
+
+    return new TranslatedContent(
+      cloneDeep(
+        DATA_FORMAT_TO_DEFAULT_VALUES[
+          dataFormat as DataFormatToDefaultValuesKey
+        ]
+      ),
+      dataFormat as DataFormatToDefaultValuesKey,
+      false
+    );
   }
 }
