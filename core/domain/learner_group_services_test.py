@@ -138,14 +138,7 @@ class LearnerGroupServicesUnitTests(test_utils.GenericTestBase):
             'learner_groups_are_enabled', self.admin_id, 'edit rules',
             [
                 param_domain.PlatformParameterRule.from_dict({
-                    'filters': [
-                        {
-                            'type': 'server_mode',
-                            'conditions': [
-                                ['=', param_domain.ServerMode.DEV.value]
-                            ]
-                        }
-                    ],
+                    'filters': [],
                     'value_when_matched': True
                 })
             ],
@@ -160,10 +153,8 @@ class LearnerGroupServicesUnitTests(test_utils.GenericTestBase):
                 param_domain.PlatformParameterRule.from_dict({
                     'filters': [
                         {
-                            'type': 'server_mode',
-                            'conditions': [
-                                ['=', param_domain.ServerMode.DEV.value]
-                            ]
+                            'type': 'platform_type',
+                            'conditions': [['=', 'Backend']]
                         }
                     ],
                     'value_when_matched': False

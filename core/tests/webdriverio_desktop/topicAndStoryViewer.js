@@ -102,7 +102,7 @@ describe('Topic and Story viewer functionality', function() {
     await releaseCoordinatorPage.getFeaturesTab();
     var endChapterFlag = (
       await releaseCoordinatorPage.getEndChapterCelebrationFeatureElement());
-    await releaseCoordinatorPage.enableFeatureForTest(endChapterFlag);
+    await releaseCoordinatorPage.enableFeature(endChapterFlag);
 
     await createDummyExplorations();
     var handle = await browser.getWindowHandle();

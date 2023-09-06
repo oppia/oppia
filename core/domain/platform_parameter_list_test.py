@@ -130,3 +130,15 @@ class ExistingPlatformParameterValidityTests(test_utils.GenericTestBase):
                 'but "%s" feature-flag is of type "%s".' % (
                     feature['name'], feature['data_type'])
             )
+
+    def test_all_feature_flags_have_default_value_as_false(self) -> None:
+        feature_flags = feature_services.get_all_feature_flag_dicts()
+        self.assertGreater(len(feature_flags), 0)
+        for feature in feature_flags:
+            self.assertEqual(
+                feature['default_value'],
+                False,
+                'We expect all the feature-flags default_value to be False '
+                'but "%s" feature-flag has "%s".' % (
+                    feature['name'], feature['default_value'])
+            )

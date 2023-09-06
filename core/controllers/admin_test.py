@@ -385,8 +385,8 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
             {
                 'filters': [
                     {
-                        'type': 'server_mode',
-                        'conditions': [['=', 'dev']]
+                        'type': 'platform_type',
+                        'conditions': [['=', 'Web']]
                     }
                 ],
                 'value_when_matched': True
@@ -894,8 +894,8 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
             {
                 'filters': [
                     {
-                        'type': 'server_mode',
-                        'conditions': [['=', 'dev']]
+                        'type': 'platform_type',
+                        'conditions': [['=', 'Web']]
                     }
                 ],
                 'value_when_matched': True
@@ -942,8 +942,8 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
             {
                 'filters': [
                     {
-                        'type': 'server_mode',
-                        'conditions': [['=', 'dev']]
+                        'type': 'platform_type',
+                        'conditions': [['=', 'Web']]
                     }
                 ],
                 'value_when_matched': True
@@ -986,8 +986,8 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
             {
                 'filters': [
                     {
-                        'type': 'server_mode',
-                        'conditions': [['=', 'prod']]
+                        'type': 'platform_type',
+                        'conditions': [['=', 'Web']]
                     }
                 ],
                 'value_when_matched': True
@@ -1031,8 +1031,8 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
             {
                 'filters': [
                     {
-                        'type': 'server_mode',
-                        'conditions': [['=', 'dev']]
+                        'type': 'platform_type',
+                        'conditions': [['=', 'Web']]
                     }
                 ],
                 'value_when_matched': 'unknown'
@@ -1162,8 +1162,8 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
             {
                 'filters': [
                     {
-                        'type': 'server_mode',
-                        'conditions': [['=', 'dev']]
+                        'type': 'platform_type',
+                        'conditions': [['=', 'Web']]
                     }
                 ],
                 'value_when_matched': True

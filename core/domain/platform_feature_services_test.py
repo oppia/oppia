@@ -21,6 +21,7 @@ from __future__ import annotations
 import enum
 
 from core import feconf
+from core import utils
 from core.constants import constants
 from core.domain import caching_services
 from core.domain import platform_feature_services as feature_services
@@ -79,6 +80,7 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
         self.prod_feature = registry.Registry.create_feature_flag(
             ParamNames.FEATURE_C, 'a feature in prod stage',
             FeatureStages.PROD)
+
         self.param_a = registry.Registry.create_platform_parameter(
             ParamNames.PARAM_A,
             'Parameter named a',
@@ -96,14 +98,7 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
             self.dev_feature.name, self.user_id, 'edit rules',
             [
                 platform_parameter_domain.PlatformParameterRule.from_dict({
-                    'filters': [
-                        {
-                            'type': 'server_mode',
-                            'conditions': [
-                                ['=', ServerMode.DEV.value]
-                            ]
-                        }
-                    ],
+                    'filters': [],
                     'value_when_matched': True
                 })
             ],
@@ -114,15 +109,7 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
             self.test_feature.name, self.user_id, 'edit rules',
             [
                 platform_parameter_domain.PlatformParameterRule.from_dict({
-                    'filters': [
-                        {
-                            'type': 'server_mode',
-                            'conditions': [
-                                ['=', ServerMode.DEV.value],
-                                ['=', ServerMode.TEST.value],
-                            ]
-                        }
-                    ],
+                    'filters': [],
                     'value_when_matched': True
                 })
             ],
@@ -133,16 +120,7 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
             self.prod_feature.name, self.user_id, 'edit rules',
             [
                 platform_parameter_domain.PlatformParameterRule.from_dict({
-                    'filters': [
-                        {
-                            'type': 'server_mode',
-                            'conditions': [
-                                ['=', ServerMode.DEV.value],
-                                ['=', ServerMode.TEST.value],
-                                ['=', ServerMode.PROD.value]
-                            ]
-                        }
-                    ],
+                    'filters': [],
                     'value_when_matched': True
                 })
             ],
@@ -258,7 +236,7 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
             context = feature_services.create_evaluation_context_for_client({
                 'platform_type': 'Android',
                 'app_version': '1.0.0',
-            })
+        })
             self.assertEqual(
                 feature_services.evaluate_all_feature_flag_values_for_client(
                     context),
@@ -409,18 +387,10 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
             self.dev_feature.name, self.user_id, 'test update',
             [
                 platform_parameter_domain.PlatformParameterRule.from_dict({
-                    'filters': [
-                        {
-                            'type': 'server_mode',
-                            'conditions': [
-                                ['=', FeatureStages.DEV.value]
-                            ]
-                        }
-                    ],
+                    'filters': [],
                     'value_when_matched': False
                 })
-            ],
-            False
+            ]
         )
 
         with self.swap(constants, 'DEV_MODE', True):
@@ -439,8 +409,32 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
                     platform_parameter_domain.PlatformParameterRule.from_dict(
                         {'filters': [], 'value_when_matched': False}
                     ),
-                ],
-                False
+                ]
+            )
+
+    def test_update_feature_flag_with_invalid_rules_raises_error(
+        self
+    ) -> None:
+        with self.assertRaisesRegex(utils.ValidationError, (
+            'Unsupported comparison operator \'!\' for app_version filter, '
+            'expected one of \\[\'=\', \'<\', \'<=\', \'>\', \'>=\'].')
+        ):
+            feature_services.update_feature_flag(
+                self.dev_feature.name, self.user_id, 'test update',
+                [
+                    platform_parameter_domain.PlatformParameterRule.from_dict({
+                        'filters': [
+                            {
+                                'type': 'app_version',
+                                'conditions': [['!', '1.2.3']]
+                            }
+                        ],
+                        'value_when_matched': True
+                    }),
+                    platform_parameter_domain.PlatformParameterRule.from_dict({
+                        'filters': [], 'value_when_matched': False
+                    })
+                ]
             )
 
     def test_all_platform_params_should_appear_once_in_features_or_in_params_list( # pylint: disable=line-too-long
