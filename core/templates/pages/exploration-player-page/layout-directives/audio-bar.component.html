@@ -30,6 +30,7 @@
           </div>
           <div *ngIf="!audioLoadingIndicatorIsShown">
             <oppia-audio-slider [value]="audioPlayerService.getCurrentTime()"
+                                [dir]="isLanguageRTL() ? 'rtl' : 'ltr'"
                                 [max]="audioPlayerService.getAudioDuration()"
                                 (valueChange)="setProgress($event)"
                                 aria-label="audio-slider">
