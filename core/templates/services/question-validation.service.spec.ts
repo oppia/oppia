@@ -211,6 +211,9 @@ describe('Question Validation Service', () => {
 
     it('should return error message if no feedback for default outcome', () => {
       const interaction = mockQuestionDict.question_state_data.interaction;
+      // This throws "Object is possibly 'null'.". We need to suppress this
+      // error because the object is initialized in the beforeEach().
+      // @ts-ignore
       interaction.default_outcome.feedback.html = '';
       const question = questionObjectFactory.createFromBackendDict(
         mockQuestionDict);
@@ -223,6 +226,9 @@ describe('Question Validation Service', () => {
        'answer group is hidden', () => {
       shouldHideDefaultAnswerGroupSpy.and.returnValue(true);
       const interaction = mockQuestionDict.question_state_data.interaction;
+      // This throws "Object is possibly 'null'.". We need to suppress this
+      // error because the object is initialized in the beforeEach().
+      // @ts-ignore
       interaction.default_outcome.feedback.html = '';
       const question = questionObjectFactory.createFromBackendDict(
         mockQuestionDict);
