@@ -41,8 +41,8 @@ describe('PlatformFeatureAdminBackendApiService', () => {
       data_type: 'bool',
       rules: [{
         filters: [{
-          type: PlatformParameterFilterType.ServerMode,
-          conditions: [['=', 'dev'] as [string, string]]
+          type: PlatformParameterFilterType.PlatformType,
+          conditions: [['=', 'Web'] as [string, string]]
         }],
         value_when_matched: true
       }],
@@ -124,7 +124,7 @@ describe('PlatformFeatureAdminBackendApiService', () => {
       ];
 
       featureAdminService.updateFeatureFlag(
-        'feature_name', 'update message', newRules, false
+        'feature_name', 'update message', newRules
       ).then(successHandler, failHandler);
 
       const req = httpTestingController.expectOne(
@@ -151,7 +151,7 @@ describe('PlatformFeatureAdminBackendApiService', () => {
     ];
 
     featureAdminService.updateFeatureFlag(
-      'feature_name', 'update message', newRules, false
+      'feature_name', 'update message', newRules
     ).then(successHandler, failHandler);
 
     const req = httpTestingController.expectOne(

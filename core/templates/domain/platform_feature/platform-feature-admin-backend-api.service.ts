@@ -69,8 +69,7 @@ export class PlatformFeatureAdminBackendApiService {
   }
 
   async updateFeatureFlag(
-      name: string, message: string, newRules: PlatformParameterRule[],
-      defaultValue: PlatformParameterValue
+      name: string, message: string, newRules: PlatformParameterRule[]
   ):
       Promise<void> {
     await this.http.post(
@@ -79,8 +78,7 @@ export class PlatformFeatureAdminBackendApiService {
         action: FeatureFlagDomainConstants.UPDATE_FEATURE_FLAG_ACTION,
         feature_name: name,
         commit_message: message,
-        new_rules: newRules.map(rule => rule.toBackendDict()),
-        default_value: defaultValue
+        new_rules: newRules.map(rule => rule.toBackendDict())
       }
     ).toPromise();
   }
