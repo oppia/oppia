@@ -1141,6 +1141,23 @@ describe('State Responses Component', () => {
     expect(component.onSaveInteractionDefaultOutcome.emit).toHaveBeenCalled();
   });
 
+  it('should get answer choices', () => {
+    const answerChoices = [
+      {
+        val: 0,
+        label: 'label1'
+      },
+      {
+        val: 1,
+        label: 'label2'
+      }
+    ];
+    spyOn(responsesService, 'getAnswerChoices').and.returnValue(answerChoices);
+
+    expect(component.getAnswerChoices())
+      .toEqual(answerChoices);
+  });
+
   it('should return summary of answer group', () => {
     expect(component.summarizeAnswerGroup(
       answerGroupObjectFactory.createNew(
