@@ -21,9 +21,11 @@ from __future__ import annotations
 import os
 import site
 import subprocess
+from core import feconf
 
 from core.tests import test_utils
-from scripts import install_third_party_libs
+if not feconf.OPPIA_IS_DOCKERIZED:
+    from scripts import install_third_party_libs
 from scripts import run_mypy_checks
 
 from typing import Final, List, Optional, Tuple

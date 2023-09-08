@@ -28,13 +28,12 @@ build.%: ## Builds the given docker service. Example: make build.datastore
 build: ## Builds the all docker setup.
 	docker compose build
 	$(MAKE) install_node
-	docker cp oppia-angular-build:/app/oppia/node_modules .
 
 run-devserver: # Runs the dev-server
-	docker compose up dev-server -d --no-deps
-	$(MAKE) update.requirements
 	docker compose up angular-build -d
 	$(MAKE) update.package
+	docker compose up dev-server -d --no-deps
+	$(MAKE) update.requirements
 	$(MAKE) run-offline
 
 run-offline: # Runs the dev-server in offline mode

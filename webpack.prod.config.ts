@@ -21,14 +21,15 @@ var common = require('./webpack.common.config.ts');
 var path = require('path');
 var webpack = require('webpack');
 var analyticsConstants = require('./assets/analytics-constants.json');
+const TerserPlugin = require('terser-webpack-plugin');
 
 
 module.exports = merge(common, {
   mode: 'production',
   output: {
     filename: '[name].[contenthash].bundle.js',
-    path: path.resolve(__dirname, 'backend_prod_files/webpack_bundles'),
-    publicPath: '/build/webpack_bundles/'
+    path: '/app/oppia/backend_prod_files/webpack_bundles',
+    publicPath: '/app/oppia/build/webpack_bundles/'
   },
   plugins: [
     // This plugin performs a direct text replacement, so the value given to it
@@ -40,5 +41,14 @@ module.exports = merge(common, {
         analyticsConstants.SITE_NAME_FOR_ANALYTICS
       ),
     })
-  ]
+  ],
+  optimization: {
+    minimizer: [
+      new TerserPlugin({
+        cache: true,
+        parallel: false,
+        sourceMap: false,        
+      }),
+    ],
+  }
 });

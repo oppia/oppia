@@ -72,8 +72,8 @@ TEMPLATES_CORE_DIRNAMES_TO_DIRPATHS = {
     'out_dir': os.path.join('build', 'templates', '')
 }
 WEBPACK_DIRNAMES_TO_DIRPATHS = {
-    'staging_dir': os.path.join('backend_prod_files', 'webpack_bundles', ''),
-    'out_dir': os.path.join('build', 'webpack_bundles', '')
+    'staging_dir': os.path.join('app', 'oppia', 'backend_prod_files', 'webpack_bundles', ''),
+    'out_dir': os.path.join('app', 'oppia', 'build', 'webpack_bundles', '')
 }
 
 # This json file contains a json object. The object's keys are file paths and
@@ -337,15 +337,14 @@ def _minify_and_create_sourcemap(
         common.NODE_BIN_PATH, UGLIFY_FILE, source_path,
         source_map_properties, target_file_path)
     if feconf.OPPIA_IS_DOCKERIZED:
-        cmd = ' '.join([
-            'bash', '-c',
+        subprocess.check_call(
             'node /app/oppia/node_modules/uglify-js/bin/uglifyjs'
             ' /app/oppia/third_party/generated/js/third_party.js'
-            ' -c -m --source-map %s -o /app/oppia/third_party/'
-            'generated/js/third_party.min.js' % (
-                source_map_properties
-            )
-        ])
+            ' -c -m --source-map includeSources,url=\'third_party.min.js.map\''
+            ' -o /app/oppia/third_party/generated/js/third_party.min.js',
+            shell=True
+        )
+        return
 
     subprocess.check_call(cmd, shell=True)
 
@@ -790,11 +789,20 @@ def generate_copy_tasks_to_copy_from_source_to_target(
     """
     print('Processing %s' % os.path.join(os.getcwd(), source))
     print('Copying into %s' % os.path.join(os.getcwd(), target))
+    print('shiv here1')
     copy_tasks: Deque[threading.Thread] = collections.deque()
+    print(source, 'source')
+    print('copy_tasks', copy_tasks)
+    print('os.walk(os.path.join(os.getcwd(), source))', os.walk(os.path.join(os.getcwd(), source)))
     for root, dirnames, filenames in os.walk(os.path.join(os.getcwd(), source)):
+        print('shiv herex')
         for directory in dirnames:
+            print('shiv here2')
+            print(directory)
             print('Copying %s' % os.path.join(root, directory))
         for filename in filenames:
+            print('shiv here3')
+            print(filename)
             source_path = os.path.join(root, filename)
             # Python files should not be copied to final build directory.
             if not any(
@@ -809,6 +817,7 @@ def generate_copy_tasks_to_copy_from_source_to_target(
                     relative_path = (
                         _insert_hash(relative_path, file_hashes[relative_path]))
 
+                print('shiv here4')
                 target_path = os.path.join(os.getcwd(), target, relative_path)
                 ensure_directory_exists(target_path)
                 copy_task = threading.Thread(
@@ -1366,6 +1375,7 @@ def generate_build_directory(hashes: Dict[str, str]) -> None:
     assert len(copy_input_dirs) == len(copy_output_dirs)
     for i, copy_input_dir in enumerate(copy_input_dirs):
         safe_delete_directory_tree(copy_output_dirs[i])
+        print(copy_input_dir, copy_output_dirs[i], "shivv")
         copy_tasks += generate_copy_tasks_to_copy_from_source_to_target(
             copy_input_dir, copy_output_dirs[i], hashes)
     _execute_tasks(copy_tasks)
