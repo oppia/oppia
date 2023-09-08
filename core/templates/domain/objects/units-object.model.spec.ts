@@ -17,14 +17,14 @@
  */
 
 import {TestBed} from '@angular/core/testing';
-import { Units, UnitsObjectFactory } from
+import { Units } from
   'domain/objects/units-object.model';
 
-describe('UnitsObjectFactory', () => {
-  let units: UnitsObjectFactory;
+describe('Units', () => {
+  let units: Units;
 
   beforeEach(() => {
-    units = TestBed.get(UnitsObjectFactory);
+    units = TestBed.get(Units);
   });
 
   it('should test the createCurrencyUnits function', () => {
@@ -34,7 +34,7 @@ describe('UnitsObjectFactory', () => {
   });
 
   it('should convert unitsList to a string in units format', () => {
-    let UOF = new UnitsObjectFactory();
+    let UOF = new Units();
     expect(UOF.fromList([{ exponent: -1, unit: 'cents' }]).toString())
       .toBe('cents^-1');
     expect(UOF.fromList([{ exponent: 1, unit: 'mol' }]).toString()).toBe('mol');
@@ -100,7 +100,7 @@ describe('UnitsObjectFactory', () => {
   });
 
   it('should parse valid units strings', () => {
-    let UOF = new UnitsObjectFactory();
+    let UOF = new Units();
     expect(
       units.fromRawInputString('')
         .toDict()).toEqual(UOF.fromList([]).toDict());
