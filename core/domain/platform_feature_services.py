@@ -181,8 +181,7 @@ def update_feature_flag(
     feature_name: str,
     committer_id: str,
     commit_message: str,
-    new_rules: List[platform_parameter_domain.PlatformParameterRule],
-    default_value: bool
+    new_rules: List[platform_parameter_domain.PlatformParameterRule]
 ) -> None:
     """Updates the feature flag's rules.
 
@@ -192,7 +191,6 @@ def update_feature_flag(
         commit_message: str. The commit message.
         new_rules: list(PlatformParameterRule). A list of PlatformParameterRule
             objects to update.
-        default_value: bool. The default value of the feature flag.
 
     Raises:
         FeatureFlagNotFoundException. The feature_name is not registered in
@@ -202,8 +200,10 @@ def update_feature_flag(
         raise FeatureFlagNotFoundException(
             'Unknown feature flag: %s.' % feature_name)
 
+    # The default value of a feature flag is always False and that
+    # is why we are explicitly passing default_value as False.
     registry.Registry.update_platform_parameter(
-        feature_name, committer_id, commit_message, new_rules, default_value)
+        feature_name, committer_id, commit_message, new_rules, False)
 
 
 def get_server_mode() -> platform_parameter_domain.ServerMode:
@@ -290,10 +290,10 @@ def _evaluate_feature_flag_values_for_context(
     for feature_name in feature_names_set:
         param = registry.Registry.get_platform_parameter(
             feature_name)
-        feature_name_value = param.evaluate(context)
+        feature_is_enabled = param.evaluate(context)
         # Ruling out the possibility of any other type for mypy type checking.
-        assert isinstance(feature_name_value, bool)
-        result_dict[feature_name] = feature_name_value
+        assert isinstance(feature_is_enabled, bool)
+        result_dict[feature_name] = feature_is_enabled
     return result_dict
 
 
