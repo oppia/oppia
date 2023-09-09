@@ -86,12 +86,6 @@ enum ExpansionTabType {
   TRANSLATION
 }
 
-      // const clickedIndex = suggestionIdsList.indexOf(suggestionId);
-      // const skippedContributionIds = [];
-      // for (let i = 0; i < clickedIndex; i++) {
-      //   skippedContributionIds.push(suggestionIdsList[i]);
-      // }
-
 @Component({
   selector: 'oppia-translation-suggestion-review-modal',
   templateUrl: './translation-suggestion-review-modal.component.html',
@@ -205,7 +199,8 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
       this.heading = 'Review Translation Contributions';
     }
     const suggestionIdsList = Object.keys(this.suggestionIdToContribution);
-    const clickedSuggestionIndex = suggestionIdsList.indexOf(this.activeSuggestionId);
+    const clickedSuggestionIndex = suggestionIdsList.indexOf(
+      this.activeSuggestionId);
     this.skippedContributionIds.push(...suggestionIdsList.slice(
       0, clickedSuggestionIndex));
     delete this.suggestionIdToContribution[this.initialSuggestionId];
