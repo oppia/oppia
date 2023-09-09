@@ -100,7 +100,7 @@ class AdminPage(
     def get(self) -> None:
         """Renders the admin page."""
 
-        self.render_template('admin-page.mainpage.html')
+        self.render_template('oppia-root.mainpage.html')
 
 
 class AdminHandlerNormalizePayloadDict(TypedDict):

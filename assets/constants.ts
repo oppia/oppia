@@ -6518,6 +6518,24 @@ export default {
 
   // Pages registered with angular router.
   "PAGES_REGISTERED_WITH_FRONTEND": {
+    "ADIMN_PAGE": {
+      "ROUTE": "admin",
+      "TITLE": "Oppia admin page",
+      "META": [
+        {
+          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_VALUE": "description",
+          // eslint-disable-next-line max-len
+          "CONTENT": "With Oppia, you can access free lessons on math, physics, statistics, chemistry, music, history and more from anywhere in the world. Oppia is a nonprofit with the mission of providing high-quality education to those who lack access to it."
+        },
+        {
+          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_VALUE": "og:description",
+          // eslint-disable-next-line max-len
+          "CONTENT": "With Oppia, you can access free lessons on math, physics, statistics, chemistry, music, history and more from anywhere in the world. Oppia is a nonprofit with the mission of providing high-quality education to those who lack access to it."
+        }
+      ]
+    },
     "ABOUT": {
       "ROUTE": "about",
       "TITLE": "I18N_ABOUT_PAGE_TITLE",
