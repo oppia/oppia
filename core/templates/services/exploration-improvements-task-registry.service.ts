@@ -45,8 +45,8 @@ import {
   CyclicStateTransitionsPlaythroughIssue,
   EarlyQuitPlaythroughIssue,
   MultipleIncorrectSubmissionsPlaythroughIssue,
-  PlaythroughIssue
-} from 'domain/statistics/PlaythroughIssueObjectFactory';
+  PlaythroughIssueType
+} from 'domain/statistics/playthrough-issue.model';
 import { ExplorationStats } from
   'domain/statistics/exploration-stats.model';
 import { StateStats } from 'domain/statistics/state-stats-model';
@@ -178,7 +178,7 @@ export class ExplorationImprovementsTaskRegistryService {
       resolvedTaskTypesByStateName:
         ReadonlyMap<string, readonly ExplorationTaskType[]>,
       topAnswersByStateName: ReadonlyMap<string, readonly AnswerStats[]>,
-      playthroughIssues: readonly PlaythroughIssue[]): void {
+      playthroughIssues: readonly PlaythroughIssueType[]): void {
     this.validateInitializationArgs(
       config, states, expStats, openTasks,
       resolvedTaskTypesByStateName, topAnswersByStateName,
@@ -330,7 +330,7 @@ export class ExplorationImprovementsTaskRegistryService {
       resolvedTaskTypesByStateName: ReadonlyMap<
           string, readonly ExplorationTaskType[]>,
       topAnswersByStateName: ReadonlyMap<string, readonly AnswerStats[]>,
-      playthroughIssues: readonly PlaythroughIssue[]): void {
+      playthroughIssues: readonly PlaythroughIssueType[]): void {
     // Validate that the exploration stats correspond with provided exploration.
     if (expStats.expId !== config.explorationId) {
       throw new Error(

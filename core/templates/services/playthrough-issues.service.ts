@@ -19,7 +19,7 @@
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { PlaythroughIssuesBackendApiService } from 'services/playthrough-issues-backend-api.service';
-import { PlaythroughIssue } from 'domain/statistics/PlaythroughIssueObjectFactory';
+import { PlaythroughIssueType } from 'domain/statistics/playthrough-issue.model';
 
 @Injectable({
   providedIn: 'root'
@@ -50,7 +50,7 @@ export class PlaythroughIssuesService {
     this.explorationVersion = newExplorationVersion;
   }
 
-  getIssues(): Promise<PlaythroughIssue[]> {
+  getIssues(): Promise<PlaythroughIssueType[]> {
     return this.playthroughIssuesBackendApiService.fetchIssuesAsync(
       this.explorationId, this.explorationVersion);
   }
