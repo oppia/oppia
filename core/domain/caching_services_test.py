@@ -939,7 +939,11 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
             'rules': [
                 {
                     'filters': [
-                        {'type': 'server_mode', 'conditions': [['=', 'prod']]}],
+                        {
+                            'type': 'platform_type',
+                            'conditions': [['=', 'Backend']]
+                        }
+                    ],
                     'value_when_matched': True
                 }
             ],
