@@ -1182,7 +1182,7 @@ describe('Contributions and review component', () => {
               story_title: 'story_title',
               chapter_title: 'chapter_title'
             }
-          },
+          }
         };
         const reviewableTranslation = Promise.resolve({
           suggestionIdToDetails: suggestion1,
@@ -1219,8 +1219,8 @@ describe('Contributions and review component', () => {
           expect(component._showTranslationSuggestionModal).
             toHaveBeenCalledWith(
               suggestion1,
-              'suggestion_2',
-              true,
+              'suggestion_1',
+              true
             );
         });
         // Wait for the first test to complete.
