@@ -33,7 +33,7 @@ import { PlatformFeatureAdminBackendApiService } from
 import { PlatformFeatureDummyBackendApiService } from
   'domain/platform_feature/platform-feature-dummy-backend-api.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
-import { PlatformParameterFilterType, ServerMode } from
+import { PlatformParameterFilterType } from
   'domain/platform_feature/platform-parameter-filter.model';
 import { FeatureStage, PlatformParameter } from 'domain/platform_feature/platform-parameter.model';
 import { PlatformFeatureService } from 'services/platform-feature.service';
@@ -111,8 +111,8 @@ describe('Release coordinator page feature tab', function() {
           rules: [{
             filters: [
               {
-                type: PlatformParameterFilterType.ServerMode,
-                conditions: [['=', ServerMode.Dev]]
+                type: PlatformParameterFilterType.PlatformType,
+                conditions: [['=', 'Web']]
               }
             ],
             // This does not match the data type of feature flags, but this is
@@ -226,7 +226,7 @@ describe('Release coordinator page feature tab', function() {
       // Verifies it's ['server_mode', 'app_version'] after adding a new filter
       // to the end.
       expect(rule.filters[0].type)
-        .toEqual(PlatformParameterFilterType.ServerMode);
+        .toEqual(PlatformParameterFilterType.PlatformType);
       expect(rule.filters[1].type)
         .toEqual(PlatformParameterFilterType.AppVersion);
     });
@@ -260,7 +260,7 @@ describe('Release coordinator page feature tab', function() {
       // Original condition list: ['=dev']
       // Verifies it's ['=dev', '=mock'] after adding.
       expect(filter.conditions[0])
-        .toEqual(['=', ServerMode.Dev.toString()]);
+        .toEqual(['=', 'Web']);
       expect(filter.conditions[1])
         .toEqual(['=', 'mock']);
     });
@@ -346,8 +346,8 @@ describe('Release coordinator page feature tab', function() {
       rules: [{
         filters: [
           {
-            type: PlatformParameterFilterType.ServerMode,
-            conditions: [['=', ServerMode.Dev]]
+            type: PlatformParameterFilterType.PlatformType,
+            conditions: [['=', 'Web']]
           }
         ],
         value_when_matched: true,
@@ -365,8 +365,8 @@ describe('Release coordinator page feature tab', function() {
       rules: [{
         filters: [
           {
-            type: PlatformParameterFilterType.ServerMode,
-            conditions: [['=', ServerMode.Dev]]
+            type: PlatformParameterFilterType.PlatformType,
+            conditions: [['=', 'Web']]
           }
         ],
         value_when_matched: true,
@@ -444,8 +444,7 @@ describe('Release coordinator page feature tab', function() {
       flushMicrotasks();
 
       expect(updateApiSpy).toHaveBeenCalledWith(
-        featureFlag.name, 'mock msg', featureFlag.rules,
-        featureFlag.defaultValue);
+        featureFlag.name, 'mock msg', featureFlag.rules);
       expect(setStatusSpy).toHaveBeenCalledWith('Saved successfully.');
     }));
 
@@ -572,60 +571,6 @@ describe('Release coordinator page feature tab', function() {
     }));
   });
 
-  describe('server mode option filter', () => {
-    type OptionFilterType = (
-      (feature: PlatformParameter, option: string) => boolean);
-    let options: readonly string[];
-    let optionFilter: OptionFilterType;
-
-    beforeEach(() => {
-      options = component
-        .filterTypeToContext[PlatformParameterFilterType.ServerMode]
-        .options as readonly string[];
-      optionFilter = component
-        .filterTypeToContext[PlatformParameterFilterType.ServerMode]
-        .optionFilter as OptionFilterType;
-    });
-
-    it('should return [\'dev\'] for feature in dev stage', () => {
-      expect(
-        options.filter(option => optionFilter(
-          { featureStage: FeatureStage.DEV } as PlatformParameter,
-          option))
-      )
-        .toEqual(['dev']);
-    });
-
-    it('should return [\'dev\', \'test\'] for feature in test stage', () => {
-      expect(
-        options.filter(option => optionFilter(
-          { featureStage: FeatureStage.TEST } as PlatformParameter,
-          option))
-      )
-        .toEqual(['dev', 'test']);
-    });
-
-    it('should return [\'dev\', \'test\', \'prod\'] for feature in prod stage',
-      () => {
-        expect(
-          options.filter(option => optionFilter(
-            { featureStage: FeatureStage.PROD } as PlatformParameter,
-            option))
-        )
-          .toEqual(['dev', 'test', 'prod']);
-      }
-    );
-
-    it('should return empty array for feature in invalid stage', () => {
-      expect(
-        options.filter(option => optionFilter(
-          { featureStage: null } as PlatformParameter,
-          option))
-      )
-        .toEqual([]);
-    });
-  });
-
   describe('.isFeatureFlagChanged', () => {
     it('should return false if the feature is the same as the backup instance',
       () => {
@@ -648,15 +593,6 @@ describe('Release coordinator page feature tab', function() {
       }
     );
 
-    it('should return true if the feature default value is different from ' +
-    'the backup instance', () => {
-      let featureFlag = component.featureFlags[0];
-      featureFlag.defaultValue = true;
-
-      expect(component.isFeatureFlagChanged(featureFlag))
-        .toBeTrue();
-    });
-
     it('should throw error if the feature username is not found', () => {
       const featureFlag = PlatformParameter.createFromBackendDict({
         data_type: 'bool',
@@ -670,12 +606,8 @@ describe('Release coordinator page feature tab', function() {
           {
             filters: [
               {
-                type: PlatformParameterFilterType.ServerMode,
-                conditions: [['=', ServerMode.Dev], ['=', ServerMode.Test]]
-              },
-              {
-                type: PlatformParameterFilterType.ServerMode,
-                conditions: [['=', ServerMode.Prod]]
+                type: PlatformParameterFilterType.PlatformType,
+                conditions: [['=', 'Web']]
               }
             ],
             value_when_matched: true,
@@ -708,12 +640,8 @@ describe('Release coordinator page feature tab', function() {
             {
               filters: [
                 {
-                  type: PlatformParameterFilterType.ServerMode,
-                  conditions: [['=', ServerMode.Dev], ['=', ServerMode.Test]]
-                },
-                {
-                  type: PlatformParameterFilterType.ServerMode,
-                  conditions: [['=', ServerMode.Prod]]
+                  type: PlatformParameterFilterType.PlatformType,
+                  conditions: [['=', 'Web']]
                 }
               ],
               value_when_matched: true,
@@ -769,12 +697,12 @@ describe('Release coordinator page feature tab', function() {
             {
               filters: [
                 {
-                  type: PlatformParameterFilterType.ServerMode,
-                  conditions: [['=', ServerMode.Dev]]
+                  type: PlatformParameterFilterType.PlatformType,
+                  conditions: [['=', 'Web']]
                 },
                 {
-                  type: PlatformParameterFilterType.ServerMode,
-                  conditions: [['=', ServerMode.Dev]]
+                  type: PlatformParameterFilterType.PlatformType,
+                  conditions: [['=', 'Web']]
                 }
               ],
               value_when_matched: true
@@ -801,8 +729,8 @@ describe('Release coordinator page feature tab', function() {
             {
               filters: [
                 {
-                  type: PlatformParameterFilterType.ServerMode,
-                  conditions: [['=', ServerMode.Dev], ['=', ServerMode.Dev]]
+                  type: PlatformParameterFilterType.PlatformType,
+                  conditions: [['=', 'Web'], ['=', 'Web']]
                 },
               ],
               value_when_matched: true
