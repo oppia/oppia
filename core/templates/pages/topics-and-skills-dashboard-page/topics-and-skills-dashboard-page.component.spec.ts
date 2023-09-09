@@ -332,12 +332,15 @@ describe('Topics and skills dashboard page component', () => {
     componentInstance.filterBoxIsShown = false;
     componentInstance.toggleFilterBox();
     expect(componentInstance.filterBoxIsShown).toBeTrue();
+    componentInstance.toggleFilterBox();
+    expect(componentInstance.filterBoxIsShown).toBeFalse();
   });
 
   it('should display filter box on maximizing the window', () => {
     componentInstance.filterBoxIsShown = false;
 
     spyOn(windowDimensionsService, 'isWindowNarrow').and.returnValue(false);
+    spyOnProperty(window, 'innerWidth').and.returnValue(1024);
 
     componentInstance.filterBoxOnResize();
 
@@ -348,6 +351,7 @@ describe('Topics and skills dashboard page component', () => {
     componentInstance.filterBoxIsShown = true;
 
     spyOn(windowDimensionsService, 'isWindowNarrow').and.returnValue(true);
+    spyOnProperty(window, 'innerWidth').and.returnValue(768);
 
     componentInstance.filterBoxOnResize();
 
