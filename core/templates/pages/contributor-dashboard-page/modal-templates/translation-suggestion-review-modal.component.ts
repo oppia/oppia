@@ -216,10 +216,6 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
     this.editedContent = {
       html: this.translationHtml
     };
-    this.explorationImagesString = this.getImageInfoForSuggestion(
-      this.contentHtml);
-    this.suggestionImagesString = this.getImageInfoForSuggestion(
-      this.translationHtml);
   }
 
   refreshActiveContributionState(): void {
@@ -308,6 +304,10 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
         }
       });
     }
+    this.explorationImagesString = this.getImageInfoForSuggestion(
+      this.contentHtml);
+    this.suggestionImagesString = this.getImageInfoForSuggestion(
+      this.translationHtml);
     setTimeout(() => {
       this.computePanelOverflowState();
     }, 0);
@@ -351,6 +351,8 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
           reloadOpportunitiesEventEmitter.emit();
       },
       this.showTranslationSuggestionUpdateError);
+    this.suggestionImagesString = this.getImageInfoForSuggestion(
+      this.translationHtml);
   }
 
   // The length of the commit message should not exceed 375 characters,
