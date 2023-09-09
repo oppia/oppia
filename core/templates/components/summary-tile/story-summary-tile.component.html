@@ -128,7 +128,7 @@
       <div class="chapters-list">
         <div class="tablet-view chapters-heading">
           <div class="heading-label">Available</div>
-          <div class="chapters-count">{{ availableNodeCount }} {{ getChapterTextBasedOnCount(availableNodeCount) }}</div>
+          <div class="chapters-count" [innerHTML]="'I18N_TOPIC_VIEWER_CHAPTERS' | translate:{count:availableNodeCount, messageFormat: true}"></div>
         </div>
         <hr class="tablet-view heading-separator">
         <div *ngFor="let node of nodes;let idx = index">
@@ -152,7 +152,7 @@
       <div class="chapters-list" *ngIf="comingSoonNodeCount">
         <div class="tablet-view chapters-heading">
           <div class="heading-label">Coming Soon</div>
-          <div class="chapters-count">{{ comingSoonNodeCount }} {{ getChapterTextBasedOnCount(comingSoonNodeCount) }}</div>
+          <div class="chapters-count" [innerHTML]="'I18N_TOPIC_VIEWER_CHAPTERS' | translate:{count:comingSoonNodeCount, messageFormat: true}"></div>
         </div>
         <hr class="tablet-view heading-separator">
         <div *ngFor="let node of nodes;let idx = index">
@@ -207,7 +207,7 @@
       <div class="chapters-list">
         <div class="chapters-heading">
           <div class="heading-label">Available</div>
-          <div class="chapters-count">{{ availableNodeCount }} {{ getChapterTextBasedOnCount(availableNodeCount) }}</div>
+          <div class="chapters-count" [innerHTML]="'I18N_TOPIC_VIEWER_CHAPTERS' | translate:{count:availableNodeCount, messageFormat: true}"></div>
         </div>
         <hr class="heading-separator">
         <div class="chapter-title"
@@ -229,7 +229,7 @@
       <div class="chapters-list" *ngIf="comingSoonNodeCount">
         <div class="chapters-heading">
           <div class="heading-label">Coming Soon</div>
-          <div class="chapters-count">{{ comingSoonNodeCount }} {{ getChapterTextBasedOnCount(comingSoonNodeCount) }}</div>
+          <div class="chapters-count" [innerHTML]="'I18N_TOPIC_VIEWER_CHAPTERS' | translate:{count:comingSoonNodeCount, messageFormat: true}"></div>
         </div>
         <hr class="heading-separator">
         <div class="chapter-title coming-soon-chapters"

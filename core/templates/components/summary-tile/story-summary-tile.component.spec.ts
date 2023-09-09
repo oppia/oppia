@@ -214,11 +214,6 @@ describe('StorySummaryTileComponent', () => {
     expect(component.thumbnailUrl).toBe(null);
   });
 
-  it('should get correct text based on chapter count', () => {
-    expect(component.getChapterTextBasedOnCount(1)).toBe('Chapter');
-    expect(component.getChapterTextBasedOnCount(2)).toBe('Chapters');
-  });
-
   it('should show thumbnail if thumbnail filename is given', () => {
     // StorySummary with a thumbnail.
     component.storySummary = StorySummary.createFromBackendDict({

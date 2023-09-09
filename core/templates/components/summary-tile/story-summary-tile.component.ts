@@ -260,14 +260,6 @@ export class StorySummaryTileComponent implements OnInit {
     this.getStoryStatus();
   }
 
-  getChapterTextBasedOnCount(chapterCount: number): string {
-    let chapterText = 'Chapters';
-    if (chapterCount === 1) {
-      chapterText = 'Chapter';
-    }
-    return chapterText;
-  }
-
   isHackyStoryTitleTranslationDisplayed(): boolean {
     return (
       this.i18nLanguageCodeService.isHackyTranslationAvailable(
