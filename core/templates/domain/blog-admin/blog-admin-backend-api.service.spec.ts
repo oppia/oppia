@@ -31,19 +31,11 @@ describe('Blog Admin backend api service', () => {
     role_to_actions: {
       blog_post_editor: ['action for editor']
     },
-    config_properties: {
-      list_of_default_tags_for_blog_post: {
-        description: 'List of tags',
-        value: ['Learners', 'News'],
-        schema: {
-          type: 'list',
-          items: {
-            type: 'unicode'
-          },
-          validators: [{
-            id: 'is_uniquified',
-          }],
-        }
+    platform_parameters: {
+      max_number_of_tags_assigned_to_blog_post: {
+        description: 'Max number of tags.',
+        value: 10,
+        schema: {type: 'number'}
       }
     },
     updatable_roles: {
@@ -51,8 +43,7 @@ describe('Blog Admin backend api service', () => {
     }
   };
   let blogAdminDataObject: BlogAdminPageData;
-  let configPropertyValues = {
-    list_of_default_tags_for_blog_post: ['News', 'Learners'],
+  let platformParameterValues = {
     max_number_of_tags_assigned_to_blog_post: 5
   };
 
@@ -68,7 +59,7 @@ describe('Blog Admin backend api service', () => {
     blogAdminDataObject = {
       updatableRoles: blogAdminBackendResponse.updatable_roles,
       roleToActions: blogAdminBackendResponse.role_to_actions,
-      configProperties: blogAdminBackendResponse.config_properties,
+      platformParameters: blogAdminBackendResponse.platform_parameters,
     };
 
     spyOn(csrfService, 'getTokenAsync').and.callFake(async() => {
@@ -210,73 +201,17 @@ describe('Blog Admin backend api service', () => {
   }
   ));
 
-  it('should revert specified config property to default' +
-    'value given the config property ID when calling' +
-    'revertConfigPropertyAsync', fakeAsync(() => {
-    let action = 'revert_config_property';
-    let configPropertyId = 'max_number_of_tags_assigned_to_blog_post';
-    let payload = {
-      action: action,
-      config_property_id: configPropertyId
-    };
-
-    babas.revertConfigPropertyAsync(
-      configPropertyId).then(successHandler, failHandler);
-
-    let req = httpTestingController.expectOne('/blogadminhandler');
-    expect(req.request.method).toEqual('POST');
-    expect(req.request.body).toEqual(payload);
-
-    req.flush(200);
-    flushMicrotasks();
-
-    expect(successHandler).toHaveBeenCalled();
-    expect(failHandler).not.toHaveBeenCalled();
-  }
-  ));
-
-  it('should fail to revert specified config property to default' +
-    'value when given config property ID is invalid when calling' +
-    'revertConfigPropertyAsync', fakeAsync(() => {
-    let action = 'revert_config_property';
-    let configPropertyId = 'InvalidId';
-    let payload = {
-      action: action,
-      config_property_id: configPropertyId
-    };
-
-    babas.revertConfigPropertyAsync(
-      configPropertyId).then(successHandler, failHandler);
-
-    let req = httpTestingController.expectOne('/blogadminhandler');
-    expect(req.request.method).toEqual('POST');
-    expect(req.request.body).toEqual(payload);
-
-    req.flush({
-      error: 'Config property does not exist.'
-    }, {
-      status: 500, statusText: 'Internal Server Error'
-    });
-    flushMicrotasks();
-
-    expect(successHandler).not.toHaveBeenCalled();
-    expect(failHandler).toHaveBeenCalledWith(
-      'Config property does not exist.');
-  }
-  ));
-
-
   it('should save the new config properties given the new' +
-    'config property when calling' +
-    'saveConfigPropertiesAsync', fakeAsync(() => {
-    let action = 'save_config_properties';
+    'platform parameter when calling' +
+    'savePlatformParametersAsync', fakeAsync(() => {
+    let action = 'save_platform_parameters';
     let payload = {
       action: action,
-      new_config_property_values: configPropertyValues
+      new_platform_parameter_values: platformParameterValues
     };
 
-    babas.saveConfigPropertiesAsync(
-      configPropertyValues).then(successHandler, failHandler);
+    babas.savePlatformParametersAsync(
+      platformParameterValues).then(successHandler, failHandler);
 
     let req = httpTestingController.expectOne('/blogadminhandler');
     expect(req.request.method).toEqual('POST');
@@ -291,22 +226,22 @@ describe('Blog Admin backend api service', () => {
   ));
 
   it('should fail to save the new config properties when given new' +
-    'config property is invalid when calling' +
-    'saveConfigPropertiesAsync', fakeAsync(() => {
-    let action = 'save_config_properties';
+    'platform parameter is invalid when calling' +
+    'savePlatformParametersAsync', fakeAsync(() => {
+    let action = 'save_platform_parameters';
     let payload = {
       action: action,
-      new_config_property_values: configPropertyValues
+      new_platform_parameter_values: platformParameterValues
     };
-    babas.saveConfigPropertiesAsync(
-      configPropertyValues).then(successHandler, failHandler);
+    babas.savePlatformParametersAsync(
+      platformParameterValues).then(successHandler, failHandler);
 
     let req = httpTestingController.expectOne('/blogadminhandler');
     expect(req.request.method).toEqual('POST');
     expect(req.request.body).toEqual(payload);
 
     req.flush({
-      error: 'Config property does not exist.'
+      error: 'Platform parameter does not exist.'
     }, {
       status: 500, statusText: 'Internal Server Error'
     });
@@ -314,7 +249,7 @@ describe('Blog Admin backend api service', () => {
 
     expect(successHandler).not.toHaveBeenCalled();
     expect(failHandler).toHaveBeenCalledWith(
-      'Config property does not exist.');
+      'Platform parameter does not exist.');
   }
   ));
 });

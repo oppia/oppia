@@ -72,6 +72,14 @@ PLATFORM_PARAMS_TO_SHOW_IN_RC_PAGE = set([
     platform_parameter_list.ParamNames.PROMO_BAR_MESSAGE.value
 ])
 
+# Platform parameters that we plan to show on the blog admin page.
+PLATFORM_PARAMS_TO_SHOW_IN_BLOG_ADMIN_PAGE = set([
+    (
+        platform_parameter_list.ParamNames.
+        MAX_NUMBER_OF_TAGS_ASSIGNED_TO_BLOG_POST.value
+    )
+])
+
 
 class ClassroomPageDataDict(TypedDict):
     """Dict representation of classroom page's data dictionary."""
@@ -260,18 +268,18 @@ class AdminHandler(
             feature_services.
             get_all_platform_parameters_except_feature_flag_dicts()
         )
-        # Removes promo-bar related platform params as promo-bar is handled by
-        # release coordinators in /release-coordinator page.
+        # Removes promo-bar related and blog related platform params as
+        # they are handled in release-coordinator page and blog admin page
+        # respectively.
         platform_params_dicts = [
             param for param in platform_params_dicts
-            if param['name'] not in PLATFORM_PARAMS_TO_SHOW_IN_RC_PAGE
+            if (
+                param['name'] not in PLATFORM_PARAMS_TO_SHOW_IN_RC_PAGE and
+                param['name'] not in PLATFORM_PARAMS_TO_SHOW_IN_BLOG_ADMIN_PAGE
+            )
         ]
 
         config_properties = config_domain.Registry.get_config_property_schemas()
-
-        # Remove blog related configs as they will be handled by 'blog admins'
-        # on blog admin page.
-        del config_properties['max_number_of_tags_assigned_to_blog_post']
 
         self.render_json({
             'config_properties': config_properties,

@@ -32,6 +32,7 @@ docstrings in this file.
 
 from __future__ import annotations
 
+import copy
 import json
 import os
 
@@ -40,7 +41,6 @@ from core import platform_feature_list
 from core import utils
 from core.constants import constants
 from core.domain import platform_parameter_domain
-from core.domain import platform_parameter_list
 from core.domain import platform_parameter_registry as registry
 
 from typing import Dict, Final, List, Set
@@ -55,29 +55,11 @@ ALL_FEATURES_NAMES_SET: Set[str] = set(
     feature.value for feature in ALL_FEATURE_FLAGS
 )
 
-ALL_PLATFORM_PARAMS_EXCEPT_FEATURE_FLAGS: List[
-    platform_parameter_list.ParamNames
-] = [
-        (
-            platform_parameter_list.ParamNames.
-            ALWAYS_ASK_LEARNERS_FOR_ANSWER_DETAILS
-        ),
-        platform_parameter_list.ParamNames.DUMMY_PARAMETER,
-        (
-            platform_parameter_list.ParamNames.
-            HIGH_BOUNCE_RATE_TASK_STATE_BOUNCE_RATE_CREATION_THRESHOLD
-        ),
-        (
-            platform_parameter_list.ParamNames.
-            HIGH_BOUNCE_RATE_TASK_STATE_BOUNCE_RATE_OBSOLETION_THRESHOLD
-        ),
-        (
-            platform_parameter_list.ParamNames.
-            HIGH_BOUNCE_RATE_TASK_MINIMUM_EXPLORATION_STARTS
-        ),
-        platform_parameter_list.ParamNames.PROMO_BAR_ENABLED,
-        platform_parameter_list.ParamNames.PROMO_BAR_MESSAGE,
-    ]
+DATA_TYPE_TO_SCHEMA_TYPE: Dict[str, str] = {
+    'number': 'float',
+    'string': 'unicode',
+    'bool': 'bool'
+}
 
 PACKAGE_JSON_FILE_PATH: Final = os.path.join(os.getcwd(), 'package.json')
 
@@ -143,7 +125,8 @@ def get_all_platform_parameters_except_feature_flag_dicts() -> List[
     """
     return [
         registry.Registry.get_platform_parameter(_plat_param.value).to_dict()
-        for _plat_param in ALL_PLATFORM_PARAMS_EXCEPT_FEATURE_FLAGS
+        for _plat_param in platform_feature_list.
+        ALL_PLATFORM_PARAMS_EXCEPT_FEATURE_FLAGS
     ]
 
 
@@ -339,3 +322,30 @@ def get_platform_parameter_value(
     context = _create_evaluation_context_for_server()
     param = registry.Registry.get_platform_parameter(parameter_name)
     return param.evaluate(context)
+
+
+def get_platform_parameter_schema(param_name: str) -> Dict[str, str]:
+    """Returns the schema for the platform parameter.
+
+    Args:
+        param_name: str. The name of the platform parameter.
+
+    Returns:
+        Dict[str, str]. The schema of the platform parameter according
+        to the data_type.
+
+    Raises:
+        Exception. The platform parameter does not have valid data type.
+    """
+    parameter = registry.Registry.get_platform_parameter(param_name)
+    if DATA_TYPE_TO_SCHEMA_TYPE.get(parameter.data_type) is not None:
+        schema_type = copy.deepcopy(
+            DATA_TYPE_TO_SCHEMA_TYPE[parameter.data_type])
+        return {'type': schema_type}
+    else:
+        raise Exception(
+            'The %s platform parameter has a data type of %s which is not '
+            'valid. Please use one of these data types instead: %s.' % (
+                parameter.name, parameter.data_type,
+                platform_parameter_domain.PlatformDataTypes)
+        )

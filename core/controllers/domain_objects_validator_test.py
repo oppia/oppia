@@ -134,10 +134,96 @@ class ValidateNewConfigPropertyValuesTests(test_utils.GenericTestBase):
 
     def test_valid_object_raises_no_exception(self) -> None:
         config_properties = {
-            'max_number_of_tags_assigned_to_blog_post': 20,
+            'record_playthrough_probability': 0.3,
         }
         domain_objects_validator.validate_new_config_property_values(
             config_properties)
+
+
+class ValidateNewPlatformParamsValueForBlogAdminTests(
+    test_utils.GenericTestBase):
+    """Tests to validate platform parameters dict coming from API."""
+
+    def test_valid_params_values_raises_no_exception(self) -> None:
+        new_platform_parameter_values = {
+            'max_number_of_tags_assigned_to_blog_post': 20,
+        }
+        domain_objects_validator.validate_platform_params_values_for_blog_admin(
+            new_platform_parameter_values)
+
+        new_platform_parameter_values = {
+            'promo_bar_enabled': False,
+        }
+        domain_objects_validator.validate_platform_params_values_for_blog_admin(
+            new_platform_parameter_values)
+
+    def test_difference_of_incoming_value_and_parameter_data_type_raise_error(
+        self
+    ) -> None:
+        new_platform_parameter_values = {
+            'max_number_of_tags_assigned_to_blog_post': 'str'
+        }
+        with self.assertRaisesRegex(
+            Exception, 'The value of platform parameter max_number_of_tags_'
+            'assigned_to_blog_post is of type \'str\', expected it to be '
+            'of type \'number\''
+        ):
+            (
+                domain_objects_validator.
+                validate_platform_params_values_for_blog_admin(
+                    new_platform_parameter_values)
+            )
+
+    def test_param_name_type_other_than_str_raises_error(self) -> None:
+        new_platform_parameter_values = {1234: 20, }
+        with self.assertRaisesRegex(
+            Exception, 'Platform parameter name should be a string, received'
+            ': %s' % 1234
+        ):
+            (
+                # TODO(#13059): Here we use MyPy ignore because after we fully
+                # type the codebase we plan to get rid of the tests that
+                # intentionally test wrong inputs that we can normally catch
+                # by typing.
+                domain_objects_validator.
+                validate_platform_params_values_for_blog_admin(
+                    new_platform_parameter_values) # type: ignore[arg-type]
+            )
+
+    def test_with_invalid_type_raises_error(self) -> None:
+        new_platform_parameter_values = {
+            'max_number_of_tags_assigned_to_blog_post': [20]
+        }
+        with self.assertRaisesRegex(
+            Exception, 'The value of max_number_of_tags_assigned_to_blog_post '
+            'platform parameter is not of valid type, it should be one of '
+            'typing.Union\\[str, int, bool, float].'
+        ):
+            (
+                # TODO(#13059): Here we use MyPy ignore because after we fully
+                # type the codebase we plan to get rid of the tests that
+                # intentionally test wrong inputs that we can normally catch
+                # by typing.
+                domain_objects_validator.
+                validate_platform_params_values_for_blog_admin(
+                    new_platform_parameter_values) # type: ignore[arg-type]
+            )
+
+    def test_value_less_or_equal_0_for_max_no_of_tags_raises_errors(
+        self
+    ) -> None:
+        new_platform_parameter_values = {
+            'max_number_of_tags_assigned_to_blog_post': -2
+        }
+        with self.assertRaisesRegex(
+            Exception, 'The value of max_number_of_tags_assigned_to_blog_post '
+            'should be greater than 0, it is -2.'
+        ):
+            (
+                domain_objects_validator.
+                validate_platform_params_values_for_blog_admin(
+                    new_platform_parameter_values)
+            )
 
 
 class ValidateNewDefaultValueForPlatformParametersTests(

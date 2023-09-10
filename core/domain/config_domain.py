@@ -36,10 +36,8 @@ from core.platform import models  # pylint: disable=invalid-import-from # isort:
 MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import config_models
-    from mypy_imports import suggestion_models
 
-(config_models, suggestion_models,) = models.Registry.import_models(
-    [models.Names.CONFIG, models.Names.SUGGESTION])
+(config_models,) = models.Registry.import_models([models.Names.CONFIG])
 
 AllowedDefaultValueTypes = Union[
     str,
@@ -213,11 +211,13 @@ class ConfigProperty:
     - contact_email_address.
     - contribute_gallery_page_announcement.
     - contributor_dashboard_is_enabled.
+    - contributor_dashboard_reviewer_emails_is_enabled.
     - default_twitter_share_message_editor.
     - disabled_explorations.
     - editor_page_announcement.
     - editor_prerequisites_agreement.
     - embedded_google_group_url.
+    - enable_admin_notifications_for_reviewer_shortage.
     - featured_translation_languages.
     - full_site_url.
     - high_bounce_rate_task_minimum_exploration_starts.
@@ -227,10 +227,13 @@ class ConfigProperty:
     - learner_groups_are_enabled.
     - list_of_default_tags_for_blog_post.
     - max_number_of_explorations_in_math_svgs_batch.
+    - max_number_of_suggestions_per_reviewer.
     - max_number_of_svgs_in_math_svgs_batch.
+    - max_number_of_tags_assigned_to_blog_post.
     - moderator_ids.
     - moderator_request_forum_url.
     - moderator_usernames.
+    - notify_admins_suggestions_waiting_too_long_is_enabled.
     - promo_bar_enabled.
     - promo_bar_message.
     - publicize_exploration_email_html_body.
@@ -473,43 +476,3 @@ CLASSROOM_PAGES_DATA = ConfigProperty(
 RECORD_PLAYTHROUGH_PROBABILITY = ConfigProperty(
     'record_playthrough_probability', FLOAT_SCHEMA,
     'The probability of recording playthroughs', 0.2)
-
-MAX_NUMBER_OF_TAGS_ASSIGNED_TO_BLOG_POST = ConfigProperty(
-    'max_number_of_tags_assigned_to_blog_post',
-    POSITIVE_INT_SCHEMA,
-    'The maximum number of tags that can be selected to categorize the blog'
-    ' post',
-    10
-)
-
-CONTRIBUTOR_DASHBOARD_REVIEWER_EMAILS_IS_ENABLED = ConfigProperty(
-    'contributor_dashboard_reviewer_emails_is_enabled', BOOL_SCHEMA,
-    (
-        'Enable sending Contributor Dashboard reviewers email notifications '
-        'about suggestions that need review. The default value is false.'
-    ), False)
-
-ENABLE_ADMIN_NOTIFICATIONS_FOR_SUGGESTIONS_NEEDING_REVIEW = ConfigProperty(
-    'notify_admins_suggestions_waiting_too_long_is_enabled', BOOL_SCHEMA,
-    (
-        'Enable sending admins email notifications if there are Contributor '
-        'Dashboard suggestions that have been waiting for a review for more '
-        'than %s days. The default value is false.' % (
-            suggestion_models.SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS)
-    ), False)
-
-ENABLE_ADMIN_NOTIFICATIONS_FOR_REVIEWER_SHORTAGE = ConfigProperty(
-    'enable_admin_notifications_for_reviewer_shortage', BOOL_SCHEMA,
-    (
-        'Enable sending admins email notifications if Contributor Dashboard '
-        'reviewers are needed in specific suggestion types. The default value '
-        'is false.'
-    ), False)
-
-MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER = ConfigProperty(
-    'max_number_of_suggestions_per_reviewer',
-    INT_SCHEMA,
-    'The maximum number of Contributor Dashboard suggestions per reviewer. If '
-    'the number of suggestions per reviewer surpasses this maximum, for any '
-    'given suggestion type on the dashboard, the admins are notified by email.',
-    5)
