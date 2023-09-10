@@ -2810,7 +2810,7 @@ def update_translation_contribution_stats_at_submission(
             accepted_translation_word_count=0,
             rejected_translations_count=0,
             rejected_translation_word_count=0,
-            contribution_dates=[suggestion.last_updated.date()]
+            contribution_dates=sorted([suggestion.last_updated.date()])
         )
     else:
         translation_contribution_stat = (
@@ -3006,7 +3006,7 @@ def update_translation_contribution_stats_at_review(
             accepted_translation_word_count=accepted_translation_word_count,
             rejected_translations_count=rejected_translations_count,
             rejected_translation_word_count=rejected_translation_word_count,
-            contribution_dates=[suggestion.last_updated.date()]
+            contribution_dates=sorted([suggestion.last_updated.date()])
         )
     else:
         translation_contribution_stat = (
