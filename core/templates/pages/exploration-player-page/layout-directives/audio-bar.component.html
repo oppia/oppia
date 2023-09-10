@@ -1,4 +1,4 @@
-<div tabindex="0" aria-label="audio menu" class="audio-header" *ngIf="isAudioBarAvailable()"
+<div tabindex="0" aria-label="audio menu" class="audio-header" *ngIf="isAudioBarAvailable()" #audioBarContainer
      [ngClass]="{'audio-header-margin': explorationPlayerModeIsActive}" headroom>
   <div *ngIf="audioBarIsExpanded" class="audio-bar-expanded" headroom>
     <div class="audio-controls" [ngClass]="{'audio-controls-margin': progressBarIsShown}">
@@ -58,7 +58,9 @@
     <div class="audio-collapse-button audio-toggle-button"
          *ngIf="audioBarIsExpanded"
          (click)="collapseAudioBar()"
+         (keydown.enter)="collapseAudioBar()"
          aria-label="Audio menu collapse"
+         tabindex="0"
          [ngClass]="{'audio-controls-margin': progressBarIsShown}">
       <i class="fas fa-sort-up"></i>
     </div>
@@ -71,15 +73,15 @@
     <div class="container e2e-test-audio-bar">
       <div class="row">
         <div class="col-lg-6 px-0 mt-1 ml-2">
-          <span class="audio-expand-button-text">
+          <span class="audio-expand-button-text" tabindex="0">
             {{ 'I18N_PLAYER_AUDIO_EXPAND_TEXT' | translate }}
           </span>
         </div>
         <div class="col-lg-3 col-6 px-0 mt-lg-2">
-          <i tabindex="0" aria-label="headphone icon" class="audio-expand-icon fas fa-headphones-alt"></i>
+          <i class="audio-expand-icon fas fa-headphones-alt"></i>
         </div>
         <div class="col-lg-2 col-6 px-0 mt-lg-1">
-          <i tabindex="0" aria-label="Press Enter to expand the audio menu" class="audio-expand-icon fas fa-sort-down"></i>
+          <i tabindex="0" aria-label="Press Enter to expand the audio menu" role="button" class="audio-expand-icon fas fa-sort-down"></i>
         </div>
       </div>
     </div>
@@ -110,6 +112,10 @@
 
   .audio-header .fa-sort-up, .audio-header .fa-sort-down {
     transform: translateY(-2px);
+  }
+
+  .audio-header:focus {
+    outline: none;
   }
 
   .audio-expand-button {
