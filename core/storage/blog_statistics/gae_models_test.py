@@ -90,7 +90,7 @@ class BlogPostViewedEventLogEntryModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             blog_stats_models.BlogPostViewedEventLogEntryModel
             .get_deletion_policy(),
-            base_models.DELETION_POLICY.DELETE
+            base_models.DELETION_POLICY.NOT_APPLICABLE
         )
 
     def test_create_and_get_event_models(self) -> None:
@@ -179,7 +179,8 @@ class BlogPostReadEventLogEntryModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             blog_stats_models.BlogPostReadEventLogEntryModel
             .get_deletion_policy(),
-            base_models.DELETION_POLICY.DELETE)
+            base_models.DELETION_POLICY.NOT_APPLICABLE
+        )
 
     def test_create_and_get_event_models(self) -> None:
         entity_id = (
@@ -273,7 +274,8 @@ class BlogPostExitedEventLogEntryModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             blog_stats_models.BlogPostExitedEventLogEntryModel
             .get_deletion_policy(),
-            base_models.DELETION_POLICY.DELETE)
+            base_models.DELETION_POLICY.NOT_APPLICABLE
+        )
 
     def test_create_and_get_event_models(self) -> None:
         entity_id = (
