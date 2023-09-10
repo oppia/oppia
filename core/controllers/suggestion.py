@@ -148,7 +148,7 @@ class SuggestionHandler(
         Dict[str, str]
     ]
 ):
-    """"Handles operations  relating to suggestions."""
+    """"Handles operations relating to suggestions."""
 
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
     HANDLER_ARGS_SCHEMAS = {
