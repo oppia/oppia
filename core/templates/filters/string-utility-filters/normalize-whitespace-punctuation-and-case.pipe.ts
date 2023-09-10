@@ -25,13 +25,16 @@ import { Injectable, Pipe, PipeTransform } from '@angular/core';
 @Injectable({
   providedIn: 'root'
 })
-@Pipe({name: 'normalizeWhitespacePunctuationAndCase'})
+@Pipe({ name: 'normalizeWhitespacePunctuationAndCase' })
 export class NormalizeWhitespacePunctuationAndCasePipe
-implements PipeTransform {
+  implements PipeTransform {
   transform(input: string): string {
     let isAlphanumeric = function(character: string) {
       return 'qwertyuiopasdfghjklzxcvbnm0123456789'.indexOf(
         character.toLowerCase()) !== -1;
+    };
+    let isPunctuation = function(character: string) {
+      return ',.!?'.indexOf(character) !== -1;
     };
 
     input = input.trim();
@@ -39,26 +42,25 @@ implements PipeTransform {
     let resultLines = [];
     for (let i: number = 0; i < inputLines.length; i++) {
       let result = '';
-
       let inputLine = inputLines[i].trim().replace(/\s{2,}/g, ' ');
       for (let j: number = 0; j < inputLine.length; j++) {
         let currentChar: string = inputLine.charAt(j).toLowerCase();
         if (currentChar === ' ') {
           if (j > 0 && j < inputLine.length - 1 &&
-                              isAlphanumeric(inputLine.charAt(j - 1)) &&
-                              isAlphanumeric(inputLine.charAt(j + 1))) {
+            (isAlphanumeric(inputLine.charAt(j - 1)) ||
+            isPunctuation(inputLine.charAt(j - 1))) &&
+            (isAlphanumeric(inputLine.charAt(j + 1)) ||
+            isPunctuation(inputLine.charAt(j + 1)))) {
             result += currentChar;
           }
         } else {
           result += currentChar;
         }
       }
-
       if (result) {
         resultLines.push(result);
       }
     }
-
-    return resultLines.join('\n');
+    return resultLines.join('\n').trim();
   }
 }

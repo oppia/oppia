@@ -35,27 +35,22 @@ describe('Testing NormalizeWhitespacePunctuationAndCasePipe', () => {
 
   it('should normalize spaces and turn characters to lower case', () => {
     expect(nwpcp.transform('')).toEqual('');
-
-    expect(nwpcp.transform('  remove '))
-      .toEqual('remove');
-
-    //  Should remove the space if it does not
-    //  separate two alphanumeric "words".
-    expect(nwpcp.transform('  remove ? '))
-      .toEqual('remove?');
-    expect(nwpcp.transform(' Hello, world '))
-      .toEqual('hello,world');
+    expect(nwpcp.transform('  remove ')).toEqual('remove');
+    expect(nwpcp.transform('  remove ? ')).toEqual('remove ?');
+    expect(nwpcp.transform(' Hello, world ')).toEqual('hello, world');
     expect(nwpcp.transform('  Test1 tesT2 teSt3 '))
       .toEqual('test1 test2 test3');
     expect(nwpcp.transform('  Test1 tesT2! teSt3 '))
-      .toEqual('test1 test2!test3');
+      .toEqual('test1 test2! test3');
+    expect(nwpcp.transform(' teSTstrinG12  ')).toEqual('teststring12');
+    expect(nwpcp.transform(' tesT1 teSt2 ')).toEqual('test1 test2');
+    expect(nwpcp.transform('tesT1\n teSt2')).toEqual('test1\ntest2');
+  });
 
-    expect(nwpcp.transform(' teSTstrinG12  '))
-      .toEqual('teststring12');
-    expect(nwpcp.transform(' tesT1 teSt2 '))
-      .toEqual('test1 test2');
-
-    expect(nwpcp.transform('tesT1\n teSt2'))
-      .toEqual('test1\ntest2');
+  it('should preserve spaces around punctuation', () => {
+    expect(nwpcp.transform('Hello, World')).toEqual('hello, world');
+    expect(nwpcp.transform('Hello. World')).toEqual('hello. world');
+    expect(nwpcp.transform('Hello! World')).toEqual('hello! world');
+    expect(nwpcp.transform('Hello? World')).toEqual('hello? world');
   });
 });
