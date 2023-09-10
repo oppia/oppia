@@ -2,7 +2,7 @@
   <mat-label class="text-capitalize">
     {{ 'I18N_PREFERENCES_SUBJECT_INTERESTS' | translate }}
   </mat-label>
-  <mat-chip-list #chipList aria-label="Subject Interests">
+  <mat-chip-list #chipList role="textbox">
     <mat-chip *ngFor="let subjectInterest of subjectInterests"
               [selectable]="selectable"
               [removable]="removable"
@@ -12,6 +12,7 @@
     </mat-chip>
     <input placeholder="{{ 'I18N_PREFERENCES_SUBJECT_INTERESTS_LABEL' | translate }}"
            class="e2e-test-subject-interests-input"
+           aria-label="New subject interests"
            #subjectInterestInput
            [formControl]="formCtrl"
            [matAutocomplete]="auto"

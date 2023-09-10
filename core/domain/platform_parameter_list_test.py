@@ -51,6 +51,7 @@ class ExistingPlatformParameterValidityTests(test_utils.GenericTestBase):
                             'promo_bar_enabled',
                             'promo_bar_message',
                             'serial_chapter_launch_curriculum_admin_view',
+                            'serial_chapter_launch_learner_view',
                             'show_feedback_updates_in_profile_pic_dropdown',
                             'show_redesigned_learner_dashboard',
                             'show_translation_size',
@@ -128,4 +129,16 @@ class ExistingPlatformParameterValidityTests(test_utils.GenericTestBase):
                 'We expect all the feature-flags to be of type boolean '
                 'but "%s" feature-flag is of type "%s".' % (
                     feature['name'], feature['data_type'])
+            )
+
+    def test_all_feature_flags_have_default_value_as_false(self) -> None:
+        feature_flags = feature_services.get_all_feature_flag_dicts()
+        self.assertGreater(len(feature_flags), 0)
+        for feature in feature_flags:
+            self.assertEqual(
+                feature['default_value'],
+                False,
+                'We expect all the feature-flags default_value to be False '
+                'but "%s" feature-flag has "%s".' % (
+                    feature['name'], feature['default_value'])
             )
