@@ -175,6 +175,48 @@ export class InteractiveDragAndDropSortInputComponent implements OnInit {
     this.setFocus();
   }
 
+  handleKeyDownmultipleItemsInSamePosition(
+      event: KeyboardEvent,
+      currentIndex: number): void {
+    let newIndex = currentIndex;
+    if (event.key === 'ArrowDown') {
+      event.preventDefault();
+      if (this.activeItem !== this.listItems.length - 1) {
+        newIndex += 1;
+        moveItemInArray(
+          this.multipleItemsInSamePositionArray,
+          currentIndex,
+          newIndex);
+      }
+    }
+    if (event.key === 'ArrowUp') {
+      event.preventDefault();
+      if (this.activeItem !== 0) {
+        newIndex -= 1;
+        moveItemInArray(
+          this.multipleItemsInSamePositionArray,
+          currentIndex,
+          newIndex);
+      }
+    }
+
+    if (event.key === 'Tab') {
+      if (event.shiftKey) {
+        if (this.activeItem > 0) {
+          event.preventDefault();
+          newIndex -= 1;
+        }
+      } else {
+        if (this.activeItem < this.listItems.length - 1) {
+          event.preventDefault();
+          newIndex += 1;
+        }
+      }
+    }
+    this.activeItem = newIndex;
+    this.setFocus();
+  }
+
   handleKeyDown(event: KeyboardEvent, currentIndex: number): void {
     let newIndex = currentIndex;
     if (event.key === 'ArrowDown') {
@@ -286,10 +328,8 @@ export class InteractiveDragAndDropSortInputComponent implements OnInit {
       } else {
         // Pre populate with the choices, if no saved solution is present.
         for (let choice of this.choices) {
-          this.multipleItemsInSamePositionArray.push([]);
           this.multipleItemsInSamePositionArray.push([choice]);
         }
-        this.multipleItemsInSamePositionArray.push([]);
       }
     } else {
       // Use Array to store the single item in same position.

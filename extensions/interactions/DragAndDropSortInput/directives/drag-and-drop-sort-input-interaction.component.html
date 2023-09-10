@@ -26,12 +26,15 @@
                  (mouseover)="addHighlight(idx)"
                  (mouseout)="removeHighlight()"
                  (mousedown)="setRootPlaceHolderHeight(idx)">
-            </div>
-            <div *ngFor="let item of items"
+          </div>
+                 <div *ngFor="let item of items"
                  class="child-dnd-item-box"
                  tabindex="0"
                  [ngClass]="{'highlight-group': idx === highlightedGroup}"
-                 cdkDrag>
+                 cdkDrag
+                 role="listitem"
+                 #listItem
+                 (keydown)="handleKeyDownmultipleItemsInSamePosition($event, idx)">
               <div class="child-dnd-placeholder" *cdkDragPlaceholder></div>
               <oppia-rte-output-display [rteString]="item"></oppia-rte-output-display>
             </div>
@@ -142,7 +145,6 @@
     border-top: solid 1px #ccc;
     display: block;
     overflow: hidden;
-    padding-bottom: 25px;
   }
 
   .child-dnd-border .child-dnd-placeholder {
