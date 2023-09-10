@@ -103,7 +103,9 @@ describe('Audio Bar Component', () => {
     let secondaryTranslaionsSpy = spyOn(
       audioTranslationManagerService, 'setSecondaryAudioTranslations')
       .and.callThrough();
+    let audioBarContainer = new ElementRef(document.createElement('div'));
 
+    component.audioBarContainer = audioBarContainer;
     component.ngOnInit();
     component.expandAudioBar();
     component.isPaused = false;
