@@ -623,8 +623,6 @@ class GenerateContributionStatsJob(base_jobs.JobBase):
             stat.contribution_dates for stat in stats
         ]
         contribution_dates = contribution_dates.union(*all_contribution_dates)
-        sorted_contribution_dates = sorted(contribution_dates)
-        sorted_contribution_dates_set = set(sorted_contribution_dates)
 
         return suggestion_registry.TranslationContributionStats(
             language_code=list(stats)[0].language_code,
@@ -646,7 +644,7 @@ class GenerateContributionStatsJob(base_jobs.JobBase):
                 stat.rejected_translations_count for stat in stats),
             rejected_translation_word_count=sum(
                 stat.rejected_translation_word_count for stat in stats),
-            contribution_dates=sorted_contribution_dates_set
+            contribution_dates=contribution_dates
         )
 
     @staticmethod
@@ -919,7 +917,7 @@ class GenerateContributionStatsJob(base_jobs.JobBase):
                         translation.rejected_translations_count),
                     rejected_translation_word_count=(
                         translation.rejected_translation_word_count),
-                    contribution_dates=translation.contribution_dates
+                    contribution_dates=sorted(translation.contribution_dates)
                 )
             )
             translation_contributions_stats_model.update_timestamps()
