@@ -27,8 +27,8 @@ import {
   EarlyQuitCustomizationArgs,
   MultipleIncorrectSubmissionsCustomizationArgs
 } from 'domain/statistics/PlaythroughIssueObjectFactory';
-import { LearnerAction, LearnerActionObjectFactory } from
-  'domain/statistics/LearnerActionObjectFactory';
+import { LearnerActionType, LearnerAction } from
+  'domain/statistics/learner-action.model';
 import { Playthrough, PlaythroughObjectFactory } from
   'domain/statistics/PlaythroughObjectFactory';
 import { PlaythroughBackendApiService } from
@@ -183,14 +183,13 @@ export class PlaythroughService {
   private eqTracker!: EarlyQuitTracker;
   private cstTracker!: CyclicStateTransitionsTracker;
   private misTracker!: MultipleIncorrectAnswersTracker;
-  private recordedLearnerActions!: LearnerAction[];
+  private recordedLearnerActions!: LearnerActionType[];
   private playthroughStopwatch!: Stopwatch;
   private playthroughDurationInSecs!: number;
   private learnerIsInSamplePopulation: boolean = false;
 
   constructor(
       private explorationFeaturesService: ExplorationFeaturesService,
-      private learnerActionObjectFactory: LearnerActionObjectFactory,
       private playthroughBackendApiService: PlaythroughBackendApiService,
       private playthroughObjectFactory: PlaythroughObjectFactory) {}
 
@@ -209,7 +208,7 @@ export class PlaythroughService {
     }
 
     this.recordedLearnerActions = [
-      this.learnerActionObjectFactory.createNewExplorationStartAction({
+      LearnerAction.createNewExplorationStartAction({
         state_name: {value: initStateName},
       })
     ];
@@ -231,7 +230,7 @@ export class PlaythroughService {
     }
 
     this.recordedLearnerActions.push(
-      this.learnerActionObjectFactory.createNewAnswerSubmitAction({
+      LearnerAction.createNewAnswerSubmitAction({
         state_name: {value: stateName},
         dest_state_name: {value: destStateName},
         interaction_id: {value: interactionId},
@@ -251,7 +250,7 @@ export class PlaythroughService {
     }
 
     this.recordedLearnerActions.push(
-      this.learnerActionObjectFactory.createNewExplorationQuitAction({
+      LearnerAction.createNewExplorationQuitAction({
         state_name: {value: stateName},
         time_spent_in_state_in_msecs: {value: 1000 * timeSpentInStateSecs}
       }));

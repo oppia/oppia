@@ -18,13 +18,12 @@
 
 import { TestBed } from '@angular/core/testing';
 
-import { LearnerActionObjectFactory } from
-  'domain/statistics/LearnerActionObjectFactory';
+import { LearnerAction } from
+  'domain/statistics/learner-action.model';
 import { PlaythroughObjectFactory } from
   'domain/statistics/PlaythroughObjectFactory';
 
 describe('Playthrough Object Factory', () => {
-  let laof: LearnerActionObjectFactory;
   let pof: PlaythroughObjectFactory;
 
   beforeEach(() => {
@@ -33,11 +32,10 @@ describe('Playthrough Object Factory', () => {
     });
 
     pof = TestBed.get(PlaythroughObjectFactory);
-    laof = TestBed.get(LearnerActionObjectFactory);
   });
 
   it('should create a new playthrough', () => {
-    let actions = [laof.createNewExplorationStartAction({
+    let actions = [LearnerAction.createNewExplorationStartAction({
       state_name: {
         value: 'state'
       }
@@ -134,7 +132,7 @@ describe('Playthrough Object Factory', () => {
       }
     });
     expect(playthroughObject.actions).toEqual(
-      [laof.createNewAnswerSubmitAction({
+      [LearnerAction.createNewAnswerSubmitAction({
         state_name: {
           value: 'state'
         },
@@ -157,7 +155,7 @@ describe('Playthrough Object Factory', () => {
   });
 
   it('should convert a playthrough to a backend dict', () => {
-    let actions = [laof.createNewAnswerSubmitAction({
+    let actions = [LearnerAction.createNewAnswerSubmitAction({
       state_name: {
         value: 'state'
       },

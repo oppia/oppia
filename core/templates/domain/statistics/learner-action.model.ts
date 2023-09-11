@@ -13,12 +13,9 @@
 // limitations under the License.
 
 /**
- * @fileoverview Factory for creating new frontend instances of Learner
+ * @fileoverview Model class for creating new frontend instances of Learner
  *     Action domain objects.
  */
-
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
 
 import { StatisticsDomainConstants } from
   'domain/statistics/statistics-domain.constants';
@@ -100,16 +97,13 @@ export class AnswerSubmitLearnerAction extends
 export class ExplorationQuitLearnerAction extends
   LearnerActionBase<'ExplorationQuit'> {}
 
-export type LearnerAction = (
+export type LearnerActionType = (
   ExplorationStartLearnerAction |
   AnswerSubmitLearnerAction |
   ExplorationQuitLearnerAction);
 
-@Injectable({
-  providedIn: 'root'
-})
-export class LearnerActionObjectFactory {
-  createNewExplorationStartAction(
+export class LearnerAction {
+  static createNewExplorationStartAction(
       actionCustomizationArgs: ExplorationStartCustomizationArgs
   ): ExplorationStartLearnerAction {
     return new ExplorationStartLearnerAction(
@@ -117,7 +111,7 @@ export class LearnerActionObjectFactory {
       StatisticsDomainConstants.LEARNER_ACTION_SCHEMA_LATEST_VERSION);
   }
 
-  createNewAnswerSubmitAction(
+  static createNewAnswerSubmitAction(
       actionCustomizationArgs: AnswerSubmitCustomizationArgs
   ): AnswerSubmitLearnerAction {
     return new AnswerSubmitLearnerAction(
@@ -125,7 +119,7 @@ export class LearnerActionObjectFactory {
       StatisticsDomainConstants.LEARNER_ACTION_SCHEMA_LATEST_VERSION);
   }
 
-  createNewExplorationQuitAction(
+  static createNewExplorationQuitAction(
       actionCustomizationArgs: ExplorationQuitCustomizationArgs
   ): ExplorationQuitLearnerAction {
     return new ExplorationQuitLearnerAction(
@@ -144,10 +138,10 @@ export class LearnerActionObjectFactory {
 
   /**
    * @param {LearnerActionBackendDict} learnerActionBackendDict
-   * @returns {LearnerAction}
+   * @returns {LearnerActionType}
    */
-  createFromBackendDict(
-      learnerActionBackendDict: LearnerActionBackendDict): LearnerAction {
+  static createFromBackendDict(
+      learnerActionBackendDict: LearnerActionBackendDict): LearnerActionType {
     switch (learnerActionBackendDict.action_type) {
       case 'ExplorationStart':
         return new ExplorationStartLearnerAction(
@@ -173,7 +167,3 @@ export class LearnerActionObjectFactory {
       angular.toJson(invalidBackendDict));
   }
 }
-
-angular.module('oppia').factory(
-  'LearnerActionObjectFactory',
-  downgradeInjectable(LearnerActionObjectFactory));
