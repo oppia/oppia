@@ -120,6 +120,13 @@ describe('NoninteractiveSkillreview', () => {
   });
 
   it('should close concept card when user clicks the link', fakeAsync(() => {
+    spyOn(contextService, 'setCustomEntityContext');
+    spyOn(contextService, 'getEntityId').and.callFake(function() {
+      return 'InitialEntityId';
+    });
+    spyOn(contextService, 'getEntityType').and.callFake(function() {
+      return 'InitialEntityType';
+    });
     spyOn(contextService, 'removeCustomEntityContext');
     let e = {
       currentTarget: {
@@ -144,6 +151,8 @@ describe('NoninteractiveSkillreview', () => {
 
     expect(modalSpy).toHaveBeenCalled();
     expect(contextService.removeCustomEntityContext).toHaveBeenCalled();
+    expect(contextService.setCustomEntityContext).toHaveBeenCalledWith(
+      'InitialEntityType', 'InitialEntityId');
   }));
 
   it('should throw error when modal is closed in a method other than' +

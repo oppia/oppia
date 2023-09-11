@@ -29,19 +29,11 @@ describe('Blog Admin Data Service', () => {
     role_to_actions: {
       blog_post_editor: ['action for editor']
     },
-    config_properties: {
-      list_of_default_tags_for_blog_post: {
-        description: 'List of tags',
-        value: ['News'],
-        schema: {
-          type: 'list',
-          items: {
-            type: 'unicode'
-          },
-          validators: [{
-            id: 'is_uniquified',
-          }],
-        }
+    platform_parameters: {
+      max_number_of_tags_assigned_to_blog_post: {
+        description: 'Max number of tags.',
+        value: 10,
+        schema: {type: 'number'}
       }
     },
     updatable_roles: {
@@ -60,7 +52,7 @@ describe('Blog Admin Data Service', () => {
     blogAdminDataResponse = {
       updatableRoles: sampleBlogAdminData.updatable_roles,
       roleToActions: sampleBlogAdminData.role_to_actions,
-      configProperties: sampleBlogAdminData.config_properties,
+      platformParameters: sampleBlogAdminData.platform_parameters,
     };
   });
 
