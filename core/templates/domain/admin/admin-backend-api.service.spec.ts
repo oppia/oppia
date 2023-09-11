@@ -111,12 +111,7 @@ describe('Admin backend api service', () => {
       topic_list_intro: 'fsd',
       url_fragment: 'mathfsad',
     },
-    contributor_dashboard_reviewer_emails_is_enabled: true,
-    enable_admin_notifications_for_reviewer_shortage: false,
-    max_number_of_suggestions_per_reviewer: 5,
-    notify_admins_suggestions_waiting_too_long_is_enabled: false,
-    record_playthrough_probability: 0.2,
-    oppia_csrf_secret: 'H62T5aIngXb1PB6arDkFrAnxakpQ='
+    record_playthrough_probability: 0.2
   };
 
   beforeEach(() => {
