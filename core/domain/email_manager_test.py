@@ -4316,6 +4316,7 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
             platform_parameter_list.ParamNames.EMAIL_SENDER_NAME.value
         ):
             return email_manager.EMAIL_SENDER_NAME.default_value
+        return ''
 
     def _mock_logging_info(self, msg: str, *args: str) -> None:
         """Mocks logging.info() by appending the log message to the logged info
@@ -5104,6 +5105,7 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
             platform_parameter_list.ParamNames.EMAIL_SENDER_NAME.value
         ):
             return email_manager.EMAIL_SENDER_NAME.default_value
+        return ''
 
     def setUp(self) -> None:
         super().setUp()
