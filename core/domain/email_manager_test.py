@@ -2900,14 +2900,14 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
                 email_manager.EMAIL_FOOTER.default_value))
 
         with self.can_send_emails_ctx, self.log_new_error_ctx:
-            with self.swap_get_platform_parameter_value, self.mock_datetime_utcnow(
-                mocked_datetime_for_utcnow):
-                (
-                    email_manager
-                    .send_mail_to_notify_contributor_dashboard_reviewers(
-                        [self.reviewer_1_id],
-                        [[reviewable_suggestion_email_info]])
-                )
+            with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
+                with self.swap_get_platform_parameter_value:
+                    (
+                        email_manager
+                        .send_mail_to_notify_contributor_dashboard_reviewers(
+                            [self.reviewer_1_id],
+                            [[reviewable_suggestion_email_info]])
+                    )
 
         # Make sure correct email is sent.
         messages = self._get_sent_email_messages(self.REVIEWER_1_EMAIL)
@@ -2957,14 +2957,14 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
                 email_manager.EMAIL_FOOTER.default_value))
 
         with self.can_send_emails_ctx, self.log_new_error_ctx:
-            with self.swap_get_platform_parameter_value, self.mock_datetime_utcnow(
-                mocked_datetime_for_utcnow):
-                (
-                    email_manager
-                    .send_mail_to_notify_contributor_dashboard_reviewers(
-                        [self.reviewer_1_id],
-                        [[reviewable_suggestion_email_info]])
-                )
+            with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
+                with self.swap_get_platform_parameter_value:
+                    (
+                        email_manager
+                        .send_mail_to_notify_contributor_dashboard_reviewers(
+                            [self.reviewer_1_id],
+                            [[reviewable_suggestion_email_info]])
+                    )
 
         # Make sure correct email is sent.
         messages = self._get_sent_email_messages(self.REVIEWER_1_EMAIL)
@@ -3014,14 +3014,14 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
                 email_manager.EMAIL_FOOTER.default_value))
 
         with self.can_send_emails_ctx, self.log_new_error_ctx:
-            with self.swap_get_platform_parameter_value, self.mock_datetime_utcnow(
-                mocked_datetime_for_utcnow):
-                (
-                    email_manager
-                    .send_mail_to_notify_contributor_dashboard_reviewers(
-                        [self.reviewer_1_id],
-                        [[reviewable_suggestion_email_info]])
-                )
+            with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
+                with self.swap_get_platform_parameter_value:
+                    (
+                        email_manager
+                        .send_mail_to_notify_contributor_dashboard_reviewers(
+                            [self.reviewer_1_id],
+                            [[reviewable_suggestion_email_info]])
+                    )
 
         # Make sure correct email is sent.
         messages = self._get_sent_email_messages(self.REVIEWER_1_EMAIL)
@@ -3072,14 +3072,14 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
                 email_manager.EMAIL_FOOTER.default_value))
 
         with self.can_send_emails_ctx, self.log_new_error_ctx:
-            with self.swap_get_platform_parameter_value, self.mock_datetime_utcnow(
-                mocked_datetime_for_utcnow):
-                (
-                    email_manager
-                    .send_mail_to_notify_contributor_dashboard_reviewers(
-                        [self.reviewer_1_id],
-                        [[reviewable_suggestion_email_info]])
-                )
+            with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
+                with self.swap_get_platform_parameter_value:
+                    (
+                        email_manager
+                        .send_mail_to_notify_contributor_dashboard_reviewers(
+                            [self.reviewer_1_id],
+                            [[reviewable_suggestion_email_info]])
+                    )
 
         # Make sure correct email is sent.
         messages = self._get_sent_email_messages(self.REVIEWER_1_EMAIL)
@@ -3130,14 +3130,14 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
                 email_manager.EMAIL_FOOTER.default_value))
 
         with self.can_send_emails_ctx, self.log_new_error_ctx:
-            with self.swap_get_platform_parameter_value, self.mock_datetime_utcnow(
-                mocked_datetime_for_utcnow):
-                (
-                    email_manager
-                    .send_mail_to_notify_contributor_dashboard_reviewers(
-                        [self.reviewer_1_id],
-                        [[reviewable_suggestion_email_info]])
-                )
+            with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
+                with self.swap_get_platform_parameter_value:
+                    (
+                        email_manager
+                        .send_mail_to_notify_contributor_dashboard_reviewers(
+                            [self.reviewer_1_id],
+                            [[reviewable_suggestion_email_info]])
+                    )
 
         # Make sure correct email is sent.
         messages = self._get_sent_email_messages(self.REVIEWER_1_EMAIL)
@@ -3187,14 +3187,14 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
                 email_manager.EMAIL_FOOTER.default_value))
 
         with self.can_send_emails_ctx, self.log_new_error_ctx:
-            with self.swap_get_platform_parameter_value, self.mock_datetime_utcnow(
-                mocked_datetime_for_utcnow):
-                (
-                    email_manager
-                    .send_mail_to_notify_contributor_dashboard_reviewers(
-                        [self.reviewer_1_id],
-                        [[reviewable_suggestion_email_info]])
-                )
+            with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
+                with self.swap_get_platform_parameter_value:
+                    (
+                        email_manager
+                        .send_mail_to_notify_contributor_dashboard_reviewers(
+                            [self.reviewer_1_id],
+                            [[reviewable_suggestion_email_info]])
+                    )
 
         # Make sure correct email is sent.
         messages = self._get_sent_email_messages(self.REVIEWER_1_EMAIL)
@@ -3244,14 +3244,14 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
                 email_manager.EMAIL_FOOTER.default_value))
 
         with self.can_send_emails_ctx, self.log_new_error_ctx:
-            with self.swap_get_platform_parameter_value, self.mock_datetime_utcnow(
-                mocked_datetime_for_utcnow):
-                (
-                    email_manager
-                    .send_mail_to_notify_contributor_dashboard_reviewers(
-                        [self.reviewer_1_id],
-                        [[reviewable_suggestion_email_info]])
-                )
+            with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
+                with self.swap_get_platform_parameter_value:
+                    (
+                        email_manager
+                        .send_mail_to_notify_contributor_dashboard_reviewers(
+                            [self.reviewer_1_id],
+                            [[reviewable_suggestion_email_info]])
+                    )
 
         # Make sure correct email is sent.
         messages = self._get_sent_email_messages(self.REVIEWER_1_EMAIL)
@@ -3310,14 +3310,14 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
                 email_manager.EMAIL_FOOTER.default_value))
 
         with self.can_send_emails_ctx, self.log_new_error_ctx:
-            with self.swap_get_platform_parameter_value, self.mock_datetime_utcnow(
-                mocked_datetime_for_utcnow):
-                (
-                    email_manager
-                    .send_mail_to_notify_contributor_dashboard_reviewers(
-                        [self.reviewer_1_id],
-                        [reviewable_suggestion_email_infos])
-                )
+            with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
+                with self.swap_get_platform_parameter_value:
+                    (
+                        email_manager
+                        .send_mail_to_notify_contributor_dashboard_reviewers(
+                            [self.reviewer_1_id],
+                            [reviewable_suggestion_email_infos])
+                    )
 
         # Make sure correct email is sent.
         messages = self._get_sent_email_messages(self.REVIEWER_1_EMAIL)
@@ -3416,17 +3416,17 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
                 email_manager.EMAIL_FOOTER.default_value))
 
         with self.can_send_emails_ctx, self.log_new_error_ctx:
-            with self.swap_get_platform_parameter_value, self.mock_datetime_utcnow(
-                mocked_datetime_for_utcnow):
-                (
-                    email_manager
-                    .send_mail_to_notify_contributor_dashboard_reviewers(
-                        [self.reviewer_1_id, self.reviewer_2_id],
-                        [
-                            reviewer_1_suggestion_email_infos,
-                            reviewer_2_suggestion_email_infos
-                        ])
-                )
+            with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
+                with self.swap_get_platform_parameter_value:
+                    (
+                        email_manager
+                        .send_mail_to_notify_contributor_dashboard_reviewers(
+                            [self.reviewer_1_id, self.reviewer_2_id],
+                            [
+                                reviewer_1_suggestion_email_infos,
+                                reviewer_2_suggestion_email_infos
+                            ])
+                    )
 
         # Make sure correct emails are sent.
         messages = self._get_sent_email_messages(self.REVIEWER_1_EMAIL)
@@ -3484,14 +3484,14 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
                 email_manager.EMAIL_FOOTER.default_value))
 
         with self.can_send_emails_ctx, self.log_new_error_ctx:
-            with self.swap_get_platform_parameter_value, self.mock_datetime_utcnow(
-                mocked_datetime_for_utcnow):
-                (
-                    email_manager
-                    .send_mail_to_notify_contributor_dashboard_reviewers(
-                        [self.reviewer_1_id],
-                        [[reviewable_suggestion_email_info]])
-                )
+            with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
+                with self.swap_get_platform_parameter_value:
+                    (
+                        email_manager
+                        .send_mail_to_notify_contributor_dashboard_reviewers(
+                            [self.reviewer_1_id],
+                            [[reviewable_suggestion_email_info]])
+                    )
 
         # Make sure correct email is sent.
         messages = self._get_sent_email_messages(self.REVIEWER_1_EMAIL)
@@ -3540,14 +3540,14 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
                 email_manager.EMAIL_FOOTER.default_value))
 
         with self.can_send_emails_ctx, self.log_new_error_ctx:
-            with self.swap_get_platform_parameter_value, self.mock_datetime_utcnow(
-                mocked_datetime_for_utcnow):
-                (
-                    email_manager
-                    .send_mail_to_notify_contributor_dashboard_reviewers(
-                        [self.reviewer_1_id],
-                        [[reviewable_suggestion_email_info]])
-                )
+            with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
+                with self.swap_get_platform_parameter_value:
+                    (
+                        email_manager
+                        .send_mail_to_notify_contributor_dashboard_reviewers(
+                            [self.reviewer_1_id],
+                            [[reviewable_suggestion_email_info]])
+                    )
 
         # Make sure correct email is sent.
         messages = self._get_sent_email_messages(self.REVIEWER_1_EMAIL)
@@ -3599,14 +3599,14 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
                 email_manager.EMAIL_FOOTER.default_value))
 
         with self.can_send_emails_ctx, self.log_new_error_ctx:
-            with self.swap_get_platform_parameter_value, self.mock_datetime_utcnow(
-                mocked_datetime_for_utcnow):
-                (
-                    email_manager
-                    .send_mail_to_notify_contributor_dashboard_reviewers(
-                        [self.reviewer_1_id],
-                        [[reviewable_suggestion_email_info]])
-                )
+            with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
+                with self.swap_get_platform_parameter_value:
+                    (
+                        email_manager
+                        .send_mail_to_notify_contributor_dashboard_reviewers(
+                            [self.reviewer_1_id],
+                            [[reviewable_suggestion_email_info]])
+                    )
 
         # Make sure correct email is sent.
         messages = self._get_sent_email_messages(self.REVIEWER_1_EMAIL)
@@ -3658,14 +3658,14 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
                 email_manager.EMAIL_FOOTER.default_value))
 
         with self.can_send_emails_ctx, self.log_new_error_ctx:
-            with self.swap_get_platform_parameter_value, self.mock_datetime_utcnow(
-                mocked_datetime_for_utcnow):
-                (
-                    email_manager
-                    .send_mail_to_notify_contributor_dashboard_reviewers(
-                        [self.reviewer_1_id],
-                        [[reviewable_suggestion_email_info]])
-                )
+            with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
+                with self.swap_get_platform_parameter_value:
+                    (
+                        email_manager
+                        .send_mail_to_notify_contributor_dashboard_reviewers(
+                            [self.reviewer_1_id],
+                            [[reviewable_suggestion_email_info]])
+                    )
 
         # Make sure correct email is sent.
         messages = self._get_sent_email_messages(self.REVIEWER_1_EMAIL)
@@ -3717,14 +3717,14 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
                 email_manager.EMAIL_FOOTER.default_value))
 
         with self.can_send_emails_ctx, self.log_new_error_ctx:
-            with self.swap_get_platform_parameter_value, self.mock_datetime_utcnow(
-                mocked_datetime_for_utcnow):
-                (
-                    email_manager
-                    .send_mail_to_notify_contributor_dashboard_reviewers(
-                        [self.reviewer_1_id],
-                        [[reviewable_suggestion_email_info]])
-                )
+            with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
+                with self.swap_get_platform_parameter_value:
+                    (
+                        email_manager
+                        .send_mail_to_notify_contributor_dashboard_reviewers(
+                            [self.reviewer_1_id],
+                            [[reviewable_suggestion_email_info]])
+                    )
 
         # Make sure correct email is sent.
         messages = self._get_sent_email_messages(self.REVIEWER_1_EMAIL)
@@ -3776,14 +3776,14 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
                 email_manager.EMAIL_FOOTER.default_value))
 
         with self.can_send_emails_ctx, self.log_new_error_ctx:
-            with self.swap_get_platform_parameter_value, self.mock_datetime_utcnow(
-                mocked_datetime_for_utcnow):
-                (
-                    email_manager
-                    .send_mail_to_notify_contributor_dashboard_reviewers(
-                        [self.reviewer_1_id],
-                        [[reviewable_suggestion_email_info]])
-                )
+            with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
+                with self.swap_get_platform_parameter_value:
+                    (
+                        email_manager
+                        .send_mail_to_notify_contributor_dashboard_reviewers(
+                            [self.reviewer_1_id],
+                            [[reviewable_suggestion_email_info]])
+                    )
 
         # Make sure correct email is sent.
         messages = self._get_sent_email_messages(self.REVIEWER_1_EMAIL)
@@ -3835,14 +3835,14 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
                 email_manager.EMAIL_FOOTER.default_value))
 
         with self.can_send_emails_ctx, self.log_new_error_ctx:
-            with self.swap_get_platform_parameter_value, self.mock_datetime_utcnow(
-                mocked_datetime_for_utcnow):
-                (
-                    email_manager
-                    .send_mail_to_notify_contributor_dashboard_reviewers(
-                        [self.reviewer_1_id],
-                        [[reviewable_suggestion_email_info]])
-                )
+            with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
+                with self.swap_get_platform_parameter_value:
+                    (
+                        email_manager
+                        .send_mail_to_notify_contributor_dashboard_reviewers(
+                            [self.reviewer_1_id],
+                            [[reviewable_suggestion_email_info]])
+                    )
 
         # Make sure correct email is sent.
         messages = self._get_sent_email_messages(self.REVIEWER_1_EMAIL)
@@ -3901,14 +3901,14 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
                 email_manager.EMAIL_FOOTER.default_value))
 
         with self.can_send_emails_ctx, self.log_new_error_ctx:
-            with self.swap_get_platform_parameter_value, self.mock_datetime_utcnow(
-                mocked_datetime_for_utcnow):
-                (
-                    email_manager
-                    .send_mail_to_notify_contributor_dashboard_reviewers(
-                        [self.reviewer_1_id],
-                        [reviewable_suggestion_email_infos])
-                )
+            with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
+                with self.swap_get_platform_parameter_value:
+                    (
+                        email_manager
+                        .send_mail_to_notify_contributor_dashboard_reviewers(
+                            [self.reviewer_1_id],
+                            [reviewable_suggestion_email_infos])
+                    )
 
         # Make sure correct email is sent.
         messages = self._get_sent_email_messages(self.REVIEWER_1_EMAIL)
@@ -4007,17 +4007,17 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
                 email_manager.EMAIL_FOOTER.default_value))
 
         with self.can_send_emails_ctx, self.log_new_error_ctx:
-            with self.swap_get_platform_parameter_value, self.mock_datetime_utcnow(
-                mocked_datetime_for_utcnow):
-                (
-                    email_manager
-                    .send_mail_to_notify_contributor_dashboard_reviewers(
-                        [self.reviewer_1_id, self.reviewer_2_id],
-                        [
-                            reviewer_1_suggestion_email_infos,
-                            reviewer_2_suggestion_email_infos
-                        ])
-                )
+            with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
+                with self.swap_get_platform_parameter_value:
+                    (
+                        email_manager
+                        .send_mail_to_notify_contributor_dashboard_reviewers(
+                            [self.reviewer_1_id, self.reviewer_2_id],
+                            [
+                                reviewer_1_suggestion_email_infos,
+                                reviewer_2_suggestion_email_infos
+                            ])
+                    )
 
         # Make sure correct emails are sent.
         messages = self._get_sent_email_messages(self.REVIEWER_1_EMAIL)
@@ -4122,17 +4122,17 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
                 email_manager.EMAIL_FOOTER.default_value))
 
         with self.can_send_emails_ctx, self.log_new_error_ctx:
-            with self.swap_get_platform_parameter_value, self.mock_datetime_utcnow(
-                mocked_datetime_for_utcnow):
-                (
-                    email_manager
-                    .send_mail_to_notify_contributor_dashboard_reviewers(
-                        [self.reviewer_1_id, self.reviewer_2_id],
-                        [
-                            reviewer_1_suggestion_email_infos,
-                            reviewer_2_suggestion_email_infos
-                        ])
-                )
+            with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
+                with self.swap_get_platform_parameter_value:
+                    (
+                        email_manager
+                        .send_mail_to_notify_contributor_dashboard_reviewers(
+                            [self.reviewer_1_id, self.reviewer_2_id],
+                            [
+                                reviewer_1_suggestion_email_infos,
+                                reviewer_2_suggestion_email_infos
+                            ])
+                    )
 
         # Make sure correct emails are sent.
         messages = self._get_sent_email_messages(self.REVIEWER_1_EMAIL)
