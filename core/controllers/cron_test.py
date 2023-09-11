@@ -21,10 +21,10 @@ import datetime
 from core import feconf
 from core.constants import constants
 from core.domain import beam_job_services
-from core.domain import config_services
 from core.domain import email_manager
 from core.domain import exp_domain
 from core.domain import exp_services
+from core.domain import platform_feature_services
 from core.domain import question_domain
 from core.domain import story_domain
 from core.domain import story_services
@@ -359,9 +359,6 @@ class CronMailReviewersContributorDashboardSuggestionsHandlerTests(
         self
     ) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
-        config_services.set_property(
-            'committer_id',
-            'contributor_dashboard_reviewer_emails_is_enabled', False)
 
         with self.can_send_emails, self.testapp_swap:
             with self.swap(
@@ -378,12 +375,14 @@ class CronMailReviewersContributorDashboardSuggestionsHandlerTests(
 
     def test_email_not_sent_if_sending_emails_is_not_enabled(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
-        config_services.set_property(
-            'committer_id',
-            'contributor_dashboard_reviewer_emails_is_enabled', True)
+        swap_platform_parameter_value = self.swap_to_always_return(
+            platform_feature_services,
+            'get_platform_parameter_value',
+            True
+        )
 
         with self.cannot_send_emails, self.testapp_swap:
-            with self.swap(
+            with swap_platform_parameter_value, self.swap(
                 email_manager,
                 'send_mail_to_notify_contributor_dashboard_reviewers',
                 self._mock_send_contributor_dashboard_reviewers_emails):
@@ -399,12 +398,14 @@ class CronMailReviewersContributorDashboardSuggestionsHandlerTests(
         self
     ) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
-        config_services.set_property(
-            'committer_id',
-            'contributor_dashboard_reviewer_emails_is_enabled', True)
+        swap_platform_parameter_value = self.swap_to_always_return(
+            platform_feature_services,
+            'get_platform_parameter_value',
+            True
+        )
 
         with self.can_send_emails, self.testapp_swap:
-            with self.swap(
+            with swap_platform_parameter_value, self.swap(
                 email_manager,
                 'send_mail_to_notify_contributor_dashboard_reviewers',
                 self._mock_send_contributor_dashboard_reviewers_emails):
@@ -421,14 +422,16 @@ class CronMailReviewersContributorDashboardSuggestionsHandlerTests(
 
     def test_email_not_sent_if_reviewer_ids_is_empty(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
-        config_services.set_property(
-            'committer_id',
-            'contributor_dashboard_reviewer_emails_is_enabled', True)
+        swap_platform_parameter_value = self.swap_to_always_return(
+            platform_feature_services,
+            'get_platform_parameter_value',
+            True
+        )
         user_services.remove_translation_review_rights_in_language(
             self.reviewer_id, self.language_code)
 
         with self.can_send_emails, self.testapp_swap:
-            with self.swap(
+            with swap_platform_parameter_value, self.swap(
                 email_manager,
                 'send_mail_to_notify_contributor_dashboard_reviewers',
                 self._mock_send_contributor_dashboard_reviewers_emails):
@@ -609,15 +612,14 @@ class CronMailAdminContributorDashboardBottlenecksHandlerTests(
 
     def test_email_not_sent_if_sending_emails_is_disabled(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
-        config_services.set_property(
-            'committer_id',
-            'enable_admin_notifications_for_reviewer_shortage', True)
-        config_services.set_property(
-            'committer_id',
-            'notify_admins_suggestions_waiting_too_long_is_enabled', True)
+        swap_platform_parameter_value = self.swap_to_always_return(
+            platform_feature_services,
+            'get_platform_parameter_value',
+            True
+        )
 
         with self.cannot_send_emails, self.testapp_swap:
-            with self.swap(
+            with swap_platform_parameter_value, self.swap(
                 email_manager,
                 'send_mail_to_notify_admins_that_reviewers_are_needed',
                 self.mock_send_mail_to_notify_admins_that_reviewers_are_needed):
@@ -640,9 +642,6 @@ class CronMailAdminContributorDashboardBottlenecksHandlerTests(
         self
     ) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
-        config_services.set_property(
-            'committer_id',
-            'enable_admin_notifications_for_reviewer_shortage', False)
 
         with self.can_send_emails, self.testapp_swap:
             with self.swap(
@@ -661,9 +660,6 @@ class CronMailAdminContributorDashboardBottlenecksHandlerTests(
         self
     ) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
-        config_services.set_property(
-            'committer_id',
-            'notify_admins_suggestions_waiting_too_long_is_enabled', False)
 
         with self.can_send_emails, self.testapp_swap:
             with self.swap(
@@ -682,12 +678,14 @@ class CronMailAdminContributorDashboardBottlenecksHandlerTests(
         self
     ) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
-        config_services.set_property(
-            'committer_id',
-            'enable_admin_notifications_for_reviewer_shortage', True)
+        swap_platform_parameter_value = self.swap_to_always_return(
+            platform_feature_services,
+            'get_platform_parameter_value',
+            True
+        )
 
         with self.can_send_emails, self.testapp_swap:
-            with self.swap(
+            with swap_platform_parameter_value, self.swap(
                 email_manager,
                 'send_mail_to_notify_admins_that_reviewers_are_needed',
                 self.mock_send_mail_to_notify_admins_that_reviewers_are_needed):
@@ -704,12 +702,14 @@ class CronMailAdminContributorDashboardBottlenecksHandlerTests(
         self
     ) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
-        config_services.set_property(
-            'committer_id',
-            'notify_admins_suggestions_waiting_too_long_is_enabled', True)
+        swap_platform_parameter_value = self.swap_to_always_return(
+            platform_feature_services,
+            'get_platform_parameter_value',
+            True
+        )
 
         with self.can_send_emails, self.testapp_swap:
-            with self.swap(
+            with swap_platform_parameter_value, self.swap(
                 suggestion_models,
                 'SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS', 0):
                 with self.swap(

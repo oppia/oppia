@@ -29,6 +29,8 @@ from core.domain import change_domain
 from core.domain import config_domain
 from core.domain import email_services
 from core.domain import html_cleaner
+from core.domain import platform_feature_services
+from core.domain import platform_parameter_list
 from core.domain import rights_domain
 from core.domain import story_domain
 from core.domain import subscription_services
@@ -1650,9 +1652,10 @@ def send_mail_to_notify_admins_suggestions_waiting_long(
         logging.error('This app cannot send emails to users.')
         return
 
-    if not (
-            config_domain
-            .ENABLE_ADMIN_NOTIFICATIONS_FOR_SUGGESTIONS_NEEDING_REVIEW.value):
+    if not platform_feature_services.get_platform_parameter_value(
+        platform_parameter_list.ParamNames.
+        ENABLE_ADMIN_NOTIFICATIONS_FOR_SUGGESTIONS_NEEDING_REVIEW.value
+    ):
         logging.error(
             'The "notify_admins_suggestions_waiting_too_long" property '
             'must be enabled on the admin config page in order to send '
@@ -1786,9 +1789,10 @@ def send_mail_to_notify_admins_that_reviewers_are_needed(
         logging.error('This app cannot send emails to users.')
         return
 
-    if not (
-            config_domain
-            .ENABLE_ADMIN_NOTIFICATIONS_FOR_REVIEWER_SHORTAGE.value):
+    if not platform_feature_services.get_platform_parameter_value(
+        platform_parameter_list.ParamNames.
+        ENABLE_ADMIN_NOTIFICATIONS_FOR_REVIEWER_SHORTAGE.value
+    ):
         logging.error(
             'The "enable_admin_notifications_for_reviewer_shortage" '
             'property must be enabled on the admin config page in order to '
@@ -1933,13 +1937,14 @@ def send_mail_to_notify_contributor_dashboard_reviewers(
         logging.error('This app cannot send emails to users.')
         return
 
-    if not (
-            config_domain
-            .CONTRIBUTOR_DASHBOARD_REVIEWER_EMAILS_IS_ENABLED.value):
+    if not platform_feature_services.get_platform_parameter_value(
+        platform_parameter_list.ParamNames.
+        CONTRIBUTOR_DASHBOARD_REVIEWER_EMAILS_IS_ENABLED.value
+    ):
         logging.error(
             'The "contributor_dashboard_reviewer_emails_is_enabled" property '
-            'must be enabled on the admin config page in order to send '
-            'reviewers the emails.'
+            'must be enabled on the platform parameters tab on the admin page '
+            'in order to send reviewers the emails.'
         )
         return
 
