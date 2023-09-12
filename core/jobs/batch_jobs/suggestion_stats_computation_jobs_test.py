@@ -1248,6 +1248,8 @@ class GenerateContributionStatsJobTests(job_test_utils.JobTestBase):
         self.assertEqual(translation_stats_model.rejected_translations_count, 0)
         self.assertEqual(
             translation_stats_model.rejected_translation_word_count, 0)
+        # We are checking whether contribution_dates are added in ascending
+        # order.
         self.assertListEqual(
             translation_stats_model.contribution_dates,
             [
