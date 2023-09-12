@@ -26,7 +26,7 @@ import { ParamChangeObjectFactory } from
   'domain/exploration/ParamChangeObjectFactory';
 import { ParamChangesObjectFactory } from
   'domain/exploration/ParamChangesObjectFactory';
-import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory';
+import { Units } from 'domain/objects/Units';
 import { WrittenTranslationObjectFactory } from
   'domain/exploration/WrittenTranslationObjectFactory';
 import { WrittenTranslationsObjectFactory } from
@@ -70,7 +70,7 @@ describe('Question update service', function() {
     $provide.value(
       'ParamChangesObjectFactory', new ParamChangesObjectFactory(
         new ParamChangeObjectFactory()));
-    $provide.value('UnitsObjectFactory', new UnitsObjectFactory());
+    $provide.value('Units', new Units());
     $provide.value(
       'WrittenTranslationObjectFactory',
       new WrittenTranslationObjectFactory());

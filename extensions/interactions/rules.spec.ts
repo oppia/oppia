@@ -21,7 +21,7 @@
 import { CodeNormalizerService } from 'services/code-normalizer.service';
 import { GraphUtilsService } from
   'interactions/GraphInput/directives/graph-utils.service';
-import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory';
+import { Units } from 'domain/objects/units-object.model';
 import { SetInputRulesService } from
   'interactions/SetInput/directives/set-input-rules.service';
 import { NumericInputRulesService } from
@@ -97,7 +97,7 @@ describe('Rule spec services', function() {
     $provide.value(
       'NumberWithUnitsRulesService', new NumberWithUnitsRulesService(
         new NumberWithUnitsObjectFactory(
-          new UnitsObjectFactory(),
+          new Units(),
         ), new UtilsService()));
     $provide.value(
       'NumericExpressionInputRulesService',
@@ -122,7 +122,7 @@ describe('Rule spec services', function() {
         return answer.clickedRegions.indexOf(inputs.x) !== -1;
       }
     });
-    $provide.value('UnitsObjectFactory', new UnitsObjectFactory());
+    $provide.value('Units', new Units());
   }));
   beforeEach(angular.mock.module('oppia', function($provide) {
     var ugs = new UpgradedServices();

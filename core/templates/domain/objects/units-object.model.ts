@@ -250,4 +250,3 @@ static fromRawInputString(units: string): Units {
   return new Units(this.fromStringToList(units));
 }
 }
-

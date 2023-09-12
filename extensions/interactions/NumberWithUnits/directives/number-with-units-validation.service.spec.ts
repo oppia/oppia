@@ -27,7 +27,7 @@ import { Rule } from 'domain/exploration/rule.model';
 import { Unit } from 'interactions/answer-defs';
 import { Fraction, FractionDict } from 'domain/objects/fraction.model';
 import { NumberWithUnits, NumberWithUnitsObjectFactory } from 'domain/objects/NumberWithUnitsObjectFactory';
-import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory';
+import { Units } from 'domain/objects/units-object.model';
 
 describe('NumberWithUnitsValidationService', () => {
   let validatorService: NumberWithUnitsValidationService;
@@ -246,7 +246,7 @@ describe('NumberWithUnitsValidationService', () => {
         return null;
       },
       toDict: () => {
-        let uof = new UnitsObjectFactory();
+        let uof = new Units();
         let tmp = new NumberWithUnits('real', 2.02, new Fraction(
           false, 0, 0, 1), uof.fromRawInputString(
           'm / s^2'));
