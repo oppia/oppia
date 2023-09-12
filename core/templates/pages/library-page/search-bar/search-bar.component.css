@@ -104,7 +104,7 @@ oppia-search-bar .oppia-input-group {
   max-width: 150px;
 }
 .oppia-search-bar-dropdown-menu-section {
-  max-height: 400px;
+  max-height: 230px;
   overflow: auto;
 }
 .oppia-search-bar-hr {
