@@ -43,6 +43,11 @@ var ContributorDashboardAdminPage = function() {
   var viewContributionRightsMethodInputCss = (
     '.e2e-test-view-contribution-rights-method');
   var statusMessage = $('.e2e-test-status-message');
+  var statsListItemsSelector = function() {
+    return $$('.e2e-test-stats-list-item');
+  };
+  var statsTable = $('.e2e-test-stats-table');
+  var expandedRow = $('.e2e-test-expanded-row');
 
   this.get = async function() {
     await browser.url('/contributor-dashboard-admin');
@@ -176,6 +181,21 @@ var ContributorDashboardAdminPage = function() {
       contributionRights,
       'Submit Question Right Element taking too long to appear');
     expect(await contributionRights.getText()).toBe('Allowed');
+  };
+
+  this.checkstatslistelements = async function(number) {
+    await waitFor.presenceOf(statsTable, 'stats table was not visible');
+    var statsListItems = await statsListItemsSelector();
+    expect(statsListItems.length).toBe(number);
+  };
+
+  this.checkexpandablestats = async function() {
+    await waitFor.presenceOf(statsTable, 'stats table was not visible');
+    var statsListItems = await statsListItemsSelector();
+    await action.click('Stats row', statsListItems[0]);
+    await waitFor.visibilityOf(expandedRow, 'Expanded row not visible');
+    await action.click('Stats row', statsListItems[0]);
+    await waitFor.invisibilityOf(expandedRow, 'Expanded row still visible');
   };
 };
 

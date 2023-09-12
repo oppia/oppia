@@ -25,12 +25,16 @@ var ContributorDashboardTranslateTextTab = require(
 var ContributorDashboardPage = function() {
   var navigateToTranslateTextTabButton = $('.e2e-test-translateTextTab');
   var submitQuestionTabButton = $('.e2e-test-submitQuestionTab');
+  var myContributionTabButton = $('.e2e-test-myContributionTab');
   var opportunityLoadingPlaceholder = $(
     '.e2e-test-opportunity-loading-placeholder');
   var opportunityListEmptyAvailabilityMessage = $(
     '.e2e-test-opportunity-list-empty-availability-message');
   var opportunityListItemsSelector = function() {
     return $$('.e2e-test-opportunity-list-item');
+  };
+  var reviewTabsSelector = function() {
+    return $$('.e2e-test-review-tabs');
   };
   var opportunityHeadingCss = (
     '.e2e-test-opportunity-list-item-heading');
@@ -52,6 +56,18 @@ var ContributorDashboardPage = function() {
     '.e2e-test-question-suggestion-review-modal-header');
   var usernameContainer = $('.e2e-test-username');
   var reviewRightsDiv = $('.e2e-test-review-rights');
+  var selectorContainer = $('.e2e-test-language-selector');
+
+  var _openLanguageSelector = async function() {
+    await action.click('Test Language Selector Container', selectorContainer);
+  };
+
+  var _selectLanguage = async function(language) {
+    await _openLanguageSelector();
+    var selectorOption = selectorContainer.$(
+      `.e2e-test-language-selector-option=${language}`);
+    await action.click('Test Language Selector Option', selectorOption);
+  };
 
   this.get = async function() {
     let width = (await browser.getWindowSize()).width;
@@ -250,6 +266,23 @@ var ContributorDashboardPage = function() {
     await action.click(
       'Submit question tab button', submitQuestionTabButton);
     await this.waitForOpportunitiesToLoad();
+  };
+
+  this.navigateToMyContributionTab = async function() {
+    await action.click(
+      'Submit question tab button', myContributionTabButton);
+    await this.waitForOpportunitiesToLoad();
+  };
+
+  this.selectTranslationReviewTab = async function() {
+    var reviewTabs = await reviewTabsSelector();
+    await action.click(
+      'Open translation review opportunity', reviewTabs[1]
+    );
+  };
+
+  this.selectReviewLanguage = async function(language) {
+    await _selectLanguage(language);
   };
 };
 
