@@ -226,7 +226,6 @@ describe('Contributor Admin Dashboard', function() {
     await contributorDashboardPage.selectTranslationReviewTab();
     await contributorDashboardPage.waitForOpportunitiesToLoad();
     await contributorDashboardPage.selectReviewLanguage('shqip (Albanian)');
-    await browser.debug();
 
     if (width < 700) {
       let opportunityItemSelector = function() {
