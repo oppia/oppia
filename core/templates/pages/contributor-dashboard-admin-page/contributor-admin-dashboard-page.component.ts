@@ -76,7 +76,6 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.CONTRIBUTION_TYPES = ['a'];
     let userInfoPromise = this.userService.getUserInfoAsync();
     userInfoPromise.then(userInfo => {
       const username = userInfo.getUsername();
