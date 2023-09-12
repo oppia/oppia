@@ -111,16 +111,7 @@ describe('Admin backend api service', () => {
       topic_list_intro: 'fsd',
       url_fragment: 'mathfsad',
     },
-    email_footer: 'fsdf',
-    email_sender_name: 'Site Admin',
-    notification_user_ids_for_failed_tasks: [],
-    notify_admins_suggestions_waiting_too_long_is_enabled: false,
-    record_playthrough_probability: 0.2,
-    signup_email_content: {
-      subject: 'THIS IS A PLACEHOLDER.',
-      html_body: 'THIS IS A <b>PLACEHOLDER</b> AND SHOULD BE REPLACED.'
-    },
-    unpublish_exploration_email_html_body: 'test'
+    record_playthrough_probability: 0.2
   };
 
   beforeEach(() => {

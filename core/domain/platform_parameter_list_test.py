@@ -38,6 +38,8 @@ class ExistingPlatformParameterValidityTests(test_utils.GenericTestBase):
                             'diagnostic_test',
                             'dummy_feature_flag_for_e2e_tests',
                             'dummy_parameter',
+                            'email_footer',
+                            'email_sender_name',
                             'enable_admin_notifications_for_reviewer_shortage',
                             'end_chapter_celebration',
                             'high_bounce_rate_task_minimum_exploration_starts',
@@ -63,7 +65,10 @@ class ExistingPlatformParameterValidityTests(test_utils.GenericTestBase):
                             'serial_chapter_launch_learner_view',
                             'show_feedback_updates_in_profile_pic_dropdown',
                             'show_redesigned_learner_dashboard',
-                            'show_translation_size',]
+                            'show_translation_size',
+                            'signup_email_body_content',
+                            'signup_email_subject_content',
+                            'unpublish_exploration_email_html_body']
 
     def test_all_defined_parameters_are_valid(self) -> None:
         all_names = (

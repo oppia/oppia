@@ -160,7 +160,7 @@
                     <div class="row oppia-parameter-top-margin">
                       <div class="col-4"><b>then set the value to:</b></div>
                       <div class="col-6">
-                        <schema-based-editor [schema]="getPlatformParamSchema(platformParameter.dataType)" [(ngModel)]="rule.valueWhenMatched">
+                        <schema-based-editor [schema]="getPlatformParamSchema(platformParameter.dataType, platformParameter.name)" [(ngModel)]="rule.valueWhenMatched">
                         </schema-based-editor>
                       </div>
                     </div>
@@ -205,7 +205,7 @@
   <div class="row oppia-parameter-top-margin">
     <div class="col-2"><b>Default value:</b></div>
     <div *ngIf="platformParametersInEditMode.get(platformParameter.name)" class="col-9">
-      <schema-based-editor [schema]="getPlatformParamSchema(platformParameter.dataType)" [(ngModel)]="platformParameter.defaultValue">
+      <schema-based-editor [schema]="getPlatformParamSchema(platformParameter.dataType, platformParameter.name)" [(ngModel)]="platformParameter.defaultValue">
       </schema-based-editor>
     </div>
     <div *ngIf="!platformParametersInEditMode.get(platformParameter.name)" class="col-10">{{platformParameter.defaultValue}}</div>

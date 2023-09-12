@@ -81,7 +81,8 @@ class SentEmailModel(base_models.BaseModel):
             feconf.BULK_EMAIL_INTENT_TEST,
             (
                 feconf
-                .EMAIL_INTENT_NOTIFY_CONTRIBUTOR_DASHBOARD_ACHIEVEMENTS)
+                .EMAIL_INTENT_NOTIFY_CONTRIBUTOR_DASHBOARD_ACHIEVEMENTS),
+            feconf.EMAIL_INTENT_ML_JOB_FAILURE
         ])
     # The subject line of the email.
     subject = datastore_services.TextProperty(required=True)
