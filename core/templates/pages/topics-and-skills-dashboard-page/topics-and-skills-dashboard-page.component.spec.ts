@@ -30,10 +30,20 @@ import { FocusManagerService } from 'services/stateful/focus-manager.service';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { TopicsAndSkillsDashboardPageComponent } from './topics-and-skills-dashboard-page.component';
 import { TopicsAndSkillsDashboardPageService } from './topics-and-skills-dashboard-page.service';
+import { PlatformFeatureService } from '../../services/platform-feature.service';
+import { ETopicPublishedOptions, ETopicStatusOptions, TopicsAndSkillsDashboardPageConstants } from './topics-and-skills-dashboard-page.constants';
 
 /**
  * @fileoverview Unit tests for the topics and skills dashboard component.
  */
+
+class MockPlatformFeatureService {
+  status = {
+    SerialChapterLaunchCurriculumAdminView: {
+      isEnabled: false
+    }
+  };
+}
 
 describe('Topics and skills dashboard page component', () => {
   let fixture: ComponentFixture<TopicsAndSkillsDashboardPageComponent>;
@@ -45,6 +55,7 @@ describe('Topics and skills dashboard page component', () => {
   let topicCreationService: TopicCreationService;
   let createNewSkillModalService: CreateNewSkillModalService;
   let topicsAndSkillsDashboardPageService: TopicsAndSkillsDashboardPageService;
+  let mockPlatformFeatureService = new MockPlatformFeatureService();
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -61,7 +72,11 @@ describe('Topics and skills dashboard page component', () => {
         TopicCreationService,
         TopicsAndSkillsDashboardBackendApiService,
         TopicsAndSkillsDashboardPageService,
-        WindowDimensionsService
+        WindowDimensionsService,
+        {
+          provide: PlatformFeatureService,
+          useValue: mockPlatformFeatureService
+        }
       ],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
@@ -78,7 +93,6 @@ describe('Topics and skills dashboard page component', () => {
     createNewSkillModalService = TestBed.inject(CreateNewSkillModalService);
     topicsAndSkillsDashboardPageService = TestBed.inject(
       TopicsAndSkillsDashboardPageService);
-    fixture.detectChanges();
   });
 
   it('should create', () => {
@@ -95,6 +109,63 @@ describe('Topics and skills dashboard page component', () => {
     tick();
     expect(componentInstance._initDashboard).toHaveBeenCalled();
   }));
+
+  it('should correctly initialize sort and status options list', () => {
+    type TopicPublishedOptionsKeys = (
+      keyof typeof TopicsAndSkillsDashboardPageConstants.
+      TOPIC_PUBLISHED_OPTIONS);
+    type TopicSortOptionsKeys = (
+      keyof typeof TopicsAndSkillsDashboardPageConstants.TOPIC_SORT_OPTIONS);
+    type TopicSortingOptionsKeys = (
+      keyof typeof TopicsAndSkillsDashboardPageConstants.TOPIC_SORTING_OPTIONS);
+    type TopicStatusOptionsKeys = (
+      keyof typeof TopicsAndSkillsDashboardPageConstants
+      .TOPIC_STATUS_OPTIONS);
+
+    mockPlatformFeatureService.
+      status.SerialChapterLaunchCurriculumAdminView.isEnabled = false;
+
+    let topicSortOptions: string[] = [];
+    for (let key in TopicsAndSkillsDashboardPageConstants.TOPIC_SORT_OPTIONS) {
+      topicSortOptions.push(
+        TopicsAndSkillsDashboardPageConstants.TOPIC_SORT_OPTIONS[
+        key as TopicSortOptionsKeys]);
+    }
+    let topicStatusOptions: (
+      ETopicPublishedOptions | ETopicStatusOptions)[] = [];
+    for (let key in TopicsAndSkillsDashboardPageConstants
+      .TOPIC_PUBLISHED_OPTIONS) {
+      topicStatusOptions.push(
+        TopicsAndSkillsDashboardPageConstants.TOPIC_PUBLISHED_OPTIONS[
+          key as TopicPublishedOptionsKeys]);
+    }
+
+    componentInstance.ngOnInit();
+    expect(componentInstance.sortOptions).toEqual(topicSortOptions);
+    expect(componentInstance.statusOptions).toEqual(topicStatusOptions);
+
+    mockPlatformFeatureService.
+      status.SerialChapterLaunchCurriculumAdminView.isEnabled = true;
+
+    topicSortOptions = [];
+    for (let key in TopicsAndSkillsDashboardPageConstants
+      .TOPIC_SORTING_OPTIONS) {
+      topicSortOptions.push(
+        TopicsAndSkillsDashboardPageConstants.TOPIC_SORTING_OPTIONS[
+          key as TopicSortingOptionsKeys]);
+    }
+    topicStatusOptions = [];
+    for (let key in TopicsAndSkillsDashboardPageConstants
+      .TOPIC_STATUS_OPTIONS) {
+      topicStatusOptions.push(
+        TopicsAndSkillsDashboardPageConstants.TOPIC_STATUS_OPTIONS[
+          key as TopicStatusOptionsKeys]);
+    }
+
+    componentInstance.ngOnInit();
+    expect(componentInstance.sortOptions).toEqual(topicSortOptions);
+    expect(componentInstance.statusOptions).toEqual(topicStatusOptions);
+  });
 
   it('should destroy', () => {
     spyOn(componentInstance.directiveSubscriptions, 'unsubscribe');
@@ -267,18 +338,21 @@ describe('Topics and skills dashboard page component', () => {
 
   it('should display filter box on maximizing the window', () => {
     componentInstance.filterBoxIsShown = false;
-    spyOn(windowDimensionsService, 'isWindowNarrow').and.returnValue(false);
 
-    Object.defineProperty(window, 'innerWidth', { value: 1024 });
+    spyOn(windowDimensionsService, 'isWindowNarrow').and.returnValue(false);
+    spyOnProperty(window, 'innerWidth').and.returnValue(1024);
+
     componentInstance.filterBoxOnResize();
+
     expect(componentInstance.filterBoxIsShown).toBeTrue();
   });
 
   it('should hide filter box on minimizing the window', () => {
     componentInstance.filterBoxIsShown = true;
-    spyOn(windowDimensionsService, 'isWindowNarrow').and.returnValue(true);
 
-    Object.defineProperty(window, 'innerWidth', { value: 768 });
+    spyOn(windowDimensionsService, 'isWindowNarrow').and.returnValue(true);
+    spyOnProperty(window, 'innerWidth').and.returnValue(768);
+
     componentInstance.filterBoxOnResize();
 
     expect(componentInstance.filterBoxIsShown).toBeFalse();
