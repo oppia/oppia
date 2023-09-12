@@ -1,4 +1,4 @@
-// Copyright 2019 The Oppia Authors. All Rights Reserved.
+// Copyright 2023 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -45,9 +45,9 @@ export class Units {
   }
 
   toString(): string {
-    var unit = '';
-    for (var i = 0; i < this.units.length; i++) {
-      var d = this.units[i];
+    let unit = '';
+    for (let i = 0; i < this.units.length; i++) {
+      let d = this.units[i];
       if (d.exponent === 1) {
         unit += d.unit + ' ';
       } else {
@@ -57,7 +57,7 @@ export class Units {
     return unit.trim();
   }
 
-static isunit(unit: string): boolean {
+static isUnit(unit: string): boolean {
   return !('/*() '.includes(unit));
 }
 
@@ -70,9 +70,9 @@ static isLastElementUnit(unitList: string[]): boolean {
 
 static stringToLexical(units: string): string[] {
   units += '#';
-  var unitList = [];
-  var unit = '';
-  for (var i = 0; i < units.length; i++) {
+  let unitList = [];
+  let unit = '';
+  for (let i = 0; i < units.length; i++) {
     if ('*/()# '.includes(units[i]) && unit !== 'per') {
       if (unit.length > 0) {
         if (this.isLastElementUnit(unitList)) {
@@ -95,11 +95,11 @@ static stringToLexical(units: string): string[] {
 }
 
 static unitWithMultiplier(unitList: string[]): [string, number][] {
-  var multiplier = 1;
-  var unitsWithMultiplier: [string, number][] = [];
-  var parenthesisStack = [];
+  let multiplier = 1;
+  let unitsWithMultiplier: [string, number][] = [];
+  let parenthesisStack = [];
 
-  for (var ind = 0; ind < unitList.length; ind++) {
+  for (let ind = 0; ind < unitList.length; ind++) {
     if (unitList[ind] === '/') {
       multiplier = -multiplier;
     } else if (unitList[ind] === '(') {
@@ -114,7 +114,7 @@ static unitWithMultiplier(unitList: string[]): [string, number][] {
         parenthesisStack.push(['(', 1]);
       }
     } else if (unitList[ind] === ')') {
-      var elem = parenthesisStack.pop();
+      let elem = parenthesisStack.pop();
       if (elem) {
         multiplier = parseInt(elem[1] as string) * multiplier;
       } else {
@@ -133,21 +133,21 @@ static unitWithMultiplier(unitList: string[]): [string, number][] {
 }
 
 static convertUnitDictToList(unitDict: UnitsDict): Unit[] {
-  var unitList: Unit[] = [];
-  for (var key in unitDict) {
+  let unitList: Unit[] = [];
+  for (let key in unitDict) {
     unitList.push({ unit: key, exponent: unitDict[key] });
   }
   return unitList;
 }
 
 static unitToList(unitsWithMultiplier: [string, number][]): Unit[] {
-  var unitDict: UnitsDict = {};
-  for (var i = 0; i < unitsWithMultiplier.length; i++) {
-    var unit = unitsWithMultiplier[i][0];
-    var multiplier = unitsWithMultiplier[i][1];
-    var ind = unit.indexOf('^');
-    var s = null;
-    var power = null;
+  let unitDict: UnitsDict = {};
+  for (let i = 0; i < unitsWithMultiplier.length; i++) {
+    let unit = unitsWithMultiplier[i][0];
+    let multiplier = unitsWithMultiplier[i][1];
+    let ind = unit.indexOf('^');
+    let s = null;
+    let power = null;
     if (ind > -1) {
       s = unit.substr(0, ind);
       power = parseInt(unit.substr(ind + 1));
@@ -173,10 +173,10 @@ static fromStringToList(unitsString: string): Unit[] {
 }
 
 static createCurrencyUnits(): void {
-  var keys = (
+  let keys = (
     Object.keys(ObjectsDomainConstants.CURRENCY_UNITS) as CurrencyUnitsKeys
   );
-  for (var i = 0; i < keys.length; i++) {
+  for (let i = 0; i < keys.length; i++) {
     let baseUnitValue = (
       ObjectsDomainConstants.CURRENCY_UNITS[keys[i]].base_unit);
     if (baseUnitValue !== null) {
@@ -205,12 +205,12 @@ static toMathjsCompatibleString(units: string): string {
   // Special symbols need to be replaced as math.js doesn't support custom
   // units starting with special symbols. Also, it doesn't allow units
   // followed by a number as in the case of currency units.
-  var keys = (
+  let keys = (
     Object.keys(ObjectsDomainConstants.CURRENCY_UNITS) as CurrencyUnitsKeys
   );
-  for (var i = 0; i < keys.length; i++) {
+  for (let i = 0; i < keys.length; i++) {
     for (
-      var j = 0;
+      let j = 0;
       j < ObjectsDomainConstants.CURRENCY_UNITS[keys[i]].front_units.length;
       j++) {
       if (
@@ -223,7 +223,7 @@ static toMathjsCompatibleString(units: string): string {
     }
 
     for (
-      var j = 0;
+      let j = 0;
       j < ObjectsDomainConstants.CURRENCY_UNITS[keys[i]].aliases.length;
       j++) {
       if (
@@ -243,7 +243,7 @@ static fromRawInputString(units: string): Units {
     this.createCurrencyUnits();
   } catch (parsingError) {}
 
-  var compatibleUnits = this.toMathjsCompatibleString(units);
+  let compatibleUnits = this.toMathjsCompatibleString(units);
   if (compatibleUnits !== '') {
     unit(compatibleUnits);
   }
