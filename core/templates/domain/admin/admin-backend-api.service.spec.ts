@@ -91,8 +91,8 @@ describe('Admin backend api service', () => {
       data_type: 'string',
       rules: [{
         filters: [{
-          type: PlatformParameterFilterType.ServerMode,
-          conditions: [['=', 'dev'] as [string, string]]
+          type: PlatformParameterFilterType.PlatformType,
+          conditions: [['=', 'Web'] as [string, string]]
         }],
         value_when_matched: ''
       }],
@@ -111,11 +111,8 @@ describe('Admin backend api service', () => {
       topic_list_intro: 'fsd',
       url_fragment: 'mathfsad',
     },
-    contributor_dashboard_reviewer_emails_is_enabled: true,
     email_footer: 'fsdf',
     email_sender_name: 'Site Admin',
-    enable_admin_notifications_for_reviewer_shortage: false,
-    max_number_of_suggestions_per_reviewer: 5,
     notification_user_ids_for_failed_tasks: [],
     notify_admins_suggestions_waiting_too_long_is_enabled: false,
     record_playthrough_probability: 0.2,

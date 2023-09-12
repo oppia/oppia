@@ -59,19 +59,11 @@ describe('Blog Admin Page component ', () => {
     roleToActions: {
       blog_post_editor: ['action for editor']
     },
-    configProperties: {
-      list_of_default_tags_for_blog_post: {
-        description: 'List of tags',
-        value: ['News'],
-        schema: {
-          type: 'list',
-          items: {
-            type: 'unicode'
-          },
-          validators: [{
-            id: 'is_uniquified',
-          }],
-        }
+    platformParameters: {
+      max_number_of_tags_assigned_to_blog_post: {
+        description: 'Max number of tags.',
+        value: 10,
+        schema: {type: 'number'}
       }
     },
     updatableRoles: {
@@ -138,14 +130,14 @@ describe('Blog Admin Page component ', () => {
         blogAdminPageData.roleToActions);
     }));
 
-  it('should reload config properties when initialized', fakeAsync(() => {
-    expect(component.configProperties).toEqual({});
+  it('should reload platform parameters when initialized', fakeAsync(() => {
+    expect(component.platformParameters).toEqual({});
 
     component.ngOnInit();
     tick();
 
-    expect(component.configProperties).toEqual(
-      blogAdminPageData.configProperties);
+    expect(component.platformParameters).toEqual(
+      blogAdminPageData.platformParameters);
   }));
 
   it('should return schema callback when calling ' +
@@ -320,99 +312,56 @@ describe('Blog Admin Page component ', () => {
       }));
   });
 
-  describe('when clicking on revert to default button ', () => {
-    it('should revert to default config property ' +
-      'successfully', fakeAsync(() => {
-      // Setting confirm button clicked to be true.
-      confirmSpy.and.returnValue(true);
-      spyOn(blogAdminBackendApiService, 'revertConfigPropertyAsync')
-        .and.returnValue(Promise.resolve());
-
-      component.revertToDefaultConfigPropertyValue('configId1');
-      tick();
-
-      expect(component.statusMessage).toBe(
-        'Config property reverted successfully.');
-    }));
-
-    it('should not revert to default config property ' +
-      'in case of backend error', fakeAsync(() => {
-      // Setting confirm button clicked to be true.
-      confirmSpy.and.returnValue(true);
-      spyOn(blogAdminBackendApiService, 'revertConfigPropertyAsync')
-        .and.returnValue(Promise.reject('Internal Server Error.'));
-
-      component.revertToDefaultConfigPropertyValue('configId1');
-      tick();
-
-      expect(component.statusMessage).toBe(
-        'Server error: Internal Server Error.');
-    }));
-
-    it('should not request backend to revert to default config property ' +
-      'if cancel button is clicked in the alert', fakeAsync(() => {
-      // Setting confirm button clicked to be false.
-      confirmSpy.and.returnValue(false);
-      let revertConfigSpy = spyOn(
-        blogAdminBackendApiService, 'revertConfigPropertyAsync');
-
-      component.revertToDefaultConfigPropertyValue('configId1');
-      tick();
-
-      expect(revertConfigSpy).not.toHaveBeenCalled();
-    }));
-  });
-
   describe('when clicking on save button ', () => {
-    it('should save config properties successfully', fakeAsync(() => {
+    it('should save platform parameters successfully', fakeAsync(() => {
       // Setting confirm button clicked to be true.
       confirmSpy.and.returnValue(true);
-      spyOn(blogAdminBackendApiService, 'saveConfigPropertiesAsync')
+      spyOn(blogAdminBackendApiService, 'savePlatformParametersAsync')
         .and.returnValue(Promise.resolve());
 
-      component.configProperties = blogAdminPageData.configProperties;
-      component.saveConfigProperties();
+      component.platformParameters = blogAdminPageData.platformParameters;
+      component.savePlatformParameters();
       tick();
 
       expect(component.statusMessage).toBe(
         'Data saved successfully.');
     }));
 
-    it('should not save config properties ' +
+    it('should not save platform parameters ' +
       'in case of backend error', fakeAsync(() => {
       // Setting confirm button clicked to be true.
       confirmSpy.and.returnValue(true);
-      spyOn(blogAdminBackendApiService, 'saveConfigPropertiesAsync')
+      spyOn(blogAdminBackendApiService, 'savePlatformParametersAsync')
         .and.returnValue(Promise.reject('Internal Server Error.'));
 
-      component.saveConfigProperties();
+      component.savePlatformParameters();
       tick();
 
       expect(component.statusMessage).toBe(
         'Server error: Internal Server Error.');
     }));
 
-    it('should not save config properties ' +
+    it('should not save platform parameters ' +
       'if a task is still running in the queue', fakeAsync(() => {
       // Setting task is still running to be true.
       spyOn(adminTaskManagerService, 'isTaskRunning').and.returnValue(true);
       let saveConfigSpy = spyOn(
-        blogAdminBackendApiService, 'saveConfigPropertiesAsync');
+        blogAdminBackendApiService, 'savePlatformParametersAsync');
 
-      component.saveConfigProperties();
+      component.savePlatformParameters();
       tick();
 
       expect(saveConfigSpy).not.toHaveBeenCalled();
     }));
 
-    it('should not request backend to save config properties ' +
+    it('should not request backend to save platform parameters ' +
       'if cancel button is clicked in the alert', fakeAsync(() => {
       // Setting confirm button clicked to be false.
       confirmSpy.and.returnValue(false);
       let saveConfigSpy = spyOn(
-        blogAdminBackendApiService, 'saveConfigPropertiesAsync');
+        blogAdminBackendApiService, 'savePlatformParametersAsync');
 
-      component.saveConfigProperties();
+      component.savePlatformParameters();
       tick();
 
       expect(saveConfigSpy).not.toHaveBeenCalled();
