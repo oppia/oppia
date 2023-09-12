@@ -44,6 +44,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 
 interface PlatformSchema {
   'type': string;
+  'ui_config'?: { 'rows': number };
 }
 
 type FilterType = keyof typeof PlatformParameterFilterType;
@@ -71,11 +72,6 @@ export class AdminPlatformParametersTabComponent implements OnInit {
       inputRegex?: RegExp;
     }
   } = {
-      [PlatformParameterFilterType.ServerMode]: {
-        displayName: 'Server Mode',
-        options: AdminFeaturesTabConstants.ALLOWED_SERVER_MODES,
-        operators: ['=']
-      },
       [PlatformParameterFilterType.PlatformType]: {
         displayName: 'Platform Type',
         options: AdminFeaturesTabConstants.ALLOWED_PLATFORM_TYPES,
@@ -96,7 +92,7 @@ export class AdminPlatformParametersTabComponent implements OnInit {
 
   private readonly defaultNewFilter: PlatformParameterFilter = (
     PlatformParameterFilter.createFromBackendDict({
-      type: PlatformParameterFilterType.ServerMode,
+      type: PlatformParameterFilterType.PlatformType,
       conditions: []
     })
   );
@@ -142,13 +138,24 @@ export class AdminPlatformParametersTabComponent implements OnInit {
     });
   }
 
-  getPlatformParamSchema(dataType: string): PlatformSchema {
+  getPlatformParamSchema(dataType: string, name: string): PlatformSchema {
     if (dataType === 'string') {
+      if (name === 'email_footer') {
+        return {type: 'unicode', ui_config: {rows: 5}};
+      } else if (
+        name === 'signup_email_body_content' ||
+        name === 'unpublish_exploration_email_html_body'
+      ) {
+        return {type: 'unicode', ui_config: {rows: 20}};
+      }
       return {type: 'unicode'};
     } else if (dataType === 'number') {
       return {type: 'float'};
+    } else if (dataType === 'bool') {
+      return {type: 'bool'};
     }
-    return {type: dataType};
+    throw new Error(
+      'Unexpected data type value, must be one of string, number or bool.');
   }
 
   getReadonlyFilterValues(rule: PlatformParameterRule): string {
