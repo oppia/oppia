@@ -456,7 +456,7 @@ import { TopicsAndSkillsDashboardPageService } from
   'pages/topics-and-skills-dashboard-page/topics-and-skills-dashboard-page.service';
 import { TopicViewerBackendApiService } from
   'domain/topic_viewer/topic-viewer-backend-api.service';
-import { UnitsObjectFactory } from 'domain/objects/units-object.model';
+import { Units } from 'domain/objects/units-object.model';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 import { UrlService } from 'services/contextual/url.service';
@@ -614,7 +614,7 @@ export class UpgradedServices {
     upgradedServices['TopicsAndSkillsDashboardPageService'] =
         new TopicsAndSkillsDashboardPageService(
           upgradedServices['PlatformFeatureService']);
-    upgradedServices['UnitsObjectFactory'] = new UnitsObjectFactory();
+    upgradedServices['Units'] = new Units();
     upgradedServices['UtilsService'] = new UtilsService();
     upgradedServices['VersionTreeService'] = new VersionTreeService();
     upgradedServices['WindowRef'] = new WindowRef();
@@ -711,13 +711,13 @@ export class UpgradedServices {
         upgradedServices['baseInteractionValidationService']);
     upgradedServices['NumberWithUnitsObjectFactory'] =
       new NumberWithUnitsObjectFactory(
-        upgradedServices['UnitsObjectFactory']);
+        upgradedServices['Units']);
     upgradedServices['NumericExpressionInputValidationService'] =
       new NumericExpressionInputValidationService(
         upgradedServices['baseInteractionValidationService']);
     upgradedServices['NumberWithUnitsRulesService'] =
       new NumberWithUnitsRulesService(
-        upgradedServices['UnitsObjectFactory'],
+        upgradedServices['Units'],
         upgradedServices['UtilsService']);
     upgradedServices['OutcomeObjectFactory'] =
       new OutcomeObjectFactory();

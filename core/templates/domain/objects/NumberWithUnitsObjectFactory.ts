@@ -23,7 +23,7 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { Fraction } from 'domain/objects/fraction.model';
 import { ObjectsDomainConstants } from
   'domain/objects/objects-domain.constants';
-import { Units, UnitsObjectFactory } from
+import { Units } from
   'domain/objects/units-object.model';
 import { Unit, NumberWithUnitsAnswer } from
   'interactions/answer-defs';
@@ -73,7 +73,7 @@ export class NumberWithUnits {
     // type, real, fraction and units. Hence, we cannot inject
     // UnitsObjectFactory, since that'll lead to creation of 5th property
     // which isn't allowed. Refer objects.py L#956.
-    let unitsString = (new UnitsObjectFactory()).fromList(
+    let unitsString = (new Units()).fromList(
       this.units).toString();
     if (unitsString.includes('$')) {
       unitsString = unitsString.replace('$', '');
@@ -100,9 +100,9 @@ export class NumberWithUnits {
 
   toMathjsCompatibleString(): string {
     let numberWithUnitsString = '';
-    let unitsString = (new UnitsObjectFactory()).fromList(
+    let unitsString = (new Units()).fromList(
       this.units).toString();
-    unitsString = (new UnitsObjectFactory()).toMathjsCompatibleString(
+    unitsString = (new Units()).toMathjsCompatibleString(
       unitsString);
 
     if (this.type === 'real') {
@@ -130,7 +130,7 @@ export class NumberWithUnits {
   providedIn: 'root'
 })
 export class NumberWithUnitsObjectFactory {
-  constructor(private unitsFactory: UnitsObjectFactory) {}
+  constructor(private unitsFactory: Units) {}
   createCurrencyUnits(): void {
     try {
       this.unitsFactory.createCurrencyUnits();

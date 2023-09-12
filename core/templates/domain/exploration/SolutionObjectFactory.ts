@@ -31,7 +31,7 @@ import { NumberWithUnitsObjectFactory } from
   'domain/objects/NumberWithUnitsObjectFactory';
 import { SubtitledHtml } from
   'domain/exploration/subtitled-html.model';
-import { UnitsObjectFactory } from 'domain/objects/units-object.model';
+import { Units } from 'domain/objects/units-object.model';
 import {
   DragAndDropAnswer,
   FractionAnswer,
@@ -108,7 +108,7 @@ export class Solution extends BaseTranslatableObject {
         this.correctAnswer as FractionAnswer).toString();
     } else if (interactionId === 'NumberWithUnits') {
       correctAnswer = (new NumberWithUnitsObjectFactory(
-        new UnitsObjectFactory())).fromDict(
+        new Units())).fromDict(
           this.correctAnswer as NumberWithUnitsAnswer).toString();
     } else if (interactionId === 'DragAndDropSortInput') {
       correctAnswer = [];
