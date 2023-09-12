@@ -218,32 +218,16 @@ class PromoBarHandler(
         logging.info(
             '[RELEASE COORDINATOR] %s saved promo-bar config property values: '
             '%s' % (self.user_id, promo_bar_message_value))
-        server_mode = (
-            'dev'
-            if constants.DEV_MODE
-            else 'prod'
-            if feconf.ENV_IS_OPPIA_ORG_PRODUCTION_SERVER
-            else 'test'
-        )
+
         rules_for_promo_bar_enabled_value = [
             platform_parameter_domain.PlatformParameterRule.from_dict({
-                'filters': [
-                    {
-                        'type': 'server_mode',
-                        'conditions': [['=', server_mode]]
-                    }
-                ],
+                'filters': [],
                 'value_when_matched': promo_bar_enabled_value
             })
         ]
         rules_for_promo_bar_message_value = [
             platform_parameter_domain.PlatformParameterRule.from_dict({
-                'filters': [
-                    {
-                        'type': 'server_mode',
-                        'conditions': [['=', server_mode]]
-                    }
-                ],
+                'filters': [],
                 'value_when_matched': promo_bar_message_value
             })
         ]
