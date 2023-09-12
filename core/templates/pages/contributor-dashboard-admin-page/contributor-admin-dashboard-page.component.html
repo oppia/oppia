@@ -52,9 +52,15 @@
   </div>
   <div class="dashboard-content-mobile">
     <div class="dropdown">
-      <oppia-filtered-choices-field [choices]="CONTRIBUTION_TYPES" placeholder="Contribution Type"
-        [isSearchable]="false" [(selection)]="activeTab">
-      </oppia-filtered-choices-field>
+      <mat-form-field class="choices-field">
+        <mat-select placeholder="Contribution Type"
+                    [value]="selection"
+                    (valueChange)="updateSelection($event)">
+          <mat-option *ngFor="let choice of CONTRIBUTION_TYPES" [value]="choice">
+            {{ choice }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
     </div>
     <contributor-admin-stats-table [activeTab]="activeTab"></contributor-admin-stats-table>
   </div>
