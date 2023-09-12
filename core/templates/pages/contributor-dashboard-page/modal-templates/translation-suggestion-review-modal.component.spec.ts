@@ -19,7 +19,7 @@
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ComponentFixture, fakeAsync, flush, TestBed, tick, waitForAsync } from '@angular/core/testing';
 import { TranslationSuggestionReviewModalComponent } from './translation-suggestion-review-modal.component';
-import { ChangeDetectorRef, ElementRef, NO_ERRORS_SCHEMA } from '@angular/core';
+import { ChangeDetectorRef, ElementRef, NO_ERRORS_SCHEMA, Input } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { AppConstants } from 'app.constants';
 import { AlertsService } from 'services/alerts.service';
@@ -29,6 +29,10 @@ import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { ThreadDataBackendApiService } from 'pages/exploration-editor-page/feedback-tab/services/thread-data-backend-api.service';
 import { UserService } from 'services/user.service';
 import { UserInfo } from 'domain/user/user-info.model';
+import { of, Observable } from 'rxjs';
+import { MatSnackBar, MatSnackBarRef, MatSnackBarModule } from '@angular/material/snack-bar';
+import { OverlayModule } from '@angular/cdk/overlay'
+
 // This throws "TS2307". We need to
 // suppress this error because rte-output-display is not strictly typed yet.
 // @ts-ignore
@@ -38,7 +42,7 @@ class MockChangeDetectorRef {
   detectChanges(): void {}
 }
 
-describe('Translation Suggestion Review Modal Component', function() {
+fdescribe('Translation Suggestion Review Modal Component', function() {
   let fixture: ComponentFixture<TranslationSuggestionReviewModalComponent>;
   let component: TranslationSuggestionReviewModalComponent;
   let alertsService: AlertsService;
@@ -49,11 +53,15 @@ describe('Translation Suggestion Review Modal Component', function() {
   let userService: UserService;
   let activeModal: NgbActiveModal;
   let changeDetectorRef: MockChangeDetectorRef = new MockChangeDetectorRef();
+  let snackBar: MatSnackBar;
+  let snackBarSpy: jasmine.Spy;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [
-        HttpClientTestingModule
+        HttpClientTestingModule,
+        OverlayModule,
+        MatSnackBarModule
       ],
       declarations: [TranslationSuggestionReviewModalComponent],
       providers: [
@@ -67,7 +75,8 @@ describe('Translation Suggestion Review Modal Component', function() {
         {
           provide: ChangeDetectorRef,
           useValue: changeDetectorRef
-        }
+        },
+        MatSnackBar
       ],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
@@ -82,15 +91,22 @@ describe('Translation Suggestion Review Modal Component', function() {
     siteAnalyticsService = TestBed.inject(SiteAnalyticsService);
     threadDataBackendApiService = TestBed.inject(ThreadDataBackendApiService);
     userService = TestBed.inject(UserService);
+    // mockMatSnackBar = TestBed.inject(MatSnackBar) as unknown as MockMatSnackBar;
     contributionAndReviewService = TestBed.inject(
       ContributionAndReviewService);
     languageUtilService = TestBed.inject(LanguageUtilService);
+    snackBar = TestBed.inject(MatSnackBar);
     spyOn(
       siteAnalyticsService,
       'registerContributorDashboardViewSuggestionForReview');
     spyOn(
       languageUtilService, 'getAudioLanguageDescription')
       .and.returnValue('audio_language_description');
+    snackBarSpy = spyOn(snackBar, 'openFromComponent').and.returnValue({
+      instance: { message: '' },
+      afterDismissed: () => of(null),
+      onAction: () => of(null) // Add this line.
+    });
 
     component.contentContainer = new ElementRef({offsetHeight: 150});
     component.translationContainer = new ElementRef({offsetHeight: 150});
@@ -277,7 +293,7 @@ describe('Translation Suggestion Review Modal Component', function() {
       component.reviewMessage = 'Review message example';
       component.translationUpdated = true;
       component.acceptAndReviewNext();
-
+      expect(snackBarSpy).toHaveBeenCalled();
       expect(component.activeSuggestionId).toBe('suggestion_2');
       expect(component.activeSuggestion).toEqual(suggestion2);
       expect(component.reviewable).toBe(reviewable);
