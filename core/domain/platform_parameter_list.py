@@ -65,4 +65,10 @@ class ParamNames(enum.Enum):
         'enable_admin_notifications_for_reviewer_shortage')
     MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER = (
         'max_number_of_suggestions_per_reviewer')
+    EMAIL_SENDER_NAME = 'email_sender_name'
+    EMAIL_FOOTER = 'email_footer'
+    SIGNUP_EMAIL_SUBJECT_CONTENT = 'signup_email_subject_content'
+    SIGNUP_EMAIL_BODY_CONTENT = 'signup_email_body_content'
+    UNPUBLISH_EXPLORATION_EMAIL_HTML_BODY = (
+        'unpublish_exploration_email_html_body')
     CD_ADMIN_DASHBOARD_NEW_UI = 'cd_admin_dashboard_new_ui'
