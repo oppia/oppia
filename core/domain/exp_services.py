@@ -31,6 +31,7 @@ import logging
 import math
 import os
 import pprint
+import re
 import zipfile
 
 from core import android_validation_constants
@@ -395,7 +396,14 @@ def export_to_zip_file(
         if not exploration.title:
             zfile.writestr('Unpublished_exploration.yaml', yaml_repr)
         else:
-            zfile.writestr('%s.yaml' % exploration.title, yaml_repr)
+            exploration_file_name = re.sub(
+                r'[^A-Za-z0-9_ -]+', '', exploration.title)
+            # Trim whitespace when checking to handle potential
+            # whitespace-only 'exploration_file_name'.
+            if not exploration_file_name.strip():
+                zfile.writestr('exploration.yaml', yaml_repr)
+            else:
+                zfile.writestr('%s.yaml' % exploration_file_name, yaml_repr)
 
         fs = fs_services.GcsFileSystem(
             feconf.ENTITY_TYPE_EXPLORATION, exploration_id)
