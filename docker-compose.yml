@@ -65,6 +65,7 @@ services:
       - DATASTORE_PROJECT_ID=dev-project-id
       - DATASTORE_USE_PROJECT_ID_AS_APP_ID=true
       - GOOGLE_CLOUD_PROJECT=dev-project-id
+      - REDIS_HOST=redis
     depends_on:
       - angular-build
       - webpack-compiler

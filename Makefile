@@ -89,12 +89,13 @@ logs.%: ## Shows the logs of the given docker service. Example: make logs.datast
 restart.%: ## Restarts the given docker service. Example: make restart.datastore
 	docker compose restart $*
 
-run-backend-tests: ## [Not ready for use] Runs the backend tests
-	@echo "Run the backend test on the following module: $(RUN_ARGS)"
-	@echo "Not in use, under construction!"
+run_tests.backend: ## [Not ready for use] Runs the backend tests
+	docker compose up datastore redis -d
+	docker compose run --no-deps --entrypoint "python -m scripts.run_backend_tests $(PYTHON_ARGS)" dev-server
+	$(MAKE) stop
 
 run_tests.frontend: ## Runs the frontend unit tests
-	docker compose run --no-deps --entrypoint "python -m scripts.run_frontend_tests $(flags)" dev-server
+	docker compose run --no-deps --entrypoint "python -m scripts.run_frontend_tests $(PYTHON_ARGS)" dev-server
 
 run_tests.typescript: ## Runs the typescript checks
 	docker compose run --no-deps --entrypoint "python -m scripts.typescript_checks" dev-server

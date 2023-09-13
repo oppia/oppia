@@ -31,8 +31,7 @@ from typing import Optional, Sequence  # isort:skip
 
 from . import build  # isort:skip
 from . import check_frontend_test_coverage  # isort:skip
-if not feconf.OPPIA_IS_DOCKERIZED:
-    from . import install_third_party_libs  # isort:skip
+from . import install_third_party_libs  # isort:skip
 
 # These is a relative path from the oppia/ folder. They are relative because the
 # dtslint command prepends the current working directory to the path, even if

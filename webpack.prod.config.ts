@@ -28,8 +28,8 @@ module.exports = merge(common, {
   mode: 'production',
   output: {
     filename: '[name].[contenthash].bundle.js',
-    path: '/app/oppia/backend_prod_files/webpack_bundles',
-    publicPath: '/app/oppia/build/webpack_bundles/'
+    path: path.resolve(__dirname, 'backend_prod_files/webpack_bundles'),
+    publicPath: '/build/webpack_bundles/'
   },
   plugins: [
     // This plugin performs a direct text replacement, so the value given to it

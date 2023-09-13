@@ -65,11 +65,10 @@ from typing import Dict, Final, List, Optional, Tuple, cast
 
 from core import feconf, utils  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 
-if not feconf.OPPIA_IS_DOCKERIZED:
-    from . import install_third_party_libs
-    # This installs third party libraries before importing other files or importing
-    # libraries that use the builtins python module (e.g. build, utils).
-    install_third_party_libs.main()
+from . import install_third_party_libs
+# This installs third party libraries before importing other files or importing
+# libraries that use the builtins python module (e.g. build, utils).
+install_third_party_libs.main()
 
 from . import common  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 from . import concurrent_task_utils  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
