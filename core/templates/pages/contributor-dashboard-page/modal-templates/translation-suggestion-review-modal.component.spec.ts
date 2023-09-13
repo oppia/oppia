@@ -269,7 +269,7 @@ fdescribe('Translation Suggestion Review Modal Component', function() {
     });
 
     it('should accept suggestion in suggestion modal service when clicking' +
-      ' on accept and review next suggestion button', function() {
+      ' on accept and review next suggestion button', fakeAsync(() => {
       component.ngOnInit();
       expect(component.activeSuggestionId).toBe('suggestion_1');
       expect(component.activeSuggestion).toEqual(suggestion1);
@@ -289,11 +289,14 @@ fdescribe('Translation Suggestion Review Modal Component', function() {
         });
       spyOn(activeModal, 'close');
       spyOn(alertsService, 'addSuccessMessage');
+      spyOn(component, 'showSnackbar');
 
       component.reviewMessage = 'Review message example';
       component.translationUpdated = true;
       component.acceptAndReviewNext();
-      expect(snackBarSpy).toHaveBeenCalled();
+
+      tick(30000)
+
       expect(component.activeSuggestionId).toBe('suggestion_2');
       expect(component.activeSuggestion).toEqual(suggestion2);
       expect(component.reviewable).toBe(reviewable);
@@ -314,7 +317,8 @@ fdescribe('Translation Suggestion Review Modal Component', function() {
 
       component.reviewMessage = 'Review message example 2';
       component.translationUpdated = false;
-      component.acceptAndReviewNext();
+      component.acceptAndReviewNext();''
+      tick(30000)
 
       expect(
         siteAnalyticsService.registerContributorDashboardAcceptSuggestion)
@@ -327,11 +331,12 @@ fdescribe('Translation Suggestion Review Modal Component', function() {
       expect(alertsService.addSuccessMessage).toHaveBeenCalled();
       expect(activeModal.close).toHaveBeenCalledWith([
         'suggestion_1', 'suggestion_2']);
-    });
+      flush();
+    }));
 
     it('should set suggestion review message to auto-generated note when ' +
       'suggestion is accepted with edits and no user-supplied review message',
-    function() {
+    fakeAsync(() => {
       component.ngOnInit();
       expect(component.activeSuggestionId).toBe('suggestion_1');
       expect(component.activeSuggestion).toEqual(suggestion1);
@@ -348,10 +353,11 @@ fdescribe('Translation Suggestion Review Modal Component', function() {
           return Promise.resolve(successCallback(suggestionId));
         });
       spyOn(alertsService, 'addSuccessMessage');
+      spyOn(component, 'showSnackbar');
 
       component.translationUpdated = true;
       component.acceptAndReviewNext();
-
+      tick(30000);
       expect(
         siteAnalyticsService.registerContributorDashboardAcceptSuggestion)
         .toHaveBeenCalledWith('Translation');
@@ -362,10 +368,10 @@ fdescribe('Translation Suggestion Review Modal Component', function() {
           'hint section of "StateName" card', jasmine.any(Function),
           jasmine.any(Function));
       expect(alertsService.addSuccessMessage).toHaveBeenCalled();
-    });
+    }));
 
     it('should reject suggestion in suggestion modal service when clicking ' +
-      'on reject and review next suggestion button', function() {
+      'on reject and review next suggestion button', fakeAsync(() => {
       component.ngOnInit();
       expect(component.activeSuggestionId).toBe('suggestion_1');
       expect(component.activeSuggestion).toEqual(suggestion1);
@@ -383,15 +389,19 @@ fdescribe('Translation Suggestion Review Modal Component', function() {
         'registerContributorDashboardRejectSuggestion');
       spyOn(activeModal, 'close');
       spyOn(alertsService, 'addSuccessMessage');
+      spyOn(component, 'showSnackbar');
 
       component.reviewMessage = 'Review message example';
       component.translationUpdated = true;
       component.rejectAndReviewNext(component.reviewMessage);
 
+      expect(component.hasQueuedSuggestion).toBeTrue();
       expect(component.activeSuggestionId).toBe('suggestion_2');
       expect(component.activeSuggestion).toEqual(suggestion2);
       expect(component.reviewable).toBe(reviewable);
       expect(component.reviewMessage).toBe('');
+      tick(30000);
+
       expect(
         siteAnalyticsService.registerContributorDashboardRejectSuggestion)
         .toHaveBeenCalledWith('Translation');
@@ -405,17 +415,19 @@ fdescribe('Translation Suggestion Review Modal Component', function() {
       component.reviewMessage = 'Review message example 2';
       component.translationUpdated = false;
       component.rejectAndReviewNext(component.reviewMessage);
-
+      
+      tick(30000)
       expect(
         siteAnalyticsService.registerContributorDashboardRejectSuggestion)
         .toHaveBeenCalledWith('Translation');
       expect(alertsService.addSuccessMessage).toHaveBeenCalled();
       expect(activeModal.close).toHaveBeenCalledWith([
         'suggestion_1', 'suggestion_2']);
-    });
+      flush()
+    }));
 
     it('should allow the reviewer to fix the suggestion if the backend pre' +
-      ' accept/reject validation failed', function() {
+      ' accept/reject validation failed', fakeAsync(() => { 
       const responseMessage = 'Pre accept validation failed.';
 
       component.ngOnInit();
@@ -438,9 +450,11 @@ fdescribe('Translation Suggestion Review Modal Component', function() {
           );
         });
       spyOn(alertsService, 'addWarning');
+      spyOn(component, 'showSnackbar');
 
       component.reviewMessage = 'Review message example';
       component.acceptAndReviewNext();
+      await fixture.whenStable();
 
       expect(component.activeSuggestionId).toBe('suggestion_1');
       expect(component.activeSuggestion).toEqual(suggestion1);
@@ -459,6 +473,7 @@ fdescribe('Translation Suggestion Review Modal Component', function() {
 
       component.reviewMessage = 'Edited review message example';
       component.rejectAndReviewNext(component.reviewMessage);
+      await fixture.whenStable();
 
       expect(component.activeSuggestionId).toBe('suggestion_1');
       expect(component.activeSuggestion).toEqual(suggestion1);
@@ -473,7 +488,8 @@ fdescribe('Translation Suggestion Review Modal Component', function() {
           jasmine.any(Function), jasmine.any(Function));
       expect(alertsService.addWarning).toHaveBeenCalledWith(
         jasmine.stringContaining(responseMessage));
-    });
+      flush();
+  }));
 
     it(
       'should cancel suggestion in suggestion modal service when clicking ' +
@@ -884,7 +900,7 @@ fdescribe('Translation Suggestion Review Modal Component', function() {
     });
 
     it('should reject suggestion in suggestion modal service when clicking ' +
-      'on reject and review next suggestion button', function() {
+      'on reject and review next suggestion button', fakeAsync(() => {
       expect(component.activeSuggestionId).toBe('suggestion_1');
       expect(component.activeSuggestion).toEqual(suggestion1);
       expect(component.reviewable).toBe(reviewable);
@@ -901,10 +917,12 @@ fdescribe('Translation Suggestion Review Modal Component', function() {
         'registerContributorDashboardRejectSuggestion');
       spyOn(activeModal, 'close');
       spyOn(alertsService, 'addSuccessMessage');
+      spyOn(component, 'showSnackbar');
 
       component.reviewMessage = 'Review message example';
       component.rejectAndReviewNext(component.reviewMessage);
-
+      
+      tick(30000);
       expect(
         siteAnalyticsService.registerContributorDashboardRejectSuggestion)
         .toHaveBeenCalledWith('Translation');
@@ -917,7 +935,8 @@ fdescribe('Translation Suggestion Review Modal Component', function() {
         'Suggestion rejected.');
       expect(activeModal.close).toHaveBeenCalledWith([
         'suggestion_1']);
-    });
+      flush();
+    }));
   });
 
   describe('when navigating through suggestions', function() {

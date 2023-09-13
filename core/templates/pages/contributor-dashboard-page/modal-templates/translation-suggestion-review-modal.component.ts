@@ -545,7 +545,6 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
       () => {
         this.alertsService.clearMessages();
         this.alertsService.addSuccessMessage('Suggestion rejected.');
-        this.resolveSuggestionAndUpdateModal();
       }, (errorMessage) => {
         this.alertsService.clearWarnings();
         this.alertsService.addWarning(`Invalid Suggestion: ${errorMessage}`);
