@@ -92,8 +92,8 @@ export class SideNavigationBarComponent {
               hackyTopicTranslationKey
             );
           }
-        });
-    });
+        }, () => {});
+    }, () => {});
 
     this.userService.getUserInfoAsync().then((userInfo) => {
       this.userIsLoggedIn = userInfo.isLoggedIn();
