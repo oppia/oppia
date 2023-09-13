@@ -68,12 +68,12 @@ describe('Admin Data Service', () => {
     human_readable_current_time: 'June 03 15:31:20',
     demo_collections: [],
     config_properties: {
-      oppia_csrf_secret: {
+      record_playthrough_probability: {
         schema: {
-          type: 'unicode'
+          type: 'float'
         },
-        value: '3WHOWnD3sy0r1wukJ2lX4vBS_YA=',
-        description: 'Text used to encrypt CSRF tokens.'
+        value: 0.2,
+        description: 'The record_playthrough_probability.'
       }
     },
     demo_exploration_ids: ['19'],
@@ -94,8 +94,8 @@ describe('Admin Data Service', () => {
       data_type: 'string',
       rules: [{
         filters: [{
-          type: PlatformParameterFilterType.ServerMode,
-          conditions: [['=', 'dev'] as [string, string]]
+          type: PlatformParameterFilterType.PlatformType,
+          conditions: [['=', 'Web'] as [string, string]]
         }],
         value_when_matched: ''
       }],

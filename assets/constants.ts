@@ -115,6 +115,14 @@ export default {
     "IncreasingUpdatedOn": "Most Recently Updated",
     "DecreasingUpdatedOn": "Least Recently Updated"
   },
+  "TOPIC_SKILL_DASHBOARD_SORTING_OPTIONS": {
+    "IncreasingCreatedOn": "Newly Created",
+    "DecreasingCreatedOn": "Oldest Created",
+    "IncreasingUpdatedOn": "Most Recently Updated",
+    "DecreasingUpdatedOn": "Least Recently Updated",
+    "DecreasingUpcomingLaunches": "Most Upcoming Launches",
+    "DecreasingOverdueLaunches": "Most Launches Behind Schedule"
+  },
 
   // Sorting categories for contributor admin dashboard.
   "CD_ADMIN_STATS_SORT_OPTIONS": {
@@ -6377,8 +6385,14 @@ export default {
   // Maximum allowed length of a username.
   "MAX_USERNAME_LENGTH": 30,
 
+  // Minimum allowed length of a blog post author's name.
+  "MIN_AUTHOR_NAME_LENGTH": 2,
+
   // Maximum allowed length of a blog post author's name.
   "MAX_AUTHOR_NAME_LENGTH": 35,
+
+  // Minimum allowed characters in a blog post author's bio.
+  "MIN_CHARS_IN_AUTHOR_BIO": 5,
 
   // Maximum allowed characters in a blog post author's bio.
   "MAX_CHARS_IN_AUTHOR_BIO": 250,

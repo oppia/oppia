@@ -282,7 +282,8 @@ def get_suggestion_from_model(
         suggestion_model.status, suggestion_model.author_id,
         suggestion_model.final_reviewer_id, suggestion_model.change_cmd,
         suggestion_model.score_category, suggestion_model.language_code,
-        suggestion_model.edited_by_reviewer, suggestion_model.last_updated)
+        suggestion_model.edited_by_reviewer, suggestion_model.last_updated,
+        suggestion_model.created_on)
 
 
 @overload
@@ -1084,6 +1085,60 @@ def get_reviewable_translation_suggestions_by_offset(
                 sort_key,
                 language_codes,
                 opportunity_summary_exp_ids))
+
+    translation_suggestions = []
+    for suggestion_model in in_review_translation_suggestions:
+        suggestion = get_suggestion_from_model(suggestion_model)
+        # Here, we are narrowing down the type from BaseSuggestion to
+        # SuggestionTranslateContent.
+        assert isinstance(
+            suggestion, suggestion_registry.SuggestionTranslateContent
+        )
+        translation_suggestions.append(suggestion)
+
+    return translation_suggestions, next_offset
+
+
+def get_reviewable_translation_suggestions_for_single_exp(
+    user_id: str,
+    opportunity_summary_exp_id: str,
+    language_code: str
+) -> Tuple[List[suggestion_registry.SuggestionTranslateContent], int]:
+    """Returns a list of translation suggestions matching the
+     passed opportunity ID which the user can review.
+
+    Args:
+        user_id: str. The ID of the user.
+        opportunity_summary_exp_id: str.
+            The exploration ID for which suggestions
+            are fetched. If exp id is empty, no suggestions are
+            fetched.
+        language_code: str. The language code to get results for.
+
+    Returns:
+        Tuple of (results, next_offset). where:
+            results: list(Suggestion). A list of translation suggestions
+            which the supplied user is permitted to review.
+            next_offset: int. The input offset + the number of results returned
+                by the current query.
+    """
+    contribution_rights = user_services.get_user_contribution_rights(
+        user_id)
+    language_codes = (
+        contribution_rights.can_review_translation_for_language_codes)
+
+    # The user doesn't have rights to review in any languages, or the user
+    # doesn't have right to review in the chosen language so return early.
+    if language_codes is None or (
+        language_code not in language_codes):
+        return [], 0
+
+    in_review_translation_suggestions, next_offset = (
+        suggestion_models.GeneralSuggestionModel
+        .get_reviewable_translation_suggestions(
+            user_id,
+            language_code,
+            opportunity_summary_exp_id))
 
     translation_suggestions = []
     for suggestion_model in in_review_translation_suggestions:
@@ -1909,7 +1964,7 @@ def get_suggestion_types_that_need_reviewers() -> Dict[str, Set[str]]:
     """Uses the community contribution stats to determine which suggestion
     types need more reviewers. Suggestion types need more reviewers if the
     number of suggestions in that type divided by the number of reviewers is
-    greater than config_domain.MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER.
+    greater than ParamNames.MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER.
 
     Returns:
         dict. A dictionary that uses the presence of its keys to indicate which
@@ -2333,7 +2388,7 @@ def _update_translation_contribution_stats_models(
             stat.rejected_translations_count)
         stats_model.rejected_translation_word_count = (
             stat.rejected_translation_word_count)
-        stats_model.contribution_dates = stat.contribution_dates
+        stats_model.contribution_dates = sorted(stat.contribution_dates)
         stats_models_to_update.append(stats_model)
 
     suggestion_models.TranslationContributionStatsModel.update_timestamps_multi(

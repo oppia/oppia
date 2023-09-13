@@ -21,6 +21,8 @@ from __future__ import annotations
 import enum
 
 from core import feconf
+from core import platform_feature_list
+from core import utils
 from core.constants import constants
 from core.domain import caching_services
 from core.domain import platform_feature_services as feature_services
@@ -79,10 +81,11 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
         self.prod_feature = registry.Registry.create_feature_flag(
             ParamNames.FEATURE_C, 'a feature in prod stage',
             FeatureStages.PROD)
+
         self.param_a = registry.Registry.create_platform_parameter(
             ParamNames.PARAM_A,
             'Parameter named a',
-            platform_parameter_domain.DataTypes.BOOL)
+            platform_parameter_domain.DataTypes.STRING)
         self.param_b = registry.Registry.create_platform_parameter(
             ParamNames.PARAM_B,
             'Parameter named b',
@@ -90,20 +93,12 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
         self.param_c = registry.Registry.create_platform_parameter(
             ParamNames.PARAM_C,
             'Parameter named c',
-            platform_parameter_domain.DataTypes.BOOL)
-
+            platform_parameter_domain.DataTypes.NUMBER)
         registry.Registry.update_platform_parameter(
             self.dev_feature.name, self.user_id, 'edit rules',
             [
                 platform_parameter_domain.PlatformParameterRule.from_dict({
-                    'filters': [
-                        {
-                            'type': 'server_mode',
-                            'conditions': [
-                                ['=', ServerMode.DEV.value]
-                            ]
-                        }
-                    ],
+                    'filters': [],
                     'value_when_matched': True
                 })
             ],
@@ -114,15 +109,7 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
             self.test_feature.name, self.user_id, 'edit rules',
             [
                 platform_parameter_domain.PlatformParameterRule.from_dict({
-                    'filters': [
-                        {
-                            'type': 'server_mode',
-                            'conditions': [
-                                ['=', ServerMode.DEV.value],
-                                ['=', ServerMode.TEST.value],
-                            ]
-                        }
-                    ],
+                    'filters': [],
                     'value_when_matched': True
                 })
             ],
@@ -133,16 +120,7 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
             self.prod_feature.name, self.user_id, 'edit rules',
             [
                 platform_parameter_domain.PlatformParameterRule.from_dict({
-                    'filters': [
-                        {
-                            'type': 'server_mode',
-                            'conditions': [
-                                ['=', ServerMode.DEV.value],
-                                ['=', ServerMode.TEST.value],
-                                ['=', ServerMode.PROD.value]
-                            ]
-                        }
-                    ],
+                    'filters': [],
                     'value_when_matched': True
                 })
             ],
@@ -155,7 +133,7 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
             feature_services.ALL_FEATURES_NAMES_SET
         )
         self.original_parameter_list = (
-            feature_services.ALL_PLATFORM_PARAMS_EXCEPT_FEATURE_FLAGS)
+            platform_feature_list.ALL_PLATFORM_PARAMS_EXCEPT_FEATURE_FLAGS)
         # Here we use MyPy ignore because the expected type of ALL_FEATURE_FLAGS
         # is a list of 'PARAM_NAMES' Enum, but here for testing purposes we are
         # providing a list of 'ParamNames' enums, which causes MyPy to throw an
@@ -168,7 +146,7 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
         # Enum, but here for testing purposes we are providing a list of
         # 'ParamNames' enums, which causes MyPy to throw an 'Incompatible types
         # in assignment' error. Thus to avoid the error, we used ignore here.
-        feature_services.ALL_PLATFORM_PARAMS_EXCEPT_FEATURE_FLAGS = (
+        platform_feature_list.ALL_PLATFORM_PARAMS_EXCEPT_FEATURE_FLAGS = (
             param_name_enums) # type: ignore[assignment]
 
     def tearDown(self) -> None:
@@ -176,7 +154,7 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
         feature_services.ALL_FEATURE_FLAGS = self.original_feature_list
         feature_services.ALL_FEATURES_NAMES_SET = (
             self.original_feature_name_set)
-        feature_services.ALL_PLATFORM_PARAMS_EXCEPT_FEATURE_FLAGS = (
+        platform_feature_list.ALL_PLATFORM_PARAMS_EXCEPT_FEATURE_FLAGS = (
             self.original_parameter_list)
         registry.Registry.parameter_registry = self.original_parameter_registry
 
@@ -196,7 +174,7 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
     def test_get_platform_parameter_value(self) -> None:
         self.assertEqual(
             feature_services.get_platform_parameter_value(
-                self.param_a.name), False)
+                self.param_b.name), False)
 
     def test_get_unknown_platform_param_value_results_in_error(self) -> None:
         with self.assertRaisesRegex(
@@ -258,7 +236,7 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
             context = feature_services.create_evaluation_context_for_client({
                 'platform_type': 'Android',
                 'app_version': '1.0.0',
-            })
+        })
             self.assertEqual(
                 feature_services.evaluate_all_feature_flag_values_for_client(
                     context),
@@ -409,18 +387,10 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
             self.dev_feature.name, self.user_id, 'test update',
             [
                 platform_parameter_domain.PlatformParameterRule.from_dict({
-                    'filters': [
-                        {
-                            'type': 'server_mode',
-                            'conditions': [
-                                ['=', FeatureStages.DEV.value]
-                            ]
-                        }
-                    ],
+                    'filters': [],
                     'value_when_matched': False
                 })
-            ],
-            False
+            ]
         )
 
         with self.swap(constants, 'DEV_MODE', True):
@@ -439,8 +409,32 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
                     platform_parameter_domain.PlatformParameterRule.from_dict(
                         {'filters': [], 'value_when_matched': False}
                     ),
-                ],
-                False
+                ]
+            )
+
+    def test_update_feature_flag_with_invalid_rules_raises_error(
+        self
+    ) -> None:
+        with self.assertRaisesRegex(utils.ValidationError, (
+            'Unsupported comparison operator \'!\' for app_version filter, '
+            'expected one of \\[\'=\', \'<\', \'<=\', \'>\', \'>=\'].')
+        ):
+            feature_services.update_feature_flag(
+                self.dev_feature.name, self.user_id, 'test update',
+                [
+                    platform_parameter_domain.PlatformParameterRule.from_dict({
+                        'filters': [
+                            {
+                                'type': 'app_version',
+                                'conditions': [['!', '1.2.3']]
+                            }
+                        ],
+                        'value_when_matched': True
+                    }),
+                    platform_parameter_domain.PlatformParameterRule.from_dict({
+                        'filters': [], 'value_when_matched': False
+                    })
+                ]
             )
 
     def test_all_platform_params_should_appear_once_in_features_or_in_params_list( # pylint: disable=line-too-long
@@ -449,7 +443,7 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
         feature_services.ALL_FEATURE_FLAGS = self.original_feature_list
         feature_services.ALL_FEATURES_NAMES_SET = (
             self.original_feature_name_set)
-        feature_services.ALL_PLATFORM_PARAMS_EXCEPT_FEATURE_FLAGS = (
+        platform_feature_list.ALL_PLATFORM_PARAMS_EXCEPT_FEATURE_FLAGS = (
             self.original_parameter_list)
         registry.Registry.parameter_registry = self.original_parameter_registry
         all_params_name = registry.Registry.get_all_platform_parameter_names()
@@ -457,7 +451,9 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
             feature.value for feature in feature_services.ALL_FEATURE_FLAGS]
         all_params_except_features_names_list = [
             params.value
-            for params in feature_services.ALL_PLATFORM_PARAMS_EXCEPT_FEATURE_FLAGS]
+            for params in platform_feature_list.
+            ALL_PLATFORM_PARAMS_EXCEPT_FEATURE_FLAGS
+        ]
         self.assertEqual(
             len(all_params_name),
             (
@@ -482,3 +478,50 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
                     'in the ALL_PLATFORM_PARAMS_EXCEPT_FEATURE_FLAGS list and '
                     'should not be present in the ALL_FEATURE_FLAGS list.' % (
                         param_name))
+
+    def test_platform_parameter_schema_acc_to_data_type(self) -> None:
+        self.assertEqual(
+            {'type': 'unicode'},
+            feature_services.get_platform_parameter_schema(self.param_a.name)
+        )
+
+        self.assertEqual(
+            {'type': 'bool'},
+            feature_services.get_platform_parameter_schema(self.param_b.name)
+        )
+
+        self.assertEqual(
+            {'type': 'float'},
+            feature_services.get_platform_parameter_schema(self.param_c.name)
+        )
+
+    def test_raise_exception_when_invalid_data_type_trying_to_get_schema(
+        self) -> None:
+        param_dict = {
+            'name': 'param_name',
+            'description': 'param description',
+            'data_type': 'unknown',
+            'rules': [],
+            'rule_schema_version': (
+                feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION),
+            'default_value': 'abc',
+            'is_feature': False,
+            'feature_stage': None
+        }
+        # Here we use MyPy ignore because we want to create a platform parameter
+        # with an invalid 'data_type' field to test that the exception
+        # gets raised.
+        parameter = platform_parameter_domain.PlatformParameter.from_dict(
+            param_dict) # type: ignore[arg-type]
+        swap_get_platform_parameter = self.swap_to_always_return(
+            registry.Registry,
+            'get_platform_parameter',
+            parameter
+        )
+
+        with swap_get_platform_parameter, self.assertRaisesRegex(Exception, (
+            'The param_name platform parameter has a data type of unknown '
+            'which is not valid. Please use one of these data types instead: '
+            'typing.Union\\[str, int, bool, float].'
+        )):
+            feature_services.get_platform_parameter_schema(parameter.name)
