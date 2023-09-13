@@ -198,15 +198,16 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
         .registerContributorDashboardViewSuggestionForReview('Translation');
       this.heading = 'Review Translation Contributions';
     }
-    const suggestionIdsList = Object.keys(this.suggestionIdToContribution);
-    const clickedSuggestionIndex = suggestionIdsList.indexOf(
+    const suggestionIds = Object.keys(this.suggestionIdToContribution);
+    const clickedSuggestionIndex = suggestionIds.indexOf(
       this.activeSuggestionId);
-    this.skippedContributionIds.push(...suggestionIdsList.slice(
+    this.skippedContributionIds.push(...suggestionIds.slice(
       0, clickedSuggestionIndex));
+      this.skippedContributionIds = (
+        [...suggestionIds.slice(0, clickedSuggestionIndex)]);
     delete this.suggestionIdToContribution[this.initialSuggestionId];
-    this.remainingContributionIds = Object.keys(this.suggestionIdToContribution)
-      .filter(contributionId => !this.skippedContributionIds.includes(
-        contributionId));
+    this.remainingContributionIds = suggestionIds.slice(
+      clickedSuggestionIndex + 1, suggestionIds.length);
     this.remainingContributionIds.reverse();
     this.isLastItem = this.remainingContributionIds.length === 0;
     this.allContributions = this.suggestionIdToContribution;
