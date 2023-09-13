@@ -22,13 +22,12 @@ import { fakeAsync, flushMicrotasks, TestBed } from '@angular/core/testing';
 
 import { PlaythroughIssuesBackendApiService } from
   'services/playthrough-issues-backend-api.service';
-import { PlaythroughIssueBackendDict, PlaythroughIssueObjectFactory } from
-  'domain/statistics/PlaythroughIssueObjectFactory';
+import { PlaythroughIssueBackendDict, PlaythroughIssue } from
+  'domain/statistics/playthrough-issue.model';
 
 describe('PlaythroughIssuesBackendApiService', () => {
   let httpTestingController: HttpTestingController;
   let playthroughIssuesBackendApiService: PlaythroughIssuesBackendApiService;
-  let playthroughIssueObjectFactory: PlaythroughIssueObjectFactory;
 
   let backendIssues: PlaythroughIssueBackendDict[] = [{
     issue_type: 'MultipleIncorrectSubmissions',
@@ -46,8 +45,6 @@ describe('PlaythroughIssuesBackendApiService', () => {
     httpTestingController = TestBed.inject(HttpTestingController);
     playthroughIssuesBackendApiService = TestBed.inject(
       PlaythroughIssuesBackendApiService);
-    playthroughIssueObjectFactory = TestBed.inject(
-      PlaythroughIssueObjectFactory);
   });
 
   afterEach(() => {
@@ -71,7 +68,7 @@ describe('PlaythroughIssuesBackendApiService', () => {
 
         expect(successHandler).toHaveBeenCalledWith(
           backendIssues.map(
-            playthroughIssueObjectFactory.createFromBackendDict));
+            PlaythroughIssue.createFromBackendDict));
         expect(failureHandler).not.toHaveBeenCalled();
       }));
 
@@ -115,7 +112,7 @@ describe('PlaythroughIssuesBackendApiService', () => {
 
         expect(successHandler).toHaveBeenCalledWith(
           backendIssues.map(
-            playthroughIssueObjectFactory.createFromBackendDict));
+            PlaythroughIssue.createFromBackendDict));
         expect(failureHandler).not.toHaveBeenCalled();
 
         // Try to fetch another issue.
@@ -125,7 +122,7 @@ describe('PlaythroughIssuesBackendApiService', () => {
         flushMicrotasks();
 
         expect(successHandler).toHaveBeenCalledWith(backendIssues.map(
-          playthroughIssueObjectFactory.createFromBackendDict));
+          PlaythroughIssue.createFromBackendDict));
         expect(failureHandler).not.toHaveBeenCalled();
       }));
 
@@ -154,7 +151,7 @@ describe('PlaythroughIssuesBackendApiService', () => {
         flushMicrotasks();
 
         expect(successHandler).toHaveBeenCalledWith(
-          playthroughIssueObjectFactory.createFromBackendDict(
+          PlaythroughIssue.createFromBackendDict(
             backendPlaythrough));
         expect(failureHandler).not.toHaveBeenCalled();
       }));
@@ -189,7 +186,7 @@ describe('PlaythroughIssuesBackendApiService', () => {
       let successHandler = jasmine.createSpy('success');
       let failureHandler = jasmine.createSpy('failure');
       let explorationId = '7';
-      let playthroughIssue = playthroughIssueObjectFactory
+      let playthroughIssue = PlaythroughIssue
         .createFromBackendDict(backendIssues[0]);
 
       playthroughIssuesBackendApiService.fetchIssuesAsync('7', 1)
@@ -217,7 +214,7 @@ describe('PlaythroughIssuesBackendApiService', () => {
         var successHandler = jasmine.createSpy('success');
         var failHandler = jasmine.createSpy('fail');
         let explorationId = '7';
-        let playthroughIssue = playthroughIssueObjectFactory
+        let playthroughIssue = PlaythroughIssue
           .createFromBackendDict(backendIssues[0]);
 
         playthroughIssuesBackendApiService.fetchIssuesAsync('7', 1)
@@ -252,7 +249,7 @@ describe('PlaythroughIssuesBackendApiService', () => {
         let successHandler = jasmine.createSpy('success');
         let failHandler = jasmine.createSpy('fail');
         let explorationId = '7';
-        let playthroughIssue = playthroughIssueObjectFactory
+        let playthroughIssue = PlaythroughIssue
           .createFromBackendDict(backendIssues[0]);
 
         playthroughIssuesBackendApiService.resolveIssueAsync(

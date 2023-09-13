@@ -308,8 +308,6 @@ import { PlayerTranscriptService } from
   'pages/exploration-player-page/services/player-transcript.service';
 import { PlaythroughBackendApiService } from
   'domain/statistics/playthrough-backend-api.service';
-import { PlaythroughIssueObjectFactory } from
-  'domain/statistics/PlaythroughIssueObjectFactory';
 import { PlaythroughIssuesBackendApiService } from
   'services/playthrough-issues-backend-api.service';
 import { PlaythroughObjectFactory } from
@@ -586,8 +584,6 @@ export class UpgradedServices {
     upgradedServices['ParamTypeObjectFactory'] = new ParamTypeObjectFactory();
     upgradedServices['PlayerCorrectnessFeedbackEnabledService'] =
       new PlayerCorrectnessFeedbackEnabledService();
-    upgradedServices['PlaythroughIssueObjectFactory'] =
-      new PlaythroughIssueObjectFactory();
     upgradedServices['RatingComputationService'] =
       new RatingComputationService();
     upgradedServices['RatioExpressionInputRulesService'] =
@@ -999,7 +995,6 @@ export class UpgradedServices {
     upgradedServices['PlaythroughIssuesBackendApiService'] =
       new PlaythroughIssuesBackendApiService(
         upgradedServices['HttpClient'],
-        upgradedServices['PlaythroughIssueObjectFactory'],
         upgradedServices['UrlInterpolationService']);
     upgradedServices['ProfilePageBackendApiService'] =
       new ProfilePageBackendApiService(

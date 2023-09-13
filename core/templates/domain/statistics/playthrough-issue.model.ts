@@ -13,12 +13,9 @@
 // limitations under the License.
 
 /**
- * @fileoverview Factory for creating new frontend instances of Exploration
+ * @fileoverview Model class for creating new frontend instances of Exploration
  *     Issue domain objects.
  */
-
-import { Injectable } from '@angular/core';
-import { downgradeInjectable } from '@angular/upgrade/static';
 
 export interface EarlyQuitCustomizationArgs {
   'state_name': { value: string };
@@ -114,17 +111,14 @@ export class CyclicStateTransitionsPlaythroughIssue extends
   }
 }
 
-export type PlaythroughIssue = (
+export type PlaythroughIssueType = (
   EarlyQuitPlaythroughIssue |
   MultipleIncorrectSubmissionsPlaythroughIssue |
   CyclicStateTransitionsPlaythroughIssue);
 
-@Injectable({
-  providedIn: 'root'
-})
-export class PlaythroughIssueObjectFactory {
-  createFromBackendDict(
-      backendDict: PlaythroughIssueBackendDict): PlaythroughIssue {
+export class PlaythroughIssue {
+  static createFromBackendDict(
+      backendDict: PlaythroughIssueBackendDict): PlaythroughIssueType {
     switch (backendDict.issue_type) {
       case 'EarlyQuit':
         return new EarlyQuitPlaythroughIssue(
@@ -150,7 +144,3 @@ export class PlaythroughIssueObjectFactory {
       angular.toJson(invalidBackendDict));
   }
 }
-
-angular.module('oppia').factory(
-  'PlaythroughIssueObjectFactory',
-  downgradeInjectable(PlaythroughIssueObjectFactory));

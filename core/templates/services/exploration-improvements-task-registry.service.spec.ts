@@ -48,8 +48,8 @@ import {
   EarlyQuitPlaythroughIssueBackendDict,
   MultipleIncorrectSubmissionsPlaythroughIssueBackendDict,
   MultipleIncorrectSubmissionsPlaythroughIssue,
-  PlaythroughIssueObjectFactory,
-} from 'domain/statistics/PlaythroughIssueObjectFactory';
+  PlaythroughIssue,
+} from 'domain/statistics/playthrough-issue.model';
 import { StatesObjectFactory } from 'domain/exploration/StatesObjectFactory';
 import { ExplorationImprovementsTaskRegistryService } from
   'services/exploration-improvements-task-registry.service';
@@ -58,7 +58,6 @@ import { ExplorationImprovementsTaskRegistryService } from
 describe('Exploration improvements task registrar service', () => {
   let taskRegistryService: ExplorationImprovementsTaskRegistryService;
 
-  let playthroughIssueObjectFactory: PlaythroughIssueObjectFactory;
   let statesObjectFactory: StatesObjectFactory;
 
   let answerStatsBackendDict: AnswerStatsBackendDict;
@@ -82,7 +81,6 @@ describe('Exploration improvements task registrar service', () => {
     taskRegistryService = (
       TestBed.get(ExplorationImprovementsTaskRegistryService));
 
-    playthroughIssueObjectFactory = TestBed.get(PlaythroughIssueObjectFactory);
     statesObjectFactory = TestBed.get(StatesObjectFactory);
 
     config = new ExplorationImprovementsConfig(
@@ -244,17 +242,17 @@ describe('Exploration improvements task registrar service', () => {
   };
   const makeCstPlaythroughIssue = (dict = cstPlaythroughIssueBackendDict) => {
     return (
-      playthroughIssueObjectFactory.createFromBackendDict(dict)
+      PlaythroughIssue.createFromBackendDict(dict)
     ) as CyclicStateTransitionsPlaythroughIssue;
   };
   const makeEqPlaythroughIssue = (dict = eqPlaythroughIssueBackendDict) => {
     return (
-      playthroughIssueObjectFactory.createFromBackendDict(dict)
+      PlaythroughIssue.createFromBackendDict(dict)
     ) as EarlyQuitPlaythroughIssue;
   };
   const makeMisPlaythroughIssue = (dict = misPlaythroughIssueBackendDict) => {
     return (
-      playthroughIssueObjectFactory.createFromBackendDict(dict)) as
+      PlaythroughIssue.createFromBackendDict(dict)) as
        MultipleIncorrectSubmissionsPlaythroughIssue;
   };
 
