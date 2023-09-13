@@ -178,9 +178,9 @@ class TopicEditorStoryHandler(
                             node.planned_publication_date))
                     if node.is_node_upcoming():
                         upcoming_chapters_count += 1
-                        upcoming_chapters_expected_days.append((
+                        upcoming_chapters_expected_days.append((int)((
                             planned_publication_date_msecs -
-                            current_time_msecs) / (1000.0 * 3600 * 24))
+                            current_time_msecs) / (1000.0 * 3600 * 24)))
                     if node.is_node_behind_schedule():
                         overdue_chapters_count += 1
 
