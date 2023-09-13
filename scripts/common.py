@@ -882,7 +882,7 @@ def url_retrieve(
                     output_file.write(response.read())
         except (
             urlerror.URLError, ssl.SSLError,
-                    client.IncompleteRead, ConnectionResetError
+            client.IncompleteRead, ConnectionResetError
         ) as exception:
             failures += 1
             print('Attempt %d of %d failed when downloading %s.' % (
