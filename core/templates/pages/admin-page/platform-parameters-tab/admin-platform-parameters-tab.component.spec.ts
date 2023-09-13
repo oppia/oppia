@@ -126,18 +126,52 @@ describe('Admin page platform parameters tab', () => {
 
   describe('.getPlatformParamSchema', () => {
     it('should return unicode schema for string data type', () => {
-      const schema = component.getPlatformParamSchema('string');
+      const schema = component.getPlatformParamSchema(
+        'string', component.platformParameters[0].name);
       expect(schema).toEqual({type: 'unicode'});
     });
 
+    it('should return correct unicode schema for email_footer ' +
+    'platform parameter', () => {
+      const schema = component.getPlatformParamSchema(
+        'string', 'email_footer');
+      expect(schema).toEqual(
+        {type: 'unicode', ui_config: {rows: 5}});
+    });
+
+    it('should return correct unicode schema for signup_email_body_content ' +
+    'platform parameter', () => {
+      const schema = component.getPlatformParamSchema(
+        'string', 'signup_email_body_content');
+      expect(schema).toEqual(
+        {type: 'unicode', ui_config: {rows: 20}});
+    });
+
+    it('should return correct unicode schema for unpublish_exploration_email' +
+    '_html_body platform parameter', () => {
+      const schema = component.getPlatformParamSchema(
+        'string', 'unpublish_exploration_email_html_body');
+      expect(schema).toEqual(
+        {type: 'unicode', ui_config: {rows: 20}});
+    });
+
     it('should return float schema for number data type', () => {
-      const schema = component.getPlatformParamSchema('number');
+      const schema = component.getPlatformParamSchema(
+        'number', component.platformParameters[0].name);
       expect(schema).toEqual({type: 'float'});
     });
 
-    it('should return the schema according to the data type', () => {
-      const schema = component.getPlatformParamSchema('bool');
+    it('should return bool schema for bool data type', () => {
+      const schema = component.getPlatformParamSchema(
+        'bool', component.platformParameters[0].name);
       expect(schema).toEqual({type: 'bool'});
+    });
+
+    it('should raise error for unknown schema', () => {
+      expect(() => {
+        component.getPlatformParamSchema(
+          'float', component.platformParameters[0].name);
+      }).toThrowError();
     });
   });
 
