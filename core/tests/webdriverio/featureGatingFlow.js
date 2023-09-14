@@ -88,18 +88,9 @@ describe('Feature Gating Flow', function() {
     await users.logout();
   });
 
-  it('should not show indicators for dummy_feature_flag_for_e2e_tests ' +
-  'to different users', async() => {
+  it('should show indicators for dummy_feature_flag_for_e2e_tests ' +
+  'to different users when feature is enabled', async() => {
     await users.login(RELEASE_COORDINATOR_USER1_EMAIL, true);
-
-    await releaseCoordinatorPage.getFeaturesTab();
-    var dummy = await releaseCoordinatorPage.getDummyFeatureFlagForE2ETests();
-    await releaseCoordinatorPage.enableFeatureForDev(dummy);
-
-    await users.logout();
-    await users.login(RELEASE_COORDINATOR_USER2_EMAIL, true);
-
-    await releaseCoordinatorPage.getFeaturesTab();
 
     // Indicator in Angular component that is visible if the
     // dummy_feature_flag_for_e2e_tests is enabled, and the feature status
@@ -113,8 +104,19 @@ describe('Feature Gating Flow', function() {
     var agDummyHandlerIndicator = $(
       '.e2e-test-angular-dummy-handler-indicator');
 
+    await releaseCoordinatorPage.getFeaturesTab();
     expect(await agDummyFeatureIndicator.isExisting()).toBe(false);
     expect(await agDummyHandlerIndicator.isExisting()).toBe(false);
+    var dummy = await releaseCoordinatorPage.getDummyFeatureFlagForE2ETests();
+    await releaseCoordinatorPage.enableFeature(dummy);
+
+    await users.logout();
+    await users.login(RELEASE_COORDINATOR_USER2_EMAIL, true);
+
+    await releaseCoordinatorPage.getFeaturesTab();
+
+    expect(await agDummyFeatureIndicator.isExisting()).toBe(true);
+    expect(await agDummyHandlerIndicator.isExisting()).toBe(true);
     await users.logout();
   });
 });

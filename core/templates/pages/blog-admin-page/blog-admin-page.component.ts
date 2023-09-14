@@ -19,7 +19,7 @@
 import { Component, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 
-import { BlogAdminBackendApiService, ConfigPropertiesBackendResponse, ConfigPropertyValues }
+import { BlogAdminBackendApiService, PlatformParameterBackendResponse, PlatformParameterValues }
   from 'domain/blog-admin/blog-admin-backend-api.service';
 import { BlogAdminDataService } from 'pages/blog-admin-page/services/blog-admin-data.service';
 import { AdminTaskManagerService } from 'pages/admin-page/services/admin-task-manager.service';
@@ -44,8 +44,8 @@ interface FormData {
   removeEditorRole: RemoveEditorRole;
 }
 
-type ConfigPropertyValuesRecord = (
-  Record<keyof ConfigPropertyValues, string[] | number>);
+type PlatformParameterValuesRecord = (
+  Record<keyof PlatformParameterValues, string[] | number>);
 
 @Component({
   selector: 'oppia-blog-admin-page',
@@ -59,7 +59,7 @@ export class BlogAdminPageComponent implements OnInit {
   formData!: FormData;
   UPDATABLE_ROLES = {};
   statusMessage: string = '';
-  configProperties: ConfigPropertiesBackendResponse = {};
+  platformParameters: PlatformParameterBackendResponse = {};
   constructor(
     private backendApiService: BlogAdminBackendApiService,
     private blogAdminDataService: BlogAdminDataService,
@@ -73,7 +73,7 @@ export class BlogAdminPageComponent implements OnInit {
       this.UPDATABLE_ROLES = DataObject.updatableRoles;
       this.roleToActions = DataObject.roleToActions;
     });
-    this.reloadConfigProperties();
+    this.reloadPlatformParameters();
   }
 
   refreshFormData(): void {
@@ -142,9 +142,9 @@ export class BlogAdminPageComponent implements OnInit {
     this.adminTaskManagerService.finishTask();
   }
 
-  reloadConfigProperties(): void {
+  reloadPlatformParameters(): void {
     this.blogAdminDataService.getDataAsync().then((DataObject) => {
-      this.configProperties = DataObject.configProperties;
+      this.platformParameters = DataObject.platformParameters;
     });
   }
 
@@ -154,22 +154,7 @@ export class BlogAdminPageComponent implements OnInit {
     };
   }
 
-  revertToDefaultConfigPropertyValue(configPropertyId: string): void {
-    if (!this.windowRef.nativeWindow.confirm(
-      'This action is irreversible. Are you sure?')) {
-      return;
-    }
-
-    this.backendApiService.revertConfigPropertyAsync(configPropertyId)
-      .then(() => {
-        this.statusMessage = 'Config property reverted successfully.';
-        this.reloadConfigProperties();
-      }, errorResponse => {
-        this.statusMessage = 'Server error: ' + errorResponse;
-      });
-  }
-
-  saveConfigProperties(): void {
+  savePlatformParameters(): void {
     if (this.adminTaskManagerService.isTaskRunning()) {
       return;
     }
@@ -181,14 +166,14 @@ export class BlogAdminPageComponent implements OnInit {
     this.statusMessage = 'Saving...';
 
     this.adminTaskManagerService.startTask();
-    let newConfigPropertyValues = {} as ConfigPropertyValuesRecord;
-    for (let property in this.configProperties) {
-      const prop = property as keyof ConfigPropertyValues;
-      newConfigPropertyValues[prop] = this.configProperties[prop].value;
+    let newPlatformParameterValues = {} as PlatformParameterValuesRecord;
+    for (let property in this.platformParameters) {
+      const prop = property as keyof PlatformParameterValues;
+      newPlatformParameterValues[prop] = this.platformParameters[prop].value;
     }
 
-    this.backendApiService.saveConfigPropertiesAsync(
-      newConfigPropertyValues as ConfigPropertyValues).then(() => {
+    this.backendApiService.savePlatformParametersAsync(
+      newPlatformParameterValues as PlatformParameterValues).then(() => {
       this.statusMessage = 'Data saved successfully.';
       this.adminTaskManagerService.finishTask();
     }, errorResponse => {
