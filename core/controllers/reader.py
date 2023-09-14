@@ -27,7 +27,6 @@ from core.controllers import base
 from core.controllers import domain_objects_validator
 from core.controllers import editor
 from core.domain import collection_services
-from core.domain import config_domain
 from core.domain import event_services
 from core.domain import exp_domain
 from core.domain import exp_fetchers
