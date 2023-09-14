@@ -207,7 +207,7 @@ describe('Translation Suggestion Review Modal Component', function() {
       component.editedContent = editedContent;
     });
 
-    it('should be able to navigate to both previous suggestion and '+
+    it('should be able to navigate to both previous suggestion and ' +
     'next suggestion if initial suggestion is in middle of list', () => {
       component.initialSuggestionId = 'suggestion_2';
       component.ngOnInit();
@@ -217,28 +217,29 @@ describe('Translation Suggestion Review Modal Component', function() {
       expect(component.remainingContributionIds).toEqual(['suggestion_3']);
     });
 
-    it('should be able to navigate to only previous suggestion '+
+    it('should be able to navigate to only previous suggestion ' +
     'if initial suggestion is the last suggestion of the list', () => {
-      component.initialSuggestionId = 'suggestion_1';
+      component.initialSuggestionId = 'suggestion_3';
       component.ngOnInit();
 
-      expect(component.activeSuggestionId).toBe('suggestion_1');
-      expect(component.skippedContributionIds).toEqual(
+      expect(component.activeSuggestionId).toBe('suggestion_3');
+      expect(component.skippedContributionIds.sort()).toEqual(
         ['suggestion_1', 'suggestion_2']);
       expect(component.remainingContributionIds).toEqual([]);
     });
 
-    it('should be able to navigate to only next suggestion '+
+    it('should be able to navigate to only next suggestion ' +
     'if initial suggestion is in first suggestion of the list', () => {
       component.initialSuggestionId = 'suggestion_1';
       component.ngOnInit();
 
       expect(component.activeSuggestionId).toBe('suggestion_1');
       expect(component.skippedContributionIds).toEqual([]);
-      expect(component.remainingContributionIds).toEqual(
+      expect(component.remainingContributionIds.sort()).toEqual(
         ['suggestion_2', 'suggestion_3']);
     });
-  })
+  });
+
   describe('when reviewing suggestion', function() {
     const reviewable = true;
     const subheading = 'topic_1 / story_1 / chapter_1';
