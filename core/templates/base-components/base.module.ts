@@ -52,6 +52,7 @@ import {
 import { SmartRouterModule } from 'hybrid-router-module-provider';
 import { OppiaAngularRootComponent } from 'components/oppia-angular-root.component';
 import { NgBootstrapModule } from 'modules/ng-boostrap.module';
+import { FooterDonateVolunteerComponent } from './footer-donate-volunteer.component';
 
 @NgModule({
   imports: [
@@ -83,6 +84,7 @@ import { NgBootstrapModule } from 'modules/ng-boostrap.module';
     PromoBarComponent,
     SideNavigationBarComponent,
     SocialButtonsComponent,
+    FooterDonateVolunteerComponent,
     ThanksForSubscribingModalComponent,
     TopNavigationBarComponent,
     WarningsAndAlertsComponent,

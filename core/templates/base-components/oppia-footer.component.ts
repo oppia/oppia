@@ -16,7 +16,7 @@
  * @fileoverview Component for the footer.
  */
 
-import { Component, ViewEncapsulation } from '@angular/core';
+import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { PlatformFeatureService } from 'services/platform-feature.service';
@@ -33,8 +33,7 @@ import './oppia-footer.component.css';
 @Component({
   selector: 'oppia-footer',
   templateUrl: './oppia-footer.component.html',
-  styleUrls: ['./oppia-footer.component.css'],
-  encapsulation: ViewEncapsulation.None,
+  styleUrls: ['./oppia-footer.component.css']
 })
 export class OppiaFooterComponent {
   emailAddress: string | null = null;
