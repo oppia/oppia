@@ -61,6 +61,7 @@ export class InteractiveItemSelectionInputComponent implements OnInit {
   newQuestion: boolean = false;
   notEnoughSelections: boolean = false;
   preventAdditionalSelections: boolean = false;
+  exactSelections: boolean = false;
 
   constructor(
     private browserCheckerService: BrowserCheckerService,
@@ -131,7 +132,9 @@ export class InteractiveItemSelectionInputComponent implements OnInit {
 
     // The following indicates that the number of answers is less than
     // minAllowableSelectionCount.
-    this.notEnoughSelections = this.minAllowableSelectionCount > 0;
+    this.notEnoughSelections = (this.minAllowableSelectionCount > 0 && this.minAllowableSelectionCount < this.maxAllowableSelectionCount) || this.minAllowableSelectionCount === 1 && this.maxAllowableSelectionCount === 1;
+
+    this.exactSelections = this.minAllowableSelectionCount === this.maxAllowableSelectionCount;
     this.currentInteractionService.registerCurrentInteraction(
       this.submitAnswer.bind(this), this.validityCheckFn.bind(this));
   }
