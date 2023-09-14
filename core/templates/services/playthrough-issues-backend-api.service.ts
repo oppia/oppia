@@ -26,8 +26,8 @@ export interface FetchIssuesResponseBackendDict {
 
 import {
   PlaythroughIssueBackendDict,
-  PlaythroughIssueType,
-  PlaythroughIssue
+  PlaythroughIssue,
+  PlaythroughIssueModel
 } from 'domain/statistics/playthrough-issue.model';
 import { ServicesConstants } from 'services/services.constants';
 import { UrlInterpolationService } from
@@ -35,7 +35,7 @@ import { UrlInterpolationService } from
 
 @Injectable({ providedIn: 'root' })
 export class PlaythroughIssuesBackendApiService {
-  private cachedIssues: PlaythroughIssueType[] = [];
+  private cachedIssues: PlaythroughIssue[] = [];
 
   constructor(
       private httpClient: HttpClient,
@@ -43,7 +43,7 @@ export class PlaythroughIssuesBackendApiService {
 
   async fetchIssuesAsync(
       explorationId: string,
-      explorationVersion: number): Promise<PlaythroughIssueType[]> {
+      explorationVersion: number): Promise<PlaythroughIssue[]> {
     if (this.cachedIssues.length !== 0) {
       return Promise.resolve(this.cachedIssues);
     }
@@ -54,7 +54,7 @@ export class PlaythroughIssuesBackendApiService {
           params: { exp_version: explorationVersion.toString() }}).toPromise()
         .then(response => {
           resolve(this.cachedIssues = response.unresolved_issues.map(
-            PlaythroughIssue.createFromBackendDict));
+            PlaythroughIssueModel.createFromBackendDict));
         }, errorResponse => {
           reject(errorResponse.error.error);
         });
@@ -63,12 +63,12 @@ export class PlaythroughIssuesBackendApiService {
 
   async fetchPlaythroughAsync(
       explorationId: string,
-      playthroughId: string): Promise<PlaythroughIssueType> {
+      playthroughId: string): Promise<PlaythroughIssue> {
     return new Promise((resolve, reject) => {
       this.httpClient.get<PlaythroughIssueBackendDict>(
         this.getFetchPlaythroughUrl(explorationId, playthroughId)).toPromise()
         .then(response => {
-          resolve(PlaythroughIssue.createFromBackendDict(
+          resolve(PlaythroughIssueModel.createFromBackendDict(
             response));
         }, errorResponse => {
           reject(errorResponse.error.error);
@@ -77,7 +77,7 @@ export class PlaythroughIssuesBackendApiService {
   }
 
   async resolveIssueAsync(
-      issueToResolve: PlaythroughIssueType,
+      issueToResolve: PlaythroughIssue,
       explorationId: string, explorationVersion: number): Promise<void> {
     return new Promise((resolve, reject) => {
       this.httpClient.post(this.getResolveIssueUrl(explorationId), {

@@ -18,8 +18,9 @@
 
 import {
   PlaythroughIssueBackendDict,
-  PlaythroughIssue,
-  EarlyQuitPlaythroughIssue
+  PlaythroughIssueModel,
+  EarlyQuitPlaythroughIssue,
+  PlaythroughIssueType
 } from 'domain/statistics/playthrough-issue.model';
 
 describe('Playthrough Issue Object Factory', () => {
@@ -27,7 +28,7 @@ describe('Playthrough Issue Object Factory', () => {
 
   it('should create a new exploration issue', () => {
     playthroughIssueObject = new EarlyQuitPlaythroughIssue(
-      'EarlyQuit', {
+      PlaythroughIssueType.EarlyQuit, {
         state_name: {
           value: 'state'
         },
@@ -36,7 +37,9 @@ describe('Playthrough Issue Object Factory', () => {
         }
       }, [], 1, true);
 
-    expect(playthroughIssueObject.issueType).toEqual('EarlyQuit');
+    expect(playthroughIssueObject.issueType).toEqual(
+      PlaythroughIssueType.EarlyQuit
+    );
     expect(playthroughIssueObject.issueCustomizationArgs).toEqual({
       state_name: {
         value: 'state'
@@ -51,8 +54,8 @@ describe('Playthrough Issue Object Factory', () => {
   });
 
   it('should create a new exploration issue from a backend dict', () => {
-    const playthroughIssueObject = PlaythroughIssue.createFromBackendDict({
-      issue_type: 'EarlyQuit',
+    const playthroughIssueObject = PlaythroughIssueModel.createFromBackendDict({
+      issue_type: PlaythroughIssueType.EarlyQuit,
       issue_customization_args: {
         state_name: {
           value: 'state'
@@ -66,7 +69,8 @@ describe('Playthrough Issue Object Factory', () => {
       is_valid: true
     });
 
-    expect(playthroughIssueObject.issueType).toEqual('EarlyQuit');
+    expect(playthroughIssueObject.issueType)
+      .toEqual(PlaythroughIssueType.EarlyQuit);
     expect(playthroughIssueObject.issueCustomizationArgs).toEqual({
       state_name: {
         value: 'state'
@@ -82,7 +86,7 @@ describe('Playthrough Issue Object Factory', () => {
 
   it('should convert exploration issue to backend dict', () => {
     const playthroughDict: PlaythroughIssueBackendDict = {
-      issue_type: 'EarlyQuit',
+      issue_type: PlaythroughIssueType.EarlyQuit,
       issue_customization_args: {
         state_name: {
           value: 'state'
@@ -95,7 +99,7 @@ describe('Playthrough Issue Object Factory', () => {
       schema_version: 1,
       is_valid: true
     };
-    const playthroughIssueObject = PlaythroughIssue
+    const playthroughIssueObject = PlaythroughIssueModel
       .createFromBackendDict(playthroughDict);
 
     expect(playthroughIssueObject.toBackendDict()).toEqual(playthroughDict);
@@ -123,15 +127,15 @@ describe('Playthrough Issue Object Factory', () => {
       // 'playthroughDict' has an invalid value of 'issue_type' property. We
       // need to do that in order to test validations.
       // @ts-expect-error
-      PlaythroughIssue.createFromBackendDict(playthroughDict);
+      PlaythroughIssueModel.createFromBackendDict(playthroughDict);
     }).toThrowError(
       'Backend dict does not match any known issue type: ' +
       JSON.stringify(playthroughDict));
   });
 
   it('should return the state in which the issue appears', () => {
-    let eqPlaythrough = PlaythroughIssue.createFromBackendDict({
-      issue_type: 'EarlyQuit',
+    let eqPlaythrough = PlaythroughIssueModel.createFromBackendDict({
+      issue_type: PlaythroughIssueType.EarlyQuit,
       issue_customization_args: {
         state_name: {value: 'state'},
         time_spent_in_exp_in_msecs: {value: 30000},
@@ -142,8 +146,8 @@ describe('Playthrough Issue Object Factory', () => {
     });
     expect(eqPlaythrough.getStateNameWithIssue()).toEqual('state');
 
-    let cstPlaythrough = PlaythroughIssue.createFromBackendDict({
-      issue_type: 'CyclicStateTransitions',
+    let cstPlaythrough = PlaythroughIssueModel.createFromBackendDict({
+      issue_type: PlaythroughIssueType.CyclicStateTransitions,
       issue_customization_args: {
         state_names: {value: ['state3', 'state1']}
       },
@@ -153,8 +157,8 @@ describe('Playthrough Issue Object Factory', () => {
     });
     expect(cstPlaythrough.getStateNameWithIssue()).toEqual('state1');
 
-    let misPlaythrough = PlaythroughIssue.createFromBackendDict({
-      issue_type: 'MultipleIncorrectSubmissions',
+    let misPlaythrough = PlaythroughIssueModel.createFromBackendDict({
+      issue_type: PlaythroughIssueType.MultipleIncorrectSubmissions,
       issue_customization_args: {
         state_name: {value: 'state'},
         num_times_answered_incorrectly: {value: 5},

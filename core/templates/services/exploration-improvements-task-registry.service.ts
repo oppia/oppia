@@ -45,7 +45,8 @@ import {
   CyclicStateTransitionsPlaythroughIssue,
   EarlyQuitPlaythroughIssue,
   MultipleIncorrectSubmissionsPlaythroughIssue,
-  PlaythroughIssueType
+  PlaythroughIssue,
+  PlaythroughIssueType,
 } from 'domain/statistics/playthrough-issue.model';
 import { ExplorationStats } from
   'domain/statistics/exploration-stats.model';
@@ -178,7 +179,7 @@ export class ExplorationImprovementsTaskRegistryService {
       resolvedTaskTypesByStateName:
         ReadonlyMap<string, readonly ExplorationTaskType[]>,
       topAnswersByStateName: ReadonlyMap<string, readonly AnswerStats[]>,
-      playthroughIssues: readonly PlaythroughIssueType[]): void {
+      playthroughIssues: readonly PlaythroughIssue[]): void {
     this.validateInitializationArgs(
       config, states, expStats, openTasks,
       resolvedTaskTypesByStateName, topAnswersByStateName,
@@ -198,12 +199,13 @@ export class ExplorationImprovementsTaskRegistryService {
       const playthroughIssuesByType = group(
         playthroughIssuesByStateName.get(stateName) || [], p => p.issueType);
       const cstPlaythroughIssues = (
-        playthroughIssuesByType.get('CyclicStateTransitions')
+        playthroughIssuesByType.get(PlaythroughIssueType.CyclicStateTransitions)
       ) as CstPlaythroughIssue[];
-      const eqPlaythroughIssues = (
-        playthroughIssuesByType.get('EarlyQuit') as EqPlaythroughIssue[]);
-      const misPlaythroughIssues = (
-        playthroughIssuesByType.get('MultipleIncorrectSubmissions')
+      const eqPlaythroughIssues = playthroughIssuesByType.get(
+        PlaythroughIssueType.EarlyQuit
+      ) as EqPlaythroughIssue[];
+      const misPlaythroughIssues = playthroughIssuesByType.get(
+        PlaythroughIssueType.MultipleIncorrectSubmissions
       ) as MisPlaythroughIssue[];
 
       this.registerNewStateTasks(
@@ -330,7 +332,7 @@ export class ExplorationImprovementsTaskRegistryService {
       resolvedTaskTypesByStateName: ReadonlyMap<
           string, readonly ExplorationTaskType[]>,
       topAnswersByStateName: ReadonlyMap<string, readonly AnswerStats[]>,
-      playthroughIssues: readonly PlaythroughIssueType[]): void {
+      playthroughIssues: readonly PlaythroughIssue[]): void {
     // Validate that the exploration stats correspond with provided exploration.
     if (expStats.expId !== config.explorationId) {
       throw new Error(
