@@ -92,8 +92,18 @@ export class SideNavigationBarComponent {
               hackyTopicTranslationKey
             );
           }
-        }, () => {});
-    }, () => {});
+        }, () => {
+          // Note to developers:
+          // This callback is triggered when the default classroom does not
+          // exist. But for generating hacky translations, no further
+          // action is needed.
+        });
+    }, () => {
+      // Note to developers:
+      // This callback is triggered when the default classroom does not
+      // exist. But for generating hacky translations, no further
+      // action is needed.
+    });
 
     this.userService.getUserInfoAsync().then((userInfo) => {
       this.userIsLoggedIn = userInfo.isLoggedIn();

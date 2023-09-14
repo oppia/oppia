@@ -239,8 +239,18 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
               hackyTopicTranslationKey
             );
           }
-        }, () => {});
-    }, () => {});
+        }, () => {
+          // Note to developers:
+          // This callback is triggered when the default classroom does not
+          // exist. But for generating hacky translations, no further
+          // action is needed.
+        });
+    }, () => {
+      // Note to developers:
+      // This callback is triggered when the default classroom does not
+      // exist. But for generating hacky translations, no further
+      // action is needed.
+    });
 
     // Inside a setTimeout function call, 'this' points to the global object.
     // To access the context in which the setTimeout call is made, we need to
