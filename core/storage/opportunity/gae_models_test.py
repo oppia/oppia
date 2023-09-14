@@ -312,3 +312,36 @@ class SkillOpportunityModelTest(test_utils.GenericTestBase):
         self.assertEqual(results[0].id, 'opportunity_id2')
         self.assertFalse(more)
         self.assertTrue(isinstance(cursor, str))
+
+class PinnedOpportunityModelTest(test_utils.GenericTestBase):
+    """Tests for the PinnedOpportunityModel class."""
+
+    def setUp(self) -> None:
+        super().setUp()
+
+        self.user_id = 'user_id_1'
+        self.language_code = 'en'
+        self.topic_id = 'topic_id_1'
+        self.opportunity_id_1 = 'opportunity_id1'
+
+    def test_generate_id(self) -> None:
+        expected_id = 'user_id_1.en.topic_id_1'
+        generated_id = opportunity_models.PinnedOpportunityModel._generate_id(
+            self.user_id, self.language_code, self.topic_id)
+        self.assertEqual(generated_id, expected_id)
+
+    def test_create_and_fetch_model(self) -> None:
+        # Ensure that the model instance doesn't exist yet.
+        fetched_model = opportunity_models.PinnedOpportunityModel.get_model(
+            self.user_id, self.language_code, self.topic_id)
+        self.assertIsNone(fetched_model)
+
+        # Create a new instance.
+        opportunity_models.PinnedOpportunityModel.create(
+            self.user_id, self.language_code, self.topic_id, self.opportunity_id_1)
+
+        # Testing fetching of the model using `get_model()`.
+        fetched_model = opportunity_models.PinnedOpportunityModel.get_model(
+            self.user_id, self.language_code, self.topic_id)
+        self.assertIsNotNone(fetched_model)
+        self.assertEqual(fetched_model.opportunity_id, self.opportunity_id_1)

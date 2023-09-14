@@ -256,3 +256,68 @@ class SkillOpportunityModel(base_models.BaseModel):
             (cursor.urlsafe().decode('utf-8') if cursor else None),
             more_results
         )
+
+
+class PinnedOpportunityModel(base_models.BaseModel):
+    """Model for storing pinned opportunities for a user.
+
+    The ID of each instance is the combination of user_id, language_code, and topic_id.
+    """
+
+    user_id = datastore_services.StringProperty(required=True, indexed=True)
+    language_code = datastore_services.StringProperty(required=True, indexed=True)
+    topic_id = datastore_services.StringProperty(required=True, indexed=True)
+    opportunity_id = datastore_services.StringProperty(indexed=True)
+
+    @classmethod
+    def _generate_id(cls, user_id, language_code, topic_id):
+        """Generates the ID for the instance of PinnedOpportunityModel class.
+
+        Args:
+            user_id: str. The ID of the user.
+            language_code: str. The code of the language.
+            topic_id: str. The ID of the topic.
+
+        Returns:
+            str. The ID for this entity, in the form user_id.language_code.topic_id.
+        """
+        return '%s.%s.%s' % (user_id, language_code, topic_id)
+
+    @classmethod
+    def get_model(cls, user_id, language_code, topic_id):
+        """Fetches the PinnedOpportunityModel instance from the datastore.
+
+        Args:
+            user_id: str. The ID of the user.
+            language_code: str. The code of the language.
+            topic_id: str. The ID of the topic.
+
+        Returns:
+            PinnedOpportunityModel. The model instance with the given parameters or None if not found.
+        """
+        return cls.get_by_id(cls._generate_id(user_id, language_code, topic_id))
+
+    @classmethod
+    def create(cls, user_id, language_code, topic_id, opportunity_id):
+        """Creates a new PinnedOpportunityModel instance. Fails if the model already exists.
+
+        Args:
+            user_id: str. The ID of the user.
+            language_code: str. The code of the language.
+            topic_id: str. The ID of the topic.
+            opportunity_id: str. The ID of the pinned opportunity.
+
+        Returns:
+            PinnedOpportunityModel. The created instance.
+
+        Raises:
+            Exception. If a model with the same ID already exists in the datastore.
+        """
+        instance_id = cls._generate_id(user_id, language_code, topic_id)
+        if cls.get_by_id(instance_id):
+            raise Exception('Model with ID {} already exists'.format(instance_id))
+
+        instance = cls(id=instance_id, user_id=user_id, language_code=language_code,
+                       topic_id=topic_id, opportunity_id=opportunity_id)
+        instance.put()
+        return instance
