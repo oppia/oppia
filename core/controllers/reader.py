@@ -36,6 +36,8 @@ from core.domain import feedback_services
 from core.domain import interaction_registry
 from core.domain import learner_progress_services
 from core.domain import moderator_services
+from core.domain import platform_feature_services
+from core.domain import platform_parameter_list
 from core.domain import question_services
 from core.domain import rating_services
 from core.domain import recommendations_services
@@ -448,7 +450,11 @@ class ExplorationHandler(
             'correctness_feedback_enabled': (
                 exploration.correctness_feedback_enabled),
             'record_playthrough_probability': (
-                config_domain.RECORD_PLAYTHROUGH_PROBABILITY.value),
+                platform_feature_services.get_platform_parameter_value(
+                    platform_parameter_list.ParamNames.
+                    RECORD_PLAYTHROUGH_PROBABILITY.value
+                )
+            ),
             'has_viewed_lesson_info_modal_once': (
                 has_viewed_lesson_info_modal_once),
             'furthest_reached_checkpoint_exp_version': (
