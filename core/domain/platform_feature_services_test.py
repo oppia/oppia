@@ -454,9 +454,11 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
         self
     ) -> None:
         with self.assertRaisesRegex(
-            utils.ValidationError, ('Unsupported comparison operator \'!\' '
-            'for app_version filter, expected one of '
-            '\\[\'=\', \'<\', \'<=\', \'>\', \'>=\'].')
+            utils.ValidationError, (
+                'Unsupported comparison operator \'!\' '
+                'for app_version filter, expected one of '
+                '\\[\'=\', \'<\', \'<=\', \'>\', \'>=\'].'
+            )
         ):
             with self.swap_all_feature_flags, self.swap_all_feature_names_set:
                 feature_services.update_feature_flag(
