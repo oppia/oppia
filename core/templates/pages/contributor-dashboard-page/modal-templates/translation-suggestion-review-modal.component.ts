@@ -201,8 +201,6 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
     const suggestionIds = Object.keys(this.suggestionIdToContribution);
     const clickedSuggestionIndex = suggestionIds.indexOf(
       this.activeSuggestionId);
-    this.skippedContributionIds.push(...suggestionIds.slice(
-      0, clickedSuggestionIndex));
     this.skippedContributionIds = (
       [...suggestionIds.slice(0, clickedSuggestionIndex)]);
     delete this.suggestionIdToContribution[this.initialSuggestionId];
