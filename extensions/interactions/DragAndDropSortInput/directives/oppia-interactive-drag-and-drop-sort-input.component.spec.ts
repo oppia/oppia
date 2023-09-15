@@ -129,6 +129,88 @@ describe('Drag and drop sort input interactive component', () => {
     component = fixture.componentInstance;
   });
 
+  describe('handleKeyDownmultipleItemsInSamePosition', () => {
+    it('should increment newIndex when ArrowDown key is pressed', () => {
+      const event = new KeyboardEvent('keydown', { key: 'ArrowDown' });
+      const currentIndex = 1;
+      component.activeItem = 1;
+      component.listItems = new QueryList<ElementRef<HTMLDivElement>>();
+      component.listItems.reset([
+        new ElementRef(document.createElement('div')),
+        new ElementRef(document.createElement('div')),
+        new ElementRef(document.createElement('div')),
+      ]);
+      component.multipleItemsInSamePositionArray = [
+        '<p>choice 1</p>',
+        '<p>choice 2</p>',
+        '<p>choice 3</p>',
+      ];
+
+      spyOn(component, 'setFocus');
+
+      component.handleKeyDownmultipleItemsInSamePosition(event, currentIndex);
+
+      expect(component.setFocus).toHaveBeenCalled();
+      expect(component.activeItem).toBe(currentIndex + 1);
+    });
+
+    it('should decrement newIndex when ArrowUp key is pressed', () => {
+      const event = new KeyboardEvent('keydown', { key: 'ArrowUp' });
+      const currentIndex = 1;
+      component.activeItem = 1;
+      component.listItems = new QueryList<ElementRef<HTMLDivElement>>();
+      component.listItems.reset([
+        new ElementRef(document.createElement('div')),
+        new ElementRef(document.createElement('div')),
+        new ElementRef(document.createElement('div')),
+      ]);
+      component.multipleItemsInSamePositionArray = [
+        '<p>choice 1</p>',
+        '<p>choice 2</p>',
+        '<p>choice 3</p>',
+      ];
+
+      spyOn(component, 'setFocus');
+
+      component.handleKeyDownmultipleItemsInSamePosition(event, currentIndex);
+
+      expect(component.setFocus).toHaveBeenCalled();
+      expect(component.activeItem).toBe(currentIndex - 1);
+    });
+
+    it('should increment newIndex when Tab key is pressed', () => {
+      const event = new KeyboardEvent('keydown', { key: 'Tab', shiftKey: false });
+      const currentIndex = 1;
+      component.activeItem = 1;
+      component.listItems = new QueryList<ElementRef<HTMLDivElement>>();
+      component.listItems.reset([
+        new ElementRef(document.createElement('div')),
+        new ElementRef(document.createElement('div')),
+        new ElementRef(document.createElement('div')),
+      ]);
+
+      spyOn(component, 'setFocus');
+
+      component.handleKeyDownmultipleItemsInSamePosition(event, currentIndex);
+
+      expect(component.setFocus).toHaveBeenCalled();
+      expect(component.activeItem).toBe(currentIndex + 1);
+    });
+
+    it('should decrement newIndex when Shift + Tab keys are pressed', () => {
+      const event = new KeyboardEvent('keydown', { key: 'Tab', shiftKey: true });
+      const currentIndex = 1;
+      component.activeItem = 1;
+
+      spyOn(component, 'setFocus');
+
+      component.handleKeyDownmultipleItemsInSamePosition(event, currentIndex);
+
+      expect(component.setFocus).toHaveBeenCalled();
+      expect(component.activeItem).toBe(currentIndex - 1);
+    });
+  });
+
   describe('when multiple items in the same position are allowed', () => {
     beforeEach(() => {
       fixture = TestBed.createComponent(
@@ -212,23 +294,18 @@ describe('Drag and drop sort input interactive component', () => {
 
         expect(component.allowMultipleItemsInSamePosition).toBe(true);
         expect(component.multipleItemsInSamePositionArray).toEqual([
-          [],
           [
             '<p>choice 1</p>'
           ],
-          [],
           [
             '<p>choice 2</p>'
           ],
-          [],
           [
             '<p>choice 3</p>'
           ],
-          [],
           [
             '<p>choice 4</p>'
           ],
-          []
         ]);
       });
 
