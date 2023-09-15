@@ -287,22 +287,6 @@ class PinnedOpportunityModel(base_models.BaseModel):
         return '%s.%s.%s' % (user_id, language_code, topic_id)
 
     @classmethod
-    def get_model(cls, user_id, language_code, topic_id) -> Optional[
-        PinnedOpportunityModel]:
-        """Fetches the PinnedOpportunityModel instance from the datastore.
-
-        Args:
-            user_id: str. The ID of the user.
-            language_code: str. The code of the language.
-            topic_id: str. The ID of the topic.
-
-        Returns:
-            PinnedOpportunityModel. The model instance with the given parameters
-            or None if not found.
-        """
-        return cls.get_by_id(cls._generate_id(user_id, language_code, topic_id))
-
-    @classmethod
     def create(
         cls, user_id, language_code, topic_id, opportunity_id
     ) -> PinnedOpportunityModel:
@@ -335,6 +319,32 @@ class PinnedOpportunityModel(base_models.BaseModel):
         return instance
 
     @classmethod
+    def get_model(cls, user_id, language_code, topic_id) -> Optional[
+        PinnedOpportunityModel]:
+        """Fetches the PinnedOpportunityModel instance from the datastore.
+
+        Args:
+            user_id: str. The ID of the user.
+            language_code: str. The code of the language.
+            topic_id: str. The ID of the topic.
+
+        Returns:
+            PinnedOpportunityModel. The model instance with the given parameters
+            or None if not found.
+        """
+        return cls.get_by_id(cls._generate_id(user_id, language_code, topic_id))
+
+    @classmethod
+    def apply_deletion_policy(cls, user_id: str) -> None:
+        """Delete instances of PinnedOpportunityModel for the user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be deleted.
+        """
+        datastore_services.delete_multi(
+            cls.query(cls.user_id == user_id).fetch(keys_only=True))
+
+    @classmethod
     def get_deletion_policy(cls) -> base_models.DELETION_POLICY:
         """Model contains data corresponding to a user: user_id."""
         return base_models.DELETION_POLICY.DELETE
@@ -354,6 +364,21 @@ class PinnedOpportunityModel(base_models.BaseModel):
         return cls.query(
             cls.user_id == user_id
         ).get(keys_only=True) is not None
+
+    @classmethod
+    def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
+        """Model contains data to export corresponding to a user."""
+        return dict(super(cls, cls).get_export_policy(), **{
+            'language_code':
+                base_models.EXPORT_POLICY.EXPORTED,
+            # User ID is not exported in order to keep internal ids private.
+            'user_id':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'topic_id':
+                base_models.EXPORT_POLICY.EXPORTED,
+            'opportunity_id':
+                base_models.EXPORT_POLICY.EXPORTED
+        })
 
     @classmethod
     def export_data(cls, user_id: str) -> Dict[str, List[Dict[str, str]]]:
@@ -388,13 +413,3 @@ class PinnedOpportunityModel(base_models.BaseModel):
         multiple languages and topics relevant to a user.
         """
         return base_models.MODEL_ASSOCIATION_TO_USER.MULTIPLE_INSTANCES_PER_USER
-
-    @classmethod
-    def apply_deletion_policy(cls, user_id: str) -> None:
-        """Delete instances of PinnedOpportunityModel for the user.
-
-        Args:
-            user_id: str. The ID of the user whose data should be deleted.
-        """
-        datastore_services.delete_multi(
-            cls.query(cls.user_id == user_id).fetch(keys_only=True))

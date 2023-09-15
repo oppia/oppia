@@ -379,3 +379,26 @@ class PinnedOpportunityModelTest(test_utils.GenericTestBase):
         }
 
         self.assertEqual(user_data, expected_data)
+
+    def test_model_association_to_user(self) -> None:
+        self.assertEqual(
+            opportunity_models.PinnedOpportunityModel.get_model_association_to_user(),
+            base_models.MODEL_ASSOCIATION_TO_USER.MULTIPLE_INSTANCES_PER_USER
+        )
+
+    def test_get_export_policy(self) -> None:
+        expected_export_policy = {
+            'language_code': base_models.EXPORT_POLICY.EXPORTED,
+            'user_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'topic_id': base_models.EXPORT_POLICY.EXPORTED,
+            'opportunity_id': base_models.EXPORT_POLICY.EXPORTED
+        }
+        expected_export_policy = dict(super(
+            opportunity_models.PinnedOpportunityModel,
+            opportunity_models.PinnedOpportunityModel
+        ).get_export_policy(), **expected_export_policy)
+
+        self.assertEqual(
+            opportunity_models.PinnedOpportunityModel.get_export_policy(),
+            expected_export_policy
+        )
