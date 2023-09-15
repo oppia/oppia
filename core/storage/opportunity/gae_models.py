@@ -261,16 +261,18 @@ class SkillOpportunityModel(base_models.BaseModel):
 class PinnedOpportunityModel(base_models.BaseModel):
     """Model for storing pinned opportunities for a user.
 
-    The ID of each instance is the combination of user_id, language_code, and topic_id.
+    The ID of each instance is the combination of user_id,
+    language_code, and topic_id.
     """
 
     user_id = datastore_services.StringProperty(required=True, indexed=True)
-    language_code = datastore_services.StringProperty(required=True, indexed=True)
+    language_code = datastore_services.StringProperty(
+        required=True, indexed=True)
     topic_id = datastore_services.StringProperty(required=True, indexed=True)
     opportunity_id = datastore_services.StringProperty(indexed=True)
 
     @classmethod
-    def _generate_id(cls, user_id, language_code, topic_id):
+    def _generate_id(cls, user_id, language_code, topic_id) -> str:
         """Generates the ID for the instance of PinnedOpportunityModel class.
 
         Args:
@@ -279,12 +281,14 @@ class PinnedOpportunityModel(base_models.BaseModel):
             topic_id: str. The ID of the topic.
 
         Returns:
-            str. The ID for this entity, in the form user_id.language_code.topic_id.
+            str. The ID for this entity, in the form
+            user_id.language_code.topic_id.
         """
         return '%s.%s.%s' % (user_id, language_code, topic_id)
 
     @classmethod
-    def get_model(cls, user_id, language_code, topic_id):
+    def get_model(cls, user_id, language_code, topic_id) -> Optional[
+        PinnedOpportunityModel]:
         """Fetches the PinnedOpportunityModel instance from the datastore.
 
         Args:
@@ -293,13 +297,17 @@ class PinnedOpportunityModel(base_models.BaseModel):
             topic_id: str. The ID of the topic.
 
         Returns:
-            PinnedOpportunityModel. The model instance with the given parameters or None if not found.
+            PinnedOpportunityModel. The model instance with the given parameters
+            or None if not found.
         """
         return cls.get_by_id(cls._generate_id(user_id, language_code, topic_id))
 
     @classmethod
-    def create(cls, user_id, language_code, topic_id, opportunity_id):
-        """Creates a new PinnedOpportunityModel instance. Fails if the model already exists.
+    def create(
+        cls, user_id, language_code, topic_id, opportunity_id
+    ) -> PinnedOpportunityModel:
+        """Creates a new PinnedOpportunityModel instance. Fails if the
+        model already exists.
 
         Args:
             user_id: str. The ID of the user.
@@ -311,13 +319,20 @@ class PinnedOpportunityModel(base_models.BaseModel):
             PinnedOpportunityModel. The created instance.
 
         Raises:
-            Exception. If a model with the same ID already exists in the datastore.
+            Exception. If a model with the same ID already exists
+            in the datastore.
         """
         instance_id = cls._generate_id(user_id, language_code, topic_id)
         if cls.get_by_id(instance_id):
-            raise Exception('Model with ID {} already exists'.format(instance_id))
+            raise Exception('Model with ID {} already exists'.format(
+                instance_id))
 
-        instance = cls(id=instance_id, user_id=user_id, language_code=language_code,
+        instance = cls(
+            id=instance_id, user_id=user_id, language_code=language_code,
                        topic_id=topic_id, opportunity_id=opportunity_id)
         instance.put()
         return instance
+
+    @classmethod
+    def get_deletion_policy(cls) -> base_models.DELETION_POLICY:
+        return base_models.DELETION_POLICY.DELETE
