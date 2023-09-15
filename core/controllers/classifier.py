@@ -131,8 +131,7 @@ class TrainedClassifierHandler(
             classifier_services.get_classifier_training_job_by_id(job_id))
         if classifier_training_job.status == (
                 feconf.TRAINING_JOB_STATUS_FAILED):
-            # Send email to admin and admin-specified email recipients.
-            # Other email recipients are specified on admin config page.
+            # Send email to admin.
             email_manager.send_job_failure_email(job_id)
             raise self.InternalErrorException(
                 'The current status of the job cannot transition to COMPLETE.')
