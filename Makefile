@@ -32,6 +32,7 @@ build: ## Builds the all docker setup.
 run-devserver: # Runs the dev-server
 	docker compose up angular-build -d
 	$(MAKE) update.package
+	docker cp oppia-angular-build:/app/oppia/node_modules ./node_modules
 	docker compose up dev-server -d --no-deps
 	$(MAKE) update.requirements
 	$(MAKE) run-offline
@@ -91,7 +92,7 @@ restart.%: ## Restarts the given docker service. Example: make restart.datastore
 
 run_tests.backend: ## Runs the backend tests
 	$(MAKE) stop
-	docker compose up datastore  dev-server -d --no-deps
+	docker compose up datastore dev-server redis firebase -d --no-deps
 	$(SHELL_PREFIX) dev-server python -m scripts.run_backend_tests $(PYTHON_ARGS)
 	$(MAKE) stop
 
@@ -127,7 +128,7 @@ run_tests.e2e: ## Runs the e2e tests for the parsed suite
 # Starting the development server for the e2e tests.
 	$(MAKE) start-devserver-for-tests
 	@echo 'Starting e2e test for the suite: $(suite)'
-	../oppia_tools/node-v16.13.0-linux-x64/bin/npx wdio ./core/tests/wdio.conf.js --suite $(suite) $(CHROME_VERSION) --params.devMode=True --capabilities[0].maxInstances=3
+	../oppia_tools/node-v16.13.0/bin/npx wdio ./core/tests/wdio.conf.js --suite $(suite) $(CHROME_VERSION) --params.devMode=True --capabilities[0].maxInstances=3
 	$(MAKE) stop
 
 OS_NAME := $(shell uname)
@@ -172,4 +173,13 @@ install_node:
 		./configure; \
 		make; \
 	fi
+
+	@cd ../oppia_tools && \
+    for dir in node*; do \
+        if [ -d "$$dir" ]; then \
+            new_dir="node-v16.13.0"; \
+            mv "$$dir" "$$new_dir"; \
+        fi; \
+    done
+
 	@echo "Node.js installation completed."
