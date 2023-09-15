@@ -26,8 +26,8 @@ build.%: ## Builds the given docker service. Example: make build.datastore
 	docker compose build $*
 
 build: ## Builds the all docker setup.
-	docker compose build
 	$(MAKE) install_node
+	docker compose build
 
 run-devserver: # Runs the dev-server
 	docker compose up angular-build -d
@@ -90,8 +90,9 @@ restart.%: ## Restarts the given docker service. Example: make restart.datastore
 	docker compose restart $*
 
 run_tests.backend: ## [Not ready for use] Runs the backend tests
-	docker compose up datastore redis -d
-	docker compose run --no-deps --entrypoint "python -m scripts.run_backend_tests $(PYTHON_ARGS)" dev-server
+	$(MAKE) stop
+	docker compose up datastore  dev-server -d --no-deps
+	$(SHELL_PREFIX) dev-server python -m scripts.run_backend_tests $(PYTHON_ARGS)
 	$(MAKE) stop
 
 run_tests.frontend: ## Runs the frontend unit tests
@@ -112,6 +113,7 @@ run_tests.backend_associate: ## Runs the backend associate tests
 run_tests.acceptance: ## Runs the acceptance tests for the parsed suite
 	@echo 'Shutting down any previously started server.'
 	$(MAKE) stop 
+# Starting the development server for the acceptance tests.
 	$(MAKE) start-devserver-for-tests
 	@echo 'Starting acceptance test for the suite: $(suite)'
 	./node_modules/.bin/jasmine --config="./core/tests/puppeteer-acceptance-tests/jasmine.json" ./core/tests/puppeteer-acceptance-tests/spec/$(suite)
@@ -122,6 +124,7 @@ CHROME_VERSION := $(shell google-chrome --version | awk '{print $$3}')
 run_tests.e2e: ## Runs the e2e tests for the parsed suite
 	@echo 'Shutting down any previously started server.'
 	$(MAKE) stop 
+# Starting the development server for the e2e tests.
 	$(MAKE) start-devserver-for-tests
 	@echo 'Starting e2e test for the suite: $(suite)'
 	../oppia_tools/node-v16.13.0-linux-x64/bin/npx wdio ./core/tests/wdio.conf.js --suite $(suite) $(CHROME_VERSION) --params.devMode=True --capabilities[0].maxInstances=3

@@ -49,8 +49,8 @@ module.exports = class baseUser {
          * every test passes on both modes. */
         headless: false,
         args: [
-        '--start-fullscreen',
-        '--use-fake-ui-for-media-stream'
+          '--start-fullscreen',
+          '--use-fake-ui-for-media-stream'
         ]
       })
       .then(async(browser) => {

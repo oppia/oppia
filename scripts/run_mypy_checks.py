@@ -150,7 +150,8 @@ def install_mypy_prerequisites(install_globally: bool) -> Tuple[int, str]:
         if feconf.OPPIA_IS_DOCKERIZED:
             cmd = [
                 'pip', 'install', '-r',
-                MYPY_REQUIREMENTS_FILE_PATH
+                MYPY_REQUIREMENTS_FILE_PATH, '--find-links=/root/.cache',
+                '--no-index'
             ]
     else:
         cmd = [
@@ -161,8 +162,8 @@ def install_mypy_prerequisites(install_globally: bool) -> Tuple[int, str]:
         if feconf.OPPIA_IS_DOCKERIZED:
             cmd = [
                 'pip', 'install', '-r',
-                MYPY_REQUIREMENTS_FILE_PATH, '--target', MYPY_TOOLS_DIR,
-                '--upgrade'
+                MYPY_REQUIREMENTS_FILE_PATH, '--find-links=/root/.cache',
+                '--no-index', '--target', MYPY_TOOLS_DIR, '--upgrade'
             ]
     process = subprocess.Popen(
         cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
