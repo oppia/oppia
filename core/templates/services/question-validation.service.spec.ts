@@ -16,10 +16,13 @@
  * @fileoverview Unit tests for QuestionValidationService.
  */
 
-import { TestBed } from '@angular/core/testing';
+import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { TestBed, waitForAsync } from '@angular/core/testing';
 import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import { QuestionBackendDict, QuestionObjectFactory } from 'domain/question/QuestionObjectFactory';
 import { MisconceptionObjectFactory, MisconceptionSkillMap } from 'domain/skill/MisconceptionObjectFactory';
+import { ResponsesService } from 'pages/exploration-editor-page/editor-tab/services/responses.service';
 import { QuestionValidationService } from './question-validation.service';
 
 describe('Question Validation Service', () => {
@@ -28,14 +31,30 @@ describe('Question Validation Service', () => {
   let mockQuestionDict: QuestionBackendDict;
   let questionObjectFactory: QuestionObjectFactory;
   let qvs: QuestionValidationService;
+  let rs: ResponsesService;
   let ses: StateEditorService;
+  let shouldHideDefaultAnswerGroupSpy: jasmine.Spy;
+
+  beforeEach(waitForAsync(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
+      providers: [
+        StateEditorService,
+        ResponsesService,
+      ],
+      schemas: [NO_ERRORS_SCHEMA]
+    }).compileComponents();
+  }));
 
   beforeEach(() => {
     misconceptionObjectFactory = TestBed.inject(MisconceptionObjectFactory);
     qvs = TestBed.inject(QuestionValidationService);
+    rs = TestBed.inject(ResponsesService);
     ses = TestBed.inject(StateEditorService);
     questionObjectFactory = TestBed.inject(QuestionObjectFactory);
     spyOn(ses, 'isCurrentSolutionValid').and.returnValue(true);
+    shouldHideDefaultAnswerGroupSpy = spyOn(rs, 'shouldHideDefaultAnswerGroup');
+    shouldHideDefaultAnswerGroupSpy.and.returnValue(false);
   });
 
   beforeEach(() => {
@@ -181,5 +200,90 @@ describe('Question Validation Service', () => {
 
   it('should return false if question is not valid', () => {
     expect(qvs.isQuestionValid(undefined, mockMisconceptionObject)).toBeFalse();
+  });
+
+  describe('getValidationErrorMessage()', () => {
+    it('should return null when there are no errors', () => {
+      const question = questionObjectFactory.createFromBackendDict(
+        mockQuestionDict);
+      expect(qvs.getValidationErrorMessage(question)).toBeNull();
+    });
+
+    it('should return error message if no feedback for default outcome', () => {
+      const interaction = mockQuestionDict.question_state_data.interaction;
+      // This throws "Object is possibly 'null'.". We need to suppress this
+      // error because the object is initialized in the beforeEach().
+      // @ts-ignore
+      interaction.default_outcome.feedback.html = '';
+      const question = questionObjectFactory.createFromBackendDict(
+        mockQuestionDict);
+
+      expect(qvs.getValidationErrorMessage(question)).toEqual(
+        'Please enter a feedback for the default outcome.');
+    });
+
+    it('should return null if no feedback for default outcome but default ' +
+       'answer group is hidden', () => {
+      shouldHideDefaultAnswerGroupSpy.and.returnValue(true);
+      const interaction = mockQuestionDict.question_state_data.interaction;
+      // This throws "Object is possibly 'null'.". We need to suppress this
+      // error because the object is initialized in the beforeEach().
+      // @ts-ignore
+      interaction.default_outcome.feedback.html = '';
+      const question = questionObjectFactory.createFromBackendDict(
+        mockQuestionDict);
+
+      expect(qvs.getValidationErrorMessage(question)).toBeNull();
+    });
+
+    it('should return error message if no answer is marked correct', () => {
+      const interaction = mockQuestionDict.question_state_data.interaction;
+      interaction.answer_groups[0].outcome.labelled_as_correct = false;
+      const question = questionObjectFactory.createFromBackendDict(
+        mockQuestionDict);
+
+      expect(qvs.getValidationErrorMessage(question)).toEqual(
+        'At least one answer should be marked correct');
+    });
+
+    it('should return error message if no solution', () => {
+      const interaction = mockQuestionDict.question_state_data.interaction;
+      interaction.solution = null;
+      const question = questionObjectFactory.createFromBackendDict(
+        mockQuestionDict);
+
+      expect(qvs.getValidationErrorMessage(question)).toEqual(
+        'A solution must be specified');
+    });
+
+    it('should return error message if no hint', () => {
+      const interaction = mockQuestionDict.question_state_data.interaction;
+      interaction.hints = [];
+      const question = questionObjectFactory.createFromBackendDict(
+        mockQuestionDict);
+
+      expect(qvs.getValidationErrorMessage(question)).toEqual(
+        'At least 1 hint should be specified');
+    });
+
+    it('should return error message if no interaction', () => {
+      const interaction = mockQuestionDict.question_state_data.interaction;
+      interaction.id = null;
+      const question = questionObjectFactory.createFromBackendDict(
+        mockQuestionDict);
+
+      expect(qvs.getValidationErrorMessage(question)).toEqual(
+        'An interaction must be specified');
+    });
+
+    it('should return error message if no question content', () => {
+      const questionContent = mockQuestionDict.question_state_data.content;
+      questionContent.html = '';
+      const question = questionObjectFactory.createFromBackendDict(
+        mockQuestionDict);
+
+      expect(qvs.getValidationErrorMessage(question)).toEqual(
+        'Please enter a question.');
+    });
   });
 });

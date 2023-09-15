@@ -120,6 +120,11 @@ export class QuestionSuggestionEditorModalComponent
       this.question, this.misconceptionsBySkill);
   }
 
+  getQuestionValidationErrorMessage(): string | null {
+    return this.questionValidationService.getValidationErrorMessage(
+      this.question);
+  }
+
   done(): void {
     if (!this.isQuestionValid()) {
       return;
