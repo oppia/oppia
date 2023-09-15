@@ -380,3 +380,21 @@ class PinnedOpportunityModel(base_models.BaseModel):
         return {
             'user_data': user_data
         }
+
+    @staticmethod
+    def get_model_association_to_user(
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+        """Model is exported as multiple instances per user since there are
+        multiple languages and topics relevant to a user.
+        """
+        return base_models.MODEL_ASSOCIATION_TO_USER.MULTIPLE_INSTANCES_PER_USER
+
+    @classmethod
+    def apply_deletion_policy(cls, user_id: str) -> None:
+        """Delete instances of PinnedOpportunityModel for the user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be deleted.
+        """
+        datastore_services.delete_multi(
+            cls.query(cls.user_id == user_id).fetch(keys_only=True))
