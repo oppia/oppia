@@ -325,25 +325,57 @@ class PinnedOpportunityModelTest(test_utils.GenericTestBase):
         self.topic_id = 'topic_id_1'
         self.opportunity_id_1 = 'opportunity_id1'
 
+        opportunity_models.PinnedOpportunityModel.create(
+            user_id=self.user_id,
+            language_code=self.language_code,
+            topic_id=self.topic_id,
+            opportunity_id=self.opportunity_id
+        )
+
     def test_create_and_fetch_model(self) -> None:
         # Ensure that the model instance doesn't exist yet.
         fetched_model = opportunity_models.PinnedOpportunityModel.get_model(
             self.user_id, self.language_code, self.topic_id)
-        self.assertIsNone(fetched_model)
+        self.assertIsNotNone(fetched_model)
+        self.assertEqual(fetched_model.opportunity_id, self.opportunity_id_1)
 
         # Create a new instance.
         opportunity_models.PinnedOpportunityModel.create(
-            self.user_id, self.language_code, self.topic_id,
-            self.opportunity_id_1)
+            'user_id_2', 'en', 'topic_id_1',
+            'opportunity_id_2')
 
         # Testing fetching of the model using `get_model()`.
         fetched_model = opportunity_models.PinnedOpportunityModel.get_model(
-            self.user_id, self.language_code, self.topic_id)
+            'user_id_2', 'en', 'topic_id_1')
         self.assertIsNotNone(fetched_model)
-        self.assertEqual(fetched_model.opportunity_id, self.opportunity_id_1)
+        self.assertEqual(fetched_model.opportunity_id, 'opportunity_id_2')
 
     def test_get_deletion_policy(self) -> None:
         self.assertEqual(
             opportunity_models.PinnedOpportunityModel.get_deletion_policy(),
             base_models.DELETION_POLICY.DELETE
         )
+
+    def test_has_reference_to_user_id(self) -> None:
+        self.assertTrue(
+            opportunity_models.PinnedOpportunityModel.
+            has_reference_to_user_id(
+                self.user_id
+            )
+        )
+
+    def test_export_data_valid_user(self) -> None: 
+        user_data = opportunity_models.PinnedOpportunityModel.export_data(
+            self.user_id)
+
+        expected_data = {
+            'user_data': [
+                {
+                    'language_code': self.language_code,
+                    'topic_id': self.topic_id,
+                    'opportunity_id': self.opportunity_id_1
+                }
+            ]
+        }
+
+        self.assertEqual(user_data, expected_data)

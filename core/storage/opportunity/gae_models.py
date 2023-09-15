@@ -20,7 +20,7 @@ from __future__ import annotations
 
 from core.platform import models
 
-from typing import Dict, Optional, Sequence, Tuple
+from typing import Dict, Optional, Sequence, Tuple, List
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -319,13 +319,14 @@ class PinnedOpportunityModel(base_models.BaseModel):
             PinnedOpportunityModel. The created instance.
 
         Raises:
-            Exception. If a model with the same ID already exists
-            in the datastore.
+            Exception. There is already a pinned opportunity with
+            the given id.
         """
         instance_id = cls._generate_id(user_id, language_code, topic_id)
         if cls.get_by_id(instance_id):
-            raise Exception('Model with ID {} already exists'.format(
-                instance_id))
+            raise Exception(
+                'There is already a pinned opportunity with the given'
+                ' id: %s' % instance_id)
 
         instance = cls(
             id=instance_id, user_id=user_id, language_code=language_code,
@@ -335,4 +336,47 @@ class PinnedOpportunityModel(base_models.BaseModel):
 
     @classmethod
     def get_deletion_policy(cls) -> base_models.DELETION_POLICY:
+        """Model contains data corresponding to a user: user_id."""
         return base_models.DELETION_POLICY.DELETE
+
+    @classmethod
+    def has_reference_to_user_id(cls, user_id: str) -> bool:
+        """Check whether PinnedOpportunityModel references the
+        supplied user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be
+            checked.
+
+        Returns:
+            bool. Whether any models refer to the given user ID.
+        """
+        return cls.query(
+            cls.user_id == user_id
+        ).get(keys_only=True) is not None
+
+    @classmethod
+    def export_data(cls, user_id: str) -> Dict[str, List[Dict[str, str]]]:
+        """Fetches all the data associated with the given user ID.
+
+        Args:
+            user_id: str. The ID of the user whose data should be fetched.
+
+        Returns:
+            dict. A dictionary containing all the data associated
+            with the user.
+        """
+        user_data = []
+
+        user_models = cls.query(cls.user_id == user_id).fetch()
+
+        for model in user_models:
+            user_data.append({
+                'language_code': model.language_code,
+                'topic_id': model.topic_id,
+                'opportunity_id': model.opportunity_id
+            })
+
+        return {
+            'user_data': user_data
+        }
