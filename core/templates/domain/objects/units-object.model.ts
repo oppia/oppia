@@ -64,7 +64,7 @@ export class Units {
   static isLastElementUnit(unitList: string[]): boolean {
     return (
       unitList.length > 0 &&
-      this.isunit(unitList.slice(-1).pop() as string)
+      this.isUnit(unitList.slice(-1).pop() as string)
     );
   }
 
@@ -120,7 +120,7 @@ export class Units {
         } else {
           throw new Error('Close parenthesis with no open parenthesis');
         }
-      } else if (this.isunit(unitList[ind])) {
+      } else if (this.isUnit(unitList[ind])) {
         unitsWithMultiplier.push([unitList[ind], multiplier]);
         // If previous element was division then we need to invert
         // multiplier.
