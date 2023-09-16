@@ -504,7 +504,7 @@ Registry.create_platform_parameter(
 
 Registry.create_platform_parameter(
     ParamNames.HIGH_BOUNCE_RATE_TASK_STATE_BOUNCE_RATE_OBSOLETION_THRESHOLD,
-    'The bounce-rate a state must exceed to create a new improvements task.',
+    'The bounce-rate a state must fall under to discard its improvement task.',
     platform_parameter_domain.DataTypes.NUMBER,
     default=0.20
 )

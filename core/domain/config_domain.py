@@ -216,6 +216,8 @@ class ConfigProperty:
     - disabled_explorations.
     - editor_page_announcement.
     - editor_prerequisites_agreement.
+    - email_footer.
+    - email_sender_name.
     - embedded_google_group_url.
     - enable_admin_notifications_for_reviewer_shortage.
     - featured_translation_languages.
@@ -239,13 +241,17 @@ class ConfigProperty:
     - publicize_exploration_email_html_body.
     - sharing_options.
     - sharing_options_twitter_text.
+    - show_translation_size.
     - sidebar_menu_additional_links.
+    - signup_email_body_content.
+    - signup_email_subject_content.
     - site_forum_url.
     - social_media_buttons.
     - splash_page_exploration_id.
     - splash_page_exploration_version.
     - splash_page_youtube_video_id.
     - ssl_challenge_responses.
+    - unpublish_exploration_email_html_body.
     - vmid_shared_secret_key_mapping.
     - whitelisted_email_senders.
     - whitelisted_exploration_ids_for_playthroughs.
