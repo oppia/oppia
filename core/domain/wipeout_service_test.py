@@ -4237,8 +4237,9 @@ class WipeoutServiceDeletePinnedOpportunitiesModelsTest(
             topic_id=self.TOPIC_ID,
             opportunity_id=self.OPPORTUNITY_ID,
             language_code='en'
-        ).put()
+        )
         wipeout_service.pre_delete_user(self.user_1_id)
+        self.process_and_flush_pending_tasks()
 
     def test_pinned_opportunities_are_deleted(self) -> None:
         wipeout_service.delete_user(

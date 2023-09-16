@@ -39,6 +39,8 @@ from core.platform import models
 
 from typing import Dict, Final, List, Optional, Sequence, Tuple, Type, Union
 
+from oppia.core.storage import user
+
 MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import app_feedback_report_models
@@ -437,6 +439,7 @@ def delete_user(
     _pseudonymize_config_models(pending_deletion_request)
     _delete_models(user_id, models.Names.FEEDBACK)
     _delete_models(user_id, models.Names.SUGGESTION)
+    _delete_models(user_id, models.Names.OPPORTUNITY)
     if feconf.ROLE_ID_MOBILE_LEARNER not in user_roles:
         remove_user_from_activities_with_associated_rights_models(
             pending_deletion_request.user_id)

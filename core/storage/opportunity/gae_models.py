@@ -324,6 +324,7 @@ class PinnedOpportunityModel(base_models.BaseModel):
         instance = cls(
             id=instance_id, user_id=user_id, language_code=language_code,
                        topic_id=topic_id, opportunity_id=opportunity_id)
+        instance.update_timestamps()
         instance.put()
         return instance
 

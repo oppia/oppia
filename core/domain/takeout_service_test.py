@@ -77,7 +77,8 @@ if MYPY: # pragma: no cover
     subtopic_models,
     suggestion_models,
     topic_models,
-    user_models
+    user_models,
+    opportunity_models
 ) = models.Registry.import_models([
     models.Names.APP_FEEDBACK_REPORT,
     models.Names.AUTH,
@@ -95,7 +96,8 @@ if MYPY: # pragma: no cover
     models.Names.SUBTOPIC,
     models.Names.SUGGESTION,
     models.Names.TOPIC,
-    models.Names.USER
+    models.Names.USER,
+    models.Names.OPPORTUNITY
 ])
 
 
