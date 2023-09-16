@@ -329,7 +329,7 @@ class PinnedOpportunityModelTest(test_utils.GenericTestBase):
             user_id=self.user_id,
             language_code=self.language_code,
             topic_id=self.topic_id,
-            opportunity_id=self.opportunity_id
+            opportunity_id=self.opportunity_id_1
         )
 
     def test_create_and_fetch_model(self) -> None:

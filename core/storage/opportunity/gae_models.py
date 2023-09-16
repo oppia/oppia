@@ -272,7 +272,12 @@ class PinnedOpportunityModel(base_models.BaseModel):
     opportunity_id = datastore_services.StringProperty(indexed=True)
 
     @classmethod
-    def _generate_id(cls, user_id, language_code, topic_id) -> str:
+    def _generate_id(
+        cls,
+        user_id: str,
+        language_code: str,
+        topic_id: str
+    ) -> str:
         """Generates the ID for the instance of PinnedOpportunityModel class.
 
         Args:
@@ -288,7 +293,11 @@ class PinnedOpportunityModel(base_models.BaseModel):
 
     @classmethod
     def create(
-        cls, user_id, language_code, topic_id, opportunity_id
+        cls,
+        user_id: str,
+        language_code: str,
+        topic_id: str,
+        opportunity_id: str
     ) -> PinnedOpportunityModel:
         """Creates a new PinnedOpportunityModel instance. Fails if the
         model already exists.
@@ -393,7 +402,8 @@ class PinnedOpportunityModel(base_models.BaseModel):
         """
         user_data = []
 
-        user_models = cls.query(cls.user_id == user_id).fetch()
+        user_models: Sequence[PinnedOpportunityModel] = (
+            cls.query(cls.user_id == user_id).fetch())
 
         for model in user_models:
             user_data.append({

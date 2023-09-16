@@ -4229,13 +4229,13 @@ class WipeoutServiceDeletePinnedOpportunitiesModelsTest(
     USER_1_USERNAME: Final = 'user1'
 
     def setUp(self) -> None:
-        super.setUp()
+        super().setUp()
         self.signup(self.USER_1_EMAIL, self.USER_1_USERNAME)
         self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)
         opportunity_models.PinnedOpportunityModel.create(
             user_id=self.user_1_id,
             topic_id=self.TOPIC_ID,
-            opportunity_id=self.EXPLORATION_ID,
+            opportunity_id=self.OPPORTUNITY_ID,
             language_code='en'
         ).put()
         wipeout_service.pre_delete_user(self.user_1_id)
