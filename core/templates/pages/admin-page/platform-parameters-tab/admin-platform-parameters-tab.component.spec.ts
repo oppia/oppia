@@ -27,13 +27,15 @@ import { AdminPageData } from 'domain/admin/admin-backend-api.service';
 import { AdminDataService } from 'pages/admin-page/services/admin-data.service';
 import { AdminTaskManagerService } from
   'pages/admin-page/services/admin-task-manager.service';
+import { AdminFeaturesTabConstants } from
+  'pages/release-coordinator-page/features-tab/features-tab.constants';
 import { PlatformFeatureAdminBackendApiService } from
   'domain/platform_feature/platform-feature-admin-backend-api.service';
 import { AdminPlatformParametersTabComponent } from
   // eslint-disable-next-line max-len
   'pages/admin-page/platform-parameters-tab/admin-platform-parameters-tab.component';
 import { WindowRef } from 'services/contextual/window-ref.service';
-import { PlatformParameterFilterType, ServerMode } from
+import { PlatformParameterFilterType } from
   'domain/platform_feature/platform-parameter-filter.model';
 import { FeatureStage, PlatformParameter } from 'domain/platform_feature/platform-parameter.model';
 import { HttpErrorResponse } from '@angular/common/http';
@@ -97,8 +99,8 @@ describe('Admin page platform parameters tab', () => {
           rules: [{
             filters: [
               {
-                type: PlatformParameterFilterType.ServerMode,
-                conditions: [['=', ServerMode.Dev]]
+                type: PlatformParameterFilterType.PlatformType,
+                conditions: [['=', 'Web']]
               }
             ],
             // This does not match the data type of platform param, but this is
@@ -124,30 +126,52 @@ describe('Admin page platform parameters tab', () => {
 
   describe('.getPlatformParamSchema', () => {
     it('should return unicode schema for string data type', () => {
-      const schema = component.getPlatformParamSchema('string');
+      const schema = component.getPlatformParamSchema(
+        'string', component.platformParameters[0].name);
       expect(schema).toEqual({type: 'unicode'});
     });
 
+    it('should return correct unicode schema for email_footer ' +
+    'platform parameter', () => {
+      const schema = component.getPlatformParamSchema(
+        'string', 'email_footer');
+      expect(schema).toEqual(
+        {type: 'unicode', ui_config: {rows: 5}});
+    });
+
+    it('should return correct unicode schema for signup_email_body_content ' +
+    'platform parameter', () => {
+      const schema = component.getPlatformParamSchema(
+        'string', 'signup_email_body_content');
+      expect(schema).toEqual(
+        {type: 'unicode', ui_config: {rows: 20}});
+    });
+
+    it('should return correct unicode schema for unpublish_exploration_email' +
+    '_html_body platform parameter', () => {
+      const schema = component.getPlatformParamSchema(
+        'string', 'unpublish_exploration_email_html_body');
+      expect(schema).toEqual(
+        {type: 'unicode', ui_config: {rows: 20}});
+    });
+
     it('should return float schema for number data type', () => {
-      const schema = component.getPlatformParamSchema('number');
+      const schema = component.getPlatformParamSchema(
+        'number', component.platformParameters[0].name);
       expect(schema).toEqual({type: 'float'});
     });
 
-    it('should return the schema according to the data type', () => {
-      const schema = component.getPlatformParamSchema('bool');
+    it('should return bool schema for bool data type', () => {
+      const schema = component.getPlatformParamSchema(
+        'bool', component.platformParameters[0].name);
       expect(schema).toEqual({type: 'bool'});
     });
-  });
 
-  describe('.addNewRuleToTop', () => {
-    it('should add new rule to top of rule list', () => {
-      const platformParameter = component.platformParameters[0];
-
-      expect(platformParameter.rules.length).toBe(1);
-
-      component.addNewRuleToTop(platformParameter);
-      expect(platformParameter.rules.length).toBe(2);
-      expect(platformParameter.rules[1].valueWhenMatched).toEqual('original');
+    it('should raise error for unknown schema', () => {
+      expect(() => {
+        component.getPlatformParamSchema(
+          'float', component.platformParameters[0].name);
+      }).toThrowError();
     });
   });
 
@@ -224,11 +248,11 @@ describe('Admin page platform parameters tab', () => {
       rule.filters[1].type = PlatformParameterFilterType.AppVersion;
 
       expect(rule.filters.length).toBe(2);
-      // Original filter list: ['server_mode']
-      // Verifies it's ['server_mode', 'app_version'] after adding a new filter
-      // to the end.
+      // Original filter list: ['platform_type']
+      // Verifies it's ['platform_type', 'app_version'] after adding a new
+      // filter to the end.
       expect(rule.filters[0].type)
-        .toEqual(PlatformParameterFilterType.ServerMode);
+        .toEqual(PlatformParameterFilterType.PlatformType);
       expect(rule.filters[1].type)
         .toEqual(PlatformParameterFilterType.AppVersion);
     });
@@ -242,7 +266,7 @@ describe('Admin page platform parameters tab', () => {
 
       component.removeFilter(rule, 0);
 
-      // Original filter list: ['server_mode', 'app_version']
+      // Original filter list: ['platform_type', 'app_version']
       // Verifies it's ['app_version'] after removing the first filter.
       expect(rule.filters.length).toBe(1);
       expect(rule.filters[0].type)
@@ -262,7 +286,7 @@ describe('Admin page platform parameters tab', () => {
       // Original condition list: ['=dev']
       // Verifies it's ['=dev', '=mock'] after adding.
       expect(filter.conditions[0])
-        .toEqual(['=', ServerMode.Dev.toString()]);
+        .toEqual(['=', 'Web']);
       expect(filter.conditions[1])
         .toEqual(['=', 'mock']);
     });
@@ -295,12 +319,23 @@ describe('Admin page platform parameters tab', () => {
   });
 
   describe('.clearChanges', () => {
+    it('should not do anything when no changes are done to platform ' +
+    'param', () => {
+      const platformParameter = component.platformParameters[0];
+
+      expect(platformParameter.rules.length).toBe(1);
+
+      component.clearChanges(platformParameter);
+
+      expect(platformParameter.rules.length).toBe(1);
+    });
+
     it('should clear changes', () => {
       spyOn(mockWindowRef.nativeWindow, 'confirm').and.returnValue(true);
       const platformParameter = component.platformParameters[0];
       const originalRules = cloneDeep(platformParameter.rules);
 
-      component.addNewRuleToTop(platformParameter);
+      component.addNewRuleToBottom(platformParameter);
       component.clearChanges(platformParameter);
 
       expect(platformParameter.rules.length).toBe(1);
@@ -313,10 +348,104 @@ describe('Admin page platform parameters tab', () => {
 
       expect(platformParameter.rules.length).toBe(1);
 
-      component.addNewRuleToTop(platformParameter);
+      component.addNewRuleToBottom(platformParameter);
       component.clearChanges(platformParameter);
 
       expect(platformParameter.rules.length).toBe(2);
+    });
+  });
+
+  describe('.shiftToEditMode', () => {
+    it('should shift to edit mode', () => {
+      const platformParameter = component.platformParameters[0];
+      expect(
+        component.platformParametersInEditMode.get(platformParameter.name)
+      ).toBeFalse;
+
+      component.shiftToEditMode(platformParameter);
+
+      expect(
+        component.platformParametersInEditMode.get(platformParameter.name)
+      ).toBeTrue;
+    });
+  });
+
+  describe('.shiftToReadMode', () => {
+    it('should shift to read mode', () => {
+      const platformParameter = component.platformParameters[0];
+      component.shiftToEditMode(platformParameter);
+      expect(
+        component.platformParametersInEditMode.get(platformParameter.name)
+      ).toBeTrue;
+
+      component.shiftToReadMode(platformParameter);
+
+      expect(
+        component.platformParametersInEditMode.get(platformParameter.name)
+      ).toBeFalse;
+    });
+  });
+
+  describe('.getReadonlyFilterValues', () => {
+    it('should get read only value of the rule with one filter and one ' +
+    'condition', () => {
+      const platformParameter = component.platformParameters[0];
+
+      expect(
+        component.getReadonlyFilterValues(platformParameter.rules[0])
+      ).toBe('Platform Type in [Web]');
+    });
+
+    it('should get read only value of the rule with one filter and multiple ' +
+    'condition', () => {
+      const platformParameter = component.platformParameters[0];
+      component.addNewCondition(platformParameter.rules[0].filters[0]);
+
+      expect(
+        component.getReadonlyFilterValues(platformParameter.rules[0])
+      ).toBe('Platform Type in [Web, Web]');
+    });
+
+    it('should get read only value of the rule with multiple filter', () => {
+      const platformParameter = component.platformParameters[0];
+      component.addNewFilter(platformParameter.rules[0]);
+      component.addNewCondition(platformParameter.rules[0].filters[1]);
+
+      expect(
+        component.getReadonlyFilterValues(platformParameter.rules[0])
+      ).toBe('Platform Type in [Web]; Platform Type in [Web]');
+    });
+
+    it('should get read only value of the rule with no condition', () => {
+      const platformParameter = component.platformParameters[0];
+      component.addNewRuleToBottom(platformParameter);
+
+      expect(
+        component.getReadonlyFilterValues(platformParameter.rules[1])
+      ).toBe('Platform Type in [ ]');
+    });
+  });
+
+  describe('.getWarnings', () => {
+    it('should show all the warnings present in the platform-parameter', () => {
+      const platformParameter = component.platformParameters[0];
+      component.removeFilter(platformParameter.rules[0], 0);
+
+      let warnings = component.getWarnings(platformParameter);
+
+      expect(warnings.length).toEqual(1);
+      expect(warnings[0]).toEqual(
+        'In rule 1, there should be at least one filter.');
+    });
+  });
+
+  describe('.setWarningsAreShown', () => {
+    it('should set the warningsAreShown to boolean', () => {
+      expect(component.warningsAreShown).toBeFalse;
+
+      component.setWarningsAreShown(true);
+
+      expect(component.warningsAreShown).toBeTrue;
     });
   });
 
@@ -357,7 +486,10 @@ describe('Admin page platform parameters tab', () => {
 
       const platformParameter = component.platformParameters[0];
 
-      component.addNewRuleToTop(platformParameter);
+      component.addNewRuleToBottom(platformParameter);
+      platformParameter.rules[1].filters[0].conditions = [
+        ['=', AdminFeaturesTabConstants.ALLOWED_PLATFORM_TYPES[1]]
+      ];
       component.updateParameterRulesAsync(platformParameter);
 
       flushMicrotasks();
@@ -373,7 +505,10 @@ describe('Admin page platform parameters tab', () => {
 
         const platformParameter = component.platformParameters[0];
 
-        component.addNewRuleToTop(platformParameter);
+        component.addNewRuleToBottom(platformParameter);
+        platformParameter.rules[1].filters[0].conditions = [
+          ['=', AdminFeaturesTabConstants.ALLOWED_PLATFORM_TYPES[1]]
+        ];
         component.updateParameterRulesAsync(platformParameter);
 
         flushMicrotasks();
@@ -395,7 +530,10 @@ describe('Admin page platform parameters tab', () => {
         const platformParameter = component.platformParameters[0];
         const originalFeatureFlag = cloneDeep(platformParameter);
 
-        component.addNewRuleToTop(platformParameter);
+        component.addNewRuleToBottom(platformParameter);
+        platformParameter.rules[1].filters[0].conditions = [
+          ['=', AdminFeaturesTabConstants.ALLOWED_PLATFORM_TYPES[1]]
+        ];
         component.updateParameterRulesAsync(platformParameter);
 
         flushMicrotasks();
@@ -411,7 +549,10 @@ describe('Admin page platform parameters tab', () => {
 
       const platformParameter = component.platformParameters[0];
 
-      component.addNewRuleToTop(platformParameter);
+      component.addNewRuleToBottom(platformParameter);
+      platformParameter.rules[1].filters[0].conditions = [
+        ['=', AdminFeaturesTabConstants.ALLOWED_PLATFORM_TYPES[1]]
+      ];
       component.updateParameterRulesAsync(platformParameter);
 
       flushMicrotasks();
@@ -432,7 +573,10 @@ describe('Admin page platform parameters tab', () => {
 
         const platformParameter = component.platformParameters[0];
 
-        component.addNewRuleToTop(platformParameter);
+        component.addNewRuleToBottom(platformParameter);
+        platformParameter.rules[1].filters[0].conditions = [
+          ['=', AdminFeaturesTabConstants.ALLOWED_PLATFORM_TYPES[1]]
+        ];
         component.updateParameterRulesAsync(platformParameter);
 
         flushMicrotasks();
@@ -448,8 +592,8 @@ describe('Admin page platform parameters tab', () => {
       const platformParameter = component.platformParameters[0];
 
       // Two identical rules.
-      component.addNewRuleToTop(platformParameter);
-      component.addNewRuleToTop(platformParameter);
+      component.addNewRuleToBottom(platformParameter);
+      component.addNewRuleToBottom(platformParameter);
       component.updateParameterRulesAsync(platformParameter);
 
       flushMicrotasks();
@@ -469,7 +613,10 @@ describe('Admin page platform parameters tab', () => {
       updateApiSpy.and.rejectWith(errorResponse);
       const platformParameter = component.platformParameters[0];
 
-      component.addNewRuleToTop(platformParameter);
+      component.addNewRuleToBottom(platformParameter);
+      platformParameter.rules[1].filters[0].conditions = [
+        ['=', AdminFeaturesTabConstants.ALLOWED_PLATFORM_TYPES[1]]
+      ];
       component.updateParameterRulesAsync(platformParameter);
 
       flushMicrotasks();
@@ -491,7 +638,10 @@ describe('Admin page platform parameters tab', () => {
       updateApiSpy.and.rejectWith(errorResponse);
       const platformParameter = component.platformParameters[0];
 
-      component.addNewRuleToTop(platformParameter);
+      component.addNewRuleToBottom(platformParameter);
+      platformParameter.rules[1].filters[0].conditions = [
+        ['=', AdminFeaturesTabConstants.ALLOWED_PLATFORM_TYPES[1]]
+      ];
       component.updateParameterRulesAsync(platformParameter);
 
       flushMicrotasks();
@@ -529,12 +679,19 @@ describe('Admin page platform parameters tab', () => {
       () => {
         const platformParameter = component.platformParameters[0];
 
-        component.addNewRuleToTop(platformParameter);
+        component.addNewRuleToBottom(platformParameter);
 
         expect(component.isPlatformParamChanged(platformParameter))
           .toBeTrue();
       }
     );
+
+    it('should return true when default value is changed', () => {
+      const platformParameter = component.platformParameters[0];
+      platformParameter.defaultValue = 'new value';
+
+      expect(component.isPlatformParamChanged(platformParameter)).toBeTrue();
+    });
 
     it('should throw error if the platform param username is not found', () => {
       const platformParameter = PlatformParameter.createFromBackendDict({
@@ -549,12 +706,8 @@ describe('Admin page platform parameters tab', () => {
           {
             filters: [
               {
-                type: PlatformParameterFilterType.ServerMode,
-                conditions: [['=', ServerMode.Dev], ['=', ServerMode.Test]]
-              },
-              {
-                type: PlatformParameterFilterType.ServerMode,
-                conditions: [['=', ServerMode.Prod]]
+                type: PlatformParameterFilterType.PlatformType,
+                conditions: [['=', 'Web']]
               }
             ],
             value_when_matched: true,
@@ -587,18 +740,23 @@ describe('Admin page platform parameters tab', () => {
             {
               filters: [
                 {
-                  type: PlatformParameterFilterType.ServerMode,
-                  conditions: [['=', ServerMode.Dev], ['=', ServerMode.Test]]
-                },
-                {
-                  type: PlatformParameterFilterType.ServerMode,
-                  conditions: [['=', ServerMode.Prod]]
+                  type: PlatformParameterFilterType.PlatformType,
+                  conditions: [
+                    ['=', AdminFeaturesTabConstants.ALLOWED_PLATFORM_TYPES[0]]
+                  ]
                 }
               ],
               value_when_matched: true,
             },
             {
-              filters: [],
+              filters: [
+                {
+                  type: PlatformParameterFilterType.PlatformType,
+                  conditions: [
+                    ['=', AdminFeaturesTabConstants.ALLOWED_PLATFORM_TYPES[1]]
+                  ]
+                }
+              ],
               value_when_matched: true
             }
           ],
@@ -620,18 +778,32 @@ describe('Admin page platform parameters tab', () => {
           rule_schema_version: 1,
           rules: [
             {
-              filters: [],
+              filters: [
+                {
+                  type: PlatformParameterFilterType.PlatformType,
+                  conditions: [
+                    ['=', AdminFeaturesTabConstants.ALLOWED_PLATFORM_TYPES[1]]
+                  ]
+                }
+              ],
               value_when_matched: true
             },
             {
-              filters: [],
+              filters: [
+                {
+                  type: PlatformParameterFilterType.PlatformType,
+                  conditions: [
+                    ['=', AdminFeaturesTabConstants.ALLOWED_PLATFORM_TYPES[1]]
+                  ]
+                }
+              ],
               value_when_matched: true
             },
           ],
         })
       );
 
-      expect(issues).toEqual(['The 1-th & 2-th rules are identical.']);
+      expect(issues).toEqual(['Rules 1 & 2 are identical.']);
     });
 
     it('should return issues if there are identical filters', () => {
@@ -648,12 +820,12 @@ describe('Admin page platform parameters tab', () => {
             {
               filters: [
                 {
-                  type: PlatformParameterFilterType.ServerMode,
-                  conditions: [['=', ServerMode.Dev]]
+                  type: PlatformParameterFilterType.PlatformType,
+                  conditions: [['=', 'Web']]
                 },
                 {
-                  type: PlatformParameterFilterType.ServerMode,
-                  conditions: [['=', ServerMode.Dev]]
+                  type: PlatformParameterFilterType.PlatformType,
+                  conditions: [['=', 'Web']]
                 }
               ],
               value_when_matched: true
@@ -663,7 +835,7 @@ describe('Admin page platform parameters tab', () => {
       );
 
       expect(issues).toEqual([
-        'In the 1-th rule: the 1-th & 2-th filters are identical.']);
+        'In rule 1, filters 1 & 2 are identical.']);
     });
 
     it('should return issues if there are identical conditions', () => {
@@ -680,8 +852,8 @@ describe('Admin page platform parameters tab', () => {
             {
               filters: [
                 {
-                  type: PlatformParameterFilterType.ServerMode,
-                  conditions: [['=', ServerMode.Dev], ['=', ServerMode.Dev]]
+                  type: PlatformParameterFilterType.PlatformType,
+                  conditions: [['=', 'Web'], ['=', 'Web']]
                 },
               ],
               value_when_matched: true
@@ -691,8 +863,58 @@ describe('Admin page platform parameters tab', () => {
       );
 
       expect(issues).toEqual([
-        'In the 1-th rule, 1-th filter: the 1-th & 2-th conditions' +
-        ' are identical.']);
+        'In rule 1, filter 1, conditions 1 & 2 are identical.']);
+    });
+
+    it('should return issues if filter has no condition', () => {
+      const issues = AdminPlatformParametersTabComponent.validatePlatformParam(
+        PlatformParameter.createFromBackendDict({
+          data_type: 'bool',
+          default_value: false,
+          description: 'This is a dummy platform param.',
+          feature_stage: FeatureStage.DEV,
+          is_feature: true,
+          name: 'dummy_platform_parameter',
+          rule_schema_version: 1,
+          rules: [
+            {
+              filters: [
+                {
+                  type: PlatformParameterFilterType.PlatformType,
+                  conditions: []
+                },
+              ],
+              value_when_matched: true
+            },
+          ],
+        })
+      );
+
+      expect(issues).toEqual(
+        ['In rule 1, filter 1 should have at least one condition.']);
+    });
+
+    it('should return issues if there is no filter in the rule', () => {
+      const issues = AdminPlatformParametersTabComponent.validatePlatformParam(
+        PlatformParameter.createFromBackendDict({
+          data_type: 'bool',
+          default_value: false,
+          description: 'This is a dummy platform param.',
+          feature_stage: FeatureStage.DEV,
+          is_feature: true,
+          name: 'dummy_platform_parameter',
+          rule_schema_version: 1,
+          rules: [
+            {
+              filters: [],
+              value_when_matched: true
+            },
+          ],
+        })
+      );
+
+      expect(issues).toEqual(
+        ['In rule 1, there should be at least one filter.']);
     });
   });
 });
