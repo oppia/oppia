@@ -378,18 +378,16 @@ class PinnedOpportunityModelTest(test_utils.GenericTestBase):
     def test_export_data_valid_user(self) -> None: 
         user_data = opportunity_models.PinnedOpportunityModel.export_data(
             self.user_id)
+        model_id = f"{self.user_id}.{self.language_code}.{self.topic_id}"
 
         expected_data = {
-            'user_data': [
-                {
-                    'language_code': self.language_code,
-                    'topic_id': self.topic_id,
-                    'opportunity_id': self.opportunity_id_1
-                }
-            ]
+            model_id: {
+                'language_code': self.language_code,
+                'topic_id': self.topic_id,
+                'opportunity_id': self.opportunity_id_1
+            }
         }
-
-        self.assertEqual(user_data, expected_data)
+        self.assertDictEqual(user_data, expected_data)
 
     def test_model_association_to_user(self) -> None:
         self.assertEqual(
