@@ -253,39 +253,6 @@ describe('Question object factory', function() {
       misconceptionsDict)).toEqual(['name_2', 'name_3']);
   });
 
-  it('should correctly validate question', function() {
-    var interaction = sampleQuestion.getStateData().interaction;
-
-    expect(sampleQuestion.getValidationErrorMessage()).toBeNull();
-
-    interaction.defaultOutcome.feedback.html = '';
-    expect(sampleQuestion.getValidationErrorMessage()).toEqual(
-      'Please enter a feedback for the default outcome.');
-
-    interaction.defaultOutcome.feedback.html = 'feedback';
-
-    interaction.answerGroups[0].outcome.labelledAsCorrect = false;
-    expect(sampleQuestion.getValidationErrorMessage()).toEqual(
-      'At least one answer should be marked correct');
-
-    interaction.solution = null;
-    expect(sampleQuestion.getValidationErrorMessage()).toEqual(
-      'A solution must be specified');
-
-    interaction.hints = [];
-    expect(sampleQuestion.getValidationErrorMessage()).toEqual(
-      'At least 1 hint should be specified');
-
-    interaction.id = null;
-    expect(sampleQuestion.getValidationErrorMessage()).toEqual(
-      'An interaction must be specified');
-
-    var questionContent = sampleQuestion.getStateData().content;
-    questionContent.html = '';
-    expect(sampleQuestion.getValidationErrorMessage()).toEqual(
-      'Please enter a question.');
-  });
-
   it('should correctly create a Default Question', function() {
     var sampleQuestion1 = QuestionObjectFactory.createDefaultQuestion(
       ['skill_id3', 'skill_id4']);

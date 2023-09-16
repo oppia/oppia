@@ -1,6 +1,6 @@
 <div class="thumbnail-editor e2e-test-thumbnail-editor form-group">
   <div>
-    <div class="oppia-editable-section float-left" title="Change Thumbnail"
+    <div class="oppia-editable-section float-left edit-btn-container" title="Change Thumbnail"
          [ngStyle]="{background: bgColor}">
       <div tabindex="0" class="oppia-click-to-start-editing e2e-test-photo-button"
            (click)="showEditThumbnailModal()"
@@ -54,5 +54,10 @@
   .oppia-pencil-icon {
     right: 8px;
     top: 8px;
+  }
+
+  .edit-btn-container {
+    min-height: 2rem;
+    min-width: 2rem;
   }
 </style>
