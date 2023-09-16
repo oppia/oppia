@@ -91,7 +91,7 @@
           </div>
           <!-- CkDrop End -->
         </div>
-        <div *ngIf="!suppressDefaultAnswerGroup()">
+        <div *ngIf="!shouldHideDefaultAnswerGroup()">
           <div class="oppia-option-list nav-stacked nav-pills" role="tablist">
             <div class="option-list-default"
                  [ngClass]="{'active': activeAnswerGroupIndex === answerGroups.length}"
@@ -127,7 +127,7 @@
                                                [outcome]="defaultOutcome"
                                                [taggedSkillMisconceptionId]="null"
                                                [isEditable]="editabilityService.isEditable()"
-                                               [suppressWarnings]="suppressDefaultAnswerGroup()"
+                                               [suppressWarnings]="shouldHideDefaultAnswerGroup()"
                                                [displayFeedback]="!isLinearWithNoFeedback(defaultOutcome)"
                                                [addState]="addState"
                                                (onSaveAnswerGroupFeedback)="saveDefaultOutcomeFeedback($event)"
