@@ -19,6 +19,8 @@ from __future__ import annotations
 import datetime
 import itertools
 import logging
+from operator import mod
+from pyexpat import model
 import re
 
 from core import feconf
@@ -38,8 +40,6 @@ from core.domain import wipeout_domain
 from core.platform import models
 
 from typing import Dict, Final, List, Optional, Sequence, Tuple, Type, Union
-
-from oppia.core.storage import user
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -61,6 +61,7 @@ if MYPY:  # pragma: no cover
     from mypy_imports import topic_models
     from mypy_imports import transaction_services
     from mypy_imports import user_models
+    # from mypy_imports import opportunity_models
 
 (
     app_feedback_report_models, base_models,
@@ -68,14 +69,14 @@ if MYPY:  # pragma: no cover
     exp_models, feedback_models, improvements_models,
     question_models, skill_models, story_models,
     subtopic_models, suggestion_models, topic_models,
-    user_models
+    user_models, opportunity_models
 ) = models.Registry.import_models([
     models.Names.APP_FEEDBACK_REPORT, models.Names.BASE_MODEL,
     models.Names.BLOG, models.Names.COLLECTION, models.Names.CONFIG,
     models.Names.EXPLORATION, models.Names.FEEDBACK, models.Names.IMPROVEMENTS,
     models.Names.QUESTION, models.Names.SKILL, models.Names.STORY,
     models.Names.SUBTOPIC, models.Names.SUGGESTION, models.Names.TOPIC,
-    models.Names.USER,
+    models.Names.USER, models.Names.OPPORTUNITY
 ])
 
 datastore_services = models.Registry.import_datastore_services()
