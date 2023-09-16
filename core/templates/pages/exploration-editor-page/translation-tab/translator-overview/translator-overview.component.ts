@@ -33,6 +33,15 @@ import { ExplorationEditorPageConstants } from 'pages/exploration-editor-page/ex
 import { ContextService } from 'services/context.service';
 import { EntityTranslationsService } from 'services/entity-translations.services';
 import { LoaderService } from 'services/loader.service';
+import { ChangeListService } from 'pages/exploration-editor-page/services/change-list.service';
+import { EntityTranslation } from 'domain/translation/EntityTranslationObjectFactory';
+import { TranslatedContent } from 'domain/exploration/TranslatedContentObjectFactory';
+import {
+  ExplorationChangeEditTranslation,
+  ExplorationChangeMarkTranslationsNeedsUpdate,
+  ExplorationChangeRemoveTranslations,
+  ExplorationTranslationChange
+} from 'domain/exploration/exploration-draft.model';
 
 @Component({
   selector: 'oppia-translator-overview',
@@ -58,6 +67,7 @@ export class TranslatorOverviewComponent implements OnInit {
   constructor(
     private contextService: ContextService,
     private entityTranslationsService: EntityTranslationsService,
+    private changeListService: ChangeListService,
     private explorationLanguageCodeService:
       ExplorationLanguageCodeService,
     private focusManagerService: FocusManagerService,
@@ -73,7 +83,7 @@ export class TranslatorOverviewComponent implements OnInit {
   ) { }
 
   canShowTabModeSwitcher(): boolean {
-    return this.contextService.isExplorationLinkedToStory() && (
+    return !this.contextService.isExplorationLinkedToStory() && (
       this.languageCode !== this.explorationLanguageCodeService.displayed);
   }
 
@@ -150,7 +160,8 @@ export class TranslatorOverviewComponent implements OnInit {
     this.loaderService.showLoadingScreen('Loading');
     this.entityTranslationsService.getEntityTranslationsAsync(
       this.languageCode
-    ).then(() => {
+    ).then((entityTranslations) => {
+      this.updateTranslationWithChangeList(entityTranslations);
       this.translationLanguageService.setActiveLanguageCode(
         this.languageCode);
       this.translationStatusService.refresh();
@@ -175,6 +186,34 @@ export class TranslatorOverviewComponent implements OnInit {
         ' items translated out of ' +
         this.numberOfRequiredAudio + ' items');
     }
+  }
+
+  updateTranslationWithChangeList(entityTranslation: EntityTranslation): void {
+    this.changeListService.getTranslationChangeList().forEach((changeDict) => {
+      changeDict = changeDict as ExplorationTranslationChange;
+      switch (changeDict.cmd) {
+        case 'edit_translation':
+          changeDict = changeDict as ExplorationChangeEditTranslation;
+          if (this.languageCode === changeDict.language_code) {
+            entityTranslation.updateTranslation(
+              changeDict.content_id,
+              TranslatedContent.createFromBackendDict(changeDict.translation)
+            );
+          }
+          break;
+        case 'remove_translations':
+          changeDict = changeDict as ExplorationChangeRemoveTranslations;
+          entityTranslation.removeTranslation(changeDict.content_id);
+          break;
+        case 'mark_translations_needs_update':
+          changeDict = (
+            changeDict as ExplorationChangeMarkTranslationsNeedsUpdate);
+          entityTranslation.markTranslationAsNeedingUpdate(
+            changeDict.content_id
+          );
+          break;
+      }
+    });
   }
 
   ngOnInit(): void {
@@ -202,7 +241,8 @@ export class TranslatorOverviewComponent implements OnInit {
 
     this.entityTranslationsService.getEntityTranslationsAsync(
       this.languageCode
-    ).then(() => {
+    ).then((entityTranslation) => {
+      this.updateTranslationWithChangeList(entityTranslation);
       this.translationLanguageService.setActiveLanguageCode(this.languageCode);
       // We need to refresh the status service once the active language is
       // set.
