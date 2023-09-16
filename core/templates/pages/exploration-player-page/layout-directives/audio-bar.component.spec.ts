@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for the AudioBarComponent.
  */
 
-import { EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
+import { EventEmitter, ElementRef, NO_ERRORS_SCHEMA } from '@angular/core';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ComponentFixture, discardPeriodicTasks, fakeAsync, flush, TestBed, tick, waitForAsync } from '@angular/core/testing';
 import { MockTranslatePipe } from 'tests/unit-test-utils';

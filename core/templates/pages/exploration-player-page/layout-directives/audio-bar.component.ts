@@ -48,7 +48,8 @@ export class AudioBarComponent {
   explorationPlayerModeIsActive: boolean;
   // Value may be null if the language is not available.
   selectedLanguage: { value: string | null };
-  @ViewChild('audioBarContainer') audioBarContainer!: ElementRef<HTMLDivElement>;
+  @ViewChild('audioBarContainer') audioBarContainer!:
+    ElementRef<HTMLDivElement>;
 
   constructor(
     private assetsBackendApiService: AssetsBackendApiService,
