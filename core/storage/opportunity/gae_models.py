@@ -20,7 +20,7 @@ from __future__ import annotations
 
 from core.platform import models
 
-from typing import Dict, Optional, Sequence, Tuple, List
+from typing import Dict, Literal, Optional, Sequence, Tuple
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -270,7 +270,8 @@ class PinnedOpportunityModel(base_models.BaseModel):
         required=True, indexed=True)
     topic_id = datastore_services.StringProperty(required=True, indexed=True)
     opportunity_id = datastore_services.StringProperty(indexed=True)
-
+    # We use the model id as a key in the Takeout dict.
+    ID_IS_USED_AS_TAKEOUT_KEY: Literal[True] = True
     @classmethod
     def _generate_id(
         cls,
@@ -391,7 +392,7 @@ class PinnedOpportunityModel(base_models.BaseModel):
         })
 
     @classmethod
-    def export_data(cls, user_id: str) -> Dict[str, List[Dict[str, str]]]:
+    def export_data(cls, user_id: str) -> Dict[str, Dict[str, str]]:
         """Fetches all the data associated with the given user ID.
 
         Args:
@@ -401,21 +402,18 @@ class PinnedOpportunityModel(base_models.BaseModel):
             dict. A dictionary containing all the data associated
             with the user.
         """
-        user_data = []
+        user_data = {}
 
         user_models: Sequence[PinnedOpportunityModel] = (
             cls.query(cls.user_id == user_id).fetch())
 
         for model in user_models:
-            user_data.append({
+            user_data[model.id] = {  # Using model's ID as a key.
                 'language_code': model.language_code,
                 'topic_id': model.topic_id,
                 'opportunity_id': model.opportunity_id
-            })
-
-        return {
-            'user_data': user_data
-        }
+            }
+        return user_data
 
     @staticmethod
     def get_model_association_to_user(

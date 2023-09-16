@@ -1181,8 +1181,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             str, Union[bool, List[str]]
         ] = {}
 
-        expected_pinned_opportunities_data: Dict[
-            str, Dict[str, Dict[str, Dict[str, str]]]] = {}
+        expected_pinned_opportunities_data: Dict[str, Dict[str, str]] = {}
         expected_collection_rights_sm: Dict[str, Dict[str, Dict[str, str]]] = {}
         expected_collection_sm: Dict[str, Dict[str, Dict[str, str]]] = {}
         expected_skill_sm: Dict[str, Dict[str, Dict[str, str]]] = {}
@@ -1298,7 +1297,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
                 expected_question_submitter_total_contribution_stats,
             'question_reviewer_total_contribution_stats':
                 expected_question_reviewer_total_contribution_stats,
-            'pinned_opportunities': expected_pinned_opportunities_data,
+            'pinned_opportunity': expected_pinned_opportunities_data,
             'translation_coordinators':
                 expected_translation_coordinator_stats,
             'story_snapshot_metadata': expected_story_sm,
@@ -2095,13 +2094,13 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
                         self.LAST_CONTRIBUTION_DATE.isoformat())
                 }
         }
-        expected_pinned_opportunities_data = {
-            '%s' % (
-                self.USER_ID_1): {
-                    'topic_id': self.TOPIC_ID_1,
-                    'opportunity_id': self.EXPLORATION_IDS[0],
-                    'language_code': self.SUGGESTION_LANGUAGE_CODE
-                }
+        expected_pinned_opportunities_data: Dict[str, Dict[str, str]] = {
+            '%s.%s.%s' % (self.USER_ID_1, self.SUGGESTION_LANGUAGE_CODE,
+            self.EXPLORATION_IDS[0]): {
+                'topic_id': self.TOPIC_ID_1,
+                'opportunity_id': self.EXPLORATION_IDS[0],
+                'language_code': self.SUGGESTION_LANGUAGE_CODE
+            }
         }
         expected_translation_coordinator_stats_data = {
             'coordinated_language_ids': ['es', 'hi']
@@ -2165,7 +2164,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
                 expected_question_reviewer_total_contribution_stats_data,
             'translation_coordinators':
                 expected_translation_coordinator_stats_data,
-            'pinned_opportunities': expected_pinned_opportunities_data,
+            'pinned_opportunity': expected_pinned_opportunities_data,
             'story_snapshot_metadata': expected_story_sm,
             'question_snapshot_metadata': expected_question_sm,
             'config_property_snapshot_metadata':
