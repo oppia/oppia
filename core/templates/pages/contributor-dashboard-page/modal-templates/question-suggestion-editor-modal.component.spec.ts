@@ -327,6 +327,7 @@ describe('Question Suggestion Editor Modal Component', () => {
 
   it('should evaluate question validity', () => {
     expect(component.isQuestionValid()).toBe(true);
+    expect(component.getQuestionValidationErrorMessage()).toBeNull();
   });
 
   it('should update the question', () => {
