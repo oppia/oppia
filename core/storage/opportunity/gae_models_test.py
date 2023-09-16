@@ -350,6 +350,17 @@ class PinnedOpportunityModelTest(test_utils.GenericTestBase):
         self.assertIsNotNone(fetched_model)
         self.assertEqual(fetched_model.opportunity_id, 'opportunity_id_2')
 
+    def test_create_raises_exception_for_existing_instance(self) -> None:
+        with self.assertRaisesRegexp(
+            Exception, 'There is already a pinned opportunity' +
+            ' with the given id:'):
+            opportunity_models.PinnedOpportunityModel.create(
+                user_id=self.user_id,
+                language_code=self.language_code,
+                topic_id=self.topic_id,
+                opportunity_id=self.opportunity_id_1
+            )
+
     def test_get_deletion_policy(self) -> None:
         self.assertEqual(
             opportunity_models.PinnedOpportunityModel.get_deletion_policy(),
@@ -402,3 +413,11 @@ class PinnedOpportunityModelTest(test_utils.GenericTestBase):
             opportunity_models.PinnedOpportunityModel.get_export_policy(),
             expected_export_policy
         )
+
+    def test_apply_deletion_policy(self) -> None:
+        opportunity_models.PinnedOpportunityModel.apply_deletion_policy(
+            self.user_id)
+
+        fetched_model = opportunity_models.PinnedOpportunityModel.get_model(
+            self.user_id, self.language_code, self.topic_id)
+        self.assertIsNone(fetched_model)
