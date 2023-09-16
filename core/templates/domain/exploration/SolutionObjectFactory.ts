@@ -107,9 +107,8 @@ export class Solution extends BaseTranslatableObject {
       correctAnswer = Fraction.fromDict(
         this.correctAnswer as FractionAnswer).toString();
     } else if (interactionId === 'NumberWithUnits') {
-      correctAnswer = (new NumberWithUnitsObjectFactory(
-        new Units())).fromDict(
-          this.correctAnswer as NumberWithUnitsAnswer).toString();
+      correctAnswer = (new NumberWithUnitsObjectFactory()).fromDict(
+        this.correctAnswer as NumberWithUnitsAnswer).toString();
     } else if (interactionId === 'DragAndDropSortInput') {
       correctAnswer = [];
       const subtitledHtmlChoices = (

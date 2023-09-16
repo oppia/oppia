@@ -614,7 +614,7 @@ export class UpgradedServices {
     upgradedServices['TopicsAndSkillsDashboardPageService'] =
         new TopicsAndSkillsDashboardPageService(
           upgradedServices['PlatformFeatureService']);
-    upgradedServices['Units'] = new Units();
+    upgradedServices['Units'] = Units;
     upgradedServices['UtilsService'] = new UtilsService();
     upgradedServices['VersionTreeService'] = new VersionTreeService();
     upgradedServices['WindowRef'] = new WindowRef();
@@ -710,8 +710,7 @@ export class UpgradedServices {
       new NumericInputValidationService(
         upgradedServices['baseInteractionValidationService']);
     upgradedServices['NumberWithUnitsObjectFactory'] =
-      new NumberWithUnitsObjectFactory(
-        upgradedServices['Units']);
+      new NumberWithUnitsObjectFactory();
     upgradedServices['NumericExpressionInputValidationService'] =
       new NumericExpressionInputValidationService(
         upgradedServices['baseInteractionValidationService']);

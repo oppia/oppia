@@ -73,7 +73,7 @@ export class NumberWithUnits {
     // type, real, fraction and units. Hence, we cannot inject
     // UnitsObjectFactory, since that'll lead to creation of 5th property
     // which isn't allowed. Refer objects.py L#956.
-    let unitsString = (new Units()).fromList(
+    let unitsString = Units.fromList(
       this.units).toString();
     if (unitsString.includes('$')) {
       unitsString = unitsString.replace('$', '');
@@ -100,9 +100,9 @@ export class NumberWithUnits {
 
   toMathjsCompatibleString(): string {
     let numberWithUnitsString = '';
-    let unitsString = (new Units()).fromList(
+    let unitsString = Units.fromList(
       this.units).toString();
-    unitsString = (new Units()).toMathjsCompatibleString(
+    unitsString = Units.toMathjsCompatibleString(
       unitsString);
 
     if (this.type === 'real') {
@@ -130,10 +130,10 @@ export class NumberWithUnits {
   providedIn: 'root'
 })
 export class NumberWithUnitsObjectFactory {
-  constructor(private unitsFactory: Units) {}
+
   createCurrencyUnits(): void {
     try {
-      this.unitsFactory.createCurrencyUnits();
+      Units.createCurrencyUnits();
     } catch (parsingError) {}
   }
 
@@ -266,7 +266,7 @@ export class NumberWithUnitsObjectFactory {
       }
     }
 
-    const unitsObj = this.unitsFactory.fromRawInputString(units);
+    const unitsObj = Units.fromRawInputString(units);
     return new NumberWithUnits(type, real, fractionObj, unitsObj);
   }
 
@@ -275,7 +275,7 @@ export class NumberWithUnitsObjectFactory {
       numberWithUnitsDict.type,
       numberWithUnitsDict.real,
       Fraction.fromDict(numberWithUnitsDict.fraction),
-      this.unitsFactory.fromList(numberWithUnitsDict.units));
+      Units.fromList(numberWithUnitsDict.units));
   }
 }
 
