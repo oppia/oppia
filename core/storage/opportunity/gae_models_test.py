@@ -333,21 +333,17 @@ class PinnedOpportunityModelTest(test_utils.GenericTestBase):
         )
 
     def test_create_and_fetch_model(self) -> None:
-        # Ensure that the model instance doesn't exist yet.
         fetched_model = opportunity_models.PinnedOpportunityModel.get_model(
             self.user_id, self.language_code, self.topic_id)
-        self.assertIsNotNone(fetched_model)
+        assert fetched_model is not None, "Expected fetched_model to be not None"
         self.assertEqual(fetched_model.opportunity_id, self.opportunity_id_1)
 
-        # Create a new instance.
         opportunity_models.PinnedOpportunityModel.create(
-            'user_id_2', 'en', 'topic_id_1',
-            'opportunity_id_2')
+            'user_id_2', 'en', 'topic_id_1', 'opportunity_id_2')
 
-        # Testing fetching of the model using `get_model()`.
         fetched_model = opportunity_models.PinnedOpportunityModel.get_model(
             'user_id_2', 'en', 'topic_id_1')
-        self.assertIsNotNone(fetched_model)
+        assert fetched_model is not None, "Expected fetched_model to be not None"
         self.assertEqual(fetched_model.opportunity_id, 'opportunity_id_2')
 
     def test_create_raises_exception_for_existing_instance(self) -> None:
@@ -375,10 +371,10 @@ class PinnedOpportunityModelTest(test_utils.GenericTestBase):
             )
         )
 
-    def test_export_data_valid_user(self) -> None: 
+    def test_export_data_valid_user(self) -> None:
         user_data = opportunity_models.PinnedOpportunityModel.export_data(
             self.user_id)
-        model_id = f"{self.user_id}.{self.language_code}.{self.topic_id}"
+        model_id = f'{self.user_id}.{self.language_code}.{self.topic_id}'
 
         expected_data = {
             model_id: {
@@ -391,7 +387,8 @@ class PinnedOpportunityModelTest(test_utils.GenericTestBase):
 
     def test_model_association_to_user(self) -> None:
         self.assertEqual(
-            opportunity_models.PinnedOpportunityModel.get_model_association_to_user(),
+            opportunity_models.PinnedOpportunityModel.
+            get_model_association_to_user(),
             base_models.MODEL_ASSOCIATION_TO_USER.MULTIPLE_INSTANCES_PER_USER
         )
 

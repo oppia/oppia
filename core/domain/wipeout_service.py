@@ -19,8 +19,6 @@ from __future__ import annotations
 import datetime
 import itertools
 import logging
-from operator import mod
-from pyexpat import model
 import re
 
 from core import feconf
@@ -61,7 +59,6 @@ if MYPY:  # pragma: no cover
     from mypy_imports import topic_models
     from mypy_imports import transaction_services
     from mypy_imports import user_models
-    # from mypy_imports import opportunity_models
 
 (
     app_feedback_report_models, base_models,

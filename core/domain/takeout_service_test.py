@@ -2095,12 +2095,14 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
                 }
         }
         expected_pinned_opportunities_data: Dict[str, Dict[str, str]] = {
-            '%s.%s.%s' % (self.USER_ID_1, self.SUGGESTION_LANGUAGE_CODE,
-            self.EXPLORATION_IDS[0]): {
-                'topic_id': self.TOPIC_ID_1,
-                'opportunity_id': self.EXPLORATION_IDS[0],
-                'language_code': self.SUGGESTION_LANGUAGE_CODE
-            }
+            '%s.%s.%s' % (
+                self.USER_ID_1,
+                self.SUGGESTION_LANGUAGE_CODE,
+                self.EXPLORATION_IDS[0]): {
+                    'topic_id': self.TOPIC_ID_1,
+                    'opportunity_id': self.EXPLORATION_IDS[0],
+                    'language_code': self.SUGGESTION_LANGUAGE_CODE
+                }
         }
         expected_translation_coordinator_stats_data = {
             'coordinated_language_ids': ['es', 'hi']

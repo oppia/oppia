@@ -62,6 +62,7 @@ if MYPY:  # pragma: no cover
     from mypy_imports import feedback_models
     from mypy_imports import improvements_models
     from mypy_imports import learner_group_models
+    from mypy_imports import opportunity_models
     from mypy_imports import question_models
     from mypy_imports import skill_models
     from mypy_imports import story_models
@@ -69,7 +70,6 @@ if MYPY:  # pragma: no cover
     from mypy_imports import suggestion_models
     from mypy_imports import topic_models
     from mypy_imports import user_models
-    from mypy_imports import opportunity_models
 
 (
     app_feedback_report_models, auth_models, blog_models,
