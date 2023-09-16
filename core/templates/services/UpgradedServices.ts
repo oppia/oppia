@@ -480,6 +480,8 @@ import { WrittenTranslationsObjectFactory } from
 import { SolutionVerificationService } from
   // eslint-disable-next-line max-len
   'pages/exploration-editor-page/editor-tab/services/solution-verification.service';
+import { ResponsesService } from
+  'pages/exploration-editor-page/editor-tab/services/responses.service';
 import { QuestionValidationService } from './question-validation.service';
 import { MathInteractionsService } from './math-interactions.service';
 
@@ -737,10 +739,23 @@ export class UpgradedServices {
       upgradedServices['LearnerActionObjectFactory']);
     upgradedServices['PythonProgramTokenizer'] = new PythonProgramTokenizer(
       upgradedServices['LoggerService']);
+    upgradedServices['ResponsesService'] =
+      new ResponsesService(
+        upgradedServices['AlertsService'],
+        upgradedServices['LoggerService'],
+        upgradedServices['OutcomeObjectFactory'],
+        upgradedServices['SolutionValidityService'],
+        upgradedServices['SolutionVerificationService'],
+        upgradedServices['StateCustomizationArgsService'],
+        upgradedServices['StateEditorService'],
+        upgradedServices['StateInteractionIdService'],
+        upgradedServices['StateSolutionService']
+      );
     upgradedServices['QuestionValidationService'] =
-    new QuestionValidationService(
-      upgradedServices['StateEditorService']
-    );
+      new QuestionValidationService(
+        upgradedServices['ResponsesService'],
+        upgradedServices['StateEditorService']
+      );
     upgradedServices['RatioExpressionInputValidationService'] =
           new RatioExpressionInputValidationService(
             upgradedServices['baseInteractionValidationService']);
