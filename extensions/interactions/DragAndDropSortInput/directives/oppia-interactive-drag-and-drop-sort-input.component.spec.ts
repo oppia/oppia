@@ -179,7 +179,8 @@ describe('Drag and drop sort input interactive component', () => {
     });
 
     it('should increment newIndex when Tab key is pressed', () => {
-      const event = new KeyboardEvent('keydown', { key: 'Tab', shiftKey: false });
+      const event = new KeyboardEvent('keydown',
+        { key: 'Tab', shiftKey: false });
       const currentIndex = 1;
       component.activeItem = 1;
       component.listItems = new QueryList<ElementRef<HTMLDivElement>>();
@@ -197,8 +198,10 @@ describe('Drag and drop sort input interactive component', () => {
       expect(component.activeItem).toBe(currentIndex + 1);
     });
 
-    it('should decrement newIndex when Shift + Tab keys are pressed', () => {
-      const event = new KeyboardEvent('keydown', { key: 'Tab', shiftKey: true });
+    it('should decrement newIndex when Shift + Tab keys are pressed',
+      () => {
+      const event = new KeyboardEvent('keydown',
+        { key: 'Tab', shiftKey: true });
       const currentIndex = 1;
       component.activeItem = 1;
 

@@ -64,7 +64,7 @@ export class InteractiveDragAndDropSortInputComponent implements OnInit {
     private dragAndDropSortInputRulesService: DragAndDropSortInputRulesService,
     private el: ElementRef,
     private interactionAttributesExtractorService:
-      InteractionAttributesExtractorService) {}
+      InteractionAttributesExtractorService) { }
 
   ngAfterViewInit(): void {
     this.listSubscription = this.listItems.changes.subscribe((_) => {
@@ -178,46 +178,46 @@ export class InteractiveDragAndDropSortInputComponent implements OnInit {
   handleKeyDownmultipleItemsInSamePosition(
     event: KeyboardEvent,
     currentIndex: number): void {
-  let newIndex = currentIndex;
-  if (event.key === 'ArrowDown') {
-    event.preventDefault();
-    if (this.activeItem < this.listItems.length - 1) {
-      newIndex += 1;
-      moveItemInArray(
-        this.multipleItemsInSamePositionArray,
-        currentIndex,
-        newIndex);
-    } else {
-      newIndex = 0;
-    }
-  }
-  if (event.key === 'ArrowUp') {
-    event.preventDefault();
-    if (this.activeItem !== 0) {
-      newIndex -= 1;
-      moveItemInArray(
-        this.multipleItemsInSamePositionArray,
-        currentIndex,
-        newIndex);
-    }
-  }
-
-  if (event.key === 'Tab') {
-    if (event.shiftKey) {
-      if (this.activeItem > 0) {
-        event.preventDefault();
-        newIndex -= 1;
-      }
-    } else {
+    let newIndex = currentIndex;
+    if (event.key === 'ArrowDown') {
+      event.preventDefault();
       if (this.activeItem < this.listItems.length - 1) {
-        event.preventDefault();
         newIndex += 1;
+        moveItemInArray(
+          this.multipleItemsInSamePositionArray,
+          currentIndex,
+          newIndex);
+      } else {
+        newIndex = 0;
       }
     }
+    if (event.key === 'ArrowUp') {
+      event.preventDefault();
+      if (this.activeItem !== 0) {
+        newIndex -= 1;
+        moveItemInArray(
+          this.multipleItemsInSamePositionArray,
+          currentIndex,
+          newIndex);
+      }
+    }
+
+    if (event.key === 'Tab') {
+      if (event.shiftKey) {
+        if (this.activeItem > 0) {
+          event.preventDefault();
+          newIndex -= 1;
+        }
+      } else {
+        if (this.activeItem < this.listItems.length - 1) {
+          event.preventDefault();
+          newIndex += 1;
+        }
+      }
+    }
+    this.activeItem = newIndex;
+    this.setFocus();
   }
-  this.activeItem = newIndex;
-  this.setFocus();
-}
 
   handleKeyDown(event: KeyboardEvent, currentIndex: number): void {
     let newIndex = currentIndex;

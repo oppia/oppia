@@ -26,8 +26,8 @@
                  (mouseover)="addHighlight(idx)"
                  (mouseout)="removeHighlight()"
                  (mousedown)="setRootPlaceHolderHeight(idx)">
-          </div>
-                 <div *ngFor="let item of items"
+            </div>
+            <div *ngFor="let item of items"
                  class="child-dnd-item-box"
                  tabindex="0"
                  [ngClass]="{'highlight-group': idx === highlightedGroup}"
