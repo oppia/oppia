@@ -39,7 +39,7 @@ describe('Drag and drop sort input interactive component', () => {
 
   class MockInteractionAttributesExtractorService {
     getValuesFromAttributes(
-        interactionId: InteractionSpecsKey, attributes: Record<string, string>
+      interactionId: InteractionSpecsKey, attributes: Record<string, string>
     ) {
       return {
         choices: {
@@ -55,17 +55,17 @@ describe('Drag and drop sort input interactive component', () => {
 
   class MockCurrentInteractionService {
     onSubmit(
-        answer: DragAndDropAnswer, rulesService: CurrentInteractionService
-    ) {}
+      answer: DragAndDropAnswer, rulesService: CurrentInteractionService
+    ) { }
 
     registerCurrentInteraction(
-        submitAnswerFn: Function, validateExpressionFn: Function) {
+      submitAnswerFn: Function, validateExpressionFn: Function) {
       submitAnswerFn();
     }
   }
   class DragAndDropEventClass<T> {
     createInContainerEvent(
-        containerId: string, data: T[], fromIndex: number, toIndex: number
+      containerId: string, data: T[], fromIndex: number, toIndex: number
     ): CdkDragDrop<T[], T[]> {
       const event = this.createEvent(fromIndex, toIndex);
       const container = { id: containerId, data: data };
@@ -76,7 +76,7 @@ describe('Drag and drop sort input interactive component', () => {
     }
 
     createCrossContainerEvent(
-        from: ContainerModel<T>, to: ContainerModel<T>
+      from: ContainerModel<T>, to: ContainerModel<T>
     ): CdkDragDrop<T[], T[]> {
       const event = this.createEvent(from.index, to.index);
       event.container = this.createContainer(to);
@@ -86,7 +86,7 @@ describe('Drag and drop sort input interactive component', () => {
     }
 
     private createEvent(
-        previousIndex: number, currentIndex: number
+      previousIndex: number, currentIndex: number
     ): CdkDragDrop<T[], T[]> {
       return {
         previousIndex: previousIndex,
@@ -97,7 +97,7 @@ describe('Drag and drop sort input interactive component', () => {
     }
 
     private createContainer(
-        model: ContainerModel<T>
+      model: ContainerModel<T>
     ): CdkDropList<T[]> {
       const container = { id: model.id, data: model.data };
       return container as CdkDropList<T[]>;
@@ -200,18 +200,18 @@ describe('Drag and drop sort input interactive component', () => {
 
     it('should decrement newIndex when Shift + Tab keys are pressed',
       () => {
-      const event = new KeyboardEvent('keydown',
-        { key: 'Tab', shiftKey: true });
-      const currentIndex = 1;
-      component.activeItem = 1;
+        const event = new KeyboardEvent('keydown',
+          { key: 'Tab', shiftKey: true });
+        const currentIndex = 1;
+        component.activeItem = 1;
 
-      spyOn(component, 'setFocus');
+        spyOn(component, 'setFocus');
 
-      component.handleKeyDownmultipleItemsInSamePosition(event, currentIndex);
+        component.handleKeyDownmultipleItemsInSamePosition(event, currentIndex);
 
-      expect(component.setFocus).toHaveBeenCalled();
-      expect(component.activeItem).toBe(currentIndex - 1);
-    });
+        expect(component.setFocus).toHaveBeenCalled();
+        expect(component.activeItem).toBe(currentIndex - 1);
+      });
   });
 
   describe('when multiple items in the same position are allowed', () => {
@@ -236,7 +236,7 @@ describe('Drag and drop sort input interactive component', () => {
         '    "html": "<p>choice 4</p>",' +
         '    "contentId": "ca_choices_4"' +
         '}' +
-    ']';
+        ']';
       component.allowMultipleItemsInSamePositionWithValue = 'true';
       component.savedSolution = [
         [
@@ -458,7 +458,7 @@ describe('Drag and drop sort input interactive component', () => {
     });
 
     it('should move list inside list of lists', fakeAsync(() => {
-      spyOn(component, 'resetArray').and.callFake(() => {});
+      spyOn(component, 'resetArray').and.callFake(() => { });
 
       component.multipleItemsInSamePositionArray = [
         [],
@@ -706,7 +706,7 @@ describe('Drag and drop sort input interactive component', () => {
         '    "html": "<p>choice 3</p>",' +
         '    "contentId": "ca_choices_3"' +
         '}' +
-    ']';
+        ']';
       component.allowMultipleItemsInSamePositionWithValue = 'false';
       component.savedSolution = [
         [
