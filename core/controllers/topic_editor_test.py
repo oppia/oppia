@@ -132,7 +132,7 @@ class TopicEditorStoryHandlerTests(BaseTopicEditorControllerTests):
         self.publish_exploration(self.admin_id, 'exp-3')
 
         topic_id = topic_fetchers.get_new_topic_id()
-        canonical_story_id = story_services.get_new_story_id()
+        canonical_story_id_1 = story_services.get_new_story_id()
         canonical_story_id_2 = story_services.get_new_story_id()
         canonical_story_id_3 = story_services.get_new_story_id()
         additional_story_id = story_services.get_new_story_id()
@@ -142,7 +142,7 @@ class TopicEditorStoryHandlerTests(BaseTopicEditorControllerTests):
         response = self.get_json(
             '%s/%s' % (feconf.TOPIC_EDITOR_STORY_URL, self.topic_id))
         story = story_domain.Story.create_default_story(
-            canonical_story_id, 'title', 'description', topic_id,
+            canonical_story_id_1, 'title', 'description', topic_id,
             'url-fragment')
         story.meta_tag_content = 'story meta content'
         node_1: story_domain.StoryNodeDict = {
@@ -159,8 +159,8 @@ class TopicEditorStoryHandlerTests(BaseTopicEditorControllerTests):
             'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
                 'chapter'][0],
             'thumbnail_size_in_bytes': 21131,
-            'status': constants.STORYNODE_STATUS_PUBLISHED,
-            'planned_publication_date_msecs': 1672770600000,
+            'status': constants.STORY_NODE_STATUS_PUBLISHED,
+            'planned_publication_date_msecs': None,
             'first_publication_date_msecs': 1672684200000,
             'last_modified_msecs': 1672684200000,
             'unpublishing_reason': None
@@ -179,7 +179,7 @@ class TopicEditorStoryHandlerTests(BaseTopicEditorControllerTests):
             'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
                 'chapter'][0],
             'thumbnail_size_in_bytes': 21131,
-            'status': constants.STORYNODE_STATUS_DRAFT,
+            'status': constants.STORY_NODE_STATUS_DRAFT,
             'planned_publication_date_msecs': 1672770600000,
             'first_publication_date_msecs': None,
             'last_modified_msecs': 1672684200000,
@@ -199,7 +199,7 @@ class TopicEditorStoryHandlerTests(BaseTopicEditorControllerTests):
             'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
                 'chapter'][0],
             'thumbnail_size_in_bytes': 21131,
-            'status': constants.STORYNODE_STATUS_READY_TO_PUBLISH,
+            'status': constants.STORY_NODE_STATUS_READY_TO_PUBLISH,
             'planned_publication_date_msecs': 1690655400000,
             'first_publication_date_msecs': None,
             'last_modified_msecs': 1672684200000,
@@ -220,7 +220,7 @@ class TopicEditorStoryHandlerTests(BaseTopicEditorControllerTests):
             topic_id, self.admin_id, name='New name',
             abbreviated_name='topic-two', url_fragment='topic-two',
             description='New description',
-            canonical_story_ids=[canonical_story_id, canonical_story_id_2,
+            canonical_story_ids=[canonical_story_id_1, canonical_story_id_2,
                 canonical_story_id_3],
             additional_story_ids=[additional_story_id],
             uncategorized_skill_ids=[self.skill_id],
@@ -261,42 +261,48 @@ class TopicEditorStoryHandlerTests(BaseTopicEditorControllerTests):
         story_services.save_story_summary(story_summary)
 
         topic_services.publish_story(
-            topic_id, canonical_story_id, self.admin_id)
+            topic_id, canonical_story_id_1, self.admin_id)
         topic_services.publish_story(
             topic_id, canonical_story_id_2, self.admin_id)
 
-        response = self.get_json(
-            '%s/%s' % (feconf.TOPIC_EDITOR_STORY_URL, topic_id))
-        canonical_story_summary_dict = response[
-            'canonical_story_summary_dicts'][0]
-        additional_story_summary_dict = response[
-            'additional_story_summary_dicts'][0]
+        def mock_get_current_time_in_millisecs() -> int:
+            return 1690555400000
 
-        self.assertEqual(
-            canonical_story_summary_dict['description'], 'description')
-        self.assertEqual(canonical_story_summary_dict['title'], 'title')
-        self.assertEqual(
-            canonical_story_summary_dict['id'], canonical_story_id)
-        self.assertEqual(
-            canonical_story_summary_dict['story_is_published'], True)
-        self.assertEqual(
-            canonical_story_summary_dict['total_chapters_count'], 3)
-        self.assertEqual(
-            canonical_story_summary_dict['published_chapters_count'], 1)
-        self.assertEqual(
-            canonical_story_summary_dict['upcoming_chapters_count'], 1)
-        self.assertEqual(
-            canonical_story_summary_dict['overdue_chapters_count'], 1)
+        with self.swap(
+            utils, 'get_current_time_in_millisecs',
+            mock_get_current_time_in_millisecs):
+            response = self.get_json(
+                '%s/%s' % (feconf.TOPIC_EDITOR_STORY_URL, topic_id))
+            canonical_story_summary_dict = response[
+                'canonical_story_summary_dicts'][0]
+            additional_story_summary_dict = response[
+                'additional_story_summary_dicts'][0]
 
-        self.assertEqual(
-            additional_story_summary_dict['description'],
-            'another description')
-        self.assertEqual(
-            additional_story_summary_dict['title'], 'another title')
-        self.assertEqual(
-            additional_story_summary_dict['id'], additional_story_id)
-        self.assertEqual(
-            additional_story_summary_dict['story_is_published'], False)
+            self.assertEqual(
+                canonical_story_summary_dict['description'], 'description')
+            self.assertEqual(canonical_story_summary_dict['title'], 'title')
+            self.assertEqual(
+                canonical_story_summary_dict['id'], canonical_story_id_1)
+            self.assertEqual(
+                canonical_story_summary_dict['story_is_published'], True)
+            self.assertEqual(
+                canonical_story_summary_dict['total_chapters_count'], 3)
+            self.assertEqual(
+                canonical_story_summary_dict['published_chapters_count'], 1)
+            self.assertEqual(
+                canonical_story_summary_dict['upcoming_chapters_count'], 1)
+            self.assertEqual(
+                canonical_story_summary_dict['overdue_chapters_count'], 1)
+
+            self.assertEqual(
+                additional_story_summary_dict['description'],
+                'another description')
+            self.assertEqual(
+                additional_story_summary_dict['title'], 'another title')
+            self.assertEqual(
+                additional_story_summary_dict['id'], additional_story_id)
+            self.assertEqual(
+                additional_story_summary_dict['story_is_published'], False)
 
         self.logout()
 

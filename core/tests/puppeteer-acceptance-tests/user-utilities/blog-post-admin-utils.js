@@ -30,7 +30,7 @@ const unauthErrorContainer = 'div.e2e-test-error-container';
 const blogDashboardAuthorDetailsModal = 'div.modal-dialog';
 const roleUpdateUsernameInput = 'input#label-target-update-form-name';
 const blogEditorUsernameInput = 'input#label-target-form-reviewer-username';
-const maximumTagLimitInput = 'input#mat-input-0';
+const maximumTagLimitInput = 'input#float-input';
 const blogAuthorBioField = 'textarea.e2e-test-blog-author-bio-field';
 const blogDashboardUrl = testConstants.URLs.BlogDashboard;
 const blogAdminUrl = testConstants.URLs.BlogAdmin;
@@ -424,7 +424,7 @@ module.exports = class e2eBlogPostAdmin extends baseUser {
    */
   async expectMaximumTagLimitNotToBe(limit) {
     await this.page.evaluate(async(limit) => {
-      const tagLimit = document.getElementById('mat-input-0').value;
+      const tagLimit = document.getElementById('float-input').value;
       if (tagLimit.value === limit) {
         throw new Error(`Maximum tag limit is already ${limit}!`);
       }
@@ -438,7 +438,7 @@ module.exports = class e2eBlogPostAdmin extends baseUser {
    */
   async expectMaximumTagLimitToBe(limit) {
     await this.page.evaluate(async(limit) => {
-      const tagLimit = document.getElementById('mat-input-0').value;
+      const tagLimit = document.getElementById('float-input').value;
       if (tagLimit.value !== limit) {
         throw new Error(`Maximum tag limit is not ${limit}!`);
       }

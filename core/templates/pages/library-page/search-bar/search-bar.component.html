@@ -1,7 +1,7 @@
 <div class="oppia-same-row-container">
   <form class="search-bar-float-left oppia-search-bar-form" role="search">
     <div class="form-group">
-      <div class="input-group oppia-input-group" [ngClass]="{'classroom-page-input-group': isSearchButtonActive()}">
+      <div class="input-group oppia-input-group inptcls" [ngClass]="{'classroom-page-input-group': isSearchButtonActive()}">
         <div class="input-group-addon oppia-search-bar-icon">
           <i class="fas fa-search oppia-translate-icon-down md-18" *ngIf="!isSearchInProgress()"></i>
           <span *ngIf="isSearchInProgress()">
@@ -28,10 +28,10 @@
             (focus)="openSubmenu($event, 'category')"
             (keydown)="onMenuKeypress($event, 'category', {shiftTab: ACTION_CLOSE, enter: ACTION_OPEN})"
             type="button"
-            class="btn e2e-test-search-bar-dropdown-toggle oppia-search-bar-dropdown-toggle oppia-search-bar-input oppia-search-bar-category-input dropdown-toggle"
+            class="btn e2e-test-search-bar-dropdown-toggle oppia-search-bar-dropdown-toggle oppia-search-bar-input oppia-search-bar-category-input dropdown-toggle catbtn"
             title="{{ selectionDetails.categories.description | translate }}">
       <i *ngIf="isMobileViewActive()" class="fas fa-shapes category-selector-icon"></i>
-      <span class="btn-text">
+      <span class="btn-text spnel">
         {{ categoryButtonText | truncate:14 }}
       </span>
     </button>
@@ -88,10 +88,10 @@
             (focus)="openSubmenu($event, 'language')"
             (keydown)="onMenuKeypress($event, 'language', {shiftTab: ACTION_CLOSE, enter: ACTION_OPEN})"
             type="button"
-            class="btn e2e-test-search-bar-dropdown-toggle oppia-search-bar-input oppia-search-bar-language-input dropdown-toggle language-dropdown-toggle oppia-search-bar-dropdown-toggle-button"
+            class="btn e2e-test-search-bar-dropdown-toggle oppia-search-bar-input oppia-search-bar-language-input dropdown-toggle language-dropdown-toggle oppia-search-bar-dropdown-toggle-button langbtn"
             title="{{selectionDetails.languageCodes.description | translate}}">
       <i *ngIf="isMobileViewActive()" class="fas fa-globe language-selector-icon"></i>
-      <span class="btn-text">
+      <span class="btn-text spnel">
         {{ languageButtonText | truncate:14 }}
       </span>
     </button>
@@ -148,3 +148,76 @@
     </div>
   </div>
 </div>
+<style>
+  :lang(ar) .oppia-search-bar-dropdown-toggle-button:after {
+     margin-right: 30px;
+  }
+  :lang(ar) .oppia-search-bar-dropdown-toggle:after {
+    margin-right: 2px;
+  }
+  @media (max-width: 445px) {
+
+.classroom-page-input-group.inptcls {
+      font-size: 15.7px;
+      width: 14em;
+ }
+
+/* stylelint-disable order/properties-alphabetical-order */
+.search-bar-float-left .oppia-search-bar-dropdown-toggle.catbtn {
+  font-size: 13px;
+  position: relative;
+  left: 6rem;
+  width: 10em;
+}
+.oppia-search-bar-language-selector .langbtn {
+  font-size: 13px;
+  position: relative;
+  left: 5rem;
+  width: 10em;
+}
+  /* stylelint-enable order/properties-alphabetical-order */
+  :lang(ar) .classroom-page-input-group.inptcls {
+    font-size: 12px;
+    width: 14em;
+  }
+  :lang(ar) .search-bar-float-left .oppia-search-bar-dropdown-toggle.catbtn {
+ font-size: 13px;
+ position: relative;
+ right: 9rem;
+ width: 10em;
+  }
+  :lang(ar) .oppia-search-bar-language-selector .langbtn {
+ font-size: 13px;
+ padding-left: 3rem;
+ position: relative;
+ right: 8rem;
+ width: 10em;
+  }
+}
+@media (max-width : 340px) {
+
+ :lang(ar) .oppia-search-bar-language-selector .langbtn {
+ font-size: 13px;
+ padding-left: 3rem;
+ position: relative;
+ right: 8rem;
+ width: 10em;
+  }
+}
+@media (max-width : 285px) {
+  .classroom-page-input-group.inptcls {
+    font-size: 13.4px;
+    width: 13.4em;
+  }
+  .search-bar-float-left .oppia-search-bar-dropdown-toggle.catbtn {
+  font-size: 10px;
+ left: 10rem;
+ width: 12em;
+  }
+  .oppia-search-bar-language-selector .langbtn {
+    font-size: 10px;
+    left: 4.8rem;
+    width: 12em;
+  }
+}
+</style>

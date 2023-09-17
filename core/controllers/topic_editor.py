@@ -18,7 +18,6 @@ are created.
 
 from __future__ import annotations
 
-import datetime
 import logging
 
 from core import feconf
@@ -152,18 +151,17 @@ class TopicEditorStoryHandler(
 
         canonical_stories_ids = [summary['id'] for
             summary in canonical_story_summary_dicts]
-        canonical_stories = story_fetchers.get_stories_by_ids(
-            canonical_stories_ids)
-        non_empty_canonical_stories = [story for story in
-            canonical_stories if story is not None]
+        canonical_stories = list(filter(
+            None, story_fetchers.get_stories_by_ids(canonical_stories_ids)))
+        canonical_stories_dict: Dict[str, story_domain.Story] = {
+            canonical_story.id: canonical_story for canonical_story in
+            canonical_stories}
         updated_canonical_story_summary_dicts = []
+
         for summary in canonical_story_summary_dicts:
-            story = None
-            for canonical_story in non_empty_canonical_stories:
-                if canonical_story.id == summary['id']:
-                    story = canonical_story
-            if story is None:
+            if summary['id'] not in canonical_stories_dict:
                 continue
+            story = canonical_stories_dict[summary['id']]
             nodes = story.story_contents.nodes
             total_chapters_count = len(nodes)
             published_chapters_count = 0
@@ -171,19 +169,19 @@ class TopicEditorStoryHandler(
             overdue_chapters_count = 0
             upcoming_chapters_expected_days = []
             for node in nodes:
-                if node.status == constants.STORYNODE_STATUS_PUBLISHED:
+                if node.status == constants.STORY_NODE_STATUS_PUBLISHED:
                     published_chapters_count += 1
-                if (node.status != constants.STORYNODE_STATUS_PUBLISHED and
-                    node.planned_publication_date is not None):
-                    if ((node.planned_publication_date - datetime.datetime.
-                        today()).days < 14 and node.planned_publication_date >
-                        datetime.datetime.today()):
+                if node.planned_publication_date is not None:
+                    current_time_msecs = utils.get_current_time_in_millisecs()
+                    planned_publication_date_msecs = (
+                        utils.get_time_in_millisecs(
+                            node.planned_publication_date))
+                    if node.is_node_upcoming():
                         upcoming_chapters_count += 1
-                        upcoming_chapters_expected_days.append((
-                            node.planned_publication_date - datetime.datetime.
-                            today()).days)
-                    if (node.planned_publication_date <
-                        datetime.datetime.today()):
+                        upcoming_chapters_expected_days.append((int)((
+                            planned_publication_date_msecs -
+                            current_time_msecs) / (1000.0 * 3600 * 24)))
+                    if node.is_node_behind_schedule():
                         overdue_chapters_count += 1
 
             upcoming_chapters_expected_days.sort()

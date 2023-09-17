@@ -115,6 +115,14 @@ export default {
     "IncreasingUpdatedOn": "Most Recently Updated",
     "DecreasingUpdatedOn": "Least Recently Updated"
   },
+  "TOPIC_SKILL_DASHBOARD_SORTING_OPTIONS": {
+    "IncreasingCreatedOn": "Newly Created",
+    "DecreasingCreatedOn": "Oldest Created",
+    "IncreasingUpdatedOn": "Most Recently Updated",
+    "DecreasingUpdatedOn": "Least Recently Updated",
+    "DecreasingUpcomingLaunches": "Most Upcoming Launches",
+    "DecreasingOverdueLaunches": "Most Launches Behind Schedule"
+  },
 
   // Sorting categories for contributor admin dashboard.
   "CD_ADMIN_STATS_SORT_OPTIONS": {
@@ -129,7 +137,9 @@ export default {
     "IncreasingReviewedTranslations": "Lowest to Highest Reviewed Translations",
     "DecreasingReviewedTranslations": "Highest to Lowest Reviewed Translations",
     "IncreasingReviewedQuestions": "Lowest to Highest Reviewed Questions",
-    "DecreasingReviewedQuestions": "Highest to Lowest Reviewed Questions"
+    "DecreasingReviewedQuestions": "Highest to Lowest Reviewed Questions",
+    "DecreasingCoordinatorCounts": "Highest to Lowest Coordinators Count",
+    "IncreasingCoordinatorCounts": "Lowest to Highest Coordinators Count"
   },
   // These categories are shown in the library navbar. The categories should
   // be in sorted order.
@@ -411,12 +421,13 @@ export default {
     "story": ["#F8BF74", "#D68F78", "#8EBBB6", "#B3D8F1"]
   },
 
-  "ALLOWED_STORYNODE_STATUS": ["Draft", "Ready To Publish", "Published"],
-  "ALLOWED_STORYNODE_UNPUBLISHING_REASONS": ["BAD_CONTENT",
+  "ALLOWED_STORY_NODE_STATUS": ["Draft", "Ready To Publish", "Published"],
+  "ALLOWED_STORY_NODE_UNPUBLISHING_REASONS": ["BAD_CONTENT",
     "CHAPTER_NEEDS_SPLITTING"],
-  "STORYNODE_STATUS_PUBLISHED": "Published",
-  "STORYNODE_STATUS_READY_TO_PUBLISH": "Ready To Publish",
-  "STORYNODE_STATUS_DRAFT": "Draft",
+  "STORY_NODE_STATUS_PUBLISHED": "Published",
+  "STORY_NODE_STATUS_READY_TO_PUBLISH": "Ready To Publish",
+  "STORY_NODE_STATUS_DRAFT": "Draft",
+  "CHAPTER_PUBLICATION_NOTICE_PERIOD_IN_DAYS": 14,
 
   "ALLOWED_IMAGE_FORMATS": ["svg", "png", "jpeg", "jpg", "gif"],
   "MAX_ALLOWED_IMAGE_SIZE_IN_KB_FOR_BLOG": 1024,
@@ -6374,8 +6385,14 @@ export default {
   // Maximum allowed length of a username.
   "MAX_USERNAME_LENGTH": 30,
 
+  // Minimum allowed length of a blog post author's name.
+  "MIN_AUTHOR_NAME_LENGTH": 2,
+
   // Maximum allowed length of a blog post author's name.
   "MAX_AUTHOR_NAME_LENGTH": 35,
+
+  // Minimum allowed characters in a blog post author's bio.
+  "MIN_CHARS_IN_AUTHOR_BIO": 5,
 
   // Maximum allowed characters in a blog post author's bio.
   "MAX_CHARS_IN_AUTHOR_BIO": 250,
