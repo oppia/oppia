@@ -23,11 +23,11 @@ from core import feconf
 from core import utils
 from core.constants import constants
 from core.domain import change_domain
-from core.domain import config_services
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import fs_services
 from core.domain import html_validation_service
+from core.domain import platform_feature_services
 from core.domain import question_domain
 from core.domain import question_services
 from core.domain import skill_services
@@ -3204,12 +3204,16 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
             self.sample_language_code, 2)
         stats.set_translation_reviewer_count_for_language_code(
             self.sample_language_code, 1)
-        config_services.set_property(
-            'committer_id', 'max_number_of_suggestions_per_reviewer', 1)
+        swap_platform_parameter_value = self.swap_to_always_return(
+            platform_feature_services,
+            'get_platform_parameter_value',
+            1
+        )
 
-        reviewers_are_needed = (
-            stats.are_translation_reviewers_needed_for_lang_code(
-                self.sample_language_code))
+        with swap_platform_parameter_value:
+            reviewers_are_needed = (
+                stats.are_translation_reviewers_needed_for_lang_code(
+                    self.sample_language_code))
 
         self.assertTrue(reviewers_are_needed)
 
@@ -3221,12 +3225,16 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
             self.sample_language_code, 2)
         stats.set_translation_reviewer_count_for_language_code(
             self.sample_language_code, 2)
-        config_services.set_property(
-            'committer_id', 'max_number_of_suggestions_per_reviewer', 1)
+        swap_platform_parameter_value = self.swap_to_always_return(
+            platform_feature_services,
+            'get_platform_parameter_value',
+            1
+        )
 
-        reviewers_are_needed = (
-            stats.are_translation_reviewers_needed_for_lang_code(
-                self.sample_language_code))
+        with swap_platform_parameter_value:
+            reviewers_are_needed = (
+                stats.are_translation_reviewers_needed_for_lang_code(
+                    self.sample_language_code))
 
         self.assertFalse(reviewers_are_needed)
 
@@ -3238,12 +3246,16 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
             self.sample_language_code, 1)
         stats.set_translation_reviewer_count_for_language_code(
             self.sample_language_code, 2)
-        config_services.set_property(
-            'committer_id', 'max_number_of_suggestions_per_reviewer', 1)
+        swap_platform_parameter_value = self.swap_to_always_return(
+            platform_feature_services,
+            'get_platform_parameter_value',
+            1
+        )
 
-        reviewers_are_needed = (
-            stats.are_translation_reviewers_needed_for_lang_code(
-                self.sample_language_code))
+        with swap_platform_parameter_value:
+            reviewers_are_needed = (
+                stats.are_translation_reviewers_needed_for_lang_code(
+                    self.sample_language_code))
 
         self.assertFalse(reviewers_are_needed)
 
@@ -3282,10 +3294,14 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
         stats = suggestion_services.get_community_contribution_stats()
         stats.question_suggestion_count = 2
         stats.question_reviewer_count = 1
-        config_services.set_property(
-            'committer_id', 'max_number_of_suggestions_per_reviewer', 1)
+        swap_platform_parameter_value = self.swap_to_always_return(
+            platform_feature_services,
+            'get_platform_parameter_value',
+            1
+        )
 
-        reviewers_are_needed = stats.are_question_reviewers_needed()
+        with swap_platform_parameter_value:
+            reviewers_are_needed = stats.are_question_reviewers_needed()
 
         self.assertTrue(reviewers_are_needed)
 
@@ -3295,10 +3311,14 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
         stats = suggestion_services.get_community_contribution_stats()
         stats.question_suggestion_count = 2
         stats.question_reviewer_count = 2
-        config_services.set_property(
-            'committer_id', 'max_number_of_suggestions_per_reviewer', 1)
+        swap_platform_parameter_value = self.swap_to_always_return(
+            platform_feature_services,
+            'get_platform_parameter_value',
+            1
+        )
 
-        reviewers_are_needed = stats.are_question_reviewers_needed()
+        with swap_platform_parameter_value:
+            reviewers_are_needed = stats.are_question_reviewers_needed()
 
         self.assertFalse(reviewers_are_needed)
 
@@ -3308,10 +3328,14 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
         stats = suggestion_services.get_community_contribution_stats()
         stats.question_suggestion_count = 1
         stats.question_reviewer_count = 2
-        config_services.set_property(
-            'committer_id', 'max_number_of_suggestions_per_reviewer', 1)
+        swap_platform_parameter_value = self.swap_to_always_return(
+            platform_feature_services,
+            'get_platform_parameter_value',
+            1
+        )
 
-        reviewers_are_needed = stats.are_question_reviewers_needed()
+        with swap_platform_parameter_value:
+            reviewers_are_needed = stats.are_question_reviewers_needed()
 
         self.assertFalse(reviewers_are_needed)
 
