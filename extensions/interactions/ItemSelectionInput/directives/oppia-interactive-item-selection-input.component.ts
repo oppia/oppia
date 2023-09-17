@@ -165,10 +165,22 @@ export class InteractiveItemSelectionInputComponent implements OnInit {
     this.newQuestion = false;
     this.selectionCount = Object.keys(this.userSelections).filter(
       (obj) => this.userSelections[obj]).length;
-    this.preventAdditionalSelections = (
+    if (this.minAllowableSelectionCount === this.maxAllowableSelectionCount){
+      if (this.selectionCount < this.maxAllowableSelectionCount) {
+        this.exactSelections = true;
+        this.preventAdditionalSelections = (
+          this.selectionCount >= this.maxAllowableSelectionCount);
+      } else {
+        this.exactSelections = false;
+        this.preventAdditionalSelections = true;
+      }
+    } else if (this.minAllowableSelectionCount !== this.maxAllowableSelectionCount){
+          this.preventAdditionalSelections = (
       this.selectionCount >= this.maxAllowableSelectionCount);
-    this.notEnoughSelections = (
-      this.selectionCount < this.minAllowableSelectionCount);
+        this.notEnoughSelections = (
+      this.selectionCount < this.minAllowableSelectionCount && 
+        this.minAllowableSelectionCount !== this.maxAllowableSelectionCount);
+    }
     this.currentInteractionService.updateCurrentAnswer(this.getAnswers());
   }
 
