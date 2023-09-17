@@ -31,7 +31,6 @@ import { StateCard } from 'domain/state_card/state-card.model';
 import { InteractionAnswer, ItemSelectionAnswer } from 'interactions/answer-defs';
 import { InteractionSpecsKey } from 'pages/interaction-specs.constants';
 import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
-import { hasUncaughtExceptionCaptureCallback } from 'process';
 
 describe('oppiaInteractiveItemSelectionInput', function() {
   let component: InteractiveItemSelectionInputComponent;
@@ -317,7 +316,7 @@ describe('oppiaInteractiveItemSelectionInput', function() {
         '}' +
     ']';
       component.maxAllowableSelectionCountWithValue = '3';
-      component.minAllowableSelectionCountWithValue = '3';      
+      component.minAllowableSelectionCountWithValue = '3';
     });
 
     it('should initialise component when user adds interaction', () => {
