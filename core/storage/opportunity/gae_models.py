@@ -315,7 +315,7 @@ class PinnedOpportunityModel(base_models.BaseModel):
 
         Raises:
             Exception. There is already a pinned opportunity with
-            the given id.
+                the given id.
         """
         instance_id = cls._generate_id(user_id, language_code, topic_id)
         if cls.get_by_id(instance_id):
@@ -331,7 +331,12 @@ class PinnedOpportunityModel(base_models.BaseModel):
         return instance
 
     @classmethod
-    def get_model(cls, user_id: str, language_code: str, topic_id: str) -> Optional[
+    def get_model(
+        cls,
+        user_id: str,
+        language_code: str,
+        topic_id: str
+    ) -> Optional[
         PinnedOpportunityModel]:
         """Fetches the PinnedOpportunityModel instance from the datastore.
 
@@ -368,7 +373,7 @@ class PinnedOpportunityModel(base_models.BaseModel):
 
         Args:
             user_id: str. The ID of the user whose data should be
-            checked.
+                checked.
 
         Returns:
             bool. Whether any models refer to the given user ID.

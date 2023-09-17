@@ -335,19 +335,21 @@ class PinnedOpportunityModelTest(test_utils.GenericTestBase):
     def test_create_and_fetch_model(self) -> None:
         fetched_model = opportunity_models.PinnedOpportunityModel.get_model(
             self.user_id, self.language_code, self.topic_id)
-        assert fetched_model is not None, "Expected fetched_model to be not None"
+        assert fetched_model is not None, ('Expected' +
+        ' fetched_model to be not None')
         self.assertEqual(fetched_model.opportunity_id, self.opportunity_id_1)
 
         opportunity_models.PinnedOpportunityModel.create(
             'user_id_2', 'en', 'topic_id_1', 'opportunity_id_2')
 
-        fetched_model = opportunity_models.PinnedOpportunityModel.get_model(
-            'user_id_2', 'en', 'topic_id_1')
-        assert fetched_model is not None, "Expected fetched_model to be not None"
+        fetched_model = (opportunity_models.PinnedOpportunityModel.
+        get_model('user_id_2', 'en', 'topic_id_1'))
+        assert fetched_model is not None, ('Expected' +
+        ' fetched_model to be not None')
         self.assertEqual(fetched_model.opportunity_id, 'opportunity_id_2')
 
     def test_create_raises_exception_for_existing_instance(self) -> None:
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, 'There is already a pinned opportunity' +
             ' with the given id:'):
             opportunity_models.PinnedOpportunityModel.create(
@@ -399,10 +401,6 @@ class PinnedOpportunityModelTest(test_utils.GenericTestBase):
             'topic_id': base_models.EXPORT_POLICY.EXPORTED,
             'opportunity_id': base_models.EXPORT_POLICY.EXPORTED
         }
-        expected_export_policy = dict(super(
-            opportunity_models.PinnedOpportunityModel,
-            opportunity_models.PinnedOpportunityModel
-        ).get_export_policy(), **expected_export_policy)
 
         self.assertEqual(
             opportunity_models.PinnedOpportunityModel.get_export_policy(),

@@ -4252,6 +4252,7 @@ class WipeoutServiceDeletePinnedOpportunitiesModelsTest(
                 topic_id=self.TOPIC_ID
             ))
 
+
 class WipeoutServiceVerifyDeleteSuggestionModelsTests(
         test_utils.GenericTestBase):
     """Provides testing of the verification part of wipeout service."""
