@@ -140,10 +140,11 @@ describe('Drag and drop sort input interactive component', () => {
         new ElementRef(document.createElement('div')),
         new ElementRef(document.createElement('div')),
       ]);
+      //  Changes by Yogesh: 22/07/2021
       component.multipleItemsInSamePositionArray = [
-        '<p>choice 1</p>',
-        '<p>choice 2</p>',
-        '<p>choice 3</p>',
+        ['<p>choice 1</p>'],
+        ['<p>choice 2</p>'],
+        ['<p>choice 3</p>'],
       ];
 
       spyOn(component, 'setFocus');
