@@ -26,13 +26,13 @@ import { Units} from 'domain/objects/units-object.model';
 describe('NumberWithUnitsObjectFactory', () => {
   describe('number with units object factory', () => {
     let nwuof: NumberWithUnitsObjectFactory;
-    let uof: UnitsObjectFactory;
+    let uof: Units;
     let errors: (
       typeof ObjectsDomainConstants.NUMBER_WITH_UNITS_PARSING_ERROR_I18N_KEYS);
 
     beforeEach(() => {
       nwuof = new NumberWithUnitsObjectFactory(new Units());
-      uof = new UnitsObjectFactory();
+      uof = new Units;
       errors = ObjectsDomainConstants.NUMBER_WITH_UNITS_PARSING_ERROR_I18N_KEYS;
     });
 
