@@ -246,7 +246,7 @@ describe('NumberWithUnitsValidationService', () => {
         return null;
       },
       toDict: () => {
-        let uof = new Units();
+        let uof = Units;
         let tmp = new NumberWithUnits('real', 2.02, new Fraction(
           false, 0, 0, 1), uof.fromRawInputString(
           'm / s^2'));

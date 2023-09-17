@@ -21,7 +21,7 @@ import { NumberWithUnits, NumberWithUnitsObjectFactory } from
   'domain/objects/NumberWithUnitsObjectFactory';
 import { ObjectsDomainConstants } from
   'domain/objects/objects-domain.constants';
-import { Units, UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory';
+import { Units} from 'domain/objects/units-object.model';
 
 describe('NumberWithUnitsObjectFactory', () => {
   describe('number with units object factory', () => {
@@ -31,7 +31,7 @@ describe('NumberWithUnitsObjectFactory', () => {
       typeof ObjectsDomainConstants.NUMBER_WITH_UNITS_PARSING_ERROR_I18N_KEYS);
 
     beforeEach(() => {
-      nwuof = new NumberWithUnitsObjectFactory(new UnitsObjectFactory());
+      nwuof = new NumberWithUnitsObjectFactory(new Units());
       uof = new UnitsObjectFactory();
       errors = ObjectsDomainConstants.NUMBER_WITH_UNITS_PARSING_ERROR_I18N_KEYS;
     });
