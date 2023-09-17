@@ -313,7 +313,7 @@ describe('Contributor Admin Dashboard', function() {
     await releaseCoordinatorPage.getFeaturesTab();
     var CdAdminDashboardNewUiFlag = (
       await releaseCoordinatorPage.getCdAdminDashboardNewUiFeatureElement());
-    await releaseCoordinatorPage.enableFeatureForDev(
+    await releaseCoordinatorPage.enableFeature(
       CdAdminDashboardNewUiFlag);
 
     await users.logout();

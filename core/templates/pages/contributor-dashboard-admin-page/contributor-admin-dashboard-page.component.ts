@@ -49,7 +49,6 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
   questionReviewersCount: number = 0;
   CONTRIBUTION_TYPES!: string[];
   selection!: string;
-
   isQuestionCoordinator!: boolean;
   isTranslationCoordinator!: boolean;
 
