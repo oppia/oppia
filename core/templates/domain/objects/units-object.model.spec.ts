@@ -21,7 +21,6 @@ import { Units } from
   'domain/objects/units-object.model';
 
 describe('Units', () => {
-  let units: Units;
 
   beforeEach(() => {
     units = TestBed.get(Units);
@@ -133,9 +132,9 @@ describe('Units', () => {
   });
 
   it('should have units without char /, *, (, )', () => {
-    expect(Units.isunit('kg cm^3')).toBe(true);
-    expect(Units.isunit('/*')).toBe(false);
-    expect(Units.isunit('()')).toBe(false);
+    expect(Units.isUnit('kg cm^3')).toBe(true);
+    expect(Units.isUnit('/*')).toBe(false);
+    expect(Units.isUnit('()')).toBe(false);
   });
 
   it('should convert new units from the list', () => {
