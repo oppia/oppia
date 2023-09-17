@@ -31,7 +31,7 @@ import { NumberWithUnitsObjectFactory } from
   'domain/objects/NumberWithUnitsObjectFactory';
 import { SubtitledHtml } from
   'domain/exploration/subtitled-html.model';
-import { Units } from 'domain/objects/units-object.model';
+// import { Units } from 'domain/objects/units-object.model';
 import {
   DragAndDropAnswer,
   FractionAnswer,

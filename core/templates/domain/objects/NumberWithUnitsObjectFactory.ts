@@ -130,7 +130,6 @@ export class NumberWithUnits {
   providedIn: 'root'
 })
 export class NumberWithUnitsObjectFactory {
-
   createCurrencyUnits(): void {
     try {
       Units.createCurrencyUnits();
