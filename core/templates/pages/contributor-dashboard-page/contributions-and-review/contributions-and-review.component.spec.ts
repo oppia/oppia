@@ -37,6 +37,7 @@ import { QuestionObjectFactory } from 'domain/question/QuestionObjectFactory';
 import { FormatRtePreviewPipe } from 'filters/format-rte-preview.pipe';
 import { PlatformFeatureService } from 'services/platform-feature.service';
 import { OpportunitiesListComponent } from '../opportunities-list/opportunities-list.component';
+import { HtmlEscaperService } from 'services/html-escaper.service';
 
 
 class MockNgbModalRef {
@@ -84,6 +85,7 @@ describe('Contributions and review component', () => {
   var getUserCreatedQuestionSuggestionsAsyncSpy = null;
   let getUserContributionRightsDataAsyncSpy = null;
   let formatRtePreviewPipe: FormatRtePreviewPipe;
+  let htmlEscaperService: HtmlEscaperService;
   const mockActiveTopicEventEmitter = new EventEmitter();
 
   beforeEach(waitForAsync(() => {
@@ -103,6 +105,7 @@ describe('Contributions and review component', () => {
         MisconceptionObjectFactory,
         SkillBackendApiService,
         FormatRtePreviewPipe,
+        HtmlEscaperService,
         QuestionObjectFactory,
         SkillObjectFactory,
         CsrfTokenService,
@@ -134,6 +137,7 @@ describe('Contributions and review component', () => {
       ContributionOpportunitiesService);
     formatRtePreviewPipe = TestBed.inject(
       FormatRtePreviewPipe);
+    htmlEscaperService = TestBed.inject(HtmlEscaperService);
     translationTopicService = TestBed.inject(TranslationTopicService);
 
     spyOn(
@@ -719,19 +723,6 @@ describe('Contributions and review component', () => {
         // satisfy code coverage for resolveSuggestionSuccess().
         spyOn(alertsService, 'addSuccessMessage').and.stub();
 
-        let suggestion = {
-          change: {
-            skill_id: 'string',
-            question_dict: null,
-            skill_difficulty: null,
-            translation_html: ['suggestion_1', 'suggestion_2']
-          },
-          target_id: 'string;,',
-          suggestion_id: 'string;',
-          author_name: 'string;',
-        };
-
-        component.getTranslationSuggestionHeading(suggestion as Suggestion);
         component.resolveSuggestionSuccess('suggestion_id');
         tick();
 
@@ -1478,19 +1469,6 @@ describe('Contributions and review component', () => {
         .toHaveBeenCalled();
     }));
 
-    it('should get Translation Suggestion Heading', () => {
-      spyOn(formatRtePreviewPipe, 'transform').and.stub();
-      let value = {
-        change: {
-          translation_html: 'string'
-        }
-      };
-
-      component.getTranslationSuggestionHeading(value as Suggestion);
-
-      expect(formatRtePreviewPipe.transform).toHaveBeenCalled();
-    });
-
     it('should load opportunities correctly', () => {
       component.loadOpportunities().then(({opportunitiesDicts, more}) => {
         expect(Object.keys(component.contributions)).toContain('suggestion_1');
@@ -1597,8 +1575,10 @@ describe('Contributions and review component', () => {
 
     describe('when navigating to review tab', () => {
       it('should get in-review translation suggestions', fakeAsync(() => {
-        spyOn(component, 'getTranslationSuggestionHeading')
-          .and.returnValue('heading');
+        spyOn(formatRtePreviewPipe, 'transform')
+          .and.returnValue('Traducáú &amp;');
+        spyOn(htmlEscaperService, 'escapedStrToUnescapedStr')
+          .and.returnValue('Traducáú &');
         let suggestionIdToSuggestions = {
           suggestion: {
             suggestion: {
@@ -1609,7 +1589,7 @@ describe('Contributions and review component', () => {
               status: 'review',
               change: {
                 content_html: '<p>This is test para</p>',
-                translation_html: 'Traducáú'
+                translation_html: '<p>Traducáú &amp;</p>'
               }
             } as Suggestion,
             details: {
@@ -1629,7 +1609,7 @@ describe('Contributions and review component', () => {
         expect(component.getTranslationContributionsSummary(
           suggestionIdToSuggestions)).toEqual([{
           id: 'id',
-          heading: 'heading',
+          heading: 'Traducáú &',
           subheading: 'topic_name / story_title / chapter_title',
           labelText: 'Awaiting review',
           labelColor: '#eeeeee',
@@ -1639,8 +1619,6 @@ describe('Contributions and review component', () => {
       }));
 
       it('should get in-review question suggestions', fakeAsync(() => {
-        spyOn(component, 'getTranslationSuggestionHeading')
-          .and.returnValue('heading');
         spyOn(formatRtePreviewPipe, 'transform').and.returnValue('heading');
         let suggestionIdToSuggestions = {
           suggestion: {
