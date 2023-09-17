@@ -176,8 +176,8 @@ export class InteractiveDragAndDropSortInputComponent implements OnInit {
   }
 
   handleKeyDownmultipleItemsInSamePosition(
-    event: KeyboardEvent,
-    currentIndex: number): void {
+      event: KeyboardEvent,
+      currentIndex: number): void {
     let newIndex = currentIndex;
     if (event.key === 'ArrowDown') {
       event.preventDefault();

@@ -39,7 +39,7 @@ describe('Drag and drop sort input interactive component', () => {
 
   class MockInteractionAttributesExtractorService {
     getValuesFromAttributes(
-      interactionId: InteractionSpecsKey, attributes: Record<string, string>
+        interactionId: InteractionSpecsKey, attributes: Record<string, string>
     ) {
       return {
         choices: {
@@ -55,17 +55,17 @@ describe('Drag and drop sort input interactive component', () => {
 
   class MockCurrentInteractionService {
     onSubmit(
-      answer: DragAndDropAnswer, rulesService: CurrentInteractionService
+        answer: DragAndDropAnswer, rulesService: CurrentInteractionService
     ) { }
 
     registerCurrentInteraction(
-      submitAnswerFn: Function, validateExpressionFn: Function) {
+        submitAnswerFn: Function, validateExpressionFn: Function) {
       submitAnswerFn();
     }
   }
   class DragAndDropEventClass<T> {
     createInContainerEvent(
-      containerId: string, data: T[], fromIndex: number, toIndex: number
+        containerId: string, data: T[], fromIndex: number, toIndex: number
     ): CdkDragDrop<T[], T[]> {
       const event = this.createEvent(fromIndex, toIndex);
       const container = { id: containerId, data: data };
@@ -76,7 +76,7 @@ describe('Drag and drop sort input interactive component', () => {
     }
 
     createCrossContainerEvent(
-      from: ContainerModel<T>, to: ContainerModel<T>
+        from: ContainerModel<T>, to: ContainerModel<T>
     ): CdkDragDrop<T[], T[]> {
       const event = this.createEvent(from.index, to.index);
       event.container = this.createContainer(to);
@@ -86,7 +86,7 @@ describe('Drag and drop sort input interactive component', () => {
     }
 
     private createEvent(
-      previousIndex: number, currentIndex: number
+        previousIndex: number, currentIndex: number
     ): CdkDragDrop<T[], T[]> {
       return {
         previousIndex: previousIndex,
@@ -97,7 +97,7 @@ describe('Drag and drop sort input interactive component', () => {
     }
 
     private createContainer(
-      model: ContainerModel<T>
+        model: ContainerModel<T>
     ): CdkDropList<T[]> {
       const container = { id: model.id, data: model.data };
       return container as CdkDropList<T[]>;
@@ -179,8 +179,8 @@ describe('Drag and drop sort input interactive component', () => {
     });
 
     it('should increment newIndex when Tab key is pressed', () => {
-      const event = new KeyboardEvent('keydown',
-        { key: 'Tab', shiftKey: false });
+      const event = new KeyboardEvent(
+        'keydown', { key: 'Tab', shiftKey: false });
       const currentIndex = 1;
       component.activeItem = 1;
       component.listItems = new QueryList<ElementRef<HTMLDivElement>>();
@@ -200,8 +200,8 @@ describe('Drag and drop sort input interactive component', () => {
 
     it('should decrement newIndex when Shift + Tab keys are pressed',
       () => {
-        const event = new KeyboardEvent('keydown',
-          { key: 'Tab', shiftKey: true });
+        const event = new KeyboardEvent(
+          'keydown', { key: 'Tab', shiftKey: true });
         const currentIndex = 1;
         component.activeItem = 1;
 
