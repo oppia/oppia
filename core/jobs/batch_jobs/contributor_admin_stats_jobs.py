@@ -684,7 +684,8 @@ class GenerateContributorAdminStatsJob(base_jobs.JobBase):
         Returns:
             bool. True if topic doesn't exist and False if topic exists.
         """
-        topic = topic_fetchers.get_topic_by_id(topic_id, strict=False)
+        with datastore_services.get_ndb_context():
+            topic = topic_fetchers.get_topic_by_id(topic_id, strict=False)
 
         if topic is None:
             return True
