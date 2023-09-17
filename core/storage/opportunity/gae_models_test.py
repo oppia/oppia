@@ -335,17 +335,18 @@ class PinnedOpportunityModelTest(test_utils.GenericTestBase):
     def test_create_and_fetch_model(self) -> None:
         fetched_model = opportunity_models.PinnedOpportunityModel.get_model(
             self.user_id, self.language_code, self.topic_id)
-        assert fetched_model is not None, ('Expected' +
-        ' fetched_model to be not None')
+        assert fetched_model is not None, (
+            'Expected fetched_model to be not None')
         self.assertEqual(fetched_model.opportunity_id, self.opportunity_id_1)
 
         opportunity_models.PinnedOpportunityModel.create(
             'user_id_2', 'en', 'topic_id_1', 'opportunity_id_2')
 
-        fetched_model = (opportunity_models.PinnedOpportunityModel.
+        fetched_model = (
+            opportunity_models.PinnedOpportunityModel.
         get_model('user_id_2', 'en', 'topic_id_1'))
-        assert fetched_model is not None, ('Expected' +
-        ' fetched_model to be not None')
+        assert fetched_model is not None, (
+            'Expected fetched_model to be not None')
         self.assertEqual(fetched_model.opportunity_id, 'opportunity_id_2')
 
     def test_create_raises_exception_for_existing_instance(self) -> None:
@@ -399,7 +400,10 @@ class PinnedOpportunityModelTest(test_utils.GenericTestBase):
             'language_code': base_models.EXPORT_POLICY.EXPORTED,
             'user_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'topic_id': base_models.EXPORT_POLICY.EXPORTED,
-            'opportunity_id': base_models.EXPORT_POLICY.EXPORTED
+            'opportunity_id': base_models.EXPORT_POLICY.EXPORTED,
+            'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE
         }
 
         self.assertEqual(
