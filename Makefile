@@ -32,7 +32,7 @@ build: ## Builds the all docker setup.
 run-devserver: # Runs the dev-server
 	docker compose up angular-build -d
 	$(MAKE) update.package
-	docker cp oppia-angular-build:/app/oppia/node_modules ./node_modules
+	docker cp oppia-angular-build:/app/oppia/node_modules .
 	docker compose up dev-server -d --no-deps
 	$(MAKE) update.requirements
 	$(MAKE) run-offline
@@ -124,11 +124,13 @@ CHROME_VERSION := $(shell google-chrome --version | awk '{print $$3}')
 
 run_tests.e2e: ## Runs the e2e tests for the parsed suite
 	@echo 'Shutting down any previously started server.'
-	$(MAKE) stop 
+	$(MAKE) stop
+# Adding node to the path.
+	@cd .. && export PATH=$$PATH:$(shell pwd)/oppia_tools/node-16.13.0/bin/
 # Starting the development server for the e2e tests.
 	$(MAKE) start-devserver-for-tests
 	@echo 'Starting e2e test for the suite: $(suite)'
-	../oppia_tools/node-v16.13.0/bin/npx wdio ./core/tests/wdio.conf.js --suite $(suite) $(CHROME_VERSION) --params.devMode=True --capabilities[0].maxInstances=3
+	../oppia_tools/node-16.13.0/bin/npx wdio ./core/tests/wdio.conf.js --suite $(suite) $(CHROME_VERSION) --params.devMode=True --capabilities[0].maxInstances=3
 	$(MAKE) stop
 
 OS_NAME := $(shell uname)
@@ -175,11 +177,6 @@ install_node:
 	fi
 
 	@cd ../oppia_tools && \
-    for dir in node*; do \
-        if [ -d "$$dir" ]; then \
-            new_dir="node-v16.13.0"; \
-            mv "$$dir" "$$new_dir"; \
-        fi; \
-    done
+	find . -maxdepth 1 -type d -name 'node*' -exec mv {} node-16.13.0 \;
 
 	@echo "Node.js installation completed."

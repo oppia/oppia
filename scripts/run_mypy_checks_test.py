@@ -21,6 +21,7 @@ from __future__ import annotations
 import os
 import site
 import subprocess
+from core import feconf
 
 from core.tests import test_utils
 from scripts import install_third_party_libs
@@ -170,6 +171,16 @@ class MypyScriptChecks(test_utils.GenericTestBase):
             code, path = run_mypy_checks.install_mypy_prerequisites(False)
             self.assertEqual(code, 0)
             self.assertEqual(path, self.mypy_cmd_path)
+
+    def test_install_mypy_prerequisites(self) -> None:
+        with self.swap(feconf, 'OPPIA_IS_DOCKERIZED', True):
+            with self.popen_swap_success:
+                code, path = run_mypy_checks.install_mypy_prerequisites(True)
+                self.assertEqual(code, 0)
+                self.assertEqual(path, self.mypy_cmd_path)
+                code, path = run_mypy_checks.install_mypy_prerequisites(False)
+                self.assertEqual(code, 0)
+                self.assertEqual(path, self.mypy_cmd_path)
 
     def test_install_mypy_prerequisites_for_ci(self) -> None:
         with self.popen_swap_success:

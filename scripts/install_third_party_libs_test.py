@@ -25,7 +25,7 @@ import subprocess
 import tempfile
 import zipfile
 
-from core import utils
+from core import feconf, utils
 from core.tests import test_utils
 
 from typing import Final, List, Tuple
@@ -104,6 +104,16 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
 
         self.dir_exists_swap = self.swap(
             common, 'ensure_directory_exists', mock_ensure_directory_exists)
+
+    def test_install_third_party_main_under_docker(self) -> None:
+        feconf.OPPIA_IS_DOCKERIZED = True
+        with self.check_call_swap:
+            install_third_party_libs.main()
+
+    def test_install_third_party_main(self) -> None:
+        feconf.OPPIA_IS_DOCKERIZED = False
+        with self.check_call_swap:
+            install_third_party_libs.main()
 
     def test_tweak_yarn_executable(self) -> None:
         check_function_calls = {

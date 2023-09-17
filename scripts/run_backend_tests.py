@@ -72,8 +72,7 @@ install_third_party_libs.main()
 
 from . import common  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 from . import concurrent_task_utils  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
-if not feconf.OPPIA_IS_DOCKERIZED:
-    from . import servers  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
+from . import servers  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 
 COVERAGE_EXCLUSION_LIST_PATH: Final = os.path.join(
     os.getcwd(), 'scripts', 'backend_tests_incomplete_coverage.txt'
