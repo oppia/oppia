@@ -140,7 +140,6 @@ describe('Drag and drop sort input interactive component', () => {
         new ElementRef(document.createElement('div')),
         new ElementRef(document.createElement('div')),
       ]);
-      //  Changes by Yogesh
       component.multipleItemsInSamePositionArray = [
         ['<p>choice 1</p>'],
         ['<p>choice 2</p>'],
