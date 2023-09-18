@@ -266,6 +266,7 @@ describe('Ratings and recommendations component', () => {
 
   it('should submit user rating when user clicks on rating star', () => {
     spyOn(learnerViewRatingService, 'submitUserRating');
+    componentInstance.feedbackPopOver = mockNgbPopover;
     const userRating = 5;
 
     componentInstance.submitUserRating(userRating);
