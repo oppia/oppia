@@ -68,7 +68,7 @@ describe('Ratings and recommendations component', () => {
   let siteAnalyticsService: SiteAnalyticsService;
 
   const mockNgbPopover = jasmine.createSpyObj(
-    'NgbPopover', ['close', 'toggle']);
+    'NgbPopover', ['close', 'toggle', 'open']);
 
 
   class MockWindowRef {
