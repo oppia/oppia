@@ -444,7 +444,7 @@ describe('oppiaInteractiveItemSelectionInput', function() {
       expect(component.preventAdditionalSelections).toBeFalse();
       expect(component.notEnoughSelections).toBeFalse();
       expect(component.exactSelections).toBeTrue();
-      
+
       component.onToggleCheckbox();
 
       expect(component.newQuestion).toBe(false);
@@ -484,5 +484,5 @@ describe('oppiaInteractiveItemSelectionInput', function() {
         currentInteractionService.updateCurrentAnswer).toHaveBeenCalledOnceWith(
         ['ca_choices_1', 'ca_choices_2', 'ca_choices_3']);
     });
-  });  
+  });
 });
