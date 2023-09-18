@@ -100,6 +100,146 @@ describe('Translation Suggestion Review Modal Component', function() {
       null, null, new ElementRef({offsetHeight: 200}), null);
   });
 
+  describe('when initializing the modal ', () => {
+    const reviewable = true;
+    const subheading = 'topic_1 / story_1 / chapter_1';
+
+    const suggestion1 = {
+      author_name: 'author_name',
+      language_code: 'language_code',
+      last_updated_msecs: 1559074000000,
+      status: 'status',
+      suggestion_id: 'suggestion_1',
+      target_id: '1',
+      target_type: 'target_type',
+      suggestion_type: 'translate_content',
+      change: {
+        content_id: 'hint_1',
+        content_html: '<p>content</p><p>&nbsp;</p>',
+        translation_html: 'Tradução',
+        state_name: 'StateName',
+        cmd: 'edit_state_property',
+        data_format: 'html',
+        language_code: 'language_code',
+      },
+      exploration_content_html: '<p>content</p><p>&nbsp;</p>'
+    };
+    const suggestion2 = {
+      author_name: 'author_name',
+      language_code: 'language_code',
+      last_updated_msecs: 1559074000000,
+      status: 'status',
+      suggestion_id: 'suggestion_2',
+      target_id: '2',
+      target_type: 'target_type',
+      suggestion_type: 'translate_content',
+      change: {
+        content_id: 'hint_1',
+        content_html: '<p>content</p>',
+        translation_html: 'Tradução',
+        state_name: 'StateName',
+        cmd: 'edit_state_property',
+        data_format: 'html',
+        language_code: 'language_code',
+      },
+      exploration_content_html: '<p>content CHANGED</p>'
+    };
+    const suggestion3 = {
+      author_name: 'author_name',
+      language_code: 'language_code',
+      last_updated_msecs: 1559074000000,
+      status: 'status',
+      suggestion_id: 'suggestion_3',
+      target_id: '3',
+      target_type: 'target_type',
+      suggestion_type: 'translate_content',
+      change: {
+        content_id: 'hint_1',
+        content_html: '<p>content</p>',
+        translation_html: 'Tradução',
+        state_name: 'StateName',
+        cmd: 'edit_state_property',
+        data_format: 'html',
+        language_code: 'language_code',
+      },
+      exploration_content_html: '<p>content CHANGED</p>'
+    };
+
+    const contribution1 = {
+      suggestion: suggestion1,
+      details: {
+        topic_name: 'topic_1',
+        story_title: 'story_1',
+        chapter_title: 'chapter_1'
+      }
+    };
+    const contribution2 = {
+      suggestion: suggestion2,
+      details: {
+        topic_name: 'topic_2',
+        story_title: 'story_2',
+        chapter_title: 'chapter_2'
+      }
+    };
+    const contribution3 = {
+      suggestion: suggestion3,
+      details: {
+        topic_name: 'topic_3',
+        story_title: 'story_3',
+        chapter_title: 'chapter_3'
+      }
+    };
+
+    const suggestionIdToContribution = {
+      suggestion_1: contribution1,
+      suggestion_2: contribution2,
+      suggestion_3: contribution3
+    };
+    const editedContent = {
+      html: '<p>In Hindi</p>'
+    };
+
+    beforeEach(() => {
+      component.subheading = subheading;
+      component.reviewable = reviewable;
+      component.suggestionIdToContribution = angular.copy(
+        suggestionIdToContribution);
+      component.editedContent = editedContent;
+    });
+
+    it('should be able to navigate to both previous suggestion and ' +
+    'next suggestion if initial suggestion is in middle of list', () => {
+      component.initialSuggestionId = 'suggestion_2';
+      component.ngOnInit();
+
+      expect(component.activeSuggestionId).toBe('suggestion_2');
+      expect(component.skippedContributionIds).toEqual(['suggestion_1']);
+      expect(component.remainingContributionIds).toEqual(['suggestion_3']);
+    });
+
+    it('should be able to navigate to only previous suggestion ' +
+    'if initial suggestion is the last suggestion of the list', () => {
+      component.initialSuggestionId = 'suggestion_3';
+      component.ngOnInit();
+
+      expect(component.activeSuggestionId).toBe('suggestion_3');
+      expect(component.skippedContributionIds.sort()).toEqual(
+        ['suggestion_1', 'suggestion_2']);
+      expect(component.remainingContributionIds).toEqual([]);
+    });
+
+    it('should be able to navigate to only next suggestion ' +
+    'if initial suggestion is in first suggestion of the list', () => {
+      component.initialSuggestionId = 'suggestion_1';
+      component.ngOnInit();
+
+      expect(component.activeSuggestionId).toBe('suggestion_1');
+      expect(component.skippedContributionIds).toEqual([]);
+      expect(component.remainingContributionIds.sort()).toEqual(
+        ['suggestion_2', 'suggestion_3']);
+    });
+  });
+
   describe('when reviewing suggestion', function() {
     const reviewable = true;
     const subheading = 'topic_1 / story_1 / chapter_1';

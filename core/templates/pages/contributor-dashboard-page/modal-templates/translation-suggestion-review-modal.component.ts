@@ -86,7 +86,6 @@ enum ExpansionTabType {
   TRANSLATION
 }
 
-
 @Component({
   selector: 'oppia-translation-suggestion-review-modal',
   templateUrl: './translation-suggestion-review-modal.component.html',
@@ -199,9 +198,14 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
         .registerContributorDashboardViewSuggestionForReview('Translation');
       this.heading = 'Review Translation Contributions';
     }
+    const suggestionIds = Object.keys(this.suggestionIdToContribution);
+    const clickedSuggestionIndex = suggestionIds.indexOf(
+      this.activeSuggestionId);
+    this.skippedContributionIds = (
+      suggestionIds.slice(0, clickedSuggestionIndex));
     delete this.suggestionIdToContribution[this.initialSuggestionId];
-    this.remainingContributionIds = Object.keys(
-      this.suggestionIdToContribution);
+    this.remainingContributionIds = suggestionIds.slice(
+      clickedSuggestionIndex + 1, suggestionIds.length);
     this.remainingContributionIds.reverse();
     this.isLastItem = this.remainingContributionIds.length === 0;
     this.allContributions = this.suggestionIdToContribution;
