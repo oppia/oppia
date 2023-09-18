@@ -22,15 +22,15 @@ import datetime
 import logging
 
 from core import feconf
-from core import schema_utils
 from core import utils
 from core.constants import constants
 from core.domain import change_domain
-from core.domain import config_domain
 from core.domain import email_services
 from core.domain import html_cleaner
 from core.domain import platform_feature_services
+from core.domain import platform_parameter_domain
 from core.domain import platform_parameter_list
+from core.domain import platform_parameter_registry
 from core.domain import rights_domain
 from core.domain import story_domain
 from core.domain import subscription_services
@@ -57,6 +57,8 @@ if MYPY: # pragma: no cover
 app_identity_services = models.Registry.import_app_identity_services()
 transaction_services = models.Registry.import_transaction_services()
 secrets_services = models.Registry.import_secrets_services()
+
+PlatformParameterRegistry = platform_parameter_registry.Registry
 
 
 NEW_REVIEWER_EMAIL_DATA: Dict[str, Dict[str, str]] = {
@@ -111,82 +113,54 @@ REMOVED_REVIEWER_EMAIL_DATA: Dict[str, Dict[str, str]] = {
     }
 }
 
-NOTIFICATION_USER_IDS_LIST_SCHEMA: Dict[
-    str,
-    Union[
-        str,
-        Dict[str, Union[str, List[Dict[str, str]]]],
-        List[Dict[str, Union[str, int]]]
-    ]
-] = {
-    'type': schema_utils.SCHEMA_TYPE_LIST,
-    'items': {
-        'type': schema_utils.SCHEMA_TYPE_UNICODE,
-        'validators': [{
-            'id': 'is_valid_user_id',
-        }]
-    },
-    'validators': [{
-        'id': 'has_length_at_most',
-        'max_value': 5
-    }, {
-        'id': 'is_uniquified',
-    }]
-}
+EMAIL_SENDER_NAME: platform_parameter_domain.PlatformParameter = (
+    PlatformParameterRegistry.create_platform_parameter(
+        platform_parameter_list.ParamNames.EMAIL_SENDER_NAME,
+        'The default sender name for outgoing emails.',
+        platform_parameter_domain.DataTypes.STRING,
+        default='Site Admin'
+    )
+)
 
-EMAIL_HTML_BODY_SCHEMA: Dict[str, Union[str, Dict[str, int]]] = {
-    'type': schema_utils.SCHEMA_TYPE_UNICODE,
-    'ui_config': {
-        'rows': 20,
-    }
-}
-
-EMAIL_CONTENT_SCHEMA: Dict[
-    str,
-    Union[
-        str,
-        List[Dict[str, Union[str, Dict[str, Union[str, Dict[str, int]]]]]]
-    ]
-] = {
-    'type': schema_utils.SCHEMA_TYPE_DICT,
-    'properties': [{
-        'name': 'subject',
-        'schema': {
-            'type': schema_utils.SCHEMA_TYPE_UNICODE,
-        },
-    }, {
-        'name': 'html_body',
-        'schema': EMAIL_HTML_BODY_SCHEMA,
-    }],
-}
-
-EMAIL_SENDER_NAME: config_domain.ConfigProperty = config_domain.ConfigProperty(
-    'email_sender_name', {'type': 'unicode'},
-    'The default sender name for outgoing emails.', 'Site Admin')
-EMAIL_FOOTER: config_domain.ConfigProperty = config_domain.ConfigProperty(
-    'email_footer', {'type': 'unicode', 'ui_config': {'rows': 5}},
-    'The footer to append to all outgoing emails. (This should be written in '
-    'HTML and include an unsubscribe link.)',
-    'You can change your email preferences via the '
-    '<a href="%s%s">Preferences</a> page.' % (
-        feconf.OPPIA_SITE_URL, feconf.PREFERENCES_URL))
+EMAIL_FOOTER: platform_parameter_domain.PlatformParameter = (
+    PlatformParameterRegistry.create_platform_parameter(
+        platform_parameter_list.ParamNames.EMAIL_FOOTER,
+        'The footer to append to all outgoing emails. (This should '
+        'be written in HTML and include an unsubscribe link.)',
+        platform_parameter_domain.DataTypes.STRING,
+        default=(
+            'You can change your email preferences via the '
+            '<a href="%s%s">Preferences</a> page.' % (
+                feconf.OPPIA_SITE_URL, feconf.PREFERENCES_URL)
+        )
+    )
+)
 
 _PLACEHOLDER_SUBJECT: Final = 'THIS IS A PLACEHOLDER.'
 _PLACEHOLDER_HTML_BODY: Final = (
     'THIS IS A <b>PLACEHOLDER</b> AND SHOULD BE REPLACED.'
 )
 
-SIGNUP_EMAIL_CONTENT: config_domain.ConfigProperty = (
-    config_domain.ConfigProperty(
-        'signup_email_content', EMAIL_CONTENT_SCHEMA,
+SIGNUP_EMAIL_SUBJECT_CONTENT: platform_parameter_domain.PlatformParameter = (
+    PlatformParameterRegistry.create_platform_parameter(
+        platform_parameter_list.ParamNames.SIGNUP_EMAIL_SUBJECT_CONTENT,
+        'Content of email sent after a new user signs up. Set the email '
+        'subject. These emails are only sent if the functionality is enabled '
+        'in feconf.py.',
+        platform_parameter_domain.DataTypes.STRING,
+        default=_PLACEHOLDER_SUBJECT
+    )
+)
+
+SIGNUP_EMAIL_BODY_CONTENT: platform_parameter_domain.PlatformParameter = (
+    PlatformParameterRegistry.create_platform_parameter(
+        platform_parameter_list.ParamNames.SIGNUP_EMAIL_BODY_CONTENT,
         'Content of email sent after a new user signs up. (The email body '
         'should be written with HTML and not include a salutation or footer.) '
         'These emails are only sent if the functionality is enabled in '
         'feconf.py.',
-        {
-            'subject': _PLACEHOLDER_SUBJECT,
-            'html_body': _PLACEHOLDER_HTML_BODY,
-        }
+        platform_parameter_domain.DataTypes.STRING,
+        default=_PLACEHOLDER_HTML_BODY
     )
 )
 
@@ -225,28 +199,23 @@ EDITOR_ROLE_EMAIL_RIGHTS_FOR_ROLE: Dict[str, str] = {
     EXPLORATION_ROLE_PLAYTESTER: _EDITOR_ROLE_EMAIL_HTML_RIGHTS['can_play']
 }
 
-UNPUBLISH_EXPLORATION_EMAIL_HTML_BODY: config_domain.ConfigProperty = (
-    config_domain.ConfigProperty(
-        'unpublish_exploration_email_html_body', EMAIL_HTML_BODY_SCHEMA,
-        'Default content for the email sent after an exploration is unpublished'
-        ' by a moderator. These emails are only sent if the functionality is '
-        'enabled in feconf.py. Leave this field blank if emails should not be '
-        'sent.',
-        'I\'m writing to inform you that I have unpublished the above '
-        'exploration.'
+UNPUBLISH_EXPLORATION_EMAIL_HTML_BODY: (
+    platform_parameter_domain.PlatformParameter) = (
+        PlatformParameterRegistry.create_platform_parameter(
+            (
+                platform_parameter_list.ParamNames.
+                UNPUBLISH_EXPLORATION_EMAIL_HTML_BODY
+            ),
+            'Default content for the email sent after an exploration is '
+            'unpublished by a moderator. These emails are only sent if the '
+            'functionality is enabled in feconf.py. Leave this field blank '
+            'if emails should not be sent.',
+            platform_parameter_domain.DataTypes.STRING,
+            default=(
+                'I\'m writing to inform you that I have unpublished the above '
+                'exploration.')
+        )
     )
-)
-
-NOTIFICATION_USER_IDS_FOR_FAILED_TASKS_DEFAULT_VALUE: List[str] = []
-
-NOTIFICATION_USER_IDS_FOR_FAILED_TASKS: config_domain.ConfigProperty = (
-    config_domain.ConfigProperty(
-        'notification_user_ids_for_failed_tasks',
-        NOTIFICATION_USER_IDS_LIST_SCHEMA,
-        'User IDs to notify if an ML training task fails',
-        NOTIFICATION_USER_IDS_FOR_FAILED_TASKS_DEFAULT_VALUE
-    )
-)
 
 CONTRIBUTOR_DASHBOARD_REVIEWER_NOTIFICATION_EMAIL_DATA: Dict[str, str] = {
     'email_body_template': (
@@ -542,6 +511,8 @@ SENDER_VALIDATORS: Dict[str, Union[bool, Callable[[str], bool]]] = {
     feconf.BULK_EMAIL_INTENT_LEARNER_REENGAGEMENT: (
         lambda x: x == feconf.SYSTEM_COMMITTER_ID),
     feconf.BULK_EMAIL_INTENT_TEST: (
+        lambda x: x == feconf.SYSTEM_COMMITTER_ID),
+    feconf.EMAIL_INTENT_ML_JOB_FAILURE: (
         lambda x: x == feconf.SYSTEM_COMMITTER_ID)
 }
 
@@ -623,7 +594,12 @@ def _send_email(
     """
 
     if sender_name is None:
-        sender_name = EMAIL_SENDER_NAME.value
+        email_sender_name = (
+            platform_feature_services.get_platform_parameter_value(
+                EMAIL_SENDER_NAME.name)
+        )
+        assert isinstance(email_sender_name, str)
+        sender_name = email_sender_name
 
     require_sender_id_is_valid(intent, sender_id)
 
@@ -733,8 +709,7 @@ def _send_bulk_mail(
 
 
 def send_job_failure_email(job_id: str) -> None:
-    """Sends an email to admin email as well as any email addresses
-    specificed on the admin config page.
+    """Sends an email to admin regarding the ML job failure.
 
     Args:
         job_id: str. The Job ID of the failing job.
@@ -744,17 +719,18 @@ def send_job_failure_email(job_id: str) -> None:
         'ML job %s has failed. For more information,'
         'please visit the admin page at:\n'
         'https://www.oppia.org/admin#/jobs') % job_id)
-    send_mail_to_admin(mail_subject, mail_body)
-    recipient_ids = (
-        NOTIFICATION_USER_IDS_FOR_FAILED_TASKS.value)
-    bulk_email_model_id = email_models.BulkEmailModel.get_new_id('')
-    if recipient_ids:
-        _send_bulk_mail(
-            recipient_ids, feconf.SYSTEM_COMMITTER_ID,
-            feconf.BULK_EMAIL_INTENT_ML_JOB_FAILURE, mail_subject, mail_body,
-            feconf.SYSTEM_EMAIL_ADDRESS, feconf.SYSTEM_EMAIL_NAME,
-            bulk_email_model_id
-        )
+    admin_user_settings = user_services.get_user_settings_from_email(
+        feconf.ADMIN_EMAIL_ADDRESS)
+    # Rulling out the possibility of admin_user_settings is None for
+    # the mypy checks.
+    assert admin_user_settings is not None
+    _send_email(
+        admin_user_settings.user_id, feconf.SYSTEM_COMMITTER_ID,
+        feconf.EMAIL_INTENT_ML_JOB_FAILURE,
+        mail_subject, mail_body,
+        feconf.SYSTEM_EMAIL_ADDRESS, False,
+        feconf.SYSTEM_EMAIL_NAME
+    )
 
 
 def send_dummy_mail_to_admin(username: str) -> None:
@@ -807,30 +783,48 @@ def send_post_signup_email(
         test_for_duplicate_email: bool. For testing duplicate emails.
     """
 
+    email_subject_content = (
+        platform_feature_services.get_platform_parameter_value(
+            SIGNUP_EMAIL_SUBJECT_CONTENT.name)
+    )
+    # Here we use assert because the get_platform_parameter_value returns
+    # value of type platform_parameter_domain.PlatformDataTypes and we
+    # are sure that email_subject_content is of type str. This helps us
+    # avoid the mypy error.
+    assert isinstance(email_subject_content, str)
+    email_body_content = (
+        platform_feature_services.get_platform_parameter_value(
+            SIGNUP_EMAIL_BODY_CONTENT.name)
+    )
     if not test_for_duplicate_email:
-        for key, content in SIGNUP_EMAIL_CONTENT.value.items():
-            email_content_default_value = SIGNUP_EMAIL_CONTENT.default_value
-            # Here, we used assert to narrow down the type from various allowed
-            # default types to Dict[str, str] and we are sure that it is always
-            # going to be Dict type because at the time of initialization of
-            # SIGNUP_EMAIL_CONTENT we are providing Dict as a default value.
-            assert isinstance(email_content_default_value, dict)
-            if content == email_content_default_value[key]:
-                logging.error(
-                    'Please ensure that the value for the admin config '
-                    'property SIGNUP_EMAIL_CONTENT is set, before allowing '
-                    'post-signup emails to be sent.')
-                return
+        email_subject_content_default_value = (
+            SIGNUP_EMAIL_SUBJECT_CONTENT.default_value)
+        email_body_content_default_value = (
+            SIGNUP_EMAIL_BODY_CONTENT.default_value)
+        if email_subject_content_default_value == email_subject_content:
+            logging.error(
+                'Please ensure that the value for the admin platform '
+                'property SIGNUP_EMAIL_SUBJECT_CONTENT is set, before allowing '
+                'post-signup emails to be sent.'
+            )
+            return
+        if email_body_content_default_value == email_body_content:
+            logging.error(
+                'Please ensure that the value for the admin platform '
+                'property SIGNUP_EMAIL_BODY_CONTENT is set, before allowing '
+                'post-signup emails to be sent.'
+            )
+            return
 
     recipient_username = user_services.get_username(user_id)
-    email_subject = SIGNUP_EMAIL_CONTENT.value['subject']
+    email_footer = platform_feature_services.get_platform_parameter_value(
+        EMAIL_FOOTER.name)
     email_body = 'Hi %s,<br><br>%s<br><br>%s' % (
-        recipient_username, SIGNUP_EMAIL_CONTENT.value['html_body'],
-        EMAIL_FOOTER.value)
+        recipient_username, email_body_content, email_footer)
 
     _send_email(
         user_id, feconf.SYSTEM_COMMITTER_ID, feconf.EMAIL_INTENT_SIGNUP,
-        email_subject, email_body, feconf.NOREPLY_EMAIL_ADDRESS)
+        email_subject_content, email_body, feconf.NOREPLY_EMAIL_ADDRESS)
 
 
 def get_moderator_unpublish_exploration_email() -> str:
@@ -849,15 +843,13 @@ def get_moderator_unpublish_exploration_email() -> str:
     except utils.ValidationError:
         return ''
 
-    config_prop = config_domain.Registry.get_config_property(
-        'unpublish_exploration_email_html_body'
+    unpublish_exp_email_html_body = (
+        platform_feature_services.get_platform_parameter_value(
+            UNPUBLISH_EXPLORATION_EMAIL_HTML_BODY.name)
     )
-    # Ruling out the possibility of None for mypy type checking.
-    assert config_prop is not None
-    config_prop_value = config_prop.value
     # Ruling out the possibility of Any for mypy type checking.
-    assert isinstance(config_prop_value, str)
-    return config_prop_value
+    assert isinstance(unpublish_exp_email_html_body, str)
+    return unpublish_exp_email_html_body
 
 
 def require_moderator_email_prereqs_are_satisfied() -> None:
@@ -922,10 +914,12 @@ def send_moderator_action_email(
     # called.
     assert callable(email_signoff_html_fn)
     email_signoff_html = email_signoff_html_fn(sender_username)
+    email_footer = platform_feature_services.get_platform_parameter_value(
+        EMAIL_FOOTER.name)
     full_email_content = (
         '%s<br><br>%s<br><br>%s<br><br>%s' % (
             email_salutation_html, email_body, email_signoff_html,
-            EMAIL_FOOTER.value))
+            email_footer))
     _send_email(
         recipient_id, sender_id, intent, email_subject, full_email_content,
         feconf.SYSTEM_EMAIL_ADDRESS, bcc_admin=True)
@@ -1007,9 +1001,11 @@ def send_role_notification_email(
     rights_html = EDITOR_ROLE_EMAIL_RIGHTS_FOR_ROLE[role_description]
 
     email_subject = email_subject_template % exploration_title
+    email_footer = platform_feature_services.get_platform_parameter_value(
+        EMAIL_FOOTER.name)
     email_body = email_body_template % (
         recipient_username, inviter_username, role_description, exploration_id,
-        exploration_title, rights_html, exploration_id, EMAIL_FOOTER.value)
+        exploration_title, rights_html, exploration_id, email_footer)
 
     _send_email(
         recipient_id, feconf.SYSTEM_COMMITTER_ID,
@@ -1065,9 +1061,12 @@ def send_emails_to_subscribers(
         recipient_list)
     for index, username in enumerate(recipients_usernames):
         if recipients_preferences[index].can_receive_subscription_email:
+            email_footer = (
+                platform_feature_services.get_platform_parameter_value(
+                    EMAIL_FOOTER.name))
             email_body = email_body_template % (
                 username, creator_name, exploration_id,
-                exploration_title, EMAIL_FOOTER.value)
+                exploration_title, email_footer)
             _send_email(
                 recipient_list[index], feconf.SYSTEM_COMMITTER_ID,
                 feconf.EMAIL_INTENT_SUBSCRIPTION_NOTIFICATION,
@@ -1135,10 +1134,13 @@ def send_feedback_message_email(
     email_subject = email_subject_template % (
         (count_messages, 's') if count_messages > 1 else ('a', ''))
 
+    email_footer = platform_feature_services.get_platform_parameter_value(
+        EMAIL_FOOTER.name)
+
     email_body = email_body_template % (
         recipient_username, count_messages if count_messages > 1
         else 'a', 's' if count_messages > 1 else '', messages_html,
-        EMAIL_FOOTER.value)
+        email_footer)
 
     _send_email(
         recipient_id, feconf.SYSTEM_COMMITTER_ID,
@@ -1232,9 +1234,12 @@ def send_suggestion_email(
         recipient_username = user_services.get_username(recipient_id)
         # Send email only if recipient wants to receive.
         if can_users_receive_email[index]:
+            email_footer = (
+                platform_feature_services.get_platform_parameter_value(
+                    EMAIL_FOOTER.name))
             email_body = email_body_template % (
                 recipient_username, author_username, exploration_id,
-                exploration_title, exploration_id, EMAIL_FOOTER.value)
+                exploration_title, exploration_id, email_footer)
             _send_email(
                 recipient_id, feconf.SYSTEM_COMMITTER_ID,
                 feconf.EMAIL_INTENT_SUGGESTION_NOTIFICATION,
@@ -1287,9 +1292,11 @@ def send_instant_feedback_message_email(
     recipient_preferences = user_services.get_email_preferences(recipient_id)
 
     if recipient_preferences.can_receive_feedback_message_email:
+        email_footer = platform_feature_services.get_platform_parameter_value(
+            EMAIL_FOOTER.name)
         email_body = email_body_template % (
             recipient_username, thread_title, exploration_id,
-            exploration_title, sender_username, message, EMAIL_FOOTER.value)
+            exploration_title, sender_username, message, email_footer)
         _send_email(
             recipient_id, feconf.SYSTEM_COMMITTER_ID,
             feconf.EMAIL_INTENT_FEEDBACK_MESSAGE_NOTIFICATION, email_subject,
@@ -1330,9 +1337,12 @@ def send_flag_exploration_email(
 
     reporter_username = user_services.get_username(reporter_id)
 
+    email_footer = platform_feature_services.get_platform_parameter_value(
+        EMAIL_FOOTER.name)
+
     email_body = email_body_template % (
         reporter_username, exploration_title, report_text, exploration_id,
-        EMAIL_FOOTER.value)
+        email_footer)
 
     recipient_list = user_services.get_user_ids_by_role(
         feconf.ROLE_ID_MODERATOR)
@@ -1366,8 +1376,10 @@ def send_query_completion_email(recipient_id: str, query_id: str) -> None:
         '<br>%s')
 
     recipient_username = user_services.get_username(recipient_id)
+    email_footer = platform_feature_services.get_platform_parameter_value(
+        EMAIL_FOOTER.name)
     email_body = email_body_template % (
-        recipient_username, query_id, query_id, EMAIL_FOOTER.value)
+        recipient_username, query_id, query_id, email_footer)
     _send_email(
         recipient_id, feconf.SYSTEM_COMMITTER_ID,
         feconf.EMAIL_INTENT_QUERY_STATUS_NOTIFICATION, email_subject,
@@ -1400,8 +1412,10 @@ def send_query_failure_email(
         '<br>%s')
 
     recipient_username = user_services.get_username(recipient_id)
+    email_footer = platform_feature_services.get_platform_parameter_value(
+        EMAIL_FOOTER.name)
     email_body = email_body_template % (
-        recipient_username, query_id, EMAIL_FOOTER.value)
+        recipient_username, query_id, email_footer)
     _send_email(
         recipient_id, feconf.SYSTEM_COMMITTER_ID,
         feconf.EMAIL_INTENT_QUERY_STATUS_NOTIFICATION, email_subject,
@@ -1508,8 +1522,10 @@ def send_mail_to_onboard_new_reviewers(
 
     # Send email only if recipient wants to receive.
     if can_user_receive_email:
+        email_footer = platform_feature_services.get_platform_parameter_value(
+            EMAIL_FOOTER.name)
         email_body = email_body_template % (
-            recipient_username, category, category, EMAIL_FOOTER.value)
+            recipient_username, category, category, email_footer)
         _send_email(
             recipient_id, feconf.SYSTEM_COMMITTER_ID,
             feconf.EMAIL_INTENT_ONBOARD_REVIEWER,
@@ -1552,8 +1568,10 @@ def send_mail_to_notify_users_to_review(
 
     # Send email only if recipient wants to receive.
     if can_user_receive_email:
+        email_footer = platform_feature_services.get_platform_parameter_value(
+            EMAIL_FOOTER.name)
         email_body = email_body_template % (
-            recipient_username, category, EMAIL_FOOTER.value)
+            recipient_username, category, email_footer)
         _send_email(
             recipient_id, feconf.SYSTEM_COMMITTER_ID,
             feconf.EMAIL_INTENT_REVIEW_CREATOR_DASHBOARD_SUGGESTIONS,
@@ -1979,12 +1997,15 @@ def send_mail_to_notify_contributor_dashboard_reviewers(
                 _create_html_for_reviewable_suggestion_email_info(
                     reviewer_suggestion_email_info))
 
+        email_footer = platform_feature_services.get_platform_parameter_value(
+            EMAIL_FOOTER.name)
+
         email_body = email_body_template % (
             reviewer_usernames[index],
             feconf.OPPIA_SITE_URL,
             feconf.CONTRIBUTOR_DASHBOARD_URL,
             ''.join(suggestion_descriptions),
-            EMAIL_FOOTER.value
+            email_footer
         )
 
         _send_email(
