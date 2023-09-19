@@ -30,8 +30,8 @@ const usernameMethodValue = 'username';
 const roleMethodValue = 'role';
 
 // "View Contributor Dashboard Users" form elements.
-const viewContributorMethodSelect =
-  'select#view-contributor-method-select';
+const viewContributorFilterMethodSelect =
+  'select#view-contributor-filter-method-select';
 const viewContributerUsernameInput =
   'input#view-contributor-username-input';
 const viewContributorCategorySelect =
@@ -52,7 +52,7 @@ const addContributonRightsCategorySelect =
   'select#add-contribution-rights-category-select';
 const addContributonRightsLanguageDropdown =
   'select#add-contribution-rights-language-select';
-const addontributionRightsSubmitButton =
+const addContributionRightsSubmitButton =
    'button#add-contribution-rights-submit-button';
 
 // "Remove Contribution Rights" form elements.
@@ -78,13 +78,13 @@ module.exports = class TranslationAdmin extends baseUser {
    * @param {string} username - the username of the user.
    * @param {string} languageCode - the language code of the language to assign.
    */
-  async assignTranslationRightsToUserWithLanguageCode(username, languageCode) {
+  async addTranslationLanguageReviewRights(username, languageCode) {
     await this.type(addContributorUsernameInput, username);
     await this.select(
       addContributonRightsCategorySelect, translationRightValue);
     await this.select(
       addContributonRightsLanguageDropdown, 'string:' + languageCode);
-    await this.clickOn(addontributionRightsSubmitButton);
+    await this.clickOn(addContributionRightsSubmitButton);
 
     await this.page.waitForNetworkIdle();
   }
@@ -94,7 +94,7 @@ module.exports = class TranslationAdmin extends baseUser {
    * @param {string} username - the username of the user.
    * @param {string} languageCode - the language code of the language to revoke.
    */
-  async revokeTranslationRightsFromUserForLanguageCode(username, languageCode) {
+  async removeTranslationLanguageReviewRights(username, languageCode) {
     await this.type(revokeContributorUsernameInput, username);
     await this.select(
       revokeContributonRightsCategorySelect, translationRightValue);
@@ -106,11 +106,11 @@ module.exports = class TranslationAdmin extends baseUser {
   }
 
   /**
-   * Function to display contributon rights by user.
+   * Function to display contribution rights by user.
    * @param {string} username - the username of the user to view.
    */
-  async viewContributorRightsForUser(username) {
-    await this.select(viewContributorMethodSelect, usernameMethodValue);
+  async viewContributionRightsForUser(username) {
+    await this.select(viewContributorFilterMethodSelect, usernameMethodValue);
     await this.type(viewContributerUsernameInput, username);
     await this.clickOn(viewContributorSubmitButton);
 
@@ -122,7 +122,7 @@ module.exports = class TranslationAdmin extends baseUser {
    * @param {string} languageCode - the language option as an option value.
    */
   async viewContributorTranslationRightsByLanguageCode(languageCode) {
-    await this.select(viewContributorMethodSelect, roleMethodValue);
+    await this.select(viewContributorFilterMethodSelect, roleMethodValue);
     await this.select(viewContributorCategorySelect, translationRightValue);
     await this.select(viewContributorLanguageSelect, 'string:' + languageCode);
     await this.clickOn(viewContributorSubmitButton);
@@ -136,7 +136,7 @@ module.exports = class TranslationAdmin extends baseUser {
    */
   async expectDisplayedLanguagesToContain(language) {
     await this.page.waitForSelector(viewContributorLanguageResult);
-    let displayedLanguage = await this.page.$eval(
+    const displayedLanguage = await this.page.$eval(
       viewContributorLanguageResult,
       element => element.innerText);
     if (!displayedLanguage.includes(language)) {
@@ -154,7 +154,7 @@ module.exports = class TranslationAdmin extends baseUser {
    */
   async expectUserToBeDisplayed(username) {
     await this.page.waitForSelector(viewLanguageRoleUserResult);
-    let displayedUsers = await this.page.$eval(
+    const displayedUsers = await this.page.$eval(
       viewLanguageRoleUserResult,
       element => element.innerText
     );

@@ -13,8 +13,8 @@
 // limitations under the License.
 
 /**
- * @fileoverview Acceptance Test for translation admins to provide translation
- * rights from users.
+ * @fileoverview Acceptance Test for translation admins to add translation
+ * rights to users.
  */
 
 const userFactory = require(
@@ -38,9 +38,11 @@ describe('Translation Admin', function() {
         'translatorSpanish', 'translatorSpanish@example.com');
       await userFactory.closeBrowserForUser(translatorSpanish);
       await translationAdmin.navigateToContributorDashboardAdminPage();
-      await translationAdmin.assignTranslationRightsToUserWithLanguageCode(
+
+      await translationAdmin.addTranslationLanguageReviewRights(
         'translatorSpanish', 'es');
-      await translationAdmin.viewContributorRightsForUser('translatorSpanish');
+
+      await translationAdmin.viewContributionRightsForUser('translatorSpanish');
       await translationAdmin.expectDisplayedLanguagesToContain('Spanish');
       await translationAdmin.viewContributorTranslationRightsByLanguageCode(
         'es');

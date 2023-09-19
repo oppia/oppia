@@ -17,11 +17,11 @@
     <form class="form-horizontal" ng-submit="$ctrl.submitViewContributorUsersForm($ctrl.formData.viewContributionReviewers)">
       <legend class="text-center">View Contributor Dashboard Users</legend>
       <div class="d-xl-inline-flex form-group">
-        <label class="col-md-4 col-lg-4 col-sm-4 col-form-label" for="view-contributor-method-select">
+        <label class="col-md-4 col-lg-4 col-sm-4 col-form-label" for="view-contributor-filter-method-select">
           Select Method
         </label>
         <div class="col-md-8 ml-auto">
-          <select id="view-contributor-method-select"
+          <select id="view-contributor-filter-method-select"
                   ng-model="$ctrl.formData.viewContributionReviewers.filterCriterion"
                   class="form-control e2e-test-view-contribution-rights-method"
                   ng-change="$ctrl.clearResults()">
