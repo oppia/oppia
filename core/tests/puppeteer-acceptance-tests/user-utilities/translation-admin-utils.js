@@ -74,7 +74,7 @@ module.exports = class TranslationAdmin extends baseUser {
   }
 
   /**
-   * Function for assigning a translation right to a user.
+   * Function for adding a translation right to a user.
    * @param {string} username - the username of the user.
    * @param {string} languageCode - the language code of the language to assign.
    */
@@ -90,7 +90,7 @@ module.exports = class TranslationAdmin extends baseUser {
   }
 
   /**
-   * Function for revoking a translation right from a user.
+   * Function for removing a translation right from a user.
    * @param {string} username - the username of the user.
    * @param {string} languageCode - the language code of the language to revoke.
    */
@@ -170,7 +170,7 @@ module.exports = class TranslationAdmin extends baseUser {
    */
   async expectUserToNotBeDisplayed(username) {
     await this.page.waitForSelector(viewLanguageRoleUserResult);
-    let displayedUsers = await this.page.$eval(
+    const displayedUsers = await this.page.$eval(
       viewLanguageRoleUserResult,
       element => element.innerText
     );
