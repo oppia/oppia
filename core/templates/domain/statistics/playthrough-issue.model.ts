@@ -38,23 +38,26 @@ export interface MultipleIncorrectSubmissionsCustomizationArgs {
 
 // NOTE TO DEVELOPERS: Treat this as an implementation detail; do not export it.
 // This type takes one of the values of the above customization args based
-// on the type of IssueType.
-type IssueCustomizationArgs<IssueType=PlaythroughIssueType> = (
-  IssueType extends PlaythroughIssueType.EarlyQuit ? EarlyQuitCustomizationArgs
-    : IssueType extends PlaythroughIssueType.CyclicStateTransitions
-      ? CyclicStateTransitionsCustomizationArgs
-        : IssueType extends PlaythroughIssueType.MultipleIncorrectSubmissions
-          ? MultipleIncorrectSubmissionsCustomizationArgs : never);
+// on the type of PlaythroughIssueType.
+type IssueCustomizationArgs<PlaythroughIssueType> =
+  PlaythroughIssueType extends PlaythroughIssueType.EarlyQuit
+    ? EarlyQuitCustomizationArgs
+    : PlaythroughIssueType extends PlaythroughIssueType.CyclicStateTransitions
+    ? CyclicStateTransitionsCustomizationArgs
+    : PlaythroughIssueType extends PlaythroughIssueType
+      .MultipleIncorrectSubmissions
+    ? MultipleIncorrectSubmissionsCustomizationArgs
+    : never;
 
 // NOTE TO DEVELOPERS: Treat this as an implementation detail; do not export it.
-// This interface takes the type of backend dict according to the IssueType
-// parameter.
-interface PlaythroughIssueBackendDictBase<IssueType=PlaythroughIssueType> {
-  'issue_type': IssueType;
-  'issue_customization_args': IssueCustomizationArgs<IssueType>;
-  'playthrough_ids': string[];
-  'schema_version': number;
-  'is_valid': boolean;
+// This interface takes the type of backend dict according to the
+// PlaythroughIssueType.
+interface PlaythroughIssueBackendDictBase<PlaythroughIssueType> {
+  issue_type: PlaythroughIssueType;
+  issue_customization_args: IssueCustomizationArgs<PlaythroughIssueType>;
+  playthrough_ids: string[];
+  schema_version: number;
+  is_valid: boolean;
 }
 
 export type EarlyQuitPlaythroughIssueBackendDict = (
@@ -79,17 +82,18 @@ export type PlaythroughIssueBackendDict = (
 
 // NOTE TO DEVELOPERS: Treat this as an implementation detail; do not export it.
 // This class takes the type according to the IssueType parameter.
-abstract class PlaythroughIssueBase<IssueType=PlaythroughIssueType> {
+abstract class PlaythroughIssueBase<PlaythroughIssueType> {
   constructor(
-    public readonly issueType: IssueType,
-    public issueCustomizationArgs: IssueCustomizationArgs<IssueType>,
+    public readonly issueType: PlaythroughIssueType,
+    public issueCustomizationArgs: IssueCustomizationArgs<PlaythroughIssueType>,
     public playthroughIds: string[],
     public schemaVersion: number,
-    public isValid: boolean) { }
+    public isValid: boolean
+  ) {}
 
   abstract getStateNameWithIssue(): string;
 
-  toBackendDict(): PlaythroughIssueBackendDictBase<IssueType> {
+  toBackendDict(): PlaythroughIssueBackendDictBase<PlaythroughIssueType> {
     return {
       issue_type: this.issueType,
       issue_customization_args: this.issueCustomizationArgs,
