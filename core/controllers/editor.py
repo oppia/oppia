@@ -181,8 +181,6 @@ class ExplorationHandler(
         # 'apply_draft' and 'v'(version) are optional parameters because the
         # exploration history tab also uses this handler, and these parameters
         # are not used by that tab.
-        assert self.user_id is not None
-        assert self.normalized_request is not None
         version = self.normalized_request.get('v')
         apply_draft = self.normalized_request['apply_draft']
 
