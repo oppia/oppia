@@ -240,7 +240,7 @@ describe('Translator Overview component', () => {
   describe('when selected language is not exploration language', () => {
     beforeEach(() => {
       component.languageCode = 'hi';
-      explorationLanguageCodeService.init('en');;
+      explorationLanguageCodeService.init('en');
     });
 
     it('should show mode switcher if exploration is linked to story', () => {
