@@ -181,8 +181,8 @@ class ExplorationHandler(
         # 'apply_draft' and 'v'(version) are optional parameters because the
         # exploration history tab also uses this handler, and these parameters
         # are not used by that tab.
-        version = self.normalized_request.get('v')
-        apply_draft = self.normalized_request['apply_draft']
+        version = self.normalized_request.get('v') if self.normalized_request else None
+        apply_draft = self.normalized_request['apply_draft'] if self.normalized_request else None
 
         user_settings = user_services.get_user_settings(
             self.user_id, strict=False
@@ -198,7 +198,7 @@ class ExplorationHandler(
         try:
             exploration_data = exp_services.get_user_exploration_data(
                 self.user_id, exploration_id, apply_draft=apply_draft,
-                version=version)
+                version=version) if self.user_id else None
             exploration_data['show_state_editor_tutorial_on_load'] = bool(
                 self.user_id and not has_seen_editor_tutorial)
             exploration_data['show_state_translation_tutorial_on_load'] = bool(
