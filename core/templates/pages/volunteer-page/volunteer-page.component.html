@@ -1,11 +1,11 @@
 <div class="volunteer-page e2e-test-volunteer-page">
   <div class="row oppia-volunteer-banner">
     <div class="oppia-volunteer-banner-content flex-gt-md-55">
-      <h1 class="oppia-volunteer-h1" [innerHTML]="'I18N_VOLUNTEER_PAGE_SECTION_ONE' | translate"></h1>
+      <h1 class="oppia-volunteer-h1">{{ 'I18N_VOLUNTEER_PAGE_SECTION_ONE' | translate }}</h1>
 
       <div class="oppia-volunteer-content">
-        <p [innerHTML]="'I18N_VOLUNTEER_PAGE_SECTION_ONE_CONTENT_1' | translate"></p>
-        <p [innerHTML]="'I18N_VOLUNTEER_PAGE_SECTION_ONE_CONTENT_2' | translate"></p>
+        <p>{{ 'I18N_VOLUNTEER_PAGE_SECTION_ONE_CONTENT_1' | translate }}</p>
+        <p>{{ 'I18N_VOLUNTEER_PAGE_SECTION_ONE_CONTENT_2' | translate }}</p>
       </div>
     </div>
 
@@ -31,14 +31,14 @@
     <button class="btn">
       <a href="https://forms.gle/rhFYoLLSFr3JEZHy8"
          target="_blank"
-         rel="noopener"
-         [innerHTML]="'I18N_VOLUNTEER_PAGE_SECTION_ONE_BUTTON' | translate">
+         rel="noopener">
+         {{ 'I18N_VOLUNTEER_PAGE_SECTION_ONE_BUTTON' | translate }}
       </a>
     </button>
   </div>
 
   <div class="row oppia-volunteer-body">
-    <h3 class="oppia-volunteer-h3" [innerHTML]="'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION' | translate"></h3>
+    <h3 class="oppia-volunteer-h3">{{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION' | translate }}</h3>
 
     <div class="oppia-volunteer-tabs">
       <mat-tab-group mat-stretch-tabs mat-align-tabs="center">
@@ -69,16 +69,16 @@
 
             </div>
             <div class="col oppia-volunteer-tab-description">
-              <p [innerHTML]="'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_ART_CONTENT_1' | translate"></p>
-              <p [innerHTML]="'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_ART_CONTENT_2' | translate"></p>
+              <p>{{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_ART_CONTENT_1' | translate }}</p>
+              <p>{{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_ART_CONTENT_2' | translate }}</p>
 
               <div class="oppia-volunteer-dotted-spaced-line mb-5"><br></div>
 
               <p [innerHTML]="'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_ART_WHAT_WE' | translate "></p>
               <ul>
-                <li class="oppia-volunteer-page-description-list-item" [innerHTML]="'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_ART_WHAT_WE_1' | translate"></li>
-                <li class="oppia-volunteer-page-description-list-item" [innerHTML]="'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_ART_WHAT_WE_2' | translate"></li>
-                <li class="oppia-volunteer-page-description-list-item" [innerHTML]="'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_ART_WHAT_WE_3' | translate"></li>
+                <li class="oppia-volunteer-page-description-list-item">{{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_ART_WHAT_WE_1' | translate }}</li>
+                <li class="oppia-volunteer-page-description-list-item">{{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_ART_WHAT_WE_2' | translate }}</li>
+                <li class="oppia-volunteer-page-description-list-item">{{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_ART_WHAT_WE_3' | translate }}</li>
               </ul>
 
             </div>
@@ -117,9 +117,9 @@
 
               <p [innerHTML]="'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_DEVELOPMENT_WHAT_WE' | translate"></p>
               <ul>
-                <li class="oppia-volunteer-page-description-list-item" [innerHTML]="'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_DEVELOPMENT_WHAT_WE_1' | translate"></li>
-                <li class="oppia-volunteer-page-description-list-item" [innerHTML]="'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_DEVELOPMENT_WHAT_WE_2' | translate"></li>
-                <li class="oppia-volunteer-page-description-list-item" [innerHTML]="'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_DEVELOPMENT_WHAT_WE_3' | translate"></li>
+                <li class="oppia-volunteer-page-description-list-item">{{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_DEVELOPMENT_WHAT_WE_1' | translate }}</li>
+                <li class="oppia-volunteer-page-description-list-item">{{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_DEVELOPMENT_WHAT_WE_2' | translate }}</li>
+                <li class="oppia-volunteer-page-description-list-item">{{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_DEVELOPMENT_WHAT_WE_3' | translate }}</li>
               </ul>
 
             </div>
@@ -152,16 +152,16 @@
 
             </div>
             <div class="col oppia-volunteer-tab-description">
-              <p [innerHTML]="'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_LEARNER_FEEDBACK_CONTENT_1' | translate"></p>
-              <p [innerHTML]="'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_LEARNER_FEEDBACK_CONTENT_2' | translate"></p>
+              <p>{{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_LEARNER_FEEDBACK_CONTENT_1' | translate }}</p>
+              <p>{{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_LEARNER_FEEDBACK_CONTENT_2' | translate }}</p>
 
               <div class="oppia-volunteer-dotted-spaced-line mb-5"><br></div>
 
               <p [innerHTML]="'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_LEARNER_FEEDBACK_WHAT_WE' | translate "></p>
               <ul>
-                <li class="oppia-volunteer-page-description-list-item" [innerHTML]="'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_LEARNER_FEEDBACK_WHAT_WE_1' | translate"></li>
-                <li class="oppia-volunteer-page-description-list-item" [innerHTML]="'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_LEARNER_FEEDBACK_WHAT_WE_2' | translate"></li>
-                <li class="oppia-volunteer-page-description-list-item" [innerHTML]="'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_LEARNER_FEEDBACK_WHAT_WE_3' | translate"></li>
+                <li class="oppia-volunteer-page-description-list-item">{{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_LEARNER_FEEDBACK_WHAT_WE_1' | translate }}</li>
+                <li class="oppia-volunteer-page-description-list-item">{{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_LEARNER_FEEDBACK_WHAT_WE_2' | translate }}</li>
+                <li class="oppia-volunteer-page-description-list-item">{{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_LEARNER_FEEDBACK_WHAT_WE_3' | translate }}</li>
               </ul>
 
             </div>
@@ -194,16 +194,16 @@
 
             </div>
             <div class="col oppia-volunteer-tab-description">
-              <p [innerHTML]="'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_LESSON_CREATION_CONTENT_1' | translate"></p>
-              <p [innerHTML]="'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_LESSON_CREATION_CONTENT_2' | translate"></p>
+              <p>{{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_LESSON_CREATION_CONTENT_1' | translate }}</p>
+              <p>{{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_LESSON_CREATION_CONTENT_2' | translate }}</p>
 
               <div class="oppia-volunteer-dotted-spaced-line mb-5"><br></div>
 
               <p [innerHTML]="'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_LESSON_CREATION_WHAT_WE' | translate "></p>
               <ul>
-                <li class="oppia-volunteer-page-description-list-item" [innerHTML]="'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_LESSON_CREATION_WHAT_WE_1' | translate"></li>
-                <li class="oppia-volunteer-page-description-list-item" [innerHTML]="'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_LESSON_CREATION_WHAT_WE_2' | translate"></li>
-                <li class="oppia-volunteer-page-description-list-item" [innerHTML]="'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_LESSON_CREATION_WHAT_WE_3' | translate"></li>
+                <li class="oppia-volunteer-page-description-list-item">{{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_LESSON_CREATION_WHAT_WE_1' | translate }}</li>
+                <li class="oppia-volunteer-page-description-list-item">{{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_LESSON_CREATION_WHAT_WE_2' | translate }}</li>
+                <li class="oppia-volunteer-page-description-list-item">{{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_LESSON_CREATION_WHAT_WE_3' | translate }}</li>
               </ul>
 
             </div>
