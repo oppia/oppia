@@ -32,7 +32,7 @@ describe('Translation Admin', function() {
       await userFactory.createNewTranslationAdmin('translationAdm');
   }, DEFAULT_SPEC_TIMEOUT);
 
-  it('should be able to revoke translation rights from user.',
+  it('should be able to remove translation rights from user.',
     async function() {
       let translatorSpanish = await userFactory.createNewGuestUser(
         'translatorSpanish', 'translatorSpanish@example.com');

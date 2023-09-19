@@ -56,14 +56,14 @@ const addContributionRightsSubmitButton =
    'button#add-contribution-rights-submit-button';
 
 // "Remove Contribution Rights" form elements.
-const revokeContributorUsernameInput =
-  'input#revoke-contribution-rights-user-input';
-const revokeContributonRightsCategorySelect =
-  'select#revoke-contribution-rights-category-select';
-const revokeContributonRightsLanguageSelect =
-  'select#revoke-contribution-rights-language-select';
-const revokeContributionRightsSubmitButton =
-  'button#revoke-contribution-rights-submit-button';
+const removeContributorUsernameInput =
+  'input#remove-contribution-rights-user-input';
+const removeContributonRightsCategorySelect =
+  'select#remove-contribution-rights-category-select';
+const removeContributonRightsLanguageSelect =
+  'select#remove-contribution-rights-language-select';
+const removeContributionRightsSubmitButton =
+  'button#remove-contribution-rights-submit-button';
 
 module.exports = class TranslationAdmin extends baseUser {
   /**
@@ -76,7 +76,7 @@ module.exports = class TranslationAdmin extends baseUser {
   /**
    * Function for adding a translation right to a user.
    * @param {string} username - the username of the user.
-   * @param {string} languageCode - the language code of the language to assign.
+   * @param {string} languageCode - the language code of the language to add.
    */
   async addTranslationLanguageReviewRights(username, languageCode) {
     await this.type(addContributorUsernameInput, username);
@@ -92,15 +92,15 @@ module.exports = class TranslationAdmin extends baseUser {
   /**
    * Function for removing a translation right from a user.
    * @param {string} username - the username of the user.
-   * @param {string} languageCode - the language code of the language to revoke.
+   * @param {string} languageCode - the language code of the language to remove.
    */
   async removeTranslationLanguageReviewRights(username, languageCode) {
-    await this.type(revokeContributorUsernameInput, username);
+    await this.type(removeContributorUsernameInput, username);
     await this.select(
-      revokeContributonRightsCategorySelect, translationRightValue);
+      removeContributonRightsCategorySelect, translationRightValue);
     await this.select(
-      revokeContributonRightsLanguageSelect, 'string:' + languageCode);
-    await this.clickOn(revokeContributionRightsSubmitButton);
+      removeContributonRightsLanguageSelect, 'string:' + languageCode);
+    await this.clickOn(removeContributionRightsSubmitButton);
 
     await this.page.waitForNetworkIdle();
   }

@@ -164,10 +164,10 @@
     <form class="form-horizontal" ng-submit="$ctrl.submitRemoveContributionRightsForm($ctrl.formData.removeContributionReviewer)">
       <legend class="text-center">Remove Contribution Rights</legend>
       <div class="d-xl-inline-flex form-group">
-        <label for="revoke-contribution-rights-user-input" class="col-md-4 col-lg-4 col-sm-4 col-form-label">Enter Username</label>
+        <label for="remove-contribution-rights-user-input" class="col-md-4 col-lg-4 col-sm-4 col-form-label">Enter Username</label>
         <div class="col-md-8 col-lg-8 col-sm-8 ml-auto">
           <input type="text"
-                 id="revoke-contribution-rights-user-input"
+                 id="remove-contribution-rights-user-input"
                  class="form-control e2e-test-form-contributor-username"
                  placeholder="Enter username"
                  ng-model="$ctrl.formData.removeContributionReviewer.username">
@@ -175,12 +175,12 @@
       </div>
 
       <div class="d-xl-inline-flex form-group">
-        <label for="revoke-contribution-rights-category-select"
+        <label for="remove-contribution-rights-category-select"
                class="col-md-4 col-lg-4 col-sm-4 col-form-label">
           Remove from
         </label>
         <div class="col-md-8 col-lg-8 col-sm-8 ml-auto">
-          <select id="revoke-contribution-rights-category-select"
+          <select id="remove-contribution-rights-category-select"
                   ng-options="value as key for (key, value) in $ctrl.CONTRIBUTION_RIGHT_CATEGORIES"
                   ng-model="$ctrl.formData.removeContributionReviewer.category"
                   class="form-control">
@@ -190,19 +190,19 @@
 
       <div class="d-xl-inline-flex form-group"
            ng-if="$ctrl.isLanguageSpecificReviewCategory($ctrl.formData.removeContributionReviewer.category)">
-        <label for="revoke-contribution-rights-language-select"
+        <label for="remove-contribution-rights-language-select"
                class="col-md-4 col-lg-4 col-sm-4 col-form-label">
           Select language
         </label>
         <div class="col-md-8 col-lg-8 col-sm-8 ml-auto">
-          <select id="revoke-contribution-rights-language-select"
+          <select id="remove-contribution-rights-language-select"
                   ng-model="$ctrl.formData.removeContributionReviewer.languageCode"
                   class="form-control e2e-test-form-language-select"
                   ng-options="language.id as language.description for language in $ctrl.languageCodesAndDescriptions">
           </select>
         </div>
       </div>
-      <button id="revoke-contribution-rights-submit-button"
+      <button id="remove-contribution-rights-submit-button"
               type="submit"
               class="btn btn-success e2e-test-contribution-rights-form-submit-button"
               ng-disabled="!$ctrl.formData.removeContributionReviewer.isValid()" value="update role">Remove Rights
