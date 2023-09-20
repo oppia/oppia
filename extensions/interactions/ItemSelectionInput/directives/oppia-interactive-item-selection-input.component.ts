@@ -174,13 +174,13 @@ export class InteractiveItemSelectionInputComponent implements OnInit {
         this.exactSelections = false;
         this.preventAdditionalSelections = true;
       }
-    } else if (this.minAllowableSelectionCount !==
-      this.maxAllowableSelectionCount) {
+    } else {
       this.preventAdditionalSelections = (
         this.selectionCount >= this.maxAllowableSelectionCount);
       this.notEnoughSelections = (
         this.selectionCount < this.minAllowableSelectionCount &&
         this.minAllowableSelectionCount !== this.maxAllowableSelectionCount);
+      this.exactSelections = false;
     }
     this.currentInteractionService.updateCurrentAnswer(this.getAnswers());
   }
