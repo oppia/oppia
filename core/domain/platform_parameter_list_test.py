@@ -61,6 +61,7 @@ class ExistingPlatformParameterValidityTests(test_utils.GenericTestBase):
                             ),
                             'promo_bar_enabled',
                             'promo_bar_message',
+                            'record_playthrough_probability',
                             'serial_chapter_launch_curriculum_admin_view',
                             'serial_chapter_launch_learner_view',
                             'show_feedback_updates_in_profile_pic_dropdown',
