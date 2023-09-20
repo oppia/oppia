@@ -237,6 +237,27 @@ describe('Translator Overview component', () => {
       });
     });
 
+  describe('when selected language is not exploration language', () => {
+    beforeEach(() => {
+      component.languageCode = 'hi';
+      explorationLanguageCodeService.init('en');
+    });
+
+    it('should show mode switcher if exploration is linked to story', () => {
+      spyOn(contextService, 'isExplorationLinkedToStory').and.returnValue(true);
+      expect(component.canShowTabModeSwitcher()).toBeTrue;
+    });
+
+    it('should not show mode switcher if exploration is not linked to story',
+      () => {
+        spyOn(contextService, 'isExplorationLinkedToStory').and.returnValue(
+          false
+        );
+        expect(component.canShowTabModeSwitcher()).toBeFalse;
+      }
+    );
+  });
+
   it('should change to voiceover active mode when changing translation tab',
     fakeAsync(() => {
       spyOn(userExplorationPermissionsService, 'getPermissionsAsync').and
