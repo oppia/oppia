@@ -239,6 +239,7 @@ class ConfigProperty:
     - promo_bar_enabled.
     - promo_bar_message.
     - publicize_exploration_email_html_body.
+    - record_playthrough_probability.
     - sharing_options.
     - sharing_options_twitter_text.
     - show_translation_size.
@@ -478,7 +479,3 @@ CLASSROOM_PAGES_DATA = ConfigProperty(
         'topic_list_intro': ''
     }]
 )
-
-RECORD_PLAYTHROUGH_PROBABILITY = ConfigProperty(
-    'record_playthrough_probability', FLOAT_SCHEMA,
-    'The probability of recording playthroughs', 0.2)
