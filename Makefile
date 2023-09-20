@@ -32,6 +32,7 @@ build: ## Builds the all docker setup.
 run-devserver: # Runs the dev-server
 	docker compose up angular-build -d
 	$(MAKE) update.package
+	docker compose stop angular-build
 	docker cp oppia-angular-build:/app/oppia/node_modules .
 	docker compose up dev-server -d --no-deps
 	$(MAKE) update.requirements
