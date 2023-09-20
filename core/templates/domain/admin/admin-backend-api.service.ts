@@ -91,7 +91,6 @@ export interface ConfigProperty {
 
 export interface ConfigPropertyValues {
   'classroom_pages_data': ClassroomPageData;
-  'record_playthrough_probability': number;
 }
 
 export interface AdminPageDataBackendDict {

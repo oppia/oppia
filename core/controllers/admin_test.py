@@ -112,22 +112,31 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
 
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
-        new_config_value = 0.4
+        new_config_value = [{
+            'name': 'math',
+            'url_fragment': 'math',
+            'topic_ids': [],
+            'course_details': 'Detailed math classroom.',
+            'topic_list_intro': ''
+        }]
 
         response_dict = self.get_json('/adminhandler')
         response_config_properties = response_dict['config_properties']
         self.assertDictContainsSubset({
-            'value': 0.2,
+            'value': [{
+                'name': 'math',
+                'url_fragment': 'math',
+                'topic_ids': [],
+                'course_details': '',
+                'topic_list_intro': ''
+            }],
         }, response_config_properties[
-            config_domain.
-            RECORD_PLAYTHROUGH_PROBABILITY.name])
+            config_domain.CLASSROOM_PAGES_DATA.name])
 
         payload = {
             'action': 'save_config_properties',
             'new_config_property_values': {
-                config_domain.
-                RECORD_PLAYTHROUGH_PROBABILITY.name: (
-                    new_config_value),
+                config_domain.CLASSROOM_PAGES_DATA.name: new_config_value,
             }
         }
         self.post_json('/adminhandler', payload, csrf_token=csrf_token)
@@ -137,8 +146,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         self.assertDictContainsSubset({
             'value': new_config_value,
         }, response_config_properties[
-            config_domain.
-            RECORD_PLAYTHROUGH_PROBABILITY.name])
+            config_domain.CLASSROOM_PAGES_DATA.name])
 
         self.logout()
 
@@ -808,23 +816,44 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         csrf_token = self.get_new_csrf_token()
 
         config_services.set_property(
-            self.admin_id, 'record_playthrough_probability', 0.5)
+            self.admin_id, 'classroom_pages_data', [{
+                'name': 'math',
+                'url_fragment': 'math',
+                'topic_ids': [],
+                'course_details': 'Detailed math classroom.',
+                'topic_list_intro': ''
+            }]
+        )
         self.assertEqual(
-            config_domain.RECORD_PLAYTHROUGH_PROBABILITY.value, 0.5)
+            config_domain.CLASSROOM_PAGES_DATA.value, [{
+                'name': 'math',
+                'url_fragment': 'math',
+                'topic_ids': [],
+                'course_details': 'Detailed math classroom.',
+                'topic_list_intro': ''
+            }]
+        )
 
         with self.swap(logging, 'info', _mock_logging_function):
             self.post_json(
                 '/adminhandler', {
                     'action': 'revert_config_property',
-                    'config_property_id': 'record_playthrough_probability'
+                    'config_property_id': 'classroom_pages_data'
                 }, csrf_token=csrf_token)
 
         self.assertEqual(
-            config_domain.RECORD_PLAYTHROUGH_PROBABILITY.value, 0.2)
+            config_domain.CLASSROOM_PAGES_DATA.value, [{
+                'name': 'math',
+                'url_fragment': 'math',
+                'topic_ids': [],
+                'course_details': '',
+                'topic_list_intro': ''
+            }]
+        )
         self.assertEqual(
             observed_log_messages,
             ['[ADMIN] %s reverted config property: '
-             'record_playthrough_probability' % self.admin_id])
+             'classroom_pages_data' % self.admin_id])
 
         self.logout()
 

@@ -134,7 +134,13 @@ class ValidateNewConfigPropertyValuesTests(test_utils.GenericTestBase):
 
     def test_valid_object_raises_no_exception(self) -> None:
         config_properties = {
-            'record_playthrough_probability': 0.3,
+            'classroom_pages_data': [{
+                'name': 'math',
+                'url_fragment': 'math',
+                'topic_ids': [],
+                'course_details': 'Detailed math classroom.',
+                'topic_list_intro': ''
+            }]
         }
         domain_objects_validator.validate_new_config_property_values(
             config_properties)
