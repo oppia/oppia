@@ -70,11 +70,6 @@ export interface ModelsRelatedToUserBackendResponse {
   'related_models_exist': boolean;
 }
 
-export interface SignupEmailContent {
-  'html_body': string;
-  'subject': string;
-}
-
 export interface ClassroomPageData {
   'name': string;
   'topic_ids': string[];
@@ -96,17 +91,6 @@ export interface ConfigProperty {
 
 export interface ConfigPropertyValues {
   'classroom_pages_data': ClassroomPageData;
-  'contributor_dashboard_reviewer_emails_is_enabled': boolean;
-  'email_footer': string;
-  'email_sender_name': string;
-  'enable_admin_notifications_for_reviewer_shortage': boolean;
-  'max_number_of_suggestions_per_reviewer': number;
-  'notification_user_ids_for_failed_tasks': string[];
-  'notify_admins_suggestions_waiting_too_long_is_enabled': boolean;
-  'oppia_csrf_secret': string;
-  'record_playthrough_probability': number;
-  'signup_email_content': SignupEmailContent;
-  'unpublish_exploration_email_html_body': string;
 }
 
 export interface AdminPageDataBackendDict {

@@ -30,7 +30,7 @@ module.exports = {
         {
           'matchingUrlPattern': '^http://localhost:8181/preferences$',
           'assertions': {
-            'categories:accessibility': ['error', {'minScore': 0.85}]
+            'categories:accessibility': ['error', {'minScore': 1}]
           }
         },
         {

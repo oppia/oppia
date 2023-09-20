@@ -39,7 +39,8 @@ export class OppiaFooterComponent {
 
   SHORT_COMMIT_HASH = AppConstants.SHORT_COMMIT_HASH;
 
-  versionInformationIsShown: boolean = this.router.url === '/about';
+  versionInformationIsShown: boolean = (
+    this.router.url === '/about' && !AppConstants.DEV_MODE);
 
   constructor(
     private platformFeatureService: PlatformFeatureService,
