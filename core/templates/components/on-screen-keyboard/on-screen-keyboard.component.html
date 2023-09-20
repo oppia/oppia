@@ -18,18 +18,18 @@
       <button class="oppia-osk-btn-number number-7" (click)="insertString('7')">7</button>
       <button class="oppia-osk-btn-number number-8" (click)="insertString('8')">8</button>
       <button class="oppia-osk-btn-number number-9" (click)="insertString('9')">9</button>
-      <button class="oppia-osk-btn-operator" (click)="insertString('+')">+</button>
-      <button class="oppia-osk-btn-operator" (click)="insertString('*')">×</button>
+      <button class="oppia-osk-btn-operator" matTooltip="Addition" (click)="insertString('+')">+</button>
+      <button class="oppia-osk-btn-operator" matTooltip="Multiplication" (click)="insertString('*')">×</button>
       <button class="oppia-osk-btn-number number-4" (click)="insertString('4')">4</button>
       <button class="oppia-osk-btn-number number-5" (click)="insertString('5')">5</button>
       <button class="oppia-osk-btn-number number-6" (click)="insertString('6')">6</button>
-      <button class="oppia-osk-btn-operator" (click)="insertString('-')">-</button>
-      <img [src]="getStaticImageUrl('/icons/osk-fraction.svg')" class="oppia-osk-btn-operator" alt="÷" (click)="insertSymbol('frac')">
+      <button class="oppia-osk-btn-operator" matTooltip="Subtraction" (click)="insertString('-')">-</button>
+      <button class="oppia-osk-btn-operator" matTooltip="Division" (click)="insertSymbol('frac')">/</button>
       <button class="oppia-osk-btn-number number-1" (click)="insertString('1')">1</button>
       <button class="oppia-osk-btn-number number-2" (click)="insertString('2')">2</button>
       <button class="oppia-osk-btn-number number-3" (click)="insertString('3')">3</button>
-      <img [src]="getStaticImageUrl('/icons/osk-radical-2.svg')" class="oppia-osk-btn-shortcut" alt="sqrt" (click)="insertString('sqrt')">
-      <img [src]="getStaticImageUrl('/icons/osk-exponent.svg')" class="oppia-osk-btn-shortcut" alt="^" (click)="insertSymbol('exp')">
+      <img [src]="getStaticImageUrl('/icons/osk-radical-2.svg')" matTooltip="Square Root" class="oppia-osk-btn-shortcut" alt="sqrt" (click)="insertString('sqrt')">
+      <img [src]="getStaticImageUrl('/icons/osk-exponent.svg')" matTooltip="Exponential" class="oppia-osk-btn-shortcut" alt="^" (click)="insertSymbol('exp')">
       <button class="oppia-osk-btn-number" (click)="insertString('.')">.</button>
       <button class="oppia-osk-btn-number number-0" (click)="insertString('0')">0</button>
       <img [src]="getStaticImageUrl('/icons/osk-delete.svg')" class="oppia-osk-btn-delete" alt="delete" (click)="backspace()">
