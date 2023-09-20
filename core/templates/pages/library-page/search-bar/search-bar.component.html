@@ -161,7 +161,7 @@
           <a tabindex="0"
              [attr.aria-label]="item.text + 'selected'"
              (keydown.enter)="toggleSelection('languageCodes', item.id)"
-             (click)="toggleSelection('languageCodes', item.id)"#
+             (click)="toggleSelection('languageCodes', item.id)"
              *ngIf="last"
              (keydown)="onMenuKeypress($event, 'language', {tab: ACTION_CLOSE})"
              class="dropdown-item">
