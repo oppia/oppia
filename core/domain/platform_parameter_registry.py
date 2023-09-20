@@ -556,3 +556,10 @@ Registry.create_platform_parameter(
     platform_parameter_domain.DataTypes.NUMBER,
     default=5
 )
+
+Registry.create_platform_parameter(
+    ParamNames.RECORD_PLAYTHROUGH_PROBABILITY,
+    'The probability of recording playthroughs',
+    platform_parameter_domain.DataTypes.NUMBER,
+    default=0.2
+)
