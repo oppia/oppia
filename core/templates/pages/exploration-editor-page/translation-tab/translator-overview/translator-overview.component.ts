@@ -83,7 +83,7 @@ export class TranslatorOverviewComponent implements OnInit {
   ) { }
 
   canShowTabModeSwitcher(): boolean {
-    return !this.contextService.isExplorationLinkedToStory() && (
+    return this.contextService.isExplorationLinkedToStory() && (
       this.languageCode !== this.explorationLanguageCodeService.displayed);
   }
 
