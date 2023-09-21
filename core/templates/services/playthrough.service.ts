@@ -27,7 +27,7 @@ import {
   EarlyQuitCustomizationArgs,
   MultipleIncorrectSubmissionsCustomizationArgs
 } from 'domain/statistics/PlaythroughIssueObjectFactory';
-import { LearnerActionType, LearnerAction } from
+import { LearnerAction, LearnerActionModel } from
   'domain/statistics/learner-action.model';
 import { Playthrough, PlaythroughObjectFactory } from
   'domain/statistics/PlaythroughObjectFactory';
@@ -183,7 +183,7 @@ export class PlaythroughService {
   private eqTracker!: EarlyQuitTracker;
   private cstTracker!: CyclicStateTransitionsTracker;
   private misTracker!: MultipleIncorrectAnswersTracker;
-  private recordedLearnerActions!: LearnerActionType[];
+  private recordedLearnerActions!: LearnerAction[];
   private playthroughStopwatch!: Stopwatch;
   private playthroughDurationInSecs!: number;
   private learnerIsInSamplePopulation: boolean = false;
@@ -208,7 +208,7 @@ export class PlaythroughService {
     }
 
     this.recordedLearnerActions = [
-      LearnerAction.createNewExplorationStartAction({
+      LearnerActionModel.createNewExplorationStartAction({
         state_name: {value: initStateName},
       })
     ];
@@ -230,7 +230,7 @@ export class PlaythroughService {
     }
 
     this.recordedLearnerActions.push(
-      LearnerAction.createNewAnswerSubmitAction({
+      LearnerActionModel.createNewAnswerSubmitAction({
         state_name: {value: stateName},
         dest_state_name: {value: destStateName},
         interaction_id: {value: interactionId},
@@ -250,7 +250,7 @@ export class PlaythroughService {
     }
 
     this.recordedLearnerActions.push(
-      LearnerAction.createNewExplorationQuitAction({
+      LearnerActionModel.createNewExplorationQuitAction({
         state_name: {value: stateName},
         time_spent_in_state_in_msecs: {value: 1000 * timeSpentInStateSecs}
       }));

@@ -21,9 +21,9 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
 import {
-  LearnerAction,
+  LearnerActionModel,
   LearnerActionBackendDict,
-  LearnerActionType,
+  LearnerAction,
 } from 'domain/statistics/learner-action.model';
 import {
   EarlyQuitCustomizationArgs,
@@ -74,7 +74,7 @@ abstract class PlaythroughBase<IssueType> {
     public issueCustomizationArgs: IssueCustomizationArgs<IssueType>,
     public expId: string,
     public expVersion: number,
-    public actions: LearnerActionType[]) { }
+    public actions: LearnerAction[]) { }
 
   abstract getStateNameWithIssue(): string;
 
@@ -123,7 +123,7 @@ export class PlaythroughObjectFactory {
   createNewEarlyQuitPlaythrough(
       expId: string, expVersion: number,
       issueCustomizationArgs: EarlyQuitCustomizationArgs,
-      actions: LearnerActionType[]): EarlyQuitPlaythrough {
+      actions: LearnerAction[]): EarlyQuitPlaythrough {
     return new EarlyQuitPlaythrough(
       'EarlyQuit', issueCustomizationArgs, expId,
       expVersion, actions);
@@ -132,7 +132,7 @@ export class PlaythroughObjectFactory {
   createNewMultipleIncorrectSubmissionsPlaythrough(
       expId: string, expVersion: number,
       issueCustomizationArgs: MultipleIncorrectSubmissionsCustomizationArgs,
-      actions: LearnerActionType[]): MultipleIncorrectSubmissionsPlaythrough {
+      actions: LearnerAction[]): MultipleIncorrectSubmissionsPlaythrough {
     return new MultipleIncorrectSubmissionsPlaythrough(
       'MultipleIncorrectSubmissions', issueCustomizationArgs,
       expId, expVersion, actions);
@@ -141,7 +141,7 @@ export class PlaythroughObjectFactory {
   createNewCyclicStateTransitionsPlaythrough(
       expId: string, expVersion: number,
       issueCustomizationArgs: CyclicStateTransitionsCustomizationArgs,
-      actions: LearnerActionType[]): CyclicStateTransitionsPlaythrough {
+      actions: LearnerAction[]): CyclicStateTransitionsPlaythrough {
     return new CyclicStateTransitionsPlaythrough(
       'CyclicStateTransitions', issueCustomizationArgs,
       expId, expVersion, actions);
@@ -150,7 +150,7 @@ export class PlaythroughObjectFactory {
   createFromBackendDict(
       playthroughBackendDict: PlaythroughBackendDict): Playthrough {
     var actions = playthroughBackendDict.actions.map(
-      LearnerAction.createFromBackendDict);
+      LearnerActionModel.createFromBackendDict);
 
     switch (playthroughBackendDict.issue_type) {
       case 'EarlyQuit':

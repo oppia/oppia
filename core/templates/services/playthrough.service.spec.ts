@@ -21,7 +21,7 @@ import { TestBed } from '@angular/core/testing';
 
 import { ExplorationFeaturesService } from
   'services/exploration-features.service';
-import { LearnerAction } from
+import { LearnerActionModel } from
   'domain/statistics/learner-action.model';
 import { Playthrough } from 'domain/statistics/PlaythroughObjectFactory';
 import { PlaythroughService } from 'services/playthrough.service';
@@ -112,10 +112,10 @@ describe('PlaythroughService', () => {
       it('should record actions', () => {
         const storePlaythroughSpy = spyOnStorePlaythrough(playthrough => {
           expect(playthrough.actions).toEqual([
-            LearnerAction.createNewExplorationStartAction({
+            LearnerActionModel.createNewExplorationStartAction({
               state_name: {value: 'A'},
             }),
-            LearnerAction.createNewAnswerSubmitAction({
+            LearnerActionModel.createNewAnswerSubmitAction({
               state_name: {value: 'A'},
               dest_state_name: {value: 'B'},
               interaction_id: {value: 'TextInput'},
@@ -123,7 +123,7 @@ describe('PlaythroughService', () => {
               feedback: {value: 'Wrong!'},
               time_spent_state_in_msecs: {value: 30000},
             }),
-            LearnerAction.createNewExplorationQuitAction({
+            LearnerActionModel.createNewExplorationQuitAction({
               state_name: {value: 'B'},
               time_spent_in_state_in_msecs: {value: 40000},
             }),
@@ -143,10 +143,10 @@ describe('PlaythroughService', () => {
       it('should ignore extraneous actions', () => {
         const storePlaythroughSpy = spyOnStorePlaythrough(playthrough => {
           expect(playthrough.actions).toEqual([
-            LearnerAction.createNewExplorationStartAction({
+            LearnerActionModel.createNewExplorationStartAction({
               state_name: {value: 'A'},
             }),
-            LearnerAction.createNewAnswerSubmitAction({
+            LearnerActionModel.createNewAnswerSubmitAction({
               state_name: {value: 'A'},
               dest_state_name: {value: 'B'},
               interaction_id: {value: 'TextInput'},
@@ -154,7 +154,7 @@ describe('PlaythroughService', () => {
               feedback: {value: 'Wrong!'},
               time_spent_state_in_msecs: {value: 30000},
             }),
-            LearnerAction.createNewExplorationQuitAction({
+            LearnerActionModel.createNewExplorationQuitAction({
               state_name: {value: 'B'},
               time_spent_in_state_in_msecs: {value: 40000},
             }),

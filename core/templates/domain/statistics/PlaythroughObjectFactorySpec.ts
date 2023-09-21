@@ -18,7 +18,7 @@
 
 import { TestBed } from '@angular/core/testing';
 
-import { LearnerAction } from
+import { LearnerActionModel, LearnerActionType } from
   'domain/statistics/learner-action.model';
 import { PlaythroughObjectFactory } from
   'domain/statistics/PlaythroughObjectFactory';
@@ -35,7 +35,7 @@ describe('Playthrough Object Factory', () => {
   });
 
   it('should create a new playthrough', () => {
-    let actions = [LearnerAction.createNewExplorationStartAction({
+    let actions = [LearnerActionModel.createNewExplorationStartAction({
       state_name: {
         value: 'state'
       }
@@ -94,7 +94,7 @@ describe('Playthrough Object Factory', () => {
           }
         },
         actions: [{
-          action_type: 'AnswerSubmit',
+          action_type: LearnerActionType.AnswerSubmit,
           action_customization_args: {
             state_name: {
               value: 'state'
@@ -132,7 +132,7 @@ describe('Playthrough Object Factory', () => {
       }
     });
     expect(playthroughObject.actions).toEqual(
-      [LearnerAction.createNewAnswerSubmitAction({
+      [LearnerActionModel.createNewAnswerSubmitAction({
         state_name: {
           value: 'state'
         },
@@ -155,7 +155,7 @@ describe('Playthrough Object Factory', () => {
   });
 
   it('should convert a playthrough to a backend dict', () => {
-    let actions = [LearnerAction.createNewAnswerSubmitAction({
+    let actions = [LearnerActionModel.createNewAnswerSubmitAction({
       state_name: {
         value: 'state'
       },
@@ -191,7 +191,7 @@ describe('Playthrough Object Factory', () => {
         time_spent_in_exp_in_msecs: {value: 30000}
       },
       actions: [{
-        action_type: 'AnswerSubmit',
+        action_type: LearnerActionType.AnswerSubmit,
         action_customization_args: {
           state_name: {
             value: 'state'

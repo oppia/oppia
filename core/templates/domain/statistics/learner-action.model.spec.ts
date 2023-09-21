@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for the LearnerAction model class.
  */
 
-import { LearnerAction } from
+import { LearnerActionModel, LearnerActionType } from
   'domain/statistics/learner-action.model';
 import { StatisticsDomainConstants } from
   'domain/statistics/statistics-domain.constants';
@@ -27,7 +27,7 @@ describe('Learner Action Object Factory', () => {
 
   it('should create a new learner action', () => {
     var answerSubmitlearnerActionObject =
-      LearnerAction.createNewAnswerSubmitAction({
+      LearnerActionModel.createNewAnswerSubmitAction({
         state_name: {
           value: 'state'
         },
@@ -48,13 +48,13 @@ describe('Learner Action Object Factory', () => {
         }
       });
     var explorationStartlearnerActionObject =
-      LearnerAction.createNewExplorationStartAction({
+      LearnerActionModel.createNewExplorationStartAction({
         state_name: {
           value: 'state'
         }
       });
     var explorationQuitlearnerActionObject =
-      LearnerAction.createNewExplorationQuitAction({
+      LearnerActionModel.createNewExplorationQuitAction({
         state_name: {
           value: 'state'
         },
@@ -87,7 +87,7 @@ describe('Learner Action Object Factory', () => {
     expect(answerSubmitlearnerActionObject.schemaVersion)
       .toEqual(LEARNER_ACTION_SCHEMA_LATEST_VERSION);
     expect(explorationStartlearnerActionObject.actionType).toEqual(
-      'ExplorationStart');
+      LearnerActionType.ExplorationStart);
     expect(
       explorationStartlearnerActionObject.actionCustomizationArgs).toEqual({
       state_name: {
@@ -97,7 +97,7 @@ describe('Learner Action Object Factory', () => {
     expect(explorationStartlearnerActionObject.schemaVersion)
       .toEqual(LEARNER_ACTION_SCHEMA_LATEST_VERSION);
     expect(explorationQuitlearnerActionObject.actionType).toEqual(
-      'ExplorationQuit');
+      LearnerActionType.ExplorationQuit);
     expect(
       explorationQuitlearnerActionObject.actionCustomizationArgs).toEqual({
       state_name: {
@@ -114,8 +114,8 @@ describe('Learner Action Object Factory', () => {
   it('should create a new learner action AnswerSubmit from a backend dict',
     () => {
       var learnerActionObject =
-        LearnerAction.createFromBackendDict({
-          action_type: 'AnswerSubmit',
+        LearnerActionModel.createFromBackendDict({
+          action_type: LearnerActionType.AnswerSubmit,
           action_customization_args: {
             state_name: {value: 'string'},
             dest_state_name: {value: 'string'},
@@ -127,7 +127,8 @@ describe('Learner Action Object Factory', () => {
           schema_version: 1
         });
 
-      expect(learnerActionObject.actionType).toEqual('AnswerSubmit');
+      expect(learnerActionObject.actionType)
+        .toEqual(LearnerActionType.AnswerSubmit);
       expect(learnerActionObject.actionCustomizationArgs).toEqual({
         state_name: {value: 'string'},
         dest_state_name: {value: 'string'},
@@ -142,8 +143,8 @@ describe('Learner Action Object Factory', () => {
   it('should create a new learner action ExplorationStart from a backend dict',
     () => {
       var learnerActionObject =
-        LearnerAction.createFromBackendDict({
-          action_type: 'ExplorationStart',
+        LearnerActionModel.createFromBackendDict({
+          action_type: LearnerActionType.ExplorationStart,
           action_customization_args: {
             state_name: {
               value: 'state'
@@ -152,7 +153,8 @@ describe('Learner Action Object Factory', () => {
           schema_version: 1
         });
 
-      expect(learnerActionObject.actionType).toEqual('ExplorationStart');
+      expect(learnerActionObject.actionType)
+        .toEqual(LearnerActionType.ExplorationStart);
       expect(learnerActionObject.actionCustomizationArgs).toEqual({
         state_name: {
           value: 'state'
@@ -164,8 +166,8 @@ describe('Learner Action Object Factory', () => {
   it('should create a new learner action ExplorationQuit from a backend dict',
     () => {
       var learnerActionObject =
-        LearnerAction.createFromBackendDict({
-          action_type: 'ExplorationQuit',
+        LearnerActionModel.createFromBackendDict({
+          action_type: LearnerActionType.ExplorationQuit,
           action_customization_args: {
             state_name: {
               value: 'state'
@@ -177,7 +179,8 @@ describe('Learner Action Object Factory', () => {
           schema_version: 1
         });
 
-      expect(learnerActionObject.actionType).toEqual('ExplorationQuit');
+      expect(learnerActionObject.actionType)
+        .toEqual(LearnerActionType.ExplorationQuit);
       expect(learnerActionObject.actionCustomizationArgs).toEqual({
         state_name: {
           value: 'state'
@@ -191,7 +194,7 @@ describe('Learner Action Object Factory', () => {
 
   it('should convert a learner action to a backend dict', () => {
     var learnerActionObject =
-        LearnerAction.createNewAnswerSubmitAction({
+        LearnerActionModel.createNewAnswerSubmitAction({
           state_name: {
             value: 'state'
           },
@@ -214,7 +217,7 @@ describe('Learner Action Object Factory', () => {
 
     var learnerActionDict = learnerActionObject.toBackendDict();
     expect(learnerActionDict).toEqual({
-      action_type: 'AnswerSubmit',
+      action_type: LearnerActionType.AnswerSubmit,
       action_customization_args: {
         state_name: {
           value: 'state'
@@ -252,7 +255,7 @@ describe('Learner Action Object Factory', () => {
       // 'playthroughDict' has an invalid value of 'action_type' property. We
       // need to do that in order to test validations.
       // @ts-expect-error
-      LearnerAction.createFromBackendDict(playthroughDict);
+      LearnerActionModel.createFromBackendDict(playthroughDict);
     }).toThrowError(
       'Backend dict does not match any known action type: ' +
       JSON.stringify(playthroughDict));
