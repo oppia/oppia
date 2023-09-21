@@ -91,7 +91,7 @@ logs.%: ## Shows the logs of the given docker service. Example: make logs.datast
 restart.%: ## Restarts the given docker service. Example: make restart.datastore
 	docker compose restart $*
 
-run_tests.lints: ## Runs the linter tests
+run_tests.lint: ## Runs the linter tests
 	docker compose run --no-deps --entrypoint "python -m scripts.linters.pre_commit_linter $(PYTHON_ARGS)" dev-server
 
 run_tests.backend: ## Runs the backend tests
