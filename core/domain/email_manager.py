@@ -61,9 +61,10 @@ secrets_services = models.Registry.import_secrets_services()
 PlatformParameterRegistry = platform_parameter_registry.Registry
 
 
-NEW_REVIEWER_EMAIL_DATA: Dict[str, Dict[str, str]] = {
+NEW_CONTRIBUTOR_EMAIL_DATA: Dict[str, Dict[str, str]] = {
     constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION: {
-        'review_category': 'translations',
+        'task': 'review',
+        'category': 'translations',
         'to_check': 'translation suggestions',
         'description_template': '%s language translations',
         'rights_message_template': (
@@ -71,7 +72,8 @@ NEW_REVIEWER_EMAIL_DATA: Dict[str, Dict[str, str]] = {
             'language')
     },
     constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER: {
-        'review_category': 'voiceovers',
+        'task': 'review',
+        'category': 'voiceovers',
         'to_check': 'voiceover applications',
         'description_template': '%s language voiceovers',
         'rights_message_template': (
@@ -79,10 +81,18 @@ NEW_REVIEWER_EMAIL_DATA: Dict[str, Dict[str, str]] = {
             'language')
     },
     constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION: {
-        'review_category': 'questions',
+        'task': 'review',
+        'category': 'questions',
         'to_check': 'question suggestions',
         'description': 'questions',
         'rights_message': 'review question suggestions made by contributors'
+    },
+    constants.CONTRIBUTION_RIGHT_CATEGORY_SUBMIT_QUESTION: {
+        'task': 'submit',
+        'category': 'questions',
+        'to_submit': 'question suggestions',
+        'description': 'questions',
+        'rights_message': 'submit question suggestions'
     }
 }
 
@@ -2197,12 +2207,12 @@ def send_account_deletion_failed_email(user_id: str, user_email: str) -> None:
     send_mail_to_admin(email_subject, email_body_template)
 
 
-def send_email_to_new_contribution_reviewer(
+def send_email_to_new_contributor(
     recipient_id: str,
-    review_category: str,
+    contribution_category: str,
     language_code: Optional[str] = None
 ) -> None:
-    """Sends an email to user who is assigned as a reviewer.
+    """Sends an email to user who is assigned rights to either review or submit contributions.
 
     Args:
         recipient_id: str. The ID of the user.
@@ -2215,14 +2225,16 @@ def send_email_to_new_contribution_reviewer(
         Exception. The language_code cannot be None if the review category is
             'translation' or 'voiceover'.
     """
-    if review_category not in NEW_REVIEWER_EMAIL_DATA:
-        raise Exception('Invalid review_category: %s' % review_category)
+    print("Called sending email to new contributor")
 
-    review_category_data = NEW_REVIEWER_EMAIL_DATA[review_category]
-    email_subject = 'You have been invited to review Oppia %s' % (
-        review_category_data['review_category'])
+    if contribution_category not in NEW_CONTRIBUTOR_EMAIL_DATA:
+        raise Exception('Invalid contribution_category: %s' % contribution_category)
 
-    if review_category in [
+    review_category_data = NEW_CONTRIBUTOR_EMAIL_DATA[contribution_category]
+    email_subject = 'You have been invited to %s Oppia %s' % (review_category_data['task'],
+        review_category_data['category'])
+
+    if contribution_category in [
             constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION,
             constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER]:
         if language_code is None:
@@ -2241,18 +2253,40 @@ def send_email_to_new_contribution_reviewer(
         review_category_description = review_category_data['description']
         reviewer_rights_message = review_category_data['rights_message']
 
-    to_review = review_category_data['to_check']
+    email_body_template = ""
 
-    email_body_template = (
+    if contribution_category in [
+            constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION,
+            constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER,
+            constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER
+            ]:
+        to_contribute = review_category_data['to_check']
+        email_body_template = (
         'Hi %s,<br><br>'
         'This is to let you know that the Oppia team has added you as a '
-        'reviewer for %s. This allows you to %s.<br><br>'
+        'reviewer to %s. This allows you to %s.<br><br>'
         'You can check the %s waiting for review in the '
         '<a href="https://www.oppia.org/contributor-dashboard">'
         'Contributor Dashboard</a>.<br><br>'
         'Thanks, and happy contributing!<br><br>'
         'Best wishes,<br>'
         'The Oppia Community')
+
+    elif contribution_category in [
+            constants.CONTRIBUTION_RIGHT_CATEGORY_SUBMIT_QUESTION
+            ]:
+        to_contribute = review_category_data['to_submit']
+        email_body_template = (
+        'Hi %s,<br><br>'
+        'This is to let you know that the Oppia team has added you as a '
+        'contributor to %s. This allows you to %s.<br><br>'
+        'You can check the available opportunities in the'
+        '<a href="https://www.oppia.org/contributor-dashboard">'
+        'Contributor Dashboard</a>.<br><br>'
+        'Thanks, and happy contributing!<br><br>'
+        'Best wishes,<br>'
+        'The Oppia Community')
+    print(email_body_template)
 
     if not feconf.CAN_SEND_EMAILS:
         logging.error('This app cannot send emails to users.')
@@ -2266,7 +2300,8 @@ def send_email_to_new_contribution_reviewer(
     if can_user_receive_email:
         email_body = email_body_template % (
             recipient_username, review_category_description,
-            reviewer_rights_message, to_review)
+            reviewer_rights_message, to_contribute)
+        print(email_body)
         _send_email(
             recipient_id, feconf.SYSTEM_COMMITTER_ID,
             feconf.EMAIL_INTENT_ONBOARD_REVIEWER, email_subject, email_body,
@@ -2278,6 +2313,7 @@ def send_email_to_removed_contribution_reviewer(
     review_category: str,
     language_code: Optional[str] = None
 ) -> None:
+    print("Sending reviewer Email")
     """Sends an email to user who is removed from the reviewer position.
 
     Args:
@@ -2347,6 +2383,83 @@ def send_email_to_removed_contribution_reviewer(
             user_id, feconf.SYSTEM_COMMITTER_ID,
             feconf.EMAIL_INTENT_REMOVE_REVIEWER, email_subject, email_body,
             feconf.NOREPLY_EMAIL_ADDRESS)
+
+def send_email_to_new_contribution_submit_questions(
+    recipient_id: str,
+    review_category: str,
+    language_code: Optional[str] = None
+) -> None:
+    print("Called sending email to new contributor")
+    """Sends an email to user who is added to the submit question allowlist.
+
+    Args:
+        recipient_id: str. The ID of the user.
+        review_category: str. The category in which user can review.
+        language_code: None|str. The language code for a language if the review
+            item is translation or voiceover else None.
+
+    Raises:
+        Exception. The review category is not valid.
+        Exception. The language_code cannot be None if the review category is
+            'translation' or 'voiceover'.
+    """
+    if review_category not in NEW_CONTRIBUTOR_EMAIL_DATA:
+        raise Exception('Invalid review_category: %s' % review_category)
+
+    review_category_data = NEW_CONTRIBUTOR_EMAIL_DATA[review_category]
+    email_subject = 'You have been invited to submit questions to Oppia %s' % (
+        review_category_data['review_category'])
+
+    if review_category in [
+            constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION,
+            constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER]:
+        if language_code is None:
+            raise Exception(
+                'The language_code cannot be None if the review category is'
+                ' \'translation\' or \'voiceover\''
+            )
+        language_description = utils.get_supported_audio_language_description(
+            language_code).capitalize()
+        review_category_description = (
+            review_category_data['description_template'] % language_description)
+        reviewer_rights_message = (
+            review_category_data['rights_message_template'] % (
+                language_description))
+    else:
+        review_category_description = review_category_data['description']
+        reviewer_rights_message = review_category_data['rights_message']
+
+    to_review = review_category_data['to_check']
+
+    email_body_template = (
+        'Hi %s,<br><br>'
+        'This is to let you know that the Oppia team has granted you rights to submit questions '
+        'for %s. This allows you to %s.<br><br>'
+        'You can check the %s waiting for review in the '
+        '<a href="https://www.oppia.org/contributor-dashboard">'
+        'Contributor Dashboard</a>.<br><br>'
+        'Thanks, and happy contributing!<br><br>'
+        'Best wishes,<br>'
+        'The Oppia Community')
+
+    if not feconf.CAN_SEND_EMAILS:
+        logging.error('This app cannot send emails to users.')
+        return
+
+    recipient_username = user_services.get_username(recipient_id)
+    can_user_receive_email = user_services.get_email_preferences(
+        recipient_id).can_receive_email_updates
+
+    # Send email only if recipient wants to receive.
+    if can_user_receive_email:
+        email_body = email_body_template % (
+            recipient_username, review_category_description,
+            reviewer_rights_message, to_review)
+        _send_email(
+            recipient_id, feconf.SYSTEM_COMMITTER_ID,
+            feconf.EMAIL_INTENT_ONBOARD_REVIEWER, email_subject, email_body,
+            feconf.NOREPLY_EMAIL_ADDRESS)
+
 
 
 def send_not_mergeable_change_list_to_admin_for_review(
