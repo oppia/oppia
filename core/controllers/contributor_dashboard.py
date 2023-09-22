@@ -70,6 +70,7 @@ class ContributorDashboardPage(
 
     @acl_decorators.open_access
     def get(self) -> None:
+        """Handles GET requests and renders the contributor dashboard page."""
         self.render_template('contributor-dashboard-page.mainpage.html')
 
 
@@ -126,7 +127,18 @@ class ContributionOpportunitiesHandler(
 
     @acl_decorators.open_access
     def get(self, opportunity_type: str) -> None:
-        """Handles GET requests."""
+        """Handles GET requests.
+
+        Args:
+            opportunity_type: str. The opportunity type.
+
+        Raises:
+            PageNotFoundException. The opportunity type is invalid.
+            InvalidInputException. The language_code is invalid.
+                This happens when the opportunity type is of type
+                constant.OPPORTUNITY_TYPE_TRANSLATION and the
+                language_code is set to None by normalized_request.
+        """
         assert self.normalized_request is not None
         search_cursor = self.normalized_request.get('cursor')
         language_code = self.normalized_request.get('language_code')
@@ -442,7 +454,11 @@ class TranslatableTextHandler(
 
     @acl_decorators.open_access
     def get(self) -> None:
-        """Handles GET requests."""
+        """Handles GET requests.
+
+        Raises:
+            InvalidInputException. The exploration ID is invalid.
+        """
         assert self.normalized_request is not None
         language_code = self.normalized_request['language_code']
         exp_id = self.normalized_request['exp_id']
@@ -882,7 +898,28 @@ class ContributorStatsSummariesHandler(
         contribution_subtype: str,
         username: str
     ) -> None:
-        """Handles GET requests."""
+        """Handles GET requests.
+
+        Args:
+            contribution_type: str. The type of contribution to retrieve
+                statistics for. This should be one of the following constants:
+                - feconf.CONTRIBUTION_TYPE_TRANSLATION: For translation
+                  contributions.
+                - feconf.CONTRIBUTION_TYPE_QUESTION: For question
+                  contributions.
+            contribution_subtype: str. The subtype of contribution to retrieve
+                statistics for. This should be one of the following constants:
+                - feconf.CONTRIBUTION_SUBTYPE_SUBMISSION: For contributions made
+                  as submissions.
+                - feconf.CONTRIBUTION_SUBTYPE_REVIEW: For contributions made as
+                  reviews.
+            username: str. The username of the contributor whose statistics are
+                to be fetched.
+
+        Raises:
+            InvalidInputException. The contribution type or the contribution
+                subtype is invalid.
+        """
         if contribution_type not in [
             feconf.CONTRIBUTION_TYPE_TRANSLATION,
             feconf.CONTRIBUTION_TYPE_QUESTION
