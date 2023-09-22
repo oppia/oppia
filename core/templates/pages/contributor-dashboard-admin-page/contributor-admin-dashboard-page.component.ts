@@ -48,7 +48,7 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
   translationReviewersCount: number = 0;
   questionReviewersCount: number = 0;
   CONTRIBUTION_TYPES!: string[];
-  selection!: string;
+  selectedContributionType!: string;
   isQuestionCoordinator!: boolean;
   isTranslationCoordinator!: boolean;
 
@@ -69,9 +69,9 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
     return (this.windowRef.nativeWindow.innerWidth < 800);
   }
 
-  updateSelection(selection: string): void {
-    this.selection = selection;
-    this.setActiveTab(selection);
+  updateSelectedContributionType(selectedContributionType: string): void {
+    this.selectedContributionType = selectedContributionType;
+    this.setActiveTab(selectedContributionType);
   }
 
   ngOnInit(): void {
@@ -97,7 +97,7 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
             this.TAB_NAME_QUESTION_REVIEWER];
         }
 
-        this.updateSelection(this.CONTRIBUTION_TYPES[0]);
+        this.updateSelectedContributionType(this.CONTRIBUTION_TYPES[0]);
         this.changeDetectorRef.detectChanges();
       }
     });

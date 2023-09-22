@@ -144,9 +144,9 @@ describe('Contributor dashboard Admin page', () => {
     expect(component.activeTab).toBe('Translation Submitter');
   });
 
-  it('should update selection', () => {
-    component.updateSelection('selection1');
-    expect(component.selection).toEqual('selection1');
+  it('should update selectedContributionType', () => {
+    component.updateSelectedContributionType('selection1');
+    expect(component.selectedContributionType).toEqual('selection1');
   });
 
   it('should update translation coordinator view', fakeAsync(() => {
