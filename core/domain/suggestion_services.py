@@ -1964,7 +1964,7 @@ def get_suggestion_types_that_need_reviewers() -> Dict[str, Set[str]]:
     """Uses the community contribution stats to determine which suggestion
     types need more reviewers. Suggestion types need more reviewers if the
     number of suggestions in that type divided by the number of reviewers is
-    greater than config_domain.MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER.
+    greater than ParamNames.MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER.
 
     Returns:
         dict. A dictionary that uses the presence of its keys to indicate which
@@ -2388,7 +2388,7 @@ def _update_translation_contribution_stats_models(
             stat.rejected_translations_count)
         stats_model.rejected_translation_word_count = (
             stat.rejected_translation_word_count)
-        stats_model.contribution_dates = stat.contribution_dates
+        stats_model.contribution_dates = sorted(stat.contribution_dates)
         stats_models_to_update.append(stats_model)
 
     suggestion_models.TranslationContributionStatsModel.update_timestamps_multi(

@@ -26,13 +26,31 @@ class ConfigServicesTests(test_utils.GenericTestBase):
 
     def test_can_set_config_property(self) -> None:
         self.assertEqual(
-            config_domain.RECORD_PLAYTHROUGH_PROBABILITY.value, 0.2
+            config_domain.CLASSROOM_PAGES_DATA.value, [{
+                'name': 'math',
+                'url_fragment': 'math',
+                'topic_ids': [],
+                'course_details': '',
+                'topic_list_intro': ''
+            }]
         )
         config_services.set_property(
-            'admin', 'record_playthrough_probability', 0.5
+            'admin', 'classroom_pages_data', [{
+                'name': 'math',
+                'url_fragment': 'math',
+                'topic_ids': [],
+                'course_details': 'Detailed math classroom.',
+                'topic_list_intro': ''
+            }]
         )
         self.assertEqual(
-            config_domain.RECORD_PLAYTHROUGH_PROBABILITY.value, 0.5
+            config_domain.CLASSROOM_PAGES_DATA.value, [{
+                'name': 'math',
+                'url_fragment': 'math',
+                'topic_ids': [],
+                'course_details': 'Detailed math classroom.',
+                'topic_list_intro': ''
+            }]
         )
 
     def test_can_not_set_config_property_with_invalid_config_property_name(
@@ -46,15 +64,39 @@ class ConfigServicesTests(test_utils.GenericTestBase):
 
     def test_can_revert_config_property(self) -> None:
         self.assertEqual(
-            config_domain.RECORD_PLAYTHROUGH_PROBABILITY.value, 0.2)
+            config_domain.CLASSROOM_PAGES_DATA.value, [{
+                'name': 'math',
+                'url_fragment': 'math',
+                'topic_ids': [],
+                'course_details': '',
+                'topic_list_intro': ''
+            }])
         config_services.set_property(
-            'admin', 'record_playthrough_probability', 0.5)
+            'admin', 'classroom_pages_data', [{
+                'name': 'math',
+                'url_fragment': 'math',
+                'topic_ids': [],
+                'course_details': 'Detailed math classroom.',
+                'topic_list_intro': ''
+            }])
         self.assertEqual(
-            config_domain.RECORD_PLAYTHROUGH_PROBABILITY.value, 0.5)
+            config_domain.CLASSROOM_PAGES_DATA.value, [{
+                'name': 'math',
+                'url_fragment': 'math',
+                'topic_ids': [],
+                'course_details': 'Detailed math classroom.',
+                'topic_list_intro': ''
+            }])
         config_services.revert_property(
-            'admin', 'record_playthrough_probability')
+            'admin', 'classroom_pages_data')
         self.assertEqual(
-            config_domain.RECORD_PLAYTHROUGH_PROBABILITY.value, 0.2)
+            config_domain.CLASSROOM_PAGES_DATA.value, [{
+                'name': 'math',
+                'url_fragment': 'math',
+                'topic_ids': [],
+                'course_details': '',
+                'topic_list_intro': ''
+            }])
 
     def test_can_not_revert_config_property_with_invalid_config_property_name(
         self
