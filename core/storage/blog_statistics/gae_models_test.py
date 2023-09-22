@@ -317,6 +317,7 @@ class BlogPostViewsAggregatedStatsModelUnitTests(test_utils.GenericTestBase):
 
     BLOG_POST_ONE_ID: Final = 'blog_post_one'
     BLOG_POST_TWO_ID: Final = 'blog_post_two'
+    BLOG_POST_THREE_ID: Final = 'blog_post_three'
 
     def setUp(self) -> None:
         """Set up blog post exited event log entry models in datastore for use
@@ -351,14 +352,17 @@ class BlogPostViewsAggregatedStatsModelUnitTests(test_utils.GenericTestBase):
 
         self.assertEqual(stats_model.id, self.BLOG_POST_TWO_ID)
 
-        # Test should raise exception if model with given blog post id already
-        # exists.
+    def test_create_raises_exception_with_existing_blog_id(self) -> None:
+        blog_stats_models.BlogPostViewsAggregatedStatsModel.create(
+            self.BLOG_POST_THREE_ID
+        )
+
         with self.assertRaisesRegex(
             Exception,
             'A blog post views stats model with the given blog post ID'
             'exists already.'):
             blog_stats_models.BlogPostViewsAggregatedStatsModel.create(
-                 self.BLOG_POST_TWO_ID
+                 self.BLOG_POST_THREE_ID
             )
 
     def test_get_model_association_to_user(self) -> None:
@@ -389,6 +393,7 @@ class BlogPostReadsAggregatedStatsModelUnitTests(test_utils.GenericTestBase):
 
     BLOG_POST_ONE_ID: Final = 'blog_post_one'
     BLOG_POST_TWO_ID: Final = 'blog_post_two'
+    BLOG_POST_THREE_ID: Final = 'blog_post_three'
 
     def setUp(self) -> None:
         """Set up blog post reads aggregated stats models in datastore for use
@@ -423,14 +428,17 @@ class BlogPostReadsAggregatedStatsModelUnitTests(test_utils.GenericTestBase):
 
         self.assertEqual(stats_model.id, self.BLOG_POST_TWO_ID)
 
-        # Test should raise exception if model with given blog post id already
-        # exists.
+    def test_create_raises_exception_with_existing_blog_id(self) -> None:
+        blog_stats_models.BlogPostReadsAggregatedStatsModel.create(
+            self.BLOG_POST_THREE_ID
+        )
+
         with self.assertRaisesRegex(
             Exception,
             'A blog post reads stats model with the given blog post ID'
             'exists already.'):
             blog_stats_models.BlogPostReadsAggregatedStatsModel.create(
-                self.BLOG_POST_TWO_ID
+                self.BLOG_POST_THREE_ID
             )
 
     def test_get_model_association_to_user(self) -> None:
@@ -461,6 +469,7 @@ class BlogPostReadingTimeModelUnitTests(test_utils.GenericTestBase):
 
     BLOG_POST_ONE_ID: Final = 'blog_post_one'
     BLOG_POST_TWO_ID: Final = 'blog_post_two'
+    BLOG_POST_THREE_ID: Final = 'blog_post_three'
 
     def setUp(self) -> None:
         """Set up blog post reading time model in datastore for use
@@ -503,14 +512,18 @@ class BlogPostReadingTimeModelUnitTests(test_utils.GenericTestBase):
 
         self.assertEqual(stats_model.id, self.BLOG_POST_TWO_ID)
 
-        # Test should raise exception if model with given blog post id already
-        # exists.
+
+    def test_create_raises_exception_with_existing_blog_id(self) -> None:
+        blog_stats_models.BlogPostReadingTimeModel.create(
+            self.BLOG_POST_THREE_ID
+        )
+
         with self.assertRaisesRegex(
             Exception,
             'A blog post reading time model with the given blog post ID'
             'exists already.'):
             blog_stats_models.BlogPostReadingTimeModel.create(
-                self.BLOG_POST_TWO_ID
+                self.BLOG_POST_THREE_ID
             )
 
     def test_get_model_association_to_user(self) -> None:
@@ -551,6 +564,7 @@ class AuthorBlogPostReadsAggregatedStatsModelUnitTests(
 
     AUTHOR_ONE_ID: Final = 'author_one'
     AUTHOR_TWO_ID: Final = 'author_two'
+    AUTHOR_THREE_ID: Final = 'author_three'
     NONEXISTENT_USER_ID: Final = 'no_user'
 
     def setUp(self) -> None:
@@ -589,16 +603,21 @@ class AuthorBlogPostReadsAggregatedStatsModelUnitTests(
 
         self.assertEqual(stats_model.id, self.AUTHOR_TWO_ID)
 
-        # Test should raise exception if model with given author id already
-        # exists.
+
+    def test_create_raises_exception_with_existing_author_id(self) -> None:
+        blog_stats_models.AuthorBlogPostReadsAggregatedStatsModel.create(
+            self.AUTHOR_THREE_ID
+        )
+
         with self.assertRaisesRegex(
             Exception,
             'A author blog post reads stats model with the given author ID'
             ' exists already.'):
             (
                 blog_stats_models.AuthorBlogPostReadsAggregatedStatsModel
-                    .create(self.AUTHOR_TWO_ID)
+                    .create(self.AUTHOR_THREE_ID)
             )
+
 
     def test_get_model_association_to_user(self) -> None:
         self.assertEqual(
@@ -638,6 +657,7 @@ class AuthorBlogPostViewsAggregatedStatsModelUnitTests(
 
     AUTHOR_ONE_ID: Final = 'author_one'
     AUTHOR_TWO_ID: Final = 'author_two'
+    AUTHOR_THREE_ID: Final = 'author_three'
     NONEXISTENT_USER_ID: Final = 'no_user'
 
     def setUp(self) -> None:
@@ -676,15 +696,20 @@ class AuthorBlogPostViewsAggregatedStatsModelUnitTests(
 
         self.assertEqual(stats_model.id, self.AUTHOR_TWO_ID)
 
-        # Test should raise exception if model with given author id already
-        # exists.
+
+    def test_create_raises_exception_with_existing_author_id(self) -> None:
+        blog_stats_models.AuthorBlogPostViewsAggregatedStatsModel.create(
+            self.AUTHOR_THREE_ID
+        )
+
         with self.assertRaisesRegex(
             Exception,
             'A author blog post views stats model with the given author ID'
             ' exists already.'):
             blog_stats_models.AuthorBlogPostViewsAggregatedStatsModel.create(
-                self.AUTHOR_TWO_ID
+                self.AUTHOR_THREE_ID
             )
+
 
     def test_get_model_association_to_user(self) -> None:
         self.assertEqual(
@@ -722,6 +747,7 @@ class AuthorBlogPostsReadingTimeModelUnitTests(test_utils.GenericTestBase):
 
     AUTHOR_ONE_ID: Final = 'author_one'
     AUTHOR_TWO_ID: Final = 'author_two'
+    AUTHOR_THREE_ID: Final = 'author_three'
     NONEXISTENT_USER_ID: Final = 'no_user'
 
     def setUp(self) -> None:
@@ -776,6 +802,19 @@ class AuthorBlogPostsReadingTimeModelUnitTests(test_utils.GenericTestBase):
             ' exists already.'):
             blog_stats_models.AuthorBlogPostAggregatedReadingTimeModel.create(
                 self.AUTHOR_TWO_ID
+            )
+
+    def test_create_raises_exception_with_existing_author_id(self) -> None:
+        blog_stats_models.AuthorBlogPostAggregatedReadingTimeModel.create(
+            self.AUTHOR_THREE_ID
+        )
+
+        with self.assertRaisesRegex(
+            Exception,
+            'A author blog post views stats model with the given author ID'
+            ' exists already.'):
+            blog_stats_models.AuthorBlogPostAggregatedReadingTimeModel.create(
+                self.AUTHOR_THREE_ID
             )
 
     def test_get_model_association_to_user(self) -> None:

@@ -43,7 +43,8 @@ class BlogPostViewedEventLogEntryModel(base_models.BaseModel):
 
     # ID of blog post currently being viewed.
     blog_post_id = datastore_services.StringProperty(
-        indexed=True, required=True)
+        indexed=True, required=True
+    )
 
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:
@@ -55,18 +56,23 @@ class BlogPostViewedEventLogEntryModel(base_models.BaseModel):
         """Generates a unique id for the event model of the form
         '[timestamp]:[blog_post_id]:[random_hash]'.
         """
-        timestamp = datetime.datetime.utcnow()
 
         # To avoid collision between events occuring at the same date and time,
         # a random hash is appended to the event model id.
         for _ in range(base_models.MAX_RETRIES):
             random_hash = utils.convert_to_hash(
                 str(utils.get_random_int(base_models.RAND_RANGE)),
-                base_models.ID_LENGTH)
-        return cls.get_new_id('%s:%s:%s' % (
-            utils.get_time_in_millisecs(timestamp),
-            blog_post_id,
-            random_hash)
+                base_models.ID_LENGTH
+            )
+            new_id = ('%s:%s:%s' % (
+                utils.get_time_in_millisecs(utils.get_current_time_in_millisecs),
+                blog_post_id,
+                random_hash)
+            )
+            if not cls.get_by_id(new_id):
+                return new_id
+        raise Exception(
+            'The id generator for the model is producing too many collisions.'
         )
 
     @classmethod
@@ -78,7 +84,8 @@ class BlogPostViewedEventLogEntryModel(base_models.BaseModel):
         entity_id = cls.get_new_event_entity_id(blog_post_id)
         event_entity = cls(
             id=entity_id,
-            blog_post_id=blog_post_id)
+            blog_post_id=blog_post_id
+        )
         event_entity.update_timestamps()
         event_entity.put()
         return entity_id
@@ -112,7 +119,8 @@ class BlogPostReadEventLogEntryModel(base_models.BaseModel):
 
     # ID of blog post currently being read.
     blog_post_id = datastore_services.StringProperty(
-        indexed=True, required=True)
+        indexed=True, required=True
+    )
 
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:
@@ -124,19 +132,25 @@ class BlogPostReadEventLogEntryModel(base_models.BaseModel):
         """Generates a unique id for the event model of the form
         '[timestamp]:[blog_post_id]:[random_hash]'.
         """
-        timestamp = datetime.datetime.utcnow()
 
         # To avoid collision between events occuring at the same date and time,
         # a random hash is appended to the event model id.
         for _ in range(base_models.MAX_RETRIES):
             random_hash = utils.convert_to_hash(
                 str(utils.get_random_int(base_models.RAND_RANGE)),
-                base_models.ID_LENGTH)
-        return cls.get_new_id('%s:%s:%s' % (
-            utils.get_time_in_millisecs(timestamp),
-            blog_post_id,
-            random_hash)
+                base_models.ID_LENGTH
+            )
+            new_id = ('%s:%s:%s' % (
+                utils.get_time_in_millisecs(utils.get_current_time_in_millisecs),
+                blog_post_id,
+                random_hash)
+            )
+            if not cls.get_by_id(new_id):
+                return new_id
+        raise Exception(
+            'The id generator for the model is producing too many collisions.'
         )
+
 
     @classmethod
     def create(
@@ -183,10 +197,12 @@ class BlogPostExitedEventLogEntryModel(base_models.BaseModel):
 
     # ID of blog post being exited.
     blog_post_id = datastore_services.StringProperty(
-        indexed=True, required=True)
+        indexed=True, required=True
+    )
     # Time user stayed on the blog post.
     time_user_stayed_on_blog_post = (
-        datastore_services.FloatProperty(indexed=True, required=True))
+        datastore_services.FloatProperty(indexed=True, required=True)
+    )
 
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:
@@ -198,18 +214,23 @@ class BlogPostExitedEventLogEntryModel(base_models.BaseModel):
         """Generates a unique id for the event model of the form
         '[timestamp]:[blog_post_id]:[random_hash]'.
         """
-        timestamp = datetime.datetime.utcnow()
 
         # To avoid collision between events occuring at the same date and time,
         # a random hash is appended to the event model id.
         for _ in range(base_models.MAX_RETRIES):
             random_hash = utils.convert_to_hash(
                 str(utils.get_random_int(base_models.RAND_RANGE)),
-                base_models.ID_LENGTH)
-        return cls.get_new_id('%s:%s:%s' % (
-            utils.get_time_in_millisecs(timestamp),
-            blog_post_id,
-            random_hash)
+                base_models.ID_LENGTH
+            )
+            new_id = ('%s:%s:%s' % (
+                utils.get_time_in_millisecs(utils.get_current_time_in_millisecs),
+                blog_post_id,
+                random_hash)
+            )
+            if not cls.get_by_id(new_id):
+                return new_id
+        raise Exception(
+            'The id generator for the model is producing too many collisions.'
         )
 
     @classmethod
@@ -629,37 +650,40 @@ class AuthorBlogPostAggregatedReadingTimeModel(base_models.BaseModel):
 
     # Number of user taking less than a minute to read the blog post.
     zero_to_one_min = datastore_services.IntegerProperty(
-        indexed=False, required=True, repeated=False)
+        indexed=False, required=True, repeated=False
+    )
     # Number of users taking one to two minutes to read the blog post.
     one_to_two_min = datastore_services.IntegerProperty(
-        indexed=False, required=True, repeated=False)
-    # Number of users taking two to three minutes to read the blog post.
+        indexed=False, required=True, repeated=False
+    )
     two_to_three_min = datastore_services.IntegerProperty(
-        indexed=False, required=True, repeated=False)
-    # Number of users taking three to four minutes to read the blog post.
+        indexed=False, required=True, repeated=False
+    )
     three_to_four_min = datastore_services.IntegerProperty(
-        indexed=False, required=True, repeated=False)
-    # Number of users taking four to five minutes to read the blog post.
+        indexed=False, required=True, repeated=False
+    )
     four_to_five_min = datastore_services.IntegerProperty(
-        indexed=False, required=True, repeated=False)
-    # Number of users taking five to six minutes to read the blog post.
+        indexed=False, required=True, repeated=False
+    )
     five_to_six_min = datastore_services.IntegerProperty(
-        indexed=False, required=True, repeated=False)
-    # Number of users taking six to seven minutes to read the blog post.
+        indexed=False, required=True, repeated=False
+    )
     six_to_seven_min = datastore_services.IntegerProperty(
-        indexed=False, required=True, repeated=False)
-    # Number of users taking seven to eight minutes to read the blog post.
+        indexed=False, required=True, repeated=False
+    )
     seven_to_eight_min = datastore_services.IntegerProperty(
-        indexed=False, required=True, repeated=False)
-    # Number of users taking eight to nine minutes to read the blog post.
+        indexed=False, required=True, repeated=False
+    )
     eight_to_nine_min = datastore_services.IntegerProperty(
-        indexed=False, required=True, repeated=False)
-    # Number of users taking nine to ten minutes to read the blog post.
+        indexed=False, required=True, repeated=False
+    )
     nine_to_ten_min = datastore_services.IntegerProperty(
-        indexed=False, required=True, repeated=False)
+        indexed=False, required=True, repeated=False
+    )
     # Number of users taking more than ten minutes to read the blog post.
     more_than_ten_min = datastore_services.IntegerProperty(
-        indexed=False, required=True, repeated=False)
+        indexed=False, required=True, repeated=False
+    )
 
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:
