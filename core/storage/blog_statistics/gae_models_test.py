@@ -18,6 +18,8 @@
 
 from __future__ import annotations
 
+import types
+
 from core.platform import models
 from core.tests import test_utils
 
@@ -92,6 +94,19 @@ class BlogPostViewedEventLogEntryModelUnitTests(test_utils.GenericTestBase):
             .get_deletion_policy(),
             base_models.DELETION_POLICY.NOT_APPLICABLE
         )
+
+    def test_create_raises_exception_by_mocking_collision(self) -> None:
+        stats_model_class = blog_stats_models.BlogPostViewedEventLogEntryModel
+        with self.assertRaisesRegex(
+            Exception, 'The id generator for the model is producing too many'
+            ' collisions.'):
+            # Swap dependent method get_by_id to simulate collision every time.
+            with self.swap(
+                blog_stats_models.BlogPostViewedEventLogEntryModel,
+                'get_by_id', types.MethodType(
+                    lambda x, y: True,
+                    blog_stats_models.BlogPostViewedEventLogEntryModel)):
+                stats_model_class.create('blog_post_id')
 
     def test_create_and_get_event_models(self) -> None:
         entity_id = (
@@ -181,6 +196,19 @@ class BlogPostReadEventLogEntryModelUnitTests(test_utils.GenericTestBase):
             .get_deletion_policy(),
             base_models.DELETION_POLICY.NOT_APPLICABLE
         )
+
+    def test_create_raises_exception_by_mocking_collision(self) -> None:
+        stats_model_class = blog_stats_models.BlogPostReadEventLogEntryModel
+        with self.assertRaisesRegex(
+            Exception, 'The id generator for the model is producing too many'
+            ' collisions.'):
+            # Swap dependent method get_by_id to simulate collision every time.
+            with self.swap(
+                blog_stats_models.BlogPostReadEventLogEntryModel,
+                'get_by_id', types.MethodType(
+                    lambda x, y: True,
+                    blog_stats_models.BlogPostReadEventLogEntryModel)):
+                stats_model_class.create('blog_post_id')
 
     def test_create_and_get_event_models(self) -> None:
         entity_id = (
@@ -288,6 +316,19 @@ class BlogPostExitedEventLogEntryModelUnitTests(test_utils.GenericTestBase):
 
         self.assertEqual(event_model.blog_post_id, self.BLOG_POST_TWO_ID)
         self.assertEqual(event_model.time_user_stayed_on_blog_post, 0.5)
+
+    def test_create_raises_exception_by_mocking_collision(self) -> None:
+        stats_model_class = blog_stats_models.BlogPostExitedEventLogEntryModel
+        with self.assertRaisesRegex(
+            Exception, 'The id generator for the model is producing too many'
+            ' collisions.'):
+            # Swap dependent method get_by_id to simulate collision every time.
+            with self.swap(
+                blog_stats_models.BlogPostExitedEventLogEntryModel,
+                'get_by_id', types.MethodType(
+                    lambda x, y: True,
+                    blog_stats_models.BlogPostExitedEventLogEntryModel)):
+                stats_model_class.create('blog_post_id', 7.2)
 
     def test_get_model_association_to_user(self) -> None:
         self.assertEqual(
@@ -512,7 +553,6 @@ class BlogPostReadingTimeModelUnitTests(test_utils.GenericTestBase):
 
         self.assertEqual(stats_model.id, self.BLOG_POST_TWO_ID)
 
-
     def test_create_raises_exception_with_existing_blog_id(self) -> None:
         blog_stats_models.BlogPostReadingTimeModel.create(
             self.BLOG_POST_THREE_ID
@@ -603,7 +643,6 @@ class AuthorBlogPostReadsAggregatedStatsModelUnitTests(
 
         self.assertEqual(stats_model.id, self.AUTHOR_TWO_ID)
 
-
     def test_create_raises_exception_with_existing_author_id(self) -> None:
         blog_stats_models.AuthorBlogPostReadsAggregatedStatsModel.create(
             self.AUTHOR_THREE_ID
@@ -617,7 +656,6 @@ class AuthorBlogPostReadsAggregatedStatsModelUnitTests(
                 blog_stats_models.AuthorBlogPostReadsAggregatedStatsModel
                     .create(self.AUTHOR_THREE_ID)
             )
-
 
     def test_get_model_association_to_user(self) -> None:
         self.assertEqual(
@@ -696,7 +734,6 @@ class AuthorBlogPostViewsAggregatedStatsModelUnitTests(
 
         self.assertEqual(stats_model.id, self.AUTHOR_TWO_ID)
 
-
     def test_create_raises_exception_with_existing_author_id(self) -> None:
         blog_stats_models.AuthorBlogPostViewsAggregatedStatsModel.create(
             self.AUTHOR_THREE_ID
@@ -709,7 +746,6 @@ class AuthorBlogPostViewsAggregatedStatsModelUnitTests(
             blog_stats_models.AuthorBlogPostViewsAggregatedStatsModel.create(
                 self.AUTHOR_THREE_ID
             )
-
 
     def test_get_model_association_to_user(self) -> None:
         self.assertEqual(
@@ -811,7 +847,7 @@ class AuthorBlogPostsReadingTimeModelUnitTests(test_utils.GenericTestBase):
 
         with self.assertRaisesRegex(
             Exception,
-            'A author blog post views stats model with the given author ID'
+            'A author blog post reading time model with the given author ID'
             ' exists already.'):
             blog_stats_models.AuthorBlogPostAggregatedReadingTimeModel.create(
                 self.AUTHOR_THREE_ID

@@ -18,8 +18,6 @@
 
 from __future__ import annotations
 
-import datetime
-
 from core import utils
 from core.platform import models
 
@@ -65,7 +63,7 @@ class BlogPostViewedEventLogEntryModel(base_models.BaseModel):
                 base_models.ID_LENGTH
             )
             new_id = ('%s:%s:%s' % (
-                utils.get_time_in_millisecs(utils.get_current_time_in_millisecs),
+                utils.get_current_time_in_millisecs,
                 blog_post_id,
                 random_hash)
             )
@@ -141,7 +139,7 @@ class BlogPostReadEventLogEntryModel(base_models.BaseModel):
                 base_models.ID_LENGTH
             )
             new_id = ('%s:%s:%s' % (
-                utils.get_time_in_millisecs(utils.get_current_time_in_millisecs),
+                utils.get_current_time_in_millisecs,
                 blog_post_id,
                 random_hash)
             )
@@ -150,7 +148,6 @@ class BlogPostReadEventLogEntryModel(base_models.BaseModel):
         raise Exception(
             'The id generator for the model is producing too many collisions.'
         )
-
 
     @classmethod
     def create(
@@ -223,7 +220,7 @@ class BlogPostExitedEventLogEntryModel(base_models.BaseModel):
                 base_models.ID_LENGTH
             )
             new_id = ('%s:%s:%s' % (
-                utils.get_time_in_millisecs(utils.get_current_time_in_millisecs),
+                utils.get_current_time_in_millisecs,
                 blog_post_id,
                 random_hash)
             )
