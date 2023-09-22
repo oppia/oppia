@@ -207,7 +207,12 @@ class SuggestionHandler(
 
     @acl_decorators.can_suggest_changes
     def post(self) -> None:
-        """Handles POST requests."""
+        """Handles POST requests.
+
+        Raises:
+            InvalidInputException. The suggestion type is 'edit_state_content',
+                as content suggestion submissions are no longer supported.
+        """
         assert self.user_id is not None
         assert self.normalized_payload is not None
         suggestion_type = self.normalized_payload['suggestion_type']
@@ -557,6 +562,10 @@ class SuggestionToSkillActionHandler(
         Args:
             target_id: str. The ID of the suggestion target.
             suggestion_id: str. The ID of the suggestion.
+
+        Raises:
+            InvalidInputException. The suggestion is not for skills
+                or the provided skill ID is invalid.
         """
         assert self.user_id is not None
         assert self.normalized_payload is not None
@@ -1203,6 +1212,9 @@ def _construct_exploration_suggestions(
         list(dict). List of suggestion dicts with an additional
         exploration_content_html field representing the target
         exploration's current content.
+
+    Raises:
+        ValueError. Exploration content is unavailable.
     """
     suggestion_dicts: List[FrontendBaseSuggestionDict] = []
     exp_ids = {suggestion.target_id for suggestion in suggestions}
