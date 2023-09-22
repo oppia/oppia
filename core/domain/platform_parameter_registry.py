@@ -457,7 +457,7 @@ Registry.create_feature_flag(
 Registry.create_feature_flag(
     ParamNames.CD_ADMIN_DASHBOARD_NEW_UI,
     'This flag is to show new contributor admin dashboard.',
-    platform_parameter_domain.FeatureStages.DEV)
+    platform_parameter_domain.FeatureStages.TEST)
 
 Registry.create_feature_flag(
     ParamNames.IS_IMPROVEMENTS_TAB_ENABLED,
