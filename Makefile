@@ -42,8 +42,10 @@ run-offline: # Runs the dev-server in offline mode
 	docker compose up dev-server -d
 	@printf 'Please wait while the development server starts...\n\n'
 	@while [[ $$(curl -s -o /tmp/status_code.txt -w '%{http_code}' http://localhost:8181) != "200" ]] || [[ $$(curl -s -o /tmp/status_code.txt -w '%{http_code}' http://localhost:8181/community-library) != "200" ]]; do \
-		sleep 5; \
+		printf  "▓"; \
+		sleep 1; \
 	done
+	@printf '\n\n'
 	@echo 'Development server started at port 8181.'
 	@echo 'Please visit http://localhost:8181 to access the development server.'
 	@echo 'Check dev-server logs using "make logs.dev-server"'
@@ -53,8 +55,10 @@ start-devserver-for-tests: ## Starts the development server for the tests
 	docker compose up dev-server -d
 	@printf 'Please wait while the development server starts...\n\n'
 	@while [[ $$(curl -s -o /tmp/status_code.txt -w '%{http_code}' http://localhost:8181) != "200" ]] || [[ $$(curl -s -o /tmp/status_code.txt -w '%{http_code}' http://localhost:8181/community-library) != "200" ]]; do \
-		sleep 5; \
+		printf  "▓"; \
+		sleep 1; \
 	done
+	@printf '\n\n'
 	@echo 'Development server started at port 8181.'
 
 init: build run-devserver ## Initializes the build and runs dev-server.
@@ -97,7 +101,13 @@ run_tests.lint: ## Runs the linter tests
 run_tests.backend: ## Runs the backend tests
 	$(MAKE) stop
 	docker compose up datastore dev-server redis firebase -d --no-deps
+	@echo '------------------------------------------------------'
+	@echo '  Backend tests started....'
+	@echo '------------------------------------------------------'
 	$(SHELL_PREFIX) dev-server python -m scripts.run_backend_tests $(PYTHON_ARGS)
+	@echo '------------------------------------------------------'
+	@echo '  Backend tests has been executed successfully....'
+	@echo '------------------------------------------------------'
 	$(MAKE) stop
 
 run_tests.frontend: ## Runs the frontend unit tests
@@ -122,8 +132,13 @@ run_tests.acceptance: ## Runs the acceptance tests for the parsed suite
 	export PATH=$(shell cd .. && pwd)/oppia_tools/node-16.13.0/bin:$(PATH)
 # Starting the development server for the acceptance tests.
 	$(MAKE) start-devserver-for-tests
-	@echo 'Starting acceptance test for the suite: $(suite)'
+	@echo '------------------------------------------------------'
+	@echo '  Starting acceptance test for the suite: $(suite)'
+	@echo '------------------------------------------------------'
 	./node_modules/.bin/jasmine --config="./core/tests/puppeteer-acceptance-tests/jasmine.json" ./core/tests/puppeteer-acceptance-tests/spec/$(suite)
+	@echo '------------------------------------------------------'
+	@echo '  Acceptance test has been executed successfully....'
+	@echo '------------------------------------------------------'
 	$(MAKE) stop
 
 CHROME_VERSION := $(shell google-chrome --version | awk '{print $$3}')
@@ -135,8 +150,13 @@ run_tests.e2e: ## Runs the e2e tests for the parsed suite
 	export PATH=$(shell cd .. && pwd)/oppia_tools/node-16.13.0/bin:$(PATH)
 # Starting the development server for the e2e tests.
 	$(MAKE) start-devserver-for-tests
-	@echo 'Starting e2e test for the suite: $(suite)'
+	@echo '------------------------------------------------------'
+	@echo '  Starting e2e test for the suite: $(suite)'
+	@echo '------------------------------------------------------'
 	../oppia_tools/node-16.13.0/bin/npx wdio ./core/tests/wdio.conf.js --suite $(suite) $(CHROME_VERSION) --params.devMode=True --capabilities[0].maxInstances=3
+	@echo '------------------------------------------------------'
+	@echo '  e2e test has been executed successfully....'
+	@echo '------------------------------------------------------'
 	$(MAKE) stop
 
 OS_NAME := $(shell uname)
