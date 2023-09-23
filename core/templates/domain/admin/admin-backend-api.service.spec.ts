@@ -69,12 +69,18 @@ describe('Admin backend api service', () => {
     },
     demo_collections: [],
     config_properties: {
-      record_playthrough_probability: {
+      classroom_pages_data: {
         schema: {
-          type: 'float'
+          type: 'list'
         } as Schema,
-        value: 0.2,
-        description: 'The record_playthrough_probability.'
+        value: {
+          name: 'math',
+          url_fragment: 'math',
+          course_details: '',
+          topic_list_intro: '',
+          topic_ids: []
+        },
+        description: 'The details for each classroom page.'
       }
     },
     demo_exploration_ids: ['19'],
@@ -110,8 +116,7 @@ describe('Admin backend api service', () => {
       topic_ids: [],
       topic_list_intro: 'fsd',
       url_fragment: 'mathfsad',
-    },
-    record_playthrough_probability: 0.2
+    }
   };
 
   beforeEach(() => {
@@ -957,7 +962,7 @@ describe('Admin backend api service', () => {
     'value given the config property ID when calling' +
     'revertConfigPropertyAsync', fakeAsync(() => {
     let action = 'revert_config_property';
-    let configPropertyId = 'record_playthrough_probability';
+    let configPropertyId = 'classroom_pages_data';
     let payload = {
       action: action,
       config_property_id: configPropertyId
