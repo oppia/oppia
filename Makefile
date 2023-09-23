@@ -118,6 +118,8 @@ run_tests.backend_associate: ## Runs the backend associate tests
 run_tests.acceptance: ## Runs the acceptance tests for the parsed suite
 	@echo 'Shutting down any previously started server.'
 	$(MAKE) stop 
+# Adding node to the path.
+	export PATH=$(shell cd .. && pwd)/oppia_tools/node-16.13.0/bin:$(PATH)
 # Starting the development server for the acceptance tests.
 	$(MAKE) start-devserver-for-tests
 	@echo 'Starting acceptance test for the suite: $(suite)'
@@ -130,7 +132,7 @@ run_tests.e2e: ## Runs the e2e tests for the parsed suite
 	@echo 'Shutting down any previously started server.'
 	$(MAKE) stop
 # Adding node to the path.
-	@cd .. && export PATH=$$PATH:$(shell pwd)/oppia_tools/node-16.13.0/bin/
+	export PATH=$(shell cd .. && pwd)/oppia_tools/node-16.13.0/bin:$(PATH)
 # Starting the development server for the e2e tests.
 	$(MAKE) start-devserver-for-tests
 	@echo 'Starting e2e test for the suite: $(suite)'
