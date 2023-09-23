@@ -69,6 +69,7 @@ from typing import Dict, List, Optional, Set, Tuple
 # we migrate to Python 3.8.
 from scripts import common  # isort:skip pylint: disable=wrong-import-position
 
+from core import feconf  # isort:skip
 from core import utils  # isort:skip
 
 # Install third party dependencies before proceeding.
@@ -81,7 +82,8 @@ from . import linter_utils  # isort:skip
 from . import other_files_linter  # isort:skip
 from . import python_linter  # isort:skip
 from .. import concurrent_task_utils  # isort:skip
-from .. import install_third_party_libs  # isort:skip
+if not feconf.OPPIA_IS_DOCKERIZED:
+    from .. import install_third_party_libs  # isort:skip
 
 OTHER_SHARD_NAME = 'other'
 
@@ -637,7 +639,8 @@ def main(args: Optional[List[str]] = None) -> None:
         namespace=namespace
     )
 
-    install_third_party_libs.main()
+    if not feconf.OPPIA_IS_DOCKERIZED:
+        install_third_party_libs.main()
 
     print('Starting Linter....')
 
