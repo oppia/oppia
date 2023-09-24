@@ -7657,7 +7657,7 @@ class TranslationCoordinatorRightsTests(test_utils.GenericTestBase):
 
         self.assertEqual(0, len(
             suggestion_services.get_translation_rights_with_user(user_id_c)))
-        
+
     def test_check_user_is_coordinator_for_no_language_model(self) -> None:
         self.assertFalse(suggestion_services.check_user_is_coordinator(
             'user1', 'non_existing_language'))
