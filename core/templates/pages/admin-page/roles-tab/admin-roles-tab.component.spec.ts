@@ -153,7 +153,8 @@ describe('Admin roles tab component ', function() {
       successPromise = Promise.resolve({
         roles: ['TOPIC_MANAGER'],
         managed_topic_ids: ['topic_id_1'],
-        banned: false
+        banned: false,
+        coordinated_language_ids: []
       });
     });
 
