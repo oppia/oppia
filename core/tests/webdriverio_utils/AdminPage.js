@@ -226,7 +226,7 @@ var AdminPage = function() {
       '.e2e-test-language-selector-close-button');
     var languageSelectorAddButton = $('.e2e-test-language-selector-add-button');
 
-    await action.waitFor.visibilityOf(
+    await waitFor.visibilityOf(
       languageSelectorModal,
       'Language selector modal taking too long to appear');
     await action.select(
@@ -234,12 +234,13 @@ var AdminPage = function() {
     );
     await action.click('Add language button', languageSelectorAddButton);
     await action.click('Close button', languageSelectorCloseButton);
-    await action.waitFor.invisibilityOf(
+    await waitFor.invisibilityOf(
       languageSelectorModal,
       'Language selector modal taking too long to disappear');
 
     await waitFor.invisibilityOf(
       progressSpinner, 'Progress spinner is taking too long to disappear.');
+    newRole = 'translation coordinator';
     var removeButtonElement = $(
       '.e2e-test-' + newRole.split(' ').join('-') +
       '-remove-button-container');
