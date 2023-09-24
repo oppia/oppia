@@ -198,8 +198,7 @@ class ExplorationHandler(
                 has_seen_editor_tutorial = True
             if user_settings.last_started_state_translation_tutorial:
                 has_seen_translation_tutorial = True
-
-        exploration_data = {}
+                
         try:
             exploration_data = exp_services.get_user_exploration_data(
                 self.user_id, exploration_id, apply_draft=apply_draft,
