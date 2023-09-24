@@ -2132,7 +2132,9 @@ class TranslationCoordinatorRoleHandlerTest(test_utils.GenericTestBase):
 
         self.delete_json(
             feconf.ADMIN_ROLE_HANDLER_URL,
-            params={'username': username, 'role': feconf.ROLE_ID_TRANSLATION_COORDINATOR})
+            params={
+                'username': username,
+                'role': feconf.ROLE_ID_TRANSLATION_COORDINATOR})
 
         response_dict = self.get_json(
             feconf.ADMIN_ROLE_HANDLER_URL,

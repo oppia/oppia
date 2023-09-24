@@ -123,7 +123,7 @@ var ReleaseCoordinatorPage = function() {
     return null;
   };
 
-  // TODO(#18881) Remove this method after the cd_admin_dashboard_new_ui
+  // TODO(#18881): Remove this method after the cd_admin_dashboard_new_ui
   // feature flag is deprecated.
   this.getCdAdminDashboardNewUiFeatureElement = async function() {
     var featureFlagElements = await featureFlagElementsSelector();

@@ -7622,11 +7622,13 @@ class TranslationCoordinatorRightsTests(test_utils.GenericTestBase):
     def test_get_translation_rights_from_model(self) -> None:
         model = suggestion_models.TranslationCoordinatorsModel.get('en')
 
-        object = suggestion_services.get_translation_rights_from_model(model)
+        model_object = suggestion_services.get_translation_rights_from_model(model)
 
-        self.assertEqual(model.id, object.language_id)
-        self.assertEqual(model.coordinators_count, object.coordinators_count)
-        self.assertEqual(model.coordinator_ids, object.coordinator_ids)
+        self.assertEqual(model.id, model_object.language_id)
+        self.assertEqual(
+            model.coordinators_count, model_object.coordinators_count)
+        self.assertEqual(
+            model.coordinator_ids, model_object.coordinator_ids)
 
     def test_deassign_user_from_all_languages(self) -> None:
         self.signup('c@example.com', 'C')

@@ -25,7 +25,7 @@ import re
 
 from core import feconf
 from core.constants import constants
-from core.domain import contribution_stats_services, role_services
+from core.domain import contribution_stats_services
 from core.domain import email_manager
 from core.domain import exp_fetchers
 from core.domain import feedback_services
@@ -33,6 +33,7 @@ from core.domain import html_cleaner
 from core.domain import html_validation_service
 from core.domain import opportunity_services
 from core.domain import question_domain
+from core.domain import role_services
 from core.domain import skill_services
 from core.domain import state_domain
 from core.domain import suggestion_registry
@@ -41,9 +42,8 @@ from core.domain import user_domain
 from core.domain import user_services
 from core.platform import models
 
-from typing import (
-    Callable, Dict, Final, List, Literal, Mapping, Match,
-    Optional, Sequence, Set, Tuple, Union, cast, overload)
+from typing import (Callable, Dict, Final, List, Literal, Mapping, Match,
+                    Optional, Sequence, Set, Tuple, Union, cast, overload)
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -4225,7 +4225,7 @@ def deassign_user_from_all_languages(
             language_rights)
 
 
-def check_user_is_coordinator(user_id:str, language_id: str) -> bool:
+def check_user_is_coordinator(user_id: str, language_id: str) -> bool:
     """Check if the given user is coordinator of provided language.
 
     Args:
