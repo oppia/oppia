@@ -1,30 +1,25 @@
 <div class="partnerships-page e2e-test-partnerships-page">
   <div class="row oppia-partnerships-banner">
     <div class="oppia-partnerships-banner-content flex-gt-md-55">
-      <h1 class="oppia-partnerships-h1">
-        Partnerships with the Oppia Foundation
-      </h1>
+      <h1 class="oppia-partnerships-h1">{{ 'I18N_PARTNERSHIPS_PAGE_SECTION_ONE' | translate }}</h1>
 
       <div class="oppia-partnerships-list">
-        <p>
-          Does your organization share our vision for global educational
-          equality? With the help of our partners, we have...
-        </p>
+        <p>{{ 'I18N_PARTNERSHIPS_PAGE_SECTION_ONE_CONTENT' | translate }}</p>
         <ul>
           <li class="oppia-partnerships-page-welcome-text-bullet-list">
-            Served over
+            {{ 'I18N_PARTNERSHIPS_PAGE_SECTION_ONE_CONTENT_1_PART_1' | translate }}
             <span class="oppia-partnerships-emphasized">1,000,000</span>
-            learners worldwide
+            {{ 'I18N_PARTNERSHIPS_PAGE_SECTION_ONE_CONTENT_1_PART_2' | translate }}
           </li>
           <li class="oppia-partnerships-page-welcome-text-bullet-list">
-            Completed
+            {{ 'I18N_PARTNERSHIPS_PAGE_SECTION_ONE_CONTENT_2_PART_1' | translate }}
             <span class="oppia-partnerships-emphasized">1</span>
-            randomized control trial (RCT)
+            {{ 'I18N_PARTNERSHIPS_PAGE_SECTION_ONE_CONTENT_2_PART_2' | translate }}
           </li>
           <li class="oppia-partnerships-page-welcome-text-bullet-list">
-            Created over
+            {{ 'I18N_PARTNERSHIPS_PAGE_SECTION_ONE_CONTENT_3_PART_1' | translate }}
             <span class="oppia-partnerships-emphasized">2,000</span>
-            personalized lessons
+            {{ 'I18N_PARTNERSHIPS_PAGE_SECTION_ONE_CONTENT_3_PART_2' | translate }}
           </li>
         </ul>
       </div>
@@ -42,48 +37,41 @@
   </div>
 
   <div class="oppia-partnerships-benefits">
-    <h3 class="oppia-partnerships-h3">Benefits of being an Oppia partner</h3>
+    <h3 class="oppia-partnerships-h3">{{ 'I18N_PARTNERSHIPS_PAGE_BENEFITS_OF' | translate }}</h3>
 
     <div class="row">
       <div class="col col-lg-3 col-md-3 col-sm-12">
-        <span class="oppia-partnerships-emphasized">1.</span> Access to
-        Oppia-specific tips for curriculum building and lesson usage
+        <span class="oppia-partnerships-emphasized">1.</span> {{ 'I18N_PARTNERSHIPS_PAGE_BENEFITS_OF_1' | translate }}
       </div>
       <div class="col col-lg-3 col-md-3 col-sm-12">
-        <span class="oppia-partnerships-emphasized">2.</span> Personalized
-        guidance for how to best make use of Oppia's lessons for the learners
-        you work with
+        <span class="oppia-partnerships-emphasized">2.</span> {{ 'I18N_PARTNERSHIPS_PAGE_BENEFITS_OF_2' | translate }}
       </div>
       <div class="col col-lg-3 col-md-3 col-sm-12">
-        <span class="oppia-partnerships-emphasized">3.</span> Direct support and
-        collaboration with one of the Oppia Partnership Leads
+        <span class="oppia-partnerships-emphasized">3.</span> {{ 'I18N_PARTNERSHIPS_PAGE_BENEFITS_OF_3' | translate }}
       </div>
     </div>
   </div>
 
   <div class="oppia-partnerships-cta">
-    <h3 class="oppia-partnerships-h3">Get started today</h3>
-
+    <h3 class="oppia-partnerships-h3">{{ 'I18N_PARTNERSHIPS_PAGE_GET_STARTED' | translate }}</h3>
     <div class="row">
       <div class="col">
         <div class="oppia-partnerships-cta-icon flex-33">
           <img alt="Form Icon" [src]="formIconUrl">
         </div>
-        <span class="oppia-partnerships-emphasized">1.</span> Fill out the
-        interest form
+        <span class="oppia-partnerships-emphasized">1.</span> {{ 'I18N_PARTNERSHIPS_PAGE_GET_STARTED_1' | translate }}
       </div>
       <div class="col">
         <div class="oppia-partnerships-cta-icon flex-33">
           <img alt="Call Icon" [src]="callIconUrl">
         </div>
-        <span class="oppia-partnerships-emphasized">2.</span> Schedule a 1:1
-        call with our Partnerships Lead
+        <span class="oppia-partnerships-emphasized">2.</span> {{ 'I18N_PARTNERSHIPS_PAGE_GET_STARTED_2' | translate }}
       </div>
       <div class="col">
         <div class="oppia-partnerships-cta-icon flex-33">
           <img alt="Change Icon" [src]="changeIconUrl">
         </div>
-        <span class="oppia-partnerships-emphasized">3.</span> Make change!
+        <span class="oppia-partnerships-emphasized">3.</span> {{ 'I18N_PARTNERSHIPS_PAGE_GET_STARTED_3' | translate }}
       </div>
     </div>
 
@@ -91,115 +79,57 @@
       <a href="https://forms.gle/Y71U8FdhQwZpicJj8"
          target="_blank"
          rel="noopener">
-        FILL OUT INTEREST FORM
+         {{ 'I18N_PARTNERSHIPS_PAGE_GET_STARTED_BUTTON' | translate }}
       </a>
     </button>
   </div>
 
   <div class="oppia-partnerships-faqs">
-    <h3 class="oppia-partnerships-h3">Frequently asked questions</h3>
+    <h3 class="oppia-partnerships-h3">{{ 'I18N_PARTNERSHIPS_PAGE_FREQUENTLY_ASKED' | translate }}</h3>
 
     <mat-accordion>
       <div class="oppia-partnerships-faq-card">
         <mat-expansion-panel hideToggle>
           <mat-expansion-panel-header>
-            <mat-panel-title>
-              What does Oppia require from our organization?
-            </mat-panel-title>
+            <mat-panel-title>{{ 'I18N_PARTNERSHIPS_PAGE_FREQUENTLY_ASKED_1' | translate }}</mat-panel-title>
           </mat-expansion-panel-header>
-          <p>
-            This depends on the nature of the partnership. At the outset, we
-            would work together to understand how our missions align, and how
-            Oppia can provide support. We would then work together to establish
-            specific goals to follow through on during the partnership.<br>
-            Since partnerships require investment on both sides, it would be
-            helpful to have a contact who is fluent in English with whom we can
-            communicate regularly throughout the partnership.
-          </p>
+          <p [innerHTML]="'I18N_PARTNERSHIPS_PAGE_FREQUENTLY_ASKED_1_CONTENT' | translate"></p>
         </mat-expansion-panel>
       </div>
 
       <div class="oppia-partnerships-faq-card">
         <mat-expansion-panel hideToggle>
           <mat-expansion-panel-header>
-            <mat-panel-title>
-              Does Oppia give funding to organizations?
-            </mat-panel-title>
+            <mat-panel-title>{{ 'I18N_PARTNERSHIPS_PAGE_FREQUENTLY_ASKED_2' | translate }}</mat-panel-title>
           </mat-expansion-panel-header>
-          <p>
-            Each partnership between Oppia and organizations is unique. We try
-            to coordinate with organizations to meet their biggest needs. This
-            can include help with integrating Oppia into existing programming
-            and providing relevant resources for students, teachers, and
-            parents.<br>
-            We can also help organizations implement sustainable programming.
-            Get in touch with our Partnerships team lead, Melanie, at
-            <a href="mailto:melanies@oppia.org">melanies@oppia.org</a>, to see
-            how Oppia can work with your organization.
-          </p>
+          <p [innerHTML]="'I18N_PARTNERSHIPS_PAGE_FREQUENTLY_ASKED_2_CONTENT' | translate"></p>
         </mat-expansion-panel>
       </div>
 
       <div class="oppia-partnerships-faq-card">
         <mat-expansion-panel hideToggle>
           <mat-expansion-panel-header>
-            <mat-panel-title>
-              Can Oppia send volunteers to our area?
-            </mat-panel-title>
+            <mat-panel-title>{{ 'I18N_PARTNERSHIPS_PAGE_FREQUENTLY_ASKED_3' | translate }}</mat-panel-title>
           </mat-expansion-panel-header>
-          <p>
-            Perhaps. This is dependent on the partnership goals that have been
-            established, and the availability of local Oppia volunteers. We
-            strive to form partnerships that provide the most impact in a
-            region, which might include providing remote support and helping
-            organizations and community volunteers to get the most out of the
-            program.
-          </p>
+          <p [innerHTML]="'I18N_PARTNERSHIPS_PAGE_FREQUENTLY_ASKED_3_CONTENT' | translate"></p>
         </mat-expansion-panel>
       </div>
 
       <div class="oppia-partnerships-faq-card">
         <mat-expansion-panel hideToggle>
           <mat-expansion-panel-header>
-            <mat-panel-title>
-              Can the Oppia lessons be used in my region?
-            </mat-panel-title>
+            <mat-panel-title>{{ 'I18N_PARTNERSHIPS_PAGE_FREQUENTLY_ASKED_4' | translate }}</mat-panel-title>
           </mat-expansion-panel-header>
-          <p>
-            Yes! Oppia's
-            <a href="https://www.oppia.org/learn/math">classroom lessons</a> are
-            high-quality, engaging sessions designed to be accessible and
-            applicable for any region. We have tested these lessons and found
-            them to be effective in small-scale studies. Users can also
-            <a href="https://www.oppia.org/community-library">
-              create and upload
-            </a>
-            their own lessons to the Oppia platform.<br>
-            If it would help to have a mapping from your region's curriculum to
-            our lessons, please let us know (and, if possible, send a copy of
-            the curriculum) at
-            <a href="mailto:partnerships-support@oppia.org">
-              partnerships-support@oppia.org
-            </a>.
-          </p>
+          <p [innerHTML]="'I18N_PARTNERSHIPS_PAGE_FREQUENTLY_ASKED_4_CONTENT' | translate"></p>
         </mat-expansion-panel>
       </div>
 
       <div class="oppia-partnerships-faq-card">
         <mat-expansion-panel hideToggle>
           <mat-expansion-panel-header>
-            <mat-panel-title>
-              Would Oppia be willing to translate lessons to the language in our
-              region?
-            </mat-panel-title>
+            <mat-panel-title>{{ 'I18N_PARTNERSHIPS_PAGE_FREQUENTLY_ASKED_5' | translate }}</mat-panel-title>
           </mat-expansion-panel-header>
-          <p>
-            The Oppia team is happy to work with partners to offer translations.
-            Contact our Partnerships Team lead, Melanie, at
-            <a href="mailto:melanies@oppia.org">melanies@oppia.org</a>, to find
-            out how your organization can partner with Oppia to provide
-            accessible, effective educational materials in your region.
-          </p>
+          <p [innerHTML]="'I18N_PARTNERSHIPS_PAGE_FREQUENTLY_ASKED_5_CONTENT' | translate"></p>
         </mat-expansion-panel>
       </div>
     </mat-accordion>

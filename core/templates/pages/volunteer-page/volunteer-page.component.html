@@ -1,18 +1,11 @@
 <div class="volunteer-page e2e-test-volunteer-page">
   <div class="row oppia-volunteer-banner">
     <div class="oppia-volunteer-banner-content flex-gt-md-55">
-      <h1 class="oppia-volunteer-h1">
-        Join our global team of volunteers
-      </h1>
+      <h1 class="oppia-volunteer-h1">{{ 'I18N_VOLUNTEER_PAGE_SECTION_ONE' | translate }}</h1>
 
       <div class="oppia-volunteer-content">
-        <p>
-          Contributing to Oppia is an opportunity to impact the lives of millions of students.
-        </p>
-        <p>
-          It doesn&rsquo;t matter where you come from, what language you speak, or how young or
-          old you are - this is a community project, and all are welcome!
-        </p>
+        <p>{{ 'I18N_VOLUNTEER_PAGE_SECTION_ONE_CONTENT_1' | translate }}</p>
+        <p>{{ 'I18N_VOLUNTEER_PAGE_SECTION_ONE_CONTENT_2' | translate }}</p>
       </div>
     </div>
 
@@ -39,13 +32,13 @@
       <a href="https://forms.gle/rhFYoLLSFr3JEZHy8"
          target="_blank"
          rel="noopener">
-        FILL OUT INTEREST FORM
+         {{ 'I18N_VOLUNTEER_PAGE_SECTION_ONE_BUTTON' | translate }}
       </a>
     </button>
   </div>
 
   <div class="row oppia-volunteer-body">
-    <h3 class="oppia-volunteer-h3">Read about some of our current volunteers below!</h3>
+    <h3 class="oppia-volunteer-h3">{{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION' | translate }}</h3>
 
     <div class="oppia-volunteer-tabs">
       <mat-tab-group mat-stretch-tabs mat-align-tabs="center">
@@ -76,33 +69,16 @@
 
             </div>
             <div class="col oppia-volunteer-tab-description">
-              <p>
-                Creative artwork is a key part of our story-based lessons and
-                general non-profit activities. We are always working on a
-                variety of projects around the world, so we could use help
-                from artists and graphic designers from all backgrounds
-                and specialties!
-              </p>
-              <p>
-                Contributing to Oppia is a great opportunity to grow your
-                skills, work with an international team of creators and artists,
-                and positively impact the lives of millions of students.
-              </p>
+              <p>{{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_ART_CONTENT_1' | translate }}</p>
+              <p>{{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_ART_CONTENT_2' | translate }}</p>
 
               <div class="oppia-volunteer-dotted-spaced-line mb-5"><br></div>
 
-              <p><b> What we do: </b></p>
+              <p [innerHTML]="'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_ART_WHAT_WE' | translate "></p>
               <ul>
-                <li class="oppia-volunteer-page-description-list-item">
-                  Create graphics for lessons, websites, and other
-                  foundation-related outreach materials.
-                </li>
-                <li class="oppia-volunteer-page-description-list-item">
-                  Collaborate with team to define art-related needs.
-                </li>
-                <li class="oppia-volunteer-page-description-list-item">
-                  Help drive the design-related strategy and direction for Oppia.
-                </li>
+                <li class="oppia-volunteer-page-description-list-item">{{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_ART_WHAT_WE_1' | translate }}</li>
+                <li class="oppia-volunteer-page-description-list-item">{{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_ART_WHAT_WE_2' | translate }}</li>
+                <li class="oppia-volunteer-page-description-list-item">{{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_ART_WHAT_WE_3' | translate }}</li>
               </ul>
 
             </div>
@@ -135,29 +111,15 @@
 
             </div>
             <div class="col oppia-volunteer-tab-description">
-              <p>
-                Oppia enables authors to collaborate on creating high-quality
-                lessons at scale. As a developer, you'll be contributing to the
-                technology that makes it all possible!
-                The <a href="https://github.com/oppia/oppia">Oppia codebase</a>
-                is open source, developed by a community of volunteers from all
-                around the world who want to use their skills to make a difference.
-              </p>
+              <p [innerHTML]="'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_DEVELOPMENT_CONTENT' | translate"></p>
 
               <div class="oppia-volunteer-dotted-spaced-line mb-5"><br></div>
 
-              <p><b> What we do: </b></p>
+              <p [innerHTML]="'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_DEVELOPMENT_WHAT_WE' | translate"></p>
               <ul>
-                <li class="oppia-volunteer-page-description-list-item">
-                  Build features enabling students to learn effectively.
-                </li>
-                <li class="oppia-volunteer-page-description-list-item">
-                  Provide infrastructure to deliver lessons at scale.
-                </li>
-                <li class="oppia-volunteer-page-description-list-item">
-                  Apply ML techniques to help Oppia respond better to
-                  students' answers.
-                </li>
+                <li class="oppia-volunteer-page-description-list-item">{{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_DEVELOPMENT_WHAT_WE_1' | translate }}</li>
+                <li class="oppia-volunteer-page-description-list-item">{{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_DEVELOPMENT_WHAT_WE_2' | translate }}</li>
+                <li class="oppia-volunteer-page-description-list-item">{{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_DEVELOPMENT_WHAT_WE_3' | translate }}</li>
               </ul>
 
             </div>
@@ -190,38 +152,16 @@
 
             </div>
             <div class="col oppia-volunteer-tab-description">
-              <p>
-                Oppia’s Learner Feedback Program focuses on understanding
-                students’ expectations, behaviors, and needs. Local volunteers
-                conduct studies with students by working through lessons and
-                gathering feedback. This feedback allows us to create content
-                that is fun and easily digestible.This feedback is critical in
-                helping us better align our lessons with the core needs and
-                goals of students. It also enables us to help future
-                students more effectively.
-              </p>
-              <p>
-                If you are passionate about education and want to make a
-                difference in your local community, sign up to be a
-                Learner Feedback Program volunteer and help us create
-                the best platform for students around the world!
-              </p>
+              <p>{{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_LEARNER_FEEDBACK_CONTENT_1' | translate }}</p>
+              <p>{{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_LEARNER_FEEDBACK_CONTENT_2' | translate }}</p>
 
               <div class="oppia-volunteer-dotted-spaced-line mb-5"><br></div>
 
-              <p><b> What we do: </b></p>
+              <p [innerHTML]="'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_LEARNER_FEEDBACK_WHAT_WE' | translate "></p>
               <ul>
-                <li class="oppia-volunteer-page-description-list-item">
-                  Observe students using the lessons to understand if our
-                  platform is meeting their needs.
-                </li>
-                <li class="oppia-volunteer-page-description-list-item">
-                  Recommend ways that Oppia can improve its program and lessons.
-                </li>
-                <li class="oppia-volunteer-page-description-list-item">
-                  Generate awareness around Oppia in our local community
-                  among students, parents, and teachers.
-                </li>
+                <li class="oppia-volunteer-page-description-list-item">{{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_LEARNER_FEEDBACK_WHAT_WE_1' | translate }}</li>
+                <li class="oppia-volunteer-page-description-list-item">{{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_LEARNER_FEEDBACK_WHAT_WE_2' | translate }}</li>
+                <li class="oppia-volunteer-page-description-list-item">{{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_LEARNER_FEEDBACK_WHAT_WE_3' | translate }}</li>
               </ul>
 
             </div>
@@ -254,34 +194,16 @@
 
             </div>
             <div class="col oppia-volunteer-tab-description">
-              <p>
-                Oppia’s lesson creation team is responsible for creating a set
-                of highly effective and enjoyable lessons that students around
-                the world can use for free. The team follows a tested process
-                to generate effective lessons that appeal to students
-                from all backgrounds.
-              </p>
-              <p>
-                Our goal is to not only teach students in an easily digestible
-                way, but also encourage a positive attitude towards learning.
-                Currently, we're focusing on basic mathematics,
-                but intend to expand to other subjects in the future.
-              </p>
+              <p>{{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_LESSON_CREATION_CONTENT_1' | translate }}</p>
+              <p>{{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_LESSON_CREATION_CONTENT_2' | translate }}</p>
 
               <div class="oppia-volunteer-dotted-spaced-line mb-5"><br></div>
 
-              <p><b> What we do: </b></p>
+              <p [innerHTML]="'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_LESSON_CREATION_WHAT_WE' | translate "></p>
               <ul>
-                <li class="oppia-volunteer-page-description-list-item">
-                  Break down math concepts into bite-sized lessons that
-                  build on each other.
-                </li>
-                <li class="oppia-volunteer-page-description-list-item">
-                  Come up with interesting stories for the lesson's "main plot".
-                </li>
-                <li class="oppia-volunteer-page-description-list-item">
-                  Create scripts for lessons and implement them on Oppia.
-                </li>
+                <li class="oppia-volunteer-page-description-list-item">{{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_LESSON_CREATION_WHAT_WE_1' | translate }}</li>
+                <li class="oppia-volunteer-page-description-list-item">{{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_LESSON_CREATION_WHAT_WE_2' | translate }}</li>
+                <li class="oppia-volunteer-page-description-list-item">{{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_LESSON_CREATION_WHAT_WE_3' | translate }}</li>
               </ul>
 
             </div>
@@ -292,19 +214,13 @@
   </div>
 
   <div class="oppia-volunteer-footer">
-    <p>
-      If you're interested in helping out, simply let us know what you’re
-      interested in working on and a lead will reach out to you shortly!
-      You can fill out the form below (or go to
-      <a href="https://github.com/oppia/oppia/wiki">GitHub</a> if you're
-      interested in contributing to the codebase as a developer).
-    </p>
+    <p [innerHTML]="'I18N_VOLUNTEER_PAGE_FOOTER' | translate"></p>
 
     <button class="btn">
       <a href="https://forms.gle/rhFYoLLSFr3JEZHy8"
          target="_blank"
-         rel="noopener">
-        FILL OUT INTEREST FORM
+         rel="noopener"
+         [innerHTML]="'I18N_VOLUNTEER_PAGE_FOOTER_BUTTON' | translate">
       </a>
     </button>
   </div>
