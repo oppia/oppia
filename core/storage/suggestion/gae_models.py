@@ -3511,7 +3511,7 @@ class TranslationCoordinatorsModel(base_models.BaseModel):
     # https://mypy.readthedocs.io/en/stable/error_code_list.html#check-validity-of-overrides-override
     @classmethod
     def get( # type: ignore[override]
-        cls, language_code: INVALID_STORY_REJECT_TRANSLATION_SUGGESTIONS_MSG
+        cls, language_code: str
     ) -> Optional[TranslationCoordinatorsModel]:
         """Gets the TranslationCoordinatorsModel
         matching the supplied language_code.

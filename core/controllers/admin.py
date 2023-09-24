@@ -2105,10 +2105,10 @@ class TranslationCoordinatorRoleHandlerNormalizedPayloadDict(TypedDict):
 
 class TranslationCoordinatorRoleHandler(
     base.BaseHandler[
-        TopicManagerRoleHandlerNormalizedPayloadDict, Dict[str, str]
+        TranslationCoordinatorRoleHandlerNormalizedPayloadDict, Dict[str, str]
     ]
 ):
-    """Handler to assign or deassigning manager to a topic."""
+    """Handler to assign or deassigning coordinator to a language."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}

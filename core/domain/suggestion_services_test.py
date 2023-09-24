@@ -7605,6 +7605,16 @@ class TranslationCoordinatorRightsTests(test_utils.GenericTestBase):
     def test_guest_user_cannot_be_deassgined(
         self
     ) -> None:
+        with self.assertRaisesRegex(
+            Exception,
+            'No model exists for provided language.'
+        ):
+            suggestion_services.deassign_coordinator(
+                self.user_admin, self.user_a, 'no_model')
+
+    def test_deassigning_for_non_existing_language_model(
+        self
+    ) -> None:
         guest_user = user_services.get_user_actions_info(None)
         with self.assertRaisesRegex(
             Exception,
@@ -7625,6 +7635,8 @@ class TranslationCoordinatorRightsTests(test_utils.GenericTestBase):
         model_object = suggestion_services.get_translation_rights_from_model(
             model)
 
+        # Asserting here because we have created a model for 'en' in setup.
+        assert model_object is not None
         self.assertEqual(model.id, model_object.language_id)
         self.assertEqual(
             model.coordinators_count, model_object.coordinators_count)
@@ -7645,3 +7657,14 @@ class TranslationCoordinatorRightsTests(test_utils.GenericTestBase):
 
         self.assertEqual(0, len(
             suggestion_services.get_translation_rights_with_user(user_id_c)))
+
+    def test_deassign_non_coordinator_from_all_languages(self) -> None:
+        self.signup('c@example.com', 'C')
+        user_id_c = self.get_user_id_from_email('c@example.com')
+
+        with self.assertRaisesRegex(
+            Exception,
+            'Cannot change the role of the Guest user.'
+        ):
+            suggestion_services.deassign_user_from_all_languages(
+                self.user_admin, user_id_c)
