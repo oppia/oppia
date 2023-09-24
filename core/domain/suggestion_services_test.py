@@ -7631,7 +7631,7 @@ class TranslationCoordinatorRightsTests(test_utils.GenericTestBase):
 
     def test_get_translation_rights_from_model(self) -> None:
         model = suggestion_models.TranslationCoordinatorsModel.get('en')
-
+        assert model is not None
         model_object = suggestion_services.get_translation_rights_from_model(
             model)
 

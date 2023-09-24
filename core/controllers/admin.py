@@ -2100,7 +2100,7 @@ class TranslationCoordinatorRoleHandlerNormalizedPayloadDict(TypedDict):
 
     username: str
     action: str
-    language_code: str
+    language_id: str
 
 
 class TranslationCoordinatorRoleHandler(
