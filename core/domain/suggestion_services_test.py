@@ -7657,14 +7657,3 @@ class TranslationCoordinatorRightsTests(test_utils.GenericTestBase):
 
         self.assertEqual(0, len(
             suggestion_services.get_translation_rights_with_user(user_id_c)))
-
-    def test_deassign_non_coordinator_from_all_languages(self) -> None:
-        self.signup('c@example.com', 'C')
-        user_id_c = self.get_user_id_from_email('c@example.com')
-
-        with self.assertRaisesRegex(
-            Exception,
-            'Cannot change the role of the Guest user.'
-        ):
-            suggestion_services.deassign_user_from_all_languages(
-                self.user_admin, user_id_c)

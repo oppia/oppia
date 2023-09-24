@@ -4187,19 +4187,10 @@ def get_translation_rights_with_user(user_id: str) -> List[
     Returns:
         list(TranslationCoordinatorStats). The rights objects associated with
         the languagesassigned to given user.
-
-    Raises:
-        Exception. User is not assigned to any language.
     """
     translation_coordinator_models: Sequence[
         suggestion_models.TranslationCoordinatorsModel] = (
         suggestion_models.TranslationCoordinatorsModel.get_by_user(user_id))
-
-    if translation_coordinator_models is None:
-        raise Exception(
-            'User is not assigned to any language.'
-        )
-
     return [
         get_translation_rights_from_model(model)
         for model in translation_coordinator_models
