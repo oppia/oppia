@@ -460,7 +460,7 @@ describe('Admin roles tab component ', function() {
 
       expect(modalSpy).toHaveBeenCalledWith(
         TranslationCoordinatorRoleEditorModalComponent);
-      expect(component.managedTopicIds).toEqual(['en']);
+      expect(component.coordinatedLanguageIds).toEqual(['en']);
       expect(component.userRoles).toEqual(
         ['MODERATOR', 'TRANSLATION_COORDINATOR']);
     }));
