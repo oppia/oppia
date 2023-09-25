@@ -19,6 +19,7 @@
 
 var action = require('./action.js');
 var waitFor = require('./waitFor.js');
+var users = require('./users.js');
 
 var ContributorDashboardAdminPage = function() {
   var CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION = 'REVIEW_TRANSLATION';
@@ -119,6 +120,58 @@ var ContributorDashboardAdminPage = function() {
     }
   };
 
+  this.copyElementWithClassName = async function(
+      elementDescription, elementClassName) {
+    let copyButton = $('.e2e-test-copy-button');
+    let doneButton = $('.e2e-test-close-rich-text-component-editor');
+    let saveButton = $('.e2e-test-save-button');
+    let textbox = $('.e2e-test-description-box');
+
+    // Copy tool should copy image on pressing 'Done'.
+    await waitFor.visibilityOf(
+      copyButton, 'Copy button taking too long to appear');
+    await action.click('Copy button', copyButton);
+    await action.click(elementDescription, elementClassName);
+    await action.setValue(
+      'Set Image description', textbox, 'An example description');
+    await action.click('Done', doneButton);
+    await action.click('Save', saveButton);
+    await users.logout();
+  };
+
+  this.clickFirstOpportunityInSmallScreenView = async function() {
+    let opportunityItemSelector = function() {
+      return $$('.e2e-test-opportunity-list-item');
+    };
+    let opportunity = (await opportunityItemSelector())[0];
+    await action.click('Opportunity Item', opportunity);
+  }
+
+  this.acceptTranslation = async function() {
+    var acceptButton = $('.e2e-test-translation-accept-button');
+    await action.click('Translation accept button', acceptButton);
+  };
+
+  this.navigateToquestionSubmitterTab = async function() {
+    var questionSubmitterTab = $('.e2e-test-question-submitters-tab');
+    await action.click('Question Submitter tab', questionSubmitterTab);
+  };
+
+  this.navigateToquestionReviewerTab = async function() {
+    var questionReviewerTab = $('.e2e-test-question-reviewers-tab');
+    await action.click('Question Reviewer tab', questionReviewerTab);
+  };
+
+  this.navigateTotranslationSubmitterTab = async function() {
+    var translationSubmitterTab = $('.e2e-test-translation-submitters-tab');
+    await action.click('Translation Submitter tab', translationSubmitterTab);
+  };
+
+  this.navigateTotranslationReviewerTab = async function() {
+    var translationReviewerTab = $('.e2e-test-translation-reviewers-tab');
+    await action.click('Translation Reviewer tab', translationReviewerTab);
+  };
+
   this.assignTranslationReviewer = async function(
       username, languageDescription) {
     await _assignContributionRights(
@@ -183,14 +236,14 @@ var ContributorDashboardAdminPage = function() {
     expect(await contributionRights.getText()).toBe('Allowed');
   };
 
-  this.checkstatslistelements = async function(number) {
-    await waitFor.presenceOf(statsTable, 'stats table was not visible');
+  this.expectStatsElementCountToBe = async function(elementsCount) {
+    await waitFor.visibilityOf(statsTable, 'stats table is not visible');
     var statsListItems = await statsListItemsSelector();
-    expect(statsListItems.length).toBe(number);
+    expect(statsListItems.length).toBe(elementsCount);
   };
 
-  this.checkexpandablestats = async function() {
-    await waitFor.presenceOf(statsTable, 'stats table was not visible');
+  this.checkExpandableStats = async function() {
+    await waitFor.visibilityOf(statsTable, 'stats table was not visible');
     var statsListItems = await statsListItemsSelector();
     await action.click('Stats row', statsListItems[0]);
     await waitFor.visibilityOf(expandedRow, 'Expanded row not visible');
