@@ -21,7 +21,7 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 import { ImagesData } from 'services/image-local-storage.service';
 
-import { TranslateTextBackendApiService } from './translate-text-backend-api.service';
+import { translateTextBackendApiService } from './translate-text-backend-api.service';
 import { TranslatableTexts } from 'domain/opportunity/translatable-texts.model';
 import {
   TRANSLATION_DATA_FORMAT_SET_OF_NORMALIZED_STRING,
@@ -76,7 +76,7 @@ export class TranslateTextService {
 
   constructor(
     private translateTextBackedApiService:
-      TranslateTextBackendApiService
+      translateTextBackendApiService
   ) { }
 
   private _getNextText(): string | string[] {
