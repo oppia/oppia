@@ -47,13 +47,13 @@ DEV_FEATURES_LIST = [
     params.ParamNames.SERIAL_CHAPTER_LAUNCH_LEARNER_VIEW,
     params.ParamNames.SHOW_FEEDBACK_UPDATES_IN_PROFILE_PIC_DROPDOWN,
     params.ParamNames.SHOW_REDESIGNED_LEARNER_DASHBOARD,
-    params.ParamNames.SHOW_TRANSLATION_SIZE,
-    params.ParamNames.CD_ADMIN_DASHBOARD_NEW_UI,
+    params.ParamNames.SHOW_TRANSLATION_SIZE
 ]
 
 # Names of features in test stage, the corresponding feature flag instances must
 # be in test stage otherwise it will cause a test error in the backend test.
 TEST_FEATURES_LIST: List[ParamNames] = [
+    params.ParamNames.CD_ADMIN_DASHBOARD_NEW_UI
 ]
 
 # Names of features in prod stage, the corresponding feature flag instances must
@@ -99,5 +99,6 @@ ALL_PLATFORM_PARAMS_EXCEPT_FEATURE_FLAGS: List[ParamNames] = [
     params.ParamNames.PROMO_BAR_MESSAGE,
     params.ParamNames.SIGNUP_EMAIL_BODY_CONTENT,
     params.ParamNames.SIGNUP_EMAIL_SUBJECT_CONTENT,
-    params.ParamNames.UNPUBLISH_EXPLORATION_EMAIL_HTML_BODY
+    params.ParamNames.UNPUBLISH_EXPLORATION_EMAIL_HTML_BODY,
+    params.ParamNames.RECORD_PLAYTHROUGH_PROBABILITY
 ]
