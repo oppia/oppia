@@ -31,8 +31,6 @@ class ParamNames(enum.Enum):
     CHECKPOINT_CELEBRATION = 'checkpoint_celebration'
     CONTRIBUTOR_DASHBOARD_ACCOMPLISHMENTS = (
         'contributor_dashboard_accomplishments')
-    ANDROID_BETA_LANDING_PAGE = 'android_beta_landing_page'
-    BLOG_PAGES = 'blog_pages'
     DIAGNOSTIC_TEST = 'diagnostic_test'
     SERIAL_CHAPTER_LAUNCH_CURRICULUM_ADMIN_VIEW = (
         'serial_chapter_launch_curriculum_admin_view')
