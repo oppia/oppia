@@ -75,31 +75,31 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    let userInfoPromise = this.userService.getUserInfoAsync();
-    userInfoPromise.then(userInfo => {
+    this.userService.getUserInfoAsync().then(userInfo => {
       const username = userInfo.getUsername();
-      if (username) {
-        this.isQuestionCoordinator = userInfo.isQuestionCoordinator();
-        this.isTranslationCoordinator = userInfo.isTranslationCoordinator();
-
-        if (this.isTranslationCoordinator) {
-          this.CONTRIBUTION_TYPES = [this.TAB_NAME_TRANSLATION_SUBMITTER,
-            this.TAB_NAME_TRANSLATION_REVIEWER];
-        }
-        if (this.isQuestionCoordinator) {
-          this.CONTRIBUTION_TYPES = [this.TAB_NAME_QUESTION_SUBMITTER,
-            this.TAB_NAME_QUESTION_REVIEWER];
-        }
-        if (this.isQuestionCoordinator && this.isTranslationCoordinator) {
-          this.CONTRIBUTION_TYPES = [this.TAB_NAME_TRANSLATION_SUBMITTER,
-            this.TAB_NAME_TRANSLATION_REVIEWER,
-            this.TAB_NAME_QUESTION_SUBMITTER,
-            this.TAB_NAME_QUESTION_REVIEWER];
-        }
-
-        this.updateSelectedContributionType(this.CONTRIBUTION_TYPES[0]);
-        this.changeDetectorRef.detectChanges();
+      if (username === null) {
+        return;
       }
+      this.isQuestionCoordinator = userInfo.isQuestionCoordinator();
+      this.isTranslationCoordinator = userInfo.isTranslationCoordinator();
+
+      if (this.isTranslationCoordinator) {
+        this.CONTRIBUTION_TYPES = [this.TAB_NAME_TRANSLATION_SUBMITTER,
+          this.TAB_NAME_TRANSLATION_REVIEWER];
+      }
+      if (this.isQuestionCoordinator) {
+        this.CONTRIBUTION_TYPES = [this.TAB_NAME_QUESTION_SUBMITTER,
+          this.TAB_NAME_QUESTION_REVIEWER];
+      }
+      if (this.isQuestionCoordinator && this.isTranslationCoordinator) {
+        this.CONTRIBUTION_TYPES = [this.TAB_NAME_TRANSLATION_SUBMITTER,
+          this.TAB_NAME_TRANSLATION_REVIEWER,
+          this.TAB_NAME_QUESTION_SUBMITTER,
+          this.TAB_NAME_QUESTION_REVIEWER];
+      }
+
+      this.updateSelectedContributionType(this.CONTRIBUTION_TYPES[0]);
+      this.changeDetectorRef.detectChanges();
     });
 
     this.contributorDashboardAdminStatsBackendApiService
