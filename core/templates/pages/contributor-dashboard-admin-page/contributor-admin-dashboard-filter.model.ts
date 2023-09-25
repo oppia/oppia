@@ -43,6 +43,6 @@ export class ContributorAdminDashboardFilter {
  *   ContributorAdminDashboardFilter instance.
  */
   static createDefault(): ContributorAdminDashboardFilter {
-    return new ContributorAdminDashboardFilter([], 'es');
+    return new ContributorAdminDashboardFilter([], 'pt');
   }
 }

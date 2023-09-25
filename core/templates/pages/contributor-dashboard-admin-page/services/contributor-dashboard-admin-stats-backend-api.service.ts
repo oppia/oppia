@@ -147,6 +147,7 @@ export interface QuestionReviewerStatsBackendDict {
   providedIn: 'root',
 })
 export class ContributorDashboardAdminStatsBackendApiService {
+  params: {};
   constructor(
     private http: HttpClient,
     private urlInterpolationService: UrlInterpolationService
@@ -184,6 +185,16 @@ export class ContributorDashboardAdminStatsBackendApiService {
         contribution_subtype: contributionSubtype
       }
     );
+    this.params = {
+      page_size: pageSize,
+      offset: nextOffset,
+      language_code: filter.languageCode,
+      topic_ids: [],
+      ...(
+        filter.lastActivity ? {
+          max_days_since_last_activity: filter.lastActivity
+        } : {}),
+    };
     if (contributionType === AppConstants.CONTRIBUTION_STATS_TYPE_TRANSLATION) {
       if (
         contributionSubtype === (
@@ -191,12 +202,7 @@ export class ContributorDashboardAdminStatsBackendApiService {
         return new Promise((resolve, reject) => {
           this.http.get<TranslationSubmitterStatsBackendDict>(
             url, {
-              params: {
-                page_size: pageSize,
-                offset: nextOffset,
-                language_code: filter.languageCode,
-                topic_ids: []
-              }
+              params: this.params
             } as Object
           ).toPromise().then(response => {
             resolve({
@@ -217,12 +223,7 @@ export class ContributorDashboardAdminStatsBackendApiService {
         return new Promise((resolve, reject) => {
           this.http.get<TranslationReviewerStatsBackendDict>(
             url, {
-              params: {
-                page_size: pageSize,
-                offset: nextOffset,
-                language_code: filter.languageCode,
-                topic_ids: []
-              }
+              params: this.params
             } as Object
           ).toPromise().then(response => {
             resolve({
@@ -245,12 +246,7 @@ export class ContributorDashboardAdminStatsBackendApiService {
         return new Promise((resolve, reject) => {
           this.http.get<QuestionSubmitterStatsBackendDict>(
             url, {
-              params: {
-                page_size: pageSize,
-                offset: nextOffset,
-                language_code: filter.languageCode,
-                topic_ids: []
-              }
+              params: this.params
             } as Object
           ).toPromise().then(response => {
             resolve({
@@ -271,12 +267,7 @@ export class ContributorDashboardAdminStatsBackendApiService {
         return new Promise((resolve, reject) => {
           this.http.get<QuestionReviewerStatsBackendDict>(
             url, {
-              params: {
-                page_size: pageSize,
-                offset: nextOffset,
-                language_code: filter.languageCode,
-                topic_ids: []
-              }
+              params: this.params
             } as Object
           ).toPromise().then(response => {
             resolve({

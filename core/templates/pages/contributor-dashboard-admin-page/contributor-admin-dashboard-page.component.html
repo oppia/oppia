@@ -48,7 +48,49 @@
         </li>
       </ul>
     </div>
-    <contributor-admin-stats-table [activeTab]="activeTab"></contributor-admin-stats-table>
+    <div class="filter-container">
+      <div class="language-selector-container">
+        <div #dropdown class="oppia-filter-selector-container e2e-test-topic-selector">
+          <div class="oppia-filter-selector-inner-container e2e-test-topic-selector-selected"
+               (click)="toggleLanguageDropdown()">
+            {{selectedLanguage}}
+            <span class="fas fa-caret-down oppia-filter-selector-inner-container-arrow"
+                  [ngStyle]="{ 'transform': languageDropdownShown ? 'scaleY(-1)' : 'scaleY(1)' }">
+            </span>
+          </div>
+          <div *ngIf="languageDropdownShown"
+               class="oppia-filter-selector-dropdown-container e2e-test-topic-selector-dropdown">
+            <div class="oppia-filter-selector-dropdown-option e2e-test-topic-selector-option"
+                 *ngFor="let option of languages"
+                 (click)="selectLanguage(option.language)"
+                 [ngClass]="{'oppia-filter-selector-dropdown-option-selected' : option === selectedLanguage}">
+              {{option.language}}
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="last-activity-selector-container">
+        <div #dropdown class="oppia-filter-selector-container e2e-test-topic-selector">
+          <div class="oppia-filter-selector-inner-container e2e-test-topic-selector-selected"
+               (click)="toggleActivityDropdown()">
+            Within {{selectedLastActivity}} days
+            <span class="fas fa-caret-down oppia-filter-selector-inner-container-arrow"
+                  [ngStyle]="{ 'transform': activityDropdownShown ? 'scaleY(-1)' : 'scaleY(1)' }">
+            </span>
+          </div>
+          <div *ngIf="activityDropdownShown"
+               class="oppia-filter-selector-dropdown-container e2e-test-topic-selector-dropdown">
+            <div class="oppia-filter-selector-dropdown-option e2e-test-topic-selector-option"
+                 *ngFor="let option of lastActivty"
+                 (click)="selectLastActivity(option)"
+                 [ngClass]="{'oppia-filter-selector-dropdown-option-selected' : option === selectedLastActivity}">
+              Within {{option}} days
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <contributor-admin-stats-table [activeTab]="activeTab" [filter]="filter"></contributor-admin-stats-table>
   </div>
   <div class="dashboard-content-mobile">
     <div class="dropdown">

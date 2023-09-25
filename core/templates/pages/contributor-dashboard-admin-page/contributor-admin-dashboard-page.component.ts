@@ -17,12 +17,20 @@
  * @fileoverview Component for the feedback Updates page.
  */
 
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, ViewChild, ElementRef, HostListener } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import './contributor-admin-dashboard-page.component.css';
 import { animate, state, style, transition, trigger } from '@angular/animations';
 import { ContributorDashboardAdminStatsBackendApiService } from './services/contributor-dashboard-admin-stats-backend-api.service';
+import { AppConstants } from 'app.constants';
+import { ContributorAdminDashboardFilter } from './contributor-admin-dashboard-filter.model';
+
+
+interface LangaugeChoice {
+  id: string;
+  language: string;
+}
 
 @Component({
   selector: 'contributor-admin-dashboard-page',
@@ -39,6 +47,10 @@ import { ContributorDashboardAdminStatsBackendApiService } from './services/cont
   ],
 })
 export class ContributorAdminDashboardPageComponent implements OnInit {
+  @ViewChild('dropdown', {'static': false}) dropdownRef!: ElementRef;
+
+  languageDropdownShown: boolean = false;
+  activityDropdownShown: boolean = false;
   activeTab!: string;
   TAB_NAME_TRANSLATION_SUBMITTER: string = 'Translation Submitter';
   TAB_NAME_TRANSLATION_REVIEWER: string = 'Translation Reviewer';
@@ -50,6 +62,15 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
     this.TAB_NAME_TRANSLATION_REVIEWER,
     this.TAB_NAME_QUESTION_SUBMITTER,
     this.TAB_NAME_QUESTION_REVIEWER];
+
+  selectedLanguage: string;
+  selectedLanguageId: string = 'pt';
+  selectedLastActivity: number;
+
+  languages: LangaugeChoice[] = [];
+  lastActivty: number[] = [7, 30, 90];
+  filter: ContributorAdminDashboardFilter = (
+    ContributorAdminDashboardFilter.createDefault());
 
   constructor(
     private windowRef: WindowRef,
@@ -66,6 +87,54 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
           this.translationReviewersCount = response.translation_reviewers_count;
           this.questionReviewersCount = response.question_reviewers_count;
         });
+
+    this.languages = AppConstants.SUPPORTED_AUDIO_LANGUAGES.map(
+      (languageItem) => {
+        return {
+          id: languageItem.id,
+          language: languageItem.description
+        };
+      }
+    );
+
+    this.lastActivty = [7, 30, 90];
+
+    this.filter = new ContributorAdminDashboardFilter(
+      [],
+      'pt',
+      null,
+      this.selectedLastActivity);
+  }
+
+  toggleLanguageDropdown(): void {
+    this.languageDropdownShown = !this.languageDropdownShown;
+  }
+
+  toggleActivityDropdown(): void {
+    this.activityDropdownShown = !this.activityDropdownShown;
+  }
+
+  selectLanguage(language: string): void {
+    const currentOption = this.languages.find(
+      (option) => option.language === language);
+    this.selectedLanguage = currentOption?.language;
+    this.selectedLanguageId = currentOption?.id;
+    this.filter = new ContributorAdminDashboardFilter(
+      [],
+      this.selectedLanguageId,
+      null,
+      this.selectedLastActivity);
+    this.languageDropdownShown = false;
+  }
+
+  selectLastActivity(lastActive: number): void {
+    this.selectedLastActivity = lastActive;
+    this.filter = new ContributorAdminDashboardFilter(
+      [],
+      this.selectedLanguageId,
+      null,
+      this.selectedLastActivity);
+    this.activityDropdownShown = false;
   }
 
   setActiveTab(tabName: string): void {
@@ -75,6 +144,22 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
 
   checkMobileView(): boolean {
     return (this.windowRef.nativeWindow.innerWidth < 800);
+  }
+
+  /**
+   * Close dropdown when outside elements are clicked
+   * @param event mouse click event
+   */
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent): void {
+    const targetElement = event.target as HTMLElement;
+    if (
+      targetElement &&
+      !this.dropdownRef.nativeElement.contains(targetElement)
+    ) {
+      this.languageDropdownShown = false;
+      // this.activityDropdownShown = false;
+    }
   }
 }
 

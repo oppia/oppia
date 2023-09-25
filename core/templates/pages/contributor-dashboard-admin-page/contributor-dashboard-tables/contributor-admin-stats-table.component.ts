@@ -54,6 +54,7 @@ import { QuestionReviewerStats, QuestionSubmitterStats, TranslationReviewerStats
 })
 export class ContributorAdminStatsTable implements OnInit {
   @Input() activeTab: string = 'Translation Submitter';
+  @Input() filter: ContributorAdminDashboardFilter;
 
   columnsToDisplay = [
     'chevron',
@@ -103,6 +104,9 @@ export class ContributorAdminStatsTable implements OnInit {
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes.activeTab) {
+      this.filter = ContributorAdminDashboardFilter.createDefault();
+    }
+    if (changes) {
       this.loadingMessage = 'Loading';
       this.updateColumnsToDisplay();
     }
@@ -131,7 +135,7 @@ export class ContributorAdminStatsTable implements OnInit {
       }
       this.ContributorDashboardAdminStatsBackendApiService
         .fetchContributorAdminStats(
-          ContributorAdminDashboardFilter.createDefault(),
+          this.filter,
           20,
           0,
           AppConstants.CONTRIBUTION_STATS_TYPE_TRANSLATION,
@@ -160,7 +164,7 @@ export class ContributorAdminStatsTable implements OnInit {
       }
       this.ContributorDashboardAdminStatsBackendApiService
         .fetchContributorAdminStats(
-          ContributorAdminDashboardFilter.createDefault(),
+          this.filter,
           20,
           0,
           AppConstants.CONTRIBUTION_STATS_TYPE_TRANSLATION,
@@ -193,7 +197,7 @@ export class ContributorAdminStatsTable implements OnInit {
       }
       this.ContributorDashboardAdminStatsBackendApiService
         .fetchContributorAdminStats(
-          ContributorAdminDashboardFilter.createDefault(),
+          this.filter,
           20,
           0,
           AppConstants.CONTRIBUTION_STATS_TYPE_QUESTION,
@@ -222,7 +226,7 @@ export class ContributorAdminStatsTable implements OnInit {
       }
       this.ContributorDashboardAdminStatsBackendApiService
         .fetchContributorAdminStats(
-          ContributorAdminDashboardFilter.createDefault(),
+          this.filter,
           20,
           0,
           AppConstants.CONTRIBUTION_STATS_TYPE_QUESTION,
