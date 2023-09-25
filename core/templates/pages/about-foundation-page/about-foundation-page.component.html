@@ -11,12 +11,8 @@
                class="oppia-about-foundation-page-oppia-logo"
                src="/assets/images/about_foundation/oppia_big_logo.png">
         </picture>
-        <h1>
-          The Oppia Foundation
-        </h1>
-        <h3>
-          Building a community to provide quality education to those who lack access to it
-        </h3>
+        <h1>{{ 'I18N_ABOUT_FOUNDATION_PAGE_HEADING' | translate }}</h1>
+        <h3>{{ 'I18N_ABOUT_FOUNDATION_PAGE_HEADING_CONTENT' | translate }}</h3>
       </div>
     </div>
   </div>
@@ -24,22 +20,10 @@
   <div class="row oppia-about-foundation-info-card-white">
     <div class="col-lg-8">
       <div class="row">
-        <h1>
-          Millions of children are not receiving the education they deserve.
-        </h1>
+        <h1>{{ 'I18N_ABOUT_FOUNDATION_PAGE_MILLIONS_OF' | translate }}</h1>
       </div>
       <div class="row">
-        <p>
-          Of the
-          <a href="http://uis.unesco.org/en/news/world-poverty-could-be-cut-half-if-all-adults-completed-secondary-education">
-            61 million children
-          </a> worldwide who cannot attend primary school,
-          17 million will never step foot into a school if trends continue.
-          Unfortunately,
-          <a href="http://uis.unesco.org/sites/default/files/documents/fs46-more-than-half-children-not-learning-en-2017.pdf">
-            even those who are in school
-          </a> may not be getting the effective education they need.
-        </p>
+        <p [innerHTML]="'I18N_ABOUT_FOUNDATION_PAGE_MILLIONS_OF_CONTENT' | translate"></p>
       </div>
     </div>
     <div class="col-lg-4 oppia-about-foundation-image-with-caption">
@@ -76,20 +60,10 @@
     </div>
     <div class="col-lg-8">
       <div class="row">
-        <h1>
-          We cannot ignore the potential quality education has to improve people's lives.
-        </h1>
+        <h1>{{ 'I18N_ABOUT_FOUNDATION_PAGE_WE_CANNOT' | translate }}</h1>
       </div>
       <div class="row">
-        <p>
-          Researchers have shown again and again that education has the power
-          to rejuvenate communities, increase economic growth, and disrupt the
-          cycle of poverty. UNESCO predicts that if we achieve universal primary
-          and secondary completion, we could lift more than
-          <a href="http://uis.unesco.org/en/news/world-poverty-could-be-cut-half-if-all-adults-completed-secondary-education">
-            420 million
-          </a> people out of poverty.
-        </p>
+        <p [innerHTML]="'I18N_ABOUT_FOUNDATION_PAGE_WE_CANNOT_CONTENT' | translate"></p>
       </div>
     </div>
   </div>
@@ -97,23 +71,17 @@
   <div class="row oppia-about-foundation-info-card-gray">
     <div class="col-lg-8">
       <div class="row">
-        <h1>
-          Creating fun and effective learning for the world’s underserved students
-        </h1>
+        <h1>{{ 'I18N_ABOUT_FOUNDATION_PAGE_CREATING' | translate }}</h1>
       </div>
       <div class="row">
-        <p>
-          The Oppia Foundation accomplishes its mission through the creation and
-          expansion of our online learning platform, Oppia, where we use story-based
-          lessons and specialized features to engage the most underserved students around the world.
-        </p>
+        <p>{{ 'I18N_ABOUT_FOUNDATION_PAGE_CREATING_CONTENT' | translate }}</p>
       </div>
       <div class="row">
         <button class="btn">
           <a href="/about"
              target="_blank"
              rel="noopener">
-            LEARN MORE ABOUT OPPIA
+             {{ 'I18N_ABOUT_FOUNDATION_PAGE_CREATING_BUTTON' | translate }}
           </a>
         </button>
       </div>
@@ -145,23 +113,17 @@
     </div>
     <div class="col-lg-8">
       <div class="row">
-        <h1>
-          Built from a unified passion for educational equality
-        </h1>
+        <h1>{{ 'I18N_ABOUT_FOUNDATION_PAGE_BUILT_FROM' | translate }}</h1>
       </div>
       <div class="row">
-        <p>
-          Our platform and everything else we’ve accomplished thus far is due
-          to the hard work and collaboration of dozens of passionate volunteers.
-          Take the next step and join our community today!
-        </p>
+        <p>{{ 'I18N_ABOUT_FOUNDATION_PAGE_BUILT_FROM_CONTENT' | translate }}</p>
       </div>
       <div class="row">
         <button class="btn">
           <a href="/volunteer"
              target="_blank"
              rel="noopener">
-            BECOME A VOLUNTEER
+             {{ 'I18N_ABOUT_FOUNDATION_PAGE_BUILT_FROM_BUTTON' | translate }}
           </a>
         </button>
       </div>
@@ -171,27 +133,16 @@
   <div class="row oppia-about-foundation-info-card-gray oppia-about-foundation-cta">
     <div class="col">
       <div class="row">
-        <h1>
-          There's a role for you to play
-        </h1>
+        <h1>{{ 'I18N_ABOUT_FOUNDATION_PAGE_SECTION_SIX' | translate }}</h1>
       </div>
       <div class="row">
-        <p>
-          Are you a part of a school, NGO, or other organization who shares our
-          passion for educational inequality? <a href="/partnerships">Consider becoming a partner today!</a>
-        </p>
-        <p>
-          Do you have time, skills, or other resources you’d like to share to
-          help advance our mission? <a href="/volunteer">Join our large volunteer community!</a>
-        </p>
-        <p>
-          If neither of those apply to you, we always appreciate <a href="/donate">donations</a> too!
-        </p>
+        <p [innerHTML]="'I18N_ABOUT_FOUNDATION_PAGE_SECTION_SIX_PART_1' | translate"></p>
+        <p [innerHTML]="'I18N_ABOUT_FOUNDATION_PAGE_SECTION_SIX_PART_2' | translate"></p>
+        <p [innerHTML]="'I18N_ABOUT_FOUNDATION_PAGE_SECTION_SIX_PART_3' | translate"></p>
       </div>
     </div>
   </div>
 </div>
-
 <style>
   .about-foundation-page {
     user-select: text;
