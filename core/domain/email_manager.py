@@ -2230,9 +2230,9 @@ def send_email_to_new_contributor(
     if contribution_category not in NEW_CONTRIBUTOR_EMAIL_DATA:
         raise Exception('Invalid contribution_category: %s' % contribution_category)
 
-    review_category_data = NEW_CONTRIBUTOR_EMAIL_DATA[contribution_category]
-    email_subject = 'You have been invited to %s Oppia %s' % (review_category_data['task'],
-        review_category_data['category'])
+    contribution_category_data = NEW_CONTRIBUTOR_EMAIL_DATA[contribution_category]
+    email_subject = 'You have been invited to %s Oppia %s' % (contribution_category_data['task'],
+        contribution_category_data['category'])
 
     if contribution_category in [
             constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION,
@@ -2244,64 +2244,65 @@ def send_email_to_new_contributor(
             )
         language_description = utils.get_supported_audio_language_description(
             language_code).capitalize()
-        review_category_description = (
-            review_category_data['description_template'] % language_description)
-        reviewer_rights_message = (
-            review_category_data['rights_message_template'] % (
+        contribution_category_description = (
+            contribution_category_data['description_template'] % language_description)
+        contributor_rights_message = (
+            contribution_category_data['rights_message_template'] % (
                 language_description))
     else:
-        review_category_description = review_category_data['description']
-        reviewer_rights_message = review_category_data['rights_message']
-
-    email_body_template = ""
-
+        contribution_category_description = contribution_category_data['description']
+        contributor_rights_message = contribution_category_data['rights_message']
+    
+    email_body_template = ('%s %s %s %s')
+    to_contribute = ""
     if contribution_category in [
             constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION,
             constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER,
             constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER
             ]:
-        to_contribute = review_category_data['to_check']
+        to_contribute = contribution_category_data['to_check']
         email_body_template = (
-        'Hi %s,<br><br>'
-        'This is to let you know that the Oppia team has added you as a '
-        'reviewer to %s. This allows you to %s.<br><br>'
-        'You can check the %s waiting for review in the '
-        '<a href="https://www.oppia.org/contributor-dashboard">'
-        'Contributor Dashboard</a>.<br><br>'
-        'Thanks, and happy contributing!<br><br>'
-        'Best wishes,<br>'
-        'The Oppia Community')
+            'Hi %s,<br><br>'
+            'This is to let you know that the Oppia team has added you as a '
+            'reviewer to %s. This allows you to %s.<br><br>'
+            'You can check the %s waiting for review in the '
+            '<a href="https://www.oppia.org/contributor-dashboard">'
+            'Contributor Dashboard</a>.<br><br>'
+            'Thanks, and happy contributing!<br><br>'
+            'Best wishes,<br>'
+            'The Oppia Community')
 
     elif contribution_category in [
-            constants.CONTRIBUTION_RIGHT_CATEGORY_SUBMIT_QUESTION
-            ]:
-        to_contribute = review_category_data['to_submit']
+                constants.CONTRIBUTION_RIGHT_CATEGORY_SUBMIT_QUESTION
+                ]:
+        to_contribute = contribution_category_data['to_submit']
         email_body_template = (
-        'Hi %s,<br><br>'
-        'This is to let you know that the Oppia team has added you as a '
-        'contributor to %s. This allows you to %s.<br><br>'
-        'You can check the available opportunities in the'
-        '<a href="https://www.oppia.org/contributor-dashboard">'
-        'Contributor Dashboard</a>.<br><br>'
-        'Thanks, and happy contributing!<br><br>'
-        'Best wishes,<br>'
-        'The Oppia Community')
-    print(email_body_template)
+            'Hi %s,<br><br>'
+            'This is to let you know that the Oppia team has added you as a '
+            'contributor to %s. This allows you to %s.<br><br>'
+            'You can to submit %s in the'
+            '<a href="https://www.oppia.org/contributor-dashboard">'
+            'Contributor Dashboard</a>.<br><br>'
+            'Thanks, and happy contributing!<br><br>'
+            'Best wishes,<br>'
+            'The Oppia Community')
+        
+    recipient_username = user_services.get_username(recipient_id)
+
+    email_body = email_body_template % (
+            recipient_username, contribution_category_description,
+            contributor_rights_message, to_contribute)
 
     if not feconf.CAN_SEND_EMAILS:
         logging.error('This app cannot send emails to users.')
+        logging.info("Email Text: \n %s" % email_body)
         return
 
-    recipient_username = user_services.get_username(recipient_id)
     can_user_receive_email = user_services.get_email_preferences(
         recipient_id).can_receive_email_updates
 
     # Send email only if recipient wants to receive.
     if can_user_receive_email:
-        email_body = email_body_template % (
-            recipient_username, review_category_description,
-            reviewer_rights_message, to_contribute)
-        print(email_body)
         _send_email(
             recipient_id, feconf.SYSTEM_COMMITTER_ID,
             feconf.EMAIL_INTENT_ONBOARD_REVIEWER, email_subject, email_body,
