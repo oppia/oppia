@@ -1,4 +1,5 @@
 {
+	"I18N_ABOUT_FOUNDATION_PAGE_WE_CANNOT": "Non possiamo ignorare il potenziale di un’istruzione di qualità per migliorare la vita delle persone.",
 	"I18N_ABOUT_PAGE_ABOUT_TAB_CREATE": "Crea un'esplorazione",
 	"I18N_ABOUT_PAGE_ABOUT_TAB_CREATE_TEXT": "su un argomento che ti interessa.",
 	"I18N_ABOUT_PAGE_ABOUT_TAB_FEEDBACK": "Guadagna feedback",
@@ -443,5 +444,7 @@
 	"I18N_TOPNAV_SIGN_IN_WITH_GOOGLE": "Accedi con Google",
 	"I18N_TOPNAV_TEACH_WITH_OPPIA": "Insegna con Oppia",
 	"I18N_UNSUBSCRIBE_BUTTON_TEXT": "Cancella iscrizione",
+	"I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_DEVELOPMENT_WHAT_WE": "<b>Cosa facciamo:</b>",
+	"I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_LESSON_CREATION_WHAT_WE": "<b>Cosa facciamo:</b>",
 	"I18N_WARNING_MODAL_TITLE": "Attenzione!"
 }
