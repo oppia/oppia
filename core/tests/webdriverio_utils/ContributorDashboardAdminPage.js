@@ -145,7 +145,7 @@ var ContributorDashboardAdminPage = function() {
     };
     let opportunity = (await opportunityItemSelector())[0];
     await action.click('Opportunity Item', opportunity);
-  }
+  };
 
   this.acceptTranslation = async function() {
     var acceptButton = $('.e2e-test-translation-accept-button');
