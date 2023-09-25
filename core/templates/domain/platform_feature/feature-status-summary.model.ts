@@ -27,8 +27,6 @@ export enum FeatureNames {
   EndChapterCelebration = 'end_chapter_celebration',
   CheckpointCelebration = 'checkpoint_celebration',
   ContributorDashboardAccomplishments = 'contributor_dashboard_accomplishments',
-  AndroidBetaLandingPage = 'android_beta_landing_page',
-  BlogPages = 'blog_pages',
   DiagnosticTest = 'diagnostic_test',
   SerialChapterLaunchCurriculumAdminView =
   'serial_chapter_launch_curriculum_admin_view',
