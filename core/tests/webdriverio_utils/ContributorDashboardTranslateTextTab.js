@@ -22,9 +22,7 @@ var waitFor = require('./waitFor.js');
 
 var ContributorDashboardTranslateTextTab = function() {
   var selectorContainer = $('.e2e-test-language-selector');
-  var topicSelectorContainer = $('.e2e-test-topic-selector');
   var selectedLanguageElement = $('.e2e-test-language-selector-selected');
-  var selectedTopicElement = $('.e2e-test-topic-selector-selected');
   var featuredLanguageElementsSelector = function() {
     return selectorContainer.$$('.e2e-test-featured-language');
   };
@@ -36,10 +34,6 @@ var ContributorDashboardTranslateTextTab = function() {
     await action.click('Test Language Selector Container', selectorContainer);
   };
 
-  var _openTopicSelector = async function() {
-    await action.click('Test Topic Selector Container', selectorContainer);
-  };
-
   var _selectLanguage = async function(language) {
     await _openLanguageSelector();
     var selectorOption = selectorContainer.$(
@@ -47,20 +41,8 @@ var ContributorDashboardTranslateTextTab = function() {
     await action.click('Test Language Selector Option', selectorOption);
   };
 
-  var _selectTopic = async function(topic) {
-    await _openTopicSelector();
-    var selectorOption = topicSelectorContainer.$(
-      `.e2e-test-topic-selector-option=${topic}`);
-    await action.click('Test Topic Selector Option', selectorOption);
-  };
-
   this.changeLanguage = async function(language) {
     await _selectLanguage(language);
-    await waitFor.pageToFullyLoad();
-  };
-
-  this.changeTopic = async function(topic) {
-    await _selectTopic(topic);
     await waitFor.pageToFullyLoad();
   };
 
