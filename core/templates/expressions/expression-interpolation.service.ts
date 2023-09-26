@@ -41,7 +41,7 @@ export class ExpressionInterpolationService {
   processHtml(sourceHtml: string, envs: Record<string, string>[]): string {
     return sourceHtml.replace(/{{([^}]*)}}/g, (match, p1)=> {
       try {
-        // TODO(sll): Remove the call to $filter once we have a
+        // TODO(#3645): Remove the call to $filter once we have a
         // custom UI for entering expressions. It is only needed because
         // expressions are currently input inline via the RTE.
         return this.htmlEscaperService.unescapedStrToEscapedStr(
@@ -64,7 +64,7 @@ export class ExpressionInterpolationService {
       sourceUnicode: string, envs: Record<string, string>[]): string | null {
     try {
       return sourceUnicode.replace(/{{([^}]*)}}/g, (match, p1)=> {
-        // TODO(sll): Remove the call to $filter once we have a
+        // TODO(#3645): Remove the call to $filter once we have a
         // custom UI for entering expressions. It is only needed because
         // expressions are currently input inline via the RTE.
         return this.expressionEvaluatorService.evaluateExpression(
