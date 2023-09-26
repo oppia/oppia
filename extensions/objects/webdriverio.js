@@ -94,7 +94,7 @@ var CoordTwoDim = function(elem) {
 var FilepathEditor = function(elem) {
   return {
     upload: async function(filepath) {
-      // TODO(Jacob): Modify filepath relative to the directory from which the
+      // TODO(#16106): Modify filepath relative to the directory from which the
       // webdriverio code is operating.
       await action.setValue(
         'Filepath Editor Input', elem.$('.e2e-test-file-upload'), filepath);
