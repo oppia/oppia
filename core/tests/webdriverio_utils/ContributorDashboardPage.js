@@ -70,7 +70,7 @@ var ContributorDashboardPage = function() {
     await _openLanguageSelector();
     var selectorOption = selectorContainer.$(
       `.e2e-test-language-selector-option=${language}`);
-    await action.click(language + ' Language Selector Option', selectorOption);
+    await action.click(`Language ${language} option`, selectorOption);
   };
 
   this.get = async function() {

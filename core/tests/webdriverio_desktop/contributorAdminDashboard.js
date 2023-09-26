@@ -159,7 +159,6 @@ describe('Contributor Admin Dashboard', function() {
     await explorationEditorMainTab.setInteraction('EndExploration');
     var explorationEditorSettingsTab = explorationEditorPage.getSettingsTab();
     await explorationEditorPage.navigateToSettingsTab();
-    let width = (await browser.getWindowSize()).width;
     var basicSettings = $('.e2e-test-settings-container');
     await action.click('Basic Settings', basicSettings);
     await explorationEditorSettingsTab.setTitle('exp1');
@@ -210,21 +209,11 @@ describe('Contributor Admin Dashboard', function() {
     await contributorDashboardPage.waitForOpportunitiesToLoad();
     await contributorDashboardPage.selectReviewLanguage('shqip (Albanian)');
 
-    if (width < 700) {
-      await (
-        contributorDashboardAdminPage.clickFirstOpportunityInSmallScreenView());
-    } else {
-      await contributorDashboardPage.clickOpportunityActionButton(
-        'Chapter 1', 'Topic 0 for contribution - Story Title');
-    }
+    await contributorDashboardPage.clickOpportunityActionButton(
+      'Chapter 1', 'Topic 0 for contribution - Story Title');
 
-    if (width < 700) {
-      await (
-        contributorDashboardAdminPage.clickFirstOpportunityInSmallScreenView());
-    } else {
-      await contributorDashboardPage.clickOpportunityActionButton(
-        '[Image]', 'Topic 0 for contribution / Story Title / Chapter 1');
-    }
+    await contributorDashboardPage.clickOpportunityActionButton(
+      '[Image]', 'Topic 0 for contribution / Story Title / Chapter 1');
 
     await contributorDashboardAdminPage.acceptTranslation();
     await users.logout();
@@ -264,16 +253,8 @@ describe('Contributor Admin Dashboard', function() {
     await contributorDashboardPage.get();
     await contributorDashboardPage.waitForOpportunitiesToLoad();
 
-    if (width < 700) {
-      let opportunityItemSelector = function() {
-        return $$('.e2e-test-opportunity-list-item');
-      };
-      let opportunity = (await opportunityItemSelector())[0];
-      await action.click('Opportunity Item', opportunity);
-    } else {
-      await contributorDashboardPage.clickOpportunityActionButton(
-        'Question 1', SKILL_DESCRIPTIONS[0]);
-    }
+    await contributorDashboardPage.clickOpportunityActionButton(
+      'Question 1', SKILL_DESCRIPTIONS[0]);
     await (
       contributorDashboardPage.waitForQuestionSuggestionReviewModalToAppear());
     await contributorDashboardPage.clickAcceptQuestionSuggestionButton();
@@ -281,11 +262,11 @@ describe('Contributor Admin Dashboard', function() {
     await contributorDashboardPage.expectEmptyOpportunityAvailabilityMessage();
     await users.logout();
 
+    await users.login(ADMIN_EMAIL);
+
     // The below lines enable the cd_admin_dashboard_new_ui flag in dev mode.
     // They should be removed after the cd_admin_dashboard_new_ui flag is
     // deprecated.
-    await users.login(ADMIN_EMAIL);
-
     await releaseCoordinatorPage.getFeaturesTab();
     var CdAdminDashboardNewUiFlag = (
       await releaseCoordinatorPage.getCdAdminDashboardNewUiFeatureElement());
@@ -299,22 +280,22 @@ describe('Contributor Admin Dashboard', function() {
     await users.login(QUESTION_COORDINATOR_EMAIL);
     await contributorDashboardAdminPage.get();
 
-    await contributorDashboardAdminPage.navigateToquestionSubmitterTab();
+    await contributorDashboardAdminPage.navigateToQuestionSubmitterTab();
     await contributorDashboardAdminPage.expectStatsElementCountToBe(2);
-    await contributorDashboardAdminPage.checkExpandableStats();
+    await contributorDashboardAdminPage.expectStatsRowsAreExpanded();
 
-    await contributorDashboardAdminPage.navigateToquestionReviewerTab();
+    await contributorDashboardAdminPage.navigateToQuestionReviewerTab();
     await contributorDashboardAdminPage.expectStatsElementCountToBe(2);
-    await contributorDashboardAdminPage.checkExpandableStats();
+    await contributorDashboardAdminPage.expectStatsRowsAreExpanded();
 
     await users.logout();
 
     await users.login(TRANSLATION_COORDINATOR_EMAIL);
     await contributorDashboardAdminPage.get();
 
-    await contributorDashboardAdminPage.navigateTotranslationSubmitterTab();
+    await contributorDashboardAdminPage.navigateToTranslationSubmitterTab();
     await contributorDashboardAdminPage.expectStatsElementCountToBe(0);
-    await contributorDashboardAdminPage.navigateTotranslationReviewerTab();
+    await contributorDashboardAdminPage.navigateToTranslationReviewerTab();
     await contributorDashboardAdminPage.expectStatsElementCountToBe(0);
 
     await users.logout();

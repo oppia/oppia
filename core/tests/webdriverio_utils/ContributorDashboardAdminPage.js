@@ -49,6 +49,15 @@ var ContributorDashboardAdminPage = function() {
   };
   var statsTable = $('.e2e-test-stats-table');
   var expandedRow = $('.e2e-test-expanded-row');
+  var copyButton = $('.e2e-test-copy-button');
+  var doneButton = $('.e2e-test-close-rich-text-component-editor');
+  var saveButton = $('.e2e-test-save-button');
+  var textbox = $('.e2e-test-description-box');
+  var acceptButton = $('.e2e-test-translation-accept-button');
+  var questionSubmitterTab = $('.e2e-test-question-submitters-tab');
+  var questionReviewerTab = $('.e2e-test-question-reviewers-tab');
+  var translationSubmitterTab = $('.e2e-test-translation-submitters-tab');
+  var translationReviewerTab = $('.e2e-test-translation-reviewers-tab');
 
   this.get = async function() {
     await browser.url('/contributor-dashboard-admin');
@@ -122,53 +131,32 @@ var ContributorDashboardAdminPage = function() {
 
   this.copyElementWithClassName = async function(
       elementDescription, elementClassName) {
-    let copyButton = $('.e2e-test-copy-button');
-    let doneButton = $('.e2e-test-close-rich-text-component-editor');
-    let saveButton = $('.e2e-test-save-button');
-    let textbox = $('.e2e-test-description-box');
-
-    // Copy tool should copy image on pressing 'Done'.
-    await waitFor.visibilityOf(
-      copyButton, 'Copy button taking too long to appear');
     await action.click('Copy button', copyButton);
     await action.click(elementDescription, elementClassName);
     await action.setValue(
       'Set Image description', textbox, 'An example description');
-    await action.click('Done', doneButton);
-    await action.click('Save', saveButton);
+    await action.click('Copy Done button', doneButton);
+    await action.click('Save button', saveButton);
     await users.logout();
   };
 
-  this.clickFirstOpportunityInSmallScreenView = async function() {
-    let opportunityItemSelector = function() {
-      return $$('.e2e-test-opportunity-list-item');
-    };
-    let opportunity = (await opportunityItemSelector())[0];
-    await action.click('Opportunity Item', opportunity);
-  };
-
   this.acceptTranslation = async function() {
-    var acceptButton = $('.e2e-test-translation-accept-button');
     await action.click('Translation accept button', acceptButton);
   };
 
-  this.navigateToquestionSubmitterTab = async function() {
-    var questionSubmitterTab = $('.e2e-test-question-submitters-tab');
+  this.navigateToQuestionSubmitterTab = async function() {
     await action.click('Question Submitter tab', questionSubmitterTab);
   };
 
-  this.navigateToquestionReviewerTab = async function() {
-    var questionReviewerTab = $('.e2e-test-question-reviewers-tab');
+  this.navigateToQuestionReviewerTab = async function() {
     await action.click('Question Reviewer tab', questionReviewerTab);
   };
 
-  this.navigateTotranslationSubmitterTab = async function() {
-    var translationSubmitterTab = $('.e2e-test-translation-submitters-tab');
+  this.navigateToTranslationSubmitterTab = async function() {
     await action.click('Translation Submitter tab', translationSubmitterTab);
   };
 
-  this.navigateTotranslationReviewerTab = async function() {
-    var translationReviewerTab = $('.e2e-test-translation-reviewers-tab');
+  this.navigateToTranslationReviewerTab = async function() {
     await action.click('Translation Reviewer tab', translationReviewerTab);
   };
 
@@ -242,8 +230,8 @@ var ContributorDashboardAdminPage = function() {
     expect(statsListItems.length).toBe(elementsCount);
   };
 
-  this.checkExpandableStats = async function() {
-    await waitFor.visibilityOf(statsTable, 'stats table was not visible');
+  this.expectStatsRowsAreExpanded = async function() {
+    await waitFor.visibilityOf(statsTable, 'Stats table was not visible');
     var statsListItems = await statsListItemsSelector();
     await action.click('Stats row', statsListItems[0]);
     await waitFor.visibilityOf(expandedRow, 'Expanded row not visible');
