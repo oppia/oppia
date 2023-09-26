@@ -200,9 +200,12 @@ class ExplorationHandler(
                 has_seen_translation_tutorial = True
                 
         try:
-            exploration_data = exp_services.get_user_exploration_data(
-                self.user_id, exploration_id, apply_draft=apply_draft,
-                version=version) if self.user_id else {}
+            if self.user_id:
+                exploration_data = exp_services.get_user_exploration_data(
+                    self.user_id, exploration_id, apply_draft=apply_draft,
+                    version=version)
+            else:
+                exploration_data = {}
             exploration_data['show_state_editor_tutorial_on_load'] = bool(
                 self.user_id and not has_seen_editor_tutorial)
             exploration_data['show_state_translation_tutorial_on_load'] = bool(
