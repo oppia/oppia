@@ -1,4 +1,4 @@
-// Copyright 2022 The Oppia Authors. All Rights Reserved.
+// Copyright 2023 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -11,6 +11,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+import { ElementRef } from '@angular/core';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync} from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
@@ -72,6 +73,26 @@ describe('Topic Filter component', () => {
         expect(component.filteredTopics).toBeDefined();
         expect(component.topicFilter).toBeDefined();
         expect(component.searchDropDownTopics).toEqual(['topic3', 'topic4']);
+
+        component.topicFilterInput = {
+          nativeElement: {
+            value: ''
+          }
+        } as ElementRef;
+        component.selectTopic(({ option: { viewValue: 'topic3'}}));
+        // Search with applied topics will be executed only when no change in
+        // topic filter is done for 1500ms. We add 1ms extra to avoid flaking
+        // of test.
+        tick(1500 + 1);
+
+        expect(component.selectedTopics).toEqual(
+          ['topic1', 'topic2', 'topic3']);
+        expect(component.searchDropDownTopics).toEqual(['topic4']);
+
+        component.selectTopic(({ option: { viewValue: 'noTopic'}}));
+        tick(1600);
+
+        expect(component.selectionsChange.emit).toHaveBeenCalled();
       })
   );
 
