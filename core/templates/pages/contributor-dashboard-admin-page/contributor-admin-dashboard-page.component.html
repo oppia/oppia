@@ -25,24 +25,24 @@
 <div class="dashboard-content">
   <div class="dashboard-content-primary">
     <div>
-      <ul class="dashboard-tabs e2e-test-topics-tab">
-        <li [ngClass]="{'dashboard-tabs-active': activeTab === TAB_NAME_TRANSLATION_SUBMITTER}">
-          <a class="dashboard-tabs-text e2e-test-topics-tab" (click)="setActiveTab(TAB_NAME_TRANSLATION_SUBMITTER)">
+      <ul class="dashboard-tabs">
+        <li [ngClass]="{'dashboard-tabs-active': activeTab === TAB_NAME_TRANSLATION_SUBMITTER}" *ngIf="isTranslationCoordinator">
+          <a class="dashboard-tabs-text e2e-test-translation-submitters-tab" (click)="setActiveTab(TAB_NAME_TRANSLATION_SUBMITTER)">
             Translation<br>Submitters
           </a>
         </li>
-        <li [ngClass]="{'dashboard-tabs-active': activeTab === TAB_NAME_TRANSLATION_REVIEWER}">
-          <a class="dashboard-tabs-text e2e-test-skills-tab" (click)="setActiveTab(TAB_NAME_TRANSLATION_REVIEWER)">
+        <li [ngClass]="{'dashboard-tabs-active': activeTab === TAB_NAME_TRANSLATION_REVIEWER}" *ngIf="isTranslationCoordinator">
+          <a class="dashboard-tabs-text e2e-test-translation-reviewers-tab" (click)="setActiveTab(TAB_NAME_TRANSLATION_REVIEWER)">
             Translation<br>Reviewers
           </a>
         </li>
-        <li [ngClass]="{'dashboard-tabs-active': activeTab === TAB_NAME_QUESTION_SUBMITTER}">
-          <a class="dashboard-tabs-text e2e-test-skills-tab" (click)="setActiveTab(TAB_NAME_QUESTION_SUBMITTER)">
+        <li [ngClass]="{'dashboard-tabs-active': activeTab === TAB_NAME_QUESTION_SUBMITTER}" *ngIf="isQuestionCoordinator">
+          <a class="dashboard-tabs-text e2e-test-question-submitters-tab" (click)="setActiveTab(TAB_NAME_QUESTION_SUBMITTER)">
             Question<br>Submitters
           </a>
         </li>
-        <li [ngClass]="{'dashboard-tabs-active': activeTab === TAB_NAME_QUESTION_REVIEWER}">
-          <a class="dashboard-tabs-text e2e-test-skills-tab" (click)="setActiveTab(TAB_NAME_QUESTION_REVIEWER)">
+        <li [ngClass]="{'dashboard-tabs-active': activeTab === TAB_NAME_QUESTION_REVIEWER}" *ngIf="isQuestionCoordinator">
+          <a class="dashboard-tabs-text e2e-test-question-reviewers-tab" (click)="setActiveTab(TAB_NAME_QUESTION_REVIEWER)">
             Question<br>Reviewers
           </a>
         </li>
@@ -52,9 +52,15 @@
   </div>
   <div class="dashboard-content-mobile">
     <div class="dropdown">
-      <oppia-filtered-choices-field [choices]="CONTRIBUTION_TYPES" placeholder="Contribution Type"
-        [isSearchable]="false" [(selection)]="activeTab">
-      </oppia-filtered-choices-field>
+      <mat-form-field class="choices-field">
+        <mat-select placeholder="Contribution Type"
+                    [value]="selectedContributionType"
+                    (valueChange)="updateSelectedContributionType($event)">
+          <mat-option *ngFor="let choice of CONTRIBUTION_TYPES" [value]="choice">
+            {{ choice }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
     </div>
     <contributor-admin-stats-table [activeTab]="activeTab"></contributor-admin-stats-table>
   </div>
