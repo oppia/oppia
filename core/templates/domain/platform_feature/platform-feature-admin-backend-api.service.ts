@@ -29,17 +29,17 @@ import { PlatformParameterDomainConstants } from
 import { PlatformParameterRule, PlatformParameterValue } from
   'domain/platform_feature/platform-parameter-rule.model';
 import {
-  PlatformParameter,
-  PlatformParameterBackendDict
-} from 'domain/platform_feature/platform-parameter.model';
+  FeatureFlag,
+  FeatureFlagBackendDict
+} from 'domain/feature_flag/feature-flag.model';
 
 export interface FeatureFlagsDicts {
-  'feature_flags': PlatformParameterBackendDict[];
+  'feature_flags': FeatureFlagBackendDict[];
   'server_stage': string;
 }
 
 export interface FeatureFlagsResponse {
-  featureFlags: PlatformParameter[];
+  featureFlags: FeatureFlag[];
   serverStage: string;
 }
 
@@ -58,7 +58,7 @@ export class PlatformFeatureAdminBackendApiService {
       ).toPromise().then(response => {
         resolve({
           featureFlags: response.feature_flags.map(
-            dict => PlatformParameter.createFromBackendDict(
+            dict => FeatureFlag.createFromBackendDict(
               dict)),
           serverStage: response.server_stage
         });
@@ -69,7 +69,8 @@ export class PlatformFeatureAdminBackendApiService {
   }
 
   async updateFeatureFlag(
-      name: string, message: string, newRules: PlatformParameterRule[]
+      name: string, forceEnableForAllUsers: boolean, rolloutPercentage: number,
+      userGroupIds: string[]
   ):
       Promise<void> {
     await this.http.post(
@@ -77,8 +78,9 @@ export class PlatformFeatureAdminBackendApiService {
       {
         action: FeatureFlagDomainConstants.UPDATE_FEATURE_FLAG_ACTION,
         feature_name: name,
-        commit_message: message,
-        new_rules: newRules.map(rule => rule.toBackendDict())
+        force_enable_for_all_users: forceEnableForAllUsers,
+        rollout_percentage: rolloutPercentage,
+        user_group_ids: userGroupIds
       }
     ).toPromise();
   }

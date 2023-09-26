@@ -25,7 +25,6 @@ import re
 from core import feconf
 from core import utils
 from core.constants import constants
-from core.domain import change_domain
 
 from typing import Final, List, TypedDict
 
@@ -45,6 +44,20 @@ ALLOWED_FEATURE_STAGES: Final = [
     FeatureStages.TEST.value,
     FeatureStages.PROD.value
 ]
+
+def get_server_mode() -> ServerMode:
+    """Returns the current server mode.
+
+    Returns:
+        ServerMode. The current server mode.
+    """
+    return (
+        ServerMode.DEV
+        if constants.DEV_MODE
+        else ServerMode.PROD
+        if feconf.ENV_IS_OPPIA_ORG_PRODUCTION_SERVER
+        else ServerMode.TEST
+    )
 
 
 class FeatureFlagDict(TypedDict):
@@ -180,20 +193,6 @@ class FeatureFlag:
         """
         self._last_updated = last_updated
 
-    def _get_server_mode(self) -> ServerMode:
-        """Returns the current server mode.
-
-        Returns:
-            ServerMode. The current server mode.
-        """
-        return (
-            ServerMode.DEV
-            if constants.DEV_MODE
-            else ServerMode.PROD
-            if feconf.ENV_IS_OPPIA_ORG_PRODUCTION_SERVER
-            else ServerMode.TEST
-        )
-
     def validate(self) -> None:
         """Validates the FeatureFlag object."""
         if re.match(self.FEATURE_NAME_REGEXP, self._name) is None:
@@ -209,7 +208,7 @@ class FeatureFlag:
                 'Invalid feature stage, got \'%s\', expected one of %s.' % (
                     self._feature_stage, ALLOWED_FEATURE_STAGES))
 
-        server_mode = self._get_server_mode()
+        server_mode = get_server_mode()
         if (
             server_mode == ServerMode.TEST and
             self._feature_stage == ServerMode.DEV.value

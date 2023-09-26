@@ -20,9 +20,10 @@ import enum
 
 from core import feconf
 from core.constants import constants
-from core.domain import platform_feature_services
-from core.domain import platform_parameter_domain
-from core.domain import platform_parameter_registry
+from core.domain import caching_services
+from core.domain import feature_flag_registry
+from core.domain import feature_flag_services
+from core.domain import feature_flag_domain
 from core.tests import test_utils
 
 
@@ -33,7 +34,7 @@ class ParamNames(enum.Enum):
     TEST_FEATURE_2 = 'test_feature_2'
 
 
-FeatureStages = platform_parameter_domain.FeatureStages
+FeatureStages = feature_flag_domain.FeatureStages
 
 
 class ReleaseCoordinatorPageTest(test_utils.GenericTestBase):
@@ -99,6 +100,14 @@ class FeatureFlagsHandlerTest(test_utils.GenericTestBase):
             self.RELEASE_COORDINATOR_USERNAME,
             feconf.ROLE_ID_RELEASE_COORDINATOR)
 
+    def tearDown(self) -> None:
+        caching_services.delete_multi(
+            caching_services.CACHE_NAMESPACE_FEATURE_FLAG, None, [
+                ParamNames.TEST_FEATURE_1.value,
+                ParamNames.TEST_FEATURE_2.value]
+        )
+        return super().tearDown()
+
     def test_without_feature_name_action_update_feature_flag_is_not_performed(
         self
     ) -> None:
@@ -120,68 +129,23 @@ class FeatureFlagsHandlerTest(test_utils.GenericTestBase):
 
         self.logout()
 
-    def test_without_new_rules_action_update_feature_flag_is_not_performed(
-        self
-    ) -> None:
-        self.login(self.RELEASE_COORDINATOR_EMAIL)
-        csrf_token = self.get_new_csrf_token()
-
-        prod_mode_swap = self.swap(constants, 'DEV_MODE', False)
-        assert_raises_regexp_context_manager = self.assertRaisesRegex(
-            Exception,
-            'The \'new_rules\' must be provided when the action is '
-            'update_feature_flag.'
-        )
-        with assert_raises_regexp_context_manager, prod_mode_swap:
-            self.post_json(
-                feconf.FEATURE_FLAGS_URL, {
-                    'action': 'update_feature_flag',
-                    'feature_name': 'new_feature',
-                    'new_rules': None
-                }, csrf_token=csrf_token)
-
-        self.logout()
-
-    def test_without_commit_message_action_update_feature_flag_is_not_performed(
-        self
-    ) -> None:
-        self.login(self.RELEASE_COORDINATOR_EMAIL)
-        csrf_token = self.get_new_csrf_token()
-
-        prod_mode_swap = self.swap(constants, 'DEV_MODE', False)
-        assert_raises_regexp_context_manager = self.assertRaisesRegex(
-            Exception,
-            'The \'commit_message\' must be provided when the action is '
-            'update_feature_flag.'
-        )
-        with assert_raises_regexp_context_manager, prod_mode_swap:
-            self.post_json(
-                feconf.FEATURE_FLAGS_URL, {
-                    'action': 'update_feature_flag',
-                    'feature_name': 'new_feature',
-                    'new_rules': [],
-                    'commit_message': None
-                }, csrf_token=csrf_token)
-
-        self.logout()
-
     def test_get_handler_includes_all_feature_flags(self) -> None:
         self.login(self.RELEASE_COORDINATOR_EMAIL)
-        feature = platform_parameter_registry.Registry.create_feature_flag(
+        feature = feature_flag_registry.Registry.create_feature_flag(
             ParamNames.TEST_FEATURE_1, 'feature for test.', FeatureStages.DEV)
 
         feature_list_ctx = self.swap(
-            platform_feature_services, 'ALL_FEATURE_FLAGS',
+            feature_flag_services, 'ALL_FEATURE_FLAGS',
             [ParamNames.TEST_FEATURE_1])
         feature_set_ctx = self.swap(
-            platform_feature_services, 'ALL_FEATURES_NAMES_SET',
+            feature_flag_services, 'ALL_FEATURES_NAMES_SET',
             set([feature.name]))
         with feature_list_ctx, feature_set_ctx:
             response_dict = self.get_json(feconf.FEATURE_FLAGS_URL)
             self.assertEqual(
                 response_dict['feature_flags'], [feature.to_dict()])
 
-        platform_parameter_registry.Registry.parameter_registry.pop(
+        feature_flag_registry.Registry.feature_registry.pop(
             feature.name)
         self.logout()
 
@@ -189,63 +153,54 @@ class FeatureFlagsHandlerTest(test_utils.GenericTestBase):
         self.login(self.RELEASE_COORDINATOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
-        feature = platform_parameter_registry.Registry.create_feature_flag(
+        feature = feature_flag_registry.Registry.create_feature_flag(
             ParamNames.TEST_FEATURE_1, 'feature for test.', FeatureStages.DEV)
-        new_rule_dicts = [
-            {
-                'filters': [
-                    {
-                        'type': 'platform_type',
-                        'conditions': [['=', 'Backend']]
-                    }
-                ],
-                'value_when_matched': True
-            }
-        ]
 
         feature_list_ctx = self.swap(
-            platform_feature_services, 'ALL_FEATURE_FLAGS',
+            feature_flag_services, 'ALL_FEATURE_FLAGS',
             [ParamNames.TEST_FEATURE_1])
         feature_set_ctx = self.swap(
-            platform_feature_services, 'ALL_FEATURES_NAMES_SET',
+            feature_flag_services, 'ALL_FEATURES_NAMES_SET',
             set([feature.name]))
         with feature_list_ctx, feature_set_ctx:
             self.post_json(
                 feconf.FEATURE_FLAGS_URL, {
                     'action': 'update_feature_flag',
                     'feature_name': feature.name,
-                    'new_rules': new_rule_dicts,
-                    'commit_message': 'test update feature'
+                    'force_enable_for_all_users': False,
+                    'rollout_percentage': 50,
+                    'user_group_ids': []
                 }, csrf_token=csrf_token)
 
-            rule_dicts = [
-                rule.to_dict() for rule
-                in platform_parameter_registry.Registry.get_platform_parameter(
-                    feature.name).rules
-            ]
-            self.assertEqual(rule_dicts, new_rule_dicts)
+            updated_feature = (
+                feature_flag_registry.Registry.get_feature_flag(
+                    feature.name))
+            self.assertEqual(updated_feature.force_enable_for_all_users, False)
+            self.assertEqual(updated_feature.rollout_percentage, 50)
+            self.assertEqual(updated_feature.user_group_ids, [])
 
-        platform_parameter_registry.Registry.parameter_registry.pop(
+        feature_flag_registry.Registry.feature_registry.pop(
             feature.name)
         self.logout()
 
-    def test_update_flag_rules_with_unknown_feature_name_returns_400(
+    def test_update_flag_with_unknown_feature_name_returns_400(
         self
     ) -> None:
         self.login(self.RELEASE_COORDINATOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
         feature_list_ctx = self.swap(
-            platform_feature_services, 'ALL_FEATURE_FLAGS', [])
+            feature_flag_services, 'ALL_FEATURE_FLAGS', [])
         feature_set_ctx = self.swap(
-            platform_feature_services, 'ALL_FEATURES_NAMES_SET', set([]))
+            feature_flag_services, 'ALL_FEATURES_NAMES_SET', set([]))
         with feature_list_ctx, feature_set_ctx:
             response = self.post_json(
                 feconf.FEATURE_FLAGS_URL, {
                     'action': 'update_feature_flag',
                     'feature_name': 'test_feature_1',
-                    'new_rules': [],
-                    'commit_message': 'test update feature'
+                    'force_enable_for_all_users': False,
+                    'rollout_percentage': 50,
+                    'user_group_ids': []
                 },
                 csrf_token=csrf_token,
                 expected_status_int=400
@@ -256,48 +211,38 @@ class FeatureFlagsHandlerTest(test_utils.GenericTestBase):
 
         self.logout()
 
-    def test_update_flag_rules_with_invalid_rules_returns_400(self) -> None:
+    def test_update_flag_with_invalid_values_returns_400(self) -> None:
         self.login(self.RELEASE_COORDINATOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
-        feature = platform_parameter_registry.Registry.create_feature_flag(
+        feature = feature_flag_registry.Registry.create_feature_flag(
             ParamNames.TEST_FEATURE_2, 'feature for test.', FeatureStages.DEV)
-        new_rule_dicts = [
-            {
-                'filters': [
-                    {
-                        'type': 'app_version',
-                        'conditions': [['!', '1.2.3']]
-                    }
-                ],
-                'value_when_matched': True
-            }
-        ]
 
         feature_list_ctx = self.swap(
-            platform_feature_services, 'ALL_FEATURE_FLAGS',
+            feature_flag_services, 'ALL_FEATURE_FLAGS',
             [ParamNames.TEST_FEATURE_2])
         feature_set_ctx = self.swap(
-            platform_feature_services, 'ALL_FEATURES_NAMES_SET',
+            feature_flag_services, 'ALL_FEATURES_NAMES_SET',
             set([feature.name]))
         with feature_list_ctx, feature_set_ctx:
             response = self.post_json(
                 feconf.FEATURE_FLAGS_URL, {
                     'action': 'update_feature_flag',
                     'feature_name': feature.name,
-                    'new_rules': new_rule_dicts,
-                    'commit_message': 'test update feature'
+                    'force_enable_for_all_users': False,
+                    'rollout_percentage': 200,
+                    'user_group_ids': []
                 },
                 csrf_token=csrf_token,
                 expected_status_int=400
             )
             self.assertEqual(
                 response['error'],
-                'Schema validation for \'new_rules\' failed: '
-                'Unsupported comparison operator \'!\' for app_version filter, '
-                'expected one of [\'=\', \'<\', \'<=\', \'>\', \'>=\'].')
+                'Schema validation for \'rollout_percentage\' failed: '
+                'Validation failed: is_at_most ({\'max_value\': 100}) '
+                'for object 200')
 
-        platform_parameter_registry.Registry.parameter_registry.pop(
+        feature_flag_registry.Registry.feature_registry.pop(
             feature.name)
         self.logout()
 
@@ -308,24 +253,25 @@ class FeatureFlagsHandlerTest(test_utils.GenericTestBase):
         csrf_token = self.get_new_csrf_token()
 
         feature_list_ctx = self.swap(
-            platform_feature_services, 'ALL_FEATURE_FLAGS',
+            feature_flag_services, 'ALL_FEATURE_FLAGS',
             [ParamNames.TEST_FEATURE_2])
         feature_set_ctx = self.swap(
-            platform_feature_services, 'ALL_FEATURES_NAMES_SET',
+            feature_flag_services, 'ALL_FEATURES_NAMES_SET',
             set([ParamNames.TEST_FEATURE_2.value]))
         # Here we use MyPy ignore because we are assigning a None value
         # where instance of 'PlatformParameter' is expected, and this is
         # done to Replace the stored instance with None in order to
         # trigger the unexpected exception during update.
-        platform_parameter_registry.Registry.parameter_registry[
+        feature_flag_registry.Registry.feature_registry[
             ParamNames.TEST_FEATURE_2.value] = None  # type: ignore[assignment]
         with feature_list_ctx, feature_set_ctx:
             response = self.post_json(
                 feconf.FEATURE_FLAGS_URL, {
                     'action': 'update_feature_flag',
                     'feature_name': ParamNames.TEST_FEATURE_2.value,
-                    'new_rules': [],
-                    'commit_message': 'test update feature'
+                    'force_enable_for_all_users': False,
+                    'rollout_percentage': 20,
+                    'user_group_ids': []
                 },
                 csrf_token=csrf_token,
                 expected_status_int=500
@@ -334,6 +280,6 @@ class FeatureFlagsHandlerTest(test_utils.GenericTestBase):
                 response['error'],
                 '\'NoneType\' object has no attribute \'serialize\'')
 
-        platform_parameter_registry.Registry.parameter_registry.pop(
+        feature_flag_registry.Registry.feature_registry.pop(
             ParamNames.TEST_FEATURE_2.value)
         self.logout()

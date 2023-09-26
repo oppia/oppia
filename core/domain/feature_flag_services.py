@@ -18,11 +18,14 @@
 
 from __future__ import annotations
 
+import hashlib
+import secrets
+
 from core import platform_feature_list
 from core.domain import feature_flag_domain
 from core.domain import feature_flag_registry as registry
 
-from typing import Dict, List, Set
+from typing import Dict, List, Optional, Set
 
 ALL_FEATURE_FLAGS: List[platform_feature_list.ParamNames] = (
     platform_feature_list.DEV_FEATURES_LIST +
@@ -84,25 +87,56 @@ def get_all_feature_flag_dicts() -> List[feature_flag_domain.FeatureFlag]:
     ]
 
 
-def is_feature_flag_enabled(user_id: str, feature_name: str) -> bool:
+def is_feature_flag_enabled(user_id: Optional[str], feature_name: str) -> bool:
     """Returns True if feature is enabled for the given user else False.
 
     Args:
-        user_id: str. The id of the user.
+        user_id: str|None. The id of the user, if logged-out user then None.
         feature_name: str. The name of the feature flag that needs to
             be evaluated.
 
     Returns:
         bool. True if the feature is enabled for the given user else False.
     """
-    return True
+    feature = registry.Registry.get_feature_flag(feature_name)
+    current_server = feature_flag_domain.get_server_mode()
+
+    if (
+        current_server == feature_flag_domain.ServerMode.TEST and
+        feature.feature_stage == feature_flag_domain.ServerMode.DEV.value
+    ):
+        return False
+
+    if (
+        current_server == feature_flag_domain.ServerMode.PROD and
+        feature.feature_stage in (
+            feature_flag_domain.ServerMode.DEV.value,
+            feature_flag_domain.ServerMode.TEST.value)
+    ):
+        return False
+
+    if feature.force_enable_for_all_users:
+        return True
+    if user_id:
+        random_bytes = secrets.token_bytes(16)
+        salt = feature_name.encode('utf-8') + random_bytes
+        hashed_user_id = hashlib.sha256(
+            user_id.encode('utf-8') + salt).hexdigest()
+        hash_value = int(hashed_user_id, 16)
+        mod_result = hash_value % 1000
+        threshold = (feature.rollout_percentage / 100) * 1000
+        if mod_result < threshold:
+            return True
+        else:
+            return False
+    return False
 
 
-def evaluate_all_feature_flag_values(user_id: str) -> Dict[str, bool]:
+def evaluate_all_feature_flag_values(user_id: Optional[str]) -> Dict[str, bool]:
     """Evaluates and returns the value of feature flags.
 
     Args:
-        user_id: str. The id of the user.
+        user_id: str|None. The id of the user, if logged-out user then None.
 
     Returns:
         dict. The keys are the feature names and the values are boolean
@@ -110,7 +144,7 @@ def evaluate_all_feature_flag_values(user_id: str) -> Dict[str, bool]:
     """
     result_dict = {}
     for feature_name in ALL_FEATURES_NAMES_SET:
-        feature_name_value = is_feature_flag_enabled(user_id)
+        feature_name_value = is_feature_flag_enabled(user_id, feature_name)
         # Ruling out the possibility of any other type for mypy type checking.
         assert isinstance(feature_name_value, bool)
         result_dict[feature_name] = feature_name_value

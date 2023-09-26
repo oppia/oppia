@@ -34,7 +34,7 @@ import { AudioTranslationLanguageService } from 'pages/exploration-player-page/s
 import { StateObjectsBackendDict } from 'domain/exploration/StatesObjectFactory';
 import { PlatformFeatureService } from 'services/platform-feature.service';
 import { ExplorationPlayerStateService } from 'pages/exploration-player-page/services/exploration-player-state.service';
-import { FeatureStatusChecker } from 'domain/platform_feature/feature-status-summary.model';
+import { FeatureStatusChecker } from 'domain/feature_flag/feature-status-summary.model';
 
 class MockCheckpointCelebrationUtilityService {
   isOnCheckpointedState = false;
