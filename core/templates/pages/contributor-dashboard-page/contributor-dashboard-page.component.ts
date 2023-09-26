@@ -199,7 +199,7 @@ export class ContributorDashboardPageComponent
         if (topicNames.length <= 0) {
           return;
         }
-        this.topicName = topicNames[0];
+        this.topicName = 'All';
         if (
           prevSelectedTopicName &&
           topicNames.indexOf(prevSelectedTopicName) !== -1
