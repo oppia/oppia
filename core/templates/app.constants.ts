@@ -170,7 +170,7 @@ export const AppConstants = {
 
   DEFAULT_PROFILE_IMAGE_PNG_PATH: '/avatar/user_blue_150px.png',
 
-  // TODO(vojtechjelinek): Move these to separate file later, after we establish
+  // TODO(#6731): Move these to separate file later, after we establish
   // process to follow for Angular constants (#6731).
   SUBTOPIC_PAGE_EDITOR_DATA_URL_TEMPLATE: (
     '/subtopic_page_editor_handler/data/<topic_id>/<subtopic_id>'),
@@ -182,7 +182,7 @@ export const AppConstants = {
 
   LABEL_FOR_CLEARING_FOCUS: 'labelForClearingFocus',
 
-  // TODO(bhenning): This constant should be provided by the backend.
+  // TODO(#1462): This constant should be provided by the backend.
   COLLECTION_DATA_URL_TEMPLATE: '/collection_handler/data/<collection_id>',
 
   ENTITY_TYPE: {
