@@ -17,7 +17,7 @@
  */
 
 // These should match the constants defined in core.domain.collection_domain.
-// TODO(bhenning): The values of these constants should be provided by the
+// TODO(#1462): The values of these constants should be provided by the
 // backend.
 // NOTE TO DEVELOPERS: the properties 'prerequisite_skills' and
 // 'acquired_skills' are deprecated. Do not use them.
