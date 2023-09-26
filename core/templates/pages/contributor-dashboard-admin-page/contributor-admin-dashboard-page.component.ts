@@ -23,6 +23,7 @@ import { WindowRef } from 'services/contextual/window-ref.service';
 import './contributor-admin-dashboard-page.component.css';
 import { animate, state, style, transition, trigger } from '@angular/animations';
 import { ContributorDashboardAdminStatsBackendApiService } from './services/contributor-dashboard-admin-stats-backend-api.service';
+import { UserService } from 'services/user.service';
 
 @Component({
   selector: 'contributor-admin-dashboard-page',
@@ -46,27 +47,18 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
   TAB_NAME_QUESTION_REVIEWER: string = 'Question Reviewer';
   translationReviewersCount: number = 0;
   questionReviewersCount: number = 0;
-  CONTRIBUTION_TYPES: string[] = [this.TAB_NAME_TRANSLATION_SUBMITTER,
-    this.TAB_NAME_TRANSLATION_REVIEWER,
-    this.TAB_NAME_QUESTION_SUBMITTER,
-    this.TAB_NAME_QUESTION_REVIEWER];
+  CONTRIBUTION_TYPES!: string[];
+  selectedContributionType!: string;
+  isQuestionCoordinator!: boolean;
+  isTranslationCoordinator!: boolean;
 
   constructor(
     private windowRef: WindowRef,
     private changeDetectorRef: ChangeDetectorRef,
     private contributorDashboardAdminStatsBackendApiService:
-      ContributorDashboardAdminStatsBackendApiService
+      ContributorDashboardAdminStatsBackendApiService,
+    private userService: UserService,
   ) {}
-
-  ngOnInit(): void {
-    this.activeTab = this.TAB_NAME_TRANSLATION_SUBMITTER;
-    this.contributorDashboardAdminStatsBackendApiService
-      .fetchCommunityStats().then(
-        (response) => {
-          this.translationReviewersCount = response.translation_reviewers_count;
-          this.questionReviewersCount = response.question_reviewers_count;
-        });
-  }
 
   setActiveTab(tabName: string): void {
     this.activeTab = tabName;
@@ -75,6 +67,47 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
 
   checkMobileView(): boolean {
     return (this.windowRef.nativeWindow.innerWidth < 800);
+  }
+
+  updateSelectedContributionType(selectedContributionType: string): void {
+    this.selectedContributionType = selectedContributionType;
+    this.setActiveTab(selectedContributionType);
+  }
+
+  ngOnInit(): void {
+    this.userService.getUserInfoAsync().then(userInfo => {
+      const username = userInfo.getUsername();
+      if (username === null) {
+        return;
+      }
+      this.isQuestionCoordinator = userInfo.isQuestionCoordinator();
+      this.isTranslationCoordinator = userInfo.isTranslationCoordinator();
+
+      if (this.isTranslationCoordinator) {
+        this.CONTRIBUTION_TYPES = [this.TAB_NAME_TRANSLATION_SUBMITTER,
+          this.TAB_NAME_TRANSLATION_REVIEWER];
+      }
+      if (this.isQuestionCoordinator) {
+        this.CONTRIBUTION_TYPES = [this.TAB_NAME_QUESTION_SUBMITTER,
+          this.TAB_NAME_QUESTION_REVIEWER];
+      }
+      if (this.isQuestionCoordinator && this.isTranslationCoordinator) {
+        this.CONTRIBUTION_TYPES = [this.TAB_NAME_TRANSLATION_SUBMITTER,
+          this.TAB_NAME_TRANSLATION_REVIEWER,
+          this.TAB_NAME_QUESTION_SUBMITTER,
+          this.TAB_NAME_QUESTION_REVIEWER];
+      }
+
+      this.updateSelectedContributionType(this.CONTRIBUTION_TYPES[0]);
+      this.changeDetectorRef.detectChanges();
+    });
+
+    this.contributorDashboardAdminStatsBackendApiService
+      .fetchCommunityStats().then(
+        (response) => {
+          this.translationReviewersCount = response.translation_reviewers_count;
+          this.questionReviewersCount = response.question_reviewers_count;
+        });
   }
 }
 

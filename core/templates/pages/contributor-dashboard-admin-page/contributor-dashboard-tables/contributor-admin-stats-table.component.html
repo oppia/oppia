@@ -1,5 +1,5 @@
 <div class="example-container">
-  <div *ngIf="loadingMessage">
+  <div *ngIf="loadingMessage" class="e2e-test-loading-message">
     <div class="oppia-align-center">
       <span>{{ loadingMessage }}</span>
       <loading-dots></loading-dots>
@@ -9,7 +9,7 @@
          [dataSource]="dataSource"
          multiTemplateDataRows
          [class.isMobile]="true"
-         class="mat-elevation-z8"
+         class="mat-elevation-z8 e2e-test-stats-table"
          *ngIf="!loadingMessage">
 
     <ng-container matColumnDef="contributorName">
@@ -152,7 +152,7 @@
       <td mat-cell
           *matCellDef="let element"
           [attr.colspan]="columnsToDisplay.length">
-        <div class="example-element-detail"
+        <div class="example-element-detail e2e-test-expanded-row"
              [@detailExpand]="element == expandedElement ? 'expanded' : 'collapsed'">
           <div class="details-container"
                *ngIf="activeTab === TAB_NAME_TRANSLATION_SUBMITTER">
@@ -295,7 +295,7 @@
               <div class="attribute-container">
                 <div class="attribute-sub-container">
                   <div class="attribute-key">Active Topics</div>
-                  <div class="attribute-value">
+                  <div class="attribute-value e2e-test-topic-names">
                     {{ element.topicsWithQuestionSubmissions ? element.topicsWithQuestionSubmissions.join(', ') : 'No topics available' }}
                   </div>
                 </div>
@@ -344,7 +344,9 @@
                 <div class="attribute-sub-container">
                   <div class="attribute-key">Active Topics</div>
                   <div class="attribute-value">
-                    {{ element.topicsWithQuestionReviews ? element.topicsWithQuestionReviews.join(', ') : 'No topics available' }}
+                    <span class="e2e-test-topic-names">
+                      {{ element.topicsWithQuestionReviews ? element.topicsWithQuestionReviews.join(', ') : 'No topics available' }}
+                    </span>
                   </div>
                 </div>
               </div>
@@ -357,7 +359,7 @@
     <b><tr mat-header-row *matHeaderRowDef="columnsToDisplay"></tr></b>
     <tr mat-row
         *matRowDef="let element; columns: columnsToDisplay"
-        class="example-element-row"
+        class="example-element-row e2e-test-stats-list-item"
         [class.example-expanded-row]="expandedElement === element"
         (click)="expandedElement = expandedElement === element ? null : element">
     </tr>

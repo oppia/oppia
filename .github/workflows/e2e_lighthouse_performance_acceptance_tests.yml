@@ -81,6 +81,7 @@ jobs:
           - classroomPageFileUploadFeatures
           - collections
           - contributorDashboard
+          - contributorAdminDashboard
           - coreEditorAndPlayerFeatures
           - creatorDashboard
           - embedding

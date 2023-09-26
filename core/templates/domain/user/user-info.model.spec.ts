@@ -45,6 +45,7 @@ describe('User info model', () => {
     expect(userInfo.isTranslationAdmin()).toBe(false);
     expect(userInfo.isQuestionAdmin()).toBe(false);
     expect(userInfo.isQuestionCoordinator()).toBe(false);
+    expect(userInfo.isTranslationCoordinator()).toBe(false);
     expect(userInfo.canCreateCollections()).toBe(true);
     expect(userInfo.getPreferredSiteLanguageCode()).toBe('en');
     expect(userInfo.getUsername()).toBe('tester');
