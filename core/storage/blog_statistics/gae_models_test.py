@@ -18,8 +18,10 @@
 
 from __future__ import annotations
 
+import time
 import types
 
+from core import utils
 from core.platform import models
 from core.tests import test_utils
 
@@ -107,6 +109,19 @@ class BlogPostViewedEventLogEntryModelUnitTests(test_utils.GenericTestBase):
                     lambda x, y: True,
                     blog_stats_models.BlogPostViewedEventLogEntryModel)):
                 stats_model_class.create('blog_post_id')
+
+    def test_get_new_event_entity_id(self) -> None:
+        time_instance1 = utils.get_current_time_in_millisecs()
+        time.sleep(1)
+        new_id = (
+            blog_stats_models.BlogPostViewedEventLogEntryModel
+                .get_new_event_entity_id('BLOG')
+        )
+        time_id_created = int(new_id.split(':')[0])
+        self.assertGreater(time_id_created, time_instance1)
+        time.sleep(1)
+        self.assertLess(time_id_created, utils.get_current_time_in_millisecs())
+        self.assertEqual(new_id.split(':')[1], 'BLOG')
 
     def test_create_and_get_event_models(self) -> None:
         entity_id = (
@@ -196,6 +211,19 @@ class BlogPostReadEventLogEntryModelUnitTests(test_utils.GenericTestBase):
             .get_deletion_policy(),
             base_models.DELETION_POLICY.NOT_APPLICABLE
         )
+
+    def test_get_new_event_entity_id(self) -> None:
+        time_instance1 = utils.get_current_time_in_millisecs()
+        time.sleep(1)
+        new_id = (
+            blog_stats_models.BlogPostViewedEventLogEntryModel
+                .get_new_event_entity_id('BLOG')
+        )
+        time_id_created = int(new_id.split(':')[0])
+        self.assertGreater(time_id_created, time_instance1)
+        time.sleep(1)
+        self.assertLess(time_id_created, utils.get_current_time_in_millisecs())
+        self.assertEqual(new_id.split(':')[1], 'BLOG')
 
     def test_create_raises_exception_by_mocking_collision(self) -> None:
         stats_model_class = blog_stats_models.BlogPostReadEventLogEntryModel
@@ -304,6 +332,19 @@ class BlogPostExitedEventLogEntryModelUnitTests(test_utils.GenericTestBase):
             .get_deletion_policy(),
             base_models.DELETION_POLICY.NOT_APPLICABLE
         )
+
+    def test_get_new_event_entity_id(self) -> None:
+        time_instance1 = utils.get_current_time_in_millisecs()
+        time.sleep(1)
+        new_id = (
+            blog_stats_models.BlogPostViewedEventLogEntryModel
+                .get_new_event_entity_id('BLOG')
+        )
+        time_id_created = int(new_id.split(':')[0])
+        self.assertGreater(time_id_created, time_instance1)
+        time.sleep(1)
+        self.assertLess(time_id_created, utils.get_current_time_in_millisecs())
+        self.assertEqual(new_id.split(':')[1], 'BLOG')
 
     def test_create_and_get_event_models(self) -> None:
         entity_id = (

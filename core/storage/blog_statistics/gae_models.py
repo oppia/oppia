@@ -63,7 +63,9 @@ class BlogPostViewedEventLogEntryModel(base_models.BaseModel):
                 base_models.ID_LENGTH
             )
             new_id = ('%s:%s:%s' % (
-                utils.get_current_time_in_millisecs,
+                str(
+                    utils.get_current_time_in_millisecs()
+                ).split('.', maxsplit=1)[0],
                 blog_post_id,
                 random_hash)
             )
@@ -139,7 +141,9 @@ class BlogPostReadEventLogEntryModel(base_models.BaseModel):
                 base_models.ID_LENGTH
             )
             new_id = ('%s:%s:%s' % (
-                utils.get_current_time_in_millisecs,
+                str(
+                    utils.get_current_time_in_millisecs()
+                ).split('.', maxsplit=1)[0],
                 blog_post_id,
                 random_hash)
             )
@@ -220,7 +224,9 @@ class BlogPostExitedEventLogEntryModel(base_models.BaseModel):
                 base_models.ID_LENGTH
             )
             new_id = ('%s:%s:%s' % (
-                utils.get_current_time_in_millisecs,
+                str(
+                    utils.get_current_time_in_millisecs()
+                ).split('.', maxsplit=1)[0],
                 blog_post_id,
                 random_hash)
             )
