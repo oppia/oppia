@@ -206,7 +206,7 @@ export class ContributorDashboardPageComponent
         ) {
           this.topicName = prevSelectedTopicName;
         }
-        this.translationTopicService.setActiveTopicName('All');
+        this.translationTopicService.setActiveTopicName(this.topicName);
       });
 
     this.activeTabName = 'myContributionTab';
