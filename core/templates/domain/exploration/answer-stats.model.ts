@@ -93,7 +93,7 @@ export class AnswerStats {
    */
   static createFromBackendDict(
       backendDict: AnswerStatsBackendDict): AnswerStats {
-  // TODO(brianrodri): Use a proper service which takes the state's
+  // TODO(#9749): Use a proper service which takes the state's
   // interaction type into account for generating the answer's HTML.
     var answerHtml = (typeof backendDict.answer === 'string') ?
     backendDict.answer : JSON.stringify(backendDict.answer);
