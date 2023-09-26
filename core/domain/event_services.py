@@ -141,7 +141,7 @@ class AnswerSubmissionEventHandler(BaseEventHandler):
         here is a Python-representation of the actual answer submitted by the
         user.
         """
-        # TODO(sll): Escape these args?
+        # TODO(#16047): Escape these args?
         stats_services.record_answer(
             exploration_id, exploration_version, state_name, interaction_id,
             stats_domain.SubmittedAnswer(
