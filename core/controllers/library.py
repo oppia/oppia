@@ -71,7 +71,7 @@ def get_matching_activity_dicts(
     # We only populate collections in the initial load, since the current
     # frontend search infrastructure is set up to only deal with one search
     # offset at a time.
-    # TODO(sll): Remove this special casing.
+    # TODO(#16804): Remove this special casing.
     collection_ids: List[str] = []
     if not search_offset:
         collection_ids, _ = (
@@ -121,7 +121,7 @@ class LibraryIndexHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     @acl_decorators.open_access
     def get(self) -> None:
         """Handles GET requests."""
-        # TODO(sll): Support index pages for other language codes.
+        # TODO(#18664): Support index pages for other language codes.
         summary_dicts_by_category = summary_services.get_library_groups([
             constants.DEFAULT_LANGUAGE_CODE])
         top_rated_activity_summary_dicts = (
