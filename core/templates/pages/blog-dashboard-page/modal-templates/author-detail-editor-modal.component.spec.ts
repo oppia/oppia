@@ -106,6 +106,13 @@ describe('Upload Blog Post Thumbnail Modal Component', () => {
       'Author Name should not be empty.'
     ]);
 
+    component.authorName = 'test_username';
+    component.authorBio = 'general bio';
+    expect(component.validateAuthorDetails().length).toBe(1);
+    expect(component.validateAuthorDetails()).toEqual([
+      'Author Name can only have alphanumeric characters and spaces.'
+    ]);
+
     component.authorName = '';
     component.authorBio = '';
     expect(component.validateAuthorDetails().length).toBe(2);
