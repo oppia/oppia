@@ -199,14 +199,14 @@ export class ContributorDashboardPageComponent
         if (topicNames.length <= 0) {
           return;
         }
-        this.topicName = 'All';
+        this.topicName = topicNames[0];
         if (
           prevSelectedTopicName &&
           topicNames.indexOf(prevSelectedTopicName) !== -1
         ) {
           this.topicName = prevSelectedTopicName;
         }
-        this.translationTopicService.setActiveTopicName(this.topicName);
+        this.translationTopicService.setActiveTopicName('All');
       });
 
     this.activeTabName = 'myContributionTab';
