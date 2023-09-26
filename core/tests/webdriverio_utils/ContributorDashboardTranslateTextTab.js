@@ -62,6 +62,7 @@ var ContributorDashboardTranslateTextTab = function() {
   this.changeTopic = async function(topic) {
     await _selectTopic(topic);
     await waitFor.pageToFullyLoad();
+  };
 
   this.mouseoverFeaturedLanguageTooltip = async function(index) {
     await _openLanguageSelector();
