@@ -64,8 +64,8 @@ PlatformParameterRegistry = platform_parameter_registry.Registry
 NEW_CONTRIBUTOR_EMAIL_DATA: Dict[str, Dict[str, str]] = {
     constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION: {
         'task': 'review',
-        'category': 'translations',
-        'to_check': 'translation suggestions',
+        'contribution_category': 'translations',
+        'to_contribute': 'translation suggestions',
         'description_template': '%s language translations',
         'rights_message_template': (
             'review translation suggestions made by contributors in the %s '
@@ -73,8 +73,8 @@ NEW_CONTRIBUTOR_EMAIL_DATA: Dict[str, Dict[str, str]] = {
     },
     constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER: {
         'task': 'review',
-        'category': 'voiceovers',
-        'to_check': 'voiceover applications',
+        'contribution_category': 'voiceovers',
+        'to_contribute': 'voiceover applications',
         'description_template': '%s language voiceovers',
         'rights_message_template': (
             'review voiceover applications made by contributors in the %s '
@@ -82,15 +82,15 @@ NEW_CONTRIBUTOR_EMAIL_DATA: Dict[str, Dict[str, str]] = {
     },
     constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION: {
         'task': 'review',
-        'category': 'questions',
-        'to_check': 'question suggestions',
+        'contribution_category': 'questions',
+        'to_contribute': 'question suggestions',
         'description': 'questions',
         'rights_message': 'review question suggestions made by contributors'
     },
     constants.CONTRIBUTION_RIGHT_CATEGORY_SUBMIT_QUESTION: {
         'task': 'submit',
-        'category': 'questions',
-        'to_submit': 'question suggestions',
+        'contribution_category': 'questions',
+        'to_contribute': 'question suggestions',
         'description': 'questions',
         'rights_message': 'submit question suggestions'
     }
@@ -2216,23 +2216,21 @@ def send_email_to_new_contributor(
 
     Args:
         recipient_id: str. The ID of the user.
-        review_category: str. The category in which user can review.
+        contribution_category: str. The category in which user can contribute.
         language_code: None|str. The language code for a language if the review
             item is translation or voiceover else None.
 
     Raises:
-        Exception. The review category is not valid.
-        Exception. The language_code cannot be None if the review category is
+        Exception. The contribution category is not valid.
+        Exception. The language_code cannot be None if the contribution category is
             'translation' or 'voiceover'.
     """
-    print("Called sending email to new contributor")
-
     if contribution_category not in NEW_CONTRIBUTOR_EMAIL_DATA:
         raise Exception('Invalid contribution_category: %s' % contribution_category)
 
     contribution_category_data = NEW_CONTRIBUTOR_EMAIL_DATA[contribution_category]
     email_subject = 'You have been invited to %s Oppia %s' % (contribution_category_data['task'],
-        contribution_category_data['category'])
+        contribution_category_data['contribution_category'])
 
     if contribution_category in [
             constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION,
@@ -2254,44 +2252,46 @@ def send_email_to_new_contributor(
         contributor_rights_message = contribution_category_data['rights_message']
     
     email_body_template = ('%s %s %s %s')
+    recipient_username = user_services.get_username(recipient_id)
     to_contribute = ""
     if contribution_category in [
             constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION,
             constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER,
-            constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER
+            constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER, 
+            constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION
             ]:
-        to_contribute = contribution_category_data['to_check']
+        to_contribute = contribution_category_data['to_contribute']
         email_body_template = (
             'Hi %s,<br><br>'
             'This is to let you know that the Oppia team has added you as a '
-            'reviewer to %s. This allows you to %s.<br><br>'
+            'reviewer for %s. This allows you to %s.<br><br>'
             'You can check the %s waiting for review in the '
             '<a href="https://www.oppia.org/contributor-dashboard">'
             'Contributor Dashboard</a>.<br><br>'
             'Thanks, and happy contributing!<br><br>'
             'Best wishes,<br>'
             'The Oppia Community')
+        email_body = email_body_template % (
+            recipient_username, contribution_category_description,
+            contributor_rights_message, to_contribute)
 
     elif contribution_category in [
                 constants.CONTRIBUTION_RIGHT_CATEGORY_SUBMIT_QUESTION
                 ]:
-        to_contribute = contribution_category_data['to_submit']
+        to_contribute = contribution_category_data['to_contribute']
         email_body_template = (
             'Hi %s,<br><br>'
             'This is to let you know that the Oppia team has added you as a '
-            'contributor to %s. This allows you to %s.<br><br>'
-            'You can to submit %s in the'
+            'contributor to %s for use in lessons.<br><br>'
+            'You can now start to submit %s in the'
             '<a href="https://www.oppia.org/contributor-dashboard">'
             'Contributor Dashboard</a>.<br><br>'
             'Thanks, and happy contributing!<br><br>'
             'Best wishes,<br>'
             'The Oppia Community')
-        
-    recipient_username = user_services.get_username(recipient_id)
-
-    email_body = email_body_template % (
-            recipient_username, contribution_category_description,
-            contributor_rights_message, to_contribute)
+        email_body = email_body_template % (
+            recipient_username, contributor_rights_message,
+            contribution_category_description)
 
     if not feconf.CAN_SEND_EMAILS:
         logging.error('This app cannot send emails to users.')
@@ -2330,7 +2330,7 @@ def send_email_to_removed_contribution_reviewer(
             'translation' or 'voiceover'.
     """
     if review_category not in REMOVED_REVIEWER_EMAIL_DATA:
-        raise Exception('Invalid review_category: %s' % review_category)
+        raise Exception('Invalid contribution_category: %s' % review_category)
 
     review_category_data = REMOVED_REVIEWER_EMAIL_DATA[review_category]
     email_subject = 'You have been unassigned as a %s reviewer' % (
@@ -2405,11 +2405,11 @@ def send_email_to_new_contribution_submit_questions(
             'translation' or 'voiceover'.
     """
     if review_category not in NEW_CONTRIBUTOR_EMAIL_DATA:
-        raise Exception('Invalid review_category: %s' % review_category)
+        raise Exception('Invalid contribution_category: %s' % review_category)
 
     review_category_data = NEW_CONTRIBUTOR_EMAIL_DATA[review_category]
     email_subject = 'You have been invited to submit questions to Oppia %s' % (
-        review_category_data['review_category'])
+        review_category_data['contribution_category'])
 
     if review_category in [
             constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION,
@@ -2430,7 +2430,7 @@ def send_email_to_new_contribution_submit_questions(
         review_category_description = review_category_data['description']
         reviewer_rights_message = review_category_data['rights_message']
 
-    to_review = review_category_data['to_check']
+    to_review = review_category_data['to_contribute']
 
     email_body_template = (
         'Hi %s,<br><br>'
