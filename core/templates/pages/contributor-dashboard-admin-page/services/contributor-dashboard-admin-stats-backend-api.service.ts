@@ -26,6 +26,9 @@ import { TranslationSubmitterStats, TranslationReviewerStats,
 } from '../contributor-dashboard-admin-summary.model';
 import { AppConstants } from 'app.constants';
 import { ContributorDashboardAdminPageConstants as PageConstants } from '../contributor-dashboard-admin-page.constants';
+import { TopicChoice } from '../contributor-admin-dashboard-page.component';
+import { ClassroomDomainConstants } from 'domain/classroom/classroom-domain.constants';
+import { ClassroomDataBackendDict } from 'domain/classroom/classroom-backend-api.service';
 
 export interface TranslationSubmitterBackendDict {
     'language_code': string;
@@ -194,6 +197,10 @@ export class ContributorDashboardAdminStatsBackendApiService {
         filter.lastActivity ? {
           max_days_since_last_activity: filter.lastActivity
         } : {}),
+      ...(
+        (filter.topicIds.length > 0) ? {
+          topic_ids: JSON.stringify(filter.topicIds)
+        } : {}),
     };
     if (contributionType === AppConstants.CONTRIBUTION_STATS_TYPE_TRANSLATION) {
       if (
@@ -288,6 +295,25 @@ export class ContributorDashboardAdminStatsBackendApiService {
       nextOffset: 0,
       more: false
     });
+  }
+
+  async fetchTopicsData(): Promise<TopicChoice[]> {
+    let classroomDataUrl = this.urlInterpolationService.interpolateUrl(
+      ClassroomDomainConstants.CLASSROOOM_DATA_URL_TEMPLATE, {
+        classroom_url_fragment: 'math'
+      });
+
+    const response = await this.http
+      .get<ClassroomDataBackendDict>(classroomDataUrl)
+      .toPromise();
+
+    const topicChoices: TopicChoice[] = response.topic_summary_dicts.map(
+      (obj) => ({
+        id: obj.id,
+        topic: obj.name
+      }));
+
+    return topicChoices;
   }
 }
 

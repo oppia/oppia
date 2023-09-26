@@ -32,6 +32,11 @@ interface LangaugeChoice {
   language: string;
 }
 
+export interface TopicChoice {
+  id: string;
+  topic: string;
+}
+
 @Component({
   selector: 'contributor-admin-dashboard-page',
   styleUrls: ['./contributor-admin-dashboard-page.component.css'],
@@ -47,7 +52,8 @@ interface LangaugeChoice {
   ],
 })
 export class ContributorAdminDashboardPageComponent implements OnInit {
-  @ViewChild('dropdown', {'static': false}) dropdownRef!: ElementRef;
+  @ViewChild('languageDropdown', {'static': false}) dropdown1Ref!: ElementRef;
+  @ViewChild('activityDropdown', {'static': false}) dropdown2Ref!: ElementRef;
 
   languageDropdownShown: boolean = false;
   activityDropdownShown: boolean = false;
@@ -66,11 +72,21 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
   selectedLanguage: string;
   selectedLanguageId: string = 'pt';
   selectedLastActivity: number;
+  selectedTopics: string[] = [];
+  allTopicNames: string[] = [];
 
   languages: LangaugeChoice[] = [];
-  lastActivty: number[] = [7, 30, 90];
+  lastActivty: number[] = [];
   filter: ContributorAdminDashboardFilter = (
     ContributorAdminDashboardFilter.createDefault());
+
+  topics: TopicChoice[] = [{
+    id: 'asd',
+    topic: 'asd'
+  }, {
+    id: 'asd',
+    topic: 'asd'
+  }];
 
   constructor(
     private windowRef: WindowRef,
@@ -99,6 +115,16 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
 
     this.lastActivty = [7, 30, 90];
 
+    this.contributorDashboardAdminStatsBackendApiService
+      .fetchTopicsData().then(
+        (response) => {
+          this.topics = response;
+          response.map((
+              topic) =>
+            this.allTopicNames.push(topic.topic));
+        }
+      );
+
     this.filter = new ContributorAdminDashboardFilter(
       [],
       'pt',
@@ -112,6 +138,14 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
 
   toggleActivityDropdown(): void {
     this.activityDropdownShown = !this.activityDropdownShown;
+  }
+
+  applyTopicFilter(): void {
+    this.filter = new ContributorAdminDashboardFilter(
+      this.selectedTopics,
+      this.selectedLanguageId,
+      null,
+      this.selectedLastActivity);
   }
 
   selectLanguage(language: string): void {
@@ -155,10 +189,15 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
     const targetElement = event.target as HTMLElement;
     if (
       targetElement &&
-      !this.dropdownRef.nativeElement.contains(targetElement)
+      !this.dropdown1Ref.nativeElement.contains(targetElement)
     ) {
       this.languageDropdownShown = false;
-      // this.activityDropdownShown = false;
+    }
+    if (
+      targetElement &&
+      !this.dropdown2Ref.nativeElement.contains(targetElement)
+    ) {
+      this.activityDropdownShown = false;
     }
   }
 }

@@ -1,0 +1,28 @@
+<div class="oppia-same-row-container topic-filter w-100 e2e-test-topic-filter-component">
+  <mat-form-field appearance="fill"
+                  class="w-100">
+    <mat-label>{{ 'I18N_BLOG_HOME_PAGE_TAG_FILTER_HOLDER_TEXT' | translate }}</mat-label>
+    <mat-chip-list #chipList aria-label="Topics Filter">
+      <mat-chip *ngFor="let topic of selectedTopics"
+                (removed)="deselectTopic(topic)">
+                {{ topic }}
+        <button matChipRemove>
+          <mat-icon class="pl-2">cancel</mat-icon>
+        </button>
+      </mat-chip>
+      <input placeholder="New topic ..."
+             #topicFilterInput
+             #trigger="matAutocompleteTrigger"
+             [formControl]="topicFilter"
+             [matAutocomplete]="auto"
+             [matChipInputFor]="chipList"
+             [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
+             class="e2e-test-topic-filter-selection-input">
+    </mat-chip-list>
+    <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selectTopic($event)" class="e2e-test-topic-filter-selection-dropdown">
+      <mat-option *ngFor="let topic of filteredTopics | async" [value]="topic" (click)="$event.stopPropagation(); trigger.openPanel()">
+        {{ topic }}
+      </mat-option>
+    </mat-autocomplete>
+  </mat-form-field>
+</div>

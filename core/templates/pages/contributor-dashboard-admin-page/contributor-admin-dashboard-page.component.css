@@ -71,6 +71,33 @@
 .oppia-dashboard-container {
   max-width: 960px;
 }
+.filter-sub-container {
+  display: flex;
+  flex-direction: row;
+}
+.topic-filter mat-form-field .mat-form-field-flex {
+  background: #fff;
+  border: 1px solid #707070;
+  border-radius: 4px;
+}
+
+mat-chip-list .mat-standard-chip {
+  background: #fff;
+  border: 1px solid #333;
+  border-radius: 2px;
+  color: #555;
+  font-family: 'Roboto', Arial, sans-serif;
+  font-size: 16px;
+  font-weight: bold;
+  letter-spacing: 0;
+  line-height: 19px;
+  text-align: center;
+}
+
+mat-chip-list .mat-standard-chip .mat-chip-remove {
+  color: #555;
+  display: contents;
+}
 .filter-container {
   display: flex;
   flex-direction: column;
