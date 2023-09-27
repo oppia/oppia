@@ -2165,7 +2165,8 @@ class OnboardingReviewerInstantEmailTests(test_utils.EmailTestBase):
                 sent_email_model.sender_email,
                 'Site Admin <%s>' % feconf.NOREPLY_EMAIL_ADDRESS)
             self.assertEqual(
-                sent_email_model.intent, feconf.EMAIL_INTENT_ONBOARD_CONTRIBUTOR)
+                sent_email_model.intent,
+                feconf.EMAIL_INTENT_ONBOARD_CONTRIBUTOR)
 
 
 class NotifyReviewerInstantEmailTests(test_utils.EmailTestBase):
@@ -6325,7 +6326,7 @@ class ContributionReviewerEmailTest(test_utils.EmailTestBase):
                     self.translation_reviewer_id,
                     constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION)
 
-    def test_assign_translation_reviewer_email_for_invalid_contribution_category(
+    def test_assign_translation_reviewer_email_for_invalid_category(
         self
     ) -> None:
         with self.assertRaisesRegex(Exception, 'Invalid contribution_category'):
@@ -6333,13 +6334,17 @@ class ContributionReviewerEmailTest(test_utils.EmailTestBase):
                 self.translation_reviewer_id, 'invalid_category')
 
     def test_schema_of_new_contributor_email_data_constant(self) -> None:
-        self.assertEqual(sorted(email_manager.NEW_CONTRIBUTOR_EMAIL_DATA.keys()), [
-            constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION,
-            constants.CONTRIBUTION_RIGHT_CATEGORY_SUBMIT_QUESTION,
-            constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION,
-            constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER
+        self.assertEqual(
+            sorted(email_manager.NEW_CONTRIBUTOR_EMAIL_DATA.keys()),
+            [
+                constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION,
+                constants.CONTRIBUTION_RIGHT_CATEGORY_SUBMIT_QUESTION,
+                constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION,
+                constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER
             ])
-        for category_details in email_manager.NEW_CONTRIBUTOR_EMAIL_DATA.values():
+        for category_details in (
+            email_manager.NEW_CONTRIBUTOR_EMAIL_DATA.values()
+        ):
             self.assertEqual(len(category_details), 5)
             self.assertTrue(
                 'description' in category_details or (
@@ -6396,12 +6401,10 @@ class ContributionReviewerEmailTest(test_utils.EmailTestBase):
                 sent_email_model.sender_email,
                 'Site Admin <%s>' % feconf.NOREPLY_EMAIL_ADDRESS)
             self.assertEqual(
-                sent_email_model.intent, feconf.EMAIL_INTENT_ONBOARD_CONTRIBUTOR)
+                sent_email_model.intent,
+                feconf.EMAIL_INTENT_ONBOARD_CONTRIBUTOR)
 
     def test_send_assigned_voiceover_reviewer_email(self) -> None:
-
-        f_template = open("template_tests.txt", "a")
-
         expected_email_subject = (
             'You have been invited to review Oppia voiceovers')
         expected_email_html_body = (
@@ -6416,9 +6419,6 @@ class ContributionReviewerEmailTest(test_utils.EmailTestBase):
             'Thanks, and happy contributing!<br><br>'
             'Best wishes,<br>'
             'The Oppia Community')
-        f_template.write(expected_email_html_body)
-        f_template.write('\n\n')
-        #f_template.close()
 
         with self.can_send_emails_ctx:
             email_manager.send_email_to_new_contributor(
@@ -6430,13 +6430,7 @@ class ContributionReviewerEmailTest(test_utils.EmailTestBase):
             messages = self._get_sent_email_messages(
                 self.VOICEOVER_REVIEWER_EMAIL)
             self.assertEqual(len(messages), 1)
-            html = messages[0].html
-            print("HTML: ", html)
-            f_template.write(html)
-
             self.assertEqual(messages[0].html, expected_email_html_body)
-            #f_result = open("results_tests.txt", "a")
-            f_template.close()
 
             # Make sure correct email model is stored.
             all_models: Sequence[
@@ -6456,7 +6450,8 @@ class ContributionReviewerEmailTest(test_utils.EmailTestBase):
                 sent_email_model.sender_email,
                 'Site Admin <%s>' % feconf.NOREPLY_EMAIL_ADDRESS)
             self.assertEqual(
-                sent_email_model.intent, feconf.EMAIL_INTENT_ONBOARD_CONTRIBUTOR)
+                sent_email_model.intent,
+                feconf.EMAIL_INTENT_ONBOARD_CONTRIBUTOR)
 
     def test_send_assigned_question_reviewer_email(self) -> None:
         expected_email_subject = (
@@ -6502,15 +6497,17 @@ class ContributionReviewerEmailTest(test_utils.EmailTestBase):
                 sent_email_model.sender_email,
                 'Site Admin <%s>' % feconf.NOREPLY_EMAIL_ADDRESS)
             self.assertEqual(
-                sent_email_model.intent, feconf.EMAIL_INTENT_ONBOARD_CONTRIBUTOR)
-    
+                sent_email_model.intent,
+                feconf.EMAIL_INTENT_ONBOARD_CONTRIBUTOR)
+
     def test_send_assigned_question_submitter_email(self) -> None:
         expected_email_subject = (
             'You have been invited to submit Oppia questions')
         expected_email_html_body = (
             'Hi questionSuggestor,<br><br>'
             'This is to let you know that the Oppia team has added you as a '
-            'contributor to submit question suggestions for use in lessons.<br><br>'
+            'contributor to submit question suggestions ' 
+            'for use in lessons.<br><br>'
             'You can now start to submit questions in the'
             '<a href="https://www.oppia.org/contributor-dashboard">'
             'Contributor Dashboard</a>.<br><br>'
@@ -6547,7 +6544,8 @@ class ContributionReviewerEmailTest(test_utils.EmailTestBase):
                 sent_email_model.sender_email,
                 'Site Admin <%s>' % feconf.NOREPLY_EMAIL_ADDRESS)
             self.assertEqual(
-                sent_email_model.intent, feconf.EMAIL_INTENT_ONBOARD_CONTRIBUTOR)
+                sent_email_model.intent,
+                feconf.EMAIL_INTENT_ONBOARD_CONTRIBUTOR)
 
     def test_email_is_not_sent_can_send_emails_is_false(self) -> None:
         with self.can_not_send_emails_ctx:
@@ -6560,7 +6558,7 @@ class ContributionReviewerEmailTest(test_utils.EmailTestBase):
             self.TRANSLATION_REVIEWER_EMAIL)
         self.assertEqual(len(messages), 0)
 
-    def test_remove_translation_reviewer_email_for_invalid_contribution_category(
+    def test_remove_translation_reviewer_email_for_invalid_category(
         self
     ) -> None:
         with self.assertRaisesRegex(Exception, 'Invalid contribution_category'):
@@ -6724,7 +6722,7 @@ class ContributionReviewerEmailTest(test_utils.EmailTestBase):
             self.assertEqual(
                 sent_email_model.intent, feconf.EMAIL_INTENT_REMOVE_CONTRIBUTOR)
 
-def test_send_removed_question_submitter_email(self) -> None:
+    def test_send_removed_question_submitter_email(self) -> None:
         expected_email_subject = (
             'You have been unassigned as a question submitter')
         expected_email_html_body = (
@@ -6768,7 +6766,6 @@ def test_send_removed_question_submitter_email(self) -> None:
                 'Site Admin <%s>' % feconf.NOREPLY_EMAIL_ADDRESS)
             self.assertEqual(
                 sent_email_model.intent, feconf.EMAIL_INTENT_REMOVE_CONTRIBUTOR)
-
 
 
 class NotMergeableChangesEmailUnitTest(test_utils.EmailTestBase):

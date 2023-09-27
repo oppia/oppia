@@ -2218,7 +2218,8 @@ def send_email_to_new_contributor(
     contribution_category: str,
     language_code: Optional[str] = None
 ) -> None:
-    """Sends an email to user who is assigned rights to either review or submit contributions.
+    """Sends an email to user who is assigned rights to either
+       review or submit contributions.
 
     Args:
         recipient_id: str. The ID of the user.
@@ -2228,19 +2229,25 @@ def send_email_to_new_contributor(
 
     Raises:
         Exception. The contribution category is not valid.
-        Exception. The language_code cannot be None if the contribution category is
-            'translation' or 'voiceover'.
+        Exception. The language_code cannot be None if the 
+            contribution category is 'translation' or 'voiceover'.
     """
     if contribution_category not in NEW_CONTRIBUTOR_EMAIL_DATA:
-        raise Exception('Invalid contribution_category: %s' % contribution_category)
+        raise Exception(
+            'Invalid contribution_category: %s' % contribution_category
+            )
 
-    contribution_category_data = NEW_CONTRIBUTOR_EMAIL_DATA[contribution_category]
-    email_subject = 'You have been invited to %s Oppia %s' % (contribution_category_data['task'],
-        contribution_category_data['contribution_category'])
+    contribution_category_data = (
+        NEW_CONTRIBUTOR_EMAIL_DATA[contribution_category])
+    email_subject = 'You have been invited to %s Oppia %s' % (
+                    contribution_category_data['task'],
+                    contribution_category_data['contribution_category']
+                    )
 
     if contribution_category in [
             constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION,
-            constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER]:
+            constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER
+            ]:
         if language_code is None:
             raise Exception(
                 'The language_code cannot be None if the review category is'
@@ -2249,21 +2256,24 @@ def send_email_to_new_contributor(
         language_description = utils.get_supported_audio_language_description(
             language_code).capitalize()
         contribution_category_description = (
-            contribution_category_data['description_template'] % language_description)
+            contribution_category_data['description_template'] %
+                language_description)
         contributor_rights_message = (
-            contribution_category_data['rights_message_template'] % (
-                language_description))
+            contribution_category_data['rights_message_template'] %
+                (language_description))
     else:
-        contribution_category_description = contribution_category_data['description']
-        contributor_rights_message = contribution_category_data['rights_message']
-    
-    email_body_template = ('%s %s %s %s')
+        contribution_category_description = (
+            contribution_category_data['description'])
+        contributor_rights_message = (
+            contribution_category_data['rights_message'])
+
+    email_body_template = '%s %s %s %s'
     recipient_username = user_services.get_username(recipient_id)
-    to_contribute = ""
+    to_contribute = ''
     if contribution_category in [
             constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION,
             constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER,
-            constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER, 
+            constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER,
             constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION
             ]:
         to_contribute = contribution_category_data['to_contribute']
@@ -2301,7 +2311,7 @@ def send_email_to_new_contributor(
 
     if not feconf.CAN_SEND_EMAILS:
         logging.error('This app cannot send emails to users.')
-        logging.info("Email Text: \n %s" % email_body)
+        logging.info('Email Text: \n %s' % email_body)
         return
 
     can_user_receive_email = user_services.get_email_preferences(
@@ -2320,11 +2330,12 @@ def send_email_to_removed_contributor(
     contribution_category: str,
     language_code: Optional[str] = None
 ) -> None:
-    """Sends an email to user who is removed from a specific contributor position.
+    """Sends an email to user who is removed from a specific 
+        contributor position.
 
     Args:
         user_id: str. The ID of the user.
-        contribute_category: str. The category which for which review role is
+        contribution_category: str. The category which for which review role is
             removed.
         language_code: None|str. The language code for a language if the review
             item is translation or voiceover else None.
@@ -2335,9 +2346,12 @@ def send_email_to_removed_contributor(
             'translation' or 'voiceover'.
     """
     if contribution_category not in REMOVED_CONTRIBUTOR_EMAIL_DATA:
-        raise Exception('Invalid contribution_category: %s' % contribution_category)
+        raise Exception(
+            'Invalid contribution_category: %s' % contribution_category
+            )
 
-    contribution_category_data = REMOVED_CONTRIBUTOR_EMAIL_DATA[contribution_category]
+    contribution_category_data = (
+        REMOVED_CONTRIBUTOR_EMAIL_DATA[contribution_category])
     email_subject = 'You have been unassigned as a %s reviewer' % (
         contribution_category_data['contribution_category'])
 
@@ -2389,6 +2403,7 @@ def send_email_to_removed_contributor(
             user_id, feconf.SYSTEM_COMMITTER_ID,
             feconf.EMAIL_INTENT_REMOVE_CONTRIBUTOR, email_subject, email_body,
             feconf.NOREPLY_EMAIL_ADDRESS)
+
 
 def send_not_mergeable_change_list_to_admin_for_review(
     exp_id: str,
