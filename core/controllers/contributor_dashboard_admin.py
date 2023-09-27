@@ -265,9 +265,10 @@ class ContributionRightsHandler(
         if category in [
                 constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION,
                 constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER,
-                constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION
+                constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION, 
+                constants.CONTRIBUTION_RIGHT_CATEGORY_SUBMIT_QUESTION
         ]:
-            email_manager.send_email_to_removed_contribution_reviewer(
+            email_manager.send_email_to_removed_contributor(
                 user_id, category, language_code=language_code)
 
         self.render_json({})
