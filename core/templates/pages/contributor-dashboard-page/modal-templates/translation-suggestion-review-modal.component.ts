@@ -450,6 +450,7 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
 
     // If the reviewed item was the last item, close the modal.
     if (this.lastSuggestionToReview || this.isLastItem) {
+      this.commitQueuedSuggestion();
       this.activeModal.close(this.resolvedSuggestionIds);
       return;
     }

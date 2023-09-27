@@ -42,7 +42,7 @@ class MockChangeDetectorRef {
   detectChanges(): void {}
 }
 
-describe('Translation Suggestion Review Modal Component', function() {
+fdescribe('Translation Suggestion Review Modal Component', function() {
   let fixture: ComponentFixture<TranslationSuggestionReviewModalComponent>;
   let component: TranslationSuggestionReviewModalComponent;
   let alertsService: AlertsService;
@@ -561,6 +561,62 @@ describe('Translation Suggestion Review Modal Component', function() {
       expect(commitQueuedSuggestionSpy).toHaveBeenCalled();
     });
 
+    it('should remove suggestion_id from resolvedSuggestionIds if it exists', () => {
+      component.ngOnInit();
+      component.resolvedSuggestionIds = ['suggestion_1', 'suggestion_2'];
+      component.queuedSuggestion = {
+        suggestion_id: 'suggestion_1',
+        action_status: 'accept',
+        target_id: '1',
+        reviewer_message: ''
+      };
+      // component.removedSuggestion = { };
+
+      component.revertSuggestionResolution();
+
+      expect(component.resolvedSuggestionIds).toEqual(['suggestion_2']);
+    });
+
+  it('should not modify resolvedSuggestionIds if suggestion_id does not exist', () => {
+      component.ngOnInit();
+      component.resolvedSuggestionIds = ['suggestion_2'];
+      component.queuedSuggestion = {        suggestion_id: 'suggestion_1',
+      action_status: 'accept',
+      target_id: '1',
+      reviewer_message: ''};
+      // component.removedSuggestion = { someData: 'test' };
+
+      component.revertSuggestionResolution();
+
+      expect(component.resolvedSuggestionIds).toEqual(['suggestion_2']);
+  });
+
+    it('should close the modal if the suggestion reviewed is the last item', () => {
+      component.ngOnInit()
+      expect(component.activeSuggestionId).toBe('suggestion_1');
+      expect(component.activeSuggestion).toEqual(suggestion1);
+      expect(component.reviewable).toBe(reviewable);
+      expect(component.reviewMessage).toBe('');
+
+      spyOn(
+        siteAnalyticsService, 'registerContributorDashboardAcceptSuggestion');
+      spyOn(contributionAndReviewService, 'reviewExplorationSuggestion');
+      const modalCloseSpy = spyOn(activeModal, 'close');
+      spyOn(alertsService, 'addSuccessMessage');
+      const commitQueuedSuggestionSpy = spyOn(component, 'commitQueuedSuggestion').and.stub();
+
+      component.goToNextItem();
+      spyOn(component, 'resolveSuggestionAndUpdateModal').and.callThrough()
+      expect(component.activeSuggestionId).toBe('suggestion_2');
+      expect(component.activeSuggestion).toEqual(suggestion2);
+      component.isLastItem = true;
+      component.acceptAndReviewNext();
+      component.isLastItem = true;
+      console.log("Here it issss",component.isLastItem);
+      expect(modalCloseSpy).toHaveBeenCalled();
+      expect(commitQueuedSuggestionSpy).toHaveBeenCalled();
+      console.log("Here it issss 2",component.isLastItem);
+    });
 
     it(
       'should cancel suggestion in suggestion modal service when clicking ' +
