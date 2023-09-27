@@ -96,6 +96,7 @@ enum ExpansionTabType {
   TRANSLATION
 }
 
+
 const COMMIT_TIMEOUT_DURATION = 30000; // 30 seconds in milliseconds.
 
 @Component({
