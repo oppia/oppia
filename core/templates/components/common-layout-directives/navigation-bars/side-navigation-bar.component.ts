@@ -70,41 +70,6 @@ export class SideNavigationBarComponent {
   ngOnInit(): void {
     this.currentUrl = this.windowRef.nativeWindow.location.pathname;
 
-    // TODO(#18362): Resolve the console error on the signup page and then
-    // add the error catch block to the 'validateAccessToClassroomPage'
-    // and 'fetchClassroomDataAsync'.
-    this.accessValidationBackendApiService.validateAccessToClassroomPage(
-      this.DEFAULT_CLASSROOM_URL_FRAGMENT).then(()=>{
-      this.classroomBackendApiService.fetchClassroomDataAsync(
-        this.DEFAULT_CLASSROOM_URL_FRAGMENT)
-        .then((classroomData) => {
-          this.classroomData = classroomData.getTopicSummaries();
-          this.classroomBackendApiService.onInitializeTranslation.emit();
-          // Store hacky tranlation keys of topics.
-          for (let i = 0; i < this.classroomData.length; i++) {
-            let topicSummary = this.classroomData[i];
-            let hackyTopicTranslationKey = (
-              this.i18nLanguageCodeService.getTopicTranslationKey(
-                topicSummary.getId(), TranslationKeyType.TITLE
-              )
-            );
-            this.topicTitlesTranslationKeys.push(
-              hackyTopicTranslationKey
-            );
-          }
-        }, () => {
-          // Note to developers:
-          // This callback is triggered when the default classroom does not
-          // exist. But for generating hacky translations, no further
-          // action is needed.
-        });
-    }, () => {
-      // Note to developers:
-      // This callback is triggered when the default classroom does not
-      // exist. But for generating hacky translations, no further
-      // action is needed.
-    });
-
     this.userService.getUserInfoAsync().then((userInfo) => {
       this.userIsLoggedIn = userInfo.isLoggedIn();
     });

@@ -137,7 +137,7 @@ describe('Classroom Page Component', () => {
   });
 
   it('should initialize', fakeAsync(() => {
-    let classroomUrlFragment = 'test_fragment';
+    let classroomUrlFragment = 'math';
     let bannerImageUrl = 'banner_image_url';
     spyOn(urlService, 'getClassroomUrlFragmentFromUrl')
       .and.returnValue(classroomUrlFragment);

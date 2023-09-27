@@ -217,41 +217,6 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
     this.FEEDBACK_UPDATES_IN_PROFILE_PIC_DROP_DOWN_IS_ENABLED =
     this.isShowFeedbackUpdatesInProfilepicDropdownFeatureFlagEnable();
 
-    // TODO(#18362): Resolve the console error on the signup page and then
-    // add the error catch block to the 'validateAccessToClassroomPage'
-    // and 'fetchClassroomDataAsync'.
-    this.accessValidationBackendApiService.validateAccessToClassroomPage(
-      this.DEFAULT_CLASSROOM_URL_FRAGMENT).then(()=>{
-      this.classroomBackendApiService.fetchClassroomDataAsync(
-        this.DEFAULT_CLASSROOM_URL_FRAGMENT)
-        .then((classroomData) => {
-          this.classroomData = classroomData.getTopicSummaries();
-          this.classroomBackendApiService.onInitializeTranslation.emit();
-          // Store hacky tranlation keys of topics.
-          for (let i = 0; i < this.classroomData.length; i++) {
-            let topicSummary = this.classroomData[i];
-            let hackyTopicTranslationKey = (
-              this.i18nLanguageCodeService.getTopicTranslationKey(
-                topicSummary.getId(), TranslationKeyType.TITLE
-              )
-            );
-            this.topicTitlesTranslationKeys.push(
-              hackyTopicTranslationKey
-            );
-          }
-        }, () => {
-          // Note to developers:
-          // This callback is triggered when the default classroom does not
-          // exist. But for generating hacky translations, no further
-          // action is needed.
-        });
-    }, () => {
-      // Note to developers:
-      // This callback is triggered when the default classroom does not
-      // exist. But for generating hacky translations, no further
-      // action is needed.
-    });
-
     // Inside a setTimeout function call, 'this' points to the global object.
     // To access the context in which the setTimeout call is made, we need to
     // first save a reference to that context in a variable, and then use that
