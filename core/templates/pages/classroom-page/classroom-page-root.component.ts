@@ -35,7 +35,7 @@ export class ClassroomPageRootComponent {
     private urlService: UrlService,
   ) {}
 
-  errorPageIsShown: boolean = true;
+  errorPageIsShown: boolean = false;
   pageIsShown: boolean = false;
   classroomUrlFragment!: string;
 
@@ -50,6 +50,8 @@ export class ClassroomPageRootComponent {
       this.pageHeadService.updateTitleAndMetaTags(
         AppConstants.PAGES_REGISTERED_WITH_FRONTEND.CLASSROOM.TITLE,
         AppConstants.PAGES_REGISTERED_WITH_FRONTEND.CLASSROOM.META);
+    }, () => {
+      this.errorPageIsShown = true;
     });
   }
 }
