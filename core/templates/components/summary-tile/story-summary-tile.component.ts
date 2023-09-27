@@ -28,8 +28,10 @@ import { AppConstants } from 'app.constants';
 import { StorySummary } from 'domain/story/story-summary.model';
 import { I18nLanguageCodeService, TranslationKeyType } from 'services/i18n-language-code.service';
 import { StoryNode } from 'domain/story/story-node.model';
+import { PlatformFeatureService } from 'services/platform-feature.service';
 
 import './story-summary-tile.component.css';
+import constants from 'assets/constants';
 
 
 @Component({
@@ -57,6 +59,7 @@ export class StorySummaryTileComponent implements OnInit {
   completedStrokeDashArrayValues!: string;
   thumbnailBgColor!: string;
   nodeTitles!: string[];
+  nodes!: StoryNode[];
   nodeTitlesTranslationKeys: string[] = [];
   storyLink!: string;
   thumbnailUrl: string | null = null;
@@ -64,6 +67,8 @@ export class StorySummaryTileComponent implements OnInit {
   circumference = (20 * 2 * Math.PI);
   gapLength = 5;
   EXPLORE_PAGE_PREFIX = '/explore/';
+  availableNodeCount = 0;
+  comingSoonNodeCount = 0;
 
   constructor(
     private i18nLanguageCodeService: I18nLanguageCodeService,
@@ -71,10 +76,17 @@ export class StorySummaryTileComponent implements OnInit {
     private urlService: UrlService,
     private windowDimensionsService: WindowDimensionsService,
     private assetsBackendApiService: AssetsBackendApiService,
+    private platformFeatureService: PlatformFeatureService,
   ) {}
 
   checkTabletView(): boolean {
     return this.windowDimensionsService.getWidth() < 768;
+  }
+
+  isSerialChapterFeatureFlagEnabled(): boolean {
+    return (
+      this.platformFeatureService.
+        status.SerialChapterLaunchCurriculumAdminView.isEnabled);
   }
 
   getStoryLink(): string {
@@ -131,7 +143,7 @@ export class StorySummaryTileComponent implements OnInit {
     let segmentLength = (
       (
         this.circumference -
-        (this.nodeCount * this.gapLength)) / this.nodeCount);
+        (this.availableNodeCount * this.gapLength)) / this.availableNodeCount);
     return segmentLength.toString() + ' ' + this.gapLength.toString();
   }
 
@@ -167,7 +179,7 @@ export class StorySummaryTileComponent implements OnInit {
     let segmentLength = (
       (
         this.circumference -
-        (this.nodeCount * this.gapLength)) / this.nodeCount);
+        (this.availableNodeCount * this.gapLength)) / this.availableNodeCount);
     for (let i = 1; i <= this.completedStoriesCount - 1; i++) {
       completedStrokeValues += (
         segmentLength.toString() + ' ' + this.gapLength.toString() + ' ');
@@ -189,8 +201,18 @@ export class StorySummaryTileComponent implements OnInit {
         this.completedStoriesCount++;
       }
     }
+    this.availableNodeCount = 0;
+    this.comingSoonNodeCount = 0;
+    for (let idx in this.storySummary.getAllNodes()) {
+      let nodeStatus = this.storySummary.getAllNodes()[idx].getStatus();
+      if (nodeStatus === constants.STORY_NODE_STATUS_PUBLISHED) {
+        this.availableNodeCount++;
+      } else if (nodeStatus === constants.STORY_NODE_STATUS_READY_TO_PUBLISH) {
+        this.comingSoonNodeCount++;
+      }
+    }
     this.storyProgress = Math.floor(
-      (this.completedStoriesCount / this.nodeCount) * 100);
+      (this.completedStoriesCount / this.availableNodeCount) * 100);
 
     this.chaptersDisplayed = this.allChaptersAreShown ? this.nodeCount : 3;
     if (this.windowDimensionsService.getWidth() <= 768 &&
@@ -227,6 +249,7 @@ export class StorySummaryTileComponent implements OnInit {
       this.getCompletedStrokeDashArrayValues();
     this.thumbnailBgColor = this.storySummary.getThumbnailBgColor();
     this.nodeTitles = this.storySummary.getNodeTitles();
+    this.nodes = this.storySummary.getAllNodes();
     for (let idx in this.storySummary.getAllNodes()) {
       let storyNode: StoryNode = this.storySummary.getAllNodes()[idx];
       let storyNodeTranslationKey = this.i18nLanguageCodeService.
