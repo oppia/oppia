@@ -562,7 +562,7 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
       if (indexToRemove !== -1) {
         this.resolvedSuggestionIds.splice(indexToRemove, 1);
         this.allContributions[
-          this.queuedSuggestion.suggestion_id] = this.removedSuggestion;
+          this.queuedSuggestion.suggestion_id] = this.removedSuggestion!;
       }
     }
     this.clearQueuedSuggestion();
