@@ -23,6 +23,9 @@ var waitFor = require('../webdriverio_utils/waitFor.js');
 var workflow = require('../webdriverio_utils/workflow.js');
 
 var Constants = require('../webdriverio_utils/WebdriverioConstants.js');
+var ReleaseCoordinatorPage = require(
+  '../webdriverio_utils/ReleaseCoordinatorPage.js');
+var AdminPage = require('../webdriverio_utils/AdminPage.js');
 var TopicsAndSkillsDashboardPage =
   require('../webdriverio_utils/TopicsAndSkillsDashboardPage.js');
 var TopicEditorPage = require('../webdriverio_utils/TopicEditorPage.js');
@@ -381,4 +384,120 @@ describe('Chapter editor functionality', function() {
       allowedErrors.pop();
     }
   });
+});
+
+describe('Serial Chapter Launch functionality', function() {
+  var topicsAndSkillsDashboardPage = null;
+  var topicEditorPage = null;
+  var storyEditorPage = null;
+  var releaseCoordinatorPage = null;
+  var adminPage = null;
+  var storyName = 'Story 0';
+  var explorationEditorPage = null;
+  var dummyExplorationIds = [];
+  var dummyExplorationInfo = [
+    'Dummy exploration', 'Algorithms', 'Learn more about oppia', 'English'];
+  var topicName = 'Topic 0';
+  var topicUrlFragment = 'topic-zero';
+  var userEmail = 'creator@serialChapterTest.com';
+
+  var createDummyExplorations = async function(numExplorations) {
+    var ids = [];
+    for (var i = 0; i < numExplorations; i++) {
+      var info = dummyExplorationInfo.slice();
+      info[0] += i.toString();
+      if (i === 0) {
+        info.push(true);
+        await workflow.createAndPublishExploration.apply(workflow, info);
+      } else {
+        info.push(false);
+        await workflow.createAndPublishExploration.apply(workflow, info);
+      }
+      var url = await browser.getUrl();
+      var id = url.split('/')[4].replace('#', '');
+      ids.push(id);
+    }
+    return ids;
+  };
+
+  beforeAll(async function() {
+    topicsAndSkillsDashboardPage =
+      new TopicsAndSkillsDashboardPage.TopicsAndSkillsDashboardPage();
+    topicEditorPage = new TopicEditorPage.TopicEditorPage();
+    storyEditorPage = new StoryEditorPage.StoryEditorPage();
+    skillEditorPage = new SkillEditorPage.SkillEditorPage();
+    explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
+    explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
+    releaseCoordinatorPage = (
+      new ReleaseCoordinatorPage.ReleaseCoordinatorPage());
+    adminPage = new AdminPage.AdminPage();
+    explorationEditorMainTab = explorationEditorPage.getMainTab();
+    await users.createAndLoginCurriculumAdminUser(
+      userEmail, 'creatorSerialChapterTest');
+
+    await adminPage.get();
+    await adminPage.addRole('creatorSerialChapterTest', 'release coordinator');
+    await releaseCoordinatorPage.getFeaturesTab();
+    var curriculumAdminSerialChapterFlag = (
+      await releaseCoordinatorPage.
+        getSerialChapterCurriculumAdminFeatureElement());
+    await releaseCoordinatorPage.enableFeature(
+      curriculumAdminSerialChapterFlag);
+
+    dummyExplorationIds = await createDummyExplorations(2);
+    var handle = await browser.getWindowHandle();
+    await topicsAndSkillsDashboardPage.get();
+    await topicsAndSkillsDashboardPage.createTopic(
+      topicName, topicUrlFragment, 'Description', false);
+    await topicEditorPage.createStory(
+      storyName, 'topicandstoryeditortwo', 'Story description',
+      Constants.TEST_SVG_PATH);
+    await general.closeCurrentTabAndSwitchTo(handle);
+    await users.logout();
+  });
+
+  it('should change the status and publish chapters serially.',
+    async function() {
+      await users.login(userEmail);
+      await topicsAndSkillsDashboardPage.get();
+      await topicsAndSkillsDashboardPage.editTopic(topicName);
+      await topicEditorPage.navigateToStoryWithTitle(storyName);
+      await storyEditorPage.createNewChapter(
+        'Chapter 1', dummyExplorationIds[0], Constants.TEST_SVG_PATH);
+      await storyEditorPage.saveStory('First save');
+      await storyEditorPage.navigateToChapterWithName('Chapter 1');
+      await storyEditorPage.changeNodeDescription('Chapter description 1');
+      await storyEditorPage.setNodePlannedPublicationDate('25-10-2030');
+      await storyEditorPage.changeNodeOutline(
+        await forms.toRichText('First outline'));
+      await storyEditorPage.saveStory('Change chapter details');
+      await storyEditorPage.setNodeStatusToReadyToPublish();
+      await storyEditorPage.navigateToStoryEditorTab();
+      await storyEditorPage.expectChapterStatusToBe(0, 'Ready To Publish');
+
+      await storyEditorPage.createNewChapter(
+        'Chapter 2', dummyExplorationIds[1], Constants.TEST_SVG_PATH);
+      await storyEditorPage.saveStory('Second save');
+      await storyEditorPage.navigateToChapterWithName('Chapter 2');
+      await storyEditorPage.changeNodeDescription('Chapter description 2');
+      await storyEditorPage.changeNodeOutline(
+        await forms.toRichText('Second outline'));
+      await storyEditorPage.setNodePlannedPublicationDate('24-10-2030');
+      await storyEditorPage.saveStory('Change chapter details');
+      await storyEditorPage.setNodeStatusToReadyToPublish();
+      await storyEditorPage.navigateToStoryEditorTab();
+      await storyEditorPage.expectChapterStatusToBe(1, 'Ready To Publish');
+      await storyEditorPage.navigateToChapterWithName('Chapter 2');
+      await storyEditorPage.setNodeStatusToDraft();
+      await storyEditorPage.navigateToStoryEditorTab();
+      await storyEditorPage.expectChapterStatusToBe(1, 'Draft');
+      await storyEditorPage.navigateToChapterWithName('Chapter 2');
+      await storyEditorPage.setNodeStatusToReadyToPublish();
+      await storyEditorPage.navigateToStoryEditorTab();
+      await storyEditorPage.expectChapterStatusToBe(1, 'Ready To Publish');
+
+      await storyEditorPage.publishNodes(1);
+      await storyEditorPage.expectChapterStatusToBe(0, 'Published');
+      await storyEditorPage.expectChapterStatusToBe(1, 'Published');
+    });
 });

@@ -37,7 +37,6 @@ var ReleaseCoordinatorPage = function() {
   var serverModeSelectorLocator = '.e2e-test-server-mode-selector';
   var removeFilterConditionLocator = '.e2e-test-remove-condition';
   var valueSelectorLocator = '.e2e-test-value-selector';
-  var statusMessage = $('.e2e-test-status-message');
 
   this.get = async function() {
     await browser.url(RELEASE_COORDINATOR_URL_SUFFIX);
@@ -116,6 +115,22 @@ var ReleaseCoordinatorPage = function() {
       var elem = featureFlagElements[i];
       if ((await elem.$(featureNameLocator).getText()) ===
           'checkpoint_celebration') {
+        return elem;
+      }
+    }
+
+    return null;
+  };
+
+  // Remove this method after the serial_chapter_launch_curriculum_admin_view
+  // feature flag is deprecated.
+  this.getSerialChapterCurriculumAdminFeatureElement = async function() {
+    var featureFlagElements = await featureFlagElementsSelector();
+    var count = featureFlagElements.length;
+    for (let i = 0; i < count; i++) {
+      var elem = featureFlagElements[i];
+      if ((await elem.$(featureNameLocator).getText()) ===
+          'serial_chapter_launch_curriculum_admin_view') {
         return elem;
       }
     }
