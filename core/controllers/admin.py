@@ -96,7 +96,6 @@ class AdminPage(
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
-    @acl_decorators.can_access_admin_page
     def get(self) -> None:
         """Renders the admin page."""
 

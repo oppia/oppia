@@ -28,7 +28,7 @@ const routes: Route[] = [
   {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ADIMN_PAGE.ROUTE,
     loadChildren: () => import('pages/admin-page/admin-page.module')
-      .then(m => m.AdminPageModule)
+      .then(m => m.AdminPageModule),
   },
   {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ABOUT.ROUTE,
