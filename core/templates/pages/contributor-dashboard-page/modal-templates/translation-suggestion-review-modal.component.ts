@@ -32,13 +32,12 @@ import { ThreadMessage } from 'domain/feedback_message/ThreadMessage.model';
 import { AppConstants } from 'app.constants';
 import { ListSchema, UnicodeSchema } from 'services/schema-default-value.service';
 import { UserContributionRightsDataBackendDict } from 'services/user-backend-api.service';
-import { UndoSnackbarComponent } from '../custom-snackbar/undo-snackbar.component';
-import { MatSnackBar, MatSnackBarRef } from '@angular/material/snack-bar';
-
 // This throws "TS2307". We need to
 // suppress this error because rte-output-display is not strictly typed yet.
 // @ts-ignore
 import { RteOutputDisplayComponent } from 'rich_text_components/rte-output-display.component';
+import { UndoSnackbarComponent } from '../custom-snackbar/undo-snackbar.component';
+import { MatSnackBar, MatSnackBarRef } from '@angular/material/snack-bar';
 
 interface HTMLSchema {
   'type': string;
@@ -85,12 +84,13 @@ export interface ActiveContributionDict {
 }
 
 interface PendingSuggestionDict {
-  target_id: string;
-  suggestion_id: string;
-  action_status: string;
-  reviewer_message: string;
-  commit_message?: string;
+  'target_id': string;
+  'suggestion_id': string;
+  'action_status': string;
+  'reviewer_message': string;
+  'commit_message'?: string;
 }
+
 enum ExpansionTabType {
   CONTENT,
   TRANSLATION
@@ -156,7 +156,6 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
   removedSuggestion: ActiveContributionDict | null = null;
   hasQueuedSuggestion: boolean = false;
   currentSnackbarRef: MatSnackBarRef<UndoSnackbarComponent>;
-
   @Input() altTextIsDisplayed: boolean = false;
 
   @ViewChild('contentPanel')
@@ -217,10 +216,14 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
         .registerContributorDashboardViewSuggestionForReview('Translation');
       this.heading = 'Review Translation Contributions';
     }
+    const suggestionIds = Object.keys(this.suggestionIdToContribution);
+    const clickedSuggestionIndex = suggestionIds.indexOf(
+      this.activeSuggestionId);
+    this.skippedContributionIds = (
+      suggestionIds.slice(0, clickedSuggestionIndex));
     delete this.suggestionIdToContribution[this.initialSuggestionId];
-    this.remainingContributionIds = Object.keys(this.suggestionIdToContribution)
-      .filter(contributionId => !this.skippedContributionIds.includes(
-        contributionId));
+    this.remainingContributionIds = suggestionIds.slice(
+      clickedSuggestionIndex + 1, suggestionIds.length);
     this.remainingContributionIds.reverse();
     this.isLastItem = this.remainingContributionIds.length === 0;
     this.allContributions = this.suggestionIdToContribution;
@@ -436,7 +439,8 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
   }
 
   resolveSuggestionAndUpdateModal(): void {
-    this.resolvedSuggestionIds.push(this.queuedSuggestion.suggestion_id);
+    this.resolvedSuggestionIds.push(
+      this.queuedSuggestion.suggestion_id);
 
     // Resolved contributions don't need to be displayed in the modal.
     this.removedSuggestion = this.allContributions[
@@ -486,12 +490,24 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
         action_status: AppConstants.ACTION_REJECT_SUGGESTION,
         reviewer_message: reviewMessage || this.reviewMessage
       };
-      console.log("Before committing", this.queuedSuggestion);
       this.hasQueuedSuggestion = true;
       this.resolveSuggestionAndUpdateModal();
       this.startCommitTimeout();
       this.showSnackbar();
     }
+  }
+
+  revertSuggestionResolution(): void {
+    // Remove the suggestion ID from resolvedSuggestionIds.
+    const index = this.resolvedSuggestionIds.indexOf(
+      this.queuedSuggestion.suggestion_id);
+    if (index > -1) {
+      this.resolvedSuggestionIds.splice(index, 1);
+    }
+
+    // Add the removed suggestion back to allContributions.
+    this.allContributions[
+      this.queuedSuggestion.suggestion_id] = this.removedSuggestion;
   }
 
   startCommitTimeout(): void {
@@ -504,51 +520,36 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
   }
 
   commitQueuedSuggestion(): void {
-    if (!this.hasQueuedSuggestion) {
+    if (!this.hasQueuedSuggestion || !this.queuedSuggestion) {
       return;
     }
-    if (this.queuedSuggestion) {
-      if (this.queuedSuggestion.action_status === 'accept') {
-        this._commitAcceptedSuggestion();
-      } else {
-        this._commitRejectedSuggestion();
-      }
-      this.queuedSuggestion = null; // Clear the queued suggestion;
-      this.hasQueuedSuggestion = false;
-    }
-  }
-
-  _commitAcceptedSuggestion(): void {
     this.contributionAndReviewService.reviewExplorationSuggestion(
-      this.queuedSuggestion.target_id, this.queuedSuggestion.suggestion_id,
-      AppConstants.ACTION_ACCEPT_SUGGESTION,
+      this.queuedSuggestion.target_id,
+      this.queuedSuggestion.suggestion_id,
+      this.queuedSuggestion.action_status,
       this.queuedSuggestion.reviewer_message,
-      this.queuedSuggestion.commit_message,
+      (
+        this.queuedSuggestion.action_status === 'accept' ?
+      this.queuedSuggestion.commit_message : null),
+      // Only include commit_message for accepted suggestions.
       () => {
         this.alertsService.clearMessages();
-        this.alertsService.addSuccessMessage('Suggestion accepted.');
-      }, (errorMessage) => {
+        this.alertsService.addSuccessMessage(
+          `Suggestion ${this.queuedSuggestion.action_status === 'accept' ?
+          'accepted' : 'rejected'}.`);
+        this.clearQueuedSuggestion();
+      },
+      (errorMessage) => {
         this.alertsService.clearWarnings();
         this.alertsService.addWarning(`Invalid Suggestion: ${errorMessage}`);
-      });
+        this.revertSuggestionResolution();
+      }
+    );
   }
 
-  _commitRejectedSuggestion(): void {
-    console.log("Called jhere");
-    // In case of rejection, the suggestion is not applied, so there is no
-    // commit message. Because there is no commit to make.
-    console.log(this.queuedSuggestion);
-    this.contributionAndReviewService.reviewExplorationSuggestion(
-      this.queuedSuggestion.target_id, this.queuedSuggestion.suggestion_id,
-      AppConstants.ACTION_REJECT_SUGGESTION,
-      this.queuedSuggestion.reviewer_message, null,
-      () => {
-        this.alertsService.clearMessages();
-        this.alertsService.addSuccessMessage('Suggestion rejected.');
-      }, (errorMessage) => {
-        this.alertsService.clearWarnings();
-        this.alertsService.addWarning(`Invalid Suggestion: ${errorMessage}`);
-      });
+  clearQueuedSuggestion(): void {
+    this.queuedSuggestion = null;
+    this.hasQueuedSuggestion = false;
   }
 
   undoReviewAction(): void {
@@ -562,15 +563,15 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
           this.queuedSuggestion.suggestion_id] = this.removedSuggestion;
       }
     }
-    this.queuedSuggestion = null; // Clear the queued suggestion.
-    this.hasQueuedSuggestion = false;
+    this.clearQueuedSuggestion();
   }
 
   showSnackbar(): void {
-    this.currentSnackbarRef = this.snackBar.openFromComponent<UndoSnackbarComponent>(
-      UndoSnackbarComponent, {
-      duration: COMMIT_TIMEOUT_DURATION
-    });
+    this.currentSnackbarRef = this.snackBar
+      .openFromComponent<UndoSnackbarComponent>(
+        UndoSnackbarComponent, {
+          duration: COMMIT_TIMEOUT_DURATION
+        });
     this.currentSnackbarRef.instance.message = 'Suggestion queued';
 
     this.currentSnackbarRef.onAction().subscribe(() => {
@@ -628,11 +629,8 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
   }
 
   cancel(): void {
+    this.commitQueuedSuggestion();
     this.activeModal.close(this.resolvedSuggestionIds);
-    if (this.currentSnackbarRef) {
-      this.currentSnackbarRef.dismiss();
-      this.commitQueuedSuggestion();
-    }
   }
 
   showTranslationSuggestionUpdateError(error: Error): void {

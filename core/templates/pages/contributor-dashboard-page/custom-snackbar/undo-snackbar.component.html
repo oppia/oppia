@@ -1,5 +1,32 @@
-<div>
-  {{ message }}
-  <button mat-button (click)="onUndo()">Undo</button>
-  <button mat-button (click)="onDismiss()">Dismiss</button>
+<div class = "snackbar-container">
+  <div>
+    {{ message }}
+    <button mat-button class="undo-button" (click)="onUndo()">Undo</button>
+    <button mat-button class="dismiss-button" (click)="onDismiss()">Dismiss</button>
+  </div>
 </div>
+<style>
+  .snackbar-container {
+  background-color: rgba(0, 0, 0, 0.87); /* Background color for the Snackbar container */
+  color: #ffffff; /* Text color for the Snackbar message */
+}
+
+.snackbar-actions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 16px; /* Adjust the gap between buttons as needed */
+}
+
+/* Style for the Undo button */
+.button.undo-button {
+  background-color: #00796b; /* Dark cyan blue background color */
+  color: #ffffff; /* Text color for the button */
+}
+
+/* Style for the Dismiss button (optional) */
+.button.dismiss-button {
+  background-color: #bdbdbd; /* Background color for the Dismiss button */
+  color: #000000; /* Text color for the Dismiss button */
+}
+</style>
