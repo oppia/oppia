@@ -93,6 +93,7 @@ describe('Contributor dashboard admin page ', function() {
       isTranslationAdmin: () => true,
       isQuestionAdmin: () => true,
       isQuestionCoordinator: () => true,
+      isTranslationCoordinator: () => true,
       canCreateCollections: () => true,
       getPreferredSiteLanguageCode: () =>'en',
       getUsername: () => 'username1',
