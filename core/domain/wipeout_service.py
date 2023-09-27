@@ -73,7 +73,7 @@ if MYPY:  # pragma: no cover
     models.Names.EXPLORATION, models.Names.FEEDBACK, models.Names.IMPROVEMENTS,
     models.Names.QUESTION, models.Names.SKILL, models.Names.STORY,
     models.Names.SUBTOPIC, models.Names.SUGGESTION, models.Names.TOPIC,
-    models.Names.USER
+    models.Names.USER,
 ])
 
 datastore_services = models.Registry.import_datastore_services()

@@ -20,7 +20,7 @@ from __future__ import annotations
 
 from core.platform import models
 
-from typing import Dict, Literal, Optional, Sequence, Tuple
+from typing import Dict, Optional, Sequence, Tuple
 
 MYPY = False
 if MYPY: # pragma: no cover

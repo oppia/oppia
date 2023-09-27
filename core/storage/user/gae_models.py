@@ -3231,8 +3231,6 @@ class PinnedOpportunityModel(base_models.BaseModel):
         required=True, indexed=True)
     topic_id = datastore_services.StringProperty(required=True, indexed=True)
     opportunity_id = datastore_services.StringProperty(indexed=True)
-    # We use the model id as a key in the Takeout dict.
-    ID_IS_USED_AS_TAKEOUT_KEY: Literal[True] = True
 
     @classmethod
     def _generate_id(
@@ -3375,7 +3373,7 @@ class PinnedOpportunityModel(base_models.BaseModel):
             cls.query(cls.user_id == user_id).fetch())
 
         for index, model in enumerate(user_models):
-            key = f"opportunity_{index}"  # This creates keys like "opportunity_0", "opportunity_1", etc.
+            key = f"opportunity_{index}"
             user_data[key] = {
                 'language_code': model.language_code,
                 'topic_id': model.topic_id,
