@@ -1,7 +1,7 @@
 <div class="oppia-same-row-container topic-filter w-100 e2e-test-topic-filter-component">
   <mat-form-field appearance="fill"
                   class="w-100">
-    <mat-label>{{ 'I18N_BLOG_HOME_PAGE_TAG_FILTER_HOLDER_TEXT' | translate }}</mat-label>
+    <mat-label><b>Topics</b></mat-label>
     <mat-chip-list #chipList aria-label="Topics Filter">
       <mat-chip *ngFor="let topic of selectedTopics"
                 (removed)="deselectTopic(topic)">
@@ -10,7 +10,7 @@
           <mat-icon class="pl-2">cancel</mat-icon>
         </button>
       </mat-chip>
-      <input placeholder="New topic ..."
+      <input placeholder="Start typing..."
              #topicFilterInput
              #trigger="matAutocompleteTrigger"
              [formControl]="topicFilter"
@@ -26,3 +26,7 @@
     </mat-autocomplete>
   </mat-form-field>
 </div>
+
+<style>
+  
+</style>

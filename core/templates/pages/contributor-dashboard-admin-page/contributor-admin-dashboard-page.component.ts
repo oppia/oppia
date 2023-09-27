@@ -25,6 +25,7 @@ import { animate, state, style, transition, trigger } from '@angular/animations'
 import { ContributorDashboardAdminStatsBackendApiService } from './services/contributor-dashboard-admin-stats-backend-api.service';
 import { AppConstants } from 'app.constants';
 import { ContributorAdminDashboardFilter } from './contributor-admin-dashboard-filter.model';
+import { UserService } from 'services/user.service';
 
 
 interface LangaugeChoice {
@@ -64,10 +65,10 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
   TAB_NAME_QUESTION_REVIEWER: string = 'Question Reviewer';
   translationReviewersCount: number = 0;
   questionReviewersCount: number = 0;
-  CONTRIBUTION_TYPES: string[] = [this.TAB_NAME_TRANSLATION_SUBMITTER,
-    this.TAB_NAME_TRANSLATION_REVIEWER,
-    this.TAB_NAME_QUESTION_SUBMITTER,
-    this.TAB_NAME_QUESTION_REVIEWER];
+  CONTRIBUTION_TYPES: string[] = [];
+  selectedContributionType!: string;
+  isQuestionCoordinator!: boolean;
+  isTranslationCoordinator!: boolean;
 
   selectedLanguage: string;
   selectedLanguageId: string = 'pt';
@@ -92,7 +93,8 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
     private windowRef: WindowRef,
     private changeDetectorRef: ChangeDetectorRef,
     private contributorDashboardAdminStatsBackendApiService:
-      ContributorDashboardAdminStatsBackendApiService
+      ContributorDashboardAdminStatsBackendApiService,
+    private userService: UserService,
   ) {}
 
   ngOnInit(): void {
@@ -130,6 +132,40 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
       'pt',
       null,
       this.selectedLastActivity);
+
+    this.userService.getUserInfoAsync().then(userInfo => {
+      const username = userInfo.getUsername();
+      if (username === null) {
+        return;
+      }
+      this.isQuestionCoordinator = userInfo.isQuestionCoordinator();
+      this.isTranslationCoordinator = userInfo.isTranslationCoordinator();
+
+      if (this.isTranslationCoordinator) {
+        this.CONTRIBUTION_TYPES = [this.TAB_NAME_TRANSLATION_SUBMITTER,
+          this.TAB_NAME_TRANSLATION_REVIEWER];
+      }
+      if (this.isQuestionCoordinator) {
+        this.CONTRIBUTION_TYPES = [this.TAB_NAME_QUESTION_SUBMITTER,
+          this.TAB_NAME_QUESTION_REVIEWER];
+      }
+      if (this.isQuestionCoordinator && this.isTranslationCoordinator) {
+        this.CONTRIBUTION_TYPES = [this.TAB_NAME_TRANSLATION_SUBMITTER,
+          this.TAB_NAME_TRANSLATION_REVIEWER,
+          this.TAB_NAME_QUESTION_SUBMITTER,
+          this.TAB_NAME_QUESTION_REVIEWER];
+      }
+
+      this.updateSelectedContributionType(this.CONTRIBUTION_TYPES[0]);
+      this.changeDetectorRef.detectChanges();
+    });
+
+    this.contributorDashboardAdminStatsBackendApiService
+      .fetchCommunityStats().then(
+        (response) => {
+          this.translationReviewersCount = response.translation_reviewers_count;
+          this.questionReviewersCount = response.question_reviewers_count;
+        });
   }
 
   toggleLanguageDropdown(): void {
@@ -141,8 +177,14 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
   }
 
   applyTopicFilter(): void {
+    const selectedTopicsIds: string[] = this.selectedTopics.map((
+        selectedTopic) => {
+      const matchingTopic = this.topics.find(
+        (topicChoice) => topicChoice.topic === selectedTopic);
+      return matchingTopic ? matchingTopic.id : '';
+    });
     this.filter = new ContributorAdminDashboardFilter(
-      this.selectedTopics,
+      selectedTopicsIds,
       this.selectedLanguageId,
       null,
       this.selectedLastActivity);
@@ -178,6 +220,12 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
 
   checkMobileView(): boolean {
     return (this.windowRef.nativeWindow.innerWidth < 800);
+  }
+
+
+  updateSelectedContributionType(selectedContributionType: string): void {
+    this.selectedContributionType = selectedContributionType;
+    this.setActiveTab(selectedContributionType);
   }
 
   /**
