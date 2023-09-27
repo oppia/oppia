@@ -3346,7 +3346,7 @@ class PinnedOpportunityModel(base_models.BaseModel):
         """Model contains data to export corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'language_code':
-                base_models.EXPORT_POLICY.EXPORTED,
+                base_models.EXPORT_POLICY.EXPORTED_AS_KEY_FOR_TAKEOUT_DICT,
             # User ID is not exported in order to keep internal ids private.
             'user_id':
                 base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -3372,12 +3372,12 @@ class PinnedOpportunityModel(base_models.BaseModel):
         user_models: Sequence[PinnedOpportunityModel] = (
             cls.query(cls.user_id == user_id).fetch())
 
-        for index, model in enumerate(user_models):
-            key = f'opportunity_{index}'
+        for model in user_models:
+            key = f'{model.language_code}_{model.topic_id}_{model.opportunity_id}'
             user_data[key] = {
-                'language_code': model.language_code,
                 'topic_id': model.topic_id,
-                'opportunity_id': model.opportunity_id
+                'opportunity_id': model.opportunity_id,
+                'language_code': model.language_code
             }
         return user_data
 

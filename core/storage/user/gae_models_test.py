@@ -3619,13 +3619,13 @@ class PinnedOpportunityModelTest(test_utils.GenericTestBase):
     def test_export_data_valid_user(self) -> None:
         user_data = user_models.PinnedOpportunityModel.export_data(
             self.user_id)
-        key = 'opportunity_0'
+        key = f'{self.language_code}_{self.topic_id}_{self.opportunity_id_1}'
 
         expected_data = {
             key: {
-                'language_code': self.language_code,
                 'topic_id': self.topic_id,
-                'opportunity_id': self.opportunity_id_1
+                'opportunity_id': self.opportunity_id_1,
+                'language_code': self.language_code
             }
         }
 
@@ -3640,7 +3640,7 @@ class PinnedOpportunityModelTest(test_utils.GenericTestBase):
 
     def test_get_export_policy(self) -> None:
         expected_export_policy = {
-            'language_code': base_models.EXPORT_POLICY.EXPORTED,
+            'language_code': base_models.EXPORT_POLICY.EXPORTED_AS_KEY_FOR_TAKEOUT_DICT,
             'user_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'topic_id': base_models.EXPORT_POLICY.EXPORTED,
             'opportunity_id': base_models.EXPORT_POLICY.EXPORTED,
