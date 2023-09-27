@@ -66,14 +66,14 @@ if MYPY:  # pragma: no cover
     exp_models, feedback_models, improvements_models,
     question_models, skill_models, story_models,
     subtopic_models, suggestion_models, topic_models,
-    user_models, opportunity_models
+    user_models
 ) = models.Registry.import_models([
     models.Names.APP_FEEDBACK_REPORT, models.Names.BASE_MODEL,
     models.Names.BLOG, models.Names.COLLECTION, models.Names.CONFIG,
     models.Names.EXPLORATION, models.Names.FEEDBACK, models.Names.IMPROVEMENTS,
     models.Names.QUESTION, models.Names.SKILL, models.Names.STORY,
     models.Names.SUBTOPIC, models.Names.SUGGESTION, models.Names.TOPIC,
-    models.Names.USER, models.Names.OPPORTUNITY
+    models.Names.USER
 ])
 
 datastore_services = models.Registry.import_datastore_services()
@@ -437,7 +437,6 @@ def delete_user(
     _pseudonymize_config_models(pending_deletion_request)
     _delete_models(user_id, models.Names.FEEDBACK)
     _delete_models(user_id, models.Names.SUGGESTION)
-    _delete_models(user_id, models.Names.OPPORTUNITY)
     if feconf.ROLE_ID_MOBILE_LEARNER not in user_roles:
         remove_user_from_activities_with_associated_rights_models(
             pending_deletion_request.user_id)

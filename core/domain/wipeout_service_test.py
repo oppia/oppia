@@ -62,7 +62,6 @@ if MYPY:  # pragma: no cover
     from mypy_imports import feedback_models
     from mypy_imports import improvements_models
     from mypy_imports import learner_group_models
-    from mypy_imports import opportunity_models
     from mypy_imports import question_models
     from mypy_imports import skill_models
     from mypy_imports import story_models
@@ -76,14 +75,14 @@ if MYPY:  # pragma: no cover
     collection_models, config_models, email_models, exp_models,
     feedback_models, improvements_models, learner_group_models,
     question_models, skill_models, story_models, subtopic_models,
-    suggestion_models, topic_models, user_models, opportunity_models
+    suggestion_models, topic_models, user_models
 ) = models.Registry.import_models([
     models.Names.APP_FEEDBACK_REPORT, models.Names.AUTH, models.Names.BLOG,
     models.Names.COLLECTION, models.Names.CONFIG, models.Names.EMAIL,
     models.Names.EXPLORATION, models.Names.FEEDBACK, models.Names.IMPROVEMENTS,
     models.Names.LEARNER_GROUP, models.Names.QUESTION, models.Names.SKILL,
     models.Names.STORY, models.Names.SUBTOPIC, models.Names.SUGGESTION,
-    models.Names.TOPIC, models.Names.USER, models.Names.OPPORTUNITY
+    models.Names.TOPIC, models.Names.USER
 ])
 
 datastore_services = models.Registry.import_datastore_services()
@@ -4232,7 +4231,7 @@ class WipeoutServiceDeletePinnedOpportunitiesModelsTest(
         super().setUp()
         self.signup(self.USER_1_EMAIL, self.USER_1_USERNAME)
         self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)
-        opportunity_models.PinnedOpportunityModel.create(
+        user_models.PinnedOpportunityModel.create(
             user_id=self.user_1_id,
             topic_id=self.TOPIC_ID,
             opportunity_id=self.OPPORTUNITY_ID,
@@ -4246,7 +4245,7 @@ class WipeoutServiceDeletePinnedOpportunitiesModelsTest(
             wipeout_service.get_pending_deletion_request(self.user_1_id))
 
         self.assertIsNone(
-            opportunity_models.PinnedOpportunityModel.get_model(
+            user_models.PinnedOpportunityModel.get_model(
                 user_id=self.user_1_id,
                 language_code=self.LANGUAGE_CODE,
                 topic_id=self.TOPIC_ID

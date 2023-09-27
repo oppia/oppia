@@ -51,7 +51,6 @@ if MYPY: # pragma: no cover
     from mypy_imports import feedback_models
     from mypy_imports import improvements_models
     from mypy_imports import learner_group_models
-    from mypy_imports import opportunity_models
     from mypy_imports import question_models
     from mypy_imports import skill_models
     from mypy_imports import story_models
@@ -77,8 +76,7 @@ if MYPY: # pragma: no cover
     subtopic_models,
     suggestion_models,
     topic_models,
-    user_models,
-    opportunity_models
+    user_models
 ) = models.Registry.import_models([
     models.Names.APP_FEEDBACK_REPORT,
     models.Names.AUTH,
@@ -96,8 +94,7 @@ if MYPY: # pragma: no cover
     models.Names.SUBTOPIC,
     models.Names.SUGGESTION,
     models.Names.TOPIC,
-    models.Names.USER,
-    models.Names.OPPORTUNITY
+    models.Names.USER
 ])
 
 
@@ -831,7 +828,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             last_contribution_date=self.LAST_CONTRIBUTION_DATE
         )
 
-        opportunity_models.PinnedOpportunityModel.create(
+        user_models.PinnedOpportunityModel.create(
             user_id=self.USER_ID_1,
             topic_id=self.TOPIC_ID_1,
             language_code=self.SUGGESTION_LANGUAGE_CODE,
@@ -2095,14 +2092,11 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
                 }
         }
         expected_pinned_opportunities_data: Dict[str, Dict[str, str]] = {
-            '%s.%s.%s' % (
-                self.USER_ID_1,
-                self.SUGGESTION_LANGUAGE_CODE,
-                self.EXPLORATION_IDS[0]): {
-                    'topic_id': self.TOPIC_ID_1,
-                    'opportunity_id': self.EXPLORATION_IDS[0],
-                    'language_code': self.SUGGESTION_LANGUAGE_CODE
-                }
+            'opportunity_0': {
+                'topic_id': self.TOPIC_ID_1,
+                'opportunity_id': self.EXPLORATION_IDS[0],
+                'language_code': self.SUGGESTION_LANGUAGE_CODE
+            }
         }
         expected_translation_coordinator_stats_data = {
             'coordinated_language_ids': ['es', 'hi']
