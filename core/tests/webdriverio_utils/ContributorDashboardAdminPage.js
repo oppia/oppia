@@ -19,6 +19,7 @@
 
 var action = require('./action.js');
 var waitFor = require('./waitFor.js');
+var users = require('./users.js');
 
 var ContributorDashboardAdminPage = function() {
   var CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION = 'REVIEW_TRANSLATION';
@@ -48,6 +49,15 @@ var ContributorDashboardAdminPage = function() {
   };
   var statsTable = $('.e2e-test-stats-table');
   var expandedRow = $('.e2e-test-expanded-row');
+  var copyButton = $('.e2e-test-copy-button');
+  var doneButton = $('.e2e-test-close-rich-text-component-editor');
+  var saveButton = $('.e2e-test-save-button');
+  var textbox = $('.e2e-test-description-box');
+  var acceptButton = $('.e2e-test-translation-accept-button');
+  var questionSubmitterTab = $('.e2e-test-question-submitters-tab');
+  var questionReviewerTab = $('.e2e-test-question-reviewers-tab');
+  var translationSubmitterTab = $('.e2e-test-translation-submitters-tab');
+  var translationReviewerTab = $('.e2e-test-translation-reviewers-tab');
 
   this.get = async function() {
     await browser.url('/contributor-dashboard-admin');
@@ -119,6 +129,37 @@ var ContributorDashboardAdminPage = function() {
     }
   };
 
+  this.copyElementWithClassName = async function(
+      elementDescription, elementClassName) {
+    await action.click('Copy button', copyButton);
+    await action.click(elementDescription, elementClassName);
+    await action.setValue(
+      'Set Image description', textbox, 'An example description');
+    await action.click('Copy Done button', doneButton);
+    await action.click('Save button', saveButton);
+    await users.logout();
+  };
+
+  this.acceptTranslation = async function() {
+    await action.click('Translation accept button', acceptButton);
+  };
+
+  this.navigateToQuestionSubmitterTab = async function() {
+    await action.click('Question Submitter tab', questionSubmitterTab);
+  };
+
+  this.navigateToQuestionReviewerTab = async function() {
+    await action.click('Question Reviewer tab', questionReviewerTab);
+  };
+
+  this.navigateToTranslationSubmitterTab = async function() {
+    await action.click('Translation Submitter tab', translationSubmitterTab);
+  };
+
+  this.navigateToTranslationReviewerTab = async function() {
+    await action.click('Translation Reviewer tab', translationReviewerTab);
+  };
+
   this.assignTranslationReviewer = async function(
       username, languageDescription) {
     await _assignContributionRights(
@@ -183,14 +224,14 @@ var ContributorDashboardAdminPage = function() {
     expect(await contributionRights.getText()).toBe('Allowed');
   };
 
-  this.checkstatslistelements = async function(number) {
-    await waitFor.presenceOf(statsTable, 'stats table was not visible');
+  this.expectStatsElementCountToBe = async function(elementsCount) {
+    await waitFor.visibilityOf(statsTable, 'stats table is not visible');
     var statsListItems = await statsListItemsSelector();
-    expect(statsListItems.length).toBe(number);
+    expect(statsListItems.length).toBe(elementsCount);
   };
 
-  this.checkexpandablestats = async function() {
-    await waitFor.presenceOf(statsTable, 'stats table was not visible');
+  this.expectStatsRowsAreExpanded = async function() {
+    await waitFor.visibilityOf(statsTable, 'Stats table was not visible');
     var statsListItems = await statsListItemsSelector();
     await action.click('Stats row', statsListItems[0]);
     await waitFor.visibilityOf(expandedRow, 'Expanded row not visible');

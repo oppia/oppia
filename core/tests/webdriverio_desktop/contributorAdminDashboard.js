@@ -159,11 +159,8 @@ describe('Contributor Admin Dashboard', function() {
     await explorationEditorMainTab.setInteraction('EndExploration');
     var explorationEditorSettingsTab = explorationEditorPage.getSettingsTab();
     await explorationEditorPage.navigateToSettingsTab();
-    let width = (await browser.getWindowSize()).width;
-    if (width < 769) {
-      var basicSettings = $('.e2e-test-settings-container');
-      await action.click('Basic Settings', basicSettings);
-    }
+    var basicSettings = $('.e2e-test-settings-container');
+    await action.click('Basic Settings', basicSettings);
     await explorationEditorSettingsTab.setTitle('exp1');
     await explorationEditorSettingsTab.setCategory('Algebra');
     await explorationEditorSettingsTab.setLanguage('English');
@@ -187,14 +184,8 @@ describe('Contributor Admin Dashboard', function() {
     await storyEditorPage.saveStory('Saving Story');
     await storyEditorPage.publishStory();
 
-    // Testing the copy tool.
     let opportunityActionButtonCss = $(
       '.e2e-test-opportunity-list-item-button');
-    let copyButton = $('.e2e-test-copy-button');
-    let doneButton = $('.e2e-test-close-rich-text-component-editor');
-    let saveButton = $('.e2e-test-save-button');
-    let textbox = $('.e2e-test-description-box');
-
     await contributorDashboardPage.get();
     await waitFor.pageToFullyLoad();
     await contributorDashboardPage.navigateToTranslateTextTab();
@@ -208,49 +199,23 @@ describe('Contributor Admin Dashboard', function() {
       'Test image taking too long to appear.');
     let images = await $$('.e2e-test-image');
     expect(images.length).toEqual(1);
-
-    // Copy tool should copy image on pressing 'Done'.
-    await waitFor.visibilityOf(
-      copyButton, 'Copy button taking too long to appear');
-    await action.click('Copy button', copyButton);
-    await action.click('Image', images[0]);
-    await action.setValue(
-      'Set Image description', textbox, 'An example description');
-    await action.click('Done', doneButton);
-    await action.click('Save', saveButton);
-    await users.logout();
+    await contributorDashboardAdminPage.copyElementWithClassName(
+      'image', images[0]);
 
     // Accept suggestion as user1.
     await users.login(USER_EMAILS[1]);
     await contributorDashboardPage.get();
-    await contributorDashboardPage.selectTranslationReviewTab();
+    await contributorDashboardPage.selectTranslationReviewButton();
     await contributorDashboardPage.waitForOpportunitiesToLoad();
     await contributorDashboardPage.selectReviewLanguage('shqip (Albanian)');
 
-    if (width < 700) {
-      let opportunityItemSelector = function() {
-        return $$('.e2e-test-opportunity-list-item');
-      };
-      let opportunity = (await opportunityItemSelector())[0];
-      await action.click('Opportunity Item', opportunity);
-    } else {
-      await contributorDashboardPage.clickOpportunityActionButton(
-        'Chapter 1', 'Topic 0 for contribution - Story Title');
-    }
+    await contributorDashboardPage.clickOpportunityActionButton(
+      'Chapter 1', 'Topic 0 for contribution - Story Title');
 
-    if (width < 700) {
-      let opportunityItemSelector = function() {
-        return $$('.e2e-test-opportunity-list-item');
-      };
-      let opportunity = (await opportunityItemSelector())[0];
-      await action.click('Opportunity Item', opportunity);
-    } else {
-      await contributorDashboardPage.clickOpportunityActionButton(
-        '[Image]', 'Topic 0 for contribution / Story Title / Chapter 1');
-    }
+    await contributorDashboardPage.clickOpportunityActionButton(
+      '[Image]', 'Topic 0 for contribution / Story Title / Chapter 1');
 
-    var acceptButton = $('.e2e-test-translation-accept-button');
-    await action.click('Translation accept button', acceptButton);
+    await contributorDashboardAdminPage.acceptTranslation();
     await users.logout();
 
     await users.login(USER_EMAILS[0]);
@@ -288,16 +253,8 @@ describe('Contributor Admin Dashboard', function() {
     await contributorDashboardPage.get();
     await contributorDashboardPage.waitForOpportunitiesToLoad();
 
-    if (width < 700) {
-      let opportunityItemSelector = function() {
-        return $$('.e2e-test-opportunity-list-item');
-      };
-      let opportunity = (await opportunityItemSelector())[0];
-      await action.click('Opportunity Item', opportunity);
-    } else {
-      await contributorDashboardPage.clickOpportunityActionButton(
-        'Question 1', SKILL_DESCRIPTIONS[0]);
-    }
+    await contributorDashboardPage.clickOpportunityActionButton(
+      'Question 1', SKILL_DESCRIPTIONS[0]);
     await (
       contributorDashboardPage.waitForQuestionSuggestionReviewModalToAppear());
     await contributorDashboardPage.clickAcceptQuestionSuggestionButton();
@@ -305,11 +262,11 @@ describe('Contributor Admin Dashboard', function() {
     await contributorDashboardPage.expectEmptyOpportunityAvailabilityMessage();
     await users.logout();
 
+    await users.login(ADMIN_EMAIL);
+
     // The below lines enable the cd_admin_dashboard_new_ui flag in dev mode.
     // They should be removed after the cd_admin_dashboard_new_ui flag is
     // deprecated.
-    await users.login(ADMIN_EMAIL);
-
     await releaseCoordinatorPage.getFeaturesTab();
     var CdAdminDashboardNewUiFlag = (
       await releaseCoordinatorPage.getCdAdminDashboardNewUiFeatureElement());
@@ -323,28 +280,23 @@ describe('Contributor Admin Dashboard', function() {
     await users.login(QUESTION_COORDINATOR_EMAIL);
     await contributorDashboardAdminPage.get();
 
-    var questionSubmitterTab = $('.e2e-test-question-submitters-tab');
-    var questionReviewerTab = $('.e2e-test-question-reviewers-tab');
+    await contributorDashboardAdminPage.navigateToQuestionSubmitterTab();
+    await contributorDashboardAdminPage.expectStatsElementCountToBe(2);
+    await contributorDashboardAdminPage.expectStatsRowsAreExpanded();
 
-    await action.click('Question Submitter tab', questionSubmitterTab);
-    await contributorDashboardAdminPage.checkstatslistelements(2);
-    await contributorDashboardAdminPage.checkexpandablestats();
-    await action.click('Question Reviewer tab', questionReviewerTab);
-    await contributorDashboardAdminPage.checkstatslistelements(2);
-    await contributorDashboardAdminPage.checkexpandablestats();
+    await contributorDashboardAdminPage.navigateToQuestionReviewerTab();
+    await contributorDashboardAdminPage.expectStatsElementCountToBe(2);
+    await contributorDashboardAdminPage.expectStatsRowsAreExpanded();
 
     await users.logout();
 
     await users.login(TRANSLATION_COORDINATOR_EMAIL);
     await contributorDashboardAdminPage.get();
 
-    var translationSubmitterTab = $('.e2e-test-translation-submitters-tab');
-    await contributorDashboardAdminPage.checkstatslistelements(0);
-    var translationReviewerTab = $('.e2e-test-translation-reviewers-tab');
-    await contributorDashboardAdminPage.checkstatslistelements(0);
-
-    await action.click('Translation Submitter tab', translationSubmitterTab);
-    await action.click('Translation Reviewer tab', translationReviewerTab);
+    await contributorDashboardAdminPage.navigateToTranslationSubmitterTab();
+    await contributorDashboardAdminPage.expectStatsElementCountToBe(0);
+    await contributorDashboardAdminPage.navigateToTranslationReviewerTab();
+    await contributorDashboardAdminPage.expectStatsElementCountToBe(0);
 
     await users.logout();
   });

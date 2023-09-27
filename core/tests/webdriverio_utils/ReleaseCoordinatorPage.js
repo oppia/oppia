@@ -145,8 +145,7 @@ var ReleaseCoordinatorPage = function() {
   this.enableFeatureForTest = async function(featureElement) {
     await action.click(
       'Add feature rule button',
-      featureElement
-        .$(addFeatureRuleButtonLocator)
+      featureElement.$(addFeatureRuleButtonLocator)
     );
 
     await waitFor.visibilityOf(

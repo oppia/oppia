@@ -33,8 +33,8 @@ var ContributorDashboardPage = function() {
   var opportunityListItemsSelector = function() {
     return $$('.e2e-test-opportunity-list-item');
   };
-  var reviewTabsSelector = function() {
-    return $$('.e2e-test-review-tabs');
+  var reviewButtonsSelector = function() {
+    return $$('.e2e-test-review-buttons');
   };
   var opportunityHeadingCss = (
     '.e2e-test-opportunity-list-item-heading');
@@ -57,16 +57,20 @@ var ContributorDashboardPage = function() {
   var usernameContainer = $('.e2e-test-username');
   var reviewRightsDiv = $('.e2e-test-review-rights');
   var selectorContainer = $('.e2e-test-language-selector');
+  var selectorDropdownContainer = $('.e2e-test-language-selector-dropdown');
 
   var _openLanguageSelector = async function() {
-    await action.click('Test Language Selector Container', selectorContainer);
+    await action.click('Language Selector Container', selectorContainer);
+    await waitFor.visibilityOf(
+      selectorDropdownContainer,
+      'Language selector dropdown takes too long to appear');
   };
 
   var _selectLanguage = async function(language) {
     await _openLanguageSelector();
     var selectorOption = selectorContainer.$(
       `.e2e-test-language-selector-option=${language}`);
-    await action.click('Test Language Selector Option', selectorOption);
+    await action.click(`Language ${language} option`, selectorOption);
   };
 
   this.get = async function() {
@@ -270,14 +274,14 @@ var ContributorDashboardPage = function() {
 
   this.navigateToMyContributionTab = async function() {
     await action.click(
-      'Submit question tab button', myContributionTabButton);
+      'My Contribution tab button', myContributionTabButton);
     await this.waitForOpportunitiesToLoad();
   };
 
-  this.selectTranslationReviewTab = async function() {
-    var reviewTabs = await reviewTabsSelector();
+  this.selectTranslationReviewButton = async function() {
+    var reviewButtons = await reviewButtonsSelector();
     await action.click(
-      'Open translation review opportunity', reviewTabs[1]
+      'Translation Review Button', reviewButtons[1]
     );
   };
 

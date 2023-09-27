@@ -54,8 +54,8 @@
     <div class="dropdown">
       <mat-form-field class="choices-field">
         <mat-select placeholder="Contribution Type"
-                    [value]="selection"
-                    (valueChange)="updateSelection($event)">
+                    [value]="selectedContributionType"
+                    (valueChange)="updateSelectedContributionType($event)">
           <mat-option *ngFor="let choice of CONTRIBUTION_TYPES" [value]="choice">
             {{ choice }}
           </mat-option>

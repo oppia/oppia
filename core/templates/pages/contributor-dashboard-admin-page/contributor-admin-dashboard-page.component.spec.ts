@@ -56,6 +56,33 @@ describe('Contributor dashboard Admin page', () => {
     getEmail: () => 'tester@example.org',
     isLoggedIn: () => true
   };
+  let nullUserInfo = {
+    _roles: ['USER_ROLE'],
+    _isModerator: true,
+    _isCurriculumAdmin: false,
+    _isTopicManager: false,
+    _isSuperAdmin: false,
+    _canCreateCollections: true,
+    _preferredSiteLanguageCode: 'en',
+    _username: null,
+    _email: 'tester@example.org',
+    _isLoggedIn: true,
+    isModerator: () => true,
+    isCurriculumAdmin: () => false,
+    isSuperAdmin: () => false,
+    isTopicManager: () => false,
+    isTranslationAdmin: () => false,
+    isBlogAdmin: () => false,
+    isBlogPostEditor: () => false,
+    isQuestionAdmin: () => false,
+    isQuestionCoordinator: () => false,
+    isTranslationCoordinator: () => true,
+    canCreateCollections: () => true,
+    getPreferredSiteLanguageCode: () =>'en',
+    getUsername: () => null,
+    getEmail: () => 'tester@example.org',
+    isLoggedIn: () => true
+  };
   let questionCoordinatorInfo = {
     _roles: ['USER_ROLE'],
     _isModerator: true,
@@ -144,9 +171,9 @@ describe('Contributor dashboard Admin page', () => {
     expect(component.activeTab).toBe('Translation Submitter');
   });
 
-  it('should update selection', () => {
-    component.updateSelection('selection1');
-    expect(component.selection).toEqual('selection1');
+  it('should update selectedContributionType', () => {
+    component.updateSelectedContributionType('selection1');
+    expect(component.selectedContributionType).toEqual('selection1');
   });
 
   it('should update translation coordinator view', fakeAsync(() => {
@@ -177,4 +204,14 @@ describe('Contributor dashboard Admin page', () => {
       expect(component.isQuestionCoordinator).toBeTrue();
       expect(component.isTranslationCoordinator).toBeTrue();
     }));
+
+  it('should not update translation and question coordinator view' +
+    'if username is null', fakeAsync(() => {
+    spyOn(userService, 'getUserInfoAsync').and.returnValue(
+      Promise.resolve(nullUserInfo));
+    component.ngOnInit();
+    tick();
+    fixture.detectChanges();
+    expect(component.CONTRIBUTION_TYPES).toBeUndefined();
+  }));
 });
