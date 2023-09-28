@@ -30,7 +30,7 @@ import { ThreadDataBackendApiService } from 'pages/exploration-editor-page/feedb
 import { UserService } from 'services/user.service';
 import { UserInfo } from 'domain/user/user-info.model';
 import { of, Subject } from 'rxjs';
-import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatSnackBar, MatSnackBarModule, MatSnackBarRef } from '@angular/material/snack-bar';
 import { OverlayModule } from '@angular/cdk/overlay';
 
 // This throws "TS2307". We need to
@@ -107,9 +107,9 @@ describe('Translation Suggestion Review Modal Component', function() {
     spyOn(
       languageUtilService, 'getAudioLanguageDescription')
       .and.returnValue('audio_language_description');
-    snackBarSpy = spyOn(
-      snackBar, 'openFromComponent').and.returnValue(
-        new MockMatSnackBarRef());
+      snackBarSpy = spyOn(snackBar, 'openFromComponent').and.returnValue(
+        new MockMatSnackBarRef() as unknown as MatSnackBarRef<unknown>
+      );
 
     component.contentContainer = new ElementRef({offsetHeight: 150});
     component.translationContainer = new ElementRef({offsetHeight: 150});
