@@ -178,10 +178,7 @@ describe('Classroom Page Component', () => {
     let classroomData = ClassroomData.createFromBackendData(
       'Math', topicSummaryDicts, 'Course details', 'Topics covered');
     spyOn(accessValidationBackendApiService, 'validateAccessToClassroomPage')
-      .and.returnValues(
-        Promise.reject(),
-        Promise.resolve()
-      );
+      .and.returnValue(Promise.resolve());
     spyOn(classroomBackendApiService, 'fetchClassroomDataAsync')
       .and.returnValue(Promise.resolve(classroomData));
     spyOn(i18nLanguageCodeService, 'getClassroomTranslationKey')

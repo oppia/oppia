@@ -18,7 +18,7 @@
 
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync, tick, fakeAsync } from '@angular/core/testing';
 
 import { PageHeadService } from 'services/page-head.service';
 
@@ -79,4 +79,21 @@ describe('Classroom Root Page', () => {
       accessValidationBackendApiService.validateAccessToClassroomPage)
       .toHaveBeenCalledWith('classroom_url_fragment');
   });
+
+  it('should show error when classroom does not exist', fakeAsync(() => {
+    spyOn(pageHeadService, 'updateTitleAndMetaTags');
+    spyOn(urlService, 'getClassroomUrlFragmentFromUrl').and.returnValue(
+      'classroom_url_fragment');
+    spyOn(accessValidationBackendApiService, 'validateAccessToClassroomPage')
+      .and.returnValue(Promise.reject());
+
+    expect(component.errorPageIsShown).toBeFalse();
+    expect(component.pageIsShown).toBeFalse();
+
+    component.ngOnInit();
+    tick();
+
+    expect(component.pageIsShown).toBeFalse();
+    expect(component.errorPageIsShown).toBeTrue();
+  }));
 });

@@ -23,18 +23,14 @@ import { APP_BASE_HREF } from '@angular/common';
 import { RouterModule } from '@angular/router';
 
 import { SmartRouterModule } from 'hybrid-router-module-provider';
-import { ClassroomData } from 'domain/classroom/classroom-data.model';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { SideNavigationBarComponent } from './side-navigation-bar.component';
-import { ClassroomBackendApiService } from 'domain/classroom/classroom-backend-api.service';
 import { UserService } from 'services/user.service';
 import { UserInfo } from 'domain/user/user-info.model';
 import { SidebarStatusService } from 'services/sidebar-status.service';
-import { CreatorTopicSummary } from 'domain/topic/creator-topic-summary.model';
-import { AccessValidationBackendApiService } from 'pages/oppia-root/routing/access-validation-backend-api.service';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 
 class MockWindowRef {
@@ -49,7 +45,6 @@ class MockWindowRef {
 
 
 describe('Side Navigation Bar Component', () => {
-  let accessValidationBackendApiService: AccessValidationBackendApiService;
   let fixture: ComponentFixture<SideNavigationBarComponent>;
   let componentInstance: SideNavigationBarComponent;
   let currentUrl: string = '/test';
@@ -57,7 +52,6 @@ describe('Side Navigation Bar Component', () => {
   let mockWindowRef: MockWindowRef;
   let siteAnalyticsService: SiteAnalyticsService;
   let sidebarStatusService: SidebarStatusService;
-  let classroomBackendApiService: ClassroomBackendApiService;
   let userService: UserService;
   let i18nLanguageCodeService: I18nLanguageCodeService;
 
@@ -100,13 +94,10 @@ describe('Side Navigation Bar Component', () => {
   }));
 
   beforeEach(() => {
-    accessValidationBackendApiService = TestBed
-      .inject(AccessValidationBackendApiService);
     fixture = TestBed.createComponent(SideNavigationBarComponent);
     sidebarStatusService = TestBed.inject(SidebarStatusService);
     siteAnalyticsService = TestBed.inject(SiteAnalyticsService);
     componentInstance = fixture.componentInstance;
-    classroomBackendApiService = TestBed.inject(ClassroomBackendApiService);
     userService = TestBed.inject(UserService);
     i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
 

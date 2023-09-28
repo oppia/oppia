@@ -27,7 +27,7 @@ import { WindowRef } from 'services/contextual/window-ref.service';
 import { CreatorTopicSummary } from 'domain/topic/creator-topic-summary.model';
 import { SidebarStatusService } from 'services/sidebar-status.service';
 import { AccessValidationBackendApiService } from 'pages/oppia-root/routing/access-validation-backend-api.service';
-import { I18nLanguageCodeService, TranslationKeyType } from 'services/i18n-language-code.service';
+import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 
  @Component({
    selector: 'oppia-side-navigation-bar',

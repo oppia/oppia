@@ -33,7 +33,7 @@ import { WindowDimensionsService } from 'services/contextual/window-dimensions.s
 import { SearchService } from 'services/search.service';
 import { EventToCodes, NavigationService } from 'services/navigation.service';
 import { AppConstants } from 'app.constants';
-import { I18nLanguageCodeService, TranslationKeyType } from 'services/i18n-language-code.service';
+import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';

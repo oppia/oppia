@@ -40,8 +40,6 @@ import { ClassroomBackendApiService } from 'domain/classroom/classroom-backend-a
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { I18nService } from 'i18n/i18n.service';
 import { CookieService } from 'ngx-cookie';
-import { CreatorTopicSummary } from 'domain/topic/creator-topic-summary.model';
-import { ClassroomData } from 'domain/classroom/classroom-data.model';
 import { AccessValidationBackendApiService } from 'pages/oppia-root/routing/access-validation-backend-api.service';
 import { PlatformFeatureService } from 'services/platform-feature.service';
 import { LearnerGroupBackendApiService } from 'domain/learner_group/learner-group-backend-api.service';
@@ -95,7 +93,6 @@ class MockWindowRef {
 }
 
 describe('TopNavigationBarComponent', () => {
-  let accessValidationBackendApiService: AccessValidationBackendApiService;
   let fixture: ComponentFixture<TopNavigationBarComponent>;
   let component: TopNavigationBarComponent;
   let mockWindowRef: MockWindowRef;
@@ -110,7 +107,6 @@ describe('TopNavigationBarComponent', () => {
   let sidebarStatusService: SidebarStatusService;
   let feedbackUpdatesBackendApiService:
       FeedbackUpdatesBackendApiService;
-  let classroomBackendApiService: ClassroomBackendApiService;
   let learnerGroupBackendApiService: LearnerGroupBackendApiService;
   let i18nLanguageCodeService: I18nLanguageCodeService;
   let i18nService: I18nService;
