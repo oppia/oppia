@@ -6169,7 +6169,7 @@ class TranslationCoordinatorsModelUnitTests(test_utils.GenericTestBase):
             {
                 'coordinator_ids': 'coordinated_language_ids'
             })
-        
+
     def test_get_returns_model_when_it_exists(self) -> None:
 
         translation_coordinators_model = (
