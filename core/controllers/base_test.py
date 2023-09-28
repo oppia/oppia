@@ -875,10 +875,34 @@ class SessionEndHandlerTests(test_utils.GenericTestBase):
 
         self.assertEqual(call_counter.times_called, 1)
 
+import unittest
+import re
 
 class I18nDictsTests(test_utils.GenericTestBase):
     """Tests for I18n dicts."""
+    def test_i19n_keys(self):
+        # expression for valid i18n keys
+        valid_i18n_key_pattern = r'^I18N_[0-9A-Za-z\-_]+$'
 
+        # i18n keys to be tested 
+        i18n_keys = [
+            'I18N_hello_world',
+            'I18N_123_ABC_DEF',
+            'I18N_my-key',
+            'I18N_With Spaces',
+            'INVALID_KEY',
+            'i18n_lowercase',
+        ]
+
+        # check each i18n key and verify that it matches the pattern
+        for key in i18n_keys:
+            with self.subTest(key=key):
+                self.assertTrue(re.match(valid_i18n_key_pattern, key), f"Invalid i18n key: {key}")
+
+if __name__ == '__main__':
+    unittest.main()
+
+    
     def _extract_keys_from_json_file(self, filename: str) -> List[str]:
         """Returns the extracted keys from the json file corresponding to the
         given filename.
