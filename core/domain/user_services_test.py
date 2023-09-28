@@ -48,8 +48,8 @@ MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import audit_models
     from mypy_imports import auth_models
-    from mypy_imports import user_models
     from mypy_imports import suggestion_models
+    from mypy_imports import user_models
 
 datastore_services = models.Registry.import_datastore_services()
 (auth_models, user_models, audit_models, suggestion_models) = (
