@@ -142,7 +142,8 @@ describe('Contributor Admin Dashboard', function() {
         elem = await elem.editItem(0, 'Dictionary');
         elem = await elem.editEntry(4, 'List');
         elem = await elem.addItem('Unicode');
-        await action.setValue('Topic Id', elem, TOPIC_ID, false);
+        await action.setValue(
+          'Topic Id', elem, TOPIC_ID, clickInputElement = false);
       });
 
     // Creating an exploration with an image.
