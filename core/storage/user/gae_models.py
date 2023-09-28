@@ -3373,11 +3373,14 @@ class PinnedOpportunityModel(base_models.BaseModel):
             cls.query(cls.user_id == user_id).fetch())
 
         for model in user_models:
-            key = f'{model.language_code}_{model.topic_id}_{model.opportunity_id}'
+            key = '%s_%s_%s' % (
+                model.language_code,
+                model.topic_id,
+                model.opportunity_id
+            )
             user_data[key] = {
                 'topic_id': model.topic_id,
                 'opportunity_id': model.opportunity_id,
-                'language_code': model.language_code
             }
         return user_data
 

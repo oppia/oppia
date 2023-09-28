@@ -3625,7 +3625,6 @@ class PinnedOpportunityModelTest(test_utils.GenericTestBase):
             key: {
                 'topic_id': self.topic_id,
                 'opportunity_id': self.opportunity_id_1,
-                'language_code': self.language_code
             }
         }
 
@@ -3640,7 +3639,8 @@ class PinnedOpportunityModelTest(test_utils.GenericTestBase):
 
     def test_get_export_policy(self) -> None:
         expected_export_policy = {
-            'language_code': base_models.EXPORT_POLICY.EXPORTED_AS_KEY_FOR_TAKEOUT_DICT,
+            'language_code': base_models.
+                EXPORT_POLICY.EXPORTED_AS_KEY_FOR_TAKEOUT_DICT,
             'user_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'topic_id': base_models.EXPORT_POLICY.EXPORTED,
             'opportunity_id': base_models.EXPORT_POLICY.EXPORTED,

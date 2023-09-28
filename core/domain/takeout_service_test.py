@@ -2098,7 +2098,6 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
                 self.EXPLORATION_IDS[0]): {
                     'topic_id': self.TOPIC_ID_1,
                     'opportunity_id': self.EXPLORATION_IDS[0],
-                    'language_code': self.SUGGESTION_LANGUAGE_CODE
                 }
         }
         expected_translation_coordinator_stats_data = {
