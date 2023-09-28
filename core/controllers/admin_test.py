@@ -2093,6 +2093,17 @@ class TranslationCoordinatorRoleHandlerTest(test_utils.GenericTestBase):
                 'coordinated_language_ids': ['en']
             })
 
+        # Check role correctly gets updated.
+        csrf_token = self.get_new_csrf_token()
+        response_dict = self.put_json(
+            '/translationcoordinatorrolehandler', {
+                'action': 'deassign',
+                'username': username,
+                'language_id': 'en'
+            }, csrf_token=csrf_token)
+
+        self.assertEqual(response_dict, {})
+
         self.delete_json(
             feconf.ADMIN_ROLE_HANDLER_URL,
             params={
