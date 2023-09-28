@@ -22,7 +22,7 @@ import { downgradeComponent } from '@angular/upgrade/static';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import './contributor-admin-dashboard-page.component.css';
 import { animate, state, style, transition, trigger } from '@angular/animations';
-import { ContributorDashboardAdminStatsBackendApiService } from './services/contributor-dashboard-admin-stats-backend-api.service';
+import { ContributorDashboardAdminStatsBackendApiService, translationReviewersCount } from './services/contributor-dashboard-admin-stats-backend-api.service';
 import { AppConstants } from 'app.constants';
 import { ContributorAdminDashboardFilter } from './contributor-admin-dashboard-filter.model';
 import { UserService } from 'services/user.service';
@@ -63,31 +63,26 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
   TAB_NAME_TRANSLATION_REVIEWER: string = 'Translation Reviewer';
   TAB_NAME_QUESTION_SUBMITTER: string = 'Question Submitter';
   TAB_NAME_QUESTION_REVIEWER: string = 'Question Reviewer';
+  translationReviewersCountByLanguage!: translationReviewersCount;
   translationReviewersCount: number = 0;
   questionReviewersCount: number = 0;
   CONTRIBUTION_TYPES: string[] = [];
+  assignedLanguageIds: string[] = [];
   selectedContributionType!: string;
   isQuestionCoordinator!: boolean;
   isTranslationCoordinator!: boolean;
 
   selectedLanguage: string;
-  selectedLanguageId: string = 'pt';
+  selectedLanguageId: string;
   selectedLastActivity: number;
   selectedTopics: string[] = [];
   allTopicNames: string[] = [];
 
   languages: LangaugeChoice[] = [];
   lastActivty: number[] = [];
-  filter: ContributorAdminDashboardFilter = (
-    ContributorAdminDashboardFilter.createDefault());
+  filter!: ContributorAdminDashboardFilter;
 
-  topics: TopicChoice[] = [{
-    id: 'asd',
-    topic: 'asd'
-  }, {
-    id: 'asd',
-    topic: 'asd'
-  }];
+  topics: TopicChoice[] = [];
 
   constructor(
     private windowRef: WindowRef,
@@ -102,7 +97,8 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
     this.contributorDashboardAdminStatsBackendApiService
       .fetchCommunityStats().then(
         (response) => {
-          this.translationReviewersCount = response.translation_reviewers_count;
+          this.translationReviewersCountByLanguage = (
+            response.translation_reviewers_count);
           this.questionReviewersCount = response.question_reviewers_count;
         });
 
@@ -115,6 +111,48 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
       }
     );
 
+    this.userService.getUserInfoAsync().then(userInfo => {
+      const username = userInfo.getUsername();
+      if (username === null) {
+        return;
+      }
+      this.isQuestionCoordinator = userInfo.isQuestionCoordinator();
+      this.isTranslationCoordinator = userInfo.isTranslationCoordinator();
+
+      if (this.isTranslationCoordinator) {
+        this.CONTRIBUTION_TYPES.push(
+          this.TAB_NAME_TRANSLATION_SUBMITTER,
+          this.TAB_NAME_TRANSLATION_REVIEWER);
+      }
+      if (this.isQuestionCoordinator) {
+        this.CONTRIBUTION_TYPES.push(
+          this.TAB_NAME_QUESTION_SUBMITTER,
+          this.TAB_NAME_QUESTION_REVIEWER);
+      }
+
+      this.updateSelectedContributionType(this.CONTRIBUTION_TYPES[0]);
+
+
+      this.contributorDashboardAdminStatsBackendApiService
+        .fetchAssignedLanguageIds(username).then(
+          (response) => {
+            this.assignedLanguageIds = response;
+            this.languages = this.languages.filter((
+                languageItem) =>
+              this.assignedLanguageIds.includes(languageItem.id));
+            this.selectedLanguage = this.languages[0].language;
+            this.selectedLanguageId = this.languages[0].id;
+          });
+
+      this.filter = new ContributorAdminDashboardFilter(
+        [],
+        this.selectedLanguageId,
+        null,
+        this.selectedLastActivity);
+
+      this.changeDetectorRef.detectChanges();
+    });
+
     this.lastActivty = [7, 30, 90];
 
     this.contributorDashboardAdminStatsBackendApiService
@@ -126,46 +164,6 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
             this.allTopicNames.push(topic.topic));
         }
       );
-
-    this.filter = new ContributorAdminDashboardFilter(
-      [],
-      'pt',
-      null,
-      this.selectedLastActivity);
-
-    this.userService.getUserInfoAsync().then(userInfo => {
-      const username = userInfo.getUsername();
-      if (username === null) {
-        return;
-      }
-      this.isQuestionCoordinator = userInfo.isQuestionCoordinator();
-      this.isTranslationCoordinator = userInfo.isTranslationCoordinator();
-
-      if (this.isTranslationCoordinator) {
-        this.CONTRIBUTION_TYPES = [this.TAB_NAME_TRANSLATION_SUBMITTER,
-          this.TAB_NAME_TRANSLATION_REVIEWER];
-      }
-      if (this.isQuestionCoordinator) {
-        this.CONTRIBUTION_TYPES = [this.TAB_NAME_QUESTION_SUBMITTER,
-          this.TAB_NAME_QUESTION_REVIEWER];
-      }
-      if (this.isQuestionCoordinator && this.isTranslationCoordinator) {
-        this.CONTRIBUTION_TYPES = [this.TAB_NAME_TRANSLATION_SUBMITTER,
-          this.TAB_NAME_TRANSLATION_REVIEWER,
-          this.TAB_NAME_QUESTION_SUBMITTER,
-          this.TAB_NAME_QUESTION_REVIEWER];
-      }
-
-      this.updateSelectedContributionType(this.CONTRIBUTION_TYPES[0]);
-      this.changeDetectorRef.detectChanges();
-    });
-
-    this.contributorDashboardAdminStatsBackendApiService
-      .fetchCommunityStats().then(
-        (response) => {
-          this.translationReviewersCount = response.translation_reviewers_count;
-          this.questionReviewersCount = response.question_reviewers_count;
-        });
   }
 
   toggleLanguageDropdown(): void {
@@ -195,6 +193,8 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
       (option) => option.language === language);
     this.selectedLanguage = currentOption?.language;
     this.selectedLanguageId = currentOption?.id;
+    this.translationReviewersCount = this.translationReviewersCountByLanguage[
+      this.selectedLanguageId];
     this.filter = new ContributorAdminDashboardFilter(
       [],
       this.selectedLanguageId,

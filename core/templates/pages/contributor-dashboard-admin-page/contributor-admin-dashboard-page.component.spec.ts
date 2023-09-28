@@ -21,7 +21,7 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ContributorAdminDashboardPageComponent } from './contributor-admin-dashboard-page.component';
 import { UserService } from 'services/user.service';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { CommunityContributionStatsDict, ContributorDashboardAdminStatsBackendApiService } from './services/contributor-dashboard-admin-stats-backend-api.service';
+import { CommunityContributionStatsBackendDict, CommunityContributionStatsDict, ContributorDashboardAdminStatsBackendApiService } from './services/contributor-dashboard-admin-stats-backend-api.service';
 
 describe('Contributor dashboard Admin page', () => {
   let component: ContributorAdminDashboardPageComponent;
@@ -159,9 +159,12 @@ describe('Contributor dashboard Admin page', () => {
     spyOn(
       contributorDashboardAdminStatsBackendApiService, 'fetchCommunityStats')
       .and.returnValue(Promise.resolve({
-        translation_reviewers_count: 1,
+        translation_reviewers_count: {
+          en: 1,
+          ar: 1
+        },
         question_reviewers_count: 1
-      } as CommunityContributionStatsDict));
+      } as CommunityContributionStatsBackendDict));
 
     component.ngOnInit();
   }));

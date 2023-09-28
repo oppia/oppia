@@ -86,6 +86,7 @@ export class ContributorAdminStatsTable implements OnInit {
   TAB_NAME_LANGUAGE_COORDINATOR: string = 'Language Coordinator';
   TAB_NAME_QUESTION_COORDINATOR: string = 'Question Coordinator';
   loadingMessage!: string;
+  noDataMessage!: string;
 
   constructor(
     private windowRef: WindowRef,
@@ -108,6 +109,7 @@ export class ContributorAdminStatsTable implements OnInit {
     }
     if (changes) {
       this.loadingMessage = 'Loading';
+      this.noDataMessage = '';
       this.updateColumnsToDisplay();
     }
   }
@@ -145,6 +147,10 @@ export class ContributorAdminStatsTable implements OnInit {
             this.nextOffset = response.nextOffset;
             this.more = response.more;
             this.loadingMessage = '';
+            this.noDataMessage = '';
+            if (this.dataSource.length === 0) {
+              this.noDataMessage = 'No stats to display';
+            }
           });
     } else if (this.activeTab === this.TAB_NAME_TRANSLATION_REVIEWER) {
       this.columnsToDisplay = [
@@ -174,6 +180,10 @@ export class ContributorAdminStatsTable implements OnInit {
             this.nextOffset = response.nextOffset;
             this.more = response.more;
             this.loadingMessage = '';
+            this.noDataMessage = '';
+            if (this.dataSource.length === 0) {
+              this.noDataMessage = 'No stats to display';
+            }
           });
     } else if (this.activeTab === this.TAB_NAME_QUESTION_SUBMITTER) {
       this.columnsToDisplay = [
@@ -207,6 +217,10 @@ export class ContributorAdminStatsTable implements OnInit {
             this.nextOffset = response.nextOffset;
             this.more = response.more;
             this.loadingMessage = '';
+            this.noDataMessage = '';
+            if (this.dataSource.length === 0) {
+              this.noDataMessage = 'No stats to display';
+            }
           });
     } else if (this.activeTab === this.TAB_NAME_QUESTION_REVIEWER) {
       this.columnsToDisplay = [
@@ -236,6 +250,10 @@ export class ContributorAdminStatsTable implements OnInit {
             this.nextOffset = response.nextOffset;
             this.more = response.more;
             this.loadingMessage = '';
+            this.noDataMessage = '';
+            if (this.dataSource.length === 0) {
+              this.noDataMessage = 'No stats to display';
+            }
           });
     }
   }

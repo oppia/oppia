@@ -257,7 +257,8 @@ mat-chip-list .mat-standard-chip .mat-chip-remove {
   background-color: #fff;
   border-radius: 4px;
   box-shadow: 0 0 4px rgba(0, 0, 0, 0.25);
-  height: 200px;
+  height: fit-content;
+  max-height: 200px;
   left: 0;
   overflow-y: scroll;
   padding: 8px 12px;

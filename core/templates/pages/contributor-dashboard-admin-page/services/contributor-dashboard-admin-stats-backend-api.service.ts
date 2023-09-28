@@ -29,6 +29,7 @@ import { ContributorDashboardAdminPageConstants as PageConstants } from '../cont
 import { TopicChoice } from '../contributor-admin-dashboard-page.component';
 import { ClassroomDomainConstants } from 'domain/classroom/classroom-domain.constants';
 import { ClassroomDataBackendDict } from 'domain/classroom/classroom-backend-api.service';
+import { UserRolesBackendResponse } from 'domain/admin/admin-backend-api.service';
 
 export interface TranslationSubmitterBackendDict {
     'language_code': string;
@@ -85,11 +86,11 @@ export interface QuestionReviewerBackendDict {
 }
 
 export interface CommunityContributionStatsBackendDict {
-  'translation_reviewers_count': translation_reviewers_count;
+  'translation_reviewers_count': translationReviewersCount;
   'question_reviewers_count': number;
 }
 
-export interface translation_reviewers_count {
+export interface translationReviewersCount {
   [key: string]: number;
 }
 
@@ -157,17 +158,37 @@ export class ContributorDashboardAdminStatsBackendApiService {
   ) {}
 
   async fetchCommunityStats():
-    Promise<CommunityContributionStatsDict> {
+    Promise<CommunityContributionStatsBackendDict> {
     return new Promise((resolve, reject) => {
       this.http.get<CommunityContributionStatsBackendDict>(
         PageConstants.COMMUNITY_CONTRIBUTION_STATS_URL
       ).toPromise().then(response => {
         resolve({
           translation_reviewers_count: (
-            response.translation_reviewers_count.en),
+            response.translation_reviewers_count),
           question_reviewers_count: response.question_reviewers_count
         });
       });
+    });
+  }
+
+  async fetchAssignedLanguageIds(username: string):
+    Promise<string[]> {
+    return new Promise((resolve, reject) => {
+      this.http.get<UserRolesBackendResponse>(
+        PageConstants.ADMIN_ROLE_HANDLER_URL, {
+          params: {
+            filter_criterion: 'username',
+            username: username
+          }
+        }
+      ).toPromise().then(
+        response =>
+          resolve(
+            response.coordinated_language_ids
+          ), errorResponse => {
+          reject(errorResponse.error.error);
+        });
     });
   }
 

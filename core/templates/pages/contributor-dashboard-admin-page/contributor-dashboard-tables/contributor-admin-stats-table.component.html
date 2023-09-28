@@ -1,8 +1,13 @@
 <div class="example-container">
-  <div *ngIf="loadingMessage" class="e2e-test-loading-message">
+  <div *ngIf="loadingMessage && !noDataMessage" class="e2e-test-loading-message">
     <div class="oppia-align-center">
       <span>{{ loadingMessage }}</span>
       <loading-dots></loading-dots>
+    </div>
+  </div>
+  <div *ngIf="!loadingMessage && noDataMessage" class="e2e-test-no-data-message">
+    <div class="oppia-align-center">
+      <span>{{ noDataMessage }}</span>
     </div>
   </div>
   <table mat-table
@@ -10,7 +15,7 @@
          multiTemplateDataRows
          [class.isMobile]="true"
          class="mat-elevation-z8 e2e-test-stats-table"
-         *ngIf="!loadingMessage">
+         *ngIf="!loadingMessage && !noDataMessage">
 
     <ng-container matColumnDef="contributorName">
       <th mat-header-cell *matHeaderCellDef class="user-header"><b> User </b></th>
