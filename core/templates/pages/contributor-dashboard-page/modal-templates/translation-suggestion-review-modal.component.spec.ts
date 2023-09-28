@@ -42,6 +42,12 @@ class MockChangeDetectorRef {
   detectChanges(): void {}
 }
 
+class MockMatSnackBarRef {
+  instance = { message: '' };
+  afterDismissed = () => of({ action: '', dismissedByAction: false });
+  onAction = () => of(undefined);
+}
+
 describe('Translation Suggestion Review Modal Component', function() {
   let fixture: ComponentFixture<TranslationSuggestionReviewModalComponent>;
   let component: TranslationSuggestionReviewModalComponent;
@@ -101,11 +107,10 @@ describe('Translation Suggestion Review Modal Component', function() {
     spyOn(
       languageUtilService, 'getAudioLanguageDescription')
       .and.returnValue('audio_language_description');
-    snackBarSpy = spyOn(snackBar, 'openFromComponent').and.returnValue({
-      instance: { message: '' },
-      afterDismissed: () => of({ action: '', dismissedByAction: false }),
-      onAction: () => of(undefined)
-    });
+    snackBarSpy = spyOn(
+      snackBar, 'openFromComponent').and.returnValue(
+        new MockMatSnackBarRef());
+
     component.contentContainer = new ElementRef({offsetHeight: 150});
     component.translationContainer = new ElementRef({offsetHeight: 150});
     component.contentPanel = new RteOutputDisplayComponent(
