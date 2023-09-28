@@ -75,8 +75,7 @@
                     class="oppia-bio-border e2e-test-user-bio oppia-autofocus"
                     [(ngModel)]="userBio"
                     [attr.value]="userBio"
-                    (blur)="saveUserBio(userBio)"
-                    (change)="registerBioChanged()"
+                    (change)="saveUserBio(userBio)"
                     rows="5"
                     maxlength="2000">
           </textarea>

@@ -122,6 +122,7 @@ export class PreferencesPageComponent {
   }
 
   saveUserBio(userBio: string): void {
+    this.registerBioChanged();
     this._saveDataItem('user_bio', userBio);
   }
 
