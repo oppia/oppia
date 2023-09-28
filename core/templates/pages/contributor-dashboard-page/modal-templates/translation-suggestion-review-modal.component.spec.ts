@@ -103,8 +103,8 @@ describe('Translation Suggestion Review Modal Component', function() {
       .and.returnValue('audio_language_description');
     snackBarSpy = spyOn(snackBar, 'openFromComponent').and.returnValue({
       instance: { message: '' },
-      afterDismissed: () => of(null),
-      onAction: () => of(null) // Add this line.
+      afterDismissed: () => of({ action: '', dismissedByAction: false }),
+      onAction: () => of(undefined)
     });
     component.contentContainer = new ElementRef({offsetHeight: 150});
     component.translationContainer = new ElementRef({offsetHeight: 150});
@@ -410,6 +410,7 @@ describe('Translation Suggestion Review Modal Component', function() {
     'review button', () => {
       spyOn(window, 'setTimeout').and.callFake((callback) => {
         callback();
+        return 1234;  // Mock ID for the timeout.
       });
       component.ngOnInit();
 
@@ -443,6 +444,7 @@ describe('Translation Suggestion Review Modal Component', function() {
     'review button', () => {
       spyOn(window, 'setTimeout').and.callFake((callback) => {
         callback();
+        return 1234;  // Mock ID for the timeout.
       });
 
       component.ngOnInit();
@@ -476,6 +478,7 @@ describe('Translation Suggestion Review Modal Component', function() {
     it('should undo the queued suggestion when clicked on undo button', () => {
       spyOn(window, 'setTimeout').and.callFake((callback) => {
         callback();
+        return 1234;  // Mock ID for the timeout.
       });
       component.ngOnInit();
       component.resolvedSuggestionIds = ['suggestion_1'];
@@ -522,6 +525,7 @@ describe('Translation Suggestion Review Modal Component', function() {
             targetId, suggestionId, action, reviewMessage, commitMessage,
             successCallback, errorCallback) => {
           errorCallback(responseMessage);
+          return Promise.reject();
         });
       spyOn(alertsService, 'addWarning');
 

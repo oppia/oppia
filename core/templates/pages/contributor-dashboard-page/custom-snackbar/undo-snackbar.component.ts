@@ -26,7 +26,7 @@ import { MatSnackBarRef } from '@angular/material/snack-bar';
 })
 
 export class UndoSnackbarComponent {
-  public message: string;
+  message!: string;
 
   constructor(private snackBarRef: MatSnackBarRef<UndoSnackbarComponent>) {}
 
