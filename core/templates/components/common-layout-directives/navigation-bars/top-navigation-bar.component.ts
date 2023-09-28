@@ -37,6 +37,7 @@ import { WindowRef } from 'services/contextual/window-ref.service';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
 import { I18nService } from 'i18n/i18n.service';
+import { CreatorTopicSummary } from 'domain/topic/creator-topic-summary.model';
 import { PlatformFeatureService } from 'services/platform-feature.service';
 import { LearnerGroupBackendApiService } from 'domain/learner_group/learner-group-backend-api.service';
 import { FeedbackUpdatesBackendApiService } from 'domain/feedback_updates/feedback-updates-backend-api.service';
@@ -68,6 +69,7 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
   currentLanguageCode!: string;
   supportedSiteLanguages!: LanguageInfo[];
   currentLanguageText!: string;
+  classroomData: CreatorTopicSummary[] = [];
   topicTitlesTranslationKeys: string[] = [];
   learnDropdownOffset: number = 0;
   isModerator: boolean = false;
