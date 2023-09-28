@@ -29,12 +29,13 @@ import urllib
 from core import feconf
 from core import utils
 from core.constants import constants
-from core.domain import auth_domain, suggestion_registry
+from core.domain import auth_domain
 from core.domain import auth_services
 from core.domain import exp_fetchers
 from core.domain import fs_services
 from core.domain import role_services
 from core.domain import state_domain
+from core.domain import suggestion_registry
 from core.domain import user_domain
 from core.platform import models
 

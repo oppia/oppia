@@ -33,7 +33,6 @@ from core.domain import html_cleaner
 from core.domain import html_validation_service
 from core.domain import opportunity_services
 from core.domain import question_domain
-from core.domain import role_services
 from core.domain import skill_services
 from core.domain import state_domain
 from core.domain import suggestion_registry
