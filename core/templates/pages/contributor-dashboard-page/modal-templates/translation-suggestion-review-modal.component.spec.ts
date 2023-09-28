@@ -413,7 +413,7 @@ describe('Translation Suggestion Review Modal Component', function() {
 
     it('should queue the suggestion when clicked on accept and ' +
     'review button', () => {
-      spyOn(window, 'setTimeout').and.callFake((callback) => {
+      spyOn(window, 'setTimeout' as any).and.callFake((callback: Function) => {
         callback();
         return 1234;  // Mock ID for the timeout.
       });
@@ -447,7 +447,7 @@ describe('Translation Suggestion Review Modal Component', function() {
 
     it('should queue the suggestion when clicked on reject and' +
     'review button', () => {
-      spyOn(window, 'setTimeout').and.callFake((callback) => {
+      spyOn(window, 'setTimeout' as any).and.callFake((callback: Function) => {
         callback();
         return 1234;  // Mock ID for the timeout.
       });
@@ -481,7 +481,7 @@ describe('Translation Suggestion Review Modal Component', function() {
     });
 
     it('should undo the queued suggestion when clicked on undo button', () => {
-      spyOn(window, 'setTimeout').and.callFake((callback) => {
+      spyOn(window, 'setTimeout' as any).and.callFake((callback: Function) => {
         callback();
         return 1234;  // Mock ID for the timeout.
       });
