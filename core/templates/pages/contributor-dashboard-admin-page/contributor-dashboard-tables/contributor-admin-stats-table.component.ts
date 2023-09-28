@@ -96,7 +96,9 @@ export class ContributorAdminStatsTable implements OnInit {
 
   ngOnInit(): void {
     this.loadingMessage = 'Loading';
-    this.updateColumnsToDisplay();
+    if (this.filter) {
+      this.updateColumnsToDisplay();
+    }
   }
 
   checkMobileView(): boolean {
@@ -104,9 +106,6 @@ export class ContributorAdminStatsTable implements OnInit {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes.activeTab) {
-      this.filter = ContributorAdminDashboardFilter.createDefault();
-    }
     if (changes) {
       this.loadingMessage = 'Loading';
       this.noDataMessage = '';

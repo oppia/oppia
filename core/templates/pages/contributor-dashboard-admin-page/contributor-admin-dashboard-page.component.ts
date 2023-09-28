@@ -43,12 +43,17 @@ export interface TopicChoice {
   styleUrls: ['./contributor-admin-dashboard-page.component.css'],
   templateUrl: './contributor-admin-dashboard-page.component.html',
   animations: [
-    trigger('detailExpand', [
-      state('collapsed', style({height: '0px', minHeight: '0'})),
-      state('expanded', style({height: '*'})),
-      transition(
-        'expanded <=> collapsed',
-        animate('225ms cubic-bezier(0.4, 0.0, 0.2, 1)')),
+    trigger('lastActivityDropdown', [
+      state('expanded', style({ transform: 'rotate(180deg)' })),
+      state('collapsed', style({ transform: 'rotate(0)' })),
+      transition('expanded => collapsed', animate('200ms ease-out')),
+      transition('collapsed => expanded', animate('200ms ease-in')),
+    ]),
+    trigger('languageDropdown', [
+      state('expanded', style({ transform: 'rotate(180deg)' })),
+      state('collapsed', style({ transform: 'rotate(0)' })),
+      transition('expanded => collapsed', animate('200ms ease-out')),
+      transition('collapsed => expanded', animate('200ms ease-in')),
     ]),
   ],
 })
@@ -130,9 +135,6 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
           this.TAB_NAME_QUESTION_REVIEWER);
       }
 
-      this.updateSelectedContributionType(this.CONTRIBUTION_TYPES[0]);
-
-
       this.contributorDashboardAdminStatsBackendApiService
         .fetchAssignedLanguageIds(username).then(
           (response) => {
@@ -142,18 +144,19 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
               this.assignedLanguageIds.includes(languageItem.id));
             this.selectedLanguage = this.languages[0].language;
             this.selectedLanguageId = this.languages[0].id;
+
+            this.filter = new ContributorAdminDashboardFilter(
+              [],
+              this.selectedLanguageId,
+              null,
+              this.selectedLastActivity);
+
+            this.updateSelectedContributionType(this.CONTRIBUTION_TYPES[0]);
           });
-
-      this.filter = new ContributorAdminDashboardFilter(
-        [],
-        this.selectedLanguageId,
-        null,
-        this.selectedLastActivity);
-
       this.changeDetectorRef.detectChanges();
     });
 
-    this.lastActivty = [7, 30, 90];
+    this.lastActivty = [0, 7, 30, 90];
 
     this.contributorDashboardAdminStatsBackendApiService
       .fetchTopicsData().then(
@@ -204,6 +207,15 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
   }
 
   selectLastActivity(lastActive: number): void {
+    if (lastActive === 0) {
+      this.selectedLastActivity = lastActive;
+      this.filter = new ContributorAdminDashboardFilter(
+        [],
+        this.selectedLanguageId,
+        null);
+      this.activityDropdownShown = false;
+      return;
+    }
     this.selectedLastActivity = lastActive;
     this.filter = new ContributorAdminDashboardFilter(
       [],
@@ -214,8 +226,12 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
   }
 
   setActiveTab(tabName: string): void {
+    this.filter = new ContributorAdminDashboardFilter(
+      [],
+      this.selectedLanguageId,
+      null,
+      this.selectedLastActivity);
     this.activeTab = tabName;
-    this.changeDetectorRef.detectChanges();
   }
 
   checkMobileView(): boolean {

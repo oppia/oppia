@@ -10,7 +10,7 @@
       <div class="translation-reviewer stats-card" [attr.aria-label]="'Translation Reviewer '" tabindex="0" *ngIf="isTranslationCoordinator">
         <p class="stat-description">Translation<br>Reviewers</p>
         <h2 class="stat-value-with-rating e2e-test-oppia-average-rating">
-          {{translationReviewersCount}}
+          {{ translationReviewersCount ? translationReviewersCount : 0 }}
         </h2>
       </div>
       <div class="question-reviewer stats-card" [attr.aria-label]="'Question Reviewer '" tabindex="0" *ngIf="isQuestionCoordinator">
@@ -49,13 +49,13 @@
       </ul>
     </div>
     <div class="filter-container">
-      <div class="language-selector-container">
+      <div class="language-selector-container" *ngIf="(activeTab === TAB_NAME_TRANSLATION_SUBMITTER) || (activeTab === TAB_NAME_TRANSLATION_REVIEWER)">
         <div #languageDropdown class="oppia-filter-selector-container e2e-test-topic-selector">
           <div class="oppia-filter-selector-inner-container e2e-test-topic-selector-selected"
                (click)="toggleLanguageDropdown()">
             <b>Language: </b>{{selectedLanguage}}
             <span class="fas fa-caret-down oppia-filter-selector-inner-container-arrow"
-                  [ngStyle]="{ 'transform': languageDropdownShown ? 'scaleY(-1)' : 'scaleY(1)' }">
+                  [@languageDropdown]="languageDropdownShown ? 'expanded' : 'collapsed'">
             </span>
           </div>
           <div *ngIf="languageDropdownShown"
@@ -77,7 +77,7 @@
                  <b>Last Active: </b>
                  {{ selectedLastActivity ? 'Within ' + selectedLastActivity + ' days' : 'All time contribution' }}
               <span class="fas fa-caret-down oppia-filter-selector-inner-container-arrow"
-                    [ngStyle]="{ 'transform': activityDropdownShown ? 'scaleY(-1)' : 'scaleY(1)' }">
+                    [@lastActivityDropdown]="activityDropdownShown ? 'expanded' : 'collapsed'">
               </span>
             </div>
             <div *ngIf="activityDropdownShown"
@@ -86,13 +86,14 @@
                    *ngFor="let option of lastActivty"
                    (click)="selectLastActivity(option)"
                    [ngClass]="{'oppia-filter-selector-dropdown-option-selected' : option === selectedLastActivity}">
-                Within {{option}} days
+                {{ option ? 'Within ' + option + ' days' : 'All time contribution' }}
               </div>
             </div>
           </div>
         </div>
         <div class="topic-selector-container">
           <oppia-topic-filter
+            *ngIf="(activeTab === TAB_NAME_TRANSLATION_SUBMITTER) || (activeTab === TAB_NAME_QUESTION_SUBMITTER)"
             [(listOfDefaultTopics)]="allTopicNames"
             [(selectedTopics)]="selectedTopics"
             (selectionsChange)="applyTopicFilter()">

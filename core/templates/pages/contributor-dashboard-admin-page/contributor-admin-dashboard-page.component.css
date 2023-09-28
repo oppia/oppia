@@ -110,7 +110,7 @@ mat-chip-list .mat-standard-chip .mat-chip-remove {
 .last-activity-selector-container {
   display: inline-block;
   vertical-align: top;
-  width: 25%;
+  width: 35%;
 }
 @media (max-width: 815px) {
   .oppia-dashboard-container {
@@ -189,7 +189,9 @@ mat-chip-list .mat-standard-chip .mat-chip-remove {
 .dashboard-tabs a.dashboard-tabs-text {
   color: #667085;
 }
-
+.oppia-same-row-container {
+  margin-top: 10px;
+}
 .dashboard-tabs-active .dashboard-tabs-text,
 .dashboard-tabs-active .dashboard-tabs-text:hover {
   border-bottom: 4px solid rgb(0, 99, 93);
@@ -237,10 +239,11 @@ mat-chip-list .mat-standard-chip .mat-chip-remove {
   box-shadow: 0 0 4px rgba(0, 0, 0, 0.25);
   cursor: pointer;
   justify-content: space-between;
-  padding: 10px 20px;
+  padding: 20px 20px;
   position: relative;
   vertical-align: top;
   margin: 10px;
+  height: 60px;
 }
 .oppia-filter-selector-inner-container {
   display: flex;
