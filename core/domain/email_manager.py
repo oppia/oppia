@@ -2267,6 +2267,10 @@ def send_email_to_new_contributor(
         contributor_rights_message = (
             contribution_category_data['rights_message'])
 
+    if not feconf.CAN_SEND_EMAILS:
+        logging.error('This app cannot send emails to users.')
+        return
+
     email_body_template = '%s %s %s %s'
     recipient_username = user_services.get_username(recipient_id)
     to_contribute = ''
@@ -2308,11 +2312,6 @@ def send_email_to_new_contributor(
         email_body = email_body_template % (
             recipient_username, contributor_rights_message,
             contribution_category_description)
-
-    if not feconf.CAN_SEND_EMAILS:
-        logging.error('This app cannot send emails to users.')
-        logging.info('Email Text: \n %s' % email_body)
-        return
 
     can_user_receive_email = user_services.get_email_preferences(
         recipient_id).can_receive_email_updates
