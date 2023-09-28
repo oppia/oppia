@@ -6181,7 +6181,7 @@ class TranslationCoordinatorsModelUnitTests(test_utils.GenericTestBase):
         # Ruling out the possibility of None for mypy type checking.
         assert translation_coordinators_model is not None
         self.assertEqual(
-            translation_coordinators_model.language_code,
+            translation_coordinators_model.id,
             self.LANGUAGE_4_ID
         )
         self.assertEqual(
