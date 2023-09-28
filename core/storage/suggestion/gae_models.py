@@ -3506,6 +3506,26 @@ class TranslationCoordinatorsModel(base_models.BaseModel):
     coordinators_count = datastore_services.IntegerProperty(
         indexed=True, required=True)
 
+    # Here we use MyPy ignore because the signature of this method
+    # doesn't match with BaseModel.get().
+    # https://mypy.readthedocs.io/en/stable/error_code_list.html#check-validity-of-overrides-override
+    @classmethod
+    def get( # type: ignore[override]
+        cls, language_code: str
+    ) -> Optional[TranslationCoordinatorsModel]:
+        """Gets the TranslationCoordinatorsModel
+        matching the supplied language_code.
+
+        Args:
+            language_code: str. ISO 639-1 language code.
+
+        Returns:
+            TranslationCoordinatorsModel|None. The matching
+            TranslationCoordinatorsModel, or None if no
+            such model instance exists.
+        """
+        return cls.get_by_id(language_code)
+
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:
         """Model contains data to pseudonymize or delete corresponding
@@ -3576,3 +3596,18 @@ class TranslationCoordinatorsModel(base_models.BaseModel):
         return {
             'coordinated_language_ids': coordinated_language_ids
         }
+
+    @classmethod
+    def get_by_user(cls, user_id: str) -> Sequence[
+        TranslationCoordinatorsModel]:
+        """Retrieves the rights object for all languages assigned to given user
+
+        Args:
+            user_id: str. ID of user.
+
+        Returns:
+            list(TranslationCoordinatorsModel). The list of
+            TranslationCoordinatorsModel objects in which the given user is a
+            coordinator.
+        """
+        return cls.query(cls.coordinator_ids == user_id).fetch()
