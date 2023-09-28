@@ -413,7 +413,7 @@ describe('Translation Suggestion Review Modal Component', function() {
 
     it('should queue the suggestion when clicked on accept and ' +
     'review button', () => {
-      spyOn(window, 'setTimeout' as any).and.callFake((callback: Function) => {
+      spyOn(window as any, 'setTimeout').and.callFake((callback: Function) => {
         callback();
         return 1234;  // Mock ID for the timeout.
       });
