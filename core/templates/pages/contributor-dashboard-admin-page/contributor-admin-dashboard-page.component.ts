@@ -47,7 +47,7 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
   TAB_NAME_QUESTION_REVIEWER: string = 'Question Reviewer';
   translationReviewersCount: number = 0;
   questionReviewersCount: number = 0;
-  CONTRIBUTION_TYPES!: string[];
+  CONTRIBUTION_TYPES: string[] = [];
   selectedContributionType!: string;
   isQuestionCoordinator!: boolean;
   isTranslationCoordinator!: boolean;
@@ -84,18 +84,14 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
       this.isTranslationCoordinator = userInfo.isTranslationCoordinator();
 
       if (this.isTranslationCoordinator) {
-        this.CONTRIBUTION_TYPES = [this.TAB_NAME_TRANSLATION_SUBMITTER,
-          this.TAB_NAME_TRANSLATION_REVIEWER];
+        this.CONTRIBUTION_TYPES.push(
+          this.TAB_NAME_TRANSLATION_SUBMITTER,
+          this.TAB_NAME_TRANSLATION_REVIEWER);
       }
       if (this.isQuestionCoordinator) {
-        this.CONTRIBUTION_TYPES = [this.TAB_NAME_QUESTION_SUBMITTER,
-          this.TAB_NAME_QUESTION_REVIEWER];
-      }
-      if (this.isQuestionCoordinator && this.isTranslationCoordinator) {
-        this.CONTRIBUTION_TYPES = [this.TAB_NAME_TRANSLATION_SUBMITTER,
-          this.TAB_NAME_TRANSLATION_REVIEWER,
+        this.CONTRIBUTION_TYPES.push(
           this.TAB_NAME_QUESTION_SUBMITTER,
-          this.TAB_NAME_QUESTION_REVIEWER];
+          this.TAB_NAME_QUESTION_REVIEWER);
       }
 
       this.updateSelectedContributionType(this.CONTRIBUTION_TYPES[0]);
