@@ -36,11 +36,9 @@ import { UserInfo } from 'domain/user/user-info.model';
 import { FeedbackUpdatesBackendApiService } from 'domain/feedback_updates/feedback-updates-backend-api.service';
 import { FeedbackThreadSummary } from
   'domain/feedback_thread/feedback-thread-summary.model';
-import { ClassroomBackendApiService } from 'domain/classroom/classroom-backend-api.service';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { I18nService } from 'i18n/i18n.service';
 import { CookieService } from 'ngx-cookie';
-import { AccessValidationBackendApiService } from 'pages/oppia-root/routing/access-validation-backend-api.service';
 import { PlatformFeatureService } from 'services/platform-feature.service';
 import { LearnerGroupBackendApiService } from 'domain/learner_group/learner-group-backend-api.service';
 import { AppConstants } from 'app.constants';
@@ -207,12 +205,9 @@ describe('TopNavigationBarComponent', () => {
     feedbackUpdatesBackendApiService =
         TestBed.inject(FeedbackUpdatesBackendApiService);
     alertsService = TestBed.inject(AlertsService);
-    classroomBackendApiService = TestBed.inject(ClassroomBackendApiService);
     learnerGroupBackendApiService = TestBed.inject(
       LearnerGroupBackendApiService);
     i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
-    accessValidationBackendApiService = TestBed
-      .inject(AccessValidationBackendApiService);
     urlInterpolationService = TestBed.inject(UrlInterpolationService);
 
     spyOn(searchService, 'onSearchBarLoaded')

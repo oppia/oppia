@@ -21,7 +21,6 @@
 import { Subscription } from 'rxjs';
 import { ContextService } from 'services/context.service';
 import { ChangeDetectorRef, Component, Input, OnDestroy, OnInit } from '@angular/core';
-import { ClassroomBackendApiService } from 'domain/classroom/classroom-backend-api.service';
 import { SidebarStatusService } from 'services/sidebar-status.service';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { DebouncerService } from 'services/debouncer.service';
@@ -38,8 +37,6 @@ import { WindowRef } from 'services/contextual/window-ref.service';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
 import { I18nService } from 'i18n/i18n.service';
-import { CreatorTopicSummary } from 'domain/topic/creator-topic-summary.model';
-import { AccessValidationBackendApiService } from 'pages/oppia-root/routing/access-validation-backend-api.service';
 import { PlatformFeatureService } from 'services/platform-feature.service';
 import { LearnerGroupBackendApiService } from 'domain/learner_group/learner-group-backend-api.service';
 import { FeedbackUpdatesBackendApiService } from 'domain/feedback_updates/feedback-updates-backend-api.service';
@@ -71,7 +68,6 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
   currentLanguageCode!: string;
   supportedSiteLanguages!: LanguageInfo[];
   currentLanguageText!: string;
-  classroomData: CreatorTopicSummary[] = [];
   topicTitlesTranslationKeys: string[] = [];
   learnDropdownOffset: number = 0;
   isModerator: boolean = false;
@@ -157,10 +153,7 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
   );
 
   constructor(
-    private accessValidationBackendApiService:
-      AccessValidationBackendApiService,
     private changeDetectorRef: ChangeDetectorRef,
-    private classroomBackendApiService: ClassroomBackendApiService,
     private contextService: ContextService,
     private i18nLanguageCodeService: I18nLanguageCodeService,
     private i18nService: I18nService,
