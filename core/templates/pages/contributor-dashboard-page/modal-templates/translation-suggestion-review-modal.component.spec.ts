@@ -524,6 +524,7 @@ describe('Translation Suggestion Review Modal Component', function() {
           return Promise.reject();
         });
       spyOn(alertsService, 'addWarning');
+      component.showSnackbar();
 
       component.commitQueuedSuggestion();
 
@@ -1048,6 +1049,7 @@ describe('Translation Suggestion Review Modal Component', function() {
       spyOn(component, 'showSnackbar');
 
       component.reviewMessage = 'Review message example';
+      component.showSnackbar();
       component.rejectAndReviewNext(component.reviewMessage);
       tick(30000);
 
