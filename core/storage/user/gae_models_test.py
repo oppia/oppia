@@ -3641,7 +3641,7 @@ class PinnedOpportunityModelTest(test_utils.GenericTestBase):
             'language_code': base_models.
                 EXPORT_POLICY.EXPORTED_AS_KEY_FOR_TAKEOUT_DICT,
             'user_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'topic_id': base_models.EXPORT_POLICY.EXPORTED,
+            'topic_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'opportunity_id': base_models.EXPORT_POLICY.EXPORTED,
             'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE,

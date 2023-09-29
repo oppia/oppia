@@ -3351,7 +3351,7 @@ class PinnedOpportunityModel(base_models.BaseModel):
             'user_id':
                 base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'topic_id':
-                base_models.EXPORT_POLICY.EXPORTED,
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'opportunity_id':
                 base_models.EXPORT_POLICY.EXPORTED
         })
