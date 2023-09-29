@@ -532,7 +532,7 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
       this.queuedSuggestion.reviewer_message,
       (
         this.queuedSuggestion.action_status === 'accept' ?
-      this.queuedSuggestion.commit_message : null),
+      this.queuedSuggestion!.commit_message : null),
       // Only include commit_message for accepted suggestions.
       () => {
         this.alertsService.clearMessages();
