@@ -540,11 +540,13 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
           `Suggestion ${this.queuedSuggestion!.action_status === 'accept' ?
           'accepted' : 'rejected'}.`);
         this.clearQueuedSuggestion();
+        this.currentSnackbarRef.dismiss();
       },
       (errorMessage) => {
         this.alertsService.clearWarnings();
         this.alertsService.addWarning(`Invalid Suggestion: ${errorMessage}`);
         this.revertSuggestionResolution();
+        this.currentSnackbarRef.dismiss();
       }
     );
   }
@@ -572,7 +574,9 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
     this.currentSnackbarRef = this.snackBar
       .openFromComponent<UndoSnackbarComponent>(
         UndoSnackbarComponent, {
-          duration: COMMIT_TIMEOUT_DURATION
+          duration: COMMIT_TIMEOUT_DURATION,
+          verticalPosition: 'bottom',
+          horizontalPosition: 'right'
         });
     this.currentSnackbarRef.instance.message = 'Suggestion queued';
 
