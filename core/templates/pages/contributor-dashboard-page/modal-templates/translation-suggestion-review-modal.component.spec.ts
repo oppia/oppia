@@ -107,9 +107,9 @@ describe('Translation Suggestion Review Modal Component', function() {
     spyOn(
       languageUtilService, 'getAudioLanguageDescription')
       .and.returnValue('audio_language_description');
-      snackBarSpy = spyOn(snackBar, 'openFromComponent').and.returnValue(
+    snackBarSpy = spyOn(snackBar, 'openFromComponent').and.returnValue(
         new MockMatSnackBarRef() as unknown as MatSnackBarRef<unknown>
-      );
+    );
 
     component.contentContainer = new ElementRef({offsetHeight: 150});
     component.translationContainer = new ElementRef({offsetHeight: 150});
@@ -413,7 +413,7 @@ describe('Translation Suggestion Review Modal Component', function() {
 
     it('should queue the suggestion when clicked on accept and ' +
     'review button', () => {
-      spyOn(window as any, 'setTimeout').and.callFake((callback: Function) => {
+      spyOn(window as unknown, 'setTimeout').and.callFake((callback: Function) => {
         callback();
         return 1234;
       });
@@ -447,7 +447,7 @@ describe('Translation Suggestion Review Modal Component', function() {
 
     it('should queue the suggestion when clicked on reject and' +
     'review button', () => {
-      spyOn(window as any, 'setTimeout').and.callFake((callback: Function) => {
+      spyOn(window as unknown, 'setTimeout').and.callFake((callback: Function) => {
         callback();
         return 1234;
       });
@@ -481,7 +481,7 @@ describe('Translation Suggestion Review Modal Component', function() {
     });
 
     it('should undo the queued suggestion when clicked on undo button', () => {
-      spyOn(window as any, 'setTimeout').and.callFake((callback: Function) => {
+      spyOn(window as unknown, 'setTimeout').and.callFake((callback: Function) => {
         callback();
         return 1234;
       });
@@ -570,7 +570,8 @@ describe('Translation Suggestion Review Modal Component', function() {
       expect(commitQueuedSuggestionSpy).toHaveBeenCalled();
     });
 
-    it('should remove suggestion_id from resolvedSuggestionIds if it exists', () => {
+    it('should remove suggestion_id from resolvedSuggestionIds' +
+    'if it exists', () => {
       component.ngOnInit();
       component.resolvedSuggestionIds = ['suggestion_1', 'suggestion_2'];
       component.queuedSuggestion = {
@@ -579,29 +580,31 @@ describe('Translation Suggestion Review Modal Component', function() {
         target_id: '1',
         reviewer_message: ''
       };
-      // component.removedSuggestion = { };
 
       component.revertSuggestionResolution();
 
       expect(component.resolvedSuggestionIds).toEqual(['suggestion_2']);
     });
 
-  it('should not modify resolvedSuggestionIds if suggestion_id does not exist', () => {
+  it('should not modify resolvedSuggestionIds if suggestion_id' +
+  'does not exist', () => {
       component.ngOnInit();
       component.resolvedSuggestionIds = ['suggestion_2'];
-      component.queuedSuggestion = {        suggestion_id: 'suggestion_1',
-      action_status: 'accept',
-      target_id: '1',
-      reviewer_message: ''};
-      // component.removedSuggestion = { someData: 'test' };
+      component.queuedSuggestion = {
+        suggestion_id: 'suggestion_1',
+        action_status: 'accept',
+        target_id: '1',
+        reviewer_message: ''
+      };
 
-      component.revertSuggestionResolution();
+    component.revertSuggestionResolution();
 
-      expect(component.resolvedSuggestionIds).toEqual(['suggestion_2']);
+    expect(component.resolvedSuggestionIds).toEqual(['suggestion_2']);
   });
 
-    it('should close the modal if the suggestion reviewed is the last item', () => {
-      component.ngOnInit()
+    it('should close the modal if the suggestion reviewed is' +
+    'the last item', () => {
+      component.ngOnInit();
       expect(component.activeSuggestionId).toBe('suggestion_1');
       expect(component.activeSuggestion).toEqual(suggestion1);
       expect(component.reviewable).toBe(reviewable);
@@ -621,10 +624,8 @@ describe('Translation Suggestion Review Modal Component', function() {
       component.isLastItem = true;
       component.acceptAndReviewNext();
       component.isLastItem = true;
-      console.log("Here it issss",component.isLastItem);
       expect(modalCloseSpy).toHaveBeenCalled();
       expect(commitQueuedSuggestionSpy).toHaveBeenCalled();
-      console.log("Here it issss 2",component.isLastItem);
     });
 
     it(
