@@ -35,7 +35,6 @@ from core.domain import exp_fetchers
 from core.domain import fs_services
 from core.domain import role_services
 from core.domain import state_domain
-from core.domain import suggestion_registry
 from core.domain import user_domain
 from core.platform import models
 
@@ -3126,7 +3125,7 @@ def deassign_coordinator(
 def get_translation_rights_from_model(
     translation_coordinator_model:
         suggestion_models.TranslationCoordinatorsModel
-) -> suggestion_registry.TranslationCoordinatorStats:
+) -> user_domain.TranslationCoordinatorStats:
     """Constructs a TranslationCoordinatorStats object from the given
     translation coordinator model.
 
@@ -3138,7 +3137,7 @@ def get_translation_rights_from_model(
         TranslationCoordinatorStats. The TranslationCoordinatorStats object
         created from the model.
     """
-    return suggestion_registry.TranslationCoordinatorStats(
+    return user_domain.TranslationCoordinatorStats(
         translation_coordinator_model.id,
         translation_coordinator_model.coordinator_ids,
         translation_coordinator_model.coordinators_count
@@ -3146,7 +3145,7 @@ def get_translation_rights_from_model(
 
 
 def get_translation_rights_with_user(user_id: str) -> List[
-    suggestion_registry.TranslationCoordinatorStats]:
+    user_domain.TranslationCoordinatorStats]:
     """Retrieves the rights object for all languages assigned to given user.
 
     Args:
