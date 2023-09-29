@@ -6508,7 +6508,7 @@ class ContributionReviewerEmailTest(test_utils.EmailTestBase):
             'This is to let you know that the Oppia team has added you as a '
             'contributor to submit question suggestions ' 
             'for use in lessons.<br><br>'
-            'You can now start to submit questions in the'
+            'You can now start to submit questions in the '
             '<a href="https://www.oppia.org/contributor-dashboard">'
             'Contributor Dashboard</a>.<br><br>'
             'Thanks, and happy contributing!<br><br>'
@@ -6525,6 +6525,7 @@ class ContributionReviewerEmailTest(test_utils.EmailTestBase):
             messages = self._get_sent_email_messages(
                 self.QUESTION_SUBMITTER_EMAIL)
             self.assertEqual(len(messages), 1)
+            print(messages[0].html)
             self.assertEqual(messages[0].html, expected_email_html_body)
 
             # Make sure correct email model is stored.
@@ -6609,6 +6610,7 @@ class ContributionReviewerEmailTest(test_utils.EmailTestBase):
             messages = self._get_sent_email_messages(
                 self.TRANSLATION_REVIEWER_EMAIL)
             self.assertEqual(len(messages), 1)
+            print(messages[0].html)
             self.assertEqual(messages[0].html, expected_email_html_body)
 
             # Make sure correct email model is stored.
@@ -6726,7 +6728,7 @@ class ContributionReviewerEmailTest(test_utils.EmailTestBase):
         expected_email_subject = (
             'You have been unassigned as a question submitter')
         expected_email_html_body = (
-            'Hi question,<br><br>'
+            'Hi questionSuggestor,<br><br>'
             'The Oppia team has removed you from the question submitter role. '
             'You won\'t be able to submit question suggestions '
             'any more, but you can still contribute questions '
@@ -6738,7 +6740,7 @@ class ContributionReviewerEmailTest(test_utils.EmailTestBase):
 
         with self.can_send_emails_ctx:
             email_manager.send_email_to_removed_contributor(
-                self.question_reviewer_id,
+                self.question_submitter_id,
                 constants.CONTRIBUTION_RIGHT_CATEGORY_SUBMIT_QUESTION,
                 language_code='hi')
 
@@ -6756,7 +6758,7 @@ class ContributionReviewerEmailTest(test_utils.EmailTestBase):
             self.assertEqual(
                 sent_email_model.subject, expected_email_subject)
             self.assertEqual(
-                sent_email_model.recipient_id, self.question_reviewer_id)
+                sent_email_model.recipient_id, self.question_submitter_id)
             self.assertEqual(
                 sent_email_model.recipient_email, self.QUESTION_SUBMITTER_EMAIL)
             self.assertEqual(

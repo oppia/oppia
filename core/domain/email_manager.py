@@ -2303,7 +2303,7 @@ def send_email_to_new_contributor(
             'Hi %s,<br><br>'
             'This is to let you know that the Oppia team has added you as a '
             'contributor to %s for use in lessons.<br><br>'
-            'You can now start to submit %s in the'
+            'You can now start to submit %s in the '
             '<a href="https://www.oppia.org/contributor-dashboard">'
             'Contributor Dashboard</a>.<br><br>'
             'Thanks, and happy contributing!<br><br>'
@@ -2351,7 +2351,11 @@ def send_email_to_removed_contributor(
 
     contribution_category_data = (
         REMOVED_CONTRIBUTOR_EMAIL_DATA[contribution_category])
-    email_subject = 'You have been unassigned as a %s reviewer' % (
+    if (contribution_category in [constants.CONTRIBUTION_RIGHT_CATEGORY_SUBMIT_QUESTION]): 
+        email_subject = 'You have been unassigned as a %s submitter' % (
+        contribution_category_data['contribution_category'])
+    else:   
+        email_subject = 'You have been unassigned as a %s reviewer' % (
         contribution_category_data['contribution_category'])
 
     if contribution_category in [
