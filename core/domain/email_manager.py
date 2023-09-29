@@ -2351,10 +2351,11 @@ def send_email_to_removed_contributor(
 
     contribution_category_data = (
         REMOVED_CONTRIBUTOR_EMAIL_DATA[contribution_category])
-    if (contribution_category in [constants.CONTRIBUTION_RIGHT_CATEGORY_SUBMIT_QUESTION]): 
+    if contribution_category in (
+        [constants.CONTRIBUTION_RIGHT_CATEGORY_SUBMIT_QUESTION]):
         email_subject = 'You have been unassigned as a %s submitter' % (
         contribution_category_data['contribution_category'])
-    else:   
+    else:
         email_subject = 'You have been unassigned as a %s reviewer' % (
         contribution_category_data['contribution_category'])
 
