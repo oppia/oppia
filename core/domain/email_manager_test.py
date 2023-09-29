@@ -6525,7 +6525,6 @@ class ContributionReviewerEmailTest(test_utils.EmailTestBase):
             messages = self._get_sent_email_messages(
                 self.QUESTION_SUBMITTER_EMAIL)
             self.assertEqual(len(messages), 1)
-            print(messages[0].html)
             self.assertEqual(messages[0].html, expected_email_html_body)
 
             # Make sure correct email model is stored.
@@ -6610,7 +6609,6 @@ class ContributionReviewerEmailTest(test_utils.EmailTestBase):
             messages = self._get_sent_email_messages(
                 self.TRANSLATION_REVIEWER_EMAIL)
             self.assertEqual(len(messages), 1)
-            print(messages[0].html)
             self.assertEqual(messages[0].html, expected_email_html_body)
 
             # Make sure correct email model is stored.
