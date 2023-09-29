@@ -143,10 +143,10 @@ class PlatformFeatureListTest(test_utils.GenericTestBase):
         invalid_feature_names = []
         for feature in platform_feature_list.TEST_FEATURES_LIST:
             feature_flag = (
-                registry.Registry.get_platform_parameter(feature.name))
+                registry.Registry.get_platform_parameter(feature.value))
             if (feature_flag.feature_stage !=
                     platform_parameter_domain.FeatureStages.TEST.value):
-                invalid_feature_names.append(feature.name)
+                invalid_feature_names.append(feature.value)
         self.assertTrue(
             len(invalid_feature_names) == 0,
             msg='Following entries defined in TEST_FEATURES_LIST are not in '

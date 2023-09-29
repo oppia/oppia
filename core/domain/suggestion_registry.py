@@ -25,13 +25,14 @@ from core import feconf
 from core import utils
 from core.constants import constants
 from core.domain import change_domain
-from core.domain import config_domain
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import fs_services
 from core.domain import html_cleaner
 from core.domain import opportunity_services
+from core.domain import platform_feature_services
+from core.domain import platform_parameter_list
 from core.domain import question_domain
 from core.domain import question_services
 from core.domain import skill_domain
@@ -1361,7 +1362,7 @@ class CommunityContributionStats:
         suggestions in a given language need more reviewers if the number of
         translation suggestions in that language divided by the number of
         translation reviewers in that language is greater than
-        config_domain.MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER.
+        ParamNames.MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER.
 
         Args:
             lang_code: str. The language code of the translation
@@ -1381,10 +1382,18 @@ class CommunityContributionStats:
             self.translation_reviewer_counts_by_lang_code[lang_code])
         number_of_suggestions = (
             self.translation_suggestion_counts_by_lang_code[lang_code])
+        max_number_of_suggestions_per_reviewer = (
+            platform_feature_services.get_platform_parameter_value(
+                platform_parameter_list.ParamNames.
+                MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER.value
+            )
+        )
+        assert isinstance(max_number_of_suggestions_per_reviewer, int)
         return bool(
             number_of_suggestions > (
-                config_domain.MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER.value * (
-                    number_of_reviewers)))
+                max_number_of_suggestions_per_reviewer * number_of_reviewers
+            )
+        )
 
     def get_translation_language_codes_that_need_reviewers(self) -> Set[str]:
         """Returns the language codes where more reviewers are needed to review
@@ -1392,7 +1401,7 @@ class CommunityContributionStats:
         given language need more reviewers if the number of translation
         suggestions in that language divided by the number of translation
         reviewers in that language is greater than
-        config_domain.MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER.
+        ParamNames.MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER.
 
         Returns:
             set. A set of of the language codes where more translation reviewers
@@ -1409,7 +1418,7 @@ class CommunityContributionStats:
         """Returns whether or not more reviewers are needed to review question
         suggestions. Question suggestions need more reviewers if the number of
         question suggestions divided by the number of question reviewers is
-        greater than config_domain.MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER.
+        greater than ParamNames.MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER.
 
         Returns:
             bool. Whether or not more reviewers are needed to review
@@ -1421,10 +1430,20 @@ class CommunityContributionStats:
         if self.question_reviewer_count == 0:
             return True
 
+        max_number_of_suggestions_per_reviewer = (
+            platform_feature_services.get_platform_parameter_value(
+                platform_parameter_list.ParamNames.
+                MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER.value
+            )
+        )
+        assert isinstance(max_number_of_suggestions_per_reviewer, int)
+
         return bool(
             self.question_suggestion_count > (
-                config_domain.MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER.value * (
-                    self.question_reviewer_count)))
+                max_number_of_suggestions_per_reviewer *
+                self.question_reviewer_count
+            )
+        )
 
 
 class TranslationContributionStatsDict(TypedDict):
