@@ -58,8 +58,11 @@ export interface TopicChoice {
   ],
 })
 export class ContributorAdminDashboardPageComponent implements OnInit {
-  @ViewChild('languageDropdown', {'static': false}) dropdown1Ref!: ElementRef;
-  @ViewChild('activityDropdown', {'static': false}) dropdown2Ref!: ElementRef;
+  @ViewChild(
+    'languageDropdown', {'static': false}) languageDropdownRef!: ElementRef;
+
+  @ViewChild(
+    'activityDropdown', {'static': false}) activityDropdownRef!: ElementRef;
 
   languageDropdownShown: boolean = false;
   activityDropdownShown: boolean = false;
@@ -85,7 +88,8 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
 
   languages: LangaugeChoice[] = [];
   lastActivty: number[] = [];
-  filter!: ContributorAdminDashboardFilter;
+  filter: ContributorAdminDashboardFilter = (
+    ContributorAdminDashboardFilter.createDefault());
 
   topics: TopicChoice[] = [];
 
@@ -251,17 +255,24 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: MouseEvent): void {
     const targetElement = event.target as HTMLElement;
-    if (
-      targetElement &&
-      !this.dropdown1Ref.nativeElement.contains(targetElement)
-    ) {
-      this.languageDropdownShown = false;
-    }
-    if (
-      targetElement &&
-      !this.dropdown2Ref.nativeElement.contains(targetElement)
-    ) {
-      this.activityDropdownShown = false;
+    if (this.checkMobileView()) {
+      if (
+        (this.activeTab === this.TAB_NAME_TRANSLATION_SUBMITTER) ||
+        (this.activeTab === this.TAB_NAME_TRANSLATION_REVIEWER)
+      ) {
+        if (
+          targetElement &&
+          !this.languageDropdownRef.nativeElement.contains(targetElement)
+        ) {
+          this.languageDropdownShown = false;
+        }
+      }
+      if (
+        targetElement &&
+        !this.activityDropdownRef.nativeElement.contains(targetElement)
+      ) {
+        this.activityDropdownShown = false;
+      }
     }
   }
 }

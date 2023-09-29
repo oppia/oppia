@@ -16,6 +16,9 @@
  * @fileoverview Model class for creating filters of frontend contributor
  * admin Dashboard.
  */
+
+import { ContributorDashboardAdminPageConstants as PageConstants } from './contributor-dashboard-admin-page.constants';
+
 export class ContributorAdminDashboardFilter {
   topicIds: string[];
   languageCode?: string;
@@ -43,6 +46,7 @@ export class ContributorAdminDashboardFilter {
  *   ContributorAdminDashboardFilter instance.
  */
   static createDefault(): ContributorAdminDashboardFilter {
-    return new ContributorAdminDashboardFilter([]);
+    return new ContributorAdminDashboardFilter(
+      [], PageConstants.DEFAULT_LANGUAGE_FILTER);
   }
 }

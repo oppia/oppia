@@ -212,8 +212,10 @@ export class ContributorDashboardAdminStatsBackendApiService {
     this.params = {
       page_size: pageSize,
       offset: nextOffset,
-      language_code: filter.languageCode,
-      topic_ids: [],
+      ...(
+        filter.languageCode ? {
+          language_code: filter.languageCode
+        } : {language_code: PageConstants.DEFAULT_LANGUAGE_FILTER}),
       ...(
         filter.lastActivity ? {
           max_days_since_last_activity: filter.lastActivity
@@ -221,7 +223,7 @@ export class ContributorDashboardAdminStatsBackendApiService {
       ...(
         (filter.topicIds.length > 0) ? {
           topic_ids: JSON.stringify(filter.topicIds)
-        } : {}),
+        } : {topic_ids: []}),
     };
     if (contributionType === AppConstants.CONTRIBUTION_STATS_TYPE_TRANSLATION) {
       if (

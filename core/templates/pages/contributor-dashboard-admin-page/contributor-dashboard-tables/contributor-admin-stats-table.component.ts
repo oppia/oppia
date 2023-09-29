@@ -54,7 +54,8 @@ import { QuestionReviewerStats, QuestionSubmitterStats, TranslationReviewerStats
 })
 export class ContributorAdminStatsTable implements OnInit {
   @Input() activeTab: string = 'Translation Submitter';
-  @Input() filter: ContributorAdminDashboardFilter;
+  @Input() filter: ContributorAdminDashboardFilter = (
+    ContributorAdminDashboardFilter.createDefault());
 
   columnsToDisplay = [
     'chevron',

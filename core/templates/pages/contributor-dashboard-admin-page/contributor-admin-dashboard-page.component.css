@@ -311,8 +311,17 @@ mat-chip-list .mat-standard-chip .mat-chip-remove {
   border-radius: 4px;
 }
 @media only screen and (max-width: 800px) {
+  .language-selector-container {
+    width: auto;
+  }
+  .last-activity-selector-container {
+    width: auto;
+  }
+  .topic-selector-container {
+    width: auto;
+  }
   .oppia-filter-selector-inner-container {
-    font-size: 20px;
+    font-size: 16px;
   }
   .oppia-contributor-dashboard-main-content
   .stats-card

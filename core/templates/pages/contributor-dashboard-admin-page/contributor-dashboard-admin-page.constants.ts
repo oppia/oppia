@@ -29,5 +29,6 @@ export const ContributorDashboardAdminPageConstants = {
     '/<contribution_subtype>'
   ),
   COMMUNITY_CONTRIBUTION_STATS_URL: '/community-contribution-stats',
-  ADMIN_ROLE_HANDLER_URL: '/adminrolehandler'
+  ADMIN_ROLE_HANDLER_URL: '/adminrolehandler',
+  DEFAULT_LANGUAGE_FILTER: 'en'
 } as const;
