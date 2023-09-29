@@ -1985,7 +1985,7 @@ class TranslationCoordinatorRoleHandlerTest(test_utils.GenericTestBase):
             })
         self.logout()
 
-    def test_adding_two_translation_coordinators_to_language(self) -> None:
+    def test_assigning_two_languages_to_translation_coordinator(self) -> None:
         user_email = 'user1@example.com'
         username = 'user1'
         self.signup(user_email, username)
