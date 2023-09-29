@@ -3284,7 +3284,7 @@ class PinnedOpportunityModel(base_models.BaseModel):
 
         instance = cls(
             id=instance_id, user_id=user_id, language_code=language_code,
-                       topic_id=topic_id, opportunity_id=opportunity_id)
+            topic_id=topic_id, opportunity_id=opportunity_id)
         instance.update_timestamps()
         instance.put()
         return instance
@@ -3373,13 +3373,11 @@ class PinnedOpportunityModel(base_models.BaseModel):
             cls.query(cls.user_id == user_id).fetch())
 
         for model in user_models:
-            key = '%s_%s_%s' % (
+            key = '%s_%s' % (
                 model.language_code,
                 model.topic_id,
-                model.opportunity_id
             )
             user_data[key] = {
-                'topic_id': model.topic_id,
                 'opportunity_id': model.opportunity_id,
             }
         return user_data

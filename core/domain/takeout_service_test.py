@@ -2092,11 +2092,9 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
                 }
         }
         expected_pinned_opportunities_data: Dict[str, Dict[str, str]] = {
-            '%s_%s_%s' % (
+            '%s_%s' % (
                 self.SUGGESTION_LANGUAGE_CODE,
-                self.TOPIC_ID_1,
-                self.EXPLORATION_IDS[0]): {
-                    'topic_id': self.TOPIC_ID_1,
+                self.TOPIC_ID_1): {
                     'opportunity_id': self.EXPLORATION_IDS[0],
                 }
         }

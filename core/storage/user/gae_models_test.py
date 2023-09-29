@@ -3619,11 +3619,10 @@ class PinnedOpportunityModelTest(test_utils.GenericTestBase):
     def test_export_data_valid_user(self) -> None:
         user_data = user_models.PinnedOpportunityModel.export_data(
             self.user_id)
-        key = f'{self.language_code}_{self.topic_id}_{self.opportunity_id_1}'
+        key = f'{self.language_code}_{self.topic_id}'
 
         expected_data = {
             key: {
-                'topic_id': self.topic_id,
                 'opportunity_id': self.opportunity_id_1,
             }
         }
