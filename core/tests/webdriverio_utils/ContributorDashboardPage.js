@@ -25,12 +25,16 @@ var ContributorDashboardTranslateTextTab = require(
 var ContributorDashboardPage = function() {
   var navigateToTranslateTextTabButton = $('.e2e-test-translateTextTab');
   var submitQuestionTabButton = $('.e2e-test-submitQuestionTab');
+  var myContributionTabButton = $('.e2e-test-myContributionTab');
   var opportunityLoadingPlaceholder = $(
     '.e2e-test-opportunity-loading-placeholder');
   var opportunityListEmptyAvailabilityMessage = $(
     '.e2e-test-opportunity-list-empty-availability-message');
   var opportunityListItemsSelector = function() {
     return $$('.e2e-test-opportunity-list-item');
+  };
+  var reviewButtonsSelector = function() {
+    return $$('.e2e-test-review-buttons');
   };
   var opportunityHeadingCss = (
     '.e2e-test-opportunity-list-item-heading');
@@ -52,6 +56,22 @@ var ContributorDashboardPage = function() {
     '.e2e-test-question-suggestion-review-modal-header');
   var usernameContainer = $('.e2e-test-username');
   var reviewRightsDiv = $('.e2e-test-review-rights');
+  var selectorContainer = $('.e2e-test-language-selector');
+  var selectorDropdownContainer = $('.e2e-test-language-selector-dropdown');
+
+  var _openLanguageSelector = async function() {
+    await action.click('Language Selector Container', selectorContainer);
+    await waitFor.visibilityOf(
+      selectorDropdownContainer,
+      'Language selector dropdown takes too long to appear');
+  };
+
+  var _selectLanguage = async function(language) {
+    await _openLanguageSelector();
+    var selectorOption = selectorContainer.$(
+      `.e2e-test-language-selector-option=${language}`);
+    await action.click(`Language ${language} option`, selectorOption);
+  };
 
   this.get = async function() {
     let width = (await browser.getWindowSize()).width;
@@ -250,6 +270,23 @@ var ContributorDashboardPage = function() {
     await action.click(
       'Submit question tab button', submitQuestionTabButton);
     await this.waitForOpportunitiesToLoad();
+  };
+
+  this.navigateToMyContributionTab = async function() {
+    await action.click(
+      'My Contribution tab button', myContributionTabButton);
+    await this.waitForOpportunitiesToLoad();
+  };
+
+  this.selectTranslationReviewButton = async function() {
+    var reviewButtons = await reviewButtonsSelector();
+    await action.click(
+      'Translation Review Button', reviewButtons[1]
+    );
+  };
+
+  this.selectReviewLanguage = async function(language) {
+    await _selectLanguage(language);
   };
 };
 
