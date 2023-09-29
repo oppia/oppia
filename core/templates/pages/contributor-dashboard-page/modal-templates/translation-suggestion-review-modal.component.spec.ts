@@ -342,6 +342,10 @@ describe('Translation Suggestion Review Modal Component', function() {
       component.suggestionIdToContribution = angular.copy(
         suggestionIdToContribution);
       component.editedContent = editedContent;
+      spyOn(window as any, 'setTimeout').and.callFake((callback: Function) => {
+        callback();
+        return 1234;
+      });
     });
 
     it('should call user service at initialization.',
@@ -413,10 +417,6 @@ describe('Translation Suggestion Review Modal Component', function() {
 
     it('should queue the suggestion when clicked on accept and ' +
     'review button', () => {
-      spyOn(window as unknown, 'setTimeout').and.callFake((callback: Function) => {
-        callback();
-        return 1234;
-      });
       component.ngOnInit();
 
       expect(component.activeSuggestionId).toBe('suggestion_1');
@@ -447,11 +447,6 @@ describe('Translation Suggestion Review Modal Component', function() {
 
     it('should queue the suggestion when clicked on reject and' +
     'review button', () => {
-      spyOn(window as unknown, 'setTimeout').and.callFake((callback: Function) => {
-        callback();
-        return 1234;
-      });
-
       component.ngOnInit();
 
       expect(component.activeSuggestionId).toBe('suggestion_1');
@@ -481,10 +476,6 @@ describe('Translation Suggestion Review Modal Component', function() {
     });
 
     it('should undo the queued suggestion when clicked on undo button', () => {
-      spyOn(window as unknown, 'setTimeout').and.callFake((callback: Function) => {
-        callback();
-        return 1234;
-      });
       component.ngOnInit();
       component.resolvedSuggestionIds = ['suggestion_1'];
 
