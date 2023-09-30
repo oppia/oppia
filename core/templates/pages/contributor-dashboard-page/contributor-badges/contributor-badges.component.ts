@@ -103,11 +103,16 @@ export class ContributorBadgesComponent {
     if (userContributionRights === null) {
       throw new Error('Cannot fetch user contribution rights.');
     }
-    userContributionRights.can_review_translation_for_language_codes.map(
-      (languageCode) => {
-        const languageDescription = this.languageUtilService
-          .getAudioLanguageDescription(
-            languageCode);
+
+    const allContributionStats = await this
+      .contributionAndReviewStatsService.fetchAllStats(username);
+
+    if (allContributionStats.translation_review_stats.length > 0) {
+      await allContributionStats.translation_review_stats.map((stat) => {
+        const languageDescription =
+          this.languageUtilService.getAudioLanguageDescription(
+            stat.language_code);
+
         this.totalTranslationStats[languageDescription] = {
           language: this.languageUtilService.getShortLanguageDescription(
             languageDescription),
@@ -117,6 +122,8 @@ export class ContributorBadgesComponent {
         };
         this.reviewableLanguages.push(languageDescription);
       });
+    }
+
     this.userCanReviewQuestionSuggestions = (
       userContributionRights.can_review_questions);
     this.userCanSuggestQuestions = (
@@ -124,9 +131,6 @@ export class ContributorBadgesComponent {
     this.userHasQuestionRights = (
       this.userCanSuggestQuestions ||
       this.userCanReviewQuestionSuggestions);
-
-    const allContributionStats = await this
-      .contributionAndReviewStatsService.fetchAllStats(username);
 
     if (allContributionStats.translation_contribution_stats.length > 0) {
       await allContributionStats.translation_contribution_stats.map((stat) => {
