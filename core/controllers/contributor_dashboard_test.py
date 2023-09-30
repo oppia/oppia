@@ -513,7 +513,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
                     params={'topic_name': 'topic'}
                 )
 
-    def test_skip_story_if_none(self) -> None:
+    def test_skip_story_if_story_is_none(self) -> None:
         # Create a new exploration and linked story.
         continue_state_name = 'continue state'
         exp_100 = self.save_new_linear_exp_with_state_names_and_interactions(
