@@ -535,14 +535,14 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
 
         self.login(self.CURRICULUM_ADMIN_EMAIL)
 
-        # Get translation opportunities with 'None' story
+        # Get translation opportunities with 'None' story.
         with swap_with_corrupt_story:
             response = self.get_json(
                 '%s' % feconf.REVIEWABLE_OPPORTUNITIES_URL,
                 params={'topic_name': 'topic'}
             )
 
-        # The 'None' story should be skipped
+        # The 'None' story should be skipped.
         self.assertEqual(len(response['opportunities']), 0)
 
     def test_get_reviewable_translation_opportunities_when_state_is_removed(
