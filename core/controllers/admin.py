@@ -57,7 +57,6 @@ from core.domain import story_domain
 from core.domain import story_services
 from core.domain import subtopic_page_domain
 from core.domain import subtopic_page_services
-from core.domain import suggestion_services
 from core.domain import topic_domain
 from core.domain import topic_fetchers
 from core.domain import topic_services
@@ -1318,7 +1317,7 @@ class AdminRoleHandler(
             if feconf.ROLE_ID_TRANSLATION_COORDINATOR in user_roles:
                 coordinated_language_ids = [
                     rights.language_id for rights in
-                    suggestion_services.get_translation_rights_with_user(
+                    user_services.get_translation_rights_with_user(
                         user_id)]
             user_roles_dict = {
                 'roles': user_roles,
@@ -1382,7 +1381,7 @@ class AdminRoleHandler(
             topic_services.deassign_user_from_all_topics(self.user, user_id)
 
         if role == feconf.ROLE_ID_TRANSLATION_COORDINATOR:
-            suggestion_services.deassign_user_from_all_languages(
+            user_services.deassign_user_from_all_languages(
                 self.user, user_id)
 
         user_services.remove_user_role(user_id, role)
@@ -2161,7 +2160,7 @@ class TranslationCoordinatorRoleHandler(
 
             language_coordinator = user_services.get_user_actions_info(user_id)
 
-            suggestion_services.assign_coordinator(
+            user_services.assign_coordinator(
                 user_services.get_system_user(),
                 language_coordinator, language_id)
         else:
@@ -2171,7 +2170,7 @@ class TranslationCoordinatorRoleHandler(
             # 'deassign' if this branch is executed.
             assert action == 'deassign'
             language_coordinator = user_services.get_user_actions_info(user_id)
-            suggestion_services.deassign_coordinator(
+            user_services.deassign_coordinator(
                 user_services.get_system_user(),
                 language_coordinator, language_id)
 
