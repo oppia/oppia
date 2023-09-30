@@ -58,6 +58,7 @@ var ContributorDashboardAdminPage = function() {
   var questionReviewerTab = $('.e2e-test-question-reviewers-tab');
   var translationSubmitterTab = $('.e2e-test-translation-submitters-tab');
   var translationReviewerTab = $('.e2e-test-translation-reviewers-tab');
+  var languageSelector = $('.e2e-test-language-selector');
 
   this.get = async function() {
     await browser.url('/contributor-dashboard-admin');
@@ -182,6 +183,13 @@ var ContributorDashboardAdminPage = function() {
 
   this.assignQuestionContributor = async function(username) {
     await _assignContributionRights(username, CATEGORY_SUBMIT_QUESTION);
+  };
+
+  this.switchLanguage = async function(language) {
+    await action.click('Language Selector', languageSelector);
+    var selectorOption = languageSelector.$(
+      `.e2e-test-language-selector-option=${language}`);
+    await action.click(`${language} option selector`, selectorOption);
   };
 
   this.expectUserToBeTranslationReviewer = async function(

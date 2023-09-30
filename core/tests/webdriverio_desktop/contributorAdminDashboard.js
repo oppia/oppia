@@ -100,7 +100,11 @@ describe('Contributor Admin Dashboard', function() {
     await adminPage.get();
     await adminPage.addRole('management', 'release coordinator');
     await adminPage.addRole('question', 'question coordinator');
-    await adminPage.makeUserTranslationCoordinator('translation');
+    await adminPage.makeUserTranslationCoordinator('translation', 'English');
+    await adminPage.makeUserTranslationCoordinator(
+      'translation', 'shqip (Albanian)');
+    await adminPage.makeUserTranslationCoordinator(
+      'translation', 'العربية (Arabic)');
     await adminPage.addRole('question', 'translation admin');
     await users.logout();
 
@@ -111,6 +115,8 @@ describe('Contributor Admin Dashboard', function() {
     await contributorDashboardAdminPage.assignQuestionReviewer('user1');
     await contributorDashboardAdminPage.assignTranslationReviewer(
       'user1', 'shqip (Albanian)');
+    await contributorDashboardAdminPage.assignTranslationReviewer(
+      'user1', 'English');
     await users.logout();
 
     // Populating Dashboard.
@@ -295,8 +301,15 @@ describe('Contributor Admin Dashboard', function() {
 
     await contributorDashboardAdminPage.navigateToTranslationSubmitterTab();
     await contributorDashboardAdminPage.expectStatsElementCountToBe(0);
+
+    await contributorDashboardAdminPage.switchLanguage('shqip (Albanian)');
+    await contributorDashboardAdminPage.expectStatsElementCountToBe(1);
+
     await contributorDashboardAdminPage.navigateToTranslationReviewerTab();
     await contributorDashboardAdminPage.expectStatsElementCountToBe(0);
+
+    await contributorDashboardAdminPage.switchLanguage('shqip (Albanian)');
+    await contributorDashboardAdminPage.expectStatsElementCountToBe(1);
 
     await users.logout();
   });

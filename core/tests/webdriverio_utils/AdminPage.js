@@ -213,7 +213,7 @@ var AdminPage = function() {
       removeButtonElement, 'Role removal button takes too long to appear.');
   };
 
-  this.makeUserTranslationCoordinator = async function(name) {
+  this.makeUserTranslationCoordinator = async function(name, language) {
     await this._editUserRole(name);
 
     await action.click('Add new role', addNewRoleButton);
@@ -230,7 +230,7 @@ var AdminPage = function() {
       languageSelectorModal,
       'Language selector modal taking too long to appear');
     await action.select(
-      'Language selector', languageSelector, 'English'
+      'Language selector', languageSelector, language
     );
     await action.click('Add language button', languageSelectorAddButton);
     await action.click('Close button', languageSelectorCloseButton);

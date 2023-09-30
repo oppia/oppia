@@ -134,7 +134,7 @@ describe('Contribution Admin dasboard stats service', () => {
       spyOn(cdasbas, 'fetchContributorAdminStats').and.callThrough();
       const url = (
         '/contributor-dashboard-admin-stats/translation/submission' +
-            '?page_size=20&offset=0&language_code=es');
+            '?page_size=20&offset=0&language_code=en');
 
       cdasbas.fetchContributorAdminStats(
         ContributorAdminDashboardFilter.createDefault(),
@@ -193,7 +193,7 @@ describe('Contribution Admin dasboard stats service', () => {
       spyOn(cdasbas, 'fetchContributorAdminStats').and.callThrough();
       const url = (
         '/contributor-dashboard-admin-stats/translation/review' +
-            '?page_size=20&offset=0&language_code=es');
+            '?page_size=20&offset=0&language_code=en');
 
       cdasbas.fetchContributorAdminStats(
         ContributorAdminDashboardFilter.createDefault(),
@@ -252,7 +252,7 @@ describe('Contribution Admin dasboard stats service', () => {
       spyOn(cdasbas, 'fetchContributorAdminStats').and.callThrough();
       const url = (
         '/contributor-dashboard-admin-stats/question/submission' +
-            '?page_size=20&offset=0&language_code=es');
+            '?page_size=20&offset=0&language_code=en');
 
       cdasbas.fetchContributorAdminStats(
         ContributorAdminDashboardFilter.createDefault(),
@@ -311,7 +311,7 @@ describe('Contribution Admin dasboard stats service', () => {
       spyOn(cdasbas, 'fetchContributorAdminStats').and.callThrough();
       const url = (
         '/contributor-dashboard-admin-stats/question/review' +
-                '?page_size=20&offset=0&language_code=es');
+                '?page_size=20&offset=0&language_code=en');
 
       cdasbas.fetchContributorAdminStats(
         ContributorAdminDashboardFilter.createDefault(),
