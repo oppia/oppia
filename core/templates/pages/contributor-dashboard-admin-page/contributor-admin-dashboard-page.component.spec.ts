@@ -16,9 +16,10 @@
  * @fileoverview Unit tests for contributor admin dashboard page component.
  */
 
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+import { ComponentFixture, TestBed, fakeAsync, tick, waitForAsync } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ContributorAdminDashboardPageComponent } from './contributor-admin-dashboard-page.component';
+import { UserService } from 'services/user.service';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { CommunityContributionStatsDict, ContributorDashboardAdminStatsBackendApiService } from './services/contributor-dashboard-admin-stats-backend-api.service';
 
@@ -27,6 +28,115 @@ describe('Contributor dashboard Admin page', () => {
   let fixture: ComponentFixture<ContributorAdminDashboardPageComponent>;
   let contributorDashboardAdminStatsBackendApiService: (
     ContributorDashboardAdminStatsBackendApiService);
+  let userService: UserService;
+  let translationCoordinatorInfo = {
+    _roles: ['USER_ROLE'],
+    _isModerator: true,
+    _isCurriculumAdmin: false,
+    _isTopicManager: false,
+    _isSuperAdmin: false,
+    _canCreateCollections: true,
+    _preferredSiteLanguageCode: 'en',
+    _username: 'username1',
+    _email: 'tester@example.org',
+    _isLoggedIn: true,
+    isModerator: () => true,
+    isCurriculumAdmin: () => false,
+    isSuperAdmin: () => false,
+    isTopicManager: () => false,
+    isTranslationAdmin: () => false,
+    isBlogAdmin: () => false,
+    isBlogPostEditor: () => false,
+    isQuestionAdmin: () => false,
+    isQuestionCoordinator: () => false,
+    isTranslationCoordinator: () => true,
+    canCreateCollections: () => true,
+    getPreferredSiteLanguageCode: () =>'en',
+    getUsername: () => 'username1',
+    getEmail: () => 'tester@example.org',
+    isLoggedIn: () => true
+  };
+  let nullUserInfo = {
+    _roles: ['USER_ROLE'],
+    _isModerator: true,
+    _isCurriculumAdmin: false,
+    _isTopicManager: false,
+    _isSuperAdmin: false,
+    _canCreateCollections: true,
+    _preferredSiteLanguageCode: 'en',
+    _username: null,
+    _email: 'tester@example.org',
+    _isLoggedIn: true,
+    isModerator: () => true,
+    isCurriculumAdmin: () => false,
+    isSuperAdmin: () => false,
+    isTopicManager: () => false,
+    isTranslationAdmin: () => false,
+    isBlogAdmin: () => false,
+    isBlogPostEditor: () => false,
+    isQuestionAdmin: () => false,
+    isQuestionCoordinator: () => false,
+    isTranslationCoordinator: () => true,
+    canCreateCollections: () => true,
+    getPreferredSiteLanguageCode: () =>'en',
+    getUsername: () => null,
+    getEmail: () => 'tester@example.org',
+    isLoggedIn: () => true
+  };
+  let questionCoordinatorInfo = {
+    _roles: ['USER_ROLE'],
+    _isModerator: true,
+    _isCurriculumAdmin: false,
+    _isTopicManager: false,
+    _isSuperAdmin: false,
+    _canCreateCollections: true,
+    _preferredSiteLanguageCode: 'en',
+    _username: 'username1',
+    _email: 'tester@example.org',
+    _isLoggedIn: true,
+    isModerator: () => true,
+    isCurriculumAdmin: () => false,
+    isSuperAdmin: () => false,
+    isTopicManager: () => false,
+    isTranslationAdmin: () => false,
+    isBlogAdmin: () => false,
+    isBlogPostEditor: () => false,
+    isQuestionAdmin: () => false,
+    isQuestionCoordinator: () => true,
+    isTranslationCoordinator: () => false,
+    canCreateCollections: () => true,
+    getPreferredSiteLanguageCode: () =>'en',
+    getUsername: () => 'username1',
+    getEmail: () => 'tester@example.org',
+    isLoggedIn: () => true
+  };
+  let fullAccessUserInfo = {
+    _roles: ['USER_ROLE'],
+    _isModerator: true,
+    _isCurriculumAdmin: false,
+    _isTopicManager: false,
+    _isSuperAdmin: false,
+    _canCreateCollections: true,
+    _preferredSiteLanguageCode: 'en',
+    _username: 'username1',
+    _email: 'tester@example.org',
+    _isLoggedIn: true,
+    isModerator: () => true,
+    isCurriculumAdmin: () => false,
+    isSuperAdmin: () => false,
+    isTopicManager: () => false,
+    isTranslationAdmin: () => false,
+    isBlogAdmin: () => false,
+    isBlogPostEditor: () => false,
+    isQuestionAdmin: () => false,
+    isQuestionCoordinator: () => true,
+    isTranslationCoordinator: () => true,
+    canCreateCollections: () => true,
+    getPreferredSiteLanguageCode: () =>'en',
+    getUsername: () => 'username1',
+    getEmail: () => 'tester@example.org',
+    isLoggedIn: () => true
+  };
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -44,6 +154,7 @@ describe('Contributor dashboard Admin page', () => {
     component = fixture.componentInstance;
     contributorDashboardAdminStatsBackendApiService = TestBed.inject(
       ContributorDashboardAdminStatsBackendApiService);
+    userService = TestBed.inject(UserService);
 
     spyOn(
       contributorDashboardAdminStatsBackendApiService, 'fetchCommunityStats')
@@ -59,4 +170,48 @@ describe('Contributor dashboard Admin page', () => {
     component.setActiveTab('Translation Submitter');
     expect(component.activeTab).toBe('Translation Submitter');
   });
+
+  it('should update selectedContributionType', () => {
+    component.updateSelectedContributionType('selection1');
+    expect(component.selectedContributionType).toEqual('selection1');
+  });
+
+  it('should update translation coordinator view', fakeAsync(() => {
+    spyOn(userService, 'getUserInfoAsync').and.returnValue(
+      Promise.resolve(translationCoordinatorInfo));
+    component.ngOnInit();
+    tick();
+    fixture.detectChanges();
+    expect(component.isTranslationCoordinator).toBeTrue();
+  }));
+
+  it('should update question coordinator view', fakeAsync(() => {
+    spyOn(userService, 'getUserInfoAsync').and.returnValue(
+      Promise.resolve(questionCoordinatorInfo));
+    component.ngOnInit();
+    tick();
+    fixture.detectChanges();
+    expect(component.isQuestionCoordinator).toBeTrue();
+  }));
+
+  it('should update translation and question coordinator view',
+    fakeAsync(() => {
+      spyOn(userService, 'getUserInfoAsync').and.returnValue(
+        Promise.resolve(fullAccessUserInfo));
+      component.ngOnInit();
+      tick();
+      fixture.detectChanges();
+      expect(component.isQuestionCoordinator).toBeTrue();
+      expect(component.isTranslationCoordinator).toBeTrue();
+    }));
+
+  it('should not update translation and question coordinator view' +
+    'if username is null', fakeAsync(() => {
+    spyOn(userService, 'getUserInfoAsync').and.returnValue(
+      Promise.resolve(nullUserInfo));
+    component.ngOnInit();
+    tick();
+    fixture.detectChanges();
+    expect(component.CONTRIBUTION_TYPES).toBeUndefined();
+  }));
 });
