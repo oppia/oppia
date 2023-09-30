@@ -111,17 +111,24 @@ class BlogPostViewedEventLogEntryModelUnitTests(test_utils.GenericTestBase):
                 stats_model_class.create('blog_post_id')
 
     def test_get_new_event_entity_id(self) -> None:
-        time_instance1 = utils.get_current_time_in_millisecs()
-        time.sleep(1)
-        new_id = (
-            blog_stats_models.BlogPostViewedEventLogEntryModel
-                .get_new_event_entity_id('BLOG')
-        )
-        time_id_created = int(new_id.split(':')[0])
-        self.assertGreater(time_id_created, time_instance1)
-        time.sleep(1)
-        self.assertLess(time_id_created, utils.get_current_time_in_millisecs())
-        self.assertEqual(new_id.split(':')[1], 'BLOG')
+        creation_time_in_millisecs = utils.get_current_time_in_millisecs()
+        mock_get_current_time_in_millisecs = lambda: creation_time_in_millisecs
+        def mock_convert_to_hash(input_string: str, max_length: int) -> str: # pylint: disable=unused-argument
+            return '123456789123'
+        with self.swap(
+            utils,
+            'get_current_time_in_millisecs',
+            mock_get_current_time_in_millisecs
+        ):
+            with self.swap(utils, 'convert_to_hash', mock_convert_to_hash):
+                new_id = (
+                    blog_stats_models.BlogPostViewedEventLogEntryModel
+                        .get_new_event_entity_id('BLOG')
+                )
+                time_id_created = int(new_id.split(':')[0])
+                self.assertEqual(time_id_created, int(creation_time_in_millisecs))
+                self.assertEqual(new_id.split(':')[1], 'BLOG')
+                self.assertEqual(new_id.split(':')[2], '123456789123')
 
     def test_create_and_get_event_models(self) -> None:
         entity_id = (
@@ -213,17 +220,24 @@ class BlogPostReadEventLogEntryModelUnitTests(test_utils.GenericTestBase):
         )
 
     def test_get_new_event_entity_id(self) -> None:
-        time_instance1 = utils.get_current_time_in_millisecs()
-        time.sleep(1)
-        new_id = (
-            blog_stats_models.BlogPostViewedEventLogEntryModel
-                .get_new_event_entity_id('BLOG')
-        )
-        time_id_created = int(new_id.split(':')[0])
-        self.assertGreater(time_id_created, time_instance1)
-        time.sleep(1)
-        self.assertLess(time_id_created, utils.get_current_time_in_millisecs())
-        self.assertEqual(new_id.split(':')[1], 'BLOG')
+        creation_time_in_millisecs = utils.get_current_time_in_millisecs()
+        mock_get_current_time_in_millisecs = lambda: creation_time_in_millisecs
+        def mock_convert_to_hash(input_string: str, max_length: int) -> str: # pylint: disable=unused-argument
+            return '123456789123'
+        with self.swap(
+            utils,
+            'get_current_time_in_millisecs',
+            mock_get_current_time_in_millisecs
+        ):
+            with self.swap(utils, 'convert_to_hash', mock_convert_to_hash):
+                new_id = (
+                    blog_stats_models.BlogPostReadEventLogEntryModel
+                        .get_new_event_entity_id('BLOG')
+                )
+                time_id_created = int(new_id.split(':')[0])
+                self.assertEqual(time_id_created, int(creation_time_in_millisecs))
+                self.assertEqual(new_id.split(':')[1], 'BLOG')
+                self.assertEqual(new_id.split(':')[2], '123456789123')
 
     def test_create_raises_exception_by_mocking_collision(self) -> None:
         stats_model_class = blog_stats_models.BlogPostReadEventLogEntryModel
@@ -334,17 +348,24 @@ class BlogPostExitedEventLogEntryModelUnitTests(test_utils.GenericTestBase):
         )
 
     def test_get_new_event_entity_id(self) -> None:
-        time_instance1 = utils.get_current_time_in_millisecs()
-        time.sleep(1)
-        new_id = (
-            blog_stats_models.BlogPostViewedEventLogEntryModel
-                .get_new_event_entity_id('BLOG')
-        )
-        time_id_created = int(new_id.split(':')[0])
-        self.assertGreater(time_id_created, time_instance1)
-        time.sleep(1)
-        self.assertLess(time_id_created, utils.get_current_time_in_millisecs())
-        self.assertEqual(new_id.split(':')[1], 'BLOG')
+        creation_time_in_millisecs = utils.get_current_time_in_millisecs()
+        mock_get_current_time_in_millisecs = lambda: creation_time_in_millisecs
+        def mock_convert_to_hash(input_string: str, max_length: int) -> str: # pylint: disable=unused-argument
+            return '123456789123'
+        with self.swap(
+            utils,
+            'get_current_time_in_millisecs',
+            mock_get_current_time_in_millisecs
+        ):
+            with self.swap(utils, 'convert_to_hash', mock_convert_to_hash):
+                new_id = (
+                    blog_stats_models.BlogPostExitedEventLogEntryModel
+                        .get_new_event_entity_id('BLOG')
+                )
+                time_id_created = int(new_id.split(':')[0])
+                self.assertEqual(time_id_created, int(creation_time_in_millisecs))
+                self.assertEqual(new_id.split(':')[1], 'BLOG')
+                self.assertEqual(new_id.split(':')[2], '123456789123')
 
     def test_create_and_get_event_models(self) -> None:
         entity_id = (
