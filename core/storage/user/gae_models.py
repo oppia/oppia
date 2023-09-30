@@ -3216,3 +3216,176 @@ class LearnerGroupsUserModel(base_models.BaseModel):
 
         cls.update_timestamps_multi(learner_groups_user_models_to_put)
         cls.put_multi(learner_groups_user_models_to_put)
+
+
+class PinnedOpportunityModel(base_models.BaseModel):
+    """Model for storing pinned opportunities in the
+    contributor dashboard for a user.
+
+    The ID of each instance is the combination of user_id,
+    language_code, and topic_id.
+    """
+
+    user_id = datastore_services.StringProperty(required=True, indexed=True)
+    language_code = datastore_services.StringProperty(
+        required=True, indexed=True)
+    topic_id = datastore_services.StringProperty(required=True, indexed=True)
+    opportunity_id = datastore_services.StringProperty(indexed=True)
+
+    @classmethod
+    def _generate_id(
+        cls,
+        user_id: str,
+        language_code: str,
+        topic_id: str
+    ) -> str:
+        """Generates the ID for the instance of PinnedOpportunityModel class.
+
+        Args:
+            user_id: str. The ID of the user.
+            language_code: str. The code of the language.
+            topic_id: str. The ID of the topic.
+
+        Returns:
+            str. The ID for this entity, in the form
+            user_id.language_code.topic_id.
+        """
+        return '%s.%s.%s' % (user_id, language_code, topic_id)
+
+    @classmethod
+    def create(
+        cls,
+        user_id: str,
+        language_code: str,
+        topic_id: str,
+        opportunity_id: str
+    ) -> PinnedOpportunityModel:
+        """Creates a new PinnedOpportunityModel instance. Fails if the
+        model already exists.
+
+        Args:
+            user_id: str. The ID of the user.
+            language_code: str. The code of the language.
+            topic_id: str. The ID of the topic.
+            opportunity_id: str. The ID of the pinned opportunity.
+
+        Returns:
+            PinnedOpportunityModel. The created instance.
+
+        Raises:
+            Exception. There is already a pinned opportunity with
+                the given id.
+        """
+        instance_id = cls._generate_id(user_id, language_code, topic_id)
+        if cls.get_by_id(instance_id):
+            raise Exception(
+                'There is already a pinned opportunity with the given'
+                ' id: %s' % instance_id)
+
+        instance = cls(
+            id=instance_id, user_id=user_id, language_code=language_code,
+            topic_id=topic_id, opportunity_id=opportunity_id)
+        instance.update_timestamps()
+        instance.put()
+        return instance
+
+    @classmethod
+    def get_model(
+        cls,
+        user_id: str,
+        language_code: str,
+        topic_id: str
+    ) -> Optional[
+        PinnedOpportunityModel]:
+        """Fetches the PinnedOpportunityModel instance from the datastore.
+
+        Args:
+            user_id: str. The ID of the user.
+            language_code: str. The code of the language.
+            topic_id: str. The ID of the topic.
+
+        Returns:
+            PinnedOpportunityModel. The model instance with the given parameters
+            or None if not found.
+        """
+        return cls.get_by_id(cls._generate_id(user_id, language_code, topic_id))
+
+    @classmethod
+    def apply_deletion_policy(cls, user_id: str) -> None:
+        """Delete instances of PinnedOpportunityModel for the user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be deleted.
+        """
+        datastore_services.delete_multi(
+            cls.query(cls.user_id == user_id).fetch(keys_only=True))
+
+    @classmethod
+    def get_deletion_policy(cls) -> base_models.DELETION_POLICY:
+        """Model contains data corresponding to a user: user_id."""
+        return base_models.DELETION_POLICY.DELETE
+
+    @classmethod
+    def has_reference_to_user_id(cls, user_id: str) -> bool:
+        """Check whether PinnedOpportunityModel references the
+        supplied user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be
+                checked.
+
+        Returns:
+            bool. Whether any models refer to the given user ID.
+        """
+        return cls.query(
+            cls.user_id == user_id
+        ).get(keys_only=True) is not None
+
+    @classmethod
+    def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
+        """Model contains data to export corresponding to a user."""
+        return dict(super(cls, cls).get_export_policy(), **{
+            'language_code':
+                base_models.EXPORT_POLICY.EXPORTED_AS_KEY_FOR_TAKEOUT_DICT,
+            # User ID is not exported in order to keep internal ids private.
+            'user_id':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'topic_id':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'opportunity_id':
+                base_models.EXPORT_POLICY.EXPORTED
+        })
+
+    @classmethod
+    def export_data(cls, user_id: str) -> Dict[str, Dict[str, str]]:
+        """Fetches all the data associated with the given user ID.
+
+        Args:
+            user_id: str. The ID of the user whose data should be fetched.
+
+        Returns:
+            dict. A dictionary containing all the data associated
+            with the user.
+        """
+        user_data = {}
+
+        user_models: Sequence[PinnedOpportunityModel] = (
+            cls.query(cls.user_id == user_id).fetch())
+
+        for model in user_models:
+            key = '%s_%s' % (
+                model.language_code,
+                model.topic_id,
+            )
+            user_data[key] = {
+                'opportunity_id': model.opportunity_id,
+            }
+        return user_data
+
+    @staticmethod
+    def get_model_association_to_user(
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+        """Model is exported as multiple instances per user since there are
+        multiple languages and topics relevant to a user.
+        """
+        return base_models.MODEL_ASSOCIATION_TO_USER.MULTIPLE_INSTANCES_PER_USER

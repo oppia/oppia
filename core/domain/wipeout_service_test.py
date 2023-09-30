@@ -4216,6 +4216,48 @@ class WipeoutServiceDeleteSuggestionModelsTests(test_utils.GenericTestBase):
                 self.QUESTION_STATS_1_ID))
 
 
+class WipeoutServiceDeletePinnedOpportunitiesModelsTest(
+    test_utils.GenericTestBase
+):
+    """Provides testing of the deletion part of wipeout service."""
+
+    USER_1_EMAIL: Final = 'some@example.com'
+    TOPIC_ID: Final = 'topic_1'
+    OPPORTUNITY_ID: Final = 'opportunity_1'
+    LANGUAGE_CODE: Final = 'en'
+    USER_1_USERNAME: Final = 'user1'
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.signup(self.USER_1_EMAIL, self.USER_1_USERNAME)
+        self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)
+        user_models.PinnedOpportunityModel.create(
+            user_id=self.user_1_id,
+            topic_id=self.TOPIC_ID,
+            opportunity_id=self.OPPORTUNITY_ID,
+            language_code='en'
+        )
+        wipeout_service.pre_delete_user(self.user_1_id)
+        self.process_and_flush_pending_tasks()
+
+    def test_pinned_opportunities_are_deleted(self) -> None:
+        self.assertIsNotNone(
+            user_models.PinnedOpportunityModel.get_model(
+                user_id=self.user_1_id,
+                language_code=self.LANGUAGE_CODE,
+                topic_id=self.TOPIC_ID
+            ))
+        wipeout_service.delete_user(
+            wipeout_service.get_pending_deletion_request(self.user_1_id))
+
+        self.assertIsNone(
+            user_models.PinnedOpportunityModel.get_model(
+                user_id=self.user_1_id,
+                language_code=self.LANGUAGE_CODE,
+                topic_id=self.TOPIC_ID
+            ))
+
+
 class WipeoutServiceVerifyDeleteSuggestionModelsTests(
         test_utils.GenericTestBase):
     """Provides testing of the verification part of wipeout service."""
