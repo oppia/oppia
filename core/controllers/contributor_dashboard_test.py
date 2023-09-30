@@ -532,7 +532,6 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
         swap_with_corrupt_story = self.swap_to_always_return(
             story_fetchers, 'get_stories_by_ids', [corrupt_story]
         )
-
         self.login(self.CURRICULUM_ADMIN_EMAIL)
 
         # Get translation opportunities with 'None' story.
