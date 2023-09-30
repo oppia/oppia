@@ -533,6 +533,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             story_fetchers, 'get_stories_by_ids', [corrupt_story]
         )
         
+
 self.login(self.CURRICULUM_ADMIN_EMAIL)
 
         # Get translation opportunities with 'None' story.
