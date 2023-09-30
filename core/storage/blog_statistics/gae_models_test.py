@@ -18,7 +18,6 @@
 
 from __future__ import annotations
 
-import time
 import types
 
 from core import utils
@@ -126,7 +125,8 @@ class BlogPostViewedEventLogEntryModelUnitTests(test_utils.GenericTestBase):
                         .get_new_event_entity_id('BLOG')
                 )
                 time_id_created = int(new_id.split(':')[0])
-                self.assertEqual(time_id_created, int(creation_time_in_millisecs))
+                self.assertEqual(
+                    time_id_created, int(creation_time_in_millisecs))
                 self.assertEqual(new_id.split(':')[1], 'BLOG')
                 self.assertEqual(new_id.split(':')[2], '123456789123')
 
@@ -235,7 +235,8 @@ class BlogPostReadEventLogEntryModelUnitTests(test_utils.GenericTestBase):
                         .get_new_event_entity_id('BLOG')
                 )
                 time_id_created = int(new_id.split(':')[0])
-                self.assertEqual(time_id_created, int(creation_time_in_millisecs))
+                self.assertEqual(
+                    time_id_created, int(creation_time_in_millisecs))
                 self.assertEqual(new_id.split(':')[1], 'BLOG')
                 self.assertEqual(new_id.split(':')[2], '123456789123')
 
@@ -363,7 +364,8 @@ class BlogPostExitedEventLogEntryModelUnitTests(test_utils.GenericTestBase):
                         .get_new_event_entity_id('BLOG')
                 )
                 time_id_created = int(new_id.split(':')[0])
-                self.assertEqual(time_id_created, int(creation_time_in_millisecs))
+                self.assertEqual(
+                    time_id_created, int(creation_time_in_millisecs))
                 self.assertEqual(new_id.split(':')[1], 'BLOG')
                 self.assertEqual(new_id.split(':')[2], '123456789123')
 
