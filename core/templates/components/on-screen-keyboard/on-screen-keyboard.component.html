@@ -32,22 +32,22 @@
       <img [src]="getStaticImageUrl('/icons/osk-exponent.svg')" matTooltip="Exponential" class="oppia-osk-btn-shortcut" alt="^" (click)="insertSymbol('exp')">
       <button class="oppia-osk-btn-number" (click)="insertString('.')">.</button>
       <button class="oppia-osk-btn-number number-0" (click)="insertString('0')">0</button>
-      <img [src]="getStaticImageUrl('/icons/osk-delete.svg')" class="oppia-osk-btn-delete" alt="delete" (click)="backspace()">
-      <button class="oppia-osk-btn-number" (click)="left()">
+      <img [src]="getStaticImageUrl('/icons/osk-delete.svg')" class="oppia-osk-btn-delete" alt="delete" (click)="backspace()" matTooltip="Backspace">
+      <button class="oppia-osk-btn-number" (click)="left()" matTooltip="Left">
         <i class="fa fa-angle-left"></i>
       </button>
-      <button class="oppia-osk-btn-number" (click)="right()">
+      <button class="oppia-osk-btn-number" (click)="right()" matTooltip="Right">
         <i class="fa fa-angle-right"></i>
       </button>
     </div>
     <div class="oppia-osk-functions-tab" *ngIf="currentTab===functionsTab">
-      <button class="oppia-osk-btn-operator" (click)="insertSymbol('paren')">()</button>
-      <button class="oppia-osk-btn-operator" (click)="insertString('abs')">||</button>
-      <button *ngIf="interactionType === 'MathEquationInput'" class="oppia-osk-btn-operator" (click)="insertString('=')">=</button>
-      <img [src]="getStaticImageUrl('/icons/osk-exponent-2.svg')" class="oppia-osk-btn-shortcut" alt="^2" (click)="exponent('2')">
-      <img [src]="getStaticImageUrl('/icons/osk-exponent-3.svg')" class="oppia-osk-btn-shortcut" alt="^3" (click)="exponent('3')">
+      <button class="oppia-osk-btn-operator" (click)="insertSymbol('paren')" matTooltip="Parenthesis">()</button>
+      <button class="oppia-osk-btn-operator" (click)="insertString('abs')" matTooltip="Absolute">||</button>
+      <button *ngIf="interactionType === 'MathEquationInput'" class="oppia-osk-btn-operator" (click)="insertString('=')" matTooltip="Equal">=</button>
+      <img [src]="getStaticImageUrl('/icons/osk-exponent-2.svg')" class="oppia-osk-btn-shortcut" alt="^2" (click)="exponent('2')" matTooltip="Exp 2">
+      <img [src]="getStaticImageUrl('/icons/osk-exponent-3.svg')" class="oppia-osk-btn-shortcut" alt="^3" (click)="exponent('3')" matTooltip="Exp 3">
       <button class="oppia-osk-btn-function" (click)="insertString(function)" *ngFor="let function of functions">{{function}}</button>
-      <img [src]="getStaticImageUrl('/icons/osk-delete.svg')" class="oppia-osk-btn-delete" alt="delete" (click)="backspace()">
+      <img [src]="getStaticImageUrl('/icons/osk-delete.svg')" class="oppia-osk-btn-delete" alt="delete" (click)="backspace()" matTooltip="Backspace">
     </div>
   </div>
 </div>
