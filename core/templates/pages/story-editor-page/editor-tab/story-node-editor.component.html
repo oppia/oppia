@@ -117,31 +117,51 @@
         <div class="e2e-test-add-chapter-outline">
           <div class="story-node-header oppia-mobile-collapsible-card-header" (click)="toggleChapterOutline()">
             <span>Chapter Outline</span>
-            <i class="fa fa-caret-down"
-               *ngIf="!chapterOutlineIsShown"
-               aria-hidden="true">
-            </i>
-            <i class="fa fa-caret-up"
-               *ngIf="chapterOutlineIsShown"
-               aria-hidden="true">
-            </i>
           </div>
-          <div class="chapter-card-inputs oppia-mobile-collapsible-card-content" *ngIf="chapterOutlineIsShown">
+          <br>
+          <div *ngIf="oldOutline" style="margin: 30px">
             Outline Finalized
             <i *ngIf="!outlineIsFinalized" (click)="finalizeOutline()" class="far fa-square md-18 e2e-test-finalize-outline" aria-label="Finalize outline"></i>
             <i *ngIf="outlineIsFinalized" (click)="unfinalizeOutline()" class="fas fa-check-square md-18" aria-label="Unfinalize outline"></i>
-            <div tabindex="-1" (blur)="toggleChapterOutlineButtons()" (click)="toggleChapterOutlineButtons()">
+          </div>
+          <div *ngIf="!chapterOutlineIsShown">
+            <div class="outline-content-hover" *ngIf="!oldOutlineToReadOnly" style="margin-left: 50px; width: 400px;">
+              <input id="chapter-outline-editor-content-id" 
+                     class="chapter-outline-editor-content outline-content-hover e2e-test-node-outline-editor-content e2e-test-rte"
+                     readonly 
+                     style="cursor: pointer; width: 380px;"
+                     (click)="chapterOutlineIsShown=true" 
+                     placeholder="Open chapter outline editor.">
+              <label for="chapter-outline-editor-content-id" 
+                     class="fas fa-pencil-alt oppia-icon" 
+                     (click)="chapterOutlineIsShown=true" 
+                     style="cursor: pointer;  float: right;"><label>
+            </div> 
+            <div *ngIf="oldOutlineToReadOnly" >
+              <button class="chapter-outline-editor-content outline-content-hover e2e-test-node-outline-editor-content e2e-test-rte" 
+                      (click)="chapterOutlineIsShown=true"
+                      style="margin-left: 50px; width: 400px;">{{oldOutlineToReadOnly}}
+                <label class="fas fa-pencil-alt oppia-icon" 
+                       (click)="chapterOutlineIsShown=true" 
+                       style="cursor: pointer; float: right"></label>
+              </button>  
+            </div>     
+          </div>
+          <br>
+          <div class="chapter-card-inputs oppia-mobile-collapsible-card-content" *ngIf="chapterOutlineIsShown">
+            <div tabindex="-1" >
               <schema-based-editor id="storyNodeOutline"
                                    [schema]="OUTLINE_SCHEMA"
                                    [localValue]="editableOutline"
-                                   (localValueChange)="updateLocalEditableOutline($event)">
+                                   (localValueChange)="updateLocalEditableOutline($event);"
+				                           (click)="chapterOutlineButtonsAreShown=true; ">
               </schema-based-editor>
-              <div class="save-button-container">
-                <button class="btn btn-default">Cancel</button>
+              <div class="save-button-container" *ngIf="chapterOutlineButtonsAreShown">
+                <button type="button" class="btn btn-default" (click)="onCancelButtonClicked();">Cancel</button>
                 <button type="button"
                         class="btn btn-success save-button e2e-test-node-outline-save-button"
                         [disabled]="!isOutlineModified(editableOutline)"
-                        (click)="updateOutline(editableOutline)">
+                        (click)="updateOutline(editableOutline); onSaveButtonClicked();">
                   Save
                 </button>
               </div>
@@ -366,6 +386,15 @@
 </div>
 
 <style>
+  .chapter-outline-editor-content {
+    background: #ffffff;
+    border: none;
+    outline: none;
+    text-align: left;
+  }
+  .outline-content-hover:hover {
+    background: rgb(240,240,240);
+  }
   .story-node-content-container {
     display: flex;
     flex-wrap: wrap;

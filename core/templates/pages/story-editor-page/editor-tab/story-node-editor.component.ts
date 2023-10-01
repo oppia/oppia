@@ -77,6 +77,7 @@ export class StoryNodeEditorComponent implements OnInit, OnDestroy {
   editableThumbnailBgColor: string;
   oldOutline: string;
   editableOutline: string;
+  oldOutlineToReadOnly: string;
   currentExplorationId: string;
   expIdIsValid: boolean;
   invalidExpErrorIsShown: boolean;
@@ -505,6 +506,18 @@ export class StoryNodeEditorComponent implements OnInit, OnDestroy {
 
   toggleChapterOutlineButtons(): void {
     this.chapterOutlineButtonsAreShown = !this.chapterOutlineButtonsAreShown;
+  }
+
+  onSaveButtonClicked(): void {
+    this.oldOutlineToReadOnly = this.oldOutline.slice(3,-4);
+    this.chapterOutlineButtonsAreShown = false;
+    this.chapterOutlineIsShown=false;
+  }
+
+  onCancelButtonClicked(): void {
+    this.editableOutline = this.oldOutline;
+    this.chapterOutlineButtonsAreShown = false;
+    this.chapterOutlineIsShown=false;
   }
 
   _recalculateAvailableNodes(): void {
