@@ -217,6 +217,12 @@ describe('Contributor dashboard page', function() {
     await contributorDashboardPage.navigateToTranslateTextTab();
     await contributorDashboardTranslateTextTab.changeLanguage(
       GERMAN_LANGUAGE);
+    await contributorDashboardTranslateTextTab.expectSelectedLanguageToBe(
+      GERMAN_LANGUAGE);
+    await contributorDashboardTranslateTextTab.expectSelectedTopicToBe(
+      TOPIC_NAMES[0]);
+    await contributorDashboardTranslateTextTab.changeTopic(
+      TOPIC_NAMES[0]);
     await contributorDashboardPage.waitForOpportunitiesToLoad();
     await action.click('Opportunity button', opportunityActionButtonCss);
     let image = $('.e2e-test-image');
