@@ -73,6 +73,10 @@ var suites = {
     './core/tests/webdriverio_desktop/collections.js'
   ],
 
+  contributorAdminDashboard: [
+    './core/tests/webdriverio_desktop/contributorAdminDashboard.js'
+  ],
+
   contributorDashboard: [
     './core/tests/webdriverio_desktop/contributorDashboard.js'
   ],
