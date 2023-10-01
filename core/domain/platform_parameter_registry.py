@@ -457,7 +457,7 @@ Registry.create_feature_flag(
 Registry.create_feature_flag(
     ParamNames.CD_ADMIN_DASHBOARD_NEW_UI,
     'This flag is to show new contributor admin dashboard.',
-    platform_parameter_domain.FeatureStages.DEV)
+    platform_parameter_domain.FeatureStages.TEST)
 
 Registry.create_feature_flag(
     ParamNames.IS_IMPROVEMENTS_TAB_ENABLED,
@@ -555,4 +555,11 @@ Registry.create_platform_parameter(
     ),
     platform_parameter_domain.DataTypes.NUMBER,
     default=5
+)
+
+Registry.create_platform_parameter(
+    ParamNames.RECORD_PLAYTHROUGH_PROBABILITY,
+    'The probability of recording playthroughs',
+    platform_parameter_domain.DataTypes.NUMBER,
+    default=0.2
 )
