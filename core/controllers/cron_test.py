@@ -25,6 +25,9 @@ from core.domain import email_manager
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import platform_feature_services
+from core.domain import platform_parameter_domain
+from core.domain import platform_parameter_list
+from core.domain import platform_parameter_registry
 from core.domain import question_domain
 from core.domain import story_domain
 from core.domain import story_services
@@ -702,16 +705,34 @@ class CronMailAdminContributorDashboardBottlenecksHandlerTests(
         self
     ) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
-        swap_platform_parameter_value = self.swap_to_always_return(
-            platform_feature_services,
-            'get_platform_parameter_value',
-            True
+        platform_parameter_registry.Registry.update_platform_parameter(
+            (
+                platform_parameter_list.ParamNames.
+                ENABLE_ADMIN_NOTIFICATIONS_FOR_SUGGESTIONS_NEEDING_REVIEW.value
+            ),
+            self.admin_id,
+            'Updating value.',
+            [
+                platform_parameter_domain.PlatformParameterRule.from_dict({
+                    'filters': [
+                        {
+                            'type': 'platform_type',
+                            'conditions': [
+                                ['=', 'Web']
+                            ],
+                        }
+                    ],
+                    'value_when_matched': True
+                })
+            ],
+            False
         )
 
         with self.can_send_emails, self.testapp_swap:
-            with swap_platform_parameter_value, self.swap(
+            with self.swap(
                 suggestion_models,
-                'SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS', 0):
+                'SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS', 0
+            ):
                 with self.swap(
                     email_manager,
                     'send_mail_to_notify_admins_suggestions_waiting_long',
