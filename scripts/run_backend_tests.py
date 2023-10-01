@@ -63,12 +63,6 @@ import threading
 import time
 from typing import Dict, Final, List, Optional, Tuple, cast
 
-from . import install_third_party_libs
-
-# This installs third party libraries before importing other files or importing
-# libraries that use the builtins python module (e.g. build, utils).
-install_third_party_libs.main()
-
 from core import utils  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 from . import common  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 from . import concurrent_task_utils  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
@@ -474,6 +468,13 @@ def print_coverage_report(
 def main(args: Optional[List[str]] = None) -> None:
     """Run the tests."""
     parsed_args = _PARSER.parse_args(args=args)
+
+    # Installing third-party Oppia dependencies is unnecessary
+    # when running the test with the --test_target flag. It is done
+    # for performance improvement.
+    if not parsed_args.test_target:
+        from . import install_third_party_libs
+        install_third_party_libs.main()
 
     for directory in common.DIRS_TO_ADD_TO_SYS_PATH:
         if not os.path.exists(os.path.dirname(directory)):
