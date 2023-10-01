@@ -172,7 +172,7 @@ class MypyScriptChecks(test_utils.GenericTestBase):
             self.assertEqual(code, 0)
             self.assertEqual(path, self.mypy_cmd_path)
 
-    def test_install_mypy_prerequisites(self) -> None:
+    def test_install_mypy_prerequisites_docker(self) -> None:
         with self.swap(feconf, 'OPPIA_IS_DOCKERIZED', True):
             with self.popen_swap_success:
                 code, path = run_mypy_checks.install_mypy_prerequisites(True)

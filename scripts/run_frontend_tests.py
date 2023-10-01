@@ -79,6 +79,7 @@ _PARSER.add_argument(
     action='store_true'
 )
 
+
 def run_dtslint_type_tests() -> None:
     """Runs the dtslint type tests in typings/tests."""
     print('Running dtslint type tests.')

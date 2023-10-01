@@ -26,7 +26,8 @@ import subprocess
 import sys
 import threading
 
-from core import feconf, utils
+from core import feconf
+from core import utils
 from core.tests import test_utils
 from scripts import common
 from scripts import concurrent_task_utils
@@ -619,11 +620,12 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
             run_backend_tests, 'check_coverage',
             lambda *unused_args, **unused_kwargs: ('', 100.00))
         with self.swap(feconf, 'OPPIA_IS_DOCKERIZED', True):
-            with self.swap_execute_task, swapcheck_coverage, self.swap_redis_server:
+            with self.swap_execute_task, swapcheck_coverage:
                 with self.swap_cloud_datastore_emulator, swap_check_results:
-                    with self.print_swap:
+                    with self.print_swap, self.swap_redis_server:
                         run_backend_tests.main(
-                            args=['--test_target', 'scripts.run_backend_tests.py'])
+                            args=['--test_target',
+                                  'scripts.run_backend_tests.py'])
 
         self.assertIn(
             'WARNING : test_target flag should point to the test file.',

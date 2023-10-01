@@ -25,7 +25,8 @@ import subprocess
 import tempfile
 import zipfile
 
-from core import feconf, utils
+from core import feconf
+from core import utils
 from core.tests import test_utils
 
 from typing import Final, List, Tuple

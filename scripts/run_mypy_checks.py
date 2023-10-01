@@ -26,10 +26,11 @@ import sys
 from core import feconf
 
 from scripts import common
-if not feconf.OPPIA_IS_DOCKERIZED:
-    from scripts import install_third_party_libs
 
 from typing import Final, List, Optional, Tuple
+
+if not feconf.OPPIA_IS_DOCKERIZED:
+    from scripts import install_third_party_libs
 
 # List of directories whose files won't be type-annotated ever.
 EXCLUDED_DIRECTORIES: Final = [

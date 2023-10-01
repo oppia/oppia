@@ -22,10 +22,12 @@ import pathlib
 import shutil
 import subprocess
 import zipfile
-from scripts import install_python_dev_dependencies
-from typing import Final, List
 
 from core import feconf
+from scripts import install_python_dev_dependencies
+
+from typing import Final, List
+
 if not feconf.OPPIA_IS_DOCKERIZED:
     install_python_dev_dependencies.main(['--assert_compiled'])
 
@@ -34,6 +36,7 @@ if not feconf.OPPIA_IS_DOCKERIZED:
     from . import pre_push_hook  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
     from . import setup  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
     from . import setup_gae  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
+
 from . import common  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 
 from core import utils  # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
