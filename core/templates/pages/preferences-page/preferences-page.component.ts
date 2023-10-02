@@ -38,7 +38,6 @@ import { AssetsBackendApiService } from 'services/assets-backend-api.service';
 require('cropperjs/dist/cropper.min.css');
 
 import './preferences-page.component.css';
-import { event } from 'jquery';
 
 interface AudioLangaugeChoice {
   id: string;
@@ -86,7 +85,9 @@ export class PreferencesPageComponent {
   PAGES_REGISTERED_WITH_FRONTEND = (
     AppConstants.PAGES_REGISTERED_WITH_FRONTEND);
   @ViewChild('firstRadio') firstRadio: ElementRef;
+
   @ViewChild('secondRadio') secondRadio: ElementRef;
+
   @ViewChild('thirdRadio') thirdRadio: ElementRef;
 
   constructor(
@@ -249,8 +250,7 @@ export class PreferencesPageComponent {
     if (event.key === 'Tab' && !event.shiftKey) {
       event.preventDefault();
       this.thirdRadio.nativeElement.focus();
-    }
-    else if (event.key === 'Tab' && event.shiftKey) {
+    } else if (event.key === 'Tab' && event.shiftKey) {
       event.preventDefault();
       this.firstRadio.nativeElement.focus();
     }

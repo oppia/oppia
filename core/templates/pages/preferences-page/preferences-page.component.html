@@ -95,17 +95,17 @@
       </label>
       <div class="col-lg-8 col-md-8 col-sm-8">
         <div class="checkbox oppia-checkbox">
-            <input type="radio"
-                   #firstRadio
-                   (keydown)="handleTabForFirstRadio($event)"
-                   [(ngModel)]="defaultDashboard"
-                   value="{{ DASHBOARD_TYPE_CREATOR }}"
-                   (change)="saveDefaultDashboard(defaultDashboard)"
-                   class="e2e-test-creator-dashboard-radio"
-                   attr.aria-label="{{ 'I18N_PREFERENCES_PREFERRED_DASHBOARD' | translate }}, {{ 'I18N_TOPNAV_CREATOR_DASHBOARD' | translate }}">
-            <span aria-hidden="true">
-              {{ 'I18N_TOPNAV_CREATOR_DASHBOARD' | translate }}
-            </span>
+          <input type="radio"
+                 #firstRadio
+                 (keydown)="handleTabForFirstRadio($event)"
+                 [(ngModel)]="defaultDashboard"
+                 value="{{ DASHBOARD_TYPE_CREATOR }}"
+                 (change)="saveDefaultDashboard(defaultDashboard)"
+                 class="e2e-test-creator-dashboard-radio"
+                 attr.aria-label="{{ 'I18N_PREFERENCES_PREFERRED_DASHBOARD' | translate }}, {{ 'I18N_TOPNAV_CREATOR_DASHBOARD' | translate }}">
+          <span aria-hidden="true">
+            {{ 'I18N_TOPNAV_CREATOR_DASHBOARD' | translate }}
+          </span>
         </div>
         <div class="checkbox oppia-checkbox">
             <input type="radio"
