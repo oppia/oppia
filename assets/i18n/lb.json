@@ -1,5 +1,6 @@
 {
 	"I18N_ABOUT_FOUNDATION_PAGE_BREADCRUMB": "Iwwer d'Oppia-Fondatioun",
+	"I18N_ABOUT_FOUNDATION_PAGE_MILLIONS_OF": "Millioune vu Kanner kréien net déi Ausbildung, déi se verdéngen.",
 	"I18N_ABOUT_FOUNDATION_PAGE_TITLE": "Iwwer d'Oppia-Fondatioun | Oppia",
 	"I18N_ABOUT_PAGE_ABOUT_TAB_HEADING": "Iwwer Oppia",
 	"I18N_ABOUT_PAGE_ABOUT_TAB_SHARE": "Publizéieren &amp; Deelen",
@@ -288,6 +289,8 @@
 	"I18N_MODAL_CONTINUE_BUTTON": "Virufueren",
 	"I18N_NO": "Neen",
 	"I18N_ONE_SUBSCRIBER_TEXT": "Dir hutt 1 Abonnent.",
+	"I18N_PARTNERSHIPS_PAGE_FREQUENTLY_ASKED_3": "Kann Oppia Fräiwëlleger an eis Géigend schécken?",
+	"I18N_PARTNERSHIPS_PAGE_FREQUENTLY_ASKED_4": "Kënnen Oppia-Lektiounen a menger Regioun benotzt ginn?",
 	"I18N_PLAYER_AUDIO_EXPAND_TEXT": "Der Lexioun nolauschteren",
 	"I18N_PLAYER_AUDIO_LANGUAGE": "Sprooch",
 	"I18N_PLAYER_AUDIO_LOADING_AUDIO": "Audio gëtt gelueden...",
@@ -456,5 +459,6 @@
 	"I18N_TOPNAV_TRY_ANDROID_APP_TEXT": "Probéiert et haut!",
 	"I18N_TOTAL_SUBSCRIBERS_TEXT": "Dir hutt am Ganzen <[totalSubscribers]> Abonnenten.",
 	"I18N_UNSUBSCRIBE_BUTTON_TEXT": "Ofbestellen",
+	"I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_LEARNER_FEEDBACK_WHAT_WE": "<b> Wat mir maachen: </b>",
 	"I18N_YES": "Jo"
 }
