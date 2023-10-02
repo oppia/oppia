@@ -59,6 +59,9 @@ var ContributorDashboardAdminPage = function() {
   var translationSubmitterTab = $('.e2e-test-translation-submitters-tab');
   var translationReviewerTab = $('.e2e-test-translation-reviewers-tab');
   var languageSelector = $('.e2e-test-language-selector');
+  var noDataMessage = $('.e2e-test-no-data-message');
+  var loadingMessage = $('.e2e-test-loading-message');
+  var languageDropdown = $('.e2e-test-language-selector-dropdown');
 
   this.get = async function() {
     await browser.url('/contributor-dashboard-admin');
@@ -187,9 +190,14 @@ var ContributorDashboardAdminPage = function() {
 
   this.switchLanguage = async function(language) {
     await action.click('Language Selector', languageSelector);
+    await waitFor.visibilityOf(
+      languageDropdown, 'Language Dropdown not visible');
     var selectorOption = languageSelector.$(
       `.e2e-test-language-selector-option=${language}`);
     await action.click(`${language} option selector`, selectorOption);
+    await action.click('Language Selector', languageSelector);
+    await waitFor.invisibilityOf(
+      languageDropdown, 'Language Dropdown did not disappear');
   };
 
   this.expectUserToBeTranslationReviewer = async function(
@@ -233,12 +241,16 @@ var ContributorDashboardAdminPage = function() {
   };
 
   this.expectStatsElementCountToBe = async function(elementsCount) {
-    await waitFor.presenceOf(statsTable, 'stats table is not visible');
-    var statsListItems = await statsListItemsSelector();
     if (elementsCount === 0) {
-      return;
+      await waitFor.invisibilityOf(
+        loadingMessage, 'Loading message did not disappear');
+      await waitFor.visibilityOf(
+        noDataMessage, 'No data message is not visible');
     } else {
-      await waitFor.visibilityOf(statsListItems);
+      await waitFor.invisibilityOf(
+        loadingMessage, 'Loading message did not disappear');
+      await waitFor.visibilityOf(statsTable, 'stats table is not visible');
+      var statsListItems = await statsListItemsSelector();
       expect(statsListItems.length).toBe(elementsCount);
     }
   };
@@ -250,6 +262,11 @@ var ContributorDashboardAdminPage = function() {
     await waitFor.visibilityOf(expandedRow, 'Expanded row not visible');
     await action.click('Stats row', statsListItems[0]);
     await waitFor.invisibilityOf(expandedRow, 'Expanded row still visible');
+  };
+
+  this.pageToFullyInitiate = async function() {
+    await waitFor.invisibilityOf(
+      loadingMessage, 'Loading message did not disappear');
   };
 };
 

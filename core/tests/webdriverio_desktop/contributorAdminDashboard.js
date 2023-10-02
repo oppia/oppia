@@ -280,7 +280,7 @@ describe('Contributor Admin Dashboard', function() {
     await users.logout();
   });
 
-  it('should allow user to navigate to new dashboard', async function() {
+  it('should allow question coordinator to view dashboard', async function() {
     await users.login(QUESTION_COORDINATOR_EMAIL);
     await contributorDashboardAdminPage.get();
 
@@ -289,26 +289,35 @@ describe('Contributor Admin Dashboard', function() {
     await contributorDashboardAdminPage.expectStatsRowsAreExpanded();
 
     await contributorDashboardAdminPage.navigateToQuestionReviewerTab();
-    await contributorDashboardAdminPage.expectStatsElementCountToBe(2);
+    await contributorDashboardAdminPage.expectStatsElementCountToBe(2 );
     await contributorDashboardAdminPage.expectStatsRowsAreExpanded();
 
     await users.logout();
-
-    await users.login(TRANSLATION_COORDINATOR_EMAIL);
-    await contributorDashboardAdminPage.get();
-
-    await contributorDashboardAdminPage.navigateToTranslationSubmitterTab();
-    await contributorDashboardAdminPage.expectStatsElementCountToBe(0);
-
-    await contributorDashboardAdminPage.switchLanguage('shqip (Albanian)');
-    await contributorDashboardAdminPage.expectStatsElementCountToBe(1);
-
-    await contributorDashboardAdminPage.navigateToTranslationReviewerTab();
-    await contributorDashboardAdminPage.expectStatsElementCountToBe(0);
-
-    await contributorDashboardAdminPage.switchLanguage('shqip (Albanian)');
-    await contributorDashboardAdminPage.expectStatsElementCountToBe(1);
-
-    await users.logout();
   });
+
+  it('should allow translation coordinator to view dashboard',
+    async function() {
+      await users.login(TRANSLATION_COORDINATOR_EMAIL);
+      await contributorDashboardAdminPage.get();
+
+      await contributorDashboardAdminPage.navigateToTranslationSubmitterTab();
+      await contributorDashboardAdminPage.pageToFullyInitiate();
+      await contributorDashboardAdminPage.expectStatsElementCountToBe(0);
+
+      await contributorDashboardAdminPage.switchLanguage('shqip (Albanian)');
+      await contributorDashboardAdminPage.pageToFullyInitiate();
+      await contributorDashboardAdminPage.expectStatsElementCountToBe(2);
+      await contributorDashboardAdminPage.expectStatsRowsAreExpanded();
+
+      await contributorDashboardAdminPage.navigateToTranslationReviewerTab();
+      await contributorDashboardAdminPage.pageToFullyInitiate();
+      await contributorDashboardAdminPage.expectStatsElementCountToBe(2);
+      await contributorDashboardAdminPage.expectStatsRowsAreExpanded();
+
+      await contributorDashboardAdminPage.switchLanguage('English');
+      await contributorDashboardAdminPage.pageToFullyInitiate();
+      await contributorDashboardAdminPage.expectStatsElementCountToBe(0);
+
+      await users.logout();
+    });
 });

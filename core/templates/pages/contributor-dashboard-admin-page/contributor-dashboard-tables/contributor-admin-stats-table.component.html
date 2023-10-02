@@ -368,9 +368,6 @@
         [class.example-expanded-row]="expandedElement === element"
         (click)="expandedElement = expandedElement === element ? null : element">
     </tr>
-    <!-- <div *ngIf="checkMobileView()">
-      <tr mat-row *matRowDef="let element; columns: ['mobile-role']" class="mobile-edit-role"></tr>
-    </div> -->
     <tr mat-row
         *matRowDef="let row; columns: ['expandedDetail']"
         class="example-detail-row">
