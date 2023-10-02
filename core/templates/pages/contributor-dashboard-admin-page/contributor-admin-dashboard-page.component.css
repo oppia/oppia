@@ -328,8 +328,8 @@ mat-chip-list .mat-standard-chip .mat-chip-remove {
   }
   .oppia-filter-selector-inner-container {
     display: flex;
-    font-size: 16px;
     flex-direction: column;
+    font-size: 16px;
   }
   .selector-icon-div {
     display: flex;
@@ -412,9 +412,9 @@ mat-chip-list .mat-standard-chip .mat-chip-remove {
     border-radius: 5px;
     display: flex;
     height: 90px;
+    margin-bottom: 20px;
     padding: 20px;
     width: 220px;
-    margin-bottom: 20px;
   }
 }
 @media screen and (max-width: 1200px) {
