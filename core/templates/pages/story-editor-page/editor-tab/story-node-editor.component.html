@@ -131,7 +131,7 @@
                      (click)="chapterOutlineIsShown=true"
                      placeholder="Open chapter outline editor.">
               <label class="fas fa-pencil-alt oppia-icon"
-                     (click)="chapterOutlineIsShown=true"><label>
+                     (click)="chapterOutlineIsShown=true"></label>
             </div>
             <div class="outline-content-container" *ngIf="oldOutlineToReadOnly" >
               <button class="chapter-outline-editor-content e2e-test-node-outline-editor-content e2e-test-rte"
@@ -391,14 +391,14 @@
     background: rgb(240,240,240);
   }
   .chapter-outline-editor-content {
-    cursor: pointer;
     background-color: transparent;
     border: none;
+    cursor: pointer;
     outline: none;
     text-align: left;
     width: 380px;
   }
-  .oppia-icon{
+  .oppia-icon {
     cursor: pointer;
     float: right;
   }
