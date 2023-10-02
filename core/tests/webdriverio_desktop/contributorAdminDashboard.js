@@ -289,7 +289,7 @@ describe('Contributor Admin Dashboard', function() {
     await contributorDashboardAdminPage.expectStatsRowsAreExpanded();
 
     await contributorDashboardAdminPage.navigateToQuestionReviewerTab();
-    await contributorDashboardAdminPage.expectStatsElementCountToBe(2 );
+    await contributorDashboardAdminPage.expectStatsElementCountToBe(2);
     await contributorDashboardAdminPage.expectStatsRowsAreExpanded();
 
     await users.logout();
