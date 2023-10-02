@@ -75,7 +75,7 @@ export class TranslateTextService {
   activeContentStatus: Status;
 
   constructor(
-    private translateTextBackedApiService:
+    private translateTextBackendApiService:
       TranslateTextBackendApiService
   ) { }
 
