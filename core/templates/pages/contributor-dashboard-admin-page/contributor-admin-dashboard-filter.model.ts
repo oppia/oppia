@@ -22,7 +22,7 @@ import { ContributorDashboardAdminPageConstants as PageConstants } from './contr
 export class ContributorAdminDashboardFilter {
   topicIds: string[];
   languageCode?: string;
-  sort?: string;
+  sort?: string | null;
   lastActivity?: number;
 
   /**
