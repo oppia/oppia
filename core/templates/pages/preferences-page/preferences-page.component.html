@@ -108,30 +108,30 @@
           </span>
         </div>
         <div class="checkbox oppia-checkbox">
-            <input type="radio"
-                   #secondRadio
-                   (keydown)="handleTabForSecondRadio($event)"
-                   [(ngModel)]="defaultDashboard"
-                   value="{{ DASHBOARD_TYPE_LEARNER }}"
-                   (change)="saveDefaultDashboard(defaultDashboard)"
-                   class="e2e-test-learner-dashboard-radio"
-                   attr.aria-label="{{ 'I18N_PREFERENCES_PREFERRED_DASHBOARD' | translate }}, {{ 'I18N_TOPNAV_LEARNER_DASHBOARD' | translate }}">
-            <span aria-hidden="true">
-              {{ 'I18N_TOPNAV_LEARNER_DASHBOARD' | translate }}
-            </span>
+          <input type="radio"
+                 #secondRadio
+                 (keydown)="handleTabForSecondRadio($event)"
+                 [(ngModel)]="defaultDashboard"
+                 value="{{ DASHBOARD_TYPE_LEARNER }}"
+                 (change)="saveDefaultDashboard(defaultDashboard)"
+                 class="e2e-test-learner-dashboard-radio"
+                 attr.aria-label="{{ 'I18N_PREFERENCES_PREFERRED_DASHBOARD' | translate }}, {{ 'I18N_TOPNAV_LEARNER_DASHBOARD' | translate }}">
+          <span aria-hidden="true">
+            {{ 'I18N_TOPNAV_LEARNER_DASHBOARD' | translate }}
+          </span>
         </div>
         <div class="checkbox oppia-checkbox">
-            <input type="radio"
-                   #thirdRadio
-                   (keydown)="handleTabForThirdRadio($event)"
-                   [(ngModel)]="defaultDashboard"
-                   value="{{ DASHBOARD_TYPE_CONTRIBUTOR }}"
-                   (change)="saveDefaultDashboard(defaultDashboard)"
-                   class="e2e-test-contributor-dashboard-radio"
-                   attr.aria-label="{{ 'I18N_PREFERENCES_PREFERRED_DASHBOARD' | translate }}, {{ 'I18N_TOPNAV_CONTRIBUTOR_DASHBOARD' | translate }}">
-            <span aria-hidden="true">
-              {{ 'I18N_TOPNAV_CONTRIBUTOR_DASHBOARD' | translate }}
-            </span>
+          <input type="radio"
+                 #thirdRadio
+                 (keydown)="handleTabForThirdRadio($event)"
+                 [(ngModel)]="defaultDashboard"
+                 value="{{ DASHBOARD_TYPE_CONTRIBUTOR }}"
+                 (change)="saveDefaultDashboard(defaultDashboard)"
+                 class="e2e-test-contributor-dashboard-radio"
+                 attr.aria-label="{{ 'I18N_PREFERENCES_PREFERRED_DASHBOARD' | translate }}, {{ 'I18N_TOPNAV_CONTRIBUTOR_DASHBOARD' | translate }}">
+          <span aria-hidden="true">
+            {{ 'I18N_TOPNAV_CONTRIBUTOR_DASHBOARD' | translate }}
+          </span>
         </div>
         <span class="form-text oppia-form-text">
           {{ 'I18N_PREFERENCES_PREFERRED_DASHBOARD_EXPLAIN' | translate }}
