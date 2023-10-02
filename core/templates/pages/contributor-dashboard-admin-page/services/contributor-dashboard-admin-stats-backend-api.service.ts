@@ -151,7 +151,7 @@ export interface QuestionReviewerStatsBackendDict {
   providedIn: 'root',
 })
 export class ContributorDashboardAdminStatsBackendApiService {
-  params: {};
+  params!: {};
   constructor(
     private http: HttpClient,
     private urlInterpolationService: UrlInterpolationService

@@ -81,9 +81,9 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
   isTranslationCoordinator!: boolean;
   loadingMessage!: string;
 
-  selectedLanguage: string;
-  selectedLanguageId: string;
-  selectedLastActivity: number;
+  selectedLanguage!: string;
+  selectedLanguageId!: string;
+  selectedLastActivity!: number;
   selectedTopics: string[] = [];
   allTopicNames: string[] = [];
   selectedTopicsIds: string[] = [];
@@ -208,8 +208,8 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
   selectLanguage(language: string): void {
     const currentOption = this.languages.find(
       (option) => option.language === language);
-    this.selectedLanguage = currentOption?.language;
-    this.selectedLanguageId = currentOption?.id;
+    this.selectedLanguage = currentOption.language;
+    this.selectedLanguageId = currentOption.id;
     this.translationReviewersCount = this.translationReviewersCountByLanguage[
       this.selectedLanguageId];
     this.filter = new ContributorAdminDashboardFilter(

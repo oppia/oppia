@@ -33,7 +33,7 @@ export class ContributorAdminDashboardFilter {
  */
   constructor(
       topicIds: string[], languageCode?: string,
-      sort?: string, lastActivity?: number) {
+      sort?: string | null, lastActivity?: number) {
     this.languageCode = languageCode;
     this.topicIds = topicIds;
     this.sort = sort;
