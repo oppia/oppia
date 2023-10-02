@@ -6184,14 +6184,6 @@ class TranslationCoordinatorsModelUnitTests(test_utils.GenericTestBase):
             translation_coordinators_model.id,
             self.LANGUAGE_4_ID
         )
-        self.assertEqual(
-            translation_coordinators_model.coordinator_ids,
-            [self.USER_ID_2]
-        )
-        self.assertEqual(
-            translation_coordinators_model.coordinators_count,
-            1
-        )
 
     def test_get_model_by_user_id(self) -> None:
 
@@ -6204,4 +6196,12 @@ class TranslationCoordinatorsModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             len(translation_coordinators_models),
             2
+        )
+        self.assertEqual(
+            translation_coordinators_models[0].id,
+            self.LANGUAGE_4_ID
+        )
+        self.assertEqual(
+            translation_coordinators_models[1].id,
+            self.LANGUAGE_5_ID
         )

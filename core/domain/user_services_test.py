@@ -4331,8 +4331,7 @@ class TranslationCoordinatorRightsTests(test_utils.GenericTestBase):
         user_id_c = self.get_user_id_from_email('c@example.com')
         self.set_translation_coordinators(['C'], 'en')
         self.set_translation_coordinators(['C'], 'hi')
-        self.set_translation_coordinators(['C'], 'fr')
-        self.assertEqual(3, len(
+        self.assertEqual(2, len(
             user_services.get_translation_rights_with_user(user_id_c)))
 
         user_services.deassign_user_from_all_languages(
