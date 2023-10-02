@@ -207,7 +207,10 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
 
   selectLanguage(language: string): void {
     const currentOption: LangaugeChoice = this.languages.find(
-      (option) => option.language === language);
+      (option) => option.language === language) || {
+      language: 'English',
+      id: 'en'
+    };
     this.selectedLanguage = currentOption.language;
     this.selectedLanguageId = currentOption.id;
     this.translationReviewersCount = this.translationReviewersCountByLanguage[
