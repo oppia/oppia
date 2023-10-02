@@ -80,11 +80,11 @@
 }
 .topic-filter mat-form-field .mat-form-field-flex {
   background: #fff;
-  border: 1px solid #ffffff;
+  border: 1px solid #fff;
   border-radius: 4px;
+  padding-bottom: 5px;
   padding-left: 1em;
   padding-top: 0;
-  padding-bottom: 5px;
 }
 .mat-form-field-underline {
   display: none;
@@ -249,10 +249,10 @@ mat-chip-list .mat-standard-chip .mat-chip-remove {
   box-shadow: 0 0 4px rgba(0, 0, 0, 0.25);
   cursor: pointer;
   justify-content: space-between;
+  margin: 10px;
   padding: 20px 20px;
   position: relative;
   vertical-align: top;
-  margin: 10px;
 }
 .oppia-topic-filter-selector-container {
   background-color: #fff;
@@ -260,9 +260,9 @@ mat-chip-list .mat-standard-chip .mat-chip-remove {
   box-shadow: 0 0 4px rgba(0, 0, 0, 0.25);
   cursor: pointer;
   justify-content: space-between;
+  margin: 10px;
   position: relative;
   vertical-align: top;
-  margin: 10px;
 }
 .oppia-filter-selector-inner-container {
   display: flex;
@@ -271,7 +271,7 @@ mat-chip-list .mat-standard-chip .mat-chip-remove {
   justify-content: space-between;
 }
 .oppia-filter-selector-inner-container-arrow {
-  color: #000000;
+  color: #000;
   cursor: pointer;
   padding-top: 3px;
 }
@@ -280,8 +280,8 @@ mat-chip-list .mat-standard-chip .mat-chip-remove {
   border-radius: 4px;
   box-shadow: 0 0 4px rgba(0, 0, 0, 0.25);
   height: fit-content;
-  max-height: 200px;
   left: 0;
+  max-height: 200px;
   overflow-y: scroll;
   padding: 8px 12px;
   position: absolute;
@@ -316,19 +316,6 @@ mat-chip-list .mat-standard-chip .mat-chip-remove {
   background-color: rgb(238, 238, 238);
   border-radius: 4px;
 }
-
-.oppia-filter-selector-dropdown-option {
-  color: rgb(104, 104, 104);
-  display: flex;
-  flex: 1;
-  margin-left: 16px;
-  padding: 8px;
-}
-.oppia-filter-selector-dropdown-option-selected,
-.oppia-filter-selector-dropdown-option:hover {
-  background-color: rgb(238, 238, 238);
-  border-radius: 4px;
-}
 @media only screen and (max-width: 800px) {
   .language-selector-container {
     width: auto;
@@ -340,8 +327,8 @@ mat-chip-list .mat-standard-chip .mat-chip-remove {
     width: auto;
   }
   .oppia-filter-selector-inner-container {
-    font-size: 16px;
     display: flex;
+    font-size: 16px;
     flex-direction: column;
   }
   .selector-icon-div {
@@ -420,13 +407,13 @@ mat-chip-list .mat-standard-chip .mat-chip-remove {
     flex-direction: column;
   }
   .dashboard-content-mobile .dropdown {
+    align-self: center;
     background: white;
     border-radius: 5px;
     display: flex;
     height: 90px;
     padding: 20px;
     width: 220px;
-    align-self: center;
     margin-bottom: 20px;
   }
 }

@@ -81,7 +81,7 @@
             <div #activityDropdown  class="oppia-filter-selector-container e2e-test-last-activity-selector">
               <div class="oppia-filter-selector-inner-container e2e-test-last-activity-selector-selected"
                    (click)="toggleActivityDropdown()">
-                   <b>Filter by last activity: </b>
+                <b>Filter by last activity: </b>
                    {{ selectedLastActivity ? 'Within past ' + selectedLastActivity + ' days' : 'All time' }}
                 <span class="fas fa-caret-down oppia-filter-selector-inner-container-arrow"
                       [@lastActivityDropdown]="activityDropdownShown ? 'expanded' : 'collapsed'">
@@ -149,23 +149,23 @@
         <div class="last-activity-selector-container">
           <div #activityDropdown  class="oppia-filter-selector-container e2e-test-topic-selector">
             <div class="oppia-filter-selector-inner-container e2e-test-topic-selector-selected"
-                  (click)="toggleActivityDropdown()">
+                 (click)="toggleActivityDropdown()">
               <b *ngIf="activeTab === TAB_NAME_TRANSLATION_SUBMITTER">Last Translated:</b>
               <b *ngIf="(activeTab === TAB_NAME_TRANSLATION_REVIEWER) || (activeTab === TAB_NAME_QUESTION_REVIEWER)">Last Reviewed:</b>
               <b *ngIf="activeTab === TAB_NAME_QUESTION_SUBMITTER">Last Submitted:</b>
-                <div class="selector-icon-div">
-                  {{ selectedLastActivity ? 'Within past ' + selectedLastActivity + ' days' : 'All time' }}
-                  <span class="fas fa-caret-down oppia-filter-selector-inner-container-arrow"
-                        [@lastActivityDropdown]="activityDropdownShown ? 'expanded' : 'collapsed'">
-                  </span>
-                </div>
+              <div class="selector-icon-div">
+                {{ selectedLastActivity ? 'Within past ' + selectedLastActivity + ' days' : 'All time' }}
+                <span class="fas fa-caret-down oppia-filter-selector-inner-container-arrow"
+                      [@lastActivityDropdown]="activityDropdownShown ? 'expanded' : 'collapsed'">
+                </span>
+              </div>
             </div>
             <div *ngIf="activityDropdownShown"
-                  class="oppia-filter-selector-dropdown-container e2e-test-topic-selector-dropdown">
+                 class="oppia-filter-selector-dropdown-container e2e-test-topic-selector-dropdown">
               <div class="oppia-filter-selector-dropdown-option e2e-test-topic-selector-option"
-                    *ngFor="let option of lastActivty"
-                    (click)="selectLastActivity(option)"
-                    [ngClass]="{'oppia-filter-selector-dropdown-option-selected' : option === selectedLastActivity}">
+                   *ngFor="let option of lastActivty"
+                   (click)="selectLastActivity(option)"
+                   [ngClass]="{'oppia-filter-selector-dropdown-option-selected' : option === selectedLastActivity}">
                 {{ option ? 'Within past ' + option + ' days' : 'All time' }}
               </div>
             </div>

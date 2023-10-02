@@ -17,7 +17,7 @@
  * @fileoverview Component for the feedback Updates page.
  */
 
-import { Component, OnInit, ChangeDetectorRef, ViewChild, ElementRef, HostListener } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, ViewChild, ElementRef } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import './contributor-admin-dashboard-page.component.css';
