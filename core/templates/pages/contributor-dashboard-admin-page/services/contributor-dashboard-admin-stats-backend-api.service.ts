@@ -186,9 +186,7 @@ export class ContributorDashboardAdminStatsBackendApiService {
         response =>
           resolve(
             response.coordinated_language_ids
-          ), errorResponse => {
-          reject(errorResponse.error.error);
-        });
+          ));
     });
   }
 

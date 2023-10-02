@@ -79,12 +79,14 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
   selectedContributionType!: string;
   isQuestionCoordinator!: boolean;
   isTranslationCoordinator!: boolean;
+  loadingMessage!: string;
 
   selectedLanguage: string;
   selectedLanguageId: string;
   selectedLastActivity: number;
   selectedTopics: string[] = [];
   allTopicNames: string[] = [];
+  selectedTopicsIds: string[] = [];
 
   languages: LangaugeChoice[] = [];
   lastActivty: number[] = [];
@@ -102,6 +104,7 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    this.loadingMessage = 'Loading';
     this.activeTab = this.TAB_NAME_TRANSLATION_SUBMITTER;
     this.contributorDashboardAdminStatsBackendApiService
       .fetchCommunityStats().then(
@@ -120,6 +123,8 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
       }
     );
 
+    this.selectedLastActivity = 0;
+
     this.userService.getUserInfoAsync().then(userInfo => {
       const username = userInfo.getUsername();
       if (username === null) {
@@ -132,6 +137,19 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
         this.CONTRIBUTION_TYPES.push(
           this.TAB_NAME_TRANSLATION_SUBMITTER,
           this.TAB_NAME_TRANSLATION_REVIEWER);
+        this.contributorDashboardAdminStatsBackendApiService
+          .fetchAssignedLanguageIds(username).then(
+            (response) => {
+              this.assignedLanguageIds = response;
+              this.languages = this.languages.filter((
+                  languageItem) =>
+                this.assignedLanguageIds.includes(languageItem.id));
+              this.selectedLanguage = this.languages[0].language;
+              this.selectedLanguageId = this.languages[0].id;
+              this.translationReviewersCount = (
+                this.translationReviewersCountByLanguage[
+                  this.selectedLanguageId]);
+            });
       }
       if (this.isQuestionCoordinator) {
         this.CONTRIBUTION_TYPES.push(
@@ -139,24 +157,15 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
           this.TAB_NAME_QUESTION_REVIEWER);
       }
 
-      this.contributorDashboardAdminStatsBackendApiService
-        .fetchAssignedLanguageIds(username).then(
-          (response) => {
-            this.assignedLanguageIds = response;
-            this.languages = this.languages.filter((
-                languageItem) =>
-              this.assignedLanguageIds.includes(languageItem.id));
-            this.selectedLanguage = this.languages[0].language;
-            this.selectedLanguageId = this.languages[0].id;
+      this.filter = new ContributorAdminDashboardFilter(
+        [],
+        this.selectedLanguageId,
+        null,
+        this.selectedLastActivity);
 
-            this.filter = new ContributorAdminDashboardFilter(
-              [],
-              this.selectedLanguageId,
-              null,
-              this.selectedLastActivity);
+      this.updateSelectedContributionType(this.CONTRIBUTION_TYPES[0]);
 
-            this.updateSelectedContributionType(this.CONTRIBUTION_TYPES[0]);
-          });
+      this.loadingMessage = '';
       this.changeDetectorRef.detectChanges();
     });
 
@@ -169,6 +178,7 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
           response.map((
               topic) =>
             this.allTopicNames.push(topic.topic));
+          this.applyTopicFilter();
         }
       );
   }
@@ -182,14 +192,14 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
   }
 
   applyTopicFilter(): void {
-    const selectedTopicsIds: string[] = this.selectedTopics.map((
+    this.selectedTopicsIds = this.selectedTopics.map((
         selectedTopic) => {
       const matchingTopic = this.topics.find(
         (topicChoice) => topicChoice.topic === selectedTopic);
       return matchingTopic ? matchingTopic.id : '';
     });
     this.filter = new ContributorAdminDashboardFilter(
-      selectedTopicsIds,
+      this.selectedTopicsIds,
       this.selectedLanguageId,
       null,
       this.selectedLastActivity);
@@ -246,34 +256,6 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
   updateSelectedContributionType(selectedContributionType: string): void {
     this.selectedContributionType = selectedContributionType;
     this.setActiveTab(selectedContributionType);
-  }
-
-  /**
-   * Close dropdown when outside elements are clicked
-   * @param event mouse click event
-   */
-  @HostListener('document:click', ['$event'])
-  onDocumentClick(event: MouseEvent): void {
-    const targetElement = event.target as HTMLElement;
-    if (this.checkMobileView()) {
-      if (
-        (this.activeTab === this.TAB_NAME_TRANSLATION_SUBMITTER) ||
-        (this.activeTab === this.TAB_NAME_TRANSLATION_REVIEWER)
-      ) {
-        if (
-          targetElement &&
-          !this.languageDropdownRef.nativeElement.contains(targetElement)
-        ) {
-          this.languageDropdownShown = false;
-        }
-      }
-      if (
-        targetElement &&
-        !this.activityDropdownRef.nativeElement.contains(targetElement)
-      ) {
-        this.activityDropdownShown = false;
-      }
-    }
   }
 }
 

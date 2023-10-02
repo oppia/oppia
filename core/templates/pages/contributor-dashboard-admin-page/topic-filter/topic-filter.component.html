@@ -1,8 +1,8 @@
-<div class="oppia-same-row-container topic-filter w-100 e2e-test-topic-filter-component">
+<div class="oppia-topic-filter-selector-container topic-filter w-100 e2e-test-topic-filter-component">
   <mat-form-field appearance="fill"
                   class="w-100">
-    <mat-label><b>Topics</b></mat-label>
     <mat-chip-list #chipList aria-label="Topics Filter">
+      <b>Filter by topic: </b>
       <mat-chip *ngFor="let topic of selectedTopics"
                 (removed)="deselectTopic(topic)">
                 {{ topic }}

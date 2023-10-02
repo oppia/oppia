@@ -65,11 +65,14 @@
 .mat-card.oppia-mat-card {
   align-items: baseline;
   display: flex;
-  justify-content: space-around;
+  justify-content: space-between;
   width: 960px;
 }
 .oppia-dashboard-container {
   max-width: 960px;
+}
+.mat-form-field-wrapper {
+  padding-bottom: 0;
 }
 .filter-sub-container {
   display: flex;
@@ -79,8 +82,16 @@
   background: #fff;
   border: 1px solid #ffffff;
   border-radius: 4px;
+  padding-left: 1em;
+  padding-top: 0;
+  padding-bottom: 5px;
 }
-
+.mat-form-field-underline {
+  display: none;
+}
+.example-element-detail {
+  padding-bottom: 10px;
+}
 mat-chip-list .mat-standard-chip {
   background: #fff;
   border: 1px solid #333;
@@ -167,7 +178,6 @@ mat-chip-list .mat-standard-chip .mat-chip-remove {
   display: inline-block;
   justify-content: space-around;
   margin-bottom: 50px;
-  overflow: auto;
 }
 
 .dashboard-content-mobile {
@@ -243,7 +253,16 @@ mat-chip-list .mat-standard-chip .mat-chip-remove {
   position: relative;
   vertical-align: top;
   margin: 10px;
-  height: 60px;
+}
+.oppia-topic-filter-selector-container {
+  background-color: #fff;
+  border-radius: 4px;
+  box-shadow: 0 0 4px rgba(0, 0, 0, 0.25);
+  cursor: pointer;
+  justify-content: space-between;
+  position: relative;
+  vertical-align: top;
+  margin: 10px;
 }
 .oppia-filter-selector-inner-container {
   display: flex;
@@ -322,6 +341,17 @@ mat-chip-list .mat-standard-chip .mat-chip-remove {
   }
   .oppia-filter-selector-inner-container {
     font-size: 16px;
+    display: flex;
+    flex-direction: column;
+  }
+  .selector-icon-div {
+    display: flex;
+    flex-direction: row;
+    justify-content: inherit;
+  }
+  .oppia-filter-selector-container {
+    height: auto;
+    padding: 15px;
   }
   .oppia-contributor-dashboard-main-content
   .stats-card
@@ -385,7 +415,7 @@ mat-chip-list .mat-standard-chip .mat-chip-remove {
     max-width: 1000px;
   }
   .dashboard-content-mobile {
-    align-items: center;
+    align-items: flex-start;
     display: flex;
     flex-direction: column;
   }
@@ -396,6 +426,8 @@ mat-chip-list .mat-standard-chip .mat-chip-remove {
     height: 90px;
     padding: 20px;
     width: 220px;
+    align-self: center;
+    margin-bottom: 20px;
   }
 }
 @media screen and (max-width: 1200px) {

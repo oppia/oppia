@@ -22,7 +22,7 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ContributorAdminDashboardPageComponent } from './contributor-admin-dashboard-page.component';
 import { UserService } from 'services/user.service';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { CommunityContributionStatsBackendDict, CommunityContributionStatsDict, ContributorDashboardAdminStatsBackendApiService } from './services/contributor-dashboard-admin-stats-backend-api.service';
+import { CommunityContributionStatsBackendDict, ContributorDashboardAdminStatsBackendApiService } from './services/contributor-dashboard-admin-stats-backend-api.service';
 
 describe('Contributor dashboard Admin page', () => {
   let component: ContributorAdminDashboardPageComponent;
@@ -167,7 +167,88 @@ describe('Contributor dashboard Admin page', () => {
         question_reviewers_count: 1
       } as CommunityContributionStatsBackendDict));
 
+    spyOn(
+      contributorDashboardAdminStatsBackendApiService,
+      'fetchAssignedLanguageIds')
+      .and.returnValue(Promise.resolve(['en', 'ar']));
+
+    spyOn(
+      contributorDashboardAdminStatsBackendApiService,
+      'fetchTopicsData')
+      .and.returnValue(Promise.resolve([
+        { id: '1', topic: 'Science' },
+        { id: '2', topic: 'Technology' },
+      ]));
+    fixture.detectChanges();
+
     component.ngOnInit();
+  }));
+
+  afterEach(() => {
+    fixture.destroy();
+  });
+
+  it('should initialize variables onInit', fakeAsync(() => {
+    spyOn(userService, 'getUserInfoAsync').and.returnValue(
+      Promise.resolve(fullAccessUserInfo));
+    component.ngOnInit();
+    tick();
+    fixture.detectChanges();
+    expect(component.assignedLanguageIds).toEqual(['en', 'ar']);
+    expect(component.selectedLanguage).toEqual('English');
+    expect(component.selectedLanguageId).toEqual('en');
+  }));
+
+  it('should open language dropdown', () => {
+    expect(component.languageDropdownShown).toBeFalse();
+    component.toggleLanguageDropdown();
+    expect(component.languageDropdownShown).toBeTrue();
+  });
+
+  it('should open last activity dropdown', fakeAsync(() => {
+    expect(component.activityDropdownShown).toBeFalse();
+    component.toggleActivityDropdown();
+    expect(component.activityDropdownShown).toBeTrue();
+  }));
+
+  it('should select language from dropdown', fakeAsync(() => {
+    spyOn(userService, 'getUserInfoAsync').and.returnValue(
+      Promise.resolve(fullAccessUserInfo));
+    component.ngOnInit();
+    tick();
+    fixture.detectChanges();
+    expect(component.selectedLanguage).toBe('English');
+    expect(component.selectedLanguageId).toBe('en');
+    component.selectLanguage('العربية (Arabic)');
+    expect(component.selectedLanguage).toBe('العربية (Arabic)');
+    expect(component.selectedLanguageId).toBe('ar');
+  }));
+
+  it('should select last activity from dropdown', fakeAsync(() => {
+    spyOn(userService, 'getUserInfoAsync').and.returnValue(
+      Promise.resolve(fullAccessUserInfo));
+    component.ngOnInit();
+    tick();
+    fixture.detectChanges();
+    expect(component.selectedLastActivity).toEqual(0);
+    component.selectLastActivity(7);
+    expect(component.selectedLastActivity).toEqual(7);
+    component.selectLastActivity(0);
+    expect(component.selectedLastActivity).toEqual(0);
+  }));
+
+  it('should apply topic filter', fakeAsync(() => {
+    component.ngOnInit();
+    tick();
+    component.selectedTopics = ['Science', 'Technology'];
+    component.topics = [
+      { id: '1', topic: 'Science' },
+      { id: '2', topic: 'Technology' },
+    ];
+    fixture.detectChanges();
+    tick();
+    component.applyTopicFilter();
+    expect(component.selectedTopicsIds).toEqual(['1', '2']);
   }));
 
   it('should evaluate active tab', () => {
@@ -216,6 +297,6 @@ describe('Contributor dashboard Admin page', () => {
     component.ngOnInit();
     tick();
     fixture.detectChanges();
-    expect(component.CONTRIBUTION_TYPES).toBeUndefined();
+    expect(component.CONTRIBUTION_TYPES).toEqual([]);
   }));
 });

@@ -101,10 +101,8 @@ describe('Contributor Admin Dashboard', function() {
     await adminPage.addRole('management', 'release coordinator');
     await adminPage.addRole('question', 'question coordinator');
     await adminPage.makeUserTranslationCoordinator('translation', 'English');
-    await adminPage.makeUserTranslationCoordinator(
-      'translation', 'shqip (Albanian)');
-    await adminPage.makeUserTranslationCoordinator(
-      'translation', 'العربية (Arabic)');
+    await adminPage.addLanguageToCoordinator('translation', 'shqip (Albanian)');
+    await adminPage.addLanguageToCoordinator('translation', 'العربية (Arabic)');
     await adminPage.addRole('question', 'translation admin');
     await users.logout();
 

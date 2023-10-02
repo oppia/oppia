@@ -32,7 +32,8 @@ import { QuestionReviewerStats, QuestionSubmitterStats, TranslationReviewerStats
   templateUrl: './contributor-admin-stats-table.component.html',
   animations: [
     trigger('detailExpand', [
-      state('collapsed', style({height: '0px', minHeight: '0'})),
+      state('collapsed', style(
+        {height: '0px', minHeight: '0', paddingBottom: '0'})),
       state('expanded', style({height: '*'})),
       transition(
         'expanded <=> collapsed',
@@ -132,6 +133,7 @@ export class ContributorAdminStatsTable implements OnInit {
           'overallAccuracy',
           'submittedTranslationsCount',
           'lastContributedInDays',
+          'role',
           'chevron'
         ];
       }
@@ -149,7 +151,7 @@ export class ContributorAdminStatsTable implements OnInit {
             this.loadingMessage = '';
             this.noDataMessage = '';
             if (this.dataSource.length === 0) {
-              this.noDataMessage = 'No stats to display';
+              this.noDataMessage = 'No statistics to display';
             }
           });
     } else if (this.activeTab === this.TAB_NAME_TRANSLATION_REVIEWER) {
@@ -165,6 +167,7 @@ export class ContributorAdminStatsTable implements OnInit {
           'contributorName',
           'reviewedTranslationsCount',
           'lastContributedInDays',
+          'role',
           'chevron'
         ];
       }
@@ -182,7 +185,7 @@ export class ContributorAdminStatsTable implements OnInit {
             this.loadingMessage = '';
             this.noDataMessage = '';
             if (this.dataSource.length === 0) {
-              this.noDataMessage = 'No stats to display';
+              this.noDataMessage = 'No statistics to display';
             }
           });
     } else if (this.activeTab === this.TAB_NAME_QUESTION_SUBMITTER) {
@@ -202,6 +205,7 @@ export class ContributorAdminStatsTable implements OnInit {
           'overallAccuracy',
           'submittedQuestionsCount',
           'lastContributedInDays',
+          'role',
           'chevron'
         ];
       }
@@ -219,7 +223,7 @@ export class ContributorAdminStatsTable implements OnInit {
             this.loadingMessage = '';
             this.noDataMessage = '';
             if (this.dataSource.length === 0) {
-              this.noDataMessage = 'No stats to display';
+              this.noDataMessage = 'No statistics to display';
             }
           });
     } else if (this.activeTab === this.TAB_NAME_QUESTION_REVIEWER) {
@@ -235,6 +239,7 @@ export class ContributorAdminStatsTable implements OnInit {
           'contributorName',
           'reviewedQuestionsCount',
           'lastContributedInDays',
+          'role',
           'chevron'
         ];
       }
@@ -252,7 +257,7 @@ export class ContributorAdminStatsTable implements OnInit {
             this.loadingMessage = '';
             this.noDataMessage = '';
             if (this.dataSource.length === 0) {
-              this.noDataMessage = 'No stats to display';
+              this.noDataMessage = 'No statistics to display';
             }
           });
     }

@@ -233,7 +233,7 @@ var ContributorDashboardAdminPage = function() {
   };
 
   this.expectStatsElementCountToBe = async function(elementsCount) {
-    await waitFor.visibilityOf(statsTable, 'stats table is not visible');
+    await waitFor.presenceOf(statsTable, 'stats table is not visible');
     var statsListItems = await statsListItemsSelector();
     expect(statsListItems.length).toBe(elementsCount);
   };
