@@ -126,26 +126,26 @@
           </div>
           <div *ngIf="!chapterOutlineIsShown">
             <div class="outline-content-hover" *ngIf="!oldOutlineToReadOnly" style="margin-left: 50px; width: 400px;">
-              <input id="chapter-outline-editor-content-id" 
+              <input id="chapter-outline-editor-content-id"
                      class="chapter-outline-editor-content outline-content-hover e2e-test-node-outline-editor-content e2e-test-rte"
-                     readonly 
+                     readonly
                      style="cursor: pointer; width: 380px;"
-                     (click)="chapterOutlineIsShown=true" 
+                     (click)="chapterOutlineIsShown=true"
                      placeholder="Open chapter outline editor.">
-              <label for="chapter-outline-editor-content-id" 
-                     class="fas fa-pencil-alt oppia-icon" 
-                     (click)="chapterOutlineIsShown=true" 
+              <label for="chapter-outline-editor-content-id"
+                     class="fas fa-pencil-alt oppia-icon"
+                     (click)="chapterOutlineIsShown=true"
                      style="cursor: pointer;  float: right;"><label>
-            </div> 
+            </div>
             <div *ngIf="oldOutlineToReadOnly" >
-              <button class="chapter-outline-editor-content outline-content-hover e2e-test-node-outline-editor-content e2e-test-rte" 
+              <button class="chapter-outline-editor-content outline-content-hover e2e-test-node-outline-editor-content e2e-test-rte"
                       (click)="chapterOutlineIsShown=true"
                       style="margin-left: 50px; width: 400px;">{{oldOutlineToReadOnly}}
-                <label class="fas fa-pencil-alt oppia-icon" 
-                       (click)="chapterOutlineIsShown=true" 
+                <label class="fas fa-pencil-alt oppia-icon"
+                       (click)="chapterOutlineIsShown=true"
                        style="cursor: pointer; float: right"></label>
-              </button>  
-            </div>     
+              </button>
+            </div>
           </div>
           <br>
           <div class="chapter-card-inputs oppia-mobile-collapsible-card-content" *ngIf="chapterOutlineIsShown">
@@ -154,7 +154,7 @@
                                    [schema]="OUTLINE_SCHEMA"
                                    [localValue]="editableOutline"
                                    (localValueChange)="updateLocalEditableOutline($event);"
-				                           (click)="chapterOutlineButtonsAreShown=true; ">
+                                   (click)="chapterOutlineButtonsAreShown=true; ">
               </schema-based-editor>
               <div class="save-button-container" *ngIf="chapterOutlineButtonsAreShown">
                 <button type="button" class="btn btn-default" (click)="onCancelButtonClicked();">Cancel</button>
@@ -387,7 +387,7 @@
 
 <style>
   .chapter-outline-editor-content {
-    background: #ffffff;
+    background: #fff;
     border: none;
     outline: none;
     text-align: left;

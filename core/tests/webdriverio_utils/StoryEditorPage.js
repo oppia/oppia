@@ -470,7 +470,7 @@ var StoryEditorPage = function() {
     var chapterTitleButton = chapterTitles[index];
     await action.click('Chapter Title Button', chapterTitleButton);
   };
-  
+
   this.expectNodeOutlineToMatch = async function(nodeOutline) {
     var nodeOutlineEditorRteContent = (
       await nodeOutlineEditorRteContentSelector());
