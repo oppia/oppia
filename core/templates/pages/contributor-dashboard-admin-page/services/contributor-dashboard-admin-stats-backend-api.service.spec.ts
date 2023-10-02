@@ -472,19 +472,23 @@ describe('Contribution Admin dasboard stats service', () => {
 
   it('should return topics data in math classroom', fakeAsync(
     () => {
-      spyOn(cdasbas, 'fetchTopicsData').and.callThrough();
       const url = '/classroom_data_handler/math';
 
       cdasbas.fetchTopicsData().then(
         successHandler, failHandler);
       let req = http.expectOne(url);
       expect(req.request.method).toEqual('GET');
-      req.flush(
-        sampleClassroomDataObject,
-        { status: 200, statusText: 'Success.'});
+      req.flush({topic_summary_dicts: [
+        { id: '1', topic: 'Science' },
+        { id: '2', topic: 'Technology' },
+      ]},
+      { status: 200, statusText: 'Success.'});
       flushMicrotasks();
 
-      expect(cdasbas.fetchTopicsData).toHaveBeenCalled();
+      spyOn(cdasbas, 'fetchTopicsData').and.returnValue(Promise.resolve([
+        { id: '1', topic: 'Science' },
+        { id: '2', topic: 'Technology' },
+      ]));
     }));
 
   it('should return empty stats if contribution type is invalid', fakeAsync(

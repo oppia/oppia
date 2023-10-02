@@ -57,9 +57,9 @@
       </div>
       <div class="filter-container">
         <div class="language-selector-container" *ngIf="(activeTab === TAB_NAME_TRANSLATION_SUBMITTER) || (activeTab === TAB_NAME_TRANSLATION_REVIEWER)">
-          <div #languageDropdown class="oppia-filter-selector-container e2e-test-language-selector">
-            <div class="oppia-filter-selector-inner-container e2e-test-language-selector-selected"
-                 (click)="toggleLanguageDropdown()">
+          <div #languageDropdown class="oppia-filter-selector-container e2e-test-language-selector"
+               (click)="toggleLanguageDropdown()">
+            <div class="oppia-filter-selector-inner-container e2e-test-language-selector-selected">
               <b>Language: </b>{{selectedLanguage}}
               <span class="fas fa-caret-down oppia-filter-selector-inner-container-arrow"
                     [@languageDropdown]="languageDropdownShown ? 'expanded' : 'collapsed'">
@@ -78,9 +78,9 @@
         </div>
         <div class="filter-sub-container">
           <div class="last-activity-selector-container">
-            <div #activityDropdown  class="oppia-filter-selector-container e2e-test-last-activity-selector">
-              <div class="oppia-filter-selector-inner-container e2e-test-last-activity-selector-selected"
-                   (click)="toggleActivityDropdown()">
+            <div #activityDropdown  class="oppia-filter-selector-container e2e-test-last-activity-selector"
+                 (click)="toggleActivityDropdown()">
+              <div class="oppia-filter-selector-inner-container e2e-test-last-activity-selector-selected">
                 <b>Filter by last activity: </b>
                    {{ selectedLastActivity ? 'Within past ' + selectedLastActivity + ' days' : 'All time' }}
                 <span class="fas fa-caret-down oppia-filter-selector-inner-container-arrow"
@@ -124,9 +124,8 @@
       </div>
       <div class="filter-container">
         <div class="language-selector-container" *ngIf="(activeTab === TAB_NAME_TRANSLATION_SUBMITTER) || (activeTab === TAB_NAME_TRANSLATION_REVIEWER)">
-          <div #languageDropdown class="oppia-filter-selector-container e2e-test-topic-selector">
-            <div class="oppia-filter-selector-inner-container e2e-test-topic-selector-selected"
-                 (click)="toggleLanguageDropdown()">
+          <div #languageDropdown class="oppia-filter-selector-container e2e-test-topic-selector" (click)="toggleLanguageDropdown()">
+            <div class="oppia-filter-selector-inner-container e2e-test-topic-selector-selected">
               <b class="required">Language: </b>
               <div class="selector-icon-div">
                 {{selectedLanguage}}
@@ -147,9 +146,8 @@
           </div>
         </div>
         <div class="last-activity-selector-container">
-          <div #activityDropdown  class="oppia-filter-selector-container e2e-test-topic-selector">
-            <div class="oppia-filter-selector-inner-container e2e-test-topic-selector-selected"
-                 (click)="toggleActivityDropdown()">
+          <div #activityDropdown  class="oppia-filter-selector-container e2e-test-topic-selector" (click)="toggleActivityDropdown()">
+            <div class="oppia-filter-selector-inner-container e2e-test-topic-selector-selected">
               <b *ngIf="activeTab === TAB_NAME_TRANSLATION_SUBMITTER">Last Translated:</b>
               <b *ngIf="(activeTab === TAB_NAME_TRANSLATION_REVIEWER) || (activeTab === TAB_NAME_QUESTION_REVIEWER)">Last Reviewed:</b>
               <b *ngIf="activeTab === TAB_NAME_QUESTION_SUBMITTER">Last Submitted:</b>
