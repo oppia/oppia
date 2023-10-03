@@ -24,7 +24,7 @@ import { UserService } from 'services/user.service';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { CommunityContributionStatsBackendDict, ContributorDashboardAdminStatsBackendApiService } from './services/contributor-dashboard-admin-stats-backend-api.service';
 
-fdescribe('Contributor dashboard Admin page', () => {
+describe('Contributor dashboard Admin page', () => {
   let component: ContributorAdminDashboardPageComponent;
   let fixture: ComponentFixture<ContributorAdminDashboardPageComponent>;
   let contributorDashboardAdminStatsBackendApiService: (
