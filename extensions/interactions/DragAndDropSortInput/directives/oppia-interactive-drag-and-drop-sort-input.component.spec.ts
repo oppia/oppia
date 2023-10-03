@@ -192,14 +192,14 @@ describe('Drag and drop sort input interactive component', () => {
         component.handleKeyDownmultipleItemsInSamePosition(event, currentIndex);
         expect(component.setFocus).toHaveBeenCalled();
         expect(component.activeItem).toBe(0);
-    });
+      });
 
     it('should retain currentIndex when ArrowUp key is pressed', () => {
       const event = new KeyboardEvent('keydown', { key: 'ArrowUp' });
       const currentIndex = 0;
       component.activeItem = 0;
-      component.listItems = component.listItems
-       = new QueryList<ElementRef<HTMLDivElement>>();
+      component.listItems = component.listItems =
+       new QueryList<ElementRef<HTMLDivElement>>();
       component.listItems.reset([
         new ElementRef(document.createElement('div')),
         new ElementRef(document.createElement('div')),
@@ -211,8 +211,9 @@ describe('Drag and drop sort input interactive component', () => {
       expect(component.activeItem).toBe(0);
     });
     it('should increment newIndex when Tab key is pressed', () => {
-      const event = new KeyboardEvent('keydown',
-       { key: 'Tab', shiftKey: false });
+      const event = new KeyboardEvent(
+        'keydown',
+        { key: 'Tab', shiftKey: false });
       const currentIndex = 1;
       component.activeItem = 1;
       component.listItems = component.listItems = new QueryList<ElementRef<HTMLDivElement>>();
