@@ -175,8 +175,9 @@ describe('Drag and drop sort input interactive component', () => {
       expect(component.setFocus).toHaveBeenCalled();
       expect(component.activeItem).toBe(currentIndex - 1);
     });
-  
-    it('should reset newIndex when ArrowDown key is pressed and activeItem is at the end of the list', () => {
+
+    it('should reset newIndex when ArrowDown key is pressed',
+     () => {
       const event = new KeyboardEvent('keydown', { key: 'ArrowDown' });
       const currentIndex = 2;
       component.activeItem = 2;
