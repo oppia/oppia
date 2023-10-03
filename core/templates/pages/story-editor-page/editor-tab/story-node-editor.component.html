@@ -149,7 +149,11 @@
                                    (click)="chapterOutlineButtonsAreShown=true; ">
               </schema-based-editor>
               <div class="save-button-container" *ngIf="chapterOutlineButtonsAreShown">
-                <button type="button" class="btn btn-default" (click)="onCancelButtonClicked();">Cancel</button>
+                <button type="button"
+                        class="btn btn-default e2e-test-node-outline-cancel-button"
+                        (click)="onCancelButtonClicked();">
+                  Cancel
+                </button>
                 <button type="button"
                         class="btn btn-success save-button e2e-test-node-outline-save-button"
                         [disabled]="!isOutlineModified(editableOutline)"
