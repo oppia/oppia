@@ -181,21 +181,6 @@ jobs:
       - name: (Artifact re-build) Build Webpack
         if: steps.download_artifact_1.outcome == 'failure'
         run: python -m scripts.build --prod_env
-      - name: (Artifact re-build) Zip build files
-        if: steps.download_artifact_1.outcome == 'failure'
-        run: |
-          zip -rqy build_files.zip oppia/third_party oppia_tools oppia/build oppia/webpack_bundles oppia/proto_files oppia/app.yaml oppia/assets/hashes.json oppia/proto_files oppia/extensions/classifiers/proto/* oppia/backend_prod_files oppia/dist
-        working-directory: /home/runner/work/oppia
-      - name: (Artifact re-build) Upload build files 
-        if: steps.download_artifact_1.outcome == 'failure'
-        uses: actions/upload-artifact@v3
-        with:
-          name: build_files
-          path: /home/runner/work/oppia/build_files.zip
-          retention-days: 1
-      - name: (artifact re-build) Remove build_files.zip
-        if: steps.download_artifact_1.outcome == 'failure'
-        run: rm build_files.zip
       - name: Run E2E Test ${{ matrix.suite }}
         run: xvfb-run -a --server-args="-screen 0, 1285x1000x24" python -m scripts.run_e2e_tests --skip-install --skip-build --suite=${{ matrix.suite }} --prod_env
         env:
@@ -249,12 +234,15 @@ jobs:
             ${{ runner.os }}-build-${{ env.cache-name }}-
             ${{ runner.os }}-build-
             ${{ runner.os }}-
-      - name: Download build files artifact
+      - name: Attempt to download build files artifact
+        id: download_artifact_1
         uses: actions/download-artifact@v3
+        continue-on-error: true
         with:
           name: build_files
           path: /home/runner/work/oppia/
       - name: Unzip build files
+        if: steps.download_artifact_1.outcome != 'failure'
         run: |
           ls -la
           unzip build_files.zip
@@ -271,6 +259,21 @@ jobs:
           ls -la oppia/third_party
         working-directory: /home/runner/work/oppia
         shell: bash
+      - name: (Artifact re-build) Cache third_party/static
+        if: steps.download_artifact_1.outcome == 'failure'
+        uses: actions/cache@v3
+        env:
+          cache-name: cache-node-modules
+        with:
+          path: /home/runner/work/oppia/oppia/third_party/static
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('dependencies.json') }}
+          restore-keys: |
+            ${{ runner.os }}-build-${{ env.cache-name }}-
+            ${{ runner.os }}-build-
+            ${{ runner.os }}-
+      - name: (Artifact re-build) Build Webpack
+        if: steps.download_artifact_1.outcome == 'failure'
+        run: python -m scripts.build --prod_env
       - uses: ./.github/actions/install-oppia-dependencies
       - name: Install chrome
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
@@ -364,21 +367,6 @@ jobs:
         - name: (Artifact re-build) Build Webpack
           if: steps.download_artifact_1.outcome == 'failure'
           run: python -m scripts.build --prod_env
-        - name: (Artifact re-build) Zip build files
-          if: steps.download_artifact_1.outcome == 'failure'
-          run: |
-            zip -rqy build_files.zip oppia/third_party oppia_tools oppia/build oppia/webpack_bundles oppia/proto_files oppia/app.yaml oppia/assets/hashes.json oppia/proto_files oppia/extensions/classifiers/proto/* oppia/backend_prod_files oppia/dist
-          working-directory: /home/runner/work/oppia
-        - name: (Artifact re-build) Upload build files 
-          if: steps.download_artifact_1.outcome == 'failure'
-          uses: actions/upload-artifact@v3
-          with:
-            name: build_files
-            path: /home/runner/work/oppia/build_files.zip
-            retention-days: 1
-        - name: (artifact re-build) Remove build_files.zip
-          if: steps.download_artifact_1.outcome == 'failure'
-          run: rm build_files.zip
         - name: Run Acceptance Test ${{ matrix.suite }}
           run: xvfb-run -a --server-args="-screen 0, 1285x1000x24" python -m scripts.run_acceptance_tests --skip-build --suite=${{ matrix.suite }} --prod_env
         - name: Uploading webpack bundles as an artifact
