@@ -318,22 +318,19 @@ export class ContributorDashboardAdminStatsBackendApiService {
     });
   }
 
-  async fetchTopicsData(): Promise<TopicChoice[]> {
+  async fetchTopicChoices(): Promise<TopicChoice[]> {
     let classroomDataUrl = this.urlInterpolationService.interpolateUrl(
       ClassroomDomainConstants.CLASSROOOM_DATA_URL_TEMPLATE, {
         classroom_url_fragment: 'math'
       });
-
     const response = await this.http
       .get<ClassroomDataBackendDict>(classroomDataUrl)
       .toPromise();
-
     const topicChoices: TopicChoice[] = response.topic_summary_dicts.map(
       (obj) => ({
         id: obj.id,
         topic: obj.name
       }));
-
     return topicChoices;
   }
 }

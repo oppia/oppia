@@ -22,8 +22,6 @@ import { ContributorDashboardAdminStatsBackendApiService } from './contributor-d
 import { ContributorAdminDashboardFilter } from '../contributor-admin-dashboard-filter.model';
 import { AppConstants } from 'app.constants';
 import { CsrfTokenService } from 'services/csrf-token.service';
-import { ClassroomData } from 'domain/classroom/classroom-data.model';
-import { CreatorTopicSummaryBackendDict } from 'domain/topic/creator-topic-summary.model';
 
 describe('Contribution Admin dasboard stats service', () => {
   let cdasbas: ContributorDashboardAdminStatsBackendApiService;
@@ -410,7 +408,7 @@ describe('Contribution Admin dasboard stats service', () => {
     () => {
       const url = '/classroom_data_handler/math';
 
-      cdasbas.fetchTopicsData().then(
+      cdasbas.fetchTopicChoices().then(
         successHandler, failHandler);
       let req = http.expectOne(url);
       expect(req.request.method).toEqual('GET');
@@ -421,7 +419,7 @@ describe('Contribution Admin dasboard stats service', () => {
       { status: 200, statusText: 'Success.'});
       flushMicrotasks();
 
-      spyOn(cdasbas, 'fetchTopicsData').and.returnValue(Promise.resolve([
+      spyOn(cdasbas, 'fetchTopicChoices').and.returnValue(Promise.resolve([
         { id: '1', topic: 'Science' },
         { id: '2', topic: 'Technology' },
       ]));

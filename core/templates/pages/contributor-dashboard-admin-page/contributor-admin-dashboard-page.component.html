@@ -15,7 +15,7 @@
       [ngClass]="{'oppia-contributor-dashboard-mobile-mode': checkMobileView()}">
       <mat-card layout="row" class="oppia-mat-card">
         <div class="translation-reviewer stats-card" [attr.aria-label]="'Translation Reviewer '" tabindex="0" *ngIf="isTranslationCoordinator">
-          <p class="stat-description">Translation<br>Reviewers [{{selectedLanguage}}]</p>
+          <p class="stat-description">Translation<br>Reviewers [{{selectedLanguage.language}}]</p>
           <h2 class="stat-value-with-rating e2e-test-oppia-average-rating">
             {{ translationReviewersCount ? translationReviewersCount : 0 }}
           </h2>
@@ -30,7 +30,7 @@
     </div>
   </div>
   <div class="dashboard-content">
-    <div class="dashboard-content-primary">
+    <div class="dashboard-content-primary" *ngIf="!checkMobileView()">
       <div>
         <ul class="dashboard-tabs">
           <li [ngClass]="{'dashboard-tabs-active': activeTab === TAB_NAME_TRANSLATION_SUBMITTER}" *ngIf="isTranslationCoordinator">
@@ -60,17 +60,17 @@
           <div #languageDropdown class="oppia-filter-selector-container e2e-test-language-selector"
                (click)="toggleLanguageDropdown()">
             <div class="oppia-filter-selector-inner-container e2e-test-language-selector-selected">
-              <b>Language: </b>{{selectedLanguage}}
+              <b>Language: </b>{{selectedLanguage.language}}
               <span class="fas fa-caret-down oppia-filter-selector-inner-container-arrow"
-                    [@languageDropdown]="languageDropdownShown ? 'expanded' : 'collapsed'">
+                    [@languageDropdownTrigger]="languageDropdownShown ? 'expanded' : 'collapsed'">
               </span>
             </div>
             <div *ngIf="languageDropdownShown"
                  class="oppia-filter-selector-dropdown-container e2e-test-language-selector-dropdown">
               <div class="oppia-filter-selector-dropdown-option e2e-test-language-selector-option"
-                   *ngFor="let option of languages"
+                   *ngFor="let option of languageChoices"
                    (click)="selectLanguage(option.language)"
-                   [ngClass]="{'oppia-filter-selector-dropdown-option-selected' : option === selectedLanguage}">
+                   [ngClass]="{'oppia-filter-selector-dropdown-option-selected' : option === selectedLanguage.language}">
                 {{option.language}}
               </div>
             </div>
@@ -90,7 +90,7 @@
               <div *ngIf="activityDropdownShown"
                    class="oppia-filter-selector-dropdown-container e2e-test-last-activity-selector-dropdown">
                 <div class="oppia-filter-selector-dropdown-option e2e-test-last-activity-selector-option"
-                     *ngFor="let option of lastActivty"
+                     *ngFor="let option of lastActivity"
                      (click)="selectLastActivity(option)"
                      [ngClass]="{'oppia-filter-selector-dropdown-option-selected' : option === selectedLastActivity}">
                   {{ option ? 'Within past ' + option + ' days' : 'All time' }}
@@ -102,7 +102,7 @@
             <oppia-topic-filter
               *ngIf="(activeTab === TAB_NAME_TRANSLATION_SUBMITTER) || (activeTab === TAB_NAME_QUESTION_SUBMITTER)"
               [(listOfDefaultTopics)]="allTopicNames"
-              [(selectedTopics)]="selectedTopics"
+              [(selectedTopics)]="selectedTopics.topics"
               (selectionsChange)="applyTopicFilter()">
             </oppia-topic-filter>
           </div>
@@ -124,29 +124,29 @@
       </div>
       <div class="filter-container">
         <div class="language-selector-container" *ngIf="(activeTab === TAB_NAME_TRANSLATION_SUBMITTER) || (activeTab === TAB_NAME_TRANSLATION_REVIEWER)">
-          <div #languageDropdown class="oppia-filter-selector-container e2e-test-topic-selector" (click)="toggleLanguageDropdown()">
+          <div class="oppia-filter-selector-container e2e-test-topic-selector" (click)="toggleLanguageDropdown()">
             <div class="oppia-filter-selector-inner-container e2e-test-topic-selector-selected">
               <b class="required">Language: </b>
               <div class="selector-icon-div">
-                {{selectedLanguage}}
+                {{selectedLanguage.language}}
                 <span class="fas fa-caret-down oppia-filter-selector-inner-container-arrow"
-                      [@languageDropdown]="languageDropdownShown ? 'expanded' : 'collapsed'">
+                      [@languageDropdownTrigger]="languageDropdownShown ? 'expanded' : 'collapsed'">
                 </span>
               </div>
             </div>
             <div *ngIf="languageDropdownShown"
                  class="oppia-filter-selector-dropdown-container e2e-test-topic-selector-dropdown">
               <div class="oppia-filter-selector-dropdown-option e2e-test-topic-selector-option"
-                   *ngFor="let option of languages"
+                   *ngFor="let option of languageChoices"
                    (click)="selectLanguage(option.language)"
-                   [ngClass]="{'oppia-filter-selector-dropdown-option-selected' : option === selectedLanguage}">
+                   [ngClass]="{'oppia-filter-selector-dropdown-option-selected' : option === selectedLanguage.language}">
                 {{option.language}}
               </div>
             </div>
           </div>
         </div>
         <div class="last-activity-selector-container">
-          <div #activityDropdown  class="oppia-filter-selector-container e2e-test-topic-selector" (click)="toggleActivityDropdown()">
+          <div class="oppia-filter-selector-container e2e-test-topic-selector" (click)="toggleActivityDropdown()">
             <div class="oppia-filter-selector-inner-container e2e-test-topic-selector-selected">
               <b *ngIf="activeTab === TAB_NAME_TRANSLATION_SUBMITTER">Last Translated:</b>
               <b *ngIf="(activeTab === TAB_NAME_TRANSLATION_REVIEWER) || (activeTab === TAB_NAME_QUESTION_REVIEWER)">Last Reviewed:</b>
@@ -161,7 +161,7 @@
             <div *ngIf="activityDropdownShown"
                  class="oppia-filter-selector-dropdown-container e2e-test-topic-selector-dropdown">
               <div class="oppia-filter-selector-dropdown-option e2e-test-topic-selector-option"
-                   *ngFor="let option of lastActivty"
+                   *ngFor="let option of lastActivity"
                    (click)="selectLastActivity(option)"
                    [ngClass]="{'oppia-filter-selector-dropdown-option-selected' : option === selectedLastActivity}">
                 {{ option ? 'Within past ' + option + ' days' : 'All time' }}
@@ -173,7 +173,7 @@
           <oppia-topic-filter
             *ngIf="(activeTab === TAB_NAME_TRANSLATION_SUBMITTER) || (activeTab === TAB_NAME_QUESTION_SUBMITTER)"
             [(listOfDefaultTopics)]="allTopicNames"
-            [(selectedTopics)]="selectedTopics"
+            [(selectedTopics)]="selectedTopics.topics"
             (selectionsChange)="applyTopicFilter()">
           </oppia-topic-filter>
         </div>

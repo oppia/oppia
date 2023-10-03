@@ -24,7 +24,7 @@ import { UserService } from 'services/user.service';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { CommunityContributionStatsBackendDict, ContributorDashboardAdminStatsBackendApiService } from './services/contributor-dashboard-admin-stats-backend-api.service';
 
-describe('Contributor dashboard Admin page', () => {
+fdescribe('Contributor dashboard Admin page', () => {
   let component: ContributorAdminDashboardPageComponent;
   let fixture: ComponentFixture<ContributorAdminDashboardPageComponent>;
   let contributorDashboardAdminStatsBackendApiService: (
@@ -174,7 +174,7 @@ describe('Contributor dashboard Admin page', () => {
 
     spyOn(
       contributorDashboardAdminStatsBackendApiService,
-      'fetchTopicsData')
+      'fetchTopicChoices')
       .and.returnValue(Promise.resolve([
         { id: '1', topic: 'Science' },
         { id: '2', topic: 'Technology' },
@@ -194,9 +194,8 @@ describe('Contributor dashboard Admin page', () => {
     component.ngOnInit();
     tick();
     fixture.detectChanges();
-    expect(component.assignedLanguageIds).toEqual(['en', 'ar']);
-    expect(component.selectedLanguage).toEqual('English');
-    expect(component.selectedLanguageId).toEqual('en');
+    expect(component.selectedLanguage.language).toEqual('English');
+    expect(component.selectedLanguage.id).toEqual('en');
   }));
 
   it('should open language dropdown', () => {
@@ -217,11 +216,11 @@ describe('Contributor dashboard Admin page', () => {
     component.ngOnInit();
     tick();
     fixture.detectChanges();
-    expect(component.selectedLanguage).toBe('English');
-    expect(component.selectedLanguageId).toBe('en');
+    expect(component.selectedLanguage.language).toBe('English');
+    expect(component.selectedLanguage.id).toBe('en');
     component.selectLanguage('العربية (Arabic)');
-    expect(component.selectedLanguage).toBe('العربية (Arabic)');
-    expect(component.selectedLanguageId).toBe('ar');
+    expect(component.selectedLanguage.language).toBe('العربية (Arabic)');
+    expect(component.selectedLanguage.id).toBe('ar');
   }));
 
   it('should select last activity from dropdown', fakeAsync(() => {
@@ -240,7 +239,7 @@ describe('Contributor dashboard Admin page', () => {
   it('should apply topic filter', fakeAsync(() => {
     component.ngOnInit();
     tick();
-    component.selectedTopics = ['Science', 'Technology'];
+    component.selectedTopics.topics = ['Science', 'Technology'];
     component.topics = [
       { id: '1', topic: 'Science' },
       { id: '2', topic: 'Technology' },
@@ -248,7 +247,7 @@ describe('Contributor dashboard Admin page', () => {
     fixture.detectChanges();
     tick();
     component.applyTopicFilter();
-    expect(component.selectedTopicsIds).toEqual(['1', '2']);
+    expect(component.selectedTopics.ids).toEqual(['1', '2']);
   }));
 
   it('should evaluate active tab', () => {
@@ -299,4 +298,44 @@ describe('Contributor dashboard Admin page', () => {
     fixture.detectChanges();
     expect(component.CONTRIBUTION_TYPES).toEqual([]);
   }));
+
+  it('should correctly show and hide language dropdown when clicked away',
+    fakeAsync(() => {
+      spyOn(component, 'checkMobileView').and.returnValue(false);
+      spyOn(userService, 'getUserInfoAsync').and.returnValue(
+        Promise.resolve(fullAccessUserInfo));
+      let fakeClickAwayEvent = new MouseEvent('click');
+      Object.defineProperty(
+        fakeClickAwayEvent,
+        'target',
+        {value: document.createElement('div')});
+
+      component.toggleLanguageDropdown();
+      component.ngOnInit();
+      tick();
+      component.onDocumentClick(fakeClickAwayEvent);
+      fixture.detectChanges();
+
+      expect(component.languageDropdownShown).toBe(false);
+    }));
+
+  it('should correctly show and hide activity dropdown when clicked away',
+    fakeAsync(() => {
+      spyOn(component, 'checkMobileView').and.returnValue(false);
+      spyOn(userService, 'getUserInfoAsync').and.returnValue(
+        Promise.resolve(fullAccessUserInfo));
+      let fakeClickAwayEvent = new MouseEvent('click');
+      Object.defineProperty(
+        fakeClickAwayEvent,
+        'target',
+        {value: document.createElement('div')});
+
+      component.toggleActivityDropdown();
+      component.ngOnInit();
+      tick();
+      component.onDocumentClick(fakeClickAwayEvent);
+      fixture.detectChanges();
+
+      expect(component.activityDropdownShown).toBe(false);
+    }));
 });

@@ -116,12 +116,12 @@ mat-chip-list .mat-standard-chip .mat-chip-remove {
 .language-selector-container {
   display: inline-block;
   vertical-align: top;
-  width: 35%;
+  width: 40%;
 }
 .last-activity-selector-container {
   display: inline-block;
   vertical-align: top;
-  width: 35%;
+  width: 40%;
 }
 @media (max-width: 815px) {
   .oppia-dashboard-container {
