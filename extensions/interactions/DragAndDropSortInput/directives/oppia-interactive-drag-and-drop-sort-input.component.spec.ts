@@ -177,15 +177,16 @@ describe('Drag and drop sort input interactive component', () => {
     });
 
     it('should reset newIndex when ArrowDown key is pressed',
-     () => {
-      const event = new KeyboardEvent('keydown', { key: 'ArrowDown' });
-      const currentIndex = 2;
-      component.activeItem = 2;
-      component.listItems = component.listItems = new QueryList<ElementRef<HTMLDivElement>>();
-      component.listItems.reset([
-        new ElementRef(document.createElement('div')),
-        new ElementRef(document.createElement('div')),
-        new ElementRef(document.createElement('div')),
+      () => {
+        const event = new KeyboardEvent('keydown', { key: 'ArrowDown' });
+        const currentIndex = 2;
+        component.activeItem = 2;
+        component.listItems = component.listItems = 
+        new QueryList<ElementRef<HTMLDivElement>>();
+        component.listItems.reset([
+          new ElementRef(document.createElement('div')),
+          new ElementRef(document.createElement('div')),
+          new ElementRef(document.createElement('div')),
       ]);
       spyOn(component, 'setFocus');
       component.handleKeyDownmultipleItemsInSamePosition(event, currentIndex);
