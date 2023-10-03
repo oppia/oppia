@@ -22,6 +22,7 @@ enum UserRoles {
   BLOG_ADMIN='BLOG_ADMIN',
   BLOG_POST_EDITOR='BLOG_POST_EDITOR',
   TRANSLATION_ADMIN='TRANSLATION_ADMIN',
+  TRANSLATION_COORDINATOR='TRANSLATION_COORDINATOR',
  }
 
 export interface UserInfoBackendDict {
@@ -104,6 +105,10 @@ export class UserInfo {
 
   isQuestionAdmin(): boolean {
     return this._roles.includes(UserRoles.QUESTION_ADMIN);
+  }
+
+  isTranslationCoordinator(): boolean {
+    return this._roles.includes(UserRoles.TRANSLATION_COORDINATOR);
   }
 
   isQuestionCoordinator(): boolean {

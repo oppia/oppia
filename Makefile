@@ -29,15 +29,16 @@ build: ## Builds the all docker services.
 	docker compose build
 
 run-devserver: # Runs the dev-server
-	docker compose up dev-server -d
+	docker compose up dev-server -d --no-deps
 	$(MAKE) update.requirements
+	docker compose up angular-build -d
 	$(MAKE) update.package
 	$(MAKE) run-offline
 
 run-offline: # Runs the dev-server in offline mode
 	docker compose up dev-server -d
 	@printf 'Please wait while the development server starts...\n\n'
-	@while [[ $$(curl -s -o /tmp/status_code.txt -w '%{http_code}' http://localhost:8181/community-library) != "200" ]]; do \
+	@while [[ $$(curl -s -o /tmp/status_code.txt -w '%{http_code}' http://localhost:8181) != "200" ]] || [[ $$(curl -s -o /tmp/status_code.txt -w '%{http_code}' http://localhost:8181/community-library) != "200" ]]; do \
 		sleep 5; \
 	done
 	@echo 'Development server started at port 8181.'
@@ -78,6 +79,9 @@ logs.%: ## Shows the logs of the given docker service. Example: make logs.datast
 
 restart.%: ## Restarts the given docker service. Example: make restart.datastore
 	docker compose restart $*
+
+run_tests.lints: ## Runs the linter tests
+	docker compose run --no-deps --entrypoint "python -m scripts.linters.pre_commit_linter $(PYTHON_ARGS)" dev-server
 
 run-backend-tests: ## [Not ready for use] Runs the backend tests
 	@echo "Run the backend test on the following module: $(RUN_ARGS)"

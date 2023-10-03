@@ -24,7 +24,6 @@ import { ConfirmOrCancelModal } from 'components/common-layout-directives/common
 @Component({
   selector: 'oppia-blog-author-details-editor',
   templateUrl: './author-detail-editor-modal.component.html',
-  styleUrls: []
 })
 export class BlogAuthorDetailsEditorComponent extends ConfirmOrCancelModal {
   // These properties are initialized using Angular lifecycle hooks
@@ -48,20 +47,40 @@ export class BlogAuthorDetailsEditorComponent extends ConfirmOrCancelModal {
   }
 
   validateAuthorDetails(): string[] {
-    let issues = [];
-    if (this.authorName === '') {
+    let issues: string[] = [];
+    const validAuthorNameRegex = (
+      new RegExp(AppConstants.VALID_AUTHOR_NAME_REGEX)
+    );
+    if (this.authorName.trim().length === 0) {
       issues.push(
         'Author Name should not be empty.');
+    } else if (
+      this.authorName.length < AppConstants.MIN_AUTHOR_NAME_LENGTH) {
+      issues.push(
+        'Author Name should not be less than ' +
+        `${AppConstants.MIN_AUTHOR_NAME_LENGTH} characters.`
+      );
     } else if (
       this.authorName.length > AppConstants.MAX_AUTHOR_NAME_LENGTH) {
       issues.push(
         'Author Name should not be more than ' +
         `${AppConstants.MAX_AUTHOR_NAME_LENGTH} characters.`
       );
+    } else if (
+      !validAuthorNameRegex.test(this.authorName)
+    ) {
+      issues.push(
+        'Author Name can only have alphanumeric characters and spaces.');
     }
-    if (this.authorBio === '') {
+
+    if (this.authorBio.trim().length === 0) {
       issues.push(
         'Author Bio should not be empty.');
+    } else if (this.authorBio.length < AppConstants.MIN_CHARS_IN_AUTHOR_BIO) {
+      issues.push(
+        'Author Bio should not be less than ' +
+        `${AppConstants.MIN_CHARS_IN_AUTHOR_BIO} characters.`
+      );
     } else if (this.authorBio.length > AppConstants.MAX_CHARS_IN_AUTHOR_BIO) {
       issues.push(
         'Author Bio should not be more than ' +

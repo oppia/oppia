@@ -106,12 +106,33 @@ describe('Upload Blog Post Thumbnail Modal Component', () => {
       'Author Name should not be empty.'
     ]);
 
+    component.authorName = 'test_username';
+    component.authorBio = 'general bio';
+    expect(component.validateAuthorDetails().length).toBe(1);
+    expect(component.validateAuthorDetails()).toEqual([
+      'Author Name can only have alphanumeric characters and spaces.'
+    ]);
+
     component.authorName = '';
     component.authorBio = '';
     expect(component.validateAuthorDetails().length).toBe(2);
     expect(component.validateAuthorDetails()).toEqual([
       'Author Name should not be empty.',
       'Author Bio should not be empty.'
+    ]);
+
+    component.authorName = 'A';
+    component.authorBio = 'general bio';
+    expect(component.validateAuthorDetails().length).toBe(1);
+    expect(component.validateAuthorDetails()).toEqual([
+      'Author Name should not be less than 2 characters.',
+    ]);
+
+    component.authorName = 'test username';
+    component.authorBio = 'A';
+    expect(component.validateAuthorDetails().length).toBe(1);
+    expect(component.validateAuthorDetails()).toEqual([
+      'Author Bio should not be less than 5 characters.',
     ]);
 
     component.authorName = 'Author name exceeding character limit of 35' +
