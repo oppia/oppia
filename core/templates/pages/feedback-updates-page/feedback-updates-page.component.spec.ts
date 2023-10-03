@@ -170,6 +170,7 @@ describe('Feedback updates page', () => {
     isBlogAdmin: () => false,
     isBlogPostEditor: () => false,
     isQuestionAdmin: () => false,
+    isTranslationCoordinator: () => false,
     canCreateCollections: () => true,
     getPreferredSiteLanguageCode: () =>'en',
     getUsername: () => 'username1',
