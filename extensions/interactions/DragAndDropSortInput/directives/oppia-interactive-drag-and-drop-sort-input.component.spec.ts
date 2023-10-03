@@ -171,49 +171,75 @@ describe('Drag and drop sort input interactive component', () => {
       ];
 
       spyOn(component, 'setFocus');
-
       component.handleKeyDownmultipleItemsInSamePosition(event, currentIndex);
-
       expect(component.setFocus).toHaveBeenCalled();
       expect(component.activeItem).toBe(currentIndex - 1);
     });
-
-    it('should increment newIndex when Tab key is pressed', () => {
-      const event = new KeyboardEvent(
-        'keydown', { key: 'Tab', shiftKey: false });
-      const currentIndex = 1;
-      component.activeItem = 1;
-      component.listItems = new QueryList<ElementRef<HTMLDivElement>>();
+  
+    it('should reset newIndex when ArrowDown key is pressed and activeItem is at the end of the list', () => {
+      const event = new KeyboardEvent('keydown', { key: 'ArrowDown' });
+      const currentIndex = 2;
+      component.activeItem = 2;
+      component.listItems = component.listItems = new QueryList<ElementRef<HTMLDivElement>>();
       component.listItems.reset([
         new ElementRef(document.createElement('div')),
         new ElementRef(document.createElement('div')),
         new ElementRef(document.createElement('div')),
       ]);
-
       spyOn(component, 'setFocus');
-
       component.handleKeyDownmultipleItemsInSamePosition(event, currentIndex);
-
+      expect(component.setFocus).toHaveBeenCalled();
+      expect(component.activeItem).toBe(0);
+    });
+  
+    it('should retain currentIndex when ArrowUp key is pressed and activeItem is at the start of list', () => {
+      const event = new KeyboardEvent('keydown', { key: 'ArrowUp' });
+      const currentIndex = 0;
+      component.activeItem = 0;
+      component.listItems = component.listItems = new QueryList<ElementRef<HTMLDivElement>>();
+      component.listItems.reset([
+        new ElementRef(document.createElement('div')),
+        new ElementRef(document.createElement('div')),
+        new ElementRef(document.createElement('div')),
+      ]);
+      spyOn(component, 'setFocus');
+      component.handleKeyDownmultipleItemsInSamePosition(event, currentIndex);
+      expect(component.setFocus).toHaveBeenCalled();
+      expect(component.activeItem).toBe(0);
+    });
+    it('should increment newIndex when Tab key is pressed', () => {
+      const event = new KeyboardEvent('keydown', { key: 'Tab', shiftKey: false });
+      const currentIndex = 1;
+      component.activeItem = 1;
+      component.listItems = component.listItems = new QueryList<ElementRef<HTMLDivElement>>();
+      component.listItems.reset([
+        new ElementRef(document.createElement('div')),
+        new ElementRef(document.createElement('div')),
+        new ElementRef(document.createElement('div')),
+      ]);
+      spyOn(component, 'setFocus');
+      component.handleKeyDownmultipleItemsInSamePosition(event, currentIndex);
       expect(component.setFocus).toHaveBeenCalled();
       expect(component.activeItem).toBe(currentIndex + 1);
     });
 
-    it('should decrement newIndex when Shift + Tab keys are pressed',
-      () => {
-        const event = new KeyboardEvent(
-          'keydown', { key: 'Tab', shiftKey: true });
-        const currentIndex = 1;
-        component.activeItem = 1;
-
-        spyOn(component, 'setFocus');
-
-        component.handleKeyDownmultipleItemsInSamePosition(event, currentIndex);
-
-        expect(component.setFocus).toHaveBeenCalled();
-        expect(component.activeItem).toBe(currentIndex - 1);
-      });
-  });
-
+    it('should decrement newIndex when Shift + Tab keys are pressed', () => {
+      const event = new KeyboardEvent('keydown', { key: 'Tab', shiftKey: true });
+      const currentIndex = 1;
+      component.activeItem = 1;
+      component.listItems = component.listItems = new QueryList<ElementRef<HTMLDivElement>>();
+      component.listItems.reset([
+        new ElementRef(document.createElement('div')),
+        new ElementRef(document.createElement('div')),
+        new ElementRef(document.createElement('div')),
+      ]);
+      spyOn(component, 'setFocus');
+      component.handleKeyDownmultipleItemsInSamePosition(event, currentIndex);
+      expect(component.setFocus).toHaveBeenCalled();
+      expect(component.activeItem).toBe(currentIndex - 1);
+    });
+  }); 
+  
   describe('when multiple items in the same position are allowed', () => {
     beforeEach(() => {
       fixture = TestBed.createComponent(
