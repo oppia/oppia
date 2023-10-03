@@ -67,7 +67,7 @@ def filter_a(tag: str, name: str, value: str) -> bool:
     return False
 
 
-ATTRS_WHITELIST: Final = {
+ATTRS_ALLOWLIST: Final = {
     'a': filter_a,
     'b': [],
     'blockquote': [],
@@ -108,7 +108,7 @@ def clean(user_submitted_html: str) -> str:
     oppia_custom_tags = (
         rte_component_registry.Registry.get_tag_list_with_attrs())
 
-    core_tags = ATTRS_WHITELIST.copy()
+    core_tags = ATTRS_ALLOWLIST.copy()
     core_tags.update(oppia_custom_tags)
     tag_names = list(core_tags.keys())
 
