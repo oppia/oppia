@@ -4170,9 +4170,11 @@ class TranslationCoordinatorRightsTests(test_utils.GenericTestBase):
             self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL))
 
         self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
-        self.set_translation_coordinators(
-            [user_services.get_username(
-                self.user_id_translationcoordinator)], 'en')
+        self.set_translation_coordinators([
+            user_services.get_username(
+                self.user_id_translationcoordinator
+            )
+        ], 'en')
         self.user_a = user_services.get_user_actions_info(self.user_id_a)
         self.user_b = user_services.get_user_actions_info(self.user_id_b)
         self.user_translationcoordinator = user_services.get_user_actions_info(
@@ -4203,7 +4205,8 @@ class TranslationCoordinatorRightsTests(test_utils.GenericTestBase):
 
         with self.assertRaisesRegex(
             Exception,
-            'UnauthorizedUserException: Could not assign new role.'):
+            'UnauthorizedUserException: Could not assign new role.'
+        ):
             user_services.assign_coordinator(
                 self.user_b, self.user_a, 'en')
 
@@ -4229,9 +4232,11 @@ class TranslationCoordinatorRightsTests(test_utils.GenericTestBase):
 
     def test_reassigning_role_to_same_user(self) -> None:
         with self.assertRaisesRegex(
-            Exception, 'This user already is a coordinator for this language'):
+            Exception, 'This user already is a coordinator for this language.'
+        ):
             user_services.assign_coordinator(
-                self.user_admin, self.user_translationcoordinator, 'en')
+                self.user_admin, self.user_translationcoordinator, 'en'
+            )
 
     def test_assigning_role_to_a_user(self) -> None:
         self.signup('c@example.com', 'C')

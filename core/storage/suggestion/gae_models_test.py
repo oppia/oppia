@@ -6171,7 +6171,6 @@ class TranslationCoordinatorsModelUnitTests(test_utils.GenericTestBase):
             })
 
     def test_get_returns_model_when_it_exists(self) -> None:
-
         translation_coordinators_model = (
             suggestion_models.TranslationCoordinatorsModel.get(
                 self.LANGUAGE_4_ID
@@ -6186,7 +6185,6 @@ class TranslationCoordinatorsModelUnitTests(test_utils.GenericTestBase):
         )
 
     def test_get_model_by_user_id(self) -> None:
-
         translation_coordinators_models = (
             suggestion_models.TranslationCoordinatorsModel.get_by_user(
                 self.USER_ID_2
