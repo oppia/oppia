@@ -3023,8 +3023,10 @@ def assign_coordinator(
             'Guest user is not allowed to assign roles to a user.'
         )
 
-    if (role_services.ACTION_MODIFY_CORE_ROLES_FOR_ANY_ACTIVITY not in
-            committer.actions):
+    if (
+        role_services.ACTION_MODIFY_CORE_ROLES_FOR_ANY_ACTIVITY not in
+            committer.actions
+    ):
         logging.error(
             'User %s tried to allow user %s to be a coordinator of language %s '
             'but was refused permission.' % (
@@ -3051,7 +3053,8 @@ def assign_coordinator(
     else:
         if assignee.user_id in language_rights.coordinator_ids:
             raise Exception(
-                'This user already is a coordinator for this language')
+                'This user already is a coordinator for this language'
+            )
 
         language_rights.coordinator_ids.append(assignee.user_id)
         language_rights.coordinators_count += 1
@@ -3090,8 +3093,10 @@ def deassign_coordinator(
         )
     language_rights = suggestion_models.TranslationCoordinatorsModel.get(
         language_id)
-    if (role_services.ACTION_MODIFY_CORE_ROLES_FOR_ANY_ACTIVITY not in
-            committer.actions):
+    if (
+        role_services.ACTION_MODIFY_CORE_ROLES_FOR_ANY_ACTIVITY not in
+            committer.actions
+    ):
         logging.error(
             'User %s tried to allow user %s to be a coordinator of language %s '
             'but was refused permission.' % (
@@ -3156,12 +3161,16 @@ def get_translation_rights_with_user(user_id: str) -> List[
         the languagesassigned to given user.
     """
     translation_coordinator_models: Sequence[
-        suggestion_models.TranslationCoordinatorsModel] = (
-        suggestion_models.TranslationCoordinatorsModel.get_by_user(user_id))
+        suggestion_models.TranslationCoordinatorsModel
+    ] = (
+        suggestion_models.TranslationCoordinatorsModel.get_by_user(user_id)
+    )
+
     return [
         get_translation_rights_from_model(model)
         for model in translation_coordinator_models
-        if model is not None]
+        if model is not None
+    ]
 
 
 def deassign_user_from_all_languages(

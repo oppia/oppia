@@ -3599,7 +3599,8 @@ class TranslationCoordinatorsModel(base_models.BaseModel):
 
     @classmethod
     def get_by_user(cls, user_id: str) -> Sequence[
-        TranslationCoordinatorsModel]:
+        TranslationCoordinatorsModel
+    ]:
         """Retrieves the rights object for all languages assigned to given user
 
         Args:

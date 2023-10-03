@@ -1654,7 +1654,7 @@ class LearnerGroupsUser:
 
 
 class TranslationCoordinatorStatsDict(TypedDict):
-    """Dict representation of TranslationCoordinatorStats domain object"""
+    """Dict representation of TranslationCoordinatorStats domain object."""
 
     language_id: str
     coordinator_ids: List[str]

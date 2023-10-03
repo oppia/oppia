@@ -421,7 +421,7 @@ describe('Admin roles tab component ', function() {
       ngbModal = TestBed.inject(NgbModal);
     });
 
-    it('should open the TranslationCoordinatorrRoleEditor', fakeAsync(() => {
+    it('should open the TranslationCoordinatorRoleEditor', fakeAsync(() => {
       let modalSpy = spyOn(ngbModal, 'open').and.callFake(() => {
         return ({
           componentInstance: MockNgbModalRef,

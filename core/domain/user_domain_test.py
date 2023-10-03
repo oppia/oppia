@@ -1697,7 +1697,8 @@ class LearnerGroupsUserTest(test_utils.GenericTestBase):
 
 
 class TranslationCoordinatorStatsUnitTests(
-    test_utils.GenericTestBase):
+    test_utils.GenericTestBase
+):
     """Tests for the TranslationCoordinatorStats class."""
 
     expected_stats_dict = {
@@ -1707,7 +1708,7 @@ class TranslationCoordinatorStatsUnitTests(
     }
 
     def test_to_dict(self) -> None:
-        actual_stats = user_domain.TranslationCoordinatorStats( # pylint: disable=line-too-long
+        actual_stats = user_domain.TranslationCoordinatorStats(
             'en',
             ['user1', 'user2'],
             2
