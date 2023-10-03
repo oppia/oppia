@@ -3150,7 +3150,8 @@ def get_translation_rights_from_model(
 
 
 def get_translation_rights_with_user(user_id: str) -> List[
-    user_domain.TranslationCoordinatorStats]:
+    user_domain.TranslationCoordinatorStats
+]:
     """Retrieves the rights object for all languages assigned to given user.
 
     Args:
