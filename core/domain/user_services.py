@@ -3218,7 +3218,7 @@ def check_user_is_coordinator(user_id: str, language_id: str) -> bool:
         bool. True if the user is coordinator or else False.
     """
     model = suggestion_models.TranslationCoordinatorsModel.get(
-            language_id)
+        language_id)
 
     if model is None:
         return False
