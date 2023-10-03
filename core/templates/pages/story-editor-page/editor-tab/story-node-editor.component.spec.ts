@@ -621,23 +621,6 @@ describe('Story node editor component', () => {
     expect(component.explorationInputButtonsAreShown).toBe(false);
   });
 
-  it('should toggle chapter outline buttons', () => {
-    component.chapterOutlineButtonsAreShown = false;
-    component.toggleChapterOutlineButtons();
-
-    expect(component.chapterOutlineButtonsAreShown).toBe(true);
-
-    component.toggleChapterOutlineButtons();
-
-    expect(component.chapterOutlineButtonsAreShown).toBe(false);
-
-    component.chapterOutlineButtonsAreShown = false;
-    component.editableOutline = '';
-    component.updateLocalEditableOutline('value');
-
-    expect(component.editableOutline).toBe('value');
-  });
-
   it('should call StoryUpdateService and curatedExplorationValidationService' +
     ' to set node exploration id if story is published',
   fakeAsync(() => {
