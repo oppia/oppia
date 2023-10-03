@@ -3150,7 +3150,8 @@ def get_translation_rights_from_model(
 
 
 def get_translation_rights_with_user(user_id: str) -> List[
-    user_domain.TranslationCoordinatorStats]:
+    user_domain.TranslationCoordinatorStats
+]:
     """Retrieves the rights object for all languages assigned to given user.
 
     Args:
@@ -3218,7 +3219,7 @@ def check_user_is_coordinator(user_id: str, language_id: str) -> bool:
         bool. True if the user is coordinator or else False.
     """
     model = suggestion_models.TranslationCoordinatorsModel.get(
-            language_id)
+        language_id)
 
     if model is None:
         return False
