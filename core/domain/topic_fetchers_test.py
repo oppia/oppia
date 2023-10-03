@@ -19,6 +19,9 @@
 from __future__ import annotations
 
 from core import feconf
+from core.domain import story_domain
+from core.domain import story_fetchers
+from core.domain import story_services
 from core.domain import topic_domain
 from core.domain import topic_fetchers
 from core.domain import topic_services
@@ -568,3 +571,86 @@ class TopicFetchersUnitTests(test_utils.GenericTestBase):
             topic_fetchers.get_multi_topic_rights(
                 ['invalid_topic_id'], strict=True
             )
+
+    def test_get_all_story_exploration_ids_in_all_topics(self) -> None:
+        topic_id_2 = topic_fetchers.get_new_topic_id()
+        story_id_4 = 'story_4'
+        self.save_new_topic(
+            topic_id_2, self.user_id, name='Name 2',
+            abbreviated_name='name2', url_fragment='name-two',
+            description='Description',
+            canonical_story_ids=[story_id_4], additional_story_ids=[],
+            uncategorized_skill_ids=[], subtopics=[], next_subtopic_id=1)
+        self.save_new_story(story_id_4, self.user_id, topic_id_2)
+
+        exp_ids = ['exp_1', 'exp_2', 'exp_3', 'exp_4']
+        self._add_story_nodes_with_exploration_ids(
+            self.story_id_1, exp_ids[0])
+        self._add_story_nodes_with_exploration_ids(
+            self.story_id_3, *exp_ids[1:3])
+        self._add_story_nodes_with_exploration_ids(
+            story_id_4, exp_ids[3])
+
+        story_exp_ids = topic_fetchers.get_all_story_exploration_ids()
+
+        self.assertItemsEqual(exp_ids, story_exp_ids)
+
+    def test_get_all_story_exploration_ids_in_a_topic_by_name(
+        self
+    ) -> None:
+        topic_2_name = 'Name 2'
+        topic_id_2 = topic_fetchers.get_new_topic_id()
+        story_id_4 = 'story_4'
+        self.save_new_topic(
+            topic_id_2, self.user_id, name=topic_2_name,
+            abbreviated_name='name2', url_fragment='name-two',
+            description='Description',
+            canonical_story_ids=[story_id_4], additional_story_ids=[],
+            uncategorized_skill_ids=[], subtopics=[], next_subtopic_id=1)
+        self.save_new_story(story_id_4, self.user_id, topic_id_2)
+
+        topic_1_exp_ids = ['exp_1', 'exp_2', 'exp_3']
+        topic_2_exp_ids = ['exp_4']
+        self._add_story_nodes_with_exploration_ids(
+            self.story_id_1, topic_1_exp_ids[0])
+        self._add_story_nodes_with_exploration_ids(
+            self.story_id_3, *topic_1_exp_ids[1:3])
+        self._add_story_nodes_with_exploration_ids(
+            story_id_4, topic_2_exp_ids[0])
+
+        story_exp_ids = topic_fetchers.get_all_story_exploration_ids(
+            topic_2_name)
+
+        self.assertItemsEqual(topic_2_exp_ids, story_exp_ids)
+
+    def _add_story_nodes_with_exploration_ids(
+        self,
+        story_id: str,
+        *exp_ids: str
+    ) -> None:
+        """Appends a story node for each exploration id given in exp_ids to the
+        story with story_id.
+
+        Args:
+            story_id: str. ID of the story containing the new node.
+            *exp_ids: str. IDs of the exploration.
+        """
+        for exp_id in exp_ids:
+            story = story_fetchers.get_story_by_id(story_id)
+            node_id = story.story_contents.next_node_id
+
+            story_services.update_story(self.user_id, story_id, [
+                story_domain.StoryChange({
+                    'cmd': story_domain.CMD_ADD_STORY_NODE,
+                    'node_id': node_id,
+                    'title': node_id
+                }),
+                story_domain.StoryChange({
+                    'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+                    'property_name': (
+                        story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
+                    'node_id': node_id,
+                    'old_value': None,
+                    'new_value': exp_id
+                })
+            ], 'Add exploration ' + exp_id + ' to story ' + story_id)

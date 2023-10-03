@@ -174,7 +174,8 @@ def get_topic_from_model(
         topic_model.version, feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION,
         topic_model.meta_tag_content, topic_model.practice_tab_is_displayed,
         topic_model.page_title_fragment_for_web,
-        topic_model.skill_ids_for_diagnostic_test, topic_model.created_on,
+        topic_model.skill_ids_for_diagnostic_test,
+        topic_model.story_exploration_mapping, topic_model.created_on,
         topic_model.last_updated)
 
 
@@ -747,3 +748,27 @@ def get_canonical_story_dicts(
         canonical_story_dicts.append(story_summary_dict)
 
     return canonical_story_dicts
+
+
+def get_all_story_exploration_ids(
+    topic_name: Optional[str] = None
+) -> List[str]:
+    """Returns a list of all exploration ids belonging to each story of the
+    topic, whose name is topic_name.
+
+    Args:
+        topic_name: str|None. The name of the topic to search through. When not
+            provided, all topics are searched through.
+
+    Returns:
+        list(str). A list of all exploration ids belonging to the stories in the
+        topic(s) to search through.
+    """
+    mappings = topic_models.TopicModel.get_all_story_exploration_mappings(
+        topic_name)
+
+    story_exp_ids = set()
+    for mapping in mappings:
+        for exp_ids in mapping.values():
+            story_exp_ids.update(exp_ids)
+    return list(story_exp_ids)

@@ -3644,7 +3644,8 @@ version: 1
         language_code: str = constants.DEFAULT_LANGUAGE_CODE,
         meta_tag_content: str = 'topic meta tag content',
         practice_tab_is_displayed: bool = False,
-        page_title_fragment_for_web: str = 'topic page title'
+        page_title_fragment_for_web: str = 'topic page title',
+        story_exploration_mapping: Optional[Mapping[str, List[str]]] = None
     ) -> topic_domain.Topic:
         """Creates an Oppia Topic and saves it.
 
@@ -3676,6 +3677,11 @@ version: 1
                 displayed.
             page_title_fragment_for_web: str. The page title fragment for the
                 topic.
+            story_exploration_mapping: dict(str, list(str)). A dictionary
+                that maps from the topic's story ids to a list of exploration
+                ids that belong to that story. If not given, the final
+                dictionary will include all the provided story ids, each mapping
+                to an empty list.
 
         Returns:
             Topic. A newly-created topic.
@@ -3702,7 +3708,12 @@ version: 1
             feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION, next_subtopic_id,
             language_code, 0, feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION,
             meta_tag_content, practice_tab_is_displayed,
-            page_title_fragment_for_web, skill_ids_for_diagnostic_test)
+            page_title_fragment_for_web, skill_ids_for_diagnostic_test,
+            story_exploration_mapping or {
+                story_id: []
+                for story_id
+                in (canonical_story_ids or []) + (additional_story_ids or [])
+            })
         topic_services.save_new_topic(owner_id, topic)
         return topic
 

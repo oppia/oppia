@@ -1893,6 +1893,9 @@ class Story:
     def delete_node(self, node_id: str) -> None:
         """Deletes a node with the given node_id.
 
+        NOTE: The caller is responsible for removing the node's exploration_id
+        from this story's corresponding topic.story_exploration_mapping.
+
         Args:
             node_id: str. The id of the node.
 
@@ -2132,6 +2135,9 @@ class Story:
     def rearrange_node_in_story(self, from_index: int, to_index: int) -> None:
         """Rearranges or moves a node in the story content.
 
+        NOTE: The caller is responsible for swapping the nodes' linked
+        exploration ids in the corresponding topic.story_exploration_mapping.
+
         Args:
             from_index: int. The index of the node to move.
             to_index: int. The index at which to insert the moved node.
@@ -2168,6 +2174,9 @@ class Story:
         self, node_id: str, new_exploration_id: str
     ) -> None:
         """Updates the exploration id field of a given node.
+
+        NOTE: The caller is responsible for adding the new_exploration_id to
+        this story's corresponding topic.story_exploration_mapping.
 
         Args:
             node_id: str. The id of the node.

@@ -749,6 +749,7 @@ class AdminHandler(
                     description)
                 story.update_node_exploration_id(
                     '%s%d' % (story_domain.NODE_ID_PREFIX, node_id), exp_id)
+                topic_1.story_exploration_mapping[story.id].append(exp_id)
 
                 if node_id != len(story_node_dicts):
                     story.update_node_destination_node_ids(

@@ -103,7 +103,8 @@ def _create_topic(
         meta_tag_content=topic.meta_tag_content,
         practice_tab_is_displayed=topic.practice_tab_is_displayed,
         page_title_fragment_for_web=topic.page_title_fragment_for_web,
-        skill_ids_for_diagnostic_test=topic.skill_ids_for_diagnostic_test
+        skill_ids_for_diagnostic_test=topic.skill_ids_for_diagnostic_test,
+        story_exploration_mapping=topic.story_exploration_mapping
     )
     commit_cmd_dicts = [commit_cmd.to_dict() for commit_cmd in commit_cmds]
     model.commit(committer_id, commit_message, commit_cmd_dicts)
@@ -507,6 +508,18 @@ def apply_change_list(
                     )
                     topic.update_skill_ids_for_diagnostic_test(
                         update_skill_ids_for_diagnostic_test_cmd.new_value
+                    )
+                elif (change.property_name ==
+                      topic_domain.TOPIC_PROPERTY_STORY_EXPLORATION_MAPPING):
+                    # Here we use cast because this 'elif'
+                    # condition forces change to have type
+                    # UpdateTopicPropertyStoryExplorationMappingCmd.
+                    update_story_exploration_mapping_cmd = cast(
+                        topic_domain.UpdateTopicPropertyStoryExplorationMappingCmd,  # pylint: disable=line-too-long
+                        change
+                    )
+                    topic.update_story_exploration_mapping(
+                        update_story_exploration_mapping_cmd.new_value
                     )
             elif (change.cmd ==
                   subtopic_page_domain.CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY):
@@ -1604,6 +1617,7 @@ def populate_topic_model_fields(
     topic_model.page_title_fragment_for_web = topic.page_title_fragment_for_web
     topic_model.skill_ids_for_diagnostic_test = (
         topic.skill_ids_for_diagnostic_test)
+    topic_model.story_exploration_mapping = topic.story_exploration_mapping
     return topic_model
 
 

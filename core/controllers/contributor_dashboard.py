@@ -27,7 +27,6 @@ from core.domain import config_domain
 from core.domain import exp_fetchers
 from core.domain import opportunity_domain
 from core.domain import opportunity_services
-from core.domain import story_fetchers
 from core.domain import suggestion_registry
 from core.domain import suggestion_services
 from core.domain import topic_fetchers
@@ -351,37 +350,13 @@ class ReviewableOpportunitiesHandler(
         Raises:
             Exception. No exploration_id found for the node_id.
         """
-        # 1. Fetch the eligible topics.
-        # 2. Fetch the stories for the topics.
-        # 3. Get the reviewable translation suggestion target IDs for the user.
-        # 4. Get story exploration nodes in order, filtering for explorations
-        # that have in review translation suggestions.
-        if topic_name is None:
-            topics = topic_fetchers.get_all_topics()
-        else:
-            topic = topic_fetchers.get_topic_by_name(topic_name)
-            if topic is None:
-                raise self.InvalidInputException(
-                    'The supplied input topic: %s is not valid' % topic_name)
-            topics = [topic]
-        topic_stories = story_fetchers.get_stories_by_ids(
-            [
-                reference.story_id
-                for topic in topics
-                for reference in topic.get_all_story_references()
-                if reference.story_is_published
-            ],
-            strict=True
-        )
-        topic_exp_ids = []
-        for story in topic_stories:
-            for node in story.story_contents.get_ordered_nodes():
-                if node.exploration_id is None:
-                    raise Exception(
-                        'No exploration_id found for the node_id: %s'
-                        % node.id
-                    )
-                topic_exp_ids.append(node.exploration_id)
+        # 1. Fetch all the exploration IDs of chapters in stories under the
+        #    topic(s).
+        # 2. Get the reviewable translation suggestion target IDs for the user.
+        # 3. Get story exploration nodes in order, filtering for explorations
+        #    that have in review translation suggestions.
+        topic_exp_ids = topic_fetchers.get_all_story_exploration_ids(topic_name)
+
         in_review_suggestions, _ = (
             suggestion_services
             .get_reviewable_translation_suggestions_by_offset(

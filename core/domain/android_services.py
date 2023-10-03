@@ -218,6 +218,7 @@ def initialize_android_test_data() -> str:
     story.update_node_exploration_id(
         '%s%d' % (story_domain.NODE_ID_PREFIX, 1), exp_id
     )
+    topic.story_exploration_mapping[story.id].append(exp_id)
 
     # Save the dummy image to the filesystem to be used as thumbnail.
     with utils.open_file(

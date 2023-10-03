@@ -37,7 +37,9 @@ from core.domain import rights_manager
 from core.domain import story_domain
 from core.domain import story_fetchers
 from core.domain import suggestion_services
+from core.domain import topic_domain
 from core.domain import topic_fetchers
+from core.domain import topic_services
 from core.platform import models
 
 from typing import List, Sequence, Tuple, cast
@@ -116,11 +118,14 @@ def save_new_story(committer_id: str, story: story_domain.Story) -> None:
 
 # Repository SAVE and DELETE methods.
 def apply_change_list(
-    story_id: str, change_list: List[story_domain.StoryChange]
+    committer_id: str,
+    story_id: str,
+    change_list: List[story_domain.StoryChange]
 ) -> Tuple[story_domain.Story, List[str], List[str]]:
     """Applies a changelist to a story and returns the result.
 
     Args:
+        committer_id: str. ID of the user who's introducing the changes.
         story_id: str. ID of the given story.
         change_list: list(StoryChange). A change list to be applied to the given
             story.
@@ -157,7 +162,44 @@ def apply_change_list(
                     story_domain.DeleteStoryNodeCmd,
                     change
                 )
+                # Find the index of the node to delete and check if it has an
+                # exploration. If it does, store the index of that node.
+                delete_index = -1
+                for index, node in enumerate(story.story_contents.nodes):
+                    if node.id == delete_story_node_cmd.node_id and (
+                        node.exploration_id):
+                        delete_index = index
+                        break
                 story.delete_node(delete_story_node_cmd.node_id)
+
+                if delete_index > -1:
+                    old_mapping = topic_fetchers.get_topic_by_id(
+                        story.corresponding_topic_id).story_exploration_mapping
+                    new_mapping = {
+                        topic_story_id: exp_ids
+                        if topic_story_id != story.id
+                        else exp_ids[:delete_index] + exp_ids[delete_index + 1:]
+                        for topic_story_id, exp_ids
+                        in old_mapping.items()
+                    }
+
+                    topic_services.update_topic_and_subtopic_pages(
+                        committer_id,
+                        story.corresponding_topic_id,
+                        [topic_domain.TopicChange({
+                            'cmd': topic_domain.CMD_UPDATE_TOPIC_PROPERTY,
+                            'property_name': (
+                                topic_domain
+                                .TOPIC_PROPERTY_STORY_EXPLORATION_MAPPING
+                            ),
+                            'old_value': old_mapping,
+                            'new_value': new_mapping
+                        })],
+                        'Story Exploration Mapping: Removed exploration ' + (
+                            old_mapping[story.id][delete_index] +
+                            ' from story ' + story.id + '.'
+                        )
+                    )
             elif (change.cmd ==
                   story_domain.CMD_UPDATE_STORY_NODE_OUTLINE_STATUS):
                 # Here we use cast because we are narrowing down the type from
@@ -285,10 +327,60 @@ def apply_change_list(
                         story_domain.UpdateStoryNodePropertyExplorationIdCmd,
                         change
                     )
+                    replace_index = -1
+                    for index, node in enumerate(story.story_contents.nodes):
+                        if (node.id == update_node_exploration_id_cmd.node_id
+                            and node.exploration_id):
+                            replace_index = index
+                            break
                     story.update_node_exploration_id(
                         update_node_exploration_id_cmd.node_id,
                         update_node_exploration_id_cmd.new_value
                     )
+
+                    if update_node_exploration_id_cmd.new_value:
+                        old_mapping = (
+                            topic_fetchers.get_topic_by_id(
+                                story.corresponding_topic_id)
+                            .story_exploration_mapping
+                        )
+                        new_mapping = {
+                            topic_story_id: (
+                                (
+                                    exp_ids[:replace_index] + (
+                                        [update_node_exploration_id_cmd
+                                            .new_value] +
+                                        exp_ids[replace_index + 1:]
+                                    )
+                                    if replace_index > -1
+                                    else exp_ids + [
+                                        update_node_exploration_id_cmd
+                                        .new_value
+                                    ]
+                                )
+                                if topic_story_id == story.id
+                                else exp_ids
+                            )
+                            for topic_story_id, exp_ids
+                            in old_mapping.items()
+                        }
+                        topic_services.update_topic_and_subtopic_pages(
+                            committer_id,
+                            story.corresponding_topic_id,
+                            [topic_domain.TopicChange({
+                                'cmd': topic_domain.CMD_UPDATE_TOPIC_PROPERTY,
+                                'property_name': (
+                                    topic_domain
+                                    .TOPIC_PROPERTY_STORY_EXPLORATION_MAPPING
+                                ),
+                                'old_value': old_mapping,
+                                'new_value': new_mapping
+                            })],
+                            'Story exploration mapping: Added exploration ' + (
+                                update_node_exploration_id_cmd.new_value +
+                                ' to story ' + story.id + '.'
+                            )
+                        )
                 elif (change.property_name ==
                         story_domain.STORY_NODE_PROPERTY_STATUS):
                     # Here we use cast because this 'elif'
@@ -427,6 +519,51 @@ def apply_change_list(
                     )
                     story.rearrange_node_in_story(
                         update_node_cmd.old_value, update_node_cmd.new_value)
+
+                    if update_node_cmd.old_value < update_node_cmd.new_value:
+                        left = update_node_cmd.old_value
+                        right = update_node_cmd.new_value
+                    else:
+                        left = update_node_cmd.new_value
+                        right = update_node_cmd.old_value
+
+                    old_mapping = topic_fetchers.get_topic_by_id(
+                        story.corresponding_topic_id).story_exploration_mapping
+                    new_mapping = {
+                        topic_story_id: (
+                            (
+                                exp_ids[:left] +
+                                [exp_ids[right]] +
+                                exp_ids[left + 1:right] +
+                                [exp_ids[left]] +
+                                exp_ids[right + 1:]
+                            )
+                            if topic_story_id == story.id
+                            else exp_ids
+                        )
+                        for topic_story_id, exp_ids
+                        in old_mapping.items()
+                    }
+                    topic_services.update_topic_and_subtopic_pages(
+                        committer_id,
+                        story.corresponding_topic_id,
+                        [topic_domain.TopicChange({
+                            'cmd': topic_domain.CMD_UPDATE_TOPIC_PROPERTY,
+                            'property_name': (
+                                topic_domain
+                                .TOPIC_PROPERTY_STORY_EXPLORATION_MAPPING
+                            ),
+                            'old_value': old_mapping,
+                            'new_value': new_mapping
+                        })],
+                        (
+                            'Story exploration mapping: Swapped exploration ' +
+                            old_mapping[story.id][left] +
+                            ' with exploration ' +
+                            old_mapping[story.id][right] +
+                            ' within story ' + story.id + '.'
+                        )
+                    )
             elif (
                     change.cmd ==
                     story_domain.CMD_MIGRATE_SCHEMA_TO_LATEST_VERSION):
@@ -810,7 +947,7 @@ def update_story(
 
     old_story = story_fetchers.get_story_by_id(story_id)
     new_story, exp_ids_removed_from_story, exp_ids_added_to_story = (
-        apply_change_list(story_id, change_list))
+        apply_change_list(committer_id, story_id, change_list))
     story_is_published = is_story_published_and_present_in_topic(new_story)
     exploration_context_models_to_be_deleted_with_none = (
         exp_models.ExplorationContextModel.get_multi(

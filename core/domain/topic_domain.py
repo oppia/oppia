@@ -31,7 +31,7 @@ from core.constants import constants
 from core.domain import change_domain
 from core.domain import subtopic_page_domain
 
-from typing import List, Literal, Optional, TypedDict
+from typing import List, Literal, Mapping, Optional, TypedDict
 
 # The fs_services module is required in one of the migration
 # functions in Topic class. This import should be removed
@@ -63,6 +63,7 @@ TOPIC_PROPERTY_META_TAG_CONTENT = 'meta_tag_content'
 TOPIC_PROPERTY_PRACTICE_TAB_IS_DISPLAYED = 'practice_tab_is_displayed'
 TOPIC_PROPERTY_PAGE_TITLE_FRAGMENT_FOR_WEB = 'page_title_fragment_for_web'
 TOPIC_PROPERTY_SKILL_IDS_FOR_DIAGNOSTIC_TEST = 'skill_ids_for_diagnostic_test'
+TOPIC_PROPERTY_STORY_EXPLORATION_MAPPING = 'story_exploration_mapping'
 
 SUBTOPIC_PROPERTY_TITLE = 'title'
 SUBTOPIC_PROPERTY_THUMBNAIL_FILENAME = 'thumbnail_filename'
@@ -133,7 +134,8 @@ class TopicChange(change_domain.BaseChange):
         TOPIC_PROPERTY_META_TAG_CONTENT,
         TOPIC_PROPERTY_PRACTICE_TAB_IS_DISPLAYED,
         TOPIC_PROPERTY_PAGE_TITLE_FRAGMENT_FOR_WEB,
-        TOPIC_PROPERTY_SKILL_IDS_FOR_DIAGNOSTIC_TEST
+        TOPIC_PROPERTY_SKILL_IDS_FOR_DIAGNOSTIC_TEST,
+        TOPIC_PROPERTY_STORY_EXPLORATION_MAPPING
     ]
 
     # The allowed list of subtopic properties which can be used in
@@ -601,6 +603,18 @@ class UpdateTopicPropertySkillIdsForDiagnosticTestCmd(TopicChange):
     old_value: List[str]
 
 
+class UpdateTopicPropertyStoryExplorationMappingCmd(TopicChange):
+    """Class representing the TopicChange's
+    CMD_UPDATE_TOPIC_PROPERTY command with
+    TOPIC_PROPERTY_STORY_EXPLORATION_MAPPING
+    as allowed value.
+    """
+
+    property_name: Literal['story_exploration_mapping']
+    new_value: Mapping[str, List[str]]
+    old_value: Mapping[str, List[str]]
+
+
 class MigrateSubtopicSchemaToLatestVersionCmd(TopicChange):
     """Class representing the TopicChange's
     CMD_MIGRATE_SUBTOPIC_SCHEMA_TO_LATEST_VERSION command.
@@ -954,6 +968,7 @@ class TopicDict(TypedDict, total=False):
     practice_tab_is_displayed: bool
     page_title_fragment_for_web: str
     skill_ids_for_diagnostic_test: List[str]
+    story_exploration_mapping: Mapping[str, List[str]]
     created_on: str
     last_updated: str
 
@@ -998,6 +1013,7 @@ class Topic:
         practice_tab_is_displayed: bool,
         page_title_fragment_for_web: str,
         skill_ids_for_diagnostic_test: List[str],
+        story_exploration_mapping: Mapping[str, List[str]],
         created_on: Optional[datetime.datetime] = None,
         last_updated: Optional[datetime.datetime] = None
     ) -> None:
@@ -1039,6 +1055,9 @@ class Topic:
                 topic viewer page.
             skill_ids_for_diagnostic_test: list(str). The list of skill_id that
                 will be used from a topic in the diagnostic test.
+            story_exploration_mapping: dict(str, list(str)). A dictionary that
+                maps each of the topic's story ids to its corresponding linked
+                exploration ids.
             created_on: datetime.datetime. Date and time when the topic is
                 created.
             last_updated: datetime.datetime. Date and time when the
@@ -1068,6 +1087,7 @@ class Topic:
         self.practice_tab_is_displayed = practice_tab_is_displayed
         self.page_title_fragment_for_web = page_title_fragment_for_web
         self.skill_ids_for_diagnostic_test = skill_ids_for_diagnostic_test
+        self.story_exploration_mapping = story_exploration_mapping
 
     def to_dict(self) -> TopicDict:
         """Returns a dict representing this Topic domain object.
@@ -1105,7 +1125,8 @@ class Topic:
             'meta_tag_content': self.meta_tag_content,
             'practice_tab_is_displayed': self.practice_tab_is_displayed,
             'page_title_fragment_for_web': self.page_title_fragment_for_web,
-            'skill_ids_for_diagnostic_test': self.skill_ids_for_diagnostic_test
+            'skill_ids_for_diagnostic_test': self.skill_ids_for_diagnostic_test,
+            'story_exploration_mapping': self.story_exploration_mapping
         }
 
     def serialize(self) -> str:
@@ -1186,6 +1207,7 @@ class Topic:
             topic_dict['practice_tab_is_displayed'],
             topic_dict['page_title_fragment_for_web'],
             topic_dict['skill_ids_for_diagnostic_test'],
+            topic_dict['story_exploration_mapping'],
             topic_created_on,
             topic_last_updated)
 
@@ -1385,10 +1407,12 @@ class Topic:
         return self.uncategorized_skill_ids
 
     def delete_canonical_story(self, story_id: str) -> None:
-        """Removes a story from the canonical_story_references list.
+        """Removes a story from the canonical_story_references list and from the
+        mapping.
 
         Args:
-            story_id: str. The story id to remove from the list.
+            story_id: str. The story id to remove from the list and from the
+                mapping.
 
         Raises:
             Exception. The story_id is not present in the canonical stories
@@ -1398,6 +1422,7 @@ class Topic:
         for index, reference in enumerate(self.canonical_story_references):
             if reference.story_id == story_id:
                 del self.canonical_story_references[index]
+                del self.story_exploration_mapping[story_id]
                 deleted = True
                 break
         if not deleted:
@@ -1435,10 +1460,11 @@ class Topic:
             to_index, canonical_story_reference_to_move)
 
     def add_canonical_story(self, story_id: str) -> None:
-        """Adds a story to the canonical_story_references list.
+        """Adds a story to the canonical_story_references list and to the
+        story_exploration_mapping.
 
         Args:
-            story_id: str. The story id to add to the list.
+            story_id: str. The story id to add to the list and to the mapping.
 
         Raises:
             Exception. The story ID is already present in the canonical
@@ -1452,12 +1478,14 @@ class Topic:
         self.canonical_story_references.append(
             StoryReference.create_default_story_reference(story_id)
         )
+        self.story_exploration_mapping[story_id] = []
 
     def add_additional_story(self, story_id: str) -> None:
-        """Adds a story to the additional_story_references list.
+        """Adds a story to the additional_story_references list and to the
+        story_exploration_mapping.
 
         Args:
-            story_id: str. The story id to add to the list.
+            story_id: str. The story id to add to the list and to the mapping.
 
         Raises:
             Exception. The story ID is already present in the additional
@@ -1471,12 +1499,15 @@ class Topic:
         self.additional_story_references.append(
             StoryReference.create_default_story_reference(story_id)
         )
+        self.story_exploration_mapping[story_id] = []
 
     def delete_additional_story(self, story_id: str) -> None:
-        """Removes a story from the additional_story_references list.
+        """Removes a story from the additional_story_references list and to the
+        story_exploration_mapping.
 
         Args:
-            story_id: str. The story id to remove from the list.
+            story_id: str. The story id to remove from the list and from the
+                mapping.
 
         Raises:
             Exception. The story ID is not present in the additional stories
@@ -1486,6 +1517,7 @@ class Topic:
         for index, reference in enumerate(self.additional_story_references):
             if reference.story_id == story_id:
                 del self.additional_story_references[index]
+                del self.story_exploration_mapping[story_id]
                 deleted = True
                 break
         if not deleted:
@@ -1643,7 +1675,7 @@ class Topic:
             feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION, 1,
             constants.DEFAULT_LANGUAGE_CODE, 0,
             feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION, '',
-            False, page_title_frag, [])
+            False, page_title_frag, [], {})
 
     @classmethod
     def _convert_subtopic_v3_dict_to_v4_dict(
@@ -1890,6 +1922,18 @@ class Topic:
                 the topic.
         """
         self.skill_ids_for_diagnostic_test = skill_ids_for_diagnostic_test
+
+    def update_story_exploration_mapping(
+        self, story_exploration_mapping: Mapping[str, List[str]]
+    ) -> None:
+        """Updates the story_exploration_mapping field for the topic instance.
+
+        Args:
+            story_exploration_mapping: dict(str, list(str)). A dictionary that
+                maps from a story id to a list of exp ids that the story
+                contains.
+        """
+        self.story_exploration_mapping = story_exploration_mapping
 
     def add_uncategorized_skill_id(
         self, new_uncategorized_skill_id: str

@@ -99,8 +99,8 @@ class TopicCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
 class TopicModel(base_models.VersionedModel):
     """Model for storing Topics.
 
-    This class should only be imported by the topic services file
-    and the topic model test file.
+    This class should only be imported by the topic services file, the topic
+    fetchers file, and the topic model test file.
     """
 
     SNAPSHOT_METADATA_CLASS = TopicSnapshotMetadataModel
@@ -173,6 +173,14 @@ class TopicModel(base_models.VersionedModel):
     # questions should be fetched for the diagnostic test.
     skill_ids_for_diagnostic_test = datastore_services.StringProperty(
         repeated=True, indexed=True)
+    # A mapping from each story id belonging to the topic to a list of
+    # exploration ids that are linked to the corresponding story. This mapping
+    # represents the relationships between a topic, its stories,
+    # and the explorations that are linked to each story. This field must be
+    # kept in-sync with updates made to an owned story's explorations and to
+    # the topic's ownership of said stories.
+    story_exploration_mapping = datastore_services.JsonProperty(
+        indexed=True, default={})
 
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:
@@ -287,6 +295,28 @@ class TopicModel(base_models.VersionedModel):
         # TODO(#10210): Make fetching by URL fragment faster.
         return cls.get_all().filter(cls.url_fragment == url_fragment).get()
 
+    @classmethod
+    def get_all_story_exploration_mappings(
+        cls,
+        name: Optional[str] = None
+    ) -> List[Dict[str, List[str]]]:
+        """Gets each TopicModel's story_exploration_mapping property. The models
+        to get said property can be filtered by topic name, if given.
+
+        Args:
+            name: str|None. The name of the topic. If no name is given, then
+                topic models aren't filtered out by name.
+
+        Returns:
+            list(dict(str, list(str))). A list of story_exploration_mapping
+            values in each TopicModel that haven't been filtered out.
+        """
+        query = cls.query(projection=['story_exploration_mapping'])
+        if name:
+            query = query.filter(cls.name == name)
+        projections = query.fetch(feconf.DEFAULT_SUGGESTION_QUERY_LIMIT)
+        return [model.story_exploration_mapping for model in projections]
+
     @staticmethod
     def get_model_association_to_user(
     ) -> base_models.MODEL_ASSOCIATION_TO_USER:
@@ -316,12 +346,14 @@ class TopicModel(base_models.VersionedModel):
             'next_subtopic_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'language_code': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'meta_tag_content': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'page_title_fragment_for_web': (
-                base_models.EXPORT_POLICY.NOT_APPLICABLE),
+            'page_title_fragment_for_web':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'practice_tab_is_displayed':
                 base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'url_fragment': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'skill_ids_for_diagnostic_test':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'story_exploration_mapping':
                 base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
 
