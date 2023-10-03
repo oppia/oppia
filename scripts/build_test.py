@@ -113,6 +113,10 @@ class BuildTests(test_utils.GenericTestBase):
             with self.swap(feconf, 'OPPIA_IS_DOCKERIZED', True):
                 build._minify_and_create_sourcemap(  # pylint: disable=protected-access
                     INVALID_INPUT_FILEPATH, INVALID_OUTPUT_FILEPATH)
+        # Here we use MyPy ignore because the stubs of 'assertRaisesRegex' do
+        # not contain any returncode attribute, so because of this MyPy throws
+        # an '"Exception" has no attribute "returncode"' error. Thus to avoid
+        # the error, we used ignore here.
         # `returncode` is the exit status of the child process.
         self.assertEqual(called_process.exception.returncode, 1)  # type: ignore[attr-defined]
 
