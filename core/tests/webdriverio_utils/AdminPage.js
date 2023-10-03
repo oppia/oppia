@@ -238,6 +238,26 @@ var AdminPage = function() {
       'Language selector modal taking too long to disappear');
   };
 
+  this._selectLanguage = async function(language) {
+    var languageSelectorModal = $('.e2e-test-language-selector-modal');
+    var languageSelector = $('.e2e-test-language-selector');
+    var languageSelectorCloseButton = $(
+      '.e2e-test-language-selector-close-button');
+    var languageSelectorAddButton = $('.e2e-test-language-selector-add-button');
+
+    await waitFor.visibilityOf(
+      languageSelectorModal,
+      'Language selector modal taking too long to appear');
+    await action.select(
+      'Language selector', languageSelector, language
+    );
+    await action.click('Add language button', languageSelectorAddButton);
+    await action.click('Close button', languageSelectorCloseButton);
+    await waitFor.invisibilityOf(
+      languageSelectorModal,
+      'Language selector modal taking too long to disappear');
+  };
+
   this.makeUserTranslationCoordinator = async function(name, language) {
     await this._editUserRole(name);
 
