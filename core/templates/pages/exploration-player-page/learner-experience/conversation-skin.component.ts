@@ -376,7 +376,7 @@ export class ConversationSkinComponent {
 
             // If the user is a guest, has completed this exploration
             // within the context of a collection, and the collection is
-            // whitelisted, record their temporary progress.
+            // allowlisted, record their temporary progress.
 
             if (this.doesCollectionAllowsGuestProgress(
               this.collectionId) && !this.isLoggedIn) {
