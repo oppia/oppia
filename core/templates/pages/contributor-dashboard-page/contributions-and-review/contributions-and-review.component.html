@@ -48,7 +48,7 @@
   <div class="oppia-contributions-show-review-side-navbar-container" >
     <div class="oppia-contributions-side-navbar-part" *ngIf="reviewTabs.length > 0" tabindex="0">
       <div class="oppia-contributions-navbar-items-list" navbar-label="Available Tasks" aria-label="Available tasks">
-        <div class="oppia-contributions-navbar-item" *ngFor="let tab of reviewTabs">
+        <div class="oppia-contributions-navbar-item e2e-test-review-buttons" *ngFor="let tab of reviewTabs">
           <button class="oppia-contributions-navbar-button"
                   (click)="switchToTab(TAB_TYPE_REVIEWS, tab.tabSubType)"
                   [ngClass]="isActiveTab(TAB_TYPE_REVIEWS, tab.tabSubType) ? 'oppia-contributions-active-navbar' : ''">{{tab.text}}
@@ -85,7 +85,7 @@
     </div>
     <div class="oppia-login-required" *ngIf="userDetailsLoading || userIsLoggedIn">
       <div *ngIf="activeExplorationId === null && isReviewTranslationsTab() && !isAccomplishmentsTabActive()" class="oppia-language-selector-container">
-        <review-translation-language-selector class="oppia-language-selector"
+        <review-translation-language-selector class="oppia-language-selector e2e-test-language-dropdown"
                                               [activeLanguageCode]="languageCode"
                                               (setActiveLanguageCode)="onChangeLanguage($event)">
         </review-translation-language-selector>
