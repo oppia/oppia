@@ -233,10 +233,11 @@ describe('Drag and drop sort input interactive component', () => {
       const event = new KeyboardEvent(
         'keydown',
         { key: 'Tab', shiftKey: true }
-        );
+      );
       const currentIndex = 1;
       component.activeItem = 1;
-      component.listItems = component.listItems = new QueryList<ElementRef<HTMLDivElement>>();
+      component.listItems = component.listItems =
+       new QueryList<ElementRef<HTMLDivElement>>();
       component.listItems.reset([
         new ElementRef(document.createElement('div')),
         new ElementRef(document.createElement('div')),
@@ -247,7 +248,7 @@ describe('Drag and drop sort input interactive component', () => {
       expect(component.setFocus).toHaveBeenCalled();
       expect(component.activeItem).toBe(currentIndex - 1);
     });
-  }); 
+  });
 
   describe('when multiple items in the same position are allowed', () => {
     beforeEach(() => {
