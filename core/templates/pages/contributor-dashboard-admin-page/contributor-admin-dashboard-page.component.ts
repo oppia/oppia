@@ -86,9 +86,9 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
   loadingMessage!: string;
   selectedLastActivity!: number;
   allTopicNames: string[] = [];
-
-  languageChoices: LanguageChoice[] = [];
   lastActivity: number[] = [];
+  languageChoices: LanguageChoice[] = [];
+  topics: TopicChoice[] = [];
   filter: ContributorAdminDashboardFilter = (
     ContributorAdminDashboardFilter.createDefault());
 
@@ -102,7 +102,6 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
     id: ''
   };
 
-  topics: TopicChoice[] = [];
 
   constructor(
     private windowRef: WindowRef,
@@ -159,9 +158,7 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
             this.languageChoices = this.languageChoices.filter((
                 languageItem) =>
               response.includes(languageItem.id));
-            this.selectedLanguage.language = (
-              this.languageChoices[0].language);
-            this.selectedLanguage.id = this.languageChoices[0].id;
+            this.selectedLanguage = this.languageChoices[0];
             this.translationReviewersCount = (
               this.translationReviewersCountByLanguage[
                 this.selectedLanguage.id]);
@@ -185,9 +182,7 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
       .fetchTopicChoices().then(
         response => {
           this.topics = response;
-          response.map((
-              topic) =>
-            this.allTopicNames.push(topic.topic));
+          this.allTopicNames = response.map(topic => topic.topic);
           this.applyTopicFilter();
         }
       );
@@ -221,8 +216,7 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
       language: 'English',
       id: 'en'
     };
-    this.selectedLanguage.language = currentOption.language;
-    this.selectedLanguage.id = currentOption.id;
+    this.selectedLanguage = currentOption;
     this.translationReviewersCount = this.translationReviewersCountByLanguage[
       this.selectedLanguage.id];
     this.filter = new ContributorAdminDashboardFilter(
@@ -234,15 +228,6 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
   }
 
   selectLastActivity(lastActive: number): void {
-    if (lastActive === 0) {
-      this.selectedLastActivity = lastActive;
-      this.filter = new ContributorAdminDashboardFilter(
-        this.selectedTopics.ids,
-        this.selectedLanguage.id,
-        null);
-      this.activityDropdownShown = false;
-      return;
-    }
     this.selectedLastActivity = lastActive;
     this.filter = new ContributorAdminDashboardFilter(
       this.selectedTopics.ids,
@@ -278,21 +263,22 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: MouseEvent): void {
     const targetElement = event.target as HTMLElement;
-    if (!this.checkMobileView()) {
-      if (this.isTranslationCoordinator) {
-        if (
-          targetElement &&
-          !this.languageDropdownRef.nativeElement.contains(targetElement)
-        ) {
-          this.languageDropdownShown = false;
-        }
-      }
+    if (this.checkMobileView()) {
+      return;
+    }
+    if (this.isTranslationCoordinator) {
       if (
         targetElement &&
-        !this.activityDropdownRef.nativeElement.contains(targetElement)
+        !this.languageDropdownRef.nativeElement.contains(targetElement)
       ) {
-        this.activityDropdownShown = false;
+        this.languageDropdownShown = false;
       }
+    }
+    if (
+      targetElement &&
+      !this.activityDropdownRef.nativeElement.contains(targetElement)
+    ) {
+      this.activityDropdownShown = false;
     }
   }
 }

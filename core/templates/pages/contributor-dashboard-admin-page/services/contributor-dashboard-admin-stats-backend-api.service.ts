@@ -210,18 +210,16 @@ export class ContributorDashboardAdminStatsBackendApiService {
     this.params = {
       page_size: pageSize,
       offset: nextOffset,
-      ...(
-        filter.languageCode ? {
-          language_code: filter.languageCode
-        } : {language_code: PageConstants.DEFAULT_LANGUAGE_FILTER}),
+      topic_ids: filter.topicIds.length > 0 ? JSON.stringify(
+        filter.topicIds
+      ) : [],
+      language_code: filter.languageCode ? filter.languageCode : (
+        PageConstants.DEFAULT_LANGUAGE_FILTER
+      ),
       ...(
         filter.lastActivity ? {
           max_days_since_last_activity: filter.lastActivity
         } : {}),
-      ...(
-        (filter.topicIds.length > 0) ? {
-          topic_ids: JSON.stringify(filter.topicIds)
-        } : {topic_ids: []}),
     };
     if (contributionType === AppConstants.CONTRIBUTION_STATS_TYPE_TRANSLATION) {
       if (

@@ -191,33 +191,42 @@ describe('Contributor dashboard Admin page', () => {
   it('should initialize variables onInit', fakeAsync(() => {
     spyOn(userService, 'getUserInfoAsync').and.returnValue(
       Promise.resolve(fullAccessUserInfo));
+
     component.ngOnInit();
     tick();
     fixture.detectChanges();
+
     expect(component.selectedLanguage.language).toEqual('English');
     expect(component.selectedLanguage.id).toEqual('en');
   }));
 
   it('should open language dropdown', () => {
     expect(component.languageDropdownShown).toBeFalse();
+
     component.toggleLanguageDropdown();
+
     expect(component.languageDropdownShown).toBeTrue();
   });
 
   it('should open last activity dropdown', fakeAsync(() => {
     expect(component.activityDropdownShown).toBeFalse();
+
     component.toggleActivityDropdown();
+
     expect(component.activityDropdownShown).toBeTrue();
   }));
 
   it('should select language from dropdown', fakeAsync(() => {
     spyOn(userService, 'getUserInfoAsync').and.returnValue(
       Promise.resolve(fullAccessUserInfo));
+
     component.ngOnInit();
     tick();
     fixture.detectChanges();
+
     expect(component.selectedLanguage.language).toBe('English');
     expect(component.selectedLanguage.id).toBe('en');
+
     component.selectLanguage('العربية (Arabic)');
     expect(component.selectedLanguage.language).toBe('العربية (Arabic)');
     expect(component.selectedLanguage.id).toBe('ar');
@@ -229,9 +238,12 @@ describe('Contributor dashboard Admin page', () => {
     component.ngOnInit();
     tick();
     fixture.detectChanges();
+
     expect(component.selectedLastActivity).toEqual(0);
+
     component.selectLastActivity(7);
     expect(component.selectedLastActivity).toEqual(7);
+
     component.selectLastActivity(0);
     expect(component.selectedLastActivity).toEqual(0);
   }));
@@ -244,37 +256,70 @@ describe('Contributor dashboard Admin page', () => {
       { id: '1', topic: 'Science' },
       { id: '2', topic: 'Technology' },
     ];
+
     fixture.detectChanges();
     tick();
     component.applyTopicFilter();
+
+    expect(component.selectedTopics.ids).toEqual(['1', '2']);
+  }));
+
+  it('should apply topic and language filter both', fakeAsync(() => {
+    spyOn(userService, 'getUserInfoAsync').and.returnValue(
+      Promise.resolve(fullAccessUserInfo));
+    component.ngOnInit();
+    tick();
+    component.selectedTopics.topics = ['Science', 'Technology'];
+    component.topics = [
+      { id: '1', topic: 'Science' },
+      { id: '2', topic: 'Technology' },
+    ];
+
+    fixture.detectChanges();
+    tick();
+    component.applyTopicFilter();
+
+    expect(component.selectedTopics.ids).toEqual(['1', '2']);
+    expect(component.selectedLanguage.language).toBe('English');
+    expect(component.selectedLanguage.id).toBe('en');
+
+    component.selectLanguage('العربية (Arabic)');
+    expect(component.selectedLanguage.language).toBe('العربية (Arabic)');
+    expect(component.selectedLanguage.id).toBe('ar');
     expect(component.selectedTopics.ids).toEqual(['1', '2']);
   }));
 
   it('should evaluate active tab', () => {
     component.setActiveTab('Translation Submitter');
+
     expect(component.activeTab).toBe('Translation Submitter');
   });
 
   it('should update selectedContributionType', () => {
     component.updateSelectedContributionType('selection1');
+
     expect(component.selectedContributionType).toEqual('selection1');
   });
 
   it('should update translation coordinator view', fakeAsync(() => {
     spyOn(userService, 'getUserInfoAsync').and.returnValue(
       Promise.resolve(translationCoordinatorInfo));
+
     component.ngOnInit();
     tick();
     fixture.detectChanges();
+
     expect(component.isTranslationCoordinator).toBeTrue();
   }));
 
   it('should update question coordinator view', fakeAsync(() => {
     spyOn(userService, 'getUserInfoAsync').and.returnValue(
       Promise.resolve(questionCoordinatorInfo));
+
     component.ngOnInit();
     tick();
     fixture.detectChanges();
+
     expect(component.isQuestionCoordinator).toBeTrue();
   }));
 
@@ -282,9 +327,11 @@ describe('Contributor dashboard Admin page', () => {
     fakeAsync(() => {
       spyOn(userService, 'getUserInfoAsync').and.returnValue(
         Promise.resolve(fullAccessUserInfo));
+
       component.ngOnInit();
       tick();
       fixture.detectChanges();
+
       expect(component.isQuestionCoordinator).toBeTrue();
       expect(component.isTranslationCoordinator).toBeTrue();
     }));
@@ -293,9 +340,11 @@ describe('Contributor dashboard Admin page', () => {
     'if username is null', fakeAsync(() => {
     spyOn(userService, 'getUserInfoAsync').and.returnValue(
       Promise.resolve(nullUserInfo));
+
     component.ngOnInit();
     tick();
     fixture.detectChanges();
+
     expect(component.CONTRIBUTION_TYPES).toEqual([]);
   }));
 
@@ -304,7 +353,7 @@ describe('Contributor dashboard Admin page', () => {
       spyOn(component, 'checkMobileView').and.returnValue(false);
       spyOn(userService, 'getUserInfoAsync').and.returnValue(
         Promise.resolve(fullAccessUserInfo));
-      let fakeClickAwayEvent = new MouseEvent('click');
+      const fakeClickAwayEvent = new MouseEvent('click');
       Object.defineProperty(
         fakeClickAwayEvent,
         'target',
@@ -324,7 +373,7 @@ describe('Contributor dashboard Admin page', () => {
       spyOn(component, 'checkMobileView').and.returnValue(false);
       spyOn(userService, 'getUserInfoAsync').and.returnValue(
         Promise.resolve(fullAccessUserInfo));
-      let fakeClickAwayEvent = new MouseEvent('click');
+      const fakeClickAwayEvent = new MouseEvent('click');
       Object.defineProperty(
         fakeClickAwayEvent,
         'target',
@@ -337,5 +386,25 @@ describe('Contributor dashboard Admin page', () => {
       fixture.detectChanges();
 
       expect(component.activityDropdownShown).toBe(false);
+    }));
+
+  it('should not show and hide activity dropdown when clicked away on mobile',
+    fakeAsync(() => {
+      spyOn(component, 'checkMobileView').and.returnValue(true);
+      spyOn(userService, 'getUserInfoAsync').and.returnValue(
+        Promise.resolve(fullAccessUserInfo));
+      const fakeClickAwayEvent = new MouseEvent('click');
+      Object.defineProperty(
+        fakeClickAwayEvent,
+        'target',
+        {value: document.createElement('div')});
+
+      component.toggleActivityDropdown();
+      component.ngOnInit();
+      tick();
+      component.onDocumentClick(fakeClickAwayEvent);
+      fixture.detectChanges();
+
+      expect(component.activityDropdownShown).toBe(true);
     }));
 });
