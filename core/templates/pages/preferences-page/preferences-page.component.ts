@@ -85,11 +85,11 @@ export class PreferencesPageComponent {
   PAGES_REGISTERED_WITH_FRONTEND = (
     AppConstants.PAGES_REGISTERED_WITH_FRONTEND);
 
-  @ViewChild('firstRadio') firstRadio: ElementRef;
+  @ViewChild('firstRadio') firstRadio!: ElementRef;
 
-  @ViewChild('secondRadio') secondRadio: ElementRef;
+  @ViewChild('secondRadio') secondRadio!: ElementRef;
 
-  @ViewChild('thirdRadio') thirdRadio: ElementRef;
+  @ViewChild('thirdRadio') thirdRadio!: ElementRef;
 
   constructor(
     private ngbModal: NgbModal,
