@@ -24,8 +24,9 @@ import re
 from unittest import mock
 
 from core.constants import constants
-from core.domain import auth_domain, user_services
+from core.domain import auth_domain
 from core.domain import param_domain
+from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
 
