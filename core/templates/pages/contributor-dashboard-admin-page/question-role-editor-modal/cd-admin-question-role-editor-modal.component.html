@@ -1,0 +1,121 @@
+<style>
+  .question-submitter-role-checkbox {
+    cursor: pointer;
+    font-size: 20px;
+    color: #00645C;
+  }
+  .question-role-editor-main-container {
+    position: relative;
+    background: white;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+  }
+  .question-role-editor-footer {
+    padding: 15px;
+    gap: 12px;
+    display: flex;
+    align-self: flex-end;
+  }
+  .question-role-editor-footer-ruler {
+    opacity: 0.10;
+    border: 1px #333333 solid;
+    margin-top: 5px;
+  }
+  .question-role-editor-footer-container {
+    width: 221px;
+    height: 36px;
+    left: 580px;
+    top: 17px;
+    justify-content: flex-start;
+    align-items: flex-start;
+    gap: 12px;
+    display: inline-flex
+  }
+  .cancel-button {
+    color: #00645C;
+    font-size: 14px;
+    font-family: Roboto;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.30px;
+    border-color: #00645C;
+    border-radius: 5px;
+    padding: 5px;
+  }
+  .save-button {
+    color: white;
+    font-size: 14px;
+    font-family: Roboto;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.30px;
+    background: #00645C;
+    border-radius: 5px;
+    padding: 5px;
+  }
+  .label {
+    left: 32px;
+    top: 0px; 
+    color: #333333;
+    font-size: 16px;
+    font-family: Roboto;
+    font-weight: 400;
+    word-wrap: break-word
+  }
+  .label-explanation {
+    left: 32px; top: 23px;  color: #667085; font-size: 14px; font-family: Roboto; font-weight: 400; word-wrap: break-word
+  }
+  .title-container {
+    color: #00645C;
+    font-size: 20px;
+    font-family: Capriola;
+    margin-top: 25px;
+    margin-left: 20px;
+    margin-bottom: 20px;
+  }
+  .sub-heading-container {
+    font-weight: 600;
+    margin-left: 20px;
+    word-spacing: 1.6px;
+    margin-bottom: 5px;
+  }
+  .label-container {
+    display: flex;
+    flex-direction: column;
+  }
+  .attribute-container {
+    display: flex;
+    padding-left: 20px;
+    padding-bottom: 5px;
+  }
+</style>
+<div class="question-role-editor-main-container">
+    <div class="title-container">Edit Role for user {{username}}</div>
+    <div class="sub-heading-container">User Role</div>
+    <div class="attribute-container">
+        <span (click)="toggleQuestionSubmitter()" (keydown.space)="toggleQuestionSubmitter()" tabindex="0">
+            <i *ngIf="!isQuestionSubmitter" class="material-icons md-18 question-submitter-role-checkbox">&#xE835;</i>
+            <i *ngIf="isQuestionSubmitter" class="material-icons md-18 question-submitter-role-checkbox">&#xE834;</i>
+        </span>
+        <div class="label-container">
+            <div class="label">Question Submitter</div>
+            <div class="label-explanation">Submits questions for review</div>
+        </div>
+    </div>
+    <div class="attribute-container">
+        <span (click)="toggleQuestionReviewer()" (keydown.space)="toggleQuestionReviewer()" tabindex="0">
+            <i *ngIf="!isQuestionReviewer" class="material-icons md-18 question-submitter-role-checkbox">&#xE835;</i>
+            <i *ngIf="isQuestionReviewer" class="material-icons md-18 question-submitter-role-checkbox">&#xE834;</i>
+        </span>
+        <div class="label-container">
+            <div class="label">Question Reviewer</div>
+            <div class="label-explanation">Reviews questions submitted</div>
+        </div>
+    </div>
+    <div class="question-role-editor-footer-ruler"></div>
+    <div class="question-role-editor-footer">
+        <button class="cancel-button" (click)="close()">Cancel</button>
+        <button class="save-button" (click)="saveAndClose()">Save Changes</button>
+    </div>
+</div>

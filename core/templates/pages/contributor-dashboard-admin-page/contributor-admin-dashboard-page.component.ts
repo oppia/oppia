@@ -145,24 +145,24 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
         this.CONTRIBUTION_TYPES.push(
           this.TAB_NAME_TRANSLATION_SUBMITTER,
           this.TAB_NAME_TRANSLATION_REVIEWER);
+
+        this.contributorDashboardAdminStatsBackendApiService
+          .fetchAssignedLanguageIds(username).then(
+            response => {
+              this.languageChoices = this.languageChoices.filter((
+                  languageItem) =>
+                response.includes(languageItem.id));
+              this.selectedLanguage = this.languageChoices[0];
+              this.translationReviewersCount = (
+                this.translationReviewersCountByLanguage[
+                  this.selectedLanguage.id]);
+            });
       }
       if (this.isQuestionCoordinator) {
         this.CONTRIBUTION_TYPES.push(
           this.TAB_NAME_QUESTION_SUBMITTER,
           this.TAB_NAME_QUESTION_REVIEWER);
       }
-
-      this.contributorDashboardAdminStatsBackendApiService
-        .fetchAssignedLanguageIds(username).then(
-          response => {
-            this.languageChoices = this.languageChoices.filter((
-                languageItem) =>
-              response.includes(languageItem.id));
-            this.selectedLanguage = this.languageChoices[0];
-            this.translationReviewersCount = (
-              this.translationReviewersCountByLanguage[
-                this.selectedLanguage.id]);
-          });
 
       this.filter = new ContributorAdminDashboardFilter(
         [],
