@@ -65,6 +65,14 @@ class SkillOpportunityDict(TypedDict):
     question_count: int
 
 
+class PinnedOpportunityDict(TypedDict):
+    """A dictionary representing PinnedOpportunity object."""
+
+    language_code: str
+    topic_id: str
+    opportunity_id: str
+
+
 class ExplorationOpportunitySummary:
     """The domain object for the translation and voiceover opportunities summary
     available in an exploration.
@@ -317,4 +325,79 @@ class SkillOpportunity:
             'id': self.id,
             'skill_description': self.skill_description,
             'question_count': self.question_count
+        }
+
+
+class PinnedOpportunity:
+    """The domain object for pinned opportunities in the contributor dashboard."""
+
+    def __init__(
+        self,
+        language_code: str,
+        topic_id: str,
+        opportunity_id: str
+    ) -> None:
+        """Constructs a PinnedOpportunity domain object.
+
+        Args:
+            language_code: str. The code of the language.
+            topic_id: str. The ID of the topic.
+            opportunity_id: str. The ID of the pinned opportunity.
+        """
+        self.language_code = language_code
+        self.topic_id = topic_id
+        self.opportunity_id = opportunity_id
+        self.validate()
+
+    def validate(self) -> None:
+        """Validates various properties of the object.
+
+        Raises:
+            ValidationError. One or more attributes of the object are invalid.
+        """
+
+        if not isinstance(self.language_code, str):
+            raise utils.ValidationError(
+                'Expected language_code to be a string, '
+                'received %s' % type(self.language_code).__name__)
+
+        if not isinstance(self.topic_id, str):
+            raise utils.ValidationError(
+                'Expected topic_id to be a string, '
+                'received %s' % type(self.topic_id).__name__)
+
+        if not isinstance(self.opportunity_id, str):
+            raise utils.ValidationError(
+                'Expected opportunity_id to be a string, '
+                'received %s' % type(self.opportunity_id).__name__)
+
+    @classmethod
+    def from_dict(
+        cls, pinned_opportunity_dict: PinnedOpportunityDict
+    ) -> 'PinnedOpportunity':
+        """Return a PinnedOpportunity domain object from a dict.
+
+        Args:
+            pinned_opportunity_dict: dict. The dict representation of a
+                PinnedOpportunity object.
+
+        Returns:
+            PinnedOpportunity. The corresponding PinnedOpportunity domain object.
+        """
+        return cls(
+            pinned_opportunity_dict['language_code'],
+            pinned_opportunity_dict['topic_id'],
+            pinned_opportunity_dict['opportunity_id'])
+
+    def to_dict(self) -> PinnedOpportunityDict:
+        """Returns a copy of the object as a dictionary. It includes all
+        necessary information to represent a pinned opportunity.
+
+        Returns:
+            dict. A dict mapping the fields of PinnedOpportunity instance.
+        """
+        return {
+            'language_code': self.language_code,
+            'topic_id': self.topic_id,
+            'opportunity_id': self.opportunity_id
         }

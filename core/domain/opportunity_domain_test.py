@@ -335,3 +335,64 @@ class SkillOpportunityDomainTest(test_utils.GenericTestBase):
             'Expected question_count to be a non-negative integer, '
             'received -5'
         )
+
+
+class TestPinnedOpportunityDomain(test_utils.GenericTestBase):
+    """Tests for the PinnedOpportunity domain object."""
+
+    def setUp(self) -> None:
+        valid_pinned_opportunity_dict = {
+            'language_code': 'en',
+            'topic_id': 'topic_id_1',
+            'opportunity_id': 'opportunity_id1'
+        }
+        self.valid_pinned_opportunity = (opportunity_domain.
+            PinnedOpportunity.from_dict(valid_pinned_opportunity_dict))
+
+    def test_to_and_from_dict_works_correctly(self):
+        pinned_opportunity_dict = {
+            'language_code': 'en',
+            'topic_id': 'topic_id_1',
+            'opportunity_id': 'opportunity_id1'
+        }
+
+        pinned_opportunity = (opportunity_domain.PinnedOpportunity.
+            from_dict(pinned_opportunity_dict))
+
+        self.assertTrue(isinstance(
+            pinned_opportunity, opportunity_domain.PinnedOpportunity))
+        self.assertEqual(pinned_opportunity.to_dict(), {
+            'language_code': 'en',
+            'topic_id': 'topic_id_1',
+            'opportunity_id': 'opportunity_id1'
+        })
+
+    def test_invalid_language_code_raises_validation_error(self):
+        self.assert_validation_error(
+            opportunity_domain.PinnedOpportunity(
+                language_code=123,
+                topic_id='topic_3',
+                opportunity_id='opportunity_3'
+            ),
+            'Expected language_code to be a string, received int'
+        )
+
+    def test_invalid_topic_id_raises_validation_error(self):
+        self.assert_validation_error(
+            opportunity_domain.PinnedOpportunity(
+                language_code='fr',
+                topic_id=456,
+                opportunity_id='opportunity_4'
+            ),
+            'Expected topic_id to be a string, received int'
+        )
+
+    def test_invalid_opportunity_id_raises_validation_error(self):
+        self.assert_validation_error(
+            opportunity_domain.PinnedOpportunity(
+                language_code='de',
+                topic_id='topic_5',
+                opportunity_id=789
+            ),
+            'Expected opportunity_id to be a string, received int'
+        )
