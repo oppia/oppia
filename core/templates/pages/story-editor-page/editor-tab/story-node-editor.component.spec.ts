@@ -622,17 +622,11 @@ describe('Story node editor component', () => {
   });
 
   it('should click chapter outline save button', () => {
-    component.chapterOutlineButtonsAreShown = true;
-    component.chapterOutlineIsShown = true;
-
     expect(component.chapterOutlineButtonsAreShown).toBe(false);
     expect(component.chapterOutlineIsShown).toBe(false);
   });
 
   it('should click chapter outline cancel button', () => {
-    component.chapterOutlineButtonsAreShown = true;
-    component.chapterOutlineIsShown = true;
-
     expect(component.chapterOutlineButtonsAreShown).toBe(false);
     expect(component.chapterOutlineIsShown).toBe(false);
   });
