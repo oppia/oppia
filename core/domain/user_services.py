@@ -3053,7 +3053,7 @@ def assign_coordinator(
     else:
         if assignee.user_id in language_rights.coordinator_ids:
             raise Exception(
-                'This user already is a coordinator for this language'
+                'This user already is a coordinator for this language.'
             )
 
         language_rights.coordinator_ids.append(assignee.user_id)
