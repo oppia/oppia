@@ -502,9 +502,7 @@ export class StoryNodeEditorComponent implements OnInit, OnDestroy {
   }
 
   onSaveButtonClicked(): void {
-    if (this.oldOutline !== '') {
-      this.oldOutlineToReadOnly = this.oldOutline.slice(3, -4);
-    }
+    this.oldOutlineToReadOnly = $(this.oldOutline).text();
     this.chapterOutlineButtonsAreShown = false;
     this.chapterOutlineIsShown = false;
   }
