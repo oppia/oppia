@@ -3040,7 +3040,7 @@ def assign_coordinator(
         )
 
     language_rights = suggestion_models.TranslationCoordinatorsModel.get(
-        language_id)
+        language_id, strict=False)
 
     if language_rights is None:
         model = suggestion_models.TranslationCoordinatorsModel(
@@ -3092,7 +3092,7 @@ def deassign_coordinator(
             'Guest user is not allowed to deassign roles to a user.'
         )
     language_rights = suggestion_models.TranslationCoordinatorsModel.get(
-        language_id)
+        language_id, strict=False)
     if (
         role_services.ACTION_MODIFY_CORE_ROLES_FOR_ANY_ACTIVITY not in
             committer.actions
@@ -3219,7 +3219,7 @@ def check_user_is_coordinator(user_id: str, language_id: str) -> bool:
         bool. True if the user is coordinator or else False.
     """
     model = suggestion_models.TranslationCoordinatorsModel.get(
-        language_id)
+        language_id, strict=False)
 
     if model is None:
         return False

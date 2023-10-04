@@ -6195,11 +6195,11 @@ class TranslationCoordinatorsModelUnitTests(test_utils.GenericTestBase):
             len(translation_coordinators_models),
             2
         )
-        self.assertEqual(
-            translation_coordinators_models[0].id,
-            self.LANGUAGE_4_ID
+        self.assertIn(
+            self.USER_ID_2,
+            translation_coordinators_models[0].coordinator_ids
         )
-        self.assertEqual(
-            translation_coordinators_models[1].id,
-            self.LANGUAGE_5_ID
+        self.assertIn(
+            self.USER_ID_2,
+            translation_coordinators_models[1].coordinator_ids
         )
