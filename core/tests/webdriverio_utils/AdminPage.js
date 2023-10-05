@@ -61,6 +61,7 @@ var AdminPage = function() {
   var languageSelectorCloseButton = $(
     '.e2e-test-language-selector-close-button');
   var languageSelectorAddButton = $('.e2e-test-language-selector-add-button');
+  var editLanguageButton = $('.e2e-test-edit-language-button');
 
   // The reload functions are used for mobile testing
   // done via Browserstack. These functions may cause
@@ -218,33 +219,7 @@ var AdminPage = function() {
       removeButtonElement, 'Role removal button takes too long to appear.');
   };
 
-  this.makeUserTranslationCoordinator = async function(name) {
-    await this._editUserRole(name);
-
-    await action.click('Add new role', addNewRoleButton);
-    await action.matSelect(
-      'New role selector', roleSelector, 'translation coordinator');
-
-    await waitFor.visibilityOf(
-      languageSelectorModal,
-      'Language selector modal taking too long to appear');
-    await action.select(
-      'Language selector', languageSelector, language
-    );
-    await action.click('Add language button', languageSelectorAddButton);
-    await action.click('Close button', languageSelectorCloseButton);
-    await waitFor.invisibilityOf(
-      languageSelectorModal,
-      'Language selector modal taking too long to disappear');
-  };
-
   this._selectLanguage = async function(language) {
-    var languageSelectorModal = $('.e2e-test-language-selector-modal');
-    var languageSelector = $('.e2e-test-language-selector');
-    var languageSelectorCloseButton = $(
-      '.e2e-test-language-selector-close-button');
-    var languageSelectorAddButton = $('.e2e-test-language-selector-add-button');
-
     await waitFor.visibilityOf(
       languageSelectorModal,
       'Language selector modal taking too long to appear');
@@ -279,13 +254,9 @@ var AdminPage = function() {
 
   this.addLanguageToCoordinator = async function(name, language) {
     await this._editUserRole(name);
-
-    var editLanguageButton = $('.e2e-test-edit-language-button');
-
     await action.click(
       'Edit coordinated languages button',
       editLanguageButton);
-
     await this._selectLanguage(language);
   };
 

@@ -241,18 +241,18 @@ var ContributorDashboardAdminPage = function() {
   };
 
   this.expectStatsElementCountToBe = async function(elementsCount) {
-    if (elementsCount === 0) {
-      await waitFor.invisibilityOf(
-        loadingMessage, 'Loading message did not disappear');
-      await waitFor.visibilityOf(
-        noDataMessage, 'No data message is not visible');
-    } else {
-      await waitFor.invisibilityOf(
-        loadingMessage, 'Loading message did not disappear');
-      await waitFor.visibilityOf(statsTable, 'stats table is not visible');
-      var statsListItems = await statsListItemsSelector();
-      expect(statsListItems.length).toBe(elementsCount);
-    }
+    await waitFor.invisibilityOf(
+      loadingMessage, 'Loading message did not disappear');
+    await waitFor.visibilityOf(statsTable, 'stats table is not visible');
+    var statsListItems = await statsListItemsSelector();
+    expect(statsListItems.length).toBe(elementsCount);
+  };
+
+  this.expectNoStatsElement = async function() {
+    await waitFor.invisibilityOf(
+      loadingMessage, 'Loading message did not disappear');
+    await waitFor.visibilityOf(
+      noDataMessage, 'No data message is not visible');
   };
 
   this.expectStatsRowsAreExpanded = async function() {
@@ -264,7 +264,7 @@ var ContributorDashboardAdminPage = function() {
     await waitFor.invisibilityOf(expandedRow, 'Expanded row still visible');
   };
 
-  this.pageToFullyInitiate = async function() {
+  this.waitForLoadingMessageToDisappear = async function() {
     await waitFor.invisibilityOf(
       loadingMessage, 'Loading message did not disappear');
   };
