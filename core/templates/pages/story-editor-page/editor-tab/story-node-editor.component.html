@@ -119,11 +119,6 @@
             <span>Chapter Outline</span>
           </div>
           <br>
-          <div class="outline-Finalized-container" *ngIf="oldOutline">
-            Outline Finalized
-            <i *ngIf="!outlineIsFinalized" (click)="finalizeOutline()" class="far fa-square md-18 e2e-test-finalize-outline" aria-label="Finalize outline"></i>
-            <i *ngIf="outlineIsFinalized" (click)="unfinalizeOutline()" class="fas fa-check-square md-18" aria-label="Unfinalize outline"></i>
-          </div>
           <div *ngIf="!chapterOutlineIsShown">
             <div class="outline-content-container" *ngIf="!oldOutlineToReadOnly">
               <input class="chapter-outline-editor-content e2e-test-node-outline-editor-content e2e-test-rte"
@@ -139,6 +134,9 @@
           </div>
           <br>
           <div class="chapter-card-inputs oppia-mobile-collapsible-card-content" *ngIf="chapterOutlineIsShown">
+            Outline Finalized
+            <i *ngIf="!outlineIsFinalized" (click)="finalizeOutline()" class="far fa-square md-18 e2e-test-finalize-outline" aria-label="Finalize outline"></i>
+            <i *ngIf="outlineIsFinalized" (click)="unfinalizeOutline()" class="fas fa-check-square md-18" aria-label="Unfinalize outline"></i>
             <div tabindex="-1" >
               <schema-based-editor id="storyNodeOutline"
                                    [schema]="OUTLINE_SCHEMA"
@@ -380,9 +378,6 @@
 </div>
 
 <style>
-  .outline-Finalized-container {
-    margin-left: 30px;
-  }
   .outline-content-container {
     margin-left: 50px;
     width: 400px;
