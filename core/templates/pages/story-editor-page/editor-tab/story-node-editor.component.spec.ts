@@ -638,6 +638,14 @@ describe('Story node editor component', () => {
     expect(component.editableOutline).toBe('value');
   });
 
+  it('should click chapter outline save buttons', () => {
+    component.chapterOutlineButtonsAreShown = false;
+
+    component.onSaveButtonClicked();
+
+    expect(component.chapterOutlineButtonsAreShown).toBe(true);
+  });
+
   it('should call StoryUpdateService and curatedExplorationValidationService' +
     ' to set node exploration id if story is published',
   fakeAsync(() => {
