@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for the Preferences page.
  */
 
-import { NO_ERRORS_SCHEMA, Pipe ,ElementRef } from '@angular/core';
+import { NO_ERRORS_SCHEMA, Pipe, ElementRef } from '@angular/core';
 import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
 import { NgbModal, NgbModalModule, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { UserInfo } from 'domain/user/user-info.model';
@@ -474,8 +474,10 @@ describe('Preferences Page Component', () => {
 
       componentInstance.handleTabForFirstRadio(event);
 
-      expect(componentInstance.secondRadio.nativeElement.focus).toHaveBeenCalled();
-      expect(componentInstance.thirdRadio.nativeElement.focus).not.toHaveBeenCalled();
+      expect(componentInstance.secondRadio.nativeElement.focus)
+        .toHaveBeenCalled();
+      expect(componentInstance.thirdRadio.nativeElement.focus)
+        .not.toHaveBeenCalled();
     });
 
     it('should handle tab key press for second radio', () => {
@@ -491,14 +493,17 @@ describe('Preferences Page Component', () => {
 
       componentInstance.handleTabForSecondRadio(event);
 
-      expect(componentInstance.firstRadio.nativeElement.focus).not.toHaveBeenCalled();
-      expect(componentInstance.thirdRadio.nativeElement.focus).toHaveBeenCalled();
+      expect(componentInstance.firstRadio.nativeElement.focus)
+        .not.toHaveBeenCalled();
+      expect(componentInstance.thirdRadio.nativeElement.focus)
+        .toHaveBeenCalled();
     });
 
     it('should handle shift+tab key press for second radio', () => {
       const mockFirstRadio = new ElementRef(document.createElement('input'));
       const mockThirdRadio = new ElementRef(document.createElement('input'));
-      const event = new KeyboardEvent('keydown', { key: 'Tab', shiftKey: true });
+      const event = new KeyboardEvent('keydown', { key: 'Tab',
+        shiftKey: true });
 
       componentInstance.firstRadio = mockFirstRadio;
       componentInstance.thirdRadio = mockThirdRadio;
@@ -508,14 +513,17 @@ describe('Preferences Page Component', () => {
 
       componentInstance.handleTabForSecondRadio(event);
 
-      expect(componentInstance.firstRadio.nativeElement.focus).toHaveBeenCalled();
-      expect(componentInstance.thirdRadio.nativeElement.focus).not.toHaveBeenCalled();
+      expect(componentInstance.firstRadio.nativeElement.focus)
+        .toHaveBeenCalled();
+      expect(componentInstance.thirdRadio.nativeElement.focus)
+        .not.toHaveBeenCalled();
     });
 
     it('should handle shift+tab key press for third radio', () => {
       const mockFirstRadio = new ElementRef(document.createElement('input'));
       const mockSecondRadio = new ElementRef(document.createElement('input'));
-      const event = new KeyboardEvent('keydown', { key: 'Tab', shiftKey: true });
+      const event = new KeyboardEvent('keydown',
+        { key: 'Tab', shiftKey: true });
 
       componentInstance.firstRadio = mockFirstRadio;
       componentInstance.secondRadio = mockSecondRadio;
@@ -525,8 +533,10 @@ describe('Preferences Page Component', () => {
 
       componentInstance.handleTabForThirdRadio(event);
 
-      expect(componentInstance.firstRadio.nativeElement.focus).not.toHaveBeenCalled();
-      expect(componentInstance.secondRadio.nativeElement.focus).toHaveBeenCalled();
+      expect(componentInstance.firstRadio.nativeElement.focus)
+        .not.toHaveBeenCalled();
+      expect(componentInstance.secondRadio.nativeElement.focus)
+        .toHaveBeenCalled();
     });
 
     afterEach(() => {
