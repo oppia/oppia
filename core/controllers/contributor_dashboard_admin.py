@@ -189,14 +189,13 @@ class ContributionRightsHandler(
                         username))
             user_services.allow_user_to_submit_question(user_id)
 
-        if category in [
+        assert category in (
                 constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION,
                 constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER,
                 constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION,
-
                 constants.CONTRIBUTION_RIGHT_CATEGORY_SUBMIT_QUESTION,
-        ]:
-            email_manager.send_email_to_new_contributor(
+        )
+        email_manager.send_email_to_new_contributor(
                 user_id, category, language_code=language_code)
         self.render_json({})
 
@@ -262,13 +261,13 @@ class ContributionRightsHandler(
                         username))
             user_services.remove_question_submit_rights(user_id)
 
-        if category in [
+        assert category in (
                 constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION,
                 constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER,
                 constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION,
                 constants.CONTRIBUTION_RIGHT_CATEGORY_SUBMIT_QUESTION
-        ]:
-            email_manager.send_email_to_removed_contributor(
+        )
+        email_manager.send_email_to_removed_contributor(
                 user_id, category, language_code=language_code)
         self.render_json({})
 
