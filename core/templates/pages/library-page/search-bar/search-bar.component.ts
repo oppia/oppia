@@ -181,25 +181,26 @@ export class SearchBarComponent implements OnInit, OnDestroy {
     }
 
     this.updateSelectionDetails(itemsType);
-    this.onSearchQueryChangeExec();
     this.refreshSearchBarLabels();
   }
 
   deselectAll(itemsType: string): void {
     this.selectionDetails[itemsType].selections = {};
     this.updateSelectionDetails(itemsType);
-    this.onSearchQueryChangeExec();
     this.refreshSearchBarLabels();
   }
 
   onSearchQueryChangeExec(): void {
+    let searchUrlQueryString = this.searchService.getSearchUrlQueryString(
+      this.searchQuery, this.selectionDetails.categories.selections,
+      this.selectionDetails.languageCodes.selections
+    );
+    if (!searchUrlQueryString) {
+      return;
+    }
     this.searchService.executeSearchQuery(
       this.searchQuery, this.selectionDetails.categories.selections,
       this.selectionDetails.languageCodes.selections, () => {
-        let searchUrlQueryString = this.searchService.getSearchUrlQueryString(
-          this.searchQuery, this.selectionDetails.categories.selections,
-          this.selectionDetails.languageCodes.selections
-        );
         let url = new URL(this.windowRef.nativeWindow.location.toString());
         let siteLangCode: string | null = url.searchParams.get('lang');
         url.search = '?q=' + searchUrlQueryString;
