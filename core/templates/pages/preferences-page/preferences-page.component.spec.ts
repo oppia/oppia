@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for the Preferences page.
  */
 
-import { NO_ERRORS_SCHEMA, Pipe } from '@angular/core';
+import { NO_ERRORS_SCHEMA, Pipe , ElementRef} from '@angular/core';
 import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
 import { NgbModal, NgbModalModule, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { UserInfo } from 'domain/user/user-info.model';
@@ -460,6 +460,61 @@ describe('Preferences Page Component', () => {
       expect(userService.setProfileImageDataUrlAsync).toHaveBeenCalled();
       expect(mockWindowRef.nativeWindow.location.reload).toHaveBeenCalled();
     }));
+
+  it('should handle tab key press for first radio', () => {
+    const mockSecondRadio = new ElementRef(document.createElement('input'));
+    const mockThirdRadio = new ElementRef(document.createElement('input'));
+    const event = new KeyboardEvent('keydown', { key: 'Tab' });
+
+    spyOn(mockSecondRadio.nativeElement, 'focus');
+
+    componentInstance.handleTabForFirstRadio(event);
+
+    expect(mockSecondRadio.nativeElement.focus).toHaveBeenCalled();
+    expect(mockThirdRadio.nativeElement.focus).not.toHaveBeenCalled();
+  });
+
+  it('should handle tab key press for second radio', () => {
+    const mockFirstRadio = new ElementRef(document.createElement('input'));
+    const mockThirdRadio = new ElementRef(document.createElement('input'));
+    const event = new KeyboardEvent('keydown', { key: 'Tab' });
+
+    spyOn(mockFirstRadio.nativeElement, 'focus');
+    spyOn(mockThirdRadio.nativeElement, 'focus');
+
+
+    componentInstance.handleTabForSecondRadio(event);
+
+    expect(mockFirstRadio.nativeElement.focus).not.toHaveBeenCalled();
+    expect(mockThirdRadio.nativeElement.focus).toHaveBeenCalled();
+  });
+
+  it('should handle shift+tab key press for second radio', () => {
+    const mockFirstRadio = new ElementRef(document.createElement('input'));
+    const mockThirdRadio = new ElementRef(document.createElement('input'));
+    const event = new KeyboardEvent('keydown', { key: 'Tab', shiftKey: true });
+
+    spyOn(mockFirstRadio.nativeElement, 'focus');
+    spyOn(mockThirdRadio.nativeElement, 'focus');
+
+    componentInstance.handleTabForSecondRadio(event);
+
+    expect(mockFirstRadio.nativeElement.focus).toHaveBeenCalled();
+    expect(mockThirdRadio.nativeElement.focus).not.toHaveBeenCalled();
+  });
+
+  it('should handle shift+tab key press for third radio', () => {
+    const mockFirstRadio = new ElementRef(document.createElement('input'));
+    const mockSecondRadio = new ElementRef(document.createElement('input'));
+    const event = new KeyboardEvent('keydown', { key: 'Tab', shiftKey: true });
+
+    spyOn(mockSecondRadio.nativeElement, 'focus');
+
+    componentInstance.handleTabForThirdRadio(event);
+
+    expect(mockSecondRadio.nativeElement.focus).toHaveBeenCalled();
+    expect(mockFirstRadio.nativeElement.focus).not.toHaveBeenCalled();
+  });
 
     afterEach(() => {
       httpTestingController.verify();
