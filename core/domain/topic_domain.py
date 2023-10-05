@@ -31,7 +31,7 @@ from core.constants import constants
 from core.domain import change_domain
 from core.domain import subtopic_page_domain
 
-from typing import Dict, List, Literal, Mapping, Optional, TypedDict
+from typing import Dict, List, Literal, Optional, TypedDict
 
 # The fs_services module is required in one of the migration
 # functions in Topic class. This import should be removed
