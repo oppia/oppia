@@ -34,6 +34,7 @@ export class CdAdminQuestionRoleEditorModal implements OnInit {
 // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() username!: string;
   @Input() rights!: questionRights;
+  @Input() loadingMessage: string = 'Loading';
   isQuestionSubmitter!: boolean;
   isQuestionReviewer!: boolean;
 
@@ -42,8 +43,11 @@ export class CdAdminQuestionRoleEditorModal implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.isQuestionSubmitter = this.rights.isQuestionSubmitter;
-    this.isQuestionReviewer = this.rights.isQuestionReviewer;
+    if (this.rights) {
+      this.isQuestionSubmitter = this.rights.isQuestionSubmitter;
+      this.isQuestionReviewer = this.rights.isQuestionReviewer;
+      this.loadingMessage = '';
+    }
   }
 
   toggleQuestionSubmitter(): void {

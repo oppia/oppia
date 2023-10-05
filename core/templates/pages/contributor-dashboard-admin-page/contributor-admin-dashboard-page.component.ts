@@ -266,7 +266,8 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
     if (this.checkMobileView()) {
       return;
     }
-    if (this.isTranslationCoordinator) {
+    if (this.activeTab === this.TAB_NAME_TRANSLATION_REVIEWER ||
+      this.activeTab === this.TAB_NAME_TRANSLATION_SUBMITTER) {
       if (
         targetElement &&
         !this.languageDropdownRef.nativeElement.contains(targetElement)

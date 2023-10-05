@@ -15,7 +15,7 @@
     padding: 15px;
     gap: 12px;
     display: flex;
-    align-self: flex-end;
+    justify-content: end;
   }
   .question-role-editor-footer-ruler {
     opacity: 0.10;
@@ -64,7 +64,11 @@
     word-wrap: break-word
   }
   .label-explanation {
-    left: 32px; top: 23px;  color: #667085; font-size: 14px; font-family: Roboto; font-weight: 400; word-wrap: break-word
+    color: #667085;
+    font-size: 14px;
+    font-family: Roboto;
+    font-weight: 400;
+    word-wrap: break-word
   }
   .title-container {
     color: #00645C;
@@ -89,8 +93,20 @@
     padding-left: 20px;
     padding-bottom: 5px;
   }
+  .loading-message {
+    color: #00645C;
+    font-size: xx-large;
+    padding: 20px;
+  }
 </style>
 <div class="question-role-editor-main-container">
+  <div *ngIf="loadingMessage" class="loading-message e2e-test-loading-message">
+    <div class="oppia-align-center">
+      <span>{{ loadingMessage }}</span>
+      <loading-dots></loading-dots>
+    </div>
+  </div>
+  <div *ngIf="!loadingMessage">
     <div class="title-container">Edit Role for user {{username}}</div>
     <div class="sub-heading-container">User Role</div>
     <div class="attribute-container">
@@ -118,4 +134,5 @@
         <button class="cancel-button" (click)="close()">Cancel</button>
         <button class="save-button" (click)="saveAndClose()">Save Changes</button>
     </div>
+  </div>
 </div>

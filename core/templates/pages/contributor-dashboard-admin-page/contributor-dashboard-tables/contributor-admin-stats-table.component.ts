@@ -29,6 +29,7 @@ import { AppConstants } from 'app.constants';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { QuestionReviewerStats, QuestionSubmitterStats, TranslationReviewerStats, TranslationSubmitterStats } from '../contributor-dashboard-admin-summary.model';
 import { CdAdminQuestionRoleEditorModal } from '../question-role-editor-modal/cd-admin-question-role-editor-modal.component';
+import { CdAdminTranslationRoleEditorModal } from '../translation-role-editor-modal/cd-admin-translation-role-editor-modal.component';
 import constants from 'assets/constants';
 
 @Component({
@@ -111,10 +112,10 @@ export class ContributorAdminStatsTable implements OnInit {
   }
 
   openCdAdminQuestionEditorRoleModal(username: string): void {
+    const modelRef = this.modalService.open(
+      CdAdminQuestionRoleEditorModal);
     this.contributorDashboardAdminBackendApiService
       .contributionReviewerRightsAsync(username).then(response => {
-        const modelRef = this.modalService.open(
-          CdAdminQuestionRoleEditorModal);
         modelRef.componentInstance.username = username;
         modelRef.componentInstance.rights = {
           isQuestionSubmitter: response.can_submit_questions,
@@ -161,6 +162,31 @@ export class ContributorAdminStatsTable implements OnInit {
           // No further action is needed.
         });
       });
+  }
+
+  openCdAdminTranslationRoleEditorModal(username: string): void {
+    const modalRef = this.modalService.open(
+      CdAdminTranslationRoleEditorModal);
+    this.contributorDashboardAdminBackendApiService
+      .contributionReviewerRightsAsync(username).then(response => {
+        modalRef.componentInstance.username = username;
+        modalRef.componentInstance.assignedLanguageIds = (
+          response.can_review_translation_for_language_codes);
+        let languageIdToName: Record<string, string> = {};
+        constants.SUPPORTED_AUDIO_LANGUAGES.forEach(
+          language => languageIdToName[language.id] = language.description);
+        modalRef.componentInstance.languageIdToName = languageIdToName;
+      });
+  }
+
+  openRoleEditor(username: string): void {
+    if (this.activeTab === this.TAB_NAME_TRANSLATION_REVIEWER ||
+      this.activeTab === this.TAB_NAME_TRANSLATION_SUBMITTER) {
+      this.openCdAdminTranslationRoleEditorModal(username);
+    } else if (this.activeTab === this.TAB_NAME_QUESTION_SUBMITTER ||
+      this.activeTab === this.TAB_NAME_QUESTION_REVIEWER) {
+      this.openCdAdminQuestionEditorRoleModal(username);
+    }
   }
 
   checkMobileView(): boolean {

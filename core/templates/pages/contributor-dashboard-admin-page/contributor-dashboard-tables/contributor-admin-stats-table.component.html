@@ -124,7 +124,7 @@
     <ng-container matColumnDef="role">
       <th mat-header-cell *matHeaderCellDef><b> Role </b></th>
       <td mat-cell *matCellDef="let element">
-        <button mat-raised-button (click)="openCdAdminQuestionEditorRoleModal(element.contributorName) && expandedElement = expandedElement !== element ? null : element">
+        <button mat-raised-button (click)="openRoleEditor(element.contributorName) && expandedElement = expandedElement !== element ? null : element">
           {{ checkMobileView() ? 'EDIT ROLE' : 'EDIT' }}
         </button>
       </td>

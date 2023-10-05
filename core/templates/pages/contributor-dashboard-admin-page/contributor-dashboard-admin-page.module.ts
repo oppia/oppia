@@ -34,6 +34,7 @@ import { RequestInterceptor } from 'services/request-interceptor.service';
 import { SharedComponentsModule } from 'components/shared-component.module';
 import { OppiaAngularRootComponent } from 'components/oppia-angular-root.component';
 import { CdAdminQuestionRoleEditorModal } from './question-role-editor-modal/cd-admin-question-role-editor-modal.component';
+import { CdAdminTranslationRoleEditorModal } from './translation-role-editor-modal/cd-admin-translation-role-editor-modal.component';
 import { ContributorDashboardAdminNavbarComponent } from './navbar/contributor-dashboard-admin-navbar.component';
 import { ContributorAdminDashboardPageComponent } from './contributor-admin-dashboard-page.component';
 import { ContributorAdminStatsTable } from './contributor-dashboard-tables/contributor-admin-stats-table.component';
@@ -63,6 +64,7 @@ import { AppErrorHandlerProvider } from 'pages/oppia-root/app-error-handler';
   ],
   declarations: [
     CdAdminQuestionRoleEditorModal,
+    CdAdminTranslationRoleEditorModal,
     ContributorDashboardAdminNavbarComponent,
     ContributorAdminDashboardPageComponent,
     ContributorAdminStatsTable,
@@ -70,6 +72,7 @@ import { AppErrorHandlerProvider } from 'pages/oppia-root/app-error-handler';
   ],
   entryComponents: [
     CdAdminQuestionRoleEditorModal,
+    CdAdminTranslationRoleEditorModal,
     ContributorDashboardAdminNavbarComponent,
     ContributorAdminDashboardPageComponent,
     ContributorAdminStatsTable,
