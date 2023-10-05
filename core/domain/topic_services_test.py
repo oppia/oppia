@@ -762,13 +762,14 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             'property_name': (
                 topic_domain.TOPIC_PROPERTY_STORY_EXPLORATION_MAPPING),
             'old_value': {
-                self.story_id_1: [],
-                self.story_id_2: [],
-                self.story_id_3: []
+                story_id: []
+                for story_id
+                in [self.story_id_1, self.story_id_2, self.story_id_3]
             },
             'new_value': {
-                self.story_id_1: [],
-                self.story_id_2: ['example_exp_id'],
+                story_id: []
+                for story_id
+                in [self.story_id_1, self.story_id_2]
             }
         })]
         topic_services.update_topic_and_subtopic_pages(
@@ -790,8 +791,9 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(topic.page_title_fragment_for_web, 'topic page title')
         self.assertEqual(topic.skill_ids_for_diagnostic_test, [])
         self.assertDictEqual(topic.story_exploration_mapping, {
-            self.story_id_1: [],
-            self.story_id_2: ['example_exp_id']
+            story_id: []
+            for story_id
+            in [self.story_id_1, self.story_id_2]
         })
         self.assertEqual(topic_summary.version, 3)
         self.assertEqual(topic_summary.thumbnail_filename, 'thumbnail.svg')

@@ -3645,7 +3645,7 @@ version: 1
         meta_tag_content: str = 'topic meta tag content',
         practice_tab_is_displayed: bool = False,
         page_title_fragment_for_web: str = 'topic page title',
-        story_exploration_mapping: Optional[Mapping[str, List[str]]] = None
+        story_exploration_mapping: Optional[Dict[str, List[str]]] = None
     ) -> topic_domain.Topic:
         """Creates an Oppia Topic and saves it.
 

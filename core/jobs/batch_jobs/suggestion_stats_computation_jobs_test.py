@@ -997,6 +997,10 @@ class GenerateContributionStatsJobTests(job_test_utils.JobTestBase):
         })
         subtopics = [subtopic]
         skill_ids_for_diagnostic_test = [skill_id]
+        story_exploration_mapping: Dict[str, List[str]] = {
+            'story_id1': [],
+            'story_id2': []
+        }
 
         topic = topic_domain.Topic(
             topic_id, 'Topic1', 'topic-three', 'topic-three', None,
@@ -1006,7 +1010,8 @@ class GenerateContributionStatsJobTests(job_test_utils.JobTestBase):
             feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION, 2,
             'en', 0, feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION,
             'topic meta tag content', False,
-            'topic page title', skill_ids_for_diagnostic_test)
+            'topic page title', skill_ids_for_diagnostic_test,
+            story_exploration_mapping)
         topic_services.save_new_topic('topic_admin', topic)
 
         subtopic = topic_domain.Subtopic.from_dict({
@@ -1915,6 +1920,10 @@ class AuditGenerateContributionStatsJobTests(job_test_utils.JobTestBase):
         })
         subtopics = [subtopic]
         skill_ids_for_diagnostic_test = [skill_id]
+        story_exploration_mapping: Dict[str, List[str]] = {
+            'story_id1': [],
+            'story_id2': []
+        }
 
         topic = topic_domain.Topic(
             topic_id, 'Topic1', 'topic-three', 'topic-three', None,
@@ -1924,7 +1933,8 @@ class AuditGenerateContributionStatsJobTests(job_test_utils.JobTestBase):
             feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION, 2,
             'en', 0, feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION,
             'topic meta tag content', False,
-            'topic page title', skill_ids_for_diagnostic_test)
+            'topic page title', skill_ids_for_diagnostic_test,
+            story_exploration_mapping)
         topic_services.save_new_topic('topic_admin', topic)
 
         subtopic = topic_domain.Subtopic.from_dict({
