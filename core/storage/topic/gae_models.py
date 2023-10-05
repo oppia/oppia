@@ -299,7 +299,7 @@ class TopicModel(base_models.VersionedModel):
     def get_all_story_exploration_mappings(
         cls,
         name: Optional[str] = None
-    ) -> List[Dict[str, List[str]]]:
+        ) -> List[Dict[str, List[str]]]:
         """Gets each TopicModel's story_exploration_mapping property. The models
         to get said property can be filtered by topic name, if given.
 
@@ -308,14 +308,18 @@ class TopicModel(base_models.VersionedModel):
                 topic models aren't filtered out by name.
 
         Returns:
-            list(dict(str, list(str))). A list of story_exploration_mapping
-            values in each TopicModel that haven't been filtered out.
+            list(dict(str, list(str))). A list of
+            story_exploration_mapping values in each TopicModel that haven't
+            been filtered out.
         """
         query = cls.query(projection=['story_exploration_mapping'])
         if name:
             query = query.filter(cls.name == name)
-        projections = query.fetch(feconf.DEFAULT_SUGGESTION_QUERY_LIMIT)
-        return [model.story_exploration_mapping for model in projections]
+        projections: Sequence[TopicModel] = query.fetch(
+            feconf.DEFAULT_SUGGESTION_QUERY_LIMIT)
+        return [
+            projection.story_exploration_mapping for projection in projections
+        ]
 
     @staticmethod
     def get_model_association_to_user(

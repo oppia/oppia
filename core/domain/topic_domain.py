@@ -31,7 +31,7 @@ from core.constants import constants
 from core.domain import change_domain
 from core.domain import subtopic_page_domain
 
-from typing import List, Literal, Mapping, Optional, TypedDict
+from typing import Dict, List, Literal, Mapping, Optional, TypedDict
 
 # The fs_services module is required in one of the migration
 # functions in Topic class. This import should be removed
@@ -611,8 +611,8 @@ class UpdateTopicPropertyStoryExplorationMappingCmd(TopicChange):
     """
 
     property_name: Literal['story_exploration_mapping']
-    new_value: Mapping[str, List[str]]
-    old_value: Mapping[str, List[str]]
+    new_value: Dict[str, List[str]]
+    old_value: Dict[str, List[str]]
 
 
 class MigrateSubtopicSchemaToLatestVersionCmd(TopicChange):
@@ -968,7 +968,7 @@ class TopicDict(TypedDict, total=False):
     practice_tab_is_displayed: bool
     page_title_fragment_for_web: str
     skill_ids_for_diagnostic_test: List[str]
-    story_exploration_mapping: Mapping[str, List[str]]
+    story_exploration_mapping: Dict[str, List[str]]
     created_on: str
     last_updated: str
 
@@ -1013,7 +1013,7 @@ class Topic:
         practice_tab_is_displayed: bool,
         page_title_fragment_for_web: str,
         skill_ids_for_diagnostic_test: List[str],
-        story_exploration_mapping: Mapping[str, List[str]],
+        story_exploration_mapping: Dict[str, List[str]],
         created_on: Optional[datetime.datetime] = None,
         last_updated: Optional[datetime.datetime] = None
     ) -> None:
@@ -1055,9 +1055,9 @@ class Topic:
                 topic viewer page.
             skill_ids_for_diagnostic_test: list(str). The list of skill_id that
                 will be used from a topic in the diagnostic test.
-            story_exploration_mapping: dict(str, list(str)). A dictionary that
-                maps each of the topic's story ids to its corresponding linked
-                exploration ids.
+            story_exploration_mapping: dict(str, list(str)). A
+                dictionary that maps each of the topic's story ids to its
+                corresponding linked exploration ids.
             created_on: datetime.datetime. Date and time when the topic is
                 created.
             last_updated: datetime.datetime. Date and time when the
@@ -1422,7 +1422,12 @@ class Topic:
         for index, reference in enumerate(self.canonical_story_references):
             if reference.story_id == story_id:
                 del self.canonical_story_references[index]
-                del self.story_exploration_mapping[story_id]
+                self.story_exploration_mapping = {
+                    topic_story_id: exp_ids
+                    for topic_story_id, exp_ids
+                    in self.story_exploration_mapping.items()
+                    if topic_story_id != story_id
+                }
                 deleted = True
                 break
         if not deleted:
@@ -1478,7 +1483,11 @@ class Topic:
         self.canonical_story_references.append(
             StoryReference.create_default_story_reference(story_id)
         )
-        self.story_exploration_mapping[story_id] = []
+        self.story_exploration_mapping = dict(
+            list(self.story_exploration_mapping.items()) + [
+                (story_id, [])
+            ]
+        )
 
     def add_additional_story(self, story_id: str) -> None:
         """Adds a story to the additional_story_references list and to the
@@ -1499,7 +1508,11 @@ class Topic:
         self.additional_story_references.append(
             StoryReference.create_default_story_reference(story_id)
         )
-        self.story_exploration_mapping[story_id] = []
+        self.story_exploration_mapping = dict(
+            list(self.story_exploration_mapping.items()) + [
+                (story_id, [])
+            ]
+        )
 
     def delete_additional_story(self, story_id: str) -> None:
         """Removes a story from the additional_story_references list and to the
@@ -1517,7 +1530,12 @@ class Topic:
         for index, reference in enumerate(self.additional_story_references):
             if reference.story_id == story_id:
                 del self.additional_story_references[index]
-                del self.story_exploration_mapping[story_id]
+                self.story_exploration_mapping = {
+                    topic_story_id: exp_ids
+                    for topic_story_id, exp_ids
+                    in self.story_exploration_mapping.items()
+                    if topic_story_id != story_id
+                }
                 deleted = True
                 break
         if not deleted:
@@ -1924,7 +1942,7 @@ class Topic:
         self.skill_ids_for_diagnostic_test = skill_ids_for_diagnostic_test
 
     def update_story_exploration_mapping(
-        self, story_exploration_mapping: Mapping[str, List[str]]
+        self, story_exploration_mapping: Dict[str, List[str]]
     ) -> None:
         """Updates the story_exploration_mapping field for the topic instance.
 

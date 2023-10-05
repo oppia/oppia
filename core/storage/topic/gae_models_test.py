@@ -81,7 +81,8 @@ class TopicModelUnitTests(test_utils.GenericTestBase):
             next_subtopic_id=1,
             language_code='en',
             page_title_fragment_for_web='fragm',
-            skill_ids_for_diagnostic_test=[]
+            skill_ids_for_diagnostic_test=[],
+            story_exploration_mapping={}
         )
         # We check that topic has not been saved before calling commit().
         self.assertIsNone(topic_models.TopicModel.get_by_name(self.TOPIC_NAME))
