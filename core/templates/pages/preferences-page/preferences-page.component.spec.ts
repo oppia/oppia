@@ -502,8 +502,8 @@ describe('Preferences Page Component', () => {
     it('should handle shift+tab key press for second radio', () => {
       const mockFirstRadio = new ElementRef(document.createElement('input'));
       const mockThirdRadio = new ElementRef(document.createElement('input'));
-      const event = new KeyboardEvent('keydown', { key: 'Tab',
-        shiftKey: true });
+      const event = new KeyboardEvent(
+        'keydown', { key: 'Tab', shiftKey: true });
 
       componentInstance.firstRadio = mockFirstRadio;
       componentInstance.thirdRadio = mockThirdRadio;
@@ -522,8 +522,8 @@ describe('Preferences Page Component', () => {
     it('should handle shift+tab key press for third radio', () => {
       const mockFirstRadio = new ElementRef(document.createElement('input'));
       const mockSecondRadio = new ElementRef(document.createElement('input'));
-      const event = new KeyboardEvent('keydown',
-        { key: 'Tab', shiftKey: true });
+      const event = new KeyboardEvent(
+        'keydown', { key: 'Tab', shiftKey: true });
 
       componentInstance.firstRadio = mockFirstRadio;
       componentInstance.secondRadio = mockSecondRadio;
