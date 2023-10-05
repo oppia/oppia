@@ -43,6 +43,7 @@ export interface NewConfigPropertyValues {
 export interface UserRolesBackendResponse {
   roles: string[];
   'managed_topic_ids': string[];
+  'coordinated_language_ids': string[];
   banned: boolean;
 }
 
@@ -260,6 +261,36 @@ export class AdminBackendApiService {
         AdminPageConstants.TOPIC_MANAGER_ROLE_HANDLER_URL, {
           username: username,
           topic_id: topicId,
+          action: 'deassign'
+        }
+      ).toPromise().then(resolve, errorResponse => {
+        reject(errorResponse.error.error);
+      });
+    });
+  }
+
+  async assignTranslationCoordinator(
+      username: string, languageId: string): Promise<void> {
+    return new Promise((resolve, reject) => {
+      this.http.put<void>(
+        AdminPageConstants.TRANSLATION_COORDINATOR_ROLE_HANDLER_URL, {
+          username: username,
+          language_id: languageId,
+          action: 'assign'
+        }
+      ).toPromise().then(resolve, errorResponse => {
+        reject(errorResponse.error.error);
+      });
+    });
+  }
+
+  async deassignTranslationCoordinator(
+      username: string, languageId: string): Promise<void> {
+    return new Promise((resolve, reject) => {
+      this.http.put<void>(
+        AdminPageConstants.TRANSLATION_COORDINATOR_ROLE_HANDLER_URL, {
+          username: username,
+          language_id: languageId,
           action: 'deassign'
         }
       ).toPromise().then(resolve, errorResponse => {
