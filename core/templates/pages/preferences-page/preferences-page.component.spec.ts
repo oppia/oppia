@@ -466,12 +466,16 @@ describe('Preferences Page Component', () => {
     const mockThirdRadio = new ElementRef(document.createElement('input'));
     const event = new KeyboardEvent('keydown', { key: 'Tab' });
 
-    spyOn(mockSecondRadio.nativeElement, 'focus');
+    componentInstance.secondRadio = mockSecondRadio;
+    componentInstance.thirdRadio = mockThirdRadio;
+
+    spyOn(componentInstance.secondRadio.nativeElement, 'focus');
+    spyOn(componentInstance.thirdRadio.nativeElement, 'focus');
 
     componentInstance.handleTabForFirstRadio(event);
 
-    expect(mockSecondRadio.nativeElement.focus).toHaveBeenCalled();
-    expect(mockThirdRadio.nativeElement.focus).not.toHaveBeenCalled();
+    expect(componentInstance.secondRadio.nativeElement.focus).toHaveBeenCalled();
+    expect(componentInstance.thirdRadio.nativeElement.focus).not.toHaveBeenCalled();
   });
 
   it('should handle tab key press for second radio', () => {
@@ -479,14 +483,16 @@ describe('Preferences Page Component', () => {
     const mockThirdRadio = new ElementRef(document.createElement('input'));
     const event = new KeyboardEvent('keydown', { key: 'Tab' });
 
-    spyOn(mockFirstRadio.nativeElement, 'focus');
-    spyOn(mockThirdRadio.nativeElement, 'focus');
+    componentInstance.firstRadio = mockFirstRadio;
+    componentInstance.thirdRadio = mockThirdRadio;
 
+    spyOn(componentInstance.firstRadio.nativeElement, 'focus');
+    spyOn(componentInstance.thirdRadio.nativeElement, 'focus');
 
     componentInstance.handleTabForSecondRadio(event);
 
-    expect(mockFirstRadio.nativeElement.focus).not.toHaveBeenCalled();
-    expect(mockThirdRadio.nativeElement.focus).toHaveBeenCalled();
+    expect(componentInstance.firstRadio.nativeElement.focus).not.toHaveBeenCalled();
+    expect(componentInstance.thirdRadio.nativeElement.focus).toHaveBeenCalled();
   });
 
   it('should handle shift+tab key press for second radio', () => {
@@ -494,13 +500,16 @@ describe('Preferences Page Component', () => {
     const mockThirdRadio = new ElementRef(document.createElement('input'));
     const event = new KeyboardEvent('keydown', { key: 'Tab', shiftKey: true });
 
-    spyOn(mockFirstRadio.nativeElement, 'focus');
-    spyOn(mockThirdRadio.nativeElement, 'focus');
+    componentInstance.firstRadio = mockFirstRadio;
+    componentInstance.thirdRadio = mockThirdRadio;
+
+    spyOn(componentInstance.firstRadio.nativeElement, 'focus');
+    spyOn(componentInstance.thirdRadio.nativeElement, 'focus');
 
     componentInstance.handleTabForSecondRadio(event);
 
-    expect(mockFirstRadio.nativeElement.focus).toHaveBeenCalled();
-    expect(mockThirdRadio.nativeElement.focus).not.toHaveBeenCalled();
+    expect(componentInstance.firstRadio.nativeElement.focus).toHaveBeenCalled();
+    expect(componentInstance.thirdRadio.nativeElement.focus).not.toHaveBeenCalled();
   });
 
   it('should handle shift+tab key press for third radio', () => {
@@ -508,12 +517,16 @@ describe('Preferences Page Component', () => {
     const mockSecondRadio = new ElementRef(document.createElement('input'));
     const event = new KeyboardEvent('keydown', { key: 'Tab', shiftKey: true });
 
-    spyOn(mockSecondRadio.nativeElement, 'focus');
+    componentInstance.firstRadio = mockFirstRadio;
+    componentInstance.secondRadio = mockSecondRadio;
+
+    spyOn(componentInstance.firstRadio.nativeElement, 'focus');
+    spyOn(componentInstance.secondRadio.nativeElement, 'focus');
 
     componentInstance.handleTabForThirdRadio(event);
 
-    expect(mockSecondRadio.nativeElement.focus).toHaveBeenCalled();
-    expect(mockFirstRadio.nativeElement.focus).not.toHaveBeenCalled();
+    expect(componentInstance.firstRadio.nativeElement.focus).not.toHaveBeenCalled();
+    expect(componentInstance.secondRadio.nativeElement.focus).toHaveBeenCalled();
   });
 
     afterEach(() => {
