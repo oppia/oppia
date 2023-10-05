@@ -621,24 +621,21 @@ describe('Story node editor component', () => {
     expect(component.explorationInputButtonsAreShown).toBe(false);
   });
 
-  it('should click chapter outline save button', () => {
-    component.chapterOutlineButtonsAreShown = true;
-    component.chapterOutlineIsShown = true;
+  it('should toggle chapter outline buttons', () => {
+    component.chapterOutlineButtonsAreShown = false;
+    component.toggleChapterOutlineButtons();
 
-    component.onSaveButtonClicked();
+    expect(component.chapterOutlineButtonsAreShown).toBe(true);
 
-    expect(component.chapterOutlineButtonsAreShown).toBe(false);
-    expect(component.chapterOutlineIsShown).toBe(false);
-  });
-
-  it('should click chapter outline cancel button', () => {
-    component.chapterOutlineButtonsAreShown = true;
-    component.chapterOutlineIsShown = true;
-
-    component.onCancelButtonClicked();
+    component.toggleChapterOutlineButtons();
 
     expect(component.chapterOutlineButtonsAreShown).toBe(false);
-    expect(component.chapterOutlineIsShown).toBe(false);
+
+    component.chapterOutlineButtonsAreShown = false;
+    component.editableOutline = '';
+    component.updateLocalEditableOutline('value');
+
+    expect(component.editableOutline).toBe('value');
   });
 
   it('should call StoryUpdateService and curatedExplorationValidationService' +
