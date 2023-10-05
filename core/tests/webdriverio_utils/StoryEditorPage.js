@@ -463,6 +463,7 @@ var StoryEditorPage = function() {
     await action.click('Chapter node editor content', nodeOutlineEditorContent);
     await action.click('Chapter node editor', nodeOutlineEditor);
     await action.click('Node outline cancel button', nodeOutlineCancelButton);
+    await action.click('Chapter node editor content', nodeOutlineEditorContent);   
     await action.click('Finalize outline', nodeOutlineFinalizeCheckbox);
   };
 
