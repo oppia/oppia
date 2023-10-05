@@ -1497,7 +1497,8 @@ class AdminRoleHandlerTest(test_utils.GenericTestBase):
             response_dict, {
                 'roles': [feconf.ROLE_ID_FULL_USER],
                 'banned': False,
-                'managed_topic_ids': []
+                'managed_topic_ids': [],
+                'coordinated_language_ids': []
             })
 
         # Check role correctly gets updated.
@@ -1622,7 +1623,8 @@ class AdminRoleHandlerTest(test_utils.GenericTestBase):
                 'roles': [
                     feconf.ROLE_ID_FULL_USER, feconf.ROLE_ID_TOPIC_MANAGER],
                 'banned': False,
-                'managed_topic_ids': [topic_id]
+                'managed_topic_ids': [topic_id],
+                'coordinated_language_ids': []
             })
 
         csrf_token = self.get_new_csrf_token()
@@ -1648,7 +1650,8 @@ class AdminRoleHandlerTest(test_utils.GenericTestBase):
         self.assertEqual(response_dict, {
             'roles': [feconf.ROLE_ID_FULL_USER, feconf.ROLE_ID_MODERATOR],
             'banned': False,
-            'managed_topic_ids': []
+            'managed_topic_ids': [],
+            'coordinated_language_ids': []
         })
 
         self.logout()
@@ -1675,7 +1678,8 @@ class AdminRoleHandlerTest(test_utils.GenericTestBase):
             response_dict, {
                 'roles': [feconf.ROLE_ID_FULL_USER, feconf.ROLE_ID_MODERATOR],
                 'banned': False,
-                'managed_topic_ids': []
+                'managed_topic_ids': [],
+                'coordinated_language_ids': []
             })
 
         self.delete_json(
@@ -1690,7 +1694,8 @@ class AdminRoleHandlerTest(test_utils.GenericTestBase):
             response_dict, {
                 'roles': [feconf.ROLE_ID_FULL_USER],
                 'banned': False,
-                'managed_topic_ids': []
+                'managed_topic_ids': [],
+                'coordinated_language_ids': []
             })
         self.logout()
 
@@ -1745,7 +1750,8 @@ class AdminRoleHandlerTest(test_utils.GenericTestBase):
                 'roles': [
                     feconf.ROLE_ID_FULL_USER, feconf.ROLE_ID_TOPIC_MANAGER],
                 'banned': False,
-                'managed_topic_ids': [topic_id]
+                'managed_topic_ids': [topic_id],
+                'coordinated_language_ids': []
             })
 
         self.delete_json(
@@ -1760,7 +1766,8 @@ class AdminRoleHandlerTest(test_utils.GenericTestBase):
             response_dict, {
                 'roles': [feconf.ROLE_ID_FULL_USER],
                 'banned': False,
-                'managed_topic_ids': []
+                'managed_topic_ids': [],
+                'coordinated_language_ids': []
             })
 
 
@@ -1817,7 +1824,8 @@ class TopicManagerRoleHandlerTest(test_utils.GenericTestBase):
             response_dict, {
                 'roles': [feconf.ROLE_ID_FULL_USER],
                 'banned': False,
-                'managed_topic_ids': []
+                'managed_topic_ids': [],
+                'coordinated_language_ids': []
             })
 
         # Check role correctly gets updated.
@@ -1839,7 +1847,8 @@ class TopicManagerRoleHandlerTest(test_utils.GenericTestBase):
                 'roles': [
                     feconf.ROLE_ID_FULL_USER, feconf.ROLE_ID_TOPIC_MANAGER],
                 'banned': False,
-                'managed_topic_ids': [topic_id]
+                'managed_topic_ids': [topic_id],
+                'coordinated_language_ids': []
             })
         self.logout()
 
@@ -1876,7 +1885,8 @@ class TopicManagerRoleHandlerTest(test_utils.GenericTestBase):
                 'roles': [
                     feconf.ROLE_ID_FULL_USER, feconf.ROLE_ID_TOPIC_MANAGER],
                 'banned': False,
-                'managed_topic_ids': [topic_id]
+                'managed_topic_ids': [topic_id],
+                'coordinated_language_ids': []
             })
 
         new_topic_id = topic_fetchers.get_new_topic_id()
@@ -1910,6 +1920,272 @@ class TopicManagerRoleHandlerTest(test_utils.GenericTestBase):
         self.logout()
 
 
+class TranslationCoordinatorRoleHandlerTest(test_utils.GenericTestBase):
+    """Tests for TranslationCoordinatorRoleHandler."""
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.admin_id = self.get_user_id_from_email(self.SUPER_ADMIN_EMAIL)
+
+    def test_handler_with_invalid_username(self) -> None:
+        username = 'invaliduser'
+
+        self.login(self.SUPER_ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+        response = self.put_json(
+            '/translationcoordinatorrolehandler', {
+                'action': 'assign',
+                'username': username,
+                'language_id': 'en'
+            }, csrf_token=csrf_token, expected_status_int=400)
+
+        self.assertEqual(
+            response['error'], 'User with given username does not exist.')
+
+    def test_adding_translation_coordinator_role_to_language(self) -> None:
+        user_email = 'user1@example.com'
+        username = 'user1'
+        self.signup(user_email, username)
+        self.login(self.SUPER_ADMIN_EMAIL, is_super_admin=True)
+
+        response_dict = self.get_json(
+            feconf.ADMIN_ROLE_HANDLER_URL,
+            params={'filter_criterion': 'username', 'username': username})
+
+        self.assertEqual(
+            response_dict, {
+                'roles': [feconf.ROLE_ID_FULL_USER],
+                'banned': False,
+                'managed_topic_ids': [],
+                'coordinated_language_ids': []
+            })
+
+        # Check role correctly gets updated.
+        csrf_token = self.get_new_csrf_token()
+        response_dict = self.put_json(
+            '/translationcoordinatorrolehandler', {
+                'action': 'assign',
+                'username': username,
+                'language_id': 'en'
+            }, csrf_token=csrf_token)
+
+        self.assertEqual(response_dict, {})
+
+        response_dict = self.get_json(
+            feconf.ADMIN_ROLE_HANDLER_URL,
+            params={'filter_criterion': 'username', 'username': username})
+        self.assertEqual(
+            response_dict, {
+                'roles': [
+                    feconf.ROLE_ID_FULL_USER,
+                    feconf.ROLE_ID_TRANSLATION_COORDINATOR],
+                'banned': False,
+                'managed_topic_ids': [],
+                'coordinated_language_ids': ['en']
+            })
+        self.logout()
+
+    def test_assigning_two_languages_to_translation_coordinator(self) -> None:
+        user_email = 'user1@example.com'
+        username = 'user1'
+        self.signup(user_email, username)
+        self.login(self.SUPER_ADMIN_EMAIL, is_super_admin=True)
+
+        response_dict = self.get_json(
+            feconf.ADMIN_ROLE_HANDLER_URL,
+            params={'filter_criterion': 'username', 'username': username})
+
+        self.assertEqual(
+            response_dict, {
+                'roles': [feconf.ROLE_ID_FULL_USER],
+                'banned': False,
+                'managed_topic_ids': [],
+                'coordinated_language_ids': []
+            })
+
+        # Check role correctly gets updated.
+        csrf_token = self.get_new_csrf_token()
+        response_dict = self.put_json(
+            '/translationcoordinatorrolehandler', {
+                'action': 'assign',
+                'username': username,
+                'language_id': 'en'
+            }, csrf_token=csrf_token)
+
+        self.assertEqual(response_dict, {})
+
+        response_dict = self.get_json(
+            feconf.ADMIN_ROLE_HANDLER_URL,
+            params={'filter_criterion': 'username', 'username': username})
+        self.assertEqual(
+            response_dict, {
+                'roles': [
+                    feconf.ROLE_ID_FULL_USER,
+                    feconf.ROLE_ID_TRANSLATION_COORDINATOR],
+                'banned': False,
+                'managed_topic_ids': [],
+                'coordinated_language_ids': ['en']
+            })
+
+        csrf_token = self.get_new_csrf_token()
+        response_dict = self.put_json(
+            '/translationcoordinatorrolehandler', {
+                'action': 'assign',
+                'username': username,
+                'language_id': 'hi'
+            }, csrf_token=csrf_token)
+
+        self.assertEqual(response_dict, {})
+
+        response_dict = self.get_json(
+            feconf.ADMIN_ROLE_HANDLER_URL,
+            params={'filter_criterion': 'username', 'username': username})
+        self.assertEqual(
+            response_dict, {
+                'roles': [
+                    feconf.ROLE_ID_FULL_USER,
+                    feconf.ROLE_ID_TRANSLATION_COORDINATOR],
+                'banned': False,
+                'managed_topic_ids': [],
+                'coordinated_language_ids': ['en', 'hi']
+            })
+        self.logout()
+
+    def test_deassigning_language_from_coordinator(self) -> None:
+        user_email = 'user1@example.com'
+        username = 'user1'
+        self.signup(user_email, username)
+        self.login(self.SUPER_ADMIN_EMAIL, is_super_admin=True)
+
+        response_dict = self.get_json(
+            feconf.ADMIN_ROLE_HANDLER_URL,
+            params={'filter_criterion': 'username', 'username': username})
+
+        self.assertEqual(
+            response_dict, {
+                'roles': [feconf.ROLE_ID_FULL_USER],
+                'banned': False,
+                'managed_topic_ids': [],
+                'coordinated_language_ids': []
+            })
+
+        # Check role correctly gets updated.
+        csrf_token = self.get_new_csrf_token()
+        response_dict = self.put_json(
+            '/translationcoordinatorrolehandler', {
+                'action': 'assign',
+                'username': username,
+                'language_id': 'en'
+            }, csrf_token=csrf_token)
+
+        self.assertEqual(response_dict, {})
+
+        response_dict = self.get_json(
+            feconf.ADMIN_ROLE_HANDLER_URL,
+            params={'filter_criterion': 'username', 'username': username})
+        self.assertEqual(
+            response_dict, {
+                'roles': [
+                    feconf.ROLE_ID_FULL_USER,
+                    feconf.ROLE_ID_TRANSLATION_COORDINATOR],
+                'banned': False,
+                'managed_topic_ids': [],
+                'coordinated_language_ids': ['en']
+            })
+
+        # Check role correctly gets updated.
+        csrf_token = self.get_new_csrf_token()
+        response_dict = self.put_json(
+            '/translationcoordinatorrolehandler', {
+                'action': 'deassign',
+                'username': username,
+                'language_id': 'en'
+            }, csrf_token=csrf_token)
+
+        self.assertEqual(response_dict, {})
+
+        self.delete_json(
+            feconf.ADMIN_ROLE_HANDLER_URL,
+            params={
+                'role': feconf.ROLE_ID_TRANSLATION_COORDINATOR,
+                'username': username},
+            expected_status_int=200)
+
+        response_dict = self.get_json(
+            feconf.ADMIN_ROLE_HANDLER_URL,
+            params={'filter_criterion': 'username', 'username': username})
+        self.assertEqual(
+            response_dict, {
+                'roles': [
+                    feconf.ROLE_ID_FULL_USER],
+                'banned': False,
+                'managed_topic_ids': [],
+                'coordinated_language_ids': []
+            })
+        self.logout()
+
+    def test_removing_translation_coordinator_role(self) -> None:
+        user_email = 'user1@example.com'
+        username = 'user1'
+        self.signup(user_email, username)
+        self.login(self.SUPER_ADMIN_EMAIL, is_super_admin=True)
+
+        response_dict = self.get_json(
+            feconf.ADMIN_ROLE_HANDLER_URL,
+            params={'filter_criterion': 'username', 'username': username})
+
+        self.assertEqual(
+            response_dict, {
+                'roles': [feconf.ROLE_ID_FULL_USER],
+                'banned': False,
+                'managed_topic_ids': [],
+                'coordinated_language_ids': []
+            })
+
+        # Check role correctly gets updated.
+        csrf_token = self.get_new_csrf_token()
+        response_dict = self.put_json(
+            '/translationcoordinatorrolehandler', {
+                'action': 'assign',
+                'username': username,
+                'language_id': 'en'
+            }, csrf_token=csrf_token)
+
+        self.assertEqual(response_dict, {})
+
+        response_dict = self.get_json(
+            feconf.ADMIN_ROLE_HANDLER_URL,
+            params={'filter_criterion': 'username', 'username': username})
+        self.assertEqual(
+            response_dict, {
+                'roles': [
+                    feconf.ROLE_ID_FULL_USER,
+                    feconf.ROLE_ID_TRANSLATION_COORDINATOR],
+                'banned': False,
+                'managed_topic_ids': [],
+                'coordinated_language_ids': ['en']
+            })
+
+        self.delete_json(
+            feconf.ADMIN_ROLE_HANDLER_URL,
+            params={
+                'username': username,
+                'role': feconf.ROLE_ID_TRANSLATION_COORDINATOR})
+
+        response_dict = self.get_json(
+            feconf.ADMIN_ROLE_HANDLER_URL,
+            params={'filter_criterion': 'username', 'username': username})
+        self.assertEqual(
+            response_dict, {
+                'roles': [
+                    feconf.ROLE_ID_FULL_USER],
+                'banned': False,
+                'managed_topic_ids': [],
+                'coordinated_language_ids': []
+            })
+        self.logout()
+
+
 class BannedUsersHandlerTest(test_utils.GenericTestBase):
     """Tests for BannedUsersHandler."""
 
@@ -1931,7 +2207,8 @@ class BannedUsersHandlerTest(test_utils.GenericTestBase):
             response_dict, {
                 'roles': [feconf.ROLE_ID_FULL_USER],
                 'banned': False,
-                'managed_topic_ids': []
+                'managed_topic_ids': [],
+                'coordinated_language_ids': []
             })
 
         csrf_token = self.get_new_csrf_token()
@@ -1950,7 +2227,8 @@ class BannedUsersHandlerTest(test_utils.GenericTestBase):
             response_dict, {
                 'roles': [],
                 'banned': True,
-                'managed_topic_ids': []
+                'managed_topic_ids': [],
+                'coordinated_language_ids': []
             })
 
     def test_banning_topic_manager_should_remove_user_from_topics(
@@ -1987,7 +2265,8 @@ class BannedUsersHandlerTest(test_utils.GenericTestBase):
                 'roles': [
                     feconf.ROLE_ID_FULL_USER, feconf.ROLE_ID_TOPIC_MANAGER],
                 'banned': False,
-                'managed_topic_ids': [topic_id]
+                'managed_topic_ids': [topic_id],
+                'coordinated_language_ids': []
             })
 
         csrf_token = self.get_new_csrf_token()
@@ -2004,7 +2283,8 @@ class BannedUsersHandlerTest(test_utils.GenericTestBase):
             response_dict, {
                 'roles': [],
                 'banned': True,
-                'managed_topic_ids': []
+                'managed_topic_ids': [],
+                'coordinated_language_ids': []
             })
 
     def test_ban_user_with_invalid_username(self) -> None:
@@ -2038,7 +2318,8 @@ class BannedUsersHandlerTest(test_utils.GenericTestBase):
             response_dict, {
                 'roles': [],
                 'banned': True,
-                'managed_topic_ids': []
+                'managed_topic_ids': [],
+                'coordinated_language_ids': []
             })
 
         self.delete_json('/bannedusershandler', params={'username': username})
@@ -2051,7 +2332,8 @@ class BannedUsersHandlerTest(test_utils.GenericTestBase):
             response_dict, {
                 'roles': [feconf.ROLE_ID_FULL_USER],
                 'banned': False,
-                'managed_topic_ids': []
+                'managed_topic_ids': [],
+                'coordinated_language_ids': []
             })
 
     def test_unban_user_with_invalid_username(self) -> None:

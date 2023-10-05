@@ -100,7 +100,7 @@ describe('Contributor Admin Dashboard', function() {
     await adminPage.get();
     await adminPage.addRole('management', 'release coordinator');
     await adminPage.addRole('question', 'question coordinator');
-    await adminPage.addRole('translation', 'translation coordinator');
+    await adminPage.makeUserTranslationCoordinator('translation');
     await adminPage.addRole('question', 'translation admin');
     await users.logout();
 

@@ -27,6 +27,7 @@ from core.domain import email_manager
 from core.domain import suggestion_registry
 from core.domain import suggestion_services
 from core.domain import topic_fetchers
+from core.domain import user_domain
 from core.domain import user_services
 
 from typing import Dict, List, Optional, TypedDict, Union
@@ -784,8 +785,8 @@ class CommunityContributionStatsHandler(
 
 
 def get_translation_coordinator_frontend_dict(
-    backend_stats: List[suggestion_registry.TranslationCoordinatorStats]
-) -> List[suggestion_registry.TranslationCoordinatorStatsDict]:
+    backend_stats: List[user_domain.TranslationCoordinatorStats]
+) -> List[user_domain.TranslationCoordinatorStatsDict]:
     """Returns corresponding stats dicts with all the necessary
     information for the frontend.
 

@@ -26,6 +26,7 @@ from unittest import mock
 from core.constants import constants
 from core.domain import auth_domain
 from core.domain import param_domain
+from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
 
@@ -691,6 +692,28 @@ class TestUtilsTests(test_utils.GenericTestBase):
             AssertionError, 'extra item \'1\''
         ):
             self.assert_matches_regexps(['1'], [])
+
+    def test_set_translation_coordinators(self) -> None:
+        self.signup('c@example.com', 'C')
+        user_id_c = self.get_user_id_from_email('c@example.com')
+
+        self.set_translation_coordinators(['C'], 'en')
+        self.set_translation_coordinators(['C'], 'hi')
+
+        coordinator_rights_model = (
+            user_services.get_translation_rights_with_user(user_id_c))
+        self.assertEqual(
+            2,
+            len(coordinator_rights_model)
+        )
+        self.assertEqual(
+            'en',
+            coordinator_rights_model[0].language_id
+        )
+        self.assertEqual(
+            'hi',
+            coordinator_rights_model[1].language_id
+        )
 
 
 class CheckImagePngOrWebpTests(test_utils.GenericTestBase):

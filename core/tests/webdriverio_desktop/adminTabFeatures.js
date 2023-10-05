@@ -54,6 +54,16 @@ describe('Admin Page', function() {
     await users.logout();
   });
 
+  it('should allow assigning role of translation coordinator',
+    async function() {
+      await users.createUser('user1@admintab.com', 'user1');
+      await users.login('management@adminTab.com');
+
+      await adminPage.makeUserTranslationCoordinator('user1');
+      await adminPage.expectUserRolesToMatch(
+        'user1', ['full user', 'translation coordinator']);
+    });
+
   afterEach(async function() {
     await general.checkForConsoleErrors([]);
   });

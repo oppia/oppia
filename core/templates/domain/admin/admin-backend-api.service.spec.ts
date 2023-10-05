@@ -462,6 +462,110 @@ describe('Admin backend api service', () => {
     }));
   });
 
+  describe('assignTranslationCoordinator', () => {
+    it('should make request to assign user to a language', fakeAsync(() => {
+      let languageID = 'en';
+      let username = 'validUser';
+      let payload = {
+        language_id: languageID,
+        username: username,
+        action: 'assign'
+      };
+      abas.assignTranslationCoordinator(username, languageID).then(
+        successHandler, failHandler);
+
+      let req = httpTestingController.expectOne(
+        '/translationcoordinatorrolehandler');
+      expect(req.request.method).toEqual('PUT');
+      expect(req.request.body).toEqual(payload);
+
+      req.flush(
+        { status: 200, statusText: 'Success.'});
+      flushMicrotasks();
+
+      expect(successHandler).toHaveBeenCalled();
+      expect(failHandler).not.toHaveBeenCalled();
+    }));
+
+    it('should call fail handler if the request fails', fakeAsync(() => {
+      let languageID = 'en';
+      let username = 'invalidUser';
+      let payload = {
+        language_id: languageID,
+        username: username,
+        action: 'assign'
+      };
+      abas.assignTranslationCoordinator(username, languageID).then(
+        successHandler, failHandler);
+
+      let req = httpTestingController.expectOne(
+        '/translationcoordinatorrolehandler');
+      expect(req.request.method).toEqual('PUT');
+      expect(req.request.body).toEqual(payload);
+
+      req.flush(
+        { error: 'User with given username does not exist'},
+        { status: 500, statusText: 'Internal Server Error'});
+      flushMicrotasks();
+
+      expect(successHandler).not.toHaveBeenCalled();
+      expect(failHandler).toHaveBeenCalledWith(
+        'User with given username does not exist');
+    }));
+  });
+
+  describe('deassignTranslationCoordinator', () => {
+    it('should make request to deassign user from language', fakeAsync(() => {
+      let languageID = 'en';
+      let username = 'validUser';
+      let payload = {
+        language_id: languageID,
+        username: username,
+        action: 'deassign'
+      };
+      abas.deassignTranslationCoordinator(username, languageID).then(
+        successHandler, failHandler);
+
+      let req = httpTestingController.expectOne(
+        '/translationcoordinatorrolehandler');
+      expect(req.request.method).toEqual('PUT');
+      expect(req.request.body).toEqual(payload);
+
+      req.flush(
+        { status: 200, statusText: 'Success.'});
+      flushMicrotasks();
+
+      expect(successHandler).toHaveBeenCalled();
+      expect(failHandler).not.toHaveBeenCalled();
+    }));
+
+    it('should call fail handler if the request fails', fakeAsync(() => {
+      let languageID = 'en';
+      let username = 'invalidUser';
+      let payload = {
+        language_id: languageID,
+        username: username,
+        action: 'deassign'
+      };
+      abas.deassignTranslationCoordinator(username, languageID).then(
+        successHandler, failHandler);
+
+      let req = httpTestingController.expectOne(
+        '/translationcoordinatorrolehandler');
+      expect(req.request.method).toEqual('PUT');
+      expect(req.request.body).toEqual(payload);
+
+      req.flush(
+        { error: 'User with given username does not exist'},
+        { status: 500, statusText: 'Internal Server Error'});
+      flushMicrotasks();
+
+      expect(successHandler).not.toHaveBeenCalled();
+      expect(failHandler).toHaveBeenCalledWith(
+        'User with given username does not exist');
+    }));
+  });
+
   describe('markUserBannedAsync', () => {
     it('should make request to mark a user banned', fakeAsync(() => {
       let username = 'validUser';

@@ -2995,3 +2995,233 @@ def is_user_blog_post_author(user_id: str) -> bool:
     user_settings = get_user_settings(user_id, strict=True)
     author_roles = [feconf.ROLE_ID_BLOG_ADMIN, feconf.ROLE_ID_BLOG_POST_EDITOR]
     return any(role in author_roles for role in user_settings.roles)
+
+
+def assign_coordinator(
+    committer: user_domain.UserActionsInfo,
+    assignee: user_domain.UserActionsInfo,
+    language_id: str
+) -> None:
+    """Assigns a new role to the user.
+
+    Args:
+        committer: UserActionsInfo. UserActionsInfo object for the user
+            who is performing the action.
+        assignee: UserActionsInfo. UserActionsInfo object for the user
+            whose role is being changed.
+        language_id: str. ID of the language.
+
+    Raises:
+        Exception. The committer does not have rights to modify a role.
+        Exception. The assignee is already coordinator for this language.
+        Exception. Guest user is not allowed to assign roles to a user.
+        Exception. The role of the Guest user cannot be changed.
+    """
+    committer_id = committer.user_id
+    if committer_id is None:
+        raise Exception(
+            'Guest user is not allowed to assign roles to a user.'
+        )
+
+    if (
+        role_services.ACTION_MODIFY_CORE_ROLES_FOR_ANY_ACTIVITY not in
+            committer.actions
+    ):
+        logging.error(
+            'User %s tried to allow user %s to be a coordinator of language %s '
+            'but was refused permission.' % (
+                committer_id, assignee.user_id, language_id))
+        raise Exception(
+            'UnauthorizedUserException: Could not assign new role.')
+
+    if assignee.user_id is None:
+        raise Exception(
+            'Cannot change the role of the Guest user.'
+        )
+
+    language_rights = suggestion_models.TranslationCoordinatorsModel.get(
+        language_id, strict=False)
+
+    if language_rights is None:
+        model = suggestion_models.TranslationCoordinatorsModel(
+            id=language_id,
+            coordinator_ids=[assignee.user_id],
+            coordinators_count=1
+        )
+        model.update_timestamps()
+        model.put()
+    else:
+        if assignee.user_id in language_rights.coordinator_ids:
+            raise Exception(
+                'This user already is a coordinator for this language.'
+            )
+
+        language_rights.coordinator_ids.append(assignee.user_id)
+        language_rights.coordinators_count += 1
+
+        suggestion_models.TranslationCoordinatorsModel.update_timestamps(
+            language_rights,
+            update_last_updated_time=True)
+        suggestion_models.TranslationCoordinatorsModel.put(
+            language_rights)
+
+
+def deassign_coordinator(
+    committer: user_domain.UserActionsInfo,
+    assignee: user_domain.UserActionsInfo,
+    language_id: str
+) -> None:
+    """Removes the user as a coordinator of that language.
+
+    Args:
+        committer: UserActionsInfo. UserActionsInfo object for the user
+            who is performing the action.
+        assignee: UserActionsInfo. UserActionsInfo object for the user
+            whose role is being changed.
+        language_id: str. ID of the language.
+
+    Raises:
+        Exception. The committer does not have rights to modify a role.
+        Exception. The assignee is already coordinator for this language.
+        Exception. Guest user is not allowed to assign roles to a user.
+        Exception. The role of the Guest user cannot be changed.
+    """
+    committer_id = committer.user_id
+    if committer_id is None:
+        raise Exception(
+            'Guest user is not allowed to deassign roles to a user.'
+        )
+    language_rights = suggestion_models.TranslationCoordinatorsModel.get(
+        language_id, strict=False)
+    if (
+        role_services.ACTION_MODIFY_CORE_ROLES_FOR_ANY_ACTIVITY not in
+            committer.actions
+    ):
+        logging.error(
+            'User %s tried to allow user %s to be a coordinator of language %s '
+            'but was refused permission.' % (
+                committer_id, assignee.user_id, language_id))
+        raise Exception(
+            'UnauthorizedUserException: Could not assign new role.')
+
+    if assignee.user_id is None:
+        raise Exception(
+            'Cannot change the role of the Guest user.'
+        )
+
+    if language_rights is None:
+        raise Exception(
+            'No model exists for provided language.'
+        )
+
+    if assignee.user_id not in language_rights.coordinator_ids:
+        raise Exception('This user is not a coordinator for this language')
+
+    language_rights.coordinator_ids.remove(assignee.user_id)
+    language_rights.coordinators_count -= 1
+
+    suggestion_models.TranslationCoordinatorsModel.update_timestamps(
+        language_rights,
+        update_last_updated_time=True)
+    suggestion_models.TranslationCoordinatorsModel.put(
+        language_rights)
+
+
+def get_translation_rights_from_model(
+    translation_coordinator_model:
+        suggestion_models.TranslationCoordinatorsModel
+) -> user_domain.TranslationCoordinatorStats:
+    """Constructs a TranslationCoordinatorStats object from the given
+    translation coordinator model.
+
+    Args:
+        translation_coordinator_model: TranslationCoordinatorsModel. The
+            model which is to be converted to an object.
+
+    Returns:
+        TranslationCoordinatorStats. The TranslationCoordinatorStats object
+        created from the model.
+    """
+    return user_domain.TranslationCoordinatorStats(
+        translation_coordinator_model.id,
+        translation_coordinator_model.coordinator_ids,
+        translation_coordinator_model.coordinators_count
+    )
+
+
+def get_translation_rights_with_user(user_id: str) -> List[
+    user_domain.TranslationCoordinatorStats
+]:
+    """Retrieves the rights object for all languages assigned to given user.
+
+    Args:
+        user_id: str. ID of the user.
+
+    Returns:
+        list(TranslationCoordinatorStats). The rights objects associated with
+        the languagesassigned to given user.
+    """
+    translation_coordinator_models: Sequence[
+        suggestion_models.TranslationCoordinatorsModel
+    ] = (
+        suggestion_models.TranslationCoordinatorsModel.get_by_user(user_id)
+    )
+
+    return [
+        get_translation_rights_from_model(model)
+        for model in translation_coordinator_models
+        if model is not None
+    ]
+
+
+def deassign_user_from_all_languages(
+    committer: user_domain.UserActionsInfo, user_id: str
+) -> None:
+    """Deassigns given user from all languages assigned to them.
+
+    Args:
+        committer: UserActionsInfo. UserActionsInfo object for the user
+            who is performing the action.
+        user_id: str. The ID of the user.
+
+    Raises:
+        Exception. Guest users are not allowed to deassign users from
+            all languages.
+    """
+    translation_rights_list = get_translation_rights_with_user(user_id)
+    if committer.user_id is None:
+        raise Exception(
+            'Guest users are not allowed to deassign users from all languages.'
+        )
+
+    for translation_rights in translation_rights_list:
+        translation_rights.coordinator_ids.remove(user_id)
+        translation_rights.coordinators_count -= 1
+        language_rights = suggestion_models.TranslationCoordinatorsModel(
+            id=translation_rights.language_id,
+            coordinator_ids=translation_rights.coordinator_ids,
+            coordinators_count=translation_rights.coordinators_count)
+        suggestion_models.TranslationCoordinatorsModel.update_timestamps(
+            language_rights,
+            update_last_updated_time=True)
+        suggestion_models.TranslationCoordinatorsModel.put(
+            language_rights)
+
+
+def check_user_is_coordinator(user_id: str, language_id: str) -> bool:
+    """Check if the given user is coordinator of provided language.
+
+    Args:
+        user_id:str. User ID.
+        language_id: str. ID of the language.
+
+    Returns:
+        bool. True if the user is coordinator or else False.
+    """
+    model = suggestion_models.TranslationCoordinatorsModel.get(
+        language_id, strict=False)
+
+    if model is None:
+        return False
+
+    return user_id in model.coordinator_ids

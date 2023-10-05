@@ -48,13 +48,16 @@ MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import audit_models
     from mypy_imports import auth_models
+    from mypy_imports import suggestion_models
     from mypy_imports import user_models
 
 datastore_services = models.Registry.import_datastore_services()
-(auth_models, user_models, audit_models) = (models.Registry.import_models([
-    models.Names.AUTH,
-    models.Names.USER,
-    models.Names.AUDIT
+(auth_models, user_models, audit_models, suggestion_models) = (
+    models.Registry.import_models([
+        models.Names.AUTH,
+        models.Names.USER,
+        models.Names.AUDIT,
+        models.Names.SUGGESTION
 ]))
 bulk_email_services = models.Registry.import_bulk_email_services()
 
@@ -4144,3 +4147,203 @@ class UserContributionReviewRightsTests(test_utils.GenericTestBase):
         user_contribution_rights = (
             user_services.get_user_contribution_rights(user_id))
         self.assertFalse(user_contribution_rights.can_submit_questions)
+
+
+class TranslationCoordinatorRightsTests(test_utils.GenericTestBase):
+    """Tests for handling translation coordinator rights"""
+
+    def setUp(self) -> None:
+        self.test_list: List[str] = []
+        super().setUp()
+        self.signup('a@example.com', 'A')
+        self.signup('b@example.com', 'B')
+        self.signup(
+            'translationcoordinator@example.com', 'translationcoordinator')
+        self.signup(
+            self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+
+        self.user_id_a = self.get_user_id_from_email('a@example.com')
+        self.user_id_b = self.get_user_id_from_email('b@example.com')
+        self.user_id_translationcoordinator = self.get_user_id_from_email(
+            'translationcoordinator@example.com')
+        self.user_id_admin = (
+            self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL))
+
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
+        self.set_translation_coordinators([
+            user_services.get_username(
+                self.user_id_translationcoordinator
+            )
+        ], 'en')
+        self.user_a = user_services.get_user_actions_info(self.user_id_a)
+        self.user_b = user_services.get_user_actions_info(self.user_id_b)
+        self.user_translationcoordinator = user_services.get_user_actions_info(
+            self.user_id_translationcoordinator)
+        self.user_admin = user_services.get_user_actions_info(
+            self.user_id_admin)
+
+    def test_raises_error_if_guest_user_trying_to_deassign_roles_from_topic(
+        self
+    ) -> None:
+        guest_user = user_services.get_user_actions_info(None)
+        with self.assertRaisesRegex(
+            Exception,
+            'Guest users are not allowed to deassign users from all languages.'
+        ):
+            user_services.deassign_user_from_all_languages(
+                guest_user, 'user_id')
+
+        with self.assertRaisesRegex(
+            Exception,
+            'Guest user is not allowed to deassign roles to a user.'
+        ):
+            user_services.deassign_coordinator(
+                guest_user, self.user_a, 'en'
+            )
+
+    def test_non_admin_cannot_assign_roles(self) -> None:
+
+        with self.assertRaisesRegex(
+            Exception,
+            'UnauthorizedUserException: Could not assign new role.'
+        ):
+            user_services.assign_coordinator(
+                self.user_b, self.user_a, 'en')
+
+    def test_guest_user_cannot_assign_roles(self) -> None:
+        guest_user = user_services.get_user_actions_info(None)
+        with self.assertRaisesRegex(
+            Exception,
+            'Guest user is not allowed to assign roles to a user.'
+        ):
+            user_services.assign_coordinator(
+                guest_user, self.user_b, 'en')
+
+    def test_roles_of_guest_user_cannot_be_changed_until_guest_is_logged_in(
+        self
+    ) -> None:
+        guest_user = user_services.get_user_actions_info(None)
+        with self.assertRaisesRegex(
+            Exception,
+            'Cannot change the role of the Guest user.'
+        ):
+            user_services.assign_coordinator(
+                self.user_admin, guest_user, 'en')
+
+    def test_reassigning_role_to_same_user(self) -> None:
+        with self.assertRaisesRegex(
+            Exception, 'This user already is a coordinator for this language.'
+        ):
+            user_services.assign_coordinator(
+                self.user_admin, self.user_translationcoordinator, 'en'
+            )
+
+    def test_assigning_role_to_a_user(self) -> None:
+        self.signup('c@example.com', 'C')
+        user_id_c = self.get_user_id_from_email('a@example.com')
+        user_c = user_services.get_user_actions_info(user_id_c)
+
+        self.assertFalse(user_services.check_user_is_coordinator(
+            user_id_c, 'en'
+        ))
+
+        user_services.assign_coordinator(
+            self.user_admin, user_c, 'en'
+        )
+
+        self.assertTrue(user_services.check_user_is_coordinator(
+            user_id_c, 'en'
+        ))
+
+    def test_deassign_role_to_a_user(self) -> None:
+        self.signup('c@example.com', 'C')
+        user_id_c = self.get_user_id_from_email('a@example.com')
+        user_c = user_services.get_user_actions_info(user_id_c)
+        user_services.assign_coordinator(
+            self.user_admin, user_c, 'en'
+        )
+        self.assertTrue(user_services.check_user_is_coordinator(
+            user_id_c, 'en'
+        ))
+
+        user_services.deassign_coordinator(
+            self.user_admin, user_c, 'en'
+        )
+
+        self.assertFalse(user_services.check_user_is_coordinator(
+            user_id_c, 'en'
+        ))
+
+    def test_non_admin_cannot_deassign_roles(self) -> None:
+        with self.assertRaisesRegex(
+            Exception,
+            'UnauthorizedUserException: Could not assign new role.'):
+            user_services.deassign_coordinator(
+                self.user_b, self.user_a, 'en')
+
+    def test_guest_user_cannot_deassign_roles(self) -> None:
+        guest_user = user_services.get_user_actions_info(None)
+        with self.assertRaisesRegex(
+            Exception,
+            'Guest user is not allowed to deassign roles to a user.'
+        ):
+            user_services.deassign_coordinator(
+                guest_user, self.user_b, 'en')
+
+    def test_guest_user_cannot_be_deassgined(
+        self
+    ) -> None:
+        with self.assertRaisesRegex(
+            Exception,
+            'No model exists for provided language.'
+        ):
+            user_services.deassign_coordinator(
+                self.user_admin, self.user_a, 'no_model')
+
+    def test_deassigning_for_non_existing_language_model(
+        self
+    ) -> None:
+        guest_user = user_services.get_user_actions_info(None)
+        with self.assertRaisesRegex(
+            Exception,
+            'Cannot change the role of the Guest user.'
+        ):
+            user_services.deassign_coordinator(
+                self.user_admin, guest_user, 'en')
+
+    def test_deassigning_role_from_non_coordinator(self) -> None:
+        with self.assertRaisesRegex(
+            Exception, 'This user is not a coordinator for this language'):
+            user_services.deassign_coordinator(
+                self.user_admin, self.user_a, 'en')
+
+    def test_get_translation_rights_from_model(self) -> None:
+        model = suggestion_models.TranslationCoordinatorsModel.get(
+            'en', strict=False)
+        assert model is not None
+        model_object = user_services.get_translation_rights_from_model(
+            model)
+
+        # Asserting here because we have created a model for 'en' in setup.
+        assert model_object is not None
+        self.assertEqual(model.id, model_object.language_id)
+        self.assertEqual(
+            model.coordinators_count, model_object.coordinators_count)
+        self.assertEqual(
+            model.coordinator_ids, model_object.coordinator_ids)
+
+    def test_deassign_user_from_all_languages(self) -> None:
+        self.signup('c@example.com', 'C')
+        user_id_c = self.get_user_id_from_email('c@example.com')
+        self.set_translation_coordinators(['C'], 'en')
+        self.set_translation_coordinators(['C'], 'hi')
+
+        user_services.deassign_user_from_all_languages(
+            self.user_admin, user_id_c)
+
+        self.assertEqual(0, len(
+            user_services.get_translation_rights_with_user(user_id_c)))
+
+    def test_check_user_is_coordinator_for_no_language_model(self) -> None:
+        self.assertFalse(user_services.check_user_is_coordinator(
+            'user1', 'non_existing_language'))

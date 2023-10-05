@@ -6169,3 +6169,37 @@ class TranslationCoordinatorsModelUnitTests(test_utils.GenericTestBase):
             {
                 'coordinator_ids': 'coordinated_language_ids'
             })
+
+    def test_get_returns_model_when_it_exists(self) -> None:
+        translation_coordinators_model = (
+            suggestion_models.TranslationCoordinatorsModel.get(
+                self.LANGUAGE_4_ID
+            )
+        )
+
+        # Ruling out the possibility of None for mypy type checking.
+        assert translation_coordinators_model is not None
+        self.assertEqual(
+            translation_coordinators_model.id,
+            self.LANGUAGE_4_ID
+        )
+
+    def test_get_model_by_user_id(self) -> None:
+        translation_coordinators_models = (
+            suggestion_models.TranslationCoordinatorsModel.get_by_user(
+                self.USER_ID_2
+            )
+        )
+
+        self.assertEqual(
+            len(translation_coordinators_models),
+            2
+        )
+        self.assertIn(
+            self.USER_ID_2,
+            translation_coordinators_models[0].coordinator_ids
+        )
+        self.assertIn(
+            self.USER_ID_2,
+            translation_coordinators_models[1].coordinator_ids
+        )

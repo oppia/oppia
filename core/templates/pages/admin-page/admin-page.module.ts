@@ -40,6 +40,7 @@ import { AdminRolesTabComponent } from './roles-tab/admin-roles-tab.component';
 import { AdminConfigTabComponent } from './config-tab/admin-config-tab.component';
 import { AdminPageComponent } from './admin-page.component';
 import { TopicManagerRoleEditorModalComponent } from './roles-tab/topic-manager-role-editor-modal.component';
+import { TranslationCoordinatorRoleEditorModalComponent } from './roles-tab/translation-coordinator-role-editor-modal.component';
 import { SharedFormsModule } from 'components/forms/shared-forms.module';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ToastrModule } from 'ngx-toastr';
@@ -70,6 +71,7 @@ import { SmartRouterModule } from 'hybrid-router-module-provider';
     AdminRolesTabComponent,
     AdminDevModeActivitiesTabComponent,
     TopicManagerRoleEditorModalComponent,
+    TranslationCoordinatorRoleEditorModalComponent,
     AdminPlatformParametersTabComponent
   ],
   entryComponents: [
@@ -80,7 +82,8 @@ import { SmartRouterModule } from 'hybrid-router-module-provider';
     AdminPageComponent,
     AdminRolesTabComponent,
     AdminDevModeActivitiesTabComponent,
-    TopicManagerRoleEditorModalComponent
+    TopicManagerRoleEditorModalComponent,
+    TranslationCoordinatorRoleEditorModalComponent
   ],
   providers: [
     {
