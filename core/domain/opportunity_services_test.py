@@ -42,6 +42,7 @@ from core.domain import translation_domain
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
+from unittest.mock import MagicMock
 
 from typing import Dict, List, Union
 
@@ -1048,6 +1049,48 @@ class OpportunityServicesUnitTest(test_utils.GenericTestBase):
                 self.TOPIC_ID
             )
 
+    def test_update_and_get_pinned_opportunity_model(self) -> None:
+        user_id = 'user123'
+        language_code = 'en'
+        topic_id = 'topic123'
+        lesson_id = 'lesson456'
+
+        mock_opportunity_summary = MagicMock(
+            id=lesson_id,
+            topic_id=topic_id,
+            topic_name='topic',
+            story_id='story_id_1',
+            story_title='A story title',
+            chapter_title='Title 1',
+            content_count=20,
+            incomplete_translation_language_codes=['hi', 'ar', 'en'],
+            translation_counts={'hi': 1, 'ar': 2, 'en': 3},
+            language_codes_needing_voice_artists=['en'],
+            language_codes_with_assigned_voice_artists=[]
+        )
+        # Mock the get method of ExplorationOpportunitySummaryModel.
+        with self.swap(
+            opportunity_models.ExplorationOpportunitySummaryModel, 'get',
+            lambda _id: mock_opportunity_summary if _id == lesson_id else None
+        ):
+            # Test pinning an opportunity.
+            opportunity_services.update_pinned_opportunity_model(
+                user_id, language_code, topic_id, lesson_id)
+            
+            pinned_opportunity = opportunity_services.get_pinned_lesson(
+                user_id, language_code, topic_id)
+
+            self.assertIsNotNone(pinned_opportunity)
+            self.assertEqual(pinned_opportunity.id, lesson_id)
+
+            # Test unpinning the opportunity.
+            opportunity_services.update_pinned_opportunity_model(
+                user_id, language_code, topic_id, None)
+
+            pinned_opportunity = opportunity_services.get_pinned_lesson(
+                user_id, language_code, topic_id)
+
+            self.assertIsNone(pinned_opportunity)
 
 class OpportunityUpdateOnAcceeptingSuggestionUnitTest(
         test_utils.GenericTestBase):

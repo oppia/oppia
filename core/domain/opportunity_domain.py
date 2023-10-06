@@ -56,7 +56,6 @@ class ExplorationOpportunitySummaryDict(
     language_codes_needing_voice_artists: List[str]
     language_codes_with_assigned_voice_artists: List[str]
 
-
 class SkillOpportunityDict(TypedDict):
     """A dictionary representing SkillOpportunity object."""
 
@@ -83,7 +82,8 @@ class ExplorationOpportunitySummary:
         translation_counts: Dict[str, int],
         language_codes_needing_voice_artists: List[str],
         language_codes_with_assigned_voice_artists: List[str],
-        translation_in_review_counts: Dict[str, int]
+        translation_in_review_counts: Dict[str, int],
+        is_pinned = False
     ) -> None:
         """Constructs a ExplorationOpportunitySummary domain object.
 
@@ -124,6 +124,7 @@ class ExplorationOpportunitySummary:
         self.language_codes_with_assigned_voice_artists = (
             language_codes_with_assigned_voice_artists)
         self.translation_in_review_counts = translation_in_review_counts
+        self.is_pinned = is_pinned
         self.validate()
 
     @classmethod
@@ -178,7 +179,8 @@ class ExplorationOpportunitySummary:
             'chapter_title': self.chapter_title,
             'content_count': self.content_count,
             'translation_counts': self.translation_counts,
-            'translation_in_review_counts': self.translation_in_review_counts
+            'translation_in_review_counts': self.translation_in_review_counts,
+            'is_pinned': self.is_pinned
         }
 
     def validate(self) -> None:

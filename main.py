@@ -353,6 +353,10 @@ URLS = [
         r'%s' % feconf.REVIEWABLE_OPPORTUNITIES_URL,
         contributor_dashboard.ReviewableOpportunitiesHandler),
     get_redirect_route(
+        r'%s' % feconf.PINNED_OPPORTUNITIES_URL,
+        contributor_dashboard.PinLessonsHandler,
+    ),
+    get_redirect_route(
         r'/gettranslatabletexthandler',
         contributor_dashboard.TranslatableTextHandler),
     get_redirect_route(

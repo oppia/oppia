@@ -34,6 +34,7 @@ from core.domain import topic_fetchers
 from core.domain import translation_domain
 from core.domain import translation_services
 from core.domain import user_services
+from collections import OrderedDict
 
 from typing import Dict, List, Optional, Sequence, Tuple, TypedDict, Union
 
@@ -333,7 +334,10 @@ class ReviewableOpportunitiesHandler(
                 self.user_id, topic_name, language
             ):
                 if opp is not None:
-                    opportunity_dicts.append(opp.to_dict())
+                   if isinstance(opp, dict):
+                        opportunity_dicts.append(opp)
+                   else:
+                        opportunity_dicts.append(opp.to_dict())
         self.values = {
             'opportunities': opportunity_dicts,
         }
@@ -411,9 +415,84 @@ class ReviewableOpportunitiesHandler(
             for exp_id in topic_exp_ids
             if exp_id in in_review_suggestion_target_ids
         ]
-        return list(
-            opportunity_services.get_exploration_opportunity_summaries_by_ids(
-                exp_ids).values())
+        pinned_opportunity_summary = None
+        if topic_name:
+            topic = topic_fetchers.get_topic_by_name(topic_name)
+            pinned_opportunity_summary = opportunity_services.get_pinned_lesson(
+                self.user_id,
+                language,
+                topic.id
+            )
+            print('pinned_oppp', pinned_opportunity_summary)
+
+        exp_opp_summaries = opportunity_services.get_exploration_opportunity_summaries_by_ids(exp_ids)
+
+        # If there is a pinned opportunity summary, add it to the list of opportunities at the top.
+        ordered_exp_opp_summaries = OrderedDict()
+        if pinned_opportunity_summary:
+            print('Ordered dict is here 11', ordered_exp_opp_summaries)
+            exp_opp_summaries.pop(pinned_opportunity_summary['id'], None)
+            ordered_exp_opp_summaries[pinned_opportunity_summary['id']] = pinned_opportunity_summary
+            print('Ordered dict is here 22', ordered_exp_opp_summaries)
+        
+        for item in exp_opp_summaries.values():
+            ordered_exp_opp_summaries[item.id] = item
+        print('Ordered dict is here 333', list(ordered_exp_opp_summaries.values()))
+        return list(ordered_exp_opp_summaries.values())
+
+
+class PinLessonsHandlerNormalizedRequestDict(TypedDict):
+    """Dict representation of ReviewableOpportunitiesHandler's
+    normalized_request dictionary.
+    """
+
+    topic_name: str
+    language_code: str
+    opportunity_id: Optional[str] 
+
+
+class PinLessonsHandler(
+    base.BaseHandler[
+        Dict[str, str], ReviewableOpportunitiesHandlerNormalizedRequestDict
+    ]
+):
+    """Handler for pinning & unpinning lessons."""
+
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'PUT': {
+            'language_code': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            },
+            'topic_id': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            },
+            'opportunity_id': {
+                'schema': {
+                    'type': 'basestring'
+                },
+                'default_value': None
+            }
+        },
+    }
+
+    def put(self):
+        """Handles pinning/unpinning lessons."""
+        assert self.normalized_request is not None
+        if not self.user_id:
+            return
+        topic_id = self.normalized_request.get('topic_id')
+        language_code = self.normalized_request.get('language_code')
+        opportunity_id = self.normalized_request.get('opportunity_id')
+
+        opportunity_services.update_pinned_opportunity_model(
+            self.user_id, language_code, topic_id, opportunity_id)
+
+        self.render_json({})
 
 
 class TranslatableTextHandlerNormalizedRequestDict(TypedDict):
