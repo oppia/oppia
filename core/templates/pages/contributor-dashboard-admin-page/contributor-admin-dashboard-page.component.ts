@@ -29,8 +29,8 @@ import { UserService } from 'services/user.service';
 
 
 export interface LanguageChoice {
-  id: string;
-  language: string;
+  id: string | null;
+  language: string | null;
 }
 
 export interface TopicChoice {
@@ -156,6 +156,10 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
                 languageItem) =>
               response.includes(languageItem.id));
             this.selectedLanguage = this.languageChoices[0];
+            if (!this.selectedLanguage) {
+              throw new Error(
+                'No languages are assigned to user.');
+            }
             this.translationReviewersCount = (
               this.translationReviewersCountByLanguage[
                 this.selectedLanguage.id]);

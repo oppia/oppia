@@ -261,9 +261,9 @@ mat-chip-list .mat-standard-chip .mat-chip-remove {
   cursor: pointer;
   justify-content: space-between;
   margin: 10px;
+  min-height: 60px;
   position: relative;
   vertical-align: top;
-  min-height: 60px;
 }
 .oppia-filter-selector-inner-container {
   display: flex;

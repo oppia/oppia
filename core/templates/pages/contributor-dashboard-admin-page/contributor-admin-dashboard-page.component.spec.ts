@@ -30,6 +30,7 @@ describe('Contributor dashboard Admin page', () => {
   let contributorDashboardAdminStatsBackendApiService: (
     ContributorDashboardAdminStatsBackendApiService);
   let userService: UserService;
+  let fetchAssignedLanguageIdsSpy: jasmine.Spy;
   let translationCoordinatorInfo = {
     _roles: ['USER_ROLE'],
     _isModerator: true,
@@ -167,7 +168,7 @@ describe('Contributor dashboard Admin page', () => {
         question_reviewers_count: 1
       } as CommunityContributionStatsBackendDict));
 
-    spyOn(
+    fetchAssignedLanguageIdsSpy = spyOn(
       contributorDashboardAdminStatsBackendApiService,
       'fetchAssignedLanguageIds')
       .and.returnValue(Promise.resolve(['en', 'ar']));
@@ -199,6 +200,21 @@ describe('Contributor dashboard Admin page', () => {
     expect(component.selectedLanguage.language).toEqual('English');
     expect(component.selectedLanguage.id).toEqual('en');
   }));
+
+  it('should throw error if fetchAssignedLanguageIds returns null',
+    fakeAsync(() => {
+      spyOn(userService, 'getUserInfoAsync').and.returnValue(
+        Promise.resolve(fullAccessUserInfo));
+      fetchAssignedLanguageIdsSpy.and.returnValue(null);
+
+      component.ngOnInit();
+      tick();
+      fixture.detectChanges();
+
+      expect(component.ngOnInit()).toThrowError(
+        'No languages are assigned to user.'
+      );
+    }));
 
   it('should open language dropdown', () => {
     expect(component.languageDropdownShown).toBeFalse();
