@@ -139,7 +139,7 @@
             Outline Finalized
             <i *ngIf="!outlineIsFinalized" (click)="finalizeOutline()" class="far fa-square md-18 e2e-test-finalize-outline" aria-label="Finalize outline"></i>
             <i *ngIf="outlineIsFinalized" (click)="unfinalizeOutline()" class="fas fa-check-square md-18" aria-label="Unfinalize outline"></i>
-            <div tabindex="-1" (blur)="toggleChapterOutlineButtons()" (click)="toggleChapterOutlineButtons()">
+            <div tabindex="-1">
               <schema-based-editor id="storyNodeOutline"
                                    [schema]="OUTLINE_SCHEMA"
                                    [localValue]="editableOutline"
