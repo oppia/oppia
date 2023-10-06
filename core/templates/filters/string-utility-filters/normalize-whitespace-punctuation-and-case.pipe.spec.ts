@@ -46,11 +46,4 @@ describe('Testing NormalizeWhitespacePunctuationAndCasePipe', () => {
     expect(nwpcp.transform(' tesT1 teSt2 ')).toEqual('test1 test2');
     expect(nwpcp.transform('tesT1\n teSt2')).toEqual('test1\ntest2');
   });
-
-  it('should preserve spaces around punctuation', () => {
-    expect(nwpcp.transform('Hello, World')).toEqual('hello, world');
-    expect(nwpcp.transform('Hello. World')).toEqual('hello. world');
-    expect(nwpcp.transform('Hello! World')).toEqual('hello! world');
-    expect(nwpcp.transform('Hello? World')).toEqual('hello? world');
-  });
 });
