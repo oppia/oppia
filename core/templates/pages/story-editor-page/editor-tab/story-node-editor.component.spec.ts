@@ -622,7 +622,10 @@ describe('Story node editor component', () => {
   });
 
   it('should update updateLocalEditableOutlines', () => {
+    component.chapterOutlineIsShown = true;
+    component.chapterOutlineButtonsAreShown = false;
     component.editableOutline = '';
+
     component.updateLocalEditableOutline('value');
 
     expect(component.editableOutline).toBe('value');
