@@ -139,14 +139,19 @@
             Outline Finalized
             <i *ngIf="!outlineIsFinalized" (click)="finalizeOutline()" class="far fa-square md-18 e2e-test-finalize-outline" aria-label="Finalize outline"></i>
             <i *ngIf="outlineIsFinalized" (click)="unfinalizeOutline()" class="fas fa-check-square md-18" aria-label="Unfinalize outline"></i>
-            <div tabindex="-1">
+            <div tabindex="-1" >
               <schema-based-editor id="storyNodeOutline"
                                    [schema]="OUTLINE_SCHEMA"
                                    [localValue]="editableOutline"
-                                   (localValueChange)="updateLocalEditableOutline($event)">
+                                   (localValueChange)="updateLocalEditableOutline($event);"
+                                   (click)="chapterOutlineButtonsAreShown=true; ">
               </schema-based-editor>
-              <div class="save-button-container">
-                <button class="btn btn-default">Cancel</button>
+              <div class="save-button-container" *ngIf="chapterOutlineButtonsAreShown">
+                <button type="button"
+                        class="btn btn-default e2e-test-node-outline-cancel-button"
+                        (click)="onCancelButtonClicked();">
+                  Cancel
+                </button>
                 <button type="button"
                         class="btn btn-success save-button e2e-test-node-outline-save-button"
                         [disabled]="!isOutlineModified(editableOutline)"
