@@ -63,8 +63,8 @@ describe('Topic Filter component', () => {
     fakeAsync(
       () => {
         spyOn(component.selectionsChange, 'emit');
-        component.selectedTopics = ['topic1', 'topic2'];
-        component.listOfDefaultTopics = [
+        component.selectedTopicNames = ['topic1', 'topic2'];
+        component.defaultTopicNames = [
           'topic1', 'topic2', 'topic3', 'topic4'];
 
         fixture.detectChanges();
@@ -85,7 +85,7 @@ describe('Topic Filter component', () => {
         // of test.
         tick(1500 + 1);
 
-        expect(component.selectedTopics).toEqual(
+        expect(component.selectedTopicNames).toEqual(
           ['topic1', 'topic2', 'topic3']);
         expect(component.searchDropDownTopics).toEqual(['topic4']);
 
@@ -105,10 +105,10 @@ describe('Topic Filter component', () => {
   it('should remove topic from selected topics and execute search', () => {
     spyOn(component.selectionsChange, 'emit');
     spyOn(component, 'refreshSearchDropDownTopics');
-    component.selectedTopics = ['topic1', 'topic2', 'topic3'];
+    component.selectedTopicNames = ['topic1', 'topic2', 'topic3'];
 
     component.deselectTopic('topic1');
 
-    expect(component.selectedTopics).toEqual(['topic2', 'topic3']);
+    expect(component.selectedTopicNames).toEqual(['topic2', 'topic3']);
   });
 });

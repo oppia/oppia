@@ -32,8 +32,8 @@ export class TopicFilterComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
-  @Input() listOfDefaultTopics!: string[];
-  @Input() selectedTopics: string[] = [];
+  @Input() defaultTopicNames!: string[];
+  @Input() selectedTopicNames: string[] = [];
   @Output() selectionsChange: EventEmitter<string[]> = (
     new EventEmitter());
 
@@ -57,7 +57,6 @@ export class TopicFilterComponent implements OnInit {
 
   filter(value: string): string[] {
     const filterValue = value.toLowerCase();
-
     return this.searchDropDownTopics.filter(
       topic => topic.toLowerCase().includes(filterValue));
   }
@@ -70,23 +69,23 @@ export class TopicFilterComponent implements OnInit {
   }
 
   deselectTopic(topic: string): void {
-    this.removeTopic(topic, this.selectedTopics);
+    this.removeTopic(topic, this.selectedTopicNames);
     this.searchDropDownTopics.push(topic);
     this.refreshSearchDropDownTopics();
     this.topicFilter.setValue(null);
   }
 
   selectTopic(event: { option: { viewValue: string}}): void {
-    this.selectedTopics.push(event.option.viewValue);
+    this.selectedTopicNames.push(event.option.viewValue);
     this.refreshSearchDropDownTopics();
     this.topicFilterInput.nativeElement.value = '';
     this.topicFilter.setValue(null);
   }
 
   refreshSearchDropDownTopics(): void {
-    this.searchDropDownTopics = this.listOfDefaultTopics;
-    if (this.selectedTopics.length > 0) {
-      for (let topic of this.selectedTopics) {
+    this.searchDropDownTopics = this.defaultTopicNames;
+    if (this.selectedTopicNames.length > 0) {
+      for (let topic of this.selectedTopicNames) {
         this.removeTopic(topic, this.searchDropDownTopics);
       }
     }
@@ -98,7 +97,7 @@ export class TopicFilterComponent implements OnInit {
       debounceTime(1500), distinctUntilChanged()
     ).subscribe(() => {
       this.autoTrigger.closePanel();
-      this.selectionsChange.emit(this.selectedTopics);
+      this.selectionsChange.emit(this.selectedTopicNames);
     });
   }
 }

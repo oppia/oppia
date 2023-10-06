@@ -3,7 +3,7 @@
                   class="w-100">
     <mat-chip-list #chipList aria-label="Topics Filter">
       <b>Filter by topic: </b>
-      <mat-chip *ngFor="let topic of selectedTopics"
+      <mat-chip *ngFor="let topic of selectedTopicNames"
                 (removed)="deselectTopic(topic)">
                 {{ topic }}
         <button matChipRemove>

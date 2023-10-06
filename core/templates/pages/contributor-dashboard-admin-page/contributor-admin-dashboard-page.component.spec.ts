@@ -251,7 +251,7 @@ describe('Contributor dashboard Admin page', () => {
   it('should apply topic filter', fakeAsync(() => {
     component.ngOnInit();
     tick();
-    component.selectedTopics.topics = ['Science', 'Technology'];
+    component.selectedTopicNames = ['Science', 'Technology'];
     component.topics = [
       { id: '1', topic: 'Science' },
       { id: '2', topic: 'Technology' },
@@ -261,7 +261,25 @@ describe('Contributor dashboard Admin page', () => {
     tick();
     component.applyTopicFilter();
 
-    expect(component.selectedTopics.ids).toEqual(['1', '2']);
+    expect(component.selectedTopicIds).toEqual(['1', '2']);
+  }));
+
+  it('should throw error when topic filter chooses null', fakeAsync(() => {
+    component.ngOnInit();
+    tick();
+    component.selectedTopicNames = ['topic_with_no_id'];
+    component.topics = [
+      { id: '1', topic: 'Science' },
+      { id: '2', topic: 'Technology' },
+    ];
+
+    fixture.detectChanges();
+    tick();
+    component.applyTopicFilter();
+
+    expect(component.applyTopicFilter).toThrowError(
+      'Selected Topic Id doesn\'t match any valid topic.'
+    );
   }));
 
   it('should apply topic and language filter both', fakeAsync(() => {
@@ -269,7 +287,7 @@ describe('Contributor dashboard Admin page', () => {
       Promise.resolve(fullAccessUserInfo));
     component.ngOnInit();
     tick();
-    component.selectedTopics.topics = ['Science', 'Technology'];
+    component.selectedTopicNames = ['Science', 'Technology'];
     component.topics = [
       { id: '1', topic: 'Science' },
       { id: '2', topic: 'Technology' },
@@ -279,14 +297,14 @@ describe('Contributor dashboard Admin page', () => {
     tick();
     component.applyTopicFilter();
 
-    expect(component.selectedTopics.ids).toEqual(['1', '2']);
+    expect(component.selectedTopicIds).toEqual(['1', '2']);
     expect(component.selectedLanguage.language).toBe('English');
     expect(component.selectedLanguage.id).toBe('en');
 
     component.selectLanguage('العربية (Arabic)');
     expect(component.selectedLanguage.language).toBe('العربية (Arabic)');
     expect(component.selectedLanguage.id).toBe('ar');
-    expect(component.selectedTopics.ids).toEqual(['1', '2']);
+    expect(component.selectedTopicIds).toEqual(['1', '2']);
   }));
 
   it('should evaluate active tab', () => {

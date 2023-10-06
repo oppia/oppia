@@ -87,19 +87,16 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
   selectedLastActivity!: number;
   allTopicNames: string[] = [];
   lastActivity: number[] = [];
+  selectedTopicIds: string[] = [];
+  selectedTopicNames: string[] = [];
   languageChoices: LanguageChoice[] = [];
   topics: TopicChoice[] = [];
   filter: ContributorAdminDashboardFilter = (
     ContributorAdminDashboardFilter.createDefault());
 
-  selectedTopics: selectedTopicChoices = {
-    ids: [],
-    topics: []
-  };
-
   selectedLanguage: LanguageChoice = {
-    language: '',
-    id: ''
+    language: null,
+    id: null
   };
 
 
@@ -197,14 +194,17 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
   }
 
   applyTopicFilter(): void {
-    this.selectedTopics.ids = this.selectedTopics.topics.map(
+    this.selectedTopicIds = this.selectedTopicNames.map(
       selectedTopic => {
         const matchingTopic = this.topics.find(
           topicChoice => topicChoice.topic === selectedTopic);
-        return matchingTopic ? matchingTopic.id : '';
+        return matchingTopic ? matchingTopic.id : null;
       });
+    if (this.selectedTopicIds === null) {
+      throw new Error('Selected Topic Id doesn\'t match any valid topic.');
+    }
     this.filter = new ContributorAdminDashboardFilter(
-      this.selectedTopics.ids,
+      this.selectedTopicIds,
       this.selectedLanguage.id,
       null,
       this.selectedLastActivity);
@@ -220,7 +220,7 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
     this.translationReviewersCount = this.translationReviewersCountByLanguage[
       this.selectedLanguage.id];
     this.filter = new ContributorAdminDashboardFilter(
-      this.selectedTopics.ids,
+      this.selectedTopicIds,
       this.selectedLanguage.id,
       null,
       this.selectedLastActivity);
@@ -230,7 +230,7 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
   selectLastActivity(lastActive: number): void {
     this.selectedLastActivity = lastActive;
     this.filter = new ContributorAdminDashboardFilter(
-      this.selectedTopics.ids,
+      this.selectedTopicIds,
       this.selectedLanguage.id,
       null,
       this.selectedLastActivity);
@@ -239,7 +239,7 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
 
   setActiveTab(tabName: string): void {
     this.filter = new ContributorAdminDashboardFilter(
-      this.selectedTopics.ids,
+      this.selectedTopicIds,
       this.selectedLanguage.id,
       null,
       this.selectedLastActivity);
@@ -266,7 +266,8 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
     if (this.checkMobileView()) {
       return;
     }
-    if (this.isTranslationCoordinator) {
+    if (this.activeTab === this.TAB_NAME_TRANSLATION_SUBMITTER ||
+      this.activeTab === this.TAB_NAME_TRANSLATION_REVIEWER) {
       if (
         targetElement &&
         !this.languageDropdownRef.nativeElement.contains(targetElement)
