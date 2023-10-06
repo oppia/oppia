@@ -29,8 +29,8 @@ import { UserService } from 'services/user.service';
 
 
 export interface LanguageChoice {
-  id: string | null;
-  language: string | null;
+  id: string;
+  language: string;
 }
 
 export interface TopicChoice {
@@ -95,8 +95,8 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
     ContributorAdminDashboardFilter.createDefault());
 
   selectedLanguage: LanguageChoice = {
-    language: null,
-    id: null
+    language: '',
+    id: ''
   };
 
 
@@ -156,7 +156,8 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
                 languageItem) =>
               response.includes(languageItem.id));
             this.selectedLanguage = this.languageChoices[0];
-            if (this.selectedLanguage === null) {
+            if (this.selectedLanguage.id === '' ||
+              this.selectedLanguage.language === '') {
               throw new Error(
                 'No languages are assigned to user.');
             }
@@ -204,7 +205,7 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
           topicChoice => topicChoice.topic === selectedTopic);
         return matchingTopic ? matchingTopic.id : null;
       });
-    if (this.selectedTopicIds === null) {
+    if (!this.selectedTopicIds) {
       throw new Error('Selected Topic Id doesn\'t match any valid topic.');
     }
     this.filter = new ContributorAdminDashboardFilter(

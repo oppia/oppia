@@ -205,7 +205,7 @@ describe('Contributor dashboard Admin page', () => {
     fakeAsync(() => {
       spyOn(userService, 'getUserInfoAsync').and.returnValue(
         Promise.resolve(fullAccessUserInfo));
-      fetchAssignedLanguageIdsSpy.and.returnValue(null);
+      fetchAssignedLanguageIdsSpy.and.returnValue('not_valid_language');
 
       component.ngOnInit();
       tick();
