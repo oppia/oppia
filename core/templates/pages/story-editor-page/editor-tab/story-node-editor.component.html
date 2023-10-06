@@ -117,15 +117,24 @@
         <div class="e2e-test-add-chapter-outline">
           <div class="story-node-header oppia-mobile-collapsible-card-header" (click)="toggleChapterOutline()">
             <span>Chapter Outline</span>
-            <i class="fa fa-caret-down"
-               *ngIf="!chapterOutlineIsShown"
-               aria-hidden="true">
-            </i>
-            <i class="fa fa-caret-up"
-               *ngIf="chapterOutlineIsShown"
-               aria-hidden="true">
-            </i>
           </div>
+          <br>
+          <div *ngIf="!chapterOutlineIsShown">
+            <div class="outline-content-container" *ngIf="!oldOutlineToReadOnly">
+              <input class="chapter-outline-editor-content e2e-test-node-outline-editor-content e2e-test-rte"
+                     readonly
+                     (click)="chapterOutlineIsShown=true"
+                     placeholder="Open chapter outline editor.">
+              <label class="fas fa-pencil-alt oppia-icon" (click)="chapterOutlineIsShown=true"></label>
+            </div>
+            <div class="outline-content-container" *ngIf="oldOutlineToReadOnly" >
+              <button class="chapter-outline-editor-content e2e-test-node-outline-editor-content e2e-test-rte"
+                      (click)="chapterOutlineIsShown=true">{{oldOutlineToReadOnly}}
+              </button>
+              <label class="fas fa-pencil-alt oppia-icon" (click)="chapterOutlineIsShown=true"></label>
+            </div>
+          </div>
+          <br>
           <div class="chapter-card-inputs oppia-mobile-collapsible-card-content" *ngIf="chapterOutlineIsShown">
             Outline Finalized
             <i *ngIf="!outlineIsFinalized" (click)="finalizeOutline()" class="far fa-square md-18 e2e-test-finalize-outline" aria-label="Finalize outline"></i>
@@ -366,6 +375,25 @@
 </div>
 
 <style>
+  .outline-content-container {
+    margin-left: 50px;
+    width: 400px;
+  }
+  .outline-content-container:hover {
+    background: rgb(240,240,240);
+  }
+  .chapter-outline-editor-content {
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    outline: none;
+    text-align: left;
+    width: 380px;
+  }
+  .oppia-icon {
+    cursor: pointer;
+    float: right;
+  }
   .story-node-content-container {
     display: flex;
     flex-wrap: wrap;
