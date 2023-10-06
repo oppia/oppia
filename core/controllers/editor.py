@@ -206,7 +206,7 @@ class ExplorationHandler(
             if user_settings.last_started_state_editor_tutorial:
                 has_seen_editor_tutorial = True
             if user_settings.last_started_state_translation_tutorial:
-                has_seen_translation_tutorial = True        
+                has_seen_translation_tutorial = True
         try:
             if self.user_id:
                 exploration_data = exp_services.get_user_exploration_data(
