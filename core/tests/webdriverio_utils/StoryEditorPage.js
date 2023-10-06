@@ -100,7 +100,6 @@ var StoryEditorPage = function() {
     return $$('.e2e-test-rte');
   };
   var nodeOutlineSaveButton = $('.e2e-test-node-outline-save-button');
-  var nodeOutlineCancelButton = $('.e2e-test-node-outline-cancel-button');
   var createChapterThumbnailButton = $(
     '.e2e-test-chapter-input-thumbnail .e2e-test-photo-button');
   var storyThumbnailImageElement = $(
@@ -460,8 +459,6 @@ var StoryEditorPage = function() {
     await richTextInstructions(editor);
     await action.click('Chapter node editor', nodeOutlineEditor);
     await action.click('Node outline save button', nodeOutlineSaveButton);
-    await action.click('Chapter node editor content', nodeOutlineEditorContent);
-    await action.click('Node outline cancel button', nodeOutlineCancelButton);
     await action.click('Finalize outline', nodeOutlineFinalizeCheckbox);
   };
 
