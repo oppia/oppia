@@ -156,7 +156,7 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
                 languageItem) =>
               response.includes(languageItem.id));
             this.selectedLanguage = this.languageChoices[0];
-            if (!this.selectedLanguage) {
+            if (this.selectedLanguage === null) {
               throw new Error(
                 'No languages are assigned to user.');
             }
