@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for PlatformParameterRuleModel.
  */
 
-import { PlatformParameterFilterType, ServerMode } from
+import { PlatformParameterFilterType } from
   'domain/platform_feature/platform-parameter-filter.model';
 import {
   PlatformParameterRule,
@@ -28,8 +28,8 @@ describe('PlatformParameterRuleModel', () => {
     const rule = PlatformParameterRule.createFromBackendDict({
       filters: [
         {
-          type: PlatformParameterFilterType.ServerMode,
-          conditions: [['=', ServerMode.Dev.toString()]]
+          type: PlatformParameterFilterType.PlatformType,
+          conditions: [['=', 'Web']]
         },
         {
           type: PlatformParameterFilterType.AppVersion,
@@ -47,8 +47,8 @@ describe('PlatformParameterRuleModel', () => {
     const backendDict: PlatformParameterRuleBackendDict = {
       filters: [
         {
-          type: PlatformParameterFilterType.ServerMode,
-          conditions: [['=', ServerMode.Dev.toString()]]
+          type: PlatformParameterFilterType.PlatformType,
+          conditions: [['=', 'Web']]
         },
         {
           type: PlatformParameterFilterType.AppVersion,
@@ -61,39 +61,5 @@ describe('PlatformParameterRuleModel', () => {
     const instance = PlatformParameterRule.createFromBackendDict(backendDict);
 
     expect(instance.toBackendDict()).toEqual(backendDict);
-  });
-
-  describe('.hasServerModeFilter', () => {
-    it('should be true if the rule has server mode filter', () => {
-      const instance = PlatformParameterRule.createFromBackendDict({
-        filters: [
-          {
-            type: PlatformParameterFilterType.ServerMode,
-            conditions: [['=', ServerMode.Dev.toString()]]
-          },
-          {
-            type: PlatformParameterFilterType.AppVersion,
-            conditions: [['>', '1.0.0']]
-          }
-        ],
-        value_when_matched: true
-      });
-
-      expect(instance.hasServerModeFilter()).toBeTrue();
-    });
-
-    it('should be false if the rule doesn\'t have server mode filter', () => {
-      const instance = PlatformParameterRule.createFromBackendDict({
-        filters: [
-          {
-            type: PlatformParameterFilterType.AppVersion,
-            conditions: [['>', '1.0.0']]
-          }
-        ],
-        value_when_matched: true
-      });
-
-      expect(instance.hasServerModeFilter()).toBeFalse();
-    });
   });
 });

@@ -43,6 +43,7 @@ export interface NewConfigPropertyValues {
 export interface UserRolesBackendResponse {
   roles: string[];
   'managed_topic_ids': string[];
+  'coordinated_language_ids': string[];
   banned: boolean;
 }
 
@@ -70,11 +71,6 @@ export interface ModelsRelatedToUserBackendResponse {
   'related_models_exist': boolean;
 }
 
-export interface SignupEmailContent {
-  'html_body': string;
-  'subject': string;
-}
-
 export interface ClassroomPageData {
   'name': string;
   'topic_ids': string[];
@@ -96,16 +92,6 @@ export interface ConfigProperty {
 
 export interface ConfigPropertyValues {
   'classroom_pages_data': ClassroomPageData;
-  'contributor_dashboard_reviewer_emails_is_enabled': boolean;
-  'email_footer': string;
-  'email_sender_name': string;
-  'enable_admin_notifications_for_reviewer_shortage': boolean;
-  'max_number_of_suggestions_per_reviewer': number;
-  'notification_user_ids_for_failed_tasks': string[];
-  'notify_admins_suggestions_waiting_too_long_is_enabled': boolean;
-  'record_playthrough_probability': number;
-  'signup_email_content': SignupEmailContent;
-  'unpublish_exploration_email_html_body': string;
 }
 
 export interface AdminPageDataBackendDict {
@@ -275,6 +261,36 @@ export class AdminBackendApiService {
         AdminPageConstants.TOPIC_MANAGER_ROLE_HANDLER_URL, {
           username: username,
           topic_id: topicId,
+          action: 'deassign'
+        }
+      ).toPromise().then(resolve, errorResponse => {
+        reject(errorResponse.error.error);
+      });
+    });
+  }
+
+  async assignTranslationCoordinator(
+      username: string, languageId: string): Promise<void> {
+    return new Promise((resolve, reject) => {
+      this.http.put<void>(
+        AdminPageConstants.TRANSLATION_COORDINATOR_ROLE_HANDLER_URL, {
+          username: username,
+          language_id: languageId,
+          action: 'assign'
+        }
+      ).toPromise().then(resolve, errorResponse => {
+        reject(errorResponse.error.error);
+      });
+    });
+  }
+
+  async deassignTranslationCoordinator(
+      username: string, languageId: string): Promise<void> {
+    return new Promise((resolve, reject) => {
+      this.http.put<void>(
+        AdminPageConstants.TRANSLATION_COORDINATOR_ROLE_HANDLER_URL, {
+          username: username,
+          language_id: languageId,
           action: 'deassign'
         }
       ).toPromise().then(resolve, errorResponse => {

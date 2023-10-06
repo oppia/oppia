@@ -72,6 +72,14 @@ PLATFORM_PARAMS_TO_SHOW_IN_RC_PAGE = set([
     platform_parameter_list.ParamNames.PROMO_BAR_MESSAGE.value
 ])
 
+# Platform parameters that we plan to show on the blog admin page.
+PLATFORM_PARAMS_TO_SHOW_IN_BLOG_ADMIN_PAGE = set([
+    (
+        platform_parameter_list.ParamNames.
+        MAX_NUMBER_OF_TAGS_ASSIGNED_TO_BLOG_POST.value
+    )
+])
+
 
 class ClassroomPageDataDict(TypedDict):
     """Dict representation of classroom page's data dictionary."""
@@ -260,18 +268,18 @@ class AdminHandler(
             feature_services.
             get_all_platform_parameters_except_feature_flag_dicts()
         )
-        # Removes promo-bar related platform params as promo-bar is handled by
-        # release coordinators in /release-coordinator page.
+        # Removes promo-bar related and blog related platform params as
+        # they are handled in release-coordinator page and blog admin page
+        # respectively.
         platform_params_dicts = [
             param for param in platform_params_dicts
-            if param['name'] not in PLATFORM_PARAMS_TO_SHOW_IN_RC_PAGE
+            if (
+                param['name'] not in PLATFORM_PARAMS_TO_SHOW_IN_RC_PAGE and
+                param['name'] not in PLATFORM_PARAMS_TO_SHOW_IN_BLOG_ADMIN_PAGE
+            )
         ]
 
         config_properties = config_domain.Registry.get_config_property_schemas()
-
-        # Remove blog related configs as they will be handled by 'blog admins'
-        # on blog admin page.
-        del config_properties['max_number_of_tags_assigned_to_blog_post']
 
         self.render_json({
             'config_properties': config_properties,
@@ -312,12 +320,12 @@ class AdminHandler(
                 regenerate_topic_related_opportunities.
             Exception. The exp_id' must be provided when the action is
                 rollback_exploration_to_safe_state.
-            Exception. The feature_name must be provided when the action
-                is update_feature_flag_rules.
+            Exception. The platform_param_name must be provided when the action
+                is update_platform_parameter_rules.
             Exception. The new_rules must be provided when the action is
-                update_feature_flag_rules.
+                update_platform_parameter_rules.
             Exception. The commit_message must be provided when the action
-                is update_feature_flag_rules.
+                is update_platform_parameter_rules.
             InvalidInputException. The input provided is not valid.
         """
         assert self.user_id is not None
@@ -1301,13 +1309,20 @@ class AdminRoleHandler(
             user_settings = user_services.get_user_settings(user_id)
             user_roles = user_settings.roles
             managed_topic_ids = []
+            coordinated_language_ids = []
             if feconf.ROLE_ID_TOPIC_MANAGER in user_roles:
                 managed_topic_ids = [
                     rights.id for rights in
                     topic_fetchers.get_topic_rights_with_user(user_id)]
+            if feconf.ROLE_ID_TRANSLATION_COORDINATOR in user_roles:
+                coordinated_language_ids = [
+                    rights.language_id for rights in
+                    user_services.get_translation_rights_with_user(
+                        user_id)]
             user_roles_dict = {
                 'roles': user_roles,
                 'managed_topic_ids': managed_topic_ids,
+                'coordinated_language_ids': coordinated_language_ids,
                 'banned': user_settings.banned
             }
             self.render_json(user_roles_dict)
@@ -1364,6 +1379,10 @@ class AdminRoleHandler(
 
         if role == feconf.ROLE_ID_TOPIC_MANAGER:
             topic_services.deassign_user_from_all_topics(self.user, user_id)
+
+        if role == feconf.ROLE_ID_TRANSLATION_COORDINATOR:
+            user_services.deassign_user_from_all_languages(
+                self.user, user_id)
 
         user_services.remove_user_role(user_id, role)
 
@@ -2070,4 +2089,89 @@ class UpdateBlogPostHandler(
 
         blog_services.update_blog_models_author_and_published_on_date(
             blog_post_id, author_id, published_on)
+        self.render_json({})
+
+
+class TranslationCoordinatorRoleHandlerNormalizedPayloadDict(TypedDict):
+    """Dict representation of TranslationCoordinatorRoleHandler's
+    normalized_payload dictionary.
+    """
+
+    username: str
+    action: str
+    language_id: str
+
+
+class TranslationCoordinatorRoleHandler(
+    base.BaseHandler[
+        TranslationCoordinatorRoleHandlerNormalizedPayloadDict, Dict[str, str]
+    ]
+):
+    """Handler to assign or deassigning coordinator to a language."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'PUT': {
+            'username': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            },
+            'action': {
+                'schema': {
+                    'type': 'basestring',
+                    'choices': ['assign', 'deassign']
+                }
+            },
+            'language_id': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            }
+        }
+    }
+
+    @acl_decorators.can_access_admin_page
+    def put(self) -> None:
+        """Adds or removes the translation-coordinator role for a user in the
+        context of a specific language.
+
+        Raises:
+            InvalidInputException. User with given username does not exist.
+        """
+        assert self.normalized_payload is not None
+        username = self.normalized_payload['username']
+        action = self.normalized_payload['action']
+        language_id = self.normalized_payload['language_id']
+
+        user_settings = user_services.get_user_settings_from_username(username)
+
+        if user_settings is None:
+            raise self.InvalidInputException(
+                'User with given username does not exist.')
+
+        user_id = user_settings.user_id
+        if action == 'assign':
+            if not feconf.ROLE_ID_TRANSLATION_COORDINATOR in (
+                user_settings.roles):
+                user_services.add_user_role(
+                    user_id, feconf.ROLE_ID_TRANSLATION_COORDINATOR)
+
+            language_coordinator = user_services.get_user_actions_info(user_id)
+
+            user_services.assign_coordinator(
+                user_services.get_system_user(),
+                language_coordinator, language_id)
+        else:
+            # The handler schema defines the possible values of 'action'.
+            # If 'action' has a value other than those defined in the schema,
+            # a Bad Request error will be thrown. Hence, 'action' must be
+            # 'deassign' if this branch is executed.
+            assert action == 'deassign'
+            language_coordinator = user_services.get_user_actions_info(user_id)
+            user_services.deassign_coordinator(
+                user_services.get_system_user(),
+                language_coordinator, language_id)
+
         self.render_json({})

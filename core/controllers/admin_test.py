@@ -21,6 +21,7 @@ import enum
 import logging
 
 from core import feconf
+from core import platform_feature_list
 from core import utils
 from core.constants import constants
 from core.domain import blog_services
@@ -32,7 +33,6 @@ from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import fs_services
 from core.domain import opportunity_services
-from core.domain import platform_feature_services
 from core.domain import platform_parameter_domain
 from core.domain import platform_parameter_registry
 from core.domain import question_fetchers
@@ -112,22 +112,31 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
 
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
-        new_config_value = False
+        new_config_value = [{
+            'name': 'math',
+            'url_fragment': 'math',
+            'topic_ids': [],
+            'course_details': 'Detailed math classroom.',
+            'topic_list_intro': ''
+        }]
 
         response_dict = self.get_json('/adminhandler')
         response_config_properties = response_dict['config_properties']
         self.assertDictContainsSubset({
-            'value': False,
+            'value': [{
+                'name': 'math',
+                'url_fragment': 'math',
+                'topic_ids': [],
+                'course_details': '',
+                'topic_list_intro': ''
+            }],
         }, response_config_properties[
-            config_domain.
-            ENABLE_ADMIN_NOTIFICATIONS_FOR_REVIEWER_SHORTAGE.name])
+            config_domain.CLASSROOM_PAGES_DATA.name])
 
         payload = {
             'action': 'save_config_properties',
             'new_config_property_values': {
-                config_domain.
-                ENABLE_ADMIN_NOTIFICATIONS_FOR_REVIEWER_SHORTAGE.name: (
-                    new_config_value),
+                config_domain.CLASSROOM_PAGES_DATA.name: new_config_value,
             }
         }
         self.post_json('/adminhandler', payload, csrf_token=csrf_token)
@@ -137,8 +146,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         self.assertDictContainsSubset({
             'value': new_config_value,
         }, response_config_properties[
-            config_domain.
-            ENABLE_ADMIN_NOTIFICATIONS_FOR_REVIEWER_SHORTAGE.name])
+            config_domain.CLASSROOM_PAGES_DATA.name])
 
         self.logout()
 
@@ -385,8 +393,8 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
             {
                 'filters': [
                     {
-                        'type': 'server_mode',
-                        'conditions': [['=', 'dev']]
+                        'type': 'platform_type',
+                        'conditions': [['=', 'Web']]
                     }
                 ],
                 'value_when_matched': True
@@ -808,23 +816,44 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         csrf_token = self.get_new_csrf_token()
 
         config_services.set_property(
-            self.admin_id, 'record_playthrough_probability', 0.5)
+            self.admin_id, 'classroom_pages_data', [{
+                'name': 'math',
+                'url_fragment': 'math',
+                'topic_ids': [],
+                'course_details': 'Detailed math classroom.',
+                'topic_list_intro': ''
+            }]
+        )
         self.assertEqual(
-            config_domain.RECORD_PLAYTHROUGH_PROBABILITY.value, 0.5)
+            config_domain.CLASSROOM_PAGES_DATA.value, [{
+                'name': 'math',
+                'url_fragment': 'math',
+                'topic_ids': [],
+                'course_details': 'Detailed math classroom.',
+                'topic_list_intro': ''
+            }]
+        )
 
         with self.swap(logging, 'info', _mock_logging_function):
             self.post_json(
                 '/adminhandler', {
                     'action': 'revert_config_property',
-                    'config_property_id': 'record_playthrough_probability'
+                    'config_property_id': 'classroom_pages_data'
                 }, csrf_token=csrf_token)
 
         self.assertEqual(
-            config_domain.RECORD_PLAYTHROUGH_PROBABILITY.value, 0.2)
+            config_domain.CLASSROOM_PAGES_DATA.value, [{
+                'name': 'math',
+                'url_fragment': 'math',
+                'topic_ids': [],
+                'course_details': '',
+                'topic_list_intro': ''
+            }]
+        )
         self.assertEqual(
             observed_log_messages,
             ['[ADMIN] %s reverted config property: '
-             'record_playthrough_probability' % self.admin_id])
+             'classroom_pages_data' % self.admin_id])
 
         self.logout()
 
@@ -868,7 +897,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
                 platform_parameter_domain.DataTypes.BOOL)
         )
         with self.swap(
-            platform_feature_services,
+            platform_feature_list,
             'ALL_PLATFORM_PARAMS_EXCEPT_FEATURE_FLAGS',
             [ParamNames.TEST_PARAMETER_1]
         ):
@@ -894,8 +923,8 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
             {
                 'filters': [
                     {
-                        'type': 'server_mode',
-                        'conditions': [['=', 'dev']]
+                        'type': 'platform_type',
+                        'conditions': [['=', 'Web']]
                     }
                 ],
                 'value_when_matched': True
@@ -903,7 +932,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         ]
 
         with self.swap(
-            platform_feature_services,
+            platform_feature_list,
             'ALL_PLATFORM_PARAMS_EXCEPT_FEATURE_FLAGS',
             [ParamNames.TEST_PARAMETER_1]
         ):
@@ -942,8 +971,8 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
             {
                 'filters': [
                     {
-                        'type': 'server_mode',
-                        'conditions': [['=', 'dev']]
+                        'type': 'platform_type',
+                        'conditions': [['=', 'Web']]
                     }
                 ],
                 'value_when_matched': True
@@ -951,7 +980,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         ]
 
         with self.swap(
-            platform_feature_services,
+            platform_feature_list,
             'ALL_PLATFORM_PARAMS_EXCEPT_FEATURE_FLAGS',
             [ParamNames.TEST_PARAMETER_1]
         ):
@@ -986,8 +1015,8 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
             {
                 'filters': [
                     {
-                        'type': 'server_mode',
-                        'conditions': [['=', 'prod']]
+                        'type': 'platform_type',
+                        'conditions': [['=', 'Web']]
                     }
                 ],
                 'value_when_matched': True
@@ -995,7 +1024,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         ]
 
         with self.swap(
-            platform_feature_services,
+            platform_feature_list,
             'ALL_PLATFORM_PARAMS_EXCEPT_FEATURE_FLAGS',
             [ParamNames.TEST_PARAMETER_1]
         ):
@@ -1031,8 +1060,8 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
             {
                 'filters': [
                     {
-                        'type': 'server_mode',
-                        'conditions': [['=', 'dev']]
+                        'type': 'platform_type',
+                        'conditions': [['=', 'Web']]
                     }
                 ],
                 'value_when_matched': 'unknown'
@@ -1162,8 +1191,8 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
             {
                 'filters': [
                     {
-                        'type': 'server_mode',
-                        'conditions': [['=', 'dev']]
+                        'type': 'platform_type',
+                        'conditions': [['=', 'Web']]
                     }
                 ],
                 'value_when_matched': True
@@ -1468,7 +1497,8 @@ class AdminRoleHandlerTest(test_utils.GenericTestBase):
             response_dict, {
                 'roles': [feconf.ROLE_ID_FULL_USER],
                 'banned': False,
-                'managed_topic_ids': []
+                'managed_topic_ids': [],
+                'coordinated_language_ids': []
             })
 
         # Check role correctly gets updated.
@@ -1593,7 +1623,8 @@ class AdminRoleHandlerTest(test_utils.GenericTestBase):
                 'roles': [
                     feconf.ROLE_ID_FULL_USER, feconf.ROLE_ID_TOPIC_MANAGER],
                 'banned': False,
-                'managed_topic_ids': [topic_id]
+                'managed_topic_ids': [topic_id],
+                'coordinated_language_ids': []
             })
 
         csrf_token = self.get_new_csrf_token()
@@ -1619,7 +1650,8 @@ class AdminRoleHandlerTest(test_utils.GenericTestBase):
         self.assertEqual(response_dict, {
             'roles': [feconf.ROLE_ID_FULL_USER, feconf.ROLE_ID_MODERATOR],
             'banned': False,
-            'managed_topic_ids': []
+            'managed_topic_ids': [],
+            'coordinated_language_ids': []
         })
 
         self.logout()
@@ -1646,7 +1678,8 @@ class AdminRoleHandlerTest(test_utils.GenericTestBase):
             response_dict, {
                 'roles': [feconf.ROLE_ID_FULL_USER, feconf.ROLE_ID_MODERATOR],
                 'banned': False,
-                'managed_topic_ids': []
+                'managed_topic_ids': [],
+                'coordinated_language_ids': []
             })
 
         self.delete_json(
@@ -1661,7 +1694,8 @@ class AdminRoleHandlerTest(test_utils.GenericTestBase):
             response_dict, {
                 'roles': [feconf.ROLE_ID_FULL_USER],
                 'banned': False,
-                'managed_topic_ids': []
+                'managed_topic_ids': [],
+                'coordinated_language_ids': []
             })
         self.logout()
 
@@ -1716,7 +1750,8 @@ class AdminRoleHandlerTest(test_utils.GenericTestBase):
                 'roles': [
                     feconf.ROLE_ID_FULL_USER, feconf.ROLE_ID_TOPIC_MANAGER],
                 'banned': False,
-                'managed_topic_ids': [topic_id]
+                'managed_topic_ids': [topic_id],
+                'coordinated_language_ids': []
             })
 
         self.delete_json(
@@ -1731,7 +1766,8 @@ class AdminRoleHandlerTest(test_utils.GenericTestBase):
             response_dict, {
                 'roles': [feconf.ROLE_ID_FULL_USER],
                 'banned': False,
-                'managed_topic_ids': []
+                'managed_topic_ids': [],
+                'coordinated_language_ids': []
             })
 
 
@@ -1788,7 +1824,8 @@ class TopicManagerRoleHandlerTest(test_utils.GenericTestBase):
             response_dict, {
                 'roles': [feconf.ROLE_ID_FULL_USER],
                 'banned': False,
-                'managed_topic_ids': []
+                'managed_topic_ids': [],
+                'coordinated_language_ids': []
             })
 
         # Check role correctly gets updated.
@@ -1810,7 +1847,8 @@ class TopicManagerRoleHandlerTest(test_utils.GenericTestBase):
                 'roles': [
                     feconf.ROLE_ID_FULL_USER, feconf.ROLE_ID_TOPIC_MANAGER],
                 'banned': False,
-                'managed_topic_ids': [topic_id]
+                'managed_topic_ids': [topic_id],
+                'coordinated_language_ids': []
             })
         self.logout()
 
@@ -1847,7 +1885,8 @@ class TopicManagerRoleHandlerTest(test_utils.GenericTestBase):
                 'roles': [
                     feconf.ROLE_ID_FULL_USER, feconf.ROLE_ID_TOPIC_MANAGER],
                 'banned': False,
-                'managed_topic_ids': [topic_id]
+                'managed_topic_ids': [topic_id],
+                'coordinated_language_ids': []
             })
 
         new_topic_id = topic_fetchers.get_new_topic_id()
@@ -1881,6 +1920,272 @@ class TopicManagerRoleHandlerTest(test_utils.GenericTestBase):
         self.logout()
 
 
+class TranslationCoordinatorRoleHandlerTest(test_utils.GenericTestBase):
+    """Tests for TranslationCoordinatorRoleHandler."""
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.admin_id = self.get_user_id_from_email(self.SUPER_ADMIN_EMAIL)
+
+    def test_handler_with_invalid_username(self) -> None:
+        username = 'invaliduser'
+
+        self.login(self.SUPER_ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+        response = self.put_json(
+            '/translationcoordinatorrolehandler', {
+                'action': 'assign',
+                'username': username,
+                'language_id': 'en'
+            }, csrf_token=csrf_token, expected_status_int=400)
+
+        self.assertEqual(
+            response['error'], 'User with given username does not exist.')
+
+    def test_adding_translation_coordinator_role_to_language(self) -> None:
+        user_email = 'user1@example.com'
+        username = 'user1'
+        self.signup(user_email, username)
+        self.login(self.SUPER_ADMIN_EMAIL, is_super_admin=True)
+
+        response_dict = self.get_json(
+            feconf.ADMIN_ROLE_HANDLER_URL,
+            params={'filter_criterion': 'username', 'username': username})
+
+        self.assertEqual(
+            response_dict, {
+                'roles': [feconf.ROLE_ID_FULL_USER],
+                'banned': False,
+                'managed_topic_ids': [],
+                'coordinated_language_ids': []
+            })
+
+        # Check role correctly gets updated.
+        csrf_token = self.get_new_csrf_token()
+        response_dict = self.put_json(
+            '/translationcoordinatorrolehandler', {
+                'action': 'assign',
+                'username': username,
+                'language_id': 'en'
+            }, csrf_token=csrf_token)
+
+        self.assertEqual(response_dict, {})
+
+        response_dict = self.get_json(
+            feconf.ADMIN_ROLE_HANDLER_URL,
+            params={'filter_criterion': 'username', 'username': username})
+        self.assertEqual(
+            response_dict, {
+                'roles': [
+                    feconf.ROLE_ID_FULL_USER,
+                    feconf.ROLE_ID_TRANSLATION_COORDINATOR],
+                'banned': False,
+                'managed_topic_ids': [],
+                'coordinated_language_ids': ['en']
+            })
+        self.logout()
+
+    def test_assigning_two_languages_to_translation_coordinator(self) -> None:
+        user_email = 'user1@example.com'
+        username = 'user1'
+        self.signup(user_email, username)
+        self.login(self.SUPER_ADMIN_EMAIL, is_super_admin=True)
+
+        response_dict = self.get_json(
+            feconf.ADMIN_ROLE_HANDLER_URL,
+            params={'filter_criterion': 'username', 'username': username})
+
+        self.assertEqual(
+            response_dict, {
+                'roles': [feconf.ROLE_ID_FULL_USER],
+                'banned': False,
+                'managed_topic_ids': [],
+                'coordinated_language_ids': []
+            })
+
+        # Check role correctly gets updated.
+        csrf_token = self.get_new_csrf_token()
+        response_dict = self.put_json(
+            '/translationcoordinatorrolehandler', {
+                'action': 'assign',
+                'username': username,
+                'language_id': 'en'
+            }, csrf_token=csrf_token)
+
+        self.assertEqual(response_dict, {})
+
+        response_dict = self.get_json(
+            feconf.ADMIN_ROLE_HANDLER_URL,
+            params={'filter_criterion': 'username', 'username': username})
+        self.assertEqual(
+            response_dict, {
+                'roles': [
+                    feconf.ROLE_ID_FULL_USER,
+                    feconf.ROLE_ID_TRANSLATION_COORDINATOR],
+                'banned': False,
+                'managed_topic_ids': [],
+                'coordinated_language_ids': ['en']
+            })
+
+        csrf_token = self.get_new_csrf_token()
+        response_dict = self.put_json(
+            '/translationcoordinatorrolehandler', {
+                'action': 'assign',
+                'username': username,
+                'language_id': 'hi'
+            }, csrf_token=csrf_token)
+
+        self.assertEqual(response_dict, {})
+
+        response_dict = self.get_json(
+            feconf.ADMIN_ROLE_HANDLER_URL,
+            params={'filter_criterion': 'username', 'username': username})
+        self.assertEqual(
+            response_dict, {
+                'roles': [
+                    feconf.ROLE_ID_FULL_USER,
+                    feconf.ROLE_ID_TRANSLATION_COORDINATOR],
+                'banned': False,
+                'managed_topic_ids': [],
+                'coordinated_language_ids': ['en', 'hi']
+            })
+        self.logout()
+
+    def test_deassigning_language_from_coordinator(self) -> None:
+        user_email = 'user1@example.com'
+        username = 'user1'
+        self.signup(user_email, username)
+        self.login(self.SUPER_ADMIN_EMAIL, is_super_admin=True)
+
+        response_dict = self.get_json(
+            feconf.ADMIN_ROLE_HANDLER_URL,
+            params={'filter_criterion': 'username', 'username': username})
+
+        self.assertEqual(
+            response_dict, {
+                'roles': [feconf.ROLE_ID_FULL_USER],
+                'banned': False,
+                'managed_topic_ids': [],
+                'coordinated_language_ids': []
+            })
+
+        # Check role correctly gets updated.
+        csrf_token = self.get_new_csrf_token()
+        response_dict = self.put_json(
+            '/translationcoordinatorrolehandler', {
+                'action': 'assign',
+                'username': username,
+                'language_id': 'en'
+            }, csrf_token=csrf_token)
+
+        self.assertEqual(response_dict, {})
+
+        response_dict = self.get_json(
+            feconf.ADMIN_ROLE_HANDLER_URL,
+            params={'filter_criterion': 'username', 'username': username})
+        self.assertEqual(
+            response_dict, {
+                'roles': [
+                    feconf.ROLE_ID_FULL_USER,
+                    feconf.ROLE_ID_TRANSLATION_COORDINATOR],
+                'banned': False,
+                'managed_topic_ids': [],
+                'coordinated_language_ids': ['en']
+            })
+
+        # Check role correctly gets updated.
+        csrf_token = self.get_new_csrf_token()
+        response_dict = self.put_json(
+            '/translationcoordinatorrolehandler', {
+                'action': 'deassign',
+                'username': username,
+                'language_id': 'en'
+            }, csrf_token=csrf_token)
+
+        self.assertEqual(response_dict, {})
+
+        self.delete_json(
+            feconf.ADMIN_ROLE_HANDLER_URL,
+            params={
+                'role': feconf.ROLE_ID_TRANSLATION_COORDINATOR,
+                'username': username},
+            expected_status_int=200)
+
+        response_dict = self.get_json(
+            feconf.ADMIN_ROLE_HANDLER_URL,
+            params={'filter_criterion': 'username', 'username': username})
+        self.assertEqual(
+            response_dict, {
+                'roles': [
+                    feconf.ROLE_ID_FULL_USER],
+                'banned': False,
+                'managed_topic_ids': [],
+                'coordinated_language_ids': []
+            })
+        self.logout()
+
+    def test_removing_translation_coordinator_role(self) -> None:
+        user_email = 'user1@example.com'
+        username = 'user1'
+        self.signup(user_email, username)
+        self.login(self.SUPER_ADMIN_EMAIL, is_super_admin=True)
+
+        response_dict = self.get_json(
+            feconf.ADMIN_ROLE_HANDLER_URL,
+            params={'filter_criterion': 'username', 'username': username})
+
+        self.assertEqual(
+            response_dict, {
+                'roles': [feconf.ROLE_ID_FULL_USER],
+                'banned': False,
+                'managed_topic_ids': [],
+                'coordinated_language_ids': []
+            })
+
+        # Check role correctly gets updated.
+        csrf_token = self.get_new_csrf_token()
+        response_dict = self.put_json(
+            '/translationcoordinatorrolehandler', {
+                'action': 'assign',
+                'username': username,
+                'language_id': 'en'
+            }, csrf_token=csrf_token)
+
+        self.assertEqual(response_dict, {})
+
+        response_dict = self.get_json(
+            feconf.ADMIN_ROLE_HANDLER_URL,
+            params={'filter_criterion': 'username', 'username': username})
+        self.assertEqual(
+            response_dict, {
+                'roles': [
+                    feconf.ROLE_ID_FULL_USER,
+                    feconf.ROLE_ID_TRANSLATION_COORDINATOR],
+                'banned': False,
+                'managed_topic_ids': [],
+                'coordinated_language_ids': ['en']
+            })
+
+        self.delete_json(
+            feconf.ADMIN_ROLE_HANDLER_URL,
+            params={
+                'username': username,
+                'role': feconf.ROLE_ID_TRANSLATION_COORDINATOR})
+
+        response_dict = self.get_json(
+            feconf.ADMIN_ROLE_HANDLER_URL,
+            params={'filter_criterion': 'username', 'username': username})
+        self.assertEqual(
+            response_dict, {
+                'roles': [
+                    feconf.ROLE_ID_FULL_USER],
+                'banned': False,
+                'managed_topic_ids': [],
+                'coordinated_language_ids': []
+            })
+        self.logout()
+
+
 class BannedUsersHandlerTest(test_utils.GenericTestBase):
     """Tests for BannedUsersHandler."""
 
@@ -1902,7 +2207,8 @@ class BannedUsersHandlerTest(test_utils.GenericTestBase):
             response_dict, {
                 'roles': [feconf.ROLE_ID_FULL_USER],
                 'banned': False,
-                'managed_topic_ids': []
+                'managed_topic_ids': [],
+                'coordinated_language_ids': []
             })
 
         csrf_token = self.get_new_csrf_token()
@@ -1921,7 +2227,8 @@ class BannedUsersHandlerTest(test_utils.GenericTestBase):
             response_dict, {
                 'roles': [],
                 'banned': True,
-                'managed_topic_ids': []
+                'managed_topic_ids': [],
+                'coordinated_language_ids': []
             })
 
     def test_banning_topic_manager_should_remove_user_from_topics(
@@ -1958,7 +2265,8 @@ class BannedUsersHandlerTest(test_utils.GenericTestBase):
                 'roles': [
                     feconf.ROLE_ID_FULL_USER, feconf.ROLE_ID_TOPIC_MANAGER],
                 'banned': False,
-                'managed_topic_ids': [topic_id]
+                'managed_topic_ids': [topic_id],
+                'coordinated_language_ids': []
             })
 
         csrf_token = self.get_new_csrf_token()
@@ -1975,7 +2283,8 @@ class BannedUsersHandlerTest(test_utils.GenericTestBase):
             response_dict, {
                 'roles': [],
                 'banned': True,
-                'managed_topic_ids': []
+                'managed_topic_ids': [],
+                'coordinated_language_ids': []
             })
 
     def test_ban_user_with_invalid_username(self) -> None:
@@ -2009,7 +2318,8 @@ class BannedUsersHandlerTest(test_utils.GenericTestBase):
             response_dict, {
                 'roles': [],
                 'banned': True,
-                'managed_topic_ids': []
+                'managed_topic_ids': [],
+                'coordinated_language_ids': []
             })
 
         self.delete_json('/bannedusershandler', params={'username': username})
@@ -2022,7 +2332,8 @@ class BannedUsersHandlerTest(test_utils.GenericTestBase):
             response_dict, {
                 'roles': [feconf.ROLE_ID_FULL_USER],
                 'banned': False,
-                'managed_topic_ids': []
+                'managed_topic_ids': [],
+                'coordinated_language_ids': []
             })
 
     def test_unban_user_with_invalid_username(self) -> None:
