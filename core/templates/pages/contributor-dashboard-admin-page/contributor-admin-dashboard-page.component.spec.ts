@@ -201,19 +201,18 @@ describe('Contributor dashboard Admin page', () => {
     expect(component.selectedLanguage.id).toEqual('en');
   }));
 
-  it('should throw error if fetchAssignedLanguageIds returns not_valid ' +
+  it('should throw error if fetchAssignedLanguageIds returns invalid ' +
     'language', fakeAsync(() => {
     spyOn(userService, 'getUserInfoAsync').and.returnValue(
       Promise.resolve(fullAccessUserInfo));
-    fetchAssignedLanguageIdsSpy.and.returnValue('not_valid_language');
+    fetchAssignedLanguageIdsSpy.and.returnValue(Promise.resolve(
+      ['invalid_language']));
 
-    component.ngOnInit();
-    tick();
-    fixture.detectChanges();
-
-    expect(component.ngOnInit()).toThrowError(
-      'No languages are assigned to user.'
-    );
+    expect(() => {
+      component.ngOnInit();
+      tick();
+    }).toThrowError(
+      'Uncaught (in promise): Error: No languages are assigned to user.');
   }));
 
   it('should open language dropdown', () => {
@@ -279,25 +278,6 @@ describe('Contributor dashboard Admin page', () => {
 
     expect(component.selectedTopicIds).toEqual(['1', '2']);
   }));
-
-  it('should throw error when topic filter chooses topic with no id',
-    fakeAsync(() => {
-      component.ngOnInit();
-      tick();
-      component.selectedTopicNames = ['topic_with_no_id'];
-      component.topics = [
-        { id: '1', topic: 'Science' },
-        { id: '2', topic: 'Technology' },
-      ];
-
-      fixture.detectChanges();
-      tick();
-      component.applyTopicFilter();
-
-      expect(component.applyTopicFilter).toThrowError(
-        'Selected Topic Id doesn\'t match any valid topic.'
-      );
-    }));
 
   it('should apply topic and language filter both', fakeAsync(() => {
     spyOn(userService, 'getUserInfoAsync').and.returnValue(

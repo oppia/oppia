@@ -156,8 +156,7 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
                 languageItem) =>
               response.includes(languageItem.id));
             this.selectedLanguage = this.languageChoices[0];
-            if (this.selectedLanguage.id === '' ||
-              this.selectedLanguage.language === '') {
+            if (!this.selectedLanguage) {
               throw new Error(
                 'No languages are assigned to user.');
             }
@@ -205,9 +204,6 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
           topicChoice => topicChoice.topic === selectedTopic);
         return matchingTopic ? matchingTopic.id : '';
       });
-    if (!this.selectedTopicIds) {
-      throw new Error('Selected Topic Id doesn\'t match any valid topic.');
-    }
     this.filter = new ContributorAdminDashboardFilter(
       this.selectedTopicIds,
       this.selectedLanguage.id,
