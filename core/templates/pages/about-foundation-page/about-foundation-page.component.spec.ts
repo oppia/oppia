@@ -21,6 +21,7 @@ import { TestBed } from '@angular/core/testing';
 import { TranslateService } from '@ngx-translate/core';
 
 import { AboutFoundationPageComponent } from './about-foundation-page.component';
+import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { PageTitleService } from 'services/page-title.service';
 
@@ -36,7 +37,10 @@ describe('About foundation page', () => {
   let pageTitleService: PageTitleService;
   beforeEach(async() => {
     TestBed.configureTestingModule({
-      declarations: [AboutFoundationPageComponent],
+      declarations: [
+        AboutFoundationPageComponent,
+        MockTranslatePipe
+      ],
       providers: [
         UrlInterpolationService,
         PageTitleService,

@@ -35,6 +35,7 @@ var ReleaseCoordinatorPage = function() {
   var removeRuleButtonLocator = '.e2e-test-remove-rule-button';
   var saveButtonLocator = '.e2e-test-save-button';
   var serverModeSelectorLocator = '.e2e-test-server-mode-selector';
+  var removeFilterConditionLocator = '.e2e-test-remove-condition';
   var valueSelectorLocator = '.e2e-test-value-selector';
   var statusMessage = $('.e2e-test-status-message');
 
@@ -122,14 +123,29 @@ var ReleaseCoordinatorPage = function() {
     return null;
   };
 
+  // TODO(#18881): Remove this method after the cd_admin_dashboard_new_ui
+  // feature flag is deprecated.
+  this.getCdAdminDashboardNewUiFeatureElement = async function() {
+    var featureFlagElements = await featureFlagElementsSelector();
+    var count = featureFlagElements.length;
+    for (let i = 0; i < count; i++) {
+      var elem = featureFlagElements[i];
+      if ((await elem.$(featureNameLocator).getText()) ===
+          'cd_admin_dashboard_new_ui') {
+        return elem;
+      }
+    }
+
+    return null;
+  };
+
   // This function is meant to be used to enable a feature gated behind
   // a feature flag in test mode, which is the server environment the E2E
   // tests are run in.
   this.enableFeatureForTest = async function(featureElement) {
     await action.click(
       'Add feature rule button',
-      featureElement
-        .$(addFeatureRuleButtonLocator)
+      featureElement.$(addFeatureRuleButtonLocator)
     );
 
     await waitFor.visibilityOf(
@@ -158,7 +174,7 @@ var ReleaseCoordinatorPage = function() {
   // This function is meant to be used to enable a feature gated behind
   // a feature flag in prod mode, which is the server environment the E2E
   // tests are run in.
-  this.enableFeatureForProd = async function(featureElement) {
+  this.enableFeature = async function(featureElement) {
     await this.removeAllRulesOfFeature(featureElement);
 
     await action.click(
@@ -166,50 +182,26 @@ var ReleaseCoordinatorPage = function() {
       featureElement
         .$(addFeatureRuleButtonLocator)
     );
-
     await waitFor.visibilityOf(
       featureElement.$(valueSelectorLocator),
       'Value Selector takes too long to appear'
     );
+
     await (featureElement.$(valueSelectorLocator)).selectByVisibleText(
       'Enabled');
-
     await action.click(
       'Add condition button',
       featureElement
         .$(addConditionButtonLocator)
     );
-
     await waitFor.visibilityOf(
       featureElement.$(serverModeSelectorLocator),
       'Value Selector takes too long to appear'
     );
-    await (featureElement.$(serverModeSelectorLocator)).selectByVisibleText(
-      'prod');
-
-    await this.saveChangeOfFeature(featureElement);
-  };
-
-  this.enableFeatureForDev = async function(featureElement) {
-    await this.removeAllRulesOfFeature(featureElement);
 
     await action.click(
-      'Add feature rule button',
-      featureElement
-        .$(addFeatureRuleButtonLocator)
-    );
-
-    await waitFor.visibilityOf(
-      featureElement.$(valueSelectorLocator),
-      'Value Selector takes too long to appear'
-    );
-    await (featureElement.$(valueSelectorLocator)).selectByVisibleText(
-      'Enabled');
-
-    await action.click(
-      'Add condition button',
-      featureElement
-        .$(addConditionButtonLocator)
+      'Remove filter condition',
+      featureElement.$(removeFilterConditionLocator)
     );
 
     await this.saveChangeOfFeature(featureElement);

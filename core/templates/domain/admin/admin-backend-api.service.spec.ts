@@ -69,12 +69,18 @@ describe('Admin backend api service', () => {
     },
     demo_collections: [],
     config_properties: {
-      record_playthrough_probability: {
+      classroom_pages_data: {
         schema: {
-          type: 'float'
+          type: 'list'
         } as Schema,
-        value: 0.2,
-        description: 'The record_playthrough_probability.'
+        value: {
+          name: 'math',
+          url_fragment: 'math',
+          course_details: '',
+          topic_list_intro: '',
+          topic_ids: []
+        },
+        description: 'The details for each classroom page.'
       }
     },
     demo_exploration_ids: ['19'],
@@ -91,8 +97,8 @@ describe('Admin backend api service', () => {
       data_type: 'string',
       rules: [{
         filters: [{
-          type: PlatformParameterFilterType.ServerMode,
-          conditions: [['=', 'dev'] as [string, string]]
+          type: PlatformParameterFilterType.PlatformType,
+          conditions: [['=', 'Web'] as [string, string]]
         }],
         value_when_matched: ''
       }],
@@ -110,20 +116,7 @@ describe('Admin backend api service', () => {
       topic_ids: [],
       topic_list_intro: 'fsd',
       url_fragment: 'mathfsad',
-    },
-    contributor_dashboard_reviewer_emails_is_enabled: true,
-    email_footer: 'fsdf',
-    email_sender_name: 'Site Admin',
-    enable_admin_notifications_for_reviewer_shortage: false,
-    max_number_of_suggestions_per_reviewer: 5,
-    notification_user_ids_for_failed_tasks: [],
-    notify_admins_suggestions_waiting_too_long_is_enabled: false,
-    record_playthrough_probability: 0.2,
-    signup_email_content: {
-      subject: 'THIS IS A PLACEHOLDER.',
-      html_body: 'THIS IS A <b>PLACEHOLDER</b> AND SHOULD BE REPLACED.'
-    },
-    unpublish_exploration_email_html_body: 'test'
+    }
   };
 
   beforeEach(() => {
@@ -455,6 +448,110 @@ describe('Admin backend api service', () => {
         successHandler, failHandler);
 
       let req = httpTestingController.expectOne('/topicmanagerrolehandler');
+      expect(req.request.method).toEqual('PUT');
+      expect(req.request.body).toEqual(payload);
+
+      req.flush(
+        { error: 'User with given username does not exist'},
+        { status: 500, statusText: 'Internal Server Error'});
+      flushMicrotasks();
+
+      expect(successHandler).not.toHaveBeenCalled();
+      expect(failHandler).toHaveBeenCalledWith(
+        'User with given username does not exist');
+    }));
+  });
+
+  describe('assignTranslationCoordinator', () => {
+    it('should make request to assign user to a language', fakeAsync(() => {
+      let languageID = 'en';
+      let username = 'validUser';
+      let payload = {
+        language_id: languageID,
+        username: username,
+        action: 'assign'
+      };
+      abas.assignTranslationCoordinator(username, languageID).then(
+        successHandler, failHandler);
+
+      let req = httpTestingController.expectOne(
+        '/translationcoordinatorrolehandler');
+      expect(req.request.method).toEqual('PUT');
+      expect(req.request.body).toEqual(payload);
+
+      req.flush(
+        { status: 200, statusText: 'Success.'});
+      flushMicrotasks();
+
+      expect(successHandler).toHaveBeenCalled();
+      expect(failHandler).not.toHaveBeenCalled();
+    }));
+
+    it('should call fail handler if the request fails', fakeAsync(() => {
+      let languageID = 'en';
+      let username = 'invalidUser';
+      let payload = {
+        language_id: languageID,
+        username: username,
+        action: 'assign'
+      };
+      abas.assignTranslationCoordinator(username, languageID).then(
+        successHandler, failHandler);
+
+      let req = httpTestingController.expectOne(
+        '/translationcoordinatorrolehandler');
+      expect(req.request.method).toEqual('PUT');
+      expect(req.request.body).toEqual(payload);
+
+      req.flush(
+        { error: 'User with given username does not exist'},
+        { status: 500, statusText: 'Internal Server Error'});
+      flushMicrotasks();
+
+      expect(successHandler).not.toHaveBeenCalled();
+      expect(failHandler).toHaveBeenCalledWith(
+        'User with given username does not exist');
+    }));
+  });
+
+  describe('deassignTranslationCoordinator', () => {
+    it('should make request to deassign user from language', fakeAsync(() => {
+      let languageID = 'en';
+      let username = 'validUser';
+      let payload = {
+        language_id: languageID,
+        username: username,
+        action: 'deassign'
+      };
+      abas.deassignTranslationCoordinator(username, languageID).then(
+        successHandler, failHandler);
+
+      let req = httpTestingController.expectOne(
+        '/translationcoordinatorrolehandler');
+      expect(req.request.method).toEqual('PUT');
+      expect(req.request.body).toEqual(payload);
+
+      req.flush(
+        { status: 200, statusText: 'Success.'});
+      flushMicrotasks();
+
+      expect(successHandler).toHaveBeenCalled();
+      expect(failHandler).not.toHaveBeenCalled();
+    }));
+
+    it('should call fail handler if the request fails', fakeAsync(() => {
+      let languageID = 'en';
+      let username = 'invalidUser';
+      let payload = {
+        language_id: languageID,
+        username: username,
+        action: 'deassign'
+      };
+      abas.deassignTranslationCoordinator(username, languageID).then(
+        successHandler, failHandler);
+
+      let req = httpTestingController.expectOne(
+        '/translationcoordinatorrolehandler');
       expect(req.request.method).toEqual('PUT');
       expect(req.request.body).toEqual(payload);
 
@@ -969,7 +1066,7 @@ describe('Admin backend api service', () => {
     'value given the config property ID when calling' +
     'revertConfigPropertyAsync', fakeAsync(() => {
     let action = 'revert_config_property';
-    let configPropertyId = 'record_playthrough_probability';
+    let configPropertyId = 'classroom_pages_data';
     let payload = {
       action: action,
       config_property_id: configPropertyId
