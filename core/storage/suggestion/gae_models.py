@@ -3576,3 +3576,19 @@ class TranslationCoordinatorsModel(base_models.BaseModel):
         return {
             'coordinated_language_ids': coordinated_language_ids
         }
+
+    @classmethod
+    def get_by_user(cls, user_id: str) -> Sequence[
+        TranslationCoordinatorsModel
+    ]:
+        """Retrieves the rights object for all languages assigned to given user
+
+        Args:
+            user_id: str. ID of user.
+
+        Returns:
+            list(TranslationCoordinatorsModel). The list of
+            TranslationCoordinatorsModel objects in which the given user is a
+            coordinator.
+        """
+        return cls.query(cls.coordinator_ids == user_id).fetch()
