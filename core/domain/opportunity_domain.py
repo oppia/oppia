@@ -56,6 +56,7 @@ class ExplorationOpportunitySummaryDict(
     language_codes_needing_voice_artists: List[str]
     language_codes_with_assigned_voice_artists: List[str]
 
+
 class SkillOpportunityDict(TypedDict):
     """A dictionary representing SkillOpportunity object."""
 
@@ -83,7 +84,7 @@ class ExplorationOpportunitySummary:
         language_codes_needing_voice_artists: List[str],
         language_codes_with_assigned_voice_artists: List[str],
         translation_in_review_counts: Dict[str, int],
-        is_pinned = False
+        is_pinned: bool = False
     ) -> None:
         """Constructs a ExplorationOpportunitySummary domain object.
 
@@ -108,6 +109,8 @@ class ExplorationOpportunitySummary:
             translation_in_review_counts: dict. A dict with language code as a
                 key and number of translation in review in that language as the
                 value.
+            is_pinned: bool. Denotes whether the opportunity is pinned or not in
+                contributor dashboard.
         """
         self.id = exp_id
         self.topic_id = topic_id

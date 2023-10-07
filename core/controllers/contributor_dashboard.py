@@ -423,21 +423,17 @@ class ReviewableOpportunitiesHandler(
                 language,
                 topic.id
             )
-            print('pinned_oppp', pinned_opportunity_summary)
 
         exp_opp_summaries = opportunity_services.get_exploration_opportunity_summaries_by_ids(exp_ids)
 
         # If there is a pinned opportunity summary, add it to the list of opportunities at the top.
         ordered_exp_opp_summaries = OrderedDict()
         if pinned_opportunity_summary:
-            print('Ordered dict is here 11', ordered_exp_opp_summaries)
             exp_opp_summaries.pop(pinned_opportunity_summary['id'], None)
             ordered_exp_opp_summaries[pinned_opportunity_summary['id']] = pinned_opportunity_summary
-            print('Ordered dict is here 22', ordered_exp_opp_summaries)
         
         for item in exp_opp_summaries.values():
             ordered_exp_opp_summaries[item.id] = item
-        print('Ordered dict is here 333', list(ordered_exp_opp_summaries.values()))
         return list(ordered_exp_opp_summaries.values())
 
 

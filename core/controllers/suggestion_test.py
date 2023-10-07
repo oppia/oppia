@@ -3100,6 +3100,7 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
                     'chapter_title': 'Node1',
                     'content_count': 1,
                     'id': 'exp1',
+                    'is_pinned': False,
                     'story_title': 'A story',
                     'topic_name': 'topic',
                     'translation_counts': {},
