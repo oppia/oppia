@@ -1092,6 +1092,14 @@ class OpportunityServicesUnitTest(test_utils.GenericTestBase):
 
             self.assertIsNone(pinned_opportunity)
 
+            # Test pinning an opportunity whose model exists.
+            opportunity_services.update_pinned_opportunity_model(
+                user_id,
+                language_code,
+                topic_id,
+                'lesson_2'
+            )
+
 class OpportunityUpdateOnAcceeptingSuggestionUnitTest(
         test_utils.GenericTestBase):
     """Unit test validating opportunity gets updated after accepting translation

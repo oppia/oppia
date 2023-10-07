@@ -39,6 +39,7 @@ class PartialExplorationOpportunitySummaryDict(TypedDict):
     content_count: int
     translation_counts: Dict[str, int]
     translation_in_review_counts: Dict[str, int]
+    is_pinned: bool
 
 
 class ExplorationOpportunitySummaryDict(

@@ -1061,7 +1061,7 @@ def update_pinned_opportunity_model(
         # If there's no model and no lesson_id provided, no action needed.
         return
 
-    if not pinned_opportunity:
+    if not pinned_opportunity and lesson_id:
         # If no model exists, create a new one with the provided parameters.
         user_models.PinnedOpportunityModel.create(
             user_id=user_id,
@@ -1080,7 +1080,7 @@ def get_pinned_lesson(
     user_id: str,
     language_code: str,
     topic_id: str
-):
+) -> opportunity_domain.ExplorationOpportunitySummary: 
     """
     Retrieves the pinned lesson for a user in a specific language and topic.
 
