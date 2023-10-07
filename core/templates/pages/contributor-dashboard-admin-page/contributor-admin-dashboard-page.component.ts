@@ -38,11 +38,6 @@ export interface TopicChoice {
   topic: string;
 }
 
-export interface selectedTopicChoices {
-  ids: string[];
-  topics: string[];
-}
-
 @Component({
   selector: 'contributor-admin-dashboard-page',
   styleUrls: ['./contributor-admin-dashboard-page.component.css'],
@@ -202,7 +197,11 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
       selectedTopic => {
         const matchingTopic = this.topics.find(
           topicChoice => topicChoice.topic === selectedTopic);
-        return matchingTopic ? matchingTopic.id : '';
+        if (this.selectedTopicNames.length && !matchingTopic) {
+          throw new Error(
+            'Selected Topic Id doesn\'t match any valid topic.');
+        }
+        return matchingTopic.id;
       });
     this.filter = new ContributorAdminDashboardFilter(
       this.selectedTopicIds,
