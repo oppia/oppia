@@ -1100,6 +1100,13 @@ class OpportunityServicesUnitTest(test_utils.GenericTestBase):
                 'lesson_2'
             )
 
+            opportunity_services.update_pinned_opportunity_model(
+                user_id,
+                language_code,
+                topic_id,
+                None
+            )
+
 class OpportunityUpdateOnAcceeptingSuggestionUnitTest(
         test_utils.GenericTestBase):
     """Unit test validating opportunity gets updated after accepting translation
