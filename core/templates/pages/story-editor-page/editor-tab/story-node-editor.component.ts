@@ -497,6 +497,9 @@ export class StoryNodeEditorComponent implements OnInit, OnDestroy {
   updateLocalEditableOutline($event: string): void {
     if (this.editableOutline !== $event) {
       this.editableOutline = $event;
+      if (!this.chapterOutlineButtonsAreShown && $event) {
+        this.chapterOutlineButtonsAreShown = true;
+      }
       this.changeDetectorRef.detectChanges();
     }
   }
