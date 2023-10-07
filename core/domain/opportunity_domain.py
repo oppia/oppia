@@ -341,7 +341,7 @@ class PinnedOpportunity:
 
         Args:
             language_code: str. The ISO 639-1 language code for which the opportunity is pinned.
-            topic_id: str. The ID of the topic.
+            topic_id: str. The ID of the topic for which the opportunity is pinned.
             opportunity_id: str. The ID of the pinned opportunity.
         """
         self.language_code = language_code
