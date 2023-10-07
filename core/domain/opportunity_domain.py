@@ -329,7 +329,7 @@ class SkillOpportunity:
 
 
 class PinnedOpportunity:
-    """The domain object for pinned opportunities in the contributor dashboard."""
+    """The domain object for pinned translation opportunities in the contributor dashboard."""
 
     def __init__(
         self,
