@@ -42,7 +42,10 @@ run-offline: # Runs the dev-server in offline mode
 	docker compose up dev-server -d
 	@printf 'Please wait while the development server starts...\n\n'
 	@while [[ $$(curl -s -o /tmp/status_code.txt -w '%{http_code}' http://localhost:8181) != "200" ]] || [[ $$(curl -s -o /tmp/status_code.txt -w '%{http_code}' http://localhost:8181/community-library) != "200" ]]; do \
-		printf  "▓"; \
+		printf "▓"; \
+		if [[ "$(prod_env)" = 'true' ]] && [[ -n $$(docker ps -q -f status=exited -f name=webpack-compiler) ]]; then \
+			${SHELL_PREFIX} dev-server python -m scripts.generate_build_directory; \
+		fi; \
 		sleep 1; \
 	done
 	@printf '\n\n'
@@ -55,7 +58,10 @@ start-devserver-for-tests: ## Starts the development server for the tests
 	docker compose up dev-server -d
 	@printf 'Please wait while the development server starts...\n\n'
 	@while [[ $$(curl -s -o /tmp/status_code.txt -w '%{http_code}' http://localhost:8181) != "200" ]] || [[ $$(curl -s -o /tmp/status_code.txt -w '%{http_code}' http://localhost:8181/community-library) != "200" ]]; do \
-		printf  "▓"; \
+		printf "▓"; \
+		if [[ "$(prod_env)" = 'true' ]] && [[ -n $$(docker ps -q -f status=exited -f name=webpack-compiler) ]]; then \
+			${SHELL_PREFIX} dev-server python -m scripts.generate_build_directory; \
+		fi; \
 		sleep 1; \
 	done
 	@printf '\n\n'
