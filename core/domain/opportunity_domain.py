@@ -340,7 +340,7 @@ class PinnedOpportunity:
         """Constructs a PinnedOpportunity domain object.
 
         Args:
-            language_code: str. The code of the language.
+            language_code: str. The ISO 639-1 language code for which the opportunity is pinned.
             topic_id: str. The ID of the topic.
             opportunity_id: str. The ID of the pinned opportunity.
         """
