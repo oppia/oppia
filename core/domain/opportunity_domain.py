@@ -66,7 +66,7 @@ class SkillOpportunityDict(TypedDict):
 
 
 class PinnedOpportunityDict(TypedDict):
-    """A dictionary representing PinnedOpportunity object."""
+    """A dictionary representing a PinnedOpportunity object."""
 
     language_code: str
     topic_id: str
