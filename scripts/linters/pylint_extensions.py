@@ -2919,6 +2919,98 @@ class DisallowedImportsChecker(checkers.BaseChecker):  # type: ignore[misc]
                 self.add_message('disallowed-text-import', node=node)
 
 
+# TODO(#16567): Here we use MyPy ignore because of the incomplete typing of
+# pylint library and absences of stubs in pylint, forces MyPy to
+# assume that BaseChecker class has attributes of type Any.
+# Thus to avoid MyPy's error
+# (Class cannot subclass 'BaseChecker' (has type 'Any')),
+# we added an ignore here.
+class NoBlankLineAfterFunctionDef(checkers.BaseChecker):
+    """Ensures that there is no blank line after function definition"""
+
+    name = 'no-blank-line'
+    msgs = {
+        'C0041': (
+            'Blank line after function definition',
+            'Blank-line-after-function-definition',
+            'Please remove blank line after function definition',
+        )
+    }
+    def visit_functiondef(self, node: astroid.nodes.FunctionDef) -> None:
+        """Called for function and method definitions (def).
+        Args:
+            node: astroid.scoped_nodes.FunctionDef. Node for a function or
+                method definition in the AST.
+        """
+        print(node)
+        func_dec_end_pattern = re.compile(r"\)\s\-\>\s$[\:]")
+        if node.doc:
+            if (
+                node.lineno == node.tolineno
+            ):
+                return
+            if (
+                len(node.doc.split('\n')) + node.lineno
+                < node.tolineno
+            ):
+                if node.args:
+                    line = linecache.getline(node.root().file, node.lineno)
+                    if func_dec_end_pattern.search(line):
+                        line_number = (
+                            len(node.doc.split('\n'))
+                            + node.lineno
+                        )
+                        line = linecache.getline(node.root().file, line_number)
+                        if not line.strip():
+                            self.add_message(
+                                'Blank-line-after-function-definition',
+                                line=line_number,
+                                node=node,
+                            )
+                    else:
+                        line_number = node.lineno
+                        while not func_dec_end_pattern.search(line):
+                            line_number = line_number + 1
+                            line = linecache.getline(
+                                node.root().file,
+                            line_number
+                            )
+                        line_number + 1
+                        if not linecache.getline(node.root().file, line_number + 1).split():
+                                self.add_message(
+                                'Blank-line-after-function-definition',
+                                line=line_number+1,
+                                node=node,
+                            )
+
+        if node.doc is None:
+            line = linecache.getline(node.root().file, node.lineno)
+            if func_dec_end_pattern.search(line):
+                line_number = node.lineno + 1
+                line = linecache.getline(node.root().file, line_number)
+                if not line.split():
+                    self.add_message(
+                    'Blank-line-after-function-definition',
+                    line=line_number,
+                    node=node,
+                    )
+            else:
+                line_number = node.lineno
+                while not func_dec_end_pattern.search(line):
+                    line_number = line_number + 1
+                    line = linecache.getline(
+                            node.root().file,
+                            line_number
+                        )
+                line_number + 1
+                if not linecache.getline(node.root().file, line_number + 1).split():
+                    self.add_message(
+                    'Blank-line-after-function-definition',
+                    line=line_number+1,
+                    node=node,
+                    )
+
+
 def register(linter: lint.PyLinter) -> None:
     """Registers the checker with pylint.
 
@@ -2943,3 +3035,4 @@ def register(linter: lint.PyLinter) -> None:
     linter.register_checker(DisallowedFunctionsChecker(linter))
     linter.register_checker(DisallowHandlerWithoutSchema(linter))
     linter.register_checker(DisallowedImportsChecker(linter))
+    linter.register_checker(NoBlankLineAfterFunctionDef(linter))
