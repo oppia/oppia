@@ -1102,7 +1102,7 @@ class OpportunityServicesUnitTest(test_utils.GenericTestBase):
 
             opportunity_services.update_pinned_opportunity_model(
                 user_id,
-                language_code,
+                'lang',
                 topic_id,
                 None
             )
