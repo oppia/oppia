@@ -355,7 +355,6 @@ class PinnedOpportunity:
         Raises:
             ValidationError. One or more attributes of the object are invalid.
         """
-
         if not isinstance(self.language_code, str):
             raise utils.ValidationError(
                 'Expected language_code to be a string, '
