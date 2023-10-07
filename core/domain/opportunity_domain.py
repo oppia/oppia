@@ -375,7 +375,7 @@ class PinnedOpportunity:
     def from_dict(
         cls, pinned_opportunity_dict: PinnedOpportunityDict
     ) -> 'PinnedOpportunity':
-        """Return a PinnedOpportunity domain object from a dict.
+        """Returns a PinnedOpportunity domain object from a dict.
 
         Args:
             pinned_opportunity_dict: dict. The dict representation of a
