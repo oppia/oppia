@@ -476,6 +476,7 @@ class PinLessonsHandler(
         },
     }
 
+    @acl_decorators.open_access
     def put(self):
         """Handles pinning/unpinning lessons."""
         assert self.normalized_request is not None
