@@ -350,28 +350,6 @@ class PinnedOpportunity:
         self.language_code = language_code
         self.topic_id = topic_id
         self.opportunity_id = opportunity_id
-        self.validate()
-
-    def validate(self) -> None:
-        """Validates various properties of the object.
-
-        Raises:
-            ValidationError. One or more attributes of the object are invalid.
-        """
-        if not isinstance(self.language_code, str):
-            raise utils.ValidationError(
-                'Expected language_code to be a string, '
-                'received %s' % type(self.language_code).__name__)
-
-        if not isinstance(self.topic_id, str):
-            raise utils.ValidationError(
-                'Expected topic_id to be a string, '
-                'received %s' % type(self.topic_id).__name__)
-
-        if not isinstance(self.opportunity_id, str):
-            raise utils.ValidationError(
-                'Expected opportunity_id to be a string, '
-                'received %s' % type(self.opportunity_id).__name__)
 
     @classmethod
     def from_dict(
