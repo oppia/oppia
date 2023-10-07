@@ -57,20 +57,20 @@ class ExplorationOpportunitySummaryDict(
     language_codes_with_assigned_voice_artists: List[str]
 
 
-class SkillOpportunityDict(TypedDict):
-    """A dictionary representing SkillOpportunity object."""
-
-    id: str
-    skill_description: str
-    question_count: int
-
-
 class PinnedOpportunityDict(TypedDict):
     """A dictionary representing a PinnedOpportunity object."""
 
     language_code: str
     topic_id: str
     opportunity_id: str
+
+
+class SkillOpportunityDict(TypedDict):
+    """A dictionary representing SkillOpportunity object."""
+
+    id: str
+    skill_description: str
+    question_count: int
 
 
 class ExplorationOpportunitySummary:
@@ -329,7 +329,8 @@ class SkillOpportunity:
 
 
 class PinnedOpportunity:
-    """The domain object for pinned translation opportunities in the contributor dashboard."""
+    """The domain object for pinned translation opportunities in
+    the contributor dashboard."""
 
     def __init__(
         self,
@@ -340,8 +341,10 @@ class PinnedOpportunity:
         """Constructs a PinnedOpportunity domain object.
 
         Args:
-            language_code: str. The ISO 639-1 language code for which the opportunity is pinned.
-            topic_id: str. The ID of the topic for which the opportunity is pinned.
+            language_code: str. The ISO 639-1 language code for which the
+                opportunity is pinned.
+            topic_id: str. The ID of the topic for which the
+                opportunity is pinned.
             opportunity_id: str. The ID of the pinned opportunity.
         """
         self.language_code = language_code
@@ -381,7 +384,8 @@ class PinnedOpportunity:
                 PinnedOpportunity object.
 
         Returns:
-            PinnedOpportunity. The corresponding PinnedOpportunity domain object.
+            PinnedOpportunity. The corresponding PinnedOpportunity
+                domain object.
         """
         return cls(
             pinned_opportunity_dict['language_code'],

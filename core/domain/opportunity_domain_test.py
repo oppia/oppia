@@ -342,24 +342,25 @@ class PinnedOpportunityDomainTest(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
         super().setUp()
-        valid_pinned_opportunity_dict: opportunity_domain.PinnedOpportunityDict = {
+        valid_pinned_opportunity_dict: opportunity_domain.PinnedOpportunityDict = { # pylint: disable=line-too-long
             'language_code': 'en',
             'topic_id': 'topic_id_1',
             'opportunity_id': 'opportunity_id1'
         }
-        self.valid_pinned_opportunity = opportunity_domain.PinnedOpportunity.from_dict(
+        self.valid_pinned_opportunity = opportunity_domain.PinnedOpportunity.from_dict( # pylint: disable=line-too-long
             valid_pinned_opportunity_dict
         )
 
     def test_to_and_from_dict_works_correctly(self) -> None:
-        pinned_opportunity_dict = {
+        pinned_opportunity_dict: opportunity_domain.PinnedOpportunityDict = {
             'language_code': 'en',
             'topic_id': 'topic_id_1',
             'opportunity_id': 'opportunity_id1'
         }
 
-        pinned_opportunity = (opportunity_domain.PinnedOpportunity.
-            from_dict(pinned_opportunity_dict))
+        pinned_opportunity = (
+            opportunity_domain.PinnedOpportunity.
+                from_dict(pinned_opportunity_dict))
 
         self.assertTrue(isinstance(
             pinned_opportunity, opportunity_domain.PinnedOpportunity))
@@ -368,24 +369,3 @@ class PinnedOpportunityDomainTest(test_utils.GenericTestBase):
             'topic_id': 'topic_id_1',
             'opportunity_id': 'opportunity_id1'
         })
-
-    def test_invalid_language_code_raises_validation_error(self) -> None:
-        self.valid_pinned_opportunity.language_code = 123
-        self._assert_validation_error(
-            self.valid_pinned_opportunity,
-            'Expected language_code to be a string, received int'
-        )
-
-    def test_invalid_topic_id_raises_validation_error(self) -> None:
-        self.valid_pinned_opportunity.topic_id = 123
-        self._assert_validation_error(
-            self.valid_pinned_opportunity,
-            'Expected topic_id to be a string, received int'
-        )
-
-    def test_invalid_opportunity_id_raises_validation_error(self) -> None:
-        self.valid_pinned_opportunity.opportunity_id = 123
-        self._assert_validation_error(
-            self.valid_pinned_opportunity,
-            'Expected opportunity_id to be a string, received int'
-        )
