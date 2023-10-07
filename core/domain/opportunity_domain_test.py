@@ -93,7 +93,8 @@ class ExplorationOpportunitySummaryDomainTests(test_utils.GenericTestBase):
             'chapter_title': 'A new chapter',
             'content_count': 5,
             'translation_counts': {},
-            'translation_in_review_counts': {}
+            'translation_in_review_counts': {},
+            'is_pinned': False
         })
 
     def test_negative_content_count_fails_validation_check(self) -> None:
