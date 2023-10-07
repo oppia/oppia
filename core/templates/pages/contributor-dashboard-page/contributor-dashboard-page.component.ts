@@ -197,6 +197,8 @@ export class ContributorDashboardPageComponent
       .then((topicNames) => {
         // TODO(#15710): Set default active topic to 'All'.
         if (topicNames.length <= 0) {
+          this.translationTopicService.setActiveTopicName(
+            ContributorDashboardConstants.DEFAULT_OPPORTUNITY_TOPIC_NAME);
           return;
         }
         this.topicName = topicNames[0];
