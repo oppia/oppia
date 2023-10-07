@@ -77,7 +77,6 @@ export class StoryNodeEditorComponent implements OnInit, OnDestroy {
   editableThumbnailBgColor: string;
   oldOutline: string;
   editableOutline: string;
-  oldOutlineToReadOnly: string;
   currentExplorationId: string;
   expIdIsValid: boolean;
   invalidExpErrorIsShown: boolean;
@@ -497,20 +496,15 @@ export class StoryNodeEditorComponent implements OnInit, OnDestroy {
   updateLocalEditableOutline($event: string): void {
     if (this.editableOutline !== $event) {
       this.editableOutline = $event;
+      if (!this.chapterOutlineButtonsAreShown && $event) {
+        this.toggleChapterOutlineButtons();
+      }
       this.changeDetectorRef.detectChanges();
     }
   }
 
-  onSaveButtonClicked(): void {
-    this.oldOutlineToReadOnly = $(this.oldOutline).text();
-    this.chapterOutlineButtonsAreShown = false;
-    this.chapterOutlineIsShown = false;
-  }
-
-  onCancelButtonClicked(): void {
-    this.editableOutline = this.oldOutline;
-    this.chapterOutlineButtonsAreShown = false;
-    this.chapterOutlineIsShown = false;
+  toggleChapterOutlineButtons(): void {
+    this.chapterOutlineButtonsAreShown = !this.chapterOutlineButtonsAreShown;
   }
 
   _recalculateAvailableNodes(): void {
@@ -540,7 +534,7 @@ export class StoryNodeEditorComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.pageTitleService.setNavbarTitleForMobileView('Chapter Editor');
-    this.chapterOutlineIsShown = false;
+    this.chapterOutlineIsShown = !this.windowDimensionsService.isWindowNarrow();
     this.chapterTodoCardIsShown = (
       !this.windowDimensionsService.isWindowNarrow());
     this.prerequisiteSkillIsShown = (
