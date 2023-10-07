@@ -112,10 +112,10 @@ export class ContributorAdminStatsTable implements OnInit {
   }
 
   openCdAdminQuestionEditorRoleModal(username: string): void {
-    const modelRef = this.modalService.open(
-      CdAdminQuestionRoleEditorModal);
     this.contributorDashboardAdminBackendApiService
       .contributionReviewerRightsAsync(username).then(response => {
+        const modelRef = this.modalService.open(
+          CdAdminQuestionRoleEditorModal);
         modelRef.componentInstance.username = username;
         modelRef.componentInstance.rights = {
           isQuestionSubmitter: response.can_submit_questions,
@@ -165,10 +165,10 @@ export class ContributorAdminStatsTable implements OnInit {
   }
 
   openCdAdminTranslationRoleEditorModal(username: string): void {
-    const modalRef = this.modalService.open(
-      CdAdminTranslationRoleEditorModal);
     this.contributorDashboardAdminBackendApiService
       .contributionReviewerRightsAsync(username).then(response => {
+        const modalRef = this.modalService.open(
+          CdAdminTranslationRoleEditorModal);
         modalRef.componentInstance.username = username;
         modalRef.componentInstance.assignedLanguageIds = (
           response.can_review_translation_for_language_codes);
@@ -180,6 +180,7 @@ export class ContributorAdminStatsTable implements OnInit {
   }
 
   openRoleEditor(username: string): void {
+    this.expandedElement = null;
     if (this.activeTab === this.TAB_NAME_TRANSLATION_REVIEWER ||
       this.activeTab === this.TAB_NAME_TRANSLATION_SUBMITTER) {
       this.openCdAdminTranslationRoleEditorModal(username);

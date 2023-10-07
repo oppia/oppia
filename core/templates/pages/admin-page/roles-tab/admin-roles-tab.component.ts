@@ -131,7 +131,7 @@ export class AdminRolesTabComponent implements OnInit {
     });
   }
 
-  openTranslationCoordinatorrRoleEditor(): void {
+  openTranslationCoordinatorRoleEditor(): void {
     const modalRef = this.modalService.open(
       TranslationCoordinatorRoleEditorModalComponent);
     modalRef.componentInstance.coordinatedLanguageIds = (
@@ -159,7 +159,7 @@ export class AdminRolesTabComponent implements OnInit {
     }
 
     if (role === 'TRANSLATION_COORDINATOR') {
-      this.openTranslationCoordinatorrRoleEditor();
+      this.openTranslationCoordinatorRoleEditor();
       return;
     }
 

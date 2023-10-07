@@ -1,0 +1,60 @@
+<div class="username-input-modal" [ngClass]="{'disabled': isChecking}">
+  <div class="modal-header">
+    <h4 class="modal-title">Enter the username to add {{activeTab}} rights</h4>
+  </div>
+  <div class="modal-body">
+    <input class="username-input-box" type="text" placeholder="Username" [(ngModel)]="username">
+    <div class="alert alert-danger" *ngIf="isInvalidUsername">
+      Username is invalid. Please enter a valid username.
+    </div>
+  </div>
+  <div class="question-role-editor-footer">
+      <button class="cancel-button" (click)="close()" autofocus>Cancel</button>
+      <button class="save-button" (click)="saveAndClose()">Add Rights</button>
+  </div>
+</div>
+
+<style>
+  .username-input-modal.disabled {
+    opacity: 0.6;
+    pointer-events: none;
+    background-color: #f2f2f2;
+    border: 1px solid #ccc;
+    color: #888;
+  }
+  .username-input-box {
+    border: 1.2px #D0D5DD solid;
+    margin: 5px;
+    padding: 5px;
+    width: 100%;
+    border-radius: 4px;
+  }
+  .question-role-editor-footer {
+    padding: 15px;
+    gap: 12px;
+    display: flex;
+    justify-content: end;
+  }
+  .cancel-button {
+    color: #00645C;
+    font-size: 14px;
+    font-family: Roboto;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.30px;
+    border-color: #00645C;
+    border-radius: 5px;
+    padding: 5px;
+  }
+  .save-button {
+    color: white;
+    font-size: 14px;
+    font-family: Roboto;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.30px;
+    background: #00645C;
+    border-radius: 5px;
+    padding: 5px;
+  }
+</style>

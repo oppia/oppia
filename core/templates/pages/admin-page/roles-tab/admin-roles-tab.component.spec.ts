@@ -347,12 +347,12 @@ describe('Admin roles tab component ', function() {
       ' translation coordinator role', () => {
         spyOn(
           component,
-          'openTranslationCoordinatorrRoleEditor').and.returnValue();
+          'openTranslationCoordinatorRoleEditor').and.returnValue();
 
         component.addNewRole('TRANSLATION_COORDINATOR');
 
         expect(
-          component.openTranslationCoordinatorrRoleEditor).toHaveBeenCalled();
+          component.openTranslationCoordinatorRoleEditor).toHaveBeenCalled();
       });
   });
 
@@ -410,7 +410,7 @@ describe('Admin roles tab component ', function() {
       }));
   });
 
-  describe('on calling openTranslationCoordinatorrRoleEditor', function() {
+  describe('on calling openTranslationCoordinatorRoleEditor', function() {
     let ngbModal: NgbModal;
 
     class MockNgbModalRef {
@@ -432,7 +432,7 @@ describe('Admin roles tab component ', function() {
       component.userRoles = ['MODERATOR'];
       component.coordinatedLanguageIds = [];
 
-      component.openTranslationCoordinatorrRoleEditor();
+      component.openTranslationCoordinatorRoleEditor();
       tick();
 
       expect(modalSpy).toHaveBeenCalledWith(
@@ -455,7 +455,7 @@ describe('Admin roles tab component ', function() {
       component.userRoles = ['MODERATOR', 'TRANSLATION_COORDINATOR'];
       component.coordinatedLanguageIds = [];
 
-      component.openTranslationCoordinatorrRoleEditor();
+      component.openTranslationCoordinatorRoleEditor();
       tick();
 
       expect(modalSpy).toHaveBeenCalledWith(

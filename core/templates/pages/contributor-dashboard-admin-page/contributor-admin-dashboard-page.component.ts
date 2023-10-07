@@ -26,6 +26,11 @@ import { ContributorDashboardAdminStatsBackendApiService, translationReviewersCo
 import { AppConstants } from 'app.constants';
 import { ContributorAdminDashboardFilter } from './contributor-admin-dashboard-filter.model';
 import { UserService } from 'services/user.service';
+import { ContributorDashboardAdminBackendApiService } from './services/contributor-dashboard-admin-backend-api.service';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { UsernameInputModal } from './username-input-modal/username-input-modal.component';
+import { CdAdminQuestionRoleEditorModal } from './question-role-editor-modal/cd-admin-question-role-editor-modal.component';
+import { CdAdminTranslationRoleEditorModal } from './translation-role-editor-modal/cd-admin-translation-role-editor-modal.component';
 
 
 export interface LanguageChoice {
@@ -36,11 +41,6 @@ export interface LanguageChoice {
 export interface TopicChoice {
   id: string;
   topic: string;
-}
-
-export interface selectedTopicChoices {
-  ids: string[];
-  topics: string[];
 }
 
 @Component({
@@ -87,15 +87,12 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
   selectedLastActivity!: number;
   allTopicNames: string[] = [];
   lastActivity: number[] = [];
+  selectedTopicIds: string[] = [];
+  selectedTopicNames: string[] = [];
   languageChoices: LanguageChoice[] = [];
   topics: TopicChoice[] = [];
   filter: ContributorAdminDashboardFilter = (
     ContributorAdminDashboardFilter.createDefault());
-
-  selectedTopics: selectedTopicChoices = {
-    ids: [],
-    topics: []
-  };
 
   selectedLanguage: LanguageChoice = {
     language: '',
@@ -109,6 +106,9 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
     private contributorDashboardAdminStatsBackendApiService:
       ContributorDashboardAdminStatsBackendApiService,
     private userService: UserService,
+    private contributorDashboardAdminBackendApiService:
+      ContributorDashboardAdminBackendApiService,
+    private modalService: NgbModal,
   ) {}
 
   ngOnInit(): void {
@@ -164,6 +164,22 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
           this.TAB_NAME_QUESTION_REVIEWER);
       }
 
+      this.contributorDashboardAdminStatsBackendApiService
+        .fetchAssignedLanguageIds(username).then(
+          response => {
+            this.languageChoices = this.languageChoices.filter((
+                languageItem) =>
+              response.includes(languageItem.id));
+            this.selectedLanguage = this.languageChoices[0];
+            if (!this.selectedLanguage) {
+              throw new Error(
+                'No languages are assigned to user.');
+            }
+            this.translationReviewersCount = (
+              this.translationReviewersCountByLanguage[
+                this.selectedLanguage.id]);
+          });
+
       this.filter = new ContributorAdminDashboardFilter(
         [],
         this.selectedLanguage.id,
@@ -197,14 +213,18 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
   }
 
   applyTopicFilter(): void {
-    this.selectedTopics.ids = this.selectedTopics.topics.map(
+    this.selectedTopicIds = this.selectedTopicNames.map(
       selectedTopic => {
         const matchingTopic = this.topics.find(
           topicChoice => topicChoice.topic === selectedTopic);
-        return matchingTopic ? matchingTopic.id : '';
+        if (this.selectedTopicNames.length && !matchingTopic) {
+          throw new Error(
+            'Selected Topic Id doesn\'t match any valid topic.');
+        }
+        return matchingTopic.id;
       });
     this.filter = new ContributorAdminDashboardFilter(
-      this.selectedTopics.ids,
+      this.selectedTopicIds,
       this.selectedLanguage.id,
       null,
       this.selectedLastActivity);
@@ -220,26 +240,24 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
     this.translationReviewersCount = this.translationReviewersCountByLanguage[
       this.selectedLanguage.id];
     this.filter = new ContributorAdminDashboardFilter(
-      this.selectedTopics.ids,
+      this.selectedTopicIds,
       this.selectedLanguage.id,
       null,
       this.selectedLastActivity);
-    this.languageDropdownShown = false;
   }
 
   selectLastActivity(lastActive: number): void {
     this.selectedLastActivity = lastActive;
     this.filter = new ContributorAdminDashboardFilter(
-      this.selectedTopics.ids,
+      this.selectedTopicIds,
       this.selectedLanguage.id,
       null,
       this.selectedLastActivity);
-    this.activityDropdownShown = false;
   }
 
   setActiveTab(tabName: string): void {
     this.filter = new ContributorAdminDashboardFilter(
-      this.selectedTopics.ids,
+      this.selectedTopicIds,
       this.selectedLanguage.id,
       null,
       this.selectedLastActivity);
@@ -256,6 +274,95 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
     this.setActiveTab(selectedContributionType);
   }
 
+  openRoleEditorModal(): void {
+    const modalRef = this.modalService.open(
+      UsernameInputModal);
+    modalRef.componentInstance.activeTab = this.activeTab;
+    modalRef.result.then(results => this.openRoleEditor(results), () => {
+      // Note to developers:
+      // This callback is triggered when the Cancel button is clicked.
+      // No further action is needed.
+    });
+  }
+
+  openCdAdminQuestionEditorRoleModal(username: string): void {
+    this.contributorDashboardAdminBackendApiService
+      .contributionReviewerRightsAsync(username).then(response => {
+        const modelRef = this.modalService.open(
+          CdAdminQuestionRoleEditorModal);
+        modelRef.componentInstance.username = username;
+        modelRef.componentInstance.rights = {
+          isQuestionSubmitter: response.can_submit_questions,
+          isQuestionReviewer: response.can_review_questions
+        };
+        modelRef.result.then(results => {
+          if (results.isQuestionSubmitter !== response.can_submit_questions) {
+            if (results.isQuestionSubmitter) {
+              this.contributorDashboardAdminBackendApiService
+                .addContributionReviewerAsync(
+                  AppConstants.CONTRIBUTION_RIGHT_CATEGORY_SUBMIT_QUESTION,
+                  username,
+                  null
+                );
+            } else {
+              this.contributorDashboardAdminBackendApiService
+                .removeContributionReviewerAsync(
+                  username,
+                  AppConstants.CONTRIBUTION_RIGHT_CATEGORY_SUBMIT_QUESTION,
+                  null
+                );
+            }
+          }
+          if (results.isQuestionReviewer !== response.can_review_questions) {
+            if (results.isQuestionReviewer) {
+              this.contributorDashboardAdminBackendApiService
+                .addContributionReviewerAsync(
+                  AppConstants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION,
+                  username,
+                  null
+                );
+            } else {
+              this.contributorDashboardAdminBackendApiService
+                .removeContributionReviewerAsync(
+                  username,
+                  AppConstants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION,
+                  null
+                );
+            }
+          }
+        }, () => {
+          // Note to developers:
+          // This callback is triggered when the Cancel button is clicked.
+          // No further action is needed.
+        });
+      });
+  }
+
+  openCdAdminTranslationRoleEditorModal(username: string): void {
+    this.contributorDashboardAdminBackendApiService
+      .contributionReviewerRightsAsync(username).then(response => {
+        const modalRef = this.modalService.open(
+          CdAdminTranslationRoleEditorModal);
+        modalRef.componentInstance.username = username;
+        modalRef.componentInstance.assignedLanguageIds = (
+          response.can_review_translation_for_language_codes);
+        let languageIdToName: Record<string, string> = {};
+        AppConstants.SUPPORTED_AUDIO_LANGUAGES.forEach(
+          language => languageIdToName[language.id] = language.description);
+        modalRef.componentInstance.languageIdToName = languageIdToName;
+      });
+  }
+
+  openRoleEditor(username: string): void {
+    if (this.activeTab === this.TAB_NAME_TRANSLATION_REVIEWER ||
+      this.activeTab === this.TAB_NAME_TRANSLATION_SUBMITTER) {
+      this.openCdAdminTranslationRoleEditorModal(username);
+    } else if (this.activeTab === this.TAB_NAME_QUESTION_SUBMITTER ||
+      this.activeTab === this.TAB_NAME_QUESTION_REVIEWER) {
+      this.openCdAdminQuestionEditorRoleModal(username);
+    }
+  }
+
   /**
   * Close dropdown when outside elements are clicked
   * @param event mouse click event
@@ -266,8 +373,8 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
     if (this.checkMobileView()) {
       return;
     }
-    if (this.activeTab === this.TAB_NAME_TRANSLATION_REVIEWER ||
-      this.activeTab === this.TAB_NAME_TRANSLATION_SUBMITTER) {
+    if (this.activeTab === this.TAB_NAME_TRANSLATION_SUBMITTER ||
+      this.activeTab === this.TAB_NAME_TRANSLATION_REVIEWER) {
       if (
         targetElement &&
         !this.languageDropdownRef.nativeElement.contains(targetElement)

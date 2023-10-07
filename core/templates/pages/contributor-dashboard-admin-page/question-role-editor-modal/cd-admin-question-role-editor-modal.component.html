@@ -22,16 +22,6 @@
     border: 1px #333333 solid;
     margin-top: 5px;
   }
-  .question-role-editor-footer-container {
-    width: 221px;
-    height: 36px;
-    left: 580px;
-    top: 17px;
-    justify-content: flex-start;
-    align-items: flex-start;
-    gap: 12px;
-    display: inline-flex
-  }
   .cancel-button {
     color: #00645C;
     font-size: 14px;
@@ -107,7 +97,7 @@
     </div>
   </div>
   <div *ngIf="!loadingMessage">
-    <div class="title-container">Edit Role for user {{username}}</div>
+    <div class="title-container">Edit roles for user {{username}}</div>
     <div class="sub-heading-container">User Role</div>
     <div class="attribute-container">
         <span (click)="toggleQuestionSubmitter()" (keydown.space)="toggleQuestionSubmitter()" tabindex="0">
@@ -126,7 +116,7 @@
         </span>
         <div class="label-container">
             <div class="label">Question Reviewer</div>
-            <div class="label-explanation">Reviews questions submitted</div>
+            <div class="label-explanation">Reviews submitted questions</div>
         </div>
     </div>
     <div class="question-role-editor-footer-ruler"></div>

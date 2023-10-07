@@ -1,39 +1,29 @@
 <div class="modal-header e2e-test-language-selector-modal">
-  <h4 class="modal-title">Translation Coordinator role editor</h4>
-  <button type="button" class="close" aria-label="Close" (click)="close()">
-    <span aria-hidden="true">&times;</span>
-  </button>
+  <h4 class="modal-title">Translation reviewer roles for user {{username}}</h4>
 </div>
 <div class="modal-body">
-  <div class="attribute-container">
-    <span (click)="toggleTranslationReviewer()" (keydown.space)="toggleTranslationReviewer()" tabindex="0">
-        <i *ngIf="!isTranslationReviewer" class="material-icons md-18 translation-submitter-role-checkbox">&#xE835;</i>
-        <i *ngIf="isTranslationReviewer" class="material-icons md-18 translation-submitter-role-checkbox">&#xE834;</i>
-    </span>
-    <div class="label-container">
-        <div class="label">Translation Reviewer</div>
-        <div class="label-explanation">Reviews Translation for assigned languages</div>
-    </div>
-  </div>
-  <p *ngIf="assignedLanguageIds.length">User has rights in the following languages:</p>
-  <p *ngIf="!assignedLanguageIds.length">Please assign users to required language:</p>
-  <ul>
-    <li *ngFor="let languageId of assignedLanguageIds">
-      <div class="d-flex justify-content-between">
-        <span>{{ languageIdToName[languageId] }}</span>
-        <div class="mat-icon-button oppia-progress-spinner" *ngIf="languageIdInUpdate === languageId">
-          <mat-spinner [diameter]="24"></mat-spinner>
+  <div class="modal-body">
+    <p *ngIf="assignedLanguageIds.length">User has review rights in the following languages:</p>
+    <p *ngIf="!assignedLanguageIds.length">Please assign user to atleast one language:</p>
+    <ul>
+      <li *ngFor="let languageId of assignedLanguageIds">
+        <div class="d-flex justify-content-between">
+          <span>{{ languageIdToName[languageId] }}</span>
+          <div class="mat-icon-button oppia-progress-spinner" *ngIf="languageIdInUpdate === languageId">
+            <mat-spinner [diameter]="24"></mat-spinner>
+          </div>
+          <button mat-button matSuffix mat-icon-button
+                  *ngIf="languageIdInUpdate !== languageId"
+                  aria-label="Clear"
+                  (click)="removeLanguageId(languageId)">
+            <mat-icon matListIcon>close</mat-icon>
+          </button>
         </div>
-        <button mat-button matSuffix mat-icon-button
-                *ngIf="languageIdInUpdate !== languageId && assignedLanguageIds.length > 1"
-                aria-label="Clear"
-                (click)="removeLanguageId(languageId)">
-          <mat-icon matListIcon>close</mat-icon>
-        </button>
-      </div>
-    </li>
-    <li *ngIf="languageIdsForSelection.length">
-      <div class="d-inline-flex mt-3 w-100">
+      </li>
+    </ul>
+    <div>Add Language:</div>
+    <div *ngIf="languageIdsForSelection.length">
+      <div class="d-inline-flex mt-3 w-100 language-dropdown">
         <select class="w-50 e2e-test-language-selector" placeholder="Select new language to add" label="Language selector" ngbAutofocus [(ngModel)]="newLanguageId">
           <option *ngFor="let languageId of languageIdsForSelection" [value]="languageId">{{ languageIdToName[languageId] }}</option>
         </select>
@@ -41,17 +31,35 @@
           <mat-icon aria-label="Example icon-button with a heart icon">add</mat-icon>
         </button>
       </div>
-    </li>
-    <li *ngIf="!languageIdsForSelection.length">
+    </div>
+    <div *ngIf="!languageIdsForSelection.length">
       <i *ngIf="assignedLanguageIds.length">There are no languages remaining, looks like user is assigned to all the languages.</i>
-    </li>
-  </ul>
+    </div>
+  </div>
 </div>
 <div class="modal-footer">
-  <button type="button" class="btn btn-outline-dark e2e-test-language-selector-close-button" (click)="close()">Close</button>
+  <button type="button" class="cancel-button" (click)="close()"> save and Close</button>
 </div>
 
 <style>
+  .modal-body.disabled, .language-dropdown.disabled {
+    opacity: 0.6;
+    pointer-events: none;
+    background-color: #f2f2f2;
+    border: 1px solid #ccc;
+    color: #888;
+  }
+  .cancel-button {
+    color: #00645C;
+    font-size: 14px;
+    font-family: Roboto;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.30px;
+    border-color: #00645C;
+    border-radius: 5px;
+    padding: 5px;
+  }
   .oppia-progress-spinner {
     align-items: center;
     display: flex;

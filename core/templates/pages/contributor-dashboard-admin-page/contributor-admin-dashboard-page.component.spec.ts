@@ -30,6 +30,7 @@ describe('Contributor dashboard Admin page', () => {
   let contributorDashboardAdminStatsBackendApiService: (
     ContributorDashboardAdminStatsBackendApiService);
   let userService: UserService;
+  let fetchAssignedLanguageIdsSpy: jasmine.Spy;
   let translationCoordinatorInfo = {
     _roles: ['USER_ROLE'],
     _isModerator: true,
@@ -167,7 +168,7 @@ describe('Contributor dashboard Admin page', () => {
         question_reviewers_count: 1
       } as CommunityContributionStatsBackendDict));
 
-    spyOn(
+    fetchAssignedLanguageIdsSpy = spyOn(
       contributorDashboardAdminStatsBackendApiService,
       'fetchAssignedLanguageIds')
       .and.returnValue(Promise.resolve(['en', 'ar']));
@@ -198,6 +199,19 @@ describe('Contributor dashboard Admin page', () => {
 
     expect(component.selectedLanguage.language).toEqual('English');
     expect(component.selectedLanguage.id).toEqual('en');
+  }));
+
+  it('should throw error if fetchAssignedLanguageIds returns invalid ' +
+    'language', fakeAsync(() => {
+    spyOn(userService, 'getUserInfoAsync').and.returnValue(
+      Promise.resolve(fullAccessUserInfo));
+    fetchAssignedLanguageIdsSpy.and.returnValue(Promise.resolve(
+      ['invalid_language']));
+
+    expect(() => {
+      component.ngOnInit();
+      tick();
+    }).toThrowError();
   }));
 
   it('should open language dropdown', () => {
@@ -251,7 +265,7 @@ describe('Contributor dashboard Admin page', () => {
   it('should apply topic filter', fakeAsync(() => {
     component.ngOnInit();
     tick();
-    component.selectedTopics.topics = ['Science', 'Technology'];
+    component.selectedTopicNames = ['Science', 'Technology'];
     component.topics = [
       { id: '1', topic: 'Science' },
       { id: '2', topic: 'Technology' },
@@ -261,7 +275,7 @@ describe('Contributor dashboard Admin page', () => {
     tick();
     component.applyTopicFilter();
 
-    expect(component.selectedTopics.ids).toEqual(['1', '2']);
+    expect(component.selectedTopicIds).toEqual(['1', '2']);
   }));
 
   it('should apply topic and language filter both', fakeAsync(() => {
@@ -269,7 +283,7 @@ describe('Contributor dashboard Admin page', () => {
       Promise.resolve(fullAccessUserInfo));
     component.ngOnInit();
     tick();
-    component.selectedTopics.topics = ['Science', 'Technology'];
+    component.selectedTopicNames = ['Science', 'Technology'];
     component.topics = [
       { id: '1', topic: 'Science' },
       { id: '2', topic: 'Technology' },
@@ -279,14 +293,14 @@ describe('Contributor dashboard Admin page', () => {
     tick();
     component.applyTopicFilter();
 
-    expect(component.selectedTopics.ids).toEqual(['1', '2']);
+    expect(component.selectedTopicIds).toEqual(['1', '2']);
     expect(component.selectedLanguage.language).toBe('English');
     expect(component.selectedLanguage.id).toBe('en');
 
     component.selectLanguage('العربية (Arabic)');
     expect(component.selectedLanguage.language).toBe('العربية (Arabic)');
     expect(component.selectedLanguage.id).toBe('ar');
-    expect(component.selectedTopics.ids).toEqual(['1', '2']);
+    expect(component.selectedTopicIds).toEqual(['1', '2']);
   }));
 
   it('should evaluate active tab', () => {

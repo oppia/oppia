@@ -78,6 +78,24 @@
   display: flex;
   flex-direction: row;
 }
+.filter-rights-sub-container {
+  display: flex;
+  flex-direction: row-reverse;
+  justify-content: space-between;
+}
+.add-rights-button {
+  background-color: #00645C;
+  border: transparent;
+  border-radius: 4px;
+  color: #fff;
+  padding: 6px 20px;
+}
+.add-rights-button-container {
+  margin: 10px;
+}
+.modal-content {
+  margin-top: 40px;
+}
 .topic-filter mat-form-field .mat-form-field-flex {
   background: #fff;
   border: 1px solid #fff;
@@ -172,7 +190,6 @@ mat-chip-list .mat-standard-chip .mat-chip-remove {
   flex-wrap: wrap;
   justify-content: space-around;
   margin: 0 auto;
-  padding-top: 50px;
 }
 .dashboard-content-primary {
   display: inline-block;
@@ -258,11 +275,13 @@ mat-chip-list .mat-standard-chip .mat-chip-remove {
   background-color: #fff;
   border-radius: 4px;
   box-shadow: 0 0 4px rgba(0, 0, 0, 0.25);
-  cursor: pointer;
   justify-content: space-between;
   margin: 10px;
+  min-height: 60px;
   position: relative;
-  vertical-align: top;
+}
+.mat-form-field-appearance-fill .mat-form-field-infix {
+  padding-top: 0.45em;
 }
 .oppia-filter-selector-inner-container {
   display: flex;

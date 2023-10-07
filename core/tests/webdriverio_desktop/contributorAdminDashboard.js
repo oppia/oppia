@@ -301,22 +301,22 @@ describe('Contributor Admin Dashboard', function() {
       await contributorDashboardAdminPage.get();
 
       await contributorDashboardAdminPage.navigateToTranslationSubmitterTab();
-      await contributorDashboardAdminPage.pageToFullyInitiate();
-      await contributorDashboardAdminPage.expectStatsElementCountToBe(0);
+      await contributorDashboardAdminPage.waitForLoadingMessageToDisappear();
+      await contributorDashboardAdminPage.expectNoStatsElement();
 
       await contributorDashboardAdminPage.switchLanguage('shqip (Albanian)');
-      await contributorDashboardAdminPage.pageToFullyInitiate();
+      await contributorDashboardAdminPage.waitForLoadingMessageToDisappear();
       await contributorDashboardAdminPage.expectStatsElementCountToBe(2);
       await contributorDashboardAdminPage.expectStatsRowsAreExpanded();
 
       await contributorDashboardAdminPage.navigateToTranslationReviewerTab();
-      await contributorDashboardAdminPage.pageToFullyInitiate();
+      await contributorDashboardAdminPage.waitForLoadingMessageToDisappear();
       await contributorDashboardAdminPage.expectStatsElementCountToBe(2);
       await contributorDashboardAdminPage.expectStatsRowsAreExpanded();
 
       await contributorDashboardAdminPage.switchLanguage('English');
-      await contributorDashboardAdminPage.pageToFullyInitiate();
-      await contributorDashboardAdminPage.expectStatsElementCountToBe(0);
+      await contributorDashboardAdminPage.waitForLoadingMessageToDisappear();
+      await contributorDashboardAdminPage.expectNoStatsElement(0);
 
       await users.logout();
     });

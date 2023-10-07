@@ -1,4 +1,4 @@
-// Copyright 2021 The Oppia Authors. All Rights Reserved.
+// Copyright 2023 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -32,7 +32,7 @@ export class CdAdminTranslationRoleEditorModal implements OnInit {
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
-  @Input() assignedLanguageIds!: string[];
+  @Input() assignedLanguageIds: string[] = [];
   @Input() languageIdToName!: {[languageId: string]: string};
   @Input() username!: string;
   // Set to null when there is no language left in the list of languages to be
@@ -41,7 +41,6 @@ export class CdAdminTranslationRoleEditorModal implements OnInit {
   newLanguageId: string | null = null;
   languageIdInUpdate: string | null = null;
   languageIdsForSelection: string[] = [];
-  isTranslationReviewer!: boolean;
 
   constructor(
     private activeModal: NgbActiveModal,
@@ -53,7 +52,6 @@ export class CdAdminTranslationRoleEditorModal implements OnInit {
   private updatelanguageIdsForSelection(): void {
     this.languageIdsForSelection = Object.keys(this.languageIdToName).filter(
       languageId => !this.assignedLanguageIds.includes(languageId));
-    console.log(this.languageIdsForSelection);
     this.newLanguageId = this.languageIdsForSelection[0];
   }
 
@@ -100,20 +98,10 @@ export class CdAdminTranslationRoleEditorModal implements OnInit {
   }
 
   close(): void {
-    this.activeModal.close(this.isTranslationReviewer);
+    this.activeModal.close();
   }
-
-  toggleTranslationReviewer(): void {
-    this.isTranslationReviewer = !this.isTranslationReviewer;
-  }
-
-  saveAndClose(): void {
-    this.activeModal.close(this.isTranslationReviewer);
-  }
-
 
   ngOnInit(): void {
-    this.isTranslationReviewer = this.assignedLanguageIds.length ? true : false;
     this.updatelanguageIdsForSelection();
   }
 }
