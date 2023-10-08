@@ -73,7 +73,7 @@ jobs:
       - name: Build Docker Containers
         run: |
           echo ---Building Docker Images---
-          make build  
+          docker compose build --no-cache
       - name: Initialize Containers
         run: |
           echo ---Initializing containers---
