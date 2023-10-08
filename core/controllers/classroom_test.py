@@ -273,7 +273,7 @@ class ClassroomAdminTests(test_utils.GenericTestBase):
         self.get_json(
             feconf.CLASSROOM_ADMIN_DATA_HANDLER_URL, expected_status_int=401)
         self.logout()
-        
+
     def test_get_unused_topics(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         unused_topic = self.save_new_topic(
@@ -287,7 +287,7 @@ class ClassroomAdminTests(test_utils.GenericTestBase):
             unused_topics
         )
         self.logout()
-    
+
     def test_not_able_to_get_unused_topics_when_user_is_not_admin(
         self
     ) -> None:
