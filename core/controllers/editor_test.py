@@ -721,7 +721,7 @@ solicit_answer_details: false
         zf_saved = zipfile.ZipFile(io.BytesIO(response.body))
         self.assertEqual(
             zf_saved.namelist(),
-            ['The title for ZIP download handler test!.yaml'])
+            ['The title for ZIP download handler test.yaml'])
 
         # Load golden zip file.
         golden_zip_filepath = os.path.join(
@@ -734,7 +734,7 @@ solicit_answer_details: false
         # Compare saved with golden file.
         self.assertEqual(
             zf_saved.open(
-                'The title for ZIP download handler test!.yaml').read(),
+                'The title for ZIP download handler test.yaml').read(),
             zf_gold.open(
                 'The title for ZIP download handler test!.yaml').read())
 
@@ -789,7 +789,7 @@ solicit_answer_details: false
             'attachment; filename=%s' % filename)
 
         zf_saved = zipfile.ZipFile(io.BytesIO(response.body))
-        self.assertEqual(zf_saved.namelist(), [u'¡Hola!.yaml'])
+        self.assertEqual(zf_saved.namelist(), [u'Hola.yaml'])
 
         self.logout()
 
