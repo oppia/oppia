@@ -263,7 +263,7 @@
                 <span class="publish-upto-chapter-label">Publish up to Chapter ...</span>
                 <select [(ngModel)]="selectedChapterIndexInPublishUptoDropdown"
                         (ngModelChange)="updatePublishUptoChapterSelection(selectedChapterIndexInPublishUptoDropdown)"
-                        class="publish-upto-chapter-dropdown e2e-test-publish-chapters-upto-dropdown">
+                        class="publish-upto-chapter-dropdown e2e-test-publish-up-to-chapter-dropdown">
                   <option [value]="-1">None</option>
                   <option *ngFor="let node of linearNodesList;index as idx"
                           [disabled]="!chapterIsPublishable[idx]"

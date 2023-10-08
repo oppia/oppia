@@ -28,6 +28,8 @@ var ReleaseCoordinatorPage = require(
 var AdminPage = require('../webdriverio_utils/AdminPage.js');
 var TopicsAndSkillsDashboardPage =
   require('../webdriverio_utils/TopicsAndSkillsDashboardPage.js');
+var TopicViewerPage = require(
+  '../webdriverio_utils/TopicViewerPage.js');
 var TopicEditorPage = require('../webdriverio_utils/TopicEditorPage.js');
 var StoryEditorPage = require('../webdriverio_utils/StoryEditorPage.js');
 var SkillEditorPage = require('../webdriverio_utils/SkillEditorPage.js');
@@ -394,6 +396,7 @@ describe('Serial Chapter Launch functionality', function() {
   var adminPage = null;
   var storyName = 'Story 0';
   var explorationEditorPage = null;
+  var topicViewerPage = null;
   var dummyExplorationIds = [];
   var dummyExplorationInfo = [
     'Dummy exploration', 'Algorithms', 'Learn more about oppia', 'English'];
@@ -430,6 +433,8 @@ describe('Serial Chapter Launch functionality', function() {
     explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
     releaseCoordinatorPage = (
       new ReleaseCoordinatorPage.ReleaseCoordinatorPage());
+    topicViewerPage = (
+      new TopicViewerPage.TopicViewerPage());
     adminPage = new AdminPage.AdminPage();
     explorationEditorMainTab = explorationEditorPage.getMainTab();
     await users.createAndLoginCurriculumAdminUser(
@@ -449,14 +454,88 @@ describe('Serial Chapter Launch functionality', function() {
     await topicsAndSkillsDashboardPage.get();
     await topicsAndSkillsDashboardPage.createTopic(
       topicName, topicUrlFragment, 'Description', false);
+
+    await topicEditorPage.submitTopicThumbnail(Constants.TEST_SVG_PATH, true);
+    await topicEditorPage.updateMetaTagContent('topic meta tag');
+    await topicEditorPage.updatePageTitleFragment('topic page title');
+    await topicEditorPage.saveTopic('Added thumbnail.');
+    var url = await browser.getUrl();
+    var topicId = url.split('/')[4].slice(0, -1);
+    await general.closeCurrentTabAndSwitchTo(handle);
+    await adminPage.editConfigProperty(
+      'The details for each classroom page.',
+      'List',
+      async function(elem) {
+        elem = await elem.editItem(0, 'Dictionary');
+        elem = await elem.editEntry(4, 'List');
+        elem = await elem.addItem('Unicode');
+        await elem.setValue(topicId);
+      });
+
+    await topicsAndSkillsDashboardPage.get();
+    await topicsAndSkillsDashboardPage.createSkillWithDescriptionAndExplanation(
+      'Skill', 'Concept card explanation', false);
+    await skillEditorPage.addRubricExplanationForDifficulty(
+      'Easy', 'Second explanation for easy difficulty.');
+    await skillEditorPage.saveOrPublishSkill('Edited rubrics');
+
+    url = await browser.getUrl();
+    skillId = url.split('/')[4];
+    await skillEditorPage.get(skillId);
+
+    for (let i = 0; i < 10; i++) {
+      await skillEditorPage.moveToQuestionsTab();
+      await skillEditorPage.clickCreateQuestionButton();
+      await explorationEditorMainTab.setContent(
+        await forms.toRichText('Question 1'), true);
+      await explorationEditorMainTab.setInteraction(
+        'TextInput', 'Placeholder', 5);
+      await explorationEditorMainTab.addResponse(
+        'TextInput', await forms.toRichText('Correct Answer'), null, false,
+        'FuzzyEquals', ['correct']);
+      var responseEditor = await explorationEditorMainTab.getResponseEditor(0);
+      await responseEditor.markAsCorrect();
+      await (
+        await explorationEditorMainTab.getResponseEditor('default')
+      ).setFeedback(await forms.toRichText('Try again'));
+      await explorationEditorMainTab.addHint('Hint 1');
+      await explorationEditorMainTab.addSolution('TextInput', {
+        correctAnswer: 'correct',
+        explanation: 'It is correct'
+      });
+      await skillEditorPage.saveQuestion();
+      await skillEditorPage.get(skillId);
+    }
+
+    await general.closeCurrentTabAndSwitchTo(handle);
+    await topicsAndSkillsDashboardPage.get();
+    await topicsAndSkillsDashboardPage.navigateToSkillsTab();
+    await topicsAndSkillsDashboardPage.assignSkillToTopic(
+      'Skill', topicName);
+    await topicsAndSkillsDashboardPage.get();
+    await topicsAndSkillsDashboardPage.editTopic(topicName);
+    await topicEditorPage.togglePracticeTab();
+    await topicEditorPage.addDiagnosticTestSkill('Skill');
+    await topicEditorPage.addSubtopic(
+      'Subtopic', 'subtopic-one', Constants.TEST_SVG_PATH,
+      'Subtopic content');
+    await topicEditorPage.addConceptCardToSubtopicExplanation('Skill');
+    await topicEditorPage.saveSubtopicExplanation();
+    await topicEditorPage.saveTopic('Added subtopic.');
+    await topicEditorPage.navigateToTopicEditorTab();
+    await topicEditorPage.replacementDragSkillToSubtopic(0);
+    await topicEditorPage.saveTopic('Added skill to subtopic.');
+    await topicEditorPage.publishTopic();
+
+    await topicsAndSkillsDashboardPage.get();
+    await topicsAndSkillsDashboardPage.editTopic(topicName);
     await topicEditorPage.createStory(
       storyName, 'topicandstoryeditortwo', 'Story description',
       Constants.TEST_SVG_PATH);
-    await general.closeCurrentTabAndSwitchTo(handle);
     await users.logout();
   });
 
-  it('should change the status and publish chapters serially.',
+  it('should change the status and publish chapters serially',
     async function() {
       await users.login(userEmail);
       await topicsAndSkillsDashboardPage.get();
@@ -475,6 +554,12 @@ describe('Serial Chapter Launch functionality', function() {
       await storyEditorPage.navigateToStoryEditorTab();
       await storyEditorPage.expectChapterStatusToBe(0, 'Ready To Publish');
 
+      await topicViewerPage.get('math', topicName);
+      await topicViewerPage.expectStoryCountToBe(0);
+
+      await topicsAndSkillsDashboardPage.get();
+      await topicsAndSkillsDashboardPage.editTopic(topicName);
+      await topicEditorPage.navigateToStoryWithTitle(storyName);
       await storyEditorPage.createNewChapter(
         'Chapter 2', dummyExplorationIds[1], Constants.TEST_SVG_PATH);
       await storyEditorPage.saveStory('Second save');
@@ -499,5 +584,8 @@ describe('Serial Chapter Launch functionality', function() {
       await storyEditorPage.publishNodes(1);
       await storyEditorPage.expectChapterStatusToBe(0, 'Published');
       await storyEditorPage.expectChapterStatusToBe(1, 'Published');
+
+      await topicViewerPage.get('math', topicName);
+      await topicViewerPage.expectStoryCountToBe(1);
     });
 });

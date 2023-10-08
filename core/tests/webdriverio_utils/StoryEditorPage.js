@@ -109,7 +109,7 @@ var StoryEditorPage = function() {
     return $$('.e2e-test-rte');
   };
   var publishUptoChaptersDropdownSelector = $(
-    '.e2e-test-publish-chapters-upto-dropdown');
+    '.e2e-test-publish-up-to-chapter-dropdown');
   var nodeOutlineSaveButton = $('.e2e-test-node-outline-save-button');
   var createChapterThumbnailButton = $(
     '.e2e-test-chapter-input-thumbnail .e2e-test-photo-button');
@@ -267,7 +267,9 @@ var StoryEditorPage = function() {
 
   this.expectChapterStatusToBe = async function(index, status) {
     var chapterTitles = await chapterStatusSelector();
-    expect(await chapterTitles[index].getText()).toEqual(status);
+    var chapterStatusText = await action.getText(
+      'Chapter Status', chapterTitles[index]);
+    expect(chapterStatusText).toEqual(status);
   };
 
   this.dragChapterToAnotherChapter = (async function(chapter1, chapter2) {
@@ -444,39 +446,28 @@ var StoryEditorPage = function() {
   };
 
   this.setNodeStatusToReadyToPublish = async function() {
-    await waitFor.visibilityOf(
-      markAsReadyToPublishButton,
-      'Mark As Ready To Publish button taking too long to appear');
     await action.click(
       'Mark As Ready To Publish Button', markAsReadyToPublishButton);
   };
 
   this.setNodeStatusToDraft = async function() {
-    await waitFor.visibilityOf(
-      markAsDraftButton, 'Mark As Draft button taking too long to appear');
     await action.click('Mark As Draft Button', markAsDraftButton);
   };
 
   this.publishNodeChanges = async function() {
-    await waitFor.visibilityOf(
-      publishChangesButton,
-      'Publish Changes button taking too long to appear');
     await action.click('Publish Changes Button', publishChangesButton);
   };
 
   this.publishNodes = async function(chapterIndex) {
     await action.select(
-      'Publish Upto Chapter Dropdown',
+      'Publish Up to Chapter Dropdown',
       publishUptoChaptersDropdownSelector, Number(chapterIndex) + 1);
-    await waitFor.visibilityOf(
-      publishChapterButton,
-      'Publish Chapters Button taking too long to appear');
     await action.click('Publish Chapters Button', publishChapterButton);
   };
 
   this.unpublishNodes = async function(chapterIndex) {
     await action.select(
-      'Publish Upto Chapter Dropdown',
+      'Publish Up to Chapter Dropdown',
       publishUptoChaptersDropdownSelector, Number(chapterIndex) + 1);
     await action.click('Unpublish Story Button', publishChapterButton);
     await action.click('Close Save Modal button', closeSaveModalButton);

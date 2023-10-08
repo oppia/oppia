@@ -146,7 +146,7 @@ var ReleaseCoordinatorPage = function() {
     var count = featureFlagElements.length;
     for (let i = 0; i < count; i++) {
       var elem = featureFlagElements[i];
-      if ((await elem.$(featureNameLocator).getText()) ===
+      if (await action.getText('Feature Flag', elem.$(featureNameLocator)) ===
           'serial_chapter_launch_curriculum_admin_view') {
         return elem;
       }
