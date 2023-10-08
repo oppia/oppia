@@ -215,7 +215,10 @@ CHROME_PATHS = [
 ACCEPTANCE_TESTS_SUITE_NAMES = [
     'blog-admin-tests/assign-roles-to-users-and-change-tag-properties.spec.js',
     'blog-editor-tests/check-blog-editor-unable-to-publish-' +
-    'duplicate-blog-post.spec.js'
+    'duplicate-blog-post.spec.js',
+    'translation-admin-tests/add-translation-rights.spec.js',
+    'translation-admin-tests/remove-translation-rights.spec.js'
+
 ]
 
 GAE_PORT_FOR_E2E_TESTING: Final = 9001
@@ -881,7 +884,8 @@ def url_retrieve(
                 with open(output_path, 'wb') as output_file:
                     output_file.write(response.read())
         except (
-            urlerror.URLError, ssl.SSLError, client.IncompleteRead
+            urlerror.URLError, ssl.SSLError,
+            client.IncompleteRead, ConnectionResetError
         ) as exception:
             failures += 1
             print('Attempt %d of %d failed when downloading %s.' % (
