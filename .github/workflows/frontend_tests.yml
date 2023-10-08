@@ -74,23 +74,12 @@ jobs:
         run: |
           echo ---Building Docker Images---
           make build  
-      - name: Start Containers
+      - name: Initialize Containers
         run: |
-          echo ---Starting Containers---
-          make run-devserver
-      - name: Checking server reachability
-        run: |
-          for i in {1..50}; do
-            if curl -s http://localhost:8181/; then
-              echo ---Dev-server is up---
-              exit 0
-            else
-              echo ---Retrying in 30 seconds---
-              sleep 30
-            fi
-          done
-          echo ---Dev-server is not started after all retries---
-          exit 1
+          echo ---Initializing containers---
+          docker compose up dev-server --no-deps -d
+          docker compose up angular-build -d
+          docker cp oppia-angular-build:/app/oppia/node_modules .
       - name: Stop Containers
         run: make stop
       - name: Run frontend tests ${{ matrix.num_runs }}
