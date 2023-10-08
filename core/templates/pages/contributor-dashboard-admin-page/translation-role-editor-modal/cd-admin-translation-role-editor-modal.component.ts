@@ -44,7 +44,7 @@ export class CdAdminTranslationRoleEditorModal implements OnInit {
 
   constructor(
     private activeModal: NgbActiveModal,
-    private contributorDashboardAdminBackendApiService: 
+    private contributorDashboardAdminBackendApiService:
       ContributorDashboardAdminBackendApiService,
     private alertsService: AlertsService
   ) {}

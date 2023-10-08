@@ -26,7 +26,7 @@
     border-color: #00645c;
     border-radius: 5px;
     color: #00645c;
-    font-family: 'Roboto', sans-serif;;
+    font-family: 'Roboto', sans-serif;
     font-size: 14px;
     font-weight: 500;
     letter-spacing: 0.30px;
@@ -37,7 +37,7 @@
     background: #00645c;
     border-radius: 5px;
     color: white;
-    font-family: 'Roboto', sans-serif;;
+    font-family: 'Roboto', sans-serif;
     font-size: 14px;
     font-weight: 500;
     letter-spacing: 0.30px;
@@ -46,8 +46,8 @@
   }
   .label {
     color: #333;
+    font-family: 'Roboto', sans-serif;
     font-size: 16px;
-    font-family: 'Roboto', sans-serif;;
     font-weight: 400;
     left: 32px;
     top: 0;
@@ -55,14 +55,14 @@
   }
   .label-explanation {
     color: #667085;
-    font-family: 'Roboto', sans-serif;;
+    font-family: 'Roboto', sans-serif;
     font-size: 14px;
     font-weight: 400;
     word-wrap: break-word
   }
   .title-container {
     color: #00645c;
-    font-family: Capriola;
+    font-family: 'Capriola', Arial, sans-serif;
     font-size: 20px;
     margin-bottom: 20px;
     margin-left: 20px;
@@ -101,12 +101,12 @@
     <div class="sub-heading-container">User Role</div>
     <div class="attribute-container">
       <span (click)="toggleQuestionSubmitter()" (keydown.space)="toggleQuestionSubmitter()" tabindex="0">
-          <i *ngIf="!isQuestionSubmitter" class="material-icons md-18 question-submitter-role-checkbox">&#xE835;</i>
-          <i *ngIf="isQuestionSubmitter" class="material-icons md-18 question-submitter-role-checkbox">&#xE834;</i>
+        <i *ngIf="!isQuestionSubmitter" class="material-icons md-18 question-submitter-role-checkbox">&#xE835;</i>
+        <i *ngIf="isQuestionSubmitter" class="material-icons md-18 question-submitter-role-checkbox">&#xE834;</i>
       </span>
       <div class="label-container">
-          <div class="label">Question Submitter</div>
-          <div class="label-explanation">Submits questions for review</div>
+        <div class="label">Question Submitter</div>
+        <div class="label-explanation">Submits questions for review</div>
       </div>
     </div>
     <div class="attribute-container">
