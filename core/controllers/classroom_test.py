@@ -273,6 +273,29 @@ class ClassroomAdminTests(test_utils.GenericTestBase):
         self.get_json(
             feconf.CLASSROOM_ADMIN_DATA_HANDLER_URL, expected_status_int=401)
         self.logout()
+        
+    def test_get_unused_topics(self) -> None:
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        unused_topic = self.save_new_topic(
+            'unused_topic',
+            self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
+        )
+        unused_topics = [unused_topic.to_dict()]
+        json_response = self.get_json(feconf.UNUSED_TOPICS_HANDLER_URL)
+        self.assertEqual(
+            json_response['unused_topics'],
+            unused_topics
+        )
+        self.logout()
+    
+    def test_not_able_to_get_unused_topics_when_user_is_not_admin(
+        self
+    ) -> None:
+        self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
+        self.login(self.VIEWER_EMAIL)
+        self.get_json(
+            feconf.UNUSED_TOPICS_HANDLER_URL, expected_status_int=401)
+        self.logout()
 
     def test_get_new_classroom_id(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
