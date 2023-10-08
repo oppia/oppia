@@ -217,7 +217,7 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
       selectedTopic => {
         const matchingTopic = this.topics.find(
           topicChoice => topicChoice.topic === selectedTopic);
-        if (this.selectedTopicNames.length && !matchingTopic) {
+        if (!matchingTopic && this.selectedTopicNames.length) {
           throw new Error(
             'Selected Topic Id doesn\'t match any valid topic.');
         }
