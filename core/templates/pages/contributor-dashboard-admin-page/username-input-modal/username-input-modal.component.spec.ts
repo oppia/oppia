@@ -55,7 +55,7 @@ describe('UsernameInputModal', () => {
   it('should throw error when entered username is invaid', () => {
     spyOn(
       signupPageBackendApiService, 'checkUsernameAvailableAsync'
-    ).and.returnValue(Promise.resolve(false));
+    ).and.returnValue(Promise.resolve({username_is_taken: false}));
 
     component.saveAndClose();
 
@@ -65,7 +65,7 @@ describe('UsernameInputModal', () => {
   it('should save and close with correct username', () => {
     spyOn(
       signupPageBackendApiService, 'checkUsernameAvailableAsync'
-    ).and.returnValue(Promise.resolve(true));
+    ).and.returnValue(Promise.resolve({username_is_taken: true}));
     const modalCloseSpy = spyOn(ngbActiveModal, 'close').and.callThrough();
     component.username = 'user1';
 
@@ -77,7 +77,7 @@ describe('UsernameInputModal', () => {
   it('should close without returning anything', () => {
     spyOn(
       signupPageBackendApiService, 'checkUsernameAvailableAsync'
-    ).and.returnValue(Promise.resolve(true));
+    ).and.returnValue(Promise.resolve({username_is_taken: true}));
     const modalCloseSpy = spyOn(ngbActiveModal, 'dismiss').and.callThrough();
 
     component.close();
