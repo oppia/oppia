@@ -54,6 +54,7 @@ export class StoryNodeEditorComponent implements OnInit, OnDestroy {
   chapterPreviewCardIsShown = false;
   mainChapterCardIsShown = true;
   explorationInputButtonsAreShown = false;
+  chapterOutlineButtonsAreShown = false;
   skillIdToSummaryMap = {};
   chapterOutlineIsShown: boolean = false;
   chapterTodoCardIsShown: boolean = false;
@@ -466,7 +467,7 @@ export class StoryNodeEditorComponent implements OnInit, OnDestroy {
 
   toggleChapterOutline(): void {
     if (this.windowDimensionsService.isWindowNarrow()) {
-      this.chapterOutlineIsShown = !this.chapterOutlineIsShown;
+      this.chapterOutlineIsShown = !this.chapterOutlineButtonsAreShown;
     }
   }
 
@@ -502,11 +503,13 @@ export class StoryNodeEditorComponent implements OnInit, OnDestroy {
 
   onSaveButtonClicked(): void {
     this.outlineEditViewIsShown = $(this.oldOutline).text();
+    this.chapterOutlineButtonsAreShown = false;
     this.chapterOutlineIsShown = false;
   }
 
   onCancelButtonClicked(): void {
     this.editableOutline = this.oldOutline;
+    this.chapterOutlineButtonsAreShown = false;
     this.chapterOutlineIsShown = false;
   }
 

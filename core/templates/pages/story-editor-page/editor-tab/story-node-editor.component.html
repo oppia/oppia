@@ -139,14 +139,16 @@
               <label class="fas fa-pencil-alt oppia-icon" (click)="makeChapterOutlineEditable()"></label>
             </div>
           </div>
+          <br>
           <div class="chapter-card-inputs oppia-mobile-collapsible-card-content" *ngIf="chapterOutlineIsShown">
             <div tabindex="-1" >
               <schema-based-editor id="storyNodeOutline"
                                    [schema]="OUTLINE_SCHEMA"
                                    [localValue]="editableOutline"
-                                   (localValueChange)="updateLocalEditableOutline($event)">
+                                   (localValueChange)="updateLocalEditableOutline($event);"
+                                   (click)="chapterOutlineButtonsAreShown=true; ">
               </schema-based-editor>
-              <div class="save-button-container">
+              <div class="save-button-container" *ngIf="chapterOutlineButtonsAreShown">
                 <button type="button"
                         class="btn btn-default e2e-test-node-outline-cancel-button"
                         (click)="onCancelButtonClicked();">
@@ -381,9 +383,7 @@
 
 <style>
   .outline-content-container {
-    margin-left: 25px;
-    padding-bottom: 20px;
-    padding-top: 20px;
+    margin-left: 50px;
     width: 400px;
   }
   .outline-content-container:hover {
@@ -400,9 +400,6 @@
   .oppia-icon {
     cursor: pointer;
     float: right;
-  }
-  .outline-finalized-container {
-    margin-left: 25px;
   }
   .story-node-content-container {
     display: flex;
@@ -432,7 +429,7 @@
     padding: 10px;
   }
   .chapter-card-inputs {
-    padding: 30px 55px 30px 25px;
+    padding: 30px 55px 30px 45px;
   }
   .checklist-items .todo-item-container {
     display: flex;
