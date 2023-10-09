@@ -69,7 +69,11 @@ jobs:
           echo ---Initializing containers---
           docker compose up angular-build -d
           echo ---Copying---
+          pwd
+          ls
+          ls /home/runner/work/oppia
           sudo docker cp oppia-angular-build:/app/oppia/node_modules .
+          ls /home/runner/work/oppia
           echo ---Copying done---
       - name: Stop Containers
         run: make stop
