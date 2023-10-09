@@ -307,22 +307,22 @@ export class CkEditor4RteComponent implements AfterViewInit, OnChanges,
     }
 
     /**
-       * Create rules to allowlist all the rich text components and
+       * Create rules to allow all the rich text components and
        * their wrappers and overlays.
        * See format of filtering rules here:
        * http://docs.ckeditor.com/#!/guide/dev_allowed_content_rules
        */
-    // Allowlist the component tags with any attributes and classes.
+    // Allow the component tags with any attributes and classes.
     var componentRule = names.map((name) => {
       return 'oppia-noninteractive-ckeditor-' + name;
     }).join(' ') + '(*)[*];';
-      // Allowlist the inline component wrapper, which is a
+      // Allow the inline component wrapper, which is a
       // span with a "type" attribute.
     var inlineWrapperRule = ' span[type];';
-    // Allowlist the block component wrapper, which is a div
+    // Allow the block component wrapper, which is a div
     // with a "type" attribute and a CSS class.
     var blockWrapperRule = ' div(oppia-rte-component-container)[type];';
-    // Allowlist the transparent block component overlay, which is
+    // Allow the transparent block component overlay, which is
     // a div with a CSS class.
     var blockOverlayRule = ' div(oppia-rte-component-overlay);';
     // Put all the rules together.

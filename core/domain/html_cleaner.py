@@ -41,7 +41,7 @@ class ComponentsDict(TypedDict):
 
 def filter_a(tag: str, name: str, value: str) -> bool:
     """Returns whether the described attribute of a tag should be
-    whitelisted.
+    allowed.
 
     Args:
         tag: str. The name of the tag passed.
@@ -49,7 +49,7 @@ def filter_a(tag: str, name: str, value: str) -> bool:
         value: str. The value of the attribute.
 
     Returns:
-        bool. Whether the given attribute should be whitelisted.
+        bool. Whether the given attribute should be allowed.
 
     Raises:
         Exception. The 'tag' is not as expected.

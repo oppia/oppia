@@ -498,13 +498,13 @@ export class ConversationSkinComponent {
   }
 
   doesCollectionAllowsGuestProgress(collectionId: string | never): boolean {
-    let allowListedCollectionIds = (
+    let allowedCollectionIds = (
       AppConstants.
-        ALLOWLISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS
+        ALLOWED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS
     );
     return (
       (
-        allowListedCollectionIds as readonly[]
+        allowedCollectionIds as readonly[]
       ).
         indexOf(collectionId as never) !== -1);
   }
