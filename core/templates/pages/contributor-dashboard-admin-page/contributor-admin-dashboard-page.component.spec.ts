@@ -29,7 +29,7 @@ import { CdAdminQuestionRoleEditorModal } from './question-role-editor-modal/cd-
 import { CdAdminTranslationRoleEditorModal } from './translation-role-editor-modal/cd-admin-translation-role-editor-modal.component';
 import { UsernameInputModal } from './username-input-modal/username-input-modal.component';
 
-fdescribe('Contributor dashboard Admin page', () => {
+describe('Contributor dashboard Admin page', () => {
   let component: ContributorAdminDashboardPageComponent;
   let fixture: ComponentFixture<ContributorAdminDashboardPageComponent>;
   let contributorDashboardAdminStatsBackendApiService: (
@@ -290,6 +290,25 @@ fdescribe('Contributor dashboard Admin page', () => {
     component.applyTopicFilter();
 
     expect(component.selectedTopicIds).toEqual(['1', '2']);
+  }));
+
+  it('should throw error when topic filter chooses null', fakeAsync(() => {
+    component.ngOnInit();
+    tick();
+    component.selectedTopicNames = ['topic_with_no_id'];
+    component.topics = [
+      { id: '1', topic: 'Science' },
+      { id: '2', topic: 'Technology' },
+    ];
+
+    fixture.detectChanges();
+    tick();
+
+    expect(() => {
+      component.applyTopicFilter();
+      tick();
+    }).toThrowError(
+      'Selected Topic Id doesn\'t match any valid topic.');
   }));
 
   it('should apply topic and language filter both', fakeAsync(() => {
