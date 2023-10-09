@@ -22,6 +22,7 @@ import { FormsModule } from '@angular/forms';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 
 import { CdAdminQuestionRoleEditorModal } from './cd-admin-question-role-editor-modal.component';
+import { LoadingDotsComponent } from '../../../components/common-layout-directives/common-elements/loading-dots.component';
 
 describe('CdAdminQuestionRoleEditorModal', () => {
   let component: CdAdminQuestionRoleEditorModal;
@@ -34,7 +35,10 @@ describe('CdAdminQuestionRoleEditorModal', () => {
         FormsModule,
         HttpClientTestingModule
       ],
-      declarations: [CdAdminQuestionRoleEditorModal],
+      declarations: [
+        CdAdminQuestionRoleEditorModal,
+        LoadingDotsComponent
+      ],
       providers: [
         NgbActiveModal
       ]
@@ -47,6 +51,7 @@ describe('CdAdminQuestionRoleEditorModal', () => {
     component = fixture.componentInstance;
     ngbActiveModal = TestBed.get(NgbActiveModal);
     fixture.detectChanges();
+    component.ngOnInit();
   });
 
   it('should properly initialize rights', () => {
@@ -56,6 +61,7 @@ describe('CdAdminQuestionRoleEditorModal', () => {
     };
 
     fixture.detectChanges();
+    component.ngOnInit();
 
     expect(component.isQuestionSubmitter).toBeTrue();
     expect(component.isQuestionReviewer).toBeFalse();
@@ -67,6 +73,7 @@ describe('CdAdminQuestionRoleEditorModal', () => {
       isQuestionReviewer: false
     };
     fixture.detectChanges();
+    component.ngOnInit();
 
     component.toggleQuestionSubmitter();
 
@@ -79,6 +86,7 @@ describe('CdAdminQuestionRoleEditorModal', () => {
       isQuestionReviewer: false
     };
     fixture.detectChanges();
+    component.ngOnInit();
 
     component.toggleQuestionReviewer();
 

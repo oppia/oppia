@@ -22,7 +22,7 @@ import { FormsModule } from '@angular/forms';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { MaterialModule } from 'modules/material.module';
 
-import { ContributorDashboardAdminBackendApiService } from '../services/contributor-dashboard-admin-backend-api.service';
+import { ContributorDashboardAdminBackendApiService } from '../services/contributor-dashboard-admin-backend-api.service'; 
 import { AlertsService } from 'services/alerts.service';
 
 import { CdAdminTranslationRoleEditorModal } from './cd-admin-translation-role-editor-modal.component';
@@ -67,6 +67,7 @@ describe('CdAdminTranslationRoleEditorModal', () => {
       sk: 'shqip (Albanian)'
     };
     fixture.detectChanges();
+    component.ngOnInit();
   });
 
   it('should update topic ids for selection on initialization', () => {
@@ -85,7 +86,8 @@ describe('CdAdminTranslationRoleEditorModal', () => {
     it('should make request to add topic', fakeAsync(() => {
       spyOn(
         contributorDashboardAdminBackendApiService,
-        'addContributionReviewerAsync').and.resolveTo();
+        'addContributionReviewerAsync'
+      ).and.resolveTo();
       component.newLanguageId = 'en';
 
       component.addLanguage();
@@ -100,8 +102,7 @@ describe('CdAdminTranslationRoleEditorModal', () => {
     it('should alert warning if request fails', fakeAsync(() => {
       spyOn(
         contributorDashboardAdminBackendApiService,
-        'addContributionReviewerAsync'
-      ).and.returnValue(
+        'addContributionReviewerAsync').and.returnValue(
         Promise.reject());
       spyOn(alertsService, 'addWarning').and.callThrough();
 
@@ -154,12 +155,12 @@ describe('CdAdminTranslationRoleEditorModal', () => {
     }));
   });
 
-  it('should close with correct managed topic ids', () => {
+  it('should close without returning anything', () => {
     const modalCloseSpy = spyOn(ngbActiveModal, 'close').and.callThrough();
     component.assignedLanguageIds = ['en'];
 
     component.close();
 
-    expect(modalCloseSpy).toHaveBeenCalledWith(['en']);
+    expect(modalCloseSpy).toHaveBeenCalledWith();
   });
 });

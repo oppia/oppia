@@ -32,7 +32,6 @@ import { UsernameInputModal } from './username-input-modal/username-input-modal.
 import { CdAdminQuestionRoleEditorModal } from './question-role-editor-modal/cd-admin-question-role-editor-modal.component';
 import { CdAdminTranslationRoleEditorModal } from './translation-role-editor-modal/cd-admin-translation-role-editor-modal.component';
 
-
 export interface LanguageChoice {
   id: string;
   language: string;
@@ -274,7 +273,7 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
     this.setActiveTab(selectedContributionType);
   }
 
-  openRoleEditorModal(): void {
+  openUsernameInputModal(): void {
     const modalRef = this.modalService.open(
       UsernameInputModal);
     modalRef.componentInstance.activeTab = this.activeTab;
@@ -285,7 +284,7 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
     });
   }
 
-  openCdAdminQuestionEditorRoleModal(username: string): void {
+  openCdAdminQuestionRoleEditorModal(username: string): void {
     this.contributorDashboardAdminBackendApiService
       .contributionReviewerRightsAsync(username).then(response => {
         const modelRef = this.modalService.open(
@@ -359,7 +358,7 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
       this.openCdAdminTranslationRoleEditorModal(username);
     } else if (this.activeTab === this.TAB_NAME_QUESTION_SUBMITTER ||
       this.activeTab === this.TAB_NAME_QUESTION_REVIEWER) {
-      this.openCdAdminQuestionEditorRoleModal(username);
+      this.openCdAdminQuestionRoleEditorModal(username);
     }
   }
 

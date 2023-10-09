@@ -111,7 +111,7 @@ export class ContributorAdminStatsTable implements OnInit {
     }
   }
 
-  openCdAdminQuestionEditorRoleModal(username: string): void {
+  openCdAdminQuestionRoleEditorModal(username: string): void {
     this.contributorDashboardAdminBackendApiService
       .contributionReviewerRightsAsync(username).then(response => {
         const modelRef = this.modalService.open(
@@ -186,7 +186,7 @@ export class ContributorAdminStatsTable implements OnInit {
       this.openCdAdminTranslationRoleEditorModal(username);
     } else if (this.activeTab === this.TAB_NAME_QUESTION_SUBMITTER ||
       this.activeTab === this.TAB_NAME_QUESTION_REVIEWER) {
-      this.openCdAdminQuestionEditorRoleModal(username);
+      this.openCdAdminQuestionRoleEditorModal(username);
     }
   }
 

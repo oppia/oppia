@@ -23,7 +23,6 @@ import { ContributorDashboardAdminBackendApiService } from '../services/contribu
 import { AlertsService } from 'services/alerts.service';
 import constants from 'assets/constants';
 
-
 @Component({
   selector: 'oppia-translation-role-editor-modal',
   templateUrl: './cd-admin-translation-role-editor-modal.component.html',

@@ -58,7 +58,7 @@
       <div class="filter-container">
         <div class="filter-rights-sub-container">
           <div class="add-rights-button-container">
-            <button class="add-rights-button" (click)="openRoleEditorModal()" *ngIf="!(activeTab === TAB_NAME_TRANSLATION_SUBMITTER)">
+            <button class="add-rights-button" (click)="openUsernameInputModal()" *ngIf="!(activeTab === TAB_NAME_TRANSLATION_SUBMITTER)">
               + ADD {{ (activeTab === TAB_NAME_QUESTION_SUBMITTER) ? 'SUBMITTER' : 'REVIEWER' }}
             </button>
           </div>
@@ -131,7 +131,7 @@
       </div>
       <div class="filter-container">
         <div class="add-rights-button-container">
-          <button class="add-rights-button" (click)="openRoleEditorModal()" *ngIf="!(activeTab === TAB_NAME_TRANSLATION_SUBMITTER)">
+          <button class="add-rights-button" (click)="openUsernameInputModal()" *ngIf="!(activeTab === TAB_NAME_TRANSLATION_SUBMITTER)">
             + ADD {{ (activeTab === TAB_NAME_QUESTION_SUBMITTER) ? 'SUBMITTER' : 'REVIEWER' }}
           </button>
         </div>
