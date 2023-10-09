@@ -201,7 +201,7 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
           throw new Error(
             'Selected Topic Id doesn\'t match any valid topic.');
         }
-        return matchingTopic.id;
+        return matchingTopic ? matchingTopic.id : '';
       });
     this.filter = new ContributorAdminDashboardFilter(
       this.selectedTopicIds,
