@@ -67,14 +67,10 @@ jobs:
       - name: Initialize Containers
         run: |
           echo ---Initializing containers---
+          docker compose up dev-server --no-deps -d
           docker compose up angular-build -d
-          echo ---Copying---
-          pwd
-          ls
-          ls /home/runner/work/oppia
+          echo ---Copying node_modules from container---
           sudo docker cp oppia-angular-build:/app/oppia/node_modules .
-          ls /home/runner/work/oppia
-          echo ---Copying done---
       - name: Stop Containers
         run: make stop
       - name: Run frontend tests ${{ matrix.num_runs }}
