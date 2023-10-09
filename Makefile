@@ -136,9 +136,9 @@ run_tests.acceptance: ## Runs the acceptance tests for the parsed suite
 	$(MAKE) stop 
 # Adding node to the path.
 	@if [ "$(OS_NAME)" = "Windows" ]; then \
-		export PATH=$(cd .. && pwd)/oppia_tools/node-16.13.0:$PATH \
+		export PATH=$(cd .. && pwd)/oppia_tools/node-16.13.0:$(PATH); \
 	else \
-		export PATH=$(shell cd .. && pwd)/oppia_tools/node-16.13.0/bin:$(PATH) \
+		export PATH=$(shell cd .. && pwd)/oppia_tools/node-16.13.0/bin:$(PATH); \
 	fi
 # Starting the development server for the acceptance tests.
 	$(MAKE) start-devserver-for-tests
@@ -158,9 +158,9 @@ run_tests.e2e: ## Runs the e2e tests for the parsed suite
 	$(MAKE) stop
 # Adding node to the path.
 	@if [ "$(OS_NAME)" = "Windows" ]; then \
-		export PATH=$(cd .. && pwd)/oppia_tools/node-16.13.0:$PATH \
+		export PATH=$(cd .. && pwd)/oppia_tools/node-16.13.0:$(PATH); \
 	else \
-		export PATH=$(shell cd .. && pwd)/oppia_tools/node-16.13.0/bin:$(PATH) \
+		export PATH=$(shell cd .. && pwd)/oppia_tools/node-16.13.0/bin:$(PATH); \
 	fi
 # Starting the development server for the e2e tests.
 	$(MAKE) start-devserver-for-tests
