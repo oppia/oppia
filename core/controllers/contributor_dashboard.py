@@ -334,9 +334,12 @@ class ReviewableOpportunitiesHandler(
                 self.user_id, topic_name, language
             ):
                 if opp is not None:
-                   if isinstance(opp, dict):
+                    print('LINE 337 IN HERE')
+                    if isinstance(opp, dict):
+                        print('LINE 339 IN HERE')
                         opportunity_dicts.append(opp)
-                   else:
+                    else:
+                        print('LINE 342 IN HERE')
                         opportunity_dicts.append(opp.to_dict())
         self.values = {
             'opportunities': opportunity_dicts,
@@ -449,7 +452,8 @@ class PinLessonsHandlerNormalizedRequestDict(TypedDict):
 
 class PinLessonsHandler(
     base.BaseHandler[
-        Dict[str, str], ReviewableOpportunitiesHandlerNormalizedRequestDict
+        PinLessonsHandlerNormalizedRequestDict,
+        Dict[str, str],
     ]
 ):
     """Handler for pinning & unpinning lessons."""
@@ -479,6 +483,7 @@ class PinLessonsHandler(
     @acl_decorators.open_access
     def put(self):
         """Handles pinning/unpinning lessons."""
+        print("I am right here inside put")
         assert self.normalized_request is not None
         if not self.user_id:
             return
@@ -489,7 +494,7 @@ class PinLessonsHandler(
         opportunity_services.update_pinned_opportunity_model(
             self.user_id, language_code, topic_id, opportunity_id)
 
-        self.render_json({})
+        self.render_json(self.values)
 
 
 class TranslatableTextHandlerNormalizedRequestDict(TypedDict):

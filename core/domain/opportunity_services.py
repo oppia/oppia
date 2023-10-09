@@ -895,6 +895,7 @@ def delete_skill_opportunity(skill_id: str) -> None:
     skill_opportunity_model = (
         opportunity_models.SkillOpportunityModel.get_by_id(skill_id))
     if skill_opportunity_model is not None:
+        print("Deleting this yuiui")
         opportunity_models.SkillOpportunityModel.delete(skill_opportunity_model)
 
 

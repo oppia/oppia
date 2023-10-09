@@ -17,6 +17,7 @@
 from __future__ import annotations
 
 import datetime
+import json
 
 from core import feconf
 from core.constants import constants
@@ -567,6 +568,45 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
 
             self.assertEqual(
                 response['opportunities'], [expected_opp_dict_1, expected_opp_dict_2])
+
+    def test_pin_translation_opportunity(self) -> None:
+        self.login(self.OWNER_EMAIL)
+        topic_id = 'topic123'
+        language_code = 'en'
+        opportunity_id = 'opp123'
+
+        request_dict = {
+            'topic_id': topic_id,
+            'language_code': language_code,
+            'opportunity_id': opportunity_id
+        }
+        csrf_token = self.get_new_csrf_token()
+
+        response = self.put_json(
+            '%s' % feconf.PINNED_OPPORTUNITIES_URL,
+            request_dict,
+            csrf_token=csrf_token,
+            expected_status_int=200)
+
+
+    def test_unpin_translation_opportunity(self) -> None:
+        self.login(self.OWNER_EMAIL)
+        topic_id = 'topic123'
+        language_code = 'en'
+        opportunity_id = None  # Unpinning, so opportunity_id is None.
+
+        request_dict = {
+            'topic_id': topic_id,
+            'language_code': language_code,
+            'opportunity_id': opportunity_id
+        }
+        csrf_token = self.get_new_csrf_token()
+
+        response = self.put_json(
+            '%s' % feconf.PINNED_OPPORTUNITIES_URL,
+            request_dict,
+            csrf_token=csrf_token,
+            expected_status_int=200 )
 
     def test_raises_error_if_story_contain_none_exploration_id(self) -> None:
         # Create a new exploration and linked story.
