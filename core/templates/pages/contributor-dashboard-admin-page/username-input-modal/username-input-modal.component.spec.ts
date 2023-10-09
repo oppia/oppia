@@ -24,7 +24,7 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { SignupPageBackendApiService } from '../../signup-page/services/signup-page-backend-api.service';
 import { UsernameInputModal } from './username-input-modal.component';
 
-fdescribe('UsernameInputModal', () => {
+describe('UsernameInputModal', () => {
   let component: UsernameInputModal;
   let fixture: ComponentFixture<UsernameInputModal>;
   let ngbActiveModal: NgbActiveModal;

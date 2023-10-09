@@ -22,7 +22,7 @@ import { FormsModule } from '@angular/forms';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { MaterialModule } from 'modules/material.module';
 
-import { ContributorDashboardAdminBackendApiService } from '../services/contributor-dashboard-admin-backend-api.service'; 
+import { ContributorDashboardAdminBackendApiService } from '../services/contributor-dashboard-admin-backend-api.service';
 import { AlertsService } from 'services/alerts.service';
 
 import { CdAdminTranslationRoleEditorModal } from './cd-admin-translation-role-editor-modal.component';
