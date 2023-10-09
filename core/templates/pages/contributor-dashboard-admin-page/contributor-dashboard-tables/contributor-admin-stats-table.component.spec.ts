@@ -18,6 +18,7 @@
 
 import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
 import { NO_ERRORS_SCHEMA, SimpleChanges } from '@angular/core';
+import { CdAdminTranslationRoleEditorModal } from '../translation-role-editor-modal/cd-admin-translation-role-editor-modal.component';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ContributorAdminStatsTable } from './contributor-admin-stats-table.component';
 import { ContributorDashboardAdminStatsBackendApiService, QuestionReviewerStatsData, QuestionSubmitterStatsData, TranslationReviewerStatsData, TranslationSubmitterStatsData } from '../services/contributor-dashboard-admin-stats-backend-api.service';
@@ -27,7 +28,7 @@ import { WindowRef } from 'services/contextual/window-ref.service';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { CdAdminQuestionRoleEditorModal } from '../question-role-editor-modal/cd-admin-question-role-editor-modal.component';
-import { CdAdminTranslationRoleEditorModal } from '../translation-role-editor-modal/cd-admin-translation-role-editor-modal.component';
+import { BrowserDynamicTestingModule } from '@angular/platform-browser-dynamic/testing';
 
 describe('Contributor stats component', () => {
   let component: ContributorAdminStatsTable;
@@ -50,6 +51,7 @@ describe('Contributor stats component', () => {
         MatTooltipModule
       ],
       declarations: [
+        CdAdminTranslationRoleEditorModal,
         ContributorAdminStatsTable
       ],
       providers: [
@@ -57,6 +59,11 @@ describe('Contributor stats component', () => {
         ContributorDashboardAdminBackendApiService
       ],
       schemas: [NO_ERRORS_SCHEMA]
+    }).overrideModule(BrowserDynamicTestingModule, {
+      set: {
+        entryComponents: [
+          CdAdminTranslationRoleEditorModal]
+      }
     }).compileComponents();
   }));
 
@@ -508,7 +515,11 @@ describe('Contributor stats component', () => {
         can_review_voiceover_for_language_codes: []
       }));
 
-      let modalSpy = spyOn(ngbModal, 'open').and.callThrough();
+      let modalSpy = spyOn(ngbModal, 'open').and.callFake(() => {
+        return ({
+          componentInstance: MockNgbModalRef
+        }) as NgbModalRef;
+      });
       component.openRoleEditor('user1');
       tick();
       expect(modalSpy).toHaveBeenCalledWith(CdAdminTranslationRoleEditorModal);
