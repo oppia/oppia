@@ -135,7 +135,11 @@ run_tests.acceptance: ## Runs the acceptance tests for the parsed suite
 	@echo 'Shutting down any previously started server.'
 	$(MAKE) stop 
 # Adding node to the path.
-	export PATH=$(shell cd .. && pwd)/oppia_tools/node-16.13.0/bin:$(PATH)
+	@if [ "$(OS_NAME)" = "Windows" ]; then \
+		export PATH=$(cd .. && pwd)/oppia_tools/node-16.13.0:$PATH \
+	else \
+		export PATH=$(shell cd .. && pwd)/oppia_tools/node-16.13.0/bin:$(PATH) \
+	fi
 # Starting the development server for the acceptance tests.
 	$(MAKE) start-devserver-for-tests
 	@echo '------------------------------------------------------'
@@ -153,7 +157,11 @@ run_tests.e2e: ## Runs the e2e tests for the parsed suite
 	@echo 'Shutting down any previously started server.'
 	$(MAKE) stop
 # Adding node to the path.
-	export PATH=$(shell cd .. && pwd)/oppia_tools/node-16.13.0/bin:$(PATH)
+	@if [ "$(OS_NAME)" = "Windows" ]; then \
+		export PATH=$(cd .. && pwd)/oppia_tools/node-16.13.0:$PATH \
+	else \
+		export PATH=$(shell cd .. && pwd)/oppia_tools/node-16.13.0/bin:$(PATH) \
+	fi
 # Starting the development server for the e2e tests.
 	$(MAKE) start-devserver-for-tests
 	@echo '------------------------------------------------------'
@@ -172,7 +180,7 @@ OS_NAME := $(shell uname)
 install_node:
 	@echo "Installing Node.js..."
 	@if [ "$(OS_NAME)" = "Windows" ]; then \
-		if [ "$(shell python -c 'import sys; print(sys.maxsize > 2**32)')" = "True" ]; then \
+		if [ "$(shell uname -m')" = "x86_64" ]; then \
 			architecture=x64; \
 		else \
 			architecture=x86; \
