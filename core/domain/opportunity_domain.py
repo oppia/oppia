@@ -354,7 +354,8 @@ class PinnedOpportunity:
 
     @classmethod
     def from_dict(
-        cls, pinned_opportunity_dict: PinnedOpportunityDict
+        cls,
+        pinned_opportunity_dict: PinnedOpportunityDict,
     ) -> 'PinnedOpportunity':
         """Returns a PinnedOpportunity domain object from a dict.
 
@@ -364,7 +365,7 @@ class PinnedOpportunity:
 
         Returns:
             PinnedOpportunity. The corresponding PinnedOpportunity
-                domain object.
+            domain object.
         """
         return cls(
             pinned_opportunity_dict['language_code'],
