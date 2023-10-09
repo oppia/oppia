@@ -485,8 +485,7 @@ class PinLessonsHandler(
         """Handles pinning/unpinning lessons."""
         print("I am right here inside put")
         assert self.normalized_request is not None
-        if not self.user_id:
-            return
+        assert self.user_id is not None
         topic_id = self.normalized_request.get('topic_id')
         language_code = self.normalized_request.get('language_code')
         opportunity_id = self.normalized_request.get('opportunity_id')
