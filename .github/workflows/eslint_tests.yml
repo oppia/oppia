@@ -36,8 +36,8 @@ jobs:
       - name: Initialize Containers
         run: |
           echo ---Initializing containers---
-          docker compose up dev-server --no-deps -d --no-cache
-          docker compose up angular-build -d --no-cache
+          docker compose up dev-server --no-deps -d
+          docker compose up angular-build -d
           docker cp oppia-angular-build:/app/oppia/node_modules .
       - name: Stop Containers
         run: make stop
