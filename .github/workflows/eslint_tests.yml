@@ -38,6 +38,7 @@ jobs:
           echo ---Initializing containers---
           docker compose up dev-server --no-deps -d
           docker compose up angular-build -d
+          chmod +rwx /home/runner/work/oppia/oppia/node_modules
           docker cp oppia-angular-build:/app/oppia/node_modules .
       - name: Stop Containers
         run: make stop
