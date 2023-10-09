@@ -118,7 +118,6 @@
           <div class="story-node-header oppia-mobile-collapsible-card-header" (click)="toggleChapterOutline()">
             <span>Chapter Outline</span>
           </div>
-          <br>
           <div class="outline-finalized-container">
             Outline Finalized
             <i *ngIf="!outlineIsFinalized" (click)="finalizeOutline()" class="far fa-square md-18 e2e-test-finalize-outline" aria-label="Finalize outline"></i>
@@ -139,7 +138,6 @@
               <label class="fas fa-pencil-alt oppia-icon" (click)="makeChapterOutlineEditable()"></label>
             </div>
           </div>
-          <br>
           <div class="chapter-card-inputs oppia-mobile-collapsible-card-content" *ngIf="chapterOutlineIsShown">
             <div tabindex="-1" >
               <schema-based-editor id="storyNodeOutline"
@@ -383,7 +381,7 @@
 
 <style>
   .outline-content-container {
-    margin-left: 50px;
+    margin-left: 25px;
     width: 400px;
   }
   .outline-content-container:hover {
@@ -400,6 +398,9 @@
   .oppia-icon {
     cursor: pointer;
     float: right;
+  }
+  .outline-finalized-container {
+    margin-left: 25px;
   }
   .story-node-content-container {
     display: flex;
@@ -429,7 +430,7 @@
     padding: 10px;
   }
   .chapter-card-inputs {
-    padding: 30px 55px 30px 45px;
+    padding: 30px 55px 30px 25px;
   }
   .checklist-items .todo-item-container {
     display: flex;
