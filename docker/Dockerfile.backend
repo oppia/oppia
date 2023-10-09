@@ -92,3 +92,6 @@ RUN /app/buf-0.29.0/protoc/bin/protoc \
     $PROTOC_FILES_PATH/*.proto
 
 RUN sed -i 's/import text_classifier_pb2 as text__classifier__pb2/from . import text_classifier_pb2 as text__classifier__pb2/' /app/oppia/proto_files/training_job_response_payload_pb2.py
+
+
+# check if there is a scope of optimising the actions in terms of storage
