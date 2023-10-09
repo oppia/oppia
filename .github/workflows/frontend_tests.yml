@@ -67,7 +67,6 @@ jobs:
       - name: Initialize Containers
         run: |
           echo ---Initializing containers---
-          docker compose up dev-server --no-deps -d
           docker compose up angular-build -d
           echo ---Copying---
           sudo docker cp oppia-angular-build:/app/oppia/node_modules .
