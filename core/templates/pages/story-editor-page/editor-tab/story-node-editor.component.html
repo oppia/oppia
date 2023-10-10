@@ -144,10 +144,9 @@
               <schema-based-editor id="storyNodeOutline"
                                    [schema]="OUTLINE_SCHEMA"
                                    [localValue]="editableOutline"
-                                   (localValueChange)="updateLocalEditableOutline($event);"
-                                   (click)="chapterOutlineButtonsAreShown=true; ">
+                                   (localValueChange)="updateLocalEditableOutline($event)">
               </schema-based-editor>
-              <div class="save-button-container" *ngIf="chapterOutlineButtonsAreShown">
+              <div class="save-button-container">
                 <button type="button"
                         class="btn btn-default e2e-test-node-outline-cancel-button"
                         (click)="onCancelButtonClicked();">
