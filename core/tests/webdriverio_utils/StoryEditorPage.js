@@ -449,6 +449,8 @@ var StoryEditorPage = function() {
   };
 
   this.changeNodeOutline = async function(richTextInstructions) {
+    await waitFor.visibilityOf(
+      nodeOutlineEditorContent, 'Node outline editor content taking too long to appear.');
     await action.click('Chapter node editor content', nodeOutlineEditorContent);
     await waitFor.visibilityOf(
       nodeOutlineEditor, 'Node outline editor taking too long to appear.');
