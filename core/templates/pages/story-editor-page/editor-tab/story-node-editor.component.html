@@ -118,6 +118,7 @@
           <div class="story-node-header oppia-mobile-collapsible-card-header" (click)="toggleChapterOutline()">
             <span>Chapter Outline</span>
           </div>
+          <br>
           <div class="outline-finalized-container">
             Outline Finalized
             <i *ngIf="!outlineIsFinalized" (click)="finalizeOutline()" class="far fa-square md-18 e2e-test-finalize-outline" aria-label="Finalize outline"></i>
@@ -381,7 +382,9 @@
 
 <style>
   .outline-content-container {
-    margin-left: 50px;
+    margin-left: 25px;
+    padding-bottom: 20px;
+    padding-top: 20px;
     width: 400px;
   }
   .outline-content-container:hover {
@@ -430,7 +433,7 @@
     padding: 10px;
   }
   .chapter-card-inputs {
-    padding: 30px 55px 30px 45px;
+    padding: 30px 55px 30px 25px;
   }
   .checklist-items .todo-item-container {
     display: flex;
