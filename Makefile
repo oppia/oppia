@@ -192,7 +192,7 @@ install_node:
 		powershell.exe -c "Expand-Archive -Path node-download -DestinationPath ../oppia_tools"; \
 	else \
 		extension=.tar.gz; \
-		if [ "$(shell python -c 'import sys; print(sys.maxsize > 2**32)')" = "True" ]; then \
+		if [ "$(shell python -c 'import sys; print(sys.maxsize > 2**32)')" = "True" ] || [ "$(shell uname -m)" = "x86_64" ]; then \
 			if [ "$(OS_NAME)" = "Darwin" ]; then \
 				node_file_name=node-v16.13.0-darwin-x64; \
 			elif [ "$(OS_NAME)" = "Linux" ]; then \
