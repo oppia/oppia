@@ -895,7 +895,6 @@ def delete_skill_opportunity(skill_id: str) -> None:
     skill_opportunity_model = (
         opportunity_models.SkillOpportunityModel.get_by_id(skill_id))
     if skill_opportunity_model is not None:
-        print("Deleting this yuiui")
         opportunity_models.SkillOpportunityModel.delete(skill_opportunity_model)
 
 
@@ -1081,21 +1080,25 @@ def get_pinned_lesson(
     user_id: str,
     language_code: str,
     topic_id: str
-) -> opportunity_domain.ExplorationOpportunitySummary: 
-    """
-    Retrieves the pinned lesson for a user in a specific language and topic.
+) -> opportunity_domain.ExplorationOpportunitySummary:
+    """Retrieves the pinned lesson for a user in a specific language and topic.
 
     Args:
-        user_id (str): The ID of the user for whom to retrieve the pinned lesson.
-        language_code (str): The ISO 639-1 language code for the desired language.
-        topic_id (str): The ID of the topic for which to retrieve the pinned lesson.
+        user_id: str. The ID of the user for whom to retrieve the pinned
+            lesson.
+        language_code: str. The ISO 639-1 language code for the
+            desired language.
+        topic_id: str. The ID of the topic for which to retrieve
+            the pinned lesson.
 
     Returns:
-        ExplorationOpportunitySummary or None: The pinned lesson as an
-            ExplorationOpportunitySummary object, or None if no pinned lesson exists.
+        ExplorationOpportunitySummary or None. The pinned lesson as an
+            ExplorationOpportunitySummary object, or None if no
+            pinned lesson exists.
 
     Note:
-        If the pinned lesson exists, it will have the 'is_pinned' attribute set to True.
+        If the pinned lesson exists, it will have the 'is_pinned'
+            attribute set to True.
     """
     pinned_opportunity = user_models.PinnedOpportunityModel.get_model(
         user_id,

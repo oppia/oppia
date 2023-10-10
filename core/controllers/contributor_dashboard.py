@@ -34,9 +34,8 @@ from core.domain import topic_fetchers
 from core.domain import translation_domain
 from core.domain import translation_services
 from core.domain import user_services
-from collections import OrderedDict
 
-from typing import Dict, List, Optional, Sequence, Tuple, TypedDict, Union
+from typing import Dict, List, Optional, Sequence, Tuple, TypedDict, Union, OrderedDict
 
 
 ListOfContributorDashboardStatsTypes = Sequence[Union[
@@ -334,12 +333,9 @@ class ReviewableOpportunitiesHandler(
                 self.user_id, topic_name, language
             ):
                 if opp is not None:
-                    print('LINE 337 IN HERE')
                     if isinstance(opp, dict):
-                        print('LINE 339 IN HERE')
                         opportunity_dicts.append(opp)
                     else:
-                        print('LINE 342 IN HERE')
                         opportunity_dicts.append(opp.to_dict())
         self.values = {
             'opportunities': opportunity_dicts,
@@ -427,14 +423,17 @@ class ReviewableOpportunitiesHandler(
                 topic.id
             )
 
-        exp_opp_summaries = opportunity_services.get_exploration_opportunity_summaries_by_ids(exp_ids)
+        exp_opp_summaries = (opportunity_services.
+            get_exploration_opportunity_summaries_by_ids(exp_ids))
 
-        # If there is a pinned opportunity summary, add it to the list of opportunities at the top.
+        # If there is a pinned opportunity summary,
+        # add it to the list of opportunities at the top.
         ordered_exp_opp_summaries = OrderedDict()
         if pinned_opportunity_summary:
             exp_opp_summaries.pop(pinned_opportunity_summary['id'], None)
-            ordered_exp_opp_summaries[pinned_opportunity_summary['id']] = pinned_opportunity_summary
-        
+            ordered_exp_opp_summaries[
+                pinned_opportunity_summary['id']] = pinned_opportunity_summary
+
         for item in exp_opp_summaries.values():
             ordered_exp_opp_summaries[item.id] = item
         return list(ordered_exp_opp_summaries.values())
@@ -447,7 +446,7 @@ class PinLessonsHandlerNormalizedRequestDict(TypedDict):
 
     topic_name: str
     language_code: str
-    opportunity_id: Optional[str] 
+    opportunity_id: Optional[str]
 
 
 class PinLessonsHandler(
@@ -483,7 +482,6 @@ class PinLessonsHandler(
     @acl_decorators.open_access
     def put(self):
         """Handles pinning/unpinning lessons."""
-        print("I am right here inside put")
         assert self.normalized_request is not None
         assert self.user_id is not None
         topic_id = self.normalized_request.get('topic_id')

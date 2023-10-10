@@ -582,18 +582,17 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
         }
         csrf_token = self.get_new_csrf_token()
 
-        response = self.put_json(
+        _ = self.put_json(
             '%s' % feconf.PINNED_OPPORTUNITIES_URL,
             request_dict,
             csrf_token=csrf_token,
             expected_status_int=200)
 
-
     def test_unpin_translation_opportunity(self) -> None:
         self.login(self.OWNER_EMAIL)
         topic_id = 'topic123'
         language_code = 'en'
-        opportunity_id = None  # Unpinning, so opportunity_id is None.
+        opportunity_id = None
 
         request_dict = {
             'topic_id': topic_id,
@@ -602,11 +601,11 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
         }
         csrf_token = self.get_new_csrf_token()
 
-        response = self.put_json(
+        _ = self.put_json(
             '%s' % feconf.PINNED_OPPORTUNITIES_URL,
             request_dict,
             csrf_token=csrf_token,
-            expected_status_int=200 )
+            expected_status_int=200)
 
     def test_raises_error_if_story_contain_none_exploration_id(self) -> None:
         # Create a new exploration and linked story.
