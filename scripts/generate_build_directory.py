@@ -15,10 +15,12 @@
 """Script for generating the build directory in the prod mode when
 the webpack bundling is completed."""
 
-from typing import Optional, Sequence
+from __future__ import annotations
+
 from scripts import build
 
-def main(args: Optional[Sequence[str]] = None) -> None:
+
+def main() -> None:
     """The main method of this script."""
 
     build.safe_delete_directory_tree('build/')
