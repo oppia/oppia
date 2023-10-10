@@ -290,62 +290,111 @@ describe('Search bar component', () => {
 
   it('should toggle selection', () => {
     spyOn(component, 'updateSelectionDetails');
-    spyOn(component, 'onSearchQueryChangeExec');
+    spyOn(component, 'refreshSearchBarLabels');
     component.toggleSelection('categories', 'id_1');
     component.toggleSelection('categories', 'id_1');
     expect(component.updateSelectionDetails).toHaveBeenCalled();
-    expect(component.onSearchQueryChangeExec).toHaveBeenCalled();
+    expect(component.refreshSearchBarLabels).toHaveBeenCalled();
   });
 
   it('should deselectAll', () => {
     spyOn(component, 'updateSelectionDetails');
-    spyOn(component, 'onSearchQueryChangeExec');
+    spyOn(component, 'refreshSearchBarLabels');
     component.deselectAll('categories');
     expect(component.selectionDetails.categories.selections).toEqual({});
     expect(component.updateSelectionDetails).toHaveBeenCalled();
-    expect(component.onSearchQueryChangeExec).toHaveBeenCalled();
+    expect(component.refreshSearchBarLabels).toHaveBeenCalled();
   });
+
 
   it('should handle search query change with language param in URL', () => {
     spyOn(searchService, 'executeSearchQuery').and.callFake(
       (
           searchQuery: string, categorySelections: object,
-          languageCodeSelections: object, callb: () => void) => {
+          languageCodeSelections: object, callb: () => void
+      ) => {
         callb();
-      });
-    spyOn(searchService, 'getSearchUrlQueryString').and.returnValue(
-      'search_query');
-    spyOn(windowRef.nativeWindow.history, 'pushState');
-    windowRef.nativeWindow.location = new URL('http://localhost/search/find?lang=en');
+      }
+    );
 
+    spyOn(searchService, 'getSearchUrlQueryString')
+      .and.returnValue('search_query');
+    spyOn(windowRef.nativeWindow.history, 'pushState');
+
+    component.searchQuery = 'test_query';
+
+    windowRef.nativeWindow.location = new URL('http://localhost/search/find?lang=en');
     component.onSearchQueryChangeExec();
 
     expect(windowRef.nativeWindow.history.pushState).toHaveBeenCalled();
+
     windowRef.nativeWindow.location = new URL('http://localhost/not/search/find?lang=en');
     component.onSearchQueryChangeExec();
-    expect(windowRef.nativeWindow.location.href).toEqual(
-      'http://localhost/search/find?q=search_query&lang=en');
+    expect(windowRef.nativeWindow.location.href)
+      .toEqual('http://localhost/search/find?q=search_query&lang=en');
+  });
+
+  it('should handle search query change with empty search query and ' +
+  'language param in URL', () => {
+    spyOn(searchService, 'executeSearchQuery');
+    spyOn(searchService, 'getSearchUrlQueryString').and.returnValue('');
+    spyOn(windowRef.nativeWindow.history, 'pushState');
+
+    component.searchQuery = '';
+    windowRef.nativeWindow.location = new URL('http://localhost/not/search/find?lang=en');
+    component.onSearchQueryChangeExec();
+
+    expect(windowRef.nativeWindow.history.pushState).not.toHaveBeenCalled();
+    expect(windowRef.nativeWindow.location.href).toEqual('http://localhost/not/search/find?lang=en');
   });
 
   it('should handle search query change without language param in URL', () => {
     spyOn(searchService, 'executeSearchQuery').and.callFake(
       (
           searchQuery: string, categorySelections: object,
-          languageCodeSelections: object, callb: () => void) => {
+          languageCodeSelections: object, callb: () => void
+      ) => {
         callb();
-      });
-    spyOn(searchService, 'getSearchUrlQueryString').and.returnValue(
-      'search_query');
-    spyOn(windowRef.nativeWindow.history, 'pushState');
-    windowRef.nativeWindow.location = new URL('http://localhost/search/find');
+      }
+    );
 
+    spyOn(searchService, 'getSearchUrlQueryString')
+      .and.returnValue('search_query');
+    spyOn(windowRef.nativeWindow.history, 'pushState');
+
+    component.searchQuery = 'test_query';
+
+    windowRef.nativeWindow.location = new URL('http://localhost/search/find');
     component.onSearchQueryChangeExec();
 
     expect(windowRef.nativeWindow.history.pushState).toHaveBeenCalled();
+
     windowRef.nativeWindow.location = new URL('http://localhost/not/search/find');
     component.onSearchQueryChangeExec();
-    expect(windowRef.nativeWindow.location.href).toEqual(
-      'http://localhost/search/find?q=search_query');
+    expect(windowRef.nativeWindow.location.href).toEqual('http://localhost/search/find?q=search_query');
+  });
+
+  it('should handle search query change with empty query string ' +
+  'and without language param in URL', () => {
+    spyOn(searchService, 'executeSearchQuery');
+    spyOn(searchService, 'getSearchUrlQueryString').and.returnValue('');
+    spyOn(windowRef.nativeWindow.history, 'pushState');
+
+    component.searchQuery = '';
+
+    windowRef.nativeWindow.location = new URL('http://localhost/search/find');
+    component.onSearchQueryChangeExec();
+
+    expect(windowRef.nativeWindow.history.pushState).not.toHaveBeenCalled();
+    expect(windowRef.nativeWindow.location.href).toEqual('http://localhost/search/find');
+
+    windowRef.nativeWindow.history.pushState.calls.reset();
+
+    windowRef.nativeWindow.location = new URL('http://localhost/not/search/find');
+    component.onSearchQueryChangeExec();
+
+    expect(windowRef.nativeWindow.history.pushState).not.toHaveBeenCalled();
+    expect(windowRef.nativeWindow.location.href).toEqual('http://localhost/not/search/find');
   });
 
   it('should update search fields based on url query', () => {
