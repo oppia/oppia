@@ -24,6 +24,9 @@ import { PlaythroughBackendApiService } from
   'domain/statistics/playthrough-backend-api.service';
 import { PlaythroughObjectFactory, PlaythroughBackendDict } from
   'domain/statistics/PlaythroughObjectFactory';
+import {
+  LearnerActionType,
+} from 'domain/statistics/learner-action.model';
 
 describe('Playthrough backend api service', () => {
   let pbas: PlaythroughBackendApiService;
@@ -62,7 +65,7 @@ describe('Playthrough backend api service', () => {
         }
       },
       actions: [{
-        action_type: 'AnswerSubmit',
+        action_type: LearnerActionType.AnswerSubmit,
         action_customization_args: {
           state_name: {
             value: ''
