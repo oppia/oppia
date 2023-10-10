@@ -94,7 +94,7 @@ var StoryEditorPage = function() {
   var nextChapterCard = $('.e2e-test-next-chapter-card');
   var nodeDescriptionInputField = $('.e2e-test-add-chapter-description');
   var nodeOutlineEditor = $('.e2e-test-add-chapter-outline');
-  var nodeOutlineEditorContent = $('.e2e-test-node-outline-editor-content');
+  var storyNodeHeader = $('.e2e-test-story-node-header');
   var nodeOutlineFinalizeCheckbox = $('.e2e-test-finalize-outline');
   var nodeOutlineEditorRteContentSelector = function() {
     return $$('.e2e-test-rte');
@@ -449,9 +449,7 @@ var StoryEditorPage = function() {
   };
 
   this.changeNodeOutline = async function(richTextInstructions) {
-    await waitFor.visibilityOf(
-      nodeOutlineEditorContent, 'Node outline editor content taking too long to appear.');
-    await action.click('Chapter node editor content', nodeOutlineEditorContent);
+    await action.click('Story node header', storyNodeHeader);
     await waitFor.visibilityOf(
       nodeOutlineEditor, 'Node outline editor taking too long to appear.');
     var editor = await forms.RichTextEditor(
