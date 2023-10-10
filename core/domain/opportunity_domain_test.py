@@ -335,3 +335,37 @@ class SkillOpportunityDomainTest(test_utils.GenericTestBase):
             'Expected question_count to be a non-negative integer, '
             'received -5'
         )
+
+
+class PinnedOpportunityDomainTest(test_utils.GenericTestBase):
+    """Tests for the PinnedOpportunity domain object."""
+
+    def setUp(self) -> None:
+        super().setUp()
+        valid_pinned_opportunity_dict: opportunity_domain.PinnedOpportunityDict = { # pylint: disable=line-too-long
+            'language_code': 'en',
+            'topic_id': 'topic_id_1',
+            'opportunity_id': 'opportunity_id1'
+        }
+        self.valid_pinned_opportunity = opportunity_domain.PinnedOpportunity.from_dict( # pylint: disable=line-too-long
+            valid_pinned_opportunity_dict
+        )
+
+    def test_to_and_from_dict_works_correctly(self) -> None:
+        pinned_opportunity_dict: opportunity_domain.PinnedOpportunityDict = {
+            'language_code': 'en',
+            'topic_id': 'topic_id_1',
+            'opportunity_id': 'opportunity_id1'
+        }
+
+        pinned_opportunity = (
+            opportunity_domain.PinnedOpportunity.
+                from_dict(pinned_opportunity_dict))
+
+        self.assertTrue(isinstance(
+            pinned_opportunity, opportunity_domain.PinnedOpportunity))
+        self.assertEqual(pinned_opportunity.to_dict(), {
+            'language_code': 'en',
+            'topic_id': 'topic_id_1',
+            'opportunity_id': 'opportunity_id1'
+        })
