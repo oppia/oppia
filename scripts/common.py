@@ -34,6 +34,7 @@ from urllib import error as urlerror
 from urllib import request as urlrequest
 
 from core import constants
+from core import feconf
 from scripts import servers
 
 from typing import Dict, Final, Generator, List, Optional, Union
@@ -880,7 +881,8 @@ def url_retrieve(
                 with open(output_path, 'wb') as output_file:
                     output_file.write(response.read())
         except (
-            urlerror.URLError, ssl.SSLError, client.IncompleteRead
+            urlerror.URLError, ssl.SSLError,
+            client.IncompleteRead, ConnectionResetError
         ) as exception:
             failures += 1
             print('Attempt %d of %d failed when downloading %s.' % (
@@ -978,39 +980,43 @@ def modify_constants(
         expected_number_of_replacements=1
     )
 
-    branch_name_variable = (
-        '"BRANCH_NAME": "%s"'
-        % (
-            subprocess.check_output(
-                ['git', 'rev-parse', '--abbrev-ref', 'HEAD'],
-                encoding='utf-8'
-            ).strip().split('\n', maxsplit=1)[0]
-            if version_info_must_be_set else ''
-        )
-    )
-    inplace_replace_file(
-        CONSTANTS_FILE_PATH,
-        r'"BRANCH_NAME": ".*"',
-        branch_name_variable,
-        expected_number_of_replacements=1
-    )
+    if feconf.OPPIA_IS_DOCKERIZED:
+        return
 
-    short_commit_hash_variable = (
-        '"SHORT_COMMIT_HASH": "%s"'
-        % (
-            subprocess.check_output(
-                ['git', 'rev-parse', '--short', 'HEAD'],
-                encoding='utf-8'
-            ).strip().split('\n', maxsplit=1)[0]
-            if version_info_must_be_set else ''
+    if prod_env or version_info_must_be_set is False:
+        branch_name_variable = (
+            '"BRANCH_NAME": "%s"'
+            % (
+                subprocess.check_output(
+                    ['git', 'rev-parse', '--abbrev-ref', 'HEAD'],
+                    encoding='utf-8'
+                ).strip().split('\n', maxsplit=1)[0]
+                if version_info_must_be_set else ''
+            )
         )
-    )
-    inplace_replace_file(
-        CONSTANTS_FILE_PATH,
-        r'"SHORT_COMMIT_HASH": ".*"',
-        short_commit_hash_variable,
-        expected_number_of_replacements=1
-    )
+        inplace_replace_file(
+            CONSTANTS_FILE_PATH,
+            r'"BRANCH_NAME": ".*"',
+            branch_name_variable,
+            expected_number_of_replacements=1
+        )
+
+        short_commit_hash_variable = (
+            '"SHORT_COMMIT_HASH": "%s"'
+            % (
+                subprocess.check_output(
+                    ['git', 'rev-parse', '--short', 'HEAD'],
+                    encoding='utf-8'
+                ).strip().split('\n', maxsplit=1)[0]
+                if version_info_must_be_set else ''
+            )
+        )
+        inplace_replace_file(
+            CONSTANTS_FILE_PATH,
+            r'"SHORT_COMMIT_HASH": ".*"',
+            short_commit_hash_variable,
+            expected_number_of_replacements=1
+        )
 
 
 def is_oppia_server_already_running() -> bool:

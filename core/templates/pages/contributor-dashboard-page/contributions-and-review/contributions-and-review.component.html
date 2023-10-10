@@ -48,7 +48,7 @@
   <div class="oppia-contributions-show-review-side-navbar-container" >
     <div class="oppia-contributions-side-navbar-part" *ngIf="reviewTabs.length > 0" tabindex="0">
       <div class="oppia-contributions-navbar-items-list" navbar-label="Available Tasks" aria-label="Available tasks">
-        <div class="oppia-contributions-navbar-item" *ngFor="let tab of reviewTabs">
+        <div class="oppia-contributions-navbar-item e2e-test-review-buttons" *ngFor="let tab of reviewTabs">
           <button class="oppia-contributions-navbar-button"
                   (click)="switchToTab(TAB_TYPE_REVIEWS, tab.tabSubType)"
                   [ngClass]="isActiveTab(TAB_TYPE_REVIEWS, tab.tabSubType) ? 'oppia-contributions-active-navbar' : ''">{{tab.text}}
@@ -85,7 +85,7 @@
     </div>
     <div class="oppia-login-required" *ngIf="userDetailsLoading || userIsLoggedIn">
       <div *ngIf="activeExplorationId === null && isReviewTranslationsTab() && !isAccomplishmentsTabActive()" class="oppia-language-selector-container">
-        <review-translation-language-selector class="oppia-language-selector"
+        <review-translation-language-selector class="oppia-language-selector e2e-test-language-dropdown"
                                               [activeLanguageCode]="languageCode"
                                               (setActiveLanguageCode)="onChangeLanguage($event)">
         </review-translation-language-selector>
@@ -124,7 +124,7 @@
         <oppia-opportunities-list [loadOpportunities]="loadOpportunities.bind(this)"
                                   [loadMoreOpportunities]="loadMoreOpportunities.bind(this)"
                                   (clickActionButton)="onClickViewSuggestion($event)"
-                                  [labelRequired]="!activeReviewTab"
+                                  [labelRequired]="!isReviewTranslationsTab()"
                                   [opportunityHeadingTruncationLength]="30"
                                   [showOpportunityButton]="false">
         </oppia-opportunities-list>
@@ -275,7 +275,7 @@
   }
 
   .oppia-contributions-back-button-label {
-    color: #009688;
+    color: #00645d;
     font-weight: bold;
     margin-left: 6px;
   }
@@ -360,11 +360,9 @@
 
   .oppia-contributions-tab-panel {
     font-size: 15px;
-    padding: 5px 0 20px 10px;
   }
 
   .oppia-contributions-tab-panel-container {
-    padding-bottom: 46px;
     padding-top: 13px;
   }
 

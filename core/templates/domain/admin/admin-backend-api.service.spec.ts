@@ -56,7 +56,11 @@ describe('Admin backend api service', () => {
         total_published_node_count: 0,
         can_edit_topic: true,
         is_published: false,
-        url_fragment: ''
+        url_fragment: '',
+        total_upcoming_chapters_count: 1,
+        total_overdue_chapters_count: 1,
+        total_chapter_counts_for_each_story: [5, 4],
+        published_chapter_counts_for_each_story: [3, 4]
       }
     ],
     updatable_roles: ['TOPIC_MANAGER'],
@@ -65,12 +69,18 @@ describe('Admin backend api service', () => {
     },
     demo_collections: [],
     config_properties: {
-      oppia_csrf_secret: {
+      classroom_pages_data: {
         schema: {
-          type: 'unicode'
+          type: 'list'
         } as Schema,
-        value: '3WHOWnD3sy0r1wukJ2lX4vBS_YA=',
-        description: 'Text used to encrypt CSRF tokens.'
+        value: {
+          name: 'math',
+          url_fragment: 'math',
+          course_details: '',
+          topic_list_intro: '',
+          topic_ids: []
+        },
+        description: 'The details for each classroom page.'
       }
     },
     demo_exploration_ids: ['19'],
@@ -87,8 +97,8 @@ describe('Admin backend api service', () => {
       data_type: 'string',
       rules: [{
         filters: [{
-          type: PlatformParameterFilterType.ServerMode,
-          conditions: [['=', 'dev'] as [string, string]]
+          type: PlatformParameterFilterType.PlatformType,
+          conditions: [['=', 'Web'] as [string, string]]
         }],
         value_when_matched: ''
       }],
@@ -106,21 +116,7 @@ describe('Admin backend api service', () => {
       topic_ids: [],
       topic_list_intro: 'fsd',
       url_fragment: 'mathfsad',
-    },
-    contributor_dashboard_reviewer_emails_is_enabled: true,
-    email_footer: 'fsdf',
-    email_sender_name: 'Site Admin',
-    enable_admin_notifications_for_reviewer_shortage: false,
-    max_number_of_suggestions_per_reviewer: 5,
-    notification_user_ids_for_failed_tasks: [],
-    notify_admins_suggestions_waiting_too_long_is_enabled: false,
-    oppia_csrf_secret: 'H62T5aIngXb1PB6arDkFrAnxakpQ=',
-    record_playthrough_probability: 0.2,
-    signup_email_content: {
-      subject: 'THIS IS A PLACEHOLDER.',
-      html_body: 'THIS IS A <b>PLACEHOLDER</b> AND SHOULD BE REPLACED.'
-    },
-    unpublish_exploration_email_html_body: 'test'
+    }
   };
 
   beforeEach(() => {
@@ -966,7 +962,7 @@ describe('Admin backend api service', () => {
     'value given the config property ID when calling' +
     'revertConfigPropertyAsync', fakeAsync(() => {
     let action = 'revert_config_property';
-    let configPropertyId = 'record_playthrough_probability';
+    let configPropertyId = 'classroom_pages_data';
     let payload = {
       action: action,
       config_property_id: configPropertyId

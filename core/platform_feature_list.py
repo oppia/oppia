@@ -44,6 +44,8 @@ ParamNames = params.ParamNames
 # be in dev stage otherwise it will cause a test error in the backend test.
 DEV_FEATURES_LIST = [
     params.ParamNames.SERIAL_CHAPTER_LAUNCH_CURRICULUM_ADMIN_VIEW,
+    params.ParamNames.SERIAL_CHAPTER_LAUNCH_LEARNER_VIEW,
+    params.ParamNames.SHOW_FEEDBACK_UPDATES_IN_PROFILE_PIC_DROPDOWN,
     params.ParamNames.SHOW_REDESIGNED_LEARNER_DASHBOARD,
     params.ParamNames.SHOW_TRANSLATION_SIZE
 ]
@@ -51,6 +53,7 @@ DEV_FEATURES_LIST = [
 # Names of features in test stage, the corresponding feature flag instances must
 # be in test stage otherwise it will cause a test error in the backend test.
 TEST_FEATURES_LIST: List[ParamNames] = [
+    params.ParamNames.CD_ADMIN_DASHBOARD_NEW_UI
 ]
 
 # Names of features in prod stage, the corresponding feature flag instances must
@@ -71,4 +74,31 @@ PROD_FEATURES_LIST: List[ParamNames] = [
 # completed and no longer gated because their functionality is permanently
 # built into the codebase.
 DEPRECATED_FEATURE_NAMES: List[ParamNames] = [
+]
+
+ALL_PLATFORM_PARAMS_EXCEPT_FEATURE_FLAGS: List[ParamNames] = [
+    params.ParamNames.ALWAYS_ASK_LEARNERS_FOR_ANSWER_DETAILS,
+    params.ParamNames.CONTRIBUTOR_DASHBOARD_REVIEWER_EMAILS_IS_ENABLED,
+    params.ParamNames.DUMMY_PARAMETER,
+    params.ParamNames.EMAIL_FOOTER,
+    params.ParamNames.EMAIL_SENDER_NAME,
+    params.ParamNames.ENABLE_ADMIN_NOTIFICATIONS_FOR_REVIEWER_SHORTAGE,
+    params.ParamNames.ENABLE_ADMIN_NOTIFICATIONS_FOR_SUGGESTIONS_NEEDING_REVIEW,
+    (
+        params.ParamNames.
+        HIGH_BOUNCE_RATE_TASK_STATE_BOUNCE_RATE_CREATION_THRESHOLD
+    ),
+    (
+        params.ParamNames.
+        HIGH_BOUNCE_RATE_TASK_STATE_BOUNCE_RATE_OBSOLETION_THRESHOLD
+    ),
+    params.ParamNames.HIGH_BOUNCE_RATE_TASK_MINIMUM_EXPLORATION_STARTS,
+    params.ParamNames.MAX_NUMBER_OF_TAGS_ASSIGNED_TO_BLOG_POST,
+    params.ParamNames.MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER,
+    params.ParamNames.PROMO_BAR_ENABLED,
+    params.ParamNames.PROMO_BAR_MESSAGE,
+    params.ParamNames.SIGNUP_EMAIL_BODY_CONTENT,
+    params.ParamNames.SIGNUP_EMAIL_SUBJECT_CONTENT,
+    params.ParamNames.UNPUBLISH_EXPLORATION_EMAIL_HTML_BODY,
+    params.ParamNames.RECORD_PLAYTHROUGH_PROBABILITY
 ]

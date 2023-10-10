@@ -28,6 +28,7 @@ import urllib
 import zipfile
 
 from core import utils
+from scripts import install_dependencies_json_packages
 from typing import Dict, Final, List, Literal, Optional, TypedDict, cast
 
 from . import common
@@ -353,56 +354,6 @@ def validate_dependencies(filepath: str) -> None:
             test_dependencies_syntax(download_format, dependency_contents)
 
 
-def download_all_dependencies(filepath: str) -> None:
-    """This download all files to the required folders.
-
-    Args:
-        filepath: str. The path to the json file.
-    """
-    validate_dependencies(filepath)
-    dependencies_data = return_json(filepath)
-    dependencies = dependencies_data['dependencies']
-    for data, dependency in dependencies.items():
-        for _, dependency_contents in dependency.items():
-            dependency_rev = dependency_contents['version']
-            dependency_url = dependency_contents['url']
-            download_format = dependency_contents['downloadFormat']
-            if download_format == _DOWNLOAD_FORMAT_FILES:
-                dependency_files = dependency_contents['files']
-                target_dirname = (
-                    dependency_contents['targetDirPrefix'] + dependency_rev)
-                dependency_dst = os.path.join(
-                    TARGET_DOWNLOAD_DIRS[data], target_dirname)
-                download_files(dependency_url, dependency_dst, dependency_files)
-
-            elif download_format == _DOWNLOAD_FORMAT_ZIP:
-                if 'rootDir' in dependency_contents:
-                    dependency_zip_root_name = dependency_contents['rootDir']
-                else:
-                    dependency_zip_root_name = (
-                        dependency_contents['rootDirPrefix'] + dependency_rev)
-
-                if 'targetDir' in dependency_contents:
-                    dependency_target_root_name = (
-                        dependency_contents['targetDir'])
-                else:
-                    dependency_target_root_name = (
-                        dependency_contents['targetDirPrefix'] + dependency_rev)
-                download_and_unzip_files(
-                    dependency_url, TARGET_DOWNLOAD_DIRS[data],
-                    dependency_zip_root_name, dependency_target_root_name)
-
-            elif download_format == _DOWNLOAD_FORMAT_TAR:
-                dependency_tar_root_name = (
-                    dependency_contents['tarRootDirPrefix'] + dependency_rev)
-
-                dependency_target_root_name = (
-                    dependency_contents['targetDirPrefix'] + dependency_rev)
-                download_and_untar_files(
-                    dependency_url, TARGET_DOWNLOAD_DIRS[data],
-                    dependency_tar_root_name, dependency_target_root_name)
-
-
 def install_elasticsearch_dev_server() -> None:
     """This installs a local ElasticSearch server to the oppia_tools
     directory to be used by development servers and backend tests.
@@ -519,7 +470,8 @@ def main(args: Optional[List[str]] = None) -> None:
             'your machine is on the Windows operating system.')
     unused_parsed_args = _PARSER.parse_args(args=args)
     install_python_prod_dependencies.main()
-    download_all_dependencies(DEPENDENCIES_FILE_PATH)
+    install_dependencies_json_packages.download_all_dependencies(
+        DEPENDENCIES_FILE_PATH)
     install_redis_cli()
     install_elasticsearch_dev_server()
 

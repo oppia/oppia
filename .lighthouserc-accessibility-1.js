@@ -29,7 +29,9 @@ module.exports = {
       'assertMatrix': [
         {
           'matchingUrlPattern': '^http://127.0.0.1:8181/$',
-          'assertions': baseConfig['baseAccessibilityAssertions']
+          'assertions': {
+            'categories:accessibility': ['error', {'minScore': 1}]
+          }
         },
         {
           'matchingUrlPattern': '^http://127.0.0.1:8181/about$',
@@ -39,7 +41,9 @@ module.exports = {
         },
         {
           'matchingUrlPattern': '^http://127.0.0.1:8181/admin$',
-          'assertions': baseConfig['baseAccessibilityAssertions']
+          'assertions': {
+            'categories:accessibility': ['error', {'minScore': 1}]
+          }
         },
         {
           'matchingUrlPattern': '^http://127.0.0.1:8181/blog-dashboard$',
@@ -62,13 +66,13 @@ module.exports = {
         {
           'matchingUrlPattern': '^http://127.0.0.1:8181/contributor-dashboard$',
           'assertions': {
-            'categories:accessibility': ['error', {'minScore': 0.98}]
+            'categories:accessibility': ['error', {'minScore': 1}]
           }
         },
         {
           'matchingUrlPattern': '^http://127.0.0.1:8181/creator-dashboard$',
           'assertions': {
-            'categories:accessibility': ['error', {'minScore': 0.98}]
+            'categories:accessibility': ['error', {'minScore': 1}]
           }
         },
         {
@@ -85,7 +89,9 @@ module.exports = {
         },
         {
           'matchingUrlPattern': '^http://127.0.0.1:8181/emailDashboard$',
-          'assertions': baseConfig['baseAccessibilityAssertions']
+          'assertions': {
+            'categories:accessibility': ['error', {'minScore': 1}]
+          }
         },
         {
           'matchingUrlPattern': '^http://127.0.0.1:8181/get-started$',
@@ -96,7 +102,7 @@ module.exports = {
         {
           'matchingUrlPattern': '^http://127.0.0.1:8181/learner-dashboard$',
           'assertions': {
-            'categories:accessibility': ['error', {'minScore': 0.98}]
+            'categories:accessibility': ['error', {'minScore': 1}]
           }
         },
         {

@@ -23,19 +23,21 @@ from core import feconf
 from core import utils
 from core.constants import constants
 from core.domain import change_domain
-from core.domain import config_services
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import fs_services
 from core.domain import html_validation_service
+from core.domain import platform_feature_services
 from core.domain import question_domain
 from core.domain import question_services
 from core.domain import skill_services
 from core.domain import state_domain
 from core.domain import suggestion_registry
 from core.domain import suggestion_services
+from core.domain import topic_fetchers
 from core.domain import translation_domain
 from core.domain import translation_fetchers
+from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
 from extensions import domain
@@ -139,6 +141,7 @@ class SuggestionEditStateContentDict(TypedDict):
     score_category: str
     language_code: Optional[str]
     last_updated: float
+    created_on: float
     edited_by_reviewer: bool
 
 
@@ -177,6 +180,7 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
             'score_category': 'content.Algebra',
             'language_code': None,
             'last_updated': utils.get_time_in_millisecs(self.fake_date),
+            'created_on': utils.get_time_in_millisecs(self.fake_date),
             'edited_by_reviewer': False
         }
 
@@ -190,7 +194,9 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
             expected_suggestion_dict['status'], self.author_id,
             self.reviewer_id, expected_suggestion_dict['change'],
             expected_suggestion_dict['score_category'],
-            expected_suggestion_dict['language_code'], False, self.fake_date)
+            expected_suggestion_dict['language_code'], False, self.fake_date,
+            self.fake_date
+        )
 
         self.assertDictEqual(
             observed_suggestion.to_dict(), expected_suggestion_dict)
@@ -925,6 +931,7 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
             'score_category': 'translation.Algebra',
             'language_code': 'hi',
             'last_updated': utils.get_time_in_millisecs(self.fake_date),
+            'created_on': utils.get_time_in_millisecs(self.fake_date),
             'edited_by_reviewer': False
         }
 
@@ -1057,7 +1064,9 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
             expected_suggestion_dict['status'], self.author_id,
             self.reviewer_id, expected_suggestion_dict['change'],
             expected_suggestion_dict['score_category'],
-            expected_suggestion_dict['language_code'], False, self.fake_date)
+            expected_suggestion_dict['language_code'], False, self.fake_date,
+            self.fake_date
+        )
 
         self.assertDictEqual(
             observed_suggestion.to_dict(), expected_suggestion_dict)
@@ -1782,6 +1791,7 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             'score_category': 'question.topic_1',
             'language_code': 'en',
             'last_updated': utils.get_time_in_millisecs(self.fake_date),
+            'created_on': utils.get_time_in_millisecs(self.fake_date),
             'edited_by_reviewer': False
         }
 
@@ -1795,7 +1805,9 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             expected_suggestion_dict['status'], self.author_id,
             self.reviewer_id, expected_suggestion_dict['change'],
             expected_suggestion_dict['score_category'],
-            expected_suggestion_dict['language_code'], False, self.fake_date)
+            expected_suggestion_dict['language_code'], False, self.fake_date,
+            self.fake_date
+        )
 
         self.assertDictEqual(
             observed_suggestion.to_dict(), expected_suggestion_dict)
@@ -2602,6 +2614,7 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             'score_category': 'question.skill1',
             'language_code': 'en',
             'last_updated': utils.get_time_in_millisecs(self.fake_date),
+            'created_on': utils.get_time_in_millisecs(self.fake_date),
             'edited_by_reviewer': False
         }
         suggestion = suggestion_registry.SuggestionAddQuestion(
@@ -2668,6 +2681,7 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             'score_category': 'question.skill1',
             'language_code': 'en',
             'last_updated': utils.get_time_in_millisecs(self.fake_date),
+            'created_on': utils.get_time_in_millisecs(self.fake_date),
             'edited_by_reviewer': False
         }
         suggestion = suggestion_registry.SuggestionAddQuestion(
@@ -2814,6 +2828,7 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             'score_category': 'question.skill1',
             'language_code': 'en',
             'last_updated': utils.get_time_in_millisecs(self.fake_date),
+            'created_on': utils.get_time_in_millisecs(self.fake_date),
             'edited_by_reviewer': False
         }
         self.save_new_skill(
@@ -3189,12 +3204,16 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
             self.sample_language_code, 2)
         stats.set_translation_reviewer_count_for_language_code(
             self.sample_language_code, 1)
-        config_services.set_property(
-            'committer_id', 'max_number_of_suggestions_per_reviewer', 1)
+        swap_platform_parameter_value = self.swap_to_always_return(
+            platform_feature_services,
+            'get_platform_parameter_value',
+            1
+        )
 
-        reviewers_are_needed = (
-            stats.are_translation_reviewers_needed_for_lang_code(
-                self.sample_language_code))
+        with swap_platform_parameter_value:
+            reviewers_are_needed = (
+                stats.are_translation_reviewers_needed_for_lang_code(
+                    self.sample_language_code))
 
         self.assertTrue(reviewers_are_needed)
 
@@ -3206,12 +3225,16 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
             self.sample_language_code, 2)
         stats.set_translation_reviewer_count_for_language_code(
             self.sample_language_code, 2)
-        config_services.set_property(
-            'committer_id', 'max_number_of_suggestions_per_reviewer', 1)
+        swap_platform_parameter_value = self.swap_to_always_return(
+            platform_feature_services,
+            'get_platform_parameter_value',
+            1
+        )
 
-        reviewers_are_needed = (
-            stats.are_translation_reviewers_needed_for_lang_code(
-                self.sample_language_code))
+        with swap_platform_parameter_value:
+            reviewers_are_needed = (
+                stats.are_translation_reviewers_needed_for_lang_code(
+                    self.sample_language_code))
 
         self.assertFalse(reviewers_are_needed)
 
@@ -3223,12 +3246,16 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
             self.sample_language_code, 1)
         stats.set_translation_reviewer_count_for_language_code(
             self.sample_language_code, 2)
-        config_services.set_property(
-            'committer_id', 'max_number_of_suggestions_per_reviewer', 1)
+        swap_platform_parameter_value = self.swap_to_always_return(
+            platform_feature_services,
+            'get_platform_parameter_value',
+            1
+        )
 
-        reviewers_are_needed = (
-            stats.are_translation_reviewers_needed_for_lang_code(
-                self.sample_language_code))
+        with swap_platform_parameter_value:
+            reviewers_are_needed = (
+                stats.are_translation_reviewers_needed_for_lang_code(
+                    self.sample_language_code))
 
         self.assertFalse(reviewers_are_needed)
 
@@ -3267,10 +3294,14 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
         stats = suggestion_services.get_community_contribution_stats()
         stats.question_suggestion_count = 2
         stats.question_reviewer_count = 1
-        config_services.set_property(
-            'committer_id', 'max_number_of_suggestions_per_reviewer', 1)
+        swap_platform_parameter_value = self.swap_to_always_return(
+            platform_feature_services,
+            'get_platform_parameter_value',
+            1
+        )
 
-        reviewers_are_needed = stats.are_question_reviewers_needed()
+        with swap_platform_parameter_value:
+            reviewers_are_needed = stats.are_question_reviewers_needed()
 
         self.assertTrue(reviewers_are_needed)
 
@@ -3280,10 +3311,14 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
         stats = suggestion_services.get_community_contribution_stats()
         stats.question_suggestion_count = 2
         stats.question_reviewer_count = 2
-        config_services.set_property(
-            'committer_id', 'max_number_of_suggestions_per_reviewer', 1)
+        swap_platform_parameter_value = self.swap_to_always_return(
+            platform_feature_services,
+            'get_platform_parameter_value',
+            1
+        )
 
-        reviewers_are_needed = stats.are_question_reviewers_needed()
+        with swap_platform_parameter_value:
+            reviewers_are_needed = stats.are_question_reviewers_needed()
 
         self.assertFalse(reviewers_are_needed)
 
@@ -3293,10 +3328,14 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
         stats = suggestion_services.get_community_contribution_stats()
         stats.question_suggestion_count = 1
         stats.question_reviewer_count = 2
-        config_services.set_property(
-            'committer_id', 'max_number_of_suggestions_per_reviewer', 1)
+        swap_platform_parameter_value = self.swap_to_always_return(
+            platform_feature_services,
+            'get_platform_parameter_value',
+            1
+        )
 
-        reviewers_are_needed = stats.are_question_reviewers_needed()
+        with swap_platform_parameter_value:
+            reviewers_are_needed = stats.are_question_reviewers_needed()
 
         self.assertFalse(reviewers_are_needed)
 
@@ -3852,7 +3891,6 @@ class TranslationSubmitterTotalContributionStatsUnitTests(
     """Tests for the TranslationSubmitterTotalContributionStats class."""
 
     SUGGESTION_LANGUAGE_CODE: Final = 'es'
-    USER_ID_1: Final = 'uid_01234567890123456789012345678912'
     TOPIC_IDS_WITH_TRANSLATION_SUBMISSIONS: Final = ['topic1', 'topic2']
     RECENT_REVIEW_OUTCOMES: Final = ['accepted', 'rejected']
     RECENT_PERFORMANCE: Final = 2
@@ -3867,14 +3905,43 @@ class TranslationSubmitterTotalContributionStatsUnitTests(
     FIRST_CONTRIBUTION_DATE = datetime.date.today()
     LAST_CONTRIBUTION_DATE = (
         datetime.date.today() - datetime.timedelta(25))
+    user_id: str = 'user_id'
+    story_id_1: str = 'story_1'
+    story_id_2: str = 'story_2'
+    story_id_3: str = 'story_3'
+    subtopic_id: int = 1
+    skill_id_1: str = 'skill_1'
+    skill_id_2: str = 'skill_2'
 
     def test_to_frontend_dict(self) -> None:
+        auth_id = 'someUser'
+        username = 'username'
+        user_settings = user_services.create_new_user(
+            auth_id, 'user@example.com')
+        user_services.set_username(user_settings.user_id, username)
+        topic_id_1 = topic_fetchers.get_new_topic_id()
+        topic_id_2 = topic_fetchers.get_new_topic_id()
+        self.save_new_topic(
+            topic_id_1, self.user_id, name='topic1',
+            abbreviated_name='name1', url_fragment='name-one',
+            description='Description',
+            canonical_story_ids=[self.story_id_1, self.story_id_2],
+            additional_story_ids=[self.story_id_3],
+            uncategorized_skill_ids=[self.skill_id_1, self.skill_id_2],
+            subtopics=[], next_subtopic_id=1)
+        self.save_new_topic(
+            topic_id_2, self.user_id, name='topic2',
+            abbreviated_name='name2', url_fragment='name-two',
+            description='Description',
+            canonical_story_ids=[self.story_id_1, self.story_id_2],
+            additional_story_ids=[self.story_id_3],
+            uncategorized_skill_ids=[self.skill_id_1, self.skill_id_2],
+            subtopics=[], next_subtopic_id=1)
         expected_frontend_dict = {
             'language_code': self.SUGGESTION_LANGUAGE_CODE,
-            'contributor_id': self.USER_ID_1,
-            'topic_ids_with_translation_submissions': (
+            'contributor_name': username,
+            'topic_names': (
                 self.TOPIC_IDS_WITH_TRANSLATION_SUBMISSIONS),
-            'recent_review_outcomes': self.RECENT_REVIEW_OUTCOMES,
             'recent_performance': self.RECENT_PERFORMANCE,
             'overall_accuracy': self.OVERALL_ACCURACY,
             'submitted_translations_count': (
@@ -3899,8 +3966,9 @@ class TranslationSubmitterTotalContributionStatsUnitTests(
         }
 
         actual_stats = suggestion_registry.TranslationSubmitterTotalContributionStats( # pylint: disable=line-too-long
-            self.SUGGESTION_LANGUAGE_CODE, self.USER_ID_1,
-            self.TOPIC_IDS_WITH_TRANSLATION_SUBMISSIONS,
+            self.SUGGESTION_LANGUAGE_CODE,
+            user_settings.user_id,
+            [topic_id_1, topic_id_2],
             self.RECENT_REVIEW_OUTCOMES, self.RECENT_PERFORMANCE,
             self.OVERALL_ACCURACY,
             self.SUBMITTED_TRANSLATIONS_COUNT,
@@ -3922,7 +3990,6 @@ class TranslationReviewerTotalContributionStatsUnitTests(
     """Tests for the TranslationReviewerTotalContributionStats class."""
 
     SUGGESTION_LANGUAGE_CODE: Final = 'es'
-    USER_ID_1: Final = 'uid_01234567890123456789012345678912'
     TOPIC_IDS_WITH_TRANSLATION_REVIEWS: Final = ['topic1', 'topic2']
     REVIEWED_TRANSLATIONS_COUNT: Final = 2
     ACCEPTED_TRANSLATIONS_COUNT: Final = 1
@@ -3932,12 +3999,42 @@ class TranslationReviewerTotalContributionStatsUnitTests(
     FIRST_CONTRIBUTION_DATE = datetime.date.today()
     LAST_CONTRIBUTION_DATE = (
         datetime.date.today() - datetime.timedelta(25))
+    user_id: str = 'user_id'
+    story_id_1: str = 'story_1'
+    story_id_2: str = 'story_2'
+    story_id_3: str = 'story_3'
+    subtopic_id: int = 1
+    skill_id_1: str = 'skill_1'
+    skill_id_2: str = 'skill_2'
 
     def test_to_frontend_dict(self) -> None:
+        auth_id = 'someUser'
+        username = 'username'
+        user_settings = user_services.create_new_user(
+            auth_id, 'user@example.com')
+        user_services.set_username(user_settings.user_id, username)
+        topic_id_1 = topic_fetchers.get_new_topic_id()
+        topic_id_2 = topic_fetchers.get_new_topic_id()
+        self.save_new_topic(
+            topic_id_1, self.user_id, name='topic1',
+            abbreviated_name='name1', url_fragment='name-one',
+            description='Description',
+            canonical_story_ids=[self.story_id_1, self.story_id_2],
+            additional_story_ids=[self.story_id_3],
+            uncategorized_skill_ids=[self.skill_id_1, self.skill_id_2],
+            subtopics=[], next_subtopic_id=1)
+        self.save_new_topic(
+            topic_id_2, self.user_id, name='topic2',
+            abbreviated_name='name2', url_fragment='name-two',
+            description='Description',
+            canonical_story_ids=[self.story_id_1, self.story_id_2],
+            additional_story_ids=[self.story_id_3],
+            uncategorized_skill_ids=[self.skill_id_1, self.skill_id_2],
+            subtopics=[], next_subtopic_id=1)
         expected_stats_dict = {
             'language_code': self.SUGGESTION_LANGUAGE_CODE,
-            'contributor_id': self.USER_ID_1,
-            'topic_ids_with_translation_reviews': (
+            'contributor_name': username,
+            'topic_names': (
                 self.TOPIC_IDS_WITH_TRANSLATION_REVIEWS),
             'reviewed_translations_count': (
                 self.REVIEWED_TRANSLATIONS_COUNT),
@@ -3957,8 +4054,9 @@ class TranslationReviewerTotalContributionStatsUnitTests(
         }
 
         actual_stats = suggestion_registry.TranslationReviewerTotalContributionStats( # pylint: disable=line-too-long
-            self.SUGGESTION_LANGUAGE_CODE, self.USER_ID_1,
-            self.TOPIC_IDS_WITH_TRANSLATION_REVIEWS,
+            self.SUGGESTION_LANGUAGE_CODE,
+            user_settings.user_id,
+            [topic_id_1, topic_id_2],
             self.REVIEWED_TRANSLATIONS_COUNT,
             self.ACCEPTED_TRANSLATIONS_COUNT,
             self.ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT,
@@ -3975,7 +4073,6 @@ class QuestionSubmitterTotalContributionStatsUnitTests(
     test_utils.GenericTestBase):
     """Tests for the QuestionSubmitterTotalContributionStats class."""
 
-    USER_ID_1: Final = 'uid_01234567890123456789012345678912'
     TOPIC_IDS_WITH_QUESTION_SUBMISSIONS: Final = ['topic1', 'topic2']
     RECENT_REVIEW_OUTCOMES: Final = ['accepted', 'rejected']
     RECENT_PERFORMANCE: Final = 2
@@ -3990,13 +4087,42 @@ class QuestionSubmitterTotalContributionStatsUnitTests(
     FIRST_CONTRIBUTION_DATE = datetime.date.today()
     LAST_CONTRIBUTION_DATE = (
         datetime.date.today() - datetime.timedelta(25))
+    user_id: str = 'user_id'
+    story_id_1: str = 'story_1'
+    story_id_2: str = 'story_2'
+    story_id_3: str = 'story_3'
+    subtopic_id: int = 1
+    skill_id_1: str = 'skill_1'
+    skill_id_2: str = 'skill_2'
 
     def test_to_frontend_dict(self) -> None:
+        auth_id = 'someUser'
+        username = 'username'
+        user_settings = user_services.create_new_user(
+            auth_id, 'user@example.com')
+        user_services.set_username(user_settings.user_id, username)
+        topic_id_1 = topic_fetchers.get_new_topic_id()
+        topic_id_2 = topic_fetchers.get_new_topic_id()
+        self.save_new_topic(
+            topic_id_1, self.user_id, name='topic1',
+            abbreviated_name='name1', url_fragment='name-one',
+            description='Description',
+            canonical_story_ids=[self.story_id_1, self.story_id_2],
+            additional_story_ids=[self.story_id_3],
+            uncategorized_skill_ids=[self.skill_id_1, self.skill_id_2],
+            subtopics=[], next_subtopic_id=1)
+        self.save_new_topic(
+            topic_id_2, self.user_id, name='topic2',
+            abbreviated_name='name2', url_fragment='name-two',
+            description='Description',
+            canonical_story_ids=[self.story_id_1, self.story_id_2],
+            additional_story_ids=[self.story_id_3],
+            uncategorized_skill_ids=[self.skill_id_1, self.skill_id_2],
+            subtopics=[], next_subtopic_id=1)
         expected_stats_dict = {
-            'contributor_id': self.USER_ID_1,
-            'topic_ids_with_question_submissions': (
+            'contributor_name': username,
+            'topic_names': (
                 self.TOPIC_IDS_WITH_QUESTION_SUBMISSIONS),
-            'recent_review_outcomes': self.RECENT_REVIEW_OUTCOMES,
             'recent_performance': self.RECENT_PERFORMANCE,
             'overall_accuracy': self.OVERALL_ACCURACY,
             'submitted_questions_count': (
@@ -4015,8 +4141,8 @@ class QuestionSubmitterTotalContributionStatsUnitTests(
         }
 
         actual_stats = suggestion_registry.QuestionSubmitterTotalContributionStats( # pylint: disable=line-too-long
-            self.USER_ID_1,
-            self.TOPIC_IDS_WITH_QUESTION_SUBMISSIONS,
+            user_settings.user_id,
+            [topic_id_1, topic_id_2],
             self.RECENT_REVIEW_OUTCOMES, self.RECENT_PERFORMANCE,
             self.OVERALL_ACCURACY,
             self.SUBMITTED_QUESTIONS_COUNT,
@@ -4034,7 +4160,6 @@ class QuestionReviewerTotalContributionStatsUnitTests(
     test_utils.GenericTestBase):
     """Tests for the QuestionReviewerTotalContributionStats class."""
 
-    USER_ID_1: Final = 'uid_01234567890123456789012345678912'
     TOPIC_IDS_WITH_QUESTION_REVIEWS: Final = ['topic1', 'topic2']
     REVIEWED_QUESTIONS_COUNT: Final = 2
     ACCEPTED_QUESTIONS_COUNT: Final = 1
@@ -4043,11 +4168,41 @@ class QuestionReviewerTotalContributionStatsUnitTests(
     FIRST_CONTRIBUTION_DATE = datetime.date.today()
     LAST_CONTRIBUTION_DATE = (
         datetime.date.today() - datetime.timedelta(25))
+    user_id: str = 'user_id'
+    story_id_1: str = 'story_1'
+    story_id_2: str = 'story_2'
+    story_id_3: str = 'story_3'
+    subtopic_id: int = 1
+    skill_id_1: str = 'skill_1'
+    skill_id_2: str = 'skill_2'
 
     def test_to_frontend_dict(self) -> None:
+        auth_id = 'someUser'
+        username = 'username'
+        user_settings = user_services.create_new_user(
+            auth_id, 'user@example.com')
+        user_services.set_username(user_settings.user_id, username)
+        topic_id_1 = topic_fetchers.get_new_topic_id()
+        topic_id_2 = topic_fetchers.get_new_topic_id()
+        self.save_new_topic(
+            topic_id_1, self.user_id, name='topic1',
+            abbreviated_name='name1', url_fragment='name-one',
+            description='Description',
+            canonical_story_ids=[self.story_id_1, self.story_id_2],
+            additional_story_ids=[self.story_id_3],
+            uncategorized_skill_ids=[self.skill_id_1, self.skill_id_2],
+            subtopics=[], next_subtopic_id=1)
+        self.save_new_topic(
+            topic_id_2, self.user_id, name='topic2',
+            abbreviated_name='name2', url_fragment='name-two',
+            description='Description',
+            canonical_story_ids=[self.story_id_1, self.story_id_2],
+            additional_story_ids=[self.story_id_3],
+            uncategorized_skill_ids=[self.skill_id_1, self.skill_id_2],
+            subtopics=[], next_subtopic_id=1)
         expected_stats_dict = {
-            'contributor_id': self.USER_ID_1,
-            'topic_ids_with_question_reviews': (
+            'contributor_name': username,
+            'topic_names': (
                 self.TOPIC_IDS_WITH_QUESTION_REVIEWS),
             'reviewed_questions_count': (
                 self.REVIEWED_QUESTIONS_COUNT),
@@ -4065,8 +4220,8 @@ class QuestionReviewerTotalContributionStatsUnitTests(
         }
 
         actual_stats = suggestion_registry.QuestionReviewerTotalContributionStats( # pylint: disable=line-too-long
-            self.USER_ID_1,
-            self.TOPIC_IDS_WITH_QUESTION_REVIEWS,
+            user_settings.user_id,
+            [topic_id_1, topic_id_2],
             self.REVIEWED_QUESTIONS_COUNT,
             self.ACCEPTED_QUESTIONS_COUNT,
             self.ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT,
@@ -4076,3 +4231,24 @@ class QuestionReviewerTotalContributionStatsUnitTests(
 
         self.assertDictEqual(
             actual_stats.to_frontend_dict(), expected_stats_dict)
+
+
+class TranslationCoordinatorStatsUnitTests(
+    test_utils.GenericTestBase):
+    """Tests for the TranslationCoordinatorStats class."""
+
+    expected_stats_dict = {
+        'language_id': 'en',
+        'coordinator_ids': ['user1', 'user2'],
+        'coordinators_count': 2
+    }
+
+    def test_to_dict(self) -> None:
+        actual_stats = suggestion_registry.TranslationCoordinatorStats( # pylint: disable=line-too-long
+            'en',
+            ['user1', 'user2'],
+            2
+        )
+
+        self.assertDictEqual(
+            actual_stats.to_dict(), self.expected_stats_dict)

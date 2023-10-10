@@ -37,6 +37,7 @@ import { QuestionObjectFactory } from 'domain/question/QuestionObjectFactory';
 import { FormatRtePreviewPipe } from 'filters/format-rte-preview.pipe';
 import { PlatformFeatureService } from 'services/platform-feature.service';
 import { OpportunitiesListComponent } from '../opportunities-list/opportunities-list.component';
+import { HtmlEscaperService } from 'services/html-escaper.service';
 
 
 class MockNgbModalRef {
@@ -80,8 +81,11 @@ describe('Contributions and review component', () => {
   let questionObjectFactory: QuestionObjectFactory;
   var getUserCreatedTranslationSuggestionsAsyncSpy = null;
   var getReviewableQuestionSuggestionsAsyncSpy = null;
+  var getReviewableTranslationSuggestionsAsyncSpy = null;
+  var getUserCreatedQuestionSuggestionsAsyncSpy = null;
   let getUserContributionRightsDataAsyncSpy = null;
   let formatRtePreviewPipe: FormatRtePreviewPipe;
+  let htmlEscaperService: HtmlEscaperService;
   const mockActiveTopicEventEmitter = new EventEmitter();
 
   beforeEach(waitForAsync(() => {
@@ -101,6 +105,7 @@ describe('Contributions and review component', () => {
         MisconceptionObjectFactory,
         SkillBackendApiService,
         FormatRtePreviewPipe,
+        HtmlEscaperService,
         QuestionObjectFactory,
         SkillObjectFactory,
         CsrfTokenService,
@@ -132,6 +137,7 @@ describe('Contributions and review component', () => {
       ContributionOpportunitiesService);
     formatRtePreviewPipe = TestBed.inject(
       FormatRtePreviewPipe);
+    htmlEscaperService = TestBed.inject(HtmlEscaperService);
     translationTopicService = TestBed.inject(TranslationTopicService);
 
     spyOn(
@@ -315,7 +321,7 @@ describe('Contributions and review component', () => {
         },
         more: false,
       }));
-    spyOn(
+    getUserCreatedQuestionSuggestionsAsyncSpy = spyOn(
       contributionAndReviewService, 'getUserCreatedQuestionSuggestionsAsync')
       .and.returnValue(Promise.resolve({
         suggestionIdToDetails: {
@@ -449,7 +455,7 @@ describe('Contributions and review component', () => {
           assignedSkillTopicData: null,
           groupedSkillSummaries: null
         }));
-    spyOn(
+    getReviewableTranslationSuggestionsAsyncSpy = spyOn(
       contributionAndReviewService,
       'getReviewableTranslationSuggestionsAsync')
       .and.returnValue(Promise.resolve({
@@ -467,8 +473,7 @@ describe('Contributions and review component', () => {
                 new_value: null,
                 old_value: null,
                 content_html: 'Translation',
-                translation_html: 'Tradução',
-                skill_id: 'skill_id'
+                translation_html: 'Tradução'
               },
               status: 'review'
             },
@@ -718,19 +723,6 @@ describe('Contributions and review component', () => {
         // satisfy code coverage for resolveSuggestionSuccess().
         spyOn(alertsService, 'addSuccessMessage').and.stub();
 
-        let suggestion = {
-          change: {
-            skill_id: 'string',
-            question_dict: null,
-            skill_difficulty: null,
-            translation_html: ['suggestion_1', 'suggestion_2']
-          },
-          target_id: 'string;,',
-          suggestion_id: 'string;',
-          author_name: 'string;',
-        };
-
-        component.getTranslationSuggestionHeading(suggestion as Suggestion);
         component.resolveSuggestionSuccess('suggestion_id');
         tick();
 
@@ -1156,6 +1148,208 @@ describe('Contributions and review component', () => {
         });
       });
 
+      it('should show only selected type when switching tabs', fakeAsync(() => {
+        const suggestion1 = {
+          suggestion_1: {
+            suggestion: {
+              target_type: 'state',
+              author_name: 'rod newt',
+              last_updated_msecs: '66778',
+              suggestion_id: 'suggestion_1',
+              target_id: '1',
+              suggestion_type: 'translate_content',
+              change: {
+                state_name: 'state',
+                new_value: 'new',
+                old_value: 'old',
+                content_html: 'Translation',
+                translation_html: 'Tradução'
+              },
+              status: 'rejected',
+              exploration_content_html: null
+            },
+            details: {
+              topic_name: 'topic_name',
+              story_title: 'story_title',
+              chapter_title: 'chapter_title'
+            }
+          }
+        };
+        const reviewableTranslation = Promise.resolve({
+          suggestionIdToDetails: suggestion1,
+          more: false
+        });
+        getReviewableTranslationSuggestionsAsyncSpy.and.returnValue(
+          reviewableTranslation);
+
+        // Go to the review translations tab, to ensure that
+        // getReviewableTranslationSuggestionsAsyncSpy is
+        // called by loadContributions.
+        component.switchToTab(
+          component.TAB_TYPE_REVIEWS, 'translate_content');
+
+        // Set up contributions with a translation to be reviewed.
+        component.loadContributions(null).then(({opportunitiesDicts, more}) => {
+          expect(Object.keys(component.contributions)).toContain(
+            'suggestion_1');
+          expect(opportunitiesDicts).toEqual([{
+            id: 'suggestion_1',
+            heading: 'Tradução',
+            subheading: 'topic_name / story_title / chapter_title',
+            labelText: 'Obsolete',
+            labelColor: '#e76c8c',
+            actionButtonTitle: 'Review',
+            translationWordCount: undefined
+          }]);
+          expect(more).toEqual(false);
+
+          // When opening the review modal for translations,
+          // only translations should be shown.
+          spyOn(component, '_showTranslationSuggestionModal');
+          component.onClickViewSuggestion('suggestion_1');
+          expect(component._showTranslationSuggestionModal).
+            toHaveBeenCalledWith(
+              suggestion1,
+              'suggestion_1',
+              true
+            );
+        });
+        // Wait for the first test to complete.
+        tick();
+
+        const suggestion2 = {
+          target_type: 'state',
+          author_name: 'eddie name',
+          last_updated_msecs: '345435',
+          suggestion_id: 'suggestion_2',
+          target_id: '1',
+          suggestion_type: 'add_question',
+          change: {
+            state_name: 'state',
+            new_value: 'new',
+            old_value: 'old',
+            skill_id: 'skill1',
+            question_dict: {
+              id: '1',
+              question_state_data: {
+                content: {
+                  html: 'Question 2',
+                  content_id: 'content_2'
+                },
+                interaction: {
+                  answer_groups: [{
+                    outcome: {
+                      dest: 'outcome 1',
+                      dest_if_really_stuck: null,
+                      feedback: {
+                        content_id: 'content_1',
+                        html: ''
+                      },
+                      labelled_as_correct: true,
+                      param_changes: [],
+                      refresher_exploration_id: null
+                    },
+                    rule_specs: [],
+                  }],
+                  confirmed_unclassified_answers: [],
+                  customization_args: {
+                    placeholder: {
+                      value: {
+                        content_id: 'ca_placeholder_0',
+                        unicode_str: ''
+                      }
+                    },
+                    rows: { value: 1 },
+                    catchMisspellings: {
+                      value: false
+                    }
+                  },
+                  default_outcome: {
+                    dest: null,
+                    dest_if_really_stuck: null,
+                    feedback: {
+                      html: 'Correct Answer',
+                      content_id: 'content_2'
+                    },
+                    param_changes: [],
+                    labelled_as_correct: true
+                  },
+                  hints: [{
+                    hint_content: {
+                      html: 'Hint 1',
+                      content_id: 'content_3'
+                    }
+                  }],
+                  solution: {
+                    correct_answer: 'This is the correct answer',
+                    answer_is_exclusive: false,
+                    explanation: {
+                      html: 'Solution explanation',
+                      content_id: 'content_4'
+                    }
+                  },
+                  id: 'TextInput'
+                },
+                param_changes: [],
+                recorded_voiceovers: {
+                  voiceovers_mapping: {}
+                }
+              },
+            }
+          },
+          status: 'accepted'
+        };
+        getUserCreatedQuestionSuggestionsAsyncSpy.and.returnValue(
+          Promise.resolve({
+            suggestionIdToDetails: {
+              suggestion_2: {
+                suggestion: suggestion2,
+                details: {
+                  skill_id: 'skill_1',
+                  skill_description: 'skill_1'
+                }
+              }
+            },
+            more: false
+          }));
+
+        // Go to the add questions tab, to ensure that
+        // getUserCreatedQuestionSuggestionsAsyncSpy is
+        // called by loadContributions.
+        component.switchToTab(
+          component.TAB_TYPE_CONTRIBUTIONS, 'add_question');
+
+        // Load contributions object with a question. This should also remove
+        // any data created in the previous call to loadContributions
+        // from the component.contributions object.
+        component.loadContributions(null).then(({opportunitiesDicts, more}) => {
+          expect(Object.keys(component.contributions)).toContain(
+            'suggestion_2');
+          expect(opportunitiesDicts).toEqual([
+            {
+              id: 'suggestion_2',
+              heading: 'Question 2',
+              subheading: 'skill_1',
+              labelText: 'Accepted',
+              labelColor: '#8ed274',
+              actionButtonTitle: 'View'
+            }]);
+          expect(more).toEqual(false);
+
+          // When opening the contribution modal for questions,
+          // only contribution questions should be shown.
+          spyOn(component, 'openQuestionSuggestionModal');
+          component.onClickViewSuggestion('suggestion_2');
+
+          expect(component.openQuestionSuggestionModal).
+            toHaveBeenCalledWith(
+              'suggestion_2',
+              suggestion2,
+              false
+            );
+        });
+      }));
+
       it('should return empty list if tab is not initialized', () => {
         component.activeTabType = null;
         component.loadContributions(null).then(({opportunitiesDicts, more}) => {
@@ -1275,19 +1469,6 @@ describe('Contributions and review component', () => {
         .toHaveBeenCalled();
     }));
 
-    it('should get Translation Suggestion Heading', () => {
-      spyOn(formatRtePreviewPipe, 'transform').and.stub();
-      let value = {
-        change: {
-          translation_html: 'string'
-        }
-      };
-
-      component.getTranslationSuggestionHeading(value as Suggestion);
-
-      expect(formatRtePreviewPipe.transform).toHaveBeenCalled();
-    });
-
     it('should load opportunities correctly', () => {
       component.loadOpportunities().then(({opportunitiesDicts, more}) => {
         expect(Object.keys(component.contributions)).toContain('suggestion_1');
@@ -1394,8 +1575,10 @@ describe('Contributions and review component', () => {
 
     describe('when navigating to review tab', () => {
       it('should get in-review translation suggestions', fakeAsync(() => {
-        spyOn(component, 'getTranslationSuggestionHeading')
-          .and.returnValue('heading');
+        spyOn(formatRtePreviewPipe, 'transform')
+          .and.returnValue('Traducáú &amp;');
+        spyOn(htmlEscaperService, 'escapedStrToUnescapedStr')
+          .and.returnValue('Traducáú &');
         let suggestionIdToSuggestions = {
           suggestion: {
             suggestion: {
@@ -1406,7 +1589,7 @@ describe('Contributions and review component', () => {
               status: 'review',
               change: {
                 content_html: '<p>This is test para</p>',
-                translation_html: 'Traducáú'
+                translation_html: '<p>Traducáú &amp;</p>'
               }
             } as Suggestion,
             details: {
@@ -1426,7 +1609,7 @@ describe('Contributions and review component', () => {
         expect(component.getTranslationContributionsSummary(
           suggestionIdToSuggestions)).toEqual([{
           id: 'id',
-          heading: 'heading',
+          heading: 'Traducáú &',
           subheading: 'topic_name / story_title / chapter_title',
           labelText: 'Awaiting review',
           labelColor: '#eeeeee',
@@ -1436,8 +1619,6 @@ describe('Contributions and review component', () => {
       }));
 
       it('should get in-review question suggestions', fakeAsync(() => {
-        spyOn(component, 'getTranslationSuggestionHeading')
-          .and.returnValue('heading');
         spyOn(formatRtePreviewPipe, 'transform').and.returnValue('heading');
         let suggestionIdToSuggestions = {
           suggestion: {

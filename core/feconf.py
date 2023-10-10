@@ -81,6 +81,8 @@ def check_dev_mode_is_true() -> None:
 
 check_dev_mode_is_true()
 
+# TODO(#18260): Remove this when we permanently move to the Dockerized Setup.
+OPPIA_IS_DOCKERIZED = bool(os.environ.get('OPPIA_IS_DOCKERIZED', False))
 CLASSIFIERS_DIR = os.path.join('extensions', 'classifiers')
 TESTS_DATA_DIR = os.path.join('core', 'tests', 'data')
 SAMPLE_EXPLORATIONS_DIR = os.path.join('data', 'explorations')
@@ -531,6 +533,7 @@ VALID_MAILCHIMP_FIELD_KEYS = ['NAME']
 # Valid Mailchimp tags.
 VALID_MAILCHIMP_TAGS = ['Account', 'Android', 'Web']
 
+ES_HOST = os.environ.get('ES_HOST', 'localhost')
 ES_LOCALHOST_PORT = 9200
 # NOTE TO RELEASE COORDINATORS: Replace this with the correct ElasticSearch
 # auth information during deployment.
@@ -541,7 +544,7 @@ ES_USERNAME = None
 # Port when switching to prod server. Keep this in sync with redis.conf in the
 # root folder. Specifically, REDISPORT should always be the same as the port in
 # redis.conf.
-REDISHOST = 'localhost'
+REDISHOST = os.environ.get('REDIS_HOST', 'localhost')
 REDISPORT = 6379
 
 # The DB numbers for various Redis instances that Oppia uses. Do not reuse these
@@ -565,14 +568,13 @@ ENV_IS_OPPIA_ORG_PRODUCTION_SERVER = bool(OPPIA_PROJECT_ID == 'oppiaserver')
 DATAFLOW_TEMP_LOCATION = 'gs://todo/todo'
 DATAFLOW_STAGING_LOCATION = 'gs://todo/todo'
 
-OPPIA_VERSION = '3.3.1'
+OPPIA_VERSION = '3.3.2'
 OPPIA_PYTHON_PACKAGE_PATH = './build/oppia-beam-job-%s.tar.gz' % OPPIA_VERSION
 
 # Committer id for system actions. The username for the system committer
 # (i.e. admin) is also 'admin'.
 SYSTEM_COMMITTER_ID = 'admin'
 # Domain name for email address.
-INCOMING_EMAILS_DOMAIN_NAME = 'example.com'
 SYSTEM_EMAIL_ADDRESS = 'system@example.com'
 SYSTEM_EMAIL_NAME = '.'
 ADMIN_EMAIL_ADDRESS = 'testadmin@example.com'
@@ -666,6 +668,9 @@ EMAIL_INTENT_ACCOUNT_DELETED = 'account_deleted'
 EMAIL_INTENT_NOTIFY_CONTRIBUTOR_DASHBOARD_ACHIEVEMENTS = (
     'notify_contributor_dashboard_achievements'
 )
+EMAIL_INTENT_NOTIFY_CURRICULUM_ADMINS_CHAPTERS = (
+    'notify_curriculum_admins_chapters'
+)
 # Possible intents for email sent in bulk.
 BULK_EMAIL_INTENT_MARKETING = 'bulk_email_marketing'
 BULK_EMAIL_INTENT_IMPROVE_EXPLORATION = 'bulk_email_improve_exploration'
@@ -674,6 +679,7 @@ BULK_EMAIL_INTENT_CREATOR_REENGAGEMENT = 'bulk_email_creator_reengagement'
 BULK_EMAIL_INTENT_LEARNER_REENGAGEMENT = 'bulk_email_learner_reengagement'
 BULK_EMAIL_INTENT_ML_JOB_FAILURE = 'bulk_email_ml_job_failure'
 BULK_EMAIL_INTENT_TEST = 'bulk_email_test'
+EMAIL_INTENT_ML_JOB_FAILURE = 'email_ml_job_failure'
 
 MESSAGE_TYPE_FEEDBACK = 'feedback'
 MESSAGE_TYPE_SUGGESTION = 'suggestion'
@@ -922,6 +928,9 @@ CONTRIBUTOR_STATS_SUMMARIES_URL = '/contributorstatssummaries'
 CONTRIBUTOR_ALL_STATS_SUMMARIES_URL = '/contributorallstatssummaries'
 CONTRIBUTOR_CERTIFICATE_URL = '/contributorcertificate'
 CONTRIBUTOR_DASHBOARD_ADMIN_URL = '/contributor-dashboard-admin'
+CONTRIBUTOR_DASHBOARD_ADMIN_STATS_URL_PREFIX = (
+    '/contributor-dashboard-admin-stats')
+COMMUNITY_CONTRIBUTION_STATS_URL = '/community-contribution-stats'
 CONTRIBUTOR_OPPORTUNITIES_DATA_URL = '/opportunitiessummaryhandler'
 CREATOR_DASHBOARD_DATA_URL = '/creatordashboardhandler/data'
 CREATOR_DASHBOARD_URL = '/creator-dashboard'
@@ -953,6 +962,10 @@ FEEDBACK_THREAD_URL_PREFIX = '/threadhandler'
 FEEDBACK_THREADLIST_URL_PREFIX = '/threadlisthandler'
 FEEDBACK_THREADLIST_URL_PREFIX_FOR_TOPICS = '/threadlisthandlerfortopic'
 FEEDBACK_THREAD_VIEW_EVENT_URL = '/feedbackhandler/thread_view_event'
+FEEDBACK_UPDATES_DATA_URL = (
+    '/feedbackupdateshandler/data')
+FEEDBACK_UPDATES_URL = '/feedbackupdates'
+FEEDBACK_UPDATES_THREAD_DATA_URL = '/feedbackupdatesthreadhandler'
 FETCH_SKILLS_URL_PREFIX = '/fetch_skills'
 FLAG_EXPLORATION_URL_PREFIX = '/flagexplorationhandler'
 FRACTIONS_LANDING_PAGE_URL = '/fractions'
@@ -971,10 +984,7 @@ LEARNER_DASHBOARD_COLLECTION_DATA_URL = (
     '/learnerdashboardcollectionsprogresshandler/data')
 LEARNER_DASHBOARD_EXPLORATION_DATA_URL = (
     '/learnerdashboardexplorationsprogresshandler/data')
-LEARNER_DASHBOARD_FEEDBACK_UPDATES_DATA_URL = (
-    '/learnerdashboardfeedbackupdateshandler/data')
 LEARNER_DASHBOARD_IDS_DATA_URL = '/learnerdashboardidshandler/data'
-LEARNER_DASHBOARD_FEEDBACK_THREAD_DATA_URL = '/learnerdashboardthreadhandler'
 LEARNER_GOALS_DATA_URL = '/learnergoalshandler'
 LEARNER_PLAYLIST_DATA_URL = '/learnerplaylistactivityhandler'
 LEARNER_INCOMPLETE_ACTIVITY_DATA_URL = '/learnerincompleteactivityhandler'
@@ -1212,6 +1222,7 @@ ROLE_ID_TOPIC_MANAGER = 'TOPIC_MANAGER'
 ROLE_ID_TRANSLATION_ADMIN = 'TRANSLATION_ADMIN'
 ROLE_ID_VOICEOVER_ADMIN = 'VOICEOVER_ADMIN'
 ROLE_ID_QUESTION_COORDINATOR = 'QUESTION_COORDINATOR'
+ROLE_ID_TRANSLATION_COORDINATOR = 'TRANSLATION_COORDINATOR'
 
 ALLOWED_DEFAULT_USER_ROLES_ON_REGISTRATION = [
     ROLE_ID_FULL_USER, ROLE_ID_MOBILE_LEARNER]
@@ -1230,7 +1241,8 @@ ALLOWED_USER_ROLES = [
     ROLE_ID_TOPIC_MANAGER,
     ROLE_ID_TRANSLATION_ADMIN,
     ROLE_ID_VOICEOVER_ADMIN,
-    ROLE_ID_QUESTION_COORDINATOR
+    ROLE_ID_QUESTION_COORDINATOR,
+    ROLE_ID_TRANSLATION_COORDINATOR
 ]
 
 # Intent of the User making query to role structure via admin interface. Used
@@ -1358,7 +1370,8 @@ FIREBASE_ROLE_SUPER_ADMIN = 'super_admin'
 # use alpha-numeric characters, hence the tighter restriction.
 FIREBASE_AUTH_ID_REGEX = '^[A-Za-z0-9]{1,128}$'
 
-CLOUD_DATASTORE_EMULATOR_HOST = 'localhost'
+# TODO(#18260): Change this when we permanently move to the Dockerized Setup.
+CLOUD_DATASTORE_EMULATOR_HOST = os.environ.get('DATASTORE_HOST', 'localhost')
 CLOUD_DATASTORE_EMULATOR_PORT = 8089
 
 FIREBASE_EMULATOR_CONFIG_PATH = '.firebase.json'
@@ -1596,6 +1609,7 @@ CONTRIBUTION_TYPE_TRANSLATION: Final = 'translation'
 CONTRIBUTION_TYPE_QUESTION: Final = 'question'
 CONTRIBUTION_SUBTYPE_ACCEPTANCE: Final = 'acceptance'
 CONTRIBUTION_SUBTYPE_REVIEW: Final = 'review'
+CONTRIBUTION_SUBTYPE_COORDINATE: Final = 'coordinate'
 CONTRIBUTION_SUBTYPE_EDIT: Final = 'edit'
 CONTRIBUTION_SUBTYPE_SUBMISSION: Final = 'submission'
 
