@@ -19,6 +19,8 @@
 let e2eSuperAdmin = require('../user-utilities/super-admin-utils.js');
 let e2eBlogAdmin = e2eBlogPostEditor = e2eGuestUser = require(
   '../user-utilities/blog-post-admin-utils.js');
+let e2eTranslationAdmin = require(
+  '../user-utilities/translation-admin-utils.js');
 
 /**
  * Global user instances that are created and can be reused again.
@@ -27,6 +29,7 @@ let superAdminInstance = null;
 let activeUsers = [];
 const ROLE_BLOG_ADMIN = 'blog admin';
 const ROLE_BLOG_POST_EDITOR = 'blog post editor';
+const ROLE_TRANSLATION_ADMIN = 'translation admin';
 
 /**
  * The function creates a new super admin user and returns the instance
@@ -109,6 +112,32 @@ let createNewGuestUser = async function(username, email) {
 };
 
 /**
+ * Function to create a user with the translation admin role.
+ * @param {string} username - the username of the translation admin.
+ * @param {string} email - the email of the user.
+ * @returns the instance of the translation admin.
+ */
+let createNewTranslationAdmin = async function(username, email) {
+  if (superAdminInstance === null) {
+    superAdminInstance = await createNewSuperAdmin('superAdm');
+  }
+
+  const translationAdmin = new e2eTranslationAdmin();
+  await translationAdmin.openBrowser();
+  await translationAdmin.signUpNewUser(
+    username,
+    'translation_admin@example.com');
+
+  await superAdminInstance.assignRoleToUser(
+    username, ROLE_TRANSLATION_ADMIN);
+  await superAdminInstance.expectUserToHaveRole(
+    username, ROLE_TRANSLATION_ADMIN);
+
+  activeUsers.push(translationAdmin);
+  return translationAdmin;
+};
+
+/**
  * The function closes all the browsers opened by different users.
  */
 let closeAllBrowsers = async function() {
@@ -117,10 +146,23 @@ let closeAllBrowsers = async function() {
   }
 };
 
+/**
+ * Function to close the browser opened by the specified user
+ * @param {baseUser} user - the user object of the user who's browser
+ * should be closed.
+ */
+let closeBrowserForUser = async function(user) {
+  const index = activeUsers.indexOf(user);
+  activeUsers.splice(index, 1);
+  await user.closeBrowser();
+};
+
 module.exports = {
   createNewSuperAdmin,
   createNewBlogAdmin,
   createNewBlogPostEditor,
   createNewGuestUser,
-  closeAllBrowsers
+  createNewTranslationAdmin,
+  closeAllBrowsers,
+  closeBrowserForUser
 };
