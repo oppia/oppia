@@ -135,10 +135,6 @@ describe('Ratings and recommendations component', () => {
     siteAnalyticsService = TestBed.inject(SiteAnalyticsService);
   });
 
-  afterEach(() => {
-    component.ngOnDestroy();
-  });
-
   it('should populate internal properties and subscribe to event' +
     ' listeners on initialize', fakeAsync(() => {
     const collectionId = 'collection_id';
