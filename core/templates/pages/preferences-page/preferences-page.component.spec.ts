@@ -334,12 +334,6 @@ describe('Preferences Page Component', () => {
       }));
     });
 
-    it('should register bio changed', () => {
-      spyOn(preventPageUnloadEventService, 'addListener');
-      componentInstance.registerBioChanged();
-      expect(preventPageUnloadEventService.addListener).toHaveBeenCalled();
-    });
-
     it('should validate user popover when username is longer 10 chars', () => {
       expect(componentInstance.showUsernamePopover('greaterthan10characters'))
         .toEqual('mouseenter');

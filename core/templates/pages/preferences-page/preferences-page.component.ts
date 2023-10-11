@@ -122,12 +122,7 @@ export class PreferencesPageComponent {
   }
 
   saveUserBio(userBio: string): void {
-    this.registerBioChanged();
     this._saveDataItem('user_bio', userBio);
-  }
-
-  registerBioChanged(): void {
-    this.preventPageUnloadEventService.addListener();
   }
 
   onSubjectInterestsSelectionChange(subjectInterests: string): void {
