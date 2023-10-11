@@ -110,10 +110,11 @@ class BlogPostViewedEventLogEntryModelUnitTests(test_utils.GenericTestBase):
                 stats_model_class.create('blog_post_id')
 
     def test_get_new_event_entity_id(self) -> None:
-        creation_time_in_millisecs = utils.get_current_time_in_millisecs()
-        mock_get_current_time_in_millisecs = lambda: creation_time_in_millisecs
+        time_in_millisecs = utils.get_current_time_in_millisecs()
+        mock_get_current_time_in_millisecs = lambda: time_in_millisecs
+        rand_hash = '123456789123'
         def mock_convert_to_hash(input_string: str, max_length: int) -> str: # pylint: disable=unused-argument
-            return '123456789123'
+            return rand_hash
         with self.swap(
             utils,
             'get_current_time_in_millisecs',
@@ -124,11 +125,10 @@ class BlogPostViewedEventLogEntryModelUnitTests(test_utils.GenericTestBase):
                     blog_stats_models.BlogPostViewedEventLogEntryModel
                         .get_new_event_entity_id('BLOG')
                 )
-                time_id_created = int(new_id.split(':')[0])
                 self.assertEqual(
-                    time_id_created, int(creation_time_in_millisecs))
-                self.assertEqual(new_id.split(':')[1], 'BLOG')
-                self.assertEqual(new_id.split(':')[2], '123456789123')
+                    new_id,
+                    ':'.join([str(int(time_in_millisecs)), 'BLOG', rand_hash])
+                )
 
     def test_create_and_get_event_models(self) -> None:
         entity_id = (
@@ -220,10 +220,11 @@ class BlogPostReadEventLogEntryModelUnitTests(test_utils.GenericTestBase):
         )
 
     def test_get_new_event_entity_id(self) -> None:
-        creation_time_in_millisecs = utils.get_current_time_in_millisecs()
-        mock_get_current_time_in_millisecs = lambda: creation_time_in_millisecs
+        time_in_millisecs = utils.get_current_time_in_millisecs()
+        rand_hash = '123456789123'
+        mock_get_current_time_in_millisecs = lambda: time_in_millisecs
         def mock_convert_to_hash(input_string: str, max_length: int) -> str: # pylint: disable=unused-argument
-            return '123456789123'
+            return rand_hash
         with self.swap(
             utils,
             'get_current_time_in_millisecs',
@@ -234,11 +235,10 @@ class BlogPostReadEventLogEntryModelUnitTests(test_utils.GenericTestBase):
                     blog_stats_models.BlogPostReadEventLogEntryModel
                         .get_new_event_entity_id('BLOG')
                 )
-                time_id_created = int(new_id.split(':')[0])
                 self.assertEqual(
-                    time_id_created, int(creation_time_in_millisecs))
-                self.assertEqual(new_id.split(':')[1], 'BLOG')
-                self.assertEqual(new_id.split(':')[2], '123456789123')
+                    new_id,
+                    ':'.join([str(int(time_in_millisecs)), 'BLOG', rand_hash])
+                )
 
     def test_create_raises_exception_by_mocking_collision(self) -> None:
         stats_model_class = blog_stats_models.BlogPostReadEventLogEntryModel
@@ -349,10 +349,11 @@ class BlogPostExitedEventLogEntryModelUnitTests(test_utils.GenericTestBase):
         )
 
     def test_get_new_event_entity_id(self) -> None:
-        creation_time_in_millisecs = utils.get_current_time_in_millisecs()
-        mock_get_current_time_in_millisecs = lambda: creation_time_in_millisecs
+        time_in_millisecs = utils.get_current_time_in_millisecs()
+        mock_get_current_time_in_millisecs = lambda: time_in_millisecs
+        rand_hash = '123456789123'
         def mock_convert_to_hash(input_string: str, max_length: int) -> str: # pylint: disable=unused-argument
-            return '123456789123'
+            return rand_hash
         with self.swap(
             utils,
             'get_current_time_in_millisecs',
@@ -363,11 +364,10 @@ class BlogPostExitedEventLogEntryModelUnitTests(test_utils.GenericTestBase):
                     blog_stats_models.BlogPostExitedEventLogEntryModel
                         .get_new_event_entity_id('BLOG')
                 )
-                time_id_created = int(new_id.split(':')[0])
                 self.assertEqual(
-                    time_id_created, int(creation_time_in_millisecs))
-                self.assertEqual(new_id.split(':')[1], 'BLOG')
-                self.assertEqual(new_id.split(':')[2], '123456789123')
+                    new_id,
+                    ':'.join([str(int(time_in_millisecs)), 'BLOG', rand_hash])
+                )
 
     def test_create_and_get_event_models(self) -> None:
         entity_id = (
