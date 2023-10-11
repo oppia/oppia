@@ -33,6 +33,9 @@ You can also append the following options to the above command:
 
     --test_shard=1 runs all tests in shard 1.
 
+    --skip-install skips installing dependencies. You can use this flag only if
+        you have also passed the --test_target flag.
+
     --generate_coverage_report generates a coverage report as part of the final
         test output (but it makes the tests slower).
 
@@ -62,6 +65,8 @@ import sys
 import threading
 import time
 from typing import Dict, Final, List, Optional, Tuple, cast
+
+from . import install_third_party_libs
 
 from core import utils  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 from . import common  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
@@ -98,6 +103,10 @@ should be specified.
 """)
 
 _EXCLUSIVE_GROUP: Final = _PARSER.add_mutually_exclusive_group()
+_PARSER.add_argument(
+    '--skip-install',
+    help='If true, skips installing dependencies. The default value is false.',
+    action='store_true')
 _EXCLUSIVE_GROUP.add_argument(
     '--test_target',
     help='optional dotted module name of the test(s) to run',
@@ -128,6 +137,23 @@ _PARSER.add_argument(
     help='optional; if specified, display the output of the tests being run',
     action='store_true')
 
+def install_third_party_libraries(test_target: bool, skip_install: bool) -> None:
+    """Run the installation script.
+
+    Args:
+        test_target: bool. Whether a test target is specified.
+        skip_install: bool. Whether to skip running the installation script.
+    """
+    if skip_install and not test_target:
+        raise Exception(
+            'The --skip-install flag should only be used when running a single '
+            'test module. Please specify a test module using the --test_target '
+            'flag.')
+
+    # Installing third-party Oppia dependencies is unnecessary
+    # when running the test with the --test_target flag.
+    if not (test_target and skip_install):
+        install_third_party_libs.main()
 
 def run_shell_cmd(
     exe: List[str],
@@ -469,12 +495,8 @@ def main(args: Optional[List[str]] = None) -> None:
     """Run the tests."""
     parsed_args = _PARSER.parse_args(args=args)
 
-    # Installing third-party Oppia dependencies is unnecessary
-    # when running the test with the --test_target flag. It is done
-    # for performance improvement.
-    if not parsed_args.test_target:
-        from . import install_third_party_libs
-        install_third_party_libs.main()
+    install_third_party_libraries(
+        parsed_args.test_target, parsed_args.skip_install)
 
     for directory in common.DIRS_TO_ADD_TO_SYS_PATH:
         if not os.path.exists(os.path.dirname(directory)):
