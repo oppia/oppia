@@ -28,6 +28,7 @@ import { CertificateDownloadModalComponent } from './certificate-download-modal.
 import { ContributionAndReviewService } from '../services/contribution-and-review.service';
 import { AlertsService } from 'services/alerts.service';
 import { ContributorCertificateResponse } from '../services/contribution-and-review-backend-api.service';
+import { HttpErrorResponse } from '@angular/common/http';
 
 class MockChangeDetectorRef {
   detectChanges(): void {}
@@ -122,24 +123,20 @@ describe('Contributor Certificate Download Modal Component', () => {
     ).toHaveBeenCalled();
   });
 
-  it('should show error when contributions not found', fakeAsync(() => {
-    component.fromDate = '2022/01/01';
-    component.toDate = '2022/10/31';
-    spyOn(
-      contributionAndReviewService,
-      'downloadContributorCertificateAsync')
-      .and.returnValue(Promise.reject());
+  it(
+    'should set errorsFound and errorMessage for To date in the future', () => {
+      const today = new Date();
+      const tomorrow = new Date(today);
+      tomorrow.setDate(today.getDate() + 1);
 
-    component.downloadCertificate();
-    tick();
-
-    expect(
-      contributionAndReviewService.downloadContributorCertificateAsync
-    ).toHaveBeenCalled();
-    expect(component.errorsFound).toBeTrue();
-    expect(component.errorMessage).toEqual(
-      'Not able to download contributor certificate');
-  }));
+      component.fromDate = '2023-10-01';
+      component.toDate = tomorrow.toISOString().split('T')[0];
+      component.validateDate();
+      expect(component.errorsFound).toBe(true);
+      expect(
+        component.errorMessage
+      ).toBe("Please select a 'To' date that is earlier than today's date");
+    });
 
   it('should show error for invalid to date', () => {
     const today = new Date();
@@ -174,6 +171,21 @@ describe('Contributor Certificate Download Modal Component', () => {
     spyOn(activeModal, 'close');
     component.close();
     expect(activeModal.close).toHaveBeenCalled();
+  });
+
+  it('should handle errors properly', async() => {
+    const mockError = new HttpErrorResponse(
+      { error: { error: 'Error message' } });
+    spyOn(
+      contributionAndReviewService,
+      'downloadContributorCertificateAsync'
+    ).and.returnValue(Promise.reject(mockError));
+
+    await component.downloadCertificate();
+
+    expect(component.errorsFound).toBe(true);
+    expect(component.certificateDownloading).toBe(false);
+    expect(component.errorMessage).toBe('Error message');
   });
 
   it('should throw error when canvas context is null', () => {

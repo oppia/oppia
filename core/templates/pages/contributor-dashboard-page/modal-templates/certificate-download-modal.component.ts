@@ -281,7 +281,7 @@ export class CertificateDownloadModalComponent {
 
       // Create an HTML link and clicks on it to download.
       const link = document.createElement('a');
-      link.download = 'certificate.jpeg';
+      link.download = 'certificate.png';
       link.href = canvas.toDataURL();
       link.click();
     };
