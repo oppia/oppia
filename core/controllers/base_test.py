@@ -939,6 +939,18 @@ class I18nDictsTests(test_utils.GenericTestBase):
             msg='Invalid HTML: %s at %s in %s' % (input_string, key, filename))
         return sorted(result)
 
+    """HEREEEEEE"""
+    def test_i18n_keys_format(self) -> None:
+        """Tests that the keys are correctly formatted.
+        """
+        valid_key_pattern = re.compile(r'^I18N_[0-9A-Za-z-_]+$')
+        key_list = self._extract_keys_from_json_file('en.json')
+        for key in key_list:
+            self.assertTrue((valid_key_pattern.match(key)), key)
+            # if not valid_key_pattern.match(key):
+            #     self.log_line('Wrong formatted key: %s' % key)
+            # self.log_line('%s'% key)
+
     def test_i18n_keys(self) -> None:
         """Tests that the keys in all JSON files are a subset of those in
         en.json.
