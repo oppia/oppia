@@ -95,12 +95,12 @@
         </span>
       </div>
       <div (click)="showAllChapters()"
-           *ngIf="showButton && (chaptersDisplayed < nodeCount)"
+           *ngIf="showButton && (chaptersDisplayed < nodeCount) && !isSerialChapterFeatureFlagEnabled()"
            class="view-button">
         <span class="fas fa-caret-down down-caret-position"></span>
       </div>
       <div (click)="hideExtraChapters()"
-           *ngIf="showButton && (chaptersDisplayed === nodeCount)"
+           *ngIf="showButton && (chaptersDisplayed === nodeCount) && !isSerialChapterFeatureFlagEnabled()"
            class="view-button">
         <span class="fas fa-caret-up up-caret-position"></span>
       </div>
@@ -132,7 +132,7 @@
         </div>
         <hr class="tablet-view heading-separator">
         <div *ngFor="let node of nodes;let idx = index">
-          <div class="story-details-box chapter-specific-box" *ngIf="idx < chaptersDisplayed && node.getStatus() === 'Published'">
+          <div class="story-details-box chapter-specific-box" *ngIf="node.getStatus() === 'Published'">
             <div class="chapter-icon">
               <span class="chapter-icon-number">{{ idx + 1 }}</span>
             </div>
@@ -156,7 +156,7 @@
         </div>
         <hr class="tablet-view heading-separator">
         <div *ngFor="let node of nodes;let idx = index">
-          <div class="story-details-box chapter-specific-box coming-soon-chapters" *ngIf="idx < chaptersDisplayed && node.getStatus() === 'Ready To Publish'">
+          <div class="story-details-box chapter-specific-box coming-soon-chapters" *ngIf="node.getStatus() === 'Ready To Publish'">
             <div class="chapter-icon">
               <span class="chapter-icon-number">{{ idx + 1 }}</span>
             </div>
@@ -214,8 +214,8 @@
            *ngFor="let node of nodes;let idx = index">
           <div *ngIf="node.getStatus() === 'Published' && storySummary.isNodeCompleted(node.getTitle())" class="fas fa-check completed-icon">
           </div>
-          <div [ngClass]="{'border-bottom': idx < chaptersDisplayed, 'pending-chapter': !storySummary.isNodeCompleted(node.getTitle()) && isPreviousChapterCompleted(idx), 'incomplete-chapter': !storySummary.isNodeCompleted(node.getTitle()), 'complete-chapter': storySummary.isNodeCompleted(node.getTitle())}"
-              *ngIf="node.getStatus() === 'Published' && idx < chaptersDisplayed">
+          <div [ngClass]="{'pending-chapter': !storySummary.isNodeCompleted(node.getTitle()) && isPreviousChapterCompleted(idx), 'incomplete-chapter': !storySummary.isNodeCompleted(node.getTitle()), 'complete-chapter': storySummary.isNodeCompleted(node.getTitle())}"
+              *ngIf="node.getStatus() === 'Published'">
             <a [href]="getChapterUrl(node.getTitle())" rel="noopener">
               <span class="chapter-identifier" [innerHTML]="'I18N_TOPIC_VIEWER_CHAPTER' | translate">
               </span>&nbsp;<span class="chapter-identifier">{{ idx + 1 }}:</span>&nbsp;<span dir="auto" *ngIf="!isHackyNodeTitleTranslationDisplayed(idx)">{{ node.getTitle() }}</span>
@@ -234,8 +234,8 @@
         <hr class="heading-separator">
         <div class="chapter-title coming-soon-chapters"
            *ngFor="let node of nodes;let idx = index">
-          <div [ngClass]="{'border-bottom': idx < chaptersDisplayed, 'pending-chapter': !storySummary.isNodeCompleted(node.getTitle()) && isPreviousChapterCompleted(idx), 'incomplete-chapter': !storySummary.isNodeCompleted(node.getTitle()), 'complete-chapter': storySummary.isNodeCompleted(node.getTitle())}"
-              *ngIf="node.getStatus() === 'Ready To Publish' && idx < chaptersDisplayed">
+          <div [ngClass]="{'pending-chapter': !storySummary.isNodeCompleted(node.getTitle()) && isPreviousChapterCompleted(idx), 'incomplete-chapter': !storySummary.isNodeCompleted(node.getTitle()), 'complete-chapter': storySummary.isNodeCompleted(node.getTitle())}"
+              *ngIf="node.getStatus() === 'Ready To Publish'">
             <a [href]="getChapterUrl(node.getTitle())" rel="noopener">
               <span class="chapter-identifier" [innerHTML]="'I18N_TOPIC_VIEWER_CHAPTER' | translate">
               </span>&nbsp;<span class="chapter-identifier">{{ idx + 1 }}:</span>&nbsp;<span dir="auto" *ngIf="!isHackyNodeTitleTranslationDisplayed(idx)">{{ node.getTitle() }}</span>
@@ -245,18 +245,6 @@
             </a>
           </div>
         </div>
-      </div>
-      <div (click)="showAllChapters()"
-           *ngIf="showButton && (chaptersDisplayed < nodeCount)"
-           class="view-button">
-        <span [innerHTML]="'I18N_TOPIC_VIEWER_VIEW_ALL' | translate"></span>
-        <span class="fas fa-caret-down down-caret-position"></span>
-      </div>
-      <div (click)="hideExtraChapters()"
-           *ngIf="showButton && (chaptersDisplayed === nodeCount)"
-           class="view-button">
-        <span [innerHTML]="'I18N_TOPIC_VIEWER_VIEW_LESS' | translate"></span>
-        <span class="fas fa-caret-up up-caret-position"></span>
       </div>
     </div>
   </div>

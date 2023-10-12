@@ -31,12 +31,6 @@ const routes: Route[] = [
     path: '',
     children: [
       {
-        path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.CLASSROOM.ROUTE,
-        pathMatch: 'full',
-        loadChildren: () => import('pages/classroom-page/classroom-page.module')
-          .then(m => m.ClassroomPageModule)
-      },
-      {
         path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.SPLASH.ROUTE,
         pathMatch: 'full',
         canLoad: [CanAccessSplashPageGuard],
