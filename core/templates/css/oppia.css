@@ -459,7 +459,7 @@ h3 {
 }
 
 .oppia-contact-mail {
-  color: #052b6c;
+  text-decoration: underline;
 }
 
 a {
