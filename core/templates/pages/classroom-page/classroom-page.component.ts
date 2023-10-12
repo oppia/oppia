@@ -122,10 +122,10 @@ export class ClassroomPageComponent implements OnDestroy {
         }
       });
     }, (err) => {
-      // User provided classroom doesnot exist. Redirect to default classroom.
-      this.windowRef.nativeWindow.history.pushState(
-        null, 'classroom', AppConstants.DEFAULT_CLASSROOM_URL_FRAGMENT);
-      this.ngOnInit();
+      // Note to developers:
+      // This callback is triggered when the provided classroom does not exist,
+      // this will raise page not found exception.
+      // No further action is needed.
     });
   }
 
