@@ -451,7 +451,7 @@ export class StoryNodeEditorComponent implements OnInit, OnDestroy {
       this.storyUpdateService.setStoryNodeOutline(
         this.story, this.nodeId, newOutline);
       this.oldOutline = newOutline;
-      this.outlineEditViewIsShown = $(this.oldOutline).text();
+      this.outlineEditViewIsShown = this.oldOutline;
     }
   }
 
