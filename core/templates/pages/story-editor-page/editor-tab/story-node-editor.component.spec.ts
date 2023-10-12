@@ -632,7 +632,7 @@ describe('Story node editor component', () => {
   it('should click chapter outline save button', () => {
     component.chapterOutlineIsShown = true;
 
-    component.onSaveButtonClicked();
+    component.onSaveButtonClicked('New outline');
 
     expect(component.chapterOutlineIsShown).toBe(false);
   });
