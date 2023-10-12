@@ -118,7 +118,7 @@ run_tests.custom_eslint: ## Runs the custome eslint tests
 run_tests.mypy: ## Runs mypy checks
 	docker compose run --no-deps --entrypoint "python -m scripts.run_mypy_checks" dev-server
 
-run_tests.backend_associate: ## Runs the backend associate tests
+run_tests.check_backend_associated_tests: ## Runs the backend associate tests
 	docker compose run --no-deps --entrypoint "/bin/sh -c 'git config --global --add safe.directory /app/oppia && python -m scripts.check_backend_associated_test_file'" dev-server
 
 run_tests.acceptance: ## Runs the acceptance tests for the parsed suite
