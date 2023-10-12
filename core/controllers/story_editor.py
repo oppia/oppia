@@ -21,7 +21,7 @@ from core import utils
 from core.constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
-from core.domain import classroom_services
+from core.domain import classroom_config_services
 from core.domain import skill_services
 from core.domain import story_domain
 from core.domain import story_fetchers
@@ -155,7 +155,7 @@ class EditableStoryDataHandler(
         skill_summaries = skill_services.get_multi_skill_summaries(skill_ids)
         skill_summary_dicts = [summary.to_dict() for summary in skill_summaries]
         classroom_url_fragment = (
-            classroom_services.get_classroom_url_fragment_for_topic_id(
+            classroom_config_services.get_classroom_url_fragment_for_topic_id(
                 topic.id))
 
         for story_reference in topic.canonical_story_references:
