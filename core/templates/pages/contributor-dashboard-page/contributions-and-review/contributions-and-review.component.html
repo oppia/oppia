@@ -108,6 +108,7 @@
       <oppia-opportunities-list *ngIf="activeExplorationId === null && isReviewTranslationsTab() && !isAccomplishmentsTabActive()"
                                 [loadOpportunities]="loadReviewableTranslationOpportunities.bind(this)"
                                 (clickActionButton)="onClickReviewableTranslations($event)"
+                                (clickPinButton) = "pinReviewableTranslationOpportunity($event)"
                                 [labelRequired]="!activeReviewTab"
                                 [showOpportunityButton]="true"
                                 #opportunitiesList>

@@ -23,6 +23,7 @@ import { AppConstants } from 'app.constants';
 import { ContributorDashboardConstants } from 'pages/contributor-dashboard-page/contributor-dashboard-page.constants';
 import { Subscription } from 'rxjs';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
+import { MatIconModule } from '@angular/material/icon';
 
 export interface ExplorationOpportunity {
   id: string;
@@ -36,6 +37,8 @@ export interface ExplorationOpportunity {
   heading?: string;
   actionButtonTitle?: string;
   translationWordCount?: number;
+  isPinned?: boolean;
+  topicName: string
 }
 
 @Component({
@@ -74,6 +77,19 @@ export class OpportunitiesListItemComponent {
 
   @Output() clickActionButton: EventEmitter<string> = (
     new EventEmitter());
+
+  @Output() clickPinButton: EventEmitter<{
+    'topic_name': string,
+    'exploration_id': string
+  }> = (
+    new EventEmitter());
+
+  pinOpportunity() {
+    this.clickPinButton.emit({
+      topic_name: this.opportunity.topicName,
+      exploration_id: this.opportunity.id
+    })
+  }
 
   opportunityDataIsLoading: boolean = true;
   correspondingOpportunityDeleted: boolean = false;

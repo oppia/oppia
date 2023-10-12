@@ -420,20 +420,21 @@ class ReviewableOpportunitiesHandler(
         ]
         pinned_opportunity_summary = None
         if topic_name:
-            topic = topic_fetchers.get_topic_by_name(topic_name)
+            # topic = topic_fetchers.get_topic_by_name(topic_name)
             pinned_opportunity_summary = opportunity_services.get_pinned_lesson(
                 self.user_id,
                 language,
-                topic.id
+                topic_name
             )
+            print(pinned_opportunity_summary)
 
         exp_opp_summaries = opportunity_services.get_exploration_opportunity_summaries_by_ids(exp_ids)
 
         # If there is a pinned opportunity summary, add it to the list of opportunities at the top.
         ordered_exp_opp_summaries = OrderedDict()
         if pinned_opportunity_summary:
-            exp_opp_summaries.pop(pinned_opportunity_summary['id'], None)
-            ordered_exp_opp_summaries[pinned_opportunity_summary['id']] = pinned_opportunity_summary
+            exp_opp_summaries.pop(pinned_opportunity_summary.id, None)
+            ordered_exp_opp_summaries[pinned_opportunity_summary.id] = pinned_opportunity_summary
         
         for item in exp_opp_summaries.values():
             ordered_exp_opp_summaries[item.id] = item
@@ -486,12 +487,18 @@ class PinLessonsHandler(
         print("I am right here inside put")
         assert self.normalized_request is not None
         assert self.user_id is not None
-        topic_id = self.normalized_request.get('topic_id')
-        language_code = self.normalized_request.get('language_code')
-        opportunity_id = self.normalized_request.get('opportunity_id')
+        topic_id = self.normalized_payload.get('topic_id')
+        language_code = self.normalized_payload.get('language_code')
+        opportunity_id = self.normalized_payload.get('opportunity_id')
 
         opportunity_services.update_pinned_opportunity_model(
             self.user_id, language_code, topic_id, opportunity_id)
+        print('Here the req dict', opportunity_id, topic_id)
+        print("Here's pinned opp", opportunity_services.get_pinned_lesson(
+            self.user_id,
+            language_code,
+            topic_id
+        ))
 
         self.render_json(self.values)
 

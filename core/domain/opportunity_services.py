@@ -1057,6 +1057,8 @@ def update_pinned_opportunity_model(
         user_id,
         language_code,
         topic_id)
+    
+    print('LINE 1061616161   ', lesson_id)
 
     if not pinned_opportunity and not lesson_id:
         # If there's no model and no lesson_id provided, no action needed.
@@ -1070,6 +1072,7 @@ def update_pinned_opportunity_model(
             topic_id=topic_id,
             opportunity_id=lesson_id
         )
+        print('Creating a new model in service layer')
     else:
         # Update the model's opportunity_id with the given lesson_id.
         pinned_opportunity.opportunity_id = lesson_id

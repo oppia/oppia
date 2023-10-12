@@ -92,6 +92,10 @@ export class ContributionOpportunitiesBackendApiService {
     private userService: UserService,
   ) {}
 
+  private UPDATE_PINNED_OPPORTUNITY_HANDLER_URL = (
+    '/pinned-opportunities'
+  )
+
   private _getExplorationOpportunityFromDict(
       opportunityDict: ExplorationOpportunitySummaryBackendDict):
       ExplorationOpportunitySummary {
@@ -100,7 +104,8 @@ export class ContributionOpportunitiesBackendApiService {
       opportunityDict.story_title, opportunityDict.chapter_title,
       opportunityDict.content_count, opportunityDict.translation_counts,
       opportunityDict.translation_in_review_counts,
-      opportunityDict.language_code);
+      opportunityDict.language_code,
+      opportunityDict.is_pinned);
   }
 
   private _getSkillOpportunityFromDict(
@@ -133,6 +138,22 @@ export class ContributionOpportunitiesBackendApiService {
     }, errorResponse => {
       throw new Error(errorResponse.error.error);
     });
+  }
+
+  async pinTranslationOpportunity(
+    languageCode: string,
+    topicName: string,
+    explorationId?: string
+  ): Promise<void> {
+    console.log("lang 148", languageCode, topicName, explorationId)
+    return this.http.put<void>(
+      this.UPDATE_PINNED_OPPORTUNITY_HANDLER_URL,
+      {
+        topic_id: topicName,
+        language_code: languageCode,
+        opportunity_id: explorationId,
+      }
+    ).toPromise();
   }
 
   async fetchTranslationOpportunitiesAsync(

@@ -137,6 +137,17 @@ export class ContributionOpportunitiesService {
       });
   }
 
+  async pinReviewableTranslationOpportunityAsync(
+    topicName: string,
+    languageCode: string,
+    explorationId?: string): Promise<void> {
+      return this.contributionOpportunitiesBackendApiService
+        .pinTranslationOpportunity(
+          languageCode,
+          topicName,
+          explorationId)
+    }
+
   async getTranslatableTopicNamesAsync(): Promise<string[]> {
     return this._getTranslatableTopicNamesAsync();
   }

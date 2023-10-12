@@ -54,6 +54,11 @@ export class OpportunitiesListComponent {
     new EventEmitter()
   );
 
+  @Output() clickPinButton: EventEmitter<{
+    'topic_name': string,
+    'exploration_id': string
+  }> = (
+    new EventEmitter());
 
   loadingOpportunityData: boolean = true;
   opportunities: ExplorationOpportunity[] = [];

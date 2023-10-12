@@ -29,6 +29,7 @@ export interface ExplorationOpportunitySummaryBackendDict {
   'translation_counts': TranslationCountsDict;
   'translation_in_review_counts': TranslationCountsDict;
   'language_code': string;
+  'is_pinned': boolean;
 }
 
 export class ExplorationOpportunitySummary {
@@ -40,13 +41,14 @@ export class ExplorationOpportunitySummary {
   translationCounts: TranslationCountsDict;
   translationInReviewCount: TranslationCountsDict;
   languageCode: string;
+  isPinned: boolean
 
   constructor(
       expId: string, topicName: string, storyTitle: string,
       chapterTitle: string, contentCount: number,
       translationCounts: TranslationCountsDict,
       translationInReviewCount: TranslationCountsDict,
-      languageCode: string) {
+      languageCode: string, isPinned: boolean) {
     this.id = expId;
     this.topicName = topicName;
     this.storyTitle = storyTitle;
@@ -55,6 +57,7 @@ export class ExplorationOpportunitySummary {
     this.translationCounts = translationCounts;
     this.translationInReviewCount = translationInReviewCount;
     this.languageCode = languageCode;
+    this.isPinned = isPinned
   }
 
   static createFromBackendDict(

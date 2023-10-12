@@ -65,6 +65,7 @@ export interface ContributionsSummary {
   labelColor: string;
   actionButtonTitle: string;
   translationWordCount?: number;
+  isPinned?: boolean;
 }
 
 export interface Opportunity {
@@ -465,13 +466,17 @@ export class ContributionsAndReview
         this.translationTopicService.getActiveTopicName(),
         this.languageCode)
       .then((response) => {
+        console.log('Calling inside');
         const opportunitiesDicts = [];
         response.opportunities.forEach(opportunity => {
+          console.log("IS IT PINNED", opportunity.isPinned)
           const opportunityDict = {
             id: opportunity.getExplorationId(),
             heading: opportunity.getOpportunityHeading(),
             subheading: opportunity.getOpportunitySubheading(),
             actionButtonTitle: 'Translations',
+            isPinned: opportunity.isPinned,
+            topicName: opportunity.topicName
           };
           opportunitiesDicts.push(opportunityDict);
         });
@@ -481,6 +486,19 @@ export class ContributionsAndReview
           more: response.more
         };
       });
+  }
+
+  pinReviewableTranslationOpportunity(
+    dict
+  ): void {
+    const topicName = dict.topic_name;
+    const explorationId = dict.exploration_id;
+    this.contributionOpportunitiesService.pinReviewableTranslationOpportunityAsync(topicName,
+      this.languageCode, explorationId).then(() => {
+        console.log('Calling');
+        this.loadReviewableTranslationOpportunities();
+        // this.ngOnInit();
+      })
   }
 
   onClickReviewableTranslations(explorationId: string): void {

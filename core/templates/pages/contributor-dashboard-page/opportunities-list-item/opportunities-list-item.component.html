@@ -135,6 +135,9 @@
 <!-- Desktop -->
 <div *ngIf="!onMobile && !opportunityDataIsLoading"
      class="oppia-opportunities-list-item oppia-desktop-list-item e2e-test-opportunity-list-item" tabindex="0">
+  <mat-icon class="pin-icon"
+  *ngIf="opportunity"
+  (click)="pinOpportunity()">push_pin</mat-icon>
   <ng-template [ngTemplateOutlet]="OpportunitiesDetails"></ng-template>
   <ng-template [ngTemplateOutlet]="ProgressBar"></ng-template>
   <ng-template [ngTemplateOutlet]="OpportunitiesLabel"></ng-template>
