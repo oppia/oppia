@@ -155,7 +155,7 @@
                 <button type="button"
                         class="btn btn-success save-button e2e-test-node-outline-save-button"
                         [disabled]="!isOutlineModified(editableOutline)"
-                        (click)="updateOutline(editableOutline); onSaveButtonClicked();">
+                        (click)="updateOutline(editableOutline); onSaveButtonClicked(editableOutline);">
                   Save
                 </button>
               </div>
