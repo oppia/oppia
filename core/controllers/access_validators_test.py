@@ -19,6 +19,8 @@ from __future__ import annotations
 import datetime
 
 from core import feconf
+from core.domain import classroom_config_domain
+from core.domain import classroom_config_services
 from core.domain import config_services
 from core.domain import learner_group_fetchers
 from core.domain import learner_group_services
@@ -59,6 +61,18 @@ class ClassroomPageAccessValidationHandlerTests(test_utils.GenericTestBase):
                 'course_details': '',
                 'topic_list_intro': ''
             }])
+        math_classroom_dict: classroom_config_domain.ClassroomDict = {
+            'classroom_id': 'math_classroom_id',
+            'name': 'math',
+            'url_fragment': 'math',
+            'course_details': 'Course details for classroom.',
+            'topic_list_intro': 'Topics covered for classroom',
+            'topic_id_to_prerequisite_topic_ids': {}
+        }
+        math_classroom = classroom_config_domain.Classroom.from_dict(
+            math_classroom_dict)
+
+        classroom_config_services.create_new_classroom(math_classroom)
 
     def test_validation_returns_true_if_classroom_is_available(self) -> None:
         self.login(self.EDITOR_EMAIL)

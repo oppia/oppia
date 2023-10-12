@@ -22,7 +22,7 @@ import collections
 
 from core import utils
 from core.constants import constants
-from core.domain import classroom_services
+from core.domain import classroom_config_services
 from core.domain import collection_domain
 from core.domain import collection_services
 from core.domain import config_domain
@@ -1700,7 +1700,8 @@ def get_displayable_story_summary_dicts(
             'topic_name': topic.name,
             'topic_url_fragment': topic.url_fragment,
             'classroom_url_fragment': (
-                classroom_services.get_classroom_url_fragment_for_topic_id(
+                classroom_config_services
+                .get_classroom_url_fragment_for_topic_id(
                     story.corresponding_topic_id))
         })
 
@@ -1735,7 +1736,8 @@ def get_displayable_untracked_topic_summary_dicts(
                 all_skill_ids))
         degrees_of_mastery = skill_services.get_multi_user_skill_mastery(
             user_id, all_skill_ids)
-        summary_dict[classroom_services.get_classroom_url_fragment_for_topic_id(
+        summary_dict[
+            classroom_config_services.get_classroom_url_fragment_for_topic_id(
             topic.id)].append({
                 'id': topic.id,
                 'name': topic.name,
@@ -1752,8 +1754,8 @@ def get_displayable_untracked_topic_summary_dicts(
                     topic_fetchers.get_canonical_story_dicts(user_id, topic)),
                 'url_fragment': topic.url_fragment,
                 'classroom': (
-                    classroom_services.get_classroom_url_fragment_for_topic_id(
-                        topic.id)),
+                    classroom_config_services.
+                    get_classroom_url_fragment_for_topic_id(topic.id)),
                 'practice_tab_is_displayed': topic.practice_tab_is_displayed,
                 'degrees_of_mastery': degrees_of_mastery,
                 'skill_descriptions': skill_descriptions,
@@ -1803,8 +1805,8 @@ def get_displayable_topic_summary_dicts(
                 topic_fetchers.get_canonical_story_dicts(user_id, topic)),
             'url_fragment': topic.url_fragment,
             'classroom': (
-                classroom_services.get_classroom_url_fragment_for_topic_id(
-                    topic.id)),
+                classroom_config_services.
+                get_classroom_url_fragment_for_topic_id(topic.id)),
             'practice_tab_is_displayed': topic.practice_tab_is_displayed,
             'degrees_of_mastery': degrees_of_mastery,
             'skill_descriptions': skill_descriptions,

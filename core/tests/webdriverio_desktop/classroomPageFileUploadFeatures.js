@@ -19,10 +19,13 @@
 
 var general = require('../webdriverio_utils/general.js');
 var users = require('../webdriverio_utils/users.js');
+var waitFor = require('../webdriverio_utils/waitFor.js');
 var workflow = require('../webdriverio_utils/workflow.js');
+
 
 var AdminPage = require('../webdriverio_utils/AdminPage.js');
 var ClassroomPage = require('../webdriverio_utils/ClassroomPage.js');
+var DiagnosticTestPage = require('../webdriverio_utils/DiagnosticTestPage.js');
 var SkillEditorPage = require('../webdriverio_utils/SkillEditorPage.js');
 var LibraryPage = require('../webdriverio_utils/LibraryPage.js');
 var TopicsAndSkillsDashboardPage = require(
@@ -39,6 +42,7 @@ describe('Classroom page functionality', function() {
   beforeAll(async function() {
     adminPage = new AdminPage.AdminPage();
     classroomPage = new ClassroomPage.ClassroomPage();
+    diagnosticTestPage = new DiagnosticTestPage.DiagnosticTestPage();
     libraryPage = new LibraryPage.LibraryPage();
     skillEditorPage = new SkillEditorPage.SkillEditorPage();
     topicsAndSkillsDashboardPage = (
@@ -76,6 +80,11 @@ describe('Classroom page functionality', function() {
           elem = await elem.addItem('Unicode');
           await elem.setValue(topicId);
         });
+
+      await browser.url('/classroom-admin/');
+      await waitFor.pageToFullyLoad();
+      await diagnosticTestPage.createNewClassroomConfig('Math', 'math');
+      await diagnosticTestPage.addTopicIdToClassroomConfig(topicId, 0);
       await classroomPage.get('math');
       // Even if the topic is unpublished, an unclickable tile is shown
       // currently.

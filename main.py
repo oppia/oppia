@@ -1157,7 +1157,7 @@ URLS.extend((
         oppia_root.OppiaRootPage),
     get_redirect_route(
         r'/learn/<classroom_url_fragment>',
-        oppia_root.OppiaLightweightRootPage
+        oppia_root.OppiaRootPage
     ),
     get_redirect_route(
         r'%s/<blog_post_url>' % feconf.BLOG_HOMEPAGE_URL,

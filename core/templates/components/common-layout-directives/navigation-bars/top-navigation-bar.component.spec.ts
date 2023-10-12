@@ -36,13 +36,9 @@ import { UserInfo } from 'domain/user/user-info.model';
 import { FeedbackUpdatesBackendApiService } from 'domain/feedback_updates/feedback-updates-backend-api.service';
 import { FeedbackThreadSummary } from
   'domain/feedback_thread/feedback-thread-summary.model';
-import { ClassroomBackendApiService } from 'domain/classroom/classroom-backend-api.service';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { I18nService } from 'i18n/i18n.service';
 import { CookieService } from 'ngx-cookie';
-import { CreatorTopicSummary } from 'domain/topic/creator-topic-summary.model';
-import { ClassroomData } from 'domain/classroom/classroom-data.model';
-import { AccessValidationBackendApiService } from 'pages/oppia-root/routing/access-validation-backend-api.service';
 import { PlatformFeatureService } from 'services/platform-feature.service';
 import { LearnerGroupBackendApiService } from 'domain/learner_group/learner-group-backend-api.service';
 import { AppConstants } from 'app.constants';
@@ -95,7 +91,6 @@ class MockWindowRef {
 }
 
 describe('TopNavigationBarComponent', () => {
-  let accessValidationBackendApiService: AccessValidationBackendApiService;
   let fixture: ComponentFixture<TopNavigationBarComponent>;
   let component: TopNavigationBarComponent;
   let mockWindowRef: MockWindowRef;
@@ -110,7 +105,6 @@ describe('TopNavigationBarComponent', () => {
   let sidebarStatusService: SidebarStatusService;
   let feedbackUpdatesBackendApiService:
       FeedbackUpdatesBackendApiService;
-  let classroomBackendApiService: ClassroomBackendApiService;
   let learnerGroupBackendApiService: LearnerGroupBackendApiService;
   let i18nLanguageCodeService: I18nLanguageCodeService;
   let i18nService: I18nService;
@@ -211,12 +205,9 @@ describe('TopNavigationBarComponent', () => {
     feedbackUpdatesBackendApiService =
         TestBed.inject(FeedbackUpdatesBackendApiService);
     alertsService = TestBed.inject(AlertsService);
-    classroomBackendApiService = TestBed.inject(ClassroomBackendApiService);
     learnerGroupBackendApiService = TestBed.inject(
       LearnerGroupBackendApiService);
     i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
-    accessValidationBackendApiService = TestBed
-      .inject(AccessValidationBackendApiService);
     urlInterpolationService = TestBed.inject(UrlInterpolationService);
 
     spyOn(searchService, 'onSearchBarLoaded')
@@ -697,36 +688,6 @@ describe('TopNavigationBarComponent', () => {
     expect(component.learnDropdownOffset).toBe(-10);
     expect(component.getInvolvedMenuOffset).toBe(-10);
     expect(component.donateMenuOffset).toBe(-10);
-  }));
-
-  it('should fetch classroom data', fakeAsync(() => {
-    spyOn(accessValidationBackendApiService, 'validateAccessToClassroomPage')
-      .and.returnValue(Promise.resolve());
-
-    let cData1: CreatorTopicSummary = new CreatorTopicSummary(
-      'dummy', 'addition', 3, 3, 3, 3, 1,
-      'en', 'dummy', 1, 1, 1, 1, true,
-      true, 'math', 'public/img.webp', 'red', 'add', 1, 1, [5, 4], [3, 4]);
-    let cData2: CreatorTopicSummary = new CreatorTopicSummary(
-      'dummy2', 'division', 2, 2, 3, 3, 0,
-      'es', 'dummy2', 1, 1, 1, 1, true,
-      true, 'math', 'public/img1.png', 'green', 'div', 1, 1, [5, 4], [3, 4]);
-
-    let array: CreatorTopicSummary[] = [cData1, cData2];
-    let classroomData = new ClassroomData('test', array, 'dummy', 'dummy');
-    let topicTitlesTranslationKeys: string[] =
-      ['I18N_TOPIC_dummy_TITLE', 'I18N_TOPIC_dummy2_TITLE'];
-    spyOn(
-      classroomBackendApiService, 'fetchClassroomDataAsync')
-      .and.resolveTo(classroomData);
-
-    component.ngOnInit();
-
-    tick();
-
-    expect(component.classroomData).toEqual(array);
-    expect(component.topicTitlesTranslationKeys).toEqual(
-      topicTitlesTranslationKeys);
   }));
 
   it('should check whether hacky translations are displayed or not', () => {

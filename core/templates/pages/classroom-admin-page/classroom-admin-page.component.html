@@ -214,7 +214,8 @@
               <div class="new-topic-input-container" *ngIf="newTopicCanBeAdded">
                 <input [(ngModel)]="newTopicId"
                        class="form-control new-topic-input e2e-test-add-topic-to-classroom-input"
-                       (ngModelChange)="onNewTopicInputModelChange()">
+                       (ngModelChange)="onNewTopicInputModelChange()"
+                       placeholder="Topic ID">
                 <button (click)="removeNewTopicInputField()"
                         class="btn btn-secondary">
                   Cancel

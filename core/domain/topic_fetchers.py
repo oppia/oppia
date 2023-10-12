@@ -23,7 +23,7 @@ import copy
 from core import feconf
 from core import utils
 from core.domain import caching_services
-from core.domain import classroom_services
+from core.domain import classroom_config_services
 from core.domain import story_domain
 from core.domain import story_fetchers
 from core.domain import topic_domain
@@ -738,7 +738,7 @@ def get_canonical_story_dicts(
         )
         story_summary_dict['topic_url_fragment'] = topic.url_fragment
         story_summary_dict['classroom_url_fragment'] = (
-            classroom_services.get_classroom_url_fragment_for_topic_id(
+            classroom_config_services.get_classroom_url_fragment_for_topic_id(
                 topic.id))
         story_summary_dict['story_is_published'] = True
         story_summary_dict['completed_node_titles'] = completed_node_titles

@@ -49,7 +49,7 @@ class ClassroomPageTests(BaseClassroomControllerTests):
     def test_any_user_can_access_classroom_page(self) -> None:
         response = self.get_html_response('/learn/math')
         self.assertIn(
-            '<lightweight-oppia-root></lightweight-oppia-root>', response)
+            '<oppia-root></oppia-root>', response)
 
 
 class ClassroomAdminPageTests(BaseClassroomControllerTests):
@@ -124,6 +124,23 @@ class ClassroomDataHandlerTests(BaseClassroomControllerTests):
             }
         }
         self.post_json('/adminhandler', payload, csrf_token=csrf_token)
+
+        math_classroom_dict: classroom_config_domain.ClassroomDict = {
+            'classroom_id': 'math_classroom_id',
+            'name': 'math',
+            'url_fragment': 'math',
+            'course_details': 'Course details for classroom.',
+            'topic_list_intro': 'Topics covered for classroom',
+            'topic_id_to_prerequisite_topic_ids': {
+                topic_id_1: [],
+                topic_id_2: [],
+                topic_id_3: []
+            }
+        }
+        math_classroom = classroom_config_domain.Classroom.from_dict(
+            math_classroom_dict)
+
+        classroom_config_services.create_new_classroom(math_classroom)
         self.logout()
 
         json_response = self.get_json(
