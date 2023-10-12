@@ -416,7 +416,7 @@ export class ExplorationFooterComponent {
     !this.hasLearnerHasViewedLessonInfoTooltip() &&
     this.getMostRecentlyReachedCheckpointIndex() === 2;
 
-    if(shouldRenderLessonInfoTooltip) {
+    if (shouldRenderLessonInfoTooltip) {
       this.lessonInfoButton.nativeElement.focus();
     }
     return shouldRenderLessonInfoTooltip;
