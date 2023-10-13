@@ -493,9 +493,11 @@ export class StoryNodeEditorComponent implements OnInit, OnDestroy {
   }
 
   onSaveButtonClicked(newOutline: string): void {
-    this.storyUpdateService.setStoryNodeOutline(
-      this.story, this.nodeId, newOutline);
-    this.oldOutline = newOutline;
+    if (this.isOutlineModified(newOutline)) {
+      this.storyUpdateService.setStoryNodeOutline(
+        this.story, this.nodeId, newOutline);
+      this.oldOutline = newOutline;
+    }
     this.outlineEditViewIsShown = 'First outline';
     this.chapterOutlineIsShown = false;
   }
