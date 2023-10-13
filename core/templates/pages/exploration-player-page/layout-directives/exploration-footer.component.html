@@ -1,6 +1,6 @@
 <div class="footer navbar-fixed-bottom oppia-exploration-footer" *ngIf="!iframed">
-  <div *ngIf="!footerIsInQuestionPlayerMode && !hasLearnerHasViewedLessonInfoTooltip() && getMostRecentlyReachedCheckpointIndex() == 2">
-    <div class="close-tooltip e2e-test-close-lesson-info-tooltip" (click)="learnerHasViewedLessonInfo()"></div>
+  <div *ngIf="shouldRenderLessonInfoTooltip()" aria-live="assertive">
+    <div class="close-tooltip e2e-test-close-lesson-info-tooltip" (click)="learnerHasViewedLessonInfo()" (keydown.enter)="learnerHasViewedLessonInfo()" tabindex="0"></div>
     <div class="lesson-info-tooltip lesson-info-tooltip-add-ons"
          [innerHTML]="'I18N_LESSON_INFO_TOOLTIP_MESSAGE' | translate">
     </div>
@@ -8,6 +8,8 @@
   <div class="row">
     <div [ngClass]="{'col-sm-5': isLanguageRTL(), 'col-sm-3': !isLanguageRTL()}">
       <button class="oppia-lesson-info"
+              #lessonInfoButton
+              (keydown.escape)="learnerHasViewedLessonInfo()"
               (click)="showInformationCard()"
               *ngIf="!footerIsInQuestionPlayerMode">
         <img [src]="getStaticImageUrl('/general/apple.svg')"
