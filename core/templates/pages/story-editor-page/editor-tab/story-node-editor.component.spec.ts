@@ -630,9 +630,14 @@ describe('Story node editor component', () => {
   });
 
   it('should click chapter outline save button', () => {
+
+    let storySpy = spyOn(storyUpdateService, 'setStoryNodeOutline');
+
     component.chapterOutlineIsShown = true;
 
     component.onSaveButtonClicked('New outline');
+
+    expect(storySpy).toHaveBeenCalled();
 
     expect(component.chapterOutlineIsShown).toBe(false);
   });
