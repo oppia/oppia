@@ -13,12 +13,9 @@
 // limitations under the License.
 
 /**
- * @fileoverview Factory for creating new frontend instances of Learner
+ * @fileoverview Model class for creating new frontend instances of Learner
  *     Action domain objects.
  */
-
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
 
 import { StatisticsDomainConstants } from
   'domain/statistics/statistics-domain.constants';
@@ -60,14 +57,20 @@ interface LearnerActionBackendDictBase<ActionType> {
   'schema_version': number;
 }
 
+export enum LearnerActionType {
+  ExplorationStart = 'ExplorationStart',
+  AnswerSubmit = 'AnswerSubmit',
+  ExplorationQuit = 'ExplorationQuit',
+}
+
 export type ExplorationStartLearnerActionBackendDict = (
-  LearnerActionBackendDictBase<'ExplorationStart'>);
+  LearnerActionBackendDictBase<LearnerActionType.ExplorationStart>);
 
 export type AnswerSubmitLearnerActionBackendDict = (
-  LearnerActionBackendDictBase<'AnswerSubmit'>);
+  LearnerActionBackendDictBase<LearnerActionType.AnswerSubmit>);
 
 export type ExplorationQuitLearnerActionBackendDict = (
-  LearnerActionBackendDictBase<'ExplorationQuit'>);
+  LearnerActionBackendDictBase<LearnerActionType.ExplorationQuit>);
 
 export type LearnerActionBackendDict = (
   ExplorationStartLearnerActionBackendDict |
@@ -75,14 +78,15 @@ export type LearnerActionBackendDict = (
   ExplorationQuitLearnerActionBackendDict);
 
 // NOTE TO DEVELOPERS: Treat this as an implementation detail; do not export it.
-// This class takes the type according to the ActionType parameter.
-class LearnerActionBase<ActionType> {
+// This class takes the type according to the LearnerActionType parameter.
+class LearnerActionBase<LearnerActionType> {
   constructor(
-      public readonly actionType: ActionType,
-      public actionCustomizationArgs: ActionCustomizationArgs<ActionType>,
-      public schemaVersion: number) {}
+    public readonly actionType: LearnerActionType,
+    public actionCustomizationArgs: ActionCustomizationArgs<LearnerActionType>,
+    public schemaVersion: number
+  ) {}
 
-  toBackendDict(): LearnerActionBackendDictBase<ActionType> {
+  toBackendDict(): LearnerActionBackendDictBase<LearnerActionType> {
     return {
       action_type: this.actionType,
       action_customization_args: this.actionCustomizationArgs,
@@ -92,44 +96,41 @@ class LearnerActionBase<ActionType> {
 }
 
 export class ExplorationStartLearnerAction extends
-  LearnerActionBase<'ExplorationStart'> {}
+  LearnerActionBase<LearnerActionType.ExplorationStart> {}
 
 export class AnswerSubmitLearnerAction extends
-  LearnerActionBase<'AnswerSubmit'> {}
+  LearnerActionBase<LearnerActionType.AnswerSubmit> {}
 
 export class ExplorationQuitLearnerAction extends
-  LearnerActionBase<'ExplorationQuit'> {}
+  LearnerActionBase<LearnerActionType.ExplorationQuit> {}
 
 export type LearnerAction = (
   ExplorationStartLearnerAction |
   AnswerSubmitLearnerAction |
   ExplorationQuitLearnerAction);
 
-@Injectable({
-  providedIn: 'root'
-})
-export class LearnerActionObjectFactory {
-  createNewExplorationStartAction(
+export class LearnerActionModel {
+  static createNewExplorationStartAction(
       actionCustomizationArgs: ExplorationStartCustomizationArgs
   ): ExplorationStartLearnerAction {
     return new ExplorationStartLearnerAction(
-      'ExplorationStart', actionCustomizationArgs,
+      LearnerActionType.ExplorationStart, actionCustomizationArgs,
       StatisticsDomainConstants.LEARNER_ACTION_SCHEMA_LATEST_VERSION);
   }
 
-  createNewAnswerSubmitAction(
+  static createNewAnswerSubmitAction(
       actionCustomizationArgs: AnswerSubmitCustomizationArgs
   ): AnswerSubmitLearnerAction {
     return new AnswerSubmitLearnerAction(
-      'AnswerSubmit', actionCustomizationArgs,
+      LearnerActionType.AnswerSubmit, actionCustomizationArgs,
       StatisticsDomainConstants.LEARNER_ACTION_SCHEMA_LATEST_VERSION);
   }
 
-  createNewExplorationQuitAction(
+  static createNewExplorationQuitAction(
       actionCustomizationArgs: ExplorationQuitCustomizationArgs
   ): ExplorationQuitLearnerAction {
     return new ExplorationQuitLearnerAction(
-      'ExplorationQuit', actionCustomizationArgs,
+      LearnerActionType.ExplorationQuit, actionCustomizationArgs,
       StatisticsDomainConstants.LEARNER_ACTION_SCHEMA_LATEST_VERSION);
   }
 
@@ -146,20 +147,20 @@ export class LearnerActionObjectFactory {
    * @param {LearnerActionBackendDict} learnerActionBackendDict
    * @returns {LearnerAction}
    */
-  createFromBackendDict(
+  static createFromBackendDict(
       learnerActionBackendDict: LearnerActionBackendDict): LearnerAction {
     switch (learnerActionBackendDict.action_type) {
-      case 'ExplorationStart':
+      case LearnerActionType.ExplorationStart:
         return new ExplorationStartLearnerAction(
           learnerActionBackendDict.action_type,
           learnerActionBackendDict.action_customization_args,
           learnerActionBackendDict.schema_version);
-      case 'AnswerSubmit':
+      case LearnerActionType.AnswerSubmit:
         return new AnswerSubmitLearnerAction(
           learnerActionBackendDict.action_type,
           learnerActionBackendDict.action_customization_args,
           learnerActionBackendDict.schema_version);
-      case 'ExplorationQuit':
+      case LearnerActionType.ExplorationQuit:
         return new ExplorationQuitLearnerAction(
           learnerActionBackendDict.action_type,
           learnerActionBackendDict.action_customization_args,
@@ -173,7 +174,3 @@ export class LearnerActionObjectFactory {
       angular.toJson(invalidBackendDict));
   }
 }
-
-angular.module('oppia').factory(
-  'LearnerActionObjectFactory',
-  downgradeInjectable(LearnerActionObjectFactory));
