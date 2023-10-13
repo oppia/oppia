@@ -1,6 +1,5 @@
 <button mat-button
         class="oppia-learner-confirm-button e2e-test-continue-to-next-card-button oppia-autofocus"
-        [oppiaFocusOn]="focusLabel"
         (click)="clickContinueButton.emit()"
         aria-label="Continue">
   <div *ngIf="!isLearnAgainButton">
