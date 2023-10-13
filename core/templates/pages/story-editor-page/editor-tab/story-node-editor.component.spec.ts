@@ -647,6 +647,14 @@ describe('Story node editor component', () => {
     expect(component.chapterOutlineIsShown).toBe(true);
   });
 
+  it('should be modified outline', () => {
+    if (component.editableOutline == component.oldOutline) {
+      expect(component.isOutlineModified(component.editableOutline)).toBe(false);
+    } else { 
+      expect(component.isOutlineModified(component.editableOutline)).toBe(true);
+    }
+  });
+
   it('should call StoryUpdateService and curatedExplorationValidationService' +
     ' to set node exploration id if story is published',
   fakeAsync(() => {
