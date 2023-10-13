@@ -648,10 +648,12 @@ describe('Story node editor component', () => {
   });
 
   it('should be modified outline', () => {
-    if (component.editableOutline == component.oldOutline) {
-      expect(component.isOutlineModified(component.editableOutline)).toBe(false);
-    } else { 
-      expect(component.isOutlineModified(component.editableOutline)).toBe(true);
+    if (component.editableOutline === component.oldOutline) {
+      expect(component.isOutlineModified(
+        component.editableOutline)).toBe(false);
+    } else {
+      expect(component.isOutlineModified(
+        component.editableOutline)).toBe(true);
     }
   });
 
