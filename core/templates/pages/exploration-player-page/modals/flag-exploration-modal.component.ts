@@ -77,7 +77,6 @@ export class FlagExplorationModalComponent extends ConfirmOrCancelModal {
     } else if (event.key === 'Tab' && event.shiftKey) {
       event.preventDefault();
       this.firstRadio.nativeElement.focus();
-      console.log('here');
     }
   }
 

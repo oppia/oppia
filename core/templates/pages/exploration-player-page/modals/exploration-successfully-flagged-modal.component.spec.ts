@@ -62,7 +62,6 @@ describe('Exploration Successfully flagged modal', () => {
     component.ngOnInit();
 
     expect(component.headingElement.nativeElement.focus)
-    .toHaveBeenCalled();
+      .toHaveBeenCalled();
   });
-
 });

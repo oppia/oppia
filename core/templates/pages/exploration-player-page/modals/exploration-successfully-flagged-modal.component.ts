@@ -26,7 +26,6 @@ import { ConfirmOrCancelModal } from 'components/common-layout-directives/common
 })
 export class ExplorationSuccessfullyFlaggedModalComponent
   extends ConfirmOrCancelModal {
-
   @ViewChild('headingRef') headingElement!: ElementRef;
 
   constructor(
