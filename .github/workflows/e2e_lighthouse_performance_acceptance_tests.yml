@@ -51,9 +51,7 @@ jobs:
       # - name: Build Webpack
       #   run: python -m scripts.build --prod_env
       - name: Build server in prod mode
-        run: make run-devserver prod_env=true
-        env:
-          PROD_MODE: true
+        run: make run-devserver
       - name: Stop the server
         run: make stop
       - name: Zip build files
