@@ -38,8 +38,21 @@ jobs:
         run: pip install coverage configparser
       - name: Setting up containers
         run: |
-          sudo docker compose up angular-build -d
-          sudo make run-offline
+          docker compose up angular-build -d
+          docker compose up -d
+      - name: Checking server reachability
+        run: |
+          for i in {1..50}; do
+            if curl -s http://localhost:8181/; then
+              echo ---Dev-server is up---
+              exit 0
+            else
+              echo ---Retrying in 30 seconds---
+              sleep 30
+            fi
+          done
+          echo ---Dev-server is not started after all retries---
+          exit 1
       - name: Stopping containers
         run: make stop
       - name: Run backend test shard
