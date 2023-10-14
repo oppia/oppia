@@ -2265,9 +2265,13 @@ oppia-parameter {
 }
 
 .oppia-modal-lesson-information-card .modal-dialog {
-  margin: 100px auto;
+  margin: 25px auto;
   max-width: 400px;
   min-width: 320px;
+}
+
+.oppia-modal-lesson-information-card {
+  height: fit-content;
 }
 
 .oppia-progress-reminder-modal .modal-dialog {
