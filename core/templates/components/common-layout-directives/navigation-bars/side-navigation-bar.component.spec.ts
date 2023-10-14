@@ -23,18 +23,14 @@ import { APP_BASE_HREF } from '@angular/common';
 import { RouterModule } from '@angular/router';
 
 import { SmartRouterModule } from 'hybrid-router-module-provider';
-import { ClassroomData } from 'domain/classroom/classroom-data.model';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { SideNavigationBarComponent } from './side-navigation-bar.component';
-import { ClassroomBackendApiService } from 'domain/classroom/classroom-backend-api.service';
 import { UserService } from 'services/user.service';
 import { UserInfo } from 'domain/user/user-info.model';
 import { SidebarStatusService } from 'services/sidebar-status.service';
-import { CreatorTopicSummary } from 'domain/topic/creator-topic-summary.model';
-import { AccessValidationBackendApiService } from 'pages/oppia-root/routing/access-validation-backend-api.service';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 
 class MockWindowRef {
@@ -49,7 +45,6 @@ class MockWindowRef {
 
 
 describe('Side Navigation Bar Component', () => {
-  let accessValidationBackendApiService: AccessValidationBackendApiService;
   let fixture: ComponentFixture<SideNavigationBarComponent>;
   let componentInstance: SideNavigationBarComponent;
   let currentUrl: string = '/test';
@@ -57,7 +52,6 @@ describe('Side Navigation Bar Component', () => {
   let mockWindowRef: MockWindowRef;
   let siteAnalyticsService: SiteAnalyticsService;
   let sidebarStatusService: SidebarStatusService;
-  let classroomBackendApiService: ClassroomBackendApiService;
   let userService: UserService;
   let i18nLanguageCodeService: I18nLanguageCodeService;
 
@@ -100,13 +94,10 @@ describe('Side Navigation Bar Component', () => {
   }));
 
   beforeEach(() => {
-    accessValidationBackendApiService = TestBed
-      .inject(AccessValidationBackendApiService);
     fixture = TestBed.createComponent(SideNavigationBarComponent);
     sidebarStatusService = TestBed.inject(SidebarStatusService);
     siteAnalyticsService = TestBed.inject(SiteAnalyticsService);
     componentInstance = fixture.componentInstance;
-    classroomBackendApiService = TestBed.inject(ClassroomBackendApiService);
     userService = TestBed.inject(UserService);
     i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
 
@@ -218,36 +209,6 @@ describe('Side Navigation Bar Component', () => {
       tick();
       expect(componentInstance.userIsLoggedIn).toBeTrue();
     }));
-
-  it('should fetch classroom data', fakeAsync(() => {
-    spyOn(accessValidationBackendApiService, 'validateAccessToClassroomPage')
-      .and.returnValue(Promise.resolve());
-
-    let cData1: CreatorTopicSummary = new CreatorTopicSummary(
-      'dummy', 'addition', 3, 3, 3, 3, 1,
-      'en', 'dummy', 1, 1, 1, 1, true,
-      true, 'math', 'public/img.webp', 'red', 'add', 1, 1, [5, 4], [3, 4]);
-    let cData2: CreatorTopicSummary = new CreatorTopicSummary(
-      'dummy2', 'division', 2, 2, 3, 3, 0,
-      'es', 'dummy2', 1, 1, 1, 1, true,
-      true, 'math', 'public/img1.png', 'green', 'div', 1, 1, [5, 4], [3, 4]);
-
-    let array: CreatorTopicSummary[] = [cData1, cData2];
-    let classroomData = new ClassroomData('test', array, 'dummy', 'dummy');
-    let topicTitlesTranslationKeys: string[] =
-      ['I18N_TOPIC_dummy_TITLE', 'I18N_TOPIC_dummy2_TITLE'];
-    spyOn(
-      classroomBackendApiService, 'fetchClassroomDataAsync')
-      .and.resolveTo(classroomData);
-
-    componentInstance.ngOnInit();
-
-    tick();
-
-    expect(componentInstance.classroomData).toEqual(array);
-    expect(componentInstance.topicTitlesTranslationKeys).toEqual(
-      topicTitlesTranslationKeys);
-  }));
 
   it('should check whether hacky translations are displayed or not', () => {
     spyOn(i18nLanguageCodeService, 'isHackyTranslationAvailable')
