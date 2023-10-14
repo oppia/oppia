@@ -44,12 +44,12 @@ jobs:
         run: sudo apt install ffmpeg
       # - name: Build Webpack
       #   run: python -m scripts.build --prod_env
-      - name: Build docker images
-        run: |
-          sudo make build
-          docker builder prune -f
       - name: Start the server
-        run: sudo make run-devserver
+        run: |
+          sudo docker compose build
+          sudo docker compose up angular-build -d
+          sudo docker compose up dev-server -d --no-deps
+          sudo make run-offline
       - name: Stop the server
         run: make stop
       - name: Zip build files

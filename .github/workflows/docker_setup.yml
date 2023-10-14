@@ -1,15 +1,5 @@
 name: Docker Setup Test
-on:
-  merge_group:
-    types: [checks_requested]
-  push:
-    branches:
-      - develop
-      - release-*
-  pull_request:
-    branches:
-      - develop
-      - release-*
+on: [push]
 
 jobs:
   build:
@@ -47,6 +37,13 @@ jobs:
           done
           echo ---Dev-server is not started after all retries---
           exit 1
+
+      - name: copy node_modules
+        run: |
+          df -H
+          echo ---Copying node_modules---
+          sudo docker cp oppia-angular-build:/app/oppia/node_modules .
+          df -H
           
       - name: Stop Containers
         run: docker compose down
