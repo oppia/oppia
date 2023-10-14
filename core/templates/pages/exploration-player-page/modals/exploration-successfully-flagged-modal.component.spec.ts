@@ -16,6 +16,7 @@
  * @fileoverview Unit tests for FlagExplorationModalComponent.
  */
 
+import { ElementRef } from '@angular/core';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
@@ -52,4 +53,16 @@ describe('Exploration Successfully flagged modal', () => {
   it('should create', () => {
     expect(component).toBeDefined();
   });
+
+  it('should call focus on the heading element', () => {
+    const headingElementRef = new ElementRef(document.createElement('h3'));
+    component.headingElement = headingElementRef;
+    spyOn(component.headingElement.nativeElement, 'focus');
+
+    component.ngOnInit();
+
+    expect(component.headingElement.nativeElement.focus)
+    .toHaveBeenCalled();
+  });
+
 });

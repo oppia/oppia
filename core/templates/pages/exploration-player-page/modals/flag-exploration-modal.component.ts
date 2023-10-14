@@ -16,7 +16,7 @@
  * @fileoverview Component for flag exploration modal.
  */
 
-import { Component } from '@angular/core';
+import { Component, ViewChild, ElementRef } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
@@ -41,6 +41,12 @@ export class FlagExplorationModalComponent extends ConfirmOrCancelModal {
   flagMessageTextareaIsShown: boolean = false;
   flag: boolean = false;
 
+  @ViewChild('firstRadio') firstRadio!: ElementRef;
+
+  @ViewChild('secondRadio') secondRadio!: ElementRef;
+
+  @ViewChild('thirdRadio') thirdRadio!: ElementRef;
+
   constructor(
     private ngbActiveModal: NgbActiveModal,
     private focusManagerService: FocusManagerService,
@@ -54,6 +60,31 @@ export class FlagExplorationModalComponent extends ConfirmOrCancelModal {
     if (value) {
       this.flagMessageTextareaIsShown = true;
       this.focusManagerService.setFocus('flagMessageTextarea');
+    }
+  }
+
+  handleTabForFirstRadio(event: KeyboardEvent): void {
+    if (event.key === 'Tab' && !event.shiftKey) {
+      event.preventDefault();
+      this.secondRadio.nativeElement.focus();
+    }
+  }
+
+  handleTabForSecondRadio(event: KeyboardEvent): void {
+    if (event.key === 'Tab' && !event.shiftKey) {
+      event.preventDefault();
+      this.thirdRadio.nativeElement.focus();
+    } else if (event.key === 'Tab' && event.shiftKey) {
+      event.preventDefault();
+      this.firstRadio.nativeElement.focus();
+      console.log('here');
+    }
+  }
+
+  handleTabForThirdRadio(event: KeyboardEvent): void {
+    if (event.key === 'Tab' && event.shiftKey) {
+      event.preventDefault();
+      this.secondRadio.nativeElement.focus();
     }
   }
 

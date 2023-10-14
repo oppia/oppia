@@ -16,6 +16,7 @@
  * @fileoverview Unit tests for FlagExplorationModalComponent.
  */
 
+import { ElementRef } from '@angular/core';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { FormsModule } from '@angular/forms';
@@ -63,7 +64,7 @@ describe('Flag Exploration modal', () => {
 
   beforeEach(() => {
     fixture = TestBed.createComponent(FlagExplorationModalComponent);
-    component = fixture.componentInstance;
+    component = fixture.component;
     focusManagerService = TestBed.inject(FocusManagerService);
     ngbActiveModal = TestBed.inject(NgbActiveModal);
   });
@@ -92,5 +93,83 @@ describe('Flag Exploration modal', () => {
       report_text: flagMessageTextareaIsShown,
       state: stateName
     });
+  });
+
+  it('should handle tab key press for first radio', () => {
+    const mockSecondRadio = new ElementRef(document.createElement('input'));
+    const mockThirdRadio = new ElementRef(document.createElement('input'));
+    const event = new KeyboardEvent('keydown', { key: 'Tab' });
+
+    component.secondRadio = mockSecondRadio;
+    component.thirdRadio = mockThirdRadio;
+
+    spyOn(component.secondRadio.nativeElement, 'focus');
+    spyOn(component.thirdRadio.nativeElement, 'focus');
+
+    component.handleTabForFirstRadio(event);
+
+    expect(component.secondRadio.nativeElement.focus)
+      .toHaveBeenCalled();
+    expect(component.thirdRadio.nativeElement.focus)
+      .not.toHaveBeenCalled();
+  });
+
+  it('should handle tab key press for second radio', () => {
+    const mockFirstRadio = new ElementRef(document.createElement('input'));
+    const mockThirdRadio = new ElementRef(document.createElement('input'));
+    const event = new KeyboardEvent('keydown', { key: 'Tab' });
+
+    component.firstRadio = mockFirstRadio;
+    component.thirdRadio = mockThirdRadio;
+
+    spyOn(component.firstRadio.nativeElement, 'focus');
+    spyOn(component.thirdRadio.nativeElement, 'focus');
+
+    component.handleTabForSecondRadio(event);
+
+    expect(component.firstRadio.nativeElement.focus)
+      .not.toHaveBeenCalled();
+    expect(component.thirdRadio.nativeElement.focus)
+      .toHaveBeenCalled();
+  });
+
+  it('should handle shift+tab key press for second radio', () => {
+    const mockFirstRadio = new ElementRef(document.createElement('input'));
+    const mockThirdRadio = new ElementRef(document.createElement('input'));
+    const event = new KeyboardEvent(
+      'keydown', { key: 'Tab', shiftKey: true });
+
+    component.firstRadio = mockFirstRadio;
+    component.thirdRadio = mockThirdRadio;
+
+    spyOn(component.firstRadio.nativeElement, 'focus');
+    spyOn(component.thirdRadio.nativeElement, 'focus');
+
+    component.handleTabForSecondRadio(event);
+
+    expect(component.firstRadio.nativeElement.focus)
+      .toHaveBeenCalled();
+    expect(component.thirdRadio.nativeElement.focus)
+      .not.toHaveBeenCalled();
+  });
+
+  it('should handle shift+tab key press for third radio', () => {
+    const mockFirstRadio = new ElementRef(document.createElement('input'));
+    const mockSecondRadio = new ElementRef(document.createElement('input'));
+    const event = new KeyboardEvent(
+      'keydown', { key: 'Tab', shiftKey: true });
+
+    component.firstRadio = mockFirstRadio;
+    component.secondRadio = mockSecondRadio;
+
+    spyOn(component.firstRadio.nativeElement, 'focus');
+    spyOn(component.secondRadio.nativeElement, 'focus');
+
+    component.handleTabForThirdRadio(event);
+
+    expect(component.firstRadio.nativeElement.focus)
+      .not.toHaveBeenCalled();
+    expect(component.secondRadio.nativeElement.focus)
+      .toHaveBeenCalled();
   });
 });

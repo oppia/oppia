@@ -11,6 +11,8 @@
     <div class="oppia-flag-modal-long-text radio">
       <label>
         <input type="radio" value="ad" [(ngModel)]="flag"
+               #firstRadio
+               (keydown)="handleTabForFirstRadio($event)"
                [ngModelOptions]="{standalone: true}"
                class="e2e-test-report-exploration-radio-button"
                (change)="showFlagMessageTextarea(flag)">
@@ -20,6 +22,8 @@
     <div class="oppia-flag-modal-long-text radio">
       <label>
         <input type="radio" value="poor_experience" [(ngModel)]="flag"
+               #secondRadio
+               (keydown)="handleTabForSecondRadio($event)"
                [ngModelOptions]="{standalone: true}"
                class="e2e-test-report-exploration-radio-button"
                (change)="showFlagMessageTextarea(flag)">
@@ -29,6 +33,8 @@
     <div class="oppia-flag-modal-long-text radio">
       <label>
         <input type="radio" value="other" [(ngModel)]="flag"
+               #thirdRadio
+               (keydown)="handleTabForThirdRadio($event)"
                [ngModelOptions]="{standalone: true}"
                class="e2e-test-report-exploration-radio-button"
                (change)="showFlagMessageTextarea(flag)">
