@@ -104,9 +104,6 @@
   padding-left: 1em;
   padding-top: 0;
 }
-.mat-form-field-appearance-fill .mat-form-field-infix {
-  padding-top: 0.45em;
-}
 .mat-form-field-underline {
   display: none;
 }
