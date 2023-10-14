@@ -44,7 +44,11 @@ jobs:
         run: sudo apt install ffmpeg
       # - name: Build Webpack
       #   run: python -m scripts.build --prod_env
-      - name: Build server in prod mode
+      - name: Build docker images
+        run: |
+          sudo make build
+          docker builder prune -f
+      - name: Start the server
         run: sudo make run-devserver
       - name: Stop the server
         run: make stop
