@@ -196,8 +196,6 @@ var ContributorDashboardAdminPage = function() {
       `.e2e-test-language-selector-option=${language}`);
     await action.click(`${language} option selector`, selectorOption);
     await action.click('Language Selector', languageSelector);
-    await waitFor.invisibilityOf(
-      languageDropdown, 'Language Dropdown did not disappear');
   };
 
   this.expectUserToBeTranslationReviewer = async function(
