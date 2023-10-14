@@ -373,9 +373,32 @@
         class="example-detail-row">
     </tr>
   </table>
+  <div class="dashboard-list-header" *ngIf="!loadingMessage && !noDataMessage">
+    <div class="dashboard-list-header-count">
+      <span>Displaying 1 - 10 of 10</span>
+    </div>
+    <div class="dashboard-list-pagination">
+      <div>
+        <i class="fa fa-angle-left stats-pagination-arrow" (click)="navigatePage(MOVE_TO_PREV_PAGE)" *ngIf="statsPageNumber > 0"></i>
+        <span class="dashboard-list-pagination-value">
+          <span class="dashboard-list-pagination-active">{{ statsPageNumber + 1 }}</span>
+        </span>
+        <i class="fa fa-angle-right stats-pagination-arrow" (click)="navigatePage(MOVE_TO_NEXT_PAGE)" *ngIf="more"></i>
+      </div>
+      <div>
+        <span>Results per page: </span>
+        <select [(ngModel)]="itemsPerPage" aria-label="Results Per Page" (change)="refreshPagination()">
+          <option *ngFor="let choice of itemsPerPageChoice" [value]="choice" >{{ choice }}</option>
+        </select>
+      </div>
+    </div>
+  </div>
 </div>
 
 <style>
+  .stats-pagination-arrow {
+    cursor: pointer;
+  }
   .oppia-align-center {
     font-size: 2em;
     width: 960px;
@@ -390,7 +413,6 @@
   }
 
   table {
-    margin: 10px;
     max-width: 960px;
   }
 
@@ -522,6 +544,49 @@
   th.mat-header-cell:first-of-type {
     border-top-left-radius: 5px;
     width: 50px;
+  }
+  .dashboard-list-header {
+    box-shadow: 0px 5px 5px -3px rgb(0 0 0 / 20%), 0px 8px 10px 1px rgb(0 0 0 / 14%), 0px 3px 14px 2px rgb(0 0 0 / 12%);
+    background: #fff;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    padding: 20px 20px;
+  }
+  .dashboard-list-pagination {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    width: 50%;
+  }
+  .dashboard-list-pagination-value {
+    font-size: 16px;
+    outline: none;
+    padding: 0 4px;
+  }
+  .dashboard-list-pagination-active {
+    background-color: #00645c;
+    border-radius: 5px;
+    box-shadow: 0 3px 3px #707070;
+    color: #fff;
+    display: inline-block;
+    font-size: 16px;
+    height: 23px;
+    outline: none;
+    padding: 0 4px;
+    text-align: center;
+    width: 23px;
+  }
+  .dashboard-list-pagination-active span {
+    color: #fff;
+    font-size: 16px;
+    outline: none;
+  }
+  select {
+    border: transparent;
+    background: transparent;
+    color: #00645C;
+    padding: 0 5px 0;
   }
 
   @media only screen and (max-width: 800px) {

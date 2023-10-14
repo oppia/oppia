@@ -31,6 +31,8 @@ import { QuestionReviewerStats, QuestionSubmitterStats, TranslationReviewerStats
 import { CdAdminQuestionRoleEditorModal } from '../question-role-editor-modal/cd-admin-question-role-editor-modal.component';
 import { CdAdminTranslationRoleEditorModal } from '../translation-role-editor-modal/cd-admin-translation-role-editor-modal.component';
 import constants from 'assets/constants';
+import debounce from 'lodash/debounce';
+
 
 @Component({
   selector: 'contributor-admin-stats-table',
@@ -79,7 +81,7 @@ export class ContributorAdminStatsTable implements OnInit {
     QuestionReviewerStats[] = [];
 
   nextOffset: number = 0;
-  more: boolean = false;
+  more: boolean = true;
 
   expandedElement: TranslationSubmitterStats[] |
     TranslationReviewerStats[] |
@@ -94,6 +96,14 @@ export class ContributorAdminStatsTable implements OnInit {
   TAB_NAME_QUESTION_COORDINATOR: string = 'Question Coordinator';
   loadingMessage!: string;
   noDataMessage!: string;
+  itemsPerPageChoice: number[] = [1, 2, 3];
+  itemsPerPage: number = 1;
+  statsPageNumber: number = 0;
+  pageNumber: number = 0;
+  MOVE_TO_NEXT_PAGE: string = 'next_page';
+  MOVE_TO_PREV_PAGE: string = 'prev_page';
+  fetchdataDebounced!: () => void;
+  firstTimeFetchingData: boolean = true;
 
   constructor(
     private windowRef: WindowRef,
@@ -109,6 +119,8 @@ export class ContributorAdminStatsTable implements OnInit {
     if (this.filter) {
       this.updateColumnsToDisplay();
     }
+
+    this.fetchdataDebounced = debounce(this.updateColumnsToDisplay, 300);
   }
 
   openCdAdminQuestionRoleEditorModal(username: string): void {
@@ -198,6 +210,7 @@ export class ContributorAdminStatsTable implements OnInit {
     if (changes) {
       this.loadingMessage = 'Loading';
       this.noDataMessage = '';
+      this.refreshPagination();
       this.updateColumnsToDisplay();
     }
   }
@@ -227,8 +240,8 @@ export class ContributorAdminStatsTable implements OnInit {
       this.ContributorDashboardAdminStatsBackendApiService
         .fetchContributorAdminStats(
           this.filter,
-          20,
-          0,
+          this.itemsPerPage,
+          this.nextOffset,
           AppConstants.CONTRIBUTION_STATS_TYPE_TRANSLATION,
           AppConstants.CONTRIBUTION_STATS_SUBTYPE_SUBMISSION).then(
           (response) => {
@@ -261,8 +274,8 @@ export class ContributorAdminStatsTable implements OnInit {
       this.ContributorDashboardAdminStatsBackendApiService
         .fetchContributorAdminStats(
           this.filter,
-          20,
-          0,
+          this.itemsPerPage,
+          this.nextOffset,
           AppConstants.CONTRIBUTION_STATS_TYPE_TRANSLATION,
           AppConstants.CONTRIBUTION_STATS_SUBTYPE_REVIEW).then(
           (response) => {
@@ -299,8 +312,8 @@ export class ContributorAdminStatsTable implements OnInit {
       this.ContributorDashboardAdminStatsBackendApiService
         .fetchContributorAdminStats(
           this.filter,
-          20,
-          0,
+          this.itemsPerPage,
+          this.nextOffset,
           AppConstants.CONTRIBUTION_STATS_TYPE_QUESTION,
           AppConstants.CONTRIBUTION_STATS_SUBTYPE_SUBMISSION).then(
           (response) => {
@@ -333,8 +346,8 @@ export class ContributorAdminStatsTable implements OnInit {
       this.ContributorDashboardAdminStatsBackendApiService
         .fetchContributorAdminStats(
           this.filter,
-          20,
-          0,
+          this.itemsPerPage,
+          this.nextOffset,
           AppConstants.CONTRIBUTION_STATS_TYPE_QUESTION,
           AppConstants.CONTRIBUTION_STATS_SUBTYPE_REVIEW).then(
           (response) => {
@@ -349,6 +362,54 @@ export class ContributorAdminStatsTable implements OnInit {
           });
     }
   }
+
+  refreshPagination(): void {
+    this.nextOffset = 0;
+    this.dataSource = [];
+    this.more = true;
+    this.firstTimeFetchingData = true;
+    this.goToPageNumber(0);
+  }
+
+  goToPageNumber(pageNumber: number): void {
+    this.statsPageNumber = pageNumber;
+    this.pageNumber = this.statsPageNumber;
+    this.nextOffset = (pageNumber * this.itemsPerPage);
+    this.updateColumnsToDisplay();
+  }
+
+  navigatePage(direction: string): void {
+    if (direction === this.MOVE_TO_NEXT_PAGE) {
+      console.log("next page present true");
+      this.goToPageNumber(this.pageNumber + 1);
+      // if (this.isNextPagePresent()) {
+      // } else {
+      //   console.log("debounced");
+      //   this.fetchdataDebounced();
+      // }
+    } else if (this.pageNumber >= 1) {
+      console.log("going to previous page");
+      this.goToPageNumber(this.pageNumber - 1);
+    }
+  }
+
+  /**
+   * Tells whether the next skill page is present in memory or not.
+   * This case occurs when the next page is fetched from the backend
+   * and then we move back one page, but the next page is still in
+   * memory. So instead of making the backend call for the next page,
+   * we first check if the next page is present in memory.
+   * @returns {Boolean} - Whether the next page is present or not.
+   */
+  // isNextPagePresent(): boolean {
+  //   let totalStatsPresent: number = this.totalStats.length;
+  //   // Here +1 is used since we are checking the next page and
+  //   // another +1 because page numbers start from 0.
+  //   let numberOfStatsRequired: number = (
+  //     (this.statsPageNumber + 2) * this.itemsPerPage);
+
+  //   return totalStatsPresent >= numberOfStatsRequired;
+  // }
 }
 
 
