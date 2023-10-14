@@ -35,6 +35,10 @@ export class ExplorationSuccessfullyFlaggedModalComponent
   }
 
   ngOnInit(): void {
+    this.focusOnHeading();
+  }
+
+  focusOnHeading(): void {
     setTimeout(() => {
       this.headingElement.nativeElement.focus();
     });
