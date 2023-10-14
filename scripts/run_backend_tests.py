@@ -137,7 +137,8 @@ _PARSER.add_argument(
     help='optional; if specified, display the output of the tests being run',
     action='store_true')
 
-def install_third_party_libraries(test_target: bool, skip_install: bool) -> None:
+def install_third_party_libraries(
+        test_target: bool, skip_install: bool) -> None:
     """Run the installation script.
 
     Args:
