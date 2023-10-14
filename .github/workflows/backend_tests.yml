@@ -38,7 +38,6 @@ jobs:
         run: pip install coverage configparser
       - name: Setting up containers
         run: |
-          sudo docker compose build
           sudo docker compose up angular-build -d
           sudo make run-offline
       - name: Stopping containers
