@@ -29,27 +29,33 @@ jobs:
             requirements.txt
             requirements_dev.in
             requirements_dev.txt
-      - uses: ./.github/actions/merge
-      - name: Cache node modules and third_party/static
-        uses: actions/cache@v3
-        env:
-          cache-name: cache-node-modules
-        with:
-          path: |
-            /home/runner/work/oppia/yarn_cache
-            /home/runner/work/oppia/oppia/third_party/static
-          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('yarn.lock', 'dependencies.json') }}
-          restore-keys: |
-            ${{ runner.os }}-build-${{ env.cache-name }}-
-            ${{ runner.os }}-build-
-            ${{ runner.os }}-
-      - uses: ./.github/actions/install-oppia-dependencies
+      # - uses: ./.github/actions/merge
+      # - name: Cache node modules and third_party/static
+      #   uses: actions/cache@v3
+      #   env:
+      #     cache-name: cache-node-modules
+      #   with:
+      #     path: |
+      #       /home/runner/work/oppia/yarn_cache
+      #       /home/runner/work/oppia/oppia/third_party/static
+      #     key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('yarn.lock', 'dependencies.json') }}
+      #     restore-keys: |
+      #       ${{ runner.os }}-build-${{ env.cache-name }}-
+      #       ${{ runner.os }}-build-
+      #       ${{ runner.os }}-
+      # - uses: ./.github/actions/install-oppia-dependencies
       - name: Install chrome
         run: python -m scripts.install_chrome_for_ci
       - name: Install ffmpeg
         run: sudo apt install ffmpeg
-      - name: Build Webpack
-        run: python -m scripts.build --prod_env
+      # - name: Build Webpack
+      #   run: python -m scripts.build --prod_env
+      - name: Build server in prod mode
+        run: make run-devserver prod_env=true
+        env:
+          PROD_MODE: true
+      - name: Stop the server
+        run: make stop
       - name: Zip build files
         # We avoid using ../ or absolute paths because unzip treats these as
         # security issues and will refuse to follow them.
