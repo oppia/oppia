@@ -59,7 +59,7 @@ describe('Admin Page', function() {
       await users.createUser('user1@admintab.com', 'user1');
       await users.login('management@adminTab.com');
 
-      await adminPage.makeUserTranslationCoordinator('user1');
+      await adminPage.makeUserTranslationCoordinator('user1', 'English');
       await adminPage.expectUserRolesToMatch(
         'user1', ['full user', 'translation coordinator']);
     });
