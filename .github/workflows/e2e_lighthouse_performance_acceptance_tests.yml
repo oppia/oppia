@@ -1,15 +1,5 @@
 name: End-to-End, Lighthouse CI performance and Acceptance tests
-on:
-  merge_group:
-    types: [checks_requested]
-  push:
-    branches:
-      - develop
-      - release-*
-  pull_request:
-    branches:
-      - develop
-      - release-*
+on: [push]
 
 jobs:
   build:
