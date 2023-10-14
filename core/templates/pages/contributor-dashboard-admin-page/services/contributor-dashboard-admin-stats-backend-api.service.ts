@@ -26,6 +26,10 @@ import { TranslationSubmitterStats, TranslationReviewerStats,
 } from '../contributor-dashboard-admin-summary.model';
 import { AppConstants } from 'app.constants';
 import { ContributorDashboardAdminPageConstants as PageConstants } from '../contributor-dashboard-admin-page.constants';
+import { TopicChoice } from '../contributor-admin-dashboard-page.component';
+import { ClassroomDomainConstants } from 'domain/classroom/classroom-domain.constants';
+import { ClassroomDataBackendDict } from 'domain/classroom/classroom-backend-api.service';
+import { UserRolesBackendResponse } from 'domain/admin/admin-backend-api.service';
 
 export interface TranslationSubmitterBackendDict {
     'language_code': string;
@@ -82,11 +86,11 @@ export interface QuestionReviewerBackendDict {
 }
 
 export interface CommunityContributionStatsBackendDict {
-  'translation_reviewers_count': translation_reviewers_count;
+  'translation_reviewers_count': translationReviewersCount;
   'question_reviewers_count': number;
 }
 
-export interface translation_reviewers_count {
+export interface translationReviewersCount {
   [key: string]: number;
 }
 
@@ -147,23 +151,42 @@ export interface QuestionReviewerStatsBackendDict {
   providedIn: 'root',
 })
 export class ContributorDashboardAdminStatsBackendApiService {
+  params!: {};
   constructor(
     private http: HttpClient,
     private urlInterpolationService: UrlInterpolationService
   ) {}
 
   async fetchCommunityStats():
-    Promise<CommunityContributionStatsDict> {
+    Promise<CommunityContributionStatsBackendDict> {
     return new Promise((resolve, reject) => {
       this.http.get<CommunityContributionStatsBackendDict>(
         PageConstants.COMMUNITY_CONTRIBUTION_STATS_URL
       ).toPromise().then(response => {
         resolve({
           translation_reviewers_count: (
-            response.translation_reviewers_count.en),
+            response.translation_reviewers_count),
           question_reviewers_count: response.question_reviewers_count
         });
       });
+    });
+  }
+
+  async fetchAssignedLanguageIds(username: string):
+    Promise<string[]> {
+    return new Promise((resolve, reject) => {
+      this.http.get<UserRolesBackendResponse>(
+        PageConstants.ADMIN_ROLE_HANDLER_URL, {
+          params: {
+            filter_criterion: 'username',
+            username: username
+          }
+        }
+      ).toPromise().then(
+        response =>
+          resolve(
+            response.coordinated_language_ids
+          ));
     });
   }
 
@@ -184,6 +207,20 @@ export class ContributorDashboardAdminStatsBackendApiService {
         contribution_subtype: contributionSubtype
       }
     );
+    this.params = {
+      page_size: pageSize,
+      offset: nextOffset,
+      topic_ids: filter.topicIds.length > 0 ? JSON.stringify(
+        filter.topicIds
+      ) : [],
+      language_code: filter.languageCode ? filter.languageCode : (
+        PageConstants.DEFAULT_LANGUAGE_FILTER
+      ),
+      ...(
+        filter.lastActivity ? {
+          max_days_since_last_activity: filter.lastActivity
+        } : {}),
+    };
     if (contributionType === AppConstants.CONTRIBUTION_STATS_TYPE_TRANSLATION) {
       if (
         contributionSubtype === (
@@ -191,12 +228,7 @@ export class ContributorDashboardAdminStatsBackendApiService {
         return new Promise((resolve, reject) => {
           this.http.get<TranslationSubmitterStatsBackendDict>(
             url, {
-              params: {
-                page_size: pageSize,
-                offset: nextOffset,
-                language_code: filter.languageCode,
-                topic_ids: []
-              }
+              params: this.params
             } as Object
           ).toPromise().then(response => {
             resolve({
@@ -217,12 +249,7 @@ export class ContributorDashboardAdminStatsBackendApiService {
         return new Promise((resolve, reject) => {
           this.http.get<TranslationReviewerStatsBackendDict>(
             url, {
-              params: {
-                page_size: pageSize,
-                offset: nextOffset,
-                language_code: filter.languageCode,
-                topic_ids: []
-              }
+              params: this.params
             } as Object
           ).toPromise().then(response => {
             resolve({
@@ -245,12 +272,7 @@ export class ContributorDashboardAdminStatsBackendApiService {
         return new Promise((resolve, reject) => {
           this.http.get<QuestionSubmitterStatsBackendDict>(
             url, {
-              params: {
-                page_size: pageSize,
-                offset: nextOffset,
-                language_code: filter.languageCode,
-                topic_ids: []
-              }
+              params: this.params
             } as Object
           ).toPromise().then(response => {
             resolve({
@@ -271,12 +293,7 @@ export class ContributorDashboardAdminStatsBackendApiService {
         return new Promise((resolve, reject) => {
           this.http.get<QuestionReviewerStatsBackendDict>(
             url, {
-              params: {
-                page_size: pageSize,
-                offset: nextOffset,
-                language_code: filter.languageCode,
-                topic_ids: []
-              }
+              params: this.params
             } as Object
           ).toPromise().then(response => {
             resolve({
@@ -297,6 +314,22 @@ export class ContributorDashboardAdminStatsBackendApiService {
       nextOffset: 0,
       more: false
     });
+  }
+
+  async fetchTopicChoices(): Promise<TopicChoice[]> {
+    let classroomDataUrl = this.urlInterpolationService.interpolateUrl(
+      ClassroomDomainConstants.CLASSROOOM_DATA_URL_TEMPLATE, {
+        classroom_url_fragment: 'math'
+      });
+    const response = await this.http
+      .get<ClassroomDataBackendDict>(classroomDataUrl)
+      .toPromise();
+    const topicChoices: TopicChoice[] = response.topic_summary_dicts.map(
+      (obj) => ({
+        id: obj.id,
+        topic: obj.name
+      }));
+    return topicChoices;
   }
 }
 

@@ -80,6 +80,9 @@ PLATFORM_PARAMS_TO_SHOW_IN_BLOG_ADMIN_PAGE = set([
     )
 ])
 
+supported_languages: List[str] = [
+    lang['id'] for lang in constants.SUPPORTED_AUDIO_LANGUAGES]
+
 
 class ClassroomPageDataDict(TypedDict):
     """Dict representation of classroom page's data dictionary."""
@@ -2126,7 +2129,8 @@ class TranslationCoordinatorRoleHandler(
             },
             'language_id': {
                 'schema': {
-                    'type': 'basestring'
+                    'type': 'basestring',
+                    'choices': supported_languages
                 }
             }
         }

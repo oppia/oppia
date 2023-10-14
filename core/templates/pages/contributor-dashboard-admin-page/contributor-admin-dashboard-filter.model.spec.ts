@@ -26,7 +26,7 @@ describe('Contributor Admin Dashboard Filter Model', () => {
   });
 
   it('should create a new dashboard filter object', () => {
-    expect(filter.languageCode).toEqual('es');
+    expect(filter.languageCode).toEqual('en');
     expect(filter.topicIds).toEqual([]);
   });
 });

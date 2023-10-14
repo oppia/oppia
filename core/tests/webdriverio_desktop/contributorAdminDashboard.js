@@ -100,7 +100,9 @@ describe('Contributor Admin Dashboard', function() {
     await adminPage.get();
     await adminPage.addRole('management', 'release coordinator');
     await adminPage.addRole('question', 'question coordinator');
-    await adminPage.makeUserTranslationCoordinator('translation');
+    await adminPage.makeUserTranslationCoordinator('translation', 'English');
+    await adminPage.addLanguageToCoordinator('translation', 'shqip (Albanian)');
+    await adminPage.addLanguageToCoordinator('translation', 'العربية (Arabic)');
     await adminPage.addRole('question', 'translation admin');
     await users.logout();
 
@@ -111,6 +113,8 @@ describe('Contributor Admin Dashboard', function() {
     await contributorDashboardAdminPage.assignQuestionReviewer('user1');
     await contributorDashboardAdminPage.assignTranslationReviewer(
       'user1', 'shqip (Albanian)');
+    await contributorDashboardAdminPage.assignTranslationReviewer(
+      'user1', 'English');
     await users.logout();
 
     // Populating Dashboard.
@@ -276,7 +280,7 @@ describe('Contributor Admin Dashboard', function() {
     await users.logout();
   });
 
-  it('should allow user to navigate to new dashboard', async function() {
+  it('should allow question coordinator to view dashboard', async function() {
     await users.login(QUESTION_COORDINATOR_EMAIL);
     await contributorDashboardAdminPage.get();
 
@@ -289,15 +293,31 @@ describe('Contributor Admin Dashboard', function() {
     await contributorDashboardAdminPage.expectStatsRowsAreExpanded();
 
     await users.logout();
-
-    await users.login(TRANSLATION_COORDINATOR_EMAIL);
-    await contributorDashboardAdminPage.get();
-
-    await contributorDashboardAdminPage.navigateToTranslationSubmitterTab();
-    await contributorDashboardAdminPage.expectStatsElementCountToBe(0);
-    await contributorDashboardAdminPage.navigateToTranslationReviewerTab();
-    await contributorDashboardAdminPage.expectStatsElementCountToBe(0);
-
-    await users.logout();
   });
+
+  it('should allow translation coordinator to view dashboard',
+    async function() {
+      await users.login(TRANSLATION_COORDINATOR_EMAIL);
+      await contributorDashboardAdminPage.get();
+
+      await contributorDashboardAdminPage.navigateToTranslationSubmitterTab();
+      await contributorDashboardAdminPage.waitForLoadingMessageToDisappear();
+      await contributorDashboardAdminPage.expectNoStatsElement();
+
+      await contributorDashboardAdminPage.switchLanguage('shqip (Albanian)');
+      await contributorDashboardAdminPage.waitForLoadingMessageToDisappear();
+      await contributorDashboardAdminPage.expectStatsElementCountToBe(2);
+      await contributorDashboardAdminPage.expectStatsRowsAreExpanded();
+
+      await contributorDashboardAdminPage.navigateToTranslationReviewerTab();
+      await contributorDashboardAdminPage.waitForLoadingMessageToDisappear();
+      await contributorDashboardAdminPage.expectStatsElementCountToBe(2);
+      await contributorDashboardAdminPage.expectStatsRowsAreExpanded();
+
+      await contributorDashboardAdminPage.switchLanguage('English');
+      await contributorDashboardAdminPage.waitForLoadingMessageToDisappear();
+      await contributorDashboardAdminPage.expectNoStatsElement(0);
+
+      await users.logout();
+    });
 });
