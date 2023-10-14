@@ -18,6 +18,7 @@
 
 from __future__ import annotations
 
+from core.constants import constants
 from core.domain import classroom_config_domain
 from core.platform import models
 
@@ -148,6 +149,23 @@ def get_classroom_by_url_fragment(
         return None
 
 
+def get_classroom_url_fragment_for_topic_id(topic_id: str) -> str:
+    """Returns the classroom url fragment for the provided topic id.
+
+    Args:
+        topic_id: str. The topic id.
+
+    Returns:
+        str. Returns the classroom url fragment for a topic.
+    """
+    classrooms = get_all_classrooms()
+    for classroom in classrooms:
+        topic_ids = list(classroom.topic_id_to_prerequisite_topic_ids.keys())
+        if topic_id in topic_ids:
+            return classroom.url_fragment
+    return str(constants.CLASSROOM_URL_FRAGMENT_FOR_UNATTACHED_TOPICS)
+
+
 def get_new_classroom_id() -> str:
     """Returns a new classroom ID.
 
@@ -157,7 +175,7 @@ def get_new_classroom_id() -> str:
     return classroom_models.ClassroomModel.generate_new_classroom_id()
 
 
-def _update_classroom(
+def update_classroom(
     classroom: classroom_config_domain.Classroom,
     classroom_model: classroom_models.ClassroomModel
 ) -> None:
@@ -180,7 +198,7 @@ def _update_classroom(
     classroom_model.put()
 
 
-def _create_new_classroom(
+def create_new_classroom(
     classroom: classroom_config_domain.Classroom
 ) -> None:
     """Creates a new classroom model from using the classroom domain object.
@@ -210,9 +228,9 @@ def update_or_create_classroom_model(
         classroom.classroom_id, strict=False)
 
     if model is None:
-        _create_new_classroom(classroom)
+        create_new_classroom(classroom)
     else:
-        _update_classroom(classroom, model)
+        update_classroom(classroom, model)
 
 
 def delete_classroom(classroom_id: str) -> None:

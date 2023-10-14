@@ -42,6 +42,17 @@ export interface TopicChoice {
   topic: string;
 }
 
+
+export interface LanguageChoice {
+  id: string;
+  language: string;
+}
+
+export interface TopicChoice {
+  id: string;
+  topic: string;
+}
+
 @Component({
   selector: 'contributor-admin-dashboard-page',
   styleUrls: ['./contributor-admin-dashboard-page.component.css'],
