@@ -55,12 +55,11 @@ describe('Exploration Successfully flagged modal', () => {
   });
 
   it('should call focus on the heading element', () => {
-    const headingElementRef = new ElementRef(document.createElement('h3'));
+    const headingElementRef = new ElementRef(document.createElement('div'));
     component.headingElement = headingElementRef;
     spyOn(component.headingElement.nativeElement, 'focus');
 
     component.ngOnInit();
-    tick();
 
     expect(component.headingElement.nativeElement.focus)
       .toHaveBeenCalled();
