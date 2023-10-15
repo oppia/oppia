@@ -23,13 +23,6 @@ jobs:
           echo ---Starting Containers---
           docker compose up angular-build -d
           docker compose up -d
-      
-      - name: Deleting ubuntu build files
-        run: |
-          df -H
-          sudo rm -rf /usr/share/dotnet
-          sudo rm -rf "$AGENT_TOOLSDIRECTORY"
-          df -H
 
       - name: Checking server reachability
         run: |

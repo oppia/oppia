@@ -34,6 +34,12 @@ jobs:
       #       ${{ runner.os }}-build-
       #       ${{ runner.os }}-
       # - uses: ./.github/actions/install-oppia-dependencies
+      - name: Freeing up Ubuntu space
+        run: |
+          sudo rm -rf /usr/share/dotnet
+          sudo rm -rf /opt/ghc
+          sudo rm -rf "/usr/local/share/boost"
+          sudo rm -rf "$AGENT_TOOLSDIRECTORY"
       - name: Install python deps
         run: |
           pip install --require-hashes --no-deps -r requirements.txt
@@ -42,14 +48,10 @@ jobs:
         run: python -m scripts.install_chrome_for_ci
       - name: Install ffmpeg
         run: sudo apt install ffmpeg
-      # - name: Build Webpack
-      #   run: python -m scripts.build --prod_env
-      - name: Start the server
-        run: |
-          sudo docker compose build
-          sudo docker compose up angular-build -d
-          sudo docker compose up dev-server -d --no-deps
-          sudo make run-offline
+      - name: Build Docker images
+        run: sudo make build
+      - name: Initializing Server
+        run: make run-devserver
       - name: Stop the server
         run: make stop
       - name: Zip build files
