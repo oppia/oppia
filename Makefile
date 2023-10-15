@@ -51,6 +51,7 @@ start-devserver: ## Starts the development server for the tests
 		printf "▓"; \
 		if [[ "$(prod_env)" = 'true' ]] && [[ -n $$(docker ps -q -f status=exited -f name=webpack-compiler) ]]; then \
 			${SHELL_PREFIX} dev-server python -m scripts.generate_build_directory; \
+			$(MAKE) logs.dev-server; \
 		fi; \
 		sleep 1; \
 	done
