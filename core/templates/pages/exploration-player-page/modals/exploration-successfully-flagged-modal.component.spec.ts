@@ -16,6 +16,7 @@
  * @fileoverview Unit tests for FlagExplorationModalComponent.
  */
 
+import { ElementRef } from '@angular/core';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
