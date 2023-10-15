@@ -60,9 +60,7 @@ describe('Exploration Successfully flagged modal', () => {
     spyOn(component.headingElement.nativeElement, 'focus');
 
     component.ngOnInit();
-    component.focusOnHeading();
 
-    expect(component.headingElement.nativeElement.focus)
-      .toHaveBeenCalled();
+    expect(component.focusOnHeading).toHaveBeenCalled();
   });
 });
