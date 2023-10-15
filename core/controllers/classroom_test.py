@@ -259,7 +259,6 @@ class ClassroomAdminTests(test_utils.GenericTestBase):
         classroom_config_services.update_or_create_classroom_model(
             self.math_classroom)
 
-
     def test_get_classroom_id_to_classroom_name(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         classroom_id_to_classroom_name = {
