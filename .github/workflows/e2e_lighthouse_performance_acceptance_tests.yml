@@ -51,7 +51,7 @@ jobs:
       - name: Build Docker images
         run: sudo make build
       - name: Initializing Server
-        run: make run-devserver
+        run: sudo make run-devserver
       - name: Stop the server
         run: make stop
       - name: Zip build files
