@@ -133,11 +133,9 @@
               <label class="fas fa-pencil-alt oppia-icon" (click)="makeChapterOutlineEditable()"></label>
             </div>
             <div class="outline-content-container" *ngIf="outlineEditViewIsShown">
-              <schema-based-editor [disabled]="true"
-                                   [schema]="OUTLINE_SCHEMA"
-                                   [localValue]="oldOutline"
-                                   (click)="makeChapterOutlineEditable()">
-              </schema-based-editor>
+              <button class="chapter-outline-editor-content e2e-test-node-outline-editor-content e2e-test-rte"
+                      (click)="makeChapterOutlineEditable()">{{outlineEditViewIsShown}}
+              </button>
               <label class="fas fa-pencil-alt oppia-icon" (click)="makeChapterOutlineEditable()"></label>
             </div>
           </div>
