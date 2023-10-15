@@ -15,6 +15,17 @@
       </mat-card>
     </div>
   </div>
+  <div class="dashboard-list-header" *ngIf="!loadingMessage && !noDataMessage && checkMobileView()">
+    <div class="dashboard-list-header-count">
+      <span>Displaying {{ statsPageNumber * itemsPerPage + 1 }} - {{ getUpperLimitValueForPagination() }} of many</span>
+    </div>
+    <div class="results-per-page-div">
+      <span>Results per page: </span>
+      <select [(ngModel)]="itemsPerPage" aria-label="Results Per Page" (change)="refreshPagination()">
+        <option *ngFor="let choice of itemsPerPageChoice" [value]="choice" >{{ choice }}</option>
+      </select>
+    </div>
+  </div>
   <table mat-table
          [dataSource]="dataSource"
          multiTemplateDataRows
@@ -373,9 +384,9 @@
         class="example-detail-row">
     </tr>
   </table>
-  <div class="dashboard-list-header" *ngIf="!loadingMessage && !noDataMessage">
-    <div class="dashboard-list-header-count">
-      <span>Displaying 1 - 10 of 10</span>
+  <div class="dashboard-list-footer" *ngIf="!loadingMessage && !noDataMessage && !checkMobileView()">
+    <div class="dashboard-list-footer-count">
+      <span>Displaying {{ statsPageNumber * itemsPerPage + 1 }} - {{ getUpperLimitValueForPagination() }} of many</span>
     </div>
     <div class="dashboard-list-pagination">
       <div>
@@ -391,6 +402,15 @@
           <option *ngFor="let choice of itemsPerPageChoice" [value]="choice" >{{ choice }}</option>
         </select>
       </div>
+    </div>
+  </div>
+  <div class="dashboard-list-footer" *ngIf="!loadingMessage && !noDataMessage && checkMobileView()">
+    <div class="navigate-page-div">
+      <i class="fa fa-angle-left stats-pagination-arrow" (click)="navigatePage(MOVE_TO_PREV_PAGE)" *ngIf="statsPageNumber > 0"></i>
+      <span class="dashboard-list-pagination-value">
+        <span class="dashboard-list-pagination-active">{{ statsPageNumber + 1 }}</span>
+      </span>
+      <i class="fa fa-angle-right stats-pagination-arrow" (click)="navigatePage(MOVE_TO_NEXT_PAGE)" *ngIf="more"></i>
     </div>
   </div>
 </div>
@@ -545,9 +565,18 @@
     border-top-left-radius: 5px;
     width: 50px;
   }
+  .dashboard-list-footer {
+    box-shadow: 0px 5px 5px -3px rgb(0 0 0 / 20%), 0px 8px 10px 1px rgb(0 0 0 / 14%), 0px 3px 14px 2px rgb(0 0 0 / 12%);
+    background: #fff;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    padding: 20px 20px;
+  }
   .dashboard-list-header {
     box-shadow: 0px 5px 5px -3px rgb(0 0 0 / 20%), 0px 8px 10px 1px rgb(0 0 0 / 14%), 0px 3px 14px 2px rgb(0 0 0 / 12%);
     background: #fff;
+    color: #333;
     display: flex;
     flex-wrap: wrap;
     justify-content: space-between;
@@ -590,6 +619,16 @@
   }
 
   @media only screen and (max-width: 800px) {
+    .dashboard-list-footer {
+      color: #333;
+      padding: 10px 10px;
+      width: -webkit-fill-available;
+      justify-content: center;
+    }
+    .dashboard-list-header {
+      padding: 10px 10px;
+      width: -webkit-fill-available;
+    }
     .mobile-chevron {
       padding-left: 50%;
     }
@@ -630,6 +669,7 @@
       align-items: baseline;
       display: flex;
       justify-content: space-around;
+      flex-direction: column;
     }
 
     .mat-row {

@@ -31,8 +31,6 @@ import { QuestionReviewerStats, QuestionSubmitterStats, TranslationReviewerStats
 import { CdAdminQuestionRoleEditorModal } from '../question-role-editor-modal/cd-admin-question-role-editor-modal.component';
 import { CdAdminTranslationRoleEditorModal } from '../translation-role-editor-modal/cd-admin-translation-role-editor-modal.component';
 import constants from 'assets/constants';
-import debounce from 'lodash/debounce';
-
 
 @Component({
   selector: 'contributor-admin-stats-table',
@@ -99,10 +97,8 @@ export class ContributorAdminStatsTable implements OnInit {
   itemsPerPageChoice: number[] = [1, 2, 3];
   itemsPerPage: number = 1;
   statsPageNumber: number = 0;
-  pageNumber: number = 0;
   MOVE_TO_NEXT_PAGE: string = 'next_page';
   MOVE_TO_PREV_PAGE: string = 'prev_page';
-  fetchdataDebounced!: () => void;
   firstTimeFetchingData: boolean = true;
 
   constructor(
@@ -119,8 +115,6 @@ export class ContributorAdminStatsTable implements OnInit {
     if (this.filter) {
       this.updateColumnsToDisplay();
     }
-
-    this.fetchdataDebounced = debounce(this.updateColumnsToDisplay, 300);
   }
 
   openCdAdminQuestionRoleEditorModal(username: string): void {
@@ -189,6 +183,14 @@ export class ContributorAdminStatsTable implements OnInit {
           language => languageIdToName[language.id] = language.description);
         modalRef.componentInstance.languageIdToName = languageIdToName;
       });
+  }
+
+  getUpperLimitValueForPagination(): number {
+    return (
+      Math.min((
+        (this.statsPageNumber * this.itemsPerPage) +
+          this.itemsPerPage), (this.statsPageNumber * this.itemsPerPage) +
+          this.dataSource.length));
   }
 
   openRoleEditor(username: string): void {
@@ -364,6 +366,7 @@ export class ContributorAdminStatsTable implements OnInit {
   }
 
   refreshPagination(): void {
+    this.loadingMessage = 'Loading';
     this.nextOffset = 0;
     this.dataSource = [];
     this.more = true;
@@ -373,43 +376,19 @@ export class ContributorAdminStatsTable implements OnInit {
 
   goToPageNumber(pageNumber: number): void {
     this.statsPageNumber = pageNumber;
-    this.pageNumber = this.statsPageNumber;
     this.nextOffset = (pageNumber * this.itemsPerPage);
     this.updateColumnsToDisplay();
   }
 
   navigatePage(direction: string): void {
     if (direction === this.MOVE_TO_NEXT_PAGE) {
-      console.log("next page present true");
-      this.goToPageNumber(this.pageNumber + 1);
-      // if (this.isNextPagePresent()) {
-      // } else {
-      //   console.log("debounced");
-      //   this.fetchdataDebounced();
-      // }
-    } else if (this.pageNumber >= 1) {
-      console.log("going to previous page");
-      this.goToPageNumber(this.pageNumber - 1);
+      this.loadingMessage = 'Loading';
+      this.goToPageNumber(this.statsPageNumber + 1);
+    } else {
+      this.loadingMessage = 'Loading';
+      this.goToPageNumber(this.statsPageNumber - 1);
     }
   }
-
-  /**
-   * Tells whether the next skill page is present in memory or not.
-   * This case occurs when the next page is fetched from the backend
-   * and then we move back one page, but the next page is still in
-   * memory. So instead of making the backend call for the next page,
-   * we first check if the next page is present in memory.
-   * @returns {Boolean} - Whether the next page is present or not.
-   */
-  // isNextPagePresent(): boolean {
-  //   let totalStatsPresent: number = this.totalStats.length;
-  //   // Here +1 is used since we are checking the next page and
-  //   // another +1 because page numbers start from 0.
-  //   let numberOfStatsRequired: number = (
-  //     (this.statsPageNumber + 2) * this.itemsPerPage);
-
-  //   return totalStatsPresent >= numberOfStatsRequired;
-  // }
 }
 
 

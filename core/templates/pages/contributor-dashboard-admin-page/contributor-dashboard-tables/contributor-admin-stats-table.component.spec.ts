@@ -30,7 +30,7 @@ import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { CdAdminQuestionRoleEditorModal } from '../question-role-editor-modal/cd-admin-question-role-editor-modal.component';
 import { BrowserDynamicTestingModule } from '@angular/platform-browser-dynamic/testing';
 
-describe('Contributor stats component', () => {
+fdescribe('Contributor stats component', () => {
   let component: ContributorAdminStatsTable;
   let fixture: ComponentFixture<ContributorAdminStatsTable>;
   let $window: WindowRef;
@@ -227,6 +227,34 @@ describe('Contributor stats component', () => {
         'role'
       ]);
     }));
+
+    it('should check for upperlimit for pagination', fakeAsync(() => {
+      component.dataSource = [];
+      component.statsPageNumber = 1;
+      component.itemsPerPage = 3;
+      fixture.detectChanges();
+      expect(component.getUpperLimitValueForPagination()).toEqual(3);
+    }));
+
+    it('should navigate to next page', fakeAsync(() => {
+      const goToSpy = spyOn(component, 'goToPageNumber');
+      component.statsPageNumber = 1;
+      fixture.detectChanges();
+
+      component.navigatePage(component.MOVE_TO_NEXT_PAGE);
+
+      expect(goToSpy).toHaveBeenCalledWith(2);
+    }));
+
+    it('should navigate to previous page', fakeAsync(() => {
+      const goToSpy = spyOn(component, 'goToPageNumber');
+      component.statsPageNumber = 1;
+      fixture.detectChanges();
+
+      component.navigatePage(component.MOVE_TO_PREV_PAGE);
+
+      expect(goToSpy).toHaveBeenCalledWith(0);
+    }));
   });
 
   describe('when user navigates to contributor admin page on mobile', () => {
@@ -335,7 +363,7 @@ describe('Contributor stats component', () => {
     }));
   });
 
-  describe('when toggled various model', () => {
+  describe('when toggled various modal', () => {
     beforeEach(() => {
     });
 
