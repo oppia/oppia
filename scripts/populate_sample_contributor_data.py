@@ -40,6 +40,8 @@ import json
 
 from core import feconf
 from core.constants import constants
+from core.domain import classroom_config_domain
+from core.domain import classroom_config_services
 
 import requests
 from typing import Dict, Final, List
@@ -252,6 +254,19 @@ class SampleDataInitializer:
             }),
             'csrf_token': self.csrf_token
         }
+
+        math_classroom_dict: classroom_config_domain.ClassroomDict = {
+            'classroom_id': 'math_classroom_id',
+            'name': classroom_name,
+            'url_fragment': classroom_url_fragment,
+            'course_details': '',
+            'topic_list_intro': '',
+            'topic_id_to_prerequisite_topic_ids': dict.fromkeys(topic_ids, [])
+        }
+        math_classroom = classroom_config_domain.Classroom.from_dict(
+            math_classroom_dict)
+
+        classroom_config_services.create_new_classroom(math_classroom)
 
         self._make_request('POST', '/adminhandler', params=params)
 
