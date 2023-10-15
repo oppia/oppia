@@ -51,7 +51,7 @@ jobs:
       - name: Build Docker images
         run: sudo make build
       - name: Initializing Server
-        run: sudo make run-devserver
+        run: sudo make run-devserver prod_env=true
       - name: Stop the server
         run: make stop
       - name: Zip build files
@@ -129,17 +129,17 @@ jobs:
             requirements_dev.in
             requirements_dev.txt
       - uses: ./.github/actions/merge
-      - name: Cache node modules
-        uses: actions/cache@v3
-        env:
-          cache-name: cache-node-modules
-        with:
-          path: /home/runner/work/oppia/yarn_cache
-          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-build-${{ env.cache-name }}-
-            ${{ runner.os }}-build-
-            ${{ runner.os }}-
+      # - name: Cache node modules
+      #   uses: actions/cache@v3
+      #   env:
+      #     cache-name: cache-node-modules
+      #   with:
+      #     path: /home/runner/work/oppia/yarn_cache
+      #     key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('yarn.lock') }}
+      #     restore-keys: |
+      #       ${{ runner.os }}-build-${{ env.cache-name }}-
+      #       ${{ runner.os }}-build-
+      #       ${{ runner.os }}-
       - name: Attempt to download build files artifact
         id: download_artifact_1
         uses: actions/download-artifact@v3
@@ -165,7 +165,7 @@ jobs:
           ls -la oppia/third_party
         working-directory: /home/runner/work/oppia
         shell: bash
-      - uses: ./.github/actions/install-oppia-dependencies
+      # - uses: ./.github/actions/install-oppia-dependencies
       - name: Install chrome
         run: python -m scripts.install_chrome_for_ci
       - name: Install ffmpeg
@@ -182,11 +182,12 @@ jobs:
             ${{ runner.os }}-build-${{ env.cache-name }}-
             ${{ runner.os }}-build-
             ${{ runner.os }}-
-      - name: (Artifact re-build) Build Webpack
-        if: steps.download_artifact_1.outcome == 'failure'
-        run: python -m scripts.build --prod_env
+      # - name: (Artifact re-build) Build Webpack
+      #   if: steps.download_artifact_1.outcome == 'failure'
+      #   run: python -m scripts.build --prod_env
       - name: Run E2E Test ${{ matrix.suite }}
-        run: xvfb-run -a --server-args="-screen 0, 1285x1000x24" python -m scripts.run_e2e_tests --skip-install --skip-build --suite=${{ matrix.suite }} --prod_env
+        run: xvfb-run -a --server-args="-screen 0, 1285x1000x24" make run_tests.e2e suite=${{ matrix.suite }} prod_env=true
+        # run: xvfb-run -a --server-args="-screen 0, 1285x1000x24" python -m scripts.run_e2e_tests --skip-install --skip-build --suite=${{ matrix.suite }} --prod_env
         env:
           VIDEO_RECORDING_IS_ENABLED: 0
       - name: Uploading webdriverio-video as Artifacts
@@ -321,17 +322,17 @@ jobs:
               requirements_dev.in
               requirements_dev.txt
         - uses: ./.github/actions/merge
-        - name: Cache node modules
-          uses: actions/cache@v3
-          env:
-            cache-name: cache-node-modules
-          with:
-            path: /home/runner/work/oppia/yarn_cache
-            key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('yarn.lock') }}
-            restore-keys: |
-              ${{ runner.os }}-build-${{ env.cache-name }}-
-              ${{ runner.os }}-build-
-              ${{ runner.os }}-
+        # - name: Cache node modules
+        #   uses: actions/cache@v3
+        #   env:
+        #     cache-name: cache-node-modules
+        #   with:
+        #     path: /home/runner/work/oppia/yarn_cache
+        #     key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('yarn.lock') }}
+        #     restore-keys: |
+        #       ${{ runner.os }}-build-${{ env.cache-name }}-
+        #       ${{ runner.os }}-build-
+        #       ${{ runner.os }}-
         - name: Attempt to download build files artifact
           id: download_artifact_1
           uses: actions/download-artifact@v3
@@ -357,7 +358,7 @@ jobs:
             ls -la oppia/third_party
           working-directory: /home/runner/work/oppia
           shell: bash
-        - uses: ./.github/actions/install-oppia-dependencies
+        # - uses: ./.github/actions/install-oppia-dependencies
         - name: (Artifact re-build) Cache third_party/static
           if: steps.download_artifact_1.outcome == 'failure'
           uses: actions/cache@v3
@@ -370,11 +371,12 @@ jobs:
               ${{ runner.os }}-build-${{ env.cache-name }}-
               ${{ runner.os }}-build-
               ${{ runner.os }}-
-        - name: (Artifact re-build) Build Webpack
-          if: steps.download_artifact_1.outcome == 'failure'
-          run: python -m scripts.build --prod_env
+        # - name: (Artifact re-build) Build Webpack
+        #   if: steps.download_artifact_1.outcome == 'failure'
+        #   run: python -m scripts.build --prod_env
         - name: Run Acceptance Test ${{ matrix.suite }}
-          run: xvfb-run -a --server-args="-screen 0, 1285x1000x24" python -m scripts.run_acceptance_tests --skip-build --suite=${{ matrix.suite }} --prod_env
+          run: xvfb-run -a --server-args="-screen 0, 1285x1000x24" make run_tests.acceptance suite=${{ matrix.suite }} prod_env=true
+          # run: xvfb-run -a --server-args="-screen 0, 1285x1000x24" python -m scripts.run_acceptance_tests --skip-build --suite=${{ matrix.suite }} --prod_env
         - name: Uploading webpack bundles as an artifact
           if: ${{ failure() }}
           uses: actions/upload-artifact@v3
