@@ -122,6 +122,8 @@
         "core.storage.config.gae_models_test",
         "core.platform.app_identity.gae_app_identity_services_test",
         "core.storage.topic.gae_models_test",
+        "core.storage.blog_statistics.gae_models_test",
+        "core.domain.blog_statistics_domain_test",
         "scripts.release_scripts.cut_release_or_hotfix_branch_test",
         "scripts.linters.css_linter_test",
         "extensions.actions.ExplorationStart.ExplorationStart_test",
