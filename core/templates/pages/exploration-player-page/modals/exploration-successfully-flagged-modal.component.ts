@@ -16,7 +16,7 @@
  * @fileoverview Component for the exploration successfully flagged modal.
  */
 
-import { Component, ViewChild, ElementRef } from '@angular/core';
+import { Component } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 
@@ -26,21 +26,9 @@ import { ConfirmOrCancelModal } from 'components/common-layout-directives/common
 })
 export class ExplorationSuccessfullyFlaggedModalComponent
   extends ConfirmOrCancelModal {
-  @ViewChild('headingRef') headingElement!: ElementRef;
-
   constructor(
     private ngbActiveModal: NgbActiveModal
   ) {
     super(ngbActiveModal);
-  }
-
-  ngOnInit(): void {
-    this.focusOnHeading();
-  }
-
-  focusOnHeading(): void {
-    setTimeout(() => {
-      this.headingElement.nativeElement.focus();
-    });
   }
 }
