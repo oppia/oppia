@@ -37,9 +37,9 @@ jobs:
       - name: Freeing up Ubuntu space
         run: |
           sudo rm -rf /usr/share/dotnet
-          sudo rm -rf /opt/ghc
-          sudo rm -rf "/usr/local/share/boost"
           sudo rm -rf "$AGENT_TOOLSDIRECTORY"
+        # sudo rm -rf /opt/ghc
+        # sudo rm -rf "/usr/local/share/boost"
       - name: Install python deps
         run: |
           pip install --require-hashes --no-deps -r requirements.txt
