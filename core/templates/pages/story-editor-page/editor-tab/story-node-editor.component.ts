@@ -446,6 +446,14 @@ export class StoryNodeEditorComponent implements OnInit, OnDestroy {
     return this.oldOutline !== outline;
   }
 
+  updateOutline(newOutline: string): void {
+    if (this.isOutlineModified(newOutline)) {
+      this.storyUpdateService.setStoryNodeOutline(
+        this.story, this.nodeId, newOutline);
+      this.oldOutline = newOutline;
+    }
+  }
+
   togglePreview(): void {
     this.chapterPreviewCardIsShown = !this.chapterPreviewCardIsShown;
   }
@@ -492,10 +500,7 @@ export class StoryNodeEditorComponent implements OnInit, OnDestroy {
     }
   }
 
-  onSaveButtonClicked(newOutline: string): void {
-    this.storyUpdateService.setStoryNodeOutline(
-      this.story, this.nodeId, newOutline);
-    this.oldOutline = newOutline;
+  onSaveButtonClicked(): void {
     this.outlineEditViewIsShown = $(this.oldOutline).text();
     this.chapterOutlineIsShown = false;
   }

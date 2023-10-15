@@ -377,6 +377,14 @@ describe('Story node editor component', () => {
       expect(currentNodeIsPublishableSpy).toHaveBeenCalled();
     });
 
+  it('should call StoryUpdate service to update outline', () => {
+    let storySpy = spyOn(storyUpdateService, 'setStoryNodeOutline');
+
+    component.updateOutline('New outline');
+
+    expect(storySpy).toHaveBeenCalled();
+  });
+
   it('should call StoryUpdate service to update description', () => {
     let storySpy = spyOn(storyUpdateService, 'setStoryNodeDescription');
     let currentNodeIsPublishableSpy = spyOn(
@@ -623,11 +631,9 @@ describe('Story node editor component', () => {
 
   it('should click chapter outline save button', () => {
     component.chapterOutlineIsShown = true;
-    let storySpy = spyOn(storyUpdateService, 'setStoryNodeOutline');
 
-    component.onSaveButtonClicked('New outline');
+    component.onSaveButtonClicked();
 
-    expect(storySpy).toHaveBeenCalled();
     expect(component.chapterOutlineIsShown).toBe(false);
   });
 
@@ -645,16 +651,6 @@ describe('Story node editor component', () => {
     component.makeChapterOutlineEditable();
 
     expect(component.chapterOutlineIsShown).toBe(true);
-  });
-
-  it('should be modified outline', () => {
-    if (component.editableOutline === component.oldOutline) {
-      expect(component.isOutlineModified(
-        component.editableOutline)).toBe(false);
-    } else {
-      expect(component.isOutlineModified(
-        component.editableOutline)).toBe(true);
-    }
   });
 
   it('should call StoryUpdateService and curatedExplorationValidationService' +
