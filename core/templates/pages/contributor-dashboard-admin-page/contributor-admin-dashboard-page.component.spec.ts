@@ -22,7 +22,7 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ContributorAdminDashboardPageComponent } from './contributor-admin-dashboard-page.component';
 import { UserService } from 'services/user.service';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { CommunityContributionStatsDict, ContributorDashboardAdminStatsBackendApiService } from './services/contributor-dashboard-admin-stats-backend-api.service';
+import { CommunityContributionStatsBackendDict, ContributorDashboardAdminStatsBackendApiService } from './services/contributor-dashboard-admin-stats-backend-api.service';
 import { UserInfo } from 'domain/user/user-info.model';
 
 describe('Contributor dashboard Admin page', () => {
@@ -31,6 +31,7 @@ describe('Contributor dashboard Admin page', () => {
   let contributorDashboardAdminStatsBackendApiService: (
     ContributorDashboardAdminStatsBackendApiService);
   let userService: UserService;
+  let fetchAssignedLanguageIdsSpy: jasmine.Spy;
   let translationCoordinatorInfo = new UserInfo(
     ['USER_ROLE', 'TRANSLATION_COORDINATOR'], true, false, false, false, true,
     'en', 'username1', 'tester@example.com', true
@@ -284,7 +285,7 @@ describe('Contributor dashboard Admin page', () => {
 
     component.ngOnInit();
     tick();
-    fixture.detectChanges()
+    fixture.detectChanges();
 
     expect(component.CONTRIBUTION_TYPES).toEqual([]);
   }));
