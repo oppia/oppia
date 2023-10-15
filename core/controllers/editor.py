@@ -214,7 +214,7 @@ class ExplorationHandler(
                     apply_draft=apply_draft if apply_draft is not None else False,
                     version=version)
             else:
-                empty_dict = {}
+                empty_dict: Dict[str, Any] = {}
             exploration_data['show_state_editor_tutorial_on_load'] = bool(
                 self.user_id and not has_seen_editor_tutorial)
             exploration_data['show_state_translation_tutorial_on_load'] = bool(
