@@ -36,7 +36,8 @@ import { UrlInterpolationService } from
 })
 export class VolunteerPageComponent implements OnInit, OnDestroy {
   directiveSubscriptions = new Subscription();
-  mapImgPath = '';
+  bannerImgPath = '';
+  footerImgPath = '';
   art!: {
     images: string[];
     caption: {
@@ -92,7 +93,8 @@ export class VolunteerPageComponent implements OnInit, OnDestroy {
         this.setPageTitle();
       })
     );
-    this.mapImgPath = '/volunteer/map.png';
+    this.bannerImgPath = '/volunteer/banner-background.png';
+    this.footerImgPath = '/volunteer/footer-background.png';
 
     this.art = {
       images: [

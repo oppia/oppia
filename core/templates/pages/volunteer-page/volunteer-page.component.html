@@ -5,36 +5,59 @@
 
       <div class="oppia-volunteer-content">
         <p>{{ 'I18N_VOLUNTEER_PAGE_SECTION_ONE_CONTENT_1' | translate }}</p>
-        <p>{{ 'I18N_VOLUNTEER_PAGE_SECTION_ONE_CONTENT_2' | translate }}</p>
       </div>
+      <button class="btn volunteer-btn">
+        <a href="https://forms.gle/rhFYoLLSFr3JEZHy8"
+           target="_blank"
+           rel="noopener">
+           {{ 'I18N_VOLUNTEER_PAGE_SECTION_ONE_BUTTON' | translate }}
+        </a>
+      </button>
     </div>
 
     <div class="hide-xs hide-sm hide-md col-4 flex-45 mt-5">
       <picture>
         <source type="image/webp"
-                [srcset]="this.getStaticImageUrl(this.getWebpExtendedName(mapImgPath))">
+                [srcset]="this.getStaticImageUrl(this.getWebpExtendedName(bannerImgPath))">
         <source type="image/png"
-                [srcset]="this.getStaticImageUrl(mapImgPath)">
-        <img alt="Volunteer page map image - Desktop view" [src]="this.getStaticImageUrl(mapImgPath)">
+                [srcset]="this.getStaticImageUrl(bannerImgPath)">
+        <img alt="Volunteer page map image - Desktop view" [src]="this.getStaticImageUrl(bannerImgPath)">
       </picture>
     </div>
     <div class="hide-gt-md px-5">
       <picture>
         <source type="image/webp"
-                [srcset]="this.getStaticImageUrl(this.getWebpExtendedName(mapImgPath))">
+                [srcset]="this.getStaticImageUrl(this.getWebpExtendedName(bannerImgPath))">
         <source type="image/png"
-                [srcset]="this.getStaticImageUrl(mapImgPath)">
-        <img alt="Volunteer page map image - Mobile view" [src]="this.getStaticImageUrl(mapImgPath)">
+                [srcset]="this.getStaticImageUrl(bannerImgPath)">
+        <img alt="Volunteer page map image - Mobile view" [src]="this.getStaticImageUrl(bannerImgPath)">
       </picture>
     </div>
 
-    <button class="btn">
-      <a href="https://forms.gle/rhFYoLLSFr3JEZHy8"
-         target="_blank"
-         rel="noopener">
-         {{ 'I18N_VOLUNTEER_PAGE_SECTION_ONE_BUTTON' | translate }}
-      </a>
-    </button>
+    
+  </div>
+
+  <div class="oppia-section-why-volunteer">
+    <div class="container text-center">
+      <h2 class="section-heading mb-5">{{ 'I18N_VOLUNTEER_PAGE_WHY_VOLUNTEER_SECTION' | translate }}</h2>
+      <div class="row mt-4">
+        <div class="col-md-4">
+          <i class="fa fa-suitcase fa-2x m-3"></i>
+          <h3 class="font-weight-light">{{ 'I18N_VOLUNTEER_PAGE_WHY_VOLUNTEER_SECTION_HEADING_1' | translate }}</h3>
+          <p class="mt-5">{{ 'I18N_VOLUNTEER_PAGE_WHY_VOLUNTEER_SECTION_HEADING_1_CONTENT' | translate }}</p>
+        </div>
+        <div class="col-md-4">
+          <i class="fa fa-users fa-2x m-3"></i>
+          <h3 class="font-weight-light">{{ 'I18N_VOLUNTEER_PAGE_WHY_VOLUNTEER_SECTION_HEADING_2' | translate }}</h3>
+          <p class="mt-5">{{ 'I18N_VOLUNTEER_PAGE_WHY_VOLUNTEER_SECTION_HEADING_2_CONTENT' | translate }}</p>
+        </div>
+        <div class="col-md-4">
+          <i class="fa fa-award fa-2x m-3"></i>
+          <h3 class="font-weight-light">{{ 'I18N_VOLUNTEER_PAGE_WHY_VOLUNTEER_SECTION_HEADING_3' | translate }}</h3>
+          <p class="mt-5">{{ 'I18N_VOLUNTEER_PAGE_WHY_VOLUNTEER_SECTION_HEADING_3_CONTENT' | translate }}</p>
+        </div>
+      </div>
+    </div>
   </div>
 
   <div class="row oppia-volunteer-body">
@@ -42,8 +65,21 @@
 
     <div class="oppia-volunteer-tabs">
       <mat-tab-group mat-stretch-tabs mat-align-tabs="center">
-        <mat-tab label="Art">
+        <mat-tab label="Growth">
           <div class="row pt-3">
+            <div class="col oppia-volunteer-tab-description">
+              <h3 class="mb-5 carousel-header">{{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_HEADING' | translate }}</h3>
+              <p>{{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_GROWTH' | translate }}</p>
+              
+              <h4 class="carousel-sub-header pt-5">{{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_GROWTH_SUB_HEADING_1' | translate }}</h4>
+              <p>{{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_GROWTH_CONTENT_1' | translate }}</p>
+
+              <h4 class="carousel-sub-header">{{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_GROWTH_SUB_HEADING_2' | translate }}</h4>
+              <p>{{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_GROWTH_CONTENT_2' | translate }}</p>
+
+              <h4 class="carousel-sub-header">{{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_GROWTH_SUB_HEADING_3' | translate }}</h4>
+              <p>{{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_GROWTH_CONTENT_3' | translate }}</p>
+            </div>
             <div class="col">
 
               <ngb-carousel *ngIf="art.images.length > 0">
@@ -68,24 +104,23 @@
               </ngb-carousel>
 
             </div>
-            <div class="col oppia-volunteer-tab-description">
-              <p>{{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_ART_CONTENT_1' | translate }}</p>
-              <p>{{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_ART_CONTENT_2' | translate }}</p>
-
-              <div class="oppia-volunteer-dotted-spaced-line mb-5"><br></div>
-
-              <p [innerHTML]="'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_ART_WHAT_WE' | translate "></p>
-              <ul>
-                <li class="oppia-volunteer-page-description-list-item">{{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_ART_WHAT_WE_1' | translate }}</li>
-                <li class="oppia-volunteer-page-description-list-item">{{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_ART_WHAT_WE_2' | translate }}</li>
-                <li class="oppia-volunteer-page-description-list-item">{{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_ART_WHAT_WE_3' | translate }}</li>
-              </ul>
-
-            </div>
           </div>
         </mat-tab>
         <mat-tab label="Development">
           <div class="row pt-3">
+            <div class="col oppia-volunteer-tab-description">
+              <h3 class="mb-5 carousel-header">{{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_HEADING' | translate }}</h3>
+              <p>{{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_DEVELOPMENT' | translate }}</p>
+              
+              <h4 class="carousel-sub-header pt-5">{{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_DEVELOPMENT_SUB_HEADING_1' | translate }}</h4>
+              <p>{{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_DEVELOPMENT_CONTENT_1' | translate }}</p>
+
+              <h4 class="carousel-sub-header">{{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_DEVELOPMENT_SUB_HEADING_2' | translate }}</h4>
+              <p>{{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_DEVELOPMENT_CONTENT_2' | translate }}</p>
+
+              <h4 class="carousel-sub-header">{{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_DEVELOPMENT_SUB_HEADING_3' | translate }}</h4>
+              <p>{{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_DEVELOPMENT_CONTENT_3' | translate }}</p>
+            </div>
             <div class="col">
 
               <ngb-carousel *ngIf="development.images.length > 0">
@@ -110,27 +145,25 @@
               </ngb-carousel>
 
             </div>
-            <div class="col oppia-volunteer-tab-description">
-              <p [innerHTML]="'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_DEVELOPMENT_CONTENT' | translate"></p>
-
-              <div class="oppia-volunteer-dotted-spaced-line mb-5"><br></div>
-
-              <p [innerHTML]="'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_DEVELOPMENT_WHAT_WE' | translate"></p>
-              <ul>
-                <li class="oppia-volunteer-page-description-list-item">{{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_DEVELOPMENT_WHAT_WE_1' | translate }}</li>
-                <li class="oppia-volunteer-page-description-list-item">{{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_DEVELOPMENT_WHAT_WE_2' | translate }}</li>
-                <li class="oppia-volunteer-page-description-list-item">{{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_DEVELOPMENT_WHAT_WE_3' | translate }}</li>
-              </ul>
-
-            </div>
           </div>
         </mat-tab>
-        <mat-tab label="Learner Feedback">
+        <mat-tab label="Art and Design">
           <div class="row pt-3">
+            <div class="col oppia-volunteer-tab-description">
+              <h3 class="mb-5 carousel-header">{{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_HEADING' | translate }}</h3>
+              <p>{{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_ART_AND_DESIGN' | translate }}</p>
+              
+              <h4 class="carousel-sub-header pt-5">{{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_ART_AND_DESIGN_SUB_HEADING_1' | translate }}</h4>
+              <p>{{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_ART_AND_DESIGN_CONTENT_1' | translate }}</p>
+
+              <h4 class="carousel-sub-header">{{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_ART_AND_DESIGN_SUB_HEADING_2' | translate }}</h4>
+              <p>{{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_ART_AND_DESIGN_CONTENT_2' | translate }}</p>
+
+            </div>
             <div class="col">
 
-              <ngb-carousel *ngIf="learnerFeedback.images.length > 0">
-                <ng-template *ngFor="let image of learnerFeedback.images; index as index" ngbSlide>
+              <ngb-carousel *ngIf="art.images.length > 0">
+                <ng-template *ngFor="let image of art.images; index as index" ngbSlide>
                   <div class="oppia-carousel-wrapper">
                     <picture>
                       <source type="image/webp"
@@ -141,34 +174,74 @@
                     </picture>
                   </div>
                   <div class="carousel-caption">
-                    <p> {{ learnerFeedback.caption[index].content }} </p>
+                    <p> {{ art.caption[index].content }} </p>
                     <div class="oppia-volunteer-name">
-                      <p><b> {{ learnerFeedback.caption[index].name }} </b></p>
-                      <p><i> {{ learnerFeedback.caption[index].type }} </i></p>
+                      <p><b> {{ art.caption[index].name }} </b></p>
+                      <p><i> {{ art.caption[index].type }} </i></p>
                     </div>
                   </div>
                 </ng-template>
               </ngb-carousel>
 
             </div>
+          </div>
+        </mat-tab>
+        <mat-tab label="Translation">
+          <div class="row pt-3">
             <div class="col oppia-volunteer-tab-description">
-              <p>{{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_LEARNER_FEEDBACK_CONTENT_1' | translate }}</p>
-              <p>{{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_LEARNER_FEEDBACK_CONTENT_2' | translate }}</p>
+              <h3 class="mb-5 carousel-header">{{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_HEADING' | translate }}</h3>
+              <p>{{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_TRANSLATION' | translate }}</p>
+              
+              <h4 class="carousel-sub-header pt-5">{{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_TRANSLATION_SUB_HEADING_1' | translate }}</h4>
+              <p>{{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_TRANSLATION_CONTENT_1' | translate }}</p>
 
-              <div class="oppia-volunteer-dotted-spaced-line mb-5"><br></div>
+              <h4 class="carousel-sub-header">{{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_TRANSLATION_SUB_HEADING_2' | translate }}</h4>
+              <p>{{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_TRANSLATION_CONTENT_2' | translate }}</p>
 
-              <p [innerHTML]="'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_LEARNER_FEEDBACK_WHAT_WE' | translate "></p>
-              <ul>
-                <li class="oppia-volunteer-page-description-list-item">{{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_LEARNER_FEEDBACK_WHAT_WE_1' | translate }}</li>
-                <li class="oppia-volunteer-page-description-list-item">{{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_LEARNER_FEEDBACK_WHAT_WE_2' | translate }}</li>
-                <li class="oppia-volunteer-page-description-list-item">{{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_LEARNER_FEEDBACK_WHAT_WE_3' | translate }}</li>
-              </ul>
+              <h4 class="carousel-sub-header">{{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_TRANSLATION_SUB_HEADING_3' | translate }}</h4>
+              <p>{{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_TRANSLATION_CONTENT_3' | translate }}</p>
+            </div>
+            <div class="col">
+
+              <ngb-carousel *ngIf="development.images.length > 0">
+                <ng-template *ngFor="let image of development.images; index as index" ngbSlide>
+                  <div class="oppia-carousel-wrapper">
+                    <picture>
+                      <source type="image/webp"
+                              [srcset]="this.getStaticImageUrl(this.getWebpExtendedName(image))">
+                      <source type="image/png"
+                              [srcset]="this.getStaticImageUrl(image)">
+                      <img [src]="this.getStaticImageUrl(image)" alt="Volunteer profile image">
+                    </picture>
+                  </div>
+                  <div class="carousel-caption">
+                    <p> {{ development.caption[index].content }} </p>
+                    <div class="oppia-volunteer-name">
+                      <p><b> {{ development.caption[index].name }} </b></p>
+                      <p><i> {{ development.caption[index].type }} </i></p>
+                    </div>
+                  </div>
+                </ng-template>
+              </ngb-carousel>
 
             </div>
           </div>
-        </mat-tab>
+        </mat-tab>        
         <mat-tab label="Lesson Creation">
           <div class="row pt-3">
+            <div class="col oppia-volunteer-tab-description">
+              <h3 class="mb-5 carousel-header">{{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_HEADING' | translate }}</h3>
+              <p>{{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_LESSON_CREATION' | translate }}</p>
+              
+              <h4 class="carousel-sub-header pt-5">{{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_LESSON_CREATION_SUB_HEADING_1' | translate }}</h4>
+              <p>{{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_LESSON_CREATION_CONTENT_1' | translate }}</p>
+
+              <h4 class="carousel-sub-header">{{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_LESSON_CREATION_SUB_HEADING_2' | translate }}</h4>
+              <p>{{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_LESSON_CREATION_CONTENT_2' | translate }}</p>
+
+              <h4 class="carousel-sub-header">{{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_LESSON_CREATION_SUB_HEADING_3' | translate }}</h4>
+              <p>{{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_LESSON_CREATION_CONTENT_3' | translate }}</p>
+            </div>
             <div class="col">
 
               <ngb-carousel *ngIf="lessonCreation.images.length > 0">
@@ -191,20 +264,6 @@
                   </div>
                 </ng-template>
               </ngb-carousel>
-
-            </div>
-            <div class="col oppia-volunteer-tab-description">
-              <p>{{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_LESSON_CREATION_CONTENT_1' | translate }}</p>
-              <p>{{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_LESSON_CREATION_CONTENT_2' | translate }}</p>
-
-              <div class="oppia-volunteer-dotted-spaced-line mb-5"><br></div>
-
-              <p [innerHTML]="'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_LESSON_CREATION_WHAT_WE' | translate "></p>
-              <ul>
-                <li class="oppia-volunteer-page-description-list-item">{{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_LESSON_CREATION_WHAT_WE_1' | translate }}</li>
-                <li class="oppia-volunteer-page-description-list-item">{{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_LESSON_CREATION_WHAT_WE_2' | translate }}</li>
-                <li class="oppia-volunteer-page-description-list-item">{{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_LESSON_CREATION_WHAT_WE_3' | translate }}</li>
-              </ul>
 
             </div>
           </div>
