@@ -39,22 +39,12 @@ run-devserver: # Runs the dev-server
 	$(MAKE) run-offline
 
 run-offline: # Runs the dev-server in offline mode
-	docker compose up dev-server -d
-	@printf 'Please wait while the development server starts...\n\n'
-	@while [[ $$(curl -s -o /tmp/status_code.txt -w '%{http_code}' http://localhost:8181) != "200" ]] || [[ $$(curl -s -o /tmp/status_code.txt -w '%{http_code}' http://localhost:8181/community-library) != "200" ]]; do \
-		printf "▓"; \
-		if [[ "$(prod_env)" = 'true' ]] && [[ -n $$(docker ps -q -f status=exited -f name=webpack-compiler) ]]; then \
-			${SHELL_PREFIX} dev-server python -m scripts.generate_build_directory; \
-		fi; \
-		sleep 1; \
-	done
-	@printf '\n\n'
-	@echo 'Development server started at port 8181.'
+	$(MAKE) start-devserver
 	@echo 'Please visit http://localhost:8181 to access the development server.'
 	@echo 'Check dev-server logs using "make logs.dev-server"'
 	@echo 'Stop the development server using "make stop"'
 
-start-devserver-for-tests: ## Starts the development server for the tests
+start-devserver: ## Starts the development server for the tests
 	docker compose up dev-server -d
 	@printf 'Please wait while the development server starts...\n\n'
 	@while [[ $$(curl -s -o /tmp/status_code.txt -w '%{http_code}' http://localhost:8181) != "200" ]] || [[ $$(curl -s -o /tmp/status_code.txt -w '%{http_code}' http://localhost:8181/community-library) != "200" ]]; do \
@@ -129,16 +119,20 @@ run_tests.custom_eslint: ## Runs the custome eslint tests
 run_tests.mypy: ## Runs mypy checks
 	docker compose run --no-deps --entrypoint "python -m scripts.run_mypy_checks" dev-server
 
-run_tests.backend_associate: ## Runs the backend associate tests
+run_tests.check_backend_associated_tests: ## Runs the backend associate tests
 	docker compose run --no-deps --entrypoint "/bin/sh -c 'git config --global --add safe.directory /app/oppia && python -m scripts.check_backend_associated_test_file'" dev-server
 
 run_tests.acceptance: ## Runs the acceptance tests for the parsed suite
 	@echo 'Shutting down any previously started server.'
 	$(MAKE) stop 
 # Adding node to the path.
-	export PATH=$(shell cd .. && pwd)/oppia_tools/node-16.13.0/bin:$(PATH)
+	@if [ "$(OS_NAME)" = "Windows" ]; then \
+		export PATH=$(cd .. && pwd)/oppia_tools/node-16.13.0:$(PATH); \
+	else \
+		export PATH=$(shell cd .. && pwd)/oppia_tools/node-16.13.0/bin:$(PATH); \
+	fi
 # Starting the development server for the acceptance tests.
-	$(MAKE) start-devserver-for-tests
+	$(MAKE) start-devserver
 	@echo '------------------------------------------------------'
 	@echo '  Starting acceptance test for the suite: $(suite)'
 	@echo '------------------------------------------------------'
@@ -154,9 +148,13 @@ run_tests.e2e: ## Runs the e2e tests for the parsed suite
 	@echo 'Shutting down any previously started server.'
 	$(MAKE) stop
 # Adding node to the path.
-	export PATH=$(shell cd .. && pwd)/oppia_tools/node-16.13.0/bin:$(PATH)
+	@if [ "$(OS_NAME)" = "Windows" ]; then \
+		export PATH=$(cd .. && pwd)/oppia_tools/node-16.13.0:$(PATH); \
+	else \
+		export PATH=$(shell cd .. && pwd)/oppia_tools/node-16.13.0/bin:$(PATH); \
+	fi
 # Starting the development server for the e2e tests.
-	$(MAKE) start-devserver-for-tests
+	$(MAKE) start-devserver
 	@echo '------------------------------------------------------'
 	@echo '  Starting e2e test for the suite: $(suite)'
 	@echo '------------------------------------------------------'
@@ -173,7 +171,7 @@ OS_NAME := $(shell uname)
 install_node:
 	@echo "Installing Node.js..."
 	@if [ "$(OS_NAME)" = "Windows" ]; then \
-		if [ "$(shell python -c 'import sys; print(sys.maxsize > 2**32)')" = "True" ]; then \
+		if [ "$(shell uname -m')" = "x86_64" ]; then \
 			architecture=x64; \
 		else \
 			architecture=x86; \
@@ -185,7 +183,7 @@ install_node:
 		powershell.exe -c "Expand-Archive -Path node-download -DestinationPath ../oppia_tools"; \
 	else \
 		extension=.tar.gz; \
-		if [ "$(shell python -c 'import sys; print(sys.maxsize > 2**32)')" = "True" ]; then \
+		if [ "$(shell python -c 'import sys; print(sys.maxsize > 2**32)')" = "True" ] || [ "$(shell uname -m)" = "x86_64" ]; then \
 			if [ "$(OS_NAME)" = "Darwin" ]; then \
 				node_file_name=node-v16.13.0-darwin-x64; \
 			elif [ "$(OS_NAME)" = "Linux" ]; then \
