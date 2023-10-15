@@ -29,6 +29,7 @@ import { AdminRolesTabComponent} from './admin-roles-tab.component';
 import { AlertsService } from 'services/alerts.service';
 
 import { TopicManagerRoleEditorModalComponent } from './topic-manager-role-editor-modal.component';
+import { TranslationCoordinatorRoleEditorModalComponent } from './translation-coordinator-role-editor-modal.component';
 
 describe('Admin roles tab component ', function() {
   let component: AdminRolesTabComponent;
@@ -153,7 +154,8 @@ describe('Admin roles tab component ', function() {
       successPromise = Promise.resolve({
         roles: ['TOPIC_MANAGER'],
         managed_topic_ids: ['topic_id_1'],
-        banned: false
+        banned: false,
+        coordinated_language_ids: []
       });
     });
 
@@ -301,6 +303,19 @@ describe('Admin roles tab component ', function() {
         expect(component.userRoles).toEqual(['MODERATOR']);
         expect(component.managedTopicIds).toEqual([]);
       }));
+
+    it('should flush coordinated_language_ids while removing' +
+      ' translation coordinator role',
+    fakeAsync(() => {
+      component.userRoles = ['MODERATOR', 'TRANSLATION_COORDINATOR'];
+      component.coordinatedLanguageIds = ['en', 'hi'];
+
+      component.removeRole('TRANSLATION_COORDINATOR');
+      tick();
+
+      expect(component.userRoles).toEqual(['MODERATOR']);
+      expect(component.coordinatedLanguageIds).toEqual([]);
+    }));
   });
 
   describe('on calling addNewRole', function() {
@@ -326,6 +341,19 @@ describe('Admin roles tab component ', function() {
 
       expect(component.openTopicManagerRoleEditor).toHaveBeenCalled();
     });
+
+    it(
+      'should open translation coordinator modal on adding' +
+      ' translation coordinator role', () => {
+        spyOn(
+          component,
+          'openTranslationCoordinatorRoleEditor').and.returnValue();
+
+        component.addNewRole('TRANSLATION_COORDINATOR');
+
+        expect(
+          component.openTranslationCoordinatorRoleEditor).toHaveBeenCalled();
+      });
   });
 
   describe('on calling openTopicManagerRoleEditor', function() {
@@ -360,7 +388,7 @@ describe('Admin roles tab component ', function() {
       expect(component.userRoles).toEqual(['MODERATOR', 'TOPIC_MANAGER']);
     }));
 
-    it('should not readd topic manager role if user is already a manager',
+    it('should not read topic manager role if user is already a manager',
       fakeAsync(() => {
         let modalSpy = spyOn(ngbModal, 'open').and.callFake(() => {
           return ({
@@ -380,6 +408,62 @@ describe('Admin roles tab component ', function() {
         expect(component.managedTopicIds).toEqual(['topic_id_1']);
         expect(component.userRoles).toEqual(['MODERATOR', 'TOPIC_MANAGER']);
       }));
+  });
+
+  describe('on calling openTranslationCoordinatorRoleEditor', function() {
+    let ngbModal: NgbModal;
+
+    class MockNgbModalRef {
+      componentInstance!: {};
+    }
+
+    beforeEach(function() {
+      ngbModal = TestBed.inject(NgbModal);
+    });
+
+    it('should open the TranslationCoordinatorRoleEditor', fakeAsync(() => {
+      let modalSpy = spyOn(ngbModal, 'open').and.callFake(() => {
+        return ({
+          componentInstance: MockNgbModalRef,
+          result: Promise.resolve(['en'])
+        }) as NgbModalRef;
+      });
+
+      component.userRoles = ['MODERATOR'];
+      component.coordinatedLanguageIds = [];
+
+      component.openTranslationCoordinatorRoleEditor();
+      tick();
+
+      expect(modalSpy).toHaveBeenCalledWith(
+        TranslationCoordinatorRoleEditorModalComponent);
+      expect(component.coordinatedLanguageIds).toEqual(['en']);
+      expect(component.userRoles).toEqual(
+        ['MODERATOR', 'TRANSLATION_COORDINATOR']);
+    }));
+
+    it('should not read translation coordinator role if user is already a' +
+    ' coordinator',
+    fakeAsync(() => {
+      let modalSpy = spyOn(ngbModal, 'open').and.callFake(() => {
+        return ({
+          componentInstance: MockNgbModalRef,
+          result: Promise.resolve(['en'])
+        }) as NgbModalRef;
+      });
+
+      component.userRoles = ['MODERATOR', 'TRANSLATION_COORDINATOR'];
+      component.coordinatedLanguageIds = [];
+
+      component.openTranslationCoordinatorRoleEditor();
+      tick();
+
+      expect(modalSpy).toHaveBeenCalledWith(
+        TranslationCoordinatorRoleEditorModalComponent);
+      expect(component.coordinatedLanguageIds).toEqual(['en']);
+      expect(component.userRoles).toEqual(
+        ['MODERATOR', 'TRANSLATION_COORDINATOR']);
+    }));
   });
 
   describe('on calling showNewRoleSelector', function() {
