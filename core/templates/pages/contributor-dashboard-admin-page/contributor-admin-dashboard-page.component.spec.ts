@@ -29,6 +29,7 @@ import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { CdAdminQuestionRoleEditorModal } from './question-role-editor-modal/cd-admin-question-role-editor-modal.component';
 import { UsernameInputModal } from './username-input-modal/username-input-modal.component';
 import { BrowserDynamicTestingModule } from '@angular/platform-browser-dynamic/testing';
+import { UserInfo } from 'domain/user/user-info.model';
 
 describe('Contributor dashboard Admin page', () => {
   let component: ContributorAdminDashboardPageComponent;
@@ -43,114 +44,22 @@ describe('Contributor dashboard Admin page', () => {
   }
   let userService: UserService;
   let fetchAssignedLanguageIdsSpy: jasmine.Spy;
-  let translationCoordinatorInfo = {
-    _roles: ['USER_ROLE'],
-    _isModerator: true,
-    _isCurriculumAdmin: false,
-    _isTopicManager: false,
-    _isSuperAdmin: false,
-    _canCreateCollections: true,
-    _preferredSiteLanguageCode: 'en',
-    _username: 'username1',
-    _email: 'tester@example.org',
-    _isLoggedIn: true,
-    isModerator: () => true,
-    isCurriculumAdmin: () => false,
-    isSuperAdmin: () => false,
-    isTopicManager: () => false,
-    isTranslationAdmin: () => false,
-    isBlogAdmin: () => false,
-    isBlogPostEditor: () => false,
-    isQuestionAdmin: () => false,
-    isQuestionCoordinator: () => false,
-    isTranslationCoordinator: () => true,
-    canCreateCollections: () => true,
-    getPreferredSiteLanguageCode: () =>'en',
-    getUsername: () => 'username1',
-    getEmail: () => 'tester@example.org',
-    isLoggedIn: () => true
-  };
-  let nullUserInfo = {
-    _roles: ['USER_ROLE'],
-    _isModerator: true,
-    _isCurriculumAdmin: false,
-    _isTopicManager: false,
-    _isSuperAdmin: false,
-    _canCreateCollections: true,
-    _preferredSiteLanguageCode: 'en',
-    _username: null,
-    _email: 'tester@example.org',
-    _isLoggedIn: true,
-    isModerator: () => true,
-    isCurriculumAdmin: () => false,
-    isSuperAdmin: () => false,
-    isTopicManager: () => false,
-    isTranslationAdmin: () => false,
-    isBlogAdmin: () => false,
-    isBlogPostEditor: () => false,
-    isQuestionAdmin: () => false,
-    isQuestionCoordinator: () => false,
-    isTranslationCoordinator: () => true,
-    canCreateCollections: () => true,
-    getPreferredSiteLanguageCode: () =>'en',
-    getUsername: () => null,
-    getEmail: () => 'tester@example.org',
-    isLoggedIn: () => true
-  };
-  let questionCoordinatorInfo = {
-    _roles: ['USER_ROLE'],
-    _isModerator: true,
-    _isCurriculumAdmin: false,
-    _isTopicManager: false,
-    _isSuperAdmin: false,
-    _canCreateCollections: true,
-    _preferredSiteLanguageCode: 'en',
-    _username: 'username1',
-    _email: 'tester@example.org',
-    _isLoggedIn: true,
-    isModerator: () => true,
-    isCurriculumAdmin: () => false,
-    isSuperAdmin: () => false,
-    isTopicManager: () => false,
-    isTranslationAdmin: () => false,
-    isBlogAdmin: () => false,
-    isBlogPostEditor: () => false,
-    isQuestionAdmin: () => false,
-    isQuestionCoordinator: () => true,
-    isTranslationCoordinator: () => false,
-    canCreateCollections: () => true,
-    getPreferredSiteLanguageCode: () =>'en',
-    getUsername: () => 'username1',
-    getEmail: () => 'tester@example.org',
-    isLoggedIn: () => true
-  };
-  let fullAccessUserInfo = {
-    _roles: ['USER_ROLE'],
-    _isModerator: true,
-    _isCurriculumAdmin: false,
-    _isTopicManager: false,
-    _isSuperAdmin: false,
-    _canCreateCollections: true,
-    _preferredSiteLanguageCode: 'en',
-    _username: 'username1',
-    _email: 'tester@example.org',
-    _isLoggedIn: true,
-    isModerator: () => true,
-    isCurriculumAdmin: () => false,
-    isSuperAdmin: () => false,
-    isTopicManager: () => false,
-    isTranslationAdmin: () => false,
-    isBlogAdmin: () => false,
-    isBlogPostEditor: () => false,
-    isQuestionAdmin: () => false,
-    isQuestionCoordinator: () => true,
-    isTranslationCoordinator: () => true,
-    canCreateCollections: () => true,
-    getPreferredSiteLanguageCode: () =>'en',
-    getUsername: () => 'username1',
-    getEmail: () => 'tester@example.org',
-    isLoggedIn: () => true
-  };
+  let translationCoordinatorInfo = new UserInfo(
+    ['USER_ROLE', 'TRANSLATION_COORDINATOR'], true, false, false, false, true,
+    'en', 'username1', 'tester@example.com', true
+  );
+  let nullUserInfo = new UserInfo(
+    ['USER_ROLE', 'TRANSLATION_COORDINATOR'], true, false, false, false, true,
+    'en', null, 'tester@example.com', true
+  );
+  let questionCoordinatorInfo = new UserInfo(
+    ['USER_ROLE', 'QUESTION_COORDINATOR'], true, false, false, false, true,
+    'en', 'username1', 'tester@example.com', true
+  );
+  let fullAccessUserInfo = new UserInfo(
+    ['USER_ROLE', 'QUESTION_COORDINATOR', 'TRANSLATION_COORDINATOR'], true,
+    false, false, false, true, 'en', 'username1', 'tester@example.com', true
+  );
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
