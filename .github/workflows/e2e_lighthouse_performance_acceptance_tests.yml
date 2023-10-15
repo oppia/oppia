@@ -46,12 +46,14 @@ jobs:
         run: |
           sudo rm -rf /usr/share/dotnet
           sudo rm -rf "$AGENT_TOOLSDIRECTORY"
-        # sudo rm -rf /opt/ghc
-        # sudo rm -rf "/usr/local/share/boost"
       - name: Build Docker images
         run: sudo make build
-      - name: Initializing Server
-        run: sudo make run-devserver
+      - name: Setting up node_modules
+        run: |
+          docker compose up angular-build -d
+          make stop
+      - name: Initialize server in prod mode
+        run: make run-offline prod_env=true
       - name: Stop the server
         run: make stop
       - name: Zip build files
