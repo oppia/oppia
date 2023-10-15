@@ -83,7 +83,7 @@ stop.%: ## Stops the given docker service. Example: make stop.datastore
 	docker compose stop $*
 
 update.requirements: ## Installs the python requirements for the project
-	${SHELL_PREFIX} dev-server pip install -r requirements.txt
+	${SHELL_PREFIX} dev-server pip install -r requirements.txt -t /app/oppia/third_party/python_libs
 	${SHELL_PREFIX} dev-server pip install -r requirements_dev.txt
 
 update.package: ## Installs the npm requirements for the project
@@ -107,6 +107,7 @@ run_tests.lint: ## Runs the linter tests
 run_tests.backend: ## Runs the backend tests
 	$(MAKE) stop
 	docker compose up datastore dev-server redis firebase -d --no-deps
+	$(MAKE) update.requirements
 	@echo '------------------------------------------------------'
 	@echo '  Backend tests started....'
 	@echo '------------------------------------------------------'
