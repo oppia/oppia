@@ -30,7 +30,7 @@ import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { CdAdminQuestionRoleEditorModal } from '../question-role-editor-modal/cd-admin-question-role-editor-modal.component';
 import { BrowserDynamicTestingModule } from '@angular/platform-browser-dynamic/testing';
 
-fdescribe('Contributor stats component', () => {
+describe('Contributor stats component', () => {
   let component: ContributorAdminStatsTable;
   let fixture: ComponentFixture<ContributorAdminStatsTable>;
   let $window: WindowRef;
