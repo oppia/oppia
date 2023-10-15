@@ -9,10 +9,12 @@
               (removed)="remove(language)">
       <ng-container *ngFor="let choice of choices">
         <ng-container *ngIf="choice.id === language">
-          {{ choice.text }}
+          <span tabindex="0" [attr.aria-label]="choice.text+', selected'">{{ choice.text }}</span>
         </ng-container>
       </ng-container>
-      <mat-icon matChipRemove *ngIf="removable">cancel</mat-icon>
+      <button class="oppia-cancel-button" role="button" tabindex="0" matChipRemove aria-label=". Remove" *ngIf="removable">
+        <mat-icon class="oppia-cancel-button-text">cancel</mat-icon>
+      </button>
     </mat-chip>
     <input placeholder="{{ 'I18N_PREFERENCES_PREFERRED_EXPLORATION_LANGUAGE_SELECT' | translate }}"
            #languageInput

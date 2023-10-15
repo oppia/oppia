@@ -104,6 +104,9 @@
   padding-left: 1em;
   padding-top: 0;
 }
+.mat-form-field-appearance-fill .mat-form-field-infix {
+  padding-top: 0.45em;
+}
 .mat-form-field-underline {
   display: none;
 }
@@ -275,6 +278,7 @@ mat-chip-list .mat-standard-chip .mat-chip-remove {
   background-color: #fff;
   border-radius: 4px;
   box-shadow: 0 0 4px rgba(0, 0, 0, 0.25);
+  cursor: pointer;
   justify-content: space-between;
   margin: 10px;
   min-height: 60px;
@@ -282,6 +286,7 @@ mat-chip-list .mat-standard-chip .mat-chip-remove {
 }
 .mat-form-field-appearance-fill .mat-form-field-infix {
   padding-top: 0.45em;
+  vertical-align: top;
 }
 .oppia-filter-selector-inner-container {
   display: flex;

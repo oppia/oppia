@@ -17,7 +17,7 @@
  * in exploration player.
  */
 
-import { Component } from '@angular/core';
+import { Component, ElementRef, ViewChild } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { QuestionPlayerStateService } from 'components/question-directives/question-player/services/question-player-state.service';
@@ -83,6 +83,7 @@ export class ExplorationFooterComponent {
 
   conceptCardForStateExists: boolean = true;
   linkedSkillId: string | null = null;
+  @ViewChild('lessonInfoButton') lessonInfoButton!: ElementRef;
 
   constructor(
     private contextService: ContextService,
@@ -407,6 +408,18 @@ export class ExplorationFooterComponent {
           this.learnerHasViewedLessonInfoTooltip = (
             response.has_viewed_lesson_info_modal_once);
         });
+  }
+
+  shouldRenderLessonInfoTooltip(): boolean {
+    const shouldRenderLessonInfoTooltip =
+    !this.footerIsInQuestionPlayerMode &&
+    !this.hasLearnerHasViewedLessonInfoTooltip() &&
+    this.getMostRecentlyReachedCheckpointIndex() === 2;
+
+    if (shouldRenderLessonInfoTooltip) {
+      this.lessonInfoButton.nativeElement.focus();
+    }
+    return shouldRenderLessonInfoTooltip;
   }
 
   learnerHasViewedLessonInfo(): void {
