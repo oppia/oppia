@@ -57,7 +57,7 @@ describe('Exploration Successfully flagged modal', () => {
   it('should call focus on the heading element', () => {
     const headingElementRef = new ElementRef(document.createElement('h3'));
     component.headingElement = headingElementRef;
-    spyOn(component.headingElement.nativeElement, 'focus');
+    spyOn(component, 'focusOnHeading');
 
     component.ngOnInit();
 
