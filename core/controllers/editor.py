@@ -210,10 +210,11 @@ class ExplorationHandler(
         try:
             if self.user_id:
                 exploration_data = exp_services.get_user_exploration_data(
-                    self.user_id, exploration_id, apply_draft=apply_draft,
+                    self.user_id, exploration_id,
+                    apply_draft=apply_draft if apply_draft is not None else False,
                     version=version)
             else:
-                exploration_data = {}
+                empty_dict = {}
             exploration_data['show_state_editor_tutorial_on_load'] = bool(
                 self.user_id and not has_seen_editor_tutorial)
             exploration_data['show_state_translation_tutorial_on_load'] = bool(
