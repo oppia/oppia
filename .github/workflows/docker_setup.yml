@@ -24,11 +24,11 @@ jobs:
           docker compose up angular-build -d
           docker compose up -d
       
-      - name: Pruning docker build cache
+      - name: Deleting ubuntu build files
         run: |
           df -H
-          echo ---Pruning docker build cache---
-          docker builder prune -f
+          sudo rm -rf /usr/share/dotnet
+          sudo rm -rf "$AGENT_TOOLSDIRECTORY"
           df -H
 
       - name: Checking server reachability
