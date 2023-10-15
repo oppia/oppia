@@ -34,12 +34,6 @@ jobs:
       #       ${{ runner.os }}-build-
       #       ${{ runner.os }}-
       # - uses: ./.github/actions/install-oppia-dependencies
-      - name: Freeing up Ubuntu space
-        run: |
-          sudo rm -rf /usr/share/dotnet
-          sudo rm -rf "$AGENT_TOOLSDIRECTORY"
-        # sudo rm -rf /opt/ghc
-        # sudo rm -rf "/usr/local/share/boost"
       - name: Install python deps
         run: |
           pip install --require-hashes --no-deps -r requirements.txt
@@ -48,6 +42,12 @@ jobs:
         run: python -m scripts.install_chrome_for_ci
       - name: Install ffmpeg
         run: sudo apt install ffmpeg
+      - name: Freeing up Ubuntu space
+        run: |
+          sudo rm -rf /usr/share/dotnet
+          sudo rm -rf "$AGENT_TOOLSDIRECTORY"
+        # sudo rm -rf /opt/ghc
+        # sudo rm -rf "/usr/local/share/boost"
       - name: Build Docker images
         run: sudo make build
       - name: Initializing Server
