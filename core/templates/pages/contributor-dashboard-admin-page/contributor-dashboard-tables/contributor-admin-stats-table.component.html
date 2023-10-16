@@ -1,8 +1,18 @@
 <div class="example-container">
-  <div *ngIf="loadingMessage" class="e2e-test-loading-message">
+  <div *ngIf="loadingMessage && !noDataMessage" class="e2e-test-loading-message">
     <div class="oppia-align-center">
       <span>{{ loadingMessage }}</span>
       <loading-dots></loading-dots>
+    </div>
+  </div>
+  <div *ngIf="!loadingMessage && noDataMessage" class="e2e-test-no-data-message">
+    <div class="m-auto oppia-dashboard-aggregated-stats oppia-contributor-dashboard-main-content pt-1"
+    [ngClass]="{'oppia-contributor-dashboard-mobile-mode': checkMobileView()}">
+      <mat-card layout="row" class="oppia-mat-card">
+        <div class="translation-reviewer stats-card" tabindex="0">
+          <h2>{{ noDataMessage }}</h2>
+        </div>
+      </mat-card>
     </div>
   </div>
   <table mat-table
@@ -10,7 +20,7 @@
          multiTemplateDataRows
          [class.isMobile]="true"
          class="mat-elevation-z8 e2e-test-stats-table"
-         *ngIf="!loadingMessage">
+         *ngIf="!loadingMessage && !noDataMessage">
 
     <ng-container matColumnDef="contributorName">
       <th mat-header-cell *matHeaderCellDef class="user-header"><b> User </b></th>
@@ -114,7 +124,9 @@
     <ng-container matColumnDef="role">
       <th mat-header-cell *matHeaderCellDef><b> Role </b></th>
       <td mat-cell *matCellDef="let element">
-        <button mat-raised-button disabled>EDIT</button>
+        <button mat-raised-button disabled>
+          {{ checkMobileView() ? 'EDIT ROLE' : 'EDIT' }}
+        </button>
       </td>
     </ng-container>
 
@@ -137,13 +149,6 @@
              [@mobileChevronExpand]="element == expandedElement ? 'expanded' : 'collapsed'">
           </i>
         </div>
-      </td>
-    </ng-container>
-
-    <ng-container matColumnDef="mobile-role" *ngIf="checkMobileView()">
-      <th mat-header-cell *matHeaderCellDef><b> </b></th>
-      <td mat-cell *matCellDef="let element">
-        <button mat-raised-button disabled>EDIT ROLE</button>
       </td>
     </ng-container>
 
@@ -363,9 +368,6 @@
         [class.example-expanded-row]="expandedElement === element"
         (click)="expandedElement = expandedElement === element ? null : element">
     </tr>
-    <div *ngIf="checkMobileView()">
-      <tr mat-row *matRowDef="let element; columns: ['mobile-role']" class="mobile-edit-role"></tr>
-    </div>
     <tr mat-row
         *matRowDef="let row; columns: ['expandedDetail']"
         class="example-detail-row">
