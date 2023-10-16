@@ -18,6 +18,7 @@
 
 import { Component } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import { PlatformFeatureService } from 'services/platform-feature.service';
 
 @Component({
   selector: 'oppia-story-editor-unpublish-modal',
@@ -25,14 +26,45 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 })
 export class StoryEditorUnpublishModalComponent {
   constructor(
+     private platformFeatureService: PlatformFeatureService,
      private activeModal: NgbActiveModal
   ) {}
+
+  unpublishedChapters: number[] = [];
+
+  badContentReasonText: string = 'Bad content (no new explorations ' +
+    'will be added)';
+
+  splitChapterReasonText: string = 'Split Chapters' +
+    ' (requires new explorations to be added)';
+
+  selectedReasonText: string = this.badContentReasonText;
+  unpublishingReason: string = 'BAD_CONTENT';
 
   cancel(): void {
     this.activeModal.dismiss();
   }
 
   confirm(): void {
-    this.activeModal.close();
+    if (this.isSerialChapterFeatureFlagEnabled()) {
+      this.activeModal.close(this.unpublishingReason);
+    } else {
+      this.activeModal.close();
+    }
+  }
+
+  isSerialChapterFeatureFlagEnabled(): boolean {
+    return (
+      this.platformFeatureService.
+        status.SerialChapterLaunchCurriculumAdminView.isEnabled);
+  }
+
+  setReason(reason: string): void {
+    this.unpublishingReason = reason;
+    if (reason === 'BAD_CONTENT') {
+      this.selectedReasonText = this.badContentReasonText;
+    } else if (reason === 'CHAPTER_NEEDS_SPLITTING') {
+      this.selectedReasonText = this.splitChapterReasonText;
+    }
   }
 }

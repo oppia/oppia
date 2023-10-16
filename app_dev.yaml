@@ -125,7 +125,7 @@ env_variables:
 # (The second note under 'Configuring your app to use a connector') which
 # redirects to these instructions to disable URL fetch:
 # https://cloud.google.com/appengine/docs/standard/python/sockets#making_httplib_use_sockets
-  GAE_USE_SOCKETS_HTTPLIB : "anyvalue"
+  GAE_USE_SOCKETS_HTTPLIB: "anyvalue"
 # FIREBASE_AUTH_EMULATOR_HOST is needed to allow the Firebase SDK to connect
 # with the Firebase emulator. THIS MUST NOT BE DEPLOYED TO PRODUCTION. We
 # protect against this in the build script.

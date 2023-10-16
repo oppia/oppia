@@ -17,7 +17,7 @@
  * in exploration player.
  */
 
-import { Component } from '@angular/core';
+import { Component, ElementRef, ViewChild } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { QuestionPlayerStateService } from 'components/question-directives/question-player/services/question-player-state.service';
@@ -80,10 +80,10 @@ export class ExplorationFooterComponent {
   learnerHasViewedLessonInfoTooltip: boolean = false;
   userIsLoggedIn: boolean = false;
   footerIsInQuestionPlayerMode: boolean = false;
-  CHECKPOINTS_FEATURE_IS_ENABLED = false;
 
   conceptCardForStateExists: boolean = true;
   linkedSkillId: string | null = null;
+  @ViewChild('lessonInfoButton') lessonInfoButton!: ElementRef;
 
   constructor(
     private contextService: ContextService,
@@ -163,28 +163,18 @@ export class ExplorationFooterComponent {
         });
       this.footerIsInQuestionPlayerMode = true;
     } else if (this.explorationId) {
-      this.readOnlyExplorationBackendApiService
-        .fetchCheckpointsFeatureIsEnabledStatus().then(
-          (checkpointsFeatureIsEnabled) => {
-            this.CHECKPOINTS_FEATURE_IS_ENABLED = checkpointsFeatureIsEnabled;
-            if (this.CHECKPOINTS_FEATURE_IS_ENABLED) {
-              // Fetching the number of checkpoints.
-              this.getCheckpointCount();
-              this.setLearnerHasViewedLessonInfoTooltip();
-            }
-          }
-        );
+      // Fetching the number of checkpoints.
+      this.getCheckpointCount();
+      this.setLearnerHasViewedLessonInfoTooltip();
     }
     this.directiveSubscriptions.add(
       this.playerPositionService.onLoadedMostRecentCheckpoint.subscribe(() => {
-        if (this.CHECKPOINTS_FEATURE_IS_ENABLED) {
-          if (this.checkpointCount) {
+        if (this.checkpointCount) {
+          this.showProgressReminderModal();
+        } else {
+          this.getCheckpointCount().then(() => {
             this.showProgressReminderModal();
-          } else {
-            this.getCheckpointCount().then(() => {
-              this.showProgressReminderModal();
-            });
-          }
+          });
         }
       })
     );
@@ -418,6 +408,18 @@ export class ExplorationFooterComponent {
           this.learnerHasViewedLessonInfoTooltip = (
             response.has_viewed_lesson_info_modal_once);
         });
+  }
+
+  shouldRenderLessonInfoTooltip(): boolean {
+    const shouldRenderLessonInfoTooltip =
+    !this.footerIsInQuestionPlayerMode &&
+    !this.hasLearnerHasViewedLessonInfoTooltip() &&
+    this.getMostRecentlyReachedCheckpointIndex() === 2;
+
+    if (shouldRenderLessonInfoTooltip) {
+      this.lessonInfoButton.nativeElement.focus();
+    }
+    return shouldRenderLessonInfoTooltip;
   }
 
   learnerHasViewedLessonInfo(): void {

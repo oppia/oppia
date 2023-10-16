@@ -99,6 +99,7 @@ export class StateEditorService {
   stateEditorDirectiveInitialised: boolean = false;
   currentRuleInputIsValid: boolean = false;
   inapplicableSkillMisconceptionIds: string[] = [];
+  initActiveContentId: string | null = null;
 
   updateStateContentEditorInitialised(): void {
     this.stateContentEditorInitialised = true;
@@ -317,6 +318,14 @@ export class StateEditorService {
       throw new Error('Active State for this solution is not set');
     }
     this.solutionValidityService.deleteSolutionValidity(this.activeStateName);
+  }
+
+  setInitActiveContentId(newActiveContentId: string | null): void {
+    this.initActiveContentId = newActiveContentId;
+  }
+
+  getInitActiveContentId(): string | null {
+    return this.initActiveContentId;
   }
 
   get onStateEditorInitialized(): EventEmitter<State> {

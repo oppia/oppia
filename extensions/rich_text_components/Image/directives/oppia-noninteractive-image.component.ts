@@ -56,6 +56,7 @@ interface Dimension {
   styleUrls: []
 })
 export class NoninteractiveImage implements OnInit, OnChanges {
+  @Input() altTextIsDisplayed: boolean = false;
   @Input() altWithValue: string = '';
   @Input() captionWithValue: string = '';
   // These properties are initialized using Angular lifecycle hooks
@@ -64,6 +65,7 @@ export class NoninteractiveImage implements OnInit, OnChanges {
   @Input() filepathWithValue!: string;
   filepath!: string;
   dimensions!: ImageDimensions;
+  miniatureImageContainerStyle!: Dimension;
   imageContainerStyle!: Dimension;
   loadingIndicatorStyle!: Dimension;
   imageUrl: SafeResourceUrl | string = '';
@@ -100,6 +102,10 @@ export class NoninteractiveImage implements OnInit, OnChanges {
     this.imageContainerStyle = {
       height: this.dimensions.height + 'px',
       width: this.dimensions.width + 'px'
+    };
+    this.miniatureImageContainerStyle = {
+      height: '50px',
+      width: '50px'
     };
     // If viewing a concept card in the exploration player, don't use the
     // preloader service. Since, in that service, the image file names are
@@ -170,17 +176,18 @@ export class NoninteractiveImage implements OnInit, OnChanges {
         }
         throw e;
       }
-
-      this.imageCaption = '';
-      if (this.captionWithValue) {
-        this.imageCaption = this.htmlEscaperService.escapedJsonToObj(
-          this.captionWithValue) as string;
-      }
-      this.imageAltText = '';
-      if (this.altWithValue) {
-        this.imageAltText = this.htmlEscaperService.escapedJsonToObj(
-          this.altWithValue) as string;
-      }
+    }
+    // We set the alt text and caption for the image, regardless of when
+    // user is in the exploration player or not in the exploration player.
+    this.imageAltText = '';
+    if (this.altWithValue) {
+      this.imageAltText = this.htmlEscaperService.escapedJsonToObj(
+        this.altWithValue) as string;
+    }
+    this.imageCaption = '';
+    if (this.captionWithValue) {
+      this.imageCaption = this.htmlEscaperService.escapedJsonToObj(
+        this.captionWithValue) as string;
     }
   }
 

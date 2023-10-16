@@ -28,11 +28,13 @@ from core import feconf
 from core import utils
 from core.constants import constants
 from core.controllers import creator_dashboard
-from core.domain import config_services
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import fs_services
+from core.domain import platform_parameter_domain
+from core.domain import platform_parameter_list
+from core.domain import platform_parameter_registry
 from core.domain import question_services
 from core.domain import rights_domain
 from core.domain import rights_manager
@@ -1611,7 +1613,7 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
             }, csrf_token=csrf_token, expected_status_int=400)
         self.assertEqual(
             response['error'],
-            'Users are not allowed to assign other roles to themselves')
+            'Users are not allowed to assign other roles to themselves.')
         self.logout()
 
     def test_for_deassign_viewer_role_from_exploration(self) -> None:
@@ -2502,9 +2504,29 @@ class ModeratorEmailsTests(test_utils.EmailTestBase):
         # Set the default email config.
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
-        config_services.set_property(
-            self.admin_id, 'unpublish_exploration_email_html_body',
-            'Default unpublishing email body')
+        platform_parameter_registry.Registry.update_platform_parameter(
+            (
+                platform_parameter_list.ParamNames.
+                UNPUBLISH_EXPLORATION_EMAIL_HTML_BODY.value
+            ),
+            self.admin_id,
+            'Updating email body.',
+            [
+                platform_parameter_domain.PlatformParameterRule.from_dict({
+                    'filters': [
+                        {
+                            'type': 'platform_type',
+                            'conditions': [
+                                ['=', 'Web']
+                            ],
+                        }
+                    ],
+                    'value_when_matched': 'Default unpublishing email body'
+                })
+            ],
+            'I\'m writing to inform you that I have unpublished the above '
+            'exploration.'
+        )
 
     def test_error_cases_for_email_sending(self) -> None:
         with self.swap(
@@ -3579,7 +3601,7 @@ class ImageUploadHandlerTests(BaseEditorControllerTests):
             upload_files=[('image', 'unused_filename', b'')]
         )
 
-        error_msg = ('No image supplied')
+        error_msg = 'No image supplied'
         self.assertEqual(response['error'], error_msg)
 
         # Check that the file is not uploaded.

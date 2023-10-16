@@ -43,7 +43,8 @@ class DiagnosticTestPlayerPage(
     def get(self) -> None:
         """Handles GET requests."""
         if platform_feature_services.is_feature_enabled(
-            platform_feature_list.ParamNames.DIAGNOSTIC_TEST.value):
+            platform_feature_list.ParamNames.DIAGNOSTIC_TEST.value
+        ):
             self.render_template('diagnostic-test-player-page.mainpage.html')
         else:
             raise self.PageNotFoundException
@@ -108,6 +109,11 @@ class DiagnosticTestQuestionsHandler(
 
     @acl_decorators.open_access
     def get(self, topic_id: str) -> None:
+        """Retrieves diagnostic test questions for a specific topic.
+
+        Args:
+            topic_id: str. The ID of the topic.
+        """
         # Here we use cast because we are narrowing down the type of
         # 'normalized_request' from Union of request TypedDicts to a
         # particular TypedDict that was defined according to the schemas.

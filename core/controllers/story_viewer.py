@@ -59,7 +59,11 @@ class StoryPageDataHandler(
 
     @acl_decorators.can_access_story_viewer_page
     def get(self, story_id: str) -> None:
-        """Handles GET requests."""
+        """Retrieves and organizes the data needed to display a story.
+
+        Args:
+            story_id: str. The story ID.
+        """
         story = story_fetchers.get_story_by_id(story_id)
         topic_id = story.corresponding_topic_id
         topic_name = topic_fetchers.get_topic_by_id(topic_id).name
@@ -137,7 +141,27 @@ class StoryProgressHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         completed_node_ids: List[str],
         ordered_nodes: List[story_domain.StoryNode]
     ) -> Tuple[List[str], Optional[str], List[str]]:
-        """Records node completion."""
+        """Records node completion.
+
+        Args:
+            story_id: str. The story ID.
+            node_id: str. The node ID.
+            completed_node_ids: List[str]. A list of IDS of completed nodes.
+            ordered_nodes: List[story_domain.StoryNode]. A list of story
+                nodes in order.
+
+        Returns:
+            3-Tuple(next_exp_ids, next_node_id, completed_node_ids). Where:
+                next_exp_ids: List[str]. The next_exp_ids list contains
+                    the exploration IDs of the next node(s) to be explored
+                next_node_id: str. The ID of the next node to be explored.
+                completed_node_ids: List[str]. An updated list of IDS that
+                    represents all the nodes the user has completed.
+
+        Raises:
+            PageNotFoundException. The new structure viewer updates are
+                not enabled, or the provided story_id or node_id is invalid.
+        """
         assert self.user_id is not None
         if not constants.ENABLE_NEW_STRUCTURE_VIEWER_UPDATES:
             raise self.PageNotFoundException
@@ -171,7 +195,12 @@ class StoryProgressHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
 
     @acl_decorators.can_access_story_viewer_page_as_logged_in_user
     def get(self, story_id: str, node_id: str) -> None:
-        """Handles GET requests."""
+        """Redirects the user to the next appropriate node or the story page.
+
+        Args:
+            story_id: str. The story ID.
+            node_id: str. The node ID.
+        """
         (
             _, _, classroom_url_fragment, topic_url_fragment,
             story_url_fragment, node_id) = self.request.path.split('/')
@@ -217,6 +246,12 @@ class StoryProgressHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
 
     @acl_decorators.can_access_story_viewer_page_as_logged_in_user
     def post(self, story_id: str, node_id: str) -> None:
+        """Records the completion of a specific node within a story.
+
+        Args:
+            story_id: str. The story ID.
+            node_id: str. The node ID.
+        """
         assert self.user_id is not None
         story = story_fetchers.get_story_by_id(story_id)
         if story is None:
@@ -291,7 +326,7 @@ class StoryProgressHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
             learner_progress_services.mark_topic_as_learnt(
                 self.user_id, topic.id)
 
-        return self.render_json({
+        self.render_json({
             'summaries': exp_summaries,
             'ready_for_review_test': ready_for_review_test,
             'next_node_id': next_node_id

@@ -26,6 +26,12 @@ import { AppConstants } from 'app.constants';
 // Otherwise pages will have false 404 status code.
 const routes: Route[] = [
   {
+    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.CLASSROOM.ROUTE,
+    pathMatch: 'full',
+    loadChildren: () => import('pages/classroom-page/classroom-page.module')
+      .then(m => m.ClassroomPageModule)
+  },
+  {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ABOUT.ROUTE,
     loadChildren: () => import('pages/about-page/about-page.module')
       .then(m => m.AboutPageModule)
@@ -76,6 +82,13 @@ const routes: Route[] = [
     pathMatch: 'full',
     loadChildren: () => import('pages/preferences-page/preferences-page.module')
       .then(m => m.PreferencesPageModule)
+  },
+  {
+    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.FEEDBACK_UPDATES.ROUTE,
+    pathMatch: 'full',
+    loadChildren: () => import(
+      'pages/feedback-updates-page/feedback-updates-page.module')
+      .then(m => m.FeedbackUpdatesPageModule)
   },
   {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.PROFILE.ROUTE,

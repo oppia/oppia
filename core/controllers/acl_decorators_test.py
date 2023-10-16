@@ -29,6 +29,8 @@ from core.controllers import incoming_app_feedback_report
 from core.domain import blog_services
 from core.domain import classifier_domain
 from core.domain import classifier_services
+from core.domain import classroom_config_domain
+from core.domain import classroom_config_services
 from core.domain import config_services
 from core.domain import exp_domain
 from core.domain import exp_services
@@ -984,6 +986,20 @@ class ClassroomExistDecoratorTests(test_utils.GenericTestBase):
                 'course_details': '',
                 'topic_list_intro': ''
             }])
+
+        math_classroom_dict: classroom_config_domain.ClassroomDict = {
+            'classroom_id': 'math_classroom_id',
+            'name': 'math',
+            'url_fragment': 'math',
+            'course_details': 'Course details for classroom.',
+            'topic_list_intro': 'Topics covered for classroom',
+            'topic_id_to_prerequisite_topic_ids': {}
+        }
+        math_classroom = classroom_config_domain.Classroom.from_dict(
+            math_classroom_dict)
+
+        classroom_config_services.create_new_classroom(math_classroom)
+
         self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
             [webapp2.Route(
                 '/mock_classroom_data/<classroom_url_fragment>',
@@ -4334,6 +4350,55 @@ class AccessLearnerDashboardDecoratorTests(test_utils.GenericTestBase):
         self.assertEqual(response['error'], error_msg)
 
 
+class AccessFeedbackUpdatesDecoratorTests(test_utils.GenericTestBase):
+    """Tests the decorator can_access_learner_dashboard."""
+
+    user = 'user'
+    user_email = 'user@example.com'
+    banned_user = 'banneduser'
+    banned_user_email = 'banned@example.com'
+
+    class MockHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
+        GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+        HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
+
+        @acl_decorators.can_access_feedback_updates
+        def get(self) -> None:
+            self.render_json({'success': True})
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.signup(self.user_email, self.user)
+        self.signup(self.banned_user_email, self.banned_user)
+        self.mark_user_banned(self.banned_user)
+        self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
+            [webapp2.Route('/mock/', self.MockHandler)],
+            debug=feconf.DEBUG,
+        ))
+
+    def test_banned_user_cannot_access_feedback_updates(self) -> None:
+        self.login(self.banned_user_email)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json('/mock/', expected_status_int=401)
+        error_msg = 'You do not have the credentials to access this page.'
+        self.assertEqual(response['error'], error_msg)
+        self.logout()
+
+    def test_exploration_editor_can_access_feedback_updates(self) -> None:
+        self.login(self.user_email)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json('/mock/')
+        self.assertTrue(response['success'])
+        self.logout()
+
+    def test_guest_user_cannot_access_feedback_updates(self) -> None:
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json('/mock/', expected_status_int=401)
+        error_msg = 'You must be logged in to access this resource.'
+        self.assertEqual(response['error'], error_msg)
+
+
 class AccessLearnerGroupsDecoratorTests(test_utils.GenericTestBase):
     """Tests the decorator can_access_learner_groups."""
 
@@ -6883,6 +6948,39 @@ class EditEntityDecoratorTests(test_utils.GenericTestBase):
             self.assertEqual(
                 response['error'], 'You do not have credentials to submit'
                 ' images to questions.')
+        self.logout()
+
+    def test_can_submit_images_to_explorations(self) -> None:
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json('/mock_edit_entity/%s/%s' % (
+                feconf.IMAGE_CONTEXT_EXPLORATION_SUGGESTIONS,
+                self.published_exp_id))
+            self.assertEqual(response['entity_id'], self.published_exp_id)
+            self.assertEqual(response['entity_type'], 'exploration_suggestions')
+        self.logout()
+
+    def test_unauthenticated_users_cannot_submit_images_to_explorations(
+        self
+    ) -> None:
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json('/mock_edit_entity/%s/%s' % (
+                feconf.IMAGE_CONTEXT_EXPLORATION_SUGGESTIONS,
+                self.published_exp_id),
+                expected_status_int=401)
+
+    def test_cannot_submit_images_to_explorations_without_having_permissions(
+        self
+    ) -> None:
+        self.login(self.user_email)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json('/mock_edit_entity/%s/%s' % (
+                feconf.IMAGE_CONTEXT_EXPLORATION_SUGGESTIONS,
+                self.published_exp_id),
+                expected_status_int=401)
+            self.assertEqual(
+                response['error'], 'You do not have credentials to submit'
+                ' images to explorations.')
         self.logout()
 
     def test_can_edit_blog_post(self) -> None:

@@ -25,7 +25,7 @@ from core import utils
 from core.constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
-from core.domain import classroom_services
+from core.domain import classroom_config_services
 from core.domain import email_manager
 from core.domain import fs_services
 from core.domain import image_validation_services
@@ -126,7 +126,11 @@ class TopicEditorStoryHandler(
 
     @acl_decorators.can_view_any_topic_editor
     def get(self, topic_id: str) -> None:
-        """Handles GET requests."""
+        """Retrieves information about a topic.
+
+        Args:
+            topic_id: str. The ID of the topic.
+        """
         topic = topic_fetchers.get_topic_by_id(topic_id)
         story_id_to_publication_status_map = {}
         for reference in topic.canonical_story_references:
@@ -145,8 +149,42 @@ class TopicEditorStoryHandler(
         additional_story_summary_dicts = [
             summary.to_dict() for summary in additional_story_summaries]
 
+        canonical_stories_ids = [summary['id'] for
+            summary in canonical_story_summary_dicts]
+        canonical_stories = list(filter(
+            None, story_fetchers.get_stories_by_ids(canonical_stories_ids)))
+        canonical_stories_dict: Dict[str, story_domain.Story] = {
+            canonical_story.id: canonical_story for canonical_story in
+            canonical_stories}
         updated_canonical_story_summary_dicts = []
+
         for summary in canonical_story_summary_dicts:
+            if summary['id'] not in canonical_stories_dict:
+                continue
+            story = canonical_stories_dict[summary['id']]
+            nodes = story.story_contents.nodes
+            total_chapters_count = len(nodes)
+            published_chapters_count = 0
+            upcoming_chapters_count = 0
+            overdue_chapters_count = 0
+            upcoming_chapters_expected_days = []
+            for node in nodes:
+                if node.status == constants.STORY_NODE_STATUS_PUBLISHED:
+                    published_chapters_count += 1
+                if node.planned_publication_date is not None:
+                    current_time_msecs = utils.get_current_time_in_millisecs()
+                    planned_publication_date_msecs = (
+                        utils.get_time_in_millisecs(
+                            node.planned_publication_date))
+                    if node.is_node_upcoming():
+                        upcoming_chapters_count += 1
+                        upcoming_chapters_expected_days.append((int)((
+                            planned_publication_date_msecs -
+                            current_time_msecs) / (1000.0 * 3600 * 24)))
+                    if node.is_node_behind_schedule():
+                        overdue_chapters_count += 1
+
+            upcoming_chapters_expected_days.sort()
             updated_canonical_story_summary_dict = {
                 'id': summary['id'],
                 'title': summary['title'],
@@ -162,7 +200,13 @@ class TopicEditorStoryHandler(
                 'story_is_published': (
                     story_id_to_publication_status_map[summary['id']]),
                 'completed_node_titles': [],
-                'all_node_dicts': []
+                'all_node_dicts': [],
+                'total_chapters_count': total_chapters_count,
+                'published_chapters_count': published_chapters_count,
+                'upcoming_chapters_count': upcoming_chapters_count,
+                'upcoming_chapters_expected_days': (
+                    upcoming_chapters_expected_days),
+                'overdue_chapters_count': overdue_chapters_count
             }
             updated_canonical_story_summary_dicts.append(
                 updated_canonical_story_summary_dict
@@ -287,7 +331,14 @@ class TopicEditorPage(base.BaseHandler[Dict[str, str], Dict[str, str]]):
 
     @acl_decorators.can_view_any_topic_editor
     def get(self, topic_id: str) -> None:
-        """Handles GET requests."""
+        """Displays the topic editor page.
+
+        Args:
+            topic_id: str. The ID of the topic.
+
+        Raises:
+            Exception. The topic with the given id doesn't exist.
+        """
         topic = topic_fetchers.get_topic_by_id(topic_id, strict=False)
 
         if topic is None:
@@ -327,7 +378,12 @@ class EditableSubtopicPageDataHandler(
 
     @acl_decorators.can_view_any_topic_editor
     def get(self, topic_id: str, subtopic_id: int) -> None:
-        """Handles GET requests."""
+        """Retrieves the details of a specific subtopic.
+
+        Args:
+            topic_id: str. The ID of the topic.
+            subtopic_id: str. The ID of the subtopic.
+        """
         subtopic_page = subtopic_page_services.get_subtopic_page_by_id(
             topic_id, subtopic_id, strict=False)
 
@@ -408,6 +464,10 @@ class EditableTopicDataHandler(
     ) -> None:
         """Check that the payload version matches the given topic
         version.
+
+        Args:
+            version_from_payload: int. The payload version.
+            topic_version: int. The topic version.
         """
 
         if version_from_payload != topic_version:
@@ -418,7 +478,11 @@ class EditableTopicDataHandler(
 
     @acl_decorators.can_view_any_topic_editor
     def get(self, topic_id: str) -> None:
-        """Populates the data on the individual topic page."""
+        """Populates the data on the individual topic page.
+
+        Args:
+            topic_id: str. The ID of the topic.
+        """
         topic = topic_fetchers.get_topic_by_id(topic_id, strict=False)
 
         if topic is None:
@@ -459,7 +523,7 @@ class EditableTopicDataHandler(
             grouped_skill_summary_dicts[topic_object.name] = skill_summary_dicts
 
         classroom_url_fragment = (
-            classroom_services.get_classroom_url_fragment_for_topic_id(
+            classroom_config_services.get_classroom_url_fragment_for_topic_id(
                 topic_id))
         skill_question_count_dict = {}
         for skill_id in topic.get_all_skill_ids():
@@ -489,6 +553,9 @@ class EditableTopicDataHandler(
         means that change is for a topic (includes adding and removing
         subtopics), while False would mean it is for a Subtopic Page (this
         includes editing its html data as of now).
+
+        Args:
+            topic_id: str. The ID of the topic.
         """
         assert self.user_id is not None
         assert self.normalized_payload is not None
@@ -553,7 +620,11 @@ class EditableTopicDataHandler(
 
     @acl_decorators.can_delete_topic
     def delete(self, topic_id: str) -> None:
-        """Handles Delete requests."""
+        """Deletes a topic.
+
+        Args:
+            topic_id: str. The ID of the topic.
+        """
         assert self.user_id is not None
         topic = topic_fetchers.get_topic_by_id(topic_id, strict=False)
         if topic is None:
@@ -585,7 +656,14 @@ class TopicRightsHandler(
 
     @acl_decorators.can_view_any_topic_editor
     def get(self, topic_id: str) -> None:
-        """Returns the TopicRights object of a topic."""
+        """Fetches the topic rights of a topic.
+
+        Args:
+            topic_id: str. The ID of the topic.
+
+        Raises:
+            InvalidInputException. The topic ID provided is not valid..
+        """
         assert self.user_id is not None
         topic_rights = topic_fetchers.get_topic_rights(topic_id, strict=False)
         if topic_rights is None:
@@ -652,7 +730,11 @@ class TopicPublishSendMailHandler(
 
     @acl_decorators.can_view_any_topic_editor
     def put(self, topic_id: str) -> None:
-        """Returns the TopicRights object of a topic."""
+        """Requests a review and publication of a topic.
+
+        Args:
+            topic_id: str. The ID of the topic.
+        """
         assert self.normalized_payload is not None
         topic_url = feconf.TOPIC_EDITOR_URL_PREFIX + '/' + topic_id
         if feconf.CAN_SEND_EMAILS:
@@ -709,7 +791,15 @@ class TopicPublishHandler(
 
     @acl_decorators.can_change_topic_publication_status
     def put(self, topic_id: str) -> None:
-        """Publishes or unpublishes a topic."""
+        """Publishes or unpublishes a topic.
+
+        Args:
+            topic_id: str. The ID of the topic.
+
+        Raises:
+            PageNotFoundException. The page cannot be found.
+            UnauthorizedUserException. User does not have permission.
+        """
         assert self.user_id is not None
         assert self.normalized_payload is not None
         topic = topic_fetchers.get_topic_by_id(topic_id, strict=False)
@@ -745,6 +835,9 @@ class TopicUrlFragmentHandler(
     def get(self, topic_url_fragment: str) -> None:
         """Handler that receives a topic url fragment and checks whether
         a topic with the same url fragment exists.
+
+        Args:
+            topic_url_fragment: str. The topic URL fragment.
         """
         self.values.update({
             'topic_url_fragment_exists': (
@@ -777,6 +870,9 @@ class TopicNameHandler(
     def get(self, topic_name: str) -> None:
         """Handler that receives a topic name and checks whether
         a topic with the same name exists.
+
+        Args:
+            topic_name: str. The topic name.
         """
         self.values.update({
             'topic_name_exists': (
@@ -833,6 +929,7 @@ class TopicIdToTopicNameHandler(
 
     @acl_decorators.can_access_classroom_admin_page
     def get(self) -> None:
+        """Accesses a classroom admin page."""
         assert self.normalized_request is not None
         topic_ids = self.normalized_request[
             'comma_separated_topic_ids']

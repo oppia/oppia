@@ -19,6 +19,8 @@
 export const AdminPageConstants = {
   ADMIN_ROLE_HANDLER_URL: '/adminrolehandler',
   TOPIC_MANAGER_ROLE_HANDLER_URL: '/topicmanagerrolehandler',
+  TRANSLATION_COORDINATOR_ROLE_HANDLER_URL:
+    '/translationcoordinatorrolehandler',
 
   ADMIN_HANDLER_URL: '/adminhandler',
   ADMIN_TOPICS_CSV_DOWNLOAD_HANDLER_URL: '/admintopicscsvdownloadhandler',
@@ -39,6 +41,7 @@ export const AdminPageConstants = {
   ADMIN_TAB_URLS: {
     ACTIVITIES: '#/activities',
     CONFIG: '#/config',
+    PLATFORM_PARAMETERS: '#/platform-parameters',
     ROLES: '#/roles',
     MISC: '#/misc'
   },

@@ -21,6 +21,7 @@ var forms = require('../webdriverio_utils/forms.js');
 var general = require('../webdriverio_utils/general.js');
 var users = require('../webdriverio_utils/users.js');
 var workflow = require('../webdriverio_utils/workflow.js');
+var waitFor = require('../webdriverio_utils/waitFor.js');
 
 var ReleaseCoordinatorPage = require(
   '../webdriverio_utils/ReleaseCoordinatorPage.js');
@@ -37,6 +38,7 @@ var ExplorationEditorPage =
 var ExplorationPlayerPage =
   require('../webdriverio_utils/ExplorationPlayerPage.js');
 var SkillEditorPage = require('../webdriverio_utils/SkillEditorPage.js');
+var DiagnosticTestPage = require('../webdriverio_utils/DiagnosticTestPage.js');
 
 describe('Checkpoints functionality', function() {
   var adminPage = null;
@@ -80,19 +82,9 @@ describe('Checkpoints functionality', function() {
     topicEditorPage = new TopicEditorPage.TopicEditorPage();
     skillEditorPage = new SkillEditorPage.SkillEditorPage();
     storyEditorPage = new StoryEditorPage.StoryEditorPage();
+    diagnosticTestPage = new DiagnosticTestPage.DiagnosticTestPage();
     await users.createAndLoginCurriculumAdminUser(
       'creator@storyViewer.com', 'creatorStoryViewer');
-
-    // The below lines of code enable the user checkpoints feature on the
-    // config tab. This is required to enable the lesson-info modal button
-    // on the exploration footer, which in turn is required to view the
-    // checkpoint message.
-    // This should be removed when the user checkpoints feature is no longer
-    // gated behind a config option.
-    await adminPage.editConfigProperty(
-      'Enable checkpoints feature.', 'Boolean',
-      async(elem) => await action.setValue(
-        'Enable checkpoints feature', elem, true, false));
 
     // The below lines enable the checkpoint_celebration flag in prod mode.
     // They should be removed after the checkpoint_celebration flag is
@@ -102,8 +94,7 @@ describe('Checkpoints functionality', function() {
     await releaseCoordinatorPage.getFeaturesTab();
     var checkpointCelebrationFlag = (
       await releaseCoordinatorPage.getCheckpointCelebrationFeatureElement());
-    await releaseCoordinatorPage.enableFeatureForTest(
-      checkpointCelebrationFlag);
+    await releaseCoordinatorPage.enableFeature(checkpointCelebrationFlag);
 
     await createDummyExploration();
     var handle = await browser.getWindowHandle();
@@ -128,6 +119,11 @@ describe('Checkpoints functionality', function() {
         await action.setValue(
           'Topic ID', elem, topicId, false);
       });
+
+    await browser.url('/classroom-admin/');
+    await waitFor.pageToFullyLoad();
+    await diagnosticTestPage.createNewClassroomConfig('Math', 'math');
+    await diagnosticTestPage.addTopicIdToClassroomConfig(topicId, 0);
 
     await topicsAndSkillsDashboardPage.get();
     await topicsAndSkillsDashboardPage.createSkillWithDescriptionAndExplanation(

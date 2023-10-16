@@ -19,9 +19,10 @@
 from __future__ import annotations
 
 from core.constants import constants
-from core.domain import config_services
 from core.domain import learner_group_fetchers
 from core.domain import learner_group_services
+from core.domain import platform_parameter_domain as param_domain
+from core.domain import platform_parameter_registry as registry
 from core.domain import topic_domain
 from core.domain import topic_services
 from core.platform import models
@@ -133,13 +134,34 @@ class LearnerGroupServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(self.learner_group.story_ids, ['story_id_1'])
 
     def test_is_learner_group_feature_enabled(self) -> None:
-        config_services.set_property(
-            self.admin_id, 'learner_groups_are_enabled', True)
+        registry.Registry.update_platform_parameter(
+            'learner_groups_are_enabled', self.admin_id, 'edit rules',
+            [
+                param_domain.PlatformParameterRule.from_dict({
+                    'filters': [],
+                    'value_when_matched': True
+                })
+            ],
+            False
+        )
         self.assertTrue(
             learner_group_services.is_learner_group_feature_enabled())
 
-        config_services.set_property(
-            self.admin_id, 'learner_groups_are_enabled', False)
+        registry.Registry.update_platform_parameter(
+            'learner_groups_are_enabled', self.admin_id, 'edit rules',
+            [
+                param_domain.PlatformParameterRule.from_dict({
+                    'filters': [
+                        {
+                            'type': 'platform_type',
+                            'conditions': [['=', 'Backend']]
+                        }
+                    ],
+                    'value_when_matched': False
+                })
+            ],
+            False
+        )
         self.assertFalse(
             learner_group_services.is_learner_group_feature_enabled())
 

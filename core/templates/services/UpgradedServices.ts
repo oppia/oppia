@@ -211,8 +211,6 @@ import { ItemSelectionInputValidationService } from
   // eslint-disable-next-line max-len
   'interactions/ItemSelectionInput/directives/item-selection-input-validation.service';
 import { LanguageUtilService } from 'domain/utilities/language-util.service';
-import { LearnerActionObjectFactory } from
-  'domain/statistics/LearnerActionObjectFactory';
 import { LearnerAnswerDetailsBackendApiService } from
   'domain/statistics/learner-answer-details-backend-api.service';
 import { LearnerDashboardBackendApiService } from
@@ -480,6 +478,8 @@ import { WrittenTranslationsObjectFactory } from
 import { SolutionVerificationService } from
   // eslint-disable-next-line max-len
   'pages/exploration-editor-page/editor-tab/services/solution-verification.service';
+import { ResponsesService } from
+  'pages/exploration-editor-page/editor-tab/services/responses.service';
 import { QuestionValidationService } from './question-validation.service';
 import { MathInteractionsService } from './math-interactions.service';
 
@@ -556,8 +556,6 @@ export class UpgradedServices {
     upgradedServices['InteractionSpecsService'] = new InteractionSpecsService();
     upgradedServices['ItemSelectionInputRulesService'] =
       new ItemSelectionInputRulesService();
-    upgradedServices['LearnerActionObjectFactory'] =
-      new LearnerActionObjectFactory();
     upgradedServices['LearnerParamsService'] = new LearnerParamsService();
     upgradedServices['LoaderService'] = new LoaderService();
     upgradedServices['LoggerService'] = new LoggerService();
@@ -612,7 +610,8 @@ export class UpgradedServices {
       new ThreadStatusDisplayService();
     upgradedServices['Title'] = new Title({});
     upgradedServices['TopicsAndSkillsDashboardPageService'] =
-        new TopicsAndSkillsDashboardPageService();
+        new TopicsAndSkillsDashboardPageService(
+          upgradedServices['PlatformFeatureService']);
     upgradedServices['UnitsObjectFactory'] = new UnitsObjectFactory();
     upgradedServices['UtilsService'] = new UtilsService();
     upgradedServices['VersionTreeService'] = new VersionTreeService();
@@ -732,14 +731,27 @@ export class UpgradedServices {
         upgradedServices['baseInteractionValidationService']);
     upgradedServices['PlayerTranscriptService'] = new PlayerTranscriptService(
       upgradedServices['LoggerService']);
-    upgradedServices['PlaythroughObjectFactory'] = new PlaythroughObjectFactory(
-      upgradedServices['LearnerActionObjectFactory']);
+    upgradedServices['PlaythroughObjectFactory'] =
+      new PlaythroughObjectFactory();
     upgradedServices['PythonProgramTokenizer'] = new PythonProgramTokenizer(
       upgradedServices['LoggerService']);
+    upgradedServices['ResponsesService'] =
+      new ResponsesService(
+        upgradedServices['AlertsService'],
+        upgradedServices['LoggerService'],
+        upgradedServices['OutcomeObjectFactory'],
+        upgradedServices['SolutionValidityService'],
+        upgradedServices['SolutionVerificationService'],
+        upgradedServices['StateCustomizationArgsService'],
+        upgradedServices['StateEditorService'],
+        upgradedServices['StateInteractionIdService'],
+        upgradedServices['StateSolutionService']
+      );
     upgradedServices['QuestionValidationService'] =
-    new QuestionValidationService(
-      upgradedServices['StateEditorService']
-    );
+      new QuestionValidationService(
+        upgradedServices['ResponsesService'],
+        upgradedServices['StateEditorService']
+      );
     upgradedServices['RatioExpressionInputValidationService'] =
           new RatioExpressionInputValidationService(
             upgradedServices['baseInteractionValidationService']);

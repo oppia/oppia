@@ -137,7 +137,7 @@ describe('Classroom Page Component', () => {
   });
 
   it('should initialize', fakeAsync(() => {
-    let classroomUrlFragment = 'test_fragment';
+    let classroomUrlFragment = 'math';
     let bannerImageUrl = 'banner_image_url';
     spyOn(urlService, 'getClassroomUrlFragmentFromUrl')
       .and.returnValue(classroomUrlFragment);
@@ -168,16 +168,17 @@ describe('Classroom Page Component', () => {
       can_edit_topic: true,
       is_published: true,
       url_fragment: 'some-url-fragment',
-      classroom: 'math'
+      classroom: 'math',
+      total_upcoming_chapters_count: 1,
+      total_overdue_chapters_count: 1,
+      total_chapter_counts_for_each_story: [5, 4],
+      published_chapter_counts_for_each_story: [3, 4]
     }];
 
     let classroomData = ClassroomData.createFromBackendData(
       'Math', topicSummaryDicts, 'Course details', 'Topics covered');
     spyOn(accessValidationBackendApiService, 'validateAccessToClassroomPage')
-      .and.returnValues(
-        Promise.reject(),
-        Promise.resolve()
-      );
+      .and.returnValue(Promise.resolve());
     spyOn(classroomBackendApiService, 'fetchClassroomDataAsync')
       .and.returnValue(Promise.resolve(classroomData));
     spyOn(i18nLanguageCodeService, 'getClassroomTranslationKey')

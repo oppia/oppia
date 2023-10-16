@@ -33,7 +33,7 @@ import { PlatformFeatureAdminBackendApiService } from
 import { PlatformFeatureDummyBackendApiService } from
   'domain/platform_feature/platform-feature-dummy-backend-api.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
-import { PlatformParameterFilterType, ServerMode } from
+import { PlatformParameterFilterType } from
   'domain/platform_feature/platform-parameter-filter.model';
 import { FeatureStage, PlatformParameter } from 'domain/platform_feature/platform-parameter.model';
 import { PlatformFeatureService } from 'services/platform-feature.service';
@@ -41,12 +41,14 @@ import { HttpErrorResponse } from '@angular/common/http';
 
 
 let dummyFeatureStatus = false;
-const mockDummyFeatureStatus = (status: boolean) => dummyFeatureStatus = status;
+const mockDummyFeatureFlagForE2ETestsStatus = (status: boolean) => {
+  dummyFeatureStatus = status;
+};
 
 class MockPlatformFeatureService {
   get status() {
     return {
-      DummyFeature: {
+      DummyFeatureFlagForE2ETests: {
         get isEnabled() {
           return dummyFeatureStatus;
         }
@@ -104,13 +106,13 @@ describe('Release coordinator page feature tab', function() {
           description: 'This is a dummy feature flag.',
           feature_stage: FeatureStage.DEV,
           is_feature: true,
-          name: 'dummy_feature',
+          name: 'dummy_feature_flag_for_e2e_tests',
           rule_schema_version: 1,
           rules: [{
             filters: [
               {
-                type: PlatformParameterFilterType.ServerMode,
-                conditions: [['=', ServerMode.Dev]]
+                type: PlatformParameterFilterType.PlatformType,
+                conditions: [['=', 'Web']]
               }
             ],
             // This does not match the data type of feature flags, but this is
@@ -119,7 +121,8 @@ describe('Release coordinator page feature tab', function() {
             value_when_matched: 'original',
           }],
         })
-      ]
+      ],
+      serverStage: 'dev'
     } as FeatureFlagsResponse);
 
     updateApiSpy = spyOn(featureApiService, 'updateFeatureFlag')
@@ -130,7 +133,8 @@ describe('Release coordinator page feature tab', function() {
 
   it('should load feature flags on init', () => {
     expect(component.featureFlags.length).toBe(1);
-    expect(component.featureFlags[0].name).toEqual('dummy_feature');
+    expect(component.featureFlags[0].name).toEqual(
+      'dummy_feature_flag_for_e2e_tests');
   });
 
   describe('.addNewRuleToTop', () => {
@@ -222,7 +226,7 @@ describe('Release coordinator page feature tab', function() {
       // Verifies it's ['server_mode', 'app_version'] after adding a new filter
       // to the end.
       expect(rule.filters[0].type)
-        .toEqual(PlatformParameterFilterType.ServerMode);
+        .toEqual(PlatformParameterFilterType.PlatformType);
       expect(rule.filters[1].type)
         .toEqual(PlatformParameterFilterType.AppVersion);
     });
@@ -256,7 +260,7 @@ describe('Release coordinator page feature tab', function() {
       // Original condition list: ['=dev']
       // Verifies it's ['=dev', '=mock'] after adding.
       expect(filter.conditions[0])
-        .toEqual(['=', ServerMode.Dev.toString()]);
+        .toEqual(['=', 'Web']);
       expect(filter.conditions[1])
         .toEqual(['=', 'mock']);
     });
@@ -311,6 +315,114 @@ describe('Release coordinator page feature tab', function() {
 
       expect(featureFlag.rules.length).toBe(2);
     });
+  });
+
+  describe('.saveDefaultValueToStorage', () => {
+    it('should save the changes', fakeAsync(() => {
+      component.saveDefaultValueToStorage();
+
+      expect(updateApiSpy).toHaveBeenCalled();
+    }));
+
+    it('should not proceed if the user doesn\'t confirm', fakeAsync(() => {
+      mockConfirmResult(false);
+      component.saveDefaultValueToStorage();
+
+      flushMicrotasks();
+
+      expect(updateApiSpy).not.toHaveBeenCalled();
+    }));
+  });
+
+  describe('.getFeatureValidOnCurrentServer', () => {
+    let featureFlagDevStage = PlatformParameter.createFromBackendDict({
+      data_type: 'bool',
+      default_value: false,
+      description: 'This is a dummy feature flag.',
+      feature_stage: FeatureStage.DEV,
+      is_feature: true,
+      name: 'dummy_feature_flag_for_e2e_tests',
+      rule_schema_version: 1,
+      rules: [{
+        filters: [
+          {
+            type: PlatformParameterFilterType.PlatformType,
+            conditions: [['=', 'Web']]
+          }
+        ],
+        value_when_matched: true,
+      }],
+    });
+
+    let featureFlagProdStage = PlatformParameter.createFromBackendDict({
+      data_type: 'bool',
+      default_value: false,
+      description: 'This is a dummy feature flag.',
+      feature_stage: FeatureStage.PROD,
+      is_feature: true,
+      name: 'dummy_feature_flag_for_e2e_tests',
+      rule_schema_version: 1,
+      rules: [{
+        filters: [
+          {
+            type: PlatformParameterFilterType.PlatformType,
+            conditions: [['=', 'Web']]
+          }
+        ],
+        value_when_matched: true,
+      }],
+    });
+
+    afterEach(() => {
+      component.serverStage = '';
+    });
+
+    it('should return true when the server in dev stage and feature ' +
+    'stage is dev too', (() => {
+      component.serverStage = 'dev';
+
+      expect(component.getFeatureValidOnCurrentServer(
+        featureFlagDevStage)).toBe(true);
+    }));
+
+    it('should return false when the server in test stage and feature ' +
+    'stage is dev', (() => {
+      component.serverStage = 'test';
+
+      expect(component.getFeatureValidOnCurrentServer(
+        featureFlagDevStage)).toBe(false);
+    }));
+
+    it('should return true when the server in test stage and feature ' +
+    'stage is prod', (() => {
+      component.serverStage = 'test';
+
+      expect(component.getFeatureValidOnCurrentServer(
+        featureFlagProdStage)).toBe(true);
+    }));
+
+    it('should return true when the server in prod stage and feature ' +
+    'stage is prod', (() => {
+      component.serverStage = 'prod';
+
+      expect(component.getFeatureValidOnCurrentServer(
+        featureFlagProdStage)).toBe(true);
+    }));
+
+    it('should return false when the server in prod stage and feature ' +
+    'stage is dev', (() => {
+      component.serverStage = 'prod';
+
+      expect(component.getFeatureValidOnCurrentServer(
+        featureFlagDevStage)).toBe(false);
+    }));
+
+    it('should return false when the server stage is unknown', (() => {
+      component.serverStage = 'unknown';
+
+      expect(component.getFeatureValidOnCurrentServer(
+        featureFlagDevStage)).toBe(false);
+    }));
   });
 
   describe('.updateFeatureRulesAsync', () => {
@@ -459,66 +571,12 @@ describe('Release coordinator page feature tab', function() {
     }));
   });
 
-  describe('server mode option filter', () => {
-    type OptionFilterType = (
-      (feature: PlatformParameter, option: string) => boolean);
-    let options: readonly string[];
-    let optionFilter: OptionFilterType;
-
-    beforeEach(() => {
-      options = component
-        .filterTypeToContext[PlatformParameterFilterType.ServerMode]
-        .options as readonly string[];
-      optionFilter = component
-        .filterTypeToContext[PlatformParameterFilterType.ServerMode]
-        .optionFilter as OptionFilterType;
-    });
-
-    it('should return [\'dev\'] for feature in dev stage', () => {
-      expect(
-        options.filter(option => optionFilter(
-          { featureStage: FeatureStage.DEV } as PlatformParameter,
-          option))
-      )
-        .toEqual(['dev']);
-    });
-
-    it('should return [\'dev\', \'test\'] for feature in test stage', () => {
-      expect(
-        options.filter(option => optionFilter(
-          { featureStage: FeatureStage.TEST } as PlatformParameter,
-          option))
-      )
-        .toEqual(['dev', 'test']);
-    });
-
-    it('should return [\'dev\', \'test\', \'prod\'] for feature in prod stage',
-      () => {
-        expect(
-          options.filter(option => optionFilter(
-            { featureStage: FeatureStage.PROD } as PlatformParameter,
-            option))
-        )
-          .toEqual(['dev', 'test', 'prod']);
-      }
-    );
-
-    it('should return empty array for feature in invalid stage', () => {
-      expect(
-        options.filter(option => optionFilter(
-          { featureStage: null } as PlatformParameter,
-          option))
-      )
-        .toEqual([]);
-    });
-  });
-
-  describe('.isFeatureFlagRulesChanged', () => {
+  describe('.isFeatureFlagChanged', () => {
     it('should return false if the feature is the same as the backup instance',
       () => {
         const featureFlag = component.featureFlags[0];
 
-        expect(component.isFeatureFlagRulesChanged(featureFlag))
+        expect(component.isFeatureFlagChanged(featureFlag))
           .toBeFalse();
       }
     );
@@ -530,7 +588,7 @@ describe('Release coordinator page feature tab', function() {
 
         component.addNewRuleToTop(featureFlag);
 
-        expect(component.isFeatureFlagRulesChanged(featureFlag))
+        expect(component.isFeatureFlagChanged(featureFlag))
           .toBeTrue();
       }
     );
@@ -548,12 +606,8 @@ describe('Release coordinator page feature tab', function() {
           {
             filters: [
               {
-                type: PlatformParameterFilterType.ServerMode,
-                conditions: [['=', ServerMode.Dev], ['=', ServerMode.Test]]
-              },
-              {
-                type: PlatformParameterFilterType.ServerMode,
-                conditions: [['=', ServerMode.Prod]]
+                type: PlatformParameterFilterType.PlatformType,
+                conditions: [['=', 'Web']]
               }
             ],
             value_when_matched: true,
@@ -566,7 +620,7 @@ describe('Release coordinator page feature tab', function() {
       });
 
       expect(() => {
-        component.isFeatureFlagRulesChanged(featureFlag);
+        component.isFeatureFlagChanged(featureFlag);
       }).toThrowError();
     });
   });
@@ -580,18 +634,14 @@ describe('Release coordinator page feature tab', function() {
           description: 'This is a dummy feature flag.',
           feature_stage: FeatureStage.DEV,
           is_feature: true,
-          name: 'dummy_feature',
+          name: 'dummy_feature_flag_for_e2e_tests',
           rule_schema_version: 1,
           rules: [
             {
               filters: [
                 {
-                  type: PlatformParameterFilterType.ServerMode,
-                  conditions: [['=', ServerMode.Dev], ['=', ServerMode.Test]]
-                },
-                {
-                  type: PlatformParameterFilterType.ServerMode,
-                  conditions: [['=', ServerMode.Prod]]
+                  type: PlatformParameterFilterType.PlatformType,
+                  conditions: [['=', 'Web']]
                 }
               ],
               value_when_matched: true,
@@ -615,7 +665,7 @@ describe('Release coordinator page feature tab', function() {
           description: 'This is a dummy feature flag.',
           feature_stage: FeatureStage.DEV,
           is_feature: true,
-          name: 'dummy_feature',
+          name: 'dummy_feature_flag_for_e2e_tests',
           rule_schema_version: 1,
           rules: [
             {
@@ -641,18 +691,18 @@ describe('Release coordinator page feature tab', function() {
           description: 'This is a dummy feature flag.',
           feature_stage: FeatureStage.DEV,
           is_feature: true,
-          name: 'dummy_feature',
+          name: 'dummy_feature_flag_for_e2e_tests',
           rule_schema_version: 1,
           rules: [
             {
               filters: [
                 {
-                  type: PlatformParameterFilterType.ServerMode,
-                  conditions: [['=', ServerMode.Dev]]
+                  type: PlatformParameterFilterType.PlatformType,
+                  conditions: [['=', 'Web']]
                 },
                 {
-                  type: PlatformParameterFilterType.ServerMode,
-                  conditions: [['=', ServerMode.Dev]]
+                  type: PlatformParameterFilterType.PlatformType,
+                  conditions: [['=', 'Web']]
                 }
               ],
               value_when_matched: true
@@ -673,14 +723,14 @@ describe('Release coordinator page feature tab', function() {
           description: 'This is a dummy feature flag.',
           feature_stage: FeatureStage.DEV,
           is_feature: true,
-          name: 'dummy_feature',
+          name: 'dummy_feature_flag_for_e2e_tests',
           rule_schema_version: 1,
           rules: [
             {
               filters: [
                 {
-                  type: PlatformParameterFilterType.ServerMode,
-                  conditions: [['=', ServerMode.Dev], ['=', ServerMode.Dev]]
+                  type: PlatformParameterFilterType.PlatformType,
+                  conditions: [['=', 'Web'], ['=', 'Web']]
                 },
               ],
               value_when_matched: true
@@ -695,15 +745,15 @@ describe('Release coordinator page feature tab', function() {
     });
   });
 
-  describe('.isDummyFeatureEnabled', () => {
+  describe('.dummyFeatureFlagForE2eTestsIsEnabled', () => {
     it('should return true when dummy feature is enabled', () => {
-      mockDummyFeatureStatus(true);
-      expect(component.isDummyFeatureEnabled).toBeTrue();
+      mockDummyFeatureFlagForE2ETestsStatus(true);
+      expect(component.dummyFeatureFlagForE2eTestsIsEnabled).toBeTrue();
     });
 
     it('should return false when dummy feature is disabled', () => {
-      mockDummyFeatureStatus(false);
-      expect(component.isDummyFeatureEnabled).toBeFalse();
+      mockDummyFeatureFlagForE2ETestsStatus(false);
+      expect(component.dummyFeatureFlagForE2eTestsIsEnabled).toBeFalse();
     });
   });
 
@@ -721,7 +771,7 @@ describe('Release coordinator page feature tab', function() {
 
     it('should not request dummy handler if the dummy feature is disabled',
       fakeAsync(() => {
-        mockDummyFeatureStatus(false);
+        mockDummyFeatureFlagForE2ETestsStatus(false);
 
         component.reloadDummyHandlerStatusAsync();
 
@@ -733,7 +783,7 @@ describe('Release coordinator page feature tab', function() {
 
     it('should request dummy handler if the dummy feature is enabled',
       fakeAsync(() => {
-        mockDummyFeatureStatus(true);
+        mockDummyFeatureFlagForE2ETestsStatus(true);
 
         component.reloadDummyHandlerStatusAsync();
 

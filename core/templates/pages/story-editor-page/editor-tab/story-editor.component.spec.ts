@@ -32,6 +32,7 @@ import { NewChapterTitleModalComponent } from '../modal-templates/new-chapter-ti
 import { DeleteChapterModalComponent } from '../modal-templates/delete-chapter-modal.component';
 import { CdkDragDrop } from '@angular/cdk/drag-drop';
 import { StoryNode } from 'domain/story/story-node.model';
+import { PlatformFeatureService } from '../../../services/platform-feature.service';
 
 class MockNgbModalRef {
   componentInstance: {
@@ -47,10 +48,19 @@ class MockNgbModal {
   }
 }
 
-describe('Story Editor Component having two story nodes', () => {
+class MockPlatformFeatureService {
+  status = {
+    SerialChapterLaunchCurriculumAdminView: {
+      isEnabled: false
+    }
+  };
+}
+
+describe('Story Editor Component having three story nodes', () => {
   let component: StoryEditorComponent;
   let fixture: ComponentFixture<StoryEditorComponent>;
   let ngbModal: NgbModal;
+  let mockPlatformFeatureService = new MockPlatformFeatureService();
   let story: Story;
   let windowDimensionsService: WindowDimensionsService;
   let undoRedoService: UndoRedoService;
@@ -74,6 +84,10 @@ describe('Story Editor Component having two story nodes', () => {
         StoryEditorNavigationService,
         StoryUpdateService,
         StoryEditorStateService,
+        {
+          provide: PlatformFeatureService,
+          useValue: mockPlatformFeatureService
+        },
         {
           provide: NgbModal,
           useClass: MockNgbModal
@@ -117,7 +131,12 @@ describe('Story Editor Component having two story nodes', () => {
             destination_node_ids: [],
             outline: 'Outline',
             exploration_id: null,
-            outline_is_finalized: false
+            outline_is_finalized: false,
+            status: 'Published',
+            planned_publication_date_msecs: 30,
+            last_modified_msecs: 20,
+            first_publication_date_msecs: 10,
+            unpublishing_reason: 'Bad Content'
           }, {
             id: 'node_2',
             title: 'Title 2',
@@ -127,7 +146,27 @@ describe('Story Editor Component having two story nodes', () => {
             destination_node_ids: ['node_1'],
             outline: 'Outline 2',
             exploration_id: 'exp_1',
-            outline_is_finalized: true
+            outline_is_finalized: true,
+            status: 'Ready To Publish',
+            planned_publication_date_msecs: 30,
+            last_modified_msecs: 20,
+            first_publication_date_msecs: 10,
+            unpublishing_reason: null
+          }, {
+            id: 'node_3',
+            title: 'Title 3',
+            description: 'Description 3',
+            prerequisite_skill_ids: ['skill_4'],
+            acquired_skill_ids: ['skill_5'],
+            destination_node_ids: ['node_2'],
+            outline: 'Outline 3',
+            exploration_id: 'exp_3',
+            outline_is_finalized: true,
+            status: 'Draft',
+            planned_publication_date_msecs: 30,
+            last_modified_msecs: 20,
+            first_publication_date_msecs: 10,
+            unpublishing_reason: null
           }],
         next_node_id: 'node_3'
       },
@@ -150,7 +189,55 @@ describe('Story Editor Component having two story nodes', () => {
     component.ngOnDestroy();
   });
 
-  it('should change list oder', fakeAsync(() => {
+  it('should get status of Serial Chapter Launch Feature flag', () => {
+    expect(component.isSerialChapterFeatureFlagEnabled()).toEqual(false);
+
+    mockPlatformFeatureService.
+      status.SerialChapterLaunchCurriculumAdminView.isEnabled = true;
+    expect(component.isSerialChapterFeatureFlagEnabled()).toEqual(true);
+  });
+
+  it('should correctly initialize chapterIsPublishable', () => {
+    expect(component.chapterIsPublishable[0]).toEqual(true);
+    expect(component.chapterIsPublishable[1]).toEqual(true);
+    expect(component.chapterIsPublishable[2]).toEqual(false);
+  });
+
+  it('should get medium dateStyle locale date string', () => {
+    const options = {
+      dateStyle: 'medium'
+    } as Intl.DateTimeFormatOptions;
+    expect(component.getMediumStyleLocaleDateString(1692144000000)).toEqual(
+      (new Date(1692144000000)).toLocaleDateString(undefined, options));
+  });
+
+  it('should disable drag and drop', () => {
+    let node = StoryNode.createFromBackendDict({
+      id: 'node_1',
+      thumbnail_filename: 'image.png',
+      title: 'Title 1',
+      description: 'Description 1',
+      prerequisite_skill_ids: ['skill_1'],
+      acquired_skill_ids: ['skill_2'],
+      destination_node_ids: ['node_2'],
+      outline: 'Outline',
+      exploration_id: null,
+      outline_is_finalized: false,
+      thumbnail_bg_color: '#a33f40',
+      status: 'Published',
+      planned_publication_date_msecs: 100,
+      last_modified_msecs: 100,
+      first_publication_date_msecs: 200,
+      unpublishing_reason: null
+    });
+    expect(component.isDragAndDropDisabled(node)).toBeTrue();
+
+    node.setStatus('Draft');
+    spyOnProperty(window, 'innerWidth', 'get').and.returnValue(1200);
+    expect(component.isDragAndDropDisabled(node)).toBeFalse();
+  });
+
+  it('should change list order', fakeAsync(() => {
     spyOn(storyUpdateService, 'rearrangeNodeInStory').and.stub();
     component.linearNodesList = [StoryNode.createFromBackendDict({
       id: 'node_1',
@@ -163,7 +250,12 @@ describe('Story Editor Component having two story nodes', () => {
       outline: 'Outline',
       exploration_id: null,
       outline_is_finalized: false,
-      thumbnail_bg_color: '#a33f40'
+      thumbnail_bg_color: '#a33f40',
+      status: 'Published',
+      planned_publication_date_msecs: 100,
+      last_modified_msecs: 100,
+      first_publication_date_msecs: 200,
+      unpublishing_reason: null
     }),
     StoryNode.createFromBackendDict({
       id: 'node_2',
@@ -176,7 +268,12 @@ describe('Story Editor Component having two story nodes', () => {
       outline: 'Outline',
       exploration_id: null,
       outline_is_finalized: false,
-      thumbnail_bg_color: '#a33f40'
+      thumbnail_bg_color: '#a33f40',
+      status: 'Ready To Publish',
+      planned_publication_date_msecs: 100,
+      last_modified_msecs: 100,
+      first_publication_date_msecs: 200,
+      unpublishing_reason: null
     }),
     StoryNode.createFromBackendDict({
       id: 'node_3',
@@ -189,25 +286,63 @@ describe('Story Editor Component having two story nodes', () => {
       outline: 'Outline',
       exploration_id: null,
       outline_is_finalized: false,
-      thumbnail_bg_color: '#a33f40'
+      thumbnail_bg_color: '#a33f40',
+      status: 'Draft',
+      planned_publication_date_msecs: 100,
+      last_modified_msecs: 100,
+      first_publication_date_msecs: 200,
+      unpublishing_reason: null
     })];
 
     const event1 = {
-      previousIndex: 0,
-      currentIndex: 1,
-    } as CdkDragDrop<string[]>;
-    const event2 = {
       previousIndex: 1,
       currentIndex: 0,
     } as CdkDragDrop<string[]>;
+    const event2 = {
+      previousIndex: 1,
+      currentIndex: 2,
+    } as CdkDragDrop<string[]>;
+    const event3 = {
+      previousIndex: 0,
+      currentIndex: 1,
+    } as CdkDragDrop<string[]>;
 
+    expect(component.publishedChaptersDropErrorIsShown).toEqual(false);
     component.drop(event1);
-    tick();
+    expect(component.publishedChaptersDropErrorIsShown).toEqual(true);
+    tick(5000);
+
+    expect(storyUpdateService.rearrangeNodeInStory).toHaveBeenCalledTimes(0);
+    expect(component.publishedChaptersDropErrorIsShown).toEqual(false);
+
     component.drop(event2);
+    tick();
+
+    expect(storyUpdateService.rearrangeNodeInStory).toHaveBeenCalledTimes(1);
+
+    component.drop(event3);
     tick();
 
     expect(storyUpdateService.rearrangeNodeInStory).toHaveBeenCalledTimes(2);
   }));
+
+  it('should move a chapter up in list', () => {
+    let rearrangeNodeSpy = spyOn(component, 'rearrangeNodeInList');
+
+    component.moveNodeUpInStory(2);
+
+    expect(component.selectedChapterIndex).toEqual(-1);
+    expect(rearrangeNodeSpy).toHaveBeenCalled();
+  });
+
+  it('should move a chapter down in list', () => {
+    let rearrangeNodeSpy = spyOn(component, 'rearrangeNodeInList');
+
+    component.moveNodeDownInStory(1);
+
+    expect(component.selectedChapterIndex).toEqual(-1);
+    expect(rearrangeNodeSpy).toHaveBeenCalled();
+  });
 
   it('should display topicname on main story card', () => {
     expect(component.storyPreviewCardIsShown).toEqual(false);
@@ -535,11 +670,14 @@ describe('Story Editor Component having two story nodes', () => {
     let mockEventEmitter = new EventEmitter();
     spyOnProperty(storyEditorStateService, 'onStoryInitialized')
       .and.returnValue(mockEventEmitter);
+    let updatePublishUptoChapterSelectionSpy = spyOn(
+      component, 'updatePublishUptoChapterSelection');
 
     component.ngOnInit();
     mockEventEmitter.emit();
 
     expect(fetchSpy).toHaveBeenCalled();
+    expect(updatePublishUptoChapterSelectionSpy).toHaveBeenCalled();
   });
 
   it('should fetch story when story is reinitialized', () => {
@@ -562,5 +700,40 @@ describe('Story Editor Component having two story nodes', () => {
     mockEventEmitter.emit();
 
     expect(fetchSpy).toHaveBeenCalled();
+  });
+
+  it('should update publish upto dropdown chapter selection', () => {
+    let selectChapterSpy = spyOn(
+      storyEditorStateService, 'setSelectedChapterIndexInPublishUptoDropdown');
+    let chaptersAreBeingPublishedSpy = spyOn(
+      storyEditorStateService, 'setChaptersAreBeingPublished');
+    let newChapterPublicationIsDisabledSpy = spyOn(
+      storyEditorStateService, 'setNewChapterPublicationIsDisabled');
+
+    component.updatePublishUptoChapterSelection(1);
+    expect(selectChapterSpy).toHaveBeenCalledWith(1);
+    expect(chaptersAreBeingPublishedSpy).toHaveBeenCalledWith(true);
+    expect(newChapterPublicationIsDisabledSpy).toHaveBeenCalledWith(false);
+
+    component.story.getStoryContents().getNodes()[1].setStatus('Published');
+    component.story.getStoryContents().getNodes()[2].setStatus('Published');
+
+    component.updatePublishUptoChapterSelection(2);
+    expect(selectChapterSpy).toHaveBeenCalledWith(2);
+    expect(newChapterPublicationIsDisabledSpy).toHaveBeenCalledWith(true);
+
+    component.updatePublishUptoChapterSelection(1);
+    expect(chaptersAreBeingPublishedSpy).toHaveBeenCalledWith(false);
+
+    component.updatePublishUptoChapterSelection(-1);
+    expect(selectChapterSpy).toHaveBeenCalled();
+    expect(chaptersAreBeingPublishedSpy).toHaveBeenCalledWith(false);
+    expect(newChapterPublicationIsDisabledSpy).toHaveBeenCalledWith(false);
+
+    component.linearNodesList = [];
+    component.updatePublishUptoChapterSelection(-1);
+    expect(selectChapterSpy).toHaveBeenCalled();
+    expect(chaptersAreBeingPublishedSpy).toHaveBeenCalledWith(true);
+    expect(newChapterPublicationIsDisabledSpy).toHaveBeenCalledWith(true);
   });
 });

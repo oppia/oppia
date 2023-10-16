@@ -29,6 +29,7 @@ import { Question, QuestionBackendDict, QuestionObjectFactory } from 'domain/que
 import { ActiveContributionDict, TranslationSuggestionReviewModalComponent } from '../modal-templates/translation-suggestion-review-modal.component';
 import { ContributorDashboardConstants } from 'pages/contributor-dashboard-page/contributor-dashboard-page.constants';
 import { QuestionSuggestionReviewModalComponent } from '../modal-templates/question-suggestion-review-modal.component';
+import { TranslationLanguageService } from 'pages/exploration-editor-page/translation-tab/services/translation-language.service';
 import { TranslationTopicService } from 'pages/exploration-editor-page/translation-tab/services/translation-topic.service';
 import { FormatRtePreviewPipe } from 'filters/format-rte-preview.pipe';
 import { UserService } from 'services/user.service';
@@ -38,6 +39,8 @@ import { ContributionAndReviewService } from '../services/contribution-and-revie
 import { ContributionOpportunitiesService } from '../services/contribution-opportunities.service';
 import { OpportunitiesListComponent } from '../opportunities-list/opportunities-list.component';
 import { PlatformFeatureService } from 'services/platform-feature.service';
+import { HtmlLengthService } from 'services/html-length.service';
+import { HtmlEscaperService } from 'services/html-escaper.service';
 
 export interface Suggestion {
   change: {
@@ -62,6 +65,7 @@ export interface ContributionsSummary {
   labelText: string;
   labelColor: string;
   actionButtonTitle: string;
+  translationWordCount?: number;
 }
 
 export interface Opportunity {
@@ -71,6 +75,7 @@ export interface Opportunity {
   labelText: string;
   labelColor: string;
   actionButtonTitle: string;
+  translationWordCount?: number;
 }
 
 export interface GetOpportunitiesResponse {
@@ -171,9 +176,12 @@ export class ContributionsAndReview
     private ngbModal: NgbModal,
     private questionObjectFactory: QuestionObjectFactory,
     private skillBackendApiService: SkillBackendApiService,
+    private translationLanguageService: TranslationLanguageService,
     private translationTopicService: TranslationTopicService,
     private userService: UserService,
-    private featureService: PlatformFeatureService
+    private featureService: PlatformFeatureService,
+    private htmlLengthService: HtmlLengthService,
+    private htmlEscaperService: HtmlEscaperService
   ) {}
 
   getQuestionContributionsSummary(
@@ -238,7 +246,11 @@ export class ContributionsAndReview
           this.SUGGESTION_LABELS[suggestion.status].text),
         labelColor: this.SUGGESTION_LABELS[suggestion.status].color,
         actionButtonTitle: (
-          this.activeTabType === this.TAB_TYPE_REVIEWS ? 'Review' : 'View')
+          this.activeTabType === this.TAB_TYPE_REVIEWS ? 'Review' : 'View'),
+        translationWordCount: (
+          this.isReviewTranslationsTab() && this.activeExplorationId) ? (
+            this.htmlLengthService.computeHtmlLengthInWords(
+              suggestion.change.content_html)) : undefined
       };
 
       translationContributionsSummaryList.push(requiredData);
@@ -249,10 +261,11 @@ export class ContributionsAndReview
   getTranslationSuggestionHeading(suggestion: Suggestion): string {
     const changeTranslation = suggestion.change.translation_html;
 
-    if (Array.isArray(changeTranslation)) {
-      return this.formatRtePreviewPipe.transform(', ');
-    }
-    return this.formatRtePreviewPipe.transform(changeTranslation);
+    return this.htmlEscaperService.escapedStrToUnescapedStr(
+      this.formatRtePreviewPipe.transform(
+        Array.isArray(changeTranslation) ? ', ' : changeTranslation
+      )
+    );
   }
 
   resolveSuggestionSuccess(suggestionId: string): void {
@@ -482,6 +495,7 @@ export class ContributionsAndReview
 
   loadContributions(shouldResetOffset: boolean):
     Promise<GetOpportunitiesResponse> {
+    this.contributions = {};
     if (!this.activeTabType || !this.activeTabSubtype) {
       return new Promise((resolve, reject) => {
         resolve({opportunitiesDicts: [], more: false});
@@ -555,6 +569,8 @@ export class ContributionsAndReview
     this.contributions = {};
     this.userDetailsLoading = true;
     this.userIsLoggedIn = false;
+    this.languageCode = (
+      this.translationLanguageService.getActiveLanguageCode());
     this.activeTabType = '';
     this.activeTabSubtype = '';
     this.dropdownShown = false;
@@ -590,9 +606,6 @@ export class ContributionsAndReview
         enabled: true
       }
     ];
-
-    this.translationTopicService.setActiveTopicName(
-      ContributorDashboardConstants.DEFAULT_OPPORTUNITY_TOPIC_NAME);
 
     // Reset active exploration when changing topics.
     this.directiveSubscriptions.add(

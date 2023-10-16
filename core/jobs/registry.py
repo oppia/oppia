@@ -56,19 +56,22 @@ from core.jobs.batch_jobs import opportunity_management_jobs         # pylint: d
 from core.jobs.batch_jobs import question_migration_jobs             # pylint: disable=unused-import  # isort: skip
 from core.jobs.batch_jobs import skill_migration_jobs                # pylint: disable=unused-import  # isort: skip
 from core.jobs.batch_jobs import story_migration_jobs                # pylint: disable=unused-import  # isort: skip
+from core.jobs.batch_jobs import subtopic_migration_jobs                # pylint: disable=unused-import  # isort: skip
 from core.jobs.batch_jobs import topic_migration_jobs                # pylint: disable=unused-import  # isort: skip
 from core.jobs.batch_jobs import suggestion_stats_computation_jobs   # pylint: disable=unused-import  # isort: skip
 from core.jobs.batch_jobs import suggestion_migration_jobs   # pylint: disable=unused-import  # isort: skip
 from core.jobs.batch_jobs import translation_migration_jobs         # pylint: disable=unused-import  # isort: skip
 from core.jobs.batch_jobs import user_stats_computation_jobs         # pylint: disable=unused-import  # isort: skip
 from core.jobs.batch_jobs import math_interactions_audit_jobs        # pylint: disable=unused-import  # isort: skip
-from core.jobs.batch_jobs import mailchimp_population_jobs           # pylint: disable=unused-import  # isort: skip
 from core.jobs.batch_jobs import (                                   # pylint: disable=unused-import  # isort: skip
       exp_version_history_computation_job)
 from core.jobs.batch_jobs import (                                   # pylint: disable=unused-import  # isort: skip
     rejecting_suggestion_for_invalid_content_ids_jobs)
 from core.jobs.batch_jobs import (                                   # pylint: disable=unused-import  # isort: skip
     remove_profile_picture_data_url_field_jobs)
+from core.jobs.batch_jobs import contributor_admin_stats_jobs        # pylint: disable=unused-import  # isort: skip
+from core.jobs.batch_jobs import (                                   # pylint: disable=unused-import  # isort: skip
+    story_node_jobs)
 
 
 def get_all_jobs() -> List[Type[base_jobs.JobBase]]:

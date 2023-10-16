@@ -21,6 +21,7 @@ import logging
 import random
 
 from core import feconf
+from core import utils
 from core.constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
@@ -38,7 +39,10 @@ from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import fs_services
 from core.domain import opportunity_services
+from core.domain import platform_feature_services as feature_services
 from core.domain import platform_parameter_domain as parameter_domain
+from core.domain import platform_parameter_list
+from core.domain import platform_parameter_registry as registry
 from core.domain import question_domain
 from core.domain import question_services
 from core.domain import recommendations_services
@@ -61,6 +65,23 @@ from core.domain import user_services
 from core.domain import wipeout_service
 
 from typing import Dict, List, Optional, TypedDict, Union, cast
+
+# Platform paramters that we plan to show on the the release-coordinator page.
+PLATFORM_PARAMS_TO_SHOW_IN_RC_PAGE = set([
+    platform_parameter_list.ParamNames.PROMO_BAR_ENABLED.value,
+    platform_parameter_list.ParamNames.PROMO_BAR_MESSAGE.value
+])
+
+# Platform parameters that we plan to show on the blog admin page.
+PLATFORM_PARAMS_TO_SHOW_IN_BLOG_ADMIN_PAGE = set([
+    (
+        platform_parameter_list.ParamNames.
+        MAX_NUMBER_OF_TAGS_ASSIGNED_TO_BLOG_POST.value
+    )
+])
+
+supported_languages: List[str] = [
+    lang['id'] for lang in constants.SUPPORTED_AUDIO_LANGUAGES]
 
 
 class ClassroomPageDataDict(TypedDict):
@@ -88,7 +109,7 @@ class AdminPage(
 
     @acl_decorators.can_access_admin_page
     def get(self) -> None:
-        """Handles GET requests."""
+        """Renders the admin page."""
 
         self.render_template('admin-page.mainpage.html')
 
@@ -109,9 +130,11 @@ class AdminHandlerNormalizePayloadDict(TypedDict):
     config_property_id: Optional[str]
     data: Optional[str]
     topic_id: Optional[str]
+    platform_param_name: Optional[str]
     commit_message: Optional[str]
     new_rules: Optional[List[parameter_domain.PlatformParameterRule]]
     exp_id: Optional[str]
+    default_value: Dict[str, parameter_domain.PlatformDataTypes]
 
 
 class AdminHandler(
@@ -136,6 +159,7 @@ class AdminHandler(
                         'save_config_properties', 'revert_config_property',
                         'upload_topic_similarities',
                         'regenerate_topic_related_opportunities',
+                        'update_platform_parameter_rules',
                         'rollback_exploration_to_safe_state'
                     ]
                 },
@@ -194,6 +218,12 @@ class AdminHandler(
                 },
                 'default_value': None
             },
+            'platform_param_name': {
+                'schema': {
+                    'type': 'basestring'
+                },
+                'default_value': None
+            },
             'commit_message': {
                 'schema': {
                     'type': 'basestring'
@@ -215,28 +245,44 @@ class AdminHandler(
                     'type': 'basestring'
                 },
                 'default_value': None
+            },
+            'default_value': {
+                'schema': {
+                    'type': 'object_dict',
+                    'validation_method': (
+                        validation_method.
+                        validate_new_default_value_of_platform_parameter)
+                },
+                'default_value': None
             }
         }
     }
 
     @acl_decorators.can_access_admin_page
     def get(self) -> None:
-        """Handles GET requests."""
+        """Populates the data on the admin page."""
         demo_exploration_ids = list(feconf.DEMO_EXPLORATIONS.keys())
 
         topic_summaries = topic_fetchers.get_all_topic_summaries()
         topic_summary_dicts = [
             summary.to_dict() for summary in topic_summaries]
 
-        config_properties = config_domain.Registry.get_config_property_schemas()
-        # Removes promo-bar related configs as promo-bar is handled by
-        # release coordinators in /release-coordinator page.
-        del config_properties['promo_bar_enabled']
-        del config_properties['promo_bar_message']
+        platform_params_dicts = (
+            feature_services.
+            get_all_platform_parameters_except_feature_flag_dicts()
+        )
+        # Removes promo-bar related and blog related platform params as
+        # they are handled in release-coordinator page and blog admin page
+        # respectively.
+        platform_params_dicts = [
+            param for param in platform_params_dicts
+            if (
+                param['name'] not in PLATFORM_PARAMS_TO_SHOW_IN_RC_PAGE and
+                param['name'] not in PLATFORM_PARAMS_TO_SHOW_IN_BLOG_ADMIN_PAGE
+            )
+        ]
 
-        # Remove blog related configs as they will be handled by 'blog admins'
-        # on blog admin page.
-        del config_properties['max_number_of_tags_assigned_to_blog_post']
+        config_properties = config_domain.Registry.get_config_property_schemas()
 
         self.render_json({
             'config_properties': config_properties,
@@ -248,11 +294,43 @@ class AdminHandler(
             'human_readable_roles': role_services.HUMAN_READABLE_ROLES,
             'role_to_actions': role_services.get_role_actions(),
             'topic_summaries': topic_summary_dicts,
+            'platform_params_dicts': platform_params_dicts,
         })
 
     @acl_decorators.can_access_admin_page
     def post(self) -> None:
-        """Handles POST requests."""
+        """Performs a series of actions based on the action parameter on the
+        admin page.
+
+        Raises:
+            Exception. The exploration_id must be provided when the action
+                is reload_exploration.
+            Exception. The collection_id must be provided when the action
+                is reload_collection.
+            Exception. The num_dummy_exps_to_generate must be provided when
+                the action is generate_dummy_explorations.
+            Exception. The num_dummy_exps_to_publish must be provided when
+                the action is generate_dummy_explorations.
+            InvalidInputException. Generate count cannot be less than publish
+                count.
+            Exception. The new_config_property_values must be provided
+                when the action is save_config_properties.
+            Exception. The config_property_id must be provided when the
+                action is revert_config_property.
+            Exception. The data must be provided when the action is
+                upload_topic_similarities.
+            Exception. The topic_id must be provided when the action is
+                regenerate_topic_related_opportunities.
+            Exception. The exp_id' must be provided when the action is
+                rollback_exploration_to_safe_state.
+            Exception. The platform_param_name must be provided when the action
+                is update_platform_parameter_rules.
+            Exception. The new_rules must be provided when the action is
+                update_platform_parameter_rules.
+            Exception. The commit_message must be provided when the action
+                is update_platform_parameter_rules.
+            InvalidInputException. The input provided is not valid.
+        """
         assert self.user_id is not None
         assert self.normalized_payload is not None
         action = self.normalized_payload.get('action')
@@ -354,13 +432,7 @@ class AdminHandler(
                 result = {
                     'opportunities_count': opportunities_count
                 }
-            else:
-                # The handler schema defines the possible values of 'action'.
-                # If 'action' has a value other than those defined in the
-                # schema, a Bad Request error will be thrown. Hence, 'action'
-                # must be 'rollback_exploration_to_safe_state' if this branch is
-                # executed.
-                assert action == 'rollback_exploration_to_safe_state'
+            elif action == 'rollback_exploration_to_safe_state':
                 exp_id = self.normalized_payload.get('exp_id')
                 if exp_id is None:
                     raise Exception(
@@ -372,6 +444,52 @@ class AdminHandler(
                 result = {
                     'version': version
                 }
+            else:
+                # The handler schema defines the possible values of 'action'.
+                # If 'action' has a value other than those defined in the
+                # schema, a Bad Request error will be thrown. Hence, 'action'
+                # must be 'update_platform_parameter_rules' if this branch is
+                # executed.
+                assert action == 'update_platform_parameter_rules'
+                platform_param_name = self.normalized_payload.get(
+                    'platform_param_name'
+                )
+                if platform_param_name is None:
+                    raise Exception(
+                        'The \'platform_param_name\' must be provided when '
+                        'the action is update_platform_parameter_rules.'
+                    )
+                new_rules = self.normalized_payload.get('new_rules')
+                if new_rules is None:
+                    raise Exception(
+                        'The \'new_rules\' must be provided when the action'
+                        ' is update_platform_parameter_rules.'
+                    )
+                commit_message = self.normalized_payload.get('commit_message')
+                if commit_message is None:
+                    raise Exception(
+                        'The \'commit_message\' must be provided when the '
+                        'action is update_platform_parameter_rules.'
+                    )
+                default_value = self.normalized_payload.get('default_value')
+                assert default_value is not None
+
+                try:
+                    registry.Registry.update_platform_parameter(
+                        platform_param_name, self.user_id, commit_message,
+                        new_rules,
+                        default_value['value']
+                    )
+                except (
+                    utils.ValidationError,
+                    feature_services.PlatformParameterNotFoundException
+                ) as e:
+                    raise self.InvalidInputException(e)
+
+                new_rule_dicts = [rule.to_dict() for rule in new_rules]
+                logging.info(
+                    '[ADMIN] %s updated feature %s with new rules: '
+                    '%s.' % (self.user_id, platform_param_name, new_rule_dicts))
             self.render_json(result)
         except Exception as e:
             logging.exception('[ADMIN] %s', e)
@@ -1131,6 +1249,16 @@ class AdminRoleHandler(
 
     @acl_decorators.can_access_admin_page
     def get(self) -> None:
+        """Retrieves information about users based on different filter
+        criteria to populate the roles tab.
+
+        Raises:
+            Exception. The role must be provided when the filter criterion
+                is 'role'.
+            Exception. The username must be provided when the filter
+                criterion is 'username'.
+            InvalidInputException. User with given username does not exist.
+        """
         assert self.user_id is not None
         # Here we use cast because we are narrowing down the type of
         # 'normalized_request' from Union of request TypedDicts to a
@@ -1184,19 +1312,32 @@ class AdminRoleHandler(
             user_settings = user_services.get_user_settings(user_id)
             user_roles = user_settings.roles
             managed_topic_ids = []
+            coordinated_language_ids = []
             if feconf.ROLE_ID_TOPIC_MANAGER in user_roles:
                 managed_topic_ids = [
                     rights.id for rights in
                     topic_fetchers.get_topic_rights_with_user(user_id)]
+            if feconf.ROLE_ID_TRANSLATION_COORDINATOR in user_roles:
+                coordinated_language_ids = [
+                    rights.language_id for rights in
+                    user_services.get_translation_rights_with_user(
+                        user_id)]
             user_roles_dict = {
                 'roles': user_roles,
                 'managed_topic_ids': managed_topic_ids,
+                'coordinated_language_ids': coordinated_language_ids,
                 'banned': user_settings.banned
             }
             self.render_json(user_roles_dict)
 
     @acl_decorators.can_access_admin_page
     def put(self) -> None:
+        """Adds a role to a user.
+
+        Raises:
+            InvalidInputException. User with given username does not exist.
+            InvalidInputException. Unsupported role for this handler.
+        """
         assert self.normalized_payload is not None
         username = self.normalized_payload['username']
         role = self.normalized_payload['role']
@@ -1218,6 +1359,11 @@ class AdminRoleHandler(
 
     @acl_decorators.can_access_admin_page
     def delete(self) -> None:
+        """Removes a role from a user.
+
+        Raises:
+            InvalidInputException. User with given username does not exist.
+        """
         # Here we use cast because we are narrowing down the type of
         # 'normalized_request' from Union of request TypedDicts to a
         # particular TypedDict that was defined according to the schemas.
@@ -1236,6 +1382,10 @@ class AdminRoleHandler(
 
         if role == feconf.ROLE_ID_TOPIC_MANAGER:
             topic_services.deassign_user_from_all_topics(self.user, user_id)
+
+        if role == feconf.ROLE_ID_TRANSLATION_COORDINATOR:
+            user_services.deassign_user_from_all_languages(
+                self.user, user_id)
 
         user_services.remove_user_role(user_id, role)
 
@@ -1284,6 +1434,12 @@ class TopicManagerRoleHandler(
 
     @acl_decorators.can_access_admin_page
     def put(self) -> None:
+        """Adds or removes the topic-manager role for a user in the context
+        of a specific topic.
+
+        Raises:
+            InvalidInputException. User with given username does not exist.
+        """
         assert self.normalized_payload is not None
         username = self.normalized_payload['username']
         action = self.normalized_payload['action']
@@ -1369,6 +1525,11 @@ class BannedUsersHandler(
 
     @acl_decorators.can_access_admin_page
     def put(self) -> None:
+        """Marks a user as banned.
+
+        Raises:
+            InvalidInputException. User with given username does not exist.
+        """
         assert self.normalized_payload is not None
         username = self.normalized_payload['username']
         user_id = user_services.get_user_id_from_username(username)
@@ -1383,6 +1544,11 @@ class BannedUsersHandler(
 
     @acl_decorators.can_access_admin_page
     def delete(self) -> None:
+        """Removes the banned status of the user.
+
+        Raises:
+            InvalidInputException. User with given username does not exist.
+        """
         assert self.normalized_request is not None
         username = self.normalized_request['username']
         user_id = user_services.get_user_id_from_username(username)
@@ -1441,6 +1607,13 @@ class AdminSuperAdminPrivilegesHandler(
 
     @acl_decorators.can_access_admin_page
     def put(self) -> None:
+        """Grants super admin privileges to a user.
+
+        Raises:
+            UnauthorizedUserException. Only the default system admin can
+                manage super admins.
+            InvalidInputException. No such user exists.
+        """
         assert self.normalized_payload is not None
         if self.email != feconf.ADMIN_EMAIL_ADDRESS:
             raise self.UnauthorizedUserException(
@@ -1456,6 +1629,15 @@ class AdminSuperAdminPrivilegesHandler(
 
     @acl_decorators.can_access_admin_page
     def delete(self) -> None:
+        """Revokes super admin privileges from a user.
+
+        Raises:
+            UnauthorizedUserException. Only the default system admin can
+                manage super admins.
+            InvalidInputException. No such user exists.
+            InvalidInputException. Cannot revoke privileges from the default
+                super admin account.
+        """
         assert self.normalized_request is not None
         if self.email != feconf.ADMIN_EMAIL_ADDRESS:
             raise self.UnauthorizedUserException(
@@ -1485,6 +1667,7 @@ class AdminTopicsCsvFileDownloader(
 
     @acl_decorators.can_access_admin_page
     def get(self) -> None:
+        """Generates a CSV file containing topic similarities."""
         topic_similarities = (
             recommendations_services.get_topic_similarities_as_csv()
         )
@@ -1544,6 +1727,14 @@ class DataExtractionQueryHandler(
 
     @acl_decorators.can_access_admin_page
     def get(self) -> None:
+        """Retrieves a specified number of submitted answers for a particular
+        state within an exploration.
+
+        Raises:
+            InvalidInputException. Entity not found.
+            InvalidInputException. Exploration does not have such state.
+            Exception. No state answer exists.
+        """
         assert self.normalized_request is not None
         exp_id = self.normalized_request['exp_id']
         exp_version = self.normalized_request['exp_version']
@@ -1593,6 +1784,12 @@ class SendDummyMailToAdminHandler(
 
     @acl_decorators.can_access_admin_page
     def post(self) -> None:
+        """Sends a dummy email to the admin if the application is
+        configured to send emails.
+
+        Raises:
+            InvalidInputException. This app cannot send emails.
+        """
         username = self.username
         assert username is not None
         if feconf.CAN_SEND_EMAILS:
@@ -1640,6 +1837,15 @@ class UpdateUsernameHandler(
 
     @acl_decorators.can_access_admin_page
     def put(self) -> None:
+        """Updates the username for a user.
+
+        Raises:
+            InvalidInputException. Invalid username.
+            InvalidInputException. The user does not have a profile picture
+                with png extension.
+            InvalidInputException. The user does not have a profile picture
+                with webp extension.
+        """
         assert self.user_id is not None
         assert self.normalized_payload is not None
         old_username = self.normalized_payload['old_username']
@@ -1701,6 +1907,7 @@ class NumberOfDeletionRequestsHandler(
 
     @acl_decorators.can_access_admin_page
     def get(self) -> None:
+        """Retrieves the number of pending deletion requests for models."""
         self.render_json({
             'number_of_pending_deletion_models': (
                 wipeout_service.get_number_of_pending_deletion_requests())
@@ -1736,6 +1943,9 @@ class VerifyUserModelsDeletedHandler(
 
     @acl_decorators.can_access_admin_page
     def get(self) -> None:
+        """Checks if a user with a specific user_id has been deleted and
+        if there are related models or not.
+        """
         assert self.normalized_request is not None
         user_id = self.normalized_request['user_id']
 
@@ -1778,6 +1988,13 @@ class DeleteUserHandler(
 
     @acl_decorators.can_delete_any_user
     def delete(self) -> None:
+        """Initiates the pre-deletion process for a user.
+
+        Raises:
+            InvalidInputException. The username doesn't belong to any user.
+            InvalidInputException. The user ID retrieved from the username
+                and the user ID provided by admin differ.
+        """
         assert self.normalized_request is not None
         user_id = self.normalized_request['user_id']
         username = self.normalized_request['username']
@@ -1842,6 +2059,15 @@ class UpdateBlogPostHandler(
 
     @acl_decorators.can_access_admin_page
     def put(self) -> None:
+        """Updates the author and published date of a blog post.
+
+        Raises:
+            InvalidInputException. Invalid username.
+            InvalidInputException. User does not have enough rights to be
+                blog post author.
+            PageNotFoundException. The blog post with the given id or url
+                doesn't exist.
+        """
         assert self.normalized_payload is not None
         blog_post_id = self.normalized_payload['blog_post_id']
         author_username = self.normalized_payload['author_username']
@@ -1866,4 +2092,90 @@ class UpdateBlogPostHandler(
 
         blog_services.update_blog_models_author_and_published_on_date(
             blog_post_id, author_id, published_on)
+        self.render_json({})
+
+
+class TranslationCoordinatorRoleHandlerNormalizedPayloadDict(TypedDict):
+    """Dict representation of TranslationCoordinatorRoleHandler's
+    normalized_payload dictionary.
+    """
+
+    username: str
+    action: str
+    language_id: str
+
+
+class TranslationCoordinatorRoleHandler(
+    base.BaseHandler[
+        TranslationCoordinatorRoleHandlerNormalizedPayloadDict, Dict[str, str]
+    ]
+):
+    """Handler to assign or deassigning coordinator to a language."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'PUT': {
+            'username': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            },
+            'action': {
+                'schema': {
+                    'type': 'basestring',
+                    'choices': ['assign', 'deassign']
+                }
+            },
+            'language_id': {
+                'schema': {
+                    'type': 'basestring',
+                    'choices': supported_languages
+                }
+            }
+        }
+    }
+
+    @acl_decorators.can_access_admin_page
+    def put(self) -> None:
+        """Adds or removes the translation-coordinator role for a user in the
+        context of a specific language.
+
+        Raises:
+            InvalidInputException. User with given username does not exist.
+        """
+        assert self.normalized_payload is not None
+        username = self.normalized_payload['username']
+        action = self.normalized_payload['action']
+        language_id = self.normalized_payload['language_id']
+
+        user_settings = user_services.get_user_settings_from_username(username)
+
+        if user_settings is None:
+            raise self.InvalidInputException(
+                'User with given username does not exist.')
+
+        user_id = user_settings.user_id
+        if action == 'assign':
+            if not feconf.ROLE_ID_TRANSLATION_COORDINATOR in (
+                user_settings.roles):
+                user_services.add_user_role(
+                    user_id, feconf.ROLE_ID_TRANSLATION_COORDINATOR)
+
+            language_coordinator = user_services.get_user_actions_info(user_id)
+
+            user_services.assign_coordinator(
+                user_services.get_system_user(),
+                language_coordinator, language_id)
+        else:
+            # The handler schema defines the possible values of 'action'.
+            # If 'action' has a value other than those defined in the schema,
+            # a Bad Request error will be thrown. Hence, 'action' must be
+            # 'deassign' if this branch is executed.
+            assert action == 'deassign'
+            language_coordinator = user_services.get_user_actions_info(user_id)
+            user_services.deassign_coordinator(
+                user_services.get_system_user(),
+                language_coordinator, language_id)
+
         self.render_json({})

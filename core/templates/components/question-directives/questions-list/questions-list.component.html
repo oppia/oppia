@@ -45,8 +45,8 @@
                            [question]="question"
                            [userCanEditQuestion]="canEditQuestion">
     </oppia-question-editor>
-    <div class="alert alert-danger" *ngIf="question.getStateData().interaction.id && question.getValidationErrorMessage()">
-      {{question.getValidationErrorMessage()}}
+    <div class="alert alert-danger" *ngIf="question.getStateData().interaction.id && questionValidationService.getValidationErrorMessage(question)">
+      {{questionValidationService.getValidationErrorMessage(question)}}
     </div>
   </div>
   <mat-card class="question-data-container" *ngIf="!editorIsOpen">
@@ -297,6 +297,9 @@
   }
   .btn-success[disabled] {
     background-color: #008098;
+  }
+  .btn-success {
+    color: #000;
   }
   .save-question-button-container {
     border-top: 1px solid #000;

@@ -36,8 +36,6 @@ from core.controllers import payload_validator
 from core.domain import auth_domain
 from core.domain import auth_services
 from core.domain import classifier_domain
-from core.domain import config_domain
-from core.domain import config_services
 from core.domain import user_services
 
 from typing import (
@@ -53,10 +51,6 @@ _NormalizedRequestDictType = TypeVar('_NormalizedRequestDictType')
 _NormalizedPayloadDictType = TypeVar('_NormalizedPayloadDictType')
 
 ONE_DAY_AGO_IN_SECS: Final = -24 * 60 * 60
-DEFAULT_CSRF_SECRET: Final = 'oppia csrf secret'
-CSRF_SECRET: Final = config_domain.ConfigProperty(
-    'oppia_csrf_secret', {'type': 'unicode'},
-    'Text used to encrypt CSRF tokens.', DEFAULT_CSRF_SECRET)
 
 # NOTE: These handlers manage user sessions and serve auth pages. Thus, we
 # should never reject or replace them when running in maintenance mode;
@@ -889,31 +883,22 @@ class CsrfTokenManager:
     _USER_ID_DEFAULT: Final = 'non_logged_in_user'
 
     @classmethod
-    def init_csrf_secret(cls) -> None:
-        """Verify that non-default CSRF secret exists; creates one if not."""
-
-        # Any non-default value is fine.
-        if CSRF_SECRET.value and CSRF_SECRET.value != DEFAULT_CSRF_SECRET:
-            return
-
-        # Initialize to random value.
-        config_services.set_property(
-            feconf.SYSTEM_COMMITTER_ID, CSRF_SECRET.name,
-            base64.urlsafe_b64encode(os.urandom(20)))
-
-    @classmethod
-    def _create_token(cls, user_id: Optional[str], issued_on: float) -> str:
+    def _create_token(
+            cls, user_id: Optional[str], issued_on: float,
+            nonce: Optional[str] = None) -> str:
         """Creates a new CSRF token.
 
         Args:
             user_id: str|None. The user_id for which the token is generated.
             issued_on: float. The timestamp at which the token was issued.
+            nonce: str|None. A token that is never reused to prevent reply
+                attacks. This argument should only be provided when validating a
+                received CSRF token, in which case the nonce in the received
+                token should be provided here.
 
         Returns:
             str. The generated CSRF token.
         """
-        cls.init_csrf_secret()
-
         # The token has 4 parts: hash of the actor user id, hash of the page
         # name, hash of the time issued and plain text of the time issued.
 
@@ -923,19 +908,31 @@ class CsrfTokenManager:
         # Round time to seconds.
         issued_on_str = str(int(issued_on))
 
+        # Generate a nonce (number used once) to ensure that even two
+        # consecutive calls to the same endpoint in the same second generate
+        # different tokens. Note that this nonce is just for anti-collision
+        # purposes, so it's okay that the nonce is stored in the CSRF token and
+        # therefore can be controlled by an attacker. See OWASP guidance here:
+        # https://cheatsheetseries.owasp.org/cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.html#signed-double-submit-cookie.
+        if nonce is None:
+            nonce = base64.urlsafe_b64encode(os.urandom(20)).decode('utf-8')
+
         digester = hmac.new(
-            key=CSRF_SECRET.value.encode('utf-8'),
-            digestmod='md5'
+            key=auth_services.get_csrf_secret_value().encode('utf-8'),
+            digestmod='sha256'
         )
         digester.update(user_id.encode('utf-8'))
         digester.update(b':')
         digester.update(issued_on_str.encode('utf-8'))
+        digester.update(b':')
+        digester.update(nonce.encode('utf-8'))
 
         digest = digester.digest()
         # The b64encode returns bytes, so we first need to decode the returned
         # bytes to string.
-        token = '%s/%s' % (
-            issued_on_str, base64.urlsafe_b64encode(digest).decode('utf-8'))
+        token = '%s/%s/%s' % (
+            issued_on_str, nonce,
+            base64.urlsafe_b64encode(digest).decode('utf-8'))
 
         return token
 
@@ -973,7 +970,7 @@ class CsrfTokenManager:
         """
         try:
             parts = token.split('/')
-            if len(parts) != 2:
+            if len(parts) != 3:
                 return False
 
             issued_on = int(parts[0])
@@ -981,8 +978,12 @@ class CsrfTokenManager:
             if age > cls._CSRF_TOKEN_AGE_SECS:
                 return False
 
-            authentic_token = cls._create_token(user_id, issued_on)
-            if authentic_token == token:
+            nonce = parts[1]
+
+            authentic_token = cls._create_token(user_id, issued_on, nonce)
+            if hmac.compare_digest(
+                authentic_token.encode('utf-8'), token.encode('utf-8')
+            ):
                 return True
 
             return False

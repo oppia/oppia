@@ -35,7 +35,7 @@ import { AlertsService } from 'services/alerts.service';
 import { MailingListBackendApiService } from 'domain/mailing-list/mailing-list-backend-api.service';
 import { ThanksForDonatingModalComponent } from './thanks-for-donating-modal.component';
 import { ThanksForSubscribingModalComponent } from './thanks-for-subscribing-modal.component';
-
+import { InsertScriptService, KNOWN_SCRIPTS } from 'services/insert-script.service';
 @Component({
   selector: 'donate-page',
   templateUrl: './donate-page.component.html',
@@ -59,10 +59,12 @@ export class DonatePageComponent implements OnInit, OnDestroy {
     private translateService: TranslateService,
     private alertsService: AlertsService,
     private mailingListBackendApiService: MailingListBackendApiService,
-    private ngbModal: NgbModal
+    private ngbModal: NgbModal,
+    private insertScriptService: InsertScriptService,
   ) {}
 
   ngOnInit(): void {
+    this.insertScriptService.loadScript(KNOWN_SCRIPTS.DONORBOX);
     this.windowIsNarrow = this.windowDimensionService.isWindowNarrow();
     this.donateImgUrl = this.getStaticImageUrl('/general/opp_donate_text.svg');
     this.directiveSubscriptions.add(
@@ -70,11 +72,12 @@ export class DonatePageComponent implements OnInit, OnDestroy {
         this.setPageTitle();
       })
     );
-    this.showThanksForDonatingModal();
-  }
 
-  showThanksForDonatingModal(): void {
-    if (this.windowRef.nativeWindow.location.hash === '#thank-you') {
+    const searchParams = new URLSearchParams(
+      this.windowRef.nativeWindow.location.search);
+    const params = Object.fromEntries(searchParams.entries());
+    if (params.hasOwnProperty('thanks')) {
+      // Show the "thanks for donating" modal.
       this.ngbModal.open(
         ThanksForDonatingModalComponent,
         {

@@ -36,10 +36,8 @@ from core.platform import models  # pylint: disable=invalid-import-from # isort:
 MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import config_models
-    from mypy_imports import suggestion_models
 
-(config_models, suggestion_models,) = models.Registry.import_models(
-    [models.Names.CONFIG, models.Names.SUGGESTION])
+(config_models,) = models.Registry.import_models([models.Names.CONFIG])
 
 AllowedDefaultValueTypes = Union[
     str,
@@ -150,10 +148,6 @@ BOOL_SCHEMA = {
     'type': schema_utils.SCHEMA_TYPE_BOOL
 }
 
-UNICODE_SCHEMA = {
-    'type': schema_utils.SCHEMA_TYPE_UNICODE
-}
-
 FLOAT_SCHEMA = {
     'type': schema_utils.SCHEMA_TYPE_FLOAT
 }
@@ -203,36 +197,62 @@ class ConfigProperty:
     - admin_ids.
     - admin_usernames.
     - allow_yaml_file_upload.
+    - always_ask_learners_for_answer_details.
     - banned_usernames.
     - banner_alt_text.
     - before_end_body_tag_hook.
     - before_end_head_tag_hook.
+    - batch_index_for_mailchimp
     - carousel_slides_config.
+    - checkpoints_feature_is_enabled.
     - classroom_page_is_accessible.
+    - classroom_promos_are_enabled.
     - collection_editor_whitelist.
     - contact_email_address.
     - contribute_gallery_page_announcement.
+    - contributor_dashboard_is_enabled.
+    - contributor_dashboard_reviewer_emails_is_enabled.
     - default_twitter_share_message_editor.
     - disabled_explorations.
     - editor_page_announcement.
     - editor_prerequisites_agreement.
+    - email_footer.
+    - email_sender_name.
     - embedded_google_group_url.
+    - enable_admin_notifications_for_reviewer_shortage.
     - featured_translation_languages.
     - full_site_url.
+    - high_bounce_rate_task_minimum_exploration_starts.
+    - high_bounce_rate_task_state_bounce_rate_creation_threshold.
+    - high_bounce_rate_task_state_bounce_rate_obsoletion_threshold.
+    - is_improvements_tab_enabled.
+    - learner_groups_are_enabled.
     - list_of_default_tags_for_blog_post.
+    - max_number_of_explorations_in_math_svgs_batch.
+    - max_number_of_suggestions_per_reviewer.
+    - max_number_of_svgs_in_math_svgs_batch.
+    - max_number_of_tags_assigned_to_blog_post.
     - moderator_ids.
     - moderator_request_forum_url.
     - moderator_usernames.
+    - notify_admins_suggestions_waiting_too_long_is_enabled.
+    - promo_bar_enabled.
+    - promo_bar_message.
     - publicize_exploration_email_html_body.
+    - record_playthrough_probability.
     - sharing_options.
     - sharing_options_twitter_text.
+    - show_translation_size.
     - sidebar_menu_additional_links.
+    - signup_email_body_content.
+    - signup_email_subject_content.
     - site_forum_url.
     - social_media_buttons.
     - splash_page_exploration_id.
     - splash_page_exploration_version.
     - splash_page_youtube_video_id.
     - ssl_challenge_responses.
+    - unpublish_exploration_email_html_body.
     - vmid_shared_secret_key_mapping.
     - whitelisted_email_senders.
     - whitelisted_exploration_ids_for_playthroughs.
@@ -446,13 +466,6 @@ class Registry:
         return list(cls._config_registry)
 
 
-PROMO_BAR_ENABLED = ConfigProperty(
-    'promo_bar_enabled', BOOL_SCHEMA,
-    'Whether the promo bar should be enabled for all users', False)
-PROMO_BAR_MESSAGE = ConfigProperty(
-    'promo_bar_message', UNICODE_SCHEMA,
-    'The message to show to all users if the promo bar is enabled', '')
-
 # Add classroom name to SEARCH_DROPDOWN_CLASSROOMS in constants.ts file
 # to add that classroom to learner group syllabus filter whenever a new
 # classroom is added.
@@ -466,112 +479,3 @@ CLASSROOM_PAGES_DATA = ConfigProperty(
         'topic_list_intro': ''
     }]
 )
-
-RECORD_PLAYTHROUGH_PROBABILITY = ConfigProperty(
-    'record_playthrough_probability', FLOAT_SCHEMA,
-    'The probability of recording playthroughs', 0.2)
-
-IS_IMPROVEMENTS_TAB_ENABLED = ConfigProperty(
-    'is_improvements_tab_enabled', BOOL_SCHEMA,
-    'Exposes the Improvements Tab for creators in the exploration editor.',
-    False)
-
-ALWAYS_ASK_LEARNERS_FOR_ANSWER_DETAILS = ConfigProperty(
-    'always_ask_learners_for_answer_details', BOOL_SCHEMA,
-    'Always ask learners for answer details. For testing -- do not use',
-    False)
-
-# TODO(#15682): Implement user checkpoints feature flag using feature-gating
-# service.
-CHECKPOINTS_FEATURE_IS_ENABLED = ConfigProperty(
-    'checkpoints_feature_is_enabled', BOOL_SCHEMA,
-    'Enable checkpoints feature.', False)
-
-CLASSROOM_PROMOS_ARE_ENABLED = ConfigProperty(
-    'classroom_promos_are_enabled', BOOL_SCHEMA,
-    'Show classroom promos.', False)
-
-LEARNER_GROUPS_ARE_ENABLED = ConfigProperty(
-    'learner_groups_are_enabled', BOOL_SCHEMA,
-    'Enable learner groups feature', False)
-
-BATCH_INDEX_FOR_MAILCHIMP = ConfigProperty(
-    'batch_index_for_mailchimp', INT_SCHEMA,
-    'Index of batch to populate mailchimp database.', 0)
-
-HIGH_BOUNCE_RATE_TASK_STATE_BOUNCE_RATE_CREATION_THRESHOLD = ConfigProperty(
-    'high_bounce_rate_task_state_bounce_rate_creation_threshold',
-    FLOAT_SCHEMA,
-    'The bounce-rate a state must exceed to create a new improvements task.',
-    0.20)
-
-HIGH_BOUNCE_RATE_TASK_STATE_BOUNCE_RATE_OBSOLETION_THRESHOLD = ConfigProperty(
-    'high_bounce_rate_task_state_bounce_rate_obsoletion_threshold',
-    FLOAT_SCHEMA,
-    'The bounce-rate a state must fall under to discard its improvement task.',
-    0.20)
-
-HIGH_BOUNCE_RATE_TASK_MINIMUM_EXPLORATION_STARTS = ConfigProperty(
-    'high_bounce_rate_task_minimum_exploration_starts',
-    INT_SCHEMA,
-    'The minimum number of times an exploration is started before it can '
-    'generate high bounce-rate improvements tasks.',
-    100)
-
-MAX_NUMBER_OF_SVGS_IN_MATH_SVGS_BATCH = ConfigProperty(
-    'max_number_of_svgs_in_math_svgs_batch',
-    INT_SCHEMA,
-    'The maximum number of Math SVGs that can be send in a batch of math rich '
-    'text svgs.',
-    25)
-
-MAX_NUMBER_OF_EXPLORATIONS_IN_MATH_SVGS_BATCH = ConfigProperty(
-    'max_number_of_explorations_in_math_svgs_batch',
-    INT_SCHEMA,
-    'The maximum number of explorations that can be send in a batch of math '
-    'rich text svgs.',
-    2)
-
-MAX_NUMBER_OF_TAGS_ASSIGNED_TO_BLOG_POST = ConfigProperty(
-    'max_number_of_tags_assigned_to_blog_post',
-    POSITIVE_INT_SCHEMA,
-    'The maximum number of tags that can be selected to categorize the blog'
-    ' post',
-    10
-)
-
-CONTRIBUTOR_DASHBOARD_IS_ENABLED = ConfigProperty(
-    'contributor_dashboard_is_enabled', BOOL_SCHEMA,
-    'Enable contributor dashboard page. The default value is true.', True)
-
-CONTRIBUTOR_DASHBOARD_REVIEWER_EMAILS_IS_ENABLED = ConfigProperty(
-    'contributor_dashboard_reviewer_emails_is_enabled', BOOL_SCHEMA,
-    (
-        'Enable sending Contributor Dashboard reviewers email notifications '
-        'about suggestions that need review. The default value is false.'
-    ), False)
-
-ENABLE_ADMIN_NOTIFICATIONS_FOR_SUGGESTIONS_NEEDING_REVIEW = ConfigProperty(
-    'notify_admins_suggestions_waiting_too_long_is_enabled', BOOL_SCHEMA,
-    (
-        'Enable sending admins email notifications if there are Contributor '
-        'Dashboard suggestions that have been waiting for a review for more '
-        'than %s days. The default value is false.' % (
-            suggestion_models.SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS)
-    ), False)
-
-ENABLE_ADMIN_NOTIFICATIONS_FOR_REVIEWER_SHORTAGE = ConfigProperty(
-    'enable_admin_notifications_for_reviewer_shortage', BOOL_SCHEMA,
-    (
-        'Enable sending admins email notifications if Contributor Dashboard '
-        'reviewers are needed in specific suggestion types. The default value '
-        'is false.'
-    ), False)
-
-MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER = ConfigProperty(
-    'max_number_of_suggestions_per_reviewer',
-    INT_SCHEMA,
-    'The maximum number of Contributor Dashboard suggestions per reviewer. If '
-    'the number of suggestions per reviewer surpasses this maximum, for any '
-    'given suggestion type on the dashboard, the admins are notified by email.',
-    5)

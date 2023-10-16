@@ -5,6 +5,7 @@
         "core.controllers.base_test",
         "core.controllers.collection_editor_test",
         "core.controllers.editor_test",
+        "core.controllers.firebase_test",
         "core.controllers.learner_playlist_test",
         "core.controllers.review_tests_test",
         "core.controllers.resources_test",
@@ -121,6 +122,8 @@
         "core.storage.config.gae_models_test",
         "core.platform.app_identity.gae_app_identity_services_test",
         "core.storage.topic.gae_models_test",
+        "core.storage.blog_statistics.gae_models_test",
+        "core.domain.blog_statistics_domain_test",
         "scripts.release_scripts.cut_release_or_hotfix_branch_test",
         "scripts.linters.css_linter_test",
         "extensions.actions.ExplorationStart.ExplorationStart_test",
@@ -188,7 +191,8 @@
         "core.handler_schema_constants_test",
         "core.domain.classroom_domain_test",
         "core.domain.takeout_domain_test",
-        "core.jobs.batch_jobs.question_migration_jobs_test"
+        "core.jobs.batch_jobs.question_migration_jobs_test",
+        "core.jobs.batch_jobs.subtopic_migration_jobs_test"
     ],
     "4": [
         "core.storage.learner_group.gae_models_test",
@@ -258,7 +262,6 @@
         "core.jobs.batch_jobs.math_interactions_audit_jobs_test",
         "core.jobs.batch_jobs.opportunity_management_jobs_test",
         "core.jobs.batch_jobs.collection_info_jobs_test",
-        "core.jobs.batch_jobs.mailchimp_population_jobs_test",
         "core.domain.image_validation_services_test",
         "core.storage.beam_job.gae_models_test",
         "scripts.linters.js_ts_linter_test",
@@ -283,6 +286,7 @@
         "core.domain.translation_services_test",
         "core.storage.recommendations.gae_models_test",
         "scripts.linters.other_files_linter_test",
+        "scripts.install_dependencies_json_packages_test",
         "scripts.install_third_party_test",
         "scripts.check_frontend_test_coverage_test",
         "core.platform.models_test",
@@ -301,9 +305,11 @@
         "scripts.docstrings_checker_test",
         "extensions.domain_test",
         "core.controllers.learner_dashboard_test",
+        "core.controllers.feedback_updates_test",
         "core.platform.storage.cloud_storage_emulator_test",
         "core.platform.storage.dev_mode_storage_services_test",
-        "core.platform.storage.cloud_storage_services_test"
+        "core.platform.storage.cloud_storage_services_test",
+        "core.domain.contribution_stats_services_test"
     ],
     "5": [
         "core.controllers.classifier_test",
@@ -383,6 +389,8 @@
         "core.jobs.io.job_io_test",
         "core.jobs.batch_jobs.remove_profile_picture_data_url_field_jobs_test",
         "core.jobs.io.gcs_io_test",
-        "core.domain.android_services_test"
+        "core.domain.android_services_test",
+        "core.jobs.batch_jobs.contributor_admin_stats_jobs_test",
+        "core.jobs.batch_jobs.story_node_jobs_test"
     ]
 }

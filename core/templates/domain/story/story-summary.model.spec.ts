@@ -34,7 +34,12 @@ describe('Story summary model', () => {
       outline: 'Outline',
       exploration_id: null,
       outline_is_finalized: false,
-      thumbnail_bg_color: '#a33f40'
+      thumbnail_bg_color: '#a33f40',
+      status: 'Published',
+      planned_publication_date_msecs: 100,
+      last_modified_msecs: 100,
+      first_publication_date_msecs: 200,
+      unpublishing_reason: null
     };
 
     const sampleStorySummaryBackendDict = {
@@ -50,7 +55,13 @@ describe('Story summary model', () => {
       all_node_dicts: [nodeDict],
       topic_name: 'Topic one',
       topic_url_fragment: 'topic-one',
-      classroom_url_fragment: 'math'
+      classroom_url_fragment: 'math',
+      published_chapters_count: 2,
+      total_chapters_count: 5,
+      upcoming_chapters_count: 1,
+      upcoming_chapters_expected_days: [3],
+      overdue_chapters_count: 1,
+      visited_chapter_titles: ['Chapter 2']
     };
     _sampleStorySummary = StorySummary.createFromBackendDict(
       sampleStorySummaryBackendDict
@@ -81,12 +92,24 @@ describe('Story summary model', () => {
         outline: 'Outline',
         exploration_id: null,
         outline_is_finalized: false,
-        thumbnail_bg_color: '#a33f40'
+        thumbnail_bg_color: '#a33f40',
+        status: 'Published',
+        planned_publication_date_msecs: 100,
+        last_modified_msecs: 100,
+        first_publication_date_msecs: 200,
+        unpublishing_reason: null
       })
     ]);
     expect(_sampleStorySummary.getCompletedNodeTitles()).toEqual(['Chapter 1']);
     expect(_sampleStorySummary.getTopicName()).toEqual('Topic one');
     expect(_sampleStorySummary.getTopicUrlFragment()).toEqual('topic-one');
     expect(_sampleStorySummary.getClassroomUrlFragment()).toEqual('math');
+    expect(_sampleStorySummary.getPublishedChaptersCount()).toEqual(2);
+    expect(_sampleStorySummary.getTotalChaptersCount()).toEqual(5);
+    expect(_sampleStorySummary.getUpcomingChaptersCount()).toEqual(1);
+    expect(_sampleStorySummary.getUpcomingChaptersExpectedDays()).toEqual([3]);
+    expect(_sampleStorySummary.getOverdueChaptersCount()).toEqual(1);
+    expect(_sampleStorySummary.getVisitedChapterTitles()).toEqual(
+      ['Chapter 2']);
   });
 });

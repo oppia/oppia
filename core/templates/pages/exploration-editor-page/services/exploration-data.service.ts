@@ -149,7 +149,6 @@ export class ExplorationDataService {
           .fetchApplyDraftExplorationAsync(
             this.explorationId).then((response) => {
             this.loggerService.info('Retrieved exploration data.');
-            this.loggerService.info(JSON.stringify(response));
             this.draftChangeListId = response.draft_change_list_id;
             this.data = response;
             const draft = this.localStorageService.getExplorationDraft(
@@ -185,8 +184,6 @@ export class ExplorationDataService {
     return this.readOnlyExplorationBackendApiService.loadLatestExplorationAsync(
       this.explorationId).then(response => {
       this.loggerService.info('Retrieved saved exploration data.');
-      this.loggerService.info(JSON.stringify(response));
-
       return response.exploration;
     });
   }

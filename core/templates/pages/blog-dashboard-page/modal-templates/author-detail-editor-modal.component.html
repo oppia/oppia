@@ -7,6 +7,7 @@
   <h4 class="my-auto col-2 px-0 ml-4">{{ 'I18N_BLOG_DASHBOARD_AUTHOR_NAME_HEADING' | translate }} :</h4>
   <input class="col-8 form-control required general-text-format oppia-autofocus blog-author-editor e2e-test-blog-author-name-field col"
          [(ngModel)]="authorName"
+         minlength="MIN_AUTHOR_NAME_LENGTH"
          maxlength="MAX_AUTHOR_NAME_LENGTH"
          aria-label="Author Name of the user">
 </span>
@@ -19,8 +20,8 @@
               [(ngModel)]="authorBio"
               [attr.value]="authorBio"
               rows="5"
-              [maxlength]="250"
-              [minlength]="5"
+              maxlength="MAX_CHARS_IN_AUTHOR_BIO"
+              minlength="MIN_CHARS_IN_AUTHOR_BIO"
               placeholder="{{ 'I18N_BLOG_DASHBOARD_AUTHOR_BIO_EXPLAIN_TEXT' | translate }}">
     </textarea>
   </span>
@@ -60,5 +61,6 @@
 
   .oppia-bio-border {
     border-color: #ced4da;
+    outline: none;
   }
 </style>

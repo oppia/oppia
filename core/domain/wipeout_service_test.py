@@ -4086,6 +4086,70 @@ class WipeoutServiceDeleteSuggestionModelsTests(test_utils.GenericTestBase):
             last_contribution_date=(
                 datetime.date.fromtimestamp(1616173837))
         ).put()
+        suggestion_models.TranslationSubmitterTotalContributionStatsModel(
+            id=self.TRANSLATION_STATS_1_ID,
+            language_code='cs',
+            contributor_id=self.user_1_id,
+            topic_ids_with_translation_submissions=['topic1', 'topic2'],
+            recent_review_outcomes=['accepted', 'rejected'],
+            recent_performance=1,
+            overall_accuracy=1.0,
+            submitted_translations_count=1,
+            submitted_translation_word_count=1,
+            accepted_translations_count=1,
+            accepted_translations_without_reviewer_edits_count=2,
+            accepted_translation_word_count=3,
+            rejected_translations_count=4,
+            rejected_translation_word_count=6,
+            first_contribution_date=(
+                datetime.date.fromtimestamp(1616173837)),
+            last_contribution_date=(
+                datetime.date.fromtimestamp(1616173837))
+        ).put()
+        suggestion_models.TranslationReviewerTotalContributionStatsModel(
+            id=self.TRANSLATION_STATS_1_ID,
+            language_code='cs',
+            contributor_id=self.user_1_id,
+            topic_ids_with_translation_reviews=['topic1', 'topic2'],
+            reviewed_translations_count=1,
+            accepted_translations_count=1,
+            accepted_translations_with_reviewer_edits_count=2,
+            accepted_translation_word_count=3,
+            rejected_translations_count=2,
+            first_contribution_date=(
+                datetime.date.fromtimestamp(1616173837)),
+            last_contribution_date=(
+                datetime.date.fromtimestamp(1616173837))
+        ).put()
+        suggestion_models.QuestionSubmitterTotalContributionStatsModel(
+            id=self.QUESTION_STATS_1_ID,
+            contributor_id=self.user_1_id,
+            topic_ids_with_question_submissions=['topic1', 'topic2'],
+            recent_review_outcomes=['accepted', 'rejected'],
+            recent_performance=1,
+            overall_accuracy=1.0,
+            submitted_questions_count=1,
+            accepted_questions_count=1,
+            accepted_questions_without_reviewer_edits_count=2,
+            rejected_questions_count=1,
+            first_contribution_date=(
+                datetime.date.fromtimestamp(1616173837)),
+            last_contribution_date=(
+                datetime.date.fromtimestamp(1616173837))
+        ).put()
+        suggestion_models.QuestionReviewerTotalContributionStatsModel(
+            id=self.QUESTION_STATS_1_ID,
+            contributor_id=self.user_1_id,
+            topic_ids_with_question_reviews=['topic1', 'topic2'],
+            reviewed_questions_count=1,
+            accepted_questions_count=1,
+            accepted_questions_with_reviewer_edits_count=1,
+            rejected_questions_count=1,
+            first_contribution_date=(
+                datetime.date.fromtimestamp(1616173837)),
+            last_contribution_date=(
+                datetime.date.fromtimestamp(1616173837))
+        ).put()
         wipeout_service.pre_delete_user(self.user_1_id)
         self.process_and_flush_pending_tasks()
 
@@ -4120,6 +4184,78 @@ class WipeoutServiceDeleteSuggestionModelsTests(test_utils.GenericTestBase):
         self.assertIsNone(
             suggestion_models.QuestionReviewStatsModel.get_by_id(
                 self.QUESTION_STATS_1_ID))
+
+    def test_translation_submitter_total_contribution_stats_are_deleted(
+            self) -> None:
+        wipeout_service.delete_user(
+            wipeout_service.get_pending_deletion_request(self.user_1_id))
+
+        self.assertIsNone(
+            suggestion_models.TranslationSubmitterTotalContributionStatsModel
+            .get_by_id(
+                self.TRANSLATION_STATS_1_ID))
+
+    def test_translation_reviewer_total_contribution_stats_are_deleted(
+            self) -> None:
+        wipeout_service.delete_user(
+            wipeout_service.get_pending_deletion_request(self.user_1_id))
+
+        self.assertIsNone(
+            suggestion_models.TranslationReviewerTotalContributionStatsModel
+            .get_by_id(
+                self.TRANSLATION_STATS_1_ID))
+
+    def test_question_submitter_total_contribution_stats_are_deleted(
+            self) -> None:
+        wipeout_service.delete_user(
+            wipeout_service.get_pending_deletion_request(self.user_1_id))
+
+        self.assertIsNone(
+            suggestion_models.QuestionSubmitterTotalContributionStatsModel
+            .get_by_id(
+                self.QUESTION_STATS_1_ID))
+
+
+class WipeoutServiceDeletePinnedOpportunitiesModelsTest(
+    test_utils.GenericTestBase
+):
+    """Provides testing of the deletion part of wipeout service."""
+
+    USER_1_EMAIL: Final = 'some@example.com'
+    TOPIC_ID: Final = 'topic_1'
+    OPPORTUNITY_ID: Final = 'opportunity_1'
+    LANGUAGE_CODE: Final = 'en'
+    USER_1_USERNAME: Final = 'user1'
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.signup(self.USER_1_EMAIL, self.USER_1_USERNAME)
+        self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)
+        user_models.PinnedOpportunityModel.create(
+            user_id=self.user_1_id,
+            topic_id=self.TOPIC_ID,
+            opportunity_id=self.OPPORTUNITY_ID,
+            language_code='en'
+        )
+        wipeout_service.pre_delete_user(self.user_1_id)
+        self.process_and_flush_pending_tasks()
+
+    def test_pinned_opportunities_are_deleted(self) -> None:
+        self.assertIsNotNone(
+            user_models.PinnedOpportunityModel.get_model(
+                user_id=self.user_1_id,
+                language_code=self.LANGUAGE_CODE,
+                topic_id=self.TOPIC_ID
+            ))
+        wipeout_service.delete_user(
+            wipeout_service.get_pending_deletion_request(self.user_1_id))
+
+        self.assertIsNone(
+            user_models.PinnedOpportunityModel.get_model(
+                user_id=self.user_1_id,
+                language_code=self.LANGUAGE_CODE,
+                topic_id=self.TOPIC_ID
+            ))
 
 
 class WipeoutServiceVerifyDeleteSuggestionModelsTests(

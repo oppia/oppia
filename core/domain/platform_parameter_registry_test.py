@@ -22,10 +22,13 @@ import enum
 
 from core import feconf
 from core import utils
+from core.constants import constants
 from core.domain import caching_services
 from core.domain import platform_parameter_domain as parameter_domain
 from core.domain import platform_parameter_registry as registry
 from core.tests import test_utils
+
+from typing import List
 
 DataTypes = parameter_domain.DataTypes
 FeatureStages = parameter_domain.FeatureStages
@@ -67,8 +70,8 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
                 {
                     'filters': [
                         {
-                            'type': 'server_mode',
-                            'conditions': [['=', FeatureStages.DEV.value]]
+                            'type': 'platform_type',
+                            'conditions': [['=', 'Backend']]
                         }
                     ],
                     'value_when_matched': '222'
@@ -176,13 +179,14 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
                 parameter_domain.PlatformParameterRule.from_dict({
                     'filters': [
                         {
-                            'type': 'server_mode',
-                            'conditions': [['=', FeatureStages.DEV.value]]
+                            'type': 'platform_type',
+                            'conditions': [['=', 'Backend']]
                         }
                     ],
                     'value_when_matched': 'updated'
                 })
             ],
+            'default'
         )
         parameter_updated = registry.Registry.get_platform_parameter(
             parameter_name)
@@ -204,13 +208,14 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
                 parameter_domain.PlatformParameterRule.from_dict({
                     'filters': [
                         {
-                            'type': 'server_mode',
-                            'conditions': [['=', FeatureStages.DEV.value]]
+                            'type': 'platform_type',
+                            'conditions': [['=', 'Backend']]
                         }
                     ],
                     'value_when_matched': 'updated'
                 })
             ],
+            'default'
         )
         self.assertIsNone(
             registry.Registry.load_platform_parameter_from_memcache(
@@ -233,70 +238,69 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
                     parameter_domain.PlatformParameterRule.from_dict({
                         'filters': [
                             {
-                                'type': 'server_mode',
-                                'conditions': [['=', FeatureStages.DEV.value]]
+                                'type': 'platform_type',
+                                'conditions': [['=', 'Backend']]
                             }
                         ],
                         'value_when_matched': True
                     })
                 ],
+                'default'
             )
 
-    def test_update_dev_feature_with_rule_enabled_for_test_raises_exception(
+    def test_update_dev_feature_in_prod_environment_raises_exception(
         self
     ) -> None:
         parameter_name = 'parameter_a'
         registry.Registry.create_feature_flag(
             ParamNames.PARAMETER_A, 'dev feature', FeatureStages.DEV)
 
-        with self.assertRaisesRegex(
-            utils.ValidationError,
-            'Feature in dev stage cannot be enabled in test or production '
-            'environments.'):
-            registry.Registry.update_platform_parameter(
-                parameter_name,
-                feconf.SYSTEM_COMMITTER_ID,
-                'commit message',
-                [
-                    parameter_domain.PlatformParameterRule.from_dict({
-                        'filters': [
-                            {
-                                'type': 'server_mode',
-                                'conditions': [['=', FeatureStages.TEST.value]]
-                            }
+        with self.swap(constants, 'DEV_MODE', False):
+            with self.swap(feconf, 'ENV_IS_OPPIA_ORG_PRODUCTION_SERVER', True):
+                with self.assertRaisesRegex(
+                    utils.ValidationError,
+                    'Feature in dev stage cannot be updated in prod '
+                    'environment.'
+                ):
+                    registry.Registry.update_platform_parameter(
+                        parameter_name,
+                        feconf.SYSTEM_COMMITTER_ID,
+                        'commit message',
+                        [
+                            parameter_domain.PlatformParameterRule.from_dict({
+                                'filters': [],
+                                'value_when_matched': True
+                            })
                         ],
-                        'value_when_matched': True
-                    })
-                ],
-            )
+                        False
+                    )
 
-    def test_update_dev_feature_with_rule_enabled_for_prod_raises_exception(
+    def test_update_dev_feature_in_test_environment_raises_exception(
         self
     ) -> None:
         parameter_name = 'parameter_a'
         registry.Registry.create_feature_flag(
             ParamNames.PARAMETER_A, 'dev feature', FeatureStages.DEV)
 
-        with self.assertRaisesRegex(
-            utils.ValidationError,
-            'Feature in dev stage cannot be enabled in test or production '
-            'environments.'):
-            registry.Registry.update_platform_parameter(
-                parameter_name,
-                feconf.SYSTEM_COMMITTER_ID,
-                'commit message',
-                [
-                    parameter_domain.PlatformParameterRule.from_dict({
-                        'filters': [
-                            {
-                                'type': 'server_mode',
-                                'conditions': [['=', FeatureStages.PROD.value]]
-                            }
+        with self.swap(constants, 'DEV_MODE', False):
+            with self.swap(feconf, 'ENV_IS_OPPIA_ORG_PRODUCTION_SERVER', False):
+                with self.assertRaisesRegex(
+                    utils.ValidationError,
+                    'Feature in dev stage cannot be updated in test '
+                    'environment.'
+                ):
+                    registry.Registry.update_platform_parameter(
+                        parameter_name,
+                        feconf.SYSTEM_COMMITTER_ID,
+                        'commit message',
+                        [
+                            parameter_domain.PlatformParameterRule.from_dict({
+                                'filters': [],
+                                'value_when_matched': True
+                            })
                         ],
-                        'value_when_matched': True
-                    })
-                ],
-            )
+                        False
+                    )
 
     def test_update_test_feature_with_rule_enabled_for_prod_raises_exception(
         self
@@ -305,26 +309,25 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
         registry.Registry.create_feature_flag(
             ParamNames.PARAMETER_A, 'dev feature', FeatureStages.TEST)
 
-        with self.assertRaisesRegex(
-            utils.ValidationError,
-            'Feature in test stage cannot be enabled in production '
-            'environment.'):
-            registry.Registry.update_platform_parameter(
-                parameter_name,
-                feconf.SYSTEM_COMMITTER_ID,
-                'commit message',
-                [
-                    parameter_domain.PlatformParameterRule.from_dict({
-                        'filters': [
-                            {
-                                'type': 'server_mode',
-                                'conditions': [['=', FeatureStages.PROD.value]]
-                            }
+        with self.swap(constants, 'DEV_MODE', False):
+            with self.swap(feconf, 'ENV_IS_OPPIA_ORG_PRODUCTION_SERVER', True):
+                with self.assertRaisesRegex(
+                    utils.ValidationError,
+                    'Feature in test stage cannot be updated in prod '
+                    'environment.'
+                ):
+                    registry.Registry.update_platform_parameter(
+                        parameter_name,
+                        feconf.SYSTEM_COMMITTER_ID,
+                        'commit message',
+                        [
+                            parameter_domain.PlatformParameterRule.from_dict({
+                                'filters': [],
+                                'value_when_matched': True
+                            })
                         ],
-                        'value_when_matched': True
-                    })
-                ],
-            )
+                        False
+                    )
 
     def test_updated_parameter_is_saved_in_storage(self) -> None:
         parameter_name = 'parameter_a'
@@ -341,13 +344,14 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
                 parameter_domain.PlatformParameterRule.from_dict({
                     'filters': [
                         {
-                            'type': 'server_mode',
-                            'conditions': [['=', FeatureStages.DEV.value]]
+                            'type': 'platform_type',
+                            'conditions': [['=', 'Backend']]
                         }
                     ],
                     'value_when_matched': 'updated'
                 })
             ],
+            'default'
         )
 
         parameter_updated = (
@@ -356,11 +360,89 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
         )
         self.assertIsNotNone(parameter_updated)
 
+    def test_default_value_return_from_parameter_registry_when_none_in_model(
+        self
+    ) -> None:
+        def _mock_update_platform_parameter(
+            name: str,
+            committer_id: str,
+            commit_message: str,
+            new_rules: List[parameter_domain.PlatformParameterRule],
+            default_value: parameter_domain.PlatformDataTypes
+        ) -> None:
+            param = registry.Registry.get_platform_parameter(name)
+
+            new_rule_dicts = [rules.to_dict() for rules in new_rules]
+            param_dict = param.to_dict()
+            param_dict['rules'] = new_rule_dicts
+            param_dict['default_value'] = default_value
+            updated_param = param.from_dict(param_dict)
+            updated_param.validate()
+
+            model_instance = registry.Registry._to_platform_parameter_model( # pylint: disable=protected-access
+                param)
+            param.set_rules(new_rules)
+            param.set_default_value(default_value)
+            registry.Registry.parameter_registry[param.name] = param
+
+            model_instance.rules = [rule.to_dict() for rule in param.rules]
+            model_instance.default_value = None
+            model_instance.commit(
+                committer_id,
+                commit_message,
+                [{
+                    'cmd': (
+                        parameter_domain
+                        .PlatformParameterChange.CMD_EDIT_RULES),
+                    'new_rules': new_rule_dicts,
+                    'default_value': None
+                }]
+            )
+
+            caching_services.delete_multi(
+                caching_services.CACHE_NAMESPACE_PLATFORM_PARAMETER,
+                None,
+                [name]
+            )
+
+        with self.swap(
+            registry.Registry,
+            'update_platform_parameter',
+            _mock_update_platform_parameter
+        ):
+            parameter_name = 'parameter_b'
+            self._create_example_parameter_with_name(parameter_name)
+            registry.Registry.update_platform_parameter(
+                parameter_name,
+                feconf.SYSTEM_COMMITTER_ID,
+                'commit message',
+                [
+                    parameter_domain.PlatformParameterRule.from_dict({
+                        'filters': [
+                            {
+                                'type': 'platform_type',
+                                'conditions': [['=', 'Backend']]
+                            }
+                        ],
+                        'value_when_matched': 'updated'
+                    })
+                ],
+                'default'
+            )
+
+            parameter_storage = (
+                registry.Registry.load_platform_parameter_from_storage(
+                    parameter_name)
+            )
+
+        self.assertIsNotNone(parameter_storage)
+        assert parameter_storage is not None
+        self.assertEqual(parameter_storage.default_value, 'default')
+
     def test_evaluate_all_parameters(self) -> None:
         context = parameter_domain.EvaluationContext.from_dict(
             {
-                'platform_type': 'Android',
-                'browser_type': None,
+                'platform_type': 'Web',
                 'app_version': '1.2.3',
             },
             {
@@ -375,8 +457,8 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
                 {
                     'filters': [
                         {
-                            'type': 'server_mode',
-                            'conditions': [['=', FeatureStages.DEV.value]]
+                            'type': 'platform_type',
+                            'conditions': [['=', 'Web']]
                         }
                     ],
                     'value_when_matched': '222'

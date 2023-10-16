@@ -20,6 +20,10 @@ import { HttpClientTestingModule, HttpTestingController } from
   '@angular/common/http/testing';
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
+import { PlatformParameterFilterType } from
+  'domain/platform_feature/platform-parameter-filter.model';
+import { PlatformParameter } from
+  'domain/platform_feature/platform-parameter.model';
 import { AdminDataService } from
   'pages/admin-page/services/admin-data.service';
 import { AdminPageData, AdminPageDataBackendDict } from
@@ -53,19 +57,23 @@ describe('Admin Data Service', () => {
         total_published_node_count: 10,
         url_fragment: 'topicurlfrag',
         can_edit_topic: false,
-        is_published: false
+        is_published: false,
+        total_upcoming_chapters_count: 1,
+        total_overdue_chapters_count: 1,
+        total_chapter_counts_for_each_story: [5, 4],
+        published_chapter_counts_for_each_story: [3, 4]
       }
     ],
     updatable_roles: ['TOPIC_MANAGER'],
     human_readable_current_time: 'June 03 15:31:20',
     demo_collections: [],
     config_properties: {
-      oppia_csrf_secret: {
+      record_playthrough_probability: {
         schema: {
-          type: 'unicode'
+          type: 'float'
         },
-        value: '3WHOWnD3sy0r1wukJ2lX4vBS_YA=',
-        description: 'Text used to encrypt CSRF tokens.'
+        value: 0.2,
+        description: 'The record_playthrough_probability.'
       }
     },
     demo_exploration_ids: ['19'],
@@ -79,7 +87,23 @@ describe('Admin Data Service', () => {
     human_readable_roles: {
       FULL_USER: 'full user',
       TOPIC_MANAGER: 'topic manager'
-    }
+    },
+    platform_params_dicts: [{
+      name: 'dummy_parameter',
+      description: 'This is a dummy platform parameter.',
+      data_type: 'string',
+      rules: [{
+        filters: [{
+          type: PlatformParameterFilterType.PlatformType,
+          conditions: [['=', 'Web'] as [string, string]]
+        }],
+        value_when_matched: ''
+      }],
+      rule_schema_version: 1,
+      default_value: '',
+      is_feature: false,
+      feature_stage: null
+    }],
   };
   let adminDataResponse: AdminPageData;
 
@@ -100,7 +124,9 @@ describe('Admin Data Service', () => {
       viewableRoles: sampleAdminData.viewable_roles,
       humanReadableRoles: sampleAdminData.human_readable_roles,
       topicSummaries: sampleAdminData.topic_summaries.map(
-        CreatorTopicSummary.createFromBackendDict)
+        CreatorTopicSummary.createFromBackendDict),
+      platformParameters: sampleAdminData.platform_params_dicts.map(
+        dict => PlatformParameter.createFromBackendDict(dict))
     };
   });
 

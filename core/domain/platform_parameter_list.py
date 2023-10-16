@@ -20,16 +20,11 @@ from __future__ import annotations
 
 import enum
 
-from core.domain import platform_parameter_domain
-from core.domain import platform_parameter_registry as registry
-
-Registry = registry.Registry
-
 
 class ParamNames(enum.Enum):
     """Enum for parameter names."""
 
-    DUMMY_FEATURE = 'dummy_feature'
+    DUMMY_FEATURE_FLAG_FOR_E2E_TESTS = 'dummy_feature_flag_for_e2e_tests'
     DUMMY_PARAMETER = 'dummy_parameter'
 
     END_CHAPTER_CELEBRATION = 'end_chapter_celebration'
@@ -41,67 +36,40 @@ class ParamNames(enum.Enum):
     DIAGNOSTIC_TEST = 'diagnostic_test'
     SERIAL_CHAPTER_LAUNCH_CURRICULUM_ADMIN_VIEW = (
         'serial_chapter_launch_curriculum_admin_view')
+    SERIAL_CHAPTER_LAUNCH_LEARNER_VIEW = (
+        'serial_chapter_launch_learner_view')
+    SHOW_REDESIGNED_LEARNER_DASHBOARD = (
+        'show_redesigned_learner_dashboard')
     SHOW_TRANSLATION_SIZE = 'show_translation_size'
-
-
-# Platform parameters should all be defined below.
-
-Registry.create_feature_flag(
-    ParamNames.DUMMY_FEATURE,
-    'This is a dummy feature flag.',
-    platform_parameter_domain.FeatureStages.DEV,
-)
-
-Registry.create_platform_parameter(
-    ParamNames.DUMMY_PARAMETER,
-    'This is a dummy platform parameter.',
-    platform_parameter_domain.DataTypes.STRING
-)
-
-Registry.create_feature_flag(
-    ParamNames.END_CHAPTER_CELEBRATION,
-    'This flag is for the end chapter celebration feature.',
-    platform_parameter_domain.FeatureStages.PROD,
-)
-
-Registry.create_feature_flag(
-    ParamNames.CHECKPOINT_CELEBRATION,
-    'This flag is for the checkpoint celebration feature.',
-    platform_parameter_domain.FeatureStages.PROD,
-)
-
-Registry.create_feature_flag(
-    ParamNames.CONTRIBUTOR_DASHBOARD_ACCOMPLISHMENTS,
-    'This flag enables showing per-contributor accomplishments on the' +
-    ' contributor dashboard.',
-    platform_parameter_domain.FeatureStages.PROD,
-)
-
-Registry.create_feature_flag(
-    ParamNames.ANDROID_BETA_LANDING_PAGE,
-    'This flag is for Android beta promo landing page.',
-    platform_parameter_domain.FeatureStages.PROD)
-
-Registry.create_feature_flag(
-    ParamNames.BLOG_PAGES,
-    'This flag is for blog home page, blog author profile page and blog post' +
-    ' page.',
-    platform_parameter_domain.FeatureStages.PROD)
-
-
-Registry.create_feature_flag(
-    ParamNames.DIAGNOSTIC_TEST,
-    'This flag is for the diagnostic test functionality.',
-    platform_parameter_domain.FeatureStages.PROD)
-
-Registry.create_feature_flag(
-    ParamNames.SERIAL_CHAPTER_LAUNCH_CURRICULUM_ADMIN_VIEW,
-    'This flag is for serial chapter launch feature and making changes only' +
-    'in the curriculum admin view.',
-    platform_parameter_domain.FeatureStages.DEV)
-
-Registry.create_feature_flag(
-    ParamNames.SHOW_TRANSLATION_SIZE,
-    'This flag is to show translation size on translation cards in' +
-    'contributor dashboard.',
-    platform_parameter_domain.FeatureStages.DEV)
+    SHOW_FEEDBACK_UPDATES_IN_PROFILE_PIC_DROPDOWN = (
+        'show_feedback_updates_in_profile_pic_dropdown')
+    IS_IMPROVEMENTS_TAB_ENABLED = 'is_improvements_tab_enabled'
+    LEARNER_GROUPS_ARE_ENABLED = 'learner_groups_are_enabled'
+    PROMO_BAR_ENABLED = 'promo_bar_enabled'
+    PROMO_BAR_MESSAGE = 'promo_bar_message'
+    MAX_NUMBER_OF_TAGS_ASSIGNED_TO_BLOG_POST = (
+        'max_number_of_tags_assigned_to_blog_post')
+    ALWAYS_ASK_LEARNERS_FOR_ANSWER_DETAILS = (
+        'always_ask_learners_for_answer_details')
+    HIGH_BOUNCE_RATE_TASK_STATE_BOUNCE_RATE_CREATION_THRESHOLD = (
+        'high_bounce_rate_task_state_bounce_rate_creation_threshold')
+    HIGH_BOUNCE_RATE_TASK_STATE_BOUNCE_RATE_OBSOLETION_THRESHOLD = (
+        'high_bounce_rate_task_state_bounce_rate_obsoletion_threshold')
+    HIGH_BOUNCE_RATE_TASK_MINIMUM_EXPLORATION_STARTS = (
+        'high_bounce_rate_task_minimum_exploration_starts')
+    CONTRIBUTOR_DASHBOARD_REVIEWER_EMAILS_IS_ENABLED = (
+        'contributor_dashboard_reviewer_emails_is_enabled')
+    ENABLE_ADMIN_NOTIFICATIONS_FOR_SUGGESTIONS_NEEDING_REVIEW = (
+        'notify_admins_suggestions_waiting_too_long_is_enabled')
+    ENABLE_ADMIN_NOTIFICATIONS_FOR_REVIEWER_SHORTAGE = (
+        'enable_admin_notifications_for_reviewer_shortage')
+    MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER = (
+        'max_number_of_suggestions_per_reviewer')
+    EMAIL_SENDER_NAME = 'email_sender_name'
+    EMAIL_FOOTER = 'email_footer'
+    SIGNUP_EMAIL_SUBJECT_CONTENT = 'signup_email_subject_content'
+    SIGNUP_EMAIL_BODY_CONTENT = 'signup_email_body_content'
+    UNPUBLISH_EXPLORATION_EMAIL_HTML_BODY = (
+        'unpublish_exploration_email_html_body')
+    CD_ADMIN_DASHBOARD_NEW_UI = 'cd_admin_dashboard_new_ui'
+    RECORD_PLAYTHROUGH_PROBABILITY = 'record_playthrough_probability'

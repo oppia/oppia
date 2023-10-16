@@ -40,14 +40,18 @@ import json
 
 from core import feconf
 from core.constants import constants
+from core.domain import classroom_config_domain
+from core.domain import classroom_config_services
 
 import requests
 from typing import Dict, Final, List
 
 PORT_NUMBER_FOR_GAE_SERVER: Final = 8181
+# TODO(#18260): Change this when we permanently move to the Dockerized Setup.
 
+FIREBASE_HOST = '0.0.0.0' if feconf.OPPIA_IS_DOCKERIZED else 'localhost'
 FIREBASE_AUTH_EMULATOR_HOST: Final = (
-    'localhost:%s' % feconf.FIREBASE_EMULATOR_PORT)
+    '%s:%s' % (FIREBASE_HOST, feconf.FIREBASE_EMULATOR_PORT))
 FIREBASE_SIGN_IN_URL: Final = (
     'http://%s/identitytoolkit.googleapis.com/v1/accounts:signInWithPassword'
     % FIREBASE_AUTH_EMULATOR_HOST)
@@ -66,6 +70,9 @@ CONTRIBUTOR_USERNAME: Final = 'b'
 
 CLASSROOM_NAME: Final = 'math'
 CLASSROOM_URL_FRAGMENT: Final = 'math'
+
+# Timeout for requests in seconds.
+TIMEOUT_SECS = 60
 
 
 class SampleDataInitializer:
@@ -146,7 +153,8 @@ class SampleDataInitializer:
             json={
                 'email': email,
                 'password': password
-            }
+            },
+            timeout=TIMEOUT_SECS,
         ).json()['idToken']
 
         return str(token_id)
@@ -167,7 +175,8 @@ class SampleDataInitializer:
             json={
                 'email': email,
                 'password': password
-            }
+            },
+            timeout=TIMEOUT_SECS,
         ).json()['idToken']
 
         return str(token_id)
@@ -245,6 +254,19 @@ class SampleDataInitializer:
             }),
             'csrf_token': self.csrf_token
         }
+
+        math_classroom_dict: classroom_config_domain.ClassroomDict = {
+            'classroom_id': 'math_classroom_id',
+            'name': classroom_name,
+            'url_fragment': classroom_url_fragment,
+            'course_details': '',
+            'topic_list_intro': '',
+            'topic_id_to_prerequisite_topic_ids': dict.fromkeys(topic_ids, [])
+        }
+        math_classroom = classroom_config_domain.Classroom.from_dict(
+            math_classroom_dict)
+
+        classroom_config_services.create_new_classroom(math_classroom)
 
         self._make_request('POST', '/adminhandler', params=params)
 

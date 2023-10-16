@@ -32,27 +32,46 @@ docstrings in this file.
 
 from __future__ import annotations
 
+import copy
+import json
+import os
+
 from core import feconf
 from core import platform_feature_list
+from core import utils
 from core.constants import constants
 from core.domain import platform_parameter_domain
 from core.domain import platform_parameter_registry as registry
 
-from typing import Dict, List, Set
+from typing import Dict, Final, List, Set
 
-ALL_FEATURES_LIST: List[platform_feature_list.ParamNames] = (
+ALL_FEATURE_FLAGS: List[platform_feature_list.ParamNames] = (
     platform_feature_list.DEV_FEATURES_LIST +
     platform_feature_list.TEST_FEATURES_LIST +
     platform_feature_list.PROD_FEATURES_LIST
 )
 
 ALL_FEATURES_NAMES_SET: Set[str] = set(
-    feature.value for feature in ALL_FEATURES_LIST
+    feature.value for feature in ALL_FEATURE_FLAGS
 )
+
+DATA_TYPE_TO_SCHEMA_TYPE: Dict[str, str] = {
+    'number': 'float',
+    'string': 'unicode',
+    'bool': 'bool'
+}
+
+PACKAGE_JSON_FILE_PATH: Final = os.path.join(os.getcwd(), 'package.json')
 
 
 class FeatureFlagNotFoundException(Exception):
     """Exception thrown when an unknown feature flag is requested."""
+
+    pass
+
+
+class PlatformParameterNotFoundException(Exception):
+    """Exception thrown when an unknown platform parameter is requested."""
 
     pass
 
@@ -72,7 +91,7 @@ def create_evaluation_context_for_client(
     return platform_parameter_domain.EvaluationContext.from_dict(
         client_context_dict,
         {
-            'server_mode': _get_server_mode()
+            'server_mode': get_server_mode()
         }
     )
 
@@ -89,7 +108,25 @@ def get_all_feature_flag_dicts() -> List[
     """
     return [
         registry.Registry.get_platform_parameter(_feature.value).to_dict()
-        for _feature in ALL_FEATURES_LIST
+        for _feature in ALL_FEATURE_FLAGS
+    ]
+
+
+def get_all_platform_parameters_except_feature_flag_dicts() -> List[
+    platform_parameter_domain.PlatformParameterDict
+]:
+    """Returns dict representations of all platform parameters that do not
+    contains feature flags. This method is used for providing detailed
+    platform parameters information to the release-coordinator page.
+
+    Returns:
+        list(dict). A list containing the dict mappings of all fields of the
+        platform parameters.
+    """
+    return [
+        registry.Registry.get_platform_parameter(_plat_param.value).to_dict()
+        for _plat_param in platform_feature_list.
+        ALL_PLATFORM_PARAMS_EXCEPT_FEATURE_FLAGS
     ]
 
 
@@ -123,7 +160,7 @@ def is_feature_enabled(feature_name: str) -> bool:
     return _evaluate_feature_flag_value_for_server(feature_name)
 
 
-def update_feature_flag_rules(
+def update_feature_flag(
     feature_name: str,
     committer_id: str,
     commit_message: str,
@@ -146,11 +183,13 @@ def update_feature_flag_rules(
         raise FeatureFlagNotFoundException(
             'Unknown feature flag: %s.' % feature_name)
 
+    # The default value of a feature flag is always False and that
+    # is why we are explicitly passing default_value as False.
     registry.Registry.update_platform_parameter(
-        feature_name, committer_id, commit_message, new_rules)
+        feature_name, committer_id, commit_message, new_rules, False)
 
 
-def _get_server_mode() -> platform_parameter_domain.ServerMode:
+def get_server_mode() -> platform_parameter_domain.ServerMode:
     """Returns the running mode of Oppia.
 
     Returns:
@@ -176,20 +215,32 @@ def _create_evaluation_context_for_server() -> (
     Returns:
         EvaluationContext. The context for evaluation.
     """
-    # TODO(#11208): Here we use MyPy ignore because due to the missing
-    # `browser_type` key MyPy throwing missing key error. Also, `app_version`
-    # key is set as none which forces us to use `.get()` method while fetching
-    # the values from dictionaries. So, to remove 'type ignore' from here and
-    # '.get()' method from '.from_dict' method, properly set app version and
-    # browser type key below using GAE app version as part of the server &
-    # client context.
+    current_app_version = json.load(utils.open_file(
+        PACKAGE_JSON_FILE_PATH, 'r'))['version']
+    # We want to make sure that the branch is the release branch.
+    if not constants.BRANCH_NAME == '' and 'release' in constants.BRANCH_NAME:
+        # We only need current app version so we can drop the 'release' part.
+        current_app_version = constants.BRANCH_NAME.split('release-')[1]
+        # We want to replace the '-' with the '.' for the version name.
+        # If the branch is the hotfix branch then we would require to further
+        # split it up and do the replacement for the version name. In the end,
+        # '3-3-1-hotfix-5' will be '3.3.1-hotfix-5' and '3-3-1' will be '3.3.1'.
+        if 'hotfix' in current_app_version:
+            split_via_hotfix = current_app_version.split('-hotfix')
+            current_app_version = (
+                split_via_hotfix[0].replace('-', '.') +
+                '-hotfix' + split_via_hotfix[1]
+            )
+        else:
+            current_app_version = current_app_version.replace('-', '.')
+
     return platform_parameter_domain.EvaluationContext.from_dict(
-        {  # type: ignore[typeddict-item]
-            'platform_type': 'Backend',
-            'app_version': None,
+        {
+            'platform_type': 'Web',
+            'app_version': current_app_version,
         },
         {
-            'server_mode': _get_server_mode()
+            'server_mode': get_server_mode()
         }
     )
 
@@ -222,10 +273,10 @@ def _evaluate_feature_flag_values_for_context(
     for feature_name in feature_names_set:
         param = registry.Registry.get_platform_parameter(
             feature_name)
-        feature_name_value = param.evaluate(context)
+        feature_is_enabled = param.evaluate(context)
         # Ruling out the possibility of any other type for mypy type checking.
-        assert isinstance(feature_name_value, bool)
-        result_dict[feature_name] = feature_name_value
+        assert isinstance(feature_is_enabled, bool)
+        result_dict[feature_name] = feature_is_enabled
     return result_dict
 
 
@@ -244,3 +295,57 @@ def _evaluate_feature_flag_value_for_server(feature_name: str) -> bool:
     values_dict = _evaluate_feature_flag_values_for_context(
         set([feature_name]), context)
     return values_dict[feature_name]
+
+
+def get_platform_parameter_value(
+    parameter_name: str) -> platform_parameter_domain.PlatformDataTypes:
+    """Returns the value of the platform parameter.
+
+    Args:
+        parameter_name: str. The name of the platform parameter whose
+            value is required.
+
+    Returns:
+        PlatformDataTypes. The value of the platform parameter.
+
+    Raises:
+        PlatformParameterNotFoundException. Platform parameter is not valid.
+    """
+    all_platform_params_dicts = (
+        get_all_platform_parameters_except_feature_flag_dicts())
+    all_platform_params_names_set = set(
+        param['name'] for param in all_platform_params_dicts)
+    if parameter_name not in all_platform_params_names_set:
+        raise PlatformParameterNotFoundException(
+            'Unknown platform parameter: %s.' % parameter_name)
+
+    context = _create_evaluation_context_for_server()
+    param = registry.Registry.get_platform_parameter(parameter_name)
+    return param.evaluate(context)
+
+
+def get_platform_parameter_schema(param_name: str) -> Dict[str, str]:
+    """Returns the schema for the platform parameter.
+
+    Args:
+        param_name: str. The name of the platform parameter.
+
+    Returns:
+        Dict[str, str]. The schema of the platform parameter according
+        to the data_type.
+
+    Raises:
+        Exception. The platform parameter does not have valid data type.
+    """
+    parameter = registry.Registry.get_platform_parameter(param_name)
+    if DATA_TYPE_TO_SCHEMA_TYPE.get(parameter.data_type) is not None:
+        schema_type = copy.deepcopy(
+            DATA_TYPE_TO_SCHEMA_TYPE[parameter.data_type])
+        return {'type': schema_type}
+    else:
+        raise Exception(
+            'The %s platform parameter has a data type of %s which is not '
+            'valid. Please use one of these data types instead: %s.' % (
+                parameter.name, parameter.data_type,
+                platform_parameter_domain.PlatformDataTypes)
+        )

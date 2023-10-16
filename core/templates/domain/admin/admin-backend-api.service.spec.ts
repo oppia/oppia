@@ -22,6 +22,8 @@ import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
 import { AdminPageData, AdminBackendApiService } from 'domain/admin/admin-backend-api.service';
 import { CreatorTopicSummary } from 'domain/topic/creator-topic-summary.model';
+import { PlatformParameterFilterType } from 'domain/platform_feature/platform-parameter-filter.model';
+import { PlatformParameter } from 'domain/platform_feature/platform-parameter.model';
 import { CsrfTokenService } from 'services/csrf-token.service';
 import { Schema } from 'services/schema-default-value.service';
 
@@ -54,7 +56,11 @@ describe('Admin backend api service', () => {
         total_published_node_count: 0,
         can_edit_topic: true,
         is_published: false,
-        url_fragment: ''
+        url_fragment: '',
+        total_upcoming_chapters_count: 1,
+        total_overdue_chapters_count: 1,
+        total_chapter_counts_for_each_story: [5, 4],
+        published_chapter_counts_for_each_story: [3, 4]
       }
     ],
     updatable_roles: ['TOPIC_MANAGER'],
@@ -63,12 +69,18 @@ describe('Admin backend api service', () => {
     },
     demo_collections: [],
     config_properties: {
-      oppia_csrf_secret: {
+      classroom_pages_data: {
         schema: {
-          type: 'unicode'
+          type: 'list'
         } as Schema,
-        value: '3WHOWnD3sy0r1wukJ2lX4vBS_YA=',
-        description: 'Text used to encrypt CSRF tokens.'
+        value: {
+          name: 'math',
+          url_fragment: 'math',
+          course_details: '',
+          topic_list_intro: '',
+          topic_ids: []
+        },
+        description: 'The details for each classroom page.'
       }
     },
     demo_exploration_ids: ['19'],
@@ -78,42 +90,33 @@ describe('Admin backend api service', () => {
         'welcome.yaml'
       ]
     ],
-    viewable_roles: ['TOPIC_MANAGER']
+    viewable_roles: ['TOPIC_MANAGER'],
+    platform_params_dicts: [{
+      name: 'dummy_parameter',
+      description: 'This is a dummy platform parameter.',
+      data_type: 'string',
+      rules: [{
+        filters: [{
+          type: PlatformParameterFilterType.PlatformType,
+          conditions: [['=', 'Web'] as [string, string]]
+        }],
+        value_when_matched: ''
+      }],
+      rule_schema_version: 1,
+      default_value: '',
+      is_feature: false,
+      feature_stage: null
+    }]
   };
   let adminDataObject: AdminPageData;
   let configPropertyValues = {
-    always_ask_learners_for_answer_details: false,
     classroom_pages_data: {
       course_details: 'fds',
       name: 'mathfas',
       topic_ids: [],
       topic_list_intro: 'fsd',
       url_fragment: 'mathfsad',
-    },
-    classroom_promos_are_enabled: false,
-    contributor_dashboard_is_enabled: true,
-    contributor_dashboard_reviewer_emails_is_enabled: true,
-    email_footer: 'fsdf',
-    email_sender_name: 'Site Admin',
-    enable_admin_notifications_for_reviewer_shortage: false,
-    high_bounce_rate_task_minimum_exploration_starts: 1001,
-    high_bounce_rate_task_state_bounce_rate_creation_threshold: 0.2,
-    high_bounce_rate_task_state_bounce_rate_obsoletion_threshold: 0.2,
-    is_improvements_tab_enabled: false,
-    max_number_of_explorations_in_math_svgs_batch: 2,
-    max_number_of_suggestions_per_reviewer: 5,
-    max_number_of_svgs_in_math_svgs_batch: 25,
-    notification_user_ids_for_failed_tasks: [],
-    notify_admins_suggestions_waiting_too_long_is_enabled: false,
-    oppia_csrf_secret: 'H62T5aIngXb1PB6arDkFrAnxakpQ=',
-    promo_bar_enabled: false,
-    promo_bar_message: 'fasdfa',
-    record_playthrough_probability: 0.2,
-    signup_email_content: {
-      subject: 'THIS IS A PLACEHOLDER.',
-      html_body: 'THIS IS A <b>PLACEHOLDER</b> AND SHOULD BE REPLACED.'
-    },
-    unpublish_exploration_email_html_body: 'test'
+    }
   };
 
   beforeEach(() => {
@@ -136,7 +139,9 @@ describe('Admin backend api service', () => {
       viewableRoles: adminBackendResponse.viewable_roles,
       humanReadableRoles: adminBackendResponse.human_readable_roles,
       topicSummaries: adminBackendResponse.topic_summaries.map(
-        dict => CreatorTopicSummary.createFromBackendDict(dict))
+        dict => CreatorTopicSummary.createFromBackendDict(dict)),
+      platformParameters: adminBackendResponse.platform_params_dicts.map(
+        dict => PlatformParameter.createFromBackendDict(dict))
     };
 
     spyOn(csrfService, 'getTokenAsync').and.callFake(async() => {
@@ -443,6 +448,110 @@ describe('Admin backend api service', () => {
         successHandler, failHandler);
 
       let req = httpTestingController.expectOne('/topicmanagerrolehandler');
+      expect(req.request.method).toEqual('PUT');
+      expect(req.request.body).toEqual(payload);
+
+      req.flush(
+        { error: 'User with given username does not exist'},
+        { status: 500, statusText: 'Internal Server Error'});
+      flushMicrotasks();
+
+      expect(successHandler).not.toHaveBeenCalled();
+      expect(failHandler).toHaveBeenCalledWith(
+        'User with given username does not exist');
+    }));
+  });
+
+  describe('assignTranslationCoordinator', () => {
+    it('should make request to assign user to a language', fakeAsync(() => {
+      let languageID = 'en';
+      let username = 'validUser';
+      let payload = {
+        language_id: languageID,
+        username: username,
+        action: 'assign'
+      };
+      abas.assignTranslationCoordinator(username, languageID).then(
+        successHandler, failHandler);
+
+      let req = httpTestingController.expectOne(
+        '/translationcoordinatorrolehandler');
+      expect(req.request.method).toEqual('PUT');
+      expect(req.request.body).toEqual(payload);
+
+      req.flush(
+        { status: 200, statusText: 'Success.'});
+      flushMicrotasks();
+
+      expect(successHandler).toHaveBeenCalled();
+      expect(failHandler).not.toHaveBeenCalled();
+    }));
+
+    it('should call fail handler if the request fails', fakeAsync(() => {
+      let languageID = 'en';
+      let username = 'invalidUser';
+      let payload = {
+        language_id: languageID,
+        username: username,
+        action: 'assign'
+      };
+      abas.assignTranslationCoordinator(username, languageID).then(
+        successHandler, failHandler);
+
+      let req = httpTestingController.expectOne(
+        '/translationcoordinatorrolehandler');
+      expect(req.request.method).toEqual('PUT');
+      expect(req.request.body).toEqual(payload);
+
+      req.flush(
+        { error: 'User with given username does not exist'},
+        { status: 500, statusText: 'Internal Server Error'});
+      flushMicrotasks();
+
+      expect(successHandler).not.toHaveBeenCalled();
+      expect(failHandler).toHaveBeenCalledWith(
+        'User with given username does not exist');
+    }));
+  });
+
+  describe('deassignTranslationCoordinator', () => {
+    it('should make request to deassign user from language', fakeAsync(() => {
+      let languageID = 'en';
+      let username = 'validUser';
+      let payload = {
+        language_id: languageID,
+        username: username,
+        action: 'deassign'
+      };
+      abas.deassignTranslationCoordinator(username, languageID).then(
+        successHandler, failHandler);
+
+      let req = httpTestingController.expectOne(
+        '/translationcoordinatorrolehandler');
+      expect(req.request.method).toEqual('PUT');
+      expect(req.request.body).toEqual(payload);
+
+      req.flush(
+        { status: 200, statusText: 'Success.'});
+      flushMicrotasks();
+
+      expect(successHandler).toHaveBeenCalled();
+      expect(failHandler).not.toHaveBeenCalled();
+    }));
+
+    it('should call fail handler if the request fails', fakeAsync(() => {
+      let languageID = 'en';
+      let username = 'invalidUser';
+      let payload = {
+        language_id: languageID,
+        username: username,
+        action: 'deassign'
+      };
+      abas.deassignTranslationCoordinator(username, languageID).then(
+        successHandler, failHandler);
+
+      let req = httpTestingController.expectOne(
+        '/translationcoordinatorrolehandler');
       expect(req.request.method).toEqual('PUT');
       expect(req.request.body).toEqual(payload);
 
@@ -957,7 +1066,7 @@ describe('Admin backend api service', () => {
     'value given the config property ID when calling' +
     'revertConfigPropertyAsync', fakeAsync(() => {
     let action = 'revert_config_property';
-    let configPropertyId = 'promo_bar_enabled';
+    let configPropertyId = 'classroom_pages_data';
     let payload = {
       action: action,
       config_property_id: configPropertyId

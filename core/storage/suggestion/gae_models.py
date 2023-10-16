@@ -17,6 +17,7 @@
 from __future__ import annotations
 
 import datetime
+import enum
 
 from core import feconf
 from core.constants import constants
@@ -44,10 +45,21 @@ STATUS_ACCEPTED: Final = 'accepted'
 STATUS_IN_REVIEW: Final = 'review'
 STATUS_REJECTED: Final = 'rejected'
 
+# Constants defining different possible outcomes of a suggestion submitted.
+REVIEW_OUTCOME_ACCEPTED: Final = 'accepted'
+REVIEW_OUTCOME_ACCEPTED_WITH_EDITS: Final = 'accepted_with_edits'
+REVIEW_OUTCOME_REJECTED: Final = 'rejected'
+
 STATUS_CHOICES: Final = [
     STATUS_ACCEPTED,
     STATUS_IN_REVIEW,
     STATUS_REJECTED
+]
+
+REVIEW_OUTCOME_CHOICES: Final = [
+    REVIEW_OUTCOME_ACCEPTED,
+    REVIEW_OUTCOME_ACCEPTED_WITH_EDITS,
+    REVIEW_OUTCOME_REJECTED
 ]
 
 # Daily emails are sent to reviewers to notify them of suggestions on the
@@ -120,6 +132,31 @@ INCREMENT_SCORE_OF_AUTHOR_BY: Final = 1
 
 # The unique ID for the CommunityContributionStatsModel.
 COMMUNITY_CONTRIBUTION_STATS_MODEL_ID: Final = 'community_contribution_stats'
+
+# Number of models to fetch for contributor admin dashboard stats.
+NUM_MODELS_PER_FETCH: Final = 500
+
+
+class SortChoices(enum.Enum):
+    """Enum for Sort Options available in Contributor Admin Dashboard.
+    Every attribute here should match with "CD_ADMIN_STATS_SORT_OPTIONS"
+    in constants.ts.
+    """
+
+    SORT_KEY_INCREASING_LAST_ACTIVITY = 'IncreasingLastActivity'
+    SORT_KEY_DECREASING_LAST_ACTIVITY = 'DecreasingLastActivity'
+    SORT_KEY_INCREASING_PERFORMANCE = 'IncreasingPerformance'
+    SORT_KEY_DECREASING_PERFORMANCE = 'DecreasingPerformance'
+    SORT_KEY_INCREASING_ACCURACY = 'IncreasingAccuracy'
+    SORT_KEY_DECREASING_ACCURACY = 'DecreasingAccuracy'
+    SORT_KEY_INCREASING_SUBMISSIONS = 'IncreasingSubmissions'
+    SORT_KEY_DECREASING_SUBMISSIONS = 'DecreasingSubmissions'
+    SORT_KEY_INCREASING_REVIEWED_TRANSLATIONS = 'IncreasingReviewedTranslations'
+    SORT_KEY_DECREASING_REVIEWED_TRANSLATIONS = 'DecreasingReviewedTranslations'
+    SORT_KEY_INCREASING_REVIEWED_QUESTIONS = 'IncreasingReviewedQuestions'
+    SORT_KEY_DECREASING_REVIEWED_QUESTIONS = 'DecreasingReviewedQuestions'
+    SORT_KEY_INCREASING_COORDINATOR_COUNTS = 'IncreasingCoordinatorCounts'
+    SORT_KEY_DECREASING_COORDINATOR_COUNTS = 'DecreasingCoordinatorCounts'
 
 
 class GeneralSuggestionExportDataDict(TypedDict):
@@ -630,6 +667,62 @@ class GeneralSuggestionModel(base_models.BaseModel):
             next_offset
         )
 
+    @classmethod
+    def get_reviewable_translation_suggestions(
+        cls,
+        user_id: str,
+        language_code: str,
+        exp_id: str
+    ) -> Tuple[Sequence[GeneralSuggestionModel], int]:
+        """Fetches reviewable translation suggestions for a single exploration.
+
+        Args:
+            user_id: str. The id of the user trying to make this query.
+                Suggestions authored by this user will be excluded from
+                the results.
+            language_code: str. The language code to get results for.
+            exp_id: str. Exploration ID matching the target ID of the
+                translation suggestions.
+
+        Returns:
+            Tuple of (results, next_offset). Where:
+                results: list(SuggestionModel). A list of all suggestions
+                    that are in-review, not authored by the supplied user,
+                    matching the supplied language code, and correspond
+                    to the given exploration ID.
+                    The suggestions are ordered by descending creation
+                    date.
+                next_offset: int. The number of results
+                    returned by the current query.
+        """
+        # The first sort property must be the same as the property to which
+        # an inequality filter is applied. Thus, the inequality filter on
+        # author_id can not be used here.
+        suggestion_query = cls.get_all().filter(datastore_services.all_of(
+            cls.status == STATUS_IN_REVIEW,
+            cls.suggestion_type == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            cls.language_code == language_code,
+            cls.target_id == exp_id
+        )).order(-cls.created_on)
+
+        sorted_results: List[GeneralSuggestionModel] = []
+        offset = 0
+        suggestion_models: Sequence[GeneralSuggestionModel] = (
+            suggestion_query.fetch(offset=offset))
+        for suggestion_model in suggestion_models:
+            offset += 1
+            if suggestion_model.author_id != user_id:
+                sorted_results.append(suggestion_model)
+
+        return (
+            sorted_results,
+            offset
+        )
+
+    # TODO(#18745): Transition all callsites to use the new method
+    # get_reviewable_translation_suggestions_for_single_exploration instead
+    # for the case of a single exploration without a limit. Deprecate the
+    # no-limit behavior of this method to avoid future issues.
     @classmethod
     def get_in_review_translation_suggestions_with_exp_ids_by_offset(
         cls,
@@ -1252,7 +1345,7 @@ class TranslationContributionStatsModel(base_models.BaseModel):
 
     @classmethod
     def get_deletion_policy(cls) -> base_models.DELETION_POLICY:
-        """Model contains corresponding to a user: contributor_user_id."""
+        """Model contains data corresponding to a user: contributor_user_id."""
         return base_models.DELETION_POLICY.DELETE
 
     @staticmethod
@@ -1492,7 +1585,7 @@ class TranslationReviewStatsModel(base_models.BaseModel):
 
     @classmethod
     def get_deletion_policy(cls) -> base_models.DELETION_POLICY:
-        """Model contains corresponding to a user: reviewer_user_id."""
+        """Model contains data corresponding to a user: reviewer_user_id."""
         return base_models.DELETION_POLICY.DELETE
 
     @staticmethod
@@ -1709,7 +1802,7 @@ class QuestionContributionStatsModel(base_models.BaseModel):
 
     @classmethod
     def get_deletion_policy(cls) -> base_models.DELETION_POLICY:
-        """Model contains corresponding to a user: contributor_user_id."""
+        """Model contains data corresponding to a user: contributor_user_id."""
         return base_models.DELETION_POLICY.DELETE
 
     @staticmethod
@@ -1915,7 +2008,7 @@ class QuestionReviewStatsModel(base_models.BaseModel):
 
     @classmethod
     def get_deletion_policy(cls) -> base_models.DELETION_POLICY:
-        """Model contains corresponding to a user: reviewer_user_id."""
+        """Model contains data corresponding to a user: reviewer_user_id."""
         return base_models.DELETION_POLICY.DELETE
 
     @staticmethod
@@ -1990,3 +2083,1512 @@ class QuestionReviewStatsModel(base_models.BaseModel):
                     model.last_contribution_date.isoformat())
             }
         return user_data
+
+
+class TranslationSubmitterTotalContributionStatsModel(base_models.BaseModel):
+    """Records the Total Translation contribution stats and data of
+    recent_review keyed per (language_code, contributor_id) tuple.
+    Its IDs will be in the following structure:
+    [language_code].[contributor_id]
+    """
+
+    # We use the model id as a key in the Takeout dict.
+    ID_IS_USED_AS_TAKEOUT_KEY: Literal[True] = True
+
+    # The ISO 639-1 language code for which the translation contributions were
+    # made.
+    language_code = datastore_services.StringProperty(
+        required=True, indexed=True)
+    # The user ID of the translation contributor.
+    contributor_id = datastore_services.StringProperty(
+        required=True, indexed=True)
+    # The topic ID(s) of the topics for which the contributor has at least one
+    # contribution.
+    topic_ids_with_translation_submissions = datastore_services.StringProperty(
+        repeated=True, indexed=True)
+    # The outcomes of last 100 translations submitted by the user.
+    recent_review_outcomes = datastore_services.StringProperty(
+        repeated=True, indexed=True, choices=REVIEW_OUTCOME_CHOICES)
+    # Performance of the user in last 100 translations.
+    # recent_performance = accepted cards - 2 (rejected cards).
+    recent_performance = datastore_services.IntegerProperty(
+        required=True, indexed=True)
+    # Overall accuracy of the user.
+    # overall_accuracy = accepted cards / submitted cards.
+    overall_accuracy = datastore_services.FloatProperty(
+        required=True, indexed=True)
+    # The number of submitted translations.
+    submitted_translations_count = datastore_services.IntegerProperty(
+        required=True, indexed=True)
+    # The total word count of submitted translations. Excludes HTML tags and
+    # attributes.
+    submitted_translation_word_count = datastore_services.IntegerProperty(
+        required=True, indexed=True)
+    # The number of accepted translations.
+    accepted_translations_count = datastore_services.IntegerProperty(
+        required=True, indexed=True)
+    # The number of accepted translations without reviewer edits.
+    accepted_translations_without_reviewer_edits_count = (
+        datastore_services.IntegerProperty(required=True, indexed=True))
+    # The total word count of accepted translations. Excludes HTML tags and
+    # attributes.
+    accepted_translation_word_count = datastore_services.IntegerProperty(
+        required=True, indexed=True)
+    # The number of rejected translations.
+    rejected_translations_count = datastore_services.IntegerProperty(
+        required=True, indexed=True)
+    # The total word count of rejected translations. Excludes HTML tags and
+    # attributes.
+    rejected_translation_word_count = datastore_services.IntegerProperty(
+        required=True, indexed=True)
+    # The unique first date of the translation suggestions.
+    first_contribution_date = datastore_services.DateProperty(indexed=True)
+    # The unique last_updated date of the translation suggestions.
+    last_contribution_date = datastore_services.DateProperty(indexed=True)
+
+    @classmethod
+    def create(
+        cls,
+        language_code: str,
+        contributor_id: str,
+        topic_ids_with_translation_submissions: List[str],
+        recent_review_outcomes: List[str],
+        recent_performance: int,
+        overall_accuracy: float,
+        submitted_translations_count: int,
+        submitted_translation_word_count: int,
+        accepted_translations_count: int,
+        accepted_translations_without_reviewer_edits_count: int,
+        accepted_translation_word_count: int,
+        rejected_translations_count: int,
+        rejected_translation_word_count: int,
+        first_contribution_date: datetime.date,
+        last_contribution_date: datetime.date
+    ) -> str:
+        """Creates a new TranslationSubmitterTotalContributionStatsModel
+        instance and returns its ID.
+
+        Args:
+            language_code: str. The ISO 639-1 language code for which the
+                translation contributions were made.
+            contributor_id: str. The user ID of the translation contributor.
+            topic_ids_with_translation_submissions: List[str]. The topic ID(s)
+                of the topics for which the contributor has at least one
+                contribution.
+            recent_review_outcomes: List[str]. The outcomes of last 100
+                translations submitted by the user.
+            recent_performance: int. Performance of the user in last 100
+                translations.
+            overall_accuracy: float. Overall accuracy of the user.
+            submitted_translations_count: int. The number of submitted
+                translations.
+            submitted_translation_word_count: int. The total word count of
+                submitted translations.
+            accepted_translations_count: int. The number of accepted
+                translations.
+            accepted_translations_without_reviewer_edits_count: int.
+                The number of accepted translations without reviewer edits.
+            accepted_translation_word_count: int. The total word count of
+                accepted translations.
+            rejected_translations_count: int. The number of rejected
+                translations.
+            rejected_translation_word_count: int. The total word count of
+                rejected translations.
+            first_contribution_date: datetime.date. The unique first date of
+                the translation suggestions.
+            last_contribution_date: datetime.date. The unique last date of
+                the translation suggestions.
+
+        Returns:
+            str. The id of the model created.
+        """
+        entity_id = cls.construct_id(language_code, contributor_id)
+        entity = cls(
+            id=entity_id,
+            language_code=language_code,
+            contributor_id=contributor_id,
+            topic_ids_with_translation_submissions=(
+                topic_ids_with_translation_submissions),
+            recent_review_outcomes=recent_review_outcomes,
+            recent_performance=recent_performance,
+            overall_accuracy=overall_accuracy,
+            submitted_translations_count=submitted_translations_count,
+            submitted_translation_word_count=submitted_translation_word_count,
+            accepted_translations_count=accepted_translations_count,
+            accepted_translations_without_reviewer_edits_count=(
+                accepted_translations_without_reviewer_edits_count),
+            accepted_translation_word_count=accepted_translation_word_count,
+            rejected_translations_count=rejected_translations_count,
+            rejected_translation_word_count=rejected_translation_word_count,
+            first_contribution_date=first_contribution_date,
+            last_contribution_date=last_contribution_date)
+        entity.update_timestamps()
+        entity.put()
+        return entity_id
+
+    @staticmethod
+    def construct_id(language_code: str, contributor_id: str) -> str:
+        """Constructs a unique ID for a
+        TranslationSubmitterTotalContributionStatsModel instance.
+
+        Args:
+            language_code: str. ISO 639-1 language code.
+            contributor_id: str. User ID.
+
+        Returns:
+            str. An ID of the form:
+
+            [language_code].[contributor_id]
+        """
+        return (
+            '%s.%s' % (language_code, contributor_id)
+        )
+
+    # Here we use MyPy ignore because the signature of this method
+    # doesn't match with BaseModel.get().
+    # https://mypy.readthedocs.io/en/stable/error_code_list.html#check-validity-of-overrides-override
+    @classmethod
+    def get( # type: ignore[override]
+        cls, language_code: str, contributor_id: str
+    ) -> Optional[TranslationSubmitterTotalContributionStatsModel]:
+        """Gets the TranslationSubmitterTotalContributionStatsModel
+        matching the supplied language_code and contributor_id.
+
+        Args:
+            language_code: str. ISO 639-1 language code.
+            contributor_id: str. User ID.
+
+        Returns:
+            TranslationSubmitterTotalContributionStatsModel|None. The matching
+            TranslationSubmitterTotalContributionStatsModel, or None if no
+            such model instance exists.
+        """
+        entity_id = cls.construct_id(language_code, contributor_id)
+        return cls.get_by_id(entity_id)
+
+    @classmethod
+    def fetch_page(
+        cls,
+        page_size: int,
+        offset: int,
+        language_code: str,
+        sort_by: Optional[SortChoices.value],
+        topic_ids: Optional[List[str]],
+        max_days_since_last_activity: Optional[int]
+    ) -> Tuple[Sequence[TranslationSubmitterTotalContributionStatsModel],
+                int,
+                bool]:
+        """Returns the models according to values specified.
+
+        Args:
+            page_size: int. Number of models to fetch.
+            offset: int. Number of results to skip from the beginning of all
+                results matching the query.
+            language_code: str. The language code to get results for.
+            sort_by: SortChoices|None. A string indicating how to sort the
+                result.
+            topic_ids: List[str]|None. List of topic ID(s) to fetch
+                contributor stats for.
+            max_days_since_last_activity: int. To get number of users
+                who are active in max_days_since_last_activity.
+
+        Returns:
+            3-tuple(sorted_results, next_offset, more). where:
+                sorted_results:
+                    list(TranslationSubmitterTotalContributionStatsModel).
+                    The list of models which match the supplied language_code,
+                    topic_ids and max_days_since_last_activity filters,
+                    returned in the order specified by sort_by.
+                next_offset: int. Number of results to skip in next batch.
+                more: bool. If True, there are (probably) more results after
+                    this batch. If False, there are no further results
+                    after this batch.
+        """
+
+        sort_options_dict = {
+            SortChoices.SORT_KEY_INCREASING_LAST_ACTIVITY.value:
+                -cls.last_contribution_date,
+            SortChoices.SORT_KEY_DECREASING_LAST_ACTIVITY.value:
+                cls.last_contribution_date,
+            SortChoices.SORT_KEY_INCREASING_PERFORMANCE.value:
+                cls.recent_performance,
+            SortChoices.SORT_KEY_DECREASING_PERFORMANCE.value:
+                -cls.recent_performance,
+            SortChoices.SORT_KEY_DECREASING_ACCURACY.value:
+                -cls.overall_accuracy,
+            SortChoices.SORT_KEY_INCREASING_ACCURACY.value:
+                cls.overall_accuracy,
+            SortChoices.SORT_KEY_DECREASING_SUBMISSIONS.value:
+                -cls.submitted_translations_count,
+            SortChoices.SORT_KEY_INCREASING_SUBMISSIONS.value:
+                cls.submitted_translations_count
+        }
+
+        sort = -cls.recent_performance
+        if sort_by is not None:
+            sort = sort_options_dict[sort_by]
+
+        # The first sort property must be the same as the property to which
+        # an inequality filter is applied. Thus, the inequality filter on
+        # last_activity can not be used here and we have implemented it
+        # separately below. Learn more about this here:
+        # https://cloud.google.com/appengine/docs/legacy/standard/go111/datastore/query-restrictions#properties_used_in_inequality_filters_must_be_sorted_first.
+        if topic_ids is not None:
+            sort_query = cls.query(
+                datastore_services.all_of(
+                    cls.language_code == language_code,
+                    cls.topic_ids_with_translation_submissions.IN(topic_ids)
+                )).order(sort)
+        else:
+            sort_query = cls.query(
+                datastore_services.all_of(
+                    cls.language_code == language_code
+                )).order(sort)
+
+        sorted_results: List[
+            TranslationSubmitterTotalContributionStatsModel] = []
+        today = datetime.date.today()
+
+        if max_days_since_last_activity is not None:
+            last_date = today - datetime.timedelta(
+                days=max_days_since_last_activity)
+            next_offset = offset
+            while len(sorted_results) < page_size:
+                result_models: Sequence[
+                    TranslationSubmitterTotalContributionStatsModel] = (
+                    sort_query.fetch(
+                        NUM_MODELS_PER_FETCH, offset=next_offset))
+                if not result_models:
+                    break
+                for result_model in result_models:
+                    next_offset += 1
+                    if result_model.last_contribution_date >= last_date:
+                        sorted_results.append(result_model)
+                        if len(sorted_results) == page_size:
+                            break
+        else:
+            sorted_results = list(sort_query.fetch(page_size, offset=offset))
+            next_offset = offset + len(sorted_results)
+
+        # Check whether we have more results.
+        next_result_model: Sequence[
+            TranslationSubmitterTotalContributionStatsModel] = (
+                sort_query.fetch(offset=next_offset))
+        more: bool = len(next_result_model) != 0
+
+        return (
+            sorted_results,
+            next_offset,
+            more
+        )
+
+    @classmethod
+    def get_all_by_user_id(
+        cls, user_id: str
+    ) -> Sequence[TranslationSubmitterTotalContributionStatsModel]:
+        """Gets all TranslationSubmitterTotalContributionStatsModel matching
+        the supplied user_id.
+
+        Args:
+            user_id: str. User ID.
+
+        Returns:
+            list(TranslationSubmitterTotalContributionStatsModel). The matching
+            TranslationSubmitterTotalContributionStatsModel.
+        """
+        return cls.get_all().filter(
+            cls.contributor_id == user_id
+        ).fetch(feconf.DEFAULT_SUGGESTION_QUERY_LIMIT)
+
+    @classmethod
+    def has_reference_to_user_id(cls, user_id: str) -> bool:
+        """Check whether TranslationSubmitterTotalContributionStatsModel
+        references the supplied user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be checked.
+
+        Returns:
+            bool. Whether any models refer to the given user ID.
+        """
+        return cls.query(
+            cls.contributor_id == user_id
+        ).get(keys_only=True) is not None
+
+    @classmethod
+    def get_deletion_policy(cls) -> base_models.DELETION_POLICY:
+        """Model contains data corresponding to a user: contributor_id."""
+        return base_models.DELETION_POLICY.DELETE
+
+    @staticmethod
+    def get_model_association_to_user(
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+        """Model is exported as multiple instances per user since there are
+        multiple languages relevant to a user.
+        """
+        return base_models.MODEL_ASSOCIATION_TO_USER.MULTIPLE_INSTANCES_PER_USER
+
+    @classmethod
+    def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
+        """Model contains data to export corresponding to a user."""
+        return dict(super(cls, cls).get_export_policy(), **{
+            'language_code':
+                base_models.EXPORT_POLICY.EXPORTED,
+            # User ID is not exported in order to keep internal ids private.
+            'contributor_id':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'topic_ids_with_translation_submissions':
+                base_models.EXPORT_POLICY.EXPORTED,
+            'recent_review_outcomes':
+                base_models.EXPORT_POLICY.EXPORTED,
+            'recent_performance':
+                base_models.EXPORT_POLICY.EXPORTED,
+            'overall_accuracy':
+                base_models.EXPORT_POLICY.EXPORTED,
+            'submitted_translations_count':
+                base_models.EXPORT_POLICY.EXPORTED,
+            'submitted_translation_word_count':
+                base_models.EXPORT_POLICY.EXPORTED,
+            'accepted_translations_count':
+                base_models.EXPORT_POLICY.EXPORTED,
+            'accepted_translations_without_reviewer_edits_count':
+                base_models.EXPORT_POLICY.EXPORTED,
+            'accepted_translation_word_count':
+                base_models.EXPORT_POLICY.EXPORTED,
+            'rejected_translations_count':
+                base_models.EXPORT_POLICY.EXPORTED,
+            'rejected_translation_word_count':
+                base_models.EXPORT_POLICY.EXPORTED,
+            'first_contribution_date':
+                base_models.EXPORT_POLICY.EXPORTED,
+            'last_contribution_date':
+                base_models.EXPORT_POLICY.EXPORTED
+        })
+
+    @classmethod
+    def apply_deletion_policy(cls, user_id: str) -> None:
+        """Delete instances of TranslationSubmitterTotalContributionStatsModel
+        for the user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be deleted.
+        """
+        datastore_services.delete_multi(
+            cls.query(cls.contributor_id == user_id).fetch(keys_only=True))
+
+    @classmethod
+    def export_data(
+        cls, user_id: str
+    ) -> Dict[str, Dict[str, Union[str, int, List[str]]]]:
+        """Exports the data from TranslationSubmitterTotalContributionStatsModel
+        into dict format for Takeout.
+
+        Args:
+            user_id: str. The ID of the user whose data should be exported.
+
+        Returns:
+            dict. Dictionary of the data from
+            TranslationSubmitterTotalContributionStatsModel.
+        """
+        user_data = {}
+        stats_models: Sequence[TranslationSubmitterTotalContributionStatsModel] = ( # pylint: disable=line-too-long
+            cls.get_all().filter(cls.contributor_id == user_id).fetch())
+        for model in stats_models:
+            splitted_id = model.id.split('.')
+            language_code = splitted_id[0]
+            user_data[language_code] = {
+                'language_code': model.language_code,
+                'topic_ids_with_translation_submissions': (
+                    model.topic_ids_with_translation_submissions),
+                'recent_review_outcomes': (
+                    model.recent_review_outcomes),
+                'recent_performance': (
+                    model.recent_performance),
+                'overall_accuracy': (
+                    model.overall_accuracy),
+                'submitted_translations_count': (
+                    model.submitted_translations_count),
+                'submitted_translation_word_count': (
+                    model.submitted_translation_word_count),
+                'accepted_translations_count': (
+                    model.accepted_translations_count),
+                'accepted_translations_without_reviewer_edits_count': (
+                    model.accepted_translations_without_reviewer_edits_count),
+                'accepted_translation_word_count': (
+                    model.accepted_translation_word_count),
+                'rejected_translations_count': (
+                    model.rejected_translations_count),
+                'rejected_translation_word_count': (
+                    model.rejected_translation_word_count),
+                'first_contribution_date': (
+                    model.first_contribution_date.isoformat()),
+                'last_contribution_date': (
+                    model.last_contribution_date.isoformat())
+            }
+        return user_data
+
+
+class TranslationReviewerTotalContributionStatsModel(base_models.BaseModel):
+    """Records the translation review stats for contributor admin dashboard.
+    There is one instance of this model per (language_code, contributor_id)
+    tuple. Its IDs are in the following structure:
+    [language_code].[contributor_id]
+    """
+
+    # We use the model id as a key in the Takeout dict.
+    ID_IS_USED_AS_TAKEOUT_KEY = True
+
+    # The ISO 639-1 language code for which the translation reviews were
+    # made.
+    language_code = datastore_services.StringProperty(
+        required=True, indexed=True)
+    # The user ID of the translation reviewer.
+    contributor_id = datastore_services.StringProperty(
+        required=True, indexed=True)
+    # # The topic ID(s) to which user has at least one review.
+    topic_ids_with_translation_reviews = (
+        datastore_services.StringProperty(repeated=True, indexed=True))
+    # The number of reviewed translations.
+    reviewed_translations_count = datastore_services.IntegerProperty(
+        required=True, indexed=True)
+    # The number of accepted translations.
+    accepted_translations_count = datastore_services.IntegerProperty(
+        required=True, indexed=True)
+    # The number of accepted translations with reviewer edits.
+    accepted_translations_with_reviewer_edits_count = (
+        datastore_services.IntegerProperty(required=True, indexed=True))
+    # The total word count of accepted translations. Excludes HTML tags and
+    # attributes.
+    accepted_translation_word_count = datastore_services.IntegerProperty(
+        required=True, indexed=True)
+    # The total number of rejected translations.
+    rejected_translations_count = datastore_services.IntegerProperty(
+        required=True, indexed=True)
+    # The first date that the reviewer made a translation review.
+    first_contribution_date = datastore_services.DateProperty(indexed=True)
+    # The last date that the reviewer made a translation review.
+    last_contribution_date = datastore_services.DateProperty(indexed=True)
+
+    @classmethod
+    def create(
+        cls,
+        language_code: str,
+        contributor_id: str,
+        topic_ids_with_translation_reviews: List[str],
+        reviewed_translations_count: int,
+        accepted_translations_count: int,
+        accepted_translations_with_reviewer_edits_count: int,
+        accepted_translation_word_count: int,
+        rejected_translations_count: int,
+        first_contribution_date: datetime.date,
+        last_contribution_date: datetime.date
+    ) -> str:
+        """Creates a new TranslationReviewerTotalContributionStatsModel
+        instance and returns its ID.
+
+        Args:
+            language_code: str. The ISO 639-1 language code for which the
+                translation contributions were made.
+            contributor_id: str. The user ID of the translation reviewer.
+            topic_ids_with_translation_reviews: List[str]. The topic ID(s)
+                of the topics for which the contributor has at least one
+                review.
+            reviewed_translations_count: int. The number of reviewed
+                translations.
+            accepted_translations_count: int. The number of accepted
+                translations.
+            accepted_translations_with_reviewer_edits_count: int.
+                The number of accepted translations with reviewer edits.
+            accepted_translation_word_count: int. The total word count of
+                accepted translations.
+            rejected_translations_count: int. The number of rejected
+                translations.
+            first_contribution_date: datetime.date. The unique first date of
+                the translation suggestions.
+            last_contribution_date: datetime.date. The unique last date of
+                the translation suggestions.
+
+        Returns:
+            str. The id of the model created.
+        """
+        entity_id = cls.construct_id(language_code, contributor_id)
+        entity = cls(
+            id=entity_id,
+            language_code=language_code,
+            contributor_id=contributor_id,
+            topic_ids_with_translation_reviews=(
+                topic_ids_with_translation_reviews),
+            reviewed_translations_count=reviewed_translations_count,
+            accepted_translations_count=accepted_translations_count,
+            accepted_translations_with_reviewer_edits_count=(
+                accepted_translations_with_reviewer_edits_count),
+            accepted_translation_word_count=accepted_translation_word_count,
+            rejected_translations_count=rejected_translations_count,
+            first_contribution_date=first_contribution_date,
+            last_contribution_date=last_contribution_date)
+        entity.update_timestamps()
+        entity.put()
+        return entity_id
+
+    @staticmethod
+    def construct_id(language_code: str, contributor_id: str) -> str:
+        """Constructs a unique ID for a
+        TranslationReviewerTotalContributionStatsModel instance.
+
+        Args:
+            language_code: str. ISO 639-1 language code.
+            contributor_id: str. User ID.
+
+        Returns:
+            str. An ID of the form:
+
+            [language_code].[contributor_id]
+        """
+        return (
+            '%s.%s' % (language_code, contributor_id)
+        )
+
+    # Here we use MyPy ignore because the signature of this method
+    # doesn't match with BaseModel.get().
+    # https://mypy.readthedocs.io/en/stable/error_code_list.html#check-validity-of-overrides-override
+    @classmethod
+    def get( # type: ignore[override]
+        cls, language_code: str, contributor_id: str
+    ) -> Optional[TranslationReviewerTotalContributionStatsModel]:
+        """Gets the TranslationReviewerTotalContributionStatsModel
+        matching the supplied language_code, contributor_id.
+
+        Args:
+            language_code: str. ISO 639-1 language code.
+            contributor_id: str. User ID.
+
+        Returns:
+            TranslationReviewerTotalContributionStatsModel|None. The matching
+            TranslationReviewerTotalContributionStatsModel, or None
+            if no such model instance exists.
+        """
+        entity_id = cls.construct_id(language_code, contributor_id)
+        return cls.get_by_id(entity_id)
+
+    @classmethod
+    def get_all_by_user_id(
+        cls, user_id: str
+    ) -> Sequence[TranslationReviewerTotalContributionStatsModel]:
+        """Gets all TranslationReviewerTotalContributionStatsModel
+        matching the supplied user_id.
+
+        Args:
+            user_id: str. User ID.
+
+        Returns:
+            list(TranslationReviewerTotalContributionStatsModel). The matching
+            TranslationReviewerTotalContributionStatsModel.
+        """
+        return cls.get_all().filter(
+            cls.contributor_id == user_id
+        ).fetch(feconf.DEFAULT_SUGGESTION_QUERY_LIMIT)
+
+    @classmethod
+    def fetch_page(
+        cls,
+        page_size: int,
+        offset: int,
+        language_code: str,
+        sort_by: Optional[SortChoices.value],
+        max_days_since_last_activity: Optional[int]
+    ) -> Tuple[Sequence[TranslationReviewerTotalContributionStatsModel],
+                int,
+                bool]:
+        """Returns the models according to values specified.
+
+        Args:
+            page_size: int. Number of models to fetch.
+            offset: int. Number of results to skip from the beginning of all
+                results matching the query.
+            language_code: str. The language code to get results for.
+            sort_by: SortChoices|None. A string indicating how to sort the
+                result.
+            max_days_since_last_activity: int|None. To get number of users
+                who are active in max_days_since_last_activity.
+
+        Returns:
+            3-tuple(sorted_results, next_offset, more). where:
+                sorted_results:
+                    list(TranslationSubmitterTotalContributionStatsModel).
+                    The list of models which match the supplied language_code,
+                    and max_days_since_last_activity filters, returned in the
+                    order specified by sort_by.
+                next_offset: int. Number of results to skip in next batch.
+                more: bool. If True, there are (probably) more results after
+                    this batch. If False, there are no further results
+                    after this batch.
+        """
+
+        sort_options_dict = {
+            SortChoices.SORT_KEY_INCREASING_LAST_ACTIVITY.value:
+                -cls.last_contribution_date,
+            SortChoices.SORT_KEY_DECREASING_LAST_ACTIVITY.value:
+                cls.last_contribution_date,
+            SortChoices.SORT_KEY_INCREASING_REVIEWED_TRANSLATIONS.value:
+                cls.reviewed_translations_count,
+            SortChoices.SORT_KEY_DECREASING_REVIEWED_TRANSLATIONS.value:
+                -cls.reviewed_translations_count
+        }
+
+        sort = -cls.reviewed_translations_count
+        if sort_by is not None:
+            sort = sort_options_dict[sort_by]
+
+        # The first sort property must be the same as the property to which
+        # an inequality filter is applied. Thus, the inequality filter on
+        # last_activity can not be used here and we have implemented it
+        # separately below. Learn more about this here:
+        # https://cloud.google.com/appengine/docs/legacy/standard/go111/datastore/query-restrictions#properties_used_in_inequality_filters_must_be_sorted_first.
+        sort_query = cls.query(
+            datastore_services.all_of(
+                cls.language_code == language_code
+            )).order(sort)
+
+        sorted_results: List[
+            TranslationReviewerTotalContributionStatsModel] = []
+        today = datetime.date.today()
+
+        if max_days_since_last_activity is not None:
+            last_date = today - datetime.timedelta(
+                days=max_days_since_last_activity)
+            next_offset = offset
+            while len(sorted_results) < page_size:
+                result_models: Sequence[
+                    TranslationReviewerTotalContributionStatsModel] = (
+                    sort_query.fetch(
+                        NUM_MODELS_PER_FETCH, offset=next_offset))
+                if not result_models:
+                    break
+                for result_model in result_models:
+                    next_offset += 1
+                    if result_model.last_contribution_date >= last_date:
+                        sorted_results.append(result_model)
+                        if len(sorted_results) == page_size:
+                            break
+        else:
+            sorted_results = list(sort_query.fetch(page_size, offset=offset))
+            next_offset = offset + len(sorted_results)
+
+        # Check whether we have more results.
+        next_result_model: Sequence[
+            TranslationReviewerTotalContributionStatsModel] = (
+                sort_query.fetch(1, offset=next_offset))
+        more: bool = len(next_result_model) != 0
+
+        return (
+            sorted_results,
+            next_offset,
+            more
+        )
+
+    @classmethod
+    def has_reference_to_user_id(cls, user_id: str) -> bool:
+        """Check whether TranslationReviewerTotalContributionStatsModel
+        references the supplied user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be checked.
+
+        Returns:
+            bool. Whether any models refer to the given user ID.
+        """
+        return cls.query(
+            cls.contributor_id == user_id
+        ).get(keys_only=True) is not None
+
+    @classmethod
+    def get_deletion_policy(cls) -> base_models.DELETION_POLICY:
+        """Model contains data corresponding to a user: contributor_id."""
+        return base_models.DELETION_POLICY.DELETE
+
+    @staticmethod
+    def get_model_association_to_user(
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+        """Model is exported as multiple instances per user since there are
+        multiple languages relevant to a user.
+        """
+        return base_models.MODEL_ASSOCIATION_TO_USER.MULTIPLE_INSTANCES_PER_USER
+
+    @classmethod
+    def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
+        """Model contains data to export corresponding to a user."""
+        return dict(super(cls, cls).get_export_policy(), **{
+            'language_code':
+                base_models.EXPORT_POLICY.EXPORTED,
+            # User ID is not exported in order to keep internal ids private.
+            'contributor_id':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'topic_ids_with_translation_reviews':
+                base_models.EXPORT_POLICY.EXPORTED,
+            'reviewed_translations_count':
+                base_models.EXPORT_POLICY.EXPORTED,
+            'accepted_translations_count':
+                base_models.EXPORT_POLICY.EXPORTED,
+            'accepted_translations_with_reviewer_edits_count':
+                base_models.EXPORT_POLICY.EXPORTED,
+            'accepted_translation_word_count':
+                base_models.EXPORT_POLICY.EXPORTED,
+            'rejected_translations_count':
+                base_models.EXPORT_POLICY.EXPORTED,
+            'first_contribution_date':
+                base_models.EXPORT_POLICY.EXPORTED,
+            'last_contribution_date':
+                base_models.EXPORT_POLICY.EXPORTED
+        })
+
+    @classmethod
+    def apply_deletion_policy(cls, user_id: str) -> None:
+        """Delete instances of TranslationReviewerTotalContributionStatsModel
+        for the user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be deleted.
+        """
+        datastore_services.delete_multi(
+            cls.query(cls.contributor_id == user_id).fetch(keys_only=True))
+
+    @classmethod
+    def export_data(
+        cls, user_id: str
+    ) -> Dict[str, Dict[str, Union[str, int, List[str]]]]:
+        """Exports the data from TranslationReviewerTotalContributionStatsModel
+        into dict format for Takeout.
+
+        Args:
+            user_id: str. The ID of the user whose data should be exported.
+
+        Returns:
+            dict. Dictionary of the data from
+            TranslationReviewerTotalContributionStatsModel.
+        """
+        user_data = {}
+        stats_models: Sequence[TranslationReviewerTotalContributionStatsModel] = ( # pylint: disable=line-too-long
+            cls.get_all().filter(cls.contributor_id == user_id).fetch())
+        for model in stats_models:
+            splitted_id = model.id.split('.')
+            language_code = splitted_id[0]
+            user_data[language_code] = {
+                'language_code': model.language_code,
+                'topic_ids_with_translation_reviews': (
+                    model.topic_ids_with_translation_reviews),
+                'reviewed_translations_count': (
+                    model.reviewed_translations_count),
+                'accepted_translations_count': (
+                    model.accepted_translations_count),
+                'accepted_translations_with_reviewer_edits_count': (
+                    model.accepted_translations_with_reviewer_edits_count),
+                'accepted_translation_word_count': (
+                    model.accepted_translation_word_count),
+                'rejected_translations_count': (
+                    model.rejected_translations_count),
+                'first_contribution_date': (
+                    model.first_contribution_date.isoformat()),
+                'last_contribution_date': (
+                    model.last_contribution_date.isoformat())
+            }
+        return user_data
+
+
+class QuestionSubmitterTotalContributionStatsModel(base_models.BaseModel):
+    """Records the question contribution stats for contributor dashboard admin
+    page. There is one instance of this model per contributor_id.
+    Its ID is same as [contributor_id].
+    """
+
+    # The user ID of the question contributor.
+    contributor_id = datastore_services.StringProperty(
+        required=True, indexed=True)
+    # The topic ID(s) to which user has at least one contribution.
+    topic_ids_with_question_submissions = datastore_services.StringProperty(
+        repeated=True, indexed=True)
+    # Review outcomes of last 100 contributions of the user.
+    recent_review_outcomes = datastore_services.StringProperty(
+        repeated=True, indexed=True)
+    # Performance of the user in last 100 questions submission.
+    # recent_performance = accepted_questions - 2 (rejected_questions).
+    recent_performance = datastore_services.IntegerProperty(
+        required=True, indexed=True)
+    # Overall accuracy of the user.
+    # overall_accuracy = accepted questions / submitted questions.
+    overall_accuracy = datastore_services.FloatProperty(
+        required=True, indexed=True)
+    # The number of submitted questions.
+    submitted_questions_count = datastore_services.IntegerProperty(
+        required=True, indexed=True)
+    # The number of accepted questions.
+    accepted_questions_count = datastore_services.IntegerProperty(
+        required=True, indexed=True)
+    # The number of accepted questions without reviewer edits.
+    accepted_questions_without_reviewer_edits_count = (
+        datastore_services.IntegerProperty(required=True, indexed=True))
+    # The number of rejected questions.
+    rejected_questions_count = datastore_services.IntegerProperty(
+        required=True, indexed=True)
+    # The first date that the submitter made a question submission.
+    first_contribution_date = datastore_services.DateProperty(indexed=True)
+    # The last date that the submitter made a question submission.
+    last_contribution_date = datastore_services.DateProperty(indexed=True)
+
+    @classmethod
+    def create(
+        cls,
+        contributor_id: str,
+        topic_ids_with_question_submissions: List[str],
+        recent_review_outcomes: List[str],
+        recent_performance: int,
+        overall_accuracy: float,
+        submitted_questions_count: int,
+        accepted_questions_count: int,
+        accepted_questions_without_reviewer_edits_count: int,
+        rejected_questions_count: int,
+        first_contribution_date: datetime.date,
+        last_contribution_date: datetime.date
+    ) -> str:
+        """Creates a new QuestionSubmitterTotalContributionStatsModel
+        instance and returns its ID.
+
+        Args:
+            contributor_id: str. The user ID of the contributor.
+            topic_ids_with_question_submissions: List[str]. The topic ID(s)
+                of the topics for which the contributor has at least one
+                contribution.
+            recent_review_outcomes: List[str]. The outcomes of last 100
+                questions submitted by the user.
+            recent_performance: int. Performance of the user in last 100
+                questions.
+            overall_accuracy: float. Overall accuracy of the user.
+            submitted_questions_count: int. The number of submitted
+                questions.
+            accepted_questions_count: int. The number of accepted
+                questions.
+            accepted_questions_without_reviewer_edits_count: int.
+                The number of accepted questions without reviewer edits.
+            rejected_questions_count: int. The number of rejected
+                questions.
+            first_contribution_date: datetime.date. The unique first date of
+                the question suggestions.
+            last_contribution_date: datetime.date. The unique last date of
+                the question suggestions.
+
+        Returns:
+            str. The ID of the model created.
+        """
+        entity_id = contributor_id
+        entity = cls(
+            id=entity_id,
+            contributor_id=contributor_id,
+            topic_ids_with_question_submissions=(
+                topic_ids_with_question_submissions),
+            recent_review_outcomes=recent_review_outcomes,
+            recent_performance=recent_performance,
+            overall_accuracy=overall_accuracy,
+            submitted_questions_count=submitted_questions_count,
+            accepted_questions_count=accepted_questions_count,
+            accepted_questions_without_reviewer_edits_count=(
+                accepted_questions_without_reviewer_edits_count),
+            rejected_questions_count=rejected_questions_count,
+            first_contribution_date=first_contribution_date,
+            last_contribution_date=last_contribution_date)
+        entity.update_timestamps()
+        entity.put()
+        return entity_id
+
+    @classmethod
+    def has_reference_to_user_id(cls, user_id: str) -> bool:
+        """Check whether QuestionSubmitterTotalContributionStatsModel
+        references the supplied user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be checked.
+
+        Returns:
+            bool. Whether any models refer to the given user ID.
+        """
+        return cls.query(
+            cls.contributor_id == user_id
+        ).get(keys_only=True) is not None
+
+    @classmethod
+    def fetch_page(
+        cls,
+        page_size: int,
+        offset: int,
+        sort_by: Optional[SortChoices.value],
+        topic_ids: Optional[List[str]],
+        max_days_since_last_activity: Optional[int]
+    ) -> Tuple[Sequence[QuestionSubmitterTotalContributionStatsModel],
+                int,
+                bool]:
+        """Returns the models according to values specified.
+
+        Args:
+            page_size: int. Number of models to fetch.
+            offset: int. Number of results to skip from the beginning of all
+                results matching the query.
+            sort_by: SortChoices|None. A string indicating how to sort the
+                result.
+            topic_ids: List[str]|None. List of topic ID(s) to fetch contributor
+                stats for.
+            max_days_since_last_activity: int|None. To get number of users
+                who are active in max_days_since_last_activity.
+
+        Returns:
+            3-tuple(sorted_results, next_offset, more). where:
+                sorted_results:
+                    list(QuestionSubmitterTotalContributionStatsModel).
+                    The list of models which match the supplied topic_ids
+                    and max_days_since_last_activity filters,
+                    returned in the order specified by sort_by.
+                next_offset: int. Number of results to skip in next batch.
+                more: bool. If True, there are (probably) more results after
+                    this batch. If False, there are no further results
+                    after this batch.
+        """
+
+        sort_options_dict = {
+            SortChoices.SORT_KEY_INCREASING_LAST_ACTIVITY.value:
+                -cls.last_contribution_date,
+            SortChoices.SORT_KEY_DECREASING_LAST_ACTIVITY.value:
+                cls.last_contribution_date,
+            SortChoices.SORT_KEY_INCREASING_PERFORMANCE.value:
+                cls.recent_performance,
+            SortChoices.SORT_KEY_DECREASING_PERFORMANCE.value:
+                -cls.recent_performance,
+            SortChoices.SORT_KEY_DECREASING_ACCURACY.value:
+                -cls.overall_accuracy,
+            SortChoices.SORT_KEY_INCREASING_ACCURACY.value:
+                cls.overall_accuracy,
+            SortChoices.SORT_KEY_DECREASING_SUBMISSIONS.value:
+                -cls.submitted_questions_count,
+            SortChoices.SORT_KEY_INCREASING_SUBMISSIONS.value:
+                cls.submitted_questions_count
+        }
+
+        sort = -cls.recent_performance
+        if sort_by is not None:
+            sort = sort_options_dict[sort_by]
+
+        # The first sort property must be the same as the property to which
+        # an inequality filter is applied. Thus, the inequality filter on
+        # last_activity can not be used here and we have implemented it
+        # separately below. Learn more about this here:
+        # https://cloud.google.com/appengine/docs/legacy/standard/go111/datastore/query-restrictions#properties_used_in_inequality_filters_must_be_sorted_first.
+        if topic_ids is not None:
+            sort_query = cls.query(
+                datastore_services.all_of(
+                    cls.topic_ids_with_question_submissions.IN(topic_ids)
+                )).order(sort)
+        else:
+            sort_query = cls.get_all().order(sort)
+
+        sorted_results: List[
+            QuestionSubmitterTotalContributionStatsModel] = []
+        today = datetime.date.today()
+
+        if max_days_since_last_activity is not None:
+            last_date = today - datetime.timedelta(
+                days=max_days_since_last_activity)
+            next_offset = offset
+            while len(sorted_results) < page_size:
+                result_models: Sequence[
+                    QuestionSubmitterTotalContributionStatsModel] = (
+                    sort_query.fetch(
+                        NUM_MODELS_PER_FETCH, offset=next_offset))
+                if not result_models:
+                    break
+                for result_model in result_models:
+                    next_offset += 1
+                    if result_model.last_contribution_date >= last_date:
+                        sorted_results.append(result_model)
+                        if len(sorted_results) == page_size:
+                            break
+        else:
+            sorted_results = list(sort_query.fetch(page_size, offset=offset))
+            next_offset = offset + len(sorted_results)
+
+        # Check whether we have more results.
+        next_result_model: Sequence[
+            QuestionSubmitterTotalContributionStatsModel] = (
+                sort_query.fetch(offset=next_offset))
+        more: bool = len(next_result_model) != 0
+
+        return (
+            sorted_results,
+            next_offset,
+            more
+        )
+
+    @classmethod
+    def get_deletion_policy(cls) -> base_models.DELETION_POLICY:
+        """Model contains data corresponding to a user: contributor_id."""
+        return base_models.DELETION_POLICY.DELETE
+
+    @staticmethod
+    def get_model_association_to_user(
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+        """Model is exported as single instances per user."""
+        return base_models.MODEL_ASSOCIATION_TO_USER.ONE_INSTANCE_PER_USER
+
+    @classmethod
+    def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
+        """Model contains data to export corresponding to a user."""
+        return dict(super(cls, cls).get_export_policy(), **{
+            # User ID is not exported in order to keep internal ids private.
+            'contributor_id':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'topic_ids_with_question_submissions':
+                base_models.EXPORT_POLICY.EXPORTED,
+            'recent_review_outcomes':
+                base_models.EXPORT_POLICY.EXPORTED,
+            'recent_performance':
+                base_models.EXPORT_POLICY.EXPORTED,
+            'overall_accuracy':
+                base_models.EXPORT_POLICY.EXPORTED,
+            'submitted_questions_count':
+                base_models.EXPORT_POLICY.EXPORTED,
+            'accepted_questions_count':
+                base_models.EXPORT_POLICY.EXPORTED,
+            'accepted_questions_without_reviewer_edits_count':
+                base_models.EXPORT_POLICY.EXPORTED,
+            'rejected_questions_count':
+                base_models.EXPORT_POLICY.EXPORTED,
+            'first_contribution_date':
+                base_models.EXPORT_POLICY.EXPORTED,
+            'last_contribution_date':
+                base_models.EXPORT_POLICY.EXPORTED
+        })
+
+    @classmethod
+    def apply_deletion_policy(cls, user_id: str) -> None:
+        """Delete instances of QuestionSubmitterTotalContributionStatsModel
+        for the user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be deleted.
+        """
+        datastore_services.delete_multi(
+            cls.query(cls.contributor_id == user_id).fetch(keys_only=True))
+
+    @classmethod
+    def export_data(
+        cls, user_id: str
+    ) -> Dict[str, Dict[str, Union[str, int, List[str]]]]:
+        """Exports the data from QuestionSubmitterTotalContributionStatsModel
+        into dict format for Takeout.
+
+        Args:
+            user_id: str. The ID of the user whose data should be exported.
+
+        Returns:
+            dict. Dictionary of the data from
+            QuestionSubmitterTotalContributionStatsModel.
+        """
+        user_data = {}
+        stats_models: Sequence[QuestionSubmitterTotalContributionStatsModel] = ( # pylint: disable=line-too-long
+            cls.get_all().filter(cls.contributor_id == user_id).fetch())
+        for model in stats_models:
+            user_data = {
+                'topic_ids_with_question_submissions': (
+                    model.topic_ids_with_question_submissions),
+                'recent_review_outcomes': (
+                    model.recent_review_outcomes),
+                'recent_performance': (
+                    model.recent_performance),
+                'overall_accuracy': (
+                    model.overall_accuracy),
+                'submitted_questions_count': (
+                    model.submitted_questions_count),
+                'accepted_questions_count': (
+                    model.accepted_questions_count),
+                'accepted_questions_without_reviewer_edits_count': (
+                    model.accepted_questions_without_reviewer_edits_count),
+                'rejected_questions_count': (
+                    model.rejected_questions_count),
+                'first_contribution_date': (
+                    model.first_contribution_date.isoformat()),
+                'last_contribution_date': (
+                    model.last_contribution_date.isoformat())
+            }
+        return user_data
+
+
+class QuestionReviewerTotalContributionStatsModel(base_models.BaseModel):
+    """Records the question review stats for contributor admin dashboard.
+    There is one instance of this model per contributor_id.
+    Its ID is same as the user_id of the contributor.
+    """
+
+    # The user ID of the question reviewer.
+    contributor_id = datastore_services.StringProperty(
+        required=True, indexed=True)
+    # The topic ID(s) to which user has at least one contribution.
+    topic_ids_with_question_reviews = datastore_services.StringProperty(
+        repeated=True, indexed=True)
+    # The number of reviewed questions.
+    reviewed_questions_count = datastore_services.IntegerProperty(
+        required=True, indexed=True)
+    # The number of accepted questions.
+    accepted_questions_count = datastore_services.IntegerProperty(
+        required=True, indexed=True)
+    # The number of accepted questions with reviewer edits.
+    accepted_questions_with_reviewer_edits_count = (
+        datastore_services.IntegerProperty(required=True, indexed=True))
+    # The number of rejected questions.
+    rejected_questions_count = datastore_services.IntegerProperty(
+        required=True, indexed=True)
+    # The first date that the reviewer made a question review.
+    first_contribution_date = datastore_services.DateProperty(indexed=True)
+    # The last date that the reviewer made a question review.
+    last_contribution_date = datastore_services.DateProperty(indexed=True)
+
+    @classmethod
+    def create(
+        cls,
+        contributor_id: str,
+        topic_ids_with_question_reviews: List[str],
+        reviewed_questions_count: int,
+        accepted_questions_count: int,
+        accepted_questions_with_reviewer_edits_count: int,
+        rejected_questions_count: int,
+        first_contribution_date: datetime.date,
+        last_contribution_date: datetime.date
+    ) -> str:
+        """Creates a new QuestionReviewerTotalContributionStatsModel
+        instance and returns its ID.
+
+        Args:
+            contributor_id: str. The user ID of the contributor.
+            topic_ids_with_question_reviews: List[str]. The topic ID(s)
+                of the topics for which the contributor has at least one
+                review.
+            reviewed_questions_count: int. The number of reviewed
+                questions.
+            accepted_questions_count: int. The number of accepted
+                questions.
+            accepted_questions_with_reviewer_edits_count: int.
+                The number of accepted questions with reviewer edits.
+            rejected_questions_count: int. The number of rejected
+                questions.
+            first_contribution_date: datetime.date. The unique first date of
+                the question suggestions.
+            last_contribution_date: datetime.date. The unique last date of
+                the question suggestions.
+
+        Returns:
+            str. The ID of the model created.
+        """
+        entity = cls(
+            id=contributor_id,
+            contributor_id=contributor_id,
+            topic_ids_with_question_reviews=topic_ids_with_question_reviews,
+            reviewed_questions_count=reviewed_questions_count,
+            accepted_questions_count=accepted_questions_count,
+            accepted_questions_with_reviewer_edits_count=(
+                accepted_questions_with_reviewer_edits_count),
+            rejected_questions_count=rejected_questions_count,
+            first_contribution_date=first_contribution_date,
+            last_contribution_date=last_contribution_date)
+        entity.update_timestamps()
+        entity.put()
+        return contributor_id
+
+    @classmethod
+    def has_reference_to_user_id(cls, user_id: str) -> bool:
+        """Check whether QuestionReviewerTotalContributionStatsModel references
+        the supplied user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be checked.
+
+        Returns:
+            bool. Whether any models refer to the given user ID.
+        """
+        return cls.query(
+            cls.contributor_id == user_id
+        ).get(keys_only=True) is not None
+
+    @classmethod
+    def fetch_page(
+        cls,
+        page_size: int,
+        offset: int,
+        sort_by: Optional[SortChoices.value],
+        max_days_since_last_activity: Optional[int]
+    ) -> Tuple[Sequence[QuestionReviewerTotalContributionStatsModel],
+                int,
+                bool]:
+        """Returns the models according to values specified.
+
+        Args:
+            page_size: int. Number of models to fetch.
+            offset: int. Number of results to skip from the beginning of all
+                results matching the query.
+            sort_by: SortChoices|None. A string indicating how to sort the
+                result.
+            max_days_since_last_activity: int|None. To get number of users
+                who are active in max_days_since_last_activity.
+
+        Returns:
+            3-tuple(sorted_results, next_offset, more). where:
+                sorted_results:
+                    list(QuestionReviewerTotalContributionStatsModel).
+                    The list of models which match the supplied
+                    max_days_since_last_activity filters,
+                    returned in the order specified by sort_by.
+                next_offset: int. Number of results to skip in next batch.
+                more: bool. If True, there are (probably) more results after
+                    this batch. If False, there are no further results
+                    after this batch.
+        """
+
+        sort_options_dict = {
+            SortChoices.SORT_KEY_INCREASING_LAST_ACTIVITY.value:
+                -cls.last_contribution_date,
+            SortChoices.SORT_KEY_DECREASING_LAST_ACTIVITY.value:
+                cls.last_contribution_date,
+            SortChoices.SORT_KEY_INCREASING_REVIEWED_QUESTIONS.value:
+                cls.reviewed_questions_count,
+            SortChoices.SORT_KEY_DECREASING_REVIEWED_QUESTIONS.value:
+                -cls.reviewed_questions_count
+        }
+
+        sort = -cls.reviewed_questions_count
+        if sort_by is not None:
+            sort = sort_options_dict[sort_by]
+
+        # The first sort property must be the same as the property to which
+        # an inequality filter is applied. Thus, the inequality filter on
+        # last_activity can not be used here and we have implemented it
+        # separately below. Learn more about this here:
+        # https://cloud.google.com/appengine/docs/legacy/standard/go111/datastore/query-restrictions#properties_used_in_inequality_filters_must_be_sorted_first.
+        sort_query = cls.get_all().order(sort)
+
+        sorted_results: List[
+            QuestionReviewerTotalContributionStatsModel] = []
+        today = datetime.date.today()
+
+        if max_days_since_last_activity is not None:
+            last_date = today - datetime.timedelta(
+                days=max_days_since_last_activity)
+            next_offset = offset
+            while len(sorted_results) < page_size:
+                result_models: Sequence[
+                    QuestionReviewerTotalContributionStatsModel] = (
+                    sort_query.fetch(
+                        NUM_MODELS_PER_FETCH, offset=next_offset))
+                if not result_models:
+                    break
+                for result_model in result_models:
+                    next_offset += 1
+                    if result_model.last_contribution_date >= last_date:
+                        sorted_results.append(result_model)
+                        if len(sorted_results) == page_size:
+                            break
+        else:
+            sorted_results = list(sort_query.fetch(page_size, offset=offset))
+            next_offset = offset + len(sorted_results)
+
+        # Check whether we have more results.
+        next_result_model: Sequence[
+            QuestionReviewerTotalContributionStatsModel] = (
+                sort_query.fetch(1, offset=next_offset))
+        more: bool = len(next_result_model) != 0
+
+        return (
+            sorted_results,
+            next_offset,
+            more
+        )
+
+    @classmethod
+    def get_deletion_policy(cls) -> base_models.DELETION_POLICY:
+        """Model contains data corresponding to a user: contributor_id."""
+        return base_models.DELETION_POLICY.DELETE
+
+    @staticmethod
+    def get_model_association_to_user(
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+        """Model is exported as single instances per user."""
+        return base_models.MODEL_ASSOCIATION_TO_USER.ONE_INSTANCE_PER_USER
+
+    @classmethod
+    def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
+        """Model contains data to export corresponding to a user."""
+        return dict(super(cls, cls).get_export_policy(), **{
+            # User ID is not exported in order to keep internal ids private.
+            'contributor_id':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'topic_ids_with_question_reviews':
+                base_models.EXPORT_POLICY.EXPORTED,
+            'reviewed_questions_count':
+                base_models.EXPORT_POLICY.EXPORTED,
+            'accepted_questions_count':
+                base_models.EXPORT_POLICY.EXPORTED,
+            'accepted_questions_with_reviewer_edits_count':
+                base_models.EXPORT_POLICY.EXPORTED,
+            'rejected_questions_count':
+                base_models.EXPORT_POLICY.EXPORTED,
+            'first_contribution_date':
+                base_models.EXPORT_POLICY.EXPORTED,
+            'last_contribution_date':
+                base_models.EXPORT_POLICY.EXPORTED
+        })
+
+    @classmethod
+    def apply_deletion_policy(cls, user_id: str) -> None:
+        """Delete instances of QuestionReviewerTotalContributionStatsModel
+        for the user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be deleted.
+        """
+        datastore_services.delete_multi(
+            cls.query(cls.contributor_id == user_id).fetch(keys_only=True))
+
+    @classmethod
+    def export_data(
+        cls, user_id: str
+    ) -> Dict[str, Dict[str, Union[str, int, List[str]]]]:
+        """Exports the data from QuestionReviewerTotalContributionStatsModel
+        into dict format for Takeout.
+
+        Args:
+            user_id: str. The ID of the user whose data should be exported.
+
+        Returns:
+            dict. Dictionary of the data from
+            QuestionReviewerTotalContributionStatsModel.
+        """
+        user_data = {}
+        stats_models: Sequence[QuestionReviewerTotalContributionStatsModel] = (
+            cls.get_all().filter(cls.contributor_id == user_id).fetch())
+        for model in stats_models:
+            user_data = {
+                'topic_ids_with_question_reviews': (
+                    model.topic_ids_with_question_reviews),
+                'reviewed_questions_count': (
+                    model.reviewed_questions_count),
+                'accepted_questions_count': (
+                    model.accepted_questions_count),
+                'accepted_questions_with_reviewer_edits_count': (
+                    model.accepted_questions_with_reviewer_edits_count),
+                'rejected_questions_count': (
+                    model.rejected_questions_count),
+                'first_contribution_date': (
+                    model.first_contribution_date.isoformat()),
+                'last_contribution_date': (
+                    model.last_contribution_date.isoformat())
+            }
+        return user_data
+
+
+class TranslationCoordinatorsModel(base_models.BaseModel):
+    """Storage model for rights related to translation coordinator.
+
+    The id of each instance is the id of the corresponding language (the
+    ISO 639-1 language code).
+    """
+
+    # The user_ids of the coordinators of this language.
+    coordinator_ids = datastore_services.StringProperty(
+        indexed=True, repeated=True)
+
+    # The number of coordinators of this language. This property is added to
+    # enable the sorting of datastore query results. It is equal to the
+    # length of the coordinator_ids field.
+    # TODO(#18762): Add a validate method in domain layer to verify that the
+    # coordinators_count equals the length of coordinator_ids.
+    coordinators_count = datastore_services.IntegerProperty(
+        indexed=True, required=True)
+
+    @staticmethod
+    def get_deletion_policy() -> base_models.DELETION_POLICY:
+        """Model contains data to pseudonymize or delete corresponding
+        to a user: coordinator_ids field.
+        """
+        return base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE
+
+    @classmethod
+    def has_reference_to_user_id(cls, user_id: str) -> bool:
+        """Check whether TranslationCoordinatorsModel references user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be checked.
+
+        Returns:
+            bool. Whether any models refer to the given user ID.
+        """
+        return cls.query(
+            cls.coordinator_ids == user_id
+        ).get(keys_only=True) is not None
+
+    @staticmethod
+    def get_model_association_to_user(
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+        """Model is exported as one instance shared across users since multiple
+        users can coordinate a single language.
+        """
+        return (
+            base_models
+            .MODEL_ASSOCIATION_TO_USER
+            .ONE_INSTANCE_SHARED_ACROSS_USERS)
+
+    @classmethod
+    def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
+        """Model contains data to export corresponding to a user."""
+        return dict(super(cls, cls).get_export_policy(), **{
+            'coordinator_ids': base_models.EXPORT_POLICY.EXPORTED,
+            'coordinators_count': base_models.EXPORT_POLICY.NOT_APPLICABLE
+        })
+
+    @classmethod
+    def get_field_name_mapping_to_takeout_keys(cls) -> Dict[str, str]:
+        """Defines the mapping of field names to takeout keys since this model
+        is exported as one instance shared across users.
+        """
+        return {
+            'coordinator_ids': 'coordinated_language_ids'
+        }
+
+    @classmethod
+    def export_data(cls, user_id: str) -> Dict[str, List[str]]:
+        """(Takeout) Export user-relevant properties of
+        TranslationCoordinatorsModel.
+
+        Args:
+            user_id: str. The user_id denotes which user's data to extract.
+
+        Returns:
+            dict. The user-relevant properties of TranslationCoordinatorsModel
+            in a dict format. In this case, we are returning all the ids of the
+            languages this user coordinates.
+        """
+        coordinated_languages = cls.get_all().filter(
+            cls.coordinator_ids == user_id)
+        coordinated_language_ids = [
+            language.id for language in coordinated_languages]
+
+        return {
+            'coordinated_language_ids': coordinated_language_ids
+        }
+
+    @classmethod
+    def get_by_user(cls, user_id: str) -> Sequence[
+        TranslationCoordinatorsModel
+    ]:
+        """Retrieves the rights object for all languages assigned to given user
+
+        Args:
+            user_id: str. ID of user.
+
+        Returns:
+            list(TranslationCoordinatorsModel). The list of
+            TranslationCoordinatorsModel objects in which the given user is a
+            coordinator.
+        """
+        return cls.query(cls.coordinator_ids == user_id).fetch()
