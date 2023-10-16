@@ -36,6 +36,7 @@ jobs:
             fi
           done
           echo ---Dev-server is not started after all retries---
+          make logs.dev-server
           exit 1
 
       - name: copy node_modules
