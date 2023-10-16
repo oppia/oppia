@@ -46,7 +46,7 @@ jobs:
         run: |
           sudo rm -rf /usr/share/dotnet
           sudo rm -rf "$AGENT_TOOLSDIRECTORY"
-      - name: Build Webpack
+      - name: Build Webpack and Angular bundles
         # run: python -m scripts.build --prod_env
         run: |
           sudo make build
@@ -195,11 +195,11 @@ jobs:
             ${{ runner.os }}-build-${{ env.cache-name }}-
             ${{ runner.os }}-build-
             ${{ runner.os }}-
-      - name: (Artifact re-build) Build Webpack
-        if: steps.download_artifact_1.outcome == 'failure'
-        run: python -m scripts.build --prod_env
+      # - name: (Artifact re-build) Build Webpack
+      #   if: steps.download_artifact_1.outcome == 'failure'
+      #   run: python -m scripts.build --prod_env
       - name: Run E2E Test ${{ matrix.suite }}
-        run: xvfb-run -a --server-args="-screen 0, 1285x1000x24" make run_tests.e2e suite=${{ matrix.suite }} prod_env=true
+        run: sudo xvfb-run -a --server-args="-screen 0, 1285x1000x24" make run_tests.e2e suite=${{ matrix.suite }} prod_env=true
         env:
           VIDEO_RECORDING_IS_ENABLED: 0
       - name: Uploading webdriverio-video as Artifacts
