@@ -137,25 +137,6 @@ _PARSER.add_argument(
     help='optional; if specified, display the output of the tests being run',
     action='store_true')
 
-def install_third_party_libraries(
-        test_target: bool, skip_install: bool) -> None:
-    """Run the installation script.
-
-    Args:
-        test_target: bool. Whether a test target is specified.
-        skip_install: bool. Whether to skip running the installation script.
-    """
-    if skip_install and not test_target:
-        raise Exception(
-            'The --skip-install flag should only be used when running a single '
-            'test module. Please specify a test module using the --test_target '
-            'flag.')
-
-    # Installing third-party Oppia dependencies is unnecessary
-    # when running the test with the --test_target flag.
-    if not (test_target and skip_install):
-        install_third_party_libs.main()
-
 def run_shell_cmd(
     exe: List[str],
     stdout: int = subprocess.PIPE,
@@ -496,8 +477,14 @@ def main(args: Optional[List[str]] = None) -> None:
     """Run the tests."""
     parsed_args = _PARSER.parse_args(args=args)
 
-    install_third_party_libraries(
-        parsed_args.test_target, parsed_args.skip_install)
+    if not parsed_args.skip_install:
+        install_third_party_libs.main()
+    else:
+        if parsed_args.skip_install and not parsed_args.test_target:
+            raise Exception(
+                'The --skip-install flag should only be used when running a single '
+                'test module. Please specify a test module using the --test_target '
+                'flag.')
 
     for directory in common.DIRS_TO_ADD_TO_SYS_PATH:
         if not os.path.exists(os.path.dirname(directory)):
