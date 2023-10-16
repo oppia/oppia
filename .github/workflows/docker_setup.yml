@@ -28,14 +28,17 @@ jobs:
         run: |
           for i in {1..50}; do
             if curl -s http://localhost:8181/; then
-              echo ---Dev-server is up---
+              echo "---Dev-server is up---"
               exit 0
             else
-              echo ---Retrying in 30 seconds---
+              echo "---Retrying in 30 seconds---"
+              if [[ -n $(docker ps -q -f status=exited -f name=webpack-compiler) ]]; then
+                docker compose exec dev-server python -m scripts.generate_build_directory
+              fi
               sleep 30
             fi
           done
-          echo ---Dev-server is not started after all retries---
+          echo "---Dev-server is not started after all retries---"
           make logs.dev-server
           exit 1
 
