@@ -49,16 +49,13 @@ jobs:
       - name: Build Webpack
         # run: python -m scripts.build --prod_env
         run: |
-          echo "step 1"
+          sudo make build
           docker compose up angular-build -d
           sudo docker cp oppia-angular-build:/app/oppia/node_modules .
           make stop
-          echo "step 2"
           prod_env=true docker compose up dev-server -d --no-deps
-          echo "step 3"
           prod_env=true docker compose up webpack-compiler
           prod_env=true docker compose up angular-build
-          echo "step 4"
           docker compose exec dev-server python -m scripts.generate_build_directory
       - name: Stopping Containers
         run: make stop
