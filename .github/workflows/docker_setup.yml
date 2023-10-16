@@ -21,8 +21,8 @@ jobs:
       - name: Start Containers
         run: |
           echo ---Starting Containers---
-          prod_env=true docker compose up angular-build -d
-          prod_env=true docker compose up -d
+          docker compose up angular-build -d
+          docker compose up -d
 
       - name: Checking server reachability
         run: |
@@ -32,14 +32,10 @@ jobs:
               exit 0
             else
               echo "---Retrying in 30 seconds---"
-              if [[ -n $(docker ps -q -f status=exited -f name=webpack-compiler) ]]; then
-                docker compose exec dev-server python -m scripts.generate_build_directory
-              fi
               sleep 30
             fi
           done
           echo "---Dev-server is not started after all retries---"
-          make logs.dev-server
           exit 1
 
       - name: copy node_modules
