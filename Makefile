@@ -109,7 +109,7 @@ run_tests.backend: ## Runs the backend tests
 	$(MAKE) stop
 
 run_tests.frontend: ## Runs the frontend unit tests
-	docker compose run --no-deps --entrypoint "python -m scripts.run_frontend_tests $(PYTHON_ARGS)" dev-server
+	docker compose run --no-deps --entrypoint "python -m scripts.run_frontend_tests $(PYTHON_ARGS) --skip_install" dev-server
 
 run_tests.typescript: ## Runs the typescript checks
 	docker compose run --no-deps --entrypoint "python -m scripts.typescript_checks" dev-server
