@@ -23,7 +23,7 @@
   </p>
 </ng-template>
 
-<mat-card class="oppia-editor-card-with-avatar">
+<mat-card class="oppia-editor-card-with-avatar oppia-editor-card-with-avatar-sticky">
   <div class="state-content-header-container" (click)="toggleConceptCard()">
     <div class="state-content-header oppia-mobile-collapsible-card-header">
       <h3 class="oppia-exp-content-card-header">Content</h3>
@@ -39,8 +39,8 @@
   </div>
   <div class="oppia-mobile-collapsible-card-content" *ngIf="conceptCardIsShown"  joyrideStep="editorTabTourContentEditorTab" [stepContent]="ContentEditorTab">
     <div class="oppia-editor-card-body oppia-editor-concept-container">
-      <img *ngIf="!windowIsNarrow" [src]="oppiaBlackImgUrl" alt="" class="oppia-editor-card-avatar">
-      <div id="tutorialStateContent" class="oppia-editor-card-section state-content-editor-parent-container">
+      <img *ngIf="!windowIsNarrow" [src]="oppiaBlackImgUrl" alt="" class="oppia-editor-card-avatar" [ngClass]="{'oppia-editor-card-avatar-sticky': isSticky}">
+      <div id="tutorialStateContent" class="oppia-editor-card-section" [ngClass]="{'state-content-editor-parent-container': !isSticky}">
         <oppia-state-content-editor class="e2e-test-state-content-editor"
                                     (saveStateContent)="sendOnSaveStateContent($event)"
                                     [stateContentPlaceholder]="stateContentPlaceholder"
@@ -93,6 +93,16 @@
 </div>
 
 <style>
+  .oppia-editor-card-with-avatar-sticky {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+  }
+
+  .oppia-editor-card-avatar-sticky {
+    top: 15px;
+  }
+
   .state-content-header-container {
     display: none;
     padding: 0 30px;

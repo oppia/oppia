@@ -100,6 +100,9 @@ export class QuestionSuggestionReviewModalComponent
   @Output() editSuggestionEmitter = (
     new EventEmitter<QuestionSuggestionModalValue>());
 
+  @Output() scrollEvent = new EventEmitter<boolean>();
+
+
   // These properties below are initialized using Angular lifecycle hooks
   // where we need to do non-null assertion. For more information see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
@@ -147,6 +150,16 @@ export class QuestionSuggestionReviewModalComponent
   ) {
     super(ngbActiveModal);
   }
+
+  handleScroll(event: Event): void {
+    const element = event.target as HTMLElement;
+    if (element.scrollTop > 50) {
+      this.scrollEvent.emit(true);
+    } else {
+      this.scrollEvent.emit(false);
+    }
+  }
+
 
   cancel(): void {
     this.suggestionModalService.cancelSuggestion(this.ngbActiveModal);
