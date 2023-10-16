@@ -52,9 +52,9 @@ jobs:
           echo "step 1"
           prod_env=true docker compose up dev-server --no-deps -d
           echo "step 2"
-          prod_env=true docker compose up angular-build -d
+          prod_env=true docker compose up angular-build
           echo "step 3"
-          prod_env=true docker compose up webpack-compiler -d
+          prod_env=true docker compose up webpack-compiler
           echo "step 4"
           docker compose exec dev-server python -m scripts.generate_build_directory
           make stop
