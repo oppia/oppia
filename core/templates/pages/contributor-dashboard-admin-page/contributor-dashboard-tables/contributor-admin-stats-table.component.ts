@@ -94,8 +94,8 @@ export class ContributorAdminStatsTable implements OnInit {
   TAB_NAME_QUESTION_COORDINATOR: string = 'Question Coordinator';
   loadingMessage!: string;
   noDataMessage!: string;
-  itemsPerPageChoice: number[] = [1, 2, 3];
-  itemsPerPage: number = 1;
+  itemsPerPageChoice: number[] = [20, 50, 100];
+  itemsPerPage: number = 20;
   statsPageNumber: number = 0;
   MOVE_TO_NEXT_PAGE: string = 'next_page';
   MOVE_TO_PREV_PAGE: string = 'prev_page';
