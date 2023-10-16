@@ -171,10 +171,18 @@ jobs:
         working-directory: /home/runner/work/oppia
         shell: bash
       # - uses: ./.github/actions/install-oppia-dependencies
+      - name: Install Python deps
+        run: |
+          pip install --require-hashes --no-deps -r requirements.txt
+          pip install --require-hashes --no-deps -r requirements_dev.txt
       - name: Install chrome
         run: python -m scripts.install_chrome_for_ci
       - name: Install ffmpeg
         run: sudo apt install ffmpeg
+      - name: Deleting ubuntu files
+        run: |
+          sudo rm -rf /usr/share/dotnet
+          sudo rm -rf "$AGENT_TOOLSDIRECTORY"
       - name: (Artifact re-build) Cache third_party/static
         if: steps.download_artifact_1.outcome == 'failure'
         uses: actions/cache@v3
