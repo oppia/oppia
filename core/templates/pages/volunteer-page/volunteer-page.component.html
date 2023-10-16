@@ -272,14 +272,17 @@
     </div>
   </div>
 
-  <div class="oppia-volunteer-footer">
-    <p [innerHTML]="'I18N_VOLUNTEER_PAGE_FOOTER' | translate"></p>
+  <div class="oppia-volunteer-footer"
+       [style.background-image]="'url(' + getStaticImageUrl(getWebpExtendedName(footerImgPath)) + '), url(' + getStaticImageUrl(footerImgPath) + ')'"
+       [style.background-position]="'center center'"
+       [style.background-size]="'cover'">
+    <p>{{ 'I18N_VOLUNTEER_PAGE_FOOTER' | translate }}</p>
 
     <button class="btn">
       <a href="https://forms.gle/rhFYoLLSFr3JEZHy8"
          target="_blank"
-         rel="noopener"
-         [innerHTML]="'I18N_VOLUNTEER_PAGE_FOOTER_BUTTON' | translate">
+         rel="noopener">
+         {{ 'I18N_VOLUNTEER_PAGE_FOOTER_BUTTON' | translate }}
       </a>
     </button>
   </div>
@@ -301,7 +304,7 @@
   }
 
   .oppia-volunteer-h3 {
-    color: #fff;
+    color: #333333;
     font-family: "Capriola", "Roboto", Arial, sans-serif;
     font-size: 1.3em;
     margin: 3em auto;
@@ -327,7 +330,7 @@
   }
 
   .oppia-section-why-volunteer {
-    background-color: #edf6f6;
+    background-color: #EEEEEE;
     padding: 2em;
   }
 
@@ -495,9 +498,13 @@
     text-align: center;
   }
 
-  .oppia-volunteer-footer p,button {
+  .oppia-volunteer-footer p {
     text-align: center;
     width: 100%;
+  }
+
+  .oppia-volunteer-footer button {
+    width: 50%;
   }
 
   @media screen and (max-width: 440px) {
