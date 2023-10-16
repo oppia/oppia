@@ -21,8 +21,8 @@ jobs:
       - name: Start Containers
         run: |
           echo ---Starting Containers---
-          docker compose up angular-build -d
-          docker compose up -d
+          prod_env=true docker compose up angular-build -d
+          prod_env=true docker compose up -d
 
       - name: Checking server reachability
         run: |

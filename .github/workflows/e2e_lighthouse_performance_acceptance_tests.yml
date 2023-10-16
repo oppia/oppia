@@ -53,7 +53,7 @@ jobs:
           docker compose up angular-build -d
           make stop
       - name: Initialize server in prod mode
-        run: make run-offline prod_env=true
+        run: make run-offli
       - name: Stop the server
         run: make stop
       - name: Zip build files
