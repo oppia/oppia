@@ -980,7 +980,7 @@
     "I18N_LOGOUT_LOADING": "Logging out",
     "I18N_LOGOUT_PAGE_BROWSER_TAB_TITLE": "Logout | Oppia",
     "I18N_LOGOUT_PAGE_TITLE": "Logout",
-    "I18N_MATH_COURSE_DETAILS": "Oppia’s curated math foundations course teaches the basic building blocks of math, covering essential concepts like addition, multiplication and fractions. Once you have mastered these basic concepts, you can move onto more advanced lessons! Each topic builds on the previous one, so you can start from the beginning and complete the lessons from any skill level, or just dive right in if you need help on a particular topic.",
+    "I18N_MATH_COURSE_DETAILS": "Oppia’s math courses teach the basics of math, covering concepts like addition, multiplication and fractions. Once you master these basic concepts, you can move on to more advanced lessons! Each topic builds on the previous one, so you can start from the beginning and complete the lessons from any skill level, or just dive right in if you need help on a particular topic.",
     "I18N_MATH_TOPICS_COVERED": "Start from the basics with our first topic, Place Values. Or, if you want to brush up on a specific subject, jump to any topic and dive in!",
     "I18N_MODAL_CANCEL_BUTTON": "Cancel",
     "I18N_MODAL_CONTINUE_BUTTON": "Continue",
