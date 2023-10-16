@@ -41,9 +41,9 @@ jobs:
       - name: Build Webpack
         # run: python -m scripts.build --prod_env
         run: |
+          prod_env=true docker compose up dev-server --no-deps -d
           prod_env=true docker compose up angular-build -d
           prod_env=true docker compose up webpack-compiler -d
-          prod_env=true docker compose up dev-server --no-deps -d
           docker compose exec dev-sercer python -m scripts.generate_build_directory
       - name: Zip build files
         # We avoid using ../ or absolute paths because unzip treats these as
