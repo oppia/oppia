@@ -137,6 +137,7 @@ _PARSER.add_argument(
     help='optional; if specified, display the output of the tests being run',
     action='store_true')
 
+
 def run_shell_cmd(
     exe: List[str],
     stdout: int = subprocess.PIPE,
@@ -482,9 +483,9 @@ def main(args: Optional[List[str]] = None) -> None:
     else:
         if parsed_args.skip_install and not parsed_args.test_target:
             raise Exception(
-                'The --skip-install flag should only be used when running a single '
-                'test module. Please specify a test module using the --test_target '
-                'flag.')
+                'The --skip-install flag should only be used when running '
+                'a single test module. Please specify a test module using '
+                'the --test_target flag.')
 
     for directory in common.DIRS_TO_ADD_TO_SYS_PATH:
         if not os.path.exists(os.path.dirname(directory)):
