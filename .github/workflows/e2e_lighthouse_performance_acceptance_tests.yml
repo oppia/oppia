@@ -34,6 +34,10 @@ jobs:
             ${{ runner.os }}-build-
             ${{ runner.os }}-
       # - uses: ./.github/actions/install-oppia-dependencies
+      - name: Install Python deps
+        run: |
+          pip install --require-hashes --no-deps -r requirements.txt
+          pip install --require-hashes --no-deps -r requirements_dev.txt
       - name: Install chrome
         run: python -m scripts.install_chrome_for_ci
       - name: Install ffmpeg
