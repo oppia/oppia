@@ -376,7 +376,7 @@ export class ConversationSkinComponent {
 
             // If the user is a guest, has completed this exploration
             // within the context of a collection, and the collection is
-            // whitelisted, record their temporary progress.
+            // allowlisted, record their temporary progress.
 
             if (this.doesCollectionAllowsGuestProgress(
               this.collectionId) && !this.isLoggedIn) {
@@ -498,13 +498,13 @@ export class ConversationSkinComponent {
   }
 
   doesCollectionAllowsGuestProgress(collectionId: string | never): boolean {
-    let whiteListedCollectionIds = (
+    let allowedCollectionIds = (
       AppConstants.
-        WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS
+        ALLOWED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS
     );
     return (
       (
-        whiteListedCollectionIds as readonly[]
+        allowedCollectionIds as readonly[]
       ).
         indexOf(collectionId as never) !== -1);
   }

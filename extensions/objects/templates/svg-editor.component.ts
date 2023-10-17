@@ -363,7 +363,7 @@ export class SvgEditorComponent implements OnInit {
     });
     const elements = svg.querySelectorAll('*');
     // Fabric js adds vector-effect as an attribute which is not part of
-    // the svg attribute whitelist, so here it is removed
+    // the svg attribute allowlist, so here it is removed
     // and added as part of the style attribute.
     for (let i = 0; i < elements.length; i++) {
       if (
