@@ -460,7 +460,7 @@ var StoryEditorPage = function() {
 
   this.publishNodes = async function(chapterIndex) {
     await action.select(
-      'Publish Up to Chapter Dropdown',
+      'Publish up to Chapter Dropdown',
       publishUptoChaptersDropdownSelector, Number(chapterIndex) + 1);
     await action.click('Publish Chapters Button', publishChapterButton);
   };
