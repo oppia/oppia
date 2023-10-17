@@ -38,6 +38,7 @@ import { ContributorAdminDashboardPageComponent } from './contributor-admin-dash
 import { ContributorAdminStatsTable } from './contributor-dashboard-tables/contributor-admin-stats-table.component';
 import { platformFeatureInitFactory, PlatformFeatureService } from 'services/platform-feature.service';
 import { SmartRouterModule } from 'hybrid-router-module-provider';
+import { TopicFilterComponent } from './topic-filter/topic-filter.component';
 import { ToastrModule } from 'ngx-toastr';
 import { MyHammerConfig, toastrConfig } from 'pages/oppia-root/app.module';
 import { AppErrorHandlerProvider } from 'pages/oppia-root/app-error-handler';
@@ -62,12 +63,14 @@ import { AppErrorHandlerProvider } from 'pages/oppia-root/app-error-handler';
   declarations: [
     ContributorDashboardAdminNavbarComponent,
     ContributorAdminDashboardPageComponent,
-    ContributorAdminStatsTable
+    ContributorAdminStatsTable,
+    TopicFilterComponent
   ],
   entryComponents: [
     ContributorDashboardAdminNavbarComponent,
     ContributorAdminDashboardPageComponent,
-    ContributorAdminStatsTable
+    ContributorAdminStatsTable,
+    TopicFilterComponent
   ],
   providers: [
     {
