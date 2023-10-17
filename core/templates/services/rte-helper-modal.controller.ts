@@ -318,13 +318,24 @@ export class RteHelperModalComponent {
         name: "video_id" | "start" | "end" | "autoplay";
       }
     >[];
-    let start: number = tmpCustomizationArgs[1].value;
-    let end: number = tmpCustomizationArgs[2].value;
-
-    if (start > end) {
-      return true;
+    let start: number = 0;
+    let end: number = 0;
+  
+    for (const arg of tmpCustomizationArgs) {
+      if (arg.name === "start") {
+        if (typeof arg.value === 'number') {
+          start = arg.value;
+        }
+      } else if (arg.name === "end") {
+        if (typeof arg.value === 'number') {
+          end = arg.value;
+        }
+      }
     }
-    return false;
+    if (start === 0 && end === 0) {
+      return false;
+    }
+    return start >= end;
   }
 
   save(): void {
