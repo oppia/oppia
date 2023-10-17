@@ -90,6 +90,8 @@ export class StateEditorComponent implements OnInit, OnDestroy {
   servicesInitialized: boolean = false;
   currentInteractionCanHaveSolution: boolean = false;
   conceptCardIsShown: boolean = true;
+  isSticky: boolean = false;
+
 
   constructor(
     private stateCardIsCheckpointService: StateCardIsCheckpointService,
@@ -106,6 +108,11 @@ export class StateEditorComponent implements OnInit, OnDestroy {
     private urlInterpolationService: UrlInterpolationService,
     private windowDimensionsService: WindowDimensionsService,
   ) { }
+
+
+  onChildScroll(sticky: boolean): void {
+    this.isSticky = sticky;
+  }
 
   sendRecomputeGraph(): void {
     this.recomputeGraph.emit();

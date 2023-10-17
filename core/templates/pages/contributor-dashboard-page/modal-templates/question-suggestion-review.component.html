@@ -20,20 +20,23 @@
 </div>
 
 <div class="modal-body">
+  <section class="oppia-suggestion-review-container">
   <div class="oppia-question-details questionSuggestionDiv" (scroll)="handleScroll($event)" tabindex="0">
-    <strong class="oppia-difficulty-title">
-      Selected Difficulty: {{skillDifficultyLabel}}
-    </strong>
-    <div *ngIf="skillRubricExplanations.length > 0">
-      <strong class="oppia-skill-rubrics"
-              title="Use these notes to make sure your question is at the right difficulty.">
-        Notes from Skill Rubric
+    <div class="oppia-question-suggestion">
+      <strong class="oppia-difficulty-title">
+        Selected Difficulty: {{skillDifficultyLabel}}
       </strong>
-      <ul>
-        <li *ngFor="let explanation of skillRubricExplanations">
-          <span class="oppia-skill-explanation" [innerHtml]="explanation"></span>
-        </li>
-      </ul>
+      <div *ngIf="skillRubricExplanations.length > 0">
+        <strong class="oppia-skill-rubrics"
+                title="Use these notes to make sure your question is at the right difficulty.">
+          Notes from Skill Rubric
+        </strong>
+        <ul>
+          <li *ngFor="let explanation of skillRubricExplanations">
+            <span class="oppia-skill-explanation" [innerHtml]="explanation"></span>
+          </li>
+        </ul>
+      </div>
     </div>
   </div>
   <div *ngIf="showQuestion">
@@ -46,6 +49,7 @@
                            tabindex="0">
     </oppia-question-editor>
   </div>
+  </section>
   <section [hidden]="!reviewable"
            class="oppia-reviewer-actions">
     <div class="oppia-suggestion-review-message">
@@ -110,6 +114,36 @@
 </div>
 
 <style>
+
+  /*This one makes it sticky */
+  .modal-header {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    background-color: white; /* To ensure content doesn't show behind the header */
+  }
+
+  .oppia-suggestion-review-container {
+    height: 1300px;
+    padding-bottom: 0;
+    padding-top: 0;
+  }
+
+
+  .oppia-editor-card-with-avatar-sticky {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+  }
+  .oppia-editor-card-avatar-sticky {
+    top: 15px;
+  }
+
+  /*Doest not seems to do anything */
+  .modal-header .oppia-question-header {
+    margin-top: 0;
+  }
+
   .oppia-close-button-position {
     font-size: 2.5rem;
     position: absolute;
@@ -181,7 +215,7 @@
   }
   .oppia-question-suggestion {
     height: 100%;
-    overflow: scroll;
+    overflow: auto;
   }
   .oppia-reviewer-actions {
     border-top: 1px solid #e5e5e5;
@@ -213,9 +247,7 @@
       display: block;
       font-size: 20px;
     }
-    .modal-header {
-      padding-bottom: 0;
-    }
+
     .oppia-question-header {
       display: none;
     }
