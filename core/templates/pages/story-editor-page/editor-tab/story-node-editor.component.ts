@@ -501,7 +501,7 @@ export class StoryNodeEditorComponent implements OnInit, OnDestroy {
   }
 
   onSaveButtonClicked(): void {
-    this.outlineEditViewIsShown = this.oldOutline.replace(/<.+?>/g, "");
+    this.outlineEditViewIsShown = this.oldOutline;
     this.chapterOutlineIsShown = false;
   }
 
