@@ -36,23 +36,10 @@ export interface LanguageChoice {
   id: string;
   language: string;
 }
-
 export interface TopicChoice {
   id: string;
   topic: string;
 }
-
-
-export interface LanguageChoice {
-  id: string;
-  language: string;
-}
-
-export interface TopicChoice {
-  id: string;
-  topic: string;
-}
-
 @Component({
   selector: 'contributor-admin-dashboard-page',
   styleUrls: ['./contributor-admin-dashboard-page.component.css'],
@@ -163,6 +150,10 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
                   languageItem) =>
                 response.includes(languageItem.id));
               this.selectedLanguage = this.languageChoices[0];
+              if (!this.selectedLanguage) {
+                throw new Error(
+                  'No languages are assigned to user.');
+              }
               this.translationReviewersCount = (
                 this.translationReviewersCountByLanguage[
                   this.selectedLanguage.id]);
@@ -173,22 +164,6 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
           this.TAB_NAME_QUESTION_SUBMITTER,
           this.TAB_NAME_QUESTION_REVIEWER);
       }
-
-      this.contributorDashboardAdminStatsBackendApiService
-        .fetchAssignedLanguageIds(username).then(
-          response => {
-            this.languageChoices = this.languageChoices.filter((
-                languageItem) =>
-              response.includes(languageItem.id));
-            this.selectedLanguage = this.languageChoices[0];
-            if (!this.selectedLanguage) {
-              throw new Error(
-                'No languages are assigned to user.');
-            }
-            this.translationReviewersCount = (
-              this.translationReviewersCountByLanguage[
-                this.selectedLanguage.id]);
-          });
 
       this.filter = new ContributorAdminDashboardFilter(
         [],

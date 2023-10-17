@@ -339,7 +339,7 @@ describe('Contributor stats component', () => {
     beforeEach(() => {
     });
 
-    it('should open question role editor modal and return not' +
+    it('should open question role editor modal and return changed value of' +
       ' translation submitter', fakeAsync(() => {
       const removeRightsSpy = spyOn(
         contributorDashboardAdminBackendApiService,
@@ -362,7 +362,6 @@ describe('Contributor stats component', () => {
         can_review_translation_for_language_codes: [],
         can_review_voiceover_for_language_codes: []
       }));
-
       let modalSpy = spyOn(ngbModal, 'open').and.callFake(() => {
         return ({
           componentInstance: MockNgbModalRef,
@@ -372,14 +371,16 @@ describe('Contributor stats component', () => {
           })
         }) as NgbModalRef;
       });
+
       component.openRoleEditor('user1');
       tick();
+
       expect(modalSpy).toHaveBeenCalledWith(CdAdminQuestionRoleEditorModal);
       expect(removeRightsSpy).toHaveBeenCalled();
     }));
 
-    it('should open question role editor modal and return not' +
-      ' translation reviewer', fakeAsync(() => {
+    it('should open question role editor modal and return false changed' +
+      ' value of translation reviewer', fakeAsync(() => {
       const removeRightsSpy = spyOn(
         contributorDashboardAdminBackendApiService,
         'removeContributionReviewerAsync');
@@ -401,7 +402,6 @@ describe('Contributor stats component', () => {
         can_review_translation_for_language_codes: [],
         can_review_voiceover_for_language_codes: []
       }));
-
       let modalSpy = spyOn(ngbModal, 'open').and.callFake(() => {
         return ({
           componentInstance: MockNgbModalRef,
@@ -411,14 +411,16 @@ describe('Contributor stats component', () => {
           })
         }) as NgbModalRef;
       });
+
       component.openRoleEditor('user1');
       tick();
+
       expect(modalSpy).toHaveBeenCalledWith(CdAdminQuestionRoleEditorModal);
       expect(removeRightsSpy).toHaveBeenCalled();
     }));
 
-    it('should open question role editor modal and return is' +
-      ' translation reviewer', fakeAsync(() => {
+    it('should open question role editor modal and return true changed' +
+      ' value of translation reviewer', fakeAsync(() => {
       const addRightsSpy = spyOn(
         contributorDashboardAdminBackendApiService,
         'addContributionReviewerAsync');
@@ -440,7 +442,6 @@ describe('Contributor stats component', () => {
         can_review_translation_for_language_codes: [],
         can_review_voiceover_for_language_codes: []
       }));
-
       let modalSpy = spyOn(ngbModal, 'open').and.callFake(() => {
         return ({
           componentInstance: MockNgbModalRef,
@@ -450,14 +451,16 @@ describe('Contributor stats component', () => {
           })
         }) as NgbModalRef;
       });
+
       component.openRoleEditor('user1');
       tick();
+
       expect(modalSpy).toHaveBeenCalledWith(CdAdminQuestionRoleEditorModal);
       expect(addRightsSpy).toHaveBeenCalled();
     }));
 
-    it('should open question role editor modal and return is' +
-      ' translation submitter', fakeAsync(() => {
+    it('should open question role editor modal and return true changed' +
+      ' value of translation submitter', fakeAsync(() => {
       const addRightsSpy = spyOn(
         contributorDashboardAdminBackendApiService,
         'addContributionReviewerAsync');
@@ -479,7 +482,6 @@ describe('Contributor stats component', () => {
         can_review_translation_for_language_codes: [],
         can_review_voiceover_for_language_codes: []
       }));
-
       let modalSpy = spyOn(ngbModal, 'open').and.callFake(() => {
         return ({
           componentInstance: MockNgbModalRef,
@@ -489,8 +491,10 @@ describe('Contributor stats component', () => {
           })
         }) as NgbModalRef;
       });
+
       component.openRoleEditor('user1');
       tick();
+
       expect(modalSpy).toHaveBeenCalledWith(CdAdminQuestionRoleEditorModal);
       expect(addRightsSpy).toHaveBeenCalled();
     }));
@@ -514,14 +518,15 @@ describe('Contributor stats component', () => {
         can_review_translation_for_language_codes: [],
         can_review_voiceover_for_language_codes: []
       }));
-
       let modalSpy = spyOn(ngbModal, 'open').and.callFake(() => {
         return ({
           componentInstance: MockNgbModalRef
         }) as NgbModalRef;
       });
+
       component.openRoleEditor('user1');
       tick();
+
       expect(modalSpy).toHaveBeenCalledWith(CdAdminTranslationRoleEditorModal);
     }));
   });

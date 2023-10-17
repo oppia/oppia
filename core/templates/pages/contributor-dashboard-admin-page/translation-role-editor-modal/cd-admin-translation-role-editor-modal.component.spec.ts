@@ -70,7 +70,7 @@ describe('CdAdminTranslationRoleEditorModal', () => {
     component.ngOnInit();
   });
 
-  it('should update topic ids for selection on initialization', () => {
+  it('should update language ids for selection on initialization', () => {
     component.languageIdsForSelection = [];
 
     component.ngOnInit();
@@ -83,12 +83,12 @@ describe('CdAdminTranslationRoleEditorModal', () => {
       component.ngOnInit();
     });
 
-    it('should make request to add topic', fakeAsync(() => {
+    it('should make request to add language', fakeAsync(() => {
       spyOn(
         contributorDashboardAdminBackendApiService,
         'addContributionReviewerAsync'
       ).and.resolveTo();
-      component.newLanguageId = 'en';
+      component.selectedLanguageId = 'en';
 
       component.addLanguage();
       expect(component.languageIdInUpdate).toEqual('en');
@@ -106,7 +106,7 @@ describe('CdAdminTranslationRoleEditorModal', () => {
         Promise.reject());
       spyOn(alertsService, 'addWarning').and.callThrough();
 
-      component.newLanguageId = 'en';
+      component.selectedLanguageId = 'en';
 
       component.addLanguage();
       tick();
@@ -114,12 +114,12 @@ describe('CdAdminTranslationRoleEditorModal', () => {
       expect(alertsService.addWarning).toHaveBeenCalled();
     }));
 
-    it('should throw error if no more topic left', fakeAsync(() => {
-      component.newLanguageId = null;
+    it('should throw error if no more language left', fakeAsync(() => {
+      component.selectedLanguageId = null;
 
       expect(() => {
         component.addLanguage();
-      }).toThrowError('Expected newLanguageId to be non-null.');
+      }).toThrowError('Expected selectedLanguageId to be non-null.');
     }));
   });
 
@@ -128,7 +128,7 @@ describe('CdAdminTranslationRoleEditorModal', () => {
       component.ngOnInit();
     });
 
-    it('should make request to remove topic', fakeAsync(() => {
+    it('should make request to remove language', fakeAsync(() => {
       spyOn(
         contributorDashboardAdminBackendApiService,
         'removeContributionReviewerAsync').and.resolveTo();

@@ -63,8 +63,8 @@ describe('CdAdminQuestionRoleEditorModal', () => {
     fixture.detectChanges();
     component.ngOnInit();
 
-    expect(component.isQuestionSubmitter).toBeTrue();
-    expect(component.isQuestionReviewer).toBeFalse();
+    expect(component.rights.isQuestionSubmitter).toBeTrue();
+    expect(component.rights.isQuestionReviewer).toBeFalse();
   });
 
   it('should properly toggle Question Submitter checkbox', () => {
@@ -77,10 +77,10 @@ describe('CdAdminQuestionRoleEditorModal', () => {
 
     component.toggleQuestionSubmitter();
 
-    expect(component.isQuestionSubmitter).toBeFalse();
+    expect(component.rights.isQuestionSubmitter).toBeFalse();
   });
 
-  it('should properly toggle Question Reviwer checkbox', () => {
+  it('should properly toggle Question reviewer checkbox', () => {
     component.rights = {
       isQuestionSubmitter: true,
       isQuestionReviewer: false
@@ -90,10 +90,10 @@ describe('CdAdminQuestionRoleEditorModal', () => {
 
     component.toggleQuestionReviewer();
 
-    expect(component.isQuestionSubmitter).toBeTrue();
+    expect(component.rights.isQuestionSubmitter).toBeTrue();
   });
 
-  it('should save and close modal with returning rights', () => {
+  it('should save and close modal and return selected rights', () => {
     component.rights = {
       isQuestionSubmitter: true,
       isQuestionReviewer: false

@@ -13,13 +13,13 @@
 // limitations under the License.
 
 /**
- * @fileoverview Component for editing user roles.
+ * @fileoverview Component for editing a user's question contribution rights.
  */
 
 import { Component, OnInit, Input } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 
-export interface questionRights {
+export interface QuestionRights {
     isQuestionSubmitter: boolean;
     isQuestionReviewer: boolean;
 }
@@ -33,36 +33,23 @@ export class CdAdminQuestionRoleEditorModal implements OnInit {
 // and we need to do non-null assertion. For more information, see
 // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() username!: string;
-  @Input() rights!: questionRights;
-  @Input() loadingMessage: string = 'Loading';
-  isQuestionSubmitter!: boolean;
-  isQuestionReviewer!: boolean;
+  @Input() rights!: QuestionRights;
 
   constructor(
     private activeModal: NgbActiveModal,
   ) {}
 
-  ngOnInit(): void {
-    if (this.rights) {
-      this.isQuestionSubmitter = this.rights.isQuestionSubmitter;
-      this.isQuestionReviewer = this.rights.isQuestionReviewer;
-      this.loadingMessage = '';
-    }
-  }
+  ngOnInit(): void {}
 
   toggleQuestionSubmitter(): void {
-    this.isQuestionSubmitter = !this.isQuestionSubmitter;
+    this.rights.isQuestionSubmitter = !this.rights.isQuestionSubmitter;
   }
 
   toggleQuestionReviewer(): void {
-    this.isQuestionReviewer = !this.isQuestionReviewer;
+    this.rights.isQuestionReviewer = !this.rights.isQuestionReviewer;
   }
 
   saveAndClose(): void {
-    this.rights = {
-      isQuestionSubmitter: this.isQuestionSubmitter,
-      isQuestionReviewer: this.isQuestionReviewer
-    };
     this.activeModal.close(this.rights);
   }
 

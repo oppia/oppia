@@ -172,7 +172,7 @@ export class ContributorAdminStatsTable implements OnInit {
         modalRef.componentInstance.username = username;
         modalRef.componentInstance.assignedLanguageIds = (
           response.can_review_translation_for_language_codes);
-        let languageIdToName: Record<string, string> = {};
+        const languageIdToName: Record<string, string> = {};
         constants.SUPPORTED_AUDIO_LANGUAGES.forEach(
           language => languageIdToName[language.id] = language.description);
         modalRef.componentInstance.languageIdToName = languageIdToName;

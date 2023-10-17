@@ -4,7 +4,7 @@
 <div class="modal-body">
   <div class="modal-body">
     <p *ngIf="assignedLanguageIds.length">User has review rights in the following languages:</p>
-    <p *ngIf="!assignedLanguageIds.length">Please assign user to atleast one language:</p>
+    <p *ngIf="!assignedLanguageIds.length">Please assign user to at least one language for user to be translation reviewer:</p>
     <ul>
       <li *ngFor="let languageId of assignedLanguageIds">
         <div class="d-flex justify-content-between">
@@ -24,7 +24,7 @@
     <div>Add Language:</div>
     <div *ngIf="languageIdsForSelection.length">
       <div class="d-inline-flex mt-3 w-100 language-dropdown">
-        <select class="w-50 e2e-test-language-selector" placeholder="Select new language to add" label="Language selector" ngbAutofocus [(ngModel)]="newLanguageId">
+        <select class="w-50 e2e-test-language-selector" placeholder="Select new language to add" label="Language selector" ngbAutofocus [(ngModel)]="selectedLanguageId">
           <option *ngFor="let languageId of languageIdsForSelection" [value]="languageId">{{ languageIdToName[languageId] }}</option>
         </select>
         <button mat-icon-button color="primary" (click)="addLanguage()" class="e2e-test-language-selector-add-button">
@@ -38,7 +38,7 @@
   </div>
 </div>
 <div class="modal-footer">
-  <button type="button" class="cancel-button" (click)="close()"> save and Close</button>
+  <button type="button" class="cancel-button" (click)="close()">Close</button>
 </div>
 
 <style>
