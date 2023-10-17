@@ -423,8 +423,11 @@ class ReviewableOpportunitiesHandler(
                 topic.id
             )
 
-        exp_opp_summaries = (opportunity_services.
-            get_exploration_opportunity_summaries_by_ids(exp_ids))
+        exp_opp_summaries = (
+            opportunity_services.get_exploration_opportunity_summaries_by_ids(
+                exp_ids
+            )
+        )
 
         # If there is a pinned opportunity summary,
         # add it to the list of opportunities at the top.
