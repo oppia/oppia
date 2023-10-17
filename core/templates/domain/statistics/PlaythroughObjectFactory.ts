@@ -29,7 +29,7 @@ import {
   EarlyQuitCustomizationArgs,
   CyclicStateTransitionsCustomizationArgs,
   MultipleIncorrectSubmissionsCustomizationArgs
-} from 'domain/statistics/PlaythroughIssueObjectFactory';
+} from 'domain/statistics/playthrough-issue.model';
 
 // NOTE TO DEVELOPERS: Treat this as an implementation detail; do not export it.
 // This type takes one of the values of the customization args based
