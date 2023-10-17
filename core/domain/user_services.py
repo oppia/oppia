@@ -2541,7 +2541,6 @@ def get_contributor_usernames(
     if (
         category in (
             constants.CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION,
-            constants.CD_USER_RIGHTS_CATEGORY_REVIEW_VOICEOVER
         ) and language_code is None
     ):
         raise Exception(
@@ -2554,12 +2553,6 @@ def get_contributor_usernames(
         user_ids = (
             user_models.UserContributionRightsModel
             .get_translation_reviewer_user_ids(language_code))
-    elif category == constants.CD_USER_RIGHTS_CATEGORY_REVIEW_VOICEOVER:
-        # Ruling out the possibility of None for mypy type checking.
-        assert language_code is not None
-        user_ids = (
-            user_models.UserContributionRightsModel
-            .get_voiceover_reviewer_user_ids(language_code))
     elif category == constants.CD_USER_RIGHTS_CATEGORY_REVIEW_QUESTION:
         if language_code is not None:
             raise Exception('Expected language_code to be None, found: %s' % (

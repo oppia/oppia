@@ -6018,11 +6018,10 @@ export default {
   "MIN_CHOICES_IN_MULTIPLE_CHOICE_INPUT_REGULAR_EXP": 2,
 
   "CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION": "review_translation",
-  "CD_USER_RIGHTS_CATEGORY_REVIEW_VOICEOVER": "review_voiceover",
   "CD_USER_RIGHTS_CATEGORY_REVIEW_QUESTION": "review_question",
   "CD_USER_RIGHTS_CATEGORY_SUBMIT_QUESTION": "submit_question",
   "CD_USER_RIGHTS_CATEGORIES": [
-    "translation", "voiceover", "question", "submit_question"
+    "translation", "question", "submit_question"
   ],
 
   "SUGGESTIONS_SORT_KEY_DATE": "Date",

@@ -192,7 +192,6 @@ class ContributionRightsHandler(
 
         assert category in (
                 constants.CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION,
-                constants.CD_USER_RIGHTS_CATEGORY_REVIEW_VOICEOVER,
                 constants.CD_USER_RIGHTS_CATEGORY_REVIEW_QUESTION,
                 constants.CD_USER_RIGHTS_CATEGORY_SUBMIT_QUESTION,
         )
@@ -264,7 +263,6 @@ class ContributionRightsHandler(
 
         assert category in (
                 constants.CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION,
-                constants.CD_USER_RIGHTS_CATEGORY_REVIEW_VOICEOVER,
                 constants.CD_USER_RIGHTS_CATEGORY_REVIEW_QUESTION,
                 constants.CD_USER_RIGHTS_CATEGORY_SUBMIT_QUESTION
         )

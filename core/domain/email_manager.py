@@ -71,15 +71,6 @@ NEW_CD_USER_EMAIL_DATA: Dict[str, Dict[str, str]] = {
             'review translation suggestions made by contributors in the %s '
             'language')
     },
-    constants.CD_USER_RIGHTS_CATEGORY_REVIEW_VOICEOVER: {
-        'task': 'review',
-        'category': 'voiceovers',
-        'to_review': 'voiceover applications',
-        'description_template': '%s language voiceovers',
-        'rights_message_template': (
-            'review voiceover applications made by contributors in the %s '
-            'language')
-    },
     constants.CD_USER_RIGHTS_CATEGORY_REVIEW_QUESTION: {
         'task': 'review',
         'category': 'questions',
@@ -104,14 +95,6 @@ REMOVED_CD_USER_EMAIL_DATA: Dict[str, Dict[str, str]] = {
         'rights_message_template': (
             'review translation suggestions made by contributors in the %s '
             'language'),
-    },
-    constants.CD_USER_RIGHTS_CATEGORY_REVIEW_VOICEOVER: {
-        'category': 'voiceover',
-        'role_description_template': (
-            'voiceover reviewer role in the %s language'),
-        'rights_message_template': (
-            'review voiceover applications made by contributors in the %s '
-            'language')
     },
     constants.CD_USER_RIGHTS_CATEGORY_REVIEW_QUESTION: {
         'category': 'question',
@@ -2219,14 +2202,15 @@ def send_email_to_new_cd_user(
 
     Args:
         recipient_id: str. The ID of the user.
-        category: str. The category in which user can review or submit contributions.
-        language_code: None|str. The language code for a language if the review
-            item is translation or voiceover else None.
+        category: str. The category in which user can review or submit 
+            contributions.
+        language_code: None|str. The language code for a language if 
+            the category is 'translation' else None.
 
     Raises:
         Exception. The contribution category is not valid.
         Exception. The language_code cannot be None if the 
-            contribution category is 'translation' or 'voiceover'.
+            category is 'translation'.
     """
     if category not in NEW_CD_USER_EMAIL_DATA:
         raise Exception(
@@ -2242,12 +2226,11 @@ def send_email_to_new_cd_user(
 
     if category in [
             constants.CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION,
-            constants.CD_USER_RIGHTS_CATEGORY_REVIEW_VOICEOVER
         ]:
         if language_code is None:
             raise Exception(
                 'The language_code cannot be None if the review category is'
-                ' \'translation\' or \'voiceover\''
+                ' \'translation\''
             )
         language_description = utils.get_supported_audio_language_description(
             language_code).capitalize()
@@ -2271,8 +2254,6 @@ def send_email_to_new_cd_user(
     recipient_username = user_services.get_username(recipient_id)
     if category in [
             constants.CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION,
-            constants.CD_USER_RIGHTS_CATEGORY_REVIEW_VOICEOVER,
-            constants.CD_USER_RIGHTS_CATEGORY_REVIEW_VOICEOVER,
             constants.CD_USER_RIGHTS_CATEGORY_REVIEW_QUESTION
         ]:
         to_review = category_data['to_review']
@@ -2293,7 +2274,6 @@ def send_email_to_new_cd_user(
     elif category in [
                 constants.CD_USER_RIGHTS_CATEGORY_SUBMIT_QUESTION
                 ]:
-        to_submit = category_data['to_submit']
         email_body_template = (
             'Hi %s,<br><br>'
             'This is to let you know that the Oppia team has added you as a '
@@ -2329,14 +2309,15 @@ def send_email_to_removed_cd_user(
 
     Args:
         user_id: str. The ID of the user.
-        category: str. The category in which user can no longer review or submit contributions
+        category: str. The category in which user can no longer review or 
+            submit contributions.
         language_code: None|str. The language code for a language if the review
-            item is translation or voiceover else None.
+            item is translation else None.
 
     Raises:
         Exception. The contribution category is not valid.
         Exception. The language_code cannot be None if the review category is
-            'translation' or 'voiceover'.
+            'translation'.
     """
     if category not in REMOVED_CD_USER_EMAIL_DATA:
         raise Exception(
@@ -2355,11 +2336,11 @@ def send_email_to_removed_cd_user(
 
     if category in [
             constants.CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION,
-            constants.CD_USER_RIGHTS_CATEGORY_REVIEW_VOICEOVER]:
+        ]:
         if language_code is None:
             raise Exception(
                 'The language_code cannot be None if the review category is'
-                ' \'translation\' or \'voiceover\''
+                ' \'translation\''
             )
         language_description = utils.get_supported_audio_language_description(
             language_code).capitalize()

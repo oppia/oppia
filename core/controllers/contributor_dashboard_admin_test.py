@@ -116,7 +116,7 @@ class ContributionRightsHandlerTest(test_utils.GenericTestBase):
 
         csrf_token = self.get_new_csrf_token()
         response = self.post_json(
-            '/contributionrightshandler/translation', {
+            '/contributionrightshandler/review_translation', {
                 'username': 'invalid',
                 'language_code': 'en'
             }, csrf_token=csrf_token, expected_status_int=400)
@@ -133,7 +133,7 @@ class ContributionRightsHandlerTest(test_utils.GenericTestBase):
 
         csrf_token = self.get_new_csrf_token()
         self.post_json(
-            '/contributionrightshandler/translation', {
+            '/contributionrightshandler/review_translation', {
                 'username': 'translator',
                 'language_code': 'hi'
             }, csrf_token=csrf_token)
@@ -148,7 +148,7 @@ class ContributionRightsHandlerTest(test_utils.GenericTestBase):
 
         csrf_token = self.get_new_csrf_token()
         response = self.post_json(
-            '/contributionrightshandler/translation', {
+            '/contributionrightshandler/review_translation', {
                 'username': 'translator',
             },
             csrf_token=csrf_token,
@@ -161,7 +161,7 @@ class ContributionRightsHandlerTest(test_utils.GenericTestBase):
         )
 
         response = self.delete_json(
-            '/contributionrightshandler/translation', params={
+            '/contributionrightshandler/review_translation', params={
                 'username': 'translator'
             },
             expected_status_int=500
@@ -182,7 +182,7 @@ class ContributionRightsHandlerTest(test_utils.GenericTestBase):
                 self.translation_reviewer_id, language_code='hi'))
         csrf_token = self.get_new_csrf_token()
         self.post_json(
-            '/contributionrightshandler/translation', {
+            '/contributionrightshandler/review_translation', {
                 'username': 'translator',
                 'language_code': 'hi'
             }, csrf_token=csrf_token)
@@ -190,7 +190,7 @@ class ContributionRightsHandlerTest(test_utils.GenericTestBase):
             user_services.can_review_translation_suggestions(
                 self.translation_reviewer_id, language_code='hi'))
         response = self.post_json(
-            '/contributionrightshandler/translation', {
+            '/contributionrightshandler/review_translation', {
                 'username': 'translator',
                 'language_code': 'hi'
             }, csrf_token=csrf_token, expected_status_int=400)
@@ -208,7 +208,7 @@ class ContributionRightsHandlerTest(test_utils.GenericTestBase):
 
         csrf_token = self.get_new_csrf_token()
         self.post_json(
-            '/contributionrightshandler/question', {
+            '/contributionrightshandler/review_question', {
                 'username': 'question'
             }, csrf_token=csrf_token)
 
@@ -224,14 +224,14 @@ class ContributionRightsHandlerTest(test_utils.GenericTestBase):
         self.login(self.QUESTION_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
         response = self.post_json(
-            '/contributionrightshandler/question', {
+            '/contributionrightshandler/review_question', {
                 'username': 'question'
             }, csrf_token=csrf_token)
         self.assertTrue(user_services.can_review_question_suggestions(
             self.question_reviewer_id))
 
         response = self.post_json(
-            '/contributionrightshandler/question', {
+            '/contributionrightshandler/review_question', {
                 'username': 'question'
             }, csrf_token=csrf_token, expected_status_int=400)
 
@@ -299,7 +299,7 @@ class ContributionRightsHandlerTest(test_utils.GenericTestBase):
         self.login(self.QUESTION_ADMIN_EMAIL)
 
         response = self.delete_json(
-            '/contributionrightshandler/question', params={
+            '/contributionrightshandler/review_question', params={
                 'username': 'invalid'
             }, expected_status_int=400)
 
@@ -316,7 +316,7 @@ class ContributionRightsHandlerTest(test_utils.GenericTestBase):
         self.login(self.TRANSLATION_ADMIN_EMAIL)
 
         self.delete_json(
-            '/contributionrightshandler/translation', params={
+            '/contributionrightshandler/review_translation', params={
                 'username': 'translator',
                 'language_code': 'hi'
             })
@@ -330,7 +330,7 @@ class ContributionRightsHandlerTest(test_utils.GenericTestBase):
                 self.translation_reviewer_id, language_code='hi'))
         self.login(self.TRANSLATION_ADMIN_EMAIL)
         response = self.delete_json(
-            '/contributionrightshandler/translation', params={
+            '/contributionrightshandler/review_translation', params={
                 'username': 'translator',
                 'language_code': 'hi'
             }, expected_status_int=400)
@@ -347,7 +347,7 @@ class ContributionRightsHandlerTest(test_utils.GenericTestBase):
 
         self.login(self.QUESTION_ADMIN_EMAIL)
         self.delete_json(
-            '/contributionrightshandler/question', params={
+            '/contributionrightshandler/review_question', params={
                 'username': 'question'
             })
 
@@ -360,7 +360,7 @@ class ContributionRightsHandlerTest(test_utils.GenericTestBase):
 
         self.login(self.QUESTION_ADMIN_EMAIL)
         response = self.delete_json(
-            '/contributionrightshandler/question', params={
+            '/contributionrightshandler/review_question', params={
                 'username': 'question'
             }, expected_status_int=400)
 

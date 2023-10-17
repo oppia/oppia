@@ -35,7 +35,6 @@ angular.module('oppia').directive('contributorDashboardAdminPage', [
   'PlatformFeatureService',
   'CD_USER_RIGHTS_CATEGORY_REVIEW_QUESTION',
   'CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION',
-  'CD_USER_RIGHTS_CATEGORY_REVIEW_VOICEOVER',
   'CD_USER_RIGHTS_CATEGORY_SUBMIT_QUESTION',
   'USER_FILTER_CRITERION_ROLE', 'USER_FILTER_CRITERION_USERNAME',
   function(
@@ -44,7 +43,6 @@ angular.module('oppia').directive('contributorDashboardAdminPage', [
       PlatformFeatureService,
       CD_USER_RIGHTS_CATEGORY_REVIEW_QUESTION,
       CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION,
-      CD_USER_RIGHTS_CATEGORY_REVIEW_VOICEOVER,
       CD_USER_RIGHTS_CATEGORY_SUBMIT_QUESTION,
       USER_FILTER_CRITERION_ROLE, USER_FILTER_CRITERION_USERNAME,) {
     return {
@@ -82,8 +80,7 @@ angular.module('oppia').directive('contributorDashboardAdminPage', [
 
         ctrl.isLanguageSpecificReviewCategory = function(reviewCategory) {
           return (
-            reviewCategory === CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION ||
-            reviewCategory === CD_USER_RIGHTS_CATEGORY_REVIEW_VOICEOVER);
+            reviewCategory === CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION);
         };
 
         ctrl.submitAddContributionRightsForm = function(formResponse) {

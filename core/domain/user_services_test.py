@@ -4067,23 +4067,6 @@ class UserContributionReviewRightsTests(test_utils.GenericTestBase):
                 constants.CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION
             )
 
-    def test_get_contributor_usernames_in_voiceover_category_returns_correctly(
-        self
-    ) -> None:
-        usernames = user_services.get_contributor_usernames(
-            constants.CD_USER_RIGHTS_CATEGORY_REVIEW_VOICEOVER,
-            language_code='hi')
-        self.assertEqual(usernames, [])
-
-        user_services.allow_user_to_review_voiceover_in_language(
-            self.voice_artist_id, 'hi')
-
-        usernames = user_services.get_contributor_usernames(
-            constants.CD_USER_RIGHTS_CATEGORY_REVIEW_VOICEOVER,
-            language_code='hi')
-
-        self.assertEqual(usernames, [self.VOICE_ARTIST_USERNAME])
-
     def test_get_contributor_usernames_with_invalid_category_raises(
         self
     ) -> None:
