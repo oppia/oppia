@@ -6294,7 +6294,7 @@ class ContributionReviewerEmailTest(test_utils.EmailTestBase):
         with self.can_not_send_emails_ctx:
             email_manager.send_email_to_new_cd_user(
                 self.translation_reviewer_id,
-                constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION,
+                constants.CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION,
                 language_code='hi')
 
         messages = self._get_sent_email_messages(
@@ -6311,7 +6311,7 @@ class ContributionReviewerEmailTest(test_utils.EmailTestBase):
             with self.can_not_send_emails_ctx:
                 email_manager.send_email_to_new_cd_user(
                     self.translation_reviewer_id,
-                    constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION
+                    constants.CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION
                 )
 
     def test_without_language_code_email_not_sent_to_removed_translation_reviewer(   # pylint: disable=line-too-long
@@ -6324,12 +6324,12 @@ class ContributionReviewerEmailTest(test_utils.EmailTestBase):
             with self.can_not_send_emails_ctx:
                 email_manager.send_email_to_removed_cd_user(
                     self.translation_reviewer_id,
-                    constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION)
+                    constants.CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION)
 
     def test_assign_translation_reviewer_email_for_invalid_category(
         self
     ) -> None:
-        with self.assertRaisesRegex(Exception, 'Invalid contribution_category'):
+        with self.assertRaisesRegex(Exception, 'Invalid category'):
             email_manager.send_email_to_new_cd_user(
                 self.translation_reviewer_id, 'invalid_category')
 
@@ -6337,10 +6337,10 @@ class ContributionReviewerEmailTest(test_utils.EmailTestBase):
         self.assertEqual(
             sorted(email_manager.NEW_CD_USER_EMAIL_DATA.keys()),
             [
-                constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION,
-                constants.CONTRIBUTION_RIGHT_CATEGORY_SUBMIT_QUESTION,
-                constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION,
-                constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER
+                constants.CD_USER_RIGHTS_CATEGORY_REVIEW_QUESTION,
+                constants.CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION,
+                constants.CD_USER_RIGHTS_CATEGORY_REVIEW_VOICEOVER,
+                constants.CD_USER_RIGHTS_CATEGORY_SUBMIT_QUESTION
             ])
         for category_details in (
             email_manager.NEW_CD_USER_EMAIL_DATA.values()
@@ -6349,11 +6349,12 @@ class ContributionReviewerEmailTest(test_utils.EmailTestBase):
             self.assertTrue(
                 'description' in category_details or (
                     'description_template' in category_details))
-            self.assertTrue('contribution_category' in category_details)
+            self.assertTrue('category' in category_details)
             self.assertTrue(
                 'rights_message' in category_details or (
                     'rights_message_template' in category_details))
-            self.assertTrue('to_contribute' in category_details)
+            self.assertTrue('to_review' in category_details or (
+                    'to_submit' in category_details))
 
     def test_send_assigned_translation_reviewer_email(self) -> None:
         expected_email_subject = (
@@ -6374,7 +6375,7 @@ class ContributionReviewerEmailTest(test_utils.EmailTestBase):
         with self.can_send_emails_ctx:
             email_manager.send_email_to_new_cd_user(
                 self.translation_reviewer_id,
-                constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION,
+                constants.CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION,
                 language_code='hi')
 
             # Make sure correct email is sent.
@@ -6423,7 +6424,7 @@ class ContributionReviewerEmailTest(test_utils.EmailTestBase):
         with self.can_send_emails_ctx:
             email_manager.send_email_to_new_cd_user(
                 self.voiceover_reviewer_id,
-                constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER,
+                constants.CD_USER_RIGHTS_CATEGORY_REVIEW_VOICEOVER,
                 language_code='hi')
 
             # Make sure correct email is sent.
@@ -6471,7 +6472,7 @@ class ContributionReviewerEmailTest(test_utils.EmailTestBase):
         with self.can_send_emails_ctx:
             email_manager.send_email_to_new_cd_user(
                 self.question_reviewer_id,
-                constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION,
+                constants.CD_USER_RIGHTS_CATEGORY_REVIEW_QUESTION,
                 language_code='hi')
 
             # Make sure correct email is sent.
@@ -6518,7 +6519,7 @@ class ContributionReviewerEmailTest(test_utils.EmailTestBase):
         with self.can_send_emails_ctx:
             email_manager.send_email_to_new_cd_user(
                 self.question_submitter_id,
-                constants.CONTRIBUTION_RIGHT_CATEGORY_SUBMIT_QUESTION,
+                constants.CD_USER_RIGHTS_CATEGORY_SUBMIT_QUESTION,
                 language_code='hi')
 
             # Make sure correct email is sent.
@@ -6551,7 +6552,7 @@ class ContributionReviewerEmailTest(test_utils.EmailTestBase):
         with self.can_not_send_emails_ctx:
             email_manager.send_email_to_removed_cd_user(
                 self.translation_reviewer_id,
-                constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION,
+                constants.CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION,
                 language_code='hi')
 
         messages = self._get_sent_email_messages(
@@ -6561,28 +6562,29 @@ class ContributionReviewerEmailTest(test_utils.EmailTestBase):
     def test_remove_translation_reviewer_email_for_invalid_category(
         self
     ) -> None:
-        with self.assertRaisesRegex(Exception, 'Invalid contribution_category'):
+        with self.assertRaisesRegex(Exception, 'Invalid category'):
             email_manager.send_email_to_removed_cd_user(
                 self.translation_reviewer_id, 'invalid_category')
 
     def test_schema_of_removed_reviewer_email_data_constant(self) -> None:
         self.assertEqual(
-            sorted(email_manager.REMOVED_CD_USER_EMAIL_DATA.keys()), [
-                constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION,
-                constants.CONTRIBUTION_RIGHT_CATEGORY_SUBMIT_QUESTION,
-                constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION,
-                constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER])
+            sorted(email_manager.REMOVED_CD_USER_EMAIL_DATA.keys()),
+                [
+                    constants.CD_USER_RIGHTS_CATEGORY_REVIEW_QUESTION,
+                    constants.CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION,
+                    constants.CD_USER_RIGHTS_CATEGORY_REVIEW_VOICEOVER,
+                    constants.CD_USER_RIGHTS_CATEGORY_SUBMIT_QUESTION,
+                ])
         for category_details in (
                 email_manager.REMOVED_CD_USER_EMAIL_DATA.values()):
-            self.assertEqual(len(category_details), 4)
+            self.assertEqual(len(category_details), 3)
             self.assertTrue(
                 'role_description' in category_details or (
                     'role_description_template' in category_details))
-            self.assertTrue('contribution_category' in category_details)
+            self.assertTrue('category' in category_details)
             self.assertTrue(
                 'rights_message' in category_details or (
                     'rights_message_template' in category_details))
-            self.assertTrue('contribution_allowed' in category_details)
 
     def test_send_removed_translation_reviewer_email(self) -> None:
         expected_email_subject = (
@@ -6602,7 +6604,7 @@ class ContributionReviewerEmailTest(test_utils.EmailTestBase):
         with self.can_send_emails_ctx:
             email_manager.send_email_to_removed_cd_user(
                 self.translation_reviewer_id,
-                constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION,
+                constants.CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION,
                 language_code='hi')
 
             # Make sure correct email is sent.
@@ -6649,7 +6651,7 @@ class ContributionReviewerEmailTest(test_utils.EmailTestBase):
         with self.can_send_emails_ctx:
             email_manager.send_email_to_removed_cd_user(
                 self.voiceover_reviewer_id,
-                constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER,
+                constants.CD_USER_RIGHTS_CATEGORY_REVIEW_VOICEOVER,
                 language_code='hi')
 
             # Make sure correct email is sent.
@@ -6694,7 +6696,7 @@ class ContributionReviewerEmailTest(test_utils.EmailTestBase):
         with self.can_send_emails_ctx:
             email_manager.send_email_to_removed_cd_user(
                 self.question_reviewer_id,
-                constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION,
+                constants.CD_USER_RIGHTS_CATEGORY_REVIEW_QUESTION,
                 language_code='hi')
 
             # Make sure correct email is sent.
@@ -6739,7 +6741,7 @@ class ContributionReviewerEmailTest(test_utils.EmailTestBase):
         with self.can_send_emails_ctx:
             email_manager.send_email_to_removed_cd_user(
                 self.question_submitter_id,
-                constants.CONTRIBUTION_RIGHT_CATEGORY_SUBMIT_QUESTION,
+                constants.CD_USER_RIGHTS_CATEGORY_SUBMIT_QUESTION,
                 language_code='hi')
 
             # Make sure correct email is sent.

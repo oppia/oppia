@@ -62,70 +62,66 @@ PlatformParameterRegistry = platform_parameter_registry.Registry
 
 
 NEW_CD_USER_EMAIL_DATA: Dict[str, Dict[str, str]] = {
-    constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION: {
+    constants.CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION: {
         'task': 'review',
-        'contribution_category': 'translations',
-        'to_contribute': 'translation suggestions',
+        'category': 'translations',
+        'to_review': 'translation suggestions',
         'description_template': '%s language translations',
         'rights_message_template': (
             'review translation suggestions made by contributors in the %s '
             'language')
     },
-    constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER: {
+    constants.CD_USER_RIGHTS_CATEGORY_REVIEW_VOICEOVER: {
         'task': 'review',
-        'contribution_category': 'voiceovers',
-        'to_contribute': 'voiceover applications',
+        'category': 'voiceovers',
+        'to_review': 'voiceover applications',
         'description_template': '%s language voiceovers',
         'rights_message_template': (
             'review voiceover applications made by contributors in the %s '
             'language')
     },
-    constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION: {
+    constants.CD_USER_RIGHTS_CATEGORY_REVIEW_QUESTION: {
         'task': 'review',
-        'contribution_category': 'questions',
-        'to_contribute': 'question suggestions',
+        'category': 'questions',
+        'to_review': 'question suggestions',
         'description': 'questions',
         'rights_message': 'review question suggestions made by contributors'
     },
-    constants.CONTRIBUTION_RIGHT_CATEGORY_SUBMIT_QUESTION: {
+    constants.CD_USER_RIGHTS_CATEGORY_SUBMIT_QUESTION: {
         'task': 'submit',
-        'contribution_category': 'questions',
-        'to_contribute': 'question suggestions',
+        'category': 'questions',
+        'to_submit': 'question suggestions',
         'description': 'questions',
         'rights_message': 'submit question suggestions'
     }
 }
 
 REMOVED_CD_USER_EMAIL_DATA: Dict[str, Dict[str, str]] = {
-    constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION: {
-        'contribution_category': 'translation',
+    constants.CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION: {
+        'category': 'translation',
         'role_description_template': (
             'translation reviewer role in the %s language'),
         'rights_message_template': (
             'review translation suggestions made by contributors in the %s '
             'language'),
-        'contribution_allowed': 'translations'
     },
-    constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER: {
-        'contribution_category': 'voiceover',
+    constants.CD_USER_RIGHTS_CATEGORY_REVIEW_VOICEOVER: {
+        'category': 'voiceover',
         'role_description_template': (
             'voiceover reviewer role in the %s language'),
         'rights_message_template': (
             'review voiceover applications made by contributors in the %s '
-            'language'),
-        'contribution_allowed': 'voiceovers'
+            'language')
     },
-    constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION: {
-        'contribution_category': 'question',
+    constants.CD_USER_RIGHTS_CATEGORY_REVIEW_QUESTION: {
+        'category': 'question',
         'role_description': 'question reviewer role',
         'rights_message': 'review question suggestions made by contributors',
-        'contribution_allowed': 'questions'
     },
-    constants.CONTRIBUTION_RIGHT_CATEGORY_SUBMIT_QUESTION: {
-        'contribution_category': 'question',
+    constants.CD_USER_RIGHTS_CATEGORY_SUBMIT_QUESTION: {
+        'category': 'question',
         'role_description': 'question submitter role',
-        'rights_message': 'submit question suggestions',
-        'contribution_allowed': 'questions'
+        'rights_message': 'submit question suggestions'
     }
 }
 
@@ -2215,7 +2211,7 @@ def send_account_deletion_failed_email(user_id: str, user_email: str) -> None:
 
 def send_email_to_new_cd_user(
     recipient_id: str,
-    contribution_category: str,
+    category: str,
     language_code: Optional[str] = None
 ) -> None:
     """Sends an email to user who is assigned rights to either
@@ -2223,7 +2219,7 @@ def send_email_to_new_cd_user(
 
     Args:
         recipient_id: str. The ID of the user.
-        contribution_category: str. The category in which user can contribute.
+        category: str. The category in which user can review or submit contributions.
         language_code: None|str. The language code for a language if the review
             item is translation or voiceover else None.
 
@@ -2232,22 +2228,22 @@ def send_email_to_new_cd_user(
         Exception. The language_code cannot be None if the 
             contribution category is 'translation' or 'voiceover'.
     """
-    if contribution_category not in NEW_CD_USER_EMAIL_DATA:
+    if category not in NEW_CD_USER_EMAIL_DATA:
         raise Exception(
-            'Invalid contribution_category: %s' % contribution_category
+            'Invalid category: %s' % category
             )
 
-    contribution_category_data = (
-        NEW_CD_USER_EMAIL_DATA[contribution_category])
+    category_data = (
+        NEW_CD_USER_EMAIL_DATA[category])
     email_subject = 'You have been invited to %s Oppia %s' % (
-                    contribution_category_data['task'],
-                    contribution_category_data['contribution_category']
+                    category_data['task'],
+                    category_data['category']
                     )
 
-    if contribution_category in [
-            constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION,
-            constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER
-            ]:
+    if category in [
+            constants.CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION,
+            constants.CD_USER_RIGHTS_CATEGORY_REVIEW_VOICEOVER
+        ]:
         if language_code is None:
             raise Exception(
                 'The language_code cannot be None if the review category is'
@@ -2255,17 +2251,17 @@ def send_email_to_new_cd_user(
             )
         language_description = utils.get_supported_audio_language_description(
             language_code).capitalize()
-        contribution_category_description = (
-            contribution_category_data['description_template'] %
+        category_description = (
+            category_data['description_template'] %
                 language_description)
-        contributor_rights_message = (
-            contribution_category_data['rights_message_template'] %
+        rights_message = (
+            category_data['rights_message_template'] %
                 (language_description))
     else:
-        contribution_category_description = (
-            contribution_category_data['description'])
-        contributor_rights_message = (
-            contribution_category_data['rights_message'])
+        category_description = (
+            category_data['description'])
+        rights_message = (
+            category_data['rights_message'])
 
     if not feconf.CAN_SEND_EMAILS:
         logging.error('This app cannot send emails to users.')
@@ -2273,14 +2269,13 @@ def send_email_to_new_cd_user(
 
     email_body_template = '%s %s %s %s'
     recipient_username = user_services.get_username(recipient_id)
-    to_contribute = ''
-    if contribution_category in [
-            constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION,
-            constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER,
-            constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER,
-            constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION
-            ]:
-        to_contribute = contribution_category_data['to_contribute']
+    if category in [
+            constants.CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION,
+            constants.CD_USER_RIGHTS_CATEGORY_REVIEW_VOICEOVER,
+            constants.CD_USER_RIGHTS_CATEGORY_REVIEW_VOICEOVER,
+            constants.CD_USER_RIGHTS_CATEGORY_REVIEW_QUESTION
+        ]:
+        to_review = category_data['to_review']
         email_body_template = (
             'Hi %s,<br><br>'
             'This is to let you know that the Oppia team has added you as a '
@@ -2292,13 +2287,13 @@ def send_email_to_new_cd_user(
             'Best wishes,<br>'
             'The Oppia Community')
         email_body = email_body_template % (
-            recipient_username, contribution_category_description,
-            contributor_rights_message, to_contribute)
+            recipient_username, category_description,
+            rights_message, to_review)
 
-    elif contribution_category in [
-                constants.CONTRIBUTION_RIGHT_CATEGORY_SUBMIT_QUESTION
+    elif category in [
+                constants.CD_USER_RIGHTS_CATEGORY_SUBMIT_QUESTION
                 ]:
-        to_contribute = contribution_category_data['to_contribute']
+        to_submit = category_data['to_submit']
         email_body_template = (
             'Hi %s,<br><br>'
             'This is to let you know that the Oppia team has added you as a '
@@ -2310,8 +2305,8 @@ def send_email_to_new_cd_user(
             'Best wishes,<br>'
             'The Oppia Community')
         email_body = email_body_template % (
-            recipient_username, contributor_rights_message,
-            contribution_category_description)
+            recipient_username, rights_message,
+            category_description)
 
     can_user_receive_email = user_services.get_email_preferences(
         recipient_id).can_receive_email_updates
@@ -2326,7 +2321,7 @@ def send_email_to_new_cd_user(
 
 def send_email_to_removed_cd_user(
     user_id: str,
-    contribution_category: str,
+    category: str,
     language_code: Optional[str] = None
 ) -> None:
     """Sends an email to user who is removed from a specific 
@@ -2334,8 +2329,7 @@ def send_email_to_removed_cd_user(
 
     Args:
         user_id: str. The ID of the user.
-        contribution_category: str. The category which for which review role is
-            removed.
+        category: str. The category in which user can no longer review or submit contributions
         language_code: None|str. The language code for a language if the review
             item is translation or voiceover else None.
 
@@ -2344,24 +2338,24 @@ def send_email_to_removed_cd_user(
         Exception. The language_code cannot be None if the review category is
             'translation' or 'voiceover'.
     """
-    if contribution_category not in REMOVED_CD_USER_EMAIL_DATA:
+    if category not in REMOVED_CD_USER_EMAIL_DATA:
         raise Exception(
-            'Invalid contribution_category: %s' % contribution_category
+            'Invalid category: %s' % category
             )
 
-    contribution_category_data = (
-        REMOVED_CD_USER_EMAIL_DATA[contribution_category])
-    if contribution_category in (
-        [constants.CONTRIBUTION_RIGHT_CATEGORY_SUBMIT_QUESTION]):
+    category_data = (
+        REMOVED_CD_USER_EMAIL_DATA[category])
+    if category in (
+        [constants.CD_USER_RIGHTS_CATEGORY_SUBMIT_QUESTION]):
         email_subject = 'You have been unassigned as a %s submitter' % (
-        contribution_category_data['contribution_category'])
+        category_data['category'])
     else:
         email_subject = 'You have been unassigned as a %s reviewer' % (
-        contribution_category_data['contribution_category'])
+        category_data['category'])
 
-    if contribution_category in [
-            constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION,
-            constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER]:
+    if category in [
+            constants.CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION,
+            constants.CD_USER_RIGHTS_CATEGORY_REVIEW_VOICEOVER]:
         if language_code is None:
             raise Exception(
                 'The language_code cannot be None if the review category is'
@@ -2370,19 +2364,19 @@ def send_email_to_removed_cd_user(
         language_description = utils.get_supported_audio_language_description(
             language_code).capitalize()
         role_description = (
-            contribution_category_data['role_description_template'] % (
+            category_data['role_description_template'] % (
                 language_description))
         rights_message = (
-            contribution_category_data['rights_message_template'] % (
+            category_data['rights_message_template'] % (
                 language_description))
     else:
-        role_description = contribution_category_data['role_description']
-        rights_message = contribution_category_data['rights_message']
+        role_description = category_data['role_description']
+        rights_message = category_data['rights_message']
 
     email_body_template = (
         'Hi %s,<br><br>'
         'The Oppia team has removed you from the %s. You won\'t be able to %s '
-        'any more, but you can still contribute %s through the '
+        'any more, but you can still contribute %ss through the '
         '<a href="https://www.oppia.org/contributor-dashboard">'
         'Contributor Dashboard</a>.<br><br>'
         'Thanks, and happy contributing!<br><br>'
@@ -2402,7 +2396,7 @@ def send_email_to_removed_cd_user(
         email_body = email_body_template % (
             recipient_username, role_description,
             rights_message,
-            contribution_category_data['contribution_allowed'])
+            category_data['category'])
         _send_email(
             user_id, feconf.SYSTEM_COMMITTER_ID,
             feconf.EMAIL_INTENT_REMOVE_CD_USER, email_subject, email_body,

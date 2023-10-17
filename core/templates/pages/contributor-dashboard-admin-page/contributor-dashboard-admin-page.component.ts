@@ -33,19 +33,19 @@ angular.module('oppia').directive('contributorDashboardAdminPage', [
   '$rootScope', 'ContributorDashboardAdminBackendApiService',
   'LanguageUtilService', 'UrlInterpolationService', 'UserService',
   'PlatformFeatureService',
-  'CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION',
-  'CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION',
-  'CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER',
-  'CONTRIBUTION_RIGHT_CATEGORY_SUBMIT_QUESTION',
+  'CD_USER_RIGHTS_CATEGORY_REVIEW_QUESTION',
+  'CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION',
+  'CD_USER_RIGHTS_CATEGORY_REVIEW_VOICEOVER',
+  'CD_USER_RIGHTS_CATEGORY_SUBMIT_QUESTION',
   'USER_FILTER_CRITERION_ROLE', 'USER_FILTER_CRITERION_USERNAME',
   function(
       $rootScope, ContributorDashboardAdminBackendApiService,
       LanguageUtilService, UrlInterpolationService, UserService,
       PlatformFeatureService,
-      CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION,
-      CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION,
-      CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER,
-      CONTRIBUTION_RIGHT_CATEGORY_SUBMIT_QUESTION,
+      CD_USER_RIGHTS_CATEGORY_REVIEW_QUESTION,
+      CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION,
+      CD_USER_RIGHTS_CATEGORY_REVIEW_VOICEOVER,
+      CD_USER_RIGHTS_CATEGORY_SUBMIT_QUESTION,
       USER_FILTER_CRITERION_ROLE, USER_FILTER_CRITERION_USERNAME,) {
     return {
       restrict: 'E',
@@ -82,8 +82,8 @@ angular.module('oppia').directive('contributorDashboardAdminPage', [
 
         ctrl.isLanguageSpecificReviewCategory = function(reviewCategory) {
           return (
-            reviewCategory === CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION ||
-            reviewCategory === CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER);
+            reviewCategory === CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION ||
+            reviewCategory === CD_USER_RIGHTS_CATEGORY_REVIEW_VOICEOVER);
         };
 
         ctrl.submitAddContributionRightsForm = function(formResponse) {
@@ -133,7 +133,7 @@ angular.module('oppia').directive('contributorDashboardAdminPage', [
                 formResponse.username
               ).then((contributionRights) => {
                 if (
-                  ctrl.CONTRIBUTION_RIGHT_CATEGORIES.hasOwnProperty(
+                  ctrl.CD_USER_CATEGORIES.hasOwnProperty(
                     'REVIEW_TRANSLATION')) {
                   ctrl.contributionReviewersResult = {
                     REVIEW_TRANSLATION: getLanguageDescriptions(
@@ -142,7 +142,7 @@ angular.module('oppia').directive('contributorDashboardAdminPage', [
                   };
                 }
                 if (
-                  ctrl.CONTRIBUTION_RIGHT_CATEGORIES.hasOwnProperty(
+                  ctrl.CD_USER_CATEGORIES.hasOwnProperty(
                     'REVIEW_QUESTION')) {
                   ctrl.contributionReviewersResult.REVIEW_QUESTION = (
                     contributionRights.can_review_questions),
@@ -279,17 +279,17 @@ angular.module('oppia').directive('contributorDashboardAdminPage', [
               ctrl.UserIsTranslationAdmin = true;
               translationCategories = {
                 REVIEW_TRANSLATION: (
-                  CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION)
+                  CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION)
               };
             }
             if (userInfo.isQuestionAdmin() ||
                 userInfo.isQuestionCoordinator()) {
               questionCategories = {
-                REVIEW_QUESTION: CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION,
-                SUBMIT_QUESTION: CONTRIBUTION_RIGHT_CATEGORY_SUBMIT_QUESTION
+                REVIEW_QUESTION: CD_USER_RIGHTS_CATEGORY_REVIEW_QUESTION,
+                SUBMIT_QUESTION: CD_USER_RIGHTS_CATEGORY_SUBMIT_QUESTION
               };
             }
-            ctrl.CONTRIBUTION_RIGHT_CATEGORIES = {
+            ctrl.CD_USER_CATEGORIES = {
               ...translationCategories,
               ...questionCategories
             };
