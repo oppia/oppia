@@ -311,6 +311,22 @@ export class RteHelperModalComponent {
     return url !== text;
   }
 
+  validateVideoStartEnd(): boolean {
+    const tmpCustomizationArgs = this.tmpCustomizationArgs as Extract<
+      CustomizationArgsNameAndValueArray[number],
+      {
+        name: "video_id" | "start" | "end" | "autoplay";
+      }
+    >[];
+    let start: number = tmpCustomizationArgs[1].value;
+    let end: number = tmpCustomizationArgs[2].value;
+
+    if (start > end) {
+      return true;
+    }
+    return false;
+  }
+
   save(): void {
     for (let index in this.customizationArgsForm.value) {
       this.tmpCustomizationArgs[index].value = (
@@ -420,6 +436,10 @@ export class RteHelperModalComponent {
           customizationArgsDict[caName] = this.extractVideoIdFromVideoUrl(
             temp.toString()
           );
+          const validStartAndEnd = this.validateVideoStartEnd();
+          if (validStartAndEnd) {
+            return;
+          }
         } else if (caName === 'text' && this.currentRteIsLinkEditor) {
           // Set the link `text` to the link `url` if the `text` is empty.
           (

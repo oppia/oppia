@@ -21,6 +21,9 @@
       It seems like clicking on this link will lead the user to a different URL
       than the text specifies. Please change the text.
     </div>
+    <div *ngIf="validateVideoStartEnd()" class="link-error-message">
+      Please ensure that the start time of the video is earlier than the end.
+    </div>
   </div>
 
   <div class="modal-footer">
