@@ -167,6 +167,21 @@ describe('Contributor Certificate Download Modal Component', () => {
     expect(component.errorMessage).toEqual('Invalid date range.');
   });
 
+  it('should function correctly', () => {
+    const today = new Date();
+    let fromDate = new Date();
+    let toDate = new Date();
+    fromDate.setDate(today.getDate() - 2);
+    toDate.setDate(today.getDate() - 1);
+    component.fromDate = fromDate.toDateString();
+    component.toDate = toDate.toDateString();
+
+    component.validateDate();
+
+    expect(component.errorsFound).toBeFalse();
+    expect(component.errorMessage).toEqual('');
+  });
+
   it('should close', () => {
     spyOn(activeModal, 'close');
     component.close();
