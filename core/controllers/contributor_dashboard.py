@@ -492,7 +492,8 @@ class PinLessonsHandler(
         opportunity_id = self.normalized_request.get('opportunity_id')
 
         opportunity_services.update_pinned_opportunity_model(
-            self.user_id, language_code, topic_id, opportunity_id)
+            self.user_id, language_code, topic_id, opportunity_id
+        )
 
         self.render_json(self.values)
 
