@@ -42,13 +42,7 @@ EXCLUDED_DIRECTORIES: Final = [
     # ignored while type checking, because these files are only
     # used as resources for the tests.
     'core/tests/build_sources/',
-    'core/tests/data/',
-    'core/jobs/io/gcs_io.py',
-    'core/jobs/batch_jobs/translation_migration_jobs.py',
-    'core/jobs/batch_jobs/suggestion_stats_computation_jobs.py',
-    'core/jobs/batch_jobs/suggestion_migration_jobs.py',
-    'core/jobs/batch_jobs/opportunity_management_jobs.py',
-    'core/jobs/batch_jobs/exp_migration_jobs.py'
+    'core/tests/data/'
 ]
 
 CONFIG_FILE_PATH: Final = os.path.join('.', 'mypy.ini')
