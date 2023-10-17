@@ -48,8 +48,9 @@ import {
   EarlyQuitPlaythroughIssueBackendDict,
   MultipleIncorrectSubmissionsPlaythroughIssueBackendDict,
   MultipleIncorrectSubmissionsPlaythroughIssue,
-  PlaythroughIssueObjectFactory,
-} from 'domain/statistics/PlaythroughIssueObjectFactory';
+  PlaythroughIssueModel,
+  PlaythroughIssueType,
+} from 'domain/statistics/playthrough-issue.model';
 import { StatesObjectFactory } from 'domain/exploration/StatesObjectFactory';
 import { ExplorationImprovementsTaskRegistryService } from
   'services/exploration-improvements-task-registry.service';
@@ -58,7 +59,6 @@ import { ExplorationImprovementsTaskRegistryService } from
 describe('Exploration improvements task registrar service', () => {
   let taskRegistryService: ExplorationImprovementsTaskRegistryService;
 
-  let playthroughIssueObjectFactory: PlaythroughIssueObjectFactory;
   let statesObjectFactory: StatesObjectFactory;
 
   let answerStatsBackendDict: AnswerStatsBackendDict;
@@ -82,7 +82,6 @@ describe('Exploration improvements task registrar service', () => {
     taskRegistryService = (
       TestBed.get(ExplorationImprovementsTaskRegistryService));
 
-    playthroughIssueObjectFactory = TestBed.get(PlaythroughIssueObjectFactory);
     statesObjectFactory = TestBed.get(StatesObjectFactory);
 
     config = new ExplorationImprovementsConfig(
@@ -172,7 +171,7 @@ describe('Exploration improvements task registrar service', () => {
     };
 
     cstPlaythroughIssueBackendDict = {
-      issue_type: 'CyclicStateTransitions',
+      issue_type: PlaythroughIssueType.CyclicStateTransitions,
       issue_customization_args: {
         state_names: {
           value: ['Middle', 'Introduction']
@@ -184,7 +183,7 @@ describe('Exploration improvements task registrar service', () => {
     };
 
     eqPlaythroughIssueBackendDict = {
-      issue_type: 'EarlyQuit',
+      issue_type: PlaythroughIssueType.EarlyQuit,
       issue_customization_args: {
         state_name: {
           value: 'Introduction'
@@ -199,7 +198,7 @@ describe('Exploration improvements task registrar service', () => {
     };
 
     misPlaythroughIssueBackendDict = {
-      issue_type: 'MultipleIncorrectSubmissions',
+      issue_type: PlaythroughIssueType.MultipleIncorrectSubmissions,
       issue_customization_args: {
         state_name: { value: 'Introduction' },
         num_times_answered_incorrectly: { value: 3 },
@@ -244,17 +243,17 @@ describe('Exploration improvements task registrar service', () => {
   };
   const makeCstPlaythroughIssue = (dict = cstPlaythroughIssueBackendDict) => {
     return (
-      playthroughIssueObjectFactory.createFromBackendDict(dict)
+      PlaythroughIssueModel.createFromBackendDict(dict)
     ) as CyclicStateTransitionsPlaythroughIssue;
   };
   const makeEqPlaythroughIssue = (dict = eqPlaythroughIssueBackendDict) => {
     return (
-      playthroughIssueObjectFactory.createFromBackendDict(dict)
+      PlaythroughIssueModel.createFromBackendDict(dict)
     ) as EarlyQuitPlaythroughIssue;
   };
   const makeMisPlaythroughIssue = (dict = misPlaythroughIssueBackendDict) => {
     return (
-      playthroughIssueObjectFactory.createFromBackendDict(dict)) as
+      PlaythroughIssueModel.createFromBackendDict(dict)) as
        MultipleIncorrectSubmissionsPlaythroughIssue;
   };
 

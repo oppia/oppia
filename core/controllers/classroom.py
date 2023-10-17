@@ -22,7 +22,6 @@ from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import classroom_config_domain
 from core.domain import classroom_config_services
-from core.domain import classroom_services
 from core.domain import topic_domain
 from core.domain import topic_fetchers
 
@@ -68,14 +67,14 @@ class ClassroomDataHandler(
         Args:
             classroom_url_fragment: str. THe classroom URL fragment.
         """
-        classroom = classroom_services.get_classroom_by_url_fragment(
+        classroom = classroom_config_services.get_classroom_by_url_fragment(
             classroom_url_fragment)
 
         # Here we are asserting that classroom can never be none, because
         # in the decorator `does_classroom_exist` we are already handling
         # the None case of classroom.
         assert classroom is not None
-        topic_ids = classroom.topic_ids
+        topic_ids = list(classroom.topic_id_to_prerequisite_topic_ids.keys())
         topic_summaries = topic_fetchers.get_multi_topic_summaries(topic_ids)
         topic_rights = topic_fetchers.get_multi_topic_rights(topic_ids)
         topic_summary_dicts: List[ClassroomTopicSummaryDict] = []

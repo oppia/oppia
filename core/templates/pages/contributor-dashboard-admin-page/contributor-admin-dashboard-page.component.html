@@ -1,67 +1,184 @@
 <background-banner></background-banner>
-<div class="oppia-dashboard-container position-relative">
-  <div class="oppia-dashboard-title"
-    [ngClass]="{'oppia-dashboard-title-mobile': checkMobileView(), 'oppia-dashboard-title-desktop': !checkMobileView()}">
-    <h1 tabindex="0">Contributor Admin Dashboard</h1>
-  </div>
-  <div class="m-auto oppia-dashboard-aggregated-stats oppia-contributor-dashboard-main-content pt-1"
-    [ngClass]="{'oppia-contributor-dashboard-mobile-mode': checkMobileView()}">
-    <mat-card layout="row" class="oppia-mat-card">
-      <div class="translation-reviewer stats-card" [attr.aria-label]="'Translation Reviewer ' + 24" tabindex="0">
-        <p class="stat-description">Translation<br>Reviewers</p>
-        <h2 class="stat-value-with-rating e2e-test-oppia-average-rating">
-          {{translationReviewersCount}}
-        </h2>
-      </div>
-      <div class="question-reviewer stats-card" [attr.aria-label]="'Question Reviewer ' + 24" tabindex="0">
-        <p class="stat-description">Question<br>Reviewers</p>
-        <h2 class="stat-value-with-rating e2e-test-oppia-total-plays">
-          {{questionReviewersCount}}
-        </h2>
-      </div>
-    </mat-card>
+<div *ngIf="loadingMessage" class="e2e-test-loading-message">
+  <div class="oppia-align-center">
+    <span>{{ loadingMessage }}</span>
+    <loading-dots></loading-dots>
   </div>
 </div>
-<div class="dashboard-content">
-  <div class="dashboard-content-primary">
-    <div>
-      <ul class="dashboard-tabs">
-        <li [ngClass]="{'dashboard-tabs-active': activeTab === TAB_NAME_TRANSLATION_SUBMITTER}" *ngIf="isTranslationCoordinator">
-          <a class="dashboard-tabs-text e2e-test-translation-submitters-tab" (click)="setActiveTab(TAB_NAME_TRANSLATION_SUBMITTER)">
-            Translation<br>Submitters
-          </a>
-        </li>
-        <li [ngClass]="{'dashboard-tabs-active': activeTab === TAB_NAME_TRANSLATION_REVIEWER}" *ngIf="isTranslationCoordinator">
-          <a class="dashboard-tabs-text e2e-test-translation-reviewers-tab" (click)="setActiveTab(TAB_NAME_TRANSLATION_REVIEWER)">
-            Translation<br>Reviewers
-          </a>
-        </li>
-        <li [ngClass]="{'dashboard-tabs-active': activeTab === TAB_NAME_QUESTION_SUBMITTER}" *ngIf="isQuestionCoordinator">
-          <a class="dashboard-tabs-text e2e-test-question-submitters-tab" (click)="setActiveTab(TAB_NAME_QUESTION_SUBMITTER)">
-            Question<br>Submitters
-          </a>
-        </li>
-        <li [ngClass]="{'dashboard-tabs-active': activeTab === TAB_NAME_QUESTION_REVIEWER}" *ngIf="isQuestionCoordinator">
-          <a class="dashboard-tabs-text e2e-test-question-reviewers-tab" (click)="setActiveTab(TAB_NAME_QUESTION_REVIEWER)">
-            Question<br>Reviewers
-          </a>
-        </li>
-      </ul>
+<div *ngIf="!loadingMessage">
+  <div class="oppia-dashboard-container position-relative">
+    <div class="oppia-dashboard-title"
+      [ngClass]="{'oppia-dashboard-title-mobile': checkMobileView(), 'oppia-dashboard-title-desktop': !checkMobileView()}">
+      <h1 tabindex="0">Contributor Admin Dashboard</h1>
     </div>
-    <contributor-admin-stats-table [activeTab]="activeTab"></contributor-admin-stats-table>
+    <div class="m-auto oppia-dashboard-aggregated-stats oppia-contributor-dashboard-main-content pt-1"
+      [ngClass]="{'oppia-contributor-dashboard-mobile-mode': checkMobileView()}">
+      <mat-card layout="row" class="oppia-mat-card">
+        <div class="translation-reviewer stats-card" [attr.aria-label]="'Translation Reviewer '" tabindex="0" *ngIf="isTranslationCoordinator">
+          <p class="stat-description">Translation<br>Reviewers [{{selectedLanguage.language}}]</p>
+          <h2 class="stat-value-with-rating e2e-test-oppia-average-rating">
+            {{ translationReviewersCount ? translationReviewersCount : 0 }}
+          </h2>
+        </div>
+        <div class="question-reviewer stats-card" [attr.aria-label]="'Question Reviewer '" tabindex="0" *ngIf="isQuestionCoordinator">
+          <p class="stat-description">Question<br>Reviewers</p>
+          <h2 class="stat-value-with-rating e2e-test-oppia-total-plays">
+            {{questionReviewersCount}}
+          </h2>
+        </div>
+      </mat-card>
+    </div>
   </div>
-  <div class="dashboard-content-mobile">
-    <div class="dropdown">
-      <mat-form-field class="choices-field">
-        <mat-select placeholder="Contribution Type"
-                    [value]="selectedContributionType"
-                    (valueChange)="updateSelectedContributionType($event)">
-          <mat-option *ngFor="let choice of CONTRIBUTION_TYPES" [value]="choice">
-            {{ choice }}
-          </mat-option>
-        </mat-select>
-      </mat-form-field>
+  <div class="dashboard-content">
+    <div class="dashboard-content-primary" *ngIf="!checkMobileView()">
+      <div>
+        <ul class="dashboard-tabs">
+          <li [ngClass]="{'dashboard-tabs-active': activeTab === TAB_NAME_TRANSLATION_SUBMITTER}" *ngIf="isTranslationCoordinator">
+            <a class="dashboard-tabs-text e2e-test-translation-submitters-tab" (click)="setActiveTab(TAB_NAME_TRANSLATION_SUBMITTER)">
+              Translation<br>Submitters
+            </a>
+          </li>
+          <li [ngClass]="{'dashboard-tabs-active': activeTab === TAB_NAME_TRANSLATION_REVIEWER}" *ngIf="isTranslationCoordinator">
+            <a class="dashboard-tabs-text e2e-test-translation-reviewers-tab" (click)="setActiveTab(TAB_NAME_TRANSLATION_REVIEWER)">
+              Translation<br>Reviewers
+            </a>
+          </li>
+          <li [ngClass]="{'dashboard-tabs-active': activeTab === TAB_NAME_QUESTION_SUBMITTER}" *ngIf="isQuestionCoordinator">
+            <a class="dashboard-tabs-text e2e-test-question-submitters-tab" (click)="setActiveTab(TAB_NAME_QUESTION_SUBMITTER)">
+              Question<br>Submitters
+            </a>
+          </li>
+          <li [ngClass]="{'dashboard-tabs-active': activeTab === TAB_NAME_QUESTION_REVIEWER}" *ngIf="isQuestionCoordinator">
+            <a class="dashboard-tabs-text e2e-test-question-reviewers-tab" (click)="setActiveTab(TAB_NAME_QUESTION_REVIEWER)">
+              Question<br>Reviewers
+            </a>
+          </li>
+        </ul>
+      </div>
+      <div class="filter-container">
+        <div class="language-selector-container" *ngIf="(activeTab === TAB_NAME_TRANSLATION_SUBMITTER) || (activeTab === TAB_NAME_TRANSLATION_REVIEWER)">
+          <div #languageDropdown class="oppia-filter-selector-container e2e-test-language-selector"
+               (click)="toggleLanguageDropdown()">
+            <div class="oppia-filter-selector-inner-container e2e-test-language-selector-selected">
+              <b>Language: </b>{{selectedLanguage.language}}
+              <span class="fas fa-caret-down oppia-filter-selector-inner-container-arrow"
+                    [@languageDropdownTrigger]="languageDropdownShown ? 'expanded' : 'collapsed'">
+              </span>
+            </div>
+            <div *ngIf="languageDropdownShown"
+                 class="oppia-filter-selector-dropdown-container e2e-test-language-selector-dropdown">
+              <div class="oppia-filter-selector-dropdown-option e2e-test-language-selector-option"
+                   *ngFor="let option of languageChoices"
+                   (click)="selectLanguage(option.language)"
+                   [ngClass]="{'oppia-filter-selector-dropdown-option-selected' : option === selectedLanguage.language}">
+                {{option.language}}
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="filter-sub-container">
+          <div class="last-activity-selector-container">
+            <div #activityDropdown  class="oppia-filter-selector-container e2e-test-last-activity-selector"
+                 (click)="toggleActivityDropdown()">
+              <div class="oppia-filter-selector-inner-container e2e-test-last-activity-selector-selected">
+                <b>Filter by last activity: </b>
+                   {{ selectedLastActivity ? 'Within past ' + selectedLastActivity + ' days' : 'All time' }}
+                <span class="fas fa-caret-down oppia-filter-selector-inner-container-arrow"
+                      [@lastActivityDropdown]="activityDropdownShown ? 'expanded' : 'collapsed'">
+                </span>
+              </div>
+              <div *ngIf="activityDropdownShown"
+                   class="oppia-filter-selector-dropdown-container e2e-test-last-activity-selector-dropdown">
+                <div class="oppia-filter-selector-dropdown-option e2e-test-last-activity-selector-option"
+                     *ngFor="let option of lastActivity"
+                     (click)="selectLastActivity(option)"
+                     [ngClass]="{'oppia-filter-selector-dropdown-option-selected' : option === selectedLastActivity}">
+                  {{ option ? 'Within past ' + option + ' days' : 'All time' }}
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="topic-selector-container">
+            <oppia-topic-filter
+              *ngIf="(activeTab === TAB_NAME_TRANSLATION_SUBMITTER) || (activeTab === TAB_NAME_QUESTION_SUBMITTER)"
+              [(defaultTopicNames)]="allTopicNames"
+              [(selectedTopicNames)]="selectedTopicNames"
+              (selectionsChange)="applyTopicFilter()">
+            </oppia-topic-filter>
+          </div>
+        </div>
+      </div>
+      <contributor-admin-stats-table [activeTab]="activeTab" [filter]="filter"></contributor-admin-stats-table>
     </div>
-    <contributor-admin-stats-table [activeTab]="activeTab"></contributor-admin-stats-table>
+    <div class="dashboard-content-mobile">
+      <div class="dropdown">
+        <mat-form-field class="choices-field">
+          <mat-select placeholder="Contribution Type"
+                      [value]="selectedContributionType"
+                      (valueChange)="updateSelectedContributionType($event)">
+            <mat-option *ngFor="let choice of CONTRIBUTION_TYPES" [value]="choice">
+              {{ choice }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+      <div class="filter-container">
+        <div class="language-selector-container" *ngIf="(activeTab === TAB_NAME_TRANSLATION_SUBMITTER) || (activeTab === TAB_NAME_TRANSLATION_REVIEWER)">
+          <div class="oppia-filter-selector-container e2e-test-topic-selector" (click)="toggleLanguageDropdown()">
+            <div class="oppia-filter-selector-inner-container e2e-test-topic-selector-selected">
+              <b class="required">Language: </b>
+              <div class="selector-icon-div">
+                {{selectedLanguage.language}}
+                <span class="fas fa-caret-down oppia-filter-selector-inner-container-arrow"
+                      [@languageDropdownTrigger]="languageDropdownShown ? 'expanded' : 'collapsed'">
+                </span>
+              </div>
+            </div>
+            <div *ngIf="languageDropdownShown"
+                 class="oppia-filter-selector-dropdown-container e2e-test-topic-selector-dropdown">
+              <div class="oppia-filter-selector-dropdown-option e2e-test-topic-selector-option"
+                   *ngFor="let option of languageChoices"
+                   (click)="selectLanguage(option.language)"
+                   [ngClass]="{'oppia-filter-selector-dropdown-option-selected' : option === selectedLanguage.language}">
+                {{option.language}}
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="last-activity-selector-container">
+          <div class="oppia-filter-selector-container e2e-test-topic-selector" (click)="toggleActivityDropdown()">
+            <div class="oppia-filter-selector-inner-container e2e-test-topic-selector-selected">
+              <b *ngIf="activeTab === TAB_NAME_TRANSLATION_SUBMITTER">Last Translated:</b>
+              <b *ngIf="(activeTab === TAB_NAME_TRANSLATION_REVIEWER) || (activeTab === TAB_NAME_QUESTION_REVIEWER)">Last Reviewed:</b>
+              <b *ngIf="activeTab === TAB_NAME_QUESTION_SUBMITTER">Last Submitted:</b>
+              <div class="selector-icon-div">
+                {{ selectedLastActivity ? 'Within past ' + selectedLastActivity + ' days' : 'All time' }}
+                <span class="fas fa-caret-down oppia-filter-selector-inner-container-arrow"
+                      [@lastActivityDropdown]="activityDropdownShown ? 'expanded' : 'collapsed'">
+                </span>
+              </div>
+            </div>
+            <div *ngIf="activityDropdownShown"
+                 class="oppia-filter-selector-dropdown-container e2e-test-topic-selector-dropdown">
+              <div class="oppia-filter-selector-dropdown-option e2e-test-topic-selector-option"
+                   *ngFor="let option of lastActivity"
+                   (click)="selectLastActivity(option)"
+                   [ngClass]="{'oppia-filter-selector-dropdown-option-selected' : option === selectedLastActivity}">
+                {{ option ? 'Within past ' + option + ' days' : 'All time' }}
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="topic-selector-container">
+          <oppia-topic-filter
+            *ngIf="(activeTab === TAB_NAME_TRANSLATION_SUBMITTER) || (activeTab === TAB_NAME_QUESTION_SUBMITTER)"
+            [(defaultTopicNames)]="allTopicNames"
+            [(selectedTopicNames)]="selectedTopicNames"
+            (selectionsChange)="applyTopicFilter()">
+          </oppia-topic-filter>
+        </div>
+      </div>
+      <contributor-admin-stats-table [activeTab]="activeTab" [filter]="filter"></contributor-admin-stats-table>
+    </div>
   </div>
 </div>
