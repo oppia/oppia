@@ -93,6 +93,7 @@
         "core.domain.learner_goals_services_test",
         "scripts.scripts_test_utils_test",
         "scripts.servers_test",
+        "scripts.generate_build_directory_test",
         "scripts.concurrent_task_utils_test",
         "core.storage.storage_models_test",
         "core.platform.cache.redis_cache_services_test",

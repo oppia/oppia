@@ -55,8 +55,7 @@ FILES_WITHOUT_ASSOCIATED_TEST_FILES = [
     'third_party/python_libs/yaml/tokens.py',
     'third_party/python_libs/yaml/serializer.py',
     'third_party/python_libs/yaml/scanner.py',
-    'third_party/python_libs/yaml/resolver.py',
-    'scripts/generate_build_directory.py',
+    'third_party/python_libs/yaml/resolver.py'
 ]
 
 
