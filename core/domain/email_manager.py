@@ -496,9 +496,9 @@ SENDER_VALIDATORS: Dict[str, Union[bool, Callable[[str], bool]]] = {
     feconf.EMAIL_INTENT_DELETE_EXPLORATION: user_services.is_moderator,
     feconf.EMAIL_INTENT_REPORT_BAD_CONTENT: (
         lambda x: x == feconf.SYSTEM_COMMITTER_ID),
-    feconf.EMAIL_INTENT_ONBOARD_CONTRIBUTOR: (
+    feconf.EMAIL_INTENT_ONBOARD_CD_USER: (
         lambda x: x == feconf.SYSTEM_COMMITTER_ID),
-    feconf.EMAIL_INTENT_REMOVE_CONTRIBUTOR: (
+    feconf.EMAIL_INTENT_REMOVE_CD_USER: (
         lambda x: x == feconf.SYSTEM_COMMITTER_ID),
     feconf.EMAIL_INTENT_REVIEW_CREATOR_DASHBOARD_SUGGESTIONS: (
         lambda x: x == feconf.SYSTEM_COMMITTER_ID),
@@ -1544,7 +1544,7 @@ def send_mail_to_onboard_new_reviewers(
             recipient_username, category, category, email_footer)
         _send_email(
             recipient_id, feconf.SYSTEM_COMMITTER_ID,
-            feconf.EMAIL_INTENT_ONBOARD_CONTRIBUTOR,
+            feconf.EMAIL_INTENT_ONBOARD_CD_USER,
             email_subject, email_body, feconf.NOREPLY_EMAIL_ADDRESS)
 
 
@@ -2320,7 +2320,7 @@ def send_email_to_new_cd_user(
     if can_user_receive_email:
         _send_email(
             recipient_id, feconf.SYSTEM_COMMITTER_ID,
-            feconf.EMAIL_INTENT_ONBOARD_CONTRIBUTOR, email_subject, email_body,
+            feconf.EMAIL_INTENT_ONBOARD_CD_USER, email_subject, email_body,
             feconf.NOREPLY_EMAIL_ADDRESS)
 
 
@@ -2405,7 +2405,7 @@ def send_email_to_removed_cd_user(
             contribution_category_data['contribution_allowed'])
         _send_email(
             user_id, feconf.SYSTEM_COMMITTER_ID,
-            feconf.EMAIL_INTENT_REMOVE_CONTRIBUTOR, email_subject, email_body,
+            feconf.EMAIL_INTENT_REMOVE_CD_USER, email_subject, email_body,
             feconf.NOREPLY_EMAIL_ADDRESS)
 
 

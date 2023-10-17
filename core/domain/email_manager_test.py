@@ -2166,7 +2166,7 @@ class OnboardingReviewerInstantEmailTests(test_utils.EmailTestBase):
                 'Site Admin <%s>' % feconf.NOREPLY_EMAIL_ADDRESS)
             self.assertEqual(
                 sent_email_model.intent,
-                feconf.EMAIL_INTENT_ONBOARD_CONTRIBUTOR)
+                feconf.EMAIL_INTENT_ONBOARD_CD_USER)
 
 
 class NotifyReviewerInstantEmailTests(test_utils.EmailTestBase):
@@ -6333,7 +6333,7 @@ class ContributionReviewerEmailTest(test_utils.EmailTestBase):
             email_manager.send_email_to_new_cd_user(
                 self.translation_reviewer_id, 'invalid_category')
 
-    def test_schema_of_new_contributor_email_data_constant(self) -> None:
+    def test_schema_of_new_cd_user_email_data_constant(self) -> None:
         self.assertEqual(
             sorted(email_manager.NEW_CD_USER_EMAIL_DATA.keys()),
             [
@@ -6402,7 +6402,7 @@ class ContributionReviewerEmailTest(test_utils.EmailTestBase):
                 'Site Admin <%s>' % feconf.NOREPLY_EMAIL_ADDRESS)
             self.assertEqual(
                 sent_email_model.intent,
-                feconf.EMAIL_INTENT_ONBOARD_CONTRIBUTOR)
+                feconf.EMAIL_INTENT_ONBOARD_CD_USER)
 
     def test_send_assigned_voiceover_reviewer_email(self) -> None:
         expected_email_subject = (
@@ -6451,7 +6451,7 @@ class ContributionReviewerEmailTest(test_utils.EmailTestBase):
                 'Site Admin <%s>' % feconf.NOREPLY_EMAIL_ADDRESS)
             self.assertEqual(
                 sent_email_model.intent,
-                feconf.EMAIL_INTENT_ONBOARD_CONTRIBUTOR)
+                feconf.EMAIL_INTENT_ONBOARD_CD_USER)
 
     def test_send_assigned_question_reviewer_email(self) -> None:
         expected_email_subject = (
@@ -6498,7 +6498,7 @@ class ContributionReviewerEmailTest(test_utils.EmailTestBase):
                 'Site Admin <%s>' % feconf.NOREPLY_EMAIL_ADDRESS)
             self.assertEqual(
                 sent_email_model.intent,
-                feconf.EMAIL_INTENT_ONBOARD_CONTRIBUTOR)
+                feconf.EMAIL_INTENT_ONBOARD_CD_USER)
 
     def test_send_assigned_question_submitter_email(self) -> None:
         expected_email_subject = (
@@ -6545,7 +6545,7 @@ class ContributionReviewerEmailTest(test_utils.EmailTestBase):
                 'Site Admin <%s>' % feconf.NOREPLY_EMAIL_ADDRESS)
             self.assertEqual(
                 sent_email_model.intent,
-                feconf.EMAIL_INTENT_ONBOARD_CONTRIBUTOR)
+                feconf.EMAIL_INTENT_ONBOARD_CD_USER)
 
     def test_email_is_not_sent_can_send_emails_is_false(self) -> None:
         with self.can_not_send_emails_ctx:
@@ -6629,7 +6629,7 @@ class ContributionReviewerEmailTest(test_utils.EmailTestBase):
                 sent_email_model.sender_email,
                 'Site Admin <%s>' % feconf.NOREPLY_EMAIL_ADDRESS)
             self.assertEqual(
-                sent_email_model.intent, feconf.EMAIL_INTENT_REMOVE_CONTRIBUTOR)
+                sent_email_model.intent, feconf.EMAIL_INTENT_REMOVE_CD_USER)
 
     def test_send_removed_voiceover_reviewer_email(self) -> None:
         expected_email_subject = (
@@ -6675,7 +6675,7 @@ class ContributionReviewerEmailTest(test_utils.EmailTestBase):
                 sent_email_model.sender_email,
                 'Site Admin <%s>' % feconf.NOREPLY_EMAIL_ADDRESS)
             self.assertEqual(
-                sent_email_model.intent, feconf.EMAIL_INTENT_REMOVE_CONTRIBUTOR)
+                sent_email_model.intent, feconf.EMAIL_INTENT_REMOVE_CD_USER)
 
     def test_send_removed_question_reviewer_email(self) -> None:
         expected_email_subject = (
@@ -6720,7 +6720,7 @@ class ContributionReviewerEmailTest(test_utils.EmailTestBase):
                 sent_email_model.sender_email,
                 'Site Admin <%s>' % feconf.NOREPLY_EMAIL_ADDRESS)
             self.assertEqual(
-                sent_email_model.intent, feconf.EMAIL_INTENT_REMOVE_CONTRIBUTOR)
+                sent_email_model.intent, feconf.EMAIL_INTENT_REMOVE_CD_USER)
 
     def test_send_removed_question_submitter_email(self) -> None:
         expected_email_subject = (
@@ -6765,7 +6765,7 @@ class ContributionReviewerEmailTest(test_utils.EmailTestBase):
                 sent_email_model.sender_email,
                 'Site Admin <%s>' % feconf.NOREPLY_EMAIL_ADDRESS)
             self.assertEqual(
-                sent_email_model.intent, feconf.EMAIL_INTENT_REMOVE_CONTRIBUTOR)
+                sent_email_model.intent, feconf.EMAIL_INTENT_REMOVE_CD_USER)
 
 
 class NotMergeableChangesEmailUnitTest(test_utils.EmailTestBase):
