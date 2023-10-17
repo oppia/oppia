@@ -90,7 +90,7 @@
                                               (setActiveLanguageCode)="onChangeLanguage($event)">
         </review-translation-language-selector>
       </div>
-      <div class="oppia-contributions-tab-panel oppia-contributions-tab-panel-container">
+      <div class="oppia-contributions-tab-panel oppia-contributions-tab-panel-container" [hidden]="!isReviewQuestionsTab()">
         <span class="sort-questions-select float-right"
               *ngIf="isReviewQuestionsTab()">
           <p class="sort-by-text">Sort By</p>
