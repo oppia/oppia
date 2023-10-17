@@ -196,7 +196,7 @@ class ContributionRightsHandler(
                 constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION,
                 constants.CONTRIBUTION_RIGHT_CATEGORY_SUBMIT_QUESTION,
         )
-        email_manager.send_email_to_new_contributor(
+        email_manager.send_email_to_new_cd_user(
                 user_id, category, language_code=language_code)
         self.render_json({})
 
@@ -268,7 +268,7 @@ class ContributionRightsHandler(
                 constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION,
                 constants.CONTRIBUTION_RIGHT_CATEGORY_SUBMIT_QUESTION
         )
-        email_manager.send_email_to_removed_contributor(
+        email_manager.send_email_to_removed_cd_user(
                 user_id, category, language_code=language_code)
         self.render_json({})
 

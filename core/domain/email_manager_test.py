@@ -6292,7 +6292,7 @@ class ContributionReviewerEmailTest(test_utils.EmailTestBase):
         self
     ) -> None:
         with self.can_not_send_emails_ctx:
-            email_manager.send_email_to_new_contributor(
+            email_manager.send_email_to_new_cd_user(
                 self.translation_reviewer_id,
                 constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION,
                 language_code='hi')
@@ -6309,7 +6309,7 @@ class ContributionReviewerEmailTest(test_utils.EmailTestBase):
             'The language_code cannot be None'
         ):
             with self.can_not_send_emails_ctx:
-                email_manager.send_email_to_new_contributor(
+                email_manager.send_email_to_new_cd_user(
                     self.translation_reviewer_id,
                     constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION
                 )
@@ -6322,7 +6322,7 @@ class ContributionReviewerEmailTest(test_utils.EmailTestBase):
             'The language_code cannot be None'
         ):
             with self.can_not_send_emails_ctx:
-                email_manager.send_email_to_removed_contributor(
+                email_manager.send_email_to_removed_cd_user(
                     self.translation_reviewer_id,
                     constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION)
 
@@ -6330,12 +6330,12 @@ class ContributionReviewerEmailTest(test_utils.EmailTestBase):
         self
     ) -> None:
         with self.assertRaisesRegex(Exception, 'Invalid contribution_category'):
-            email_manager.send_email_to_new_contributor(
+            email_manager.send_email_to_new_cd_user(
                 self.translation_reviewer_id, 'invalid_category')
 
     def test_schema_of_new_contributor_email_data_constant(self) -> None:
         self.assertEqual(
-            sorted(email_manager.NEW_CONTRIBUTOR_EMAIL_DATA.keys()),
+            sorted(email_manager.NEW_CD_USER_EMAIL_DATA.keys()),
             [
                 constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION,
                 constants.CONTRIBUTION_RIGHT_CATEGORY_SUBMIT_QUESTION,
@@ -6343,7 +6343,7 @@ class ContributionReviewerEmailTest(test_utils.EmailTestBase):
                 constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER
             ])
         for category_details in (
-            email_manager.NEW_CONTRIBUTOR_EMAIL_DATA.values()
+            email_manager.NEW_CD_USER_EMAIL_DATA.values()
         ):
             self.assertEqual(len(category_details), 5)
             self.assertTrue(
@@ -6372,7 +6372,7 @@ class ContributionReviewerEmailTest(test_utils.EmailTestBase):
             'The Oppia Community')
 
         with self.can_send_emails_ctx:
-            email_manager.send_email_to_new_contributor(
+            email_manager.send_email_to_new_cd_user(
                 self.translation_reviewer_id,
                 constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION,
                 language_code='hi')
@@ -6421,7 +6421,7 @@ class ContributionReviewerEmailTest(test_utils.EmailTestBase):
             'The Oppia Community')
 
         with self.can_send_emails_ctx:
-            email_manager.send_email_to_new_contributor(
+            email_manager.send_email_to_new_cd_user(
                 self.voiceover_reviewer_id,
                 constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER,
                 language_code='hi')
@@ -6469,7 +6469,7 @@ class ContributionReviewerEmailTest(test_utils.EmailTestBase):
             'The Oppia Community')
 
         with self.can_send_emails_ctx:
-            email_manager.send_email_to_new_contributor(
+            email_manager.send_email_to_new_cd_user(
                 self.question_reviewer_id,
                 constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION,
                 language_code='hi')
@@ -6516,7 +6516,7 @@ class ContributionReviewerEmailTest(test_utils.EmailTestBase):
             'The Oppia Community')
 
         with self.can_send_emails_ctx:
-            email_manager.send_email_to_new_contributor(
+            email_manager.send_email_to_new_cd_user(
                 self.question_submitter_id,
                 constants.CONTRIBUTION_RIGHT_CATEGORY_SUBMIT_QUESTION,
                 language_code='hi')
@@ -6549,7 +6549,7 @@ class ContributionReviewerEmailTest(test_utils.EmailTestBase):
 
     def test_email_is_not_sent_can_send_emails_is_false(self) -> None:
         with self.can_not_send_emails_ctx:
-            email_manager.send_email_to_removed_contributor(
+            email_manager.send_email_to_removed_cd_user(
                 self.translation_reviewer_id,
                 constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION,
                 language_code='hi')
@@ -6562,18 +6562,18 @@ class ContributionReviewerEmailTest(test_utils.EmailTestBase):
         self
     ) -> None:
         with self.assertRaisesRegex(Exception, 'Invalid contribution_category'):
-            email_manager.send_email_to_removed_contributor(
+            email_manager.send_email_to_removed_cd_user(
                 self.translation_reviewer_id, 'invalid_category')
 
     def test_schema_of_removed_reviewer_email_data_constant(self) -> None:
         self.assertEqual(
-            sorted(email_manager.REMOVED_CONTRIBUTOR_EMAIL_DATA.keys()), [
+            sorted(email_manager.REMOVED_CD_USER_EMAIL_DATA.keys()), [
                 constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION,
                 constants.CONTRIBUTION_RIGHT_CATEGORY_SUBMIT_QUESTION,
                 constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION,
                 constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER])
         for category_details in (
-                email_manager.REMOVED_CONTRIBUTOR_EMAIL_DATA.values()):
+                email_manager.REMOVED_CD_USER_EMAIL_DATA.values()):
             self.assertEqual(len(category_details), 4)
             self.assertTrue(
                 'role_description' in category_details or (
@@ -6600,7 +6600,7 @@ class ContributionReviewerEmailTest(test_utils.EmailTestBase):
             'The Oppia Community')
 
         with self.can_send_emails_ctx:
-            email_manager.send_email_to_removed_contributor(
+            email_manager.send_email_to_removed_cd_user(
                 self.translation_reviewer_id,
                 constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION,
                 language_code='hi')
@@ -6647,7 +6647,7 @@ class ContributionReviewerEmailTest(test_utils.EmailTestBase):
             'The Oppia Community')
 
         with self.can_send_emails_ctx:
-            email_manager.send_email_to_removed_contributor(
+            email_manager.send_email_to_removed_cd_user(
                 self.voiceover_reviewer_id,
                 constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER,
                 language_code='hi')
@@ -6692,7 +6692,7 @@ class ContributionReviewerEmailTest(test_utils.EmailTestBase):
             'The Oppia Community')
 
         with self.can_send_emails_ctx:
-            email_manager.send_email_to_removed_contributor(
+            email_manager.send_email_to_removed_cd_user(
                 self.question_reviewer_id,
                 constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION,
                 language_code='hi')
@@ -6737,7 +6737,7 @@ class ContributionReviewerEmailTest(test_utils.EmailTestBase):
             'The Oppia Community')
 
         with self.can_send_emails_ctx:
-            email_manager.send_email_to_removed_contributor(
+            email_manager.send_email_to_removed_cd_user(
                 self.question_submitter_id,
                 constants.CONTRIBUTION_RIGHT_CATEGORY_SUBMIT_QUESTION,
                 language_code='hi')

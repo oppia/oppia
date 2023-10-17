@@ -61,7 +61,7 @@ secrets_services = models.Registry.import_secrets_services()
 PlatformParameterRegistry = platform_parameter_registry.Registry
 
 
-NEW_CONTRIBUTOR_EMAIL_DATA: Dict[str, Dict[str, str]] = {
+NEW_CD_USER_EMAIL_DATA: Dict[str, Dict[str, str]] = {
     constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION: {
         'task': 'review',
         'contribution_category': 'translations',
@@ -96,7 +96,7 @@ NEW_CONTRIBUTOR_EMAIL_DATA: Dict[str, Dict[str, str]] = {
     }
 }
 
-REMOVED_CONTRIBUTOR_EMAIL_DATA: Dict[str, Dict[str, str]] = {
+REMOVED_CD_USER_EMAIL_DATA: Dict[str, Dict[str, str]] = {
     constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION: {
         'contribution_category': 'translation',
         'role_description_template': (
@@ -2213,7 +2213,7 @@ def send_account_deletion_failed_email(user_id: str, user_email: str) -> None:
     send_mail_to_admin(email_subject, email_body_template)
 
 
-def send_email_to_new_contributor(
+def send_email_to_new_cd_user(
     recipient_id: str,
     contribution_category: str,
     language_code: Optional[str] = None
@@ -2232,13 +2232,13 @@ def send_email_to_new_contributor(
         Exception. The language_code cannot be None if the 
             contribution category is 'translation' or 'voiceover'.
     """
-    if contribution_category not in NEW_CONTRIBUTOR_EMAIL_DATA:
+    if contribution_category not in NEW_CD_USER_EMAIL_DATA:
         raise Exception(
             'Invalid contribution_category: %s' % contribution_category
             )
 
     contribution_category_data = (
-        NEW_CONTRIBUTOR_EMAIL_DATA[contribution_category])
+        NEW_CD_USER_EMAIL_DATA[contribution_category])
     email_subject = 'You have been invited to %s Oppia %s' % (
                     contribution_category_data['task'],
                     contribution_category_data['contribution_category']
@@ -2324,7 +2324,7 @@ def send_email_to_new_contributor(
             feconf.NOREPLY_EMAIL_ADDRESS)
 
 
-def send_email_to_removed_contributor(
+def send_email_to_removed_cd_user(
     user_id: str,
     contribution_category: str,
     language_code: Optional[str] = None
@@ -2344,13 +2344,13 @@ def send_email_to_removed_contributor(
         Exception. The language_code cannot be None if the review category is
             'translation' or 'voiceover'.
     """
-    if contribution_category not in REMOVED_CONTRIBUTOR_EMAIL_DATA:
+    if contribution_category not in REMOVED_CD_USER_EMAIL_DATA:
         raise Exception(
             'Invalid contribution_category: %s' % contribution_category
             )
 
     contribution_category_data = (
-        REMOVED_CONTRIBUTOR_EMAIL_DATA[contribution_category])
+        REMOVED_CD_USER_EMAIL_DATA[contribution_category])
     if contribution_category in (
         [constants.CONTRIBUTION_RIGHT_CATEGORY_SUBMIT_QUESTION]):
         email_subject = 'You have been unassigned as a %s submitter' % (
