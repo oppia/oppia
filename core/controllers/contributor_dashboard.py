@@ -435,7 +435,8 @@ class ReviewableOpportunitiesHandler(
         if pinned_opportunity_summary:
             exp_opp_summaries.pop(pinned_opportunity_summary['id'], None)
             ordered_exp_opp_summaries[
-                pinned_opportunity_summary['id']] = pinned_opportunity_summary
+                pinned_opportunity_summary['id']
+            ] = pinned_opportunity_summary
 
         for item in exp_opp_summaries.values():
             ordered_exp_opp_summaries[item.id] = item
