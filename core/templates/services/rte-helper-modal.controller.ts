@@ -315,18 +315,17 @@ export class RteHelperModalComponent {
     const tmpCustomizationArgs = this.tmpCustomizationArgs as Extract<
       CustomizationArgsNameAndValueArray[number],
       {
-        name: "video_id" | "start" | "end" | "autoplay";
+        name: 'video_id' | 'start' | 'end' | 'autoplay';
       }
     >[];
     let start: number = 0;
     let end: number = 0;
-  
     for (const arg of tmpCustomizationArgs) {
-      if (arg.name === "start") {
+      if (arg.name === 'start') {
         if (typeof arg.value === 'number') {
           start = arg.value;
         }
-      } else if (arg.name === "end") {
+      } else if (arg.name === 'end') {
         if (typeof arg.value === 'number') {
           end = arg.value;
         }
