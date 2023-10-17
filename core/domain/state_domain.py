@@ -896,7 +896,7 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
 
         Args:
             require_valid_component_names: function. Function to check
-                whether the RTE tags in the html string are whitelisted.
+                whether the RTE tags in the html string are allowed.
 
         Returns:
             bool. Whether the RTE content is valid.
@@ -3773,14 +3773,14 @@ class State(translation_domain.BaseTranslatableObject):
             bool. Whether the RTE components in the state is valid.
         """
         def require_valid_component_names(html: str) -> bool:
-            """Checks if the provided html string contains only whitelisted
+            """Checks if the provided html string contains only allowed
             RTE tags.
 
             Args:
                 html: str. The html string.
 
             Returns:
-                bool. Whether all RTE tags in the html are whitelisted.
+                bool. Whether all RTE tags in the html are allowed.
             """
             component_name_prefix = 'oppia-noninteractive-'
             component_names = set(
