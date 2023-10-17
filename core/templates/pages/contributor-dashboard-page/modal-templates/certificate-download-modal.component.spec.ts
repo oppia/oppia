@@ -19,7 +19,7 @@
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { ChangeDetectorRef, NO_ERRORS_SCHEMA } from '@angular/core';
 
-import { ComponentFixture, TestBed, tick, waitForAsync } from '@angular/core/testing';
+import { ComponentFixture, fakeAsync, flushMicrotasks, TestBed, tick, waitForAsync } from '@angular/core/testing';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { OppiaAngularRootComponent } from 'components/oppia-angular-root.component';
 import { ContextService } from 'services/context.service';
@@ -173,7 +173,7 @@ describe('Contributor Certificate Download Modal Component', () => {
     expect(activeModal.close).toHaveBeenCalled();
   });
 
-  it('should handle errors properly', async() => {
+  it('should handle errors properly', fakeAsync(() => {
     const mockError = new HttpErrorResponse(
       { error: { error: 'Error message' } });
     spyOn(
@@ -181,12 +181,14 @@ describe('Contributor Certificate Download Modal Component', () => {
       'downloadContributorCertificateAsync'
     ).and.returnValue(Promise.reject(mockError));
 
-    await component.downloadCertificate();
+    component.downloadCertificate();
+
+    flushMicrotasks();
 
     expect(component.errorsFound).toBe(true);
     expect(component.certificateDownloading).toBe(false);
     expect(component.errorMessage).toBe('Error message');
-  });
+  }));
 
   it('should throw error when canvas context is null', () => {
     spyOn(document, 'createElement').and.callFake(
