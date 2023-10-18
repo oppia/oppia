@@ -43,6 +43,7 @@ var ExplorationEditorPage = require(
 var CreatorDashboardPage = require(
   '../webdriverio_utils/CreatorDashboardPage.js'
 );
+var DiagnosticTestPage = require('../webdriverio_utils/DiagnosticTestPage.js');
 
 describe('Contributor dashboard page', function() {
   const TOPIC_NAMES = [
@@ -83,6 +84,7 @@ describe('Contributor dashboard page', function() {
     adminPage = new AdminPage.AdminPage();
     contributorDashboardAdminPage = (
       new ContributorDashboardAdminPage.ContributorDashboardAdminPage());
+    diagnosticTestPage = new DiagnosticTestPage.DiagnosticTestPage();
 
     await users.createUser(USER_EMAILS[0], 'user0');
     await users.createUser(USER_EMAILS[1], 'user1');
@@ -117,6 +119,10 @@ describe('Contributor dashboard page', function() {
         elem = await elem.addItem('Unicode');
         await elem.setValue(TOPIC_ID);
       });
+    await browser.url('/classroom-admin/');
+    await waitFor.pageToFullyLoad();
+    await diagnosticTestPage.createNewClassroomConfig('Math', 'math');
+    await diagnosticTestPage.addTopicIdToClassroomConfig(TOPIC_ID, 0);
     await users.logout();
 
     await users.login(QUESTION_ADMIN_EMAIL);
