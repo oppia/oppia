@@ -45,8 +45,9 @@ import {
   CyclicStateTransitionsPlaythroughIssue,
   EarlyQuitPlaythroughIssue,
   MultipleIncorrectSubmissionsPlaythroughIssue,
-  PlaythroughIssue
-} from 'domain/statistics/PlaythroughIssueObjectFactory';
+  PlaythroughIssue,
+  PlaythroughIssueType,
+} from 'domain/statistics/playthrough-issue.model';
 import { ExplorationStats } from
   'domain/statistics/exploration-stats.model';
 import { StateStats } from 'domain/statistics/state-stats-model';
@@ -198,12 +199,13 @@ export class ExplorationImprovementsTaskRegistryService {
       const playthroughIssuesByType = group(
         playthroughIssuesByStateName.get(stateName) || [], p => p.issueType);
       const cstPlaythroughIssues = (
-        playthroughIssuesByType.get('CyclicStateTransitions')
+        playthroughIssuesByType.get(PlaythroughIssueType.CyclicStateTransitions)
       ) as CstPlaythroughIssue[];
-      const eqPlaythroughIssues = (
-        playthroughIssuesByType.get('EarlyQuit') as EqPlaythroughIssue[]);
-      const misPlaythroughIssues = (
-        playthroughIssuesByType.get('MultipleIncorrectSubmissions')
+      const eqPlaythroughIssues = playthroughIssuesByType.get(
+        PlaythroughIssueType.EarlyQuit
+      ) as EqPlaythroughIssue[];
+      const misPlaythroughIssues = playthroughIssuesByType.get(
+        PlaythroughIssueType.MultipleIncorrectSubmissions
       ) as MisPlaythroughIssue[];
 
       this.registerNewStateTasks(
