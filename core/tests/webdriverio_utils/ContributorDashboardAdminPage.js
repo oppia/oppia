@@ -36,6 +36,8 @@ var ContributorDashboardAdminPage = function() {
     '.e2e-test-contribution-rights-form-submit-button');
   var userTranslationReviewerLanguageCss = (
     '.e2e-test-translation-reviewer-language');
+  var userVoiceoverReviewerLanguageCss = (
+    '.e2e-test-voiceover-reviewer-language');
   var userQuestionReviewerCss = '.e2e-test-question-reviewer';
   var userQuestionContributorCss = '.e2e-test-question-contributor';
   var viewContributionRightsMethodInputCss = (
@@ -117,7 +119,11 @@ var ContributorDashboardAdminPage = function() {
 
     if (category === CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION) {
       return $$(userTranslationReviewerLanguageCss);
-    } else if (category === CD_USER_RIGHTS_CATEGORY_REVIEW_QUESTION) {
+    } 
+    else if (category === CD_USER_RIGHTS_CATEGORY_REVIEW_VOICEOVER) {
+      return $$(userVoiceoverReviewerLanguageCss);
+    }
+    else if (category === CD_USER_RIGHTS_CATEGORY_REVIEW_QUESTION) {
       return $(userQuestionReviewerCss);
     } else if (category === CATEGORY_SUBMIT_QUESTION) {
       return $(userQuestionContributorCss);
@@ -163,6 +169,13 @@ var ContributorDashboardAdminPage = function() {
       languageDescription);
   };
 
+  this.assignVoiceoverReviewer = async function(username, languageDescription) {
+    await _assignContributionRights(
+      username,
+      CD_USER_RIGHTS_CATEGORY_REVIEW_VOICEOVER,
+      languageDescription);
+  };
+
   this.assignQuestionReviewer = async function(username) {
     await _assignContributionRights(
       username, CD_USER_RIGHTS_CATEGORY_REVIEW_QUESTION);
@@ -178,6 +191,17 @@ var ContributorDashboardAdminPage = function() {
       username, CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION);
     var languageList = await Promise.all(
       contributionRights.map(function(languageElem) {
+        return languageElem.getText();
+      }));
+    expect(languageList).toContain(languageDescription);
+  };
+
+  this.expectUserToBeVoiceoverReviewer = async function(
+    username, languageDescription) {
+    var contributionRights = await _getUserContributionRightsElement(
+      username, CD_USER_RIGHTS_CATEGORY_REVIEW_VOICEOVER);
+    var languageList = await Promise.all(contributionRights.map(
+      function(languageElem) {
         return languageElem.getText();
       }));
     expect(languageList).toContain(languageDescription);
