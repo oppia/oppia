@@ -400,7 +400,7 @@ describe('Serial Chapter Launch functionality', function() {
   var dummyExplorationIds = [];
   var dummyExplorationInfo = [
     'Dummy exploration', 'Algorithms', 'Learn more about oppia', 'English'];
-  var topicName = 'Topic 1';
+  var topicName = 'Topic 2';
   var topicUrlFragment = 'topic-zero';
   var userEmail = 'creator@serialChapterTest.com';
 
