@@ -390,4 +390,99 @@ describe('oppiaInteractiveItemSelectionInput', function() {
         ['ca_choices_1', 'ca_choices_2']);
     });
   });
+
+  describe('when an exact number of choices are allowed to be selected', () => {
+    beforeEach(() => {
+      component.choicesWithValue = '[' +
+        '{' +
+        '    "html": "choice 1",' +
+        '    "contentId": "ca_choices_1"' +
+        '},' +
+        '{' +
+        '    "html": "choice 2",' +
+        '    "contentId": "ca_choices_2"' +
+        '},' +
+        '{' +
+        '    "html": "choice 3",' +
+        '    "contentId": "ca_choices_3"' +
+        '}' +
+    ']';
+      component.maxAllowableSelectionCountWithValue = '3';
+      component.minAllowableSelectionCountWithValue = '3';
+    });
+
+    it('should initialise component when user adds interaction', () => {
+      spyOn(playerTranscriptService, 'getCard').and.returnValue(displayedCard);
+      component.ngOnInit();
+      expect(component.choices).toEqual([
+        'choice 1', 'choice 2', 'choice 3'
+      ]);
+      expect(component.userSelections).toEqual({
+        'choice 1': false,
+        'choice 2': false,
+        'choice 3': false
+      });
+      expect(component.maxAllowableSelectionCount).toBe(3);
+      expect(component.minAllowableSelectionCount).toBe(3);
+      expect(component.displayCheckboxes).toBeTrue();
+      expect(component.preventAdditionalSelections).toBeFalse();
+      expect(component.notEnoughSelections).toBeFalse();
+      expect(component.exactSelections).toBeTrue();
+    });
+
+    it('should toggle checkbox when user clicks checkbox', () => {
+      spyOn(playerTranscriptService, 'getCard').and.returnValue(displayedCard);
+      spyOn(currentInteractionService, 'updateCurrentAnswer');
+      component.ngOnInit();
+      component.userSelections = {
+        'choice 1': true,
+        'choice 2': false,
+        'choice 3': false
+      };
+      expect(component.selectionCount).toBeUndefined();
+      expect(component.newQuestion).toBeFalse();
+      expect(component.preventAdditionalSelections).toBeFalse();
+      expect(component.notEnoughSelections).toBeFalse();
+      expect(component.exactSelections).toBeTrue();
+
+      component.onToggleCheckbox();
+
+      expect(component.newQuestion).toBe(false);
+      expect(component.selectionCount).toBe(1);
+      // The preventAdditionalSelections is set to true when the
+      // maxAllowableSelectionCount is reached. Therefore we test to
+      // ensure preventAdditionalSelections is false because the count has
+      // not been reached.
+      expect(component.preventAdditionalSelections).toBeFalse();
+      expect(component.notEnoughSelections).toBeFalse();
+      expect(
+        currentInteractionService.updateCurrentAnswer).toHaveBeenCalledOnceWith(
+        ['ca_choices_1']);
+    });
+
+    it('should prevent users from selecting more options when' +
+    ' \'maxAllowableSelectionCount\' has been reached', () => {
+      spyOn(playerTranscriptService, 'getCard').and.returnValue(displayedCard);
+      spyOn(currentInteractionService, 'updateCurrentAnswer');
+      component.ngOnInit();
+      component.userSelections = {
+        'choice 1': true,
+        'choice 2': true,
+        'choice 3': true
+      };
+      expect(component.selectionCount).toBeUndefined();
+      expect(component.preventAdditionalSelections).toBeFalse();
+      expect(component.notEnoughSelections).toBeFalse();
+      expect(component.exactSelections).toBeTrue();
+
+      component.onToggleCheckbox();
+
+      expect(component.selectionCount).toBe(3);
+      expect(component.preventAdditionalSelections).toBeTrue();
+      expect(component.notEnoughSelections).toBeFalse();
+      expect(
+        currentInteractionService.updateCurrentAnswer).toHaveBeenCalledOnceWith(
+        ['ca_choices_1', 'ca_choices_2', 'ca_choices_3']);
+    });
+  });
 });

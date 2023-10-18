@@ -1,6 +1,13 @@
 <div class="item-selection-input-form-container">
   <form>
     <small class="item-selection-info-text" *ngIf="displayCheckboxes">
+      <span *ngIf="exactSelections">
+        <span [innerHTML]="'I18N_INTERACTIONS_ITEM_SELECTION_EXACT' | translate: {
+                    exactChoiceNumber: minAllowableSelectionCount,
+                    messageFormat: true
+        }"></span>
+      </span>
+
       <span *ngIf="notEnoughSelections">
         <span [innerHTML]="'I18N_INTERACTIONS_ITEM_SELECTION_NOT_ENOUGH' | translate: {
                     minChoiceNumber: minAllowableSelectionCount,
@@ -15,7 +22,7 @@
         }"></span>
       </span>
 
-      <span *ngIf="!notEnoughSelections && !preventAdditionalSelections">
+      <span *ngIf="!notEnoughSelections && !preventAdditionalSelections && !exactSelections">
         <span [innerHTML]="'I18N_INTERACTIONS_ITEM_SELECTION_MORE' | translate"></span>
       </span>
     </small>
