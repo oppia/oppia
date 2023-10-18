@@ -166,7 +166,7 @@ run_tests.e2e: ## Runs the e2e tests for the parsed suite
 
 run_e2e_tests_on_ci: ## Runs the e2e tests for the parsed suite on CI
 	export PATH=$(shell cd .. && pwd)/oppia_tools/node-16.13.0/bin:$(PATH);
-	docker compose up dev-server datastore redis elasticsearch firebase -d
+	docker compose up dev-server datastore redis elasticsearch firebase -d --no-deps
 	@printf 'Please wait while the development server starts...\n\n'
 	@while [[ $$(curl -s -o /tmp/status_code.txt -w '%{http_code}' http://localhost:8181) != "200" ]] || [[ $$(curl -s -o /tmp/status_code.txt -w '%{http_code}' http://localhost:8181/community-library) != "200" ]]; do \
 		printf "▓"; \
