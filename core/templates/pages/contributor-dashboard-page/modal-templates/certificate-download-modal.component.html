@@ -37,7 +37,7 @@
     Cancel
   </button>
   <button [disabled]="certificateDownloading || disableDownloadButton() || errorsFound"
-          class="btn btn-success oppia-upload-translated-text-button"
+          class="btn btn-success"
           (click)="downloadCertificate()">
     <i [hidden]="!certificateDownloading" class="fa fa-spinner"></i>
     <span>
