@@ -26,7 +26,7 @@ import {
   CyclicStateTransitionsCustomizationArgs,
   EarlyQuitCustomizationArgs,
   MultipleIncorrectSubmissionsCustomizationArgs
-} from 'domain/statistics/PlaythroughIssueObjectFactory';
+} from 'domain/statistics/playthrough-issue.model';
 import { LearnerAction, LearnerActionModel } from
   'domain/statistics/learner-action.model';
 import { Playthrough, PlaythroughObjectFactory } from

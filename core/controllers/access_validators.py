@@ -21,7 +21,7 @@ from core.constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import blog_services
-from core.domain import classroom_services
+from core.domain import classroom_config_services
 from core.domain import learner_group_services
 from core.domain import user_services
 
@@ -71,7 +71,7 @@ class ClassroomAccessValidationHandler(
         classroom_url_fragment = self.normalized_request[
             'classroom_url_fragment'
         ]
-        classroom = classroom_services.get_classroom_by_url_fragment(
+        classroom = classroom_config_services.get_classroom_by_url_fragment(
             classroom_url_fragment)
 
         if not classroom:
