@@ -1694,3 +1694,25 @@ class LearnerGroupsUserTest(test_utils.GenericTestBase):
                 'user1', ['group_id_1'], [learner_group_user_details], 1),
             'Learner cannot be invited to join learner group group_id_1 since '
             'they are already its learner.')
+
+
+class TranslationCoordinatorStatsUnitTests(
+    test_utils.GenericTestBase
+):
+    """Tests for the TranslationCoordinatorStats class."""
+
+    expected_stats_dict = {
+        'language_id': 'en',
+        'coordinator_ids': ['user1', 'user2'],
+        'coordinators_count': 2
+    }
+
+    def test_to_dict(self) -> None:
+        actual_stats = user_domain.TranslationCoordinatorStats(
+            'en',
+            ['user1', 'user2'],
+            2
+        )
+
+        self.assertDictEqual(
+            actual_stats.to_dict(), self.expected_stats_dict)

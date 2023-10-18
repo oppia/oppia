@@ -40,6 +40,7 @@ var ExplorationEditorPage =
 var ExplorationPlayerPage =
   require('../webdriverio_utils/ExplorationPlayerPage.js');
 var SkillEditorPage = require('../webdriverio_utils/SkillEditorPage.js');
+var DiagnosticTestPage = require('../webdriverio_utils/DiagnosticTestPage.js');
 
 describe('Topic and Story viewer functionality', function() {
   var adminPage = null;
@@ -91,6 +92,7 @@ describe('Topic and Story viewer functionality', function() {
     skillEditorPage = new SkillEditorPage.SkillEditorPage();
     storyEditorPage = new StoryEditorPage.StoryEditorPage();
     subTopicViewerPage = new SubTopicViewerPage.SubTopicViewerPage();
+    diagnosticTestPage = new DiagnosticTestPage.DiagnosticTestPage();
     await users.createAndLoginCurriculumAdminUser(
       'creator@storyViewer.com', 'creatorStoryViewer');
 
@@ -126,6 +128,10 @@ describe('Topic and Story viewer functionality', function() {
         await elem.setValue(topicId);
       });
 
+    await browser.url('/classroom-admin/');
+    await waitFor.pageToFullyLoad();
+    await diagnosticTestPage.createNewClassroomConfig('Math', 'math');
+    await diagnosticTestPage.addTopicIdToClassroomConfig(topicId, 0);
     await topicsAndSkillsDashboardPage.get();
     await topicsAndSkillsDashboardPage.createSkillWithDescriptionAndExplanation(
       'Skill TASV1', 'Concept card explanation', false);

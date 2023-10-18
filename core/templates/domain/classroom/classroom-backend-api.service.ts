@@ -30,7 +30,7 @@ import { CreatorTopicSummaryBackendDict } from
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 
-interface ClassroomDataBackendDict {
+export interface ClassroomDataBackendDict {
   'name': string;
   'topic_summary_dicts': CreatorTopicSummaryBackendDict[];
   'course_details': string;
