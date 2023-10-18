@@ -369,12 +369,14 @@ class ContributionRightsDataHandler(
         user_rights = (
             user_services.get_user_contribution_rights(user_id))
         response: Dict[str, Union[List[str], bool]] = {}
-        if feconf.ROLE_ID_TRANSLATION_ADMIN in self.roles:
+        if (feconf.ROLE_ID_TRANSLATION_ADMIN in self.roles or
+            feconf.ROLE_ID_TRANSLATION_COORDINATOR in self.roles):
             response = {
                 'can_review_translation_for_language_codes': (
                     user_rights.can_review_translation_for_language_codes)
             }
-        if feconf.ROLE_ID_QUESTION_ADMIN in self.roles:
+        if (feconf.ROLE_ID_QUESTION_ADMIN in self.roles or
+            feconf.ROLE_ID_QUESTION_COORDINATOR in self.roles):
             response.update({
                 'can_review_questions': user_rights.can_review_questions,
                 'can_submit_questions': user_rights.can_submit_questions
