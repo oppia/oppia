@@ -401,7 +401,7 @@ describe('Serial Chapter Launch functionality', function() {
   var dummyExplorationInfo = [
     'Dummy exploration', 'Algorithms', 'Learn more about oppia', 'English'];
   var topicName = 'Topic 2';
-  var topicUrlFragment = 'topic-zero';
+  var topicUrlFragment = 'topic-two';
   var userEmail = 'creator@serialChapterTest.com';
 
   var createDummyExplorations = async function(numExplorations) {
