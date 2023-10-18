@@ -13,11 +13,7 @@
 // limitations under the License.
 
 /**
-<<<<<<< HEAD
- * @fileoverview Component for editing user roles.
-=======
  * @fileoverview Component for editing a user's translation contribution rights.
->>>>>>> 23c6fbce44207ad636b2c970ffdce82c05086502
  */
 
 import { Component, OnInit, Input } from '@angular/core';
