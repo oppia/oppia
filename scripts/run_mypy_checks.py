@@ -23,13 +23,12 @@ import os
 import site
 import subprocess
 import sys
-from core import feconf
 
+from core import feconf
 from scripts import common
+from scripts import install_third_party_libs
 
 from typing import Final, List, Optional, Tuple
-
-from scripts import install_third_party_libs
 
 # List of directories whose files won't be type-annotated ever.
 EXCLUDED_DIRECTORIES: Final = [
