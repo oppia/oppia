@@ -199,7 +199,7 @@ jobs:
       #   if: steps.download_artifact_1.outcome == 'failure'
       #   run: python -m scripts.build --prod_env
       - name: Run E2E Test ${{ matrix.suite }}
-        run: sudo xvfb-run -a --server-args="-screen 0, 1285x1000x24" make run_tests.e2e suite=${{ matrix.suite }} prod_env=true
+        run: xvfb-run -a --server-args="-screen 0, 1285x1000x24" make run_e2e_tests_on_ci suite=${{ matrix.suite }} prod_env=true
         env:
           VIDEO_RECORDING_IS_ENABLED: 0
       - name: Uploading webdriverio-video as Artifacts
