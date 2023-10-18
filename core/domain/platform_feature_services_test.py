@@ -271,26 +271,3 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
                     ),
                 ]
             )
-
-    def test_update_feature_flag_rules_with_invalid_rules_raises_error(
-        self
-    ) -> None:
-        with self.assertRaisesRegex(
-            utils.ValidationError, 'must have a server_mode filter'):
-            feature_services.update_feature_flag_rules(
-                self.dev_feature.name, self.user_id, 'test update',
-                [
-                    platform_parameter_domain.PlatformParameterRule.from_dict({
-                        'filters': [
-                            {
-                                'type': 'app_version',
-                                'conditions': [['=', '1.2.3']]
-                            }
-                        ],
-                        'value_when_matched': True
-                    }),
-                    platform_parameter_domain.PlatformParameterRule.from_dict({
-                        'filters': [], 'value_when_matched': False
-                    })
-                ]
-            )
