@@ -22,7 +22,6 @@ import { FormsModule } from '@angular/forms';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 
 import { CdAdminQuestionRoleEditorModal } from './cd-admin-question-role-editor-modal.component';
-import { LoadingDotsComponent } from '../../../components/common-layout-directives/common-elements/loading-dots.component';
 
 describe('CdAdminQuestionRoleEditorModal', () => {
   let component: CdAdminQuestionRoleEditorModal;
@@ -36,8 +35,7 @@ describe('CdAdminQuestionRoleEditorModal', () => {
         HttpClientTestingModule
       ],
       declarations: [
-        CdAdminQuestionRoleEditorModal,
-        LoadingDotsComponent
+        CdAdminQuestionRoleEditorModal
       ],
       providers: [
         NgbActiveModal
@@ -50,21 +48,7 @@ describe('CdAdminQuestionRoleEditorModal', () => {
       CdAdminQuestionRoleEditorModal);
     component = fixture.componentInstance;
     ngbActiveModal = TestBed.get(NgbActiveModal);
-    fixture.detectChanges();
     component.ngOnInit();
-  });
-
-  it('should properly initialize rights', () => {
-    component.rights = {
-      isQuestionSubmitter: true,
-      isQuestionReviewer: false
-    };
-
-    fixture.detectChanges();
-    component.ngOnInit();
-
-    expect(component.rights.isQuestionSubmitter).toBeTrue();
-    expect(component.rights.isQuestionReviewer).toBeFalse();
   });
 
   it('should properly toggle Question Submitter checkbox', () => {
@@ -73,11 +57,13 @@ describe('CdAdminQuestionRoleEditorModal', () => {
       isQuestionReviewer: false
     };
     fixture.detectChanges();
-    component.ngOnInit();
 
     component.toggleQuestionSubmitter();
 
-    expect(component.rights.isQuestionSubmitter).toBeFalse();
+    expect(component.rights).toEqual({
+      isQuestionSubmitter: false,
+      isQuestionReviewer: false
+    });
   });
 
   it('should properly toggle Question reviewer checkbox', () => {
@@ -86,11 +72,13 @@ describe('CdAdminQuestionRoleEditorModal', () => {
       isQuestionReviewer: false
     };
     fixture.detectChanges();
-    component.ngOnInit();
 
     component.toggleQuestionReviewer();
 
-    expect(component.rights.isQuestionSubmitter).toBeTrue();
+    expect(component.rights).toEqual({
+      isQuestionSubmitter: true,
+      isQuestionReviewer: true
+    });
   });
 
   it('should save and close modal and return selected rights', () => {

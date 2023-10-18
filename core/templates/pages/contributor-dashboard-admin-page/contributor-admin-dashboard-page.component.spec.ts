@@ -408,7 +408,7 @@ describe('Contributor dashboard Admin page', () => {
     }));
 
     it('should open question role editor modal and return changed' +
-      'value of question reviewer', fakeAsync(() => {
+      ' value of question reviewer', fakeAsync(() => {
       const removeRightsSpy = spyOn(
         contributorDashboardAdminBackendApiService,
         'removeContributionReviewerAsync');
