@@ -2215,7 +2215,7 @@ def send_email_to_new_cd_user(
     if category not in NEW_CD_USER_EMAIL_DATA:
         raise Exception('Invalid category: %s' % category)
 
-    category_data = (NEW_CD_USER_EMAIL_DATA[category])
+    category_data = NEW_CD_USER_EMAIL_DATA[category]
     email_subject = 'You have been invited to %s Oppia %s' % (
         category_data['task'],
         category_data['category']
