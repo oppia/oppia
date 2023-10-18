@@ -211,8 +211,6 @@ import { ItemSelectionInputValidationService } from
   // eslint-disable-next-line max-len
   'interactions/ItemSelectionInput/directives/item-selection-input-validation.service';
 import { LanguageUtilService } from 'domain/utilities/language-util.service';
-import { LearnerActionObjectFactory } from
-  'domain/statistics/LearnerActionObjectFactory';
 import { LearnerAnswerDetailsBackendApiService } from
   'domain/statistics/learner-answer-details-backend-api.service';
 import { LearnerDashboardBackendApiService } from
@@ -308,8 +306,6 @@ import { PlayerTranscriptService } from
   'pages/exploration-player-page/services/player-transcript.service';
 import { PlaythroughBackendApiService } from
   'domain/statistics/playthrough-backend-api.service';
-import { PlaythroughIssueObjectFactory } from
-  'domain/statistics/PlaythroughIssueObjectFactory';
 import { PlaythroughIssuesBackendApiService } from
   'services/playthrough-issues-backend-api.service';
 import { PlaythroughObjectFactory } from
@@ -558,8 +554,6 @@ export class UpgradedServices {
     upgradedServices['InteractionSpecsService'] = new InteractionSpecsService();
     upgradedServices['ItemSelectionInputRulesService'] =
       new ItemSelectionInputRulesService();
-    upgradedServices['LearnerActionObjectFactory'] =
-      new LearnerActionObjectFactory();
     upgradedServices['LearnerParamsService'] = new LearnerParamsService();
     upgradedServices['LoaderService'] = new LoaderService();
     upgradedServices['LoggerService'] = new LoggerService();
@@ -588,8 +582,6 @@ export class UpgradedServices {
     upgradedServices['ParamTypeObjectFactory'] = new ParamTypeObjectFactory();
     upgradedServices['PlayerCorrectnessFeedbackEnabledService'] =
       new PlayerCorrectnessFeedbackEnabledService();
-    upgradedServices['PlaythroughIssueObjectFactory'] =
-      new PlaythroughIssueObjectFactory();
     upgradedServices['RatingComputationService'] =
       new RatingComputationService();
     upgradedServices['RatioExpressionInputRulesService'] =
@@ -735,8 +727,8 @@ export class UpgradedServices {
         upgradedServices['baseInteractionValidationService']);
     upgradedServices['PlayerTranscriptService'] = new PlayerTranscriptService(
       upgradedServices['LoggerService']);
-    upgradedServices['PlaythroughObjectFactory'] = new PlaythroughObjectFactory(
-      upgradedServices['LearnerActionObjectFactory']);
+    upgradedServices['PlaythroughObjectFactory'] =
+      new PlaythroughObjectFactory();
     upgradedServices['PythonProgramTokenizer'] = new PythonProgramTokenizer(
       upgradedServices['LoggerService']);
     upgradedServices['ResponsesService'] =
@@ -1014,7 +1006,6 @@ export class UpgradedServices {
     upgradedServices['PlaythroughIssuesBackendApiService'] =
       new PlaythroughIssuesBackendApiService(
         upgradedServices['HttpClient'],
-        upgradedServices['PlaythroughIssueObjectFactory'],
         upgradedServices['UrlInterpolationService']);
     upgradedServices['ProfilePageBackendApiService'] =
       new ProfilePageBackendApiService(

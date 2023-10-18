@@ -27,6 +27,9 @@
 </div>
 
 <div class="modal-body">
+  <div *ngIf="status == 'rejected'" class="translation-suggestion-review-message alert alert-danger">
+    <p>See your submitted translation below. Please submit a new translation to address the requested revisions.</p>
+  </div>
   <section class="oppia-suggestion-review-container">
     <div class="oppia-suggestion-review-panel-container float-left">
       <div class="oppia-suggestion-review-panel-header-container">
@@ -201,7 +204,7 @@
       </button>
     </span>
     <span>
-      <button class="btn btn-success oppia-suggestion-resolve-button"
+      <button class="btn btn-success oppia-suggestion-resolve-button e2e-test-translation-accept-button"
               [disabled]="resolvingSuggestion || reviewMessage.length > MAX_REVIEW_MESSAGE_LENGTH"
               *ngIf="reviewable"
               (click)="acceptAndReviewNext()">
