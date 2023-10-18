@@ -644,16 +644,6 @@ class PlatformParameterRule:
             filter_domain.evaluate(context)
             for filter_domain in self._filters)
 
-    def has_server_mode_filter(self) -> bool:
-        """Checks if the rule has a filter with type 'server_mode'.
-
-        Returns:
-            bool. True if the rule has a filter with type 'server_mode'.
-        """
-        return any(
-            filter_domain.type == 'server_mode'
-            for filter_domain in self._filters)
-
     def to_dict(self) -> PlatformParameterRuleDict:
         """Returns a dict representation of the PlatformParameterRule domain
         object.
@@ -844,9 +834,6 @@ class PlatformParameter:
                 raise utils.ValidationError(
                     'Expected %s, received \'%s\' in value_when_matched.' % (
                         self._data_type, rule.value_when_matched))
-            if not rule.has_server_mode_filter():
-                raise utils.ValidationError(
-                    'All rules must have a server_mode filter.')
             rule.validate()
 
         if self._is_feature:

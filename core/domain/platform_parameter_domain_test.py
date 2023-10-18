@@ -1487,30 +1487,6 @@ class PlatformParameterRuleTests(test_utils.GenericTestBase):
         rule = parameter_domain.PlatformParameterRule.from_dict(rule_dict)
         self.assertEqual(rule.to_dict(), rule_dict)
 
-    def test_has_server_mode_filter_with_mode_filter_returns_true(self) -> None:
-        rule = parameter_domain.PlatformParameterRule.from_dict(
-            {
-                'filters': [
-                    {'type': 'server_mode', 'conditions': [['=', 'dev']]}
-                ],
-                'value_when_matched': False,
-            },
-        )
-        self.assertTrue(rule.has_server_mode_filter())
-
-    def test_has_server_mode_filter_without_mode_filter_returns_false(
-        self
-    ) -> None:
-        rule = parameter_domain.PlatformParameterRule.from_dict(
-            {
-                'filters': [
-                    {'type': 'app_version', 'conditions': [['=', '1.2.3']]}
-                ],
-                'value_when_matched': False,
-            },
-        )
-        self.assertFalse(rule.has_server_mode_filter())
-
     def test_evaluation_with_matching_context_returns_true(self) -> None:
         rule = parameter_domain.PlatformParameterRule.from_dict(
             {
@@ -2057,29 +2033,6 @@ class PlatformParameterTests(test_utils.GenericTestBase):
         })
         with self.assertRaisesRegex(
             utils.ValidationError, 'Invalid feature stage, got \'Invalid\''):
-            parameter.validate()
-
-    def test_validate_feature_with_no_mode_filter_raises_exception(
-        self
-    ) -> None:
-        parameter = parameter_domain.PlatformParameter.from_dict({
-            'name': 'parameter_a',
-            'description': 'for test',
-            'data_type': 'bool',
-            'rules': [
-                {
-                    'filters': [],
-                    'value_when_matched': True
-                }
-            ],
-            'rule_schema_version': (
-                feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION),
-            'default_value': False,
-            'is_feature': True,
-            'feature_stage': 'dev',
-        })
-        with self.assertRaisesRegex(
-            utils.ValidationError, 'must have a server_mode filter'):
             parameter.validate()
 
     def test_validate_dev_feature_for_test_env_raises_exception(self) -> None:
