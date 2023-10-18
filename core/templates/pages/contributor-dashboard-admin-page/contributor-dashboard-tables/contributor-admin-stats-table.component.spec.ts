@@ -32,19 +32,6 @@ describe('Contributor stats component', () => {
   let contributorDashboardAdminStatsBackendApiService: (
     ContributorDashboardAdminStatsBackendApiService);
 
-  const TranslationReviewerStats = {
-    contributorName: 'string',
-    languageCode: 'string',
-    topicsWithTranslationReviews: ['string'],
-    reviewedTranslationsCount: 1,
-    acceptedTranslationsCount: 1,
-    acceptedTranslationsWithReviewerEditsCount: 1,
-    acceptedTranslationWordCount: 1,
-    rejectedTranslationsCount: 1,
-    firstContributionDate: 'string',
-    lastContributedInDays: 1
-  };
-
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [
@@ -130,7 +117,7 @@ describe('Contributor stats component', () => {
         contributorDashboardAdminStatsBackendApiService,
         'fetchContributorAdminStats')
         .and.returnValue(Promise.resolve({
-          stats: [TranslationReviewerStats],
+          stats: [],
           nextOffset: 1,
           more: false
         } as TranslationReviewerStatsData));
@@ -244,6 +231,7 @@ describe('Contributor stats component', () => {
         'overallAccuracy',
         'submittedTranslationsCount',
         'lastContributedInDays',
+        'role',
         'chevron'
       ]);
     }));
@@ -265,6 +253,7 @@ describe('Contributor stats component', () => {
         'contributorName',
         'reviewedTranslationsCount',
         'lastContributedInDays',
+        'role',
         'chevron'
       ]);
     }));
@@ -288,6 +277,7 @@ describe('Contributor stats component', () => {
         'overallAccuracy',
         'submittedQuestionsCount',
         'lastContributedInDays',
+        'role',
         'chevron'
       ]);
     }));
@@ -309,6 +299,7 @@ describe('Contributor stats component', () => {
         'contributorName',
         'reviewedQuestionsCount',
         'lastContributedInDays',
+        'role',
         'chevron'
       ]);
 
