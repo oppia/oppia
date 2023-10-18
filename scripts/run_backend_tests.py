@@ -478,8 +478,7 @@ def main(args: Optional[List[str]] = None) -> None:
     parsed_args = _PARSER.parse_args(args=args)
 
     for directory in common.DIRS_TO_ADD_TO_SYS_PATH:
-        if (not os.path.exists(os.path.dirname(directory))
-            and not feconf.OPPIA_IS_DOCKERIZED):
+        if (not os.path.exists(os.path.dirname(directory))):
             raise Exception('Directory %s does not exist.' % directory)
 
         # The directories should only be inserted starting at index 1. See

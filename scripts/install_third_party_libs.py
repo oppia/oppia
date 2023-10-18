@@ -169,6 +169,7 @@ def compile_protobuf_files(proto_files_paths: List[str]) -> None:
 
 def main() -> None:
     """Install third-party libraries for Oppia."""
+    return
     if feconf.OPPIA_IS_DOCKERIZED:
         return
 
