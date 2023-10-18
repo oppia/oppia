@@ -2050,14 +2050,14 @@ def send_mail_to_notify_contributor_ranking_achievement(
                     language,
                     feconf.OPPIA_SITE_URL,
                     feconf.CONTRIBUTOR_DASHBOARD_URL
-                )
+            )
         else:
             email_body = email_template['email_body_template'] % (
                     recipient_username,
                     contributor_ranking_email_info.rank_name,
                     feconf.OPPIA_SITE_URL,
                     feconf.CONTRIBUTOR_DASHBOARD_URL
-                )
+            )
 
         _send_email(
             contributor_ranking_email_info.contributor_user_id,
@@ -2213,20 +2213,17 @@ def send_email_to_new_cd_user(
             category is 'translation'.
     """
     if category not in NEW_CD_USER_EMAIL_DATA:
-        raise Exception(
-            'Invalid category: %s' % category
-            )
+        raise Exception('Invalid category: %s' % category)
 
-    category_data = (
-        NEW_CD_USER_EMAIL_DATA[category])
+    category_data = (NEW_CD_USER_EMAIL_DATA[category])
     email_subject = 'You have been invited to %s Oppia %s' % (
-                    category_data['task'],
-                    category_data['category']
-                    )
+        category_data['task'],
+        category_data['category']
+    )
 
     if category in [
             constants.CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION,
-        ]:
+    ]:
         if language_code is None:
             raise Exception(
                 'The language_code cannot be None if the review category is'
@@ -2255,7 +2252,7 @@ def send_email_to_new_cd_user(
     if category in [
             constants.CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION,
             constants.CD_USER_RIGHTS_CATEGORY_REVIEW_QUESTION
-        ]:
+    ]:
         to_review = category_data['to_review']
         email_body_template = (
             'Hi %s,<br><br>'
@@ -2272,8 +2269,8 @@ def send_email_to_new_cd_user(
             rights_message, to_review)
 
     elif category in [
-                constants.CD_USER_RIGHTS_CATEGORY_SUBMIT_QUESTION
-                ]:
+        constants.CD_USER_RIGHTS_CATEGORY_SUBMIT_QUESTION
+    ]:
         email_body_template = (
             'Hi %s,<br><br>'
             'This is to let you know that the Oppia team has added you as a '
@@ -2320,9 +2317,7 @@ def send_email_to_removed_cd_user(
             'translation'.
     """
     if category not in REMOVED_CD_USER_EMAIL_DATA:
-        raise Exception(
-            'Invalid category: %s' % category
-            )
+        raise Exception('Invalid category: %s' % category)
 
     category_data = (
         REMOVED_CD_USER_EMAIL_DATA[category])
@@ -2336,7 +2331,7 @@ def send_email_to_removed_cd_user(
 
     if category in [
             constants.CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION,
-        ]:
+    ]:
         if language_code is None:
             raise Exception(
                 'The language_code cannot be None if the review category is'
