@@ -940,9 +940,8 @@ class I18nDictsTests(test_utils.GenericTestBase):
         return sorted(result)
 
     def test_i18n_keys_format(self) -> None:
-        """Tests that the keys are correctly formatted.
-        """
-        valid_key_pattern = re.compile(r'^I18N_[0-9A-Za-z-_]+$')
+        """Tests that the keys are correctly formatted."""
+        valid_key_pattern = re.compile(r'^I18N_[0-9A-Za-z-_&/]+$')
         key_list = self._extract_keys_from_json_file('en.json')
         for key in key_list:
             self.assertTrue((valid_key_pattern.match(key)), key)
