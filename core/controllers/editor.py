@@ -214,7 +214,31 @@ class ExplorationHandler(
                     apply_draft=apply_draft if apply_draft is not None else False,
                     version=version)
             else:
-                empty_dict: Dict[str, Any] = {}
+                exploration_data = {
+                    'exploration_id': None,
+                    'title': None,
+                    'category': None,
+                    'objective': None,
+                    'language_code': None,
+                    'tags': None,
+                    'init_state_name': None,
+                    'states': None,
+                    'param_specs': None,
+                    'param_changes': None,
+                    'version': None,
+                    'auto_tts_enabled': None,
+                    'correctness_feedback_enabled': None,
+                    'edits_allowed': None,
+                    'draft_change_list_id': None,
+                    'rights': None,
+                    'show_state_editor_tutorial_on_load': False,
+                    'show_state_translation_tutorial_on_load': False,
+                    'is_version_of_draft_valid': False,
+                    'draft_changes': None,
+                    'email_preferences': None,
+                    'next_content_id_index': None,
+                    'exploration_metadata': None
+                }
             exploration_data['show_state_editor_tutorial_on_load'] = bool(
                 self.user_id and not has_seen_editor_tutorial)
             exploration_data['show_state_translation_tutorial_on_load'] = bool(
