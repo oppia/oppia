@@ -19,6 +19,7 @@
 var general = require('../webdriverio_utils/general.js');
 var users = require('../webdriverio_utils/users.js');
 var workflow = require('../webdriverio_utils/workflow.js');
+var waitFor = require('../webdriverio_utils/waitFor.js');
 
 var TopicsAndSkillsDashboardPage =
   require('../webdriverio_utils/TopicsAndSkillsDashboardPage.js');
@@ -39,6 +40,7 @@ var ExplorationEditorPage =
   require('../webdriverio_utils/ExplorationEditorPage.js');
 var Constants = require('../webdriverio_utils/WebdriverioConstants.js');
 var SkillEditorPage = require('../webdriverio_utils/SkillEditorPage.js');
+var DiagnosticTestPage = require('../webdriverio_utils/DiagnosticTestPage.js');
 
 describe('Learner dashboard functionality', function() {
   var explorationPlayerPage = null;
@@ -90,6 +92,7 @@ describe('Learner dashboard functionality', function() {
     explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
     subscriptionDashboardPage =
       new SubscriptionDashboardPage.SubscriptionDashboardPage();
+    diagnosticTestPage = new DiagnosticTestPage.DiagnosticTestPage();
   });
 
   it('should display learners subscriptions', async function() {
@@ -231,6 +234,10 @@ describe('Learner dashboard functionality', function() {
         elem = await elem.addItem('Unicode');
         await elem.setValue(topicId);
       });
+    await browser.url('/classroom-admin/');
+    await waitFor.pageToFullyLoad();
+    await diagnosticTestPage.createNewClassroomConfig('Math', 'math');
+    await diagnosticTestPage.addTopicIdToClassroomConfig(topicId, 0);
     await topicsAndSkillsDashboardPage.get();
     await topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(1);
     (
@@ -319,6 +326,9 @@ describe('Learner dashboard functionality', function() {
         elem = await elem.addItem('Unicode');
         await elem.setValue(topicId);
       });
+    await browser.url('/classroom-admin/');
+    await waitFor.pageToFullyLoad();
+    await diagnosticTestPage.addTopicIdToClassroomConfig(topicId, 0);
 
     await topicsAndSkillsDashboardPage.get();
     await topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(2);
