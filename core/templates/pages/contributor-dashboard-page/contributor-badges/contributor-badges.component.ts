@@ -108,7 +108,7 @@ export class ContributorBadgesComponent {
       .contributionAndReviewStatsService.fetchAllStats(username);
 
     if (allContributionStats.translation_review_stats.length > 0) {
-      await allContributionStats.translation_review_stats.map((stat) => {
+      allContributionStats.translation_review_stats.forEach((stat) => {
         const languageDescription =
           this.languageUtilService.getAudioLanguageDescription(
             stat.language_code);
@@ -133,7 +133,7 @@ export class ContributorBadgesComponent {
       this.userCanReviewQuestionSuggestions);
 
     if (allContributionStats.translation_contribution_stats.length > 0) {
-      await allContributionStats.translation_contribution_stats.map((stat) => {
+      allContributionStats.translation_contribution_stats.forEach((stat) => {
         const languageDescription =
           this.languageUtilService.getAudioLanguageDescription(
             stat.language_code);
@@ -156,7 +156,7 @@ export class ContributorBadgesComponent {
       });
     }
     if (allContributionStats.translation_review_stats.length > 0) {
-      await allContributionStats.translation_review_stats.map((stat) => {
+      allContributionStats.translation_review_stats.forEach((stat) => {
         const languageDescription =
           this.languageUtilService.getAudioLanguageDescription(
             stat.language_code);
