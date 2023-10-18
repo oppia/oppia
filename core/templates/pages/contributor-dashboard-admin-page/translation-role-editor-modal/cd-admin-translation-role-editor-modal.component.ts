@@ -13,7 +13,11 @@
 // limitations under the License.
 
 /**
+<<<<<<< HEAD
  * @fileoverview Component for editing user roles.
+=======
+ * @fileoverview Component for editing a user's translation contribution rights.
+>>>>>>> 23c6fbce44207ad636b2c970ffdce82c05086502
  */
 
 import { Component, OnInit, Input } from '@angular/core';
@@ -38,7 +42,7 @@ export class CdAdminTranslationRoleEditorModal implements OnInit {
   // Set to null when there is no language left in the list of languages to be
   // updated. If this value is null, it also means that the 'Add' button
   // should be disabled.
-  newLanguageId: string | null = null;
+  selectedLanguageId: string | null = null;
   languageIdInUpdate: string | null = null;
   languageIdsForSelection: string[] = [];
 
@@ -49,25 +53,25 @@ export class CdAdminTranslationRoleEditorModal implements OnInit {
     private alertsService: AlertsService
   ) {}
 
-  private updatelanguageIdsForSelection(): void {
+  private updateLanguageIdsForSelection(): void {
     this.languageIdsForSelection = Object.keys(this.languageIdToName).filter(
       languageId => !this.assignedLanguageIds.includes(languageId));
-    this.newLanguageId = this.languageIdsForSelection[0];
+    this.selectedLanguageId = this.languageIdsForSelection[0];
   }
 
   addLanguage(): void {
-    if (this.newLanguageId === null) {
-      throw new Error('Expected newLanguageId to be non-null.');
+    if (this.selectedLanguageId === null) {
+      throw new Error('Expected selectedLanguageId to be non-null.');
     }
-    this.assignedLanguageIds.push(this.newLanguageId);
-    this.languageIdInUpdate = this.newLanguageId;
-    this.newLanguageId = null;
+    this.assignedLanguageIds.push(this.selectedLanguageId);
+    this.languageIdInUpdate = this.selectedLanguageId;
+    this.selectedLanguageId = null;
     this.contributorDashboardAdminBackendApiService
       .addContributionReviewerAsync(
         constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION,
         this.username, this.languageIdInUpdate).then(()=> {
         this.languageIdInUpdate = null;
-        this.updatelanguageIdsForSelection();
+        this.updateLanguageIdsForSelection();
       }, errorMessage => {
         if (this.languageIdInUpdate !== null) {
           let languageIdIndex = this.assignedLanguageIds.indexOf(
@@ -90,7 +94,7 @@ export class CdAdminTranslationRoleEditorModal implements OnInit {
         languageIdToRemove).then(() => {
         this.assignedLanguageIds.splice(languageIdIndex, 1);
         this.languageIdInUpdate = null;
-        this.updatelanguageIdsForSelection();
+        this.updateLanguageIdsForSelection();
       }, errorMessage => {
         this.alertsService.addWarning(
           errorMessage || 'Error communicating with server.');
@@ -102,6 +106,6 @@ export class CdAdminTranslationRoleEditorModal implements OnInit {
   }
 
   ngOnInit(): void {
-    this.updatelanguageIdsForSelection();
+    this.updateLanguageIdsForSelection();
   }
 }

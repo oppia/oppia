@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Component for editing user roles.
+ * @fileoverview Component for looking up a user by username.
  */
 
 import { Component, OnInit, Input } from '@angular/core';

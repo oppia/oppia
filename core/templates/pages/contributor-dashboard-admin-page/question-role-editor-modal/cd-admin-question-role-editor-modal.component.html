@@ -90,19 +90,13 @@
   }
 </style>
 <div class="question-role-editor-main-container">
-  <div *ngIf="loadingMessage" class="loading-message e2e-test-loading-message">
-    <div class="oppia-align-center">
-      <span>{{ loadingMessage }}</span>
-      <loading-dots></loading-dots>
-    </div>
-  </div>
-  <div *ngIf="!loadingMessage">
+  <div>
     <div class="title-container">Edit roles for user {{username}}</div>
     <div class="sub-heading-container">User Role</div>
     <div class="attribute-container">
       <span (click)="toggleQuestionSubmitter()" (keydown.space)="toggleQuestionSubmitter()" tabindex="0">
-        <i *ngIf="!isQuestionSubmitter" class="material-icons md-18 question-submitter-role-checkbox">&#xE835;</i>
-        <i *ngIf="isQuestionSubmitter" class="material-icons md-18 question-submitter-role-checkbox">&#xE834;</i>
+        <i *ngIf="!rights.isQuestionSubmitter" class="material-icons md-18 question-submitter-role-checkbox">&#xE835;</i>
+        <i *ngIf="rights.isQuestionSubmitter" class="material-icons md-18 question-submitter-role-checkbox">&#xE834;</i>
       </span>
       <div class="label-container">
         <div class="label">Question Submitter</div>
@@ -111,8 +105,8 @@
     </div>
     <div class="attribute-container">
       <span (click)="toggleQuestionReviewer()" (keydown.space)="toggleQuestionReviewer()" tabindex="0">
-        <i *ngIf="!isQuestionReviewer" class="material-icons md-18 question-submitter-role-checkbox">&#xE835;</i>
-        <i *ngIf="isQuestionReviewer" class="material-icons md-18 question-submitter-role-checkbox">&#xE834;</i>
+        <i *ngIf="!rights.isQuestionReviewer" class="material-icons md-18 question-submitter-role-checkbox">&#xE835;</i>
+        <i *ngIf="rights.isQuestionReviewer" class="material-icons md-18 question-submitter-role-checkbox">&#xE834;</i>
       </span>
       <div class="label-container">
         <div class="label">Question Reviewer</div>
