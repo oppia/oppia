@@ -38,6 +38,7 @@ export class VolunteerPageComponent implements OnInit, OnDestroy {
   directiveSubscriptions = new Subscription();
   bannerImgPath = '';
   footerImgPath = '';
+  mobBannerImgPath = '';
   art!: {
     images: string[];
     caption: {
@@ -95,6 +96,7 @@ export class VolunteerPageComponent implements OnInit, OnDestroy {
     );
     this.bannerImgPath = '/volunteer/banner-background.png';
     this.footerImgPath = '/volunteer/footer-background.png';
+    this.mobBannerImgPath = '/volunteer/mob-banner-background.png';
 
     this.art = {
       images: [
