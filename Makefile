@@ -164,27 +164,6 @@ run_tests.e2e: ## Runs the e2e tests for the parsed suite
 	@echo '------------------------------------------------------'
 	$(MAKE) stop
 
-run_e2e_tests_on_ci: ## Runs the e2e tests for the parsed suite on CI
-	export PATH=$(shell cd .. && pwd)/oppia_tools/node-16.13.0/bin:$(PATH);
-	docker compose up dev-server datastore redis elasticsearch firebase -d --no-deps
-	@printf 'Please wait while the development server starts...\n\n'
-	@while [[ $$(curl -s -o /tmp/status_code.txt -w '%{http_code}' http://localhost:8181) != "200" ]] || [[ $$(curl -s -o /tmp/status_code.txt -w '%{http_code}' http://localhost:8181/community-library) != "200" ]]; do \
-		printf "▓"; \
-		if [[ "$(prod_env)" = 'true' ]] && [[ -n $$(docker ps -q -f status=exited -f name=webpack-compiler) ]]; then \
-			${SHELL_PREFIX} dev-server python -m scripts.generate_build_directory; \
-		fi; \
-		sleep 1; \
-	done
-	@printf '\n\n'
-	@echo '------------------------------------------------------'
-	@echo '  Starting e2e test for the suite: $(suite)'
-	@echo '------------------------------------------------------'
-	../oppia_tools/node-16.13.0/bin/npx wdio ./core/tests/wdio.conf.js --suite $(suite) $(CHROME_VERSION) --params.devMode=True --capabilities[0].maxInstances=3
-	@echo '------------------------------------------------------'
-	@echo '  e2e test has been executed successfully....'
-	@echo '------------------------------------------------------'
-	$(MAKE) stop
-
 OS_NAME := $(shell uname)
 
 install_node: ## Installs node-16.13.0 in the oppia_tools directory

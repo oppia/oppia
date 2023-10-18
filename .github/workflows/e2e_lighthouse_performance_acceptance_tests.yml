@@ -42,6 +42,7 @@ jobs:
         run: python -m scripts.install_chrome_for_ci
       - name: Install ffmpeg
         run: sudo apt install ffmpeg
+        # Deleting ubuntu files for getting more space (refer: https://github.com/actions/runner-images/issues/2840#issuecomment-1284059930)
       - name: Deleting ubuntu files
         run: |
           sudo rm -rf /usr/share/dotnet
@@ -179,6 +180,7 @@ jobs:
         run: python -m scripts.install_chrome_for_ci
       - name: Install ffmpeg
         run: sudo apt install ffmpeg
+        # Deleting ubuntu files for getting more space (refer: https://github.com/actions/runner-images/issues/2840#issuecomment-1284059930)
       - name: Deleting ubuntu files
         run: |
           sudo rm -rf /usr/share/dotnet
@@ -199,7 +201,12 @@ jobs:
       #   if: steps.download_artifact_1.outcome == 'failure'
       #   run: python -m scripts.build --prod_env
       - name: Run E2E Test ${{ matrix.suite }}
-        run: xvfb-run -a --server-args="-screen 0, 1285x1000x24" make run_e2e_tests_on_ci suite=${{ matrix.suite }} prod_env=true
+        # run: xvfb-run -a --server-args="-screen 0, 1285x1000x24" make run_e2e_tests_on_ci suite=${{ matrix.suite }} prod_env=true
+        run: |
+          sudo make clean
+          sudo make run-devserver
+          make stop
+          sudo xvfb-run -a --server-args="-screen 0, 1285x1000x24" make run_tests.e2e suite=${{ matrix.suite }} prod_env=true
         env:
           VIDEO_RECORDING_IS_ENABLED: 0
       - name: Uploading webdriverio-video as Artifacts
